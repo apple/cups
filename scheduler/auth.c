@@ -93,11 +93,24 @@ static void		to64(char *s, unsigned long v, int n);
 
 
 /*
+ * Local structures...
+ */
+
+#if HAVE_LIBPAM
+typedef struct cupsd_authdata_s		/**** Authentication data ****/
+{
+  char	username[33],			/* Username string */
+	password[33];			/* Password string */
+} cupsd_authdata_t;
+#endif /* HAVE_LIBPAM */
+
+
+/*
  * Local globals...
  */
 
 #if defined(__hpux) && defined(HAVE_LIBPAM)
-static cupsd_client_t	*auth_client;	/* Current client being authenticated */
+static cupsd_authdata_t	*auth_datat;	/* Current client being authenticated */
 #endif /* __hpux && HAVE_LIBPAM */
 
 
@@ -273,6 +286,471 @@ cupsdAllowIP(cupsd_location_t *loc,	/* I - Location to add to */
   temp->type = AUTH_IP;
   memcpy(temp->mask.ip.address, address, sizeof(temp->mask.ip.address));
   memcpy(temp->mask.ip.netmask, netmask, sizeof(temp->mask.ip.netmask));
+}
+
+
+/*
+ * 'cupsdAuthorize()' - Validate any authorization credentials.
+ */
+
+void
+cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
+{
+  int		type;			/* Authentication type */
+  char		*authorization,		/* Pointer into Authorization string */
+		*ptr,			/* Pointer into string */
+		username[65],		/* Username string */
+		password[33];		/* Password string */
+  const char	*localuser;		/* Certificate username */
+  char		nonce[HTTP_MAX_VALUE],	/* Nonce value from client */
+		md5[33],		/* MD5 password */
+		basicmd5[33];		/* MD5 of Basic password */
+  static const char * const states[] =	/* HTTP client states... */
+		{
+		  "WAITING",
+		  "OPTIONS",
+		  "GET",
+		  "GET",
+		  "HEAD",
+		  "POST",
+		  "POST",
+		  "POST",
+		  "PUT",
+		  "PUT",
+		  "DELETE",
+		  "TRACE",
+		  "CLOSE",
+		  "STATUS"
+		};
+
+
+ /*
+  * Locate the best matching location so we know what kind of
+  * authentication to expect...
+  */
+
+  con->best = cupsdFindBest(con->uri, con->http.state);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdAuthorize: con->uri=\"%s\", con->best=%p(%s)",
+                  con->uri, con->best, con->best ? con->best->location : "");
+
+  if (con->best && con->best->type != AUTH_NONE)
+    type = con->best->type;
+  else
+    type = DefaultAuthType;
+
+ /*
+  * Decode the Authorization string...
+  */
+
+  authorization = con->http.fields[HTTP_FIELD_AUTHORIZATION];
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAuthorize: Authorization=\"%s\"",
+                  authorization);
+
+  username[0] = '\0';
+  password[0] = '\0';
+
+  if (type == AUTH_NONE)
+  {
+   /*
+    * No authorization required, return early...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAuthorize: No authentication required.");
+    return;
+  }
+  else if (!*authorization)
+  {
+   /*
+    * No authorization data provided, return early...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAuthorize: No authentication data provided.");
+    return;
+  }
+  else if (!strncmp(authorization, "Local", 5) &&
+           !strcasecmp(con->http.hostname, "localhost"))
+  {
+   /*
+    * Get Local certificate authentication data...
+    */
+
+    authorization += 5;
+    while (isspace(*authorization))
+      authorization ++;
+
+    if ((localuser = cupsdFindCert(authorization)) != NULL)
+      strlcpy(username, localuser, sizeof(username));
+    else
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdAuthorize: Local authentication certificate not "
+		      "found!");
+      return;
+    }
+  }
+  else if (!strncmp(authorization, "Basic", 5) &&
+           (type == AUTH_BASIC || type == AUTH_BASICDIGEST))
+  {
+   /*
+    * Get the Basic authentication data...
+    */
+
+    authorization += 5;
+    while (isspace(*authorization))
+      authorization ++;
+
+    httpDecode64(username, authorization);
+
+   /*
+    * Pull the username and password out...
+    */
+
+    if ((ptr = strchr(username, ':')) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdAuthorize: Missing Basic password!");
+      return;
+    }
+
+    *ptr++ = '\0';
+
+    if (!username[0])
+    {
+     /*
+      * Username must not be empty...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdAuthorize: Empty Basic username!");
+      return;
+    }
+
+    if (!*ptr)
+    {
+     /*
+      * Password must not be empty...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdAuthorize: Empty Basic password!");
+      return;
+    }
+
+    strlcpy(password, ptr, sizeof(password));
+
+   /*
+    * Validate the username and password...
+    */
+
+    switch (type)
+    {
+      case AUTH_BASIC :
+          {
+#if HAVE_LIBPAM
+	   /*
+	    * Only use PAM to do authentication.  This supports MD5
+	    * passwords, among other things...
+	    */
+
+	    pam_handle_t	*pamh;	/* PAM authentication handle */
+	    int			pamerr;	/* PAM error code */
+	    struct pam_conv	pamdata;/* PAM conversation data */
+	    cupsd_authdata_t	data;	/* Authentication data */
+
+
+            strlcpy(data.username, username, sizeof(data.username));
+	    strlcpy(data.password, password, sizeof(data.password));
+
+	    pamdata.conv        = pam_func;
+	    pamdata.appdata_ptr = &data;
+
+#  ifdef __hpux
+	   /*
+	    * Workaround for HP-UX bug in pam_unix; see pam_func() below for
+	    * more info...
+	    */
+
+	    auth_data = &data;
+#  endif /* __hpux */
+
+	    pamerr = pam_start("cups", username, &pamdata, &pamh);
+	    if (pamerr != PAM_SUCCESS)
+	    {
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "cupsdAuthorize: pam_start() returned %d (%s)!\n",
+        	              pamerr, pam_strerror(pamh, pamerr));
+	      pam_end(pamh, 0);
+	      return;
+	    }
+
+	    pamerr = pam_authenticate(pamh, PAM_SILENT);
+	    if (pamerr != PAM_SUCCESS)
+	    {
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "cupsdAuthorize: pam_authenticate() returned %d "
+			      "(%s)!\n",
+        	              pamerr, pam_strerror(pamh, pamerr));
+	      pam_end(pamh, 0);
+	      return;
+	    }
+
+	    pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
+	    if (pamerr != PAM_SUCCESS)
+	    {
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "cupsdAuthorize: pam_acct_mgmt() returned %d "
+			      "(%s)!\n",
+        	              pamerr, pam_strerror(pamh, pamerr));
+	      pam_end(pamh, 0);
+	      return;
+	    }
+
+	    pam_end(pamh, PAM_SUCCESS);
+
+#elif defined(HAVE_USERSEC_H)
+	   /*
+	    * Use AIX authentication interface...
+	    */
+
+	    char	*authmsg;	/* Authentication message */
+	    char	*loginmsg;	/* Login message */
+	    int		reenter;	/* ??? */
+
+
+	    cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                    "cupsdAuthorize: AIX authenticate of username \"%s\"",
+                            username);
+
+	    reenter = 1;
+	    if (authenticate(username, password, &reenter, &authmsg) != 0)
+	    {
+	      cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                      "cupsdAuthorize: Unable to authenticate username "
+			      "\"%s\": %s",
+	                      username, strerror(errno));
+	      return;
+	    }
+
+#else
+           /*
+	    * Use normal UNIX password file-based authentication...
+	    */
+
+            char		*pass;	/* Encrypted password */
+            struct passwd	*pw;	/* User password data */
+#  ifdef HAVE_SHADOW_H
+            struct spwd		*spw;	/* Shadow password data */
+#  endif /* HAVE_SHADOW_H */
+
+
+	    pw = getpwnam(username);	/* Get the current password */
+	    endpwent();			/* Close the password file */
+
+	    if (!pw)
+	    {
+	     /*
+	      * No such user...
+	      */
+
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "cupsdAuthorize: Unknown username \"%s\"!",
+        	              username);
+	      return (HTTP_UNAUTHORIZED);
+	    }
+
+#  ifdef HAVE_SHADOW_H
+	    spw = getspnam(username);
+	    endspent();
+
+	    if (!spw && !strcmp(pw->pw_passwd, "x"))
+	    {
+	     /*
+	      * Don't allow blank passwords!
+	      */
+
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "cupsdAuthorize: Username \"%s\" has no shadow "
+			      "password!", username);
+	      return;
+	    }
+
+	    if (spw && !spw->sp_pwdp[0] && !pw->pw_passwd[0])
+#  else
+	    if (!pw->pw_passwd[0])
+#  endif /* HAVE_SHADOW_H */
+	    {
+	     /*
+	      * Don't allow blank passwords!
+	      */
+
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "cupsdAuthorize: Username \"%s\" has no password!",
+        	              username);
+	      return;
+	    }
+
+	   /*
+	    * OK, the password isn't blank, so compare with what came from the
+	    * client...
+	    */
+
+	    pass = cups_crypt(password, pw->pw_passwd);
+
+	    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                    "cupsdAuthorize: pw_passwd=\"%s\", crypt=\"%s\"",
+		            pw->pw_passwd, pass);
+
+	    if (!pass || strcmp(pw->pw_passwd, pass))
+	    {
+#  ifdef HAVE_SHADOW_H
+	      if (spw)
+	      {
+		pass = cups_crypt(password, spw->sp_pwdp);
+
+		cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                	"cupsdAuthorize: sp_pwdp=\"%s\", crypt=\"%s\"",
+				spw->sp_pwdp, pass);
+
+		if (pass == NULL || strcmp(spw->sp_pwdp, pass))
+		{
+	          cupsdLogMessage(CUPSD_LOG_ERROR,
+		                  "cupsdAuthorize: Authentication failed for "
+				  "user \"%s\"!",
+				  username);
+		  return;
+        	}
+	      }
+	      else
+#  endif /* HAVE_SHADOW_H */
+	      {
+		cupsdLogMessage(CUPSD_LOG_ERROR,
+		        	"cupsdAuthorize: Authentication failed for "
+				"user \"%s\"!",
+				username);
+		return;
+              }
+	    }
+#endif /* HAVE_LIBPAM */
+          }
+          break;
+
+      case AUTH_BASICDIGEST :
+         /*
+	  * Do Basic authentication with the Digest password file...
+	  */
+
+	  if (!cupsdGetMD5Passwd(username, NULL, md5))
+	  {
+            cupsdLogMessage(CUPSD_LOG_ERROR,
+	                    "cupsdAuthorize: Unknown MD5 username \"%s\"!",
+	                    username);
+            return;
+	  }
+
+	  httpMD5(username, "CUPS", password, basicmd5);
+
+	  if (strcmp(md5, basicmd5))
+	  {
+            cupsdLogMessage(CUPSD_LOG_ERROR,
+	                    "cupsdAuthorize: Authentication failed for \"%s\"!",
+	                    username);
+            return;
+	  }
+	  break;
+    }
+  }
+  else if (!strncmp(authorization, "Digest", 6) && type == AUTH_DIGEST)
+  {
+   /*
+    * Get the username, password, and nonce from the Digest attributes...
+    */
+
+    if (!httpGetSubField2(&(con->http), HTTP_FIELD_AUTHORIZATION, "username",
+                          username, sizeof(username)) || !username[0])
+    {
+     /*
+      * Username must not be empty...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdAuthorize: Empty or missing Digest username!");
+      return;
+    }
+
+    if (!httpGetSubField2(&(con->http), HTTP_FIELD_AUTHORIZATION, "response",
+                          password, sizeof(password)) || !password[0])
+    {
+     /*
+      * Password must not be empty...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdAuthorize: Empty or missing Digest password!");
+      return;
+    }
+
+    if (!httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "nonce",
+                         nonce))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+	              "cupsdAuthorize: No nonce value for Digest "
+		      "authentication!");
+      return;
+    }
+
+    if (strcmp(con->http.hostname, nonce))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+	              "cupsdAuthorize: Bad nonce value, expected \"%s\", "
+		      "got \"%s\"!", con->http.hostname, nonce);
+      return;
+    }
+
+   /*
+    * Validate the username and password...
+    */
+
+    if (!cupsdGetMD5Passwd(username, NULL, md5))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+	              "cupsdAuthorize: Unknown MD5 username \"%s\"!",
+	              username);
+      return;
+    }
+
+    httpMD5Final(nonce, states[con->http.state], con->uri, md5);
+
+    if (strcmp(md5, password))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+	              "cupsdAuthorize: Authentication failed for \"%s\"!",
+	              username);
+      return;
+    }
+  }
+  else
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAuthorize: Bad authentication data.");
+    return;
+  }
+
+ /*
+  * If we get here, then we were able to validate the username and
+  * password - copy the validated username and password to the client
+  * data and return...
+  */
+
+  strlcpy(con->username, username, sizeof(con->username));
+  strlcpy(con->password, password, sizeof(con->password));
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: username=\"%s\"",
+                  con->username);
 }
 
 
@@ -1030,41 +1508,6 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   cupsd_location_t	*best;		/* Best match for location so far */
   int			hostlen;	/* Length of hostname */
   struct passwd		*pw;		/* User password data */
-  char			nonce[HTTP_MAX_VALUE],
-					/* Nonce value from client */
-			md5[33],	/* MD5 password */
-			basicmd5[33];	/* MD5 of Basic password */
-#if HAVE_LIBPAM
-  pam_handle_t		*pamh;		/* PAM authentication handle */
-  int			pamerr;		/* PAM error code */
-  struct pam_conv	pamdata;	/* PAM conversation data */
-#elif defined(HAVE_USERSEC_H)
-  char			*authmsg;	/* Authentication message */
-  char			*loginmsg;	/* Login message */
-  int			reenter;	/* ??? */
-#else
-  char			*pass;		/* Encrypted password */
-#  ifdef HAVE_SHADOW_H
-  struct spwd		*spw;		/* Shadow password data */
-#  endif /* HAVE_SHADOW_H */
-#endif /* HAVE_LIBPAM */
-  static const char * const states[] =	/* HTTP client states... */
-		{
-		  "WAITING",
-		  "OPTIONS",
-		  "GET",
-		  "GET",
-		  "HEAD",
-		  "POST",
-		  "POST",
-		  "POST",
-		  "PUT",
-		  "PUT",
-		  "DELETE",
-		  "TRACE",
-		  "CLOSE",
-		  "STATUS"
-		};
   static const char * const levels[] =	/* Auth levels */
 		{
 		  "ANON",
@@ -1236,11 +1679,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     }
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdIsAuthorized: username=\"%s\" password=%d chars",
-	          con->username, (int)strlen(con->password));
-  DEBUG_printf(("cupsdIsAuthorized: username=\"%s\", password=\"%s\"\n",
-		con->username, con->password));
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: username=\"%s\"",
+	          con->username);
 
   if (!con->username[0])
   {
@@ -1251,324 +1691,19 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   }
 
  /*
-  * Check the user's password...
-  */
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdIsAuthorized: Checking \"%s\", address = %x:%x:%x:%x, hostname = \"%s\"",
-	          con->username, address[0], address[1], address[2],
-	          address[3], con->http.hostname);
-
-  pw = NULL;
-
-  if (strcasecmp(con->http.hostname, "localhost") ||
-      strncmp(con->http.fields[HTTP_FIELD_AUTHORIZATION], "Local", 5))
-  {
-   /*
-    * Not doing local certificate-based authentication; check the password...
-    */
-
-    if (!con->password[0])
-      return (HTTP_UNAUTHORIZED);
-
-   /*
-    * See what kind of authentication we are doing...
-    */
-
-    switch (best->type != AUTH_NONE ? best->type : DefaultAuthType)
-    {
-      case AUTH_BASIC :
-	 /*
-	  * Get the user info...
-	  */
-
-	  pw = getpwnam(con->username);		/* Get the current password */
-	  endpwent();				/* Close the password file */
-
-#if HAVE_LIBPAM
-	 /*
-	  * Only use PAM to do authentication.  This allows MD5 passwords, among
-	  * other things...
-	  */
-
-	  pamdata.conv        = pam_func;
-	  pamdata.appdata_ptr = con;
-
-#  ifdef __hpux
-	 /*
-	  * Workaround for HP-UX bug in pam_unix; see pam_conv() below for
-	  * more info...
-	  */
-
-	  auth_client = con;
-#  endif /* __hpux */
-
-	  DEBUG_printf(("cupsdIsAuthorized: Setting appdata_ptr = %p\n", con));
-
-	  pamerr = pam_start("cups", con->username, &pamdata, &pamh);
-	  if (pamerr != PAM_SUCCESS)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "cupsdIsAuthorized: pam_start() returned %d (%s)!\n",
-        	            pamerr, pam_strerror(pamh, pamerr));
-	    pam_end(pamh, 0);
-	    return (HTTP_UNAUTHORIZED);
-	  }
-
-	  pamerr = pam_authenticate(pamh, PAM_SILENT);
-	  if (pamerr != PAM_SUCCESS)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "cupsdIsAuthorized: pam_authenticate() returned %d (%s)!\n",
-        	            pamerr, pam_strerror(pamh, pamerr));
-	    pam_end(pamh, 0);
-	    return (HTTP_UNAUTHORIZED);
-	  }
-
-	  pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
-	  if (pamerr != PAM_SUCCESS)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "cupsdIsAuthorized: pam_acct_mgmt() returned %d (%s)!\n",
-        	            pamerr, pam_strerror(pamh, pamerr));
-	    pam_end(pamh, 0);
-	    return (HTTP_UNAUTHORIZED);
-	  }
-
-	  pam_end(pamh, PAM_SUCCESS);
-#elif defined(HAVE_USERSEC_H)
-	 /*
-	  * Use AIX authentication interface...
-	  */
-
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "cupsdIsAuthorized: AIX authenticate of username \"%s\"",
-                          con->username);
-
-	  reenter = 1;
-	  if (authenticate(con->username, con->password, &reenter, &authmsg) != 0)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdIsAuthorized: Unable to authenticate username \"%s\": %s",
-	               con->username, strerror(errno));
-	    return (HTTP_UNAUTHORIZED);
-	  }
-#else
-         /*
-	  * Use normal UNIX password file-based authentication...
-	  */
-
-	  if (pw == NULL)			/* No such user... */
-	  {
-	    cupsdLogMessage(CUPSD_LOG_WARN,
-	                    "cupsdIsAuthorized: Unknown username \"%s\"; access denied.",
-        	            con->username);
-	    return (HTTP_UNAUTHORIZED);
-	  }
-
-#  ifdef HAVE_SHADOW_H
-	  spw = getspnam(con->username);
-	  endspent();
-
-	  if (spw == NULL && strcmp(pw->pw_passwd, "x") == 0)
-	  {					/* Don't allow blank passwords! */
-	    cupsdLogMessage(CUPSD_LOG_WARN,
-	                    "cupsdIsAuthorized: Username \"%s\" has no shadow password; access denied.",
-        	            con->username);
-	    return (HTTP_UNAUTHORIZED);	/* No such user or bad shadow file */
-	  }
-
-#    ifdef DEBUG
-	  if (spw != NULL)
-	    printf("spw->sp_pwdp = \"%s\"\n", spw->sp_pwdp);
-	  else
-	    puts("spw = NULL");
-#    endif /* DEBUG */
-
-	  if (spw != NULL && spw->sp_pwdp[0] == '\0' && pw->pw_passwd[0] == '\0')
-#  else
-	  if (pw->pw_passwd[0] == '\0')
-#  endif /* HAVE_SHADOW_H */
-	  {					/* Don't allow blank passwords! */
-	    cupsdLogMessage(CUPSD_LOG_WARN,
-	                    "cupsdIsAuthorized: Username \"%s\" has no password; access denied.",
-        	            con->username);
-	    return (HTTP_UNAUTHORIZED);
-	  }
-
-	 /*
-	  * OK, the password isn't blank, so compare with what came from the client...
-	  */
-
-	  pass = cups_crypt(con->password, pw->pw_passwd);
-
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                  "cupsdIsAuthorized: pw_passwd = %s, crypt = %s",
-		          pw->pw_passwd, pass);
-
-	  if (pass == NULL || strcmp(pw->pw_passwd, pass) != 0)
-	  {
-#  ifdef HAVE_SHADOW_H
-	    if (spw != NULL)
-	    {
-	      pass = cups_crypt(con->password, spw->sp_pwdp);
-
-	      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                      "cupsdIsAuthorized: sp_pwdp = %s, crypt = %s",
-			      spw->sp_pwdp, pass);
-
-	      if (pass == NULL || strcmp(spw->sp_pwdp, pass) != 0)
-		return (HTTP_UNAUTHORIZED);
-	    }
-	    else
-#  endif /* HAVE_SHADOW_H */
-	      return (HTTP_UNAUTHORIZED);
-	  }
-#endif /* HAVE_LIBPAM */
-          break;
-
-      case AUTH_DIGEST :
-	 /*
-	  * Do Digest authentication...
-	  */
-
-	  if (!httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "nonce",
-                               nonce))
-	  {
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "cupsdIsAuthorized: No nonce value for Digest authentication!");
-            return (HTTP_UNAUTHORIZED);
-	  }
-
-	  if (strcmp(con->http.hostname, nonce) != 0)
-	  {
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "cupsdIsAuthorized: Nonce value error!");
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "cupsdIsAuthorized: Expected \"%s\",",
-	                    con->http.hostname);
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "cupsdIsAuthorized: Got \"%s\"!", nonce);
-            return (HTTP_UNAUTHORIZED);
-	  }
-
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: nonce = \"%s\"",
-	                  nonce);
-
-	  if (best->num_names && best->level == AUTH_GROUP)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdIsAuthorized: num_names = %d",
-			    best->num_names);
-
-            for (i = 0; i < best->num_names; i ++)
-	    {
-	      if (!strcasecmp(best->names[i], "@SYSTEM"))
-	      {
-	        for (j = 0; j < NumSystemGroups; j ++)
-		  if (cupsdGetMD5Passwd(con->username, SystemGroups[j], md5))
-		    break;
-
-                if (j < NumSystemGroups)
-		  break;
-	      }
-	      else if (cupsdGetMD5Passwd(con->username, best->names[i], md5))
-		break;
-            }
-
-            if (i >= best->num_names)
-	      md5[0] = '\0';
-	  }
-	  else if (!cupsdGetMD5Passwd(con->username, NULL, md5))
-	    md5[0] = '\0';
-
-	  if (!md5[0])
-	  {
-            cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdIsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
-	                    con->username);
-            return (HTTP_UNAUTHORIZED);
-	  }
-
-	  httpMD5Final(nonce, states[con->http.state], con->uri, md5);
-
-	  if (strcmp(md5, con->password) != 0)
-	  {
-            cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdIsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
-	                    md5, con->password);
-            return (HTTP_UNAUTHORIZED);
-	  }
-          break;
-
-      case AUTH_BASICDIGEST :
-         /*
-	  * Do Basic authentication with the Digest password file...
-	  */
-
-	  if (best->num_names && best->level == AUTH_GROUP)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdIsAuthorized: num_names = %d",
-			    best->num_names);
-
-            for (i = 0; i < best->num_names; i ++)
-	    {
-	      if (!strcasecmp(best->names[i], "@SYSTEM"))
-	      {
-	        for (j = 0; j < NumSystemGroups; j ++)
-		  if (cupsdGetMD5Passwd(con->username, SystemGroups[j], md5))
-		    break;
-
-                if (j < NumSystemGroups)
-		  break;
-	      }
-	      else if (cupsdGetMD5Passwd(con->username, best->names[i], md5))
-		break;
-            }
-
-            if (i >= best->num_names)
-	      md5[0] = '\0';
-	  }
-	  else if (!cupsdGetMD5Passwd(con->username, NULL, md5))
-	    md5[0] = '\0';
-
-	  if (!md5[0])
-	  {
-            cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdIsAuthorized: No matching user:group for \"%s\" in passwd.md5!",
-	                    con->username);
-            return (HTTP_UNAUTHORIZED);
-	  }
-
-	  httpMD5(con->username, "CUPS", con->password, basicmd5);
-
-	  if (strcmp(md5, basicmd5) != 0)
-	  {
-            cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdIsAuthorized: MD5s \"%s\" and \"%s\" don't match!",
-	                    md5, basicmd5);
-            return (HTTP_UNAUTHORIZED);
-	  }
-	  break;
-    }
-  }
-  else
-  {
-   /*
-    * Get password entry for certificate-based auth...
-    */
-
-    pw = getpwnam(con->username);	/* Get the current password */
-    endpwent();				/* Close the password file */
-  }
-
- /*
   * OK, the password is good.  See if we need normal user access, or group
   * access... (root always matches)
   */
 
   if (!strcmp(con->username, "root"))
     return (HTTP_OK);
+
+ /*
+  * Get the user info...
+  */
+
+  pw = getpwnam(con->username);
+  endpwent();
 
   if (best->level == AUTH_USER)
   {
@@ -1618,43 +1753,34 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdIsAuthorized: Checking group membership...");
 
-  if (best->type == AUTH_BASIC)
+ /*
+  * Check to see if this user is in any of the named groups...
+  */
+
+  for (i = 0; i < best->num_names; i ++)
   {
-   /*
-    * Check to see if this user is in any of the named groups...
-    */
-
-    for (i = 0; i < best->num_names; i ++)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdIsAuthorized: Checking group \"%s\" membership...",
-                      best->names[i]);
-
-      if (!strcasecmp(best->names[i], "@SYSTEM"))
-      {
-        for (j = 0; j < NumSystemGroups; j ++)
-	  if (cupsdCheckGroup(con->username, pw, SystemGroups[j]))
-	    return (HTTP_OK);
-      }
-      else if (cupsdCheckGroup(con->username, pw, best->names[i]))
-        return (HTTP_OK);
-    }
-
-   /*
-    * The user isn't part of the specified group, so deny access...
-    */
-
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdIsAuthorized: User not in group(s)!");
+                    "cupsdIsAuthorized: Checking group \"%s\" membership...",
+                    best->names[i]);
 
-    return (HTTP_UNAUTHORIZED);
+    if (!strcasecmp(best->names[i], "@SYSTEM"))
+    {
+      for (j = 0; j < NumSystemGroups; j ++)
+	if (cupsdCheckGroup(con->username, pw, SystemGroups[j]))
+	  return (HTTP_OK);
+    }
+    else if (cupsdCheckGroup(con->username, pw, best->names[i]))
+      return (HTTP_OK);
   }
 
  /*
-  * All checks passed...
+  * The user isn't part of the specified group, so deny access...
   */
 
-  return (HTTP_OK);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdIsAuthorized: User not in group(s)!");
+
+  return (HTTP_UNAUTHORIZED);
 }
 
 
@@ -1880,7 +2006,7 @@ pam_func(
 {
   int			i;		/* Looping var */
   struct pam_response	*replies;	/* Replies */
-  cupsd_client_t	*client;	/* Pointer client connection */
+  cupsd_authdata_t	*data;		/* Pointer to auth data */
 
 
  /*
@@ -1902,10 +2028,10 @@ pam_func(
   * module.  This is a workaround...
   */
 
-  client = auth_client;
+  data = auth_data;
   (void)appdata_ptr;
 #else
-  client = (cupsd_client_t *)appdata_ptr;
+  data = (cupsd_authdata_t *)appdata_ptr;
 #endif /* __hpux */
 
   for (i = 0; i < num_msg; i ++)
@@ -1916,16 +2042,16 @@ pam_func(
     {
       case PAM_PROMPT_ECHO_ON:
           DEBUG_printf(("pam_func: PAM_PROMPT_ECHO_ON, returning \"%s\"...\n",
-	                client->username));
+	                data->username));
           replies[i].resp_retcode = PAM_SUCCESS;
-          replies[i].resp         = strdup(client->username);
+          replies[i].resp         = strdup(data->username);
           break;
 
       case PAM_PROMPT_ECHO_OFF:
           DEBUG_printf(("pam_func: PAM_PROMPT_ECHO_OFF, returning \"%s\"...\n",
-	                client->password));
+	                data->password));
           replies[i].resp_retcode = PAM_SUCCESS;
-          replies[i].resp         = strdup(client->password);
+          replies[i].resp         = strdup(data->password);
           break;
 
       case PAM_TEXT_INFO:

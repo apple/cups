@@ -429,6 +429,8 @@ httpGet(http_t     *http,		/* I - HTTP data */
 
 /*
  * 'httpGetSubField()' - Get a sub-field value.
+ *
+ * @deprecated@
  */
 
 char *					/* O - Value or NULL */
@@ -437,19 +439,37 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
                 const char   *name,	/* I - Name of sub-field */
 		char         *value)	/* O - Value string */
 {
+  return (httpGetSubField2(http, field, name, value, HTTP_MAX_VALUE));
+}
+
+
+/*
+ * 'httpGetSubField2()' - Get a sub-field value.
+ *
+ * @since CUPS 1.2@
+ */
+
+char *					/* O - Value or NULL */
+httpGetSubField2(http_t       *http,	/* I - HTTP data */
+                 http_field_t field,	/* I - Field index */
+                 const char   *name,	/* I - Name of sub-field */
+		 char         *value,	/* O - Value string */
+		 int          valuelen)	/* I - Size of value buffer */
+{
   const char	*fptr;			/* Pointer into field */
   char		temp[HTTP_MAX_VALUE],	/* Temporary buffer for name */
-		*ptr;			/* Pointer into string buffer */
+		*ptr,			/* Pointer into string buffer */
+		*end;			/* End of value buffer */
 
+  DEBUG_printf(("httpGetSubField2(http=%p, field=%d, name=\"%s\", value=%p, valuelen=%d)\n",
+                http, field, name, value, valuelen));
 
-  DEBUG_printf(("httpGetSubField(http=%p, field=%d, name=\"%s\", value=%p)\n",
-                http, field, name, value));
-
-  if (http == NULL ||
+  if (!http || !name || !value || valuelen < 2 ||
       field < HTTP_FIELD_ACCEPT_LANGUAGE ||
-      field > HTTP_FIELD_WWW_AUTHENTICATE ||
-      name == NULL || value == NULL)
+      field > HTTP_FIELD_WWW_AUTHENTICATE)
     return (NULL);
+
+  end = value + valuelen - 1;
 
   for (fptr = http->fields[field]; *fptr;)
   {
@@ -471,7 +491,8 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
     */
 
     for (ptr = temp;
-         *fptr && *fptr != '=' && !isspace(*fptr & 255) && ptr < (temp + sizeof(temp) - 1);
+         *fptr && *fptr != '=' && !isspace(*fptr & 255) &&
+	     ptr < (temp + sizeof(temp) - 1);
          *ptr++ = *fptr++);
 
     *ptr = '\0';
@@ -507,7 +528,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
       */
 
       for (ptr = value, fptr ++;
-           *fptr && *fptr != '\"' && ptr < (value + HTTP_MAX_VALUE - 1);
+           *fptr && *fptr != '\"' && ptr < end;
 	   *ptr++ = *fptr++);
 
       *ptr = '\0';
@@ -525,7 +546,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
       */
 
       for (ptr = value;
-           *fptr && !isspace(*fptr & 255) && *fptr != ',' && ptr < (value + HTTP_MAX_VALUE - 1);
+           *fptr && !isspace(*fptr & 255) && *fptr != ',' && ptr < end;
 	   *ptr++ = *fptr++);
 
       *ptr = '\0';
@@ -540,7 +561,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
     * See if this is the one...
     */
 
-    if (strcmp(name, temp) == 0)
+    if (!strcmp(name, temp))
       return (value);
   }
 

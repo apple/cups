@@ -430,6 +430,9 @@ extern int		httpFlushWrite(http_t *http);
 extern const char	*httpGetDateString2(time_t t, char *s, int slen);
 extern const char	*httpGetHostname(char *s, int slen);
 extern off_t		httpGetLength2(http_t *http);
+extern char		*httpGetSubField2(http_t *http, http_field_t field,
+			                  const char *name, char *value,
+					  int valuelen);
 extern http_uri_status_t httpSeparateURI(const char *uri,
 			        	 char *scheme, int schemelen,
 			        	 char *username, int usernamelen,

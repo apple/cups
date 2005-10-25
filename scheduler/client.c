@@ -36,7 +36,6 @@
  *   cupsdUpdateCGI()        - Read status messages from CGI scripts and programs.
  *   cupsdWriteClient()      - Write data to a client as needed.
  *   check_if_modified()     - Decode an "If-Modified-Since" line.
- *   decode_auth()           - Decode an authorization string.
  *   get_cdsa_server_certs() - Convert a keychain name into the CFArrayRef
  *			       required by SSLSetCertificate.
  *   get_file()              - Get a filename and state info.
@@ -63,7 +62,6 @@
 
 static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
-static void		decode_auth(cupsd_client_t *con);
 #ifdef HAVE_CDSASSL
 static CFArrayRef	get_cdsa_server_certs(void);
 #endif /* HAVE_CDSASSL */
@@ -1269,7 +1267,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     else
       con->language = cupsLangGet(DefaultLocale);
 
-    decode_auth(con);
+    cupsdAuthorize(con);
 
     if (!strncmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive", 10) &&
         KeepAlive)
@@ -1291,8 +1289,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       * Do OPTIONS command...
       */
 
-      if ((con->best = cupsdFindBest(con->uri, con->http.state)) != NULL &&
-          con->best->type != AUTH_NONE)
+      if (con->best && con->best->type != AUTH_NONE)
       {
 	if (!cupsdSendHeader(con, HTTP_UNAUTHORIZED, NULL))
 	  return (cupsdCloseClient(con));
@@ -1366,8 +1363,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return (cupsdCloseClient(con));
 #endif /* HAVE_SSL */
       }
-
-      con->best = cupsdFindBest(con->uri, con->http.state);
 
       if ((status = cupsdIsAuthorized(con, NULL)) != HTTP_OK)
       {
@@ -2410,7 +2405,7 @@ cupsdUpdateCGI(void)
     if (!strchr(CGIStatusBuffer->buffer, '\n'))
       break;
 
-  if (ptr == NULL)
+  if (ptr == NULL && errno)
   {
    /*
     * Fatal error on pipe - should never happen!
@@ -2716,81 +2711,6 @@ check_if_modified(
   return ((size != filestats->st_size && size != 0) ||
           (date < filestats->st_mtime && date != 0) ||
 	  (size == 0 && date == 0));
-}
-
-
-/*
- * 'decode_auth()' - Decode an authorization string.
- */
-
-static void
-decode_auth(cupsd_client_t *con)	/* I - Client to decode to */
-{
-  char		*s,			/* Authorization string */
-		value[1024];		/* Value string */
-  const char	*username;		/* Certificate username */
-
-
- /*
-  * Decode the string...
-  */
-
-  s = con->http.fields[HTTP_FIELD_AUTHORIZATION];
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "decode_auth(%p): Authorization string = \"%s\"", con, s);
-
-  if (!strncmp(s, "Basic", 5))
-  {
-    s += 5;
-    while (isspace(*s))
-      s ++;
-
-    httpDecode64(value, s);
-
-   /*
-    * Pull the username and password out...
-    */
-
-    if ((s = strchr(value, ':')) == NULL)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "decode_auth: %d no colon in auth string \"%s\"",
-        	      con->http.fd, value);
-      return;
-    }
-
-    *s++ = '\0';
-
-    strlcpy(con->username, value, sizeof(con->username));
-    strlcpy(con->password, s, sizeof(con->password));
-  }
-  else if (!strncmp(s, "Local", 5))
-  {
-    s += 5;
-    while (isspace(*s))
-      s ++;
-
-    if ((username = cupsdFindCert(s)) != NULL)
-      strlcpy(con->username, username, sizeof(con->username));
-  }
-  else if (!strncmp(s, "Digest", 6))
-  {
-   /*
-    * Get the username and password from the Digest attributes...
-    */
-
-    if (httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "username",
-                        value))
-      strlcpy(con->username, value, sizeof(con->username));
-
-    if (httpGetSubField(&(con->http), HTTP_FIELD_AUTHORIZATION, "response",
-                        value))
-      strlcpy(con->password, value, sizeof(con->password));
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "decode_auth: %d username=\"%s\"",
-                  con->http.fd, con->username);
 }
 
 
