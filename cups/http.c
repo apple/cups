@@ -1874,6 +1874,13 @@ http_send(http_t       *http,	/* I - HTTP data */
       }
     }
 
+  if (http->cookie)
+    if (httpPrintf(http, "Cookie: $Version=0; %s\r\n", http->cookie) < 1)
+    {
+      http->status = HTTP_ERROR;
+      return (-1);
+    }
+
   if (httpPrintf(http, "\r\n") < 1)
   {
     http->status = HTTP_ERROR;
