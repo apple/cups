@@ -34,12 +34,13 @@
 
 #  include <string.h>
 #  include <time.h>
+#  include <sys/types.h>
 #  ifdef WIN32
-#    include <winsock.h>
+#    include <winsock2.h>
+#    include <ws2tcpip.h>
 #  else
 #    include <unistd.h>
 #    include <sys/time.h>
-#    include <sys/types.h>
 #    include <sys/socket.h>
 #    include <netdb.h>
 #    include <netinet/in.h>
@@ -85,6 +86,12 @@ extern "C" {
 #    define s6_addr32	_S6_un._S6_u32
 #  elif defined(__FreeBSD__) || defined(__APPLE__)
 #    define s6_addr32	__u6_addr.__u6_addr32
+#  elif defined(WIN32)
+/*
+ * Windows only defines byte and 16-bit word members of the union and
+ * requires special casing of all raw address code...
+ */
+#    define s6_addr32	error_need_win32_specific_code
 #  endif /* __sun */
 #endif /* AF_INET6 && !s6_addr32 */
 

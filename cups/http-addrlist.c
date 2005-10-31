@@ -78,7 +78,12 @@ httpAddrConnect(
     */
 
     val = 1;
+#ifdef WIN32
+    setsockopt(*sock, SOL_SOCKET, SO_REUSEADDR, (const char *)&val,
+               sizeof(val));
+#else
     setsockopt(*sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+#endif /* WIN32 */
 
 #ifdef SO_REUSEPORT
     val = 1;
@@ -91,7 +96,12 @@ httpAddrConnect(
     */
 
     val = 1;
+#ifdef WIN32
+    setsockopt(*sock, IPPROTO_TCP, TCP_NODELAY, (const char *)&val,
+               sizeof(val)); 
+#else
     setsockopt(*sock, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
+#endif /* WIN32 */
 
 #ifdef FD_CLOEXEC
    /*
@@ -481,7 +491,11 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
         temp->addr.ipv6.sin6_family            = AF_INET6;
 	temp->addr.ipv6.sin6_port              = htons(portnum);
+#  ifdef WIN32
+	temp->addr.ipv6.sin6_addr.u.Byte[15]   = 1;
+#  else
 	temp->addr.ipv6.sin6_addr.s6_addr32[3] = htonl(1);
+#  endif /* WIN32 */
 
         addr = temp;
       }

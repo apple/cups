@@ -38,6 +38,9 @@
  *   cupsArrayNext()    - Get the next element in the array.
  *   cupsArrayPrev()    - Get the previous element in the array.
  *   cupsArrayRemove()  - Remove an element from the array.
+ *   cupsArrayRestore() - Reset the current element to the last cupsArraySave.
+ *   cupsArraySave()    - Mark the current element for a later cupsArrayRestore.
+ *   cups_find()        - Find an element in the array...
  */
 
 /*
@@ -610,6 +613,34 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
 
 
 /*
+ * 'cupsArrayRestore()' - Reset the current element to the last cupsArraySave.
+ */
+
+void *					/* O - New current element */
+cupsArrayRestore(cups_array_t *a)	/* I - Array */
+{
+  a->current = a->saved;
+  a->saved   = -1;
+
+  if (a->current >= 0 && a->current < a->num_elements)
+    return (a->elements[a->current]);
+  else
+    return (NULL);
+}
+
+
+/*
+ * 'cupsArraySave()' - Mark the current element for a later cupsArrayRestore.
+ */
+
+void
+cupsArraySave(cups_array_t *a)		/* I - Array */
+{
+  a->saved = a->current;
+}
+
+
+/*
  * 'cups_find()' - Find an element in the array...
  */
 
@@ -741,34 +772,6 @@ cups_find(cups_array_t *a,		/* I - Array */
   *rdiff = diff;
 
   return (current);
-}
-
-
-/*
- * 'cupsArrayRestore()' - Reset the current element to the last cupsArraySave.
- */
-
-void *					/* O - New current element */
-cupsArrayRestore(cups_array_t *a)	/* I - Array */
-{
-  a->current = a->saved;
-  a->saved   = -1;
-
-  if (a->current >= 0 && a->current < a->num_elements)
-    return (a->elements[a->current]);
-  else
-    return (NULL);
-}
-
-
-/*
- * 'cupsArraySave()' - Mark the current element for a later cupsArrayRestore.
- */
-
-void
-cupsArraySave(cups_array_t *a)		/* I - Array */
-{
-  a->saved = a->current;
 }
 
 
