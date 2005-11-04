@@ -45,9 +45,6 @@ DefaultAuthType Basic
   Allow localhost
 </Location>
 
-# Authenticate against system accounts by default...
-DefaultAuthType Basic
-
 # Set the default printer/job policies...
 <Policy default>
   # Job-related operations must be done by the owner or an adminstrator...
