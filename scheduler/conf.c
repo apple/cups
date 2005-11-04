@@ -1558,16 +1558,40 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     {
       loc->type  = AUTH_NONE;
       loc->level = AUTH_ANON;
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "\"AuthClass %s\" is deprecated; consider removing "
+		      "it from line %d.",
+	              value, linenum);
     }
     else if (!strcasecmp(value, "user"))
+    {
       loc->level = AUTH_USER;
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "\"AuthClass %s\" is deprecated; consider using "
+		      "\"Require valid-user\" on line %d.",
+	              value, linenum);
+    }
     else if (!strcasecmp(value, "group"))
+    {
       loc->level = AUTH_GROUP;
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "\"AuthClass %s\" is deprecated; consider using "
+		      "\"Require @groupname\" on line %d.",
+	              value, linenum);
+    }
     else if (!strcasecmp(value, "system"))
     {
       loc->level = AUTH_GROUP;
 
       cupsdAddName(loc, "@SYSTEM");
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "\"AuthClass %s\" is deprecated; consider using "
+		      "\"Require @SYSTEM\" on line %d.",
+	              value, linenum);
     }
     else
     {
@@ -1578,7 +1602,14 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     }
   }
   else if (!strcasecmp(line, "AuthGroupName"))
+  {
     cupsdAddName(loc, value);
+
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "\"AuthGroupName %s\" directive is deprecated; consider "
+		    "using \"Require @%s\" on line %d.",
+		    value, value, linenum);
+  }
   else if (!strcasecmp(line, "Require"))
   {
    /*
