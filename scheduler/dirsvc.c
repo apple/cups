@@ -23,7 +23,9 @@
  *
  * Contents:
  *
+ *   cupsdLoadRemoteCache()   - Load the remote printer cache.
  *   cupsdProcessBrowseData() - Process new browse data.
+ *   cupsdSaveRemoteCache()   - Save the remote printer cache.
  *   cupsdSendBrowseDelete()  - Send a "browse delete" message for a printer.
  *   cupsdSendBrowseList()    - Send new browsing information as necessary.
  *   cupsdSendCUPSBrowse()    - Send new browsing information using the CUPS protocol.
@@ -93,17 +95,29 @@ static SLPBoolean	slp_url_callback(SLPHandle hslp, const char *srvurl,
 
 
 /*
+ * 'cupsdLoadRemoteCache()' - Load the remote printer cache.
+ */
+
+void
+cupsdLoadRemoteCache(void)
+{
+}
+
+
+/*
  * 'cupsdProcessBrowseData()' - Process new browse data.
  */
 
 void
 cupsdProcessBrowseData(
-    const char   *uri,			/* I - URI of printer/class */
-    cups_ptype_t type,			/* I - Printer type */
-    ipp_pstate_t state,			/* I - Printer state */
-    const char   *location,		/* I - Printer location */
-    const char   *info,			/* I - Printer information */
-    const char   *make_model)		/* I - Printer make and model */
+    const char    *uri,			/* I - URI of printer/class */
+    cups_ptype_t  type,			/* I - Printer type */
+    ipp_pstate_t  state,		/* I - Printer state */
+    const char    *location,		/* I - Printer location */
+    const char    *info,		/* I - Printer information */
+    const char    *make_model,		/* I - Printer make and model */
+    int		  num_attrs,		/* I - Number of attributes */
+    cups_option_t *attrs)		/* I - Attributes */
 {
   int		i;			/* Looping var */
   int		update;			/* Update printer attributes? */
@@ -123,6 +137,7 @@ cupsdProcessBrowseData(
 		*first;			/* First printer in class */
   int		offset,			/* Offset of name */
 		len;			/* Length of name */
+  const char	*ipp_options;		/* ipp-options value */
 
 
  /*
@@ -159,44 +174,45 @@ cupsdProcessBrowseData(
   * OK, this isn't a local printer; add any remote options...
   */
 
+  ipp_options = cupsGetOption("ipp-options", num_attrs, attrs);
+
   if (BrowseRemoteOptions)
   {
     if (BrowseRemoteOptions[0] == '?')
     {
      /*
-      * Override server-supplied URI...
-      */
-
-      char	tempuri[HTTP_MAX_URI];	/* Temporary URI */
-
-
-      if (strchr(uri, '?'))
-      {
-       /*
-        * Drop everything after ?...
-	*/
-
-        strlcpy(tempuri, uri, sizeof(tempuri));
-	*strchr(tempuri, '?') = '\0';
-
-        uri = tempuri;
-      }
-
-     /*
-      * Combine stripped URI and remote options...
+      * Override server-supplied options...
       */
 
       snprintf(finaluri, sizeof(finaluri), "%s%s", uri, BrowseRemoteOptions);
     }
-    else if (strchr(uri, '?'))
-      snprintf(finaluri, sizeof(finaluri), "%s+%s", uri, BrowseRemoteOptions);
-    else
-      snprintf(finaluri, sizeof(finaluri), "%s?%s", uri, BrowseRemoteOptions);
+    else if (ipp_options)
+    {
+     /*
+      * Combine the server and local options...
+      */
 
+      snprintf(finaluri, sizeof(finaluri), "%s?%s+%s", uri, ipp_options,
+               BrowseRemoteOptions);
+    }
+    else
+    {
+     /*
+      * Just use the local options...
+      */
+
+      snprintf(finaluri, sizeof(finaluri), "%s?%s", uri, BrowseRemoteOptions);
+    }
+
+    uri = finaluri;
+  }
+  else if (ipp_options)
+  {
    /*
-    * Use the new URI instead of the old one...
+    * Just use the server-supplied options...
     */
 
+    snprintf(finaluri, sizeof(finaluri), "%s?%s", uri, ipp_options);
     uri = finaluri;
   }
 
@@ -692,6 +708,16 @@ cupsdProcessBrowseData(
 
 
 /*
+ * 'cupsdSaveRemoteCache()' - Save the remote printer cache.
+ */
+
+void
+cupsdSaveRemoteCache(void)
+{
+}
+
+
+/*
  * 'cupsdSendBrowseDelete()' - Send a "browse delete" message for a printer.
  */
 
@@ -887,12 +913,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
   */
 
   if (BrowseLocalOptions)
-  {
-    if (BrowseLocalOptions[0] == '?')
-      strlcpy(options, BrowseLocalOptions, sizeof(options));
-    else
-      snprintf(options, sizeof(options), "?%s", BrowseLocalOptions);
-  }
+    snprintf(options, sizeof(options), " ipp-options=%s", BrowseLocalOptions);
   else
     options[0] = '\0';
 
@@ -928,12 +949,12 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, iface->hostname,
 	                   iface->port,
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
-			                                    "/printers/%s%s",
-			   p->name, options);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+			                                    "/printers/%s",
+			   p->name);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
         	   type, p->state, uri, p->location ? p->location : "",
 		   p->info ? p->info : "",
-		   p->make_model ? p->make_model : "Unknown");
+		   p->make_model ? p->make_model : "Unknown", options);
 
 	  bytes = strlen(packet);
 
@@ -970,12 +991,12 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, iface->hostname,
 	                   iface->port,
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
-			                                    "/printers/%s%s",
-			   p->name, options);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
+			                                    "/printers/%s",
+			   p->name);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
         	   type, p->state, uri, p->location ? p->location : "",
 		   p->info ? p->info : "",
-		   p->make_model ? p->make_model : "Unknown");
+		   p->make_model ? p->make_model : "Unknown", options);
 
 	  bytes = strlen(packet);
 
@@ -998,11 +1019,11 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
       * the default server name...
       */
 
-      snprintf(packet, sizeof(packet), "%x %x %s%s \"%s\" \"%s\" \"%s\"\n",
-       	       type, p->state, p->uri, options,
+      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
+       	       type, p->state, p->uri,
 	       p->location ? p->location : "",
 	       p->info ? p->info : "",
-	       p->make_model ? p->make_model : "Unknown");
+	       p->make_model ? p->make_model : "Unknown", options);
 
       bytes = strlen(packet);
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -1544,6 +1565,8 @@ cupsdUpdateCUPSBrowse(void)
 		make_model[IPP_MAX_NAME];/* Make and model string */
   int		port;			/* Port portion of URI */
   cupsd_netif_t	*iface;			/* Network interface */
+  int		num_attrs;		/* Number of attributes */
+  cups_option_t	*attrs;			/* Attributes */
 
 
  /*
@@ -1684,6 +1707,8 @@ cupsdUpdateCUPSBrowse(void)
   strcpy(location, "Location Unknown");
   strcpy(info, "No Information Available");
   make_model[0] = '\0';
+  num_attrs     = 0;
+  attrs         = NULL;
 
   if ((pptr = strchr(packet, '\"')) != NULL)
   {
@@ -1713,8 +1738,7 @@ cupsdUpdateCUPSBrowse(void)
            i ++, pptr ++)
 	info[i] = *pptr;
 
-      if (i)
-	info[i] = '\0';
+      info[i] = '\0';
 
       if (*pptr == '\"')
 	pptr ++;
@@ -1729,8 +1753,13 @@ cupsdUpdateCUPSBrowse(void)
              i ++, pptr ++)
 	  make_model[i] = *pptr;
 
-	if (i)
-	  make_model[i] = '\0';
+	if (*pptr == '\"')
+	  pptr ++;
+
+	make_model[i] = '\0';
+
+        if (*pptr)
+	  num_attrs = cupsParseOptions(pptr, num_attrs, &attrs);
       }
     }
   }
@@ -1753,13 +1782,19 @@ cupsdUpdateCUPSBrowse(void)
   */
 
   if (!strcasecmp(host, ServerName) && port == LocalPort)
+  {
+    cupsFreeOptions(num_attrs, attrs);
     return;
+  }
 
   cupsdNetIFUpdate();
 
   for (iface = NetIFList; iface != NULL; iface = iface->next)
-    if (!strcasecmp(host, iface->hostname) && port == LocalPort)
+    if (!strcasecmp(host, iface->hostname) && port == iface->port)
+    {
+      cupsFreeOptions(num_attrs, attrs);
       return;
+    }
 
  /*
   * Do relaying...
@@ -1774,6 +1809,7 @@ cupsdUpdateCUPSBrowse(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "cupsdUpdateCUPSBrowse: sendto failed for relay %d - %s.",
 	                i + 1, strerror(errno));
+	cupsFreeOptions(num_attrs, attrs);
 	return;
       }
 
@@ -1782,7 +1818,8 @@ cupsdUpdateCUPSBrowse(void)
   */
 
   cupsdProcessBrowseData(uri, (cups_ptype_t)type, (ipp_pstate_t)state, location,
-                         info, make_model);
+                         info, make_model, num_attrs, attrs);
+  cupsFreeOptions(num_attrs, attrs);
 }
 
 

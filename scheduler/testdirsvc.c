@@ -65,6 +65,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		val,			/* Socket option value */
 		seconds,		/* Seconds until next cycle */
 		verbose;		/* Verbose output? */
+  const char	*options;		/* Options for URIs */
   time_t	curtime;		/* Current UNIX time */
   struct tm	*curdate;		/* Current date and time */
   struct sockaddr_in addr;		/* Broadcast address */
@@ -110,6 +111,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   port         = 0;
   verbose      = 0;
   continuous   = 0;
+  options      = NULL;
 
   for (i = 1; i < argc; i ++)
   {
@@ -122,6 +124,14 @@ main(int  argc,				/* I - Number of command-line arguments */
       i ++;
       if (i < argc)
         interval = atoi(argv[i]);
+      else
+        usage();
+    }
+    else if (!strcmp(argv[i], "-o"))
+    {
+      i ++;
+      if (i < argc)
+        options = argv[i];
       else
         usage();
     }
@@ -217,10 +227,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         snprintf(packet, sizeof(packet),
 	         "%x %x ipp://testserver-%d/printers/%s-%d \"Server Room %d\" "
-		 "\"Test Printer %d\" \"Acme Blazer 2000\"\n",
+		 "\"Test Printer %d\" \"Acme Blazer 2000\"%s%s\n",
                  CUPS_PRINTER_REMOTE, IPP_PRINTER_IDLE, server + 1,
 		 names[printer % 26], printer / 26 + 1, server + 1,
-		 printer + 1);
+		 printer + 1, options ? " ipp-options=" : "",
+		 options ? options : "");
 
         if (verbose)
 	  printf("[%02d:%02d:%02d] %s", curdate->tm_hour, curdate->tm_min,
@@ -254,7 +265,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 void
 usage(void)
 {
-  puts("Usage: testdirsvc [-i interval] [-p printers] [-s servers] [-v] port");
+  puts("Usage: testdirsvc [-i interval] [-o ipp-options] [-p printers] [-s servers] [-v] port");
   exit(0);
 }
 
