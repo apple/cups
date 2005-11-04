@@ -37,6 +37,13 @@
 
 
 /*
+ * Local globals...
+ */
+
+static int	started = 0;
+
+
+/*
  * 'cupsdStartServer()' - Start the server.
  */
 
@@ -102,6 +109,8 @@ cupsdStartServer(void)
 		    CGIPipes[0]);
     FD_SET(CGIPipes[0], InputSet);
   }
+
+  started = 1;
 }
 
 
@@ -112,6 +121,9 @@ cupsdStartServer(void)
 void
 cupsdStopServer(void)
 {
+  if (!started)
+    return;
+
  /*
   * Close all network clients and stop all jobs...
   */
@@ -120,6 +132,7 @@ cupsdStopServer(void)
   cupsdStopListening();
   cupsdStopPolling();
   cupsdStopBrowsing();
+  cupsdSaveRemoteCache();
 
   if (Clients != NULL)
   {
@@ -182,6 +195,8 @@ cupsdStopServer(void)
 
     PageFile = NULL;
   }
+
+  started = 0;
 }
 
 

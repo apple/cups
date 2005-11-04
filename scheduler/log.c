@@ -157,7 +157,7 @@ cupsdLogMessage(int        level,	/* I - Log level */
   * See if we want to log this message...
   */
 
-  if (level > LogLevel)
+  if (level > LogLevel || !ErrorLog)
     return (1);
 
 #ifdef HAVE_VSYSLOG

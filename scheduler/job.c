@@ -721,7 +721,6 @@ cupsdLoadAllJobs(void)
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
-  cupsd_printer_t	*p;		/* Printer or class */
   const char		*dest;		/* Destination */
   mime_type_t		**filetypes;	/* New filetypes array */
   int			*compressions;	/* New compressions array */
@@ -854,38 +853,8 @@ cupsdLoadAllJobs(void)
       httpSeparate(attr->values[0].string.text, method, username, host,
                    &port, resource);
 
-      if ((dest = cupsdValidateDest(host, resource, &(job->dtype), NULL)) == NULL &&
-          job->state != NULL &&
-	  job->state->values[0].integer <= IPP_JOB_PROCESSING)
-      {
-       /*
-	* Job queued on remote printer or class, so add it...
-	*/
-
-	if (strncmp(resource, "/classes/", 9) == 0)
-	{
-	  p = cupsdAddClass(resource + 9);
-	  cupsdSetString(&p->make_model, "Remote Class on unknown");
-	}
-	else
-	{
-	  p = cupsdAddPrinter(resource + 10);
-	  cupsdSetString(&p->make_model, "Remote Printer on unknown");
-	}
-
-        p->state       = IPP_PRINTER_STOPPED;
-	p->type        |= CUPS_PRINTER_REMOTE;
-	p->browse_time = 2147483647;
-
-	cupsdSetString(&p->location, "Location Unknown");
-	cupsdSetString(&p->info, "No Information Available");
-	p->hostname[0] = '\0';
-
-	cupsdSetPrinterAttrs(p);
-	dest = p->name;
-      }
-
-      if (dest == NULL)
+      if ((dest = cupsdValidateDest(host, resource, &(job->dtype),
+                                    NULL)) == NULL)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "cupsdLoadAllJobs: Unable to queue job for destination \"%s\"!",

@@ -978,6 +978,7 @@ cupsdReadConfiguration(void)
 
     cupsdLoadAllPrinters();
     cupsdLoadAllClasses();
+    cupsdLoadRemoteCache();
 
     cupsdCreateCommonData();
 
