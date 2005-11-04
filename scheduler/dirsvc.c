@@ -241,6 +241,11 @@ cupsdLoadRemoteCache(void)
       if (value)
 	cupsdSetString(&p->info, value);
     }
+    else if (!strcasecmp(line, "MakeModel"))
+    {
+      if (value)
+	cupsdSetString(&p->make_model, value);
+    }
     else if (!strcasecmp(line, "Location"))
     {
       if (value)
@@ -1121,6 +1126,9 @@ cupsdSaveRemoteCache(void)
 
     if (printer->info)
       cupsFilePrintf(fp, "Info %s\n", printer->info);
+
+    if (printer->make_model)
+      cupsFilePrintf(fp, "MakeModel %s\n", printer->make_model);
 
     if (printer->location)
       cupsFilePrintf(fp, "Location %s\n", printer->location);

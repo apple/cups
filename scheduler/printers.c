@@ -1423,8 +1423,10 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
 	         "printer-uri-supported", NULL, p->uri);
 
-    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "printer-make-and-model", NULL, p->make_model);
+    if (p->make_model)
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                   "printer-make-and-model", NULL, p->make_model);
+
     p->raw = 1;
   }
   else
@@ -1444,7 +1446,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       * Add class-specific attributes...
       */
 
-      if ((p->type & CUPS_PRINTER_IMPLICIT) && p->num_printers > 0)
+      if ((p->type & CUPS_PRINTER_IMPLICIT) && p->num_printers > 0 &&
+          p->printers[0]->make_model)
 	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                      "printer-make-and-model", NULL, p->printers[0]->make_model);
       else
@@ -1548,8 +1551,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	else
 	  cupsdSetString(&p->make_model, "Bad PPD File");
 
-	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                     "printer-make-and-model", NULL, p->make_model);
+        if (p->make_model)
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                       "printer-make-and-model", NULL, p->make_model);
 
        /*
 	* Add media options from the PPD file...
