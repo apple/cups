@@ -368,6 +368,25 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
  /*
+  * Test deleting with iteration...
+  */
+
+  fputs("Delete While Iterating: ", stdout);
+
+  text = (char *)cupsArrayFirst(array);
+  cupsArrayRemove(array, text);
+  free(text);
+
+  text = (char *)cupsArrayNext(array);
+  if (!text)
+  {
+    puts("FAIL (cupsArrayNext returned NULL!)");
+    status ++;
+  }
+  else
+    puts("PASS");
+    
+ /*
   * Delete the arrays...
   */
 

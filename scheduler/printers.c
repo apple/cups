@@ -2113,7 +2113,9 @@ cupsdUpdatePrinters(void)
       if (p->type & CUPS_PRINTER_IMPLICIT)
         cupsArrayRemove(ImplicitPrinters, p);
 
+      cupsArraySave(Printers);
       cupsdDeletePrinter(p, 0);
+      cupsArrayRestore(Printers);
     }
     else if (!(p->type & CUPS_PRINTER_REMOTE))
       cupsdSetPrinterAttrs(p);

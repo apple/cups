@@ -86,8 +86,8 @@ ALT=""></TH>
 
 <P>
 <A HREF="/help/"><IMG SRC="/images/help.gif" BORDER="0" ALIGN="MIDDLE" ALT="Help"></A>
-<A HREF="/admin/OP=add-class"><IMG SRC="/images/add-class.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Class"></A>
-<A HREF="/admin/OP=add-printer"><IMG SRC="/images/add-printer.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Printer"></A>
+<A HREF="/admin?OP=add-class"><IMG SRC="/images/add-class.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Class"></A>
+<A HREF="/admin?OP=add-printer"><IMG SRC="/images/add-printer.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Printer"></A>
 <A HREF="/classes"><IMG SRC="/images/manage-classes.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Classes"></A>
 <A HREF="/jobs"><IMG SRC="/images/manage-jobs.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Jobs"></A>
 <A HREF="/printers"><IMG SRC="/images/manage-printers.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Printers"></A>

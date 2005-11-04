@@ -515,7 +515,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       char	refresh[1024];		/* Refresh URL */
 
       cgiFormEncode(uri, name, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/classes/%s",
+      snprintf(refresh, sizeof(refresh), "5;/admin?OP=redirect&URL=/classes/%s",
                uri);
       cgiSetVariable("refresh_page", refresh);
 
@@ -1067,10 +1067,10 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 
       if (modify)
 	snprintf(refresh, sizeof(refresh),
-	         "2;/admin?OP=redirect&URL=/printers/%s", uri);
+	         "5;/admin?OP=redirect&URL=/printers/%s", uri);
       else
 	snprintf(refresh, sizeof(refresh),
-	         "2;/admin?OP=config-printer&PRINTER_NAME=%s", uri);
+	         "5;/admin?OP=config-printer&PRINTER_NAME=%s", uri);
 
       cgiSetVariable("refresh_page", refresh);
 
@@ -1628,7 +1628,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       char	refresh[1024];		/* Refresh URL */
 
       cgiFormEncode(uri, printer, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
+      snprintf(refresh, sizeof(refresh), "5;/admin?OP=redirect&URL=/printers/%s",
                uri);
       cgiSetVariable("refresh_page", refresh);
 
@@ -2227,7 +2227,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     }
     else
     {
-      cgiSetVariable("refresh_page", "10;/admin?OP=redirect");
+      cgiSetVariable("refresh_page", "5;/admin?OP=redirect");
 
       cgiStartHTML("Change Settings");
       cgiCopyTemplateLang(stdout, TEMPLATES, "restart.tmpl", getenv("LANG"));
@@ -2317,7 +2317,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     }
     else
     {
-      cgiSetVariable("refresh_page", "10;/admin?OP=redirect");
+      cgiSetVariable("refresh_page", "5;/admin?OP=redirect");
 
       cgiStartHTML("Edit Configuration File");
       cgiCopyTemplateLang(stdout, TEMPLATES, "restart.tmpl", getenv("LANG"));
@@ -3090,7 +3090,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
     char	refresh[1024];		/* Refresh URL */
 
     cgiFormEncode(uri, printer, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
+    snprintf(refresh, sizeof(refresh), "5;/admin?OP=redirect&URL=/printers/%s",
              uri);
     cgiSetVariable("refresh_page", refresh);
 
@@ -3377,7 +3377,7 @@ do_set_allowed_users(
       char	refresh[1024];		/* Refresh URL */
 
       cgiFormEncode(uri, printer, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
+      snprintf(refresh, sizeof(refresh), "5;/admin?OP=redirect&URL=/printers/%s",
                uri);
       cgiSetVariable("refresh_page", refresh);
 
@@ -3484,7 +3484,7 @@ do_set_sharing(http_t      *http,	/* I - HTTP connection */
     char	refresh[1024];		/* Refresh URL */
 
     cgiFormEncode(uri, printer, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "2;/admin?OP=redirect&URL=/printers/%s",
+    snprintf(refresh, sizeof(refresh), "5;/admin?OP=redirect&URL=/printers/%s",
              uri);
     cgiSetVariable("refresh_page", refresh);
 
