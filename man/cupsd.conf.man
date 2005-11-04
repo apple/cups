@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "30 September 2005" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "4 November 2005" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -172,14 +172,6 @@ ErrorLog
 .br
 Specifies the error log filename.
 .TP 5
-FaxRetryInterval
-.br
-Specifies the interval between retries of fax jobs in seconds.
-.TP 5
-FaxRetryLimit
-.br
-Specifies the number of retries that are done for fax jobs.
-.TP 5
 FileDevice
 .br
 Specifies whether the file pseudo-device can be used for new
@@ -225,6 +217,14 @@ remote printers.
 Include
 .br
 Includes the named file.
+.TP 5
+JobRetryInterval
+.br
+Specifies the interval between retries of jobs in seconds.
+.TP 5
+JobRetryLimit
+.br
+Specifies the number of retries that are done for jobs.
 .TP 5
 KeepAlive
 .br

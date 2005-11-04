@@ -101,8 +101,6 @@ static cupsd_var_t	variables[] =
   { "DefaultPolicy",		&DefaultPolicy,		CUPSD_VARTYPE_STRING },
   { "DocumentRoot",		&DocumentRoot,		CUPSD_VARTYPE_STRING },
   { "ErrorLog",			&ErrorLog,		CUPSD_VARTYPE_STRING },
-  { "FaxRetryLimit",		&FaxRetryLimit,		CUPSD_VARTYPE_INTEGER },
-  { "FaxRetryInterval",		&FaxRetryInterval,	CUPSD_VARTYPE_INTEGER },
   { "FileDevice",		&FileDevice,		CUPSD_VARTYPE_BOOLEAN },
   { "FilterLimit",		&FilterLimit,		CUPSD_VARTYPE_INTEGER },
   { "FilterNice",		&FilterNice,		CUPSD_VARTYPE_INTEGER },
@@ -110,6 +108,8 @@ static cupsd_var_t	variables[] =
   { "HideImplicitMembers",	&HideImplicitMembers,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitClasses",		&ImplicitClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitAnyClasses",	&ImplicitAnyClasses,	CUPSD_VARTYPE_BOOLEAN },
+  { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },
+  { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_INTEGER },
   { "KeepAliveTimeout",		&KeepAliveTimeout,	CUPSD_VARTYPE_INTEGER },
   { "KeepAlive",		&KeepAlive,		CUPSD_VARTYPE_BOOLEAN },
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
@@ -383,8 +383,8 @@ cupsdReadConfiguration(void)
 
   ConfigFilePerm      = 0640;
   DefaultAuthType     = AUTH_BASIC;
-  FaxRetryLimit       = 5;
-  FaxRetryInterval    = 300;
+  JobRetryLimit       = 5;
+  JobRetryInterval    = 300;
   FileDevice          = FALSE;
   FilterLevel         = 0;
   FilterLimit         = 0;
@@ -1791,6 +1791,36 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	linenum = read_policy(fp, value, linenum);
 	if (linenum == 0)
 	  return (0);
+      }
+      else
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
+        return (0);
+      }
+    }
+    else if (!strcasecmp(line, "FaxRetryInterval"))
+    {
+      if (value)
+      {
+        JobRetryInterval = atoi(value);
+	cupsdLogMessage(CUPSD_LOG_WARN,
+	                "FaxRetryInterval is deprecated; use "
+			"JobRetryInterval on line %d.", linenum);
+      }
+      else
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
+        return (0);
+      }
+    }
+    else if (!strcasecmp(line, "FaxRetryLimit"))
+    {
+      if (value)
+      {
+        JobRetryLimit = atoi(value);
+	cupsdLogMessage(CUPSD_LOG_WARN,
+	                "FaxRetryLimit is deprecated; use "
+			"JobRetryLimit on line %d.", linenum);
       }
       else
       {

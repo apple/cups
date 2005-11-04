@@ -79,9 +79,9 @@ VAR cups_array_t	*Jobs		VALUE(NULL),
 					/* List of active jobs */
 VAR int			NextJobId	VALUE(1);
 					/* Next job ID to use */
-VAR int			FaxRetryLimit	VALUE(5),
+VAR int			JobRetryLimit	VALUE(5),
 					/* Max number of tries */
-			FaxRetryInterval VALUE(300);
+			JobRetryInterval VALUE(300);
 					/* Seconds between retries */
 
 

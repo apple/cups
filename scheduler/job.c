@@ -445,7 +445,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
 	    job->tries ++;
 
-	    if (job->tries >= FaxRetryLimit)
+	    if (job->tries >= JobRetryLimit)
 	    {
 	     /*
 	      * Too many tries...
@@ -453,11 +453,11 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "Canceling job %d since it could not be sent after %d tries.",
-	        	      job->id, FaxRetryLimit);
+	        	      job->id, JobRetryLimit);
 
 	      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                 	    "Job cancelled since it could not be sent after %d tries.",
-			    FaxRetryLimit);
+			    JobRetryLimit);
 
 	      cupsdCancelJob(job, 0);
 	    }
@@ -467,7 +467,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	      * Try again in N seconds...
 	      */
 
-	      set_hold_until(job, time(NULL) + FaxRetryInterval);
+	      set_hold_until(job, time(NULL) + JobRetryInterval);
 	    }
 	  }
 	  else if (!strcmp(printer->error_policy, "abort-job"))
