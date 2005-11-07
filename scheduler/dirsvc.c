@@ -1324,7 +1324,9 @@ cupsdSendBrowseList(void)
 	                "Remote destination \"%s\" has timed out; deleting it...",
 	                p->name);
 
+        cupsArraySave(Printers);
         cupsdDeletePrinter(p, 1);
+        cupsArrayRestore(Printers);
       }
     }
   }
