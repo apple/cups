@@ -2386,10 +2386,10 @@ cupsdUpdateSLPBrowse(void)
 
       if (strstr(uri, "/printers/") != NULL)
         cupsdProcessBrowseData(uri, p.type, IPP_PRINTER_IDLE, p.location,
-	                  p.info, p.make_model);
+	                  p.info, p.make_model, 0, NULL);
       else if (strstr(uri, "/classes/") != NULL)
         cupsdProcessBrowseData(uri, p.type | CUPS_PRINTER_CLASS, IPP_PRINTER_IDLE,
-	                  p.location, p.info, p.make_model);
+	                  p.location, p.info, p.make_model, 0, NULL);
     }
 
    /*
