@@ -22,6 +22,9 @@
  *         WWW: http://www.cups.org
  */
 
+#ifndef _CUPS_CONFIG_H_
+#define _CUPS_CONFIG_H_
+
 /*
  * Compiler stuff...
  */
@@ -34,7 +37,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION	"CUPS v1.2.0b1"
+#define CUPS_SVERSION		"CUPS v1.2svn"
+#define CUPS_MINIMAL		"CUPS/1.2svn"
 
 
 /*
@@ -49,7 +53,7 @@
  * Default IPP port...
  */
 
-#define CUPS_DEFAULT_IPP_PORT 631
+#define CUPS_DEFAULT_IPP_PORT	631
 
 
 /*
@@ -60,24 +64,29 @@
 
 
 /*
- * Where are files stored?
+ * Do we have domain socket support?
  */
 
-#define CUPS_LOCALEDIR	"C:/CUPS/locale"
-#define CUPS_SERVERROOT	"C:/CUPS/etc"
-#define CUPS_SERVERBIN	"C:/CUPS"
-#define CUPS_DOCROOT	"C:/CUPS/share/doc"
-#define CUPS_REQUESTS	"C:/CUPS/spool"
-#define CUPS_LOGDIR	"C:/CUPS/logs"
-#define CUPS_DATADIR    "C:/CUPS/share"
-#define CUPS_FONTPATH	"C:/CUPS/share/fonts"
+#undef CUPS_DEFAULT_DOMAINSOCKET
 
 
 /*
- * What is the format string for strftime?
+ * Where are files stored?
+ *
+ * Note: These are defaults, which can be overridden by environment
+ *       variables at run-time...
  */
 
-#define CUPS_STRFTIME_FORMAT	"%c"
+#define CUPS_CACHEDIR	"C:/CUPS/cache"
+#define CUPS_DATADIR    "C:/CUPS/share"
+#define CUPS_DOCROOT	"C:/CUPS/share/doc"
+#define CUPS_FONTPATH	"C:/CUPS/share/fonts"
+#define CUPS_LOCALEDIR	"C:/CUPS/locale"
+#define CUPS_LOGDIR	"C:/CUPS/logs"
+#define CUPS_REQUESTS	"C:/CUPS/spool"
+#define CUPS_SERVERBIN	"C:/CUPS/lib"
+#define CUPS_SERVERROOT	"C:/CUPS/etc"
+#define CUPS_STATEDIR	"C:/CUPS/run"
 
 
 /*
@@ -89,22 +98,6 @@
 #undef HAVE_LIBJPEG
 #undef HAVE_LIBTIFF
 
-
-/*
- * Does this machine store words in big-endian (MSB-first) order?
- */
-
-#undef WORDS_BIGENDIAN
-
-
-/*
- * Which directory functions and headers do we use?
- */
-
-#undef HAVE_DIRENT_H
-#undef HAVE_SYS_DIR_H
-#undef HAVE_SYS_NDIR_H
-#undef HAVE_NDIR_H
 
 /*
  * Do we have PAM stuff?
@@ -132,20 +125,38 @@
 
 
 /*
- * How about standard C header files?
- */
-
-#undef HAVE_STDDEF_H
-#define HAVE_STDLIB_H
-
-
-/*
  * Use <string.h>, <strings.h>, and/or <bstring.h>?
  */
 
 #define HAVE_STRING_H
 #undef HAVE_STRINGS_H
 #undef HAVE_BSTRING_H
+
+
+/*
+ * Do we have the long long type?
+ */
+
+#undef HAVE_LONG_LONG
+
+#ifdef HAVE_LONG_LONG
+#  define CUPS_LLFMT	"%lld"
+#  define CUPS_LLCAST	(long long)
+#else
+#  define CUPS_LLFMT	"%ld"
+#  define CUPS_LLCAST	(long)
+#endif /* HAVE_LONG_LONG */
+
+
+/*
+ * Do we have the strtoll() function?
+ */
+
+#undef HAVE_STRTOLL
+
+#ifndef HAVE_STRTOLL
+#  define strtoll(nptr,endptr,base) strtol((nptr), (endptr), (base))
+#endif /* !HAVE_STRTOLL */
 
 
 /*
@@ -157,6 +168,13 @@
 #define HAVE_STRNCASECMP
 #undef HAVE_STRLCAT
 #undef HAVE_STRLCPY
+
+
+/*
+ * Do we have the geteuid() function?
+ */
+
+#undef HAVE_GETEUID
 
 
 /*
@@ -181,6 +199,7 @@
 #undef HAVE_SIGSET
 #undef HAVE_SIGACTION
 
+
 /*
  * What wait functions to use?
  */
@@ -195,6 +214,13 @@
 
 #undef HAVE_MALLINFO
 #undef HAVE_MALLOC_H
+
+
+/*
+ * Do we have the langinfo.h header file?
+ */
+
+#undef HAVE_LANGINFO_H
 
 
 /*
@@ -244,10 +270,24 @@
 
 
 /*
- * Do we have rresvport()?
+ * Do we have rresvport_af()?
  */
 
-#undef HAVE_RRESVPORT
+#undef HAVE_RRESVPORT_AF
+
+
+/*
+ * Do we have getaddrinfo()?
+ */
+
+#undef HAVE_GETADDRINFO
+
+
+/*
+ * Do we have getnameinfo()?
+ */
+
+#undef HAVE_GETNAMEINFO
 
 
 /*
@@ -279,6 +319,19 @@
 
 
 /*
+ * Do we have the AIX usersec.h header file?
+ */
+
+#undef HAVE_USERSEC_H
+
+/*
+ * Do we have pthread support?
+ */
+
+#undef HAVE_PTHREAD_H
+
+
+/*
  * Various scripting languages...
  */
 
@@ -291,6 +344,8 @@
 #undef HAVE_PYTHON
 #define CUPS_PYTHON	"/usr/bin/python"
 
+
+#endif /* !_CUPS_CONFIG_H_ */
 
 /*
  * End of "$Id$".
