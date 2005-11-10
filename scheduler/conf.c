@@ -2435,22 +2435,46 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * User ID to run as...
       */
 
-      if (isdigit(value[0]))
-        User = atoi(value);
-      else
+      if (value && isdigit(value[0] & 255))
+      {
+        int uid = atoi(value);
+
+	if (!uid)
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Will not use User 0 as specified on line %d "
+			  "for security reasons.  You must use a non-"
+			  "privileged account instead.",
+	                  linenum);
+        else
+	  User = atoi(value);
+      }
+      else if (value)
       {
         struct passwd *p;	/* Password information */
 
         endpwent();
 	p = getpwnam(value);
 
-	if (p != NULL)
-	  User = p->pw_uid;
+	if (p)
+	{
+	  if (!p->pw_uid)
+	    cupsdLogMessage(CUPSD_LOG_ERROR,
+	                    "Will not use User %s (UID=0) as specified on line "
+			    "%d for security reasons.  You must use a non-"
+			    "privileged account instead.",
+	                    value, linenum);
+	  else
+	    User = p->pw_uid;
+	}
 	else
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
 	                  "Unknown User \"%s\" on line %d, ignoring!",
 	                  value, linenum);
       }
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "User directive on line %d missing the username!",
+	                linenum);
     }
     else if (!strcasecmp(line, "Group"))
     {
