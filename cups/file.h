@@ -37,6 +37,11 @@
 
 #  include <sys/types.h>
 
+#  ifdef WIN32
+/* Windows does not support the ssize_t type, so map it to off_t... */
+typedef off_t ssize_t;
+#  endif /* WIN32 */
+
 
 /*
  * C++ magic...

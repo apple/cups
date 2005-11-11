@@ -67,11 +67,16 @@
 #include <errno.h>
 #include <cups/debug.h>
 #include <sys/types.h>
+#include <fcntl.h>
 
 #include "file.h"
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */
+#ifdef WIN32
+#  include <io.h>
+#  include <sys/locking.h>
+#endif /* WIN32 */
 
 
 /*
@@ -282,9 +287,11 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
 
   if (bytes > 0)
   {
+#ifdef HAVE_LIBZ
     if (fp->compressed)
       bytes = cups_compress(fp, fp->buf, bytes);
     else
+#endif /* HAVE_LIBZ */
       bytes = cups_write(fp, fp->buf, bytes);
 
     if (bytes < 0)
@@ -540,7 +547,11 @@ cupsFileLock(cups_file_t *fp,		/* I - File to lock */
   * Try the lock...
   */
 
+#ifdef WIN32
+  return (locking(fp->fd, block ? _LK_LOCK : _LK_NBLCK, 0));
+#else
   return (lockf(fp->fd, block ? F_LOCK : F_TLOCK, 0));
+#endif /* WIN32 */
 }
 
 
@@ -746,7 +757,9 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
   * Don't pass this file to child processes...
   */
 
+#ifndef WIN32
   fcntl(fp->fd, F_SETFD, fcntl(fp->fd, F_GETFD) | FD_CLOEXEC);
+#endif /* !WIN32 */
 
   return (fp);
 }
@@ -814,9 +827,11 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 
   if (bytes > sizeof(fp->buf))
   {
+#ifdef HAVE_LIBZ
     if (fp->compressed)
       return (cups_compress(fp, buf, bytes));
     else
+#endif /* HAVE_LIBZ */
       return (cups_write(fp, buf, bytes));
   }
   else
@@ -918,9 +933,11 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
 
   if (bytes > sizeof(fp->buf))
   {
+#ifdef HAVE_LIBZ
     if (fp->compressed)
       return (cups_compress(fp, s, bytes));
     else
+#endif /* HAVE_LIBZ */
       return (cups_write(fp, s, bytes));
   }
   else
@@ -1143,7 +1160,11 @@ cupsFileUnlock(cups_file_t *fp)		/* I - File to lock */
   * Unlock...
   */
 
+#ifdef WIN32
+  return (locking(fp->fd, _LK_UNLCK, 0));
+#else
   return (lockf(fp->fd, F_ULOCK, 0));
+#endif /* WIN32 */
 }
 
 
@@ -1188,9 +1209,11 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
 
   if (bytes > sizeof(fp->buf))
   {
+#ifdef HAVE_LIBZ
     if (fp->compressed)
       return (cups_compress(fp, buf, bytes));
     else
+#endif /* HAVE_LIBZ */
       return (cups_write(fp, buf, bytes));
   }
   else

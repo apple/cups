@@ -164,7 +164,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 		  const char *filename)	/* I - File to send or NULL */
 {
   ipp_t		*response;		/* IPP response data */
-  off_t		length;			/* Content-Length value */
+  size_t	length;			/* Content-Length value */
   http_status_t	status;			/* Status of HTTP request */
   FILE		*file;			/* File to send */
   struct stat	fileinfo;		/* File information */
@@ -295,7 +295,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
         rewind(file);
 
-        while ((bytes = fread(buffer, 1, sizeof(buffer), file)) > 0)
+        while ((bytes = (int)fread(buffer, 1, sizeof(buffer), file)) > 0)
 	{
 	  if (httpCheck(http))
 	  {

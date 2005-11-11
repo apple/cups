@@ -397,7 +397,7 @@ cupsUTF8ToUTF32(cups_utf32_t *dest,     /* O - Target string */
     const int maxout)                   /* I - Max output */
 {
   cups_utf8_t   *first = (cups_utf8_t *) src;
-  int           srclen;         /* Source string length */
+  size_t        srclen;         /* Source string length */
   int           i;              /* Looping variable */
   cups_utf32_t  ch;             /* Character value */
   cups_utf32_t  next;           /* Next character value */
@@ -1143,7 +1143,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
         vmap->char2uni[(int) leadchar] = crow;
       }
       crow += (int) (legchar & 0xff);
-      *crow = (cups_vbcs_t) unichar;
+      *crow = (cups_ucs2_t) unichar;
     }
     else
     {
@@ -1165,7 +1165,7 @@ get_vbcs_charmap(const cups_encoding_t encoding,
         vmap->wide2uni = wide2uni;
       }
       wide2uni->widechar = (cups_vbcs_t) legchar;
-      wide2uni->unichar = unichar;
+      wide2uni->unichar = (cups_ucs2_t)unichar;
       wide2uni ++;
     }
 

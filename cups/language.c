@@ -594,7 +594,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     return (NULL);
   }
 
-  i = strlen(line) - 1;
+  i = (int)strlen(line) - 1;
   if (line[i] == '\n')
     line[i] = '\0';	/* Strip LF */
 
@@ -685,7 +685,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     * Ignore blank lines...
     */
 
-    i = strlen(line) - 1;
+    i = (int)strlen(line) - 1;
     if (line[i] == '\n')
       line[i] = '\0';	/* Strip LF */
 

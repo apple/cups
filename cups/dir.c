@@ -82,8 +82,8 @@ _cups_dir_time(FILETIME ft)		/* I - File time */
   * between them...
   */
 
-  val = ft.dwLowDateTime + ft.dwHighDateTime << 32;
-  return (val / 10000000 - 11644732800);
+  val = ft.dwLowDateTime + (ft.dwHighDateTime << 32);
+  return ((time_t)(val / 10000000 - 11644732800));
 }
 
 
@@ -98,7 +98,7 @@ cupsDirClose(cups_dir_t *dp)		/* I - Directory */
   * Range check input...
   */
 
-  if (!directory)
+  if (!dp)
     return;
 
  /*
@@ -198,14 +198,14 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
   strlcpy(dp->entry.filename, entry.cFileName, sizeof(dp->entry.filename));
 
   if (entry.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-    dp->entry.st_mode = 0755 | S_IFDIR;
+    dp->entry.fileinfo.st_mode = 0755 | S_IFDIR;
   else
-    dp->entry.st_mode = 0644;
+    dp->entry.fileinfo.st_mode = 0644;
 
-  dp->entry.st_atime = _cups_dir_time(entry.ftLastAccessTime);
-  dp->entry.st_ctime = _cups_dir_time(entry.ftCreationTime);
-  dp->entry.st_mtime = _cups_dir_time(entry.ftLastWriteTime);
-  dp->entry.st_size  = entry.nFileSizeLow + entry.nFileSizeHigh << 32;
+  dp->entry.fileinfo.st_atime = _cups_dir_time(entry.ftLastAccessTime);
+  dp->entry.fileinfo.st_ctime = _cups_dir_time(entry.ftCreationTime);
+  dp->entry.fileinfo.st_mtime = _cups_dir_time(entry.ftLastWriteTime);
+  dp->entry.fileinfo.st_size  = entry.nFileSizeLow + (entry.nFileSizeHigh << 32);
 
  /*
   * Return the entry...

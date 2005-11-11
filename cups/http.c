@@ -1337,9 +1337,9 @@ httpSetField(http_t       *http,	/* I - HTTP data */
 
 void
 httpSetLength(http_t *http,		/* I - HTTP data */
-              off_t  length)		/* I - Length (0 for chunked) */
+              size_t length)		/* I - Length (0 for chunked) */
 {
-  if (!http || length < 0)
+  if (!http)
     return;
 
   if (!length)
@@ -2171,10 +2171,10 @@ http_wait(http_t *http,			/* I - HTTP data */
 {
 #ifndef WIN32
   struct rlimit		limit;          /* Runtime limit */
+  int			set_size;	/* Size of select set */
 #endif /* !WIN32 */
   struct timeval	timeout;	/* Timeout */
   int			nfds;		/* Result from select() */
-  int			set_size;	/* Size of select set */
 
 
   DEBUG_printf(("http_wait(http=%p, msec=%d)\n", http, msec));

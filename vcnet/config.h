@@ -280,14 +280,14 @@
  * Do we have getaddrinfo()?
  */
 
-#undef HAVE_GETADDRINFO
+#define HAVE_GETADDRINFO
 
 
 /*
  * Do we have getnameinfo()?
  */
 
-#undef HAVE_GETNAMEINFO
+#define HAVE_GETNAMEINFO
 
 
 /*

@@ -1036,7 +1036,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       if (name[0] == '*')
         _cups_strcpy(name, name + 1); /* Eliminate leading asterisk */
 
-      for (i = strlen(name) - 1; i > 0 && isspace(name[i] & 255); i --)
+      for (i = (int)strlen(name) - 1; i > 0 && isspace(name[i] & 255); i --)
         name[i] = '\0'; /* Eliminate trailing spaces */
 
       DEBUG_printf(("OpenUI of %s in group %s...\n", name,
@@ -2261,7 +2261,7 @@ ppd_decode(char *string)		/* I - String to decode */
 
   *outptr = '\0';
 
-  return (outptr - string);
+  return ((int)(outptr - string));
 }
 
 

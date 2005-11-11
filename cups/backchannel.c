@@ -36,9 +36,12 @@
 
 #include "cups.h"
 #include <errno.h>
-#ifndef WIN32
+#ifdef WIN32
+#  include <io.h>
+#  include <fcntl.h>
+#else
 #  include <sys/time.h>
-#endif /* !WIN32 */
+#endif /* WIN32 */
 
 
 /*

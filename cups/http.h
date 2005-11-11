@@ -445,7 +445,7 @@ extern http_uri_status_t httpSeparateURI(const char *uri,
 			        	 char *username, int usernamelen,
 					 char *host, int hostlen, int *port,
 					 char *resource, int resourcelen);
-extern void		httpSetLength(http_t *http, off_t length);
+extern void		httpSetLength(http_t *http, size_t length);
 
 
 /*

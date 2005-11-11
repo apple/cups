@@ -847,7 +847,7 @@ cupsUTF32CaseFold(
 
   cupsNormalizeMapsFree();
 
-  return (dest - start);
+  return ((int)(dest - start));
 }
 
 
@@ -1680,7 +1680,7 @@ static int				/* O - Zero or -1 on error */
 get_propmap(void)
 {
   int			i, j;		/* Looping variables */
-  int			len;		/* String length */
+  size_t		len;		/* String length */
   cups_utf32_t		unichar;	/* Unicode character value */
   cups_gencat_t		gencat;		/* General Category Value */
   cups_bidi_t	bidicat;	/* Bidi Category Value */
