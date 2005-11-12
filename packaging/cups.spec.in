@@ -179,6 +179,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/lib/cups/driver
 %dir /usr/lib/cups/filter
 /usr/lib/cups/filter/*
+%dir /usr/lib/cups/notifier
+/usr/lib/cups/notifier/*
 
 /usr/sbin/*
 %dir /usr/share/cups
