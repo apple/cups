@@ -168,7 +168,7 @@ extern void	cupsdSaveAllSubscriptions(void);
 extern void	cupsdSendNotification(cupsd_subscription_t *sub,
 		                      cupsd_event_t *event);
 extern void	cupsdStopAllNotifiers(void);
-extern void	cupsdUpdateNotiferStatus(void);
+extern void	cupsdUpdateNotifierStatus(void);
 
 
 /*

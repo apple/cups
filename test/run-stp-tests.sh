@@ -200,6 +200,7 @@ ln -s $root/backend/serial /tmp/cups-$user/bin/backend
 ln -s $root/backend/socket /tmp/cups-$user/bin/backend
 ln -s $root/backend/usb /tmp/cups-$user/bin/backend
 ln -s $root/cgi-bin /tmp/cups-$user/bin
+ln -s $root/notifier /tmp/cups-$user/bin
 ln -s $root/scheduler /tmp/cups-$user/bin/daemon
 ln -s $root/filter/hpgltops /tmp/cups-$user/bin/filter
 ln -s $root/filter/imagetops /tmp/cups-$user/bin/filter

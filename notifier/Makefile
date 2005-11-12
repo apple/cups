@@ -24,8 +24,9 @@
 
 include ../Makedefs
 
-TARGETS =	indp mailto
-OBJS	=	indp.o mailto.o
+
+TARGETS =	indp mailto testnotify
+OBJS	=	indp.o mailto.o testnotify.o
 
 
 #
@@ -55,15 +56,20 @@ install:
 
 
 #
+# Update dependencies (without system header dependencies...)
+#
+
+depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+
+
+#
 # indp
 #
 
 indp:	indp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o indp indp.o $(LIBS)
-
-indp.o:	../cups/cups.h ../cups/ipp.h ../cups/language.h	\
-		../cups/string.h
 
 
 #
@@ -74,11 +80,20 @@ mailto:	mailto.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o mailto mailto.o $(LIBS)
 
-mailto.o:	../cups/cups.h ../cups/ipp.h ../cups/language.h	\
-		../cups/string.h
+
+#
+# testnotify
+#
+
+testnotify:	testnotify.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o testnotify testnotify.o $(LIBS)
 
 
-$(OBJS):	../config.h ../Makedefs
+$(OBJS):	../Makedefs
+
+include Dependencies
+
 
 #
 # End of "$Id$".

@@ -640,6 +640,13 @@ main(int  argc,				/* I - Number of command-line arguments */
       cupsdUpdateCGI();
 
    /*
+    * Update notifier messages as needed...
+    */
+
+    if (NotifierPipes[0] >= 0 && FD_ISSET(NotifierPipes[0], input))
+      cupsdUpdateNotifierStatus();
+
+   /*
     * Update the browse list as needed...
     */
 

@@ -36,6 +36,7 @@
  *   cupsdStopAllNotifiers()       - Stop all notifier processes.
  *   cupsdUpdateNotifierStatus()   - Read messages from notifiers.
  *   cupsd_delete_event()          - Delete a single event...
+ *   cupsd_start_notifier()        - Start a notifier subprocess...
  */
 
 /*
@@ -50,6 +51,7 @@
  */
 
 static void	cupsd_delete_event(cupsd_event_t *event);
+static void	cupsd_start_notifier(cupsd_subscription_t *sub);
 
 
 /*
@@ -366,8 +368,9 @@ cupsdAddSubscription(
 
   temp->id             = NextSubscriptionId;
   temp->mask           = mask;
-  temp->job            = job;
   temp->dest           = dest;
+  temp->job            = job;
+  temp->pipe           = -1;
   temp->first_event_id = 1;
   temp->next_event_id  = 1;
 
@@ -438,6 +441,13 @@ cupsdDeleteSubscription(
 {
   int	i;				/* Looping var */
 
+
+ /*
+  * Close the pipe to the notifier as needed...
+  */
+
+  if (sub->pipe >= 0)
+    close(sub->pipe);
 
  /*
   * Free memory...
@@ -1209,6 +1219,9 @@ cupsdSendNotification(
     cupsd_subscription_t *sub,		/* I - Subscription object */
     cupsd_event_t        *event)	/* I - Event to send */
 {
+  ipp_state_t	state;			/* IPP event state */
+
+
   cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "cupsdSendNotification(sub=%p(%d), event=%p(%s))\n",
                   sub, sub->id, event, cupsdEventName(event->event));
@@ -1244,7 +1257,25 @@ cupsdSendNotification(
   * Deliver the event...
   */
 
-  /**** TODO ****/
+  if (sub->recipient)
+  {
+    if (sub->pipe < 0)
+      cupsd_start_notifier(sub);
+
+    if (sub->pipe >= 0)
+    {
+      event->attrs->state = IPP_IDLE;
+
+      while ((state = ippWriteFile(sub->pipe, event->attrs)) != IPP_DATA)
+        if (state == IPP_ERROR)
+	  break;
+
+      if (state == IPP_ERROR)
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to send event for subscription %d (%s)!",
+			sub->id, sub->recipient);
+    }
+  }
 
  /*
   * Bump the event sequence number...
@@ -1293,19 +1324,22 @@ cupsdStopAllNotifiers(void)
   * Close the status pipes...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStopAllNotifiers: Removing fd %d from InputSet...",
-	          NotifierPipes[0]);
-  FD_CLR(NotifierPipes[0], InputSet);
+  if (NotifierPipes[0] >= 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdStopAllNotifiers: Removing fd %d from InputSet...",
+	            NotifierPipes[0]);
+    FD_CLR(NotifierPipes[0], InputSet);
 
-  cupsdStatBufDelete(NotifierStatusBuffer);
+    cupsdStatBufDelete(NotifierStatusBuffer);
 
-  close(NotifierPipes[0]);
-  close(NotifierPipes[1]);
+    close(NotifierPipes[0]);
+    close(NotifierPipes[1]);
 
-  NotifierPipes[0] = -1;
-  NotifierPipes[1] = -1;
-  NotifierStatusBuffer = NULL;
+    NotifierPipes[0] = -1;
+    NotifierPipes[1] = -1;
+    NotifierStatusBuffer = NULL;
+  }
 }
 
 
@@ -1314,7 +1348,7 @@ cupsdStopAllNotifiers(void)
  */
 
 void
-cupsdUpdateNotiferStatus(void)
+cupsdUpdateNotifierStatus(void)
 {
   char		*ptr,			/* Pointer to end of line in buffer */
 		message[1024];		/* Pointer to message text */
@@ -1325,17 +1359,6 @@ cupsdUpdateNotiferStatus(void)
                                    message, sizeof(message))) != NULL)
     if (!strchr(NotifierStatusBuffer->buffer, '\n'))
       break;
-
-  if (ptr == NULL)
-  {
-   /*
-    * Fatal error on pipe - should never happen!
-    */
-
-    cupsdLogMessage(CUPSD_LOG_CRIT,
-                    "cupsdUpdateNotifierStatus: error reading from notifier error pipe - %s",
-                    strerror(errno));
-  }
 }
 
 
@@ -1393,6 +1416,133 @@ cupsd_delete_event(cupsd_event_t *event)/* I - Event to delete */
 
   ippDelete(event->attrs);
   free(event);
+}
+
+
+/*
+ * 'cupsd_start_notifier()' - Start a notifier subprocess...
+ */
+
+static void
+cupsd_start_notifier(
+    cupsd_subscription_t *sub)		/* I - Subscription object */
+{
+  int	pid;				/* Notifier process ID */
+  int	fds[2];				/* Pipe file descriptors */
+  int	envc;				/* Number of environment variables */
+  char	*argv[4],			/* Command-line arguments */
+	*envp[100],			/* Environment variables */
+	user_data[128],			/* Base-64 encoded user data */
+	scheme[256],			/* notify-recipient-uri scheme */
+	*ptr,				/* Pointer into scheme */
+	command[1024];			/* Notifier command */
+
+
+ /*
+  * Extract the scheme name from the recipient URI and point to the
+  * notifier program...
+  */
+
+  strlcpy(scheme, sub->recipient, sizeof(scheme));
+  if ((ptr = strchr(scheme, ':')) != NULL)
+    *ptr = '\0';
+
+  snprintf(command, sizeof(command), "%s/notifier/%s", ServerBin, scheme);
+
+ /*
+  * Base-64 encode the user data...
+  */
+
+  httpEncode64_2(user_data, sizeof(user_data), (char *)sub->user_data,
+                 sub->user_data_len);
+
+ /*
+  * Setup the argument array...
+  */
+
+  argv[0] = command;
+  argv[1] = sub->recipient;
+  argv[2] = user_data;
+  argv[3] = NULL;
+
+ /*
+  * Setup the environment...
+  */
+
+  envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
+
+ /*
+  * Create pipes as needed...
+  */
+
+  if (!NotifierStatusBuffer)
+  {
+   /*
+    * Create the status pipe...
+    */
+
+    if (cupsdOpenPipe(NotifierPipes))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to create pipes for notifier status - %s",
+		      strerror(errno));
+      return;
+    }
+
+    NotifierStatusBuffer = cupsdStatBufNew(NotifierPipes[0], "[Notifier]");
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "start_notifier: Adding fd %d to InputSet...",
+		    NotifierPipes[0]);
+
+    FD_SET(NotifierPipes[0], InputSet);
+  }
+
+  if (cupsdOpenPipe(fds))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create pipes for notifier %s - %s",
+		    scheme, strerror(errno));
+    return;
+  }
+
+ /*
+  * Make sure the delivery pipe is non-blocking...
+  */
+
+  fcntl(fds[1], F_SETFL, fcntl(fds[1], F_GETFL) | O_NONBLOCK);
+
+ /*
+  * Create the notifier process...
+  */
+
+  if (cupsdStartProcess(command, argv, envp, fds[0], -1, NotifierPipes[1],
+			-1, 0, &pid) < 0)
+  {
+   /*
+    * Error - can't fork!
+    */
+
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to fork for notifier %s - %s",
+                    scheme, strerror(errno));
+
+    cupsdClosePipe(fds);
+  }
+  else
+  {
+   /*
+    * Fork successful - return the PID...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Notifier %s started - PID = %d",
+                    scheme, pid);
+
+    sub->pid    = pid;
+    sub->pipe   = fds[1];
+    sub->status = 0;
+
+    close(fds[0]);
+  }
 }
 
 

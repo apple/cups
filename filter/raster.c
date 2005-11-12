@@ -842,7 +842,7 @@ cups_read(int           fd,		/* I - File descriptor */
       return (0);
     else if (count < 0)
     {
-      if (errno != EINTR)
+      if (errno == EINTR)
         count = 0;
       else
         return (-1);
@@ -872,7 +872,7 @@ cups_write(int                 fd,	/* I - File descriptor */
 
     if (count < 0)
     {
-      if (errno != EINTR)
+      if (errno == EINTR)
         count = 0;
       else
         return (-1);
