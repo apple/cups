@@ -18,7 +18,7 @@ make all
 # Setup an install directory...
 user=`whoami`
 topdir=`pwd`
-pkgdir="/tmp/cups-$user"
+pkgdir="/tmp/cups.pkg-$user"
 
 echo Building package using temp directory $pkgdir...
 rm -rf $pkgdir
@@ -31,9 +31,9 @@ make BUILDROOT=$pkgdir/Package install
 
 # Install resource files into the Resources directory...
 echo Installing resource files...
-cp LICENSE.rtf $pkgdir/Resources/ReadMe.rtf
-cp WELCOME.rtf $pkgdir/Resources/Welcome.rtf
-cp doc/images/cups-installer.tif $pkgdir/Resources/background.tif
+cp packaging/LICENSE.rtf $pkgdir/Resources/ReadMe.rtf
+cp packaging/WELCOME.rtf $pkgdir/Resources/Welcome.rtf
+cp packaging/installer.tif $pkgdir/Resources/background.tif
 
 cat >$pkgdir/Resources/preflight <<EOF
 #!/bin/sh
@@ -50,11 +50,12 @@ chmod 755 $pkgdir/Resources/postflight
 # Tag the current revision in the plist and web interface files...
 sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
 	-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
-	<cups-desc.plist.in >cups-desc.plist
+	<packaging/cups-desc.plist.in >packaging/cups-desc.plist
 sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
 	-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
-	<cups-info.plist.in >cups-info.plist
-sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' <doc/index.html.in >doc/index.html
+	<packaging/cups-info.plist.in >packaging/cups-info.plist
+sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
+	<doc/index.html.in >doc/index.html
 
 # Figure out where PackageMaker is installled...
 if test -d /Developer/Applications/Utilities/PackageMaker.app; then
@@ -69,13 +70,13 @@ rm -rf cups.pkg
 echo $PackageMaker -build -v -p cups.pkg \
 	-f $pkgdir/Package \
 	-r $pkgdir/Resources \
-	-d cups-desc.plist \
-	-i cups-info.plist
+	-d packaging/cups-desc.plist \
+	-i packaging/cups-info.plist
 $PackageMaker -build -v -p cups.pkg \
 	-f $pkgdir/Package \
 	-r $pkgdir/Resources \
-	-d cups-desc.plist \
-	-i cups-info.plist
+	-d packaging/cups-desc.plist \
+	-i packaging/cups-info.plist
 
 # Create a disk image...
 echo Creating MacOS X disk image...

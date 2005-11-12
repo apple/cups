@@ -24,10 +24,14 @@ svn export . /tmp/cups-$version
 echo Configuring...
 cd /tmp/cups-$version/config-scripts
 
-sed -e '1,$s/^CUPS_VERSION=.*/CUPS_VERSION='$version'/' <cups-common.m4 >cups-common.m4.new
+sed -e '1,$s/^CUPS_VERSION=.*/CUPS_VERSION='$version'/' \
+	<cups-common.m4 >cups-common.m4.new
 mv cups-common.m4.new cups-common.m4
 cd ..
-sed -e '1,$s/@CUPS_VERSION@/'$version'/' -e '1,$s/^Release:.*/Release: '$rev'/' -e '1,$s/-source/-r'$rev'-source/' <cups.spec.in >cups.spec
+sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
+	-e '1,$s/^Release:.*/Release: '$rev'/' \
+	-e '1,$s/-source/-r'$rev'-source/' \
+	<packaging/cups.spec.in >packaging/cups.spec
 autoconf -f
 rm -rf autom4te*.cache
 rm -rf standards
