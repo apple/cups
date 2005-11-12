@@ -1085,8 +1085,11 @@ cupsdSaveAllSubscriptions(void)
   snprintf(backup, sizeof(backup), "%s/subscriptions.conf.O", ServerRoot);
 
   if (rename(temp, backup))
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to backup subscriptions.conf - %s",
-                    strerror(errno));
+  {
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to backup subscriptions.conf - %s",
+                      strerror(errno));
+  }
 
   if ((fp = cupsFileOpen(temp, "w")) == NULL)
   {

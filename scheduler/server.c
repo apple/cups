@@ -132,6 +132,7 @@ cupsdStopServer(void)
   cupsdStopListening();
   cupsdStopPolling();
   cupsdStopBrowsing();
+  cupsdStopAllNotifiers();
   cupsdSaveRemoteCache();
 
   if (Clients != NULL)

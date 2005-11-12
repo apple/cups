@@ -907,6 +907,7 @@ cupsdReadConfiguration(void)
     * Free all memory...
     */
 
+    cupsdDeleteAllSubscriptions();
     cupsdFreeAllJobs();
     cupsdDeleteAllClasses();
     cupsdDeleteAllPrinters();
@@ -987,6 +988,12 @@ cupsdReadConfiguration(void)
     */
 
     cupsdLoadAllJobs();
+
+   /*
+    * Load subscriptions...
+    */
+
+    cupsdLoadAllSubscriptions();
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Full reload complete.");
   }
