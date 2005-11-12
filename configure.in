@@ -46,7 +46,7 @@ AC_SUBST(MAKEDEFS)
 
 sinclude(config-scripts/cups-scripting.m4)
 
-AC_OUTPUT(Makedefs cups.list cups.sh packaging/cups.spec cups-config
+AC_OUTPUT(Makedefs packaging/cups.list cups.sh packaging/cups.spec cups-config
           conf/cupsd.conf conf/pam.std doc/index.html
 	  templates/edit-config.tmpl)
 
