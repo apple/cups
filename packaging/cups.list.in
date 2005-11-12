@@ -127,6 +127,7 @@ $top_srcdir=@top_srcdir@
 
 $AMANDIR=@AMANDIR@
 $BINDIR=@bindir@
+$CACHEDIR=@CUPS_CACHEDIR@
 $DATADIR=@CUPS_DATADIR@
 $DOCDIR=@CUPS_DOCROOT@
 $INCLUDEDIR=${includedir}
@@ -142,6 +143,7 @@ $REQUESTS=@CUPS_REQUESTS@
 $SBINDIR=@sbindir@
 $SERVERBIN=@CUPS_SERVERBIN@
 $SERVERROOT=@CUPS_SERVERROOT@
+$STATEDIR=@CUPS_STATEDIR@
 
 $CUPS_USER=@CUPS_USER@
 $CUPS_GROUP=@CUPS_GROUP@
@@ -187,7 +189,10 @@ f 0755 root sys $SERVERBIN/cgi-bin/help.cgi cgi-bin/help.cgi
 f 0755 root sys $SERVERBIN/cgi-bin/jobs.cgi cgi-bin/jobs.cgi
 f 0755 root sys $SERVERBIN/cgi-bin/printers.cgi cgi-bin/printers.cgi
 d 0755 root sys $SERVERBIN/daemon -
+f 0755 root sys $SERVERBIN/daemon/cups-deviced scheduler/cups-deviced
+f 0755 root sys $SERVERBIN/daemon/cups-driverd scheduler/cups-driverd
 f 0755 root sys $SERVERBIN/daemon/cups-polld scheduler/cups-polld
+d 0755 root sys $SERVERBIN/driver -
 d 0755 root sys $SERVERBIN/filter -
 f 0755 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
 f 0755 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
@@ -200,6 +205,8 @@ l 0755 root sys $SERVERBIN/filter/rastertodymo rastertolabel
 f 0755 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
 f 0755 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
 f 0755 root sys $SERVERBIN/filter/texttops filter/texttops
+d 0755 root sys $SERVERBIN/notifier -
+f 0755 root sys $SERVERBIN/notifier/mailto notifier/mailto
 
 %subpackage lpd
 d 0755 root sys $SERVERBIN/daemon -
@@ -274,8 +281,12 @@ l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
 
 # Directories
 d 0755 root sys $LOGDIR -
-d 0700 $CUPS_USER sys $REQUESTS -
-d 1700 $CUPS_USER sys $REQUESTS/tmp -
+d 0755 root sys $REQUESTS -
+d 0755 root sys $REQUESTS/tmp -
+d 0755 root sys $CACHEDIR -
+d 0755 root sys $CACHEDIR/ppd -
+d 0755 root sys $STATEDIR -
+d 0755 root sys $STATEDIR/certs -
 
 # Data files
 f 0644 root sys $LOCALEDIR/C/cups_C locale/C/cups_C

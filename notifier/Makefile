@@ -25,8 +25,8 @@
 include ../Makedefs
 
 
-TARGETS =	indp mailto testnotify
-OBJS	=	indp.o mailto.o testnotify.o
+TARGETS =	mailto testnotify
+OBJS	=	mailto.o testnotify.o
 
 
 #
@@ -49,10 +49,10 @@ clean:
 #
 
 install:
-	-$(MKDIR) $(SERVERBIN)/notifier
-	$(CHMOD) ugo+rx $(SERVERBIN)
-	$(CHMOD) ugo+rx $(SERVERBIN)/notifier
-	$(INSTALL_BIN) $(TARGETS) $(SERVERBIN)/notifier
+	$(INSTALL_DIR) $(SERVERBIN)/notifier
+	for file in $(TARGETS); do \
+		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
+	done
 
 
 #
@@ -61,15 +61,6 @@ install:
 
 depend:
 	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
-
-
-#
-# indp
-#
-
-indp:	indp.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o indp indp.o $(LIBS)
 
 
 #
