@@ -222,7 +222,7 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
       * any...)
       */
 
-      for (j = 0, cost = 0; j < num_temp; j ++)
+      for (j = 0, cost = current->cost; j < num_temp; j ++)
         cost += temp[j].cost;
 
       if (cost < mincost)

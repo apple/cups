@@ -56,46 +56,43 @@ dnl Setup manpage extensions...
 case "$uname" in
 	*BSD* | Darwin*)
 		# *BSD
-		CAT1EXT=0
-		CAT3EXT=0
-		CAT5EXT=0
-		CAT8EXT=0
+		MAN1EXT=1
+		MAN5EXT=5
 		MAN8EXT=8
 		MAN8DIR=8
 		;;
 	IRIX*)
 		# SGI IRIX
-		CAT1EXT=z
-		CAT3EXT=z
-		CAT5EXT=z
-		CAT8EXT=z
+		MAN1EXT=1
+		MAN5EXT=5
 		MAN8EXT=1m
 		MAN8DIR=1
 		;;
 	SunOS* | HP-UX*)
 		# Solaris and HP-UX
-		CAT1EXT=1
-		CAT3EXT=3
-		CAT5EXT=5
-		CAT8EXT=1m
+		MAN1EXT=1
+		MAN5EXT=5
 		MAN8EXT=1m
 		MAN8DIR=1m
 		;;
+	Linux* | GNU*)
+		# Linux and GNU Hurd
+		MAN1EXT=1.gz
+		MAN5EXT=5.gz
+		MAN8EXT=8.gz
+		MAN8DIR=8
+		;;
 	*)
 		# All others
-		CAT1EXT=1
-		CAT3EXT=3
-		CAT5EXT=5
-		CAT8EXT=8
+		MAN1EXT=1
+		MAN5EXT=5
 		MAN8EXT=8
 		MAN8DIR=8
 		;;
 esac
 
-AC_SUBST(CAT1EXT)
-AC_SUBST(CAT3EXT)
-AC_SUBST(CAT5EXT)
-AC_SUBST(CAT8EXT)
+AC_SUBST(MAN1EXT)
+AC_SUBST(MAN5EXT)
 AC_SUBST(MAN8EXT)
 AC_SUBST(MAN8DIR)
 

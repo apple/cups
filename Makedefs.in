@@ -36,7 +36,6 @@ INSTALL		=	@INSTALL@
 LIBTOOL		=	@LIBTOOL@
 LN		=	@LN@ -sf
 MV		=	@MV@
-NROFF		=	@NROFF@
 RANLIB		=	@RANLIB@
 RM		=	@RM@ -f
 SED		=	@SED@
@@ -154,10 +153,8 @@ SERVERBIN	= 	$(BUILDROOT)@CUPS_SERVERBIN@
 SERVERROOT	= 	$(BUILDROOT)@CUPS_SERVERROOT@
 STATEDIR	=	$(BUILDROOT)@CUPS_STATEDIR@
 
-CAT1EXT		=	@CAT1EXT@
-CAT3EXT		=	@CAT3EXT@
-CAT5EXT		=	@CAT5EXT@
-CAT8EXT		=	@CAT8EXT@
+MAN1EXT		=	@MAN1EXT@
+MAN5EXT		=	@MAN5EXT@
 MAN8EXT		=	@MAN8EXT@
 MAN8DIR		=	@MAN8DIR@
 
@@ -170,23 +167,25 @@ PAMFILE		=	@PAMFILE@
 #
 
 .SILENT:
-.SUFFIXES:	.a .c .cxx .h .man .o .0 .1 .1m .3 .5 .8 .z
+.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .8 .8.gz .a .c .cxx .h .man .o .gz
+
 .c.o:
 	echo Compiling $<...
 	$(CC) $(OPTIM) $(CFLAGS) -c $<
+
 .cxx.o:
 	echo Compiling $<...
 	$(CXX) $(OPTIM) $(CXXFLAGS) -c $<
-.man.0 .man.1 .man.1m .man.3 .man.5 .man.8:
-	echo Formatting $<...
+
+.man.1 .man.1m .man.5 .man.8:
+	echo Linking $<...
 	$(RM) $@
-	-$(NROFF) -man $< >$@
-.man.z:
-	echo Formatting $<...
-	$(RM) $@ $@.tmp $@.tmp.z
-	-$(NROFF) -man $< >$@.tmp
-	pack -f $@.tmp
-	$(MV) $@.tmp.z $@
+	$(LN) $< $@
+
+.man.1.gz .man.1m.gz .man.5.gz .man.8.gz .man.gz:
+	echo Compressing $<...
+	$(RM) $@
+	gzip -v9 <$< >$@
 
 
 #

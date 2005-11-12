@@ -133,15 +133,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   snprintf(passwdnew, sizeof(passwdnew), "%s/passwd.new", root);
 
  /*
-  * Find the default system group: "sys", "system", or "root"...
+  * Find the default system group...
   */
 
-  if (getgrnam("sys"))
-    groupname = "sys";
-  else if (getgrnam("system"))
-    groupname = "system";
-  else if (getgrnam("root"))
-    groupname = "root";
+  if (getgrnam(CUPS_DEFAULT_GROUP))
+    groupname = CUPS_DEFAULT_GROUP;
   else
     groupname = "unknown";
 

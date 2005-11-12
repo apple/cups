@@ -230,7 +230,8 @@ ippRewriteURL(const char *uri,		/* I - Current URI */
     * these to see if the printer URL is local...
     */
 
-    server = getenv("SERVER_NAME");
+    if ((server = getenv("SERVER_NAME")) == NULL)
+      server = "";
 
     httpGetHostname(servername, sizeof(servername));
 

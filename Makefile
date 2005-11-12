@@ -143,28 +143,28 @@ check test:	all
 EPMFLAGS	=	-v
 
 aix:
-	epm $(EPMFLAGS) -f aix cups
+	epm $(EPMFLAGS) -f aix cups packaging/cups.list
 
 bsd:
-	epm $(EPMFLAGS) -f bsd cups
+	epm $(EPMFLAGS) -f bsd cups packaging/cups.list
 
 epm:
-	epm $(EPMFLAGS) cups
+	epm $(EPMFLAGS) cups packaging/cups.list
 
 rpm:
-	epm $(EPMFLAGS) -f rpm cups
+	epm $(EPMFLAGS) -f rpm cups packaging/cups.list
 
 deb:
-	epm $(EPMFLAGS) -f deb cups
+	epm $(EPMFLAGS) -f deb cups packaging/cups.list
 
 depot:
-	epm $(EPMFLAGS) -f depot cups
+	epm $(EPMFLAGS) -f depot cups packaging/cups.list
 
 pkg:
-	epm $(EPMFLAGS) -f pkg cups
+	epm $(EPMFLAGS) -f pkg cups packaging/cups.list
 
 tardist:
-	epm $(EPMFLAGS) -f tardist cups
+	epm $(EPMFLAGS) -f tardist cups packaging/cups.list
 
 #
 # End of "$Id$".

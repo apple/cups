@@ -219,7 +219,15 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man5
 /usr/share/man/man5/*
 %dir /usr/share/man/man8
-/usr/share/man/man8/*
+/usr/share/man/man8/accept.8.gz
+/usr/share/man/man8/cupsaddsmb.8.gz
+/usr/share/man/man8/cupsd.8.gz
+/usr/share/man/man8/cupsenable.8.gz
+/usr/share/man/man8/cups-polld.8.gz
+/usr/share/man/man8/lpadmin.8.gz
+/usr/share/man/man8/lpc.8.gz
+/usr/share/man/man8/lpinfo.8.gz
+/usr/share/man/man8/lpmove.8.gz
 
 %dir /var/cache/cups
 %dir /var/cache/cups/ppd
@@ -255,10 +263,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %files lpd
 %defattr(-,root,root)
+#/etc/xinetd.d/cups-lpd
 %dir /usr/lib/cups
 %dir /usr/lib/cups/daemon
 /usr/lib/cups/daemon/cups-lpd
-#/etc/xinetd.d/cups-lpd
+%dir /usr/share/man/man8
+/usr/share/man/man8/cups-lpd.8.gz
 
 #
 # End of "$Id$".

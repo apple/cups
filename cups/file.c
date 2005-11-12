@@ -80,8 +80,18 @@
 
 
 /*
+ * Some operating systems support large files via open flag O_LARGEFILE...
+ */
+
+#ifndef O_LARGEFILE
+#  define O_LARGEFILE
+#endif /* !O_LARGEFILE */
+
+
+/*
  * Types and structures...
  */
+
 struct _cups_file_s			/**** CUPS file structure... ****/
 
 {
@@ -596,15 +606,15 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   switch (*mode)
   {
     case 'a' : /* Append file */
-        fd = open(filename, O_RDWR | O_CREAT | O_APPEND, 0666);
+        fd = open(filename, O_RDWR | O_CREAT | O_APPEND | O_LARGEFILE, 0666);
         break;
 
     case 'r' : /* Read file */
-	fd = open(filename, O_RDONLY, 0);
+	fd = open(filename, O_RDONLY | O_LARGEFILE, 0);
 	break;
 
     case 'w' : /* Write file */
-        fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0666);
+        fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT | O_LARGEFILE, 0666);
         break;
 
     case 's' : /* Read/write socket */

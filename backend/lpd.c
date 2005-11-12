@@ -773,23 +773,27 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     }
 
     httpGetHostname(localhost, sizeof(localhost));
-    localhost[31] = '\0'; /* RFC 1179, Section 7.2 - host name < 32 chars */
 
-    snprintf(control, sizeof(control), "H%s\nP%s\nJ%s\n", localhost, user,
-             title);
+    snprintf(control, sizeof(control),
+             "H.31%s\n"		/* RFC 1179, Section 7.2 - host name <= 31 chars */
+	     "P.31%s\n"		/* RFC 1179, Section 7.2 - user name <= 31 chars */
+	     "J.99%s\n",	/* RFC 1179, Section 7.2 - job name <= 99 chars */
+	     localhost, user, title);
     cptr = control + strlen(control);
 
     if (banner)
     {
-      snprintf(cptr, sizeof(control) - (cptr - control), "C%s\nL%s\n",
+      snprintf(cptr, sizeof(control) - (cptr - control),
+               "C.31%s\n"	/* RFC 1179, Section 7.2 - class name <= 31 chars */
+	       "L%s\n",
                localhost, user);
       cptr   += strlen(cptr);
     }
 
     while (copies > 0)
     {
-      snprintf(cptr, sizeof(control) - (cptr - control), "%cdfA%03d%.15s\n", format,
-               (int)getpid() % 1000, localhost);
+      snprintf(cptr, sizeof(control) - (cptr - control), "%cdfA%03d%.15s\n",
+               format, (int)getpid() % 1000, localhost);
       cptr   += strlen(cptr);
       copies --;
     }

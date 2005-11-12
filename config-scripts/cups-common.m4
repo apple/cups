@@ -55,15 +55,6 @@ AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(HTMLDOC,htmldoc)
 AC_PATH_PROG(LN,ln)
 AC_PATH_PROG(MV,mv)
-AC_PATH_PROG(NROFF,nroff)
-if test "x$NROFF" = x; then
-	AC_PATH_PROG(GROFF,groff)
-	if test "x$GROFF" = x; then
-        	NROFF="echo"
-	else
-        	NROFF="$GROFF -T ascii"
-	fi
-fi
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(SED,sed)
 AC_PATH_PROG(STRIP,strip)
