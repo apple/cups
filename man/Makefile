@@ -96,15 +96,15 @@ install:	all
 		echo Installing $$file in $(MANDIR)/man5...; \
 		$(INSTALL_MAN) $$file $(MANDIR)/man5; \
 	done
-	$(INSTALL_DIR) $(AMANDIR)/man$(MAN8EXT)
+	$(INSTALL_DIR) $(AMANDIR)/man$(MAN8DIR)
 	for file in $(MAN8); do \
-		echo Installing $$file in $(AMANDIR)/man$(MAN8EXT)...; \
-		$(INSTALL_MAN) $$file $(AMANDIR)/man$(MAN8EXT); \
+		echo Installing $$file in $(AMANDIR)/man$(MAN8DIR)...; \
+		$(INSTALL_MAN) $$file $(AMANDIR)/man$(MAN8DIR); \
 	done
-	$(RM) $(AMANDIR)/man$(MAN8EXT)/reject.$(MAN8EXT)
-	$(LN) accept.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)/reject.$(MAN8EXT)
-	$(RM) $(AMANDIR)/man$(MAN8EXT)/cupsdisable.$(MAN8EXT)
-	$(LN) cupsenable.$(MAN8EXT) $(AMANDIR)/man$(MAN8EXT)/cupsdisable.$(MAN8EXT)
+	$(RM) $(AMANDIR)/man$(MAN8DIR)/reject.$(MAN8EXT)
+	$(LN) accept.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/reject.$(MAN8EXT)
+	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
+	$(LN) cupsenable.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
 
 
 #

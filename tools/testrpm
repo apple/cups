@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# "$Id$"
+#
 # Test script for making RPMs...
 #
 
@@ -12,37 +14,15 @@ if test ! -f tools/testrpm; then
         exit 1
 fi
 
-echo Updating...
-svn up
-rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
-version="1.2svn"
+# Get a snapshot of the current source...
+. tools/makesrcdist
 
-echo Exporting $version...
-rm -rf /tmp/cups-$version
-svn export . /tmp/cups-$version
-
-echo Configuring...
-cd /tmp/cups-$version/config-scripts
-
-sed -e '1,$s/^CUPS_VERSION=.*/CUPS_VERSION='$version'/' \
-	<cups-common.m4 >cups-common.m4.new
-mv cups-common.m4.new cups-common.m4
-cd ..
-sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
-	-e '1,$s/^Release:.*/Release: '$rev'/' \
-	-e '1,$s/-source/-r'$rev'-source/' \
-	<packaging/cups.spec.in >packaging/cups.spec
-autoconf -f
-rm -rf autom4te*.cache
-rm -rf standards
-rm -rf tools
-cd ..
-
-echo Archiving...
-tar czf cups-$version-r$rev-source.tar.gz cups-$version
-tar cjf cups-$version-r$rev-source.tar.bz2 cups-$version
-
+# Build the RPM...
 echo Building rpm...
 rm -f /usr/src/redhat/RPMS/i386/cups*.rpm
 rm -f /usr/src/redhat/SRPMS/cups*.rpm
-rpmbuild -ta cups-$version-r$rev-source.tar.gz
+rpmbuild -ta cups-$fileversion-source.tar.bz2
+
+#
+# End of "$Id$".
+#

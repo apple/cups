@@ -194,20 +194,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/locale
 /usr/share/locale/*
 
-%dir /usr/share/man/cat1
-/usr/share/man/cat1/cancel.1
-/usr/share/man/cat1/cupstestppd.1
-/usr/share/man/cat1/lp.1
-/usr/share/man/cat1/lpoptions.1
-/usr/share/man/cat1/lppasswd.1
-/usr/share/man/cat1/lpq.1
-/usr/share/man/cat1/lpr.1
-/usr/share/man/cat1/lprm.1
-/usr/share/man/cat1/lpstat.1
-%dir /usr/share/man/cat5
-/usr/share/man/cat5/*
-%dir /usr/share/man/cat8
-/usr/share/man/cat8/*
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
 /usr/share/man/man1/cupstestppd.1.gz
@@ -224,12 +210,14 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/accept.8.gz
 /usr/share/man/man8/cupsaddsmb.8.gz
 /usr/share/man/man8/cupsd.8.gz
+/usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz
 /usr/share/man/man8/cups-polld.8.gz
 /usr/share/man/man8/lpadmin.8.gz
 /usr/share/man/man8/lpc.8.gz
 /usr/share/man/man8/lpinfo.8.gz
 /usr/share/man/man8/lpmove.8.gz
+/usr/share/man/man8/reject.8.gz
 
 %dir /var/cache/cups
 %dir /var/cache/cups/ppd
@@ -241,10 +229,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(-,root,root)
-%dir /usr/share/man/cat1
-/usr/share/man/cat1/backend.1
-/usr/share/man/cat1/cups-config.1
-/usr/share/man/cat1/filter.1
 %dir /usr/share/man/man1
 /usr/share/man/man1/backend.1.gz
 /usr/share/man/man1/cups-config.1.gz

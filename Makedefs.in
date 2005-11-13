@@ -183,7 +183,7 @@ PAMFILE		=	@PAMFILE@
 	$(LN) $< $@
 
 .man.1.gz .man.1m.gz .man.5.gz .man.8.gz .man.gz:
-	echo Compressing $<...
+	echo -n Compressing $<...
 	$(RM) $@
 	gzip -v9 <$< >$@
 
