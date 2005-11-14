@@ -37,6 +37,7 @@
  *   cupsdSendNotification()       - Send a notification for the specified event.
  *   cupsdStopAllNotifiers()       - Stop all notifier processes.
  *   cupsdUpdateNotifierStatus()   - Read messages from notifiers.
+ *   cupsd_compare_subscriptions() - Compare two subscriptions.
  *   cupsd_delete_event()          - Delete a single event...
  *   cupsd_start_notifier()        - Start a notifier subprocess...
  */
@@ -52,6 +53,9 @@
  * Local functions...
  */
 
+static int	cupsd_compare_subscriptions(cupsd_subscription_t *first,
+		                            cupsd_subscription_t *second,
+		                            void *unused);
 static void	cupsd_delete_event(cupsd_event_t *event);
 static void	cupsd_start_notifier(cupsd_subscription_t *sub);
 
@@ -71,7 +75,6 @@ cupsdAddEvent(
   va_list		ap;		/* Pointer to additional arguments */
   char			ftext[1024];	/* Formatted text buffer */
   cupsd_event_t		*temp;		/* New event pointer */
-  int			i;		/* Looping var */
   cupsd_subscription_t	*sub;		/* Current subscription */
 
 
@@ -110,13 +113,13 @@ cupsdAddEvent(
   * caches...
   */
 
-  for (i = 0, temp = NULL; i < NumSubscriptions; i ++)
+  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions), temp = NULL;
+       sub;
+       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
   {
    /*
     * Check if this subscription requires this event...
     */
-
-    sub = Subscriptions[i];
 
     if ((sub->mask & event) != 0 &&
         (sub->dest == dest || !sub->dest) &&
@@ -314,10 +317,11 @@ cupsdAddEvent(
 
 cupsd_subscription_t *			/* O - New subscription object */
 cupsdAddSubscription(
-    unsigned   mask,			/* I - Event mask */
-    cupsd_printer_t  *dest,			/* I - Printer, if any */
-    cupsd_job_t      *job,			/* I - Job, if any */
-    const char *uri)			/* I - notify-recipient-uri, if any */
+    unsigned        mask,		/* I - Event mask */
+    cupsd_printer_t *dest,		/* I - Printer, if any */
+    cupsd_job_t     *job,		/* I - Job, if any */
+    const char      *uri,		/* I - notify-recipient-uri, if any */
+    int             sub_id)		/* I - notify-subscription-id or 0 */
 {
   cupsd_subscription_t	*temp;		/* New subscription object */
 
@@ -328,28 +332,22 @@ cupsdAddSubscription(
 	          job, job ? job->id : 0, uri);
 
   if (!Subscriptions)
+    Subscriptions = cupsArrayNew((cups_array_func_t)cupsd_compare_subscriptions,
+                                 NULL);
+
+  if (!Subscriptions)
   {
-   /*
-    * Allocate memory for the subscription array...
-    */
-
-    Subscriptions    = calloc(MaxSubscriptions, sizeof(cupsd_subscription_t *));
-    NumSubscriptions = 0;
-
-    if (!Subscriptions)
-    {
-      cupsdLogMessage(CUPSD_LOG_CRIT,
-                      "Unable to allocate memory for subscriptions - %s",
-        	      strerror(errno));
-      return (NULL);
-    }
+    cupsdLogMessage(CUPSD_LOG_CRIT,
+                    "Unable to allocate memory for subscriptions - %s",
+        	    strerror(errno));
+    return (NULL);
   }
 
  /*
   * Limit the number of subscriptions...
   */
 
-  if (NumSubscriptions >= MaxSubscriptions)
+  if (cupsArrayCount(Subscriptions) >= MaxSubscriptions)
     return (NULL);
 
  /*
@@ -368,7 +366,20 @@ cupsdAddSubscription(
   * Fill in common data...
   */
 
-  temp->id             = NextSubscriptionId;
+  if (sub_id)
+  {
+    temp->id = sub_id;
+
+    if (sub_id >= NextSubscriptionId)
+      NextSubscriptionId = sub_id + 1;
+  }
+  else
+  {
+    temp->id = NextSubscriptionId;
+
+    NextSubscriptionId ++;
+  }
+
   temp->mask           = mask;
   temp->dest           = dest;
   temp->job            = job;
@@ -382,9 +393,7 @@ cupsdAddSubscription(
   * Add the subscription to the array...
   */
 
-  Subscriptions[NumSubscriptions] = temp;
-  NumSubscriptions ++;
-  NextSubscriptionId ++;
+  cupsArrayAdd(Subscriptions, temp);
 
   return (temp);
 }
@@ -418,16 +427,18 @@ cupsdDeleteAllEvents(void)
 void
 cupsdDeleteAllSubscriptions(void)
 {
-  int	i;				/* Looping var */
+  cupsd_subscription_t	*sub;		/* Subscription */
 
 
   if (!Subscriptions)
     return;
 
-  for (i = 0; i < NumSubscriptions; i ++)
-    cupsdDeleteSubscription(Subscriptions[i], 0);
+  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
+       sub;
+       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
+    cupsdDeleteSubscription(sub, 0);
 
-  free(Subscriptions);
+  cupsArrayDelete(Subscriptions);
   Subscriptions = NULL;
 }
 
@@ -441,15 +452,18 @@ cupsdDeleteSubscription(
     cupsd_subscription_t *sub,		/* I - Subscription object */
     int                  update)	/* I - 1 = update subscriptions.conf */
 {
-  int	i;				/* Looping var */
-
-
  /*
   * Close the pipe to the notifier as needed...
   */
 
   if (sub->pipe >= 0)
     close(sub->pipe);
+
+ /*
+  * Remove subscription from array...
+  */
+
+  cupsArrayRemove(Subscriptions, sub);
 
  /*
   * Free memory...
@@ -462,25 +476,6 @@ cupsdDeleteSubscription(
     free(sub->events);
 
   free(sub);
-
- /*
-  * Remove subscription from array...
-  */
-
-  for (i = 0; i < NumSubscriptions; i ++)
-    if (Subscriptions[i] == sub)
-    {
-     /*
-      * Remove from array and stop...
-      */
-
-      NumSubscriptions --;
-
-      if (i < NumSubscriptions)
-        memmove(Subscriptions + i, Subscriptions + i + 1,
-	        (NumSubscriptions - i) * sizeof(cupsd_subscription_t *));
-      break;
-    }
 
  /*
   * Update the subscriptions as needed...
@@ -638,18 +633,17 @@ cupsdExpireSubscriptions(
     cupsd_printer_t *dest,		/* I - Printer, if any */
     cupsd_job_t     *job)		/* I - Job, if any */
 {
-  int			i;		/* Looping var */
   cupsd_subscription_t	*sub;		/* Current subscription */
   int			update;		/* Update subscriptions.conf? */
   time_t		curtime;	/* Current time */
 
 
   curtime = time(NULL);
+  update  = 0;
 
-  for (i = 0, update = 0; i < NumSubscriptions; i ++)
-  {
-    sub = Subscriptions[i];
-
+  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
+       sub;
+       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
     if (sub->expire <= curtime ||
         (dest && sub->dest == dest) ||
 	(job && sub->job == job))
@@ -660,7 +654,6 @@ cupsdExpireSubscriptions(
 
       update = 1;
     }
-  }
 
   if (update)
     cupsdSaveAllSubscriptions();
@@ -674,42 +667,12 @@ cupsdExpireSubscriptions(
 cupsd_subscription_t *			/* O - Subscription object */
 cupsdFindSubscription(int id)		/* I - Subscription ID */
 {
-  int			left,		/* Left side of binary search */
-			center,		/* Center of binary search */
-			right;		/* Right side of binary search */
-  cupsd_subscription_t	*sub;		/* Current subscription */
+  cupsd_subscription_t	sub;		/* Subscription template */
 
 
- /*
-  * Return early if we have no subscriptions...
-  */
+  sub.id = id;
 
-  if (NumSubscriptions == 0)
-    return (NULL);
-
- /*
-  * Otherwise do a binary search for the subscription ID...
-  */
-
-  for (left = 0, right = NumSubscriptions - 1; (right - left) > 1;)
-  {
-    center = (left + right) / 2;
-    sub    = Subscriptions[center];
-
-    if (sub->id == id)
-      return (sub);
-    else if (sub->id < id)
-      left = center;
-    else
-      right = center;
-  }
-
-  if (Subscriptions[left]->id == id)
-    return (Subscriptions[left]);
-  else if (Subscriptions[right]->id == id)
-    return (Subscriptions[right]);
-  else
-    return (NULL);
+  return ((cupsd_subscription_t *)cupsArrayFind(Subscriptions, &sub));
 }
 
 
@@ -762,8 +725,8 @@ cupsdLoadAllSubscriptions(void)
 
       if (!sub && value && isdigit(value[0] & 255))
       {
-        sub     = cupsdAddSubscription(CUPSD_EVENT_NONE, NULL, NULL, NULL);
-	sub->id = atoi(value);
+        sub = cupsdAddSubscription(CUPSD_EVENT_NONE, NULL, NULL, NULL,
+	                           atoi(value));
       }
       else
       {
@@ -1066,7 +1029,7 @@ cupsdLoadAllSubscriptions(void)
 void
 cupsdSaveAllSubscriptions(void)
 {
-  int			i, j;		/* Looping vars */
+  int			i;		/* Looping var */
   cups_file_t		*fp;		/* subscriptions.conf file */
   char			temp[1024];	/* Temporary string */
   char			backup[1024];	/* subscriptions.conf.O file */
@@ -1128,10 +1091,10 @@ cupsdSaveAllSubscriptions(void)
   * Write every subscription known to the system...
   */
 
-  for (i = 0; i < NumSubscriptions; i ++)
+  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
+       sub;
+       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
   {
-    sub = Subscriptions[i];
-
     cupsFilePrintf(fp, "<Subscription %d>\n", sub->id);
 
     if ((name = cupsdEventName((cupsd_eventmask_t)sub->mask)) != NULL)
@@ -1170,29 +1133,29 @@ cupsdSaveAllSubscriptions(void)
     {
       cupsFilePuts(fp, "UserData ");
 
-      for (j = 0, hex = 0; j < sub->user_data_len; j ++)
+      for (i = 0, hex = 0; i < sub->user_data_len; i ++)
       {
-        if (sub->user_data[j] < ' ' ||
-	    sub->user_data[j] > 0x7f ||
-	    sub->user_data[j] == '<')
+        if (sub->user_data[i] < ' ' ||
+	    sub->user_data[i] > 0x7f ||
+	    sub->user_data[i] == '<')
 	{
 	  if (!hex)
 	  {
-	    cupsFilePrintf(fp, "<%02X", sub->user_data[j]);
+	    cupsFilePrintf(fp, "<%02X", sub->user_data[i]);
 	    hex = 1;
 	  }
 	  else
-	    cupsFilePrintf(fp, "%02X", sub->user_data[j]);
+	    cupsFilePrintf(fp, "%02X", sub->user_data[i]);
 	}
 	else
 	{
 	  if (hex)
 	  {
-	    cupsFilePrintf(fp, ">%c", sub->user_data[j]);
+	    cupsFilePrintf(fp, ">%c", sub->user_data[i]);
 	    hex = 0;
 	  }
 	  else
-	    cupsFilePutChar(fp, sub->user_data[j]);
+	    cupsFilePutChar(fp, sub->user_data[i]);
 	}
       }
 
@@ -1296,7 +1259,6 @@ cupsdSendNotification(
 void
 cupsdStopAllNotifiers(void)
 {
-  int			i;		/* Looping var */
   cupsd_subscription_t	*sub;		/* Current subscription */
 
 
@@ -1311,10 +1273,9 @@ cupsdStopAllNotifiers(void)
   * Yes, kill and processes that are left...
   */
 
-  for (i = 0; i < NumSubscriptions; i ++)
-  {
-    sub = Subscriptions[i];
-
+  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
+       sub;
+       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
     if (sub->pid)
     {
       cupsdEndProcess(sub->pid, 0);
@@ -1322,7 +1283,6 @@ cupsdStopAllNotifiers(void)
       close(sub->pipe);
       sub->pipe = -1;
     }
-  }
 
  /*
   * Close the status pipes...
@@ -1367,6 +1327,22 @@ cupsdUpdateNotifierStatus(void)
 
 
 /*
+ * 'cupsd_compare_subscriptions()' - Compare two subscriptions.
+ */
+
+static int				/* O - Result of comparison */
+cupsd_compare_subscriptions(
+    cupsd_subscription_t *first,	/* I - First subscription object */
+    cupsd_subscription_t *second,	/* I - Second subscription object */
+    void                 *unused)	/* I - Unused user data pointer */
+{
+  (void)unused;
+
+  return (first->id - second->id);
+}
+
+
+/*
  * 'cupsd_delete_event()' - Delete a single event...
  *
  * Oldest events must be deleted first, otherwise the subscription cache
@@ -1376,7 +1352,6 @@ cupsdUpdateNotifierStatus(void)
 static void
 cupsd_delete_event(cupsd_event_t *event)/* I - Event to delete */
 {
-  int			i;		/* Looping var */
   cupsd_subscription_t	*sub;		/* Current subscription */
 
 
@@ -1384,14 +1359,14 @@ cupsd_delete_event(cupsd_event_t *event)/* I - Event to delete */
   * Loop through the subscriptions and look for the event in the cache...
   */
 
-  for (i = 0; i < NumSubscriptions; i ++)
+  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
+       sub;
+       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
   {
    /*
     * Only check the first event in the subscription cache, since the
     * caller will only delete the oldest event in the cache...
     */
-
-    sub = Subscriptions[i];
 
     if (sub->num_events > 0 && sub->events[0] == event)
     {

@@ -1346,7 +1346,8 @@ add_job_subscriptions(
     if (mask == CUPSD_EVENT_NONE)
       mask = CUPSD_EVENT_JOB_COMPLETED;
 
-    sub = cupsdAddSubscription(mask, cupsdFindDest(job->dest), job, recipient);
+    sub = cupsdAddSubscription(mask, cupsdFindDest(job->dest), job, recipient,
+                               0);
 
     sub->interval = interval;
 
@@ -4471,7 +4472,7 @@ create_subscription(
     else
       job = NULL;
 
-    sub = cupsdAddSubscription(mask, printer, job, recipient);
+    sub = cupsdAddSubscription(mask, printer, job, recipient, 0);
 
     sub->interval = interval;
     sub->lease    = lease;
@@ -5738,7 +5739,6 @@ static void
 get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
                   ipp_attribute_t *uri)	/* I - Printer/job URI */
 {
-  int			i;		/* Looping var */
   int			count;		/* Number of subscriptions */
   int			limit;		/* Limit */
   cupsd_subscription_t	*sub;		/* Subscription */
@@ -5862,10 +5862,9 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
   else
     username[0] = '\0';
 
-  for (i = 0, count = 0; i < NumSubscriptions; i ++)
-  {
-    sub = Subscriptions[i];
-
+  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions), count = 0;
+       sub;
+       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
     if ((!printer || sub->dest == printer) && (!job || sub->job == job) &&
         (!username[0] || !strcasecmp(username, sub->owner)))
     {
@@ -5876,7 +5875,6 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
       if (limit && count >= limit)
         break;
     }
-  }
 
   con->response->request.status.status_code = !count ? IPP_NOT_FOUND :
                                               requested ? IPP_OK_SUBST : IPP_OK;

@@ -125,10 +125,8 @@ VAR int		MaxSubscriptions VALUE(100),
 					/* Next subscription ID */
 		DefaultLeaseTime VALUE(86400),
 					/* Default notify-lease-time */
-		MaxLeaseTime VALUE(0),	/* Maximum notify-lease-time */
-		NumSubscriptions VALUE(0);
-					/* Number of active subscriptions */
-VAR cupsd_subscription_t **Subscriptions VALUE(NULL);
+		MaxLeaseTime VALUE(0);	/* Maximum notify-lease-time */
+VAR cups_array_t *Subscriptions VALUE(NULL);
 					/* Active subscriptions */
 
 VAR int		MaxEvents VALUE(100),	/* Maximum number of events */
@@ -148,9 +146,9 @@ VAR cupsd_statbuf_t *NotifierStatusBuffer VALUE(NULL);
 extern void	cupsdAddEvent(cupsd_eventmask_t event, cupsd_printer_t *dest,
 		              cupsd_job_t *job, const char *text, ...);
 extern cupsd_subscription_t *
-		cupsdAddSubscription(unsigned mask,
-		                     cupsd_printer_t *dest,
-		                     cupsd_job_t *job, const char *uri);
+		cupsdAddSubscription(unsigned mask, cupsd_printer_t *dest,
+		                     cupsd_job_t *job, const char *uri,
+				     int sub_id);
 extern void	cupsdDeleteAllEvents(void);
 extern void	cupsdDeleteAllSubscriptions(void);
 extern void	cupsdDeleteSubscription(cupsd_subscription_t *sub, int update);

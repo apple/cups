@@ -655,7 +655,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Expire subscriptions as needed...
     */
 
-    if (NumSubscriptions > 0 && current_time > expire_time)
+    if (cupsArrayCount(Subscriptions) > 0 && current_time > expire_time)
     {
       cupsdExpireSubscriptions(NULL, NULL);
 
@@ -1455,16 +1455,14 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * Expire subscriptions as needed...
   */
 
-  for (i = 0; i < NumSubscriptions; i ++)
-  {
-    sub = Subscriptions[i];
-
+  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
+       sub;
+       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
     if (!sub->job && sub->expire < timeout)
     {
       timeout = sub->expire;
       why     = "expire subscription";
     }
-  }
 
  /*
   * Adjust from absolute to relative time.  If p->browse_time above
