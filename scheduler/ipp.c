@@ -46,6 +46,7 @@
  *   copy_file()                 - Copy a PPD file or interface script...
  *   copy_model()                - Copy a PPD model file, substituting default
  *                                 values as needed...
+ *   copy_subscription_attrs()   - Copy subscription attributes.
  *   create_job()                - Print a file to a printer or class.
  *   create_subscription()       - Create a notification subscription.
  *   delete_printer()            - Remove a printer or class from the system.
@@ -132,6 +133,8 @@ static void	copy_attrs(ipp_t *to, ipp_t *from, ipp_attribute_t *req,
 static int	copy_banner(cupsd_client_t *con, cupsd_job_t *job, const char *name);
 static int	copy_file(const char *from, const char *to);
 static int	copy_model(cupsd_client_t *con, const char *from, const char *to);
+static void	copy_subscription_attrs(cupsd_client_t *con,
+		                        cupsd_subscription_t *sub);
 static void	create_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	create_subscription(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -247,14 +250,15 @@ cupsdProcessIPPRequest(
     for (attr = con->request->attrs, group = attr->group_tag;
 	 attr != NULL;
 	 attr = attr->next)
-      if (attr->group_tag < group)
+      if (attr->group_tag < group && attr->group_tag != IPP_TAG_ZERO)
       {
        /*
 	* Out of order; return an error...
 	*/
 
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdProcessIPPRequest: attribute groups are out of order!");
+	                "cupsdProcessIPPRequest: attribute groups are out of "
+			"order (%x < %x)!", attr->group_tag, group);
 
 	cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                       "%04X %s Attribute groups are out of order",
@@ -1355,9 +1359,15 @@ add_job_subscriptions(
              sub->user_data_len);
     }
 
+    ippAddSeparator(con->response);
+    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                  "notify-subscription-id", sub->id);
+
     if (attr)
       attr = attr->next;
   }
+
+  cupsdSaveAllSubscriptions();
 
  /*
   * Remove all of the subscription attributes from the job request...
@@ -3617,6 +3627,100 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
+ * 'copy_subscription_attrs()' - Copy subscription attributes.
+ */
+
+static void
+copy_subscription_attrs(
+    cupsd_client_t       *con,		/* I - Client connection */
+    cupsd_subscription_t *sub)		/* I - Subscription */
+{
+  ipp_attribute_t	*attr;		/* Current attribute */
+  char			printer_uri[HTTP_MAX_URI];
+					/* Printer URI */
+  int			count;		/* Number of events */
+  unsigned		mask;		/* Current event mask */
+  const char		*name;		/* Current event name */
+
+
+ /*
+  * Copy the subscription attributes to the response using the
+  * requested-attributes attribute that may be provided by the client.
+  */
+
+  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                "notify-subscription-id", sub->id);
+
+  if ((name = cupsdEventName((cupsd_eventmask_t)sub->mask)) != NULL)
+  {
+   /*
+    * Simple event list...
+    */
+
+    ippAddString(con->response, IPP_TAG_SUBSCRIPTION,
+                 IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                 "notify-events", NULL, name);
+  }
+  else
+  {
+   /*
+    * Complex event list...
+    */
+
+    for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
+      if (sub->mask & mask)
+        count ++;
+
+    attr = ippAddStrings(con->response, IPP_TAG_SUBSCRIPTION,
+                         IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                         "notify-events", count, NULL, NULL);
+
+    for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
+      if (sub->mask & mask)
+      {
+        attr->values[count].string.text =
+	    (char *)cupsdEventName((cupsd_eventmask_t)mask);
+
+        count ++;
+      }
+  }
+
+  ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_NAME,
+               "notify-subscriber-user-name", NULL, sub->owner);
+  if (sub->recipient)
+    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
+        	 "notify-recipient-uri", NULL, sub->recipient);
+  else
+    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_KEYWORD,
+                 "notify-pull-method", NULL, "ippget");
+
+  if (sub->user_data_len > 0)
+    ippAddOctetString(con->response, IPP_TAG_SUBSCRIPTION, "notify-user-data",
+                      sub->user_data, sub->user_data_len);
+
+  if (!sub->job)
+    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                  "notify-lease-time", sub->lease);
+
+  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                "notify-interval", sub->interval);
+
+  if (sub->dest)
+  {
+    httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
+                     con->servername, con->serverport, "/printers/%s",
+        	     sub->dest->name);
+    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
+        	 "notify-printer-uri", NULL, printer_uri);
+  }
+
+  if (sub->job)
+    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                  "notify-job-id", sub->job->id);
+}
+
+
+/*
  * 'create_job()' - Print a file to a printer or class.
  */
 
@@ -4092,6 +4196,22 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
     job->sheets = attr;
 
  /*
+  * Fill in the response info...
+  */
+
+  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	   LocalPort, job->id);
+
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
+                job->state->values[0].integer);
+
+  con->response->request.status.status_code = IPP_OK;
+
+ /*
   * Add any job subscriptions...
   */
 
@@ -4114,22 +4234,6 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
                   job->id, job->dest, job->username);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_CREATED, printer, job, "Job created.");
-
- /*
-  * Fill in the response info...
-  */
-
-  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   LocalPort, job->id);
-
-  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, job_uri);
-
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
-
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
-
-  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -4142,6 +4246,257 @@ create_subscription(
     cupsd_client_t  *con,		/* I - Client connection */
     ipp_attribute_t *uri)		/* I - Printer URI */
 {
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  const char		*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			userpass[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  cupsd_printer_t	*printer;	/* Printer/class */
+  cupsd_job_t		*job;		/* Job */
+  int			jobid;		/* Job ID */
+  cupsd_subscription_t	*sub;		/* Subscription object */
+  const char		*username,	/* requesting-user-name or authenticated username */
+			*recipient,	/* notify-recipient-uri */
+			*pullmethod;	/* notify-pull-method */
+  ipp_attribute_t	*user_data;	/* notify-user-data */
+  int			interval,	/* notify-time-interval */
+			lease;		/* notify-lease-time */
+  unsigned		mask;		/* notify-events */
+
+
+ /*
+  * Is the destination valid?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, userpass, host, &port,
+               resource);
+
+  if (!strcmp(resource, "/"))
+  {
+    dest    = NULL;
+    dtype   = (cups_ptype_t)0;
+    printer = NULL;
+  }
+  else if (!strncmp(resource, "/printers", 9) && strlen(resource) <= 10)
+  {
+    dest    = NULL;
+    dtype   = (cups_ptype_t)0;
+    printer = NULL;
+  }
+  else if (!strncmp(resource, "/classes", 8) && strlen(resource) <= 9)
+  {
+    dest    = NULL;
+    dtype   = CUPS_PRINTER_CLASS;
+    printer = NULL;
+  }
+  else if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
+  {
+   /*
+    * Bad URI...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "create_subscription: resource name \'%s\' no good!",
+                    resource);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (printer)
+  {
+    if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "create_subscription: not authorized!");
+      send_ipp_error(con, IPP_NOT_AUTHORIZED);
+      return;
+    }
+  }
+  else if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "create_subscription: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Get the user that is requesting the subscription...
+  */
+
+  if (con->username[0])
+    username = con->username;
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
+                                    IPP_TAG_NAME)) != NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "create_subscription: requesting-user-name = \'%s\'",
+                    attr->values[0].string.text);
+
+    username = attr->values[0].string.text;
+  }
+  else
+    username = "anonymous";
+
+ /*
+  * Find the first subscription group attribute; return if we have
+  * none...
+  */
+
+  for (attr = con->request->attrs; attr; attr = attr->next)
+    if (attr->group_tag == IPP_TAG_SUBSCRIPTION)
+      break;
+
+  if (!attr)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "create_subscription: no subscription attributes in request!");
+    send_ipp_error(con, IPP_BAD_REQUEST);
+    return;
+  }
+
+ /*
+  * Process the subscription attributes in the request...
+  */
+
+  while (attr)
+  {
+    recipient = NULL;
+    pullmethod = NULL;
+    user_data  = NULL;
+    interval   = 0;
+    lease      = DefaultLeaseTime;
+    jobid      = 0;
+    mask       = CUPSD_EVENT_NONE;
+
+    while (attr && attr->group_tag != IPP_TAG_ZERO)
+    {
+      if (!strcmp(attr->name, "notify-recipient") &&
+          attr->value_tag == IPP_TAG_URI)
+        recipient = attr->values[0].string.text;
+      else if (!strcmp(attr->name, "notify-pull-method") &&
+               attr->value_tag == IPP_TAG_KEYWORD)
+        pullmethod = attr->values[0].string.text;
+      else if (!strcmp(attr->name, "notify-charset") &&
+               attr->value_tag == IPP_TAG_CHARSET &&
+	       strcmp(attr->values[0].string.text, "utf-8"))
+      {
+        send_ipp_error(con, IPP_CHARSET);
+	return;
+      }
+      else if (!strcmp(attr->name, "notify-natural-language") &&
+               attr->value_tag == IPP_TAG_LANGUAGE &&
+	       strcmp(attr->values[0].string.text, DefaultLanguage))
+      {
+        send_ipp_error(con, IPP_CHARSET);
+	return;
+      }
+      else if (!strcmp(attr->name, "notify-user-data") &&
+               attr->value_tag == IPP_TAG_STRING)
+      {
+        if (attr->num_values > 1 || attr->values[0].unknown.length > 63)
+	{
+          send_ipp_error(con, IPP_REQUEST_VALUE);
+	  return;
+	}
+
+        user_data = attr;
+      }
+      else if (!strcmp(attr->name, "notify-events") &&
+               attr->value_tag == IPP_TAG_KEYWORD)
+      {
+        for (i = 0; i < attr->num_values; i ++)
+	  mask |= cupsdEventValue(attr->values[i].string.text);
+      }
+      else if (!strcmp(attr->name, "notify-lease-time") &&
+               attr->value_tag == IPP_TAG_INTEGER)
+        lease = attr->values[0].integer;
+      else if (!strcmp(attr->name, "notify-time-interval") &&
+               attr->value_tag == IPP_TAG_INTEGER)
+        interval = attr->values[0].integer;
+      else if (!strcmp(attr->name, "notify-job-id") &&
+               attr->value_tag == IPP_TAG_INTEGER)
+        jobid = attr->values[0].integer;
+
+      attr = attr->next;
+    }
+
+    if (!recipient && !pullmethod)
+      break;
+
+    if (mask == CUPSD_EVENT_NONE)
+    {
+      if (jobid)
+        mask = CUPSD_EVENT_JOB_COMPLETED;
+      else if (printer)
+        mask = CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      else
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "create_subscription: notify-events not specified!");
+        send_ipp_error(con, IPP_BAD_REQUEST);
+	return;
+      }
+    }
+
+    if (MaxLeaseTime && lease > MaxLeaseTime)
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "create_subscription: Limiting notify-lease-time to %d "
+		      "seconds.",
+		      MaxLeaseTime);
+      lease = MaxLeaseTime;
+    }
+
+    if (jobid)
+    {
+      if ((job = cupsdFindJob(jobid)) == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "create_subscription: Job %d not found!", jobid);
+	send_ipp_error(con, IPP_NOT_FOUND);
+	return;
+      }
+    }
+    else
+      job = NULL;
+
+    sub = cupsdAddSubscription(mask, printer, job, recipient);
+
+    sub->interval = interval;
+    sub->lease    = lease;
+    sub->expire   = time(NULL) + lease;
+
+    cupsdSetString(&sub->owner, username);
+
+    if (user_data)
+    {
+      sub->user_data_len = user_data->values[0].unknown.length;
+      memcpy(sub->user_data, user_data->values[0].unknown.data,
+             sub->user_data_len);
+    }
+
+    ippAddSeparator(con->response);
+    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                  "notify-subscription-id", sub->id);
+
+    if (attr)
+      attr = attr->next;
+  }
+
+  cupsdSaveAllSubscriptions();
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -4648,7 +5003,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     if ((job->dtype & dmask) != dtype &&
         (job->printer == NULL || (job->printer->type & dmask) != dtype))
       continue;
-    if (username[0] != '\0' && strcmp(username, job->username) != 0)
+    if (username[0] != '\0' && strcasecmp(username, job->username) != 0)
       continue;
 
     if (completed && job->state->values[0].integer <= IPP_JOB_STOPPED)
@@ -5324,6 +5679,54 @@ get_subscription_attrs(
     cupsd_client_t *con,		/* I - Client connection */
     int            sub_id)		/* I - Subscription ID */
 {
+  cupsd_subscription_t	*sub;		/* Subscription */
+  ipp_attribute_t	*requested;	/* requested-attributes */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "get_subscription_attrs(con=%p[%d], sub_id=%d)",
+                  con, con->http.fd, sub_id);
+
+ /*
+  * Is the subscription ID valid?
+  */
+
+  if ((sub = cupsdFindSubscription(sub_id)) == NULL)
+  {
+   /*
+    * Bad subscription ID...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "get_subscription_attrs: notify-subscription-id %d no good!",
+		    sub_id);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if (!cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr : DefaultPolicyPtr,
+                        con, sub->owner))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "get_subscription_attrs: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Copy the subscription attributes to the response using the
+  * requested-attributes attribute that may be provided by the client.
+  */
+
+  requested = ippFindAttribute(con->request, "requested-attributes",
+	                       IPP_TAG_KEYWORD);
+
+  copy_subscription_attrs(con, sub);
+
+  con->response->request.status.status_code = requested ? IPP_OK_SUBST : IPP_OK;
 }
 
 
@@ -5333,8 +5736,150 @@ get_subscription_attrs(
 
 static void
 get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
-                  ipp_attribute_t *uri)	/* I - Printer URI */
+                  ipp_attribute_t *uri)	/* I - Printer/job URI */
 {
+  int			i;		/* Looping var */
+  int			count;		/* Number of subscriptions */
+  int			limit;		/* Limit */
+  cupsd_subscription_t	*sub;		/* Subscription */
+  ipp_attribute_t	*requested,	/* requested-attributes */
+			*attr;		/* Attribute */
+  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  char			method[HTTP_MAX_URI],
+					/* Method portion of URI */
+			username[HTTP_MAX_URI],
+					/* Username portion of URI */
+			host[HTTP_MAX_URI],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  cupsd_job_t		*job;		/* Job pointer */
+  cupsd_printer_t	*printer;	/* Printer */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "get_subscriptions(con=%p[%d], uri=%s)",
+                  con, con->http.fd, uri->values[0].string.text);
+
+ /*
+  * Is the destination valid?
+  */
+
+  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+
+  if (!strcmp(resource, "/") ||
+      (!strncmp(resource, "/jobs", 5) && strlen(resource) <= 6) ||
+      (!strncmp(resource, "/printers", 9) && strlen(resource) <= 10) ||
+      (!strncmp(resource, "/classes", 8) && strlen(resource) <= 9))
+  {
+    printer = NULL;
+    job     = NULL;
+  }
+  else if (!strncmp(resource, "/jobs/", 6) && resource[6])
+  {
+    printer = NULL;
+    job     = cupsdFindJob(atoi(resource + 6));
+
+    if (!job)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "get_subscriptions: job-id %s does not exist!",
+                      resource + 6);
+      send_ipp_error(con, IPP_NOT_FOUND);
+      return;
+    }
+  }
+  else if (!cupsdValidateDest(host, resource, &dtype, &printer))
+  {
+   /*
+    * Bad URI...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "get_subscriptions: resource name \'%s\' no good!",
+                    resource);
+    send_ipp_error(con, IPP_NOT_FOUND);
+    return;
+  }
+  else if ((attr = ippFindAttribute(con->request, "notify-job-id",
+                                    IPP_TAG_INTEGER)) != NULL)
+  {
+    job = cupsdFindJob(attr->values[0].integer);
+
+    if (!job)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "get_subscriptions: job-id %d does not exist!",
+                      attr->values[0].integer);
+      send_ipp_error(con, IPP_NOT_FOUND);
+      return;
+    }
+  }
+  else
+    job = NULL;
+
+ /*
+  * Check policy...
+  */
+
+  if (!cupsdCheckPolicy(printer ? printer->op_policy_ptr : DefaultPolicyPtr,
+                        con, NULL))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "get_subscriptions: not authorized!");
+    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    return;
+  }
+
+ /*
+  * Copy the subscription attributes to the response using the
+  * requested-attributes attribute that may be provided by the client.
+  */
+
+  requested = ippFindAttribute(con->request, "requested-attributes",
+	                       IPP_TAG_KEYWORD);
+
+  if ((attr = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER)) != NULL)
+    limit = attr->values[0].integer;
+  else
+    limit = 0;
+
+ /*
+  * See if we only want to see subscriptions for a specific user...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "my-subscriptions",
+                               IPP_TAG_BOOLEAN)) != NULL &&
+      attr->values[0].boolean)
+  {
+    if (con->username[0])
+      strlcpy(username, con->username, sizeof(username));
+    else if ((attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
+      strlcpy(username, attr->values[0].string.text, sizeof(username));
+    else
+      strcpy(username, "anonymous");
+  }
+  else
+    username[0] = '\0';
+
+  for (i = 0, count = 0; i < NumSubscriptions; i ++)
+  {
+    sub = Subscriptions[i];
+
+    if ((!printer || sub->dest == printer) && (!job || sub->job == job) &&
+        (!username[0] || !strcasecmp(username, sub->owner)))
+    {
+      ippAddSeparator(con->response);
+      copy_subscription_attrs(con, sub);
+
+      count ++;
+      if (limit && count >= limit)
+        break;
+    }
+  }
+
+  con->response->request.status.status_code = !count ? IPP_NOT_FOUND :
+                                              requested ? IPP_OK_SUBST : IPP_OK;
 }
 
 
@@ -5798,7 +6343,6 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   int		priority;		/* Job priority */
   char		*title;			/* Job name/title */
   cupsd_job_t	*job;			/* Current job */
-  int		jobid;			/* Job ID number */
   char		job_uri[HTTP_MAX_URI],	/* Job URI */
 		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
@@ -6443,6 +6987,24 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   }
 
  /*
+  * Fill in the response info...
+  */
+
+  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	   LocalPort, job->id);
+
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
+               job_uri);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
+                job->state->values[0].integer);
+  add_job_state_reasons(con, job);
+
+  con->response->request.status.status_code = IPP_OK;
+
+ /*
   * Add any job subscriptions...
   */
 
@@ -6469,33 +7031,10 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   cupsdAddEvent(CUPSD_EVENT_JOB_CREATED, printer, job, "Job created.");
 
  /*
-  * Start the job if possible...  Since cupsdCheckJobs() can cancel a job
-  * if it doesn't print, we need to re-find the job afterwards...
+  * Start the job if possible...
   */
-
-  jobid = job->id;
 
   cupsdCheckJobs();
-
-  job = cupsdFindJob(jobid);
-
- /*
-  * Fill in the response info...
-  */
-
-  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   LocalPort, jobid);
-
-  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
-               job_uri);
-
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
-
-  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job ? job->state->values[0].integer : IPP_JOB_CANCELLED);
-  add_job_state_reasons(con, job);
-
-  con->response->request.status.status_code = IPP_OK;
 }
 
 

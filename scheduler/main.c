@@ -101,9 +101,11 @@ main(int  argc,				/* I - Number of command-line arguments */
   cupsd_client_t	*con;		/* Current client */
   cupsd_job_t		*job;		/* Current job */
   cupsd_listener_t	*lis;		/* Current listener */
-  time_t		activity;	/* Activity timer */
-  time_t		browse_time;	/* Next browse send time */
-  time_t		senddoc_time;	/* Send-Document time */
+  time_t		current_time,	/* Current time */
+			activity,	/* Activity timer */
+			browse_time,	/* Next browse send time */
+			senddoc_time,	/* Send-Document time */
+			expire_time;	/* Subscription expire time */
 #ifdef HAVE_MALLINFO
   time_t		mallinfo_time;	/* Malloc information time */
 #endif /* HAVE_MALLINFO */
@@ -457,6 +459,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 #endif /* HAVE_MALLINFO */
   browse_time   = time(NULL);
   senddoc_time  = time(NULL);
+  expire_time   = time(NULL);
   fds           = 1;
 
   while (!stop_scheduler)
@@ -609,6 +612,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       break;
     }
 
+    current_time = time(NULL);
+
    /*
     * Check for status info from job filters...
     */
@@ -647,6 +652,17 @@ main(int  argc,				/* I - Number of command-line arguments */
       cupsdUpdateNotifierStatus();
 
    /*
+    * Expire subscriptions as needed...
+    */
+
+    if (NumSubscriptions > 0 && current_time > expire_time)
+    {
+      cupsdExpireSubscriptions(NULL, NULL);
+
+      expire_time = current_time;
+    }
+
+   /*
     * Update the browse list as needed...
     */
 
@@ -660,14 +676,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 #ifdef HAVE_LIBSLP
       if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_SLP) &&
-          BrowseSLPRefresh <= time(NULL))
+          BrowseSLPRefresh <= current_time)
         cupsdUpdateSLPBrowse();
 #endif /* HAVE_LIBSLP */
 
-      if (time(NULL) > browse_time)
+      if (current_time > browse_time)
       {
         cupsdSendBrowseList();
-	browse_time = time(NULL);
+	browse_time = current_time;
       }
     }
 
@@ -750,7 +766,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Check the activity and close old clients...
       */
 
-      activity = time(NULL) - Timeout;
+      activity = current_time - Timeout;
       if (con->http.activity < activity && !con->pipe_pid)
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -767,10 +783,10 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Update any pending multi-file documents...
     */
 
-    if ((time(NULL) - senddoc_time) >= 10)
+    if ((current_time - senddoc_time) >= 10)
     {
       cupsdCheckJobs();
-      senddoc_time = time(NULL);
+      senddoc_time = current_time;
     }
 
 #ifdef HAVE_MALLINFO
@@ -778,7 +794,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Log memory usage every minute...
     */
 
-    if ((time(NULL) - mallinfo_time) >= 60 && LogLevel >= CUPSD_LOG_DEBUG)
+    if ((current_time - mallinfo_time) >= 60 && LogLevel >= CUPSD_LOG_DEBUG)
     {
       struct mallinfo mem;		/* Malloc information */
 
@@ -788,7 +804,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                       "mallinfo: arena = %d, used = %d, free = %d\n",
                       mem.arena, mem.usmblks + mem.uordblks,
 		      mem.fsmblks + mem.fordblks);
-      mallinfo_time = time(NULL);
+      mallinfo_time = current_time;
     }
 #endif /* HAVE_MALLINFO */
 
@@ -796,7 +812,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Update the root certificate once every 5 minutes...
     */
 
-    if ((time(NULL) - RootCertTime) >= RootCertDuration && RootCertDuration &&
+    if ((current_time - RootCertTime) >= RootCertDuration && RootCertDuration &&
         !RunUser)
     {
      /*
@@ -1314,6 +1330,7 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   cupsd_client_t	*con;		/* Client information */
   cupsd_printer_t	*p;		/* Printer information */
   cupsd_job_t		*job;		/* Job information */
+  cupsd_subscription_t	*sub;		/* Subscription information */
   const char		*why;		/* Debugging aid */
 
 
@@ -1432,6 +1449,21 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   {
     timeout = RootCertTime + RootCertDuration;
     why     = "update root certificate";
+  }
+
+ /*
+  * Expire subscriptions as needed...
+  */
+
+  for (i = 0; i < NumSubscriptions; i ++)
+  {
+    sub = Subscriptions[i];
+
+    if (!sub->job && sub->expire < timeout)
+    {
+      timeout = sub->expire;
+      why     = "expire subscription";
+    }
   }
 
  /*

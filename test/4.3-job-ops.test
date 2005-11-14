@@ -1,5 +1,5 @@
 #
-# "$Id: 4.3-job-ops.test,v 1.1 2001/03/01 20:40:16 mike Exp $"
+# "$Id$"
 #
 #   Verify that the IPP job operations work.
 #
@@ -68,6 +68,9 @@
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
 	ATTR name requesting-user-name $user
 
+        GROUP subscription
+	ATTR uri notify-recipient testnotify
+
 	FILE testfile.ps
 
 	# What statuses are OK?
@@ -77,6 +80,7 @@
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
 	EXPECT job-id
+	EXPECT notify-subscription-id
 }
 {
 	# The name of the test...
@@ -293,5 +297,5 @@
 }
 
 #
-# End of "$Id: 4.3-job-ops.test,v 1.1 2001/03/01 20:40:16 mike Exp $"
+# End of "$Id$"
 #

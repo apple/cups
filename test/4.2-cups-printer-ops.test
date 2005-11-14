@@ -1,5 +1,5 @@
 #
-# "$Id: 4.2-cups-printer-ops.test,v 1.1 2001/03/01 20:40:16 mike Exp $"
+# "$Id$"
 #
 #   Verify that the CUPS printer operations work.
 #
@@ -88,6 +88,33 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Subscribe to Printer Events"
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/
+	ATTR name requesting-user-name $user
+
+        GROUP subscription
+	ATTR uri notify-recipient testnotify
+	ATTR keyword notify-events printer-added,printer-modified,printer-deleted
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT notify-subscription-id
 }
 {
 	# The name of the test...
@@ -210,5 +237,5 @@
 }
 
 #
-# End of "$Id: 4.2-cups-printer-ops.test,v 1.1 2001/03/01 20:40:16 mike Exp $"
+# End of "$Id$"
 #

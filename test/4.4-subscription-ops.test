@@ -1,0 +1,122 @@
+#
+# "$Id$"
+#
+#   Verify that the CUPS subscription operations work.
+#
+{
+	# The name of the test...
+	NAME "Add Printer Subscription w/Lease"
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+        GROUP subscription
+	ATTR uri notify-recipient testnotify
+	ATTR keyword notify-events printer-state-changed
+	ATTR integer notify-lease-time 5
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT notify-subscription-id
+	DISPLAY notify-subscription-id
+}
+{
+	# The name of the test...
+	NAME "Verify Subscription Expiration"
+
+	# Delay test for 6 seconds to allow lease to expire...
+	DELAY 6
+
+	# The operation to use
+	OPERATION Get-Subscription-Attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+	ATTR integer notify-subscription-id $notify-subscription-id
+
+	# What statuses are OK?
+	STATUS client-error-not-found
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Add 2 Printer Subscriptions w/Lease"
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+        GROUP subscription
+	ATTR uri notify-recipient testnotify
+	ATTR keyword notify-events printer-state-changed
+	ATTR integer notify-lease-time 5
+
+        GROUP subscription
+	ATTR uri notify-recipient testnotify
+	ATTR keyword notify-events printer-config-changed
+	ATTR integer notify-lease-time 5
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT notify-subscription-id
+	DISPLAY notify-subscription-id
+}
+{
+	# The name of the test...
+	NAME "List Printer Subscriptions"
+
+	# The operation to use
+	OPERATION Get-Subscriptions
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT notify-subscription-id
+	DISPLAY notify-subscription-id
+	EXPECT notify-printer-uri
+	DISPLAY notify-printer-uri
+	EXPECT notify-events
+	DISPLAY notify-events
+}
+
+#
+# End of "$Id$"
+#

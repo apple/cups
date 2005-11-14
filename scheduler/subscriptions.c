@@ -28,8 +28,10 @@
  *   cupsdDeleteAllEvents()        - Delete all cached events.
  *   cupsdDeleteAllSubscriptions() - Delete all subscriptions.
  *   cupsdDeleteSubscription()     - Delete a subscription object.
- *   cupsdFindSubscription()       - Find a subscription by ID.
+ *   cupsdEventName()              - Return a single event name.
+ *   cupsdEventValue()             - Return the event mask value for a name.
  *   cupsdExpireSubscriptions()    - Expire old subscription objects.
+ *   cupsdFindSubscription()       - Find a subscription by ID.
  *   cupsdLoadAllSubscriptions()   - Load all subscriptions from the .conf file.
  *   cupsdSaveAllSubscriptions()   - Save all subscriptions to the .conf file.
  *   cupsdSendNotification()       - Send a notification for the specified event.
@@ -722,7 +724,6 @@ cupsdLoadAllSubscriptions(void)
   cups_file_t		*fp;		/* subscriptions.conf file */
   int			linenum;	/* Current line number */
   char			line[1024],	/* Line from file */
-			name[256],	/* Parameter name */
 			*value,		/* Pointer to value */
 			*valueptr;	/* Pointer into value */
   cupsd_subscription_t	*sub;		/* Current subscription */
@@ -753,7 +754,7 @@ cupsdLoadAllSubscriptions(void)
 
   while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    if (!strcasecmp(name, "<Subscription"))
+    if (!strcasecmp(line, "<Subscription"))
     {
      /*
       * <Subscription #>
@@ -772,7 +773,7 @@ cupsdLoadAllSubscriptions(void)
         return;
       }
     }
-    else if (!strcasecmp(name, "</Subscription>"))
+    else if (!strcasecmp(line, "</Subscription>"))
     {
       if (!sub)
       {
@@ -795,7 +796,7 @@ cupsdLoadAllSubscriptions(void)
 	              linenum);
       return;
     }
-    else if (!strcasecmp(name, "Events"))
+    else if (!strcasecmp(line, "Events"))
     {
      /*
       * Events name
@@ -836,7 +837,7 @@ cupsdLoadAllSubscriptions(void)
 	value = valueptr;
       }
     }
-    else if (!strcasecmp(name, "Owner"))
+    else if (!strcasecmp(line, "Owner"))
     {
      /*
       * Owner
@@ -852,7 +853,7 @@ cupsdLoadAllSubscriptions(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "Recipient"))
+    else if (!strcasecmp(line, "Recipient"))
     {
      /*
       * Recipient uri
@@ -868,7 +869,7 @@ cupsdLoadAllSubscriptions(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "JobId"))
+    else if (!strcasecmp(line, "JobId"))
     {
      /*
       * JobId #
@@ -892,7 +893,7 @@ cupsdLoadAllSubscriptions(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "PrinterName"))
+    else if (!strcasecmp(line, "PrinterName"))
     {
      /*
       * PrinterName name
@@ -916,7 +917,7 @@ cupsdLoadAllSubscriptions(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "UserData"))
+    else if (!strcasecmp(line, "UserData"))
     {
      /*
       * UserData encoded-string
@@ -978,7 +979,7 @@ cupsdLoadAllSubscriptions(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "LeaseTime"))
+    else if (!strcasecmp(line, "LeaseTime"))
     {
      /*
       * LeaseTime #
@@ -994,7 +995,7 @@ cupsdLoadAllSubscriptions(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "Interval"))
+    else if (!strcasecmp(line, "Interval"))
     {
      /*
       * Interval #
@@ -1010,7 +1011,7 @@ cupsdLoadAllSubscriptions(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "ExpirationTime"))
+    else if (!strcasecmp(line, "ExpirationTime"))
     {
      /*
       * ExpirationTime #
@@ -1026,7 +1027,7 @@ cupsdLoadAllSubscriptions(void)
 	return;
       }
     }
-    else if (!strcasecmp(name, "NextEventId"))
+    else if (!strcasecmp(line, "NextEventId"))
     {
      /*
       * NextEventId #
@@ -1050,7 +1051,7 @@ cupsdLoadAllSubscriptions(void)
 
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unknown configuration directive %s on line %d of subscriptions.conf.",
-	              name, linenum);
+	              line, linenum);
     }
   }
 

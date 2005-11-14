@@ -31,6 +31,7 @@
  *   ippAddDate()           - Add a date attribute to an IPP request.
  *   ippAddInteger()        - Add a integer attribute to an IPP request.
  *   ippAddIntegers()       - Add an array of integer values.
+ *   ippAddOctetString()    - Add an octetString value to an IPP request.
  *   ippAddString()         - Add a language-encoded string to an IPP request.
  *   ippAddStrings()        - Add language-encoded strings to an IPP request.
  *   ippAddRange()          - Add a range of values to an IPP request.
@@ -327,6 +328,51 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP request */
 	 i < num_values;
 	 i ++, value ++)
       value->integer = values[i];
+
+  return (attr);
+}
+
+
+/*
+ * 'ippAddOctetString()' - Add an octetString value to an IPP request.
+ *
+ * @since CUPS 1.2@
+ */
+
+ipp_attribute_t	*			/* O - New attribute */
+ippAddOctetString(ipp_t      *ipp,	/* I - IPP request */
+                  ipp_tag_t  group,	/* I - IPP group */
+                  const char *name,	/* I - Name of attribute */
+                  const void *data,	/* I - octetString data */
+		  int        datalen)	/* I - Length of data in bytes */
+{
+  ipp_attribute_t	*attr;		/* New attribute */
+
+
+  if (ipp == NULL || name == NULL)
+    return (NULL);
+
+  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+    return (NULL);
+
+ /*
+  * Initialize the attribute data...
+  */
+
+  attr->name                     = strdup(name);
+  attr->group_tag                = group;
+  attr->value_tag                = IPP_TAG_STRING;
+  attr->values[0].unknown.length = datalen;
+
+  if (data)
+  {
+    attr->values[0].unknown.data = malloc(datalen);
+    memcpy(attr->values[0].unknown.data, data, datalen);
+  }
+
+ /*
+  * Return the new attribute...
+  */
 
   return (attr);
 }
@@ -2411,6 +2457,9 @@ ipp_length(ipp_t *ipp,			/* I - IPP request or collection */
 
       bytes ++;	/* Group tag */
     }
+
+    if (!attr->name)
+      continue;
 
     DEBUG_printf(("attr->name = %s, attr->num_values = %d, bytes = %d\n",
                   attr->name, attr->num_values, bytes));

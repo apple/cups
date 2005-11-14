@@ -447,6 +447,9 @@ extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp);
 extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking, ipp_t *parent, ipp_t *ipp);
 
 /**** New in CUPS 1.2 ****/
+extern ipp_attribute_t	*ippAddOctetString(ipp_t *ipp, ipp_tag_t group,
+			                   const char *name,
+					   const void *data, int datalen);
 extern ipp_status_t	ippErrorValue(const char *name);
 extern const char	*ippOpString(ipp_op_t op);
 extern ipp_op_t		ippOpValue(const char *name);

@@ -59,18 +59,10 @@ install:
 # ipptest
 #
 
-ipptest:	ipptest.o ../cups/$(LIBCUPS)
+ipptest:	ipptest.o ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o ipptest ipptest.o $(LIBS)
-
-
-#
-# purify target for doing tests on the CUPS API...
-#
-
-purify:	ipptest.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	purify $(CC) $(LDFLAGS) -o ipptest.pure ipptest.o $(LIBS)
+	$(CC) $(LDFLAGS) -o ipptest ipptest.o  ../cups/libcups.a \
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

@@ -45,11 +45,6 @@
 
 
 /*
- * Local globals...
- */
-
-
-/*
  * Local functions...
  */
 
@@ -57,7 +52,7 @@ int		do_tests(const char *, const char *);
 ipp_op_t	ippOpValue(const char *);
 ipp_status_t	ippErrorValue(const char *);
 ipp_tag_t	get_tag(const char *);
-char		*get_token(FILE *, char *, int);
+char		*get_token(FILE *, char *, int, int *linenum);
 void		print_attr(ipp_attribute_t *);
 
 
@@ -109,6 +104,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
          const char *testfile)		/* I - Test file to use */
 {
   int		i;			/* Looping var */
+  int		linenum;		/* Current line number */
   int		version;		/* IPP version number to use */
   http_t	*http;			/* HTTP connection to server */
   char		method[HTTP_MAX_URI],	/* URI method */
@@ -132,10 +128,13 @@ do_tests(const char *uri,		/* I - URI to connect on */
   ipp_status_t	statuses[100];		/* Valid status codes */
   int		num_expects;		/* Number of expected attributes */
   char		*expects[100];		/* Expected attributes */
+  int		num_displayed;		/* Number of displayed attributes */
+  char		*displayed[100];	/* Displayed attributes */
   char		name[1024];		/* Name of test */
   char		filename[1024];		/* Filename */
   int		pass;			/* Did we pass the test? */
   int		job_id;			/* Job ID from last operation */
+  int		subscription_id;	/* Subscription ID from last operation */
 
 
  /*
@@ -165,19 +164,22 @@ do_tests(const char *uri,		/* I - URI to connect on */
   */
 
   printf("\"%s\":\n", testfile);
-  pass    = 1;
-  job_id  = 0;
-  version = 1;
+  pass            = 1;
+  job_id          = 0;
+  subscription_id = 0;
+  version         = 1;
+  linenum         = 1;
 
-  while (get_token(fp, token, sizeof(token)) != NULL)
+  while (get_token(fp, token, sizeof(token), &linenum) != NULL)
   {
    /*
     * Expect an open brace...
     */
 
-    if (strcmp(token, "{") != 0)
+    if (strcmp(token, "{"))
     {
-      printf("Unexpected token %s seen - aborting test!\n", token);
+      printf("Unexpected token %s seen on line %d - aborting test!\n", token,
+             linenum);
       httpClose(http);
       return (0);
     }
@@ -188,13 +190,14 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
     httpSeparate(uri, method, userpass, server, &port, resource);
 
-    request      = ippNew();
-    op           = (ipp_op_t)0;
-    group        = IPP_TAG_OPERATION;
-    value        = IPP_TAG_ZERO;
-    num_statuses = 0;
-    num_expects  = 0;
-    filename[0]  = '\0';
+    request       = ippNew();
+    op            = (ipp_op_t)0;
+    group         = IPP_TAG_ZERO;
+    value         = IPP_TAG_ZERO;
+    num_statuses  = 0;
+    num_expects   = 0;
+    num_displayed = 0;
+    filename[0]   = '\0';
 
     strcpy(name, testfile);
     if (strrchr(name, '.') != NULL)
@@ -204,63 +207,80 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Parse until we see a close brace...
     */
 
-    while (get_token(fp, token, sizeof(token)) != NULL)
+    while (get_token(fp, token, sizeof(token), &linenum) != NULL)
     {
-      if (strcmp(token, "}") == 0)
+      if (!strcmp(token, "}"))
         break;
-      else if (strcasecmp(token, "NAME") == 0)
+      else if (!strcasecmp(token, "NAME"))
       {
        /*
         * Name of test...
 	*/
 
-	get_token(fp, name, sizeof(name));
+	get_token(fp, name, sizeof(name), &linenum);
       }
-      else if (strcasecmp(token, "VERSION") == 0)
+      else if (!strcasecmp(token, "VERSION"))
       {
        /*
         * IPP version number for test...
 	*/
 
-	get_token(fp, temp, sizeof(temp));
+	get_token(fp, temp, sizeof(temp), &linenum);
 	sscanf(temp, "%*d.%d", &version);
       }
-      else if (strcasecmp(token, "RESOURCE") == 0)
+      else if (!strcasecmp(token, "RESOURCE"))
       {
        /*
         * Resource name...
 	*/
 
-	get_token(fp, resource, sizeof(resource));
+	get_token(fp, resource, sizeof(resource), &linenum);
       }
-      else if (strcasecmp(token, "OPERATION") == 0)
+      else if (!strcasecmp(token, "OPERATION"))
       {
        /*
         * Operation...
 	*/
 
-	get_token(fp, token, sizeof(token));
+	get_token(fp, token, sizeof(token), &linenum);
 	op = ippOpValue(token);
       }
-      else if (strcasecmp(token, "GROUP") == 0)
+      else if (!strcasecmp(token, "GROUP"))
       {
        /*
         * Attribute group...
 	*/
 
-	get_token(fp, token, sizeof(token));
-	group = get_tag(token);
+	get_token(fp, token, sizeof(token), &linenum);
+	value = get_tag(token);
+
+	if (value == group)
+	  ippAddSeparator(request);
+
+        group = value;
       }
-      else if (strcasecmp(token, "ATTR") == 0)
+      else if (!strcasecmp(token, "DELAY"))
+      {
+       /*
+        * Delay before operation...
+	*/
+
+        int delay;
+
+	get_token(fp, token, sizeof(token), &linenum);
+	if ((delay = atoi(token)) > 0)
+	  sleep(delay);
+      }
+      else if (!strcasecmp(token, "ATTR"))
       {
        /*
         * Attribute...
 	*/
 
-	get_token(fp, token, sizeof(token));
+	get_token(fp, token, sizeof(token), &linenum);
 	value = get_tag(token);
-	get_token(fp, attr, sizeof(attr));
-	get_token(fp, temp, sizeof(temp));
+	get_token(fp, attr, sizeof(attr), &linenum);
+	get_token(fp, temp, sizeof(temp), &linenum);
 
         token[sizeof(token) - 1] = '\0';
 
@@ -272,44 +292,50 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	    * Substitute a string/number...
 	    */
 
-            if (strncasecmp(tempptr + 1, "uri", 3) == 0)
+            if (!strncasecmp(tempptr + 1, "uri", 3))
 	    {
 	      strlcpy(tokenptr, uri, sizeof(token) - (tokenptr - token));
 	      tempptr += 4;
 	    }
-	    else if (strncasecmp(tempptr + 1, "method", 6) == 0)
+	    else if (!strncasecmp(tempptr + 1, "method", 6))
 	    {
 	      strlcpy(tokenptr, method, sizeof(token) - (tokenptr - token));
 	      tempptr += 7;
 	    }
-	    else if (strncasecmp(tempptr + 1, "username", 8) == 0)
+	    else if (!strncasecmp(tempptr + 1, "username", 8))
 	    {
 	      strlcpy(tokenptr, userpass, sizeof(token) - (tokenptr - token));
 	      tempptr += 9;
 	    }
-	    else if (strncasecmp(tempptr + 1, "hostname", 8) == 0)
+	    else if (!strncasecmp(tempptr + 1, "hostname", 8))
 	    {
 	      strlcpy(tokenptr, server, sizeof(token) - (tokenptr - token));
 	      tempptr += 9;
 	    }
-	    else if (strncasecmp(tempptr + 1, "port", 4) == 0)
+	    else if (!strncasecmp(tempptr + 1, "port", 4))
 	    {
 	      snprintf(tokenptr, sizeof(token) - (tokenptr - token),
 	               "%d", port);
 	      tempptr += 5;
 	    }
-	    else if (strncasecmp(tempptr + 1, "resource", 8) == 0)
+	    else if (!strncasecmp(tempptr + 1, "resource", 8))
 	    {
 	      strlcpy(tokenptr, resource, sizeof(token) - (tokenptr - token));
 	      tempptr += 9;
 	    }
-	    else if (strncasecmp(tempptr + 1, "job-id", 6) == 0)
+	    else if (!strncasecmp(tempptr + 1, "job-id", 6))
 	    {
 	      snprintf(tokenptr, sizeof(token) - (tokenptr - token),
 	               "%d", job_id);
 	      tempptr += 7;
 	    }
-	    else if (strncasecmp(tempptr + 1, "user", 4) == 0)
+	    else if (!strncasecmp(tempptr + 1, "notify-subscription-id", 22))
+	    {
+	      snprintf(tokenptr, sizeof(token) - (tokenptr - token),
+	               "%d", subscription_id);
+	      tempptr += 23;
+	    }
+	    else if (!strncasecmp(tempptr + 1, "user", 4))
 	    {
 	      strlcpy(tokenptr, cupsUser(), sizeof(token) - (tokenptr - token));
 	      tempptr += 5;
@@ -331,7 +357,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
         switch (value)
 	{
 	  case IPP_TAG_BOOLEAN :
-	      if (strcasecmp(token, "true") == 0)
+	      if (!strcasecmp(token, "true"))
 		ippAddBoolean(request, group, attr, 1);
               else
 		ippAddBoolean(request, group, attr, atoi(token));
@@ -351,41 +377,80 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	      break;
 
 	  default :
-	      ippAddString(request, group, value, attr, NULL, token);
+	      if (!strchr(token, ','))
+	        ippAddString(request, group, value, attr, NULL, token);
+	      else
+	      {
+	       /*
+	        * Multiple string values...
+		*/
+
+                int	num_values;	/* Number of values */
+                char	*values[100],	/* Values */
+			*ptr;		/* Pointer to next value */
+
+
+                values[0]  = token;
+		num_values = 1;
+
+                for (ptr = strchr(token, ','); ptr; ptr = strchr(ptr, ','))
+		{
+		  *ptr++ = '\0';
+		  values[num_values] = ptr;
+		  num_values ++;
+		}
+
+	        ippAddStrings(request, group, value, attr, num_values,
+		              NULL, (const char **)values);
+	      }
 	      break;
 	}
       }
-      else if (strcasecmp(token, "FILE") == 0)
+      else if (!strcasecmp(token, "FILE"))
       {
        /*
         * File...
 	*/
 
-	get_token(fp, filename, sizeof(filename));
+	get_token(fp, filename, sizeof(filename), &linenum);
       }
-      else if (strcasecmp(token, "STATUS") == 0)
+      else if (!strcasecmp(token, "STATUS") &&
+               num_statuses < (int)(sizeof(statuses) / sizeof(statuses[0])))
       {
        /*
         * Status...
 	*/
 
-	get_token(fp, token, sizeof(token));
+	get_token(fp, token, sizeof(token), &linenum);
 	statuses[num_statuses] = ippErrorValue(token);
 	num_statuses ++;
       }
-      else if (strcasecmp(token, "EXPECT") == 0)
+      else if (!strcasecmp(token, "EXPECT") &&
+               num_expects < (int)(sizeof(expects) / sizeof(expects[0])))
       {
        /*
-        * Status...
+        * Expected attributes...
 	*/
 
-	get_token(fp, token, sizeof(token));
+	get_token(fp, token, sizeof(token), &linenum);
 	expects[num_expects] = strdup(token);
 	num_expects ++;
       }
+      else if (!strcasecmp(token, "DISPLAY") &&
+               num_displayed < (int)(sizeof(displayed) / sizeof(displayed[0])))
+      {
+       /*
+        * Display attributes...
+	*/
+
+	get_token(fp, token, sizeof(token), &linenum);
+	displayed[num_displayed] = strdup(token);
+	num_displayed ++;
+      }
       else
       {
-	printf("Unexpected token %s seen - aborting test!\n", token);
+	printf("Unexpected token %s seen on line %d - aborting test!\n", token,
+	       linenum);
 	httpClose(http);
 	ippDelete(request);
 	return (0);
@@ -400,7 +465,12 @@ do_tests(const char *uri,		/* I - URI to connect on */
     request->request.op.operation_id = op;
     request->request.op.request_id   = 1;
 
-    printf("    %-60.60s [    ]", name);
+#ifdef DEBUG
+    for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
+      print_attr(attrptr);
+#endif /* DEBUG */
+
+    printf("    %-60.60s [", name);
     fflush(stdout);
 
     if (filename[0])
@@ -414,63 +484,80 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
       curtime = time(NULL);
 
-      printf("\b\b\b\b\bFAIL]\n");
-      printf("        ERROR %x\n", cupsLastError());
-      printf("        (%s) @ %s\n",
+      puts("FAIL]");
+      printf("        ERROR %04x (%s) @ %s\n", cupsLastError(),
 	     ippErrorString(cupsLastError()), ctime(&curtime));
       pass = 0;
     }
     else
     {
-      if ((attrptr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) != NULL)
+      if ((attrptr = ippFindAttribute(response, "job-id",
+                                      IPP_TAG_INTEGER)) != NULL)
         job_id = attrptr->values[0].integer;
+
+      if ((attrptr = ippFindAttribute(response, "notify-subscription-id",
+                                      IPP_TAG_INTEGER)) != NULL)
+        subscription_id = attrptr->values[0].integer;
 
       for (i = 0; i < num_statuses; i ++)
         if (response->request.status.status_code == statuses[i])
 	  break;
 
       if (i == num_statuses && num_statuses > 0)
-      {
-	printf("\b\b\b\b\bFAIL]\n");
-        printf("        STATUS %x\n", response->request.status.status_code);
-        printf("        (%s)\n",
-	       ippErrorString(response->request.status.status_code));
-	printf("        (%lu bytes in response)\n",
-	       (unsigned long)ippLength(response));
-
 	pass = 0;
-      }
       else
       {
         for (i = 0; i < num_expects; i ++)
 	  if (ippFindAttribute(response, expects[i], IPP_TAG_ZERO) == NULL)
 	  {
-	    if (pass)
-	    {
-	      printf("\b\b\b\b\bFAIL]\n");
-	      printf("        (%lu bytes in response)\n",
-	             (unsigned long)ippLength(response));
-	      pass = 0;
-	    }
-
-	    printf("        EXPECTED %s\n", expects[i]);
+	    pass = 0;
+	    break;
 	  }
+      }
 
-	if (pass)
-	{
-	  printf("\b\b\b\b\bPASS]\n");
-	  printf("        (%lu bytes in response)\n",
-	         (unsigned long)ippLength(response));
-	}
-	else
-	{
-	  puts("        RECEIVED");
-	  printf("        status-code = %04x\n",
-	         response->request.status.status_code);
+      if (pass)
+      {
+	puts("PASS]");
+	printf("        RECEIVED: %lu bytes in response\n",
+	       (unsigned long)ippLength(response));
 
+        if (num_displayed > 0)
+	{
 	  for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
-	    print_attr(attrptr);
-	}
+	    if (attrptr->name)
+	    {
+	      for (i = 0; i < num_displayed; i ++)
+		if (!strcmp(displayed[i], attrptr->name))
+		{
+		  print_attr(attrptr);
+		  break;
+		}
+	    }
+        }
+      }
+      else
+      {
+	puts("FAIL]");
+	printf("        RECEIVED: %lu bytes in response\n",
+	       (unsigned long)ippLength(response));
+
+	for (i = 0; i < num_statuses; i ++)
+          if (response->request.status.status_code == statuses[i])
+	    break;
+
+	if (i == num_statuses && num_statuses > 0)
+	  puts("        BAD STATUS");
+
+	printf("        status-code = %04x (%s)\n",
+	       response->request.status.status_code,
+	       ippErrorString(response->request.status.status_code));
+
+        for (i = 0; i < num_expects; i ++)
+	  if (ippFindAttribute(response, expects[i], IPP_TAG_ZERO) == NULL)
+	    printf("        EXPECTED: %s\n", expects[i]);
+
+	for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
+	  print_attr(attrptr);
       }
 
       ippDelete(response);
@@ -494,14 +581,15 @@ do_tests(const char *uri,		/* I - URI to connect on */
  * 'get_tag()' - Get an IPP value or group tag from a name...
  */
 
-ipp_tag_t
-get_tag(const char *name)
+ipp_tag_t				/* O - Value/group tag */
+get_tag(const char *name)		/* I - Name of value/group tag */
 {
-  int		i;
-  static char	*names[] =
-		{
+  int			i;		/* Looping var */
+  static const char	* const names[] =
+		{			/* Value/group tag names */
 		  "zero", "operation", "job", "end", "printer",
-		  "unsupported-group", "", "", "", "", "", "", "",
+		  "unsupported-group", "subscription", "event-notification",
+		  "", "", "", "", "",
 		  "", "", "", "unsupported-value", "default",
 		  "unknown", "novalue", "", "notsettable",
 		  "deleteattr", "anyvalue", "", "", "", "", "", "",
@@ -515,7 +603,7 @@ get_tag(const char *name)
 
 
   for (i = 0; i < (sizeof(names) / sizeof(names[0])); i ++)
-    if (strcasecmp(name, names[i]) == 0)
+    if (!strcasecmp(name, names[i]))
       return ((ipp_tag_t)i);
 
   return (IPP_TAG_ZERO);
@@ -526,15 +614,16 @@ get_tag(const char *name)
  * 'get_token()' - Get a token from a file.
  */
 
-char *				/* O - Token from file or NULL on EOF */
-get_token(FILE *fp,		/* I - File to read from */
-          char *buf,		/* I - Buffer to read into */
-	  int  buflen)		/* I - Length of buffer */
+char *					/* O  - Token from file or NULL on EOF */
+get_token(FILE *fp,			/* I  - File to read from */
+          char *buf,			/* I  - Buffer to read into */
+	  int  buflen,			/* I  - Length of buffer */
+	  int  *linenum)		/* IO - Current line number */
 {
-  int	ch,			/* Character from file */
-	quote;			/* Quoting character */
-  char	*bufptr,		/* Pointer into buffer */
-	*bufend;		/* End of buffer */
+  int	ch,				/* Character from file */
+	quote;				/* Quoting character */
+  char	*bufptr,			/* Pointer into buffer */
+	*bufend;			/* End of buffer */
 
 
   for (;;)
@@ -543,7 +632,11 @@ get_token(FILE *fp,		/* I - File to read from */
     * Skip whitespace...
     */
 
-    while (isspace(ch = getc(fp)));
+    while (isspace(ch = getc(fp)))
+    {
+      if (ch == '\n')
+        (*linenum) ++;
+    }
 
    /*
     * Read a token...
@@ -579,6 +672,8 @@ get_token(FILE *fp,		/* I - File to read from */
       while ((ch = getc(fp)) != EOF)
 	if (ch == '\n')
           break;
+
+      (*linenum) ++;
     }
     else
     {
