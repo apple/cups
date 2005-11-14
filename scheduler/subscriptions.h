@@ -93,8 +93,8 @@ typedef struct cupsd_subscription_s	/**** Subscription structure ****/
   char			*recipient;	/* notify-recipient-uri, if applicable */
   unsigned char		user_data[64];	/* notify-user-data */
   int			user_data_len;	/* Length of notify-user-data */
-  int			lease;		/* notify-lease-time */
-  int			interval;	/* notify-interval */
+  int			lease;		/* notify-lease-duration */
+  int			interval;	/* notify-time-interval */
   cupsd_printer_t	*dest;		/* notify-printer-uri, if any */
   cupsd_job_t		*job;		/* notify-job-id, if any */
   int			pid;		/* Process ID of notifier */

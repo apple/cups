@@ -48,6 +48,7 @@
  *                                 values as needed...
  *   copy_subscription_attrs()   - Copy subscription attributes.
  *   create_job()                - Print a file to a printer or class.
+ *   create_requested_array()    - Create an array for the requested-attributes.
  *   create_subscription()       - Create a notification subscription.
  *   delete_printer()            - Remove a printer or class from the system.
  *   get_default()               - Get the default destination.
@@ -134,8 +135,10 @@ static int	copy_banner(cupsd_client_t *con, cupsd_job_t *job, const char *name);
 static int	copy_file(const char *from, const char *to);
 static int	copy_model(cupsd_client_t *con, const char *from, const char *to);
 static void	copy_subscription_attrs(cupsd_client_t *con,
-		                        cupsd_subscription_t *sub);
+		                        cupsd_subscription_t *sub,
+					cups_array_t *ra);
 static void	create_job(cupsd_client_t *con, ipp_attribute_t *uri);
+static cups_array_t *create_requested_array(ipp_t *request);
 static void	create_subscription(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_default(cupsd_client_t *con);
@@ -3634,7 +3637,8 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 static void
 copy_subscription_attrs(
     cupsd_client_t       *con,		/* I - Client connection */
-    cupsd_subscription_t *sub)		/* I - Subscription */
+    cupsd_subscription_t *sub,		/* I - Subscription */
+    cups_array_t         *ra)		/* I - Requested attributes array */
 {
   ipp_attribute_t	*attr;		/* Current attribute */
   char			printer_uri[HTTP_MAX_URI];
@@ -3649,64 +3653,71 @@ copy_subscription_attrs(
   * requested-attributes attribute that may be provided by the client.
   */
 
-  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                "notify-subscription-id", sub->id);
+  if (!ra || cupsArrayFind(ra, "notify-subscription-id"))
+    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                  "notify-subscription-id", sub->id);
 
-  if ((name = cupsdEventName((cupsd_eventmask_t)sub->mask)) != NULL)
+  if (!ra || cupsArrayFind(ra, "notify-events"))
   {
-   /*
-    * Simple event list...
-    */
+    if ((name = cupsdEventName((cupsd_eventmask_t)sub->mask)) != NULL)
+    {
+     /*
+      * Simple event list...
+      */
 
-    ippAddString(con->response, IPP_TAG_SUBSCRIPTION,
-                 IPP_TAG_KEYWORD | IPP_TAG_COPY,
-                 "notify-events", NULL, name);
+      ippAddString(con->response, IPP_TAG_SUBSCRIPTION,
+                   IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                   "notify-events", NULL, name);
+    }
+    else
+    {
+     /*
+      * Complex event list...
+      */
+
+      for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
+	if (sub->mask & mask)
+          count ++;
+
+      attr = ippAddStrings(con->response, IPP_TAG_SUBSCRIPTION,
+                           IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                           "notify-events", count, NULL, NULL);
+
+      for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
+	if (sub->mask & mask)
+	{
+          attr->values[count].string.text =
+	      (char *)cupsdEventName((cupsd_eventmask_t)mask);
+
+          count ++;
+	}
+    }
   }
-  else
-  {
-   /*
-    * Complex event list...
-    */
 
-    for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
-      if (sub->mask & mask)
-        count ++;
+  if (!ra || cupsArrayFind(ra, "notify-subscriber-user-name"))
+    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_NAME,
+        	 "notify-subscriber-user-name", NULL, sub->owner);
 
-    attr = ippAddStrings(con->response, IPP_TAG_SUBSCRIPTION,
-                         IPP_TAG_KEYWORD | IPP_TAG_COPY,
-                         "notify-events", count, NULL, NULL);
-
-    for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
-      if (sub->mask & mask)
-      {
-        attr->values[count].string.text =
-	    (char *)cupsdEventName((cupsd_eventmask_t)mask);
-
-        count ++;
-      }
-  }
-
-  ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_NAME,
-               "notify-subscriber-user-name", NULL, sub->owner);
-  if (sub->recipient)
+  if (sub->recipient && (!ra || cupsArrayFind(ra, "notify-recipient-uri")))
     ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
         	 "notify-recipient-uri", NULL, sub->recipient);
-  else
+  else if (!ra || cupsArrayFind(ra, "notify-pull-method"))
     ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_KEYWORD,
                  "notify-pull-method", NULL, "ippget");
 
-  if (sub->user_data_len > 0)
+  if (sub->user_data_len > 0 && (!ra || cupsArrayFind(ra, "notify-user-data")))
     ippAddOctetString(con->response, IPP_TAG_SUBSCRIPTION, "notify-user-data",
                       sub->user_data, sub->user_data_len);
 
-  if (!sub->job)
+  if (!sub->job && (!ra || cupsArrayFind(ra, "notify-lease-duration")))
     ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                  "notify-lease-time", sub->lease);
+                  "notify-lease-duration", sub->lease);
 
-  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                "notify-interval", sub->interval);
+  if (!ra || cupsArrayFind(ra, "notify-time-interval"))
+    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                  "notify-time-interval", sub->interval);
 
-  if (sub->dest)
+  if (sub->dest && (!ra || cupsArrayFind(ra, "notify-printer-uri")))
   {
     httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
                      con->servername, con->serverport, "/printers/%s",
@@ -3715,7 +3726,7 @@ copy_subscription_attrs(
         	 "notify-printer-uri", NULL, printer_uri);
   }
 
-  if (sub->job)
+  if (sub->job && (!ra || cupsArrayFind(ra, "notify-job-id")))
     ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
                   "notify-job-id", sub->job->id);
 }
@@ -4235,6 +4246,186 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
                   job->id, job->dest, job->username);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_CREATED, printer, job, "Job created.");
+}
+
+
+/*
+ * 'create_requested_array()' - Create an array for the requested-attributes.
+ */
+
+static cups_array_t *			/* O - Array of attributes or NULL */
+create_requested_array(ipp_t *request)	/* I - IPP request */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*requested;	/* requested-attributes attribute */
+  cups_array_t		*ra;		/* Requested attributes array */
+  char			*value;		/* Current value */
+
+
+ /*
+  * Get the requested-attributes attribute, and return NULL if we don't
+  * have one...
+  */
+
+  if ((requested = ippFindAttribute(request, "requested-attributes",
+                                    IPP_TAG_KEYWORD)) == NULL)
+    return (NULL);
+
+ /*
+  * If the attribute contains a single "all" keyword, return NULL...
+  */
+
+  if (requested->num_values == 1 &&
+      !strcmp(requested->values[0].string.text, "all"))
+    return (NULL);
+
+ /*
+  * Create an array using "strcmp" as the comparison function...
+  */
+
+  ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+
+  for (i = 0; i < requested->num_values; i ++)
+  {
+    value = requested->values[i].string.text;
+
+    if (!strcmp(value, "job-template"))
+    {
+      cupsArrayAdd(ra, "copies");
+      cupsArrayAdd(ra, "copies-default");
+      cupsArrayAdd(ra, "copies-supported");
+      cupsArrayAdd(ra, "finishings");
+      cupsArrayAdd(ra, "finishings-default");
+      cupsArrayAdd(ra, "finishings-supported");
+      cupsArrayAdd(ra, "job-hold-until");
+      cupsArrayAdd(ra, "job-hold-until-default");
+      cupsArrayAdd(ra, "job-hold-until-supported");
+      cupsArrayAdd(ra, "job-priority");
+      cupsArrayAdd(ra, "job-priority-default");
+      cupsArrayAdd(ra, "job-priority-supported");
+      cupsArrayAdd(ra, "job-sheets");
+      cupsArrayAdd(ra, "job-sheets-default");
+      cupsArrayAdd(ra, "job-sheets-supported");
+      cupsArrayAdd(ra, "media");
+      cupsArrayAdd(ra, "media-default");
+      cupsArrayAdd(ra, "media-supported");
+      cupsArrayAdd(ra, "multiple-document-handling");
+      cupsArrayAdd(ra, "multiple-document-handling-default");
+      cupsArrayAdd(ra, "multiple-document-handling-supported");
+      cupsArrayAdd(ra, "number-up");
+      cupsArrayAdd(ra, "number-up-default");
+      cupsArrayAdd(ra, "number-up-supported");
+      cupsArrayAdd(ra, "orientation-requested");
+      cupsArrayAdd(ra, "orientation-requested-default");
+      cupsArrayAdd(ra, "orientation-requested-supported");
+      cupsArrayAdd(ra, "page-ranges");
+      cupsArrayAdd(ra, "page-ranges-supported");
+      cupsArrayAdd(ra, "printer-resolution");
+      cupsArrayAdd(ra, "printer-resolution-default");
+      cupsArrayAdd(ra, "printer-resolution-supported");
+      cupsArrayAdd(ra, "print-quality");
+      cupsArrayAdd(ra, "print-quality-default");
+      cupsArrayAdd(ra, "print-quality-supported");
+      cupsArrayAdd(ra, "sides");
+      cupsArrayAdd(ra, "sides-default");
+      cupsArrayAdd(ra, "sides-supported");
+    }
+    else if (!strcmp(value, "job-description"))
+    {
+      cupsArrayAdd(ra, "date-time-at-completed");
+      cupsArrayAdd(ra, "date-time-at-creation");
+      cupsArrayAdd(ra, "date-time-at-processing");
+      cupsArrayAdd(ra, "job-detailed-status-message");
+      cupsArrayAdd(ra, "job-document-access-errors");
+      cupsArrayAdd(ra, "job-id");
+      cupsArrayAdd(ra, "job-impressions");
+      cupsArrayAdd(ra, "job-impressions-completed");
+      cupsArrayAdd(ra, "job-k-octets");
+      cupsArrayAdd(ra, "job-k-octets-processed");
+      cupsArrayAdd(ra, "job-media-sheets");
+      cupsArrayAdd(ra, "job-media-sheets-completed");
+      cupsArrayAdd(ra, "job-message-from-operator");
+      cupsArrayAdd(ra, "job-more-info");
+      cupsArrayAdd(ra, "job-name");
+      cupsArrayAdd(ra, "job-originating-user-name");
+      cupsArrayAdd(ra, "job-printer-up-time");
+      cupsArrayAdd(ra, "job-printer-uri");
+      cupsArrayAdd(ra, "job-state");
+      cupsArrayAdd(ra, "job-state-message");
+      cupsArrayAdd(ra, "job-state-reasons");
+      cupsArrayAdd(ra, "job-uri");
+      cupsArrayAdd(ra, "number-of-documents");
+      cupsArrayAdd(ra, "number-of-intervening-jobs");
+      cupsArrayAdd(ra, "output-device-assigned");
+      cupsArrayAdd(ra, "time-at-completed");
+      cupsArrayAdd(ra, "time-at-creation");
+      cupsArrayAdd(ra, "time-at-processing");
+    }
+    else if (!strcmp(value, "printer-description"))
+    {
+      cupsArrayAdd(ra, "charset-configured");
+      cupsArrayAdd(ra, "charset-supported");
+      cupsArrayAdd(ra, "color-supported");
+      cupsArrayAdd(ra, "compression-supported");
+      cupsArrayAdd(ra, "document-format-default");
+      cupsArrayAdd(ra, "document-format-supported");
+      cupsArrayAdd(ra, "generated-natural-language-supported");
+      cupsArrayAdd(ra, "ipp-versions-supported");
+      cupsArrayAdd(ra, "job-impressions-supported");
+      cupsArrayAdd(ra, "job-k-octets-supported");
+      cupsArrayAdd(ra, "job-media-sheets-supported");
+      cupsArrayAdd(ra, "multiple-document-jobs-supported");
+      cupsArrayAdd(ra, "multiple-operation-time-out");
+      cupsArrayAdd(ra, "natural-language-configured");
+      cupsArrayAdd(ra, "notify-attributes-supported");
+      cupsArrayAdd(ra, "notify-lease-duration-default");
+      cupsArrayAdd(ra, "notify-lease-duration-supported");
+      cupsArrayAdd(ra, "notify-max-events-supported");
+      cupsArrayAdd(ra, "notify-notify-events-default");
+      cupsArrayAdd(ra, "notify-notify-events-supported");
+      cupsArrayAdd(ra, "notify-pull-method-supported");
+      cupsArrayAdd(ra, "notify-schemes-supported");
+      cupsArrayAdd(ra, "operations-supported");
+      cupsArrayAdd(ra, "pages-per-minute");
+      cupsArrayAdd(ra, "pages-per-minute-color");
+      cupsArrayAdd(ra, "pdl-override-supported");
+      cupsArrayAdd(ra, "printer-current-time");
+      cupsArrayAdd(ra, "printer-driver-installer");
+      cupsArrayAdd(ra, "printer-info");
+      cupsArrayAdd(ra, "printer-is-accepting-jobs");
+      cupsArrayAdd(ra, "printer-location");
+      cupsArrayAdd(ra, "printer-make-and-model");
+      cupsArrayAdd(ra, "printer-message-from-operator");
+      cupsArrayAdd(ra, "printer-more-info");
+      cupsArrayAdd(ra, "printer-more-info-manufacturer");
+      cupsArrayAdd(ra, "printer-name");
+      cupsArrayAdd(ra, "printer-state");
+      cupsArrayAdd(ra, "printer-state-message");
+      cupsArrayAdd(ra, "printer-state-reasons");
+      cupsArrayAdd(ra, "printer-up-time");
+      cupsArrayAdd(ra, "printer-uri-supported");
+      cupsArrayAdd(ra, "queued-job-count");
+      cupsArrayAdd(ra, "reference-uri-schemes-supported");
+      cupsArrayAdd(ra, "uri-authentication-supported");
+      cupsArrayAdd(ra, "uri-security-supported");
+    }
+    else if (!strcmp(value, "subscription-template"))
+    {
+      cupsArrayAdd(ra, "notify-attributes");
+      cupsArrayAdd(ra, "notify-charset");
+      cupsArrayAdd(ra, "notify-events");
+      cupsArrayAdd(ra, "notify-lease-duration");
+      cupsArrayAdd(ra, "notify-natural-language");
+      cupsArrayAdd(ra, "notify-pull-method");
+      cupsArrayAdd(ra, "notify-recipient-uri");
+      cupsArrayAdd(ra, "notify-time-interval");
+      cupsArrayAdd(ra, "notify-user-data");
+    }
+    else
+      cupsArrayAdd(ra, value);
+  }
+
+  return (ra);
 }
 
 
@@ -5681,7 +5872,7 @@ get_subscription_attrs(
     int            sub_id)		/* I - Subscription ID */
 {
   cupsd_subscription_t	*sub;		/* Subscription */
-  ipp_attribute_t	*requested;	/* requested-attributes */
+  cups_array_t		*ra;		/* Requested attributes array */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -5722,12 +5913,13 @@ get_subscription_attrs(
   * requested-attributes attribute that may be provided by the client.
   */
 
-  requested = ippFindAttribute(con->request, "requested-attributes",
-	                       IPP_TAG_KEYWORD);
+  ra = create_requested_array(con->request);
 
-  copy_subscription_attrs(con, sub);
+  copy_subscription_attrs(con, sub, ra);
 
-  con->response->request.status.status_code = requested ? IPP_OK_SUBST : IPP_OK;
+  cupsArrayDelete(ra);
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -5742,8 +5934,8 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
   int			count;		/* Number of subscriptions */
   int			limit;		/* Limit */
   cupsd_subscription_t	*sub;		/* Subscription */
-  ipp_attribute_t	*requested,	/* requested-attributes */
-			*attr;		/* Attribute */
+  cups_array_t		*ra;		/* Requested attributes array */
+  ipp_attribute_t	*attr;		/* Attribute */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -5836,8 +6028,7 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
   * requested-attributes attribute that may be provided by the client.
   */
 
-  requested = ippFindAttribute(con->request, "requested-attributes",
-	                       IPP_TAG_KEYWORD);
+  ra = create_requested_array(con->request);
 
   if ((attr = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER)) != NULL)
     limit = attr->values[0].integer;
@@ -5869,15 +6060,16 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
         (!username[0] || !strcasecmp(username, sub->owner)))
     {
       ippAddSeparator(con->response);
-      copy_subscription_attrs(con, sub);
+      copy_subscription_attrs(con, sub, ra);
 
       count ++;
       if (limit && count >= limit)
         break;
     }
 
-  con->response->request.status.status_code = !count ? IPP_NOT_FOUND :
-                                              requested ? IPP_OK_SUBST : IPP_OK;
+  cupsArrayDelete(ra);
+
+  con->response->request.status.status_code = !count ? IPP_NOT_FOUND : IPP_OK;
 }
 
 
