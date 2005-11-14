@@ -20,7 +20,7 @@
         GROUP subscription
 	ATTR uri notify-recipient testnotify
 	ATTR keyword notify-events printer-state-changed
-	ATTR integer notify-lease-time 5
+	ATTR integer notify-lease-duration 5
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -73,12 +73,12 @@
         GROUP subscription
 	ATTR uri notify-recipient testnotify
 	ATTR keyword notify-events printer-state-changed
-	ATTR integer notify-lease-time 5
+	ATTR integer notify-lease-duration 5
 
         GROUP subscription
 	ATTR uri notify-recipient testnotify
 	ATTR keyword notify-events printer-config-changed
-	ATTR integer notify-lease-time 5
+	ATTR integer notify-lease-duration 5
 
 	# What statuses are OK?
 	STATUS successful-ok

@@ -303,7 +303,6 @@ cupsdCreateCommonData(void)
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Attribute data */
-  cupsd_printer_t	*p;		/* Current printer */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
@@ -393,6 +392,36 @@ cupsdCreateCommonData(void)
 		  "retry-job",
 		  "stop-printer"
 		};
+  static const char * const notify_attrs[] =
+		{			/* notify-attributes-supported values */
+		  "printer-state-change-time",
+		  "notify-lease-expiration-time",
+		  "notify-subscriber-user-name"
+		};
+  static const char * const notify_events[] =
+		{			/* notify-events-supported values */
+        	  "job-completed",
+        	  "job-config-changed",
+        	  "job-created",
+        	  "job-progress",
+        	  "job-state-changed",
+        	  "job-stopped",
+        	  "printer-added",
+        	  "printer-changed",
+        	  "printer-config-changed",
+        	  "printer-deleted",
+        	  "printer-finishings-changed",
+        	  "printer-media-changed",
+        	  "printer-modified",
+        	  "printer-restarted",
+        	  "printer-shutdown",
+        	  "printer-state-changed",
+        	  "printer-stopped",
+        	  "server-audit",
+        	  "server-restarted",
+        	  "server-started",
+        	  "server-stopped"
+		};
 
 
   if (CommonData)
@@ -400,74 +429,77 @@ cupsdCreateCommonData(void)
 
   CommonData = ippNew();
 
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-               "pdl-override-supported", NULL, "not-attempted");
-  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]),
-		NULL, versions);
-  ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                 "operations-supported",
-                 sizeof(ops) / sizeof(ops[0]) + JobFiles - 1, (int *)ops);
-  ippAddBoolean(CommonData, IPP_TAG_PRINTER,
-                "multiple-document-jobs-supported", 1);
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "multiple-operation-time-out", 60);
-  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                "multiple-document-handling-supported",
-                sizeof(multiple_document_handling) /
-		    sizeof(multiple_document_handling[0]), NULL,
-	        multiple_document_handling);
+ /*
+  * This list of attributes is sorted to improve performance when the
+  * client provides a requested-attributes attribute...
+  */
+
+  /* charset-configured */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_CHARSET,
                "charset-configured", NULL, DefaultCharset);
+
+  /* charset-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_CHARSET,
                 "charset-supported", sizeof(charsets) / sizeof(charsets[0]),
 		NULL, charsets);
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
-               "natural-language-configured", NULL, DefaultLanguage);
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
-               "generated-natural-language-supported", NULL, DefaultLanguage);
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
-               "document-format-default", NULL, "application/octet-stream");
-  ippAddStrings(CommonData, IPP_TAG_PRINTER,
-                (ipp_tag_t)(IPP_TAG_MIMETYPE | IPP_TAG_COPY),
-                "document-format-supported", NumMimeTypes, NULL, MimeTypes);
+
+  /* compression-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
         	"compression-supported",
 		sizeof(compressions) / sizeof(compressions[0]),
 		NULL, compressions);
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "job-priority-supported", 100);
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "job-priority-default", 50);
-  ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
+
+  /* TODO: move to printer-specific section! */
+  /* copies-default */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "copies-default", 1);
-  ippAddBoolean(CommonData, IPP_TAG_PRINTER, "page-ranges-supported", 1);
-  ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                 "number-up-supported", sizeof(nups) / sizeof(nups[0]), nups);
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "number-up-default", 1);
-  ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                 "orientation-requested-supported", 4, (int *)orients);
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                "orientation-requested-default", IPP_PORTRAIT);
+
+  /* copies-supported */
+  ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
+
+  /* TODO: move to printer-specific section! */
+  /* document-format-default */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
+               "document-format-default", NULL, "application/octet-stream");
+
+  /* document-format-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER,
+                (ipp_tag_t)(IPP_TAG_MIMETYPE | IPP_TAG_COPY),
+                "document-format-supported", NumMimeTypes, NULL, MimeTypes);
+
+  /* generated-natural-language-supported */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
+               "generated-natural-language-supported", NULL, DefaultLanguage);
+
+  /* ipp-versions-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]),
+		NULL, versions);
+
+  /* TODO: move to printer-specific section! */
+  /* job-hold-until-default */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "job-hold-until-default", NULL, "no-hold");
+
+  /* job-hold-until-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                 "job-hold-until-supported", sizeof(holds) / sizeof(holds[0]),
 		NULL, holds);
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-               "job-hold-until-default", NULL, "no-hold");
-  attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                       "printer-op-policy-supported", NumPolicies, NULL, NULL);
-  for (i = 0; i < NumPolicies; i ++)
-    attr->values[i].string.text = strdup(Policies[i]->name);
-  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                "printer-error-policy-supported",
-		sizeof(errors) / sizeof(errors[0]), NULL, errors);
 
+  /* TODO: move to printer-specific section! */
+  /* job-priority-default */
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "job-priority-default", 50);
+
+  /* job-priority-supported */
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "job-priority-supported", 100);
+
+  /* job-sheets-supported */
   if (NumBanners > 0)
   {
    /*
-    * Setup the job-sheets-supported and job-sheets-default attributes...
+    * Setup the job-sheets-supported attribute...
     */
 
     if (Classification && !ClassifyOverride)
@@ -489,19 +521,108 @@ cupsdCreateCommonData(void)
 	attr->values[i + 1].string.text = strdup(Banners[i].name);
     }
   }
+  else
+    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                 "job-sheets-supported", NULL, "none");
 
-  if (Printers)
-  {
-   /*
-    * Loop through the printers and update the op_policy_ptr values...
-    */
+  /* multiple-document-handling-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                "multiple-document-handling-supported",
+                sizeof(multiple_document_handling) /
+		    sizeof(multiple_document_handling[0]), NULL,
+	        multiple_document_handling);
 
-    for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-         p;
-	 p = (cupsd_printer_t *)cupsArrayNext(Printers))
-      if ((p->op_policy_ptr = cupsdFindPolicy(p->op_policy)) == NULL)
-	p->op_policy_ptr = DefaultPolicyPtr;
-  }
+  /* multiple-document-jobs-supported */
+  ippAddBoolean(CommonData, IPP_TAG_PRINTER,
+                "multiple-document-jobs-supported", 1);
+
+  /* multiple-operation-time-out */
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "multiple-operation-time-out", 60);
+
+  /* natural-language-configured */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
+               "natural-language-configured", NULL, DefaultLanguage);
+
+  /* notify-attributes-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                "notify-attributes-supported",
+		(int)(sizeof(notify_attrs) / sizeof(notify_attrs[0])),
+		NULL, notify_attrs);
+
+  /* TODO: move to printer-specific section! */
+  /* notify-lease-duration-default */
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+               "notify-lease-duration-default", DefaultLeaseDuration);
+
+  /* notify-lease-duration-supported */
+  ippAddRange(CommonData, IPP_TAG_PRINTER,
+              "notify-lease-duration-supported", 0,
+	      MaxLeaseDuration ? MaxLeaseDuration : 2147483647);
+
+  /* notify-max-events-supported */
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+               "notify-max-events-supported", MaxEvents);
+
+  /* notify-notify-events-default */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "notify-events-default", NULL, "job-completed");
+
+  /* notify-notify-events-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                "notify-events-supported",
+		(int)(sizeof(notify_events) / sizeof(notify_events[0])),
+		NULL, notify_events);
+
+  /* notify-pull-method-supported */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "notify-pull-method-supported", NULL, "ippget");
+
+  /* TODO: scan notifier directory */
+  /* notify-schemes-supported */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "notify-schemes-supported", NULL, "mailto");
+
+  /* TODO: move to printer-specific section! */
+  /* number-up-default */
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "number-up-default", 1);
+
+  /* number-up-supported */
+  ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                 "number-up-supported", sizeof(nups) / sizeof(nups[0]), nups);
+
+  /* operations-supported */
+  ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                 "operations-supported",
+                 sizeof(ops) / sizeof(ops[0]) + JobFiles - 1, (int *)ops);
+
+  /* TODO: move to printer-specific section! */
+  /* orientation-requested-default */
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                "orientation-requested-default", IPP_PORTRAIT);
+
+  /* orientation-requested-supported */
+  ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                 "orientation-requested-supported", 4, (int *)orients);
+
+  /* page-ranges-supported */
+  ippAddBoolean(CommonData, IPP_TAG_PRINTER, "page-ranges-supported", 1);
+
+  /* pdf-override-supported */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "pdl-override-supported", NULL, "not-attempted");
+
+  /* printer-error-policy-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                "printer-error-policy-supported",
+		sizeof(errors) / sizeof(errors[0]), NULL, errors);
+
+  /* printer-op-policy-supported */
+  attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                       "printer-op-policy-supported", NumPolicies, NULL, NULL);
+  for (i = 0; i < NumPolicies; i ++)
+    attr->values[i].string.text = strdup(Policies[i]->name);
 }
 
 
@@ -2123,9 +2244,17 @@ cupsdUpdatePrinters(void)
       cupsArraySave(Printers);
       cupsdDeletePrinter(p, 0);
       cupsArrayRestore(Printers);
+      continue;
     }
     else if (!(p->type & CUPS_PRINTER_REMOTE))
       cupsdSetPrinterAttrs(p);
+
+   /*
+    * Update the operation policy pointer...
+    */
+
+    if ((p->op_policy_ptr = cupsdFindPolicy(p->op_policy)) == NULL)
+      p->op_policy_ptr = DefaultPolicyPtr;
   }
 }
 

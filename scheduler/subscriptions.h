@@ -123,9 +123,10 @@ VAR int		MaxSubscriptions VALUE(100),
 					/* Per-user subscription limit */
 		NextSubscriptionId VALUE(1),
 					/* Next subscription ID */
-		DefaultLeaseTime VALUE(86400),
-					/* Default notify-lease-time */
-		MaxLeaseTime VALUE(0);	/* Maximum notify-lease-time */
+		DefaultLeaseDuration VALUE(86400),
+					/* Default notify-lease-duration */
+		MaxLeaseDuration VALUE(0);
+					/* Maximum notify-lease-duration */
 VAR cups_array_t *Subscriptions VALUE(NULL);
 					/* Active subscriptions */
 

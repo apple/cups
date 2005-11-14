@@ -1308,8 +1308,8 @@ add_job_subscriptions(
 	return;
       }
       else if (!strcmp(attr->name, "notify-natural-language") &&
-               attr->value_tag == IPP_TAG_LANGUAGE &&
-	       strcmp(attr->values[0].string.text, DefaultLanguage))
+               (attr->value_tag != IPP_TAG_LANGUAGE ||
+	        strcmp(attr->values[0].string.text, DefaultLanguage)))
       {
         send_ipp_error(con, IPP_CHARSET);
 	return;
@@ -1331,7 +1331,7 @@ add_job_subscriptions(
         for (i = 0; i < attr->num_values; i ++)
 	  mask |= cupsdEventValue(attr->values[i].string.text);
       }
-      else if (!strcmp(attr->name, "notify-lease-time"))
+      else if (!strcmp(attr->name, "notify-lease-duration"))
       {
         send_ipp_error(con, IPP_BAD_REQUEST);
 	return;
@@ -4460,7 +4460,7 @@ create_subscription(
 			*pullmethod;	/* notify-pull-method */
   ipp_attribute_t	*user_data;	/* notify-user-data */
   int			interval,	/* notify-time-interval */
-			lease;		/* notify-lease-time */
+			lease;		/* notify-lease-duration */
   unsigned		mask;		/* notify-events */
 
 
@@ -4567,7 +4567,7 @@ create_subscription(
     pullmethod = NULL;
     user_data  = NULL;
     interval   = 0;
-    lease      = DefaultLeaseTime;
+    lease      = DefaultLeaseDuration;
     jobid      = 0;
     mask       = CUPSD_EVENT_NONE;
 
@@ -4587,8 +4587,8 @@ create_subscription(
 	return;
       }
       else if (!strcmp(attr->name, "notify-natural-language") &&
-               attr->value_tag == IPP_TAG_LANGUAGE &&
-	       strcmp(attr->values[0].string.text, DefaultLanguage))
+               (attr->value_tag != IPP_TAG_LANGUAGE ||
+	        strcmp(attr->values[0].string.text, DefaultLanguage)))
       {
         send_ipp_error(con, IPP_CHARSET);
 	return;
@@ -4610,7 +4610,7 @@ create_subscription(
         for (i = 0; i < attr->num_values; i ++)
 	  mask |= cupsdEventValue(attr->values[i].string.text);
       }
-      else if (!strcmp(attr->name, "notify-lease-time") &&
+      else if (!strcmp(attr->name, "notify-lease-duration") &&
                attr->value_tag == IPP_TAG_INTEGER)
         lease = attr->values[0].integer;
       else if (!strcmp(attr->name, "notify-time-interval") &&
@@ -4641,13 +4641,13 @@ create_subscription(
       }
     }
 
-    if (MaxLeaseTime && lease > MaxLeaseTime)
+    if (MaxLeaseDuration && lease > MaxLeaseDuration)
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
-                      "create_subscription: Limiting notify-lease-time to %d "
-		      "seconds.",
-		      MaxLeaseTime);
-      lease = MaxLeaseTime;
+                      "create_subscription: Limiting notify-lease-duration to "
+		      "%d seconds.",
+		      MaxLeaseDuration);
+      lease = MaxLeaseDuration;
     }
 
     if (jobid)
@@ -4873,7 +4873,7 @@ get_default(cupsd_client_t *con)	/* I - Client connection */
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                   "printer-up-time", curtime);
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                  "printer-state-time", DefaultPrinter->state_time);
+                  "printer-state-change-time", DefaultPrinter->state_time);
     ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
                ippTimeToDate(curtime));
 
@@ -5591,10 +5591,10 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "printer-up-time", curtime);
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "printer-state-time", printer->state_time);
+                "printer-state-change-time", printer->state_time);
   ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
              ippTimeToDate(curtime));
-
+                
   ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
                "printer-error-policy", NULL, printer->error_policy);
   ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
@@ -5799,7 +5799,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
       *    printer-is-accepting-jobs
       *    printer-is-shared
       *    printer-up-time
-      *    printer-state-time
+      *    printer-state-change-time
       *    + all printer attributes
       */
 
@@ -5830,7 +5830,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
       ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                     "printer-up-time", curtime);
       ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                    "printer-state-time", printer->state_time);
+                    "printer-state-change-time", printer->state_time);
       ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
         	 ippTimeToDate(curtime));
 

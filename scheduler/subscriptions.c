@@ -942,10 +942,10 @@ cupsdLoadAllSubscriptions(void)
 	return;
       }
     }
-    else if (!strcasecmp(line, "LeaseTime"))
+    else if (!strcasecmp(line, "LeaseDuration"))
     {
      /*
-      * LeaseTime #
+      * LeaseDuration #
       */
 
       if (value && isdigit(*value & 255))
@@ -1165,7 +1165,7 @@ cupsdSaveAllSubscriptions(void)
         cupsFilePutChar(fp, '\n');
     }
 
-    cupsFilePrintf(fp, "LeaseTime %d\n", sub->lease);
+    cupsFilePrintf(fp, "LeaseDuration %d\n", sub->lease);
     cupsFilePrintf(fp, "Interval %d\n", sub->interval);
     cupsFilePrintf(fp, "ExpirationTime %ld\n", (long)sub->expire);
     cupsFilePrintf(fp, "NextEventId %d\n", sub->next_event_id);

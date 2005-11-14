@@ -98,6 +98,7 @@ static cupsd_var_t	variables[] =
   { "DataDir",			&DataDir,		CUPSD_VARTYPE_STRING },
   { "DefaultCharset",		&DefaultCharset,	CUPSD_VARTYPE_STRING },
   { "DefaultLanguage",		&DefaultLanguage,	CUPSD_VARTYPE_STRING },
+  { "DefaultLeaseDuration",	&DefaultLeaseDuration,	CUPSD_VARTYPE_INTEGER },
   { "DefaultPolicy",		&DefaultPolicy,		CUPSD_VARTYPE_STRING },
   { "DocumentRoot",		&DocumentRoot,		CUPSD_VARTYPE_STRING },
   { "ErrorLog",			&ErrorLog,		CUPSD_VARTYPE_STRING },
@@ -119,12 +120,18 @@ static cupsd_var_t	variables[] =
   { "MaxClients",		&MaxClients,		CUPSD_VARTYPE_INTEGER },
   { "MaxClientsPerHost",	&MaxClientsPerHost,	CUPSD_VARTYPE_INTEGER },
   { "MaxCopies",		&MaxCopies,		CUPSD_VARTYPE_INTEGER },
+  { "MaxEvents",		&MaxEvents,		CUPSD_VARTYPE_INTEGER },
   { "MaxJobs",			&MaxJobs,		CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerPrinter",	&MaxJobsPerPrinter,	CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerUser",		&MaxJobsPerUser,	CUPSD_VARTYPE_INTEGER },
+  { "MaxLeaseDuration",		&MaxLeaseDuration,	CUPSD_VARTYPE_INTEGER },
   { "MaxLogSize",		&MaxLogSize,		CUPSD_VARTYPE_INTEGER },
   { "MaxPrinterHistory",	&MaxPrinterHistory,	CUPSD_VARTYPE_INTEGER },
   { "MaxRequestSize",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
+  { "MaxSubscriptions",		&MaxSubscriptions,	CUPSD_VARTYPE_INTEGER },
+  { "MaxSubscriptionsPerJob",	&MaxSubscriptionsPerJob,	CUPSD_VARTYPE_INTEGER },
+  { "MaxSubscriptionsPerPrinter",&MaxSubscriptionsPerPrinter,	CUPSD_VARTYPE_INTEGER },
+  { "MaxSubscriptionsPerUser",	&MaxSubscriptionsPerUser,	CUPSD_VARTYPE_INTEGER },
   { "PageLog",			&PageLog,		CUPSD_VARTYPE_STRING },
   { "PreserveJobFiles",		&JobFiles,		CUPSD_VARTYPE_BOOLEAN },
   { "PreserveJobHistory",	&JobHistory,		CUPSD_VARTYPE_BOOLEAN },
@@ -430,6 +437,13 @@ cupsdReadConfiguration(void)
 
   cupsdDeleteAllPolicies();
   cupsdClearString(&DefaultPolicy);
+
+  MaxSubscriptions           = 100;
+  MaxSubscriptionsPerJob     = 0;
+  MaxSubscriptionsPerPrinter = 0;
+  MaxSubscriptionsPerUser    = 0;
+  DefaultLeaseDuration       = 86400;
+  MaxLeaseDuration           = 0;
 
  /*
   * Read the configuration file...
