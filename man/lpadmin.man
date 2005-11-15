@@ -51,15 +51,15 @@ class.
 When specified before the \fI-d\fR, \fI-p\fR, or \fI-x\fR options,
 the \fI-E\fR option forces encryption when connecting to the server.
 .LP
-The first form of the command sets the default printer or class to
+The first form of the command (\fI-d\fR) sets the default printer or class to
 \fIdestination\fR.  Subsequent print jobs submitted via the \fIlp(1)\fR or
 \fIlpr(1)\fR commands will use this destination unless the user specifies
 otherwise with the \fIlpoptions(1)\fR command.
 .LP
-The second form of the command configures the named printer.  The additional
+The second form of the command (\fI-p\fR) configures the named printer.  The additional
 options are described below.
 .LP
-The third form of the command deletes the printer or class \fIdestination\fR.
+The third form of the command (\fI-x\fR) deletes the printer or class \fIdestination\fR.
 Any jobs that are pending for the destination will be removed and any job that
 is currently printed will be aborted.
 .SH CONFIGURATION OPTIONS
