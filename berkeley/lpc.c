@@ -57,12 +57,12 @@ static void	show_status(http_t *, char *);
  */
 
 int
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  http_t	*http;		/* Connection to server */
-  char		line[1024],	/* Input line from user */
-		*params;	/* Pointer to parameters */
+  http_t	*http;			/* Connection to server */
+  char		line[1024],		/* Input line from user */
+		*params;		/* Pointer to parameters */
 
 
  /*
@@ -89,17 +89,37 @@ main(int  argc,		/* I - Number of command-line arguments */
     while (fgets(line, sizeof(line), stdin) != NULL)
     {
      /*
-      * Strip the trailing newline...
+      * Strip trailing whitespace...
       */
 
-      line[strlen(line) - 1] = '\0';
+      for (params = line + strlen(line) - 1; params >= line;)
+        if (!isspace(*params & 255))
+	  break;
+	else
+	  *params-- = '\0';
+
+     /*
+      * Strip leading whitespace...
+      */
+
+      for (params = line; isspace(*params & 255); params ++);
+
+      if (params > line)
+        _cups_strcpy(line, params);
+
+      if (!line[0])
+      {
+       /*
+        * Nothing left, just show a prompt...
+	*/
+
+        printf("lpc> ");
+	continue;
+      }
 
      /*
       * Find any options in the string...
       */
-
-      while (isspace(line[0] & 255))
-        _cups_strcpy(line, line + 1);
 
       for (params = line; *params != '\0'; params ++)
         if (isspace(*params & 255))
@@ -116,8 +136,8 @@ main(int  argc,		/* I - Number of command-line arguments */
       * The "quit" and "exit" commands exit; otherwise, process as needed...
       */
 
-      if (compare_strings(line, "quit", 1) == 0 ||
-          compare_strings(line, "exit", 2) == 0)
+      if (!compare_strings(line, "quit", 1) ||
+          !compare_strings(line, "exit", 2))
         break;
 
       if (*params == '\0')
@@ -147,12 +167,12 @@ main(int  argc,		/* I - Number of command-line arguments */
  * 'compare_strings()' - Compare two command-line strings.
  */
 
-static int			/* O - -1 or 1 = no match, 0 = match */
-compare_strings(char *s,	/* I - Command-line string */
-                char *t,	/* I - Option string */
-                int  tmin)	/* I - Minimum number of unique chars in option */
+static int				/* O - -1 or 1 = no match, 0 = match */
+compare_strings(char *s,		/* I - Command-line string */
+                char *t,		/* I - Option string */
+                int  tmin)		/* I - Minimum number of unique chars in option */
 {
-  int	slen;			/* Length of command-line string */
+  int	slen;				/* Length of command-line string */
 
 
   slen = strlen(s);
@@ -168,14 +188,13 @@ compare_strings(char *s,	/* I - Command-line string */
  */
 
 static void
-do_command(http_t *http,	/* I - HTTP connection to server */
-           char   *command,	/* I - Command string */
-	   char   *params)	/* I - Parameters for command */
+do_command(http_t *http,		/* I - HTTP connection to server */
+           char   *command,		/* I - Command string */
+	   char   *params)		/* I - Parameters for command */
 {
-  if (compare_strings(command, "status", 4) == 0)
+  if (!compare_strings(command, "status", 4))
     show_status(http, params);
-  else if (compare_strings(command, "help", 1) == 0 ||
-           strcmp(command, "?") == 0)
+  else if (!compare_strings(command, "help", 1) || !strcmp(command, "?"))
     show_help(params);
   else
     printf("%s is not implemented by the CUPS version of lpc.\n", command);
@@ -187,18 +206,17 @@ do_command(http_t *http,	/* I - HTTP connection to server */
  */
 
 static void
-show_help(char *command)	/* I - Command to describe or NULL */
+show_help(char *command)		/* I - Command to describe or NULL */
 {
-  if (command == NULL)
+  if (!command)
   {
     puts("Commands may be abbreviated.  Commands are:");
     puts("");
     puts("exit    help    quit    status  ?");
   }
-  else if (compare_strings(command, "help", 1) == 0 ||
-           strcmp(command, "?") == 0)
+  else if (!compare_strings(command, "help", 1) || !strcmp(command, "?"))
     puts("help\t\tget help on commands");
-  else if (compare_strings(command, "status", 4) == 0)
+  else if (!compare_strings(command, "status", 4))
     puts("status\t\tshow status of daemon and queue");
   else
     puts("?Invalid help command unknown");
@@ -210,28 +228,28 @@ show_help(char *command)	/* I - Command to describe or NULL */
  */
 
 static void
-show_status(http_t *http,	/* I - HTTP connection to server */
-            char   *dests)	/* I - Destinations */
+show_status(http_t *http,		/* I - HTTP connection to server */
+            char   *dests)		/* I - Destinations */
 {
-  ipp_t		*request,	/* IPP Request */
-		*response,	/* IPP Response */
-		*jobs;		/* IPP Get Jobs response */
-  ipp_attribute_t *attr,	/* Current attribute */
-		*jattr;		/* Current job attribute */
-  cups_lang_t	*language;	/* Default language */
-  char		*printer,	/* Printer name */
-		*device,	/* Device URI */
-                *delimiter;     /* Char search result */
-  ipp_pstate_t	pstate;		/* Printer state */
-  int		accepting;	/* Is printer accepting jobs? */
-  int		jobcount;	/* Count of current jobs */
-  char		*dptr,		/* Pointer into destination list */
-		*ptr;		/* Pointer into printer name */
-  int		match;		/* Non-zero if this job matches */
+  ipp_t		*request,		/* IPP Request */
+		*response,		/* IPP Response */
+		*jobs;			/* IPP Get Jobs response */
+  ipp_attribute_t *attr,		/* Current attribute */
+		*jattr;			/* Current job attribute */
+  cups_lang_t	*language;		/* Default language */
+  char		*printer,		/* Printer name */
+		*device,		/* Device URI */
+                *delimiter;		/* Char search result */
+  ipp_pstate_t	pstate;			/* Printer state */
+  int		accepting;		/* Is printer accepting jobs? */
+  int		jobcount;		/* Count of current jobs */
+  char		*dptr,			/* Pointer into destination list */
+		*ptr;			/* Pointer into printer name */
+  int		match;			/* Non-zero if this job matches */
   char		printer_uri[HTTP_MAX_URI];
-				/* Printer URI */
-  static const char *requested[] =
-		{		/* Requested attributes */
+					/* Printer URI */
+  static const char *requested[] =	/* Requested attributes */
+		{
 		  "printer-name",
 		  "device-uri",
 		  "printer-state",
@@ -239,7 +257,7 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 		};
 
 
-  DEBUG_printf(("show_status(%08x, %08x)\n", http, dests));
+  DEBUG_printf(("show_status(http=%p, dests=\"%s\")\n", http, dests));
 
   if (http == NULL)
     return;
@@ -306,19 +324,19 @@ show_status(http_t *http,	/* I - HTTP connection to server */
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (strcmp(attr->name, "printer-name") == 0 &&
+        if (!strcmp(attr->name, "printer-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  printer = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "device-uri") == 0 &&
+        if (!strcmp(attr->name, "device-uri") &&
 	    attr->value_tag == IPP_TAG_URI)
 	  device = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "printer-state") == 0 &&
+        if (!strcmp(attr->name, "printer-state") &&
 	    attr->value_tag == IPP_TAG_ENUM)
 	  pstate = (ipp_pstate_t)attr->values[0].integer;
 
-        if (strcmp(attr->name, "printer-is-accepting-jobs") == 0 &&
+        if (!strcmp(attr->name, "printer-is-accepting-jobs") &&
 	    attr->value_tag == IPP_TAG_BOOLEAN)
 	  accepting = attr->values[0].boolean;
 
@@ -341,10 +359,8 @@ show_status(http_t *http,	/* I - HTTP connection to server */
       * A single 'all' printer name is special, meaning all printers.
       */
 
-      if (dests != NULL && compare_strings(dests, "all", 3) == 0)
-      {
+      if (dests != NULL && !strcmp(dests, "all"))
         dests = NULL;
-      }
 
      /*
       * See if this is a printer we're interested in...
@@ -401,72 +417,68 @@ show_status(http_t *http,	/* I - HTTP connection to server */
       if (match)
       {
        /*
-        * If the printer state is "IPP_PRINTER_PROCESSING", then grab the
-	* current job for the printer.
+	* Build an IPP_GET_JOBS request, which requires the following
+	* attributes:
+	*
+	*    attributes-charset
+	*    attributes-natural-language
+	*    printer-uri
+	*    limit
 	*/
 
-        if (pstate == IPP_PRINTER_PROCESSING)
+	request = ippNew();
+
+	request->request.op.operation_id = IPP_GET_JOBS;
+	request->request.op.request_id   = 1;
+
+	language = cupsLangDefault();
+
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                     "attributes-charset", NULL,
+		     cupsLangEncoding(language));
+
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                     "attributes-natural-language", NULL,
+		     language->language);
+
+        snprintf(printer_uri, sizeof(printer_uri),
+                 "ipp://localhost/printers/%s", printer);
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
+	             "printer-uri", NULL, printer_uri);
+
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+	             "requested-attributes", NULL, "job-id");
+
+        if ((jobs = cupsDoRequest(http, request, "/")) != NULL)
 	{
 	 /*
-	  * Build an IPP_GET_JOBS request, which requires the following
-	  * attributes:
-	  *
-	  *    attributes-charset
-	  *    attributes-natural-language
-	  *    printer-uri
-	  *    limit
+	  * Grab the number of jobs for the printer.
 	  */
 
-	  request = ippNew();
+	  for (jattr = jobs->attrs; jattr != NULL; jattr = jattr->next)
+	    if (jattr->name && !strcmp(jattr->name, "job-id"))
+	      jobcount ++;
 
-	  request->request.op.operation_id = IPP_GET_JOBS;
-	  request->request.op.request_id   = 1;
-
-	  language = cupsLangDefault();
-
-	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                       "attributes-charset", NULL,
-		       cupsLangEncoding(language));
-
-	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                       "attributes-natural-language", NULL,
-		       language->language);
-
-          snprintf(printer_uri, sizeof(printer_uri),
-                   "ipp://localhost/printers/%s", printer);
-	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	               "printer-uri", NULL, printer_uri);
-
-	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-	               "requested-attributes", NULL, "job-id");
-
-          if ((jobs = cupsDoRequest(http, request, "/")) != NULL)
-	  {
-	    for (jattr = jobs->attrs; jattr != NULL; jattr = jattr->next)
-	      if (jattr->name && strcmp(jattr->name, "job-id") == 0)
-	        jobcount ++;
-
-            ippDelete(jobs);
-	  }
-        }
+          ippDelete(jobs);
+	}
 
        /*
         * Display it...
 	*/
 
         printf("%s:\n", printer);
-	if (strncmp(device, "file:", 5) == 0)
+	if (!strncmp(device, "file:", 5))
 	  printf("\tprinter is on device \'%s\' speed -1\n", device + 5);
 	else
 	{
 	 /*
-	  * Just show the method...
+	  * Just show the scheme...
 	  */
 
 	  if ((delimiter = strchr(device, ':')) != NULL )
 	  {
-	      *delimiter = '\0';
-	      printf("\tprinter is on device \'%s\' speed -1\n", device);
+	    *delimiter = '\0';
+	    printf("\tprinter is on device \'%s\' speed -1\n", device);
 	  }
 	}
 
