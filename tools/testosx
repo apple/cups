@@ -37,7 +37,7 @@ cp packaging/installer.tif $pkgdir/Resources/background.tif
 
 cat >$pkgdir/Resources/preflight <<EOF
 #!/bin/sh
-killall cupsd
+killall cupsd || exit 0
 EOF
 chmod 755 $pkgdir/Resources/preflight
 
