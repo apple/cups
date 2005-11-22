@@ -483,7 +483,12 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
     */
 
     if ((*lf = cupsFileOpen(filename, "a")) == NULL)
+    {
+      syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
+             strerror(errno));
+
       return (0);
+    }
 
     if (strncmp(filename, "/dev/", 5))
     {
@@ -515,7 +520,12 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
     rename(filename, backname);
 
     if ((*lf = cupsFileOpen(filename, "a")) == NULL)
+    {
+      syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
+             strerror(errno));
+
       return (0);
+    }
 
     if (strncmp(filename, "/dev/", 5))
     {
