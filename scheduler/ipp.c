@@ -3921,6 +3921,10 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   if (con->username[0])
   {
     cupsdSetString(&job->username, con->username);
+
+    if (attr)
+      cupsdSetString(&attr->values[0].string.text, con->username);
+
     save_auth_info(con, job);
   }
   else if (attr != NULL)
@@ -6853,6 +6857,10 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   if (con->username[0])
   {
     cupsdSetString(&job->username, con->username);
+
+    if (attr)
+      cupsdSetString(&attr->values[0].string.text, con->username);
+
     save_auth_info(con, job);
   }
   else if (attr != NULL)

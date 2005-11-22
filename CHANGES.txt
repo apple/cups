@@ -1,8 +1,10 @@
-CHANGES.txt - 10/24/2005
+CHANGES.txt - 11/21/2005
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The scheduler now sets the job-originating-user-name to
+	  the authenticated username, if available (STR #1318)
 	- The scheduler now only updates the permissions of SSL
 	  keys and certificates when they are under the
 	  ServerRoot directory (STR #1324)
