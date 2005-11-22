@@ -290,6 +290,7 @@ ippRewriteURL(const char *uri,		/* I - Current URI */
     */
 
     if (!strcasecmp(hostname, "localhost") ||
+	!strncasecmp(hostname, "localhost.", 10) ||
 	!strcasecmp(hostname, server) ||
 	!strcasecmp(hostname, servername))
     {
