@@ -102,10 +102,11 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   cupsdSetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName, LocalPort, name);
   cupsdSetStringf(&p->device_uri, "file:/dev/null");
 
-  p->state     = IPP_PRINTER_STOPPED;
-  p->accepting = 0;
-  p->shared    = 1;
-  p->filetype  = mimeAddType(MimeDatabase, "printer", name);
+  p->state      = IPP_PRINTER_STOPPED;
+  p->state_time = time(NULL);
+  p->accepting  = 0;
+  p->shared     = 1;
+  p->filetype   = mimeAddType(MimeDatabase, "printer", name);
 
   cupsdSetString(&p->job_sheets[0], "none");
   cupsdSetString(&p->job_sheets[1], "none");
@@ -254,7 +255,7 @@ cupsdAddPrinterHistory(
                   "printer-state-reasons", p->num_reasons, NULL,
 		  (const char * const *)p->reasons);
   ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "printer-state-time", p->state_time);
+                "printer-state-change-time", p->state_time);
   ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "printer-state-sequence-number", p->sequence_number);
 
@@ -1062,6 +1063,15 @@ cupsdLoadAllPrinters(void)
       if (value)
 	strlcpy(p->state_message, value, sizeof(p->state_message));
     }
+    else if (!strcasecmp(line, "StateTime"))
+    {
+     /*
+      * Set the state time...
+      */
+
+      if (value)
+        p->state_time = atoi(value);
+    }
     else if (!strcasecmp(line, "Accepting"))
     {
      /*
@@ -1244,7 +1254,7 @@ cupsdLoadAllPrinters(void)
 
 /*
  * 'cupsdSaveAllPrinters()' - Save all printer definitions to the printers.conf
- *                       file.
+ *                            file.
  */
 
 void
@@ -1349,6 +1359,8 @@ cupsdSaveAllPrinters(void)
     }
     else
       cupsFilePuts(fp, "State Idle\n");
+
+    cupsFilePrintf(fp, "StateTime %d\n", (int)printer->state_time);
 
     if (printer->accepting)
       cupsFilePuts(fp, "Accepting Yes\n");

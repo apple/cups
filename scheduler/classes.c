@@ -475,6 +475,15 @@ cupsdLoadAllClasses(void)
       if (value)
 	strlcpy(p->state_message, value, sizeof(p->state_message));
     }
+    else if (!strcasecmp(line, "StateTime"))
+    {
+     /*
+      * Set the state time...
+      */
+
+      if (value)
+        p->state_time = atoi(value);
+    }
     else if (!strcasecmp(line, "Accepting"))
     {
      /*
@@ -761,6 +770,8 @@ cupsdSaveAllClasses(void)
     }
     else
       cupsFilePuts(fp, "State Idle\n");
+
+    cupsFilePrintf(fp, "StateTime %d\n", (int)pclass->state_time);
 
     if (pclass->accepting)
       cupsFilePuts(fp, "Accepting Yes\n");

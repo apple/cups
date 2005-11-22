@@ -1681,12 +1681,15 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 		*denied;		/* requestint-user-name-denied */
   ipp_pstate_t	pstate;			/* Printer state */
   cups_ptype_t	ptype;			/* Printer type */
+  time_t	ptime;			/* Printer state time */
+  struct tm	*pdate;			/* Printer state date & time */
   int		jobid;			/* Job ID of current job */
   const char	*dptr,			/* Pointer into destination list */
 		*ptr;			/* Pointer into printer name */
   int		match;			/* Non-zero if this job matches */
-  char		printer_uri[HTTP_MAX_URI];
+  char		printer_uri[HTTP_MAX_URI],
 					/* Printer URI */
+		printer_state_time[255];/* Printer state time */
   const char	*root;			/* Server root directory... */
   static const char *pattrs[] =		/* Attributes we need for printers... */
 		{
@@ -1694,6 +1697,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 		  "printer-state",
 		  "printer-state-message",
 		  "printer-state-reasons",
+		  "printer-state-change-time",
 		  "printer-type",
 		  "printer-info",
                   "printer-location",
@@ -1783,6 +1787,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
       */
 
       printer     = NULL;
+      ptime       = 0;
       ptype       = CUPS_PRINTER_LOCAL;
       pstate      = IPP_PRINTER_IDLE;
       message     = NULL;
@@ -1809,7 +1814,10 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
         else if (strcmp(attr->name, "printer-state-message") == 0 &&
 	         attr->value_tag == IPP_TAG_TEXT)
 	  message = attr->values[0].string.text;
-        else if (strcmp(attr->name, "printer-info") == 0 &&
+        else if (!strcmp(attr->name, "printer-state-change-time") &&
+	         attr->value_tag == IPP_TAG_INTEGER)
+	  ptime = (time_t)attr->values[0].integer;
+	else if (strcmp(attr->name, "printer-info") == 0 &&
 	         attr->value_tag == IPP_TAG_TEXT)
 	  description = attr->values[0].string.text;
         else if (strcmp(attr->name, "printer-location") == 0 &&
@@ -1972,16 +1980,22 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
         * Display it...
 	*/
 
+        pdate = localtime(&ptime);
+        strftime(printer_state_time, sizeof(printer_state_time), "%c", pdate);
+
         switch (pstate)
 	{
 	  case IPP_PRINTER_IDLE :
-	      printf("printer %s is idle.  enabled since Jan 01 00:00\n", printer);
+	      printf("printer %s is idle.  enabled since %s\n", printer,
+	             printer_state_time);
 	      break;
 	  case IPP_PRINTER_PROCESSING :
-	      printf("printer %s now printing %s-%d.  enabled since Jan 01 00:00\n", printer, printer, jobid);
+	      printf("printer %s now printing %s-%d.  enabled since %s\n",
+	             printer, printer, jobid, printer_state_time);
 	      break;
 	  case IPP_PRINTER_STOPPED :
-	      printf("printer %s disabled since Jan 01 00:00 -\n", printer);
+	      printf("printer %s disabled since %s -\n", printer,
+	             printer_state_time);
 	      break;
 	}
 
