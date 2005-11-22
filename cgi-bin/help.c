@@ -307,12 +307,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
  /*
-  * Finish off the  content...
-  */
-
-  cgiCopyTemplateLang(stdout, TEMPLATES, "help-trailer.tmpl", getenv("LANG"));
-
- /*
   * Send a standard trailer...
   */
 

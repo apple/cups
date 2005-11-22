@@ -236,88 +236,18 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
   const char	*name,			/* Pointer to class name */
 		*ptr;			/* Pointer to CGI variable */
   const char	*title;			/* Title of page */
+  static const char * const pattrs[] =	/* Requested printer attributes */
+		{
+		  "member-names",
+		  "printer-info",
+		  "printer-location"
+		};
 
 
   title = modify ? "Modify Class" : "Add Class";
+  name  = cgiGetVariable("PRINTER_NAME");
 
   if (cgiGetVariable("PRINTER_LOCATION") == NULL)
-  {
-    if (modify)
-    {
-     /*
-      * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
-      * following attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      *    printer-uri
-      */
-
-      request = ippNew();
-
-      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-      request->request.op.request_id   = 1;
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	   "attributes-natural-language", NULL, language->language);
-
-      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/classes/%s", cgiGetVariable("PRINTER_NAME"));
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                   NULL, uri);
-
-     /*
-      * Do the request and get back a response...
-      */
-
-      if ((response = cupsDoRequest(http, request, "/")) != NULL)
-      {
-	ippSetCGIVars(response, NULL, NULL, NULL, 0);
-	ippDelete(response);
-      }
-
-     /*
-      * Update the location and description of an existing printer...
-      */
-
-      cgiStartHTML(title);
-      cgiCopyTemplateLang(stdout, TEMPLATES, "modify-class.tmpl", getenv("LANG"));
-    }
-    else
-    {
-     /*
-      * Get the name, location, and description for a new printer...
-      */
-
-      cgiStartHTML(title);
-      cgiCopyTemplateLang(stdout, TEMPLATES, "add-class.tmpl", getenv("LANG"));
-    }
-
-    cgiEndHTML();
-
-    return;
-  }
-
-  name = cgiGetVariable("PRINTER_NAME");
-  for (ptr = name; *ptr; ptr ++)
-    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
-      break;
-
-  if (*ptr || ptr == name || strlen(name) > 127)
-  {
-    cgiSetVariable("ERROR", "The class name may only contain up to 127 printable "
-                            "characters and may not contain spaces, slashes (/), "
-			    "or the pound sign (#).");
-    cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
-    cgiEndHTML();
-    return;
-  }
-
-  if (cgiGetVariable("MEMBER_URIS") == NULL)
   {
    /*
     * Build a CUPS_GET_PRINTERS request, which requires the
@@ -355,19 +285,34 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       for (element = 0, attr = response->attrs;
 	   attr != NULL;
 	   attr = attr->next)
-	if (attr->name && strcmp(attr->name, "printer-uri-supported") == 0)
+	if (attr->name && !strcmp(attr->name, "printer-uri-supported"))
 	{
-	  cgiSetArray("MEMBER_URIS", element, attr->values[0].string.text);
-	  element ++;
+	  if ((ptr = strrchr(attr->values[0].string.text, '/')) != NULL &&
+	      (!name || strcasecmp(name, ptr + 1)))
+	  {
+	   /*
+	    * Don't show the current class...
+	    */
+
+	    cgiSetArray("MEMBER_URIS", element, attr->values[0].string.text);
+	    element ++;
+	  }
 	}
 
       for (element = 0, attr = response->attrs;
 	   attr != NULL;
 	   attr = attr->next)
-	if (attr->name && strcmp(attr->name, "printer-name") == 0)
+	if (attr->name && !strcmp(attr->name, "printer-name"))
 	{
-	  cgiSetArray("MEMBER_NAMES", element, attr->values[0].string.text);
-	  element ++;
+	  if (!name || strcasecmp(name, attr->values[0].string.text))
+	  {
+	   /*
+	    * Don't show the current class...
+	    */
+
+	    cgiSetArray("MEMBER_NAMES", element, attr->values[0].string.text);
+	    element ++;
+	  }
 	}
 
       num_printers = cgiGetSize("MEMBER_URIS");
@@ -377,158 +322,204 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     else
       num_printers = 0;
 
-   /*
-    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
-    * following attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    */
-
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
-
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/classes/%s", cgiGetVariable("PRINTER_NAME"));
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, uri);
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    if (modify)
     {
-      if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
+     /*
+      * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
+      * following attributes:
+      *
+      *    attributes-charset
+      *    attributes-natural-language
+      *    printer-uri
+      */
+
+      request = ippNew();
+
+      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+      request->request.op.request_id   = 1;
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+        	   "attributes-charset", NULL, cupsLangEncoding(language));
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+        	   "attributes-natural-language", NULL, language->language);
+
+      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                       "/classes/%s", name);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                   NULL, uri);
+
+      ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                    "requested-attributes",
+		    (int)(sizeof(pattrs) / sizeof(pattrs[0])),
+		    NULL, pattrs);
+
+     /*
+      * Do the request and get back a response...
+      */
+
+      if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
-       /*
-        * Mark any current members in the class...
-	*/
+	if ((attr = ippFindAttribute(response, "member-names", IPP_TAG_NAME)) != NULL)
+	{
+	 /*
+          * Mark any current members in the class...
+	  */
 
-        for (j = 0; j < num_printers; j ++)
-	  cgiSetArray("MEMBER_SELECTED", j, "");
+          for (j = 0; j < num_printers; j ++)
+	    cgiSetArray("MEMBER_SELECTED", j, "");
 
-        for (i = 0; i < attr->num_values; i ++)
-	  for (j = 0; j < num_printers; j ++)
-	    if (strcmp(attr->values[i].string.text, cgiGetArray("MEMBER_URIS", j)) == 0)
+          for (i = 0; i < attr->num_values; i ++)
+	  {
+	    for (j = 0; j < num_printers; j ++)
 	    {
-	      cgiSetArray("MEMBER_SELECTED", j, "SELECTED");
-	      break;
-	    }
+	      if (!strcasecmp(attr->values[i].string.text,
+	                      cgiGetArray("MEMBER_NAMES", j)))
+	      {
+		cgiSetArray("MEMBER_SELECTED", j, "SELECTED");
+		break;
+	      }
+            }
+          }
+	}
+
+	if ((attr = ippFindAttribute(response, "printer-info",
+	                             IPP_TAG_TEXT)) != NULL)
+	  cgiSetVariable("PRINTER_INFO", attr->values[0].string.text);
+
+	if ((attr = ippFindAttribute(response, "printer-location",
+	                             IPP_TAG_TEXT)) != NULL)
+	  cgiSetVariable("PRINTER_LOCATION", attr->values[0].string.text);
+
+	ippDelete(response);
       }
 
-      ippDelete(response);
-    }
+     /*
+      * Update the location and description of an existing printer...
+      */
 
-   /*
-    * Let the user choose...
-    */
-
-    cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, TEMPLATES, "choose-members.tmpl", getenv("LANG"));
-    cgiEndHTML();
-  }
-  else
-  {
-   /*
-    * Build a CUPS_ADD_CLASS request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    *    printer-location
-    *    printer-info
-    *    printer-is-accepting-jobs
-    *    printer-state
-    *    member-uris
-    */
-
-    request = ippNew();
-
-    request->request.op.operation_id = CUPS_ADD_CLASS;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
-
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/classes/%s", cgiGetVariable("PRINTER_NAME"));
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, uri);
-
-    ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-location",
-                 NULL, cgiGetVariable("PRINTER_LOCATION"));
-
-    ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
-                 NULL, cgiGetVariable("PRINTER_INFO"));
-
-    ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
-
-    ippAddInteger(request, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
-                  IPP_PRINTER_IDLE);
-
-    if ((num_printers = cgiGetSize("MEMBER_URIS")) > 0)
-    {
-      attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_URI, "member-uris",
-                           num_printers, NULL, NULL);
-      for (i = 0; i < num_printers; i ++)
-        attr->values[i].string.text = strdup(cgiGetArray("MEMBER_URIS", i));
-    }
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
-    {
-      status = response->request.status.status_code;
-      ippDelete(response);
-    }
-    else
-      status = cupsLastError();
-
-    if (status > IPP_OK_CONFLICT)
-    {
       cgiStartHTML(title);
-      cgiSetVariable("ERROR", ippErrorString(status));
-      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "modify-class.tmpl", getenv("LANG"));
     }
     else
     {
      /*
-      * Redirect successful updates back to the class page...
+      * Get the name, location, and description for a new printer...
       */
 
-      char	refresh[1024];		/* Refresh URL */
-
-      cgiFormEncode(uri, name, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "5;/admin?OP=redirect&URL=/classes/%s",
-               uri);
-      cgiSetVariable("refresh_page", refresh);
-
       cgiStartHTML(title);
-
-      if (modify)
-        cgiCopyTemplateLang(stdout, TEMPLATES, "class-modified.tmpl", getenv("LANG"));
-      else
-        cgiCopyTemplateLang(stdout, TEMPLATES, "class-added.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang(stdout, TEMPLATES, "add-class.tmpl", getenv("LANG"));
     }
 
     cgiEndHTML();
+
+    return;
   }
+
+  for (ptr = name; *ptr; ptr ++)
+    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
+      break;
+
+  if (*ptr || ptr == name || strlen(name) > 127)
+  {
+    cgiSetVariable("ERROR", "The class name may only contain up to 127 printable "
+                            "characters and may not contain spaces, slashes (/), "
+			    "or the pound sign (#).");
+    cgiStartHTML(title);
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    cgiEndHTML();
+    return;
+  }
+
+ /*
+  * Build a CUPS_ADD_CLASS request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    printer-location
+  *    printer-info
+  *    printer-is-accepting-jobs
+  *    printer-state
+  *    member-uris
+  */
+
+  request = ippNew();
+
+  request->request.op.operation_id = CUPS_ADD_CLASS;
+  request->request.op.request_id   = 1;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, cupsLangEncoding(language));
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/classes/%s", cgiGetVariable("PRINTER_NAME"));
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+  ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-location",
+               NULL, cgiGetVariable("PRINTER_LOCATION"));
+
+  ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
+               NULL, cgiGetVariable("PRINTER_INFO"));
+
+  ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
+
+  ippAddInteger(request, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
+                IPP_PRINTER_IDLE);
+
+  if ((num_printers = cgiGetSize("MEMBER_URIS")) > 0)
+  {
+    attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_URI, "member-uris",
+                         num_printers, NULL, NULL);
+    for (i = 0; i < num_printers; i ++)
+      attr->values[i].string.text = strdup(cgiGetArray("MEMBER_URIS", i));
+  }
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+  {
+    status = response->request.status.status_code;
+    ippDelete(response);
+  }
+  else
+    status = cupsLastError();
+
+  if (status > IPP_OK_CONFLICT)
+  {
+    cgiStartHTML(title);
+    cgiSetVariable("ERROR", ippErrorString(status));
+    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+  }
+  else
+  {
+   /*
+    * Redirect successful updates back to the class page...
+    */
+
+    char	refresh[1024];		/* Refresh URL */
+
+    cgiFormEncode(uri, name, sizeof(uri));
+    snprintf(refresh, sizeof(refresh), "5;/admin?OP=redirect&URL=/classes/%s",
+             uri);
+    cgiSetVariable("refresh_page", refresh);
+
+    cgiStartHTML(title);
+
+    if (modify)
+      cgiCopyTemplateLang(stdout, TEMPLATES, "class-modified.tmpl", getenv("LANG"));
+    else
+      cgiCopyTemplateLang(stdout, TEMPLATES, "class-added.tmpl", getenv("LANG"));
+  }
+
+  cgiEndHTML();
 }
 
 

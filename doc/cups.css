@@ -35,6 +35,10 @@ A:link:hover, A:visited:hover, A:active {
   color: #bb5500;
 }
 
+A.sel, A.unsel {
+  font-size: 120%;
+}
+
 A.sel, TR.sel {
   background-color: #eeeebb;
 }
@@ -52,11 +56,16 @@ INPUT[TYPE="TEXT"], TEXTAREA {
   font-family: monospace;
 }
 
+INPUT[TYPE="IMAGE"] {
+  vertical-align: bottom;
+  border: none;
+}
+
 SUB, SUP {
   font-size: 50%;
 }
 
-TR.header, TR.header TH, TH.header {
+TR.header, TR.header TH, TH.header, TR.trailer, TR.trailer TH, TH.trailer {
   background-color: #bbbb88;
 }
 
@@ -66,8 +75,15 @@ TR.page, TD.page, TR.page TD {
 }
 
 TR.data, TD.data, TR.data TD {
-  background-color: #ddddaa;
   padding: 5;
+  border-bottom: solid 2px #000000;
+}
+
+TR.data TH {
+  border-bottom: solid 2px #000000;
+  padding-top: 10;
+  padding-left: 5;
+  text-align: left;
 }
 
 P.table TABLE {
@@ -104,4 +120,14 @@ H4 SPAN.info {
 
 .conflict {
   color: red;
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2px #000000;
+}
+
+IMG.button {
+  border: none;
+  padding: 2;
+  vertical-align: middle;
 }

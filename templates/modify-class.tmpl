@@ -1,46 +1,34 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 
-<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
-<TR CLASS="header">
-<TH ALIGN="LEFT" VALIGN="TOP"><IMG SRC="/images/hdr-top-left.gif"
-WIDTH="16" HEIGHT="16" ALT=""></TH>
-<TH COLSPAN="2">Modify Class {printer_name}</TH>
-<TH ALIGN="RIGHT" VALIGN="TOP"><IMG
-SRC="/images/hdr-top-right.gif" WIDTH="16" HEIGHT="16"
-ALT=""></TH>
-</TR>
-<TR CLASS="data">
-<TD></TD>
+<H2 CLASS="title">Modify Class {printer_name}</H2>
+
+<TABLE>
+<TR>
 <TH ALIGN="RIGHT">Name:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
 {printer_name}</TD>
-<TD></TD>
 </TR>
-<TR CLASS="data">
-<TD></TD>
+<TR>
 <TH ALIGN="RIGHT">Location:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"></TD>
-<TD></TD>
 </TR>
-<TR CLASS="data">
-<TD></TD>
+<TR>
 <TH ALIGN="RIGHT">Description:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"></TD>
-<TD></TD>
 </TR>
-<TR CLASS="data">
-<TD></TD>
-<TD></TD>
-<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue" BORDER="0"></TD>
+<TR>
+<TH ALIGN="RIGHT" VALIGN="TOP">Members:&nbsp;</TH>
+<TD>
+<SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
+{[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
+</SELECT>
+</TD>
 </TR>
-<TR CLASS="header">
-<TH ALIGN="LEFT" VALIGN="BOTTOM"><IMG SRC="/images/hdr-bottom-left.gif"
-WIDTH="16" HEIGHT="16" ALT=""></TH>
-<TH COLSPAN="2"></TH>
-<TH ALIGN="RIGHT" VALIGN="BOTTOM"><IMG
-SRC="/images/hdr-bottom-right.gif" WIDTH="16" HEIGHT="16"
-ALT=""></TH>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue"></TD>
 </TR>
-</TABLE></P>
+</TABLE>
+
 </FORM>
