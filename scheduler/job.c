@@ -326,7 +326,7 @@ cupsdCheckJobs(void)
 	                job->dest, job->id);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job cancelled because the destination printer/class has gone away.");
+                      "Job canceled because the destination printer/class has gone away.");
 
         cupsdCancelJob(job, 1);
       }
@@ -336,6 +336,24 @@ cupsdCheckJobs(void)
         * See if the printer is available or remote and not printing a job;
 	* if so, start the job...
 	*/
+
+        if (pclass)
+	{
+	 /*
+	  * Add/update a job-actual-printer-uri attribute for this job
+	  * so that we know which printer actually printed the job...
+	  */
+
+          ipp_attribute_t	*attr;	/* job-actual-printer-uri attribute */
+
+
+          if ((attr = ippFindAttribute(job->attrs, "job-actual-printer-uri",
+	                               IPP_TAG_URI)) != NULL)
+            cupsdSetString(&attr->values[0].string.text, printer->uri);
+	  else
+	    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI,
+	                 "job-actual-printer-uri", NULL, printer->uri);
+	}
 
         if (printer->state == IPP_PRINTER_IDLE ||	/* Printer is idle */
 	    ((printer->type & CUPS_PRINTER_REMOTE) &&	/* Printer is remote */
@@ -456,7 +474,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	        	      job->id, JobRetryLimit);
 
 	      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                	    "Job cancelled since it could not be sent after %d tries.",
+                	    "Job canceled since it could not be sent after %d tries.",
 			    JobRetryLimit);
 
 	      cupsdCancelJob(job, 0);
@@ -1341,7 +1359,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
                     job->id);
 
     cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                  "Job cancelled because it has no files.");
+                  "Job canceled because it has no files.");
 
     cupsdCancelJob(job, 0);
     return;
@@ -1393,7 +1411,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       if (job->current_file == job->num_files)
       {
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job cancelled because it has no files that can be printed.");
+                      "Job canceled because it has no files that can be printed.");
 
         cupsdCancelJob(job, 0);
       }
@@ -1489,7 +1507,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       if (job->current_file == job->num_files)
       {
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job cancelled because the print file could not be decompressed.");
+                      "Job canceled because the print file could not be decompressed.");
 
         cupsdCancelJob(job, 0);
       }
@@ -1534,7 +1552,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       if (job->current_file == job->num_files)
       {
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job cancelled because the port monitor could not be added.");
+                      "Job canceled because the port monitor could not be added.");
 
         cupsdCancelJob(job, 0);
       }
@@ -1630,7 +1648,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       FilterLevel -= job->cost;
 
       cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                    "Job cancelled because the server ran out of memory.");
+                    "Job canceled because the server ran out of memory.");
 
       cupsdCancelJob(job, 0);
       return;
@@ -1939,7 +1957,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       free(filters);
 
     cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                  "Job cancelled because the server could not create the job status pipes.");
+                  "Job canceled because the server could not create the job status pipes.");
 
     cupsdCancelJob(job, 0);
     return;
@@ -2009,7 +2027,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	cupsdClosePipe(filterfds[!slot]);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job cancelled because the server could not create the filter pipes.");
+                      "Job canceled because the server could not create the filter pipes.");
 
 	cupsdCancelJob(job, 0);
 	return;
@@ -2037,7 +2055,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	    cupsdClosePipe(filterfds[!slot]);
 
 	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                	  "Job cancelled because the server could not create the backend pipes.");
+                	  "Job canceled because the server could not create the backend pipes.");
 
 	    cupsdCancelJob(job, 0);
 	    return;
@@ -2076,7 +2094,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	    cupsdClosePipe(filterfds[!slot]);
 
 	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                	  "Job cancelled because the server could not open the output file.");
+                	  "Job canceled because the server could not open the output file.");
 
 	    cupsdCancelJob(job, 0);
 	    return;
@@ -2124,7 +2142,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       cupsdAddPrinterHistory(printer);
 
       cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                    "Job cancelled because the server could not execute a filter.");
+                    "Job canceled because the server could not execute a filter.");
 
       cupsdCancelJob(job, 0);
       return;
@@ -2171,7 +2189,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	cupsdClosePipe(statusfds);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job cancelled because the server could not open a file.");
+                      "Job canceled because the server could not open a file.");
 
 	cupsdCancelJob(job, 0);
 	return;
@@ -2211,7 +2229,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
         cupsdClosePipe(job->back_pipes);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job cancelled because the server could not execute the backend.");
+                      "Job canceled because the server could not execute the backend.");
 
         cupsdCancelJob(job, 0);
 	return;

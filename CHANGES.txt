@@ -3,6 +3,9 @@ CHANGES.txt - 11/21/2005
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The scheduler now adds a job-actual-printer-uri
+	  attribute to job objects when printing to a class (STR
+	  #116)
 	- The scheduler now logs log file open errors to the
 	  system log (STR #1289)
 	- The scheduler now sets the job-originating-user-name to
