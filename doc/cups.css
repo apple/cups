@@ -57,8 +57,9 @@ INPUT[TYPE="TEXT"], TEXTAREA {
 }
 
 INPUT[TYPE="IMAGE"] {
-  vertical-align: bottom;
   border: none;
+  padding: 2;
+  vertical-align: bottom;
 }
 
 SUB, SUP {
@@ -99,6 +100,12 @@ P.table TABLE TH {
   background: #bbbb88;
   border: none;
   border-bottom: solid thin #999966;
+}
+
+TH.label {
+  padding-top: 10;
+  text-align: right;
+  vertical-align: top;
 }
 
 HR {
