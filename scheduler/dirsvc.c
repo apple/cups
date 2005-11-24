@@ -852,17 +852,19 @@ cupsdProcessBrowseData(
   */
 
   if (DefaultPrinter == NULL && Printers != NULL)
-  {
     DefaultPrinter = (cupsd_printer_t *)cupsArrayFirst(Printers);
-
-    cupsdWritePrintcap();
-  }
 
  /*
   * Do auto-classing if needed...
   */
 
   cupsdProcessImplicitClasses();
+
+ /*
+  * Update the printcap file...
+  */
+
+  cupsdWritePrintcap();
 }
 
 

@@ -4804,6 +4804,8 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
     cupsdSaveAllPrinters();
   }
 
+  cupsdWritePrintcap();
+
  /*
   * Return with no errors...
   */
@@ -8421,6 +8423,8 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdSaveAllPrinters();
   cupsdSaveAllClasses();
+
+  cupsdWritePrintcap();
 
   cupsdLogMessage(CUPSD_LOG_INFO,
                   "Default destination set to \'%s\' by \'%s\'.", name,

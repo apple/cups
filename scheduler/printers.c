@@ -132,12 +132,6 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
     ImplicitPrinters = cupsArrayNew(compare_printers, NULL);
 
  /*
-  * Write a new /etc/printcap or /var/spool/lp/pstatus file.
-  */
-
-  cupsdWritePrintcap();
-
- /*
   * Return the new printer...
   */
 
@@ -714,11 +708,7 @@ cupsdDeletePrinter(
   */
 
   if (p == DefaultPrinter)
-  {
     DefaultPrinter = (cupsd_printer_t *)cupsArrayFirst(Printers);
-
-    cupsdWritePrintcap();
-  }
 
  /*
   * Remove this printer from any classes and send a browse delete message...
@@ -769,12 +759,6 @@ cupsdDeletePrinter(
   cupsdClearString(&p->error_policy);
 
   free(p);
-
- /*
-  * Write a new /etc/printcap file...
-  */
-
-  cupsdWritePrintcap();
 }
 
 

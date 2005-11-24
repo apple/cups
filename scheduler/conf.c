@@ -994,6 +994,7 @@ cupsdReadConfiguration(void)
     cupsdLoadAllPrinters();
     cupsdLoadAllClasses();
     cupsdLoadRemoteCache();
+    cupsdWritePrintcap();
 
     cupsdCreateCommonData();
 
@@ -1024,6 +1025,7 @@ cupsdReadConfiguration(void)
     */
 
     cupsdUpdatePrinters();
+    cupsdWritePrintcap();
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Partial reload complete.");
   }
