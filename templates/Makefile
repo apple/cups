@@ -34,7 +34,6 @@ FILES	=	add-class.tmpl \
 		admin.tmpl \
 		choose-device.tmpl \
 		choose-make.tmpl \
-		choose-members.tmpl \
 		choose-model.tmpl \
 		choose-serial.tmpl \
 		choose-uri.tmpl \
@@ -49,7 +48,6 @@ FILES	=	add-class.tmpl \
 		error.tmpl \
 		header.tmpl \
 		help-header.tmpl \
-		help-trailer.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
 		job-op.tmpl \

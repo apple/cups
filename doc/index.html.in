@@ -10,7 +10,7 @@
 <TR CLASS="HEADER">
 <TD VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG SRC="/images/top-left.gif" WIDTH="15" HEIGHT="80" ALT=""></TD>
 <TD VALIGN="TOP" WIDTH="55" ROWSPAN="2"><IMG SRC="/images/top-middle.gif" WIDTH="55" HEIGHT="80" ALT=""></TD>
-<TD WIDTH="100%" HEIGHT="60"><H1>Common UNIX Printing System v1.2svn</H1></TD>
+<TD WIDTH="100%" HEIGHT="60"><H1>Common UNIX Printing System @CUPS_VERSION@</H1></TD>
 <TD ALIGN="RIGHT" VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG
 SRC="/images/top-right.gif" WIDTH="15" HEIGHT="15" ALT=""></TD>
 </TR>
@@ -55,34 +55,59 @@ BORDER="0" ALT=""></A>
 </TD></TR>
 <TR CLASS="page">
 <TD WIDTH="15">&nbsp;</TD>
-<TD COLSPAN="2" WIDTH="100%" STYLE="height: 100%;" VALIGN="TOP">
+<TD COLSPAN="2" WIDTH="100%" VALIGN="TOP">
 
-<P><A HREF="http://www.easysw.com/"><IMG
-SRC="/images/esp-logo.gif" ALIGN="RIGHT" WIDTH="110" HEIGHT="68"
-BORDER="0" ALT="Easy Software Products"></A>CUPS (<A
-HREF="http://www.cups.org/">www.cups.org</A>) provides a portable
-printing layer for UNIX<SUP>&reg;</SUP>-based operating systems.
-It is developed and maintained by <A
-HREF="http://www.easysw.com/">Easy Software Products</A> to
-promote a standard printing solution and is the standard printing
-system on MacOS<SUP>&reg;</SUP> X and most Linux<SUP>&reg;</SUP>
-distributions.</P>
+<H2 CLASS="title">Welcome!</H2>
 
-<H2>Common Tasks</H2>
-
-<P><I>If asked for a username and password, enter your login
-username and password or the "root" username and
-password.</I></P>
+<P>These web pages allow you to monitor your printers and jobs as well
+as perform system administration tasks. Click on any of the tabs above
+or buttons below to perform a task.</P>
 
 <P>
-<A HREF="/help/"><IMG SRC="/images/help.gif" BORDER="0" ALIGN="MIDDLE" ALT="Help"></A>
-<A HREF="/admin?OP=add-class"><IMG SRC="/images/add-class.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Class"></A>
-<A HREF="/admin?OP=add-printer"><IMG SRC="/images/add-printer.gif" BORDER="0" ALIGN="MIDDLE" ALT="Add Printer"></A>
-<A HREF="/classes"><IMG SRC="/images/manage-classes.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Classes"></A>
-<A HREF="/jobs"><IMG SRC="/images/manage-jobs.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Jobs"></A>
-<A HREF="/printers"><IMG SRC="/images/manage-printers.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Printers"></A>
-<A HREF="/admin"><IMG SRC="/images/manage-server.gif" BORDER="0" ALIGN="MIDDLE" ALT="Manage Server"></A>
+<A HREF="/help/"><IMG SRC="/images/help.gif" CLASS="button" ALT="Help"></A>
+<A HREF="/admin?OP=add-class"><IMG SRC="/images/add-class.gif" CLASS="button" ALT="Add Class"></A>
+<A HREF="/admin?OP=add-printer"><IMG SRC="/images/add-printer.gif" CLASS="button" ALT="Add Printer"></A>
+<A HREF="/classes"><IMG SRC="/images/manage-classes.gif" CLASS="button" ALT="Manage Classes"></A>
+<A HREF="/jobs"><IMG SRC="/images/manage-jobs.gif" CLASS="button" ALT="Manage Jobs"></A>
+<A HREF="/printers"><IMG SRC="/images/manage-printers.gif" CLASS="button" ALT="Manage Printers"></A>
+<A HREF="/admin"><IMG SRC="/images/manage-server.gif" CLASS="button" ALT="Manage Server"></A>
 </P>
+
+<P><I>If you are asked for a username and password, enter your login
+username and password or the "root" username and password.</I></P>
+
+<H2 CLASS="title">About CUPS</H2>
+
+<P>
+<IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
+STYLE="padding-right: 10px;" ALT="Happy Computer and Printer">
+
+<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
+ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
+STYLE="padding-left: 10px; padding-bottom: 10px;"
+ALT="Easy Software Products"></A>
+
+CUPS provides a portable printing layer for
+UNIX<SUP>&reg;</SUP>-based operating systems. It is developed
+and maintained by <A HREF="http://www.easysw.com">Easy Software
+Products</a> to promote a standard printing solution and is the
+standard printing system in MacOS<SUP>&reg;</SUP> X and most
+Linux<SUP>&reg;</SUP> distributions.</P>
+
+<P>CUPS uses the <A HREF="http://www.pwg.org/ipp/"
+TARGET="_blank"> Internet Printing Protocol ("IPP")</A> as the
+basis for managing print jobs and queues and adds network
+printer browsing and PostScript Printer Description ("PPD")
+based printing options to support real-world printing.<BR CLEAR="ALL"></P>
+
+<H2 CLASS="title">For Printer Drivers and Assistance</H2>
+
+<P>Visit the official CUPS site for printer drivers and
+assistance:</P>
+
+<PRE>
+    <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
+</PRE>
 
 </TD>
 <TD WIDTH="15">&nbsp;</TD>

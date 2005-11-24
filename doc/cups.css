@@ -35,10 +35,6 @@ A:link:hover, A:visited:hover, A:active {
   color: #bb5500;
 }
 
-A.sel, A.unsel {
-  font-size: 120%;
-}
-
 A.sel, TR.sel {
   background-color: #eeeebb;
 }
@@ -48,7 +44,7 @@ TR.sel TD {
 }
 
 A.unsel {
-  background-color: #999966;
+  background-color: #666633;
   color: #e8e8b8;
 }
 
@@ -72,7 +68,8 @@ TR.header, TR.header TH, TH.header, TR.trailer, TR.trailer TH, TH.trailer {
 
 TR.page, TD.page, TR.page TD {
   background-color: #eeeebb;
-  padding: 5;
+  height: 100%;
+  padding-top: 20px;
 }
 
 TR.data, TD.data, TR.data TD {

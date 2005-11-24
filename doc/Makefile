@@ -48,10 +48,7 @@ WEBIMAGES	=	\
 			images/draft.gif \
 			images/edit-configuration-file.gif \
 			images/esp-logo.gif \
-			images/hdr-bottom-left.gif \
-			images/hdr-bottom-right.gif \
-			images/hdr-top-left.gif \
-			images/hdr-top-right.gif \
+			images/happy.gif \
 			images/help.gif \
 			images/hold-job.gif \
 			images/logo.gif \
