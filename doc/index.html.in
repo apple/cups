@@ -88,10 +88,10 @@ STYLE="padding-left: 10px; padding-bottom: 10px;"
 ALT="Easy Software Products"></A>
 
 CUPS provides a portable printing layer for
-UNIX<SUP>&reg;</SUP>-based operating systems. It is developed
-and maintained by <A HREF="http://www.easysw.com">Easy Software
-Products</a> to promote a standard printing solution and is the
-standard printing system in MacOS<SUP>&reg;</SUP> X and most
+UNIX<SUP>&reg;</SUP>-based operating systems. It is developed and
+maintained by <A HREF="http://www.easysw.com">Easy Software
+Products</a> to promote a standard printing solution. CUPS is the
+standard printing system used on MacOS<SUP>&reg;</SUP> X and most
 Linux<SUP>&reg;</SUP> distributions.</P>
 
 <P>CUPS uses the <A HREF="http://www.pwg.org/ipp/"
