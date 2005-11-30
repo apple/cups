@@ -31,7 +31,7 @@
  * Include necessary headers...
  */
 
-#include "ipp-var.h"
+#include "cgi-private.h"
 
 
 /*
@@ -93,9 +93,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   cgiSetVariable("TITLE", "Jobs");
 
-  ippSetServerVersion();
+  cgiSetServerVersion();
 
-  cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "header.tmpl", getenv("LANG"));
 
   if ((op = cgiGetVariable("OP")) != NULL)
   {
@@ -117,7 +117,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Bad operation code...  Display an error...
       */
 
-      cgiCopyTemplateLang(stdout, TEMPLATES, "job-op.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-op.tmpl", getenv("LANG"));
     }
   }
   else
@@ -149,7 +149,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
                    NULL, which_jobs);
 
-    ippGetAttributes(request, TEMPLATES, "jobs.tmpl", getenv("LANG"));
+    cgiGetAttributes(request, cgiGetTemplateDir(), "jobs.tmpl", getenv("LANG"));
 
    /*
     * Do the request and get back a response...
@@ -157,14 +157,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
-      ippSetCGIVars(response, NULL, NULL, NULL, 0);
+      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
       ippDelete(response);
 
-      cgiCopyTemplateLang(stdout, TEMPLATES, "jobs.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "jobs.tmpl", getenv("LANG"));
     }
   }
 
-  cgiCopyTemplateLang(stdout, TEMPLATES, "trailer.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "trailer.tmpl", getenv("LANG"));
 
  /*
   * Close the HTTP server connection...
@@ -202,7 +202,7 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
     return;
   }
 
@@ -258,16 +258,16 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
   if (status > IPP_OK_CONFLICT)
   {
     cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
   }
   else if (op == IPP_CANCEL_JOB)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "job-cancel.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-cancel.tmpl", getenv("LANG"));
   else if (op == IPP_HOLD_JOB)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "job-hold.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-hold.tmpl", getenv("LANG"));
   else if (op == IPP_RELEASE_JOB)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "job-release.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-release.tmpl", getenv("LANG"));
   else if (op == IPP_RESTART_JOB)
-    cgiCopyTemplateLang(stdout, TEMPLATES, "job-restart.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-restart.tmpl", getenv("LANG"));
 }
 
 

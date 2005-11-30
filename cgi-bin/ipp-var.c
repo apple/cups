@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   IPP variable routines for the Common UNIX Printing System (CUPS).
+ *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2005 by Easy Software Products.
  *
@@ -23,28 +23,26 @@
  *
  * Contents:
  *
- *   ippGetAttributes()    - Get the list of attributes that are needed
+ *   cgiGetAttributes()    - Get the list of attributes that are needed
  *                           by the template file.
- *   ippGetTemplateDir()   - Get the templates directory...
- *   ippRewriteURL()       - Rewrite a printer URI into a web browser URL...
- *   ippSetServerVersion() - Set the server name and CUPS version...
- *   ippSetCGIVars()       - Set CGI variables from an IPP response.
+ *   cgiRewriteURL()       - Rewrite a printer URI into a web browser URL...
+ *   cgiSetIPPVars()       - Set CGI variables from an IPP response.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "ipp-var.h"
+#include "cgi-private.h"
 
 
 /*
- * 'ippGetAttributes()' - Get the list of attributes that are needed
+ * 'cgiGetAttributes()' - Get the list of attributes that are needed
  *                        by the template file.
  */
 
 void
-ippGetAttributes(ipp_t      *request,	/* I - IPP request */
+cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
                  const char *directory,	/* I - Directory */
 		 const char *tmpl,	/* I - Base filename */
 		 const char *lang)	/* I - Language */
@@ -163,38 +161,11 @@ ippGetAttributes(ipp_t      *request,	/* I - IPP request */
 
 
 /*
- * 'ippGetTemplateDir()' - Get the templates directory...
- */
-
-char *					/* O - Template directory */
-ippGetTemplateDir(void)
-{
-  const char	*datadir;		/* CUPS_DATADIR env var */
-  static char	templates[1024] = "";	/* Template directory */
-
-
-  if (!templates[0])
-  {
-   /*
-    * Build the template directory pathname...
-    */
-
-    if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-      datadir = CUPS_DATADIR;
-
-    snprintf(templates, sizeof(templates), "%s/templates", datadir);
-  }
-
-  return (templates);
-}
-
-
-/*
- * 'ippRewriteURL()' - Rewrite a printer URI into a web browser URL...
+ * 'cgiRewriteURL()' - Rewrite a printer URI into a web browser URL...
  */
 
 char *					/* O - New URL */
-ippRewriteURL(const char *uri,		/* I - Current URI */
+cgiRewriteURL(const char *uri,		/* I - Current URI */
               char       *url,		/* O - New URL */
 	      int        urlsize,	/* I - Size of URL buffer */
 	      const char *newresource)	/* I - Replacement resource */
@@ -324,28 +295,11 @@ ippRewriteURL(const char *uri,		/* I - Current URI */
 
 
 /*
- * 'ippSetServerVersion()' - Set the server name and CUPS version...
- */
-
-void
-ippSetServerVersion(void)
-{
-  cgiSetVariable("SERVER_NAME", getenv("SERVER_NAME"));
-  cgiSetVariable("REMOTE_USER", getenv("REMOTE_USER"));
-  cgiSetVariable("CUPS_VERSION", CUPS_SVERSION);
-
-#ifdef LC_TIME
-  setlocale(LC_TIME, "");
-#endif /* LC_TIME */
-}
-
-
-/*
- * 'ippSetCGIVars()' - Set CGI variables from an IPP response.
+ * 'cgiSetIPPVars()' - Set CGI variables from an IPP response.
  */
 
 int					/* O - Maximum number of elements */
-ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
+cgiSetIPPVars(ipp_t      *response,	/* I - Response data to be copied... */
               const char *filter_name,	/* I - Filter name */
 	      const char *filter_value,	/* I - Filter value */
 	      const char *prefix,	/* I - Prefix for name or NULL */
@@ -362,7 +316,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
   struct tm		*date;		/* Date information */
 
 
-  fprintf(stderr, "DEBUG2: ippSetCGIVars(response=%p, filter_name=\"%s\", filter_value=\"%s\", prefix=\"%s\", parent_el=%d)\n",
+  fprintf(stderr, "DEBUG2: cgiSetIPPVars(response=%p, filter_name=\"%s\", filter_value=\"%s\", prefix=\"%s\", parent_el=%d)\n",
           response, filter_name, filter_value, prefix, parent_el);
 
  /*
@@ -370,7 +324,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
   */
 
   if (!prefix)
-    ippSetServerVersion();
+    cgiSetServerVersion();
 
  /*
   * Loop through the attributes and set them for the template...
@@ -459,7 +413,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
       if (!strcmp(name, "printer_uri_supported"))
       {
-	ippRewriteURL(attr->values[0].string.text, value, sizeof(value),
+	cgiRewriteURL(attr->values[0].string.text, value, sizeof(value),
 	              "/admin/");
 
         cgiSetArray("admin_uri", element, value);
@@ -532,7 +486,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 		  char	url[1024];	/* URL for class member... */
 
 
-		  ippRewriteURL(attr->values[i].string.text, url,
+		  cgiRewriteURL(attr->values[i].string.text, url,
 		                sizeof(url), NULL);
 
                   snprintf(valptr, sizeof(value) - (valptr - value),
@@ -540,7 +494,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 			   strrchr(url, '/') + 1);
 		}
 		else
-		  ippRewriteURL(attr->values[i].string.text, valptr,
+		  cgiRewriteURL(attr->values[i].string.text, valptr,
 		        	sizeof(value) - (valptr - value), NULL);
         	break;
               }
@@ -558,7 +512,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
 
           case IPP_TAG_BEGIN_COLLECTION :
 	      snprintf(value, sizeof(value), "%s%d", name, i + 1);
-              ippSetCGIVars(attr->values[i].collection, filter_name,
+              cgiSetIPPVars(attr->values[i].collection, filter_name,
 	                    filter_value, value, element);
               break;
 
@@ -583,7 +537,7 @@ ippSetCGIVars(ipp_t      *response,	/* I - Response data to be copied... */
       break;
   }
 
-  fprintf(stderr, "DEBUG2: Returing %d from ippSetCGIVars()...\n", element + 1);
+  fprintf(stderr, "DEBUG2: Returing %d from cgiSetIPPVars()...\n", element + 1);
 
   return (element + 1);
 }

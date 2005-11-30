@@ -25,16 +25,6 @@
 #ifndef _CUPS_HELP_INDEX_H_
 #  define _CUPS_HELP_INDEX_H_
 
-/*
- * Include necessary headers...
- */
-
-#  include <stdio.h>
-#  include <stdlib.h>
-#  include <sys/stat.h>
-#  include <cups/cups.h>
-#  include <cups/string.h>
-
 
 /*
  * Data structures...

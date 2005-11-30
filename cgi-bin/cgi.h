@@ -5,37 +5,40 @@
  *
  *   Copyright 1997-2005 by Easy Software Products.
  *
- *   This program is free software; you can redistribute it and/or modify it
- *   under the terms of the GNU General Public License as published by the Free
- *   Software Foundation; either version 2 of the License, or (at your option)
- *   any later version.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
  *
- *   This program is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- *   for more details.
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636 USA
  *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *       Voice: (301) 373-9600
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  */
 
-#ifndef _CGI_H_
-#  define _CGI_H_
+#ifndef _CUPS_CGI_H_
+#  define _CUPS_CGI_H_
 
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include <time.h>
-
-#  include <cups/string.h>
+#  include <sys/stat.h>
 
 #  ifdef WIN32
 #    include <direct.h>
 #    include <io.h>
-#    include <malloc.h>
 #  else
 #    include <unistd.h>
 #  endif /* WIN32 */
+
+#  include <cups/cups.h>
+#  include "help-index.h"
 
 
 /*
@@ -70,7 +73,20 @@ extern void		cgiStartHTML(const char *title);
 #  define cgiGetUser()	getenv("REMOTE_USER")
 #  define cgiGetHost()	(getenv("REMOTE_HOST") == NULL ? getenv("REMOTE_ADDR") : getenv("REMOTE_HOST"))
 
-#endif /* !_CGI_H_ */
+extern void		*cgiCompileSearch(const char *query);
+extern int		cgiDoSearch(void *search, const char *text);
+extern void		cgiFreeSearch(void *search);
+
+extern void		cgiGetAttributes(ipp_t *request, const char *directory,
+			                 const char *tmpl, const char *lang);
+extern char		*cgiGetTemplateDir(void);
+extern char		*cgiRewriteURL(const char *uri, char *url, int urlsize,
+			               const char *newresource);
+extern void		cgiSetServerVersion(void);
+extern int		cgiSetIPPVars(ipp_t *, const char *, const char *,
+			              const char *, int);
+
+#endif /* !_CUPS_CGI_H_ */
 
 /*
  * End of "$Id$".

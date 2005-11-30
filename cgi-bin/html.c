@@ -33,7 +33,7 @@
  * Include necessary headers...
  */
 
-#include "ipp-var.h"
+#include "cgi-private.h"
 
 
 /*
@@ -54,7 +54,7 @@ cgiEndHTML(void)
   * Send the standard trailer...
   */
 
-  cgiCopyTemplateLang(stdout, TEMPLATES, "trailer.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "trailer.tmpl", getenv("LANG"));
 }
 
 
@@ -160,9 +160,9 @@ cgiStartHTML(const char *title)		/* I - Title of page */
   */
 
   cgiSetVariable("TITLE", title);
-  ippSetServerVersion();
+  cgiSetServerVersion();
 
-  cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "header.tmpl", getenv("LANG"));
 }
 
 

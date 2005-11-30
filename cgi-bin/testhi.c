@@ -23,13 +23,15 @@
  *
  * Contents:
  *
+ *   main()       - Test the help index code.
+ *   list_nodes() - List nodes in an array...
  */
 
 /*
  * Include necessary headers...
  */
 
-#include "help-index.h"
+#include "cgi-private.h"
 
 
 /*

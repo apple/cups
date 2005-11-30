@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   IPP variable definitions for the Common UNIX Printing System (CUPS).
+ *   Private CGI definitions for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2005 by Easy Software Products.
  *
@@ -26,31 +26,10 @@
  * Include necessary headers...
  */
 
-#include <cups/cups.h>
+#include "cgi.h"
 #include <cups/debug.h>
 #include <cups/language.h>
 #include <cups/string.h>
-#include "cgi.h"
-
-
-/*
- * Definitions...
- */
-
-#define TEMPLATES	ippGetTemplateDir()
-
-
-/*
- * Prototype...
- */
-
-extern void	ippGetAttributes(ipp_t *request, const char *directory,
-		                 const char *tmpl, const char *lang);
-extern char	*ippGetTemplateDir(void);
-extern char	*ippRewriteURL(const char *, char *, int, const char *);
-extern void	ippSetServerVersion(void);
-extern int	ippSetCGIVars(ipp_t *, const char *, const char *,
-		              const char *, int);
 
 
 /*

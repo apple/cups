@@ -43,17 +43,14 @@
  * Include necessary headers...
  */
 
-#include "help-index.h"
-#include <cups/debug.h>
-#include <dirent.h>
-#include <regex.h>
+#include "cgi-private.h"
+#include <cups/dir.h>
 
 
 /*
  * Local functions...
  */
 
-static regex_t		*help_compile_search(const char *query);
 static void		help_create_sorted(help_index_t *hi);
 static void		help_delete_node(help_node_t *n);
 static void		help_insert_node(help_index_t *hi, help_node_t *n);
@@ -366,11 +363,11 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
                 const char   *query,	/* I - Query string */
 		const char   *filename)	/* I - Limit search to this file */
 {
-  int		i, j;			/* Looping vars */
+  int		i;			/* Looping var */
   help_index_t	*search;		/* Search index */
   help_node_t	**n;			/* Current node */
-  regex_t	*re;			/* Regular expression */
-  regmatch_t	matches[100];		/* RE matches */
+  void		*sc;			/* Search context */
+  int		matches;		/* Number of matches */
 
 
   DEBUG_printf(("helpSearchIndex(hi=%p, query=\"%s\", filename=\"%s\")\n",
@@ -400,8 +397,8 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   * Convert the query into a regular expression...
   */
 
-  re = help_compile_search(query);
-  if (!re)
+  sc = cgiCompileSearch(query);
+  if (!sc)
     return (NULL);
 
  /*
@@ -411,7 +408,7 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   search = calloc(1, sizeof(help_index_t));
   if (!search)
   {
-    regfree(re);
+    cgiFreeSearch(sc);
     return (NULL);
   }
 
@@ -425,8 +422,7 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   for (i = n - hi->nodes; i < hi->num_nodes; i ++, n ++)
     if (filename && strcmp(n[0]->filename, filename))
       continue;
-    else if (!regexec(re, n[0]->text, sizeof(matches) / sizeof(matches[0]),
-                      matches, 0))
+    else if ((matches = cgiDoSearch(sc, n[0]->text)) > 0)
     {
      /*
       * Found a match, add the node to the search index...
@@ -434,22 +430,14 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
 
       help_insert_node(search, *n);
 
-     /*
-      * Figure out the number of matches in the string...
-      */
-
-      for (j = 0; j < (int)(sizeof(matches) / sizeof(matches[0])); j ++)
-        if (matches[j].rm_so < 0)
-	  break;
-
-      n[0]->score = j;
+      n[0]->score = matches;
     }
 
  /*
-  * Free the regular expression...
+  * Free the search context...
   */
 
-  regfree(re);
+  cgiFreeSearch(sc);
 
  /*
   * Sort the results...
@@ -462,281 +450,6 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   */
 
   return (search);
-}
-
-
-/*
- * 'help_compile_search()' - Convert a search string into a regular expression.
- */
-
-static regex_t *			/* O - New regular expression */
-help_compile_search(const char *query)	/* I - Query string */
-{
-  regex_t	*re;			/* Regular expression */
-  char		*s,			/* Regular expression string */
-		*sptr,			/* Pointer into RE string */
-		*sword;			/* Pointer to start of word */
-  int		slen;			/* Allocated size of RE string */
-  const char	*qptr,			/* Pointer into query string */
-		*qend;			/* End of current word */
-  const char	*prefix;		/* Prefix to add to next word */
-  int		quoted;			/* Word is quoted */
-  int		wlen;			/* Word length */
-  char		*lword;			/* Last word in query */
-
-
-  DEBUG_printf(("help_compile_search(query=\"%s\")\n", query ? query : "(nil)"));
-
- /*
-  * Allocate a regular expression storage structure...
-  */
-
-  re = (regex_t *)calloc(1, sizeof(regex_t));
-
- /*
-  * Allocate a buffer to hold the regular expression string, starting
-  * at 1024 bytes or 3 times the length of the query string, whichever
-  * is greater.  We'll expand the string as needed...
-  */
-
-  slen = strlen(query) * 3;
-  if (slen < 1024)
-    slen = 1024;
-
-  s = (char *)malloc(slen);
-
- /*
-  * Copy the query string to the regular expression, handling basic
-  * AND and OR logic...
-  */
-
-  prefix = ".*";
-  qptr   = query;
-  sptr   = s;
-  lword  = NULL;
-
-  while (*qptr)
-  {
-   /*
-    * Skip leading whitespace...
-    */
-
-    while (isspace(*qptr & 255))
-      qptr ++;
-
-    if (!*qptr)
-      break;
-
-   /*
-    * Find the end of the current word...
-    */
-
-    if (*qptr == '\"' || *qptr == '\'')
-    {
-     /*
-      * Scan quoted string...
-      */
-
-      quoted = *qptr ++;
-      for (qend = qptr; *qend && *qend != quoted; qend ++);
-
-      if (!*qend)
-      {
-       /*
-        * No closing quote, error out!
-	*/
-
-	free(s);
-	free(re);
-
-	if (lword)
-          free(lword);
-
-	return (NULL);
-      }
-    }
-    else
-    {
-     /*
-      * Scan whitespace-delimited string...
-      */
-
-      quoted = 0;
-      for (qend = qptr + 1; *qend && !isspace(*qend); qend ++);
-    }
-
-    wlen = qend - qptr;
-
-   /*
-    * Look for logic words: AND, OR
-    */
-
-    if (wlen == 3 && !strncasecmp(qptr, "AND", 3))
-    {
-     /*
-      * Logical AND with the following text...
-      */
-
-      if (sptr > s)
-        prefix = ".*";
-
-      qptr = qend;
-    }
-    else if (wlen == 2 && !strncasecmp(qptr, "OR", 2))
-    {
-     /*
-      * Logical OR with the following text...
-      */
-
-      if (sptr > s)
-        prefix = ".*|.*";
-
-      qptr = qend;
-    }
-    else
-    {
-     /*
-      * Add a search word, making sure we have enough room for the
-      * string + RE overhead...
-      */
-
-      wlen = (sptr - s) + 4 * wlen + 2 * strlen(prefix) + 4;
-
-      if (wlen > slen)
-      {
-       /*
-        * Expand the RE string buffer...
-	*/
-
-        char *temp;			/* Temporary string pointer */
-
-
-	slen = wlen + 128;
-        temp = (char *)realloc(s, slen);
-	if (!temp)
-	{
-	  free(s);
-	  free(re);
-
-	  if (lword)
-            free(lword);
-
-	  return (NULL);
-	}
-
-        sptr = temp + (sptr - s);
-	s    = temp;
-      }
-
-     /*
-      * Add the prefix string...
-      */
-
-      strcpy(sptr, prefix);
-      sptr += strlen(sptr);
-
-     /*
-      * Then quote the remaining word characters as needed for the
-      * RE...
-      */
-
-      sword = sptr;
-
-      while (qptr < qend)
-      {
-       /*
-        * Quote: ^ . [ $ ( ) | * + ? { \
-	*/
-
-        if (strchr("^.[$()|*+?{\\", *qptr))
-	  *sptr++ = '\\';
-
-	*sptr++ = *qptr++;
-      }
-
-     /*
-      * For "word1 AND word2", add reciprocal "word2 AND word1"...
-      */
-
-      if (!strcmp(prefix, ".*") && lword)
-      {
-        char *lword2;			/* New "last word" */
-
-
-        lword2 = strdup(sword);
-
-        strcpy(sptr, ".*|.*");
-	sptr += 5;
-
-	strcpy(sptr, lword2);
-	sptr += strlen(sptr);
-
-        strcpy(sptr, ".*");
-	sptr += 2;
-
-	strcpy(sptr, lword);
-	sptr += strlen(sptr);
-
-        free(lword);
-	lword = lword2;
-      }
-      else
-      {
-	if (lword)
-          free(lword);
-
-	lword = strdup(sword);
-      }
-
-      prefix = ".*|.*";
-    }
-
-   /*
-    * Advance to the next string...
-    */
-
-    if (quoted)
-      qptr ++;
-  }
-
-  if (lword)
-    free(lword);
-
-  if (sptr > s)
-    strcpy(sptr, ".*");
-  else
-  {
-   /*
-    * No query data, return NULL...
-    */
-
-    free(s);
-    free(re);
-
-    return (NULL);
-  }
-
- /*
-  * Compile the regular expression...
-  */
-
-  DEBUG_printf(("    s=\"%s\"\n", s));
-
-  if (regcomp(re, s, REG_EXTENDED | REG_ICASE))
-  {
-    free(re);
-    free(s);
-
-    return (NULL);
-  }
-
- /*
-  * Free the RE string and return the new regular expression we compiled...
-  */
-
-  free(s);
-
-  return (re);
 }
 
 
@@ -915,12 +628,11 @@ help_load_directory(
     const char   *relative)		/* I - Relative path */
 {
   int		i;			/* Looping var */
-  DIR		*dir;			/* Directory file */
-  struct dirent	*dent;			/* Directory entry */
+  cups_dir_t	*dir;			/* Directory file */
+  cups_dentry_t	*dent;			/* Directory entry */
   char		*ext,			/* Pointer to extension */
 		filename[1024],		/* Full filename */
 		relname[1024];		/* Relative filename */
-  struct stat	fileinfo;		/* File information */
   int		update;			/* Updated? */
   help_node_t	**node;			/* Current node */
 
@@ -932,38 +644,28 @@ help_load_directory(
   * Open the directory and scan it...
   */
 
-  if ((dir = opendir(directory)) == NULL)
+  if ((dir = cupsDirOpen(directory)) == NULL)
     return (0);
 
   update = 0;
 
-  while ((dent = readdir(dir)) != NULL)
+  while ((dent = cupsDirRead(dir)) != NULL)
   {
    /*
-    * Skip dot files...
+    * Get absolute and relative filenames...
     */
 
-    if (dent->d_name[0] == '.')
-      continue;
-
-   /*
-    * Get file information...
-    */
-
-    snprintf(filename, sizeof(filename), "%s/%s", directory, dent->d_name);
+    snprintf(filename, sizeof(filename), "%s/%s", directory, dent->filename);
     if (relative)
-      snprintf(relname, sizeof(relname), "%s/%s", relative, dent->d_name);
+      snprintf(relname, sizeof(relname), "%s/%s", relative, dent->filename);
     else
-      strlcpy(relname, dent->d_name, sizeof(relname));
-
-    if (stat(filename, &fileinfo))
-      continue;
+      strlcpy(relname, dent->filename, sizeof(relname));
 
    /*
     * Check if we have a HTML file...
     */
 
-    if ((ext = strstr(dent->d_name, ".html")) != NULL &&
+    if ((ext = strstr(dent->filename, ".html")) != NULL &&
         (!ext[5] || !strcmp(ext + 5, ".gz")))
     {
      /*
@@ -977,7 +679,7 @@ help_load_directory(
 	* index is up-to-date...
 	*/
 
-        if (node[0]->mtime == fileinfo.st_mtime)
+        if (node[0]->mtime == dent->fileinfo.st_mtime)
 	{
 	 /*
 	  * Same modification time, so mark all of the nodes
@@ -996,9 +698,9 @@ help_load_directory(
 
       update = 1;
 
-      help_load_file(hi, filename, relname, fileinfo.st_mtime);
+      help_load_file(hi, filename, relname, dent->fileinfo.st_mtime);
     }
-    else if (S_ISDIR(fileinfo.st_mode))
+    else if (S_ISDIR(dent->fileinfo.st_mode))
     {
      /*
       * Process sub-directory...
@@ -1009,7 +711,7 @@ help_load_directory(
     }
   }
 
-  closedir(dir);
+  cupsDirClose(dir);
 
   return (update);
 }

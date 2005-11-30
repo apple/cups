@@ -5,31 +5,35 @@
  *
  *   Copyright 1997-2005 by Easy Software Products.
  *
- *   This program is free software; you can redistribute it and/or modify it
- *   under the terms of the GNU General Public License as published by the Free
- *   Software Foundation; either version 2 of the License, or (at your option)
- *   any later version.
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
  *
- *   This program is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- *   for more details.
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636 USA
  *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *       Voice: (301) 373-9600
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
  *
  * Contents:
  *
  *   cgiCopyTemplateFile() - Copy a template file and replace all the
  *                           '{variable}' strings with the variable value.
  *   cgiCopyTemplateLang() - Copy a template file using a language...
+ *   cgiGetTemplateDir()   - Get the templates directory...
+ *   cgiSetServerVersion() - Set the server name and CUPS version...
  *   cgi_copy()            - Copy the template file, substituting as needed...
  *   cgi_puts()            - Put a string to the output file, quoting as
  *                           needed...
  */
 
-#include "cgi.h"
+#include "cgi-private.h"
 
 
 /*
@@ -138,6 +142,50 @@ cgiCopyTemplateLang(FILE       *out,		/* I - Output file */
   */
 
   fclose(in);
+}
+
+
+/*
+ * 'cgiGetTemplateDir()' - Get the templates directory...
+ */
+
+char *					/* O - Template directory */
+cgiGetTemplateDir(void)
+{
+  const char	*datadir;		/* CUPS_DATADIR env var */
+  static char	templates[1024] = "";	/* Template directory */
+
+
+  if (!templates[0])
+  {
+   /*
+    * Build the template directory pathname...
+    */
+
+    if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+      datadir = CUPS_DATADIR;
+
+    snprintf(templates, sizeof(templates), "%s/templates", datadir);
+  }
+
+  return (templates);
+}
+
+
+/*
+ * 'cgiSetServerVersion()' - Set the server name and CUPS version...
+ */
+
+void
+cgiSetServerVersion(void)
+{
+  cgiSetVariable("SERVER_NAME", getenv("SERVER_NAME"));
+  cgiSetVariable("REMOTE_USER", getenv("REMOTE_USER"));
+  cgiSetVariable("CUPS_VERSION", CUPS_SVERSION);
+
+#ifdef LC_TIME
+  setlocale(LC_TIME, "");
+#endif /* LC_TIME */
 }
 
 

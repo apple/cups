@@ -30,7 +30,7 @@
  * Include necessary headers...
  */
 
-#include "ipp-var.h"
+#include "cgi-private.h"
 
 
 /*
@@ -94,7 +94,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * single printer...
   */
 
-  ippSetServerVersion();
+  cgiSetServerVersion();
 
   pclass = argv[0];
   if (strcmp(pclass, "/") == 0 || strcmp(pclass, "classes.cgi") == 0)
@@ -111,7 +111,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Show the standard header...
     */
 
-    cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "header.tmpl", getenv("LANG"));
 
    /*
     * Get the default destination...
@@ -142,7 +142,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
         cgiSetVariable("DEFAULT_URI",
-	               ippRewriteURL(attr->values[0].string.text,
+	               cgiRewriteURL(attr->values[0].string.text,
 		                     url, sizeof(url), NULL));
       }
 
@@ -198,7 +198,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                    uri);
     }
 
-    ippGetAttributes(request, TEMPLATES, "classes.tmpl", getenv("LANG"));
+    cgiGetAttributes(request, cgiGetTemplateDir(), "classes.tmpl", getenv("LANG"));
 
    /*
     * Do the request and get back a response...
@@ -206,7 +206,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
-      ippSetCGIVars(response, NULL, NULL, NULL, 0);
+      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
       ippDelete(response);
     }
 
@@ -214,7 +214,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Write the report...
     */
 
-    cgiCopyTemplateLang(stdout, TEMPLATES, "classes.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "classes.tmpl", getenv("LANG"));
 
    /*
     * Get jobs for the specified class if a class has been chosen...
@@ -263,7 +263,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                      NULL, "unknown");
 
-      ippGetAttributes(request, TEMPLATES, "jobs.tmpl", getenv("LANG"));
+      cgiGetAttributes(request, cgiGetTemplateDir(), "jobs.tmpl", getenv("LANG"));
 
      /*
       * Do the request and get back a response...
@@ -271,10 +271,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
-	ippSetCGIVars(response, NULL, NULL, NULL, 0);
+	cgiSetIPPVars(response, NULL, NULL, NULL, 0);
 	ippDelete(response);
 
-	cgiCopyTemplateLang(stdout, TEMPLATES, "jobs.tmpl", getenv("LANG"));
+	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "jobs.tmpl", getenv("LANG"));
       }
     }
   }
@@ -346,7 +346,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                                       filename)) != NULL)
     {
       status = response->request.status.status_code;
-      ippSetCGIVars(response, NULL, NULL, NULL, 0);
+      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
 
       ippDelete(response);
     }
@@ -359,7 +359,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Show the standard header...
     */
 
-    cgiCopyTemplateLang(stdout, TEMPLATES, "header.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "header.tmpl", getenv("LANG"));
 
    /*
     * Show the result...
@@ -368,13 +368,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (status > IPP_OK_CONFLICT)
     {
       cgiSetVariable("ERROR", ippErrorString(status));
-      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
     }
     else
-      cgiCopyTemplateLang(stdout, TEMPLATES, "test-page.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "test-page.tmpl", getenv("LANG"));
   }
 
-  cgiCopyTemplateLang(stdout, TEMPLATES, "trailer.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "trailer.tmpl", getenv("LANG"));
 
  /*
   * Close the HTTP server connection...

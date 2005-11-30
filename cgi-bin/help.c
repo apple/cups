@@ -30,8 +30,7 @@
  * Include necessary headers...
  */
 
-#include "ipp-var.h"
-#include "help-index.h"
+#include "cgi-private.h"
 
 
 /*
@@ -92,7 +91,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     cgiStartHTML("Help");
     cgiSetVariable("ERROR", "Unable to load help index!");
-    cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
     cgiEndHTML();
 
     return (1);
@@ -131,7 +130,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       cgiStartHTML("Help");
       cgiSetVariable("ERROR", "Unable to access help file!");
-      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
       cgiEndHTML();
 
       return (1);
@@ -141,7 +140,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       cgiStartHTML("Help");
       cgiSetVariable("ERROR", "Help file not in index!");
-      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
       cgiEndHTML();
 
       return (1);
@@ -268,7 +267,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Show the search and bookmark content...
   */
 
-  cgiCopyTemplateLang(stdout, TEMPLATES, "help-header.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "help-header.tmpl", getenv("LANG"));
 
  /*
   * If we are viewing a file, copy it in now...
@@ -302,7 +301,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       perror(filename);
       cgiSetVariable("ERROR", "Unable to open help file.");
-      cgiCopyTemplateLang(stdout, TEMPLATES, "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
     }
   }
 
