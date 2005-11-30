@@ -84,16 +84,17 @@ TR.data TH {
   text-align: left;
 }
 
-P.table TABLE {
+DIV.table TABLE {
   border: solid thin #999966;
   border-spacing: 0px;
 }
 
-P.table TABLE TD {
+DIV.table TABLE TD {
   border: solid thin #bbbb88;
+  padding-top: 5px;
 }
 
-P.table TABLE TH {
+DIV.table TABLE TH {
   background: #bbbb88;
   border: none;
   border-bottom: solid thin #999966;
@@ -110,16 +111,18 @@ HR {
 }
 
 SPAN.info {
-  background: #999966;
-  border: thin solid #666644;
+  background: #000000;
+  border: thin solid #000000;
   color: #ffffff;
-  font-weight: bold;
+  font-size: 80%;
   font-style: italic;
+  font-weight: bold;
   white-space: nowrap;
 }
 
-H4 SPAN.info {
+H3 SPAN.info {
   float: right;
+  font-size: 100%;
 }
 
 .conflict {

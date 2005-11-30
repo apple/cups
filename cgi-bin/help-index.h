@@ -43,6 +43,7 @@
 typedef struct				/**** Help node structure... ****/
 {
   char		*filename;		/* Filename, relative to help dir */
+  char		*section;		/* Section name (NULL if none) */
   char		*anchor;		/* Anchor name (NULL if none) */
   char		*text;			/* Text in anchor */
   time_t	mtime;			/* Last modification time */

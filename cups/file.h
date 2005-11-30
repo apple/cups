@@ -39,7 +39,7 @@
 
 #  ifdef WIN32
 /* Windows does not support the ssize_t type, so map it to off_t... */
-typedef off_t ssize_t;
+typedef off_t ssize_t;			/* @private@ */
 #  endif /* WIN32 */
 
 
@@ -64,7 +64,7 @@ extern "C" {
  * Types and structures...
  */
 
-typedef struct _cups_file_s cups_file_t;/**** CUPS file type... ****/
+typedef struct _cups_file_s cups_file_t;/**** CUPS file type ****/
 
 
 /*

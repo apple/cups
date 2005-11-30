@@ -1,0 +1,67 @@
+<!--
+  "$Id$"
+
+  File and directory API introduction for the Common UNIX Printing System (CUPS).
+
+  Copyright 1997-2005 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Easy Software Products and are protected by Federal
+  copyright law.  Distribution and use rights are outlined in the file
+  "LICENSE.txt" which should have been included with this file.  If this
+  file is missing or damaged please contact Easy Software Products
+  at:
+
+      Attn: CUPS Licensing Information
+      Easy Software Products
+      44141 Airport View Drive, Suite 204
+      Hollywood, Maryland 20636 USA
+
+      Voice: (301) 373-9600
+      EMail: cups-info@cups.org
+	WWW: http://www.cups.org
+-->
+<!-- SECTION: Programming -->
+
+<h2 class='title'>Introduction</h2>
+
+<p>The CUPS file and directory APIs provide portable interfaces
+for manipulating files and listing files and directories. Unlike
+stdio <tt>FILE</tt> streams, the <tt>cupsFile</tt> functions
+allow you to open more than 256 files at any given time. They
+also manage the platform-specific details of locking, large file
+support, line endings (CR, LF, or CR LF), and reading and writing
+files using Flate ("gzip") compression. Finally, you can also
+connect, read from, and write to network connections using the
+<tt>cupsFile</tt> functions.</p>
+
+<p>The <tt>cupsDir</tt> functions manage the platform-specific
+details of directory access/listing and provide a convenient way
+to get both a list of files and the information (permissions,
+size, timestamp, etc.) for each of those files.</p>
+
+<p>The CUPS scheduler (<tt>cupsd</tt>), <tt>mailto</tt> notifier,
+and many of the CUPS API functions use these functions for
+everything except console (stdin, stdout, stderr) I/O.</p>
+
+<h2 class='title'>General Usage</h2>
+
+<p>The <var>&lt;cups/dir.h&gt;</var> and
+<var>&lt;cups/file.h&gt;</var> header files must be included to
+use the <tt>cupsDir</tt> and <tt>cupsFile</tt> functions,
+respectively.</p>
+
+<p>Programs using these functions must be linked to the CUPS
+library: <var>libcups.a</var>, <var>libcups.so.2</var>,
+<var>libcups.2.dylib</var>, <var>libcups_s.a</var>, or
+<var>libcups2.lib</var> depending on the platform. The following
+command compiles <var>myprogram.c</var> using GCC and the CUPS
+library:</p>
+
+<pre class='command'>
+<kbd>gcc -o myprogram myprogram.c -lcups</kbd>
+</pre>
+
+<h2 class='title'>Compatibility</h2>
+
+<p>All of these functions require CUPS 1.2 or higher.</p>

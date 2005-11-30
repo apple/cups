@@ -31,7 +31,7 @@
  *   cupsArrayCurrent() - Return the current element in the array.
  *   cupsArrayDelete()  - Free all memory used by the array.
  *   cupsArrayDup()     - Duplicate the array.
- *   cupsArrayFind()    - Find an elemrnt in the array.
+ *   cupsArrayFind()    - Find an element in the array.
  *   cupsArrayFirst()   - Get the first element in the array.
  *   cupsArrayLast()    - Get the last element in the array.
  *   cupsArrayNew()     - Create a new array.
@@ -377,7 +377,7 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
 
 
 /*
- * 'cupsArrayFind()' - Find an elemrnt in the array.
+ * 'cupsArrayFind()' - Find an element in the array.
  */
 
 void *					/* O - Element found or NULL */

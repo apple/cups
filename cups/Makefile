@@ -319,14 +319,20 @@ testlang:	testlang.o libcups.a
 
 apihelp:
 	echo Generating CUPS API help files...
-	mxmldoc --title "Array API" array.h array.c >../doc/help/api-array.html
-	mxmldoc --title "File and Directory APIs" file.h file.c dir.h dir.c >../doc/help/api-filedir.html
-	mxmldoc --title "PPD API" ppd.h attr.c emit.c mark.c page.c ppd.c >../doc/help/api-ppd.html
-	mxmldoc --title "HTTP and IPP APIs" cups.h http.h ipp.h \
+	mxmldoc --title "Array API" --intro api-array.shtml \
+		array.h array.c >../doc/help/api-array.html
+	mxmldoc --title "File and Directory APIs" --intro api-filedir.shtml \
+		file.h file.c dir.h dir.c >../doc/help/api-filedir.html
+	mxmldoc --title "PPD API" --intro api-ppd.shtml \
+		ppd.h attr.c emit.c mark.c page.c \
+		ppd.c >../doc/help/api-ppd.html
+	mxmldoc --title "HTTP and IPP APIs" --intro api-httpipp.shtml \
+		cups.h http.h ipp.h \
 		auth.c dest.c encode.c getputfile.c http.c http-addr.c \
 		http-support.c ipp.c ipp-support.c md5passwd.c options.c \
 		usersys.c util.c >../doc/help/api-httpipp.html
-	mxmldoc --title "Filter and Backend APIs" backchannel.c >../doc/help/api-filter.html
+	mxmldoc --title "Filter and Backend APIs" --intro api-filter.shtml \
+		backchannel.c >../doc/help/api-filter.html
 
 
 #

@@ -1,24 +1,80 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
 <head>
 	<title>Array API</title>
-	<meta name='creator' content='Mini-XML v2.3'/>
-	<style><!--
+	<meta name='creator' content='Mini-XML v2.3'>
+	<style type='text/css'><!--
 	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
 	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
 	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
-	span.info { font-weight: bold; font-style: italic; color: #ffffff; background: #000000; }
-	h3 span.info { float: right; }
+	span.info { background: #000000; border: solid thin #000000; color: #ffffff; font-size: 80%; font-style: italic; font-weight: bold; white-space: nowrap; }
+	h3 span.info { float: right; font-size: 100%; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
 	--></style>
 </head>
 <body>
-<h2>Contents</h2>
+<!--
+  "$Id$"
+
+  Array API introduction for the Common UNIX Printing System (CUPS).
+
+  Copyright 1997-2005 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Easy Software Products and are protected by Federal
+  copyright law.  Distribution and use rights are outlined in the file
+  "LICENSE.txt" which should have been included with this file.  If this
+  file is missing or damaged please contact Easy Software Products
+  at:
+
+      Attn: CUPS Licensing Information
+      Easy Software Products
+      44141 Airport View Drive, Suite 204
+      Hollywood, Maryland 20636 USA
+
+      Voice: (301) 373-9600
+      EMail: cups-info@cups.org
+	WWW: http://www.cups.org
+-->
+<!-- SECTION: Programming -->
+
+<h2 class='title'>Introduction</h2>
+
+<p>The CUPS array API provides a high-performance generic array
+container. The contents of the array container can be sorted and
+the container itself is designed for optimal speed and memory
+usage under a wide variety of conditions.</p>
+
+<p>The CUPS scheduler (<tt>cupsd</tt>) and many of the CUPS API
+functions use the array API to efficiently manage large lists of
+data.</p>
+
+<h2 class='title'>General Usage</h2>
+
+<p>The <var>&lt;cups/array.h&gt;</var> header file must be
+included to use the <tt>cupsArray</tt> functions.</p>
+
+<p>Programs using these functions must be linked to the CUPS
+library: <var>libcups.a</var>, <var>libcups.so.2</var>,
+<var>libcups.2.dylib</var>, <var>libcups_s.a</var>, or
+<var>libcups2.lib</var> depending on the platform. The following
+command compiles <var>myprogram.c</var> using GCC and the CUPS
+library:</p>
+
+<pre class='command'>
+<kbd>gcc -o myprogram myprogram.c -lcups</kbd>
+</pre>
+
+<h2 class='title'>Compatibility</h2>
+
+<p>All of these functions require CUPS 1.2 or higher.</p>
+<h2 class='title'>Contents</h2>
 <ul>
-	<li><a href='#_functions'>Functions</a></li>
-	<li><a href='#_types'>Types</a></li>
+	<li><a href='#FUNCTIONS'>Functions</a></li>
+	<li><a href='#TYPES'>Types</a></li>
 </ul>
 <!-- NEW PAGE -->
-<h2><a name='_functions'>Functions</a></h2>
+<h2 class='title'><a name='FUNCTIONS'>Functions</a></h2>
 <ul>
 	<li><a href='#cupsArrayAdd'><tt>cupsArrayAdd()</tt></a> </li>
 	<li><a href='#cupsArrayClear'><tt>cupsArrayClear()</tt></a> </li>
@@ -37,8 +93,7 @@
 	<li><a href='#cupsArraySave'><tt>cupsArraySave()</tt></a> </li>
 </ul>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayAdd'>cupsArrayAdd()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayAdd'>cupsArrayAdd()</a></h3>
 <h4>Description</h4>
 <p>Add an element to the array.</p>
 <h4>Syntax</h4>
@@ -49,17 +104,16 @@ cupsArrayAdd(
     void * e);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
 <tr><td><tt>e</tt></td><td>Element</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>1 on success, 0 on failure</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayClear'>cupsArrayClear()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayClear'>cupsArrayClear()</a></h3>
 <h4>Description</h4>
 <p>Clear the array.</p>
 <h4>Syntax</h4>
@@ -69,16 +123,15 @@ cupsArrayClear(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayCount'>cupsArrayCount()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayCount'>cupsArrayCount()</a></h3>
 <h4>Description</h4>
 <p>Get the number of elements in the array.</p>
 <h4>Syntax</h4>
@@ -88,16 +141,15 @@ cupsArrayCount(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Number of elements</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayCurrent'>cupsArrayCurrent()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayCurrent'>cupsArrayCurrent()</a></h3>
 <h4>Description</h4>
 <p>Return the current element in the array.</p>
 <h4>Syntax</h4>
@@ -107,16 +159,15 @@ cupsArrayCurrent(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Element</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayDelete'>cupsArrayDelete()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayDelete'>cupsArrayDelete()</a></h3>
 <h4>Description</h4>
 <p>Free all memory used by the array.</p>
 <h4>Syntax</h4>
@@ -126,16 +177,15 @@ cupsArrayDelete(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayDup'>cupsArrayDup()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayDup'>cupsArrayDup()</a></h3>
 <h4>Description</h4>
 <p>Duplicate the array.</p>
 <h4>Syntax</h4>
@@ -145,18 +195,17 @@ cupsArrayDup(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Duplicate array</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayFind'>cupsArrayFind()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayFind'>cupsArrayFind()</a></h3>
 <h4>Description</h4>
-<p>Find an elemrnt in the array.</p>
+<p>Find an element in the array.</p>
 <h4>Syntax</h4>
 <pre>
 void *
@@ -165,17 +214,16 @@ cupsArrayFind(
     void * e);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
 <tr><td><tt>e</tt></td><td>Element</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Element found or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayFirst'>cupsArrayFirst()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayFirst'>cupsArrayFirst()</a></h3>
 <h4>Description</h4>
 <p>Get the first element in the array.</p>
 <h4>Syntax</h4>
@@ -185,16 +233,15 @@ cupsArrayFirst(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>First element or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayLast'>cupsArrayLast()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayLast'>cupsArrayLast()</a></h3>
 <h4>Description</h4>
 <p>Get the last element in the array.</p>
 <h4>Syntax</h4>
@@ -204,16 +251,15 @@ cupsArrayLast(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Last element or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayNew'>cupsArrayNew()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayNew'>cupsArrayNew()</a></h3>
 <h4>Description</h4>
 <p>Create a new array.</p>
 <h4>Syntax</h4>
@@ -224,17 +270,16 @@ cupsArrayNew(
     void * d);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>f</tt></td><td>Comparison function</td></tr>
 <tr><td><tt>d</tt></td><td>User data</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Array</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayNext'>cupsArrayNext()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayNext'>cupsArrayNext()</a></h3>
 <h4>Description</h4>
 <p>Get the next element in the array.</p>
 <h4>Syntax</h4>
@@ -244,16 +289,15 @@ cupsArrayNext(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Next element or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayPrev'>cupsArrayPrev()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayPrev'>cupsArrayPrev()</a></h3>
 <h4>Description</h4>
 <p>Get the previous element in the array.</p>
 <h4>Syntax</h4>
@@ -263,16 +307,15 @@ cupsArrayPrev(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Previous element or NULL</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayRemove'>cupsArrayRemove()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayRemove'>cupsArrayRemove()</a></h3>
 <h4>Description</h4>
 <p>Remove an element from the array.</p>
 <h4>Syntax</h4>
@@ -283,17 +326,16 @@ cupsArrayRemove(
     void * e);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
 <tr><td><tt>e</tt></td><td>Element</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>1 on success, 0 on failure</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArrayRestore'>cupsArrayRestore()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArrayRestore'>cupsArrayRestore()</a></h3>
 <h4>Description</h4>
 <p>Reset the current element to the last cupsArraySave.</p>
 <h4>Syntax</h4>
@@ -303,16 +345,15 @@ cupsArrayRestore(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>New current element</p>
 <!-- NEW PAGE -->
-<h3><a name='cupsArraySave'>cupsArraySave()</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cupsArraySave'>cupsArraySave()</a></h3>
 <h4>Description</h4>
 <p>Mark the current element for a later cupsArrayRestore.</p>
 <h4>Syntax</h4>
@@ -322,22 +363,21 @@ cupsArraySave(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
 <h4>Arguments</h4>
-<p class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' width='80%'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>a</tt></td><td>Array</td></tr>
-</tbody></table></p>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
-<h2><a name='_types'>Types</a></h2>
+<h2 class='title'><a name='TYPES'>Types</a></h2>
 <ul>
 	<li><a href='#cups_array_func_t'><tt>cups_array_func_t</tt></a> </li>
 	<li><a href='#cups_array_t'><tt>cups_array_t</tt></a> </li>
 </ul>
 <!-- NEW PAGE -->
-<h3><a name='cups_array_func_t'>cups_array_func_t</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cups_array_func_t'>cups_array_func_t</a></h3>
 <h4>Description</h4>
 <p>Array comparison function</p>
 <h4>Definition</h4>
@@ -345,8 +385,9 @@ cupsArraySave(
 typedef int (*cups_array_func_t)(void *first, void *second, void *data);
 </pre>
 <!-- NEW PAGE -->
-<h3><a name='cups_array_t'>cups_array_t</a> </h3>
-<hr noshade/>
+<h3 class='title'><a name='cups_array_t'>cups_array_t</a></h3>
+<h4>Description</h4>
+<p>CUPS array type</p>
 <h4>Definition</h4>
 <pre>
 typedef struct _cups_array_s cups_array_t;
