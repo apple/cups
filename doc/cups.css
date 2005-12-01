@@ -23,6 +23,12 @@ PRE.command {
   margin-left: 3em;
 }
 
+P.command {
+  color: #7f0000;
+  font-family: monospace;
+  margin-left: 3em;
+}
+
 A:link, A:visited {
   text-decoration: none;
   font-weight: bold;
@@ -70,6 +76,7 @@ TR.page, TD.page, TR.page TD {
   background-color: #eeeebb;
   height: 100%;
   padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 TR.data, TD.data, TR.data TD {

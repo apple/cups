@@ -1,52 +1,137 @@
 <HTML>
+<!-- SECTION: File Formats -->
 <HEAD>
 	<TITLE>access_log Reference</TITLE>
 </HEAD>
 <BODY>
 
-<P>The <VAR>access_log</VAR> file lists each HTTP resource that is accessed
-by a web browser or ESP Print Pro/IPP client. Each line is in the so-called "Common
-Log Format" used by many web servers and web reporting tools:
+<P>The <VAR>access_log</VAR> file lists each HTTP resource that
+is accessed by a web browser or client. Each line is in an
+extended version of the so-called "Common Log Format" used by
+many web servers and web reporting tools:</P>
 
-<UL><PRE>
-host group user date-time \"method resource version\" status bytes
+<P CLASS="command">
 
-127.0.0.1 - - [20/May/1999:19:20:29 +0000] "POST /admin/ HTTP/1.1" 401 0
-127.0.0.1 - mike [20/May/1999:19:20:31 +0000] "POST /admin/ HTTP/1.1" 200 0
-</PRE></UL>
+host group user date-time \"method resource version\" status
+bytes ipp-operation ipp-status<BR>
 
-<P>The <I>host</I> field will normally only be an IP address unless you
-have enabled the <A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
-directive in the <VAR>cupsd.conf</VAR> file.
+<BR>
 
-<P>The <I>group</I> field always contains "-" in ESP Print Pro.
+10.0.1.2 - - [01/Dec/2005:21:50:28 +0000] "POST / HTTP/1.1" 200
+317 CUPS-Get-Printers
+successful-ok-ignored-or-substituted-attributes<BR>
 
-<P>The <I>user</I> field is the authenticated username of the requesting user.
-If no username and password is supplied for the request then this field
-contains "-".
+localhost - - [01/Dec/2005:21:50:32 +0000] "GET /admin HTTP/1.1"
+200 0 - -<BR>
 
-<P>The <I>date-time</I> field is the date and time of the request in Greenwich
-Mean Time (a.k.a. ZULU) and is in the format:
+localhost - - [01/Dec/2005:21:50:32 +0000] "POST / HTTP/1.1" 200
+157 CUPS-Get-Printers
+successful-ok-ignored-or-substituted-attributes<BR>
 
-<UL><PRE>
-[DD/MON/YYYY:HH:MM:SS +0000]
-</PRE></UL>
+localhost - - [01/Dec/2005:21:50:32 +0000] "POST / HTTP/1.1" 200
+1411 CUPS-Get-Devices -<BR>
 
-<P>The <I>method</I> field is the HTTP method used ("GET", "PUT", "POST", etc.)
+localhost - - [01/Dec/2005:21:50:32 +0000] "GET /admin HTTP/1.1"
+200 6667 - -<BR>
 
-<P>The <I>resource</I> field is the filename of the requested resource.
+</P>
+
+<P>The <I>host</I> field will normally only be an IP address
+unless you have enabled the <A
+HREF="cupsd-conf-reference.html#HostNameLookups"><CODE>HostNameLookups</CODE></A>
+directive in the <VAR>cupsd.conf</VAR> file or if the IP address
+corresponds to your local machine.</P>
+
+<P>The <I>group</I> field always contains "-".</P>
+
+<P>The <I>user</I> field is the authenticated username of the
+requesting user. If no username and password is supplied for the
+request then this field contains "-".</P>
+
+<P>The <I>date-time</I> field is the date and time of the request
+in local time and is in the format:</P>
+
+<P CLASS="command">
+[DD/MON/YYYY:HH:MM:SS +ZZZZ]
+</P>
+
+<P>The <I>method</I> field is the HTTP method used: "GET",
+"OPTIONS", "PUT", or "POST". "GET" requests are used to get files
+from the server, both for the web interface and to get
+configuration and log files. "OPTIONS" requests are used to
+upgrade connections to TLS encryption. "PUT" requests are used to
+upload configuration files. "POST" requests are used for web
+interface forms and IPP requests.</P>
+
+<P>The <I>resource</I> field is the filename of the requested
+resource.</P>
 
 <P>The <I>version</I> field is the HTTP specification version used by the
-client. For ESP Print Pro clients this will always be "HTTP/1.1".
+client. For CUPS clients this will always be "HTTP/1.1".</P>
 
 <P>The <I>status</I> field contains the HTTP result status of the
-request. Usually it is "200", but other HTTP status codes are possible.
-For example, 401 is the "unauthorized access" status in the example
-above.
+request, as follows:</P>
 
-<P>The <I>bytes</I> field contains the number of bytes in the request.
-For POST requests the <I>bytes</I> field contains the number of bytes
-of non-IPP data that is received from the client.
+<UL>
+
+	<LI><CODE>200</CODE> - Successful operation.</LI>
+
+	<LI><CODE>201</CODE> - File created/modified successfully.</LI>
+
+	<LI><CODE>304</CODE> - The requested file has not changed.</LI>
+
+	<LI><CODE>400</CODE> - Bad HTTP request; typically this
+	means that you have a malicious program trying to access
+	your server.</LI>
+
+	<LI><CODE>401</CODE> - Unauthorized, authentication
+	(username + password) is required.</LI>
+
+	<LI><CODE>403</CODE> - Access is forbidden; typically
+	this means that a client tried to access a file or
+	resource they do not have permission to access.</LI>
+
+	<LI><CODE>404</CODE> - The file or resource does not
+	exist.</LI>
+
+	<LI><CODE>405</CODE> - URL access method is not allowed;
+	typically this means you have a web browser using your
+	server as a proxy.</LI>
+
+	<LI><CODE>413</CODE> - Request too large; typically this
+	means that a client tried to print a file larger than the
+	<A
+	HREF="cupsd-conf-reference.html#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
+	allows.</LI>
+
+	<LI><CODE>426</CODE> - Upgrading to TLS-encrypted
+	connection.</LI>
+
+	<LI><CODE>500</CODE> - Server error; typically this
+	happens when the server is unable to open/create a file -
+	consult the <VAR>error_log</VAR> file for details.</LI>
+
+	<LI><CODE>501</CODE> - The client requested encryption
+	but encryption support is not enabled/compiled in.</LI>
+
+	<LI><CODE>505</CODE> - HTTP version number not supported;
+	typically this means that you have a malicious program
+	trying to access your server.</LI>
+
+</UL>
+
+<P>The <I>bytes</I> field contains the number of bytes in the
+request. For POST requests the <I>bytes</I> field contains the
+number of bytes of non-IPP data that is received from the
+client.</P>
+
+<P>The <I>ipp-operation</I> field contains either "-" for non-IPP
+requests or the IPP operation name for POST requests containing
+an IPP request.</P>
+
+<P>The <I>ipp-status</I> field contains either "-" for non-IPP
+requests or the IPP status code name for POST requests containing
+an IPP response.</P>
 
 </BODY>
 </HTML>

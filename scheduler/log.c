@@ -387,11 +387,17 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   */
 
   cupsFilePrintf(AccessFile,
-                 "%s - %s %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT "\n",
+                 "%s - %s %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
         	 con->http.hostname, con->username[0] != '\0' ? con->username : "-",
 		 cupsdGetDateTime(con->start), states[con->operation], con->uri,
 		 con->http.version / 100, con->http.version % 100,
-		 code, CUPS_LLCAST con->bytes);
+		 code, CUPS_LLCAST con->bytes,
+		 con->request ?
+		     ippOpString(con->request->request.op.operation_id) : "-",
+		 con->response ?
+		     ippErrorString(con->response->request.status.status_code) :
+		     "-");
+
   cupsFileFlush(AccessFile);
 
   return (1);

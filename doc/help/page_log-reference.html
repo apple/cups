@@ -1,42 +1,53 @@
 <HTML>
+<!-- SECTION: File Formats -->
 <HEAD>
 	<TITLE>page_log Reference</TITLE>
 </HEAD>
 <BODY>
 
-<P>The <VAR>page_log</VAR> file lists each page that is sent to a printer.
-Each line contains the following information:
+<P>The <VAR>page_log</VAR> file lists each page that is sent to a
+printer. Each line contains the following information:</P>
 
-<UL><PRE>
-printer user job-id date-time page-number num-copies job-billing
+<P CLASS="command">
 
-DeskJet root 2 [20/May/1999:19:21:05 +0000] 1 0 acme-123
-</PRE></UL>
+printer user job-id date-time page-number num-copies job-billing<BR>
+
+<BR>
+
+DeskJet root 2 [20/May/1999:19:21:05 +0000] 1 1 acme-123<BR>
+
+DeskJet root 2 [20/May/1999:19:21:05 +0000] 2 1 acme-123<BR>
+
+</P>
 
 <P>The <I>printer</I> field contains the name of the printer that
-printed the page. If you send a job to a printer class, this field will
-contain the name of the printer that was assigned the job.
+printed the page. If you send a job to a printer class, this
+field will contain the name of the printer that was assigned the
+job.</P>
 
 <P>The <I>user</I> field contains the name of the user (the IPP
-<CODE>requesting-user-name</CODE> attribute) that submitted this file for
-printing.
+<CODE>requesting-user-name</CODE> attribute) that submitted this
+file for printing.</P>
 
-<P>The <I>job-id</I> field contains the job number of the page being printed.
-Job numbers are reset to 1 whenever the ESP Print Pro server is started, so don't depend
-on this number being unique!
+<P>The <I>job-id</I> field contains the job number of the page
+being printed. Job numbers are reset to 1 whenever the spool
+directory (<VAR>/var/spool/cups</VAR>) is cleared, so don't
+depend on this number being unique!</P>
 
-<P>The <I>date-time</I> field contains the date and time of when the page
-started printing. The format of this field is identical to the <I>data-time</I>
-field in the <VAR>access_log</VAR> file.
+<P>The <I>date-time</I> field contains the date and time of when
+the page started printing. The format of this field is identical
+to the <I>data-time</I> field in the <VAR>access_log</VAR>
+file.</P>
 
-<P>The <I>page-number</I> and <I>num-pages</I> fields contain the page number
-and number of copies being printed of that page. For printer that can not
-produce copies on their own, the <I>num-pages</I> field will always be 1.
+<P>The <I>page-number</I> and <I>num-pages</I> fields contain the
+page number and number of copies being printed of that page. For
+printers that cannot produce copies on their own, the
+<I>num-pages</I> field will always be 1.</P>
 
 <P>The <I>job-billing</I> field contains a copy of the
 <CODE>job-billing</CODE> attribute provided with the IPP
-<CODE>create-job</CODE> or <CODE>print-job</CODE> requests or "-" if none
-was provided.
+<CODE>Create-Job</CODE> or <CODE>Print-Job</CODE> requests or "-"
+if none was provided.
 
 </BODY>
 </HTML>
