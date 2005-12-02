@@ -5,371 +5,409 @@
 </HEAD>
 <BODY>
 
-<P>The CUPS scheduler (cupsd) uses the <VAR>/etc/cups/printers.conf</VAR> file 
-to store the list of available printers.  This file contains only locally defined
-printers, but not remote printers that are created automatically.  Each directive
-is listed on a line by itself followed by its value. Comments are introduced 
-using the number sign ("#") character at the beginning of a line.
+<P>The CUPS scheduler (cupsd) uses the
+<VAR>/etc/cups/printers.conf</VAR> file to store the list of
+available printers. This file contains only locally defined
+printers, but not remote printers that are created automatically
+via browsing. Each directive is listed on a line by itself
+followed by its value. Comments are introduced using the number
+sign ("#") character at the beginning of a line.</P>
 
-<P>Since the printer configuration file consists of plain text, you can
-use your favorite text editor to make changes to it.
+<P>While the printer configuration file consists of plain text
+and can be modified using your favorite text editor, you should
+normally use the <CODE>lpadmin(8)</CODE> command, web interface,
+or any of the available GUIs to manage your printers instead. If
+you do choose to edit this file manually, you will need to
+restart the scheduler to make them active.</P>
 
-<P>The <VAR>printers.conf</VAR> file contains many directives that
-determine how the printer behaves:</P>
 
-<P ALIGN="CENTER">
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
-<TR>
-<TD VALIGN="TOP">
-
-	<LI><A HREF="#Accepting"><CODE>Accepting</CODE></A>
-	<LI><A HREF="#AllowUser"><CODE>AllowUser</CODE></A>
-	<LI><A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-	<LI><A HREF="#DenyUser"><CODE>DenyUser</CODE></A>
-	<LI><A HREF="#DeviceURI"><CODE>DeviceURI</CODE></A>
-
-</TD>
-<TD VALIGN="TOP">
-&nbsp;&nbsp;&nbsp;
-</TD>
-<TD VALIGN="TOP">
-
-	<LI><A HREF="#Info"><CODE>Info</CODE></A>
-	<LI><A HREF="#JobSheets"><CODE>JobSheets</CODE></A>
-	<LI><A HREF="#KLimit"><CODE>KLimit</CODE></A>
-	<LI><A HREF="#PrinterLocation"><CODE>Location</CODE></A>
-	<LI><A HREF="#PageLimit"><CODE>PageLimit</CODE></A>
-
-</TD>
-<TD VALIGN="TOP">
-&nbsp;&nbsp;&nbsp;
-</TD>
-<TD VALIGN="TOP">
-
-	<LI><A HREF="#Printer"><CODE>Printer</CODE></A>
-	<LI><A HREF="#QuotaPeriod"><CODE>QuotaPeriod</CODE></A>
-	<LI><A HREF="#State"><CODE>State</CODE></A>
-	<LI><A HREF="#StateMessage"><CODE>StateMessage</CODE></A>
-
-</TD>
-</TR>
-</TABLE>
-</P>
-
-<!-- HALF PAGE -->
-<H3><A NAME="Accepting">Accepting</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="Accepting">Accepting</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Accepting yes
-
 Accepting no
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Accepting</CODE> directive defines the initial Boolean
-value for the <VAR>printer-is-accepting-job</VAR> attribute which can
-be set by the <CODE>accept</CODE> and <CODE>reject</CODE> commands. 
+<P>The <CODE>Accepting</CODE> directive defines the initial state
+of the <VAR>printer-is-accepting-jobs</VAR> attribute. This state
+is also set by the <CODE>accept(8)</CODE> and
+<CODE>reject(8)</CODE> commands:</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/accept printername
+/usr/sbin/reject printername</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="AllowUser">AllowUser</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="AllowUser">AllowUser</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 AllowUser foo_user
-AllowUser bar_user
-</PRE></UL>
+AllowUser @bar_group
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>AllowUser</CODE> directive adds a username to the 
-<VAR>requesting-user-name-allowed</VAR> attribute which can be set
-by the <CODE>lpadmin -u</CODE> command.
+<P>The <CODE>AllowUser</CODE> directive adds a username or group
+name to the <VAR>requesting-user-name-allowed</VAR> attribute
+which can be set by the <CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -u allow:foo_user,@bar_group</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="DefaultPrinter">DefaultPrinter</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.
+This directive cannot be used with <A
+HREF="#DenyUser"><CODE>DenyUser</CODE></A>.</P>
+
+
+<H3 CLASS="title"><A NAME="DefaultPrinter">DefaultPrinter</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
-&lt;DefaultPrinter name/&gt;
+<PRE CLASS="command">
+&lt;DefaultPrinter name&gt;
 ...
 &lt;/Printer&gt;
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>DefaultPrinter</CODE> directive begins a printer definition 
-for the default server destination.  
-It can be added by the <CODE>lpadmin</CODE> command or if already defined, 
-set as default by the <CODE>lpoptions -d</CODE> command.</P>
+<P>The <CODE>DefaultPrinter</CODE> directive begins a printer
+definition as the default server destination. The default server
+printer can be set using the <CODE>lpadmin(8)</CODE> command:</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="DenyUser">DenyUser</A></H3>
-<HR>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -d printername</KBD>
+</PRE>
+
+<P>Note that the server default printer settings can be
+overridden by the user's default printer settings which are
+normally set using the <CODE>lpoptions(1)</CODE> command.</P>
+
+
+<H3 CLASS="title"><A NAME="DenyUser">DenyUser</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 DenyUser foo_user
-DenyUser bar_user
-</PRE></UL>
+DenyUser @bar_group
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>DenyUser</CODE> directive adds a username to the 
-<VAR>requesting-user-name-allowed</VAR> attribute which can be set
-by the <CODE>lpadmin -u</CODE> command.</P>
+<P>The <CODE>DenyUser</CODE> directive adds a username or group
+name to the <VAR>requesting-user-name-denied</VAR> attribute
+which can be set by the <CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -u deny:foo_user,@bar_group</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="DeviceURI">DeviceURI</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.
+This directive cannot be used with <A
+HREF="#AllowUser"><CODE>AllowUser</CODE></A></P>
+
+
+<H3 CLASS="title"><A NAME="DeviceURI">DeviceURI</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 DeviceURI socket://foo.bar.com:9100
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>DeviceURI</CODE> directive defines the value of the 
-<VAR>device-uri-attribute</VAR> attribute which can be set by 
-the <CODE>lpadmin -v</CODE> command.
+<VAR>device-uri-attribute</VAR> attribute. It is normally set
+using the <CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -v device-uri</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Info">Info</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="Info">Info</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Info My Printer
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Info</CODE> directive defines the string for the 
-<VAR>printer-info</VAR> attribute which can be set by the 
-<CODE>lpadmin -D</CODE> command.</P>
+<VAR>printer-info</VAR> attribute. It is normally set using the
+<CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -D "My Printer"</KBD>
+</PRE>
 
-<!-- NEW PAGE -->
-<H3><A NAME="JobSheets">JobSheets</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="JobSheets">JobSheets</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 JobSheets none,standard
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>JobSheets</CODE> directive specifies the default banner pages 
-to print before and after a print job.
-In the above example, only a <VAR>standard</VAR> banner will print after each job.</P>
+<P>The <CODE>JobSheets</CODE> directive specifies the default
+banner pages  to print before and after a print job. In the above
+example, only a <VAR>standard</VAR> banner will print after each
+job. The <CODE>lpadmin(8)</CODE> command is normally used to set
+the default banners:
 
-<P>The <CODE>lpoptions -o job-sheets=</CODE> command can be used to set banners. 
-For example, the following command would produce the same results of a 
-<VAR>standard</VAR> banner at the end of each print job for the default printer.</P>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -o job-sheets-default=none,standard</KBD>
+</PRE>
 
-<UL><B>
-lpoptions -o job-sheets=none,standard
-</B></UL>
+<P>If only one banner file is specified, it will be printed
+before the files in the job. If a second banner file is
+specified, it is printed  after the files in the job.</P>
 
-<P>If only one banner file is specified, it will be printed before the 
-files in the job. If a second banner file is specified, it is printed 
-after the files in the job.</P>
-
-<P>The available banner pages depend on the local system configuration;
- CUPS includes the following banner files:</P>
+<P>The available banner pages depend on the local system
+configuration; CUPS includes the following standard banner
+files:</P>
 
 <UL>
-<LI><CODE>none</CODE> - Do not produce a banner page.</LI>
-<LI><CODE>classified</CODE> - A banner page with a &quot;classified&quot; label at the top and bottom.</LI>
-<LI><CODE>confidential</CODE> - A banner page with a &quot;confidential&quot; label at the top and bottom.</LI>
-<LI><CODE>secret</CODE> - A banner page with a &quot;secret&quot; label at the top and bottom.</LI>
-<LI><CODE>standard</CODE> - A banner page with no label at the top and bottom.</LI>
-<LI><CODE>topsecret</CODE> - A banner page with a &quot;top secret&quot; label at the top and bottom.</LI>
-<LI><CODE>unclassified</CODE> - A banner page with an &quot;unclassified&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>none</CODE> - Do not produce a banner
+	page.</LI>
+
+	<LI><CODE>classified</CODE> - A banner page with a
+	&quot;classified&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>confidential</CODE> - A banner page with a
+	&quot;confidential&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>secret</CODE> - A banner page with a
+	&quot;secret&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>standard</CODE> - A banner page with no label
+	at the top and bottom.</LI>
+
+	<LI><CODE>topsecret</CODE> - A banner page with a
+	&quot;top secret&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>unclassified</CODE> - A banner page with an
+	&quot;unclassified&quot; label at the top and bottom.</LI>
+
 </UL>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.  
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="KLimit">KLimit</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="KLimit">KLimit</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 KLimit 1234
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>KLimit</CODE> directive defines the value of the 
-<VAR>job-k-limit</VAR> attribute which can be set by the 
-<CODE>lpadmin -o job-k-limit=</CODE> command.
+<VAR>job-k-limit</VAR> attribute. It is normally set using the
+<CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -o job-k-limit=1234</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="PrinterLocation">Location</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="PrinterLocation">Location</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Location Building 3321
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Location</CODE> directive defines the string for the 
-<VAR>printer-location</VAR> attribute which can be set by the 
-<CODE>lpadmin -L</CODE> command.</P>
+<VAR>printer-location</VAR> attribute. It is normally set using the
+<CODE>lpadmin(8)</CODE> command:</P>
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD>
-	<B>Note:</B>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -L "Building 3321"</KBD>
+</PRE>
 
-	<P>Do not confuse this <CODE>Location</CODE> directive with the 
-	one for cupsd.conf.  They are completely different.
-	</TD>
-</TR>
-</TABLE></CENTER>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="PageLimit">PageLimit</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="PageLimit">PageLimit</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 PageLimit 1234
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>PageLimit</CODE> directive defines the value of the 
-<VAR>job-page-limit</VAR> attribute which can be set
-by the <CODE>lpadmin -o job-page-limit=</CODE> command.</P>
+<VAR>job-page-limit</VAR> attribute. It can be set using the
+<CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -o job-page-limit=1234</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Printer">Printer</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="Printer">Printer</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 &lt;Printer name/&gt;
 ...
 &lt;/Printer&gt;
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Printer</CODE> directive begins a printer definition.
-It can be added by the <CODE>lpadmin</CODE> command.
+It can be added using the <CODE>lpadmin(8)</CODE> command:
 
-<!-- HALF PAGE -->
-<H3><A NAME="QuotaPeriod">QuotaPeriod</A></H3>
-<HR>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername ...</KBD>
+</PRE>
+
+
+<H3 CLASS="title"><A NAME="QuotaPeriod">QuotaPeriod</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 QuotaPeriod 604800
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>QuotaPeriod</CODE> directive defines the value of the 
-<VAR>job-quota-period</VAR> attribute which can be set
-by the <CODE>lpadmin -o job-quota-period=</CODE> command.</P>
+<P>The <CODE>QuotaPeriod</CODE> directive defines the value of
+the  <VAR>job-quota-period</VAR> attribute. Typical values are
+86400 (1 day), 604800 (1 week), 2592000 (1 month), and 31536000
+(1 year). It is set using the <CODE>lpadmin(8)</CODE>
+command:</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -o job-quota-period=604800</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="State">State</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="State">State</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
+State idle
 State stopped
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>State</CODE> directive defines the initial value of the 
-<VAR>printer-state</VAR> attribute.  The strings <VAR>idle</VAR> and 
-<VAR>stopped</VAR> correspond to the IPP enumeration values.</P>
+<P>The <CODE>State</CODE> directive defines the initial value of
+the <VAR>printer-state</VAR> attribute. The strings
+<VAR>idle</VAR> and <VAR>stopped</VAR> correspond to the IPP
+enumeration values 3 and 5, respectively. The
+<CODE>cupsenable(8)</CODE> and <CODE>cupsdisable(8)</CODE>
+commands set the current state:</P>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
+<PRE CLASS="command">
+<KBD>/usr/sbin/cupsenable printername</KBD>
+<KBD>/usr/sbin/cupsdisable printername</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="StateMessage">StateMessage</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="StateMessage">StateMessage</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 StateMessage Ready to print.
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>StateMessage</CODE> directive defines the initial string for the 
-<VAR>printer-state-message</VAR> attribute.  
-The following are some example messages:</P>
+<P>The <CODE>StateMessage</CODE> directive defines the initial
+string for the  <VAR>printer-state-message</VAR> attribute. The
+following are some example messages:</P>
 
-<UL>
-<LI>Connected to <VAR>host_name</VAR>...
-<LI>Connecting to <VAR>printer_queue</VAR> on port <VAR>port_number</VAR>...
-<LI>Network host <VAR>host_name</VAR> is busy; will retry in 30 seconds...
-<LI>Printer busy; will retry in 10 seconds...
-<LI>Printer is busy; retrying print job...
-<LI>Print file accepted - job ID <VAR>id_number</VAR>.
-<LI>Ready to print.
-<LI>Waiting for job to complete
-</UL>
+<PRE CLASS="command">
+StateMessage Connected to host_name...
+StateMessage Connecting to printer_queue on port port_number...
+StateMessage Network host host_name is busy; will retry in 30 seconds...
+StateMessage Printer busy; will retry in 10 seconds...
+StateMessage Printer is busy; retrying print job...
+StateMessage Print file accepted - job ID id_number.
+StateMessage Ready to print.
+StateMessage Waiting for job to complete
+</PRE>
 
-<P>This directive must appear inside a <A HREF="#Printer"><CODE>Printer</CODE></A> 
-or <A HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.</P>
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
 
 </BODY>
 </HTML>
