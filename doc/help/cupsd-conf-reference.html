@@ -12,154 +12,83 @@ by its value. Comments are introduced using the number sign ("#")
 character at the beginning of a line.</P>
 
 <P>Since the server configuration file consists of plain text,
-you can use your favorite text editor to make changes to it.</P>
+you can use your favorite text editor to make changes to it.
+After making any changes, restart the <CODE>cupsd(8)</CODE>
+process using the startup script for your operating system:</P>
 
-<P>The <VAR>cupsd.conf</VAR> file contains many directives that
-determine how the server operates:</P>
+<UL>
 
-<P ALIGN="CENTER">
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
-<TR>
-<TD VALIGN="TOP">
+	<LI>AIX:
+	<PRE CLASS="command">
+/etc/init.d/cups restart
+	</PRE></LI>
 
-	<LI><A HREF="#AccessLog"><CODE>AccessLog</CODE></A>
-	<LI><A HREF="#Allow"><CODE>Allow</CODE></A>
-	<LI><A HREF="#AuthClass"><CODE>AuthClass</CODE></A>
-	<LI><A HREF="#AuthGroupName"><CODE>AuthGroupName</CODE></A>
-	<LI><A HREF="#AuthType"><CODE>AuthType</CODE></A>
-	<LI><A HREF="#AutoPurgeJobs"><CODE>AutoPurgeJobs</CODE></A>
-	<LI><A HREF="#BrowseAddress"><CODE>BrowseAddress</CODE></A>
-	<LI><A HREF="#BrowseAllow"><CODE>BrowseAllow</CODE></A>
-	<LI><A HREF="#BrowseDeny"><CODE>BrowseDeny</CODE></A>
-	<LI><A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A>
-	<LI><A HREF="#BrowseOrder"><CODE>BrowseOrder</CODE></A>
-	<LI><A HREF="#BrowsePoll"><CODE>BrowsePoll</CODE></A>
-	<LI><A HREF="#BrowsePort"><CODE>BrowsePort</CODE></A>
-	<LI><A HREF="#BrowseProtocols"><CODE>BrowseProtocols</CODE></A>
-	<LI><A HREF="#BrowseRelay"><CODE>BrowseRelay</CODE></A>
-	<LI><A HREF="#BrowseShortNames"><CODE>BrowseShortNames</CODE></A>
-	<LI><A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A>
-	<LI><A HREF="#Browsing"><CODE>Browsing</CODE></A>
-	<LI><A HREF="#Classification"><CODE>Classification</CODE></A>
-	<LI><A HREF="#ClassifyOverride"><CODE>ClassifyOverride</CODE></A>
-	<LI><A HREF="#ConfigFilePerm"><CODE>ConfigFilePerm</CODE></A>
-	<LI><A HREF="#DataDir"><CODE>DataDir</CODE></A>
-	<LI><A HREF="#DefaultCharset"><CODE>DefaultCharset</CODE></A>
-	<LI><A HREF="#DefaultLanguage"><CODE>DefaultLanguage</CODE></A>
-	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
-	<LI><A HREF="#Deny"><CODE>Deny</CODE></A>
-	<LI><A HREF="#DocumentRoot"><CODE>DocumentRoot</CODE></A>
+	<LI>HP-UX:
+	<PRE CLASS="command">
+/sbin/init.d/cups restart
+	</PRE></LI>
 
-</TD>
-<TD VALIGN="TOP">
-&nbsp;&nbsp;&nbsp;
-</TD>
-<TD VALIGN="TOP">
+	<LI>IRIX:
+	<PRE CLASS="command">
+/etc/init.d/cups restart
+	</PRE></LI>
 
-	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
-	<LI><A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
-	<LI><A HREF="#FileDevice"><CODE>FileDevice</CODE></A>
-	<LI><A HREF="#FilterLimit"><CODE>FilterLimit</CODE></A>
-	<LI><A HREF="#FontPath"><CODE>FontPath</CODE></A>
-	<LI><A HREF="#Group"><CODE>Group</CODE></A>
-	<LI><A HREF="#HideImplicitMembers"><CODE>HideImplicitMembers</CODE></A>
-	<LI><A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
-	<LI><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
-	<LI><A HREF="#ImplicitAnyClasses"><CODE>ImplicitAnyClasses</CODE></A>
-	<LI><A HREF="#Include"><CODE>Include</CODE></A>
-	<LI><A HREF="#KeepAliveTimeout"><CODE>KeepAliveTimeout</CODE></A>
-	<LI><A HREF="#KeepAlive"><CODE>KeepAlive</CODE></A>
-	<LI><A HREF="#Limit"><CODE>Limit</CODE></A>
-	<LI><A HREF="#LimitExcept"><CODE>LimitExcept</CODE></A>
-	<LI><A HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A>
-	<LI><A HREF="#Listen"><CODE>Listen</CODE></A>
-	<LI><A HREF="#Location"><CODE>Location</CODE></A>
-	<LI><A HREF="#LogFilePerm"><CODE>LogFilePerm</CODE></A>
-	<LI><A HREF="#LogLevel"><CODE>LogLevel</CODE></A>
-	<LI><A HREF="#MaxClients"><CODE>MaxClients</CODE></A>
-	<LI><A HREF="#MaxClientsPerHost"><CODE>MaxClientsPerHost</CODE></A>
-	<LI><A HREF="#MaxCopies"><CODE>MaxCopies</CODE></A>
-	<LI><A HREF="#MaxJobs"><CODE>MaxJobs</CODE></A>
-	<LI><A HREF="#MaxJobsPerPrinter"><CODE>MaxJobsPerPrinter</CODE></A>
-	<LI><A HREF="#MaxJobsPerUser"><CODE>MaxJobsPerUser</CODE></A>
-	<LI><A HREF="#MaxLogSize"><CODE>MaxLogSize</CODE></A>
-	<LI><A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A>
-	<LI><A HREF="#Order"><CODE>Order</CODE></A>
+	<LI>Linux:
+	<PRE CLASS="command">
+/etc/init.d/cups restart
+	</PRE></LI>
 
-</TD>
-<TD VALIGN="TOP">
-&nbsp;&nbsp;&nbsp;
-</TD>
-<TD VALIGN="TOP">
+	<LI>MacOS X:
+	<PRE CLASS="command">
+/System/Library/StartupItems/PrintingServices/PrintingServices restart
+	</PRE></LI>
 
-	<LI><A HREF="#PageLog"><CODE>PageLog</CODE></A>
-	<LI><A HREF="#Port"><CODE>Port</CODE></A>
-	<LI><A HREF="#PreserveJobFiles"><CODE>PreserveJobFiles</CODE></A>
-	<LI><A HREF="#PreserveJobHistory"><CODE>PreserveJobHistory</CODE></A>
-	<LI><A HREF="#Printcap"><CODE>Printcap</CODE></A>
-	<LI><A HREF="#PrintcapFormat"><CODE>PrintcapFormat</CODE></A>
-	<LI><A HREF="#RemoteRoot"><CODE>RemoteRoot</CODE></A>
-	<LI><A HREF="#RequestRoot"><CODE>RequestRoot</CODE></A>
-	<LI><A HREF="#Require"><CODE>Require</CODE></A>
-	<LI><A HREF="#RIPCache"><CODE>RIPCache</CODE></A>
-	<LI><A HREF="#RunAsUser"><CODE>RunAsUser</CODE></A>
-	<LI><A HREF="#Satisfy"><CODE>Satisfy</CODE></A>
-	<LI><A HREF="#ServerAdmin"><CODE>ServerAdmin</CODE></A>
-	<LI><A HREF="#ServerBin"><CODE>ServerBin</CODE></A>
-	<LI><A HREF="#ServerCertificate"><CODE>ServerCertificate</CODE></A>
-	<LI><A HREF="#ServerKey"><CODE>ServerKey</CODE></A>
-	<LI><A HREF="#ServerName"><CODE>ServerName</CODE></A>
-	<LI><A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A>
-	<LI><A HREF="#SSLListen"><CODE>SSLListen</CODE></A>
-	<LI><A HREF="#SSLPort"><CODE>SSLPort</CODE></A>
-	<LI><A HREF="#SystemGroup"><CODE>SystemGroup</CODE></A>
-	<LI><A HREF="#TempDir"><CODE>TempDir</CODE></A>
-	<LI><A HREF="#Timeout"><CODE>Timeout</CODE></A>
-	<LI><A HREF="#User"><CODE>User</CODE></A>
+	<LI>Solaris:
+	<PRE CLASS="command">
+/etc/init.d/cups restart
+	</PRE></LI>
 
-</TD>
-</TR>
-</TABLE>
-</P>
+</UL>
+
+<P>You can also edit this file from the CUPS web interface, which
+automatically handles restarting the scheduler.</P>
 
 
-<!-- HALF PAGE -->
-<H3><A NAME="AccessLog">AccessLog</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="AccessLog">AccessLog</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 AccessLog /var/log/cups/access_log
 AccessLog /var/log/cups/access_log-%s
 AccessLog syslog
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>AccessLog</CODE> directive sets the name of the access log
-file. If the filename is not absolute then it is assumed to be relative
-to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-access log file is stored in "common log format" and can be used by any
-web access reporting tool to generate a report on CUPS server activity.
+<P>The <CODE>AccessLog</CODE> directive sets the name of the
+access log file. If the filename is not absolute then it is
+assumed to be relative to the <A
+HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
+access log file is stored in "common log format" and can be used
+by any web access reporting tool to generate a report on CUPS
+server activity.</P>
 
 <P>The server name can be included in the filename by using
-<CODE>%s</CODE> in the name.
+<CODE>%s</CODE> in the name.</P>
 
-<P>The special name "syslog" can be used to send the access information
-to the system log instead of a plain file.
+<P>The special name "syslog" can be used to send the access
+information to the system log instead of a plain file.</P>
 
-<P>The default access log file is <VAR>/var/log/cups/access_log</VAR>.
+<P>The default access log file is
+<VAR>/var/log/cups/access_log</VAR>.</P>
 
 
-<!-- HALF PAGE -->
-<!-- NEED 8in -->
-<H3><A NAME="Allow">Allow</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="Allow">Allow</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Allow from All
 Allow from None
 Allow from *.domain.com
@@ -171,9 +100,10 @@ Allow from nnn.nnn.nnn.*
 Allow from nnn.nnn.nnn.nnn
 Allow from nnn.nnn.nnn.nnn/mm
 Allow from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+Allow from xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
 Allow from @LOCAL
 Allow from @IF(name)
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
@@ -183,7 +113,7 @@ directives are cummulative, so multiple <CODE>Allow</CODE> directives
 can be used to allow access for multiple hosts or networks.  The
 <CODE>/mm</CODE> notation specifies a CIDR netmask:</P>
 
-<CENTER><TABLE BORDER="1">
+<DIV CLASS="table"><TABLE>
 <TR>
 	<TH WIDTH="10%">mm</TH>
 	<TH WIDTH="20%">netmask</TH>
@@ -214,175 +144,184 @@ can be used to allow access for multiple hosts or networks.  The
 	<TD ALIGN="CENTER">32</TD>
 	<TD ALIGN="CENTER">255.255.255.255</TD>
 </TR>
-</TABLE></CENTER>
+</TABLE></DIV>
 
 <P>The <CODE>@LOCAL</CODE> name will allow access from all local
 interfaces. The <CODE>@IF(name)</CODE> name will allow access
-from the named interface.
+from the named interface.</P>
 
-<P>The <CODE>Allow</CODE> directive must appear inside a
-<A HREF="#Location"><CODE>Location</CODE></A> directive.
+<P>The <CODE>Allow</CODE> directive must appear inside a <A
+HREF="#Location"><CODE>Location</CODE></A> directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="AuthClass">AuthClass</A></H3>
-<HR>
+
+<H3 CLASS="title"><SPAN CLASS="info">Deprecated</SPAN><A NAME="AuthClass">AuthClass</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 AuthClass Anonymous
 AuthClass User
 AuthClass System
 AuthClass Group
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>AuthClass</CODE> directive defines what level of authentication
-is required:
+<P>The <CODE>AuthClass</CODE> directive defines what level of
+authentication is required:</P>
 
 <UL>
 
-	<LI><CODE>Anonymous</CODE> - No authentication should be performed
-	(default.)
+	<LI><CODE>Anonymous</CODE> - No authentication should be
+	performed (default)</LI>
 
-	<LI><CODE>User</CODE> - A valid username and password is required.
+	<LI><CODE>User</CODE> - A valid username and password is
+	required</LI>
 
-	<LI><CODE>System</CODE> - A valid username and password is
-	required, and the username must belong to the "sys" group; this
-	can be changed using the
-	<A HREF="#SystemGroup"><CODE>SystemGroup</CODE></A> directive.
+	<LI><CODE>System</CODE> - A valid username and password
+	is required, and the username must belong to the "sys"
+	group; this can be changed using the <A
+	HREF="#SystemGroup"><CODE>SystemGroup</CODE></A>
+	directive</LI>
 
 	<LI><CODE>Group</CODE> - A valid username and password is
-	required, and the username must belong to the group named by
-	the <A HREF="#AuthGroupName"><CODE>AuthGroupName</CODE></A> directive.
+	required, and the username must belong to the group named
+	by the <A
+	HREF="#AuthGroupName"><CODE>AuthGroupName</CODE></A>
+	directive</LI>
 
 </UL>
 
-<P>The <CODE>AuthClass</CODE> directive must appear inside a
-<A HREF="#Location"><CODE>Location</CODE></A> directive.
+<P>The <CODE>AuthClass</CODE> directive must appear inside a <A
+HREF="#Location"><CODE>Location</CODE></A> directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="AuthGroupName">AuthGroupName</A></H3>
-<HR>
+<P><B>This directive is deprecated and will be removed from a
+future release of CUPS.</B> Consider using the more flexible <A
+HREF="#Require"><CODE>Require</CODE></A> directive instead.</P>
+
+
+<H3 CLASS="title"><SPAN CLASS="info">Deprecated</SPAN><A NAME="AuthGroupName">AuthGroupName</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 AuthGroupName mygroup
 AuthGroupName lp
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>AuthGroupName</CODE> directive sets the group to use for
-<CODE>Group</CODE> authentication.
+<P>The <CODE>AuthGroupName</CODE> directive sets the group to use
+for <CODE>Group</CODE> authentication.</P>
 
 <P>The <CODE>AuthGroupName</CODE> directive must appear inside a
-<A HREF="#Location"><CODE>Location</CODE></A> directive.
+<A HREF="#Location"><CODE>Location</CODE></A> directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="AuthType">AuthType</A></H3>
-<HR>
+<P><B>This directive is deprecated and will be removed from a
+future release of CUPS.</B> Consider using the more flexible <A
+HREF="#Require"><CODE>Require</CODE></A> directive instead.</P>
+
+
+<H3 CLASS="title"><A NAME="AuthType">AuthType</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 AuthType None
 AuthType Basic
 AuthType Digest
-</PRE></UL>
+AuthType BasicDigest
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>AuthType</CODE> directive defines the type of authentication to
-perform:
+<P>The <CODE>AuthType</CODE> directive defines the type of
+authentication to perform:</P>
 
 <UL>
 
-	<LI><CODE>None</CODE> - No authentication should be performed
-	(default.)
+	<LI><CODE>None</CODE> - No authentication should be
+	performed (default)</LI>
 
 	<LI><CODE>Basic</CODE> - Basic authentication should be
-	performed using the UNIX password and group files.
+	performed using the UNIX password and group files</LI>
 
 	<LI><CODE>Digest</CODE> - Digest authentication should be
-	performed using the <VAR>/etc/cups/passwd.md5</VAR> file.
+	performed using the <VAR>/etc/cups/passwd.md5</VAR>
+	file</LI>
+
+	<LI><CODE>BasicDigest</CODE> - Basic authentication
+	should be performed using the
+	<VAR>/etc/cups/passwd.md5</VAR> file</LI>
 
 </UL>
 
-<P>When using <CODE>Basic</CODE> or <CODE>Digest</CODE> authentication,
-clients connecting through the <CODE>localhost</CODE> interface can also
-authenticate using <A HREF="#CERTIFICATES">certificates</A>.
+<P>When using <CODE>Basic</CODE>, <CODE>Digest</CODE>, or
+<CODE>BasicDigest</CODE> authentication, clients connecting
+through the <CODE>localhost</CODE> interface can also
+authenticate using certificates.</P>
 
-<P>The <CODE>AuthType</CODE> directive must appear inside a
-<A HREF="#Location"><CODE>Location</CODE></A> directive.
+<P>The <CODE>AuthType</CODE> directive must appear inside a <A
+HREF="#Location"><CODE>Location</CODE></A> directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="AutoPurgeJobs">AutoPurgeJobs</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="AutoPurgeJobs">AutoPurgeJobs</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 AutoPurgeJobs Yes
 AutoPurgeJobs No
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>AutoPurgeJobs</CODE> directive specifies whether or not to purge
-completed jobs once they are no longer required for quotas. This option has
-no effect if quotas are not enabled. The default setting is <CODE>No</CODE>.
+<P>The <CODE>AutoPurgeJobs</CODE> directive specifies whether or
+not to purge completed jobs once they are no longer required for
+quotas. This option has no effect if quotas are not enabled. The
+default setting is <CODE>No</CODE>.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowseAddress">BrowseAddress</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="BrowseAddress">BrowseAddress</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowseAddress 255.255.255.255:631
 BrowseAddress 192.0.2.255:631
 BrowseAddress host.domain.com:631
 BrowseAddress @LOCAL
 BrowseAddress @IF(name)
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>BrowseAddress</CODE> directive specifies an address to
-send browsing information to. Multiple <CODE>BrowseAddress</CODE>
-directives can be specified to send browsing information to different
-networks or systems.
+<P>The <CODE>BrowseAddress</CODE> directive specifies an address
+to send browsing information to. Multiple
+<CODE>BrowseAddress</CODE> directives can be specified to send
+browsing information to different networks or systems.</P>
 
 <P>The <CODE>@LOCAL</CODE> name will broadcast printer
 information to all local interfaces. The <CODE>@IF(name)</CODE>
-name will broadcast to the named interface.
+name will broadcast to the named interface.</P>
 
-<P>The default address is <CODE>255.255.255.255:631</CODE> which will
-broadcast the information to all networks the server is connected to.</P>
+<P>There is no default browse address.</P>
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD>
-	<B>Note:</B>
+<BLOCKQUOTE><B>Note:</B>
 
-	<P>If you are using HP-UX 10.20 and a subnet that is not 24,
-	16, or 8 bits, printer browsing (and in fact all broadcast
-	reception) will not work. This problem appears to be fixed in
-	HP-UX 11.0.
-	</TD>
-</TR>
-</TABLE></CENTER>
+<P>If you are using HP-UX 10.20 and a subnet that is not 24,
+16, or 8 bits, printer browsing (and in fact all broadcast
+reception) will not work. This problem appears to be fixed in
+HP-UX 11.0.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowseAllow">BrowseAllow</A></H3>
-<HR>
+</BLOCKQUOTE>
+
+
+<H3 CLASS="title"><A NAME="BrowseAllow">BrowseAllow</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowseAllow from all
 BrowseAllow from none
 BrowseAllow from 192.0.2
@@ -391,32 +330,33 @@ BrowseAllow from 192.0.2.0/255.255.255.0
 BrowseAllow from *.domain.com
 BrowseAllow from @LOCAL
 BrowseAllow from @IF(name)
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>BrowseAllow</CODE> directive specifies a system or network
-to accept browse packets from. The default is to accept browse packets
-from all hosts.
+<P>The <CODE>BrowseAllow</CODE> directive specifies a system or
+network to accept browse packets from. The default is to accept
+browse packets from all hosts.</P>
 
-<P>Host and domain name matching require that you enable the
-<A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A> directive.
+<P>Host and domain name matching require that you enable the <A
+HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
+directive.</P>
 
-<P>IP address matching supports exact matches, partial addresses that
-match networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0,
-or network addresses using the specified netmask or bit count.
+<P>IP address matching supports exact matches, partial addresses
+that match networks using netmasks of 255.0.0.0, 255.255.0.0, and
+255.255.255.0, or network addresses using the specified netmask
+or bit count.</P>
 
 <P>The <CODE>@LOCAL</CODE> name will allow browse data from all
 local interfaces. The <CODE>@IF(name)</CODE> name will allow
-browse data from the named interface.
+browse data from the named interface.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowseDeny">BrowseDeny</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="BrowseDeny">BrowseDeny</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowseDeny from all
 BrowseDeny from none
 BrowseDeny from 192.0.2
@@ -425,382 +365,376 @@ BrowseDeny from 192.0.2.0/255.255.255.0
 BrowseDeny from *.domain.com
 BrowseDeny from @LOCAL
 BrowseDeny from @IF(name)
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>BrowseDeny</CODE> directive specifies a system or network
-to reject browse packets from. The default is to deny browse packets
-from no hosts.
+<P>The <CODE>BrowseDeny</CODE> directive specifies a system or
+network to reject browse packets from. The default is to not deny
+browse packets from any hosts.</P>
 
-<P>Host and domain name matching require that you enable the
-<A HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A> directive.
+<P>Host and domain name matching require that you enable the <A
+HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
+directive.</P>
 
-<P>IP address matching supports exact matches, partial addresses that
-match networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0,
-or network addresses using the specified netmask or bit count.
+<P>IP address matching supports exact matches, partial addresses
+that match networks using netmasks of 255.0.0.0, 255.255.0.0, and
+255.255.255.0, or network addresses using the specified netmask
+or bit count.</P>
 
 <P>The <CODE>@LOCAL</CODE> name will block browse data from all
 local interfaces. The <CODE>@IF(name)</CODE> name will block
-browse data from the named interface.
+browse data from the named interface.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowseOrder">BrowseOrder</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="BrowseOrder">BrowseOrder</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowseOrder allow,deny
 BrowseOrder deny,allow
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>BrowseOrder</CODE> directive specifies the order of allow/deny
-processing. The default order is <CODE>deny,allow</CODE>:
+<P>The <CODE>BrowseOrder</CODE> directive specifies the order of
+allow/deny processing. The default order is
+<CODE>deny,allow</CODE>:</P>
 
 <UL>
 
-	<LI><CODE>allow,deny</CODE> - Browse packets are accepted unless
-	specifically denied.
+	<LI><CODE>allow,deny</CODE> - Deny browse packets by
+	default, then check <CODE>BrowseAllow</CODE> lines
+	followed by <CODE>BrowseDeny</CODE> lines.</LI>
 
-	<LI><CODE>deny,allow</CODE> - Browse packets are rejected unless
-	specifically allowed.
+	<LI><CODE>deny,allow</CODE> - Allow browse packets by
+	default, then check <CODE>BrowseDeny</CODE> lines
+	followed by <CODE>BrowseAllow</CODE> lines.</LI>
 
 </UL>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowseInterval">BrowseInterval</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="BrowseInterval">BrowseInterval</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowseInterval 0
 BrowseInterval 30
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>BrowseInterval</CODE> directive specifies the maximum amount of
-time between browsing updates. Specifying a value of 0 seconds disables
-outgoing browse updates but allows a server to receive printer information
-from other hosts.
+<P>The <CODE>BrowseInterval</CODE> directive specifies the
+maximum amount of time between browsing updates. Specifying a
+value of 0 seconds disables outgoing browse updates but allows a
+server to receive printer information from other hosts.</P>
 
-<P>The <CODE>BrowseInterval</CODE> value should always be less than the
-<A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A> value. Otherwise
-printers and classes will disappear from client systems between updates.
+<P>The <CODE>BrowseInterval</CODE> value should always be less
+than the <A HREF="#BrowseTimeout"><CODE>BrowseTimeout</CODE></A>
+value. Otherwise printers and classes will disappear from client
+systems between updates.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowsePoll">BrowsePoll</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="BrowsePoll">BrowsePoll</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowsePoll 192.0.2.2:631
 BrowsePoll host.domain.com:631
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>BrowsePoll</CODE> directive polls a server for available
-printers once every
-<A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> seconds.
-Multiple <CODE>BrowsePoll</CODE> directives can be specified to poll
-multiple servers.
+<P>The <CODE>BrowsePoll</CODE> directive polls a server for
+available printers once every <A
+HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> seconds.
+Multiple <CODE>BrowsePoll</CODE> directives can be specified to
+poll multiple servers.</P>
 
-<P>If <CODE>BrowseInterval</CODE> is set to 0 then the server is polled
-once every 30 seconds.
+<P>If <CODE>BrowseInterval</CODE> is set to 0 then the server is
+polled once every 30 seconds.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowsePort">BrowsePort</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="BrowsePort">BrowsePort</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowsePort 631
 BrowsePort 9999
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>BrowsePort</CODE> directive specifies the UDP port number
 used for browse packets. The default port number is 631.</P>
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD>
-	<B>Note:</B>
+<BLOCKQUOTE><B>Note:</B>
 
-	<P>You must set the <CODE>BrowsePort</CODE> to the same value
-	on all of the systems that you want to see.
-	</TD>
-</TR>
-</TABLE></CENTER>
+<P>You must set the <CODE>BrowsePort</CODE> to the same value
+on all of the systems that you want to see.
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowseProtocols">BrowseProtocols</A></H3>
-<HR>
+</BLOCKQUOTE>
+
+
+<H3 CLASS="title"><A NAME="BrowseProtocols">BrowseProtocols</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowseProtocols CUPS
 BrowseProtocols SLP
 BrowseProtocols CUPS SLP
 BrowseProtocols all
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>BrowseProtocols</CODE> directive specifies the protocols to
-use when collecting and distributing shared printers on the local network.
-The default protocol is <CODE>CUPS</CODE>, which is a broadcast-based
-protocol.</P>
+<P>The <CODE>BrowseProtocols</CODE> directive specifies the
+protocols to use when collecting and distributing shared printers
+on the local network. The default protocol is <CODE>CUPS</CODE>,
+which is a broadcast-based protocol.</P>
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD>
-	<B>Note:</B>
+<BLOCKQUOTE><B>Note:</B>
 
-	<P>When using the <CODE>SLP</CODE> protocol, you must have at least
-	one Directory Agent (DA) server on your network. Otherwise the
-	CUPS scheduler (<CODE>cupsd</CODE>) will not respond to client
-	requests for several seconds while polling the network.
-	</TD>
-</TR>
-</TABLE></CENTER>
+<P>When using the <CODE>SLP</CODE> protocol, you must have at least
+one Directory Agent (DA) server on your network. Otherwise the
+CUPS scheduler (<CODE>cupsd</CODE>) will not respond to client
+requests for several seconds while polling the network.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowseRelay">BrowseRelay</A></H3>
-<HR>
+</BLOCKQUOTE>
+
+
+<H3 CLASS="title"><A NAME="BrowseRelay">BrowseRelay</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowseRelay 193.0.2.1 192.0.2.255
 BrowseRelay 193.0.2.0/255.255.255.0 192.0.2.255
 BrowseRelay 193.0.2.0/24 192.0.2.255
 BrowseRelay *.domain.com 192.0.2.255
 BrowseRelay host.domain.com 192.0.2.255
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>BrowseRelay</CODE> directive specifies source and destination
-addresses for relaying browsing information from one host or network to
-another. Multiple <CODE>BrowseRelay</CODE> directives can be specified
-as needed.
+<P>The <CODE>BrowseRelay</CODE> directive specifies source and
+destination addresses for relaying browsing information from one
+host or network to another. Multiple <CODE>BrowseRelay</CODE>
+directives can be specified as needed.</P>
 
-<P><CODE>BrowseRelay</CODE> is typically used on systems that bridge
-multiple subnets using one or more network interfaces. It can also be
-used to relay printer information from polled servers with the line:
+<P><CODE>BrowseRelay</CODE> is typically used on systems that
+bridge multiple subnets using one or more network interfaces. It
+can also be used to relay printer information from polled servers
+with the line:</P>
 
-<UL><PRE>
-BrowseRelay 127.0.0.1 255.255.255.255
-</PRE></UL>
+<PRE CLASS="command">
+BrowseRelay 127.0.0.1 @LOCAL
+</PRE>
 
-<P>This effectively provides access to printers on a WAN for all clients
-on the LAN(s).
+<P>This effectively provides access to printers on a WAN for all
+clients on the LAN(s).</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowseShortNames">BrowseShortNames</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="BrowseShortNames">BrowseShortNames</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowseShortNames Yes
 BrowseShortNames No
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>BrowseShortNames</CODE> directive specifies whether or not
-short names are used for remote printers when possible. Short names are
-just the remote printer name, without the server ("printer"). If more than
-one remote printer is detected with the same name, the printers will have
-long names ("printer@server1", "printer@server2".)
+<P>The <CODE>BrowseShortNames</CODE> directive specifies whether
+or not short names are used for remote printers when possible.
+Short names are just the remote printer name, without the server
+("printer"). If more than one remote printer is detected with the
+same name, the printers will have long names ("printer@server1",
+"printer@server2".)</P>
 
-<P>The default value for this option is <CODE>Yes</CODE>.
+<P>The default value for this option is <CODE>Yes</CODE>.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="BrowseTimeout">BrowseTimeout</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="BrowseTimeout">BrowseTimeout</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 BrowseTimeout 300
 BrowseTimeout 60
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>BrowseTimeout</CODE> directive sets the timeout for
-printer or class information that is received in browse packets. Once a
-printer or class times out it is removed from the list of available
-destinations.
+printer or class information that is received in browse packets.
+Once a printer or class times out it is removed from the list of
+available destinations.</P>
 
-<P>The <CODE>BrowseTimeout</CODE> value should always be greater than the
-<A HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> value. Otherwise
-printers and classes will disappear from client systems between updates.
+<P>The <CODE>BrowseTimeout</CODE> value should always be greater
+than the <A
+HREF="#BrowseInterval"><CODE>BrowseInterval</CODE></A> value.
+Otherwise printers and classes will disappear from client systems
+between updates.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Browsing">Browsing</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Browsing">Browsing</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Browsing On
 Browsing Off
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Browsing</CODE> directive controls whether or not network printer
-browsing is enabled. The default setting is <CODE>On</CODE>.</P>
+<P>The <CODE>Browsing</CODE> directive controls whether or not
+network printer browsing is enabled. The default setting is
+<CODE>On</CODE>.</P>
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD>
-	<B>Note:</B>
+<P>This directive does not enable sharing of local printers by
+itself; you must also use the <A
+HREF="#BrowseAddress"><CODE>BrowseAddress</CODE></A> or <A
+HREF="#BrowseProtocols"><CODE>BrowseProtocols</CODE></A>
+directives to advertise local printers to other systems.</P>
 
-	<P>If you are using HP-UX 10.20 and a subnet that is not 24,
-	16, or 8 bits, printer browsing (and in fact all broadcast
-	reception) will not work. This problem appears to be fixed in
-	HP-UX 11.0.
-	</TD>
-</TR>
-</TABLE></CENTER>
+<BLOCKQUOTE><B>Note:</B>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Classification">Classification</A></H3>
-<HR>
+<P>If you are using HP-UX 10.20 and a subnet that is not 24,
+16, or 8 bits, printer browsing (and in fact all broadcast
+reception) will not work. This problem appears to be fixed in
+HP-UX 11.0.</P>
+
+</BLOCKQUOTE>
+
+
+<H3 CLASS="title"><A NAME="Classification">Classification</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Classification
 Classification classified
 Classification confidential
 Classification secret
 Classification topsecret
 Classification unclassified
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Classification</CODE> directive sets the classification level
-on the server. When this option is set, at least one of the banner pages
-is forced to the classification level, and the classification is placed
-on each page of output. The default is no classification level.
+<P>The <CODE>Classification</CODE> directive sets the
+classification level on the server. When this option is set, at
+least one of the banner pages is forced to the classification
+level, and the classification is placed on each page of output.
+The default is no classification level.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassifyOverride">ClassifyOverride</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ClassifyOverride">ClassifyOverride</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ClassifyOverride Yes
 ClassifyOverride No
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>ClassifyOverride</CODE> directive specifies whether users
-can override the default classification level on the server. When the
-server classification is set, users can change the classification using
-the <CODE>job-sheets</CODE> option and can choose to only print one
-security banner before or after the job. If the <CODE>job-sheets</CODE>
-option is set to <CODE>none</CODE> then the server default classification
-is used.
+<P>The <CODE>ClassifyOverride</CODE> directive specifies whether
+users can override the default classification level on the
+server. When the server classification is set, users can change
+the classification using the <CODE>job-sheets</CODE> option and
+can choose to only print one security banner before or after the
+job. If the <CODE>job-sheets</CODE> option is set to
+<CODE>none</CODE> then the server default classification is
+used.</P>
 
-<P>The default is to not allow classification overrides.
+<P>The default is to not allow classification overrides.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ConfigFilePerm">ConfigFilePerm</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ConfigFilePerm">ConfigFilePerm</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ConfigFilePerm 0644
 ConfigFilePerm 0600
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>ConfigFilePerm</CODE> directive specifies the permissions
-to use when writing configuration files. The default is 0600.
+<P>The <CODE>ConfigFilePerm</CODE> directive specifies the
+permissions to use when writing configuration files. The default
+is 0600.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="DataDir">DataDir</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="DataDir">DataDir</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 DataDir /usr/share/cups
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>DataDir</CODE> directive sets the directory to use for data files.
+<P>The <CODE>DataDir</CODE> directive sets the directory to use
+for data files.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="DefaultCharset">DefaultCharset</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="DefaultCharset">DefaultCharset</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 DefaultCharset utf-8
 DefaultCharset iso-8859-1
 DefaultCharset windows-1251
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>DefaultCharset</CODE> directive sets the default character set
-to use for client connections. The default character set is
-<CODE>utf-8</CODE> but is overridden by the character set for the language
-specified by the client or the <CODE>DefaultLanguage</CODE> directive.
+<P>The <CODE>DefaultCharset</CODE> directive sets the default
+character set to use for client connections. The default
+character set is <CODE>utf-8</CODE> but is overridden by the
+character set for the language specified by the client or the
+<CODE>DefaultLanguage</CODE> directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="DefaultLanguage">DefaultLanguage</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="DefaultLanguage">DefaultLanguage</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 DefaultLanguage de
 DefaultLanguage en
 DefaultLanguage es
 DefaultLanguage fr
 DefaultLanguage it
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>DefaultLanguage</CODE> directive specifies the default language
-to use for client connections. Setting the default language also sets the
-default character set if a language localization file exists for it.  The
-default language is "en" for English.
+<P>The <CODE>DefaultLanguage</CODE> directive specifies the
+default language to use for client connections. Setting the
+default language also sets the default character set if a
+language localization file exists for it. The default language
+is "en" for English.</P>
 
-<!-- HALF PAGE -->
-<!-- NEED 8in -->
-<H3><A NAME="Deny">Deny</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Deny">Deny</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Deny from All
 Deny from None
 Deny from *.domain.com
@@ -812,19 +746,21 @@ Deny from nnn.nnn.nnn.*
 Deny from nnn.nnn.nnn.nnn
 Deny from nnn.nnn.nnn.nnn/mm
 Deny from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+Deny from xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
 Deny from @LOCAL
 Deny from @IF(name)
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Deny</CODE> directive specifies a hostname, IP address, or
-network that is allowed access to the server. <CODE>Deny</CODE>
-directives are cummulative, so multiple <CODE>Deny</CODE> directives
-can be used to allow access for multiple hosts or networks. The
-<CODE>/mm</CODE> notation specifies a CIDR netmask:</P>
+<P>The <CODE>Deny</CODE> directive specifies a hostname, IP
+address, or network that is allowed access to the server.
+<CODE>Deny</CODE> directives are cummulative, so multiple
+<CODE>Deny</CODE> directives can be used to allow access for
+multiple hosts or networks. The <CODE>/mm</CODE> notation
+specifies a CIDR netmask:</P>
 
-<CENTER><TABLE BORDER="1">
+<DIV CLASS="table"><TABLE>
 <TR>
 	<TH WIDTH="10%">mm</TH>
 	<TH WIDTH="20%">netmask</TH>
@@ -855,262 +791,248 @@ can be used to allow access for multiple hosts or networks. The
 	<TD ALIGN="CENTER">32</TD>
 	<TD ALIGN="CENTER">255.255.255.255</TD>
 </TR>
-</TABLE></CENTER>
+</TABLE></DIV>
 
 <P>The <CODE>@LOCAL</CODE> name will deny access from all local
-interfaces. The <CODE>@IF(name)</CODE> name will deny access
-from the named interface.
+interfaces. The <CODE>@IF(name)</CODE> name will deny access from
+the named interface.</P>
 
-<P>The <CODE>Deny</CODE> directive must appear inside a
-<A HREF="#Location"><CODE>Location</CODE></A> directive.
+<P>The <CODE>Deny</CODE> directive must appear inside a <A
+HREF="#Location"><CODE>Location</CODE></A> directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="DocumentRoot">DocumentRoot</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="DocumentRoot">DocumentRoot</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 DocumentRoot /usr/share/doc/cups
 DocumentRoot /foo/bar/doc/cups
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>DocumentRoot</CODE> directive specifies the location of
-web content for the HTTP server in CUPS. If an absolute path is not
-specified then it is assumed to be relative to the
-<A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default directory is <VAR>/usr/share/doc/cups</VAR>.
+<P>The <CODE>DocumentRoot</CODE> directive specifies the location
+of web content for the HTTP server in CUPS. If an absolute path
+is not specified then it is assumed to be relative to the <A
+HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
+default directory is <VAR>/usr/share/doc/cups</VAR>.</P>
 
-<P>Documents are first looked up in a sub-directory for the primary
-language requested by the client (e.g. <VAR>/usr/share/doc/cups/fr/...</VAR>)
-and then directly under the <CODE>DocumentRoot</CODE> directory
-(e.g. <VAR>/usr/share/doc/cups/...</VAR>), so it is possible to localize
-the web content by providing subdirectories for each language needed.
+<P>Documents are first looked up in a sub-directory for the
+primary language requested by the client (e.g.
+<VAR>/usr/share/doc/cups/fr/...</VAR>) and then directly under
+the <CODE>DocumentRoot</CODE> directory (e.g.
+<VAR>/usr/share/doc/cups/...</VAR>), so it is possible to
+localize the web content by providing subdirectories for each
+language needed.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Encryption">Encryption</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Encryption">Encryption</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Encryption Never
 Encryption IfRequested
 Encryption Required
-Encryption Always
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Encryption</CODE> directive must appear instead a
-<A HREF="#Location"><CODE>Location</CODE></A>
-section and specifies the encryption settings for that location.
-The default setting is <CODE>IfRequested</CODE> for all locations.
+<P>The <CODE>Encryption</CODE> directive must appear instead a <A
+HREF="#Location"><CODE>Location</CODE></A> section and specifies
+the encryption settings for that location. The default setting is
+<CODE>IfRequested</CODE> for all locations.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ErrorLog">ErrorLog</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ErrorLog">ErrorLog</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ErrorLog /var/log/cups/error_log
 ErrorLog /var/log/cups/error_log-%s
 ErrorLog syslog
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>ErrorLog</CODE> directive sets the name of the error log
-file. If the filename is not absolute then it is assumed to be relative
-to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default error log file is <VAR>/var/log/cups/error_log</VAR>.
+<P>The <CODE>ErrorLog</CODE> directive sets the name of the error
+log file. If the filename is not absolute then it is assumed to
+be relative to the <A
+HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
+default error log file is <VAR>/var/log/cups/error_log</VAR>.</P>
 
 <P>The server name can be included in the filename by using
-<CODE>%s</CODE> in the name.
+<CODE>%s</CODE> in the name.</P>
 
-<P>The special name "syslog" can be used to send the error information
-to the system log instead of a plain file.
+<P>The special name "syslog" can be used to send the error
+information to the system log instead of a plain file.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="FileDevice">FileDevice</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="FileDevice">FileDevice</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 FileDevice Yes
 FileDevice No
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>FileDevice</CODE> directive determines whether the
-scheduler allows new printers to be added using device URIs of the
-form <CODE>file:/filename</CODE>. File devices are most often used
-to test new printer drivers and do no support raw file printing.
+scheduler allows new printers to be added using device URIs of
+the form <CODE>file:/filename</CODE>. File devices are most often
+used to test new printer drivers and do not support raw file
+printing.</P>
 
-<P>The default setting is <CODE>No</CODE>.
+<P>The default setting is <CODE>No</CODE>.</P>
 
-<CENTER><TABLE WIDTH="80%" BGCOLOR="#cccccc" CELLPADDING="5" BORDER="1">
-<TR>
-        <TD>
+<BLOCKQUOTE><B>Note:</B>
 
-        <B>Note:</B>
+<P>File devices are managed by the scheduler. Since the
+scheduler normally runs as the root user, file devices
+can be used to overwrite system files and potentially
+gain unauthorized access to the system. If you must
+create printers using file devices, we recommend that
+you set the <CODE>FileDevice</CODE> directive to
+<CODE>Yes</CODE> for only as long as you need to add the
+printers to the system, and then reset the directive to
+<CODE>No</CODE>.</P>
 
-        <P>File devices are managed by the scheduler. Since the
-        scheduler normally runs as the root user, file devices
-        can be used to overwrite system files and potentially
-        gain unauthorized access to the system. If you must
-        create printers using file devices, we recommend that
-        you set the <CODE>FileDevice</CODE> directive to
-        <CODE>Yes</CODE> for only as long as you need to add the
-        printers to the system, and then reset the directive to
-        <CODE>No</CODE>.
+</BLOCKQUOTE>
 
-        </TD>
-</TR>
-</TABLE></CENTER>
 
-<!-- HALF PAGE -->
-<H3><A NAME="FilterLimit">FilterLimit</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="FilterLimit">FilterLimit</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 FilterLimit 0
 FilterLimit 200
 FilterLimit 1000
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>FilterLimit</CODE> directive sets the maximum cost
-of all running job filters. It can be used to limit the number
-of filter programs that are run on a server to minimize disk,
+of all running job filters. It can be used to limit the number of
+filter programs that are run on a server to minimize disk,
 memory, and CPU resource problems. A limit of 0 disables filter
-limiting.
+limiting.</P>
 
 <P>An average print to a non-PostScript printer needs a filter
 limit of about 200. A PostScript printer needs about half that
 (100). Setting the limit below these thresholds will effectively
-limit the scheduler to printing a single job at any time.
+limit the scheduler to printing a single job at any time.</P>
 
-<P>The default limit is 0.
+<P>The default limit is 0.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="FontPath">FontPath</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="FontPath">FontPath</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 FontPath /foo/bar/fonts
 FontPath /usr/share/cups/fonts:/foo/bar/fonts
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>FontPath</CODE> directive specifies the font path to use when
-searching for fonts. The default font path is
-<CODE>/usr/share/cups/fonts</CODE>.
+<P>The <CODE>FontPath</CODE> directive specifies the font path to
+use when searching for fonts. The default font path is
+<CODE>/usr/share/cups/fonts</CODE>.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Group">Group</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Group">Group</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
-Group sys
-Group system
-Group root
-</PRE></UL>
+<PRE CLASS="command">
+Group nobody
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Group</CODE> directive specifies the UNIX group that
-filter and CGI programs run as. The default group is <CODE>sys</CODE>,
-<CODE>system</CODE>, or <CODE>root</CODE> depending on the operating system.
+filter and CGI programs run as. The default group is
+<CODE>nobody</CODE>.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="HideImplicitMembers">HideImplicitMembers</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="HideImplicitMembers">HideImplicitMembers</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 HideImplicitMembers Yes
 HideImplicitMembers No
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>HideImplicitMembers</CODE> directive controls
-whether the individual printers in an implicit class are shown
-to the user. The default is <CODE>No</CODE>.</P>
+whether the individual printers in an implicit class are hidden
+from the user. The default is <CODE>Yes</CODE>.</P>
 
 <P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
-must be enabled for this directive to have any effect.
+must be enabled for this directive to have any effect.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="HostNameLookups">HostNameLookups</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="HostNameLookups">HostNameLookups</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 HostNameLookups On
 HostNameLookups Off
 HostNameLookups Double
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>HostNameLookups</CODE> directive controls whether
-or not CUPS looks up the hostname for connecting clients. The
+<P>The <CODE>HostNameLookups</CODE> directive controls whether or
+not CUPS looks up the hostname for connecting clients. The
 <CODE>Double</CODE> setting causes CUPS to verify that the
 hostname resolved from the address matches one of the addresses
 returned for that hostname. <CODE>Double</CODE> lookups also
-prevent clients with unregistered addresses from connecting
-to your server.
+prevent clients with unregistered addresses from connecting to
+your server.</P>
 
-The default is <CODE>Off</CODE> to avoid the potential server
+<P>The default is <CODE>Off</CODE> to avoid the potential server
 performance problems with hostname lookups. Set this option to
-<CODE>On</CODE> or <CODE>Double</CODE> only if absolutely required.
+<CODE>On</CODE> or <CODE>Double</CODE> only if absolutely
+required.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ImplicitClasses">ImplicitClasses</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ImplicitClasses">ImplicitClasses</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ImplicitClasses On
 ImplicitClasses Off
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>ImplicitClasses</CODE> directive controls whether implicit
-classes are created based upon the available network printers and classes.
-The default setting is <CODE>On</CODE> but is automatically turned
-<CODE>Off</CODE> if <A HREF="#Browsing"><CODE>Browsing</CODE></A> is
-turned <CODE>Off</CODE>.
+<P>The <CODE>ImplicitClasses</CODE> directive controls whether
+implicit classes are created based upon the available network
+printers and classes. The default setting is <CODE>On</CODE> but
+is automatically turned <CODE>Off</CODE> if <A
+HREF="#Browsing"><CODE>Browsing</CODE></A> is turned
+<CODE>Off</CODE>.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ImplicitAnyClasses">ImplicitAnyClasses</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ImplicitAnyClasses">ImplicitAnyClasses</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ImplicitAnyClasses On
 ImplicitAnyClasses Off
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
@@ -1122,69 +1044,66 @@ setting is <CODE>Off</CODE>.</P>
 <P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
 must be enabled for this directive to have any effect.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Include">Include</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Include">Include</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Include filename
 Include /foo/bar/filename
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Include</CODE> directive includes the named file in
-the <CODE>cupsd.conf</CODE> file. If no leading path is
-provided, the file is assumed to be relative to the
-<A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory.</P>
+the <CODE>cupsd.conf</CODE> file. If no leading path is provided,
+the file is assumed to be relative to the <A
+HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="KeepAlive">KeepAlive</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="KeepAlive">KeepAlive</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 KeepAlive On
 KeepAlive Off
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>KeepAlive</CODE> directive controls whether or not to support
-persistent HTTP connections. The default is <CODE>On</CODE>.
+<P>The <CODE>KeepAlive</CODE> directive controls whether or not
+to support persistent HTTP connections. The default is
+<CODE>On</CODE>.</P>
 
-<P>HTTP/1.1 clients automatically support persistent connections, while
-HTTP/1.0 clients must specifically request them using the
+<P>HTTP/1.1 clients automatically support persistent connections,
+while HTTP/1.0 clients must specifically request them using the
 <CODE>Keep-Alive</CODE> attribute in the <CODE>Connection:</CODE>
-field of each request.
+field of each request.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="KeepAliveTimeout">KeepAliveTimeout</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="KeepAliveTimeout">KeepAliveTimeout</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 KeepAliveTimeout 60
 KeepAliveTimeout 30
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>KeepAliveTimeout</CODE> directive controls how long a
-persistent HTTP connection will remain open after the last request. The
-default is 60 seconds.
+<P>The <CODE>KeepAliveTimeout</CODE> directive controls how long
+a persistent HTTP connection will remain open after the last
+request. The default is 60 seconds.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Limit">Limit</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Limit">Limit</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 &lt;Limit GET POST&gt;
 ...
 &lt;/Limit&gt;
@@ -1192,93 +1111,112 @@ default is 60 seconds.
 &lt;Limit ALL&gt;
 ...
 &lt;/Limit&gt;
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Limit</CODE> directive groups access control directives for
-specific types of HTTP requests and must appear inside a
-<A HREF="#Location"><CODE>Location</CODE></A> section. Access can be limited
-for individual request types (<CODE>DELETE</CODE>, <CODE>GET</CODE>,
-<CODE>HEAD</CODE>, <CODE>OPTIONS</CODE>, <CODE>POST</CODE>, <CODE>PUT</CODE>,
-and <CODE>TRACE</CODE>) or for all request types (<CODE>ALL</CODE>). The
-request type names are case-sensitive for compatibility with Apache.
+<P>The <CODE>Limit</CODE> directive groups access control
+directives for specific types of HTTP requests and must appear
+inside a <A HREF="#Location"><CODE>Location</CODE></A> section.
+Access can be limited for individual request types
+(<CODE>DELETE</CODE>, <CODE>GET</CODE>, <CODE>HEAD</CODE>,
+<CODE>OPTIONS</CODE>, <CODE>POST</CODE>, <CODE>PUT</CODE>, and
+<CODE>TRACE</CODE>) or for all request types (<CODE>ALL</CODE>).
+The request type names are case-sensitive for compatibility with
+Apache.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="LimitExcept">LimitExcept</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="LimitExcept">LimitExcept</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 &lt;LimitExcept GET POST&gt;
 ...
 &lt;/LimitExcept&gt;
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>LimitExcept</CODE> directive groups access control directives for
-specific types of HTTP requests and must appear inside a
-<A HREF="#Location"><CODE>Location</CODE></A> section. Unlike the
-<A HREF="#Limit"><CODE>Limit</CODE></A> directive, <CODE>LimitExcept</CODE>
-restricts access for all requests <I>except</I> those listed on the
-<CODE>LimitExcept</CODE> line.
+<P>The <CODE>LimitExcept</CODE> directive groups access control
+directives for specific types of HTTP requests and must appear
+inside a <A HREF="#Location"><CODE>Location</CODE></A> section.
+Unlike the <A HREF="#Limit"><CODE>Limit</CODE></A> directive,
+<CODE>LimitExcept</CODE> restricts access for all requests
+<I>except</I> those listed on the <CODE>LimitExcept</CODE>
+line.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="LimitRequestBody">LimitRequestBody</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="LimitRequestBody">LimitRequestBody</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 LimitRequestBody 10485760
 LimitRequestBody 10m
 LimitRequestBody 0
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>LimitRequestBody</CODE> directive controls the maximum size of
-print files, IPP requests, and HTML form data in HTTP POST requests. The
-default limit is 0 which disables the limit check.
+<P>The <CODE>LimitRequestBody</CODE> directive controls the
+maximum size of print files, IPP requests, and HTML form data in
+HTTP POST requests. The default limit is 0 which disables the
+limit check.</P>
 
-<P>Also see the identical
-<A HREF="#MaxRequestSize"><CODE>MaxRequestSize</CODE></A> directive.
 
-<!-- HALF PAGE -->
-<H3><A NAME="Listen">Listen</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="Listen">Listen</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Listen 127.0.0.1:631
 Listen 192.0.2.1:631
-</PRE></UL>
+Listen [::1]:631
+Listen *:631
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Listen</CODE> directive specifies a network address and port
-to listen for connections. Multiple <CODE>Listen</CODE> directives can be
-provided to listen on multiple addresses.
+<P>The <CODE>Listen</CODE> directive specifies a network address
+and port to listen for connections. Multiple <CODE>Listen</CODE>
+directives can be provided to listen on multiple addresses.</P>
 
-<P>The <CODE>Listen</CODE> directive is similar to the
-<A HREF="#Port"><CODE>Port</CODE></A> directive but allows you to restrict
-access to specific interfaces or networks.
+<P>The <CODE>Listen</CODE> directive is similar to the <A
+HREF="#Port"><CODE>Port</CODE></A> directive but allows you to
+restrict access to specific interfaces or networks.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Location">Location</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Location">Location</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 &lt;Location /&gt;
 ...
 &lt;/Location&gt;
 
 &lt;Location /admin&gt;
+...
+&lt;/Location&gt;
+
+&lt;Location /admin/conf&gt;
+...
+&lt;/Location&gt;
+
+&lt;Location /admin/log&gt;
+...
+&lt;/Location&gt;
+
+&lt;Location /classes&gt;
+...
+&lt;/Location&gt;
+
+&lt;Location /classes/name&gt;
+...
+&lt;/Location&gt;
+
+&lt;Location /jobs&gt;
 ...
 &lt;/Location&gt;
 
@@ -1290,22 +1228,13 @@ access to specific interfaces or networks.
 ...
 &lt;/Location&gt;
 
-&lt;Location /classes&gt;
-...
-&lt;/Location&gt;
-
-&lt;Location /classes/name&gt;
-...
-&lt;/Location&gt;
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Location</CODE> directive specifies access control
 and authentication options for the specified HTTP resource or
 path.  The  <A HREF="#Allow"><CODE>Allow</CODE></A>,  <A
-HREF="#AuthClass"><CODE>AuthClass</CODE></A>,  <A
-HREF="#AuthGroupName"><CODE>AuthGroupName</CODE></A>,  <A
 HREF="#AuthType"><CODE>AuthType</CODE></A>,  <A
 HREF="#Deny"><CODE>Deny</CODE></A>,  <A
 HREF="#Encryption"><CODE>Encryption</CODE></A>,  <A
@@ -1314,21 +1243,21 @@ HREF="#LimitExcept"><CODE>LimitExcept</CODE></A>,  <A
 HREF="#Order"><CODE>Order</CODE></A>,  <A
 HREF="#Require"><CODE>Require</CODE></A>, and <A
 HREF="#Satisfy"><CODE>Satisfy</CODE></A> directives may all
-appear inside a location. More information can be found under the
-section <A HREF="#PRINTING_SECURITY">"Printing System
-Security"</A>.
+appear inside a location.</P>
 
-<P>Note that more specific resources override the less specific ones.
-So the directives inside the <CODE>/printers/name</CODE> location will override ones from <CODE>/printers</CODE>.
-Directives inside <CODE>/printers</CODE> will override ones from <CODE>/</CODE>. &nbsp;
-None of the directives are inherited.
+<P>Note that more specific resources override the less specific
+ones. So the directives inside the <CODE>/printers/name</CODE>
+location will override ones from <CODE>/printers</CODE>.
+Directives inside <CODE>/printers</CODE> will override ones from
+<CODE>/</CODE>. None of the directives are inherited.</P>
 
-<!-- NEED 5in -->
-<CENTER><TABLE BORDER="1" WIDTH="80%"><CAPTION>Locations on the Server.</CAPTION>
+<DIV CLASS="table"><TABLE>
+<CAPTION>Common Locations on the Server</CAPTION>
 <TR><TH>Location</TH><TH>Description</TH></TR>
 <TR><TD><CODE>/</CODE></TD><TD>The path for all get operations (get-printers, get-jobs, etc.)</TD></TR>
 <TR><TD><CODE>/admin</CODE></TD><TD>The path for all administration operations (add-printer, delete-printer, start-printer, etc.)</TD></TR>
-<TR><TD><CODE>/admin/conf</CODE></TD><TD>The path for access to the ESP Print Pro configuration files (cupsd.conf, client.conf, etc.)</TD></TR>
+<TR><TD><CODE>/admin/conf</CODE></TD><TD>The path for access to the CUPS configuration files (cupsd.conf, client.conf, etc.)</TD></TR>
+<TR><TD><CODE>/admin/log</CODE></TD><TD>The path for access to the CUPS log files (access_log, error_log, page_log)</TD></TR>
 <TR><TD><CODE>/classes</CODE></TD><TD>The path for all classes</TD></TR>
 <TR><TD><CODE>/classes/name</CODE></TD><TD>The resource for class <CODE>name</CODE></TD></TR>
 <TR><TD><CODE>/jobs</CODE></TD><TD>The path for all jobs (hold-job, release-job, etc.)</TD></TR>
@@ -1336,31 +1265,30 @@ None of the directives are inherited.
 <TR><TD><CODE>/printers</CODE></TD><TD>The path for all printers</TD></TR>
 <TR><TD><CODE>/printers/name</CODE></TD><TD>The path for printer <CODE>name</CODE></TD></TR>
 <TR><TD><CODE>/printers/name.ppd</CODE></TD><TD>The PPD file path for printer <CODE>name</CODE></TD></TR>
-</TABLE></CENTER>
+</TABLE></DIV>
 
-<!-- HALF PAGE -->
-<H3><A NAME="LogFilePerm">LogFilePerm</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="LogFilePerm">LogFilePerm</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 LogFilePerm 0644
 LogFilePerm 0600
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>LogFilePerm</CODE> directive specifies the permissions
-to use when writing configuration files. The default is 0644.
+<P>The <CODE>LogFilePerm</CODE> directive specifies the
+permissions to use when writing configuration files. The default
+is 0644.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="LogLevel">LogLevel</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="LogLevel">LogLevel</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 LogLevel none
 LogLevel emerg
 LogLevel alert
@@ -1371,107 +1299,98 @@ LogLevel notice
 LogLevel info
 LogLevel debug
 LogLevel debug2
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>LogLevel</CODE> directive specifies the level of logging
-for the <A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A> file. The
-following values are recognized (each level logs everything under the
-preceding levels):
+<P>The <CODE>LogLevel</CODE> directive specifies the level of
+logging for the <A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
+file. The following values are recognized (each level logs
+everything under the preceding levels):</P>
 
 <UL>
 
-	<LI><CODE>none</CODE> - Log nothing.
+	<LI><CODE>none</CODE> - Log nothing</LI>
 
-	<LI><CODE>emerg</CODE> - Log emergency conditions that prevent the
-	server from running.
+	<LI><CODE>emerg</CODE> - Log emergency conditions that
+	prevent the server from running</LI>
 
-	<LI><CODE>alert</CODE> - Log alerts that must be handled immediately.
+	<LI><CODE>alert</CODE> - Log alerts that must be handled
+	immediately</LI>
 
-	<LI><CODE>crit</CODE> - Log critical errors that don't prevent
-	the server from running.
+	<LI><CODE>crit</CODE> - Log critical errors that don't
+	prevent the server from running</LI>
 
-	<LI><CODE>error</CODE> - Log general errors.
+	<LI><CODE>error</CODE> - Log general errors</LI>
 
-	<LI><CODE>warn</CODE> - Log errors and warnings.
+	<LI><CODE>warn</CODE> - Log errors and warnings</LI>
 
-	<LI><CODE>notice</CODE> - Log temporary error conditions.
+	<LI><CODE>notice</CODE> - Log temporary error conditions</LI>
 
-	<LI><CODE>info</CODE> - Log all requests and state changes (default).
+	<LI><CODE>info</CODE> - Log all requests and state
+	changes (default)</LI>
 
-	<LI><CODE>debug</CODE> - Log basic debugging information.
+	<LI><CODE>debug</CODE> - Log basic debugging
+	information</LI>
 
-	<LI><CODE>debug2</CODE> - Log all debugging information.
+	<LI><CODE>debug2</CODE> - Log all debugging
+	information</LI>
 
 </UL>
 
-<!-- HALF PAGE -->
-<H3><A NAME="MaxClients">MaxClients</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="MaxClients">MaxClients</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 MaxClients 100
 MaxClients 1024
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>MaxClients</CODE> directive controls the maximum
 number of simultaneous clients that will be allowed by the
-server. The default is 100 clients.
+server. The default is 100 clients.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>Since each print job requires a file descriptor for the status
+pipe, the scheduler internally limits the <CODE>MaxClients</CODE>
+value to 1/3 of the available file descriptors to avoid possible
+problems when printing large numbers of jobs.</P>
+
+</BLOCKQUOTE>
 
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD>
-	<B>Note:</B>
-
-	<P>Since each print job requires a file descriptor for the
-	status pipe, the CUPS server internally limits the
-	<CODE>MaxClients</CODE> value to 1/3 of the available file descriptors
-	to avoid possible problems when printing large numbers of jobs.
-	</TD>
-</TR>
-</TABLE></CENTER>
-
-
-<!-- HALF PAGE -->
-<H3><A NAME="MaxClientsPerHost">MaxClientsPerHost</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="MaxClientsPerHost">MaxClientsPerHost</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
-MaxClientsPerHost 0
+<PRE CLASS="command">
 MaxClientsPerHost 10
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>MaxClientsPerHost</CODE> directive controls the
 maximum number of simultaneous clients that will be allowed from
-a single host by the server. The default is 10 or 1/10th the
-<CODE>MaxClients</CODE> value, whichever is greater. A value of
-0 uses the automatic setting based on the
+a single host by the server. The default is the
 <CODE>MaxClients</CODE> value.</P>
 
 <P>This directive provides a small measure of protection against
-Denial of Service attacks from a single host.
+Denial of Service attacks from a single host.</P>
 
 
-<!-- HALF PAGE -->
-<H3><A NAME="MaxCopies">MaxCopies</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="MaxCopies">MaxCopies</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 MaxCopies 100
 MaxCopies 65535
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
@@ -1479,259 +1398,262 @@ MaxCopies 65535
 number of copies that a user can print of a job. The default is
 100 copies.</P>
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD>
-	<B>Note:</B>
+<BLOCKQUOTE><B>Note:</B>
 
-	<P>Most HP PCL laser printers internally limit the
-	number of copies to 100.
+<P>Most HP PCL laser printers internally limit the number of
+copies to 100.</P>
 
-	</TD>
-</TR>
-</TABLE></CENTER>
+</BLOCKQUOTE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="MaxJobs">MaxJobs</A></H3>
-<HR>
+
+
+<H3 CLASS="title"><A NAME="MaxJobs">MaxJobs</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 MaxJobs 100
 MaxJobs 9999
 MaxJobs 0
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>MaxJobs</CODE> directive controls the maximum number of jobs
-that are kept in memory. Once the number of jobs reaches the limit, the
-oldest completed job is automatically purged from the system to make room
-for the new one. If all of the known jobs are still pending or active then
-the new job will be rejected.
+<P>The <CODE>MaxJobs</CODE> directive controls the maximum number
+of jobs that are kept in memory. Once the number of jobs reaches
+the limit, the oldest completed job is automatically purged from
+the system to make room for the new one. If all of the known jobs
+are still pending or active then the new job will be
+rejected.</P>
 
-<P>Setting the maximum size to 0 disables this functionality. The default
-setting is 0.
+<P>Setting the maximum size to 0 disables this functionality. The
+default setting is 0.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="MaxJobsPerPrinter">MaxJobsPerPrinter</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="MaxJobsPerPrinter">MaxJobsPerPrinter</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 MaxJobsPerPrinter 100
 MaxJobsPerPrinter 9999
 MaxJobsPerPrinter 0
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>MaxJobsPerPrinter</CODE> directive controls the maximum number of active jobs
-that are allowed for each printer or class. Once a printer or class reaches the limit, new jobs will be
-rejected until one of the active jobs is completed, stopped, aborted, or cancelled.
+<P>The <CODE>MaxJobsPerPrinter</CODE> directive controls the
+maximum number of active jobs that are allowed for each printer
+or class. Once a printer or class reaches the limit, new jobs
+will be rejected until one of the active jobs is completed,
+stopped, aborted, or canceled.</P>
 
-<P>Setting the maximum to 0 disables this functionality. The default
-setting is 0.
+<P>Setting the maximum to 0 disables this functionality. The
+default setting is 0.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="MaxJobsPerUser">MaxJobsPerUser</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="MaxJobsPerUser">MaxJobsPerUser</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 MaxJobsPerUser 100
 MaxJobsPerUser 9999
 MaxJobsPerUser 0
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>MaxJobsPerUser</CODE> directive controls the maximum number of active jobs
-that are allowed for each user. Once a user reaches the limit, new jobs will be
-rejected until one of the active jobs is completed, stopped, aborted, or cancelled.
+<P>The <CODE>MaxJobsPerUser</CODE> directive controls the maximum
+number of active jobs that are allowed for each user. Once a user
+reaches the limit, new jobs will be rejected until one of the
+active jobs is completed, stopped, aborted, or canceled.</P>
 
-<P>Setting the maximum to 0 disables this functionality. The default
-setting is 0.
+<P>Setting the maximum to 0 disables this functionality. The
+default setting is 0.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="MaxLogSize">MaxLogSize</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="MaxLogSize">MaxLogSize</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 MaxLogSize 1048576
 MaxLogSize 1m
 MaxLogSize 0
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>MaxLogSize</CODE> directive controls the maximum size of each
-log file. Once a log file reaches or exceeds the maximum size it is closed
-and renamed to <VAR>filename.O</VAR>. This allows you to rotate the logs
-automatically. The default size is 1048576 bytes (1MB).
+<P>The <CODE>MaxLogSize</CODE> directive controls the maximum
+size of each log file. Once a log file reaches or exceeds the
+maximum size it is closed and renamed to <VAR>filename.O</VAR>.
+This allows you to rotate the logs automatically. The default
+size is 1048576 bytes (1MB).</P>
 
-<P>Setting the maximum size to 0 disables log rotation.
+<P>Setting the maximum size to 0 disables log rotation.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="MaxRequestSize">MaxRequestSize</A></H3>
-<HR>
+
+<H3 CLASS="title"><SPAN CLASS="info">Deprecated</SPAN><A NAME="MaxRequestSize">MaxRequestSize</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 MaxRequestSize 10485760
 MaxRequestSize 10m
 MaxRequestSize 0
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>MaxRequestSize</CODE> directive controls the maximum size of
-print files, IPP requests, and HTML form data in HTTP POST requests. The
-default limit is 0 which disables the limit check.
+<P>The <CODE>MaxRequestSize</CODE> directive controls the maximum
+size of print files, IPP requests, and HTML form data in HTTP
+POST requests. The default limit is 0 which disables the limit
+check.</P>
 
-<P>Also see the identical
-<A HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A> directive.
+<P><B>This directive is deprecated and will be replaced in a
+future CUPS release.</B> Use the <A
+HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A>
+directive instead.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Order">Order</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Order">Order</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Order Allow,Deny
 Order Deny,Allow
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Order</CODE> directive defines the default access control.
-The following values are supported:
+<P>The <CODE>Order</CODE> directive defines the default access
+control. The following values are supported:</P>
 
 <UL>
 
-	<LI><CODE>Allow,Deny</CODE> - Allow requests from all
-	systems <I>except</I> for those listed in a <CODE>Deny</CODE>
-	directive.
+	<LI><CODE>allow,deny</CODE> - Deny requests by default,
+	then check the <A HREF="#Allow"><CODE>Allow</CODE></A>
+	lines followed by the <A
+	HREF="#Deny"><CODE>Deny</CODE></A> lines</LI>
 
-	<LI><CODE>Deny,Allow</CODE> - Allow requests only from
-	those listed in an <CODE>Allow</CODE> directive.
+	<LI><CODE>deny,allow</CODE> - Allow requests by default,
+	then check the <A HREF="#Deny"><CODE>Deny</CODE></A>
+	lines followed by the <A
+	HREF="#Allow"><CODE>Allow</CODE></A> lines</LI>
 
 </UL>
 
-<P>The <CODE>Order</CODE> directive must appear inside a
-<A HREF="#Location"><CODE>Location</CODE></A> directive.
+<P>The <CODE>Order</CODE> directive must appear inside a <A
+HREF="#Location"><CODE>Location</CODE></A> directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="PageLog">PageLog</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="PageLog">PageLog</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 PageLog /var/log/cups/page_log
 PageLog /var/log/cups/page_log-%s
 PageLog syslog
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>PageLog</CODE> directive sets the name of the page log
-file. If the filename is not absolute then it is assumed to be relative
-to the <A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default page log file is <VAR>/var/log/cups/page_log</VAR>.
+<P>The <CODE>PageLog</CODE> directive sets the name of the page
+log file. If the filename is not absolute then it is assumed to
+be relative to the <A
+HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
+default page log file is <VAR>/var/log/cups/page_log</VAR>.</P>
 
 <P>The server name can be included in the filename by using
-<CODE>%s</CODE> in the name.
+<CODE>%s</CODE> in the name.</P>
 
-<P>The special name "syslog" can be used to send the page information
-to the system log instead of a plain file.
+<P>The special name "syslog" can be used to send the page
+information to the system log instead of a plain file.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Port">Port</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Port">Port</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Port 631
 Port 80
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Port</CODE> directive specifies a port to listen
-on. Multiple <CODE>Port</CODE> lines can be specified to listen
-on multiple ports. The <CODE>Port</CODE> directive is equivalent
-to "<CODE>Listen *:nnn</CODE>". The default port is 631. You can
-change this directive under the <A
-HREF="#NETWORK_TAB"><I>Network</I> Tab</A> GUI.
+<P>The <CODE>Port</CODE> directive specifies a port to listen on.
+Multiple <CODE>Port</CODE> lines can be specified to listen on
+multiple ports. The <CODE>Port</CODE> directive is equivalent to
+"<CODE>Listen *:nnn</CODE>". The default port is 631.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="PreserveJobHistory">PreserveJobHistory</A></H3>
-<HR>
+<BLOCKQUOTE><B>Note:</B>
+
+<P>On systems that support IPv6, this directive will bind to both
+the IPv4 and IPv6 wildcard address.</P>
+
+</BLOCKQUOTE>
+
+
+<H3 CLASS="title"><A NAME="PreserveJobHistory">PreserveJobHistory</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 PreserveJobHistory On
 PreserveJobHistory Off
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>PreserveJobHistory</CODE> directive controls whether
-the history of completed, cancelled, or aborted print jobs is stored
-on disk.
+the history of completed, canceled, or aborted print jobs is
+stored on disk.</P>
 
-<P>A value of <CODE>On</CODE> (the default) preserves job information
-until the administrator purges it with the <CODE>cancel</CODE>
-command.
+<P>A value of <CODE>On</CODE> (the default) preserves job
+information until the administrator purges it with the
+<CODE>cancel</CODE> command.</P>
 
-<P>A value of <CODE>Off</CODE> removes the job information as soon as
-each job is completed, cancelled, or aborted. 
+<P>A value of <CODE>Off</CODE> removes the job information as
+soon as each job is completed, canceled, or aborted.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="PreserveJobFiles">PreserveJobFiles</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="PreserveJobFiles">PreserveJobFiles</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 PreserveJobFiles On
 PreserveJobFiles Off
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>PreserveJobFiles</CODE> directive controls whether the
-document files of completed, cancelled, or aborted print jobs are
-stored on disk.
+<P>The <CODE>PreserveJobFiles</CODE> directive controls whether
+the document files of completed, canceled, or aborted print jobs
+are stored on disk.</P>
 
 <P>A value of <CODE>On</CODE> preserves job files until the
-administrator purges them with the <CODE>cancel</CODE> command. Jobs
-can be restarted (and reprinted) as desired until they are purged.
+administrator purges them with the <CODE>cancel</CODE> command.
+Jobs can be restarted (and reprinted) as desired until they are
+purged.</P>
 
-<P>A value of <CODE>Off</CODE> (the default) removes the job files as
-soon as each job is completed, cancelled, or aborted.
+<P>A value of <CODE>Off</CODE> (the default) removes the job
+files as soon as each job is completed, canceled, or aborted.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Printcap">Printcap</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Printcap">Printcap</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Printcap
 Printcap /etc/printcap
 Printcap /etc/printers.conf
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
@@ -1739,213 +1661,190 @@ Printcap /etc/printers.conf
 printcap file is automatically generated and updated with a list
 of available printers. If specified with no value, then no
 printcap file will be generated. The default is to generate a
-file named <VAR>/etc/printcap</VAR>.
+file named <VAR>/etc/printcap</VAR>.</P>
 
-<P>When a filename is specified (e.g. <VAR>/etc/printcap</VAR>), the
-printcap file is written whenever a printer is added or removed. The
-printcap file can then be used by applications that are hardcoded to
-look at the printcap file for the available printers.
+<P>When a filename is specified (e.g. <VAR>/etc/printcap</VAR>),
+the printcap file is written whenever a printer is added or
+removed. The printcap file can then be used by applications that
+are hardcoded to look at the printcap file for the available
+printers.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="PrintcapFormat">PrintcapFormat</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="PrintcapFormat">PrintcapFormat</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 PrintcapFormat BSD
 PrintcapFormat Solaris
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>PrintcapFormat</CODE> directive controls the output
 format of the printcap file. The default is to generate a BSD
-printcap file. 
+printcap file.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="RemoteRoot">RemoteRoot</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="RemoteRoot">RemoteRoot</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 RemoteRoot remroot
 RemoteRoot root
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>RemoteRoot</CODE> directive sets the username for
 unauthenticated root requests from remote hosts. The default
 username is <VAR>remroot</VAR>. Setting <CODE>RemoteRoot</CODE>
-to <VAR>root</VAR> effectively disables this security mechanism.
+to <VAR>root</VAR> effectively disables this security
+mechanism.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="RequestRoot">RequestRoot</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="RequestRoot">RequestRoot</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 RequestRoot /var/spool/cups
 RequestRoot /foo/bar/spool/cups
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>RequestRoot</CODE> directive sets the directory for
 incoming IPP requests and HTML forms. If an absolute path is not
-provided then it is assumed to be relative to the
-<A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default request directory is <VAR>/var/spool/cups</VAR>.
+provided then it is assumed to be relative to the <A
+HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
+default request directory is <VAR>/var/spool/cups</VAR>.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Require">Require</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Require">Require</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Require group foo bar
 Require user john mary
 Require valid-user
-</PRE></UL>
+Require user @groupname
+Require user @SYSTEM
+Require user @OWNER
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Require</CODE> directive specifies that
 authentication is required for the resource. The
 <CODE>group</CODE> keyword specifies that the authenticated user
-must be a member of one or more of the named groups that follow.
+must be a member of one or more of the named groups that
+follow.</P>
 
 <P>The <CODE>user</CODE> keyboard specifies that the
-authenticated user must be one of the named users that follow.
+authenticated user must be one of the named users or groups that
+follow. Group names are specified using the "@" prefix.</P>
 
 <P>The <CODE>valid-user</CODE> keyword specifies that any
-authenticated user may access the resource.
+authenticated user may access the resource.</P>
 
 <P>The default is to do no authentication. This directive must
-appear inside a <A HREF="#Location"><CODE>Location</CODE></A> directive.  
+appear inside a <A HREF="#Location"><CODE>Location</CODE></A>
+directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="RIPCache">RIPCache</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="RIPCache">RIPCache</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 RIPCache 8m
 RIPCache 1g
 RIPCache 2048k
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>RIPCache</CODE> directive sets the size of the memory
-cache used by Raster Image Processor ("RIP") filters such as
-<CODE>imagetoraster</CODE> and <CODE>pstoraster</CODE>. The size can
-be suffixed with a "k" for kilobytes, "m" for megabytes, or
-"g" for gigabytes. The default cache size is "8m", or 8 megabytes.
+<P>The <CODE>RIPCache</CODE> directive sets the size of the
+memory cache used by Raster Image Processor ("RIP") filters such
+as <CODE>imagetoraster</CODE> and <CODE>pstoraster</CODE>. The
+size can be suffixed with a "k" for kilobytes, "m" for megabytes,
+or "g" for gigabytes. The default cache size is "8m", or 8
+megabytes.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="RunAsUser">RunAsUser</A></H3>
-<HR>
 
-<H4>Examples</H4>
-
-<UL><PRE>
-RunAsUser Yes
-RunAsUser No
-</PRE></UL>
-
-<H4>Description</H4>
-
-<P>The <CODE>RunAsUser</CODE> directive controls whether the
-scheduler runs as the unpriviledged user account (usually <CODE>lp</CODE>).
-The default is <CODE>No</CODE> which leaves the scheduler running as
-the <CODE>root</CODE> user.
-
-<P><B>Note:</B> Running as a non-priviledged user may prevent
-LPD and locally connected printers from working due to
-permission problems. The <CODE>lpd</CODE> backend will
-automatically use a non-priviledged mode that is not 100%
-compliant with RFC 1179. The <CODE>parallel</CODE>,
-<CODE>serial</CODE>, and <CODE>usb</CODE> backends will need
-write access to the corresponding device files.
-
-<!-- HALF PAGE -->
-<H3><A NAME="Satisfy">Satisfy</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="Satisfy">Satisfy</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Satisfy all
 Satisfy any
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Satisfy</CODE> directive specifies whether all
 conditions must be satisfied to allow access to the resource. If
 set to <CODE>all</CODE>, then all authentication and access
-control conditions must be satified to allow access.
+control conditions must be satified to allow access.</P>
 
-<P>Setting <CODE>Satisfy</CODE> to <CODE>any</CODE> allows a user to
-gain access if the authentication or access control requirements are
-satisfied. For example, you might require authentication for remote
-access, but allow local access without authentication.
+<P>Setting <CODE>Satisfy</CODE> to <CODE>any</CODE> allows a user
+to gain access if the authentication or access control
+requirements are satisfied. For example, you might require
+authentication for remote access, but allow local access without
+authentication.</P>
 
 <P>The default is <CODE>all</CODE>. This directive must appear
-inside a <A HREF="#Location"><CODE>Location</CODE></A> directive.  
+inside a <A HREF="#Location"><CODE>Location</CODE></A>
+directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ServerAdmin">ServerAdmin</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ServerAdmin">ServerAdmin</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ServerAdmin user@host
 ServerAdmin root@foo.bar.com
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>ServerAdmin</CODE> directive identifies the email address for the
-administrator on the system. By default the administrator email address is
-<CODE>root@server</CODE>, where <CODE>server</CODE> is the server name.
+<P>The <CODE>ServerAdmin</CODE> directive identifies the email
+address for the administrator on the system. By default the
+administrator email address is <CODE>root@server</CODE>, where
+<CODE>server</CODE> is the server name.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ServerBin">ServerBin</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ServerBin">ServerBin</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ServerBin /usr/lib/cups
 ServerBin /foo/bar/lib/cups
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>ServerBin</CODE> directive sets the directory for
-server-run executables. If an absolute path is not provided then it is
-assumed to be relative to the
-<A HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
+server-run executables. If an absolute path is not provided then
+it is assumed to be relative to the <A
+HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
 default executable directory is <VAR>/usr/lib/cups</VAR> or
-<VAR>/usr/lib32/cups</VAR> (IRIX 6.5).
+<VAR>/usr/lib32/cups</VAR> (IRIX 6.5).</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ServerCertificate">ServerCertificate</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ServerCertificate">ServerCertificate</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ServerCertificate /etc/cups/ssl/server.crt
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
@@ -1953,178 +1852,183 @@ ServerCertificate /etc/cups/ssl/server.crt
 location of the SSL certificate file used by the server when
 negotiating encrypted connections. The certificate must not be
 encrypted (password protected) since the scheduler normally runs
-in the background and will be unable to ask for a password.
+in the background and will be unable to ask for a password.</P>
 
-<P>The default certificate file is <VAR>/etc/cups/ssl/server.crt</VAR>.   
+<P>The default certificate file is
+<VAR>/etc/cups/ssl/server.crt</VAR>.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ServerKey">ServerKey</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ServerKey">ServerKey</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ServerKey /etc/cups/ssl/server.key
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>ServerKey</CODE> directive specifies the location
-of the SSL private key file used by the server when negotiating
-encrypted connections. 
+<P>The <CODE>ServerKey</CODE> directive specifies the location of
+the SSL private key file used by the server when negotiating
+encrypted connections.</P>
 
-<P>The default key file is <VAR>/etc/cups/ssl/server.crt</VAR>.   
+<P>The default key file is
+<VAR>/etc/cups/ssl/server.crt</VAR>.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ServerName"></A>ServerName</H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ServerName"></A>ServerName</H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ServerName foo.domain.com
 ServerName myserver.domain.com
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>ServerName</CODE> directive specifies the hostname that is
-reported to clients. By default the server name is the hostname.
+<P>The <CODE>ServerName</CODE> directive specifies the hostname
+that is reported to clients. By default the server name is the
+hostname.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ServerRoot">ServerRoot</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="ServerRoot">ServerRoot</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 ServerRoot /etc/cups
 ServerRoot /foo/bar/cups
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>ServerRoot</CODE> directive specifies the absolute path to
-the server configuration and state files. It is also used to resolve
-relative paths in the <VAR>cupsd.conf</VAR> file. The default server
-directory is <VAR>/etc/cups</VAR>.
+<P>The <CODE>ServerRoot</CODE> directive specifies the absolute
+path to the server configuration and state files. It is also used
+to resolve relative paths in the <VAR>cupsd.conf</VAR> file. The
+default server directory is <VAR>/etc/cups</VAR>.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="SSLListen">SSLListen</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="SSLListen">SSLListen</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 SSLListen 127.0.0.1:443
 SSLListen 192.0.2.1:443
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>SSLListen</CODE> directive specifies a network
 address and port to listen for secure connections. Multiple
 <CODE>SSLListen</CODE> directives can be provided to listen on
-multiple addresses.
+multiple addresses.</P>
 
-<P>The <CODE>SSLListen</CODE> directive is similar to the
-<A HREF="#SSLPort"><CODE>SSLPort</CODE></A> directive but allows
-you to restrict access to specific interfaces or networks.
+<P>The <CODE>SSLListen</CODE> directive is similar to the <A
+HREF="#SSLPort"><CODE>SSLPort</CODE></A> directive but allows you
+to restrict access to specific interfaces or networks.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="SSLPort">SSLPort</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="SSLPort">SSLPort</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 SSLPort 443
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>SSLPort</CODE> directive specifies a port to listen
 on for secure connections. Multiple <CODE>SSLPort</CODE> lines
-can be specified to listen on multiple ports.
+can be specified to listen on multiple ports.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="SystemGroup">SystemGroup</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="SystemGroup">SystemGroup</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
+SystemGroup lpadmin
 SystemGroup sys
 SystemGroup system
 SystemGroup root
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>SystemGroup</CODE> directive specifies the system
-administration group for <CODE>System</CODE> authentication. 
+administration group for <CODE>System</CODE> authentication.</P>
 
-<P>More information can be found under section <A HREF="#PRINTING_SECURITY">"Printing System Security"</A>.
 
-<!-- HALF PAGE -->
-<H3><A NAME="TempDir">TempDir</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="TempDir">TempDir</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 TempDir /var/tmp
 TempDir /foo/bar/tmp
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>TempDir</CODE> directive specifies an absolute path for
-the directory to use for temporary files. The default directory is
-<VAR>/var/tmp</VAR>.
+<P>The <CODE>TempDir</CODE> directive specifies an absolute path
+for the directory to use for temporary files. The default
+directory is <VAR>/var/spool/cups/tmp</VAR>.</P>
 
-<P>Temporary directories must be world-writable and should have the
-"sticky" permission bit enabled so that other users cannot delete
-filter temporary files. The following commands will create an
-appropriate temporary directory called <VAR>/foo/bar/tmp</VAR>:
+<P>Temporary directories must be world-writable and should have
+the "sticky" permission bit enabled so that other users cannot
+delete filter temporary files. The following commands will create
+an appropriate temporary directory called
+<VAR>/foo/bar/tmp</VAR>:</P>
 
-<UL><PRE>
-<B>mkdir /foo/bar/tmp ENTER</B>
-<B>chmod a+rwxt /foo/bar/tmp ENTER</B>
-</PRE></UL>
+<PRE CLASS="command">
+<KBD>mkdir /foo/bar/tmp</KBD>
+<KBD>chmod a+rwxt /foo/bar/tmp</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="Timeout">Timeout</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="Timeout">Timeout</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Timeout 300
 Timeout 90
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Timeout</CODE> directive controls the amount of time to
-wait before an active HTTP or IPP request times out. The default
-timeout is 300 seconds.
+<P>The <CODE>Timeout</CODE> directive controls the amount of time
+to wait before an active HTTP or IPP request times out. The
+default timeout is 300 seconds.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="User">User</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="User">User</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 User lp
 User guest
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>User</CODE> directive specifies the UNIX user that
-filter and CGI programs run as. The default user is <CODE>lp</CODE>.
+filter and CGI programs run as. The default user is
+<CODE>lp</CODE>.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>You may not use user <CODE>root</CODE>, as that would expose
+the system to unacceptable security risks. The scheduler will
+automatically choose user <CODE>nobody</CODE> if you specify a
+user whose ID is 0.</P>
+
+</BLOCKQUOTE>
+
 
 </BODY>
 </HTML>

@@ -29,6 +29,12 @@ P.command {
   margin-left: 3em;
 }
 
+BLOCKQUOTE {
+  background: #cccc99;
+  border: solid thin #999966;
+  padding: 10px;
+}
+
 A:link, A:visited {
   text-decoration: none;
   font-weight: bold;
@@ -72,7 +78,7 @@ TR.header, TR.header TH, TH.header, TR.trailer, TR.trailer TH, TH.trailer {
   background-color: #bbbb88;
 }
 
-TR.page, TD.page, TR.page TD {
+TR.page, TD.page {
   background-color: #eeeebb;
   height: 100%;
   padding-top: 20px;
@@ -94,6 +100,17 @@ TR.data TH {
 DIV.table TABLE {
   border: solid thin #999966;
   border-spacing: 0px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 DIV.table TABLE TD {

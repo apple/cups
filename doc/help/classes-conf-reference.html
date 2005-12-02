@@ -5,375 +5,536 @@
 </HEAD>
 <BODY>
 
-<P>The <VAR>/etc/cups/classes.conf</VAR> file contains many directives that
-determine how the classes behaves:</P>
+<P>The CUPS scheduler (cupsd) uses the
+<VAR>/etc/cups/classes.conf</VAR> file to store the list of
+available classes. This file contains only locally defined
+classes, not remote classes that are created automatically via
+browsing. Each directive is listed on a line by itself followed
+by its value. Comments are introduced using the number sign ("#")
+character at the beginning of a line.</P>
 
-<P ALIGN="CENTER">
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
-<TR>
-<TD VALIGN="TOP">
+<P>While the class configuration file consists of plain text and
+can be modified using your favorite text editor, you should
+normally use the <CODE>lpadmin(8)</CODE> command, web interface,
+or any of the available GUIs to manage your classes instead. If
+you do choose to edit this file manually, you will need to
+restart the scheduler to make them active.</P>
 
-	<LI><A HREF="#ClassAccepting"><CODE>Accepting</CODE></A>
-	<LI><A HREF="#ClassAllowUser"><CODE>AllowUser</CODE></A>
-	<LI><A HREF="#Class"><CODE>Class</CODE></A>
-	<LI><A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
-	<LI><A HREF="#ClassDenyUser"><CODE>DenyUser</CODE></A>
 
-</TD>
-<TD VALIGN="TOP">
-&nbsp;&nbsp;&nbsp;
-</TD>
-<TD VALIGN="TOP">
-
-	<LI><A HREF="#ClassInfo"><CODE>Info</CODE></A>
-	<LI><A HREF="#ClassJobSheets"><CODE>JobSheets</CODE></A>
-	<LI><A HREF="#ClassKLimit"><CODE>KLimit</CODE></A>
-	<LI><A HREF="#ClassLocation"><CODE>Location</CODE></A>
-	<LI><A HREF="#ClassPageLimit"><CODE>PageLimit</CODE></A>
-
-</TD>
-<TD VALIGN="TOP">
-&nbsp;&nbsp;&nbsp;
-</TD>
-<TD VALIGN="TOP">
-
-	<LI><A HREF="#ClassPrinter"><CODE>Printer</CODE></A>
-	<LI><A HREF="#ClassQuotaPeriod"><CODE>QuotaPeriod</CODE></A>
-	<LI><A HREF="#ClassState"><CODE>State</CODE></A>
-	<LI><A HREF="#ClassStateMessage"><CODE>StateMessage</CODE></A>
-
-</TD>
-</TR>
-</TABLE>
-</P>
-
-<!-- HALF PAGE -->
-<H3><A NAME="ClassAccepting">Accepting</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="Accepting">Accepting</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Accepting yes
-
 Accepting no
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Accepting</CODE> directive defines the initial Boolean
-value for the <VAR>printer-is-accepting-job</VAR> attribute which can
-be set by the <CODE>accept</CODE> and <CODE>reject</CODE> commands. 
+<P>The <CODE>Accepting</CODE> directive defines the initial state
+of the <VAR>printer-is-accepting-jobs</VAR> attribute. This state
+is also set by the <CODE>accept(8)</CODE> and
+<CODE>reject(8)</CODE> commands:</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/accept classname
+/usr/sbin/reject classname</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassAllowUser">AllowUser</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="AllowUser">AllowUser</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 AllowUser foo_user
-AllowUser bar_user
-</PRE></UL>
+AllowUser @bar_group
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>AllowUser</CODE> directive adds a username to the 
-<VAR>requesting-user-name-allowed</VAR> attribute which can be set
-by the <CODE>lpadmin -u</CODE> command.
+<P>The <CODE>AllowUser</CODE> directive adds a username or group
+name to the <VAR>requesting-user-name-allowed</VAR> attribute
+which can be set by the <CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -u allow:foo_user,@bar_group</KBD>
+</PRE>
+
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+This directive cannot be used with <A
+HREF="#DenyUser"><CODE>DenyUser</CODE></A>.</P>
 
 
-<!-- HALF PAGE -->
-<H3><A NAME="Class">Class</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="Class">Class</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
-&lt;Class name/&gt;
+<PRE CLASS="command">
+&lt;Class name&gt;
 ...
 &lt;/Class&gt;
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Class</CODE> directive begins a class definition.
-It can be added by the <CODE>lpadmin -c</CODE> command.</P>
+Classes are added using the <CODE>lpadmin(8)</CODE> command:
 
-<!-- HALF PAGE -->
-<H3><A NAME="DefaultClass">DefaultClass</A></H3>
-<HR>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -c classname</KBD>
+</PRE>
+
+
+<H3 CLASS="title"><A NAME="DefaultClass">DefaultClass</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
-&lt;DefaultClass name/&gt;
+<PRE CLASS="command">
+&lt;DefaultClass name&gt;
 ...
-&lt;/DefaultClass&gt;
-</PRE></UL>
+&lt;/Class&gt;
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>DefaultClass</CODE> directive begins a class definition 
-for the default server destination.  
-It can be added by the <CODE>lpadmin -c</CODE> command or if already defined, 
-set as default by the <CODE>lpoptions -d</CODE> command.</P>
+<P>The <CODE>DefaultClass</CODE> directive begins a class
+definition as the default server destination. The default server
+destination can be set using the <CODE>lpadmin(8)</CODE>
+command:</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassDenyUser">DenyUser</A></H3>
-<HR>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -d classname</KBD>
+</PRE>
+
+<P>Note that the server default destination settings can be
+overridden by the user's default destination settings which are
+normally set using the <CODE>lpoptions(1)</CODE> command.</P>
+
+
+<H3 CLASS="title"><A NAME="DenyUser">DenyUser</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 DenyUser foo_user
-DenyUser bar_user
-</PRE></UL>
+DenyUser @bar_group
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>DenyUser</CODE> directive adds a username to the 
-<VAR>requesting-user-name-allowed</VAR> attribute which can be set
-by the <CODE>lpadmin -u</CODE> command.</P>
+<P>The <CODE>DenyUser</CODE> directive adds a username or group
+name to the <VAR>requesting-user-name-denied</VAR> attribute
+which can be set by the <CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -u deny:foo_user,@bar_group</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassInfo">Info</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
+This directive cannot be used with <A
+HREF="#AllowUser"><CODE>AllowUser</CODE></A></P>
+
+
+<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
-Info My Printer
-</PRE></UL>
+<PRE CLASS="command">
+ErrorPolicy cancel-job
+ErrorPolicy retry-job
+ErrorPolicy stop-printer
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>ErrorPolicy</CODE> directive defines the policy that
+is used when a backend is unable to send a print job to the
+printer. The <CODE>lpadmin(8)</CODE> command sets the current
+error policy:</P>
+
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -o printer-error-policy=stop-printer</KBD>
+</PRE>
+
+<P>The following values are supported:</P>
+
+<UL>
+
+	<LI><CODE>cancel-job</CODE> - Cancel the job and proceed
+	with the next job in the queue</LI>
+
+	<LI><CODE>retry-job</CODE> - Retry the job after waiting
+	for N seconds; the <VAR>cupsd.conf</VAR> <A
+	HREF="cupsd-conf-reference.html#JobRetryInterval"><CODE>JobRetryInterval</CODE></A>
+	directive controls the value of N</LI>
+
+	<LI><CODE>stop-printer</CODE> - Stop the printer and keep
+	the job for future printing; this is the default
+	value</LI>
+
+</UL>
+
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="Info">Info</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
+Info My Class
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Info</CODE> directive defines the string for the 
-<VAR>printer-info</VAR> attribute which can be set by the 
-<CODE>lpadmin -D</CODE> command.</P>
+<VAR>printer-info</VAR> attribute. It is normally set using the
+<CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -D "My Class"</KBD>
+</PRE>
 
-<!-- NEW PAGE -->
-<H3><A NAME="ClassJobSheets">JobSheets</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="JobSheets">JobSheets</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 JobSheets none,standard
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>JobSheets</CODE> directive specifies the default banner pages 
-to print before and after a print job.
-In the above example, only a <VAR>standard</VAR> banner will print after each job.</P>
+<P>The <CODE>JobSheets</CODE> directive specifies the default
+banner pages  to print before and after a print job. In the above
+example, only a <VAR>standard</VAR> banner will print after each
+job. The <CODE>lpadmin(8)</CODE> command is normally used to set
+the default banners:
 
-<P>The <CODE>lpoptions -o job-sheets=</CODE> command can be used to set banners. 
-For example, the following command would produce the same results of a 
-<VAR>standard</VAR> banner at the end of each print job for the default class.</P>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -o job-sheets-default=none,standard</KBD>
+</PRE>
 
-<UL><B>
-lpoptions -o job-sheets=none,standard
-</B></UL>
+<P>If only one banner file is specified, it will be printed
+before the files in the job. If a second banner file is
+specified, it is printed  after the files in the job.</P>
 
-<P>If only one banner file is specified, it will be printed before the 
-files in the job. If a second banner file is specified, it is printed 
-after the files in the job.</P>
-
-<P>The available banner pages depend on the local system configuration;
- CUPS includes the following banner files:</P>
+<P>The available banner pages depend on the local system
+configuration; CUPS includes the following standard banner
+files:</P>
 
 <UL>
-<LI><CODE>none</CODE> - Do not produce a banner page.</LI>
-<LI><CODE>classified</CODE> - A banner page with a &quot;classified&quot; label at the top and bottom.</LI>
-<LI><CODE>confidential</CODE> - A banner page with a &quot;confidential&quot; label at the top and bottom.</LI>
-<LI><CODE>secret</CODE> - A banner page with a &quot;secret&quot; label at the top and bottom.</LI>
-<LI><CODE>standard</CODE> - A banner page with no label at the top and bottom.</LI>
-<LI><CODE>topsecret</CODE> - A banner page with a &quot;top secret&quot; label at the top and bottom.</LI>
-<LI><CODE>unclassified</CODE> - A banner page with an &quot;unclassified&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>none</CODE> - Do not produce a banner
+	page.</LI>
+
+	<LI><CODE>classified</CODE> - A banner page with a
+	&quot;classified&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>confidential</CODE> - A banner page with a
+	&quot;confidential&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>secret</CODE> - A banner page with a
+	&quot;secret&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>standard</CODE> - A banner page with no label
+	at the top and bottom.</LI>
+
+	<LI><CODE>topsecret</CODE> - A banner page with a
+	&quot;top secret&quot; label at the top and bottom.</LI>
+
+	<LI><CODE>unclassified</CODE> - A banner page with an
+	&quot;unclassified&quot; label at the top and bottom.</LI>
+
 </UL>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassKLimit">KLimit</A></H3>
-<HR>
+
+<H3 CLASS="title"><A NAME="KLimit">KLimit</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 KLimit 1234
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>KLimit</CODE> directive defines the value of the 
-<VAR>job-k-limit</VAR> attribute which can be set by the 
-<CODE>lpadmin -o job-k-limit=</CODE> command.
+<VAR>job-k-limit</VAR> attribute. It is normally set using the
+<CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -o job-k-limit=1234</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassLocation">Location</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="Location">Location</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 Location Building 3321
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>Location</CODE> directive defines the string for the 
-<VAR>printer-location</VAR> attribute which can be set by the 
-<CODE>lpadmin -L</CODE> command.</P>
+<VAR>printer-location</VAR> attribute. It is normally set using the
+<CODE>lpadmin(8)</CODE> command:</P>
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD>
-	<B>Note:</B>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -L "Building 3321"</KBD>
+</PRE>
 
-	<P>Do not confuse this <CODE>Location</CODE> directive with the 
-	one for cupsd.conf.  They are completely different.
-	</TD>
-</TR>
-</TABLE></CENTER>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassPageLimit">PageLimit</A></H3>
-<HR>
+<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="OpPolicy">OpPolicy</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
+OpPolicy default
+OpPolicy mypolicy
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>OpPolicy</CODE> directive sets the operation policy
+that is used for the printer. The <CODE>lpadmin(8)</CODE> command
+sets the current operation policy:</P>
+
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -o printer-op-policy=default</KBD>
+</PRE>
+
+<P>The default policy is named "default". All policies correspond
+to those defined using the <VAR>cupsd.conf</VAR> <A
+HREF="cupsd-conf-reference.html#Policy"><CODE>Policy</CODE></A>
+directive.</P>
+
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="PageLimit">PageLimit</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
 PageLimit 1234
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
 <P>The <CODE>PageLimit</CODE> directive defines the value of the 
-<VAR>job-page-limit</VAR> attribute which can be set
-by the <CODE>lpadmin -o job-page-limit=</CODE> command.</P>
+<VAR>job-page-limit</VAR> attribute. It can be set using the
+<CODE>lpadmin(8)</CODE> command:</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -o job-page-limit=1234</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassPrinter">Printer</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="Printer">Printer</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
-Printer foo
-Printer bar
-Printer foo@bar
-</PRE></UL>
+<PRE CLASS="command">
+Printer bcp
+Printer none
+Printer tbcp
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Printer</CODE> directive adds a printer to the class.
-It can be added by the <CODE>lpadmin -c</CODE> command.</P>
+<P>The <CODE>Printer</CODE> directive adds a printer to a class.
+Printers are added to a class using the <CODE>lpadmin(8)</CODE>
+command:</P>
 
-<CENTER><TABLE WIDTH="80%" BORDER="1" CELLPADDING="5" BGCOLOR="#cccccc">
-<TR>
-	<TD>
-	<B>Note:</B>
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -c classname</KBD>
+</PRE>
 
-	<P>Do not confuse this <CODE>Printer</CODE> directive with the 
-	one for printers.conf.  They are completely different.
-	</TD>
-</TR>
-</TABLE></CENTER>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.</P>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassQuotaPeriod">QuotaPeriod</A></H3>
-<HR>
+<H3 CLASS="title"><A NAME="QuotaPeriod">QuotaPeriod</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 QuotaPeriod 604800
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>QuotaPeriod</CODE> directive defines the value of the 
-<VAR>job-quota-period</VAR> attribute which can be set
-by the <CODE>lpadmin -o job-quota-period=</CODE> command.</P>
+<P>The <CODE>QuotaPeriod</CODE> directive defines the value of
+the  <VAR>job-quota-period</VAR> attribute. Typical values are
+86400 (1 day), 604800 (1 week), 2592000 (1 month), and 31536000
+(1 year). It is set using the <CODE>lpadmin(8)</CODE>
+command:</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -o job-quota-period=604800</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassState">State</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="Shared">Shared</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
+Shared yes
+Shared no
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>Shared</CODE> directive defines the initial value of
+the <VAR>printer-is-shared</VAR> attribute. The strings
+<VAR>yes</VAR> and <VAR>no</VAR> correspond to the true and false
+values, respectively. The <CODE>lpadmin(8)</CODE> command sets
+the current state:</P>
+
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p classname -o printer-is-shared=true</KBD>
+</PRE>
+
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="State">State</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
+State idle
 State stopped
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>State</CODE> directive defines the initial value of the 
-<VAR>printer-state</VAR> attribute.  The strings <VAR>idle</VAR> and 
-<VAR>stopped</VAR> correspond to the IPP enumeration values.</P>
+<P>The <CODE>State</CODE> directive defines the initial value of
+the <VAR>printer-state</VAR> attribute. The strings
+<VAR>idle</VAR> and <VAR>stopped</VAR> correspond to the IPP
+enumeration values 3 and 5, respectively. The
+<CODE>cupsenable(8)</CODE> and <CODE>cupsdisable(8)</CODE>
+commands set the current state:</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<PRE CLASS="command">
+<KBD>/usr/sbin/cupsenable classname</KBD>
+<KBD>/usr/sbin/cupsdisable classname</KBD>
+</PRE>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassStateMessage">StateMessage</A></H3>
-<HR>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><A NAME="StateMessage">StateMessage</A></H3>
 
 <H4>Examples</H4>
 
-<UL><PRE>
+<PRE CLASS="command">
 StateMessage Ready to print.
-</PRE></UL>
+</PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>StateMessage</CODE> directive defines the initial string for the 
-<VAR>printer-state-message</VAR> attribute.  
-The following are some example messages:</P>
+<P>The <CODE>StateMessage</CODE> directive defines the initial
+string for the  <VAR>printer-state-message</VAR> attribute. The
+following are some example messages:</P>
 
-<UL>
-<LI>Connected to <VAR>host_name</VAR>...
-<LI>Connecting to <VAR>class_queue</VAR> on port <VAR>port_number</VAR>...
-<LI>Network host <VAR>host_name</VAR> is busy; will retry in 30 seconds...
-<LI>Printer busy; will retry in 10 seconds...
-<LI>Printer is busy; retrying print job...
-<LI>Print file accepted - job ID <VAR>id_number</VAR>.
-<LI>Ready to print.
-<LI>Waiting for job to complete
-</UL>
+<PRE CLASS="command">
+StateMessage Connected to host_name...
+StateMessage Connecting to printer_queue on port port_number...
+StateMessage Network host host_name is busy; will retry in 30 seconds...
+StateMessage Class busy; will retry in 10 seconds...
+StateMessage Class is busy; retrying print job...
+StateMessage Print file accepted - job ID id_number.
+StateMessage Ready to print.
+StateMessage Waiting for job to complete
+</PRE>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.</P>
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="StateTime">StateTime</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
+StateTime 1133542425
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>StateTime</CODE> directive defines the UNIX time
+(seconds since Jan 1, 1970) for the last state change of the
+queue. It is mapped to the <VAR>printer-state-change-time</VAR>
+attribute.</P>
+
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
+
 
 </BODY>
 </HTML>

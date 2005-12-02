@@ -8,10 +8,10 @@
 <P>The CUPS scheduler (cupsd) uses the
 <VAR>/etc/cups/printers.conf</VAR> file to store the list of
 available printers. This file contains only locally defined
-printers, but not remote printers that are created automatically
-via browsing. Each directive is listed on a line by itself
-followed by its value. Comments are introduced using the number
-sign ("#") character at the beginning of a line.</P>
+printers, not remote printers that are created automatically via
+browsing. Each directive is listed on a line by itself followed
+by its value. Comments are introduced using the number sign ("#")
+character at the beginning of a line.</P>
 
 <P>While the printer configuration file consists of plain text
 and can be modified using your favorite text editor, you should
@@ -88,14 +88,15 @@ HREF="#DenyUser"><CODE>DenyUser</CODE></A>.</P>
 
 <P>The <CODE>DefaultPrinter</CODE> directive begins a printer
 definition as the default server destination. The default server
-printer can be set using the <CODE>lpadmin(8)</CODE> command:</P>
+destination can be set using the <CODE>lpadmin(8)</CODE>
+command:</P>
 
 <PRE CLASS="command">
 <KBD>/usr/sbin/lpadmin -d printername</KBD>
 </PRE>
 
-<P>Note that the server default printer settings can be
-overridden by the user's default printer settings which are
+<P>Note that the server default destination settings can be
+overridden by the user's default destination settings which are
 normally set using the <CODE>lpoptions(1)</CODE> command.</P>
 
 
@@ -142,6 +143,51 @@ using the <CODE>lpadmin(8)</CODE> command:</P>
 <PRE CLASS="command">
 <KBD>/usr/sbin/lpadmin -p printername -v device-uri</KBD>
 </PRE>
+
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
+ErrorPolicy cancel-job
+ErrorPolicy retry-job
+ErrorPolicy stop-printer
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>ErrorPolicy</CODE> directive defines the policy that
+is used when a backend is unable to send a print job to the
+printer. The <CODE>lpadmin(8)</CODE> command sets the current
+error policy:</P>
+
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -o printer-error-policy=stop-printer</KBD>
+</PRE>
+
+<P>The following values are supported:</P>
+
+<UL>
+
+	<LI><CODE>cancel-job</CODE> - Cancel the job and proceed
+	with the next job in the queue</LI>
+
+	<LI><CODE>retry-job</CODE> - Retry the job after waiting
+	for N seconds; the <VAR>cupsd.conf</VAR> <A
+	HREF="cupsd-conf-reference.html#JobRetryInterval"><CODE>JobRetryInterval</CODE></A>
+	directive controls the value of N</LI>
+
+	<LI><CODE>stop-printer</CODE> - Stop the printer and keep
+	the job for future printing; this is the default
+	value</LI>
+
+</UL>
 
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
@@ -256,7 +302,7 @@ HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
 directive.</P>
 
 
-<H3 CLASS="title"><A NAME="PrinterLocation">Location</A></H3>
+<H3 CLASS="title"><A NAME="Location">Location</A></H3>
 
 <H4>Examples</H4>
 
@@ -273,6 +319,36 @@ Location Building 3321
 <PRE CLASS="command">
 <KBD>/usr/sbin/lpadmin -p printername -L "Building 3321"</KBD>
 </PRE>
+
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="OpPolicy">OpPolicy</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
+OpPolicy default
+OpPolicy mypolicy
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>OpPolicy</CODE> directive sets the operation policy
+that is used for the printer. The <CODE>lpadmin(8)</CODE> command
+sets the current operation policy:</P>
+
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -o printer-op-policy=default</KBD>
+</PRE>
+
+<P>The default policy is named "default". All policies correspond
+to those defined using the <VAR>cupsd.conf</VAR> <A
+HREF="cupsd-conf-reference.html#Policy"><CODE>Policy</CODE></A>
+directive.</P>
 
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
@@ -304,20 +380,63 @@ HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
 directive.</P>
 
 
+<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="PortMonitor">PortMonitor</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
+PortMonitor bcp
+PortMonitor none
+PortMonitor tbcp
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>PortMonitor</CODE> directive sets the filter program that
+is used for every print job, typically to encode or package the print
+data in a format acceptable for a particular printer interface. It is
+set using the <CODE>lpadmin(8)</CODE> command:</P>
+
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -o port-monitor=tbcp</KBD>
+</PRE>
+
+<P>The following standard port monitors are included with CUPS:</P>
+
+<UL>
+
+	<LI><CODE>bcp</CODE> - Encode PostScript print data using
+	the Adobe Binary Control Protocol (BCP)</LI>
+
+	<LI><CODE>none</CODE> - Do not use a port monitor</LI>
+
+	<LI><CODE>tbcp</CODE> - Encode PostScript print data
+	using the Adobe Tagged Binary Control Protocol
+	(TBCP)</LI>
+
+</UL>
+
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
 <H3 CLASS="title"><A NAME="Printer">Printer</A></H3>
 
 <H4>Examples</H4>
 
 <PRE CLASS="command">
-&lt;Printer name/&gt;
+&lt;Printer name&gt;
 ...
 &lt;/Printer&gt;
 </PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Printer</CODE> directive begins a printer definition.
-It can be added using the <CODE>lpadmin(8)</CODE> command:
+<P>The <CODE>Printer</CODE> directive begins a printer
+definition. Printers are added using the <CODE>lpadmin(8)</CODE>
+command:
 
 <PRE CLASS="command">
 <KBD>/usr/sbin/lpadmin -p printername ...</KBD>
@@ -342,6 +461,33 @@ command:</P>
 
 <PRE CLASS="command">
 <KBD>/usr/sbin/lpadmin -p printername -o job-quota-period=604800</KBD>
+</PRE>
+
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
+
+<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="Shared">Shared</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
+Shared yes
+Shared no
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>Shared</CODE> directive defines the initial value of
+the <VAR>printer-is-shared</VAR> attribute. The strings
+<VAR>yes</VAR> and <VAR>no</VAR> correspond to the true and false
+values, respectively. The <CODE>lpadmin(8)</CODE> command sets
+the current state:</P>
+
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -o printer-is-shared=true</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
@@ -408,6 +554,28 @@ StateMessage Waiting for job to complete
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
 directive.</P>
+
+
+<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="StateTime">StateTime</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
+StateTime 1133542425
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>StateTime</CODE> directive defines the UNIX time
+(seconds since Jan 1, 1970) for the last state change of the
+queue. It is mapped to the <VAR>printer-state-change-time</VAR>
+attribute.</P>
+
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+directive.</P>
+
 
 </BODY>
 </HTML>

@@ -55,7 +55,7 @@ BORDER="0" ALT=""></A>
 </TD></TR>
 <TR CLASS="page">
 <TD WIDTH="15">&nbsp;</TD>
-<TD COLSPAN="2" WIDTH="100%" VALIGN="TOP">
+<TD COLSPAN="2" WIDTH="100%" VALIGN="TOP" CLASS="page">
 
 <H2 CLASS="title">Welcome!</H2>
 
