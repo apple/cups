@@ -1,7 +1,8 @@
 <FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
 
 <P ALIGN="CENTER"><B>Search in
-{HELPTITLE?"<I>{HELPTITLE}</I>":All Documents}:</B> <INPUT
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:All Documents}}:</B> <INPUT
 TYPE="TEXT" NAME="QUERY" VALUE="{?QUERY}" SIZE="60"> <INPUT
 TYPE="IMAGE" SRC="/images/search.gif" ALT="Search"></P>
 
@@ -12,13 +13,13 @@ TYPE="IMAGE" SRC="/images/search.gif" ALT="Search"></P>
 <H3 CLASS="title">On-Line Help Documents</H3>
 
 <A HREF="/help{QUERY??QUERY={QUERY}:}">All Documents</A><HR>
-{[BMTEXT]{BMINDENT=1?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>:}<A HREF="{BMLINK}">{BMTEXT}</A>{BMINDENT=1?</I>:}<BR>}
+{[BMTEXT]{BMINDENT>0?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{BMINDENT=2?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>:}:}<A HREF="{BMLINK}">{BMTEXT}</A>{BMINDENT>0?</I>:}<BR>}
 </DIV>
 
-{QUERY?<P>Search Results in {HELPFILE?"<I>{HELPTITLE}</I>":All Documents}\:</P>
+{QUERY?<P>Search Results in {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:All Documents}}\:</P>
 {QTEXT?<UL>
 {[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
 {QTEXT?</UL>:}
-:<BLOCKQUOTE>No matches found.</BLOCKQUOTE>}
+:<P>No matches found.</P>}
 {HELPTITLE?<HR NOSHADE>:}:}
 {HELPTITLE?<H1>{HELPTITLE}</H1>:}

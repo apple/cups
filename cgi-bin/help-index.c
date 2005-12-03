@@ -35,7 +35,7 @@
  *   help_load_directory()      - Load a directory of files into an index.
  *   help_load_file()           - Load a HTML files into an index.
  *   help_new_node()            - Create a new node and add it to an index.
- *   help_sort_nodes_by_name()  - Sort nodes by filename and anchor.
+ *   help_sort_nodes_by_name()  - Sort nodes by section, filename, and anchor.
  *   help_sort_nodes_by_score() - Sort nodes by score and text.
  */
 
@@ -62,8 +62,9 @@ static int		help_load_file(help_index_t *hi,
 				       const char *relative,
 				       time_t     mtime);
 static help_node_t	*help_new_node(const char *filename, const char *anchor,
-			               const char *text, time_t mtime,
-				       off_t offset, size_t length);
+			               const char *section, const char *text,
+				       time_t mtime, off_t offset,
+				       size_t length);
 static int		help_sort_by_name(const void *p1, const void *p2);
 static int		help_sort_by_score(const void *p1, const void *p2);
 
@@ -152,6 +153,8 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 		*ptr,			/* Pointer into line */
 		*filename,		/* Filename in line */
 		*anchor,		/* Anchor in line */
+		*sectptr,		/* Section pointer in line */
+		section[1024],		/* Section name */
 		*text;			/* Text in line */
   time_t	mtime;			/* Modification time */
   off_t		offset;			/* Offset into file */
@@ -182,7 +185,7 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 
     cupsFileLock(fp, 1);
 
-    if (cupsFileGets(fp, line, sizeof(line)) && !strcmp(line, "HELPV0"))
+    if (cupsFileGets(fp, line, sizeof(line)) && !strcmp(line, "HELPV1"))
     {
      /*
       * Got a valid header line, now read the data lines...
@@ -193,8 +196,8 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
        /*
 	* Each line looks like one of the following:
 	*
-	*     filename mtime offset length text
-	*     filename#anchor offset length text
+	*     filename mtime offset length "section" "text"
+	*     filename#anchor offset length "text"
 	*/
 
 	filename = line;
@@ -206,19 +209,60 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
           *ptr++ = '\0';
 
 	if ((anchor = strrchr(filename, '#')) != NULL)
+	{
           *anchor++ = '\0';
+	  mtime = 0;
+	}
+	else
+	  mtime = strtol(ptr, &ptr, 10);
 
-	mtime  = strtol(ptr, &ptr, 10);
-       /* TODO: Use strtoll for 64-bit file support */
-	offset = strtol(ptr, &ptr, 10);
-	length = strtol(ptr, &ptr, 10);
+	offset = strtoll(ptr, &ptr, 10);
+	length = strtoll(ptr, &ptr, 10);
 
 	while (isspace(*ptr & 255))
           ptr ++;
 
+        if (!anchor)
+	{
+	 /*
+	  * Get section...
+	  */
+
+          if (*ptr != '\"')
+	    break;
+
+          ptr ++;
+	  sectptr = ptr;
+
+          while (*ptr && *ptr != '\"')
+	    ptr ++;
+
+          if (*ptr != '\"')
+	    break;
+
+          *ptr++ = '\0';
+
+          strlcpy(section, sectptr, sizeof(section));
+
+	  while (isspace(*ptr & 255))
+            ptr ++;
+        }
+
+        if (*ptr != '\"')
+	  break;
+
+        ptr ++;
 	text = ptr;
 
-	if ((node = help_new_node(filename, anchor, text,
+        while (*ptr && *ptr != '\"')
+	  ptr ++;
+
+        if (*ptr != '\"')
+	  break;
+
+        *ptr++ = '\0';
+
+	if ((node = help_new_node(filename, anchor, section, text,
 				  mtime, offset, length)) == NULL)
           break;
 
@@ -317,7 +361,7 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
 
   cupsFileLock(fp, 1);
 
-  cupsFilePuts(fp, "HELPV0\n");
+  cupsFilePuts(fp, "HELPV1\n");
 
   for (i = 0; i < hi->num_nodes; i ++)
   {
@@ -329,7 +373,7 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
 
     if (node->anchor)
     {
-      if (cupsFilePrintf(fp, "%s#%s " CUPS_LLFMT " " CUPS_LLFMT " %s\n",
+      if (cupsFilePrintf(fp, "%s#%s " CUPS_LLFMT " " CUPS_LLFMT " \"%s\"\n",
                          node->filename, node->anchor,
                          CUPS_LLCAST node->offset, CUPS_LLCAST node->length,
 			 node->text) < 0)
@@ -337,10 +381,10 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
     }
     else
     {
-      if (cupsFilePrintf(fp, "%s %d " CUPS_LLFMT " " CUPS_LLFMT " %s\n",
+      if (cupsFilePrintf(fp, "%s %d " CUPS_LLFMT " " CUPS_LLFMT " \"%s\" \"%s\"\n",
                          node->filename, node->mtime,
                          CUPS_LLCAST node->offset, CUPS_LLCAST node->length,
-			 node->text) < 0)
+			 node->section ? node->section : "", node->text) < 0)
         break;
     }
   }
@@ -361,6 +405,7 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
 help_index_t *				/* O - Search index */
 helpSearchIndex(help_index_t *hi,	/* I - Index */
                 const char   *query,	/* I - Query string */
+		const char   *section,	/* I - Limit search to this section */
 		const char   *filename)	/* I - Limit search to this file */
 {
   int		i;			/* Looping var */
@@ -420,7 +465,9 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   */
 
   for (i = n - hi->nodes; i < hi->num_nodes; i ++, n ++)
-    if (filename && strcmp(n[0]->filename, filename))
+    if (section && strcmp(n[0]->section, section))
+      continue;
+    else if (filename && strcmp(n[0]->filename, filename))
       continue;
     else if ((matches = cgiDoSearch(sc, n[0]->text)) > 0)
     {
@@ -511,6 +558,9 @@ help_delete_node(help_node_t *n)	/* I - Node */
 
   if (n->anchor)
     free(n->anchor);
+
+  if (n->section)
+    free(n->section);
 
   if (n->text)
     free(n->text);
@@ -732,6 +782,7 @@ help_load_file(
   help_node_t	*node,			/* Current node */
 		**n;			/* Node pointer */
   char		line[1024],		/* Line from file */
+                section[1024],		/* Section */
 		*ptr,			/* Pointer into line */
 		*anchor,		/* Anchor name */
 		*text;			/* Text for anchor */
@@ -749,11 +800,36 @@ help_load_file(
   node   = NULL;
   offset = 0;
 
+  strcpy(section, "Other");
+
   while (cupsFileGets(fp, line, sizeof(line)))
   {
    /*
-    * Look for a <TITLE> or <A NAME prefix...
+    * Look for "<TITLE>", "<A NAME", or "<!-- SECTION:" prefix...
     */
+
+    if (!strncasecmp(line, "<!-- SECTION:", 13))
+    {
+     /*
+      * Got section line, copy it!
+      */
+
+      for (ptr = line + 13; isspace(*ptr & 255); ptr ++);
+
+      strlcpy(section, ptr, sizeof(section));
+      if ((ptr = strstr(section, "-->")) != NULL)
+      {
+       /*
+        * Strip comment stuff from end of line...
+	*/
+
+        for (*ptr-- = '\0'; ptr > line && isspace(*ptr & 255); *ptr-- = '\0');
+
+	if (isspace(*ptr & 255))
+	  *ptr = '\0';
+      }
+      continue;
+    }
 
     for (ptr = line; (ptr = strchr(ptr, '<')) != NULL;)
     {
@@ -857,13 +933,17 @@ help_load_file(
 
         node = n[0];
 
+        if (node->section)
+	  free(node->section);
+
 	if (node->text)
 	  free(node->text);
 
-	node->text   = strdup(text);
-	node->mtime  = mtime;
-	node->offset = offset;
-	node->score  = 0;
+	node->section = section[0] ? strdup(section) : NULL;
+	node->text    = strdup(text);
+	node->mtime   = mtime;
+	node->offset  = offset;
+	node->score   = 0;
       }
       else
       {
@@ -871,7 +951,7 @@ help_load_file(
 	* New node...
 	*/
 
-        node = help_new_node(relative, anchor, text, mtime, offset, 0);
+        node = help_new_node(relative, anchor, section, text, mtime, offset, 0);
 	help_insert_node(hi, node);
       }
 
@@ -924,6 +1004,7 @@ help_load_file(
 static help_node_t *			/* O - Node pointer or NULL on error */
 help_new_node(const char   *filename,	/* I - Filename */
               const char   *anchor,	/* I - Anchor */
+	      const char   *section,	/* I - Section */
 	      const char   *text,	/* I - Text */
 	      time_t       mtime,	/* I - Modification time */
               off_t        offset,	/* I - Offset in file */
@@ -942,6 +1023,7 @@ help_new_node(const char   *filename,	/* I - Filename */
 
   n->filename = strdup(filename);
   n->anchor   = anchor ? strdup(anchor) : NULL;
+  n->section  = (section && *section) ? strdup(section) : NULL;
   n->text     = strdup(text);
   n->mtime    = mtime;
   n->offset   = offset;
@@ -952,7 +1034,7 @@ help_new_node(const char   *filename,	/* I - Filename */
 
 
 /*
- * 'help_sort_nodes_by_name()' - Sort nodes by filename and anchor.
+ * 'help_sort_nodes_by_name()' - Sort nodes by section, filename, and anchor.
  */
 
 static int				/* O - Difference */
@@ -993,6 +1075,7 @@ help_sort_by_score(const void *p1,	/* I - First node */
 {
   help_node_t	**n1,			/* First node */
 		**n2;			/* Second node */
+  int		diff;			/* Difference */
 
 
   DEBUG_printf(("help_sort_by_score(p1=%p, p2=%p)\n", p1, p2));
@@ -1002,8 +1085,16 @@ help_sort_by_score(const void *p1,	/* I - First node */
 
   if (n1[0]->score != n2[0]->score)
     return (n1[0]->score - n2[0]->score);
-  else
-    return (strcasecmp(n1[0]->text, n2[0]->text));
+
+  if (n1[0]->section && !n2[0]->section)
+    return (1);
+  else if (!n1[0]->section && n2[0]->section)
+    return (-1);
+  else if (n1[0]->section && n2[0]->section &&
+           (diff = strcmp(n1[0]->section, n2[0]->section)) != 0)
+    return (diff);
+
+  return (strcasecmp(n1[0]->text, n2[0]->text));
 }
 
 

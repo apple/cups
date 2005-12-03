@@ -49,6 +49,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   const char	*server_root;		/* CUPS_SERVERROOT environment variable */
   const char	*docroot;		/* CUPS_DOCROOT environment variable */
   const char	*helpfile;		/* Current help file */
+  const char	*topic;			/* Current topic */
+  const char	*section;		/* Current section */
   char		filename[1024],		/* Filename */
 		directory[1024];	/* Directory */
   cups_file_t	*fp;			/* Help file */
@@ -173,7 +175,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   query = cgiGetVariable("QUERY");
-  si    = helpSearchIndex(hi, query, helpfile);
+  topic = cgiGetVariable("TOPIC");
+  si    = helpSearchIndex(hi, query, topic, helpfile);
 
   if (si)
   {
@@ -223,20 +226,46 @@ main(int  argc,				/* I - Number of command-line arguments */
   * OK, now list the bookmarks within the index...
   */
 
-  for (i = hi->num_nodes, j = 0, n = hi->sorted; i > 0; i --, n ++)
+  for (i = hi->num_nodes, j = 0, n = hi->sorted, section = NULL;
+       i > 0;
+       i --, n ++)
   {
     if (n[0]->anchor)
+      continue;
+
+   /*
+    * Add a section link as needed...
+    */
+
+    if (n[0]->section &&
+        (!section || strcmp(n[0]->section, section)))
+    {
+     /*
+      * Add a link for this node...
+      */
+
+      snprintf(line, sizeof(line), "/help/?TOPIC=%s&QUERY=%s",
+               n[0]->section, query ? query : "");
+      cgiSetArray("BMLINK", j, line);
+      cgiSetArray("BMTEXT", j, n[0]->section);
+      cgiSetArray("BMINDENT", j, "0");
+
+      j ++;
+      section = n[0]->section;
+    }
+
+    if (topic && strcmp(n[0]->section, topic))
       continue;
 
    /*
     * Add a link for this node...
     */
 
-    snprintf(line, sizeof(line), "/help/%s?QUERY=%s", n[0]->filename,
-             query ? query : "");
+    snprintf(line, sizeof(line), "/help/%s?TOPIC=%s&QUERY=%s", n[0]->filename,
+             n[0]->section, query ? query : "");
     cgiSetArray("BMLINK", j, line);
     cgiSetArray("BMTEXT", j, n[0]->text);
-    cgiSetArray("BMINDENT", j, "0");
+    cgiSetArray("BMINDENT", j, "1");
 
     j ++;
 
@@ -256,7 +285,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  snprintf(line, sizeof(line), "#%s", nn[0]->anchor);
 	  cgiSetArray("BMLINK", j, line);
 	  cgiSetArray("BMTEXT", j, nn[0]->text);
-	  cgiSetArray("BMINDENT", j, "1");
+	  cgiSetArray("BMINDENT", j, "2");
 
 	  j ++;
 	}
@@ -267,7 +296,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Show the search and bookmark content...
   */
 
-  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "help-header.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "help-header.tmpl",
+                      getenv("LANG"));
 
  /*
   * If we are viewing a file, copy it in now...

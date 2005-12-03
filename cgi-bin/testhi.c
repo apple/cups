@@ -68,7 +68,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc > 1)
   {
-    search = helpSearchIndex(hi, argv[1], argv[2]);
+    search = helpSearchIndex(hi, argv[1], NULL, argv[2]);
 
     if (search)
     {
