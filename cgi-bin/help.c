@@ -50,6 +50,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   const char	*docroot;		/* CUPS_DOCROOT environment variable */
   const char	*helpfile;		/* Current help file */
   const char	*topic;			/* Current topic */
+  char		topic_data[1024];	/* Topic form data */
   const char	*section;		/* Current section */
   char		filename[1024],		/* Filename */
 		directory[1024];	/* Directory */
@@ -245,7 +246,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       snprintf(line, sizeof(line), "/help/?TOPIC=%s&QUERY=%s",
-               n[0]->section, query ? query : "");
+               cgiFormEncode(topic_data, n[0]->section, sizeof(topic_data)),
+	       query ? query : "");
       cgiSetArray("BMLINK", j, line);
       cgiSetArray("BMTEXT", j, n[0]->section);
       cgiSetArray("BMINDENT", j, "0");
@@ -262,7 +264,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     snprintf(line, sizeof(line), "/help/%s?TOPIC=%s&QUERY=%s", n[0]->filename,
-             n[0]->section, query ? query : "");
+             cgiFormEncode(topic_data, n[0]->section, sizeof(topic_data)),
+	     query ? query : "");
     cgiSetArray("BMLINK", j, line);
     cgiSetArray("BMTEXT", j, n[0]->text);
     cgiSetArray("BMINDENT", j, "1");
