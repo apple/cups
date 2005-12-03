@@ -99,7 +99,30 @@ HELPFILES	=	\
 			help/error_log-reference.html \
 			help/page_log-reference.html \
 			help/printers-conf-reference.html \
-			help/subscriptions-conf-reference.html
+			help/subscriptions-conf-reference.html \
+			help/man-accept.html \
+			help/man-backend.html \
+			help/man-cupsaddsmb.html \
+			help/man-cups-config.html \
+			help/man-cupsd.html \
+			help/man-cupsenable.html \
+			help/man-cups-lpd.html \
+			help/man-cups-polld.html \
+			help/man-cupstestppd.html \
+			help/man-filter.html \
+			help/man-lpadmin.html \
+			help/man-lpc.html \
+			help/man-lp.html \
+			help/man-lpinfo.html \
+			help/man-lpmove.html \
+			help/man-lpoptions.html \
+			help/man-lppasswd.html \
+			help/man-lpq.html \
+			help/man-lpr.html \
+			help/man-lprm.html \
+			help/man-lpstat.html \
+			help/man-mime.convs.html \
+			help/man-mime.types.html
 
 
 #

@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+	<title>mime.types</title>
+</head>
+<body>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='mime.types.5'>mime.types(5)</a></h2>
+<h3 _hd_omit_toc>Name</h3>
+mime.types - mime type description file for cups
+<h3 _hd_omit_toc>Description</h3>
+The <i>mime.types</i> file defines the recognized file types.
+<p>Additional file types can be added to <i>mime.types</i> or in additional
+files in the configuration directory <b>/etc/cups</b> with the extension
+".types".
+<p>Each line in the <i>mime.types</i> file is a comment, blank, or rule
+line. Comment lines start with the # character. Rule lines start with
+the MIME type name and are optionally followed by a series of file
+recognition rules that are used to automatically identify print and web
+files:
+<br>
+<pre style='margin-left: 3em;'>
+
+    super/type rule [ ... ruleN]
+</pre>
+The rules may be grouped using parenthesis, joined using "+" for a
+logical AND and "," or whitespace for a logical OR, and negated using
+"!".
+<h3 _hd_omit_toc>Rules</h3>
+Rules take two forms - a filename extension by itself and functions with test
+values inside parenthesis. The following functions are available:
+<dl>
+<dt>match("pattern")
+</dt>
+<dd>Pattern match on filename
+</dd>
+<dt>ascii(offset,length)
+</dt>
+<dd>True if bytes are valid printable ASCII (CR, NL, TAB, BS, 32-126)
+</dd>
+<dt>printable(offset,length)
+</dt>
+<dd>True if bytes are printable 8-bit chars (CR, NL, TAB, BS, 32-126, 128-254)
+</dd>
+<dt>string(offset,"string")
+</dt>
+<dd>True if bytes are identical to string
+</dd>
+<dt>istring(offset,"string")
+</dt>
+<dd>True if a case-insensitive comparison of the bytes is identical
+</dd>
+<dt>char(offset,value)
+</dt>
+<dd>True if byte is identical
+</dd>
+<dt>short(offset,value)
+</dt>
+<dd>True if 16-bit integer is identical
+</dd>
+<dt>int(offset,value)
+</dt>
+<dd>True if 32-bit integer is identical
+</dd>
+<dt>locale("string")
+</dt>
+<dd>True if current locale matches string
+</dd>
+<dt>contains(offset,range,"string")
+</dt>
+<dd>True if the range contains the string
+</dd>
+</dl>
+<h3 _hd_omit_toc>String Constants</h3>
+String constants can be specified inside quotes ("") for strings
+containing whitespace and angle brackets (&lt;>) for hexadecimal
+strings.
+<h3 _hd_omit_toc>See Also</h3>
+classes.conf(5), cupsd(8), cupsd.conf(5), mime.convs(5), printers.conf(5),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+<h3 _hd_omit_toc>Copyright</h3>
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+
+</body>
+</html>

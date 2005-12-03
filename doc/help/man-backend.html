@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+	<title>backend</title>
+</head>
+<body>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='backend.1'>backend(1)</a></h2>
+
+<h3 _hd_omit_toc>Name</h3>
+backend - cups backend transmission interfaces
+
+<h3 _hd_omit_toc>Synopsis</h3>
+<b>backend
+</b>job user title num-copies options [
+<i>filename
+</i>]
+
+<h3 _hd_omit_toc>Description</h3>
+The CUPS backend interface provides a standard method for sending
+document files to different physical interfaces.
+
+<p>Backends must be capable of reading from a filename on the
+command-line or from the standard input, copying the standard
+input to a temporary file if required by the physical interface.
+
+<p>The command name (argv[0]) is set to the device URI of the
+destination printer. Starting with CUPS 1.1.22, any
+authentication information in argv[0] will be removed, so
+backend developers are urged to use the DEVICE_URI environment
+variable whenever authentication information is required.
+
+<h3 _hd_omit_toc>Exit Codes</h3>
+The following exit codes are defined for backends:
+
+<dl>
+<dt>0 (CUPS_BACKEND_OK)
+</dt>
+<dd>The print file was successfully transmitted to the device or
+remote server.
+
+</dd>
+<dt>1 (CUPS_BACKEND_FAILED)
+</dt>
+<dd>The print file was not successfully transmitted to the device or
+remote server. The scheduler will respond to this by canceling
+the job, retrying the job, or stopping the queue depending on the
+state of the error-policy attribute.
+
+</dd>
+<dt>2 (CUPS_BACKEND_CANCEL)
+</dt>
+<dd>The print file was not successfully transmitted because one or
+more attributes are not supported. The scheduler will respond to
+this by canceling the job.
+
+</dd>
+<dt>3 (CUPS_BACKEND_HOLD)
+</dt>
+<dd>The print file was not successfully transmitted because it cannot
+be printed at this time. The scheduler will respond to this by
+holding the job.
+
+</dd>
+<dt>4 (CUPS_BACKEND_STOP)
+</dt>
+<dd>The print file was not successfully transmitted because it cannot
+be printed at this time. The scheduler will respond to this by
+stopping the queue.
+
+</dd>
+<dt>5 (CUPS_BACKEND_AUTH_REQUIRED)
+</dt>
+<dd>The print file was not successfully transmitted because valid
+authentication information is required. The scheduler will
+respond to this by holding the job and adding the
+authentication-required job-reasons keyword.
+
+</dd>
+</dl>
+<p>All other exit code values are reserved.
+
+<h3 _hd_omit_toc>Log Messages</h3>
+Messages sent to stderr are generally logged to
+printer-state-message attribute and the current ErrorLog. Each
+line begins with a standard prefix:
+
+<dl>
+<dt>ALERT: message
+</dt>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "alert" log level.
+
+</dd>
+<dt>ATTR: attribute=value [attribute=value]
+</dt>
+<dd>Sets the named job attribute(s). Typically this will be used to
+set the job-remote-id attribute.
+
+</dd>
+<dt>CRIT: message
+</dt>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "critical" log level.
+
+</dd>
+<dt>DEBUG: message
+</dt>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "debug" log level.
+
+</dd>
+<dt>DEBUG2: message
+</dt>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "debug2" log level.
+
+</dd>
+<dt>EMERG: message
+</dt>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "emergency" log level.
+
+</dd>
+<dt>ERROR: message
+</dt>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "error" log level.
+
+</dd>
+<dt>INFO: message
+</dt>
+<dd>Sets the printer-state-message attribute. If the current LogLevel
+is set to "debug2", also adds the specified message to the
+current ErrorLog using the "info" log level.
+
+</dd>
+<dt>NOTICE: message
+</dt>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "notice" log level.
+
+</dd>
+<dt>PAGE: page-number #-copies
+</dt>
+<dt>PAGE: #-pages total
+</dt>
+<dd>Adds an entry to the current PageLog. The first form adds
+#-copies to the job-media-sheets-completed attribute. The second
+form sets the job-media-sheets-completed attribute to #-pages.
+
+</dd>
+<dt>STATE: printer-state-reason [printer-state-reason ...]
+</dt>
+<dt>STATE: + printer-state-reason [printer-state-reason ...]
+</dt>
+<dt>STATE: - printer-state-reason [printer-state-reason ...]
+</dt>
+<dd>Sets, adds, or removes printer-state-reason keywords to the
+current queue. Typically this is used to indicate media, ink, and
+toner conditions on a printer.
+
+</dd>
+<dt>WARNING: message
+</dt>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current ErrorLog using the "warning" log level.
+
+</dd>
+</dl>
+<h3 _hd_omit_toc>Environment Variables</h3>
+The following environment variables are defined by the CUPS
+server when executing the backend:
+
+<dl>
+<dt>CHARSET
+</dt>
+<dd>The default text character set, typically utf-8.
+
+</dd>
+<dt>CLASS
+</dt>
+<dd>When a job is submitted to a printer class, contains the name of
+the destination printer class. Otherwise this environment
+variable will not be set.
+
+</dd>
+<dt>CONTENT_TYPE
+</dt>
+<dd>The MIME type associated with the file (e.g.
+application/postscript).
+
+</dd>
+<dt>CUPS_DATADIR
+</dt>
+<dd>The directory where data files can be found.
+
+</dd>
+<dt>CUPS_SERVERROOT
+</dt>
+<dd>The root directory of the server.
+
+</dd>
+<dt>DEVICE_URI
+</dt>
+<dd>The device-uri associated with the printer; this is provided for
+shell scripts which may not be able to get the passed argv[0]
+string and for backends that require any authentication
+information which is not included in argv[0].
+
+</dd>
+<dt>LANG
+</dt>
+<dd>The default language locale (typically C or en).
+
+</dd>
+<dt>PATH
+</dt>
+<dd>The standard execution path for external programs that may be run by
+the backend.
+
+</dd>
+<dt>PPD
+</dt>
+<dd>The full pathname of the PostScript Printer Description (PPD)
+file for this printer.
+
+</dd>
+<dt>PRINTER
+</dt>
+<dd>The name of the printer.
+
+</dd>
+<dt>RIP_CACHE
+</dt>
+<dd>The recommended amount of memory to use for Raster Image
+Processors (RIPs).
+
+</dd>
+<dt>SOFTWARE
+</dt>
+<dd>The name and version number of the server (typically CUPS/1.1).
+
+</dd>
+<dt>TZ
+</dt>
+<dd>The timezone of the server.
+
+</dd>
+<dt>USER
+</dt>
+<dd>The user executing the backend, typically root; consult the
+cupsd.conf file for the current setting.
+
+</dd>
+</dl>
+<h3 _hd_omit_toc>See Also</h3>
+cupsd(8), filter(1)
+CUPS Interface Design Description,
+CUPS Software Administrators Manual,
+CUPS Software Programmers Manual,
+http://localhost:631/help
+
+<h3 _hd_omit_toc>Copyright</h3>
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+
+</body>
+</html>

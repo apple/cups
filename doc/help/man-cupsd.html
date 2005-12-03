@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+	<title>cupsd</title>
+</head>
+<body>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='cupsd.8'>cupsd(8)</a></h2>
+<h3 _hd_omit_toc>Name</h3>
+cupsd - common unix printing system daemon
+<h3 _hd_omit_toc>Synopsis</h3>
+<b>cupsd
+</b>[ -c
+<i>config-file
+</i>] [ -f ] [ -F ]
+<h3 _hd_omit_toc>Description</h3>
+<i>cupsd</i> is the scheduler for the Common UNIX Printing System. It
+implements a printing system based upon the Internet Printing Protocol,
+version 1.1.  If no options are specified on the command-line then the
+default configuration file (usually <i>/etc/cups/cupsd.conf</i>) will be
+used.
+<p>The <i>-f</i> option forces <i>cupsd</i> to run in the foreground; the
+default is to run in the background as a "daemon".
+<p>The <i>-F</i> option forces <i>cupsd</i> to run in the foreground
+but detaches the process from the controlling terminal and
+current directory. This is useful for running <i>cupsd</i> from
+<i>init</i>.
+<h3 _hd_omit_toc>Compatibility</h3>
+<i>cupsd</i> implements all of the required IPP/1.1 attributes and
+operations. It also implements several CUPS-specific administration
+operations.
+<h3 _hd_omit_toc>See Also</h3>
+backend(1), classes.conf(5), cupsd.conf(5), filter(1), mime.convs(5),
+mime.types(5), printers.conf(5),
+CUPS Implementation of IPP,
+CUPS Interface Design Description,
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+<h3 _hd_omit_toc>Copyright</h3>
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+
+</body>
+</html>

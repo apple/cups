@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+	<title>lpc</title>
+</head>
+<body>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='lpc.8'>lpc(8)</a></h2>
+<h3 _hd_omit_toc>Name</h3>
+lpc - line printer control program
+<h3 _hd_omit_toc>Synopsis</h3>
+<b>lpc
+</b>[
+<i>command
+</i>[
+<i>parameter(s)
+</i>] ]
+<h3 _hd_omit_toc>Description</h3>
+<i>lpc</i> provides limited control over printer and class queues provided by
+CUPS. It can also be used to query the state of queues.
+<p>If no command is specified on the command-line, lpc will display a
+prompt and accept commands from the standard input.
+<h3 _hd_omit_toc>Commands</h3>
+The <i>lpc</i> program accepts a subset of commands accepted by the Berkeley
+<i>lpc</i> program of the same name:
+<dl>
+<dt><i>exit
+</dt>
+<dd>Exits the command interpreter.
+</i></dd>
+<dt>help <i>[command]</i>
+</dt>
+<dd>Displays a short help message.
+</dd>
+<dt>quit
+</dt>
+<dd>Exits the command interpreter.
+</dd>
+<dt>status <i>[queue]</i>
+</dt>
+<dd>Displays the status of one or more printer or class queues.
+</dd>
+<dt>? <i>[command]</i>
+</dt>
+<dd>Display a short help message.
+</dd>
+</dl>
+<h3 _hd_omit_toc>Limitations</h3>
+Since <i>lpc</i> is geared towards the Berkeley printing system, it is impossible
+to use <i>lpc</i> to configure printer or class queues provided by CUPS.  To
+configure printer or class queues you must use the <i>lpadmin(8)</i> command
+or another CUPS-compatible client with that functionality.
+<h3 _hd_omit_toc>Compatibility</h3>
+The CUPS version of <i>lpc</i> does not implement all of the standard Berkeley
+commands.
+<h3 _hd_omit_toc>See Also</h3>
+accept(8), cancel(1), disable(8), enable(8), lp(1), lpr(1), lprm(1),
+lpstat(1), reject(8),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+<h3 _hd_omit_toc>Copyright</h3>
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+
+</body>
+</html>

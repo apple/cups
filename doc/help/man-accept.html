@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+	<title>accept</title>
+</head>
+<body>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='accept.8'>accept(8)</a></h2>
+<h3 _hd_omit_toc>Name</h3>
+accept/reject - accept/reject jobs sent to a destination
+<h3 _hd_omit_toc>Synopsis</h3>
+<b>accept
+</b>destination(s)
+<br>
+<b>reject
+</b>[ -E ] [ -h
+<i>server
+</i>] [ -r
+<i>reason
+</i>]
+destination(s)
+<h3 _hd_omit_toc>Description</h3>
+<i>accept</i> instructs the printing system to accept print jobs to the
+specified destinations.
+<p><i>reject</i> instructs the printing system to reject print jobs to the
+specified destinations. The <i>-r</i> option sets the reason for rejecting
+print jobs. If not specified the reason defaults to "Reason Unknown".
+<p>The <i>-E</i> option forces encryption when connecting to the server.
+<h3 _hd_omit_toc>Compatibility</h3>
+The CUPS versions of <i>accept</i> and <i>reject</i> may ask the user for an
+access password depending on the printing system configuration.  This differs
+from the System V versions which require the root user to execute these
+commands.
+<h3 _hd_omit_toc>See Also</h3>
+cancel(1), disable(8), enable(8), lp(1), lpadmin(8), lpstat(1),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+<h3 _hd_omit_toc>Copyright</h3>
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+
+</body>
+</html>

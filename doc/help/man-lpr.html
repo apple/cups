@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+	<title>lpr</title>
+</head>
+<body>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='lpr.1'>lpr(1)</a></h2>
+<h3 _hd_omit_toc>Name</h3>
+lpr - print files
+<h3 _hd_omit_toc>Synopsis</h3>
+<b>lpr
+</b>[ -E ] [ -P
+<i>destination
+</i>] [ -U
+<i>username
+</i>] [ -#
+<i>num-copies
+</i>[ -l ] [ -o
+<i>option
+</i>] [ -p] [ -r ] [ -C/J/T
+<i>title
+</i>] [
+<i>file(s)
+</i>]
+<h3 _hd_omit_toc>Description</h3>
+<b>lpr</b> submits files for printing. Files named on the command line are sent
+to the named printer (or the system default destination if no destination is
+specified). If no files are listed on the command-line <b>lpr</b> reads the
+print file from the standard input.
+<h3 _hd_omit_toc>Options</h3>
+The following options are recognized by <b>lpr</b>:
+<dl>
+<dt>-E
+</dt>
+<dd>Forces encryption when connecting to the server.
+</dd>
+<dt>-P <i>destination</i>
+</dt>
+<dd>Prints files to the named printer.
+</dd>
+<dt>-# <i>copies</i>
+</dt>
+<dd>Sets the number of copies to print from 1 to 100.
+</dd>
+<dt>-C <i>name</i>
+</dt>
+<dd>Sets the job name.
+</dd>
+<dt>-J <i>name</i>
+</dt>
+<dd>Sets the job name.
+</dd>
+<dt>-T <i>name</i>
+</dt>
+<dd>Sets the job name.
+</dd>
+<dt>-U <i>username</i>
+</dt>
+<dd>Sets the user name.
+</dd>
+<dt>-l
+</dt>
+<dd>Specifies that the print file is already formatted for the destination and
+should be sent without filtering. This option is equivalent to "-oraw".
+</dd>
+<dt>-o <i>option</i>
+</dt>
+<dd>Sets a job option.
+</dd>
+<dt>-p
+</dt>
+<dd>Specifies that the print file should be formatted with a shaded header with
+the date, time, job name, and page number. This option is equivalent to
+"-oprettyprint" and is only useful when printing text files.
+</dd>
+<dt>-r
+</dt>
+<dd>Specifies that the named print files should be deleted after printing them.
+</dd>
+</dl>
+<h3 _hd_omit_toc>Compatibility</h3>
+The "c", "d", "f", "g", "i", "m", "n", "t", "v", and "w" options are not
+supported by CUPS and will produce a warning message if used.
+<h3 _hd_omit_toc>See Also</h3>
+cancel(1), lp(1), lpstat(1),
+CUPS Software Users Manual,
+http://localhost:631/documentation.html
+<h3 _hd_omit_toc>Copyright</h3>
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+
+</body>
+</html>

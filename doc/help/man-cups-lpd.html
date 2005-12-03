@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+	<title>cups-lpd</title>
+</head>
+<body>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='cups-lpd.8'>cups-lpd(8)</a></h2>
+<h3 _hd_omit_toc>Name</h3>
+cups-lpd - receive print jobs and report printer status to lpd clients
+<h3 _hd_omit_toc>Synopsis</h3>
+<b>cups-lpd
+</b>[ -o
+<i>option=value
+</i>]
+<h3 _hd_omit_toc>Description</h3>
+<b>cups-lpd</b> is the CUPS Line Printer Daemon ("LPD") mini-server that
+supports legacy client systems that use the LPD protocol.
+<b>cups-lpd</b> does not act as a standalone network daemon but instead
+operates using the Internet "super-server" <b>inetd(8)</b>. Add the
+following line to the <b>inetd.conf</b> file to enable the
+<b>cups-lpd</b> daemon:
+<br>
+<pre style='margin-left: 3em;'>
+
+    printer stream tcp nowait lp /path/to/cups/daemon/cups-lpd cups-lpd -o document-format=application/octet-stream
+</pre>
+<p>If you are using the newer <i>xinetd(8)</i> daemon, add the following
+lines to the <b>xinetd.conf</b> file:
+<br>
+<pre style='margin-left: 3em;'>
+
+    service printer
+    {
+        socket_type = stream
+        protocol = tcp
+        wait = no
+        user = lp
+	group = sys
+	passenv =
+        server = /path/to/cups/daemon/cups-lpd
+	server_args = -o document-format=application/octet-stream
+    }
+</pre>
+<p>The /path/to/cups/daemon is usually /usr/lib/cups/daemon or
+/usr/libexec/cups/daemon, depending on the operating system.
+Consult the cupsd.conf file for the local setting.
+<h3 _hd_omit_toc>Options</h3>
+The <i>-o</i> option to <b>cups-lpd</b> inserts options for all print queues.
+Most often this is used to disable the "l" filter so that remote print jobs
+are filtered as needed for printing:
+<br>
+<pre style='margin-left: 3em;'>
+
+    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd 
+        -o document-format=application/octet-stream
+
+    server = /usr/lib/cups/daemon/cups-lpd
+    server_args = -o document-format=application/octet-stream
+</pre>
+<p>The example shown resets the document format to be
+<i>application/octet-stream</i>, which forces auto-detection of the print
+file type.
+<h3 _hd_omit_toc>Performance</h3>
+<b>cups-lpd</b> performs well with small numbers of clients and
+printers. However, since a new process is created for each
+connection and since each process must query the printing system
+before each job submission, it does not scale to larger
+configurations. We highly recommend that large configurations
+use the native IPP support provided by CUPS instead.
+<h3 _hd_omit_toc>Security</h3>
+<b>cups-lpd</b> currently does not perform any access control
+based on the settings in <i>cupsd.conf(5)</i> or in the
+<i>hosts.allow(5)</i> or <i>hosts.deny</i> files used by TCP
+wrappers. Therefore, running <b>cups-lpd</b> on your server will
+allow any computer on your network (and perhaps the entire
+Internet) to print to your server.
+<p>While <i>xinetd</i> has built-in access control support, you
+should use the TCP wrappers package with <i>inetd</i> to limit
+access to only those computers that should be able to print
+through your server.
+<p><b>cups-lpd</b> is not enabled by the standard CUPS distribution.
+Please consult with your operating system vendor to determine
+whether it is enabled in their distributions.
+<h3 _hd_omit_toc>Compatibility</h3>
+<b>cups-lpd</b> does not enforce the restricted source port
+number specified in RFC 1179, as using restricted ports does not
+prevent users from submitting print jobs. While this behavior is
+different than standard Berkeley LPD implementations, it should
+not affect normal client operations.
+<p>The output of the status requests follows RFC 2569, Mapping
+between LPD and IPP Protocols. Since many LPD implementations
+stray from this definition, remote status reporting to LPD
+clients may be unreliable.
+<h3 _hd_omit_toc>See Also</h3>
+cupsd(8), inetd(8), xinetd(8),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+<h3 _hd_omit_toc>Copyright</h3>
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+
+</body>
+</html>

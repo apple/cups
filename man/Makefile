@@ -108,5 +108,15 @@ install:	all
 
 
 #
+# Make html versions of man pages...
+#
+
+html:
+	for file in *.man; do \
+		mantohtml $$file >../doc/help/man-`basename $$file .man`.html; \
+	done
+
+
+#
 # End of "$Id$".
 #

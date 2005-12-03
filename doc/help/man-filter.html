@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+	<title>filter</title>
+</head>
+<body>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='filter.1'>filter(1)</a></h2>
+<h3 _hd_omit_toc>Name</h3>
+filter - cups file conversion filter interfaces
+<h3 _hd_omit_toc>Synopsis</h3>
+<b>filter
+</b>job user title num-copies options [
+<i>filename
+</i>]
+<h3 _hd_omit_toc>Description</h3>
+The CUPS filter interface provides a standard method for adding support for
+new document types to CUPS. Each filter is capable of converting from one
+or more input formats to another format that can either be printed directly
+or piped into another filter to get it to a printable format.
+<p>Filters must be capable of reading from a filename on the command-line
+or from the standard input, copying the standard input to a temporary
+file as required by the file format. All output must be sent to the
+standard output.
+<p>The command name (argv[0]) is set to the name of the destination printer.
+<h3 _hd_omit_toc>Environment Variables</h3>
+The following environment variables are defined by the CUPS server when
+executing each filter:
+<dl>
+<dt>CHARSET
+</dt>
+<dd>The default text character set (typically us-ascii or iso-8859-1).
+</dd>
+<dt>CLASS
+</dt>
+<dd>When a job is submitted to a printer class, contains the name of
+the destination printer class. Otherwise this environment
+variable will not be set.
+</dd>
+<dt>CONTENT_TYPE
+</dt>
+<dd>The MIME type associated with the file (e.g. application/postscript).
+</dd>
+<dt>CUPS_DATADIR
+</dt>
+<dd>The directory where data files can be found.
+</dd>
+<dt>CUPS_SERVERROOT
+</dt>
+<dd>The root directory of the server.
+</dd>
+<dt>DEVICE_URI
+</dt>
+<dd>The device-uri associated with the printer.
+</dd>
+<dt>LANG
+</dt>
+<dd>The default language locale (typically C or en).
+</dd>
+<dt>PATH
+</dt>
+<dd>The standard execution path for external programs that may be run by the filter.
+</dd>
+<dt>PPD
+</dt>
+<dd>The full pathname of the PostScript Printer Description (PPD) file for
+this printer.
+</dd>
+<dt>PRINTER
+</dt>
+<dd>The name of the printer; this is provided for shell scripts which may not be
+able to get the passed argv[0] string.
+</dd>
+<dt>RIP_CACHE
+</dt>
+<dd>The recommended amount of memory to use for Raster Image Processors (RIPs).
+</dd>
+<dt>SOFTWARE
+</dt>
+<dd>The name and version number of the server (typically CUPS/1.1).
+</dd>
+<dt>TZ
+</dt>
+<dd>The timezone of the server.
+</dd>
+<dt>USER
+</dt>
+<dd>The user executing the filter, typically lp; consult the cupsd.conf file for
+the current setting.
+</dd>
+</dl>
+<h3 _hd_omit_toc>Compatibility</h3>
+While the filter interface is compatible with System V interface
+scripts, it will only work with the System V interface script as the
+only filter.  Typically the interface script will be provided via the
+<b>lpadmin(8)</b> command using the <i>-i</i> option.
+<h3 _hd_omit_toc>See Also</h3>
+backend(1), cupsd(8),
+CUPS Interface Design Description,
+CUPS Software Administrators Manual,
+CUPS Software Programmers Manual,
+http://localhost:631/documentation.html
+<h3 _hd_omit_toc>Copyright</h3>
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+
+</body>
+</html>

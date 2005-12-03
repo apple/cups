@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+	<title>lpq</title>
+</head>
+<body>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='lpq.1'>lpq(1)</a></h2>
+<h3 _hd_omit_toc>Name</h3>
+lpq - show printer queue status
+<h3 _hd_omit_toc>Synopsis</h3>
+<b>lpq
+</b>[ -E ] [ -P
+<i>dest
+</i>] [ -a ] [ -l ] [
+<i>+interval
+</i>]
+<h3 _hd_omit_toc>Description</h3>
+<i>lpq</i> shows the current print queue status on the named printer.
+Jobs queued on the default destination will be shown if no printer or
+class is specified on the command-line.
+<p>The <i>interval</i> option allows you to continuously report the jobs
+in the queue until the queue is empty; the list of jobs is show one
+every <i>interval</i> seconds.
+<p>The <i>-E</i> option forces encryption when connecting to the server.
+<p>The <i>-a</i> option reports jobs on all printers.
+<p>The <i>-l</i> option requests a more verbose (long) reporting format.
+<h3 _hd_omit_toc>See Also</h3>
+cancel(1), lp(1), lpr(1), lprm(1), lpstat(1)
+<br>
+CUPS Software Users Manual,
+http://localhost:631/documentation.html
+<h3 _hd_omit_toc>Copyright</h3>
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+
+</body>
+</html>
