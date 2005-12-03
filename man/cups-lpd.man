@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cups-lpd 8 "Common UNIX Printing System" "11 August 2004" "Easy Software Products"
+.TH cups-lpd 8 "Common UNIX Printing System" "3 December 2005" "Easy Software Products"
 .SH NAME
 cups-lpd \- receive print jobs and report printer status to lpd clients
 .SH SYNOPSIS
@@ -39,7 +39,8 @@ following line to the \fBinetd.conf\fR file to enable the
 .br
 .nf
 
-    printer stream tcp nowait lp /path/to/cups/daemon/cups-lpd cups-lpd -o document-format=application/octet-stream
+    printer stream tcp nowait lp /path/to/cups/daemon/cups-lpd cups-lpd \\
+        -o document-format=application/octet-stream
 .fi
 .LP
 If you are using the newer \fIxinetd(8)\fR daemon, add the following
@@ -64,22 +65,12 @@ The /path/to/cups/daemon is usually /usr/lib/cups/daemon or
 /usr/libexec/cups/daemon, depending on the operating system.
 Consult the cupsd.conf file for the local setting.
 .SH OPTIONS
-The \fI-o\fR option to \fBcups-lpd\fR inserts options for all print queues.
-Most often this is used to disable the "l" filter so that remote print jobs
-are filtered as needed for printing:
-.br
-.nf
-
-    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd \
-        -o document-format=application/octet-stream
-
-    server = /usr/lib/cups/daemon/cups-lpd
-    server_args = -o document-format=application/octet-stream
-.fi
-.LP
-The example shown resets the document format to be
-\fIapplication/octet-stream\fR, which forces auto-detection of the print
-file type.
+The \fI-o\fR option to \fBcups-lpd\fR inserts options for all
+print queues. Most often this is used to disable the "l" filter
+so that remote print jobs are filtered as needed for printing;
+the examples in the previous section set the "document-format"
+option to "application/octet-stream" which forces autodetection
+of the print file format.
 .SH PERFORMANCE
 \fBcups-lpd\fR performs well with small numbers of clients and
 printers. However, since a new process is created for each
@@ -102,7 +93,7 @@ through your server.
 .LP
 \fBcups-lpd\fR is not enabled by the standard CUPS distribution.
 Please consult with your operating system vendor to determine
-whether it is enabled in their distributions.
+whether it is enabled in their distribution.
 .SH COMPATIBILITY
 \fBcups-lpd\fR does not enforce the restricted source port
 number specified in RFC 1179, as using restricted ports does not
@@ -115,9 +106,7 @@ between LPD and IPP Protocols. Since many LPD implementations
 stray from this definition, remote status reporting to LPD
 clients may be unreliable.
 .SH SEE ALSO
-cupsd(8), inetd(8), xinetd(8),
-CUPS Software Administrators Manual,
-http://localhost:631/documentation.html
+cups(1), cupsd(8), inetd(8), xinetd(8)
 .SH COPYRIGHT
 Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
 .\"

@@ -61,7 +61,7 @@ MAN8	=	accept.$(MAN8EXT) \
 # Make everything...
 #
 
-all:	$(MAN1) $(MAN5) $(MAN8)
+all:	$(MAN1) $(MAN5) $(MAN8) html
 
 
 #
@@ -111,10 +111,19 @@ install:	all
 # Make html versions of man pages...
 #
 
-html:
-	for file in *.man; do \
-		mantohtml $$file >../doc/help/man-`basename $$file .man`.html; \
+html:	$(MAN1) $(MAN8) mantohtml
+	echo Converting man pages to HTML...
+	for file in $(MAN1); do \
+		echo "    $$file..."; \
+		mantohtml `basename $$file .$(MAN1EXT)`.man >../doc/help/man-`basename $$file .$(MAN1EXT)`.html; \
 	done
+	for file in $(MAN8); do \
+		echo "    $$file..."; \
+		mantohtml `basename $$file .$(MAN8EXT)`.man >../doc/help/man-`basename $$file .$(MAN8EXT)`.html; \
+	done
+
+mantohtml:	mantohtml.o
+	$(CC) $(LDFLAGS) -o $@ mantohtml.o
 
 
 #
