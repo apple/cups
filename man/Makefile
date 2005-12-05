@@ -115,11 +115,11 @@ html:	$(MAN1) $(MAN8) mantohtml
 	echo Converting man pages to HTML...
 	for file in $(MAN1); do \
 		echo "    $$file..."; \
-		mantohtml `basename $$file .$(MAN1EXT)`.man >../doc/help/man-`basename $$file .$(MAN1EXT)`.html; \
+		./mantohtml `basename $$file .$(MAN1EXT)`.man >../doc/help/man-`basename $$file .$(MAN1EXT)`.html; \
 	done
 	for file in $(MAN8); do \
 		echo "    $$file..."; \
-		mantohtml `basename $$file .$(MAN8EXT)`.man >../doc/help/man-`basename $$file .$(MAN8EXT)`.html; \
+		./mantohtml `basename $$file .$(MAN8EXT)`.man >../doc/help/man-`basename $$file .$(MAN8EXT)`.html; \
 	done
 
 mantohtml:	mantohtml.o
