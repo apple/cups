@@ -120,9 +120,7 @@ HELPFILES	=	\
 			help/man-lpq.html \
 			help/man-lpr.html \
 			help/man-lprm.html \
-			help/man-lpstat.html \
-			help/man-mime.convs.html \
-			help/man-mime.types.html
+			help/man-lpstat.html
 
 
 #
