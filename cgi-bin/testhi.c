@@ -31,7 +31,7 @@
  * Include necessary headers...
  */
 
-#include "cgi-private.h"
+#include "cgi.h"
 
 
 /*

@@ -42,49 +42,60 @@
 
 
 /*
+ * Types...
+ */
+
+typedef struct cgi_file_s		/**** Uploaded file data ****/
+{
+  char		tempfile[1024],		/* Temporary file containing data */
+		*name,			/* Variable name */
+		*filename,		/* Original filename */
+		*mimetype;		/* MIME media type */
+  size_t	filesize;		/* Size of uploaded file */
+} cgi_file_t;
+
+
+/*
  * Prototypes...
  */
 
-extern int		cgiInitialize(void);
-extern int		cgiIsPOST(void);
 extern void		cgiAbort(const char *title, const char *stylesheet,
 			         const char *format, ...);
 extern int		cgiCheckVariables(const char *names);
-extern const char	*cgiGetArray(const char *name, int element);
-extern int		cgiGetSize(const char *name);
-extern void		cgiSetSize(const char *name, int size);
-extern const char	*cgiGetVariable(const char *name);
-extern void		cgiSetArray(const char *name, int element,
-			            const char *value);
-extern void		cgiSetVariable(const char *name, const char *value);
+extern void		*cgiCompileSearch(const char *query);
 extern void		cgiCopyTemplateFile(FILE *out, const char *tmpl);
 extern void		cgiCopyTemplateLang(FILE *out, const char *directory,
 			                    const char *tmpl, const char *lang);
-
+extern int		cgiDoSearch(void *search, const char *text);
+extern void		cgiEndHTML(void);
+extern char		*cgiFormEncode(char *dst, const char *src, size_t dstsize);
+extern void		cgiFreeSearch(void *search);
+extern const char	*cgiGetArray(const char *name, int element);
+extern void		cgiGetAttributes(ipp_t *request, const char *directory,
+			                 const char *tmpl, const char *lang);
 extern char		*cgiGetCookie(const char *name, char *buf, int buflen);
+extern const cgi_file_t	*cgiGetFile(void);
+#  define cgiGetHost()	(getenv("REMOTE_HOST") == NULL ? getenv("REMOTE_ADDR") : getenv("REMOTE_HOST"))
+extern int		cgiGetSize(const char *name);
+#  define cgiGetUser()	getenv("REMOTE_USER")
+extern char		*cgiGetTemplateDir(void);
+extern const char	*cgiGetVariable(const char *name);
+extern int		cgiInitialize(void);
+extern int		cgiIsPOST(void);
+extern char		*cgiRewriteURL(const char *uri, char *url, int urlsize,
+			               const char *newresource);
+extern void		cgiSetArray(const char *name, int element,
+			            const char *value);
 extern void		cgiSetCookie(const char *name, const char *value,
 			             const char *path, const char *domain,
 				     time_t expires, int secure);
-
-extern void		cgiEndHTML(void);
-extern char		*cgiFormEncode(char *dst, const char *src, size_t dstsize);
-extern void		cgiStartHTML(const char *title);
-
-#  define cgiGetUser()	getenv("REMOTE_USER")
-#  define cgiGetHost()	(getenv("REMOTE_HOST") == NULL ? getenv("REMOTE_ADDR") : getenv("REMOTE_HOST"))
-
-extern void		*cgiCompileSearch(const char *query);
-extern int		cgiDoSearch(void *search, const char *text);
-extern void		cgiFreeSearch(void *search);
-
-extern void		cgiGetAttributes(ipp_t *request, const char *directory,
-			                 const char *tmpl, const char *lang);
-extern char		*cgiGetTemplateDir(void);
-extern char		*cgiRewriteURL(const char *uri, char *url, int urlsize,
-			               const char *newresource);
-extern void		cgiSetServerVersion(void);
 extern int		cgiSetIPPVars(ipp_t *, const char *, const char *,
 			              const char *, int);
+extern void		cgiSetServerVersion(void);
+extern void		cgiSetSize(const char *name, int size);
+extern void		cgiSetVariable(const char *name, const char *value);
+extern void		cgiStartHTML(const char *title);
+
 
 #endif /* !_CUPS_CGI_H_ */
 

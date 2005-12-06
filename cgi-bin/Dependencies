@@ -35,4 +35,7 @@ jobs.o: ../cups/debug.h ../cups/language.h ../cups/string.h ../config.h
 printers.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 printers.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h help-index.h
 printers.o: ../cups/debug.h ../cups/language.h ../cups/string.h ../config.h
-testhi.o: help-index.h
+testcgi.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+testcgi.o: ../cups/ppd.h ../cups/file.h help-index.h
+testhi.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+testhi.o: ../cups/ppd.h ../cups/file.h help-index.h

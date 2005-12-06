@@ -23,49 +23,56 @@
  *
  * Contents:
  *
- *   cgiInitialize()         - Initialize the CGI variable "database"...
- *   cgiIsPOST()             - Determine whether this page was POSTed.
- *   cgiCheckVariables()     - Check for the presence of "required" variables.
- *   cgiGetArray()           - Get an element from a form array...
- *   cgiGetSize()            - Get the size of a form array value.
- *   cgiGetVariable()        - Get a CGI variable from the database...
- *   cgiSetArray()           - Set array element N to the specified string.
- *   cgiSetVariable()        - Set a CGI variable in the database...
- *   cgi_add_variable()      - Add a form variable.
- *   cgi_compare_variables() - Compare two variables.
- *   cgi_find_variable()     - Find a variable...
- *   cgi_initialize_get()    - Initialize form variables using the GET method.
- *   cgi_initialize_post()   - Initialize variables using the POST method.
- *   cgi_initialize_string() - Initialize form variables from a string.
- *   cgi_sort_variables()    - Sort all form variables for faster lookup.
+ *   cgiCheckVariables()        - Check for the presence of "required" variables.
+ *   cgiGetArray()              - Get an element from a form array...
+ *   cgiGetFile()               - Get the file (if any) that was submitted in the form.
+ *   cgiGetSize()               - Get the size of a form array value.
+ *   cgiGetVariable()           - Get a CGI variable from the database...
+ *   cgiInitialize()            - Initialize the CGI variable "database"...
+ *   cgiIsPOST()                - Determine whether this page was POSTed.
+ *   cgiSetArray()              - Set array element N to the specified string.
+ *   cgiSetSize()               - Set the array size.
+ *   cgiSetVariable()           - Set a CGI variable in the database...
+ *   cgi_add_variable()         - Add a form variable.
+ *   cgi_compare_variables()    - Compare two variables.
+ *   cgi_find_variable()        - Find a variable...
+ *   cgi_initialize_get()       - Initialize form variables using the GET method.
+ *   cgi_initialize_multipart() - Initialize variables and file using the POST method.
+ *   cgi_initialize_post()      - Initialize variables using the POST method.
+ *   cgi_initialize_string()    - Initialize form variables from a string.
+ *   cgi_passwd()               - Catch authentication requests and notify the server.
+ *   cgi_sort_variables()       - Sort all form variables for faster lookup.
+ *   cgi_unlink_file()          - Remove the uploaded form.
  */
 
 /*#define DEBUG*/
 #include "cgi-private.h"
 #include <errno.h>
-#include <syslog.h>
 
 
 /*
  * Data structure to hold all the CGI form variables and arrays...
  */
 
-typedef struct
+typedef struct				/**** Form variable structure ****/
 {
-  const char	*name;		/* Name of variable */
-  int		nvalues,	/* Number of values */
-		avalues;	/* Number of values allocated */
-  const char	**values;	/* Value(s) of variable */
-} var_t;
+  const char	*name;			/* Name of variable */
+  int		nvalues,		/* Number of values */
+		avalues;		/* Number of values allocated */
+  const char	**values;		/* Value(s) of variable */
+} _cgi_var_t;
 
 
 /*
  * Local globals...
  */
 
-static int	form_count = 0,		/* Form variable count */
-		form_alloc = 0;		/* Number of variables allocated */
-static var_t	*form_vars = NULL;	/* Form variables */
+static int		form_count = 0,	/* Form variable count */
+			form_alloc = 0;	/* Number of variables allocated */
+static _cgi_var_t	*form_vars = NULL;
+					/* Form variables */
+static cgi_file_t	*form_file = NULL;
+					/* Uploaded file */
 
 
 /*
@@ -74,60 +81,16 @@ static var_t	*form_vars = NULL;	/* Form variables */
 
 static void		cgi_add_variable(const char *name, int element,
 			                 const char *value);
-static int		cgi_compare_variables(const var_t *v1, const var_t *v2);
-static var_t		*cgi_find_variable(const char *name);
+static int		cgi_compare_variables(const _cgi_var_t *v1,
+			                      const _cgi_var_t *v2);
+static _cgi_var_t	*cgi_find_variable(const char *name);
 static int		cgi_initialize_get(void);
+static int		cgi_initialize_multipart(const char *boundary);
 static int		cgi_initialize_post(void);
 static int		cgi_initialize_string(const char *data);
 static const char	*cgi_passwd(const char *prompt);
 static void		cgi_sort_variables(void);
-
-
-/*
- * 'cgiInitialize()' - Initialize the CGI variable "database"...
- */
-
-int					/* O - Non-zero if there was form data */
-cgiInitialize(void)
-{
-  const char	*method;		/* Form posting method */
- 
-
- /*
-  * Setup a password callback for authentication...
-  */
-
-  cupsSetPasswordCB(cgi_passwd);
-
-#ifdef DEBUG
- /*
-  * Disable output buffering to find bugs...
-  */
-
-  setbuf(stdout, NULL);
-  puts("Content-type: text/plain\n");
-#endif /* DEBUG */
-
- /*
-  * Get the request method (GET or POST)...
-  */
-
-  method = getenv("REQUEST_METHOD");
-
-  if (!method)
-    return (0);
-
- /*
-  * Grab form data from the corresponding location...
-  */
-
-  if (!strcasecmp(method, "GET"))
-    return (cgi_initialize_get());
-  else if (!strcasecmp(method, "POST"))
-    return (cgi_initialize_post());
-  else
-    return (0);
-}
+static void		cgi_unlink_file(void);
 
 
 /*
@@ -181,31 +144,14 @@ cgiCheckVariables(const char *names)	/* I - Variables to look for */
 
 
 /*
- * 'cgiIsPOST()' - Determine whether this page was POSTed.
- */
-
-int					/* O - 1 if POST, 0 if GET */
-cgiIsPOST(void)
-{
-  const char	*method;		/* REQUEST_METHOD environment variable */
-
-
-  if ((method = getenv("REQUEST_METHOD")) == NULL)
-    return (0);
-  else
-    return (!strcmp(method, "POST"));
-}
-
-
-/*
  * 'cgiGetArray()' - Get an element from a form array...
  */
 
-const char *			/* O - Element value or NULL */
-cgiGetArray(const char *name,	/* I - Name of array variable */
-            int        element)	/* I - Element number (0 to N) */
+const char *				/* O - Element value or NULL */
+cgiGetArray(const char *name,		/* I - Name of array variable */
+            int        element)		/* I - Element number (0 to N) */
 {
-  var_t	*var;			/* Pointer to variable */
+  _cgi_var_t	*var;			/* Pointer to variable */
 
 
   if ((var = cgi_find_variable(name)) == NULL)
@@ -222,13 +168,24 @@ cgiGetArray(const char *name,	/* I - Name of array variable */
 
 
 /*
+ * 'cgiGetFile()' - Get the file (if any) that was submitted in the form.
+ */
+
+const cgi_file_t *			/* O - Attached file or NULL */
+cgiGetFile(void)
+{
+  return (form_file);
+}
+
+
+/*
  * 'cgiGetSize()' - Get the size of a form array value.
  */
 
-int				/* O - Number of elements */
-cgiGetSize(const char *name)	/* I - Name of variable */
+int					/* O - Number of elements */
+cgiGetSize(const char *name)		/* I - Name of variable */
 {
-  var_t	*var;			/* Pointer to variable */
+  _cgi_var_t	*var;			/* Pointer to variable */
 
 
   if ((var = cgi_find_variable(name)) == NULL)
@@ -241,14 +198,14 @@ cgiGetSize(const char *name)	/* I - Name of variable */
 /*
  * 'cgiGetVariable()' - Get a CGI variable from the database...
  *
- * Returns NULL if the variable doesn't exist...  If the variable is an
+ * Returns NULL if the variable doesn't exist.  If the variable is an
  * array of values, returns the last element...
  */
 
-const char *			/* O - Value of variable */
-cgiGetVariable(const char *name)/* I - Name of variable */
+const char *				/* O - Value of variable */
+cgiGetVariable(const char *name)	/* I - Name of variable */
 {
-  const var_t	*var;		/* Returned variable */
+  const _cgi_var_t	*var;		/* Returned variable */
 
 
   var = cgi_find_variable(name);
@@ -266,6 +223,81 @@ cgiGetVariable(const char *name)/* I - Name of variable */
 
 
 /*
+ * 'cgiInitialize()' - Initialize the CGI variable "database"...
+ */
+
+int					/* O - Non-zero if there was form data */
+cgiInitialize(void)
+{
+  const char	*method;		/* Form posting method */
+  const char	*content_type;		/* Content-Type of post data */
+
+
+ /*
+  * Setup a password callback for authentication...
+  */
+
+  cupsSetPasswordCB(cgi_passwd);
+
+#ifdef DEBUG
+ /*
+  * Disable output buffering to find bugs...
+  */
+
+  setbuf(stdout, NULL);
+  puts("Content-type: text/plain\n");
+#endif /* DEBUG */
+
+ /*
+  * Get the request method (GET or POST)...
+  */
+
+  method       = getenv("REQUEST_METHOD");
+  content_type = getenv("CONTENT_TYPE");
+  if (!method)
+    return (0);
+
+ /*
+  * Grab form data from the corresponding location...
+  */
+
+  if (!strcasecmp(method, "GET"))
+    return (cgi_initialize_get());
+  else if (!strcasecmp(method, "POST") && content_type)
+  {
+    const char *boundary = strstr(content_type, "boundary=");
+
+    if (boundary)
+      boundary += 9;
+
+    if (content_type && !strncmp(content_type, "multipart/form-data; ", 21))
+      return (cgi_initialize_multipart(boundary));
+    else
+      return (cgi_initialize_post());
+  }
+  else
+    return (0);
+}
+
+
+/*
+ * 'cgiIsPOST()' - Determine whether this page was POSTed.
+ */
+
+int					/* O - 1 if POST, 0 if GET */
+cgiIsPOST(void)
+{
+  const char	*method;		/* REQUEST_METHOD environment variable */
+
+
+  if ((method = getenv("REQUEST_METHOD")) == NULL)
+    return (0);
+  else
+    return (!strcmp(method, "POST"));
+}
+
+
+/*
  * 'cgiSetArray()' - Set array element N to the specified string.
  *
  * If the variable array is smaller than (element + 1), the intervening
@@ -273,12 +305,12 @@ cgiGetVariable(const char *name)/* I - Name of variable */
  */
 
 void
-cgiSetArray(const char *name,	/* I - Name of variable */
-            int        element,	/* I - Element number (0 to N) */
-            const char *value)	/* I - Value of variable */
+cgiSetArray(const char *name,		/* I - Name of variable */
+            int        element,		/* I - Element number (0 to N) */
+            const char *value)		/* I - Value of variable */
 {
-  int	i;	/* Looping var */
-  var_t	*var;	/* Returned variable */
+  int		i;			/* Looping var */
+  _cgi_var_t	*var;			/* Returned variable */
 
 
   if (name == NULL || value == NULL || element < 0 || element > 100000)
@@ -318,11 +350,11 @@ cgiSetArray(const char *name,	/* I - Name of variable */
  */
 
 void
-cgiSetSize(const char *name,	/* I - Name of variable */
-           int        size)	/* I - Number of elements (0 to N) */
+cgiSetSize(const char *name,		/* I - Name of variable */
+           int        size)		/* I - Number of elements (0 to N) */
 {
-  int	i;	/* Looping var */
-  var_t	*var;	/* Returned variable */
+  int		i;			/* Looping var */
+  _cgi_var_t	*var;			/* Returned variable */
 
 
   if (name == NULL || size < 0 || size > 100000)
@@ -364,8 +396,8 @@ void
 cgiSetVariable(const char *name,	/* I - Name of variable */
                const char *value)	/* I - Value of variable */
 {
-  int	i;				/* Looping var */
-  var_t	*var;				/* Returned variable */
+  int		i;			/* Looping var */
+  _cgi_var_t	*var;			/* Returned variable */
 
 
   if (name == NULL || value == NULL)
@@ -397,7 +429,7 @@ cgi_add_variable(const char *name,	/* I - Variable name */
 		 int        element,	/* I - Array element number */
                  const char *value)	/* I - Variable value */
 {
-  var_t	*var;				/* New variable */
+  _cgi_var_t	*var;				/* New variable */
 
 
   if (name == NULL || value == NULL || element < 0 || element > 100000)
@@ -410,9 +442,9 @@ cgi_add_variable(const char *name,	/* I - Variable name */
   if (form_count >= form_alloc)
   {
     if (form_alloc == 0)
-      form_vars = malloc(sizeof(var_t) * 16);
+      form_vars = malloc(sizeof(_cgi_var_t) * 16);
     else
-      form_vars = realloc(form_vars, (form_alloc + 16) * sizeof(var_t));
+      form_vars = realloc(form_vars, (form_alloc + 16) * sizeof(_cgi_var_t));
 
     form_alloc += 16;
   }
@@ -433,8 +465,9 @@ cgi_add_variable(const char *name,	/* I - Variable name */
  */
 
 static int				/* O - Result of comparison */
-cgi_compare_variables(const var_t *v1,	/* I - First variable */
-                      const var_t *v2)	/* I - Second variable */
+cgi_compare_variables(
+    const _cgi_var_t *v1,		/* I - First variable */
+    const _cgi_var_t *v2)		/* I - Second variable */
 {
   return (strcasecmp(v1->name, v2->name));
 }
@@ -444,10 +477,10 @@ cgi_compare_variables(const var_t *v1,	/* I - First variable */
  * 'cgi_find_variable()' - Find a variable...
  */
 
-static var_t *				/* O - Variable pointer or NULL */
+static _cgi_var_t *			/* O - Variable pointer or NULL */
 cgi_find_variable(const char *name)	/* I - Name of variable */
 {
-  var_t	key;				/* Search key */
+  _cgi_var_t	key;			/* Search key */
 
 
   if (form_count < 1 || name == NULL)
@@ -455,7 +488,7 @@ cgi_find_variable(const char *name)	/* I - Name of variable */
 
   key.name = name;
 
-  return ((var_t *)bsearch(&key, form_vars, form_count, sizeof(var_t),
+  return ((_cgi_var_t *)bsearch(&key, form_vars, form_count, sizeof(_cgi_var_t),
                            (int (*)(const void *, const void *))cgi_compare_variables));
 }
 
@@ -464,10 +497,10 @@ cgi_find_variable(const char *name)	/* I - Name of variable */
  * 'cgi_initialize_get()' - Initialize form variables using the GET method.
  */
 
-static int		/* O - 1 if form data read */
+static int				/* O - 1 if form data read */
 cgi_initialize_get(void)
 {
-  char	*data;		/* Pointer to form data string */
+  char	*data;				/* Pointer to form data string */
 
 
 #ifdef DEBUG
@@ -491,18 +524,239 @@ cgi_initialize_get(void)
 
 
 /*
+ * 'cgi_initialize_multipart()' - Initialize variables and file using the POST method.
+ *
+ * TODO: Update to support files > 2GB.
+ */
+
+static int				/* O - 1 if form data was read */
+cgi_initialize_multipart(
+    const char *boundary)		/* I - Boundary string */
+{
+  char		line[10240],		/* MIME header line */
+		name[1024],		/* Form variable name */
+		filename[1024],		/* Form filename */
+		mimetype[1024],		/* MIME media type */
+		bstring[256],		/* Boundary string to look for */
+		*ptr,			/* Pointer into name/filename */
+		*end;			/* End of buffer */
+  int		ch,			/* Character from file */
+		fd,			/* Temporary file descriptor */
+		blen;			/* Length of boundary string */
+
+
+  DEBUG_printf(("cgi_initialize_multipart(boundary=\"%s\")\n", boundary));
+
+ /*
+  * Read multipart form data until we run out...
+  */
+
+  name[0]     = '\0';
+  filename[0] = '\0';
+  mimetype[0] = '\0';
+
+  snprintf(bstring, sizeof(bstring), "\r\n--%s", boundary);
+  blen = strlen(bstring);
+
+  while (fgets(line, sizeof(line), stdin))
+  {
+    if (!strcmp(line, "\r\n"))
+    {
+     /*
+      * End of headers, grab value...
+      */
+
+      if (filename[0])
+      {
+       /*
+        * Read an embedded file...
+	*/
+
+        if (form_file)
+	{
+	 /*
+	  * Remove previous file...
+	  */
+
+	  cgi_unlink_file();
+	}
+
+       /*
+        * Allocate memory for the new file...
+	*/
+
+	if ((form_file = calloc(1, sizeof(cgi_file_t))) == NULL)
+	  return (0);
+
+        form_file->name     = strdup(name);
+	form_file->filename = strdup(filename);
+	form_file->mimetype = strdup(mimetype);
+
+        fd = cupsTempFd(form_file->tempfile, sizeof(form_file->tempfile));
+
+        if (fd < 0)
+	  return (0);
+
+        atexit(cgi_unlink_file);
+
+       /*
+        * Copy file data to the temp file...
+	*/
+	
+        ptr = line;
+
+	while ((ch = getchar()) != EOF)
+	{
+	  *ptr++ = ch;
+
+          if ((ptr - line) >= blen && !memcmp(ptr - blen, bstring, blen))
+	  {
+	    ptr -= blen;
+	    break;
+	  }
+
+          if ((ptr - line - blen) >= 8192)
+	  {
+	   /*
+	    * Write out the first 8k of the buffer...
+	    */
+
+	    write(fd, line, 8192);
+	    memmove(line, line + 8192, ptr - line - 8192);
+	    ptr -= 8192;
+	  }
+	}
+
+       /*
+        * Write the rest of the data and close the temp file...
+	*/
+
+	if (ptr > line)
+          write(fd, line, ptr - line);
+
+	close(fd);
+      }
+      else
+      {
+       /*
+        * Just get a form variable; the current code only handles
+	* form values up to 10k in size...
+	*/
+
+        ptr = line;
+	end = line + sizeof(line) - 1;
+
+	while ((ch = getchar()) != EOF)
+	{
+	  if (ptr < end)
+	    *ptr++ = ch;
+
+          if ((ptr - line) >= blen && !memcmp(ptr - blen, bstring, blen))
+	  {
+	    ptr -= blen;
+	    break;
+	  }
+	}
+
+	*ptr = '\0';
+
+       /*
+        * Set the form variable...
+	*/
+
+	if ((ptr = strrchr(name, '-')) != NULL && isdigit(ptr[1] & 255))
+	{
+	 /*
+	  * Set a specific index in the array...
+	  */
+
+	  *ptr++ = '\0';
+	  if (line[0])
+            cgiSetArray(name, atoi(ptr) - 1, line);
+	}
+	else if (cgiGetVariable(name))
+	{
+	 /*
+	  * Add another element in the array...
+	  */
+
+	  cgiSetArray(name, cgiGetSize(name), line);
+	}
+	else
+	{
+	 /*
+	  * Just set the line...
+	  */
+
+	  cgiSetVariable(name, line);
+	}
+      }
+
+     /*
+      * Read the rest of the current line...
+      */
+
+      fgets(line, sizeof(line), stdin);
+
+     /*
+      * Clear the state vars...
+      */
+
+      name[0]     = '\0';
+      filename[0] = '\0';
+      mimetype[0] = '\0';
+    }
+    else if (!strncasecmp(line, "Content-Disposition:", 20))
+    {
+      if ((ptr = strstr(line + 20, " name=\"")) != NULL)
+      {
+        strlcpy(name, ptr + 7, sizeof(name));
+
+	if ((ptr = strchr(name, '\"')) != NULL)
+	  *ptr = '\0';
+      }
+
+      if ((ptr = strstr(line + 20, " filename=\"")) != NULL)
+      {
+        strlcpy(filename, ptr + 11, sizeof(filename));
+
+	if ((ptr = strchr(filename, '\"')) != NULL)
+	  *ptr = '\0';
+      }
+    }
+    else if (!strncasecmp(line, "Content-Type:", 13))
+    {
+      for (ptr = line + 13; isspace(*ptr & 255); ptr ++);
+
+      strlcpy(mimetype, ptr, sizeof(mimetype));
+
+      for (ptr = mimetype + strlen(mimetype) - 1;
+           ptr > mimetype && isspace(*ptr & 255);
+	   *ptr-- = '\0');
+    }
+  }
+
+ /*
+  * Return 1 for "form data found"...
+  */
+
+  return (1);
+}
+
+
+/*
  * 'cgi_initialize_post()' - Initialize variables using the POST method.
  */
 
-static int			/* O - 1 if form data was read */
+static int				/* O - 1 if form data was read */
 cgi_initialize_post(void)
 {
-  char	*content_length,	/* Length of input data (string) */
-	*data;			/* Pointer to form data string */
-  int	length,			/* Length of input data */
-	nbytes,			/* Number of bytes read this read() */
-	tbytes,			/* Total number of bytes read */
-	status;			/* Return status */
+  char	*content_length,		/* Length of input data (string) */
+	*data;				/* Pointer to form data string */
+  int	length,				/* Length of input data */
+	nbytes,				/* Number of bytes read this read() */
+	tbytes,				/* Total number of bytes read */
+	status;				/* Return status */
 
 
 #ifdef DEBUG
@@ -561,14 +815,14 @@ cgi_initialize_post(void)
  * 'cgi_initialize_string()' - Initialize form variables from a string.
  */
 
-static int
+static int				/* O - 1 if form data was processed */
 cgi_initialize_string(const char *data)	/* I - Form data string */
 {
-  int	done;		/* True if we're done reading a form variable */
-  char	*s,		/* Pointer to current form string */
-	ch,		/* Temporary character */
-	name[255],	/* Name of form variable */
-	value[65536];	/* Variable value... */
+  int	done;				/* True if we're done reading a form variable */
+  char	*s,				/* Pointer to current form string */
+	ch,				/* Temporary character */
+	name[255],			/* Name of form variable */
+	value[65536];			/* Variable value... */
 
 
  /*
@@ -724,7 +978,7 @@ cgi_sort_variables(void)
   if (form_count < 2)
     return;
 
-  qsort(form_vars, form_count, sizeof(var_t),
+  qsort(form_vars, form_count, sizeof(_cgi_var_t),
         (int (*)(const void *, const void *))cgi_compare_variables);
 
 #ifdef DEBUG
@@ -733,6 +987,35 @@ cgi_sort_variables(void)
     printf("%d: %s (%d) = \"%s\" ...\n", i, form_vars[i].name,
            form_vars[i].nvalues, form_vars[i].values[0]);
 #endif /* DEBUG */
+}
+
+
+/*
+ * 'cgi_unlink_file()' - Remove the uploaded form.
+ */
+
+static void
+cgi_unlink_file(void)
+{
+  if (form_file)
+  {
+   /*
+    * Remove the temporary file...
+    */
+
+    unlink(form_file->tempfile);
+
+   /*
+    * Free memory used...
+    */
+
+    free(form_file->name);
+    free(form_file->filename);
+    free(form_file->mimetype);
+    free(form_file);
+
+    form_file = NULL;
+  }
 }
 
 
