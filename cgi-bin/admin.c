@@ -538,6 +538,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 		*response,		/* IPP response */
 		*oldinfo;		/* Old printer information */
   ipp_status_t	status;			/* Request status */
+  const cgi_file_t *file;		/* Uploaded file, if any */
   const char	*var;			/* CGI variable */
   char		uri[HTTP_MAX_URI],	/* Device or printer URI */
 		*uriptr;		/* Pointer into URI */
@@ -647,6 +648,16 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     return;
   }
 
+  file = cgiGetFile();
+
+  if (file)
+  {
+    fprintf(stderr, "DEBUG: file->tempfile=%s\n", file->tempfile);
+    fprintf(stderr, "DEBUG: file->name=%s\n", file->name);
+    fprintf(stderr, "DEBUG: file->filename=%s\n", file->filename);
+    fprintf(stderr, "DEBUG: file->mimetype=%s\n", file->mimetype);
+  }
+
   if ((var = cgiGetVariable("DEVICE_URI")) == NULL)
   {
    /*
@@ -746,7 +757,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-serial.tmpl", getenv("LANG"));
     cgiEndHTML();
   }
-  else if ((var = cgiGetVariable("PPD_NAME")) == NULL)
+  else if (!file && (var = cgiGetVariable("PPD_NAME")) == NULL)
   {
     if (modify)
     {
@@ -998,8 +1009,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
                  NULL, cgiGetVariable("PRINTER_INFO"));
 
-    ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "ppd-name",
-                 NULL, cgiGetVariable("PPD_NAME"));
+    if (!file)
+      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "ppd-name",
+                   NULL, cgiGetVariable("PPD_NAME"));
 
     strlcpy(uri, cgiGetVariable("DEVICE_URI"), sizeof(uri));
     if (strncmp(uri, "serial:", 7) == 0)
@@ -1029,7 +1041,12 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
-    if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+    if (file)
+      response = cupsDoFileRequest(http, request, "/admin/", file->tempfile);
+    else
+      response = cupsDoRequest(http, request, "/admin/");
+
+    if (response)
     {
       status = response->request.status.status_code;
       ippDelete(response);

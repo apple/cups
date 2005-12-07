@@ -25,7 +25,7 @@ by Easy Software Products, the creator of CUPS.</P>
 printers shared by other systems and only allow local access to
 the system and its printers. Administration operations require
 Basic authentication with membership in the group
-"@CUPS_DEFAULT_GROUP@".</P>
+"@CUPS_GROUP@".</P>
 
 <P>Connections are accepted via domain socket
 (<VAR>@CUPS_DEFAULT_DOMAINSOCKET@</VAR>) or "localhost"

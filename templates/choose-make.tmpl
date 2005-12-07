@@ -1,4 +1,4 @@
-<FORM METHOD="POST" ACTION="/admin">
+<FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
@@ -19,6 +19,11 @@
 {[ppd_make]<OPTION VALUE="{ppd_make}" {?current_make={ppd_make}?SELECTED:}>{ppd_make}}
 </SELECT>
 </TD>
+</TR>
+<TR>
+<TH CLASS="label">Or Provide a PPD File:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="MAX_FILE_SIZE" VALUE="262144"><INPUT
+TYPE="FILE" NAME="PPD_FILE"></TD>
 </TR>
 <TR>
 <TD></TD>
