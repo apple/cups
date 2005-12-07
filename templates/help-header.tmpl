@@ -9,11 +9,14 @@ TYPE="IMAGE" SRC="/images/search.gif" ALT="Search"></P>
 </FORM>
 
 <!-- Bookmarks -->
-<DIV STYLE="background: #ddddaa; border: solid 2px #cccc99; float: right; margin-left: 10px; padding: 5;">
+<DIV CLASS="sidebar">
 <H3 CLASS="title">On-Line Help Documents</H3>
 
-<A HREF="/help{QUERY??QUERY={QUERY}:}">All Documents</A><HR>
-{[BMTEXT]{BMINDENT>0?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{BMINDENT=2?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<I>:}:}<A HREF="{BMLINK}">{BMTEXT}</A>{BMINDENT>1?</I>:}<BR>}
+<P CLASS="l0"><A HREF="/help{QUERY??QUERY={QUERY}:}">All Documents</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
 </DIV>
 
 {QUERY?<P>Search Results in {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:All Documents}}\:</P>

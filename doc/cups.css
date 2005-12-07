@@ -168,3 +168,36 @@ IMG.button {
   padding: 2;
   vertical-align: middle;
 }
+
+DIV.sidebar {
+  background: #ddddaa;
+  border: solid 2px #cccc99;
+  float: right;
+  margin-left: 10px;
+  padding: 5;
+  width: 25%;
+}
+
+DIV.sidebar P.l0 {
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 1em;
+}
+
+DIV.sidebar P.l1 {
+  margin-bottom: 0;
+  margin-left: 3em;
+  margin-right: 0;
+  margin-top: 0;
+  text-indent: -2em;
+}
+
+DIV.sidebar P.l2 {
+  font-style: italic;
+  margin-bottom: 0;
+  margin-left: 4em;
+  margin-right: 0;
+  margin-top: 0;
+  text-indent: -2em;
+}

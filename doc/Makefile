@@ -121,6 +121,7 @@ HELPFILES	=	\
 			help/man-lpr.html \
 			help/man-lprm.html \
 			help/man-lpstat.html \
+			help/network.html \
 			help/standard.html
 
 

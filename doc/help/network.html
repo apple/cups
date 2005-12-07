@@ -1,0 +1,423 @@
+<HTML>
+<!-- SECTION: Getting Started -->
+<HEAD>
+	<TITLE>Using Network Printers</TITLE>
+</HEAD>
+<BODY>
+
+<H2 CLASS="title"><A NAME="URI">Network Printer URIs</A></H2>
+
+<P>Once you have set the IP address you can access the printer or
+print server using the <CODE>ipp</CODE>, <CODE>lpd</CODE>, or
+<CODE>socket</CODE> backends. The following is a list of common
+network interfaces and printer servers and the settings you
+should use with CUPS:</P>
+
+<DIV CLASS="table"><TABLE WIDTH="50%">
+<TR VALIGN="TOP" ALIGN="LEFT">
+	<TH>Model/Manufacturer</TH>
+	<TH>Device URI(s)</TH>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Apple LaserWriter</TD>
+	<TD>lpd://<I>address</I>/PASSTHRU</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Axis w/o IPP<BR>
+	Axis OfficeBasic<BR>
+	<A HREF="#AXIS">(see directions)</A></TD>
+	<TD>socket://<I>address</I>:9100<BR>
+	socket://<I>address</I>:9101<BR>
+	socket://<I>address</I>:9102</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Axis w/IPP</TD>
+	<TD>ipp://<I>address</I>/LPT1<BR>
+	ipp://<I>address</I>/LPT2<BR>
+	ipp://<I>address</I>/COM1</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Castelle LANpress<SUP>TM</SUP></TD>
+	<TD>lpd://<I>address</I>/pr1<BR>
+	lpd://<I>address</I>/pr2<BR>
+	lpd://<I>address</I>/pr3</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>DPI NETPrint</TD>
+	<TD>lpd://<I>address</I>/pr1<BR>
+	lpd://<I>address</I>/pr2<BR>
+	lpd://<I>address</I>/pr3</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>EFI&reg; Fiery&reg; RIP</TD>
+	<TD>lpd://<I>address</I>/print</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>EPSON&reg; Multiprotocol Ethernet Interface Board</TD>
+	<TD>socket://<I>address</I></TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Extended System ExtendNET</TD>
+	<TD>lpd://<I>address</I>/pr1<BR>
+	lpd://<I>address</I>/pr2<BR>
+	lpd://<I>address</I>/pr3</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Hewlett Packard JetDirect w/o IPP</TD>
+	<TD>socket://<I>address</I>:9100<BR>
+	socket://<I>address</I>:9101<BR>
+	socket://<I>address</I>:9102</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Hewlett Packard JetDirect w/IPP</TD>
+	<TD>ipp://<I>address</I>/ipp<BR>
+	ipp://<I>address</I>/ipp/port1<BR>
+	ipp://<I>address</I>/ipp/port2<BR>
+	ipp://<I>address</I>/ipp/port3</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Intel® NetportExpress XL, PRO/100</TD>
+	<TD>lpd://<I>address</I>/LPT1_PASSTHRU<BR>
+	lpd://<I>address</I>/LPT2_PASSTHRU<BR>
+	lpd://<I>address</I>/COM1_PASSTHRU</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Lexmark<SUP>TM</SUP> MarkNet</TD>
+	<TD>lpd://<I>address</I>/ps</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Linksys EtherFast&reg;<BR>
+	<A HREF="#LINKSYS">(see directions)</A></TD>
+	<TD>socket://<I>address</I>:4010<BR>
+	socket://<I>address</I>:4020<BR>
+	socket://<I>address</I>:4030</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Kodak&reg;</TD>
+	<TD>lpd://<I>address</I>/ps</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>QMS&reg; CrownNet<SUP>TM</SUP></TD>
+	<TD>lpd://<I>address</I>/ps</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>Tektronix&reg; PhaserShare<SUP>TM</SUP></TD>
+	<TD>socket://<I>address</I>:9100</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>XEROX&reg; 4512 NIC</TD>
+	<TD>lpd://<I>address</I>/PORT1</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>XEROX&reg; XNIC</TD>
+	<TD>lpd://<I>address</I>/PASSTHRU</TD>
+</TR>
+<TR ALIGN="LEFT" VALIGN="TOP">
+	<TD>XEROX&reg; (most others)</TD>
+	<TD>socket://<I>address</I>:5503</TD>
+</TR>
+</TABLE></DIV>
+
+<H2 CLASS="title"><A NAME="ADDRESS">Getting the IP Address</A></H2>
+
+<P>When you first install a network printer or print server on
+your LAN, you need to set the Internet Protocol ("IP") address.
+On most higher-end "workgroup" printers, you can set the address
+through the printer control panel. However, in most cases you
+will want to assign the addresses remotely from your workstation.
+This makes administration a bit easier and avoids assigning
+duplicate addresses accidentally.</P>
+
+<P>To setup your printer or print server for remote address
+assignment, you'll need the Ethernet Media Access Control ("MAC")
+address, also sometimes called a node address, and the IP address
+you want to use for the device. The Ethernet MAC address can
+often be found on the printer test page or bottom of the print
+server.</P>
+
+<H3>Configuring the IP Address Using ARP</H3>
+
+<P>The easiest way to set the IP address of a network device is
+to use the <CODE>arp(8)</CODE> command.  The <CODE>arp</CODE>
+sends an Address Resolution Protocol ("ARP") packet to the
+specified Ethernet MAC address, setting the network device's IP
+address:</P>
+
+<PRE CLASS="command">
+<KBD>arp -s ip-address ethernet-address</KBD>
+<KBD>arp -s host.domain.com 08:00:69:00:12:34</KBD>
+<KBD>arp -s 192.0.2.2 08:00:69:00:12:34</KBD>
+</PRE>
+
+<H3>Configuring the IP Address Using RARP</H3>
+
+<P>The most flexible way to remotely assign IP addresses under
+UNIX is through the Reverse Address Resolution Protocol ("RARP").
+RARP allows a network device to request an IP address using its
+Ethernet MAC address, and one or more RARP servers on the network
+will respond with an ARP packet with the IP address the device
+can use.</P>
+
+<P>RARP should be used when you have to manage many printers or
+print servers, or when you have a network device that does not
+remember its IP address after a power cycle. If you just have a
+single printer or print server, the <CODE>arp</CODE> command is
+the way to go.</P>
+
+<P>Some UNIX operating systems use a program called
+<CODE>rarpd(8)</CODE> to manage RARP. Others, like Linux, support
+this protocol in the kernel. For systems that provide the
+<CODE>rarpd</CODE> program you will need to start it before RARP
+lookups will work:</P>
+
+<PRE CLASS="command">
+<KBD>rarpd</KBD>
+</PRE>
+
+<P>Under IRIX you can enable this functionality by default
+using:</P>
+
+<PRE CLASS="command">
+<KBD>chkconfig rarpd on</KBD>
+</PRE>
+
+<P>Both the <CODE>rarpd</CODE> program and kernel RARP support
+read a list of Ethernet and IP addresses from the file
+<VAR>/etc/ethers</VAR>. Each line contains the Ethernet address
+(colon delimited) followed by an IP address or hostname like:</P>
+
+<PRE CLASS="command">
+08:00:69:00:12:34 myprinter.mydomain.com
+08:00:69:00:12:34 192.0.2.2
+</PRE>
+
+<P>Add a line to this file and cycle the power on the printer or
+print server to set its address.</P>
+
+<H3>Configuring the IP Address Using BOOTP</H3>
+
+<P>The BOOTP protocol is used when you need to provide additional
+information such as the location of a configuration file to the
+network interface. Using the standard <CODE>bootpd(8)</CODE>
+program supplied with UNIX you simply need to add a line to the
+<VAR>/etc/bootptab</VAR> file; for IRIX:</P>
+
+<PRE CLASS="command">
+myprinter 08:00:69:00:12:34 192.0.2.2 <VAR>myprinter.boot</VAR>
+</PRE>
+
+<P>Newer versions of <CODE>bootpd</CODE> use a different
+format:</P>
+
+<PRE CLASS="command">
+myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>
+</PRE>
+
+<P>The <VAR>myprinter.boot</VAR> file resides in the
+<VAR>/usr/local/boot</VAR> directory by default. If you do not
+need to provide a boot file you may leave the last part of the
+line blank.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>Some versions of UNIX do not enable the BOOTP service by
+default. The <VAR>/etc/inetd.conf</VAR> usually contains a line
+for the BOOTP service that can be uncommented if needed.</P>
+
+</BLOCKQUOTE>
+
+<H2 CLASS="title"><A NAME="VERIFY">Verifying the Printer Connection</A></H2>
+
+<P>To test that the IP address has been successfully assigned and
+that the printer is properly connected to your LAN, type:</P>
+
+<PRE CLASS="command">
+<KBD>ping ip-address</KBD>
+</PRE>
+
+<P>If the connection is working properly you will see something
+like:</P>
+
+<PRE CLASS="command">
+<KBD>ping myprinter</KBD>
+PING myprinter (192.0.2.2): 56 data bytes
+64 bytes from 192.0.2.2: icmp_seq=0 ttl=15 time=5 ms
+64 bytes from 192.0.2.2: icmp_seq=1 ttl=15 time=3 ms
+64 bytes from 192.0.2.2: icmp_seq=2 ttl=15 time=3 ms
+64 bytes from 192.0.2.2: icmp_seq=3 ttl=15 time=3 ms
+</PRE>
+
+<P>If not, verify that the printer or print server is connected
+to the LAN, it is powered on, the LAN cabling is good, and the IP
+address is set correctly. You can usually see the current IP
+address and network status by printing a configuration or test
+page on the device.</P>
+
+<H2 CLASS="title"><A NAME="AXIS">Configuring Axis Print Servers</A></H2>
+
+<P>The Axis print servers can be configured using ARP, RARP, or
+BOOTP. However, on models that do not provide IPP support an
+additional step must be performed to configure the TCP/IP portion
+of the print server for use with CUPS.</P>
+
+<P>Each print server contains a configuration file named
+<VAR>config</VAR> that contains a list of network parameters used
+by the server. To modify this file you must first download it
+from the print server using the <CODE>ftp(1)</CODE> program:</P>
+
+<PRE CLASS="command">
+<KBD>ftp ip-address</KBD>
+Connected to ip-address.
+220 Axis NPS ### FTP Printer Server V#.## MON DD YEAR ready.
+ftp> <KBD>user root</KBD>
+331 User name ok, need password
+Password: <KBD>pass</KBD> <I>(this is not echoed)</I>
+230 User logged in
+ftp> <KBD>get config</KBD>
+local: config remote: config
+200 PORT command successful.
+150 Opening data connection for config (192,0,2,2),
+(mode ascii).
+226 Transfer complete.
+##### bytes received in #.## seconds (##### Kbytes/s)
+ftp> <KBD>quit</KBD>
+221 Goodbye.
+</PRE>
+
+<P>Next, edit the file with your favorite text editor and locate
+the lines beginning with:</P>
+
+<PRE CLASS="command">
+RTN_OPT.     : YES
+RTEL_PR1.    : 0
+RTEL_PR2.    : 0
+RTEL_PR3.    : 0
+RTEL_PR4.    : 0
+RTEL_PR5.    : 0
+RTEL_PR6.    : 0
+RTEL_PR7.    : 0
+RTEL_PR8.    : 0
+</PRE>
+
+<P>Change the <CODE>RTN_OPT</CODE> line to read:</P>
+
+<PRE CLASS="command">
+RTN_OPT.     : <KBD>NO</KBD>
+</PRE>
+
+<P>This disables the Reverse TELNET protocol and enables the
+standard TELNET protocol on the print server. Next, assign a port
+number for each parallel and serial port on the server as
+follows:</P>
+
+<PRE CLASS="command">
+RTEL_PR1.    : <KBD>9100</KBD>
+RTEL_PR2.    : <KBD>9101</KBD>
+RTEL_PR3.    : <KBD>9102</KBD>
+RTEL_PR4.    : <KBD>9103</KBD>
+RTEL_PR5.    : <KBD>9104</KBD>
+RTEL_PR6.    : <KBD>9105</KBD>
+RTEL_PR7.    : <KBD>9106</KBD>
+RTEL_PR8.    : <KBD>9107</KBD>
+</PRE>
+
+<P>This essentially makes the Axis print server look like a
+Hewlett Packard JetDirect EX print server. Save the file and then
+upload the new <VAR>config</VAR> file using the <CODE>ftp</CODE>
+command:</P>
+
+<PRE CLASS="command">
+<KBD>ftp ip-address</KBD>
+Connected to ip-address.
+220 Axis NPS ### FTP Printer Server V#.## MON DD YEAR ready.
+ftp> <KBD>user root</KBD>
+331 User name ok, need password
+Password: <KBD>pass</KBD> <I>(this is not echoed)</I>
+230 User logged in
+ftp> <KBD>put config CONFIG</KBD>
+local: config remote: CONFIG
+200 PORT command successful.
+150 Opening data connection for config (192,0,2,2), (mode ascii).
+226 Transfer complete.
+##### bytes received in #.## seconds (##### Kbytes/s)
+ftp> <KBD>get hardreset</KBD>
+local: hardreset remote: hardreset
+200 PORT command successful.
+421 Axis NPS ### hard reset, closing connection.
+ftp> <KBD>quit</KBD>
+221 Goodbye.
+</PRE>
+
+<P>Your Axis print server is now ready for use!</P>
+
+<H2 CLASS="title"><A NAME="LINKSYS">Configuring Linksys Print Servers</A></H2>
+
+<P>The Linksys print servers can be configured using ARP, RARP,
+or BOOTP. Like older Axis print servers, an additional step must
+be performed to configure the TCP/IP portion of the print server
+for use with CUPS.</P>
+
+<P>Each print server contains a configuration file named
+<VAR>CONFIG</VAR> that contains a list of network parameters used
+by the server. To modify this file you must first download it
+from the print server using the <CODE>ftp(1)</CODE> program:</P>
+
+<PRE CLASS="command">
+<KBD>ftp -n ip-address</KBD>
+Connected to ip-address.
+220 Print Server Ready.
+Remote system type is Print.
+ftp> <KBD>get CONFIG</KBD>
+local: CONFIG remote: CONFIG
+200 Command OK.
+150 Open ASCII Mode Connection.
+WARNING! 68 bare linefeeds received in ASCII mode
+File may not have transferred correctly.
+226 Transfer complete.
+##### bytes received in #.## seconds (##### Kbytes/s)
+ftp> <KBD>quit</KBD>
+221 Goodbye.
+</PRE>
+
+<P>Next, edit the file with your favorite text editor and locate
+the lines beginning with:</P>
+
+<PRE CLASS="command">
+0100 L1_PROUT:P1
+0120 L2_PROUT:P1
+0140 L3_PROUT:P1
+</PRE>
+
+<P>Change the port number for each parallel and serial port on
+the server as follows:</P>
+
+<PRE CLASS="command">
+0100 L1_PROUT:<KBD>P1</KBD>
+0120 L2_PROUT:<KBD>P2</KBD>
+0140 L3_PROUT:<KBD>P3</KBD>
+</PRE>
+
+<P>This maps each virtual printer with a physical port. Save the
+file and then upload the new <VAR>CONFIG</VAR> file using the
+<CODE>ftp</CODE> command:</P>
+
+<PRE CLASS="command">
+<KBD>ftp -n ip-address</KBD>
+Connected to ip-address.
+220 Print Server Ready.
+Remote system type is Print.
+ftp> <KBD>put CONFIG</KBD>
+local: CONFIG remote: CONFIG
+200 Command OK.
+150 Open ASCII Mode Connection.
+226 Transfer complete.
+##### bytes received in #.## seconds (##### Kbytes/s)
+ftp> <KBD>quit</KBD>
+221 Goodbye.
+</PRE>
+
+<P>Your Linksys print server is now ready for use!</P>
+
+
+</BODY>
+</HTML>
