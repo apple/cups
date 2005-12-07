@@ -75,6 +75,7 @@
  *   restart_job()               - Restart an old print job.
  *   save_auth_info()            - Save authentication information for a job.
  *   send_document()             - Send a file to a printer or class.
+ *   send_http_error()           - Send a HTTP error back to the IPP client.
  *   send_ipp_error()            - Send an error status back to the IPP client.
  *   set_default()               - Set the default destination...
  *   set_job_attrs()             - Set job attributes.
@@ -165,6 +166,7 @@ static void	renew_subscription(cupsd_client_t *con, int sub_id);
 static void	restart_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	save_auth_info(cupsd_client_t *con, cupsd_job_t *job);
 static void	send_document(cupsd_client_t *con, ipp_attribute_t *uri);
+static void	send_http_error(cupsd_client_t *con, http_status_t status);
 static void	send_ipp_error(cupsd_client_t *con, ipp_status_t status);
 static void	set_default(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	set_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -651,6 +653,7 @@ static void
 accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Printer or class URI */
 {
+  http_status_t	status;			/* Policy status */
   cups_ptype_t	dtype;			/* Destination type (printer or class) */
   char		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
@@ -690,7 +693,7 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
     */
 
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "accept_jobs: resource name \'%s\' no good!", resource);
+                    "Accept-Jobs: resource name \'%s\' no good!", resource);
     send_ipp_error(con, IPP_NOT_FOUND);
     return;
   }
@@ -699,10 +702,9 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "accept_jobs: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -739,6 +741,7 @@ static void
 add_class(cupsd_client_t  *con,		/* I - Client connection */
           ipp_attribute_t *uri)		/* I - URI of class */
 {
+  http_status_t	status;			/* Policy status */
   int		i;			/* Looping var */
   char		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
@@ -803,10 +806,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "add_class: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -1412,6 +1414,7 @@ static void
 add_printer(cupsd_client_t  *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - URI of printer */
 {
+  http_status_t	status;			/* Policy status */
   int		i;			/* Looping var */
   char		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
@@ -1479,10 +1482,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "add_printer: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -2229,6 +2231,7 @@ static void
 cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 	        ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
+  http_status_t	status;			/* Policy status */
   const char	*dest;			/* Destination */
   cups_ptype_t	dtype;			/* Destination type */
   char		method[HTTP_MAX_URI],	/* Method portion of URI */
@@ -2318,7 +2321,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     if (strcmp(resource, "/printers/") != 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cancel_all_jobs: resource name \'%s\' no good!",
+                      "Purge-Jobs: resource name \'%s\' no good!",
 		      resource);
       send_ipp_error(con, IPP_NOT_FOUND);
       return;
@@ -2328,10 +2331,9 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     * Check policy...
     */
 
-    if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "cancel_all_jobs: not authorized!");
-      send_ipp_error(con, IPP_NOT_AUTHORIZED);
+      send_http_error(con, status);
       return;
     }
 
@@ -2350,10 +2352,9 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     * Check policy...
     */
 
-    if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+    if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "cancel_all_jobs: not authorized!");
-      send_ipp_error(con, IPP_NOT_AUTHORIZED);
+      send_http_error(con, status);
       return;
     }
 
@@ -3740,6 +3741,7 @@ static void
 create_job(cupsd_client_t  *con,	/* I - Client connection */
 	   ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr;		/* Current attribute */
   const char	*dest;			/* Destination */
   cups_ptype_t	dtype;			/* Destination type (printer or class) */
@@ -3810,11 +3812,14 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL) ||
-      ((printer->type & CUPS_PRINTER_AUTHENTICATED) && !con->username[0]))
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "create_job: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
+    return;
+  }
+  else if ((printer->type & CUPS_PRINTER_AUTHENTICATED) && !con->username[0])
+  {
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -4442,6 +4447,7 @@ create_subscription(
     cupsd_client_t  *con,		/* I - Client connection */
     ipp_attribute_t *uri)		/* I - Printer URI */
 {
+  http_status_t	status;			/* Policy status */
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
   const char		*dest;		/* Destination */
@@ -4512,17 +4518,15 @@ create_subscription(
 
   if (printer)
   {
-    if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+    if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "create_subscription: not authorized!");
-      send_ipp_error(con, IPP_NOT_AUTHORIZED);
+      send_http_error(con, status);
       return;
     }
   }
-  else if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  else if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "create_subscription: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -4704,6 +4708,7 @@ static void
 delete_printer(cupsd_client_t  *con,	/* I - Client connection */
                ipp_attribute_t *uri)	/* I - URI of printer or class */
 {
+  http_status_t	status;			/* Policy status */
   const char	*dest;			/* Destination */
   cups_ptype_t	dtype;			/* Destination type (printer or class) */
   char		method[HTTP_MAX_URI],	/* Method portion of URI */
@@ -4753,10 +4758,9 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "delete_printer: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -4821,6 +4825,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
 static void
 get_default(cupsd_client_t *con)	/* I - Client connection */
 {
+  http_status_t		status;		/* Policy status */
   int			i;		/* Looping var */
   ipp_attribute_t	*requested,	/* requested-attributes */
 			*history;	/* History collection */
@@ -4836,10 +4841,9 @@ get_default(cupsd_client_t *con)	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_default: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -4935,6 +4939,7 @@ get_default(cupsd_client_t *con)	/* I - Client connection */
 static void
 get_devices(cupsd_client_t *con)	/* I - Client connection */
 {
+  http_status_t		status;		/* Policy status */
   int			i;		/* Looping var */
   ipp_attribute_t	*limit,		/* Limit attribute */
 			*requested;	/* requested-attributes attribute */
@@ -4951,10 +4956,9 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_devices: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -5039,6 +5043,7 @@ static void
 get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 	 ipp_attribute_t *uri)		/* I - Printer URI */
 {
+  http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr,		/* Current attribute */
 		*requested;		/* Requested attributes */
   const char	*dest;			/* Destination */
@@ -5110,17 +5115,15 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
   if (printer)
   {
-    if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+    if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "get_jobs: not authorized!");
-      send_ipp_error(con, IPP_NOT_AUTHORIZED);
+      send_http_error(con, status);
       return;
     }
   }
-  else if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  else if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_jobs: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -5257,6 +5260,7 @@ static void
 get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      ipp_attribute_t *uri)	/* I - Job URI */
 {
+  http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr,		/* Current attribute */
 		*requested;		/* Requested attributes */
   int		jobid;			/* Job ID */
@@ -5337,10 +5341,9 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_job_attrs: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -5399,6 +5402,7 @@ get_notifications(cupsd_client_t *con,	/* I - Client connection */
 static void
 get_ppds(cupsd_client_t *con)		/* I - Client connection */
 {
+  http_status_t		status;		/* Policy status */
   int			i;		/* Looping var */
   ipp_attribute_t	*limit,		/* Limit attribute */
 			*make,		/* ppd-make attribute */
@@ -5416,10 +5420,9 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_ppds: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -5507,6 +5510,7 @@ static void
 get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		  ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  http_status_t		status;		/* Policy status */
   const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
@@ -5555,10 +5559,9 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_printer_attrs: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -5650,6 +5653,7 @@ static void
 get_printers(cupsd_client_t *con,	/* I - Client connection */
              int            type)	/* I - 0 or CUPS_PRINTER_CLASS */
 {
+  http_status_t	status;			/* Policy status */
   int		i;			/* Looping var */
   ipp_attribute_t *requested,		/* requested-attributes */
 		*history,		/* History collection */
@@ -5681,10 +5685,9 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_printers: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -5877,6 +5880,7 @@ get_subscription_attrs(
     cupsd_client_t *con,		/* I - Client connection */
     int            sub_id)		/* I - Subscription ID */
 {
+  http_status_t		status;		/* Policy status */
   cupsd_subscription_t	*sub;		/* Subscription */
   cups_array_t		*ra;		/* Requested attributes array */
 
@@ -5906,11 +5910,11 @@ get_subscription_attrs(
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr : DefaultPolicyPtr,
-                        con, sub->owner))
+  if ((status = cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr :
+                                             DefaultPolicyPtr,
+                                 con, sub->owner)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_subscription_attrs: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -5937,6 +5941,7 @@ static void
 get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
                   ipp_attribute_t *uri)	/* I - Printer/job URI */
 {
+  http_status_t		status;		/* Policy status */
   int			count;		/* Number of subscriptions */
   int			limit;		/* Limit */
   cupsd_subscription_t	*sub;		/* Subscription */
@@ -6021,11 +6026,11 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer ? printer->op_policy_ptr : DefaultPolicyPtr,
-                        con, NULL))
+  if ((status = cupsdCheckPolicy(printer ? printer->op_policy_ptr :
+                                           DefaultPolicyPtr,
+                                 con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_subscriptions: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -6240,6 +6245,7 @@ static void
 move_job(cupsd_client_t  *con,		/* I - Client connection */
 	 ipp_attribute_t *uri)		/* I - Job URI */
 {
+  http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr;		/* Current attribute */
   int		jobid;			/* Job ID */
   cupsd_job_t	*job;			/* Current job */
@@ -6380,10 +6386,9 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "move_job: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -6532,6 +6537,7 @@ static void
 print_job(cupsd_client_t  *con,		/* I - Client connection */
 	  ipp_attribute_t *uri)		/* I - Printer URI */
 {
+  http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr;		/* Current attribute */
   ipp_attribute_t *format;		/* Document-format attribute */
   const char	*dest;			/* Destination */
@@ -6778,11 +6784,14 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL) ||
-      ((printer->type & CUPS_PRINTER_AUTHENTICATED) && !con->username[0]))
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "print_job: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
+    return;
+  }
+  else if ((printer->type & CUPS_PRINTER_AUTHENTICATED) && !con->username[0])
+  {
+    send_http_error(con, status);
     return;
   }
 
@@ -7430,6 +7439,7 @@ static void
 reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Printer or class URI */
 {
+  http_status_t	status;			/* Policy status */
   cups_ptype_t	dtype;			/* Destination type (printer or class) */
   char		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
@@ -7480,10 +7490,9 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "reject_jobs: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -8307,6 +8316,27 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
 
 /*
+ * 'send_http_error()' - Send a HTTP error back to the IPP client.
+ */
+
+static void
+send_http_error(cupsd_client_t *con,	/* I - Client connection */
+                http_status_t  status)	/* I - HTTP status code */
+{
+  cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s",
+                  ippOpString(con->request->request.op.operation_id),
+		  httpStatus(status));
+
+  cupsdSendError(con, status);
+
+  ippDelete(con->response);
+  con->response = NULL;
+
+  return;
+}
+
+
+/*
  * 'send_ipp_error()' - Send an error status back to the IPP client.
  */
 
@@ -8318,21 +8348,6 @@ send_ipp_error(cupsd_client_t *con,	/* I - Client connection */
                   con->http.fd, status);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "Sending error: %s", ippErrorString(status));
-
-  if (status == IPP_NOT_AUTHORIZED)
-  {
-   /*
-    * Send HTTP_UNAUTHORIZED response instead of IPP response, so that
-    * the client will properly authenticate the request...
-    */
-
-    cupsdSendError(con, HTTP_UNAUTHORIZED);
-
-    ippDelete(con->response);
-    con->response = NULL;
-
-    return;
-  }
 
   con->response->request.status.status_code = status;
 
@@ -8355,6 +8370,7 @@ static void
 set_default(cupsd_client_t  *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  http_status_t		status;		/* Policy status */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -8408,10 +8424,9 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(DefaultPolicyPtr, con, NULL))
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "set_default: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -8777,6 +8792,7 @@ static void
 start_printer(cupsd_client_t  *con,	/* I - Client connection */
               ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  http_status_t		status;		/* Policy status */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -8830,10 +8846,9 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "start_printer: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -8869,6 +8884,7 @@ static void
 stop_printer(cupsd_client_t  *con,	/* I - Client connection */
              ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  http_status_t		status;		/* Policy status */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -8922,10 +8938,9 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "stop_printer: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -9007,6 +9022,7 @@ static void
 validate_job(cupsd_client_t  *con,	/* I - Client connection */
 	     ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  http_status_t		status;		/* Policy status */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_attribute_t	*format;	/* Document-format attribute */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
@@ -9114,10 +9130,9 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if (!cupsdCheckPolicy(printer->op_policy_ptr, con, NULL))
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "validate_job: not authorized!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_http_error(con, status);
     return;
   }
 
@@ -9204,10 +9219,8 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
   else
     printer = cupsdFindPrinter(job->dest);
 
-  if (printer)
-    return (cupsdCheckPolicy(printer->op_policy_ptr, con, owner));
-  else
-    return (cupsdCheckPolicy(DefaultPolicyPtr, con, owner));
+  return (cupsdCheckPolicy(printer ? printer->op_policy_ptr : DefaultPolicyPtr,
+                           con, owner) == HTTP_OK);
 }
 
 

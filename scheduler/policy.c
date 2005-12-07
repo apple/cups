@@ -179,7 +179,7 @@ cupsdAddPolicyOp(cupsd_policy_t   *p,	/* I - Policy */
  * 'cupsdCheckPolicy()' - Check the IPP operation and username against a policy.
  */
 
-int					/* I - 1 if OK, 0 otherwise */
+http_status_t				/* I - 1 if OK, 0 otherwise */
 cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
                  cupsd_client_t *con,	/* I - Client connection */
 	         const char     *owner)	/* I - Owner of object */
@@ -214,7 +214,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
   * Return the status of the check...
   */
 
-  return (cupsdIsAuthorized(con, owner) == HTTP_OK);
+  return (cupsdIsAuthorized(con, owner));
 }
 
 

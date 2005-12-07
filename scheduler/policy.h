@@ -54,7 +54,7 @@ extern cupsd_policy_t	*cupsdAddPolicy(const char *policy);
 extern cupsd_location_t	*cupsdAddPolicyOp(cupsd_policy_t *p,
 			                  cupsd_location_t *po,
 			                  ipp_op_t op);
-extern int		cupsdCheckPolicy(cupsd_policy_t *p, cupsd_client_t *con,
+extern http_status_t	cupsdCheckPolicy(cupsd_policy_t *p, cupsd_client_t *con,
 				         const char *owner);
 extern void		cupsdDeleteAllPolicies(void);
 extern cupsd_policy_t	*cupsdFindPolicy(const char *policy);
