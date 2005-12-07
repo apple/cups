@@ -49,6 +49,7 @@ A:link:hover, A:visited:hover, A:active {
 
 A.sel, TR.sel {
   background-color: #eeeebb;
+  color: #993300;
 }
 
 TR.sel TD {
@@ -58,6 +59,11 @@ TR.sel TD {
 A.unsel {
   background-color: #666633;
   color: #e8e8b8;
+}
+
+A.unsel:link:hover, A.unsel:visited:hover, A.unsel:active {
+  background-color: #999966;
+  color: #663300;
 }
 
 INPUT[TYPE="TEXT"], TEXTAREA {
