@@ -38,6 +38,16 @@ if test "$exec_prefix" = "NONE"; then
 	fi
 fi
 
+dnl Fix "bindir" variable...
+if test "$bindir" = "\${exec_prefix}/bin"; then
+	bindir="$exec_prefix/bin"
+fi
+
+dnl Fix "sbindir" variable...
+if test "$sbindir" = "\${exec_prefix}/sbin"; then
+	sbindir="$exec_prefix/sbin"
+fi
+
 dnl Fix "sharedstatedir" variable if it hasn't been specified...
 if test "$sharedstatedir" = "\${prefix}/com" -a "$prefix" = "/"; then
 	sharedstatedir="/usr/com"

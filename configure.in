@@ -48,7 +48,7 @@ sinclude(config-scripts/cups-scripting.m4)
 
 AC_OUTPUT(Makedefs packaging/cups.list cups.sh cups-config
           conf/cupsd.conf conf/pam.std doc/index.html
-	  templates/edit-config.tmpl)
+	  doc/help/standard.html templates/edit-config.tmpl)
 
 chmod +x cups-config
 

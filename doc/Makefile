@@ -120,7 +120,8 @@ HELPFILES	=	\
 			help/man-lpq.html \
 			help/man-lpr.html \
 			help/man-lprm.html \
-			help/man-lpstat.html
+			help/man-lpstat.html \
+			help/standard.html
 
 
 #

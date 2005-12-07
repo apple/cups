@@ -1,0 +1,128 @@
+<HTML>
+<!-- SECTION: Getting Started -->
+<HEAD>
+	<TITLE>Standard Configuration</TITLE>
+</HEAD>
+<BODY>
+
+<P>This document describes the standard configuration for this CUPS
+server.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<!-- Packagers: Change the following statement and the following sections
+     if you make any changes to the standard CUPS distribution that are
+     not automatically updated by the configure script. -->
+<P>This file reflects the standard CUPS configuration as distributed
+by Easy Software Products, the creator of CUPS.</P>
+
+</BLOCKQUOTE>
+
+
+<H2><A NAME="CUPSD">cupsd Configuration</A></H2>
+
+<P><CODE>cupsd(8)</CODE> is configured by default to show
+printers shared by other systems and only allow local access to
+the system and its printers. Administration operations require
+Basic authentication with membership in the group
+"@CUPS_DEFAULT_GROUP@".</P>
+
+<P>Connections are accepted via domain socket
+(<VAR>@CUPS_DEFAULT_DOMAINSOCKET@</VAR>) or "localhost"
+(127.0.0.1).</P>
+
+
+<H2><A NAME="DIRECTORIES">Directories</A></H2>
+
+<DIV CLASS="table"><TABLE WIDTH="80%">
+<TR>
+	<TH>Directory</TH>
+	<TH>Purpose</TH>
+</TR>
+<TR>
+	<TD><VAR>@CUPS_SERVERROOT@</VAR></TD>
+	<TD>The location of configuration files such as
+	<VAR>printers.conf</VAR>. Overridden by the <A
+	HREF="cupsd-conf-reference.html#ServerRoot"><CODE>ServerRoot</CODE></A>
+	directive in <VAR>cupsd.conf</VAR>.</TD>
+</TR>
+<TR>
+	<TD><VAR>@bindir@</VAR></TD>
+	<TD>The location of user programs.</TD>
+</TR>
+<TR>
+	<TD><VAR>@includedir@</VAR></TD>
+	<TD>The location of CUPS include files.</TD>
+</TR>
+<TR>
+	<TD><VAR>@libdir@</VAR></TD>
+	<TD>The location of CUPS library files.</TD>
+</TR>
+<TR>
+	<TD><VAR>@CUPS_SERVERBIN@</VAR></TD>
+	<TD>The location of server programs such as backends and
+	filters. Overridden by the <A
+	HREF="cupsd-conf-reference.html#ServerBin"><CODE>ServerBin</CODE></A>
+	directive in <VAR>cupsd.conf</VAR>.</TD>
+</TR>
+<TR>
+	<TD><VAR>@sbindir@</VAR></TD>
+	<TD>The location of administrator programs.</TD>
+</TR>
+<TR>
+	<TD><VAR>@CUPS_DATADIR@</VAR></TD>
+	<TD>The location of data files such as fonts. Overridden
+	by the <A
+	HREF="cupsd-conf-reference.html#DataDir"><CODE>DataDir</CODE></A>
+	directive in <VAR>cupsd.conf</VAR>.</TD>
+</TR>
+<TR>
+	<TD><VAR>@CUPS_DOCROOT@</VAR></TD>
+	<TD>The location of documentation files. Overridden by
+	the <A
+	HREF="cupsd-conf-reference.html#DocumentRoot"><CODE>DocumentRoot</CODE></A>
+	directive in <VAR>cupsd.conf</VAR>.</TD>
+</TR>
+<TR>
+	<TD><VAR>@CUPS_LOCALEDIR@</VAR></TD>
+	<TD>The location of localization files.</TD>
+</TR>
+<TR>
+	<TD><VAR>@CUPS_CACHEDIR@</VAR></TD>
+	<TD>The location of cache files such as
+	<VAR>ppds.dat</VAR> and <VAR>remote.cache</VAR>.
+	Overridden by the <A
+	HREF="cupsd-conf-reference.html#CacheDir"><CODE>CacheDir</CODE></A>
+	directive in <VAR>cupsd.conf</VAR>.</TD>
+</TR>
+<TR>
+	<TD><VAR>@CUPS_LOGDIR@</VAR></TD>
+	<TD>The location of the <VAR>access_log</VAR>,
+	<VAR>error_log</VAR>, and <VAR>page_log</VAR> files.
+	Overridden by the <A
+	HREF="cupsd-conf-reference.html#AccessLog"><CODE>AccessLog</CODE></A>,
+	<A
+	HREF="cupsd-conf-reference.html#ErrorLog"><CODE>ErrorLog</CODE></A>,
+	<A
+	HREF="cupsd-conf-reference.html#PageLog"><CODE>PageLog</CODE></A>,
+	directive in <VAR>cupsd.conf</VAR>.</TD>
+</TR>
+<TR>
+	<TD><VAR>@CUPS_STATEDIR@</VAR></TD>
+	<TD>The location of the domain socket file and state data
+	such as authentication certificates. Overridden by the <A
+	HREF="cupsd-conf-reference.html#StateDir"><CODE>StateDir</CODE></A>
+	directive in <VAR>cupsd.conf</VAR>.</TD>
+</TR>
+<TR>
+	<TD><VAR>@CUPS_REQUESTS@</VAR></TD>
+	<TD>The location of spooled print jobs. Overridden by the
+	<A
+	HREF="cupsd-conf-reference.html#RequestRoot"><CODE>RequestRoot</CODE></A>
+	directive in <VAR>cupsd.conf</VAR>.</TD>
+</TR>
+</TABLE></DIV>
+
+
+</BODY>
+</HTML>
