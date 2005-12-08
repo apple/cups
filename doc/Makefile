@@ -122,7 +122,9 @@ HELPFILES	=	\
 			help/man-lprm.html \
 			help/man-lpstat.html \
 			help/network.html \
-			help/standard.html
+			help/overview.html \
+			help/standard.html \
+			help/whatsnew.html
 
 
 #

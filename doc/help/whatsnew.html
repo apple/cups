@@ -1,0 +1,188 @@
+<HTML>
+<!-- SECTION: Getting Started -->
+<HEAD>
+	<TITLE>What's New in CUPS 1.2</TITLE>
+</HEAD>
+<BODY>
+
+<P>This document describes the new features in CUPS 1.2. If you
+have never used CUPS before, read the <A
+HREF="overview.html">"Overview of CUPS"</A> document instead.
+CUPS 1.2 adds many new features to CUPS 1.1.x:</P>
+
+<UL>
+
+	<LI><A HREF="#NETWORKING">Networking</A></LI>
+
+	<LI><A HREF="#BROWSING">Printer Browsing</A></LI>
+
+	<LI><A HREF="#WEB">Web Interface</A></LI>
+
+	<LI><A HREF="#IPP">IPP Support</A></LI>
+
+	<LI><A HREF="#SCHEDULER">Scheduler</A></LI>
+
+	<LI><A HREF="#I18N">Localization and Internationalization</A></LI>
+
+	<LI><A HREF="#DRIVERS">Printer Drivers</A></LI>
+
+	<LI><A HREF="#CUPSAPI">CUPS API</A></LI>
+
+	<LI><A HREF="#CUPSIMAGE">CUPS Imaging API</A></LI>
+
+</UL>
+
+
+<H2 CLASS="title"><A NAME="NETWORKING">Networking</A></H2>
+
+<--
+1. Networking
+   a. IPv6
+        i. Next-generation Internet support
+       ii. ????
+   b. Domain sockets
+        i. Enhanced performance under load for local clients.
+       ii. Authentication without passwords on platforms that support it.
+-->
+
+<P>CUPS 1.2 adds support for IPv6 and domain sockets. The IPv6
+support allows CUPS to work with the next-generation Internet as
+well as taking advantage of automatic local network
+configuration. Domain sockets provide 5 to 10 times faster
+printing from the desktop.</P>
+
+
+<H2 CLASS="title"><A NAME="BROWSING">Printer Browsing</A></H2>
+
+<--
+2. Printer Browsing
+   a. CUPS browsing updates
+        i. "Delete" bit for printers
+       ii. "lease-time" for printers so that clients and servers don't need
+          the same browse timeout/interval settings
+      iii. Additional attributes/default options for network-wide defaults
+       iv. Network default printer
+        v. Ability to control send and receive protocols independently
+   b. Rendevous support
+   c. LDAP support
+   d. Per-printer sharing
+-->
+
+<P>CUPS 1.2 adds support for Bonjour/mDNS and LDAP-based printer
+sharing. Printers can be shared or "published" individually,
+allowing a server to only share specific printers, and you can
+set which protocols to use for local and remote printers.
+Previously CUPS would share all or none of its printers and use
+the same protocols for local and remote printers.</P>
+
+<H3>CUPS Browse Protocol</H3>
+
+<P>The CUPS browse protocol has also been upgraded. New type
+bits, authenticated, default, and deleted, provide key
+information to clients. The "authenticated" type bit tells
+clients that the print queue requires authentication when
+printing. The "default" type bit tells clients that the print
+queue should be used as the default unless the user sets a
+different one. The "deleted" type bit is set when a printer is
+deleted from the server - this allows the client to remove its
+copy of a printer immediately rather than waiting for it to
+timeout.</P>
+
+<P>Previously, a change to the BrowseTimeout setting on the
+server had to be mirrored to each client. Browse packets now
+include printer lease time information which allows the server to
+use a different timeout setting than its clients, making
+configuration simpler and more reliable.</P>
+
+<P>Browse packets can also now contain connection options to be
+used when printing to the server. This allows the administrator
+to require encryption or compress print jobs for certain
+printers. This is most often used when printing over
+limited-bandwidth WAN connections.</P>
+
+
+<H2 CLASS="title"><A NAME="WEB">Web Interface</A></H2>
+
+<!--
+3. Web Interface
+   a. cupsd.conf interface
+   b. Move-Job
+   c. Export printers to windows
+   d. Per-printer sharing controls
+   e. Per-printer access control lists 
+   f. Policy stuff
+-->
+
+<P>The web interface features an all-new administration interface
+which provides ...</P>
+
+
+<H2 CLASS="title"><A NAME="IPP">IPP Support</A></H2>
+
+<!--
+4. IPP Support
+   a. Notifications
+   b. CUPS-Get-Devices/PPDs changes
+   c. CUPS-Autheticate-Job
+   d. Other stuff?
+-->
+
+
+<H2 CLASS="title"><A NAME="SCHEDULER">Scheduler</A></H2>
+
+<!--
+5. Scheduler
+   a. Backchannel support
+   b. Port monitor support
+   c. Device monitor
+      i. Dynamic device discovery/management
+   d. All errors include a localized message.
+   e. Fine-grain policies, server default + per-printer
+   f. UTF-8 throughout
+   g. Optimizations
+-->
+
+
+<H2 CLASS="title"><A NAME="I18N">Localization and Internationalization</A></H2>
+
+<!--
+6. I18N
+   a. Support for ... character sets
+   b. All commands and messages are localized
+   c. Character set transcoding
+   d. ... , and Japanese localizations
+-->
+
+
+<H2 CLASS="title"><A NAME="DRIVERS">Printer Drivers</A></H2>
+
+<!--
+7. Drivers
+   a. New drivers
+   b. New driver interfaces
+   c. Port monitors
+-->
+
+
+<H2 CLASS="title"><A NAME="CUPSAPI">CUPS API</A></H2>
+
+<!--
+8. CUPS API
+   a. New APIs (file, directory, array, URI)
+   b. PPD stuff
+   c. Language/charset stuff
+   d. Other enhancements
+-->
+
+
+<H2 CLASS="title"><A NAME="CUPSIMAGE">CUPS Imaging API</A></H2>
+
+<!--
+9. CUPS Imaging API
+   a. New raster stuff
+   b. RIP support function
+   c. Image and zoom APIs
+-->
+
+</BODY>
+</HTML>
