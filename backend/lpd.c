@@ -775,16 +775,16 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     httpGetHostname(localhost, sizeof(localhost));
 
     snprintf(control, sizeof(control),
-             "H.31%s\n"		/* RFC 1179, Section 7.2 - host name <= 31 chars */
-	     "P.31%s\n"		/* RFC 1179, Section 7.2 - user name <= 31 chars */
-	     "J.99%s\n",	/* RFC 1179, Section 7.2 - job name <= 99 chars */
+             "H%.31s\n"		/* RFC 1179, Section 7.2 - host name <= 31 chars */
+	     "P%.31s\n"		/* RFC 1179, Section 7.2 - user name <= 31 chars */
+	     "J%.99s\n",	/* RFC 1179, Section 7.2 - job name <= 99 chars */
 	     localhost, user, title);
     cptr = control + strlen(control);
 
     if (banner)
     {
       snprintf(cptr, sizeof(control) - (cptr - control),
-               "C.31%s\n"	/* RFC 1179, Section 7.2 - class name <= 31 chars */
+               "C%.31s\n"	/* RFC 1179, Section 7.2 - class name <= 31 chars */
 	       "L%s\n",
                localhost, user);
       cptr   += strlen(cptr);
@@ -799,7 +799,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     }
 
     snprintf(cptr, sizeof(control) - (cptr - control),
-             "UdfA%03d%.15s\nN%s\n",
+             "UdfA%03d%.15s\n"
+	     "N%.131s\n",	/* RFC 1179, Section 7.2 - sourcefile name <= 131 chars */
              (int)getpid() % 1000, localhost, title);
 
     fprintf(stderr, "DEBUG: Control file is:\n%s", control);
