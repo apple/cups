@@ -918,7 +918,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
     if (attr->values[0].integer != IPP_PRINTER_IDLE &&
-        attr->values[0].integer == IPP_PRINTER_STOPPED)
+        attr->values[0].integer != IPP_PRINTER_STOPPED)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Attempt to set %s printer-state to bad value %d!",
@@ -930,7 +930,10 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_INFO, "Setting %s printer-state to %d (was %d.)", pclass->name,
                     attr->values[0].integer, pclass->state);
 
-    cupsdSetPrinterState(pclass, (ipp_pstate_t)(attr->values[0].integer), 0);
+    if (attr->values[0].integer == IPP_PRINTER_STOPPED)
+      cupsdStopPrinter(pclass, 0);
+    else
+      cupsdSetPrinterState(pclass, (ipp_pstate_t)(attr->values[0].integer), 0);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
   {
@@ -1690,7 +1693,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "printer-state", IPP_TAG_ENUM)) != NULL)
   {
     if (attr->values[0].integer != IPP_PRINTER_IDLE &&
-        attr->values[0].integer == IPP_PRINTER_STOPPED)
+        attr->values[0].integer != IPP_PRINTER_STOPPED)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Attempt to set %s printer-state to bad value %d!",
@@ -1702,7 +1705,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_INFO, "Setting %s printer-state to %d (was %d.)", printer->name,
                attr->values[0].integer, printer->state);
 
-    cupsdSetPrinterState(printer, (ipp_pstate_t)(attr->values[0].integer), 0);
+    if (attr->values[0].integer == IPP_PRINTER_STOPPED)
+      cupsdStopPrinter(printer, 0);
+    else
+      cupsdSetPrinterState(printer, (ipp_pstate_t)(attr->values[0].integer), 0);
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message", IPP_TAG_TEXT)) != NULL)
   {
