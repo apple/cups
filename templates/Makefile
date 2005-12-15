@@ -42,8 +42,6 @@ FILES	=	add-class.tmpl \
 		class-deleted.tmpl \
 		classes.tmpl \
 		class-modified.tmpl \
-		config-printer2.tmpl \
-		config-printer.tmpl \
 		edit-config.tmpl \
 		error.tmpl \
 		header.tmpl \
@@ -75,6 +73,8 @@ FILES	=	add-class.tmpl \
 		printers.tmpl \
 		printer-stop.tmpl \
 		restart.tmpl \
+		set-printer-options-header.tmpl \
+		set-printer-options-trailer.tmpl \
 		test-page.tmpl \
 		trailer.tmpl \
 		users.tmpl

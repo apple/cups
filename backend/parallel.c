@@ -40,6 +40,8 @@
 #include <errno.h>
 #include <cups/string.h>
 #include <signal.h>
+#include <sys/select.h>
+#include "ieee1284.c"
 
 #ifdef WIN32
 #  include <io.h>
@@ -103,6 +105,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#ifdef __linux
+  unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
+#endif /* __linux */
 
 
  /*
@@ -247,6 +252,40 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   tcsetattr(fd, TCSANOW, &opts);
 
  /*
+  * Check printer status...
+  */
+
+  paperout = 0;
+
+#if defined(__linux) && defined(LP_POUTPA)
+ /*
+  * Show the printer status before we send the file...
+  */
+
+  while (!ioctl(fd, LPGETSTATUS, &status))
+  {
+    fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n", status);
+
+    if (status & LP_POUTPA)
+    {
+      fputs("WARNING: Media tray empty!\n", stderr);
+      fputs("STATUS: +media-tray-empty-error\n", stderr);
+
+      paperout = 1;
+    }
+
+    if (!(status & LP_PERRORP))
+      fputs("WARNING: Printer fault!\n", stderr);
+    else if (!(status & LP_PSELECD))
+      fputs("WARNING: Printer off-line.\n", stderr);
+    else
+      break;
+
+    sleep(5);
+  }
+#endif /* __linux && LP_POUTPA */
+
+ /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
   * can finish out any page data the driver sends (e.g. to eject the
   * current page...  Only ignore SIGTERM if we are printing data from
@@ -272,8 +311,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Finally, send the print file...
   */
 
-  wbytes   = 0;
-  paperout = 0;
+  wbytes = 0;
 
   while (copies > 0)
   {
@@ -407,120 +445,45 @@ list_devices(void)
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
   char	device[255],		/* Device filename */
-	probefile[255],		/* Probe filename */
-	basedevice[255];	/* Base device filename for ports */
-  FILE	*probe;			/* /proc/parport/n/autoprobe file */
-  char	line[1024],		/* Line from file */
-	*delim,			/* Delimiter in file */
-	make[IPP_MAX_NAME],	/* Make from file */
-	model[IPP_MAX_NAME];	/* Model from file */
+	basedevice[255],	/* Base device filename for ports */
+	device_id[1024],	/* Device ID string */
+	make_model[1024];	/* Make and model */
 
+
+  if (!access("/dev/parallel/", 0))
+    strcpy(basedevice, "/dev/parallel/");
+  else if (!access("/dev/printers/", 0))
+    strcpy(basedevice, "/dev/printers/");
+  else if (!access("/dev/par0", 0))
+    strcpy(basedevice, "/dev/par");
+  else
+    strcpy(basedevice, "/dev/lp");
 
   for (i = 0; i < 4; i ++)
   {
    /*
-    * First open the device to make sure the driver module is loaded...
+    * Open the port, if available...
     */
 
-    if ((fd = open("/dev/parallel/0", O_WRONLY)) >= 0)
+    sprintf(device, "%s%d", basedevice, i);
+    if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
+      fd = open(device, O_WRONLY);
+
+    if (fd >= 0)
     {
+     /*
+      * Now grab the IEEE 1284 device ID string...
+      */
+
+      if (!get_device_id(fd, device_id, sizeof(device_id),
+                         make_model, sizeof(make_model),
+			 NULL, NULL, 0))
+	printf("direct parallel:%s \"%s\" \"%s LPT #%d\" \"%s\"\n", device,
+	       make_model, make_model, i + 1, device_id);
+      else
+	printf("direct parallel:%s \"Unknown\" \"LPT #%d\"\n", device, i + 1);
+
       close(fd);
-      strcpy(basedevice, "/dev/parallel/");
-    }
-    else
-    {
-      sprintf(device, "/dev/lp%d", i);
-      if ((fd = open(device, O_WRONLY)) >= 0)
-      {
-	close(fd);
-	strcpy(basedevice, "/dev/lp");
-      }
-      else
-      {
-	sprintf(device, "/dev/par%d", i);
-	if ((fd = open(device, O_WRONLY)) >= 0)
-	{
-	  close(fd);
-	  strcpy(basedevice, "/dev/par");
-	}
-	else
-	{
-	  sprintf(device, "/dev/printers/%d", i);
-	  if ((fd = open(device, O_WRONLY)) >= 0)
-	  {
-	    close(fd);
-	    strcpy(basedevice, "/dev/printers/");
-	  }
-	  else
-	    strcpy(basedevice, "/dev/unknown-parallel");
-	}
-      }
-    }
-
-   /*
-    * Then try looking at the probe file...
-    */
-
-    sprintf(probefile, "/proc/parport/%d/autoprobe", i);
-    if ((probe = fopen(probefile, "r")) == NULL)
-    {
-     /*
-      * Linux 2.4 kernel has different path...
-      */
-
-      sprintf(probefile, "/proc/sys/dev/parport/parport%d/autoprobe", i);
-      probe = fopen(probefile, "r");
-    }
-
-    if (probe != NULL)
-    {
-     /*
-      * Found a probe file!
-      */
-
-      memset(make, 0, sizeof(make));
-      memset(model, 0, sizeof(model));
-      strcpy(model, "Unknown");
-
-      while (fgets(line, sizeof(line), probe) != NULL)
-      {
-       /*
-        * Strip trailing ; and/or newline.
-	*/
-
-        if ((delim = strrchr(line, ';')) != NULL)
-	  *delim = '\0';
-	else if ((delim = strrchr(line, '\n')) != NULL)
-	  *delim = '\0';
-
-       /*
-        * Look for MODEL and MANUFACTURER lines...
-	*/
-
-        if (strncmp(line, "MODEL:", 6) == 0 &&
-	    strncmp(line, "MODEL:Unknown", 13) != 0)
-	  strlcpy(model, line + 6, sizeof(model));
-	else if (strncmp(line, "MANUFACTURER:", 13) == 0 &&
-	         strncmp(line, "MANUFACTURER:Unknown", 20) != 0)
-	  strlcpy(make, line + 13, sizeof(make));
-      }
-
-      fclose(probe);
-
-      if (make[0])
-	printf("direct parallel:%s%d \"%s %s\" \"Parallel Port #%d\"\n",
-	       basedevice, i, make, model, i + 1);
-      else
-	printf("direct parallel:%s%d \"%s\" \"Parallel Port #%d\"\n",
-	       basedevice, i, model, i + 1);
-    }
-    else if (fd >= 0)
-    {
-     /*
-      * No probe file, but we know the port is there...
-      */
-
-      printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
     }
   }
 #elif defined(__sgi)

@@ -34,6 +34,7 @@
  */
 
 #include "util.h"
+#include <cups/array.h>
 #include <cups/dir.h>
 
 
@@ -46,7 +47,8 @@ typedef struct
   char	device_class[128],		/* Device class */
 	device_make_and_model[128],	/* Make and model, if known */
 	device_info[128],		/* Device info/description */
-	device_uri[1024];		/* Device URI */
+	device_uri[1024],		/* Device URI */
+	device_id[1024];		/* 1284 Device ID */
 } dev_info_t;
 
 
@@ -55,9 +57,7 @@ typedef struct
  */
 
 static int		alarm_tripped;	/* Non-zero if alarm was tripped */
-static int		num_devs,	/* Number of devices */
-			alloc_devs;	/* Number of allocated entries */
-static dev_info_t	*devs;		/* Device info */
+static cups_array_t	*devs;		/* Device info */
 
 
 /*
@@ -67,9 +67,9 @@ static dev_info_t	*devs;		/* Device info */
 static dev_info_t	*add_dev(const char *device_class,
 			         const char *device_make_and_model,
 				 const char *device_info,
-				 const char *device_uri);
-static int		compare_devs(const dev_info_t *p0,
-			             const dev_info_t *p1);
+				 const char *device_uri,
+				 const char *device_id);
+static int		compare_devs(dev_info_t *p0, dev_info_t *p1);
 static void		sigalrm_handler(int sig);
 
 
@@ -97,14 +97,16 @@ main(int  argc,				/* I - Number of command-line args */
 		dclass[64],		/* Device class */
 		uri[1024],		/* Device URI */
 		info[128],		/* Device info */
-		make_model[256];	/* Make and model */
+		make_model[256],	/* Make and model */
+		device_id[1024];	/* 1284 device ID */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
   const char	*requested;		/* requested-attributes option */
   int		send_class,		/* Send device-class attribute? */
 		send_info,		/* Send device-info attribute? */
 		send_make_and_model,	/* Send device-make-and-model attribute? */
-		send_uri;		/* Send device-uri attribute? */
+		send_uri,		/* Send device-uri attribute? */
+		send_id;		/* Send device-id attribute? */
   dev_info_t	*dev;			/* Current device */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
@@ -130,6 +132,7 @@ main(int  argc,				/* I - Number of command-line args */
     send_info           = 1;
     send_make_and_model = 1;
     send_uri            = 1;
+    send_id             = 1;
   }
   else
   {
@@ -137,6 +140,7 @@ main(int  argc,				/* I - Number of command-line args */
     send_info           = strstr(requested, "device-info") != NULL;
     send_make_and_model = strstr(requested, "device-make-and-model") != NULL;
     send_uri            = strstr(requested, "device-uri") != NULL;
+    send_id             = strstr(requested, "device-id") != NULL;
   }
 
  /*
@@ -159,9 +163,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Setup the devices array...
   */
 
-  alloc_devs = 0;
-  num_devs   = 0;
-  devs       = (dev_info_t *)0;
+  devs = cupsArrayNew((cups_array_func_t)compare_devs, NULL);
 
  /*
   * Loop through all of the device backends...
@@ -211,13 +213,17 @@ main(int  argc,				/* I - Number of command-line args */
        /*
         * Each line is of the form:
 	*
-	*   class URI "make model" "name"
+	*   class URI "make model" "name" ["1284 device ID"]
 	*/
+
+        device_id[0] = '\0';
 
         if (!strncasecmp(line, "Usage", 5))
 	  compat = 1;
-        else if (sscanf(line, "%63s%1023s%*[ \t]\"%255[^\"]\"%*[ \t]\"%127[^\"]",
-	                dclass, uri, make_model, info) != 4)
+        else if (sscanf(line,
+	                "%63s%1023s%*[ \t]\"%255[^\"]\"%*[ \t]\"%127[^\"]"
+			"%*[ \t]\"%1023[^\"]",
+	                dclass, uri, make_model, info, device_id) < 4)
         {
 	 /*
 	  * Bad format; strip trailing newline and write an error message.
@@ -237,7 +243,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  * Add the device to the array of available devices...
 	  */
 
-          dev = add_dev(dclass, make_model, info, uri);
+          dev = add_dev(dclass, make_model, info, uri, device_id);
 	  if (!dev)
 	  {
             cupsDirClose(dir);
@@ -271,7 +277,7 @@ main(int  argc,				/* I - Number of command-line args */
 	snprintf(line, sizeof(line), "Unknown Network Device (%s)",
 	         dent->filename);
 
-        dev = add_dev("network", line, "Unknown", dent->filename);
+        dev = add_dev("network", line, "Unknown", dent->filename, "");
 	if (!dev)
 	{
           cupsDirClose(dir);
@@ -290,14 +296,6 @@ main(int  argc,				/* I - Number of command-line args */
   cupsDirClose(dir);
 
  /*
-  * Sort the available devices...
-  */
-
-  if (num_devs > 1)
-    qsort(devs, num_devs, sizeof(dev_info_t),
-          (int (*)(const void *, const void *))compare_devs);
-
- /*
   * Output the list of devices...
   */
 
@@ -309,12 +307,14 @@ main(int  argc,				/* I - Number of command-line args */
   cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language", "en-US");
 
   if ((count = atoi(argv[2])) <= 0)
-    count = num_devs;
+    count = cupsArrayCount(devs);
 
-  if (count > num_devs)
-    count = num_devs;
+  if (count > cupsArrayCount(devs))
+    count = cupsArrayCount(devs);
 
-  for (dev = devs; count > 0; count --, dev ++)
+  for (dev = (dev_info_t *)cupsArrayFirst(devs);
+       count > 0;
+       count --, dev = (dev_info_t *)cupsArrayNext(devs))
   {
    /*
     * Add strings to attributes...
@@ -330,6 +330,8 @@ main(int  argc,				/* I - Number of command-line args */
                 	 dev->device_make_and_model);
     if (send_uri)
       cupsdSendIPPString(IPP_TAG_URI, "device-uri", dev->device_uri);
+    if (send_id)
+      cupsdSendIPPString(IPP_TAG_TEXT, "device-id", dev->device_id);
   }
 
   cupsdSendIPPTrailer();
@@ -338,8 +340,12 @@ main(int  argc,				/* I - Number of command-line args */
   * Free the devices array and return...
   */
 
-  if (alloc_devs)
-    free(devs);
+  for (dev = (dev_info_t *)cupsArrayFirst(devs);
+       dev;
+       dev = (dev_info_t *)cupsArrayNext(devs))
+    free(dev);
+
+  cupsArrayDelete(devs);
 
   return (0);
 }
@@ -354,44 +360,25 @@ add_dev(
     const char *device_class,		/* I - Device class */
     const char *device_make_and_model,	/* I - Device make and model */
     const char *device_info,		/* I - Device information */
-    const char *device_uri)		/* I - Device URI */
+    const char *device_uri,		/* I - Device URI */
+    const char *device_id)		/* I - 1284 device ID */
 {
   dev_info_t	*dev;			/* New device */
 
 
-  if (num_devs >= alloc_devs)
+ /*
+  * Allocate memory for the device record...
+  */
+
+  if ((dev = calloc(1, sizeof(dev_info_t))) == NULL)
   {
-   /*
-    * Allocate (more) memory for the devices...
-    */
-
-    if (alloc_devs == 0)
-      dev = malloc(sizeof(dev_info_t) * 16);
-    else
-      dev = realloc(devs, sizeof(dev_info_t) * (alloc_devs + 16));
-
-    if (dev == NULL)
-    {
-      fprintf(stderr, "ERROR: [cups-deviced] Ran out of memory for %d devices!\n",
-	      alloc_devs + 16);
-      return (NULL);
-    }
-
-    devs = dev;
-    alloc_devs += 16;
+    fputs("ERROR: [cups-deviced] Ran out of memory allocating a device!\n",
+          stderr);
+    return (NULL);
   }
 
  /*
-  * Add a new device at the end of the array...
-  */
-
-  dev = devs + num_devs;
-  num_devs ++;
-
-  memset(dev, 0, sizeof(dev_info_t));
-
- /*
-  * Copy the strings and return...
+  * Copy the strings over...
   */
 
   strlcpy(dev->device_class, device_class, sizeof(dev->device_class));
@@ -399,6 +386,13 @@ add_dev(
           sizeof(dev->device_make_and_model));
   strlcpy(dev->device_info, device_info, sizeof(dev->device_info));
   strlcpy(dev->device_uri, device_uri, sizeof(dev->device_uri));
+  strlcpy(dev->device_id, device_id, sizeof(dev->device_id));
+
+ /*
+  * Add the device to the array and return...
+  */
+
+  cupsArrayAdd(devs, dev);
 
   return (dev);
 }
@@ -409,8 +403,8 @@ add_dev(
  */
 
 static int				/* O - Result of comparison */
-compare_devs(const dev_info_t *d0,	/* I - First device */
-             const dev_info_t *d1)	/* I - Second device */
+compare_devs(dev_info_t *d0,		/* I - First device */
+             dev_info_t *d1)		/* I - Second device */
 {
   int		diff;			/* Difference between strings */
 
@@ -436,7 +430,7 @@ compare_devs(const dev_info_t *d0,	/* I - First device */
 static void
 sigalrm_handler(int sig)		/* I - Signal number */
 {
-  (void)sig;	/* remove compiler warnings... */
+  (void)sig; /* remove compiler warnings... */
 
   alarm_tripped = 1;
 }

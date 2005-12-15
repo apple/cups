@@ -156,7 +156,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_delete_class(http, language);
     else if (!strcmp(op, "delete-printer"))
       do_delete_printer(http, language);
-    else if (!strcmp(op, "config-printer"))
+    else if (!strcmp(op, "set-printer-options"))
       do_config_printer(http, language);
     else if (!strcmp(op, "config-server"))
       do_config_server(http, language);
@@ -703,7 +703,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       if ((uriptr = strchr(uri, ':')) != NULL && strncmp(uriptr, "://", 3) == 0)
         *uriptr = '\0';
 
-      cgiSetVariable("CURRENT_DEVICE_URI", uri);
+      cgiSetVariable("CURRENT_DEVICE_URI", attr->values[0].string.text);
+      cgiSetVariable("CURRENT_DEVICE_SCHEME", uri);
     }
 
     cgiStartHTML(title);
@@ -819,7 +820,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	        strerror(errno));
       }
     }
-    else if ((uriptr = strrchr(cgiGetVariable("DEVICE_URI"), ';')) != NULL)
+    else if ((uriptr = strrchr(cgiGetVariable("DEVICE_URI"), '|')) != NULL)
     {
      /*
       * Extract make and make/model from device URI string...
@@ -1032,6 +1033,14 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
                    NULL, cgiGetVariable("PPD_NAME"));
 
     strlcpy(uri, cgiGetVariable("DEVICE_URI"), sizeof(uri));
+
+   /*
+    * Strip make and model from URI...
+    */
+
+    if ((uriptr = strrchr(uri, '|')) != NULL)
+      *uriptr = '\0';
+
     if (strncmp(uri, "serial:", 7) == 0)
     {
      /*
@@ -1094,7 +1103,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	         "5;/admin?OP=redirect&URL=/printers/%s", uri);
       else
 	snprintf(refresh, sizeof(refresh),
-	         "5;/admin?OP=config-printer&PRINTER_NAME=%s", uri);
+	         "5;/admin?OP=set-printer-options&PRINTER_NAME=%s", uri);
 
       cgiSetVariable("refresh_page", refresh);
 
@@ -1240,8 +1249,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     */
 
     cgiStartHTML("Set Printer Options");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "config-printer.tmpl",
-                        getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(),
+                        "set-printer-options-header.tmpl", getenv("LANG"));
 
     if (ppdConflicts(ppd))
     {
@@ -1514,8 +1523,8 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
                           getenv("LANG"));
     }
 
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "config-printer2.tmpl",
-                        getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(),
+                        "set-printer-options-trailer.tmpl", getenv("LANG"));
     cgiEndHTML();
   }
   else
@@ -2951,31 +2960,43 @@ do_menu(http_t      *http,		/* I - HTTP connection */
            /*
 	    * Format the printer name variable for this device...
 	    *
-	    * TODO: check for existing names, add number/address...
+	    * We use the device-info string first, then device-uri,
+	    * and finally device-make-and-model to come up with a
+	    * suitable name.
 	    */
 
 	    strcpy(options, "PRINTER_NAME=");
 	    options_ptr = options + strlen(options);
 
-	    for (ptr = device_make_and_model;
+            if (strncasecmp(device_info, "unknown", 7))
+	      ptr = device_info;
+            else if ((ptr = strstr(device_uri, "://")) != NULL)
+	      ptr += 3;
+	    else
+	      ptr = device_make_and_model;
+
+	    for (;
 	         options_ptr < (options + sizeof(options) - 1) && *ptr;
 		 ptr ++)
-	      if (isalnum(*ptr & 255) || *ptr == '_' || *ptr == '-')
+	      if (isalnum(*ptr & 255) || *ptr == '_' || *ptr == '-' || *ptr == '.')
 	        *options_ptr++ = *ptr;
-	      else if (*ptr == ' ')
+	      else if ((*ptr == ' ' || *ptr == '/') && options_ptr[-1] != '_')
 	        *options_ptr++ = '_';
+	      else if (*ptr == '?' || *ptr == '(')
+	        break;
 
            /*
 	    * Then add the make and model in the printer info, so
 	    * that MacOS clients see something reasonable...
 	    */
 
-            strlcpy(options_ptr, "&PRINTER_LOCATION=&PRINTER_INFO=",
+            strlcpy(options_ptr, "&PRINTER_LOCATION=Local+Printer"
+	                         "&PRINTER_INFO=",
 	            sizeof(options) - (options_ptr - options));
 	    options_ptr += strlen(options_ptr);
 
             cgiFormEncode(options_ptr, device_make_and_model,
-	                sizeof(options) - (options_ptr - options));
+	                  sizeof(options) - (options_ptr - options));
 	    options_ptr += strlen(options_ptr);
 
            /*
@@ -2992,7 +3013,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 
             if (options_ptr < (options + sizeof(options) - 1))
 	    {
-	      *options_ptr++ = ';';
+	      *options_ptr++ = '|';
 	      cgiFormEncode(options_ptr, device_make_and_model,
 	                  sizeof(options) - (options_ptr - options));
 	    }

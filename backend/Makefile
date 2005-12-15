@@ -28,7 +28,8 @@ include ../Makedefs
 
 BACKENDS =	ipp lpd parallel scsi serial socket usb
 TARGETS	=	betest $(BACKENDS)
-OBJS	=	betest.o ipp.o lpd.o parallel.o scsi.o serial.o socket.o usb.o
+OBJS	=	betest.o ipp.o lpd.o parallel.o scsi.o \
+		serial.o socket.o usb.o
 
 
 #

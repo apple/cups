@@ -41,7 +41,6 @@ WEBIMAGES	=	\
 			images/cancel-job.gif \
 			images/change-settings.gif \
 			images/classes.gif \
-			images/config-printer.gif \
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \
@@ -70,6 +69,7 @@ WEBIMAGES	=	\
 			images/search.gif \
 			images/set-allowed-users.gif \
 			images/set-as-default.gif \
+			images/set-printer-options.gif \
 			images/show-active.gif \
 			images/show-completed.gif \
 			images/start-class.gif \

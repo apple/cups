@@ -12,8 +12,8 @@
 <TH CLASS="label">Device:</TH>
 <TD>
 <SELECT NAME="DEVICE_URI">
-{[device_uri]<OPTION VALUE="{device_uri}{?device_make_and_model!Unknown?;{device_make_and_model}:}" {?current_device_uri={device_uri}?SELECTED:}>
-{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}
+{[device_uri]<OPTION VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {?current_device_uri={device_uri}?SELECTED:{current_device_scheme={device_uri}?SELECTED:}}>
+{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}</OPTION>
 }</SELECT>
 </TD>
 </TR>

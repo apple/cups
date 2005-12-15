@@ -35,26 +35,7 @@
  * Include necessary headers.
  */
 
-#ifdef __linux
-#  include <sys/ioctl.h>
-#  include <linux/lp.h>
-#  define IOCNR_GET_DEVICE_ID		1
-
-/*
- * Get device_id string
- */
-#  define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
-#endif /* __linux */
-
-#ifdef __sun
-#  ifdef __sparc
-#    include <sys/ecppio.h>
-#  else
-#    include <sys/ioccom.h>
-#    include <sys/ecppsys.h>
-#  endif /* __sparc */
-#endif /* __sun */
-
+#include "ieee1284.c"
 #include <sys/select.h>
 
 
@@ -62,9 +43,6 @@
  * Local functions...
  */
 
-void	decode_device_id(int port, const char *device_id,
-	                 char *make_model, int mmsize,
-			 char *uri, int urisize);
 int	open_device(const char *uri);
 
 
@@ -162,6 +140,40 @@ print_device(const char *uri,		/* I - Device URI */
   tcsetattr(fd, TCSANOW, &opts);
 
  /*
+  * Check printer status...
+  */
+
+  paperout = 0;
+
+#if defined(__linux) && defined(LP_POUTPA)
+ /*
+  * Show the printer status before we send the file...
+  */
+
+  while (!ioctl(fd, LPGETSTATUS, &status))
+  {
+    fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n", status);
+
+    if (status & LP_POUTPA)
+    {
+      fputs("WARNING: Media tray empty!\n", stderr);
+      fputs("STATUS: +media-tray-empty-error\n", stderr);
+
+      paperout = 1;
+    }
+
+    if (!(status & LP_PERRORP))
+      fputs("WARNING: Printer fault!\n", stderr);
+    else if (!(status & LP_PSELECD))
+      fputs("WARNING: Printer off-line.\n", stderr);
+    else
+      break;
+
+    sleep(5);
+  }
+#endif /* __linux && LP_POUTPA */
+
+ /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
   * can finish out any page data the driver sends (e.g. to eject the
   * current page...  Only ignore SIGTERM if we are printing data from
@@ -183,37 +195,11 @@ print_device(const char *uri,		/* I - Device URI */
 #endif /* HAVE_SIGSET */
   }
 
-#if defined(__linux) && defined(LP_POUTPA)
- /*
-  * Show the printer status before we send the file; normally, we'd
-  * do this while we write data to the printer, however at least some
-  * Linux kernels have buggy USB drivers which don't like to be
-  * queried while sending data to the printer...
-  *
-  * Also, we're using the 8255 constants instead of the ones that are
-  * supposed to be used, as it appears that the USB driver also doesn't
-  * follow standards...
-  */
-
-  if (ioctl(fd, LPGETSTATUS, &status) == 0)
-  {
-    fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n", status);
-
-    if (status & LP_POUTPA)
-      fputs("WARNING: Media tray empty!\n", stderr);
-    else if (!(status & LP_PERRORP))
-      fputs("WARNING: Printer fault!\n", stderr);
-    else if (!(status & LP_PSELECD))
-      fputs("WARNING: Printer off-line.\n", stderr);
-  }
-#endif /* __linux && LP_POUTPA */
-
  /*
   * Finally, send the print file...
   */
 
-  wbytes   = 0;
-  paperout = 0;
+  wbytes = 0;
 
   while (copies > 0)
   {
@@ -330,176 +316,6 @@ print_device(const char *uri,		/* I - Device URI */
 
 
 /*
- * 'decode_device_id()' - Decode the IEEE-1284 device ID string.
- */
-
-void
-decode_device_id(int        port,		/* I - Port number */
-                 const char *device_id,		/* I - 1284 device ID string */
-                 char       *make_model,	/* O - Make/model */
-		 int        mmsize,		/* I - Size of buffer */
-		 char       *uri,		/* O - Device URI */
-		 int        urisize)		/* I - Size of buffer */
-{
-  char	*attr,					/* 1284 attribute */
-  	*delim,					/* 1284 delimiter */
-	*uriptr,				/* Pointer into URI */
-	*mfg,					/* Manufacturer string */
-	*mdl,					/* Model string */
-	serial_number[1024];			/* Serial number string */
-
-
- /*
-  * Look for the description field...
-  */
-
-  if ((attr = strstr(device_id, "DES:")) != NULL)
-    attr += 4;
-  else if ((attr = strstr(device_id, "DESCRIPTION:")) != NULL)
-    attr += 12;
-
-  if ((mfg = strstr(device_id, "MANUFACTURER:")) != NULL)
-    mfg += 13;
-  else if ((mfg = strstr(device_id, "MFG:")) != NULL)
-    mfg += 4;
-
-  if ((mdl = strstr(device_id, "MODEL:")) != NULL)
-    mdl += 6;
-  else if ((mdl = strstr(device_id, "MDL:")) != NULL)
-    mdl += 4;
-
-  if (attr)
-  {
-   /*
-    * Use description...
-    */
-
-    if (!strncasecmp(attr, "Hewlett-Packard hp ", 19))
-    {
-     /*
-      * Check for a common HP bug...
-      */
-
-      strlcpy(make_model, "HP ", mmsize);
-      strlcpy(make_model + 3, attr + 19, mmsize - 3);
-    }
-    else if (!strncasecmp(attr, "Hewlett-Packard ", 16))
-    {
-      strlcpy(make_model, "HP ", mmsize);
-      strlcpy(make_model + 3, attr + 16, mmsize - 3);
-    }
-    else
-    {
-      strlcpy(make_model, attr, mmsize);
-    }
-  }
-  else if (mfg && mdl)
-  {
-   /*
-    * Build a make-model string from the manufacturer and model attributes...
-    */
-
-    if (!strncasecmp(mfg, "Hewlett-Packard", 15))
-      strlcpy(make_model, "HP", mmsize);
-    else
-      strlcpy(make_model, mfg, mmsize);
-
-    if ((delim = strchr(make_model, ';')) != NULL)
-      *delim = '\0';
-
-    if (!strncasecmp(make_model, mdl, strlen(make_model)))
-    {
-     /*
-      * Just copy model string, since it has the manufacturer...
-      */
-
-      strlcpy(make_model, mdl, mmsize);
-    }
-    else
-    {
-     /*
-      * Concatenate the make and model...
-      */
-
-      strlcat(make_model, " ", mmsize);
-      strlcat(make_model, mdl, mmsize);
-    }
-  }
-  else
-  {
-   /*
-    * Use "Unknown" as the printer make and model...
-    */
-
-    strlcpy(make_model, "Unknown", mmsize);
-  }
-
-  if ((delim = strchr(make_model, ';')) != NULL)
-    *delim = '\0';
-
- /*
-  * Look for the serial number field...
-  */
-
-  if ((attr = strstr(device_id, "SERN:")) != NULL)
-    attr += 5;
-  else if ((attr = strstr(device_id, "SERIALNUMBER:")) != NULL)
-    attr += 13;
-  else if ((attr = strstr(device_id, ";SN:")) != NULL)
-    attr += 4;
-
-  if (attr)
-  {
-    strlcpy(serial_number, attr, sizeof(serial_number));
-
-    if ((delim = strchr(serial_number, ';')) != NULL)
-      *delim = '\0';
-  }
-  else
-    serial_number[0] = '\0';
-
- /*
-  * Generate the device URI from the make_model and serial number strings.
-  */
-
-  strlcpy(uri, "usb://", urisize);
-  for (uriptr = uri + 6, delim = make_model;
-       *delim && uriptr < (uri + urisize - 1);
-       delim ++)
-    if (*delim == ' ')
-    {
-      delim ++;
-      *uriptr++ = '/';
-      break;
-    }
-    else
-      *uriptr++ = *delim;
-
-  for (; *delim && uriptr < (uri + urisize - 3); delim ++)
-    if (*delim == ' ')
-    {
-      *uriptr++ = '%';
-      *uriptr++ = '2';
-      *uriptr++ = '0';
-    }
-    else
-      *uriptr++ = *delim;
-
-  *uriptr = '\0';
-
-  if (serial_number[0])
-  {
-   /*
-    * Add the serial number to the URI...
-    */
-
-    strlcat(uri, "?serial=", urisize);
-    strlcat(uri, serial_number, urisize);
-  }
-}
-
-
-/*
  * 'list_devices()' - List all USB devices.
  */
 
@@ -508,7 +324,6 @@ list_devices(void)
 {
 #ifdef __linux
   int	i;			/* Looping var */
-  int	length;			/* Length of device ID info */
   int	fd;			/* File descriptor */
   char	format[255],		/* Format for device filename */
 	device[255],		/* Device filename */
@@ -521,9 +336,9 @@ list_devices(void)
   * First figure out which USB printer filename to use...
   */
 
-  if (access("/dev/usblp0", 0) == 0)
+  if (!access("/dev/usblp0", 0))
     strcpy(format, "/dev/usblp%d");
-  else if (access("/dev/usb/usblp0", 0) == 0)
+  else if (!access("/dev/usb/usblp0", 0))
     strcpy(format, "/dev/usb/usblp%d");
   else
     strcpy(format, "/dev/usb/lp%d");
@@ -538,42 +353,13 @@ list_devices(void)
 
     if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
     {
-      if (ioctl(fd, LPIOC_GET_DEVICE_ID(sizeof(device_id)), device_id) == 0)
-      {
-	length = (((unsigned)device_id[0] & 255) << 8) +
-	         ((unsigned)device_id[1] & 255);
-
-       /*
-        * Check to see if the length is larger than our buffer; first
-	* assume that the vendor incorrectly implemented the 1284 spec,
-	* and then limit the length to the size of our buffer...
-	*/
-
-        if (length > (sizeof(device_id) - 2))
-	  length = (((unsigned)device_id[1] & 255) << 8) +
-	           ((unsigned)device_id[0] & 255);
-
-        if (length > (sizeof(device_id) - 2))
-	  length = sizeof(device_id) - 2;
-
-	memmove(device_id, device_id + 2, length);
-	device_id[length] = '\0';
-      }
-      else
-        device_id[0] = '\0';
+      if (!get_device_id(fd, device_id, sizeof(device_id),
+                         make_model, sizeof(make_model),
+			 "usb", device_uri, sizeof(device_uri)))
+	printf("direct %s \"%s\" \"%s USB #%d\" \"%s\"\n", device_uri,
+	       make_model, make_model, i + 1, device_id);
 
       close(fd);
-    }
-    else
-      device_id[0] = '\0';
-
-    if (device_id[0])
-    {
-      decode_device_id(i, device_id, make_model, sizeof(make_model),
-		       device_uri, sizeof(device_uri));
-
-      printf("direct %s \"%s\" \"USB Printer #%d\"\n", device_uri,
-	     make_model, i + 1);
     }
   }
 #elif defined(__sgi)
@@ -597,33 +383,13 @@ list_devices(void)
 
     if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
     {
-      did.mode = ECPP_CENTRONICS;
-      did.len  = sizeof(device_id);
-      did.rlen = 0;
-      did.addr = device_id;
-
-      if (ioctl(fd, ECPPIOC_GETDEVID, &did) == 0)
-      {
-        if (did.rlen < (sizeof(device_id) - 1))
-	  device_id[did.rlen] = '\0';
-        else
-	  device_id[sizeof(device_id) - 1] = '\0';
-      }
-      else
-        device_id[0] = '\0';
+      if (!get_device_id(fd, device_id, sizeof(device_id),
+                         make_model, sizeof(make_model),
+			 "usb", device_uri, sizeof(device_uri)))
+	printf("direct %s \"%s\" \"%s USB #%d\" \"%s\"\n", device_uri,
+	       make_model, make_model, i + 1, device_id);
 
       close(fd);
-    }
-    else
-      device_id[0] = '\0';
-
-    if (device_id[0])
-    {
-      decode_device_id(i, device_id, make_model, sizeof(make_model),
-		       device_uri, sizeof(device_uri));
-
-      printf("direct %s \"%s\" \"USB Printer #%d\"\n", device_uri,
-	     make_model, i + 1);
     }
   }
 #elif defined(__hpux)
@@ -660,10 +426,10 @@ open_device(const char *uri)		/* I - Device URI */
   * number and/or make/model.
   */
 
-  if (strncmp(uri, "usb:/dev/", 9) == 0)
+  if (!strncmp(uri, "usb:/dev/", 9))
 #ifdef __linux
     return (-1); /* Do not allow direct devices anymore */
-  else if (strncmp(uri, "usb://", 6) == 0)
+  else if (!strncmp(uri, "usb://", 6))
   {
    /*
     * For Linux, try looking up the device serial number or model...
@@ -671,7 +437,6 @@ open_device(const char *uri)		/* I - Device URI */
 
     int		i;			/* Looping var */
     int		busy;			/* Are any ports busy? */
-    int		length;			/* Length of device ID info */
     int		fd;			/* File descriptor */
     char	format[255],		/* Format for device filename */
 		device[255],		/* Device filename */
@@ -684,9 +449,9 @@ open_device(const char *uri)		/* I - Device URI */
     * First figure out which USB printer filename to use...
     */
 
-    if (access("/dev/usblp0", 0) == 0)
+    if (!access("/dev/usblp0", 0))
       strcpy(format, "/dev/usblp%d");
-    else if (access("/dev/usb/usblp0", 0) == 0)
+    else if (!access("/dev/usb/usblp0", 0))
       strcpy(format, "/dev/usb/usblp%d");
     else
       strcpy(format, "/dev/usb/lp%d");
@@ -703,15 +468,9 @@ open_device(const char *uri)		/* I - Device URI */
 
 	if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
 	{
-	  if (ioctl(fd, LPIOC_GET_DEVICE_ID(sizeof(device_id)), device_id) == 0)
-	  {
-	    length = (((unsigned)device_id[0] & 255) << 8) +
-	             ((unsigned)device_id[1] & 255);
-	    memmove(device_id, device_id + 2, length);
-	    device_id[length] = '\0';
-	  }
-	  else
-            device_id[0] = '\0';
+	  get_device_id(fd, device_id, sizeof(device_id),
+                        make_model, sizeof(make_model),
+			"usb", device_uri, sizeof(device_uri));
 	}
 	else
 	{
@@ -723,28 +482,18 @@ open_device(const char *uri)		/* I - Device URI */
 	  if (errno == EBUSY)
 	    busy = 1;
 
-	  device_id[0] = '\0';
+	  device_uri[0] = '\0';
         }
 
-	if (device_id[0])
+        if (!strcmp(uri, device_uri))
 	{
 	 /*
-          * Got the device ID - is this the one?
+	  * Yes, return this file descriptor...
 	  */
 
-	  decode_device_id(i, device_id, make_model, sizeof(make_model),
-                	   device_uri, sizeof(device_uri));
+	  fprintf(stderr, "DEBUG: Printer using device file \"%s\"...\n", device);
 
-          if (strcmp(uri, device_uri) == 0)
-	  {
-	   /*
-	    * Yes, return this file descriptor...
-	    */
-
-	    fprintf(stderr, "DEBUG: Printer using device file \"%s\"...\n", device);
-
-	    return (fd);
-	  }
+	  return (fd);
 	}
 
        /*
@@ -779,7 +528,7 @@ open_device(const char *uri)		/* I - Device URI */
   }
 #elif defined(__sun) && defined(ECPPIOC_GETDEVID)
     return (-1); /* Do not allow direct devices anymore */
-  else if (strncmp(uri, "usb://", 6) == 0)
+  else if (!strncmp(uri, "usb://", 6))
   {
    /*
     * For Solaris, try looking up the device serial number or model...
@@ -806,22 +555,9 @@ open_device(const char *uri)		/* I - Device URI */
 	sprintf(device, "/dev/usb/printer%d", i);
 
 	if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
-	{
-	  did.mode = ECPP_CENTRONICS;
-	  did.len  = sizeof(device_id);
-	  did.rlen = 0;
-	  did.addr = device_id;
-
-	  if (ioctl(fd, ECPPIOC_GETDEVID, &did) == 0)
-	  {
-            if (did.rlen < (sizeof(device_id) - 1))
-	      device_id[did.rlen] = '\0';
-            else
-	      device_id[sizeof(device_id) - 1] = '\0';
-	  }
-	  else
-            device_id[0] = '\0';
-	}
+	  get_device_id(fd, device_id, sizeof(device_id),
+                        make_model, sizeof(make_model),
+			"usb", device_uri, sizeof(device_uri));
 	else
 	{
 	 /*
@@ -832,21 +568,11 @@ open_device(const char *uri)		/* I - Device URI */
 	  if (errno == EBUSY)
 	    busy = 1;
 
-	  device_id[0] = '\0';
+	  device_uri[0] = '\0';
         }
 
-	if (device_id[0])
-	{
-	 /*
-          * Got the device ID - is this the one?
-	  */
-
-	  decode_device_id(i, device_id, make_model, sizeof(make_model),
-                	   device_uri, sizeof(device_uri));
-
-          if (strcmp(uri, device_uri) == 0)
-	    return (fd);	/* Yes, return this file descriptor... */
-	}
+        if (!strcmp(uri, device_uri))
+	  return (fd);	/* Yes, return this file descriptor... */
 
        /*
 	* This wasn't the one...
