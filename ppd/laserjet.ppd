@@ -24,20 +24,21 @@
 *%         WWW: http://www.cups.org
 *%
 *FormatVersion:	"4.3"
-*FileVersion:	"1.1"
+*FileVersion:	"1.2"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"LASERJET.PPD"
-*Manufacturer:	"ESP"
-*Product:	"(CUPS v1.1)"
-*cupsVersion:	1.1
+*Manufacturer:	"HP"
+*Product:	"(GNU Ghostscript)"
+*Product:	"(ESP Ghostscript)"
+*cupsVersion:	1.2
 *cupsManualCopies: False
 *cupsFilter:	"application/vnd.cups-raster 0 rastertohp"
 *cupsModelNumber: 0
 *ModelName:     "HP LaserJet Series"
 *ShortNickName: "HP LaserJet Series"
-*NickName:      "HP LaserJet Series CUPS v1.1"
-*PSVersion:	"(3010.000) 550"
+*NickName:      "HP LaserJet Series CUPS v1.2"
+*PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
 *DefaultColorSpace: Gray

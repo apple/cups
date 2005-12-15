@@ -697,8 +697,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     * Let the user choose...
     */
 
-    if (oldinfo &&
-        (attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
+    if ((attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
     {
       strlcpy(uri, attr->values[0].string.text, sizeof(uri));
       if ((uriptr = strchr(uri, ':')) != NULL && strncmp(uriptr, "://", 3) == 0)
@@ -708,13 +707,13 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     }
 
     cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-device.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-device.tmpl",
+                        getenv("LANG"));
     cgiEndHTML();
   }
   else if (strchr(var, '/') == NULL)
   {
-    if (oldinfo &&
-        (attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
+    if ((attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
     {
      /*
       * Set the current device URI for the form to the old one...
@@ -729,10 +728,11 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     */
 
     cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-uri.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-uri.tmpl",
+                        getenv("LANG"));
     cgiEndHTML();
   }
-  else if (strncmp(var, "serial:", 7) == 0 && cgiGetVariable("BAUDRATE") == NULL)
+  else if (!strncmp(var, "serial:", 7) && !cgiGetVariable("BAUDRATE"))
   {
    /*
     * Need baud rate, parity, etc.
@@ -754,7 +754,8 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       }
 
     cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-serial.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-serial.tmpl",
+                        getenv("LANG"));
     cgiEndHTML();
   }
   else if (!file && (var = cgiGetVariable("PPD_NAME")) == NULL)
@@ -770,6 +771,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       ppd_file_t	*ppd;		/* PPD information */
       char		buffer[1024];	/* Buffer */
       int		bytes;		/* Number of bytes */
+      http_status_t	get_status;	/* Status of GET */
 
 
       snprintf(uri, sizeof(uri), "/printers/%s.ppd", name);
@@ -777,9 +779,14 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       if (httpGet(http, uri))
         httpGet(http, uri);
 
-      while (httpUpdate(http) == HTTP_CONTINUE);
+      while ((get_status = httpUpdate(http)) == HTTP_CONTINUE);
 
-      if ((fd = cupsTempFd(filename, sizeof(filename))) >= 0)
+      if (get_status != HTTP_OK)
+      {
+        fprintf(stderr, "ERROR: Unable to get PPD file %s: %d - %s\n",
+	        uri, get_status, httpStatus(get_status));
+      }
+      else if ((fd = cupsTempFd(filename, sizeof(filename))) >= 0)
       {
 	while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
           write(fd, buffer, bytes);
@@ -790,16 +797,27 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	{
 	  if (ppd->manufacturer)
 	    cgiSetVariable("CURRENT_MAKE", ppd->manufacturer);
+
 	  if (ppd->nickname)
 	    cgiSetVariable("CURRENT_MAKE_AND_MODEL", ppd->nickname);
 
           ppdClose(ppd);
+          unlink(filename);
 	}
-
-        unlink(filename);
+	else
+	{
+	  fprintf(stderr, "ERROR: Unable to open PPD file %s: %s\n",
+	          filename, ppdErrorString(ppdLastError(&bytes)));
+	}
       }
       else
+      {
         httpFlush(http);
+
+        fprintf(stderr,
+	        "ERROR: Unable to create temporary file for PPD file: %s\n",
+	        strerror(errno));
+      }
     }
     else if ((uriptr = strrchr(cgiGetVariable("DEVICE_URI"), ';')) != NULL)
     {

@@ -24,14 +24,14 @@
 *%         WWW: http://www.cups.org
 *%
 *FormatVersion:	"4.3"
-*FileVersion:	"1.1"
+*FileVersion:	"1.2"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"ZEBRA.PPD"
-*Manufacturer:	"ESP"
+*Manufacturer:	"Zebra"
 *Product:	"(GNU Ghostscript)"
 *Product:	"(ESP Ghostscript)"
-*cupsVersion:	1.1
+*cupsVersion:	1.2
 *cupsManualCopies: False
 *cupsFilter:	"application/vnd.cups-raster 0 rastertodymo"
 *% cupsModelNumber is 16 for EPL line mode, 17 for EPL page mode,
@@ -39,8 +39,8 @@
 *cupsModelNumber: 18
 *ModelName:     "Zebra ZPL Label Printer"
 *ShortNickName: "Zebra ZPL Label Printer"
-*NickName:      "Zebra ZPL Label Printer CUPS v1.1"
-*PSVersion:	"(3010.000) 707"
+*NickName:      "Zebra ZPL Label Printer CUPS v1.2"
+*PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
 *DefaultColorSpace: Gray

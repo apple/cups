@@ -24,20 +24,21 @@
 *%         WWW: http://www.cups.org
 *%
 *FormatVersion:	"4.3"
-*FileVersion:	"1.1"
+*FileVersion:	"1.2"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"EPSON9.PPD"
-*Manufacturer:	"ESP"
-*Product:	"(CUPS v1.1)"
-*cupsVersion:	1.1
+*Manufacturer:	"Epson"
+*Product:	"(GNU Ghostscript)"
+*Product:	"(ESP Ghostscript)"
+*cupsVersion:	1.2
 *cupsManualCopies: True
 *cupsModelNumber:	0
 *cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
 *ModelName:     "EPSON 9-Pin Series"
 *ShortNickName: "EPSON 9-Pin Series"
-*NickName:      "EPSON 9-Pin Series CUPS v1.1"
-*PSVersion:	"(3010.000) 550"
+*NickName:      "EPSON 9-Pin Series CUPS v1.2"
+*PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
 *DefaultColorSpace: Gray

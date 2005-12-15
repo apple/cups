@@ -24,13 +24,14 @@
 *%         WWW: http://www.cups.org
 *%
 *FormatVersion:	"4.3"
-*FileVersion:	"1.1"
+*FileVersion:	"1.2"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"STCOLOR2.PPD"
-*Manufacturer:	"ESP"
-*Product:	"(CUPS v1.1)"
-*cupsVersion:	1.1
+*Manufacturer:	"Epson"
+*Product:	"(GNU Ghostscript)"
+*Product:	"(ESP Ghostscript)"
+*cupsVersion:	1.2
 *cupsManualCopies: True
 *cupsModelNumber:	4
 *cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
@@ -39,8 +40,8 @@
 *cupsColorProfile 720dpi/-: "1.0 2.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
 *ModelName:     "EPSON New Stylus Color Series"
 *ShortNickName: "EPSON New Stylus Color Series"
-*NickName:      "EPSON New Stylus Color Series CUPS v1.1"
-*PSVersion:	"(3010.000) 550"
+*NickName:      "EPSON New Stylus Color Series CUPS v1.2"
+*PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	True
 *DefaultColorSpace: RGB

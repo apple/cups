@@ -24,20 +24,21 @@
 *%         WWW: http://www.cups.org
 *%
 *FormatVersion:	"4.3"
-*FileVersion:	"1.1"
+*FileVersion:	"1.2"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"OKIDATA9.PPD"
-*Manufacturer:	"ESP"
-*Product:	"(CUPS v1.1)"
-*cupsVersion:	1.1
+*Manufacturer:	"Oki"
+*Product:	"(GNU Ghostscript)"
+*Product:	"(ESP Ghostscript)"
+*cupsVersion:	1.2
 *cupsManualCopies: True
 *cupsModelNumber:	0
 *cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
 *ModelName:     "OKIDATA 9-Pin Series"
 *ShortNickName: "OKIDATA 9-Pin Series"
-*NickName:      "OKIDATA 9-Pin Series CUPS v1.1"
-*PSVersion:	"(3010.000) 550"
+*NickName:      "OKIDATA 9-Pin Series CUPS v1.2"
+*PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
 *DefaultColorSpace: Gray

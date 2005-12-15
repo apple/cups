@@ -995,8 +995,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
   status = HTTP_CONTINUE;
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadClient: %d, used=%d, file=%d",
-                  con->http.fd, con->http.used, con->file);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdReadClient: %d, used=%d, file=%d state=%d",
+                  con->http.fd, con->http.used, con->file, con->http.state);
 
   if (con->http.error)
   {
@@ -2301,6 +2302,14 @@ cupsdSendFile(cupsd_client_t *con,	/* I - Client connection */
     return (0);
   if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
+
+  con->http.data_encoding  = HTTP_ENCODE_LENGTH;
+  con->http.data_remaining = filestats->st_size;
+
+  if (con->http.data_remaining <= INT_MAX)
+    con->http._data_remaining = con->http.data_remaining;
+  else
+    con->http._data_remaining = INT_MAX;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdSendFile: Adding fd %d to OutputSet...", con->http.fd);
