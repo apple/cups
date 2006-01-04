@@ -53,6 +53,13 @@
 
 
 /*
+ * Limits...
+ */
+
+#define _CUPS_MAXSAVE	32		/**** Maximum number of saves ****/
+
+
+/*
  * Types and structures...
  */
 
@@ -69,7 +76,9 @@ struct _cups_array_s			/**** CUPS array structure ****/
 			alloc_elements,	/* Allocated array elements */
 			current,	/* Current element */
 			insert,		/* Last inserted element */
-			saved;		/* Saved element */
+			num_saved,	/* Number of saved elements */
+			saved[_CUPS_MAXSAVE];
+					/* Saved elements */
   void			**elements;	/* Array elements */
   cups_array_func_t	compare;	/* Element comparison function */
   void			*data;		/* User data passed to compare */
@@ -91,7 +100,8 @@ int					/* O - 1 on success, 0 on failure */
 cupsArrayAdd(cups_array_t *a,		/* I - Array */
              void         *e)		/* I - Element */
 {
-  int	current,			/* Current element */
+  int	i,				/* Looping var */
+	current,			/* Current element */
 	diff;				/* Comparison with current element */
 
 
@@ -191,8 +201,9 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
     if (a->current >= current)
       a->current ++;
 
-    if (a->saved >= current)
-      a->saved ++;
+    for (i = 0; i < a->num_saved; i ++)
+      if (a->saved[i] >= current)
+	a->saved[i] ++;
 
     DEBUG_printf(("cupsArrayAdd: insert element at index %d...\n", current));
   }
@@ -238,7 +249,7 @@ cupsArrayClear(cups_array_t *a)		/* I - Array */
   a->num_elements = 0;
   a->current      = -1;
   a->insert       = -1;
-  a->saved        = -1;
+  a->num_saved    = 0;
 }
 
 
@@ -340,11 +351,13 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
   if (!da)
     return (NULL);
 
-  da->compare = a->compare;
-  da->data    = a->data;
-  da->current = a->current;
-  da->insert  = a->insert;
-  da->saved   = a->saved;
+  da->compare   = a->compare;
+  da->data      = a->data;
+  da->current   = a->current;
+  da->insert    = a->insert;
+  da->num_saved = a->num_saved;
+
+  memcpy(da->saved, a->saved, sizeof(a->saved));
 
   if (a->num_elements)
   {
@@ -497,11 +510,11 @@ cupsArrayNew(cups_array_func_t f,	/* I - Comparison function */
   if (!a)
     return (NULL);
 
-  a->compare = f;
-  a->data    = d;
-  a->current = -1;
-  a->insert  = -1;
-  a->saved   = -1;
+  a->compare   = f;
+  a->data      = d;
+  a->current   = -1;
+  a->insert    = -1;
+  a->num_saved = 0;
 
   return (a);
 }
@@ -565,7 +578,8 @@ int					/* O - 1 on success, 0 on failure */
 cupsArrayRemove(cups_array_t *a,	/* I - Array */
                 void         *e)	/* I - Element */
 {
-  int	current,			/* Current element */
+  int	i,				/* Looping var */
+	current,			/* Current element */
 	diff;				/* Difference */
 
 
@@ -603,10 +617,9 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
   if (current < a->insert)
     a->insert --;
 
-  if (current == a->saved)
-    a->saved = -1;
-  else if (current < a->saved)
-    a->saved --;
+  for (i = 0; i < a->num_saved; i ++)
+    if (current < a->saved[i])
+      a->saved[i] --;
 
   return (1);
 }
@@ -619,8 +632,14 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
 void *					/* O - New current element */
 cupsArrayRestore(cups_array_t *a)	/* I - Array */
 {
-  a->current = a->saved;
-  a->saved   = -1;
+  if (!a)
+    return (NULL);
+
+  if (a->num_saved <= 0)
+    return (NULL);
+
+  a->num_saved --;
+  a->current = a->saved[a->num_saved];
 
   if (a->current >= 0 && a->current < a->num_elements)
     return (a->elements[a->current]);
@@ -631,12 +650,23 @@ cupsArrayRestore(cups_array_t *a)	/* I - Array */
 
 /*
  * 'cupsArraySave()' - Mark the current element for a later cupsArrayRestore.
+ *
+ * The save/restore stack is guaranteed to be at least 32 elements deep.
  */
 
-void
+int					/* O - 1 on success, 0 on failure */
 cupsArraySave(cups_array_t *a)		/* I - Array */
 {
-  a->saved = a->current;
+  if (!a)
+    return (0);
+
+  if (a->num_saved >= _CUPS_MAXSAVE)
+    return (0);
+
+  a->saved[a->num_saved] = a->current;
+  a->num_saved ++;
+
+  return (1);
 }
 
 

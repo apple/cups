@@ -24,8 +24,8 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS__H_
-#  define _CUPS__H_
+#ifndef _CUPS_ARRAY_H_
+#  define _CUPS_ARRAY_H_
 
 /*
  * Include necessary headers...
@@ -70,12 +70,12 @@ extern void		*cupsArrayNext(cups_array_t *a);
 extern void		*cupsArrayPrev(cups_array_t *a);
 extern int		cupsArrayRemove(cups_array_t *a, void *e);
 extern void		*cupsArrayRestore(cups_array_t *a);
-extern void		cupsArraySave(cups_array_t *a);
+extern int		cupsArraySave(cups_array_t *a);
 
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-#endif /* !_CUPS__H_ */
+#endif /* !_CUPS_ARRAY_H_ */
 
 /*
  * End of "$Id$".
