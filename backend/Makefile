@@ -27,9 +27,9 @@
 include ../Makedefs
 
 BACKENDS =	ipp lpd parallel scsi serial socket usb
-TARGETS	=	betest $(BACKENDS)
+TARGETS	=	betest test1284 $(BACKENDS)
 OBJS	=	betest.o ipp.o lpd.o parallel.o scsi.o \
-		serial.o socket.o usb.o
+		serial.o socket.o test1284.o usb.o
 
 
 #
@@ -75,6 +75,15 @@ install:	all
 betest:	betest.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o betest betest.o $(LIBS)
+
+
+#
+# test1284
+#
+
+test1284:	test1284.o ../cups/libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/libcups.a
 
 
 #
@@ -154,7 +163,7 @@ socket:	socket.o ../cups/$(LIBCUPS)
 usb:	usb.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o usb usb.o $(BACKLIBS) $(LIBS)
-usb.o:	usb.c usb-darwin.c usb-unix.c
+usb.o:	usb.c usb-darwin.c usb-unix.c ieee1284.c
 
 
 #

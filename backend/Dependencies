@@ -9,7 +9,7 @@ lpd.o: ../cups/md5.h ../cups/cups.h ../cups/ipp.h ../cups/ppd.h
 lpd.o: ../cups/file.h ../cups/string.h
 parallel.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 parallel.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/string.h
-parallel.o: ../config.h ieee1284.c
+parallel.o: ../config.h ieee1284.c ../cups/debug.h
 scsi.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 scsi.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/string.h
 scsi.o: ../config.h
@@ -19,6 +19,7 @@ serial.o: ../config.h
 socket.o: ../cups/backend.h ../cups/http-private.h ../config.h ../cups/http.h
 socket.o: ../cups/md5.h ../cups/cups.h ../cups/ipp.h ../cups/ppd.h
 socket.o: ../cups/file.h ../cups/string.h
+test1284.o: ../cups/string.h ../config.h ieee1284.c ../cups/debug.h
 usb.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 usb.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/string.h
 usb.o: ../config.h

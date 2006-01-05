@@ -33,6 +33,7 @@
  * Include necessary headers.
  */
 
+#include <cups/debug.h>
 #ifdef __linux
 #  include <sys/ioctl.h>
 #  include <linux/lp.h>
@@ -79,6 +80,12 @@ get_device_id(
   struct ecpp_device_id did;		/* Device ID buffer */
 #endif /* __sun */
 
+  DEBUG_printf(("get_device_id(fd=%d, device_id=%p, device_id_size=%d, "
+                "make_model=%p, make_model_size=%d, scheme=\"%s\", "
+		"uri=%p, uri_size=%d)\n", fd, device_id, device_id_size,
+		make_model, make_model_size, scheme ? scheme : "(null)",
+		uri, uri_size));
+
  /*
   * Range check input...
   */
@@ -86,7 +93,10 @@ get_device_id(
   if (fd < 0 ||
       !device_id || device_id_size < 32 ||
       !make_model || make_model_size < 32)
+  {
+    DEBUG_puts("get_device_id: Bad args!");
     return (-1);
+  }
 
   *device_id  = '\0';
   *make_model = '\0';
@@ -99,7 +109,7 @@ get_device_id(
   */
 
 #ifdef __linux
-  if (!ioctl(fd, LPIOC_GET_DEVICE_ID(sizeof(device_id)), device_id))
+  if (!ioctl(fd, LPIOC_GET_DEVICE_ID(device_id_size), device_id))
   {
    /*
     * Extract the length of the device ID string from the first two
@@ -130,6 +140,10 @@ get_device_id(
     memmove(device_id, device_id + 2, length);
     device_id[length] = '\0';
   }
+#  ifdef DEBUG
+  else
+    printf("get_device_id: ioctl failed - %s\n", strerror(errno));
+#  endif /* DEBUG */
 #endif /* __linux */
 
 #if defined(__sun) && defined(ECPPIOC_GETDEVID)
@@ -149,7 +163,13 @@ get_device_id(
     else
       device_id[device_id_size - 1] = '\0';
   }
+#  ifdef DEBUG
+  else
+    printf("get_device_id: ioctl failed - %s\n", strerror(errno));
+#  endif /* DEBUG */
 #endif /* __sun && ECPPIOC_GETDEVID */
+
+  DEBUG_printf(("get_device_id: device_id=\"%s\"\n", device_id));
 
   if (!*device_id)
     return (-1);
@@ -270,7 +290,7 @@ get_device_id(
     */
 
     snprintf(uri, uri_size, "%s://", scheme);
-    for (uriptr = uri + 6, delim = make_model;
+    for (uriptr = uri + strlen(uri), delim = make_model;
 	 *delim && uriptr < (uri + uri_size - 1);
 	 delim ++)
       if (*delim == ' ')
