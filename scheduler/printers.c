@@ -657,6 +657,12 @@ cupsdDeletePrinter(
   DEBUG_printf(("cupsdDeletePrinter(%08x): p->name = \"%s\"...\n", p, p->name));
 
  /*
+  * Save the current position in the Printers array...
+  */
+
+  cupsArraySave(Printers);
+
+ /*
   * Stop printing on this printer...
   */
 
@@ -759,6 +765,12 @@ cupsdDeletePrinter(
   cupsdClearString(&p->error_policy);
 
   free(p);
+
+ /*
+  * Restore the previous position in the Printers array...
+  */
+
+  cupsArrayRestore(Printers);
 }
 
 
