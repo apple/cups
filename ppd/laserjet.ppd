@@ -35,9 +35,9 @@
 *cupsManualCopies: False
 *cupsFilter:	"application/vnd.cups-raster 0 rastertohp"
 *cupsModelNumber: 0
-*ModelName:     "HP LaserJet Series"
-*ShortNickName: "HP LaserJet Series"
-*NickName:      "HP LaserJet Series CUPS v1.2"
+*ModelName:     "HP LaserJet Series PCL 4/5"
+*ShortNickName: "HP LaserJet Series PCL 4/5"
+*NickName:      "HP LaserJet Series PCL 4/5 CUPS v1.2"
 *PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
