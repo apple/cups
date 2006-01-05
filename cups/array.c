@@ -611,14 +611,14 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
     memmove(a->elements + current, a->elements + current + 1,
             (a->num_elements - current) * sizeof(void *));
 
-  if (current < a->current)
+  if (current <= a->current)
     a->current --;
 
-  if (current < a->insert)
+  if (current <= a->insert)
     a->insert --;
 
   for (i = 0; i < a->num_saved; i ++)
-    if (current < a->saved[i])
+    if (current <= a->saved[i])
       a->saved[i] --;
 
   return (1);

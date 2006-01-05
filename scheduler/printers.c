@@ -654,7 +654,8 @@ cupsdDeletePrinter(
 #endif /* __sgi */
 
 
-  DEBUG_printf(("cupsdDeletePrinter(%08x): p->name = \"%s\"...\n", p, p->name));
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeletePrinter(p=%p(%s), update=%d)",
+                  p, p->name, update);
 
  /*
   * Save the current position in the Printers array...
@@ -2624,7 +2625,6 @@ write_irix_config(cupsd_printer_t *p)	/* I - Printer to update */
 {
   char		filename[1024];		/* Interface script filename */
   cups_file_t	*fp;			/* Interface script file */
-  int		tag;			/* Status tag value */
 
 
 
