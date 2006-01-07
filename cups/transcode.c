@@ -60,27 +60,27 @@
 
 static int get_charmap_count(const char *filename);
 static _cups_cmap_t *get_sbcs_charmap(const cups_encoding_t encoding,
-                                     const char *filename);
+				     const char *filename);
 static _cups_vmap_t *get_vbcs_charmap(const cups_encoding_t encoding,
-                                     const char *filename);
+				     const char *filename);
 
 static int conv_utf8_to_sbcs(char *dest,
-                             const cups_utf8_t *src,
-                             const int maxout,
-                             const cups_encoding_t encoding);
+			     const cups_utf8_t *src,
+			     const int maxout,
+			     const cups_encoding_t encoding);
 static int conv_utf8_to_vbcs(char *dest,
-                             const cups_utf8_t *src,
-                             const int maxout,
-                             const cups_encoding_t encoding);
+			     const cups_utf8_t *src,
+			     const int maxout,
+			     const cups_encoding_t encoding);
 
 static int conv_sbcs_to_utf8(cups_utf8_t *dest,
-                             const char *src,
-                             const int maxout,
-                             const cups_encoding_t encoding);
+			     const char *src,
+			     const int maxout,
+			     const cups_encoding_t encoding);
 static int conv_vbcs_to_utf8(cups_utf8_t *dest,
-                             const char *src,
-                             const int maxout,
-                             const cups_encoding_t encoding);
+			     const char *src,
+			     const int maxout,
+			     const cups_encoding_t encoding);
 
 static int compare_wide(const void *k1, const void *k2);
 
@@ -92,32 +92,35 @@ static int compare_wide(const void *k1, const void *k2);
  * This code does not handle multiple-byte character sets (MBCS)
  * (such as ISO-2022-JP) with charset switching via escapes...
  */
-void *                                  /* O - Charset map pointer */
-cupsCharmapGet(const cups_encoding_t encoding)
-                                        /* I - Encoding */
+
+void *					/* O - Charset map pointer */
+cupsCharmapGet(
+    const cups_encoding_t encoding)	/* I - Encoding */
 {
-  char          *datadir;       /* CUPS_DATADIR environment variable */
-  char          mapname[80];    /* Name of charset map */
-  char          filename[1024];  /* Filename for charset map file */
+  char          mapname[80];		/* Name of charset map */
+  char		filename[1024];		/* Filename for charset map file */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
 
  /*
   * Check for valid arguments...
   */
+
   if ((encoding < 0) || (encoding >= CUPS_ENCODING_VBCS_END))
     return (NULL);
 
  /*
   * Get the data directory and charset map name...
   */
-  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-    datadir = CUPS_DATADIR;
-  snprintf(mapname, sizeof(mapname), "%s.txt", cupsEncodingName(encoding));
+
+  snprintf(mapname, sizeof(mapname), "%s.txt", _cupsEncodingName(encoding));
   snprintf(filename, sizeof(filename), "%s/charmaps/%s",
-           datadir, mapname);
+	   cg->cups_datadir, mapname);
 
  /*
   * Read charset map input file into cache...
   */
+
   if (encoding < CUPS_ENCODING_SBCS_END)
     return (get_sbcs_charmap(encoding, filename));
   else if (encoding < CUPS_ENCODING_VBCS_END)
@@ -133,7 +136,7 @@ cupsCharmapGet(const cups_encoding_t encoding)
  */
 void
 cupsCharmapFree(const cups_encoding_t encoding)
-                                        /* I - Encoding */
+					/* I - Encoding */
 {
   _cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
   _cups_vmap_t   *vmap;          /* Legacy VBCS / Unicode Charset Map */
@@ -148,7 +151,7 @@ cupsCharmapFree(const cups_encoding_t encoding)
     if (cmap->encoding == encoding)
     {
       if (cmap->used > 0)
-        cmap->used --;
+	cmap->used --;
       return;
     }
   }
@@ -161,7 +164,7 @@ cupsCharmapFree(const cups_encoding_t encoding)
     if (vmap->encoding == encoding)
     {
       if (vmap->used > 0)
-        vmap->used --;
+	vmap->used --;
       return;
     }
   }
@@ -183,7 +186,7 @@ cupsCharmapFlush(void)
   cups_sbcs_t   *srow;          /* Pointer to SBCS row in 'uni2char' */
   cups_vbcs_t   *vrow;          /* Pointer to VBCS row in 'uni2char' */
   _cups_globals_t *cg = _cupsGlobals();
-  				/* Pointer to library globals */
+				/* Pointer to library globals */
 
  /*
   * Loop through SBCS charset map cache, free all memory...
@@ -193,7 +196,7 @@ cupsCharmapFlush(void)
     for (i = 0; i < 256; i ++)
     {
       if ((srow = cmap->uni2char[i]) != NULL)
-        free(srow);
+	free(srow);
     }
     cnext = cmap->next;
     free(cmap);
@@ -208,12 +211,12 @@ cupsCharmapFlush(void)
     for (i = 0; i < 256; i ++)
     {
       if ((crow = vmap->char2uni[i]) != NULL)
-        free(crow);
+	free(crow);
     }
     for (i = 0; i < 256; i ++)
     {
       if ((vrow = vmap->uni2char[i]) != NULL)
-        free(vrow);
+	free(vrow);
     }
     if (vmap->wide2uni)
       free(vmap->wide2uni);
@@ -310,7 +313,7 @@ cupsUTF8ToUTF16(cups_utf16_t *dest,     /* O - Target string */
 {
   int           worklen;        /* Internal UCS-4 string length */
   cups_utf32_t  work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
+				/* Internal UCS-4 string */
 
  /*
   * Check for valid arguments and clear output...
@@ -348,7 +351,7 @@ cupsUTF16ToUTF8(cups_utf8_t *dest,      /* O - Target string */
 {
   int           worklen;        /* Internal UCS-4 string length */
   cups_utf32_t  work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
+				/* Internal UCS-4 string */
 
  /*
   * Check for valid arguments and clear output...
@@ -446,14 +449,14 @@ cupsUTF8ToUTF32(cups_utf32_t *dest,     /* O - Target string */
       next = (cups_utf32_t) *src;
       next &= 0xff;
       if (next == 0)
-        return (-1);
+	return (-1);
       ch32 = ((ch & 0x1f) << 6) | (next & 0x3f);
 
      /*
       * Check for non-shortest form (invalid UTF-8)...
       */
       if (ch32 <= 127)
-        return (-1);
+	return (-1);
       *dest = ch32;
     }
     else if ((ch & 0xf0) == 0xe0)
@@ -465,20 +468,20 @@ cupsUTF8ToUTF32(cups_utf32_t *dest,     /* O - Target string */
       next = (cups_utf32_t) *src;
       next &= 0xff;
       if (next == 0)
-        return (-1);
+	return (-1);
       ch32 = ((ch & 0x1f) << 6) | (next & 0x3f);
       src ++;
       next = (cups_utf32_t) *src;
       next &= 0xff;
       if (next == 0)
-        return (-1);
+	return (-1);
       ch32 = ((ch32 << 6) | (next & 0x3f));
 
      /*
       * Check for non-shortest form (invalid UTF-8)...
       */
       if (ch32 <= 2047)
-        return (-1);
+	return (-1);
       *dest = ch32;
     }
     else if ((ch & 0xf8) == 0xf0)
@@ -487,7 +490,7 @@ cupsUTF8ToUTF32(cups_utf32_t *dest,     /* O - Target string */
       * Four-octet UTF-8 to Replacement Character...
       */
       if (((src - first) + 3) >= srclen)
-        return (-1);
+	return (-1);
       src += 3;
       *dest = 0xfffd;
     }
@@ -552,7 +555,7 @@ cupsUTF32ToUTF8(cups_utf8_t *dest,      /* O - Target string */
     const int maxout)                   /* I - Max output */
 {
   cups_utf32_t  *first = (cups_utf32_t *) src;
-                                /* First source char */
+				/* First source char */
   cups_utf8_t   *start = dest;  /* Start of destination string */
   int           i;              /* Looping variable */
   int           swap = 0;       /* Byte-swap input to output */
@@ -624,7 +627,7 @@ cupsUTF32ToUTF8(cups_utf8_t *dest,      /* O - Target string */
       * Two-octet UTF-8 <= 2047 (Latin-x)...
       */
       if (i > (maxout - 2))
-        break;
+	break;
       *dest = (cups_utf8_t) (0xc0 | ((ch >> 6) & 0x1f));
       dest ++;
       i ++;
@@ -638,7 +641,7 @@ cupsUTF32ToUTF8(cups_utf8_t *dest,      /* O - Target string */
       * Three-octet UTF-8 <= 65535 (Plane 0 - BMP)...
       */
       if (i > (maxout - 3))
-        break;
+	break;
       *dest = (cups_utf8_t) (0xe0 | ((ch >> 12) & 0x0f));
       dest ++;
       i ++;
@@ -708,7 +711,7 @@ cupsUTF16ToUTF32(cups_utf32_t *dest,    /* O - Target string */
     if ((ch >= 0xdc00) && (ch <= 0xdfff))
     {
       if (surrogate == 0)
-        return (-1);
+	return (-1);
       surrogate = 0;
       continue;
     }
@@ -719,7 +722,7 @@ cupsUTF16ToUTF32(cups_utf32_t *dest,    /* O - Target string */
     if ((ch >= 0xd800) && (ch <= 0xdbff))
     {
       if (surrogate == 1)
-        return (-1);
+	return (-1);
       surrogate = 1;
       ch = 0xfffd;
     }
@@ -806,7 +809,7 @@ static int                              /* O - Count or -1 on error */
 get_charmap_count(const char *filename) /* I - Charmap Filename */
 {
   int           i;              /* Looping variable */
-  cups_file_t	*fp;            /* Map input file pointer */
+  cups_file_t   *fp;            /* Map input file pointer */
   char          *s;             /* Line parsing pointer */
   char          line[256];      /* Line from input map file */
   cups_utf32_t  unichar;        /* Unicode character value */
@@ -831,9 +834,9 @@ get_charmap_count(const char *filename) /* I - Charmap Filename */
     if ((*s == '#') || (*s == '\n') || (*s == '\0'))
       continue;
     while ((*s != 0) && (*s != ' ') && (*s != '\t'))
-        s ++;
+	s ++;
     while ((*s == ' ') || (*s == '\t'))
-        s ++;
+	s ++;
     if (strncmp (s, "0x", 2) == 0)
       s += 2;
     if ((sscanf(s, "%lx", &unichar) != 1)
@@ -859,8 +862,8 @@ get_charmap_count(const char *filename) /* I - Charmap Filename */
  */
 static _cups_cmap_t *                    /* O - Charmap or 0 on error */
 get_sbcs_charmap(const cups_encoding_t encoding,
-                                        /* I - Charmap Encoding */
-                 const char *filename)  /* I - Charmap Filename */
+					/* I - Charmap Encoding */
+		 const char *filename)  /* I - Charmap Filename */
 {
   int           i;              /* Loop variable */
   unsigned long legchar;        /* Legacy character value */
@@ -967,9 +970,9 @@ get_sbcs_charmap(const cups_encoding_t encoding,
       srow = (cups_sbcs_t *) calloc(256, sizeof(cups_sbcs_t));
       if (srow == NULL)
       {
-        cupsFileClose(fp);
-        cupsCharmapFlush();
-        return (NULL);
+	cupsFileClose(fp);
+	cupsCharmapFlush();
+	return (NULL);
       }
       cmap->uni2char[(int) ((unichar >> 8) & 0xff)] = srow;
     }
@@ -996,8 +999,8 @@ get_sbcs_charmap(const cups_encoding_t encoding,
  */
 static _cups_vmap_t *                    /* O - Charmap or 0 on error */
 get_vbcs_charmap(const cups_encoding_t encoding,
-                                        /* I - Charmap Encoding */
-                 const char *filename)  /* I - Charmap Filename */
+					/* I - Charmap Encoding */
+		 const char *filename)  /* I - Charmap Filename */
 {
   _cups_vmap_t       *vmap;      /* Legacy VBCS / Unicode Charset Map */
   cups_ucs2_t       *crow;      /* Pointer to UCS-2 row in 'char2uni' */
@@ -1133,14 +1136,14 @@ get_vbcs_charmap(const cups_encoding_t encoding,
       crow = vmap->char2uni[(int) leadchar];
       if (crow == NULL)
       {
-        crow = (cups_ucs2_t *) calloc(256, sizeof(cups_ucs2_t));
-        if (crow == NULL)
-        {
-          cupsFileClose(fp);
-          cupsCharmapFlush();
-          return (NULL);
-        }
-        vmap->char2uni[(int) leadchar] = crow;
+	crow = (cups_ucs2_t *) calloc(256, sizeof(cups_ucs2_t));
+	if (crow == NULL)
+	{
+	  cupsFileClose(fp);
+	  cupsCharmapFlush();
+	  return (NULL);
+	}
+	vmap->char2uni[(int) leadchar] = crow;
       }
       crow += (int) (legchar & 0xff);
       *crow = (cups_ucs2_t) unichar;
@@ -1152,17 +1155,17 @@ get_vbcs_charmap(const cups_encoding_t encoding,
       */
       if (wide == 0)
       {
-        wide = 1;
-        vmap->widecount = (mapcount - i + 1);
-        wide2uni = (_cups_wide2uni_t *)
-          calloc(vmap->widecount, sizeof(_cups_wide2uni_t));
-        if (wide2uni == NULL)
-        {
-          cupsFileClose(fp);
-          cupsCharmapFlush();
-          return (NULL);
-        }
-        vmap->wide2uni = wide2uni;
+	wide = 1;
+	vmap->widecount = (mapcount - i + 1);
+	wide2uni = (_cups_wide2uni_t *)
+	  calloc(vmap->widecount, sizeof(_cups_wide2uni_t));
+	if (wide2uni == NULL)
+	{
+	  cupsFileClose(fp);
+	  cupsCharmapFlush();
+	  return (NULL);
+	}
+	vmap->wide2uni = wide2uni;
       }
       wide2uni->widechar = (cups_vbcs_t) legchar;
       wide2uni->unichar = (cups_ucs2_t)unichar;
@@ -1178,9 +1181,9 @@ get_vbcs_charmap(const cups_encoding_t encoding,
       vrow = (cups_vbcs_t *) calloc(256, sizeof(cups_vbcs_t));
       if (vrow == NULL)
       {
-        cupsFileClose(fp);
-        cupsCharmapFlush();
-        return (NULL);
+	cupsFileClose(fp);
+	cupsCharmapFlush();
+	return (NULL);
       }
       vmap->uni2char[(int) ((unichar >> 8) & 0xff)] = vrow;
     }
@@ -1218,7 +1221,7 @@ conv_utf8_to_sbcs(char *dest,           /* O - Target string */
   cups_utf32_t  unichar;        /* Character value */
   int           worklen;        /* Internal UCS-4 string length */
   cups_utf32_t  work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
+				/* Internal UCS-4 string */
   int           i;              /* Looping variable */
 
  /*
@@ -1306,7 +1309,7 @@ conv_utf8_to_vbcs(char *dest,           /* O - Target string */
   cups_vbcs_t   legchar;        /* Legacy character value */
   int           worklen;        /* Internal UCS-4 string length */
   cups_utf32_t  work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
+				/* Internal UCS-4 string */
   int           i;              /* Looping variable */
 
  /*
@@ -1413,7 +1416,7 @@ conv_sbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
   cups_utf32_t  unichar;        /* Unicode character value */
   int           worklen;        /* Internal UCS-4 string length */
   cups_utf32_t  work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
+				/* Internal UCS-4 string */
   int           i;              /* Looping variable */
 
  /*
@@ -1495,7 +1498,7 @@ conv_vbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
   int               i;          /* Looping variable */
   int               worklen;    /* Internal UCS-4 string length */
   cups_utf32_t      work[CUPS_MAX_USTRING];
-                                /* Internal UCS-4 string */
+				/* Internal UCS-4 string */
 
  /*
   * Check for valid arguments and clear output...
@@ -1543,7 +1546,7 @@ conv_vbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
     {
       src ++;
       if (*src == '\0')
-        return (-1);
+	return (-1);
       legchar = (legchar << 8) | (cups_vbcs_t) *src;
   
      /*
@@ -1551,11 +1554,11 @@ conv_vbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
       */
       crow = vmap->char2uni[(int) ((legchar >> 8) & 0xff)];
       if (crow)
-        crow += (int) (legchar & 0xff);
+	crow += (int) (legchar & 0xff);
       if ((crow == NULL) || (*crow == 0))
-        unichar = 0xfffd;
+	unichar = 0xfffd;
       else
-        unichar = (cups_utf32_t) *crow;
+	unichar = (cups_utf32_t) *crow;
       work[i] = unichar;
       i ++;
       continue;
@@ -1568,26 +1571,26 @@ conv_vbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
     {
       src ++;
       if (*src == '\0')
-        return (-1);
+	return (-1);
       legchar = (legchar << 8) | (cups_vbcs_t) *src;
       src ++;
       if (*src == '\0')
-        return (-1);
+	return (-1);
       legchar = (legchar << 8) | (cups_vbcs_t) *src;
     }
     else if (vmap->lead4char[(int) leadchar] == leadchar)
     {
       src ++;
       if (*src == '\0')
-        return (-1);
+	return (-1);
       legchar = (legchar << 8) | (cups_vbcs_t) *src;
       src ++;
       if (*src == '\0')
-        return (-1);
+	return (-1);
       legchar = (legchar << 8) | (cups_vbcs_t) *src;
       src ++;
       if (*src == '\0')
-        return (-1);
+	return (-1);
       legchar = (legchar << 8) | (cups_vbcs_t) *src;
     }
     else
@@ -1598,10 +1601,10 @@ conv_vbcs_to_utf8(cups_utf8_t *dest,    /* O - Target string */
     */
     wide2uni = vmap->wide2uni;
     wide2uni = (_cups_wide2uni_t *) bsearch(&legchar,
-                                           vmap->wide2uni,
-                                           vmap->widecount,
-                                           sizeof(_cups_wide2uni_t),
-                                           compare_wide);
+					   vmap->wide2uni,
+					   vmap->widecount,
+					   sizeof(_cups_wide2uni_t),
+					   compare_wide);
 
    /*
     * Convert unknown character to Replacement Character...
@@ -1631,9 +1634,9 @@ compare_wide(const void *k1,            /* I - Key char */
     const void *k2)                     /* I - Map char */
 {
   cups_vbcs_t       *kp = (cups_vbcs_t *) k1;
-                                /* Key char pointer */
+				/* Key char pointer */
   _cups_wide2uni_t   *mp = (_cups_wide2uni_t *) k2;
-                                /* Map char pointer */
+				/* Map char pointer */
   cups_vbcs_t       key;        /* Legacy key character */
   cups_vbcs_t       map;        /* Legacy map character */
   int               result;     /* Result Value */
@@ -1646,6 +1649,7 @@ compare_wide(const void *k1,            /* I - Key char */
     result = -1 * ((int) (map - key));
   return (result);
 }
+
 
 /*
  * End of "$Id$"

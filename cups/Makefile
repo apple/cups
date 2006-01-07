@@ -84,6 +84,7 @@ HEADERS	=	\
 		dir.h \
 		file.h \
 		http.h \
+		i18n.h \
 		ipp.h \
 		language.h \
 		md5.h \
@@ -190,12 +191,6 @@ libcups.2.dylib:	$(LIBOBJS)
 
 libcups_s.a:	$(LIBOBJS)
 	echo Creating $@...
-	$(RM) libcups_s.exp
-	(echo _ipp_add_attr; echo _ipp_free_attr; \
-	 echo _cups_hstrerror; echo _cups_md5_init; \
-	 echo _cups_md5_append; echo _cups_md5_finish; \
-	 echo _cups_strlcat; echo _cups_strlcpy; \
-	 echo _httpReadCDSA; echo _httpWriteCDSA) >libcups_s.exp
 	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o
@@ -241,16 +236,6 @@ php_cups_wrap.o:	php_cups_wrap.c
 php_cups_wrap.c:	cups.h
 	echo Creating $< using SWIG...
 	swig -php -o $@ -module cups cups.h
-
-
-#
-# cups_C.h - the default POSIX locale that is compiled in.
-#
-
-cups_C.h:	../locale/C/cups_C
-	echo Generating $@...
-	$(RM) cups_C.h
-	$(AWK) '{print "\"" $$0 "\","}' < ../locale/C/cups_C > cups_C.h
 
 
 #

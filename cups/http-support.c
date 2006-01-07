@@ -510,7 +510,7 @@ httpEncode64_2(char       *out,		/* I - String to write to */
   * Range check input...
   */
 
-  if (!out || outlen < 1 || !in || inlen < 1)
+  if (!out || outlen < 1 || !in)
     return (NULL);
 
  /*

@@ -28,14 +28,14 @@ include ../Makedefs
 # Locales...
 #
 
-LOCALES	=	C be cs de en en_US es fr he it ru_RU sv uk uk_UA zh_CN
+LOCALES	=
 
 
 #
 # Make everything...
 #
 
-all:	translate
+all:
 
 
 #
@@ -51,14 +51,14 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(LOCALEDIR)
-	for dir in $(LOCALES) ; do \
-		$(INSTALL_DIR) $(LOCALEDIR)/$$dir ; \
-		$(INSTALL_DATA) $$dir/cups_$$dir $(LOCALEDIR)/$$dir ; \
-	done
+#	for dir in $(LOCALES) ; do \
+#		$(INSTALL_DIR) $(LOCALEDIR)/$$dir ; \
+#		$(INSTALL_DATA) cups_$$dir.po $(LOCALEDIR)/$$dir ; \
+#	done
 
 
 #
-# translate - a simple utility to use Bablefish to translate the POSIX message
+# translate - a simple utility to use Bablefish to translate the message
 #             file to one of several languages.
 #
 # translate outfile language

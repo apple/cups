@@ -41,9 +41,7 @@
  * Include necessary headers...
  */
 
-#include "cups.h"
-#include "language.h"
-#include "string.h"
+#include "globals.h"
 #include <stdlib.h>
 #include <ctype.h>
 
@@ -250,6 +248,7 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
 		*instance;		/* Pointer to instance name */
   int		num_reals;		/* Number of real queues */
   cups_dest_t	*reals;			/* Real queues */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
  /*
@@ -329,13 +328,8 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
   * Load the /etc/cups/lpoptions and ~/.lpoptions files...
   */
 
-  if ((home = getenv("CUPS_SERVERROOT")) != NULL)
-  {
-    snprintf(filename, sizeof(filename), "%s/lpoptions", home);
-    num_dests = cups_get_dests(filename, num_dests, dests);
-  }
-  else
-    num_dests = cups_get_dests(CUPS_SERVERROOT "/lpoptions", num_dests, dests);
+  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
+  num_dests = cups_get_dests(filename, num_dests, dests);
 
   if ((home = getenv("HOME")) != NULL)
   {
@@ -439,6 +433,7 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
   cups_dest_t	*temps,			/* Temporary destinations */
 		*temp;			/* Current temporary dest */
   const char	*val;			/* Value of temporary option */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
  /*
@@ -459,10 +454,7 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
   * Figure out which file to write to...
   */
 
-  if ((home = getenv("CUPS_SERVERROOT")) != NULL)
-    snprintf(filename, sizeof(filename), "%s/lpoptions", home);
-  else
-    strcpy(filename, CUPS_SERVERROOT "/lpoptions");
+  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
 
 #ifndef WIN32
   if (getuid())

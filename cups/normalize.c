@@ -1439,7 +1439,6 @@ get_normmap(
   _cups_norm_map_t	*nmap;		/* Unicode Normalization Map */
   int			normcount;	/* Count of Unicode Source Chars */
   cups_ucs2_t		*uni2norm;	/* Unicode Char -> Normalization */
-  char			*datadir;	/* CUPS_DATADIR environment variable */
   char			*mapname;	/* Normalization map name */
   char			filename[1024];	/* Filename for charset map file */
   cups_file_t		*fp;		/* Normalization map file pointer */
@@ -1458,11 +1457,8 @@ get_normmap(
       return (0);
 
  /*
-  * Get the data directory and mapping name...
+  * Get the mapping name...
   */
-
-  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-    datadir = CUPS_DATADIR;
 
   switch (normalize)
   {
@@ -1488,7 +1484,7 @@ get_normmap(
   */
 
   snprintf(filename, sizeof(filename), "%s/charmaps/%s",
-           datadir, mapname);
+           cg->cups_datadir, mapname);
   if ((normcount = get_map_count(filename)) <= 0)
     return (-1);
 
@@ -1564,7 +1560,6 @@ get_foldmap(const cups_folding_t fold)	/* I - Case folding type */
   _cups_fold_map_t	*fmap;		/* Unicode Case Folding Map */
   int			foldcount;	/* Count of Unicode Source Chars */
   cups_ucs2_t		*uni2fold;	/* Unicode -> Folded Char(s) */
-  char			*datadir;	/* CUPS_DATADIR env variable */
   char			*mapname;	/* Case Folding map name */
   char			filename[1024];	/* Filename for charset map file */
   cups_file_t		*fp;		/* Case Folding map file pointer */
@@ -1583,11 +1578,8 @@ get_foldmap(const cups_folding_t fold)	/* I - Case folding type */
       return (0);
 
  /*
-  * Get the data directory and mapping name...
+  * Get the mapping name...
   */
-
-  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-    datadir = CUPS_DATADIR;
 
   switch (fold)
   {
@@ -1606,7 +1598,7 @@ get_foldmap(const cups_folding_t fold)	/* I - Case folding type */
   */
 
   snprintf(filename, sizeof(filename), "%s/charmaps/%s",
-           datadir, mapname);
+           cg->cups_datadir, mapname);
   if ((foldcount = get_map_count(filename)) <= 0)
     return (-1);
   fp = cupsFileOpen(filename, "r");
@@ -1687,7 +1679,6 @@ get_propmap(void)
   _cups_prop_map_t	*pmap;		/* Unicode Char Property Map */
   int			propcount;	/* Count of Unicode Source Chars */
   _cups_prop_t		*uni2prop;	/* Unicode Char -> Properties */
-  char			*datadir;	/* CUPS_DATADIR environment variable */
   char			*mapname;	/* Char Property map name */
   char			filename[1024];	/* Filename for charset map file */
   cups_file_t		*fp;		/* Char Property map file pointer */
@@ -1705,11 +1696,8 @@ get_propmap(void)
     return (0);
 
  /*
-  * Get the data directory and mapping name...
+  * Get the mapping name...
   */
-
-  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-    datadir = CUPS_DATADIR;
 
   mapname = "uni-prop.txt";
 
@@ -1717,7 +1705,7 @@ get_propmap(void)
   * Open char properties map input file...
   */
   snprintf(filename, sizeof(filename), "%s/charmaps/%s",
-           datadir, mapname);
+           cg->cups_datadir, mapname);
   if ((propcount = get_map_count(filename)) <= 0)
     return (-1);
   fp = cupsFileOpen(filename, "r");
@@ -1815,7 +1803,6 @@ get_combmap(void)
   _cups_comb_map_t	*cmap;		/* Unicode Comb Class Map */
   int			combcount;	/* Count of Unicode Source Chars */
   _cups_comb_t		*uni2comb;	/* Unicode Char -> Combining Class */
-  char			*datadir;	/* CUPS_DATADIR environment variable */
   char			*mapname;	/* Comb Class map name */
   char			filename[1024];	/* Filename for charset map file */
   cups_file_t		*fp;		/* Comb Class map file pointer */
@@ -1833,11 +1820,8 @@ get_combmap(void)
     return (0);
 
  /*
-  * Get the data directory and mapping name...
+  * Get the mapping name...
   */
-
-  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-    datadir = CUPS_DATADIR;
 
   mapname = "uni-comb.txt";
 
@@ -1846,7 +1830,7 @@ get_combmap(void)
   */
 
   snprintf(filename, sizeof(filename), "%s/charmaps/%s",
-           datadir, mapname);
+           cg->cups_datadir, mapname);
   if ((combcount = get_map_count(filename)) <= 0)
     return (-1);
   fp = cupsFileOpen(filename, "r");
@@ -1924,7 +1908,6 @@ get_breakmap(void)
   _cups_break_map_t	*bmap;		/* Unicode Line Break Class Map */
   int			breakcount;	/* Count of Unicode Source Chars */
   cups_ucs2_t		*uni2break;	/* Unicode -> Line Break Class */
-  char			*datadir;	/* CUPS_DATADIR environment variable */
   char			*mapname;	/* Comb Class map name */
   char			filename[1024];	/* Filename for charset map file */
   cups_file_t		*fp;		/* Comb Class map file pointer */
@@ -1942,11 +1925,8 @@ get_breakmap(void)
     return (0);
 
  /*
-  * Get the data directory and mapping name...
+  * Get the mapping name...
   */
-
-  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-    datadir = CUPS_DATADIR;
 
   mapname = "uni-line.txt";
 
@@ -1955,7 +1935,7 @@ get_breakmap(void)
   */
 
   snprintf(filename, sizeof(filename), "%s/charmaps/%s",
-           datadir, mapname);
+           cg->cups_datadir, mapname);
   if ((breakcount = get_map_count(filename)) <= 0)
     return (-1);
   fp = cupsFileOpen(filename, "r");

@@ -34,10 +34,7 @@
  * Include necessary headers...
  */
 
-#include "cups.h"
-#include "ipp.h"
-#include "language.h"
-#include "string.h"
+#include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
 #include <ctype.h>
@@ -182,7 +179,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   FILE		*fp;			/* Certificate file */
   char		filename[1024],		/* Certificate filename */
 		certificate[33];	/* Certificate string */
-  const char	*state;			/* Server state directory */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
   DEBUG_printf(("cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"\n",
@@ -204,17 +201,14 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * try the root certificate...
   */
 
-  if ((state = getenv("CUPS_STATEDIR")) == NULL)
-    state = CUPS_STATEDIR;
-
   pid = getpid();
-  snprintf(filename, sizeof(filename), "%s/certs/%d", state, pid);
+  snprintf(filename, sizeof(filename), "%s/certs/%d", cg->cups_statedir, pid);
   if ((fp = fopen(filename, "r")) == NULL && pid > 0)
   {
     DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
                   filename, strerror(errno)));
 
-    snprintf(filename, sizeof(filename), "%s/certs/0", state);
+    snprintf(filename, sizeof(filename), "%s/certs/0", cg->cups_statedir);
     fp = fopen(filename, "r");
   }
 

@@ -33,7 +33,7 @@
 
 #  include "string.h"
 #  include "cups.h"
-#  include "language.h"
+#  include "i18n.h"
 #  include "normalize.h"
 #  include "transcode.h"
 
@@ -58,6 +58,14 @@ extern "C" {
 
 typedef struct _cups_globals_s		/**** CUPS global state data ****/
 {
+  /* Multiple places... */
+  const char		*cups_datadir,	/* CUPS_DATADIR environment var */
+			*cups_serverbin,/* CUPS_SERVERBIN environment var */
+			*cups_serverroot,
+					/* CUPS_SERVERROOT environment var */
+			*cups_statedir,	/* CUPS_STATEDIR environment var */
+			*localedir;	/* LOCALDIR environment var */
+
   /* http.c */
   char			http_date[256];	/* Date+time buffer */
 

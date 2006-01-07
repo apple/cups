@@ -347,6 +347,7 @@ fi
 
 export SHLIB_PATH
 
+CUPS_SERVER=localhost; export CUPS_SERVER
 CUPS_SERVERROOT=/tmp/cups-$user; export CUPS_SERVERROOT
 CUPS_STATEDIR=/tmp/cups-$user; export CUPS_STATEDIR
 CUPS_DATADIR=/tmp/cups-$user/share; export CUPS_DATADIR

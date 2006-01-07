@@ -101,7 +101,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (strcmp(printer, "/") == 0 || strstr(printer, "printers.cgi") != NULL)
   {
     printer = NULL;
-    cgiSetVariable("TITLE", cupsLangString(language, CUPS_MSG_PRINTER));
+    cgiSetVariable("TITLE", _cupsLangString(language, _("Printer")));
   }
   else
     cgiSetVariable("TITLE", printer);

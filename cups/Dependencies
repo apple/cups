@@ -2,59 +2,65 @@
 
 array.o: array.h string.h ../config.h debug.h
 attr.o: ppd.h file.h debug.h string.h ../config.h
-auth.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
-auth.o: language.h debug.h
+auth.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h file.h
+auth.o: i18n.h language.h array.h normalize.h transcode.h debug.h
 backchannel.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
-dest.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
-dest.o: language.h
+dest.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h file.h
+dest.o: i18n.h language.h array.h normalize.h transcode.h
 dir.o: dir.h string.h ../config.h debug.h
 emit.o: ppd.h file.h string.h ../config.h
 encode.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h debug.h
 file.o: http-private.h ../config.h http.h string.h md5.h ../cups/debug.h
 file.o: file.h
 getputfile.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
-getputfile.o: language.h debug.h
+getputfile.o: language.h array.h debug.h
 globals.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
-globals.o: ipp.h ppd.h file.h language.h normalize.h transcode.h
+globals.o: ipp.h ppd.h file.h i18n.h language.h array.h normalize.h
+globals.o: transcode.h
 http.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
-http.o: ipp.h ppd.h file.h language.h normalize.h transcode.h debug.h
+http.o: ipp.h ppd.h file.h i18n.h language.h array.h normalize.h transcode.h
+http.o: debug.h
 http-addr.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
-http-addr.o: file.h language.h normalize.h transcode.h debug.h
+http-addr.o: file.h i18n.h language.h array.h normalize.h transcode.h debug.h
 http-addrlist.o: http-private.h ../config.h http.h string.h md5.h globals.h
-http-addrlist.o: cups.h ipp.h ppd.h file.h language.h normalize.h transcode.h
-http-addrlist.o: debug.h
+http-addrlist.o: cups.h ipp.h ppd.h file.h i18n.h language.h array.h
+http-addrlist.o: normalize.h transcode.h debug.h
 http-support.o: debug.h globals.h string.h ../config.h cups.h ipp.h http.h
-http-support.o: md5.h ppd.h file.h language.h normalize.h transcode.h
+http-support.o: md5.h ppd.h file.h i18n.h language.h array.h normalize.h
+http-support.o: transcode.h
 ipp.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
-ipp.o: ipp.h ppd.h file.h language.h normalize.h transcode.h debug.h
+ipp.o: ipp.h ppd.h file.h i18n.h language.h array.h normalize.h transcode.h
+ipp.o: debug.h
 ipp-support.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
-ipp-support.o: file.h language.h normalize.h transcode.h debug.h
-langprintf.o: string.h ../config.h language.h transcode.h
+ipp-support.o: file.h i18n.h language.h array.h normalize.h transcode.h
+ipp-support.o: debug.h
+langprintf.o: string.h ../config.h language.h array.h transcode.h
 language.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
-language.o: file.h language.h normalize.h transcode.h debug.h cups_C.h
+language.o: file.h i18n.h language.h array.h normalize.h transcode.h debug.h
 mark.o: ppd.h file.h string.h ../config.h debug.h
 md5.o: md5.h string.h ../config.h
 md5passwd.o: http.h string.h ../config.h md5.h
 normalize.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
-normalize.o: file.h language.h normalize.h transcode.h debug.h
+normalize.o: file.h i18n.h language.h array.h normalize.h transcode.h debug.h
 options.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h file.h
 options.o: debug.h
 page.o: ppd.h file.h string.h ../config.h
 ppd.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h file.h
-ppd.o: language.h normalize.h transcode.h debug.h
+ppd.o: i18n.h language.h array.h normalize.h transcode.h debug.h
 snprintf.o: string.h ../config.h
 string.o: string.h ../config.h
 tempfile.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
-tempfile.o: file.h language.h normalize.h transcode.h debug.h
+tempfile.o: file.h i18n.h language.h array.h normalize.h transcode.h debug.h
 transcode.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
-transcode.o: file.h language.h normalize.h transcode.h
+transcode.o: file.h i18n.h language.h array.h normalize.h transcode.h
 usersys.o: http-private.h ../config.h http.h string.h md5.h globals.h cups.h
-usersys.o: ipp.h ppd.h file.h language.h normalize.h transcode.h
+usersys.o: ipp.h ppd.h file.h i18n.h language.h array.h normalize.h
+usersys.o: transcode.h
 util.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h file.h
-util.o: language.h normalize.h transcode.h debug.h
+util.o: i18n.h language.h array.h normalize.h transcode.h debug.h
 testarray.o: ../cups/string.h ../config.h string.h array.h dir.h debug.h
 testfile.o: string.h ../config.h file.h debug.h
 testhttp.o: http.h string.h ../config.h md5.h
-testi18n.o: language.h string.h ../config.h transcode.h normalize.h
+testi18n.o: language.h array.h string.h ../config.h transcode.h normalize.h
 testipp.o: ../cups/string.h ../config.h string.h ipp.h http.h md5.h
-testlang.o: language.h
+testlang.o: i18n.h language.h array.h

@@ -3,7 +3,7 @@
 betest.o: ../cups/string.h ../config.h
 ipp.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
 ipp.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/ppd.h
-ipp.o: ../cups/file.h ../cups/language.h ../cups/string.h
+ipp.o: ../cups/file.h ../cups/language.h ../cups/array.h ../cups/string.h
 lpd.o: ../cups/backend.h ../cups/http-private.h ../config.h ../cups/http.h
 lpd.o: ../cups/md5.h ../cups/cups.h ../cups/ipp.h ../cups/ppd.h
 lpd.o: ../cups/file.h ../cups/string.h

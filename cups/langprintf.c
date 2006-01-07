@@ -26,8 +26,8 @@
  *
  * Contents:
  *
- *   cupsLangPrintf() - Print a formatted message string to a file.
- *   cupsLangPuts()   - Print a static message string to a file.
+ *   _cupsLangPrintf() - Print a formatted message string to a file.
+ *   _cupsLangPuts()   - Print a static message string to a file.
  */
 
 /*
@@ -41,14 +41,14 @@
 
 
 /*
- * 'cupsLangPrintf()' - Print a formatted message string to a file.
+ * '_cupsLangPrintf()' - Print a formatted message string to a file.
  */
 
 int					/* O - Number of bytes written */
-cupsLangPrintf(FILE        *fp,		/* I - File to write to */
-               cups_lang_t *language,	/* I - Language to use */
-	       cups_msg_t  msg,		/* I - Message string to use */
-	       ...)			/* I - Additional arguments as needed */
+_cupsLangPrintf(FILE        *fp,	/* I - File to write to */
+                cups_lang_t *language,	/* I - Language to use */
+	        const char  *message,	/* I - Message string to use */
+	        ...)			/* I - Additional arguments as needed */
 {
   int		bytes;			/* Number of bytes formatted */
   char		buffer[2048],		/* Message buffer */
@@ -60,16 +60,16 @@ cupsLangPrintf(FILE        *fp,		/* I - File to write to */
   * Range check...
   */
 
-  if (fp == NULL || language == NULL || msg < CUPS_MSG_OK ||
-      msg >= CUPS_MSG_MAX || cupsLangString(language, msg) == NULL)
+  if (!fp || !language || !message)
     return (-1);
 
  /*
   * Format the string...
   */
 
-  va_start(ap, msg);
-  bytes = vsnprintf(buffer, sizeof(buffer), cupsLangString(language, msg), ap);
+  va_start(ap, message);
+  bytes = vsnprintf(buffer, sizeof(buffer),
+                    _cupsLangString(language, message), ap);
   va_end(ap);
 
  /*
@@ -88,13 +88,13 @@ cupsLangPrintf(FILE        *fp,		/* I - File to write to */
 
 
 /*
- * 'cupsLangPuts()' - Print a static message string to a file.
+ * '_cupsLangPuts()' - Print a static message string to a file.
  */
 
 int					/* O - Number of bytes written */
-cupsLangPuts(FILE        *fp,		/* I - File to write to */
-             cups_lang_t *language,	/* I - Language to use */
-	     cups_msg_t  msg)		/* I - Message string to use */
+_cupsLangPuts(FILE        *fp,		/* I - File to write to */
+              cups_lang_t *language,	/* I - Language to use */
+	      const char  *message)	/* I - Message string to use */
 {
   int		bytes;			/* Number of bytes formatted */
   char		output[2048];		/* Message buffer */
@@ -104,8 +104,7 @@ cupsLangPuts(FILE        *fp,		/* I - File to write to */
   * Range check...
   */
 
-  if (fp == NULL || language == NULL || msg < CUPS_MSG_OK ||
-      msg >= CUPS_MSG_MAX || cupsLangString(language, msg) == NULL)
+  if (!fp || !language || !message)
     return (-1);
 
  /*
@@ -113,7 +112,7 @@ cupsLangPuts(FILE        *fp,		/* I - File to write to */
   */
 
   bytes = cupsUTF8ToCharset(output,
-                            (cups_utf8_t *)cupsLangString(language, msg),
+                            (cups_utf8_t *)_cupsLangString(language, message),
 			    sizeof(output), language->encoding);
 
  /*
@@ -127,4 +126,3 @@ cupsLangPuts(FILE        *fp,		/* I - File to write to */
 /*
  * End of "$Id$".
  */
-

@@ -52,7 +52,7 @@
 #include "mime.h"
 #include <cups/http.h>
 #include <cups/ipp.h>
-#include <cups/language.h>
+#include <cups/i18n.h>
 #include <cups/debug.h>
 
 #if defined(HAVE_CDSASSL)

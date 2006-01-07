@@ -76,7 +76,7 @@
  *   save_auth_info()            - Save authentication information for a job.
  *   send_document()             - Send a file to a printer or class.
  *   send_http_error()           - Send a HTTP error back to the IPP client.
- *   send_ipp_error()            - Send an error status back to the IPP client.
+ *   send_ipp_status()           - Send a status back to the IPP client.
  *   set_default()               - Set the default destination...
  *   set_job_attrs()             - Set job attributes.
  *   start_printer()             - Start a printer.
@@ -167,7 +167,12 @@ static void	restart_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	save_auth_info(cupsd_client_t *con, cupsd_job_t *job);
 static void	send_document(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	send_http_error(cupsd_client_t *con, http_status_t status);
-static void	send_ipp_error(cupsd_client_t *con, ipp_status_t status);
+static void	send_ipp_status(cupsd_client_t *con, ipp_status_t status,
+		                const char *message, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 3, 4)))
+#    endif /* __GNUC__ */
+;
 static void	set_default(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	set_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	start_printer(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -221,29 +226,24 @@ cupsdProcessIPPRequest(
     * Return an error, since we only support IPP 1.x.
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdProcessIPPRequest: bad request version (%d.%d)!",
-                    con->request->request.any.version[0],
-	            con->request->request.any.version[1]);
-
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                  "%04X %s Bad request version (%d.%d)",
+                  "%04X %s Bad request version number %d.%d",
 		  IPP_VERSION_NOT_SUPPORTED, con->http.hostname,
                   con->request->request.any.version[0],
 	          con->request->request.any.version[1]);
 
-    send_ipp_error(con, IPP_VERSION_NOT_SUPPORTED);
+    send_ipp_status(con, IPP_VERSION_NOT_SUPPORTED,
+                    _("Bad request version number %d.%d!"),
+		    con->request->request.any.version[0],
+	            con->request->request.any.version[1]);
   }  
   else if (con->request->attrs == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdProcessIPPRequest: no attributes in request!");
-
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                   "%04X %s No attributes in request",
 		  IPP_BAD_REQUEST, con->http.hostname);
 
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST, _("No attributes in request!"));
   }
   else
   {
@@ -261,15 +261,13 @@ cupsdProcessIPPRequest(
 	* Out of order; return an error...
 	*/
 
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdProcessIPPRequest: attribute groups are out of "
-			"order (%x < %x)!", attr->group_tag, group);
-
 	cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                       "%04X %s Attribute groups are out of order",
 		      IPP_BAD_REQUEST, con->http.hostname);
 
-	send_ipp_error(con, IPP_BAD_REQUEST);
+	send_ipp_status(con, IPP_BAD_REQUEST,
+	                _("Attribute groups are out of order (%x < %x)!"),
+			attr->group_tag, group);
 	break;
       }
       else
@@ -340,7 +338,7 @@ cupsdProcessIPPRequest(
         if (!charset)
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "cupsdProcessIPPRequest: missing attributes-charset attribute!");
+	                  "Missing attributes-charset attribute!");
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                 	"%04X %s Missing attributes-charset attribute",
@@ -350,7 +348,7 @@ cupsdProcessIPPRequest(
         if (!language)
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "cupsdProcessIPPRequest: missing attributes-natural-language attribute!");
+	                  "Missing attributes-natural-language attribute!");
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                 	"%04X %s Missing attributes-natural-language attribute",
@@ -360,7 +358,7 @@ cupsdProcessIPPRequest(
         if (!uri)
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "cupsdProcessIPPRequest: missing printer-uri or job-uri attribute!");
+	                  "Missing printer-uri or job-uri attribute!");
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                 	"%04X %s Missing printer-uri or job-uri attribute",
@@ -377,7 +375,8 @@ cupsdProcessIPPRequest(
 
 	cupsdLogMessage(CUPSD_LOG_DEBUG, "End of attributes...");
 
-	send_ipp_error(con, IPP_BAD_REQUEST);
+	send_ipp_status(con, IPP_BAD_REQUEST,
+	                _("Missing required attributes!"));
       }
       else
       {
@@ -393,9 +392,9 @@ cupsdProcessIPPRequest(
 	  * Check for root user...
 	  */
 
-	  if (strcmp(username->values[0].string.text, "root") == 0 &&
-	      strcasecmp(con->http.hostname, "localhost") != 0 &&
-	      strcmp(con->username, "root") != 0)
+	  if (!strcmp(username->values[0].string.text, "root") &&
+	      strcasecmp(con->http.hostname, "localhost") &&
+	      strcmp(con->username, "root"))
 	  {
 	   /*
 	    * Remote unauthenticated user masquerading as local root...
@@ -572,7 +571,9 @@ cupsdProcessIPPRequest(
 			    con->request->request.op.operation_id,
 			    ippOpString(con->request->request.op.operation_id));
 
-              send_ipp_error(con, IPP_OPERATION_NOT_SUPPORTED);
+              send_ipp_status(con, IPP_OPERATION_NOT_SUPPORTED,
+	                      _("%s not supported!"),
+			      ippOpString(con->request->request.op.operation_id));
 	      break;
 	}
       }
@@ -664,21 +665,8 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
   cupsd_printer_t *printer;		/* Printer data */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "accept_jobs(%p[%d], %s)\n", con,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "accept_jobs(%p[%d], %s)", con,
                   con->http.fd, uri->values[0].string.text);
-
- /*
-  * Was this operation called from the correct URI?
-  */
-
-  if (strncmp(con->uri, "/admin/", 7) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "accept_jobs: admin request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
 
  /*
   * Is the destination valid?
@@ -692,9 +680,8 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Accept-Jobs: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -722,7 +709,7 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
   else
     cupsdSaveAllPrinters();
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Printer \'%s\' now accepting jobs (\'%s\').", name,
+  cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" now accepting jobs (\"%s\").", name,
                   con->username);
 
  /*
@@ -756,21 +743,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   int		modify;			/* Non-zero if we just modified */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_class(%p[%d], %s)\n", con,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_class(%p[%d], %s)", con,
                   con->http.fd, uri->values[0].string.text);
-
- /*
-  * Was this operation called from the correct URI?
-  */
-
-  if (strncmp(con->uri, "/admin/", 7) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "add_class: admin request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
 
  /*
   * Do we have a valid URI?
@@ -784,7 +758,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     * No, return an error...
     */
 
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("The printer-uri must be of the form "
+		      "\"ipp://HOSTNAME/classes/CLASSNAME\"."));
     return;
   }
 
@@ -798,7 +774,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     * No, return an error...
     */
 
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("The printer-uri \"%s\" contains invalid characters."),
+		    uri->values[0].string.text);
     return;
   }
 
@@ -829,7 +807,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
       * Yes, return an error...
       */
 
-      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      send_ipp_status(con, IPP_NOT_POSSIBLE,
+                      _("A printer named \"%s\" already exists!"),
+		      resource + 9);
       return;
     }
 
@@ -920,10 +900,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     if (attr->values[0].integer != IPP_PRINTER_IDLE &&
         attr->values[0].integer != IPP_PRINTER_STOPPED)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Attempt to set %s printer-state to bad value %d!",
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Attempt to set %s printer-state to bad value %d!"),
                       pclass->name, attr->values[0].integer);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -1017,10 +996,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     }
     else
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "add_class: Unknown printer-op-policy \"%s\"...",
+      send_ipp_status(con, IPP_NOT_POSSIBLE,
+                      _("add_class: Unknown printer-op-policy \"%s\"."),
                       attr->values[0].string.text);
-      send_ipp_error(con, IPP_NOT_POSSIBLE);
       return;
     }
   }
@@ -1031,10 +1009,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
         strcmp(attr->values[0].string.text, "retry-job") &&
         strcmp(attr->values[0].string.text, "stop-printer"))
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                     "add_class: Unknown printer-error-policy \"%s\"...",
-                     attr->values[0].string.text);
-      send_ipp_error(con, IPP_NOT_POSSIBLE);
+      send_ipp_status(con, IPP_NOT_POSSIBLE,
+                      _("add_class: Unknown printer-error-policy \"%s\"."),
+                      attr->values[0].string.text);
       return;
     }
 
@@ -1074,9 +1051,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 	* Bad URI...
 	*/
 
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "add_class: resource name \'%s\' no good!", resource);
-	send_ipp_error(con, IPP_NOT_FOUND);
+	send_ipp_status(con, IPP_NOT_FOUND,
+                	_("The printer or class was not found."));
 	return;
       }
 
@@ -1101,10 +1077,10 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   if (modify)
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, pclass, NULL,
-                  "Class \'%s\' modified by \'%s\'.", pclass->name,
+                  "Class \"%s\" modified by \"%s\".", pclass->name,
         	  con->username);
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "Class \'%s\' modified by \'%s\'.",
+    cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" modified by \"%s\".",
                     pclass->name, con->username);
   }
   else
@@ -1112,10 +1088,10 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     cupsdAddPrinterHistory(pclass);
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, pclass, NULL,
-                  "New class \'%s\' added by \'%s\'.", pclass->name,
+                  "New class \"%s\" added by \"%s\".", pclass->name,
         	  con->username);
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "New class \'%s\' added by \'%s\'.",
+    cupsdLogMessage(CUPSD_LOG_INFO, "New class \"%s\" added by \"%s\".",
                     pclass->name, con->username);
   }
 
@@ -1163,9 +1139,9 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
   if (compressions == NULL || filetypes == NULL)
   {
     cupsdCancelJob(job, 1);
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "add_file: unable to allocate memory for file types!");
-    send_ipp_error(con, IPP_INTERNAL_ERROR);
+
+    send_ipp_status(con, IPP_INTERNAL_ERROR,
+                    _("Unable to allocate memory for file types!"));
     return (-1);
   }
 
@@ -1193,7 +1169,7 @@ add_job_state_reasons(
   cupsd_printer_t	*dest;		/* Destination printer */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job_state_reasons(%p[%d], %d)\n",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job_state_reasons(%p[%d], %d)",
                   con, con->http.fd, job ? job->id : 0);
 
   switch (job ? job->state->values[0].integer : IPP_JOB_CANCELLED)
@@ -1307,16 +1283,21 @@ add_job_subscriptions(
         pullmethod = attr->values[0].string.text;
       else if (!strcmp(attr->name, "notify-charset") &&
                attr->value_tag == IPP_TAG_CHARSET &&
+	       strcmp(attr->values[0].string.text, "us-ascii") &&
 	       strcmp(attr->values[0].string.text, "utf-8"))
       {
-        send_ipp_error(con, IPP_CHARSET);
+        send_ipp_status(con, IPP_CHARSET,
+	                _("Character set \"%s\" not supported!"),
+			attr->values[0].string.text);
 	return;
       }
       else if (!strcmp(attr->name, "notify-natural-language") &&
                (attr->value_tag != IPP_TAG_LANGUAGE ||
 	        strcmp(attr->values[0].string.text, DefaultLanguage)))
       {
-        send_ipp_error(con, IPP_CHARSET);
+        send_ipp_status(con, IPP_CHARSET,
+	                _("Language \"%s\" not supported!"),
+			attr->values[0].string.text);
 	return;
       }
       else if (!strcmp(attr->name, "notify-user-data") &&
@@ -1324,7 +1305,10 @@ add_job_subscriptions(
       {
         if (attr->num_values > 1 || attr->values[0].unknown.length > 63)
 	{
-          send_ipp_error(con, IPP_REQUEST_VALUE);
+          send_ipp_status(con, IPP_REQUEST_VALUE,
+	                  _("The notify-user-data value is too large "
+			    "(%d > 63 octets)!"),
+			  attr->values[0].unknown.length);
 	  return;
 	}
 
@@ -1338,7 +1322,9 @@ add_job_subscriptions(
       }
       else if (!strcmp(attr->name, "notify-lease-duration"))
       {
-        send_ipp_error(con, IPP_BAD_REQUEST);
+        send_ipp_status(con, IPP_BAD_REQUEST,
+	                _("The notify-lease-duration attribute cannot be "
+			  "used with job subscriptions."));
 	return;
       }
       else if (!strcmp(attr->name, "notify-time-interval") &&
@@ -1433,21 +1419,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   int		modify;			/* Non-zero if we are modifying */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_printer(%p[%d], %s)\n", con,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_printer(%p[%d], %s)", con,
                   con->http.fd, uri->values[0].string.text);
-
- /*
-  * Was this operation called from the correct URI?
-  */
-
-  if (strncmp(con->uri, "/admin/", 7) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "add_printer: admin request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
 
  /*
   * Do we have a valid URI?
@@ -1461,9 +1434,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     * No, return an error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "add_printer: bad printer URI \"%s\"!",
-                    uri->values[0].string.text);
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("The printer-uri must be of the form "
+		      "\"ipp://HOSTNAME/printers/PRINTERNAME\"."));
     return;
   }
 
@@ -1477,7 +1450,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     * No, return an error...
     */
 
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("The printer-uri \"%s\" contains invalid characters."),
+		    uri->values[0].string.text);
     return;
   }
 
@@ -1508,10 +1483,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       * Yes, return an error...
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "add_printer: \"%s\" already exists as a class!",
+      send_ipp_status(con, IPP_NOT_POSSIBLE,
+                      _("A class named \"%s\" already exists!"),
         	      resource + 10);
-      send_ipp_error(con, IPP_NOT_POSSIBLE);
       return;
     }
 
@@ -1597,10 +1571,11 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
         * File devices are disabled and the URL is not file:/dev/null...
 	*/
 
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "add_printer: File device URIs have been disabled! "
-	                "To enable, see the FileDevice directive in cupsd.conf.");
-	send_ipp_error(con, IPP_NOT_POSSIBLE);
+	send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                _("File device URIs have been disabled! "
+	                  "To enable, see the FileDevice directive in "
+			  "\"%s/cupsd.conf\"."),
+			ServerRoot);
 	return;
       }
     }
@@ -1617,10 +1592,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
         * Could not find device in list!
 	*/
 
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "add_printer: bad device-uri attribute \'%s\'!",
+	send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri \"%s\"!"),
         	        attr->values[0].string.text);
-	send_ipp_error(con, IPP_NOT_POSSIBLE);
 	return;
       }
     }
@@ -1650,10 +1623,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     if (i >= supported->num_values)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "add_printer: bad port-monitor attribute \'%s\'!",
+      send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad port-monitor \"%s\"!"),
         	      attr->values[0].string.text);
-      send_ipp_error(con, IPP_NOT_POSSIBLE);
       return;
     }
 
@@ -1695,10 +1666,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     if (attr->values[0].integer != IPP_PRINTER_IDLE &&
         attr->values[0].integer != IPP_PRINTER_STOPPED)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Attempt to set %s printer-state to bad value %d!",
-                      printer->name, attr->values[0].integer);
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad printer-state value %d!"),
+                      attr->values[0].integer);
       return;
     }
 
@@ -1752,7 +1721,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "job-quota-period",
                                IPP_TAG_INTEGER)) != NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "add_printer: Setting job-quota-period to %d...",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Setting job-quota-period to %d...",
                attr->values[0].integer);
     cupsdFreeQuotas(printer);
     printer->quota_period = attr->values[0].integer;
@@ -1760,7 +1729,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "job-k-limit",
                                IPP_TAG_INTEGER)) != NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "add_printer: Setting job-k-limit to %d...",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Setting job-k-limit to %d...",
                attr->values[0].integer);
     cupsdFreeQuotas(printer);
     printer->k_limit = attr->values[0].integer;
@@ -1768,7 +1737,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "job-page-limit",
                                IPP_TAG_INTEGER)) != NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "add_printer: Setting job-page-limit to %d...",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Setting job-page-limit to %d...",
                attr->values[0].integer);
     cupsdFreeQuotas(printer);
     printer->page_limit = attr->values[0].integer;
@@ -1782,17 +1751,16 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     if ((p = cupsdFindPolicy(attr->values[0].string.text)) != NULL)
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "add_printer: Setting printer-op-policy to \"%s\"...",
+                      "Setting printer-op-policy to \"%s\"...",
                       attr->values[0].string.text);
       cupsdSetString(&printer->op_policy, attr->values[0].string.text);
       printer->op_policy_ptr = p;
     }
     else
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "add_printer: Unknown printer-op-policy \"%s\"...",
+      send_ipp_status(con, IPP_NOT_POSSIBLE,
+                      _("Unknown printer-op-policy \"%s\"."),
                       attr->values[0].string.text);
-      send_ipp_error(con, IPP_NOT_POSSIBLE);
       return;
     }
   }
@@ -1803,15 +1771,14 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
         strcmp(attr->values[0].string.text, "retry-job") &&
         strcmp(attr->values[0].string.text, "stop-printer"))
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "add_printer: Unknown printer-error-policy \"%s\"...",
+      send_ipp_status(con, IPP_NOT_POSSIBLE,
+                      _("Unknown printer-error-policy \"%s\"."),
                       attr->values[0].string.text);
-      send_ipp_error(con, IPP_NOT_POSSIBLE);
       return;
     }
 
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "add_printer: Setting printer-error-policy to \"%s\"...",
+                    "Setting printer-error-policy to \"%s\"...",
                     attr->values[0].string.text);
     cupsdSetString(&printer->error_policy, attr->values[0].string.text);
   }
@@ -1848,7 +1815,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
                printer->name);
 
-      if (strncmp(line, "*PPD-Adobe", 10) == 0)
+      if (!strncmp(line, "*PPD-Adobe", 10))
       {
        /*
 	* The new file is a PPD file, so remove any old interface script
@@ -1866,16 +1833,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
 	if (copy_file(srcfile, dstfile))
 	{
-          cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "add_printer: Unable to copy interface script from %s to %s - %s!",
-	                  srcfile, dstfile, strerror(errno));
-          send_ipp_error(con, IPP_INTERNAL_ERROR);
+          send_ipp_status(con, IPP_INTERNAL_ERROR,
+	                  _("Unable to copy interface script - %s!"),
+	                  strerror(errno));
 	  return;
 	}
 	else
 	{
           cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "add_printer: Copied interface script successfully!");
+	                  "Copied interface script successfully!");
           chmod(dstfile, 0755);
 	}
       }
@@ -1892,16 +1858,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
 	if (copy_file(srcfile, dstfile))
 	{
-          cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "add_printer: Unable to copy PPD file from %s to %s - %s!",
-	                  srcfile, dstfile, strerror(errno));
-          send_ipp_error(con, IPP_INTERNAL_ERROR);
+          send_ipp_status(con, IPP_INTERNAL_ERROR,
+	                  _("Unable to copy PPD file - %s!"),
+	                  strerror(errno));
 	  return;
 	}
 	else
 	{
           cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "add_printer: Copied PPD file successfully!");
+	                  "Copied PPD file successfully!");
           chmod(dstfile, 0644);
 	}
       }
@@ -1947,16 +1912,13 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
       if (copy_model(con, attr->values[0].string.text, dstfile))
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "add_printer: Unable to copy PPD file from %s to %s!",
-	                attr->values[0].string.text, dstfile);
-        send_ipp_error(con, IPP_INTERNAL_ERROR);
+        send_ipp_status(con, IPP_INTERNAL_ERROR, _("Unable to copy PPD file!"));
 	return;
       }
       else
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "add_printer: Copied PPD file successfully!");
+	                "Copied PPD file successfully!");
         chmod(dstfile, 0644);
       }
     }
@@ -1997,10 +1959,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if (modify)
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
-                  "Printer \'%s\' modified by \'%s\'.", printer->name,
+                  "Printer \"%s\" modified by \"%s\".", printer->name,
         	  con->username);
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \'%s\' modified by \'%s\'.",
+    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" modified by \"%s\".",
                     printer->name, con->username);
   }
   else
@@ -2008,10 +1970,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     cupsdAddPrinterHistory(printer);
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, printer, NULL,
-                  "New printer \'%s\' added by \'%s\'.", printer->name,
+                  "New printer \"%s\" added by \"%s\".", printer->name,
         	  con->username);
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "New printer \'%s\' added by \'%s\'.",
+    cupsdLogMessage(CUPSD_LOG_INFO, "New printer \"%s\" added by \"%s\".",
                     printer->name, con->username);
   }
 
@@ -2110,9 +2072,8 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "authenticate_job: got a printer-uri attribute but no job-id!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
       return;
     }
 
@@ -2124,7 +2085,8 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+    httpSeparate(uri->values[0].string.text, method, username, host, &port,
+                 resource);
  
     if (strncmp(resource, "/jobs/", 6))
     {
@@ -2132,10 +2094,8 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "authenticate_job: bad job-uri attribute \'%s\'!\n",
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad job-uri attribute \"%s\"!"),
                       uri->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -2152,9 +2112,8 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "authenticate_job: job #%d doesn't exist!", jobid);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("Job #%d doesn't exist!"), jobid);
     return;
   }
 
@@ -2168,10 +2127,9 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
     * Return a "not-possible" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "authenticate_job: job #%d is not held for authentication!",
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Job #%d is not held for authentication!"),
 		    jobid);
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }
 
@@ -2181,7 +2139,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!con->username[0])
   {
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_ipp_status(con, IPP_NOT_AUTHORIZED, NULL);
     return;
   }
 
@@ -2191,11 +2149,10 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "authenticate_job: \"%s\" not authorized to authenticate "
-		    "job id %d owned by \"%s\"!",
-                    username, jobid, job->username);
-    send_ipp_error(con, IPP_FORBIDDEN);
+    send_ipp_status(con, IPP_FORBIDDEN,
+                    _("You are not authorized to authenticate "
+		      "job #%d owned by \"%s\"!"),
+                    jobid, job->username);
     return;
   }
 
@@ -2224,7 +2181,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdReleaseJob(job);
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was authenticated by \'%s\'.", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was authenticated by \"%s\".", jobid,
                   con->username);
 }
 
@@ -2255,29 +2212,13 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Was this operation called from the correct URI?
-  */
-
-  if (strncmp(con->uri, "/admin/", 7) &&
-      strncmp(con->uri, "/jobs/", 7))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cancel_all_jobs: admin request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * See if we have a printer URI...
   */
 
   if (strcmp(uri->name, "printer-uri"))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cancel_all_jobs: bad %s attribute \'%s\'!",
-                    uri->name, uri->values[0].string.text);
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("The printer-uri attribute is required!"));
     return;
   }
 
@@ -2293,9 +2234,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
       username = attr->values[0].string.text;
     else
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cancel_all_jobs: missing requesting-user-name attribute!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Missing requesting-user-name attribute!"));
       return;
     }
   }
@@ -2324,12 +2264,18 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI?
     */
 
-    if (strcmp(resource, "/printers/") != 0)
+    if (!strncmp(resource, "/printers/", 10) ||
+        !strncmp(resource, "/classes/", 9))
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Purge-Jobs: resource name \'%s\' no good!",
-		      resource);
-      send_ipp_error(con, IPP_NOT_FOUND);
+      send_ipp_status(con, IPP_NOT_FOUND,
+                      _("The printer or class was not found."));
+      return;
+    }
+    else if (strcmp(resource, "/printers/"))
+    {
+      send_ipp_status(con, IPP_NOT_FOUND,
+                      _("The printer-uri \"%s\" is not valid."),
+		      uri->values[0].string.text);
       return;
     }
 
@@ -2349,8 +2295,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
     cupsdCancelJobs(NULL, username, purge);
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "All jobs were %s by \'%s\'.",
-               purge ? "purged" : "cancelled", con->username);
+    cupsdLogMessage(CUPSD_LOG_INFO, "All jobs were %s by \"%s\".",
+                    purge ? "purged" : "cancelled", con->username);
   }
   else
   {
@@ -2370,7 +2316,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
     cupsdCancelJobs(dest, username, purge);
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "All jobs on \'%s\' were %s by \'%s\'.",
+    cupsdLogMessage(CUPSD_LOG_INFO, "All jobs on \"%s\" were %s by \"%s\".",
                     dest, purge ? "purged" : "cancelled", con->username);
   }
 
@@ -2403,21 +2349,6 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Verify that the POST operation was done to a valid URI.
-  */
-
-  if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/jobs/", 5) != 0 &&
-      strncmp(con->uri, "/printers/", 10) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cancel_job: cancel request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * See if we have a job URI or a printer URI...
   */
 
@@ -2429,9 +2360,8 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cancel_job: got a printer-uri attribute but no job-id!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
       return;
     }
 
@@ -2449,9 +2379,8 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	* Bad URI...
 	*/
 
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cancel_job: resource name \'%s\' no good!", resource);
-	send_ipp_error(con, IPP_NOT_FOUND);
+	send_ipp_status(con, IPP_NOT_FOUND,
+                	_("The printer or class was not found."));
 	return;
       }
 
@@ -2478,9 +2407,8 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	  jobid = job->id;
 	else
 	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR, "cancel_job: No active jobs on %s!",
+	  send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
 	                  dest);
-	  send_ipp_error(con, IPP_NOT_POSSIBLE);
 	  return;
 	}
       }
@@ -2495,16 +2423,15 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
     httpSeparate(uri->values[0].string.text, method, username, host, &port,
                  resource);
  
-    if (strncmp(resource, "/jobs/", 6) != 0)
+    if (strncmp(resource, "/jobs/", 6))
     {
      /*
       * Not a valid URI!
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cancel_job: bad job-uri attribute \'%s\'!",
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
                       uri->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -2521,9 +2448,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "cancel_job: job #%d doesn't exist!",
-                    jobid);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
     return;
   }
 
@@ -2533,11 +2458,10 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cancel_job: \"%s\" not authorized to delete job id %d "
-		    "owned by \"%s\"!",
-                    username, jobid, job->username);
-    send_ipp_error(con, IPP_FORBIDDEN);
+    send_ipp_status(con, IPP_FORBIDDEN,
+                    _("You are not authorized to delete job #%d "
+		      "owned by \"%s\"!"),
+                    jobid, job->username);
     return;
   }
 
@@ -2548,13 +2472,11 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (job->state->values[0].integer >= IPP_JOB_CANCELLED)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cancel_job: job id %d is %s - can't cancel!",
-        	    jobid,
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Job #%d is already %s - can\'t cancel."), jobid,
 		    job->state->values[0].integer == IPP_JOB_CANCELLED ? "cancelled" :
 		    job->state->values[0].integer == IPP_JOB_ABORTED ? "aborted" :
 		    "completed");
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }
 
@@ -2563,12 +2485,12 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                "Job cancelled by \'%s\'.", username);
+                "Job cancelled by \"%s\".", username);
 
   cupsdCancelJob(job, 0);
   cupsdCheckJobs();
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was cancelled by \'%s\'.", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was cancelled by \"%s\".", jobid,
                   username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -2623,7 +2545,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   else if (attr != NULL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "check_quotas: requesting-user-name = \'%s\'",
+                    "check_quotas: requesting-user-name = \"%s\"",
                     attr->values[0].string.text);
 
     strlcpy(username, attr->values[0].string.text, sizeof(username));
@@ -3770,20 +3692,6 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Verify that the POST operation was done to a valid URI.
-  */
-
-  if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/printers/", 10) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "create_job: cancel request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * Is the destination valid?
   */
 
@@ -3795,9 +3703,8 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "create_job: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -3809,8 +3716,8 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
       strcasecmp(con->http.hostname, "localhost") &&
       strcasecmp(con->http.hostname, ServerName))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "print_job: printer not shared!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_ipp_status(con, IPP_NOT_AUTHORIZED,
+                    _("The printer or class is not shared!"));
     return;
   }
 
@@ -3835,10 +3742,9 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!printer->accepting)
   {
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "create_job: destination \'%s\' is not accepting jobs.",
+    send_ipp_status(con, IPP_NOT_ACCEPTING,
+                    _("Destination \"%s\" is not accepting jobs."),
                     dest);
-    send_ipp_error(con, IPP_NOT_ACCEPTING);
     return;
   }
 
@@ -3850,11 +3756,10 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   {
     if (attr->values[0].integer < 1 || attr->values[0].integer > MaxCopies)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "create_job: Bad copies value %d.",
+      send_ipp_status(con, IPP_ATTRIBUTES, _("Bad copies value %d."),
                       attr->values[0].integer);
-      send_ipp_error(con, IPP_ATTRIBUTES);
       ippAddInteger(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_INTEGER,
-	           "copies", attr->values[0].integer);
+	            "copies", attr->values[0].integer);
       return;
     }
   }
@@ -3866,11 +3771,10 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
       if (attr->values[i].range.lower < lowerpagerange || 
 	  attr->values[i].range.lower > attr->values[i].range.upper)
       {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "create_job: bad page-ranges values %d-%d.",
+	send_ipp_status(con, IPP_BAD_REQUEST,
+	                _("Bad page-ranges values %d-%d."),
 	                attr->values[i].range.lower,
 			attr->values[i].range.upper);
-	send_ipp_error(con, IPP_BAD_REQUEST);
 	return;
       }
 
@@ -3887,14 +3791,14 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
   {
-    cupsdLogMessage(CUPSD_LOG_INFO, "create_job: too many jobs.");
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Too many active jobs."));
     return;
   }
 
   if (!check_quotas(con, printer))
   {
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    send_ipp_status(con, IPP_NOT_POSSIBLE, _("Quota limit reached."));
     return;
   }
 
@@ -3916,10 +3820,8 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if ((job = cupsdAddJob(priority, printer->name)) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "create_job: unable to add job for destination \'%s\'!",
-                    dest);
-    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    send_ipp_status(con, IPP_INTERNAL_ERROR,
+                    _("Unable to add job for destination \"%s\"!"), dest);
     return;
   }
 
@@ -3941,7 +3843,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   else if (attr != NULL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "create_job: requesting-user-name = \'%s\'",
+                    "create_job: requesting-user-name = \"%s\"",
                     attr->values[0].string.text);
 
     cupsdSetString(&job->username, attr->values[0].string.text);
@@ -4257,7 +4159,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
    
   cupsdSaveJob(job);
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d created on \'%s\' by \'%s\'.",
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d created on \"%s\" by \"%s\".",
                   job->id, job->dest, job->username);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_CREATED, printer, job, "Job created.");
@@ -4511,10 +4413,8 @@ create_subscription(
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "create_subscription: resource name \'%s\' no good!",
-                    resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -4546,7 +4446,7 @@ create_subscription(
                                     IPP_TAG_NAME)) != NULL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "create_subscription: requesting-user-name = \'%s\'",
+                    "create_subscription: requesting-user-name = \"%s\"",
                     attr->values[0].string.text);
 
     username = attr->values[0].string.text;
@@ -4565,9 +4465,8 @@ create_subscription(
 
   if (!attr)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "create_subscription: no subscription attributes in request!");
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("No subscription attributes in request!"));
     return;
   }
 
@@ -4595,16 +4494,21 @@ create_subscription(
         pullmethod = attr->values[0].string.text;
       else if (!strcmp(attr->name, "notify-charset") &&
                attr->value_tag == IPP_TAG_CHARSET &&
+	       strcmp(attr->values[0].string.text, "us-ascii") &&
 	       strcmp(attr->values[0].string.text, "utf-8"))
       {
-        send_ipp_error(con, IPP_CHARSET);
+        send_ipp_status(con, IPP_CHARSET,
+	                _("Character set \"%s\" not supported!"),
+			attr->values[0].string.text);
 	return;
       }
       else if (!strcmp(attr->name, "notify-natural-language") &&
                (attr->value_tag != IPP_TAG_LANGUAGE ||
 	        strcmp(attr->values[0].string.text, DefaultLanguage)))
       {
-        send_ipp_error(con, IPP_CHARSET);
+        send_ipp_status(con, IPP_CHARSET,
+	                _("Language \"%s\" not supported!"),
+			attr->values[0].string.text);
 	return;
       }
       else if (!strcmp(attr->name, "notify-user-data") &&
@@ -4612,7 +4516,10 @@ create_subscription(
       {
         if (attr->num_values > 1 || attr->values[0].unknown.length > 63)
 	{
-          send_ipp_error(con, IPP_REQUEST_VALUE);
+          send_ipp_status(con, IPP_REQUEST_VALUE,
+	                  _("The notify-user-data value is too large "
+			    "(%d > 63 octets)!"),
+			  attr->values[0].unknown.length);
 	  return;
 	}
 
@@ -4648,9 +4555,8 @@ create_subscription(
         mask = CUPSD_EVENT_PRINTER_STATE_CHANGED;
       else
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "create_subscription: notify-events not specified!");
-        send_ipp_error(con, IPP_BAD_REQUEST);
+        send_ipp_status(con, IPP_BAD_REQUEST,
+	                _("notify-events not specified!"));
 	return;
       }
     }
@@ -4668,9 +4574,7 @@ create_subscription(
     {
       if ((job = cupsdFindJob(jobid)) == NULL)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "create_subscription: Job %d not found!", jobid);
-	send_ipp_error(con, IPP_NOT_FOUND);
+	send_ipp_status(con, IPP_NOT_FOUND, _("Job %d not found!"), jobid);
 	return;
       }
     }
@@ -4730,19 +4634,6 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Was this operation called from the correct URI?
-  */
-
-  if (strncmp(con->uri, "/admin/", 7) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "delete_printer: admin request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * Do we have a valid URI?
   */
 
@@ -4754,9 +4645,8 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "delete_printer: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -4781,7 +4671,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, printer, NULL,
-                "%s \'%s\' deleted by \'%s\'.",
+                "%s \"%s\" deleted by \"%s\".",
 		(dtype & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
 		dest, con->username);
 
@@ -4799,7 +4689,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   if (dtype & CUPS_PRINTER_CLASS)
   {
-    cupsdLogMessage(CUPSD_LOG_INFO, "Class \'%s\' deleted by \'%s\'.", dest,
+    cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" deleted by \"%s\".", dest,
                     con->username);
 
     cupsdDeletePrinter(printer, 0);
@@ -4807,7 +4697,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   }
   else
   {
-    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \'%s\' deleted by \'%s\'.", dest,
+    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" deleted by \"%s\".", dest,
                     con->username);
 
     cupsdDeletePrinter(printer, 0);
@@ -4934,7 +4824,7 @@ get_default(cupsd_client_t *con)	/* I - Client connection */
     con->response->request.status.status_code = requested ? IPP_OK_SUBST : IPP_OK;
   }
   else
-    con->response->request.status.status_code = IPP_NOT_FOUND;
+    send_ipp_status(con, IPP_NOT_FOUND, _("No default printer"));
 }
 
 
@@ -5036,7 +4926,8 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
     * went wrong...
     */
 
-    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    send_ipp_status(con, IPP_INTERNAL_ERROR,
+                    _("cups-deviced failed to execute."));
   }
 }
 
@@ -5107,9 +4998,8 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_jobs: resource name \'%s\' no good!",
-                    resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
   else
@@ -5279,7 +5169,7 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   char		job_uri[HTTP_MAX_URI];	/* Job URI... */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_job_attrs(%p[%d], %s)\n", con,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_job_attrs(%p[%d], %s)", con,
                   con->http.fd, uri->values[0].string.text);
 
  /*
@@ -5294,9 +5184,8 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "get_job_attrs: got a printer-uri attribute but no job-id!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
       return;
     }
 
@@ -5317,10 +5206,9 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "get_job_attrs: bad job-uri attribute \'%s\'!\n",
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
                       uri->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -5337,9 +5225,7 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "get_job_attrs: job #%d doesn't exist!",
-                    jobid);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
     return;
   }
 
@@ -5503,7 +5389,8 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
     * went wrong...
     */
 
-    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    send_ipp_status(con, IPP_INTERNAL_ERROR,
+                    _("cups-driverd failed to execute."));
   }
 }
 
@@ -5554,10 +5441,8 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "get_printer_attrs: resource name \'%s\' no good!",
-		    resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -5683,7 +5568,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
 
   if (!Printers || !cupsArrayCount(Printers))
   {
-    con->response->request.status.status_code = IPP_NOT_FOUND;
+    send_ipp_status(con, IPP_NOT_FOUND, _("No destinations added."));
     return;
   }
 
@@ -5905,10 +5790,8 @@ get_subscription_attrs(
     * Bad subscription ID...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "get_subscription_attrs: notify-subscription-id %d no good!",
-		    sub_id);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("notify-subscription-id %d no good!"), sub_id);
     return;
   }
 
@@ -5992,10 +5875,8 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
 
     if (!job)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "get_subscriptions: job-id %s does not exist!",
+      send_ipp_status(con, IPP_NOT_FOUND, _("Job #%s does not exist!"),
                       resource + 6);
-      send_ipp_error(con, IPP_NOT_FOUND);
       return;
     }
   }
@@ -6005,10 +5886,8 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "get_subscriptions: resource name \'%s\' no good!",
-                    resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
   else if ((attr = ippFindAttribute(con->request, "notify-job-id",
@@ -6018,10 +5897,8 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
 
     if (!job)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "get_subscriptions: job-id %d does not exist!",
+      send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"),
                       attr->values[0].integer);
-      send_ipp_error(con, IPP_NOT_FOUND);
       return;
     }
   }
@@ -6086,7 +5963,10 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsArrayDelete(ra);
 
-  con->response->request.status.status_code = !count ? IPP_NOT_FOUND : IPP_OK;
+  if (count)
+    con->response->request.status.status_code = IPP_OK;
+  else
+    send_ipp_status(con, IPP_NOT_FOUND, _("No subscriptions found."));
 }
 
 
@@ -6113,25 +5993,10 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
                   uri->values[0].string.text);
 
  /*
-  * Verify that the POST operation was done to a valid URI.
-  */
-
-  if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/jobs/", 5) != 0 &&
-      strncmp(con->uri, "/printers/", 10) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "hold_job: hold request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * See if we have a job URI or a printer URI...
   */
 
-  if (strcmp(uri->name, "printer-uri") == 0)
+  if (!strcmp(uri->name, "printer-uri"))
   {
    /*
     * Got a printer URI; see if we also have a job-id attribute...
@@ -6139,9 +6004,8 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "hold_job: got a printer-uri attribute but no job-id!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
       return;
     }
 
@@ -6155,16 +6019,15 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
     httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
  
-    if (strncmp(resource, "/jobs/", 6) != 0)
+    if (strncmp(resource, "/jobs/", 6))
     {
      /*
       * Not a valid URI!
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "hold_job: bad job-uri attribute \'%s\'!",
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
                       uri->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -6181,8 +6044,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "hold_job: job #%d doesn't exist!", jobid);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
     return;
   }
 
@@ -6192,10 +6054,9 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "hold_job: \"%s\" not authorized to hold job id %d owned by \"%s\"!",
-                    username, jobid, job->username);
-    send_ipp_error(con, IPP_FORBIDDEN);
+    send_ipp_status(con, IPP_FORBIDDEN,
+                    _("Not authorized to hold job #%d owned by \"%s\"!"),
+                    jobid, job->username);
     return;
   }
 
@@ -6205,10 +6066,12 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
   cupsdHoldJob(job);
 
-  if ((newattr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+  if ((newattr = ippFindAttribute(con->request, "job-hold-until",
+                                  IPP_TAG_KEYWORD)) == NULL)
     newattr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_NAME);
 
-  if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+  if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
+                               IPP_TAG_KEYWORD)) == NULL)
     attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
 
   if (attr != NULL)
@@ -6237,7 +6100,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     cupsdSetJobHoldUntil(job, attr->values[0].string.text);
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was held by \'%s\'.", jobid, username);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was held by \"%s\".", jobid, username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -6280,8 +6143,8 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "move_job: got a printer-uri attribute but no job-id!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
       return;
     }
 
@@ -6296,16 +6159,15 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     httpSeparate(uri->values[0].string.text, method, username, host, &port,
                  resource);
  
-    if (strncmp(resource, "/jobs/", 6) != 0)
+    if (strncmp(resource, "/jobs/", 6))
     {
      /*
       * Not a valid URI!
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "move_job: bad job-uri attribute \'%s\'!\n",
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
                       uri->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -6322,8 +6184,8 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "move_job: job #%d doesn't exist!", jobid);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("Job #%d doesn't exist!"), jobid);
     return;
   }
 
@@ -6337,10 +6199,9 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     * Return a "not-possible" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "move_job: job #%d is finished and cannot be altered!",
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Job #%d is finished and cannot be altered!"),
 		    jobid);
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }
 
@@ -6350,11 +6211,10 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "move_job: \"%s\" not authorized to move job id %d owned "
-		    "by \"%s\"!",
-                    username, jobid, job->username);
-    send_ipp_error(con, IPP_FORBIDDEN);
+    send_ipp_status(con, IPP_FORBIDDEN,
+                    _("You are not authorized to move job #%d owned "
+		      "by \"%s\"!"),
+                    jobid, job->username);
     return;
   }
 
@@ -6364,9 +6224,8 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     * Need job-printer-uri...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "move_job: job-printer-uri attribute missing!");
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("job-printer-uri attribute missing!"));
     return;
   }
     
@@ -6382,9 +6241,8 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "move_job: resource name \'%s\' no good!",
-                    resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -6575,20 +6433,6 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
                   uri->values[0].string.text);
 
  /*
-  * Verify that the POST operation was done to a valid URI.
-  */
-
-  if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/printers/", 10) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "print_job: cancel request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * Validate job template attributes; for now just copies and page-ranges...
   */
 
@@ -6596,9 +6440,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   {
     if (attr->values[0].integer < 1 || attr->values[0].integer > MaxCopies)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "print_job: Bad copies value %d.",
+      send_ipp_status(con, IPP_ATTRIBUTES, _("Bad copies value %d."),
                       attr->values[0].integer);
-      send_ipp_error(con, IPP_ATTRIBUTES);
       ippAddInteger(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_INTEGER,
 	            "copies", attr->values[0].integer);
       return;
@@ -6612,11 +6455,10 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
       if (attr->values[i].range.lower < lowerpagerange || 
 	  attr->values[i].range.lower > attr->values[i].range.upper)
       {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "print_job: bad page-ranges values %d-%d.",
+	send_ipp_status(con, IPP_BAD_REQUEST,
+	                _("Bad page-ranges values %d-%d."),
 		        attr->values[i].range.lower,
 			attr->values[i].range.upper);
-	send_ipp_error(con, IPP_BAD_REQUEST);
 	return;
       }
 
@@ -6639,10 +6481,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 #endif /* HAVE_LIBZ */
       )
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "print_job: Unsupported compression \"%s\"!",
+      send_ipp_status(con, IPP_ATTRIBUTES,
+                      _("Unsupported compression \"%s\"!"),
         	      attr->values[0].string.text);
-      send_ipp_error(con, IPP_ATTRIBUTES);
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	           "compression", NULL, attr->values[0].string.text);
       return;
@@ -6660,8 +6501,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!con->filename)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "print_job: No file!?!");
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST, _("No file!?!"));
     return;
   }
 
@@ -6678,10 +6518,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "print_job: could not scan type \'%s\'!",
-	              format->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Could not scan type \"%s\"!"),
+		      format->values[0].string.text);
       return;
     }
   }
@@ -6731,11 +6570,10 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (filetype == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "print_job: Unsupported format \'%s/%s\'!",
-	            super, type);
+    send_ipp_status(con, IPP_DOCUMENT_FORMAT,
+                    _("Unsupported format \'%s/%s\'!"), super, type);
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Hint: Do you have the raw file printing rules enabled?");
-    send_ipp_error(con, IPP_DOCUMENT_FORMAT);
 
     if (format)
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
@@ -6767,9 +6605,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "print_job: resource name \'%s\' no good!",
-                    resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -6781,8 +6618,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
       strcasecmp(con->http.hostname, "localhost") &&
       strcasecmp(con->http.hostname, ServerName))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "print_job: printer not shared!");
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
+    send_ipp_status(con, IPP_NOT_AUTHORIZED, _("Printer not shared!"));
     return;
   }
 
@@ -6807,10 +6643,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!printer->accepting)
   {
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "print_job: destination \'%s\' is not accepting jobs.",
-                    dest);
-    send_ipp_error(con, IPP_NOT_ACCEPTING);
+    send_ipp_status(con, IPP_NOT_ACCEPTING,
+                    _("Destination \"%s\" is not accepting jobs."), dest);
     return;
   }
 
@@ -6823,16 +6657,15 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
   {
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "print_job: too many jobs - %d jobs, max jobs is %d.",
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Too many jobs - %d jobs, max jobs is %d."),
                     cupsArrayCount(Jobs), MaxJobs);
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }
 
   if (!check_quotas(con, printer))
   {
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    send_ipp_status(con, IPP_NOT_POSSIBLE, _("Quota limit reached."));
     return;
   }
 
@@ -6854,10 +6687,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if ((job = cupsdAddJob(priority, printer->name)) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "print_job: unable to add job for destination \'%s\'!",
-                    dest);
-    send_ipp_error(con, IPP_INTERNAL_ERROR);
+    send_ipp_status(con, IPP_INTERNAL_ERROR,
+                    _("Unable to add job for destination \"%s\"!"), dest);
     return;
   }
 
@@ -6882,7 +6713,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   }
   else if (attr != NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "print_job: requesting-user-name = \'%s\'",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "print_job: requesting-user-name = \"%s\"",
                attr->values[0].string.text);
 
     cupsdSetString(&job->username, attr->values[0].string.text);
@@ -7236,7 +7067,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Log and save the job...
   */
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d queued on \'%s\' by \'%s\'.", job->id,
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d queued on \"%s\" by \"%s\".", job->id,
                   job->dest, job->username);
   cupsdLogMessage(CUPSD_LOG_DEBUG, "Job %d hold_until = %d", job->id,
                   (int)job->hold_until);
@@ -7461,19 +7292,6 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Was this operation called from the correct URI?
-  */
-
-  if (strncmp(con->uri, "/admin/", 7) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "reject_jobs: admin request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * Is the destination valid?
   */
 
@@ -7486,9 +7304,8 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "reject_jobs: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -7521,14 +7338,14 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
   {
     cupsdSaveAllClasses();
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "Class \'%s\' rejecting jobs (\'%s\').",
+    cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" rejecting jobs (\"%s\").",
                     name, con->username);
   }
   else
   {
     cupsdSaveAllPrinters();
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \'%s\' rejecting jobs (\'%s\').",
+    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" rejecting jobs (\"%s\").",
                     name, con->username);
   }
 
@@ -7562,25 +7379,10 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Verify that the POST operation was done to a valid URI.
-  */
-
-  if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/jobs/", 5) != 0 &&
-      strncmp(con->uri, "/printers/", 10) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "release_job: release request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * See if we have a job URI or a printer URI...
   */
 
-  if (strcmp(uri->name, "printer-uri") == 0)
+  if (!strcmp(uri->name, "printer-uri"))
   {
    /*
     * Got a printer URI; see if we also have a job-id attribute...
@@ -7588,9 +7390,8 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "release_job: got a printer-uri attribute but no job-id!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
       return;
     }
 
@@ -7605,16 +7406,15 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
     httpSeparate(uri->values[0].string.text, method, username, host, &port,
                  resource);
  
-    if (strncmp(resource, "/jobs/", 6) != 0)
+    if (strncmp(resource, "/jobs/", 6))
     {
      /*
       * Not a valid URI!
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "release_job: bad job-uri attribute \'%s\'!",
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
                       uri->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -7631,9 +7431,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "release_job: job #%d doesn't exist!",
-                    jobid);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
     return;
   }
 
@@ -7647,9 +7445,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not possible" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "release_job: job #%d is not held!",
-                    jobid);
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    send_ipp_status(con, IPP_NOT_POSSIBLE, _("Job #%d is not held!"), jobid);
     return;
   }
 
@@ -7659,11 +7455,10 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "release_job: \"%s\" not authorized to release job id "
-		    "%d owned by \"%s\"!",
-                    username, jobid, job->username);
-    send_ipp_error(con, IPP_FORBIDDEN);
+    send_ipp_status(con, IPP_FORBIDDEN,
+                    _("You are not authorized to release job id "
+		      "%d owned by \"%s\"!"),
+                    jobid, job->username);
     return;
   }
 
@@ -7687,7 +7482,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdReleaseJob(job);
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was released by \'%s\'.", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was released by \"%s\".", jobid,
                   username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -7728,25 +7523,10 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Verify that the POST operation was done to a valid URI.
-  */
-
-  if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/jobs/", 5) != 0 &&
-      strncmp(con->uri, "/printers/", 10) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "restart_job: restart request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * See if we have a job URI or a printer URI...
   */
 
-  if (strcmp(uri->name, "printer-uri") == 0)
+  if (!strcmp(uri->name, "printer-uri"))
   {
    /*
     * Got a printer URI; see if we also have a job-id attribute...
@@ -7754,9 +7534,8 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "restart_job: got a printer-uri attribute but no job-id!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
       return;
     }
 
@@ -7777,10 +7556,9 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "restart_job: bad job-uri attribute \'%s\'!",
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
                       uri->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -7797,9 +7575,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "restart_job: job #%d doesn't exist!",
-                    jobid);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
     return;
   }
 
@@ -7813,9 +7589,8 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not possible" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "restart_job: job #%d is not complete!",
+    send_ipp_status(con, IPP_NOT_POSSIBLE, _("Job #%d is not complete!"),
                     jobid);
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
     return;
   }
 
@@ -7829,10 +7604,8 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not possible" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "restart_job: job #%d cannot be restarted - no files!",
-		    jobid);
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Job #%d cannot be restarted - no files!"), jobid);
     return;
   }
 
@@ -7842,11 +7615,10 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "restart_job: \"%s\" not authorized to restart job id "
-		    "%d owned by \"%s\"!",
-                    username, jobid, job->username);
-    send_ipp_error(con, IPP_FORBIDDEN);
+    send_ipp_status(con, IPP_FORBIDDEN,
+                    _("You are not authorized to restart job id "
+		      "%d owned by \"%s\"!"),
+                    jobid, job->username);
     return;
   }
 
@@ -7856,7 +7628,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdRestartJob(job);
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was restarted by \'%s\'.", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was restarted by \"%s\".", jobid,
                   username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -7989,25 +7761,10 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Verify that the POST operation was done to a valid URI.
-  */
-
-  if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/jobs/", 6) != 0 &&
-      strncmp(con->uri, "/printers/", 10) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "send_document: print request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * See if we have a job URI or a printer URI...
   */
 
-  if (strcmp(uri->name, "printer-uri") == 0)
+  if (!strcmp(uri->name, "printer-uri"))
   {
    /*
     * Got a printer URI; see if we also have a job-id attribute...
@@ -8015,9 +7772,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "send_document: got a printer-uri attribute but no job-id!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
       return;
     }
 
@@ -8031,16 +7787,15 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
     httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
  
-    if (strncmp(resource, "/jobs/", 6) != 0)
+    if (strncmp(resource, "/jobs/", 6))
     {
      /*
       * Not a valid URI!
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "send_document: bad job-uri attribute \'%s\'!",
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
                       uri->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -8057,9 +7812,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "send_document: job #%d doesn't exist!",
-                    jobid);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
     return;
   }
 
@@ -8069,11 +7822,10 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "send_document: \"%s\" not authorized to send document "
-		    "for job id %d owned by \"%s\"!",
-                    username, jobid, job->username);
-    send_ipp_error(con, IPP_FORBIDDEN);
+    send_ipp_status(con, IPP_FORBIDDEN,
+                    _("You are not authorized to send document "
+		      "for job #%d owned by \"%s\"!"),
+                    jobid, job->username);
     return;
   }
 
@@ -8092,10 +7844,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 #endif /* HAVE_LIBZ */
       )
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "print_job: Unsupported compression \"%s\"!",
+      send_ipp_status(con, IPP_ATTRIBUTES, _("Unsupported compression \"%s\"!"),
         	      attr->values[0].string.text);
-      send_ipp_error(con, IPP_ATTRIBUTES);
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	           "compression", NULL, attr->values[0].string.text);
       return;
@@ -8113,8 +7863,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!con->filename)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "send_document: No file!?!");
-    send_ipp_error(con, IPP_BAD_REQUEST);
+    send_ipp_status(con, IPP_BAD_REQUEST, _("No file!?!"));
     return;
   }
 
@@ -8131,10 +7880,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "send_document: could not scan type \'%s\'!",
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"!"),
 	              format->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
   }
@@ -8185,12 +7932,10 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   if (filetype == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "send_document: Unsupported format \'%s/%s\'!",
-	            super, type);
+    send_ipp_status(con, IPP_DOCUMENT_FORMAT,
+                    _("Unsupported format \'%s/%s\'!"), super, type);
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Hint: Do you have the raw file printing rules enabled?");
-    send_ipp_error(con, IPP_DOCUMENT_FORMAT);
 
     if (format)
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
@@ -8232,7 +7977,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   cupsdClearString(&con->filename);
 
   cupsdLogMessage(CUPSD_LOG_INFO,
-                  "File of type %s/%s queued in job #%d by \'%s\'.",
+                  "File of type %s/%s queued in job #%d by \"%s\".",
                   filetype->super, filetype->type, job->id, job->username);
 
  /*
@@ -8343,17 +8088,36 @@ send_http_error(cupsd_client_t *con,	/* I - Client connection */
 
 
 /*
- * 'send_ipp_error()' - Send an error status back to the IPP client.
+ * 'send_ipp_status()' - Send a status back to the IPP client.
  */
 
 static void
-send_ipp_error(cupsd_client_t *con,	/* I - Client connection */
-               ipp_status_t   status)	/* I - IPP status code */
+send_ipp_status(cupsd_client_t *con,	/* I - Client connection */
+               ipp_status_t   status,	/* I - IPP status code */
+	       const char     *message,	/* I - Status message */
+	       ...)			/* I - Additional args as needed */
 {
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ipp_error(%p[%d], %x)", con,
-                  con->http.fd, status);
+  va_list	ap;			/* Pointer to additional args */
+  char		formatted[1024];	/* Formatted errror message */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Sending error: %s", ippErrorString(status));
+
+  if (message)
+  {
+    va_start(ap, message);
+    vsnprintf(formatted, sizeof(formatted),
+              _cupsLangString(con->language, message), ap);
+    va_end(ap);
+
+    cupsdLogMessage(status >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_INFO,
+                    "%s %s: %s",
+		    ippOpString(con->request->request.op.operation_id),
+		    ippErrorString(status), formatted);
+  }
+  else
+    cupsdLogMessage(status >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_INFO,
+                    "%s %s",
+		    ippOpString(con->request->request.op.operation_id),
+		    ippErrorString(status));
 
   con->response->request.status.status_code = status;
 
@@ -8365,6 +8129,10 @@ send_ipp_error(cupsd_client_t *con,	/* I - Client connection */
                        IPP_TAG_ZERO) == NULL)
     ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                  "attributes-natural-language", NULL, DefaultLanguage);
+
+  if (message)
+    ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_TEXT,
+        	 "status-message", NULL, formatted);
 }
 
 
@@ -8395,19 +8163,6 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Was this operation called from the correct URI?
-  */
-
-  if (strncmp(con->uri, "/admin/", 7) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "set_default: admin request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * Is the destination valid?
   */
 
@@ -8420,9 +8175,8 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "set_default: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -8448,7 +8202,7 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
   cupsdWritePrintcap();
 
   cupsdLogMessage(CUPSD_LOG_INFO,
-                  "Default destination set to \'%s\' by \'%s\'.", name,
+                  "Default destination set to \"%s\" by \"%s\".", name,
                   con->username);
 
  /*
@@ -8503,9 +8257,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
     if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "set_job_attrs: got a printer-uri attribute but no job-id!");
-      send_ipp_error(con, IPP_BAD_REQUEST);
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
       return;
     }
 
@@ -8525,10 +8278,9 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "set_job_attrs: bad job-uri attribute \'%s\'!\n",
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
                       uri->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -8545,9 +8297,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "set_job_attrs: job #%d doesn't exist!",
-                    jobid);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
     return;
   }
 
@@ -8561,10 +8311,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Return a "not-possible" error...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "set_job_attrs: job #%d is finished and cannot be altered!",
-		    jobid);
-    send_ipp_error(con, IPP_NOT_POSSIBLE);
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Job #%d is finished and cannot be altered!"), jobid);
     return;
   }
 
@@ -8574,11 +8322,10 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "set_job_attrs: \"%s\" not authorized to alter job id "
-		    "%d owned by \"%s\"!",
-                    username, jobid, job->username);
-    send_ipp_error(con, IPP_FORBIDDEN);
+    send_ipp_status(con, IPP_FORBIDDEN,
+                    _("You are not authorized to alter job id "
+		      "%d owned by \"%s\"!"),
+                    jobid, job->username);
     return;
   }
 
@@ -8620,7 +8367,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       * Read-only attrs!
       */
 
-      send_ipp_error(con, IPP_ATTRIBUTES_NOT_SETTABLE);
+      send_ipp_status(con, IPP_ATTRIBUTES_NOT_SETTABLE,
+                      _("%s cannot be changed."), attr->name);
 
       if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
         attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
@@ -8636,14 +8384,15 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
       if (attr->value_tag != IPP_TAG_INTEGER)
       {
-	send_ipp_error(con, IPP_REQUEST_VALUE);
+	send_ipp_status(con, IPP_REQUEST_VALUE, _("Bad job-priority value!"));
 
 	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
           attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
       }
       else if (job->state->values[0].integer >= IPP_JOB_PROCESSING)
       {
-	send_ipp_error(con, IPP_NOT_POSSIBLE);
+	send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                _("Job is completed and cannot be changed."));
 	return;
       }
       else if (con->response->request.status.status_code == IPP_OK)
@@ -8657,7 +8406,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
       if (attr->value_tag != IPP_TAG_ENUM)
       {
-	send_ipp_error(con, IPP_REQUEST_VALUE);
+	send_ipp_status(con, IPP_REQUEST_VALUE, _("Bad job-state value!"));
 
 	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
           attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
@@ -8670,7 +8419,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	  case IPP_JOB_HELD :
 	      if (job->state->values[0].integer > IPP_JOB_HELD)
 	      {
-		send_ipp_error(con, IPP_NOT_POSSIBLE);
+		send_ipp_status(con, IPP_NOT_POSSIBLE,
+		                _("Job state cannot be changed."));
 		return;
 	      }
               else if (con->response->request.status.status_code == IPP_OK)
@@ -8681,7 +8431,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	  case IPP_JOB_STOPPED :
 	      if (job->state->values[0].integer != attr->values[0].integer)
 	      {
-		send_ipp_error(con, IPP_NOT_POSSIBLE);
+		send_ipp_status(con, IPP_NOT_POSSIBLE,
+		                _("Job state cannot be changed."));
 		return;
 	      }
 	      break;
@@ -8691,7 +8442,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	  case IPP_JOB_COMPLETED :
 	      if (job->state->values[0].integer > IPP_JOB_PROCESSING)
 	      {
-		send_ipp_error(con, IPP_NOT_POSSIBLE);
+		send_ipp_status(con, IPP_NOT_POSSIBLE,
+		                _("Job state cannot be changed."));
 		return;
 	      }
               else if (con->response->request.status.status_code == IPP_OK)
@@ -8817,19 +8569,6 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Was this operation called from the correct URI?
-  */
-
-  if (strncmp(con->uri, "/admin/", 7) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "start_printer: admin request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * Is the destination valid?
   */
 
@@ -8842,9 +8581,8 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "start_printer: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -8867,9 +8605,9 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
   cupsdStartPrinter(printer, 1);
 
   if (dtype & CUPS_PRINTER_CLASS)
-    cupsdLogMessage(CUPSD_LOG_INFO, "Class \'%s\' started by \'%s\'.", name,
+    cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" started by \"%s\".", name,
                     con->username);
-    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \'%s\' started by \'%s\'.", name,
+    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" started by \"%s\".", name,
                     con->username);
 
   cupsdCheckJobs();
@@ -8910,19 +8648,6 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
                   con->http.fd, uri->values[0].string.text);
 
  /*
-  * Was this operation called from the correct URI?
-  */
-
-  if (strncmp(con->uri, "/admin/", 7) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "stop_printer: admin request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
-
- /*
   * Is the destination valid?
   */
 
@@ -8934,9 +8659,8 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "stop_printer: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 
@@ -8966,10 +8690,10 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
   cupsdStopPrinter(printer, 1);
 
   if (dtype & CUPS_PRINTER_CLASS)
-    cupsdLogMessage(CUPSD_LOG_INFO, "Class \'%s\' stopped by \'%s\'.", name,
+    cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" stopped by \"%s\".", name,
                     con->username);
   else
-    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \'%s\' stopped by \'%s\'.", name,
+    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" stopped by \"%s\".", name,
                     con->username);
 
  /*
@@ -9048,22 +8772,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsd_printer_t	*printer;	/* Printer */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "validate_job(%p[%d], %s)\n", con,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "validate_job(%p[%d], %s)", con,
                   con->http.fd, uri->values[0].string.text);
-
- /*
-  * Verify that the POST operation was done to a valid URI.
-  */
-
-  if (strncmp(con->uri, "/classes/", 9) != 0 &&
-      strncmp(con->uri, "/printers/", 10) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "validate_job: request on bad resource \'%s\'!",
-                    con->uri);
-    send_ipp_error(con, IPP_NOT_AUTHORIZED);
-    return;
-  }
 
  /*
   * OK, see if the client is sending the document compressed - CUPS
@@ -9073,10 +8783,9 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "compression", IPP_TAG_KEYWORD)) != NULL &&
       strcmp(attr->values[0].string.text, "none") == 0)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "validate_job: Unsupported compression attribute %s!",
+    send_ipp_status(con, IPP_ATTRIBUTES,
+                    _("Unsupported compression attribute %s!"),
                     attr->values[0].string.text);
-    send_ipp_error(con, IPP_ATTRIBUTES);
     ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	         "compression", NULL, attr->values[0].string.text);
     return;
@@ -9091,10 +8800,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   {
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "validate_job: could not scan type \'%s\'!\n",
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"!"),
 		      format->values[0].string.text);
-      send_ipp_error(con, IPP_BAD_REQUEST);
       return;
     }
 
@@ -9102,12 +8809,11 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
 	 strcmp(type, "octet-stream") != 0) &&
 	mimeType(MimeDatabase, super, type) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "validate_job: Unsupported format \'%s\'!\n",
-		      format->values[0].string.text);
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "Hint: Do you have the raw file printing rules enabled?");
-      send_ipp_error(con, IPP_DOCUMENT_FORMAT);
+      send_ipp_status(con, IPP_DOCUMENT_FORMAT,
+                      _("Unsupported format \"%s\"!"),
+		      format->values[0].string.text);
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
                    "document-format", NULL, format->values[0].string.text);
       return;
@@ -9126,9 +8832,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI...
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "validate_job: resource name \'%s\' no good!", resource);
-    send_ipp_error(con, IPP_NOT_FOUND);
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
     return;
   }
 

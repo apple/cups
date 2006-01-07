@@ -2192,9 +2192,6 @@ int					/* O - 1 if successful, 0 otherwise */
 cupsdSendError(cupsd_client_t *con,	/* I - Connection */
                http_status_t  code)	/* I - Error code */
 {
-  char		message[1024];		/* Message for user */
-
-
  /*
   * Put the request in the access_log file...
   */
@@ -2242,12 +2239,38 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
     * Send a human-readable error message.
     */
 
+    char	message[1024];		/* Message for user */
+    const char	*text;			/* Status-specific text */
+
+    if (code == HTTP_UNAUTHORIZED)
+      text = _cupsLangString(con->language,
+                             _("Enter your username and password or the "
+			       "root username and password to access this "
+			       "page."));
+    else if (code == HTTP_UPGRADE_REQUIRED)
+      text = _cupsLangString(con->language,
+                             _("You must use a https: URL to access this "
+			       "page."));
+    else
+      text = "";
+
     snprintf(message, sizeof(message),
-             "<HTML><HEAD><TITLE>%d %s</TITLE></HEAD>"
-             "<BODY><H1>%s</H1>%s</BODY></HTML>\n",
-             code, httpStatus(code), httpStatus(code),
-	     con->language ? con->language->messages[code] :
-	 	            httpStatus(code));
+             "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" "
+	     "\"http://www.w3.org/TR/REC-html40/loose.dtd\">\n"
+	     "<HTML>\n"
+	     "<HEAD>\n"
+             "\t<META HTTP-EQUIV=\"Content-Type\" "
+	     "CONTENT=\"text/html; charset=utf-8\">\n"
+	     "\t<TITLE>%d %s</TITLE>\n"
+	     "\t<LINK REL=\"STYLESHEET\" TYPE=\"text/css\" "
+	     "HREF=\"/cups.css\">\n"
+	     "</HEAD>\n"
+             "<BODY>\n"
+	     "<H1>%d %s</H1>\n"
+	     "<P>%s</P>\n"
+	     "</BODY>\n"
+	     "</HTML>\n",
+	     code, httpStatus(code), code, httpStatus(code), text);
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html; charset=utf-8\r\n") < 0)
       return (0);

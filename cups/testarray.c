@@ -69,6 +69,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		end;			/* End time */
   cups_dir_t	*dir;			/* Current directory */
   cups_dentry_t	*dent;			/* Directory entry */
+  char		*saved[32];		/* Saved entries */
 
 
  /*
@@ -385,7 +386,44 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else
     puts("PASS");
-    
+
+ /*
+  * Test save/restore...
+  */
+
+  fputs("cupsArraySave: ", stdout);
+
+  for (i = 0, text = (char *)cupsArrayFirst(array);
+       i < 32;
+       i ++, text = (char *)cupsArrayNext(array))
+  {
+    saved[i] = text;
+
+    if (!cupsArraySave(array))
+      break;
+  }
+
+  if (i < 32)
+    printf("FAIL (depth = %d)\n", i);
+  else
+    puts("PASS");
+
+  fputs("cupsArrayRestore: ", stdout);
+
+  while (i > 0)
+  {
+    i --;
+
+    text = cupsArrayRestore(array);
+    if (text != saved[i])
+      break;
+  }
+
+  if (i)
+    printf("FAIL (depth = %d)\n", i);
+  else
+    puts("PASS");
+
  /*
   * Delete the arrays...
   */

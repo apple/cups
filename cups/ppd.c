@@ -511,7 +511,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   DEBUG_printf(("mask=%x, keyword=\"%s\"...\n", mask, keyword));
 
   if (mask == 0 ||
-      strcmp(keyword, "PPD-Adobe") != 0 ||
+      strcmp(keyword, "PPD-Adobe") ||
       string == NULL || string[0] != '4')
   {
    /*
@@ -651,11 +651,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
               strcmp(keyword, "MediaWeight") && strcmp(keyword, "OutputBin") &&
               strcmp(keyword, "OutputMode") && strcmp(keyword, "OutputOrder") &&
 	      strcmp(keyword, "PageSize") && strcmp(keyword, "PageRegion"))
-	    group = ppd_get_group(ppd, "Extra",
-	                          cupsLangString(language, CUPS_MSG_EXTRA), cg);
+	    group = ppd_get_group(ppd, "Extra", _("Extra"), cg);
 	  else
-	    group = ppd_get_group(ppd, "General",
-	                          cupsLangString(language, CUPS_MSG_GENERAL), cg);
+	    group = ppd_get_group(ppd, "General", _("General"), cg);
 
           if (group == NULL)
 	    goto error;
@@ -702,76 +700,71 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	    break;
 	  }
 
-        if (strcmp(keyword, "PageSize") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE),
-                  sizeof(option->text));
-	else if (strcmp(keyword, "MediaType") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE),
-                  sizeof(option->text));
-	else if (strcmp(keyword, "InputSlot") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE),
-                  sizeof(option->text));
-	else if (strcmp(keyword, "ColorModel") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_OUTPUT_MODE),
-                  sizeof(option->text));
-	else if (strcmp(keyword, "Resolution") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_RESOLUTION),
-                  sizeof(option->text));
+        if (!strcmp(keyword, "PageSize"))
+	  strlcpy(option->text, _("Media Size"), sizeof(option->text));
+	else if (!strcmp(keyword, "MediaType"))
+	  strlcpy(option->text, _("Media Type"), sizeof(option->text));
+	else if (!strcmp(keyword, "InputSlot"))
+	  strlcpy(option->text, _("Media Source"), sizeof(option->text));
+	else if (!strcmp(keyword, "ColorModel"))
+	  strlcpy(option->text, _("Output Mode"), sizeof(option->text));
+	else if (!strcmp(keyword, "Resolution"))
+	  strlcpy(option->text, _("Resolution"), sizeof(option->text));
         else
 	  strlcpy(option->text, keyword, sizeof(option->text));
       }
     }
 
-    if (strcmp(keyword, "LanguageLevel") == 0)
+    if (!strcmp(keyword, "LanguageLevel"))
       ppd->language_level = atoi(string);
-    else if (strcmp(keyword, "LanguageEncoding") == 0)
+    else if (!strcmp(keyword, "LanguageEncoding"))
       ppd->lang_encoding = string;
-    else if (strcmp(keyword, "LanguageVersion") == 0)
+    else if (!strcmp(keyword, "LanguageVersion"))
       ppd->lang_version = string;
-    else if (strcmp(keyword, "Manufacturer") == 0)
+    else if (!strcmp(keyword, "Manufacturer"))
       ppd->manufacturer = string;
-    else if (strcmp(keyword, "ModelName") == 0)
+    else if (!strcmp(keyword, "ModelName"))
       ppd->modelname = string;
-    else if (strcmp(keyword, "Protocols") == 0)
+    else if (!strcmp(keyword, "Protocols"))
       ppd->protocols = string;
-    else if (strcmp(keyword, "PCFileName") == 0)
+    else if (!strcmp(keyword, "PCFileName"))
       ppd->pcfilename = string;
-    else if (strcmp(keyword, "NickName") == 0)
+    else if (!strcmp(keyword, "NickName"))
       ppd->nickname = string;
-    else if (strcmp(keyword, "Product") == 0)
+    else if (!strcmp(keyword, "Product"))
       ppd->product = string;
-    else if (strcmp(keyword, "ShortNickName") == 0)
+    else if (!strcmp(keyword, "ShortNickName"))
       ppd->shortnickname = string;
-    else if (strcmp(keyword, "TTRasterizer") == 0)
+    else if (!strcmp(keyword, "TTRasterizer"))
       ppd->ttrasterizer = string;
-    else if (strcmp(keyword, "JCLBegin") == 0)
+    else if (!strcmp(keyword, "JCLBegin"))
     {
       ppd->jcl_begin = strdup(string);
       ppd_decode(ppd->jcl_begin);	/* Decode quoted string */
     }
-    else if (strcmp(keyword, "JCLEnd") == 0)
+    else if (!strcmp(keyword, "JCLEnd"))
     {
       ppd->jcl_end = strdup(string);
       ppd_decode(ppd->jcl_end);		/* Decode quoted string */
     }
-    else if (strcmp(keyword, "JCLToPSInterpreter") == 0)
+    else if (!strcmp(keyword, "JCLToPSInterpreter"))
     {
       ppd->jcl_ps = strdup(string);
       ppd_decode(ppd->jcl_ps);		/* Decode quoted string */
     }
-    else if (strcmp(keyword, "AccurateScreensSupport") == 0)
-      ppd->accurate_screens = strcmp(string, "True") == 0;
-    else if (strcmp(keyword, "ColorDevice") == 0)
-      ppd->color_device = strcmp(string, "True") == 0;
-    else if (strcmp(keyword, "ContoneOnly") == 0)
-      ppd->contone_only = strcmp(string, "True") == 0;
-    else if (strcmp(keyword, "cupsFlipDuplex") == 0)
-      ppd->flip_duplex = strcmp(string, "True") == 0;
-    else if (strcmp(keyword, "cupsManualCopies") == 0)
-      ppd->manual_copies = strcmp(string, "True") == 0;
-    else if (strcmp(keyword, "cupsModelNumber") == 0)
+    else if (!strcmp(keyword, "AccurateScreensSupport"))
+      ppd->accurate_screens = !strcmp(string, "True");
+    else if (!strcmp(keyword, "ColorDevice"))
+      ppd->color_device = !strcmp(string, "True");
+    else if (!strcmp(keyword, "ContoneOnly"))
+      ppd->contone_only = !strcmp(string, "True");
+    else if (!strcmp(keyword, "cupsFlipDuplex"))
+      ppd->flip_duplex = !strcmp(string, "True");
+    else if (!strcmp(keyword, "cupsManualCopies"))
+      ppd->manual_copies = !strcmp(string, "True");
+    else if (!strcmp(keyword, "cupsModelNumber"))
       ppd->model_number = atoi(string);
-    else if (strcmp(keyword, "cupsColorProfile") == 0)
+    else if (!strcmp(keyword, "cupsColorProfile"))
     {
       if (ppd->num_profiles == 0)
         profile = malloc(sizeof(ppd_profile_t));
@@ -794,7 +787,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	     profile->matrix[2] + 0, profile->matrix[2] + 1,
 	     profile->matrix[2] + 2);
     }
-    else if (strcmp(keyword, "cupsFilter") == 0)
+    else if (!strcmp(keyword, "cupsFilter"))
     {
       if (ppd->num_filters == 0)
         filter = malloc(sizeof(char *));
@@ -821,9 +814,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       *filter = string;
       string  = NULL;
     }
-    else if (strcmp(keyword, "Throughput") == 0)
+    else if (!strcmp(keyword, "Throughput"))
       ppd->throughput = atoi(string);
-    else if (strcmp(keyword, "Font") == 0)
+    else if (!strcmp(keyword, "Font"))
     {
      /*
       * Add this font to the list of available fonts...
@@ -846,21 +839,21 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd->fonts[ppd->num_fonts] = strdup(name);
       ppd->num_fonts ++;
     }
-    else if (strcmp(keyword, "ParamCustomPageSize") == 0)
+    else if (!strcmp(keyword, "ParamCustomPageSize"))
     {
-      if (strcmp(name, "Width") == 0)
+      if (!strcmp(name, "Width"))
         sscanf(string, "%*s%*s%f%f", ppd->custom_min + 0,
 	       ppd->custom_max + 0);
-      else if (strcmp(name, "Height") == 0)
+      else if (!strcmp(name, "Height"))
         sscanf(string, "%*s%*s%f%f", ppd->custom_min + 1,
 	       ppd->custom_max + 1);
     }
-    else if (strcmp(keyword, "HWMargins") == 0)
+    else if (!strcmp(keyword, "HWMargins"))
       sscanf(string, "%f%f%f%f", ppd->custom_margins + 0,
              ppd->custom_margins + 1, ppd->custom_margins + 2,
              ppd->custom_margins + 3);
-    else if (strcmp(keyword, "CustomPageSize") == 0 &&
-             strcmp(name, "True") == 0)
+    else if (!strcmp(keyword, "CustomPageSize") &&
+             !strcmp(name, "True"))
     {
       DEBUG_puts("Processing CustomPageSize...");
 
@@ -885,9 +878,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
           DEBUG_puts("PageSize option not found for CustomPageSize...");
 
-	  if ((gtemp = ppd_get_group(ppd, "General",
-                                     cupsLangString(language,
-                                                    CUPS_MSG_GENERAL), cg)) == NULL)
+	  if ((gtemp = ppd_get_group(ppd, "General", _("General"), cg)) == NULL)
 	  {
 	    DEBUG_puts("Unable to get general group!");
 
@@ -913,8 +904,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	  goto error;
 	}
 
-	strlcpy(choice->text, cupsLangString(language, CUPS_MSG_VARIABLE),
-        	sizeof(choice->text));
+	strlcpy(choice->text, _("Variable"), sizeof(choice->text));
 	option = NULL;
       }
 
@@ -940,14 +930,14 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       option       = NULL;
       string       = NULL;		/* Don't add as an attribute below */
     }
-    else if (strcmp(keyword, "LandscapeOrientation") == 0)
+    else if (!strcmp(keyword, "LandscapeOrientation"))
     {
-      if (strcmp(string, "Minus90") == 0)
+      if (!strcmp(string, "Minus90"))
         ppd->landscape = -90;
-      else if (strcmp(string, "Plus90") == 0)
+      else if (!strcmp(string, "Plus90"))
         ppd->landscape = 90;
     }
-    else if (strcmp(keyword, "Emulators") == 0)
+    else if (!strcmp(keyword, "Emulators"))
     {
       for (count = 1, sptr = string; sptr != NULL;)
         if ((sptr = strchr(sptr, ' ')) != NULL)
@@ -974,29 +964,29 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	  sptr ++;
       }
     }
-    else if (strncmp(keyword, "StartEmulator_", 14) == 0)
+    else if (!strncmp(keyword, "StartEmulator_", 14))
     {
       ppd_decode(string);
 
       for (i = 0; i < ppd->num_emulations; i ++)
-        if (strcmp(keyword + 14, ppd->emulations[i].name) == 0)
+        if (!strcmp(keyword + 14, ppd->emulations[i].name))
 	{
 	  ppd->emulations[i].start = string;
 	  string = NULL;
 	}
     }
-    else if (strncmp(keyword, "StopEmulator_", 13) == 0)
+    else if (!strncmp(keyword, "StopEmulator_", 13))
     {
       ppd_decode(string);
 
       for (i = 0; i < ppd->num_emulations; i ++)
-        if (strcmp(keyword + 13, ppd->emulations[i].name) == 0)
+        if (!strcmp(keyword + 13, ppd->emulations[i].name))
 	{
 	  ppd->emulations[i].stop = string;
 	  string = NULL;
 	}
     }
-    else if (strcmp(keyword, "JobPatchFile") == 0)
+    else if (!strcmp(keyword, "JobPatchFile"))
     {
       if (ppd->patches == NULL)
         ppd->patches = strdup(string);
@@ -1016,7 +1006,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         strcpy(ppd->patches + strlen(ppd->patches), string);
       }
     }
-    else if (strcmp(keyword, "OpenUI") == 0)
+    else if (!strcmp(keyword, "OpenUI"))
     {
      /*
       * Don't allow nesting of options...
@@ -1052,11 +1042,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
             strcmp(name, "MediaWeight") && strcmp(name, "OutputBin") &&
             strcmp(name, "OutputMode") && strcmp(name, "OutputOrder") &&
 	    strcmp(name, "PageSize") && strcmp(name, "PageRegion"))
-	  group = ppd_get_group(ppd, "Extra",
-	                        cupsLangString(language, CUPS_MSG_EXTRA), cg);
+	  group = ppd_get_group(ppd, "Extra", _("Extra"), cg);
 	else
-	  group = ppd_get_group(ppd, "General",
-	                        cupsLangString(language, CUPS_MSG_GENERAL), cg);
+	  group = ppd_get_group(ppd, "General", _("General"), cg);
 
         if (group == NULL)
 	  goto error;
@@ -1079,11 +1067,11 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Now fill in the initial information for the option...
       */
 
-      if (string && strcmp(string, "PickMany") == 0)
+      if (string && !strcmp(string, "PickMany"))
         option->ui = PPD_UI_PICKMANY;
-      else if (string && strcmp(string, "Boolean") == 0)
+      else if (string && !strcmp(string, "Boolean"))
         option->ui = PPD_UI_BOOLEAN;
-      else if (string && strcmp(string, "PickOne") == 0)
+      else if (string && !strcmp(string, "PickOne"))
         option->ui = PPD_UI_PICKONE;
       else if (cg->ppd_conform == PPD_CONFORM_STRICT)
       {
@@ -1113,21 +1101,16 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       }
       else
       {
-        if (strcmp(name, "PageSize") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SIZE),
-                  sizeof(option->text));
-	else if (strcmp(name, "MediaType") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_TYPE),
-                  sizeof(option->text));
-	else if (strcmp(name, "InputSlot") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_MEDIA_SOURCE),
-                  sizeof(option->text));
-	else if (strcmp(name, "ColorModel") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_OUTPUT_MODE),
-                  sizeof(option->text));
-	else if (strcmp(name, "Resolution") == 0)
-	  strlcpy(option->text, cupsLangString(language, CUPS_MSG_RESOLUTION),
-                  sizeof(option->text));
+        if (!strcmp(name, "PageSize"))
+	  strlcpy(option->text, _("Media Size"), sizeof(option->text));
+	else if (!strcmp(name, "MediaType"))
+	  strlcpy(option->text, _("Media Type"), sizeof(option->text));
+	else if (!strcmp(name, "InputSlot"))
+	  strlcpy(option->text, _("Media Source"), sizeof(option->text));
+	else if (!strcmp(name, "ColorModel"))
+	  strlcpy(option->text, _("Output Mode"), sizeof(option->text));
+	else if (!strcmp(name, "Resolution"))
+	  strlcpy(option->text, _("Resolution"), sizeof(option->text));
         else
 	  strlcpy(option->text, name, sizeof(option->text));
       }
@@ -1137,7 +1120,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd_free(string);
       string = NULL;
     }
-    else if (strcmp(keyword, "JCLOpenUI") == 0)
+    else if (!strcmp(keyword, "JCLOpenUI"))
     {
      /*
       * Don't allow nesting of options...
@@ -1179,11 +1162,11 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Now fill in the initial information for the option...
       */
 
-      if (string && strcmp(string, "PickMany") == 0)
+      if (string && !strcmp(string, "PickMany"))
         option->ui = PPD_UI_PICKMANY;
-      else if (string && strcmp(string, "Boolean") == 0)
+      else if (string && !strcmp(string, "Boolean"))
         option->ui = PPD_UI_BOOLEAN;
-      else if (string && strcmp(string, "PickOne") == 0)
+      else if (string && !strcmp(string, "PickOne"))
         option->ui = PPD_UI_PICKONE;
       else
       {
@@ -1212,15 +1195,14 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd_free(string);
       string = NULL;
     }
-    else if (strcmp(keyword, "CloseUI") == 0 ||
-             strcmp(keyword, "JCLCloseUI") == 0)
+    else if (!strcmp(keyword, "CloseUI") || !strcmp(keyword, "JCLCloseUI"))
     {
       option = NULL;
 
       ppd_free(string);
       string = NULL;
     }
-    else if (strcmp(keyword, "OpenGroup") == 0)
+    else if (!strcmp(keyword, "OpenGroup"))
     {
      /*
       * Open a new group...
@@ -1268,15 +1250,15 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd_free(string);
       string = NULL;
     }
-    else if (strcmp(keyword, "CloseGroup") == 0)
+    else if (!strcmp(keyword, "CloseGroup"))
     {
       group = NULL;
 
       ppd_free(string);
       string = NULL;
     }
-    else if (strcmp(keyword, "OrderDependency") == 0 ||
-             strcmp(keyword, "NonUIOrderDependency") == 0)
+    else if (!strcmp(keyword, "OrderDependency") ||
+             !strcmp(keyword, "NonUIOrderDependency"))
     {
       if (sscanf(string, "%f%40s%40s", &order, name, keyword) != 3)
       {
@@ -1288,15 +1270,15 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       if (keyword[0] == '*')
         _cups_strcpy(keyword, keyword + 1);
 
-      if (strcmp(name, "ExitServer") == 0)
+      if (!strcmp(name, "ExitServer"))
         section = PPD_ORDER_EXIT;
-      else if (strcmp(name, "Prolog") == 0)
+      else if (!strcmp(name, "Prolog"))
         section = PPD_ORDER_PROLOG;
-      else if (strcmp(name, "DocumentSetup") == 0)
+      else if (!strcmp(name, "DocumentSetup"))
         section = PPD_ORDER_DOCUMENT;
-      else if (strcmp(name, "PageSetup") == 0)
+      else if (!strcmp(name, "PageSetup"))
         section = PPD_ORDER_PAGE;
-      else if (strcmp(name, "JCLSetup") == 0)
+      else if (!strcmp(name, "JCLSetup"))
         section = PPD_ORDER_JCL;
       else
         section = PPD_ORDER_ANY;
@@ -1316,7 +1298,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
         if (i > 0)
           for (i = 0; i < gtemp->num_options; i ++)
-	    if (strcmp(keyword, gtemp->options[i].keyword) == 0)
+	    if (!strcmp(keyword, gtemp->options[i].keyword))
 	    {
 	      gtemp->options[i].section = section;
 	      gtemp->options[i].order   = order;
@@ -1332,7 +1314,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd_free(string);
       string = NULL;
     }
-    else if (strncmp(keyword, "Default", 7) == 0)
+    else if (!strncmp(keyword, "Default", 7))
     {
       if (string == NULL)
         continue;
@@ -1348,26 +1330,26 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Assign the default value as appropriate...
       */
 
-      if (strcmp(keyword, "DefaultColorSpace") == 0)
+      if (!strcmp(keyword, "DefaultColorSpace"))
       {
        /*
         * Set default colorspace...
 	*/
 
-	if (strcmp(string, "CMY") == 0)
+	if (!strcmp(string, "CMY"))
           ppd->colorspace = PPD_CS_CMY;
-	else if (strcmp(string, "CMYK") == 0)
+	else if (!strcmp(string, "CMYK"))
           ppd->colorspace = PPD_CS_CMYK;
-	else if (strcmp(string, "RGB") == 0)
+	else if (!strcmp(string, "RGB"))
           ppd->colorspace = PPD_CS_RGB;
-	else if (strcmp(string, "RGBK") == 0)
+	else if (!strcmp(string, "RGBK"))
           ppd->colorspace = PPD_CS_RGBK;
-	else if (strcmp(string, "N") == 0)
+	else if (!strcmp(string, "N"))
           ppd->colorspace = PPD_CS_N;
 	else
           ppd->colorspace = PPD_CS_GRAY;
       }
-      else if (option && strcmp(keyword + 7, option->keyword) == 0)
+      else if (option && !strcmp(keyword + 7, option->keyword))
       {
        /*
         * Set the default as part of the current option...
@@ -1395,8 +1377,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	}
       }
     }
-    else if (strcmp(keyword, "UIConstraints") == 0 ||
-             strcmp(keyword, "NonUIConstraints") == 0)
+    else if (!strcmp(keyword, "UIConstraints") ||
+             !strcmp(keyword, "NonUIConstraints"))
     {
       if (ppd->num_consts == 0)
 	constraint = calloc(1, sizeof(ppd_const_t));
@@ -1478,7 +1460,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd_free(string);
       string = NULL;
     }
-    else if (strcmp(keyword, "PaperDimension") == 0)
+    else if (!strcmp(keyword, "PaperDimension"))
     {
       if ((size = ppdPageSize(ppd, name)) == NULL)
 	size = ppd_add_size(ppd, name);
@@ -1499,7 +1481,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd_free(string);
       string = NULL;
     }
-    else if (strcmp(keyword, "ImageableArea") == 0)
+    else if (!strcmp(keyword, "ImageableArea"))
     {
       if ((size = ppdPageSize(ppd, name)) == NULL)
 	size = ppd_add_size(ppd, name);
@@ -1524,11 +1506,11 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     else if (option != NULL &&
              (mask & (PPD_KEYWORD | PPD_OPTION | PPD_STRING)) ==
 	         (PPD_KEYWORD | PPD_OPTION | PPD_STRING) &&
-	     strcmp(keyword, option->keyword) == 0)
+	     !strcmp(keyword, option->keyword))
     {
       DEBUG_printf(("group = %p, subgroup = %p\n", group, subgroup));
 
-      if (strcmp(keyword, "PageSize") == 0)
+      if (!strcmp(keyword, "PageSize"))
       {
        /*
         * Add a page size...
@@ -1549,10 +1531,10 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         strlcpy(choice->text, text, sizeof(choice->text));
         ppd_fix(choice->text);
       }
-      else if (strcmp(name, "True") == 0)
-        strcpy(choice->text, "Yes");
-      else if (strcmp(name, "False") == 0)
-        strcpy(choice->text, "No");
+      else if (!strcmp(name, "True"))
+        strcpy(choice->text, _("Yes"));
+      else if (!strcmp(name, "False"))
+        strcpy(choice->text, _("No"));
       else
         strlcpy(choice->text, name, sizeof(choice->text));
 
@@ -1839,8 +1821,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
       choice = ppd_add_choice(option, "Auto");
 
-      strlcpy(choice->text, cupsLangString(language, CUPS_MSG_AUTO),
-              sizeof(choice->text));
+      strlcpy(choice->text, _("Auto"), sizeof(choice->text));
       choice->code = NULL;
     }
   }
@@ -2524,7 +2505,7 @@ ppd_get_group(ppd_file_t     *ppd,	/* I - PPD file */
                 ppd, name, text, cg));
 
   for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-    if (strcmp(group->name, name) == 0)
+    if (!strcmp(group->name, name))
       break;
 
   if (i == 0)
@@ -2580,7 +2561,7 @@ ppd_get_option(ppd_group_t *group,	/* I - Group */
                 group, group->name, name));
 
   for (i = group->num_options, option = group->options; i > 0; i --, option ++)
-    if (strcmp(option->keyword, name) == 0)
+    if (!strcmp(option->keyword, name))
       break;
 
   if (i == 0)
@@ -2931,15 +2912,15 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
     *string    = NULL;
 
     if ((!line[0] ||			/* Blank line */
-         strncmp(line, "*%", 2) == 0 ||	/* Comment line */
-         strcmp(line, "*End") == 0) &&	/* End of multi-line string */
+         !strncmp(line, "*%", 2) ||	/* Comment line */
+         !strcmp(line, "*End")) &&	/* End of multi-line string */
         ignoreblank)			/* Ignore these? */
     {
       startline = cg->ppd_line + 1;
       continue;
     }
 
-    if (strcmp(line, "*") == 0)		/* (Bad) comment line */
+    if (!strcmp(line, "*"))		/* (Bad) comment line */
     {
       if (cg->ppd_conform == PPD_CONFORM_RELAXED)
       {
@@ -3009,7 +2990,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
     *keyptr = '\0';
 
-    if (strcmp(keyword, "End") == 0)
+    if (!strcmp(keyword, "End"))
       continue;
 
     mask |= PPD_KEYWORD;

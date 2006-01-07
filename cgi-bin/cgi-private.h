@@ -28,7 +28,7 @@
 
 #include "cgi.h"
 #include <cups/debug.h>
-#include <cups/language.h>
+#include <cups/i18n.h>
 #include <cups/string.h>
 
 

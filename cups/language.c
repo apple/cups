@@ -25,17 +25,24 @@
  *
  * Contents:
  *
- *   cupsEncodingName()   - Return the character encoding name string
- *                          for the given encoding enumeration.
- *   cupsLangEncoding()   - Return the character encoding (us-ascii, etc.)
- *                          for the given language.
- *   cupsLangFlush()      - Flush all language data out of the cache.
- *   cupsLangFree()       - Free language data.
- *   cupsLangGet()        - Get a language.
- *   _cupsRestoreLocale() - Restore the original locale...
- *   _cupsSaveLocale()    - Set the locale and save a copy of the old locale...
- *   appleLangDefault()   - Get the default locale string.
- *   cups_cache_lookup()  - Lookup a language in the cache...
+ *   _cupsEncodingName()    - Return the character encoding name string
+ *                            for the given encoding enumeration.
+ *   cupsLangDefault()      - Return the default language.
+ *   cupsLangEncoding()     - Return the character encoding (us-ascii, etc.)
+ *                            for the given language.
+ *   cupsLangFlush()        - Flush all language data out of the cache.
+ *   cupsLangFree()         - Free language data.
+ *   cupsLangGet()          - Get a language.
+ *   _cupsLangString()      - Get a message string.
+ *   _cupsMessageFree()     - Free a messages array.
+ *   _cupsMessageLoad()     - Load a .po file into a messages array.
+ *   _cupsMessageLookup()   - Lookup a message string.
+ *   _cupsRestoreLocale()   - Restore the original locale...
+ *   _cupsSaveLocale()      - Set the locale and save a copy of the old locale...
+ *   appleLangDefault()     - Get the default locale string.
+ *   cups_cache_lookup()    - Lookup a language in the cache...
+ *   cups_message_compare() - Compare two messages.
+ *   cups_unquote()         - Unquote characters in strings...
  */
 
 /*
@@ -56,6 +63,17 @@
 
 
 /*
+ * Message catalog data...
+ */
+
+typedef struct _cups_message_s		/**** Message catalog entry ****/
+{
+  char	*id,				/* Original string */
+	*str;				/* Localized string */
+} _cups_message_t;
+
+
+/*
  * Local functions...
  */
 
@@ -65,14 +83,15 @@ static const char	*appleLangDefault(void);
 #endif /* __APPLE__ */
 static cups_lang_t	*cups_cache_lookup(const char *name,
 			                   cups_encoding_t encoding);
-  
+static int		cups_message_compare(_cups_message_t *m1,
+			                     _cups_message_t *m2);
+static void		cups_unquote(char *d, const char *s);
+
 
 /*
  * Local globals...
  */
 
-static const char	lang_blank[] = "";
-					/* Blank constant string */
 static const char * const lang_encodings[] =
 			{		/* Encoding strings */
 			  "us-ascii",		"iso-8859-1",
@@ -142,20 +161,15 @@ static const char * const lang_encodings[] =
 			  "euc-cn",		"euc-jp",
 			  "euc-kr",		"euc-tw"
 			};
-static const char *const lang_default[] =
-			{		/* Default POSIX locale */
-#include "cups_C.h"
-			  NULL
-			};
 
 
 /*
- * 'cupsEncodingName()' - Return the character encoding name string
- *                        for the given encoding enumeration.
+ * '_cupsEncodingName()' - Return the character encoding name string
+ *                         for the given encoding enumeration.
  */
 
 const char *				/* O - Character encoding */
-cupsEncodingName(
+_cupsEncodingName(
     cups_encoding_t encoding)		/* I - Encoding value */
 {
   if (encoding < 0 ||
@@ -163,6 +177,17 @@ cupsEncodingName(
     return (lang_encodings[0]);
   else
     return (lang_encodings[encoding]);
+}
+
+
+/*
+ * 'cupsLangDefault()' - Return the default language.
+ */
+
+cups_lang_t *				/* O - Language data */
+cupsLangDefault(void)
+{
+  return (cupsLangGet(NULL));
 }
 
 
@@ -188,7 +213,6 @@ cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 void
 cupsLangFlush(void)
 {
-  int		i;			/* Looping var */
   cups_lang_t	*lang,			/* Current language */
 		*next;			/* Next language */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
@@ -204,9 +228,7 @@ cupsLangFlush(void)
     * Free all messages...
     */
 
-    for (i = 0; i < CUPS_MSG_MAX; i ++)
-      if (lang->messages[i] != NULL && lang->messages[i] != lang_blank)
-        free(lang->messages[i]);
+    _cupsMessageFree(lang->strings);
 
    /*
     * Then free the language structure itself...
@@ -241,7 +263,7 @@ cupsLangFree(cups_lang_t *lang)		/* I - Language to free */
 cups_lang_t *				/* O - Language data */
 cupsLangGet(const char *language)	/* I - Language or locale */
 {
-  int			i, count;	/* Looping vars */
+  int			i;		/* Looping var */
   char			locale[255],	/* Copy of locale name */
 			langname[16],	/* Requested language name */
 			country[16],	/* Country code */
@@ -251,13 +273,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 #endif /* CODESET */
 			*ptr,		/* Pointer into language/charset */
 			real[48],	/* Real language name */
-			filename[1024],	/* Filename for language locale file */
-			*localedir;	/* Directory for locale files */
+			filename[1024];	/* Filename for language locale file */
   cups_encoding_t	encoding;	/* Encoding to use */
-  FILE			*fp;		/* Language locale file pointer */
-  char			line[1024];	/* Line from file */
-  cups_msg_t		msg;		/* Message number */
-  char			*text;		/* Message text */
   cups_lang_t		*lang;		/* Current language... */
   char			*oldlocale;	/* Old locale name */
   _cups_globals_t	*cg = _cupsGlobals();
@@ -517,13 +534,6 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 		    lang_encodings[encoding]));
 
  /*
-  * Now find the message catalog for this locale...
-  */
-
-  if ((localedir = getenv("LOCALEDIR")) == NULL)
-    localedir = CUPS_LOCALEDIR;
-
- /*
   * See if we already have this language/country loaded...
   */
 
@@ -532,7 +542,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   if ((lang = cups_cache_lookup(real, encoding)) != NULL)
     return (lang);
 
-  snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir, real, real);
+  snprintf(filename, sizeof(filename), "%s/%s/cups_%s", cg->localedir,
+           real, real);
 
   if (!country[0] || access(filename, 0))
   {
@@ -543,7 +554,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     if ((lang = cups_cache_lookup(langname, encoding)) != NULL)
       return (lang);
 
-    snprintf(filename, sizeof(filename), "%s/%s/cups_%s", localedir,
+    snprintf(filename, sizeof(filename), "%s/%s/cups_%s", cg->localedir,
              langname, langname);
 
     if (access(filename, 0))
@@ -553,50 +564,11 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       */
 
       strcpy(real, "C");
-      snprintf(filename, sizeof(filename), "%s/C/cups_C", localedir);
+      snprintf(filename, sizeof(filename), "%s/C/cups_C", cg->localedir);
     }
     else
       strcpy(real, langname);
   }
-
- /*
-  * Open the messages file; the first line contains the default
-  * language encoding (us-ascii, iso-8859-1, etc.), and the rest are
-  * messages consisting of:
-  *
-  *    #### SP message text
-  *
-  * or:
-  *
-  *    message text
-  *
-  * If the line starts with a number, then message processing picks up
-  * where the number indicates.  Otherwise the last message number is
-  * incremented.
-  *
-  * All leading whitespace is deleted.
-  */
-
-  if (strcmp(real, "C"))
-    fp = fopen(filename, "r");
-  else
-    fp = NULL;
-
-  if (fp == NULL)
-    strlcpy(line, lang_default[0], sizeof(line));
-  else if (fgets(line, sizeof(line), fp) == NULL)
-  {
-   /*
-    * Can't read encoding!
-    */
-
-    fclose(fp);
-    return (NULL);
-  }
-
-  i = (int)strlen(line) - 1;
-  if (line[i] == '\n')
-    line[i] = '\0';	/* Strip LF */
 
  /*
   * See if there is a free language available; if so, use that
@@ -614,10 +586,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     */
 
     if ((lang = calloc(sizeof(cups_lang_t), 1)) == NULL)
-    {
-      fclose(fp);
       return (NULL);
-    }
 
     lang->next     = cg->lang_cache;
     cg->lang_cache = lang;
@@ -627,13 +596,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * Free all old strings as needed...
   */
 
-  for (i = 0; i < CUPS_MSG_MAX; i ++)
-  {
-    if (lang->messages[i] != NULL && lang->messages[i] != lang_blank)
-      free(lang->messages[i]);
-
-    lang->messages[i] = (char *)lang_blank;
-  }
+  _cupsMessageFree(lang->strings);
 
  /*
   * Then assign the language and encoding fields...
@@ -645,82 +608,249 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   if (encoding != CUPS_AUTO_ENCODING)
     lang->encoding = encoding;
   else
-  {
-    lang->encoding = CUPS_US_ASCII;
-
-    for (i = 0; i < (sizeof(lang_encodings) / sizeof(lang_encodings[0])); i ++)
-      if (!strcmp(lang_encodings[i], line))
-      {
-	lang->encoding = (cups_encoding_t)i;
-	break;
-      }
-  }
+    lang->encoding = CUPS_UTF8;
 
  /*
   * Read the strings from the file...
   */
 
-  msg   = (cups_msg_t)-1;
-  count = 1;
+  lang->strings = _cupsMessageLoad(filename);
 
-  for (;;)
+ /*
+  * Return...
+  */
+
+  return (lang);
+}
+
+
+/*
+ * '_cupsLangString()' - Get a message string.
+ *
+ * The returned string is UTF-8 encoded; use cupsUTF8ToCharset() to
+ * convert the string to the language encoding.
+ */
+
+const char *				/* O - Localized message */
+_cupsLangString(cups_lang_t *lang,	/* I - Language */
+                const char  *message)	/* I - Message */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!lang || !message)
+    return (message);
+
+  return (_cupsMessageLookup(lang->strings, message));
+}
+
+
+/*
+ * '_cupsMessageFree()' - Free a messages array.
+ */
+
+void
+_cupsMessageFree(cups_array_t *a)	/* I - Message array */
+{
+  _cups_message_t	*m;		/* Current message */
+
+
+  for (m = (_cups_message_t *)cupsArrayFirst(a);
+       m;
+       m = (_cups_message_t *)cupsArrayNext(a))
   {
    /*
-    * Read a line from memory or from a file...
+    * Remove the message from the array, then free the message and strings.
     */
 
-    if (fp == NULL)
-    {
-      if (lang_default[count] == NULL)
-        break;
+    cupsArrayRemove(a, m);
 
-      strlcpy(line, lang_default[count], sizeof(line));
-    }
-    else if (fgets(line, sizeof(line), fp) == NULL)
-      break;
+    if (m->id)
+      free(m->id);
 
-    count ++;
+    if (m->str)
+      free(m->str);
 
-   /*
-    * Ignore blank lines...
-    */
-
-    i = (int)strlen(line) - 1;
-    if (line[i] == '\n')
-      line[i] = '\0';	/* Strip LF */
-
-    if (line[0] == '\0')
-      continue;
-
-   /*
-    * Grab the message number and text...
-    */
-
-    if (isdigit(line[0] & 255))
-      msg = (cups_msg_t)atoi(line);
-    else
-      msg ++;
-
-    if (msg < 0 || msg >= CUPS_MSG_MAX)
-      continue;
-
-    text = line;
-    while (isdigit(*text & 255))
-      text ++;
-    while (isspace(*text & 255))
-      text ++;
-    
-    lang->messages[msg] = strdup(text);
+    free(m);
   }
 
  /*
-  * Close the file and return...
+  * Free the array...
   */
 
-  if (fp != NULL)
-    fclose(fp);
+  cupsArrayDelete(a);
+}
 
-  return (lang);
+
+/*
+ * '_cupsMessageLoad()' - Load a .po file into a messages array.
+ */
+
+cups_array_t *				/* O - New message array */
+_cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
+{
+  cups_file_t		*fp;		/* Message file */
+  cups_array_t		*a;		/* Message array */
+  _cups_message_t	*m;		/* Current message */
+  char			s[4096],	/* String buffer */
+			*ptr,		/* Pointer into buffer */
+			*temp;		/* New string */
+  int			length;		/* Length of combined strings */
+
+
+ /*
+  * Open the message catalog file...
+  */
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+    return (NULL);
+
+ /*
+  * Create an array to hold the messages...
+  */
+
+  if ((a = cupsArrayNew((cups_array_func_t)cups_message_compare, NULL)) == NULL)
+  {
+    cupsFileClose(fp);
+    return (NULL);
+  }
+
+ /*
+  * Read messages from the catalog file until EOF...
+  *
+  * The format is the GNU gettext .po format, which is fairly simple:
+  *
+  *     msgid "some text"
+  *     msgstr "localized text"
+  *
+  * The localized text can span multiple lines using the form:
+  *
+  *     msgid "some long text"
+  *     msgstr "localized text spanning "
+  *     "multiple lines"
+  */
+
+  m = NULL;
+
+  while (cupsFileGets(fp, s, sizeof(s)) != NULL)
+  {
+   /*
+    * Skip blank and comment lines...
+    */
+
+    if (s[0] == '#' || !s[0])
+      continue;
+
+   /*
+    * Strip the trailing quote...
+    */
+
+    if ((ptr = strrchr(s, '\"')) == NULL)
+      continue;
+
+    *ptr = '\0';
+
+   /*
+    * Find start of value...
+    */
+    
+    if ((ptr = strchr(s, '\"')) == NULL)
+      continue;
+
+    ptr ++;
+
+   /*
+    * Unquote the text...
+    */
+
+    cups_unquote(ptr, ptr);
+
+   /*
+    * Create or add to a message...
+    */
+
+    if (!strncmp(s, "msgid", 5))
+    {
+      if ((m = (_cups_message_t *)calloc(1, sizeof(_cups_message_t))) == NULL)
+      {
+        cupsFileClose(fp);
+	return (a);
+      }
+
+      m->id = strdup(ptr);
+      cupsArrayAdd(a, m);
+    }
+    else if ((s[0] == '\"' || !strncmp(s, "msgstr", 6)) && m)
+    {
+      if (m->str)
+      {
+       /*
+	* Append the string...
+	*/
+
+	length = strlen(m->str);
+
+	if ((temp = realloc(m->str, length + strlen(ptr) + 1)) == NULL)
+	{
+	  cupsFileClose(fp);
+	  return (a);
+	}
+	else
+	  m->str = temp;
+
+       /*
+        * Copy the new portion at the end - safe because the buffer is
+	* allocated to the correct size...
+	*/
+
+	strcpy(m->str + length, ptr);
+      }
+      else
+      {
+       /*
+	* Set the string...
+	*/
+
+	m->str = strdup(ptr);
+      }
+    }
+  }
+
+ /*
+  * Close the message catalog file and return the new array...
+  */
+
+  cupsFileClose(fp);
+
+  return (a);
+}
+
+
+/*
+ * '_cupsMessageLookup()' - Lookup a message string.
+ */
+
+const char *				/* O - Localized message */
+_cupsMessageLookup(cups_array_t *a,	/* I - Message array */
+                   const char   *m)	/* I - Message */
+{
+  _cups_message_t	key,		/* Search key */
+			*match;		/* Matching message */
+
+
+ /*
+  * Lookup the message string; if it doesn't exist in the catalog,
+  * then return the message that was passed to us...
+  */
+
+  key.id = (char *)m;
+  match  = (_cups_message_t *)cupsArrayFind(a, &key);
+
+  if (match && match->str)
+    return (match->str);
+  else
+    return (m);
 }
 
 
@@ -1058,6 +1188,64 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
   DEBUG_puts("cups_cache_lookup: returning NULL!");
 
   return (NULL);
+}
+
+
+/*
+ * 'cups_message_compare()' - Compare two messages.
+ */
+
+static int				/* O - Result of comparison */
+cups_message_compare(
+    _cups_message_t *m1,		/* I - First message */
+    _cups_message_t *m2)		/* I - Second message */
+{
+  return (strcmp(m1->id, m2->id));
+}
+
+
+/*
+ * 'cups_unquote()' - Unquote characters in strings...
+ */
+
+static void
+cups_unquote(char       *d,		/* O - Unquoted string */
+             const char *s)		/* I - Original string */
+{
+  while (*s)
+  {
+    if (*s == '\\')
+    {
+      s ++;
+      if (isdigit(*s))
+      {
+	*d = 0;
+
+	while (isdigit(*s))
+	{
+	  *d = *d * 8 + *s - '0';
+	  s ++;
+	}
+      }
+      else
+      {
+	if (*s == 'n')
+	  *d ++ = '\n';
+	else if (*s == 'r')
+	  *d ++ = '\r';
+	else if (*s == 't')
+	  *d ++ = '\t';
+	else
+	  *d++ = *s;
+
+	s ++;
+      }
+    }
+    else
+      *d++ = *s++;
+  }
+
+  *d = '\0';
 }
 
 

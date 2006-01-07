@@ -1273,7 +1273,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     {
       if (!strcmp(group->name, "InstallableOptions"))
 	cgiSetVariable("GROUP",
-	               cupsLangString(language, CUPS_MSG_OPTIONS_INSTALLED));
+	               _cupsLangString(language, _("Options Installed")));
       else
 	cgiSetVariable("GROUP", group->text);
 
@@ -2254,7 +2254,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     if (status != HTTP_CREATED)
     {
-      cgiSetVariable("ERROR", cupsLangString(language, status));
+      cgiSetVariable("ERROR", httpStatus(status));
       cgiStartHTML("Change Settings");
       cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
     }
@@ -2344,7 +2344,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     if (status != HTTP_CREATED)
     {
-      cgiSetVariable("ERROR", cupsLangString(language, status));
+      cgiSetVariable("ERROR", httpStatus(status));
       cgiStartHTML("Edit Configuration File");
       cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
     }

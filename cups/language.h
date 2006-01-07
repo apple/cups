@@ -32,239 +32,72 @@
  */
 
 #  include <locale.h>
+#  include "array.h"
 
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* __cplusplus */
 
+
 /*
- * Messages...
+ * Types...
  */
 
-typedef enum			/**** Message Indices ****/
+typedef enum cups_encoding_e		/**** Language Encodings ****/
 {
-  CUPS_MSG_OK,
-  CUPS_MSG_CANCEL,
-  CUPS_MSG_HELP,
-  CUPS_MSG_QUIT,
-  CUPS_MSG_CLOSE,
-  CUPS_MSG_YES,
-  CUPS_MSG_NO,
-  CUPS_MSG_ON,
-  CUPS_MSG_OFF,
-  CUPS_MSG_SAVE,
-  CUPS_MSG_DISCARD,
-  CUPS_MSG_DEFAULT,
-  CUPS_MSG_OPTIONS,
-  CUPS_MSG_MORE_INFO,
-  CUPS_MSG_BLACK,
-  CUPS_MSG_COLOR,
-  CUPS_MSG_CYAN,
-  CUPS_MSG_MAGENTA,
-  CUPS_MSG_YELLOW,
-  CUPS_MSG_COPYRIGHT,
-  CUPS_MSG_GENERAL,
-  CUPS_MSG_PRINTER,
-  CUPS_MSG_IMAGE,
-  CUPS_MSG_HPGL2,
-  CUPS_MSG_EXTRA,
-  CUPS_MSG_DOCUMENT,
-  CUPS_MSG_OTHER,
-  CUPS_MSG_PRINT_PAGES,
-  CUPS_MSG_ENTIRE_DOCUMENT,
-  CUPS_MSG_PAGE_RANGE,
-  CUPS_MSG_REVERSE_ORDER,
-  CUPS_MSG_PAGE_FORMAT,
-  CUPS_MSG_1_UP,
-  CUPS_MSG_2_UP,
-  CUPS_MSG_4_UP,
-  CUPS_MSG_IMAGE_SCALING,
-  CUPS_MSG_USE_NATURAL_IMAGE_SIZE,
-  CUPS_MSG_ZOOM_BY_PERCENT,
-  CUPS_MSG_ZOOM_BY_PPI,
-  CUPS_MSG_MIRROR_IMAGE,
-  CUPS_MSG_COLOR_SATURATION,
-  CUPS_MSG_COLOR_HUE,
-  CUPS_MSG_FIT_TO_PAGE,
-  CUPS_MSG_SHADING,
-  CUPS_MSG_DEFAULT_PEN_WIDTH,
-  CUPS_MSG_GAMMA_CORRECTION,
-  CUPS_MSG_BRIGHTNESS,
-  CUPS_MSG_ADD,
-  CUPS_MSG_DELETE,
-  CUPS_MSG_MODIFY,
-  CUPS_MSG_PRINTER_URI,
-  CUPS_MSG_PRINTER_NAME,
-  CUPS_MSG_PRINTER_LOCATION,
-  CUPS_MSG_PRINTER_INFO,
-  CUPS_MSG_PRINTER_MAKE_AND_MODEL,
-  CUPS_MSG_DEVICE_URI,
-  CUPS_MSG_FORMATTING_PAGE,
-  CUPS_MSG_PRINTING_PAGE,
-  CUPS_MSG_INITIALIZING_PRINTER,
-  CUPS_MSG_PRINTER_STATE,
-  CUPS_MSG_ACCEPTING_JOBS,
-  CUPS_MSG_NOT_ACCEPTING_JOBS,
-  CUPS_MSG_PRINT_JOBS,
-  CUPS_MSG_CLASS,
-  CUPS_MSG_LOCAL,
-  CUPS_MSG_REMOTE,
-  CUPS_MSG_DUPLEXING,
-  CUPS_MSG_STAPLING,
-  CUPS_MSG_FAST_COPIES,
-  CUPS_MSG_COLLATED_COPIES,
-  CUPS_MSG_PUNCHING,
-  CUPS_MSG_COVERING,
-  CUPS_MSG_BINDING,
-  CUPS_MSG_SORTING,
-  CUPS_MSG_SMALL,
-  CUPS_MSG_MEDIUM,
-  CUPS_MSG_LARGE,
-  CUPS_MSG_VARIABLE,
-  CUPS_MSG_IDLE,
-  CUPS_MSG_PROCESSING,
-  CUPS_MSG_STOPPED,
-  CUPS_MSG_ALL,
-  CUPS_MSG_ODD,
-  CUPS_MSG_EVEN_PAGES,
-  CUPS_MSG_DARKER_LIGHTER,
-  CUPS_MSG_MEDIA_SIZE,
-  CUPS_MSG_MEDIA_TYPE,
-  CUPS_MSG_MEDIA_SOURCE,
-  CUPS_MSG_ORIENTATION,
-  CUPS_MSG_PORTRAIT,
-  CUPS_MSG_LANDSCAPE,
-  CUPS_MSG_JOB_STATE,
-  CUPS_MSG_JOB_NAME,
-  CUPS_MSG_USER_NAME,
-  CUPS_MSG_PRIORITY,
-  CUPS_MSG_COPIES,
-  CUPS_MSG_FILE_SIZE,
-  CUPS_MSG_PENDING,
-  CUPS_MSG_OUTPUT_MODE,
-  CUPS_MSG_RESOLUTION,
-  CUPS_MSG_TEXT,
-  CUPS_MSG_PRETTYPRINT,
-  CUPS_MSG_MARGINS,
-  CUPS_MSG_LEFT,
-  CUPS_MSG_RIGHT,
-  CUPS_MSG_BOTTOM,
-  CUPS_MSG_TOP,
-  CUPS_MSG_FILENAME,
-  CUPS_MSG_PRINT,
-  CUPS_MSG_OPTIONS_INSTALLED,
-  CUPS_MSG_AUTO,
-  /* Next message #111 */
+  CUPS_AUTO_ENCODING = -1,		/* Auto-detect the encoding @private@ */
+  CUPS_US_ASCII,			/* US ASCII */
+  CUPS_ISO8859_1,			/* ISO-8859-1 */
+  CUPS_ISO8859_2,			/* ISO-8859-2 */
+  CUPS_ISO8859_3,			/* ISO-8859-3 */
+  CUPS_ISO8859_4,			/* ISO-8859-4 */
+  CUPS_ISO8859_5,			/* ISO-8859-5 */
+  CUPS_ISO8859_6,			/* ISO-8859-6 */
+  CUPS_ISO8859_7,			/* ISO-8859-7 */
+  CUPS_ISO8859_8,			/* ISO-8859-8 */
+  CUPS_ISO8859_9,			/* ISO-8859-9 */
+  CUPS_ISO8859_10,			/* ISO-8859-10 */
+  CUPS_UTF8,				/* UTF-8 */
+  CUPS_ISO8859_13,			/* ISO-8859-13 */
+  CUPS_ISO8859_14,			/* ISO-8859-14 */
+  CUPS_ISO8859_15,			/* ISO-8859-15 */
+  CUPS_WINDOWS_874,			/* CP-874 */
+  CUPS_WINDOWS_1250,			/* CP-1250 */
+  CUPS_WINDOWS_1251,			/* CP-1251 */
+  CUPS_WINDOWS_1252,			/* CP-1252 */
+  CUPS_WINDOWS_1253,			/* CP-1253 */
+  CUPS_WINDOWS_1254,			/* CP-1254 */
+  CUPS_WINDOWS_1255,			/* CP-1255 */
+  CUPS_WINDOWS_1256,			/* CP-1256 */
+  CUPS_WINDOWS_1257,			/* CP-1257 */
+  CUPS_WINDOWS_1258,			/* CP-1258 */
+  CUPS_KOI8_R,				/* KOI-8-R */
+  CUPS_KOI8_U,				/* KOI-8-U */
+  CUPS_ISO8859_11,			/* ISO-8859-11 */
+  CUPS_ISO8859_16,			/* ISO-8859-16 */
+  CUPS_ENCODING_SBCS_END = 63,		/* End of single-bybte encodings @private@ */
 
-  CUPS_MSG_HTTP_BASE = 200,
-  CUPS_MSG_HTTP_END = 505,
+  CUPS_WINDOWS_932,			/* Japanese JIS X0208-1990 */
+  CUPS_WINDOWS_936,			/* Simplified Chinese GB 2312-80 */
+  CUPS_WINDOWS_949,			/* Korean KS C5601-1992 */
+  CUPS_WINDOWS_950,			/* Traditional Chinese Big Five */
+  CUPS_WINDOWS_1361,			/* Korean Johab */
+  CUPS_ENCODING_DBCS_END = 127,		/* End of double-byte encodings @private@ */
 
-  CUPS_MSG_IPP_OK = 512,
-  CUPS_MSG_IPP_OK_SUBST,
-  CUPS_MSG_IPP_OK_CONFLICT,
-  CUPS_MSG_IPP_OK_IGNORED_SUBSCRIPTIONS,
-  CUPS_MSG_IPP_OK_IGNORED_NOTIFICATIONS,
-  CUPS_MSG_IPP_OK_TOO_MANY_EVENTS,
-  CUPS_MSG_IPP_OK_BUT_CANCEL_SUBSCRIPTION,
-
-  CUPS_MSG_IPP_REDIRECTION_OTHER_SITE,
-
-  CUPS_MSG_IPP_BAD_REQUEST = 528,
-  CUPS_MSG_IPP_FORBIDDEN,
-  CUPS_MSG_IPP_NOT_AUTHENTICATED,
-  CUPS_MSG_IPP_NOT_AUTHORIZED,
-  CUPS_MSG_IPP_NOT_POSSIBLE,
-  CUPS_MSG_IPP_TIMEOUT,
-  CUPS_MSG_IPP_NOT_FOUND,
-  CUPS_MSG_IPP_GONE,
-  CUPS_MSG_IPP_REQUEST_ENTITY,
-  CUPS_MSG_IPP_REQUEST_VALUE,
-  CUPS_MSG_IPP_DOCUMENT_FORMAT,
-  CUPS_MSG_IPP_ATTRIBUTES,
-  CUPS_MSG_IPP_URI_SCHEME,
-  CUPS_MSG_IPP_CHARSET,
-  CUPS_MSG_IPP_CONFLICT,
-  CUPS_MSG_IPP_COMPRESSION_NOT_SUPPORTED,
-  CUPS_MSG_IPP_COMPRESSION_ERROR,
-  CUPS_MSG_IPP_DOCUMENT_FORMAT_ERROR,
-  CUPS_MSG_IPP_DOCUMENT_ACCESS_ERROR,
-  CUPS_MSG_IPP_ATTRIBUTES_NOT_SETTABLE,
-  CUPS_MSG_IPP_IGNORED_ALL_SUBSCRIPTIONS,
-  CUPS_MSG_IPP_TOO_MANY_SUBSCRIPTIONS,
-  CUPS_MSG_IPP_IGNORED_ALL_NOTIFICATIONS,
-  CUPS_MSG_IPP_PRINT_SUPPORT_FILE_NOT_FOUND,
-
-  CUPS_MSG_IPP_INTERNAL_ERROR = 560,
-  CUPS_MSG_IPP_OPERATION_NOT_SUPPORTED,
-  CUPS_MSG_IPP_SERVICE_UNAVAILABLE,
-  CUPS_MSG_IPP_VERSION_NOT_SUPPORTED,
-  CUPS_MSG_IPP_DEVICE_ERROR,
-  CUPS_MSG_IPP_TEMPORARY_ERROR,
-  CUPS_MSG_IPP_NOT_ACCEPTING,
-  CUPS_MSG_IPP_PRINTER_BUSY,
-  CUPS_MSG_IPP_ERROR_JOB_CANCELLED,
-  CUPS_MSG_IPP_MULTIPLE_JOBS_NOT_SUPPORTED,
-  CUPS_MSG_IPP_PRINTER_IS_DEACTIVATED,
-
-  CUPS_MSG_MAX = 1024
-} cups_msg_t;
-
-typedef enum			/**** Language Encodings ****/
-{
-  CUPS_AUTO_ENCODING = -1,
-  CUPS_US_ASCII,
-  CUPS_ISO8859_1,
-  CUPS_ISO8859_2,
-  CUPS_ISO8859_3,
-  CUPS_ISO8859_4,
-  CUPS_ISO8859_5,
-  CUPS_ISO8859_6,
-  CUPS_ISO8859_7,
-  CUPS_ISO8859_8,
-  CUPS_ISO8859_9,
-  CUPS_ISO8859_10,
-  CUPS_UTF8,
-  CUPS_ISO8859_13,
-  CUPS_ISO8859_14,
-  CUPS_ISO8859_15,
-  CUPS_WINDOWS_874,
-  CUPS_WINDOWS_1250,
-  CUPS_WINDOWS_1251,
-  CUPS_WINDOWS_1252,
-  CUPS_WINDOWS_1253,
-  CUPS_WINDOWS_1254,
-  CUPS_WINDOWS_1255,
-  CUPS_WINDOWS_1256,
-  CUPS_WINDOWS_1257,
-  CUPS_WINDOWS_1258,
-  CUPS_KOI8_R,
-  CUPS_KOI8_U,
-  CUPS_ISO8859_11,
-  CUPS_ISO8859_16,
-  CUPS_ENCODING_SBCS_END = 63,
-
-  CUPS_WINDOWS_932,		/* Japanese JIS X0208-1990 */
-  CUPS_WINDOWS_936,		/* Simplified Chinese GB 2312-80 */
-  CUPS_WINDOWS_949,		/* Korean KS C5601-1992 */
-  CUPS_WINDOWS_950,		/* Traditional Chinese Big Five */
-  CUPS_WINDOWS_1361,		/* Korean Johab */
-  CUPS_ENCODING_DBCS_END = 127,
-
-  CUPS_EUC_CN,			/* EUC Simplified Chinese */
-  CUPS_EUC_JP,			/* EUC Japanese */
-  CUPS_EUC_KR,			/* EUC Korean */
-  CUPS_EUC_TW,			/* EUC Traditional Chinese */
-  CUPS_ENCODING_VBCS_END = 191
+  CUPS_EUC_CN,				/* EUC Simplified Chinese */
+  CUPS_EUC_JP,				/* EUC Japanese */
+  CUPS_EUC_KR,				/* EUC Korean */
+  CUPS_EUC_TW,				/* EUC Traditional Chinese */
+  CUPS_ENCODING_VBCS_END = 191		/* End of variable-length encodings @private@ */
 } cups_encoding_t;
 
-typedef struct cups_lang_str	/**** Language Cache Structure ****/
+typedef struct cups_lang_s		/**** Language Cache Structure ****/
 {
-  struct cups_lang_str	*next;		/* Next language in cache */
+  struct cups_lang_s	*next;		/* Next language in cache */
   int			used;		/* Number of times this entry has been used. */
   cups_encoding_t	encoding;	/* Text encoding */
   char			language[16];	/* Language/locale name */
-  char			*messages[CUPS_MSG_MAX];
-					/* Message array */
+  cups_array_t		*strings;	/* Message strings @private@ */
 } cups_lang_t;
 
 
@@ -272,23 +105,11 @@ typedef struct cups_lang_str	/**** Language Cache Structure ****/
  * Prototypes...
  */
 
-#  define		cupsLangDefault() cupsLangGet(NULL)
+extern cups_lang_t	*cupsLangDefault(void);
 extern const char	*cupsLangEncoding(cups_lang_t *lang);
 extern void		cupsLangFlush(void);
 extern void		cupsLangFree(cups_lang_t *lang);
 extern cups_lang_t	*cupsLangGet(const char *language);
-#  define		cupsLangString(lang,msg) (lang)->messages[(msg)]
-
-/**** New in CUPS 1.1.20 ****/
-extern void		_cupsRestoreLocale(int category, char *oldlocale);
-extern char		*_cupsSaveLocale(int category, const char *locale);
-
-/**** New in CUPS 1.2 ****/
-extern const char	*cupsEncodingName(cups_encoding_t encoding);
-extern int		cupsLangPrintf(FILE *fp, cups_lang_t *lang,
-			               cups_msg_t msg, ...);
-extern int		cupsLangPuts(FILE *fp, cups_lang_t *lang,
-			             cups_msg_t msg);
 
 #  ifdef __cplusplus
 }

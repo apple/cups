@@ -26,6 +26,7 @@
  * Contents:
  *
  *   _cupsGlobals()	  - Return a pointer to thread local storage.
+ *   cups_env_init()      - Initialize environment variables.
  *   globals_init()       - Initialize globals once.
  *   globals_destructor() - Free memory allocated by _cupsGlobals().
  */
@@ -37,6 +38,30 @@
 #include "http-private.h"
 #include "globals.h"
 #include <stdlib.h>
+
+
+/*
+ * 'cups_env_init()' - Initialize environment variables.
+ */
+
+static void
+cups_env_init(_cups_globals_t *g)	/* I - Global data */
+{
+  if ((g->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
+    g->cups_datadir = CUPS_DATADIR;
+
+  if ((g->cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
+    g->cups_serverbin = CUPS_SERVERBIN;
+
+  if ((g->cups_serverroot = getenv("CUPS_SERVERROOT")) == NULL)
+    g->cups_serverroot = CUPS_SERVERROOT;
+
+  if ((g->cups_statedir = getenv("CUPS_STATEDIR")) == NULL)
+    g->cups_statedir = CUPS_STATEDIR;
+
+  if ((g->localedir = getenv("LOCALDIR")) == NULL)
+    g->localedir = CUPS_LOCALEDIR;
+}
 
 
 #ifdef HAVE_PTHREAD_H
@@ -97,6 +122,8 @@ _cupsGlobals(void)
 
     globals->encryption  = (http_encryption_t)-1;
     globals->password_cb = _cupsGetPassword;
+
+    cups_env_init(globals);
   }
 
  /*
@@ -161,6 +188,8 @@ _cupsGlobals(void)
 
     globals.encryption  = (http_encryption_t)-1;
     globals.password_cb = _cupsGetPassword;
+
+    cups_env_init(&globals);
   }
 
   return (&globals);

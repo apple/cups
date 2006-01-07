@@ -302,7 +302,7 @@ cupsdReadConfiguration(void)
   else
     cupsdSetString(&DefaultLanguage, language->language);
 
-  cupsdSetString(&DefaultCharset, cupsEncodingName(language->encoding));
+  cupsdSetString(&DefaultCharset, _cupsEncodingName(language->encoding));
 
   cupsdSetString(&RIPCache, "8m");
 

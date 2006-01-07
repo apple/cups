@@ -33,7 +33,7 @@
  */
 
 #include <stdio.h>
-#include "language.h"
+#include "i18n.h"
 
 
 /*
@@ -46,36 +46,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   cups_lang_t		*language;	/* Message catalog */
   cups_lang_t		*language2;	/* Message catalog */
-  static const char * const charsets[] =/* Character sets */
-			{
-			  "us-ascii",
-			  "iso-8859-1",
-			  "iso-8859-2",
-			  "iso-8859-3",
-			  "iso-8859-4",
-			  "iso-8859-5",
-			  "iso-8859-6",
-			  "iso-8859-7",
-			  "iso-8859-8",
-			  "iso-8859-9",
-			  "iso-8859-10",
-			  "utf-8",
-			  "iso8859-13",
-			  "iso8859-14",
-			  "iso8859-15",
-			  "windows-874",
-			  "windows-1250",
-			  "windows-1251",
-			  "windows-1252",
-			  "windows-1253",
-			  "windows-1254",
-			  "windows-1255",
-			  "windows-1256",
-			  "windows-1257",
-			  "windows-1258",
-			  "koi8-r",
-			  "koi8-u"
-			};
 
 
   if (argc == 1)
@@ -96,18 +66,18 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
   printf("Language = \"%s\"\n", language->language);
-  printf("Encoding = \"%s\"\n", charsets[language->encoding]);
-  printf("No       = \"%s\"\n", cupsLangString(language, CUPS_MSG_NO));
-  printf("Yes      = \"%s\"\n", cupsLangString(language, CUPS_MSG_YES));
+  printf("Encoding = \"%s\"\n", _cupsEncodingName(language->encoding));
+  printf("No       = \"%s\"\n", _cupsLangString(language, "No"));
+  printf("Yes      = \"%s\"\n", _cupsLangString(language, "Yes"));
 
   if (language != language2)
   {
     puts("Second result from cupsLangGet:");
 
     printf("Language = \"%s\"\n", language2->language);
-    printf("Encoding = \"%s\"\n", charsets[language2->encoding]);
-    printf("No       = \"%s\"\n", cupsLangString(language2, CUPS_MSG_NO));
-    printf("Yes      = \"%s\"\n", cupsLangString(language2, CUPS_MSG_YES));
+    printf("Encoding = \"%s\"\n", _cupsEncodingName(language2->encoding));
+    printf("No       = \"%s\"\n", _cupsLangString(language2, "No"));
+    printf("Yes      = \"%s\"\n", _cupsLangString(language2, "Yes"));
   }
 
   return (0);

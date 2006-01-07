@@ -100,7 +100,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (strcmp(pclass, "/") == 0 || strcmp(pclass, "classes.cgi") == 0)
   {
     pclass = NULL;
-    cgiSetVariable("TITLE", cupsLangString(language, CUPS_MSG_CLASS));
+    cgiSetVariable("TITLE", _cupsLangString(language, _("Class")));
   }
   else
     cgiSetVariable("TITLE", pclass);

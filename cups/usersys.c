@@ -91,13 +91,8 @@ cupsEncryption(void)
 
       if (fp == NULL)
       {
-	if ((home = getenv("CUPS_SERVERROOT")) != NULL)
-	{
-	  snprintf(line, sizeof(line), "%s/client.conf", home);
-	  fp = cupsFileOpen(line, "r");
-	}
-	else
-	  fp = cupsFileOpen(CUPS_SERVERROOT "/client.conf", "r");
+	snprintf(line, sizeof(line), "%s/client.conf", cg->cups_serverroot);
+	fp = cupsFileOpen(line, "r");
       }
 
       encryption = "IfRequested";
@@ -208,13 +203,8 @@ cupsServer(void)
 
       if (fp == NULL)
       {
-	if ((home = getenv("CUPS_SERVERROOT")) != NULL)
-	{
-	  snprintf(line, sizeof(line), "%s/client.conf", home);
-	  fp = cupsFileOpen(line, "r");
-	}
-	else
-	  fp = cupsFileOpen(CUPS_SERVERROOT "/client.conf", "r");
+	snprintf(line, sizeof(line), "%s/client.conf", cg->cups_serverroot);
+	fp = cupsFileOpen(line, "r");
       }
 
 #ifdef CUPS_DEFAULT_DOMAINSOCKET

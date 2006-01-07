@@ -1,11 +1,8 @@
 # DO NOT DELETE
 
-indp.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-indp.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/string.h
-indp.o: ../config.h
 mailto.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-mailto.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/string.h
-mailto.o: ../config.h
+mailto.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/array.h
+mailto.o: ../cups/string.h ../config.h
 testnotify.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-testnotify.o: ../cups/ppd.h ../cups/file.h ../cups/language.h
+testnotify.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/array.h
 testnotify.o: ../cups/string.h ../config.h
