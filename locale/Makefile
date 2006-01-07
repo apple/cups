@@ -51,9 +51,26 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(LOCALEDIR)
-#	for dir in $(LOCALES) ; do \
-#		$(INSTALL_DIR) $(LOCALEDIR)/$$dir ; \
-#		$(INSTALL_DATA) cups_$$dir.po $(LOCALEDIR)/$$dir ; \
+#	for loc in $(LOCALES) ; do \
+#		$(INSTALL_DIR) $(LOCALEDIR)/$$loc ; \
+#		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc ; \
+#	done
+
+
+#
+# pot - Creates/updates the cups.pot template file, and merges changes
+#       into existing message catalogs.
+#
+
+pot:
+	echo Updating cups.pot...
+	cd ..; xgettext -o locale/cups.pot -j --keyword=_ \
+		--copyright-holder="Easy Software Products" \
+		--msgid-bugs-address="http://www.cups.org/str.php" \
+		*/*.c
+#	for loc in $(LOCALES) ; do \
+#		echo Merging changes into cups_$$loc.po... ; \
+#		msgmerge cups_$$loc.po cups.pot ; \
 #	done
 
 
