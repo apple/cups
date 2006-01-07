@@ -36,7 +36,7 @@
 
 #include <stdio.h>
 #include "string.h"
-#include "language.h"
+#include "i18n.h"
 #include "transcode.h"
 
 
