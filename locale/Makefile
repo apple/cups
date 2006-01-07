@@ -68,6 +68,8 @@ pot:
 		--copyright-holder="Easy Software Products" \
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c
+	(cat cups.header; tail +6 cups.pot; cat cups.footer) > cups.pot.N
+	mv cups.pot.N cups.pot
 #	for loc in $(LOCALES) ; do \
 #		echo Merging changes into cups_$$loc.po... ; \
 #		msgmerge cups_$$loc.po cups.pot ; \
