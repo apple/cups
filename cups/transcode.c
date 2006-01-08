@@ -244,14 +244,20 @@ cupsUTF8ToCharset(char *dest,           /* O - Target string */
  /*
   * Check for valid arguments...
   */
-  if ((dest == NULL)
-  || (src == NULL)
-  || (maxout < 1)
-  || (maxout > CUPS_MAX_USTRING)
-  || (encoding < 0)
-  || (encoding == CUPS_UTF8)
-  || (encoding >= CUPS_ENCODING_VBCS_END))
+
+  if (!dest || !src || maxout < 1 || maxout > CUPS_MAX_USTRING)
     return (-1);
+
+ /*
+  * Handle identity conversions...
+  */
+
+  if (encoding == CUPS_UTF8 ||
+      encoding < 0 || encoding >= CUPS_ENCODING_VBCS_END)
+  {
+    strlcpy(dest, (char *)src, maxout);
+    return (strlen(dest));
+  }
 
  /*
   * Convert input UTF-8 to legacy charset...
@@ -281,14 +287,20 @@ cupsCharsetToUTF8(cups_utf8_t *dest,    /* O - Target string */
  /*
   * Check for valid arguments...
   */
-  if ((dest == NULL)
-  || (src == NULL)
-  || (maxout < 1)
-  || (maxout > CUPS_MAX_USTRING)
-  || (encoding < 0)
-  || (encoding == CUPS_UTF8)
-  || (encoding >= CUPS_ENCODING_VBCS_END))
+
+  if (!dest || !src || maxout < 1 || maxout > CUPS_MAX_USTRING)
     return (-1);
+
+ /*
+  * Handle identity conversions...
+  */
+
+  if (encoding == CUPS_UTF8 ||
+      encoding < 0 || encoding >= CUPS_ENCODING_VBCS_END)
+  {
+    strlcpy(dest, (char *)src, maxout);
+    return (strlen(dest));
+  }
 
  /*
   * Convert input legacy charset to UTF-8...

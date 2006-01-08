@@ -2113,7 +2113,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
     */
 
     send_ipp_status(con, IPP_NOT_FOUND,
-                    _("Job #%d doesn't exist!"), jobid);
+                    _("Job #%d does not exist!"), jobid);
     return;
   }
 
@@ -2448,7 +2448,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"), jobid);
     return;
   }
 
@@ -5225,7 +5225,7 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"), jobid);
     return;
   }
 
@@ -6044,7 +6044,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"), jobid);
     return;
   }
 
@@ -6185,7 +6185,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     send_ipp_status(con, IPP_NOT_FOUND,
-                    _("Job #%d doesn't exist!"), jobid);
+                    _("Job #%d does not exist!"), jobid);
     return;
   }
 
@@ -7431,7 +7431,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"), jobid);
     return;
   }
 
@@ -7575,7 +7575,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"), jobid);
     return;
   }
 
@@ -7812,7 +7812,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"), jobid);
     return;
   }
 
@@ -8297,7 +8297,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Nope - return a "not found" error...
     */
 
-    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d doesn't exist!"), jobid);
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"), jobid);
     return;
   }
 

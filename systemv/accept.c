@@ -33,29 +33,30 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <cups/string.h>
 #include <cups/cups.h>
-#include <cups/language.h>
+#include <cups/i18n.h>
 
 
 /*
  * 'main()' - Parse options and accept/reject jobs or disable/enable printers.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  http_t	*http;		/* HTTP connection to server */
-  int		i;		/* Looping var */
-  char		*command,	/* Command to do */
-		uri[1024],	/* Printer URI */
-		*reason;	/* Reason for reject/disable */
-  ipp_t		*request;	/* IPP request */
-  ipp_t		*response;	/* IPP response */
-  ipp_op_t	op;		/* Operation */
-  cups_lang_t	*language;	/* Language */
-  int		cancel;		/* Cancel jobs? */
+  http_t	*http;			/* HTTP connection to server */
+  int		i;			/* Looping var */
+  char		*command,		/* Command to do */
+		uri[1024],		/* Printer URI */
+		*reason;		/* Reason for reject/disable */
+  ipp_t		*request;		/* IPP request */
+  ipp_t		*response;		/* IPP response */
+  ipp_op_t	op;			/* Operation */
+  cups_lang_t	*language;		/* Language */
+  int		cancel;			/* Cancel jobs? */
 
 
  /*
@@ -67,19 +68,21 @@ main(int  argc,			/* I - Number of command-line arguments */
   else
     command = argv[0];
 
-  cancel = 0;
+  cancel   = 0;
+  language = cupsLangDefault();
 
-  if (strcmp(command, "accept") == 0)
+  if (!strcmp(command, "accept"))
     op = CUPS_ACCEPT_JOBS;
-  else if (strcmp(command, "reject") == 0)
+  else if (!strcmp(command, "reject"))
     op = CUPS_REJECT_JOBS;
-  else if (strcmp(command, "disable") == 0)
+  else if (!strcmp(command, "disable"))
     op = IPP_PAUSE_PRINTER;
-  else if (strcmp(command, "enable") == 0)
+  else if (!strcmp(command, "enable"))
     op = IPP_RESUME_PRINTER;
   else
   {
-    fprintf(stderr, "%s: Don't know what to do!\n", command);
+    _cupsLangPrintf(stderr, language, _("%s: Don't know what to do!\n"),
+                    command);
     return (1);
   }
 
@@ -101,8 +104,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	            command);
+            _cupsLangPrintf(stderr, language,
+	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	        	    command);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -121,8 +125,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fprintf(stderr, "%s: Expected server name after -h!\n",
-		        command);
+	        _cupsLangPrintf(stderr, language,
+		                _("%s: Expected server name after -h!\n"),
+		        	command);
 	        return (1);
 	      }
 
@@ -138,7 +143,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fprintf(stderr, "%s: Expected reason text after -r!\n", command);
+	        _cupsLangPrintf(stderr, language,
+		                _("%s: Expected reason text after -r!\n"),
+				command);
 		return (1);
 	      }
 
@@ -147,8 +154,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    fprintf(stderr, "%s: Unknown option \'%c\'!\n", command,
-	            argv[i][1]);
+	    _cupsLangPrintf(stderr, language, _("%s: Unknown option \'%c\'!\n"),
+	                    command, argv[i][1]);
 	    return (1);
       }
     else
@@ -162,8 +169,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (http == NULL)
       {
-	fputs(command, stderr);
-	perror(": Unable to connect to server");
+	_cupsLangPrintf(stderr, language,
+	                _("%s: Unable to connect to server: %s\n"),
+	                command, strerror(errno));
 	return (1);
       }
 
@@ -181,8 +189,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       request->request.op.operation_id = op;
       request->request.op.request_id   = 1;
-
-      language = cupsLangDefault();
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
               	   "attributes-charset", NULL, cupsLangEncoding(language));
@@ -207,8 +213,9 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         if (response->request.status.status_code > IPP_OK_CONFLICT)
 	{
-          fprintf(stderr, "%s: Operation failed: %s\n", command,
-	          ippErrorString(cupsLastError()));
+          _cupsLangPrintf(stderr, language,
+	                  _("%s: Operation failed: %s\n"),
+			  command, ippErrorString(cupsLastError()));
 	  return (1);
 	}
 	
@@ -216,8 +223,9 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-        fprintf(stderr, "%s: Operation failed: %s\n", command,
-	        ippErrorString(cupsLastError()));
+        _cupsLangPrintf(stderr, language,
+	                _("%s: Operation failed: %s\n"),
+	                command, ippErrorString(cupsLastError()));
 	return (1);
       }
 
@@ -256,8 +264,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	{
           if (response->request.status.status_code > IPP_OK_CONFLICT)
 	  {
-            fprintf(stderr, "%s: Operation failed: %s\n", command,
-	            ippErrorString(cupsLastError()));
+            _cupsLangPrintf(stderr, language,
+	                    _("%s: Operation failed: %s\n"),
+			    command, ippErrorString(cupsLastError()));
 	    return (1);
 	  }
 
@@ -265,8 +274,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
 	else
 	{
-          fprintf(stderr, "%s: Operation failed: %s\n", command,
-	          ippErrorString(cupsLastError()));
+          _cupsLangPrintf(stderr, language,
+	                  _("%s: Operation failed: %s\n"),
+			  command, ippErrorString(cupsLastError()));
 	  return (1);
 	}
       }

@@ -34,31 +34,31 @@
 #include <stdlib.h>
 #include <cups/string.h>
 #include <cups/cups.h>
-#include <cups/language.h>
+#include <cups/i18n.h>
 
 
 /*
  * 'main()' - Parse options and cancel jobs.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  http_t	*http;		/* HTTP connection to server */
-  int		i;		/* Looping var */
-  int		job_id;		/* Job ID */
-  int		num_dests;	/* Number of destinations */
-  cups_dest_t	*dests;		/* Destinations */
-  char		*dest,		/* Destination printer */
-		*job,		/* Job ID pointer */
-		*user;		/* Cancel jobs for a user */
-  int		purge;		/* Purge or cancel jobs? */
-  char		uri[1024];	/* Printer or job URI */
-  ipp_t		*request;	/* IPP request */
-  ipp_t		*response;	/* IPP response */
-  ipp_op_t	op;		/* Operation */
-  cups_lang_t	*language;	/* Language */
+  http_t	*http;			/* HTTP connection to server */
+  int		i;			/* Looping var */
+  int		job_id;			/* Job ID */
+  int		num_dests;		/* Number of destinations */
+  cups_dest_t	*dests;			/* Destinations */
+  char		*dest,			/* Destination printer */
+		*job,			/* Job ID pointer */
+		*user;			/* Cancel jobs for a user */
+  int		purge;			/* Purge or cancel jobs? */
+  char		uri[1024];		/* Printer or job URI */
+  ipp_t		*request;		/* IPP request */
+  ipp_t		*response;		/* IPP response */
+  ipp_op_t	op;			/* Operation */
+  cups_lang_t	*language;		/* Language */
 
 
  /*
@@ -73,6 +73,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   http       = NULL;
   num_dests  = 0;
   dests      = NULL;
+  language   = cupsLangDefault();
+
 
  /*
   * Process command-line arguments...
@@ -89,8 +91,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	            argv[0]);
+            _cupsLangPrintf(stderr, language,
+	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -111,7 +114,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("cancel: Error - expected hostname after \'-h\' option!\n", stderr);
+	        _cupsLangPuts(stderr, language,
+		              _("cancel: Error - expected hostname after "
+			        "\'-h\' option!\n"));
 		return (1);
               }
 	      else
@@ -130,7 +135,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("cancel: Error - expected username after \'-u\' option!\n", stderr);
+	        _cupsLangPuts(stderr, language,
+		              _("cancel: Error - expected username after "
+			        "\'-u\' option!\n"));
 		return (1);
               }
 	      else
@@ -139,7 +146,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    fprintf(stderr, "cancel: Unknown option \'%c\'!\n", argv[i][1]);
+	    _cupsLangPrintf(stderr, language,
+	                    _("cancel: Unknown option \'%c\'!\n"), argv[i][1]);
 	    return (1);
       }
     else
@@ -195,7 +203,8 @@ main(int  argc,			/* I - Number of command-line arguments */
         * Bad printer name!
 	*/
 
-        fprintf(stderr, "cancel: Unknown destination \"%s\"!\n", argv[i]);
+        _cupsLangPrintf(stderr, language,
+	                _("cancel: Unknown destination \"%s\"!\n"), argv[i]);
 	return (1);
       }
 
@@ -216,7 +225,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
 	                               cupsEncryption())) == NULL)
 	{
-	  fputs("cancel: Unable to contact server!\n", stderr);
+	  _cupsLangPuts(stderr, language,
+	                _("cancel: Unable to contact server!\n"));
 	  return (1);
 	}
 
@@ -234,8 +244,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       request->request.op.operation_id = op;
       request->request.op.request_id   = 1;
-
-      language = cupsLangDefault();
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
               	   "attributes-charset", NULL, cupsLangEncoding(language));
@@ -284,10 +292,10 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (response == NULL ||
           response->request.status.status_code > IPP_OK_CONFLICT)
       {
-	fprintf(stderr, "cancel: %s failed: %s\n",
-	        op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
-        	response ? ippErrorString(response->request.status.status_code) :
-		           ippErrorString(cupsLastError()));
+	_cupsLangPrintf(stderr, language, _("cancel: %s failed: %s\n"),
+	        	op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
+        		response ? ippErrorString(response->request.status.status_code) :
+		        	   ippErrorString(cupsLastError()));
 
 	if (response)
 	  ippDelete(response);
@@ -308,7 +316,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
 	                             cupsEncryption())) == NULL)
       {
-	fputs("cancel: Unable to contact server!\n", stderr);
+	_cupsLangPuts(stderr, language, _("cancel: Unable to contact server!\n"));
 	return (1);
       }
 
@@ -359,10 +367,10 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (response == NULL ||
         response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "cancel: %s failed: %s\n",
-	      op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
-              response ? ippErrorString(response->request.status.status_code) :
-		         ippErrorString(cupsLastError()));
+      _cupsLangPrintf(stderr, language, _("cancel: %s failed: %s\n"),
+		      op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
+        	      response ? ippErrorString(response->request.status.status_code) :
+		        	 ippErrorString(cupsLastError()));
 
       if (response)
 	ippDelete(response);

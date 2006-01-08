@@ -33,11 +33,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <cups/cups.h>
-#include <cups/language.h>
-#include <cups/debug.h>
+#include <errno.h>
 #include <cups/string.h>
+#include <cups/cups.h>
+#include <cups/i18n.h>
+#include <cups/debug.h>
 
 
 /*
@@ -52,15 +52,15 @@ static void	move_job(http_t *, int, const char *);
  */
 
 int
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  http_t	*http;		/* Connection to server */
-  const char	*job;		/* Job name */
-  int		num_dests;	/* Number of destinations */
-  cups_dest_t	*dests;		/* Destinations */
-  const char	*dest;		/* New destination */
+  int		i;			/* Looping var */
+  http_t	*http;			/* Connection to server */
+  const char	*job;			/* Job name */
+  int		num_dests;		/* Number of destinations */
+  cups_dest_t	*dests;			/* Destinations */
+  const char	*dest;			/* New destination */
 
 
   http      = NULL;
@@ -80,8 +80,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	            argv[0]);
+            _cupsLangPrintf(stderr, NULL,
+	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -100,7 +101,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("Error: need hostname after \'-h\' option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("Error: need hostname after \'-h\' option!\n"));
 		return (1);
               }
 
@@ -109,7 +111,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    fprintf(stderr, "lpmove: Unknown option \'%c\'!\n", argv[i][1]);
+	    _cupsLangPrintf(stderr, NULL, _("lpmove: Unknown option \'%c\'!\n"),
+	                    argv[i][1]);
 	    return (1);
       }
     else if (job == NULL)
@@ -127,13 +130,14 @@ main(int  argc,			/* I - Number of command-line arguments */
       dest = argv[i];
     else
     {
-      fprintf(stderr, "lpmove: Unknown argument \'%s\'!\n", argv[i]);
+      _cupsLangPrintf(stderr, NULL, _("lpmove: Unknown argument \'%s\'!\n"),
+                      argv[i]);
       return (1);
     }
 
   if (job == NULL || dest == NULL)
   {
-    puts("Usage: lpmove job dest");
+    _cupsLangPuts(stdout, NULL, _("Usage: lpmove job dest\n"));
     return (1);
   }
 
@@ -143,7 +147,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if (http == NULL)
     {
-      perror("lpmove: Unable to connect to server");
+      _cupsLangPrintf(stderr, NULL,
+                      _("lpmove: Unable to connect to server: %s\n"),
+		      strerror(errno));
       return (1);
     }
   }
@@ -159,17 +165,16 @@ main(int  argc,			/* I - Number of command-line arguments */
  */
 
 static void
-move_job(http_t     *http,	/* I - HTTP connection to server */
-         int        jobid,	/* I - Job ID */
-	 const char *dest)	/* I - Destination */
+move_job(http_t     *http,		/* I - HTTP connection to server */
+         int        jobid,		/* I - Job ID */
+	 const char *dest)		/* I - Destination */
 {
-  ipp_t		*request,	/* IPP Request */
-		*response;	/* IPP Response */
-  cups_lang_t	*language;	/* Default language */
-  char		job_uri[HTTP_MAX_URI],
-				/* job-uri */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  cups_lang_t	*language;		/* Default language */
+  char		job_uri[HTTP_MAX_URI],	/* job-uri */
 		printer_uri[HTTP_MAX_URI];
-				/* job-printer-uri */
+					/* job-printer-uri */
 
 
   if (http == NULL)
@@ -217,8 +222,8 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lpmove: move-job failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, NULL, _("lpmove: move-job failed: %s\n"),
+        	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -226,8 +231,8 @@ move_job(http_t     *http,	/* I - HTTP connection to server */
     ippDelete(response);
   }
   else
-    fprintf(stderr, "lpmove: move-job failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, NULL, _("lpmove: move-job failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
 }
 
 

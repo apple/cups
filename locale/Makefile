@@ -76,7 +76,7 @@ pot:
 	mv cups.pot.N cups.pot
 	for loc in $(LOCALES) ; do \
 		echo Merging changes into cups_$$loc.po... ; \
-		msgmerge cups_$$loc.po cups.pot ; \
+		msgmerge -o cups_$$loc.po cups_$$loc.po cups.pot ; \
 	done
 
 

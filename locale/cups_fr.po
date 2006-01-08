@@ -1,198 +1,2148 @@
 msgid ""
-msgstr "Project-Id-Version: CUPS 1.2\nReport-Msgid-Bugs-To: http://www.cups.org/str.php\nPOT-Creation-Date: 2006-01-07 22:12-0500\nPO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\nLast-Translator: FULL NAME <EMAIL@ADDRESS>\nLanguage-Team: LANGUAGE <LL@li.org>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=utf-8\nContent-Transfer-Encoding: 8bit\n"
-msgid "%s cannot be changed."
-msgstr "%s ne peut pas être changé."
-msgid "%s not supported!"
-msgstr "%s non soutenu!"
-msgid "A class named \"%s\" already exists!"
-msgstr "Une classe appelée \"%s\" existe déjà!"
-msgid "A printer named \"%s\" already exists!"
-msgstr "Un imprimeur appelé \"%s\" existe déjà!"
-msgid "Attempt to set %s printer-state to bad value %d!"
-msgstr "Essayez de placer l'imprimeur-état de %s à la mauvaise valeur %d!"
-msgid "Attribute groups are out of order (%x < %x)!"
-msgstr "Les groupes d'attribut sont en panne (%x < %x)!"
-msgid "Auto"
-msgstr "Automobile"
-msgid "Bad copies value %d."
-msgstr "Mauvaise valeur %d de copies."
-msgid "Bad device-uri \"%s\"!"
-msgstr "Mauvais device-uri \"%s\"!"
-msgid "Bad document-format \"%s\"!"
-msgstr "Mauvais document-format \"%s\"!"
-msgid "Bad job-priority value!"
-msgstr "Mauvaise valeur de job-priority!"
-msgid "Bad job-state value!"
-msgstr "Mauvaise valeur de job-state!"
-msgid "Bad job-uri attribute \"%s\"!"
-msgstr "Mauvais attribut \"%s\" de job-uri!"
-msgid "Bad page-ranges values %d-%d."
-msgstr "Mauvaises valeurs %d-%d de page-ranges."
-msgid "Bad port-monitor \"%s\"!"
-msgstr "Mauvais port-monitor \"%s\"!"
-msgid "Bad printer-state value %d!"
-msgstr "Mauvaise valeur %d de printer-state!"
-msgid "Bad request version number %d.%d!"
-msgstr "Mauvais nombre de version de demande %d.%d!"
-msgid "Character set \"%s\" not supported!"
-msgstr "Jeu de caractères \"%s\" non soutenu!"
-msgid "Class"
-msgstr "Classe"
-msgid "Could not scan type \"%s\"!"
-msgstr "N'a pas pu balayer le type \"%s\"!"
-msgid "Destination \"%s\" is not accepting jobs."
-msgstr "La destination \"%s\" n'accepte pas les travaux."
-msgid "Enter your username and password or the root username and password to access this page."
-msgstr "Entrez votre username et mot de passe ou le username de racine et le mot de passe pour accéder à cette page."
-msgid "Extra"
-msgstr "Supplémentaire"
-msgid "File device URIs have been disabled! To enable, see the FileDevice directive in \"%s/cupsd.conf\"."
-msgstr "Le dispositif URIs de dossier ont été neutralisés!  Pour permettre, voyez la directive de FileDevice dans \"%s/cupsd.conf\"."
-msgid "General"
-msgstr "Généralités"
-msgid "Got a printer-uri attribute but no job-id!"
-msgstr "N'a obtenu un attribut de printer-uri mais aucune job-id!"
-msgid "Job #%d cannot be restarted - no files!"
-msgstr "Le travail # %d ne peuvent pas être remis en marche - aucuns dossiers!"
-msgid "Job #%d does not exist!"
-msgstr "Le travail # %d n'existe pas!"
-msgid "Job #%d doesn't exist!"
-msgstr "Le travail # %d n'existe pas!"
-msgid "Job #%d is already %s - can't cancel."
-msgstr "Le travail # %d est déjà %s - ne peut pas décommander."
-msgid "Job #%d is finished and cannot be altered!"
-msgstr "Le travail # %d est fini et ne peut pas être changé!"
-msgid "Job #%d is not complete!"
-msgstr "Le travail # %d n'est pas complet!"
-msgid "Job #%d is not held for authentication!"
-msgstr "Le travail # %d n'est pas tenu pour l'authentification!"
-msgid "Job #%d is not held!"
-msgstr "Le travail # %d n'est pas tenu!"
-msgid "Job #%s does not exist!"
-msgstr "Le travail # %s n'existe pas!"
-msgid "Job %d not found!"
-msgstr "Le travail %d non trouvé!"
-msgid "Job is completed and cannot be changed."
-msgstr "Le travail est accompli et ne peut pas être changé."
-msgid "Job state cannot be changed."
-msgstr "L'état du travail ne peut pas être changé."
-msgid "Language \"%s\" not supported!"
-msgstr "Langue \"%s\" non soutenue!"
-msgid "Media Size"
-msgstr "Taille De Médias"
-msgid "Media Source"
-msgstr "Source De Médias"
-msgid "Media Type"
-msgstr "Type De Supports"
-msgid "Missing requesting-user-name attribute!"
-msgstr "Attribut absent de requesting-user-name!"
-msgid "Missing required attributes!"
-msgstr "Attributs requis manquants!"
-msgid "No"
-msgstr "Non"
-msgid "No active jobs on %s!"
-msgstr "Aucuns JOBS actifs sur %s!"
-msgid "No attributes in request!"
-msgstr "Aucuns attributs dans la demande!"
-msgid "No default printer"
-msgstr "Aucun imprimeur de défaut"
-msgid "No destinations added."
-msgstr "Aucunes destinations supplémentaires."
-msgid "No file!?!"
-msgstr "Aucun dossier!?!"
-msgid "No subscription attributes in request!"
-msgstr "Aucuns attributs d'abonnement dans la demande!"
-msgid "No subscriptions found."
-msgstr "Abonnement n'a pas trouvé."
-msgid "Not authorized to hold job #%d owned by \"%s\"!"
-msgstr "Non autorisé à juger le travail # %d possédés par \"%s\"!"
+msgstr ""
+"Project-Id-Version: CUPS 1.2\n"
+"Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
+"POT-Creation-Date: 2006-01-08 18:06-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: cgi-bin/admin.c:1276
 msgid "Options Installed"
 msgstr "Options Installées"
-msgid "Output Mode"
-msgstr "Mode De Rendement"
+
+#: cgi-bin/classes.c:103
+msgid "Class"
+msgstr "Classe"
+
+#: cgi-bin/printers.c:104
 msgid "Printer"
 msgstr "Imprimeur"
-msgid "Printer not shared!"
-msgstr "Imprimeur non partagé!"
-msgid "Quota limit reached."
-msgstr "La limite de quote-part a atteint."
+
+#: cups/ppd.c:654 cups/ppd.c:1045
+msgid "Extra"
+msgstr "Supplémentaire"
+
+#: cups/ppd.c:656 cups/ppd.c:881 cups/ppd.c:1047
+msgid "General"
+msgstr "Généralités"
+
+#: cups/ppd.c:704 cups/ppd.c:1105
+msgid "Media Size"
+msgstr "Taille De Médias"
+
+#: cups/ppd.c:706 cups/ppd.c:1107
+msgid "Media Type"
+msgstr "Type De Supports"
+
+#: cups/ppd.c:708 cups/ppd.c:1109
+msgid "Media Source"
+msgstr "Source De Médias"
+
+#: cups/ppd.c:710 cups/ppd.c:1111
+msgid "Output Mode"
+msgstr "Mode De Rendement"
+
+#: cups/ppd.c:712 cups/ppd.c:1113
 msgid "Resolution"
 msgstr "Résolution"
-msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
-msgstr "L'attribut de notify-lease-duration ne peut pas être employé avec des abonnements du travail."
-msgid "The notify-user-data value is too large (%d > 63 octets)!"
-msgstr "La valeur de notify-user-data est trop grande (%d > 63 octets)!"
-msgid "The printer or class is not shared!"
-msgstr "L'imprimeur ou la classe n'est pas partagé!"
-msgid "The printer or class was not found."
-msgstr "L'imprimeur ou la classe n'a pas été trouvé."
-msgid "The printer-uri \"%s\" contains invalid characters."
-msgstr "L'printer-uri \"%s\" contient les caractères inadmissibles."
-msgid "The printer-uri \"%s\" is not valid."
-msgstr "L'printer-uri \"%s\" est inadmissible."
-msgid "The printer-uri attribute is required!"
-msgstr "L'attribut de printer-uri est exigé!"
-msgid "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
-msgstr "L'printer-uri doit être de la forme \"ipp://HOSTNAME/classes/CLASSNAME\"."
-msgid "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
-msgstr "L'printer-uri doit être de la forme \"ipp://HOSTNAME/printers/PRINTERNAME\"."
-msgid "Too many active jobs."
-msgstr "Trop de JOBS actifs."
-msgid "Too many jobs - %d jobs, max jobs is %d."
-msgstr "Trop de travaux - les travaux de %d, les travaux maximum est %d."
-msgid "Unable to add job for destination \"%s\"!"
-msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
-msgid "Unable to allocate memory for file types!"
-msgstr "Incapable d'assigner la mémoire pour des types de dossier!"
-msgid "Unable to copy PPD file - %s!"
-msgstr "Incapable de copier le dossier de PPD - %s!"
-msgid "Unable to copy PPD file!"
-msgstr "Incapable de copier le dossier de PPD!"
-msgid "Unable to copy interface script - %s!"
-msgstr "Incapable de copier le manuscrit d'interface - %s!"
-msgid "Unknown printer-error-policy \"%s\"."
-msgstr "printer-error-policy inconnue \"%s\"."
-msgid "Unknown printer-op-policy \"%s\"."
-msgstr "printer-op-policy inconnue \"%s\"."
-msgid "Unsupported compression \"%s\"!"
-msgstr "Compression non soutenue \"%s\"!"
-msgid "Unsupported compression attribute %s!"
-msgstr "Attribut non soutenu %s de compression!"
-msgid "Unsupported format \"%s\"!"
-msgstr "Format non soutenu \"%s\"!"
-msgid "Unsupported format '%s/%s'!"
-msgstr "Format non soutenu '%s/%s '!"
+
+#: cups/ppd.c:907
 msgid "Variable"
 msgstr "Variable"
+
+#: cups/ppd.c:1535
 msgid "Yes"
 msgstr "Oui"
-msgid "You are not authorized to alter job id %d owned by \"%s\"!"
-msgstr "Vous n'êtes pas autorisés à changer l'identification de travail %d possédée par \"%s\"!"
-msgid "You are not authorized to authenticate job #%d owned by \"%s\"!"
-msgstr "Vous n'êtes pas autorisés à authentifier le travail # %d possédés par \"%s\"!"
-msgid "You are not authorized to delete job #%d owned by \"%s\"!"
-msgstr "Vous n'êtes pas autorisés à supprimer le travail # %d possédés par \"%s\"!"
-msgid "You are not authorized to move job #%d owned by \"%s\"!"
-msgstr "Vous n'êtes pas autorisés à déplacer le travail # %d possédés par \"%s\"!"
-msgid "You are not authorized to release job id %d owned by \"%s\"!"
-msgstr "Vous n'êtes pas autorisés à libérer l'identification de travail %d possédée par \"%s\"!"
-msgid "You are not authorized to restart job id %d owned by \"%s\"!"
-msgstr "Vous n'êtes pas autorisés à remettre en marche l'identification de travail %d possédée par \"%s\"!"
-msgid "You are not authorized to send document for job #%d owned by \"%s\"!"
-msgstr "Vous n'êtes pas autorisés à envoyer le document pour le travail # %d possédés par \"%s\"!"
+
+#: cups/ppd.c:1537
+msgid "No"
+msgstr "Non"
+
+#: cups/ppd.c:1824
+msgid "Auto"
+msgstr "Automobile"
+
+#: scheduler/client.c:2247
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page."
+msgstr ""
+"Entrez votre username et mot de passe ou le username de racine et le mot de "
+"passe pour accéder à cette page."
+
+#: scheduler/client.c:2252
 msgid "You must use a https: URL to access this page."
 msgstr "Vous devez employer des https:  URL pour accéder à cette page."
-msgid "add_class: Unknown printer-error-policy \"%s\"."
-msgstr "add_class:  printer-error-policy inconnue \"%s\"."
+
+#: scheduler/ipp.c:236
+#, c-format
+msgid "Bad request version number %d.%d!"
+msgstr "Mauvais nombre de version de demande %d.%d!"
+
+#: scheduler/ipp.c:246
+msgid "No attributes in request!"
+msgstr "Aucuns attributs dans la demande!"
+
+#: scheduler/ipp.c:269
+#, c-format
+msgid "Attribute groups are out of order (%x < %x)!"
+msgstr "Les groupes d'attribut sont en panne (%x < %x)!"
+
+#: scheduler/ipp.c:379
+msgid "Missing required attributes!"
+msgstr "Attributs requis manquants!"
+
+#: scheduler/ipp.c:575
+#, c-format
+msgid "%s not supported!"
+msgstr "%s non soutenu!"
+
+#: scheduler/ipp.c:684 scheduler/ipp.c:1055 scheduler/ipp.c:2271
+#: scheduler/ipp.c:2383 scheduler/ipp.c:3707 scheduler/ipp.c:4417
+#: scheduler/ipp.c:4649 scheduler/ipp.c:5002 scheduler/ipp.c:5445
+#: scheduler/ipp.c:5890 scheduler/ipp.c:6245 scheduler/ipp.c:6609
+#: scheduler/ipp.c:7308 scheduler/ipp.c:8179 scheduler/ipp.c:8585
+#: scheduler/ipp.c:8663 scheduler/ipp.c:8836
+msgid "The printer or class was not found."
+msgstr "L'imprimeur ou la classe n'a pas été trouvé."
+
+#: scheduler/ipp.c:762
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr ""
+"L'printer-uri doit être de la forme \"ipp://HOSTNAME/classes/CLASSNAME\"."
+
+#: scheduler/ipp.c:778 scheduler/ipp.c:1454
+#, c-format
+msgid "The printer-uri \"%s\" contains invalid characters."
+msgstr "L'printer-uri \"%s\" contient les caractères inadmissibles."
+
+#: scheduler/ipp.c:811
+#, c-format
+msgid "A printer named \"%s\" already exists!"
+msgstr "Un imprimeur appelé \"%s\" existe déjà!"
+
+#: scheduler/ipp.c:904
+#, c-format
+msgid "Attempt to set %s printer-state to bad value %d!"
+msgstr "Essayez de placer l'imprimeur-état de %s à la mauvaise valeur %d!"
+
+#: scheduler/ipp.c:1000
+#, c-format
 msgid "add_class: Unknown printer-op-policy \"%s\"."
 msgstr "add_class:  printer-op-policy inconnue \"%s\"."
-msgid "cups-deviced failed to execute."
-msgstr "les cups-deviced ne se sont pas exécutées."
-msgid "cups-driverd failed to execute."
-msgstr "les cups-driverd ne se sont pas exécutées."
-msgid "job-printer-uri attribute missing!"
-msgstr "disparus d'attribut de job-printer-uri!"
+
+#: scheduler/ipp.c:1013
+#, c-format
+msgid "add_class: Unknown printer-error-policy \"%s\"."
+msgstr "add_class:  printer-error-policy inconnue \"%s\"."
+
+#: scheduler/ipp.c:1144
+msgid "Unable to allocate memory for file types!"
+msgstr "Incapable d'assigner la mémoire pour des types de dossier!"
+
+#: scheduler/ipp.c:1290 scheduler/ipp.c:4501
+#, c-format
+msgid "Character set \"%s\" not supported!"
+msgstr "Jeu de caractères \"%s\" non soutenu!"
+
+#: scheduler/ipp.c:1299 scheduler/ipp.c:4510
+#, c-format
+msgid "Language \"%s\" not supported!"
+msgstr "Langue \"%s\" non soutenue!"
+
+#: scheduler/ipp.c:1309 scheduler/ipp.c:4520
+#, c-format
+msgid "The notify-user-data value is too large (%d > 63 octets)!"
+msgstr "La valeur de notify-user-data est trop grande (%d > 63 octets)!"
+
+#: scheduler/ipp.c:1326
+msgid ""
+"The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr ""
+"L'attribut de notify-lease-duration ne peut pas être employé avec des "
+"abonnements du travail."
+
+#: scheduler/ipp.c:1438
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgstr ""
+"L'printer-uri doit être de la forme \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+
+#: scheduler/ipp.c:1487
+#, c-format
+msgid "A class named \"%s\" already exists!"
+msgstr "Une classe appelée \"%s\" existe déjà!"
+
+#: scheduler/ipp.c:1575
+#, c-format
+msgid ""
+"File device URIs have been disabled! To enable, see the FileDevice directive "
+"in \"%s/cupsd.conf\"."
+msgstr ""
+"Le dispositif URIs de dossier ont été neutralisés!  Pour permettre, voyez la "
+"directive de FileDevice dans \"%s/cupsd.conf\"."
+
+#: scheduler/ipp.c:1595
+#, c-format
+msgid "Bad device-uri \"%s\"!"
+msgstr "Mauvais device-uri \"%s\"!"
+
+#: scheduler/ipp.c:1626
+#, c-format
+msgid "Bad port-monitor \"%s\"!"
+msgstr "Mauvais port-monitor \"%s\"!"
+
+#: scheduler/ipp.c:1669
+#, c-format
+msgid "Bad printer-state value %d!"
+msgstr "Mauvaise valeur %d de printer-state!"
+
+#: scheduler/ipp.c:1762
+#, c-format
+msgid "Unknown printer-op-policy \"%s\"."
+msgstr "printer-op-policy inconnue \"%s\"."
+
+#: scheduler/ipp.c:1775
+#, c-format
+msgid "Unknown printer-error-policy \"%s\"."
+msgstr "printer-error-policy inconnue \"%s\"."
+
+#: scheduler/ipp.c:1837
+#, c-format
+msgid "Unable to copy interface script - %s!"
+msgstr "Incapable de copier le manuscrit d'interface - %s!"
+
+#: scheduler/ipp.c:1862
+#, c-format
+msgid "Unable to copy PPD file - %s!"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: scheduler/ipp.c:1915
+msgid "Unable to copy PPD file!"
+msgstr "Incapable de copier le dossier de PPD!"
+
+#: scheduler/ipp.c:2076 scheduler/ipp.c:2364 scheduler/ipp.c:5188
+#: scheduler/ipp.c:6008 scheduler/ipp.c:6147 scheduler/ipp.c:7394
+#: scheduler/ipp.c:7538 scheduler/ipp.c:7776 scheduler/ipp.c:8261
+msgid "Got a printer-uri attribute but no job-id!"
+msgstr "N'a obtenu un attribut de printer-uri mais aucune job-id!"
+
+#: scheduler/ipp.c:2097 scheduler/ipp.c:2433 scheduler/ipp.c:5210
+#: scheduler/ipp.c:6029 scheduler/ipp.c:6169 scheduler/ipp.c:7416
+#: scheduler/ipp.c:7560 scheduler/ipp.c:7797 scheduler/ipp.c:8282
+#, c-format
+msgid "Bad job-uri attribute \"%s\"!"
+msgstr "Mauvais attribut \"%s\" de job-uri!"
+
+#: scheduler/ipp.c:2116 scheduler/ipp.c:2451 scheduler/ipp.c:5228
+#: scheduler/ipp.c:6047 scheduler/ipp.c:6188 scheduler/ipp.c:7434
+#: scheduler/ipp.c:7578 scheduler/ipp.c:7815 scheduler/ipp.c:8300
+#, c-format
+msgid "Job #%d doesn't exist!"
+msgstr "Le travail # %d n'existe pas!"
+
+#: scheduler/ipp.c:2131
+#, c-format
+msgid "Job #%d is not held for authentication!"
+msgstr "Le travail # %d n'est pas tenu pour l'authentification!"
+
+#: scheduler/ipp.c:2153
+#, c-format
+msgid "You are not authorized to authenticate job #%d owned by \"%s\"!"
+msgstr ""
+"Vous n'êtes pas autorisés à authentifier le travail # %d possédés par \"%s\"!"
+
+#: scheduler/ipp.c:2221
+msgid "The printer-uri attribute is required!"
+msgstr "L'attribut de printer-uri est exigé!"
+
+#: scheduler/ipp.c:2238
+msgid "Missing requesting-user-name attribute!"
+msgstr "Attribut absent de requesting-user-name!"
+
+#: scheduler/ipp.c:2277
+#, c-format
+msgid "The printer-uri \"%s\" is not valid."
+msgstr "L'printer-uri \"%s\" est inadmissible."
+
+#: scheduler/ipp.c:2410
+#, c-format
+msgid "No active jobs on %s!"
+msgstr "Aucuns JOBS actifs sur %s!"
+
+#: scheduler/ipp.c:2462
+#, c-format
+msgid "You are not authorized to delete job #%d owned by \"%s\"!"
+msgstr ""
+"Vous n'êtes pas autorisés à supprimer le travail # %d possédés par \"%s\"!"
+
+#: scheduler/ipp.c:2476
+#, c-format
+msgid "Job #%d is already %s - can't cancel."
+msgstr "Le travail # %d est déjà %s - ne peut pas décommander."
+
+#: scheduler/ipp.c:3720
+msgid "The printer or class is not shared!"
+msgstr "L'imprimeur ou la classe n'est pas partagé!"
+
+#: scheduler/ipp.c:3746 scheduler/ipp.c:6647
+#, c-format
+msgid "Destination \"%s\" is not accepting jobs."
+msgstr "La destination \"%s\" n'accepte pas les travaux."
+
+#: scheduler/ipp.c:3759 scheduler/ipp.c:6443
+#, c-format
+msgid "Bad copies value %d."
+msgstr "Mauvaise valeur %d de copies."
+
+#: scheduler/ipp.c:3775 scheduler/ipp.c:6459
+#, c-format
+msgid "Bad page-ranges values %d-%d."
+msgstr "Mauvaises valeurs %d-%d de page-ranges."
+
+#: scheduler/ipp.c:3795
+msgid "Too many active jobs."
+msgstr "Trop de JOBS actifs."
+
+#: scheduler/ipp.c:3801 scheduler/ipp.c:6668
+msgid "Quota limit reached."
+msgstr "La limite de quote-part a atteint."
+
+#: scheduler/ipp.c:3824 scheduler/ipp.c:6691
+#, c-format
+msgid "Unable to add job for destination \"%s\"!"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: scheduler/ipp.c:4469
+msgid "No subscription attributes in request!"
+msgstr "Aucuns attributs d'abonnement dans la demande!"
+
+#: scheduler/ipp.c:4559
 msgid "notify-events not specified!"
 msgstr "notify-events non indiqués!"
+
+#: scheduler/ipp.c:4577
+#, c-format
+msgid "Job %d not found!"
+msgstr "Le travail %d non trouvé!"
+
+#: scheduler/ipp.c:4827
+msgid "No default printer"
+msgstr "Aucun imprimeur de défaut"
+
+#: scheduler/ipp.c:4930
+msgid "cups-deviced failed to execute."
+msgstr "les cups-deviced ne se sont pas exécutées."
+
+#: scheduler/ipp.c:5393
+msgid "cups-driverd failed to execute."
+msgstr "les cups-driverd ne se sont pas exécutées."
+
+#: scheduler/ipp.c:5571
+msgid "No destinations added."
+msgstr "Aucunes destinations supplémentaires."
+
+#: scheduler/ipp.c:5794
+#, c-format
 msgid "notify-subscription-id %d no good!"
 msgstr "notify-subscription-id %d aucun bon!"
+
+#: scheduler/ipp.c:5878
+#, c-format
+msgid "Job #%s does not exist!"
+msgstr "Le travail # %s n'existe pas!"
+
+#: scheduler/ipp.c:5900 scheduler/ipp.c:2116 scheduler/ipp.c:2451
+#: scheduler/ipp.c:5228 scheduler/ipp.c:6047 scheduler/ipp.c:6188
+#: scheduler/ipp.c:7434 scheduler/ipp.c:7578 scheduler/ipp.c:7815
+#: scheduler/ipp.c:8300
+#, c-format
+msgid "Job #%d does not exist!"
+msgstr "Le travail # %d n'existe pas!"
+
+#: scheduler/ipp.c:5969
+msgid "No subscriptions found."
+msgstr "Abonnement n'a pas trouvé."
+
+#: scheduler/ipp.c:6058
+#, c-format
+msgid "Not authorized to hold job #%d owned by \"%s\"!"
+msgstr "Non autorisé à juger le travail # %d possédés par \"%s\"!"
+
+#: scheduler/ipp.c:6203 scheduler/ipp.c:8315
+#, c-format
+msgid "Job #%d is finished and cannot be altered!"
+msgstr "Le travail # %d est fini et ne peut pas être changé!"
+
+#: scheduler/ipp.c:6215
+#, c-format
+msgid "You are not authorized to move job #%d owned by \"%s\"!"
+msgstr ""
+"Vous n'êtes pas autorisés à déplacer le travail # %d possédés par \"%s\"!"
+
+#: scheduler/ipp.c:6228
+msgid "job-printer-uri attribute missing!"
+msgstr "disparus d'attribut de job-printer-uri!"
+
+#: scheduler/ipp.c:6485 scheduler/ipp.c:7847
+#, c-format
+msgid "Unsupported compression \"%s\"!"
+msgstr "Compression non soutenue \"%s\"!"
+
+#: scheduler/ipp.c:6504 scheduler/ipp.c:7866
+msgid "No file!?!"
+msgstr "Aucun dossier!?!"
+
+#: scheduler/ipp.c:6522
+#, c-format
+msgid "Could not scan type \"%s\"!"
+msgstr "N'a pas pu balayer le type \"%s\"!"
+
+#: scheduler/ipp.c:6574 scheduler/ipp.c:7936
+#, c-format
+msgid "Unsupported format '%s/%s'!"
+msgstr "Format non soutenu '%s/%s '!"
+
+#: scheduler/ipp.c:6621
+msgid "Printer not shared!"
+msgstr "Imprimeur non partagé!"
+
+#: scheduler/ipp.c:6661
+#, c-format
+msgid "Too many jobs - %d jobs, max jobs is %d."
+msgstr "Trop de travaux - les travaux de %d, les travaux maximum est %d."
+
+#: scheduler/ipp.c:7448
+#, c-format
+msgid "Job #%d is not held!"
+msgstr "Le travail # %d n'est pas tenu!"
+
+#: scheduler/ipp.c:7459
+#, c-format
+msgid "You are not authorized to release job id %d owned by \"%s\"!"
+msgstr ""
+"Vous n'êtes pas autorisés à libérer l'identification de travail %d possédée "
+"par \"%s\"!"
+
+#: scheduler/ipp.c:7592
+#, c-format
+msgid "Job #%d is not complete!"
+msgstr "Le travail # %d n'est pas complet!"
+
+#: scheduler/ipp.c:7608
+#, c-format
+msgid "Job #%d cannot be restarted - no files!"
+msgstr "Le travail # %d ne peuvent pas être remis en marche - aucuns dossiers!"
+
+#: scheduler/ipp.c:7619
+#, c-format
+msgid "You are not authorized to restart job id %d owned by \"%s\"!"
+msgstr ""
+"Vous n'êtes pas autorisés à remettre en marche l'identification de travail %"
+"d possédée par \"%s\"!"
+
+#: scheduler/ipp.c:7826
+#, c-format
+msgid "You are not authorized to send document for job #%d owned by \"%s\"!"
+msgstr ""
+"Vous n'êtes pas autorisés à envoyer le document pour le travail # %d "
+"possédés par \"%s\"!"
+
+#: scheduler/ipp.c:7883 scheduler/ipp.c:8803
+#, c-format
+msgid "Bad document-format \"%s\"!"
+msgstr "Mauvais document-format \"%s\"!"
+
+#: scheduler/ipp.c:8326
+#, c-format
+msgid "You are not authorized to alter job id %d owned by \"%s\"!"
+msgstr ""
+"Vous n'êtes pas autorisés à changer l'identification de travail %d possédée "
+"par \"%s\"!"
+
+#: scheduler/ipp.c:8371
+#, c-format
+msgid "%s cannot be changed."
+msgstr "%s ne peut pas être changé."
+
+#: scheduler/ipp.c:8387
+msgid "Bad job-priority value!"
+msgstr "Mauvaise valeur de job-priority!"
+
+#: scheduler/ipp.c:8395
+msgid "Job is completed and cannot be changed."
+msgstr "Le travail est accompli et ne peut pas être changé."
+
+#: scheduler/ipp.c:8409
+msgid "Bad job-state value!"
+msgstr "Mauvaise valeur de job-state!"
+
+#: scheduler/ipp.c:8423 scheduler/ipp.c:8435 scheduler/ipp.c:8446
+msgid "Job state cannot be changed."
+msgstr "L'état du travail ne peut pas être changé."
+
+#: scheduler/ipp.c:8787
+#, c-format
+msgid "Unsupported compression attribute %s!"
+msgstr "Attribut non soutenu %s de compression!"
+
+#: scheduler/ipp.c:8815
+#, c-format
+msgid "Unsupported format \"%s\"!"
+msgstr "Format non soutenu \"%s\"!"
+
+#: berkeley/lpc.c:201
+#, c-format
+msgid "%s is not implemented by the CUPS version of lpc.\n"
+msgstr ""
+
+#: berkeley/lpc.c:216
+msgid ""
+"Commands may be abbreviated.  Commands are:\n"
+"\n"
+"exit    help    quit    status  ?\n"
+msgstr ""
+
+#: berkeley/lpc.c:222
+msgid "help\t\tget help on commands\n"
+msgstr ""
+
+#: berkeley/lpc.c:225
+msgid "status\t\tshow status of daemon and queue\n"
+msgstr ""
+
+#: berkeley/lpc.c:228
+msgid "?Invalid help command unknown\n"
+msgstr ""
+
+#: berkeley/lpc.c:478 berkeley/lpc.c:490
+#, c-format
+msgid "\tprinter is on device '%s' speed -1\n"
+msgstr ""
+
+#: berkeley/lpc.c:496
+msgid "\tqueuing is enabled\n"
+msgstr ""
+
+#: berkeley/lpc.c:498
+msgid "\tqueuing is disabled\n"
+msgstr ""
+
+#: berkeley/lpc.c:501
+msgid "\tprinting is enabled\n"
+msgstr ""
+
+#: berkeley/lpc.c:503
+msgid "\tprinting is disabled\n"
+msgstr ""
+
+#: berkeley/lpc.c:506
+msgid "\tno entries\n"
+msgstr ""
+
+#: berkeley/lpc.c:508
+#, c-format
+msgid "\t%d entries\n"
+msgstr ""
+
+#: berkeley/lpc.c:510
+msgid "\tdaemon present\n"
+msgstr ""
+
+#: berkeley/lpq.c:94
+msgid "lpq: Unable to contact server!\n"
+msgstr ""
+
+#: berkeley/lpq.c:125 berkeley/lpr.c:114 berkeley/lprm.c:107
+#: systemv/accept.c:108 systemv/cancel.c:95 systemv/lpstat.c:115
+#: systemv/lpadmin.c:284 systemv/lp.c:135 systemv/lpinfo.c:80
+#: systemv/lpmove.c:84
+#, c-format
+msgid "%s: Sorry, no encryption support compiled in!\n"
+msgstr ""
+
+#: berkeley/lpq.c:155
+#, c-format
+msgid "lpq: Unknown destination \"%s/%s\"!\n"
+msgstr ""
+
+#: berkeley/lpq.c:159
+#, fuzzy, c-format
+msgid "lpq: Unknown destination \"%s\"!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: berkeley/lpq.c:211 systemv/lp.c:564
+#, c-format
+msgid ""
+"lp: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+
+#: berkeley/lpq.c:216
+msgid "lpq: error - no default destination available.\n"
+msgstr ""
+
+#: berkeley/lpq.c:363 berkeley/lpq.c:523
+#, c-format
+msgid "lpq: get-jobs failed: %s\n"
+msgstr ""
+
+#: berkeley/lpq.c:457
+msgid ""
+"Rank   Owner      Pri  Job        Files                       Total Size\n"
+msgstr ""
+
+#: berkeley/lpq.c:461
+msgid "Rank    Owner   Job     File(s)                         Total Size\n"
+msgstr ""
+
+#: berkeley/lpq.c:498
+#, c-format
+msgid "%s: %-33.33s [job %d localhost]\n"
+msgstr ""
+
+#: berkeley/lpq.c:500
+#, c-format
+msgid "        %-39.39s %.0f bytes\n"
+msgstr ""
+
+#: berkeley/lpq.c:506
+#, c-format
+msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
+msgstr ""
+
+#: berkeley/lpq.c:511
+#, c-format
+msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
+msgstr ""
+
+#: berkeley/lpq.c:529
+msgid "no entries\n"
+msgstr ""
+
+#: berkeley/lpq.c:591 berkeley/lpq.c:620
+#, c-format
+msgid "lpq: get-printer-attributes failed: %s\n"
+msgstr ""
+
+#: berkeley/lpq.c:605
+#, c-format
+msgid "%s is ready\n"
+msgstr ""
+
+#: berkeley/lpq.c:608
+#, c-format
+msgid "%s is ready and printing\n"
+msgstr ""
+
+#: berkeley/lpq.c:612
+#, fuzzy, c-format
+msgid "%s is not ready\n"
+msgstr "Le travail # %d n'est pas tenu!"
+
+#: berkeley/lpq.c:633
+msgid "Usage: lpq [-P dest] [-l] [+interval]\n"
+msgstr ""
+
+#: berkeley/lpr.c:132
+#, c-format
+msgid "lpr: error - expected value after -%c option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:146
+#, c-format
+msgid ""
+"lpr: warning - '%c' format modifier not supported - output may not be "
+"correct!\n"
+msgstr ""
+
+#: berkeley/lpr.c:159
+msgid "lpr: error - expected option=value after -o option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:185
+msgid "lpr: warning - email notification is not currently supported!\n"
+msgstr ""
+
+#: berkeley/lpr.c:207
+msgid "lpr: error - expected destination after -P option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:240
+msgid "lpr: error - expected copy count after -# option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:263
+#, c-format
+msgid "lpr: error - expected name after -%c option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:281
+msgid "lpr: error - expected username after -U option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:292
+#, c-format
+msgid "lpr: error - unknown option '%c'!\n"
+msgstr ""
+
+#: berkeley/lpr.c:305
+#, c-format
+msgid "lpr: error - unable to access \"%s\" - %s\n"
+msgstr ""
+
+#: berkeley/lpr.c:323
+#, c-format
+msgid "lpr: error - too many files - \"%s\"\n"
+msgstr ""
+
+#: berkeley/lpr.c:364
+#, c-format
+msgid ""
+"lpr: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+
+#: berkeley/lpr.c:369
+msgid "lpr: error - no default destination available.\n"
+msgstr ""
+
+#: berkeley/lpr.c:372
+msgid "lpr: error - scheduler not responding!\n"
+msgstr ""
+
+#: berkeley/lpr.c:421
+#, c-format
+msgid "lpr: error - unable to create temporary file \"%s\" - %s\n"
+msgstr ""
+
+#: berkeley/lpr.c:431
+#, c-format
+msgid "lpr: error - unable to write to temporary file \"%s\" - %s\n"
+msgstr ""
+
+#: berkeley/lpr.c:445
+msgid "lpr: error - stdin is empty, so no job has been sent.\n"
+msgstr ""
+
+#: berkeley/lpr.c:461
+#, c-format
+msgid "lpr: error - unable to print file: %s\n"
+msgstr ""
+
+#: berkeley/lprm.c:87
+msgid "lprm: Unable to contact server!\n"
+msgstr ""
+
+#: berkeley/lprm.c:127
+#, c-format
+msgid "lprm: Unknown destination \"%s\"!\n"
+msgstr ""
+
+#: berkeley/lprm.c:136
+#, c-format
+msgid "lprm: Unknown option '%c'!\n"
+msgstr ""
+
+#: berkeley/lprm.c:223
+#, fuzzy
+msgid "lprm: Job or printer not found!\n"
+msgstr "Le travail %d non trouvé!"
+
+#: berkeley/lprm.c:227
+#, fuzzy
+msgid "lprm: Not authorized to lprm job(s)!\n"
+msgstr "Non autorisé à juger le travail # %d possédés par \"%s\"!"
+
+#: berkeley/lprm.c:231
+#, c-format
+msgid "lprm: You don't own job ID %d!\n"
+msgstr ""
+
+#: berkeley/lprm.c:236
+msgid "lprm: Unable to lprm job(s)!\n"
+msgstr ""
+
+#: berkeley/lprm.c:253 berkeley/lprm.c:269
+msgid "lprm: Unable to cancel job(s)!\n"
+msgstr ""
+
+#: systemv/accept.c:84
+#, c-format
+msgid "%s: Don't know what to do!\n"
+msgstr ""
+
+#: systemv/accept.c:129
+#, c-format
+msgid "%s: Expected server name after -h!\n"
+msgstr ""
+
+#: systemv/accept.c:147
+#, c-format
+msgid "%s: Expected reason text after -r!\n"
+msgstr ""
+
+#: systemv/accept.c:157
+#, c-format
+msgid "%s: Unknown option '%c'!\n"
+msgstr ""
+
+#: systemv/accept.c:173
+#, c-format
+msgid "%s: Unable to connect to server: %s\n"
+msgstr ""
+
+#: systemv/accept.c:217 systemv/accept.c:227 systemv/accept.c:268
+#: systemv/accept.c:278
+#, c-format
+msgid "%s: Operation failed: %s\n"
+msgstr ""
+
+#: systemv/cancel.c:118
+msgid "cancel: Error - expected hostname after '-h' option!\n"
+msgstr ""
+
+#: systemv/cancel.c:139
+msgid "cancel: Error - expected username after '-u' option!\n"
+msgstr ""
+
+#: systemv/cancel.c:150
+#, c-format
+msgid "cancel: Unknown option '%c'!\n"
+msgstr ""
+
+#: systemv/cancel.c:207
+#, fuzzy, c-format
+msgid "cancel: Unknown destination \"%s\"!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/cancel.c:229 systemv/cancel.c:319
+msgid "cancel: Unable to contact server!\n"
+msgstr ""
+
+#: systemv/cancel.c:295 systemv/cancel.c:370
+#, c-format
+msgid "cancel: %s failed: %s\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:290
+#, c-format
+msgid "cupsaddsmb: Missing value on line %d!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:301
+#, c-format
+msgid "cupsaddsmb: Missing double quote on line %d!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:313
+#, c-format
+msgid "cupsaddsmb: Bad option + choice on line %d!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:496
+#, c-format
+msgid "cupsaddsmb: Unable to connect to server \"%s\" for %s - %s\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:509
+#, c-format
+msgid "cupsaddsmb: No PPD file for printer \"%s\" - skipping!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:548 systemv/cupsaddsmb.c:562
+#, c-format
+msgid "cupsaddsmb: get-printer-attributes failed for \"%s\": %s\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:578
+#, fuzzy, c-format
+msgid "cupsaddsmb: Unable to convert PPD file for %s - %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: systemv/cupsaddsmb.c:633
+#, c-format
+msgid "cupsaddsmb: Unable to copy Windows 2000 printer driver files (%d)!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:660
+#, c-format
+msgid "cupsaddsmb: Unable to copy CUPS printer driver files (%d)!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:697
+#, c-format
+msgid "cupsaddsmb: Unable to install Windows 2000 printer driver files (%d)!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:727
+#, c-format
+msgid "cupsaddsmb: Unable to copy Windows 9x printer driver files (%d)!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:750
+#, c-format
+msgid "cupsaddsmb: Unable to install Windows 9x printer driver files (%d)!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:771
+#, c-format
+msgid "cupsaddsmb: Unable to set Windows printer driver (%d)!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:854
+msgid ""
+"Usage: cupsaddsmb [options] printer1 ... printerN\n"
+"       cupsaddsmb [options] -a\n"
+"\n"
+"Options:\n"
+"  -H samba-server  Use the named SAMBA server\n"
+"  -U samba-user    Authenticate using the named SAMBA user\n"
+"  -a               Export all printers\n"
+"  -h cups-server   Use the named CUPS server\n"
+"  -v               Be verbose (show commands)\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:120
+msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:136
+msgid "cupstestppd: The -v option is incompatible with the -q option.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:193
+#, fuzzy, c-format
+msgid ""
+" FAIL\n"
+"      **FAIL**  Unable to open PPD file - %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: systemv/cupstestppd.c:204
+#, c-format
+msgid ""
+" FAIL\n"
+"      **FAIL**  Unable to open PPD file - %s on line %d.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:213
+msgid "                REF: Page 42, section 5.2.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:217
+msgid "                REF: Page 20, section 3.4.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:222
+msgid "                REF: Pages 45-46, section 5.2.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:227
+msgid "                REF: Pages 42-45, section 5.2.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:231
+msgid "                REF: Pages 48-49, section 5.2.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:235
+msgid "                REF: Pages 52-54, section 5.2.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:239
+msgid "                REF: Page 15, section 3.2.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:243 systemv/cupstestppd.c:247
+msgid "                REF: Page 15, section 3.1.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:251
+msgid "                REF: Pages 16-17, section 3.2.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:255
+msgid "                REF: Page 19, section 3.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:259
+msgid "                REF: Page 27, section 3.5.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:280
+msgid ""
+"\n"
+"    DETAILED CONFORMANCE TEST RESULTS\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:307
+#, c-format
+msgid "        WARN    %s has no corresponding options!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:318 systemv/cupstestppd.c:333
+#: systemv/cupstestppd.c:354 systemv/cupstestppd.c:369
+#: systemv/cupstestppd.c:397 systemv/cupstestppd.c:417
+#: systemv/cupstestppd.c:439 systemv/cupstestppd.c:459
+#: systemv/cupstestppd.c:479 systemv/cupstestppd.c:499
+#: systemv/cupstestppd.c:517 systemv/cupstestppd.c:535
+#: systemv/cupstestppd.c:556 systemv/cupstestppd.c:575
+#: systemv/cupstestppd.c:595 systemv/cupstestppd.c:615
+#: systemv/cupstestppd.c:635 systemv/cupstestppd.c:655
+#: systemv/cupstestppd.c:673 systemv/cupstestppd.c:690
+#: systemv/cupstestppd.c:712 systemv/cupstestppd.c:730
+#: systemv/cupstestppd.c:747 systemv/cupstestppd.c:765
+#: systemv/cupstestppd.c:781 systemv/cupstestppd.c:801
+#: systemv/cupstestppd.c:832 systemv/cupstestppd.c:854
+#: systemv/cupstestppd.c:902 systemv/cupstestppd.c:931
+#: systemv/cupstestppd.c:952
+msgid " FAIL\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:321
+msgid ""
+"      **FAIL**  REQUIRED DefaultImageableArea\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:336
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultImageableArea %s!\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:346
+msgid "        PASS    DefaultImageableArea\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:357
+msgid ""
+"      **FAIL**  REQUIRED DefaultPaperDimension\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:372
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultPaperDimension %s!\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:380
+msgid "        PASS    DefaultPaperDimension\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:400
+#, c-format
+msgid ""
+"      **FAIL**  BAD Default%s %s\n"
+"                REF: Page 40, section 4.5.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:409
+#, c-format
+msgid "        PASS    Default%s\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:420
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED Default%s\n"
+"                REF: Page 40, section 4.5.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:432
+msgid "        PASS    FileVersion\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:442
+msgid ""
+"      **FAIL**  REQUIRED FileVersion\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:452
+msgid "        PASS    FormatVersion\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:462
+msgid ""
+"      **FAIL**  REQUIRED FormatVersion\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:472
+msgid "        PASS    LanguageEncoding\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:482
+msgid ""
+"      **FAIL**  REQUIRED LanguageEncoding\n"
+"                REF: Pages 56-57, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:492
+msgid "        PASS    LanguageVersion\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:502
+msgid ""
+"      **FAIL**  REQUIRED LanguageVersion\n"
+"                REF: Pages 57-58, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:520
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:528
+msgid "        PASS    Manufacturer\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:538
+msgid ""
+"      **FAIL**  REQUIRED Manufacturer\n"
+"                REF: Pages 58-59, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:559
+#, c-format
+msgid ""
+"      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
+"                REF: Pages 59-60, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:568
+msgid "        PASS    ModelName\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:578
+msgid ""
+"      **FAIL**  REQUIRED ModelName\n"
+"                REF: Pages 59-60, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:588
+msgid "        PASS    NickName\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:598
+msgid ""
+"      **FAIL**  REQUIRED NickName\n"
+"                REF: Page 60, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:608
+msgid "        PASS    PageSize\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:618
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Pages 99-100, section 5.14.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:628
+msgid "        PASS    PageRegion\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:638
+msgid ""
+"      **FAIL**  REQUIRED PageRegion\n"
+"                REF: Page 100, section 5.14.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:648
+msgid "        PASS    PCFileName\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:658
+msgid ""
+"      **FAIL**  REQUIRED PCFileName\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:676
+msgid ""
+"      **FAIL**  BAD Product - not \"(string)\".\n"
+"                REF: Page 62, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:683
+msgid "        PASS    Product\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:693
+msgid ""
+"      **FAIL**  REQUIRED Product\n"
+"                REF: Page 62, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:715
+msgid ""
+"      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
+"                REF: Pages 62-64, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:723
+msgid "        PASS    PSVersion\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:733
+msgid ""
+"      **FAIL**  REQUIRED PSVersion\n"
+"                REF: Pages 62-64, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:750
+msgid ""
+"      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
+"                REF: Pages 64-65, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:758
+msgid "        PASS    ShortNickName\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:768
+msgid ""
+"      **FAIL**  REQUIRED ShortNickName\n"
+"                REF: Page 64-65, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:784
+msgid ""
+"      **FAIL**  BAD JobPatchFile attribute in file\n"
+"                REF: Page 24, section 3.4.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:804
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 99, section 5.14.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:835
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:857
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:905
+#, c-format
+msgid ""
+"      **FAIL**  Bad %s choice %s!\n"
+"                REF: Page 84, section 5.9\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:934
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED %s does not define choice None!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:955
+#, c-format
+msgid ""
+"      **FAIL**  Bad %s choice %s!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:967
+msgid " PASS\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:976
+#, c-format
+msgid ""
+"        WARN    Duplex option keyword %s should be named Duplex or "
+"JCLDuplex!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:986
+msgid "        WARN    Default choices conflicting!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:994
+#, c-format
+msgid ""
+"        WARN    Obsolete PPD version %.1f!\n"
+"                REF: Page 42, section 5.2.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1002
+msgid ""
+"        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
+"                REF: Pages 56-57, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1010
+msgid ""
+"        WARN    Manufacturer required by PPD 4.3 spec.\n"
+"                REF: Pages 58-59, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1023
+msgid ""
+"        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1031
+msgid ""
+"        WARN    ShortNickName required by PPD 4.3 spec.\n"
+"                REF: Pages 64-65, section 5.3.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1048
+msgid ""
+"        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
+"                REF: Pages 78-79, section 5.7.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1057
+msgid ""
+"        WARN    Protocols contains PJL but JCL attributes are not set.\n"
+"                REF: Pages 78-79, section 5.7.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1085
+#, c-format
+msgid ""
+"        WARN    %s shares a common prefix with %s\n"
+"                REF: Page 15, section 3.2.\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1097
+#, c-format
+msgid "    %d ERROR%s FOUND\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1100
+msgid "    NO ERRORS FOUND\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1360
+#, c-format
+msgid ""
+"        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
+"                (constraint=\"%s %s %s %s\")\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1376
+msgid ""
+"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
+"gz]]\n"
+"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
+msgstr ""
+
+#: systemv/lpstat.c:144 systemv/lpstat.c:155
+msgid "lpstat: Need \"completed\" or \"not-completed\" after -W!\n"
+msgstr ""
+
+#: systemv/lpstat.c:212
+msgid "lpstat: The -b option requires a destination argument.\n"
+msgstr ""
+
+#: systemv/lpstat.c:274 systemv/lpinfo.c:143 systemv/lpmove.c:105
+msgid "Error: need hostname after '-h' option!\n"
+msgstr ""
+
+#: systemv/lpstat.c:433
+#, c-format
+msgid "lpstat: Unknown option '%c'!\n"
+msgstr ""
+
+#: systemv/lpstat.c:504
+#, c-format
+msgid "lpstat: Invalid destination name in list \"%s\"!\n"
+msgstr ""
+
+#: systemv/lpstat.c:519
+#, fuzzy, c-format
+msgid "lpstat: Unknown destination \"%s\"!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/lpstat.c:541
+#, c-format
+msgid "lpstat: Unable to connect to server %s on port %d: %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:625 systemv/lpstat.c:773 systemv/lpstat.c:1187
+#: systemv/lpstat.c:1379 systemv/lpstat.c:1809 systemv/lpstat.c:2262
+#, c-format
+msgid "lpstat: get-printers failed: %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:741
+#, c-format
+msgid "%s accepting requests since Jan 01 00:00\n"
+msgstr ""
+
+#: systemv/lpstat.c:745
+#, c-format
+msgid ""
+"%s not accepting requests since Jan 01 00:00 -\n"
+"\t%s\n"
+msgstr ""
+
+#: systemv/lpstat.c:754
+#, c-format
+msgid "%s/%s accepting requests since Jan 01 00:00\n"
+msgstr ""
+
+#: systemv/lpstat.c:758
+#, c-format
+msgid ""
+"%s/%s not accepting requests since Jan 01 00:00 -\n"
+"\t%s\n"
+msgstr ""
+
+#: systemv/lpstat.c:861 systemv/lpstat.c:1056
+#, c-format
+msgid "lpstat: get-classes failed: %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1033
+#, c-format
+msgid "members of class %s:\n"
+msgstr ""
+
+#: systemv/lpstat.c:1080
+#, c-format
+msgid "system default destination: %s/%s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1083
+#, c-format
+msgid "system default destination: %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1105
+#, c-format
+msgid ""
+"lpstat: error - %s environment variable names non-existent destination \"%s"
+"\"!\n"
+msgstr ""
+
+#: systemv/lpstat.c:1109
+msgid "no system default destination\n"
+msgstr ""
+
+#: systemv/lpstat.c:1313
+#, c-format
+msgid "Output for printer %s is sent to remote printer %s on %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1319 systemv/lpstat.c:1323
+#, c-format
+msgid "Output for printer %s is sent to %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1331
+#, c-format
+msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1337 systemv/lpstat.c:1341
+#, c-format
+msgid "Output for printer %s/%s is sent to %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1346 systemv/lpstat.c:1349 systemv/lpstat.c:1352
+#, c-format
+msgid "device for %s: %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1359 systemv/lpstat.c:1362 systemv/lpstat.c:1365
+#, c-format
+msgid "device for %s/%s: %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1481 systemv/lpstat.c:1693
+#, c-format
+msgid "lpstat: get-jobs failed: %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:1681
+#, c-format
+msgid "\tqueued for %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:2037
+#, c-format
+msgid "printer %s is idle.  enabled since %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:2042
+#, c-format
+msgid "printer %s now printing %s-%d.  enabled since %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:2048
+#, c-format
+msgid "printer %s disabled since %s -\n"
+msgstr ""
+
+#: systemv/lpstat.c:2056 systemv/lpstat.c:2169
+msgid "\treason unknown\n"
+msgstr ""
+
+#: systemv/lpstat.c:2063 systemv/lpstat.c:2176
+msgid ""
+"\tForm mounted:\n"
+"\tContent types: any\n"
+"\tPrinter types: unknown\n"
+msgstr ""
+
+#: systemv/lpstat.c:2069 systemv/lpstat.c:2182
+#, c-format
+msgid "\tDescription: %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:2074 systemv/lpstat.c:2187
+msgid "\tAlerts:"
+msgstr ""
+
+#: systemv/lpstat.c:2083 systemv/lpstat.c:2196
+#, c-format
+msgid "\tLocation: %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:2088 systemv/lpstat.c:2201
+msgid "\tConnection: remote\n"
+msgstr ""
+
+#: systemv/lpstat.c:2092 systemv/lpstat.c:2205
+#, c-format
+msgid "\tInterface: %s.ppd\n"
+msgstr ""
+
+#: systemv/lpstat.c:2097 systemv/lpstat.c:2210
+msgid "\tConnection: direct\n"
+msgstr ""
+
+#: systemv/lpstat.c:2101 systemv/lpstat.c:2214
+#, c-format
+msgid "\tInterface: %s/interfaces/%s\n"
+msgstr ""
+
+#: systemv/lpstat.c:2105 systemv/lpstat.c:2218
+#, c-format
+msgid "\tInterface: %s/ppd/%s.ppd\n"
+msgstr ""
+
+#: systemv/lpstat.c:2107 systemv/lpstat.c:2220
+msgid "\tOn fault: no alert\n"
+msgstr ""
+
+#: systemv/lpstat.c:2108 systemv/lpstat.c:2221
+msgid "\tAfter fault: continue\n"
+msgstr ""
+
+#: systemv/lpstat.c:2112 systemv/lpstat.c:2126 systemv/lpstat.c:2225
+#: systemv/lpstat.c:2239
+msgid "\tUsers allowed:\n"
+msgstr ""
+
+#: systemv/lpstat.c:2119 systemv/lpstat.c:2232
+msgid "\tUsers denied:\n"
+msgstr ""
+
+#: systemv/lpstat.c:2127 systemv/lpstat.c:2240
+msgid "\t\t(all)\n"
+msgstr ""
+
+#: systemv/lpstat.c:2129 systemv/lpstat.c:2242
+msgid "\tForms allowed:\n"
+msgstr ""
+
+#: systemv/lpstat.c:2130 systemv/lpstat.c:2133 systemv/lpstat.c:2243
+#: systemv/lpstat.c:2246
+msgid "\t\t(none)\n"
+msgstr ""
+
+#: systemv/lpstat.c:2131 systemv/lpstat.c:2244
+msgid "\tBanner required\n"
+msgstr ""
+
+#: systemv/lpstat.c:2132 systemv/lpstat.c:2245
+msgid "\tCharset sets:\n"
+msgstr ""
+
+#: systemv/lpstat.c:2134 systemv/lpstat.c:2247
+msgid "\tDefault pitch:\n"
+msgstr ""
+
+#: systemv/lpstat.c:2135 systemv/lpstat.c:2248
+msgid "\tDefault page size:\n"
+msgstr ""
+
+#: systemv/lpstat.c:2136 systemv/lpstat.c:2249
+msgid "\tDefault port settings:\n"
+msgstr ""
+
+#: systemv/lpstat.c:2146
+#, c-format
+msgid "printer %s/%s is idle.  enabled since %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:2153
+#, c-format
+msgid "printer %s/%s now printing %s-%d.  enabled since %s\n"
+msgstr ""
+
+#: systemv/lpstat.c:2160
+#, c-format
+msgid "printer %s/%s disabled since %s -\n"
+msgstr ""
+
+#: systemv/lpstat.c:2279
+msgid "scheduler is running\n"
+msgstr ""
+
+#: systemv/lpstat.c:2281
+msgid "scheduler is not running\n"
+msgstr ""
+
+#: systemv/lpadmin.c:113 systemv/lpadmin.c:166 systemv/lpadmin.c:237
+#: systemv/lpadmin.c:298 systemv/lpadmin.c:317 systemv/lpadmin.c:383
+#: systemv/lpadmin.c:424 systemv/lpadmin.c:511 systemv/lpadmin.c:557
+#: systemv/lpadmin.c:603 systemv/lpadmin.c:665 systemv/lpadmin.c:711
+#: systemv/lpadmin.c:772
+#, fuzzy, c-format
+msgid "lpadmin: Unable to connect to server: %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: systemv/lpadmin.c:122
+msgid ""
+"lpadmin: Unable to add a printer to the class:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:137
+msgid "lpadmin: Expected class name after '-c' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:148 systemv/lpadmin.c:460
+msgid "lpadmin: Class name can only contain printable characters!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:181
+msgid "lpadmin: Expected printer name after '-d' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:192 systemv/lpadmin.c:409 systemv/lpadmin.c:583
+msgid "lpadmin: Printer name can only contain printable characters!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:219
+msgid "lpadmin: Expected hostname after '-h' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:246
+msgid ""
+"lpadmin: Unable to set the interface script:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:264
+msgid "lpadmin: Expected interface after '-i' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:326
+msgid ""
+"lpadmin: Unable to set the interface script or PPD file:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:345
+msgid "lpadmin: Expected model after '-m' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:365
+msgid "lpadmin: Expected name=value after '-o' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:398
+msgid "lpadmin: Expected printer after '-p' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:433
+msgid ""
+"lpadmin: Unable to remove a printer from the class:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:449
+msgid "lpadmin: Expected class after '-r' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:479
+msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:496
+#, fuzzy, c-format
+msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/lpadmin.c:520
+msgid ""
+"lpadmin: Unable to set the device URI:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:538
+msgid "lpadmin: Expected device URI after '-v' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:572
+msgid "lpadmin: Expected printer or class after '-x' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:612
+msgid ""
+"lpadmin: Unable to set the printer description:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:631
+msgid "lpadmin: Expected description after '-D' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:647
+msgid "lpadmin: Expected file type(s) after '-I' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:653
+msgid "lpadmin: Warning - content type list ignored!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:674
+msgid ""
+"lpadmin: Unable to set the printer location:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:692
+msgid "lpadmin: Expected location after '-L' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:720
+msgid ""
+"lpadmin: Unable to set the PPD file:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:738
+msgid "lpadmin: Expected PPD after '-P' option!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:749
+#, fuzzy, c-format
+msgid "lpadmin: Unknown option '%c'!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/lpadmin.c:754
+#, fuzzy, c-format
+msgid "lpadmin: Unknown argument '%s'!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/lpadmin.c:781
+msgid ""
+"lpadmin: Unable to set the printer options:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+
+#: systemv/lpadmin.c:793
+msgid ""
+"Usage:\n"
+"\n"
+"    lpadmin [-h server] -d destination\n"
+"    lpadmin [-h server] -x destination\n"
+"    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n"
+"                       [-r remove-class] [-v device] [-D description]\n"
+"                       [-P ppd-file] [-o name=value]\n"
+"                       [-u allow:user,user] [-u deny:user,user]\n"
+"\n"
+msgstr ""
+
+#: systemv/lpadmin.c:1554
+#, fuzzy, c-format
+msgid "lpadmin: Unable to create temporary file: %s\n"
+msgstr "Incapable d'assigner la mémoire pour des types de dossier!"
+
+#: systemv/lpadmin.c:1562
+#, fuzzy, c-format
+msgid "lpadmin: Unable to open file \"%s\": %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: systemv/lpadmin.c:1631 systemv/lpadmin.c:1862 systemv/lpadmin.c:1870
+#, c-format
+msgid "lpadmin: add-printer (set model) failed: %s\n"
+msgstr ""
+
+#: systemv/lpadmin.c:1701 systemv/lpadmin.c:1708
+#, c-format
+msgid "lpadmin: add-printer (set description) failed: %s\n"
+msgstr ""
+
+#: systemv/lpadmin.c:1784 systemv/lpadmin.c:1792
+#, c-format
+msgid "lpadmin: add-printer (set location) failed: %s\n"
+msgstr ""
+
+#: systemv/lpadmin.c:2021
+#, fuzzy, c-format
+msgid "lpadmin: Unable to create temporary file - %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: systemv/lpadmin.c:2031
+#, fuzzy, c-format
+msgid "lpadmin: Unable to open PPD file \"%s\" - %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: systemv/lpadmin.c:2117 systemv/lpadmin.c:2125
+#, c-format
+msgid "lpadmin: %s failed: %s\n"
+msgstr ""
+
+#: systemv/lp.c:153
+msgid "lp: Expected destination after -d option!\n"
+msgstr ""
+
+#: systemv/lp.c:184
+msgid "lp: Expected form after -f option!\n"
+msgstr ""
+
+#: systemv/lp.c:202
+msgid "lp: Expected hostname after -h option!\n"
+msgstr ""
+
+#: systemv/lp.c:220
+msgid "lp: Expected job ID after -i option!\n"
+msgstr ""
+
+#: systemv/lp.c:230
+msgid "lp: Error - cannot print files and alter jobs simultaneously!\n"
+msgstr ""
+
+#: systemv/lp.c:242
+msgid "lp: Error - bad job ID!\n"
+msgstr ""
+
+#: systemv/lp.c:264
+msgid "lp: Expected copies after -n option!\n"
+msgstr ""
+
+#: systemv/lp.c:285
+msgid "lp: Expected option string after -o option!\n"
+msgstr ""
+
+#: systemv/lp.c:304
+#, c-format
+msgid "lp: Expected priority after -%c option!\n"
+msgstr ""
+
+#: systemv/lp.c:326
+msgid "lp: Priority must be between 1 and 100.\n"
+msgstr ""
+
+#: systemv/lp.c:348
+msgid "lp: Expected title after -t option!\n"
+msgstr ""
+
+#: systemv/lp.c:364
+msgid "lp: Expected mode list after -y option!\n"
+msgstr ""
+
+#: systemv/lp.c:370
+msgid "lp: Warning - mode option ignored!\n"
+msgstr ""
+
+#: systemv/lp.c:383
+msgid "lp: Expected hold name after -H option!\n"
+msgstr ""
+
+#: systemv/lp.c:405
+msgid "lp: Need job ID (-i) before \"-H restart\"!\n"
+msgstr ""
+
+#: systemv/lp.c:427
+msgid "lp: Expected page list after -P option!\n"
+msgstr ""
+
+#: systemv/lp.c:446
+msgid "lp: Expected character set after -S option!\n"
+msgstr ""
+
+#: systemv/lp.c:452
+msgid "lp: Warning - character set option ignored!\n"
+msgstr ""
+
+#: systemv/lp.c:463
+msgid "lp: Expected content type after -T option!\n"
+msgstr ""
+
+#: systemv/lp.c:469
+msgid "lp: Warning - content type option ignored!\n"
+msgstr ""
+
+#: systemv/lp.c:473
+#, fuzzy, c-format
+msgid "lp: Unknown option '%c'!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/lp.c:482
+msgid ""
+"lp: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgstr ""
+
+#: systemv/lp.c:497
+#, c-format
+msgid "lp: Unable to access \"%s\" - %s\n"
+msgstr ""
+
+#: systemv/lp.c:514
+#, c-format
+msgid "lp: Too many files - \"%s\"\n"
+msgstr ""
+
+#: systemv/lp.c:569
+msgid "lp: error - no default destination available.\n"
+msgstr ""
+
+#: systemv/lp.c:572
+msgid "lp: error - scheduler not responding!\n"
+msgstr ""
+
+#: systemv/lp.c:611
+#, fuzzy, c-format
+msgid "lp: unable to create temporary file \"%s\" - %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: systemv/lp.c:620
+#, c-format
+msgid "lp: error - unable to write to temporary file \"%s\" - %s\n"
+msgstr ""
+
+#: systemv/lp.c:634
+msgid "lp: stdin is empty, so no job has been sent.\n"
+msgstr ""
+
+#: systemv/lp.c:650
+#, fuzzy, c-format
+msgid "lp: unable to print file: %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: systemv/lp.c:656
+#, c-format
+msgid "request id is %s-%d (%d file(s))\n"
+msgstr ""
+
+#: systemv/lp.c:703 systemv/lp.c:713
+#, c-format
+msgid "lp: restart-job failed: %s\n"
+msgstr ""
+
+#: systemv/lp.c:769 systemv/lp.c:779
+#, c-format
+msgid "lp: set-job-attributes failed: %s\n"
+msgstr ""
+
+#: systemv/lpinfo.c:98 systemv/lpinfo.c:117
+#, c-format
+msgid "lpinfo: Unable to connect to server: %s\n"
+msgstr ""
+
+#: systemv/lpinfo.c:152
+#, fuzzy, c-format
+msgid "lpinfo: Unknown option '%c'!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/lpinfo.c:158
+#, fuzzy, c-format
+msgid "lpinfo: Unknown argument '%s'!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/lpinfo.c:225 systemv/lpinfo.c:310
+#, c-format
+msgid "lpinfo: cups-get-devices failed: %s\n"
+msgstr ""
+
+#: systemv/lpinfo.c:293
+#, c-format
+msgid ""
+"Device: uri = %s\n"
+"        class = %s\n"
+"        info = %s\n"
+"        make-and-model = %s\n"
+msgstr ""
+
+#: systemv/lpinfo.c:376 systemv/lpinfo.c:454
+#, c-format
+msgid "lpinfo: cups-get-ppds failed: %s\n"
+msgstr ""
+
+#: systemv/lpinfo.c:438
+#, c-format
+msgid ""
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+msgstr ""
+
+#: systemv/lpmove.c:114
+#, fuzzy, c-format
+msgid "lpmove: Unknown option '%c'!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/lpmove.c:133
+#, fuzzy, c-format
+msgid "lpmove: Unknown argument '%s'!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/lpmove.c:140
+msgid "Usage: lpmove job dest\n"
+msgstr ""
+
+#: systemv/lpmove.c:151
+#, c-format
+msgid "lpmove: Unable to connect to server: %s\n"
+msgstr ""
+
+#: systemv/lpmove.c:225 systemv/lpmove.c:234
+#, c-format
+msgid "lpmove: move-job failed: %s\n"
+msgstr ""
+
+#: systemv/lpoptions.c:109
+msgid "lpoptions: Unknown printer or class!\n"
+msgstr ""
+
+#: systemv/lpoptions.c:159
+msgid "lpoptions: No printers!?!\n"
+msgstr ""
+
+#: systemv/lpoptions.c:207
+#, c-format
+msgid "lpoptions: Unable to add printer or instance: %s\n"
+msgstr ""
+
+#: systemv/lpoptions.c:411
+#, c-format
+msgid "lpoptions: Destination %s has no PPD file!\n"
+msgstr ""
+
+#: systemv/lpoptions.c:420
+#, fuzzy, c-format
+msgid "lpoptions: Unable to open PPD file for %s!\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: systemv/lpoptions.c:444
+msgid ""
+"Usage: lpoptions [-h server] [-E] -d printer\n"
+"       lpoptions [-h server] [-E] [-p printer] -l\n"
+"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
+"       lpoptions [-h server] [-E] -x printer\n"
+msgstr ""
+
+#: systemv/lppasswd.c:192
+msgid "lppasswd: Only root can add or delete passwords!\n"
+msgstr ""
+
+#: systemv/lppasswd.c:212
+msgid "Enter old password:"
+msgstr ""
+
+#: systemv/lppasswd.c:218 systemv/lppasswd.c:236
+#, c-format
+msgid "lppasswd: Unable to copy password string: %s\n"
+msgstr ""
+
+#: systemv/lppasswd.c:230
+msgid "Enter password:"
+msgstr ""
+
+#: systemv/lppasswd.c:241
+msgid "Enter password again:"
+msgstr ""
+
+#: systemv/lppasswd.c:247
+msgid "lppasswd: Sorry, passwords don't match!\n"
+msgstr ""
+
+#: systemv/lppasswd.c:271
+msgid ""
+"lppasswd: Sorry, password rejected.\n"
+"Your password must be at least 6 characters long, cannot contain\n"
+"your username, and must contain at least one letter and number.\n"
+msgstr ""
+
+#: systemv/lppasswd.c:321
+msgid "lppasswd: Password file busy!\n"
+msgstr ""
+
+#: systemv/lppasswd.c:324 systemv/lppasswd.c:333 systemv/lppasswd.c:351
+#, c-format
+msgid "lppasswd: Unable to open password file: %s\n"
+msgstr ""
+
+#: systemv/lppasswd.c:386 systemv/lppasswd.c:399 systemv/lppasswd.c:431
+#, c-format
+msgid "lppasswd: Unable to write to password file: %s\n"
+msgstr ""
+
+#: systemv/lppasswd.c:411
+#, c-format
+msgid "lppasswd: user \"%s\" and group \"%s\" do not exist.\n"
+msgstr ""
+
+#: systemv/lppasswd.c:421
+msgid "lppasswd: Sorry, password doesn't match!\n"
+msgstr ""
+
+#: systemv/lppasswd.c:454
+msgid "lppasswd: Password file not updated!\n"
+msgstr ""
+
+#: systemv/lppasswd.c:469
+#, c-format
+msgid "lppasswd: failed to backup old password file: %s\n"
+msgstr ""
+
+#: systemv/lppasswd.c:482
+#, c-format
+msgid "lppasswd: failed to rename password file: %s\n"
+msgstr ""
+
+#: systemv/lppasswd.c:501
+msgid "Usage: lppasswd [-g groupname]\n"
+msgstr ""
+
+#: systemv/lppasswd.c:506
+msgid ""
+"Usage: lppasswd [-g groupname] [username]\n"
+"       lppasswd [-g groupname] -a [username]\n"
+"       lppasswd [-g groupname] -x [username]\n"
+msgstr ""

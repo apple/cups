@@ -40,9 +40,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <cups/cups.h>
-#include <cups/md5.h>
 #include <cups/string.h>
+#include <cups/cups.h>
+#include <cups/i18n.h>
+#include <cups/md5.h>
 
 #ifndef WIN32
 #  include <unistd.h>
@@ -70,34 +71,34 @@ static void	usage(FILE *fp);
  * 'main()' - Add, change, or delete passwords from the MD5 password file.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  char		*opt;		/* Option pointer */
-  const char	*username;	/* Pointer to username */
-  const char	*groupname;	/* Pointer to group name */
-  int		op;		/* Operation (add, change, delete) */
-  const char	*passwd;	/* Password string */
-  FILE		*infile,	/* Input file */
-		*outfile;	/* Output file */
-  char		line[256],	/* Line from file */
-		userline[17],	/* User from line */
-		groupline[17],	/* Group from line */
-		md5line[33],	/* MD5-sum from line */
-		md5new[33];	/* New MD5 sum */
-  const char	*root;		/* CUPS server root directory */
-  char		passwdmd5[1024],/* passwd.md5 file */
-		passwdold[1024],/* passwd.old file */
-		passwdnew[1024];/* passwd.tmp file */
-  char		*newpass,	/* new password */
-  		*oldpass;	/* old password */
-  int		flag;		/* Password check flags... */
-  int		fd;		/* Password file descriptor */
-  int		error;		/* Write error */
+  int		i;			/* Looping var */
+  char		*opt;			/* Option pointer */
+  const char	*username;		/* Pointer to username */
+  const char	*groupname;		/* Pointer to group name */
+  int		op;			/* Operation (add, change, delete) */
+  const char	*passwd;		/* Password string */
+  FILE		*infile,		/* Input file */
+		*outfile;		/* Output file */
+  char		line[256],		/* Line from file */
+		userline[17],		/* User from line */
+		groupline[17],		/* Group from line */
+		md5line[33],		/* MD5-sum from line */
+		md5new[33];		/* New MD5 sum */
+  const char	*root;			/* CUPS server root directory */
+  char		passwdmd5[1024],	/* passwd.md5 file */
+		passwdold[1024],	/* passwd.old file */
+		passwdnew[1024];	/* passwd.tmp file */
+  char		*newpass,		/* new password */
+  		*oldpass;		/* old password */
+  int		flag;			/* Password check flags... */
+  int		fd;			/* Password file descriptor */
+  int		error;			/* Write error */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Signal action */
+  struct sigaction action;		/* Signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
 
 
@@ -187,7 +188,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (getuid() && getuid() != geteuid() && (op != CHANGE || username))
   {
-    fputs("lppasswd: Only root can add or delete passwords!\n", stderr);
+    _cupsLangPuts(stderr, NULL,
+                  _("lppasswd: Only root can add or delete passwords!\n"));
     return (1);
   }
 
@@ -207,12 +209,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (op == CHANGE && getuid())
   {
-    if ((passwd = cupsGetPassword("Enter old password:")) == NULL)
+    if ((passwd = cupsGetPassword(_("Enter old password:"))) == NULL)
       return (1);
 
     if ((oldpass = strdup(passwd)) == NULL)
     {
-      perror("lppasswd: Unable to copy password string");
+      _cupsLangPrintf(stderr, NULL,
+                      _("lppasswd: Unable to copy password string: %s\n"),
+		      strerror(errno));
       return (1);
     }
   }
@@ -223,21 +227,24 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (op != DELETE)
   {
-    if ((passwd = cupsGetPassword("Enter password:")) == NULL)
+    if ((passwd = cupsGetPassword(_("Enter password:"))) == NULL)
       return (1);
 
     if ((newpass = strdup(passwd)) == NULL)
     {
-      perror("lppasswd: Unable to copy password string!");
+      _cupsLangPrintf(stderr, NULL,
+                      _("lppasswd: Unable to copy password string: %s\n"),
+		      strerror(errno));
       return (1);
     }
 
-    if ((passwd = cupsGetPassword("Enter password again:")) == NULL)
+    if ((passwd = cupsGetPassword(_("Enter password again:"))) == NULL)
       return (1);
 
     if (strcmp(passwd, newpass) != 0)
     {
-      fputs("lppasswd: Sorry, passwords don't match!\n", stderr);
+      _cupsLangPuts(stderr, NULL,
+                    _("lppasswd: Sorry, passwords don't match!\n"));
       return (1);
     }
 
@@ -260,10 +267,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if (strlen(newpass) < 6 || strstr(newpass, username) != NULL || flag != 3)
     {
-      fputs("lppasswd: Sorry, password rejected.\n"
-	    "Your password must be at least 6 characters long, cannot contain\n"
-	    "your username, and must contain at least one letter and number.\n",
-	    stderr);
+      _cupsLangPuts(stderr, NULL,
+                    _("lppasswd: Sorry, password rejected.\n"
+		      "Your password must be at least 6 characters long, "
+		      "cannot contain\n"
+		      "your username, and must contain at least one letter "
+		      "and number.\n"));
       return (1);
     }
   }
@@ -309,16 +318,20 @@ main(int  argc,			/* I - Number of command-line arguments */
   if ((fd = open(passwdnew, O_WRONLY | O_CREAT | O_EXCL, 0400)) < 0)
   {
     if (errno == EEXIST)
-      fputs("lppasswd: Password file busy!\n", stderr);
+      _cupsLangPuts(stderr, NULL, _("lppasswd: Password file busy!\n"));
     else
-      perror("lppasswd: Unable to open passwd file");
+      _cupsLangPrintf(stderr, NULL,
+                      _("lppasswd: Unable to open password file: %s\n"),
+		      strerror(errno));
 
     return (1);
   }
 
   if ((outfile = fdopen(fd, "w")) == NULL)
   {
-    perror("lppasswd: Unable to open passwd file");
+    _cupsLangPrintf(stderr, NULL,
+                    _("lppasswd: Unable to open password file: %s\n"),
+		    strerror(errno));
 
     unlink(passwdnew);
 
@@ -334,7 +347,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   infile = fopen(passwdmd5, "r");
   if (infile == NULL && errno != ENOENT && op != ADD)
   {
-    perror("lppasswd: Unable to open password file");
+    _cupsLangPrintf(stderr, NULL,
+                    _("lppasswd: Unable to open password file: %s\n"),
+		    strerror(errno));
 
     fclose(outfile);
 
@@ -367,7 +382,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (fputs(line, outfile) == EOF)
       {
-        perror("lppasswd: Unable to write to password file");
+	_cupsLangPrintf(stderr, NULL,
+                	_("lppasswd: Unable to write to password file: %s\n"),
+			strerror(errno));
         error = 1;
 	break;
       }
@@ -378,7 +395,9 @@ main(int  argc,			/* I - Number of command-line arguments */
       while (fgets(line, sizeof(line), infile) != NULL)
 	if (fputs(line, outfile) == EOF)
 	{
-          perror("lppasswd: Unable to write to password file");
+	  _cupsLangPrintf(stderr, NULL,
+                	  _("lppasswd: Unable to write to password file: %s\n"),
+			  strerror(errno));
 	  error = 1;
 	  break;
 	}
@@ -388,8 +407,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (op == CHANGE &&
       (strcmp(username, userline) || strcmp(groupname, groupline)))
   {
-    fprintf(stderr, "lppasswd: user \"%s\" and group \"%s\" do not exist.\n",
-            username, groupname);
+    _cupsLangPrintf(stderr, NULL,
+                    _("lppasswd: user \"%s\" and group \"%s\" do not exist.\n"),
+        	    username, groupname);
     error = 1;
   }
   else if (op != DELETE)
@@ -397,7 +417,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (oldpass &&
         strcmp(httpMD5(username, "CUPS", oldpass, md5new), md5line) != 0)
     {
-      fputs("lppasswd: Sorry, password doesn't match!\n", stderr);
+      _cupsLangPuts(stderr, NULL,
+                    _("lppasswd: Sorry, password doesn't match!\n"));
       error = 1;
     }
     else
@@ -406,7 +427,9 @@ main(int  argc,			/* I - Number of command-line arguments */
                httpMD5(username, "CUPS", newpass, md5new));
       if (fputs(line, outfile) == EOF)
       {
-        perror("lppasswd: Unable to write to password file");
+	_cupsLangPrintf(stderr, NULL,
+                	_("lppasswd: Unable to write to password file: %s\n"),
+			strerror(errno));
         error = 1;
       }
     }
@@ -428,7 +451,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (error)
   {
-    fputs("lppasswd: Password file not updated!\n", stderr);
+    _cupsLangPuts(stderr, NULL, _("lppasswd: Password file not updated!\n"));
     
     unlink(passwdnew);
 
@@ -442,7 +465,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   unlink(passwdold);
   if (link(passwdmd5, passwdold) && errno != ENOENT)
   {
-    perror("lppasswd: failed to backup old password file");
+    _cupsLangPrintf(stderr, NULL,
+                    _("lppasswd: failed to backup old password file: %s\n"),
+		    strerror(errno));
     unlink(passwdnew);
     return (1);
   }
@@ -453,7 +478,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (rename(passwdnew, passwdmd5) < 0)
   {
-    perror("lppasswd: failed to rename password file");
+    _cupsLangPrintf(stderr, NULL,
+                    _("lppasswd: failed to rename password file: %s\n"),
+		    strerror(errno));
     unlink(passwdnew);
     return (1);
   }
@@ -471,13 +498,14 @@ usage(FILE *fp)		/* I - File to send usage to */
 {
   if (getuid())
   {
-    fputs("Usage: lppasswd [-g groupname]\n", fp);
+    _cupsLangPuts(fp, NULL, _("Usage: lppasswd [-g groupname]\n"));
   }
   else
   {
-    fputs("Usage: lppasswd [-g groupname] [username]\n", fp);
-    fputs("       lppasswd [-g groupname] -a [username]\n", fp);
-    fputs("       lppasswd [-g groupname] -x [username]\n", fp);
+    _cupsLangPuts(fp, NULL, 
+                  _("Usage: lppasswd [-g groupname] [username]\n"
+		    "       lppasswd [-g groupname] -a [username]\n"
+		    "       lppasswd [-g groupname] -x [username]\n"));
   }
 
   exit(1);

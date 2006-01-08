@@ -29,7 +29,7 @@
  * Include necessary headers...
  */
 
-#include "language.h"
+#  include "language.h"
 
 #  ifdef __cplusplus
 extern "C" {
@@ -90,8 +90,8 @@ typedef struct _cups_vmap_s		/**** VBCS Charmap Struct ****/
  * Constants...
  */
 
-#define CUPS_MAX_USTRING         1024   /* Max size of Unicode string */
-#define CUPS_MAX_CHARMAP_LINES 100000   /* Max lines in charmap file */
+#  define CUPS_MAX_USTRING		8192	/* Max size of Unicode string */
+#  define CUPS_MAX_CHARMAP_LINES	100000	/* Max lines in charmap file */
 
 
 /*

@@ -41,11 +41,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <cups/cups.h>
-#include <cups/language.h>
-#include <cups/debug.h>
+#include <errno.h>
 #include <cups/string.h>
+#include <cups/cups.h>
+#include <cups/i18n.h>
+#include <cups/debug.h>
 
 
 /*
@@ -111,8 +111,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	            argv[0]);
+            _cupsLangPrintf(stderr, NULL,
+	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -139,8 +140,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lpstat: Need \"completed\" or \"not-completed\" after -W!\n",
-		      stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lpstat: Need \"completed\" or "
+			        "\"not-completed\" after -W!\n"));
 		return (1);
               }
 
@@ -149,8 +151,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (strcmp(which, "completed") && strcmp(which, "not-completed"))
 	    {
-	      fputs("lpstat: Need \"completed\" or \"not-completed\" after -W!\n",
-		    stderr);
+	      _cupsLangPuts(stderr, NULL,
+		            _("lpstat: Need \"completed\" or "
+			      "\"not-completed\" after -W!\n"));
 	      return (1);
 	    }
 	    break;
@@ -205,8 +208,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    }
 	    else
 	    {
-	      fputs("lpstat: The -b option requires a destination argument.\n",
-	            stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpstat: The -b option requires a destination "
+			      "argument.\n"));
 
 	      return (1);
 	    }
@@ -266,7 +270,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("Error: need hostname after \'-h\' option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+	                      _("Error: need hostname after \'-h\' option!\n"));
 		return (1);
               }
 
@@ -424,7 +429,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 	default :
-	    fprintf(stderr, "lpstat: Unknown option \'%c\'!\n", argv[i][1]);
+	    _cupsLangPrintf(stderr, NULL,
+	                    _("lpstat: Unknown option \'%c\'!\n"), argv[i][1]);
 	    return (1);
       }
     else
@@ -494,7 +500,9 @@ check_dest(http_t      *http,		/* I  - HTTP connection */
         *pptr++ = *dptr++;
       else
       {
-        fprintf(stderr, "lpstat: Invalid destination name in list \"%s\"!\n", name);
+        _cupsLangPrintf(stderr, NULL,
+	                _("lpstat: Invalid destination name in list \"%s\"!\n"),
+			name);
         exit(1);
       }
     }
@@ -507,7 +515,8 @@ check_dest(http_t      *http,		/* I  - HTTP connection */
 
     if (cupsGetDest(printer, NULL, *num_dests, *dests) == NULL)
     {
-      fprintf(stderr, "lpstat: Unknown destination \"%s\"!\n", printer);
+      _cupsLangPrintf(stderr, NULL,
+                      _("lpstat: Unknown destination \"%s\"!\n"), printer);
       exit(1);
     }
   }
@@ -528,7 +537,9 @@ connect_server(http_t *http)		/* I - Current HTTP connection */
 
     if (http == NULL)
     {
-      perror("lpstat: Unable to connect to server");
+      _cupsLangPrintf(stderr, NULL,
+                      _("lpstat: Unable to connect to server %s on port %d: %s\n"),
+		      cupsServer(), ippPort(), strerror(errno));
       exit(1);
     }
   }
@@ -610,8 +621,9 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lpstat: get-printers failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, language,
+                      _("lpstat: get-printers failed: %s\n"),
+        	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
     }
@@ -643,15 +655,15 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (strcmp(attr->name, "printer-name") == 0 &&
+        if (!strcmp(attr->name, "printer-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  printer = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "printer-state-message") == 0 &&
+        if (!strcmp(attr->name, "printer-state-message") &&
 	    attr->value_tag == IPP_TAG_TEXT)
 	  message = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "printer-is-accepting-jobs") == 0 &&
+        if (!strcmp(attr->name, "printer-is-accepting-jobs") &&
 	    attr->value_tag == IPP_TAG_BOOLEAN)
 	  accepting = attr->values[0].boolean;
 
@@ -725,20 +737,28 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
       if (match)
       {
         if (accepting)
-	  printf("%s accepting requests since Jan 01 00:00\n", printer);
+	  _cupsLangPrintf(stdout, language,
+                          _("%s accepting requests since Jan 01 00:00\n"),
+			  printer);
 	else
-	  printf("%s not accepting requests since Jan 01 00:00 -\n\t%s\n", printer,
-	         message == NULL ? "reason unknown" : message);
+	  _cupsLangPrintf(stdout, language,
+                          _("%s not accepting requests since Jan 01 00:00 -\n"
+			    "\t%s\n"),
+			  printer, message == NULL ? "reason unknown" : message);
 
         for (i = 0; i < num_dests; i ++)
-	  if (strcasecmp(dests[i].name, printer) == 0 && dests[i].instance)
+	  if (!strcasecmp(dests[i].name, printer) && dests[i].instance)
 	  {
             if (accepting)
-	      printf("%s/%s accepting requests since Jan 01 00:00\n", printer, dests[i].instance);
+	      _cupsLangPrintf(stdout, language,
+                              _("%s/%s accepting requests since Jan 01 00:00\n"),
+			      printer, dests[i].instance);
 	    else
-	      printf("%s/%s not accepting requests since Jan 01 00:00 -\n\t%s\n", printer,
-	             dests[i].instance,
-	             message == NULL ? "reason unknown" : message);
+	      _cupsLangPrintf(stdout, language,
+                              _("%s/%s not accepting requests since "
+			        "Jan 01 00:00 -\n\t%s\n"),
+			      printer, dests[i].instance,
+	        	      message == NULL ? "reason unknown" : message);
 	  }
       }
 
@@ -750,8 +770,8 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   }
   else
   {
-    fprintf(stderr, "lpstat: get-printers failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, language, _("lpstat: get-printers failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
     return (1);
   }
 
@@ -837,8 +857,9 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lpstat: get-classes failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, language,
+                      _("lpstat: get-classes failed: %s\n"),
+        	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
     }
@@ -870,15 +891,15 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (strcmp(attr->name, "printer-name") == 0 &&
+        if (!strcmp(attr->name, "printer-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  printer = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "printer-uri-supported") == 0 &&
+        if (!strcmp(attr->name, "printer-uri-supported") &&
 	    attr->value_tag == IPP_TAG_URI)
 	  printer_uri = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "member-names") == 0 &&
+        if (!strcmp(attr->name, "member-names") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  members = attr;
 
@@ -1009,15 +1030,16 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
 
       if (match)
       {
-        printf("members of class %s:\n", printer);
+        _cupsLangPrintf(stdout, language, _("members of class %s:\n"), printer);
 
 	if (members)
 	{
 	  for (i = 0; i < members->num_values; i ++)
-	    printf("\t%s\n", members->values[i].string.text);
+	    _cupsLangPrintf(stdout, language, "\t%s\n",
+	                    members->values[i].string.text);
         }
 	else
-	  puts("\tunknown");
+	  _cupsLangPuts(stdout, language, "\tunknown\n");
       }
 
       if (response2)
@@ -1031,8 +1053,8 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
   }
   else
   {
-    fprintf(stderr, "lpstat: get-classes failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, language, _("lpstat: get-classes failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
     return (1);
   }
 
@@ -1055,9 +1077,11 @@ show_default(int         num_dests,	/* I - Number of user-defined dests */
   if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
   {
     if (dest->instance)
-      printf("system default destination: %s/%s\n", dest->name, dest->instance);
+      _cupsLangPrintf(stdout, NULL, _("system default destination: %s/%s\n"),
+                      dest->name, dest->instance);
     else
-      printf("system default destination: %s\n", dest->name);
+      _cupsLangPrintf(stdout, NULL, _("system default destination: %s\n"),
+                      dest->name);
   }
   else
   {
@@ -1077,10 +1101,12 @@ show_default(int         num_dests,	/* I - Number of user-defined dests */
       val = "LPDEST";
 
     if (printer && !cupsGetDest(printer, NULL, num_dests, dests))
-      printf("lpstat: error - %s environment variable names non-existent destination \"%s\"!\n",
-             val, printer);
+      _cupsLangPrintf(stdout, NULL,
+                      _("lpstat: error - %s environment variable names "
+		        "non-existent destination \"%s\"!\n"),
+        	      val, printer);
     else
-      puts("no system default destination");
+      _cupsLangPuts(stdout, NULL, _("no system default destination\n"));
   }
 }
 
@@ -1158,8 +1184,8 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lpstat: get-printers failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, language, _("lpstat: get-printers failed: %s\n"),
+        	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
     }
@@ -1191,15 +1217,15 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (strcmp(attr->name, "printer-name") == 0 &&
+        if (!strcmp(attr->name, "printer-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  printer = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "printer-uri-supported") == 0 &&
+        if (!strcmp(attr->name, "printer-uri-supported") &&
 	    attr->value_tag == IPP_TAG_URI)
 	  uri = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "device-uri") == 0 &&
+        if (!strcmp(attr->name, "device-uri") &&
 	    attr->value_tag == IPP_TAG_URI)
 	  device = attr->values[0].string.text;
 
@@ -1283,43 +1309,61 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
         if (device == NULL)
 	{
 	  httpSeparate(uri, method, username, hostname, &port, resource);
-          printf("Output for printer %s is sent to remote printer %s on %s\n",
-	         printer, strrchr(resource, '/') + 1, hostname);
+          _cupsLangPrintf(stdout, language,
+	                  _("Output for printer %s is sent to remote "
+			    "printer %s on %s\n"),
+	        	  printer, strrchr(resource, '/') + 1, hostname);
         }
         else if (strncmp(device, "file:", 5) == 0)
-          printf("Output for printer %s is sent to %s\n", printer, device + 5);
+          _cupsLangPrintf(stdout, language,
+	                  _("Output for printer %s is sent to %s\n"),
+			  printer, device + 5);
         else
-          printf("Output for printer %s is sent to %s\n", printer, device);
+          _cupsLangPrintf(stdout, language,
+	                  _("Output for printer %s is sent to %s\n"),
+			  printer, device);
 
         for (i = 0; i < num_dests; i ++)
-	  if (strcasecmp(printer, dests[i].name) == 0 && dests[i].instance)
+	  if (!strcasecmp(printer, dests[i].name) && dests[i].instance)
 	  {
             if (device == NULL)
-              printf("Output for printer %s/%s is sent to remote printer %s on %s\n",
-	             printer, dests[i].instance, strrchr(resource, '/') + 1,
-		     hostname);
-            else if (strncmp(device, "file:", 5) == 0)
-              printf("Output for printer %s/%s is sent to %s\n", printer, dests[i].instance, device + 5);
+              _cupsLangPrintf(stdout, language,
+	                      _("Output for printer %s/%s is sent to "
+			        "remote printer %s on %s\n"),
+	        	      printer, dests[i].instance,
+			      strrchr(resource, '/') + 1, hostname);
+            else if (!strncmp(device, "file:", 5))
+              _cupsLangPrintf(stdout, language,
+	                      _("Output for printer %s/%s is sent to %s\n"),
+			      printer, dests[i].instance, device + 5);
             else
-              printf("Output for printer %s/%s is sent to %s\n", printer, dests[i].instance, device);
+              _cupsLangPrintf(stdout, language,
+	                      _("Output for printer %s/%s is sent to %s\n"),
+			      printer, dests[i].instance, device);
 	  }
 #else
         if (device == NULL)
-          printf("device for %s: %s\n", printer, uri);
-        else if (strncmp(device, "file:", 5) == 0)
-          printf("device for %s: %s\n", printer, device + 5);
+          _cupsLangPrintf(stdout, language, _("device for %s: %s\n"),
+	                  printer, uri);
+        else if (!strncmp(device, "file:", 5))
+          _cupsLangPrintf(stdout, language, _("device for %s: %s\n"),
+	                  printer, device + 5);
         else
-          printf("device for %s: %s\n", printer, device);
+          _cupsLangPrintf(stdout, language, _("device for %s: %s\n"),
+	                  printer, device);
 
         for (i = 0; i < num_dests; i ++)
-	  if (strcasecmp(printer, dests[i].name) == 0 && dests[i].instance)
+	  if (!strcasecmp(printer, dests[i].name) && dests[i].instance)
 	  {
             if (device == NULL)
-              printf("device for %s/%s: %s\n", printer, dests[i].instance, uri);
-            else if (strncmp(device, "file:", 5) == 0)
-              printf("device for %s/%s: %s\n", printer, dests[i].instance, device + 5);
+              _cupsLangPrintf(stdout, language, _("device for %s/%s: %s\n"),
+	                      printer, dests[i].instance, uri);
+            else if (!strncmp(device, "file:", 5))
+              _cupsLangPrintf(stdout, language, _("device for %s/%s: %s\n"),
+	                      printer, dests[i].instance, device + 5);
             else
-              printf("device for %s/%s: %s\n", printer, dests[i].instance, device);
+              _cupsLangPrintf(stdout, language, _("device for %s/%s: %s\n"),
+	                      printer, dests[i].instance, device);
 	  }
 #endif /* __osf__ */
       }
@@ -1332,8 +1376,8 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   }
   else
   {
-    fprintf(stderr, "lpstat: get-printers failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, language, _("lpstat: get-printers failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
     return (1);
   }
 
@@ -1434,8 +1478,8 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lpstat: get-jobs failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, language, _("lpstat: get-jobs failed: %s\n"),
+        	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
     }
@@ -1616,8 +1660,9 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	  if (!strftime(date, sizeof(date), "%b %d %H:%M", jobdate))
 	    strcpy(date, "Unknown");
 
-	  printf("%s;%s;%d;%s;%s\n", temp, username ? username : "unknown",
-	         size, title ? title : "unknown", date);
+	  _cupsLangPrintf(stdout, language, "%s;%s;%d;%s;%s\n",
+	                  temp, username ? username : "unknown",
+	        	  size, title ? title : "unknown", date);
 	}
 	else
 	{
@@ -1625,13 +1670,15 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	    strcpy(date, "Unknown");
 
           if (ranking)
-	    printf("%3d %-21s %-13s %8.0f %s\n", rank, temp,
-	           username ? username : "unknown", 1024.0 * size, date);
+	    _cupsLangPrintf(stdout, language, "%3d %-21s %-13s %8.0f %s\n",
+	                    rank, temp, username ? username : "unknown",
+			    1024.0 * size, date);
           else
-	    printf("%-23s %-13s %8.0f   %s\n", temp,
-	           username ? username : "unknown", 1024.0 * size, date);
+	    _cupsLangPrintf(stdout, language, "%-23s %-13s %8.0f   %s\n",
+	                    temp, username ? username : "unknown",
+			    1024.0 * size, date);
           if (long_status)
-	    printf("\tqueued for %s\n", dest);
+	    _cupsLangPrintf(stdout, language, _("\tqueued for %s\n"), dest);
 	}
       }
 
@@ -1643,8 +1690,8 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
   }
   else
   {
-    fprintf(stderr, "lpstat: get-jobs failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, language, _("lpstat: get-jobs failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
     return (1);
   }
 
@@ -1663,7 +1710,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	      cups_dest_t *dests,	/* I - User-defined destinations */
               int         long_status)	/* I - Show long status? */
 {
-  int		i, j;			/* Looping vars */
+  int		i;			/* Looping var */
   ipp_t		*request,		/* IPP Request */
 		*response,		/* IPP Response */
 		*jobs;			/* IPP Get Jobs response */
@@ -1759,8 +1806,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lpstat: get-printers failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, language, _("lpstat: get-printers failed: %s\n"),
+        	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
     }
@@ -1802,40 +1849,40 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (strcmp(attr->name, "printer-name") == 0 &&
+        if (!strcmp(attr->name, "printer-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  printer = attr->values[0].string.text;
-        else if (strcmp(attr->name, "printer-state") == 0 &&
+        else if (!strcmp(attr->name, "printer-state") &&
 	         attr->value_tag == IPP_TAG_ENUM)
 	  pstate = (ipp_pstate_t)attr->values[0].integer;
-        else if (strcmp(attr->name, "printer-type") == 0 &&
+        else if (!strcmp(attr->name, "printer-type") &&
 	         attr->value_tag == IPP_TAG_ENUM)
 	  ptype = (cups_ptype_t)attr->values[0].integer;
-        else if (strcmp(attr->name, "printer-state-message") == 0 &&
+        else if (!strcmp(attr->name, "printer-state-message") &&
 	         attr->value_tag == IPP_TAG_TEXT)
 	  message = attr->values[0].string.text;
         else if (!strcmp(attr->name, "printer-state-change-time") &&
 	         attr->value_tag == IPP_TAG_INTEGER)
 	  ptime = (time_t)attr->values[0].integer;
-	else if (strcmp(attr->name, "printer-info") == 0 &&
+	else if (!strcmp(attr->name, "printer-info") &&
 	         attr->value_tag == IPP_TAG_TEXT)
 	  description = attr->values[0].string.text;
-        else if (strcmp(attr->name, "printer-location") == 0 &&
+        else if (!strcmp(attr->name, "printer-location") &&
 	         attr->value_tag == IPP_TAG_TEXT)
 	  location = attr->values[0].string.text;
-        else if (strcmp(attr->name, "printer-make-and-model") == 0 &&
+        else if (!strcmp(attr->name, "printer-make-and-model") &&
 	         attr->value_tag == IPP_TAG_TEXT)
 	  make_model = attr->values[0].string.text;
-        else if (strcmp(attr->name, "printer-uri-supported") == 0 &&
+        else if (!strcmp(attr->name, "printer-uri-supported") &&
 	         attr->value_tag == IPP_TAG_URI)
 	  uri = attr->values[0].string.text;
-        else if (strcmp(attr->name, "printer-state-reasons") == 0 &&
+        else if (!strcmp(attr->name, "printer-state-reasons") &&
 	         attr->value_tag == IPP_TAG_KEYWORD)
 	  reasons = attr;
-        else if (strcmp(attr->name, "requesting-user-name-allowed") == 0 &&
+        else if (!strcmp(attr->name, "requesting-user-name-allowed") &&
 	         attr->value_tag == IPP_TAG_NAME)
 	  allowed = attr;
-        else if (strcmp(attr->name, "requesting-user-name-denied") == 0 &&
+        else if (!strcmp(attr->name, "requesting-user-name-denied") &&
 	         attr->value_tag == IPP_TAG_NAME)
 	  denied = attr;
 
@@ -1986,151 +2033,220 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
         switch (pstate)
 	{
 	  case IPP_PRINTER_IDLE :
-	      printf("printer %s is idle.  enabled since %s\n", printer,
-	             printer_state_time);
+	      _cupsLangPrintf(stdout, language,
+	                      _("printer %s is idle.  enabled since %s\n"),
+			      printer, printer_state_time);
 	      break;
 	  case IPP_PRINTER_PROCESSING :
-	      printf("printer %s now printing %s-%d.  enabled since %s\n",
-	             printer, printer, jobid, printer_state_time);
+	      _cupsLangPrintf(stdout, language,
+	                      _("printer %s now printing %s-%d.  "
+			        "enabled since %s\n"),
+	        	      printer, printer, jobid, printer_state_time);
 	      break;
 	  case IPP_PRINTER_STOPPED :
-	      printf("printer %s disabled since %s -\n", printer,
-	             printer_state_time);
+	      _cupsLangPrintf(stdout, language,
+	                      _("printer %s disabled since %s -\n"),
+			      printer, printer_state_time);
 	      break;
 	}
 
         if ((message && *message) || pstate == IPP_PRINTER_STOPPED)
-	  printf("\t%s\n", message == NULL || !*message ? "reason unknown" :
-	                                                  message);
+	{
+	  if (!message || !*message)
+	    _cupsLangPuts(stdout, language, _("\treason unknown\n"));
+	  else
+	    _cupsLangPrintf(stdout, language, "\t%s\n", message);
+	}
 
         if (long_status > 1)
-	{
-	  puts("\tForm mounted:");
-	  puts("\tContent types: any");
-	  puts("\tPrinter types: unknown");
-	}
+	  _cupsLangPuts(stdout, language,
+	                _("\tForm mounted:\n"
+			  "\tContent types: any\n"
+			  "\tPrinter types: unknown\n"));
+
         if (long_status)
 	{
-	  printf("\tDescription: %s\n", description ? description : "");
+	  _cupsLangPrintf(stdout, language, _("\tDescription: %s\n"),
+	                  description ? description : "");
+
 	  if (reasons)
 	  {
-	    printf("\tAlerts:");
+	    _cupsLangPuts(stdout, language, _("\tAlerts:"));
 	    for (i = 0; i < reasons->num_values; i ++)
-	      printf(" %s", reasons->values[i].string.text);
-	    putchar('\n');
+	      _cupsLangPrintf(stdout, language, " %s",
+	                      reasons->values[i].string.text);
+	    _cupsLangPuts(stdout, language, "\n");
 	  }
 	}
         if (long_status > 1)
 	{
-	  printf("\tLocation: %s\n", location ? location : "");
-	  printf("\tConnection: %s\n",
-	         (ptype & CUPS_PRINTER_REMOTE) ? "remote" : "direct");
-	  if (!(ptype & CUPS_PRINTER_REMOTE))
-	  {
-	    if (make_model && strstr(make_model, "System V Printer"))
-	      printf("\tInterface: %s/interfaces/%s\n", root, printer);
-	    else if (make_model && !strstr(make_model, "Raw Printer"))
-	      printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
-          }
-	  else if (make_model && !strstr(make_model, "System V Printer") &&
-	           !strstr(make_model, "Raw Printer") && uri)
-	    printf("\tInterface: %s.ppd\n", uri);
+	  _cupsLangPrintf(stdout, language, _("\tLocation: %s\n"),
+	                  location ? location : "");
 
-	  puts("\tOn fault: no alert");
-	  puts("\tAfter fault: continue");
-          if (allowed)
+	  if (ptype & CUPS_PRINTER_REMOTE)
 	  {
-	    puts("\tUsers allowed:");
-	    for (i = 0; i < allowed->num_values; i ++)
-	      printf("\t\t%s\n", allowed->values[i].string.text);
-	  }
-	  else if (denied)
-	  {
-	    puts("\tUsers denied:");
-	    for (i = 0; i < denied->num_values; i ++)
-	      printf("\t\t%s\n", denied->values[i].string.text);
+	    _cupsLangPuts(stdout, language, _("\tConnection: remote\n"));
+
+	    if (make_model && !strstr(make_model, "System V Printer") &&
+	             !strstr(make_model, "Raw Printer") && uri)
+	      _cupsLangPrintf(stdout, language, _("\tInterface: %s.ppd\n"),
+	                      uri);
 	  }
 	  else
 	  {
-	    puts("\tUsers allowed:");
-	    puts("\t\t(all)");
+	    _cupsLangPuts(stdout, language, _("\tConnection: direct\n"));
+
+	    if (make_model && strstr(make_model, "System V Printer"))
+	      _cupsLangPrintf(stdout, language,
+	                      _("\tInterface: %s/interfaces/%s\n"),
+			      root, printer);
+	    else if (make_model && !strstr(make_model, "Raw Printer"))
+	      _cupsLangPrintf(stdout, language,
+	                      _("\tInterface: %s/ppd/%s.ppd\n"), root, printer);
+          }
+	  _cupsLangPuts(stdout, language, _("\tOn fault: no alert\n"));
+	  _cupsLangPuts(stdout, language, _("\tAfter fault: continue\n"));
+	      // TODO update to use printer-error-policy
+          if (allowed)
+	  {
+	    _cupsLangPuts(stdout, language, _("\tUsers allowed:\n"));
+	    for (i = 0; i < allowed->num_values; i ++)
+	      _cupsLangPrintf(stdout, language, "\t\t%s\n",
+	                      allowed->values[i].string.text);
 	  }
-	  puts("\tForms allowed:");
-	  puts("\t\t(none)");
-	  puts("\tBanner required");
-	  puts("\tCharset sets:");
-	  puts("\t\t(none)");
-	  puts("\tDefault pitch:");
-	  puts("\tDefault page size:");
-	  puts("\tDefault port settings:");
+	  else if (denied)
+	  {
+	    _cupsLangPuts(stdout, language, _("\tUsers denied:\n"));
+	    for (i = 0; i < denied->num_values; i ++)
+	      _cupsLangPrintf(stdout, language, "\t\t%s\n",
+	                      denied->values[i].string.text);
+	  }
+	  else
+	  {
+	    _cupsLangPuts(stdout, language, _("\tUsers allowed:\n"));
+	    _cupsLangPuts(stdout, language, _("\t\t(all)\n"));
+	  }
+	  _cupsLangPuts(stdout, language, _("\tForms allowed:\n"));
+	  _cupsLangPuts(stdout, language, _("\t\t(none)\n"));
+	  _cupsLangPuts(stdout, language, _("\tBanner required\n"));
+	  _cupsLangPuts(stdout, language, _("\tCharset sets:\n"));
+	  _cupsLangPuts(stdout, language, _("\t\t(none)\n"));
+	  _cupsLangPuts(stdout, language, _("\tDefault pitch:\n"));
+	  _cupsLangPuts(stdout, language, _("\tDefault page size:\n"));
+	  _cupsLangPuts(stdout, language, _("\tDefault port settings:\n"));
 	}
 
         for (i = 0; i < num_dests; i ++)
-	  if (strcasecmp(printer, dests[i].name) == 0 && dests[i].instance)
+	  if (!strcasecmp(printer, dests[i].name) && dests[i].instance)
 	  {
             switch (pstate)
 	    {
 	      case IPP_PRINTER_IDLE :
-		  printf("printer %s/%s is idle.  enabled since Jan 01 00:00\n", printer, dests[i].instance);
+		  _cupsLangPrintf(stdout, language,
+		                  _("printer %s/%s is idle.  "
+				    "enabled since %s\n"),
+				  printer, dests[i].instance,
+				  printer_state_time);
 		  break;
 	      case IPP_PRINTER_PROCESSING :
-		  printf("printer %s/%s now printing %s-%d.  enabled since Jan 01 00:00\n", printer,
-		         dests[i].instance, printer, jobid);
+		  _cupsLangPrintf(stdout, language,
+		                  _("printer %s/%s now printing %s-%d.  "
+				    "enabled since %s\n"),
+				  printer, dests[i].instance, printer, jobid,
+				  printer_state_time);
 		  break;
 	      case IPP_PRINTER_STOPPED :
-		  printf("printer %s/%s disabled since Jan 01 00:00 -\n", printer,
-		         dests[i].instance);
+		  _cupsLangPrintf(stdout, language,
+		                  _("printer %s/%s disabled since %s -\n"),
+				  printer, dests[i].instance,
+				  printer_state_time);
 		  break;
 	    }
 
             if ((message && *message) || pstate == IPP_PRINTER_STOPPED)
-	      printf("\t%s\n", message == NULL || !*message ? "reason unknown" :
-	                                                      message);
+	    {
+	      if (!message || !*message)
+		_cupsLangPuts(stdout, language, _("\treason unknown\n"));
+	      else
+		_cupsLangPrintf(stdout, language, "\t%s\n", message);
+            }
 
             if (long_status > 1)
-	    {
-	      puts("\tForm mounted:");
-	      puts("\tContent types: any");
-	      puts("\tPrinter types: unknown");
-	    }
+	      _cupsLangPuts(stdout, language,
+	                    _("\tForm mounted:\n"
+			      "\tContent types: any\n"
+			      "\tPrinter types: unknown\n"));
+
             if (long_status)
 	    {
-	      printf("\tDescription: %s\n", description ? description : "");
+	      _cupsLangPrintf(stdout, language, _("\tDescription: %s\n"),
+	                      description ? description : "");
+
 	      if (reasons)
 	      {
-	        printf("\tAlerts:");
-		for (j = 0; j < reasons->num_values; j ++)
-		  printf(" %s", reasons->values[j].string.text);
-		putchar('\n');
+		_cupsLangPuts(stdout, language, _("\tAlerts:"));
+		for (i = 0; i < reasons->num_values; i ++)
+		  _cupsLangPrintf(stdout, language, " %s",
+	                	  reasons->values[i].string.text);
+		_cupsLangPuts(stdout, language, "\n");
 	      }
 	    }
             if (long_status > 1)
 	    {
-	      printf("\tLocation: %s\n", location ? location : "");
-	      printf("\tConnection: %s\n",
-	             (ptype & CUPS_PRINTER_REMOTE) ? "remote" : "direct");
-	      if (!(ptype & CUPS_PRINTER_REMOTE))
+	      _cupsLangPrintf(stdout, language, _("\tLocation: %s\n"),
+	                      location ? location : "");
+
+	      if (ptype & CUPS_PRINTER_REMOTE)
 	      {
+		_cupsLangPuts(stdout, language, _("\tConnection: remote\n"));
+
+		if (make_model && !strstr(make_model, "System V Printer") &&
+	        	 !strstr(make_model, "Raw Printer") && uri)
+		  _cupsLangPrintf(stdout, language, _("\tInterface: %s.ppd\n"),
+	                	  uri);
+	      }
+	      else
+	      {
+		_cupsLangPuts(stdout, language, _("\tConnection: direct\n"));
+
 		if (make_model && strstr(make_model, "System V Printer"))
-		  printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
+		  _cupsLangPrintf(stdout, language,
+	                	  _("\tInterface: %s/interfaces/%s\n"),
+				  root, printer);
 		else if (make_model && !strstr(make_model, "Raw Printer"))
-		  printf("\tInterface: %s/ppd/%s.ppd\n", root, printer);
+		  _cupsLangPrintf(stdout, language,
+	                	  _("\tInterface: %s/ppd/%s.ppd\n"), root, printer);
               }
-	      else if (make_model && !strstr(make_model, "System V Printer") &&
-	               !strstr(make_model, "Raw Printer") && uri)
-		printf("\tInterface: %s.ppd\n", uri);
-	      puts("\tOn fault: no alert");
-	      puts("\tAfter fault: continue");
-	      puts("\tUsers allowed:");
-	      puts("\t\t(all)");
-	      puts("\tForms allowed:");
-	      puts("\t\t(none)");
-	      puts("\tBanner required");
-	      puts("\tCharset sets:");
-	      puts("\t\t(none)");
-	      puts("\tDefault pitch:");
-	      puts("\tDefault page size:");
-	      puts("\tDefault port settings:");
+	      _cupsLangPuts(stdout, language, _("\tOn fault: no alert\n"));
+	      _cupsLangPuts(stdout, language, _("\tAfter fault: continue\n"));
+		  // TODO update to use printer-error-policy
+              if (allowed)
+	      {
+		_cupsLangPuts(stdout, language, _("\tUsers allowed:\n"));
+		for (i = 0; i < allowed->num_values; i ++)
+		  _cupsLangPrintf(stdout, language, "\t\t%s\n",
+	                	  allowed->values[i].string.text);
+	      }
+	      else if (denied)
+	      {
+		_cupsLangPuts(stdout, language, _("\tUsers denied:\n"));
+		for (i = 0; i < denied->num_values; i ++)
+		  _cupsLangPrintf(stdout, language, "\t\t%s\n",
+	                	  denied->values[i].string.text);
+	      }
+	      else
+	      {
+		_cupsLangPuts(stdout, language, _("\tUsers allowed:\n"));
+		_cupsLangPuts(stdout, language, _("\t\t(all)\n"));
+	      }
+	      _cupsLangPuts(stdout, language, _("\tForms allowed:\n"));
+	      _cupsLangPuts(stdout, language, _("\t\t(none)\n"));
+	      _cupsLangPuts(stdout, language, _("\tBanner required\n"));
+	      _cupsLangPuts(stdout, language, _("\tCharset sets:\n"));
+	      _cupsLangPuts(stdout, language, _("\t\t(none)\n"));
+	      _cupsLangPuts(stdout, language, _("\tDefault pitch:\n"));
+	      _cupsLangPuts(stdout, language, _("\tDefault page size:\n"));
+	      _cupsLangPuts(stdout, language, _("\tDefault port settings:\n"));
 	    }
 	  }
       }
@@ -2143,8 +2259,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   }
   else
   {
-    fprintf(stderr, "lpstat: get-printers failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, language, _("lpstat: get-printers failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
     return (1);
   }
 
@@ -2159,7 +2275,10 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 static void
 show_scheduler(http_t *http)	/* I - HTTP connection to server */
 {
-  printf("scheduler is %srunning\n", http == NULL ? "not " : "");
+  if (http)
+    _cupsLangPuts(stdout, NULL, _("scheduler is running\n"));
+  else
+    _cupsLangPuts(stdout, NULL, _("scheduler is not running\n"));
 }
 
 

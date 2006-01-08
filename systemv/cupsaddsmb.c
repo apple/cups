@@ -39,9 +39,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <cups/cups.h>
-#include <cups/language.h>
 #include <cups/string.h>
+#include <cups/cups.h>
+#include <cups/i18n.h>
 #include <errno.h>
 
 
@@ -73,15 +73,15 @@ int	write_option(FILE *dstfp, int order, const char *name,
  * 'main()' - Export printers on the command-line.
  */
 
-int			/* O - Exit status */
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int	i, j;		/* Looping vars */
-  int	status;		/* Status from export_dest() */
-  int	export_all;	/* Export all printers? */
-  int	num_printers;	/* Number of printers */
-  char	**printers;	/* Printers */
+  int	i, j;				/* Looping vars */
+  int	status;				/* Status from export_dest() */
+  int	export_all;			/* Export all printers? */
+  int	num_printers;			/* Number of printers */
+  char	**printers;			/* Printers */
 
 
  /*
@@ -286,7 +286,8 @@ convert_ppd(const char *src,		/* I - Source (original) PPD */
     {
       if ((ptr = strchr(line, ':')) == NULL)
       {
-        fprintf(stderr, "cupsaddsmb: Missing value on line %d!\n", linenum);
+        _cupsLangPrintf(stderr, NULL,
+	                _("cupsaddsmb: Missing value on line %d!\n"), linenum);
         fclose(srcfp);
         fclose(dstfp);
         close(dstfd);
@@ -296,8 +297,9 @@ convert_ppd(const char *src,		/* I - Source (original) PPD */
 
       if ((ptr = strchr(ptr, '\"')) == NULL)
       {
-        fprintf(stderr, "cupsaddsmb: Missing double quote on line %d!\n",
-	        linenum);
+        _cupsLangPrintf(stderr, NULL,
+	                _("cupsaddsmb: Missing double quote on line %d!\n"),
+	        	linenum);
         fclose(srcfp);
         fclose(dstfp);
         close(dstfd);
@@ -307,8 +309,9 @@ convert_ppd(const char *src,		/* I - Source (original) PPD */
 
       if (sscanf(line, "*%40s%*[ \t]%40[^/]", option, choice) != 2)
       {
-        fprintf(stderr, "cupsaddsmb: Bad option + choice on line %d!\n",
-	        linenum);
+        _cupsLangPrintf(stderr, NULL,
+	                _("cupsaddsmb: Bad option + choice on line %d!\n"),
+	        	linenum);
         fclose(srcfp);
         fclose(dstfp);
         close(dstfd);
@@ -481,14 +484,18 @@ export_dest(const char *dest)		/* I - Destination to export */
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
 
+  language = cupsLangDefault();
+
  /*
   * Open a connection to the scheduler...
   */
 
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption())) == NULL)
   {
-    fprintf(stderr, "cupsaddsmb: Unable to connect to server \"%s\" for %s - %s\n",
-            cupsServer(), dest, strerror(errno));
+    _cupsLangPrintf(stderr, language,
+                    _("cupsaddsmb: Unable to connect to server \"%s\" for "
+		      "%s - %s\n"),
+        	    cupsServer(), dest, strerror(errno));
     return (1);
   }
 
@@ -498,8 +505,10 @@ export_dest(const char *dest)		/* I - Destination to export */
 
   if ((ppdfile = cupsGetPPD2(http, dest)) == NULL)
   {
-    fprintf(stderr, "cupsaddsmb: No PPD file for printer \"%s\" - skipping!\n",
-            dest);
+    _cupsLangPrintf(stderr, language,
+                    _("cupsaddsmb: No PPD file for printer \"%s\" - "
+		      "skipping!\n"),
+        	    dest);
     httpClose(http);
     return (0);
   }
@@ -511,8 +520,6 @@ export_dest(const char *dest)		/* I - Destination to export */
   request = ippNew();
   request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
   request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                "attributes-charset", NULL, cupsLangEncoding(language));
@@ -537,8 +544,11 @@ export_dest(const char *dest)		/* I - Destination to export */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "cupsaddsmb: get-printer-attributes failed for \"%s\": %s\n",
-              dest, ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, language,
+                      _("cupsaddsmb: get-printer-attributes failed for "
+		        "\"%s\": %s\n"),
+        	      dest,
+		      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       cupsLangFree(language);
       httpClose(http);
@@ -548,8 +558,10 @@ export_dest(const char *dest)		/* I - Destination to export */
   }
   else
   {
-    fprintf(stderr, "cupsaddsmb: get-printer-attributes failed for \"%s\": %s\n",
-            dest, ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, language,
+                    _("cupsaddsmb: get-printer-attributes failed for "
+		      "\"%s\": %s\n"),
+        	    dest, ippErrorString(cupsLastError()));
     cupsLangFree(language);
     httpClose(http);
     unlink(ppdfile);
@@ -562,8 +574,9 @@ export_dest(const char *dest)		/* I - Destination to export */
 
   if (convert_ppd(ppdfile, newppd, sizeof(newppd), response))
   {
-    fprintf(stderr, "cupsaddsmb: Unable to convert PPD file for %s - %s\n",
-            dest, strerror(errno));
+    _cupsLangPrintf(stderr, language,
+                    _("cupsaddsmb: Unable to convert PPD file for %s - %s\n"),
+        	    dest, strerror(errno));
     ippDelete(response);
     cupsLangFree(language);
     httpClose(http);
@@ -616,8 +629,10 @@ export_dest(const char *dest)		/* I - Destination to export */
 
     if ((status = do_samba_command(command, subcmd)) != 0)
     {
-      fprintf(stderr, "cupsaddsmb: Unable to copy Windows 2000 printer driver files (%d)!\n",
-              status);
+      _cupsLangPrintf(stderr, language,
+                      _("cupsaddsmb: Unable to copy Windows 2000 printer "
+		        "driver files (%d)!\n"),
+                      status);
       unlink(ppdfile);
       return (4);
     }
@@ -641,8 +656,10 @@ export_dest(const char *dest)		/* I - Destination to export */
 
       if ((status = do_samba_command(command, subcmd)) != 0)
       {
-	fprintf(stderr, "cupsaddsmb: Unable to copy CUPS printer driver files (%d)!\n",
-        	status);
+	_cupsLangPrintf(stderr, language,
+	                _("cupsaddsmb: Unable to copy CUPS printer driver "
+			  "files (%d)!\n"),
+        		status);
 	unlink(ppdfile);
 	return (4);
       }
@@ -676,8 +693,10 @@ export_dest(const char *dest)		/* I - Destination to export */
 
     if ((status = do_samba_command(command, subcmd)) != 0)
     {
-      fprintf(stderr, "cupsaddsmb: Unable to install Windows 2000 printer driver files (%d)!\n",
-              status);
+      _cupsLangPrintf(stderr, language,
+                      _("cupsaddsmb: Unable to install Windows 2000 printer "
+		        "driver files (%d)!\n"),
+        	      status);
       unlink(ppdfile);
       return (5);
     }
@@ -704,8 +723,10 @@ export_dest(const char *dest)		/* I - Destination to export */
 
     if ((status = do_samba_command(command, subcmd)) != 0)
     {
-      fprintf(stderr, "cupsaddsmb: Unable to copy Windows 9x printer driver files (%d)!\n",
-              status);
+      _cupsLangPrintf(stderr, language,
+                      _("cupsaddsmb: Unable to copy Windows 9x printer "
+		        "driver files (%d)!\n"),
+        	      status);
       unlink(ppdfile);
       return (6);
     }
@@ -725,8 +746,10 @@ export_dest(const char *dest)		/* I - Destination to export */
 
     if ((status = do_samba_command(command, subcmd)) != 0)
     {
-      fprintf(stderr, "cupsaddsmb: Unable to install Windows 9x printer driver files (%d)!\n",
-              status);
+      _cupsLangPrintf(stderr, language,
+                      _("cupsaddsmb: Unable to install Windows 9x printer "
+		        "driver files (%d)!\n"),
+        	      status);
       unlink(ppdfile);
       return (7);
     }
@@ -744,8 +767,9 @@ export_dest(const char *dest)		/* I - Destination to export */
 
   if ((status = do_samba_command(command, subcmd)) != 0)
   {
-    fprintf(stderr, "cupsaddsmb: Unable to set Windows printer driver (%d)!\n",
-            status);
+    _cupsLangPrintf(stderr, language,
+                    _("cupsaddsmb: Unable to set Windows printer driver (%d)!\n"),
+        	    status);
     return (8);
   }
 
@@ -826,15 +850,16 @@ ppd_gets(FILE *fp,			/* I - File to read from*/
 void
 usage(void)
 {
-  puts("Usage: cupsaddsmb [options] printer1 ... printerN");
-  puts("       cupsaddsmb [options] -a");
-  puts("");
-  puts("Options:");
-  puts("  -H samba-server  Use the named SAMBA server");
-  puts("  -U samba-user    Authenticate using the named SAMBA user");
-  puts("  -a               Export all printers");
-  puts("  -h cups-server   Use the named CUPS server");
-  puts("  -v               Be verbose (show commands)");
+  _cupsLangPuts(stdout, NULL,
+                _("Usage: cupsaddsmb [options] printer1 ... printerN\n"
+		  "       cupsaddsmb [options] -a\n"
+		  "\n"
+		  "Options:\n"
+		  "  -H samba-server  Use the named SAMBA server\n"
+		  "  -U samba-user    Authenticate using the named SAMBA user\n"
+		  "  -a               Export all printers\n"
+		  "  -h cups-server   Use the named CUPS server\n"
+		  "  -v               Be verbose (show commands)\n"));
   exit(1);
 }
 

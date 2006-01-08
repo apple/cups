@@ -47,11 +47,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
-#include <cups/cups.h>
 #include <cups/string.h>
-#include <cups/language.h>
+#include <cups/cups.h>
+#include <cups/i18n.h>
 #include <cups/debug.h>
-#include <config.h>
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */
@@ -110,15 +109,19 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
 
 	    if (printer == NULL)
 	    {
-	      fputs("lpadmin: Unable to add a printer to the class:\n", stderr);
-	      fputs("         You must specify a printer name first!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Unable to add a printer to the class:\n"
+			      "         You must specify a printer name "
+			      "first!\n"));
 	      return (1);
 	    }
 
@@ -130,7 +133,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected class name after \'-c\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+		              _("lpadmin: Expected class name after \'-c\' "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -139,7 +144,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(pclass))
 	    {
-	      fputs("lpadmin: Class name can only contain printable characters!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Class name can only contain printable "
+			      "characters!\n"));
 	      return (1);
 	    }
 
@@ -155,7 +162,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
@@ -168,7 +177,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected printer name after \'-d\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected printer name after \'-d\' "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -177,7 +188,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(printer))
 	    {
-	      fputs("lpadmin: Printer name can only contain printable characters!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Printer name can only contain "
+			      "printable characters!\n"));
 	      return (1);
 	    }
 
@@ -202,7 +215,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lpadmin: Expected hostname after \'-h\' option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected hostname after \'-h\' "
+			        "option!\n"));
 		return (1);
               }
 
@@ -218,15 +233,19 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
 
 	    if (printer == NULL)
 	    {
-	      fputs("lpadmin: Unable to set the interface script:\n", stderr);
-	      fputs("         You must specify a printer name first!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Unable to set the interface script:\n"
+			      "         You must specify a printer name "
+			      "first!\n"));
 	      return (1);
 	    }
 
@@ -241,7 +260,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected interface after \'-i\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected interface after \'-i\' "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -259,8 +280,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      if (http)
 		httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-              fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	              argv[0]);
+              _cupsLangPrintf(stderr, NULL,
+	                      _("%s: Sorry, no encryption support compiled in!\n"),
+	                      argv[0]);
 #endif /* HAVE_SSL */
 	      break;
 	    }
@@ -272,7 +294,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
@@ -289,15 +313,20 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
 
 	    if (printer == NULL)
 	    {
-	      fputs("lpadmin: Unable to set the interface script or PPD file:\n", stderr);
-	      fputs("         You must specify a printer name first!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Unable to set the interface script or "
+			      "PPD file:\n"
+			      "         You must specify a printer name "
+			      "first!\n"));
 	      return (1);
 	    }
 
@@ -312,7 +341,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected model after \'-m\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected model after \'-m\' "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -330,7 +361,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected name=value after \'-o\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected name=value after \'-o\' "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -346,7 +379,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
@@ -359,7 +394,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected printer after \'-p\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected printer after \'-p\' "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -368,7 +405,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(printer))
 	    {
-	      fputs("lpadmin: Printer name can only contain printable characters!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Printer name can only contain "
+			      "printable characters!\n"));
 	      return (1);
 	    }
 	    break;
@@ -381,15 +420,20 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
 
 	    if (printer == NULL)
 	    {
-	      fputs("lpadmin: Unable to remove a printer from the class:\n", stderr);
-	      fputs("         You must specify a printer name first!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Unable to remove a printer from the "
+			      "class:\n"
+			      "         You must specify a printer name "
+			      "first!\n"));
 	      return (1);
 	    }
 
@@ -401,7 +445,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected class after \'-r\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected class after \'-r\' "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -410,7 +456,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(pclass))
 	    {
-	      fputs("lpadmin: Class name can only contain printable characters!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Class name can only contain printable "
+			      "characters!\n"));
 	      return (1);
 	    }
 
@@ -427,23 +475,26 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected allow/deny:userlist after \'-u\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected allow/deny:userlist after "
+			        "\'-u\' option!\n"));
 		return (1);
 	      }
 
               val = argv[i];
 	    }
 
-            if (strncasecmp(val, "allow:", 6) == 0)
+            if (!strncasecmp(val, "allow:", 6))
 	      num_options = cupsAddOption("requesting-user-name-allowed",
 	                                  val + 6, num_options, &options);
-            else if (strncasecmp(val, "deny:", 5) == 0)
+            else if (!strncasecmp(val, "deny:", 5))
 	      num_options = cupsAddOption("requesting-user-name-denied",
 	                                  val + 5, num_options, &options);
             else
 	    {
-	      fprintf(stderr, "lpadmin: Unknown allow/deny option \"%s\"!\n",
-	              val);
+	      _cupsLangPrintf(stderr, NULL,
+	                      _("lpadmin: Unknown allow/deny option \"%s\"!\n"),
+	                      val);
 	      return (1);
 	    }
 	    break;
@@ -456,15 +507,19 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
 
 	    if (printer == NULL)
 	    {
-	      fputs("lpadmin: Unable to set the device URI:\n", stderr);
-	      fputs("         You must specify a printer name first!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Unable to set the device URI:\n"
+			      "         You must specify a printer name "
+			      "first!\n"));
 	      return (1);
 	    }
 
@@ -479,7 +534,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected device URI after \'-v\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected device URI after \'-v\' "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -496,7 +553,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
@@ -509,7 +568,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected printer or class after \'-x\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected printer or class after "
+			        "\'-x\' option!\n"));
 		return (1);
 	      }
 
@@ -518,7 +579,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
             if (!validate_name(printer))
 	    {
-	      fputs("lpadmin: Printer name can only contain printable characters!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Printer name can only contain "
+			      "printable characters!\n"));
 	      return (1);
 	    }
 
@@ -536,15 +599,20 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
 
 	    if (printer == NULL)
 	    {
-	      fputs("lpadmin: Unable to set the printer description:\n", stderr);
-	      fputs("         You must specify a printer name first!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Unable to set the printer "
+			      "description:\n"
+			      "         You must specify a printer name "
+			      "first!\n"));
 	      return (1);
 	    }
 
@@ -559,7 +627,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected description after \'-D\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected description after "
+			        "\'-D\' option!\n"));
 		return (1);
 	      }
 
@@ -573,11 +643,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    if (i >= argc)
 	    {
-	      fputs("lpadmin: Expected file type(s) after \'-I\' option!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Expected file type(s) after \'-I\' "
+			      "option!\n"));
 	      return (1);
 	    }
 
-	    fputs("lpadmin: Warning - content type list ignored!\n", stderr);
+	    _cupsLangPuts(stderr, NULL,
+	                  _("lpadmin: Warning - content type list ignored!\n"));
 	    break;
 	    
         case 'L' : /* Set the printer-location attribute */
@@ -588,15 +661,19 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
 
 	    if (printer == NULL)
 	    {
-	      fputs("lpadmin: Unable to set the printer location:\n", stderr);
-	      fputs("         You must specify a printer name first!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Unable to set the printer location:\n"
+			      "         You must specify a printer name "
+			      "first!\n"));
 	      return (1);
 	    }
 
@@ -611,7 +688,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected location after \'-L\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected location after \'-L\' "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -628,15 +707,19 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		perror("lpadmin: Unable to connect to server");
+		_cupsLangPrintf(stderr, NULL,
+		                _("lpadmin: Unable to connect to server: %s\n"),
+				strerror(errno));
 		return (1);
 	      }
             }
 
 	    if (printer == NULL)
 	    {
-	      fputs("lpadmin: Unable to set the PPD file:\n", stderr);
-	      fputs("         You must specify a printer name first!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+	                    _("lpadmin: Unable to set the PPD file:\n"
+			      "         You must specify a printer name "
+			      "first!\n"));
 	      return (1);
 	    }
 
@@ -651,7 +734,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fputs("lpadmin: Expected PPD after \'-P\' option!\n", stderr);
+		_cupsLangPuts(stderr, NULL,
+	                      _("lpadmin: Expected PPD after \'-P\' option!\n"));
 		return (1);
 	      }
 
@@ -661,12 +745,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    fprintf(stderr, "lpadmin: Unknown option \'%c\'!\n", argv[i][1]);
+	    _cupsLangPrintf(stderr, NULL,
+	                    _("lpadmin: Unknown option \'%c\'!\n"), argv[i][1]);
 	    return (1);
       }
     else
     {
-      fprintf(stderr, "lpadmin: Unknown argument \'%s\'!\n", argv[i]);
+      _cupsLangPrintf(stderr, NULL, _("lpadmin: Unknown argument \'%s\'!\n"),
+                      argv[i]);
       return (1);
     }
 
@@ -682,15 +768,18 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (http == NULL)
       {
-	perror("lpadmin: Unable to connect to server");
+	_cupsLangPrintf(stderr, NULL,
+			_("lpadmin: Unable to connect to server: %s\n"),
+			strerror(errno));
 	return (1);
       }
     }
 
     if (printer == NULL)
     {
-      fputs("lpadmin: Unable to set the printer options:\n", stderr);
-      fputs("         You must specify a printer name first!\n", stderr);
+      _cupsLangPuts(stderr, NULL,
+                    _("lpadmin: Unable to set the printer options:\n"
+		      "         You must specify a printer name first!\n"));
       return (1);
     }
 
@@ -700,15 +789,19 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (printer == NULL)
   {
-    puts("Usage:");
-    puts("");
-    puts("    lpadmin [-h server] -d destination");
-    puts("    lpadmin [-h server] -x destination");
-    puts("    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]");
-    puts("                       [-r remove-class] [-v device] [-D description]");
-    puts("                       [-P ppd-file] [-o name=value]");
-    puts("                       [-u allow:user,user] [-u deny:user,user]");
-    puts("");
+    _cupsLangPuts(stdout, NULL,
+	          _("Usage:\n"
+		    "\n"
+		    "    lpadmin [-h server] -d destination\n"
+		    "    lpadmin [-h server] -x destination\n"
+		    "    lpadmin [-h server] -p printer [-c add-class] "
+		    "[-i interface] [-m model]\n"
+		    "                       [-r remove-class] [-v device] "
+		    "[-D description]\n"
+		    "                       [-P ppd-file] [-o name=value]\n"
+		    "                       [-u allow:user,user] "
+		    "[-u deny:user,user]\n"
+		    "\n"));
   }
 
   if (http)
@@ -1449,7 +1542,7 @@ set_printer_file(http_t *http,		/* I - Server connection */
   * send the uncompressed file.
   */
 
-  if (strcmp(file + strlen(file) - 3, ".gz") == 0)
+  if (!strcmp(file + strlen(file) - 3, ".gz"))
   {
    /*
     * Yes, the file is compressed; uncompress to a temp file...
@@ -1457,13 +1550,17 @@ set_printer_file(http_t *http,		/* I - Server connection */
 
     if ((fd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
-      perror("lpadmin: Unable to create temporary file");
+      _cupsLangPrintf(stderr, NULL,
+                      _("lpadmin: Unable to create temporary file: %s\n"),
+		      strerror(errno));
       return (1);
     }
 
     if ((gz = gzopen(file, "rb")) == NULL)
     {
-      perror("lpadmin: Unable to open file");
+      _cupsLangPrintf(stderr, NULL,
+                      _("lpadmin: Unable to open file \"%s\": %s\n"),
+		      file, strerror(errno));
       close(fd);
       unlink(tempfile);
       return (1);
@@ -1530,8 +1627,9 @@ set_printer_file(http_t *http,		/* I - Server connection */
 
   if (status > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer (set model) failed: %s\n",
-            ippErrorString(status));
+    _cupsLangPrintf(stderr, NULL,
+                    _("lpadmin: add-printer (set model) failed: %s\n"),
+        	    ippErrorString(status));
 
     return (1);
   }
@@ -1599,14 +1697,16 @@ set_printer_info(http_t *http,		/* I - Server connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
   {
-    fprintf(stderr, "lpadmin: add-printer (set description) failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, NULL,
+                    _("lpadmin: add-printer (set description) failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
     return (1);
   }
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer (set description) failed: %s\n",
-            ippErrorString(response->request.status.status_code));
+    _cupsLangPrintf(stderr, NULL,
+                    _("lpadmin: add-printer (set description) failed: %s\n"),
+        	    ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
 
@@ -1680,15 +1780,17 @@ set_printer_location(http_t *http,	/* I - Server connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
   {
-    fprintf(stderr, "lpadmin: add-printer (set location) failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, NULL,
+                    _("lpadmin: add-printer (set location) failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
 
     return (1);
   }
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer (set location) failed: %s\n",
-            ippErrorString(response->request.status.status_code));
+    _cupsLangPrintf(stderr, NULL,
+                    _("lpadmin: add-printer (set location) failed: %s\n"),
+        	    ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
 
@@ -1756,15 +1858,17 @@ set_printer_model(http_t *http,		/* I - Server connection */
 
   if ((response = cupsDoRequest(http, request, "/admin/")) == NULL)
   {
-    fprintf(stderr, "lpadmin: add-printer (set model) failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, NULL,
+                    _("lpadmin: add-printer (set model) failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
 
     return (1);
   }
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: add-printer (set model) failed: %s\n",
-            ippErrorString(response->request.status.status_code));
+    _cupsLangPrintf(stderr, NULL,
+                    _("lpadmin: add-printer (set model) failed: %s\n"),
+        	    ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
 
@@ -1913,8 +2017,9 @@ set_printer_options(http_t        *http,/* I - Server connection */
 
     if ((outfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
-      fprintf(stderr, "lpadmin: Unable to create temporary file - %s\n",
-              strerror(errno));
+      _cupsLangPrintf(stderr, NULL,
+                      _("lpadmin: Unable to create temporary file - %s\n"),
+        	      strerror(errno));
       ippDelete(request);
       unlink(ppdfile);
       return (1);
@@ -1922,8 +2027,9 @@ set_printer_options(http_t        *http,/* I - Server connection */
 
     if ((in = fopen(ppdfile, "rb")) == NULL)
     {
-      fprintf(stderr, "lpadmin: Unable to open PPD file \"%s\" - %s\n",
-              ppdfile, strerror(errno));
+      _cupsLangPrintf(stderr, NULL,
+                      _("lpadmin: Unable to open PPD file \"%s\" - %s\n"),
+        	      ppdfile, strerror(errno));
       ippDelete(request);
       unlink(ppdfile);
       close(outfd);
@@ -2008,17 +2114,17 @@ set_printer_options(http_t        *http,/* I - Server connection */
 
   if (response == NULL)
   {
-    fprintf(stderr, "lpadmin: %s failed: %s\n",
-            op == CUPS_ADD_PRINTER ? "add-printer" : "add-class",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, NULL, _("lpadmin: %s failed: %s\n"),
+        	    op == CUPS_ADD_PRINTER ? "add-printer" : "add-class",
+        	    ippErrorString(cupsLastError()));
 
     return (1);
   }
   else if (response->request.status.status_code > IPP_OK_CONFLICT)
   {
-    fprintf(stderr, "lpadmin: %s failed: %s\n",
-            op == CUPS_ADD_PRINTER ? "add-printer" : "add-class",
-            ippErrorString(response->request.status.status_code));
+    _cupsLangPrintf(stderr, NULL, _("lpadmin: %s failed: %s\n"),
+        	    op == CUPS_ADD_PRINTER ? "add-printer" : "add-class",
+        	    ippErrorString(response->request.status.status_code));
 
     ippDelete(response);
 

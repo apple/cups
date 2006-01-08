@@ -60,8 +60,11 @@ _cupsLangPrintf(FILE        *fp,	/* I - File to write to */
   * Range check...
   */
 
-  if (!fp || !language || !message)
+  if (!fp || !message)
     return (-1);
+
+  if (!language)
+    language = cupsLangDefault();
 
  /*
   * Format the string...
@@ -83,7 +86,10 @@ _cupsLangPrintf(FILE        *fp,	/* I - File to write to */
   * Write the string and return the number of bytes written...
   */
 
-  return (fwrite(output, 1, bytes, fp));
+  if (bytes > 0)
+    return (fwrite(output, 1, bytes, fp));
+  else
+    return (bytes);
 }
 
 
@@ -104,8 +110,11 @@ _cupsLangPuts(FILE        *fp,		/* I - File to write to */
   * Range check...
   */
 
-  if (!fp || !language || !message)
+  if (!fp || !message)
     return (-1);
+
+  if (!language)
+    language = cupsLangDefault();
 
  /*
   * Transcode to the destination charset...
@@ -119,7 +128,10 @@ _cupsLangPuts(FILE        *fp,		/* I - File to write to */
   * Write the string and return the number of bytes written...
   */
 
-  return (fwrite(output, 1, bytes, fp));
+  if (bytes > 0)
+    return (fwrite(output, 1, bytes, fp));
+  else
+    return (bytes);
 }
 
 

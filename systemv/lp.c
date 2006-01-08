@@ -36,9 +36,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <cups/cups.h>
 #include <cups/string.h>
-#include <cups/language.h>
+#include <cups/cups.h>
+#include <cups/i18n.h>
 
 
 #ifndef WIN32
@@ -68,30 +68,30 @@ char	tempfile[1024];		/* Temporary file for printing from stdin */
  */
 
 int
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i, j;		/* Looping vars */
-  int		job_id;		/* Job ID */
-  char		*printer,	/* Printer name */
-		*instance,	/* Instance name */ 
-		*val,		/* Option value */
-		*title;		/* Job title */
-  int		priority;	/* Job priority (1-100) */
-  int		num_copies;	/* Number of copies per file */
-  int		num_files;	/* Number of files to print */
-  const char	*files[1000];	/* Files to print */
-  int		num_dests;	/* Number of destinations */
-  cups_dest_t	*dests,		/* Destinations */
-		*dest;		/* Selected destination */
-  int		num_options;	/* Number of options */
-  cups_option_t	*options;	/* Options */
-  int		silent;		/* Silent or verbose output? */
-  char		buffer[8192];	/* Copy buffer */
-  int		temp;		/* Temporary file descriptor */
+  int		i, j;			/* Looping vars */
+  int		job_id;			/* Job ID */
+  char		*printer,		/* Printer name */
+		*instance,		/* Instance name */ 
+		*val,			/* Option value */
+		*title;			/* Job title */
+  int		priority;		/* Job priority (1-100) */
+  int		num_copies;		/* Number of copies per file */
+  int		num_files;		/* Number of files to print */
+  const char	*files[1000];		/* Files to print */
+  int		num_dests;		/* Number of destinations */
+  cups_dest_t	*dests,			/* Destinations */
+		*dest;			/* Selected destination */
+  int		num_options;		/* Number of options */
+  cups_option_t	*options;		/* Options */
+  int		silent;			/* Silent or verbose output? */
+  char		buffer[8192];		/* Copy buffer */
+  int		temp;			/* Temporary file descriptor */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Signal action */
-  struct sigaction oldaction;	/* Old signal action */
+  struct sigaction action;		/* Signal action */
+  struct sigaction oldaction;		/* Old signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
 
 
@@ -109,7 +109,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   else
     val = argv[0];
 
-  if (strcmp(val, "printd") == 0)
+  if (!strcmp(val, "printd"))
     return (0);
 #endif /* __sun */
 
@@ -131,8 +131,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 #ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
-            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	            argv[0]);
+            _cupsLangPrintf(stderr, NULL,
+	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -148,7 +149,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected destination after -d option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected destination after -d option!\n"));
 		return (1);
               }
 
@@ -178,7 +180,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected form after -f option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected form after -f option!\n"));
 		return (1);
               }
 	    }
@@ -195,7 +198,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected hostname after -h option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected hostname after -h option!\n"));
 		return (1);
               }
 
@@ -212,7 +216,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected job ID after -i option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected job ID after -i option!\n"));
 		return (1);
               }
 
@@ -221,7 +226,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
             if (num_files > 0)
 	    {
-	      fputs("lp: Error - cannot print files and alter jobs simultaneously!\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+		              _("lp: Error - cannot print files and alter "
+			        "jobs simultaneously!\n"));
 	      return (1);
 	    }
 
@@ -232,7 +239,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
             if (job_id < 0)
 	    {
-	      fputs("lp: Error - bad job ID!\n", stderr);
+	      _cupsLangPuts(stderr, NULL, _("lp: Error - bad job ID!\n"));
 	      break;
 	    }
 	    break;
@@ -253,7 +260,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected copies after -n option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected copies after -n option!\n"));
 		return (1);
               }
 
@@ -273,7 +281,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected option string after -o option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected option string after -o option!\n"));
 		return (1);
               }
 
@@ -291,8 +300,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    {
 	      if ((i + 1) >= argc)
 	      {
-	        fprintf(stderr, "lp: Expected priority after -%c option!\n",
-		        argv[i][1]);
+	        _cupsLangPrintf(stderr, NULL,
+		                _("lp: Expected priority after -%c option!\n"),
+		        	argv[i][1]);
 		return (1);
               }
 
@@ -312,7 +322,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	    if (priority < 1 || priority > 100)
 	    {
-	      fputs("lp: Priority must be between 1 and 100.\n", stderr);
+	      _cupsLangPuts(stderr, NULL,
+		            _("lp: Priority must be between 1 and 100.\n"));
 	      return (1);
 	    }
 
@@ -333,7 +344,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected title after -t option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected title after -t option!\n"));
 		return (1);
               }
 
@@ -348,12 +360,14 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected mode list after -y option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected mode list after -y option!\n"));
 		return (1);
               }
 	    }
 
-	    fputs("lp: Warning - mode option ignored!\n", stderr);
+	    _cupsLangPuts(stderr, NULL,
+		          _("lp: Warning - mode option ignored!\n"));
 	    break;
 
         case 'H' : /* Hold job */
@@ -365,28 +379,30 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected hold name after -H option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected hold name after -H option!\n"));
 		return (1);
               }
 
 	      val = argv[i];
 	    }
 
-	    if (strcmp(val, "hold") == 0)
+	    if (!strcmp(val, "hold"))
               num_options = cupsAddOption("job-hold-until", "indefinite",
 	                                  num_options, &options);
-	    else if (strcmp(val, "resume") == 0 ||
-	             strcmp(val, "release") == 0)
+	    else if (!strcmp(val, "resume") ||
+	             !strcmp(val, "release"))
               num_options = cupsAddOption("job-hold-until", "no-hold",
 	                                  num_options, &options);
-	    else if (strcmp(val, "immediate") == 0)
+	    else if (!strcmp(val, "immediate"))
               num_options = cupsAddOption("job-priority", "100",
 	                                  num_options, &options);
-	    else if (strcmp(val, "restart") == 0)
+	    else if (!strcmp(val, "restart"))
 	    {
 	      if (job_id < 1)
 	      {
-	        fputs("lp: Need job ID (-i) before \"-H restart\"!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Need job ID (-i) before \"-H restart\"!\n"));
 		return (1);
 	      }
 
@@ -407,7 +423,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected page list after -P option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected page list after -P option!\n"));
 		return (1);
               }
 
@@ -425,12 +442,14 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected character set after -S option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected character set after -S option!\n"));
 		return (1);
               }
 	    }
 
-	    fputs("lp: Warning - character set option ignored!\n", stderr);
+	    _cupsLangPuts(stderr, NULL,
+		          _("lp: Warning - character set option ignored!\n"));
 	    break;
 
         case 'T' : /* Content-Type */
@@ -440,24 +459,28 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        fputs("lp: Expected content type after -T option!\n", stderr);
+	        _cupsLangPuts(stderr, NULL,
+		              _("lp: Expected content type after -T option!\n"));
 		return (1);
               }
 	    }
 
-	    fputs("lp: Warning - content type option ignored!\n", stderr);
+	    _cupsLangPuts(stderr, NULL,
+		          _("lp: Warning - content type option ignored!\n"));
 	    break;
 
 	default :
-	    fprintf(stderr, "lp: Unknown option \'%c\'!\n", argv[i][1]);
+	    _cupsLangPrintf(stderr, NULL, _("lp: Unknown option \'%c\'!\n"),
+	                    argv[i][1]);
 	    return (1);
       }
     else if (!strcmp(argv[i], "-"))
     {
       if (num_files || job_id)
       {
-        fputs("lp: Error - cannot print from stdin if files or a job ID are "
-	      "provided!\n", stderr);
+        _cupsLangPuts(stderr, NULL,
+		      _("lp: Error - cannot print from stdin if files or a "
+		        "job ID are provided!\n"));
 	return (1);
       }
 
@@ -471,8 +494,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       if (access(argv[i], R_OK) != 0)
       {
-        fprintf(stderr, "lp: Unable to access \"%s\" - %s\n", argv[i],
-	        strerror(errno));
+        _cupsLangPrintf(stderr, NULL, _("lp: Unable to access \"%s\" - %s\n"),
+	                argv[i], strerror(errno));
         return (1);
       }
 
@@ -488,7 +511,8 @@ main(int  argc,		/* I - Number of command-line arguments */
       }
     }
     else
-      fprintf(stderr, "lp: Too many files - \"%s\"\n", argv[i]);
+      _cupsLangPrintf(stderr, NULL, _("lp: Too many files - \"%s\"\n"),
+                      argv[i]);
 
  /*
   * See if we are altering an existing job...
@@ -536,12 +560,16 @@ main(int  argc,		/* I - Number of command-line arguments */
       val = "LPDEST";
 
     if (printer && !cupsGetDest(printer, NULL, num_dests, dests))
-      fprintf(stderr, "lp: error - %s environment variable names non-existent destination \"%s\"!\n",
-              val, printer);
+      _cupsLangPrintf(stderr, NULL,
+		      _("lp: error - %s environment variable names "
+		        "non-existent destination \"%s\"!\n"),
+        	      val, printer);
     else if (cupsLastError() == IPP_NOT_FOUND)
-      fputs("lp: error - no default destination available.\n", stderr);
+      _cupsLangPuts(stderr, NULL,
+		    _("lp: error - no default destination available.\n"));
     else
-      fputs("lp: error - scheduler not responding!\n", stderr);
+      _cupsLangPuts(stderr, NULL,
+		    _("lp: error - scheduler not responding!\n"));
 
     return (1);
   }
@@ -579,16 +607,19 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (temp < 0)
     {
-      fprintf(stderr, "lp: unable to create temporary file \"%s\" - %s\n",
-              tempfile, strerror(errno));
+      _cupsLangPrintf(stderr, NULL,
+		      _("lp: unable to create temporary file \"%s\" - %s\n"),
+        	      tempfile, strerror(errno));
       return (1);
     }
 
     while ((i = read(0, buffer, sizeof(buffer))) > 0)
       if (write(temp, buffer, i) < 0)
       {
-	fprintf(stderr, "lp: error - unable to write to temporary file \"%s\" - %s\n",
-        	tempfile, strerror(errno));
+	_cupsLangPrintf(stderr, NULL,
+		        _("lp: error - unable to write to temporary file "
+			  "\"%s\" - %s\n"),
+        	        tempfile, strerror(errno));
         close(temp);
         unlink(tempfile);
 	return (1);
@@ -599,7 +630,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (i == 0)
     {
-      fputs("lp: stdin is empty, so no job has been sent.\n", stderr);
+      _cupsLangPuts(stderr, NULL,
+		    _("lp: stdin is empty, so no job has been sent.\n"));
       unlink(tempfile);
       return (1);
     }
@@ -614,12 +646,15 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (job_id < 1)
   {
-    fprintf(stderr, "lp: unable to print file: %s\n",
-	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, NULL,
+		    _("lp: unable to print file: %s\n"),
+		    ippErrorString(cupsLastError()));
     return (1);
   }
   else if (!silent)
-    printf("request id is %s-%d (%d file(s))\n", printer, job_id, num_files);
+    _cupsLangPrintf(stdout, NULL,
+		    _("request id is %s-%d (%d file(s))\n"),
+		    printer, job_id, num_files);
 
   return (0);
 }
@@ -665,8 +700,8 @@ restart_job(int job_id)			/* I - Job ID */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lp: restart-job failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, NULL, _("lp: restart-job failed: %s\n"),
+                      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
     }
@@ -675,8 +710,8 @@ restart_job(int job_id)			/* I - Job ID */
   }
   else
   {
-    fprintf(stderr, "lp: restart-job failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, NULL, _("lp: restart-job failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
     return (1);
   }
 
@@ -731,8 +766,8 @@ set_job_attrs(int           job_id,	/* I - Job ID */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lp: set-job-attributes failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, NULL, _("lp: set-job-attributes failed: %s\n"),
+        	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
     }
@@ -741,8 +776,8 @@ set_job_attrs(int           job_id,	/* I - Job ID */
   }
   else
   {
-    fprintf(stderr, "lp: set-job-attributes failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, NULL, _("lp: set-job-attributes failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
     return (1);
   }
 
