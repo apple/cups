@@ -37,7 +37,7 @@
 
 #include <cups/string.h>
 #include <cups/cups.h>
-
+#include <cups/i18n.h>
 
 #ifndef WIN32
 #  include <unistd.h>
@@ -85,6 +85,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   int		deletefile;	/* Delete file after print? */
   char		buffer[8192];	/* Copy buffer */
   int		temp;		/* Temporary file descriptor */
+  cups_lang_t	*language;	/* Language information */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;	/* Signal action */
   struct sigaction oldaction;	/* Old signal action */
@@ -99,6 +100,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   options     = NULL;
   num_files   = 0;
   title       = NULL;
+  language    = cupsLangDefault();
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -108,8 +110,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 #ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
-            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	            argv[0]);
+            _cupsLangPrintf(stderr, language,
+	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -125,7 +128,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		fprintf(stderr, "lpr: error - expected value after -%c option!\n", ch);
+		_cupsLangPrintf(stderr, language,
+		                _("lpr: error - expected value after -%c "
+				  "option!\n"), ch);
 		return (1);
 	      }
 	    }
@@ -137,8 +142,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	case 'n' : /* Ditroff */
 	case 't' : /* Troff */
 	case 'v' : /* Raster image */
-	    fprintf(stderr, "lpr: warning - \'%c\' format modifier not supported - output may not be correct!\n",
-	            ch);
+	    _cupsLangPrintf(stderr, language,
+	                    _("lpr: warning - \'%c\' format modifier not "
+			      "supported - output may not be correct!\n"), ch);
 	    break;
 
 	case 'o' : /* Option */
@@ -149,7 +155,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fputs("lpr: error - expected option=value after -o option!\n", stderr);
+	        _cupsLangPuts(stderr, language,
+		              _("lpr: error - expected option=value after "
+			        "-o option!\n"));
 		return (1);
 	      }
 
@@ -173,7 +181,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
 	case 'm' : /* Mail on completion */
-	    fputs("lpr: warning - email notification is not currently supported!\n", stderr);
+	    _cupsLangPuts(stderr, language,
+	                  _("lpr: warning - email notification is not "
+			    "currently supported!\n"));
 	    break;
 
 	case 'q' : /* Queue file but don't print */
@@ -193,7 +203,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fputs("lpr: error - expected destination after -P option!\n", stderr);
+	        _cupsLangPuts(stderr, language,
+		              _("lpr: error - expected destination after -P "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -224,7 +236,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fputs("lpr: error - expected copy count after -# option!\n", stderr);
+	        _cupsLangPuts(stderr, language,
+		              _("lpr: error - expected copy count after -# "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -245,7 +259,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-		fprintf(stderr, "lpr: error - expected name after -%c option!\n", ch);
+		_cupsLangPrintf(stderr, language,
+		                _("lpr: error - expected name after -%c "
+				  "option!\n"), ch);
 		return (1);
 	      }
 
@@ -261,7 +277,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        fputs("lpr: error - expected username after -U option!\n", stderr);
+	        _cupsLangPuts(stderr, language,
+		              _("lpr: error - expected username after -U "
+			        "option!\n"));
 		return (1);
 	      }
 
@@ -270,7 +288,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    fprintf(stderr, "lpr: error - unknown option \'%c\'!\n", argv[i][1]);
+	    _cupsLangPrintf(stderr, language,
+	                    _("lpr: error - unknown option \'%c\'!\n"),
+			    argv[i][1]);
 	    return (1);
       }
     else if (num_files < 1000)
@@ -281,8 +301,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       if (access(argv[i], R_OK) != 0)
       {
-        fprintf(stderr, "lpr: error - unable to access \"%s\" - %s\n", argv[i],
-	        strerror(errno));
+        _cupsLangPrintf(stderr, language,
+	                _("lpr: error - unable to access \"%s\" - %s\n"),
+		        argv[i], strerror(errno));
         return (1);
       }
 
@@ -298,7 +319,8 @@ main(int  argc,		/* I - Number of command-line arguments */
       }
     }
     else
-      fprintf(stderr, "lpr: error - too many files - \"%s\"\n", argv[i]);
+      _cupsLangPrintf(stderr, language,
+                      _("lpr: error - too many files - \"%s\"\n"), argv[i]);
  /*
   * See if we have any files to print; if not, print from stdin...
   */
@@ -338,12 +360,16 @@ main(int  argc,		/* I - Number of command-line arguments */
       val = "LPDEST";
 
     if (printer && !cupsGetDest(printer, NULL, num_dests, dests))
-      fprintf(stderr, "lpr: error - %s environment variable names non-existent destination \"%s\"!\n",
-              val, printer);
+      _cupsLangPrintf(stderr, language,
+                      _("lpr: error - %s environment variable names "
+		        "non-existent destination \"%s\"!\n"),
+        	      val, printer);
     else if (cupsLastError() == IPP_NOT_FOUND)
-      fputs("lpr: error - no default destination available.\n", stderr);
+      _cupsLangPuts(stderr, language,
+                    _("lpr: error - no default destination available.\n"));
     else
-      fputs("lpr: error - scheduler not responding!\n", stderr);
+      _cupsLangPuts(stderr, language,
+                    _("lpr: error - scheduler not responding!\n"));
 
     return (1);
   }
@@ -391,16 +417,20 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if ((temp = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
-      fprintf(stderr, "lpr: error - unable to create temporary file \"%s\" - %s\n",
-              tempfile, strerror(errno));
+      _cupsLangPrintf(stderr, language,
+                      _("lpr: error - unable to create temporary file "
+		        "\"%s\" - %s\n"),
+        	      tempfile, strerror(errno));
       return (1);
     }
 
     while ((i = read(0, buffer, sizeof(buffer))) > 0)
       if (write(temp, buffer, i) < 0)
       {
-	fprintf(stderr, "lpr: error - unable to write to temporary file \"%s\" - %s\n",
-        	tempfile, strerror(errno));
+	_cupsLangPrintf(stderr, language,
+	                _("lpr: error - unable to write to temporary file "
+			  "\"%s\" - %s\n"),
+        		tempfile, strerror(errno));
         close(temp);
         unlink(tempfile);
 	return (1);
@@ -411,7 +441,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if (i == 0)
     {
-      fputs("lpr: error - stdin is empty, so no job has been sent.\n", stderr);
+      _cupsLangPuts(stderr, language,
+                    _("lpr: error - stdin is empty, so no job has been sent.\n"));
       unlink(tempfile);
       return (1);
     }
@@ -426,8 +457,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (job_id < 1)
   {
-    fprintf(stderr, "lpr: error - unable to print file: %s\n",
-	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, language,
+                    _("lpr: error - unable to print file: %s\n"),
+		    ippErrorString(cupsLastError()));
     return (1);
   }
 

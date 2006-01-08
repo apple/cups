@@ -34,7 +34,7 @@
 #include <stdlib.h>
 
 #include <cups/cups.h>
-#include <cups/language.h>
+#include <cups/i18n.h>
 #include <cups/string.h>
 
 
@@ -71,8 +71,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   response   = NULL;
   http       = NULL;
   encryption = cupsEncryption();
-
-  num_dests = cupsGetDests(&dests);
+  language   = cupsLangDefault();
+  num_dests  = cupsGetDests(&dests);
 
   for (i = 0; i < num_dests; i ++)
     if (dests[i].is_default)
@@ -84,7 +84,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(), encryption)) == NULL)
   {
-    fputs("lprm: Unable to contact server!\n", stderr);
+    _cupsLangPuts(stderr, language, _("lprm: Unable to contact server!\n"));
     cupsFreeDests(num_dests, dests);
     return (1);
   }
@@ -103,8 +103,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    httpEncryption(http, encryption);
 #else
-            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	            argv[0]);
+            _cupsLangPrintf(stderr, language,
+	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -122,7 +123,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    if (cupsGetDest(dest, NULL, num_dests, dests) == NULL)
 	    {
-	      fprintf(stderr, "lprm: Unknown destination \"%s\"!\n", dest);
+	      _cupsLangPrintf(stderr, language,
+	                      _("lprm: Unknown destination \"%s\"!\n"), dest);
               cupsFreeDests(num_dests, dests);
 	      httpClose(http);
 	      return(1);
@@ -130,7 +132,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    fprintf(stderr, "lprm: Unknown option \'%c\'!\n", argv[i][1]);
+	    _cupsLangPrintf(stderr, language,
+	                    _("lprm: Unknown option \'%c\'!\n"), argv[i][1]);
             cupsFreeDests(num_dests, dests);
 	    httpClose(http);
 	    return (1);
@@ -177,8 +180,6 @@ main(int  argc,			/* I - Number of command-line arguments */
       request->request.op.operation_id = op;
       request->request.op.request_id   = 1;
 
-      language = cupsLangDefault();
-
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
               	   "attributes-charset", NULL, cupsLangEncoding(language));
 
@@ -218,17 +219,21 @@ main(int  argc,			/* I - Number of command-line arguments */
         switch (response->request.status.status_code)
 	{
 	  case IPP_NOT_FOUND :
-              fputs("lprm: Job or printer not found!\n", stderr);
+              _cupsLangPuts(stderr, language,
+	                    _("lprm: Job or printer not found!\n"));
 	      break;
 	  case IPP_NOT_AUTHORIZED :
-              fputs("lprm: Not authorized to lprm job(s)!\n", stderr);
+              _cupsLangPuts(stderr, language,
+	                    _("lprm: Not authorized to lprm job(s)!\n"));
 	      break;
 	  case IPP_FORBIDDEN :
-              fprintf(stderr, "lprm: You don't own job ID %d!\n", job_id);
+              _cupsLangPrintf(stderr, language,
+	                      _("lprm: You don't own job ID %d!\n"), job_id);
 	      break;
 	  default :
               if (response->request.status.status_code > IPP_OK_CONFLICT)
-                fputs("lprm: Unable to lprm job(s)!\n", stderr);
+                _cupsLangPuts(stderr, language,
+		              _("lprm: Unable to lprm job(s)!\n"));
 	      break;
 	}
 
@@ -244,7 +249,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-        fputs("lprm: Unable to cancel job(s)!\n", stderr);
+        _cupsLangPuts(stderr, language,
+	              _("lprm: Unable to cancel job(s)!\n"));
         cupsFreeDests(num_dests, dests);
         httpClose(http);
 	return (1);
@@ -259,7 +265,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (response == NULL)
     if (!cupsCancelJob(dest, 0))
     {
-      fputs("lprm: Unable to cancel job(s)!\n", stderr);
+      _cupsLangPuts(stderr, language,
+                    _("lprm: Unable to cancel job(s)!\n"));
       cupsFreeDests(num_dests, dests);
       httpClose(http);
       return (1);

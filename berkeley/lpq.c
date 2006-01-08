@@ -41,7 +41,7 @@
 #include <stdlib.h>
 #include <cups/string.h>
 #include <cups/cups.h>
-#include <cups/language.h>
+#include <cups/i18n.h>
 #include <cups/debug.h>
 
 
@@ -75,10 +75,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 		longstatus;	/* Show file details */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests;		/* Destinations */
+  cups_lang_t	*language;	/* Language */
 #ifdef HAVE_SSL
   http_encryption_t encryption;	/* Encryption? */
 #endif /* HAVE_SSL */
 
+
+  language = cupsLangDefault();
 
  /*
   * Connect to the scheduler...
@@ -87,7 +90,8 @@ main(int  argc,		/* I - Number of command-line arguments */
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
   {
-    fputs("lpq: Unable to contact server!\n", stderr);
+    _cupsLangPuts(stderr, language,
+                  _("lpq: Unable to contact server!\n"));
     return (1);
   }
 
@@ -101,8 +105,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   interval   = 0;
   longstatus = 0;
   all        = 0;
-
-  num_dests = cupsGetDests(&dests);
+  num_dests  = cupsGetDests(&dests);
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '+')
@@ -118,8 +121,9 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, encryption);
 #else
-            fprintf(stderr, "%s: Sorry, no encryption support compiled in!\n",
-	            argv[0]);
+            _cupsLangPrintf(stderr, language,
+	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -147,10 +151,12 @@ main(int  argc,		/* I - Number of command-line arguments */
             if (cupsGetDest(dest, instance, num_dests, dests) == NULL)
 	    {
 	      if (instance)
-		fprintf(stderr, "lpq: Unknown destination \"%s/%s\"!\n",
-		        dest, instance);
+		_cupsLangPrintf(stderr, language,
+		                _("lpq: Unknown destination \"%s/%s\"!\n"),
+		        	dest, instance);
               else
-		fprintf(stderr, "lpq: Unknown destination \"%s\"!\n", dest);
+		_cupsLangPrintf(stderr, language,
+		                _("lpq: Unknown destination \"%s\"!\n"), dest);
 
 	      return (1);
 	    }
@@ -201,10 +207,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 	val = "LPDEST";
 
       if (dest && !cupsGetDest(dest, NULL, num_dests, dests))
-	fprintf(stderr, "lp: error - %s environment variable names non-existent destination \"%s\"!\n",
-        	val, dest);
+	_cupsLangPrintf(stderr, language,
+	                _("lp: error - %s environment variable names "
+			  "non-existent destination \"%s\"!\n"),
+        	        val, dest);
       else
-	fputs("lpq: error - no default destination available.\n", stderr);
+	_cupsLangPuts(stderr, language,
+	              _("lpq: error - no default destination available.\n"));
       httpClose(http);
       cupsFreeDests(num_dests, dests);
       return (1);
@@ -351,8 +360,8 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lpq: get-jobs failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, language, _("lpq: get-jobs failed: %s\n"),
+        	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (0);
     }
@@ -444,9 +453,13 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
       if (!longstatus && jobcount == 0)
 #ifdef __osf__
-	puts("Rank   Owner      Pri  Job        Files                       Total Size");
+	_cupsLangPuts(stdout, language,
+	              _("Rank   Owner      Pri  Job        Files"
+		        "                       Total Size\n"));
 #else
-	puts("Rank    Owner   Job     File(s)                         Total Size");
+	_cupsLangPuts(stdout, language,
+	              _("Rank    Owner   Job     File(s)"
+		        "                         Total Size\n"));
 #endif /* __osf__ */
 
       jobcount ++;
@@ -474,7 +487,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
       if (longstatus)
       {
-        puts("");
+        _cupsLangPuts(stdout, language, "");
 
         if (jobcopies > 1)
 	  snprintf(namestr, sizeof(namestr), "%d copies of %s", jobcopies,
@@ -482,16 +495,21 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 	else
 	  strlcpy(namestr, jobname, sizeof(namestr));
 
-        printf("%s: %-33.33s [job %d localhost]\n", jobuser, rankstr, jobid);
-        printf("        %-39.39s %.0f bytes\n", namestr, 1024.0 * jobsize);
+        _cupsLangPrintf(stdout, language, _("%s: %-33.33s [job %d localhost]\n"),
+	                jobuser, rankstr, jobid);
+        _cupsLangPrintf(stdout, language, _("        %-39.39s %.0f bytes\n"),
+	                namestr, 1024.0 * jobsize);
       }
       else
 #ifdef __osf__
-        printf("%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n", rankstr, jobuser,
-	       jobpriority, jobid, jobname, 1024.0 * jobsize);
+        _cupsLangPrintf(stdout, language,
+	                _("%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"),
+			rankstr, jobuser, jobpriority, jobid, jobname,
+			1024.0 * jobsize);
 #else
-        printf("%-7s %-7.7s %-7d %-31.31s %.0f bytes\n", rankstr, jobuser,
-	       jobid, jobname, 1024.0 * jobsize);
+        _cupsLangPrintf(stdout, language,
+	                _("%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"),
+			rankstr, jobuser, jobid, jobname, 1024.0 * jobsize);
 #endif /* __osf */
 
       if (attr == NULL)
@@ -502,12 +520,13 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   }
   else
   {
-    fprintf(stderr, "lpq: get-jobs failed: %s\n", ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, language, _("lpq: get-jobs failed: %s\n"),
+                    ippErrorString(cupsLastError()));
     return (0);
   }
 
   if (jobcount == 0)
-    puts("no entries");
+    _cupsLangPuts(stdout, language, _("no entries\n"));
 
   return (jobcount);
 }
@@ -568,8 +587,9 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      fprintf(stderr, "lpq: get-printer-attributes failed: %s\n",
-              ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, language,
+                      _("lpq: get-printer-attributes failed: %s\n"),
+        	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
     }
@@ -582,21 +602,23 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
     switch (state)
     {
       case IPP_PRINTER_IDLE :
-          printf("%s is ready\n", dest);
+          _cupsLangPrintf(stdout, language, _("%s is ready\n"), dest);
 	  break;
       case IPP_PRINTER_PROCESSING :
-          printf("%s is ready and printing\n", dest);
+          _cupsLangPrintf(stdout, language, _("%s is ready and printing\n"),
+	                  dest);
 	  break;
       case IPP_PRINTER_STOPPED :
-          printf("%s is not ready\n", dest);
+          _cupsLangPrintf(stdout, language, _("%s is not ready\n"), dest);
 	  break;
     }
 
     ippDelete(response);
   }
   else
-    fprintf(stderr, "lpq: get-printer-attributes failed: %s\n",
-            ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, language,
+                    _("lpq: get-printer-attributes failed: %s\n"),
+        	    ippErrorString(cupsLastError()));
 }
 
 
@@ -607,7 +629,8 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 static void
 usage(void)
 {
-  fputs("Usage: lpq [-P dest] [-l] [+interval]\n", stderr);
+  _cupsLangPuts(stderr, cupsLangDefault(),
+                _("Usage: lpq [-P dest] [-l] [+interval]\n"));
   exit(1);
 }
 

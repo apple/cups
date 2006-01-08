@@ -37,7 +37,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cups/cups.h>
-#include <cups/language.h>
+#include <cups/i18n.h>
 #include <cups/debug.h>
 #include <cups/string.h>
 
@@ -46,10 +46,10 @@
  * Local functions...
  */
 
-static int	compare_strings(char *, char *, int);
-static void	do_command(http_t *, char *, char *);
-static void	show_help(char *);
-static void	show_status(http_t *, char *);
+static int	compare_strings(const char *, const char *, int);
+static void	do_command(http_t *, const char *, const char *);
+static void	show_help(const char *);
+static void	show_status(http_t *, const char *);
 
 
 /*
@@ -168,9 +168,9 @@ main(int  argc,				/* I - Number of command-line arguments */
  */
 
 static int				/* O - -1 or 1 = no match, 0 = match */
-compare_strings(char *s,		/* I - Command-line string */
-                char *t,		/* I - Option string */
-                int  tmin)		/* I - Minimum number of unique chars in option */
+compare_strings(const char *s,		/* I - Command-line string */
+                const char *t,		/* I - Option string */
+                int        tmin)	/* I - Minimum number of unique chars in option */
 {
   int	slen;				/* Length of command-line string */
 
@@ -188,16 +188,18 @@ compare_strings(char *s,		/* I - Command-line string */
  */
 
 static void
-do_command(http_t *http,		/* I - HTTP connection to server */
-           char   *command,		/* I - Command string */
-	   char   *params)		/* I - Parameters for command */
+do_command(http_t     *http,		/* I - HTTP connection to server */
+           const char *command,		/* I - Command string */
+	   const char *params)		/* I - Parameters for command */
 {
   if (!compare_strings(command, "status", 4))
     show_status(http, params);
   else if (!compare_strings(command, "help", 1) || !strcmp(command, "?"))
     show_help(params);
   else
-    printf("%s is not implemented by the CUPS version of lpc.\n", command);
+    _cupsLangPrintf(stdout, cupsLangDefault(),
+                    _("%s is not implemented by the CUPS version of lpc.\n"),
+		    command);
 }
 
 
@@ -206,20 +208,24 @@ do_command(http_t *http,		/* I - HTTP connection to server */
  */
 
 static void
-show_help(char *command)		/* I - Command to describe or NULL */
+show_help(const char *command)		/* I - Command to describe or NULL */
 {
   if (!command)
   {
-    puts("Commands may be abbreviated.  Commands are:");
-    puts("");
-    puts("exit    help    quit    status  ?");
+    _cupsLangPrintf(stdout, cupsLangDefault(),
+                    _("Commands may be abbreviated.  Commands are:\n"
+		      "\n"
+		      "exit    help    quit    status  ?\n"));
   }
   else if (!compare_strings(command, "help", 1) || !strcmp(command, "?"))
-    puts("help\t\tget help on commands");
+    _cupsLangPrintf(stdout, cupsLangDefault(),
+                    _("help\t\tget help on commands\n"));
   else if (!compare_strings(command, "status", 4))
-    puts("status\t\tshow status of daemon and queue");
+    _cupsLangPrintf(stdout, cupsLangDefault(),
+                    _("status\t\tshow status of daemon and queue\n"));
   else
-    puts("?Invalid help command unknown");
+    _cupsLangPrintf(stdout, cupsLangDefault(),
+                    _("?Invalid help command unknown\n"));
 }
 
 
@@ -228,8 +234,8 @@ show_help(char *command)		/* I - Command to describe or NULL */
  */
 
 static void
-show_status(http_t *http,		/* I - HTTP connection to server */
-            char   *dests)		/* I - Destinations */
+show_status(http_t     *http,		/* I - HTTP connection to server */
+            const char *dests)		/* I - Destinations */
 {
   ipp_t		*request,		/* IPP Request */
 		*response,		/* IPP Response */
@@ -243,7 +249,7 @@ show_status(http_t *http,		/* I - HTTP connection to server */
   ipp_pstate_t	pstate;			/* Printer state */
   int		accepting;		/* Is printer accepting jobs? */
   int		jobcount;		/* Count of current jobs */
-  char		*dptr,			/* Pointer into destination list */
+  const char	*dptr,			/* Pointer into destination list */
 		*ptr;			/* Pointer into printer name */
   int		match;			/* Non-zero if this job matches */
   char		printer_uri[HTTP_MAX_URI];
@@ -441,8 +447,8 @@ show_status(http_t *http,		/* I - HTTP connection to server */
                      "attributes-natural-language", NULL,
 		     language->language);
 
-        snprintf(printer_uri, sizeof(printer_uri),
-                 "ipp://localhost/printers/%s", printer);
+        httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
+	                 "localhost", 631, "/printers/%s", printer);
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	             "printer-uri", NULL, printer_uri);
 
@@ -468,7 +474,9 @@ show_status(http_t *http,		/* I - HTTP connection to server */
 
         printf("%s:\n", printer);
 	if (!strncmp(device, "file:", 5))
-	  printf("\tprinter is on device \'%s\' speed -1\n", device + 5);
+	  _cupsLangPrintf(stdout, language,
+	                  _("\tprinter is on device \'%s\' speed -1\n"),
+			  device + 5);
 	else
 	{
 	 /*
@@ -478,18 +486,28 @@ show_status(http_t *http,		/* I - HTTP connection to server */
 	  if ((delimiter = strchr(device, ':')) != NULL )
 	  {
 	    *delimiter = '\0';
-	    printf("\tprinter is on device \'%s\' speed -1\n", device);
+	    _cupsLangPrintf(stdout, language,
+	                    _("\tprinter is on device \'%s\' speed -1\n"),
+			    device);
 	  }
 	}
 
-	printf("\tqueuing is %sabled\n", accepting ? "en" : "dis");
-	printf("\tprinting is %sabled\n",
-	       pstate == IPP_PRINTER_STOPPED ? "dis" : "en");
-	if (jobcount == 0)
-	  puts("\tno entries");
+        if (accepting)
+	  _cupsLangPuts(stdout, language, _("\tqueuing is enabled\n"));
 	else
-	  printf("\t%d entries\n", jobcount);
-	puts("\tdaemon present");
+	  _cupsLangPuts(stdout, language, _("\tqueuing is disabled\n"));
+
+        if (pstate != IPP_PRINTER_STOPPED)
+	  _cupsLangPuts(stdout, language, _("\tprinting is enabled\n"));
+	else
+	  _cupsLangPuts(stdout, language, _("\tprinting is disabled\n"));
+
+	if (jobcount == 0)
+	  _cupsLangPuts(stdout, language, _("\tno entries\n"));
+	else
+	  _cupsLangPrintf(stdout, language, _("\t%d entries\n"), jobcount);
+
+	_cupsLangPuts(stdout, language, _("\tdaemon present\n"));
       }
 
       if (attr == NULL)
