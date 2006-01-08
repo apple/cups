@@ -27,14 +27,14 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-01-07 10:34-0500\n"
+"POT-Creation-Date: 2006-01-07 22:12-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: cgi-bin/admin.c:1276
@@ -94,9 +94,7 @@ msgid "Auto"
 msgstr ""
 
 #: scheduler/client.c:2247
-msgid ""
-"Enter your username and password or the root username and password to access "
-"this page."
+msgid "Enter your username and password or the root username and password to access this page."
 msgstr ""
 
 #: scheduler/client.c:2252
@@ -136,8 +134,7 @@ msgid "The printer or class was not found."
 msgstr ""
 
 #: scheduler/ipp.c:762
-msgid ""
-"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgid "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
 msgstr ""
 
 #: scheduler/ipp.c:778 scheduler/ipp.c:1454
@@ -185,13 +182,11 @@ msgid "The notify-user-data value is too large (%d > 63 octets)!"
 msgstr ""
 
 #: scheduler/ipp.c:1326
-msgid ""
-"The notify-lease-duration attribute cannot be used with job subscriptions."
+msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
 
 #: scheduler/ipp.c:1438
-msgid ""
-"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgid "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
 msgstr ""
 
 #: scheduler/ipp.c:1487
@@ -201,9 +196,7 @@ msgstr ""
 
 #: scheduler/ipp.c:1575
 #, c-format
-msgid ""
-"File device URIs have been disabled! To enable, see the FileDevice directive "
-"in \"%s/cupsd.conf\"."
+msgid "File device URIs have been disabled! To enable, see the FileDevice directive in \"%s/cupsd.conf\"."
 msgstr ""
 
 #: scheduler/ipp.c:1595

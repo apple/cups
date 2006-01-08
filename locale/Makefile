@@ -28,14 +28,14 @@ include ../Makedefs
 # Locales...
 #
 
-LOCALES	=
+LOCALES	=	fr
 
 
 #
 # Make everything...
 #
 
-all:
+all:	translate
 
 
 #
@@ -43,6 +43,7 @@ all:
 #
 
 clean:
+	$(RM) translate translate.o
 
 
 #
@@ -51,10 +52,10 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(LOCALEDIR)
-#	for loc in $(LOCALES) ; do \
-#		$(INSTALL_DIR) $(LOCALEDIR)/$$loc ; \
-#		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc ; \
-#	done
+	for loc in $(LOCALES) ; do \
+		$(INSTALL_DIR) $(LOCALEDIR)/$$loc ; \
+		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc ; \
+	done
 
 
 #
@@ -64,20 +65,23 @@ install:
 
 pot:
 	echo Updating cups.pot...
-	cd ..; xgettext -o locale/cups.pot -j --keyword=_ \
+	cd ..; xgettext -o locale/cups.pot -j --keyword=_ --no-wrap \
 		--copyright-holder="Easy Software Products" \
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c
-	(cat cups.header; tail +6 cups.pot; cat cups.footer) > cups.pot.N
+	(cat cups.header; \
+	 tail +6 cups.pot | sed -e '1,$$s/PACKAGE VERSION/CUPS 1.2/' \
+	     -e '1,$$s/charset=CHARSET/charset=utf-8/'; \
+	 cat cups.footer) > cups.pot.N
 	mv cups.pot.N cups.pot
-#	for loc in $(LOCALES) ; do \
-#		echo Merging changes into cups_$$loc.po... ; \
-#		msgmerge cups_$$loc.po cups.pot ; \
-#	done
+	for loc in $(LOCALES) ; do \
+		echo Merging changes into cups_$$loc.po... ; \
+		msgmerge cups_$$loc.po cups.pot ; \
+	done
 
 
 #
-# translate - a simple utility to use Bablefish to translate the message
+# translate - A simple utility which uses Google to translate the cups.pot
 #             file to one of several languages.
 #
 # translate outfile language
@@ -87,7 +91,7 @@ translate:	translate.o ../cups/$(LIBCUPS)
 	echo Linking $<...
 	$(CC) $(LDFLAGS) -o translate translate.o $(LIBS)
 
-translate.o:	../cups/http.h
+translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
 
 
 #

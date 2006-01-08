@@ -46,6 +46,17 @@ extern "C" {
 
 
 /*
+ * Types...
+ */
+
+typedef struct _cups_message_s		/**** Message catalog entry ****/
+{
+  char	*id,				/* Original string */
+	*str;				/* Localized string */
+} _cups_message_t;
+
+
+/*
  * Prototypes...
  */
 

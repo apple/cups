@@ -3,11 +3,11 @@
  *
  *   HTTP-based translation program for the Common UNIX Printing System (CUPS).
  *
- *   This program uses AltaVista's "babelfish" page to translate the POSIX
- *   message file (C/cups_C) to several different languages.  The translation
- *   isn't perfect, but it's a good start (better than working from scratch.)
+ *   This program uses Google to translate the CUPS template (cups.pot) to
+ *   several different languages.  The translation isn't perfect, but it's
+ *   a start (better than working from scratch.)
  *
- *   Copyright 1997-1999 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -27,119 +27,212 @@
  *
  * Contents:
  *
- *   main() - Main entry.
  */
 
 /*
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
+#include <cups/string.h>
+#include <cups/file.h>
 #include <cups/http.h>
+#include <cups/i18n.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
+/*
+ * Local functions...
+ */
+
+int	save_messages(cups_array_t *cat, const char *filename);
+int	translate_messages(cups_array_t *cat, const char *lang);
+int	write_string(cups_file_t *fp, const char *s);
 
 
 /*
  * 'main()' - Main entry.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  http_t	*http;		/* HTTP connection */
-  http_status_t	status;		/* Status of GET command */
-  char		line[1024],	/* Line from file */
-		*lineptr,	/* Pointer into line */
-		buffer[2048],	/* Input/output buffer */
-		*bufptr,	/* Pointer into buffer */
-		length[16];	/* Content length */
-  int		bytes;		/* Number of bytes read */
-  FILE		*in,		/* Input file */
-		*out;		/* Output file */
+  cups_array_t	*cat;			/* Message catalog */
 
 
   if (argc != 3)
   {
-    fputs("Usage: translate outfile language\n", stderr);
+    fputs("Usage: translate cups_language.po language\n", stderr);
     return (1);
   }
 
-  if ((in = fopen("C/cups_C", "r")) == NULL)
+  if (access(argv[1], 0))
+    cat = _cupsMessageLoad("cups.pot");
+  else
+    cat = _cupsMessageLoad(argv[1]);
+
+  if (!cat)
   {
-    perror("translate: Unable to open input file");
+    puts("Unable to load message catalog.");
     return (1);
   }
 
-  if ((out = fopen(argv[1], "w")) == NULL)
+  if (!translate_messages(cat, argv[2]))
   {
-    perror("translate: Unable to create output file");
-    fclose(in);
+    puts("Unable to translate message catalog.");
     return (1);
   }
+
+  if (!save_messages(cat, argv[1]))
+  {
+    puts("Unable to save message catalog.");
+    return (1);
+  }
+
+  return (0);
+}
+
+
+/*
+ * 'save_messages()' - Save messages to a .po file.
+ */
+
+int					/* O - 1 on success, 0 on error */
+save_messages(cups_array_t *cat,	/* I - Message catalog */
+              const char   *filename)	/* I - File to save to */
+{
+  _cups_message_t *m;			/* Current message */
+  cups_file_t	*fp;			/* File pointer */
+
 
  /*
-  * Do character set...
+  * Open the message catalog...
   */
 
-  fgets(line, sizeof(line), in);
-  fputs("iso-8859-1\n", out);	/* Right now that's all that Babelfish does */
+  if ((fp = cupsFileOpen(filename, "w")) == NULL)
+    return (0);
 
  /*
-  * Then strings...
+  * Save the messages to a file...
   */
 
-  while (fgets(line, sizeof(line), in) != NULL)
+  for (m = (_cups_message_t *)cupsArrayFirst(cat);
+       m;
+       m = (_cups_message_t *)cupsArrayNext(cat))
   {
-   /*
-    * Strip trailing newline if necessary...
-    */
+    if (cupsFilePuts(fp, "msgid \"") < 0)
+      break;
 
-    lineptr = line + strlen(line) - 1;
-    if (*lineptr == '\n')
-      *lineptr = '\0';
+    if (!write_string(fp, m->id))
+      break;
 
-   /*
-    * Skip leading numbers and whitespace...
-    */
+    if (cupsFilePuts(fp, "\"\nmsgstr \"") < 0)
+      break;
 
-    lineptr = line;
-    while (isdigit(*lineptr))
-      putc(*lineptr++, out);
-
-    while (isspace(*lineptr))
-      putc(*lineptr++, out);
-
-    if (*lineptr == '\0')
+    if (m->str)
     {
-      putc('\n', out);
-      continue;
+      if (!write_string(fp, m->str))
+	break;
     }
 
+    if (cupsFilePuts(fp, "\"\n") < 0)
+      break;
+  }
+
+  cupsFileClose(fp);
+
+  return (!m);
+}
+
+
+/*
+ * 'translate_messages()' - Translate messages using Google.
+ */
+
+int					/* O - 1 on success, 0 on error */
+translate_messages(cups_array_t *cat,	/* I - Message catalog */
+                   const char *lang)	/* I - Output language... */
+{
+ /*
+  * Google provides a simple translation/language tool for translating
+  * from one language to another.  It is far from perfect, however it
+  * can be used to get a basic translation done or update an existing
+  * translation when no other resources are available.
+  *
+  * Translation requests are sent as HTTP POSTs to
+  * "http://translate.google.com/translate_t" with the following form
+  * variables:
+  *
+  *   Name      Description                         Value
+  *   --------  ----------------------------------  ----------------
+  *   hl        Help language?                      "en"
+  *   ie        Input encoding                      "UTF8"
+  *   langpair  Language pair                       "en|" + language
+  *   oe        Output encoding                     "UTF8"
+  *   text      Text to translate                   translation string
+  */
+
+  int		ret;			/* Return value */
+  _cups_message_t *m;			/* Current message */
+  int		tries;			/* Number of tries... */
+  http_t	*http;			/* HTTP connection */
+  http_status_t	status;			/* Status of POST request */
+  char		*idptr,			/* Pointer into msgid */
+		buffer[65536],		/* Input/output buffer */
+		*bufptr,		/* Pointer into buffer */
+		*bufend,		/* Pointer to end of buffer */
+		length[16];		/* Content length */
+  int		bytes;			/* Number of bytes read */
+
+
+ /*
+  * Connect to translate.google.com...
+  */
+
+  puts("Connecting to translate.google.com...");
+
+  if ((http = httpConnect("translate.google.com", 80)) == NULL)
+  {
+    perror("Unable to connect to translate.google.com");
+    return (0);
+  }
+
+ /*
+  * Scan the current messages, requesting a translation of any untranslated
+  * messages...
+  */
+
+  for (m = (_cups_message_t *)cupsArrayFirst(cat), ret = 1;
+       m;
+       m = (_cups_message_t *)cupsArrayNext(cat))
+  {
    /*
-    * Encode the line into the buffer...
+    * Skip messages that are already translated...
     */
 
-    sprintf(buffer, "doit=done&lp=en_%s&urltext=[", argv[2]);
-    bufptr = buffer + strlen(buffer);
+    if (m->str && m->str[0])
+      continue;
 
-    while (*lineptr)
-    {
-      if (*lineptr == ' ')
+   /*
+    * Encode the form data into the buffer...
+    */
+
+    snprintf(buffer, sizeof(buffer),
+             "hl=en&ie=UTF8&langpair=en|%s&oe=UTF8&text=", lang);
+    bufptr = buffer + strlen(buffer);
+    bufend = buffer + sizeof(buffer) - 5;
+
+    for (idptr = m->id; *idptr && bufptr < bufend; idptr ++)
+      if (*idptr == ' ')
         *bufptr++ = '+';
-      else if (*lineptr < ' ' || *lineptr == '%')
+      else if (*idptr < ' ' || *idptr == '%')
       {
-        sprintf(bufptr, "%%%02X", *lineptr & 255);
+        sprintf(bufptr, "%%%02X", *idptr & 255);
 	bufptr += 3;
       }
-      else
-        *bufptr++ = *lineptr;
-
-      lineptr ++;
-    }
+      else if (*idptr != '&')
+        *bufptr++ = *idptr;
 
     *bufptr++ = '&';
     *bufptr = '\0';
@@ -150,107 +243,203 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Send the request...
     */
 
-    if ((http = httpConnect("dns.easysw.com", 80)) == NULL)
-    {
-      perror("translate: Unable to contact proxy server");
-      fclose(in);
-      fclose(out);
-      return (1);
-    }
-
-    lineptr = line;
-    while (isdigit(*lineptr))
-      lineptr ++;
-    while (isspace(*lineptr))
-      lineptr ++;
-
-    printf("%s = ", lineptr);
+    printf("\"%s\" = ", m->id);
     fflush(stdout);
 
-    http->version = HTTP_1_0;
-    httpClearFields(http);
-    httpSetField(http, HTTP_FIELD_CONTENT_TYPE,
-                 "application/x-www-form-urlencoded");
-    httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
-    if (httpPost(http, "http://babelfish.altavista.digital.com/cgi-bin/translate?"))
-      httpPost(http, "http://babelfish.altavista.digital.com/cgi-bin/translate?");
+    tries = 0;
 
-    httpWrite(http, buffer, bufptr - buffer);
+    do
+    {
+      httpClearFields(http);
+      httpSetField(http, HTTP_FIELD_CONTENT_TYPE,
+                   "application/x-www-form-urlencoded");
+      httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, length);
 
-    while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+      if (httpPost(http, "/translate_t"))
+      {
+	httpReconnect(http);
+	httpPost(http, "/translate_t");
+      }
+
+      httpWrite(http, buffer, bufptr - buffer);
+
+      while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+
+      if (status != HTTP_OK && status != HTTP_ERROR)
+        httpFlush(http);
+
+      tries ++;
+    }
+    while (status == HTTP_ERROR && tries < 10);
 
     if (status == HTTP_OK)
     {
-      int sawparen = 0;
-      int skipws = 1;
-      int sawbracket = 0;
+     /*
+      * OK, read the translation back...
+      */
 
-      while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
+      bufptr = buffer;
+      bufend = buffer + sizeof(buffer) - 1;
+
+      while ((bytes = httpRead(http, bufptr, bufend - bufptr)) > 0)
+        bufptr += bytes;
+
+      if (bytes < 0)
       {
-        buffer[bytes] = '\0';
+       /*
+        * Read error, abort!
+	*/
 
-        for (bufptr = buffer; *bufptr; bufptr ++)
-	{
-	  if (*bufptr == '>')
-	    sawbracket = 0;
-	  else if (*bufptr == '<')
-	  {
-	    sawbracket = 1;
-	    if (sawparen)
-	      break;
-	  }
-	  else if (*bufptr == '[' && !sawbracket)
-	    sawparen = 1;
-	  else if (sawparen)
-	  {
-	    if (skipws)
-	    {
-	      if (!isspace(*bufptr))
-              {
-	        skipws = 0;
-		*bufptr = toupper(*bufptr);
-	      }
-	    }
-
-            if (!skipws)
-	    {
-              if (*bufptr == '\n')
-	      {
-		putc(' ', out);
-		putchar(' ');
-	      }
-	      else
-	      {
-        	putc(*bufptr, out);
-        	putchar(*bufptr);
-              }
-            }
-	  }
-        }
-
-        if (sawparen && sawbracket)
-	  break;
+        puts("READ ERROR!");
+	ret = 0;
+	break;
       }
 
-      httpFlush(http);
-      putc('\n', out);
-      putchar('\n');
+      *bufptr = '\0';
+
+     /*
+      * Find the first textarea element - that will have the translation data...
+      */
+
+      if ((bufptr = strstr(buffer, "<textarea")) == NULL)
+      {
+       /*
+        * No textarea, abort!
+	*/
+
+        puts("NO TEXTAREA!");
+	ret = 0;
+	break;
+      }
+
+      if ((bufptr = strchr(bufptr, '>')) == NULL)
+      {
+       /*
+        * textarea doesn't end, abort!
+	*/
+
+        puts("TEXTAREA SHORT DATA!");
+	ret = 0;
+	break;
+      }
+
+      bufptr ++;
+
+      if ((bufend = strstr(bufptr, "</textarea>")) == NULL)
+      {
+       /*
+        * textarea doesn't close, abort!
+	*/
+
+        puts("/TEXTAREA SHORT DATA!");
+	ret = 0;
+	break;
+      }
+
+      *bufend = '\0';
+
+     /*
+      * Copy the translation...
+      */
+
+      m->str = strdup(bufptr);
+
+     /*
+      * Convert character entities to regular chars...
+      */
+
+      for (bufptr = strchr(m->str, '&');
+           bufptr;
+	   bufptr = strchr(bufptr + 1, '&'))
+      {
+        if (!strncmp(bufptr, "&lt;", 4))
+	{
+	  *bufptr = '<';
+	  _cups_strcpy(bufptr + 1, bufptr + 4);
+	}
+        else if (!strncmp(bufptr, "&gt;", 4))
+	{
+	  *bufptr = '>';
+	  _cups_strcpy(bufptr + 1, bufptr + 4);
+	}
+        else if (!strncmp(bufptr, "&amp;", 5))
+	  _cups_strcpy(bufptr + 1, bufptr + 5);
+      }
+
+      printf("\"%s\"\n", m->str);
+    }
+    else if (status == HTTP_ERROR)
+    {
+      printf("NETWORK ERROR (%s)!\n", strerror(httpError(http)));
+      ret = 0;
+      break;
     }
     else
     {
-      printf("HTTP error %d\n", status);
-
-      fprintf(out, "%s\n", lineptr);
-      httpFlush(http);
+      printf("HTTP ERROR %d!\n", status);
+      ret = 0;
+      break;
     }
-
-    httpClose(http);
   }
 
-  fclose(in);
-  fclose(out);
+  httpClose(http);
 
-  return (0);
+  return (ret);
+}
+
+
+/*
+ * 'write_string()' - Write a quoted string to a file.
+ */
+
+int					/* O - 1 on success, 0 on failure */
+write_string(cups_file_t *fp,		/* I - File to write to */
+             const char  *s)		/* I - String */
+{
+  while (*s)
+  {
+    switch (*s)
+    {
+      case '\n' :
+          if (cupsFilePuts(fp, "\\n") < 0)
+	    return (0);
+	  break;
+
+      case '\r' :
+          if (cupsFilePuts(fp, "\\r") < 0)
+	    return (0);
+	  break;
+
+      case '\t' :
+          if (cupsFilePuts(fp, "\\t") < 0)
+	    return (0);
+	  break;
+
+      case '\\' :
+          if (cupsFilePuts(fp, "\\\\") < 0)
+	    return (0);
+	  break;
+
+      case '\"' :
+          if (cupsFilePuts(fp, "\\\"") < 0)
+	    return (0);
+	  break;
+
+      default :
+          if ((*s & 255) < ' ')
+	  {
+            if (cupsFilePrintf(fp, "\\%o", *s) < 0)
+	      return (0);
+	  }
+	  else if (cupsFilePutChar(fp, *s) < 0)
+	    return (0);
+	  break;
+    }
+
+    s ++;
+  }
+
+  return (1);
 }
 
 
