@@ -59,13 +59,14 @@ static int	exec_code(cups_page_header2_t *header, const char *code);
 
 /*
  * 'cupsRasterInterpretPPD()' - Interpret PPD commands to create a page header.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on failure */
-cupsRasterInterpretPPD(cups_page_header2_t *h,
-					/* O - Page header */
-                       ppd_file_t          *ppd)
-					/* I - PPD file */
+cupsRasterInterpretPPD(
+    cups_page_header2_t *h,		/* O - Page header */
+    ppd_file_t          *ppd)		/* I - PPD file */
 {
   int		i;			/* Looping var */
   int		status;			/* Cummulative status */

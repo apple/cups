@@ -160,25 +160,25 @@ typedef enum cups_cspace_e		/**** cupsColorSpace attribute values ****/
   CUPS_CSPACE_GOLD = 13,		/* Gold foil */
   CUPS_CSPACE_SILVER = 14,		/* Silver foil */
 
-  CUPS_CSPACE_CIEXYZ = 15,		/* CIE XYZ */
-  CUPS_CSPACE_CIELab = 16,		/* CIE Lab */
-  CUPS_CSPACE_RGBW = 17,		/* Red, green, blue, white */
+  CUPS_CSPACE_CIEXYZ = 15,		/* CIE XYZ @since CUPS 1.1.19@ */
+  CUPS_CSPACE_CIELab = 16,		/* CIE Lab @since CUPS 1.1.19@ */
+  CUPS_CSPACE_RGBW = 17,		/* Red, green, blue, white @since CUPS 1.2@ */
 
-  CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color */
-  CUPS_CSPACE_ICC2 = 33,		/* ICC-based, 2 colors */
-  CUPS_CSPACE_ICC3 = 34,		/* ICC-based, 3 colors */
-  CUPS_CSPACE_ICC4 = 35,		/* ICC-based, 4 colors */
-  CUPS_CSPACE_ICC5 = 36,		/* ICC-based, 5 colors */
-  CUPS_CSPACE_ICC6 = 37,		/* ICC-based, 6 colors */
-  CUPS_CSPACE_ICC7 = 38,		/* ICC-based, 7 colors */
-  CUPS_CSPACE_ICC8 = 39,		/* ICC-based, 8 colors */
-  CUPS_CSPACE_ICC9 = 40,		/* ICC-based, 9 colors */
-  CUPS_CSPACE_ICCA = 41,		/* ICC-based, 10 colors */
-  CUPS_CSPACE_ICCB = 42,		/* ICC-based, 11 colors */
-  CUPS_CSPACE_ICCC = 43,		/* ICC-based, 12 colors */
-  CUPS_CSPACE_ICCD = 44,		/* ICC-based, 13 colors */
-  CUPS_CSPACE_ICCE = 45,		/* ICC-based, 14 colors */
-  CUPS_CSPACE_ICCF = 46			/* ICC-based, 15 colors */
+  CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICC2 = 33,		/* ICC-based, 2 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICC3 = 34,		/* ICC-based, 3 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICC4 = 35,		/* ICC-based, 4 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICC5 = 36,		/* ICC-based, 5 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICC6 = 37,		/* ICC-based, 6 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICC7 = 38,		/* ICC-based, 7 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICC8 = 39,		/* ICC-based, 8 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICC9 = 40,		/* ICC-based, 9 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICCA = 41,		/* ICC-based, 10 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICCB = 42,		/* ICC-based, 11 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICCC = 43,		/* ICC-based, 12 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICCD = 44,		/* ICC-based, 13 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICCE = 45,		/* ICC-based, 14 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICCF = 46			/* ICC-based, 15 colors @since CUPS 1.1.19@ */
 } cups_cspace_t;
 
 
@@ -239,7 +239,8 @@ typedef struct cups_page_header_s	/**** Version 1 Page Header ****/
   unsigned	cupsRowStep;		/* Spacing between lines */
 } cups_page_header_t;
 
-typedef struct cups_page_header2_s	/**** Version 2 Page Header ****/
+/**** New in CUPS 1.2 ****/
+typedef struct cups_page_header2_s	/**** Version 2 Page Header @since CUPS 1.2@ ****/
 {
   /**** Standard Page Device Dictionary String Values ****/
   char		MediaClass[64];		/* MediaClass string */
@@ -295,7 +296,7 @@ typedef struct cups_page_header2_s	/**** Version 2 Page Header ****/
   char		cupsRenderingIntent[64];/* Color rendering intent */
 } cups_page_header2_t;
 
-typedef struct cups_raster_s		/**** Raster stream data ****/
+typedef struct _cups_raster_s		/**** Raster stream data ****/
 {
   unsigned		sync;		/* Sync word from start of stream */
   int			fd;		/* File descriptor */
@@ -315,22 +316,23 @@ typedef struct cups_raster_s		/**** Raster stream data ****/
  */
 
 extern void		cupsRasterClose(cups_raster_t *r);
-extern int		cupsRasterInterpretPPD(cups_page_header2_t *h,
-			                       ppd_file_t *ppd);
 extern cups_raster_t	*cupsRasterOpen(int fd, cups_mode_t mode);
 extern unsigned		cupsRasterReadHeader(cups_raster_t *r,
 			                     cups_page_header_t *h);
-extern unsigned		cupsRasterReadHeader2(cups_raster_t *r,
-			                      cups_page_header2_t *h);
 extern unsigned		cupsRasterReadPixels(cups_raster_t *r,
 			                     unsigned char *p, unsigned len);
 extern unsigned		cupsRasterWriteHeader(cups_raster_t *r,
 			                      cups_page_header_t *h);
-extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
-			                       cups_page_header2_t *h);
 extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 			                      unsigned char *p, unsigned len);
 
+/**** New in CUPS 1.2 ****/
+extern int		cupsRasterInterpretPPD(cups_page_header2_t *h,
+			                       ppd_file_t *ppd);
+extern unsigned		cupsRasterReadHeader2(cups_raster_t *r,
+			                      cups_page_header2_t *h);
+extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
+			                       cups_page_header2_t *h);
 
 #  ifdef __cplusplus
 }

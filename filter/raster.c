@@ -180,6 +180,8 @@ cupsRasterReadHeader(
 
 /*
  * 'cupsRasterReadHeader2()' - Read a V2 raster page header.
+ *
+ * @since CUPS 1.2@
  */
 
 unsigned				/* O - 1 on success, 0 on fail */
@@ -425,6 +427,8 @@ cupsRasterWriteHeader(
 
 /*
  * 'cupsRasterWriteHeader2()' - Write a V2 raster page header.
+ *
+ * @since CUPS 1.2@
  */
  
 unsigned				/* O - 1 on success, 0 on failure */
