@@ -298,8 +298,8 @@ cupsCharsetToUTF8(cups_utf8_t *dest,    /* O - Target string */
   if (encoding == CUPS_UTF8 ||
       encoding < 0 || encoding >= CUPS_ENCODING_VBCS_END)
   {
-    strlcpy(dest, (char *)src, maxout);
-    return (strlen(dest));
+    strlcpy((char *)dest, src, maxout);
+    return (strlen((char *)dest));
   }
 
  /*
