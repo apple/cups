@@ -247,6 +247,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /usr/share/doc/cups/help
 /usr/share/doc/cups/help/api*.html
+/usr/share/doc/cups/help/spec*.html
 
 %files libs
 %defattr(-,root,root)

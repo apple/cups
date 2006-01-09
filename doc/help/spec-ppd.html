@@ -1,0 +1,472 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>CUPS PPD Extensions</title>
+	<meta name='keywords' content='Programming, PostScript Printer Description'>
+</head>
+<body>
+<!--
+  "$Id$"
+
+  CUPS PPD extensions specification for the Common UNIX Printing System (CUPS).
+
+  Copyright 1997-2006 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Easy Software Products and are protected by Federal
+  copyright law.  Distribution and use rights are outlined in the file
+  "LICENSE.txt" which should have been included with this file.  If this
+  file is missing or damaged please contact Easy Software Products
+  at:
+
+      Attn: CUPS Licensing Information
+      Easy Software Products
+      44141 Airport View Drive, Suite 204
+      Hollywood, Maryland 20636 USA
+
+      Voice: (301) 373-9600
+      EMail: cups-info@cups.org
+        WWW: http://www.cups.org
+-->
+
+<h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
+
+<p>This specification describes the attributes and extensions
+that CUPS adds to <a
+href="http://partners.adobe.com/asn/developer/PDFS/TN/5003.PPD_Spec_v4.3.pdf">
+Adobe TechNote #5003: PostScript Printer Description File Format
+Specification Version 4.3</a>. PostScript Printer Description
+("PPD") files describe the capabilities of each printer and are
+used by CUPS to support printer-specific features and intelligent
+filtering.</p>
+
+<h2 class='title'><a name='SYNTAX'>PPD File Syntax</a></h2>
+
+<p>The PPD format is text-based and uses lines of up to 255
+characters terminated by a carriage return, linefeed, or
+combination of carriage return and line feed. The following ABNF
+definition [RFC2234] defines the general format of lines in a PPD
+file:</p>
+
+<pre class='command'>
+PPD-FILE = HEADER +(DATA / COMMENT / LINE-END)
+
+HEADER   = "*" 0x50.50.44.2D.41.64.6F.62.65 ":"   ; *PPD-Adobe:
+           *WSP DQUOTE "4.3" DQUOTE LINE-END
+
+COMMENT  = "*%" *TCHAR LINE-END
+
+DATA     = "*" 1*KCHAR [ WSP 1*KCHAR [ "/" 1*TCHAR ] ] ":"
+           1*(*WSP VALUE) LINE-END
+
+VALUE    = 1*TCHAR / DQUOTE 1*SCHAR DQUOTE
+
+KCHAR    = ALPHA / DIGIT / "_" / "." / "-"
+
+SCHAR    = LINE-END / WSP / %x21 / %x23-7E / %xA0-FF
+
+TCHAR    = %x20-7E / %xA0-FF
+
+LINE-END = CR / LF / CR LF
+</pre>
+
+
+<h2 class='title'><a name='ATTRIBUTES'>General Attributes</a></h2>
+
+<h3>cupsFilter</h3>
+
+<p>This string attribute provides a conversion rule of the
+form:</p>
+
+<pre class='command'>
+source/type cost program
+</pre>
+
+<p>The destination type is assumed to the printer's type. If a
+printer supports the source type directly, the special filter
+program "-" may be specified.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Standard raster printer driver filter</em> 
+*cupsFilter: "application/vnd.cups-raster 100 rastertofoo"
+
+<em>*% Plain text filter</em> 
+*cupsFilter: "text/plain 10 texttofoo"
+
+<em>*% Pass-through filter for PostScript printers</em> 
+*cupsFilter: "application/vnd.cups-postscript 0 -"
+</pre>
+
+<h3>cupsFlipDuplex</h3>
+
+<p>This boolean attribute notifies the RIP filters that the
+destination printer requires an upside-down image for the back
+page. The default value is false.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Flip the page image for the back side of duplexed output</em> 
+*cupsFlipDuplex: true
+</pre>
+
+<h3>cupsManualCopies</h3>
+
+<p>This boolean attribute notifies the RIP filters that the
+destination printer does not support copy generation in
+hardware. The default value is false.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Tell the RIP filters to generate the copies for us</em> 
+*cupsManualCopies: true
+</pre>
+
+<h3>cupsModelNumber</h3>
+
+<p>This integer attribute specifies a printer-specific model
+number. This number can be used by a filter program to adjust
+the output for a specific model of printer.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify an integer for a driver-specific model number</em> 
+*cupsModelNumber: 1234
+</pre>
+
+<h3>cupsPortMonitor</h3>
+
+<p>This string attribute specifies printer-specific "port
+monitor" filters that may be used with the printer. The CUPS
+scheduler also looks for the <tt>Protocols</tt> attribute to see
+if the <tt>BCP</tt> or <tt>TBCP</tt> protocols are supported. If
+so, the corresponding port monitor ("bcp" and "tbcp",
+respectively) is listed in the printer's
+<tt>port-monitor-supported</tt> attribute.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify a PostScript printer that supports the TBCP protocol</em>
+*Protocols: TBCP PJL
+
+<em>*% Specify a printer-specific port monitor for an Epson USB printer</em> 
+*cupsPortMonitor epson-usb/USB Status Monitor: "epson-usb"
+</pre>
+
+<h3>cupsVersion</h3>
+
+<p>This required attribute describes which version of the CUPS
+PPD file extensions was used. Currently it must be the string
+"1.0", "1.1", or "1.2".</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify a CUPS 1.2 driver</em> 
+*cupsVersion: "1.2"
+</pre>
+
+
+<h2 class='title'><a name='OPTIONS'>Custom Options</a></h2>
+
+<p>CUPS supports custom options using an extension of the
+<tt>CustomPageSize</tt> and <tt>ParamCustomPageSize</tt>
+syntax:</p>
+
+<pre class='command'>
+*CustomFoo True: "command"
+*ParamCustomFoo Name1/Text 1: order type minimum maximum
+*ParamCustomFoo Name2/Text 2: order type minimum maximum
+...
+*ParamCustomFoo NameN/Text N: order type minimum maximum
+</pre>
+
+<p>When the base option is part of the <tt>JCLSetup</tt> section,
+the "command" string contains JCL commands with "\order"
+placeholders for each numbered parameter. The CUPS API handles
+any necessary value quoting for HP-PJL commands.</p>
+
+<p>For non-<tt>JCLSetup</tt> options, the "order" value is a
+number from 1 to N and specifies the order of values as they are
+placed on the stack before the command.</p>
+
+<p>The "type" is one of the following keywords:</p>
+
+<ul>
+
+	<li><tt>curve</tt> - a real value from "minimum" to
+	"maximum" representing a gamma correction curve using the
+	function: f(x) = x <sup>value</sup></li>
+
+	<li><tt>int</tt> - an integer value from "minimum" to
+	"maximum"</li>
+
+	<li><tt>invcurve</tt> - a real value from "minimum" to
+	"maximum" representing a gamma correction curve using the
+	function: f(x) = x <sup>1 / value</sup></li>
+
+	<li><tt>passcode</tt> - a string of numbers value with a
+	minimum of "minimum" numbers and a maximum of "maximum"
+	numbers (passcode strings are not displayed in the user
+	interface)</li>
+
+	<li><tt>password</tt> - a string value with a minimum of
+	"minimum" characters and a maximum of "maximum"
+	characters (password strings are not displayed in the
+	user interface)</li>
+
+	<li><tt>points</tt> - a measurement value in points from
+	"minimum" to "maximum"</li>
+
+	<li><tt>real</tt> - a real value from "minimum" to
+	"maximum"</li>
+
+	<li><tt>string</tt> - a string value with a minimum of
+	"minimum" characters and a maximum of "maximum"
+	characters</li>
+
+</ul>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Base JCL key code option</em> 
+*OpenUI JCLPasscode/Key Code: PickOne
+*OrderDependency: 10 JCLSetup *JCLPasscode
+*DefaultJCLPasscode: None
+*JCLPasscode None/No Code: ""
+*JCLPasscode 1111: "@PJL SET PASSCODE = 1111<0A>"
+*JCLPasscode 2222: "@PJL SET PASSCODE = 2222<0A>"
+*JCLPasscode 3333: "@PJL SET PASSCODE = 3333<0A>"
+*JCLCloseUI: *JCLPasscode
+
+<em>*% Custom JCL key code option</em> 
+*CustomJCLPasscode True: "@PJL SET PASSCODE = \1<0A>"
+*ParamCustomJCLPasscode Code/Key Code: 1 passcode 4 4
+
+
+<em>*% Base PostScript gamma/density option</em> 
+*OpenUI GammaDensity/Gamma and Density: PickOne
+*OrderDependency: 10 AnySetup *GammaDensity
+*DefaultGammaDensity: Normal
+*GammaDensity Normal/Normal: "<</cupsReal1 1.0/cupsReal2 1.0>>setpagedevice"
+*GammaDensity Light/Lighter: "<</cupsReal1 0.9/cupsReal2 0.67>>setpagedevice"
+*GammaDensity Dark/Darker: "<</cupsReal1 1.1/cupsReal2 1.5>>setpagedevice"
+*JCLCloseUI: *GammaDensity
+
+<em>*% Custom PostScript gamma/density option</em> 
+*CustomGammaDensity True: "<</cupsReal1 3 1 roll/cupsReal2 3 1>>setpagedevice"
+*ParamCustomGammaDensity Gamma: 1 curve 0.1 10
+*ParamCustomGammaDensity Density: 2 real 0 2
+</pre>
+
+
+<h2 class='title'><a name='PROFILES'>Color Profiles</a></h2>
+
+<h3>cupsColorProfile</h3>
+
+<p>This string attribute specifies a color profile of the
+form:</p>
+
+<pre class='command'>
+*cupsColorProfile Resolution/MediaType: "density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"
+</pre>
+
+<p>The <i>Resolution</i> and <i>MediaType</i> values may be "-"
+to act as a wildcard. Otherwise they must match one of the
+<tt>Resolution</tt> or <tt>MediaType</tt> attributes defined in
+the PPD file.</p>
+
+<p>The <i>density</i> and <i>gamma</i> values define gamma and
+density adjustment function such that:</p>
+
+<pre class='command'>
+f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
+</pre>
+
+<p>The <i>m00</i> through <i>m22</i> values define a 3x3
+transformation matrix for the CMY color values. The density
+function is applied <i>after</i> the CMY transformation:</p>
+
+<pre class='command'>
+| m00 m01 m02 |
+| m10 m11 m12 |
+| m20 m21 m22 |
+</pre>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify a profile for printing at 360dpi on all media types</em> 
+*cupsColorProfile 360dpi/-: "1.0 1.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
+
+<em>*% Specify a profile for printing at 720dpi on Glossy media</em> 
+*cupsColorProfile 720dpi/Glossy: "1.0 2.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
+
+<em>*% Specify a default profile for printing at all other resolutions and media types</em> 
+*cupsColorProfile -/-: "0.9 2.0 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
+</pre>
+
+<h3>cupsICCProfile</h3>
+
+<p>This attribute specifies an ICC color profile of the
+form:</p>
+
+<pre class='command'>
+*cupsICCProfile ColorModel.MediaType.Resolution/Description: "filename"
+</pre>
+
+<p>The <tt>ColorModel</tt>, <tt>MediaType</tt>, and
+<tt>Resolution</tt> keywords specify a selector for color
+profiles. If omitted, the color profile will match any option
+keyword for the corresponding main keyword.</p>
+
+<p>The <tt>Description</tt> specifies human-readable text that
+is associated with the color profile. The <tt>filename</tt>
+portion specifies the ICC color profile to use; if the filename
+is not absolute, it is loaded relative to the
+<var>/usr/share/cups/profiles</var> directory.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify a profile for CMYK printing at 360dpi on all media types</em> 
+*cupsICCProfile CMYK..360dpi/360dpi CMYK: "vendor/foo-360-cmyk.icc"
+
+<em>*% Specify a profile for RGB printing at 720dpi on Glossy media</em> 
+*cupsColorProfile RGB.Glossy.720dpi/720dpi Glossy: "vendor/foo-720-glossy-rgb.icc"
+
+<em>*% Specify a default profile for printing at all other resolutions and media types</em> 
+*cupsICCProfile .../Default: "vendor/foo-default.icc"
+</pre>
+
+<h4>Customizing the Profile Selection Keywords</h4>
+
+<p>The <tt>ColorModel</tt>, <tt>MediaType</tt>, and
+<tt>Resolution</tt> keywords can be reassigned to different main
+keywords, allowing drivers to do color profile selection based
+on different parameters. The <tt>cupsICCQualifier1</tt>,
+<tt>cupsICCQualifier2</tt>, and <tt>cupsICCQualifier3</tt>
+attributes define the mapping from selector to main keyword:</p>
+
+<pre class='command'>
+*cupsICCQualifier1: MainKeyword
+*cupsICCQualifier2: MainKeyword
+*cupsICCQualifier3: MainKeyword
+</pre>
+
+<p>The default mapping is as follows:</p>
+
+<pre class='command'>
+*cupsICCQualifier1: ColorModel
+*cupsICCQualifier2: MediaType
+*cupsICCQualifier3: Resolution
+</pre>
+
+
+<h2 class='title'><a name='I18N'><a name'I18N'>I18N Support</a></a></h2>
+
+<p>CUPS 1.2 and higher adds support for PPD files containing multiple
+languages by following the following rules:</p>
+
+<ol>
+
+	<li>The <tt>LanguageVersion</tt> is <tt>English</tt></li>
+
+	<li>The <tt>LanguageEncoding</tt> is <tt>ISOLatin1</tt></li>
+
+	<li>Main and option keywords may not exceed 34
+	characters, which is a subset of what the Adobe PPD spec
+	allows.</li>
+
+	<li>Translations are specified using a locale prefix of
+	the form "ll" or "ll_CC." where "ll" is the 2-letter ISO
+	language code and "CC" is the 2-letter ISO country
+	code</li>
+
+	<li>Translation strings are encoded using UTF-8.</li>
+
+	<li>Main keywords are translated using any of the
+	following forms:
+	<p><tt>*ll.Translation MainKeyword/translation
+	text: ""</tt><br />
+	<tt>*ll_CC.Translation MainKeyword/translation
+	text: ""</tt></p></li>
+
+	<li>Option keywords are translated using any of the
+	following forms:
+	<p><tt>*ll.MainKeyword OptionKeyword/translation
+	text: ""</tt><br />
+	<tt>*ll_CC.MainKeyword OptionKeyword/translation
+	text: ""</tt></p></li>
+
+</ol>
+
+<p>Examples:</p>
+
+
+<pre class='command'>
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*ModelName: "Foobar Laser 9999"
+
+<em>*% Localize for French and German</em>
+*fr_FR.Translation ModelName/La Foobar Laser 9999: ""
+*de_DE.Translation ModelName/Foobar LaserDrucken 9999: ""
+
+...
+
+*OpenUI *InputSlot/Paper Source: PickOne
+*OrderDependency: 10 AnySetup *InputSlot
+*DefaultInputSlot: Auto
+<em>*% Localize for French and German</em>
+*fr_FR.Translation InputSlot/Papier source: ""
+*de_DE.Translation InputSlot/Papiereinzug: ""
+*InputSlot Auto/Default: "<</ManualFeed false>>setpagedevice"
+<em>*% Localize for French and German</em>
+*fr_FR.InputSlot Auto/Par Defaut: ""
+*de_DE.InputSlot Auto/Standard: ""
+*InputSlot Manual/Manual Feed: "<</ManualFeed true>>setpagedevice"
+<em>*% Localize for French and German</em>
+*fr_FR.InputSlot Manual/Manuel mecanisme de alimentation: ""
+*de_DE.InputSlot Manual/Manueller Einzug: ""
+*CloseUI: *InputSlot
+</pre>
+
+
+<h2 class='title'><a name='HISTORY'>Change History</a></h2>
+
+<h3>Changes in CUPS 1.2</h3>
+
+<ul>
+
+	<li>Added I18N support attributes</li>
+
+	<li>Added custom option values support</li>
+
+	<li>Added <tt>cupsICCProfile</tt> attribute</li>
+
+	<li>Added <tt>cupsPortMonitor</tt> attribute</li>
+
+	<li>Removed <tt>cupsProtocol</tt> attribute</li>
+
+</ul>
+
+<h3>Changes in CUPS 1.1</h3>
+
+<ul>
+
+	<li>Added <tt>cupsFlipDuplex</tt> attribute</li>
+
+	<li>Added <tt>cupsProtocol</tt> attribute</li>
+
+</ul>
+
+</body>
+</html>

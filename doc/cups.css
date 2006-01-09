@@ -23,6 +23,10 @@ PRE.command {
   margin-left: 3em;
 }
 
+PRE EM {
+  color: #3f0000;
+}
+
 P.command {
   color: #7f0000;
   font-family: monospace;
