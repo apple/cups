@@ -183,6 +183,45 @@ get_device_id(
   else if ((attr = strstr(device_id, "DESCRIPTION:")) != NULL)
     attr += 12;
 
+  if (attr)
+  {
+   /*
+    * Make sure the description contains something useful, since some
+    * printer manufacturers (HP) apparently don't follow the standards
+    * they helped to define...
+    *
+    * Here we require the description to be 8 or more characters in length,
+    * containing at least one space and one letter.
+    */
+
+    if ((delim = strchr(attr, ';')) == NULL)
+      delim = attr + strlen(attr);
+
+    if ((delim - attr) < 8)
+      attr = NULL;
+    else
+    {
+      char	*ptr;			/* Pointer into description */
+      int	letters,		/* Number of letters seen */
+		spaces;			/* Number of spaces seen */
+
+
+      for (ptr = attr, letters = 0, spaces = 0; ptr < delim; ptr ++)
+      {
+        if (isspace(*ptr & 255))
+	  spaces ++;
+	else if (isalpha(*ptr & 255))
+	  letters ++;
+
+        if (spaces && letters)
+	  break;
+      }
+
+      if (!spaces || !letters)
+        attr = NULL;
+    }
+  }
+
   if ((mfg = strstr(device_id, "MANUFACTURER:")) != NULL)
     mfg += 13;
   else if ((mfg = strstr(device_id, "MFG:")) != NULL)
