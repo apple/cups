@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -53,6 +53,15 @@ if test -n "$GCC"; then
 	fi
 
 	case $uname in
+		Darwin*)
+			if test "x$with_optim" = x; then
+				if test `uname -m` = x86; then
+					# Build universal binaries for OSX on Intel...
+					OPTIM="-arch i386 -arch ppc $OPTIM"
+				fi
+			fi
+			;;
+
 		Linux*)
 			AC_MSG_CHECKING(if GCC supports -fpie)
 
