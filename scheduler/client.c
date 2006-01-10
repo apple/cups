@@ -1150,7 +1150,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * address...
 	  */
 
-	  if (strcasecmp(hostname, ServerName) &&
+	  if (strcmp(method, "file") &&
+	      strcasecmp(hostname, ServerName) &&
 	      strcasecmp(hostname, "localhost") &&
 	      !isdigit(hostname[0]))
 	  {
