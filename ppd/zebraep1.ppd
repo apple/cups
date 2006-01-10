@@ -1,0 +1,179 @@
+*PPD-Adobe: "4.3"
+*%
+*% "$Id: zebra.ppd 4880 2005-12-15 16:19:46Z mike $"
+*%
+*%   Sample Zebra label printer driver PPD file for the Common UNIX Printing
+*%   System (CUPS).
+*%
+*%   Copyright 2001-2005 by Easy Software Products.
+*%
+*%   These coded instructions, statements, and computer programs are the
+*%   property of Easy Software Products and are protected by Federal
+*%   copyright law.  Distribution and use rights are outlined in the file
+*%   "LICENSE.txt" which should have been included with this file.  If this
+*%   file is missing or damaged please contact Easy Software Products
+*%   at:
+*%
+*%       Attn: CUPS Licensing Information
+*%       Easy Software Products
+*%       44141 Airport View Drive, Suite 204
+*%       Hollywood, Maryland 20636 USA
+*%
+*%       Voice: (301) 373-9600
+*%       EMail: cups-info@cups.org
+*%         WWW: http://www.cups.org
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.2"
+*LanguageVersion: English 
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"ZEBRA.PPD"
+*Manufacturer:	"Zebra"
+*Product:	"(GNU Ghostscript)"
+*Product:	"(ESP Ghostscript)"
+*cupsVersion:	1.2
+*cupsManualCopies: False
+*cupsFilter:	"application/vnd.cups-raster 0 rastertodymo"
+*% cupsModelNumber is 16 for EPL1 line mode, 17 for EPL2 page mode,
+*% 18 for ZPL mode, and 19 for CPCL mode.
+*cupsModelNumber: 16
+*ModelName:     "Zebra EPL1 Label Printer"
+*ShortNickName: "Zebra EPL1 Label Printer"
+*NickName:      "Zebra EPL1 Label Printer CUPS v1.2"
+*PSVersion:	"(3010.000) 81501"
+*LanguageLevel:	"3"
+*ColorDevice:	False
+*DefaultColorSpace: Gray
+*FileSystem:	False
+*Throughput:	"8"
+*LandscapeOrientation: Plus90
+*VariablePaperSize: False
+*TTRasterizer:	Type42
+
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: w288h360
+*PageSize w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
+*PageSize w288h432/Label - 4 x 6": "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+
+*OpenUI *PageRegion: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: w288h360
+*PageRegion w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
+*PageRegion w288h432/Label - 4 x 6": "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+
+*DefaultImageableArea: w288h360
+*ImageableArea w288h360/Label - 4 x 5": "0 0 288 360"
+*ImageableArea w288h432/Label - 4 x 5": "0 0 288 432"
+
+*DefaultPaperDimension: w288h360
+*PaperDimension w288h360/Label - 4 x 5": "288 360"
+*PaperDimension w288h432/Label - 4 x 5": "288 432"
+
+*MaxMediaWidth: "288"
+*MaxMediaHeight: "3600"
+*HWMargins: 0 0 0 0
+*CustomPageSize True: "pop pop pop <</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice"
+*ParamCustomPageSize Width: 1 points 36 288
+*ParamCustomPageSize Height: 2 points 36 3600
+*ParamCustomPageSize WidthOffset: 3 points 0 0
+*ParamCustomPageSize HeightOffset: 4 points 0 0
+*ParamCustomPageSize Orientation: 5 int 0 0
+
+*OpenUI *Resolution/Output Resolution: PickOne
+*OrderDependency: 20 AnySetup *Resolution
+*DefaultResolution: 203dpi
+*Resolution 203dpi/203 DPI: "<</HWResolution[203 203]>>setpagedevice"
+*Resolution 300dpi/300 DPI: "<</HWResolution[300 300]>>setpagedevice"
+*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]>>setpagedevice"
+*CloseUI: *Resolution
+
+*OpenGroup: PrinterSettings/Printer Settings
+*OpenUI *Darkness/Media Darkness: PickOne
+*OrderDependency: 20 AnySetup *Darkness
+*DefaultDarkness: -1
+*Darkness -1/PrinterDefault: "<<cupsCompression -1>>setpagedevice"
+*Darkness 1: "<</cupsCompression 4>>setpagedevice"
+*Darkness 2: "<</cupsCompression 7>>setpagedevice"
+*Darkness 3: "<</cupsCompression 10>>setpagedevice"
+*Darkness 4: "<</cupsCompression 14>>setpagedevice"
+*Darkness 5: "<</cupsCompression 17>>setpagedevice"
+*Darkness 6: "<</cupsCompression 20>>setpagedevice"
+*Darkness 7: "<</cupsCompression 24>>setpagedevice"
+*Darkness 8: "<</cupsCompression 27>>setpagedevice"
+*Darkness 9: "<</cupsCompression 30>>setpagedevice"
+*Darkness 10: "<</cupsCompression 34>>setpagedevice"
+*Darkness 11: "<</cupsCompression 37>>setpagedevice"
+*Darkness 12: "<</cupsCompression 40>>setpagedevice"
+*Darkness 13: "<</cupsCompression 44>>setpagedevice"
+*Darkness 14: "<</cupsCompression 47>>setpagedevice"
+*Darkness 15: "<</cupsCompression 50>>setpagedevice"
+*Darkness 16: "<</cupsCompression 54>>setpagedevice"
+*Darkness 17: "<</cupsCompression 57>>setpagedevice"
+*Darkness 18: "<</cupsCompression 60>>setpagedevice"
+*Darkness 19: "<</cupsCompression 64>>setpagedevice"
+*Darkness 20: "<</cupsCompression 67>>setpagedevice"
+*Darkness 21: "<</cupsCompression 70>>setpagedevice"
+*Darkness 22: "<</cupsCompression 74>>setpagedevice"
+*Darkness 23: "<</cupsCompression 77>>setpagedevice"
+*Darkness 24: "<</cupsCompression 80>>setpagedevice"
+*Darkness 25: "<</cupsCompression 84>>setpagedevice"
+*Darkness 26: "<</cupsCompression 87>>setpagedevice"
+*Darkness 27: "<</cupsCompression 90>>setpagedevice"
+*Darkness 28: "<</cupsCompression 94>>setpagedevice"
+*Darkness 29: "<</cupsCompression 97>>setpagedevice"
+*Darkness 30: "<</cupsCompression 100>>setpagedevice"
+*CloseUI: *Darkness
+
+*OpenUI *zePrintRate/Print Rate: PickOne
+*OrderDependency: 20 AnySetup *zePrintRate
+*DefaultzePrintRate: Default
+*zePrintRate Default/PrinterDefault: Default
+*zePrintRate 1/1 inch/sec.: ""
+*zePrintRate 1.5/1.5 inch/sec.: ""
+*zePrintRate 2/2 inches/sec.: ""
+*zePrintRate 2.5/2.5 inches/sec.: ""
+*CloseUI: *zePrintRate
+*CloseGroup: PrinterSettings
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+*%
+*% End of "$Id: zebra.ppd 4880 2005-12-15 16:19:46Z mike $".
+*%

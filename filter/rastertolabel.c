@@ -159,7 +159,8 @@ void
 StartPage(ppd_file_t *ppd,		/* I - PPD file */
           cups_page_header_t *header)	/* I - Page header */
 {
-  int	length;				/* Actual label length */
+  ppd_choice_t	*choice;		/* Marked choice */
+  int		length;			/* Actual label length */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -199,24 +200,69 @@ StartPage(ppd_file_t *ppd,		/* I - PPD file */
 
     case ZEBRA_EPL_LINE :
        /*
+        * Set print rate...
+	*/
+
+	if ((choice = ppdFindMarkedChoice(ppd, "zePrintRate")) != NULL &&
+	    strcmp(choice->choice, "Default"))
+	  printf("\033S%.0f", atof(choice->choice) * 2.0 - 2.0);
+
+       /*
         * Set darkness...
 	*/
 
-	printf("D%d", 7 * header->cupsCompression / 100);
+        if (header->cupsCompression > 0 && header->cupsCompression <= 100)
+	  printf("\033D%d", 7 * header->cupsCompression / 100);
+
+       /*
+        * Set left margin to 0...
+	*/
+
+	fputs("\033M01", stdout);
 
        /*
         * Start buffered output...
 	*/
 
-        putchar('B');
+        fputs("\033B", stdout);
         break;
 
     case ZEBRA_EPL_PAGE :
        /*
+        * Start a new label...
+	*/
+
+        puts("");
+	puts("N");
+
+       /*
+        * Set hardware options...
+	*/
+
+	if (!strcmp(header->MediaType, "Direct"))
+	  puts("OD");
+
+       /*
+        * Set print rate...
+	*/
+
+	if ((choice = ppdFindMarkedChoice(ppd, "zePrintRate")) != NULL &&
+	    strcmp(choice->choice, "Default"))
+	{
+	  float val = atof(choice->choice);
+
+	  if (val >= 3.0)
+	    printf("S%.0f\n", val);
+	  else
+	    printf("S%.0f\n", val * 2.0 - 2.0);
+        }
+
+       /*
         * Set darkness...
 	*/
 
-	printf("D%d", 15 * header->cupsCompression / 100);
+        if (header->cupsCompression > 0 && header->cupsCompression <= 100)
+	  printf("D%d\n", 15 * header->cupsCompression / 100);
 
        /*
         * Set label size...
@@ -230,7 +276,7 @@ StartPage(ppd_file_t *ppd,		/* I - PPD file */
         * Set darkness...
 	*/
 
-	if (header->cupsCompression > 0)
+        if (header->cupsCompression > 0 && header->cupsCompression <= 100)
 	  printf("~SD%02d\n", 30 * header->cupsCompression / 100);
 
        /*
@@ -300,7 +346,7 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
         * End buffered output, eject the label...
 	*/
 
-        putchar('E');
+        fputs("\033E\014", stdout);
 	break;
 
     case ZEBRA_EPL_PAGE :
@@ -602,16 +648,20 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
 	break;
 
     case ZEBRA_EPL_LINE :
-        printf("g%03d", header->cupsBytesPerLine);
+        printf("\033g%03d", header->cupsBytesPerLine);
 	fwrite(Buffer, 1, header->cupsBytesPerLine, stdout);
 	fflush(stdout);
         break;
 
     case ZEBRA_EPL_PAGE :
-        printf("GW0,%d,%d,1", y, header->cupsBytesPerLine);
-	fwrite(Buffer, 1, header->cupsBytesPerLine, stdout);
-	putchar('\n');
-	fflush(stdout);
+        if (Buffer[0] || memcmp(Buffer, Buffer + 1, header->cupsBytesPerLine))
+	{
+          printf("GW0,%d,%d,1\n", y, header->cupsBytesPerLine);
+	  for (i = header->cupsBytesPerLine, ptr = Buffer; i > 0; i --, ptr ++)
+	    putchar(~*ptr);
+	  putchar('\n');
+	  fflush(stdout);
+	}
         break;
 
     case ZEBRA_ZPL :
