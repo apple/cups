@@ -458,7 +458,8 @@ cupsdProcessBrowseData(
   * Pull the URI apart to see if this is a local or remote printer...
   */
 
-  httpSeparate(uri, method, username, host, &port, resource);
+  httpSeparateURI(uri, method, sizeof(method), username, sizeof(username),
+                  host, sizeof(host), &port, resource, sizeof(resource));
 
  /*
   * Determine if the URI contains any illegal characters in it...
@@ -2226,7 +2227,8 @@ cupsdUpdateCUPSBrowse(void)
   * Pull the URI apart to see if this is a local or remote printer...
   */
 
-  httpSeparate(uri, method, username, host, &port, resource);
+  httpSeparateURI(uri, method, sizeof(method), username, sizeof(username),
+                  host, sizeof(host), &port, resource, sizeof(resource));
 
   DEBUG_printf(("host=\"%s\", ServerName=\"%s\"\n", host, ServerName));
 
@@ -2376,7 +2378,8 @@ cupsdUpdateSLPBrowse(void)
       * Pull the URI apart to see if this is a local or remote printer...
       */
 
-      httpSeparate(uri, method, username, host, &port, resource);
+      httpSeparateURI(uri, method, sizeof(method), username, sizeof(username),
+                      host, sizeof(host), &port, resource, sizeof(resource));
 
       if (strcasecmp(host, ServerName) == 0)
 	continue;

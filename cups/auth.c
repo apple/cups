@@ -134,7 +134,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     * Basic authentication...
     */
 
-    httpEncode64(encode, http->userpass);
+    httpEncode64_2(encode, sizeof(encode), http->userpass,
+                   strlen(http->userpass));
     snprintf(http->authstring, sizeof(http->authstring), "Basic %s", encode);
   }
   else

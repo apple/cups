@@ -672,7 +672,9 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((name = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -750,7 +752,10 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   * Do we have a valid URI?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
+
 
   if (strncmp(resource, "/classes/", 9) != 0 || strlen(resource) == 9)
   {
@@ -1042,8 +1047,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
       * Search for the printer or class URI...
       */
 
-      httpSeparate(attr->values[i].string.text, method, username, host,
-                   &port, resource);
+      httpSeparateURI(attr->values[i].string.text, method, sizeof(method),
+                      username, sizeof(username), host, sizeof(host), &port,
+		      resource, sizeof(resource));
 
       if ((dest = cupsdValidateDest(host, resource, &dtype, &member)) == NULL)
       {
@@ -1426,7 +1432,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Do we have a valid URI?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if (strncmp(resource, "/printers/", 10) != 0 || strlen(resource) == 10)
   {
@@ -1556,8 +1564,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     * Do we have a valid device URI?
     */
 
-    httpSeparate(attr->values[0].string.text, method, username, host,
-                 &port, resource);
+    httpSeparateURI(attr->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
 
     if (!strcmp(method, "file"))
     {
@@ -2085,8 +2094,9 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port,
-                 resource);
+    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
  
     if (strncmp(resource, "/jobs/", 6))
     {
@@ -2139,7 +2149,8 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!con->username[0])
   {
-    send_ipp_status(con, IPP_NOT_AUTHORIZED, NULL);
+    send_ipp_status(con, IPP_NOT_AUTHORIZED,
+                    _("No authentication information provided!"));
     return;
   }
 
@@ -2255,8 +2266,9 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
   * And if the destination is valid...
   */
 
-  httpSeparate(uri->values[0].string.text, method, userpass, host, &port,
-               resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  userpass, sizeof(userpass), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -2371,7 +2383,9 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
       * Find the current job on the specified printer...
       */
 
-      httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+      httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                      username, sizeof(username), host, sizeof(host), &port,
+		      resource, sizeof(resource));
 
       if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
       {
@@ -2420,8 +2434,9 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port,
-                 resource);
+    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
  
     if (strncmp(resource, "/jobs/", 6))
     {
@@ -3695,7 +3710,9 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -4386,8 +4403,9 @@ create_subscription(
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, userpass, host, &port,
-               resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  userpass, sizeof(userpass), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if (!strcmp(resource, "/"))
   {
@@ -4637,7 +4655,9 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Do we have a valid URI?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -4968,7 +4988,9 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if (strcmp(resource, "/") == 0 ||
       (strncmp(resource, "/jobs", 5) == 0 && strlen(resource) <= 6))
@@ -5197,9 +5219,10 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port,
-                 resource);
- 
+    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
+
     if (strncmp(resource, "/jobs/", 6) != 0)
     {
      /*
@@ -5432,8 +5455,9 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port,
-               resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -5858,7 +5882,9 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if (!strcmp(resource, "/") ||
       (!strncmp(resource, "/jobs", 5) && strlen(resource) <= 6) ||
@@ -6017,8 +6043,10 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
- 
+    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
+
     if (strncmp(resource, "/jobs/", 6))
     {
      /*
@@ -6156,9 +6184,10 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port,
-                 resource);
- 
+    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
+
     if (strncmp(resource, "/jobs/", 6))
     {
      /*
@@ -6233,8 +6262,10 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   * Get the new printer or class...
   */
 
-  httpSeparate(attr->values[0].string.text, method, username, host, &port,
-               resource);
+  httpSeparateURI(attr->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
+
   if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
    /*
@@ -6597,7 +6628,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -7295,8 +7328,9 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port,
-               resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((name = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -7403,9 +7437,10 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port,
-                 resource);
- 
+    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
+
     if (strncmp(resource, "/jobs/", 6))
     {
      /*
@@ -7547,9 +7582,10 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port,
-                 resource);
- 
+    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
+
     if (strncmp(resource, "/jobs/", 6) != 0)
     {
      /*
@@ -7785,8 +7821,10 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
- 
+    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
+
     if (strncmp(resource, "/jobs/", 6))
     {
      /*
@@ -8166,8 +8204,9 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port,
-               resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((name = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -8270,8 +8309,10 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
- 
+    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                    username, sizeof(username), host, sizeof(host), &port,
+		    resource, sizeof(resource));
+
     if (strncmp(resource, "/jobs/", 6) != 0)
     {
      /*
@@ -8572,8 +8613,9 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port,
-               resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((name = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -8651,7 +8693,9 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if ((name = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
   {
@@ -8824,7 +8868,9 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   * Is the destination valid?
   */
 
-  httpSeparate(uri->values[0].string.text, method, username, host, &port, resource);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
 
   if (cupsdValidateDest(host, resource, &dtype, &printer) == NULL)
   {

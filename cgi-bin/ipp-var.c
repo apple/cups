@@ -3,7 +3,7 @@
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -217,7 +217,9 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
   * Convert the URI to a URL...
   */
 
-  httpSeparate(uri, method, userpass, hostname, &port, rawresource);
+  httpSeparateURI(uri, method, sizeof(method), userpass, sizeof(userpass),
+                  hostname, sizeof(hostname), &port,
+		  rawresource, sizeof(rawresource));
 
   if (!strcmp(method, "ipp") ||
       !strcmp(method, "http") ||

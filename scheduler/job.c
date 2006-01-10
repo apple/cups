@@ -868,8 +868,9 @@ cupsdLoadAllJobs(void)
 	continue;
       }
 
-      httpSeparate(attr->values[0].string.text, method, username, host,
-                   &port, resource);
+      httpSeparateURI(attr->values[0].string.text, method, sizeof(method),
+                      username, sizeof(username), host, sizeof(host), &port,
+		      resource, sizeof(resource));
 
       if ((dest = cupsdValidateDest(host, resource, &(job->dtype),
                                     NULL)) == NULL)

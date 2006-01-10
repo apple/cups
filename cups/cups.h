@@ -3,7 +3,7 @@
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -33,6 +33,17 @@
 
 #  include "ipp.h"
 #  include "ppd.h"
+
+/*
+ * With GCC 3.0 and higher, we can mark old APIs "deprecated" so you get
+ * an error at compile-time.
+ */
+
+#  if defined(__GNUC__) && __GNUC__ > 2
+#    define _CUPS_DEPRECATED __attribute__ ((__deprecated__))
+#  else
+#    define _CUPS_DEPRECATED
+#  endif /* __GNUC__ && __GNUC__ > 2 */
 
 
 /*
@@ -130,12 +141,12 @@ extern ipp_t		*cupsDoFileRequest(http_t *http, ipp_t *request,
 			                   const char *resource, const char *filename);
 extern http_encryption_t cupsEncryption(void);
 extern void		cupsFreeJobs(int num_jobs, cups_job_t *jobs);
-extern int		cupsGetClasses(char ***classes);
-extern const char	*cupsGetDefault(void);
+extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED;
+extern const char	*cupsGetDefault(void) _CUPS_DEPRECATED;
 extern int		cupsGetJobs(cups_job_t **jobs, const char *dest,
 			            int myjobs, int completed);
 extern const char	*cupsGetPPD(const char *printer);
-extern int		cupsGetPrinters(char ***printers);
+extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED;
 extern ipp_status_t	cupsLastError(void);
 extern int		cupsPrintFile(const char *printer, const char *filename,
 			              const char *title, int num_options,
@@ -143,7 +154,7 @@ extern int		cupsPrintFile(const char *printer, const char *filename,
 extern int		cupsPrintFiles(const char *printer, int num_files,
 			               const char **files, const char *title,
 				       int num_options, cups_option_t *options);
-extern char		*cupsTempFile(char *filename, int len);
+extern char		*cupsTempFile(char *filename, int len) _CUPS_DEPRECATED;
 extern int		cupsTempFd(char *filename, int len);
 
 extern int		cupsAddDest(const char *name, const char *instance,

@@ -3,7 +3,7 @@
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1196,8 +1196,9 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
       for (i = 0; i < attr->num_values; i ++)
       {
-	httpSeparate(attr->values[0].string.text, method, username, hostname,
-	             &port, resource);
+	httpSeparateURI(attr->values[i].string.text, method, sizeof(method),
+	                username, sizeof(username), hostname, sizeof(hostname),
+	                &port, resource, sizeof(resource));
 	if (!strncmp(resource, "/printers/", 10))
 	{
 	 /*
@@ -1216,8 +1217,10 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
       * Get the actual server and printer names...
       */
 
-      httpSeparate(attr->values[0].string.text, method, username, hostname,
-	           &port, resource);
+      httpSeparateURI(attr->values[0].string.text, method, sizeof(method),
+	              username, sizeof(username), hostname, sizeof(hostname),
+	              &port, resource, sizeof(resource));
+
       strlcpy(printer, strrchr(resource, '/') + 1, sizeof(printer));
     }
 

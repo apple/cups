@@ -3,7 +3,7 @@
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -914,7 +914,9 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
       response2 = NULL;
       if (members == NULL && printer_uri != NULL)
       {
-        httpSeparate(printer_uri, method, username, server, &port, resource);
+        httpSeparateURI(printer_uri, method, sizeof(method),
+	                username, sizeof(username), server, sizeof(server),
+			&port, resource, sizeof(resource));
 
         if (!strcasecmp(server, http->hostname))
 	  http2 = http;

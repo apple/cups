@@ -1127,7 +1127,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         * Handle full URLs in the request line...
 	*/
 
-        if (con->uri[0] != '/' && strcmp(con->uri, "*"))
+        if (strcmp(con->uri, "*"))
 	{
 	  char	method[HTTP_MAX_URI],	/* Method/scheme */
 		userpass[HTTP_MAX_URI],	/* Username:password */
@@ -1140,7 +1140,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * Separate the URI into its components...
 	  */
 
-          httpSeparate(con->uri, method, userpass, hostname, &port, resource);
+          httpSeparateURI(con->uri, method, sizeof(method),
+	                  userpass, sizeof(userpass),
+			  hostname, sizeof(hostname), &port,
+			  resource, sizeof(resource));
 
          /*
 	  * Only allow URIs with the servername, localhost, or an IP

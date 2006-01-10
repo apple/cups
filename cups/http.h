@@ -4,7 +4,7 @@
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -56,6 +56,17 @@
 #  endif /* WIN32 */
 
 #  include "md5.h"
+
+/*
+ * With GCC 3.0 and higher, we can mark old APIs "deprecated" so you get
+ * an error at compile-time.
+ */
+
+#  if defined(__GNUC__) && __GNUC__ > 2
+#    define _HTTP_DEPRECATED __attribute__ ((__deprecated__))
+#  else
+#    define _HTTP_DEPRECATED
+#  endif /* __GNUC__ && __GNUC__ > 2 */
 
 
 /*
@@ -377,16 +388,16 @@ extern int		httpRead(http_t *http, char *buffer, int length);
 extern int		httpReconnect(http_t *http);
 extern void		httpSeparate(const char *uri, char *method,
 			             char *username, char *host, int *port,
-				     char *resource);
+				     char *resource) _HTTP_DEPRECATED;
 extern void		httpSetField(http_t *http, http_field_t field,
 			             const char *value);
 extern const char	*httpStatus(http_status_t status);
 extern int		httpTrace(http_t *http, const char *uri);
 extern http_status_t	httpUpdate(http_t *http);
 extern int		httpWrite(http_t *http, const char *buffer, int length);
-extern char		*httpEncode64(char *out, const char *in);
-extern char		*httpDecode64(char *out, const char *in);
-extern int		httpGetLength(http_t *http);
+extern char		*httpEncode64(char *out, const char *in) _HTTP_DEPRECATED;
+extern char		*httpDecode64(char *out, const char *in) _HTTP_DEPRECATED;
+extern int		httpGetLength(http_t *http) _HTTP_DEPRECATED;
 extern char		*httpMD5(const char *, const char *, const char *,
 			         char [33]);
 extern char		*httpMD5Final(const char *, const char *, const char *,
@@ -407,7 +418,7 @@ extern void		httpSeparate2(const char *uri,
 			              char *method, int methodlen,
 			              char *username, int usernamelen,
 				      char *host, int hostlen, int *port,
-				      char *resource, int resourcelen);
+				      char *resource, int resourcelen) _HTTP_DEPRECATED;
 
 /**** New in CUPS 1.2 ****/
 extern int		httpAddrAny(const http_addr_t *addr);

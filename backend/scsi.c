@@ -3,7 +3,7 @@
  *
  *   SCSI printer backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2003-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 2003-2006 by Easy Software Products, all rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or
  *   without modification, are permitted provided that the
@@ -183,7 +183,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Extract the device name and options from the URI...
   */
 
-  httpSeparate(argv[0], method, username, hostname, &port, resource);
+  httpSeparateURI(argv[0], method, sizeof(method), username, sizeof(username),
+                  hostname, sizeof(hostname), &port,
+		  resource, sizeof(resource));
 
  /*
   * See if there are any options...

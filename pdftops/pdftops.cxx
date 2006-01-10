@@ -4,7 +4,7 @@
 //   PDF to PostScript filter front-end for the Common UNIX Printing
 //   System (CUPS).
 //
-//   Copyright 1997-2005 by Easy Software Products.
+//   Copyright 1997-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
 //   property of Easy Software Products and are protected by Federal
@@ -72,7 +72,7 @@ main(int  argc,				// I - Number of command-line args
   const char	*val;			// Option value
   ppd_file_t	*ppd;			// Current PPD
   ppd_size_t	*size;			// Current media size
-  FILE		*fp;			// Copy file
+  int		fd;			// Copy file descriptor
   const char	*server_root;		// Location of config files
   char		tempfile[1024];		// Temporary file
   char		buffer[8192];		// Copy buffer
@@ -98,7 +98,7 @@ main(int  argc,				// I - Number of command-line args
 
   // Copy stdin if needed...
   if (argc == 6) {
-    if ((fp = fopen(cupsTempFile(tempfile, sizeof(tempfile)), "w")) == NULL) {
+    if ((fd = cupsTempFd(tempfile, sizeof(tempfile))) < 0) {
       perror("ERROR: Unable to copy PDF file");
       return (1);
     }
@@ -107,8 +107,8 @@ main(int  argc,				// I - Number of command-line args
             tempfile);
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-      fwrite(buffer, 1, bytes, fp);
-    fclose(fp);
+      write(fd, buffer, bytes);
+    close(fd);
 
     fileName = new GString(tempfile);
   } else {

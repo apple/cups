@@ -3,7 +3,7 @@
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -216,10 +216,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (getenv("DEVICE_URI") != NULL)
     /* authentication information is only available in the env var */
-    httpSeparate(getenv("DEVICE_URI"), method, username, hostname, &port,
-                 resource);
+    httpSeparateURI(getenv("DEVICE_URI"), method, sizeof(method),
+                    username, sizeof(username),
+                    hostname, sizeof(hostname), &port,
+		    resource, sizeof(resource));
   else if (strchr(argv[0], ':') != NULL)
-    httpSeparate(argv[0], method, username, hostname, &port, resource);
+    httpSeparateURI(argv[0], method, sizeof(method), username, sizeof(username),
+                    hostname, sizeof(hostname), &port,
+		    resource, sizeof(resource));
   else
   {
     fputs("ERROR: Missing device URI on command-line and no DEVICE_URI environment variable!\n",

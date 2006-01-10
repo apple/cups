@@ -3,7 +3,7 @@
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2001-2005 by Easy Software Products.
+ *   Copyright 2001-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -77,11 +77,11 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  int	i, j;				/* Looping vars */
-  int	status;				/* Status from export_dest() */
-  int	export_all;			/* Export all printers? */
-  int	num_printers;			/* Number of printers */
-  char	**printers;			/* Printers */
+  int		i, j;			/* Looping vars */
+  int		status;			/* Status from export_dest() */
+  int		export_all;		/* Export all printers? */
+  int		num_dests;		/* Number of printers */
+  cups_dest_t	*dests;			/* Printers */
 
 
  /*
@@ -146,17 +146,16 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (SAMBAServer == NULL)
       SAMBAServer = cupsServer();
 
-    num_printers = cupsGetPrinters(&printers);
+    num_dests = cupsGetDests(&dests);
 
-    for (j = 0, status = 0; j < num_printers; j ++)
-      if ((status = export_dest(printers[j])) != 0)
-	break;
+    for (j = 0, status = 0; j < num_dests; j ++)
+      if (!dests[j].instance)
+      {
+        if ((status = export_dest(dests[j].name)) != 0)
+	  break;
+      }
 
-    for (j = 0; j < num_printers; j ++)
-      free(printers[j]);
-
-    if (num_printers)
-      free(printers);
+    cupsFreeDests(num_dests, dests);
 
     if (status)
       return (status);

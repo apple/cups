@@ -1,9 +1,9 @@
-/*
+;/*
  * "$Id$"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -400,11 +400,15 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Get the Basic authentication data...
     */
 
+    int	userlen;			/* Username:password length */
+
+
     authorization += 5;
     while (isspace(*authorization))
       authorization ++;
 
-    httpDecode64(username, authorization);
+    userlen = sizeof(username);
+    httpDecode64_2(username, &userlen, authorization);
 
    /*
     * Pull the username and password out...
