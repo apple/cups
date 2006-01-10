@@ -55,9 +55,10 @@ if test -n "$GCC"; then
 	case $uname in
 		Darwin*)
 			if test "x$with_optim" = x; then
-				if test `uname -m` = x86; then
+				if test `uname -m` = i386; then
 					# Build universal binaries for OSX on Intel...
 					OPTIM="-arch i386 -arch ppc $OPTIM"
+					DSOFLAGS="-arch i386 -arch ppc $DSOFLAGS"
 				fi
 			fi
 			;;
