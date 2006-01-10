@@ -48,8 +48,6 @@
  *   ppd_compare_groups()  - Compare two groups.
  *   ppd_compare_options() - Compare two options.
  *   ppd_decode()          - Decode a string value...
- *   ppd_fix()             - Fix WinANSI characters in the range 0x80 to
- *                           0x9f to be valid ISO-8859-1 characters...
  *   ppd_free_group()      - Free a single UI group.
  *   ppd_free_option()     - Free a single option.
  *   ppd_get_extoption()   - Get an extended option record.
@@ -103,11 +101,6 @@ static int		ppd_compare_groups(ppd_group_t *g0, ppd_group_t *g1);
 static int		ppd_compare_options(ppd_option_t *o0, ppd_option_t *o1);
 #endif /* !__APPLE__ */
 static int		ppd_decode(char *string);
-#ifndef __APPLE__
-static void		ppd_fix(char *string);
-#else
-#  define		ppd_fix(s)
-#endif /* !__APPLE__ */
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
 #if 0
@@ -1095,10 +1088,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	}
 
       if (text[0])
-      {
         strlcpy(option->text, text, sizeof(option->text));
-	ppd_fix(option->text);
-      }
       else
       {
         if (!strcmp(name, "PageSize"))
@@ -1236,7 +1226,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       */
 
       ppd_decode(sptr);
-      ppd_fix(sptr);
 
      /*
       * Find/add the group...
@@ -1527,10 +1516,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       choice = ppd_add_choice(option, name);
 
       if (mask & PPD_TEXT)
-      {
         strlcpy(choice->text, text, sizeof(choice->text));
-        ppd_fix(choice->text);
-      }
       else if (!strcmp(name, "True"))
         strcpy(choice->text, _("Yes"));
       else if (!strcmp(name, "False"))
@@ -2244,60 +2230,6 @@ ppd_decode(char *string)		/* I - String to decode */
 
   return ((int)(outptr - string));
 }
-
-
-#ifndef __APPLE__
-/*
- * 'ppd_fix()' - Fix WinANSI characters in the range 0x80 to 0x9f to be
- *               valid ISO-8859-1 characters...
- */
-
-static void
-ppd_fix(char *string)			/* IO - String to fix */
-{
-  unsigned char		*p;		/* Pointer into string */
-  static const unsigned char lut[32] =	/* Lookup table for characters */
-			{
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  0x20,
-			  'l',
-			  '`',
-			  '\'',
-			  '^',
-			  '~',
-			  0x20, /* bar */
-			  0x20, /* circumflex */
-			  0x20, /* dot */
-			  0x20, /* double dot */
-			  0x20,
-			  0x20, /* circle */
-			  0x20, /* ??? */
-			  0x20,
-			  '\"', /* should be right quotes */
-			  0x20, /* ??? */
-			  0x20  /* accent */
-			};
-
-
-  for (p = (unsigned char *)string; *p; p ++)
-    if (*p >= 0x80 && *p < 0xa0)
-      *p = lut[*p - 0x80];
-}
-#endif /* !__APPLE__ */
 
 
 /*

@@ -3,6 +3,8 @@ CHANGES.txt - 01/10/2006
 
 CHANGES IN CUPS V1.2.0b1
 
+	- ppdLoad*() no longer tries to "fix" bad characters in
+	  UI text (STR #1101)
 	- Printer names can now (reliably) contain Unicode
 	  characters (STR #896)
 	- The "lpstat -p" command now shows the time and date of
