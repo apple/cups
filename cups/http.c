@@ -1813,6 +1813,13 @@ http_send(http_t       *http,	/* I - HTTP data */
     return (-1);
 
  /*
+  * Set the User-Agent field if it isn't already...
+  */
+
+  if (!http->fields[HTTP_FIELD_USER_AGENT][0])
+    httpSetField(http, HTTP_FIELD_USER_AGENT, CUPS_MINIMAL);
+
+ /*
   * Encode the URI as needed...
   */
 
