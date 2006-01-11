@@ -39,7 +39,11 @@ if test x$enable_pam != xno; then
 
 	AC_CHECK_LIB(dl,dlopen)
 	AC_CHECK_LIB(pam,pam_start)
-	AC_CHECK_HEADER(pam/pam_appl.h,AC_DEFINE(HAVE_PAM_PAM_APPL_H))
+	AC_CHECK_HEADER(security/pam_appl.h)
+	if test x$ac_cv_header_security_pam_appl_h != xyes; then
+		AC_CHECK_HEADER(pam/pam_appl.h,
+			AC_DEFINE(HAVE_PAM_PAM_APPL_H))
+	fi
 
 	if test x$ac_cv_lib_pam_pam_start != xno; then
 		# Set the necessary libraries for PAM...
