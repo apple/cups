@@ -42,7 +42,11 @@
 #include <cups/string.h>
 #include <cups/cups.h>
 #include <cups/i18n.h>
+#include <cups/debug.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 
 /*
@@ -51,6 +55,7 @@
 
 int		Verbosity = 0;
 const char	*SAMBAUser,
+		*SAMBAPassword,
 		*SAMBAServer;
 
 
@@ -59,7 +64,8 @@ const char	*SAMBAUser,
  */
 
 int	convert_ppd(const char *src, char *dst, int dstsize, ipp_t *info);
-int	do_samba_command(const char *command, const char *subcommand);
+int	do_samba_command(const char *command, const char *address,
+	                 const char *subcommand);
 int	export_dest(const char *dest);
 char	*ppd_gets(FILE *fp, char *buf, int  buflen);
 void	usage(void);
@@ -90,21 +96,37 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   export_all = 0;
 
-  SAMBAUser   = cupsUser();
-  SAMBAServer = NULL;
+  SAMBAUser     = cupsUser();
+  SAMBAPassword = NULL;
+  SAMBAServer   = NULL;
 
   for (i = 1; i < argc; i ++)
-    if (strcmp(argv[i], "-a") == 0)
+    if (!strcmp(argv[i], "-a"))
       export_all = 1;
-    else if (strcmp(argv[i], "-U") == 0)
+    else if (!strcmp(argv[i], "-U"))
     {
+      char	*sep;			/* Separator for password */
+
+
       i ++;
       if (i >= argc)
         usage();
 
       SAMBAUser = argv[i];
+
+      if ((sep = strchr(argv[i], '%')) != NULL)
+      {
+       /*
+        * Nul-terminate the username at the first % and point the
+	* password at the rest...
+	*/
+
+        *sep++ = '\0';
+
+        SAMBAPassword = sep;
+      }
     }
-    else if (strcmp(argv[i], "-H") == 0)
+    else if (!strcmp(argv[i], "-H"))
     {
       i ++;
       if (i >= argc)
@@ -112,7 +134,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       SAMBAServer = argv[i];
     }
-    else if (strcmp(argv[i], "-h") == 0)
+    else if (!strcmp(argv[i], "-h"))
     {
       i ++;
       if (i >= argc)
@@ -120,7 +142,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       cupsSetServer(argv[i]);
     }
-    else if (strcmp(argv[i], "-v") == 0)
+    else if (!strcmp(argv[i], "-v"))
       Verbosity = 1;
     else if (argv[i][0] != '-')
     {
@@ -397,49 +419,86 @@ convert_ppd(const char *src,		/* I - Source (original) PPD */
 
 int					/* O - Status of command */
 do_samba_command(const char *command,	/* I - Command to run */
+                 const char *address,	/* I - Address for command */
                  const char *subcmd)	/* I - Sub-command */
 {
   int		status;			/* Status of command */
   char		temp[4096];		/* Command/prompt string */
-  static const char *p = NULL;		/* Password data */
+  int		pid;			/* Process ID of child */
 
 
-  for (status = 1;;)
+  DEBUG_printf(("do_samba_command(command=\"%s\", address=\"%s\", subcmd=\"%s\")\n",
+        	command, address, subcmd));
+  DEBUG_printf(("SAMBAUser=\"%s\", SAMBAPassword=\"%s\"\n", SAMBAUser,
+                SAMBAPassword));
+
+  for (status = 1; status; )
   {
-    if (p == NULL)
+    if (!SAMBAPassword)
     {
       snprintf(temp, sizeof(temp),
-               "Password for %s required to access %s via SAMBA: ",
+               _("Password for %s required to access %s via SAMBA: "),
 	       SAMBAUser, SAMBAServer);
 
-      if ((p = cupsGetPassword(temp)) == NULL)
+      if ((SAMBAPassword = cupsGetPassword(temp)) == NULL)
 	break;
     }
 
-    snprintf(temp, sizeof(temp), "%s -N -U\'%s%%%s\' -c \'%s\'",
-             command, SAMBAUser, p, subcmd);
+    snprintf(temp, sizeof(temp), "%s%%%s", SAMBAUser, SAMBAPassword);
 
     if (Verbosity)
-      printf("Running command: %s\n", temp);
-    else
-      strlcat(temp, " </dev/null >/dev/null 2>/dev/null", sizeof(temp));
+      _cupsLangPrintf(stdout, NULL,
+                      _("Running command: %s %s -N -U \'%s%%%s\' -c \'%s\'\n"),
+        	      command, address, SAMBAUser, SAMBAPassword, subcmd);
 
-    if ((status = system(temp)) != 0)
+    if ((pid = fork()) == 0)
     {
-      if (Verbosity)
-        puts("");
+     /*
+      * Child goes here, redirect stdin/out/err and execute the command...
+      */
 
-      if (p[0])
-        p = NULL;
-      else
-        break;
+      close(0);
+      open("/dev/null", O_RDONLY);
+
+      if (!Verbosity)
+      {
+        close(1);
+	open("/dev/null", O_WRONLY);
+	close(2);
+	dup(1);
+      }
+
+      execlp(command, command, address, "-N", "-U", temp, "-c", subcmd,
+             (char *)0);
+      exit(errno);
+    }
+    else if (pid < 0)
+    {
+      status = -1;
+
+      _cupsLangPrintf(stderr, NULL, _("cupsaddsmb: Unable to run \"%s\": %s\n"),
+                      command, strerror(errno));
     }
     else
     {
-      if (Verbosity)
-        puts("");
+     /*
+      * Wait for the process to complete...
+      */
 
-      break;
+      while (wait(&status) != pid);
+    }
+
+    DEBUG_printf(("status=%d\n", status));
+
+    if (Verbosity)
+      _cupsLangPuts(stdout, NULL, "\n");
+
+    if (status)
+    {
+      if (SAMBAPassword[0])
+        SAMBAPassword = NULL;
+      else
+        break;
     }
   }
 
@@ -458,7 +517,8 @@ export_dest(const char *dest)		/* I - Destination to export */
   const char		*ppdfile;	/* PPD file for printer drivers */
   char			newppd[1024],	/* New PPD file for printer drivers */
 			file[1024],	/* File to test for */
-			command[1024],	/* Command to run */
+			address[1024],	/* Address for command */
+			uri[1024],	/* Printer URI */
 			subcmd[1024];	/* Sub-command */
   const char		*datadir;	/* CUPS_DATADIR */
   http_t		*http;		/* Connection to server */
@@ -526,10 +586,10 @@ export_dest(const char *dest)		/* I - Destination to export */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  httpAssembleURIf(command, sizeof(command), "ipp", NULL, "localhost", 0,
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                    "/printers/%s", dest);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-               "printer-uri", NULL, command);
+               "printer-uri", NULL, uri);
 
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
@@ -615,7 +675,7 @@ export_dest(const char *dest)		/* I - Destination to export */
     * to copy the Win2k drivers over...
     */
 
-    snprintf(command, sizeof(command), "smbclient //%s/print\\$", SAMBAServer);
+    snprintf(address, sizeof(address), "//%s/print$", SAMBAServer);
 
     snprintf(subcmd, sizeof(subcmd),
              "mkdir W32X86;"
@@ -626,7 +686,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 	     "put %s/drivers/pscript5.dll W32X86/pscript5.dll",
 	     ppdfile, dest, datadir, datadir, datadir, datadir);
 
-    if ((status = do_samba_command(command, subcmd)) != 0)
+    if ((status = do_samba_command("smbclient", address, subcmd)) != 0)
     {
       _cupsLangPrintf(stderr, language,
                       _("cupsaddsmb: Unable to copy Windows 2000 printer "
@@ -653,7 +713,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 	       "put %s/drivers/cupsui6.dll W32X86/cupsui6.dll",
 	       datadir, datadir, datadir);
 
-      if ((status = do_samba_command(command, subcmd)) != 0)
+      if ((status = do_samba_command("smbclient", address, subcmd)) != 0)
       {
 	_cupsLangPrintf(stderr, language,
 	                _("cupsaddsmb: Unable to copy CUPS printer driver "
@@ -688,9 +748,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 	       dest, dest, dest);
     }
 
-    snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
-
-    if ((status = do_samba_command(command, subcmd)) != 0)
+    if ((status = do_samba_command("rpcclient", SAMBAServer, subcmd)) != 0)
     {
       _cupsLangPrintf(stderr, language,
                       _("cupsaddsmb: Unable to install Windows 2000 printer "
@@ -708,7 +766,7 @@ export_dest(const char *dest)		/* I - Destination to export */
     * Do the smbclient commands needed for the Adobe Win9x drivers...
     */
 
-    snprintf(command, sizeof(command), "smbclient //%s/print\\$", SAMBAServer);
+    snprintf(address, sizeof(address), "//%s/print$", SAMBAServer);
 
     snprintf(subcmd, sizeof(subcmd),
              "mkdir WIN40;"
@@ -720,7 +778,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 	     "put %s/drivers/PSMON.DLL WIN40/PSMON.DLL;",
 	     ppdfile, dest, datadir, datadir, datadir, datadir, datadir);
 
-    if ((status = do_samba_command(command, subcmd)) != 0)
+    if ((status = do_samba_command("smbclient", address, subcmd)) != 0)
     {
       _cupsLangPrintf(stderr, language,
                       _("cupsaddsmb: Unable to copy Windows 9x printer "
@@ -734,8 +792,6 @@ export_dest(const char *dest)		/* I - Destination to export */
     * Do the rpcclient commands needed for the Adobe Win9x drivers...
     */
 
-    snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
-
     snprintf(subcmd, sizeof(subcmd),
 	     "adddriver \"Windows 4.0\" \"%s:ADOBEPS4.DRV:%s.PPD:NULL:"
 	     "ADOBEPS4.HLP:PSMON.DLL:RAW:"
@@ -743,7 +799,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 	     "ICONLIB.DLL\"",
 	     dest, dest, dest);
 
-    if ((status = do_samba_command(command, subcmd)) != 0)
+    if ((status = do_samba_command("rpcclient", SAMBAServer, subcmd)) != 0)
     {
       _cupsLangPrintf(stderr, language,
                       _("cupsaddsmb: Unable to install Windows 9x printer "
@@ -760,11 +816,9 @@ export_dest(const char *dest)		/* I - Destination to export */
   * Finally, associate the drivers we just added with the queue...
   */
 
-  snprintf(command, sizeof(command), "rpcclient %s", SAMBAServer);
-
   snprintf(subcmd, sizeof(subcmd), "setdriver %s %s", dest, dest);
 
-  if ((status = do_samba_command(command, subcmd)) != 0)
+  if ((status = do_samba_command("rpcclient", SAMBAServer, subcmd)) != 0)
   {
     _cupsLangPrintf(stderr, language,
                     _("cupsaddsmb: Unable to set Windows printer driver (%d)!\n"),

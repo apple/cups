@@ -3,7 +3,7 @@
 .\"
 .\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "19 August 2004" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "11 January 2006" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 .SH SYNOPSIS
@@ -30,7 +30,9 @@ cupsaddsmb \- export printers to samba for windows clients
 .I samba-server
 ] [ -U
 .I samba-user
-] [ -h
+[
+.I%samba-password
+]] [ -h
 .I cups-server
 ] [ -v ] -a
 .br
@@ -52,8 +54,10 @@ driver files described below.
 The \fI-H\fR option specifies the SAMBA server which defaults
 to the CUPS server.
 .LP
-The \fI-U\fR option specifies the SAMBA print admin username which defaults
-to your current username.
+The \fI-U\fR option specifies the SAMBA print admin username
+which defaults to your current username. If the username contains
+a percent (%) character, then the text following the percent is
+treated as the SAMBA password to use.
 .LP
 The \fI-a\fR option exports all known printers. Otherwise only
 the named printers are exported.
@@ -179,8 +183,9 @@ and copy the files exactly as named below:
 .SH SEE ALSO
 CUPS Software Administrators Manual,
 http://localhost:631/documentation.html
+http://www.cups.org/windows/
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"
