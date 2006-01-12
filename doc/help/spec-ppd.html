@@ -241,13 +241,13 @@ placed on the stack before the command.</p>
 *OrderDependency: 10 JCLSetup *JCLPasscode
 *DefaultJCLPasscode: None
 *JCLPasscode None/No Code: ""
-*JCLPasscode 1111: "@PJL SET PASSCODE = 1111<0A>"
-*JCLPasscode 2222: "@PJL SET PASSCODE = 2222<0A>"
-*JCLPasscode 3333: "@PJL SET PASSCODE = 3333<0A>"
+*JCLPasscode 1111: "@PJL SET PASSCODE = 1111&lt;0A&gt;"
+*JCLPasscode 2222: "@PJL SET PASSCODE = 2222&lt;0A&gt;"
+*JCLPasscode 3333: "@PJL SET PASSCODE = 3333&lt;0A&gt;"
 *JCLCloseUI: *JCLPasscode
 
 <em>*% Custom JCL key code option</em> 
-*CustomJCLPasscode True: "@PJL SET PASSCODE = \1<0A>"
+*CustomJCLPasscode True: "@PJL SET PASSCODE = \1&lt;0A&gt;"
 *ParamCustomJCLPasscode Code/Key Code: 1 passcode 4 4
 
 
@@ -255,13 +255,13 @@ placed on the stack before the command.</p>
 *OpenUI GammaDensity/Gamma and Density: PickOne
 *OrderDependency: 10 AnySetup *GammaDensity
 *DefaultGammaDensity: Normal
-*GammaDensity Normal/Normal: "<</cupsReal1 1.0/cupsReal2 1.0>>setpagedevice"
-*GammaDensity Light/Lighter: "<</cupsReal1 0.9/cupsReal2 0.67>>setpagedevice"
-*GammaDensity Dark/Darker: "<</cupsReal1 1.1/cupsReal2 1.5>>setpagedevice"
+*GammaDensity Normal/Normal: "&lt;&lt;/cupsReal1 1.0/cupsReal2 1.0&gt;&gt;setpagedevice"
+*GammaDensity Light/Lighter: "&lt;&lt;/cupsReal1 0.9/cupsReal2 0.67&gt;&gt;setpagedevice"
+*GammaDensity Dark/Darker: "&lt;&lt;/cupsReal1 1.1/cupsReal2 1.5&gt;&gt;setpagedevice"
 *JCLCloseUI: *GammaDensity
 
 <em>*% Custom PostScript gamma/density option</em> 
-*CustomGammaDensity True: "<</cupsReal1 3 1 roll/cupsReal2 3 1>>setpagedevice"
+*CustomGammaDensity True: "&lt;&lt;/cupsReal1 3 1 roll/cupsReal2 3 1&gt;&gt;setpagedevice"
 *ParamCustomGammaDensity Gamma: 1 curve 0.1 10
 *ParamCustomGammaDensity Density: 2 real 0 2
 </pre>
@@ -370,7 +370,7 @@ attributes define the mapping from selector to main keyword:</p>
 </pre>
 
 
-<h2 class='title'><a name='I18N'><a name'I18N'>I18N Support</a></a></h2>
+<h2 class='title'><a name='I18N'>I18N Support</a></h2>
 
 <p>CUPS 1.2 and higher adds support for PPD files containing multiple
 languages by following the following rules:</p>
@@ -428,11 +428,11 @@ languages by following the following rules:</p>
 <em>*% Localize for French and German</em>
 *fr_FR.Translation InputSlot/Papier source: ""
 *de_DE.Translation InputSlot/Papiereinzug: ""
-*InputSlot Auto/Default: "<</ManualFeed false>>setpagedevice"
+*InputSlot Auto/Default: "&lt;&lt;/ManualFeed false&gt;&gt;setpagedevice"
 <em>*% Localize for French and German</em>
 *fr_FR.InputSlot Auto/Par Defaut: ""
 *de_DE.InputSlot Auto/Standard: ""
-*InputSlot Manual/Manual Feed: "<</ManualFeed true>>setpagedevice"
+*InputSlot Manual/Manual Feed: "&lt;&lt;/ManualFeed true&gt;&gt;setpagedevice"
 <em>*% Localize for French and German</em>
 *fr_FR.InputSlot Manual/Manuel mecanisme de alimentation: ""
 *de_DE.InputSlot Manual/Manueller Einzug: ""
