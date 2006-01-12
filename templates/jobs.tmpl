@@ -1,20 +1,11 @@
-{?printer_name=?:<H3 CLASS="title">Jobs</H3>}
-
-<P>{?which_jobs=?<A
-HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
-SRC="/images/show-completed.gif" CLASS="button" ALT="Show Completed
-Jobs">:<A
-HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
-SRC="/images/show-active.gif" CLASS="button" ALT="Show Active
-Jobs">}</A></P>
-
-{#job_id=0?<P>No {?which_jobs=completed?Completed:Active} Jobs</P>:
+{#job_id=0?:
 <TABLE CELLPADDING="0" CELLSPACING="0" CLASS="button" WIDTH="100%">
 <TR CLASS="data">
 <TH>ID&nbsp;</TH>
 <TH>Name&nbsp;</TH>
 <TH>User&nbsp;</TH>
 <TH>Size&nbsp;</TH>
+<TH>Pages&nbsp;</TH>
 <TH>State&nbsp;</TH>
 <TH>Control&nbsp;</TH>
 </TR>
@@ -25,6 +16,7 @@ Jobs">}</A></P>
 <TD>{?job_name=?Unknown:{job_name}}&nbsp;</TD>
 <TD>{job_originating_user_name}&nbsp;</TD>
 <TD>{job_k_octets}k&nbsp;</TD>
+<TD>{job_media_sheets_completed=0?Unknown:{?job_media_sheets_completed}}</TD>
 <TD>{job_state=3?pending since<BR>{time_at_creation}:{job_state=4?held since<BR>{time_at_creation}:
 {job_state=5?processing since<BR>{time_at_processing}:{job_state=6?stopped at<BR>{time_at_completed}:
 {job_state=7?cancelled at<BR>{time_at_completed}:{job_state=8?aborted:completed at<BR>{time_at_completed}}}}}}}&nbsp;</TD>

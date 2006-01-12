@@ -33,6 +33,7 @@
  *   cupsArrayDup()     - Duplicate the array.
  *   cupsArrayFind()    - Find an element in the array.
  *   cupsArrayFirst()   - Get the first element in the array.
+ *   cupsArrayIndex()   - Get the N-th element in the array.
  *   cupsArrayLast()    - Get the last element in the array.
  *   cupsArrayNew()     - Create a new array.
  *   cupsArrayNext()    - Get the next element in the array.
@@ -462,6 +463,23 @@ cupsArrayFirst(cups_array_t *a)		/* I - Array */
   */
 
   a->current = 0;
+
+  return (cupsArrayCurrent(a));
+}
+
+
+/*
+ * 'cupsArrayIndex()' - Get the N-th element in the array.
+ */
+
+void *					/* O - N-th element or NULL */
+cupsArrayIndex(cups_array_t *a,		/* I - Array */
+               int          n)		/* I - Index into array, starting at 0 */
+{
+  if (!a)
+    return (NULL);
+
+  a->current = n;
 
   return (cupsArrayCurrent(a));
 }

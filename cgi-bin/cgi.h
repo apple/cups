@@ -3,7 +3,7 @@
  *
  *   CGI support library definitions.
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -38,6 +38,7 @@
 #  endif /* WIN32 */
 
 #  include <cups/cups.h>
+#  include <cups/array.h>
 #  include "help-index.h"
 
 
@@ -64,20 +65,17 @@ extern void		cgiAbort(const char *title, const char *stylesheet,
 extern int		cgiCheckVariables(const char *names);
 extern void		*cgiCompileSearch(const char *query);
 extern void		cgiCopyTemplateFile(FILE *out, const char *tmpl);
-extern void		cgiCopyTemplateLang(FILE *out, const char *directory,
-			                    const char *tmpl, const char *lang);
+extern void		cgiCopyTemplateLang(const char *tmpl);
 extern int		cgiDoSearch(void *search, const char *text);
 extern void		cgiEndHTML(void);
 extern char		*cgiFormEncode(char *dst, const char *src, size_t dstsize);
 extern void		cgiFreeSearch(void *search);
 extern const char	*cgiGetArray(const char *name, int element);
-extern void		cgiGetAttributes(ipp_t *request, const char *directory,
-			                 const char *tmpl, const char *lang);
+extern void		cgiGetAttributes(ipp_t *request, const char *tmpl);
 extern char		*cgiGetCookie(const char *name, char *buf, int buflen);
 extern const cgi_file_t	*cgiGetFile(void);
-#  define cgiGetHost()	(getenv("REMOTE_HOST") == NULL ? getenv("REMOTE_ADDR") : getenv("REMOTE_HOST"))
+extern cups_array_t	*cgiGetIPPObjects(ipp_t *response, void *search);
 extern int		cgiGetSize(const char *name);
-#  define cgiGetUser()	getenv("REMOTE_USER")
 extern char		*cgiGetTemplateDir(void);
 extern const char	*cgiGetVariable(const char *name);
 extern int		cgiInitialize(void);
@@ -89,11 +87,15 @@ extern void		cgiSetArray(const char *name, int element,
 extern void		cgiSetCookie(const char *name, const char *value,
 			             const char *path, const char *domain,
 				     time_t expires, int secure);
-extern int		cgiSetIPPVars(ipp_t *, const char *, const char *,
-			              const char *, int);
+extern ipp_attribute_t	*cgiSetIPPObjectVars(ipp_attribute_t *obj,
+			                     const char *prefix, int element);
+extern int		cgiSetIPPVars(ipp_t *response, const char *filter_name,
+			              const char *filter_value,
+			              const char *prefix, int parent_el);
 extern void		cgiSetServerVersion(void);
 extern void		cgiSetSize(const char *name, int size);
 extern void		cgiSetVariable(const char *name, const char *value);
+extern void		cgiShowJobs(http_t *http, const char *dest);
 extern void		cgiStartHTML(const char *title);
 
 

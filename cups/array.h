@@ -64,6 +64,7 @@ extern void		cupsArrayDelete(cups_array_t *a);
 extern cups_array_t	*cupsArrayDup(cups_array_t *a);
 extern void		*cupsArrayFind(cups_array_t *a, void *e);
 extern void		*cupsArrayFirst(cups_array_t *a);
+extern void		*cupsArrayIndex(cups_array_t *a, int n);
 extern void		*cupsArrayLast(cups_array_t *a);
 extern cups_array_t	*cupsArrayNew(cups_array_func_t f, void *d);
 extern void		*cupsArrayNext(cups_array_t *a);

@@ -3,7 +3,7 @@
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -167,7 +167,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       cgiStartHTML("Error");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "admin-op.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("admin-op.tmpl");
       cgiEndHTML();
     }
 
@@ -184,7 +184,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     cgiStartHTML("Error");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "admin-op.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("admin-op.tmpl");
     cgiEndHTML();
   }
 
@@ -397,7 +397,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       */
 
       cgiStartHTML(title);
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "modify-class.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("modify-class.tmpl");
     }
     else
     {
@@ -406,7 +406,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       */
 
       cgiStartHTML(title);
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "add-class.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("add-class.tmpl");
     }
 
     cgiEndHTML();
@@ -424,7 +424,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
                             "characters and may not contain spaces, slashes (/), "
 			    "or the pound sign (#).");
     cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -494,7 +494,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
   {
     cgiStartHTML(title);
     cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
   }
   else
   {
@@ -512,9 +512,9 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     cgiStartHTML(title);
 
     if (modify)
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "class-modified.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("class-modified.tmpl");
     else
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "class-added.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("class-added.tmpl");
   }
 
   cgiEndHTML();
@@ -614,7 +614,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       if (oldinfo)
 	cgiSetIPPVars(oldinfo, NULL, NULL, NULL, 0);
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "modify-printer.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("modify-printer.tmpl");
     }
     else
     {
@@ -622,7 +622,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       * Get the name, location, and description for a new printer...
       */
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "add-printer.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("add-printer.tmpl");
     }
 
     cgiEndHTML();
@@ -643,7 +643,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
                             "characters and may not contain spaces, slashes (/), "
 			    "or the pound sign (#).");
     cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -708,8 +708,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     }
 
     cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-device.tmpl",
-                        getenv("LANG"));
+    cgiCopyTemplateLang("choose-device.tmpl");
     cgiEndHTML();
   }
   else if (strchr(var, '/') == NULL)
@@ -729,8 +728,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     */
 
     cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-uri.tmpl",
-                        getenv("LANG"));
+    cgiCopyTemplateLang("choose-uri.tmpl");
     cgiEndHTML();
   }
   else if (!strncmp(var, "serial:", 7) && !cgiGetVariable("BAUDRATE"))
@@ -755,8 +753,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       }
 
     cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-serial.tmpl",
-                        getenv("LANG"));
+    cgiCopyTemplateLang("choose-serial.tmpl");
     cgiEndHTML();
   }
   else if (!file && (var = cgiGetVariable("PPD_NAME")) == NULL)
@@ -917,8 +914,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	    }
 
         cgiStartHTML(title);
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-make.tmpl",
-	                    getenv("LANG"));
+	cgiCopyTemplateLang("choose-make.tmpl");
         cgiEndHTML();
       }
       else
@@ -968,8 +964,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
 	}
 
         cgiStartHTML(title);
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "choose-model.tmpl",
-	                    getenv("LANG"));
+	cgiCopyTemplateLang("choose-model.tmpl");
         cgiEndHTML();
       }
 
@@ -985,7 +980,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
                ippErrorString(cupsLastError()));
       cgiSetVariable("ERROR", message);
       cgiStartHTML(title);
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
     }
   }
@@ -1085,7 +1080,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     {
       cgiStartHTML(title);
       cgiSetVariable("ERROR", ippErrorString(status));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
     }
     else
     {
@@ -1110,9 +1105,9 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
       cgiStartHTML(title);
 
       if (modify)
-        cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-modified.tmpl", getenv("LANG"));
+        cgiCopyTemplateLang("printer-modified.tmpl");
       else
-        cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-added.tmpl", getenv("LANG"));
+        cgiCopyTemplateLang("printer-added.tmpl");
     }
 
     cgiEndHTML();
@@ -1164,7 +1159,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
     cgiStartHTML("Set Printer Options");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -1183,7 +1178,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
       cgiSetVariable("ERROR", ippErrorString(IPP_NOT_POSSIBLE));
       cgiStartHTML("Set Printer Options");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
     }
     else
@@ -1194,7 +1189,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
       cgiSetVariable("ERROR", ippErrorString(cupsLastError()));
       cgiStartHTML("Set Printer Options");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
     }
     return;
@@ -1204,7 +1199,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_DEVICE_ERROR));
     cgiStartHTML("Set Printer Options");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -1249,8 +1244,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     */
 
     cgiStartHTML("Set Printer Options");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(),
-                        "set-printer-options-header.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("set-printer-options-header.tmpl");
 
     if (ppdConflicts(ppd))
     {
@@ -1263,8 +1257,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	    k ++;
 	  }
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-conflict.tmpl",
-                          getenv("LANG"));
+      cgiCopyTemplateLang("option-conflict.tmpl");
     }
 
     for (i = ppd->num_groups, group = ppd->groups;
@@ -1277,8 +1270,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       else
 	cgiSetVariable("GROUP", group->text);
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-header.tmpl",
-                          getenv("LANG"));
+      cgiCopyTemplateLang("option-header.tmpl");
       
       for (j = group->num_options, option = group->options;
            j > 0;
@@ -1318,22 +1310,18 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
         switch (option->ui)
 	{
 	  case PPD_UI_BOOLEAN :
-              cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-boolean.tmpl",
-	                          getenv("LANG"));
+              cgiCopyTemplateLang("option-boolean.tmpl");
               break;
 	  case PPD_UI_PICKONE :
-              cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-pickone.tmpl",
-	                          getenv("LANG"));
+              cgiCopyTemplateLang("option-pickone.tmpl");
               break;
 	  case PPD_UI_PICKMANY :
-              cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-pickmany.tmpl",
-	                          getenv("LANG"));
+              cgiCopyTemplateLang("option-pickmany.tmpl");
               break;
 	}
       }
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-trailer.tmpl",
-                          getenv("LANG"));
+      cgiCopyTemplateLang("option-trailer.tmpl");
     }
 
    /*
@@ -1374,8 +1362,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	*/
 
 	cgiSetVariable("GROUP", "Banners");
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-header.tmpl",
-                            getenv("LANG"));
+	cgiCopyTemplateLang("option-header.tmpl");
 
 	cgiSetSize("CHOICES", attr->num_values);
 	cgiSetSize("TEXT", attr->num_values);
@@ -1392,19 +1379,16 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
         cgiSetVariable("DEFCHOICE", attr == NULL ?
 	                            "" : attr->values[0].string.text);
 
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-pickone.tmpl",
-	                    getenv("LANG"));
+	cgiCopyTemplateLang("option-pickone.tmpl");
 
         cgiSetVariable("KEYWORD", "job_sheets_end");
         cgiSetVariable("KEYTEXT", "Ending Banner");
         cgiSetVariable("DEFCHOICE", attr == NULL && attr->num_values > 1 ?
 	                            "" : attr->values[1].string.text);
 
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-pickone.tmpl",
-	                    getenv("LANG"));
+	cgiCopyTemplateLang("option-pickone.tmpl");
 
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-trailer.tmpl",
-                            getenv("LANG"));
+	cgiCopyTemplateLang("option-trailer.tmpl");
       }
 
       if (ippFindAttribute(response, "printer-error-policy-supported",
@@ -1417,8 +1401,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	*/
 
 	cgiSetVariable("GROUP", "Policies");
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-header.tmpl",
-                            getenv("LANG"));
+	cgiCopyTemplateLang("option-header.tmpl");
 
        /*
         * Error policy...
@@ -1446,8 +1429,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 	                              "" : attr->values[0].string.text);
         }
 
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-pickone.tmpl",
-	                    getenv("LANG"));
+	cgiCopyTemplateLang("option-pickone.tmpl");
 
        /*
         * Operation policy...
@@ -1473,12 +1455,10 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
           cgiSetVariable("DEFCHOICE", attr == NULL ?
 	                              "" : attr->values[0].string.text);
 
-	  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-pickone.tmpl",
-	                      getenv("LANG"));
+	  cgiCopyTemplateLang("option-pickone.tmpl");
         }
 
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-trailer.tmpl",
-                            getenv("LANG"));
+	cgiCopyTemplateLang("option-trailer.tmpl");
       }
 
       ippDelete(response);
@@ -1493,8 +1473,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       protocol = ppdFindAttr(ppd, "cupsProtocol", NULL);
 
       cgiSetVariable("GROUP", "PS Binary Protocol");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-header.tmpl",
-                          getenv("LANG"));
+      cgiCopyTemplateLang("option-header.tmpl");
 
       cgiSetSize("CHOICES", 2);
       cgiSetSize("TEXT", 2);
@@ -1516,15 +1495,12 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
       cgiSetVariable("KEYTEXT", "PS Binary Protocol");
       cgiSetVariable("DEFCHOICE", protocol ? protocol->value : "None");
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-pickone.tmpl",
-	                  getenv("LANG"));
+      cgiCopyTemplateLang("option-pickone.tmpl");
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "option-trailer.tmpl",
-                          getenv("LANG"));
+      cgiCopyTemplateLang("option-trailer.tmpl");
     }
 
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(),
-                        "set-printer-options-trailer.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("set-printer-options-trailer.tmpl");
     cgiEndHTML();
   }
   else
@@ -1540,7 +1516,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     {
       cgiSetVariable("ERROR", strerror(errno));
       cgiStartHTML("Set Printer Options");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
       if (in)
@@ -1650,7 +1626,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     {
       cgiStartHTML("Set Printer Options");
       cgiSetVariable("ERROR", ippErrorString(status));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
     }
     else
     {
@@ -1667,7 +1643,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
 
       cgiStartHTML("Set Printer Options");
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-configured.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("printer-configured.tmpl");
     }
 
     cgiEndHTML();
@@ -1753,7 +1729,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
       cgiStartHTML("Change Settings");
       cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
       
       perror(line);
@@ -1768,7 +1744,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     {
       cgiStartHTML("Change Settings");
       cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
       
       perror(tempfile);
@@ -1780,7 +1756,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     {
       cgiStartHTML("Change Settings");
       cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
       
       perror(tempfile);
@@ -2256,14 +2232,14 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     {
       cgiSetVariable("ERROR", httpStatus(status));
       cgiStartHTML("Change Settings");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
     }
     else
     {
       cgiSetVariable("refresh_page", "5;/admin?OP=redirect");
 
       cgiStartHTML("Change Settings");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "restart.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("restart.tmpl");
     }
 
     cgiEndHTML();
@@ -2292,7 +2268,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     {
       cgiStartHTML("Edit Configuration File");
       cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
       
       perror(tempfile);
@@ -2303,7 +2279,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     {
       cgiStartHTML("Edit Configuration File");
       cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
       
       perror(tempfile);
@@ -2346,14 +2322,14 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     {
       cgiSetVariable("ERROR", httpStatus(status));
       cgiStartHTML("Edit Configuration File");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
     }
     else
     {
       cgiSetVariable("refresh_page", "5;/admin?OP=redirect");
 
       cgiStartHTML("Edit Configuration File");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "restart.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("restart.tmpl");
     }
 
     cgiEndHTML();
@@ -2386,7 +2362,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     {
       cgiStartHTML("Edit Configuration File");
       cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
       perror(filename);
@@ -2397,7 +2373,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
     {
       cgiStartHTML("Edit Configuration File");
       cgiSetVariable("ERROR", "Unable to edit cupsd.conf files larger than 1MB!");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
       fprintf(stderr, "ERROR: \"%s\" too large (%ld) to edit!\n", filename,
@@ -2417,7 +2393,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
       cgiStartHTML("Edit Configuration File");
       cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
       perror(filename);
@@ -2444,7 +2420,7 @@ do_config_server(http_t      *http,	/* I - HTTP connection */
 
     printf("<!-- \"%s\" -->\n", filename);
 
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "edit-config.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("edit-config.tmpl");
 
     cgiEndHTML();
   }
@@ -2469,7 +2445,7 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   if (cgiGetVariable("CONFIRM") == NULL)
   {
     cgiStartHTML("Delete Class");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "class-confirm.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("class-confirm.tmpl");
     cgiEndHTML();
     return;
   }
@@ -2481,7 +2457,7 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
     cgiStartHTML("Delete Class");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -2527,10 +2503,10 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   if (status > IPP_OK_CONFLICT)
   {
     cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
   }
   else
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "class-deleted.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("class-deleted.tmpl");
 
   cgiEndHTML();
 }
@@ -2554,7 +2530,7 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   if (cgiGetVariable("CONFIRM") == NULL)
   {
     cgiStartHTML("Delete Printer");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-confirm.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("printer-confirm.tmpl");
     cgiEndHTML();
     return;
   }
@@ -2566,7 +2542,7 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
     cgiStartHTML("Delete Printer");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -2612,10 +2588,10 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   if (status > IPP_OK_CONFLICT)
   {
     cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
   }
   else
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-deleted.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("printer-deleted.tmpl");
 
   cgiEndHTML();
 }
@@ -2663,7 +2639,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 
     cgiStartHTML("Administration");
     cgiSetVariable("ERROR", strerror(errno));
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
 
     perror(line);
@@ -3049,7 +3025,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
   * Finally, show the main menu template...
   */
 
-  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "admin.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang("admin.tmpl");
 
   cgiEndHTML();
 }
@@ -3079,7 +3055,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
     cgiStartHTML(title);
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -3124,7 +3100,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
   {
     cgiStartHTML(title);
     cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
   }
   else
   {
@@ -3142,17 +3118,17 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
     cgiStartHTML(title);
 
     if (op == IPP_PAUSE_PRINTER)
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-stop.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("printer-stop.tmpl");
     else if (op == IPP_RESUME_PRINTER)
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-start.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("printer-start.tmpl");
     else if (op == CUPS_ACCEPT_JOBS)
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-accept.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("printer-accept.tmpl");
     else if (op == CUPS_REJECT_JOBS)
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-reject.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("printer-reject.tmpl");
     else if (op == IPP_PURGE_JOBS)
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-purge.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("printer-purge.tmpl");
     else if (op == CUPS_SET_DEFAULT)
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-default.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("printer-default.tmpl");
   }
 
   cgiEndHTML();
@@ -3195,7 +3171,7 @@ do_set_allowed_users(
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
     cgiStartHTML("Set Allowed Users");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -3255,10 +3231,10 @@ do_set_allowed_users(
     if (status > IPP_OK_CONFLICT)
     {
       cgiSetVariable("ERROR", ippErrorString(status));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
     }
     else
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "users.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("users.tmpl");
 
     cgiEndHTML();
   }
@@ -3411,7 +3387,7 @@ do_set_allowed_users(
     {
       cgiStartHTML("Set Allowed Users");
       cgiSetVariable("ERROR", ippErrorString(status));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
     }
     else
     {
@@ -3428,7 +3404,7 @@ do_set_allowed_users(
 
       cgiStartHTML("Set Allowed Users");
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-modified.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("printer-modified.tmpl");
     }
 
     cgiEndHTML();
@@ -3459,7 +3435,7 @@ do_set_sharing(http_t      *http,	/* I - HTTP connection */
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
     cgiStartHTML("Set Publishing");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -3468,7 +3444,7 @@ do_set_sharing(http_t      *http,	/* I - HTTP connection */
   {
     cgiSetVariable("ERROR", "Missing SHARED parameter");
     cgiStartHTML("Set Publishing");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
   }
@@ -3518,7 +3494,7 @@ do_set_sharing(http_t      *http,	/* I - HTTP connection */
   {
     cgiStartHTML("Set Publishing");
     cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
   }
   else
   {
@@ -3535,7 +3511,7 @@ do_set_sharing(http_t      *http,	/* I - HTTP connection */
 
     cgiStartHTML("Set Publishing");
 
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "printer-modified.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("printer-modified.tmpl");
   }
 
   cgiEndHTML();

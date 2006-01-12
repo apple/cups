@@ -33,5 +33,12 @@
 
 
 /*
+ * Limits...
+ */
+
+#define CUPS_PAGE_MAX	10		/* Maximum items per page */
+
+
+/*
  * End of "$Id$".
  */

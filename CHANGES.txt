@@ -1,8 +1,11 @@
-CHANGES.txt - 01/11/2006
+CHANGES.txt - 01/12/2006
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The web interface now provides searching, paging, and
+	  changing of the sort/display order of classes, jobs,
+	  and printers.
 	- cupsaddsmb now accepts a password on the command-line
 	  and supports passwords with special characters (STR
 	  #822, STR #1236)

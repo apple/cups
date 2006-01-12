@@ -3,7 +3,7 @@
  *
  *   On-line help CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -94,7 +94,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     cgiStartHTML("Help");
     cgiSetVariable("ERROR", "Unable to load help index!");
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
 
     return (1);
@@ -133,7 +133,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       cgiStartHTML("Help");
       cgiSetVariable("ERROR", "Unable to access help file!");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
       return (1);
@@ -143,7 +143,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       cgiStartHTML("Help");
       cgiSetVariable("ERROR", "Help file not in index!");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
       return (1);
@@ -299,8 +299,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Show the search and bookmark content...
   */
 
-  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "help-header.tmpl",
-                      getenv("LANG"));
+  cgiCopyTemplateLang("help-header.tmpl");
 
  /*
   * If we are viewing a file, copy it in now...
@@ -334,7 +333,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       perror(filename);
       cgiSetVariable("ERROR", "Unable to open help file.");
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
     }
   }
 

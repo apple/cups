@@ -3,7 +3,7 @@
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -111,7 +111,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Show the standard header...
     */
 
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "header.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("header.tmpl");
 
    /*
     * Get the default destination...
@@ -198,7 +198,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                    uri);
     }
 
-    cgiGetAttributes(request, cgiGetTemplateDir(), "classes.tmpl", getenv("LANG"));
+    cgiGetAttributes(request, "classes.tmpl");
 
    /*
     * Do the request and get back a response...
@@ -214,7 +214,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Write the report...
     */
 
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "classes.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("classes.tmpl");
 
    /*
     * Get jobs for the specified class if a class has been chosen...
@@ -263,7 +263,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                      NULL, "unknown");
 
-      cgiGetAttributes(request, cgiGetTemplateDir(), "jobs.tmpl", getenv("LANG"));
+      cgiGetAttributes(request, "jobs.tmpl");
 
      /*
       * Do the request and get back a response...
@@ -274,7 +274,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	cgiSetIPPVars(response, NULL, NULL, NULL, 0);
 	ippDelete(response);
 
-	cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "jobs.tmpl", getenv("LANG"));
+	cgiCopyTemplateLang("jobs.tmpl");
       }
     }
   }
@@ -359,7 +359,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Show the standard header...
     */
 
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "header.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("header.tmpl");
 
    /*
     * Show the result...
@@ -368,13 +368,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (status > IPP_OK_CONFLICT)
     {
       cgiSetVariable("ERROR", ippErrorString(status));
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("error.tmpl");
     }
     else
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "test-page.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("test-page.tmpl");
   }
 
-  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "trailer.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang("trailer.tmpl");
 
  /*
   * Close the HTTP server connection...

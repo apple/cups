@@ -3,7 +3,7 @@
  *
  *   CGI template function.
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -82,22 +82,21 @@ cgiCopyTemplateFile(FILE       *out,	/* I - Output file */
  */
 
 void
-cgiCopyTemplateLang(FILE       *out,		/* I - Output file */
-                    const char *directory,	/* I - Directory */
-                    const char *tmpl,		/* I - Base filename */
-		    const char *lang)		/* I - Language */
+cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
 {
-  int	i;					/* Looping var */
-  char	filename[1024],				/* Filename */
-	locale[16];				/* Locale name */
-  FILE	*in;					/* Input file */
+  int		i;			/* Looping var */
+  char		filename[1024],		/* Filename */
+		locale[16];		/* Locale name */
+  const char	*directory,		/* Directory for templates */
+		*lang;			/* Language */
+  FILE		*in;			/* Input file */
 
 
  /*
   * Convert the language to a locale name...
   */
 
-  if (lang != NULL)
+  if ((lang = getenv("LANG")) != NULL)
   {
     for (i = 0; lang[i] && i < 15; i ++)
       if (isalnum(lang[i] & 255))
@@ -113,6 +112,8 @@ cgiCopyTemplateLang(FILE       *out,		/* I - Output file */
  /*
   * See if we have a template file for this language...
   */
+
+  directory = cgiGetTemplateDir();
 
   snprintf(filename, sizeof(filename), "%s/%s/%s", directory, locale, tmpl);
   if (access(filename, 0))
@@ -135,7 +136,7 @@ cgiCopyTemplateLang(FILE       *out,		/* I - Output file */
   * Parse the file to the end...
   */
 
-  cgi_copy(out, in, 0, 0);
+  cgi_copy(stdout, in, 0, 0);
 
  /*
   * Close the template file and return...

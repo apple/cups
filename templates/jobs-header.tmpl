@@ -1,0 +1,17 @@
+{?printer_name=?:<H3 CLASS="title">Jobs</H3>}
+
+<P>{?which_jobs=?<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
+SRC="/images/show-completed.gif" CLASS="button" ALT="Show Completed Jobs"></A>
+<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
+SRC="/images/show-all.gif" CLASS="button" ALT="Show All Jobs">:{which_jobs=all?<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
+SRC="/images/show-completed.gif" CLASS="button" ALT="Show Completed Jobs"></A>
+<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
+SRC="/images/show-active.gif" CLASS="button" ALT="Show Active Jobs">:<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
+SRC="/images/show-active.gif" CLASS="button" ALT="Show Active Jobs"></A>
+<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
+SRC="/images/show-all.gif" CLASS="button" ALT="Show All Jobs">}}</A></P>
+
+<P>Showing {#job_id} of {total} {?which_jobs=?active:{which_jobs=all?:completed}} job{total=1?:s}.</P>

@@ -3,7 +3,7 @@
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -51,11 +51,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   cups_lang_t	*language;		/* Language information */
   http_t	*http;			/* Connection to the server */
-  const char	*which_jobs;		/* Which jobs to show */
-  ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
-   const char	*op;			/* Operation name */
-
+  const char	*op;			/* Operation name */
+  
 
  /*
   * Get any form variables...
@@ -91,11 +88,11 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Send a standard header...
   */
 
-  cgiSetVariable("TITLE", "Jobs");
+  cgiSetVariable("TITLE", _cupsLangString(language, _("Jobs")));
 
   cgiSetServerVersion();
 
-  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "header.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang("header.tmpl");
 
   if ((op = cgiGetVariable("OP")) != NULL)
   {
@@ -103,13 +100,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Do the operation...
     */
 
-    if (strcmp(op, "cancel-job") == 0)
+    if (!strcmp(op, "cancel-job"))
       do_job_op(http, language, IPP_CANCEL_JOB);
-    else if (strcmp(op, "hold-job") == 0)
+    else if (!strcmp(op, "hold-job"))
       do_job_op(http, language, IPP_HOLD_JOB);
-    else if (strcmp(op, "release-job") == 0)
+    else if (!strcmp(op, "release-job"))
       do_job_op(http, language, IPP_RELEASE_JOB);
-    else if (strcmp(op, "restart-job") == 0)
+    else if (!strcmp(op, "restart-job"))
       do_job_op(http, language, IPP_RESTART_JOB);
     else
     {
@@ -117,54 +114,19 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Bad operation code...  Display an error...
       */
 
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-op.tmpl", getenv("LANG"));
+      cgiCopyTemplateLang("job-op.tmpl");
     }
   }
   else
   {
    /*
-    * Build an IPP_GET_JOBS request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
+    * Show a list of jobs...
     */
 
-    request = ippNew();
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
-
-    request->request.op.operation_id = IPP_GET_JOBS;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL,
-        	 "ipp://localhost/jobs");
-
-    if ((which_jobs = cgiGetVariable("which_jobs")) != NULL)
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
-                   NULL, which_jobs);
-
-    cgiGetAttributes(request, cgiGetTemplateDir(), "jobs.tmpl", getenv("LANG"));
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(http, request, "/")) != NULL)
-    {
-      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-      ippDelete(response);
-
-      cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "jobs.tmpl", getenv("LANG"));
-    }
+    cgiShowJobs(http, NULL);
   }
 
-  cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "trailer.tmpl", getenv("LANG"));
+  cgiCopyTemplateLang("trailer.tmpl");
 
  /*
   * Close the HTTP server connection...
@@ -202,7 +164,7 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
   else
   {
     cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
     return;
   }
 
@@ -258,16 +220,16 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
   if (status > IPP_OK_CONFLICT)
   {
     cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "error.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("error.tmpl");
   }
   else if (op == IPP_CANCEL_JOB)
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-cancel.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("job-cancel.tmpl");
   else if (op == IPP_HOLD_JOB)
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-hold.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("job-hold.tmpl");
   else if (op == IPP_RELEASE_JOB)
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-release.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("job-release.tmpl");
   else if (op == IPP_RESTART_JOB)
-    cgiCopyTemplateLang(stdout, cgiGetTemplateDir(), "job-restart.tmpl", getenv("LANG"));
+    cgiCopyTemplateLang("job-restart.tmpl");
 }
 
 
