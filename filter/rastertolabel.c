@@ -301,7 +301,7 @@ StartPage(ppd_file_t *ppd,		/* I - PPD file */
         * Start label...
 	*/
 
-        printf("!0 %u %u %u %u\r\n", header->HWResolution[0],
+        printf("! 0 %u %u %u %u\r\n", header->HWResolution[0],
 	       header->HWResolution[1], header->cupsHeight,
 	       header->NumCopies);
         break;
@@ -499,7 +499,7 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
         * Set tear-off adjust position...
 	*/
 
-	if (header->AdvanceDistance)
+	if (header->AdvanceDistance != 1000)
           printf("PRESENT-AT %d 1\r\n", (int)header->AdvanceDistance);
 
        /*
@@ -523,7 +523,7 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 	*/
 
 	if (header->cupsCompression > 0)
-	  printf("TONE %u\n", 2 * header->cupsCompression);
+	  printf("TONE %u\r\n", 2 * header->cupsCompression);
 
        /*
         * Set print rate...
@@ -732,17 +732,13 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
         break;
 
     case ZEBRA_CPCL :
-        printf("CG %u 1 0 %d ", header->cupsBytesPerLine, y);
-
-	for (ptr = Buffer, i = header->cupsBytesPerLine;
-	     i > 0;
-	     i --, ptr ++)
-        {
-	  putchar(hex[*ptr >> 4]);
-	  putchar(hex[*ptr & 15]);
+        if (Buffer[0] || memcmp(Buffer, Buffer + 1, header->cupsBytesPerLine))
+	{
+	  printf("CG %u 1 0 %d ", header->cupsBytesPerLine, y);
+          fwrite(Buffer, 1, header->cupsBytesPerLine, stdout);
+	  puts("\r");
+	  fflush(stdout);
 	}
-
-	puts("\r");
 	break;
   }
 }

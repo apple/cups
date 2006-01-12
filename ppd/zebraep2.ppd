@@ -66,11 +66,11 @@
 
 *DefaultImageableArea: w288h360
 *ImageableArea w288h360/Label - 4 x 5": "0 0 288 360"
-*ImageableArea w288h432/Label - 4 x 5": "0 0 288 432"
+*ImageableArea w288h432/Label - 4 x 6": "0 0 288 432"
 
 *DefaultPaperDimension: w288h360
 *PaperDimension w288h360/Label - 4 x 5": "288 360"
-*PaperDimension w288h432/Label - 4 x 5": "288 432"
+*PaperDimension w288h432/Label - 4 x 6": "288 432"
 
 *MaxMediaWidth: "288"
 *MaxMediaHeight: "3600"

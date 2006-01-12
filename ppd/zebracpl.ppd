@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id$"
+*% "$Id: zebra.ppd 4905 2006-01-10 20:07:15Z mike $"
 *%
 *%   Sample Zebra label printer driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -27,7 +27,7 @@
 *FileVersion:	"1.2"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
-*PCFileName:	"ZEBRA.PPD"
+*PCFileName:	"ZEBRACPL.PPD"
 *Manufacturer:	"Zebra"
 *Product:	"(GNU Ghostscript)"
 *Product:	"(ESP Ghostscript)"
@@ -36,10 +36,10 @@
 *cupsFilter:	"application/vnd.cups-raster 0 rastertodymo"
 *% cupsModelNumber is 16 for EPL1 line mode, 17 for EPL2 page mode,
 *% 18 for ZPL mode, and 19 for CPCL mode.
-*cupsModelNumber: 18
-*ModelName:     "Zebra ZPL Label Printer"
-*ShortNickName: "Zebra ZPL Label Printer"
-*NickName:      "Zebra ZPL Label Printer CUPS v1.2"
+*cupsModelNumber: 19
+*ModelName:     "Zebra CPCL Label Printer"
+*ShortNickName: "Zebra CPCL Label Printer"
+*NickName:      "Zebra CPCL Label Printer CUPS v1.2"
 *PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
@@ -53,6 +53,15 @@
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: w288h360
+*PageSize w144h72/Label - 2 x 1": "<</PageSize[144 72]/ImagingBBox null>>setpagedevice"
+*PageSize w144h90/Label - 2 x 1.25": "<</PageSize[144 90]/ImagingBBox null>>setpagedevice"
+*PageSize w144h144/Label - 2 x 2": "<</PageSize[144 144]/ImagingBBox null>>setpagedevice"
+*PageSize w144h216/Label - 2 x 3": "<</PageSize[144 216]/ImagingBBox null>>setpagedevice"
+*PageSize w209h72/Label - 2.9 x 1": "<</PageSize[209 72]/ImagingBBox null>>setpagedevice>>"
+*PageSize w288h144/Label - 4 x 2": "<</PageSize[288 144]/ImagingBBox null>>setpagedevice"
+*PageSize w288h216/Label - 4 x 3": "<</PageSize[288 216]/ImagingBBox null>>setpagedevice"
+*PageSize w288h288/Label - 4 x 4": "<</PageSize[288 288]/ImagingBBox null>>setpagedevice"
+*PageSize w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
 *PageSize w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
 *PageSize w288h432/Label - 4 x 6": "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageSize
@@ -60,15 +69,42 @@
 *OpenUI *PageRegion: PickOne
 *OrderDependency: 10 AnySetup *PageRegion
 *DefaultPageRegion: w288h360
+*PageRegion w144h72/Label - 2 x 1": "<</PageSize[144 72]/ImagingBBox null>>setpagedevice"
+*PageRegion w144h90/Label - 2 x 1.25": "<</PageSize[144 90]/ImagingBBox null>>setpagedevice"
+*PageRegion w144h144/Label - 2 x 2": "<</PageSize[144 144]/ImagingBBox null>>setpagedevice"
+*PageRegion w144h216/Label - 2 x 3": "<</PageSize[144 216]/ImagingBBox null>>setpagedevice"
+*PageRegion w209h72/Label - 2.9 x 1": "<</PageSize[209 72]/ImagingBBox null>>setpagedevice>>"
+*PageRegion w288h144/Label - 4 x 2": "<</PageSize[288 144]/ImagingBBox null>>setpagedevice"
+*PageRegion w288h216/Label - 4 x 3": "<</PageSize[288 216]/ImagingBBox null>>setpagedevice"
+*PageRegion w288h288/Label - 4 x 4": "<</PageSize[288 288]/ImagingBBox null>>setpagedevice"
+*PageRegion w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
 *PageRegion w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
 *PageRegion w288h432/Label - 4 x 6": "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageRegion
 
 *DefaultImageableArea: w288h360
+*ImageableArea w144h72/Label - 2 x 1": "0 0 144 72"
+*ImageableArea w144h90/Label - 2 x 1.25": "0 0 144 90"
+*ImageableArea w144h144/Label - 2 x 2": "0 0 144 144"
+*ImageableArea w144h216/Label - 2 x 3": "0 0 144 216"
+*ImageableArea w209h72/Label - 2.9 x 1": "0 0 209 72>>"
+*ImageableArea w288h144/Label - 4 x 2": "0 0 288 144"
+*ImageableArea w288h216/Label - 4 x 3": "0 0 288 216"
+*ImageableArea w288h288/Label - 4 x 4": "0 0 288 288"
+*ImageableArea w288h360/Label - 4 x 5": "0 0 288 360"
 *ImageableArea w288h360/Label - 4 x 5": "0 0 288 360"
 *ImageableArea w288h432/Label - 4 x 6": "0 0 288 432"
 
 *DefaultPaperDimension: w288h360
+*PaperDimension w144h72/Label - 2 x 1": "144 72"
+*PaperDimension w144h90/Label - 2 x 1.25": "144 90"
+*PaperDimension w144h144/Label - 2 x 2": "144 144"
+*PaperDimension w144h216/Label - 2 x 3": "144 216"
+*PaperDimension w209h72/Label - 2.9 x 1": "209 72>>"
+*PaperDimension w288h144/Label - 4 x 2": "288 144"
+*PaperDimension w288h216/Label - 4 x 3": "288 216"
+*PaperDimension w288h288/Label - 4 x 4": "288 288"
+*PaperDimension w288h360/Label - 4 x 5": "288 360"
 *PaperDimension w288h360/Label - 4 x 5": "288 360"
 *PaperDimension w288h432/Label - 4 x 6": "288 432"
 
@@ -86,25 +122,7 @@
 *OrderDependency: 20 AnySetup *Resolution
 *DefaultResolution: 203dpi
 *Resolution 203dpi/203 DPI: "<</HWResolution[203 203]>>setpagedevice"
-*Resolution 300dpi/300 DPI: "<</HWResolution[300 300]>>setpagedevice"
-*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]>>setpagedevice"
 *CloseUI: *Resolution
-
-*OpenUI *zeMediaTracking/Media Tracking: PickOne
-*OrderDependency: 20 AnySetup *zeMediaTracking
-*DefaultzeMediaTracking: Web
-*zeMediaTracking Continuous: ""
-*zeMediaTracking Web/Non-continuous (Web sensing): ""
-*zeMediaTracking Mark/Non-continuous (Mark sensing): ""
-*CloseUI: *zeMediaTracking
-
-*OpenUI *MediaType/Media Type: PickOne
-*OrderDependency: 20 AnySetup *MediaType
-*DefaultMediaType: Saved
-*MediaType Saved/PrinterDefault: ""
-*MediaType Thermal/Thermal Transfer Media: "<</MediaType(Thermal)>>setpagedevice"
-*MediaType Direct/Direct Thermal Media: "<</MediaType(Direct)>>setpagedevice"
-*CloseUI: *zeMediaType
 
 *OpenGroup: PrinterSettings/Printer Settings
 *OpenUI *Darkness/Media Darkness: PickOne
@@ -151,81 +169,7 @@
 *zePrintRate 2/2 inches/sec.: ""
 *zePrintRate 3/3 inches/sec.: ""
 *zePrintRate 4/4 inches/sec.: ""
-*zePrintRate 5/5 inches/sec.: ""
-*zePrintRate 6/6 inches/sec.: ""
-*zePrintRate 7/7 inches/sec.: ""
-*zePrintRate 8/8 inches/sec.: ""
-*zePrintRate 9/9 inches/sec.: ""
-*zePrintRate 10/10 inches/sec.: ""
-*zePrintRate 11/11 inches/sec.: ""
-*zePrintRate 12/12 inches/sec.: ""
 *CloseUI: *zePrintRate
-
-*OpenUI *zeLabelTop/Label Top: PickOne
-*OrderDependency: 20 AnySetup *zeLabelTop
-*DefaultzeLabelTop: 200
-*zeLabelTop 200/PrinterDefault: "<</cupsRowStep 200>>setpagedevice"
-*zeLabelTop -120: "<</cupsRowStep -120>>setpagedevice"
-*zeLabelTop -115: "<</cupsRowStep -115>>setpagedevice"
-*zeLabelTop -110: "<</cupsRowStep -110>>setpagedevice"
-*zeLabelTop -105: "<</cupsRowStep -105>>setpagedevice"
-*zeLabelTop -100: "<</cupsRowStep -100>>setpagedevice"
-*zeLabelTop -95: "<</cupsRowStep -95>>setpagedevice"
-*zeLabelTop -90: "<</cupsRowStep -90>>setpagedevice"
-*zeLabelTop -85: "<</cupsRowStep -85>>setpagedevice"
-*zeLabelTop -80: "<</cupsRowStep -80>>setpagedevice"
-*zeLabelTop -75: "<</cupsRowStep -75>>setpagedevice"
-*zeLabelTop -70: "<</cupsRowStep -70>>setpagedevice"
-*zeLabelTop -65: "<</cupsRowStep -65>>setpagedevice"
-*zeLabelTop -60: "<</cupsRowStep -60>>setpagedevice"
-*zeLabelTop -55: "<</cupsRowStep -55>>setpagedevice"
-*zeLabelTop -50: "<</cupsRowStep -50>>setpagedevice"
-*zeLabelTop -45: "<</cupsRowStep -45>>setpagedevice"
-*zeLabelTop -40: "<</cupsRowStep -40>>setpagedevice"
-*zeLabelTop -35: "<</cupsRowStep -35>>setpagedevice"
-*zeLabelTop -30: "<</cupsRowStep -30>>setpagedevice"
-*zeLabelTop -25: "<</cupsRowStep -25>>setpagedevice"
-*zeLabelTop -20: "<</cupsRowStep -20>>setpagedevice"
-*zeLabelTop -15: "<</cupsRowStep -15>>setpagedevice"
-*zeLabelTop -10: "<</cupsRowStep -10>>setpagedevice"
-*zeLabelTop -5: "<</cupsRowStep -5>>setpagedevice"
-*zeLabelTop 0: "<</cupsRowStep 0>>setpagedevice"
-*zeLabelTop 5: "<</cupsRowStep 5>>setpagedevice"
-*zeLabelTop 10: "<</cupsRowStep 10>>setpagedevice"
-*zeLabelTop 15: "<</cupsRowStep 15>>setpagedevice"
-*zeLabelTop 20: "<</cupsRowStep 20>>setpagedevice"
-*zeLabelTop 25: "<</cupsRowStep 25>>setpagedevice"
-*zeLabelTop 30: "<</cupsRowStep 30>>setpagedevice"
-*zeLabelTop 35: "<</cupsRowStep 35>>setpagedevice"
-*zeLabelTop 40: "<</cupsRowStep 40>>setpagedevice"
-*zeLabelTop 45: "<</cupsRowStep 45>>setpagedevice"
-*zeLabelTop 50: "<</cupsRowStep 50>>setpagedevice"
-*zeLabelTop 55: "<</cupsRowStep 55>>setpagedevice"
-*zeLabelTop 60: "<</cupsRowStep 60>>setpagedevice"
-*zeLabelTop 65: "<</cupsRowStep 65>>setpagedevice"
-*zeLabelTop 70: "<</cupsRowStep 70>>setpagedevice"
-*zeLabelTop 75: "<</cupsRowStep 75>>setpagedevice"
-*zeLabelTop 80: "<</cupsRowStep 80>>setpagedevice"
-*zeLabelTop 85: "<</cupsRowStep 85>>setpagedevice"
-*zeLabelTop 90: "<</cupsRowStep 90>>setpagedevice"
-*zeLabelTop 95: "<</cupsRowStep 95>>setpagedevice"
-*zeLabelTop 100: "<</cupsRowStep 100>>setpagedevice"
-*zeLabelTop 105: "<</cupsRowStep 105>>setpagedevice"
-*zeLabelTop 110: "<</cupsRowStep 110>>setpagedevice"
-*zeLabelTop 115: "<</cupsRowStep 115>>setpagedevice"
-*zeLabelTop 120: "<</cupsRowStep 120>>setpagedevice"
-*CloseUI: *zeLabelTop
-
-*OpenUI *zePrintMode/Print Mode: PickOne
-*OrderDependency: 20 AnySetup *zePrintMode
-*DefaultzePrintMode: Saved
-*zePrintMode Saved/PrinterDefault: ""
-*zePrintMode Tear/Tear-off: ""
-*zePrintMode Peel/Peel-Off: ""
-*zePrintMode Rewind: ""
-*zePrintMode Applicator: ""
-*zePrintMode Cutter: ""
-*CloseUI: *MediaTracking
 
 *OpenUI *zeTearOffPosition/Tear-off Adjust Position: PickOne
 *OrderDependency: 20 AnySetup *zeTearOffPosition
@@ -328,5 +272,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id$".
+*% End of "$Id: zebra.ppd 4905 2006-01-10 20:07:15Z mike $".
 *%
