@@ -4,7 +4,7 @@
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -451,6 +451,7 @@ extern ipp_attribute_t	*ippAddOctetString(ipp_t *ipp, ipp_tag_t group,
 			                   const char *name,
 					   const void *data, int datalen);
 extern ipp_status_t	ippErrorValue(const char *name);
+extern ipp_t		*ippNewRequest(ipp_op_t op);
 extern const char	*ippOpString(ipp_op_t op);
 extern ipp_op_t		ippOpValue(const char *name);
 

@@ -59,7 +59,7 @@ cups_env_init(_cups_globals_t *g)	/* I - Global data */
   if ((g->cups_statedir = getenv("CUPS_STATEDIR")) == NULL)
     g->cups_statedir = CUPS_STATEDIR;
 
-  if ((g->localedir = getenv("LOCALDIR")) == NULL)
+  if ((g->localedir = getenv("LOCALEDIR")) == NULL)
     g->localedir = CUPS_LOCALEDIR;
 }
 

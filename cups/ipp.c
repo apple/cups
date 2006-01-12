@@ -4,7 +4,7 @@
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -26,39 +26,40 @@
  *
  * Contents:
  *
- *   ippAddBoolean()        - Add a boolean attribute to an IPP request.
+ *   ippAddBoolean()        - Add a boolean attribute to an IPP message.
  *   ippAddBooleans()       - Add an array of boolean values.
- *   ippAddDate()           - Add a date attribute to an IPP request.
- *   ippAddInteger()        - Add a integer attribute to an IPP request.
+ *   ippAddDate()           - Add a date attribute to an IPP message.
+ *   ippAddInteger()        - Add a integer attribute to an IPP message.
  *   ippAddIntegers()       - Add an array of integer values.
- *   ippAddOctetString()    - Add an octetString value to an IPP request.
- *   ippAddString()         - Add a language-encoded string to an IPP request.
- *   ippAddStrings()        - Add language-encoded strings to an IPP request.
- *   ippAddRange()          - Add a range of values to an IPP request.
- *   ippAddRanges()         - Add ranges of values to an IPP request.
- *   ippAddResolution()     - Add a resolution value to an IPP request.
- *   ippAddResolutions()    - Add resolution values to an IPP request.
- *   ippAddSeparator()      - Add a group separator to an IPP request.
+ *   ippAddOctetString()    - Add an octetString value to an IPP message.
+ *   ippAddString()         - Add a language-encoded string to an IPP message.
+ *   ippAddStrings()        - Add language-encoded strings to an IPP message.
+ *   ippAddRange()          - Add a range of values to an IPP message.
+ *   ippAddRanges()         - Add ranges of values to an IPP message.
+ *   ippAddResolution()     - Add a resolution value to an IPP message.
+ *   ippAddResolutions()    - Add resolution values to an IPP message.
+ *   ippAddSeparator()      - Add a group separator to an IPP message.
  *   ippDateToTime()        - Convert from RFC 1903 Date/Time format to
  *                            UNIX time in seconds.
- *   ippDelete()            - Delete an IPP request.
- *   ippDeleteAttribute()   - Delete a single attribute in an IPP request.
+ *   ippDelete()            - Delete an IPP message.
+ *   ippDeleteAttribute()   - Delete a single attribute in an IPP message.
  *   ippFindAttribute()     - Find a named attribute in a request...
  *   ippFindNextAttribute() - Find the next named attribute in a request...
- *   ippLength()            - Compute the length of an IPP request.
- *   ippNew()               - Allocate a new IPP request.
- *   ippRead()              - Read data for an IPP request from a HTTP
+ *   ippLength()            - Compute the length of an IPP message.
+ *   ippNew()               - Allocate a new IPP message.
+ *   ippNewRequest()        - Allocate a new IPP message.
+ *   ippRead()              - Read data for an IPP message from a HTTP
  *                            connection.
- *   ippReadFile()          - Read data for an IPP request from a file.
- *   ippReadIO()            - Read data for an IPP request.
+ *   ippReadFile()          - Read data for an IPP message from a file.
+ *   ippReadIO()            - Read data for an IPP message.
  *   ippTimeToDate()        - Convert from UNIX time to RFC 1903 format.
- *   ippWrite()             - Write data for an IPP request to a HTTP
+ *   ippWrite()             - Write data for an IPP message to a HTTP
  *                            connection.
- *   ippWriteFile()         - Write data for an IPP request to a file.
- *   ippWriteIO()           - Write data for an IPP request.
+ *   ippWriteFile()         - Write data for an IPP message to a file.
+ *   ippWriteIO()           - Write data for an IPP message.
  *   _ipp_add_attr()        - Add a new attribute to the request.
  *   _ipp_free_attr()       - Free an attribute.
- *   ipp_length()           - Compute the length of an IPP request or
+ *   ipp_length()           - Compute the length of an IPP message or
  *                            collection value.
  *   ipp_read_http()        - Semi-blocking read on a HTTP connection...
  *   ipp_read_file()        - Read IPP data from a file.
@@ -90,11 +91,11 @@ static int		ipp_write_file(int *fd, ipp_uchar_t *buffer, int length);
 
 
 /*
- * 'ippAddBoolean()' - Add a boolean attribute to an IPP request.
+ * 'ippAddBoolean()' - Add a boolean attribute to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddBoolean(ipp_t      *ipp,		/* I - IPP request */
+ippAddBoolean(ipp_t      *ipp,		/* I - IPP message */
               ipp_tag_t  group,		/* I - IPP group */
               const char *name,		/* I - Name of attribute */
               char       value)		/* I - Value of attribute */
@@ -124,7 +125,7 @@ ippAddBoolean(ipp_t      *ipp,		/* I - IPP request */
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddBooleans(ipp_t      *ipp,		/* I - IPP request */
+ippAddBooleans(ipp_t      *ipp,		/* I - IPP message */
                ipp_tag_t  group,	/* I - IPP group */
 	       const char *name,	/* I - Name of attribute */
 	       int        num_values,	/* I - Number of values */
@@ -165,7 +166,7 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP request */
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddCollection(ipp_t      *ipp,	/* I - IPP request */
+ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
                  ipp_tag_t  group,	/* I - IPP group */
 		 const char *name,	/* I - Name of attribute */
 		 ipp_t      *value)	/* I - Value */
@@ -199,7 +200,7 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP request */
 
 ipp_attribute_t *			/* O - New attribute */
 ippAddCollections(
-    ipp_t       *ipp,			/* I - IPP request */
+    ipp_t       *ipp,			/* I - IPP message */
     ipp_tag_t   group,			/* I - IPP group */
     const char  *name,			/* I - Name of attribute */
     int         num_values,		/* I - Number of values */
@@ -234,11 +235,11 @@ ippAddCollections(
 
 
 /*
- * 'ippAddDate()' - Add a date attribute to an IPP request.
+ * 'ippAddDate()' - Add a date attribute to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddDate(ipp_t             *ipp,	/* I - IPP request */
+ippAddDate(ipp_t             *ipp,	/* I - IPP message */
            ipp_tag_t         group,	/* I - IPP group */
 	   const char        *name,	/* I - Name of attribute */
 	   const ipp_uchar_t *value)	/* I - Value */
@@ -265,11 +266,11 @@ ippAddDate(ipp_t             *ipp,	/* I - IPP request */
 
 
 /*
- * 'ippAddInteger()' - Add a integer attribute to an IPP request.
+ * 'ippAddInteger()' - Add a integer attribute to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddInteger(ipp_t      *ipp,		/* I - IPP request */
+ippAddInteger(ipp_t      *ipp,		/* I - IPP message */
               ipp_tag_t  group,		/* I - IPP group */
 	      ipp_tag_t  type,		/* I - Type of attribute */
               const char *name,		/* I - Name of attribute */
@@ -301,7 +302,7 @@ ippAddInteger(ipp_t      *ipp,		/* I - IPP request */
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddIntegers(ipp_t      *ipp,		/* I - IPP request */
+ippAddIntegers(ipp_t      *ipp,		/* I - IPP message */
                ipp_tag_t  group,	/* I - IPP group */
 	       ipp_tag_t  type,		/* I - Type of attribute */
 	       const char *name,	/* I - Name of attribute */
@@ -334,13 +335,13 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP request */
 
 
 /*
- * 'ippAddOctetString()' - Add an octetString value to an IPP request.
+ * 'ippAddOctetString()' - Add an octetString value to an IPP message.
  *
  * @since CUPS 1.2@
  */
 
 ipp_attribute_t	*			/* O - New attribute */
-ippAddOctetString(ipp_t      *ipp,	/* I - IPP request */
+ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
                   ipp_tag_t  group,	/* I - IPP group */
                   const char *name,	/* I - Name of attribute */
                   const void *data,	/* I - octetString data */
@@ -379,11 +380,11 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP request */
 
 
 /*
- * 'ippAddString()' - Add a language-encoded string to an IPP request.
+ * 'ippAddString()' - Add a language-encoded string to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddString(ipp_t      *ipp,		/* I - IPP request */
+ippAddString(ipp_t      *ipp,		/* I - IPP message */
              ipp_tag_t  group,		/* I - IPP group */
 	     ipp_tag_t  type,		/* I - Type of attribute */
              const char *name,		/* I - Name of attribute */
@@ -440,12 +441,12 @@ ippAddString(ipp_t      *ipp,		/* I - IPP request */
 
 
 /*
- * 'ippAddStrings()' - Add language-encoded strings to an IPP request.
+ * 'ippAddStrings()' - Add language-encoded strings to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
 ippAddStrings(
-    ipp_t              *ipp,		/* I - IPP request */
+    ipp_t              *ipp,		/* I - IPP message */
     ipp_tag_t          group,		/* I - IPP group */
     ipp_tag_t          type,		/* I - Type of attribute */
     const char         *name,		/* I - Name of attribute */
@@ -502,11 +503,11 @@ ippAddStrings(
 
 
 /*
- * 'ippAddRange()' - Add a range of values to an IPP request.
+ * 'ippAddRange()' - Add a range of values to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddRange(ipp_t      *ipp,		/* I - IPP request */
+ippAddRange(ipp_t      *ipp,		/* I - IPP message */
             ipp_tag_t  group,		/* I - IPP group */
 	    const char *name,		/* I - Name of attribute */
 	    int        lower,		/* I - Lower value */
@@ -532,11 +533,11 @@ ippAddRange(ipp_t      *ipp,		/* I - IPP request */
 
 
 /*
- * 'ippAddRanges()' - Add ranges of values to an IPP request.
+ * 'ippAddRanges()' - Add ranges of values to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddRanges(ipp_t      *ipp,		/* I - IPP request */
+ippAddRanges(ipp_t      *ipp,		/* I - IPP message */
              ipp_tag_t  group,		/* I - IPP group */
 	     const char *name,		/* I - Name of attribute */
 	     int        num_values,	/* I - Number of values */
@@ -572,11 +573,11 @@ ippAddRanges(ipp_t      *ipp,		/* I - IPP request */
 
 
 /*
- * 'ippAddResolution()' - Add a resolution value to an IPP request.
+ * 'ippAddResolution()' - Add a resolution value to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddResolution(ipp_t      *ipp,	/* I - IPP request */
+ippAddResolution(ipp_t      *ipp,	/* I - IPP message */
         	 ipp_tag_t  group,	/* I - IPP group */
 		 const char *name,	/* I - Name of attribute */
 		 ipp_res_t  units,	/* I - Units for resolution */
@@ -604,11 +605,11 @@ ippAddResolution(ipp_t      *ipp,	/* I - IPP request */
 
 
 /*
- * 'ippAddResolutions()' - Add resolution values to an IPP request.
+ * 'ippAddResolutions()' - Add resolution values to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddResolutions(ipp_t      *ipp,	/* I - IPP request */
+ippAddResolutions(ipp_t      *ipp,	/* I - IPP message */
         	  ipp_tag_t  group,	/* I - IPP group */
 		  const char *name,	/* I - Name of attribute */
 		  int        num_values,/* I - Number of values */
@@ -646,11 +647,11 @@ ippAddResolutions(ipp_t      *ipp,	/* I - IPP request */
 
 
 /*
- * 'ippAddSeparator()' - Add a group separator to an IPP request.
+ * 'ippAddSeparator()' - Add a group separator to an IPP message.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-ippAddSeparator(ipp_t *ipp)		/* I - IPP request */
+ippAddSeparator(ipp_t *ipp)		/* I - IPP message */
 {
   ipp_attribute_t	*attr;		/* New attribute */
 
@@ -720,11 +721,11 @@ ippDateToTime(const ipp_uchar_t *date)	/* I - RFC 1903 date info */
 
 
 /*
- * 'ippDelete()' - Delete an IPP request.
+ * 'ippDelete()' - Delete an IPP message.
  */
 
 void
-ippDelete(ipp_t *ipp)			/* I - IPP request */
+ippDelete(ipp_t *ipp)			/* I - IPP message */
 {
   ipp_attribute_t	*attr,		/* Current attribute */
 			*next;		/* Next attribute */
@@ -746,14 +747,14 @@ ippDelete(ipp_t *ipp)			/* I - IPP request */
 
 
 /*
- * 'ippDeleteAttribute()' - Delete a single attribute in an IPP request.
+ * 'ippDeleteAttribute()' - Delete a single attribute in an IPP message.
  *
  * @since CUPS 1.1.19@
  */
 
 void
 ippDeleteAttribute(
-    ipp_t           *ipp,		/* I - IPP request */
+    ipp_t           *ipp,		/* I - IPP message */
     ipp_attribute_t *attr)		/* I - Attribute to delete */
 {
   ipp_attribute_t	*current,	/* Current attribute */
@@ -796,7 +797,7 @@ ippDeleteAttribute(
  */
 
 ipp_attribute_t	*			/* O - Matching attribute */
-ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
+ippFindAttribute(ipp_t      *ipp,	/* I - IPP message */
                  const char *name,	/* I - Name of attribute */
 		 ipp_tag_t  type)	/* I - Type of attribute */
 {
@@ -824,7 +825,7 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP request */
  */
 
 ipp_attribute_t	*			/* O - Matching attribute */
-ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP request */
+ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP message */
                      const char *name,	/* I - Name of attribute */
 		     ipp_tag_t  type)	/* I - Type of attribute */
 {
@@ -874,24 +875,24 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP request */
 
 
 /*
- * 'ippLength()' - Compute the length of an IPP request.
+ * 'ippLength()' - Compute the length of an IPP message.
  */
 
-size_t					/* O - Size of IPP request */
-ippLength(ipp_t *ipp)			/* I - IPP request */
+size_t					/* O - Size of IPP message */
+ippLength(ipp_t *ipp)			/* I - IPP message */
 {
   return (ipp_length(ipp, 0));
 }
 
 
 /*
- * 'ippNew()' - Allocate a new IPP request.
+ * 'ippNew()' - Allocate a new IPP message.
  */
 
-ipp_t *					/* O - New IPP request */
+ipp_t *					/* O - New IPP message */
 ippNew(void)
 {
-  ipp_t	*temp;				/* New IPP request */
+  ipp_t	*temp;				/* New IPP message */
 
 
   DEBUG_puts("ippNew()");
@@ -913,7 +914,62 @@ ippNew(void)
 
 
 /*
- * 'ippRead()' - Read data for an IPP request from a HTTP connection.
+ *  'ippNewRequest()' - Allocate a new IPP request message.
+ *
+ * The new request message is initialized with the attributes-charset and
+ * attributes-natural-language attributes added. The
+ * attributes-natural-language value is derived from the current locale.
+ *
+ * @since CUPS 1.2@
+ */
+
+ipp_t *					/* O - IPP request message */
+ippNewRequest(ipp_op_t op)		/* I - Operation code */
+{
+  ipp_t		*request;		/* IPP request message */
+  cups_lang_t	*language;		/* Current language localization */
+
+
+ /*
+  * Create a new IPP message...
+  */
+
+  if ((request = ippNew()) == NULL)
+    return (NULL);
+
+ /*
+  * Set the operation and request ID...
+  */
+
+  request->request.op.operation_id = op;
+  request->request.op.request_id   = 1;
+
+ /*
+  * Use UTF-8 as the character set...
+  */
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+               "attributes-charset", NULL, "utf-8");
+
+ /*
+  * Get the language from the current locale...
+  */
+
+  language = cupsLangDefault();
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+               "attributes-natural-language", NULL, language->language);
+
+ /*
+  * Return the new request...
+  */
+
+  return (request);
+}
+
+
+/*
+ * 'ippRead()' - Read data for an IPP message from a HTTP connection.
  */
 
 ipp_state_t				/* O - Current state */
@@ -934,7 +990,7 @@ ippRead(http_t *http,			/* I - HTTP connection */
 
 
 /*
- * 'ippReadFile()' - Read data for an IPP request from a file.
+ * 'ippReadFile()' - Read data for an IPP message from a file.
  *
  * @since CUPS 1.1.19@
  */
@@ -950,7 +1006,7 @@ ippReadFile(int   fd,			/* I - HTTP data */
 
 
 /*
- * 'ippReadIO()' - Read data for an IPP request.
+ * 'ippReadIO()' - Read data for an IPP message.
  *
  * @since CUPS 1.1.19@
  */
@@ -1510,7 +1566,7 @@ ippTimeToDate(time_t t)			/* I - UNIX time value */
 
 
 /*
- * 'ippWrite()' - Write data for an IPP request to a HTTP connection.
+ * 'ippWrite()' - Write data for an IPP message to a HTTP connection.
  */
 
 ipp_state_t				/* O - Current state */
@@ -1528,7 +1584,7 @@ ippWrite(http_t *http,			/* I - HTTP connection */
 
 
 /*
- * 'ippWriteFile()' - Write data for an IPP request to a file.
+ * 'ippWriteFile()' - Write data for an IPP message to a file.
  *
  * @since CUPS 1.1.19@
  */
@@ -1546,7 +1602,7 @@ ippWriteFile(int   fd,			/* I - HTTP data */
 
 
 /*
- * 'ippWriteIO()' - Write data for an IPP request.
+ * 'ippWriteIO()' - Write data for an IPP message.
  *
  * @since CUPS 1.1.19@
  */
@@ -1555,7 +1611,7 @@ ipp_state_t				/* O - Current state */
 ippWriteIO(void       *dst,		/* I - Destination */
            ipp_iocb_t cb,		/* I - Write callback function */
 	   int        blocking,		/* I - Use blocking IO? */
-	   ipp_t      *parent,		/* I - Parent IPP request */
+	   ipp_t      *parent,		/* I - Parent IPP message */
            ipp_t      *ipp)		/* I - IPP data */
 {
   int			i;		/* Looping var */
@@ -2332,7 +2388,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
  */
 
 ipp_attribute_t *			/* O - New attribute */
-_ipp_add_attr(ipp_t *ipp,		/* I - IPP request */
+_ipp_add_attr(ipp_t *ipp,		/* I - IPP message */
               int   num_values)		/* I - Number of values */
 {
   ipp_attribute_t	*attr;		/* New attribute */
@@ -2418,11 +2474,11 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
 
 
 /*
- * 'ipp_length()' - Compute the length of an IPP request or collection value.
+ * 'ipp_length()' - Compute the length of an IPP message or collection value.
  */
 
-static size_t				/* O - Size of IPP request */
-ipp_length(ipp_t *ipp,			/* I - IPP request or collection */
+static size_t				/* O - Size of IPP message */
+ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
            int   collection)		/* I - 1 if a collection, 0 otherwise */
 {
   int			i;		/* Looping var */
@@ -2436,7 +2492,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP request or collection */
     return (0);
 
  /*
-  * Start with 8 bytes for the IPP request or status header...
+  * Start with 8 bytes for the IPP message header...
   */
 
   bytes = collection ? 0 : 8;

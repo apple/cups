@@ -431,7 +431,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   country[0] = '\0';
 
   if (language == NULL || !language[0] ||
-      strcmp(language, "POSIX") == 0)
+      !strcmp(language, "POSIX"))
     strcpy(langname, "C");
   else
   {
@@ -689,21 +689,18 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
 
 
  /*
-  * Open the message catalog file...
-  */
-
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
-    return (NULL);
-
- /*
   * Create an array to hold the messages...
   */
 
   if ((a = cupsArrayNew((cups_array_func_t)cups_message_compare, NULL)) == NULL)
-  {
-    cupsFileClose(fp);
     return (NULL);
-  }
+
+ /*
+  * Open the message catalog file...
+  */
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+    return (a);
 
  /*
   * Read messages from the catalog file until EOF...
@@ -1106,7 +1103,7 @@ appleLangDefault(void)
 		 i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
 		 i++)
 	    {
-	      if (strcasecmp(buff, apple_name_locale[i].name) == 0)
+	      if (!strcasecmp(buff, apple_name_locale[i].name))
 	      {
 		cg->language = apple_name_locale[i].locale;
 		break;
