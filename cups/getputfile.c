@@ -3,7 +3,7 @@
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -54,6 +54,8 @@
 
 /*
  * 'cupsGetFd()' - Get a file from the server.
+ *
+ * This function returns HTTP_OK when the file is successfully retrieved.
  *
  * @since CUPS 1.1.20@
  */
@@ -173,6 +175,8 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
 /*
  * 'cupsGetFile()' - Get a file from the server.
  *
+ * This function returns HTTP_OK when the file is successfully retrieved.
+ *
  * @since CUPS 1.1.20@
  */
 
@@ -237,6 +241,8 @@ cupsGetFile(http_t     *http,		/* I - HTTP connection to server */
 
 /*
  * 'cupsPutFd()' - Put a file on the server.
+ *
+ * This function returns HTTP_CREATED when the file is stored successfully.
  *
  * @since CUPS 1.1.20@
  */
@@ -370,6 +376,8 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
 
 /*
  * 'cupsPutFile()' - Put a file on the server.
+ *
+ * This function returns HTTP_CREATED when the file is stored successfully.
  *
  * @since CUPS 1.1.20@
  */

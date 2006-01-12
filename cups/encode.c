@@ -102,6 +102,10 @@ static const _ipp_option_t ipp_options[] =
 
 /*
  * 'cupsEncodeOptions()' - Encode printer options into IPP attributes.
+ *
+ * This function adds operation, job, and then subscription attributes,
+ * in that order. Use the cupsEncodeOptions2() function to add attributes
+ * for a single group.
  */
 
 void
@@ -123,6 +127,10 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 /*
  * 'cupsEncodeOptions2()' - Encode printer options into IPP attributes for a group.
+ *
+ * This function only adds attributes for a single group. Call this
+ * function multiple times for each group, or use cupsEncodeOptions()
+ * to add the standard groups.
  *
  * @since CUPS 1.2@
  */

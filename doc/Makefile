@@ -89,6 +89,7 @@ WEBIMAGES	=	\
 HELPFILES	=	\
 			help/access_log-reference.html \
 			help/api-array.html \
+			help/api-cups.html \
 			help/api-filedir.html \
 			help/api-filter.html \
 			help/api-httpipp.html \

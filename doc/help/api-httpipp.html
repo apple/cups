@@ -265,7 +265,7 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#cupsFreeDests'><tt>cupsFreeDests()</tt></a> </li>
 	<li><a href='#cupsFreeJobs'><tt>cupsFreeJobs()</tt></a> </li>
 	<li><a href='#cupsFreeOptions'><tt>cupsFreeOptions()</tt></a> </li>
-	<li><a href='#cupsGetClasses'><tt>cupsGetClasses()</tt></a> </li>
+	<li><a href='#cupsGetClasses'><tt>cupsGetClasses()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#cupsGetDefault'><tt>cupsGetDefault()</tt></a> </li>
 	<li><a href='#cupsGetDefault2'><tt>cupsGetDefault2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#cupsGetDest'><tt>cupsGetDest()</tt></a> </li>
@@ -279,8 +279,9 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#cupsGetPPD'><tt>cupsGetPPD()</tt></a> </li>
 	<li><a href='#cupsGetPPD2'><tt>cupsGetPPD2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#cupsGetPassword'><tt>cupsGetPassword()</tt></a> </li>
-	<li><a href='#cupsGetPrinters'><tt>cupsGetPrinters()</tt></a> </li>
+	<li><a href='#cupsGetPrinters'><tt>cupsGetPrinters()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#cupsLastError'><tt>cupsLastError()</tt></a> </li>
+	<li><a href='#cupsLastErrorString'><tt>cupsLastErrorString()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#cupsMarkOptions'><tt>cupsMarkOptions()</tt></a> </li>
 	<li><a href='#cupsParseOptions'><tt>cupsParseOptions()</tt></a> </li>
 	<li><a href='#cupsPrintFile'><tt>cupsPrintFile()</tt></a> </li>
@@ -390,13 +391,16 @@ require CUPS 1.1 or higher.</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsAddDest'>cupsAddDest()</a></h3>
 <h4>Description</h4>
-<p>Add a destination to the list of destinations.</p>
+<p>Add a destination to the list of destinations.
+
+Use the cupsSaveDests() function to save the updated list of destinations
+to the user's lpoptions file.</p>
 <h4>Syntax</h4>
 <pre>
 int
 cupsAddDest(
-    const char * name,
-    const char * instance,
+    const <a href='#char'>char</a> * name,
+    const <a href='#char'>char</a> * instance,
     int num_dests,
     <a href='#cups_dest_t'>cups_dest_t</a> ** dests);
 </pre>
@@ -405,7 +409,7 @@ cupsAddDest(
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>name</tt></td><td>Name of destination</td></tr>
-<tr><td><tt>instance</tt></td><td>Instance of destination</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance of destination or NULL for none/primary</td></tr>
 <tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
 <tr><td><tt>dests</tt></td><td>Destinations</td></tr>
 </tbody></table></div>
@@ -419,8 +423,8 @@ cupsAddDest(
 <pre>
 int
 cupsAddOption(
-    const char * name,
-    const char * value,
+    const <a href='#char'>char</a> * name,
+    const <a href='#char'>char</a> * value,
     int num_options,
     <a href='#cups_option_t'>cups_option_t</a> ** options);
 </pre>
@@ -438,12 +442,15 @@ cupsAddOption(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsCancelJob'>cupsCancelJob()</a></h3>
 <h4>Description</h4>
-<p>Cancel a print job.</p>
+<p>Cancel a print job on the default server.
+
+Use the cupsLastError() and cupsLastErrorString() functions to get
+the cause of any failure.</p>
 <h4>Syntax</h4>
 <pre>
 int
 cupsCancelJob(
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int job);
 </pre>
 <h4>Arguments</h4>
@@ -458,7 +465,10 @@ cupsCancelJob(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsDoAuthentication'>cupsDoAuthentication()</a></h3>
 <h4>Description</h4>
-<p>Authenticate a request...
+<p>Authenticate a request.
+
+This function should be called in response to a HTTP_UNAUTHORIZED
+status, prior to resubmitting your request.
 
 </p>
 <h4>Syntax</h4>
@@ -466,8 +476,8 @@ cupsCancelJob(
 int
 cupsDoAuthentication(
     <a href='#http_t'>http_t</a> * http,
-    const char * method,
-    const char * resource);
+    const <a href='#char'>char</a> * method,
+    const <a href='#char'>char</a> * resource);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -482,15 +492,18 @@ cupsDoAuthentication(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsDoFileRequest'>cupsDoFileRequest()</a></h3>
 <h4>Description</h4>
-<p>Do an IPP request...</p>
+<p>Do an IPP request.
+
+This function sends any IPP request to the specified server, retrying
+and authenticating as necessary.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_t'>ipp_t</a> *
 cupsDoFileRequest(
     <a href='#http_t'>http_t</a> * http,
     <a href='#ipp_t'>ipp_t</a> * request,
-    const char * resource,
-    const char * filename);
+    const <a href='#char'>char</a> * resource,
+    const <a href='#char'>char</a> * filename);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -499,14 +512,18 @@ cupsDoFileRequest(
 <tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
 <tr><td><tt>request</tt></td><td>IPP request</td></tr>
 <tr><td><tt>resource</tt></td><td>HTTP resource for POST</td></tr>
-<tr><td><tt>filename</tt></td><td>File to send or NULL</td></tr>
+<tr><td><tt>filename</tt></td><td>File to send or NULL for none</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Response data</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsEncodeOptions'>cupsEncodeOptions()</a></h3>
 <h4>Description</h4>
-<p>Encode printer options into IPP attributes.</p>
+<p>Encode printer options into IPP attributes.
+
+This function adds operation, job, and then subscription attributes,
+in that order. Use the cupsEncodeOptions2() function to add attributes
+for a single group.</p>
 <h4>Syntax</h4>
 <pre>
 void
@@ -529,6 +546,10 @@ cupsEncodeOptions(
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsEncodeOptions2'>cupsEncodeOptions2()</a></h3>
 <h4>Description</h4>
 <p>Encode printer options into IPP attributes for a group.
+
+This function only adds attributes for a single group. Call this
+function multiple times for each group, or use cupsEncodeOptions()
+to add the standard groups.
 
 </p>
 <h4>Syntax</h4>
@@ -554,7 +575,12 @@ cupsEncodeOptions2(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsEncryption'>cupsEncryption()</a></h3>
 <h4>Description</h4>
-<p>Get the default encryption settings...</p>
+<p>Get the default encryption settings.
+
+The default encryption setting comes from the CUPS_ENCRYPTION
+environment variable, then the ~/.cupsrc file, and finally the
+/etc/cups/client.conf file. If not set, the default is
+HTTP_ENCRYPT_IF_REQUESTED.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#http_encryption_t'>http_encryption_t</a>
@@ -625,14 +651,18 @@ cupsFreeOptions(
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='cupsGetClasses'>cupsGetClasses()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='cupsGetClasses'>cupsGetClasses()</a></h3>
 <h4>Description</h4>
-<p>Get a list of printer classes.</p>
+<p>Get a list of printer classes from the default server.
+
+This function is deprecated - use cupsGetDests() instead.
+
+</p>
 <h4>Syntax</h4>
 <pre>
 int
 cupsGetClasses(
-    char *** classes);
+    <a href='#char'>char</a> *** classes);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -645,10 +675,17 @@ cupsGetClasses(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsGetDefault'>cupsGetDefault()</a></h3>
 <h4>Description</h4>
-<p>Get the default printer or class.</p>
+<p>Get the default printer or class for the default server.
+
+This function returns the default printer or class as defined by
+the LPDEST or PRINTER environment variables. If these environment
+variables are not set, the server default destination is returned.
+Applications should use the cupsGetDests() and cupsGetDest() functions
+to get the user-defined default printer, as this function does not
+support the lpoptions-defined default printer.</p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 cupsGetDefault(void);
 </pre>
 <h4>Arguments</h4>
@@ -658,12 +695,19 @@ cupsGetDefault(void);
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetDefault2'>cupsGetDefault2()</a></h3>
 <h4>Description</h4>
-<p>Get the default printer or class.
+<p>Get the default printer or class for the specified server.
+
+This function returns the default printer or class as defined by
+the LPDEST or PRINTER environment variables. If these environment
+variables are not set, the server default destination is returned.
+Applications should use the cupsGetDests() and cupsGetDest() functions
+to get the user-defined default printer, as this function does not
+support the lpoptions-defined default printer.
 
 </p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 cupsGetDefault2(
     <a href='#http_t'>http_t</a> * http);
 </pre>
@@ -678,13 +722,16 @@ cupsGetDefault2(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsGetDest'>cupsGetDest()</a></h3>
 <h4>Description</h4>
-<p>Get the named destination from the list.</p>
+<p>Get the named destination from the list.
+
+Use the cupsGetDests() or cupsGetDests2() functions to get a
+list of supported destinations for the current user.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#cups_dest_t'>cups_dest_t</a> *
 cupsGetDest(
-    const char * name,
-    const char * instance,
+    const <a href='#char'>char</a> * name,
+    const <a href='#char'>char</a> * instance,
     int num_dests,
     <a href='#cups_dest_t'>cups_dest_t</a> * dests);
 </pre>
@@ -702,7 +749,7 @@ cupsGetDest(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsGetDests'>cupsGetDests()</a></h3>
 <h4>Description</h4>
-<p>Get the list of destinations.</p>
+<p>Get the list of destinations from the default server.</p>
 <h4>Syntax</h4>
 <pre>
 int
@@ -720,7 +767,7 @@ cupsGetDests(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetDests2'>cupsGetDests2()</a></h3>
 <h4>Description</h4>
-<p>Get the list of destinations.
+<p>Get the list of destinations from the specified server.
 
 </p>
 <h4>Syntax</h4>
@@ -744,13 +791,15 @@ cupsGetDests2(
 <h4>Description</h4>
 <p>Get a file from the server.
 
+This function returns HTTP_OK when the file is successfully retrieved.
+
 </p>
 <h4>Syntax</h4>
 <pre>
 http_status_t
 cupsGetFd(
     <a href='#http_t'>http_t</a> * http,
-    const char * resource,
+    const <a href='#char'>char</a> * resource,
     int fd);
 </pre>
 <h4>Arguments</h4>
@@ -768,14 +817,16 @@ cupsGetFd(
 <h4>Description</h4>
 <p>Get a file from the server.
 
+This function returns HTTP_OK when the file is successfully retrieved.
+
 </p>
 <h4>Syntax</h4>
 <pre>
 http_status_t
 cupsGetFile(
     <a href='#http_t'>http_t</a> * http,
-    const char * resource,
-    const char * filename);
+    const <a href='#char'>char</a> * resource,
+    const <a href='#char'>char</a> * filename);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -790,13 +841,13 @@ cupsGetFile(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsGetJobs'>cupsGetJobs()</a></h3>
 <h4>Description</h4>
-<p>Get the jobs from the server.</p>
+<p>Get the jobs from the default server.</p>
 <h4>Syntax</h4>
 <pre>
 int
 cupsGetJobs(
     <a href='#cups_job_t'>cups_job_t</a> ** jobs,
-    const char * mydest,
+    const <a href='#char'>char</a> * mydest,
     int myjobs,
     int completed);
 </pre>
@@ -814,7 +865,7 @@ cupsGetJobs(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetJobs2'>cupsGetJobs2()</a></h3>
 <h4>Description</h4>
-<p>Get the jobs from the server.
+<p>Get the jobs from the specified server.
 
 </p>
 <h4>Syntax</h4>
@@ -823,7 +874,7 @@ int
 cupsGetJobs2(
     <a href='#http_t'>http_t</a> * http,
     <a href='#cups_job_t'>cups_job_t</a> ** jobs,
-    const char * mydest,
+    const <a href='#char'>char</a> * mydest,
     int myjobs,
     int completed);
 </pre>
@@ -845,9 +896,9 @@ cupsGetJobs2(
 <p>Get an option value.</p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 cupsGetOption(
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int num_options,
     <a href='#cups_option_t'>cups_option_t</a> * options);
 </pre>
@@ -864,12 +915,15 @@ cupsGetOption(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsGetPPD'>cupsGetPPD()</a></h3>
 <h4>Description</h4>
-<p>Get the PPD file for a printer.</p>
+<p>Get the PPD file for a printer on the default server.
+
+For classes, cupsGetPPD() returns the PPD file for the first printer
+in the class.</p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 cupsGetPPD(
-    const char * name);
+    const <a href='#char'>char</a> * name);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -882,15 +936,18 @@ cupsGetPPD(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetPPD2'>cupsGetPPD2()</a></h3>
 <h4>Description</h4>
-<p>Get the PPD file for a printer.
+<p>Get the PPD file for a printer from the specified server.
+
+For classes, cupsGetPPD2() returns the PPD file for the first printer
+in the class.
 
 </p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 cupsGetPPD2(
     <a href='#http_t'>http_t</a> * http,
-    const char * name);
+    const <a href='#char'>char</a> * name);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -904,12 +961,14 @@ cupsGetPPD2(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsGetPassword'>cupsGetPassword()</a></h3>
 <h4>Description</h4>
-<p>Get a password from the user...</p>
+<p>Get a password from the user.
+
+Returns NULL if the user does not provide a password.</p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 cupsGetPassword(
-    const char * prompt);
+    const <a href='#char'>char</a> * prompt);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -920,14 +979,18 @@ cupsGetPassword(
 <h4>Returns</h4>
 <p>Password</p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='cupsGetPrinters'>cupsGetPrinters()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='cupsGetPrinters'>cupsGetPrinters()</a></h3>
 <h4>Description</h4>
-<p>Get a list of printers.</p>
+<p>Get a list of printers from the default server.
+
+This function is deprecated - use cupsGetDests() instead.
+
+</p>
 <h4>Syntax</h4>
 <pre>
 int
 cupsGetPrinters(
-    char *** printers);
+    <a href='#char'>char</a> *** printers);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -940,7 +1003,7 @@ cupsGetPrinters(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsLastError'>cupsLastError()</a></h3>
 <h4>Description</h4>
-<p>Return the last IPP error that occurred.</p>
+<p>Return the last IPP status code.</p>
 <h4>Syntax</h4>
 <pre>
 ipp_status_t
@@ -949,7 +1012,22 @@ cupsLastError(void);
 <h4>Arguments</h4>
 <p>None.</p>
 <h4>Returns</h4>
-<p>IPP error code</p>
+<p>IPP status code from last request</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsLastErrorString'>cupsLastErrorString()</a></h3>
+<h4>Description</h4>
+<p>Return the last IPP status-message.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+const <a href='#char'>char</a> *
+cupsLastErrorString(void);
+</pre>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>status-message text from last request</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsMarkOptions'>cupsMarkOptions()</a></h3>
 <h4>Description</h4>
@@ -975,12 +1053,18 @@ cupsMarkOptions(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsParseOptions'>cupsParseOptions()</a></h3>
 <h4>Description</h4>
-<p>Parse options from a command-line argument.</p>
+<p>Parse options from a command-line argument.
+
+This function converts space-delimited name/value pairs according
+to the PAPI text option ABNF specification. Collection values
+(&quot;name={a=... b=... c=...}&quot;) are stored with the curley brackets
+intact - use cupsParseOptions() on the value to extract the collection
+attributes.</p>
 <h4>Syntax</h4>
 <pre>
 int
 cupsParseOptions(
-    const char * arg,
+    const <a href='#char'>char</a> * arg,
     int num_options,
     <a href='#cups_option_t'>cups_option_t</a> ** options);
 </pre>
@@ -997,14 +1081,14 @@ cupsParseOptions(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsPrintFile'>cupsPrintFile()</a></h3>
 <h4>Description</h4>
-<p>Print a file to a printer or class.</p>
+<p>Print a file to a printer or class on the default server.</p>
 <h4>Syntax</h4>
 <pre>
 int
 cupsPrintFile(
-    const char * name,
-    const char * filename,
-    const char * title,
+    const <a href='#char'>char</a> * name,
+    const <a href='#char'>char</a> * filename,
+    const <a href='#char'>char</a> * title,
     int num_options,
     <a href='#cups_option_t'>cups_option_t</a> * options);
 </pre>
@@ -1023,7 +1107,7 @@ cupsPrintFile(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsPrintFile2'>cupsPrintFile2()</a></h3>
 <h4>Description</h4>
-<p>Print a file to a printer or class.
+<p>Print a file to a printer or class on the specified server.
 
 </p>
 <h4>Syntax</h4>
@@ -1031,9 +1115,9 @@ cupsPrintFile(
 int
 cupsPrintFile2(
     <a href='#http_t'>http_t</a> * http,
-    const char * name,
-    const char * filename,
-    const char * title,
+    const <a href='#char'>char</a> * name,
+    const <a href='#char'>char</a> * filename,
+    const <a href='#char'>char</a> * title,
     int num_options,
     <a href='#cups_option_t'>cups_option_t</a> * options);
 </pre>
@@ -1053,15 +1137,15 @@ cupsPrintFile2(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsPrintFiles'>cupsPrintFiles()</a></h3>
 <h4>Description</h4>
-<p>Print one or more files to a printer or class.</p>
+<p>Print one or more files to a printer or class on the default server.</p>
 <h4>Syntax</h4>
 <pre>
 int
 cupsPrintFiles(
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int num_files,
-    const char ** files,
-    const char * title,
+    const <a href='#char'>char</a> ** files,
+    const <a href='#char'>char</a> * title,
     int num_options,
     <a href='#cups_option_t'>cups_option_t</a> * options);
 </pre>
@@ -1081,7 +1165,7 @@ cupsPrintFiles(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsPrintFiles2'>cupsPrintFiles2()</a></h3>
 <h4>Description</h4>
-<p>Print one or more files to a printer or class.
+<p>Print one or more files to a printer or class on the specified server.
 
 </p>
 <h4>Syntax</h4>
@@ -1089,10 +1173,10 @@ cupsPrintFiles(
 int
 cupsPrintFiles2(
     <a href='#http_t'>http_t</a> * http,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int num_files,
-    const char ** files,
-    const char * title,
+    const <a href='#char'>char</a> ** files,
+    const <a href='#char'>char</a> * title,
     int num_options,
     <a href='#cups_option_t'>cups_option_t</a> * options);
 </pre>
@@ -1115,13 +1199,15 @@ cupsPrintFiles2(
 <h4>Description</h4>
 <p>Put a file on the server.
 
+This function returns HTTP_CREATED when the file is stored successfully.
+
 </p>
 <h4>Syntax</h4>
 <pre>
 http_status_t
 cupsPutFd(
     <a href='#http_t'>http_t</a> * http,
-    const char * resource,
+    const <a href='#char'>char</a> * resource,
     int fd);
 </pre>
 <h4>Arguments</h4>
@@ -1139,14 +1225,16 @@ cupsPutFd(
 <h4>Description</h4>
 <p>Put a file on the server.
 
+This function returns HTTP_CREATED when the file is stored successfully.
+
 </p>
 <h4>Syntax</h4>
 <pre>
 http_status_t
 cupsPutFile(
     <a href='#http_t'>http_t</a> * http,
-    const char * resource,
-    const char * filename);
+    const <a href='#char'>char</a> * resource,
+    const <a href='#char'>char</a> * filename);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1161,10 +1249,13 @@ cupsPutFile(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsServer'>cupsServer()</a></h3>
 <h4>Description</h4>
-<p>Return the hostname of the default server...</p>
+<p>Return the hostname/address of the default server.
+
+The returned value can be a fully-qualified hostname, a numeric
+IPv4 or IPv6 address, or a domain socket pathname.</p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 cupsServer(void);
 </pre>
 <h4>Arguments</h4>
@@ -1174,7 +1265,10 @@ cupsServer(void);
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsSetDests'>cupsSetDests()</a></h3>
 <h4>Description</h4>
-<p>Set the list of destinations.</p>
+<p>Save the list of destinations for the default server.
+
+This function saves the destinations to /etc/cups/lpoptions when run
+as root and ~/.lpoptions when run as a normal user.</p>
 <h4>Syntax</h4>
 <pre>
 void
@@ -1194,7 +1288,10 @@ cupsSetDests(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsSetDests2'>cupsSetDests2()</a></h3>
 <h4>Description</h4>
-<p>Set the list of destinations.
+<p>Save the list of destinations for the specified server.
+
+This function saves the destinations to /etc/cups/lpoptions when run
+as root and ~/.lpoptions when run as a normal user.
 
 </p>
 <h4>Syntax</h4>
@@ -1236,25 +1333,36 @@ cupsSetEncryption(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsSetPasswordCB'>cupsSetPasswordCB()</a></h3>
 <h4>Description</h4>
-<p>Set the password callback for CUPS.</p>
+<p>Set the password callback for CUPS.
+
+Pass NULL to restore the default (console) password callback.</p>
 <h4>Syntax</h4>
 <pre>
 void
-cupsSetPasswordCB(void);
+cupsSetPasswordCB(
+    cups_password_cb_t cb);
 </pre>
 <h4>Arguments</h4>
-<p>None.</p>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>cb</tt></td><td>Callback function</td></tr>
+</tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsSetServer'>cupsSetServer()</a></h3>
 <h4>Description</h4>
-<p>Set the default server name...</p>
+<p>Set the default server name.
+
+The &quot;server&quot; string can be a fully-qualified hostname, a numeric
+IPv4 or IPv6 address, or a domain socket pathname. Pass NULL to
+restore the default server name.</p>
 <h4>Syntax</h4>
 <pre>
 void
 cupsSetServer(
-    const char * server);
+    const <a href='#char'>char</a> * server);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1267,12 +1375,14 @@ cupsSetServer(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsSetUser'>cupsSetUser()</a></h3>
 <h4>Description</h4>
-<p>Set the default user name...</p>
+<p>Set the default user name.
+
+Pass NULL to restore the default user name.</p>
 <h4>Syntax</h4>
 <pre>
 void
 cupsSetUser(
-    const char * user);
+    const <a href='#char'>char</a> * user);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1288,7 +1398,7 @@ cupsSetUser(
 <p>Return the current user's name.</p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 cupsUser(void);
 </pre>
 <h4>Arguments</h4>
@@ -1385,10 +1495,10 @@ httpAddrLocalhost(
 </p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpAddrLookup(
     const <a href='#http_addr_t'>http_addr_t</a> * addr,
-    char * name,
+    <a href='#char'>char</a> * name,
     int namelen);
 </pre>
 <h4>Arguments</h4>
@@ -1409,10 +1519,10 @@ httpAddrLookup(
 </p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpAddrString(
     const <a href='#http_addr_t'>http_addr_t</a> * addr,
-    char * s,
+    <a href='#char'>char</a> * s,
     int slen);
 </pre>
 <h4>Arguments</h4>
@@ -1440,13 +1550,13 @@ whenever you need to create a URI string.
 <pre>
 http_uri_status_t
 httpAssembleURI(
-    char * uri,
+    <a href='#char'>char</a> * uri,
     int urilen,
-    const char * scheme,
-    const char * username,
-    const char * host,
+    const <a href='#char'>char</a> * scheme,
+    const <a href='#char'>char</a> * username,
+    const <a href='#char'>char</a> * host,
     int port,
-    const char * resource);
+    const <a href='#char'>char</a> * resource);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1478,13 +1588,13 @@ string functions whenever you need to create a URI string.
 <pre>
 http_uri_status_t
 httpAssembleURIf(
-    char * uri,
+    <a href='#char'>char</a> * uri,
     int urilen,
-    const char * scheme,
-    const char * username,
-    const char * host,
+    const <a href='#char'>char</a> * scheme,
+    const <a href='#char'>char</a> * username,
+    const <a href='#char'>char</a> * host,
     int port,
-    const char * resourcef,
+    const <a href='#char'>char</a> * resourcef,
     ...);
 </pre>
 <h4>Arguments</h4>
@@ -1566,7 +1676,7 @@ httpClose(
 <pre>
 <a href='#http_t'>http_t</a> *
 httpConnect(
-    const char * host,
+    const <a href='#char'>char</a> * host,
     int port);
 </pre>
 <h4>Arguments</h4>
@@ -1586,7 +1696,7 @@ httpConnect(
 <pre>
 <a href='#http_t'>http_t</a> *
 httpConnectEncrypt(
-    const char * host,
+    const <a href='#char'>char</a> * host,
     int port,
     <a href='#http_encryption_t'>http_encryption_t</a> encryption);
 </pre>
@@ -1606,10 +1716,10 @@ httpConnectEncrypt(
 <p>Base64-decode a string.</p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpDecode64(
-    char * out,
-    const char * in);
+    <a href='#char'>char</a> * out,
+    const <a href='#char'>char</a> * in);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1628,11 +1738,11 @@ httpDecode64(
 </p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpDecode64_2(
-    char * out,
+    <a href='#char'>char</a> * out,
     int * outlen,
-    const char * in);
+    const <a href='#char'>char</a> * in);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1653,7 +1763,7 @@ httpDecode64_2(
 int
 httpDelete(
     <a href='#http_t'>http_t</a> * http,
-    const char * uri);
+    const <a href='#char'>char</a> * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1670,10 +1780,10 @@ httpDelete(
 <p>Base64-encode a string.</p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpEncode64(
-    char * out,
-    const char * in);
+    <a href='#char'>char</a> * out,
+    const <a href='#char'>char</a> * in);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1692,11 +1802,11 @@ httpEncode64(
 </p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpEncode64_2(
-    char * out,
+    <a href='#char'>char</a> * out,
     int outlen,
-    const char * in,
+    const <a href='#char'>char</a> * in,
     int inlen);
 </pre>
 <h4>Arguments</h4>
@@ -1777,7 +1887,7 @@ httpFlushWrite(
 int
 httpGet(
     <a href='#http_t'>http_t</a> * http,
-    const char * uri);
+    const <a href='#char'>char</a> * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1796,7 +1906,7 @@ httpGet(
 </p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 httpGetDateString(
     time_t t);
 </pre>
@@ -1816,10 +1926,10 @@ httpGetDateString(
 </p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 httpGetDateString2(
     time_t t,
-    char * s,
+    <a href='#char'>char</a> * s,
     int slen);
 </pre>
 <h4>Arguments</h4>
@@ -1840,7 +1950,7 @@ httpGetDateString2(
 <pre>
 time_t
 httpGetDateTime(
-    const char * s);
+    const <a href='#char'>char</a> * s);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1861,7 +1971,7 @@ address records for the specified name.
 <pre>
 struct hostent *
 httpGetHostByName(
-    const char * name);
+    const <a href='#char'>char</a> * name);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1882,9 +1992,9 @@ get the local hostname with domain.
 </p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 httpGetHostname(
-    char * s,
+    <a href='#char'>char</a> * s,
     int slen);
 </pre>
 <h4>Arguments</h4>
@@ -1950,12 +2060,12 @@ httpGetLength2(
 </p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpGetSubField(
     <a href='#http_t'>http_t</a> * http,
     http_field_t field,
-    const char * name,
-    char * value);
+    const <a href='#char'>char</a> * name,
+    <a href='#char'>char</a> * value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1976,12 +2086,12 @@ httpGetSubField(
 </p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpGetSubField2(
     <a href='#http_t'>http_t</a> * http,
     http_field_t field,
-    const char * name,
-    char * value,
+    const <a href='#char'>char</a> * name,
+    <a href='#char'>char</a> * value,
     int valuelen);
 </pre>
 <h4>Arguments</h4>
@@ -2002,9 +2112,9 @@ httpGetSubField2(
 <p>Get a line of text from a HTTP connection.</p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpGets(
-    char * line,
+    <a href='#char'>char</a> * line,
     int length,
     <a href='#http_t'>http_t</a> * http);
 </pre>
@@ -2027,7 +2137,7 @@ httpGets(
 int
 httpHead(
     <a href='#http_t'>http_t</a> * http,
-    const char * uri);
+    const <a href='#char'>char</a> * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2058,12 +2168,12 @@ httpInitialize(void);
 <p>Compute the MD5 sum of the username:group:password.</p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpMD5(
-    const char * username,
-    const char * realm,
-    const char * passwd,
-    char md5[33]);
+    const <a href='#char'>char</a> * username,
+    const <a href='#char'>char</a> * realm,
+    const <a href='#char'>char</a> * passwd,
+    <a href='#char'>char</a> md5[33]);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2084,12 +2194,12 @@ with the server-supplied nonce value, method, and
 request-uri.</p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpMD5Final(
-    const char * nonce,
-    const char * method,
-    const char * resource,
-    char md5[33]);
+    const <a href='#char'>char</a> * nonce,
+    const <a href='#char'>char</a> * method,
+    const <a href='#char'>char</a> * resource,
+    <a href='#char'>char</a> md5[33]);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2108,10 +2218,10 @@ httpMD5Final(
 <p>Convert an MD5 sum to a character string.</p>
 <h4>Syntax</h4>
 <pre>
-char *
+<a href='#char'>char</a> *
 httpMD5String(
-    const unsigned char * sum,
-    char md5[33]);
+    const unsigned <a href='#char'>char</a> * sum,
+    <a href='#char'>char</a> md5[33]);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2131,7 +2241,7 @@ httpMD5String(
 int
 httpOptions(
     <a href='#http_t'>http_t</a> * http,
-    const char * uri);
+    const <a href='#char'>char</a> * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2151,7 +2261,7 @@ httpOptions(
 int
 httpPost(
     <a href='#http_t'>http_t</a> * http,
-    const char * uri);
+    const <a href='#char'>char</a> * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2171,7 +2281,7 @@ httpPost(
 int
 httpPrintf(
     <a href='#http_t'>http_t</a> * http,
-    const char * format,
+    const <a href='#char'>char</a> * format,
     ...);
 </pre>
 <h4>Arguments</h4>
@@ -2193,7 +2303,7 @@ httpPrintf(
 int
 httpPut(
     <a href='#http_t'>http_t</a> * http,
-    const char * uri);
+    const <a href='#char'>char</a> * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2213,7 +2323,7 @@ httpPut(
 int
 httpRead(
     <a href='#http_t'>http_t</a> * http,
-    char * buffer,
+    <a href='#char'>char</a> * buffer,
     int length);
 </pre>
 <h4>Arguments</h4>
@@ -2253,12 +2363,12 @@ components.</p>
 <pre>
 void
 httpSeparate(
-    const char * uri,
-    char * scheme,
-    char * username,
-    char * host,
+    const <a href='#char'>char</a> * uri,
+    <a href='#char'>char</a> * scheme,
+    <a href='#char'>char</a> * username,
+    <a href='#char'>char</a> * host,
     int * port,
-    char * resource);
+    <a href='#char'>char</a> * resource);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2284,15 +2394,15 @@ components.
 <pre>
 void
 httpSeparate2(
-    const char * uri,
-    char * scheme,
+    const <a href='#char'>char</a> * uri,
+    <a href='#char'>char</a> * scheme,
     int schemelen,
-    char * username,
+    <a href='#char'>char</a> * username,
     int usernamelen,
-    char * host,
+    <a href='#char'>char</a> * host,
     int hostlen,
     int * port,
-    char * resource,
+    <a href='#char'>char</a> * resource,
     int resourcelen);
 </pre>
 <h4>Arguments</h4>
@@ -2323,15 +2433,15 @@ components.
 <pre>
 http_uri_status_t
 httpSeparateURI(
-    const char * uri,
-    char * scheme,
+    const <a href='#char'>char</a> * uri,
+    <a href='#char'>char</a> * scheme,
     int schemelen,
-    char * username,
+    <a href='#char'>char</a> * username,
     int usernamelen,
-    char * host,
+    <a href='#char'>char</a> * host,
     int hostlen,
     int * port,
-    char * resource,
+    <a href='#char'>char</a> * resource,
     int resourcelen);
 </pre>
 <h4>Arguments</h4>
@@ -2362,7 +2472,7 @@ httpSeparateURI(
 void
 httpSetCookie(
     <a href='#http_t'>http_t</a> * http,
-    const char * cookie);
+    const <a href='#char'>char</a> * cookie);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2383,7 +2493,7 @@ void
 httpSetField(
     <a href='#http_t'>http_t</a> * http,
     http_field_t field,
-    const char * value);
+    const <a href='#char'>char</a> * value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2423,7 +2533,7 @@ httpSetLength(
 <p>Return a short string describing a HTTP status code.</p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 httpStatus(
     http_status_t status);
 </pre>
@@ -2444,7 +2554,7 @@ httpStatus(
 int
 httpTrace(
     <a href='#http_t'>http_t</a> * http,
-    const char * uri);
+    const <a href='#char'>char</a> * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2504,7 +2614,7 @@ httpWait(
 int
 httpWrite(
     <a href='#http_t'>http_t</a> * http,
-    const char * buffer,
+    const <a href='#char'>char</a> * buffer,
     int length);
 </pre>
 <h4>Arguments</h4>
@@ -2527,8 +2637,8 @@ httpWrite(
 ippAddBoolean(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
-    char value);
+    const <a href='#char'>char</a> * name,
+    <a href='#char'>char</a> value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2551,9 +2661,9 @@ ippAddBoolean(
 ippAddBooleans(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int num_values,
-    const char * values);
+    const <a href='#char'>char</a> * values);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2579,7 +2689,7 @@ ippAddBooleans(
 ippAddCollection(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     <a href='#ipp_t'>ipp_t</a> * value);
 </pre>
 <h4>Arguments</h4>
@@ -2605,7 +2715,7 @@ ippAddCollection(
 ippAddCollections(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int num_values,
     const <a href='#ipp_t'>ipp_t</a> ** values);
 </pre>
@@ -2631,7 +2741,7 @@ ippAddCollections(
 ippAddDate(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     const <a href='#ipp_uchar_t'>ipp_uchar_t</a> * value);
 </pre>
 <h4>Arguments</h4>
@@ -2656,7 +2766,7 @@ ippAddInteger(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
     ipp_tag_t type,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int value);
 </pre>
 <h4>Arguments</h4>
@@ -2682,7 +2792,7 @@ ippAddIntegers(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
     ipp_tag_t type,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int num_values,
     const int * values);
 </pre>
@@ -2711,7 +2821,7 @@ ippAddIntegers(
 ippAddOctetString(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     const void * data,
     int datalen);
 </pre>
@@ -2737,7 +2847,7 @@ ippAddOctetString(
 ippAddRange(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int lower,
     int upper);
 </pre>
@@ -2763,7 +2873,7 @@ ippAddRange(
 ippAddRanges(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int num_values,
     const int * lower,
     const int * upper);
@@ -2791,7 +2901,7 @@ ippAddRanges(
 ippAddResolution(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     ipp_res_t units,
     int xres,
     int yres);
@@ -2819,7 +2929,7 @@ ippAddResolution(
 ippAddResolutions(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int num_values,
     ipp_res_t units,
     const int * xres,
@@ -2868,9 +2978,9 @@ ippAddString(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
     ipp_tag_t type,
-    const char * name,
-    const char * charset,
-    const char * value);
+    const <a href='#char'>char</a> * name,
+    const <a href='#char'>char</a> * charset,
+    const <a href='#char'>char</a> * value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2896,10 +3006,10 @@ ippAddStrings(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
     ipp_tag_t type,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     int num_values,
-    const char * charset,
-    const char *const * values);
+    const <a href='#char'>char</a> * charset,
+    const <a href='#char'>char</a> *const * values);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2980,7 +3090,7 @@ ippDeleteAttribute(
 <p>Return a name for the given status code.</p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 ippErrorString(
     ipp_status_t error);
 </pre>
@@ -3002,7 +3112,7 @@ ippErrorString(
 <pre>
 ipp_status_t
 ippErrorValue(
-    const char * name);
+    const <a href='#char'>char</a> * name);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -3021,7 +3131,7 @@ ippErrorValue(
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippFindAttribute(
     <a href='#ipp_t'>ipp_t</a> * ipp,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     ipp_tag_t type);
 </pre>
 <h4>Arguments</h4>
@@ -3043,7 +3153,7 @@ ippFindAttribute(
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippFindNextAttribute(
     <a href='#ipp_t'>ipp_t</a> * ipp,
-    const char * name,
+    const <a href='#char'>char</a> * name,
     ipp_tag_t type);
 </pre>
 <h4>Arguments</h4>
@@ -3095,7 +3205,7 @@ ippNew(void);
 </p>
 <h4>Syntax</h4>
 <pre>
-const char *
+const <a href='#char'>char</a> *
 ippOpString(
     ipp_op_t op);
 </pre>
@@ -3117,7 +3227,7 @@ ippOpString(
 <pre>
 ipp_op_t
 ippOpValue(
-    const char * name);
+    const <a href='#char'>char</a> * name);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -3335,7 +3445,7 @@ ippWriteIO(
 <pre>
 struct cups_dest_s
 {
-  char *name, * instance;
+  <a href='#char'>char</a> *name, * instance;
   int is_default;
   int num_options;
   <a href='#cups_option_t'>cups_option_t</a> * options;
@@ -3358,7 +3468,7 @@ struct cups_dest_s
 <pre>
 struct cups_job_s
 {
-  char *dest, *title, *user, * format;
+  <a href='#char'>char</a> *dest, *title, *user, * format;
   int id;
   int size, priority;
   time_t completed_time, creation_time, processing_time;
@@ -3378,13 +3488,13 @@ struct cups_job_s
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cups_option_s'>cups_option_s</a></h3>
 <h4>Description</h4>
-<p>Printer Options</p>
+<p>Types and structures...</p>
 <h4>Definition</h4>
 <pre>
 struct cups_option_s
 {
-  char * name;
-  char * value;
+  <a href='#char'>char</a> * name;
+  <a href='#char'>char</a> * value;
 };
 </pre>
 <h4>Members</h4>
@@ -3428,9 +3538,9 @@ struct http_s
   <a href='#http_addrlist_t'>http_addrlist_t</a> * addrlist;
   int auth_type;
   int blocking;
-  char buffer[HTTP_MAX_BUFFER];
-  char * cookie;
-  char * data;
+  <a href='#char'>char</a> buffer[HTTP_MAX_BUFFER];
+  <a href='#char'>char</a> * cookie;
+  <a href='#char'>char</a> * data;
   <a href='#http_encoding_t'>http_encoding_t</a> data_encoding;
   off_t data_remaining;
   int digest_tries;
@@ -3438,20 +3548,20 @@ struct http_s
   int error;
   http_status_t expect;
   int fd;
-  char hostname[HTTP_MAX_HOST], fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
+  <a href='#char'>char</a> hostname[HTTP_MAX_HOST], fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
   <a href='#http_addr_t'>http_addr_t</a> * hostaddr;
   fd_set * input_set;
   http_keepalive_t keep_alive;
   _cups_md5_state_t md5_state;
-  char nonce[HTTP_MAX_VALUE];
+  <a href='#char'>char</a> nonce[HTTP_MAX_VALUE];
   int nonce_count;
   <a href='#http_state_t'>http_state_t</a> state;
   http_status_t status;
   void * tls;
   int used;
-  char authstring[HTTP_MAX_VALUE], userpass[HTTP_MAX_VALUE];
+  <a href='#char'>char</a> authstring[HTTP_MAX_VALUE], userpass[HTTP_MAX_VALUE];
   http_version_t version;
-  char wbuffer[HTTP_MAX_BUFFER];
+  <a href='#char'>char</a> wbuffer[HTTP_MAX_BUFFER];
   int wused;
 };
 </pre>
@@ -3497,7 +3607,7 @@ struct http_s
 <pre>
 struct ipp_attribute_s
 {
-  char * name;
+  <a href='#char'>char</a> * name;
   struct <a href='#ipp_attribute_s'>ipp_attribute_s</a> * next;
   int num_values;
   ipp_tag_t group_tag, value_tag;
@@ -3542,6 +3652,7 @@ struct ipp_str
 <!-- NEW PAGE -->
 <h2 class='title'><a name='TYPES'>Types</a></h2>
 <ul>
+	<li><a href='#char'><tt>char</tt></a> </li>
 	<li><a href='#cups_dest_t'><tt>cups_dest_t</tt></a> </li>
 	<li><a href='#cups_job_t'><tt>cups_job_t</tt></a> </li>
 	<li><a href='#cups_option_t'><tt>cups_option_t</tt></a> </li>
@@ -3557,6 +3668,14 @@ struct ipp_str
 	<li><a href='#ipp_t'><tt>ipp_t</tt></a> </li>
 	<li><a href='#ipp_value_t'><tt>ipp_value_t</tt></a> </li>
 </ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='char'>char</a></h3>
+<h4>Description</h4>
+<p>Printer Options</p>
+<h4>Definition</h4>
+<pre>
+typedef const * (*charcups_password_cb_t)(const <a href='#char'>char</a> *);
+</pre>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cups_dest_t'>cups_dest_t</a></h3>
 <h4>Description</h4>
@@ -3576,7 +3695,7 @@ typedef struct <a href='#cups_job_s'>cups_job_s</a> cups_job_t;
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cups_option_t'>cups_option_t</a></h3>
 <h4>Description</h4>
-<p>Printer Options</p>
+<p>Types and structures...</p>
 <h4>Definition</h4>
 <pre>
 typedef struct <a href='#cups_option_s'>cups_option_s</a> cups_option_t;

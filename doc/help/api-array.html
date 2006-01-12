@@ -356,10 +356,12 @@ cupsArrayRestore(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsArraySave'>cupsArraySave()</a></h3>
 <h4>Description</h4>
-<p>Mark the current element for a later cupsArrayRestore.</p>
+<p>Mark the current element for a later cupsArrayRestore.
+
+The save/restore stack is guaranteed to be at least 32 elements deep.</p>
 <h4>Syntax</h4>
 <pre>
-void
+int
 cupsArraySave(
     <a href='#cups_array_t'>cups_array_t</a> * a);
 </pre>
@@ -370,7 +372,7 @@ cupsArraySave(
 <tr><td><tt>a</tt></td><td>Array</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
-<p>Nothing.</p>
+<p>1 on success, 0 on failure</p>
 <!-- NEW PAGE -->
 <h2 class='title'><a name='TYPES'>Types</a></h2>
 <ul>

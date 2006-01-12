@@ -25,23 +25,25 @@
  *
  * Contents:
  *
- *   cupsCancelJob()     - Cancel a print job.
- *   cupsDoFileRequest() - Do an IPP request...
- *   cupsFreeJobs()      - Free memory used by job data.
- *   cupsGetClasses()    - Get a list of printer classes.
- *   cupsGetDefault()    - Get the default printer or class.
- *   cupsGetDefault2()   - Get the default printer or class.
- *   cupsGetJobs()       - Get the jobs from the server.
- *   cupsGetJobs2()      - Get the jobs from the server.
- *   cupsGetPPD()        - Get the PPD file for a printer.
- *   cupsGetPPD2()       - Get the PPD file for a printer.
- *   cupsGetPrinters()   - Get a list of printers.
- *   cupsLastError()     - Return the last IPP error that occurred.
- *   cupsPrintFile()     - Print a file to a printer or class.
- *   cupsPrintFile2()    - Print a file to a printer or class.
- *   cupsPrintFiles()    - Print one or more files to a printer or class.
- *   cupsPrintFiles2()   - Print one or more files to a printer or class.
- *   cups_connect()      - Connect to the specified host...
+ *   cupsCancelJob()       - Cancel a print job on the default server.
+ *   cupsDoFileRequest()   - Do an IPP request.
+ *   cupsFreeJobs()        - Free memory used by job data.
+ *   cupsGetClasses()      - Get a list of printer classes from the default server.
+ *   cupsGetDefault()      - Get the default printer or class from the default server.
+ *   cupsGetDefault2()     - Get the default printer or class from the specified server.
+ *   cupsGetJobs()         - Get the jobs from the default server.
+ *   cupsGetJobs2()        - Get the jobs from the specified server.
+ *   cupsGetPPD()          - Get the PPD file for a printer on the default server.
+ *   cupsGetPPD2()         - Get the PPD file for a printer on the specified server.
+ *   cupsGetPrinters()     - Get a list of printers from the default server.
+ *   cupsLastError()       - Return the last IPP status code.
+ *   cupsLastErrorString() - Return the last IPP status-message.
+ *   cupsPrintFile()       - Print a file to a printer or class on the default server.
+ *   cupsPrintFile2()      - Print a file to a printer or class on the specified server.
+ *   cupsPrintFiles()      - Print one or more files to a printer or class on the default server.
+ *   cupsPrintFiles2()     - Print one or more files to a printer or class on the specified server.
+ *   cups_connect()        - Connect to the specified host...
+ *   cups_set_error()      - Set the last IPP status code and status-message.
  */
 
 /*
@@ -66,10 +68,14 @@
  */
 
 static char	*cups_connect(const char *name, char *printer, char *hostname);
+static void	cups_set_error(ipp_status_t status, const char *message);
 
 
 /*
- * 'cupsCancelJob()' - Cancel a print job.
+ * 'cupsCancelJob()' - Cancel a print job on the default server.
+ *
+ * Use the cupsLastError() and cupsLastErrorString() functions to get
+ * the cause of any failure.
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -92,7 +98,7 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
   if (!cups_connect(name, printer, hostname))
   {
     DEBUG_puts("Unable to connect to server!");
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+
     return (0);
   }
 
@@ -103,7 +109,8 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
   if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                        "/printers/%s", printer) != HTTP_URI_OK)
   {
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (0);
   }
 
@@ -154,14 +161,17 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
 
 
 /*
- * 'cupsDoFileRequest()' - Do an IPP request...
+ * 'cupsDoFileRequest()' - Do an IPP request.
+ *
+ * This function sends any IPP request to the specified server, retrying
+ * and authenticating as necessary.
  */
 
 ipp_t *					/* O - Response data */
 cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
                   ipp_t      *request,	/* I - IPP request */
                   const char *resource,	/* I - HTTP resource for POST */
-		  const char *filename)	/* I - File to send or NULL */
+		  const char *filename)	/* I - File to send or NULL for none */
 {
   ipp_t		*response;		/* IPP response data */
   size_t	length;			/* Content-Length value */
@@ -170,7 +180,6 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
   char		buffer[65536];		/* Output buffer */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
@@ -182,7 +191,8 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     if (request != NULL)
       ippDelete(request);
 
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (NULL);
   }
 
@@ -198,8 +208,11 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       * Can't get file information!
       */
 
+      cups_set_error(errno == ENOENT ? IPP_NOT_FOUND : IPP_NOT_AUTHORIZED,
+                     strerror(errno));
+
       ippDelete(request);
-      cg->last_error = IPP_NOT_FOUND;
+
       return (NULL);
     }
 
@@ -214,7 +227,9 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       */
 
       ippDelete(request);
-      cg->last_error = IPP_NOT_POSSIBLE;
+
+      cups_set_error(IPP_NOT_POSSIBLE, NULL);
+
       return (NULL);
     }
 
@@ -224,8 +239,11 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       * Can't open file!
       */
 
+      cups_set_error(errno == ENOENT ? IPP_NOT_FOUND : IPP_NOT_AUTHORIZED,
+                     strerror(errno));
+
       ippDelete(request);
-      cg->last_error = IPP_NOT_FOUND;
+
       return (NULL);
     }
   }
@@ -402,7 +420,8 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 	ippDelete(response);
 	response = NULL;
 
-        cg->last_error = IPP_SERVICE_UNAVAILABLE;
+        cups_set_error(IPP_SERVICE_UNAVAILABLE, strerror(errno));
+
 	break;
       }
     }
@@ -428,43 +447,52 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   ippDelete(request);
 
   if (response)
-    cg->last_error = response->request.status.status_code;
+  {
+    ipp_attribute_t	*attr;		/* status-message attribute */
+
+
+    attr = ippFindAttribute(response, "status-message", IPP_TAG_TEXT);
+
+    cups_set_error(response->request.status.status_code,
+                   attr ? attr->values[0].string.text :
+		       ippErrorString(response->request.status.status_code));
+  }
   else if (status != HTTP_OK)
   {
     switch (status)
     {
       case HTTP_NOT_FOUND :
-          cg->last_error = IPP_NOT_FOUND;
+          cups_set_error(IPP_NOT_FOUND, httpStatus(status));
 	  break;
 
       case HTTP_UNAUTHORIZED :
-          cg->last_error = IPP_NOT_AUTHORIZED;
+          cups_set_error(IPP_NOT_AUTHORIZED, httpStatus(status));
 	  break;
 
       case HTTP_FORBIDDEN :
-          cg->last_error = IPP_FORBIDDEN;
+          cups_set_error(IPP_FORBIDDEN, httpStatus(status));
 	  break;
 
       case HTTP_BAD_REQUEST :
-          cg->last_error = IPP_BAD_REQUEST;
+          cups_set_error(IPP_BAD_REQUEST, httpStatus(status));
 	  break;
 
       case HTTP_REQUEST_TOO_LARGE :
-          cg->last_error = IPP_REQUEST_VALUE;
+          cups_set_error(IPP_REQUEST_VALUE, httpStatus(status));
 	  break;
 
       case HTTP_NOT_IMPLEMENTED :
-          cg->last_error = IPP_OPERATION_NOT_SUPPORTED;
+          cups_set_error(IPP_OPERATION_NOT_SUPPORTED, httpStatus(status));
 	  break;
 
       case HTTP_NOT_SUPPORTED :
-          cg->last_error = IPP_VERSION_NOT_SUPPORTED;
+          cups_set_error(IPP_VERSION_NOT_SUPPORTED, httpStatus(status));
 	  break;
 
       default :
 	  DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
                 	status));
-	  cg->last_error = IPP_SERVICE_UNAVAILABLE;
+	  cups_set_error(IPP_SERVICE_UNAVAILABLE, httpStatus(status));
 	  break;
     }
   }
@@ -500,7 +528,11 @@ cupsFreeJobs(int        num_jobs,	/* I - Number of jobs */
 
 
 /*
- * 'cupsGetClasses()' - Get a list of printer classes.
+ * 'cupsGetClasses()' - Get a list of printer classes from the default server.
+ *
+ * This function is deprecated - use cupsGetDests() instead.
+ *
+ * @deprecated@
  */
 
 int					/* O - Number of classes */
@@ -517,7 +549,8 @@ cupsGetClasses(char ***classes)		/* O - Classes */
 
   if (classes == NULL)
   {
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (0);
   }
 
@@ -528,7 +561,7 @@ cupsGetClasses(char ***classes)		/* O - Classes */
   if (!cups_connect("default", NULL, NULL))
   {
     DEBUG_puts("Unable to connect to server!");
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+
     return (0);
   }
 
@@ -568,8 +601,6 @@ cupsGetClasses(char ***classes)		/* O - Classes */
 
   if ((response = cupsDoRequest(cg->http, request, "/")) != NULL)
   {
-    cg->last_error = response->request.status.status_code;
-
     for (attr = response->attrs; attr != NULL; attr = attr->next)
       if (attr->name != NULL &&
           strcasecmp(attr->name, "printer-name") == 0 &&
@@ -604,15 +635,20 @@ cupsGetClasses(char ***classes)		/* O - Classes */
 
     ippDelete(response);
   }
-  else
-    cg->last_error = IPP_BAD_REQUEST;
 
   return (n);
 }
 
 
 /*
- * 'cupsGetDefault()' - Get the default printer or class.
+ * 'cupsGetDefault()' - Get the default printer or class for the default server.
+ *
+ * This function returns the default printer or class as defined by
+ * the LPDEST or PRINTER environment variables. If these environment
+ * variables are not set, the server default destination is returned.
+ * Applications should use the cupsGetDests() and cupsGetDest() functions
+ * to get the user-defined default printer, as this function does not
+ * support the lpoptions-defined default printer.
  */
 
 const char *				/* O - Default printer or NULL */
@@ -641,7 +677,7 @@ cupsGetDefault(void)
   if (!cups_connect("default", NULL, NULL))
   {
     DEBUG_puts("Unable to connect to server!");
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+
     return (NULL);
   }
 
@@ -654,7 +690,14 @@ cupsGetDefault(void)
 
 
 /*
- * 'cupsGetDefault2()' - Get the default printer or class.
+ * 'cupsGetDefault2()' - Get the default printer or class for the specified server.
+ *
+ * This function returns the default printer or class as defined by
+ * the LPDEST or PRINTER environment variables. If these environment
+ * variables are not set, the server default destination is returned.
+ * Applications should use the cupsGetDests() and cupsGetDest() functions
+ * to get the user-defined default printer, as this function does not
+ * support the lpoptions-defined default printer.
  *
  * @since CUPS 1.1.21@
  */
@@ -718,8 +761,6 @@ cupsGetDefault2(http_t *http)		/* I - HTTP connection */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    cg->last_error = response->request.status.status_code;
-
     if ((attr = ippFindAttribute(response, "printer-name", IPP_TAG_NAME)) != NULL)
     {
       strlcpy(cg->def_printer, attr->values[0].string.text, sizeof(cg->def_printer));
@@ -729,15 +770,13 @@ cupsGetDefault2(http_t *http)		/* I - HTTP connection */
 
     ippDelete(response);
   }
-  else
-    cg->last_error = IPP_BAD_REQUEST;
 
   return (NULL);
 }
 
 
 /*
- * 'cupsGetJobs()' - Get the jobs from the server.
+ * 'cupsGetJobs()' - Get the jobs from the default server.
  */
 
 int					/* O - Number of jobs */
@@ -755,7 +794,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
   if (!cups_connect("default", NULL, NULL))
   {
     DEBUG_puts("Unable to connect to server!");
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+
     return (-1);
   }
 
@@ -769,7 +808,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
 
 
 /*
- * 'cupsGetJobs2()' - Get the jobs from the server.
+ * 'cupsGetJobs2()' - Get the jobs from the specified server.
  *
  * @since CUPS 1.1.21@
  */
@@ -822,7 +861,8 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
 
   if (!http || !jobs)
   {
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (-1);
   }
 
@@ -835,7 +875,8 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
     if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                          "/printers/%s", mydest) != HTTP_URI_OK)
     {
-      cg->last_error = IPP_INTERNAL_ERROR;
+      cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
       return (-1);
     }
   }
@@ -897,8 +938,6 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    cg->last_error = response->request.status.status_code;
-
     for (attr = response->attrs; attr != NULL; attr = attr->next)
     {
      /*
@@ -1030,8 +1069,6 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
 
     ippDelete(response);
   }
-  else
-    cg->last_error = IPP_BAD_REQUEST;
 
   if (n == 0 && cg->last_error >= IPP_BAD_REQUEST)
     return (-1);
@@ -1041,7 +1078,10 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
 
 
 /*
- * 'cupsGetPPD()' - Get the PPD file for a printer.
+ * 'cupsGetPPD()' - Get the PPD file for a printer on the default server.
+ *
+ * For classes, cupsGetPPD() returns the PPD file for the first printer
+ * in the class.
  */
 
 const char *				/* O - Filename for PPD file */
@@ -1056,7 +1096,7 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   if (!cups_connect(name, NULL, NULL))
   {
     DEBUG_puts("Unable to connect to server!");
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+
     return (NULL);
   }
 
@@ -1069,7 +1109,10 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 
 
 /*
- * 'cupsGetPPD2()' - Get the PPD file for a printer.
+ * 'cupsGetPPD2()' - Get the PPD file for a printer from the specified server.
+ *
+ * For classes, cupsGetPPD2() returns the PPD file for the first printer
+ * in the class.
  *
  * @since CUPS 1.1.21@
  */
@@ -1112,7 +1155,8 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
   if (!http || !name)
   {
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (NULL);
   }
 
@@ -1123,7 +1167,8 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                        "/printers/%s", name) != HTTP_URI_OK)
   {
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (NULL);
   }
 
@@ -1184,7 +1229,6 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    cg->last_error  = response->request.status.status_code;
     printer[0]  = '\0';
     hostname[0] = '\0';
 
@@ -1238,7 +1282,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
   if (!printer[0])
   {
-    cg->last_error = IPP_NOT_FOUND;
+    cups_set_error(IPP_NOT_FOUND, NULL);
     return (NULL);
   }
 
@@ -1252,7 +1296,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
                                        cupsEncryption())) == NULL)
   {
     DEBUG_puts("Unable to connect to server!");
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+
     return (NULL);
   }
 
@@ -1266,7 +1310,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     * Can't open file; close the server connection and return NULL...
     */
 
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, strerror(errno));
 
     if (http2 != http)
       httpClose(http2);
@@ -1296,17 +1340,17 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     switch (status)
     {
       case HTTP_NOT_FOUND :
-          cg->last_error = IPP_NOT_FOUND;
+          cups_set_error(IPP_NOT_FOUND, httpStatus(status));
 	  break;
-      case HTTP_ERROR :
-          DEBUG_puts("Mapping HTTP error to IPP_ERROR");
-          cg->last_error = IPP_ERROR;
-	  break;
+
       case HTTP_UNAUTHORIZED :
-          cg->last_error = IPP_NOT_AUTHORIZED;
+          cups_set_error(IPP_NOT_AUTHORIZED, httpStatus(status));
 	  break;
+
       default :
-          cg->last_error = IPP_INTERNAL_ERROR;
+	  DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
+                	status));
+	  cups_set_error(IPP_SERVICE_UNAVAILABLE, httpStatus(status));
 	  break;
     }
 
@@ -1324,7 +1368,11 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
 
 /*
- * 'cupsGetPrinters()' - Get a list of printers.
+ * 'cupsGetPrinters()' - Get a list of printers from the default server.
+ *
+ * This function is deprecated - use cupsGetDests() instead.
+ *
+ * @deprecated@
  */
 
 int					/* O - Number of printers */
@@ -1341,7 +1389,8 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   if (printers == NULL)
   {
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (0);
   }
 
@@ -1352,7 +1401,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   if (!cups_connect("default", NULL, NULL))
   {
     DEBUG_puts("Unable to connect to server!");
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+
     return (0);
   }
 
@@ -1383,6 +1432,12 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", NULL, "printer-name");
 
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                "printer-type", 0);
+
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                "printer-type-mask", CUPS_PRINTER_CLASS);
+
  /*
   * Do the request and get back a response...
   */
@@ -1392,8 +1447,6 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   if ((response = cupsDoRequest(cg->http, request, "/")) != NULL)
   {
-    cg->last_error = response->request.status.status_code;
-
     for (attr = response->attrs; attr != NULL; attr = attr->next)
       if (attr->name != NULL &&
           strcasecmp(attr->name, "printer-name") == 0 &&
@@ -1428,18 +1481,16 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
     ippDelete(response);
   }
-  else
-    cg->last_error = IPP_BAD_REQUEST;
 
   return (n);
 }
 
 
 /*
- * 'cupsLastError()' - Return the last IPP error that occurred.
+ * 'cupsLastError()' - Return the last IPP status code.
  */
 
-ipp_status_t				/* O - IPP error code */
+ipp_status_t				/* O - IPP status code from last request */
 cupsLastError(void)
 {
   return (_cupsGlobals()->last_error);
@@ -1447,7 +1498,20 @@ cupsLastError(void)
 
 
 /*
- * 'cupsPrintFile()' - Print a file to a printer or class.
+ * 'cupsLastErrorString()' - Return the last IPP status-message.
+ *
+ * @since CUPS 1.2@
+ */
+
+const char *				/* O - status-message text from last request */
+cupsLastErrorString(void)
+{
+  return (_cupsGlobals()->last_status_message);
+}
+
+
+/*
+ * 'cupsPrintFile()' - Print a file to a printer or class on the default server.
  */
 
 int					/* O - Job ID */
@@ -1466,7 +1530,7 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
 
 
 /*
- * 'cupsPrintFile2()' - Print a file to a printer or class.
+ * 'cupsPrintFile2()' - Print a file to a printer or class on the specified server.
  *
  * @since CUPS 1.1.21@
  */
@@ -1489,7 +1553,7 @@ cupsPrintFile2(http_t        *http,	/* I - HTTP connection */
 
 
 /*
- * 'cupsPrintFiles()' - Print one or more files to a printer or class.
+ * 'cupsPrintFiles()' - Print one or more files to a printer or class on the default server.
  */
 
 int					/* O - Job ID */
@@ -1517,7 +1581,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
     DEBUG_printf(("cupsPrintFiles: Unable to open connection - %s.\n",
                   strerror(errno)));
     DEBUG_puts("Unable to connect to server!");
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+
     return (0);
   }
 
@@ -1532,7 +1596,7 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 
 
 /*
- * 'cupsPrintFiles2()' - Print one or more files to a printer or class.
+ * 'cupsPrintFiles2()' - Print one or more files to a printer or class on the specified server.
  *
  * @since CUPS 1.1.21@
  */
@@ -1555,7 +1619,6 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
   cups_lang_t	*language;		/* Language to use */
   int		jobid;			/* New job ID */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_printf(("cupsPrintFiles(http=%p, name=\"%s\", num_files=%d, "
@@ -1568,7 +1631,8 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
 
   if (!http || !name || num_files < 1 || files == NULL)
   {
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (0);
   }
 
@@ -1579,7 +1643,8 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                        "/printers/%s", name) != HTTP_URI_OK)
   {
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (0);
   }
 
@@ -1596,7 +1661,8 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
 
   if ((request = ippNew()) == NULL)
   {
-    cg->last_error = IPP_INTERNAL_ERROR;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
     return (0);
   }
 
@@ -1650,7 +1716,7 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   {
     DEBUG_puts("No job ID!");
 
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
 
     jobid = 0;
   }
@@ -1748,7 +1814,8 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
   if (name == NULL)
   {
-    cg->last_error = IPP_BAD_REQUEST;
+    cups_set_error(IPP_BAD_REQUEST, NULL);
+
     return (NULL);
   }
 
@@ -1784,11 +1851,39 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
                                         cupsEncryption())) == NULL)
   {
     DEBUG_puts("Unable to connect to server!");
-    cg->last_error = IPP_SERVICE_UNAVAILABLE;
+
+    cups_set_error(IPP_SERVICE_UNAVAILABLE, strerror(errno));
+
     return (NULL);
   }
   else
     return (printer);
+}
+
+
+/*
+ * 'cups_set_error()' - Set the last IPP status code and status-message.
+ */
+
+static void
+cups_set_error(ipp_status_t status,	/* I - IPP status code */
+               const char   *message)	/* I - status-message value */
+{
+  _cups_globals_t	*cg;		/* Global data */
+
+
+  cg             = _cupsGlobals();
+  cg->last_error = status;
+
+  if (cg->last_status_message)
+  {
+    free(cg->last_status_message);
+
+    cg->last_status_message = NULL;
+  }
+
+  if (message)
+    cg->last_status_message = strdup(message);
 }
 
 

@@ -26,15 +26,15 @@
  *
  * Contents:
  *
- *   cupsEncryption()    - Get the default encryption settings...
- *   cupsGetPassword()   - Get a password from the user...
- *   cupsServer()        - Return the hostname of the default server...
+ *   cupsEncryption()    - Get the default encryption settings.
+ *   cupsGetPassword()   - Get a password from the user.
+ *   cupsServer()        - Return the hostname of the default server.
  *   cupsSetEncryption() - Set the encryption preference.
  *   cupsSetPasswordCB() - Set the password callback for CUPS.
- *   cupsSetServer()     - Set the default server name...
- *   cupsSetUser()       - Set the default user name...
+ *   cupsSetServer()     - Set the default server name.
+ *   cupsSetUser()       - Set the default user name.
  *   cupsUser()          - Return the current users name.
- *   _cupsGetPassword()  - Get a password from the user...
+ *   _cupsGetPassword()  - Get a password from the user.
  */
 
 /*
@@ -50,7 +50,12 @@
 
 
 /*
- * 'cupsEncryption()' - Get the default encryption settings...
+ * 'cupsEncryption()' - Get the default encryption settings.
+ *
+ * The default encryption setting comes from the CUPS_ENCRYPTION
+ * environment variable, then the ~/.cupsrc file, and finally the
+ * /etc/cups/client.conf file. If not set, the default is
+ * HTTP_ENCRYPT_IF_REQUESTED.
  */
 
 http_encryption_t			/* O - Encryption settings */
@@ -139,7 +144,9 @@ cupsEncryption(void)
 
 
 /*
- * 'cupsGetPassword()' - Get a password from the user...
+ * 'cupsGetPassword()' - Get a password from the user.
+ *
+ * Returns NULL if the user does not provide a password.
  */
 
 const char *				/* O - Password */
@@ -161,7 +168,10 @@ cupsSetEncryption(http_encryption_t e)	/* I - New encryption preference */
 
 
 /*
- * 'cupsServer()' - Return the hostname of the default server...
+ * 'cupsServer()' - Return the hostname/address of the default server.
+ *
+ * The returned value can be a fully-qualified hostname, a numeric
+ * IPv4 or IPv6 address, or a domain socket pathname.
  */
 
 const char *				/* O - Server name */
@@ -262,10 +272,12 @@ cupsServer(void)
 
 /*
  * 'cupsSetPasswordCB()' - Set the password callback for CUPS.
+ *
+ * Pass NULL to restore the default (console) password callback.
  */
 
 void
-cupsSetPasswordCB(const char *(*cb)(const char *))	/* I - Callback function */
+cupsSetPasswordCB(cups_password_cb_t cb)/* I - Callback function */
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
@@ -278,7 +290,11 @@ cupsSetPasswordCB(const char *(*cb)(const char *))	/* I - Callback function */
 
 
 /*
- * 'cupsSetServer()' - Set the default server name...
+ * 'cupsSetServer()' - Set the default server name.
+ *
+ * The "server" string can be a fully-qualified hostname, a numeric
+ * IPv4 or IPv6 address, or a domain socket pathname. Pass NULL to
+ * restore the default server name.
  */
 
 void
@@ -314,7 +330,9 @@ cupsSetServer(const char *server)	/* I - Server name */
 
 
 /*
- * 'cupsSetUser()' - Set the default user name...
+ * 'cupsSetUser()' - Set the default user name.
+ *
+ * Pass NULL to restore the default user name.
  */
 
 void
@@ -332,7 +350,7 @@ cupsSetUser(const char *user)		/* I - User name */
 
 #if defined(WIN32)
 /*
- * WIN32 username and password stuff...
+ * WIN32 username and password stuff.
  */
 
 /*
@@ -366,7 +384,7 @@ cupsUser(void)
 
 
 /*
- * '_cupsGetPassword()' - Get a password from the user...
+ * '_cupsGetPassword()' - Get a password from the user.
  */
 
 const char *				/* O - Password */
@@ -429,7 +447,7 @@ cupsUser(void)
 
 
 /*
- * '_cupsGetPassword()' - Get a password from the user...
+ * '_cupsGetPassword()' - Get a password from the user.
  */
 
 const char *				/* O - Password */

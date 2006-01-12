@@ -119,12 +119,14 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			user[65],	/* User name */
 			server[256],	/* Server address */
 			servername[256];/* Server hostname */
-  const char		*(*password_cb)(const char *);
-					/* Password callback */
+  cups_password_cb_t	password_cb;	/* Password callback */
 
   /* util.c */
   http_t		*http;		/* Current server connection */
   ipp_status_t		last_error;	/* Last IPP error */
+  char			*last_status_message;
+					/* Last IPP status-message */
+
   char			def_printer[256];
 					/* Default printer */
   char			ppd_filename[HTTP_MAX_URI];

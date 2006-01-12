@@ -47,14 +47,14 @@
  * 'cupsAddOption()' - Add an option to an option array.
  */
 
-int						/* O - Number of options */
-cupsAddOption(const char    *name,		/* I - Name of option */
-              const char    *value,		/* I - Value of option */
-	      int           num_options,	/* I - Number of options */
-              cups_option_t **options)		/* IO - Pointer to options */
+int					/* O - Number of options */
+cupsAddOption(const char    *name,	/* I - Name of option */
+              const char    *value,	/* I - Value of option */
+	      int           num_options,/* I - Number of options */
+              cups_option_t **options)	/* IO - Pointer to options */
 {
-  int		i;				/* Looping var */
-  cups_option_t	*temp;				/* Pointer to new option */
+  int		i;			/* Looping var */
+  cups_option_t	*temp;			/* Pointer to new option */
 
 
   if (name == NULL || !name[0] || value == NULL ||
@@ -109,10 +109,11 @@ cupsAddOption(const char    *name,		/* I - Name of option */
  */
 
 void
-cupsFreeOptions(int           num_options,	/* I - Number of options */
-                cups_option_t *options)		/* I - Pointer to options */
+cupsFreeOptions(
+    int           num_options,		/* I - Number of options */
+    cups_option_t *options)		/* I - Pointer to options */
 {
-  int	i;					/* Looping var */
+  int	i;				/* Looping var */
 
 
   if (num_options <= 0 || options == NULL)
@@ -153,17 +154,24 @@ cupsGetOption(const char    *name,	/* I - Name of option */
 
 /*
  * 'cupsParseOptions()' - Parse options from a command-line argument.
+ *
+ * This function converts space-delimited name/value pairs according
+ * to the PAPI text option ABNF specification. Collection values
+ * ("name={a=... b=... c=...}") are stored with the curley brackets
+ * intact - use cupsParseOptions() on the value to extract the collection
+ * attributes.
  */
 
-int						/* O - Number of options found */
-cupsParseOptions(const char    *arg,		/* I - Argument to parse */
-                 int           num_options,	/* I - Number of options */
-                 cups_option_t **options)	/* O - Options found */
+int					/* O - Number of options found */
+cupsParseOptions(
+    const char    *arg,			/* I - Argument to parse */
+    int           num_options,		/* I - Number of options */
+    cups_option_t **options)		/* O - Options found */
 {
-  char	*copyarg,				/* Copy of input string */
-	*ptr,					/* Pointer into string */
-	*name,					/* Pointer to name */
-	*value;					/* Pointer to value */
+  char	*copyarg,			/* Copy of input string */
+	*ptr,				/* Pointer into string */
+	*name,				/* Pointer to name */
+	*value;				/* Pointer to value */
 
 
   if (arg == NULL || options == NULL || num_options < 0)

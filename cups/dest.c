@@ -29,10 +29,10 @@
  *   cupsAddDest()     - Add a destination to the list of destinations.
  *   cupsFreeDests()   - Free the memory used by the list of destinations.
  *   cupsGetDest()     - Get the named destination from the list.
- *   cupsGetDests()    - Get the list of destinations.
- *   cupsGetDests2()   - Get the list of destinations using a HTTP connection.
- *   cupsSetDests()    - Set the list of destinations.
- *   cupsSetDests2()   - Set the list of destinations.
+ *   cupsGetDests()    - Get the list of destinations from the default server.
+ *   cupsGetDests2()   - Get the list of destinations from the specified server.
+ *   cupsSetDests()    - Set the list of destinations for the default server.
+ *   cupsSetDests2()   - Set the list of destinations for the specified server.
  *   cups_get_dests()  - Get destinations from a file.
  *   cups_get_sdests() - Get destinations from a server.
  */
@@ -58,12 +58,15 @@ static int	cups_get_sdests(http_t *http, ipp_op_t op, int num_dests,
 
 /*
  * 'cupsAddDest()' - Add a destination to the list of destinations.
+ *
+ * Use the cupsSaveDests() function to save the updated list of destinations
+ * to the user's lpoptions file.
  */
 
-int					/* O - New number of destinations */
-cupsAddDest(const char  *name,		/* I - Name of destination */
-            const char	*instance,	/* I - Instance of destination */
-            int         num_dests,	/* I - Number of destinations */
+int					/* O  - New number of destinations */
+cupsAddDest(const char  *name,		/* I  - Name of destination */
+            const char	*instance,	/* I  - Instance of destination or NULL for none/primary */
+            int         num_dests,	/* I  - Number of destinations */
             cups_dest_t **dests)	/* IO - Destinations */
 {
   int		i;			/* Looping var */
@@ -146,6 +149,9 @@ cupsFreeDests(int         num_dests,	/* I - Number of destinations */
 
 /*
  * 'cupsGetDest()' - Get the named destination from the list.
+ *
+ * Use the cupsGetDests() or cupsGetDests2() functions to get a
+ * list of supported destinations for the current user.
  */
 
 cups_dest_t *				/* O - Destination pointer or NULL */
@@ -203,7 +209,7 @@ cupsGetDest(const char  *name,		/* I - Name of destination */
 
 
 /*
- * 'cupsGetDests()' - Get the list of destinations.
+ * 'cupsGetDests()' - Get the list of destinations from the default server.
  */
 
 int					/* O - Number of destinations */
@@ -229,7 +235,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 
 
 /*
- * 'cupsGetDests2()' - Get the list of destinations.
+ * 'cupsGetDests2()' - Get the list of destinations from the specified server.
  *
  * @since CUPS 1.1.21@
  */
@@ -388,7 +394,10 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * 'cupsSetDests()' - Set the list of destinations.
+ * 'cupsSetDests()' - Save the list of destinations for the default server.
+ *
+ * This function saves the destinations to /etc/cups/lpoptions when run
+ * as root and ~/.lpoptions when run as a normal user.
  */
 
 void
@@ -412,7 +421,10 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
 
 
 /*
- * 'cupsSetDests2()' - Set the list of destinations.
+ * 'cupsSetDests2()' - Save the list of destinations for the specified server.
+ *
+ * This function saves the destinations to /etc/cups/lpoptions when run
+ * as root and ~/.lpoptions when run as a normal user.
  *
  * @since CUPS 1.1.21@
  */

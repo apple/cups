@@ -25,7 +25,7 @@
  *
  * Contents:
  *
- *   cupsDoAuthentication() - Authenticate a request...
+ *   cupsDoAuthentication() - Authenticate a request.
  *   cups_local_auth()      - Get the local authorization certificate if
  *                            available/applicable...
  */
@@ -56,7 +56,10 @@ static int	cups_local_auth(http_t *http);
 
 
 /*
- * 'cupsDoAuthentication()' - Authenticate a request...
+ * 'cupsDoAuthentication()' - Authenticate a request.
+ *
+ * This function should be called in response to a HTTP_UNAUTHORIZED
+ * status, prior to resubmitting your request.
  *
  * @since CUPS 1.1.20@
  */

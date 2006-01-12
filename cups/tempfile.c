@@ -49,6 +49,8 @@
 
 /*
  * 'cupsTempFd()' - Create a temporary file.
+ *
+ * The temporary filename is stored in the filename buffer.
  */
 
 int					/* O - New file descriptor */
@@ -157,6 +159,12 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 
 /*
  * 'cupsTempFile()' - Generate a temporary filename.
+ *
+ * The temporary filename is stored in the filename buffer.
+ * This function is deprecated - use cupsTempFd() or cupsTempFile2()
+ * instead.
+ *
+ * @deprecated@
  */
 
 char *					/* O - Filename */
@@ -200,6 +208,8 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 /*
  * 'cupsTempFile2()' - Create a temporary CUPS file.
+ *
+ * The temporary filename is stored in the filename buffer.
  *
  * @since CUPS 1.2@
  */

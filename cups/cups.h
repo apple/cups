@@ -100,6 +100,8 @@ enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_OPTIONS = 0x66fffc	/* ~(CLASS | REMOTE | IMPLICIT) */
 };
 
+typedef const char *(*cups_password_cb_t)(const char *);
+
 typedef struct cups_option_s		/**** Printer Options ****/
 {
   char		*name;			/* Name of option */
@@ -142,7 +144,7 @@ extern ipp_t		*cupsDoFileRequest(http_t *http, ipp_t *request,
 extern http_encryption_t cupsEncryption(void);
 extern void		cupsFreeJobs(int num_jobs, cups_job_t *jobs);
 extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED;
-extern const char	*cupsGetDefault(void) _CUPS_DEPRECATED;
+extern const char	*cupsGetDefault(void);
 extern int		cupsGetJobs(cups_job_t **jobs, const char *dest,
 			            int myjobs, int completed);
 extern const char	*cupsGetPPD(const char *printer);
@@ -180,7 +182,7 @@ extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
 extern const char	*cupsGetPassword(const char *prompt);
 extern const char	*cupsServer(void);
 extern void		cupsSetEncryption(http_encryption_t e);
-extern void		cupsSetPasswordCB(const char *(*cb)(const char *));
+extern void		cupsSetPasswordCB(cups_password_cb_t cb);
 extern void		cupsSetServer(const char *server);
 extern void		cupsSetUser(const char *user);
 extern const char	*cupsUser(void);
@@ -220,6 +222,7 @@ extern int		cupsBackchannelWrite(const char *buffer, int bytes,
 extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 					   cups_option_t *options,
 					   ipp_tag_t group_tag);
+extern const char	*cupsLastErrorString(void);
 extern cups_file_t	*cupsTempFile2(char *filename, int len);
 
 
