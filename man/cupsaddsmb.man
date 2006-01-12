@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "11 January 2006" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "12 January 2006" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 .SH SYNOPSIS
@@ -29,10 +29,8 @@ cupsaddsmb \- export printers to samba for windows clients
 [ -H
 .I samba-server
 ] [ -U
-.I samba-user
-[
-.I%samba-password
-]] [ -h
+.I samba-user[%samba-password]
+] [ -h
 .I cups-server
 ] [ -v ] -a
 .br
@@ -40,7 +38,7 @@ cupsaddsmb \- export printers to samba for windows clients
 [ -H
 .I samba-server
 ] [ -U
-.I samba-user
+.I samba-user[%samba-password]
 ] [ -h
 .I cups-server
 ] [ -v ] printer [ ... printer ]
