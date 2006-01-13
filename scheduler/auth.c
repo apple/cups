@@ -1513,6 +1513,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   unsigned		address[4];	/* Authorization address */
   cupsd_location_t	*best;		/* Best match for location so far */
   int			hostlen;	/* Length of hostname */
+  const char		*username;	/* Username to authorize */
   struct passwd		*pw;		/* User password data */
   static const char * const levels[] =	/* Auth levels */
 		{
@@ -1532,6 +1533,9 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdIsAuthorized: con->uri=\"%s\", con->best=%p(%s)",
                   con->uri, con->best, con->best ? con->best->location : "");
+  if (owner)
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdIsAuthorized: owner=\"%s\"", owner);
 
  /*
   * If there is no "best" authentication rule for this request, then
@@ -1666,7 +1670,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
       (best->type == AUTH_NONE && best->num_names == 0))
     return (HTTP_OK);
 
-  if (best->type == AUTH_NONE && best->limit == AUTH_LIMIT_IPP)
+  if (!con->username[0] && best->type == AUTH_NONE &&
+      best->limit == AUTH_LIMIT_IPP)
   {
    /*
     * Check for unauthenticated username...
@@ -1681,34 +1686,42 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "cupsdIsAuthorized: requesting-user-name=\"%s\"",
                       attr->values[0].string.text);
-      return (HTTP_OK);
+      username = attr->values[0].string.text;
     }
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: username=\"%s\"",
-	          con->username);
-
-  if (!con->username[0])
-  {
-    if (best->satisfy == AUTH_SATISFY_ALL || auth == AUTH_DENY)
+    else if (best->satisfy == AUTH_SATISFY_ALL || auth == AUTH_DENY)
       return (HTTP_UNAUTHORIZED);	/* Non-anonymous needs user/pass */
     else
       return (HTTP_OK);			/* unless overridden with Satisfy */
   }
+  else
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: username=\"%s\"",
+	            con->username);
+
+    if (!con->username[0])
+    {
+      if (best->satisfy == AUTH_SATISFY_ALL || auth == AUTH_DENY)
+	return (HTTP_UNAUTHORIZED);	/* Non-anonymous needs user/pass */
+      else
+	return (HTTP_OK);		/* unless overridden with Satisfy */
+    }
+
+    username = con->username;
+  }
 
  /*
-  * OK, the password is good.  See if we need normal user access, or group
+  * OK, got a username.  See if we need normal user access, or group
   * access... (root always matches)
   */
 
-  if (!strcmp(con->username, "root"))
+  if (!strcmp(username, "root"))
     return (HTTP_OK);
 
  /*
   * Get the user info...
   */
 
-  pw = getpwnam(con->username);
+  pw = getpwnam(username);
   endpwent();
 
   if (best->level == AUTH_USER)
@@ -1732,20 +1745,20 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     for (i = 0; i < best->num_names; i ++)
     {
       if (!strcasecmp(best->names[i], "@OWNER") && owner &&
-          !strcasecmp(con->username, owner))
+          !strcasecmp(username, owner))
 	return (HTTP_OK);
       else if (!strcasecmp(best->names[i], "@SYSTEM"))
       {
         for (j = 0; j < NumSystemGroups; j ++)
-	  if (cupsdCheckGroup(con->username, pw, SystemGroups[j]))
+	  if (cupsdCheckGroup(username, pw, SystemGroups[j]))
 	    return (HTTP_OK);
       }
       else if (best->names[i][0] == '@')
       {
-        if (cupsdCheckGroup(con->username, pw, best->names[i] + 1))
+        if (cupsdCheckGroup(username, pw, best->names[i] + 1))
           return (HTTP_OK);
       }
-      else if (!strcasecmp(con->username, best->names[i]))
+      else if (!strcasecmp(username, best->names[i]))
         return (HTTP_OK);
     }
 
@@ -1772,10 +1785,10 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     if (!strcasecmp(best->names[i], "@SYSTEM"))
     {
       for (j = 0; j < NumSystemGroups; j ++)
-	if (cupsdCheckGroup(con->username, pw, SystemGroups[j]))
+	if (cupsdCheckGroup(username, pw, SystemGroups[j]))
 	  return (HTTP_OK);
     }
-    else if (cupsdCheckGroup(con->username, pw, best->names[i]))
+    else if (cupsdCheckGroup(username, pw, best->names[i]))
       return (HTTP_OK);
   }
 
