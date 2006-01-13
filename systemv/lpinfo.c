@@ -76,7 +76,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr, NULL,
+            _cupsLangPrintf(stderr,
 		            _("%s: Sorry, no encryption support compiled in!\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
@@ -94,7 +94,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		_cupsLangPrintf(stderr, NULL,
+		_cupsLangPrintf(stderr,
 		                _("lpinfo: Unable to connect to server: %s\n"),
 				strerror(errno));
 		return (1);
@@ -113,7 +113,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		_cupsLangPrintf(stderr, NULL,
+		_cupsLangPrintf(stderr,
 		                _("lpinfo: Unable to connect to server: %s\n"),
 				strerror(errno));
 		return (1);
@@ -139,7 +139,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        _cupsLangPuts(stderr, NULL,
+	        _cupsLangPuts(stderr,
 		              _("Error: need hostname after \'-h\' option!\n"));
 		return (1);
               }
@@ -149,13 +149,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, NULL, _("lpinfo: Unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("lpinfo: Unknown option \'%c\'!\n"),
 	                    argv[i][1]);
 	    return (1);
       }
     else
     {
-      _cupsLangPrintf(stderr, NULL, _("lpinfo: Unknown argument \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("lpinfo: Unknown argument \'%s\'!\n"),
                       argv[i]);
       return (1);
     }
@@ -222,7 +222,7 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, NULL, _("lpinfo: cups-get-devices failed: %s\n"),
+      _cupsLangPrintf(stderr, _("lpinfo: cups-get-devices failed: %s\n"),
         	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
@@ -289,7 +289,7 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
 
       if (long_status)
       {
-	_cupsLangPrintf(stdout, language,
+	_cupsLangPrintf(stdout,
 	                _("Device: uri = %s\n"
 			  "        class = %s\n"
 			  "        info = %s\n"
@@ -297,7 +297,7 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
 			device_uri, device_class, device_info, device_make);
       }
       else
-        _cupsLangPrintf(stdout, language, "%s %s\n", device_class, device_uri);
+        _cupsLangPrintf(stdout, "%s %s\n", device_class, device_uri);
 
       if (attr == NULL)
         break;
@@ -307,7 +307,7 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, NULL, _("lpinfo: cups-get-devices failed: %s\n"),
+    _cupsLangPrintf(stderr, _("lpinfo: cups-get-devices failed: %s\n"),
         	    ippErrorString(cupsLastError()));
     return (1);
   }
@@ -373,7 +373,7 @@ show_models(http_t *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, NULL, _("lpinfo: cups-get-ppds failed: %s\n"),
+      _cupsLangPrintf(stderr, _("lpinfo: cups-get-ppds failed: %s\n"),
         	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return (1);
@@ -434,14 +434,14 @@ show_models(http_t *http,		/* I - HTTP connection to server */
 
       if (long_status)
       {
-	_cupsLangPrintf(stdout, language,
+	_cupsLangPrintf(stdout,
 	                _("Model:  name = %s\n"
 			  "        natural_language = %s\n"
 			  "        make-and-model = %s\n"),
 			ppd_name, ppd_language, ppd_make);
       }
       else
-        _cupsLangPrintf(stdout, language, "%s %s\n", ppd_name, ppd_make);
+        _cupsLangPrintf(stdout, "%s %s\n", ppd_name, ppd_make);
 
       if (attr == NULL)
         break;
@@ -451,7 +451,7 @@ show_models(http_t *http,		/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, NULL, _("lpinfo: cups-get-ppds failed: %s\n"),
+    _cupsLangPrintf(stderr, _("lpinfo: cups-get-ppds failed: %s\n"),
         	    ippErrorString(cupsLastError()));
 
     return (1);

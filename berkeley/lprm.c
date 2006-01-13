@@ -84,7 +84,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(), encryption)) == NULL)
   {
-    _cupsLangPuts(stderr, language, _("lprm: Unable to contact server!\n"));
+    _cupsLangPuts(stderr, _("lprm: Unable to contact server!\n"));
     cupsFreeDests(num_dests, dests);
     return (1);
   }
@@ -103,7 +103,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    httpEncryption(http, encryption);
 #else
-            _cupsLangPrintf(stderr, language,
+            _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
@@ -123,7 +123,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    if (cupsGetDest(dest, NULL, num_dests, dests) == NULL)
 	    {
-	      _cupsLangPrintf(stderr, language,
+	      _cupsLangPrintf(stderr,
 	                      _("lprm: Unknown destination \"%s\"!\n"), dest);
               cupsFreeDests(num_dests, dests);
 	      httpClose(http);
@@ -132,7 +132,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, language,
+	    _cupsLangPrintf(stderr,
 	                    _("lprm: Unknown option \'%c\'!\n"), argv[i][1]);
             cupsFreeDests(num_dests, dests);
 	    httpClose(http);
@@ -219,20 +219,20 @@ main(int  argc,			/* I - Number of command-line arguments */
         switch (response->request.status.status_code)
 	{
 	  case IPP_NOT_FOUND :
-              _cupsLangPuts(stderr, language,
+              _cupsLangPuts(stderr,
 	                    _("lprm: Job or printer not found!\n"));
 	      break;
 	  case IPP_NOT_AUTHORIZED :
-              _cupsLangPuts(stderr, language,
+              _cupsLangPuts(stderr,
 	                    _("lprm: Not authorized to lprm job(s)!\n"));
 	      break;
 	  case IPP_FORBIDDEN :
-              _cupsLangPrintf(stderr, language,
+              _cupsLangPrintf(stderr,
 	                      _("lprm: You don't own job ID %d!\n"), job_id);
 	      break;
 	  default :
               if (response->request.status.status_code > IPP_OK_CONFLICT)
-                _cupsLangPuts(stderr, language,
+                _cupsLangPuts(stderr,
 		              _("lprm: Unable to lprm job(s)!\n"));
 	      break;
 	}
@@ -249,7 +249,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
       else
       {
-        _cupsLangPuts(stderr, language,
+        _cupsLangPuts(stderr,
 	              _("lprm: Unable to cancel job(s)!\n"));
         cupsFreeDests(num_dests, dests);
         httpClose(http);
@@ -265,7 +265,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (response == NULL)
     if (!cupsCancelJob(dest, 0))
     {
-      _cupsLangPuts(stderr, language,
+      _cupsLangPuts(stderr,
                     _("lprm: Unable to cancel job(s)!\n"));
       cupsFreeDests(num_dests, dests);
       httpClose(http);

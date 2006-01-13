@@ -91,7 +91,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr, language,
+            _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
@@ -114,7 +114,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        _cupsLangPuts(stderr, language,
+	        _cupsLangPuts(stderr,
 		              _("cancel: Error - expected hostname after "
 			        "\'-h\' option!\n"));
 		return (1);
@@ -135,7 +135,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        _cupsLangPuts(stderr, language,
+	        _cupsLangPuts(stderr,
 		              _("cancel: Error - expected username after "
 			        "\'-u\' option!\n"));
 		return (1);
@@ -146,7 +146,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, language,
+	    _cupsLangPrintf(stderr,
 	                    _("cancel: Unknown option \'%c\'!\n"), argv[i][1]);
 	    return (1);
       }
@@ -203,7 +203,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         * Bad printer name!
 	*/
 
-        _cupsLangPrintf(stderr, language,
+        _cupsLangPrintf(stderr,
 	                _("cancel: Unknown destination \"%s\"!\n"), argv[i]);
 	return (1);
       }
@@ -225,7 +225,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
 	                               cupsEncryption())) == NULL)
 	{
-	  _cupsLangPuts(stderr, language,
+	  _cupsLangPuts(stderr,
 	                _("cancel: Unable to contact server!\n"));
 	  return (1);
 	}
@@ -292,7 +292,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (response == NULL ||
           response->request.status.status_code > IPP_OK_CONFLICT)
       {
-	_cupsLangPrintf(stderr, language, _("cancel: %s failed: %s\n"),
+	_cupsLangPrintf(stderr, _("cancel: %s failed: %s\n"),
 	        	op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
         		response ? ippErrorString(response->request.status.status_code) :
 		        	   ippErrorString(cupsLastError()));
@@ -316,7 +316,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
 	                             cupsEncryption())) == NULL)
       {
-	_cupsLangPuts(stderr, language, _("cancel: Unable to contact server!\n"));
+	_cupsLangPuts(stderr, _("cancel: Unable to contact server!\n"));
 	return (1);
       }
 
@@ -367,7 +367,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (response == NULL ||
         response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, language, _("cancel: %s failed: %s\n"),
+      _cupsLangPrintf(stderr, _("cancel: %s failed: %s\n"),
 		      op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
         	      response ? ippErrorString(response->request.status.status_code) :
 		        	 ippErrorString(cupsLastError()));

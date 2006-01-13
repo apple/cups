@@ -94,6 +94,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 
   /* language.c */
   cups_lang_t		*lang_cache;	/* Language string cache */
+  cups_lang_t		*lang_default;	/* Default language */
 #  ifdef __APPLE__
 #    ifdef HAVE_CF_LOCALE_ID
   char			language[32];	/* Cached language */

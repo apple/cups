@@ -81,7 +81,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     op = IPP_RESUME_PRINTER;
   else
   {
-    _cupsLangPrintf(stderr, language, _("%s: Don't know what to do!\n"),
+    _cupsLangPrintf(stderr, _("%s: Don't know what to do!\n"),
                     command);
     return (1);
   }
@@ -104,7 +104,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr, language,
+            _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
 	        	    command);
 #endif /* HAVE_SSL */
@@ -125,7 +125,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        _cupsLangPrintf(stderr, language,
+	        _cupsLangPrintf(stderr,
 		                _("%s: Expected server name after -h!\n"),
 		        	command);
 	        return (1);
@@ -143,7 +143,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        _cupsLangPrintf(stderr, language,
+	        _cupsLangPrintf(stderr,
 		                _("%s: Expected reason text after -r!\n"),
 				command);
 		return (1);
@@ -154,7 +154,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, language, _("%s: Unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("%s: Unknown option \'%c\'!\n"),
 	                    command, argv[i][1]);
 	    return (1);
       }
@@ -169,7 +169,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if (http == NULL)
       {
-	_cupsLangPrintf(stderr, language,
+	_cupsLangPrintf(stderr,
 	                _("%s: Unable to connect to server: %s\n"),
 	                command, strerror(errno));
 	return (1);
@@ -213,7 +213,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
         if (response->request.status.status_code > IPP_OK_CONFLICT)
 	{
-          _cupsLangPrintf(stderr, language,
+          _cupsLangPrintf(stderr,
 	                  _("%s: Operation failed: %s\n"),
 			  command, ippErrorString(cupsLastError()));
 	  return (1);
@@ -223,7 +223,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
       else
       {
-        _cupsLangPrintf(stderr, language,
+        _cupsLangPrintf(stderr,
 	                _("%s: Operation failed: %s\n"),
 	                command, ippErrorString(cupsLastError()));
 	return (1);
@@ -264,7 +264,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	{
           if (response->request.status.status_code > IPP_OK_CONFLICT)
 	  {
-            _cupsLangPrintf(stderr, language,
+            _cupsLangPrintf(stderr,
 	                    _("%s: Operation failed: %s\n"),
 			    command, ippErrorString(cupsLastError()));
 	    return (1);
@@ -274,7 +274,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
 	else
 	{
-          _cupsLangPrintf(stderr, language,
+          _cupsLangPrintf(stderr,
 	                  _("%s: Operation failed: %s\n"),
 			  command, ippErrorString(cupsLastError()));
 	  return (1);

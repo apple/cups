@@ -307,7 +307,7 @@ convert_ppd(const char *src,		/* I - Source (original) PPD */
     {
       if ((ptr = strchr(line, ':')) == NULL)
       {
-        _cupsLangPrintf(stderr, NULL,
+        _cupsLangPrintf(stderr,
 	                _("cupsaddsmb: Missing value on line %d!\n"), linenum);
         fclose(srcfp);
         fclose(dstfp);
@@ -318,7 +318,7 @@ convert_ppd(const char *src,		/* I - Source (original) PPD */
 
       if ((ptr = strchr(ptr, '\"')) == NULL)
       {
-        _cupsLangPrintf(stderr, NULL,
+        _cupsLangPrintf(stderr,
 	                _("cupsaddsmb: Missing double quote on line %d!\n"),
 	        	linenum);
         fclose(srcfp);
@@ -330,7 +330,7 @@ convert_ppd(const char *src,		/* I - Source (original) PPD */
 
       if (sscanf(line, "*%40s%*[ \t]%40[^/]", option, choice) != 2)
       {
-        _cupsLangPrintf(stderr, NULL,
+        _cupsLangPrintf(stderr,
 	                _("cupsaddsmb: Bad option + choice on line %d!\n"),
 	        	linenum);
         fclose(srcfp);
@@ -447,7 +447,7 @@ do_samba_command(const char *command,	/* I - Command to run */
     snprintf(temp, sizeof(temp), "%s%%%s", SAMBAUser, SAMBAPassword);
 
     if (Verbosity)
-      _cupsLangPrintf(stdout, NULL,
+      _cupsLangPrintf(stdout,
                       _("Running command: %s %s -N -U \'%s%%%s\' -c \'%s\'\n"),
         	      command, address, SAMBAUser, SAMBAPassword, subcmd);
 
@@ -476,7 +476,7 @@ do_samba_command(const char *command,	/* I - Command to run */
     {
       status = -1;
 
-      _cupsLangPrintf(stderr, NULL, _("cupsaddsmb: Unable to run \"%s\": %s\n"),
+      _cupsLangPrintf(stderr, _("cupsaddsmb: Unable to run \"%s\": %s\n"),
                       command, strerror(errno));
     }
     else
@@ -491,7 +491,7 @@ do_samba_command(const char *command,	/* I - Command to run */
     DEBUG_printf(("status=%d\n", status));
 
     if (Verbosity)
-      _cupsLangPuts(stdout, NULL, "\n");
+      _cupsLangPuts(stdout, "\n");
 
     if (status)
     {
@@ -551,7 +551,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption())) == NULL)
   {
-    _cupsLangPrintf(stderr, language,
+    _cupsLangPrintf(stderr,
                     _("cupsaddsmb: Unable to connect to server \"%s\" for "
 		      "%s - %s\n"),
         	    cupsServer(), dest, strerror(errno));
@@ -564,7 +564,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
   if ((ppdfile = cupsGetPPD2(http, dest)) == NULL)
   {
-    _cupsLangPrintf(stderr, language,
+    _cupsLangPrintf(stderr,
                     _("cupsaddsmb: No PPD file for printer \"%s\" - "
 		      "skipping!\n"),
         	    dest);
@@ -603,7 +603,7 @@ export_dest(const char *dest)		/* I - Destination to export */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, language,
+      _cupsLangPrintf(stderr,
                       _("cupsaddsmb: get-printer-attributes failed for "
 		        "\"%s\": %s\n"),
         	      dest,
@@ -617,7 +617,7 @@ export_dest(const char *dest)		/* I - Destination to export */
   }
   else
   {
-    _cupsLangPrintf(stderr, language,
+    _cupsLangPrintf(stderr,
                     _("cupsaddsmb: get-printer-attributes failed for "
 		      "\"%s\": %s\n"),
         	    dest, ippErrorString(cupsLastError()));
@@ -633,7 +633,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
   if (convert_ppd(ppdfile, newppd, sizeof(newppd), response))
   {
-    _cupsLangPrintf(stderr, language,
+    _cupsLangPrintf(stderr,
                     _("cupsaddsmb: Unable to convert PPD file for %s - %s\n"),
         	    dest, strerror(errno));
     ippDelete(response);
@@ -688,7 +688,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
     if ((status = do_samba_command("smbclient", address, subcmd)) != 0)
     {
-      _cupsLangPrintf(stderr, language,
+      _cupsLangPrintf(stderr,
                       _("cupsaddsmb: Unable to copy Windows 2000 printer "
 		        "driver files (%d)!\n"),
                       status);
@@ -715,7 +715,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
       if ((status = do_samba_command("smbclient", address, subcmd)) != 0)
       {
-	_cupsLangPrintf(stderr, language,
+	_cupsLangPrintf(stderr,
 	                _("cupsaddsmb: Unable to copy CUPS printer driver "
 			  "files (%d)!\n"),
         		status);
@@ -750,7 +750,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
     if ((status = do_samba_command("rpcclient", SAMBAServer, subcmd)) != 0)
     {
-      _cupsLangPrintf(stderr, language,
+      _cupsLangPrintf(stderr,
                       _("cupsaddsmb: Unable to install Windows 2000 printer "
 		        "driver files (%d)!\n"),
         	      status);
@@ -780,7 +780,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
     if ((status = do_samba_command("smbclient", address, subcmd)) != 0)
     {
-      _cupsLangPrintf(stderr, language,
+      _cupsLangPrintf(stderr,
                       _("cupsaddsmb: Unable to copy Windows 9x printer "
 		        "driver files (%d)!\n"),
         	      status);
@@ -801,7 +801,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
     if ((status = do_samba_command("rpcclient", SAMBAServer, subcmd)) != 0)
     {
-      _cupsLangPrintf(stderr, language,
+      _cupsLangPrintf(stderr,
                       _("cupsaddsmb: Unable to install Windows 9x printer "
 		        "driver files (%d)!\n"),
         	      status);
@@ -820,7 +820,7 @@ export_dest(const char *dest)		/* I - Destination to export */
 
   if ((status = do_samba_command("rpcclient", SAMBAServer, subcmd)) != 0)
   {
-    _cupsLangPrintf(stderr, language,
+    _cupsLangPrintf(stderr,
                     _("cupsaddsmb: Unable to set Windows printer driver (%d)!\n"),
         	    status);
     return (8);
@@ -903,7 +903,7 @@ ppd_gets(FILE *fp,			/* I - File to read from*/
 void
 usage(void)
 {
-  _cupsLangPuts(stdout, NULL,
+  _cupsLangPuts(stdout,
                 _("Usage: cupsaddsmb [options] printer1 ... printerN\n"
 		  "       cupsaddsmb [options] -a\n"
 		  "\n"

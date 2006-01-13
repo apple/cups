@@ -80,7 +80,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr, NULL,
+            _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
@@ -101,7 +101,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        _cupsLangPuts(stderr, NULL,
+	        _cupsLangPuts(stderr,
 		              _("Error: need hostname after \'-h\' option!\n"));
 		return (1);
               }
@@ -111,7 +111,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, NULL, _("lpmove: Unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("lpmove: Unknown option \'%c\'!\n"),
 	                    argv[i][1]);
 	    return (1);
       }
@@ -130,14 +130,14 @@ main(int  argc,				/* I - Number of command-line arguments */
       dest = argv[i];
     else
     {
-      _cupsLangPrintf(stderr, NULL, _("lpmove: Unknown argument \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("lpmove: Unknown argument \'%s\'!\n"),
                       argv[i]);
       return (1);
     }
 
   if (job == NULL || dest == NULL)
   {
-    _cupsLangPuts(stdout, NULL, _("Usage: lpmove job dest\n"));
+    _cupsLangPuts(stdout, _("Usage: lpmove job dest\n"));
     return (1);
   }
 
@@ -147,7 +147,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (http == NULL)
     {
-      _cupsLangPrintf(stderr, NULL,
+      _cupsLangPrintf(stderr,
                       _("lpmove: Unable to connect to server: %s\n"),
 		      strerror(errno));
       return (1);
@@ -222,7 +222,7 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, NULL, _("lpmove: move-job failed: %s\n"),
+      _cupsLangPrintf(stderr, _("lpmove: move-job failed: %s\n"),
         	      ippErrorString(response->request.status.status_code));
       ippDelete(response);
       return;
@@ -231,7 +231,7 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
     ippDelete(response);
   }
   else
-    _cupsLangPrintf(stderr, NULL, _("lpmove: move-job failed: %s\n"),
+    _cupsLangPrintf(stderr, _("lpmove: move-job failed: %s\n"),
         	    ippErrorString(cupsLastError()));
 }
 

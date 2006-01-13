@@ -66,14 +66,12 @@ extern char		*_cupsSaveLocale(int category, const char *locale);
 
 /**** New in CUPS 1.2 ****/
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);
-extern int		_cupsLangPrintf(FILE *fp, cups_lang_t *lang,
-			                const char *message, ...)
+extern int		_cupsLangPrintf(FILE *fp, const char *message, ...)
 #    ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 3, 4)))
+__attribute__ ((__format__ (__printf__, 2, 3)))
 #    endif /* __GNUC__ */
 ;
-extern int		_cupsLangPuts(FILE *fp, cups_lang_t *lang,
-			              const char *message);
+extern int		_cupsLangPuts(FILE *fp, const char *message);
 extern const char	*_cupsLangString(cups_lang_t *lang, const char *message);
 extern void		_cupsMessageFree(cups_array_t *a);
 extern cups_array_t	*_cupsMessageLoad(const char *filename);

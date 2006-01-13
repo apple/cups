@@ -34,7 +34,8 @@ ipp.o: debug.h
 ipp-support.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
 ipp-support.o: file.h i18n.h language.h array.h normalize.h transcode.h
 ipp-support.o: debug.h
-langprintf.o: string.h ../config.h i18n.h language.h array.h transcode.h
+langprintf.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
+langprintf.o: file.h i18n.h language.h array.h normalize.h transcode.h
 language.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
 language.o: file.h i18n.h language.h array.h normalize.h transcode.h debug.h
 mark.o: ppd.h file.h string.h ../config.h debug.h
