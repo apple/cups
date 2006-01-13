@@ -1,0 +1,189 @@
+.\"
+.\" "$Id: cupsaddsmb.man 4919 2006-01-12 14:13:01Z mike $"
+.\"
+.\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636 USA
+.\"
+.\"       Voice: (301) 373-9600
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "12 January 2006" "Easy Software Products"
+.SH NAME
+cupsaddsmb \- export printers to samba for windows clients
+.SH SYNOPSIS
+.B cupsaddsmb
+[ -H
+.I samba-server
+] [ -U
+.I samba-user[%samba-password]
+] [ -h
+.I cups-server
+] [ -v ] -a
+.br
+.B cupsaddsmb
+[ -H
+.I samba-server
+] [ -U
+.I samba-user[%samba-password]
+] [ -h
+.I cups-server
+] [ -v ] printer [ ... printer ]
+.SH DESCRIPTION
+\fIcupsaddsmb\fR exports printers to the SAMBA software (version
+2.2.0 or higher) for use with Windows clients. Depending on the
+SAMBA configuration, you may need to provide a password to
+export the printers. This program requires the Windows printer
+driver files described below.
+.LP
+The \fI-H\fR option specifies the SAMBA server which defaults
+to the CUPS server.
+.LP
+The \fI-U\fR option specifies the SAMBA print admin username
+which defaults to your current username. If the username contains
+a percent (%) character, then the text following the percent is
+treated as the SAMBA password to use.
+.LP
+The \fI-a\fR option exports all known printers. Otherwise only
+the named printers are exported.
+.LP
+The \fI-h\fR option specifies a different CUPS server to use.
+.LP
+The \fI-v\fR option specifies that verbose information should be
+shown and is useful for debugging SAMBA configuration problems.
+.SH SAMBA CONFIGURATION
+\fIcupsaddsmb\fR uses the new RPC-based printing support in
+SAMBA 2.2.x to provide printer drivers and PPD files to Windows
+client machines. In order to use this functionality, you must
+first configure SAMBA (via the smb.conf file) to support
+printing through CUPS and provide a printer driver download
+share, as follows:
+.nf
+
+    [global]
+	load printers = yes
+	printing = cups
+	printcap name = cups
+
+    [printers]
+	comment = All Printers
+	path = /var/spool/samba
+	browseable = no
+	public = yes
+	guest ok = yes
+	writable = no
+	printable = yes
+	printer admin = root
+
+    [print$]
+	comment = Printer Drivers
+	path = /etc/samba/drivers
+	browseable = yes
+	guest ok = no
+	read only = yes
+	write list = root
+.fi
+.LP
+This configuration assumes a FHS-compliant installation of
+SAMBA; adjust the [printers] and [print$] share paths
+accordingly on your system as needed.
+
+.SH MICROSOFT POSTSCRIPT DRIVERS FOR WINDOWS
+The base driver for Windows 2000 and higher is the Microsoft
+PostScript driver, which is available on any system running
+Windows 2000 or higher in the
+%WINDOWS%\\SYSTEM32\\SPOOL\\DRIVERS\\W32X86\\3 folder.
+.LP
+The CUPS printer driver is preferred over the Microsoft driver
+since it supports the page-label, job-billing, and
+job-hold-until options fully on all printers. However, currently
+only Windows 2000 and higher is supported by the Microsoft
+driver, so you will also need to get the Adobe driver to support
+Windows 95, 98, and Me clients. The Adobe and Microsoft drivers
+for Windows 2000 are identical.
+.LP
+Once you have extracted the driver files, create a "drivers"
+directory in the CUPS data directory (usually /usr/share/cups)
+and copy the files exactly as named below:
+.nf
+
+    [Windows 2000 and higher]
+    ps5ui.dll
+    pscript.hlp
+    pscript.ntf
+    pscript5.dll
+.fi
+
+.SH CUPS POSTSCRIPT DRIVERS FOR WINDOWS
+\fIcupsaddsmb\fR can use the CUPS v6 PostScript printer driver
+for Windows, which is available for download from the CUPS web
+site.
+.LP
+The CUPS printer driver is preferred over the Adobe and
+Microsoft drivers since it supports the page-label, job-billing,
+and job-hold-until options fully on all printers. However,
+currently only Windows 2000 and higher is supported by the CUPS
+driver, so you will also need to get the Adobe driver to support
+Windows 95, 98, and Me clients.
+.LP
+Once you have extracted the driver files, create a "drivers"
+directory in the CUPS data directory (usually /usr/share/cups)
+and copy the files exactly as named below:
+.nf
+
+    [Windows 2000 and higher]
+    cups6.ini
+    cupsui6.dll
+    cupsdrv6.dll
+    ps5ui.dll
+    pscript.hlp
+    pscript.ntf
+    pscript5.dll
+.fi
+
+.SH ADOBE POSTSCRIPT DRIVERS FOR WINDOWS
+\fIcupsaddsmb\fR can use the Adobe PostScript printer driver for
+Windows, which are available for download from the Adobe web
+site (http://www.adobe.com).
+.LP
+The CUPS printer driver is preferred over the Adobe drivers
+since they support the page-label, job-billing, and
+job-hold-until options fully on all printers. You can use the
+Adobe drivers for Windows 9x and the CUPS drivers for Windows
+2000 and higher. The Adobe and Microsoft drivers for Windows 2000
+are identical.
+.LP
+Once you have extracted the driver files, create a "drivers"
+directory in the CUPS data directory (usually /usr/share/cups)
+and copy the files exactly as named below:
+.nf
+
+    [Windows 95, 98, and Me]
+    ADFONTS.MFM
+    ADOBEPS4.DRV
+    ADOBEPS4.HLP
+    ICONLIB.DLL
+    PSMON.DLL
+.fi
+.SH SEE ALSO
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+http://www.cups.org/windows/
+.SH COPYRIGHT
+Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: cupsaddsmb.man 4919 2006-01-12 14:13:01Z mike $".
+.\"

@@ -1,0 +1,8 @@
+# DO NOT DELETE
+
+mailto.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+mailto.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/array.h
+mailto.o: ../cups/string.h ../config.h
+testnotify.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+testnotify.o: ../cups/ppd.h ../cups/file.h ../cups/language.h ../cups/array.h
+testnotify.o: ../cups/string.h ../config.h

@@ -1,0 +1,286 @@
+CHANGES.txt - 01/12/2006
+------------------------
+
+CHANGES IN CUPS V1.2.0b1
+
+	- The web interface now provides searching, paging, and
+	  changing of the sort/display order of classes, jobs,
+	  and printers.
+	- cupsaddsmb now accepts a password on the command-line
+	  and supports passwords with special characters (STR
+	  #822, STR #1236)
+	- ppdLoad*() no longer tries to "fix" bad characters in
+	  UI text (STR #1101)
+	- Printer names can now (reliably) contain Unicode
+	  characters (STR #896)
+	- The "lpstat -p" command now shows the time and date of
+	  the last printer state change instead of the hardcoded
+	  "Jan 01 00:00" (STR #659)
+	- The scheduler now adds a job-actual-printer-uri
+	  attribute to job objects when printing to a class (STR
+	  #116)
+	- The scheduler now logs log file open errors to the
+	  system log (STR #1289)
+	- The scheduler now sets the job-originating-user-name to
+	  the authenticated username, if available (STR #1318)
+	- The scheduler now only updates the permissions of SSL
+	  keys and certificates when they are under the
+	  ServerRoot directory (STR #1324)
+	- The rastertodymo driver has been renamed to
+	  rastertolabel (a symlink is installed so that existing
+	  queues continue to work) and now also supports Zebra's
+	  CPCL language.
+	- The lpstat command could show the wrong active job for
+	  a printer (STR #1301)
+	- Fixed a potential crash problem in the scheduler when
+	  aborting a CGI program (STR #1290)
+	- Added a "cancel all jobs" button to the class and
+	  printer web interfaces (STR #1140)
+	- The add-printer web page now shows the
+	  set-printer-options page after the printer has been
+	  added (STR #690)
+	- The classes web page now provides links to each of the
+	  member printers (STR #307)
+	- CUPS now handles HTTP request/response lines up to 32k
+	  in length; this is mainly for better cookie support
+	  (STR #1274)
+	- Added support for the Apache PassEnv and SetEnv
+	  directives to cupsd.conf (STR #853)
+	- Added large file (64-bit) support (STR #541)
+	- Fixed a performance issue with the ippReadIO()
+	  implementation (STR #1284)
+	- Fixed a performance issue with the scheduler's implicit
+	  class implementation (STR #1283)
+	- The pdftops filter now adds the Title and Creator
+	  fields from the PDF file to the PostScript document
+	  comments section (STR #539, STR #830)
+	- Added a new cups_array_t and cupsArray*() functions to
+	  the CUPS API to support sorted lists of data.
+	- Made the CUPS API library thread-safe (STR #1276)
+	- Added "media" option support for EFI EFMediaType option
+	  (STR #902)
+	- Added write buffering to the HTTP code to improve
+	  performance (STR #547)
+	- The scheduler now uses the attributes-natural-language
+	  attribute to localize banner pages (STR #386)
+	- The scheduler now returns the address that was used to
+	  connect to it (STR #1076)
+	- Fixed a problem with N-up printing and OpenOffice (STR
+	  #576)
+	- Added support for the GCC position independent
+	  executable options (STR #1209)
+	- Added new BrowseLocalProtocols and
+	  BrowseRemoteProtocols directives to cupsd.conf,
+	  allowing for different browse protocols for local and
+	  remote printers (STR #877)
+	- PPD files can now contain strings up to 256k in length
+	  (STR #1215)
+	- The pstops filter now supports the IncludeFeature DSC
+	  comment (STR #1212)
+	- The pstops filter now disables the setpagedevice
+	  procedure when doing N-up printing (STR #1161)
+	- The serial backend now supports "stop=1", "stop=2",
+	  "parity=space", and "parity=mark" options (STR #1155)
+	- "make install" no longer overwrites an existing PAM
+	  configuration file (STR #1064)
+	- The scheduler now closes all files on startup when run
+	  in daemon mode (STR #1009)
+	- Added a new RGBW colorspace to the CUPS raster format
+	  (STR #1071)
+	- The pdftops filter now sets the page size based on the
+	  media box when not scaling the output (STR #912)
+	- The pdftops filter now supports masked images (STR
+	  #281)
+	- The pdftops filter produced large output when rendering
+	  PDF files containing lot of repeated images (STR #327)
+	- The pdftops filter now minimizes print processing of
+	  PDF files when using the page-ranges option (STR #273)
+	- Updated pdftops filter to Xpdf 3.01.
+	- Added new cupsBackchannelRead() and
+	  cupsBackchannelWrite() functions, as well as
+	  backchannel support to the parallel, serial, socket,
+	  and USB backends (STR #1252)
+	- The parallel and USB backends now treat a "no space
+	  available" error as an out-of-paper condition (STR
+	  #1225)
+	- The "lpc" command now supports the "status all" command
+	  (STR #1004)
+	- ippReadIO() did not read collections properly (STR
+	  #1249)
+	- The "make test" script now creates the test files in
+	  "/tmp/cups-$USER" instead of "/tmp/$USER" (STR #981)
+	- All backends now abort on error when printing a job to
+	  a class - this allows the next printer in the class to
+	  print the job (STR #1084)
+	- The scheduler now verifies that a printer supports
+	  Letter or A4 media sizes before setting them as the
+	  initial default (STR #1250)
+	- The cupstestppd program now flags bad Resolution
+	  options (STR #1269)
+	- The USB backend now retries printing when the printer
+	  is disconnected or turned off (STR #1267)
+	- Added new httpGetHostname() function to CUPS API, and
+	  use it instead of gethostname() so that the web
+	  interface will work correctly on systems whose hostname
+	  is not the FQDN (STR #1266)
+	- The scheduler now stops printers if the backend for the
+	  queue is missing on startup (STR #1265)
+	- The configure script now supports "--disable-library"
+	  to disable particular image file format support
+	  libraries, even if they are available on the build
+	  system (STR #1248)
+	- The IPP backend did not always report on the total
+	  number of pages that were printed (STR #1251)
+	- The lpstat program could display garbage date and time
+	  values for locales whose date format exceeded 31
+	  characters (STR #1263)
+	- The cupstestppd program would segfault when testing
+	  certain broken PPD files (STR #1268)
+	- Dramatically reduced the overhead of implicit classes.
+	- Added new cupsDir*() functions to CUPS API.
+	- Printers can now be published individually for sharing.
+	- Fixed a bug in the scheduler's startup signalling code
+	  which caused cupsd to send the SIGUSR1 signal to the
+	  init process instead of the original parent process
+	  (STR #1258)
+	- Added new on-line help CGI to web interface to provide
+	  searchable help.
+	- Devices are now tracked dynamically, with each query
+	  doing a new device scan.  This eliminates a previous
+	  startup delay caused by slow backends and allows new
+	  printers to be seen without restarting the server,
+	  however it limits the amount of device URI checking
+	  that can be done (basically now the scheduler only
+	  requires a URI with a method that is a listed backend)
+	- Added new printer auto-detection, server configuration,
+	  and log file viewing to the administration web page.
+	- Added new "set allowed users" web interface to set the
+	  list of allowed users for a printer or class.
+	- The scheduler, command-line, and web interfaces now
+	  limit the list of printers and classes to those
+	  accessible by a user.
+	- cupsMarkOptions() now handles more non-standard
+	  duplexing options and choices (STR #915)
+	- cups-lpd now honors remote banner requests with the
+	  "standard" banner whenever a printer does not have one
+	  defined (STR #1220)
+	- The scheduler's denial-of-service checks did not work
+	  properly with IPv6 addresses (STR #1134)
+	- The lp and lpr commands did not error out properly when
+	  they were unable to write to a temporary file (STR
+	  #1129)
+	- The pstops filter did not handle Adobe-specific
+	  comments in Windows NT driver output (STR #1085)
+	- "lpstat -l -p" incorrectly reported the printer
+	  interface (STR #936)
+	- The web interface now operates exclusively with the
+	  UTF-8 encoding, and sends the appropriate character set
+	  and header information to the web browser (STR #919,
+	  STR #1007)
+	- Added a "set allowed users" interface to the web
+	  interface so that you can set the list of allowed or
+	  denied users/groups for a printer or class.
+	- Disallow the "#" character in printer names, since it
+	  has special meaning in the shell, config files, and in
+	  URIs (STR #917, STR #1202)
+	- Added a new application/x-csource MIME type, and
+	  support for it to the texttops filter so that you can
+	  pretty print plain text files without the C/C++
+	  keywords being highlighted.
+	- The pdftops filter did not compile with GCC 4.0 (STR
+	  #1226)
+	- The texttops filter did not highlight preprocessor
+	  directives followed by a tab properly.
+	- HP PJL output now uses both JOB DISPLAY and RDYMSG
+	  commands to show the current job on the printer's
+	  display (STR #1218)
+	- Local authentication certificates are now stored in
+	  /var/run/cups/certs by default instead of
+	  /etc/cups/certs (STR #1211)
+	- Backends now use "&" to separate options in device
+	  URIs; "+" is still recognized but is deprecated (STR
+	  #842)
+	- The USB backend no longer supports the usb:/dev/foo
+	  format on systems that support device ID queries.
+	- Forced classification markings did not work when the
+	  job-sheets parameters were "none,none".
+	- "lpstat -l -p" incorrectly showed all users as allowed,
+	  even if the queue was restricted to certain users (STR
+	  #801)
+	- The scheduler now automatically detects SSL/TLS clients
+	  without using the SSLPort/SSLListen directives.
+	- The CUPS API and scheduler no longer support SSLv2-
+	  encrypted connections.
+	- Updated the cupsaddsmb utility to correctly export the
+	  CUPS driver for Windows.
+	- Fixed a signal-handling bug in httpRead() which
+	  ultimately caused the server to print multiple copies
+	  when it was busy (STR #1184)
+	- The cupsFile API now uses the O_APPEND option when
+	  opening files in append mode (STR #990)
+	- The md5.h header and md5_* functions are now officially
+	  private and have been renamed to avoid conflicts with
+	  other implementations with the same name.
+	- The pdftops filter incorrectly embedded some Type1
+	  fonts (STR #1093)
+	- The scheduler didn't detect a closed connection in the
+	  middle of an IPP request (STR #1153)
+	- The scheduler could block trying to read the job status
+	  if there was input pending and the job was cancelled in
+	  the same input cycle (STR #1157)
+	- The scheduler could crash when deleting a class due to
+	  infinite recursion.
+	- Updated the Zebra ZPL label printer driver to use the
+	  run-length encoding and support more options.
+	- Updated serial backend to scan for /dev/ttyC* as well
+	  as /dev/ttyc* for Cyclades serial ports (STR #1049)
+	- The scheduler could hang reading the job status under
+	  certain circumstances (STR #1068)
+	- The USB backend termination signal code was inverted
+	  (STR #1046)
+	- Moved enable and disable commands to sbindir to be
+	  consistent.
+	- Added new cupsRasterInterpretPPD() function for RIP
+	  filters to setup the raster page header from
+	  PostScript commands in a PPD file.
+	- The CUPS browsing protocol now offers a "delete" bit
+	  to remove printers as soon as they are deleted on the
+	  server or as soon as the server shuts down gracefully
+	  (STR #793)
+	- The CUPS_SERVER and ServerName directives (client.conf
+	  and ~/.cupsrc) may now contain names of the form
+	  "server:port" and "/path/to/domain/socket".
+	- The "cancel -u user" command now works for ordinary
+	  users (STR #751)
+	- Added test run support to "make test" target (STR #64)
+	- Added domain socket support (STR #656)
+	- Added BrowseLocalOptions directive to allow the
+	  administrator to add printer URI options to the browse
+	  URI, e.g. "encryption=required" (STR #732)
+	- Added BrowseRemoteOptions directive to allow the
+	  administrator to add standard URI options to the
+	  remote printer URI, e.g. "encryption=required" (STR
+	  #732)
+	- Now put "-I.." compiler option in front of all others
+	  to ensure that local CUPS headers are used before
+	  installed headers (STR #437)
+	- New cupsLangPrintf() and cupsLangPuts() for localized
+	  interfaces.
+	- Now support custom attributes and extended options in
+	  PPD files.
+	- Now provide functions to save PPD files.
+	- New policy mechanism allows per-operation and
+	  per-printer control over what users and groups are
+	  allowed to do various IPP operations.
+	- New error policy mechanism to control how aborted
+	  backend errors are handled by the scheduler
+	  (abort-job, retry-job, requeue-job, stop-printer)
+	- Updated the printer test page with a better color
+	  wheel and a separate grayscale ramp.
+	- A single backend process is now run to send all print
+	  data for a job.
+	- Backends and filters can now send and receive
+	  backchannel data over file descriptor 3.
+	- Updated the raster stream format to support more
+	  user-defined attributes and to do compression of the
+	  page data.

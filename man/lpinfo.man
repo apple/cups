@@ -1,0 +1,60 @@
+.\"
+.\" "$Id: lpinfo.man 4493 2005-02-18 02:09:53Z mike $"
+.\"
+.\"   lpinfo man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2005 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636 USA
+.\"
+.\"       Voice: (301) 373-9600
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH lpinfo 8 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
+.SH NAME
+lpinfo \- show available devices or drivers
+.SH SYNOPSIS
+.B lpinfo
+[ -E ] [ -l ] [ -m ] [ -v ]
+.SH DESCRIPTION
+\fBlpinfo\fR lists the available devices or drivers known to the CUPS
+server. One of the \fI-m\fR or \fI-v\fR options must be specified to
+get any output:
+.TP 5
+\-E
+.br
+Forces encryption when connecting to the server.
+.TP 5
+\-l
+.br
+Shows a "long" listing of devices or drivers.
+.TP 5
+\-m
+.br
+Shows the available printer drivers on the system.
+.TP 5
+\-v
+.br
+Shows the available printer devices on the system.
+.SH COMPATIBILITY
+The \fBlpinfo\fR command is unique to CUPS.
+.SH SEE ALSO
+lpadmin(8),
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: lpinfo.man 4493 2005-02-18 02:09:53Z mike $".
+.\"

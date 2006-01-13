@@ -1,0 +1,57 @@
+dnl
+dnl "$Id: configure.in 4873 2005-12-07 01:46:54Z mike $"
+dnl
+dnl   Configuration script for the Common UNIX Printing System (CUPS).
+dnl
+dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl
+dnl   These coded instructions, statements, and computer programs are the
+dnl   property of Easy Software Products and are protected by Federal
+dnl   copyright law.  Distribution and use rights are outlined in the file
+dnl   "LICENSE.txt" which should have been included with this file.  If this
+dnl   file is missing or damaged please contact Easy Software Products
+dnl   at:
+dnl
+dnl       Attn: CUPS Licensing Information
+dnl       Easy Software Products
+dnl       44141 Airport View Drive, Suite 204
+dnl       Hollywood, Maryland 20636 USA
+dnl
+dnl       Voice: (301) 373-9600
+dnl       EMail: cups-info@cups.org
+dnl         WWW: http://www.cups.org
+dnl
+
+AC_INIT(cups/cups.h)
+
+sinclude(config-scripts/cups-opsys.m4)
+sinclude(config-scripts/cups-common.m4)
+sinclude(config-scripts/cups-directories.m4)
+sinclude(config-scripts/cups-manpages.m4)
+
+sinclude(config-scripts/cups-sharedlibs.m4)
+sinclude(config-scripts/cups-libtool.m4)
+sinclude(config-scripts/cups-compiler.m4)
+
+sinclude(config-scripts/cups-image.m4)
+sinclude(config-scripts/cups-network.m4)
+sinclude(config-scripts/cups-slp.m4)
+sinclude(config-scripts/cups-ssl.m4)
+sinclude(config-scripts/cups-pam.m4)
+sinclude(config-scripts/cups-threads.m4)
+sinclude(config-scripts/cups-largefile.m4)
+
+MAKEDEFS="../Makedefs"
+AC_SUBST(MAKEDEFS)
+
+sinclude(config-scripts/cups-scripting.m4)
+
+AC_OUTPUT(Makedefs packaging/cups.list cups.sh cups-config
+          conf/cupsd.conf conf/pam.std doc/index.html
+	  doc/help/standard.html templates/edit-config.tmpl)
+
+chmod +x cups-config
+
+dnl
+dnl End of "$Id: configure.in 4873 2005-12-07 01:46:54Z mike $".
+dnl

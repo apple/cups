@@ -1,0 +1,21 @@
+README - 04/08/2003
+-------------------
+
+This directory contains a dynamically loadable CUPS extension
+module for PHP 4.  To compile it type:
+
+    make
+
+To install it, type:
+
+    make install
+
+Questions should be reported to the CUPS newsgroups/mailing
+lists at:
+
+    http://www.cups.org/newsgroups.php
+
+Bug reports and enhancement requests can be submitted via the
+form at:
+
+    http://www.cups.org/str.php

@@ -1,0 +1,193 @@
+#
+# "$Id: Makedefs.in 4836 2005-11-13 06:14:46Z mike $"
+#
+#   Common makefile definitions for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44141 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636 USA
+#
+#       Voice: (301) 373-9600
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+
+#
+# Programs...
+#
+
+AR		=	@AR@
+AWK		=	@AWK@
+CC		=	@LIBTOOL@ @CC@
+CXX		=	@LIBTOOL@ @CXX@
+DSO		=	@DSO@
+HTMLDOC		=	@HTMLDOC@
+INSTALL		=	@INSTALL@
+LIBTOOL		=	@LIBTOOL@
+LN		=	@LN@ -sf
+MV		=	@MV@
+RANLIB		=	@RANLIB@
+RM		=	@RM@ -f
+SED		=	@SED@
+SHELL		=	/bin/sh
+STRIP		=	@STRIP@
+
+#
+# Installation programs...
+#
+
+INSTALL_BIN	=	$(LIBTOOL) $(INSTALL) -m 755 -s
+INSTALL_DATA	=	$(INSTALL) -m 644
+INSTALL_DIR	=	$(INSTALL) -d
+INSTALL_LIB	=	$(LIBTOOL) $(INSTALL) -m 755
+INSTALL_MAN	=	$(INSTALL) -m 644
+INSTALL_SCRIPT	=	$(INSTALL) -m 755
+
+#
+# Default user and group for the scheduler...
+#
+
+CUPS_USER	=	@CUPS_USER@
+CUPS_GROUP	=	@CUPS_GROUP@
+
+#
+# Libraries...
+#
+
+LIBCUPS		=	@LIBCUPS@
+LIBCUPSIMAGE	=	@LIBCUPSIMAGE@
+LIBJPEG		=	@LIBJPEG@
+LIBMALLOC	=	@LIBMALLOC@
+LIBPAPER	=	@LIBPAPER@
+LIBPNG		=	@LIBPNG@
+LIBSLP		=	@LIBSLP@
+LIBTIFF		=	@LIBTIFF@
+LIBZ		=	@LIBZ@
+
+#
+# Program options...
+#
+# OPTIM   defines the common compiler optimization/debugging options.
+# OPTIONS defines other compile-time options (currently only -dDEBUG for
+#         extra debug info)
+#
+
+ARFLAGS		=	@ARFLAGS@
+BACKLIBS	=	@BACKLIBS@
+CFLAGS		=	-I.. $(RC_CFLAGS) $(SSLFLAGS) @CPPFLAGS@ @CFLAGS@ \
+			@LARGEFILE@ $(OPTIONS)
+COMMONLIBS	=	@LIBS@
+CXXFLAGS	=	-I.. $(RC_CFLAGS) $(SSLFLAGS) @CPPFLAGS@ @CXXFLAGS@ \
+			@LARGEFILE@ $(OPTIONS)
+CXXLIBS		=	@CXXLIBS@
+DSOFLAGS	=	@DSOFLAGS@
+DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
+IMGLIBS		=	@IMGLIBS@ -lm
+LDFLAGS		=	-L../cups -L../filter $(RC_CFLAGS) @LDFLAGS@ $(OPTIM)
+LINKCUPS	=	@LINKCUPS@ $(SSLLIBS)
+LINKCUPSIMAGE	=	@LINKCUPSIMAGE@
+LIBS		=	$(LINKCUPS) $(COMMONLIBS)
+OPTIM		=	@OPTIM@
+OPTIONS		=
+PAMLIBS		=	@PAMLIBS@
+SSLFLAGS	=	@SSLFLAGS@
+SSLLIBS		=	@SSLLIBS@
+
+#
+# Directories...
+#
+# The first section uses the GNU names (which are *extremely*
+# difficult to find in a makefile because they are lowercase...)
+# We have to define these first because autoconf uses ${prefix}
+# and ${exec_prefix} for most of the other directories...
+#
+# This is immediately followed by definition in ALL CAPS for the
+# needed directories...
+#
+
+bindir		=	@bindir@
+datadir		=	@datadir@
+exec_prefix	=	@exec_prefix@
+includedir	=	@includedir@
+infodir		=	@infodir@
+libdir		=	@libdir@
+libexecdir	=	@libexecdir@
+localstatedir	=	@localstatedir@
+mandir		=	@mandir@
+oldincludedir	=	@oldincludedir@
+prefix		=	@prefix@
+sbindir		=	@sbindir@
+sharedstatedir	=	@sharedstatedir@
+srcdir		=	@srcdir@
+sysconfdir	=	@sysconfdir@
+top_srcdir	=	@top_srcdir@
+
+BUILDROOT	=	$(DSTROOT)
+
+AMANDIR		=	$(BUILDROOT)@AMANDIR@
+BINDIR		=	$(BUILDROOT)@bindir@
+CACHEDIR	=	$(BUILDROOT)@CUPS_CACHEDIR@
+DATADIR		=	$(BUILDROOT)@CUPS_DATADIR@
+DOCDIR		=	$(BUILDROOT)@CUPS_DOCROOT@
+INCLUDEDIR	=	$(BUILDROOT)$(includedir)
+INITDIR		=	@INITDIR@
+INITDDIR	=	@INITDDIR@
+LIBDIR		=	$(BUILDROOT)$(libdir)
+LOCALEDIR	= 	$(BUILDROOT)@CUPS_LOCALEDIR@
+LOGDIR		= 	$(BUILDROOT)@CUPS_LOGDIR@
+MANDIR		=	$(BUILDROOT)@mandir@
+PMANDIR		=	$(BUILDROOT)@PMANDIR@
+REQUESTS	= 	$(BUILDROOT)@CUPS_REQUESTS@
+SBINDIR		=	$(BUILDROOT)@sbindir@
+SERVERBIN	= 	$(BUILDROOT)@CUPS_SERVERBIN@
+SERVERROOT	= 	$(BUILDROOT)@CUPS_SERVERROOT@
+STATEDIR	=	$(BUILDROOT)@CUPS_STATEDIR@
+
+MAN1EXT		=	@MAN1EXT@
+MAN5EXT		=	@MAN5EXT@
+MAN8EXT		=	@MAN8EXT@
+MAN8DIR		=	@MAN8DIR@
+
+PAMDIR		=	$(BUILDROOT)@PAMDIR@
+PAMFILE		=	@PAMFILE@
+
+
+#
+# Rules...
+#
+
+.SILENT:
+.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .8 .8.gz .a .c .cxx .h .man .o .gz
+
+.c.o:
+	echo Compiling $<...
+	$(CC) $(OPTIM) $(CFLAGS) -c $<
+
+.cxx.o:
+	echo Compiling $<...
+	$(CXX) $(OPTIM) $(CXXFLAGS) -c $<
+
+.man.1 .man.1m .man.5 .man.8:
+	echo Linking $<...
+	$(RM) $@
+	$(LN) $< $@
+
+.man.1.gz .man.1m.gz .man.5.gz .man.8.gz .man.gz:
+	echo -n Compressing $<...
+	$(RM) $@
+	gzip -v9 <$< >$@
+
+
+#
+# End of "$Id: Makedefs.in 4836 2005-11-13 06:14:46Z mike $"
+#

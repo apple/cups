@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# "$Id$"
+#
+# Test script for making RPMs...
+#
+
+# Make sure we are running in the right directory...
+if test ! -f tools/testrpm; then
+        echo "Run this script from the top-level CUPS source directory, e.g.:"
+        echo ""
+        echo "    tools/testrpm"
+        echo ""
+        exit 1
+fi
+
+# Get a snapshot of the current source...
+. tools/makesrcdist
+
+# Build the RPM...
+echo Building rpm...
+rm -f /usr/src/redhat/RPMS/i386/cups*.rpm
+rm -f /usr/src/redhat/SRPMS/cups*.rpm
+rpmbuild -ta cups-$fileversion-source.tar.bz2
+
+#
+# End of "$Id$".
+#
