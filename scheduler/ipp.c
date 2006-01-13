@@ -6146,106 +6146,25 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   ipp_attribute_t *attr;		/* Current attribute */
   int		jobid;			/* Job ID */
   cupsd_job_t	*job;			/* Current job */
-  const char	*dest;			/* Destination */
-  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  const char	*src,			/* Source printer/class */
+		*dest;			/* Destination */
+  cups_ptype_t	stype,			/* Source type (printer or class) */
+		dtype;			/* Destination type (printer or class) */
   char		method[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
-  cupsd_printer_t *printer;		/* Printer */
+  cupsd_printer_t *sprinter,		/* Source printer */
+		*dprinter;		/* Destination printer */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "move_job(%p[%d], %s)", con, con->http.fd,
                   uri->values[0].string.text);
 
  /*
-  * See if we have a job URI or a printer URI...
+  * Get the new printer or class...
   */
-
-  if (strcmp(uri->name, "printer-uri") == 0)
-  {
-   /*
-    * Got a printer URI; see if we also have a job-id attribute...
-    */
-
-    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
-    {
-      send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Got a printer-uri attribute but no job-id!"));
-      return;
-    }
-
-    jobid = attr->values[0].integer;
-  }
-  else
-  {
-   /*
-    * Got a job URI; parse it to get the job ID...
-    */
-
-    httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
-                    username, sizeof(username), host, sizeof(host), &port,
-		    resource, sizeof(resource));
-
-    if (strncmp(resource, "/jobs/", 6))
-    {
-     /*
-      * Not a valid URI!
-      */
-
-      send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\"!"),
-                      uri->values[0].string.text);
-      return;
-    }
-
-    jobid = atoi(resource + 6);
-  }
-
- /*
-  * See if the job exists...
-  */
-
-  if ((job = cupsdFindJob(jobid)) == NULL)
-  {
-   /*
-    * Nope - return a "not found" error...
-    */
-
-    send_ipp_status(con, IPP_NOT_FOUND,
-                    _("Job #%d does not exist!"), jobid);
-    return;
-  }
-
- /*
-  * See if the job has been completed...
-  */
-
-  if (job->state->values[0].integer > IPP_JOB_STOPPED)
-  {
-   /*
-    * Return a "not-possible" error...
-    */
-
-    send_ipp_status(con, IPP_NOT_POSSIBLE,
-                    _("Job #%d is finished and cannot be altered!"),
-		    jobid);
-    return;
-  }
-
- /*
-  * See if the job is owned by the requesting user...
-  */
-
-  if (!validate_user(job, con, job->username, username, sizeof(username)))
-  {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to move job #%d owned "
-		      "by \"%s\"!"),
-                    jobid, job->username);
-    return;
-  }
 
   if ((attr = ippFindAttribute(con->request, "job-printer-uri", IPP_TAG_URI)) == NULL)
   {
@@ -6258,15 +6177,11 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     return;
   }
     
- /*
-  * Get the new printer or class...
-  */
-
   httpSeparateURI(attr->values[0].string.text, method, sizeof(method),
                   username, sizeof(username), host, sizeof(host), &port,
 		  resource, sizeof(resource));
 
-  if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
+  if ((dest = cupsdValidateDest(host, resource, &dtype, &dprinter)) == NULL)
   {
    /*
     * Bad URI...
@@ -6281,17 +6196,191 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   * Check policy...
   */
 
-  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
+  if ((status = cupsdCheckPolicy(dprinter->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
     send_http_error(con, status);
     return;
   }
 
  /*
-  * Move the job to a different printer or class...
+  * See if we have a job URI or a printer URI...
   */
 
-  cupsdMoveJob(job, dest);
+  httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
+                  username, sizeof(username), host, sizeof(host), &port,
+		  resource, sizeof(resource));
+
+  if (!strcmp(uri->name, "printer-uri"))
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id", IPP_TAG_INTEGER)) == NULL)
+    {
+     /*
+      * Move all jobs...
+      */
+
+      if ((src = cupsdValidateDest(host, resource, &stype, &sprinter)) == NULL)
+      {
+       /*
+	* Bad URI...
+	*/
+
+	send_ipp_status(con, IPP_NOT_FOUND,
+                	_("The printer or class was not found."));
+	return;
+      }
+
+      job = NULL;
+    }
+    else
+    {
+     /*
+      * Otherwise, just move a single job...
+      */
+
+      if ((job = cupsdFindJob(attr->values[0].integer)) == NULL)
+      {
+       /*
+	* Nope - return a "not found" error...
+	*/
+
+	send_ipp_status(con, IPP_NOT_FOUND,
+                	_("Job #%d does not exist!"), attr->values[0].integer);
+	return;
+      }
+      else
+      {
+       /*
+        * Job found, initialize source pointers...
+	*/
+
+	src      = NULL;
+	sprinter = NULL;
+      }
+    }
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    if (strncmp(resource, "/jobs/", 6))
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
+                      uri->values[0].string.text);
+      return;
+    }
+
+   /*
+    * See if the job exists...
+    */
+
+    jobid = atoi(resource + 6);
+
+    if ((job = cupsdFindJob(jobid)) == NULL)
+    {
+     /*
+      * Nope - return a "not found" error...
+      */
+
+      send_ipp_status(con, IPP_NOT_FOUND,
+                      _("Job #%d does not exist!"), jobid);
+      return;
+    }
+    else
+    {
+     /*
+      * Job found, initialize source pointers...
+      */
+
+      src      = NULL;
+      sprinter = NULL;
+    }
+  }
+
+ /*
+  * Now move the job or jobs...
+  */
+
+  if (job)
+  {
+   /*
+    * See if the job has been completed...
+    */
+
+    if (job->state->values[0].integer > IPP_JOB_STOPPED)
+    {
+     /*
+      * Return a "not-possible" error...
+      */
+
+      send_ipp_status(con, IPP_NOT_POSSIBLE,
+                      _("Job #%d is finished and cannot be altered!"),
+		      job->id);
+      return;
+    }
+
+   /*
+    * See if the job is owned by the requesting user...
+    */
+
+    if (!validate_user(job, con, job->username, username, sizeof(username)))
+    {
+      send_ipp_status(con, IPP_FORBIDDEN,
+                      _("You are not authorized to move job #%d owned "
+			"by \"%s\"!"),
+                      job->id, job->username);
+      return;
+    }
+
+   /*
+    * Move the job to a different printer or class...
+    */
+
+    cupsdMoveJob(job, dest);
+  }
+  else
+  {
+   /*
+    * Got the source printer, now look through the jobs...
+    */
+
+    for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
+         job;
+	 job = (cupsd_job_t *)cupsArrayNext(Jobs))
+    {
+     /*
+      * See if the job is pointing at the source printer or has not been
+      * completed...
+      */
+
+      if (strcasecmp(job->dest, src) ||
+          job->state->values[0].integer > IPP_JOB_STOPPED)
+	continue;
+
+     /*
+      * See if the job can be moved by the requesting user...
+      */
+
+      if (!validate_user(job, con, job->username, username, sizeof(username)))
+        continue;
+
+     /*
+      * Move the job to a different printer or class...
+      */
+
+      cupsdMoveJob(job, dest);
+    }
+  }
 
  /*
   * Start jobs if possible...
