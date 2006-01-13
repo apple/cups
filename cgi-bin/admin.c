@@ -256,16 +256,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
     *    printer-uri
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = CUPS_GET_PRINTERS;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(CUPS_GET_PRINTERS);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/printers");
@@ -331,16 +322,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
       *    printer-uri
       */
 
-      request = ippNew();
-
-      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-      request->request.op.request_id   = 1;
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	   "attributes-natural-language", NULL, language->language);
+      request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
       httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                        "/classes/%s", name);
@@ -443,16 +425,7 @@ do_am_class(http_t      *http,		/* I - HTTP connection */
   *    member-uris
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_ADD_CLASS;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(CUPS_ADD_CLASS);
 
   httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                    "/classes/%s", cgiGetVariable("PRINTER_NAME"));
@@ -575,16 +548,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     *    printer-uri
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
     httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                      "/printers/%s", cgiGetVariable("PRINTER_NAME"));
@@ -669,16 +633,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     *    printer-uri
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = CUPS_GET_DEVICES;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(CUPS_GET_DEVICES);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/printers/");
@@ -860,20 +815,10 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     *    printer-uri
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = CUPS_GET_PPDS;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(CUPS_GET_PPDS);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/printers/");
-
 
     if ((var = cgiGetVariable("PPD_MAKE")) != NULL)
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
@@ -1001,16 +946,7 @@ do_am_printer(http_t      *http,	/* I - HTTP connection */
     *    printer-state
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = CUPS_ADD_PRINTER;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(CUPS_ADD_PRINTER);
 
     httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                      "/printers/%s", cgiGetVariable("PRINTER_NAME"));
@@ -1333,9 +1269,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     *    printer-uri
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
     request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
@@ -1581,16 +1515,7 @@ do_config_printer(http_t      *http,	/* I - HTTP connection */
     *    [ppd file]
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = CUPS_ADD_PRINTER;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(CUPS_ADD_PRINTER);
 
     httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                      "/printers/%s", cgiGetVariable("PRINTER_NAME"));
@@ -2471,16 +2396,7 @@ do_delete_class(http_t      *http,	/* I - HTTP connection */
   *    printer-uri
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_DELETE_CLASS;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(CUPS_DELETE_CLASS);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
@@ -2556,16 +2472,7 @@ do_delete_printer(http_t      *http,	/* I - HTTP connection */
   *    printer-uri
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_DELETE_PRINTER;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(CUPS_DELETE_PRINTER);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
@@ -2779,15 +2686,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
   * Get the list of printers and their devices...
   */
 
-  request = ippNew();
-  request->request.op.operation_id = CUPS_GET_PRINTERS;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(CUPS_GET_PRINTERS);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", NULL, "device-uri");
@@ -2850,15 +2749,7 @@ do_menu(http_t      *http,		/* I - HTTP connection */
 
     ippDelete(response);
 
-    request = ippNew();
-    request->request.op.operation_id = CUPS_GET_DEVICES;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(CUPS_GET_DEVICES);
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
@@ -3069,16 +2960,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
   *    printer-uri
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = op;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(op);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
@@ -3193,16 +3075,7 @@ do_set_allowed_users(
     *    requested-attributes
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
@@ -3293,16 +3166,7 @@ do_set_allowed_users(
     *    requesting-user-name-{allowed,denied}
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = CUPS_ADD_PRINTER;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(CUPS_ADD_PRINTER);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
@@ -3459,16 +3323,7 @@ do_set_sharing(http_t      *http,	/* I - HTTP connection */
   *    printer-is-shared
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_ADD_PRINTER;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(CUPS_ADD_PRINTER);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);

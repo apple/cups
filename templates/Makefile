@@ -28,7 +28,8 @@ include ../Makedefs
 # Template files...
 #
 
-FILES	=	add-class.tmpl \
+FILES	=	\
+		add-class.tmpl \
 		add-printer.tmpl \
 		admin-op.tmpl \
 		admin.tmpl \
@@ -40,8 +41,10 @@ FILES	=	add-class.tmpl \
 		class-added.tmpl \
 		class-confirm.tmpl \
 		class-deleted.tmpl \
-		classes.tmpl \
+		class-jobs-header.tmpl \
 		class-modified.tmpl \
+		classes.tmpl \
+		classes-header.tmpl \
 		edit-config.tmpl \
 		error.tmpl \
 		header.tmpl \
@@ -52,6 +55,7 @@ FILES	=	add-class.tmpl \
 		job-release.tmpl \
 		job-restart.tmpl \
 		jobs.tmpl \
+		jobs-header.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
 		option-boolean.tmpl \
@@ -60,19 +64,23 @@ FILES	=	add-class.tmpl \
 		option-pickmany.tmpl \
 		option-pickone.tmpl \
 		option-trailer.tmpl \
+		page.tmpl \
 		printer-accept.tmpl \
 		printer-added.tmpl \
 		printer-configured.tmpl \
 		printer-confirm.tmpl \
 		printer-default.tmpl \
 		printer-deleted.tmpl \
+		printer-jobs-header.tmpl \
 		printer-modified.tmpl \
 		printer-purge.tmpl \
 		printer-reject.tmpl \
 		printer-start.tmpl \
-		printers.tmpl \
 		printer-stop.tmpl \
+		printers.tmpl \
+		printers-header.tmpl \
 		restart.tmpl \
+		search.tmpl \
 		set-printer-options-header.tmpl \
 		set-printer-options-trailer.tmpl \
 		test-page.tmpl \

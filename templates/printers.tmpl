@@ -1,9 +1,4 @@
-<P><A HREF="/admin?op=add-printer"><IMG
-SRC="/images/add-printer.gif" ALT="Add Printer"
-CLASS="button"></A></P>
-
-{#printer_name=0?No printers:
-<P><B>Server Default Destination:</B> {default_name?<A HREF="{default_uri}">{default_name}</A>:none}</P>
+{#printer_name=0?:
 {[printer_name]
 <H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}</H2>
 

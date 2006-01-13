@@ -29,6 +29,8 @@
  *   cgiRewriteURL()       - Rewrite a printer URI into a web browser URL...
  *   cgiSetIPPObjectVars() - Set CGI variables from an IPP object.
  *   cgiSetIPPVars()       - Set CGI variables from an IPP response.
+ *   cgiShowIPPError()     - Show the last IPP error message.
+ *   cgiShowJobs()         - Show print jobs.
  */
 
 /*
@@ -687,6 +689,21 @@ cgiSetIPPVars(ipp_t      *response,	/* I - Response data to be copied... */
 
 
 /*
+ * 'cgiShowIPPError()' - Show the last IPP error message.
+ *
+ * The caller must still call cgiStartHTML() and cgiEndHTML().
+ */
+
+void
+cgiShowIPPError(const char *message)	/* I - Contextual message */
+{
+  cgiSetVariable("MESSAGE", _cupsLangString(cupsLangDefault(), message));
+  cgiSetVariable("ERROR", cupsLastErrorString());
+  cgiCopyTemplateLang("error.tmpl");
+}
+
+
+/*
  * 'cgiShowJobs()' - Show print jobs.
  */
 
@@ -708,7 +725,6 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
   char			url[1024],	/* URL for prev/next/this */
 			*urlptr,	/* Position in URL */
 			*urlend;	/* End of URL */
-  cups_lang_t		*language;	/* Language information */
 
 
  /*
@@ -720,18 +736,7 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
   *    printer-uri
   */
 
-  request = ippNew();
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  request->request.op.operation_id = IPP_GET_JOBS;
-  request->request.op.request_id   = 1;
+  request = ippNewRequest(IPP_GET_JOBS);
 
   if (dest)
   {
@@ -760,7 +765,7 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     * Get a list of matching job objects.
     */
 
-    if (!dest && (var = cgiGetVariable("QUERY")) != NULL)
+    if ((var = cgiGetVariable("QUERY")) != NULL)
       search = cgiCompileSearch(var);
     else
       search = NULL;
@@ -817,14 +822,14 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
 
     urlend = url + sizeof(url);
 
-    if (dest)
+    if ((var = cgiGetVariable("QUERY")) != NULL)
     {
-      snprintf(url, sizeof(url), "/%s/%s?", cgiGetVariable("SECTION"), dest);
-      urlptr = url + strlen(url);
-    }
-    else if ((var = cgiGetVariable("QUERY")) != NULL)
-    {
-      strlcpy(url, "/jobs/?QUERY=", sizeof(url));
+      if (dest)
+        snprintf(url, sizeof(url), "/%s/%s?QUERY=", cgiGetVariable("SECTION"),
+	         dest);
+      else
+        strlcpy(url, "/jobs/?QUERY=", sizeof(url));
+
       urlptr = url + strlen(url);
 
       cgiFormEncode(urlptr, var, urlend - urlptr);
@@ -835,7 +840,11 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     }
     else
     {
-      strlcpy(url, "/jobs/?", sizeof(url));
+      if (dest)
+        snprintf(url, sizeof(url), "/%s/%s?", cgiGetVariable("SECTION"), dest);
+      else
+        strlcpy(url, "/jobs/?", sizeof(url));
+
       urlptr = url + strlen(url);
     }
 
@@ -872,8 +881,10 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     * Then show everything...
     */
 
-    if (!dest)
-      cgiCopyTemplateLang("search.tmpl");
+    if (dest)
+      cgiSetVariable("SEARCH_DEST", dest);
+
+    cgiCopyTemplateLang("search.tmpl");
 
     cgiCopyTemplateLang("jobs-header.tmpl");
 
@@ -888,7 +899,6 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     ippDelete(response);
   }
 }
-
 
 
 /*

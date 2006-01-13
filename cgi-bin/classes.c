@@ -34,6 +34,14 @@
 
 
 /*
+ * Local functions...
+ */
+
+void	show_all_classes(http_t *http, const char *username);
+void	show_class(http_t *http, const char *printer);
+
+
+/*
  * 'main()' - Main entry for CGI.
  */
 
@@ -41,17 +49,16 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  cups_lang_t	*language;		/* Language information */
-  char		*pclass;		/* Printer class name */
+  const char	*pclass;		/* Class name */
+  const char	*user;			/* Username */
   http_t	*http;			/* Connection to the server */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* IPP attribute */
-  ipp_status_t	status;			/* Operation status... */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
-  const char	*which_jobs;		/* Which jobs to show */
   const char	*op;			/* Operation to perform, if any */
-  static const char	*def_attrs[] =	/* Attributes for default printer */
+  char		refresh[1024];		/* Refresh URL */
+  static const char *def_attrs[] =	/* Attributes for default printer */
 		{
 		  "printer-name",
 		  "printer-uri-supported"
@@ -63,6 +70,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   cgiInitialize();
+
   op = cgiGetVariable("OP");
 
  /*
@@ -72,10 +80,20 @@ main(int  argc,				/* I - Number of command-line arguments */
   cgiSetVariable("SECTION", "classes");
 
  /*
-  * Get the request language...
+  * See if we are displaying a printer or all classes...
   */
 
-  language = cupsLangDefault();
+  if (!strcmp(argv[0], "/") || strstr(argv[0], "classes.cgi"))
+    pclass = NULL;
+  else
+    pclass = argv[0];
+
+ /*
+  * See who is logged in...
+  */
+
+  if ((user = getenv("REMOTE_USER")) == NULL)
+    user = "guest";
 
  /*
   * Connect to the HTTP server...
@@ -84,48 +102,16 @@ main(int  argc,				/* I - Number of command-line arguments */
   http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
  /*
-  * Tell the client to expect UTF-8 encoded HTML...
+  * Get the default printer...
   */
 
-  puts("Content-Type: text/html;charset=utf-8\n");
-
- /*
-  * See if we need to show a list of printers or the status of a
-  * single printer...
-  */
-
-  cgiSetServerVersion();
-
-  pclass = argv[0];
-  if (strcmp(pclass, "/") == 0 || strcmp(pclass, "classes.cgi") == 0)
+  if (op == NULL || strcasecmp(op, "print-test-page"))
   {
-    pclass = NULL;
-    cgiSetVariable("TITLE", _cupsLangString(language, _("Class")));
-  }
-  else
-    cgiSetVariable("TITLE", pclass);
-
-  if (op == NULL || strcasecmp(op, "print-test-page") != 0)
-  {
-   /*
-    * Show the standard header...
-    */
-
-    cgiCopyTemplateLang("header.tmpl");
-
    /*
     * Get the default destination...
     */
 
-    request = ippNew();
-    request->request.op.operation_id = CUPS_GET_DEFAULT;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(CUPS_GET_DEFAULT);
 
     ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                   "requested-attributes",
@@ -150,135 +136,16 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
    /*
-    * Get the class info...
+    * See if we need to show a list of classes or the status of a
+    * single printer...
     */
 
-    request = ippNew();
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
-
-    if (pclass == NULL)
-    {
-     /*
-      * Build a CUPS_GET_CLASSES request, which requires the following
-      * attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      */
-
-      request->request.op.operation_id = CUPS_GET_CLASSES;
-      request->request.op.request_id   = 1;
-
-      if (getenv("REMOTE_USER") != NULL)
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                     NULL, getenv("REMOTE_USER"));
-    }
+    if (!pclass)
+      show_all_classes(http, user);
     else
-    {
-     /*
-      * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
-      * attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      *    printer-uri
-      */
-
-      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-      request->request.op.request_id   = 1;
-
-      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/classes/%s", pclass);
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
-                   uri);
-    }
-
-    cgiGetAttributes(request, "classes.tmpl");
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(http, request, "/")) != NULL)
-    {
-      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-      ippDelete(response);
-    }
-
-   /*
-    * Write the report...
-    */
-
-    cgiCopyTemplateLang("classes.tmpl");
-
-   /*
-    * Get jobs for the specified class if a class has been chosen...
-    */
-
-    if (pclass != NULL)
-    {
-     /*
-      * Build an IPP_GET_JOBS request, which requires the following
-      * attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      *    printer-uri
-      */
-
-      request = ippNew();
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	   "attributes-natural-language", NULL, language->language);
-
-      request->request.op.operation_id = IPP_GET_JOBS;
-      request->request.op.request_id   = 1;
-
-      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/classes/%s", pclass);
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
-                   uri);
-
-      if ((which_jobs = cgiGetVariable("which_jobs")) != NULL)
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
-                     NULL, which_jobs);
-
-      if (getenv("REMOTE_USER") != NULL)
-      {
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                     NULL, getenv("REMOTE_USER"));
-
-	if (strcmp(getenv("REMOTE_USER"), "root"))
-	  ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
-      }
-      else
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                     NULL, "unknown");
-
-      cgiGetAttributes(request, "jobs.tmpl");
-
-     /*
-      * Do the request and get back a response...
-      */
-
-      if ((response = cupsDoRequest(http, request, "/")) != NULL)
-      {
-	cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-	ippDelete(response);
-
-	cgiCopyTemplateLang("jobs.tmpl");
-      }
-    }
+      show_class(http, pclass);
   }
-  else
+  else if (!strcasecmp(op, "print-test-page"))
   {
    /*
     * Print a test page...
@@ -286,12 +153,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     char	filename[1024];		/* Test page filename */
     const char	*datadir;		/* CUPS_DATADIR env var */
-    char	refresh[1024];		/* Refresh URL */
 
-
-    cgiFormEncode(uri, pclass, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "2;/classes/%s", uri);
-    cgiSetVariable("refresh_page", refresh);
 
     if ((datadir = getenv("CUPS_DATADIR")) == NULL)
       datadir = CUPS_DATADIR;
@@ -311,26 +173,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     *    document-format
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_PRINT_JOB;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(IPP_PRINT_JOB);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
 
-    if (getenv("REMOTE_USER") != NULL)
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                   NULL, getenv("REMOTE_USER"));
-    else
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                   NULL, "root");
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                 "requesting-user-name", NULL, user);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
         	 NULL, "Test Page");
@@ -345,49 +194,323 @@ main(int  argc,				/* I - Number of command-line arguments */
     if ((response = cupsDoFileRequest(http, request, uri + 15,
                                       filename)) != NULL)
     {
-      status = response->request.status.status_code;
       cgiSetIPPVars(response, NULL, NULL, NULL, 0);
 
       ippDelete(response);
     }
-    else
-      status = cupsLastError();
 
-    cgiSetVariable("PRINTER_NAME", pclass);
-
-   /*
-    * Show the standard header...
-    */
-
-    cgiCopyTemplateLang("header.tmpl");
-
-   /*
-    * Show the result...
-    */
-
-    if (status > IPP_OK_CONFLICT)
+    if (cupsLastError() <= IPP_OK_CONFLICT)
     {
-      cgiSetVariable("ERROR", ippErrorString(status));
-      cgiCopyTemplateLang("error.tmpl");
+     /*
+      * Automatically reload the printer status page...
+      */
+
+      cgiFormEncode(uri, pclass, sizeof(uri));
+      snprintf(refresh, sizeof(refresh), "2;/classes/%s", uri);
+      cgiSetVariable("refresh_page", refresh);
     }
+
+    cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Print Test Page")));
+    
+    if (cupsLastError() > IPP_OK_CONFLICT)
+      cgiShowIPPError(_("Unable to print test page:"));
     else
+    {
+      cgiSetVariable("PRINTER_NAME", pclass);
+
       cgiCopyTemplateLang("test-page.tmpl");
+    }
   }
 
-  cgiCopyTemplateLang("trailer.tmpl");
+  cgiEndHTML();
 
  /*
   * Close the HTTP server connection...
   */
 
   httpClose(http);
-  cupsLangFree(language);
 
  /*
   * Return with no errors...
   */
 
   return (0);
+}
+
+
+/*
+ * 'show_all_classes()' - Show all classes...
+ */
+
+void
+show_all_classes(http_t     *http,	/* I - Connection to server */
+                  const char *user)	/* I - Username */
+{
+  int			i;		/* Looping var */
+  ipp_t			*request,	/* IPP request */
+			*response;	/* IPP response */
+  cups_array_t		*classes;	/* Array of class objects */
+  ipp_attribute_t	*pclass;	/* Class object */
+  int			ascending,	/* Order of classes (0 = descending) */
+			first,		/* First class to show */
+			count;		/* Number of classes */
+  const char		*var;		/* Form variable */
+  void			*search;	/* Search data */
+  char			url[1024],	/* URL for prev/next/this */
+			*urlptr,	/* Position in URL */
+			*urlend;	/* End of URL */
+
+
+ /*
+  * Show the standard header...
+  */
+
+  cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Classes")));
+
+ /*
+  * Build a CUPS_GET_CLASSES request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    requesting-user-name
+  */
+
+  request = ippNewRequest(CUPS_GET_CLASSES);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+               "requesting-user-name", NULL, user);
+
+  cgiGetAttributes(request, "classes.tmpl");
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+   /*
+    * Get a list of matching job objects.
+    */
+
+    if ((var = cgiGetVariable("QUERY")) != NULL)
+      search = cgiCompileSearch(var);
+    else
+      search = NULL;
+
+    classes = cgiGetIPPObjects(response, search);
+    count   = cupsArrayCount(classes);
+
+    if (search)
+      cgiFreeSearch(search);
+
+   /*
+    * Figure out which classes to display...
+    */
+
+    if ((var = cgiGetVariable("FIRST")) != NULL)
+      first = atoi(var);
+    else
+      first = 0;
+
+    if (first >= count)
+      first = count - CUPS_PAGE_MAX;
+
+    first = (first / CUPS_PAGE_MAX) * CUPS_PAGE_MAX;
+
+    if (first < 0)
+      first = 0;
+
+    sprintf(url, "%d", count);
+    cgiSetVariable("TOTAL", url);
+
+    if ((var = cgiGetVariable("ORDER")) != NULL)
+      ascending = !strcasecmp(var, "asc");
+    else
+      ascending = 1;
+
+    if (ascending)
+    {
+      for (i = 0, pclass = (ipp_attribute_t *)cupsArrayIndex(classes, first);
+	   i < CUPS_PAGE_MAX && pclass;
+	   i ++, pclass = (ipp_attribute_t *)cupsArrayNext(classes))
+        cgiSetIPPObjectVars(pclass, NULL, i);
+    }
+    else
+    {
+      for (i = 0, pclass = (ipp_attribute_t *)cupsArrayIndex(classes, count - first - 1);
+	   i < CUPS_PAGE_MAX && pclass;
+	   i ++, pclass = (ipp_attribute_t *)cupsArrayPrev(classes))
+        cgiSetIPPObjectVars(pclass, NULL, i);
+    }
+
+   /*
+    * Save navigation URLs...
+    */
+
+    urlend = url + sizeof(url);
+
+    if ((var = cgiGetVariable("QUERY")) != NULL)
+    {
+      strlcpy(url, "/classes/?QUERY=", sizeof(url));
+      urlptr = url + strlen(url);
+
+      cgiFormEncode(urlptr, var, urlend - urlptr);
+      urlptr += strlen(urlptr);
+
+      strlcpy(urlptr, "&", urlend - urlptr);
+      urlptr += strlen(urlptr);
+    }
+    else
+    {
+      strlcpy(url, "/classes/?", sizeof(url));
+      urlptr = url + strlen(url);
+    }
+
+    snprintf(urlptr, urlend - urlptr, "FIRST=%d", first);
+    cgiSetVariable("THISURL", url);
+
+    if (first > 0)
+    {
+      snprintf(urlptr, urlend - urlptr, "FIRST=%d&ORDER=%s",
+	       first - CUPS_PAGE_MAX, ascending ? "asc" : "dec");
+      cgiSetVariable("PREVURL", url);
+    }
+
+    if ((first + CUPS_PAGE_MAX) < count)
+    {
+      snprintf(urlptr, urlend - urlptr, "FIRST=%d&ORDER=%s",
+	       first + CUPS_PAGE_MAX, ascending ? "asc" : "dec");
+      cgiSetVariable("NEXTURL", url);
+    }
+
+   /*
+    * Then show everything...
+    */
+
+    cgiCopyTemplateLang("search.tmpl");
+
+    cgiCopyTemplateLang("classes-header.tmpl");
+
+    if (count > CUPS_PAGE_MAX)
+      cgiCopyTemplateLang("page.tmpl");
+
+    cgiCopyTemplateLang("classes.tmpl");
+
+    if (count > CUPS_PAGE_MAX)
+      cgiCopyTemplateLang("page.tmpl");
+
+   /*
+    * Delete the response...
+    */
+
+    ippDelete(response);
+  }
+  else
+  {
+   /*
+    * Show the error...
+    */
+
+    cgiShowIPPError(_("Unable to get printer list:"));
+  }
+}
+
+
+/*
+ * 'show_class()' - Show a single class.
+ */
+
+void
+show_class(http_t     *http,		/* I - Connection to server */
+           const char *pclass)		/* I - Name of class */
+{
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* IPP attribute */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  char		refresh[1024];		/* Refresh URL */
+
+
+ /*
+  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  */
+
+  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/classes/%s", pclass);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
+               uri);
+
+  cgiGetAttributes(request, "classes.tmpl");
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+   /*
+    * Got the result; set the CGI variables and check the status of a
+    * single-queue request...
+    */
+
+    cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+
+    if (pclass && (attr = ippFindAttribute(response, "printer-state",
+                                            IPP_TAG_ENUM)) != NULL &&
+        attr->values[0].integer == IPP_PRINTER_PROCESSING)
+    {
+     /*
+      * Class is processing - automatically refresh the page until we
+      * are done printing...
+      */
+
+      cgiFormEncode(uri, pclass, sizeof(uri));
+      snprintf(refresh, sizeof(refresh), "10;/classes/%s", uri);
+      cgiSetVariable("refresh_page", refresh);
+    }
+
+   /*
+    * Delete the response...
+    */
+
+    ippDelete(response);
+
+   /*
+    * Show the standard header...
+    */
+
+    cgiStartHTML(pclass);
+
+   /*
+    * Show the class status...
+    */
+
+    cgiCopyTemplateLang("classes.tmpl");
+
+   /*
+    * Show jobs for the specified class...
+    */
+
+    cgiCopyTemplateLang("class-jobs-header.tmpl");
+    cgiShowJobs(http, pclass);
+  }
+  else
+  {
+   /*
+    * Show the IPP error...
+    */
+
+    cgiStartHTML(pclass);
+    cgiShowIPPError(_("Unable to get class status:"));
+  }
 }
 
 

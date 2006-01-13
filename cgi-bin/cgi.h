@@ -95,6 +95,7 @@ extern int		cgiSetIPPVars(ipp_t *response, const char *filter_name,
 extern void		cgiSetServerVersion(void);
 extern void		cgiSetSize(const char *name, int size);
 extern void		cgiSetVariable(const char *name, const char *value);
+extern void		cgiShowIPPError(const char *message);
 extern void		cgiShowJobs(http_t *http, const char *dest);
 extern void		cgiStartHTML(const char *title);
 
