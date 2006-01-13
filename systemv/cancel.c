@@ -58,22 +58,20 @@ main(int  argc,				/* I - Number of command-line arguments */
   ipp_t		*request;		/* IPP request */
   ipp_t		*response;		/* IPP response */
   ipp_op_t	op;			/* Operation */
-  cups_lang_t	*language;		/* Language */
 
 
  /*
   * Setup to cancel individual print jobs...
   */
 
-  op         = IPP_CANCEL_JOB;
-  purge      = 0;
-  job_id     = 0;
-  dest       = NULL;
-  user       = NULL;
-  http       = NULL;
-  num_dests  = 0;
-  dests      = NULL;
-  language   = cupsLangDefault();
+  op        = IPP_CANCEL_JOB;
+  purge     = 0;
+  job_id    = 0;
+  dest      = NULL;
+  user      = NULL;
+  http      = NULL;
+  num_dests = 0;
+  dests     = NULL;
 
 
  /*
@@ -240,16 +238,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       *    [requesting-user-name]
       */
 
-      request = ippNew();
-
-      request->request.op.operation_id = op;
-      request->request.op.request_id   = 1;
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-              	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                   "attributes-natural-language", NULL, language->language);
+      request = ippNewRequest(op);
 
       if (dest)
       {
@@ -330,18 +319,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     *    [requesting-user-name]
     */
 
-    request = ippNew();
-
-    request->request.op.operation_id = op;
-    request->request.op.request_id   = 1;
-
-    language = cupsLangDefault();
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-              	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(op);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	         "printer-uri", NULL, "ipp://localhost/printers/");
@@ -369,8 +347,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       _cupsLangPrintf(stderr, _("cancel: %s failed: %s\n"),
 		      op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
-        	      response ? ippErrorString(response->request.status.status_code) :
-		        	 ippErrorString(cupsLastError()));
+        	      cupsLastErrorString());
 
       if (response)
 	ippDelete(response);

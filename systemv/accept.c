@@ -55,7 +55,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   ipp_t		*request;		/* IPP request */
   ipp_t		*response;		/* IPP response */
   ipp_op_t	op;			/* Operation */
-  cups_lang_t	*language;		/* Language */
   int		cancel;			/* Cancel jobs? */
 
 
@@ -68,8 +67,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   else
     command = argv[0];
 
-  cancel   = 0;
-  language = cupsLangDefault();
+  cancel = 0;
 
   if (!strcmp(command, "accept"))
     op = CUPS_ACCEPT_JOBS;
@@ -185,16 +183,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       *    printer-state-message [optional]
       */
 
-      request = ippNew();
-
-      request->request.op.operation_id = op;
-      request->request.op.request_id   = 1;
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-              	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                   "attributes-natural-language", NULL, language->language);
+      request = ippNewRequest(op);
 
       httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                        "/printers/%s", argv[i]);
@@ -223,9 +212,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
       else
       {
-        _cupsLangPrintf(stderr,
-	                _("%s: Operation failed: %s\n"),
-	                command, ippErrorString(cupsLastError()));
+        _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
 	return (1);
       }
 
@@ -244,18 +231,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	*    printer-uri
 	*/
 
-	request = ippNew();
-
-	request->request.op.operation_id = IPP_PURGE_JOBS;
-	request->request.op.request_id   = 1;
-
-	language = cupsLangDefault();
-
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-              	     "attributes-charset", NULL, cupsLangEncoding(language));
-
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                     "attributes-natural-language", NULL, language->language);
+	request = ippNewRequest(IPP_PURGE_JOBS);
 
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                      "printer-uri", NULL, uri);
@@ -264,9 +240,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	{
           if (response->request.status.status_code > IPP_OK_CONFLICT)
 	  {
-            _cupsLangPrintf(stderr,
-	                    _("%s: Operation failed: %s\n"),
-			    command, ippErrorString(cupsLastError()));
+            _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
 	    return (1);
 	  }
 
@@ -274,9 +248,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
 	else
 	{
-          _cupsLangPrintf(stderr,
-	                  _("%s: Operation failed: %s\n"),
-			  command, ippErrorString(cupsLastError()));
+          _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
 	  return (1);
 	}
       }

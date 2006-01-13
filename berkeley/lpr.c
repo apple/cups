@@ -457,9 +457,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (job_id < 1)
   {
-    _cupsLangPrintf(stderr,
-                    _("lpr: error - unable to print file: %s\n"),
-		    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, _("lpr: error - unable to print file: %s\n"),
+		    cupsLastErrorString());
     return (1);
   }
 

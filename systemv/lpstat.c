@@ -565,12 +565,16 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   const char	*printer,		/* Printer name */
 		*message;		/* Printer device URI */
   int		accepting;		/* Accepting requests? */
+  time_t	ptime;			/* Printer state time */
+  struct tm	*pdate;			/* Printer state date & time */
+  char		printer_state_time[255];/* Printer state time */
   const char	*dptr,			/* Pointer into destination list */
 		*ptr;			/* Pointer into printer name */
   int		match;			/* Non-zero if this job matches */
   static const char *pattrs[] =		/* Attributes we need for printers... */
 		{
 		  "printer-name",
+		  "printer-state-change-time",
 		  "printer-state-message",
 		  "printer-is-accepting-jobs"
 		};
@@ -581,7 +585,7 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   if (http == NULL)
     return (1);
 
-  if (printers != NULL && strcmp(printers, "all") == 0)
+  if (printers != NULL && !strcmp(printers, "all"))
     printers = NULL;
 
  /*
@@ -591,6 +595,7 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   *    attributes-charset
   *    attributes-natural-language
   *    requested-attributes
+  *    requesting-user-name
   */
 
   request = ippNewRequest(CUPS_GET_PRINTERS);
@@ -598,6 +603,9 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
 		NULL, pattrs);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+               NULL, cupsUser());
 
  /*
   * Do the request and get back a response...
@@ -609,9 +617,7 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr,
-                      _("lpstat: get-printers failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (1);
     }
@@ -640,19 +646,21 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
       printer   = NULL;
       message   = NULL;
       accepting = 1;
+      ptime     = 0;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
         if (!strcmp(attr->name, "printer-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  printer = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "printer-state-message") &&
-	    attr->value_tag == IPP_TAG_TEXT)
+        else if (!strcmp(attr->name, "printer-state-change-time") &&
+	         attr->value_tag == IPP_TAG_INTEGER)
+	  ptime = (time_t)attr->values[0].integer;
+        else if (!strcmp(attr->name, "printer-state-message") &&
+	         attr->value_tag == IPP_TAG_TEXT)
 	  message = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "printer-is-accepting-jobs") &&
-	    attr->value_tag == IPP_TAG_BOOLEAN)
+        else if (!strcmp(attr->name, "printer-is-accepting-jobs") &&
+	         attr->value_tag == IPP_TAG_BOOLEAN)
 	  accepting = attr->values[0].boolean;
 
         attr = attr->next;
@@ -724,28 +732,28 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
 
       if (match)
       {
+        pdate = localtime(&ptime);
+        strftime(printer_state_time, sizeof(printer_state_time), "%c", pdate);
+
         if (accepting)
-	  _cupsLangPrintf(stdout,
-                          _("%s accepting requests since Jan 01 00:00\n"),
-			  printer);
+	  _cupsLangPrintf(stdout, _("%s accepting requests since %s\n"),
+			  printer, printer_state_time);
 	else
-	  _cupsLangPrintf(stdout,
-                          _("%s not accepting requests since Jan 01 00:00 -\n"
-			    "\t%s\n"),
-			  printer, message == NULL ? "reason unknown" : message);
+	  _cupsLangPrintf(stdout, _("%s not accepting requests since %s -\n"
+			            "\t%s\n"),
+			  printer, printer_state_time,
+			  message == NULL ? "reason unknown" : message);
 
         for (i = 0; i < num_dests; i ++)
 	  if (!strcasecmp(dests[i].name, printer) && dests[i].instance)
 	  {
             if (accepting)
-	      _cupsLangPrintf(stdout,
-                              _("%s/%s accepting requests since Jan 01 00:00\n"),
-			      printer, dests[i].instance);
+	      _cupsLangPrintf(stdout, _("%s/%s accepting requests since %s\n"),
+			      printer, dests[i].instance, printer_state_time);
 	    else
-	      _cupsLangPrintf(stdout,
-                              _("%s/%s not accepting requests since "
-			        "Jan 01 00:00 -\n\t%s\n"),
-			      printer, dests[i].instance,
+	      _cupsLangPrintf(stdout, _("%s/%s not accepting requests since "
+			                "%s -\n\t%s\n"),
+			      printer, dests[i].instance, printer_state_time,
 	        	      message == NULL ? "reason unknown" : message);
 	  }
       }
@@ -758,8 +766,7 @@ show_accepting(http_t      *http,	/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, _("lpstat: get-printers failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
     return (1);
   }
 
@@ -805,7 +812,7 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
   if (http == NULL)
     return (1);
 
-  if (dests != NULL && strcmp(dests, "all") == 0)
+  if (dests != NULL && !strcmp(dests, "all"))
     dests = NULL;
 
  /*
@@ -815,6 +822,7 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
   *    attributes-charset
   *    attributes-natural-language
   *    requested-attributes
+  *    requesting-user-name
   */
 
   request = ippNewRequest(CUPS_GET_CLASSES);
@@ -822,6 +830,9 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes", sizeof(cattrs) / sizeof(cattrs[0]),
 		NULL, cattrs);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+               NULL, cupsUser());
 
  /*
   * Do the request and get back a response...
@@ -833,9 +844,7 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr,
-                      _("lpstat: get-classes failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (1);
     }
@@ -917,7 +926,8 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
         	       "printer-uri", NULL, printer_uri);
 
 	  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                	"requested-attributes", sizeof(cattrs) / sizeof(cattrs[0]),
+                	"requested-attributes",
+		        sizeof(cattrs) / sizeof(cattrs[0]),
 			NULL, cattrs);
 
           if ((response2 = cupsDoRequest(http2, request, "/")) != NULL)
@@ -1020,8 +1030,7 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, _("lpstat: get-classes failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
     return (1);
   }
 
@@ -1111,7 +1120,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   if (http == NULL)
     return (1);
 
-  if (printers != NULL && strcmp(printers, "all") == 0)
+  if (printers != NULL && !strcmp(printers, "all"))
     printers = NULL;
 
  /*
@@ -1121,6 +1130,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   *    attributes-charset
   *    attributes-natural-language
   *    requested-attributes
+  *    requesting-user-name
   */
 
   request = ippNewRequest(CUPS_GET_PRINTERS);
@@ -1128,6 +1138,9 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
 		NULL, pattrs);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+               NULL, cupsUser());
 
  /*
   * Do the request and get back a response...
@@ -1139,8 +1152,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, _("lpstat: get-printers failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (1);
     }
@@ -1269,7 +1281,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 			    "printer %s on %s\n"),
 	        	  printer, strrchr(resource, '/') + 1, hostname);
         }
-        else if (strncmp(device, "file:", 5) == 0)
+        else if (!strncmp(device, "file:", 5))
           _cupsLangPrintf(stdout,
 	                  _("Output for printer %s is sent to %s\n"),
 			  printer, device + 5);
@@ -1331,8 +1343,7 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, _("lpstat: get-printers failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
     return (1);
   }
 
@@ -1384,7 +1395,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
   if (http == NULL)
     return (1);
 
-  if (dests != NULL && strcmp(dests, "all") == 0)
+  if (dests != NULL && !strcmp(dests, "all"))
     dests = NULL;
 
  /*
@@ -1421,8 +1432,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, _("lpstat: get-jobs failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (1);
     }
@@ -1454,28 +1464,28 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 
       while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
       {
-        if (strcmp(attr->name, "job-id") == 0 &&
+        if (!strcmp(attr->name, "job-id") &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobid = attr->values[0].integer;
 
-        if (strcmp(attr->name, "job-k-octets") == 0 &&
+        if (!strcmp(attr->name, "job-k-octets") &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  size = attr->values[0].integer;
 
-        if (strcmp(attr->name, "time-at-creation") == 0 &&
+        if (!strcmp(attr->name, "time-at-creation") &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobtime = attr->values[0].integer;
 
-        if (strcmp(attr->name, "job-printer-uri") == 0 &&
+        if (!strcmp(attr->name, "job-printer-uri") &&
 	    attr->value_tag == IPP_TAG_URI)
 	  if ((dest = strrchr(attr->values[0].string.text, '/')) != NULL)
 	    dest ++;
 
-        if (strcmp(attr->name, "job-originating-user-name") == 0 &&
+        if (!strcmp(attr->name, "job-originating-user-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  username = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "job-name") == 0 &&
+        if (!strcmp(attr->name, "job-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  title = attr->values[0].string.text;
 
@@ -1633,8 +1643,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, _("lpstat: get-jobs failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
     return (1);
   }
 
@@ -1709,7 +1718,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   if ((root = getenv("CUPS_SERVERROOT")) == NULL)
     root = CUPS_SERVERROOT;
 
-  if (printers != NULL && strcmp(printers, "all") == 0)
+  if (printers != NULL && !strcmp(printers, "all"))
     printers = NULL;
 
  /*
@@ -1719,6 +1728,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   *    attributes-charset
   *    attributes-natural-language
   *    requested-attributes
+  *    requesting-user-name
   */
 
   request = ippNewRequest(CUPS_GET_PRINTERS);
@@ -1726,6 +1736,9 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
 		NULL, pattrs);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+               NULL, cupsUser());
 
  /*
   * Do the request and get back a response...
@@ -1737,8 +1750,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, _("lpstat: get-printers failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (1);
     }
@@ -2180,8 +2192,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, _("lpstat: get-printers failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpstat: %s\n", cupsLastErrorString());
     return (1);
   }
 

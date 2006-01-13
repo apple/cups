@@ -522,7 +522,6 @@ export_dest(const char *dest)		/* I - Destination to export */
 			subcmd[1024];	/* Sub-command */
   const char		*datadir;	/* CUPS_DATADIR */
   http_t		*http;		/* Connection to server */
-  cups_lang_t		*language;	/* Default language */
   ipp_t			*request,	/* IPP request */
 			*response;	/* IPP response */
   static const char	*pattrs[] =	/* Printer attributes we want */
@@ -542,8 +541,6 @@ export_dest(const char *dest)		/* I - Destination to export */
 
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
-
-  language = cupsLangDefault();
 
  /*
   * Open a connection to the scheduler...
@@ -576,15 +573,7 @@ export_dest(const char *dest)		/* I - Destination to export */
   * Append the supported banner pages to the PPD file...
   */
 
-  request = ippNew();
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
   httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                    "/printers/%s", dest);
@@ -603,13 +592,9 @@ export_dest(const char *dest)		/* I - Destination to export */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr,
-                      _("cupsaddsmb: get-printer-attributes failed for "
-		        "\"%s\": %s\n"),
-        	      dest,
-		      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "cupsaddsmb: %s - %s\n", dest,
+                      cupsLastErrorString());
       ippDelete(response);
-      cupsLangFree(language);
       httpClose(http);
       unlink(ppdfile);
       return (2);
@@ -617,11 +602,8 @@ export_dest(const char *dest)		/* I - Destination to export */
   }
   else
   {
-    _cupsLangPrintf(stderr,
-                    _("cupsaddsmb: get-printer-attributes failed for "
-		      "\"%s\": %s\n"),
-        	    dest, ippErrorString(cupsLastError()));
-    cupsLangFree(language);
+    _cupsLangPrintf(stderr, "cupsaddsmb: %s - %s\n", dest,
+                    cupsLastErrorString());
     httpClose(http);
     unlink(ppdfile);
     return (2);
@@ -637,14 +619,12 @@ export_dest(const char *dest)		/* I - Destination to export */
                     _("cupsaddsmb: Unable to convert PPD file for %s - %s\n"),
         	    dest, strerror(errno));
     ippDelete(response);
-    cupsLangFree(language);
     httpClose(http);
     unlink(ppdfile);
     return (3);
   }
 
   ippDelete(response);
-  cupsLangFree(language);
   httpClose(http);
 
  /*

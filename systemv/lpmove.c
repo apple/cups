@@ -169,12 +169,10 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
          int        jobid,		/* I - Job ID */
 	 const char *dest)		/* I - Destination */
 {
-  ipp_t		*request,		/* IPP Request */
-		*response;		/* IPP Response */
-  cups_lang_t	*language;		/* Default language */
-  char		job_uri[HTTP_MAX_URI],	/* job-uri */
-		printer_uri[HTTP_MAX_URI];
-					/* job-printer-uri */
+  ipp_t	*request,			/* IPP Request */
+	*response;			/* IPP Response */
+  char	job_uri[HTTP_MAX_URI],		/* job-uri */
+	printer_uri[HTTP_MAX_URI];	/* job-printer-uri */
 
 
   if (http == NULL)
@@ -188,23 +186,14 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
   *    attributes-natural-language
   *    job-uri
   *    job-printer-uri
+  *    requesting-user-name
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_MOVE_JOB;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(CUPS_MOVE_JOB);
 
   snprintf(job_uri, sizeof(job_uri), "ipp://localhost/jobs/%d", jobid);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, job_uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL,
+               job_uri);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, cupsUser());
@@ -222,8 +211,7 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, _("lpmove: move-job failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpmove: %s\n", cupsLastErrorString());
       ippDelete(response);
       return;
     }
@@ -231,8 +219,7 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
     ippDelete(response);
   }
   else
-    _cupsLangPrintf(stderr, _("lpmove: move-job failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpmove: %s\n", cupsLastErrorString());
 }
 
 

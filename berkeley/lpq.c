@@ -265,7 +265,6 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   ipp_t		*request,	/* IPP Request */
 		*response;	/* IPP Response */
   ipp_attribute_t *attr;	/* Current attribute */
-  cups_lang_t	*language;	/* Default language */
   const char	*jobdest,	/* Pointer into job-printer-uri */
 		*jobuser,	/* Pointer to job-originating-user-name */
 		*jobname;	/* Pointer to job-name */
@@ -311,18 +310,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   *    job-uri or printer-uri
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = id ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                      "attributes-charset", NULL, cupsLangEncoding(language));
-
-  attr = ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                      "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(id ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS);
 
   if (dest == NULL)
   {
@@ -360,8 +348,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, _("lpq: get-jobs failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpq: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (0);
     }
@@ -401,38 +388,38 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
       while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
       {
-        if (strcmp(attr->name, "job-id") == 0 &&
+        if (!strcmp(attr->name, "job-id") &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobid = attr->values[0].integer;
 
-        if (strcmp(attr->name, "job-k-octets") == 0 &&
+        if (!strcmp(attr->name, "job-k-octets") &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobsize = attr->values[0].integer;
 
 #ifdef __osf__
-        if (strcmp(attr->name, "job-priority") == 0 &&
+        if (!strcmp(attr->name, "job-priority") &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobpriority = attr->values[0].integer;
 #endif /* __osf__ */
 
-        if (strcmp(attr->name, "job-state") == 0 &&
+        if (!strcmp(attr->name, "job-state") &&
 	    attr->value_tag == IPP_TAG_ENUM)
 	  jobstate = (ipp_jstate_t)attr->values[0].integer;
 
-        if (strcmp(attr->name, "job-printer-uri") == 0 &&
+        if (!strcmp(attr->name, "job-printer-uri") &&
 	    attr->value_tag == IPP_TAG_URI)
 	  if ((jobdest = strrchr(attr->values[0].string.text, '/')) != NULL)
 	    jobdest ++;
 
-        if (strcmp(attr->name, "job-originating-user-name") == 0 &&
+        if (!strcmp(attr->name, "job-originating-user-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  jobuser = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "job-name") == 0 &&
+        if (!strcmp(attr->name, "job-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  jobname = attr->values[0].string.text;
 
-        if (strcmp(attr->name, "copies") == 0 &&
+        if (!strcmp(attr->name, "copies") &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobcopies = attr->values[0].integer;
 
@@ -487,7 +474,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
 
       if (longstatus)
       {
-        _cupsLangPuts(stdout, "");
+        _cupsLangPuts(stdout, "\n");
 
         if (jobcopies > 1)
 	  snprintf(namestr, sizeof(namestr), "%d copies of %s", jobcopies,
@@ -520,8 +507,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, _("lpq: get-jobs failed: %s\n"),
-                    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpq: %s\n", cupsLastErrorString());
     return (0);
   }
 
@@ -537,16 +523,14 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
  */
 
 static void
-show_printer(http_t     *http,	/* I - HTTP connection to server */
-             const char *dest)	/* I - Destination */
+show_printer(http_t     *http,		/* I - HTTP connection to server */
+             const char *dest)		/* I - Destination */
 {
-  ipp_t		*request,	/* IPP Request */
-		*response;	/* IPP Response */
-  ipp_attribute_t *attr;	/* Current attribute */
-  cups_lang_t	*language;	/* Default language */
-  ipp_pstate_t	state;		/* Printer state */
-  char		uri[HTTP_MAX_URI];
-				/* Printer URI */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  ipp_pstate_t	state;			/* Printer state */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
 
 
   if (http == NULL)
@@ -561,18 +545,7 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
   *    printer-uri
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
   httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
 	           "/printers/%s", dest);
@@ -587,9 +560,7 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr,
-                      _("lpq: get-printer-attributes failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpq: %s\n", cupsLastErrorString());
       ippDelete(response);
       return;
     }
@@ -616,9 +587,7 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
     ippDelete(response);
   }
   else
-    _cupsLangPrintf(stderr,
-                    _("lpq: get-printer-attributes failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpq: %s\n", cupsLastErrorString());
 }
 
 
@@ -629,8 +598,7 @@ show_printer(http_t     *http,	/* I - HTTP connection to server */
 static void
 usage(void)
 {
-  _cupsLangPuts(stderr,
-                _("Usage: lpq [-P dest] [-l] [+interval]\n"));
+  _cupsLangPuts(stderr, _("Usage: lpq [-P dest] [-l] [+interval]\n"));
   exit(1);
 }
 

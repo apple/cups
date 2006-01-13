@@ -175,16 +175,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       *    [requesting-user-name]
       */
 
-      request = ippNew();
-
-      request->request.op.operation_id = op;
-      request->request.op.request_id   = 1;
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-              	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                   "attributes-natural-language", NULL, language->language);
+      request = ippNewRequest(op);
 
       if (dest)
       {
@@ -214,47 +205,17 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
         response = cupsDoRequest(http, request, "/jobs/");
 
-      if (response != NULL)
+      if (cupsLastError() > IPP_OK_CONFLICT)
       {
-        switch (response->request.status.status_code)
-	{
-	  case IPP_NOT_FOUND :
-              _cupsLangPuts(stderr,
-	                    _("lprm: Job or printer not found!\n"));
-	      break;
-	  case IPP_NOT_AUTHORIZED :
-              _cupsLangPuts(stderr,
-	                    _("lprm: Not authorized to lprm job(s)!\n"));
-	      break;
-	  case IPP_FORBIDDEN :
-              _cupsLangPrintf(stderr,
-	                      _("lprm: You don't own job ID %d!\n"), job_id);
-	      break;
-	  default :
-              if (response->request.status.status_code > IPP_OK_CONFLICT)
-                _cupsLangPuts(stderr,
-		              _("lprm: Unable to lprm job(s)!\n"));
-	      break;
-	}
-
-        if (response->request.status.status_code > IPP_OK_CONFLICT)
-	{
-          ippDelete(response);
-          cupsFreeDests(num_dests, dests);
-          httpClose(http);
-	  return (1);
-	}
+        _cupsLangPrintf(stderr, "lprm: %s\n", cupsLastErrorString());
 
         ippDelete(response);
-      }
-      else
-      {
-        _cupsLangPuts(stderr,
-	              _("lprm: Unable to cancel job(s)!\n"));
         cupsFreeDests(num_dests, dests);
         httpClose(http);
 	return (1);
       }
+
+      ippDelete(response);
     }
 
  /*
@@ -265,8 +226,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (response == NULL)
     if (!cupsCancelJob(dest, 0))
     {
-      _cupsLangPuts(stderr,
-                    _("lprm: Unable to cancel job(s)!\n"));
+      _cupsLangPrintf(stderr, "lprm: %s\n", cupsLastErrorString());
       cupsFreeDests(num_dests, dests);
       httpClose(http);
       return (1);

@@ -646,14 +646,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (job_id < 1)
   {
-    _cupsLangPrintf(stderr,
-		    _("lp: unable to print file: %s\n"),
-		    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lp: %s\n", cupsLastErrorString());
     return (1);
   }
   else if (!silent)
-    _cupsLangPrintf(stdout,
-		    _("request id is %s-%d (%d file(s))\n"),
+    _cupsLangPrintf(stdout, _("request id is %s-%d (%d file(s))\n"),
 		    printer, job_id, num_files);
 
   return (0);
@@ -670,23 +667,12 @@ restart_job(int job_id)			/* I - Job ID */
   http_t	*http;			/* HTTP connection to server */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
-  cups_lang_t	*language;		/* Language for request */
   char		uri[HTTP_MAX_URI];	/* URI for job */
 
 
   http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
-  language = cupsLangDefault();
-
-  request = ippNew();
-  request->request.op.operation_id = IPP_RESTART_JOB;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(IPP_RESTART_JOB);
 
   sprintf(uri, "ipp://localhost/jobs/%d", job_id);
 
@@ -700,8 +686,7 @@ restart_job(int job_id)			/* I - Job ID */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, _("lp: restart-job failed: %s\n"),
-                      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lp: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (1);
     }
@@ -710,8 +695,7 @@ restart_job(int job_id)			/* I - Job ID */
   }
   else
   {
-    _cupsLangPrintf(stderr, _("lp: restart-job failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lp: %s\n", cupsLastErrorString());
     return (1);
   }
 
@@ -731,7 +715,6 @@ set_job_attrs(int           job_id,	/* I - Job ID */
   http_t	*http;			/* HTTP connection to server */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
-  cups_lang_t	*language;		/* Language for request */
   char		uri[HTTP_MAX_URI];	/* URI for job */
 
 
@@ -740,17 +723,7 @@ set_job_attrs(int           job_id,	/* I - Job ID */
 
   http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
-  language = cupsLangDefault();
-
-  request = ippNew();
-  request->request.op.operation_id = IPP_SET_JOB_ATTRIBUTES;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(IPP_SET_JOB_ATTRIBUTES);
 
   sprintf(uri, "ipp://localhost/jobs/%d", job_id);
 
@@ -766,8 +739,7 @@ set_job_attrs(int           job_id,	/* I - Job ID */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, _("lp: set-job-attributes failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lp: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (1);
     }
@@ -776,8 +748,7 @@ set_job_attrs(int           job_id,	/* I - Job ID */
   }
   else
   {
-    _cupsLangPrintf(stderr, _("lp: set-job-attributes failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lp: %s\n", cupsLastErrorString());
     return (1);
   }
 
