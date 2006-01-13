@@ -68,8 +68,7 @@ static char	tmpfilename[1024] = "";	/* Temporary spool file name */
  * Local functions...
  */
 
-void		check_printer_state(http_t *http, cups_lang_t *language,
-				    const char *charset, const char *uri,	/* I - Printer URI */
+void		check_printer_state(http_t *http, const char *uri,
 		                    const char *resource, const char *user,
 				    int version);
 const char	*password_cb(const char *);
@@ -119,12 +118,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   ipp_attribute_t *job_sheets;		/* job-media-sheets-completed attribute */
   ipp_attribute_t *job_state;		/* job-state attribute */
   ipp_attribute_t *copies_sup;		/* copies-supported attribute */
-  ipp_attribute_t *charset_sup;		/* charset-supported attribute */
   ipp_attribute_t *format_sup;		/* document-format-supported attribute */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs attribute */
-  const char	*charset;		/* Character set to use */
-  cups_lang_t	*language;		/* Default language */
   int		copies;			/* Number of copies remaining */
   const char	*content_type;		/* CONTENT_TYPE environment variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -135,7 +131,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   static const char * const pattrs[] =
 		{			/* Printer attributes we want */
 		  "copies-supported",
-		  "charset-supported",
 		  "document-format-supported",
 		  "printer-is-accepting-jobs",
 		  "printer-state",
@@ -539,11 +534,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * don't support the copies attribute...
   */
 
-  language    = cupsLangDefault();
-  charset_sup = NULL;
-  copies_sup  = NULL;
-  format_sup  = NULL;
-  supported   = NULL;
+  copies_sup = NULL;
+  format_sup = NULL;
+  supported  = NULL;
 
   do
   {
@@ -551,17 +544,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Build the IPP request...
     */
 
-    request = ippNew();
-    request->request.op.version[1]   = version;
-    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, "utf-8");
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL,
-        	 language != NULL ? language->language : "en");
+    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+    request->request.op.version[1] = version;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
@@ -634,10 +618,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	copies_sup = NULL; /* No */
     }
 
-    charset_sup = ippFindAttribute(supported, "charset-supported",
-	                           IPP_TAG_CHARSET);
-    format_sup  = ippFindAttribute(supported, "document-format-supported",
-	                           IPP_TAG_MIMETYPE);
+    format_sup = ippFindAttribute(supported, "document-format-supported",
+	                          IPP_TAG_MIMETYPE);
 
     if (format_sup)
     {
@@ -705,43 +687,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     copies = atoi(argv[4]);
 
  /*
-  * Figure out the character set to use...
-  */
-
-  charset = language ? cupsLangEncoding(language) : "us-ascii";
-
-  if (charset_sup)
-  {
-   /*
-    * See if IPP server supports the requested character set...
-    */
-
-    for (i = 0; i < charset_sup->num_values; i ++)
-      if (strcasecmp(charset, charset_sup->values[i].string.text) == 0)
-        break;
-
-   /*
-    * If not, choose us-ascii or utf-8...
-    */
-
-    if (i >= charset_sup->num_values)
-    {
-     /*
-      * See if us-ascii is supported...
-      */
-
-      for (i = 0; i < charset_sup->num_values; i ++)
-        if (strcasecmp("us-ascii", charset_sup->values[i].string.text) == 0)
-          break;
-
-      if (i < charset_sup->num_values)
-        charset = "us-ascii";
-      else
-        charset = "utf-8";
-    }
-  }
-
- /*
   * Then issue the print-job request...
   */
 
@@ -753,17 +698,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Build the IPP request...
     */
 
-    request = ippNew();
-    request->request.op.version[1]   = version;
-    request->request.op.operation_id = IPP_PRINT_JOB;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, charset);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL,
-        	 language != NULL ? language->language : "en");
+    request = ippNewRequest(IPP_PRINT_JOB);
+    request->request.op.version[1] = version;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
@@ -923,17 +859,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Build an IPP_GET_JOB_ATTRIBUTES request...
       */
 
-      request = ippNew();
-      request->request.op.version[1]   = version;
-      request->request.op.operation_id = IPP_GET_JOB_ATTRIBUTES;
-      request->request.op.request_id   = 1;
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	   "attributes-charset", NULL, charset);
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	   "attributes-natural-language", NULL,
-        	   language != NULL ? language->language : "en");
+      request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
+      request->request.op.version[1] = version;
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	   NULL, uri);
@@ -999,8 +926,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
           if (job_state->values[0].integer > IPP_JOB_PROCESSING ||
 	      job_state->values[0].integer == IPP_JOB_HELD)
 	  {
-	    if ((job_sheets = ippFindAttribute(response, "job-media-sheets-completed",
-	                                   IPP_TAG_INTEGER)) != NULL)
+	    if ((job_sheets = ippFindAttribute(response, 
+	                                       "job-media-sheets-completed",
+	                                       IPP_TAG_INTEGER)) != NULL)
 	      fprintf(stderr, "PAGE: total %d\n", job_sheets->values[0].integer);
 
 	    ippDelete(response);
@@ -1016,11 +944,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Check the printer state and report it if necessary...
       */
 
-/*      if (!copies_sup)
-	httpReconnect(http);*/
-
-      check_printer_state(http, language, charset, uri, resource, argv[2],
-                          version);
+      check_printer_state(http, uri, resource, argv[2], version);
 
      /*
       * Wait 10 seconds before polling again...
@@ -1037,7 +961,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 /*      if (!copies_sup)
 	httpReconnect(http);*/
 
-  check_printer_state(http, language, charset, uri, resource, argv[2], version);
+  check_printer_state(http, uri, resource, argv[2], version);
 
  /*
   * Free memory...
@@ -1073,16 +997,12 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
  */
 
 void
-check_printer_state(http_t      *http,	/* I - HTTP connection */
-                    cups_lang_t *language,
-					/* I - Language */
-		    const char  *charset,
-					/* I - Charset */
-		    const char  *uri,	/* I - Printer URI */
-		    const char  *resource,
-					/* I - Resource path */
-		    const char  *user,	/* I - Username, if any */
-		    int         version)/* I - IPP version */
+check_printer_state(
+    http_t      *http,			/* I - HTTP connection */
+    const char  *uri,			/* I - Printer URI */
+    const char  *resource,		/* I - Resource path */
+    const char  *user,			/* I - Username, if any */
+    int         version)		/* I - IPP version */
 {
   ipp_t	*request,			/* IPP request */
 	*response;			/* IPP response */
@@ -1092,17 +1012,8 @@ check_printer_state(http_t      *http,	/* I - HTTP connection */
   * Check on the printer state...
   */
 
-  request = ippNew();
-  request->request.op.version[1]   = version;
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, charset);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL,
-               language != NULL ? language->language : "en");
+  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+  request->request.op.version[1] = version;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
@@ -1130,8 +1041,8 @@ check_printer_state(http_t      *http,	/* I - HTTP connection */
  * 'password_cb()' - Disable the password prompt for cupsDoFileRequest().
  */
 
-const char *			/* O - Password  */
-password_cb(const char *prompt)	/* I - Prompt (not used) */
+const char *				/* O - Password  */
+password_cb(const char *prompt)		/* I - Prompt (not used) */
 {
   (void)prompt;
 
@@ -1279,17 +1190,17 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
  * PostScript file for printing...
  */
 
-int						/* O - Exit status of filter */
-run_pictwps_filter(char       **argv,		/* I - Command-line arguments */
-                   const char *filename)	/* I - Filename */
+int					/* O - Exit status of filter */
+run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
+                   const char *filename)/* I - Filename */
 {
-  struct stat	fileinfo;			/* Print file information */
-  const char	*ppdfile;			/* PPD file for destination printer */
-  int		pid;				/* Child process ID */
-  int		fd;				/* Temporary file descriptor */
-  int		status;				/* Exit status of filter */
-  const char	*printer;			/* PRINTER env var */
-  static char	ppdenv[1024];			/* PPD environment variable */
+  struct stat	fileinfo;		/* Print file information */
+  const char	*ppdfile;		/* PPD file for destination printer */
+  int		pid;			/* Child process ID */
+  int		fd;			/* Temporary file descriptor */
+  int		status;			/* Exit status of filter */
+  const char	*printer;		/* PRINTER env var */
+  static char	ppdenv[1024];		/* PPD environment variable */
 
 
  /*
