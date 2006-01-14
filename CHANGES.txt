@@ -15,9 +15,9 @@ CHANGES IN CUPS V1.2.0b1
 	  UI text (STR #1101)
 	- Printer names can now (reliably) contain Unicode
 	  characters (STR #896)
-	- The "lpstat -p" command now shows the time and date of
-	  the last printer state change instead of the hardcoded
-	  "Jan 01 00:00" (STR #659)
+	- The lpstat command now shows the time and date of the
+	  last printer state change instead of the hardcoded "Jan
+	  01 00:00" (STR #659)
 	- The scheduler now adds a job-actual-printer-uri
 	  attribute to job objects when printing to a class (STR
 	  #116)

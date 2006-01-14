@@ -65,7 +65,7 @@ FILES	=	\
 		option-pickmany.tmpl \
 		option-pickone.tmpl \
 		option-trailer.tmpl \
-		page.tmpl \
+		pager.tmpl \
 		printer-accept.tmpl \
 		printer-added.tmpl \
 		printer-configured.tmpl \

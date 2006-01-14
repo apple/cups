@@ -158,7 +158,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (pclass)
       cgiStartHTML(pclass);
     else
-      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Classes")));
+      cgiStartHTML(cgiText(_("Classes")));
 
     cgiCopyTemplateLang("error-op.tmpl");
     cgiEndHTML();
@@ -205,7 +205,7 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
   * Show the standard header...
   */
 
-  cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Classes")));
+  cgiStartHTML(cgiText(_("Classes")));
 
  /*
   * Build a CUPS_GET_CLASSES request, which requires the following
@@ -332,13 +332,13 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
 
     cgiCopyTemplateLang("classes-header.tmpl");
 
-    if (count > CUPS_PAGE_MAX)
-      cgiCopyTemplateLang("page.tmpl");
+    if (count > 0)
+      cgiCopyTemplateLang("pager.tmpl");
 
     cgiCopyTemplateLang("classes.tmpl");
 
-    if (count > CUPS_PAGE_MAX)
-      cgiCopyTemplateLang("page.tmpl");
+    if (count > 0)
+      cgiCopyTemplateLang("pager.tmpl");
 
    /*
     * Delete the response...

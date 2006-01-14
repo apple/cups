@@ -6,9 +6,9 @@
 <TR>
 <TD VALIGN=TOP><A HREF="{printer_uri_supported}">
 <IMG SRC="/images/classes.gif" CLASS="button" ALT=""></A></TD>
-<TD VALIGN=TOP>Description: {printer_info}<BR>
-Location: {printer_location}<BR>
-Class State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
+<TD VALIGN=TOP><B>Description:</B> {printer_info}<BR>
+<B>Location:</B> {printer_location}<BR>
+<B>Class State:</B> {printer_state=3?idle:{printer_state=4?processing:stopped}},
 {printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published.
 {?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
 {?member_uris=?:<BR>Members: {member_uris}}
@@ -17,39 +17,38 @@ Class State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
 <A HREF="{printer_uri_supported}?op=print-test-page">
 <IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" CLASS="button"></A>
 {printer_state=5?
-<A HREF="{admin_uri}?op=start-class&amp;printer_name={printer_name}">
+<A HREF="{admin_uri}?op=start-class&amp;printer_name={printer_name}&amp;is_class=Y">
 <IMG SRC="/images/start-class.gif" ALT="Start Class" CLASS="button"></A>
 :
-<A HREF="{admin_uri}?op=stop-class&amp;printer_name={printer_name}">
+<A HREF="{admin_uri}?op=stop-class&amp;printer_name={printer_name}&amp;is_class=Y">
 <IMG SRC="/images/stop-class.gif" ALT="Stop Class" CLASS="button"></A>
 }
 {printer_is_accepting_jobs=0?
-<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={printer_name}">
+<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={printer_name}&amp;is_class=Y">
 <IMG SRC="/images/accept-jobs.gif" ALT="Accept Jobs" CLASS="button"></A>
 :
-<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={printer_name}">
+<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={printer_name}&amp;is_class=Y">
 <IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" CLASS="button"></A>
 }
-<A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={printer_name}">
+<A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={printer_name}&amp;is_class=Y">
 <IMG SRC="/images/cancel-all-jobs.gif" ALT="Cancel All Jobs" CLASS="button"></A>
 {printer_is_shared=0?
-<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=1">
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=1&amp;is_class=Y">
 <IMG SRC="/images/publish-printer.gif" ALT="Publish Printer" CLASS="button"></A>
 :
-<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=0">
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=0&amp;is_class=Y">
 <IMG SRC="/images/unpublish-printer.gif" ALT="Unpublish Printer" CLASS="button"></A>
 }
 <A HREF="{admin_uri}?op=modify-class&amp;printer_name={printer_name}">
 <IMG SRC="/images/modify-class.gif" ALT="Modify Class" CLASS="button"></A>
 <A HREF="{admin_uri}?op=delete-class&amp;printer_name={printer_name}">
 <IMG SRC="/images/delete-class.gif" ALT="Delete Class" CLASS="button"></A>
-<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={printer_name}">
+<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={printer_name}&amp;is_class=Y">
 <IMG SRC="/images/set-as-default.gif" ALT="Set As Default" CLASS="button"></A>
-<A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={printer_name}">
+<A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={printer_name}&amp;is_class=Y">
 <IMG SRC="/images/set-allowed-users.gif" ALT="Set Allowed Users" CLASS="button"></A>
 </P>
 </TD>
 </TR>
 </TABLE>
-
 }}

@@ -33,6 +33,7 @@
  *   cgiSetIPPVars()       - Set CGI variables from an IPP response.
  *   cgiShowIPPError()     - Show the last IPP error message.
  *   cgiShowJobs()         - Show print jobs.
+ *   cgiText()             - Return localized text.
  */
 
 /*
@@ -362,7 +363,7 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
         * Couldn't get the current destination...
 	*/
 
-        cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move Job")));
+        cgiStartHTML(cgiText(_("Move Job")));
 	cgiShowIPPError(_("Unable to find destination for job!"));
 	cgiEndHTML();
 	return;
@@ -415,9 +416,9 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
     */
 
     if (job_id)
-      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move Job")));
+      cgiStartHTML(cgiText(_("Move Job")));
     else
-      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move All Jobs")));
+      cgiStartHTML(cgiText(_("Move All Jobs")));
 
     cgiCopyTemplateLang("job-move.tmpl");
   }
@@ -485,9 +486,9 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
     }
 
     if (job_id)
-      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move Job")));
+      cgiStartHTML(cgiText(_("Move Job")));
     else
-      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move All Jobs")));
+      cgiStartHTML(cgiText(_("Move All Jobs")));
 
     if (cupsLastError() > IPP_OK_CONFLICT)
     {
@@ -599,7 +600,7 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
     cgiSetVariable("refresh_page", refresh);
   }
 
-  cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Print Test Page")));
+  cgiStartHTML(cgiText(_("Print Test Page")));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
     cgiShowIPPError(_("Unable to print test page:"));
@@ -1046,7 +1047,7 @@ cgiSetIPPVars(ipp_t      *response,	/* I - Response data to be copied... */
 void
 cgiShowIPPError(const char *message)	/* I - Contextual message */
 {
-  cgiSetVariable("MESSAGE", _cupsLangString(cupsLangDefault(), message));
+  cgiSetVariable("MESSAGE", cgiText(message));
   cgiSetVariable("ERROR", cupsLastErrorString());
   cgiCopyTemplateLang("error.tmpl");
 }
@@ -1237,16 +1238,34 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
 
     cgiCopyTemplateLang("jobs-header.tmpl");
 
-    if (count > CUPS_PAGE_MAX)
-      cgiCopyTemplateLang("page.tmpl");
+    if (count > 0)
+      cgiCopyTemplateLang("pager.tmpl");
 
     cgiCopyTemplateLang("jobs.tmpl");
 
-    if (count > CUPS_PAGE_MAX)
-      cgiCopyTemplateLang("page.tmpl");
+    if (count > 0)
+      cgiCopyTemplateLang("pager.tmpl");
 
     ippDelete(response);
   }
+}
+
+
+/*
+ * 'cgiText()' - Return localized text.
+ */
+
+const char *				/* O - Localized message */
+cgiText(const char *message)		/* I - Message */
+{
+  static cups_lang_t	*language = NULL;
+					/* Language */
+
+
+  if (!language)
+    language = cupsLangDefault();
+
+  return (_cupsLangString(language, message));
 }
 
 

@@ -100,7 +100,7 @@ extern void		cgiSetVariable(const char *name, const char *value);
 extern void		cgiShowIPPError(const char *message);
 extern void		cgiShowJobs(http_t *http, const char *dest);
 extern void		cgiStartHTML(const char *title);
-
+extern const char	*cgiText(const char *message);
 
 #endif /* !_CUPS_CGI_H_ */
 

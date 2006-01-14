@@ -1,7 +1,1 @@
-<P><A HREF="/admin?op=add-printer"><IMG
-SRC="/images/add-printer.gif" ALT="Add Printer"
-CLASS="button"></A></P>
-
-<P><B>Server Default Destination:</B> {default_name?<A HREF="{default_uri}">{default_name}</A>:none}</P>
-
-{total?<P ALIGN="CENTER">Showing {#printer_name} of {total} printer{total=1?:s}.</P>:}
+<P ALIGN="CENTER">{total=0?No printers:Showing {#printer_name} of {total} printer{total=1?:s}}.</P>

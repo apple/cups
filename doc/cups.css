@@ -205,3 +205,10 @@ DIV.sidebar P.l2 {
   margin-top: 0;
   text-indent: -2em;
 }
+
+TABLE.pager {
+  background: #cccc99;
+  border: solid thin #999966;
+  margin-top: 10px;
+  padding: 2px;
+}

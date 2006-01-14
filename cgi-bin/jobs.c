@@ -108,7 +108,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Bad operation code...  Display an error...
       */
 
-      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Jobs")));
+      cgiStartHTML(cgiText(_("Jobs")));
       cgiCopyTemplateLang("error-op.tmpl");
       cgiEndHTML();
     }
@@ -119,7 +119,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Show a list of jobs...
     */
 
-    cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Jobs")));
+    cgiStartHTML(cgiText(_("Jobs")));
     cgiShowJobs(http, NULL);
     cgiEndHTML();
   }
@@ -181,7 +181,7 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
   ippDelete(cupsDoRequest(http, request, "/jobs"));
 
-  cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Jobs")));
+  cgiStartHTML(cgiText(_("Jobs")));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
     cgiShowIPPError(_("Job operation failed:"));

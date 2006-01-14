@@ -158,7 +158,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (printer)
       cgiStartHTML(printer);
     else
-      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Printers")));
+      cgiStartHTML(cgiText(_("Printers")));
 
     cgiCopyTemplateLang("error-op.tmpl");
     cgiEndHTML();
@@ -205,7 +205,7 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
   * Show the standard header...
   */
 
-  cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Printers")));
+  cgiStartHTML(cgiText(_("Printers")));
 
  /*
   * Build a CUPS_GET_PRINTERS request, which requires the following
@@ -339,13 +339,13 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
 
     cgiCopyTemplateLang("printers-header.tmpl");
 
-    if (count > CUPS_PAGE_MAX)
-      cgiCopyTemplateLang("page.tmpl");
+    if (count > 0)
+      cgiCopyTemplateLang("pager.tmpl");
 
     cgiCopyTemplateLang("printers.tmpl");
 
-    if (count > CUPS_PAGE_MAX)
-      cgiCopyTemplateLang("page.tmpl");
+    if (count > 0)
+      cgiCopyTemplateLang("pager.tmpl");
 
    /*
     * Delete the response...
