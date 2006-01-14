@@ -38,7 +38,7 @@
  * Local functions...
  */
 
-static void	do_job_op(http_t *http, cups_lang_t *language, ipp_op_t op);
+static void	do_job_op(http_t *http, int job_id, ipp_op_t op);
 
 
 /*
@@ -49,10 +49,11 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  cups_lang_t	*language;		/* Language information */
   http_t	*http;			/* Connection to the server */
   const char	*op;			/* Operation name */
-  
+  const char	*job_id_var;		/* Job ID form variable */
+  int		job_id;			/* Job ID */
+
 
  /*
   * Get any form variables...
@@ -67,54 +68,49 @@ main(int  argc,				/* I - Number of command-line arguments */
   cgiSetVariable("SECTION", "jobs");
 
  /*
-  * Get the request language...
-  */
-
-  language = cupsLangDefault();
-
- /*
   * Connect to the HTTP server...
   */
 
   http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
  /*
-  * Tell the client to expect UTF-8 encoded HTML...
+  * Get the job ID, if any...
   */
 
-  puts("Content-Type: text/html;charset=utf-8\n");
+  if ((job_id_var = cgiGetVariable("JOB_ID")) != NULL)
+    job_id = atoi(job_id_var);
+  else
+    job_id = 0;
 
  /*
-  * Send a standard header...
+  * Do the operation...
   */
 
-  cgiSetVariable("TITLE", _cupsLangString(language, _("Jobs")));
-
-  cgiSetServerVersion();
-
-  cgiCopyTemplateLang("header.tmpl");
-
-  if ((op = cgiGetVariable("OP")) != NULL)
+  if ((op = cgiGetVariable("OP")) != NULL && job_id > 0)
   {
    /*
     * Do the operation...
     */
 
     if (!strcmp(op, "cancel-job"))
-      do_job_op(http, language, IPP_CANCEL_JOB);
+      do_job_op(http, job_id, IPP_CANCEL_JOB);
     else if (!strcmp(op, "hold-job"))
-      do_job_op(http, language, IPP_HOLD_JOB);
+      do_job_op(http, job_id, IPP_HOLD_JOB);
+    else if (!strcmp(op, "move-job"))
+      cgiMoveJobs(http, NULL, job_id);
     else if (!strcmp(op, "release-job"))
-      do_job_op(http, language, IPP_RELEASE_JOB);
+      do_job_op(http, job_id, IPP_RELEASE_JOB);
     else if (!strcmp(op, "restart-job"))
-      do_job_op(http, language, IPP_RESTART_JOB);
+      do_job_op(http, job_id, IPP_RESTART_JOB);
     else
     {
      /*
       * Bad operation code...  Display an error...
       */
 
-      cgiCopyTemplateLang("job-op.tmpl");
+      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Jobs")));
+      cgiCopyTemplateLang("error-op.tmpl");
+      cgiEndHTML();
     }
   }
   else
@@ -123,17 +119,16 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Show a list of jobs...
     */
 
+    cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Jobs")));
     cgiShowJobs(http, NULL);
+    cgiEndHTML();
   }
-
-  cgiCopyTemplateLang("trailer.tmpl");
 
  /*
   * Close the HTTP server connection...
   */
 
   httpClose(http);
-  cupsLangFree(language);
 
  /*
   * Return with no errors...
@@ -149,24 +144,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 static void
 do_job_op(http_t      *http,		/* I - HTTP connection */
-          cups_lang_t *language,	/* I - Client's language */
+          int         job_id,		/* I - Job ID */
 	  ipp_op_t    op)		/* I - Operation to perform */
 {
-  ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
+  ipp_t		*request;		/* IPP request */
   char		uri[HTTP_MAX_URI];	/* Job URI */
-  const char	*job;			/* Job ID */
-  ipp_status_t	status;			/* Operation status... */
+  const char	*user;			/* Username */
 
-
-  if ((job = cgiGetVariable("JOB_ID")) != NULL)
-    snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%s", job);
-  else
-  {
-    cgiSetVariable("ERROR", ippErrorString(IPP_NOT_FOUND));
-    cgiCopyTemplateLang("error.tmpl");
-    return;
-  }
 
  /*
   * Build a job request, which requires the following
@@ -183,36 +167,24 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
                NULL, uri);
 
-  if (getenv("REMOTE_USER") != NULL)
-  {
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                 NULL, getenv("REMOTE_USER"));
+  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
 
-    if (strcmp(getenv("REMOTE_USER"), "root"))
-      ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
-  }
-  else
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                 NULL, "unknown");
+  if ((user = getenv("REMOTE_USER")) == NULL)
+    user = "guest";
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+               "requesting-user-name", NULL, user);
 
  /*
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
-  {
-    status = response->request.status.status_code;
+  ippDelete(cupsDoRequest(http, request, "/jobs"));
 
-    ippDelete(response);
-  }
-  else
-    status = cupsLastError();
+  cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Jobs")));
 
-  if (status > IPP_OK_CONFLICT)
-  {
-    cgiSetVariable("ERROR", ippErrorString(status));
-    cgiCopyTemplateLang("error.tmpl");
-  }
+  if (cupsLastError() > IPP_OK_CONFLICT)
+    cgiShowIPPError(_("Job operation failed:"));
   else if (op == IPP_CANCEL_JOB)
     cgiCopyTemplateLang("job-cancel.tmpl");
   else if (op == IPP_HOLD_JOB)
@@ -221,6 +193,8 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
     cgiCopyTemplateLang("job-release.tmpl");
   else if (op == IPP_RESTART_JOB)
     cgiCopyTemplateLang("job-restart.tmpl");
+
+  cgiEndHTML();
 }
 
 

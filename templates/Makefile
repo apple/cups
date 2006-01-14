@@ -31,7 +31,6 @@ include ../Makedefs
 FILES	=	\
 		add-class.tmpl \
 		add-printer.tmpl \
-		admin-op.tmpl \
 		admin.tmpl \
 		choose-device.tmpl \
 		choose-make.tmpl \
@@ -47,11 +46,13 @@ FILES	=	\
 		classes-header.tmpl \
 		edit-config.tmpl \
 		error.tmpl \
+		error-op.tmpl \
 		header.tmpl \
 		help-header.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
-		job-op.tmpl \
+		job-move.tmpl \
+		job-moved.tmpl \
 		job-release.tmpl \
 		job-restart.tmpl \
 		jobs.tmpl \

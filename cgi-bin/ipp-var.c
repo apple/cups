@@ -25,7 +25,9 @@
  *
  *   cgiGetAttributes()    - Get the list of attributes that are needed
  *                           by the template file.
- *   cupsGetIPPObjects()   - Get the objects in an IPP response.
+ *   cgiGetIPPObjects()    - Get the objects in an IPP response.
+ *   cgiMoveJobs()         - Move one or more jobs.
+ *   cgiPrintTestPage()    - Print a test page.
  *   cgiRewriteURL()       - Rewrite a printer URI into a web browser URL...
  *   cgiSetIPPObjectVars() - Set CGI variables from an IPP object.
  *   cgiSetIPPVars()       - Set CGI variables from an IPP response.
@@ -167,7 +169,7 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
 
 
 /*
- * 'cupsGetIPPObjects()' - Get the objects in an IPP response.
+ * 'cgiGetIPPObjects()' - Get the objects in an IPP response.
  */
 
 cups_array_t *				/* O - Array of objects */
@@ -262,6 +264,353 @@ cgiGetIPPObjects(ipp_t *response,	/* I - IPP response */
     cupsArrayAdd(objs, first);
 
   return (objs);
+}
+
+
+/*
+ * 'cgiMoveJobs()' - Move one or more jobs.
+ *
+ * At least one of dest or job_id must be non-zero/NULL.
+ */
+
+void
+cgiMoveJobs(http_t     *http,		/* I - Connection to server */
+            const char *dest,		/* I - Destination or NULL */
+            int        job_id)		/* I - Job ID or 0 for all */
+{
+  int		i;			/* Looping var */
+  const char	*user;			/* Username */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  const char	*name;			/* Destination name */
+  const char	*job_printer_uri;	/* JOB_PRINTER_URI form variable */
+  char		current_dest[1024];	/* Current destination */
+
+
+ /*
+  * See who is logged in...
+  */
+
+  if ((user = getenv("REMOTE_USER")) == NULL)
+    user = "guest";
+
+ /*
+  * See if the user has already selected a new destination...
+  */
+
+  if ((job_printer_uri = cgiGetVariable("JOB_PRINTER_URI")) == NULL)
+  {
+   /*
+    * Make sure necessary form variables are set...
+    */
+
+    if (job_id)
+    {
+      char	temp[255];		/* Temporary string */
+
+
+      sprintf(temp, "%d", job_id);
+      cgiSetVariable("JOB_ID", temp);
+    }
+
+    if (dest)
+      cgiSetVariable("PRINTER_NAME", dest);
+
+   /*
+    * No new destination specified, show the user what the available
+    * printers/classes are...
+    */
+
+    if (!dest)
+    {
+     /*
+      * Get the current destination for job N...
+      */
+
+      char	job_uri[1024];		/* Job URI */
+
+
+      request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
+
+      snprintf(job_uri, sizeof(job_uri), "ipp://localhost/jobs/%d", job_id);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+                   NULL, job_uri);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                   "requested-attributes", NULL, "job-printer-uri");
+      
+      if ((response = cupsDoRequest(http, request, "/")) != NULL)
+      {
+        if ((attr = ippFindAttribute(response, "job-printer-uri",
+	                             IPP_TAG_URI)) != NULL)
+	{
+	 /*
+	  * Pull the name from the URI...
+	  */
+
+	  strlcpy(current_dest, strrchr(attr->values[0].string.text, '/') + 1,
+	          sizeof(current_dest));
+          dest = current_dest;
+	}
+
+        ippDelete(response);
+      }
+
+      if (!dest)
+      {
+       /*
+        * Couldn't get the current destination...
+	*/
+
+        cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move Job")));
+	cgiShowIPPError(_("Unable to find destination for job!"));
+	cgiEndHTML();
+	return;
+      }
+    }
+
+   /*
+    * Get the list of available destinations...
+    */
+
+    request = ippNewRequest(CUPS_GET_PRINTERS);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                 "requested-attributes", NULL, "printer-uri-supported");
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                 "requesting-user-name", NULL, user);
+
+    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    {
+      for (i = 0, attr = ippFindAttribute(response, "printer-uri-supported",
+                                          IPP_TAG_URI);
+           attr;
+	   attr = ippFindNextAttribute(response, "printer-uri-supported",
+	                               IPP_TAG_URI))
+      {
+       /*
+	* Pull the name from the URI...
+	*/
+
+	name = strrchr(attr->values[0].string.text, '/') + 1;
+
+       /*
+        * If the name is not the same as the current destination, add it!
+	*/
+
+        if (strcasecmp(name, dest))
+	{
+	  cgiSetArray("JOB_PRINTER_URI", i, attr->values[0].string.text);
+	  cgiSetArray("JOB_PRINTER_NAME", i, name);
+	  i ++;
+	}
+      }
+
+      ippDelete(response);
+    }
+
+   /*
+    * Show the form...
+    */
+
+    if (job_id)
+      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move Job")));
+    else
+      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move All Jobs")));
+
+    cgiCopyTemplateLang("job-move.tmpl");
+  }
+  else
+  {
+   /*
+    * Try moving the job or jobs...
+    */
+
+    char	uri[1024],		/* Job/printer URI */
+		resource[1024],		/* Post resource */
+		refresh[1024];		/* Refresh URL */
+    const char	*job_printer_name;	/* New printer name */
+
+
+    request = ippNewRequest(CUPS_MOVE_JOB);
+
+    if (job_id)
+    {
+     /*
+      * Move 1 job...
+      */
+
+      snprintf(resource, sizeof(resource), "/jobs/%d", job_id);
+
+      snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+                   NULL, uri);
+    }
+    else
+    {
+     /*
+      * Move all active jobs on a destination...
+      */
+
+      snprintf(resource, sizeof(resource), "/%s/%s",
+               cgiGetVariable("SECTION"), dest);
+
+      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", ippPort(),
+                       "/%s/%s", cgiGetVariable("SECTION"), dest);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                   NULL, uri);
+    }
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-printer-uri",
+                 NULL, job_printer_uri);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                 "requesting-user-name", NULL, user);
+
+    ippDelete(cupsDoRequest(http, request, resource));
+
+   /*
+    * Show the results...
+    */
+
+    job_printer_name = strrchr(job_printer_uri, '/') + 1;
+
+    if (cupsLastError() <= IPP_OK_CONFLICT)
+    {
+      cgiRewriteURL(job_printer_uri, resource, sizeof(resource), NULL);
+      cgiFormEncode(uri, resource, sizeof(uri));
+      snprintf(refresh, sizeof(refresh), "2;%s", uri);
+      cgiSetVariable("refresh_page", refresh);
+    }
+
+    if (job_id)
+      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move Job")));
+    else
+      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Move All Jobs")));
+
+    if (cupsLastError() > IPP_OK_CONFLICT)
+    {
+      if (job_id)
+	cgiShowIPPError(_("Unable to move job"));
+      else
+        cgiShowIPPError(_("Unable to move jobs"));
+    }
+    else
+    {
+      cgiSetVariable("JOB_PRINTER_NAME", job_printer_name);
+      cgiCopyTemplateLang("job-moved.tmpl");
+    }
+  }
+
+  cgiEndHTML();
+}
+
+
+/*
+ * 'cgiPrintTestPage()' - Print a test page.
+ */
+
+void
+cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
+                 const char *dest)	/* I - Destination printer/class */
+{
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  char		uri[HTTP_MAX_URI],	/* Printer URI */
+		resource[1024],		/* POST resource path */
+		refresh[1024],		/* Refresh URL */
+		filename[1024];		/* Test page filename */
+  const char	*datadir;		/* CUPS_DATADIR env var */
+  const char	*user;			/* Username */
+
+
+ /*
+  * See who is logged in...
+  */
+
+  if ((user = getenv("REMOTE_USER")) == NULL)
+    user = "guest";
+
+ /*
+  * Locate the test page file...
+  */
+
+  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+    datadir = CUPS_DATADIR;
+
+  snprintf(filename, sizeof(filename), "%s/data/testprint.ps", datadir);
+
+ /*
+  * Point to the printer/class...
+  */
+
+  snprintf(resource, sizeof(resource), "/%s/%s", cgiGetVariable("SECTION"),
+           dest);
+
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", ippPort(),
+                   "/%s/%s", cgiGetVariable("SECTION"), dest);
+
+ /*
+  * Build an IPP_PRINT_JOB request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    requesting-user-name
+  *    document-format
+  */
+
+  request = ippNewRequest(IPP_PRINT_JOB);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+               "requesting-user-name", NULL, user);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
+               NULL, "Test Page");
+
+  ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+               NULL, "application/postscript");
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoFileRequest(http, request, resource,
+                                    filename)) != NULL)
+  {
+    cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+
+    ippDelete(response);
+  }
+
+  if (cupsLastError() <= IPP_OK_CONFLICT)
+  {
+   /*
+    * Automatically reload the printer status page...
+    */
+
+    cgiFormEncode(uri, resource, sizeof(uri));
+    snprintf(refresh, sizeof(refresh), "2;%s", uri);
+    cgiSetVariable("refresh_page", refresh);
+  }
+
+  cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Print Test Page")));
+
+  if (cupsLastError() > IPP_OK_CONFLICT)
+    cgiShowIPPError(_("Unable to print test page:"));
+  else
+  {
+    cgiSetVariable("PRINTER_NAME", dest);
+
+    cgiCopyTemplateLang("test-page.tmpl");
+  }
+
+  cgiEndHTML();
 }
 
 

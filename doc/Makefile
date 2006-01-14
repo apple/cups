@@ -44,7 +44,6 @@ WEBIMAGES	=	\
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \
-			images/draft.gif \
 			images/edit-configuration-file.gif \
 			images/esp-logo.gif \
 			images/happy.gif \
@@ -57,6 +56,8 @@ WEBIMAGES	=	\
 			images/manage-server.gif \
 			images/modify-class.gif \
 			images/modify-printer.gif \
+			images/move-job.gif \
+			images/move-jobs.gif \
 			images/printer-idle.gif \
 			images/printer-processing.gif \
 			images/printer-stopped.gif \
@@ -71,7 +72,12 @@ WEBIMAGES	=	\
 			images/set-as-default.gif \
 			images/set-printer-options.gif \
 			images/show-active.gif \
+			images/show-all.gif \
+			images/show-ascending.gif \
 			images/show-completed.gif \
+			images/show-descending.gif \
+			images/show-next.gif \
+			images/show-previous.gif \
 			images/start-class.gif \
 			images/start-printer.gif \
 			images/stop-class.gif \

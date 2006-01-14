@@ -23,7 +23,9 @@
  *
  * Contents:
  *
- *   main() - Main entry for CGI.
+ *   main()             - Main entry for CGI.
+ *   show_all_classes() - Show all classes...
+ *   show_class()       - Show a single class.
  */
 
 /*
@@ -55,9 +57,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* IPP attribute */
-  char		uri[HTTP_MAX_URI];	/* Printer URI */
   const char	*op;			/* Operation to perform, if any */
-  char		refresh[1024];		/* Refresh URL */
   static const char *def_attrs[] =	/* Attributes for default printer */
 		{
 		  "printer-name",
@@ -105,7 +105,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Get the default printer...
   */
 
-  if (op == NULL || strcasecmp(op, "print-test-page"))
+  if (!op)
   {
    /*
     * Get the default destination...
@@ -145,84 +145,24 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       show_class(http, pclass);
   }
-  else if (!strcasecmp(op, "print-test-page"))
+  else if (!strcasecmp(op, "print-test-page") && pclass)
+    cgiPrintTestPage(http, pclass);
+  else if (!strcasecmp(op, "move-jobs") && pclass)
+    cgiMoveJobs(http, pclass, 0);
+  else
   {
    /*
-    * Print a test page...
+    * Unknown/bad operation...
     */
 
-    char	filename[1024];		/* Test page filename */
-    const char	*datadir;		/* CUPS_DATADIR env var */
-
-
-    if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-      datadir = CUPS_DATADIR;
-
-    snprintf(filename, sizeof(filename), "%s/data/testprint.ps", datadir);
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/classes/%s", pclass);
-
-   /*
-    * Build an IPP_PRINT_JOB request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    *    requesting-user-name
-    *    document-format
-    */
-
-    request = ippNewRequest(IPP_PRINT_JOB);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-        	 NULL, uri);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                 "requesting-user-name", NULL, user);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
-        	 NULL, "Test Page");
-
-    ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, "application/postscript");
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoFileRequest(http, request, uri + 15,
-                                      filename)) != NULL)
-    {
-      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-
-      ippDelete(response);
-    }
-
-    if (cupsLastError() <= IPP_OK_CONFLICT)
-    {
-     /*
-      * Automatically reload the printer status page...
-      */
-
-      cgiFormEncode(uri, pclass, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "2;/classes/%s", uri);
-      cgiSetVariable("refresh_page", refresh);
-    }
-
-    cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Print Test Page")));
-    
-    if (cupsLastError() > IPP_OK_CONFLICT)
-      cgiShowIPPError(_("Unable to print test page:"));
+    if (pclass)
+      cgiStartHTML(pclass);
     else
-    {
-      cgiSetVariable("PRINTER_NAME", pclass);
+      cgiStartHTML(_cupsLangString(cupsLangDefault(), _("Classes")));
 
-      cgiCopyTemplateLang("test-page.tmpl");
-    }
+    cgiCopyTemplateLang("error-op.tmpl");
+    cgiEndHTML();
   }
-
-  cgiEndHTML();
 
  /*
   * Close the HTTP server connection...
@@ -412,8 +352,10 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
     * Show the error...
     */
 
-    cgiShowIPPError(_("Unable to get printer list:"));
+    cgiShowIPPError(_("Unable to get class list:"));
   }
+
+   cgiEndHTML();
 }
 
 
@@ -511,6 +453,8 @@ show_class(http_t     *http,		/* I - Connection to server */
     cgiStartHTML(pclass);
     cgiShowIPPError(_("Unable to get class status:"));
   }
+
+   cgiEndHTML();
 }
 
 

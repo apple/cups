@@ -1,8 +1,10 @@
-CHANGES.txt - 01/12/2006
+CHANGES.txt - 01/14/2006
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The web interface now supports moving of a job or jobs
+	  to another queue.
 	- The web interface now provides searching, paging, and
 	  changing of the sort/display order of classes, jobs,
 	  and printers.

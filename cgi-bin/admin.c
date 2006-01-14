@@ -167,7 +167,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       cgiStartHTML("Error");
-      cgiCopyTemplateLang("admin-op.tmpl");
+      cgiCopyTemplateLang("error-op.tmpl");
       cgiEndHTML();
     }
 
@@ -184,7 +184,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     cgiStartHTML("Error");
-    cgiCopyTemplateLang("admin-op.tmpl");
+    cgiCopyTemplateLang("error-op.tmpl");
     cgiEndHTML();
   }
 
