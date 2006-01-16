@@ -51,7 +51,8 @@ following resource names are used:</p>
 
 	<dt><tt>scheme://hostname:port/</tt></dt>
 
-	<dd>Can be used for all "get" operations.</dd>
+	<dd>Can be used for all "get" operations and for server
+	subscriptions.</dd>
 
 	<dt><tt>scheme://hostname:port/admin/</tt></dt>
 
@@ -71,19 +72,18 @@ following resource names are used:</p>
 
 </dl>
 
-<p>So a typical printer URI would be "ipp://foo.bar.com/printers/LaserJet".
-
-<p>In addition, the CUPS server also supports normal browser access to
-"scheme://hostname:port/admin/", "scheme://hostname:port/classes/",
-"scheme://hostname:port/jobs/", and "scheme://hostname:port/printers/"
-to view and manage resources on the server dynamically.
+<p>So a typical printer URI would be
+"ipp://foo.bar.com/printers/LaserJet". In addition, the CUPS
+server also supports normal browser access via
+"http://hostname:port/" and "https://hostname:port/".</p>
 
 <h3 class='title'><a name='IPP_OPERATIONS'>CUPS IPP Operations</a></h3>
 
-<p>CUPS provides 13 extension operations in addition to most of the
+<p>CUPS provides 14 extension operations in addition to most of the
 standard IPP and registered extension operations:
 
-<div class='table'><table align='center' border='1' width='80%'>
+<div class='table'><table align='center' border='1' width='80%'
+summary='Supported Operations'>
 <thead>
 <tr>
 	<TH VALIGN="TOP">Operation Name</th>
@@ -100,7 +100,7 @@ standard IPP and registered extension operations:
 	<td>Print a file.</td>
 </tr>
 <tr>
-	<td><a href='#VALIDATE_JOB'>Validate-Job</a></td>
+	<td>Validate-Job</td>
 	<td>1.0</td>
 	<td>0x0004</td>
 	<td>Validate job attributes.</td>
@@ -112,61 +112,67 @@ standard IPP and registered extension operations:
 	<td>Create a print job.</td>
 </tr>
 <tr>
-	<td><a href='#SEND_DOCUMENT'>Send-Document</a></td>
+	<td>Send-Document</td>
 	<td>1.1</td>
 	<td>0x0006</td>
 	<td>Send a file for a print job.</td>
 </tr>
 <tr>
-	<td><a href='#CANCEL_JOB'>Cancel-Job</a></td>
+	<td>Cancel-Job</td>
 	<td>1.0</td>
 	<td>0x0008</td>
 	<td>Cancel a print job.</td>
 </tr>
 <tr>
-	<td><a href='#GET_JOB_ATTRIBUTES'>Get-Job-Attributes</a></td>
+	<td>Get-Job-Attributes</td>
 	<td>1.0</td>
 	<td>0x0009</td>
 	<td>Get job attributes.</td>
 </tr>
 <tr>
-	<td><a href='#GET_JOBS'>Get-Jobs</a></td>
+	<td>Get-Jobs</td>
 	<td>1.0</td>
 	<td>0x000A</td>
 	<td>Get all jobs.</td>
 </tr>
 <tr>
-	<td><a href='#GET_PRINTER_ATTRIBUTES'>Get-Printer-Attributes</a></td>
+	<td>Get-Printer-Attributes</td>
 	<td>1.0</td>
 	<td>0x000B</td>
 	<td>Get printer attributes.</td>
 </tr>
 <tr>
-	<td><a href='#HOLD_JOB'>Hold-Job</a></td>
+	<td>Hold-Job</td>
 	<td>1.1</td>
 	<td>0x000C</td>
 	<td>Hold a job for printing.</td>
 </tr>
 <tr>
-	<td><a href='#RELEASE_JOB'>Release-Job</a></td>
+	<td>Release-Job</td>
 	<td>1.1</td>
 	<td>0x000D</td>
 	<td>Release a job for printing.</td>
 </tr>
 <tr>
-	<td><a href='#PAUSE_PRINTER'>Pause-Printer</a></td>
+	<td>Restart-Job</td>
+	<td>1.1</td>
+	<td>0x000E</td>
+	<td>Restarts a print job.</td>
+</tr>
+<tr>
+	<td>Pause-Printer</td>
 	<td>1.0</td>
 	<td>0x0010</td>
 	<td>Pause printing on a printer.</td>
 </tr>
 <tr>
-	<td><a href='#RESUME_PRINTER'>Resume-Printer</a></td>
+	<td>Resume-Printer</td>
 	<td>1.0</td>
 	<td>0x0011</td>
 	<td>Resume printing on a printer.</td>
 </tr>
 <tr>
-	<td><a href='#PURGE_JOBS'>Purge-Jobs</a></td>
+	<td>Purge-Jobs</td>
 	<td>1.0</td>
 	<td>0x0012</td>
 	<td>Purge all jobs.</td>
@@ -176,6 +182,60 @@ standard IPP and registered extension operations:
 	<td>1.1</td>
 	<td>0x0014</td>
 	<td>Set attributes for a pending or held job.</td>
+</tr>
+<tr>
+	<td><a href='#CREATE_PRINTER_SUBSCRIPTION'>Create-Printer-Subscription</a></td>
+	<td>1.2</td>
+	<td>0x0016</td>
+	<td>Creates a subscription associated with a printer or the server.</td>
+</tr>
+<tr>
+	<td>Create-Job-Subscription</td>
+	<td>1.2</td>
+	<td>0x0017</td>
+	<td>Creates a subscription associated with a job.</td>
+</tr>
+<tr>
+	<td>Get-Subscription-Attributes</td>
+	<td>1.2</td>
+	<td>0x0018</td>
+	<td>Gets the attributes for a subscription.</td>
+</tr>
+<tr>
+	<td>Get-Subscriptions</td>
+	<td>1.2</td>
+	<td>0x0019</td>
+	<td>Gets the attributes for zero or more subscriptions.</td>
+</tr>
+<tr>
+	<td>Renew-Subscription</td>
+	<td>1.2</td>
+	<td>0x001A</td>
+	<td>Renews a subscription.</td>
+</tr>
+<tr>
+	<td>Cancel-Subscription</td>
+	<td>1.2</td>
+	<td>0x001B</td>
+	<td>Cancels a subscription.</td>
+</tr>
+<tr>
+	<td>Get-Notifications</td>
+	<td>1.2</td>
+	<td>0x001C</td>
+	<td>Get notification events for <tt>ippget</tt> subscriptions.</td>
+</tr>
+<tr>
+	<td>Enable-Printer</td>
+	<td>1.2</td>
+	<td>0x0022</td>
+	<td>Accepts jobs on a printer.</td>
+</tr>
+<tr>
+	<td>Disable-Printer</td>
+	<td>1.2</td>
+	<td>0x0023</td>
+	<td>Rejects jobs on a printer.</td>
 </tr>
 <tr>
 	<td><a href='#CUPS_GET_DEFAULT'>CUPS-Get-Default</a></td>
@@ -536,6 +596,98 @@ Response:
 
 </dl>
 
+<h3 class='title'><span class='info'>CUPS 1.2</span><a
+name='CREATE_PRINTER_SUBSCRIPTION'>Create-Printer-Subscription</a></h3>
+
+<p>The Create-Printer-Subscription operation (0x0016) creates a
+subscription for printer or server event notifications. CUPS
+provides several additional events in addition to the standard
+events in the IPP notifications specification.</p>
+
+<h4> Request</h4>
+
+<p>The following groups of attributes are supplied as part of the
+request:</p>
+
+<p>Group 1: Operation Attributes</p>
+
+<dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language"
+	attributes as described in section 3.1.4.1 of the IPP Model and
+	Semantics document.
+
+	<dt>"printer-uri" (uri):
+
+	<dd>The printer
+	(<tt>ipp://server/printers/printername</tt>), class
+	(<tt>ipp://server/classes/classname</tt>), or server
+	(<tt>ipp://server/</tt>) URI for event notifications.
+
+	<dt>"notify-events" (1setOf keyword):
+
+	<dd>The events to monitor. In addition to the standard
+	events, CUPS adds the following keywords:
+	<ul>
+
+		<li><tt>printer-added</tt> - Get notified
+		whenever a printer or class is added</li>
+
+		<li><tt>printer-deleted</tt> - Get notified
+		whenever a printer or class is deleted</li>
+
+		<li><tt>printer-modified</tt> - Get notified
+		whenever a printer or class is modified</li>
+
+		<li><tt>server-audit</tt> - Get notified when a
+		security condition occurs</li>
+
+		<li><tt>server-restarted</tt> - Get notified when
+		the server is restarted</li>
+
+		<li><tt>server-started</tt> - Get notified when
+		the server is started</li>
+
+		<li><tt>server-stopped</tt> - Get notified when
+		the server is stopped</li>
+
+	</ul>
+
+</dl>
+
+<h4> Response</h4>
+
+<p>The following groups of attributes are send as part of the
+response:</p>
+
+<p>Group 1: Operation Attributes</p>
+
+<dl>
+
+	<dt>Status Message:
+
+	<dd>The standard response status message.
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language"
+	attributes as described in section 3.1.4.2 of the IPP Model and
+	Semantics document.
+
+</dl>
+
+<p>Group 2: Subscription Object Attributes</p>
+
+<dl>
+
+	<dt>"subscription-id" (integer):
+
+	<dd>The subscription number.
+
+</dl>
+
 <h3 class='title'><a name='CUPS_GET_DEFAULT'>CUPS-Get-Default Operation</a></h3>
 
 <p>The CUPS-Get-Default operation (0x4001) returns the default printer
@@ -626,17 +778,17 @@ CUPS-Get-Printers request:
 	<dd>The client OPTIONALLY supplies this attribute to
 	select which printers are returned.
 
-	<dt>"printer-location" (text(127)): <span class='info'>CUPS 1.1.7</span></h4>
+	<dt>"printer-location" (text(127)): <span class='info'>CUPS 1.1.7</span>
 
 	<dd>The client OPTIONALLY supplies this attribute to
 	select which printers are returned.
 
-	<dt>"printer-type" (type2 enum): <span class='info'>CUPS 1.1.7</span></h4>
+	<dt>"printer-type" (type2 enum): <span class='info'>CUPS 1.1.7</span>
 
 	<dd>The client OPTIONALLY supplies a printer type enumeration to
 	select which printers are returned.
 
-	<dt>"printer-type-mask" (type2 enum): <span class='info'>CUPS 1.1.7</span></h4>
+	<dt>"printer-type-mask" (type2 enum): <span class='info'>CUPS 1.1.7</span>
 
 	<dd>The client OPTIONALLY supplies a printer type mask
 	enumeration to select which bits are used in the "printer-type"
@@ -871,19 +1023,19 @@ CUPS-Get-Classes request:
 	<dd>The client OPTIONALLY supplies this attribute limiting the
 	number of printer classes that are returned.
 
-	<dt>"printer-info" (text(127)): <span class='info'>CUPS 1.1.7</span></h4>
+	<dt>"printer-info" (text(127)): <span class='info'>CUPS 1.1.7</span>
 	<dd>The client OPTIONALLY supplies this attribute to
 	select which printer classes are returned.
 
-	<dt>"printer-location" (text(127)): <span class='info'>CUPS 1.1.7</span></h4>
+	<dt>"printer-location" (text(127)): <span class='info'>CUPS 1.1.7</span>
 	<dd>The client OPTIONALLY supplies this attribute to
 	select which printer classes are returned.
 
-	<dt>"printer-type" (type2 enum): <span class='info'>CUPS 1.1.7</span></h4>
+	<dt>"printer-type" (type2 enum): <span class='info'>CUPS 1.1.7</span>
 	<dd>The client OPTIONALLY supplies a printer type enumeration to
 	select which printer classes are returned.
 
-	<dt>"printer-type-mask" (type2 enum): <span class='info'>CUPS 1.1.7</span></h4>
+	<dt>"printer-type-mask" (type2 enum): <span class='info'>CUPS 1.1.7</span>
 	<dd>The client OPTIONALLY supplies a printer type mask
 	enumeration to select which bits are used in the "printer-type"
 	attribute.
@@ -1891,7 +2043,8 @@ capability bits for the printer or class. The default value is
 computed from internal state information and the PPD file for the
 printer. The following bits are defined:</p>
 
-<div class='table'><table align='center' border='1' width='80%'>
+<div class='table'><table align='center' border='1' width='80%'
+summary='Printer Type Bits'>
 <thead>
 <tr>
 	<th>Bit</th>
