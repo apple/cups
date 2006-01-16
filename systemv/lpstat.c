@@ -141,19 +141,20 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 	        _cupsLangPuts(stderr,
-		              _("lpstat: Need \"completed\" or "
-			        "\"not-completed\" after -W!\n"));
+		              _("lpstat: Need \"completed\", "
+			        "\"not-completed\", or \"all\" after -W!\n"));
 		return (1);
               }
 
 	      which = argv[i];
 	    }
 
-            if (strcmp(which, "completed") && strcmp(which, "not-completed"))
+            if (strcmp(which, "completed") && strcmp(which, "not-completed") &&
+	        strcmp(which, "all"))
 	    {
 	      _cupsLangPuts(stderr,
-		            _("lpstat: Need \"completed\" or "
-			      "\"not-completed\" after -W!\n"));
+		            _("lpstat: Need \"completed\", "
+			      "\"not-completed\", or \"all\" after -W!\n"));
 	      return (1);
 	    }
 	    break;
