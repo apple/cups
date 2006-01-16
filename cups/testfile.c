@@ -57,7 +57,8 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		status;			/* Exit status */
+  int	status;				/* Exit status */
+  char	filename[1024];			/* Filename buffer */
 
 
  /*
@@ -75,6 +76,20 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   status += read_write_tests(1);
 #endif /* HAVE_LIBZ */
+
+ /*
+  * Test path functions...
+  */
+
+  fputs("cupsFileFind: ", stdout);
+  if (cupsFileFind("cat", "/bin", filename, sizeof(filename)) &&
+      cupsFileFind("cat", "/bin:/usr/bin", filename, sizeof(filename)))
+    printf("PASS (%s)\n", filename);
+  else
+  {
+    puts("FAIL");
+    status ++;
+  }
 
  /*
   * Summarize the results and return...

@@ -514,6 +514,7 @@ int					/* O - 0 on success, non-zero on error */
 export_dest(const char *dest)		/* I - Destination to export */
 {
   int			status;		/* Status of smbclient/rpcclient commands */
+  int			have_drivers;	/* Have drivers? */
   const char		*ppdfile;	/* PPD file for printer drivers */
   char			newppd[1024],	/* New PPD file for printer drivers */
 			file[1024],	/* File to test for */
@@ -647,9 +648,13 @@ export_dest(const char *dest)		/* I - Destination to export */
   *     pscript5.dll
   */
 
+  have_drivers = 0;
+
   snprintf(file, sizeof(file), "%s/drivers/pscript5.dll", datadir);
   if (!access(file, 0))
   {
+    have_drivers |= 1;
+
    /*
     * Windows 2k driver is installed; do the smbclient commands needed
     * to copy the Win2k drivers over...
@@ -742,6 +747,8 @@ export_dest(const char *dest)		/* I - Destination to export */
   snprintf(file, sizeof(file), "%s/drivers/ADOBEPS4.DRV", datadir);
   if (!access(file, 0))
   {
+    have_drivers |= 2;
+
    /*
     * Do the smbclient commands needed for the Adobe Win9x drivers...
     */
@@ -791,6 +798,17 @@ export_dest(const char *dest)		/* I - Destination to export */
   }
 
   unlink(ppdfile);
+
+  if (have_drivers == 0)
+  {
+    _cupsLangPuts(stderr,
+                  _("cupsaddsmb: No Windows printer drivers are installed!\n"));
+    return (9);
+  }
+  else if (have_drivers == 2)
+    _cupsLangPuts(stderr,
+                  _("cupsaddsmb: Warning, no Windows 2000 printer drivers "
+		    "are installed!\n"));
 
  /*
   * Finally, associate the drivers we just added with the queue...

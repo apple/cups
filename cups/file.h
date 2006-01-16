@@ -74,6 +74,8 @@ typedef struct _cups_file_s cups_file_t;/**** CUPS file type ****/
 extern int		cupsFileClose(cups_file_t *fp);
 extern int		cupsFileCompression(cups_file_t *fp);
 extern int		cupsFileEOF(cups_file_t *fp);
+extern const char	*cupsFileFind(const char *filename, const char *path,
+			              char *buffer, int bufsize);
 extern int		cupsFileFlush(cups_file_t *fp);
 extern int		cupsFileGetChar(cups_file_t *fp);
 extern char		*cupsFileGetConf(cups_file_t *fp, char *buf, size_t buflen,

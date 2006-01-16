@@ -8,6 +8,9 @@
 SRC="/images/add-printer.gif" ALT="Add Printer" CLASS="button"></A>
 <A HREF="/printers/"><IMG SRC="/images/manage-printers.gif"
 ALT="Manage Printers" CLASS="button"></A>
+{have_samba?<A HREF="/admin/?op=export-samba"><IMG
+SRC="/images/export-samba.gif" ALT="Export Printers to Samba"
+CLASS="button"></A>:}
 </P>
 
 {#device_uri=0?:<P><B>New Printers Found:</B></P><UL>{[device_uri]

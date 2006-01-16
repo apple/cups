@@ -31,6 +31,7 @@
  *   do_config_server()        - Configure server settings.
  *   do_delete_class()         - Delete a class...
  *   do_delete_printer()       - Delete a printer...
+ *   do_export()               - Export printers to Samba...
  *   do_menu()                 - Show the main menu...
  *   do_printer_op()           - Do a printer operation.
  *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
@@ -45,6 +46,9 @@
 #include "cgi-private.h"
 #include <cups/file.h>
 #include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 
 
 /*
@@ -57,6 +61,7 @@ static void	do_config_printer(http_t *http);
 static void	do_config_server(http_t *http);
 static void	do_delete_class(http_t *http);
 static void	do_delete_printer(http_t *http);
+static void	do_export(http_t *http);
 static void	do_menu(http_t *http);
 static void	do_printer_op(http_t *http,
 		              ipp_op_t op, const char *title);
@@ -153,6 +158,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_config_printer(http);
     else if (!strcmp(op, "config-server"))
       do_config_server(http);
+    else if (!strcmp(op, "export-samba"))
+      do_export(http);
     else
     {
      /*
@@ -2425,6 +2432,244 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
 
 
 /*
+ * 'do_export()' - Export printers to Samba...
+ */
+
+static void
+do_export(http_t *http)			/* I - HTTP connection */
+{
+  int		i, j;			/* Looping vars */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  const char	*username,		/* Samba username */
+		*password,		/* Samba password */
+		*export_all;		/* Export all printers? */
+  int		export_count,		/* Number of printers to export */
+		printer_count;		/* Number of available printers */
+
+
+ /*
+  * Show header...
+  */
+
+  cgiStartHTML(cgiText(_("Export Printers to Samba")));
+
+ /*
+  * Get form data...
+  */
+
+  username     = cgiGetVariable("USERNAME");
+  password     = cgiGetVariable("PASSWORD");
+  export_all   = cgiGetVariable("EXPORT_ALL");
+  export_count = cgiGetSize("EXPORT_NAME");
+
+  if (username && *username && password && *password && export_count <= 1000)
+  {
+   /*
+    * Do export...
+    */
+
+    char	userpass[1024],		/* Username%password */
+    		*argv[1005];		/* Arguments */
+    int		argc;			/* Number of arguments */
+    int		pid;			/* Process ID of child */
+    int		status;			/* Status of command */
+
+
+    fputs("DEBUG: Export printers...\n", stderr);
+
+   /*
+    * Create the command-line for cupsaddsmb...
+    */
+
+    snprintf(userpass, sizeof(userpass), "%s%%%s", username, password);
+
+    argv[0] = "cupsaddsmb";
+    argv[1] = "-v";
+    argv[2] = "-U";
+    argv[3] = userpass;
+    argc    = 4;
+
+    if (export_all)
+      argv[argc ++] = "-a";
+    else
+    {
+      for (i = 0; i < export_count; i ++)
+        argv[argc ++] = (char *)cgiGetArray("EXPORT_NAME", i);
+    }
+
+    argv[argc] = NULL; 
+
+   /*
+    * Run the command...
+    */
+
+    if ((pid = fork()) == 0)
+    {
+     /*
+      * Child goes here...
+      */
+
+      close(0);
+      open("/dev/null", O_RDONLY);
+      close(1);
+      dup(2);
+
+      execvp("cupsaddsmb", argv);
+      perror("ERROR: Unable to execute cupsaddsmb");
+      exit(20);
+    }
+    else if (pid < 0)
+      cgiSetVariable("ERROR", cgiText(_("Unable to fork process!")));
+    else
+    {
+     /*
+      * Parent goes here, wait for child to finish...
+      */
+
+      while (wait(&status) < 0);
+
+      if (status)
+      {
+        char	message[1024];		/* Error message */
+
+
+	if (WIFEXITED(status))
+	{
+	  switch (WEXITSTATUS(status))
+	  {
+	    case 1 :
+	        cgiSetVariable("ERROR", cgiText(_("Unable to connect to server!")));
+                break;
+
+	    case 2 :
+	        cgiSetVariable("ERROR", cgiText(_("Unable to get printer "
+		                                  "attributes!")));
+                break;
+
+	    case 3 :
+	        cgiSetVariable("ERROR", cgiText(_("Unable to convert PPD file!")));
+                break;
+
+	    case 4 :
+	        cgiSetVariable("ERROR", cgiText(_("Unable to copy Windows 2000 "
+		                                  "printer driver files!")));
+                break;
+
+	    case 5 :
+	        cgiSetVariable("ERROR", cgiText(_("Unable to install Windows "
+		                                  "2000 printer driver files!")));
+                break;
+
+	    case 6 :
+	        cgiSetVariable("ERROR", cgiText(_("Unable to copy Windows 9x "
+		                                  "printer driver files!")));
+                break;
+
+	    case 7 :
+	        cgiSetVariable("ERROR", cgiText(_("Unable to install Windows "
+		                                  "9x printer driver files!")));
+                break;
+
+	    case 8 :
+	        cgiSetVariable("ERROR", cgiText(_("Unable to set Windows "
+		                                  "printer driver!")));
+                break;
+
+	    case 9 :
+	        cgiSetVariable("ERROR", cgiText(_("No printer drivers found!")));
+                break;
+
+	    case 20 :
+	        cgiSetVariable("ERROR", cgiText(_("Unable to execute "
+		                                  "cupsaddsmb command!")));
+                break;
+
+	    default :
+        	snprintf(message, sizeof(message),
+	        	  cgiText(_("cupsaddsmb failed with status %d")),
+	        	 WEXITSTATUS(status));
+
+                cgiSetVariable("ERROR", message);
+		break;
+          }
+	}
+        else
+	{
+          snprintf(message, sizeof(message),
+	            cgiText(_("cupsaddsmb crashed on signal %d")),
+	           WTERMSIG(status));
+
+          cgiSetVariable("ERROR", message);
+	}
+      }
+      else
+      {
+        cgiCopyTemplateLang("samba-exported");
+	cgiEndHTML();
+	return;
+      }
+    }
+  }
+  else if (username && !*username)
+    cgiSetVariable("ERROR",
+                   cgiText(_("A Samba username is required to export "
+		             "printer drivers!")));
+  else if (username && (!password || !*password))
+    cgiSetVariable("ERROR",
+                   cgiText(_("A Samba password is required to export "
+		             "printer drivers!")));
+
+ /*
+  * Get list of available printers...
+  */
+
+  cgiSetSize("PRINTER_NAME", 0);
+  cgiSetSize("PRINTER_EXPORT", 0);
+
+  request = ippNewRequest(CUPS_GET_PRINTERS);
+
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                "printer-type", 0);
+
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                "printer-type-mask", CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE |
+		                     CUPS_PRINTER_IMPLICIT);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+               "requested-attributes", NULL, "printer-name");
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+    cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+    ippDelete(response);
+
+    if (!export_all)
+    {
+      printer_count = cgiGetSize("PRINTER_NAME");
+
+      for (i = 0; i < printer_count; i ++)
+      {
+        for (j = 0; j < export_count; j ++)
+	  if (!strcasecmp(cgiGetArray("PRINTER_NAME", i),
+	                  cgiGetArray("EXPORT_NAME", j)))
+            break;
+
+        cgiSetArray("PRINTER_EXPORT", i, j < export_count ? "Y" : "");
+      }
+    }
+  }
+
+ /*
+  * Show form...
+  */
+
+  cgiCopyTemplateLang("samba-export.tmpl");
+  cgiEndHTML();
+}
+
+
+/*
  * 'do_menu()' - Show the main menu...
  */
 
@@ -2435,6 +2680,7 @@ do_menu(http_t *http)			/* I - HTTP connection */
   char		line[1024],		/* Line from cupsd.conf file */
 		*value;			/* Value on line */
   const char	*server_root;		/* Location of config files */
+  const char	*datadir;		/* Location of data files */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* IPP attribute */
@@ -2830,6 +3076,36 @@ do_menu(http_t *http)			/* I - HTTP connection */
         free(printer_devices);
     }
   }
+
+ /*
+  * See if Samba and the Windows drivers are installed...
+  */
+
+  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+    datadir = CUPS_DATADIR;
+
+  snprintf(line, sizeof(line), "%s/drivers/pscript5.dll", datadir);
+  if (!access(line, 0))
+  {
+   /*
+    * Found Windows 2000 driver file, see if we have smbclient and
+    * rpcclient...
+    */
+
+    if (cupsFileFind("smbclient", getenv("PATH"), line, sizeof(line)) &&
+        cupsFileFind("rpcclient", getenv("PATH"), line, sizeof(line)))
+      cgiSetVariable("HAVE_SAMBA", "Y");
+    else
+    {
+      if (!cupsFileFind("smbclient", getenv("PATH"), line, sizeof(line)))
+        fputs("ERROR: smbclient not found!\n", stderr);
+
+      if (!cupsFileFind("rpcclient", getenv("PATH"), line, sizeof(line)))
+        fputs("ERROR: rpcclient not found!\n", stderr);
+    }
+  }
+  else
+    perror(line);
 
  /*
   * Finally, show the main menu template...

@@ -31,6 +31,7 @@
  *   cupsFileClose()       - Close a CUPS file.
  *   cupsFileCompression() - Return whether a file is compressed.
  *   cupsFileEOF()         - Return the end-of-file status.
+ *   cupsFileFind()        - Find a file using the specified path.
  *   cupsFileFlush()       - Flush pending output.
  *   cupsFileGetChar()     - Get a single character from a file.
  *   cupsFileGetConf()     - Get a line from a configuration file...
@@ -268,6 +269,91 @@ int					/* O - 1 on EOF, 0 otherwise */
 cupsFileEOF(cups_file_t *fp)		/* I - CUPS file */
 {
   return (fp->eof);
+}
+
+
+/*
+ * 'cupsFileFind()' - Find a file using the specified path.
+ *
+ * This function allows the paths in the path string to be separated by
+ * colons (UNIX standard) or semicolons (Windows standard) and stores the
+ * result in the buffer supplied.  If the file cannot be found in any of
+ * the supplied paths, NULL is returned. A NULL path only matches the
+ * current directory.
+ */
+
+const char *				/* O - Full path to file or NULL */
+cupsFileFind(const char *filename,	/* I - File to find */
+             const char *path,		/* I - Colon/semicolon-separated path */
+             char       *buffer,	/* I - Filename buffer */
+	     int        bufsize)	/* I - Size of filename buffer */
+{
+  char	*bufptr,			/* Current position in buffer */
+	*bufend;			/* End of buffer */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!filename || !buffer || bufsize < 2)
+    return (NULL);
+
+  if (!path)
+  {
+   /*
+    * No path, so check current directory...
+    */
+
+    if (!access(filename, 0))
+    {
+      strlcpy(buffer, filename, bufsize);
+      return (buffer);
+    }
+    else
+      return (NULL);
+  }
+
+ /*
+  * Now check each path and return the first match...
+  */
+
+  bufend = buffer + bufsize - 1;
+  bufptr = buffer;
+
+  while (*path)
+  {
+    if (*path == ';' || *path == ':')
+    {
+      if (bufptr > buffer && bufptr[-1] != '/' && bufptr < bufend)
+        *bufptr++ = '/';
+
+      strlcpy(bufptr, filename, bufend - bufptr);
+
+      if (!access(buffer, 0))
+        return (buffer);
+
+      bufptr = buffer;
+    }
+    else if (bufptr < bufend)
+      *bufptr++ = *path;
+
+    path ++;
+  }
+
+ /*
+  * Check the last path...
+  */
+
+  if (bufptr > buffer && bufptr[-1] != '/' && bufptr < bufend)
+    *bufptr++ = '/';
+
+  strlcpy(bufptr, filename, bufend - bufptr);
+
+  if (!access(buffer, 0))
+    return (buffer);
+  else
+    return (NULL);
 }
 
 

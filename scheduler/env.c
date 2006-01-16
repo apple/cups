@@ -103,7 +103,8 @@ cupsdInitEnv(void)
   cupsdSetEnv("LD_LIBRARY_PATH", NULL);
   cupsdSetEnv("LD_PRELOAD", NULL);
   cupsdSetEnv("NLSPATH", NULL);
-  cupsdSetEnvf("PATH", "%s/filter:/bin:/usr/bin", ServerBin);
+  cupsdSetEnvf("PATH", "%s/filter:" CUPS_BINDIR ":" CUPS_SBINDIR
+                       ":/bin:/usr/bin", ServerBin);
   cupsdSetEnv("SHLIB_PATH", NULL);
   cupsdSetEnv("SOFTWARE", CUPS_MINIMAL);
   cupsdSetEnv("TMPDIR", TempDir);

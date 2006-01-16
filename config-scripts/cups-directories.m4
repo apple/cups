@@ -43,10 +43,14 @@ if test "$bindir" = "\${exec_prefix}/bin"; then
 	bindir="$exec_prefix/bin"
 fi
 
+AC_DEFINE_UNQUOTED(CUPS_BINDIR, "$bindir")
+
 dnl Fix "sbindir" variable...
 if test "$sbindir" = "\${exec_prefix}/sbin"; then
 	sbindir="$exec_prefix/sbin"
 fi
+
+AC_DEFINE_UNQUOTED(CUPS_SBINDIR, "$sbindir")
 
 dnl Fix "sharedstatedir" variable if it hasn't been specified...
 if test "$sharedstatedir" = "\${prefix}/com" -a "$prefix" = "/"; then
