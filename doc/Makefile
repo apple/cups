@@ -130,6 +130,7 @@ HELPFILES	=	\
 			help/man-lpstat.html \
 			help/network.html \
 			help/overview.html \
+			help/spec-ipp.html \
 			help/spec-ppd.html \
 			help/standard.html \
 			help/whatsnew.html

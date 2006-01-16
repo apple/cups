@@ -242,10 +242,10 @@ typedef enum			/**** IPP operations... ****/
   IPP_PRIVATE = 0x4000,
   CUPS_GET_DEFAULT,
   CUPS_GET_PRINTERS,
-  CUPS_ADD_PRINTER,
+  CUPS_ADD_MODIFY_PRINTER,
   CUPS_DELETE_PRINTER,
   CUPS_GET_CLASSES,
-  CUPS_ADD_CLASS,
+  CUPS_ADD_MODIFY_CLASS,
   CUPS_DELETE_CLASS,
   CUPS_ACCEPT_JOBS,
   CUPS_REJECT_JOBS,
@@ -255,6 +255,10 @@ typedef enum			/**** IPP operations... ****/
   CUPS_MOVE_JOB,
   CUPS_AUTHENTICATE_JOB
 } ipp_op_t;
+
+/* Old names for the operations */
+#define CUPS_ADD_PRINTER	CUPS_ADD_MODIFY_PRINTER
+#define CUPS_ADD_CLASS		CUPS_ADD_MODIFY_CLASS
 
 typedef enum			/**** IPP status codes... ****/
 {
