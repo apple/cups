@@ -1137,6 +1137,8 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
     * Show the options to the user...
     */
 
+    ppdLocalize(ppd);
+
     cgiStartHTML("Set Printer Options");
     cgiCopyTemplateLang("set-printer-options-header.tmpl");
 

@@ -196,6 +196,14 @@ any necessary value quoting for HP-PJL commands.</p>
 number from 1 to N and specifies the order of values as they are
 placed on the stack before the command.</p>
 
+<blockquote><b>Note:</b> Currently only CustomPageSize supports
+more than 1 parameter. This restriction is due to value encoding
+issues, since the "Custom.value" format does not allow for
+specification of named parameters. We anticipate supporting the
+collection value format "{Name1=foo Name2=bar}" for the final
+CUPS 1.2 release. In addition, the collection value format will
+allow string values to contain spaces.</blockquote>
+
 <p>The "type" is one of the following keywords:</p>
 
 <ul>

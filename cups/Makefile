@@ -35,6 +35,7 @@ LIBOBJS	=	\
 		attr.o \
 		auth.o \
 		backchannel.o \
+		custom.o \
 		dest.o \
 		dir.o \
 		emit.o \
@@ -50,6 +51,7 @@ LIBOBJS	=	\
 		ipp-support.o \
 		langprintf.o \
 		language.o \
+		localize.o \
 		mark.o \
 		md5.o \
 		md5passwd.o \

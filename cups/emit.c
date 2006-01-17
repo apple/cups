@@ -197,9 +197,9 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
       * Send DSC comments with option...
       */
 
-      if ((strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 ||
-           strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageRegion") == 0) &&
-          strcasecmp(choices[i]->choice, "Custom") == 0)
+      if ((!strcasecmp(choices[i]->option->keyword, "PageSize") ||
+           !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
+          !strcasecmp(choices[i]->choice, "Custom"))
       {
        /*
         * Variable size; write out standard size options, using the
@@ -306,8 +306,75 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 	  fputs(ppd_custom_code, fp);
 	}
       }
+      else if (!strcasecmp(choices[i]->choice, "Custom"))
+      {
+       /*
+        * Custom option...
+	*/
+
+        ppd_coption_t	*coption;	/* Custom option */
+	ppd_cparam_t	*cparam;	/* Custom parameter */
+        const char	*s;		/* Pointer into string value */
+
+
+       /*
+        * TODO: Support custom options with more than 1 parameter...
+	*/
+
+        if ((coption = ppdFindCustomOption(ppd, choices[i]->option->keyword))
+	        != NULL &&
+	    (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params)) != NULL)
+	{
+	  if (fprintf(fp, "%%%%BeginFeature: *Custom%s True\n",
+	              coption->keyword) < 0)
+	  {
+            free(choices);
+            return (-1);
+	  }
+
+          switch (cparam->type)
+	  {
+	    case PPD_CUSTOM_CURVE :
+	    case PPD_CUSTOM_INVCURVE :
+	    case PPD_CUSTOM_POINTS :
+	    case PPD_CUSTOM_REAL :
+	        if (fprintf(fp, "%f\n", cparam->current.custom_real) < 0)
+		{
+        	  free(choices);
+        	  return (-1);
+		}
+	        break;
+
+	    case PPD_CUSTOM_INT :
+	        if (fprintf(fp, "%d\n", cparam->current.custom_int) < 0)
+		{
+        	  free(choices);
+        	  return (-1);
+		}
+	        break;
+
+	    case PPD_CUSTOM_PASSCODE :
+	    case PPD_CUSTOM_PASSWORD :
+	    case PPD_CUSTOM_STRING :
+	        putc('(', fp);
+
+		for (s = cparam->current.custom_string; *s; s ++)
+		  if (*s < ' ' || *s == '(' || *s == ')' || *s >= 127)
+		    fprintf(fp, "\\%03o", *s & 255);
+		  else
+		    putc(*s, fp);
+
+	        if (fputs(")\n", fp) < 0)
+		{
+        	  free(choices);
+        	  return (-1);
+		}
+	        break;
+          }
+	}
+      }
       else if (fprintf(fp, "%%%%BeginFeature: *%s %s\n",
-                       ((ppd_option_t *)choices[i]->option)->keyword,
+                       choices[i]->option->keyword,
 		       choices[i]->choice) < 0)
       {
         free(choices);
@@ -397,9 +464,9 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
       * Send DSC comments with option...
       */
 
-      if ((strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 ||
-           strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageRegion") == 0) &&
-          strcasecmp(choices[i]->choice, "Custom") == 0)
+      if ((!strcasecmp(choices[i]->option->keyword, "PageSize") ||
+           !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
+          !strcasecmp(choices[i]->choice, "Custom"))
       {
         custom_size = 1;
 
@@ -410,8 +477,7 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
         custom_size = 0;
 
 	snprintf(buf, sizeof(buf), "%%%%BeginFeature: *%s %s\n",
-        	 ((ppd_option_t *)choices[i]->option)->keyword,
-		 choices[i]->choice);
+        	 choices[i]->option->keyword, choices[i]->choice);
       }
 
       if (write(fd, buf, strlen(buf)) < 1)
@@ -748,9 +814,9 @@ ppd_handle_media(ppd_file_t *ppd)
   if (!rpr)
     rpr = ppdFindAttr(ppd, "RequiresPageRegion", "All");
 
-  if (strcasecmp(size->name, "Custom") == 0 ||
+  if (!strcasecmp(size->name, "Custom") ||
       (manual_feed == NULL && input_slot == NULL) ||
-      (manual_feed != NULL && strcasecmp(manual_feed->choice, "False") == 0) ||
+      (manual_feed != NULL && !strcasecmp(manual_feed->choice, "False")) ||
       (input_slot != NULL && (input_slot->code == NULL || !input_slot->code[0])))
   {
    /*
@@ -802,9 +868,9 @@ static int			/* O - -1 if c1 < c2, 0 if equal, 1 otherwise */
 ppd_sort(ppd_choice_t **c1,	/* I - First choice */
          ppd_choice_t **c2)	/* I - Second choice */
 {
-  if (((ppd_option_t *)(*c1)->option)->order < ((ppd_option_t *)(*c2)->option)->order)
+  if ((*c1)->option->order < (*c2)->option->order)
     return (-1);
-  else if (((ppd_option_t *)(*c1)->option)->order > ((ppd_option_t *)(*c2)->option)->order)
+  else if ((*c1)->option->order > (*c2)->option->order)
     return (1);
   else
     return (0);

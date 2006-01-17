@@ -239,28 +239,23 @@ ppd_option_t *				/* O - Pointer to option or NULL */
 ppdFindOption(ppd_file_t *ppd,		/* I - PPD file data */
               const char *option)	/* I - Option/Keyword name */
 {
-  int		i, j, k;	/* Looping vars */
-  ppd_option_t	*o;		/* Pointer to option */
-  ppd_group_t	*g,		/* Pointer to group */
-		*sg;		/* Pointer to subgroup */
+  ppd_option_t	key;			/* Option search key */
 
 
-  if (ppd == NULL || option == NULL)
+ /*
+  * Range check input...
+  */
+
+  if (!ppd || !option)
     return (NULL);
 
-  for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
-  {
-    for (j = g->num_options, o = g->options; j > 0; j --, o ++)
-      if (strcasecmp(o->keyword, option) == 0)
-	return (o);
+ /*
+  * Search...
+  */
 
-    for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
-      for (k = sg->num_options, o = sg->options; k > 0; k --, o ++)
-	if (strcasecmp(o->keyword, option) == 0)
-	  return (o);
-  }
+  strlcpy(key.keyword, option, sizeof(key.keyword));
 
-  return (NULL);
+  return ((ppd_option_t *)cupsArrayFind(ppd->options, &key));
 }
 
 
@@ -323,91 +318,188 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
               const char *option,	/* I - Keyword */
               const char *choice)	/* I - Option name */
 {
-  int		i;		/* Looping var */
-  ppd_option_t	*o;		/* Option pointer */
-  ppd_choice_t	*c;		/* Choice pointer */
+  int		i, j;			/* Looping vars */
+  ppd_option_t	*o;			/* Option pointer */
+  ppd_choice_t	*c;			/* Choice pointer */
 
 
-  if (ppd == NULL)
+ /*
+  * Range check input...
+  */
+
+  if (!ppd || !option || !choice)
     return (0);
 
-  if (strcasecmp(option, "PageSize") == 0 && strncasecmp(choice, "Custom.", 7) == 0)
-  {
-   /*
-    * Handle variable page sizes...
-    */
-
-    ppdPageSize(ppd, choice);
-    choice = "Custom";
-  }
+ /*
+  * Check for custom options...
+  */
 
   if ((o = ppdFindOption(ppd, option)) == NULL)
     return (0);
 
-  for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-    if (strcasecmp(c->choice, choice) == 0)
-      break;
 
-  if (i)
+  if (!strncasecmp(choice, "Custom.", 7) /* TODO || strchr(choice, '=') */ )
   {
    /*
-    * Option found; mark it and then handle unmarking any other options.
+    * Handle a custom option...
     */
 
-    c->marked = 1;
+    if ((c = ppdFindChoice(o, "Custom")) == NULL)
+      return (0);
 
-    if (o->ui != PPD_UI_PICKMANY)
-      for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-	if (strcasecmp(c->choice, choice) != 0)
-          c->marked = 0;
-
-    if (strcasecmp(option, "PageSize") == 0 || strcasecmp(option, "PageRegion") == 0)
+    if (!strcasecmp(option, "PageSize"))
     {
      /*
-      * Mark current page size...
+      * Handle custom page sizes...
       */
 
-      for (i = 0; i < ppd->num_sizes; i ++)
-	ppd->sizes[i].marked = strcasecmp(ppd->sizes[i].name, choice) == 0;
-
-     /*
-      * Unmark the current PageSize or PageRegion setting, as appropriate...
-      */
-
-      if (strcasecmp(option, "PageSize") == 0)
-      {
-	if ((o = ppdFindOption(ppd, "PageRegion")) != NULL)
-	  for (i = 0; i < o->num_choices; i ++)
-            o->choices[i].marked = 0;
-      }
-      else
-      {
-	if ((o = ppdFindOption(ppd, "PageSize")) != NULL)
-	  for (i = 0; i < o->num_choices; i ++)
-            o->choices[i].marked = 0;
-      }
+      ppdPageSize(ppd, choice);
     }
-    else if (strcasecmp(option, "InputSlot") == 0)
+    else
     {
      /*
-      * Unmark ManualFeed option...
+      * Handle other custom options...
       */
 
-      if ((o = ppdFindOption(ppd, "ManualFeed")) != NULL)
-	for (i = 0; i < o->num_choices; i ++)
-          o->choices[i].marked = 0;
-    }
-    else if (strcasecmp(option, "ManualFeed") == 0)
-    {
+      ppd_coption_t	*coption;	/* Custom option */
+      ppd_cparam_t	*cparam;	/* Custom parameter */
+      char		units[33];	/* Custom points units */
+
+
      /*
-      * Unmark InputSlot option...
+      * TODO: Detect and support custom option values using the
+      * collection format "{Name1=foo Name2=bar}".  For now, just
+      * support Custom.value for single-valued custom options.
       */
 
-      if ((o = ppdFindOption(ppd, "InputSlot")) != NULL)
-	for (i = 0; i < o->num_choices; i ++)
-          o->choices[i].marked = 0;
+      if ((coption = ppdFindCustomOption(ppd, option)) != NULL)
+      {
+        if ((cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params)) == NULL)
+	  return (0);
+
+        switch (cparam->type)
+	{
+	  case PPD_CUSTOM_CURVE :
+	  case PPD_CUSTOM_INVCURVE :
+	  case PPD_CUSTOM_REAL :
+	      cparam->current.custom_real = atof(choice + 7);
+	      break;
+
+	  case PPD_CUSTOM_POINTS :
+	      if (sscanf(choice + 7, "%f%s", &(cparam->current.custom_points),
+	                 units) < 2)
+		strcpy(units, "pt");
+
+              if (!strcasecmp(units, "cm"))
+	        cparam->current.custom_points *= 72.0 / 2.54;	      
+              else if (!strcasecmp(units, "mm"))
+	        cparam->current.custom_points *= 72.0 / 25.4;	      
+              else if (!strcasecmp(units, "m"))
+	        cparam->current.custom_points *= 72.0 / 0.0254;	      
+              else if (!strcasecmp(units, "in"))
+	        cparam->current.custom_points *= 72.0;	      
+              else if (!strcasecmp(units, "ft"))
+	        cparam->current.custom_points *= 12 * 72.0;	      
+	      break;
+
+	  case PPD_CUSTOM_INT :
+	      cparam->current.custom_int = atoi(choice + 7);
+	      break;
+
+	  case PPD_CUSTOM_PASSCODE :
+	  case PPD_CUSTOM_PASSWORD :
+	  case PPD_CUSTOM_STRING :
+	      if (cparam->current.custom_string)
+	        free(cparam->current.custom_string);
+
+	      cparam->current.custom_string = strdup(choice + 7);
+	      break;
+	}
+      }
     }
   }
+  else
+  {
+    for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
+      if (!strcasecmp(c->choice, choice))
+        break;
+
+    if (!i)
+      return (0);
+  }
+
+ /*
+  * Option found; mark it and then handle unmarking any other options.
+  */
+
+  c->marked = 1;
+
+  if (o->ui != PPD_UI_PICKMANY)
+  {
+   /*
+    * Unmark all other choices...
+    */
+
+    for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
+      if (strcasecmp(c->choice, choice))
+      {
+        c->marked = 0;
+
+	if (!strcasecmp(option, "PageSize") ||
+	    !strcasecmp(option, "PageRegion"))
+	{
+	 /*
+	  * Mark current page size...
+	  */
+
+	  for (j = 0; j < ppd->num_sizes; j ++)
+	    ppd->sizes[i].marked = !strcasecmp(ppd->sizes[i].name,
+		                               choice);
+
+	 /*
+	  * Unmark the current PageSize or PageRegion setting, as
+	  * appropriate...
+	  */
+
+	  if (!strcasecmp(option, "PageSize"))
+	  {
+	    if ((o = ppdFindOption(ppd, "PageRegion")) != NULL)
+	      for (j = 0; j < o->num_choices; j ++)
+        	o->choices[i].marked = 0;
+	  }
+	  else
+	  {
+	    if ((o = ppdFindOption(ppd, "PageSize")) != NULL)
+	      for (j = 0; j < o->num_choices; j ++)
+        	o->choices[j].marked = 0;
+	  }
+	}
+	else if (!strcasecmp(option, "InputSlot"))
+	{
+	 /*
+	  * Unmark ManualFeed option...
+	  */
+
+	  if ((o = ppdFindOption(ppd, "ManualFeed")) != NULL)
+	    for (j = 0; j < o->num_choices; j ++)
+              o->choices[j].marked = 0;
+	}
+	else if (!strcasecmp(option, "ManualFeed"))
+	{
+	 /*
+	  * Unmark InputSlot option...
+	  */
+
+	  if ((o = ppdFindOption(ppd, "InputSlot")) != NULL)
+	    for (j = 0; j < o->num_choices; j ++)
+              o->choices[j].marked = 0;
+	}
+      }
+  }
+
+ /*
+  * Return the number of conflicts...
+  */
 
   return (ppdConflicts(ppd));
 }
