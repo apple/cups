@@ -1560,6 +1560,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                    "printer-make-and-model", NULL, p->make_model);
 
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
+        	 p->uri);
+
     p->raw = 1;
   }
   else
@@ -1586,6 +1589,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       else
 	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                      "printer-make-and-model", NULL, "Local Printer Class");
+
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
+        	   "file:///dev/null");
 
       if (p->num_printers > 0)
       {

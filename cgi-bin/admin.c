@@ -170,12 +170,6 @@ main(int  argc,				/* I - Number of command-line arguments */
       cgiCopyTemplateLang("error-op.tmpl");
       cgiEndHTML();
     }
-
-   /*
-    * Close the HTTP server connection...
-    */
-
-    httpClose(http);
   }
   else
   {
@@ -187,6 +181,12 @@ main(int  argc,				/* I - Number of command-line arguments */
     cgiCopyTemplateLang("error-op.tmpl");
     cgiEndHTML();
   }
+
+ /*
+  * Close the HTTP server connection...
+  */
+
+  httpClose(http);
 
  /*
   * Return with no errors...

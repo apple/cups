@@ -3660,7 +3660,7 @@ copy_printer_attrs(
   * and document-format attributes that may be provided by the client.
   */
 
-  if ((!ra || cupsArrayFind(ra,"printer-uri-supported")) &&
+  if ((!ra || cupsArrayFind(ra, "printer-uri-supported")) &&
       !ippFindAttribute(printer->attrs, "printer-uri-supported",
                         IPP_TAG_URI))
   {
@@ -5334,12 +5334,12 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     if (job->id < first_job_id)
       continue;
 
+    if (count > 0)
+      ippAddSeparator(con->response);
+
     count ++;
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: count = %d", count);
-
-    if (count > 0)
-      ippAddSeparator(con->response);
 
     copy_job_attrs(con, job, ra);
   }

@@ -1709,6 +1709,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
             DEBUG_printf(("ippWrite: wrote group tag = %x\n", attr->group_tag));
 	    *bufptr++ = attr->group_tag;
 	  }
+	  else if (attr->group_tag == IPP_TAG_ZERO)
+	    continue;
 
          /*
 	  * Write the attribute tag and name.  The current implementation
