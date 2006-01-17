@@ -73,6 +73,7 @@ OBJS	=	\
 		testi18n.o \
 		testipp.o \
 		testlang.o \
+		testppd.o \
 		php_cups_wrap.o
 
 
@@ -107,7 +108,8 @@ TARGETS	=	\
 		testhttp \
 		testi18n \
 		testipp \
-		testlang
+		testlang \
+		testppd
 
 
 #
@@ -297,6 +299,16 @@ testi18n:	testi18n.o libcups.a
 testlang:	testlang.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a \
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# testppd (dependency on static CUPS library is intentional)
+#
+
+testppd:	testppd.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a \
 		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 

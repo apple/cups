@@ -1,0 +1,187 @@
+*PPD-Adobe: "4.3"
+*%
+*% "$Id$"
+*%
+*%   Test PPD file for the Common UNIX Printing System (CUPS).
+*%
+*%   This file is used to test the CUPS PPD API functions and cannot be
+*%   used with any known printers.  Look at the PPD files in the "ppd"
+*%   subdirectory as well as the CUPS web site for working PPD files.
+*%
+*%   If you are a PPD file developer, consider using the CUPS DDK to
+*%   create your PPD files - not only will it save you time, it produces
+*%   consistently high-quality files.
+*%
+*%   Copyright 2002-2006 by Easy Software Products.
+*%
+*%   These coded instructions, statements, and computer programs are the
+*%   property of Easy Software Products and are protected by Federal
+*%   copyright law.  Distribution and use rights are outlined in the file
+*%   "LICENSE.txt" which should have been included with this file.  If this
+*%   file is missing or damaged please contact Easy Software Products
+*%   at:
+*%
+*%       Attn: CUPS Licensing Information
+*%       Easy Software Products
+*%       44141 Airport View Drive, Suite 204
+*%       Hollywood, Maryland 20636-3111 USA
+*%
+*%       Voice: (301) 373-9603
+*%       EMail: cups-info@cups.org
+*%         WWW: http://www.cups.org
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.2"
+*LanguageVersion: English 
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"TEST.PPD"
+*Manufacturer:	"ESP"
+*Product:	"(ESP Ghostscript)"
+*cupsVersion:	1.2
+*cupsManualCopies: True
+*cupsFilter:	"application/vnd.cups-raster 0 rastertotest"
+*cupsModelNumber: 1
+*ModelName:     "Test"
+*ShortNickName: "Test"
+*NickName:      "Test for CUPS v1.2"
+*PSVersion:	"(3010.000) 81501"
+*LanguageLevel:	"3"
+*ColorDevice:	True
+*DefaultColorSpace: RGB
+*FileSystem:	False
+*Throughput:	"1"
+*LandscapeOrientation: Plus90
+*TTRasterizer:	Type42
+
+*% These constraints are used to test ppdConflicts()
+*UIConstraints: *PageSize Letter *InputSlot Envelope
+*UIConstraints: *InputSlot Envelope *PageSize Letter
+
+*% For PageSize, we have put all of the translations in-line...
+*OpenUI *PageSize/Page Size: PickOne
+*fr.Translation PageSize/French Page Size: ""
+*fr_CA.Translation PageSize/French Canadian Page Size: ""
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/US Letter:	"PageSize=Letter"
+*fr.PageSize Letter/French US Letter: ""
+*fr_CA.PageSize Letter/French Canadian US Letter: ""
+*PageSize A4/A4:		"PageSize=A4"
+*fr.PageSize A4/French A4: ""
+*fr_CA.PageSize A4/French Canadian A4: ""
+*PageSize Env10/#10 Envelope:	"PageSize=Env10"
+*fr.PageSize Env10/French #10 Envelope: ""
+*fr_CA.PageSize Env10/French Canadian #10 Envelope: ""
+*CloseUI: *PageSize
+
+*% For PageRegion, we have separated the translations...
+*OpenUI *PageRegion/Page Region: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/US Letter:	"PageRegion=Letter"
+*PageRegion A4/A4:		"PageRegion=A4"
+*PageRegion Env10/#10 Envelope:	"PageRegion=Env10"
+*CloseUI: *PageRegion
+
+*fr.Translation PageRegion/French Page Region: ""
+*fr.PageRegion Letter/French US Letter: ""
+*fr.PageRegion A4/French A4: ""
+*fr.PageRegion Env10/French #10 Envelope: ""
+
+*fr_CA.Translation PageRegion/French Canadian Page Region: ""
+*fr_CA.PageRegion Letter/French Canadian US Letter: ""
+*fr_CA.PageRegion A4/French Canadian A4: ""
+*fr_CA.PageRegion Env10/French Canadian #10 Envelope: ""
+
+*DefaultImageableArea: Letter 
+*ImageableArea Letter:	"18 36 594 756"
+*ImageableArea A4:	"18 36 577 806"
+*ImageableArea Env10:	"18 36 279 648"
+
+*DefaultPaperDimension: Letter
+*PaperDimension Letter:	"612 792"
+*PaperDimension A4:	"595 842"
+*PaperDimension Env10:	"297 684"
+
+*% Custom page size support
+*HWMargins:      0 0 0 0
+*CustomPageSize True/Custom Page Size: "PageSize=Custom"
+*ParamCustomPageSize Width:        1 points 36 1080
+*ParamCustomPageSize Height:       2 points 36 86400
+*ParamCustomPageSize WidthOffset/Width Offset:  3 points 0 0
+*ParamCustomPageSize HeightOffset/Height Offset: 4 points 0 0
+*ParamCustomPageSize Orientation:  5 int 0 0
+
+*OpenUI *InputSlot/Input Slot: PickOne
+*OrderDependency: 10 AnySetup *InputSlot
+*DefaultInputSlot: Tray
+*InputSlot Tray/Tray: "InputSlot=Tray"
+*InputSlot Manual/Manual Feed: "InputSlot=Manual"
+*InputSlot Envelope/Envelope Feed: "InputSlot=Envelope"
+*CloseUI: *InputSlot
+
+*% Custom options...
+*OpenGroup: Extended/Extended Options
+
+*OpenUI IntOption/Integer: PickOne
+*OrderDependency: 10 AnySetup *IntOption
+*DefaultIntOption: None
+*IntOption 1: "IntOption=1"
+*IntOption 2: "IntOption=2"
+*IntOption 3: "IntOption=3"
+*CloseUI: *IntOption
+
+*CustomIntOption True/Custom Integer: "IntOption=Custom"
+*ParamCustomIntOption Integer: 1 int -100 100
+
+*OpenUI StringOption/String: PickOne
+*OrderDependency: 10 AnySetup *StringOption
+*DefaultStringOption: None
+*StringOption foo: "StringOption=foo"
+*StringOption bar: "StringOption=bar"
+*CloseUI: *StringOption
+
+*CustomStringOption True/Custom Stringeger: "StringOption=Custom"
+*ParamCustomStringOption String: 1 string * **********
+
+*CloseGroup: Extended
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+*%
+*% End of "$Id$".
+*%

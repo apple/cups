@@ -71,3 +71,4 @@ testhttp.o: http.h string.h ../config.h md5.h
 testi18n.o: language.h array.h string.h ../config.h transcode.h normalize.h
 testipp.o: ../cups/string.h ../config.h string.h ipp.h http.h md5.h
 testlang.o: i18n.h language.h array.h
+testppd.o: ../cups/string.h ../config.h string.h ppd.h array.h file.h

@@ -272,7 +272,25 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
     for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
          cparam;
 	 cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
+    {
+      switch (cparam->type)
+      {
+        case PPD_CUSTOM_PASSCODE :
+        case PPD_CUSTOM_PASSWORD :
+        case PPD_CUSTOM_STRING :
+            ppd_free(cparam->current.custom_string);
+            ppd_free(cparam->minimum.custom_string);
+            ppd_free(cparam->maximum.custom_string);
+	    break;
+
+	default :
+	    break;
+      }
+
       free(cparam);
+    }
+
+    cupsArrayDelete(coption->params);
 
     free(coption);
   }
@@ -2164,6 +2182,8 @@ ppd_get_coption(ppd_file_t *ppd,	/* I - PPD file */
   strlcpy(copt->keyword, name, sizeof(copt->keyword));
 
   copt->params = cupsArrayNew((cups_array_func_t)ppd_compare_cparams, NULL);
+
+  cupsArrayAdd(ppd->coptions, copt);
 
  /*
   * Return the new record...
