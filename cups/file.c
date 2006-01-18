@@ -1595,29 +1595,30 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	  */
 
           fp->eof = 1;
-	  return (-1);
 	}
-
-	tcrc = (((((trailer[3] << 8) | trailer[2]) << 8) | trailer[1]) << 8) |
-               trailer[0];
-
-	if (tcrc != fp->crc)
+	else
 	{
+	  tcrc = (((((trailer[3] << 8) | trailer[2]) << 8) | trailer[1]) << 8) |
+        	 trailer[0];
+
+	  if (tcrc != fp->crc)
+	  {
+	   /*
+            * Bad CRC, mark end-of-file...
+	    */
+
+	    fp->eof = 1;
+
+	    return (-1);
+	  }
+
 	 /*
-          * Bad CRC, mark end-of-file...
+	  * Otherwise, reset the compressed flag so that we re-read the
+	  * file header...
 	  */
-	  fp->eof = 1;
 
-	  return (-1);
+	  fp->compressed = 0;
 	}
-
-       /*
-	* Otherwise, reset the current pointer so that we re-read the
-	* file header...
-	*/
-
-	fp->ptr = NULL;
-	continue;
       }
 
       bytes = sizeof(fp->buf) - fp->stream.avail_out;
@@ -1629,7 +1630,8 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       fp->ptr = fp->buf;
       fp->end = fp->buf + bytes;
 
-      return (bytes);
+      if (bytes)
+	return (bytes);
     }
   }
 #endif /* HAVE_LIBZ */

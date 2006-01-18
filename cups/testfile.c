@@ -61,44 +61,75 @@ main(int  argc,				/* I - Number of command-line arguments */
   char	filename[1024];			/* Filename buffer */
 
 
- /*
-  * Do uncompressed file tests...
-  */
+  if (argc == 1)
+  {
+   /*
+    * Do uncompressed file tests...
+    */
 
-  status = read_write_tests(0);
+    status = read_write_tests(0);
 
 #ifdef HAVE_LIBZ
- /*
-  * Do compressed file tests...
-  */
+   /*
+    * Do compressed file tests...
+    */
 
-  putchar('\n');
+    putchar('\n');
 
-  status += read_write_tests(1);
+    status += read_write_tests(1);
 #endif /* HAVE_LIBZ */
 
- /*
-  * Test path functions...
-  */
+   /*
+    * Test path functions...
+    */
 
-  fputs("cupsFileFind: ", stdout);
-  if (cupsFileFind("cat", "/bin", filename, sizeof(filename)) &&
-      cupsFileFind("cat", "/bin:/usr/bin", filename, sizeof(filename)))
-    printf("PASS (%s)\n", filename);
+    fputs("cupsFileFind: ", stdout);
+    if (cupsFileFind("cat", "/bin", filename, sizeof(filename)) &&
+	cupsFileFind("cat", "/bin:/usr/bin", filename, sizeof(filename)))
+      printf("PASS (%s)\n", filename);
+    else
+    {
+      puts("FAIL");
+      status ++;
+    }
+
+   /*
+    * Summarize the results and return...
+    */
+
+    if (!status)
+      puts("\nALL TESTS PASSED!");
+    else
+      printf("\n%d TEST(S) FAILED!\n", status);
+  }
   else
   {
-    puts("FAIL");
-    status ++;
+   /*
+    * Cat the filename on the command-line...
+    */
+
+    cups_file_t	*fp;			/* File pointer */
+    char	line[1024];		/* Line from file */
+
+
+    if ((fp = cupsFileOpen(argv[1], "r")) == NULL)
+    {
+      perror(argv[1]);
+      status = 1;
+    }
+    else
+    {
+      status = 0;
+
+      while (cupsFileGets(fp, line, sizeof(line)))
+        puts(line);
+
+      if (!cupsFileEOF(fp))
+        perror(argv[1]);
+
+      cupsFileClose(fp);
+    }
   }
-
- /*
-  * Summarize the results and return...
-  */
-
-  if (!status)
-    puts("\nALL TESTS PASSED!");
-  else
-    printf("\n%d TEST(S) FAILED!\n", status);
 
   return (status);
 }
