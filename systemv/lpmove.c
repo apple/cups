@@ -44,7 +44,8 @@
  * Local functions...
  */
 
-static void	move_job(http_t *, int, const char *);
+static int	move_job(http_t *http, const char *src, int jobid,
+		         const char *dest);
 
 
 /*
@@ -58,16 +59,20 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		i;			/* Looping var */
   http_t	*http;			/* Connection to server */
   const char	*job;			/* Job name */
+  int		jobid;			/* Job ID */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dests;			/* Destinations */
-  const char	*dest;			/* New destination */
+  const char	*src,			/* Original queue */
+		*dest;			/* New destination */
 
 
+  dest      = NULL;
+  dests     = NULL;
   http      = NULL;
   job       = NULL;
-  dest      = NULL;
+  jobid     = 0;
   num_dests = 0;
-  dests     = NULL;
+  src       = NULL;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -115,16 +120,16 @@ main(int  argc,				/* I - Number of command-line arguments */
 	                    argv[i][1]);
 	    return (1);
       }
-    else if (job == NULL)
+    else if (!jobid && !src)
     {
       if (num_dests == 0)
         num_dests = cupsGetDests(&dests);
 
       if ((job = strrchr(argv[i], '-')) != NULL &&
           cupsGetDest(argv[i], NULL, num_dests, dests) == NULL)
-        job ++;
+        jobid = atoi(job + 1);
       else
-        job = argv[i];
+        src = argv[i];
     }
     else if (dest == NULL)
       dest = argv[i];
@@ -135,9 +140,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       return (1);
     }
 
-  if (job == NULL || dest == NULL)
+  if ((!jobid && !src) || !dest)
   {
-    _cupsLangPuts(stdout, _("Usage: lpmove job dest\n"));
+    _cupsLangPuts(stdout, _("Usage: lpmove job/src dest\n"));
     return (1);
   }
 
@@ -154,9 +159,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
   }
 
-  move_job(http, atoi(job), dest);
-
-  return (0);
+  return (move_job(http, src, jobid, dest));
 }
 
 
@@ -164,19 +167,19 @@ main(int  argc,				/* I - Number of command-line arguments */
  * 'move_job()' - Move a job.
  */
 
-static void
+static int				/* O - 0 on success, 1 on error */
 move_job(http_t     *http,		/* I - HTTP connection to server */
+         const char *src,		/* I - Source queue */
          int        jobid,		/* I - Job ID */
-	 const char *dest)		/* I - Destination */
+	 const char *dest)		/* I - Destination queue */
 {
-  ipp_t	*request,			/* IPP Request */
-	*response;			/* IPP Response */
+  ipp_t	*request;			/* IPP Request */
   char	job_uri[HTTP_MAX_URI],		/* job-uri */
 	printer_uri[HTTP_MAX_URI];	/* job-printer-uri */
 
 
-  if (http == NULL)
-    return;
+  if (!http)
+    return (1);
 
  /*
   * Build a CUPS_MOVE_JOB request, which requires the following
@@ -184,16 +187,26 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
   *
   *    attributes-charset
   *    attributes-natural-language
-  *    job-uri
+  *    job-uri/printer-uri
   *    job-printer-uri
   *    requesting-user-name
   */
 
   request = ippNewRequest(CUPS_MOVE_JOB);
 
-  snprintf(job_uri, sizeof(job_uri), "ipp://localhost/jobs/%d", jobid);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL,
-               job_uri);
+  if (jobid)
+  {
+    snprintf(job_uri, sizeof(job_uri), "ipp://localhost/jobs/%d", jobid);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL,
+        	 job_uri);
+  }
+  else
+  {
+    httpAssembleURIf(job_uri, sizeof(job_uri), "ipp", NULL, "localhost", 0,
+                     "/printers/%s", src);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
+        	 job_uri);
+  }
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, cupsUser());
@@ -207,19 +220,15 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/jobs")) != NULL)
-  {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
-    {
-      _cupsLangPrintf(stderr, "lpmove: %s\n", cupsLastErrorString());
-      ippDelete(response);
-      return;
-    }
+  ippDelete(cupsDoRequest(http, request, "/jobs"));
 
-    ippDelete(response);
+  if (cupsLastError() > IPP_OK_CONFLICT)
+  {
+    _cupsLangPrintf(stderr, "lpmove: %s\n", cupsLastErrorString());
+    return (1);
   }
   else
-    _cupsLangPrintf(stderr, "lpmove: %s\n", cupsLastErrorString());
+    return (0);
 }
 
 
