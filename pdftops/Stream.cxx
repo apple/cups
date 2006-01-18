@@ -7,6 +7,7 @@
 //========================================================================
 
 #include <config.h>
+#include <limits.h>
 
 #ifdef USE_GCC_PRAGMAS
 #pragma implementation
@@ -1275,8 +1276,9 @@ CCITTFaxStream::CCITTFaxStream(Stream *strA, int encodingA, GBool endOfLineA,
   endOfLine = endOfLineA;
   byteAlign = byteAlignA;
   columns = columnsA;
-  if (columns < 1) {
-    columns = 1;
+  if (columns < 1 || columns >= (INT_MAX / sizeof(short))) {
+    error(getPos(), "Bad number of columns: %d in CCITTFaxStream", columns);
+    exit(1);
   }
   rows = rowsA;
   endOfBlock = endOfBlockA;
@@ -2919,10 +2921,7 @@ GBool DCTStream::readBaselineSOF() {
   width = read16();
   numComps = str->getChar();
   if (numComps <= 0 || numComps > 4) {
-    error(getPos(), "Bad number of components in DCT stream", prec);
-    return gFalse;
-  }
-  if (numComps <= 0 || numComps > 4) {
+    numComps = 0;
     error(getPos(), "Bad number of components in DCT stream", prec);
     return gFalse;
   }
@@ -3058,7 +3057,7 @@ GBool DCTStream::readHuffmanTables() {
   while (length > 0) {
     index = str->getChar();
     --length;
-    if ((index & 0x0f) >= 4) {
+    if ((index & 0x0f) >= 4 || (index & ~0x1f)) {
       error(getPos(), "Bad DCT Huffman table");
       return gFalse;
     }
@@ -3184,6 +3183,7 @@ int DCTStream::readMarker() {
     } while (c != 0xff && c != EOF);
     do {
       c = str->getChar();
+      if (c == EOF) return EOF;
     } while (c == 0xff);
   } while (c == 0x00);
   return c;
