@@ -24,7 +24,6 @@
  * Contents:
  *
  *   main()                    - Main entry for CGI.
- *   compare_printer_devices() - Compare two printer devices.
  *   do_am_class()             - Add or modify a class.
  *   do_am_printer()           - Add or modify a printer.
  *   do_config_printer()       - Configure the default options for a printer.
@@ -193,18 +192,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   return (0);
-}
-
-
-/*
- * 'compare_printer_devices()' - Compare two printer devices.
- */
-
-static int				/* O - Result of comparison */
-compare_printer_devices(const void *a,	/* I - First device */
-                        const void *b)	/* I - Second device */
-{
-  return (strcmp(*((char **)a), *((char **)b)));
 }
 
 
@@ -520,6 +507,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 		  460800
 		};
 
+
+  fprintf(stderr, "DEBUG: do_am_printer: DEVICE_URI=\"%s\"\n",
+          cgiGetVariable("DEVICE_URI"));
 
   title = cgiText(modify ? _("Modify Printer") : _("Add Printer"));
 
@@ -2870,45 +2860,22 @@ do_menu(http_t *http)			/* I - HTTP connection */
     */
 
     int		i;			/* Looping var */
-    int		num_printer_devices;	/* Number of devices for local printers */
-    char	**printer_devices;	/* Printer devices for local printers */
+    cups_array_t *printer_devices;	/* Printer devices for local printers */
+    char	*printer_device;	/* Current printer device */
 
 
    /*
-    * Count the number of printers we have...
+    * Allocate an array and copy the device strings...
     */
 
-    for (num_printer_devices = 0,
-             attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI);
+    printer_devices = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+
+    for (attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI);
          attr;
-	 num_printer_devices ++,
-	     attr = ippFindNextAttribute(response, "device-uri", IPP_TAG_URI));
-
-    if (num_printer_devices > 0)
+	 attr = ippFindNextAttribute(response, "device-uri", IPP_TAG_URI))
     {
-     /*
-      * Allocate an array and copy the device strings...
-      */
-
-      printer_devices = calloc(num_printer_devices, sizeof(char *));
-
-      for (i = 0, attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI);
-           attr;
-	   i ++,  attr = ippFindNextAttribute(response, "device-uri", IPP_TAG_URI))
-      {
-	printer_devices[i] = strdup(attr->values[0].string.text);
-      }
-
-     /*
-      * Sort the printer devices as needed...
-      */
-
-      if (num_printer_devices > 1)
-        qsort(printer_devices, num_printer_devices, sizeof(char *),
-	      compare_printer_devices);
+      cupsArrayAdd(printer_devices, strdup(attr->values[0].string.text));
     }
-    else
-      printer_devices = NULL;
 
    /*
     * Free the printer list and get the device list...
@@ -2979,8 +2946,7 @@ do_menu(http_t *http)			/* I - HTTP connection */
 	  * device...
 	  */
 
-          if (!bsearch(&device_uri, printer_devices, num_printer_devices,
-	               sizeof(char *), compare_printer_devices))
+          if (!cupsArrayFind(printer_devices, (void *)device_uri))
           {
 	   /*
 	    * Not found, so it must be a new printer...
@@ -3042,7 +3008,7 @@ do_menu(http_t *http)			/* I - HTTP connection */
 	    options_ptr += strlen(options_ptr);
 
             cgiFormEncode(options_ptr, device_uri,
-	                sizeof(options) - (options_ptr - options));
+	                  sizeof(options) - (options_ptr - options));
 	    options_ptr += strlen(options_ptr);
 
             if (options_ptr < (options + sizeof(options) - 1))
@@ -3068,14 +3034,18 @@ do_menu(http_t *http)			/* I - HTTP connection */
 	  break;
       }
 
+      ippDelete(response);
+
      /*
       * Free the device list...
       */
 
-      ippDelete(response);
+      for (printer_device = (char *)cupsArrayFirst(printer_devices);
+           printer_device;
+	   printer_device = (char *)cupsArrayNext(printer_devices))
+        free(printer_device);
 
-      if (num_printer_devices)
-        free(printer_devices);
+      cupsArrayDelete(printer_devices);
     }
   }
 
