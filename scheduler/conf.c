@@ -288,7 +288,7 @@ cupsdReadConfiguration(void)
 
 #ifdef HAVE_SSL
 #  ifdef HAVE_CDSASSL
-  cupsdSetString(&ServerCertificate, "/var/root/Library/Keychains/CUPS");
+  cupsdSetString(&ServerCertificate, "/Library/Keychains/System.keychain");
 #  else
   cupsdSetString(&ServerCertificate, "ssl/server.crt");
   cupsdSetString(&ServerKey, "ssl/server.key");

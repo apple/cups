@@ -181,7 +181,7 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 libcups.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
-		-install_name $(libdir)/libcups.dylib \
+		-install_name $(libdir)/$@ \
 		-current_version 2.7.0 \
 		-compatibility_version 2.0.0 \
 		$(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)

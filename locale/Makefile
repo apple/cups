@@ -50,7 +50,7 @@ clean:
 # Install files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(LOCALEDIR)
 	for loc in $(LOCALES) ; do \
 		$(INSTALL_DIR) $(LOCALEDIR)/$$loc ; \

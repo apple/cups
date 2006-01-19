@@ -133,8 +133,7 @@ httpAddrLocalhost(
 {
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6 &&
-      (IN6_IS_ADDR_LOOPBACK(&(addr->ipv6.sin6_addr)) ||
-       IN6_IS_ADDR_UNSPECIFIED(&(addr->ipv6.sin6_addr))))
+      IN6_IS_ADDR_LOOPBACK(&(addr->ipv6.sin6_addr)))
     return (1);
 #endif /* AF_INET6 */
 

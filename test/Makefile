@@ -52,7 +52,7 @@ depend:
 # Install all targets...
 #
 
-install:
+install: all
 
 
 #

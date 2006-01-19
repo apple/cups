@@ -69,7 +69,14 @@ all:	$(MAN1) $(MAN5) $(MAN8) html
 #
 
 clean:
+	$(RM) mantohtml mantohtml.o
 	$(RM) $(MAN1) $(MAN5) $(MAN8)
+	for file in $(MAN1); do \
+		$(RM) ../doc/help/man-`basename $$file .$(MAN1EXT)`.html; \
+	done
+	for file in $(MAN8); do \
+		$(RM) ../doc/help/man-`basename $$file .$(MAN8EXT)`.html; \
+	done
 
 
 #

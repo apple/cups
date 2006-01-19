@@ -154,7 +154,7 @@ clean:
 # Install all documentation files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(DOCDIR)
 	for file in $(WEBPAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR); \

@@ -778,17 +778,22 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
     error = SSLSetAllowsAnyRoot(conn, true);
 
   if (!error && ServerCertificatesArray)
+  {
     error = SSLSetCertificate(conn, ServerCertificatesArray);
 
- /*
-  * Perform SSL/TLS handshake
-  */
-
-  do
-  {
-    error = SSLHandshake(conn);
+   /*
+    * Perform SSL/TLS handshake
+    */
+  
+    if (!error)
+    {
+      do
+      {
+	error = SSLHandshake(conn);
+      }
+      while (error == errSSLWouldBlock);
+    }
   }
-  while (error == errSSLWouldBlock);
 
   if (error)
   {

@@ -50,7 +50,7 @@ clean:
 # Install files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(SERVERROOT)
 	for file in $(KEEP); do \
 		if test -r $(SERVERROOT)/$$file ; then \

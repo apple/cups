@@ -48,7 +48,7 @@ clean:
 # Install all targets...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(SERVERBIN)/notifier
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \

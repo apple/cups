@@ -145,7 +145,7 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 libcupsimage.2.dylib:	$(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
-		-install_name $(libdir)/libcupsimage.dylib \
+		-install_name $(libdir)/$@ \
 		-current_version 2.2.0 \
 		-compatibility_version 2.0.0 \
 		$(IMAGEOBJS) $(DSOLIBS) -L../cups $(LINKCUPS) -lm

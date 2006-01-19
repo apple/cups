@@ -52,7 +52,7 @@ clean:
 # Install files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(DATADIR)/model
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/model; \

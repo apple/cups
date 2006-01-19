@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile,v 1.6 1999/05/10 17:42:00 mike Exp $"
+# "$Id$"
 #
 #   Fonts makefile for the Common UNIX Printing System (CUPS).
 #
@@ -50,7 +50,7 @@ clean:
 # Install files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(DATADIR)/fonts
 	for file in $(FONTS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/fonts; \
@@ -58,5 +58,5 @@ install:
 
 
 #
-# End of "$Id: Makefile,v 1.6 1999/05/10 17:42:00 mike Exp $".
+# End of "$Id$".
 #

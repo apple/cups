@@ -136,7 +136,7 @@ clean:
 # Install files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(DATADIR)/banners
 	for file in $(BANNERS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
@@ -153,6 +153,7 @@ install:
 	for file in $(DATAFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/data; \
 	done
+	$(INSTALL_DIR) $(DATADIR)/profiles
 
 
 #
