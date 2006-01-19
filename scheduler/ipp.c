@@ -3623,9 +3623,17 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-more-info", NULL, job_uri);
 
-  if (!ra || cupsArrayFind(ra, "job-uri"))
-    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
-        	 "job-uri", NULL, job_uri);
+  if (job->state->values[0].integer > IPP_JOB_PROCESSING &&
+      (!ra || cupsArrayFind(ra, "job-preserved")))
+  {
+    char	filename[1024];		/* Job data file */
+
+
+    snprintf(filename, sizeof(filename), "%s/d%05d-001", RequestRoot,
+             job->id);
+    ippAddBoolean(con->response, IPP_TAG_JOB, "job-preserved",
+                  !access(filename, 0));
+  }
 
   if (!ra || cupsArrayFind(ra, "job-printer-up-time"))
     ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
@@ -3633,6 +3641,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
 
   if (!ra || cupsArrayFind(ra, "job-state-reasons"))
     add_job_state_reasons(con, job);
+
+  if (!ra || cupsArrayFind(ra, "job-uri"))
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+        	 "job-uri", NULL, job_uri);
 
   copy_attrs(con->response, job->attrs, ra, IPP_TAG_JOB, 0);
 }
@@ -3660,6 +3672,64 @@ copy_printer_attrs(
   * and document-format attributes that may be provided by the client.
   */
 
+  curtime = time(NULL);
+
+  if (!ra || cupsArrayFind(ra, "printer-current-time"))
+    ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
+               ippTimeToDate(curtime));
+
+  if (!ra || cupsArrayFind(ra, "printer-error-policy"))
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+        	 "printer-error-policy", NULL, printer->error_policy);
+
+  if (!ra || cupsArrayFind(ra, "printer-is-accepting-jobs"))
+    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
+                  printer->accepting);
+
+  if (!ra || cupsArrayFind(ra, "printer-is-shared"))
+    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-shared",
+                  printer->shared);
+
+  if (!ra || cupsArrayFind(ra, "printer-op-policy"))
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+        	 "printer-op-policy", NULL, printer->op_policy);
+
+  if (!ra || cupsArrayFind(ra, "printer-state"))
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
+                  printer->state);
+
+  if (!ra || cupsArrayFind(ra, "printer-state-change-time"))
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "printer-state-change-time", printer->state_time);
+                
+  if (MaxPrinterHistory > 0 && printer->num_history > 0 &&
+      cupsArrayFind(ra, "printer-state-history"))
+  {
+   /*
+    * Printer history is only sent if specifically requested, so that
+    * older CUPS/IPP clients won't barf on the collection attributes.
+    */
+
+    history = ippAddCollections(con->response, IPP_TAG_PRINTER,
+                                "printer-state-history",
+                                printer->num_history, NULL);
+
+    for (i = 0; i < printer->num_history; i ++)
+      copy_attrs(history->values[i].collection = ippNew(), printer->history[i],
+                 NULL, IPP_TAG_ZERO, 0);
+  }
+
+  if (!ra || cupsArrayFind(ra, "printer-state-message"))
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+        	 "printer-state-message", NULL, printer->state_message);
+
+  if (!ra || cupsArrayFind(ra, "printer-state-reasons"))
+    add_printer_state_reasons(con, printer);
+
+  if (!ra || cupsArrayFind(ra, "printer-up-time"))
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "printer-up-time", curtime);
+
   if ((!ra || cupsArrayFind(ra, "printer-uri-supported")) &&
       !ippFindAttribute(printer->attrs, "printer-uri-supported",
                         IPP_TAG_URI))
@@ -3673,69 +3743,11 @@ copy_printer_attrs(
                     printer_uri);
   }
 
-  if (!ra || cupsArrayFind(ra, "printer-state"))
-    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
-                  printer->state);
-
-  if (!ra || cupsArrayFind(ra, "printer-state-reasons"))
-    add_printer_state_reasons(con, printer);
-
-  if (!ra || cupsArrayFind(ra, "printer-state-message"))
-    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-        	 "printer-state-message", NULL, printer->state_message);
-
-  if (!ra || cupsArrayFind(ra, "printer-is-accepting-jobs"))
-    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
-                  printer->accepting);
-
-  if (!ra || cupsArrayFind(ra, "printer-is-shared"))
-    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-shared",
-                  printer->shared);
-
-  curtime = time(NULL);
-
-  if (!ra || cupsArrayFind(ra, "printer-up-time"))
-    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                  "printer-up-time", curtime);
-
-  if (!ra || cupsArrayFind(ra, "printer-current-time"))
-    ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
-               ippTimeToDate(curtime));
-
-  if (!ra || cupsArrayFind(ra, "printer-state-change-time"))
-    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                  "printer-state-change-time", printer->state_time);
-                
-  if (!ra || cupsArrayFind(ra, "printer-error-policy"))
-    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
-        	 "printer-error-policy", NULL, printer->error_policy);
-
-  if (!ra || cupsArrayFind(ra, "printer-op-policy"))
-    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
-        	 "printer-op-policy", NULL, printer->op_policy);
-
   if (!ra || cupsArrayFind(ra, "queued-job-count"))
     add_queued_job_count(con, printer);
 
   copy_attrs(con->response, printer->attrs, ra, IPP_TAG_ZERO, 0);
   copy_attrs(con->response, CommonData, ra, IPP_TAG_ZERO, IPP_TAG_COPY);
-
- /*
-  * Printer history is only sent if specifically requested, so that
-  * older CUPS/IPP clients won't barf on the collection attributes.
-  */
-
-  if (MaxPrinterHistory > 0 && printer->num_history > 0 &&
-      cupsArrayFind(ra, "printer-state-history"))
-  {
-    history = ippAddCollections(con->response, IPP_TAG_PRINTER,
-                                "printer-state-history",
-                                printer->num_history, NULL);
-
-    for (i = 0; i < printer->num_history; i ++)
-      copy_attrs(history->values[i].collection = ippNew(), printer->history[i],
-                 NULL, IPP_TAG_ZERO, 0);
-  }
 }
 
 
@@ -3761,10 +3773,6 @@ copy_subscription_attrs(
   * Copy the subscription attributes to the response using the
   * requested-attributes attribute that may be provided by the client.
   */
-
-  if (!ra || cupsArrayFind(ra, "notify-subscription-id"))
-    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                  "notify-subscription-id", sub->id);
 
   if (!ra || cupsArrayFind(ra, "notify-events"))
   {
@@ -3803,28 +3811,13 @@ copy_subscription_attrs(
     }
   }
 
-  if (!ra || cupsArrayFind(ra, "notify-subscriber-user-name"))
-    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_NAME,
-        	 "notify-subscriber-user-name", NULL, sub->owner);
-
-  if (sub->recipient && (!ra || cupsArrayFind(ra, "notify-recipient-uri")))
-    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
-        	 "notify-recipient-uri", NULL, sub->recipient);
-  else if (!ra || cupsArrayFind(ra, "notify-pull-method"))
-    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_KEYWORD,
-                 "notify-pull-method", NULL, "ippget");
-
-  if (sub->user_data_len > 0 && (!ra || cupsArrayFind(ra, "notify-user-data")))
-    ippAddOctetString(con->response, IPP_TAG_SUBSCRIPTION, "notify-user-data",
-                      sub->user_data, sub->user_data_len);
+  if (sub->job && (!ra || cupsArrayFind(ra, "notify-job-id")))
+    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                  "notify-job-id", sub->job->id);
 
   if (!sub->job && (!ra || cupsArrayFind(ra, "notify-lease-duration")))
     ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
                   "notify-lease-duration", sub->lease);
-
-  if (!ra || cupsArrayFind(ra, "notify-time-interval"))
-    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                  "notify-time-interval", sub->interval);
 
   if (sub->dest && (!ra || cupsArrayFind(ra, "notify-printer-uri")))
   {
@@ -3835,9 +3828,28 @@ copy_subscription_attrs(
         	 "notify-printer-uri", NULL, printer_uri);
   }
 
-  if (sub->job && (!ra || cupsArrayFind(ra, "notify-job-id")))
+  if (sub->recipient && (!ra || cupsArrayFind(ra, "notify-recipient-uri")))
+    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
+        	 "notify-recipient-uri", NULL, sub->recipient);
+  else if (!ra || cupsArrayFind(ra, "notify-pull-method"))
+    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_KEYWORD,
+                 "notify-pull-method", NULL, "ippget");
+
+  if (!ra || cupsArrayFind(ra, "notify-subscriber-user-name"))
+    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_NAME,
+        	 "notify-subscriber-user-name", NULL, sub->owner);
+
+  if (!ra || cupsArrayFind(ra, "notify-subscription-id"))
     ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                  "notify-job-id", sub->job->id);
+                  "notify-subscription-id", sub->id);
+
+  if (!ra || cupsArrayFind(ra, "notify-time-interval"))
+    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                  "notify-time-interval", sub->interval);
+
+  if (sub->user_data_len > 0 && (!ra || cupsArrayFind(ra, "notify-user-data")))
+    ippAddOctetString(con->response, IPP_TAG_SUBSCRIPTION, "notify-user-data",
+                      sub->user_data, sub->user_data_len);
 }
 
 

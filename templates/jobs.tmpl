@@ -22,7 +22,7 @@
 {job_state=7?cancelled at<BR>{time_at_completed}:{job_state=8?aborted:completed at<BR>{time_at_completed}}}}}}}&nbsp;</TD>
 <TD>
 {job_state>5?
-{job_k_octets>0?
+{job_preserved>0?
 <A HREF="/jobs/?op=restart-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
 <IMG SRC="/images/restart-job.gif" ALT="Reprint Job" CLASS="button"></A>
 :}:}
