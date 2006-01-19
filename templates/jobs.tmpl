@@ -21,24 +21,20 @@
 {job_state=5?processing since<BR>{time_at_processing}:{job_state=6?stopped at<BR>{time_at_completed}:
 {job_state=7?cancelled at<BR>{time_at_completed}:{job_state=8?aborted:completed at<BR>{time_at_completed}}}}}}}&nbsp;</TD>
 <TD>
-{job_state>5?
 {job_preserved>0?
 <A HREF="/jobs/?op=restart-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
-<IMG SRC="/images/restart-job.gif" ALT="Reprint Job" CLASS="button"></A>
-:}:}
-{job_state>6?:
+<IMG SRC="/images/restart-job.gif" ALT="Reprint Job" CLASS="button"></A>:}
 {job_state=4?
 <A HREF="/jobs/?op=release-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
-<IMG SRC="/images/release-job.gif" ALT="Release Job" CLASS="button"></A>
-:
+<IMG SRC="/images/release-job.gif" ALT="Release Job" CLASS="button"></A>:}
+{job_state=3?
 <A HREF="/jobs/?op=hold-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
-<IMG SRC="/images/hold-job.gif" ALT="Hold Job" CLASS="button"></A>
-}
+<IMG SRC="/images/hold-job.gif" ALT="Hold Job" CLASS="button"></A>:}
+{job_state<7?
 <A HREF="/jobs/?op=cancel-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
 <IMG SRC="/images/cancel-job.gif" ALT="Cancel Job" CLASS="button"></A>
 <A HREF="/jobs/?op=move-job&amp;job_id={job_id}"><IMG
-SRC="/images/move-job.gif" ALT="Move Job" CLASS="button"></A>
-}
+SRC="/images/move-job.gif" ALT="Move Job" CLASS="button"></A>:}
 &nbsp;</TD>
 </TR>
 }
