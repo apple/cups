@@ -52,8 +52,9 @@
  * Local functions...
  */
 
-static void	check_dest(http_t *, const char *, int *, cups_dest_t **);
-static http_t	*connect_server(http_t *);
+static void	check_dest(const char *, http_t *, const char *, int *,
+		           cups_dest_t **);
+static http_t	*connect_server(const char *, http_t *);
 static int	show_accepting(http_t *, const char *, int, cups_dest_t *);
 static int	show_classes(http_t *, const char *);
 static void	show_default(int, cups_dest_t *);
@@ -131,6 +132,25 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      i ++;
 	    break;
 
+        case 'U' : /* Username */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected username after "
+				  "\'-U\' option!\n"),
+		        	argv[0]);
+	        return (1);
+	      }
+
+              cupsSetUser(argv[i]);
+	    }
+	    break;
+	    
         case 'W' : /* Show which jobs? */
 	    if (argv[i][2])
 	      which = argv[i] + 2;
@@ -140,9 +160,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        _cupsLangPuts(stderr,
-		              _("lpstat: Need \"completed\", "
-			        "\"not-completed\", or \"all\" after -W!\n"));
+	        _cupsLangPrintf(stderr,
+		        	_("%s: Error - need \"completed\", "
+			          "\"not-completed\", or \"all\" after "
+				  "\'-W\' option!\n"),
+				argv[0]);
 		return (1);
               }
 
@@ -152,20 +174,22 @@ main(int  argc,			/* I - Number of command-line arguments */
             if (strcmp(which, "completed") && strcmp(which, "not-completed") &&
 	        strcmp(which, "all"))
 	    {
-	      _cupsLangPuts(stderr,
-		            _("lpstat: Need \"completed\", "
-			      "\"not-completed\", or \"all\" after -W!\n"));
+	      _cupsLangPrintf(stderr,
+		              _("%s: Error - need \"completed\", "
+				"\"not-completed\", or \"all\" after "
+				"\'-W\' option!\n"),
+			      argv[0]);
 	      return (1);
 	    }
 	    break;
 
         case 'a' : /* Show acceptance status */
 	    op   = 'a';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(http, argv[i] + 2, &num_dests, &dests);
+              check_dest(argv[0], http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_accepting(http, argv[i] + 2, num_dests, dests);
 	    }
@@ -173,7 +197,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(http, argv[i], &num_dests, &dests);
+              check_dest(argv[0], http, argv[i], &num_dests, &dests);
 
 	      status |= show_accepting(http, argv[i], num_dests, dests);
 	    }
@@ -189,7 +213,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 #ifdef __sgi
         case 'b' : /* Show both the local and remote status */
 	    op   = 'b';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
 	    if (argv[i][2] != '\0')
 	    {
@@ -202,7 +226,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      * happy...
 	      */
 
-              check_dest(http, argv[i] + 2, &num_dests, &dests);
+              check_dest(argv[0], http, argv[i] + 2, &num_dests, &dests);
 
 	      puts("");
 	      status |= show_jobs(http, argv[i] + 2, NULL, 3, ranking, which);
@@ -210,8 +234,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    else
 	    {
 	      _cupsLangPuts(stderr,
-	                    _("lpstat: The -b option requires a destination "
-			      "argument.\n"));
+	                    _("%s: Error - expected destination after "
+			      "\'-b\' option!\n"),
+			    argv[0]);
 
 	      return (1);
 	    }
@@ -220,11 +245,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'c' : /* Show classes and members */
 	    op   = 'c';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(http, argv[i] + 2, &num_dests, &dests);
+              check_dest(argv[0], http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_classes(http, argv[i] + 2);
 	    }
@@ -232,7 +257,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(http, argv[i], &num_dests, &dests);
+              check_dest(argv[0], http, argv[i], &num_dests, &dests);
 
 	      status |= show_classes(http, argv[i]);
 	    }
@@ -242,7 +267,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'd' : /* Show default destination */
 	    op   = 'd';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
             if (num_dests == 0)
 	      num_dests = cupsGetDests2(http, &dests);
@@ -271,8 +296,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        _cupsLangPuts(stderr,
-	                      _("Error: need hostname after \'-h\' option!\n"));
+	        _cupsLangPrintf(stderr,
+	                	_("%s: Error - expected hostname after "
+			          "\'-h\' option!\n"),
+				argv[0]);
 		return (1);
               }
 
@@ -283,11 +310,11 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'l' : /* Long status or long job status */
 #ifdef __sgi
 	    op   = 'l';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(http, argv[i] + 2, &num_dests, &dests);
+              check_dest(argv[0], http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_jobs(http, argv[i] + 2, NULL, 3, ranking, which);
 	    }
@@ -298,11 +325,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'o' : /* Show jobs by destination */
 	    op   = 'o';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(http, argv[i] + 2, &num_dests, &dests);
+              check_dest(argv[0], http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_jobs(http, argv[i] + 2, NULL, long_status,
 	                          ranking, which);
@@ -311,7 +338,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(http, argv[i], &num_dests, &dests);
+              check_dest(argv[0], http, argv[i], &num_dests, &dests);
 
 	      status |= show_jobs(http, argv[i], NULL, long_status,
 	                          ranking, which);
@@ -323,11 +350,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'p' : /* Show printers */
 	    op   = 'p';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(http, argv[i] + 2, &num_dests, &dests);
+              check_dest(argv[0], http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_printers(http, argv[i] + 2, num_dests, dests, long_status);
 	    }
@@ -335,7 +362,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(http, argv[i], &num_dests, &dests);
+              check_dest(argv[0], http, argv[i], &num_dests, &dests);
 
 	      status |= show_printers(http, argv[i], num_dests, dests, long_status);
 	    }
@@ -350,14 +377,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'r' : /* Show scheduler status */
 	    op   = 'r';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
 	    show_scheduler(http);
 	    break;
 
         case 's' : /* Show summary */
 	    op   = 's';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
             if (num_dests == 0)
 	      num_dests = cupsGetDests2(http, &dests);
@@ -369,7 +396,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 't' : /* Show all info */
 	    op   = 't';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
             if (num_dests == 0)
 	      num_dests = cupsGetDests2(http, &dests);
@@ -385,7 +412,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'u' : /* Show jobs by user */
 	    op   = 'u';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
 	    if (argv[i][2] != '\0')
 	      status |= show_jobs(http, NULL, argv[i] + 2, long_status,
@@ -403,11 +430,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'v' : /* Show printer devices */
 	    op   = 'v';
-	    http = connect_server(http);
+	    http = connect_server(argv[0], http);
 
 	    if (argv[i][2] != '\0')
 	    {
-              check_dest(http, argv[i] + 2, &num_dests, &dests);
+              check_dest(argv[0], http, argv[i] + 2, &num_dests, &dests);
 
 	      status |= show_devices(http, argv[i] + 2, num_dests, dests);
 	    }
@@ -415,7 +442,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      i ++;
 
-              check_dest(http, argv[i], &num_dests, &dests);
+              check_dest(argv[0], http, argv[i], &num_dests, &dests);
 
 	      status |= show_devices(http, argv[i], num_dests, dests);
 	    }
@@ -431,12 +458,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	default :
 	    _cupsLangPrintf(stderr,
-	                    _("lpstat: Unknown option \'%c\'!\n"), argv[i][1]);
+	                    _("%s: Error - unknown option \'%c\'!\n"),
+			    argv[0], argv[i][1]);
 	    return (1);
       }
     else
     {
-      http = connect_server(http);
+      http = connect_server(argv[0], http);
 
       status |= show_jobs(http, argv[i], NULL, long_status, ranking, which);
       op = 'o';
@@ -444,7 +472,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (!op)
   {
-    http = connect_server(http);
+    http = connect_server(argv[0], http);
 
     status |= show_jobs(http, NULL, cupsUser(), long_status, ranking, which);
   }
@@ -458,7 +486,8 @@ main(int  argc,			/* I - Number of command-line arguments */
  */
 
 static void
-check_dest(http_t      *http,		/* I  - HTTP connection */
+check_dest(const char  *command,	/* I  - Command name */
+           http_t      *http,		/* I  - HTTP connection */
            const char  *name,		/* I  - Name of printer/class(es) */
            int         *num_dests,	/* IO - Number of destinations */
 	   cups_dest_t **dests)		/* IO - Destinations */
@@ -502,8 +531,8 @@ check_dest(http_t      *http,		/* I  - HTTP connection */
       else
       {
         _cupsLangPrintf(stderr,
-	                _("lpstat: Invalid destination name in list \"%s\"!\n"),
-			name);
+	                _("%s: Invalid destination name in list \"%s\"!\n"),
+			command, name);
         exit(1);
       }
     }
@@ -517,7 +546,7 @@ check_dest(http_t      *http,		/* I  - HTTP connection */
     if (cupsGetDest(printer, NULL, *num_dests, *dests) == NULL)
     {
       _cupsLangPrintf(stderr,
-                      _("lpstat: Unknown destination \"%s\"!\n"), printer);
+                      _("%s: Unknown destination \"%s\"!\n"), command, printer);
       exit(1);
     }
   }
@@ -529,7 +558,8 @@ check_dest(http_t      *http,		/* I  - HTTP connection */
  */
 
 static http_t *				/* O - New HTTP connection */
-connect_server(http_t *http)		/* I - Current HTTP connection */
+connect_server(const char *command,	/* I - Command name */
+               http_t     *http)	/* I - Current HTTP connection */
 {
   if (!http)
   {
@@ -538,9 +568,7 @@ connect_server(http_t *http)		/* I - Current HTTP connection */
 
     if (http == NULL)
     {
-      _cupsLangPrintf(stderr,
-                      _("lpstat: Unable to connect to server %s on port %d: %s\n"),
-		      cupsServer(), ippPort(), strerror(errno));
+      _cupsLangPrintf(stderr, _("%s: Unable to connect to server\n"), command);
       exit(1);
     }
   }

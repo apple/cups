@@ -3,6 +3,9 @@ CHANGES.txt - 01/18/2006
 
 CHANGES IN CUPS V1.2.0b1
 
+	- All of the Berkeley (except for lpc) and System V
+	  commands now support specification of user, host, and
+	  port (STR #1028, STR #1029, STR #1087)
 	- The lpmove command now allows you to move all jobs for
 	  a given queue (STR #56)
 	- The web interface now supports moving of a job or jobs

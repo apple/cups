@@ -27,13 +27,17 @@ lpmove \- move a job or all jobs to a new destination
 .SH SYNOPSIS
 .B lpmove
 [ -E ] [ -h
-.I server
+.I hostname[:port]
+] [ -U
+.I username
 ]
 .I job destination
 .br
 .B lpmove
 [ -E ] [ -h
-.I server
+.I hostname[:port]
+] [ -U
+.I username
 ]
 .I source destination
 .SH DESCRIPTION
@@ -48,6 +52,8 @@ number or the old destination and job ID:
 .fi
 .SH OPTIONS
 The \fI-E\fR option forces encryption when connecting to the server.
+.LP
+The \fI-U\fR option specifies an alternate username.
 .LP
 The \fI-h\fR option specifies an alternate server.
 .SH SEE ALSO

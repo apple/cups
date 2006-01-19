@@ -3,7 +3,7 @@
 .\"
 .\"   lp/cancel man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,17 +21,19 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lp 1 "Common UNIX Printing System" "1 May 2003" "Easy Software Products"
+.TH lp 1 "Common UNIX Printing System" "18 January 2006" "Easy Software Products"
 .SH NAME
 lp \- print files
 .br
 cancel \- cancel jobs
 .SH SYNOPSIS
 .B lp
-[ -E ] [ \-c ] [ \-d
+[ -E ] [ -U
+.I username
+] [ \-c ] [ \-d
 .I destination
 ] [ \-h
-.I server
+.I hostname[:port]
 ] [ \-m ] [ \-n
 .I num-copies
 [ \-o
@@ -49,8 +51,10 @@ cancel \- cancel jobs
 ]
 .br
 .B lp
-[ -E ] [ \-c ] [ \-h
-.I server
+[ -E ] [ -U
+.I username
+] [ \-c ] [ \-h
+.I hostname[:port]
 ] [ \-i
 .I job-id
 ] [ \-n
@@ -68,8 +72,10 @@ cancel \- cancel jobs
 ]
 .br
 .B cancel
-[ \-a ] [ -h
-.I server
+[ -E ] [ -U
+.I username
+] [ \-a ] [ -h
+.I hostname:port
 ] [ -u 
 .I username
 ] [
@@ -172,10 +178,10 @@ jobs via the \fI-u\fR option should password-protect the /jobs
 location in \fIcupsd.conf(5)\fR.
 .SH SEE ALSO
 lpstat(1),
-CUPS Software Users Manual,
-http://localhost:631/documentation.html
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

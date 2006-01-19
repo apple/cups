@@ -108,6 +108,25 @@ main(int  argc,				/* I - Number of command-line arguments */
 #endif /* HAVE_SSL */
 	    break;
 
+        case 'U' : /* Username */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected username after "
+				  "\'-U\' option!\n"),
+		        	command);
+	        return (1);
+	      }
+
+              cupsSetUser(argv[i]);
+	    }
+	    break;
+	    
         case 'c' : /* Cancel jobs */
 	    cancel = 1;
 	    break;
@@ -124,7 +143,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 	        _cupsLangPrintf(stderr,
-		                _("%s: Expected server name after -h!\n"),
+		                _("%s: Error - expected hostname after "
+				  "\'-h\' option!\n"),
 		        	command);
 	        return (1);
 	      }
@@ -142,7 +162,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 	        _cupsLangPrintf(stderr,
-		                _("%s: Expected reason text after -r!\n"),
+		                _("%s: Error - expected reason text after "
+				  "\'-r\' option!\n"),
 				command);
 		return (1);
 	      }
@@ -152,7 +173,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, _("%s: Unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%c\'!\n"),
 	                    command, argv[i][1]);
 	    return (1);
       }

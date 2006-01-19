@@ -49,9 +49,9 @@
  * Local functions...
  */
 
-static int	show_jobs(http_t *, const char *, const char *, const int,
-		          const int);
-static void	show_printer(http_t *, const char *);
+static int	show_jobs(const char *, http_t *, const char *,
+		          const char *, const int, const int);
+static void	show_printer(const char *, http_t *, const char *);
 static void	usage(void);
 
 
@@ -60,24 +60,24 @@ static void	usage(void);
  */
 
 int
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  http_t	*http;		/* Connection to server */
-  const char	*dest,		/* Desired printer */
-		*user,		/* Desired user */
-		*val;		/* Environment variable name */
-  char		*instance;	/* Printer instance */
-  int		id,		/* Desired job ID */
-		all,		/* All printers */
-		interval,	/* Reporting interval */
-		longstatus;	/* Show file details */
-  int		num_dests;	/* Number of destinations */
-  cups_dest_t	*dests;		/* Destinations */
-  cups_lang_t	*language;	/* Language */
+  int		i;			/* Looping var */
+  http_t	*http;			/* Connection to server */
+  const char	*dest,			/* Desired printer */
+		*user,			/* Desired user */
+		*val;			/* Environment variable name */
+  char		*instance;		/* Printer instance */
+  int		id,			/* Desired job ID */
+		all,			/* All printers */
+		interval,		/* Reporting interval */
+		longstatus;		/* Show file details */
+  int		num_dests;		/* Number of destinations */
+  cups_dest_t	*dests;			/* Destinations */
+  cups_lang_t	*language;		/* Language */
 #ifdef HAVE_SSL
-  http_encryption_t encryption;	/* Encryption? */
+  http_encryption_t encryption;		/* Encryption? */
 #endif /* HAVE_SSL */
 
 
@@ -90,8 +90,7 @@ main(int  argc,		/* I - Number of command-line arguments */
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
   {
-    _cupsLangPuts(stderr,
-                  _("lpq: Unable to contact server!\n"));
+    _cupsLangPrintf(stderr, _("%s: Unable to contact server!\n"), argv[0]);
     return (1);
   }
 
@@ -127,6 +126,25 @@ main(int  argc,		/* I - Number of command-line arguments */
 #endif /* HAVE_SSL */
 	    break;
 
+        case 'U' : /* Username */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected username after "
+				  "\'-U\' option!\n"),
+		        	argv[0]);
+	        return (1);
+	      }
+
+              cupsSetUser(argv[i]);
+	    }
+	    break;
+	    
         case 'P' : /* Printer */
 	    if (argv[i][2])
 	      dest = argv[i] + 2;
@@ -152,11 +170,12 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    {
 	      if (instance)
 		_cupsLangPrintf(stderr,
-		                _("lpq: Unknown destination \"%s/%s\"!\n"),
-		        	dest, instance);
+		                _("%s: Error - unknown destination \"%s/%s\"!\n"),
+		        	argv[0], dest, instance);
               else
 		_cupsLangPrintf(stderr,
-		                _("lpq: Unknown destination \"%s\"!\n"), dest);
+		                _("%s: Unknown destination \"%s\"!\n"),
+				argv[0], dest);
 
 	      return (1);
 	    }
@@ -164,6 +183,29 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 	case 'a' : /* All printers */
 	    all = 1;
+	    break;
+
+        case 'h' : /* Connect to host */
+	    if (http != NULL)
+	      httpClose(http);
+
+	    if (argv[i][2] != '\0')
+              cupsSetServer(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		        	_("%s: Error - expected hostname after "
+			          "\'-h\' option!\n"),
+				argv[0]);
+		return (1);
+              }
+	      else
+                cupsSetServer(argv[i]);
+	    }
 	    break;
 
 	case 'l' : /* Long status */
@@ -208,12 +250,13 @@ main(int  argc,		/* I - Number of command-line arguments */
 
       if (dest && !cupsGetDest(dest, NULL, num_dests, dests))
 	_cupsLangPrintf(stderr,
-	                _("lp: error - %s environment variable names "
+	                _("%s: error - %s environment variable names "
 			  "non-existent destination \"%s\"!\n"),
-        	        val, dest);
+        	        argv[0], val, dest);
       else
-	_cupsLangPuts(stderr,
-	              _("lpq: error - no default destination available.\n"));
+	_cupsLangPrintf(stderr,
+	                _("%s: error - no default destination available.\n"),
+			argv[0]);
       httpClose(http);
       cupsFreeDests(num_dests, dests);
       return (1);
@@ -227,9 +270,9 @@ main(int  argc,		/* I - Number of command-line arguments */
   for (;;)
   {
     if (dest)
-      show_printer(http, dest);
+      show_printer(argv[0], http, dest);
 
-    i = show_jobs(http, dest, user, id, longstatus);
+    i = show_jobs(argv[0], http, dest, user, id, longstatus);
 
     if (i && interval)
     {
@@ -255,32 +298,33 @@ main(int  argc,		/* I - Number of command-line arguments */
  * 'show_jobs()' - Show jobs.
  */
 
-static int			/* O - Number of jobs in queue */
-show_jobs(http_t     *http,	/* I - HTTP connection to server */
-          const char *dest,	/* I - Destination */
-	  const char *user,	/* I - User */
-	  const int  id,	/* I - Job ID */
-	  const int  longstatus)/* I - 1 if long report desired */
+static int				/* O - Number of jobs in queue */
+show_jobs(const char *command,		/* I - Command name */
+          http_t     *http,		/* I - HTTP connection to server */
+          const char *dest,		/* I - Destination */
+	  const char *user,		/* I - User */
+	  const int  id,		/* I - Job ID */
+	  const int  longstatus)	/* I - 1 if long report desired */
 {
-  ipp_t		*request,	/* IPP Request */
-		*response;	/* IPP Response */
-  ipp_attribute_t *attr;	/* Current attribute */
-  const char	*jobdest,	/* Pointer into job-printer-uri */
-		*jobuser,	/* Pointer to job-originating-user-name */
-		*jobname;	/* Pointer to job-name */
-  ipp_jstate_t	jobstate;	/* job-state */
-  int		jobid,		/* job-id */
-		jobsize,	/* job-k-octets */
+  ipp_t		*request,		/* IPP Request */
+		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  const char	*jobdest,		/* Pointer into job-printer-uri */
+		*jobuser,		/* Pointer to job-originating-user-name */
+		*jobname;		/* Pointer to job-name */
+  ipp_jstate_t	jobstate;		/* job-state */
+  int		jobid,			/* job-id */
+		jobsize,		/* job-k-octets */
 #ifdef __osf__
-		jobpriority,	/* job-priority */
+		jobpriority,		/* job-priority */
 #endif /* __osf__ */
-		jobcount,	/* Number of jobs */
-		jobcopies,	/* Number of copies */
-		rank;		/* Rank of job */
-  char		resource[1024];	/* Resource string */
-  char		rankstr[255];	/* Rank string */
-  char		namestr[1024];	/* Job name string */
-  static const char *ranks[10] =/* Ranking strings */
+		jobcount,		/* Number of jobs */
+		jobcopies,		/* Number of copies */
+		rank;			/* Rank of job */
+  char		resource[1024];		/* Resource string */
+  char		rankstr[255];		/* Rank string */
+  char		namestr[1024];		/* Job name string */
+  static const char *ranks[10] =	/* Ranking strings */
 		{
 		  "th",
 		  "st",
@@ -348,7 +392,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, "lpq: %s\n", cupsLastErrorString());
+      _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
       ippDelete(response);
       return (0);
     }
@@ -507,7 +551,7 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, "lpq: %s\n", cupsLastErrorString());
+    _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
     return (0);
   }
 
@@ -523,7 +567,8 @@ show_jobs(http_t     *http,	/* I - HTTP connection to server */
  */
 
 static void
-show_printer(http_t     *http,		/* I - HTTP connection to server */
+show_printer(const char *command,	/* I - Command name */
+             http_t     *http,		/* I - HTTP connection to server */
              const char *dest)		/* I - Destination */
 {
   ipp_t		*request,		/* IPP Request */
@@ -560,7 +605,7 @@ show_printer(http_t     *http,		/* I - HTTP connection to server */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, "lpq: %s\n", cupsLastErrorString());
+      _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
       ippDelete(response);
       return;
     }
@@ -587,7 +632,7 @@ show_printer(http_t     *http,		/* I - HTTP connection to server */
     ippDelete(response);
   }
   else
-    _cupsLangPrintf(stderr, "lpq: %s\n", cupsLastErrorString());
+    _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
 }
 
 
@@ -598,7 +643,9 @@ show_printer(http_t     *http,		/* I - HTTP connection to server */
 static void
 usage(void)
 {
-  _cupsLangPuts(stderr, _("Usage: lpq [-P dest] [-l] [+interval]\n"));
+  _cupsLangPuts(stderr,
+                _("Usage: lpq [-P dest] [-U username] [-h hostname[:port]] "
+		  "[-l] [+interval]\n"));
   exit(1);
 }
 

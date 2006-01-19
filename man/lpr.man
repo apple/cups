@@ -3,7 +3,7 @@
 .\"
 .\"   lpr man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,15 +21,17 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpr 1 "Common UNIX Printing System" "16 December 2004" "Easy Software Products"
+.TH lpr 1 "Common UNIX Printing System" "18 January 2006" "Easy Software Products"
 .SH NAME
 lpr \- print files
 .SH SYNOPSIS
 .B lpr
-[ -E ] [ \-P
-.I destination
+[ -E ] [ -H
+.I hostname[:port]
 ] [ \-U
 .I username
+] [ \-P
+.I destination
 ] [ \-#
 .I num-copies
 [ \-l ] [ \-o
@@ -98,10 +100,10 @@ The "c", "d", "f", "g", "i", "m", "n", "t", "v", and "w" options are not
 supported by CUPS and will produce a warning message if used.
 .SH SEE ALSO
 cancel(1), lp(1), lpstat(1),
-CUPS Software Users Manual,
-http://localhost:631/documentation.html
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

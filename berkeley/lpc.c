@@ -85,7 +85,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Do the command prompt thing...
     */
 
-    printf("lpc> ");
+    _cupsLangPuts(stdout, _("lpc> "));
     while (fgets(line, sizeof(line), stdin) != NULL)
     {
      /*
@@ -113,7 +113,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         * Nothing left, just show a prompt...
 	*/
 
-        printf("lpc> ");
+	_cupsLangPuts(stdout, _("lpc> "));
 	continue;
       }
 
@@ -149,7 +149,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Put another prompt out to the user...
       */
 
-      printf("lpc> ");
+      _cupsLangPuts(stdout, _("lpc> "));
     }
   }
 

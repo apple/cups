@@ -3,7 +3,7 @@
 .\"
 .\"   lpq man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,12 +21,16 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpq 1 "Common UNIX Printing System" "13 February 2001" "Easy Software Products"
+.TH lpq 1 "Common UNIX Printing System" "18 January 2006" "Easy Software Products"
 .SH NAME
 lpq \- show printer queue status
 .SH SYNOPSIS
 .B lpq
-[ -E ] [ \-P
+[ -E ] [ -U
+.I username
+] [ -h
+.I hostname[:port]
+] [ \-P
 .I dest
 ] [ \-a ] [ \-l ] [
 .I +interval
@@ -48,10 +52,9 @@ The \fI-l\fR option requests a more verbose (long) reporting format.
 .SH SEE ALSO
 cancel(1), lp(1), lpr(1), lprm(1), lpstat(1)
 .br
-CUPS Software Users Manual,
-http://localhost:631/documentation.html
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

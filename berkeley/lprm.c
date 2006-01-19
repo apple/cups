@@ -124,16 +124,60 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (cupsGetDest(dest, NULL, num_dests, dests) == NULL)
 	    {
 	      _cupsLangPrintf(stderr,
-	                      _("lprm: Unknown destination \"%s\"!\n"), dest);
+	                      _("%s: Error - unknown destination \"%s\"!\n"),
+			      argv[0], dest);
               cupsFreeDests(num_dests, dests);
 	      httpClose(http);
 	      return(1);
 	    }
 	    break;
 
+        case 'U' : /* Username */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected username after "
+				  "\'-U\' option!\n"),
+		        	argv[0]);
+	        return (1);
+	      }
+
+              cupsSetUser(argv[i]);
+	    }
+	    break;
+	    
+        case 'h' : /* Connect to host */
+	    if (http != NULL)
+	      httpClose(http);
+
+	    if (argv[i][2] != '\0')
+              cupsSetServer(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		        	_("%s: Error - expected hostname after "
+			          "\'-h\' option!\n"),
+				argv[0]);
+		return (1);
+              }
+	      else
+                cupsSetServer(argv[i]);
+	    }
+	    break;
+
 	default :
 	    _cupsLangPrintf(stderr,
-	                    _("lprm: Unknown option \'%c\'!\n"), argv[i][1]);
+	                    _("%s: Error - unknown option \'%c\'!\n"),
+			    argv[0], argv[i][1]);
             cupsFreeDests(num_dests, dests);
 	    httpClose(http);
 	    return (1);
@@ -151,7 +195,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	op     = IPP_CANCEL_JOB;
         job_id = atoi(argv[i]);
       }
-      else if (strcmp(argv[i], "-") == 0)
+      else if (!strcmp(argv[i], "-"))
       {
        /*
         * Cancel all jobs
@@ -205,17 +249,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
         response = cupsDoRequest(http, request, "/jobs/");
 
+      ippDelete(response);
+
       if (cupsLastError() > IPP_OK_CONFLICT)
       {
-        _cupsLangPrintf(stderr, "lprm: %s\n", cupsLastErrorString());
+        _cupsLangPrintf(stderr, "%s: %s\n", argv[0], cupsLastErrorString());
 
-        ippDelete(response);
         cupsFreeDests(num_dests, dests);
         httpClose(http);
 	return (1);
       }
-
-      ippDelete(response);
     }
 
  /*
@@ -226,7 +269,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (response == NULL)
     if (!cupsCancelJob(dest, 0))
     {
-      _cupsLangPrintf(stderr, "lprm: %s\n", cupsLastErrorString());
+      _cupsLangPrintf(stderr, "%s: %s\n", argv[0], cupsLastErrorString());
       cupsFreeDests(num_dests, dests);
       httpClose(http);
       return (1);
