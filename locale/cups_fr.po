@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-01-18 20:47-0500\n"
+"POT-Creation-Date: 2006-01-18 22:26-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -593,7 +593,8 @@ msgstr ""
 #: systemv/accept.c:108 systemv/cancel.c:95 systemv/lpstat.c:115
 #: systemv/lpadmin.c:284 systemv/lp.c:135 systemv/lpinfo.c:80
 #: systemv/lpmove.c:84 systemv/accept.c:106 systemv/cancel.c:93
-#: systemv/lpmove.c:89
+#: systemv/lpmove.c:89 berkeley/lpq.c:124 systemv/lp.c:136
+#: systemv/lpstat.c:116
 #, c-format
 msgid "%s: Sorry, no encryption support compiled in!\n"
 msgstr ""
@@ -623,36 +624,36 @@ msgstr ""
 msgid "lpq: get-jobs failed: %s\n"
 msgstr ""
 
-#: berkeley/lpq.c:457 berkeley/lpq.c:444
+#: berkeley/lpq.c:457 berkeley/lpq.c:444 berkeley/lpq.c:488
 msgid ""
 "Rank   Owner      Pri  Job        Files                       Total Size\n"
 msgstr ""
 
-#: berkeley/lpq.c:461 berkeley/lpq.c:448
+#: berkeley/lpq.c:461 berkeley/lpq.c:448 berkeley/lpq.c:492
 msgid "Rank    Owner   Job     File(s)                         Total Size\n"
 msgstr ""
 
-#: berkeley/lpq.c:498 berkeley/lpq.c:485
+#: berkeley/lpq.c:498 berkeley/lpq.c:485 berkeley/lpq.c:529
 #, c-format
 msgid "%s: %-33.33s [job %d localhost]\n"
 msgstr ""
 
-#: berkeley/lpq.c:500 berkeley/lpq.c:487
+#: berkeley/lpq.c:500 berkeley/lpq.c:487 berkeley/lpq.c:531
 #, c-format
 msgid "        %-39.39s %.0f bytes\n"
 msgstr ""
 
-#: berkeley/lpq.c:506 berkeley/lpq.c:493
+#: berkeley/lpq.c:506 berkeley/lpq.c:493 berkeley/lpq.c:537
 #, c-format
 msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
 msgstr ""
 
-#: berkeley/lpq.c:511 berkeley/lpq.c:498
+#: berkeley/lpq.c:511 berkeley/lpq.c:498 berkeley/lpq.c:542
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
 msgstr ""
 
-#: berkeley/lpq.c:529 berkeley/lpq.c:515
+#: berkeley/lpq.c:529 berkeley/lpq.c:515 berkeley/lpq.c:559
 msgid "no entries\n"
 msgstr ""
 
@@ -661,17 +662,17 @@ msgstr ""
 msgid "lpq: get-printer-attributes failed: %s\n"
 msgstr ""
 
-#: berkeley/lpq.c:605 berkeley/lpq.c:576
+#: berkeley/lpq.c:605 berkeley/lpq.c:576 berkeley/lpq.c:621
 #, c-format
 msgid "%s is ready\n"
 msgstr ""
 
-#: berkeley/lpq.c:608 berkeley/lpq.c:579
+#: berkeley/lpq.c:608 berkeley/lpq.c:579 berkeley/lpq.c:624
 #, c-format
 msgid "%s is ready and printing\n"
 msgstr ""
 
-#: berkeley/lpq.c:612 berkeley/lpq.c:583
+#: berkeley/lpq.c:612 berkeley/lpq.c:583 berkeley/lpq.c:628
 #, fuzzy, c-format
 msgid "%s is not ready\n"
 msgstr "Le travail # %d n'est pas tenu!"
@@ -822,7 +823,7 @@ msgstr ""
 msgid "%s: Unknown option '%c'!\n"
 msgstr ""
 
-#: systemv/accept.c:173 systemv/accept.c:171
+#: systemv/accept.c:173 systemv/accept.c:171 systemv/accept.c:192
 #, c-format
 msgid "%s: Unable to connect to server: %s\n"
 msgstr ""
@@ -1457,62 +1458,64 @@ msgstr ""
 msgid "lpstat: get-classes failed: %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:1033 systemv/lpstat.c:1011
+#: systemv/lpstat.c:1033 systemv/lpstat.c:1011 systemv/lpstat.c:1039
 #, c-format
 msgid "members of class %s:\n"
 msgstr ""
 
-#: systemv/lpstat.c:1080 systemv/lpstat.c:1057
+#: systemv/lpstat.c:1080 systemv/lpstat.c:1057 systemv/lpstat.c:1085
 #, c-format
 msgid "system default destination: %s/%s\n"
 msgstr ""
 
-#: systemv/lpstat.c:1083 systemv/lpstat.c:1060
+#: systemv/lpstat.c:1083 systemv/lpstat.c:1060 systemv/lpstat.c:1088
 #, c-format
 msgid "system default destination: %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:1105 systemv/lpstat.c:1082
+#: systemv/lpstat.c:1105 systemv/lpstat.c:1082 systemv/lpstat.c:1110
 #, c-format
 msgid ""
 "lpstat: error - %s environment variable names non-existent destination \"%s"
 "\"!\n"
 msgstr ""
 
-#: systemv/lpstat.c:1109 systemv/lpstat.c:1086
+#: systemv/lpstat.c:1109 systemv/lpstat.c:1086 systemv/lpstat.c:1114
 msgid "no system default destination\n"
 msgstr ""
 
-#: systemv/lpstat.c:1313 systemv/lpstat.c:1281
+#: systemv/lpstat.c:1313 systemv/lpstat.c:1281 systemv/lpstat.c:1309
 #, c-format
 msgid "Output for printer %s is sent to remote printer %s on %s\n"
 msgstr ""
 
 #: systemv/lpstat.c:1319 systemv/lpstat.c:1323 systemv/lpstat.c:1287
-#: systemv/lpstat.c:1291
+#: systemv/lpstat.c:1291 systemv/lpstat.c:1315
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:1331 systemv/lpstat.c:1299
+#: systemv/lpstat.c:1331 systemv/lpstat.c:1299 systemv/lpstat.c:1327
 #, c-format
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
 msgstr ""
 
 #: systemv/lpstat.c:1337 systemv/lpstat.c:1341 systemv/lpstat.c:1305
-#: systemv/lpstat.c:1309
+#: systemv/lpstat.c:1309 systemv/lpstat.c:1333
 #, c-format
 msgid "Output for printer %s/%s is sent to %s\n"
 msgstr ""
 
 #: systemv/lpstat.c:1346 systemv/lpstat.c:1349 systemv/lpstat.c:1352
 #: systemv/lpstat.c:1314 systemv/lpstat.c:1317 systemv/lpstat.c:1320
+#: systemv/lpstat.c:1342 systemv/lpstat.c:1345 systemv/lpstat.c:1348
 #, c-format
 msgid "device for %s: %s\n"
 msgstr ""
 
 #: systemv/lpstat.c:1359 systemv/lpstat.c:1362 systemv/lpstat.c:1365
 #: systemv/lpstat.c:1327 systemv/lpstat.c:1330 systemv/lpstat.c:1333
+#: systemv/lpstat.c:1355 systemv/lpstat.c:1358 systemv/lpstat.c:1361
 #, c-format
 msgid "device for %s/%s: %s\n"
 msgstr ""
@@ -1522,33 +1525,33 @@ msgstr ""
 msgid "lpstat: get-jobs failed: %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:1681 systemv/lpstat.c:1635
+#: systemv/lpstat.c:1681 systemv/lpstat.c:1635 systemv/lpstat.c:1663
 #, c-format
 msgid "\tqueued for %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:2037 systemv/lpstat.c:1971
+#: systemv/lpstat.c:2037 systemv/lpstat.c:1971 systemv/lpstat.c:1999
 #, c-format
 msgid "printer %s is idle.  enabled since %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:2042 systemv/lpstat.c:1976
+#: systemv/lpstat.c:2042 systemv/lpstat.c:1976 systemv/lpstat.c:2004
 #, c-format
 msgid "printer %s now printing %s-%d.  enabled since %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:2048 systemv/lpstat.c:1982
+#: systemv/lpstat.c:2048 systemv/lpstat.c:1982 systemv/lpstat.c:2010
 #, c-format
 msgid "printer %s disabled since %s -\n"
 msgstr ""
 
 #: systemv/lpstat.c:2056 systemv/lpstat.c:2169 systemv/lpstat.c:1990
-#: systemv/lpstat.c:2103
+#: systemv/lpstat.c:2103 systemv/lpstat.c:2018 systemv/lpstat.c:2131
 msgid "\treason unknown\n"
 msgstr ""
 
 #: systemv/lpstat.c:2063 systemv/lpstat.c:2176 systemv/lpstat.c:1997
-#: systemv/lpstat.c:2110
+#: systemv/lpstat.c:2110 systemv/lpstat.c:2025 systemv/lpstat.c:2138
 msgid ""
 "\tForm mounted:\n"
 "\tContent types: any\n"
@@ -1556,132 +1559,134 @@ msgid ""
 msgstr ""
 
 #: systemv/lpstat.c:2069 systemv/lpstat.c:2182 systemv/lpstat.c:2003
-#: systemv/lpstat.c:2116
+#: systemv/lpstat.c:2116 systemv/lpstat.c:2031 systemv/lpstat.c:2144
 #, c-format
 msgid "\tDescription: %s\n"
 msgstr ""
 
 #: systemv/lpstat.c:2074 systemv/lpstat.c:2187 systemv/lpstat.c:2008
-#: systemv/lpstat.c:2121
+#: systemv/lpstat.c:2121 systemv/lpstat.c:2036 systemv/lpstat.c:2149
 msgid "\tAlerts:"
 msgstr ""
 
 #: systemv/lpstat.c:2083 systemv/lpstat.c:2196 systemv/lpstat.c:2017
-#: systemv/lpstat.c:2130
+#: systemv/lpstat.c:2130 systemv/lpstat.c:2045 systemv/lpstat.c:2158
 #, c-format
 msgid "\tLocation: %s\n"
 msgstr ""
 
 #: systemv/lpstat.c:2088 systemv/lpstat.c:2201 systemv/lpstat.c:2022
-#: systemv/lpstat.c:2135
+#: systemv/lpstat.c:2135 systemv/lpstat.c:2050 systemv/lpstat.c:2163
 msgid "\tConnection: remote\n"
 msgstr ""
 
 #: systemv/lpstat.c:2092 systemv/lpstat.c:2205 systemv/lpstat.c:2026
-#: systemv/lpstat.c:2139
+#: systemv/lpstat.c:2139 systemv/lpstat.c:2054 systemv/lpstat.c:2167
 #, c-format
 msgid "\tInterface: %s.ppd\n"
 msgstr ""
 
 #: systemv/lpstat.c:2097 systemv/lpstat.c:2210 systemv/lpstat.c:2031
-#: systemv/lpstat.c:2144
+#: systemv/lpstat.c:2144 systemv/lpstat.c:2059 systemv/lpstat.c:2172
 msgid "\tConnection: direct\n"
 msgstr ""
 
 #: systemv/lpstat.c:2101 systemv/lpstat.c:2214 systemv/lpstat.c:2035
-#: systemv/lpstat.c:2148
+#: systemv/lpstat.c:2148 systemv/lpstat.c:2063 systemv/lpstat.c:2176
 #, c-format
 msgid "\tInterface: %s/interfaces/%s\n"
 msgstr ""
 
 #: systemv/lpstat.c:2105 systemv/lpstat.c:2218 systemv/lpstat.c:2039
-#: systemv/lpstat.c:2152
+#: systemv/lpstat.c:2152 systemv/lpstat.c:2067 systemv/lpstat.c:2180
 #, c-format
 msgid "\tInterface: %s/ppd/%s.ppd\n"
 msgstr ""
 
 #: systemv/lpstat.c:2107 systemv/lpstat.c:2220 systemv/lpstat.c:2041
-#: systemv/lpstat.c:2154
+#: systemv/lpstat.c:2154 systemv/lpstat.c:2069 systemv/lpstat.c:2182
 msgid "\tOn fault: no alert\n"
 msgstr ""
 
 #: systemv/lpstat.c:2108 systemv/lpstat.c:2221 systemv/lpstat.c:2042
-#: systemv/lpstat.c:2155
+#: systemv/lpstat.c:2155 systemv/lpstat.c:2070 systemv/lpstat.c:2183
 msgid "\tAfter fault: continue\n"
 msgstr ""
 
 #: systemv/lpstat.c:2112 systemv/lpstat.c:2126 systemv/lpstat.c:2225
 #: systemv/lpstat.c:2239 systemv/lpstat.c:2046 systemv/lpstat.c:2060
-#: systemv/lpstat.c:2159 systemv/lpstat.c:2173
+#: systemv/lpstat.c:2159 systemv/lpstat.c:2173 systemv/lpstat.c:2074
+#: systemv/lpstat.c:2088 systemv/lpstat.c:2187 systemv/lpstat.c:2201
 msgid "\tUsers allowed:\n"
 msgstr ""
 
 #: systemv/lpstat.c:2119 systemv/lpstat.c:2232 systemv/lpstat.c:2053
-#: systemv/lpstat.c:2166
+#: systemv/lpstat.c:2166 systemv/lpstat.c:2081 systemv/lpstat.c:2194
 msgid "\tUsers denied:\n"
 msgstr ""
 
 #: systemv/lpstat.c:2127 systemv/lpstat.c:2240 systemv/lpstat.c:2061
-#: systemv/lpstat.c:2174
+#: systemv/lpstat.c:2174 systemv/lpstat.c:2089 systemv/lpstat.c:2202
 msgid "\t\t(all)\n"
 msgstr ""
 
 #: systemv/lpstat.c:2129 systemv/lpstat.c:2242 systemv/lpstat.c:2063
-#: systemv/lpstat.c:2176
+#: systemv/lpstat.c:2176 systemv/lpstat.c:2091 systemv/lpstat.c:2204
 msgid "\tForms allowed:\n"
 msgstr ""
 
 #: systemv/lpstat.c:2130 systemv/lpstat.c:2133 systemv/lpstat.c:2243
 #: systemv/lpstat.c:2246 systemv/lpstat.c:2064 systemv/lpstat.c:2067
-#: systemv/lpstat.c:2177 systemv/lpstat.c:2180
+#: systemv/lpstat.c:2177 systemv/lpstat.c:2180 systemv/lpstat.c:2092
+#: systemv/lpstat.c:2095 systemv/lpstat.c:2205 systemv/lpstat.c:2208
 msgid "\t\t(none)\n"
 msgstr ""
 
 #: systemv/lpstat.c:2131 systemv/lpstat.c:2244 systemv/lpstat.c:2065
-#: systemv/lpstat.c:2178
+#: systemv/lpstat.c:2178 systemv/lpstat.c:2093 systemv/lpstat.c:2206
 msgid "\tBanner required\n"
 msgstr ""
 
 #: systemv/lpstat.c:2132 systemv/lpstat.c:2245 systemv/lpstat.c:2066
-#: systemv/lpstat.c:2179
+#: systemv/lpstat.c:2179 systemv/lpstat.c:2094 systemv/lpstat.c:2207
 msgid "\tCharset sets:\n"
 msgstr ""
 
 #: systemv/lpstat.c:2134 systemv/lpstat.c:2247 systemv/lpstat.c:2068
-#: systemv/lpstat.c:2181
+#: systemv/lpstat.c:2181 systemv/lpstat.c:2096 systemv/lpstat.c:2209
 msgid "\tDefault pitch:\n"
 msgstr ""
 
 #: systemv/lpstat.c:2135 systemv/lpstat.c:2248 systemv/lpstat.c:2069
-#: systemv/lpstat.c:2182
+#: systemv/lpstat.c:2182 systemv/lpstat.c:2097 systemv/lpstat.c:2210
 msgid "\tDefault page size:\n"
 msgstr ""
 
 #: systemv/lpstat.c:2136 systemv/lpstat.c:2249 systemv/lpstat.c:2070
-#: systemv/lpstat.c:2183
+#: systemv/lpstat.c:2183 systemv/lpstat.c:2098 systemv/lpstat.c:2211
 msgid "\tDefault port settings:\n"
 msgstr ""
 
-#: systemv/lpstat.c:2146 systemv/lpstat.c:2080
+#: systemv/lpstat.c:2146 systemv/lpstat.c:2080 systemv/lpstat.c:2108
 #, c-format
 msgid "printer %s/%s is idle.  enabled since %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:2153 systemv/lpstat.c:2087
+#: systemv/lpstat.c:2153 systemv/lpstat.c:2087 systemv/lpstat.c:2115
 #, c-format
 msgid "printer %s/%s now printing %s-%d.  enabled since %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:2160 systemv/lpstat.c:2094
+#: systemv/lpstat.c:2160 systemv/lpstat.c:2094 systemv/lpstat.c:2122
 #, c-format
 msgid "printer %s/%s disabled since %s -\n"
 msgstr ""
 
-#: systemv/lpstat.c:2279 systemv/lpstat.c:2212
+#: systemv/lpstat.c:2279 systemv/lpstat.c:2212 systemv/lpstat.c:2240
 msgid "scheduler is running\n"
 msgstr ""
 
-#: systemv/lpstat.c:2281 systemv/lpstat.c:2214
+#: systemv/lpstat.c:2281 systemv/lpstat.c:2214 systemv/lpstat.c:2242
 msgid "scheduler is not running\n"
 msgstr ""
 
@@ -2016,7 +2021,7 @@ msgstr ""
 msgid "lp: unable to print file: %s\n"
 msgstr "Incapable de copier le dossier de PPD - %s!"
 
-#: systemv/lp.c:656 systemv/lp.c:653
+#: systemv/lp.c:656 systemv/lp.c:653 systemv/lp.c:713
 #, c-format
 msgid "request id is %s-%d (%d file(s))\n"
 msgstr ""
@@ -2739,26 +2744,306 @@ msgstr ""
 msgid "lpstat: Need \"completed\", \"not-completed\", or \"all\" after -W!\n"
 msgstr ""
 
-#: systemv/lpstat.c:740
+#: systemv/lpstat.c:740 systemv/lpstat.c:768
 #, c-format
 msgid "%s accepting requests since %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:743
+#: systemv/lpstat.c:743 systemv/lpstat.c:771
 #, c-format
 msgid ""
 "%s not accepting requests since %s -\n"
 "\t%s\n"
 msgstr ""
 
-#: systemv/lpstat.c:752
+#: systemv/lpstat.c:752 systemv/lpstat.c:780
 #, c-format
 msgid "%s/%s accepting requests since %s\n"
 msgstr ""
 
-#: systemv/lpstat.c:755
+#: systemv/lpstat.c:755 systemv/lpstat.c:783
 #, c-format
 msgid ""
 "%s/%s not accepting requests since %s -\n"
 "\t%s\n"
 msgstr ""
+
+#: berkeley/lpc.c:88 berkeley/lpc.c:116 berkeley/lpc.c:152
+msgid "lpc> "
+msgstr ""
+
+#: berkeley/lpq.c:93 systemv/cancel.c:250 systemv/cancel.c:332
+#, fuzzy, c-format
+msgid "%s: Unable to contact server!\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: berkeley/lpq.c:138 berkeley/lpr.c:128 berkeley/lprm.c:144
+#: systemv/accept.c:120 systemv/cancel.c:107 systemv/lp.c:150
+#: systemv/lpstat.c:144
+#, c-format
+msgid "%s: Error - expected username after '-U' option!\n"
+msgstr ""
+
+#: berkeley/lpq.c:173
+#, fuzzy, c-format
+msgid "%s: Error - unknown destination \"%s/%s\"!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: berkeley/lpq.c:177 systemv/lpstat.c:549
+#, fuzzy, c-format
+msgid "%s: Unknown destination \"%s\"!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: berkeley/lpq.c:201 berkeley/lprm.c:167 systemv/accept.c:146
+#: systemv/cancel.c:135 systemv/lp.c:227 systemv/lpstat.c:300
+#, c-format
+msgid "%s: Error - expected hostname after '-h' option!\n"
+msgstr ""
+
+#: berkeley/lpq.c:253
+#, c-format
+msgid ""
+"%s: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+
+#: berkeley/lpq.c:258
+#, c-format
+msgid "%s: error - no default destination available.\n"
+msgstr ""
+
+#: berkeley/lpq.c:647
+msgid ""
+"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
+msgstr ""
+
+#: berkeley/lpr.c:148
+#, c-format
+msgid "%s: Error - expected hostname after '-H' option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:171
+#, c-format
+msgid "%s: Error - expected value after '-%c' option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:185
+#, c-format
+msgid ""
+"%s: Warning - '%c' format modifier not supported - output may not be "
+"correct!\n"
+msgstr ""
+
+#: berkeley/lpr.c:199
+#, c-format
+msgid "%s: error - expected option=value after '-o' option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:250
+#, c-format
+msgid "%s: Error - expected destination after '-P' option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:285
+#, c-format
+msgid "%s: Error - expected copy count after '-#' option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:309
+#, c-format
+msgid "%s: Error - expected name after '-%c' option!\n"
+msgstr ""
+
+#: berkeley/lpr.c:320 berkeley/lprm.c:179 systemv/accept.c:176
+#: systemv/cancel.c:169 systemv/lp.c:529 systemv/lpstat.c:461
+#, fuzzy, c-format
+msgid "%s: Error - unknown option '%c'!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: berkeley/lpr.c:333 systemv/lp.c:554
+#, c-format
+msgid "%s: Error - unable to access \"%s\" - %s\n"
+msgstr ""
+
+#: berkeley/lpr.c:351 systemv/lp.c:571
+#, c-format
+msgid "%s: Error - too many files - \"%s\"\n"
+msgstr ""
+
+#: berkeley/lpr.c:393 systemv/lp.c:621
+#, c-format
+msgid ""
+"%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+
+#: berkeley/lpr.c:398 systemv/lp.c:626
+#, c-format
+msgid "%s: Error - no default destination available.\n"
+msgstr ""
+
+#: berkeley/lpr.c:402 systemv/lp.c:630
+#, c-format
+msgid "%s: Error - scheduler not responding!\n"
+msgstr ""
+
+#: berkeley/lpr.c:452 systemv/lp.c:670
+#, fuzzy, c-format
+msgid "%s: Error - unable to create temporary file \"%s\" - %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: berkeley/lpr.c:462 systemv/lp.c:679
+#, fuzzy, c-format
+msgid "%s: Error - unable to write to temporary file \"%s\" - %s\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
+
+#: berkeley/lpr.c:476 systemv/lp.c:693
+#, c-format
+msgid "%s: Error - stdin is empty, so no job has been sent.\n"
+msgstr ""
+
+#: berkeley/lprm.c:127 systemv/cancel.c:227
+#, fuzzy, c-format
+msgid "%s: Error - unknown destination \"%s\"!\n"
+msgstr "Incapable d'ajouter le travail pour la destination \"%s\"!"
+
+#: systemv/accept.c:165
+#, c-format
+msgid "%s: Error - expected reason text after '-r' option!\n"
+msgstr ""
+
+#: systemv/cancel.c:157
+#, c-format
+msgid "%s: Error - expected username after '-u' option!\n"
+msgstr ""
+
+#: systemv/cancel.c:308 systemv/cancel.c:373
+#, c-format
+msgid "%s: %s failed: %s\n"
+msgstr ""
+
+#: systemv/lp.c:173
+#, c-format
+msgid "%s: Error - expected destination after '-d' option!\n"
+msgstr ""
+
+#: systemv/lp.c:206
+#, c-format
+msgid "%s: Error - expected form after '-f' option!\n"
+msgstr ""
+
+#: systemv/lp.c:213
+#, c-format
+msgid "%s: Warning - form option ignored!\n"
+msgstr ""
+
+#: systemv/lp.c:247
+#, c-format
+msgid "%s: Expected job ID after '-i' option!\n"
+msgstr ""
+
+#: systemv/lp.c:258
+#, c-format
+msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
+msgstr ""
+
+#: systemv/lp.c:271
+#, c-format
+msgid "%s: Error - bad job ID!\n"
+msgstr ""
+
+#: systemv/lp.c:296
+#, c-format
+msgid "%s: Error - expected copies after '-n' option!\n"
+msgstr ""
+
+#: systemv/lp.c:319
+#, c-format
+msgid "%s: Error - expected option string after '-o' option!\n"
+msgstr ""
+
+#: systemv/lp.c:340
+#, c-format
+msgid "%s: Error - expected priority after '-%c' option!\n"
+msgstr ""
+
+#: systemv/lp.c:363
+#, c-format
+msgid "%s: Error - priority must be between 1 and 100.\n"
+msgstr ""
+
+#: systemv/lp.c:387
+#, c-format
+msgid "%s: Error - expected title after '-t' option!\n"
+msgstr ""
+
+#: systemv/lp.c:405
+#, c-format
+msgid "%s: Error - expected mode list after '-y' option!\n"
+msgstr ""
+
+#: systemv/lp.c:413
+#, c-format
+msgid "%s: Warning - mode option ignored!\n"
+msgstr ""
+
+#: systemv/lp.c:427
+#, c-format
+msgid "%s: Error - expected hold name after '-H' option!\n"
+msgstr ""
+
+#: systemv/lp.c:451
+#, c-format
+msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
+msgstr ""
+
+#: systemv/lp.c:475
+#, c-format
+msgid "%s: Error - expected page list after '-P' option!\n"
+msgstr ""
+
+#: systemv/lp.c:496
+#, c-format
+msgid "%s: Error - expected character set after '-S' option!\n"
+msgstr ""
+
+#: systemv/lp.c:504
+#, c-format
+msgid "%s: Warning - character set option ignored!\n"
+msgstr ""
+
+#: systemv/lp.c:516
+#, c-format
+msgid "%s: Error - expected content type after '-T' option!\n"
+msgstr ""
+
+#: systemv/lp.c:524
+#, c-format
+msgid "%s: Warning - content type option ignored!\n"
+msgstr ""
+
+#: systemv/lp.c:538
+#, c-format
+msgid ""
+"%s: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgstr ""
+
+#: systemv/lpstat.c:164 systemv/lpstat.c:178
+#, c-format
+msgid ""
+"%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
+"option!\n"
+msgstr ""
+
+#: systemv/lpstat.c:237
+#, c-format
+msgid "%s: Error - expected destination after '-b' option!\n"
+msgstr ""
+
+#: systemv/lpstat.c:534
+#, c-format
+msgid "%s: Invalid destination name in list \"%s\"!\n"
+msgstr ""
+
+#: systemv/lpstat.c:571
+#, fuzzy, c-format
+msgid "%s: Unable to connect to server\n"
+msgstr "Incapable de copier le dossier de PPD - %s!"
