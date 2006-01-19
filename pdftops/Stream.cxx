@@ -412,6 +412,11 @@ StreamPredictor::StreamPredictor(Stream *strA, int predictorA,
   predLine = NULL;
   ok = gFalse;
 
+  if (width <= 0 || nComps <= 0 || nBits <= 0 ||
+      nComps >= INT_MAX/nBits ||
+      width >= INT_MAX/nComps/nBits) {
+    return;
+  }
   nVals = width * nComps;
   totalBits = nVals * nBits;
   if (totalBits == 0 ||
