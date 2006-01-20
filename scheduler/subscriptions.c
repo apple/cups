@@ -74,6 +74,7 @@ cupsdAddEvent(
 {
   va_list		ap;		/* Pointer to additional arguments */
   char			ftext[1024];	/* Formatted text buffer */
+  ipp_attribute_t	*attr;		/* Printer/job attribute */
   cupsd_event_t		*temp;		/* New event pointer */
   cupsd_subscription_t	*sub;		/* Current subscription */
 
@@ -166,7 +167,7 @@ cupsdAddEvent(
 	vsnprintf(ftext, sizeof(ftext), text, ap);
 	va_end(ap);
 
-	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD,
+	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_TEXT,
 	             "notify-text", NULL, ftext);
 
         if (dest)
@@ -205,9 +206,14 @@ cupsdAddEvent(
 	  */
 
 	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
-	                "job-id", job->id);
+	                "notify-job-id", job->id);
 	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
 	                "job-state", (int)job->state);
+
+          if ((attr = ippFindAttribute(job->attrs, "job-name",
+	                               IPP_TAG_NAME)) != NULL)
+	    ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
+	        	 "job-name", NULL, attr->values[0].string.text);
 
 	  switch (job->state->values[0].integer)
 	  {
@@ -644,8 +650,7 @@ cupsdExpireSubscriptions(
   for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
        sub;
        sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
-    if (sub->expire <= curtime ||
-        (dest && sub->dest == dest) ||
+    if ((sub->expire <= curtime && dest && sub->dest == dest) ||
 	(job && sub->job == job))
     {
       cupsdLogMessage(CUPSD_LOG_INFO, "Subscription %d has expired...", sub->id);
@@ -1229,6 +1234,8 @@ cupsdSendNotification(
     if (sub->pipe < 0)
       cupsd_start_notifier(sub);
 
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "sub->pipe=%d", sub->pipe);
+
     if (sub->pipe >= 0)
     {
       event->attrs->state = IPP_IDLE;
@@ -1270,7 +1277,7 @@ cupsdStopAllNotifiers(void)
     return;
 
  /*
-  * Yes, kill and processes that are left...
+  * Yes, kill any processes that are left...
   */
 
   for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);

@@ -56,6 +56,7 @@ LIBOBJS	=	\
 		md5.o \
 		md5passwd.o \
 		normalize.o \
+		notify.o \
 		options.o \
 		page.o \
 		ppd.o \

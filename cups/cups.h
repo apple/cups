@@ -33,6 +33,8 @@
 
 #  include "ipp.h"
 #  include "ppd.h"
+#  include "language.h"
+
 
 /*
  * With GCC 3.0 and higher, we can mark old APIs "deprecated" so you get
@@ -223,6 +225,8 @@ extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 					   cups_option_t *options,
 					   ipp_tag_t group_tag);
 extern const char	*cupsLastErrorString(void);
+extern char		*cupsNotifySubject(cups_lang_t *lang, ipp_t *event);
+extern char		*cupsNotifyText(cups_lang_t *lang, ipp_t *event);
 extern cups_file_t	*cupsTempFile2(char *filename, int len);
 
 

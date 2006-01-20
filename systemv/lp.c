@@ -278,9 +278,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 	case 'p' : /* Notify on completion */
 #endif /* __sun */
 	case 'w' : /* Write to console or email */
-	    snprintf(buffer, sizeof(buffer), "mailto:%s", cupsUser());
-	    num_options = cupsAddOption("notify-recipient", buffer, num_options,
-	                                &options);
+	    {
+	      char	email[1024];	/* EMail address */
+
+
+	      snprintf(email, sizeof(email), "mailto:%s@%s", cupsUser(),
+	               httpGetHostname(buffer, sizeof(buffer)));
+	      num_options = cupsAddOption("notify-recipient", email,
+	                                  num_options, &options);
+	    }
 	    break;
 
 	case 'n' : /* Number of copies */

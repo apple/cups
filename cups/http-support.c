@@ -419,8 +419,16 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
   * Range check input...
   */
 
-  if (!out || !outlen || *outlen < 1 || !in || !*in)
+  if (!out || !outlen || *outlen < 1 || !in)
     return (NULL);
+
+  if (!*in)
+  {
+    *out    = '\0';
+    *outlen = 0;
+
+    return (out);
+  }
 
  /*
   * Convert from base-64 to bytes...

@@ -224,9 +224,15 @@ main(int  argc,		/* I - Number of command-line arguments */
 	    break;
 
 	case 'm' : /* Mail on completion */
-	    snprintf(buffer, sizeof(buffer), "mailto:%s", cupsUser());
-	    num_options = cupsAddOption("notify-recipient", buffer, num_options,
-	                                &options);
+	    {
+	      char	email[1024];	/* EMail address */
+
+
+	      snprintf(email, sizeof(email), "mailto:%s@%s", cupsUser(),
+	               httpGetHostname(buffer, sizeof(buffer)));
+	      num_options = cupsAddOption("notify-recipient", email,
+	                                  num_options, &options);
+	    }
 	    break;
 
 	case 'q' : /* Queue file but don't print */

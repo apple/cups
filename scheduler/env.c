@@ -105,6 +105,7 @@ cupsdInitEnv(void)
   cupsdSetEnv("NLSPATH", NULL);
   cupsdSetEnvf("PATH", "%s/filter:" CUPS_BINDIR ":" CUPS_SBINDIR
                        ":/bin:/usr/bin", ServerBin);
+  cupsdSetEnv("SERVER_ADMIN", ServerAdmin);
   cupsdSetEnv("SHLIB_PATH", NULL);
   cupsdSetEnv("SOFTWARE", CUPS_MINIMAL);
   cupsdSetEnv("TMPDIR", TempDir);
