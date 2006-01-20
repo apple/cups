@@ -338,6 +338,32 @@
 #define CUPS_PYTHON	"/usr/bin/python"
 
 
+/*
+ * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
+ */
+
+#undef HAVE_COREFOUNDATION
+#undef HAVE_SYSTEMCONFIGURATION
+
+
+/*
+ * Do we have CoreFoundation public and private headers?
+ */
+
+#undef HAVE_COREFOUNDATION_H
+#undef HAVE_CFPRIV_H
+#undef HAVE_CFBUNDLEPRIV_H
+
+
+/*
+ * Do we have MacOSX 10.4's mbr_XXX functions()?
+ */
+
+#undef HAVE_MEMBERSHIP_H
+#undef HAVE_MEMBERSHIPPRIV_H
+#undef HAVE_MBR_UID_TO_UUID
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

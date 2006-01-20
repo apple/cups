@@ -24,7 +24,8 @@ dnl
 
 dnl Get the operating system and version number...
 uname=`uname`
-uversion=`uname -r | sed -e '1,$s/[[^0-9]]//g'`
+uversion=`uname -r | sed -e '1,$s/^[[^0-9]]*\([[0-9]]*\)\.\([[0-9]]*\).*/\1\2/'`
+
 case "$uname" in
 	GNU* | GNU/*)
 		uname="GNU"
