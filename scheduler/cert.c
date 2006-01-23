@@ -37,6 +37,10 @@
  */
 
 #include "cupsd.h"
+#ifdef HAVE_ACL_INIT
+#  include <sys/acl.h>
+#  include <membership.h>
+#endif /* HAVE_ACL_INIT */
 
 
 /*
@@ -94,12 +98,53 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 
   if (pid == 0)
   {
+#ifdef HAVE_ACL_INIT
+    acl_t		acl;		/* ACL information */
+    acl_entry_t		entry;		/* ACL entry */
+    acl_permset_t	permset;	/* Permissions */
+    uuid_t		group;		/* Group ID */
+#endif /* HAVE_ACL_INIT */
+
+
    /*
     * Root certificate...
     */
 
     fchmod(fd, 0440);
     fchown(fd, RunUser, SystemGroupIDs[0]);
+
+#ifdef HAVE_ACL_INIT
+    if (NumSystemGroups > 1)
+    {
+     /*
+      * Set POSIX ACLs for the root certificate so that all system
+      * groups can access it...
+      */
+
+      acl = acl_init(NumSystemGroups - 1);
+
+      for (i = 1; i < NumSystemGroups; i ++)
+      {
+       /*
+        * Add each group ID to the ACL...
+	*/
+
+        acl_create_entry(&acl, &entry);
+	acl_get_permset(entry, &permset);
+	acl_add_perm(permset, ACL_READ_DATA);
+	acl_set_tag_type(entry, ACL_EXTENDED_ALLOW);
+	mbr_gid_to_uuid((gid_t)SystemGroupIDs[i], group);
+	acl_set_qualifier(entry, &group);
+	acl_set_permset(entry, permset);
+      }
+
+      if (acl_set_fd(fd, acl))
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Unable to set ACLs on root certificate \"%s\" - %s",
+			filename, strerror(errno));
+      acl_free(acl);
+    }
+#endif /* HAVE_ACL_INIT */
 
     RootCertTime = time(NULL);
   }

@@ -159,6 +159,9 @@ AC_TRY_COMPILE([#include <time.h>],[struct tm t;
 	AC_DEFINE(HAVE_TM_GMTOFF),
 	AC_MSG_RESULT(no))
 
+dnl See if we have POSIX ACL support...
+AC_CHECK_FUNCS(acl_init)
+
 dnl Flags for "ar" command...
 case $uname in
         Darwin* | *BSD*)

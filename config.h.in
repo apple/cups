@@ -210,6 +210,13 @@
 
 
 /*
+ * Do we have the POSIX ACL functions?
+ */
+
+#undef HAVE_ACL_INIT
+
+
+/*
  * Do we have the langinfo.h header file?
  */
 
