@@ -3,7 +3,7 @@
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2005 by Easy Software Products.
+#   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -28,7 +28,7 @@ include ../Makedefs
 # Config files...
 #
 
-KEEP	=	classes.conf client.conf cupsd.conf printers.conf
+KEEP	=	client.conf cupsd.conf
 REPLACE	=	mime.convs mime.types
 
 
@@ -59,6 +59,7 @@ install:	all
 			$(INSTALL_DATA) $$file $(SERVERROOT) ; \
 		fi ; \
 	done
+	$(INSTALL_DATA) cupsd.conf $(SERVERROOT)/cupsd.conf.default
 	for file in $(REPLACE); do \
 		if test -r $(SERVERROOT)/$$file ; then \
 			$(MV) $(SERVERROOT)/$$file $(SERVERROOT)/$$file.O ; \

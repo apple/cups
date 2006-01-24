@@ -898,9 +898,10 @@ cupsdLoadAllPrinters(void)
   snprintf(line, sizeof(line), "%s/printers.conf", ServerRoot);
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdLoadAllPrinters: Unable to open %s - %s", line,
-                    strerror(errno));
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "cupsdLoadAllPrinters: Unable to open %s - %s", line,
+		      strerror(errno));
     return;
   }
 

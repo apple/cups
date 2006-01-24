@@ -706,9 +706,10 @@ cupsdLoadAllSubscriptions(void)
   snprintf(line, sizeof(line), "%s/subscriptions.conf", ServerRoot);
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "LoadAllSubscriptions: Unable to open %s - %s", line,
-                    strerror(errno));
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "LoadAllSubscriptions: Unable to open %s - %s", line,
+		      strerror(errno));
     return;
   }
 
