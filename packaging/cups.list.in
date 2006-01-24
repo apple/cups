@@ -446,7 +446,7 @@ f 0644 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.$MAN8EXT
 
 # Startup script
 %system all
-i 0755 root sys cups cups.sh
+i 0755 root sys cups init/cups.sh
 
 #
 # End of "$Id$".

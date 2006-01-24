@@ -3,7 +3,7 @@
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2004 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -92,25 +92,25 @@ install:	installhdrs
 	echo Installing startup script...
 	if test "x$(INITDIR)" != "x"; then \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/init.d; \
-		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
+		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc0.d; \
-		$(INSTALL_SCRIPT) cups.sh  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
+		$(INSTALL_SCRIPT) init/cups.sh  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc2.d; \
-		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/rc2.d/S99cups; \
+		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc2.d/S99cups; \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc3.d; \
-		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/rc3.d/S99cups; \
+		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc3.d/S99cups; \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc5.d; \
-		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
+		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
 	fi
 	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
 		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
-			$(INSTALL_SCRIPT) cups.osx $(BUILDROOT)$(INITDDIR)/PrintingServices; \
-			$(INSTALL_DATA) cups.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
+			$(INSTALL_SCRIPT) init/cups.osx $(BUILDROOT)$(INITDDIR)/PrintingServices; \
+			$(INSTALL_DATA) init/cups.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
 			$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
-			$(INSTALL_DATA) cups.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
+			$(INSTALL_DATA) init/cups.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
 		else \
-			$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
+			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		fi \
 	fi
 
