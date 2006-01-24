@@ -491,7 +491,7 @@ cupsdCreateCommonData(void)
                 "job-priority-supported", 100);
 
   /* job-sheets-supported */
-  if (NumBanners > 0)
+  if (cupsArrayCount(Banners) > 0)
   {
    /*
     * Setup the job-sheets-supported attribute...
@@ -502,7 +502,8 @@ cupsdCreateCommonData(void)
                 	  "job-sheets-supported", NULL, Classification);
     else
       attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	   "job-sheets-supported", NumBanners + 1, NULL, NULL);
+                	   "job-sheets-supported", cupsArrayCount(Banners) + 1,
+			   NULL, NULL);
 
     if (attr == NULL)
       cupsdLogMessage(CUPSD_LOG_EMERG,
@@ -510,10 +511,15 @@ cupsdCreateCommonData(void)
                       "job-sheets-supported attribute: %s!", strerror(errno));
     else if (!Classification || ClassifyOverride)
     {
+      cupsd_banner_t	*banner;	/* Current banner */
+
+
       attr->values[0].string.text = strdup("none");
 
-      for (i = 0; i < NumBanners; i ++)
-	attr->values[i + 1].string.text = strdup(Banners[i].name);
+      for (i = 1, banner = (cupsd_banner_t *)cupsArrayFirst(Banners);
+	   banner;
+	   i ++, banner = (cupsd_banner_t *)cupsArrayNext(Banners))
+	attr->values[i].string.text = strdup(banner->name);
     }
   }
   else
@@ -1525,7 +1531,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "job-page-limit", p->page_limit);
 
-  if (NumBanners > 0 && !(p->type & CUPS_PRINTER_REMOTE))
+  if (cupsArrayCount(Banners) > 0 && !(p->type & CUPS_PRINTER_REMOTE))
   {
    /*
     * Setup the job-sheets-default attribute...

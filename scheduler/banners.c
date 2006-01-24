@@ -3,7 +3,7 @@
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -26,7 +26,7 @@
  *   cupsdAddBanner()   - Add a banner to the array.
  *   cupsdFindBanner()  - Find a named banner.
  *   cupsdLoadBanners() - Load all available banner files...
- *   compare()          - Compare two banners.
+ *   compare_banners()  - Compare two banners.
  */
 
 /*
@@ -41,7 +41,8 @@
  * Local functions...
  */
 
-static int	compare(const cupsd_banner_t *b0, const cupsd_banner_t *b1);
+static int	compare_banners(const cupsd_banner_t *b0,
+		                const cupsd_banner_t *b1);
 
 
 /*
@@ -72,29 +73,16 @@ cupsdAddBanner(const char *name,	/* I - Name of banner */
   * Allocate memory...
   */
 
-  if (NumBanners == 0)
-    temp = malloc(sizeof(cupsd_banner_t));
-  else
-    temp = realloc(Banners, sizeof(cupsd_banner_t) * (NumBanners + 1));
-
-  if (temp == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdAddBanner: Ran out of memory adding a banner!");
-    return;
-  }
+  temp = calloc(1, sizeof(cupsd_banner_t));
 
  /*
   * Copy the new banner data over...
   */
 
-  Banners = temp;
-  temp    += NumBanners;
-  NumBanners ++;
-
-  memset(temp, 0, sizeof(cupsd_banner_t));
   strlcpy(temp->name, name, sizeof(temp->name));
   temp->filetype = filetype;
+
+  cupsArrayAdd(Banners, temp);
 }
 
 
@@ -110,8 +98,27 @@ cupsdFindBanner(const char *name)	/* I - Name of banner */
 
   strlcpy(key.name, name, sizeof(key.name));
 
-  return ((cupsd_banner_t *)bsearch(&key, Banners, NumBanners, sizeof(cupsd_banner_t),
-                              (int (*)(const void *, const void *))compare));
+  return ((cupsd_banner_t *)cupsArrayFind(Banners, &key));
+}
+
+
+/*
+ * 'cupsdFreeBanners()' - Free all banners.
+ */
+
+void
+cupsdFreeBanners(void)
+{
+  cupsd_banner_t	*temp;		/* Current banner */
+
+
+  for (temp = (cupsd_banner_t *)cupsArrayFirst(Banners);
+       temp;
+       temp = (cupsd_banner_t *)cupsArrayNext(Banners))
+    free(temp);
+
+  cupsArrayDelete(Banners);
+  Banners = NULL;
 }
 
 
@@ -132,11 +139,7 @@ cupsdLoadBanners(const char *d)		/* I - Directory to search */
   * Free old banner info...
   */
 
-  if (NumBanners)
-  {
-    free(Banners);
-    NumBanners = 0;
-  }
+  cupsdFreeBanners();
 
  /*
   * Try opening the banner directory...
@@ -152,6 +155,8 @@ cupsdLoadBanners(const char *d)		/* I - Directory to search */
  /*
   * Read entries, skipping directories and backup files.
   */
+
+  Banners = cupsArrayNew((cups_array_func_t)compare_banners, NULL);
 
   while ((dent = cupsDirRead(dir)) != NULL)
   {
@@ -182,24 +187,21 @@ cupsdLoadBanners(const char *d)		/* I - Directory to search */
   }
 
  /*
-  * Close the directory and sort as needed...
+  * Close the directory...
   */
 
   cupsDirClose(dir);
-
-  if (NumBanners > 1)
-    qsort(Banners, NumBanners, sizeof(cupsd_banner_t),
-          (int (*)(const void *, const void *))compare);
 }
 
 
 /*
- * 'compare()' - Compare two banners.
+ * 'compare_banners()' - Compare two banners.
  */
 
 static int				/* O - -1 if name0 < name1, etc. */
-compare(const cupsd_banner_t *b0,	/* I - First banner */
-        const cupsd_banner_t *b1)	/* I - Second banner */
+compare_banners(
+    const cupsd_banner_t *b0,		/* I - First banner */
+    const cupsd_banner_t *b1)		/* I - Second banner */
 {
   return (strcasecmp(b0->name, b1->name));
 }
