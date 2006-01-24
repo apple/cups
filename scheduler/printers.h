@@ -72,9 +72,8 @@ typedef struct cupsd_printer_s
   struct cupsd_printer_s **printers;	/* Printers in class */
   int		quota_period,		/* Period for quotas */
 		page_limit,		/* Maximum number of pages */
-		k_limit,		/* Maximum number of kilobytes */
-		num_quotas;		/* Number of quota records */
-  cupsd_quota_t	*quotas;		/* Quota records */
+		k_limit;		/* Maximum number of kilobytes */
+  cups_array_t	*quotas;		/* Quota records */
   int		deny_users,		/* 1 = deny, 0 = allow */
 		num_users;		/* Number of allowed/denied users */
   const char	**users;		/* Allowed/denied users */
