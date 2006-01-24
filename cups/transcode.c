@@ -26,6 +26,7 @@
  *   cupsCharmapGet()    - Get a character set map.
  *   cupsCharmapFree()   - Free a character set map.
  *   cupsCharmapFlush()  - Flush all character set maps out of cache.
+ *   _cupsCharmapFlush() - Flush all character set maps out of cache.
  *   cupsUTF8ToCharset() - Convert UTF-8 to legacy character set.
  *   cupsCharsetToUTF8() - Convert legacy character set to UTF-8.
  *   cupsUTF8ToUTF16()   - Convert UTF-8 to UTF-16.
@@ -171,22 +172,33 @@ cupsCharmapFree(const cups_encoding_t encoding)
   return;
 }
 
+
 /*
  * 'cupsCharmapFlush()' - Flush all character set maps out of cache.
  */
 void
 cupsCharmapFlush(void)
 {
-  int           i;              /* Looping variable */
-  _cups_cmap_t   *cmap;          /* Legacy SBCS / Unicode Charset Map */
-  _cups_vmap_t   *vmap;          /* Legacy VBCS / Unicode Charset Map */
-  _cups_cmap_t   *cnext;         /* Next Legacy SBCS Charset Map */
-  _cups_vmap_t   *vnext;         /* Next Legacy VBCS Charset Map */
-  cups_ucs2_t   *crow;          /* Pointer to UCS-2 row in 'char2uni' */
-  cups_sbcs_t   *srow;          /* Pointer to SBCS row in 'uni2char' */
-  cups_vbcs_t   *vrow;          /* Pointer to VBCS row in 'uni2char' */
-  _cups_globals_t *cg = _cupsGlobals();
-				/* Pointer to library globals */
+  _cupsCharmapFlush(_cupsGlobals());
+}
+
+
+/*
+ * '_cupsCharmapFlush()' - Flush all character set maps out of cache.
+ */
+
+void
+_cupsCharmapFlush(_cups_globals_t *cg)	/* I - Global data */
+{
+  int		i;			/* Looping variable */
+  _cups_cmap_t	*cmap;			/* Legacy SBCS / Unicode Charset Map */
+  _cups_vmap_t	*vmap;			/* Legacy VBCS / Unicode Charset Map */
+  _cups_cmap_t	*cnext;			/* Next Legacy SBCS Charset Map */
+  _cups_vmap_t	*vnext;			/* Next Legacy VBCS Charset Map */
+  cups_ucs2_t	*crow;			/* Pointer to UCS-2 row in 'char2uni' */
+  cups_sbcs_t	*srow;			/* Pointer to SBCS row in 'uni2char' */
+  cups_vbcs_t	*vrow;			/* Pointer to VBCS row in 'uni2char' */
+
 
  /*
   * Loop through SBCS charset map cache, free all memory...

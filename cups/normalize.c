@@ -26,6 +26,7 @@
  *   cupsNormalizeMapsGet()       - Get all norm maps to cache.
  *   cupsNormalizeMapsFree()      - Free all norm maps in cache.
  *   cupsNormalizeMapsFlush()     - Flush all norm maps in cache.
+ *   _cupsNormalizeMapsFlush()    - Flush all normalization maps in cache.
  *   cupsUTF8Normalize()          - Normalize UTF-8 string.
  *   cupsUTF32Normalize()         - Normalize UTF-32 string.
  *   cupsUTF8CaseFold()           - Case fold UTF-8 string.
@@ -315,12 +316,22 @@ cupsNormalizeMapsFree(void)
 void
 cupsNormalizeMapsFlush(void)
 {
+  _cupsNormalizeMapsFlush(_cupsGlobals());
+}
+
+
+/*
+ * '_cupsNormalizeMapsFlush()' - Flush all normalization maps in cache.
+ */
+
+void
+_cupsNormalizeMapsFlush(
+    _cups_globals_t *cg)		/* I - Global data */
+{
   _cups_norm_map_t	*nmap;		/* Unicode Normalization Map */
   _cups_norm_map_t	*nextnorm;	/* Next Unicode Normalization Map */
   _cups_fold_map_t	*fmap;		/* Unicode Case Folding Map */
   _cups_fold_map_t	*nextfold;	/* Next Unicode Case Folding Map */
-  _cups_globals_t	*cg = _cupsGlobals();
-					/* Pointer to library globals */
 
 
  /*

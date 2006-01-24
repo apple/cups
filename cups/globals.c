@@ -152,6 +152,18 @@ globals_init()
 static void
 globals_destructor(void *value)		/* I - Data to free */
 {
+  _cups_globals_t	*cg;		/* Global data */
+
+
+  cg = (_cups_globals_t *)value;
+
+  if (cg->http)
+    httpClose(cg->http);
+
+  _cupsLangFlush(cg);
+  _cupsCharmapFlush(cg);
+  _cupsNormalizeMapsFlush(cg);
+
   free(value);
 }
 

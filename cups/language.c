@@ -31,6 +31,7 @@
  *   cupsLangEncoding()     - Return the character encoding (us-ascii, etc.)
  *                            for the given language.
  *   cupsLangFlush()        - Flush all language data out of the cache.
+ *   _cupsLangFlush()       - Flush all language data out of the cache.
  *   cupsLangFree()         - Free language data.
  *   cupsLangGet()          - Get a language.
  *   _cupsLangString()      - Get a message string.
@@ -202,9 +203,19 @@ cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 void
 cupsLangFlush(void)
 {
+  _cupsLangFlush(_cupsGlobals());
+}
+
+
+/*
+ * '_cupsLangFlush()' - Flush all language data out of the cache.
+ */
+
+void
+_cupsLangFlush(_cups_globals_t *cg)	/* I - Global data */
+{
   cups_lang_t	*lang,			/* Current language */
 		*next;			/* Next language */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
