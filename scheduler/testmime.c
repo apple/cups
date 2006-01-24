@@ -3,7 +3,7 @@
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -51,47 +51,47 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		i, j;			/* Looping vars */
+  int		i;			/* Looping vars */
   const char	*filter_path;		/* Filter path */
   char		super[MIME_MAX_SUPER],	/* Super-type name */
 		type[MIME_MAX_TYPE];	/* Type name */
   int		compression;		/* Compression of file */
+  int		cost;			/* Cost of filters */
   mime_t	*mime;			/* MIME database */
   mime_type_t	*src,			/* Source type */
-		*dst,			/* Destination type */
-		**types;		/* File type array pointer */
-  mime_filter_t	*filters;		/* Filters for the file */
-  int		num_filters;		/* Number of filters for the file */
+		*dst;			/* Destination type */
+  cups_array_t	*filters;		/* Filters for the file */
+  mime_filter_t	*filter;		/* Current filter */
 
 
   mime        = NULL;
   src         = NULL;
   dst         = NULL;
-  filter_path = "../filter";
+  filter_path = "../filter:../pdftops";
 
   for (i = 1; i < argc; i ++)
-    if (strcmp(argv[i], "-d") == 0)
+    if (!strcmp(argv[i], "-d"))
     {
       i ++;
 
       if (i < argc)
         mime = mimeLoad(argv[i], filter_path);
     }
-    else if (strcmp(argv[i], "-f") == 0)
+    else if (!strcmp(argv[i], "-f"))
     {
       i ++;
 
       if (i < argc)
         filter_path = argv[i];
     }
-    else if (src == NULL)
+    else if (!src)
     {
       if (!mime)
 	mime = mimeLoad("../conf", filter_path);
 
       src = mimeFileType(mime, argv[i], &compression);
 
-      if (src != NULL)
+      if (src)
 	printf("%s: %s/%s%s\n", argv[i], src->super, src->type,
 	       compression ? " (gzipped)" : "");
       else
@@ -107,46 +107,52 @@ main(int  argc,				/* I - Number of command-line args */
       sscanf(argv[i], "%15[^/]/%31s", super, type);
       dst = mimeType(mime, super, type);
 
-      filters = mimeFilter(mime, src, dst, &num_filters, 10);
+      filters = mimeFilter(mime, src, dst, &cost, 10);
 
-      if (filters == NULL)
+      if (!filters)
       {
 	printf("No filters to convert from %s/%s to %s.\n", src->super,
 	       src->type, argv[i]);
       }
       else
       {
-	for (j = 0; j < num_filters; j ++)
-	  if (j < (num_filters - 1))
-	    printf("%s | ", filters[j].filter);
-	  else
-	    puts(filters[j].filter);
+        printf("Filter cost = %d\n", cost);
 
-        free(filters);
+        filter = (mime_filter_t *)cupsArrayFirst(filters);
+	fputs(filter->filter, stdout);
+
+	for (filter = (mime_filter_t *)cupsArrayNext(filters);
+	     filter;
+	     filter = (mime_filter_t *)cupsArrayNext(filters))
+	  printf(" | %s", filter->filter);
+
+        putchar('\n');
+
+        cupsArrayDelete(filters);
       }
     }
 
   if (!mime)
     mime = mimeLoad("../conf", filter_path);
 
-  if (src == NULL)
+  if (!src)
   {
     puts("MIME database types:");
-    for (i = 0, types = mime->types; i < mime->num_types; i ++, types ++)
+    for (src = mimeFirstType(mime); src; src = mimeNextType(mime))
     {
-      printf("\t%s/%s:\n", (*types)->super, (*types)->type);
-      print_rules((*types)->rules);
+      printf("\t%s/%s:\n", src->super, src->type);
+      print_rules(src->rules);
       puts("");
     }
 
     puts("");
 
     puts("MIME database filters:");
-    for (i = 0, filters = mime->filters; i < mime->num_filters; i ++, filters ++)
+    for (filter = mimeFirstFilter(mime); filter; filter = mimeNextFilter(mime))
       printf("\t%s/%s to %s/%s: %s (%d)\n",
-             filters->src->super, filters->src->type,
-	     filters->dst->super, filters->dst->type,
-	     filters->filter, filters->cost);
+             filter->src->super, filter->src->type,
+	     filter->dst->super, filter->dst->type,
+	     filter->filter, filter->cost);
   }
 
   return (0);

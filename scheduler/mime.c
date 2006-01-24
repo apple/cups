@@ -3,7 +3,7 @@
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -23,12 +23,22 @@
  *
  * Contents:
  *
- *   mimeDelete()   - Delete (free) a MIME database.
- *   mimeMerge()    - Merge a MIME database from disk with the current one.
- *   mimeNew()      - Create a new, empty MIME database.
- *   load_types()   - Load a xyz.types file...
- *   delete_rules() - Free all memory for the given rule tree.
- *   load_convs()   - Load a xyz.convs file...
+ *   mimeDelete()       - Delete (free) a MIME database.
+ *   mimeDeleteFilter() - Delete a filter from the MIME database.
+ *   mimeDeleteType()   - Delete a type from the MIME database.
+ *   mimeFirstFilter()  - Get the first filter in the MIME database.
+ *   mimeFirstType()    - Get the first type in the MIME database.
+ *   mimeNextType()     - Get the next type in the MIME database.
+ *   mimeLoad()         - Create a new MIME database from disk.
+ *   mimeMerge()        - Merge a MIME database from disk with the current one.
+ *   mimeNew()          - Create a new, empty MIME database.
+ *   mimeNextFilter()   - Get the next filter in the MIME database.
+ *   mimeNextType()     - Get the next type in the MIME database.
+ *   mimeNumFilters()   - Get the number of filters in a MIME database.
+ *   mimeNumTypes()     - Get the number of types in a MIME database.
+ *   load_types()       - Load a xyz.types file...
+ *   delete_rules()     - Free all memory for the given rule tree.
+ *   load_convs()       - Load a xyz.convs file...
  */
 
 /*
@@ -39,14 +49,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include <cups/dir.h>
 #include <cups/string.h>
 #include "mime.h"
-
-#ifdef WIN32
-#  include <windows.h>
-#else
-#  include <dirent.h>
-#endif /* WIN32 */
 
 
 /*
@@ -64,32 +69,114 @@ static void	delete_rules(mime_magic_t *rules);
  */
 
 void
-mimeDelete(mime_t *mime)	/* I - MIME database */
+mimeDelete(mime_t *mime)		/* I - MIME database */
 {
-  int	i;			/* Looping var */
+  mime_type_t	*type;			/* Current type */
+  mime_filter_t	*filter;		/* Current filter */
 
 
-  if (mime == NULL)
+  if (!mime)
     return;
 
  /*
   * Loop through the file types and delete any rules...
   */
 
-  for (i = 0; i < mime->num_types; i ++)
-  {
-    delete_rules(mime->types[i]->rules);
-    free(mime->types[i]->type);
-    free(mime->types[i]);
-  }
+  for (type = (mime_type_t *)cupsArrayFirst(mime->types);
+       type;
+       type = (mime_type_t *)cupsArrayNext(mime->types))
+    mimeDeleteType(mime, type);
+
+ /*
+  * Loop through filters and free them...
+  */
+
+  for (filter = (mime_filter_t *)cupsArrayFirst(mime->filters);
+       filter;
+       filter = (mime_filter_t *)cupsArrayNext(mime->filters))
+    mimeDeleteFilter(mime, filter);
 
  /*
   * Free the types and filters arrays, and then the MIME database structure.
   */
 
-  free(mime->types);
-  free(mime->filters);
+  cupsArrayDelete(mime->types);
+  cupsArrayDelete(mime->filters);
   free(mime);
+}
+
+
+/*
+ * 'mimeDeleteFilter()' - Delete a filter from the MIME database.
+ */
+
+void
+mimeDeleteFilter(mime_t        *mime,	/* I - MIME database */
+		 mime_filter_t *filter)	/* I - Filter */
+{
+  if (!mime || !filter)
+    return;
+
+  cupsArrayRemove(mime->filters, filter);
+  free(filter);
+}
+
+
+/*
+ * 'mimeDeleteType()' - Delete a type from the MIME database.
+ */
+
+void
+mimeDeleteType(mime_t      *mime,	/* I - MIME database */
+	       mime_type_t *mt)		/* I - Type */
+{
+  if (!mime || !mt)
+    return;
+
+  cupsArrayRemove(mime->types, mt);
+
+  delete_rules(mt->rules);
+  free(mt);
+}
+
+
+/*
+ * 'mimeFirstFilter()' - Get the first filter in the MIME database.
+ */
+
+mime_filter_t *				/* O - Filter or NULL */
+mimeFirstFilter(mime_t *mime)		/* I - MIME database */
+{
+  if (!mime)
+    return (NULL);
+  else
+    return ((mime_filter_t *)cupsArrayFirst(mime->filters));
+}
+
+
+/*
+ * 'mimeFirstType()' - Get the first type in the MIME database.
+ */
+
+mime_type_t *				/* O - Type or NULL */
+mimeFirstType(mime_t *mime)		/* I - MIME database */
+{
+  if (!mime)
+    return (NULL);
+  else
+    return ((mime_type_t *)cupsArrayFirst(mime->types));
+}
+
+
+/*
+ * 'mimeLoad()' - Create a new MIME database from disk.
+ */
+
+mime_t *				/* O - New MIME database */
+mimeLoad(const char *pathname,		/* I - Directory to load */
+         const char *filterpath)	/* I - Directory to load */
+{
+  return (mimeMerge(NULL, pathname, filterpath));
 }
 
 
@@ -97,16 +184,14 @@ mimeDelete(mime_t *mime)	/* I - MIME database */
  * 'mimeMerge()' - Merge a MIME database from disk with the current one.
  */
 
-mime_t *			/* O - Updated MIME database */
-mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
-          const char *pathname,	/* I - Directory to load */
-          const char *filterpath)/* I - Directory to load */
+mime_t *				/* O - Updated MIME database */
+mimeMerge(mime_t     *mime,		/* I - MIME database to add to */
+          const char *pathname,		/* I - Directory to load */
+          const char *filterpath)	/* I - Directory to load */
 {
-#ifdef WIN32
-  HANDLE	dir;		/* Directory handle */
-  WIN32_FIND_DATA dent;		/* Directory entry */
-  char		filename[1024],	/* Full filename of types/converts file */
-		*pathsep;	/* Last character in path */
+  cups_dir_t	*dir;			/* Directory */
+  cups_dentry_t	*dent;			/* Directory entry */
+  char		filename[1024];		/* Full filename of types/converts file */
 
 
  /*
@@ -114,148 +199,62 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
   * was read or if the pathname is NULL...
   */
 
-  if (pathname == NULL)
+  if (!pathname)
     return (NULL);
 
-  strlcpy(filename, pathname, sizeof(filename));
-
-  pathsep = filename + strlen(filename);
-  if ((pathsep - filename + 9) > sizeof(filename))
-    return (NULL);
-
-  if (pathsep == filename ||
-      (pathsep[-1] != '/' && pathsep[-1] != '\\'))
-  {
-    strcpy(pathsep, "/");
-    pathsep ++;
-  }
-
-  strcpy(pathsep, "*.types");
-  
-  if ((dir = FindFirstFile(filename, &dent)) == 0)
+  if ((dir = cupsDirOpen(pathname)) == NULL)
     return (NULL);
 
  /*
   * If "mime" is NULL, make a new, blank database...
   */
 
-  if (mime == NULL)
-    if ((mime = mimeNew()) == NULL)
-      return (NULL);
+  if (!mime)
+    mime = mimeNew();
+  if (!mime)
+    return (NULL);
 
  /*
   * Read all the .types files...
   */
 
-  do
+  while ((dent = cupsDirRead(dir)) != NULL)
   {
-   /*
-    * Load a mime.types file...
-    */
-
-    if ((pathsep - filename + strlen(dent.cFileName)) >= sizeof(filename))
-      continue;
-
-    strcpy(pathsep, dent.cFileName);
-    load_types(mime, filename);
-  }
-  while (FindNextFile(dir, &dent));
-
-  FindClose(dir);
-
- /*
-  * Read all the .convs files...
-  */
-
-  strcpy(pathsep, "*.convs");
-  
-  if ((dir = FindFirstFile(filename, &dent)) == 0)
-    return (mime);
-
-  do
-  {
-   /*
-    * Load a mime.convs file...
-    */
-
-    if ((pathsep - filename + strlen(dent.cFileName)) >= sizeof(filename))
-      continue;
-
-    strcpy(pathsep, dent.cFileName);
-    load_convs(mime, filename);
-  }
-  while (FindNextFile(dir, &dent));
-
-  FindClose(dir);
-
-  return (mime);
-#else
-  DIR		*dir;		/* Directory */
-  struct dirent	*dent;		/* Directory entry */
-  char		filename[1024];	/* Full filename of types/converts file */
-
-
- /*
-  * First open the directory specified by pathname...  Return NULL if nothing
-  * was read or if the pathname is NULL...
-  */
-
-  if (pathname == NULL)
-    return (NULL);
-
-  if ((dir = opendir(pathname)) == NULL)
-    return (NULL);
-
- /*
-  * If "mime" is NULL, make a new, blank database...
-  */
-
-  if (mime == NULL)
-    if ((mime = mimeNew()) == NULL)
-      return (NULL);
-
- /*
-  * Read all the .types files...
-  */
-
-  while ((dent = readdir(dir)) != NULL)
-  {
-    if (strlen(dent->d_name) > 6 &&
-        strcmp(dent->d_name + strlen(dent->d_name) - 6, ".types") == 0)
+    if (strlen(dent->filename) > 6 &&
+        !strcmp(dent->filename + strlen(dent->filename) - 6, ".types"))
     {
      /*
       * Load a mime.types file...
       */
 
-      snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->d_name);
+      snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->filename);
       load_types(mime, filename);
     }
   }
 
-  rewinddir(dir);
+  cupsDirRewind(dir);
 
  /*
   * Read all the .convs files...
   */
 
-  while ((dent = readdir(dir)) != NULL)
+  while ((dent = cupsDirRead(dir)) != NULL)
   {
-    if (strlen(dent->d_name) > 6 &&
-        strcmp(dent->d_name + strlen(dent->d_name) - 6, ".convs") == 0)
+    if (strlen(dent->filename) > 6 &&
+        !strcmp(dent->filename + strlen(dent->filename) - 6, ".convs"))
     {
      /*
       * Load a mime.convs file...
       */
 
-      snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->d_name);
+      snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->filename);
       load_convs(mime, filename, filterpath);
     }
   }
 
-  closedir(dir);
+  cupsDirClose(dir);
 
   return (mime);
-#endif /* WIN32 */
 }
 
 
@@ -263,10 +262,66 @@ mimeMerge(mime_t     *mime,	/* I - MIME database to add to */
  * 'mimeNew()' - Create a new, empty MIME database.
  */
 
-mime_t *			/* O - MIME database */
+mime_t *				/* O - MIME database */
 mimeNew(void)
 {
   return ((mime_t *)calloc(1, sizeof(mime_t)));
+}
+
+
+/*
+ * 'mimeNextFilter()' - Get the next filter in the MIME database.
+ */
+
+mime_filter_t *				/* O - Filter or NULL */
+mimeNextFilter(mime_t *mime)		/* I - MIME database */
+{
+  if (!mime)
+    return (NULL);
+  else
+    return ((mime_filter_t *)cupsArrayNext(mime->filters));
+}
+
+
+/*
+ * 'mimeNextType()' - Get the next type in the MIME database.
+ */
+
+mime_type_t *				/* O - Type or NULL */
+mimeNextType(mime_t *mime)		/* I - MIME database */
+{
+  if (!mime)
+    return (NULL);
+  else
+    return ((mime_type_t *)cupsArrayNext(mime->types));
+}
+
+
+/*
+ * 'mimeNumFilters()' - Get the number of filters in a MIME database.
+ */
+
+int
+mimeNumFilters(mime_t *mime)		/* I - MIME database */
+{
+  if (!mime)
+    return (0);
+  else
+    return (cupsArrayCount(mime->filters));
+}
+
+
+/*
+ * 'mimeNumTypes()' - Get the number of types in a MIME database.
+ */
+
+int
+mimeNumTypes(mime_t *mime)		/* I - MIME database */
+{
+  if (!mime)
+    return (0);
+  else
+    return (cupsArrayCount(mime->types));
 }
 
 
@@ -369,9 +424,8 @@ load_types(mime_t     *mime,		/* I - MIME database */
 static void
 load_convs(mime_t     *mime,		/* I - MIME database */
            const char *filename,	/* I - Convs file to load */
-           const char *filterpath)	/* I - Directory to load */
+           const char *filterpath)	/* I - Path for filters */
 {
-  int		i;			/* Looping var */
   cups_file_t	*fp;			/* Convs file */
   char		line[1024],		/* Input line from file */
 		*lineptr,		/* Current position in line */
@@ -379,10 +433,12 @@ load_convs(mime_t     *mime,		/* I - MIME database */
 		type[MIME_MAX_TYPE],	/* Type name */
 		*temp,			/* Temporary pointer */
 		*filter;		/* Filter program */
-  mime_type_t	**temptype,		/* MIME type looping var */
+  mime_type_t	*temptype,		/* MIME type looping var */
 		*dsttype;		/* Destination MIME type */
   int		cost;			/* Cost of filter */
+#ifndef WIN32
   char		filterprog[1024];	/* Full path of filter... */
+#endif /* !WIN32 */
 
 
  /*
@@ -475,7 +531,7 @@ load_convs(mime_t     *mime,		/* I - MIME database */
     filter = lineptr;
 
 #ifndef WIN32
-    if (strcmp(filter, "-") != 0)
+    if (strcmp(filter, "-"))
     {
      /*
       * Verify that the filter exists and is executable...
@@ -483,8 +539,9 @@ load_convs(mime_t     *mime,		/* I - MIME database */
 
       if (filter[0] == '/')
 	strlcpy(filterprog, filter, sizeof(filterprog));
-      else
-	snprintf(filterprog, sizeof(filterprog), "%s/%s", filterpath, filter);
+      else if (!cupsFileFind(filter, filterpath, filterprog,
+                             sizeof(filterprog)))
+        continue;
 
       if (access(filterprog, X_OK))
 	continue;
@@ -517,7 +574,7 @@ load_convs(mime_t     *mime,		/* I - MIME database */
 
     *temp = '\0';
 
-    if (strcmp(super, "*") == 0 && strcmp(type, "*") == 0)
+    if (!strcmp(super, "*") && !strcmp(type, "*"))
     {
      /*
       * Force * / * to be "application/octet-stream"...
@@ -531,10 +588,12 @@ load_convs(mime_t     *mime,		/* I - MIME database */
     * Add the filter to the MIME database, supporting wildcards as needed...
     */
 
-    for (temptype = mime->types, i = 0; i < mime->num_types; i ++, temptype ++)
-      if ((super[0] == '*' || strcmp((*temptype)->super, super) == 0) &&
-          (type[0] == '*' || strcmp((*temptype)->type, type) == 0))
-	mimeAddFilter(mime, *temptype, dsttype, cost, filter);
+    for (temptype = (mime_type_t *)cupsArrayFirst(mime->types);
+         temptype;
+	 temptype = (mime_type_t *)cupsArrayNext(mime->types))
+      if ((super[0] == '*' || !strcmp(temptype->super, super)) &&
+          (type[0] == '*' || !strcmp(temptype->type, type)))
+	mimeAddFilter(mime, temptype, dsttype, cost, filter);
   }
 
   cupsFileClose(fp);

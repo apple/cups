@@ -34,6 +34,7 @@
  *   cupsArrayFind()    - Find an element in the array.
  *   cupsArrayFirst()   - Get the first element in the array.
  *   cupsArrayIndex()   - Get the N-th element in the array.
+ *   cupsArrayInsert()  - Insert an element in the array.
  *   cupsArrayLast()    - Get the last element in the array.
  *   cupsArrayNew()     - Create a new array.
  *   cupsArrayNext()    - Get the next element in the array.
@@ -482,6 +483,111 @@ cupsArrayIndex(cups_array_t *a,		/* I - Array */
   a->current = n;
 
   return (cupsArrayCurrent(a));
+}
+
+
+/*
+ * 'cupsArrayInsert()' - Insert an element in the array.
+ *
+ * When inserting an element in a sorted array, this function works
+ * just like cupsArrayAdd().  For unsorted arrays, the element is
+ * inserted at the beginning of the array.
+ */
+
+int					/* O - 0 on failure, 1 on success */
+cupsArrayInsert(cups_array_t *a,	/* I - Array */
+		void         *e)	/* I - Element */
+{
+  int	i;				/* Looping var */
+
+
+  DEBUG_printf(("cupsArrayInsert(a=%p, e=%p)\n", a, e));
+
+ /*
+  * Range check input...
+  */
+
+  if (!a || !e)
+  {
+    DEBUG_puts("cupsArrayInsert: returning 0");
+    return (0);
+  }
+
+ /*
+  * Inserting into a sorted array is the same as adding...
+  */
+
+  if (a->compare)
+    return (cupsArrayAdd(a, e));
+
+ /*
+  * Verify we have room for the new element...
+  */
+
+  if (a->num_elements >= a->alloc_elements)
+  {
+   /*
+    * Allocate additional elements; start with 16 elements, then
+    * double the size until 1024 elements, then add 1024 elements
+    * thereafter...
+    */
+
+    void	**temp;			/* New array elements */
+    int		count;			/* New allocation count */
+
+
+    if (a->alloc_elements == 0)
+    {
+      count = 16;
+      temp  = malloc(count * sizeof(void *));
+    }
+    else
+    {
+      if (a->alloc_elements < 1024)
+        count = a->alloc_elements * 2;
+      else
+        count = a->alloc_elements + 1024;
+
+      temp = realloc(a->elements, count * sizeof(void *));
+    }
+
+    DEBUG_printf(("cupsArrayInsert: count=%d\n", count));
+
+    if (!temp)
+    {
+      DEBUG_puts("cupsAddInsert: allocation failed, returning 0");
+      return (0);
+    }
+
+    a->alloc_elements = count;
+    a->elements       = temp;
+  }
+
+ /*
+  * Insert the element...
+  */
+
+  memmove(a->elements + 1, a->elements, a->num_elements * sizeof(void *));
+
+  if (a->current >= 0)
+    a->current ++;
+
+  for (i = 0; i < a->num_saved; i ++)
+    if (a->saved[i] >= 0)
+      a->saved[i] ++;
+
+  a->elements[0] = e;
+  a->num_elements ++;
+  a->insert = 0;
+
+#ifdef DEBUG
+  for (i = 0; i < a->num_elements; i ++)
+    printf("cupsArrayInsert: a->elements[%d]=%p\n", i, a->elements[i]);
+#endif /* DEBUG */
+
+  DEBUG_puts("cupsArrayInsert: returning 1");
+
+  return (1);
 }
 
 

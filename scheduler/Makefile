@@ -216,7 +216,7 @@ testdirsvc:	testdirsvc.o
 # testmime
 #
 
-testmime:	testmime.o libmime.a
+testmime:	testmime.o libmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a \
 		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)

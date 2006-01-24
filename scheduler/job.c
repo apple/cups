@@ -1313,8 +1313,9 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 {
   int			i;		/* Looping var */
   int			slot;		/* Pipe slot */
-  int			num_filters;	/* Number of filters for job */
-  mime_filter_t		*filters;	/* Filters for job */
+  cups_array_t		*filters;	/* Filters for job */
+  mime_filter_t		*filter,	/* Current filter */
+			port_monitor;	/* Port monitor filter */
   char			method[255],	/* Method for output */
 			*optptr,	/* Pointer to options */
 			*valptr;	/* Pointer in value string */
@@ -1371,7 +1372,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   * the source to the destination type...
   */
 
-  num_filters   = 0;
+  filters   = NULL;
   job->cost = 0;
 
   if (printer->raw)
@@ -1393,9 +1394,9 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     */
 
     filters = mimeFilter(MimeDatabase, job->filetypes[job->current_file],
-                         printer->filetype, &num_filters, MAX_FILTERS - 1);
+                         printer->filetype, &(job->cost), MAX_FILTERS - 1);
 
-    if (num_filters == 0)
+    if (!filters)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to convert file %d to printable format for job %d!",
@@ -1424,30 +1425,16 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     * Remove NULL ("-") filters...
     */
 
-    for (i = 0; i < num_filters;)
-      if (strcmp(filters[i].filter, "-") == 0)
-      {
-        num_filters --;
-	if (i < num_filters)
-	  memcpy(filters + i, filters + i + 1,
-	         (num_filters - i) * sizeof(mime_filter_t));
-      }
-      else
-        i ++;
+    for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+         filter;
+	 filter = (mime_filter_t *)cupsArrayNext(filters))
+      if (!strcmp(filter->filter, "-"))
+        cupsArrayRemove(filters, filter);
 
-    if (num_filters == 0)
+    if (cupsArrayCount(filters) == 0)
     {
-      free(filters);
+      cupsArrayDelete(filters);
       filters = NULL;
-    }
-    else
-    {
-     /*
-      * Compute filter cost...
-      */
-
-      for (i = 0; i < num_filters; i ++)
-	job->cost += filters[i].cost;
     }
   }
 
@@ -1462,8 +1449,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     * Don't print this job quite yet...
     */
 
-    if (filters != NULL)
-      free(filters);
+    cupsArrayDelete(filters);
 
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Holding job %d because filter limit has been reached.",
@@ -1487,15 +1473,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     * Add gziptoany filter to the front of the list...
     */
 
-    mime_filter_t	*temp_filters;
-
-    if (num_filters == 0)
-      temp_filters = malloc(sizeof(mime_filter_t));
-    else
-      temp_filters = realloc(filters,
-                             sizeof(mime_filter_t) * (num_filters + 1));
-
-    if (temp_filters == NULL)
+    if (!cupsArrayInsert(filters, &gziptoany_filter))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to add decompression filter - %s",
                       strerror(errno));
@@ -1508,18 +1486,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       if (job->current_file == job->num_files)
       {
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job canceled because the print file could not be decompressed.");
+                      "Job canceled because the print file could not be "
+		      "decompressed.");
 
         cupsdCancelJob(job, 0);
       }
 
       return;
     }
-
-    filters = temp_filters;
-    memmove(filters + 1, filters, num_filters * sizeof(mime_filter_t));
-    *filters = gziptoany_filter;
-    num_filters ++;
   }
 
  /*
@@ -1532,15 +1506,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     * Add port monitor to the end of the list...
     */
 
-    mime_filter_t	*temp_filters;
-
-    if (num_filters == 0)
-      temp_filters = malloc(sizeof(mime_filter_t));
-    else
-      temp_filters = realloc(filters,
-                             sizeof(mime_filter_t) * (num_filters + 1));
-
-    if (temp_filters == NULL)
+    if (!cupsArrayAdd(filters, &port_monitor))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to add port monitor - %s",
                       strerror(errno));
@@ -1553,7 +1519,8 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       if (job->current_file == job->num_files)
       {
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job canceled because the port monitor could not be added.");
+                      "Job canceled because the port monitor could not be "
+		      "added.");
 
         cupsdCancelJob(job, 0);
       }
@@ -1561,11 +1528,8 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       return;
     }
 
-    filters = temp_filters;
-    memset(filters + num_filters, 0, sizeof(mime_filter_t));
-    snprintf(filters[num_filters].filter, sizeof(filters[num_filters].filter),
+    snprintf(port_monitor.filter, sizeof(port_monitor.filter),
              "%s/monitor/%s", ServerBin, printer->port_monitor);
-    num_filters ++;
   }
 
  /*
@@ -2002,15 +1966,17 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdStartJob: filterfds[%d] = [ %d %d ]",
                   1, filterfds[1][0], filterfds[1][1]);
 
-  for (i = 0, slot = 0; i < num_filters; i ++)
+  for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
+       filter;
+       i ++, filter = (mime_filter_t *)cupsArrayNext(filters))
   {
-    if (filters[i].filter[0] != '/')
+    if (filter->filter[0] != '/')
       snprintf(command, sizeof(command), "%s/filter/%s", ServerBin,
-               filters[i].filter);
+               filter->filter);
     else
-      strlcpy(command, filters[i].filter, sizeof(command));
+      strlcpy(command, filter->filter, sizeof(command));
 
-    if (i < (num_filters - 1))
+    if (i < (cupsArrayCount(filters) - 1))
     {
       if (cupsdOpenPipe(filterfds[slot]))
       {
@@ -2021,8 +1987,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 		"Unable to create filter pipes - %s.", strerror(errno));
 	cupsdAddPrinterHistory(printer);
 
-	if (filters != NULL)
-	  free(filters);
+	cupsArrayDelete(filters);
 
 	cupsdClosePipe(statusfds);
 	cupsdClosePipe(filterfds[!slot]);
@@ -2049,8 +2014,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 		    "Unable to create backend pipes - %s.", strerror(errno));
 	    cupsdAddPrinterHistory(printer);
 
-	    if (filters != NULL)
-	      free(filters);
+	    cupsArrayDelete(filters);
 
 	    cupsdClosePipe(statusfds);
 	    cupsdClosePipe(filterfds[!slot]);
@@ -2088,8 +2052,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
 	    cupsdAddPrinterHistory(printer);
 
-	    if (filters != NULL)
-	      free(filters);
+	    cupsArrayDelete(filters);
 
 	    cupsdClosePipe(statusfds);
 	    cupsdClosePipe(filterfds[!slot]);
@@ -2130,15 +2093,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     if (pid == 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to start filter \"%s\" - %s.",
-                      filters[i].filter, strerror(errno));
+                      filter->filter, strerror(errno));
       snprintf(printer->state_message, sizeof(printer->state_message),
                "Unable to start filter \"%s\" - %s.",
-               filters[i].filter, strerror(errno));
+               filter->filter, strerror(errno));
 
       cupsdAddPrinterHistory(printer);
 
-      if (filters != NULL)
-	free(filters);
+      cupsArrayDelete(filters);
 
       cupsdAddPrinterHistory(printer);
 
@@ -2156,8 +2118,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     slot    = !slot;
   }
 
-  if (filters != NULL)
-    free(filters);
+  cupsArrayDelete(filters);
 
  /*
   * Finally, pipe the final output into a backend process if needed...
@@ -2183,9 +2144,6 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
         	 "Unable to open \"/dev/null\" - %s.", strerror(errno));
 
 	cupsdAddPrinterHistory(printer);
-
-	if (filters != NULL)
-	  free(filters);
 
 	cupsdClosePipe(statusfds);
 

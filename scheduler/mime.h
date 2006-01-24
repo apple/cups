@@ -3,7 +3,7 @@
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -25,6 +25,7 @@
 #ifndef _CUPS_MIME_H_
 #  define _CUPS_MIME_H_
 
+#  include <cups/array.h>
 #  include <cups/ipp.h>
 #  include <cups/file.h>
 
@@ -93,9 +94,9 @@ typedef struct mime_magic_str		/**** MIME Magic Data ****/
 
 typedef struct				/**** MIME Type Data ****/
 {
-  char		super[MIME_MAX_SUPER],	/* Super-type name ("image", "application", etc.) */
-		*type;			/* Type name ("png", "postscript", etc.) */
   mime_magic_t	*rules;			/* Rules used to detect this type */
+  char		super[MIME_MAX_SUPER],	/* Super-type name ("image", "application", etc.) */
+		type[MIME_MAX_TYPE];	/* Type name ("png", "postscript", etc.) */
 } mime_type_t;
 
 typedef struct				/**** MIME Conversion Filter Data ****/
@@ -108,10 +109,8 @@ typedef struct				/**** MIME Conversion Filter Data ****/
 
 typedef struct				/**** MIME Database ****/
 {
-  int		num_types;		/* Number of file types */
-  mime_type_t	**types;		/* File types */
-  int		num_filters;		/* Number of type conversion filters */
-  mime_filter_t	*filters;		/* Type conversion filters */
+  cups_array_t	*types;			/* File types */
+  cups_array_t	*filters;		/* Type conversion filters */
 } mime_t;
 
 
@@ -120,22 +119,32 @@ typedef struct				/**** MIME Database ****/
  */
 
 extern void		mimeDelete(mime_t *mime);
-#define mimeLoad(pathname,filterpath) \
-			mimeMerge((mime_t *)0, (pathname), (filterpath))
+extern mime_t		*mimeLoad(const char *pathname, const char *filterpath);
 extern mime_t		*mimeMerge(mime_t *mime, const char *pathname,
 			           const char *filterpath);
 extern mime_t		*mimeNew(void);
 
-extern mime_type_t	*mimeAddType(mime_t *mime, const char *super, const char *type);
+extern mime_type_t	*mimeAddType(mime_t *mime, const char *super,
+			             const char *type);
 extern int		mimeAddTypeRule(mime_type_t *mt, const char *rule);
+extern void		mimeDeleteType(mime_t *mime, mime_type_t *mt);
 extern mime_type_t	*mimeFileType(mime_t *mime, const char *pathname,
 			              int *compression);
-extern mime_type_t	*mimeType(mime_t *mime, const char *super, const char *type);
+extern mime_type_t	*mimeFirstType(mime_t *mime);
+extern mime_type_t	*mimeNextType(mime_t *mime);
+extern int		mimeNumTypes(mime_t *mime);
+extern mime_type_t	*mimeType(mime_t *mime, const char *super,
+				  const char *type);
 
-extern mime_filter_t	*mimeAddFilter(mime_t *mime, mime_type_t *src, mime_type_t *dst,
-			               int cost, const char *filter);
-extern mime_filter_t	*mimeFilter(mime_t *mime, mime_type_t *src, mime_type_t *dst,
-			            int *num_filters, int max_depth);
+extern mime_filter_t	*mimeAddFilter(mime_t *mime, mime_type_t *src,
+			               mime_type_t *dst, int cost,
+				       const char *filter);
+extern void		mimeDeleteFilter(mime_t *mime, mime_filter_t *filter);
+extern cups_array_t	*mimeFilter(mime_t *mime, mime_type_t *src,
+			            mime_type_t *dst, int *cost, int max_depth);
+extern mime_filter_t	*mimeFirstFilter(mime_t *mime);
+extern mime_filter_t	*mimeNextFilter(mime_t *mime);
+extern int		mimeNumFilters(mime_t *mime);
 
 #  ifdef _cplusplus
 }

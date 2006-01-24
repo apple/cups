@@ -196,8 +196,6 @@ cupsdReadConfiguration(void)
   int		status;			/* Return status */
   char		temp[1024],		/* Temporary buffer */
 		*slash;			/* Directory separator */
-  char		type[MIME_MAX_SUPER + MIME_MAX_TYPE];
-					/* MIME type name */
   cups_lang_t	*language;		/* Language */
   struct passwd	*user;			/* Default user */
   struct group	*group;			/* Default group */
@@ -915,6 +913,11 @@ cupsdReadConfiguration(void)
       !old_serverroot || !ServerRoot || strcmp(old_serverroot, ServerRoot) ||
       !old_requestroot || !RequestRoot || strcmp(old_requestroot, RequestRoot))
   {
+    mime_type_t	*type;			/* Current type */
+    char	mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE];
+					/* MIME type name */
+
+
     cupsdLogMessage(CUPSD_LOG_INFO, "Full reload is required.");
 
    /*
@@ -956,25 +959,27 @@ cupsdReadConfiguration(void)
 
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Loaded MIME database from \'%s\': %d types, %d filters...",
-                    ServerRoot, MimeDatabase->num_types, MimeDatabase->num_filters);
+                    ServerRoot, mimeNumTypes(MimeDatabase),
+		    mimeNumFilters(MimeDatabase));
 
    /*
     * Create a list of MIME types for the document-format-supported
     * attribute...
     */
 
-    NumMimeTypes = MimeDatabase->num_types;
+    NumMimeTypes = mimeNumTypes(MimeDatabase);
     if (!mimeType(MimeDatabase, "application", "octet-stream"))
       NumMimeTypes ++;
 
     MimeTypes = calloc(NumMimeTypes, sizeof(const char *));
 
-    for (i = 0; i < MimeDatabase->num_types; i ++)
+    for (i = 0, type = mimeFirstType(MimeDatabase);
+         type;
+	 i ++, type = mimeNextType(MimeDatabase))
     {
-      snprintf(type, sizeof(type), "%s/%s", MimeDatabase->types[i]->super,
-               MimeDatabase->types[i]->type);
+      snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
 
-      MimeTypes[i] = strdup(type);
+      MimeTypes[i] = strdup(mimetype);
     }
 
     if (i < NumMimeTypes)

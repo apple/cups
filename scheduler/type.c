@@ -3,7 +3,7 @@
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -27,7 +27,7 @@
  *   mimeAddTypeRule()  - Add a detection rule for a file type.
  *   mimeFileType()     - Determine the type of a file.
  *   mimeType()         - Lookup a file type.
- *   compare()          - Compare two MIME super/type names.
+ *   compare_types()    - Compare two MIME super/type names.
  *   checkrules()       - Check each rule in a list.
  *   patmatch()         - Pattern matching...
  */
@@ -50,7 +50,7 @@
  * Local functions...
  */
 
-static int	compare(mime_type_t **, mime_type_t **);
+static int	compare_types(mime_type_t *t0, mime_type_t *t1);
 static int	checkrules(const char *, cups_file_t *, mime_magic_t *);
 static int	patmatch(const char *, const char *);
 
@@ -59,24 +59,19 @@ static int	patmatch(const char *, const char *);
  * 'mimeAddType()' - Add a MIME type to a database.
  */
 
-mime_type_t *			/* O - New (or existing) MIME type */
-mimeAddType(mime_t     *mime,	/* I - MIME database */
-            const char *super,	/* I - Super-type name */
-	    const char *type)	/* I - Type name */
+mime_type_t *				/* O - New (or existing) MIME type */
+mimeAddType(mime_t     *mime,		/* I - MIME database */
+            const char *super,		/* I - Super-type name */
+	    const char *type)		/* I - Type name */
 {
-  mime_type_t	*temp,		/* New MIME type */
-		**types;	/* New MIME types array */
+  mime_type_t	*temp;			/* New MIME type */
 
 
  /*
   * Range check input...
   */
 
-  if (mime == NULL || super == NULL || type == NULL)
-    return (NULL);
-
-  if (strlen(super) > (MIME_MAX_SUPER - 1) ||
-      strlen(type) > (MIME_MAX_TYPE - 1))
+  if (!mime || !super || !type)
     return (NULL);
 
  /*
@@ -90,35 +85,20 @@ mimeAddType(mime_t     *mime,	/* I - MIME database */
   * The type doesn't exist; add it...
   */
 
-  if ((temp = calloc(1, sizeof(mime_type_t))) == NULL)
+  if (!mime->types)
+    mime->types = cupsArrayNew((cups_array_func_t)compare_types, NULL);
+
+  if (!mime->types)
     return (NULL);
 
-  if (mime->num_types == 0)
-    types = (mime_type_t **)malloc(sizeof(mime_type_t *));
-  else
-    types = (mime_type_t **)realloc(mime->types, sizeof(mime_type_t *) * (mime->num_types + 1));
-
-  if (types == NULL)
-  {
-    free(temp);
+  if ((temp = calloc(1, sizeof(mime_type_t) - MIME_MAX_TYPE +
+                        strlen(type) + 1)) == NULL)
     return (NULL);
-  }
 
-  mime->types = types;
-  types += mime->num_types;
-  mime->num_types ++;
-
-  *types = temp;
   strlcpy(temp->super, super, sizeof(temp->super));
-  if ((temp->type = strdup(type)) == NULL)
-  {
-    mime->num_types --;
-    return (NULL);
-  }
+  strcpy(temp->type, type);		/* Safe: temp->type is allocated */
 
-  if (mime->num_types > 1)
-    qsort(mime->types, mime->num_types, sizeof(mime_type_t *),
-          (int (*)(const void *, const void *))compare);
+  cupsArrayAdd(mime->types, temp);
 
   return (temp);
 }
@@ -149,15 +129,15 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
   * Range check input...
   */
 
-  if (mt == NULL || rule == NULL)
+  if (!mt || !rule)
     return (-1);
 
  /*
   * Find the last rule in the top-level of the rules tree.
   */
 
-  for (current = mt->rules; current != NULL; current = current->next)
-    if (current->next == NULL)
+  for (current = mt->rules; current; current = current->next)
+    if (!current->next)
       break;
 
  /*
@@ -389,25 +369,25 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
         * Figure out the function...
 	*/
 
-        if (strcmp(name, "match") == 0)
+        if (!strcmp(name, "match"))
 	  op = MIME_MAGIC_MATCH;
-	else if (strcmp(name, "ascii") == 0)
+	else if (!strcmp(name, "ascii"))
 	  op = MIME_MAGIC_ASCII;
-	else if (strcmp(name, "printable") == 0)
+	else if (!strcmp(name, "printable"))
 	  op = MIME_MAGIC_PRINTABLE;
-	else if (strcmp(name, "string") == 0)
+	else if (!strcmp(name, "string"))
 	  op = MIME_MAGIC_STRING;
-	else if (strcmp(name, "istring") == 0)
+	else if (!strcmp(name, "istring"))
 	  op = MIME_MAGIC_ISTRING;
-	else if (strcmp(name, "char") == 0)
+	else if (!strcmp(name, "char"))
 	  op = MIME_MAGIC_CHAR;
-	else if (strcmp(name, "short") == 0)
+	else if (!strcmp(name, "short"))
 	  op = MIME_MAGIC_SHORT;
-	else if (strcmp(name, "int") == 0)
+	else if (!strcmp(name, "int"))
 	  op = MIME_MAGIC_INT;
-	else if (strcmp(name, "locale") == 0)
+	else if (!strcmp(name, "locale"))
 	  op = MIME_MAGIC_LOCALE;
-	else if (strcmp(name, "contains") == 0)
+	else if (!strcmp(name, "contains"))
 	  op = MIME_MAGIC_CONTAINS;
 	else
 	  return (-1);
@@ -542,9 +522,8 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
              const char *pathname,	/* I - Name of file to check */
 	     int        *compression)	/* O - Is the file compressed? */
 {
-  int		i;			/* Looping var */
   cups_file_t	*fp;			/* File pointer */
-  mime_type_t	**types;		/* File types */
+  mime_type_t	*type;			/* File type */
   const char	*filename;		/* Base filename of file */
 
 
@@ -555,7 +534,7 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
   * Range check input parameters...
   */
 
-  if (mime == NULL || pathname == NULL)
+  if (!mime || !pathname)
     return (NULL);
 
  /*
@@ -578,8 +557,10 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
   * Then check it against all known types...
   */
 
-  for (i = mime->num_types, types = mime->types; i > 0; i --, types ++)
-    if (checkrules(filename, fp, (*types)->rules))
+  for (type = (mime_type_t *)cupsArrayFirst(mime->types);
+       type;
+       type = (mime_type_t *)cupsArrayNext(mime->types))
+    if (checkrules(filename, fp, type->rules))
       break;
 
  /*
@@ -591,10 +572,7 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
 
   cupsFileClose(fp);
 
-  if (i > 0)
-    return (*types);
-  else
-    return (NULL);
+  return (type);
 }
 
 
@@ -602,27 +580,19 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
  * 'mimeType()' - Lookup a file type.
  */
 
-mime_type_t *			/* O - Matching file type definition */
-mimeType(mime_t     *mime,	/* I - MIME database */
-         const char *super,	/* I - Super-type name */
-	 const char *type)	/* I - Type name */
+mime_type_t *				/* O - Matching file type definition */
+mimeType(mime_t     *mime,		/* I - MIME database */
+         const char *super,		/* I - Super-type name */
+	 const char *type)		/* I - Type name */
 {
-  mime_type_t	key,		/* MIME type search key*/
-		*keyptr,	/* Key pointer... */
-		**match;	/* Matching pointer */
+  mime_type_t	key;			/* MIME type search key*/
+
 
  /*
   * Range check input...
   */
 
-  if (mime == NULL || super == NULL || type == NULL)
-    return (NULL);
-
-  if (strlen(super) > (MIME_MAX_SUPER - 1) ||
-      strlen(type) > (MIME_MAX_TYPE - 1))
-    return (NULL);
-
-  if (mime->num_types == 0)
+  if (!mime || !super || !type)
     return (NULL);
 
  /*
@@ -630,34 +600,25 @@ mimeType(mime_t     *mime,	/* I - MIME database */
   */
 
   strlcpy(key.super, super, sizeof(key.super));
-  key.type = (char *)type;
+  strlcpy(key.type, type, sizeof(key.type));
 
-  keyptr = &key;
-
-  match = (mime_type_t **)bsearch(&keyptr, mime->types, mime->num_types,
-                                  sizeof(mime_type_t *),
-                                  (int (*)(const void *, const void *))compare);
-
-  if (match == NULL)
-    return (NULL);
-  else
-    return (*match);
+  return ((mime_type_t *)cupsArrayFind(mime->types, &key));
 }
 
 
 /*
- * 'compare()' - Compare two MIME super/type names.
+ * 'compare_types()' - Compare two MIME super/type names.
  */
 
-static int			/* O - Result of comparison */
-compare(mime_type_t **t0,	/* I - First type */
-        mime_type_t **t1)	/* I - Second type */
+static int				/* O - Result of comparison */
+compare_types(mime_type_t *t0,		/* I - First type */
+              mime_type_t *t1)		/* I - Second type */
 {
-  int	i;			/* Result of comparison */
+  int	i;				/* Result of comparison */
 
 
-  if ((i = strcasecmp((*t0)->super, (*t1)->super)) == 0)
-    i = strcasecmp((*t0)->type, (*t1)->type);
+  if ((i = strcmp(t0->super, t1->super)) == 0)
+    i = strcmp(t0->type, t1->type);
 
   return (i);
 }

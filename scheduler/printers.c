@@ -148,12 +148,11 @@ cupsdAddPrinterFilter(
     cupsd_printer_t  *p,		/* I - Printer to add to */
     const char       *filter)		/* I - Filter to add */
 {
-  int		i;			/* Looping var */
   char		super[MIME_MAX_SUPER],	/* Super-type for filter */
 		type[MIME_MAX_TYPE],	/* Type for filter */
 		program[1024];		/* Program/filter name */
   int		cost;			/* Cost of filter */
-  mime_type_t	**temptype;		/* MIME type looping var */
+  mime_type_t	*temptype;		/* MIME type looping var */
 
 
  /*
@@ -181,18 +180,18 @@ cupsdAddPrinterFilter(
   * Add the filter to the MIME database, supporting wildcards as needed...
   */
 
-  for (temptype = MimeDatabase->types, i = MimeDatabase->num_types;
-       i > 0;
-       i --, temptype ++)
-    if (((super[0] == '*' && strcasecmp((*temptype)->super, "printer") != 0) ||
-         !strcasecmp((*temptype)->super, super)) &&
-        (type[0] == '*' || !strcasecmp((*temptype)->type, type)))
+  for (temptype = mimeFirstType(MimeDatabase);
+       temptype;
+       temptype = mimeNextType(MimeDatabase))
+    if (((super[0] == '*' && strcasecmp(temptype->super, "printer")) ||
+         !strcasecmp(temptype->super, super)) &&
+        (type[0] == '*' || !strcasecmp(temptype->type, type)))
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "Adding filter %s/%s %s/%s %d %s",
-                      (*temptype)->super, (*temptype)->type,
+                      temptype->super, temptype->type,
 		      p->filetype->super, p->filetype->type,
                       cost, program);
-      mimeAddFilter(MimeDatabase, *temptype, p->filetype, cost, program);
+      mimeAddFilter(MimeDatabase, temptype, p->filetype, cost, program);
     }
 }
 
@@ -718,6 +717,7 @@ cupsdDeletePrinter(
 
  /*
   * If p is the default printer, assign the next one...
+  * TODO: use next network default printer or NULL...
   */
 
   if (p == DefaultPrinter)
@@ -755,6 +755,8 @@ cupsdDeletePrinter(
 
   cupsdDeletePrinterFilters(p);
 
+  mimeDeleteType(MimeDatabase, p->filetype);
+
   cupsdFreePrinterUsers(p);
   cupsdFreeQuotas(p);
 
@@ -789,7 +791,6 @@ void
 cupsdDeletePrinterFilters(
     cupsd_printer_t *p)			/* I - Printer to remove from */
 {
-  int		i;			/* Looping var */
   mime_filter_t	*filter;		/* MIME filter looping var */
 
 
@@ -805,21 +806,16 @@ cupsdDeletePrinterFilters(
   * type == printer...
   */
 
-  for (filter = MimeDatabase->filters, i = MimeDatabase->num_filters;
-       i > 0;
-       i --, filter ++)
+  for (filter = mimeFirstFilter(MimeDatabase);
+       filter;
+       filter = mimeNextFilter(MimeDatabase))
     if (filter->dst == p->filetype)
     {
      /*
       * Delete the current filter...
       */
 
-      MimeDatabase->num_filters --;
-
-      if (i > 1)
-        memmove(filter, filter + 1, sizeof(mime_filter_t) * (i - 1));
-
-      filter --;
+      mimeDeleteFilter(MimeDatabase, filter);
     }
 }
 
