@@ -59,6 +59,10 @@
 #  include <arpa/inet.h>
 #  include <netdb.h>
 #endif /* WIN32 */
+#ifdef __APPLE__
+#  include <CoreFoundation/CFNumber.h>
+#  include <CoreFoundation/CFPreferences.h>
+#endif /* __APPLE__ */
 
 
 /*
@@ -95,7 +99,7 @@ static int	lpd_queue(const char *hostname, int port, const char *printer,
 		          const char *filename,
 		          const char *user, const char *title, int copies,
 			  int banner, int format, int order, int reserve,
-			  int manual_copies, int timeout);
+			  int manual_copies, int timeout, int contimeout);
 static void	lpd_timeout(int sig);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
 #ifndef HAVE_RRESVPORT_AF
@@ -135,6 +139,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int			sanitize_title;	/* Sanitize title string? */
   int			manual_copies,	/* Do manual copies? */
 			timeout,	/* Timeout */
+			contimeout,	/* Connection timeout */
 			copies;		/* Number of copies */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* Actions for POSIX signals */
@@ -243,18 +248,41 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * See if there are any options...
   */
 
-  banner         = 0;
-  format         = 'l';
-  order          = ORDER_CONTROL_DATA;
-  reserve        = RESERVE_ANY;
-  manual_copies  = 1;
-  timeout        = 300;
-  sanitize_title = 1;
+  banner        = 0;
+  format        = 'l';
+  order         = ORDER_CONTROL_DATA;
+  reserve       = RESERVE_ANY;
+  manual_copies = 1;
+  timeout       = 300;
+  contimeout    = 7 * 24 * 60 * 60;
 
-#if defined(__APPLE__)
+#ifdef __APPLE__
   /* We want to pass utf-8 characters, not re-map them (3071945) */
-  sanitize_title= 0;
-#endif
+  sanitize_title = 0;
+
+  {
+    CFPropertyListRef	pvalue;		/* Preference value */
+    SInt32		toval;		/* Timeout value */
+
+
+    pvalue = CFPreferencesCopyValue(CFSTR("timeout"),
+                                    CFSTR("com.apple.print.backends"),
+				    kCFPreferencesAnyUser,
+				    kCFPreferencesCurrentHost);
+    if (pvalue)
+    {
+      if (CFGetTypeID(pvalue) == CFNumberGetTypeID())
+      {
+	CFNumberGetValue(pvalue, kCFNumberSInt32Type, &toval);
+	contimeout = (int)toval;
+      }
+
+      CFRelease(pvalue);
+    }
+  }
+#else
+  sanitize_title = 1;
+#endif /* __APPLE__ */
 
   if ((options = strchr(resource, '?')) != NULL)
   {
@@ -293,7 +321,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
             *ptr++ = *options++;
 	*ptr = '\0';
 
-	if (*options == '+')
+	if (*options == '+' || *options == '&')
 	  options ++;
       }
       else
@@ -303,51 +331,47 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Process the option...
       */
 
-      if (strcasecmp(name, "banner") == 0)
+      if (!strcasecmp(name, "banner"))
       {
        /*
         * Set the banner...
 	*/
 
-        banner = !value[0] ||
-	         strcasecmp(value, "on") == 0 ||
-		 strcasecmp(value, "yes") == 0 ||
-		 strcasecmp(value, "true") == 0;
+        banner = !value[0] || !strcasecmp(value, "on") ||
+		 !strcasecmp(value, "yes") || !strcasecmp(value, "true");
       }
-      else if (strcasecmp(name, "format") == 0 && value[0])
+      else if (!strcasecmp(name, "format") && value[0])
       {
        /*
         * Set output format...
 	*/
 
-        if (strchr("cdfglnoprtv", value[0]) != NULL)
+        if (strchr("cdfglnoprtv", value[0]))
 	  format = value[0];
 	else
 	  fprintf(stderr, "ERROR: Unknown format character \"%c\"\n", value[0]);
       }
-      else if (strcasecmp(name, "order") == 0 && value[0])
+      else if (!strcasecmp(name, "order") && value[0])
       {
        /*
         * Set control/data order...
 	*/
 
-        if (strcasecmp(value, "control,data") == 0)
+        if (!strcasecmp(value, "control,data"))
 	  order = ORDER_CONTROL_DATA;
-	else if (strcasecmp(value, "data,control") == 0)
+	else if (!strcasecmp(value, "data,control"))
 	  order = ORDER_DATA_CONTROL;
 	else
 	  fprintf(stderr, "ERROR: Unknown file order \"%s\"\n", value);
       }
-      else if (strcasecmp(name, "reserve") == 0)
+      else if (!strcasecmp(name, "reserve"))
       {
        /*
         * Set port reservation mode...
 	*/
 
-        if (!value[0] ||
-	    !strcasecmp(value, "on") ||
-	    !strcasecmp(value, "yes") ||
-	    !strcasecmp(value, "true") ||
+        if (!value[0] || !strcasecmp(value, "on") ||
+	    !strcasecmp(value, "yes") || !strcasecmp(value, "true") ||
 	    !strcasecmp(value, "rfc1179"))
 	  reserve = RESERVE_RFC1179;
 	else if (!strcasecmp(value, "any"))
@@ -355,29 +379,25 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	else
 	  reserve = RESERVE_NONE;
       }
-      else if (strcasecmp(name, "manual_copies") == 0)
+      else if (!strcasecmp(name, "manual_copies"))
       {
        /*
         * Set manual copies...
 	*/
 
-        manual_copies = !value[0] ||
-	        	strcasecmp(value, "on") == 0 ||
-	 		strcasecmp(value, "yes") == 0 ||
-	 		strcasecmp(value, "true") == 0;
+        manual_copies = !value[0] || !strcasecmp(value, "on") ||
+	 		!strcasecmp(value, "yes") || !strcasecmp(value, "true");
       }
-      else if (strcasecmp(name, "sanitize_title") == 0)
+      else if (!strcasecmp(name, "sanitize_title"))
       {
        /*
         * Set sanitize title...
 	*/
 
-        sanitize_title = !value[0] ||
-	        	strcasecmp(value, "on") == 0 ||
-	 		strcasecmp(value, "yes") == 0 ||
-	 		strcasecmp(value, "true") == 0;
+        sanitize_title = !value[0] || !strcasecmp(value, "on") ||
+	 		!strcasecmp(value, "yes") || !strcasecmp(value, "true");
       }
-      else if (strcasecmp(name, "timeout") == 0)
+      else if (!strcasecmp(name, "timeout"))
       {
        /*
         * Set the timeout...
@@ -385,6 +405,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 	if (atoi(value) > 0)
 	  timeout = atoi(value);
+      }
+      else if (!strcasecmp(name, "contimeout"))
+      {
+       /*
+        * Set the timeout...
+	*/
+
+	if (atoi(value) > 0)
+	  contimeout = atoi(value);
       }
     }
   }
@@ -426,7 +455,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     status = lpd_queue(hostname, port, resource + 1, filename,
                        username, title, copies,
-		       banner, format, order, reserve, manual_copies, timeout);
+		       banner, format, order, reserve, manual_copies,
+		       timeout, contimeout);
 
     if (!status)
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
@@ -434,7 +464,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   else
     status = lpd_queue(hostname, port, resource + 1, filename,
                        username, title, 1,
-		       banner, format, order, reserve, 1, timeout);
+		       banner, format, order, reserve, 1,
+		       timeout, contimeout);
 
  /*
   * Remove the temporary file if necessary...
@@ -536,7 +567,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
           int        order,		/* I - Order of data/control files */
 	  int        reserve,		/* I - Reserve ports? */
 	  int        manual_copies,	/* I - Do copies by hand... */
-	  int        timeout)		/* I - Timeout... */
+	  int        timeout,		/* I - Timeout... */
+	  int        contimeout)	/* I - Connection timeout */
 {
   FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
@@ -551,6 +583,10 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   http_addrlist_t	*addrlist,	/* Address list */
 			*addr;		/* Socket address */
   int			copy;		/* Copies written */
+  time_t		start_time;	/* Time of first connect */
+#ifdef __APPLE__
+  int			recoverable;	/* Recoverable error shown? */
+#endif /* __APPLE__ */
   size_t		nbytes;		/* Number of bytes written */
   off_t			tbytes;		/* Total bytes written */
   char			buffer[65536];	/* Output buffer */
@@ -587,6 +623,15 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
             hostname);
     return (CUPS_BACKEND_STOP);
   }
+
+ /*
+  * Remember when we starting trying to connect to the printer...
+  */
+
+#ifdef __APPLE__
+  recoverable = 0;
+#endif /* __APPLE__ */
+  start_time  = time(NULL);
 
  /*
   * Loop forever trying to print the file...
@@ -714,7 +759,20 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       if (error == ECONNREFUSED || error == EHOSTDOWN ||
           error == EHOSTUNREACH)
       {
-	fprintf(stderr, "WARNING: Network host \'%s\' is busy, down, or unreachable; will retry in 30 seconds...\n",
+        if (contimeout && (time(NULL) - start_time) > contimeout)
+	{
+	  fputs("ERROR: Printer not responding!\n", stderr);
+	  return (CUPS_BACKEND_FAILED);
+	}
+
+#ifdef __APPLE__
+        recoverable = 1;
+	fprintf(stderr, "WARNING: recoverable: "
+#else
+	fprintf(stderr, "WARNING: "
+#endif /* __APPLE__ */
+	                "Network host \'%s\' is busy, down, or "
+	                "unreachable; will retry in 30 seconds...\n",
                 hostname);
 	sleep(30);
       }
@@ -728,9 +786,27 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       }
       else
       {
-	perror("ERROR: Unable to connect to printer; will retry in 30 seconds...");
+#ifdef __APPLE__
+        recoverable = 1;
+	perror("ERROR: recoverable: "
+#else
+	perror("ERROR: "
+#endif /* __APPLE__ */
+	       "Unable to connect to printer; will retry in 30 seconds...");
         sleep(30);
       }
+    }
+
+    if (recoverable)
+    {
+     /*
+      * If we've shown a recoverable error make sure the printer proxies
+      * have a chance to see the recovered message. Not pretty but
+      * necessary for now...
+      */
+
+      fputs("INFO: recovered: \n", stderr);
+      sleep(5);
     }
 
     fprintf(stderr, "INFO: Connected to %s...\n", hostname);

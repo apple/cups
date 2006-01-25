@@ -71,9 +71,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   char		method[255],		/* Method in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info (not used) */
-		resource[1024];		/* Resource info (not used) */
+		resource[1024],		/* Resource info (not used) */
+		*options,		/* Pointer to options */
+		name[255],		/* Name of option */
+		value[255],		/* Value of option */
+		*ptr;			/* Pointer into name or value */
   int		fp;			/* Print file */
   int		copies;			/* Number of copies to print */
+  int		waiteof;		/* Wait for end-of-file? */
   int		port;			/* Port number */
   char		portname[255];		/* Port name */
   int		delay;			/* Delay for retries... */
@@ -165,6 +170,71 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (port == 0)
     port = 9100;	/* Default to HP JetDirect/Tektronix PhaserShare */
+
+ /*
+  * Get options, if any...
+  */
+
+  waiteof = 1;
+
+  if ((options = strchr(resource, '?')) != NULL)
+  {
+   /*
+    * Yup, terminate the device name string and move to the first
+    * character of the options...
+    */
+
+    *options++ = '\0';
+
+   /*
+    * Parse options...
+    */
+
+    while (*options)
+    {
+     /*
+      * Get the name...
+      */
+
+      for (ptr = name; *options && *options != '=';)
+        if (ptr < (name + sizeof(name) - 1))
+          *ptr++ = *options++;
+      *ptr = '\0';
+
+      if (*options == '=')
+      {
+       /*
+        * Get the value...
+	*/
+
+        options ++;
+
+	for (ptr = value; *options && *options != '+' && *options != '&';)
+          if (ptr < (value + sizeof(value) - 1))
+            *ptr++ = *options++;
+	*ptr = '\0';
+
+	if (*options == '+' || *options == '&')
+	  options ++;
+      }
+      else
+        value[0] = '\0';
+
+     /*
+      * Process the option...
+      */
+
+      if (!strcasecmp(name, "waiteof"))
+      {
+       /*
+        * Set the wait-for-eof value...
+	*/
+
+        waiteof = !value[0] || !strcasecmp(value, "on") ||
+		  !strcasecmp(value, "yes") || !strcasecmp(value, "true");
+      }
+    }
+  }
 
  /*
   * Then try to connect to the remote host...
@@ -346,48 +416,51 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	        (unsigned long)tbytes);
     }
 
-   /*
-    * Shutdown the socket and wait for the other end to finish...
-    */
-
-    fputs("INFO: Print file sent, waiting for printer to finish...\n", stderr);
-
-    shutdown(fd, 1);
-
-    for (;;)
+    if (waiteof)
     {
      /*
-      * Wait a maximum of 90 seconds for backchannel data or a closed
-      * connection...
+      * Shutdown the socket and wait for the other end to finish...
       */
 
-      timeout.tv_sec  = 90;
-      timeout.tv_usec = 0;
+      fputs("INFO: Print file sent, waiting for printer to finish...\n", stderr);
 
-      FD_ZERO(&input);
-      FD_SET(fd, &input);
+      shutdown(fd, 1);
 
-#ifdef __hpux
-      if (select(fd + 1, (int *)&input, NULL, NULL, &timeout) > 0)
-#else
-      if (select(fd + 1, &input, NULL, NULL, &timeout) > 0)
-#endif /* __hpux */
+      for (;;)
       {
        /*
-	* Grab the data coming back and spit it out to stderr...
+	* Wait a maximum of 90 seconds for backchannel data or a closed
+	* connection...
 	*/
 
-	if ((rbytes = recv(fd, resource, sizeof(resource), 0)) > 0)
+	timeout.tv_sec  = 90;
+	timeout.tv_usec = 0;
+
+	FD_ZERO(&input);
+	FD_SET(fd, &input);
+
+  #ifdef __hpux
+	if (select(fd + 1, (int *)&input, NULL, NULL, &timeout) > 0)
+  #else
+	if (select(fd + 1, &input, NULL, NULL, &timeout) > 0)
+  #endif /* __hpux */
 	{
-	  fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
-	          rbytes);
-          cupsBackchannelWrite(resource, rbytes, 1.0);
-        }
+	 /*
+	  * Grab the data coming back and spit it out to stderr...
+	  */
+
+	  if ((rbytes = recv(fd, resource, sizeof(resource), 0)) > 0)
+	  {
+	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
+		    rbytes);
+	    cupsBackchannelWrite(resource, rbytes, 1.0);
+	  }
+	  else
+	    break;
+	}
 	else
 	  break;
       }
-      else
-        break;
     }
 
    /*

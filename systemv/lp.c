@@ -87,8 +87,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*dest;			/* Selected destination */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
+  int		end_options;		/* No more options? */
   int		silent;			/* Silent or verbose output? */
   char		buffer[8192];		/* Copy buffer */
+  ssize_t	bytes;			/* Bytes copied */
+  off_t		filesize;		/* Size of temp file */
   int		temp;			/* Temporary file descriptor */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Signal action */
@@ -123,9 +126,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   num_files   = 0;
   title       = NULL;
   job_id      = 0;
+  end_options = 0;
 
   for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-' && argv[i][1])
+    if (argv[i][0] == '-' && argv[i][1] && !end_options)
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
@@ -287,6 +291,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      num_options = cupsAddOption("notify-recipient", email,
 	                                  num_options, &options);
 	    }
+
+	    silent = 1;
 	    break;
 
 	case 'n' : /* Number of copies */
@@ -531,6 +537,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 			    argv[0]);
 	    break;
 
+        case '-' : /* Stop processing options */
+	    end_options = 1;
+	    break;
+
 	default :
 	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%c\'!\n"),
 	                    argv[0], argv[i][1]);
@@ -678,8 +688,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       return (1);
     }
 
-    while ((i = read(0, buffer, sizeof(buffer))) > 0)
-      if (write(temp, buffer, i) < 0)
+    while ((bytes = read(0, buffer, sizeof(buffer))) > 0)
+      if (write(temp, buffer, bytes) < 0)
       {
 	_cupsLangPrintf(stderr,
 		        _("%s: Error - unable to write to temporary file "
@@ -690,10 +700,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 	return (1);
       }
 
-    i = lseek(temp, 0, SEEK_CUR);
+    filesize = lseek(temp, 0, SEEK_CUR);
     close(temp);
 
-    if (i == 0)
+    if (filesize <= 0)
     {
       _cupsLangPrintf(stderr,
 		      _("%s: Error - stdin is empty, so no job has been sent.\n"),
@@ -810,7 +820,7 @@ set_job_attrs(const char    *command,	/* I - Command name */
  */
 
 void
-sighandler(int s)	/* I - Signal number */
+sighandler(int s)			/* I - Signal number */
 {
  /*
   * Remove the temporary file we're using to print from stdin...

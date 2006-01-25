@@ -64,31 +64,33 @@ char	tempfile[1024];		/* Temporary file for printing from stdin */
  */
 
 int
-main(int  argc,		/* I - Number of command-line arguments */
-     char *argv[])	/* I - Command-line arguments */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i, j;		/* Looping var */
-  int		job_id;		/* Job ID */
-  char		ch;		/* Option character */
-  char		*printer,	/* Destination printer or class */
-		*instance;	/* Instance */
-  const char	*title,		/* Job title */
-		*val;		/* Environment variable name */
-  int		num_copies;	/* Number of copies per file */
-  int		num_files;	/* Number of files to print */
-  const char	*files[1000];	/* Files to print */
-  int		num_dests;	/* Number of destinations */
-  cups_dest_t	*dests,		/* Destinations */
-		*dest;		/* Selected destination */
-  int		num_options;	/* Number of options */
-  cups_option_t	*options;	/* Options */
-  int		deletefile;	/* Delete file after print? */
-  char		buffer[8192];	/* Copy buffer */
-  int		temp;		/* Temporary file descriptor */
-  cups_lang_t	*language;	/* Language information */
+  int		i, j;			/* Looping var */
+  int		job_id;			/* Job ID */
+  char		ch;			/* Option character */
+  char		*printer,		/* Destination printer or class */
+		*instance;		/* Instance */
+  const char	*title,			/* Job title */
+		*val;			/* Environment variable name */
+  int		num_copies;		/* Number of copies per file */
+  int		num_files;		/* Number of files to print */
+  const char	*files[1000];		/* Files to print */
+  int		num_dests;		/* Number of destinations */
+  cups_dest_t	*dests,			/* Destinations */
+		*dest;			/* Selected destination */
+  int		num_options;		/* Number of options */
+  cups_option_t	*options;		/* Options */
+  int		deletefile;		/* Delete file after print? */
+  char		buffer[8192];		/* Copy buffer */
+  ssize_t	bytes;			/* Bytes copied */
+  off_t		filesize;		/* Size of temp file */
+  int		temp;			/* Temporary file descriptor */
+  cups_lang_t	*language;		/* Language information */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;	/* Signal action */
-  struct sigaction oldaction;	/* Old signal action */
+  struct sigaction action;		/* Signal action */
+  struct sigaction oldaction;		/* Old signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -461,8 +463,8 @@ main(int  argc,		/* I - Number of command-line arguments */
       return (1);
     }
 
-    while ((i = read(0, buffer, sizeof(buffer))) > 0)
-      if (write(temp, buffer, i) < 0)
+    while ((bytes = read(0, buffer, sizeof(buffer))) > 0)
+      if (write(temp, buffer, bytes) < 0)
       {
 	_cupsLangPrintf(stderr,
 	                _("%s: Error - unable to write to temporary file "
@@ -473,10 +475,10 @@ main(int  argc,		/* I - Number of command-line arguments */
 	return (1);
       }
 
-    i = lseek(temp, 0, SEEK_CUR);
+    filesize = lseek(temp, 0, SEEK_CUR);
     close(temp);
 
-    if (i == 0)
+    if (filesize <= 0)
     {
       _cupsLangPrintf(stderr,
                       _("%s: Error - stdin is empty, so no job has been sent.\n"),
@@ -509,7 +511,7 @@ main(int  argc,		/* I - Number of command-line arguments */
  */
 
 void
-sighandler(int s)	/* I - Signal number */
+sighandler(int s)			/* I - Signal number */
 {
  /*
   * Remove the temporary file we're using to print from stdin...
