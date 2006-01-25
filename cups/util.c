@@ -28,20 +28,29 @@
  *   cupsCancelJob()       - Cancel a print job on the default server.
  *   cupsDoFileRequest()   - Do an IPP request.
  *   cupsFreeJobs()        - Free memory used by job data.
- *   cupsGetClasses()      - Get a list of printer classes from the default server.
- *   cupsGetDefault()      - Get the default printer or class from the default server.
- *   cupsGetDefault2()     - Get the default printer or class from the specified server.
+ *   cupsGetClasses()      - Get a list of printer classes from the default
+ *                           server.
+ *   cupsGetDefault()      - Get the default printer or class from the default
+ *                           server.
+ *   cupsGetDefault2()     - Get the default printer or class from the
+ *                           specified server.
  *   cupsGetJobs()         - Get the jobs from the default server.
  *   cupsGetJobs2()        - Get the jobs from the specified server.
- *   cupsGetPPD()          - Get the PPD file for a printer on the default server.
- *   cupsGetPPD2()         - Get the PPD file for a printer on the specified server.
+ *   cupsGetPPD()          - Get the PPD file for a printer on the default
+ *                           server.
+ *   cupsGetPPD2()         - Get the PPD file for a printer on the specified
+ *                           server.
  *   cupsGetPrinters()     - Get a list of printers from the default server.
  *   cupsLastError()       - Return the last IPP status code.
  *   cupsLastErrorString() - Return the last IPP status-message.
- *   cupsPrintFile()       - Print a file to a printer or class on the default server.
- *   cupsPrintFile2()      - Print a file to a printer or class on the specified server.
- *   cupsPrintFiles()      - Print one or more files to a printer or class on the default server.
- *   cupsPrintFiles2()     - Print one or more files to a printer or class on the specified server.
+ *   cupsPrintFile()       - Print a file to a printer or class on the default
+ *                           server.
+ *   cupsPrintFile2()      - Print a file to a printer or class on the
+ *                           specified server.
+ *   cupsPrintFiles()      - Print one or more files to a printer or class on
+ *                           the default server.
+ *   cupsPrintFiles2()     - Print one or more files to a printer or class on
+ *                           the specified server.
  *   cups_connect()        - Connect to the specified host...
  *   cups_set_error()      - Set the last IPP status code and status-message.
  */
@@ -354,7 +363,11 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       if (cupsDoAuthentication(http, "POST", resource))
         break;
 
-      httpReconnect(http);
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+	break;
+      }
 
       continue;
     }
