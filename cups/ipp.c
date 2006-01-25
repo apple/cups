@@ -1279,7 +1279,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	                  buffer, ipp->current, ipp->prev));
 
 	    attr->group_tag  = ipp->curtag;
-	    attr->value_tag  = tag;
+	    attr->value_tag  = (ipp_tag_t)(tag | IPP_TAG_COPY_NAME);
 	    attr->name       = strdup((char *)buffer);
 	    attr->num_values = 0;
 	  }
@@ -2404,10 +2404,10 @@ _ipp_add_attr(ipp_t *ipp,		/* I - IPP message */
   attr = calloc(sizeof(ipp_attribute_t) +
                 (num_values - 1) * sizeof(ipp_value_t), 1);
 
-  attr->num_values = num_values;
-
   if (attr != NULL)
   {
+    attr->num_values = num_values;
+
     if (ipp->last == NULL)
       ipp->attrs = attr;
     else
@@ -2468,7 +2468,7 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
         break; /* anti-compiler-warning-code */
   }
 
-  if (attr->name != NULL)
+  if (attr->name && (attr->value_tag & IPP_TAG_COPY_NAME))
     free(attr->name);
 
   free(attr);

@@ -64,6 +64,7 @@ typedef int socklen_t;
 #  endif /* __sgi */
 
 #  include "http.h"
+#  include "ipp-private.h"
 
 #  if defined HAVE_LIBSSL
 /*

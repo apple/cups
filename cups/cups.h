@@ -38,7 +38,7 @@
 
 /*
  * With GCC 3.0 and higher, we can mark old APIs "deprecated" so you get
- * an error at compile-time.
+ * a warning at compile-time.
  */
 
 #  if defined(__GNUC__) && __GNUC__ > 2

@@ -666,7 +666,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Update the browse list as needed...
     */
 
-    if (Browsing && (BrowseLocalProtocols | BrowseRemoteProtocols))
+    if (Browsing && BrowseRemoteProtocols)
     {
       if (BrowseSocket >= 0 && FD_ISSET(BrowseSocket, input))
         cupsdUpdateCUPSBrowse();
@@ -679,12 +679,12 @@ main(int  argc,				/* I - Number of command-line arguments */
           BrowseSLPRefresh <= current_time)
         cupsdUpdateSLPBrowse();
 #endif /* HAVE_LIBSLP */
+    }
 
-      if (current_time > browse_time)
-      {
-        cupsdSendBrowseList();
-	browse_time = current_time;
-      }
+    if (Browsing && BrowseLocalProtocols && current_time > browse_time)
+    {
+      cupsdSendBrowseList();
+      browse_time = current_time;
     }
 
    /*

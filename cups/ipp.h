@@ -72,7 +72,7 @@ extern "C" {
  * Types and structures...
  */
 
-typedef enum			/**** Format tags for attribute formats... ****/
+typedef enum				/**** Format tags for attribute formats... ****/
 {
   IPP_TAG_ZERO = 0x00,
   IPP_TAG_OPERATION,
@@ -109,17 +109,18 @@ typedef enum			/**** Format tags for attribute formats... ****/
   IPP_TAG_LANGUAGE,
   IPP_TAG_MIMETYPE,
   IPP_TAG_MEMBERNAME,
-  IPP_TAG_MASK = 0x7fffffff,	/* Mask for copied attribute values */
-  IPP_TAG_COPY = -0x7fffffff-1	/* Bitflag for copied attribute values */
+  IPP_TAG_MASK = 0x3fffffff,		/* Mask for copied attribute values */
+  IPP_TAG_COPY_NAME = 0x40000000,	/* Name value is copied */
+  IPP_TAG_COPY = -0x7fffffff-1		/* Bitflag for copied attribute values */
 } ipp_tag_t;
 
-typedef enum			/**** Resolution units... ****/
+typedef enum				/**** Resolution units... ****/
 {
   IPP_RES_PER_INCH = 3,
   IPP_RES_PER_CM
 } ipp_res_t;
 
-typedef enum			/**** Finishings... ****/
+typedef enum				/**** Finishings... ****/
 {
   IPP_FINISHINGS_NONE = 3,
   IPP_FINISHINGS_STAPLE,
@@ -151,22 +152,22 @@ typedef enum			/**** Finishings... ****/
   IPP_FINISHINGS_BIND_BOTTOM
 } ipp_finish_t;
 
-typedef enum			/**** Orientation... ****/
+typedef enum				/**** Orientation... ****/
 {
-  IPP_PORTRAIT = 3,		/* No rotation */
-  IPP_LANDSCAPE,		/* 90 degrees counter-clockwise */
-  IPP_REVERSE_LANDSCAPE,	/* 90 degrees clockwise */
-  IPP_REVERSE_PORTRAIT		/* 180 degrees */
+  IPP_PORTRAIT = 3,			/* No rotation */
+  IPP_LANDSCAPE,			/* 90 degrees counter-clockwise */
+  IPP_REVERSE_LANDSCAPE,		/* 90 degrees clockwise */
+  IPP_REVERSE_PORTRAIT			/* 180 degrees */
 } ipp_orient_t;
 
-typedef enum			/**** Qualities... ****/
+typedef enum				/**** Qualities... ****/
 {
   IPP_QUALITY_DRAFT = 3,
   IPP_QUALITY_NORMAL,
   IPP_QUALITY_HIGH
 } ipp_quality_t;
 
-typedef enum			/**** Job States.... */
+typedef enum				/**** Job States.... */
 {
   IPP_JOB_PENDING = 3,
   IPP_JOB_HELD,
@@ -177,23 +178,23 @@ typedef enum			/**** Job States.... */
   IPP_JOB_COMPLETED
 } ipp_jstate_t;
 
-typedef enum			/**** Printer States.... */
+typedef enum				/**** Printer States.... */
 {
   IPP_PRINTER_IDLE = 3,
   IPP_PRINTER_PROCESSING,
   IPP_PRINTER_STOPPED
 } ipp_pstate_t;
 
-typedef enum			/**** IPP states... ****/
+typedef enum				/**** IPP states... ****/
 {
-  IPP_ERROR = -1,		/* An error occurred */
-  IPP_IDLE,			/* Nothing is happening/request completed */
-  IPP_HEADER,			/* The request header needs to be sent/received */
-  IPP_ATTRIBUTE,		/* One or more attributes need to be sent/received */
-  IPP_DATA			/* IPP request data needs to be sent/received */
+  IPP_ERROR = -1,			/* An error occurred */
+  IPP_IDLE,				/* Nothing is happening/request completed */
+  IPP_HEADER,				/* The request header needs to be sent/received */
+  IPP_ATTRIBUTE,			/* One or more attributes need to be sent/received */
+  IPP_DATA				/* IPP request data needs to be sent/received */
 } ipp_state_t;
 
-typedef enum			/**** IPP operations... ****/
+typedef enum				/**** IPP operations... ****/
 {
   IPP_PRINT_JOB = 0x0002,
   IPP_PRINT_URI,
@@ -260,7 +261,7 @@ typedef enum			/**** IPP operations... ****/
 #define CUPS_ADD_PRINTER	CUPS_ADD_MODIFY_PRINTER
 #define CUPS_ADD_CLASS		CUPS_ADD_MODIFY_CLASS
 
-typedef enum			/**** IPP status codes... ****/
+typedef enum				/**** IPP status codes... ****/
 {
   IPP_OK = 0x0000,
   IPP_OK_SUBST,
@@ -308,105 +309,105 @@ typedef enum			/**** IPP status codes... ****/
   IPP_PRINTER_IS_DEACTIVATED
 } ipp_status_t;
 
-typedef unsigned char ipp_uchar_t;/**** Unsigned 8-bit integer/character ****/
+typedef unsigned char ipp_uchar_t;	/**** Unsigned 8-bit integer/character ****/
 
 /**** New in CUPS 1.1.19 ****/
 typedef int	(*ipp_iocb_t)(void *, ipp_uchar_t *, int);
-				/**** IPP IO Callback Function ****/
+					/**** IPP IO Callback Function ****/
 
-typedef union			/**** Request Header ****/
+typedef union				/**** Request Header ****/
 {
-  struct			/* Any Header */
+  struct				/* Any Header */
   {
-    ipp_uchar_t	version[2];	/* Protocol version number */
-    int		op_status;	/* Operation ID or status code*/
-    int		request_id;	/* Request ID */
+    ipp_uchar_t	version[2];		/* Protocol version number */
+    int		op_status;		/* Operation ID or status code*/
+    int		request_id;		/* Request ID */
   }		any;
 
-  struct			/* Operation Header */
+  struct				/* Operation Header */
   {
-    ipp_uchar_t	version[2];	/* Protocol version number */
-    ipp_op_t	operation_id;	/* Operation ID */
-    int		request_id;	/* Request ID */
+    ipp_uchar_t	version[2];		/* Protocol version number */
+    ipp_op_t	operation_id;		/* Operation ID */
+    int		request_id;		/* Request ID */
   }		op;
 
-  struct			/* Status Header */
+  struct				/* Status Header */
   {
-    ipp_uchar_t	version[2];	/* Protocol version number */
-    ipp_status_t status_code;	/* Status code */
-    int		request_id;	/* Request ID */
+    ipp_uchar_t	version[2];		/* Protocol version number */
+    ipp_status_t status_code;		/* Status code */
+    int		request_id;		/* Request ID */
   }		status;
 
   /**** New in CUPS 1.1.19 ****/
-  struct			/* Event Header */
+  struct				/* Event Header */
   {
-    ipp_uchar_t	version[2];	/* Protocol version number */
-    ipp_status_t status_code;	/* Status code */
-    int		request_id;	/* Request ID */
+    ipp_uchar_t	version[2];		/* Protocol version number */
+    ipp_status_t status_code;		/* Status code */
+    int		request_id;		/* Request ID */
   }		event;
 } ipp_request_t;
 
 /**** New in CUPS 1.1.19 ****/
 typedef struct ipp_str ipp_t;
 
-typedef union			/**** Attribute Value ****/
+typedef union				/**** Attribute Value ****/
 {
-  int		integer;	/* Integer/enumerated value */
+  int		integer;		/* Integer/enumerated value */
 
-  char		boolean;	/* Boolean value */
+  char		boolean;		/* Boolean value */
 
-  ipp_uchar_t	date[11];	/* Date/time value */
-
-  struct
-  {
-    int		xres,		/* Horizontal resolution */
-		yres;		/* Vertical resolution */
-    ipp_res_t	units;		/* Resolution units */
-  }		resolution;	/* Resolution value */
+  ipp_uchar_t	date[11];		/* Date/time value */
 
   struct
   {
-    int		lower,		/* Lower value */
-		upper;		/* Upper value */
-  }		range;		/* Range of integers value */
+    int		xres,			/* Horizontal resolution */
+		yres;			/* Vertical resolution */
+    ipp_res_t	units;			/* Resolution units */
+  }		resolution;		/* Resolution value */
 
   struct
   {
-    char	*charset;	/* Character set */
-    char	*text;		/* String */
-  }		string;		/* String with language value */
+    int		lower,			/* Lower value */
+		upper;			/* Upper value */
+  }		range;			/* Range of integers value */
 
   struct
   {
-    int		length;		/* Length of attribute */
-    void	*data;		/* Data in attribute */
-  }		unknown;	/* Unknown attribute type */
+    char	*charset;		/* Character set */
+    char	*text;			/* String */
+  }		string;			/* String with language value */
+
+  struct
+  {
+    int		length;			/* Length of attribute */
+    void	*data;			/* Data in attribute */
+  }		unknown;		/* Unknown attribute type */
 
 /**** New in CUPS 1.1.19 ****/
-  ipp_t		*collection;	/* Collection value */
+  ipp_t		*collection;		/* Collection value */
 } ipp_value_t;
 
-typedef struct ipp_attribute_s	/**** Attribute ****/
+typedef struct ipp_attribute_s		/**** Attribute ****/
 {
-  struct ipp_attribute_s *next;	/* Next attribute in list */
-  ipp_tag_t	group_tag,	/* Job/Printer/Operation group tag */
-		value_tag;	/* What type of value is it? */
-  char		*name;		/* Name of attribute */
-  int		num_values;	/* Number of values */
-  ipp_value_t	values[1];	/* Values */
+  struct ipp_attribute_s *next;		/* Next attribute in list */
+  ipp_tag_t	group_tag,		/* Job/Printer/Operation group tag */
+		value_tag;		/* What type of value is it? */
+  char		*name;			/* Name of attribute */
+  int		num_values;		/* Number of values */
+  ipp_value_t	values[1];		/* Values */
 } ipp_attribute_t;
 
-struct ipp_str			/**** IPP Request/Response/Notification ****/
+struct ipp_str				/**** IPP Request/Response/Notification ****/
 {
-  ipp_state_t	state;		/* State of request */
-  ipp_request_t	request;	/* Request header */
-  ipp_attribute_t *attrs,	/* Attributes */
-		*last,		/* Last attribute in list */
-		*current;	/* Current attribute (for read/write) */
-  ipp_tag_t	curtag;		/* Current attribute group tag */
+  ipp_state_t	state;			/* State of request */
+  ipp_request_t	request;		/* Request header */
+  ipp_attribute_t *attrs,		/* Attributes */
+		*last,			/* Last attribute in list */
+		*current;		/* Current attribute (for read/write) */
+  ipp_tag_t	curtag;			/* Current attribute group tag */
 
 /**** New in CUPS 1.2 ****/
-  ipp_attribute_t *prev;	/* Previous attribute (for read) */
+  ipp_attribute_t *prev;		/* Previous attribute (for read) */
 };
 
 
@@ -414,18 +415,39 @@ struct ipp_str			/**** IPP Request/Response/Notification ****/
  * Prototypes...
  */
 
-extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group, const char *name, char value);
-extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const char *values);
-extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group, const char *name, const ipp_uchar_t *value);
-extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int value);
-extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const int *values);
-extern ipp_attribute_t	*ippAddRange(ipp_t *ipp, ipp_tag_t group, const char *name, int lower, int upper);
-extern ipp_attribute_t	*ippAddRanges(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const int *lower, const int *upper);
-extern ipp_attribute_t	*ippAddResolution(ipp_t *ipp, ipp_tag_t group, const char *name, ipp_res_t units, int xres, int yres);
-extern ipp_attribute_t	*ippAddResolutions(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, ipp_res_t units, const int *xres, const int *yres);
+extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group,
+			               const char *name, char value);
+extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group,
+			                const char *name, int num_values,
+					const char *values);
+extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group,
+			            const char *name, const ipp_uchar_t *value);
+extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group,
+			               ipp_tag_t type, const char *name,
+				       int value);
+extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group,
+			                ipp_tag_t type, const char *name,
+					int num_values, const int *values);
+extern ipp_attribute_t	*ippAddRange(ipp_t *ipp, ipp_tag_t group,
+			             const char *name, int lower, int upper);
+extern ipp_attribute_t	*ippAddRanges(ipp_t *ipp, ipp_tag_t group,
+			              const char *name, int num_values,
+				      const int *lower, const int *upper);
+extern ipp_attribute_t	*ippAddResolution(ipp_t *ipp, ipp_tag_t group,
+			                  const char *name, ipp_res_t units,
+					  int xres, int yres);
+extern ipp_attribute_t	*ippAddResolutions(ipp_t *ipp, ipp_tag_t group,
+			                   const char *name, int num_values,
+					   ipp_res_t units, const int *xres,
+					   const int *yres);
 extern ipp_attribute_t	*ippAddSeparator(ipp_t *ipp);
-extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, const char *charset, const char *value);
-extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group, ipp_tag_t type, const char *name, int num_values, const char *charset, const char * const *values);
+extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group,
+			              ipp_tag_t type, const char *name,
+				      const char *charset, const char *value);
+extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group,
+			               ipp_tag_t type, const char *name,
+				       int num_values, const char *charset,
+				       const char * const *values);
 extern time_t		ippDateToTime(const ipp_uchar_t *date);
 extern void		ippDelete(ipp_t *ipp);
 extern const char	*ippErrorString(ipp_status_t error);
@@ -442,13 +464,18 @@ extern int		ippPort(void);
 extern void		ippSetPort(int p);
 
 /**** New in CUPS 1.1.19 ****/
-extern ipp_attribute_t	*ippAddCollection(ipp_t *ipp, ipp_tag_t group, const char *name, ipp_t *value);
-extern ipp_attribute_t	*ippAddCollections(ipp_t *ipp, ipp_tag_t group, const char *name, int num_values, const ipp_t **values);
+extern ipp_attribute_t	*ippAddCollection(ipp_t *ipp, ipp_tag_t group,
+			                  const char *name, ipp_t *value);
+extern ipp_attribute_t	*ippAddCollections(ipp_t *ipp, ipp_tag_t group,
+			                   const char *name, int num_values,
+					   const ipp_t **values);
 extern void		ippDeleteAttribute(ipp_t *ipp, ipp_attribute_t *attr);
 extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp);
-extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking, ipp_t *parent, ipp_t *ipp);
+extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking,
+			          ipp_t *parent, ipp_t *ipp);
 extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp);
-extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking, ipp_t *parent, ipp_t *ipp);
+extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
+			           ipp_t *parent, ipp_t *ipp);
 
 /**** New in CUPS 1.2 ****/
 extern ipp_attribute_t	*ippAddOctetString(ipp_t *ipp, ipp_tag_t group,
@@ -458,13 +485,6 @@ extern ipp_status_t	ippErrorValue(const char *name);
 extern ipp_t		*ippNewRequest(ipp_op_t op);
 extern const char	*ippOpString(ipp_op_t op);
 extern ipp_op_t		ippOpValue(const char *name);
-
-/*
- * "Private" functions used internally by CUPS...
- */
-
-extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
-extern void		_ipp_free_attr(ipp_attribute_t *);
 
 
 /*

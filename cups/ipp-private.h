@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Backend definitions for the Common UNIX Printing System (CUPS).
+ *   Private IPP definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -24,26 +24,41 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_BACKEND_H_
-#  define _CUPS_BACKEND_H_
+#ifndef _CUPS_IPP_PRIVATE_H_
+#  define _CUPS_IPP_PRIVATE_H_
+
+/*
+ * Include necessary headers...
+ */
+
+#  include "ipp.h"
 
 
 /*
- * Constants...
+ * C++ magic...
  */
 
-typedef enum cups_backend_e		/**** Backend exit codes ****/
-{
-  CUPS_BACKEND_OK = 0,			/* Job completed successfully */
-  CUPS_BACKEND_FAILED = 1,		/* Job failed, use error-policy */
-  CUPS_BACKEND_AUTH_REQUIRED = 2,	/* Job failed, authentication required */
-  CUPS_BACKEND_HOLD = 3,		/* Job failed, hold job */
-  CUPS_BACKEND_STOP = 4,		/* Job failed, stop queue */
-  CUPS_BACKEND_CANCEL = 5		/* Job failed, cancel job */
-} cups_backend_t;
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
 
 
-#endif /* !_CUPS_BACKEND_H_ */
+/*
+ * Prototypes for private functions...
+ */
+
+extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
+extern void		_ipp_free_attr(ipp_attribute_t *);
+
+
+/*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_CUPS_IPP_H_ */
 
 /*
  * End of "$Id$".

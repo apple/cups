@@ -2452,7 +2452,11 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 	  */
 
 	  if ((ch = cupsFilePeekChar(fp)) == EOF)
+	  {
+	    ch = '\n';
 	    break;
+	  }
+
 	  if (ch == 0x0a)
 	    cupsFileGetChar(fp);
 	}
