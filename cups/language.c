@@ -61,6 +61,9 @@
 #else
 #  include <unistd.h>
 #endif /* WIN32 */
+#ifdef HAVE_COREFOUNDATION_H
+#  include <CoreFoundation/CoreFoundation.h>
+#endif /* HAVE_COREFOUNDATION_H */
 
 
 /*
@@ -68,7 +71,6 @@
  */
 
 #ifdef __APPLE__
-#  include <CoreFoundation/CoreFoundation.h>
 static const char	*appleLangDefault(void);
 #endif /* __APPLE__ */
 static cups_lang_t	*cups_cache_lookup(const char *name,
