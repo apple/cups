@@ -331,6 +331,18 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
     return (0);
 
  /*
+  * AP_D_InputSlot is the "default input slot" on MacOS X, and setting
+  * it clears the regular InputSlot choices...
+  */
+
+  if (!strcasecmp(option, "AP_D_InputSlot"))
+  {
+    if ((o = ppdFindOption(ppd, "InputSlot")) != NULL)
+      for (i = 0; i < o->num_choices; i ++)
+	o->choices[i].marked = 0;
+  }
+
+ /*
   * Check for custom options...
   */
 
@@ -477,14 +489,16 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	else if (!strcasecmp(option, "InputSlot"))
 	{
 	 /*
-	  * Unmark ManualFeed option...
+	  * Unmark ManualFeed True and possibly mark ManualFeed False
+	  * option...
 	  */
 
 	  if ((o = ppdFindOption(ppd, "ManualFeed")) != NULL)
 	    for (j = 0; j < o->num_choices; j ++)
-              o->choices[j].marked = 0;
+              o->choices[j].marked = !strcasecmp(o->choices[j].choice, "False");
 	}
-	else if (!strcasecmp(option, "ManualFeed"))
+	else if (!strcasecmp(option, "ManualFeed") &&
+	         !strcasecmp(choice, "True"))
 	{
 	 /*
 	  * Unmark InputSlot option...

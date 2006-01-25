@@ -4,7 +4,7 @@
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -362,6 +362,11 @@ extern ppd_status_t	ppdLastError(int *line);
 extern void		ppdSetConformance(ppd_conform_t c);
 
 /**** New in CUPS 1.2 ****/
+extern int		ppdCollect2(ppd_file_t *ppd, ppd_section_t section,
+			            float min_order, ppd_choice_t  ***choices);
+extern int		ppdEmitAfterOrder(ppd_file_t *ppd, FILE *fp,
+			                  ppd_section_t section, int limit,
+					  float min_order);
 extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp);
 extern ppd_coption_t	*ppdFindCustomOption(ppd_file_t *ppd,
 			                     const char *keyword);
