@@ -125,7 +125,11 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
       if (cupsDoAuthentication(http, "GET", resource))
         break;
 
-      httpReconnect(http);
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+        break;
+      }
 
       continue;
     }
@@ -136,7 +140,11 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
       httpFlush(http);
 
       /* Reconnect... */
-      httpReconnect(http);
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+        break;
+      }
 
       /* Upgrade with encryption... */
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
@@ -340,7 +348,11 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
       if (cupsDoAuthentication(http, "PUT", resource))
         break;
 
-      httpReconnect(http);
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+        break;
+      }
 
       continue;
     }
@@ -351,7 +363,11 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
       httpFlush(http);
 
       /* Reconnect... */
-      httpReconnect(http);
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+        break;
+      }
 
       /* Upgrade with encryption... */
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
