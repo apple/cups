@@ -3,7 +3,7 @@
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -379,11 +379,52 @@ void
 httpFlush(http_t *http)			/* I - HTTP data */
 {
   char	buffer[8192];			/* Junk buffer */
+  int	blocking;			/* To block or not to block */
 
 
   DEBUG_printf(("httpFlush(http=%p), state=%d\n", http, http->state));
 
+ /*
+  * Temporarily set non-blocking mode so we don't get stuck in httpRead()...
+  */
+
+  blocking = http->blocking;
+  http->blocking = 0;
+
+ /*
+  * Read any data we can...
+  */
+
   while (httpRead(http, buffer, sizeof(buffer)) > 0);
+
+ /*
+  * Restore blocking and reset the connection if we didn't get all of
+  * the remaining data...
+  */
+
+  http->blocking = blocking;
+
+  if (http->state != HTTP_WAITING && http->fd >= 0)
+  {
+   /*
+    * Didn't get the data back, so close the current connection.
+    */
+
+    http->state = HTTP_WAITING;
+
+#ifdef HAVE_SSL
+    if (http->tls)
+      http_shutdown_ssl(http);
+#endif /* HAVE_SSL */
+
+#ifdef WIN32
+    closesocket(http->fd);
+#else
+    close(http->fd);
+#endif /* WIN32 */
+
+    http->fd = -1;
+  }
 }
 
 
@@ -829,21 +870,23 @@ httpInitialize(void)
 
   if (!initialized)
     WSAStartup(MAKEWORD(1,1), &winsockdata);
-#elif defined(HAVE_SIGSET)
-  sigset(SIGPIPE, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
-  struct sigaction	action;		/* POSIX sigaction data */
-
-
+#elif !defined(SO_NOSIGPIPE)
  /*
   * Ignore SIGPIPE signals...
   */
 
+#  ifdef HAVE_SIGSET
+  sigset(SIGPIPE, SIG_IGN);
+#  elif defined(HAVE_SIGACTION)
+  struct sigaction	action;		/* POSIX sigaction data */
+
+
   memset(&action, 0, sizeof(action));
   action.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &action, NULL);
-#else
+#  else
   signal(SIGPIPE, SIG_IGN);
+#  endif /* !SO_NOSIGPIPE */
 #endif /* WIN32 */
 
 #ifdef HAVE_GNUTLS
@@ -1191,17 +1234,34 @@ _httpReadCDSA(
     void             *data,		/* I  - Data buffer */
     size_t           *dataLength)	/* IO - Number of bytes */
 {
+  OSStatus	result;			/* Return value */
   ssize_t	bytes;			/* Number of bytes read */
 
 
-  bytes = recv((int)connection, data, *dataLength, 0);
-  if (bytes >= 0)
+  for (;;)
   {
-    *dataLength = bytes;
-    return (0);
+    bytes = recv((int)connection, data, *dataLength, 0);
+
+    if (bytes > 0)
+    {
+      result      = (bytes == *dataLength);
+      *dataLength = bytes;
+
+      return (result);
+    }
+
+    if (bytes == 0)
+      return (errSSLClosedAbort);
+
+    if (errno == EAGAIN)
+      return (errSSLWouldBlock);
+
+    if (errno == EPIPE)
+      return (errSSLClosedAbort);
+
+    if (errno != EINTR)
+      return (errSSLInternal);
   }
-  else
-    return (-1);
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
 
@@ -1705,17 +1765,31 @@ _httpWriteCDSA(
     const void       *data,		/* I  - Data buffer */
     size_t           *dataLength)	/* IO - Number of bytes */
 {
-  ssize_t bytes;			/* Number of write written */
+  OSStatus	result;			/* Return value */
+  ssize_t	bytes;			/* Number of bytes read */
 
 
-  bytes = write((int)connection, data, *dataLength);
-  if (bytes >= 0)
+  for (;;)
   {
-    *dataLength = bytes;
-    return (0);
+    bytes = write((int)connection, data, *dataLength);
+
+    if (bytes >= 0)
+    {
+      result      = (bytes == *dataLength) ? 0 : errSSLWouldBlock;
+      *dataLength = bytes;
+
+      return (result);
+    }
+
+    if (errno == EAGAIN)
+      return (errSSLWouldBlock);
+
+    if (errno == EPIPE)
+      return (errSSLClosedAbort);
+
+    if (errno != EINTR)
+      return (errSSLInternal);
   }
-  else
-    return (-1);
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
 
@@ -1755,20 +1829,32 @@ http_read_ssl(http_t *http,		/* I - HTTP data */
   return (gnutls_record_recv(((http_tls_t *)(http->tls))->session, buf, len));
 
 #  elif defined(HAVE_CDSASSL)
+  int		result;			/* Return value */
   OSStatus	error;			/* Error info */
   size_t	processed;		/* Number of bytes processed */
 
 
   error = SSLRead((SSLContextRef)http->tls, buf, len, &processed);
 
-  if (error == 0)
-    return (processed);
-  else
+  switch (error)
   {
-    http->error = error;
-
-    return (-1);
+    case 0 :
+	result = (int)processed;
+	break;
+    case errSSLClosedGraceful :
+	result = 0;
+	break;
+    case errSSLWouldBlock :
+	errno = EAGAIN;
+	result = -1;
+	break;
+    default :
+	errno = EPIPE;
+	result = -1;
+	break;
   }
+
+  return (result);
 #  endif /* HAVE_LIBSSL */
 }
 #endif /* HAVE_SSL */
@@ -1843,7 +1929,8 @@ http_send(http_t       *http,	/* I - HTTP data */
   */
 
   if (http->status == HTTP_ERROR || http->status >= HTTP_BAD_REQUEST)
-    httpReconnect(http);
+    if (httpReconnect(http))
+      return (-1);
 
  /*
   * Send the request header...
@@ -2186,6 +2273,9 @@ http_wait(http_t *http,			/* I - HTTP data */
 
   DEBUG_printf(("http_wait(http=%p, msec=%d)\n", http, msec));
 
+  if (http->fd < 0)
+    return (0);
+
  /*
   * Check the SSL/TLS buffers for data first...
   */
@@ -2413,19 +2503,32 @@ http_write_ssl(http_t     *http,	/* I - HTTP data */
 #  elif defined(HAVE_GNUTLS)
   return (gnutls_record_send(((http_tls_t *)(http->tls))->session, buf, len));
 #  elif defined(HAVE_CDSASSL)
+  int		result;			/* Return value */
   OSStatus	error;			/* Error info */
   size_t	processed;		/* Number of bytes processed */
 
 
   error = SSLWrite((SSLContextRef)http->tls, buf, len, &processed);
 
-  if (error == 0)
-    return (processed);
-  else
+  switch (error)
   {
-    http->error = error;
-    return (-1);
+    case 0 :
+	result = (int)processed;
+	break;
+    case errSSLClosedGraceful :
+	result = 0;
+	break;
+    case errSSLWouldBlock :
+	errno = EAGAIN;
+	result = -1;
+	break;
+    default :
+	errno = EPIPE;
+	result = -1;
+	break;
   }
+
+  return (result);
 #  endif /* HAVE_LIBSSL */
 }
 #endif /* HAVE_SSL */
