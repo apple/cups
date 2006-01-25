@@ -739,17 +739,35 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
                 int         num_dests,	/* I - Number of destinations */
                 cups_dest_t **dests)	/* IO - Destinations */
 {
+  int		i;			/* Looping var */
   cups_dest_t	*dest;			/* Current destination */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
-  cups_lang_t	*language;		/* Default language */
-  const char	*name;			/* printer-name attribute */
-  char		job_sheets[1024];	/* job-sheets option */
+  int		accepting,		/* printer-is-accepting-jobs attribute */
+		shared,			/* printer-is-shared attribute */
+		state,			/* printer-state attribute */
+		change_time,		/* printer-state-change-time attribute */
+		type;			/* printer-type attribute */
+  const char	*info,			/* printer-info attribute */
+		*make_model,		/* printer-make-and-model attribute */
+		*name;			/* printer-name attribute */
+  char		job_sheets[1024],	/* job-sheets option */
+		reasons[1024],		/* printer-state-reasons attribute */
+		*rptr,			/* Pointer into reasons string */
+		temp[255];		/* Temporary string for numbers */
   static const char * const pattrs[] =	/* Attributes we're interested in */
 		{
+		  "job-sheets-default",
+		  "printer-info",
+		  "printer-is-accepting-jobs",
+		  "printer-is-shared",
+		  "printer-make-and-model",
 		  "printer-name",
-		  "job-sheets-default"
+		  "printer-state",
+		  "printer-state-change-time",
+		  "printer-state-reasons",
+		  "printer-type"
 		};
 
 
@@ -759,26 +777,17 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
   *
   *    attributes-charset
   *    attributes-natural-language
+  *    requesting-user-name
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = op;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  cupsLangFree(language);
+  request = ippNewRequest(op);
 
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
 		NULL, pattrs);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+               "requesting-user-name", NULL, cupsUser());
 
  /*
   * Do the request and get back a response...
@@ -802,17 +811,21 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
       * Pull the needed attributes from this job...
       */
 
-      name = NULL;
+      accepting   = 0;
+      change_time = 0;
+      info        = NULL;
+      make_model  = NULL;
+      name        = NULL;
+      shared      = 1;
+      state       = IPP_PRINTER_IDLE;
+      type        = CUPS_PRINTER_LOCAL;
 
       strcpy(job_sheets, "");
+      strcpy(reasons, "");
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (strcmp(attr->name, "printer-name") == 0 &&
-	    attr->value_tag == IPP_TAG_NAME)
-	  name = attr->values[0].string.text;
-
-        if (strcmp(attr->name, "job-sheets-default") == 0 &&
+        if (!strcmp(attr->name, "job-sheets-default") &&
 	    (attr->value_tag == IPP_TAG_KEYWORD ||
 	     attr->value_tag == IPP_TAG_NAME))
         {
@@ -820,8 +833,46 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 	    snprintf(job_sheets, sizeof(job_sheets), "%s,%s",
 	             attr->values[0].string.text, attr->values[1].string.text);
 	  else
-	    strcpy(job_sheets, attr->values[0].string.text);
+	    strlcpy(job_sheets, attr->values[0].string.text,
+	            sizeof(job_sheets));
         }
+        else if (!strcmp(attr->name, "printer-info") &&
+	         attr->value_tag == IPP_TAG_TEXT)
+	  info = attr->values[0].string.text;
+	else if (!strcmp(attr->name, "printer-is-accepting-jobs") &&
+	         attr->value_tag == IPP_TAG_BOOLEAN)
+          accepting = attr->values[0].boolean;
+	else if (!strcmp(attr->name, "printer-is-shared") &&
+	         attr->value_tag == IPP_TAG_BOOLEAN)
+          shared = attr->values[0].boolean;
+        else if (!strcmp(attr->name, "printer-make-and-model") &&
+	         attr->value_tag == IPP_TAG_TEXT)
+	  make_model = attr->values[0].string.text;
+        else if (!strcmp(attr->name, "printer-name") &&
+	         attr->value_tag == IPP_TAG_NAME)
+	  name = attr->values[0].string.text;
+	else if (!strcmp(attr->name, "printer-state") &&
+	         attr->value_tag == IPP_TAG_ENUM)
+          state = attr->values[0].integer;
+	else if (!strcmp(attr->name, "printer-state-change-time") &&
+	         attr->value_tag == IPP_TAG_INTEGER)
+          change_time = attr->values[0].integer;
+        else if (!strcmp(attr->name, "printer-state-reasons") &&
+	         attr->value_tag == IPP_TAG_KEYWORD)
+	{
+	  strlcpy(reasons, attr->values[0].string.text, sizeof(reasons));
+	  for (i = 1, rptr = reasons + strlen(reasons);
+	       i < attr->num_values;
+	       i ++)
+	  {
+	    snprintf(rptr, sizeof(reasons) - (rptr - reasons), ",%s",
+	             attr->values[i].string.text);
+	    rptr += strlen(rptr);
+	  }
+	}
+	else if (!strcmp(attr->name, "printer-type") &&
+	         attr->value_tag == IPP_TAG_ENUM)
+          type = attr->values[0].integer;
 
         attr = attr->next;
       }
@@ -841,9 +892,55 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
       num_dests = cupsAddDest(name, NULL, num_dests, dests);
 
       if ((dest = cupsGetDest(name, NULL, num_dests, *dests)) != NULL)
+      {
         if (job_sheets[0])
-          dest->num_options = cupsAddOption("job-sheets", job_sheets, 0,
+          dest->num_options = cupsAddOption("job-sheets", job_sheets,
+	                                    dest->num_options,
 	                                    &(dest->options));
+
+        if (info)
+          dest->num_options = cupsAddOption("printer-info", info,
+	                                    dest->num_options,
+	                                    &(dest->options));
+
+        sprintf(temp, "%d", accepting);
+	dest->num_options = cupsAddOption("printer-is-accepting-jobs", temp,
+					  dest->num_options,
+					  &(dest->options));
+
+        sprintf(temp, "%d", shared);
+	dest->num_options = cupsAddOption("printer-is-shared", temp,
+					  dest->num_options,
+					  &(dest->options));
+
+        if (make_model)
+          dest->num_options = cupsAddOption("printer-make-and-model",
+	                                    make_model, dest->num_options,
+	                                    &(dest->options));
+
+        sprintf(temp, "%d", state);
+	dest->num_options = cupsAddOption("printer-state", temp,
+					  dest->num_options,
+					  &(dest->options));
+
+        if (change_time)
+	{
+	  sprintf(temp, "%d", change_time);
+	  dest->num_options = cupsAddOption("printer-state-change-time", temp,
+					    dest->num_options,
+					    &(dest->options));
+        }
+
+        if (reasons[0])
+          dest->num_options = cupsAddOption("printer-state-reasons", reasons,
+					    dest->num_options,
+	                                    &(dest->options));
+
+        sprintf(temp, "%d", type);
+	dest->num_options = cupsAddOption("printer-type", temp,
+					  dest->num_options,
+					  &(dest->options));
+      }
 
       if (attr == NULL)
 	break;
