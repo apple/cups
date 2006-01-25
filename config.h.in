@@ -371,6 +371,14 @@
 #undef HAVE_MBR_UID_TO_UUID
 
 
+/*
+ * Do we have Darwin's notify_post() header and function?
+ */
+
+#undef HAVE_NOTIFY_H
+#undef HAVE_NOTIFY_POST
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

@@ -45,6 +45,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#ifdef HAVE_NOTIFY_H
+#  include <notify.h>
+#endif /* HAVE_NOTIFY_H */
+
 
 /*
  * Local functions...
@@ -562,16 +566,21 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
     }
 
  /*
-  * Free the temporary destinations...
+  * Free the temporary destinations and close the file...
   */
 
   cupsFreeDests(num_temps, temps);
 
+  fclose(fp);
+
+#ifdef HAVE_NOTIFY_POST
  /*
-  * Close the file and return...
+  * Send a notification so that MacOS X applications can know about the
+  * change, too.
   */
 
-  fclose(fp);
+  notify_post("com.apple.printerListChange");
+#endif /* HAVE_NOTIFY_POST */
 
   return (0);
 }

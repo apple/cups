@@ -160,6 +160,8 @@ AC_TRY_COMPILE([#include <time.h>],[struct tm t;
 	AC_MSG_RESULT(no))
 
 dnl See if we have POSIX ACL support...
+dnl TODO: Linux/Solaris/IRIX/etc. version
+
 AC_CHECK_FUNCS(acl_init)
 
 dnl Flags for "ar" command...
@@ -198,6 +200,10 @@ case $uname in
 		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))
 		AC_CHECK_HEADER(membershipPriv.h,AC_DEFINE(HAVE_MEMBERSHIPPRIV_H))
 		AC_CHECK_FUNCS(mbr_uid_to_uuid)
+
+		dnl Check for notify_post support
+		AC_CHECK_HEADER(notify.h,AC_DEFINE(HAVE_NOTIFY_H))
+		AC_CHECK_FUNCS(notify_post)
                 ;;
         *)
                 BACKLIBS=""
