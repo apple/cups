@@ -100,14 +100,14 @@ struct _cups_file_s			/**** CUPS file structure... ****/
   char		mode,			/* Mode ('r' or 'w') */
 		compressed,		/* Compression used? */
 		eof,			/* End of file? */
-		buf[2048],		/* Buffer */
+		buf[4096],		/* Buffer */
 		*ptr,			/* Pointer into buffer */
 		*end;			/* End of buffer data */
   off_t		pos;			/* File position for start of buffer */
 
 #ifdef HAVE_LIBZ
   z_stream	stream;			/* (De)compression stream */
-  Bytef		cbuf[1024];		/* (De)compression buffer */
+  Bytef		cbuf[4096];		/* (De)compression buffer */
   uLong		crc;			/* (De)compression CRC */
 #endif /* HAVE_LIBZ */
 };
@@ -1411,7 +1411,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       * file...
       */
 
-      if ((bytes = cups_read(fp, (char *)fp->cbuf, sizeof(fp->cbuf))) < 0)
+      if ((bytes = cups_read(fp, (char *)fp->buf, sizeof(fp->buf))) < 0)
       {
        /*
 	* Can't read from file!
@@ -1420,14 +1420,13 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	return (-1);
       }
 
-      if (bytes < 10 || fp->cbuf[0] != 0x1f || fp->cbuf[1] != 0x8b ||
-          fp->cbuf[2] != 8 || (fp->cbuf[3] & 0xe0) != 0)
+      if (bytes < 10 || fp->buf[0] != 0x1f ||
+          (unsigned char)fp->buf[1] != 0x8b ||
+          fp->buf[2] != 8 || (fp->buf[3] & 0xe0) != 0)
       {
        /*
 	* Not a gzip'd file!
 	*/
-
-	memcpy(fp->buf, fp->cbuf, bytes);
 
 	fp->ptr = fp->buf;
 	fp->end = fp->buf + bytes;
@@ -1439,10 +1438,10 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       * Parse header junk: extra data, original name, and comment...
       */
 
-      ptr = (unsigned char *)fp->cbuf + 10;
-      end = (unsigned char *)fp->cbuf + bytes;
+      ptr = (unsigned char *)fp->buf + 10;
+      end = (unsigned char *)fp->buf + bytes;
 
-      if (fp->cbuf[3] & 0x04)
+      if (fp->buf[3] & 0x04)
       {
        /*
 	* Skip extra data...
@@ -1470,7 +1469,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	}
       }
 
-      if (fp->cbuf[3] & 0x08)
+      if (fp->buf[3] & 0x08)
       {
        /*
 	* Skip original name data...
@@ -1491,7 +1490,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	}
       }
 
-      if (fp->cbuf[3] & 0x10)
+      if (fp->buf[3] & 0x10)
       {
        /*
 	* Skip comment data...
@@ -1512,7 +1511,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	}
       }
 
-      if (fp->cbuf[3] & 0x02)
+      if (fp->buf[3] & 0x02)
       {
        /*
 	* Skip header CRC data...
@@ -1531,15 +1530,22 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       }
 
      /*
+      * Copy the flate-compressed data to the compression buffer...
+      */
+
+      if ((bytes = end - ptr) > 0)
+        memcpy(fp->cbuf, ptr, bytes);
+
+     /*
       * Setup the decompressor data...
       */
 
       fp->stream.zalloc    = (alloc_func)0;
       fp->stream.zfree     = (free_func)0;
       fp->stream.opaque    = (voidpf)0;
-      fp->stream.next_in   = (Bytef *)ptr;
+      fp->stream.next_in   = (Bytef *)fp->cbuf;
       fp->stream.next_out  = NULL;
-      fp->stream.avail_in  = end - ptr;
+      fp->stream.avail_in  = bytes;
       fp->stream.avail_out = 0;
       fp->crc              = crc32(0L, Z_NULL, 0);
 
