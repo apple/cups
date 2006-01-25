@@ -92,14 +92,23 @@ cupsRasterInterpretPPD(
 
   memset(h, 0, sizeof(cups_page_header2_t));
 
-  h->NumCopies        = 1;
-  h->PageSize[0]      = 612;
-  h->PageSize[1]      = 792;
-  h->HWResolution[0]  = 100;
-  h->HWResolution[1]  = 100;
-  h->cupsBitsPerColor = 1;
-  h->cupsColorOrder   = CUPS_ORDER_CHUNKED;
-  h->cupsColorSpace   = CUPS_CSPACE_K;
+  h->NumCopies          = 1;
+  h->PageSize[0]        = 612;
+  h->PageSize[1]        = 792;
+  h->HWResolution[0]    = 100;
+  h->HWResolution[1]    = 100;
+  h->cupsBitsPerColor   = 1;
+  h->cupsColorOrder     = CUPS_ORDER_CHUNKED;
+  h->cupsColorSpace     = CUPS_CSPACE_K;
+  h->cupsPageScaling    = 1.0f;
+  h->cupsPageSize[0]    = 612.0f;
+  h->cupsPageSize[1]    = 792.0f;
+  h->cupsImagingBBox[0] = 0.0f;
+  h->cupsImagingBBox[1] = 0.0f;
+  h->cupsImagingBBox[2] = 612.0f;
+  h->cupsImagingBBox[3] = 792.0f;
+
+  strcpy(h->cupsPageSizeName, "Letter");
 
  /*
   * Apply patches and options to the page header...
@@ -169,6 +178,8 @@ cupsRasterInterpretPPD(
     bottom = size->bottom;
     right  = size->right;
     top    = size->top;
+
+    strlcpy(h->cupsPageSizeName, size->name, sizeof(h->cupsPageSizeName));
   }
   else
   {
@@ -188,13 +199,19 @@ cupsRasterInterpretPPD(
   h->ImagingBoundingBox[1] = bottom;
   h->ImagingBoundingBox[2] = right;
   h->ImagingBoundingBox[3] = top;
+  h->cupsImagingBBox[0]    = left;
+  h->cupsImagingBBox[1]    = bottom;
+  h->cupsImagingBBox[2]    = right;
+  h->cupsImagingBBox[3]    = top;
 
  /*
   * Compute the bitmap parameters...
   */
 
-  h->cupsWidth  = (int)((right - left) * h->HWResolution[0] / 72.0f + 0.5f);
-  h->cupsHeight = (int)((top - bottom) * h->HWResolution[1] / 72.0f + 0.5f);
+  h->cupsWidth  = (int)((right - left) * h->cupsPageScaling *
+                        h->HWResolution[0] / 72.0f + 0.5f);
+  h->cupsHeight = (int)((top - bottom) * h->cupsPageScaling *
+                        h->HWResolution[1] / 72.0f + 0.5f);
 
   switch (h->cupsColorSpace)
   {
@@ -473,6 +490,9 @@ exec_code(cups_page_header2_t *h,	/* O - Page header */
     {
       if (sscanf(value, "[%d%d]", h->PageSize + 0, h->PageSize + 1) != 2)
         return (-1);
+
+      if (sscanf(value, "[%f%f]", h->cupsPageSize + 0, h->cupsPageSize + 1) != 2)
+        return (-1);
     }
     else if (!strcmp(name, "Separations") && type == CUPS_TYPE_NAME)
       h->Separations = !strcmp(value, "true");
@@ -496,6 +516,10 @@ exec_code(cups_page_header2_t *h,	/* O - Page header */
       h->cupsRowFeed = atoi(value);
     else if (!strcmp(name, "cupsRowStep") && type == CUPS_TYPE_NUMBER)
       h->cupsRowStep = atoi(value);
+    else if (!strcmp(name, "cupsPageScaling") && type == CUPS_TYPE_NUMBER)
+    {
+      h->cupsPageScaling = atof(value);
+    }
     else if (!strncmp(name, "cupsInteger", 11) && type == CUPS_TYPE_NUMBER)
     {
       if ((i = atoi(name + 11)) >= 0 || i > 15)
