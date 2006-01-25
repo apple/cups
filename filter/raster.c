@@ -609,7 +609,7 @@ cups_raster_read_header(
   */
 
   if (r->sync == CUPS_RASTER_REVSYNC || r->sync == CUPS_RASTER_REVSYNCv1)
-    for (len = 74, s = (union swap_s *)&(r->header.AdvanceDistance);
+    for (len = 81, s = (union swap_s *)&(r->header.AdvanceDistance);
 	 len > 0;
 	 len --, s ++)
       s->v = (((((s->b[3] << 8) | s->b[2]) << 8) | s->b[1]) << 8) | s->b[0];

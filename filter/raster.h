@@ -288,12 +288,16 @@ typedef struct cups_page_header2_s	/**** Version 2 Page Header @since CUPS 1.2@ 
   unsigned	cupsRowStep;		/* Spacing between lines */
 
   /**** Version 2 Dictionary Values ****/
-  unsigned	cupsNumColors;		/* Number of colors */
-  unsigned	cupsInteger[16];	/* User-defined integer values */
-  float		cupsReal[16];		/* User-defined floating-point values */
-  char		cupsString[16][64];	/* User-defined string values */
-  char		cupsMarkerType[64];	/* Ink/toner type */
-  char		cupsRenderingIntent[64];/* Color rendering intent */
+  unsigned	cupsNumColors;		/* Number of colors @since CUPS 1.2@ */
+  float		cupsPageScaling;	/* Scaling that was applied to page data */
+  float		cupsPageSize[2];	/* Floating point PageSize @since CUPS 1.2@ */
+  float		cupsImagingBBox[4];	/* Floating point ImagingBoundingBox @since CUPS 1.2@ */
+  unsigned	cupsInteger[16];	/* User-defined integer values @since CUPS 1.2@ */
+  float		cupsReal[16];		/* User-defined floating-point values @since CUPS 1.2@ */
+  char		cupsString[16][64];	/* User-defined string values @since CUPS 1.2@ */
+  char		cupsMarkerType[64];	/* Ink/toner type @since CUPS 1.2@ */
+  char		cupsRenderingIntent[64];/* Color rendering intent @since CUPS 1.2@ */
+  char		cupsPageSizeName[64];	/* PageSize name @since CUPS 1.2@ */
 } cups_page_header2_t;
 
 typedef struct _cups_raster_s		/**** Raster stream data ****/
