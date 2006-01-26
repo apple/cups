@@ -34,7 +34,6 @@
  * Include necessary headers...
  */
 
-#include <cups/ppd.h>
 #include <cups/string.h>
 #include "raster.h"
 #include <stdlib.h>
@@ -60,17 +59,25 @@ static int	exec_code(cups_page_header2_t *header, const char *code);
 /*
  * 'cupsRasterInterpretPPD()' - Interpret PPD commands to create a page header.
  *
+ * This function does not mark the options in the PPD using the "num_options"
+ * and "options" arguments.  Instead, mark the options prior to calling
+ * cupsRasterInterpretPPD() - this allows you to do per-page options
+ * without manipulating the options array.
+ *
  * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on failure */
 cupsRasterInterpretPPD(
     cups_page_header2_t *h,		/* O - Page header */
-    ppd_file_t          *ppd)		/* I - PPD file */
+    ppd_file_t          *ppd,		/* I - PPD file */
+    int                 num_options,	/* I - Number of options */
+    cups_option_t       *options)	/* I - Options */
 {
   int		i;			/* Looping var */
   int		status;			/* Cummulative status */
   int		count;			/* Number of marked choices */
+  const char	*val;			/* Option value */
   ppd_choice_t	**choices;		/* List of marked choices */
   ppd_size_t	*size;			/* Current size */
   float		left,			/* Left position */
@@ -92,21 +99,21 @@ cupsRasterInterpretPPD(
 
   memset(h, 0, sizeof(cups_page_header2_t));
 
-  h->NumCopies          = 1;
-  h->PageSize[0]        = 612;
-  h->PageSize[1]        = 792;
-  h->HWResolution[0]    = 100;
-  h->HWResolution[1]    = 100;
-  h->cupsBitsPerColor   = 1;
-  h->cupsColorOrder     = CUPS_ORDER_CHUNKED;
-  h->cupsColorSpace     = CUPS_CSPACE_K;
-  h->cupsPageScaling    = 1.0f;
-  h->cupsPageSize[0]    = 612.0f;
-  h->cupsPageSize[1]    = 792.0f;
-  h->cupsImagingBBox[0] = 0.0f;
-  h->cupsImagingBBox[1] = 0.0f;
-  h->cupsImagingBBox[2] = 612.0f;
-  h->cupsImagingBBox[3] = 792.0f;
+  h->NumCopies                   = 1;
+  h->PageSize[0]                 = 612;
+  h->PageSize[1]                 = 792;
+  h->HWResolution[0]             = 100;
+  h->HWResolution[1]             = 100;
+  h->cupsBitsPerColor            =  1;
+  h->cupsColorOrder              = CUPS_ORDER_CHUNKED;
+  h->cupsColorSpace              = CUPS_CSPACE_K;
+  h->cupsBorderlessScalingFactor = 1.0f;
+  h->cupsPageSize[0]             = 612.0f;
+  h->cupsPageSize[1]             = 792.0f;
+  h->cupsImagingBBox[0]          = 0.0f;
+  h->cupsImagingBBox[1]          = 0.0f;
+  h->cupsImagingBBox[2]          = 612.0f;
+  h->cupsImagingBBox[3]          = 792.0f;
 
   strcpy(h->cupsPageSizeName, "Letter");
 
@@ -161,8 +168,23 @@ cupsRasterInterpretPPD(
   if (!h->HWResolution[0] || !h->HWResolution[1] ||
       !h->PageSize[0] || !h->PageSize[1] ||
       (h->cupsBitsPerColor != 1 && h->cupsBitsPerColor != 2 &&
-       h->cupsBitsPerColor != 4 && h->cupsBitsPerColor != 8))
+       h->cupsBitsPerColor != 4 && h->cupsBitsPerColor != 8) ||
+      h->cupsBorderlessScalingFactor < 0.9 ||
+      h->cupsBorderlessScalingFactor > 1.1)
     return (-1);
+
+ /*
+  * Allow option override for page scaling...
+  */
+
+  if ((val = cupsGetOption("cupsBorderlessScalingFactor", num_options,
+                           options)) != NULL)
+  {
+    float sc = atof(val);
+
+    if (sc >= 0.9 && sc <= 1.1)
+      h->cupsBorderlessScalingFactor = sc;
+  }
 
  /*
   * Get the margins for the current size...
@@ -193,12 +215,16 @@ cupsRasterInterpretPPD(
     top    = 792.0f;
   }
 
-  h->Margins[0]            = left;
-  h->Margins[1]            = bottom;
-  h->ImagingBoundingBox[0] = left;
-  h->ImagingBoundingBox[1] = bottom;
-  h->ImagingBoundingBox[2] = right;
-  h->ImagingBoundingBox[3] = top;
+  h->PageSize[0]           = h->cupsPageSize[0] *
+                             h->cupsBorderlessScalingFactor;
+  h->PageSize[1]           = h->cupsPageSize[1] *
+                             h->cupsBorderlessScalingFactor;
+  h->Margins[0]            = left * h->cupsBorderlessScalingFactor;
+  h->Margins[1]            = bottom * h->cupsBorderlessScalingFactor;
+  h->ImagingBoundingBox[0] = left * h->cupsBorderlessScalingFactor;
+  h->ImagingBoundingBox[1] = bottom * h->cupsBorderlessScalingFactor;
+  h->ImagingBoundingBox[2] = right * h->cupsBorderlessScalingFactor;
+  h->ImagingBoundingBox[3] = top * h->cupsBorderlessScalingFactor;
   h->cupsImagingBBox[0]    = left;
   h->cupsImagingBBox[1]    = bottom;
   h->cupsImagingBBox[2]    = right;
@@ -208,9 +234,9 @@ cupsRasterInterpretPPD(
   * Compute the bitmap parameters...
   */
 
-  h->cupsWidth  = (int)((right - left) * h->cupsPageScaling *
+  h->cupsWidth  = (int)((right - left) * h->cupsBorderlessScalingFactor *
                         h->HWResolution[0] / 72.0f + 0.5f);
-  h->cupsHeight = (int)((top - bottom) * h->cupsPageScaling *
+  h->cupsHeight = (int)((top - bottom) * h->cupsBorderlessScalingFactor *
                         h->HWResolution[1] / 72.0f + 0.5f);
 
   switch (h->cupsColorSpace)
@@ -488,9 +514,6 @@ exec_code(cups_page_header2_t *h,	/* O - Page header */
       h->OutputFaceUp = !strcmp(value, "true");
     else if (!strcmp(name, "PageSize") && type == CUPS_TYPE_ARRAY)
     {
-      if (sscanf(value, "[%d%d]", h->PageSize + 0, h->PageSize + 1) != 2)
-        return (-1);
-
       if (sscanf(value, "[%f%f]", h->cupsPageSize + 0, h->cupsPageSize + 1) != 2)
         return (-1);
     }
@@ -516,10 +539,9 @@ exec_code(cups_page_header2_t *h,	/* O - Page header */
       h->cupsRowFeed = atoi(value);
     else if (!strcmp(name, "cupsRowStep") && type == CUPS_TYPE_NUMBER)
       h->cupsRowStep = atoi(value);
-    else if (!strcmp(name, "cupsPageScaling") && type == CUPS_TYPE_NUMBER)
-    {
-      h->cupsPageScaling = atof(value);
-    }
+    else if (!strcmp(name, "cupsBorderlessScalingFactor") &&
+             type == CUPS_TYPE_NUMBER)
+      h->cupsBorderlessScalingFactor = atof(value);
     else if (!strncmp(name, "cupsInteger", 11) && type == CUPS_TYPE_NUMBER)
     {
       if ((i = atoi(name + 11)) >= 0 || i > 15)
