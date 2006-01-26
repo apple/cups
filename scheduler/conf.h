@@ -163,8 +163,10 @@ VAR int			ClassifyOverride	VALUE(0),
 			RunAsUser		VALUE(FALSE),
 					/* Run as unpriviledged user? */
 			RunUser,	/* User to run as, used for files */
-			PrintcapFormat		VALUE(PRINTCAP_BSD);
+			PrintcapFormat		VALUE(PRINTCAP_BSD),
 					/* Format of printcap file? */
+			DefaultShared		VALUE(TRUE);
+					/* Share printers by default? */
 VAR cups_file_t		*AccessFile		VALUE(NULL),
 					/* Access log file */
 			*ErrorFile		VALUE(NULL),

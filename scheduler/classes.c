@@ -719,7 +719,7 @@ cupsdSaveAllClasses(void)
   */
 
   fchown(cupsFileNumber(fp), RunUser, Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+  fchmod(cupsFileNumber(fp), 0600);
 
  /*
   * Write a small header to the file...
