@@ -25,34 +25,36 @@
  *
  * Contents:
  *
- *   cupsCancelJob()       - Cancel a print job on the default server.
- *   cupsDoFileRequest()   - Do an IPP request.
- *   cupsFreeJobs()        - Free memory used by job data.
- *   cupsGetClasses()      - Get a list of printer classes from the default
- *                           server.
- *   cupsGetDefault()      - Get the default printer or class from the default
- *                           server.
- *   cupsGetDefault2()     - Get the default printer or class from the
- *                           specified server.
- *   cupsGetJobs()         - Get the jobs from the default server.
- *   cupsGetJobs2()        - Get the jobs from the specified server.
- *   cupsGetPPD()          - Get the PPD file for a printer on the default
- *                           server.
- *   cupsGetPPD2()         - Get the PPD file for a printer on the specified
- *                           server.
- *   cupsGetPrinters()     - Get a list of printers from the default server.
- *   cupsLastError()       - Return the last IPP status code.
- *   cupsLastErrorString() - Return the last IPP status-message.
- *   cupsPrintFile()       - Print a file to a printer or class on the default
- *                           server.
- *   cupsPrintFile2()      - Print a file to a printer or class on the
- *                           specified server.
- *   cupsPrintFiles()      - Print one or more files to a printer or class on
- *                           the default server.
- *   cupsPrintFiles2()     - Print one or more files to a printer or class on
- *                           the specified server.
- *   cups_connect()        - Connect to the specified host...
- *   cups_set_error()      - Set the last IPP status code and status-message.
+ *   cupsCancelJob()        - Cancel a print job on the default server.
+ *   cupsDoFileRequest()    - Do an IPP request.
+ *   cupsFreeJobs()         - Free memory used by job data.
+ *   cupsGetClasses()       - Get a list of printer classes from the default
+ *                            server.
+ *   cupsGetDefault()       - Get the default printer or class from the default
+ *                            server.
+ *   cupsGetDefault2()      - Get the default printer or class from the
+ *                            specified server.
+ *   cupsGetJobs()          - Get the jobs from the default server.
+ *   cupsGetJobs2()         - Get the jobs from the specified server.
+ *   cupsGetPPD()           - Get the PPD file for a printer on the default
+ *                            server.
+ *   cupsGetPPD2()          - Get the PPD file for a printer on the specified
+ *                            server.
+ *   cupsGetPrinters()      - Get a list of printers from the default server.
+ *   cupsLastError()        - Return the last IPP status code.
+ *   cupsLastErrorString()  - Return the last IPP status-message.
+ *   cupsPrintFile()        - Print a file to a printer or class on the default
+ *                            server.
+ *   cupsPrintFile2()       - Print a file to a printer or class on the
+ *                            specified server.
+ *   cupsPrintFiles()       - Print one or more files to a printer or class on
+ *                            the default server.
+ *   cupsPrintFiles2()      - Print one or more files to a printer or class on
+ *                            the specified server.
+ *   cups_connect()         - Connect to the specified host...
+ *   cups_get_printer_uri() - Get the printer-uri-supported attribute for the
+ *                            first printer in a class.
+ *   cups_set_error()       - Set the last IPP status code and status-message.
  */
 
 /*
@@ -77,6 +79,10 @@
  */
 
 static char	*cups_connect(const char *name, char *printer, char *hostname);
+static int	cups_get_printer_uri(http_t *http, const char *name,
+		                     char *host, int hostsize, int *port,
+				     char *resource, int resourcesize,
+				     int depth);
 static void	cups_set_error(ipp_status_t status, const char *message);
 
 
@@ -1134,29 +1140,15 @@ const char *				/* O - Filename for PPD file */
 cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
             const char *name)		/* I - Printer name */
 {
-  int		i;			/* Looping var */
   int		http_port;		/* Port number */
   http_t	*http2;			/* Alternate HTTP connection */
-  ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
-  ipp_attribute_t *attr;		/* Current attribute */
-  cups_lang_t	*language;		/* Local language */
   int		fd;			/* PPD file */
-  char		uri[HTTP_MAX_URI],	/* Printer URI */
-		printer[HTTP_MAX_URI],	/* Printer name */
-		method[HTTP_MAX_URI],	/* Method/scheme name */
-		username[HTTP_MAX_URI],	/* Username:password */
+  char		localhost[HTTP_MAX_URI],/* Local hostname */
 		hostname[HTTP_MAX_URI],	/* Hostname */
 		resource[HTTP_MAX_URI];	/* Resource name */
   int		port;			/* Port number */
   http_status_t	status;			/* HTTP status from server */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
-  static const char * const requested_attrs[] =
-		{			/* Requested attributes */
-		  "printer-uri-supported",
-		  "printer-type",
-		  "member-uris"
-		};
 
 
  /*
@@ -1174,19 +1166,24 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   }
 
  /*
-  * Setup the printer URI...
+  * Try finding a printer URI for this printer...
   */
 
-  if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/printers/%s", name) != HTTP_URI_OK)
-  {
-    cups_set_error(IPP_INTERNAL_ERROR, NULL);
-
+  if (!cups_get_printer_uri(http, name, hostname, sizeof(hostname), &port,
+                            resource, sizeof(resource), 0))
     return (NULL);
-  }
 
  /*
-  * Get the port number we are connect to...
+  * Remap local hostname to localhost...
+  */
+
+  httpGetHostname(localhost, sizeof(localhost));
+
+  if (!strcasecmp(localhost, hostname))
+    strcpy(hostname, "localhost");
+
+ /*
+  * Get the port number we are connected to...
   */
 
 #ifdef AF_INET6
@@ -1198,106 +1195,6 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     http_port = ntohs(http->hostaddr->ipv4.sin_port);
   else
     http_port = ippPort(); 
-
-  port = http_port; 
-
- /*
-  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    printer-uri
-  *    requested-attributes
-  */
-
-  request = ippNew();
-
-  request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  cupsLangFree(language);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-               "printer-uri", NULL, uri);
-
-  DEBUG_printf(("cupsGetPPD2: printer-uri=\"%s\"\n", uri));
-
-  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                "requested-attributes",
-		sizeof(requested_attrs) / sizeof(requested_attrs[0]),
-		NULL, requested_attrs);
-
- /*
-  * Do the request and get back a response...
-  */
-
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
-  {
-    printer[0]  = '\0';
-    hostname[0] = '\0';
-
-    if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
-    {
-     /*
-      * Get the first actual server and printer name in the class...
-      */
-
-      for (i = 0; i < attr->num_values; i ++)
-      {
-	httpSeparateURI(attr->values[i].string.text, method, sizeof(method),
-	                username, sizeof(username), hostname, sizeof(hostname),
-	                &port, resource, sizeof(resource));
-	if (!strncmp(resource, "/printers/", 10))
-	{
-	 /*
-	  * Found a printer!
-	  */
-
-	  strlcpy(printer, resource + 10, sizeof(printer));
-	  break;
-	}
-      }
-    }
-    else if ((attr = ippFindAttribute(response, "printer-uri-supported",
-                                      IPP_TAG_URI)) != NULL)
-    {
-     /*
-      * Get the actual server and printer names...
-      */
-
-      httpSeparateURI(attr->values[0].string.text, method, sizeof(method),
-	              username, sizeof(username), hostname, sizeof(hostname),
-	              &port, resource, sizeof(resource));
-
-      strlcpy(printer, strrchr(resource, '/') + 1, sizeof(printer));
-    }
-
-    ippDelete(response);
-
-   /*
-    * Remap local hostname to localhost...
-    */
-
-    httpGetHostname(uri, sizeof(uri));
-
-    if (!strcasecmp(uri, hostname))
-      strcpy(hostname, "localhost");
-  }
-
-  if (!printer[0])
-  {
-    cups_set_error(IPP_NOT_FOUND, NULL);
-    return (NULL);
-  }
 
  /*
   * Reconnect to the correct server as needed...
@@ -1335,7 +1232,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   * And send a request to the HTTP server...
   */
 
-  snprintf(resource, sizeof(resource), "/printers/%s.ppd", printer);
+  strlcat(resource, ".ppd", sizeof(resource));
 
   status = cupsGetFd(http2, resource, fd);
 
@@ -1566,7 +1463,8 @@ cupsPrintFile2(http_t        *http,	/* I - HTTP connection */
 
 
 /*
- * 'cupsPrintFiles()' - Print one or more files to a printer or class on the default server.
+ * 'cupsPrintFiles()' - Print one or more files to a printer or class on the
+ *                      default server.
  */
 
 int					/* O - Job ID */
@@ -1609,7 +1507,8 @@ cupsPrintFiles(const char    *name,	/* I - Printer or class name */
 
 
 /*
- * 'cupsPrintFiles2()' - Print one or more files to a printer or class on the specified server.
+ * 'cupsPrintFiles2()' - Print one or more files to a printer or class on the
+ *                       specified server.
  *
  * @since CUPS 1.1.21@
  */
@@ -1774,17 +1673,18 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
       */
 
       if (cupsGetOption("raw", num_options, options))
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	     NULL, "application/vnd.cups-raw");
-      else if ((val = cupsGetOption("document-format", num_options, options)) != NULL)
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	     NULL, val);
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+	             "document-format", NULL, "application/vnd.cups-raw");
+      else if ((val = cupsGetOption("document-format", num_options,
+                                    options)) != NULL)
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+	             "document-format", NULL, val);
       else
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format",
-        	     NULL, "application/octet-stream");
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+	             "document-format", NULL, "application/octet-stream");
 
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-        	   NULL, cupsUser());
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                   "requesting-user-name", NULL, cupsUser());
 
      /*
       * Is this the last document?
@@ -1820,7 +1720,7 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
              char       *hostname)	/* O - Hostname [HTTP_MAX_URI] */
 {
   char	hostbuf[HTTP_MAX_URI];		/* Name of host */
-  _cups_globals_t  *cg = _cupsGlobals();	/* Pointer to library globals */
+  _cups_globals_t  *cg = _cupsGlobals();/* Pointer to library globals */
 
 
   DEBUG_printf(("cups_connect(\"%s\", %p, %p)\n", name, printer, hostname));
@@ -1861,7 +1761,7 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
   DEBUG_printf(("connecting to %s on port %d...\n", hostname, ippPort()));
 
   if ((cg->http = httpConnectEncrypt(hostname, ippPort(),
-                                        cupsEncryption())) == NULL)
+                                     cupsEncryption())) == NULL)
   {
     DEBUG_puts("Unable to connect to server!");
 
@@ -1871,6 +1771,195 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
   }
   else
     return (printer);
+}
+
+
+/*
+ * 'cups_get_printer_uri()' - Get the printer-uri-supported attribute for the first printer in a class.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+cups_get_printer_uri(
+    http_t     *http,			/* I - HTTP connection */
+    const char *name,			/* I - Name of printer or class */
+    char       *host,			/* I - Hostname buffer */
+    int        hostsize,		/* I - Size of hostname buffer */
+    int        *port,			/* O - Port number */
+    char       *resource,		/* I - Resource buffer */
+    int        resourcesize,		/* I - Size of resource buffer */
+    int        depth)			/* I - Depth of query */
+{
+  int		i;			/* Looping var */
+  int		http_port;		/* Port number */
+  http_t	*http2;			/* Alternate HTTP connection */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  char		uri[HTTP_MAX_URI],	/* printer-uri attribute */
+		scheme[HTTP_MAX_URI],	/* Scheme name */
+		username[HTTP_MAX_URI],	/* Username:password */
+		classname[255];		/* Temporary class name */
+  static const char * const requested_attrs[] =
+		{			/* Requested attributes */
+		  "printer-uri-supported",
+		  "printer-type",
+		  "member-uris"
+		};
+
+
+  DEBUG_printf(("cups_get_printer_uri(http=%p, name=\"%s\", host=%p, "
+                "hostsize=%d, resource=%p, resourcesize=%d, depth=%d)\n",
+		http, name ? name : "(null)", host, hostsize,
+		resource, resourcesize, depth));
+
+ /*
+  * Setup the printer URI...
+  */
+
+  if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                       "/printers/%s", name) != HTTP_URI_OK)
+  {
+    cups_set_error(IPP_INTERNAL_ERROR, NULL);
+
+    *host     = '\0';
+    *resource = '\0';
+
+    return (0);
+  }
+
+  DEBUG_printf(("cups_get_printer_uri: printer-uri=\"%s\"\n", uri));
+
+ /*
+  * Get the port number we are connected to...
+  */
+
+#ifdef AF_INET6
+  if (http->hostaddr->addr.sa_family == AF_INET6)
+    http_port = ntohs(http->hostaddr->ipv6.sin6_port);
+  else
+#endif /* AF_INET6 */
+  if (http->hostaddr->addr.sa_family == AF_INET)
+    http_port = ntohs(http->hostaddr->ipv4.sin_port);
+  else
+    http_port = ippPort(); 
+
+ /*
+  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    requested-attributes
+  */
+
+  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                "requested-attributes",
+		sizeof(requested_attrs) / sizeof(requested_attrs[0]),
+		NULL, requested_attrs);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+    if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
+    {
+     /*
+      * Get the first actual printer name in the class...
+      */
+
+      for (i = 0; i < attr->num_values; i ++)
+      {
+	httpSeparateURI(attr->values[i].string.text, scheme, sizeof(scheme),
+	                username, sizeof(username), host, hostsize,
+	                port, resource, resourcesize);
+	if (!strncmp(resource, "/printers/", 10))
+	{
+	 /*
+	  * Found a printer!
+	  */
+
+          ippDelete(response);
+
+	  return (1);
+	}
+      }
+
+     /*
+      * No printers in this class - try recursively looking for a printer,
+      * but not more than 3 levels deep...
+      */
+
+      if (depth < 3)
+      {
+	for (i = 0; i < attr->num_values; i ++)
+	{
+	  httpSeparateURI(attr->values[i].string.text, scheme, sizeof(scheme),
+			  username, sizeof(username), host, hostsize,
+			  port, resource, resourcesize);
+	  if (!strncmp(resource, "/classes/", 9))
+	  {
+	   /*
+	    * Found a class!  Connect to the right server...
+	    */
+
+	    if (!strcasecmp(http->hostname, host) && *port == http_port)
+	      http2 = http;
+	    else if ((http2 = httpConnectEncrypt(host, *port,
+						 cupsEncryption())) == NULL)
+	    {
+	      DEBUG_puts("Unable to connect to server!");
+
+	      continue;
+	    }
+
+           /*
+	    * Look up printers on that server...
+	    */
+
+            strlcpy(classname, resource + 9, sizeof(classname));
+
+            cups_get_printer_uri(http2, classname, host, hostsize, port,
+	                         resource, resourcesize, depth + 1);
+
+           /*
+	    * Close the connection as needed...
+	    */
+
+	    if (http2 != http)
+	      httpClose(http2);
+
+            if (*host)
+	      return (1);
+	  }
+	}
+      }
+    }
+    else if ((attr = ippFindAttribute(response, "printer-uri-supported",
+                                      IPP_TAG_URI)) != NULL)
+    {
+      httpSeparateURI(attr->values[0].string.text, scheme, sizeof(scheme),
+		      username, sizeof(username), host, hostsize,
+		      port, resource, resourcesize);
+      ippDelete(response);
+
+      return (1);
+    }
+
+    ippDelete(response);
+  }
+
+  *host     = '\0';
+  *resource = '\0';
+
+  return (0);
 }
 
 

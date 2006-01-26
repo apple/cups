@@ -321,8 +321,6 @@ ippPort(void)
 void
 ippSetPort(int p)			/* I - Port number to use */
 {
-  fprintf(stderr, "ippSetPort(p=%d)\n", p);
-
   _cupsGlobals()->ipp_port = p;
 }
 
