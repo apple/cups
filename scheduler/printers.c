@@ -33,8 +33,10 @@
  *   cupsdFindPrinter()          - Find a printer in the list.
  *   cupsdFreePrinterUsers()     - Free allow/deny users.
  *   cupsdLoadAllPrinters()      - Load printers from the printers.conf file.
- *   cupsdSaveAllPrinters()      - Save all printer definitions to the printers.conf
- *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD file.
+ *   cupsdSaveAllPrinters()      - Save all printer definitions to the
+ *                                 printers.conf file.
+ *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD
+ *                                 file.
  *   cupsdSetPrinterReasons()    - Set/update the reasons strings.
  *   cupsdSetPrinterState()      - Update the current state of a printer.
  *   cupsdStopPrinter()          - Stop a printer from printing any jobs...
@@ -46,8 +48,8 @@
  *   compare_printers()          - Compare two printers.
  *   write_irix_config()         - Update the config files used by the IRIX
  *                                 desktop tools.
- *   write_irix_state()          - Update the status files used by IRIX printing
- *                                 desktop tools.
+ *   write_irix_state()          - Update the status files used by IRIX
+ *                                 printing desktop tools.
  */
 
 /*
@@ -105,7 +107,7 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   p->state      = IPP_PRINTER_STOPPED;
   p->state_time = time(NULL);
   p->accepting  = 0;
-  p->shared     = 1;
+  p->shared     = DefaultShared;
   p->filetype   = mimeAddType(MimeDatabase, "printer", name);
 
   cupsdSetString(&p->job_sheets[0], "none");
@@ -237,6 +239,7 @@ cupsdAddPrinterHistory(
                 p->state);
   ippAddBoolean(history, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
                 p->accepting);
+  ippAddBoolean(history, IPP_TAG_PRINTER, "printer-is-shared", p->shared);
   ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-state-message",
                NULL, p->state_message);
   if (p->num_reasons == 0)
@@ -1301,7 +1304,7 @@ cupsdSaveAllPrinters(void)
   */
 
   fchown(cupsFileNumber(fp), getuid(), Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+  fchmod(cupsFileNumber(fp), 0600);
 
  /*
   * Write a small header to the file...
