@@ -609,6 +609,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       cupsdLogMessage(CUPSD_LOG_EMERG, "BrowseSocket = %d", BrowseSocket);
 
+      cupsdLogMessage(CUPSD_LOG_EMERG, "CGIPipes[0] = %d", CGIPipes[0]);
+
       for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	   job;
 	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
@@ -754,6 +756,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	{
 	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                  "main: Removing fd %d from InputSet...", con->file);
+	  FD_CLR(con->file, input);
 	  FD_CLR(con->file, InputSet);
 	}
       }
