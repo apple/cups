@@ -725,7 +725,7 @@ cupsdLoadAllJobs(void)
   cups_dir_t		*dir;		/* Directory */
   cups_dentry_t		*dent;		/* Directory entry */
   char			filename[1024];	/* Full filename of job file */
-  int			fd;		/* File descriptor */
+  cups_file_t		*fp;		/* Job file */
   cupsd_job_t		*job;		/* New job */
   int			jobid,		/* Current job ID */
 			fileid;		/* Current file ID */
@@ -819,10 +819,11 @@ cupsdLoadAllJobs(void)
       */
 
       snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->filename);
-      if ((fd = open(filename, O_RDONLY)) < 0)
+      if ((fp = cupsFileOpen(filename, "r")) == NULL)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdLoadAllJobs: Unable to open job control file \"%s\" - %s!",
+	                "cupsdLoadAllJobs: Unable to open job control file "
+			"\"%s\" - %s!",
 	                filename, strerror(errno));
 	ippDelete(job->attrs);
 	free(job);
@@ -831,25 +832,28 @@ cupsdLoadAllJobs(void)
       }
       else
       {
-        if (ippReadFile(fd, job->attrs) != IPP_DATA)
+        if (ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL,
+	              job->attrs) != IPP_DATA)
 	{
           cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "cupsdLoadAllJobs: Unable to read job control file \"%s\"!",
+	                  "cupsdLoadAllJobs: Unable to read job control file "
+			  "\"%s\"!",
 	                  filename);
-	  close(fd);
+	  cupsFileClose(fp);
 	  ippDelete(job->attrs);
 	  free(job);
 	  unlink(filename);
 	  continue;
 	}
 
-	close(fd);
+	cupsFileClose(fp);
       }
 
       if ((job->state = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM)) == NULL)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdLoadAllJobs: Missing or bad job-state attribute in control file \"%s\"!",
+	                "cupsdLoadAllJobs: Missing or bad job-state attribute "
+			"in control file \"%s\"!",
 	                filename);
 	ippDelete(job->attrs);
 	free(job);
@@ -860,7 +864,8 @@ cupsdLoadAllJobs(void)
       if ((attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI)) == NULL)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdLoadAllJobs: No job-printer-uri attribute in control file \"%s\"!",
+	                "cupsdLoadAllJobs: No job-printer-uri attribute in "
+			"control file \"%s\"!",
 	                filename);
 	ippDelete(job->attrs);
 	free(job);
@@ -876,7 +881,8 @@ cupsdLoadAllJobs(void)
                                     NULL)) == NULL)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdLoadAllJobs: Unable to queue job for destination \"%s\"!",
+	                "cupsdLoadAllJobs: Unable to queue job for destination "
+			"\"%s\"!",
 	                attr->values[0].string.text);
 	ippDelete(job->attrs);
 	free(job);
@@ -890,10 +896,12 @@ cupsdLoadAllJobs(void)
                                          IPP_TAG_INTEGER);
       job->job_sheets = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
 
-      if ((attr = ippFindAttribute(job->attrs, "job-priority", IPP_TAG_INTEGER)) == NULL)
+      if ((attr = ippFindAttribute(job->attrs, "job-priority",
+                                   IPP_TAG_INTEGER)) == NULL)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdLoadAllJobs: Missing or bad job-priority attribute in control file \"%s\"!",
+	                "cupsdLoadAllJobs: Missing or bad job-priority "
+			"attribute in control file \"%s\"!",
 	                filename);
 	ippDelete(job->attrs);
 	free(job);
@@ -902,10 +910,13 @@ cupsdLoadAllJobs(void)
       }
       job->priority = attr->values[0].integer;
 
-      if ((attr = ippFindAttribute(job->attrs, "job-originating-user-name", IPP_TAG_NAME)) == NULL)
+      if ((attr = ippFindAttribute(job->attrs, "job-originating-user-name",
+                                   IPP_TAG_NAME)) == NULL)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdLoadAllJobs: Missing or bad job-originating-user-name attribute in control file \"%s\"!",
+	                "cupsdLoadAllJobs: Missing or bad "
+			"job-originating-user-name attribute in control file "
+			"\"%s\"!",
 	                filename);
 	ippDelete(job->attrs);
 	free(job);
@@ -928,7 +939,8 @@ cupsdLoadAllJobs(void)
 
       if (job->state->values[0].integer == IPP_JOB_HELD)
       {
-	if ((attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD)) == NULL)
+	if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
+	                             IPP_TAG_KEYWORD)) == NULL)
           attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
 
         if (attr == NULL)
@@ -989,7 +1001,9 @@ cupsdLoadAllJobs(void)
 
         if (compressions == NULL || filetypes == NULL)
 	{
-          cupsdLogMessage(CUPSD_LOG_ERROR, "cupsdLoadAllJobs: Ran out of memory for job file types!");
+          cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "cupsdLoadAllJobs: Ran out of memory for job file "
+			  "types!");
 	  continue;
 	}
 
@@ -1104,27 +1118,26 @@ void
 cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
 {
   char		filename[1024];		/* Job control filename */
-  int		fd;			/* File descriptor */
+  cups_file_t	*fp;			/* Job file */
 
 
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, job->id);
 
-  if ((fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0)
+  if ((fp = cupsFileOpen(filename, "w")) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdSaveJob: Unable to create job control file \"%s\" - %s.",
+                    "cupsdSaveJob: Unable to create job control file "
+		    "\"%s\" - %s.",
                     filename, strerror(errno));
     return;
   }
 
-  fchmod(fd, 0600);
-  fchown(fd, RunUser, Group);
+  fchmod(cupsFileNumber(fp), 0600);
+  fchown(cupsFileNumber(fp), RunUser, Group);
 
-  ippWriteFile(fd, job->attrs);
+  ippWriteIO(fp, (ipp_iocb_t)cupsFileWrite, 1, NULL, job->attrs);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSaveJob: Closing file %d...", fd);
-
-  close(fd);
+  cupsFileClose(fp);
 }
 
 
