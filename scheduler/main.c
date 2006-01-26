@@ -545,7 +545,12 @@ main(int  argc,				/* I - Number of command-line arguments */
     timeout.tv_sec  = select_timeout(fds);
     timeout.tv_usec = 0;
 
-    if ((fds = select(MaxFDs, input, output, NULL, &timeout)) < 0)
+    if (timeout.tv_sec < 86400)		/* Only use timeout for < 1 day */
+      fds = select(MaxFDs, input, output, NULL, &timeout);
+    else
+      fds = select(MaxFDs, input, output, NULL, NULL);
+
+    if (fds < 0)
     {
       char	s[16384],		/* String buffer */
 		*sptr;			/* Pointer into buffer */
@@ -1489,17 +1494,6 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
     why     = "display memory usage";
   }
 #endif /* HAVE_MALLINFO */
-
- /*
-  * Update the root certificate when needed...
-  */
-
-  if (!RunUser && RootCertDuration &&
-      (RootCertTime + RootCertDuration) < timeout)
-  {
-    timeout = RootCertTime + RootCertDuration;
-    why     = "update root certificate";
-  }
 
  /*
   * Expire subscriptions as needed...
