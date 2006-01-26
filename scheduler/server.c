@@ -34,6 +34,9 @@
 #include <cups/http-private.h>
 #include "cupsd.h"
 #include <grp.h>
+#ifdef HAVE_NOTIFY_H
+#  include <notify.h>
+#endif /* HAVE_NOTIFY_H */
 
 
 /*
@@ -109,6 +112,14 @@ cupsdStartServer(void)
 		    CGIPipes[0]);
     FD_SET(CGIPipes[0], InputSet);
   }
+
+ /*
+  * Mark that the server has started and printers and jobs may be changed...
+  */
+
+  LastEvent     = CUPSD_EVENT_PRINTER_CHANGED | CUPSD_EVENT_JOB_STATE_CHANGED |
+                  CUPSD_EVENT_SERVER_STARTED;
+  LastEventTime = 0;
 
   started = 1;
 }
@@ -196,6 +207,16 @@ cupsdStopServer(void)
 
     PageFile = NULL;
   }
+
+#ifdef HAVE_NOTIFY_POST
+ /*
+  * Send one last notification as the server shuts down.
+  */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "notify_post(\"com.apple.printerListChange\") last");
+  notify_post("com.apple.printerListChange");
+#endif /* HAVE_NOTIFY_POST */
 
   started = 0;
 }

@@ -176,8 +176,8 @@ static unsigned		zeros[4] =
 /*
  * Local functions...
  */
-static int		check_permissions(const char *root,
-			                  const char *filename, int mode,
+static int		check_permissions(const char *filename,
+			                  const char *suffix, int mode,
 					  int user, int group, int is_dir,
 					  int create_dir);
 static http_addrlist_t	*get_address(const char *value, int defport);
@@ -1025,8 +1025,8 @@ cupsdReadConfiguration(void)
  */
 
 static int				/* O - 0 on success, -1 on error */
-check_permissions(const char *root,	/* I - Root directory */
-                  const char *filename,	/* I - File/directory name */
+check_permissions(const char *filename,	/* I - File/directory name */
+                  const char *suffix,	/* I - Additional file/directory name */
                   int        mode,	/* I - Permissions */
 		  int        user,	/* I - Owner */
 		  int        group,	/* I - Group */
@@ -1042,9 +1042,9 @@ check_permissions(const char *root,	/* I - Root directory */
   * Prepend the given root to the filename before testing it...
   */
 
-  if (root)
+  if (suffix)
   {
-    snprintf(pathname, sizeof(pathname), "%s/%s", root, filename);
+    snprintf(pathname, sizeof(pathname), "%s/%s", filename, suffix);
     filename = pathname;
   }
 

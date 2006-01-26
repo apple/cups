@@ -3,7 +3,7 @@
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -56,6 +56,9 @@
 #if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
 #  include <malloc.h>
 #endif /* HAVE_MALLOC_H && HAVE_MALLINFO */
+#ifdef HAVE_NOTIFY_H
+#  include <notify.h>
+#endif /* HAVE_NOTIFY_H */
 
 
 /*
@@ -822,6 +825,46 @@ main(int  argc,				/* I - Number of command-line arguments */
       cupsdDeleteCert(0);
       cupsdAddCert(0, "root");
     }
+
+   /*
+    * Handle OS-specific event notification for any events that have
+    * accumulated.  Don't send these more than once a second...
+    */
+
+    if (LastEvent && (time(NULL) - LastEventTime) > 1)
+    {
+#ifdef HAVE_NOTIFY_POST
+      if (LastEvent & CUPSD_EVENT_PRINTER_CHANGED)
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "notify_post(\"com.apple.printerListChange\")");
+	notify_post("com.apple.printerListChange");
+      }
+
+      if (LastEvent & CUPSD_EVENT_PRINTER_STATE_CHANGED)
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "notify_post(\"com.apple.printerHistoryChange\")");
+	notify_post("com.apple.printerHistoryChange");
+      }
+
+      if (LastEvent & (CUPSD_EVENT_JOB_STATE_CHANGED |
+                       CUPSD_EVENT_JOB_CONFIG_CHANGED |
+                       CUPSD_EVENT_JOB_PROGRESS))
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "notify_post(\"com.apple.jobChange\")");
+	notify_post("com.apple.jobChange");
+      }
+#endif /* HAVE_NOTIFY_POST */
+
+     /*
+      * Reset the accumulated events and notification time...
+      */
+
+      LastEventTime = time(NULL);
+      LastEvent     = CUPSD_EVENT_NONE;
+    }
   }
 
  /*
@@ -1350,6 +1393,13 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   */
 
   if (fds || NumClients > 50)
+    return (1);
+
+ /*
+  * If we had a recent event notification, timeout in 1 second...
+  */
+
+  if (LastEvent)
     return (1);
 
  /*
