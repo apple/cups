@@ -4589,6 +4589,10 @@ create_subscription(
   * Is the destination valid?
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsdCreateSubscription(con=%p(%d), uri=\"%s\")",
+                  con, con->http.fd, uri->values[0].string.text);
+
   httpSeparateURI(uri->values[0].string.text, method, sizeof(method),
                   userpass, sizeof(userpass), host, sizeof(host), &port,
 		  resource, sizeof(resource));
@@ -4678,6 +4682,8 @@ create_subscription(
   * Process the subscription attributes in the request...
   */
 
+  con->response->request.status.status_code = IPP_BAD_REQUEST;
+
   while (attr)
   {
     recipient = NULL;
@@ -4748,6 +4754,9 @@ create_subscription(
       attr = attr->next;
     }
 
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "recipient=\"%s\"", recipient);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "pullmethod=\"%s\"", pullmethod);
+
     if (!recipient && !pullmethod)
       break;
 
@@ -4787,6 +4796,17 @@ create_subscription(
 
     sub = cupsdAddSubscription(mask, printer, job, recipient, 0);
 
+    if (job)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Added subscription %d for job %d",
+		      sub->id, job->id);
+    else if (printer)
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "Added subscription %d for printer \"%s\"",
+		      sub->id, printer->name);
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Added subscription %d for server",
+		      sub->id);
+
     sub->interval = interval;
     sub->lease    = lease;
     sub->expire   = time(NULL) + lease;
@@ -4804,13 +4824,14 @@ create_subscription(
     ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
                   "notify-subscription-id", sub->id);
 
+    con->response->request.status.status_code = IPP_OK;
+
     if (attr)
       attr = attr->next;
   }
 
   cupsdSaveAllSubscriptions();
 
-  con->response->request.status.status_code = IPP_OK;
 }
 
 

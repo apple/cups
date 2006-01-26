@@ -1209,7 +1209,7 @@ httpRead(http_t *http,			/* I - HTTP data */
       {
         ch = buffer[i + j] & 255;
 
-	if (ch < ' ' || ch == 127)
+	if (ch < ' ' || ch >= 127)
 	  ch = '.';
 
         putchar(ch);

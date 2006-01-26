@@ -109,8 +109,7 @@ typedef enum				/**** Format tags for attribute formats... ****/
   IPP_TAG_LANGUAGE,
   IPP_TAG_MIMETYPE,
   IPP_TAG_MEMBERNAME,
-  IPP_TAG_MASK = 0x3fffffff,		/* Mask for copied attribute values */
-  IPP_TAG_COPY_NAME = 0x40000000,	/* Name value is copied */
+  IPP_TAG_MASK = 0x7fffffff,		/* Mask for copied attribute values */
   IPP_TAG_COPY = -0x7fffffff-1		/* Bitflag for copied attribute values */
 } ipp_tag_t;
 

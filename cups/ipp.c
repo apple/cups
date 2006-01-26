@@ -1023,6 +1023,7 @@ ippReadIO(void       *src,		/* I - Data source */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		tag;		/* Current tag */
+  ipp_tag_t		value_tag;	/* Current value tag */
   ipp_value_t		*value;		/* Current value */
 
 
@@ -1163,14 +1164,15 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current == NULL)
 	      return (IPP_ERROR);
 
-            attr = ipp->current;
+            attr      = ipp->current;
+	    value_tag = (ipp_tag_t)(attr->value_tag & IPP_TAG_MASK);
 
 	   /*
 	    * Make sure we aren't adding a new value of a different
 	    * type...
 	    */
 
-	    if (attr->value_tag == IPP_TAG_ZERO)
+	    if (value_tag == IPP_TAG_ZERO)
 	    {
 	     /*
 	      * Setting the value of a collection member...
@@ -1178,9 +1180,9 @@ ippReadIO(void       *src,		/* I - Data source */
 
 	      attr->value_tag = tag;
 	    }
-	    else if (attr->value_tag == IPP_TAG_STRING ||
-    		     (attr->value_tag >= IPP_TAG_TEXTLANG &&
-		      attr->value_tag <= IPP_TAG_MIMETYPE))
+	    else if (value_tag == IPP_TAG_STRING ||
+    		     (value_tag >= IPP_TAG_TEXTLANG &&
+		      value_tag <= IPP_TAG_MIMETYPE))
             {
 	     /*
 	      * String values can sometimes come across in different
@@ -1191,7 +1193,7 @@ ippReadIO(void       *src,		/* I - Data source */
     		  (tag < IPP_TAG_TEXTLANG || tag > IPP_TAG_MIMETYPE))
 	        return (IPP_ERROR);
             }
-	    else if (attr->value_tag != tag)
+	    else if (value_tag != tag)
 	      return (IPP_ERROR);
 
            /*
@@ -1279,7 +1281,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	                  buffer, ipp->current, ipp->prev));
 
 	    attr->group_tag  = ipp->curtag;
-	    attr->value_tag  = (ipp_tag_t)(tag | IPP_TAG_COPY_NAME);
+	    attr->value_tag  = tag;
 	    attr->name       = strdup((char *)buffer);
 	    attr->num_values = 0;
 	  }
@@ -2468,7 +2470,7 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
         break; /* anti-compiler-warning-code */
   }
 
-  if (attr->name && (attr->value_tag & IPP_TAG_COPY_NAME))
+  if (attr->name)
     free(attr->name);
 
   free(attr);
