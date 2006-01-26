@@ -75,6 +75,12 @@ LIBTIFF		=	@LIBTIFF@
 LIBZ		=	@LIBZ@
 
 #
+# Install static libraries?
+#
+
+INSTALLSTATIC	=	@INSTALLSTATIC@
+
+#
 # Program options...
 #
 # OPTIM   defines the common compiler optimization/debugging options.

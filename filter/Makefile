@@ -71,14 +71,14 @@ depend:
 # Install all targets...
 #
 
-install:	all installhdrs
+install:	all installhdrs @INSTALLSTATIC@
 	$(INSTALL_DIR) $(SERVERBIN)/filter
 	for file in $(FILTERS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
 	done
 	$(RM) $(SERVERBIN)/filter/rastertodymo
 	$(LN) rastertolabel $(SERVERBIN)/filter/rastertodymo
-	$(INSTALL_DIR) $(LIBDIR)
+	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
 	-if test $(LIBCUPSIMAGE) = "libcupsimage.so.2" -o $(LIBCUPSIMAGE) = "libcupsimage.sl.2"; then \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
@@ -89,6 +89,9 @@ install:	all installhdrs
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi
+
+installstatic:
+	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	-if test $(LIBCUPSIMAGE) != "libcupsimage.a"; then \
 		$(INSTALL_LIB) libcupsimage.a $(LIBDIR); \
 		$(RANLIB) $(LIBDIR)/libcupsimage.a; \

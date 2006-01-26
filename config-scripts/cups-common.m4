@@ -69,8 +69,15 @@ if test "x$CXX" = x; then
 	AC_MSG_ERROR([Unable to find required C++ compiler command.])
 fi
 
-dnl Architecture checks...
-AC_C_BIGENDIAN
+dnl Static library option...
+INSTALLSTATIC=""
+AC_ARG_ENABLE(install_static, [  --enable-static         install static libraries, default=no])
+
+if test x$enable_install_static = xyes; then
+	INSTALLSTATIC="installstatic"
+fi
+
+AC_SUBST(INSTALLSTATIC)
 
 dnl Check for libraries...
 AC_SEARCH_LIBS(crypt, crypt)

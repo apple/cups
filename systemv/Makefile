@@ -70,10 +70,10 @@ install:	all
 	$(INSTALL_DIR) $(BINDIR)
 	$(INSTALL_BIN) cancel $(BINDIR)
 	$(INSTALL_BIN) cupstestppd $(BINDIR)
-	$(RM) $(SBINDIR)/disable
-	$(LN) accept $(SBINDIR)/disable
-	$(RM) $(SBINDIR)/enable
-	$(LN) accept $(SBINDIR)/enable
+	$(RM) $(SBINDIR)/cupsdisable
+	$(LN) accept $(SBINDIR)/cupsdisable
+	$(RM) $(SBINDIR)/cupsenable
+	$(LN) accept $(SBINDIR)/cupsenable
 	$(INSTALL_BIN) lp $(BINDIR)
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
