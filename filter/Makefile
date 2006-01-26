@@ -71,7 +71,7 @@ depend:
 # Install all targets...
 #
 
-install:	all installhdrs @INSTALLSTATIC@
+install:	all installhdrs $(INSTALLSTATIC)
 	$(INSTALL_DIR) $(SERVERBIN)/filter
 	for file in $(FILTERS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \

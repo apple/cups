@@ -140,7 +140,7 @@ depend:
 # Install object and target files...
 #
 
-install:	all installhdrs @INSTALLSTATIC@
+install:	all installhdrs $(INSTALLSTATIC)
 	$(INSTALL_DIR) $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
