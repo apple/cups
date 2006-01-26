@@ -797,6 +797,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       }
     }
 
+#ifdef __APPLE__
     if (recoverable)
     {
      /*
@@ -808,6 +809,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       fputs("INFO: recovered: \n", stderr);
       sleep(5);
     }
+#endif /* __APPLE__ */
 
     fprintf(stderr, "INFO: Connected to %s...\n", hostname);
     fprintf(stderr, "DEBUG: Connected on ports %d (local %d)...\n", port,
