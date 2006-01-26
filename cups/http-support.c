@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c 4903 2006-01-10 20:02:46Z mike $"
+ * "$Id: http-support.c 4961 2006-01-20 22:19:13Z mike $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -320,6 +320,9 @@ httpAssembleURIf(char       *uri,	/* I - URI buffer */
 
   if (resourcef)
   {
+    char	*query;			/* Pointer to query string */
+
+
     va_start(ap, resourcef);
     bytes = vsnprintf(resource, sizeof(resource), resourcef, ap);
     va_end(ap);
@@ -327,9 +330,27 @@ httpAssembleURIf(char       *uri,	/* I - URI buffer */
     if (bytes >= sizeof(resource))
       goto assemble_overflow;
 
+   /*
+    * Temporarily remove query string if present...
+    */
+
+    if ((query = strchr(resource, '?')) != NULL)
+      *query = '\0';
+
     ptr = http_copy_encode(ptr, resource, end, NULL);
     if (!ptr)
       goto assemble_overflow;
+
+    if (query)
+    {
+     /*
+      * Copy query string without encoding...
+      */
+
+      *query = '?';
+      strlcpy(ptr, query, end - ptr);
+      ptr += strlen(ptr);
+    }
   }
   else if (ptr < end)
     *ptr++ = '/';
@@ -398,8 +419,16 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
   * Range check input...
   */
 
-  if (!out || !outlen || *outlen < 1 || !in || !*in)
+  if (!out || !outlen || *outlen < 1 || !in)
     return (NULL);
+
+  if (!*in)
+  {
+    *out    = '\0';
+    *outlen = 0;
+
+    return (out);
+  }
 
  /*
   * Convert from base-64 to bytes...
@@ -991,10 +1020,33 @@ httpSeparateURI(const char *uri,	/* I - Universal Resource Identifier */
 
     status    = HTTP_URI_MISSING_RESOURCE;
     *resource = '/';
-    uri       = http_copy_decode(resource + 1, uri, resourcelen - 1, "");
+
+   /*
+    * Copy any query string without decoding it...
+    */
+
+    if (*uri == '?')
+    {
+      strlcpy(resource + 1, uri, resourcelen - 1);
+      uri += strlen(uri);
+    }
+    else
+      resource[1] = '\0';
   }
   else
-    uri = http_copy_decode(resource, uri, resourcelen, "");
+  {
+    uri = http_copy_decode(resource, uri, resourcelen, "?");
+
+    if (uri && *uri == '?')
+    {
+     /*
+      * Concatenate any query string without decoding it...
+      */
+
+      strlcat(resource, uri, resourcelen);
+      uri += strlen(uri);
+    }
+  }
 
   if (!uri)
   {
@@ -1191,5 +1243,5 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 
 
 /*
- * End of "$Id: http-support.c 4903 2006-01-10 20:02:46Z mike $".
+ * End of "$Id: http-support.c 4961 2006-01-20 22:19:13Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 4903 2006-01-10 20:02:46Z mike $"
+ * "$Id: printers.c 4989 2006-01-26 00:59:45Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -33,8 +33,10 @@
  *   cupsdFindPrinter()          - Find a printer in the list.
  *   cupsdFreePrinterUsers()     - Free allow/deny users.
  *   cupsdLoadAllPrinters()      - Load printers from the printers.conf file.
- *   cupsdSaveAllPrinters()      - Save all printer definitions to the printers.conf
- *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD file.
+ *   cupsdSaveAllPrinters()      - Save all printer definitions to the
+ *                                 printers.conf file.
+ *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD
+ *                                 file.
  *   cupsdSetPrinterReasons()    - Set/update the reasons strings.
  *   cupsdSetPrinterState()      - Update the current state of a printer.
  *   cupsdStopPrinter()          - Stop a printer from printing any jobs...
@@ -46,8 +48,8 @@
  *   compare_printers()          - Compare two printers.
  *   write_irix_config()         - Update the config files used by the IRIX
  *                                 desktop tools.
- *   write_irix_state()          - Update the status files used by IRIX printing
- *                                 desktop tools.
+ *   write_irix_state()          - Update the status files used by IRIX
+ *                                 printing desktop tools.
  */
 
 /*
@@ -105,7 +107,7 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   p->state      = IPP_PRINTER_STOPPED;
   p->state_time = time(NULL);
   p->accepting  = 0;
-  p->shared     = 1;
+  p->shared     = DefaultShared;
   p->filetype   = mimeAddType(MimeDatabase, "printer", name);
 
   cupsdSetString(&p->job_sheets[0], "none");
@@ -148,12 +150,11 @@ cupsdAddPrinterFilter(
     cupsd_printer_t  *p,		/* I - Printer to add to */
     const char       *filter)		/* I - Filter to add */
 {
-  int		i;			/* Looping var */
   char		super[MIME_MAX_SUPER],	/* Super-type for filter */
 		type[MIME_MAX_TYPE],	/* Type for filter */
 		program[1024];		/* Program/filter name */
   int		cost;			/* Cost of filter */
-  mime_type_t	**temptype;		/* MIME type looping var */
+  mime_type_t	*temptype;		/* MIME type looping var */
 
 
  /*
@@ -181,18 +182,18 @@ cupsdAddPrinterFilter(
   * Add the filter to the MIME database, supporting wildcards as needed...
   */
 
-  for (temptype = MimeDatabase->types, i = MimeDatabase->num_types;
-       i > 0;
-       i --, temptype ++)
-    if (((super[0] == '*' && strcasecmp((*temptype)->super, "printer") != 0) ||
-         !strcasecmp((*temptype)->super, super)) &&
-        (type[0] == '*' || !strcasecmp((*temptype)->type, type)))
+  for (temptype = mimeFirstType(MimeDatabase);
+       temptype;
+       temptype = mimeNextType(MimeDatabase))
+    if (((super[0] == '*' && strcasecmp(temptype->super, "printer")) ||
+         !strcasecmp(temptype->super, super)) &&
+        (type[0] == '*' || !strcasecmp(temptype->type, type)))
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "Adding filter %s/%s %s/%s %d %s",
-                      (*temptype)->super, (*temptype)->type,
+                      temptype->super, temptype->type,
 		      p->filetype->super, p->filetype->type,
                       cost, program);
-      mimeAddFilter(MimeDatabase, *temptype, p->filetype, cost, program);
+      mimeAddFilter(MimeDatabase, temptype, p->filetype, cost, program);
     }
 }
 
@@ -238,6 +239,7 @@ cupsdAddPrinterHistory(
                 p->state);
   ippAddBoolean(history, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
                 p->accepting);
+  ippAddBoolean(history, IPP_TAG_PRINTER, "printer-is-shared", p->shared);
   ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-state-message",
                NULL, p->state_message);
   if (p->num_reasons == 0)
@@ -491,7 +493,7 @@ cupsdCreateCommonData(void)
                 "job-priority-supported", 100);
 
   /* job-sheets-supported */
-  if (NumBanners > 0)
+  if (cupsArrayCount(Banners) > 0)
   {
    /*
     * Setup the job-sheets-supported attribute...
@@ -502,7 +504,8 @@ cupsdCreateCommonData(void)
                 	  "job-sheets-supported", NULL, Classification);
     else
       attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                	   "job-sheets-supported", NumBanners + 1, NULL, NULL);
+                	   "job-sheets-supported", cupsArrayCount(Banners) + 1,
+			   NULL, NULL);
 
     if (attr == NULL)
       cupsdLogMessage(CUPSD_LOG_EMERG,
@@ -510,10 +513,15 @@ cupsdCreateCommonData(void)
                       "job-sheets-supported attribute: %s!", strerror(errno));
     else if (!Classification || ClassifyOverride)
     {
+      cupsd_banner_t	*banner;	/* Current banner */
+
+
       attr->values[0].string.text = strdup("none");
 
-      for (i = 0; i < NumBanners; i ++)
-	attr->values[i + 1].string.text = strdup(Banners[i].name);
+      for (i = 1, banner = (cupsd_banner_t *)cupsArrayFirst(Banners);
+	   banner;
+	   i ++, banner = (cupsd_banner_t *)cupsArrayNext(Banners))
+	attr->values[i].string.text = strdup(banner->name);
     }
   }
   else
@@ -712,6 +720,7 @@ cupsdDeletePrinter(
 
  /*
   * If p is the default printer, assign the next one...
+  * TODO: use next network default printer or NULL...
   */
 
   if (p == DefaultPrinter)
@@ -749,6 +758,8 @@ cupsdDeletePrinter(
 
   cupsdDeletePrinterFilters(p);
 
+  mimeDeleteType(MimeDatabase, p->filetype);
+
   cupsdFreePrinterUsers(p);
   cupsdFreeQuotas(p);
 
@@ -783,7 +794,6 @@ void
 cupsdDeletePrinterFilters(
     cupsd_printer_t *p)			/* I - Printer to remove from */
 {
-  int		i;			/* Looping var */
   mime_filter_t	*filter;		/* MIME filter looping var */
 
 
@@ -799,21 +809,16 @@ cupsdDeletePrinterFilters(
   * type == printer...
   */
 
-  for (filter = MimeDatabase->filters, i = MimeDatabase->num_filters;
-       i > 0;
-       i --, filter ++)
+  for (filter = mimeFirstFilter(MimeDatabase);
+       filter;
+       filter = mimeNextFilter(MimeDatabase))
     if (filter->dst == p->filetype)
     {
      /*
       * Delete the current filter...
       */
 
-      MimeDatabase->num_filters --;
-
-      if (i > 1)
-        memmove(filter, filter + 1, sizeof(mime_filter_t) * (i - 1));
-
-      filter --;
+      mimeDeleteFilter(MimeDatabase, filter);
     }
 }
 
@@ -896,9 +901,10 @@ cupsdLoadAllPrinters(void)
   snprintf(line, sizeof(line), "%s/printers.conf", ServerRoot);
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdLoadAllPrinters: Unable to open %s - %s", line,
-                    strerror(errno));
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "cupsdLoadAllPrinters: Unable to open %s - %s", line,
+		      strerror(errno));
     return;
   }
 
@@ -1298,7 +1304,7 @@ cupsdSaveAllPrinters(void)
   */
 
   fchown(cupsFileNumber(fp), getuid(), Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+  fchmod(cupsFileNumber(fp), 0600);
 
  /*
   * Write a small header to the file...
@@ -1525,7 +1531,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "job-page-limit", p->page_limit);
 
-  if (NumBanners > 0 && !(p->type & CUPS_PRINTER_REMOTE))
+  if (cupsArrayCount(Banners) > 0 && !(p->type & CUPS_PRINTER_REMOTE))
   {
    /*
     * Setup the job-sheets-default attribute...
@@ -1560,6 +1566,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                    "printer-make-and-model", NULL, p->make_model);
 
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
+        	 p->uri);
+
     p->raw = 1;
   }
   else
@@ -1586,6 +1595,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       else
 	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                      "printer-make-and-model", NULL, "Local Printer Class");
+
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
+        	   "file:///dev/null");
 
       if (p->num_printers > 0)
       {
@@ -2870,5 +2882,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 4903 2006-01-10 20:02:46Z mike $".
+ * End of "$Id: printers.c 4989 2006-01-26 00:59:45Z mike $".
  */

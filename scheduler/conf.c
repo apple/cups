@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 4903 2006-01-10 20:02:46Z mike $"
+ * "$Id: conf.c 4993 2006-01-26 19:27:40Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -24,6 +24,8 @@
  * Contents:
  *
  *   cupsdReadConfiguration() - Read the cupsd.conf file.
+ *   check_permissions()      - Fix the mode and ownership of a file or
+ *                              directory.
  *   get_address()            - Get an address + port number from a line.
  *   get_addr_and_mask()      - Get an IP address and netmask.
  *   parse_aaa()              - Parse authentication, authorization, and
@@ -100,6 +102,7 @@ static cupsd_var_t	variables[] =
   { "DefaultLanguage",		&DefaultLanguage,	CUPSD_VARTYPE_STRING },
   { "DefaultLeaseDuration",	&DefaultLeaseDuration,	CUPSD_VARTYPE_INTEGER },
   { "DefaultPolicy",		&DefaultPolicy,		CUPSD_VARTYPE_STRING },
+  { "DefaultShared",		&DefaultShared,		CUPSD_VARTYPE_BOOLEAN },
   { "DocumentRoot",		&DocumentRoot,		CUPSD_VARTYPE_STRING },
   { "ErrorLog",			&ErrorLog,		CUPSD_VARTYPE_STRING },
   { "FileDevice",		&FileDevice,		CUPSD_VARTYPE_BOOLEAN },
@@ -173,7 +176,10 @@ static unsigned		zeros[4] =
 /*
  * Local functions...
  */
-
+static int		check_permissions(const char *filename,
+			                  const char *suffix, int mode,
+					  int user, int group, int is_dir,
+					  int create_dir);
 static http_addrlist_t	*get_address(const char *value, int defport);
 static int		get_addr_and_mask(const char *value, unsigned *ip,
 			                  unsigned *mask);
@@ -196,8 +202,6 @@ cupsdReadConfiguration(void)
   int		status;			/* Return status */
   char		temp[1024],		/* Temporary buffer */
 		*slash;			/* Directory separator */
-  char		type[MIME_MAX_SUPER + MIME_MAX_TYPE];
-					/* MIME type name */
   cups_lang_t	*language;		/* Language */
   struct passwd	*user;			/* Default user */
   struct group	*group;			/* Default group */
@@ -288,7 +292,7 @@ cupsdReadConfiguration(void)
 
 #ifdef HAVE_SSL
 #  ifdef HAVE_CDSASSL
-  cupsdSetString(&ServerCertificate, "/var/root/Library/Keychains/CUPS");
+  cupsdSetString(&ServerCertificate, "/Library/Keychains/System.keychain");
 #  else
   cupsdSetString(&ServerCertificate, "ssl/server.crt");
   cupsdSetString(&ServerKey, "ssl/server.key");
@@ -388,7 +392,7 @@ cupsdReadConfiguration(void)
   * Numeric options...
   */
 
-  ConfigFilePerm      = 0640;
+  ConfigFilePerm      = 0640; /* TODO: Add configure option */
   DefaultAuthType     = AUTH_BASIC;
   JobRetryLimit       = 5;
   JobRetryInterval    = 300;
@@ -422,6 +426,7 @@ cupsdReadConfiguration(void)
   BrowseShortNames      = TRUE;
   BrowseTimeout         = DEFAULT_TIMEOUT;
   Browsing              = TRUE;
+  DefaultShared         = TRUE; /* TODO: Add configure option */
 
   cupsdClearString(&BrowseLocalOptions);
   cupsdClearString(&BrowseRemoteOptions);
@@ -587,7 +592,7 @@ cupsdReadConfiguration(void)
   if (!strncmp(ServerRoot, ServerCertificate, strlen(ServerRoot)))
   {
     chown(ServerCertificate, RunUser, Group);
-    chmod(ServerCertificate, ConfigFilePerm);
+    chmod(ServerCertificate, 0600);
   }
 
 #  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
@@ -597,7 +602,7 @@ cupsdReadConfiguration(void)
   if (!strncmp(ServerRoot, ServerKey, strlen(ServerRoot)))
   {
     chown(ServerKey, RunUser, Group);
-    chmod(ServerKey, ConfigFilePerm);
+    chmod(ServerKey, 0600);
   }
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
@@ -607,65 +612,28 @@ cupsdReadConfiguration(void)
   * writable by the user and group in the cupsd.conf file...
   */
 
-  chown(CacheDir, RunUser, Group);
-  chmod(CacheDir, 0775);
+  check_permissions(CacheDir, NULL, 0775, RunUser, Group, 1, 1);
+  check_permissions(CacheDir, "ppd", 0755, RunUser, Group, 1, 1);
 
-  snprintf(temp, sizeof(temp), "%s/ppd", CacheDir);
-  if (access(temp, 0))
-    mkdir(temp, 0755);
-  chown(temp, RunUser, Group);
-  chmod(temp, 0755);
+  check_permissions(StateDir, NULL, 0775, RunUser, Group, 1, 1);
+  check_permissions(StateDir, "certs", RunUser ? 0711 : 0511, User,
+                    SystemGroupIDs[0], 1, 1);
 
-  chown(StateDir, RunUser, Group);
-  chmod(StateDir, 0775);
-
-  snprintf(temp, sizeof(temp), "%s/certs", StateDir);
-  if (access(temp, 0))
-    mkdir(temp, 0510);
-  chown(temp, User, SystemGroupIDs[0]);
-  if (RunUser)
-    chmod(temp, 0710);
-  else
-    chmod(temp, 0510);
-
-  chown(ServerRoot, RunUser, Group);
-  chmod(ServerRoot, 0755);
-
-  snprintf(temp, sizeof(temp), "%s/ppd", ServerRoot);
-  if (access(temp, 0))
-    mkdir(temp, 0755);
-  chown(temp, RunUser, Group);
-  chmod(temp, 0755);
-
-  snprintf(temp, sizeof(temp), "%s/ssl", ServerRoot);
-  if (access(temp, 0))
-    mkdir(temp, 0700);
-  chown(temp, RunUser, Group);
-  chmod(temp, 0700);
-
-  snprintf(temp, sizeof(temp), "%s/cupsd.conf", ServerRoot);
-  chown(temp, RunUser, Group);
-  chmod(temp, ConfigFilePerm);
-
-  snprintf(temp, sizeof(temp), "%s/classes.conf", ServerRoot);
-  chown(temp, RunUser, Group);
-  chmod(temp, 0600);
-
-  snprintf(temp, sizeof(temp), "%s/printers.conf", ServerRoot);
-  chown(temp, RunUser, Group);
-  chmod(temp, 0600);
-
-  snprintf(temp, sizeof(temp), "%s/passwd.md5", ServerRoot);
-  chown(temp, User, Group);
-  chmod(temp, 0600);
+  check_permissions(ServerRoot, NULL, 0755, RunUser, Group, 1, 0);
+  check_permissions(ServerRoot, "ppd", 0755, RunUser, Group, 1, 1);
+  check_permissions(ServerRoot, "ssl", 0700, RunUser, Group, 1, 0);
+  check_permissions(ServerRoot, "cupsd.conf", ConfigFilePerm, RunUser, Group,
+                    0, 0);
+  check_permissions(ServerRoot, "classes.conf", 0600, RunUser, Group, 0, 0);
+  check_permissions(ServerRoot, "printers.conf", 0600, RunUser, Group, 0, 0);
+  check_permissions(ServerRoot, "passwd.md5", 0600, User, Group, 0, 0);
 
  /*
   * Make sure the request and temporary directories have the right
   * permissions...
   */
 
-  chown(RequestRoot, RunUser, Group);
-  chmod(RequestRoot, 0710);
+  check_permissions(RequestRoot, NULL, 0710, RunUser, Group, 1, 1);
 
   if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)) ||
       access(TempDir, 0))
@@ -675,11 +643,7 @@ cupsdReadConfiguration(void)
     * is under the spool directory or does not exist...
     */
 
-    if (access(TempDir, 0))
-      mkdir(TempDir, 01770);
-
-    chown(TempDir, RunUser, Group);
-    chmod(TempDir, 01770);
+    check_permissions(TempDir, NULL, 01770, RunUser, Group, 1, 1);
   }
 
   if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)))
@@ -915,6 +879,11 @@ cupsdReadConfiguration(void)
       !old_serverroot || !ServerRoot || strcmp(old_serverroot, ServerRoot) ||
       !old_requestroot || !RequestRoot || strcmp(old_requestroot, RequestRoot))
   {
+    mime_type_t	*type;			/* Current type */
+    char	mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE];
+					/* MIME type name */
+
+
     cupsdLogMessage(CUPSD_LOG_INFO, "Full reload is required.");
 
    /*
@@ -956,25 +925,27 @@ cupsdReadConfiguration(void)
 
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Loaded MIME database from \'%s\': %d types, %d filters...",
-                    ServerRoot, MimeDatabase->num_types, MimeDatabase->num_filters);
+                    ServerRoot, mimeNumTypes(MimeDatabase),
+		    mimeNumFilters(MimeDatabase));
 
    /*
     * Create a list of MIME types for the document-format-supported
     * attribute...
     */
 
-    NumMimeTypes = MimeDatabase->num_types;
+    NumMimeTypes = mimeNumTypes(MimeDatabase);
     if (!mimeType(MimeDatabase, "application", "octet-stream"))
       NumMimeTypes ++;
 
     MimeTypes = calloc(NumMimeTypes, sizeof(const char *));
 
-    for (i = 0; i < MimeDatabase->num_types; i ++)
+    for (i = 0, type = mimeFirstType(MimeDatabase);
+         type;
+	 i ++, type = mimeNextType(MimeDatabase))
     {
-      snprintf(type, sizeof(type), "%s/%s", MimeDatabase->types[i]->super,
-               MimeDatabase->types[i]->type);
+      snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
 
-      MimeTypes[i] = strdup(type);
+      MimeTypes[i] = strdup(mimetype);
     }
 
     if (i < NumMimeTypes)
@@ -1046,6 +1017,113 @@ cupsdReadConfiguration(void)
   cupsdStartServer();
 
   return (1);
+}
+
+
+/*
+ * 'check_permissions()' - Fix the mode and ownership of a file or directory.
+ */
+
+static int				/* O - 0 on success, -1 on error */
+check_permissions(const char *filename,	/* I - File/directory name */
+                  const char *suffix,	/* I - Additional file/directory name */
+                  int        mode,	/* I - Permissions */
+		  int        user,	/* I - Owner */
+		  int        group,	/* I - Group */
+		  int        is_dir,	/* I - 1 = directory, 0 = file */
+		  int        create_dir)/* I - 1 = create directory, 0 = not */
+{
+  int		dir_created = 0;	/* Did we create a directory? */
+  char		pathname[1024];		/* File name with prefix */
+  struct stat	fileinfo;		/* Stat buffer */
+
+
+ /*
+  * Prepend the given root to the filename before testing it...
+  */
+
+  if (suffix)
+  {
+    snprintf(pathname, sizeof(pathname), "%s/%s", filename, suffix);
+    filename = pathname;
+  }
+
+ /*
+  * See if we can stat the file/directory...
+  */
+
+  if (stat(filename, &fileinfo))
+  {
+    if (errno == ENOENT && create_dir)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Creating missing directory \"%s\"",
+                      filename);
+
+      if (mkdir(filename, mode))
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to create directory \"%s\" - %s", filename,
+		        strerror(errno));
+        return (-1);
+      }
+
+      dir_created = 1;
+    }
+    else
+      return (-1);
+  }
+
+ /*
+  * Make sure it's a regular file...
+  */
+
+  if (!dir_created && !is_dir && !S_ISREG(fileinfo.st_mode))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a regular file!", filename);
+    return (-1);
+  }
+
+  if (!dir_created && is_dir && !S_ISDIR(fileinfo.st_mode))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a directory!", filename);
+    return (-1);
+  }
+
+ /*
+  * Fix owner, group, and mode as needed...
+  */
+
+  if (dir_created || fileinfo.st_uid != user || fileinfo.st_gid != group)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN, "Repairing ownership of \"%s\"", filename);
+
+    if (chown(filename, user, group))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to change ownership of \"%s\" - %s", filename,
+		      strerror(errno));
+      return (-1);
+    }
+  }
+
+  if (dir_created || (fileinfo.st_mode & 0777) != mode)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN, "Repairing access permissions of \"%s\"", filename);
+
+    if (chmod(filename, mode))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to change permissions of \"%s\" - %s", filename,
+		      strerror(errno));
+      return (-1);
+    }
+  }
+
+ /*
+  * Everything is OK...
+  */
+
+  return (0);
 }
 
 
@@ -3044,5 +3122,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 4903 2006-01-10 20:02:46Z mike $".
+ * End of "$Id: conf.c 4993 2006-01-26 19:27:40Z mike $".
  */

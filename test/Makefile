@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4837 2005-11-14 04:13:13Z mike $"
+# "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $"
 #
 #   IPP test makefile for the Common UNIX Printing System (CUPS).
 #
@@ -52,7 +52,7 @@ depend:
 # Install all targets...
 #
 
-install:
+install: all
 
 
 #
@@ -73,5 +73,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 4837 2005-11-14 04:13:13Z mike $".
+# End of "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $".
 #

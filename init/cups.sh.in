@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: cups.sh.in 4493 2005-02-18 02:09:53Z mike $"
+# "$Id: cups.sh.in 4971 2006-01-24 14:33:18Z mike $"
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
@@ -207,5 +207,5 @@ exit 0
 
 
 #
-# End of "$Id: cups.sh.in 4493 2005-02-18 02:09:53Z mike $".
+# End of "$Id: cups.sh.in 4971 2006-01-24 14:33:18Z mike $".
 #

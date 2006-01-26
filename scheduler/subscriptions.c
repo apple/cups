@@ -1,9 +1,9 @@
 /*
- * "$Id: subscriptions.c 4840 2005-11-14 21:53:30Z mike $"
+ * "$Id: subscriptions.c 4993 2006-01-26 19:27:40Z mike $"
  *
  *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -74,9 +74,12 @@ cupsdAddEvent(
 {
   va_list		ap;		/* Pointer to additional arguments */
   char			ftext[1024];	/* Formatted text buffer */
+  ipp_attribute_t	*attr;		/* Printer/job attribute */
   cupsd_event_t		*temp;		/* New event pointer */
   cupsd_subscription_t	*sub;		/* Current subscription */
 
+
+  LastEvent |= event;
 
  /*
   * Return if we aren't keeping events...
@@ -166,7 +169,7 @@ cupsdAddEvent(
 	vsnprintf(ftext, sizeof(ftext), text, ap);
 	va_end(ap);
 
-	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD,
+	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_TEXT,
 	             "notify-text", NULL, ftext);
 
         if (dest)
@@ -205,9 +208,14 @@ cupsdAddEvent(
 	  */
 
 	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
-	                "job-id", job->id);
+	                "notify-job-id", job->id);
 	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
 	                "job-state", (int)job->state);
+
+          if ((attr = ippFindAttribute(job->attrs, "job-name",
+	                               IPP_TAG_NAME)) != NULL)
+	    ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
+	        	 "job-name", NULL, attr->values[0].string.text);
 
 	  switch (job->state->values[0].integer)
 	  {
@@ -644,8 +652,7 @@ cupsdExpireSubscriptions(
   for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
        sub;
        sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
-    if (sub->expire <= curtime ||
-        (dest && sub->dest == dest) ||
+    if ((sub->expire <= curtime && dest && sub->dest == dest) ||
 	(job && sub->job == job))
     {
       cupsdLogMessage(CUPSD_LOG_INFO, "Subscription %d has expired...", sub->id);
@@ -701,9 +708,10 @@ cupsdLoadAllSubscriptions(void)
   snprintf(line, sizeof(line), "%s/subscriptions.conf", ServerRoot);
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "LoadAllSubscriptions: Unable to open %s - %s", line,
-                    strerror(errno));
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "LoadAllSubscriptions: Unable to open %s - %s", line,
+		      strerror(errno));
     return;
   }
 
@@ -1229,6 +1237,8 @@ cupsdSendNotification(
     if (sub->pipe < 0)
       cupsd_start_notifier(sub);
 
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "sub->pipe=%d", sub->pipe);
+
     if (sub->pipe >= 0)
     {
       event->attrs->state = IPP_IDLE;
@@ -1270,7 +1280,7 @@ cupsdStopAllNotifiers(void)
     return;
 
  /*
-  * Yes, kill and processes that are left...
+  * Yes, kill any processes that are left...
   */
 
   for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
@@ -1526,5 +1536,5 @@ cupsd_start_notifier(
 
 
 /*
- * End of "$Id: subscriptions.c 4840 2005-11-14 21:53:30Z mike $".
+ * End of "$Id: subscriptions.c 4993 2006-01-26 19:27:40Z mike $".
  */

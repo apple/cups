@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4905 2006-01-10 20:07:15Z mike $"
+# "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $"
 #
 #   PPD file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -52,7 +52,7 @@ clean:
 # Install files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(DATADIR)/model
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/model; \
@@ -60,5 +60,5 @@ install:
 
 
 #
-# End of "$Id: Makefile 4905 2006-01-10 20:07:15Z mike $".
+# End of "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $".
 #

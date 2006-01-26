@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c 4785 2005-10-13 19:39:05Z mike $"
+ * "$Id: emit.c 4980 2006-01-25 19:57:45Z mike $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -27,14 +27,17 @@
  *
  * Contents:
  *
- *   ppdCollect()       - Collect all marked options that reside in the
- *                        specified section.
- *   ppdEmit()          - Emit code for marked options to a file.
- *   ppdEmitFd()        - Emit code for marked options to a file.
- *   ppdEmitJCL()       - Emit code for JCL options to a file.
- *   ppdEmitJCLEnd()    - Emit JCLEnd code to a file.
- *   ppd_handle_media() - Handle media selection...
- *   ppd_sort()         - Sort options by ordering numbers...
+ *   ppdCollect()        - Collect all marked options that reside in the
+ *                         specified section.
+ *   ppdCollect2()       - Collect all marked options that reside in the
+ *                         specified section and minimum order.
+ *   ppdEmit()           - Emit code for marked options to a file.
+ *   ppdEmitAfterOrder() - Emit a subset of the code for marked options to a file.
+ *   ppdEmitFd()         - Emit code for marked options to a file.
+ *   ppdEmitJCL()        - Emit code for JCL options to a file.
+ *   ppdEmitJCLEnd()     - Emit JCLEnd code to a file.
+ *   ppd_handle_media()  - Handle media selection...
+ *   ppd_sort()          - Sort options by ordering numbers...
  */
 
 /*
@@ -79,6 +82,23 @@ ppdCollect(ppd_file_t    *ppd,		/* I - PPD file data */
            ppd_section_t section,	/* I - Section to collect */
            ppd_choice_t  ***choices)	/* O - Pointers to choices */
 {
+  return (ppdCollect2(ppd, section, 0.0, choices));
+}
+
+
+/*
+ * 'ppdCollect2()' - Collect all marked options that reside in the
+ *                   specified section and minimum order.
+ *
+ * @since CUPS 1.2@
+ */
+
+int					/* O - Number of options marked */
+ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
+            ppd_section_t section,	/* I - Section to collect */
+	    float         min_order,	/* I - Minimum OrderDependency value */
+            ppd_choice_t  ***choices)	/* O - Pointers to choices */
+{
   int		i, j, k, m;		/* Looping vars */
   ppd_group_t	*g,			/* Current group */
 		*sg;			/* Current sub-group */
@@ -105,7 +125,7 @@ ppdCollect(ppd_file_t    *ppd,		/* I - PPD file data */
   for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
   {
     for (j = g->num_options, o = g->options; j > 0; j --, o ++)
-      if (o->section == section)
+      if (o->section == section && o->order >= min_order)
 	for (k = o->num_choices, c = o->choices; k > 0; k --, c ++)
 	  if (c->marked && count < 1000)
 	  {
@@ -115,7 +135,7 @@ ppdCollect(ppd_file_t    *ppd,		/* I - PPD file data */
 
     for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
       for (k = sg->num_options, o = sg->options; k > 0; k --, o ++)
-	if (o->section == section)
+	if (o->section == section && o->order >= min_order)
 	  for (m = o->num_choices, c = o->choices; m > 0; m --, c ++)
 	    if (c->marked && count < 1000)
 	    {
@@ -160,6 +180,29 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
         FILE          *fp,		/* I - File to write to */
         ppd_section_t section)		/* I - Section to write */
 {
+  return (ppdEmitAfterOrder(ppd, fp, section, 0, 0.0));
+}
+
+
+/*
+ * 'ppdEmitAfterOrder()' - Emit a subset of the code for marked options to a file.
+ *
+ * When "limit" is non-zero, this function only emits options whose
+ * OrderDependency value is greater than or equal to "min_order".
+ *
+ * When "limit" is zero, this function is identical to ppdEmit().
+ *
+ * @since CUPS 1.2@
+ */
+
+int					/* O - 0 on success, -1 on failure */
+ppdEmitAfterOrder(
+    ppd_file_t    *ppd,			/* I - PPD file record */
+    FILE          *fp,			/* I - File to write to */
+    ppd_section_t section,		/* I - Section to write */
+    int		  limit,		/* I - Non-zero to use min_order, 0 to include all */
+    float         min_order)		/* I - Lowest order dependency to include */
+{
   int		i,			/* Looping var */
 		count;			/* Number of choices */
   ppd_choice_t	**choices;		/* Choices */
@@ -176,7 +219,7 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
   * Collect the options we need to emit and emit them!
   */
 
-  if ((count = ppdCollect(ppd, section, &choices)) == 0)
+  if ((count = ppdCollect2(ppd, section, min_order, &choices)) == 0)
     return (0);
 
   for (i = 0; i < count; i ++)
@@ -197,9 +240,9 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
       * Send DSC comments with option...
       */
 
-      if ((strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 ||
-           strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageRegion") == 0) &&
-          strcasecmp(choices[i]->choice, "Custom") == 0)
+      if ((!strcasecmp(choices[i]->option->keyword, "PageSize") ||
+           !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
+          !strcasecmp(choices[i]->choice, "Custom"))
       {
        /*
         * Variable size; write out standard size options, using the
@@ -208,15 +251,16 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 
         ppd_attr_t	*attr;		/* PPD attribute */
 	int		pos,		/* Position of custom value */
-			values[5],	/* Values for custom command */
 			orientation;	/* Orientation to use */
-
+	float		values[5];	/* Values for custom command */
+        int		isfloat[5];	/* Whether each value is float or int */
 
         fputs("%%BeginFeature: *CustomPageSize True\n", fp);
 
         size = ppdPageSize(ppd, "Custom");
 
         memset(values, 0, sizeof(values));
+        memset(isfloat, 0, sizeof(isfloat));
 
 	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize", "Width")) != NULL)
 	{
@@ -228,7 +272,8 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 	else
 	  pos = 0;
 
-	values[pos] = (int)size->width;
+	values[pos]  = size->width;
+	isfloat[pos] = 1;
 
 	if ((attr = ppdFindAttr(ppd, "ParamCustomPageSize", "Height")) != NULL)
 	{
@@ -240,7 +285,8 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 	else
 	  pos = 1;
 
-	values[pos] = (int)size->length;
+	values[pos]  = size->length;
+	isfloat[pos] = 1;
 
        /*
         * According to the Adobe PPD specification, an orientation of 1
@@ -292,8 +338,11 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 
 	values[pos] = orientation;
 
-        fprintf(fp, "%d %d %d %d %d\n", values[0], values[1],
-	        values[2], values[3], values[4]);
+        for (pos = 0; pos < 5; pos ++)
+	  if (isfloat[pos])
+	    fprintf(fp, "%.2f\n", values[pos]);
+          else
+	    fprintf(fp, "%.0f\n", values[pos]);
 
 	if (choices[i]->code == NULL)
 	{
@@ -306,8 +355,75 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
 	  fputs(ppd_custom_code, fp);
 	}
       }
+      else if (!strcasecmp(choices[i]->choice, "Custom"))
+      {
+       /*
+        * Custom option...
+	*/
+
+        ppd_coption_t	*coption;	/* Custom option */
+	ppd_cparam_t	*cparam;	/* Custom parameter */
+        const char	*s;		/* Pointer into string value */
+
+
+       /*
+        * TODO: Support custom options with more than 1 parameter...
+	*/
+
+        if ((coption = ppdFindCustomOption(ppd, choices[i]->option->keyword))
+	        != NULL &&
+	    (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params)) != NULL)
+	{
+	  if (fprintf(fp, "%%%%BeginFeature: *Custom%s True\n",
+	              coption->keyword) < 0)
+	  {
+            free(choices);
+            return (-1);
+	  }
+
+          switch (cparam->type)
+	  {
+	    case PPD_CUSTOM_CURVE :
+	    case PPD_CUSTOM_INVCURVE :
+	    case PPD_CUSTOM_POINTS :
+	    case PPD_CUSTOM_REAL :
+	        if (fprintf(fp, "%f\n", cparam->current.custom_real) < 0)
+		{
+        	  free(choices);
+        	  return (-1);
+		}
+	        break;
+
+	    case PPD_CUSTOM_INT :
+	        if (fprintf(fp, "%d\n", cparam->current.custom_int) < 0)
+		{
+        	  free(choices);
+        	  return (-1);
+		}
+	        break;
+
+	    case PPD_CUSTOM_PASSCODE :
+	    case PPD_CUSTOM_PASSWORD :
+	    case PPD_CUSTOM_STRING :
+	        putc('(', fp);
+
+		for (s = cparam->current.custom_string; *s; s ++)
+		  if (*s < ' ' || *s == '(' || *s == ')' || *s >= 127)
+		    fprintf(fp, "\\%03o", *s & 255);
+		  else
+		    putc(*s, fp);
+
+	        if (fputs(")\n", fp) < 0)
+		{
+        	  free(choices);
+        	  return (-1);
+		}
+	        break;
+          }
+	}
+      }
       else if (fprintf(fp, "%%%%BeginFeature: *%s %s\n",
-                       ((ppd_option_t *)choices[i]->option)->keyword,
+                       choices[i]->option->keyword,
 		       choices[i]->choice) < 0)
       {
         free(choices);
@@ -397,9 +513,9 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
       * Send DSC comments with option...
       */
 
-      if ((strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageSize") == 0 ||
-           strcasecmp(((ppd_option_t *)choices[i]->option)->keyword, "PageRegion") == 0) &&
-          strcasecmp(choices[i]->choice, "Custom") == 0)
+      if ((!strcasecmp(choices[i]->option->keyword, "PageSize") ||
+           !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
+          !strcasecmp(choices[i]->choice, "Custom"))
       {
         custom_size = 1;
 
@@ -410,8 +526,7 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
         custom_size = 0;
 
 	snprintf(buf, sizeof(buf), "%%%%BeginFeature: *%s %s\n",
-        	 ((ppd_option_t *)choices[i]->option)->keyword,
-		 choices[i]->choice);
+        	 choices[i]->option->keyword, choices[i]->choice);
       }
 
       if (write(fd, buf, strlen(buf)) < 1)
@@ -748,10 +863,9 @@ ppd_handle_media(ppd_file_t *ppd)
   if (!rpr)
     rpr = ppdFindAttr(ppd, "RequiresPageRegion", "All");
 
-  if (strcasecmp(size->name, "Custom") == 0 ||
-      (manual_feed == NULL && input_slot == NULL) ||
-      (manual_feed != NULL && strcasecmp(manual_feed->choice, "False") == 0) ||
-      (input_slot != NULL && (input_slot->code == NULL || !input_slot->code[0])))
+  if (!strcasecmp(size->name, "Custom") || (!manual_feed && !input_slot) ||
+      !((manual_feed && !strcasecmp(manual_feed->choice, "True")) ||
+        (input_slot && input_slot->code && input_slot->code[0])))
   {
    /*
     * Manual feed was not selected and/or the input slot selection does
@@ -802,9 +916,9 @@ static int			/* O - -1 if c1 < c2, 0 if equal, 1 otherwise */
 ppd_sort(ppd_choice_t **c1,	/* I - First choice */
          ppd_choice_t **c2)	/* I - Second choice */
 {
-  if (((ppd_option_t *)(*c1)->option)->order < ((ppd_option_t *)(*c2)->option)->order)
+  if ((*c1)->option->order < (*c2)->option->order)
     return (-1);
-  else if (((ppd_option_t *)(*c1)->option)->order > ((ppd_option_t *)(*c2)->option)->order)
+  else if ((*c1)->option->order > (*c2)->option->order)
     return (1);
   else
     return (0);
@@ -812,5 +926,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c 4785 2005-10-13 19:39:05Z mike $".
+ * End of "$Id: emit.c 4980 2006-01-25 19:57:45Z mike $".
  */

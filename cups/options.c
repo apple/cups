@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c 4918 2006-01-12 05:14:40Z mike $"
+ * "$Id: options.c 4980 2006-01-25 19:57:45Z mike $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -367,6 +367,7 @@ cupsMarkOptions(
   char		*val,			/* Pointer into value */
 		*ptr,			/* Pointer into string */
 		s[255];			/* Temporary string */
+  const char	*page_size;		/* PageSize option */
   cups_option_t	*optptr;		/* Current option */
   ppd_option_t	*option;		/* PPD option */
   static const char * const duplex_options[] =
@@ -407,15 +408,22 @@ cupsMarkOptions(
   * Mark options...
   */
 
-  conflict = 0;
+  conflict  = 0;
 
   for (i = num_options, optptr = options; i > 0; i --, optptr ++)
     if (!strcasecmp(optptr->name, "media"))
     {
      /*
       * Loop through the option string, separating it at commas and
-      * marking each individual option.
+      * marking each individual option as long as the corresponding
+      * PPD option (PageSize, InputSlot, etc.) is not also set.
+      *
+      * For PageSize, we also check for an empty option value since
+      * some versions of MacOS X use it to specify auto-selection
+      * of the media based solely on the size.
       */
+
+      page_size = cupsGetOption("PageSize", num_options, options);
 
       for (val = optptr->value; *val;)
       {
@@ -434,7 +442,7 @@ cupsMarkOptions(
         * Mark it...
 	*/
 
-        if (cupsGetOption("PageSize", num_options, options) == NULL)
+        if (!page_size || !page_size[0])
 	  if (ppdMarkOption(ppd, "PageSize", s))
             conflict = 1;
 
@@ -569,5 +577,5 @@ cupsMarkOptions(
 
 
 /*
- * End of "$Id: options.c 4918 2006-01-12 05:14:40Z mike $".
+ * End of "$Id: options.c 4980 2006-01-25 19:57:45Z mike $".
  */

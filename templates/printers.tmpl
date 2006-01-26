@@ -1,9 +1,4 @@
-<P><A HREF="/admin?op=add-printer"><IMG
-SRC="/images/add-printer.gif" ALT="Add Printer"
-CLASS="button"></A></P>
-
-{#printer_name=0?No printers:
-<P><B>Server Default Destination:</B> {default_name?<A HREF="{default_uri}">{default_name}</A>:none}</P>
+{#printer_name=0?:
 {[printer_name]
 <H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}</H2>
 
@@ -12,17 +7,17 @@ CLASS="button"></A></P>
 <TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
 <IMG SRC="/images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" CLASS="button" ALT=""></A>
 </TD>
-<TD VALIGN="TOP">Description: {printer_info}<BR>
-Location: {printer_location}<BR>
-Make and Model: {printer_make_and_model}<BR>
-Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
+<TD VALIGN="TOP"><B>Description:</B> {printer_info}<BR>
+<B>Location:</B> {printer_location}<BR>
+<B>Make and Model:</B> {printer_make_and_model}<BR>
+<B>Printer State:</B> {printer_state=3?idle:{printer_state=4?processing:stopped}},
 {printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published.
 {?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
 {?printer_state_history2.printer_state_message=?:<BR><I>"{printer_state_history2.printer_state_message}"</I>}
 {?printer_state_history3.printer_state_message=?:<BR><I>"{printer_state_history3.printer_state_message}"</I>}
 {?printer_state_history4.printer_state_message=?:<BR><I>"{printer_state_history4.printer_state_message}"</I>}
 {?printer_state_history5.printer_state_message=?:<BR><I>"{printer_state_history5.printer_state_message}"</I>}
-{?device_uri=?:<BR>Device URI: {device_uri}}
+{?device_uri=?:<BR><B>Device URI:</B> {device_uri}}
 
 <P>
 <A HREF="{printer_uri_supported}?op=print-test-page">
@@ -41,6 +36,8 @@ Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
 <A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={printer_name}">
 <IMG SRC="/images/reject-jobs.gif" ALT="Reject Jobs" CLASS="button"></A>
 }
+<A HREF="{printer_uri_supported}?op=move-jobs&amp;printer_name={printer_name}">
+<IMG SRC="/images/move-jobs.gif" ALT="Move All Jobs" CLASS="button"></A>
 <A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={printer_name}">
 <IMG SRC="/images/cancel-all-jobs.gif" ALT="Cancel All Jobs" CLASS="button"></A>
 {printer_is_shared=0?
@@ -64,5 +61,4 @@ Printer State: {printer_state=3?idle:{printer_state=4?processing:stopped}},
 </TD>
 </TR>
 </TABLE>
-
 }}

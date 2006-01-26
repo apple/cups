@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 4898 2006-01-08 23:13:20Z mike $"
+# "$Id: Makefile 4965 2006-01-21 06:12:17Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2005 by Easy Software Products.
+#   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -28,7 +28,7 @@ include ../Makedefs
 # Locales...
 #
 
-LOCALES	=	fr
+LOCALES	=	fr ja
 
 
 #
@@ -50,7 +50,7 @@ clean:
 # Install files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(LOCALEDIR)
 	for loc in $(LOCALES) ; do \
 		$(INSTALL_DIR) $(LOCALEDIR)/$$loc ; \
@@ -95,5 +95,5 @@ translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
 
 
 #
-# End of "$Id: Makefile 4898 2006-01-08 23:13:20Z mike $".
+# End of "$Id: Makefile 4965 2006-01-21 06:12:17Z mike $".
 #

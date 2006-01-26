@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 4800 2005-10-18 18:06:20Z mike $"
+ * "$Id: http-private.h 4973 2006-01-25 02:36:02Z mike $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -64,6 +64,7 @@ typedef int socklen_t;
 #  endif /* __sgi */
 
 #  include "http.h"
+#  include "ipp-private.h"
 
 #  if defined HAVE_LIBSSL
 /*
@@ -122,5 +123,5 @@ extern const char *hstrerror(int error);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 4800 2005-10-18 18:06:20Z mike $".
+ * End of "$Id: http-private.h 4973 2006-01-25 02:36:02Z mike $".
  */

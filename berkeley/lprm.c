@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c 4906 2006-01-10 20:53:28Z mike $"
+ * "$Id: lprm.c 4948 2006-01-19 03:23:41Z mike $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -84,7 +84,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(), encryption)) == NULL)
   {
-    _cupsLangPuts(stderr, language, _("lprm: Unable to contact server!\n"));
+    _cupsLangPuts(stderr, _("lprm: Unable to contact server!\n"));
     cupsFreeDests(num_dests, dests);
     return (1);
   }
@@ -103,7 +103,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    httpEncryption(http, encryption);
 #else
-            _cupsLangPrintf(stderr, language,
+            _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
@@ -123,17 +123,61 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    if (cupsGetDest(dest, NULL, num_dests, dests) == NULL)
 	    {
-	      _cupsLangPrintf(stderr, language,
-	                      _("lprm: Unknown destination \"%s\"!\n"), dest);
+	      _cupsLangPrintf(stderr,
+	                      _("%s: Error - unknown destination \"%s\"!\n"),
+			      argv[0], dest);
               cupsFreeDests(num_dests, dests);
 	      httpClose(http);
 	      return(1);
 	    }
 	    break;
 
+        case 'U' : /* Username */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected username after "
+				  "\'-U\' option!\n"),
+		        	argv[0]);
+	        return (1);
+	      }
+
+              cupsSetUser(argv[i]);
+	    }
+	    break;
+	    
+        case 'h' : /* Connect to host */
+	    if (http != NULL)
+	      httpClose(http);
+
+	    if (argv[i][2] != '\0')
+              cupsSetServer(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		        	_("%s: Error - expected hostname after "
+			          "\'-h\' option!\n"),
+				argv[0]);
+		return (1);
+              }
+	      else
+                cupsSetServer(argv[i]);
+	    }
+	    break;
+
 	default :
-	    _cupsLangPrintf(stderr, language,
-	                    _("lprm: Unknown option \'%c\'!\n"), argv[i][1]);
+	    _cupsLangPrintf(stderr,
+	                    _("%s: Error - unknown option \'%c\'!\n"),
+			    argv[0], argv[i][1]);
             cupsFreeDests(num_dests, dests);
 	    httpClose(http);
 	    return (1);
@@ -151,7 +195,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	op     = IPP_CANCEL_JOB;
         job_id = atoi(argv[i]);
       }
-      else if (strcmp(argv[i], "-") == 0)
+      else if (!strcmp(argv[i], "-"))
       {
        /*
         * Cancel all jobs
@@ -175,16 +219,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       *    [requesting-user-name]
       */
 
-      request = ippNew();
-
-      request->request.op.operation_id = op;
-      request->request.op.request_id   = 1;
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-              	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                   "attributes-natural-language", NULL, language->language);
+      request = ippNewRequest(op);
 
       if (dest)
       {
@@ -214,43 +249,12 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
         response = cupsDoRequest(http, request, "/jobs/");
 
-      if (response != NULL)
-      {
-        switch (response->request.status.status_code)
-	{
-	  case IPP_NOT_FOUND :
-              _cupsLangPuts(stderr, language,
-	                    _("lprm: Job or printer not found!\n"));
-	      break;
-	  case IPP_NOT_AUTHORIZED :
-              _cupsLangPuts(stderr, language,
-	                    _("lprm: Not authorized to lprm job(s)!\n"));
-	      break;
-	  case IPP_FORBIDDEN :
-              _cupsLangPrintf(stderr, language,
-	                      _("lprm: You don't own job ID %d!\n"), job_id);
-	      break;
-	  default :
-              if (response->request.status.status_code > IPP_OK_CONFLICT)
-                _cupsLangPuts(stderr, language,
-		              _("lprm: Unable to lprm job(s)!\n"));
-	      break;
-	}
+      ippDelete(response);
 
-        if (response->request.status.status_code > IPP_OK_CONFLICT)
-	{
-          ippDelete(response);
-          cupsFreeDests(num_dests, dests);
-          httpClose(http);
-	  return (1);
-	}
-
-        ippDelete(response);
-      }
-      else
+      if (cupsLastError() > IPP_OK_CONFLICT)
       {
-        _cupsLangPuts(stderr, language,
-	              _("lprm: Unable to cancel job(s)!\n"));
+        _cupsLangPrintf(stderr, "%s: %s\n", argv[0], cupsLastErrorString());
+
         cupsFreeDests(num_dests, dests);
         httpClose(http);
 	return (1);
@@ -265,8 +269,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (response == NULL)
     if (!cupsCancelJob(dest, 0))
     {
-      _cupsLangPuts(stderr, language,
-                    _("lprm: Unable to cancel job(s)!\n"));
+      _cupsLangPrintf(stderr, "%s: %s\n", argv[0], cupsLastErrorString());
       cupsFreeDests(num_dests, dests);
       httpClose(http);
       return (1);
@@ -280,5 +283,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c 4906 2006-01-10 20:53:28Z mike $".
+ * End of "$Id: lprm.c 4948 2006-01-19 03:23:41Z mike $".
  */

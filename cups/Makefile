@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4918 2006-01-12 05:14:40Z mike $"
+# "$Id: Makefile 4961 2006-01-20 22:19:13Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -35,6 +35,7 @@ LIBOBJS	=	\
 		attr.o \
 		auth.o \
 		backchannel.o \
+		custom.o \
 		dest.o \
 		dir.o \
 		emit.o \
@@ -50,10 +51,12 @@ LIBOBJS	=	\
 		ipp-support.o \
 		langprintf.o \
 		language.o \
+		localize.o \
 		mark.o \
 		md5.o \
 		md5passwd.o \
 		normalize.o \
+		notify.o \
 		options.o \
 		page.o \
 		ppd.o \
@@ -71,6 +74,7 @@ OBJS	=	\
 		testi18n.o \
 		testipp.o \
 		testlang.o \
+		testppd.o \
 		php_cups_wrap.o
 
 
@@ -105,7 +109,8 @@ TARGETS	=	\
 		testhttp \
 		testi18n \
 		testipp \
-		testlang
+		testlang \
+		testppd
 
 
 #
@@ -177,7 +182,7 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 libcups.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -o $@ \
-		-install_name $(libdir)/libcups.dylib \
+		-install_name $(libdir)/$@ \
 		-current_version 2.7.0 \
 		-compatibility_version 2.0.0 \
 		$(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
@@ -299,6 +304,16 @@ testlang:	testlang.o libcups.a
 
 
 #
+# testppd (dependency on static CUPS library is intentional)
+#
+
+testppd:	testppd.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a \
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
 # Automatic API help files...
 #
 
@@ -338,5 +353,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 4918 2006-01-12 05:14:40Z mike $".
+# End of "$Id: Makefile 4961 2006-01-20 22:19:13Z mike $".
 #

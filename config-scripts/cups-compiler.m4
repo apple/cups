@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 4915 2006-01-11 15:57:53Z mike $"
+dnl "$Id: cups-compiler.m4 4953 2006-01-19 20:30:48Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -27,12 +27,14 @@ dnl for them...
 OPTIM=""
 AC_SUBST(OPTIM)
 
+AC_ARG_WITH(optim, [  --with-optim="flags"    set optimization flags ])
+
 AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no],
 	[if test x$enable_debug = xyes; then
 		OPTIM="-g"
 	fi])
 
-AC_ARG_WITH(optim, [  --with-optim="flags"    set optimization flags ])
+AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fpie option, default=no])
 
 dnl Update compiler options...
 CXXLIBS=""
@@ -64,16 +66,10 @@ if test -n "$GCC"; then
 			;;
 
 		Linux*)
-			AC_MSG_CHECKING(if GCC supports -fpie)
-
-			OLDCFLAGS="$CFLAGS"
-			CFLAGS="$CFLAGS -fpie"
-			AC_TRY_COMPILE(,,
+			if test x$enable_pie = xyes; then
 				OPTIM="$OPTIM -fpie"
 				LDFLAGS="$LDFLAGS -pie"
-				AC_MSG_RESULT(yes),
-				CFLAGS="$OLDCFLAGS"
-				AC_MSG_RESULT(no))
+			fi
 			;;
 	esac
 
@@ -196,5 +192,5 @@ if test $uname = HP-UX; then
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4 4915 2006-01-11 15:57:53Z mike $".
+dnl End of "$Id: cups-compiler.m4 4953 2006-01-19 20:30:48Z mike $".
 dnl

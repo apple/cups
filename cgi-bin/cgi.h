@@ -1,5 +1,5 @@
 /*
- * "$Id: cgi.h 4921 2006-01-12 21:26:26Z mike $"
+ * "$Id: cgi.h 4931 2006-01-14 20:37:40Z mike $"
  *
  *   CGI support library definitions.
  *
@@ -80,6 +80,8 @@ extern char		*cgiGetTemplateDir(void);
 extern const char	*cgiGetVariable(const char *name);
 extern int		cgiInitialize(void);
 extern int		cgiIsPOST(void);
+extern void		cgiMoveJobs(http_t *http, const char *dest, int job_id);
+extern void		cgiPrintTestPage(http_t *http, const char *dest);
 extern char		*cgiRewriteURL(const char *uri, char *url, int urlsize,
 			               const char *newresource);
 extern void		cgiSetArray(const char *name, int element,
@@ -95,12 +97,13 @@ extern int		cgiSetIPPVars(ipp_t *response, const char *filter_name,
 extern void		cgiSetServerVersion(void);
 extern void		cgiSetSize(const char *name, int size);
 extern void		cgiSetVariable(const char *name, const char *value);
+extern void		cgiShowIPPError(const char *message);
 extern void		cgiShowJobs(http_t *http, const char *dest);
 extern void		cgiStartHTML(const char *title);
-
+extern const char	*cgiText(const char *message);
 
 #endif /* !_CUPS_CGI_H_ */
 
 /*
- * End of "$Id: cgi.h 4921 2006-01-12 21:26:26Z mike $".
+ * End of "$Id: cgi.h 4931 2006-01-14 20:37:40Z mike $".
  */

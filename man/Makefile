@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4868 2005-12-05 16:59:11Z mike $"
+# "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -69,7 +69,14 @@ all:	$(MAN1) $(MAN5) $(MAN8) html
 #
 
 clean:
+	$(RM) mantohtml mantohtml.o
 	$(RM) $(MAN1) $(MAN5) $(MAN8)
+	for file in $(MAN1); do \
+		$(RM) ../doc/help/man-`basename $$file .$(MAN1EXT)`.html; \
+	done
+	for file in $(MAN8); do \
+		$(RM) ../doc/help/man-`basename $$file .$(MAN8EXT)`.html; \
+	done
 
 
 #
@@ -127,5 +134,5 @@ mantohtml:	mantohtml.o
 
 
 #
-# End of "$Id: Makefile 4868 2005-12-05 16:59:11Z mike $".
+# End of "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $".
 #

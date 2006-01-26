@@ -1,9 +1,9 @@
 /*
- * "$Id: encode.c 4918 2006-01-12 05:14:40Z mike $"
+ * "$Id: encode.c 4977 2006-01-25 15:52:30Z mike $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -25,9 +25,10 @@
  *
  * Contents:
  *
- *   cupsEncodeOptions()  - Encode printer options into IPP attributes.
- *   cupsEncodeOptions2() - Encode printer options into IPP attributes for
- *                          a group.
+ *   cupsEncodeOptions()   - Encode printer options into IPP attributes.
+ *   cupsEncodeOptions2()  - Encode printer options into IPP attributes for
+ *                           a group.
+ *   compare_ipp_options() - Compare two IPP options.
  */
 
 /*
@@ -35,6 +36,7 @@
  */
 
 #include "cups.h"
+#include "ipp-private.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include "string.h"
@@ -43,6 +45,8 @@
 
 /*
  * Local list of option names and the value tags they should use...
+ *
+ * **** THIS LIST MUST BE SORTED ****
  */
 
 typedef struct
@@ -89,15 +93,32 @@ static const _ipp_option_t ipp_options[] =
   { "penwidth",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "ppi",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "prettyprint",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
+  { "printer-is-accepting-jobs",IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { "printer-is-shared",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { "printer-make-and-model",	IPP_TAG_TEXT,		IPP_TAG_PRINTER },
+  { "printer-more-info",	IPP_TAG_URI,		IPP_TAG_PRINTER },
   { "printer-resolution",	IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
+  { "printer-state",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
+  { "printer-state-change-time",IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { "printer-state-reasons",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
+  { "printer-type",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "printer-uri",		IPP_TAG_URI,		IPP_TAG_OPERATION },
   { "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { "queued-job-count",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "raw",			IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
   { "saturation",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "scaling",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "sides",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { "wrap",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB }
 };
+
+
+/*
+ * Local functions...
+ */
+
+static int	compare_ipp_options(_ipp_option_t *a, _ipp_option_t *b);
 
 
 /*
@@ -189,6 +210,10 @@ cupsEncodeOptions2(
 
   for (i = 0; i < num_options; i ++)
   {
+    _ipp_option_t	key,		/* Search key */
+			*match;		/* Matching attribute */
+
+
    /*
     * Skip document format options that are handled above...
     */
@@ -202,16 +227,21 @@ cupsEncodeOptions2(
     * Figure out the proper value and group tags for this option...
     */
 
-    for (j = 0; j < (int)(sizeof(ipp_options) / sizeof(ipp_options[0])); j ++)
-      if (!strcasecmp(options[i].name, ipp_options[j].name))
-        break;
+    key.name = options[i].name;
+    match    = (_ipp_option_t *)bsearch(&key, ipp_options,
+                                        sizeof(ipp_options) /
+					    sizeof(ipp_options[0]),
+					sizeof(ipp_options[0]),
+					(int (*)(const void *,
+					         const void *))
+				            compare_ipp_options);
 
-    if (j < (int)(sizeof(ipp_options) / sizeof(ipp_options[0])))
+    if (match)
     {
-      if (ipp_options[j].group_tag != group_tag)
+      if (match->group_tag != group_tag)
         continue;
 
-      value_tag = ipp_options[j].value_tag;
+      value_tag = match->value_tag;
     }
     else if (group_tag != IPP_TAG_JOB)
       continue;
@@ -467,5 +497,17 @@ cupsEncodeOptions2(
 
 
 /*
- * End of "$Id: encode.c 4918 2006-01-12 05:14:40Z mike $".
+ * 'compare_ipp_options()' - Compare two IPP options.
+ */
+
+static int				/* O - Result of comparison */
+compare_ipp_options(_ipp_option_t *a,	/* I - First option */
+                    _ipp_option_t *b)	/* I - Second option */
+{
+  return (strcmp(a->name, b->name));
+}
+
+
+/*
+ * End of "$Id: encode.c 4977 2006-01-25 15:52:30Z mike $".
  */

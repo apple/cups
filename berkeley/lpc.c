@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c 4906 2006-01-10 20:53:28Z mike $"
+ * "$Id: lpc.c 4948 2006-01-19 03:23:41Z mike $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -85,7 +85,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Do the command prompt thing...
     */
 
-    printf("lpc> ");
+    _cupsLangPuts(stdout, _("lpc> "));
     while (fgets(line, sizeof(line), stdin) != NULL)
     {
      /*
@@ -113,7 +113,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         * Nothing left, just show a prompt...
 	*/
 
-        printf("lpc> ");
+	_cupsLangPuts(stdout, _("lpc> "));
 	continue;
       }
 
@@ -149,7 +149,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Put another prompt out to the user...
       */
 
-      printf("lpc> ");
+      _cupsLangPuts(stdout, _("lpc> "));
     }
   }
 
@@ -197,7 +197,7 @@ do_command(http_t     *http,		/* I - HTTP connection to server */
   else if (!compare_strings(command, "help", 1) || !strcmp(command, "?"))
     show_help(params);
   else
-    _cupsLangPrintf(stdout, cupsLangDefault(),
+    _cupsLangPrintf(stdout,
                     _("%s is not implemented by the CUPS version of lpc.\n"),
 		    command);
 }
@@ -212,20 +212,17 @@ show_help(const char *command)		/* I - Command to describe or NULL */
 {
   if (!command)
   {
-    _cupsLangPrintf(stdout, cupsLangDefault(),
+    _cupsLangPrintf(stdout,
                     _("Commands may be abbreviated.  Commands are:\n"
 		      "\n"
 		      "exit    help    quit    status  ?\n"));
   }
   else if (!compare_strings(command, "help", 1) || !strcmp(command, "?"))
-    _cupsLangPrintf(stdout, cupsLangDefault(),
-                    _("help\t\tget help on commands\n"));
+    _cupsLangPrintf(stdout, _("help\t\tget help on commands\n"));
   else if (!compare_strings(command, "status", 4))
-    _cupsLangPrintf(stdout, cupsLangDefault(),
-                    _("status\t\tshow status of daemon and queue\n"));
+    _cupsLangPrintf(stdout, _("status\t\tshow status of daemon and queue\n"));
   else
-    _cupsLangPrintf(stdout, cupsLangDefault(),
-                    _("?Invalid help command unknown\n"));
+    _cupsLangPrintf(stdout, _("?Invalid help command unknown\n"));
 }
 
 
@@ -474,7 +471,7 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 
         printf("%s:\n", printer);
 	if (!strncmp(device, "file:", 5))
-	  _cupsLangPrintf(stdout, language,
+	  _cupsLangPrintf(stdout,
 	                  _("\tprinter is on device \'%s\' speed -1\n"),
 			  device + 5);
 	else
@@ -486,28 +483,28 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 	  if ((delimiter = strchr(device, ':')) != NULL )
 	  {
 	    *delimiter = '\0';
-	    _cupsLangPrintf(stdout, language,
+	    _cupsLangPrintf(stdout,
 	                    _("\tprinter is on device \'%s\' speed -1\n"),
 			    device);
 	  }
 	}
 
         if (accepting)
-	  _cupsLangPuts(stdout, language, _("\tqueuing is enabled\n"));
+	  _cupsLangPuts(stdout, _("\tqueuing is enabled\n"));
 	else
-	  _cupsLangPuts(stdout, language, _("\tqueuing is disabled\n"));
+	  _cupsLangPuts(stdout, _("\tqueuing is disabled\n"));
 
         if (pstate != IPP_PRINTER_STOPPED)
-	  _cupsLangPuts(stdout, language, _("\tprinting is enabled\n"));
+	  _cupsLangPuts(stdout, _("\tprinting is enabled\n"));
 	else
-	  _cupsLangPuts(stdout, language, _("\tprinting is disabled\n"));
+	  _cupsLangPuts(stdout, _("\tprinting is disabled\n"));
 
 	if (jobcount == 0)
-	  _cupsLangPuts(stdout, language, _("\tno entries\n"));
+	  _cupsLangPuts(stdout, _("\tno entries\n"));
 	else
-	  _cupsLangPrintf(stdout, language, _("\t%d entries\n"), jobcount);
+	  _cupsLangPrintf(stdout, _("\t%d entries\n"), jobcount);
 
-	_cupsLangPuts(stdout, language, _("\tdaemon present\n"));
+	_cupsLangPuts(stdout, _("\tdaemon present\n"));
       }
 
       if (attr == NULL)
@@ -520,5 +517,5 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c 4906 2006-01-10 20:53:28Z mike $".
+ * End of "$Id: lpc.c 4948 2006-01-19 03:23:41Z mike $".
  */

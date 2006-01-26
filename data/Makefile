@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4494 2005-02-18 02:18:11Z mike $"
+# "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -136,7 +136,7 @@ clean:
 # Install files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(DATADIR)/banners
 	for file in $(BANNERS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
@@ -153,8 +153,9 @@ install:
 	for file in $(DATAFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/data; \
 	done
+	$(INSTALL_DIR) $(DATADIR)/profiles
 
 
 #
-# End of "$Id: Makefile 4494 2005-02-18 02:18:11Z mike $".
+# End of "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c 4806 2005-10-21 18:49:24Z mike $"
+ * "$Id: http-addr.c 4950 2006-01-19 16:07:57Z mike $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -133,8 +133,7 @@ httpAddrLocalhost(
 {
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6 &&
-      (IN6_IS_ADDR_LOOPBACK(&(addr->ipv6.sin6_addr)) ||
-       IN6_IS_ADDR_UNSPECIFIED(&(addr->ipv6.sin6_addr))))
+      IN6_IS_ADDR_LOOPBACK(&(addr->ipv6.sin6_addr)))
     return (1);
 #endif /* AF_INET6 */
 
@@ -541,5 +540,5 @@ httpGetHostname(char *s,		/* I - String buffer for name */
 
 
 /*
- * End of "$Id: http-addr.c 4806 2005-10-21 18:49:24Z mike $".
+ * End of "$Id: http-addr.c 4950 2006-01-19 16:07:57Z mike $".
  */

@@ -9,6 +9,7 @@ cancel.o: ../cups/i18n.h ../cups/language.h ../cups/array.h
 cupsaddsmb.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 cupsaddsmb.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/file.h
 cupsaddsmb.o: ../cups/i18n.h ../cups/language.h ../cups/array.h
+cupsaddsmb.o: ../cups/debug.h
 cupstestppd.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 cupstestppd.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/file.h
 cupstestppd.o: ../cups/i18n.h ../cups/language.h ../cups/array.h
@@ -30,6 +31,6 @@ lpoptions.o: ../cups/i18n.h ../cups/language.h ../cups/array.h
 lppasswd.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 lppasswd.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/file.h
 lppasswd.o: ../cups/i18n.h ../cups/language.h ../cups/array.h ../cups/md5.h
-lpstat.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-lpstat.o: ../cups/ppd.h ../cups/file.h ../cups/i18n.h ../cups/language.h
-lpstat.o: ../cups/array.h ../cups/debug.h ../cups/string.h ../config.h
+lpstat.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
+lpstat.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/file.h
+lpstat.o: ../cups/i18n.h ../cups/language.h ../cups/array.h ../cups/debug.h

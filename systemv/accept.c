@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c 4906 2006-01-10 20:53:28Z mike $"
+ * "$Id: accept.c 4990 2006-01-26 02:21:45Z mike $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -55,7 +55,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   ipp_t		*request;		/* IPP request */
   ipp_t		*response;		/* IPP response */
   ipp_op_t	op;			/* Operation */
-  cups_lang_t	*language;		/* Language */
   int		cancel;			/* Cancel jobs? */
 
 
@@ -68,8 +67,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   else
     command = argv[0];
 
-  cancel   = 0;
-  language = cupsLangDefault();
+  cancel = 0;
 
   if (!strcmp(command, "accept"))
     op = CUPS_ACCEPT_JOBS;
@@ -81,7 +79,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     op = IPP_RESUME_PRINTER;
   else
   {
-    _cupsLangPrintf(stderr, language, _("%s: Don't know what to do!\n"),
+    _cupsLangPrintf(stderr, _("%s: Don't know what to do!\n"),
                     command);
     return (1);
   }
@@ -104,12 +102,31 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr, language,
+            _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
 	        	    command);
 #endif /* HAVE_SSL */
 	    break;
 
+        case 'U' : /* Username */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected username after "
+				  "\'-U\' option!\n"),
+		        	command);
+	        return (1);
+	      }
+
+              cupsSetUser(argv[i]);
+	    }
+	    break;
+	    
         case 'c' : /* Cancel jobs */
 	    cancel = 1;
 	    break;
@@ -125,8 +142,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        _cupsLangPrintf(stderr, language,
-		                _("%s: Expected server name after -h!\n"),
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected hostname after "
+				  "\'-h\' option!\n"),
 		        	command);
 	        return (1);
 	      }
@@ -143,8 +161,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      i ++;
 	      if (i >= argc)
 	      {
-	        _cupsLangPrintf(stderr, language,
-		                _("%s: Expected reason text after -r!\n"),
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected reason text after "
+				  "\'-r\' option!\n"),
 				command);
 		return (1);
 	      }
@@ -154,7 +173,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, language, _("%s: Unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%c\'!\n"),
 	                    command, argv[i][1]);
 	    return (1);
       }
@@ -169,7 +188,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if (http == NULL)
       {
-	_cupsLangPrintf(stderr, language,
+	_cupsLangPrintf(stderr,
 	                _("%s: Unable to connect to server: %s\n"),
 	                command, strerror(errno));
 	return (1);
@@ -185,21 +204,15 @@ main(int  argc,				/* I - Number of command-line arguments */
       *    printer-state-message [optional]
       */
 
-      request = ippNew();
-
-      request->request.op.operation_id = op;
-      request->request.op.request_id   = 1;
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-              	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                   "attributes-natural-language", NULL, language->language);
+      request = ippNewRequest(op);
 
       httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
                        "/printers/%s", argv[i]);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                    "printer-uri", NULL, uri);
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                   "requesting-user-name", NULL, cupsUser());
 
       if (reason != NULL)
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
@@ -213,7 +226,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
         if (response->request.status.status_code > IPP_OK_CONFLICT)
 	{
-          _cupsLangPrintf(stderr, language,
+          _cupsLangPrintf(stderr,
 	                  _("%s: Operation failed: %s\n"),
 			  command, ippErrorString(cupsLastError()));
 	  return (1);
@@ -223,9 +236,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
       else
       {
-        _cupsLangPrintf(stderr, language,
-	                _("%s: Operation failed: %s\n"),
-	                command, ippErrorString(cupsLastError()));
+        _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
 	return (1);
       }
 
@@ -244,18 +255,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	*    printer-uri
 	*/
 
-	request = ippNew();
-
-	request->request.op.operation_id = IPP_PURGE_JOBS;
-	request->request.op.request_id   = 1;
-
-	language = cupsLangDefault();
-
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-              	     "attributes-charset", NULL, cupsLangEncoding(language));
-
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                     "attributes-natural-language", NULL, language->language);
+	request = ippNewRequest(IPP_PURGE_JOBS);
 
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                      "printer-uri", NULL, uri);
@@ -264,9 +264,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	{
           if (response->request.status.status_code > IPP_OK_CONFLICT)
 	  {
-            _cupsLangPrintf(stderr, language,
-	                    _("%s: Operation failed: %s\n"),
-			    command, ippErrorString(cupsLastError()));
+            _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
 	    return (1);
 	  }
 
@@ -274,9 +272,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
 	else
 	{
-          _cupsLangPrintf(stderr, language,
-	                  _("%s: Operation failed: %s\n"),
-			  command, ippErrorString(cupsLastError()));
+          _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
 	  return (1);
 	}
       }
@@ -290,5 +286,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c 4906 2006-01-10 20:53:28Z mike $".
+ * End of "$Id: accept.c 4990 2006-01-26 02:21:45Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 4912 2006-01-10 21:43:56Z mike $"
+ * "$Id: client.c 4950 2006-01-19 16:07:57Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -778,17 +778,22 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
     error = SSLSetAllowsAnyRoot(conn, true);
 
   if (!error && ServerCertificatesArray)
+  {
     error = SSLSetCertificate(conn, ServerCertificatesArray);
 
- /*
-  * Perform SSL/TLS handshake
-  */
-
-  do
-  {
-    error = SSLHandshake(conn);
+   /*
+    * Perform SSL/TLS handshake
+    */
+  
+    if (!error)
+    {
+      do
+      {
+	error = SSLHandshake(conn);
+      }
+      while (error == errSSLWouldBlock);
+    }
   }
-  while (error == errSSLWouldBlock);
 
   if (error)
   {
@@ -3480,5 +3485,5 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 4912 2006-01-10 21:43:56Z mike $".
+ * End of "$Id: client.c 4950 2006-01-19 16:07:57Z mike $".
  */

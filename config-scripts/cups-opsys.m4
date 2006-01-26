@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4 4833 2005-11-12 21:46:52Z mike $"
+dnl "$Id: cups-opsys.m4 4960 2006-01-20 16:41:20Z mike $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -24,7 +24,8 @@ dnl
 
 dnl Get the operating system and version number...
 uname=`uname`
-uversion=`uname -r | sed -e '1,$s/[[^0-9]]//g'`
+uversion=`uname -r | sed -e '1,$s/^[[^0-9]]*\([[0-9]]*\)\.\([[0-9]]*\).*/\1\2/'`
+
 case "$uname" in
 	GNU* | GNU/*)
 		uname="GNU"
@@ -95,5 +96,5 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 
 dnl
-dnl "$Id: cups-opsys.m4 4833 2005-11-12 21:46:52Z mike $"
+dnl "$Id: cups-opsys.m4 4960 2006-01-20 16:41:20Z mike $"
 dnl

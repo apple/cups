@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4834 2005-11-12 21:55:57Z mike $"
+# "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $"
 #
 #   Notifier makefile for the Common UNIX Printing System (CUPS).
 #
@@ -48,7 +48,7 @@ clean:
 # Install all targets...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(SERVERBIN)/notifier
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
@@ -87,5 +87,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 4834 2005-11-12 21:55:57Z mike $".
+# End of "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $".
 #

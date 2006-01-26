@@ -1,9 +1,9 @@
 /*
- * "$Id: banners.h 4719 2005-09-28 21:12:44Z mike $"
+ * "$Id: banners.h 4968 2006-01-24 03:56:31Z mike $"
  *
  *   Banner definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -37,9 +37,7 @@ typedef struct
  * Globals...
  */
 
-VAR int			NumBanners	VALUE(0);
-					/* Number of banner files available */
-VAR cupsd_banner_t	*Banners	VALUE(NULL);
+VAR cups_array_t	*Banners	VALUE(NULL);
 					/* Available banner files */
 
 
@@ -49,9 +47,10 @@ VAR cupsd_banner_t	*Banners	VALUE(NULL);
 
 extern void		cupsdAddBanner(const char *name, const char *filename);
 extern cupsd_banner_t	*cupsdFindBanner(const char *name);
+extern void		cupsdFreeBanners(void);
 extern void		cupsdLoadBanners(const char *d);
 
 
 /*
- * End of "$Id: banners.h 4719 2005-09-28 21:12:44Z mike $".
+ * End of "$Id: banners.h 4968 2006-01-24 03:56:31Z mike $".
  */

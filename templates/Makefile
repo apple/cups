@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4881 2005-12-15 22:03:40Z mike $"
+# "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,9 +28,9 @@ include ../Makedefs
 # Template files...
 #
 
-FILES	=	add-class.tmpl \
+FILES	=	\
+		add-class.tmpl \
 		add-printer.tmpl \
-		admin-op.tmpl \
 		admin.tmpl \
 		choose-device.tmpl \
 		choose-make.tmpl \
@@ -40,18 +40,23 @@ FILES	=	add-class.tmpl \
 		class-added.tmpl \
 		class-confirm.tmpl \
 		class-deleted.tmpl \
-		classes.tmpl \
+		class-jobs-header.tmpl \
 		class-modified.tmpl \
+		classes.tmpl \
+		classes-header.tmpl \
 		edit-config.tmpl \
 		error.tmpl \
+		error-op.tmpl \
 		header.tmpl \
 		help-header.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
-		job-op.tmpl \
+		job-move.tmpl \
+		job-moved.tmpl \
 		job-release.tmpl \
 		job-restart.tmpl \
 		jobs.tmpl \
+		jobs-header.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
 		option-boolean.tmpl \
@@ -60,19 +65,23 @@ FILES	=	add-class.tmpl \
 		option-pickmany.tmpl \
 		option-pickone.tmpl \
 		option-trailer.tmpl \
+		pager.tmpl \
 		printer-accept.tmpl \
 		printer-added.tmpl \
 		printer-configured.tmpl \
 		printer-confirm.tmpl \
 		printer-default.tmpl \
 		printer-deleted.tmpl \
+		printer-jobs-header.tmpl \
 		printer-modified.tmpl \
 		printer-purge.tmpl \
 		printer-reject.tmpl \
 		printer-start.tmpl \
-		printers.tmpl \
 		printer-stop.tmpl \
+		printers.tmpl \
+		printers-header.tmpl \
 		restart.tmpl \
+		search.tmpl \
 		set-printer-options-header.tmpl \
 		set-printer-options-trailer.tmpl \
 		test-page.tmpl \
@@ -98,7 +107,7 @@ clean:
 # Install files...
 #
 
-install:
+install: all
 	$(INSTALL_DIR) $(DATADIR)/templates
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/templates; \
@@ -106,5 +115,5 @@ install:
 
 
 #
-# End of "$Id: Makefile 4881 2005-12-15 22:03:40Z mike $".
+# End of "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $".
 #

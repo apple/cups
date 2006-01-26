@@ -1,6 +1,7 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{OP}">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+{IS_CLASS?<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="{IS_CLASS}">:}
 
 <H2 CLASS="title">Allowed Users For {printer_name}</H2>
 
@@ -17,7 +18,7 @@
 <TR>
 <TD></TD>
 <TD>
-<INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="Continue">
+<INPUT TYPE="IMAGE" SRC="/images/set-allowed-users.gif" ALT="Set Allowed Users">
 </TD>
 </TR>
 </TABLE>

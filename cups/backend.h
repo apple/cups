@@ -1,5 +1,5 @@
 /*
- * "$Id: backend.h 4703 2005-09-26 19:33:58Z mike $"
+ * "$Id: backend.h 4973 2006-01-25 02:36:02Z mike $"
  *
  *   Backend definitions for the Common UNIX Printing System (CUPS).
  *
@@ -36,15 +36,15 @@ typedef enum cups_backend_e		/**** Backend exit codes ****/
 {
   CUPS_BACKEND_OK = 0,			/* Job completed successfully */
   CUPS_BACKEND_FAILED = 1,		/* Job failed, use error-policy */
-  CUPS_BACKEND_CANCEL = 2,		/* Job failed, cancel job */
+  CUPS_BACKEND_AUTH_REQUIRED = 2,	/* Job failed, authentication required */
   CUPS_BACKEND_HOLD = 3,		/* Job failed, hold job */
   CUPS_BACKEND_STOP = 4,		/* Job failed, stop queue */
-  CUPS_BACKEND_AUTH_REQUIRED = 5	/* Job failed, authentication required */
+  CUPS_BACKEND_CANCEL = 5		/* Job failed, cancel job */
 } cups_backend_t;
 
 
 #endif /* !_CUPS_BACKEND_H_ */
 
 /*
- * End of "$Id: backend.h 4703 2005-09-26 19:33:58Z mike $".
+ * End of "$Id: backend.h 4973 2006-01-25 02:36:02Z mike $".
  */

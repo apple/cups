@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 4921 2006-01-12 21:26:26Z mike $"
+ * "$Id: printers.c 4931 2006-01-14 20:37:40Z mike $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -23,7 +23,9 @@
  *
  * Contents:
  *
- *   main() - Main entry for CGI.
+ *   main()              - Main entry for CGI.
+ *   show_all_printers() - Show all printers...
+ *   show_printer()      - Show a single printer.
  */
 
 /*
@@ -34,6 +36,14 @@
 
 
 /*
+ * Local functions...
+ */
+
+void	show_all_printers(http_t *http, const char *username);
+void	show_printer(http_t *http, const char *printer);
+
+
+/*
  * 'main()' - Main entry for CGI.
  */
 
@@ -41,17 +51,13 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  cups_lang_t	*language;		/* Language information */
-  char		*printer;		/* Printer name */
+  const char	*printer;		/* Printer name */
+  const char	*user;			/* Username */
   http_t	*http;			/* Connection to the server */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* IPP attribute */
-  ipp_status_t	status;			/* Operation status... */
-  char		uri[HTTP_MAX_URI];	/* Printer URI */
-  const char	*which_jobs;		/* Which jobs to show */
   const char	*op;			/* Operation to perform, if any */
-  char		refresh[1024];		/* Refresh URL */
   static const char *def_attrs[] =	/* Attributes for default printer */
 		{
 		  "printer-name",
@@ -64,13 +70,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   cgiInitialize();
+
   op = cgiGetVariable("OP");
-
- /*
-  * Get the request language...
-  */
-
-  language = cupsLangDefault();
 
  /*
   * Set the web interface section...
@@ -79,48 +80,38 @@ main(int  argc,				/* I - Number of command-line arguments */
   cgiSetVariable("SECTION", "printers");
 
  /*
+  * See if we are displaying a printer or all printers...
+  */
+
+  if (!strcmp(argv[0], "/") || strstr(argv[0], "printers.cgi"))
+    printer = NULL;
+  else
+    printer = argv[0];
+
+ /*
+  * See who is logged in...
+  */
+
+  if ((user = getenv("REMOTE_USER")) == NULL)
+    user = "guest";
+
+ /*
   * Connect to the HTTP server...
   */
 
   http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
  /*
-  * Tell the client to expect UTF-8 encoded HTML...
+  * Get the default printer...
   */
 
-  puts("Content-Type: text/html;charset=utf-8\n");
-
- /*
-  * See if we need to show a list of printers or the status of a
-  * single printer...
-  */
-
-  cgiSetServerVersion();
-
-  printer = argv[0];
-  if (strcmp(printer, "/") == 0 || strstr(printer, "printers.cgi") != NULL)
-  {
-    printer = NULL;
-    cgiSetVariable("TITLE", _cupsLangString(language, _("Printer")));
-  }
-  else
-    cgiSetVariable("TITLE", printer);
-
-  if (op == NULL || strcasecmp(op, "print-test-page") != 0)
+  if (!op)
   {
    /*
     * Get the default destination...
     */
 
-    request = ippNew();
-    request->request.op.operation_id = CUPS_GET_DEFAULT;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
+    request = ippNewRequest(CUPS_GET_DEFAULT);
 
     ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                   "requested-attributes",
@@ -145,281 +136,39 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
    /*
-    * Get the printer info...
+    * See if we need to show a list of printers or the status of a
+    * single printer...
     */
 
-    request = ippNew();
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
-
-    if (printer == NULL)
-    {
-     /*
-      * Build a CUPS_GET_PRINTERS request, which requires the following
-      * attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      */
-
-      request->request.op.operation_id = CUPS_GET_PRINTERS;
-      request->request.op.request_id   = 1;
-
-      ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                    "printer-type", 0);
-      ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                    "printer-type-mask", CUPS_PRINTER_CLASS);
-
-      if (getenv("REMOTE_USER") != NULL)
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                     NULL, getenv("REMOTE_USER"));
-    }
+    if (!printer)
+      show_all_printers(http, user);
     else
-    {
-     /*
-      * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
-      * attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      *    printer-uri
-      */
-
-      request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-      request->request.op.request_id   = 1;
-
-      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/printers/%s", printer);
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
-                   uri);
-    }
-
-    cgiGetAttributes(request, "printers.tmpl");
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(http, request, "/")) != NULL)
-    {
-     /*
-      * Got the result; set the CGI variables and check the status of a
-      * single-queue request...
-      */
-
-      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-
-      if (printer && (attr = ippFindAttribute(response, "printer-state",
-                                              IPP_TAG_ENUM)) != NULL &&
-          attr->values[0].integer == IPP_PRINTER_PROCESSING)
-      {
-       /*
-        * Printer is processing - automatically refresh the page until we
-	* are done printing...
-	*/
-
-	cgiFormEncode(uri, printer, sizeof(uri));
-	snprintf(refresh, sizeof(refresh), "10;/printers/%s", uri);
-	cgiSetVariable("refresh_page", refresh);
-      }
-
-     /*
-      * Delete the response...
-      */
-
-      ippDelete(response);
-    }
-    else if (printer)
-      fprintf(stderr, "ERROR: Get-Printer-Attributes request failed - %s (%x)\n",
-              ippErrorString(cupsLastError()), cupsLastError());
-    else
-      fprintf(stderr, "ERROR: CUPS-Get-Printers request failed - %s (%x)\n",
-              ippErrorString(cupsLastError()), cupsLastError());
-
-   /*
-    * Show the standard header...
-    */
-
-    cgiCopyTemplateLang("header.tmpl");
-
-   /*
-    * Write the report...
-    */
-
-    cgiCopyTemplateLang("printers.tmpl");
-
-   /*
-    * Get jobs for the specified printer if a printer has been chosen...
-    */
-
-    if (printer != NULL)
-    {
-     /*
-      * Build an IPP_GET_JOBS request, which requires the following
-      * attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      *    printer-uri
-      */
-
-      request = ippNew();
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	   "attributes-natural-language", NULL, language->language);
-
-      request->request.op.operation_id = IPP_GET_JOBS;
-      request->request.op.request_id   = 1;
-
-      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/printers/%s", printer);
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
-                   uri);
-
-      if ((which_jobs = cgiGetVariable("which_jobs")) != NULL)
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
-                     NULL, which_jobs);
-
-      if (getenv("REMOTE_USER") != NULL)
-      {
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                     NULL, getenv("REMOTE_USER"));
-
-	if (strcmp(getenv("REMOTE_USER"), "root"))
-	  ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
-      }
-      else
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                     NULL, "unknown");
-
-      cgiGetAttributes(request, "jobs.tmpl");
-
-     /*
-      * Do the request and get back a response...
-      */
-
-      if ((response = cupsDoRequest(http, request, "/")) != NULL)
-      {
-	cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-	ippDelete(response);
-
-	cgiCopyTemplateLang("jobs.tmpl");
-      }
-      else
-	fprintf(stderr, "ERROR: Get-Jobs request failed - %s (%x)\n",
-        	ippErrorString(cupsLastError()), cupsLastError());
-    }
+      show_printer(http, printer);
   }
+  else if (!strcasecmp(op, "print-test-page") && printer)
+    cgiPrintTestPage(http, printer);
+  else if (!strcasecmp(op, "move-jobs") && printer)
+    cgiMoveJobs(http, printer, 0);
   else
   {
    /*
-    * Print a test page...
+    * Unknown/bad operation...
     */
 
-    char	filename[1024];		/* Test page filename */
-    const char	*datadir;		/* CUPS_DATADIR env var */
-
-
-    cgiFormEncode(uri, printer, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "2;/printers/%s", uri);
-    cgiSetVariable("refresh_page", refresh);
-
-    if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-      datadir = CUPS_DATADIR;
-
-    snprintf(filename, sizeof(filename), "%s/data/testprint.ps", datadir);
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/printers/%s", printer);
-
-   /*
-    * Build an IPP_PRINT_JOB request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    *    requesting-user-name
-    *    document-format
-    */
-
-    request = ippNew();
-
-    request->request.op.operation_id = IPP_PRINT_JOB;
-    request->request.op.request_id   = 1;
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	 "attributes-charset", NULL, cupsLangEncoding(language));
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	 "attributes-natural-language", NULL, language->language);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-        	 NULL, uri);
-
-    if (getenv("REMOTE_USER") != NULL)
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                   NULL, getenv("REMOTE_USER"));
+    if (printer)
+      cgiStartHTML(printer);
     else
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-                   NULL, "root");
+      cgiStartHTML(cgiText(_("Printers")));
 
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
-        	 NULL, "Test Page");
-
-    ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
-        	 NULL, "application/postscript");
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoFileRequest(http, request, uri + 15,
-                                      filename)) != NULL)
-    {
-      status = response->request.status.status_code;
-      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-
-      ippDelete(response);
-    }
-    else
-      status = cupsLastError();
-
-    cgiSetVariable("PRINTER_NAME", printer);
-
-   /*
-    * Show the standard header...
-    */
-
-    cgiCopyTemplateLang("header.tmpl");
-
-   /*
-    * Show the result...
-    */
-
-    if (status > IPP_OK_CONFLICT)
-    {
-      cgiSetVariable("ERROR", ippErrorString(status));
-      cgiCopyTemplateLang("error.tmpl");
-    }
-    else
-      cgiCopyTemplateLang("test-page.tmpl");
+    cgiCopyTemplateLang("error-op.tmpl");
+    cgiEndHTML();
   }
-
-  cgiCopyTemplateLang("trailer.tmpl");
 
  /*
   * Close the HTTP server connection...
   */
 
   httpClose(http);
-  cupsLangFree(language);
 
  /*
   * Return with no errors...
@@ -430,5 +179,292 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: printers.c 4921 2006-01-12 21:26:26Z mike $".
+ * 'show_all_printers()' - Show all printers...
+ */
+
+void
+show_all_printers(http_t     *http,	/* I - Connection to server */
+                  const char *user)	/* I - Username */
+{
+  int			i;		/* Looping var */
+  ipp_t			*request,	/* IPP request */
+			*response;	/* IPP response */
+  cups_array_t		*printers;	/* Array of printer objects */
+  ipp_attribute_t	*printer;	/* Printer object */
+  int			ascending,	/* Order of printers (0 = descending) */
+			first,		/* First printer to show */
+			count;		/* Number of printers */
+  const char		*var;		/* Form variable */
+  void			*search;	/* Search data */
+  char			url[1024],	/* URL for prev/next/this */
+			*urlptr,	/* Position in URL */
+			*urlend;	/* End of URL */
+
+
+ /*
+  * Show the standard header...
+  */
+
+  cgiStartHTML(cgiText(_("Printers")));
+
+ /*
+  * Build a CUPS_GET_PRINTERS request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-type
+  *    printer-type-mask
+  *    requesting-user-name
+  */
+
+  request = ippNewRequest(CUPS_GET_PRINTERS);
+
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                "printer-type", 0);
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
+                "printer-type-mask", CUPS_PRINTER_CLASS);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+               "requesting-user-name", NULL, user);
+
+  cgiGetAttributes(request, "printers.tmpl");
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+   /*
+    * Get a list of matching job objects.
+    */
+
+    if ((var = cgiGetVariable("QUERY")) != NULL)
+      search = cgiCompileSearch(var);
+    else
+      search = NULL;
+
+    printers  = cgiGetIPPObjects(response, search);
+    count     = cupsArrayCount(printers);
+
+    if (search)
+      cgiFreeSearch(search);
+
+   /*
+    * Figure out which printers to display...
+    */
+
+    if ((var = cgiGetVariable("FIRST")) != NULL)
+      first = atoi(var);
+    else
+      first = 0;
+
+    if (first >= count)
+      first = count - CUPS_PAGE_MAX;
+
+    first = (first / CUPS_PAGE_MAX) * CUPS_PAGE_MAX;
+
+    if (first < 0)
+      first = 0;
+
+    sprintf(url, "%d", count);
+    cgiSetVariable("TOTAL", url);
+
+    if ((var = cgiGetVariable("ORDER")) != NULL)
+      ascending = !strcasecmp(var, "asc");
+    else
+      ascending = 1;
+
+    if (ascending)
+    {
+      for (i = 0, printer = (ipp_attribute_t *)cupsArrayIndex(printers, first);
+	   i < CUPS_PAGE_MAX && printer;
+	   i ++, printer = (ipp_attribute_t *)cupsArrayNext(printers))
+        cgiSetIPPObjectVars(printer, NULL, i);
+    }
+    else
+    {
+      for (i = 0, printer = (ipp_attribute_t *)cupsArrayIndex(printers, count - first - 1);
+	   i < CUPS_PAGE_MAX && printer;
+	   i ++, printer = (ipp_attribute_t *)cupsArrayPrev(printers))
+        cgiSetIPPObjectVars(printer, NULL, i);
+    }
+
+   /*
+    * Save navigation URLs...
+    */
+
+    urlend = url + sizeof(url);
+
+    if ((var = cgiGetVariable("QUERY")) != NULL)
+    {
+      strlcpy(url, "/printers/?QUERY=", sizeof(url));
+      urlptr = url + strlen(url);
+
+      cgiFormEncode(urlptr, var, urlend - urlptr);
+      urlptr += strlen(urlptr);
+
+      strlcpy(urlptr, "&", urlend - urlptr);
+      urlptr += strlen(urlptr);
+    }
+    else
+    {
+      strlcpy(url, "/printers/?", sizeof(url));
+      urlptr = url + strlen(url);
+    }
+
+    snprintf(urlptr, urlend - urlptr, "FIRST=%d", first);
+    cgiSetVariable("THISURL", url);
+
+    if (first > 0)
+    {
+      snprintf(urlptr, urlend - urlptr, "FIRST=%d&ORDER=%s",
+	       first - CUPS_PAGE_MAX, ascending ? "asc" : "dec");
+      cgiSetVariable("PREVURL", url);
+    }
+
+    if ((first + CUPS_PAGE_MAX) < count)
+    {
+      snprintf(urlptr, urlend - urlptr, "FIRST=%d&ORDER=%s",
+	       first + CUPS_PAGE_MAX, ascending ? "asc" : "dec");
+      cgiSetVariable("NEXTURL", url);
+    }
+
+   /*
+    * Then show everything...
+    */
+
+    cgiCopyTemplateLang("search.tmpl");
+
+    cgiCopyTemplateLang("printers-header.tmpl");
+
+    if (count > 0)
+      cgiCopyTemplateLang("pager.tmpl");
+
+    cgiCopyTemplateLang("printers.tmpl");
+
+    if (count > 0)
+      cgiCopyTemplateLang("pager.tmpl");
+
+   /*
+    * Delete the response...
+    */
+
+    ippDelete(response);
+  }
+  else
+  {
+   /*
+    * Show the error...
+    */
+
+    cgiShowIPPError(_("Unable to get printer list:"));
+  }
+
+   cgiEndHTML();
+}
+
+
+/*
+ * 'show_printer()' - Show a single printer.
+ */
+
+void
+show_printer(http_t     *http,		/* I - Connection to server */
+             const char *printer)	/* I - Name of printer */
+{
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* IPP attribute */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  char		refresh[1024];		/* Refresh URL */
+
+
+ /*
+  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  */
+
+  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+
+  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
+                   "/printers/%s", printer);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
+               uri);
+
+  cgiGetAttributes(request, "printers.tmpl");
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+   /*
+    * Got the result; set the CGI variables and check the status of a
+    * single-queue request...
+    */
+
+    cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+
+    if (printer && (attr = ippFindAttribute(response, "printer-state",
+                                            IPP_TAG_ENUM)) != NULL &&
+        attr->values[0].integer == IPP_PRINTER_PROCESSING)
+    {
+     /*
+      * Printer is processing - automatically refresh the page until we
+      * are done printing...
+      */
+
+      cgiFormEncode(uri, printer, sizeof(uri));
+      snprintf(refresh, sizeof(refresh), "10;/printers/%s", uri);
+      cgiSetVariable("refresh_page", refresh);
+    }
+
+   /*
+    * Delete the response...
+    */
+
+    ippDelete(response);
+
+   /*
+    * Show the standard header...
+    */
+
+    cgiStartHTML(printer);
+
+   /*
+    * Show the printer status...
+    */
+
+    cgiCopyTemplateLang("printers.tmpl");
+
+   /*
+    * Show jobs for the specified printer...
+    */
+
+    cgiCopyTemplateLang("printer-jobs-header.tmpl");
+    cgiShowJobs(http, printer);
+  }
+  else
+  {
+   /*
+    * Show the IPP error...
+    */
+
+    cgiStartHTML(printer);
+    cgiShowIPPError(_("Unable to get printer status:"));
+  }
+
+   cgiEndHTML();
+}
+
+
+/*
+ * End of "$Id: printers.c 4931 2006-01-14 20:37:40Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c 4906 2006-01-10 20:53:28Z mike $"
+ * "$Id: cupstestppd.c 4990 2006-01-26 02:21:45Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -47,17 +47,34 @@
  * Error codes...
  */
 
-#define ERROR_NONE		0
-#define ERROR_USAGE		1
-#define ERROR_FILE_OPEN		2
-#define ERROR_PPD_FORMAT	3
-#define ERROR_CONFORMANCE	4
+enum
+{
+  ERROR_NONE = 0,
+  ERROR_USAGE,
+  ERROR_FILE_OPEN,
+  ERROR_PPD_FORMAT,
+  ERROR_CONFORMANCE
+};
+
+
+/*
+ * Line endings...
+ */
+
+enum
+{
+  EOL_NONE = 0,
+  EOL_CR,
+  EOL_LF,
+  EOL_CRLF
+};
 
 
 /*
  * Local functions...
  */
 
+void	check_basics(const char *filename);
 void	show_conflicts(ppd_file_t *ppd);
 void	usage(void);
 
@@ -116,7 +133,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  case 'q' :			/* Quiet mode */
 	      if (verbose > 0)
 	      {
-        	_cupsLangPuts(stderr, NULL,
+        	_cupsLangPuts(stderr,
 		              _("cupstestppd: The -q option is incompatible "
 			        "with the -v option.\n"));
 		return (1);
@@ -132,7 +149,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  case 'v' :			/* Verbose mode */
 	      if (verbose < 0)
 	      {
-        	_cupsLangPuts(stderr, NULL,
+        	_cupsLangPuts(stderr,
 		              _("cupstestppd: The -v option is incompatible "
 			        "with the -q option.\n"));
 		return (1);
@@ -153,7 +170,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       */
 
       if (files && verbose >= 0)
-        _cupsLangPuts(stdout, NULL, "\n");
+        _cupsLangPuts(stdout, "\n");
 
       files ++;
 
@@ -189,7 +206,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  status = ERROR_FILE_OPEN;
 
 	  if (verbose >= 0)
-            _cupsLangPrintf(stdout, NULL,
+            _cupsLangPrintf(stdout,
 	                    _(" FAIL\n"
 			      "      **FAIL**  Unable to open PPD file - %s\n"),
 			    strerror(errno));
@@ -200,7 +217,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
           if (verbose >= 0)
 	  {
-            _cupsLangPrintf(stdout, NULL,
+            _cupsLangPrintf(stdout,
 	                    _(" FAIL\n"
 			      "      **FAIL**  Unable to open PPD file - "
 			      "%s on line %d.\n"),
@@ -209,58 +226,60 @@ main(int  argc,			/* I - Number of command-line arguments */
             switch (error)
 	    {
 	      case PPD_MISSING_PPDADOBE4 :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Page 42, section 5.2.\n"));
 	          break;
 	      case PPD_MISSING_VALUE :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Page 20, section 3.4.\n"));
 	          break;
 	      case PPD_BAD_OPEN_GROUP :
 	      case PPD_NESTED_OPEN_GROUP :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Pages 45-46, section 5.2.\n"));
 	          break;
 	      case PPD_BAD_OPEN_UI :
 	      case PPD_NESTED_OPEN_UI :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Pages 42-45, section 5.2.\n"));
 	          break;
 	      case PPD_BAD_ORDER_DEPENDENCY :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Pages 48-49, section 5.2.\n"));
 	          break;
 	      case PPD_BAD_UI_CONSTRAINTS :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Pages 52-54, section 5.2.\n"));
 	          break;
 	      case PPD_MISSING_ASTERISK :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Page 15, section 3.2.\n"));
 	          break;
 	      case PPD_LINE_TOO_LONG :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Page 15, section 3.1.\n"));
 	          break;
 	      case PPD_ILLEGAL_CHARACTER :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Page 15, section 3.1.\n"));
 	          break;
 	      case PPD_ILLEGAL_MAIN_KEYWORD :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Pages 16-17, section 3.2.\n"));
 	          break;
 	      case PPD_ILLEGAL_OPTION_KEYWORD :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Page 19, section 3.3.\n"));
 	          break;
 	      case PPD_ILLEGAL_TRANSLATION :
-	          _cupsLangPuts(stdout, NULL,
+	          _cupsLangPuts(stdout,
 		                _("                REF: Page 27, section 3.5.\n"));
 	          break;
               default :
 	          break;
 	    }
+
+	    check_basics(argv[i]);
 	  }
         }
 
@@ -276,7 +295,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       ppdversion = 43;
 
       if (verbose > 0)
-        _cupsLangPuts(stdout, NULL,
+        _cupsLangPuts(stdout,
 	              _("\n    DETAILED CONFORMANCE TEST RESULTS\n"));
 
       if ((attr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL &&
@@ -303,7 +322,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      
 	  if (!strncmp(attr->name, "Default", 7) &&
 	      !ppdFindOption(ppd, attr->name + 7))
-            _cupsLangPrintf(stdout, NULL,
+            _cupsLangPrintf(stdout,
 	                    _("        WARN    %s has no corresponding "
 			      "options!\n"),
 	                    attr->name);
@@ -315,9 +334,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED DefaultImageableArea\n"
 			  "                REF: Page 102, section 5.15.\n"));
         }
@@ -330,9 +349,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPrintf(stdout, NULL,
+	  _cupsLangPrintf(stdout,
 	                  _("      **FAIL**  BAD DefaultImageableArea %s!\n"
 			    "                REF: Page 102, section 5.15.\n"),
 			  attr->value);
@@ -343,7 +362,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
       {
 	if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    DefaultImageableArea\n"));
+	  _cupsLangPuts(stdout, _("        PASS    DefaultImageableArea\n"));
       }
 
       if ((attr = ppdFindAttr(ppd, "DefaultPaperDimension", NULL)) == NULL)
@@ -351,9 +370,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED DefaultPaperDimension\n"
 			  "                REF: Page 103, section 5.15.\n"));
         }
@@ -366,9 +385,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPrintf(stdout, NULL,
+	  _cupsLangPrintf(stdout,
 	                  _("      **FAIL**  BAD DefaultPaperDimension %s!\n"
 			    "                REF: Page 103, section 5.15.\n"),
 			  attr->value);
@@ -377,7 +396,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	errors ++;
       }
       else if (verbose > 0)
-	_cupsLangPuts(stdout, NULL, _("        PASS    DefaultPaperDimension\n"));
+	_cupsLangPuts(stdout, _("        PASS    DefaultPaperDimension\n"));
 
       for (j = 0, group = ppd->groups; j < ppd->num_groups; j ++, group ++)
 	for (k = 0, option = group->options; k < group->num_options; k ++, option ++)
@@ -394,9 +413,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      if (verbose >= 0)
 	      {
 		if (!errors && !verbose)
-		  _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+		  _cupsLangPuts(stdout, _(" FAIL\n"));
 
-		_cupsLangPrintf(stdout, NULL,
+		_cupsLangPrintf(stdout,
 		                _("      **FAIL**  BAD Default%s %s\n"
 				  "                REF: Page 40, section 4.5.\n"),
 				option->keyword, option->defchoice);
@@ -405,7 +424,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      errors ++;
 	    }
 	    else if (verbose > 0)
-	      _cupsLangPrintf(stdout, NULL,
+	      _cupsLangPrintf(stdout,
 	                      _("        PASS    Default%s\n"),
 			      option->keyword);
 	  }
@@ -414,9 +433,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (verbose >= 0)
 	    {
 	      if (!errors && !verbose)
-		_cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+		_cupsLangPuts(stdout, _(" FAIL\n"));
 
-	      _cupsLangPrintf(stdout, NULL,
+	      _cupsLangPrintf(stdout,
 	                      _("      **FAIL**  REQUIRED Default%s\n"
 			        "                REF: Page 40, section 4.5.\n"),
 		              option->keyword);
@@ -429,16 +448,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (ppdFindAttr(ppd, "FileVersion", NULL) != NULL)
       {
 	if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    FileVersion\n"));
+	  _cupsLangPuts(stdout, _("        PASS    FileVersion\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED FileVersion\n"
 			  "                REF: Page 56, section 5.3.\n"));
         }
@@ -449,16 +468,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (ppdFindAttr(ppd, "FormatVersion", NULL) != NULL)
       {
 	if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    FormatVersion\n"));
+	  _cupsLangPuts(stdout, _("        PASS    FormatVersion\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED FormatVersion\n"
 			  "                REF: Page 56, section 5.3.\n"));
         }
@@ -469,16 +488,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (ppd->lang_encoding != NULL)
       {
 	if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    LanguageEncoding\n"));
+	  _cupsLangPuts(stdout, _("        PASS    LanguageEncoding\n"));
       }
       else if (ppdversion > 40)
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED LanguageEncoding\n"
 			  "                REF: Pages 56-57, section 5.3.\n"));
         }
@@ -489,16 +508,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (ppd->lang_version != NULL)
       {
 	if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    LanguageVersion\n"));
+	  _cupsLangPuts(stdout, _("        PASS    LanguageVersion\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED LanguageVersion\n"
 			  "                REF: Pages 57-58, section 5.3.\n"));
         }
@@ -514,9 +533,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  if (verbose >= 0)
 	  {
 	    if (!errors && !verbose)
-	      _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	    _cupsLangPuts(stdout, NULL,
+	    _cupsLangPuts(stdout,
 	                  _("      **FAIL**  BAD Manufacturer (should be "
 			    "\"HP\")\n"
 			    "                REF: Page 211, table D.1.\n"));
@@ -525,16 +544,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  errors ++;
 	}
 	else if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    Manufacturer\n"));
+	  _cupsLangPuts(stdout, _("        PASS    Manufacturer\n"));
       }
       else if (ppdversion >= 43)
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED Manufacturer\n"
 			  "                REF: Pages 58-59, section 5.3.\n"));
         }
@@ -553,9 +572,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  if (verbose >= 0)
 	  {
 	    if (!errors && !verbose)
-	      _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	    _cupsLangPrintf(stdout, NULL,
+	    _cupsLangPrintf(stdout,
 	                    _("      **FAIL**  BAD ModelName - \"%c\" not "
 			      "allowed in string.\n"
 			      "                REF: Pages 59-60, section 5.3.\n"),
@@ -565,16 +584,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  errors ++;
 	}
 	else if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    ModelName\n"));
+	  _cupsLangPuts(stdout, _("        PASS    ModelName\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED ModelName\n"
 			  "                REF: Pages 59-60, section 5.3.\n"));
         }
@@ -585,16 +604,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (ppd->nickname != NULL)
       {
 	if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    NickName\n"));
+	  _cupsLangPuts(stdout, _("        PASS    NickName\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED NickName\n"
 	                  "                REF: Page 60, section 5.3.\n"));
         }
@@ -605,16 +624,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (ppdFindOption(ppd, "PageSize") != NULL)
       {
 	if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    PageSize\n"));
+	  _cupsLangPuts(stdout, _("        PASS    PageSize\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED PageSize\n"
 			  "                REF: Pages 99-100, section 5.14.\n"));
         }
@@ -625,16 +644,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (ppdFindOption(ppd, "PageRegion") != NULL)
       {
 	if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    PageRegion\n"));
+	  _cupsLangPuts(stdout, _("        PASS    PageRegion\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED PageRegion\n"
 			  "                REF: Page 100, section 5.14.\n"));
         }
@@ -645,16 +664,16 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (ppd->pcfilename != NULL)
       {
 	if (verbose > 0)
-          _cupsLangPuts(stdout, NULL, _("        PASS    PCFileName\n"));
+          _cupsLangPuts(stdout, _("        PASS    PCFileName\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED PCFileName\n"
 			  "                REF: Pages 61-62, section 5.3.\n"));
         }
@@ -670,9 +689,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  if (verbose >= 0)
 	  {
 	    if (!errors && !verbose)
-	      _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	    _cupsLangPuts(stdout, NULL,
+	    _cupsLangPuts(stdout,
 	                  _("      **FAIL**  BAD Product - not \"(string)\".\n"
 			    "                REF: Page 62, section 5.3.\n"));
           }
@@ -680,16 +699,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  errors ++;
 	}
 	else if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    Product\n"));
+	  _cupsLangPuts(stdout, _("        PASS    Product\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED Product\n"
 			  "                REF: Page 62, section 5.3.\n"));
         }
@@ -709,9 +728,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  if (verbose >= 0)
 	  {
 	    if (!errors && !verbose)
-	      _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	    _cupsLangPuts(stdout, NULL,
+	    _cupsLangPuts(stdout,
 	                  _("      **FAIL**  BAD PSVersion - not \"(string) "
 			    "int\".\n"
 			    "                REF: Pages 62-64, section 5.3.\n"));
@@ -720,16 +739,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  errors ++;
 	}
 	else if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    PSVersion\n"));
+	  _cupsLangPuts(stdout, _("        PASS    PSVersion\n"));
       }
       else
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED PSVersion\n"
 			  "                REF: Pages 62-64, section 5.3.\n"));
         }
@@ -744,9 +763,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  if (verbose >= 0)
 	  {
 	    if (!errors && !verbose)
-	      _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	    _cupsLangPuts(stdout, NULL,
+	    _cupsLangPuts(stdout,
 	                  _("      **FAIL**  BAD ShortNickName - longer "
 			    "than 31 chars.\n"
 			    "                REF: Pages 64-65, section 5.3.\n"));
@@ -755,16 +774,16 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  errors ++;
 	}
 	else if (verbose > 0)
-	  _cupsLangPuts(stdout, NULL, _("        PASS    ShortNickName\n"));
+	  _cupsLangPuts(stdout, _("        PASS    ShortNickName\n"));
       }
       else if (ppdversion >= 43)
       {
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED ShortNickName\n"
 			  "                REF: Page 64-65, section 5.3.\n"));
         }
@@ -778,9 +797,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  BAD JobPatchFile attribute in file\n"
 	                  "                REF: Page 24, section 3.4.\n"));
         }
@@ -798,9 +817,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	if (verbose >= 0)
 	{
 	  if (!errors && !verbose)
-	    _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("      **FAIL**  REQUIRED PageSize\n"
 			  "                REF: Page 41, section 5.\n"
 			  "                REF: Page 99, section 5.14.\n"));
@@ -829,9 +848,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (verbose >= 0)
 	    {
 	      if (!errors && !verbose)
-		_cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+		_cupsLangPuts(stdout, _(" FAIL\n"));
 
-	      _cupsLangPrintf(stdout, NULL,
+	      _cupsLangPrintf(stdout,
 	                      _("      **FAIL**  REQUIRED ImageableArea for "
 			        "PageSize %s\n"
 				"                REF: Page 41, section 5.\n"
@@ -851,9 +870,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (verbose >= 0)
 	    {
 	      if (!errors && !verbose)
-		_cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+		_cupsLangPuts(stdout, _(" FAIL\n"));
 
-	      _cupsLangPrintf(stdout, NULL,
+	      _cupsLangPrintf(stdout,
 	                      _("      **FAIL**  REQUIRED PaperDimension "
 			        "for PageSize %s\n"
 				"                REF: Page 41, section 5.\n"
@@ -899,9 +918,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (verbose >= 0)
 	    {
 	      if (!errors && !verbose)
-		_cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+		_cupsLangPuts(stdout, _(" FAIL\n"));
 
-	      _cupsLangPrintf(stdout, NULL,
+	      _cupsLangPrintf(stdout,
 	                      _("      **FAIL**  Bad %s choice %s!\n"
 			        "                REF: Page 84, section 5.9\n"),
 	                      option->keyword, choice->choice);
@@ -928,9 +947,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  if (verbose >= 0)
 	  {
 	    if (!errors && !verbose)
-	      _cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	    _cupsLangPrintf(stdout, NULL,
+	    _cupsLangPrintf(stdout,
 	                    _("      **FAIL**  REQUIRED %s does not define "
 			      "choice None!\n"
 			      "                REF: Page 122, section 5.17\n"),
@@ -949,9 +968,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (verbose >= 0)
 	    {
 	      if (!errors && !verbose)
-		_cupsLangPuts(stdout, NULL, _(" FAIL\n"));
+		_cupsLangPuts(stdout, _(" FAIL\n"));
 
-	      _cupsLangPrintf(stdout, NULL,
+	      _cupsLangPrintf(stdout,
 	                      _("      **FAIL**  Bad %s choice %s!\n"
 			        "                REF: Page 122, section 5.17\n"),
 	        	      option->keyword, choice->choice);
@@ -964,15 +983,17 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (errors)
 	status = ERROR_CONFORMANCE;
       else if (!verbose)
-	_cupsLangPuts(stdout, NULL, _(" PASS\n"));
+	_cupsLangPuts(stdout, _(" PASS\n"));
 	 
       if (verbose >= 0)
       {
+        check_basics(argv[i]);
+
         if (option &&
 	    strcmp(option->keyword, "Duplex") &&
 	    strcmp(option->keyword, "JCLDuplex"))
 	{
-	  _cupsLangPrintf(stdout, NULL,
+	  _cupsLangPrintf(stdout,
 	                  _("        WARN    Duplex option keyword %s "
 			    "should be named Duplex or JCLDuplex!\n"
 			    "                REF: Page 122, section 5.17\n"),
@@ -982,7 +1003,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         ppdMarkDefaults(ppd);
 	if (ppdConflicts(ppd))
 	{
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("        WARN    Default choices conflicting!\n"));
 
           show_conflicts(ppd);
@@ -990,7 +1011,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         if (ppdversion < 43)
 	{
-          _cupsLangPrintf(stdout, NULL,
+          _cupsLangPrintf(stdout,
 	                  _("        WARN    Obsolete PPD version %.1f!\n"
 			    "                REF: Page 42, section 5.2.\n"),
 	        	  0.1f * ppdversion);
@@ -998,7 +1019,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         if (!ppd->lang_encoding && ppdversion < 41)
 	{
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("        WARN    LanguageEncoding required by PPD "
 			  "4.3 spec.\n"
 			  "                REF: Pages 56-57, section 5.3.\n"));
@@ -1006,7 +1027,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         if (!ppd->manufacturer && ppdversion < 43)
 	{
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("        WARN    Manufacturer required by PPD "
 			  "4.3 spec.\n"
 			  "                REF: Pages 58-59, section 5.3.\n"));
@@ -1019,7 +1040,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	if (ppd->pcfilename && strlen(ppd->pcfilename) > 12)
 	{
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("        WARN    PCFileName longer than 8.3 in "
 			  "violation of PPD spec.\n"
 			  "                REF: Pages 61-62, section 5.3.\n"));
@@ -1027,7 +1048,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         if (!ppd->shortnickname && ppdversion < 43)
 	{
-	  _cupsLangPuts(stdout, NULL,
+	  _cupsLangPuts(stdout,
 	                _("        WARN    ShortNickName required by PPD "
 			  "4.3 spec.\n"
 			  "                REF: Pages 64-65, section 5.3.\n"));
@@ -1044,7 +1065,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      strstr(ppd->protocols, "BCP") &&
 	      !strstr(ppd->protocols, "TBCP"))
 	  {
-	    _cupsLangPuts(stdout, NULL,
+	    _cupsLangPuts(stdout,
 	                  _("        WARN    Protocols contains both PJL "
 			    "and BCP; expected TBCP.\n"
 			    "                REF: Pages 78-79, section 5.7.\n"));
@@ -1053,7 +1074,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  if (strstr(ppd->protocols, "PJL") &&
 	      (!ppd->jcl_begin || !ppd->jcl_end || !ppd->jcl_ps))
 	  {
-	    _cupsLangPuts(stdout, NULL,
+	    _cupsLangPuts(stdout,
 	                  _("        WARN    Protocols contains PJL but JCL "
 			    "attributes are not set.\n"
 			    "                REF: Pages 78-79, section 5.7.\n"));
@@ -1081,7 +1102,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	            len < strlen(option2->keyword) &&
 	            !strncmp(option->keyword, option2->keyword, len))
 		{
-		  _cupsLangPrintf(stdout, NULL,
+		  _cupsLangPrintf(stdout,
 		                  _("        WARN    %s shares a common "
 				    "prefix with %s\n"
 				    "                REF: Page 15, section "
@@ -1094,12 +1115,11 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (verbose > 0)
       {
         if (errors)
-          _cupsLangPrintf(stdout, NULL, _("    %d ERROR%s FOUND\n"),
+          _cupsLangPrintf(stdout, _("    %d ERROR%s FOUND\n"),
 			  errors, errors == 1 ? "" : "S");
 	else
-	  _cupsLangPuts(stdout, NULL, _("    NO ERRORS FOUND\n"));
+	  _cupsLangPuts(stdout, _("    NO ERRORS FOUND\n"));
       }
-
 
      /*
       * Then list the options, if "-v" was provided...
@@ -1107,7 +1127,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       if (verbose > 1)
       {
-	_cupsLangPrintf(stdout, NULL,
+	_cupsLangPrintf(stdout,
                         "\n"
 		        "    language_level = %d\n"
 			"    color_device = %s\n"
@@ -1121,53 +1141,53 @@ main(int  argc,			/* I - Number of command-line arguments */
 	switch (ppd->colorspace)
 	{
 	  case PPD_CS_CMYK :
-              _cupsLangPuts(stdout, NULL, "    colorspace = PPD_CS_CMYK\n");
+              _cupsLangPuts(stdout, "    colorspace = PPD_CS_CMYK\n");
 	      break;
 	  case PPD_CS_CMY :
-              _cupsLangPuts(stdout, NULL, "    colorspace = PPD_CS_CMY\n");
+              _cupsLangPuts(stdout, "    colorspace = PPD_CS_CMY\n");
 	      break;
 	  case PPD_CS_GRAY :
-              _cupsLangPuts(stdout, NULL, "    colorspace = PPD_CS_GRAY\n");
+              _cupsLangPuts(stdout, "    colorspace = PPD_CS_GRAY\n");
 	      break;
 	  case PPD_CS_RGB :
-              _cupsLangPuts(stdout, NULL, "    colorspace = PPD_CS_RGB\n");
+              _cupsLangPuts(stdout, "    colorspace = PPD_CS_RGB\n");
 	      break;
 	  default :
-              _cupsLangPuts(stdout, NULL, "    colorspace = <unknown>\n");
+              _cupsLangPuts(stdout, "    colorspace = <unknown>\n");
 	      break;
 	}
 
-	_cupsLangPrintf(stdout, NULL, "    num_emulations = %d\n",
+	_cupsLangPrintf(stdout, "    num_emulations = %d\n",
 			ppd->num_emulations);
 	for (j = 0; j < ppd->num_emulations; j ++)
-	  _cupsLangPrintf(stdout, NULL, "        emulations[%d] = %s\n",
+	  _cupsLangPrintf(stdout, "        emulations[%d] = %s\n",
 	                  j, ppd->emulations[j].name);
 
-	_cupsLangPrintf(stdout, NULL, "    lang_encoding = %s\n",
+	_cupsLangPrintf(stdout, "    lang_encoding = %s\n",
 	                ppd->lang_encoding);
-	_cupsLangPrintf(stdout, NULL, "    lang_version = %s\n",
+	_cupsLangPrintf(stdout, "    lang_version = %s\n",
 	                ppd->lang_version);
-	_cupsLangPrintf(stdout, NULL, "    modelname = %s\n", ppd->modelname);
-	_cupsLangPrintf(stdout, NULL, "    ttrasterizer = %s\n",
+	_cupsLangPrintf(stdout, "    modelname = %s\n", ppd->modelname);
+	_cupsLangPrintf(stdout, "    ttrasterizer = %s\n",
         		ppd->ttrasterizer == NULL ? "None" : ppd->ttrasterizer);
-	_cupsLangPrintf(stdout, NULL, "    manufacturer = %s\n",
+	_cupsLangPrintf(stdout, "    manufacturer = %s\n",
 	                ppd->manufacturer);
-	_cupsLangPrintf(stdout, NULL, "    product = %s\n", ppd->product);
-	_cupsLangPrintf(stdout, NULL, "    nickname = %s\n", ppd->nickname);
-	_cupsLangPrintf(stdout, NULL, "    shortnickname = %s\n",
+	_cupsLangPrintf(stdout, "    product = %s\n", ppd->product);
+	_cupsLangPrintf(stdout, "    nickname = %s\n", ppd->nickname);
+	_cupsLangPrintf(stdout, "    shortnickname = %s\n",
 	                ppd->shortnickname);
-	_cupsLangPrintf(stdout, NULL, "    patches = %d bytes\n",
+	_cupsLangPrintf(stdout, "    patches = %d bytes\n",
         		ppd->patches == NULL ? 0 : (int)strlen(ppd->patches));
 
-	_cupsLangPrintf(stdout, NULL, "    num_groups = %d\n", ppd->num_groups);
+	_cupsLangPrintf(stdout, "    num_groups = %d\n", ppd->num_groups);
 	for (j = 0, group = ppd->groups; j < ppd->num_groups; j ++, group ++)
 	{
-	  _cupsLangPrintf(stdout, NULL, "        group[%d] = %s\n",
+	  _cupsLangPrintf(stdout, "        group[%d] = %s\n",
 	                  j, group->text);
 
 	  for (k = 0, option = group->options; k < group->num_options; k ++, option ++)
 	  {
-	    _cupsLangPrintf(stdout, NULL,
+	    _cupsLangPrintf(stdout,
 	                    "            options[%d] = %s (%s) %s %s %.0f "
 			    "(%d choices)\n",
 	        	    k, option->keyword, option->text, uis[option->ui],
@@ -1184,11 +1204,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 		size = ppdPageSize(ppd, choice->choice);
 
 		if (size == NULL)
-		  _cupsLangPrintf(stdout, NULL,
+		  _cupsLangPrintf(stdout,
                                   "                %s (%s) = ERROR",
 				  choice->choice, choice->text);
         	else
-		  _cupsLangPrintf(stdout, NULL,
+		  _cupsLangPrintf(stdout,
                                   "                %s (%s) = %.2fx%.2fin "
 				  "(%.1f,%.1f,%.1f,%.1f)",
 		        	  choice->choice, choice->text,
@@ -1197,9 +1217,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 				  size->right / 72.0, size->top / 72.0);
 
         	if (!strcmp(option->defchoice, choice->choice))
-		  _cupsLangPuts(stdout, NULL, " *\n");
+		  _cupsLangPuts(stdout, " *\n");
 		else
-		  _cupsLangPuts(stdout, NULL, "\n");
+		  _cupsLangPuts(stdout, "\n");
               }
 	    }
 	    else
@@ -1208,22 +1228,22 @@ main(int  argc,			/* I - Number of command-line arguments */
 		   m > 0;
 		   m --, choice ++)
 	      {
-		_cupsLangPrintf(stdout, NULL, "                %s (%s)",
+		_cupsLangPrintf(stdout, "                %s (%s)",
 		                choice->choice, choice->text);
 
         	if (!strcmp(option->defchoice, choice->choice))
-		  _cupsLangPuts(stdout, NULL, " *\n");
+		  _cupsLangPuts(stdout, " *\n");
 		else
-		  _cupsLangPuts(stdout, NULL, "\n");
+		  _cupsLangPuts(stdout, "\n");
 	      }
             }
 	  }
 	}
 
-	_cupsLangPrintf(stdout, NULL, "    num_profiles = %d\n",
+	_cupsLangPrintf(stdout, "    num_profiles = %d\n",
 	                ppd->num_profiles);
 	for (j = 0; j < ppd->num_profiles; j ++)
-	  _cupsLangPrintf(stdout, NULL,
+	  _cupsLangPrintf(stdout,
                 	  "        profiles[%d] = %s/%s %.3f %.3f "
 			  "[ %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f ]\n",
         		  j, ppd->profiles[j].resolution,
@@ -1239,14 +1259,14 @@ main(int  argc,			/* I - Number of command-line arguments */
 			  ppd->profiles[j].matrix[2][1],
 			  ppd->profiles[j].matrix[2][2]);
 
-	_cupsLangPrintf(stdout, NULL, "    num_fonts = %d\n", ppd->num_fonts);
+	_cupsLangPrintf(stdout, "    num_fonts = %d\n", ppd->num_fonts);
 	for (j = 0; j < ppd->num_fonts; j ++)
-	  _cupsLangPrintf(stdout, NULL, "        fonts[%d] = %s\n",
+	  _cupsLangPrintf(stdout, "        fonts[%d] = %s\n",
 	                  j, ppd->fonts[j]);
 
-	_cupsLangPrintf(stdout, NULL, "    num_attrs = %d\n", ppd->num_attrs);
+	_cupsLangPrintf(stdout, "    num_attrs = %d\n", ppd->num_attrs);
 	for (j = 0; j < ppd->num_attrs; j ++)
-	  _cupsLangPrintf(stdout, NULL,
+	  _cupsLangPrintf(stdout,
 	                  "        attrs[%d] = %s %s%s%s: \"%s\"\n", j,
 	        	  ppd->attrs[j]->name, ppd->attrs[j]->spec,
 			  ppd->attrs[j]->text[0] ? "/" : "",
@@ -1262,6 +1282,91 @@ main(int  argc,			/* I - Number of command-line arguments */
     usage();
 
   return (status);
+}
+
+
+/*
+ * 'check_basics()' - Check for CR LF, mixed line endings, and blank lines.
+ */
+
+void
+check_basics(const char *filename)	/* I - PPD file to check */
+{
+  cups_file_t	*fp;			/* File pointer */
+  int		ch;			/* Current character */
+  int		col,			/* Current column */
+		whitespace;		/* Only seen whitespace? */
+  int		eol;			/* Line endings */
+  int		linenum;		/* Line number */
+  int		mixed;			/* Mixed line endings? */
+
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+    return;
+
+  linenum    = 1;
+  col        = 0;
+  eol        = EOL_NONE;
+  mixed      = 0;
+  whitespace = 1;
+
+  while ((ch = cupsFileGetChar(fp)) != EOF)
+  {
+    if (ch == '\r' || ch == '\n')
+    {
+      if (ch == '\n')
+      {
+	if (eol == EOL_NONE)
+	  eol = EOL_LF;
+	else if (eol != EOL_LF)
+	  mixed = 1;
+      }
+      else if (ch == '\r')
+      {
+	if (cupsFilePeekChar(fp) == '\n')
+	{
+	  cupsFileGetChar(fp);
+
+          if (eol == EOL_NONE)
+	    eol = EOL_CRLF;
+	  else
+	    mixed = 1;
+	}
+	else if (eol == EOL_NONE)
+	  eol = EOL_CR;
+        else
+	  mixed = 1;
+      }
+      
+      if (col > 0 && whitespace)
+	_cupsLangPrintf(stdout,
+		        _("        WARN    Line %d only contains whitespace!\n"),
+			linenum);
+
+      linenum ++;
+      col        = 0;
+      whitespace = 1;
+    }
+    else
+    {
+      if (ch != ' ' && ch != '\t')
+        whitespace = 0;
+
+      col ++;
+    }
+  }
+
+  if (mixed)
+    _cupsLangPuts(stdout,
+		  _("        WARN    File contains a mix of CR, LF, and "
+		    "CR LF line endings!\n"));
+
+  if (eol == EOL_CRLF)
+    _cupsLangPuts(stdout,
+		  _("        WARN    Non-Windows PPD files should use lines "
+		    "ending with only LF, not CR LF!\n"));
+
+  cupsFileClose(fp);
 }
 
 
@@ -1356,7 +1461,7 @@ show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
     */
 
     if (c1 != NULL && c1->marked && c2 != NULL && c2->marked)
-      _cupsLangPrintf(stdout, NULL,
+      _cupsLangPrintf(stdout,
                       _("        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
                         "                (constraint=\"%s %s %s %s\")\n"),
         	      o1->keyword, c1->choice, o2->keyword, c2->choice,
@@ -1372,7 +1477,7 @@ show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
 void
 usage(void)
 {
-  _cupsLangPuts(stdout, NULL,
+  _cupsLangPuts(stdout,
                 _("Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] "
 		  "[... filenameN.ppd[.gz]]\n"
 		  "       program | cupstestppd [-q] [-r] [-v[v]] -\n"));
@@ -1382,5 +1487,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c 4906 2006-01-10 20:53:28Z mike $".
+ * End of "$Id: cupstestppd.c 4990 2006-01-26 02:21:45Z mike $".
  */

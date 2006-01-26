@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 4918 2006-01-12 05:14:40Z mike $"
+ * "$Id: cups.h 4973 2006-01-25 02:36:02Z mike $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -33,10 +33,12 @@
 
 #  include "ipp.h"
 #  include "ppd.h"
+#  include "language.h"
+
 
 /*
  * With GCC 3.0 and higher, we can mark old APIs "deprecated" so you get
- * an error at compile-time.
+ * a warning at compile-time.
  */
 
 #  if defined(__GNUC__) && __GNUC__ > 2
@@ -223,6 +225,8 @@ extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 					   cups_option_t *options,
 					   ipp_tag_t group_tag);
 extern const char	*cupsLastErrorString(void);
+extern char		*cupsNotifySubject(cups_lang_t *lang, ipp_t *event);
+extern char		*cupsNotifyText(cups_lang_t *lang, ipp_t *event);
 extern cups_file_t	*cupsTempFile2(char *filename, int len);
 
 
@@ -233,5 +237,5 @@ extern cups_file_t	*cupsTempFile2(char *filename, int len);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 4918 2006-01-12 05:14:40Z mike $".
+ * End of "$Id: cups.h 4973 2006-01-25 02:36:02Z mike $".
  */

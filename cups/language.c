@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c 4922 2006-01-12 22:05:06Z mike $"
+ * "$Id: language.c 4985 2006-01-25 21:57:18Z mike $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,7 @@
  *   cupsLangEncoding()     - Return the character encoding (us-ascii, etc.)
  *                            for the given language.
  *   cupsLangFlush()        - Flush all language data out of the cache.
+ *   _cupsLangFlush()       - Flush all language data out of the cache.
  *   cupsLangFree()         - Free language data.
  *   cupsLangGet()          - Get a language.
  *   _cupsLangString()      - Get a message string.
@@ -60,6 +61,9 @@
 #else
 #  include <unistd.h>
 #endif /* WIN32 */
+#ifdef HAVE_COREFOUNDATION_H
+#  include <CoreFoundation/CoreFoundation.h>
+#endif /* HAVE_COREFOUNDATION_H */
 
 
 /*
@@ -67,7 +71,6 @@
  */
 
 #ifdef __APPLE__
-#  include <CoreFoundation/CoreFoundation.h>
 static const char	*appleLangDefault(void);
 #endif /* __APPLE__ */
 static cups_lang_t	*cups_cache_lookup(const char *name,
@@ -202,9 +205,19 @@ cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 void
 cupsLangFlush(void)
 {
+  _cupsLangFlush(_cupsGlobals());
+}
+
+
+/*
+ * '_cupsLangFlush()' - Flush all language data out of the cache.
+ */
+
+void
+_cupsLangFlush(_cups_globals_t *cg)	/* I - Global data */
+{
   cups_lang_t	*lang,			/* Current language */
 		*next;			/* Next language */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
@@ -1236,5 +1249,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 4922 2006-01-12 22:05:06Z mike $".
+ * End of "$Id: language.c 4985 2006-01-25 21:57:18Z mike $".
  */

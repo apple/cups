@@ -1,5 +1,5 @@
 /*
- * "$Id: lpinfo.c 4906 2006-01-10 20:53:28Z mike $"
+ * "$Id: lpinfo.c 4925 2006-01-13 02:52:47Z mike $"
  *
  *   "lpinfo" command for the Common UNIX Printing System (CUPS).
  *
@@ -76,7 +76,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr, NULL,
+            _cupsLangPrintf(stderr,
 		            _("%s: Sorry, no encryption support compiled in!\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
@@ -94,7 +94,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		_cupsLangPrintf(stderr, NULL,
+		_cupsLangPrintf(stderr,
 		                _("lpinfo: Unable to connect to server: %s\n"),
 				strerror(errno));
 		return (1);
@@ -113,7 +113,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (http == NULL)
 	      {
-		_cupsLangPrintf(stderr, NULL,
+		_cupsLangPrintf(stderr,
 		                _("lpinfo: Unable to connect to server: %s\n"),
 				strerror(errno));
 		return (1);
@@ -139,7 +139,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-	        _cupsLangPuts(stderr, NULL,
+	        _cupsLangPuts(stderr,
 		              _("Error: need hostname after \'-h\' option!\n"));
 		return (1);
               }
@@ -149,13 +149,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, NULL, _("lpinfo: Unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("lpinfo: Unknown option \'%c\'!\n"),
 	                    argv[i][1]);
 	    return (1);
       }
     else
     {
-      _cupsLangPrintf(stderr, NULL, _("lpinfo: Unknown argument \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("lpinfo: Unknown argument \'%s\'!\n"),
                       argv[i]);
       return (1);
     }
@@ -175,11 +175,11 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
-  cups_lang_t	*language;		/* Default language */
-  const char	*device_class,		/* Pointer into device-class */
-		*device_info,		/* Pointer into device-info */
-		*device_make,		/* Pointer into device-make-and-model */
-		*device_uri;		/* Pointer into device-uri */
+  const char	*device_class,		/* Pointer to device-class */
+		*device_id,		/* Pointer to device-id */
+		*device_info,		/* Pointer to device-info */
+		*device_make,		/* Pointer to device-make-and-model */
+		*device_uri;		/* Pointer to device-uri */
 
 
   if (http == NULL)
@@ -191,24 +191,9 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
   *
   *    attributes-charset
   *    attributes-natural-language
-  *    printer-uri
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_GET_DEVICES;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, "ipp://localhost/printers/");
+  request = ippNewRequest(CUPS_GET_DEVICES);
 
  /*
   * Do the request and get back a response...
@@ -222,8 +207,7 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, NULL, _("lpinfo: cups-get-devices failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpinfo: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (1);
     }
@@ -248,24 +232,25 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
       device_info  = NULL;
       device_make  = NULL;
       device_uri   = NULL;
+      device_id    = "NONE";
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
         if (!strcmp(attr->name, "device-class") &&
 	    attr->value_tag == IPP_TAG_KEYWORD)
 	  device_class = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "device-info") &&
-	    attr->value_tag == IPP_TAG_TEXT)
+        else if (!strcmp(attr->name, "device-info") &&
+	         attr->value_tag == IPP_TAG_TEXT)
 	  device_info = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "device-make-and-model") &&
-	    attr->value_tag == IPP_TAG_TEXT)
+        else if (!strcmp(attr->name, "device-make-and-model") &&
+	         attr->value_tag == IPP_TAG_TEXT)
 	  device_make = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "device-uri") &&
-	    attr->value_tag == IPP_TAG_URI)
+        else if (!strcmp(attr->name, "device-uri") &&
+	         attr->value_tag == IPP_TAG_URI)
 	  device_uri = attr->values[0].string.text;
+        else if (!strcmp(attr->name, "device-id") &&
+	         attr->value_tag == IPP_TAG_TEXT)
+	  device_id = attr->values[0].string.text;
 
         attr = attr->next;
       }
@@ -289,15 +274,17 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
 
       if (long_status)
       {
-	_cupsLangPrintf(stdout, language,
+	_cupsLangPrintf(stdout,
 	                _("Device: uri = %s\n"
 			  "        class = %s\n"
 			  "        info = %s\n"
-			  "        make-and-model = %s\n"),
-			device_uri, device_class, device_info, device_make);
+			  "        make-and-model = %s\n"
+			  "        device-id = %s\n"),
+			device_uri, device_class, device_info, device_make,
+			device_id);
       }
       else
-        _cupsLangPrintf(stdout, language, "%s %s\n", device_class, device_uri);
+        _cupsLangPrintf(stdout, "%s %s\n", device_class, device_uri);
 
       if (attr == NULL)
         break;
@@ -307,8 +294,7 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, NULL, _("lpinfo: cups-get-devices failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpinfo: %s\n", cupsLastErrorString());
     return (1);
   }
 
@@ -327,10 +313,10 @@ show_models(http_t *http,		/* I - HTTP connection to server */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
-  cups_lang_t	*language;		/* Default language */
-  const char	*ppd_language,		/* Pointer into ppd-natural-language */
-		*ppd_make,		/* Pointer into ppd-make-and-model */
-		*ppd_name;		/* Pointer into ppd-name */
+  const char	*ppd_device_id,		/* Pointer to ppd-device-id */
+		*ppd_language,		/* Pointer to ppd-natural-language */
+		*ppd_make,		/* Pointer to ppd-make-and-model */
+		*ppd_name;		/* Pointer to ppd-name */
 
 
   if (http == NULL)
@@ -342,24 +328,9 @@ show_models(http_t *http,		/* I - HTTP connection to server */
   *
   *    attributes-charset
   *    attributes-natural-language
-  *    printer-uri
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_GET_PPDS;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, "ipp://localhost/printers/");
+  request = ippNewRequest(CUPS_GET_PPDS);
 
  /*
   * Do the request and get back a response...
@@ -373,8 +344,7 @@ show_models(http_t *http,		/* I - HTTP connection to server */
 
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, NULL, _("lpinfo: cups-get-ppds failed: %s\n"),
-        	      ippErrorString(response->request.status.status_code));
+      _cupsLangPrintf(stderr, "lpinfo: %s\n", cupsLastErrorString());
       ippDelete(response);
       return (1);
     }
@@ -395,22 +365,24 @@ show_models(http_t *http,		/* I - HTTP connection to server */
       * Pull the needed attributes from this PPD...
       */
 
-      ppd_language = NULL;
-      ppd_make     = NULL;
-      ppd_name     = NULL;
+      ppd_device_id = "NONE";
+      ppd_language  = NULL;
+      ppd_make      = NULL;
+      ppd_name      = NULL;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (!strcmp(attr->name, "ppd-natural-language") &&
-	    attr->value_tag == IPP_TAG_LANGUAGE)
-	  ppd_language = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "ppd-make-and-model") &&
+        if (!strcmp(attr->name, "ppd-device-id") &&
 	    attr->value_tag == IPP_TAG_TEXT)
+	  ppd_device_id = attr->values[0].string.text;
+        else if (!strcmp(attr->name, "ppd-natural-language") &&
+	         attr->value_tag == IPP_TAG_LANGUAGE)
+	  ppd_language = attr->values[0].string.text;
+        else if (!strcmp(attr->name, "ppd-make-and-model") &&
+	         attr->value_tag == IPP_TAG_TEXT)
 	  ppd_make = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "ppd-name") &&
-	    attr->value_tag == IPP_TAG_NAME)
+        else if (!strcmp(attr->name, "ppd-name") &&
+	         attr->value_tag == IPP_TAG_NAME)
 	  ppd_name = attr->values[0].string.text;
 
         attr = attr->next;
@@ -434,14 +406,15 @@ show_models(http_t *http,		/* I - HTTP connection to server */
 
       if (long_status)
       {
-	_cupsLangPrintf(stdout, language,
+	_cupsLangPrintf(stdout,
 	                _("Model:  name = %s\n"
 			  "        natural_language = %s\n"
-			  "        make-and-model = %s\n"),
-			ppd_name, ppd_language, ppd_make);
+			  "        make-and-model = %s\n"
+			  "        device-id = %s\n"),
+			ppd_name, ppd_language, ppd_make, ppd_device_id);
       }
       else
-        _cupsLangPrintf(stdout, language, "%s %s\n", ppd_name, ppd_make);
+        _cupsLangPrintf(stdout, "%s %s\n", ppd_name, ppd_make);
 
       if (attr == NULL)
         break;
@@ -451,8 +424,7 @@ show_models(http_t *http,		/* I - HTTP connection to server */
   }
   else
   {
-    _cupsLangPrintf(stderr, NULL, _("lpinfo: cups-get-ppds failed: %s\n"),
-        	    ippErrorString(cupsLastError()));
+    _cupsLangPrintf(stderr, "lpinfo: %s\n", cupsLastErrorString());
 
     return (1);
   }
@@ -462,5 +434,5 @@ show_models(http_t *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpinfo.c 4906 2006-01-10 20:53:28Z mike $".
+ * End of "$Id: lpinfo.c 4925 2006-01-13 02:52:47Z mike $".
  */

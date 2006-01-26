@@ -1,9 +1,9 @@
 /*
- * "$Id: printers.h 4775 2005-10-12 14:27:37Z mike $"
+ * "$Id: printers.h 4970 2006-01-24 14:05:45Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -72,9 +72,8 @@ typedef struct cupsd_printer_s
   struct cupsd_printer_s **printers;	/* Printers in class */
   int		quota_period,		/* Period for quotas */
 		page_limit,		/* Maximum number of pages */
-		k_limit,		/* Maximum number of kilobytes */
-		num_quotas;		/* Number of quota records */
-  cupsd_quota_t	*quotas;		/* Quota records */
+		k_limit;		/* Maximum number of kilobytes */
+  cups_array_t	*quotas;		/* Quota records */
   int		deny_users,		/* 1 = deny, 0 = allow */
 		num_users;		/* Number of allowed/denied users */
   const char	**users;		/* Allowed/denied users */
@@ -142,5 +141,5 @@ extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
 
 
 /*
- * End of "$Id: printers.h 4775 2005-10-12 14:27:37Z mike $".
+ * End of "$Id: printers.h 4970 2006-01-24 14:05:45Z mike $".
  */

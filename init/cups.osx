@@ -8,10 +8,13 @@
 
 StartService ()
 {
-	if [ "${CUPS:=-YES-}" = "-YES-" ]; then
+	if [ "${CUPS:=-AUTOMATIC-}" = "-AUTOMATIC-" ]; then
 		ConsoleMessage "Starting printing services"
 		/usr/sbin/cupsd
-    fi
+	elif [ "${CUPS:=-AUTOMATIC-}" = "-YES-" ]; then
+		ConsoleMessage "Starting printing services"
+		/usr/sbin/cupsd
+	fi
 }
 
 StopService ()
@@ -21,7 +24,7 @@ StopService ()
 	if test "$pid" != ""; then
 		ConsoleMessage "Stopping printing services"
 		kill "${pid}"
-    fi
+	fi
 }
 
 RestartService ()
@@ -32,7 +35,10 @@ RestartService ()
 		ConsoleMessage "Restarting printing services"
 		kill -HUP "${pid}"
 	else
-		StartService
+		if [ "${CUPS:=-AUTOMATIC-}" = "-AUTOMATIC-" -o "${CUPS:=-AUTOMATIC-}" = "-YES-" ]; then
+			ConsoleMessage "Starting printing services"
+			/usr/sbin/cupsd
+		fi
 	fi
 }
 

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 4833 2005-11-12 21:46:52Z mike $"
+dnl "$Id: cups-common.m4 4979 2006-01-25 17:47:43Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -159,6 +159,11 @@ AC_TRY_COMPILE([#include <time.h>],[struct tm t;
 	AC_DEFINE(HAVE_TM_GMTOFF),
 	AC_MSG_RESULT(no))
 
+dnl See if we have POSIX ACL support...
+dnl TODO: Linux/Solaris/IRIX/etc. version
+
+AC_CHECK_FUNCS(acl_init)
+
 dnl Flags for "ar" command...
 case $uname in
         Darwin* | *BSD*)
@@ -176,6 +181,29 @@ case $uname in
         Darwin*)
                 BACKLIBS="-framework IOKit"
                 LIBS="-framework CoreFoundation $LIBS"
+
+		dnl Check for CFLocaleCreateCanonicalLocaleIdentifierFromString...
+		AC_MSG_CHECKING(for CFLocaleCreateCanonicalLocaleIdentifierFromString)
+		if test "$uname" = "Darwin" -a $uversion -ge 70; then
+			AC_DEFINE(HAVE_CF_LOCALE_ID)
+			AC_MSG_RESULT(yes)
+		else
+			AC_MSG_RESULT(no)
+		fi
+
+		dnl Check for framework headers...
+		AC_CHECK_HEADER(CoreFoundation/CoreFoundation.h,AC_DEFINE(HAVE_COREFOUNDATION_H))
+		AC_CHECK_HEADER(CoreFoundation/CFPriv.h,AC_DEFINE(HAVE_CFPRIV_H))
+		AC_CHECK_HEADER(CoreFoundation/CFBundlePriv.h,AC_DEFINE(HAVE_CFBUNDLEPRIV_H))
+
+		dnl Check for the new membership functions in MacOSX 10.4 (Tiger)...
+		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))
+		AC_CHECK_HEADER(membershipPriv.h,AC_DEFINE(HAVE_MEMBERSHIPPRIV_H))
+		AC_CHECK_FUNCS(mbr_uid_to_uuid)
+
+		dnl Check for notify_post support
+		AC_CHECK_HEADER(notify.h,AC_DEFINE(HAVE_NOTIFY_H))
+		AC_CHECK_FUNCS(notify_post)
                 ;;
         *)
                 BACKLIBS=""
@@ -193,5 +221,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 4833 2005-11-12 21:46:52Z mike $".
+dnl End of "$Id: cups-common.m4 4979 2006-01-25 17:47:43Z mike $".
 dnl

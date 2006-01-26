@@ -1,5 +1,5 @@
 /*
- * "$Id: getputfile.c 4918 2006-01-12 05:14:40Z mike $"
+ * "$Id: getputfile.c 4984 2006-01-25 21:55:36Z mike $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
@@ -125,7 +125,11 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
       if (cupsDoAuthentication(http, "GET", resource))
         break;
 
-      httpReconnect(http);
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+        break;
+      }
 
       continue;
     }
@@ -136,7 +140,11 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
       httpFlush(http);
 
       /* Reconnect... */
-      httpReconnect(http);
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+        break;
+      }
 
       /* Upgrade with encryption... */
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
@@ -340,7 +348,11 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
       if (cupsDoAuthentication(http, "PUT", resource))
         break;
 
-      httpReconnect(http);
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+        break;
+      }
 
       continue;
     }
@@ -351,7 +363,11 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
       httpFlush(http);
 
       /* Reconnect... */
-      httpReconnect(http);
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+        break;
+      }
 
       /* Upgrade with encryption... */
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
@@ -431,5 +447,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: getputfile.c 4918 2006-01-12 05:14:40Z mike $".
+ * End of "$Id: getputfile.c 4984 2006-01-25 21:55:36Z mike $".
  */

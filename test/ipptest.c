@@ -1,9 +1,9 @@
 /*
- * "$Id: ipptest.c 4837 2005-11-14 04:13:13Z mike $"
+ * "$Id: ipptest.c 4973 2006-01-25 02:36:02Z mike $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -151,7 +151,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
   * Connect to the server...
   */
 
-  httpSeparate(uri, method, userpass, server, &port, resource);
+  httpSeparateURI(uri, method, sizeof(method), userpass, sizeof(userpass),
+                  server, sizeof(server), &port, resource, sizeof(resource));
   if ((http = httpConnect(server, port)) == NULL)
   {
     printf("Unable to connect to %s on port %d - %s\n", server, port,
@@ -188,7 +189,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Initialize things...
     */
 
-    httpSeparate(uri, method, userpass, server, &port, resource);
+    httpSeparateURI(uri, method, sizeof(method), userpass, sizeof(userpass),
+		    server, sizeof(server), &port, resource, sizeof(resource));
 
     request       = ippNew();
     op            = (ipp_op_t)0;
@@ -782,5 +784,5 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
 
 /*
- * End of "$Id: ipptest.c 4837 2005-11-14 04:13:13Z mike $".
+ * End of "$Id: ipptest.c 4973 2006-01-25 02:36:02Z mike $".
  */

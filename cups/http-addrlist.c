@@ -1,9 +1,9 @@
 /*
- * "$Id: http-addrlist.c 4815 2005-10-31 20:40:17Z mike $"
+ * "$Id: http-addrlist.c 4976 2006-01-25 15:07:40Z mike $"
  *
  *   HTTP address list routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -89,6 +89,11 @@ httpAddrConnect(
     val = 1;
     setsockopt(*sock, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
 #endif /* SO_REUSEPORT */
+
+#ifdef SO_NOSIGPIPE
+    val = 1;
+    setsockopt(*sock, SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof(val));
+#endif /* SO_NOSIGPIPE */
 
    /*
     * Using TCP_NODELAY improves responsiveness, especially on systems
@@ -584,5 +589,5 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
 
 /*
- * End of "$Id: http-addrlist.c 4815 2005-10-31 20:40:17Z mike $".
+ * End of "$Id: http-addrlist.c 4976 2006-01-25 15:07:40Z mike $".
  */

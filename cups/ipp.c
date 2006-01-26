@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 4922 2006-01-12 22:05:06Z mike $"
+ * "$Id: ipp.c 4995 2006-01-26 20:14:42Z mike $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -1023,6 +1023,7 @@ ippReadIO(void       *src,		/* I - Data source */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		tag;		/* Current tag */
+  ipp_tag_t		value_tag;	/* Current value tag */
   ipp_value_t		*value;		/* Current value */
 
 
@@ -1163,14 +1164,15 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current == NULL)
 	      return (IPP_ERROR);
 
-            attr = ipp->current;
+            attr      = ipp->current;
+	    value_tag = (ipp_tag_t)(attr->value_tag & IPP_TAG_MASK);
 
 	   /*
 	    * Make sure we aren't adding a new value of a different
 	    * type...
 	    */
 
-	    if (attr->value_tag == IPP_TAG_ZERO)
+	    if (value_tag == IPP_TAG_ZERO)
 	    {
 	     /*
 	      * Setting the value of a collection member...
@@ -1178,9 +1180,9 @@ ippReadIO(void       *src,		/* I - Data source */
 
 	      attr->value_tag = tag;
 	    }
-	    else if (attr->value_tag == IPP_TAG_STRING ||
-    		     (attr->value_tag >= IPP_TAG_TEXTLANG &&
-		      attr->value_tag <= IPP_TAG_MIMETYPE))
+	    else if (value_tag == IPP_TAG_STRING ||
+    		     (value_tag >= IPP_TAG_TEXTLANG &&
+		      value_tag <= IPP_TAG_MIMETYPE))
             {
 	     /*
 	      * String values can sometimes come across in different
@@ -1191,7 +1193,7 @@ ippReadIO(void       *src,		/* I - Data source */
     		  (tag < IPP_TAG_TEXTLANG || tag > IPP_TAG_MIMETYPE))
 	        return (IPP_ERROR);
             }
-	    else if (attr->value_tag != tag)
+	    else if (value_tag != tag)
 	      return (IPP_ERROR);
 
            /*
@@ -1709,6 +1711,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
             DEBUG_printf(("ippWrite: wrote group tag = %x\n", attr->group_tag));
 	    *bufptr++ = attr->group_tag;
 	  }
+	  else if (attr->group_tag == IPP_TAG_ZERO)
+	    continue;
 
          /*
 	  * Write the attribute tag and name.  The current implementation
@@ -2402,10 +2406,10 @@ _ipp_add_attr(ipp_t *ipp,		/* I - IPP message */
   attr = calloc(sizeof(ipp_attribute_t) +
                 (num_values - 1) * sizeof(ipp_value_t), 1);
 
-  attr->num_values = num_values;
-
   if (attr != NULL)
   {
+    attr->num_values = num_values;
+
     if (ipp->last == NULL)
       ipp->attrs = attr;
     else
@@ -2466,7 +2470,7 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
         break; /* anti-compiler-warning-code */
   }
 
-  if (attr->name != NULL)
+  if (attr->name)
     free(attr->name);
 
   free(attr);
@@ -2759,5 +2763,5 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c 4922 2006-01-12 22:05:06Z mike $".
+ * End of "$Id: ipp.c 4995 2006-01-26 20:14:42Z mike $".
  */

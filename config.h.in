@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 4760 2005-10-08 20:11:08Z mike $"
+ * "$Id: config.h.in 4979 2006-01-25 17:47:43Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -71,6 +71,7 @@
  *       variables at run-time...
  */
 
+#define CUPS_BINDIR	"/usr/bin"
 #define CUPS_CACHEDIR	"/var/cache/cups"
 #define CUPS_DATADIR    "/usr/share/cups"
 #define CUPS_DOCROOT	"/usr/share/doc/cups"
@@ -78,6 +79,7 @@
 #define CUPS_LOCALEDIR	"/usr/share/locale"
 #define CUPS_LOGDIR	"/var/logs/cups"
 #define CUPS_REQUESTS	"/var/spool/cups"
+#define CUPS_SBINDIR	"/usr/sbin"
 #define CUPS_SERVERBIN	"/usr/lib/cups"
 #define CUPS_SERVERROOT	"/etc/cups"
 #define CUPS_STATEDIR	"/var/run/cups"
@@ -205,6 +207,13 @@
 
 #undef HAVE_MALLINFO
 #undef HAVE_MALLOC_H
+
+
+/*
+ * Do we have the POSIX ACL functions?
+ */
+
+#undef HAVE_ACL_INIT
 
 
 /*
@@ -336,8 +345,42 @@
 #define CUPS_PYTHON	"/usr/bin/python"
 
 
+/*
+ * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
+ */
+
+#undef HAVE_COREFOUNDATION
+#undef HAVE_SYSTEMCONFIGURATION
+
+
+/*
+ * Do we have CoreFoundation public and private headers?
+ */
+
+#undef HAVE_COREFOUNDATION_H
+#undef HAVE_CFPRIV_H
+#undef HAVE_CFBUNDLEPRIV_H
+
+
+/*
+ * Do we have MacOSX 10.4's mbr_XXX functions()?
+ */
+
+#undef HAVE_MEMBERSHIP_H
+#undef HAVE_MEMBERSHIPPRIV_H
+#undef HAVE_MBR_UID_TO_UUID
+
+
+/*
+ * Do we have Darwin's notify_post() header and function?
+ */
+
+#undef HAVE_NOTIFY_H
+#undef HAVE_NOTIFY_POST
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 4760 2005-10-08 20:11:08Z mike $".
+ * End of "$Id: config.h.in 4979 2006-01-25 17:47:43Z mike $".
  */

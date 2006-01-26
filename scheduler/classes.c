@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c 4848 2005-11-22 04:14:43Z mike $"
+ * "$Id: classes.c 4988 2006-01-26 00:53:00Z mike $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -336,9 +336,10 @@ cupsdLoadAllClasses(void)
   snprintf(line, sizeof(line), "%s/classes.conf", ServerRoot);
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdLoadAllClasses: Unable to open %s - %s", line,
-                    strerror(errno));
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "cupsdLoadAllClasses: Unable to open %s - %s", line,
+		      strerror(errno));
     return;
   }
 
@@ -718,7 +719,7 @@ cupsdSaveAllClasses(void)
   */
 
   fchown(cupsFileNumber(fp), RunUser, Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+  fchmod(cupsFileNumber(fp), 0600);
 
  /*
   * Write a small header to the file...
@@ -840,5 +841,5 @@ cupsdUpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c 4848 2005-11-22 04:14:43Z mike $".
+ * End of "$Id: classes.c 4988 2006-01-26 00:53:00Z mike $".
  */

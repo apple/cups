@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4918 2006-01-12 05:14:40Z mike $"
+# "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -44,7 +44,6 @@ WEBIMAGES	=	\
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \
-			images/draft.gif \
 			images/edit-configuration-file.gif \
 			images/esp-logo.gif \
 			images/happy.gif \
@@ -57,6 +56,8 @@ WEBIMAGES	=	\
 			images/manage-server.gif \
 			images/modify-class.gif \
 			images/modify-printer.gif \
+			images/move-job.gif \
+			images/move-jobs.gif \
 			images/printer-idle.gif \
 			images/printer-processing.gif \
 			images/printer-stopped.gif \
@@ -71,7 +72,12 @@ WEBIMAGES	=	\
 			images/set-as-default.gif \
 			images/set-printer-options.gif \
 			images/show-active.gif \
+			images/show-all.gif \
 			images/show-completed.gif \
+			images/show-next.gif \
+			images/show-previous.gif \
+			images/sort-ascending.gif \
+			images/sort-descending.gif \
 			images/start-class.gif \
 			images/start-printer.gif \
 			images/stop-class.gif \
@@ -124,6 +130,7 @@ HELPFILES	=	\
 			help/man-lpstat.html \
 			help/network.html \
 			help/overview.html \
+			help/spec-ipp.html \
 			help/spec-ppd.html \
 			help/standard.html \
 			help/whatsnew.html
@@ -147,7 +154,7 @@ clean:
 # Install all documentation files...
 #
 
-install:
+install:	all
 	$(INSTALL_DIR) $(DOCDIR)
 	for file in $(WEBPAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR); \

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4 4873 2005-12-07 01:46:54Z mike $"
+dnl "$Id: cups-directories.m4 4933 2006-01-16 00:26:57Z mike $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -43,10 +43,14 @@ if test "$bindir" = "\${exec_prefix}/bin"; then
 	bindir="$exec_prefix/bin"
 fi
 
+AC_DEFINE_UNQUOTED(CUPS_BINDIR, "$bindir")
+
 dnl Fix "sbindir" variable...
 if test "$sbindir" = "\${exec_prefix}/sbin"; then
 	sbindir="$exec_prefix/sbin"
 fi
+
+AC_DEFINE_UNQUOTED(CUPS_SBINDIR, "$sbindir")
 
 dnl Fix "sharedstatedir" variable if it hasn't been specified...
 if test "$sharedstatedir" = "\${prefix}/com" -a "$prefix" = "/"; then
@@ -275,5 +279,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 4873 2005-12-07 01:46:54Z mike $".
+dnl End of "$Id: cups-directories.m4 4933 2006-01-16 00:26:57Z mike $".
 dnl

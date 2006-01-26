@@ -1,6 +1,25 @@
 <TABLE CELLPADDING="0" CELLSPACING="0" CLASS="button" WIDTH="100%">
 <TR><TD VALIGN="TOP" NOWRAP>
 
+<H2 CLASS="title">Printers</H2>
+
+<P>
+<A HREF="/admin?op=add-printer"><IMG
+SRC="/images/add-printer.gif" ALT="Add Printer" CLASS="button"></A>
+<A HREF="/printers/"><IMG SRC="/images/manage-printers.gif"
+ALT="Manage Printers" CLASS="button"></A>
+{have_samba?<A HREF="/admin/?op=export-samba"><IMG
+SRC="/images/export-samba.gif" ALT="Export Printers to Samba"
+CLASS="button"></A>:}
+</P>
+
+{#device_uri=0?:<P><B>New Printers Found:</B></P><UL>{[device_uri]
+<LI>{device_make_and_model} ({device_info})
+<A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
+SRC="/images/add-this-printer.gif" ALT="Add This Printer" CLASS="button"
+ALIGN="MIDDLE"></A></LI>
+}</UL>}
+
 <H2 CLASS="title">Classes</H2>
 
 <P>
@@ -16,22 +35,6 @@ ALT="Manage Classes" CLASS="button"></A>
 <A HREF="/jobs/"><IMG SRC="/images/manage-jobs.gif" ALT="Manage
 Jobs" CLASS="button"></A>
 </P>
-
-<H2 CLASS="title">Printers</H2>
-
-<P>
-<A HREF="/admin?op=add-printer"><IMG
-SRC="/images/add-printer.gif" ALT="Add Printer" CLASS="button"></A>
-<A HREF="/printers/"><IMG SRC="/images/manage-printers.gif"
-ALT="Manage Printers" CLASS="button"></A>
-</P>
-
-{#device_uri=0?:<P><B>New Printers Found:</B></P><UL>{[device_uri]
-<LI>{device_make_and_model} ({device_info})
-<A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
-SRC="/images/add-this-printer.gif" ALT="Add This Printer" CLASS="button"
-ALIGN="MIDDLE"></A></LI>
-}</UL>}
 
 </TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 

@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c 4809 2005-10-21 19:43:55Z mike $"
+ * "$Id: testhttp.c 4943 2006-01-18 20:30:42Z mike $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -96,6 +96,8 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    "socket", "", "server", "/", 9100, 0 },
 			  { HTTP_URI_OK, "ipp://username:password@[v1.fe80::200:1234:5678:9abc+eth0]:999/ipp",
 			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999 },
+			  { HTTP_URI_OK, "http://server/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400",
+			    "http", "", "server", "/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400", 80, 0 },
 
 			  /* Missing scheme */
 			  { HTTP_URI_MISSING_SCHEME, "/path/to/file/index.html",
@@ -510,5 +512,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c 4809 2005-10-21 19:43:55Z mike $".
+ * End of "$Id: testhttp.c 4943 2006-01-18 20:30:42Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4801 2005-10-18 21:09:12Z mike $"
+# "$Id: Makefile 4970 2006-01-24 14:05:45Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -120,9 +120,9 @@ install:	all
 	echo Creating $(SERVERROOT)...
 	$(INSTALL_DIR) $(SERVERROOT)
 	echo Creating $(SERVERROOT)/interfaces...
-	$(INSTALL_DIR) $(SERVERROOT)/interfaces
+	$(INSTALL_DIR) -g $(CUPS_GROUP) $(SERVERROOT)/interfaces
 	echo Creating $(SERVERROOT)/ppd...
-	$(INSTALL_DIR) $(SERVERROOT)/ppd
+	$(INSTALL_DIR) -g $(CUPS_GROUP) $(SERVERROOT)/ppd
 	echo Creating $(STATEDIR)...
 	$(INSTALL_DIR) $(STATEDIR)
 	echo Creating $(STATEDIR)/certs...
@@ -130,8 +130,8 @@ install:	all
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) $(LOGDIR)
 	echo Creating $(REQUESTS)...
-	$(INSTALL_DIR) $(REQUESTS)
-	echo Creating $(REQUESTS)/tmp...
+	$(INSTALL_DIR) -g $(CUPS_GROUP) $(REQUESTS)
+	echo Creating -g $(CUPS_GROUP) $(REQUESTS)/tmp...
 	$(INSTALL_DIR) $(REQUESTS)/tmp
 	echo Creating $(CACHEDIR)...
 	$(INSTALL_DIR) $(CACHEDIR)
@@ -216,10 +216,10 @@ testdirsvc:	testdirsvc.o
 # testmime
 #
 
-testmime:	testmime.o libmime.a
+testmime:	testmime.o libmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)
 
 
 #
@@ -239,5 +239,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 4801 2005-10-18 21:09:12Z mike $".
+# End of "$Id: Makefile 4970 2006-01-24 14:05:45Z mike $".
 #

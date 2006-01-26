@@ -1,5 +1,5 @@
 /*
- * "$Id: testfile.c 4754 2005-10-08 04:01:46Z mike $"
+ * "$Id: testfile.c 4942 2006-01-18 19:49:15Z mike $"
  *
  *   File test program for the Common UNIX Printing System (CUPS).
  *
@@ -57,33 +57,79 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		status;			/* Exit status */
+  int	status;				/* Exit status */
+  char	filename[1024];			/* Filename buffer */
 
 
- /*
-  * Do uncompressed file tests...
-  */
+  if (argc == 1)
+  {
+   /*
+    * Do uncompressed file tests...
+    */
 
-  status = read_write_tests(0);
+    status = read_write_tests(0);
 
 #ifdef HAVE_LIBZ
- /*
-  * Do compressed file tests...
-  */
+   /*
+    * Do compressed file tests...
+    */
 
-  putchar('\n');
+    putchar('\n');
 
-  status += read_write_tests(1);
+    status += read_write_tests(1);
 #endif /* HAVE_LIBZ */
 
- /*
-  * Summarize the results and return...
-  */
+   /*
+    * Test path functions...
+    */
 
-  if (!status)
-    puts("\nALL TESTS PASSED!");
+    fputs("cupsFileFind: ", stdout);
+    if (cupsFileFind("cat", "/bin", filename, sizeof(filename)) &&
+	cupsFileFind("cat", "/bin:/usr/bin", filename, sizeof(filename)))
+      printf("PASS (%s)\n", filename);
+    else
+    {
+      puts("FAIL");
+      status ++;
+    }
+
+   /*
+    * Summarize the results and return...
+    */
+
+    if (!status)
+      puts("\nALL TESTS PASSED!");
+    else
+      printf("\n%d TEST(S) FAILED!\n", status);
+  }
   else
-    printf("\n%d TEST(S) FAILED!\n", status);
+  {
+   /*
+    * Cat the filename on the command-line...
+    */
+
+    cups_file_t	*fp;			/* File pointer */
+    char	line[1024];		/* Line from file */
+
+
+    if ((fp = cupsFileOpen(argv[1], "r")) == NULL)
+    {
+      perror(argv[1]);
+      status = 1;
+    }
+    else
+    {
+      status = 0;
+
+      while (cupsFileGets(fp, line, sizeof(line)))
+        puts(line);
+
+      if (!cupsFileEOF(fp))
+        perror(argv[1]);
+
+      cupsFileClose(fp);
+    }
+  }
 
   return (status);
 }
@@ -396,5 +442,5 @@ read_write_tests(int compression)	/* I - Use compression? */
 
 
 /*
- * End of "$Id: testfile.c 4754 2005-10-08 04:01:46Z mike $".
+ * End of "$Id: testfile.c 4942 2006-01-18 19:49:15Z mike $".
  */

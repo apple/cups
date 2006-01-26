@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c 4844 2005-11-21 17:37:57Z mike $"
+ * "$Id: file.c 4983 2006-01-25 21:53:43Z mike $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,7 @@
  *   cupsFileClose()       - Close a CUPS file.
  *   cupsFileCompression() - Return whether a file is compressed.
  *   cupsFileEOF()         - Return the end-of-file status.
+ *   cupsFileFind()        - Find a file using the specified path.
  *   cupsFileFlush()       - Flush pending output.
  *   cupsFileGetChar()     - Get a single character from a file.
  *   cupsFileGetConf()     - Get a line from a configuration file...
@@ -99,14 +100,14 @@ struct _cups_file_s			/**** CUPS file structure... ****/
   char		mode,			/* Mode ('r' or 'w') */
 		compressed,		/* Compression used? */
 		eof,			/* End of file? */
-		buf[2048],		/* Buffer */
+		buf[4096],		/* Buffer */
 		*ptr,			/* Pointer into buffer */
 		*end;			/* End of buffer data */
   off_t		pos;			/* File position for start of buffer */
 
 #ifdef HAVE_LIBZ
   z_stream	stream;			/* (De)compression stream */
-  Bytef		cbuf[1024];		/* (De)compression buffer */
+  Bytef		cbuf[4096];		/* (De)compression buffer */
   uLong		crc;			/* (De)compression CRC */
 #endif /* HAVE_LIBZ */
 };
@@ -268,6 +269,91 @@ int					/* O - 1 on EOF, 0 otherwise */
 cupsFileEOF(cups_file_t *fp)		/* I - CUPS file */
 {
   return (fp->eof);
+}
+
+
+/*
+ * 'cupsFileFind()' - Find a file using the specified path.
+ *
+ * This function allows the paths in the path string to be separated by
+ * colons (UNIX standard) or semicolons (Windows standard) and stores the
+ * result in the buffer supplied.  If the file cannot be found in any of
+ * the supplied paths, NULL is returned. A NULL path only matches the
+ * current directory.
+ */
+
+const char *				/* O - Full path to file or NULL */
+cupsFileFind(const char *filename,	/* I - File to find */
+             const char *path,		/* I - Colon/semicolon-separated path */
+             char       *buffer,	/* I - Filename buffer */
+	     int        bufsize)	/* I - Size of filename buffer */
+{
+  char	*bufptr,			/* Current position in buffer */
+	*bufend;			/* End of buffer */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!filename || !buffer || bufsize < 2)
+    return (NULL);
+
+  if (!path)
+  {
+   /*
+    * No path, so check current directory...
+    */
+
+    if (!access(filename, 0))
+    {
+      strlcpy(buffer, filename, bufsize);
+      return (buffer);
+    }
+    else
+      return (NULL);
+  }
+
+ /*
+  * Now check each path and return the first match...
+  */
+
+  bufend = buffer + bufsize - 1;
+  bufptr = buffer;
+
+  while (*path)
+  {
+    if (*path == ';' || *path == ':')
+    {
+      if (bufptr > buffer && bufptr[-1] != '/' && bufptr < bufend)
+        *bufptr++ = '/';
+
+      strlcpy(bufptr, filename, bufend - bufptr);
+
+      if (!access(buffer, 0))
+        return (buffer);
+
+      bufptr = buffer;
+    }
+    else if (bufptr < bufend)
+      *bufptr++ = *path;
+
+    path ++;
+  }
+
+ /*
+  * Check the last path...
+  */
+
+  if (bufptr > buffer && bufptr[-1] != '/' && bufptr < bufend)
+    *bufptr++ = '/';
+
+  strlcpy(bufptr, filename, bufend - bufptr);
+
+  if (!access(buffer, 0))
+    return (buffer);
+  else
+    return (NULL);
 }
 
 
@@ -1325,7 +1411,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       * file...
       */
 
-      if ((bytes = cups_read(fp, (char *)fp->cbuf, sizeof(fp->cbuf))) < 0)
+      if ((bytes = cups_read(fp, (char *)fp->buf, sizeof(fp->buf))) < 0)
       {
        /*
 	* Can't read from file!
@@ -1334,14 +1420,13 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	return (-1);
       }
 
-      if (bytes < 10 || fp->cbuf[0] != 0x1f || fp->cbuf[1] != 0x8b ||
-          fp->cbuf[2] != 8 || (fp->cbuf[3] & 0xe0) != 0)
+      if (bytes < 10 || fp->buf[0] != 0x1f ||
+          (unsigned char)fp->buf[1] != 0x8b ||
+          fp->buf[2] != 8 || (fp->buf[3] & 0xe0) != 0)
       {
        /*
 	* Not a gzip'd file!
 	*/
-
-	memcpy(fp->buf, fp->cbuf, bytes);
 
 	fp->ptr = fp->buf;
 	fp->end = fp->buf + bytes;
@@ -1353,10 +1438,10 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       * Parse header junk: extra data, original name, and comment...
       */
 
-      ptr = (unsigned char *)fp->cbuf + 10;
-      end = (unsigned char *)fp->cbuf + bytes;
+      ptr = (unsigned char *)fp->buf + 10;
+      end = (unsigned char *)fp->buf + bytes;
 
-      if (fp->cbuf[3] & 0x04)
+      if (fp->buf[3] & 0x04)
       {
        /*
 	* Skip extra data...
@@ -1384,7 +1469,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	}
       }
 
-      if (fp->cbuf[3] & 0x08)
+      if (fp->buf[3] & 0x08)
       {
        /*
 	* Skip original name data...
@@ -1405,7 +1490,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	}
       }
 
-      if (fp->cbuf[3] & 0x10)
+      if (fp->buf[3] & 0x10)
       {
        /*
 	* Skip comment data...
@@ -1426,7 +1511,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	}
       }
 
-      if (fp->cbuf[3] & 0x02)
+      if (fp->buf[3] & 0x02)
       {
        /*
 	* Skip header CRC data...
@@ -1445,15 +1530,22 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       }
 
      /*
+      * Copy the flate-compressed data to the compression buffer...
+      */
+
+      if ((bytes = end - ptr) > 0)
+        memcpy(fp->cbuf, ptr, bytes);
+
+     /*
       * Setup the decompressor data...
       */
 
       fp->stream.zalloc    = (alloc_func)0;
       fp->stream.zfree     = (free_func)0;
       fp->stream.opaque    = (voidpf)0;
-      fp->stream.next_in   = (Bytef *)ptr;
+      fp->stream.next_in   = (Bytef *)fp->cbuf;
       fp->stream.next_out  = NULL;
-      fp->stream.avail_in  = end - ptr;
+      fp->stream.avail_in  = bytes;
       fp->stream.avail_out = 0;
       fp->crc              = crc32(0L, Z_NULL, 0);
 
@@ -1509,29 +1601,30 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	  */
 
           fp->eof = 1;
-	  return (-1);
 	}
-
-	tcrc = (((((trailer[3] << 8) | trailer[2]) << 8) | trailer[1]) << 8) |
-               trailer[0];
-
-	if (tcrc != fp->crc)
+	else
 	{
+	  tcrc = (((((trailer[3] << 8) | trailer[2]) << 8) | trailer[1]) << 8) |
+        	 trailer[0];
+
+	  if (tcrc != fp->crc)
+	  {
+	   /*
+            * Bad CRC, mark end-of-file...
+	    */
+
+	    fp->eof = 1;
+
+	    return (-1);
+	  }
+
 	 /*
-          * Bad CRC, mark end-of-file...
+	  * Otherwise, reset the compressed flag so that we re-read the
+	  * file header...
 	  */
-	  fp->eof = 1;
 
-	  return (-1);
+	  fp->compressed = 0;
 	}
-
-       /*
-	* Otherwise, reset the current pointer so that we re-read the
-	* file header...
-	*/
-
-	fp->ptr = NULL;
-	continue;
       }
 
       bytes = sizeof(fp->buf) - fp->stream.avail_out;
@@ -1543,7 +1636,8 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       fp->ptr = fp->buf;
       fp->end = fp->buf + bytes;
 
-      return (bytes);
+      if (bytes)
+	return (bytes);
     }
   }
 #endif /* HAVE_LIBZ */
@@ -1676,5 +1770,5 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * End of "$Id: file.c 4844 2005-11-21 17:37:57Z mike $".
+ * End of "$Id: file.c 4983 2006-01-25 21:53:43Z mike $".
  */
