@@ -47,17 +47,34 @@
  * Error codes...
  */
 
-#define ERROR_NONE		0
-#define ERROR_USAGE		1
-#define ERROR_FILE_OPEN		2
-#define ERROR_PPD_FORMAT	3
-#define ERROR_CONFORMANCE	4
+enum
+{
+  ERROR_NONE = 0,
+  ERROR_USAGE,
+  ERROR_FILE_OPEN,
+  ERROR_PPD_FORMAT,
+  ERROR_CONFORMANCE
+};
+
+
+/*
+ * Line endings...
+ */
+
+enum
+{
+  EOL_NONE = 0,
+  EOL_CR,
+  EOL_LF,
+  EOL_CRLF
+};
 
 
 /*
  * Local functions...
  */
 
+void	check_basics(const char *filename);
 void	show_conflicts(ppd_file_t *ppd);
 void	usage(void);
 
@@ -261,6 +278,8 @@ main(int  argc,			/* I - Number of command-line arguments */
               default :
 	          break;
 	    }
+
+	    check_basics(argv[i]);
 	  }
         }
 
@@ -968,6 +987,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	 
       if (verbose >= 0)
       {
+        check_basics(argv[i]);
+
         if (option &&
 	    strcmp(option->keyword, "Duplex") &&
 	    strcmp(option->keyword, "JCLDuplex"))
@@ -1099,7 +1120,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	else
 	  _cupsLangPuts(stdout, _("    NO ERRORS FOUND\n"));
       }
-
 
      /*
       * Then list the options, if "-v" was provided...
@@ -1262,6 +1282,91 @@ main(int  argc,			/* I - Number of command-line arguments */
     usage();
 
   return (status);
+}
+
+
+/*
+ * 'check_basics()' - Check for CR LF, mixed line endings, and blank lines.
+ */
+
+void
+check_basics(const char *filename)	/* I - PPD file to check */
+{
+  cups_file_t	*fp;			/* File pointer */
+  int		ch;			/* Current character */
+  int		col,			/* Current column */
+		whitespace;		/* Only seen whitespace? */
+  int		eol;			/* Line endings */
+  int		linenum;		/* Line number */
+  int		mixed;			/* Mixed line endings? */
+
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+    return;
+
+  linenum    = 1;
+  col        = 0;
+  eol        = EOL_NONE;
+  mixed      = 0;
+  whitespace = 1;
+
+  while ((ch = cupsFileGetChar(fp)) != EOF)
+  {
+    if (ch == '\r' || ch == '\n')
+    {
+      if (ch == '\n')
+      {
+	if (eol == EOL_NONE)
+	  eol = EOL_LF;
+	else if (eol != EOL_LF)
+	  mixed = 1;
+      }
+      else if (ch == '\r')
+      {
+	if (cupsFilePeekChar(fp) == '\n')
+	{
+	  cupsFileGetChar(fp);
+
+          if (eol == EOL_NONE)
+	    eol = EOL_CRLF;
+	  else
+	    mixed = 1;
+	}
+	else if (eol == EOL_NONE)
+	  eol = EOL_CR;
+        else
+	  mixed = 1;
+      }
+      
+      if (col > 0 && whitespace)
+	_cupsLangPrintf(stdout,
+		        _("        WARN    Line %d only contains whitespace!\n"),
+			linenum);
+
+      linenum ++;
+      col        = 0;
+      whitespace = 1;
+    }
+    else
+    {
+      if (ch != ' ' && ch != '\t')
+        whitespace = 0;
+
+      col ++;
+    }
+  }
+
+  if (mixed)
+    _cupsLangPuts(stdout,
+		  _("        WARN    File contains a mix of CR, LF, and "
+		    "CR LF line endings!\n"));
+
+  if (eol == EOL_CRLF)
+    _cupsLangPuts(stdout,
+		  _("        WARN    Non-Windows PPD files should use lines "
+		    "ending with only LF, not CR LF!\n"));
+
+  cupsFileClose(fp);
 }
 
 

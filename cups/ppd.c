@@ -2692,13 +2692,6 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
     if (line[0] != '*')			/* All lines start with an asterisk */
     {
-      if (cg->ppd_conform == PPD_CONFORM_STRICT)
-      {
-        cg->ppd_status = PPD_MISSING_ASTERISK;
-        free(line);
-        return (0);
-      }
-
      /*
       * Allow lines consisting of just whitespace...
       */

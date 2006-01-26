@@ -211,6 +211,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                    "printer-uri", NULL, uri);
 
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                   "requesting-user-name", NULL, cupsUser());
+
       if (reason != NULL)
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
                      "printer-state-message", NULL, reason);
