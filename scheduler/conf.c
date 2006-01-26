@@ -615,7 +615,7 @@ cupsdReadConfiguration(void)
   check_permissions(CacheDir, NULL, 0775, RunUser, Group, 1, 1);
   check_permissions(CacheDir, "ppd", 0755, RunUser, Group, 1, 1);
 
-  check_permissions(StateDir, NULL, 0775, RunUser, Group, 1, 1);
+  check_permissions(StateDir, NULL, 0755, RunUser, Group, 1, 1);
   check_permissions(StateDir, "certs", RunUser ? 0711 : 0511, User,
                     SystemGroupIDs[0], 1, 1);
 
