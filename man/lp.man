@@ -98,6 +98,10 @@ The following options are recognized by \fBlp\fR:
 .br
 Forces encryption when connecting to the server.
 .TP 5
+\-U
+.br
+Specifies the username to use when connecting to the server.
+.TP 5
 \-c
 .br
 This option is provided for backwards-compatibility only. On
@@ -120,8 +124,12 @@ of the CUPS_SERVER environment variable.
 Specifies an existing job to modify.
 .TP 5
 \-m
+.TP 5
+\-p
+.TP 5
+\-w
 .br
-Send email when the job is completed (not supported CUPS 1.1.)
+Send email when the job is completed.
 .TP 5
 \-n \fIcopies\fR
 .br
@@ -167,15 +175,14 @@ Unlike the System V printing system, CUPS allows printer names to contain
 any printable character except SPACE and TAB. Also, printer and class names are
 \fBnot\fR case-sensitive. 
 .LP
-The "m" option is not functional in CUPS 1.1.
-.LP
 The "q" option accepts a different range of values than the
-Solaris lp command, matching the IPP job priority values (1-100)
-instead of the Solaris values (0-39).
+Solaris lp command, matching the IPP job priority values (1-100, 100 is
+highest priority) instead of the Solaris values (0-39, 0 is highest
+priority).
 .SH NOTES
 Administrators wishing to prevent unauthorized cancellation of
-jobs via the \fI-u\fR option should password-protect the /jobs
-location in \fIcupsd.conf(5)\fR.
+jobs via the \fI-u\fR option should require authentication for
+Cancel-Jobs operations in \fIcupsd.conf(5)\fR.
 .SH SEE ALSO
 lpstat(1),
 .br

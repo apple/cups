@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lprm 1 "Common UNIX Printing System" "18 January 2006" "Easy Software Products"
+.TH lprm 1 "Common UNIX Printing System" "27 January 2006" "Easy Software Products"
 .SH NAME
 lprm \- cancel print jobs
 .SH SYNOPSIS
@@ -32,7 +32,7 @@ lprm \- cancel print jobs
 .I hostname[:port]
 ] [ -P
 .I destination
-]  [ - ] [
+] [ - ] [
 .I job ID(s)
 ]
 .SH DESCRIPTION
@@ -44,6 +44,10 @@ cancelled. You can specify one or more job ID numbers to cancel those jobs,
 or use the \fI\-\fR option to cancel all jobs.
 .LP
 The \fI-E\fR option forces encryption when connecting to the server.
+.LP
+The \fI-U\fR option specifies the username to use when connecting to the server.
+.LP
+The \fI-h\fR option an alternate server to use.
 .SH COMPATIBILITY
 The CUPS version of \fIlprm\fR is compatible with the standard Berkeley
 \fIlprm\fR command.
