@@ -26,6 +26,7 @@ AC_INIT(cups/cups.h)
 
 sinclude(config-scripts/cups-opsys.m4)
 sinclude(config-scripts/cups-common.m4)
+sinclude(config-scripts/cups-defaults.m4)
 sinclude(config-scripts/cups-directories.m4)
 sinclude(config-scripts/cups-manpages.m4)
 
@@ -48,7 +49,8 @@ sinclude(config-scripts/cups-scripting.m4)
 
 AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh cups-config
           conf/cupsd.conf conf/pam.std doc/index.html
-	  doc/help/standard.html templates/edit-config.tmpl)
+	  doc/help/standard.html templates/edit-config.tmpl
+	  templates/header.tmpl)
 
 chmod +x cups-config
 

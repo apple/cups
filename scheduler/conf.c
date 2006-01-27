@@ -392,7 +392,7 @@ cupsdReadConfiguration(void)
   * Numeric options...
   */
 
-  ConfigFilePerm      = 0640; /* TODO: Add configure option */
+  ConfigFilePerm      = CUPS_DEFAULT_CONFIG_FILE_PERM;
   DefaultAuthType     = AUTH_BASIC;
   JobRetryLimit       = 5;
   JobRetryInterval    = 300;
@@ -401,13 +401,13 @@ cupsdReadConfiguration(void)
   FilterLimit         = 0;
   FilterNice          = 0;
   HostNameLookups     = FALSE;
-  ImplicitClasses     = TRUE;
+  ImplicitClasses     = CUPS_DEFAULT_IMPLICIT_CLASSES;
   ImplicitAnyClasses  = FALSE;
   HideImplicitMembers = TRUE;
   KeepAlive           = TRUE;
   KeepAliveTimeout    = DEFAULT_KEEPALIVE;
   ListenBackLog       = SOMAXCONN;
-  LogFilePerm         = 0644;
+  LogFilePerm         = CUPS_DEFAULT_LOG_FILE_PERM;
   LogLevel            = CUPSD_LOG_ERROR;
   MaxClients          = 100;
   MaxClientsPerHost   = 0;
@@ -421,12 +421,12 @@ cupsdReadConfiguration(void)
 
   BrowseInterval        = DEFAULT_INTERVAL;
   BrowsePort            = ippPort();
-  BrowseLocalProtocols  = BROWSE_CUPS;
-  BrowseRemoteProtocols = BROWSE_CUPS;
-  BrowseShortNames      = TRUE;
+  BrowseLocalProtocols  = BROWSE_CUPS; /* TODO: Use configure option */
+  BrowseRemoteProtocols = BROWSE_CUPS; /* TODO: Use configure option */
+  BrowseShortNames      = CUPS_DEFAULT_BROWSE_SHORT_NAMES;
   BrowseTimeout         = DEFAULT_TIMEOUT;
-  Browsing              = TRUE;
-  DefaultShared         = TRUE; /* TODO: Add configure option */
+  Browsing              = CUPS_DEFAULT_BROWSING;
+  DefaultShared         = CUPS_DEFAULT_DEFAULT_SHARED;
 
   cupsdClearString(&BrowseLocalOptions);
   cupsdClearString(&BrowseRemoteOptions);

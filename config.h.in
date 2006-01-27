@@ -5,7 +5,7 @@
  *
  *   @configure_input@
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -36,11 +36,32 @@
 
 
 /*
- * Default user and group...
+ * Default user and groups...
  */
 
 #define CUPS_DEFAULT_USER	"lp"
 #define CUPS_DEFAULT_GROUP	"sys"
+#define CUPS_DEFAULT_SYSTEM_GROUPS	"sys root system"
+
+
+/*
+ * Default file permissions...
+ */
+
+#define CUPS_DEFAULT_CONFIG_FILE_PERM	0640
+#define CUPS_DEFAULT_LOG_FILE_PERM	0644
+
+
+/*
+ * Default browsing settings...
+ */
+
+#define CUPS_DEFAULT_BROWSING	1
+#define CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS	"CUPS"
+#define CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS	"CUPS"
+#define CUPS_DEFAULT_BROWSE_SHORT_NAMES	1
+#define CUPS_DEFAULT_DEFAULT_SHARED 1
+#define CUPS_DEFAULT_IMPLICIT_CLASSES	1
 
 
 /*

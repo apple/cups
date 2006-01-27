@@ -19,7 +19,7 @@ by Easy Software Products, the creator of CUPS.</P>
 </BLOCKQUOTE>
 
 
-<H2><A NAME="CUPSD">cupsd Configuration</A></H2>
+<H2 CLASS="title"><A NAME="CUPSD">cupsd Configuration</A></H2>
 
 <P><CODE>cupsd(8)</CODE> is configured by default to show
 printers shared by other systems and only allow local access to
@@ -31,8 +31,49 @@ Basic authentication with membership in the group
 (<VAR>@CUPS_DEFAULT_DOMAINSOCKET@</VAR>) or "localhost"
 (127.0.0.1).</P>
 
+<H3><A NAME="SETTINGS">Settings</A></H3>
 
-<H2><A NAME="DIRECTORIES">Directories</A></H2>
+<DIV CLASS="table"><TABLE WIDTH="80%">
+<TR>
+	<TH>Directive</TH>
+	<TH>Value</TH>
+</TR>
+<TR>
+	<TD><CODE><A HREF="cupsd-conf-reference.html#Browsing">Browsing</A></CODE></TD>
+	<TD><CODE>@CUPS_BROWSING@</CODE></TD>
+</TR>
+<TR>
+	<TD><CODE><A HREF="cupsd-conf-reference.html#BrowseLocalProtocols">BrowseLocalProtocols</A></CODE></TD>
+	<TD><CODE>@CUPS_BROWSE_LOCAL_PROTOCOLS@</CODE></TD>
+</TR>
+<TR>
+	<TD><CODE><A HREF="cupsd-conf-reference.html#BrowseRemoteProtocols">BrowseRemoteProtocols</A></CODE></TD>
+	<TD><CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE></TD>
+</TR>
+<TR>
+	<TD><CODE><A HREF="cupsd-conf-reference.html#BrowseShortNames">BrowseShortNames</A></CODE></TD>
+	<TD><CODE>@CUPS_BROWSE_SHORT_NAMES@</CODE></TD>
+</TR>
+<TR>
+	<TD><CODE><A HREF="cupsd-conf-reference.html#ConfigFilePerm">ConfigFilePerm</A></CODE></TD>
+	<TD><CODE>@CUPS_CONFIG_FILE_PERM@</CODE></TD>
+</TR>
+<TR>
+	<TD><CODE><A HREF="cupsd-conf-reference.html#DefaultShared">DefaultShared</A></CODE></TD>
+	<TD><CODE>@CUPS_DEFAULT_SHARED@</CODE></TD>
+</TR>
+<TR>
+	<TD><CODE><A HREF="cupsd-conf-reference.html#ImplicitClasses">ImplicitClasses</A></CODE></TD>
+	<TD><CODE>@CUPS_IMPLICIT_CLASSES@</CODE></TD>
+</TR>
+<TR>
+	<TD><CODE><A HREF="cupsd-conf-reference.html#LogFilePerm">LogFilePerm</A></CODE></TD>
+	<TD><CODE>@CUPS_LOG_FILE_PERM@</CODE></TD>
+</TR>
+</TABLE></DIV>
+
+
+<H2 CLASS="title"><A NAME="DIRECTORIES">Directories</A></H2>
 
 <DIV CLASS="table"><TABLE WIDTH="80%">
 <TR>
@@ -122,7 +163,6 @@ Basic authentication with membership in the group
 	directive in <VAR>cupsd.conf</VAR>.</TD>
 </TR>
 </TABLE></DIV>
-
 
 </BODY>
 </HTML>

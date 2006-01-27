@@ -47,6 +47,7 @@ STRIP		=	@STRIP@
 #
 
 INSTALL_BIN	=	$(LIBTOOL) $(INSTALL) -m 755 -s
+INSTALL_CONFIG	=	$(INSTALL) -m @CUPS_CONFIG_FILE_PERM@
 INSTALL_DATA	=	$(INSTALL) -m 644
 INSTALL_DIR	=	$(INSTALL) -d
 INSTALL_LIB	=	$(LIBTOOL) $(INSTALL) -m 755
@@ -54,11 +55,19 @@ INSTALL_MAN	=	$(INSTALL) -m 644
 INSTALL_SCRIPT	=	$(INSTALL) -m 755
 
 #
-# Default user and group for the scheduler...
+# Default user, group, and system groups for the scheduler...
 #
 
 CUPS_USER	=	@CUPS_USER@
 CUPS_GROUP	=	@CUPS_GROUP@
+CUPS_SYSTEM_GROUPS =	@CUPS_SYSTEM_GROUPS@
+
+#
+# Default permissions...
+#
+
+CUPS_CONFIG_FILE_PERM = @CUPS_CONFIG_FILE_PERM@
+CUPS_LOG_FILE_PERM = @CUPS_LOG_FILE_PERM@
 
 #
 # Libraries...

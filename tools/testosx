@@ -25,10 +25,6 @@ rm -rf $pkgdir
 mkdir -p $pkgdir/Package
 mkdir -p $pkgdir/Resources
 
-# Install CUPS into the Package directory...
-#make INSTALL=$topdir/install-sh BUILDROOT=$pkgdir/Package install
-make BUILDROOT=$pkgdir/Package install
-
 # Install resource files into the Resources directory...
 echo Installing resource files...
 cp packaging/LICENSE.rtf $pkgdir/Resources/ReadMe.rtf
@@ -56,6 +52,12 @@ sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
 	<packaging/cups-info.plist.in >packaging/cups-info.plist
 sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
 	<doc/index.html.in >doc/index.html
+sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
+	<templates/header.tmpl.in >templates/header.tmpl
+
+# Install CUPS into the Package directory...
+#make INSTALL=$topdir/install-sh BUILDROOT=$pkgdir/Package install
+make BUILDROOT=$pkgdir/Package install
 
 # Figure out where PackageMaker is installled...
 if test -d /Developer/Applications/Utilities/PackageMaker.app; then
