@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 4993 2006-01-26 19:27:40Z mike $"
+ * "$Id: conf.c 5001 2006-01-26 23:39:23Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -615,7 +615,7 @@ cupsdReadConfiguration(void)
   check_permissions(CacheDir, NULL, 0775, RunUser, Group, 1, 1);
   check_permissions(CacheDir, "ppd", 0755, RunUser, Group, 1, 1);
 
-  check_permissions(StateDir, NULL, 0775, RunUser, Group, 1, 1);
+  check_permissions(StateDir, NULL, 0755, RunUser, Group, 1, 1);
   check_permissions(StateDir, "certs", RunUser ? 0711 : 0511, User,
                     SystemGroupIDs[0], 1, 1);
 
@@ -3122,5 +3122,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 4993 2006-01-26 19:27:40Z mike $".
+ * End of "$Id: conf.c 5001 2006-01-26 23:39:23Z mike $".
  */

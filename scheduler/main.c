@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 4993 2006-01-26 19:27:40Z mike $"
+ * "$Id: main.c 4997 2006-01-26 21:43:54Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -545,7 +545,12 @@ main(int  argc,				/* I - Number of command-line arguments */
     timeout.tv_sec  = select_timeout(fds);
     timeout.tv_usec = 0;
 
-    if ((fds = select(MaxFDs, input, output, NULL, &timeout)) < 0)
+    if (timeout.tv_sec < 86400)		/* Only use timeout for < 1 day */
+      fds = select(MaxFDs, input, output, NULL, &timeout);
+    else
+      fds = select(MaxFDs, input, output, NULL, NULL);
+
+    if (fds < 0)
     {
       char	s[16384],		/* String buffer */
 		*sptr;			/* Pointer into buffer */
@@ -603,6 +608,8 @@ main(int  argc,				/* I - Number of command-line arguments */
         cupsdLogMessage(CUPSD_LOG_EMERG, "Listeners[%d] = %d", i, lis->fd);
 
       cupsdLogMessage(CUPSD_LOG_EMERG, "BrowseSocket = %d", BrowseSocket);
+
+      cupsdLogMessage(CUPSD_LOG_EMERG, "CGIPipes[0] = %d", CGIPipes[0]);
 
       for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	   job;
@@ -749,6 +756,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	{
 	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                  "main: Removing fd %d from InputSet...", con->file);
+	  FD_CLR(con->file, input);
 	  FD_CLR(con->file, InputSet);
 	}
       }
@@ -1491,17 +1499,6 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
 #endif /* HAVE_MALLINFO */
 
  /*
-  * Update the root certificate when needed...
-  */
-
-  if (!RunUser && RootCertDuration &&
-      (RootCertTime + RootCertDuration) < timeout)
-  {
-    timeout = RootCertTime + RootCertDuration;
-    why     = "update root certificate";
-  }
-
- /*
   * Expire subscriptions as needed...
   */
 
@@ -1554,5 +1551,5 @@ usage(void)
 
 
 /*
- * End of "$Id: main.c 4993 2006-01-26 19:27:40Z mike $".
+ * End of "$Id: main.c 4997 2006-01-26 21:43:54Z mike $".
  */

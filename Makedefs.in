@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in 4836 2005-11-13 06:14:46Z mike $"
+# "$Id: Makedefs.in 4999 2006-01-26 23:36:22Z mike $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -73,6 +73,12 @@ LIBPNG		=	@LIBPNG@
 LIBSLP		=	@LIBSLP@
 LIBTIFF		=	@LIBTIFF@
 LIBZ		=	@LIBZ@
+
+#
+# Install static libraries?
+#
+
+INSTALLSTATIC	=	@INSTALLSTATIC@
 
 #
 # Program options...
@@ -189,5 +195,5 @@ PAMFILE		=	@PAMFILE@
 
 
 #
-# End of "$Id: Makedefs.in 4836 2005-11-13 06:14:46Z mike $"
+# End of "$Id: Makedefs.in 4999 2006-01-26 23:36:22Z mike $"
 #

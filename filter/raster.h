@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h 4981 2006-01-25 21:34:00Z mike $"
+ * "$Id: raster.h 4998 2006-01-26 21:59:54Z mike $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -40,7 +40,7 @@
  * Include necessary headers...
  */
 
-#  include <cups/ppd.h>
+#  include <cups/cups.h>
 
 #  ifdef __cplusplus
 extern "C" {
@@ -289,9 +289,12 @@ typedef struct cups_page_header2_s	/**** Version 2 Page Header @since CUPS 1.2@ 
 
   /**** Version 2 Dictionary Values ****/
   unsigned	cupsNumColors;		/* Number of colors @since CUPS 1.2@ */
-  float		cupsPageScaling;	/* Scaling that was applied to page data */
-  float		cupsPageSize[2];	/* Floating point PageSize @since CUPS 1.2@ */
-  float		cupsImagingBBox[4];	/* Floating point ImagingBoundingBox @since CUPS 1.2@ */
+  float		cupsBorderlessScalingFactor;
+					/* Scaling that was applied to page data */
+  float		cupsPageSize[2];	/* Floating point PageSize (scaling *
+  					 * factor not applied) @since CUPS 1.2@ */
+  float		cupsImagingBBox[4];	/* Floating point ImagingBoundingBox *
+					 * (scaling factor not applied) @since CUPS 1.2@ */
   unsigned	cupsInteger[16];	/* User-defined integer values @since CUPS 1.2@ */
   float		cupsReal[16];		/* User-defined floating-point values @since CUPS 1.2@ */
   char		cupsString[16][64];	/* User-defined string values @since CUPS 1.2@ */
@@ -332,7 +335,9 @@ extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 
 /**** New in CUPS 1.2 ****/
 extern int		cupsRasterInterpretPPD(cups_page_header2_t *h,
-			                       ppd_file_t *ppd);
+			                       ppd_file_t *ppd,
+					       int num_options,
+					       cups_option_t *options);
 extern unsigned		cupsRasterReadHeader2(cups_raster_t *r,
 			                      cups_page_header2_t *h);
 extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
@@ -345,5 +350,5 @@ extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h 4981 2006-01-25 21:34:00Z mike $".
+ * End of "$Id: raster.h 4998 2006-01-26 21:59:54Z mike $".
  */

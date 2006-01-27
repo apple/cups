@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 4979 2006-01-25 17:47:43Z mike $"
+dnl "$Id: cups-common.m4 4999 2006-01-26 23:36:22Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -69,8 +69,15 @@ if test "x$CXX" = x; then
 	AC_MSG_ERROR([Unable to find required C++ compiler command.])
 fi
 
-dnl Architecture checks...
-AC_C_BIGENDIAN
+dnl Static library option...
+INSTALLSTATIC=""
+AC_ARG_ENABLE(install_static, [  --enable-static         install static libraries, default=no])
+
+if test x$enable_install_static = xyes; then
+	INSTALLSTATIC="installstatic"
+fi
+
+AC_SUBST(INSTALLSTATIC)
 
 dnl Check for libraries...
 AC_SEARCH_LIBS(crypt, crypt)
@@ -221,5 +228,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 4979 2006-01-25 17:47:43Z mike $".
+dnl End of "$Id: cups-common.m4 4999 2006-01-26 23:36:22Z mike $".
 dnl
