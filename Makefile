@@ -28,7 +28,7 @@ include Makedefs
 # Directories to make...
 #
 
-DIRS	=	cups backend berkeley cgi-bin filter man pdftops \
+DIRS	=	cups backend berkeley cgi-bin filter locale man pdftops \
 		notifier scheduler systemv
 
 #
@@ -80,8 +80,6 @@ install:	installhdrs
 	(cd doc; $(MAKE) $(MFLAGS) install)
 	echo Installing in fonts...
 	(cd fonts; $(MAKE) $(MFLAGS) install)
-	echo Installing in locale...
-	(cd locale; $(MAKE) $(MFLAGS) install)
 	echo Installing in ppd...
 	(cd ppd; $(MAKE) $(MFLAGS) install)
 	echo Installing in templates...
