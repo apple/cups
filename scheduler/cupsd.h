@@ -121,6 +121,7 @@ extern const char *cups_hstrerror(int);
  * Other stuff for the scheduler...
  */
 
+#include "sysman.h"
 #include "statbuf.h"
 #include "cert.h"
 #include "auth.h"

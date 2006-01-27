@@ -187,6 +187,7 @@ dnl Extra platform-specific libraries...
 case $uname in
         Darwin*)
                 BACKLIBS="-framework IOKit"
+                CUPSDLIBS="-framework IOKit -framework SystemConfiguration"
                 LIBS="-framework CoreFoundation $LIBS"
 
 		dnl Check for CFLocaleCreateCanonicalLocaleIdentifierFromString...
@@ -214,10 +215,12 @@ case $uname in
                 ;;
         *)
                 BACKLIBS=""
+		CUPSDLIBS=""
                 ;;
 esac
 
 AC_SUBST(BACKLIBS)
+AC_SUBST(CUPSDLIBS)
 
 dnl New default port definition for IPP...
 AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP ],

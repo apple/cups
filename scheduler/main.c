@@ -153,11 +153,22 @@ main(int  argc,				/* I - Number of command-line arguments */
 	        * Relative directory...
 		*/
 
-                char current[1024];	/* Current directory */
+                char *current;		/* Current directory */
 
 
-                getcwd(current, sizeof(current));
+	       /*
+	        * Allocate a buffer for the current working directory to
+		* reduce run-time stack usage; this approximates the
+		* behavior of some implementations of getcwd() when they
+		* are passed a NULL pointer.
+	        */
+
+                current = malloc(1024);
+		getcwd(current, 1024);
+
 		cupsdSetStringf(&ConfigurationFile, "%s/%s", current, argv[i]);
+
+		free(current);
               }
 	      break;
 
@@ -430,6 +441,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
  /*
+  * Start power management framework...
+  */
+
+  cupsdStartSystemMonitor();
+
+ /*
   * If the administrator has configured the server to run as an unpriviledged
   * user, change to that user now...
   */
@@ -611,6 +628,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       cupsdLogMessage(CUPSD_LOG_EMERG, "CGIPipes[0] = %d", CGIPipes[0]);
 
+#ifdef __APPLE__
+      cupsdLogMessage(CUPSD_LOG_EMERG, "SysEventPipes[0] = %d",
+                      SysEventPipes[0]);
+#endif /* __APPLE__ */
+
       for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	   job;
 	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
@@ -653,6 +675,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (CGIPipes[0] >= 0 && FD_ISSET(CGIPipes[0], input))
       cupsdUpdateCGI();
+
+   /*
+    * Handle system management events as needed...
+    */
+
+#ifdef __APPLE__
+    if (SysEventPipes[0] >= 0 && FD_ISSET(SysEventPipes[0], input))
+      cupsdUpdateSystemMonitor();
+#endif	/* __APPLE__ */
 
    /*
     * Update notifier messages as needed...
@@ -892,6 +923,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   cupsdStopServer();
 
   cupsdStopAllJobs();
+
+  cupsdStopSystemMonitor();
 
 #ifdef __sgi
  /*

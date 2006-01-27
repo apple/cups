@@ -291,7 +291,8 @@ cupsdCheckJobs(void)
     * Start pending jobs if the destination is available...
     */
 
-    if (job->state->values[0].integer == IPP_JOB_PENDING && !NeedReload)
+    if (job->state->values[0].integer == IPP_JOB_PENDING && !NeedReload &&
+        !Sleeping)
     {
       printer = cupsdFindDest(job->dest);
       pclass  = NULL;

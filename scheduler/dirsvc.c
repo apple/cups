@@ -2052,6 +2052,13 @@ cupsdUpdateCUPSBrowse(void)
   packet[bytes] = '\0';
 
  /*
+  * If we're about to sleep, ignore incoming browse packets.
+  */
+
+  if (Sleeping)
+    return;
+
+ /*
   * Figure out where it came from...
   */
 

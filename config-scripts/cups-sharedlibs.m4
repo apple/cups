@@ -57,7 +57,7 @@ if test x$enable_shared != xno; then
 			LIBCUPS="libcups.2.dylib"
 			LIBCUPSIMAGE="libcupsimage.2.dylib"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS \$(RC_CFLAGS) -dynamiclib -lc"
+			DSOFLAGS="$DSOFLAGS \$(RC_CFLAGS) -dynamiclib -single_module -lc"
 			;;
 		AIX*)
 			LIBCUPS="libcups_s.a"
