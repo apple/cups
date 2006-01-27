@@ -1702,7 +1702,8 @@ cupsdStartBrowsing(void)
   if (!Browsing || !(BrowseLocalProtocols | BrowseRemoteProtocols))
     return;
 
-  if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS)
+  if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS) &&
+      BrowseSocket < 0)
   {
    /*
     * Create the broadcast socket...
@@ -1924,27 +1925,25 @@ cupsdStopBrowsing(void)
   if (!Browsing || !(BrowseLocalProtocols | BrowseRemoteProtocols))
     return;
 
-  if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS)
+  if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS) &&
+      BrowseSocket >= 0)
   {
    /*
     * Close the socket and remove it from the input selection set.
     */
 
-    if (BrowseSocket >= 0)
-    {
 #ifdef WIN32
-      closesocket(BrowseSocket);
+    closesocket(BrowseSocket);
 #else
-      close(BrowseSocket);
+    close(BrowseSocket);
 #endif /* WIN32 */
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdStopBrowsing: Removing fd %d from InputSet...",
-        	      BrowseSocket);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdStopBrowsing: Removing fd %d from InputSet...",
+		    BrowseSocket);
 
-      FD_CLR(BrowseSocket, InputSet);
-      BrowseSocket = -1;
-    }
+    FD_CLR(BrowseSocket, InputSet);
+    BrowseSocket = -1;
   }
 
 #ifdef HAVE_LIBSLP
