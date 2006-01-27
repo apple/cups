@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 4992 2006-01-26 17:50:58Z mike $"
+ * "$Id: job.c 5007 2006-01-27 18:25:42Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -291,7 +291,8 @@ cupsdCheckJobs(void)
     * Start pending jobs if the destination is available...
     */
 
-    if (job->state->values[0].integer == IPP_JOB_PENDING && !NeedReload)
+    if (job->state->values[0].integer == IPP_JOB_PENDING && !NeedReload &&
+        !Sleeping)
     {
       printer = cupsdFindDest(job->dest);
       pclass  = NULL;
@@ -2685,5 +2686,5 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 4992 2006-01-26 17:50:58Z mike $".
+ * End of "$Id: job.c 5007 2006-01-27 18:25:42Z mike $".
  */

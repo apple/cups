@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 4999 2006-01-26 23:36:22Z mike $"
+dnl "$Id: cups-common.m4 5007 2006-01-27 18:25:42Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -187,6 +187,7 @@ dnl Extra platform-specific libraries...
 case $uname in
         Darwin*)
                 BACKLIBS="-framework IOKit"
+                CUPSDLIBS="-framework IOKit -framework SystemConfiguration"
                 LIBS="-framework CoreFoundation $LIBS"
 
 		dnl Check for CFLocaleCreateCanonicalLocaleIdentifierFromString...
@@ -214,10 +215,12 @@ case $uname in
                 ;;
         *)
                 BACKLIBS=""
+		CUPSDLIBS=""
                 ;;
 esac
 
 AC_SUBST(BACKLIBS)
+AC_SUBST(CUPSDLIBS)
 
 dnl New default port definition for IPP...
 AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP ],
@@ -228,5 +231,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 4999 2006-01-26 23:36:22Z mike $".
+dnl End of "$Id: cups-common.m4 5007 2006-01-27 18:25:42Z mike $".
 dnl

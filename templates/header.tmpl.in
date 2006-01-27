@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
-	<TITLE>{title} - {cups_version}</TITLE>
+	<TITLE>{title} - @CUPS_VERSION@</TITLE>
 	<!-- Prevent caching of CGI content -->
 	<META HTTP-EQUIV="Expires" CONTENT="now">
 	<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 

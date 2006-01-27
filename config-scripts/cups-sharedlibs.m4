@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4 4800 2005-10-18 18:06:20Z mike $"
+dnl "$Id: cups-sharedlibs.m4 5007 2006-01-27 18:25:42Z mike $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -57,7 +57,7 @@ if test x$enable_shared != xno; then
 			LIBCUPS="libcups.2.dylib"
 			LIBCUPSIMAGE="libcupsimage.2.dylib"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS \$(RC_CFLAGS) -dynamiclib -lc"
+			DSOFLAGS="$DSOFLAGS \$(RC_CFLAGS) -dynamiclib -single_module -lc"
 			;;
 		AIX*)
 			LIBCUPS="libcups_s.a"
@@ -152,5 +152,5 @@ AC_SUBST(IMGLIBS)
 AC_SUBST(EXPORT_LDFLAGS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4 4800 2005-10-18 18:06:20Z mike $".
+dnl End of "$Id: cups-sharedlibs.m4 5007 2006-01-27 18:25:42Z mike $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 4906 2006-01-10 20:53:28Z mike $"
+ * "$Id: dirsvc.c 5008 2006-01-27 19:30:34Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1704,18 +1704,48 @@ cupsdStartBrowsing(void)
 
   if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS)
   {
-   /*
-    * Create the broadcast socket...
-    */
-
-    if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    if (BrowseSocket < 0)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdStartBrowsing: Unable to create broadcast socket - %s.",
-        	      strerror(errno));
-      BrowseLocalProtocols &= ~BROWSE_CUPS;
-      BrowseRemoteProtocols &= ~BROWSE_CUPS;
-      return;
+     /*
+      * Create the broadcast socket...
+      */
+
+      if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"cupsdStartBrowsing: Unable to create broadcast "
+			"socket - %s.", strerror(errno));
+	BrowseLocalProtocols &= ~BROWSE_CUPS;
+	BrowseRemoteProtocols &= ~BROWSE_CUPS;
+	return;
+      }
+
+     /*
+      * Bind the socket to browse port...
+      */
+
+      memset(&addr, 0, sizeof(addr));
+      addr.sin_addr.s_addr = htonl(INADDR_ANY);
+      addr.sin_family      = AF_INET;
+      addr.sin_port        = htons(BrowsePort);
+
+      if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"cupsdStartBrowsing: Unable to bind broadcast "
+			"socket - %s.", strerror(errno));
+
+#ifdef WIN32
+	closesocket(BrowseSocket);
+#else
+	close(BrowseSocket);
+#endif /* WIN32 */
+
+	BrowseSocket = -1;
+	BrowseLocalProtocols &= ~BROWSE_CUPS;
+	BrowseRemoteProtocols &= ~BROWSE_CUPS;
+	return;
+      }
     }
 
    /*
@@ -1727,33 +1757,6 @@ cupsdStartBrowsing(void)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "cupsdStartBrowsing: Unable to set broadcast mode - %s.",
-        	      strerror(errno));
-
-#ifdef WIN32
-      closesocket(BrowseSocket);
-#else
-      close(BrowseSocket);
-#endif /* WIN32 */
-
-      BrowseSocket = -1;
-      BrowseLocalProtocols &= ~BROWSE_CUPS;
-      BrowseRemoteProtocols &= ~BROWSE_CUPS;
-      return;
-    }
-
-   /*
-    * Bind the socket to browse port...
-    */
-
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_family      = AF_INET;
-    addr.sin_port        = htons(BrowsePort);
-
-    if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdStartBrowsing: Unable to bind broadcast socket - %s.",
         	      strerror(errno));
 
 #ifdef WIN32
@@ -1924,27 +1927,25 @@ cupsdStopBrowsing(void)
   if (!Browsing || !(BrowseLocalProtocols | BrowseRemoteProtocols))
     return;
 
-  if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS)
+  if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS) &&
+      BrowseSocket >= 0)
   {
    /*
     * Close the socket and remove it from the input selection set.
     */
 
-    if (BrowseSocket >= 0)
-    {
 #ifdef WIN32
-      closesocket(BrowseSocket);
+    closesocket(BrowseSocket);
 #else
-      close(BrowseSocket);
+    close(BrowseSocket);
 #endif /* WIN32 */
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdStopBrowsing: Removing fd %d from InputSet...",
-        	      BrowseSocket);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdStopBrowsing: Removing fd %d from InputSet...",
+		    BrowseSocket);
 
-      FD_CLR(BrowseSocket, InputSet);
-      BrowseSocket = -1;
-    }
+    FD_CLR(BrowseSocket, InputSet);
+    BrowseSocket = -1;
   }
 
 #ifdef HAVE_LIBSLP
@@ -2051,6 +2052,13 @@ cupsdUpdateCUPSBrowse(void)
   }
 
   packet[bytes] = '\0';
+
+ /*
+  * If we're about to sleep, ignore incoming browse packets.
+  */
+
+  if (Sleeping)
+    return;
 
  /*
   * Figure out where it came from...
@@ -2631,5 +2639,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id: dirsvc.c 4906 2006-01-10 20:53:28Z mike $".
+ * End of "$Id: dirsvc.c 5008 2006-01-27 19:30:34Z mike $".
  */

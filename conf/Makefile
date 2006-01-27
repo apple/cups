@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4972 2006-01-24 14:48:12Z mike $"
+# "$Id: Makefile 5008 2006-01-27 19:30:34Z mike $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -54,17 +54,17 @@ install:	all
 	$(INSTALL_DIR) $(SERVERROOT)
 	for file in $(KEEP); do \
 		if test -r $(SERVERROOT)/$$file ; then \
-			$(INSTALL_DATA) $$file $(SERVERROOT)/$$file.N ; \
+			$(INSTALL_CONFIG) $$file $(SERVERROOT)/$$file.N ; \
 		else \
-			$(INSTALL_DATA) $$file $(SERVERROOT) ; \
+			$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
 		fi ; \
 	done
-	$(INSTALL_DATA) cupsd.conf $(SERVERROOT)/cupsd.conf.default
+	$(INSTALL_CONFIG) cupsd.conf $(SERVERROOT)/cupsd.conf.default
 	for file in $(REPLACE); do \
 		if test -r $(SERVERROOT)/$$file ; then \
 			$(MV) $(SERVERROOT)/$$file $(SERVERROOT)/$$file.O ; \
 		fi ; \
-		$(INSTALL_DATA) $$file $(SERVERROOT) ; \
+		$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
 	done
 	-if test x$(PAMDIR) != x$(BUILDROOT); then \
 		$(INSTALL_DIR) $(PAMDIR); \
@@ -77,5 +77,5 @@ install:	all
 
 
 #
-# End of "$Id: Makefile 4972 2006-01-24 14:48:12Z mike $".
+# End of "$Id: Makefile 5008 2006-01-27 19:30:34Z mike $".
 #
