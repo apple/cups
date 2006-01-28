@@ -353,6 +353,15 @@
 
 
 /*
+ * Do we have launchd support?
+ */
+
+#undef HAVE_LAUNCH_H
+#undef HAVE_LAUNCHD
+#define CUPS_DEFAULT_LAUNCHD_CONF ""
+
+
+/*
  * Various scripting languages...
  */
 

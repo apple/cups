@@ -32,6 +32,12 @@
  *   cupsdReleaseSignals()     - Release signals for delivery.
  *   cupsdSetString()          - Set a string value.
  *   cupsdSetStringf()         - Set a formatted string value.
+ *   launchd_checkin()         - Check-in with launchd and collect the
+ *                               listening fds.
+ *   launchd_reload()          - Tell launchd to reload the configuration
+ *                               file to pick up the new listening directives.
+ *   launchd_sync_conf()       - Re-write the launchd(8) config file 
+ *			         com.easysw.cupsd.plist based on cupsd.conf.
  *   parent_handler()          - Catch USR1/CHLD signals...
  *   process_children()        - Process all dead children...
  *   sigchld_handler()         - Handle 'child' signals from old processes.
@@ -53,6 +59,11 @@
 #include <syslog.h>
 #include <grp.h>
 
+#ifdef HAVE_LAUNCH_H
+#  include <launch.h>
+#  include <libgen.h>
+#endif /* HAVE_LAUNCH_H */
+
 #if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
 #  include <malloc.h>
 #endif /* HAVE_MALLOC_H && HAVE_MALLINFO */
@@ -64,6 +75,12 @@
 /*
  * Local functions...
  */
+
+#ifdef HAVE_LAUNCHD
+static void	launchd_checkin(void);
+static void	launchd_reload(void);
+static int	launchd_sync_conf(void);
+#endif /* HAVE_LAUNCHD */
 
 static void	parent_handler(int sig);
 static void	process_children(void);
@@ -105,7 +122,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   cupsd_job_t		*job;		/* Current job */
   cupsd_listener_t	*lis;		/* Current listener */
   time_t		current_time,	/* Current time */
-			activity,	/* Activity timer */
+			activity,	/* Client activity timer */
 			browse_time,	/* Next browse send time */
 			senddoc_time,	/* Send-Document time */
 			expire_time;	/* Subscription expire time */
@@ -121,13 +138,21 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_file_t		*fp;		/* Fake lpsched lock file */
   struct stat		statbuf;	/* Needed for checking lpsched FIFO */
 #endif /* __sgi */
+#if HAVE_LAUNCHD
+  int			launchd,	/* Started with the -l option? */
+			launchd_idle_exit;
+					/* Idle exit on select timeout? */
+#endif	/* HAVE_LAUNCHD */
 
 
  /*
   * Check for command-line arguments...
   */
 
-  fg = 0;
+  fg      = 0;
+#if HAVE_LAUNCHD
+  launchd = 0;
+#endif /* HAVE_LAUNCHD */
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -179,6 +204,13 @@ main(int  argc,				/* I - Number of command-line arguments */
           case 'F' : /* Run in foreground, but still disconnect from terminal... */
 	      fg = -1;
 	      break;
+
+#ifdef HAVE_LAUNCHD
+          case 'l' : /* Started by launchd... */
+	      launchd = 1;
+	      fg      = 1;
+	      break;
+#endif /* HAVE_LAUNCHD */
 
 	  default : /* Unknown option */
               fprintf(stderr, "cupsd: Unknown option \'%c\' - aborting!\n",
@@ -348,6 +380,37 @@ main(int  argc,				/* I - Number of command-line arguments */
            ConfigurationFile);
     return (1);
   }
+
+#if HAVE_LAUNCHD
+  if (launchd)
+  {
+   /*
+    * If we were started by launchd make sure the cupsd plist file contains the
+    * same listeners as cupsd.conf; If it didn't then reload it before getting
+    * the list of listening file descriptors...
+    */
+
+    if (launchd_sync_conf())
+    {
+      launchd_reload();
+
+     /*
+      * Until rdar://3854821 is fixed we have to exit after the reload...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Exiting on launchd_reload");
+      exit(0);
+    }
+
+    launchd_checkin();
+  }
+#endif /* HAVE_LAUNCHD */
+
+ /*
+  * Startup the server...
+  */
+
+  cupsdStartServer();
 
  /*
   * Catch hangup and child signals and ignore broken pipes...
@@ -539,12 +602,48 @@ main(int  argc,				/* I - Number of command-line arguments */
       if ((NumClients == 0 && (!job || NeedReload != RELOAD_ALL)) ||
           (time(NULL) - ReloadTime) >= ReloadTimeout)
       {
+       /*
+	* Shutdown the server...
+	*/
+
+	cupsdStopServer();
+
+       /*
+	* Read configuration...
+	*/
+
         if (!cupsdReadConfiguration())
         {
           syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
 		 ConfigurationFile);
           break;
 	}
+
+#if HAVE_LAUNCHD
+	if (launchd)
+	{
+	  if (launchd_sync_conf())
+	  {
+	    launchd_reload();
+
+	   /*
+	    * Until rdar://3854821 is fixed we have to exit after the reload...
+	    */
+
+	    cupsdLogMessage(CUPSD_LOG_DEBUG2, "Exiting on launchd_reload");
+	    stop_scheduler = 1;
+	    break;
+	  }
+
+	  launchd_checkin();
+	}
+#endif /* HAVE_LAUNCHD */
+
+       /*
+        * Startup the server...
+        */
+
+        cupsdStartServer();
       }
     }
 
@@ -561,6 +660,24 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     timeout.tv_sec  = select_timeout(fds);
     timeout.tv_usec = 0;
+
+#if HAVE_LAUNCHD
+   /*
+    * If no other work is scheduled and we're being controlled by
+    * launchd(8) then timeout after 'LaunchdTimeout' seconds of
+    * inactivity...
+    */
+
+    if (timeout.tv_sec == 86400 && launchd && LaunchdTimeout && 
+	(!Browsing || !(BrowseLocalProtocols & BROWSE_DNSSD) ||
+	 cupsArrayCount(Printers) == 0))
+    {
+      timeout.tv_sec    = LaunchdTimeout;
+      launchd_idle_exit = 1;
+    }
+    else
+      launchd_idle_exit = 0;
+#endif	/* HAVE_LAUNCHD */
 
     if (timeout.tv_sec < 86400)		/* Only use timeout for < 1 day */
       fds = select(MaxFDs, input, output, NULL, &timeout);
@@ -645,6 +762,22 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
     current_time = time(NULL);
+
+#if HAVE_LAUNCHD
+   /*
+    * If no other work was scheduled and we're being controlled by launchd(8)
+    * then timeout after 'LaunchdTimeout' seconds of inactivity...
+    */
+
+    if (!fds && launchd_idle_exit)
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "Printer sharing is off and there are no jobs pending, "
+		      "will restart on demand.");
+      stop_scheduler = 1;
+      break;
+    }
+#endif /* HAVE_LAUNCHD */
 
    /*
     * Check for status info from job filters...
@@ -926,6 +1059,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   cupsdStopSystemMonitor();
 
+#ifdef HAVE_LAUNCHD
+ /*
+  * Update the launchd config file as needed...
+  */
+
+  launchd_sync_conf();
+#endif /* HAVE_LAUNCHD */
+
 #ifdef __sgi
  /*
   * Remove the fake IRIX lpsched lock file, but only if the existing
@@ -1191,6 +1332,553 @@ cupsdSetStringf(char       **s,		/* O - New string */
   if (olds)
     free(olds);
 }
+
+
+#ifdef HAVE_LAUNCHD
+/*
+ * 'launchd_checkin()' - Check-in with launchd and collect the listening fds.
+ */
+
+static void
+launchd_checkin(void)
+{
+  int			i,		/* Looping var */
+			portnum;	/* Port number */
+  launch_data_t		ld_msg,		/* Launch data message */
+			ld_resp,	/* Launch data response */
+			ld_array,	/* Launch data array */
+			ld_sockets,	/* Launch data sockets dictionary */
+			ld_runatload,	/* Run-at-load setting */
+			tmp;		/* Launch data */
+  cupsd_listener_t	*lis;		/* Listeners array */
+  http_addr_t		addr;		/* Address variable */
+  socklen_t		addrlen;	/* Length of address */
+  bool			runatload;	/* Run-at-load setting value */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: pid=%d", (int)getpid());
+
+ /*
+  * Check-in with launchd...
+  */
+
+  ld_msg = launch_data_new_string(LAUNCH_KEY_CHECKIN);
+  if ((ld_resp = launch_msg(ld_msg)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, 
+		    "launchd_checkin: launch_msg(\"" LAUNCH_KEY_CHECKIN
+		    "\") IPC failure");
+    exit(EXIT_FAILURE);
+  }
+  
+  if (launch_data_get_type(ld_resp) == LAUNCH_DATA_ERRNO)
+  {
+    errno = launch_data_get_errno(ld_resp);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_checkin: Check-in failed: %s",
+                    strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+
+ /*
+  * Get the "run-at-load" setting...
+  */
+
+  if ((ld_runatload = launch_data_dict_lookup(ld_resp,
+                                              LAUNCH_JOBKEY_RUNATLOAD)) != NULL &&
+      launch_data_get_type(ld_runatload) == LAUNCH_DATA_BOOL)
+    runatload = launch_data_get_bool(ld_runatload);
+  else
+  {
+    errno = launch_data_get_errno(ld_resp);
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "launchd_checkin: Unable to find Run-at-load setting: %s",
+                    strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: Run-at-load=%s",
+                  runatload ? "true" : "false");
+
+ /*
+  * Get the sockets dictionary...
+  */
+
+  if (!(ld_sockets = launch_data_dict_lookup(ld_resp, LAUNCH_JOBKEY_SOCKETS)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "launchd_checkin: No sockets found to answer requests on!");
+    exit(EXIT_FAILURE);
+  }
+  
+ /*
+  * Get the array of listener sockets...
+  */
+
+  if (!(ld_array = launch_data_dict_lookup(ld_sockets, "Listeners")))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "launchd_checkin: No sockets found to answer requests on!");
+    exit(EXIT_FAILURE);
+  }
+
+ /*
+  * Add listening fd(s) to the Listener array...
+  */
+
+  if (launch_data_get_type(ld_array) == LAUNCH_DATA_ARRAY)
+  {
+   /*
+    * Free the listeners array built from cupsd.conf...
+    */
+  
+    if (NumListeners > 0)
+      free(Listeners);
+  
+    NumListeners = launch_data_array_get_count(ld_array);
+    Listeners    = calloc(NumListeners, sizeof(cupsd_listener_t));
+
+    if (!Listeners)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "launchd_checkin: Unable to allocate new Listeners - %s.",
+                      strerror(errno));
+      exit(EXIT_FAILURE);
+    }
+
+   /*
+    * Note: launchd wants us to access the array in ascending order,
+    * thus "i" counts up and not down as we normally do elsewhere...
+    */
+
+    for (i = 0, lis = Listeners; i < NumListeners; i ++, lis ++)
+    {
+     /*
+      * Copy the current address and log it...
+      */
+  
+      tmp     = launch_data_array_get_index(ld_array, i);
+      lis->fd = launch_data_get_fd(tmp);
+      addrlen = sizeof(lis->address);
+
+      if (getsockname(lis->fd, (struct sockaddr *)&(lis->address), &addrlen))
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "launchd_checkin: Unable to get local address - %s",
+			strerror(errno));
+      }
+    
+#  ifdef HAVE_SSL
+      portnum = 0;
+  
+#    ifdef AF_INET6
+      if (addr.addr.sa_family == AF_INET6)
+	portnum = ntohs(addr.ipv6.sin6_port);
+      else
+#    endif /* AF_INET6 */
+#    ifdef AF_LOCAL
+      if (addr.addr.sa_family == AF_LOCAL)
+      {
+       /*
+	* Make sure the domain socket is accessible to all...
+	*/
+
+	fchmod(lis->fd, 0140777);
+      }
+      else
+#    endif /* AF_LOCAL */
+      if (addr.addr.sa_family == AF_INET)
+	portnum = ntohs(addr.ipv4.sin_port);
+
+      if (portnum == 443)
+	lis->encryption = HTTP_ENCRYPT_ALWAYS;
+#  endif /* HAVE_SSL */
+    }
+  }
+
+ /*
+  * Collect the browse socket (if there is one)...
+  */
+
+  if ((ld_array = launch_data_dict_lookup(ld_sockets, "BrowseSockets")))
+  {
+    if (launch_data_get_type(ld_array) == LAUNCH_DATA_ARRAY)
+    {
+      tmp = launch_data_array_get_index(ld_array, 0);
+
+      if (launch_data_get_type(tmp) == LAUNCH_DATA_FD)
+      {
+        if (BrowseSocket != -1)
+	  close(BrowseSocket);
+
+	BrowseSocket = launch_data_get_fd(tmp);
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_WARN,
+	                "launchd_checkin: BrowseSocket not a fd!");
+   }
+   else
+     cupsdLogMessage(CUPSD_LOG_WARN,
+                     "launchd_checkin: BrowseSockets is not an array!");
+  }
+  else
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: No BrowseSockets");
+
+  launch_data_free(ld_msg);
+  launch_data_free(ld_resp);
+}
+
+
+/*
+ * 'launchd_reload()' - Tell launchd to reload the configuration file to pick
+ *                      up the new listening directives.
+ */
+
+static void
+launchd_reload(void)
+{
+  int		child_status;		/* Exit status of child process */
+  pid_t		child_pid,		/* Child PID */
+		waitpid_status;		/* Child process exit status */
+  char		*argv[4];		/* Argument strings */
+
+
+ /*
+  * The current launchd doesn't support a reload option (rdar://3854821).
+  * Until this is fixed we need to reload the config file by execing launchctl
+  * twice (to unload then load). NOTE: This will cause us to exit on SIGTERM
+  * which will cancel all client & job activity.
+  *
+  * After this is fixed we'll be able to tell launchd to reload the file
+  * and pick up the new listening descriptors without disrupting current
+  * activity.
+  */
+
+ /*
+  * Unloading the current configuration will cause launchd to send us a SIGTERM;
+  * block it for now so we can get our work done...
+  */
+
+  cupsdHoldSignals();
+
+ /*
+  * Set up the unload arguments to launchctl...
+  */
+
+  argv[0] = "/bin/launchctl";
+  argv[1] = "unload";
+  argv[2] = LaunchdConf;
+  argv[3] = NULL;
+
+  if (cupsdStartProcess(argv[0], argv, NULL, -1, -1, -1, -1, 1, &child_pid) < 0)
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "launchd_reload: Unable to execute %s - %s", argv[0],
+                    strerror(errno));
+  else
+  {
+    do
+    {
+      waitpid_status = waitpid(child_pid, &child_status, 0);
+    }
+    while (waitpid_status == (pid_t)-1 && errno == EINTR);
+
+    if (WIFSIGNALED(child_status))
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "launchd_reload: %s pid %d crashed on signal %d!", 
+		      basename(argv[0]), child_pid, WTERMSIG(child_status));
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "launchd_reload: %s pid %d stopped with status %d!", 
+		      basename(argv[0]), child_pid, WEXITSTATUS(child_status));
+
+   /*
+    * Do it again with the load command...
+    */
+  
+    argv[1] = "load";
+
+    if (cupsdStartProcess(argv[0], argv, NULL, -1, -1, -1, -1, 1,
+                          &child_pid) < 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "launchd_reload: Unable to fork for %s - %s", argv[0],
+                      strerror(errno));
+    }
+    else
+    {
+      do
+      {
+	waitpid_status = waitpid(child_pid, &child_status, 0);
+      } while (waitpid_status == (pid_t)-1 && errno == EINTR);
+
+      if (WIFSIGNALED(child_status))
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "launchd_reload: %s pid %d crashed on signal %d!",
+			basename(argv[0]), child_pid, WTERMSIG(child_status));
+      else
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "launchd_reload: %s pid %d stopped with status %d",
+			basename(argv[0]), child_pid,
+			WEXITSTATUS(child_status));
+    }
+  }
+
+ /*
+  * Leave signals blocked since exit() will be called momentarily anyways...
+  */
+}
+
+
+/*
+ * 'launchd_sync_conf()' - Re-write the launchd(8) config file 
+ *			   org.cups.cupsd.plist based on cupsd.conf.
+ */
+
+static int				/* O - 1 if the file was updated */
+launchd_sync_conf(void)
+{
+  int			  i,		/* Looping var */
+			  portnum;	/* Port number */
+  CFMutableDictionaryRef  cupsd_dict,	/* com.easysw.cupsd.plist dictionary */
+			  sockets,	/* Sockets dictionary */
+			  listener;	/* Listener dictionary */
+  CFDataRef		  resourceData;	/* XML representation of the property list */
+  CFMutableArrayRef	  array;	/* Array */
+  CFNumberRef		  socket_mode;	/* Domain socket mode bits */
+  CFStringRef		  socket_path;	/* Domain socket path */
+  CFTypeRef		  value;	/* CF value */
+  CFURLRef		  fileURL;	/* File URL */
+  SInt32		  errorCode;	/* Error code */
+  cupsd_listener_t	  *lis;		/* Current listening socket */
+  struct servent	  *service;	/* Services data base entry */
+  char			  temp[1024];	/* Temporary buffer for value */
+  struct stat		  cupsd_sb,	/* File info for cupsd.conf */
+			  launchd_sb;	/* File info for com.easysw.cupsd.plist */
+
+
+ /*
+  * If the launchd conf file modification time is newer than the cupsd.conf
+  * time then there's nothing to do...
+  */
+
+  if (!stat(ConfigurationFile, &cupsd_sb) && 
+      !stat(LaunchdConf, &launchd_sb) && 
+      launchd_sb.st_mtimespec.tv_sec >= cupsd_sb.st_mtimespec.tv_sec)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "launchd_sync_conf: Nothing to do, pid=%d.", 
+		    (int)getpid());
+    return (0);
+  }
+
+ /*
+  * Time to write a new 'com.easysw.cupsd.plist' file.
+  * Create the new dictionary and populate it with values...
+  */
+
+  if ((cupsd_dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+				&kCFTypeDictionaryKeyCallBacks,
+				&kCFTypeDictionaryValueCallBacks)) != NULL)
+  {
+    CFDictionaryAddValue(cupsd_dict, CFSTR("Label"), CFSTR("org.cups.cupsd"));
+    CFDictionaryAddValue(cupsd_dict, CFSTR("Enabled"), kCFBooleanTrue);
+    CFDictionaryAddValue(cupsd_dict, CFSTR("OnDemand"), kCFBooleanTrue);
+
+    if ((Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)) ||
+        cupsArrayCount(ActiveJobs))
+      CFDictionaryAddValue(cupsd_dict, CFSTR("RunAtLoad"), kCFBooleanTrue);
+    else
+      CFDictionaryAddValue(cupsd_dict, CFSTR("RunAtLoad"), kCFBooleanFalse);
+
+    CFDictionaryAddValue(cupsd_dict, CFSTR("ServiceIPC"), kCFBooleanTrue);
+
+    if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 2,
+                                      &kCFTypeArrayCallBacks)) != NULL)
+    {
+      CFDictionaryAddValue(cupsd_dict, CFSTR("ProgramArguments"), array);
+      CFArrayAppendValue(array, CFSTR("/usr/sbin/cupsd"));
+      CFArrayAppendValue(array, CFSTR("-l"));
+      CFRelease(array);
+    }
+
+   /*
+    * Add a sockets dictionary...
+    */
+  
+    if ((sockets = (CFMutableDictionaryRef)CFDictionaryCreateMutable(
+				kCFAllocatorDefault, 0,
+				&kCFTypeDictionaryKeyCallBacks,
+				&kCFTypeDictionaryValueCallBacks)) != NULL)
+    {
+      CFDictionaryAddValue(cupsd_dict, CFSTR("Sockets"), sockets);
+
+     /*
+      * Add a Listeners array to the sockets dictionary...
+      */
+    
+      if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 0,
+                                        &kCFTypeArrayCallBacks)) != NULL)
+      {
+	CFDictionaryAddValue(sockets, CFSTR("Listeners"), array);
+
+       /*
+	* For each listener add a dictionary to the listeners array...
+	*/
+      
+        for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+	{
+	  if ((listener = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+				&kCFTypeDictionaryKeyCallBacks,
+				&kCFTypeDictionaryValueCallBacks)) != NULL)
+	  {
+	    CFArrayAppendValue(array, listener);
+
+#  ifdef AF_LOCAL
+	    if (lis->address.addr.sa_family == AF_LOCAL)
+	    {
+	      if ((socket_path = CFStringCreateWithCString(kCFAllocatorDefault, 
+					lis->address.un.sun_path, 
+					kCFStringEncodingUTF8)))
+	      {
+		CFDictionaryAddValue(listener, CFSTR("SockPathName"),
+		                     socket_path);
+		CFRelease(socket_path);
+	      }
+	      portnum = 0140777; /* (S_IFSOCK|S_IRWXU|S_IRWXG|S_IRWXO) or *
+	                          * 49663d decimal                        */
+	      if ((socket_mode = CFNumberCreate(kCFAllocatorDefault,
+	                                        kCFNumberIntType, &portnum)))
+	      {
+		CFDictionaryAddValue(listener, CFSTR("SockPathMode"),
+		                     socket_mode);
+		CFRelease(socket_mode);
+	      }
+	    }
+	    else
+#  endif /* AF_LOCAL */
+	    {
+#  ifdef AF_INET6
+	      if (lis->address.addr.sa_family == AF_INET6)
+	      {
+		CFDictionaryAddValue(listener, CFSTR("SockFamily"),
+		                     CFSTR("IPv6"));
+		portnum = lis->address.ipv6.sin6_port;
+	      }
+	      else
+#  endif /* AF_INET6 */
+	      {
+		CFDictionaryAddValue(listener, CFSTR("SockFamily"),
+		                     CFSTR("IPv4"));
+		portnum = lis->address.ipv4.sin_port;
+	      }
+
+	      if ((service = getservbyport(portnum, NULL)))
+		value = CFStringCreateWithCString(kCFAllocatorDefault, 
+						  service->s_name, 
+						  kCFStringEncodingUTF8);
+	      else
+		value = CFNumberCreate(kCFAllocatorDefault, 
+				       kCFNumberIntType, &portnum);
+
+	      if (value)
+	      {
+		CFDictionaryAddValue(listener, CFSTR("SockServiceName"), value);
+		CFRelease(value);
+	      }	
+
+	      httpAddrString(&lis->address, temp, sizeof(temp));
+	      if ((value = CFStringCreateWithCString(kCFAllocatorDefault, temp, 
+						     kCFStringEncodingUTF8)))
+	      {
+		CFDictionaryAddValue(listener, CFSTR("SockNodeName"), value);
+		CFRelease(value);
+	      }
+	    }
+
+	    CFRelease(listener);
+	  }
+	}
+
+	CFRelease(array);
+      }
+
+     /*
+      * Add the BrowseSocket to the sockets dictionary...
+      */
+      
+      if (Browsing && (BrowseRemoteProtocols & BROWSE_CUPS))
+      {
+	if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 0, 
+					  &kCFTypeArrayCallBacks)) != NULL)
+	{
+	  CFDictionaryAddValue(sockets, CFSTR("BrowseSockets"), array);
+
+	  if ((listener = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+				  &kCFTypeDictionaryKeyCallBacks,
+				  &kCFTypeDictionaryValueCallBacks)) != NULL)
+	  {
+	    CFArrayAppendValue(array, listener);
+
+	    CFDictionaryAddValue(listener, CFSTR("SockFamily"), CFSTR("IPv4"));
+	    CFDictionaryAddValue(listener, CFSTR("SockType"), CFSTR("dgram"));
+
+	    if ((service = getservbyport(BrowsePort, NULL)))
+	      value = CFStringCreateWithCString(kCFAllocatorDefault, 
+						service->s_name, 
+						kCFStringEncodingUTF8);
+	    else
+	      value = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, 
+				     &BrowsePort);
+
+	    CFDictionaryAddValue(listener, CFSTR("SockServiceName"), value);
+	    CFRelease(value);
+
+	    CFRelease(listener);
+	  }
+
+	  CFRelease(array);
+	}
+      }
+
+      CFRelease(sockets);
+    }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "launchd_sync_conf: Updating \"%s\", pid=%d\n", 
+		    LaunchdConf, (int)getpid());
+  
+    if ((fileURL = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, 
+				(const unsigned char *)LaunchdConf, 
+				strlen(LaunchdConf), false)))
+    {
+      if ((resourceData = CFPropertyListCreateXMLData(kCFAllocatorDefault,
+                                                      cupsd_dict)))
+      {
+	if (!CFURLWriteDataAndPropertiesToResource(fileURL, resourceData,
+	                                           NULL, &errorCode))
+	{
+	  cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "launchd_sync_conf: "
+			  "CFURLWriteDataAndPropertiesToResource(\"%s\") "
+			  "failed: %d\n", 
+			  LaunchdConf, (int)errorCode);
+        }
+
+	CFRelease(resourceData);
+      }
+
+      CFRelease(fileURL);
+    }
+
+    CFRelease(cupsd_dict);
+  }
+
+ /*
+  * Let the caller know we updated the file...
+  */
+
+  return (1);
+}
+#endif /* HAVE_LAUNCHD */
 
 
 /*

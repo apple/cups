@@ -33,13 +33,15 @@ cp packaging/installer.tif $pkgdir/Resources/background.tif
 
 cat >$pkgdir/Resources/preflight <<EOF
 #!/bin/sh
+# Stop any running cupsd processes...
 killall cupsd || exit 0
 EOF
 chmod 755 $pkgdir/Resources/preflight
 
 cat >$pkgdir/Resources/postflight <<EOF
 #!/bin/sh
-/usr/sbin/cupsd
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
 EOF
 chmod 755 $pkgdir/Resources/postflight
 

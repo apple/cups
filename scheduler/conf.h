@@ -192,6 +192,12 @@ VAR CFArrayRef		ServerCertificatesArray	VALUE(NULL);
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
+#ifdef HAVE_LAUNCHD
+VAR int			LaunchdTimeout		VALUE(DEFAULT_TIMEOUT);
+					/* Time after which an idle cupsd will exit */
+VAR char		*LaunchdConf		VALUE(NULL);
+					/* launchd(8) configuration file */
+#endif /* HAVE_LAUNCHD */
 
 /*
  * Prototypes...

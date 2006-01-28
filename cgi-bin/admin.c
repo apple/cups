@@ -87,6 +87,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
+  if (!http)
+  {
+    perror("ERROR: Unable to connect to cupsd");
+    fprintf(stderr, "DEBUG: cupsServer()=\"%s\"\n", cupsServer());
+    fprintf(stderr, "DEBUG: ippPort()=%d\n", ippPort());
+    fprintf(stderr, "DEBUG: cupsEncryption()=%d\n", cupsEncryption());
+    exit(1);
+  }
+
  /*
   * Set the web interface section...
   */
@@ -611,6 +620,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     *    printer-uri
     */
 
+    fputs("DEBUG: Getting list of devices...\n", stderr);
+
     request = ippNewRequest(CUPS_GET_DEVICES);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
@@ -620,11 +631,19 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    fprintf(stderr, "DEBUG: http=%p (%s)\n", http, http->hostname);
+
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
+      fputs("DEBUG: Got device list!\n", stderr);
+
       cgiSetIPPVars(response, NULL, NULL, NULL, 0);
       ippDelete(response);
     }
+    else
+      fprintf(stderr,
+              "ERROR: CUPS-Get-Devices request failed with status %x: %s\n",
+	      cupsLastError(), cupsLastErrorString());
 
    /*
     * Let the user choose...

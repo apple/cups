@@ -41,6 +41,7 @@ sinclude(config-scripts/cups-ssl.m4)
 sinclude(config-scripts/cups-pam.m4)
 sinclude(config-scripts/cups-threads.m4)
 sinclude(config-scripts/cups-largefile.m4)
+sinclude(config-scripts/cups-launchd.m4)
 
 MAKEDEFS="../Makedefs"
 AC_SUBST(MAKEDEFS)

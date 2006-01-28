@@ -30,6 +30,7 @@ include ../Makedefs
 
 WEBPAGES	=	cups.css cupsdoc.css index.html robots.txt
 WEBIMAGES	=	\
+			favicon.ico \
 			images/accept-jobs.gif \
 			images/add-class.gif \
 			images/add-printer.gif \

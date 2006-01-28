@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Enabled</key>
+	<true/>
+	<key>Label</key>
+	<string>org.cups.cupsd</string>
+	<key>OnDemand</key>
+	<true/>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/sbin/cupsd</string>
+		<string>-l</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>ServiceIPC</key>
+	<true/>
+	<key>Sockets</key>
+	<dict>
+		<key>Listeners</key>
+		<array>
+			<dict>
+				<key>SockNodeName</key>
+				<string>localhost</string>
+				<key>SockServiceName</key>
+				<string>ipp</string>
+			</dict>
+			<dict>
+				<key>SockPathMode</key>
+				<integer>49663</integer>
+				<key>SockPathName</key>
+				<string>/private/var/run/cupsd</string>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>

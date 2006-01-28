@@ -154,6 +154,10 @@ static cupsd_var_t	variables[] =
   { "ServerKey",		&ServerKey,		CUPSD_VARTYPE_STRING },
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
+#ifdef HAVE_LAUNCHD
+  { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_INTEGER },
+  { "LaunchdConf",		&LaunchdConf,		CUPSD_VARTYPE_STRING },
+#endif /* HAVE_LAUNCHD */
   { "ServerName",		&ServerName,		CUPSD_VARTYPE_STRING },
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
@@ -207,12 +211,6 @@ cupsdReadConfiguration(void)
   struct group	*group;			/* Default group */
   char		*old_serverroot,	/* Old ServerRoot */
 		*old_requestroot;	/* Old RequestRoot */
-
- /*
-  * Shutdown the server...
-  */
-
-  cupsdStopServer();
 
  /*
   * Save the old root paths...
@@ -449,6 +447,11 @@ cupsdReadConfiguration(void)
   MaxSubscriptionsPerUser    = 0;
   DefaultLeaseDuration       = 86400;
   MaxLeaseDuration           = 0;
+
+#ifdef HAVE_LAUNCHD
+  LaunchdTimeout = DEFAULT_TIMEOUT + 10;
+  cupsdSetString(&LaunchdConf, CUPS_DEFAULT_LAUNCHD_CONF);
+#endif /* HAVE_LAUNCHD */
 
  /*
   * Read the configuration file...
@@ -1009,12 +1012,6 @@ cupsdReadConfiguration(void)
 
   cupsdClearString(&old_serverroot);
   cupsdClearString(&old_requestroot);
-
- /*
-  * Startup the server and return...
-  */
-
-  cupsdStartServer();
 
   return (1);
 }
@@ -1988,11 +1985,15 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	memset(lis, 0, sizeof(cupsd_listener_t));
 	memcpy(&(lis->address), &(addr->addr), sizeof(lis->address));
+	lis->fd = -1;
 
 #ifdef HAVE_SSL
         if (!strcasecmp(line, "SSLPort") || !strcasecmp(line, "SSLListen"))
           lis->encryption = HTTP_ENCRYPT_ALWAYS;
 #endif /* HAVE_SSL */
+
+
+	httpAddrString(&lis->address, temp, sizeof(temp));
 
 #ifdef AF_INET6
         if (lis->address.addr.sa_family == AF_INET6)

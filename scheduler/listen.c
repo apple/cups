@@ -169,116 +169,124 @@ cupsdStartListening(void)
     p = ntohs(lis->address.ipv4.sin_port);
 
    /*
-    * Create a socket for listening...
+    * If needed, create a socket for listening...
     */
-
-    lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0);
 
     if (lis->fd == -1)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdStartListening: Unable to open listen socket for address %s:%d - %s.",
-                      s, p, strerror(errno));
-      continue;
+     /*
+      * Create a socket for listening...
+      */
+  
+      lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0);
+  
+      if (lis->fd == -1)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"cupsdStartListening: Unable to open listen socket for address %s:%d - %s.",
+			s, p, strerror(errno));
+	continue;
+      }
+  
+     /*
+      * Set things up to reuse the local address for this port.
+      */
+  
+      val = 1;
+  #ifdef __sun
+      setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
+  #else
+      setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+  #endif /* __sun */
+  
+     /*
+      * Bind to the port we found...
+      */
+  
+  #ifdef AF_INET6
+      if (lis->address.addr.sa_family == AF_INET6)
+      {
+  #  ifdef IPV6_V6ONLY
+       /*
+	* Accept only IPv6 connections on this socket, to avoid
+	* potential security issues and to make all platforms behave
+	* the same.
+	*/
+  
+	val = 1;
+  #    ifdef __sun
+	setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&val, sizeof(val));
+  #    else
+	setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
+  #    endif /* __sun */
+  #  endif /* IPV6_V6ONLY */
+  
+	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+		      httpAddrLength(&(lis->address)));
+      }
+      else
+  #endif /* AF_INET6 */
+  #ifdef AF_LOCAL
+      if (lis->address.addr.sa_family == AF_LOCAL)
+      {
+	mode_t	mask;			/* Umask setting */
+  
+  
+       /*
+	* Remove any existing domain socket file...
+	*/
+  
+	unlink(lis->address.un.sun_path);
+  
+       /*
+	* Save the curent umask and set it to 0...
+	*/
+  
+	mask = umask(0);
+  
+       /*
+	* Bind the domain socket...
+	*/
+  
+	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+		      httpAddrLength(&(lis->address)));
+  
+       /*
+	* Restore the umask...
+	*/
+  
+	umask(mask);
+      }
+      else
+  #endif /* AF_LOCAL */
+      status = bind(lis->fd, (struct sockaddr *)&(lis->address),
+		    sizeof(lis->address.ipv4));
+  
+      if (status < 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"cupsdStartListening: Unable to bind socket for address %s:%d - %s.",
+			s, p, strerror(errno));
+	close(lis->fd);
+	lis->fd = -1;
+	continue;
+      }
+  
+     /*
+      * Listen for new clients.
+      */
+  
+      if (listen(lis->fd, ListenBackLog) < 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"cupsdStartListening: Unable to listen for clients on address %s:%d - %s.",
+			s, p, strerror(errno));
+	exit(errno);
+      }
     }
 
     fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
-
-   /*
-    * Set things up to reuse the local address for this port.
-    */
-
-    val = 1;
-#ifdef __sun
-    setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
-#else
-    setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-#endif /* __sun */
-
-   /*
-    * Bind to the port we found...
-    */
-
-#ifdef AF_INET6
-    if (lis->address.addr.sa_family == AF_INET6)
-    {
-#  ifdef IPV6_V6ONLY
-     /*
-      * Accept only IPv6 connections on this socket, to avoid
-      * potential security issues and to make all platforms behave
-      * the same.
-      */
-
-      val = 1;
-#    ifdef __sun
-      setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&val, sizeof(val));
-#    else
-      setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
-#    endif /* __sun */
-#  endif /* IPV6_V6ONLY */
-
-      status = bind(lis->fd, (struct sockaddr *)&(lis->address),
-	            httpAddrLength(&(lis->address)));
-    }
-    else
-#endif /* AF_INET6 */
-#ifdef AF_LOCAL
-    if (lis->address.addr.sa_family == AF_LOCAL)
-    {
-      mode_t	mask;			/* Umask setting */
-
-
-     /*
-      * Remove any existing domain socket file...
-      */
-
-      unlink(lis->address.un.sun_path);
-
-     /*
-      * Save the curent umask and set it to 0...
-      */
-
-      mask = umask(0);
-
-     /*
-      * Bind the domain socket...
-      */
-
-      status = bind(lis->fd, (struct sockaddr *)&(lis->address),
-	            httpAddrLength(&(lis->address)));
-
-     /*
-      * Restore the umask...
-      */
-
-      umask(mask);
-    }
-    else
-#endif /* AF_LOCAL */
-    status = bind(lis->fd, (struct sockaddr *)&(lis->address),
-                  sizeof(lis->address.ipv4));
-
-    if (status < 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdStartListening: Unable to bind socket for address %s:%d - %s.",
-                      s, p, strerror(errno));
-      close(lis->fd);
-      lis->fd = -1;
-      continue;
-    }
-
-   /*
-    * Listen for new clients.
-    */
-
-    if (listen(lis->fd, ListenBackLog) < 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdStartListening: Unable to listen for clients on address %s:%d - %s.",
-                      s, p, strerror(errno));
-      exit(errno);
-    }
+  
 
     if (p)
       cupsdLogMessage(CUPSD_LOG_INFO,
@@ -375,10 +383,12 @@ cupsdStopListening(void)
 
   for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
   {
+    if (lis->fd != -1)
+    {
 #ifdef WIN32
-    closesocket(lis->fd);
+      closesocket(lis->fd);
 #else
-    close(lis->fd);
+      close(lis->fd);
 #endif /* WIN32 */
 
 #ifdef AF_LOCAL
@@ -386,9 +396,10 @@ cupsdStopListening(void)
     * Remove domain sockets...
     */
 
-    if (lis->address.addr.sa_family == AF_LOCAL)
-      unlink(lis->address.un.sun_path);
+      if (lis->address.addr.sa_family == AF_LOCAL)
+	unlink(lis->address.un.sun_path);
 #endif /* AF_LOCAL */
+    }
   }
 }
 
