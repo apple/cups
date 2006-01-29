@@ -29,7 +29,7 @@ include Makedefs
 #
 
 DIRS	=	cups backend berkeley cgi-bin filter locale man pdftops \
-		notifier scheduler systemv
+		notifier scheduler systemv test
 
 #
 # Make all targets...

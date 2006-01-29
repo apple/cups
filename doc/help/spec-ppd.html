@@ -4,6 +4,7 @@
 <head>
 	<title>CUPS PPD Extensions</title>
 	<meta name='keywords' content='Programming, PostScript Printer Description'>
+	<link rel='stylesheet' type='text/css' href='../cups.css'>
 </head>
 <body>
 <!--
@@ -74,18 +75,32 @@ LINE-END = CR / LF / CR LF
 
 <h2 class='title'><a name='ATTRIBUTES'>General Attributes</a></h2>
 
-<h3>cupsFilter</h3>
+<h3>APDuplexRequiresFlippedMargin</h3>
 
-<p>This string attribute provides a conversion rule of the
-form:</p>
+<p class='summary'>*APDuplexRequiresFlippedMargin: boolean</p>
+
+<p>This boolean attribute notifies the RIP filters that the
+destination printer does not require the top and bottom margins
+of the <tt>ImageableArea</tt> swapped for the back page. The
+default value is <code>true</code>.</p>
+
+<p>Example:</p>
 
 <pre class='command'>
-source/type cost program
+<em>*% Don't swap the top and bottom margins for the back side</em> 
+*APDuplexRequiresFlippedMargin: false
 </pre>
 
-<p>The destination type is assumed to the printer's type. If a
-printer supports the source type directly, the special filter
-program "-" may be specified.</p>
+<p>Also see the related <tt>cupsFlipDuplex</tt> attribute.</p>
+
+<h3>cupsFilter</h3>
+
+<p class='summary'>*cupsFilter: "source/type cost program"</p>
+
+<p>This string attribute provides a conversion rule from the
+given source type to the printer's native format using the
+filter "program". If a printer supports the source type directly,
+the special filter program "-" may be specified.</p>
 
 <p>Examples:</p>
 
@@ -102,9 +117,11 @@ program "-" may be specified.</p>
 
 <h3>cupsFlipDuplex</h3>
 
+<p class='summary'>*cupsFlipDuplex: boolean</p>
+
 <p>This boolean attribute notifies the RIP filters that the
 destination printer requires an upside-down image for the back
-page. The default value is false.</p>
+page. The default value is <code>false</code>.</p>
 
 <p>Example:</p>
 
@@ -113,11 +130,30 @@ page. The default value is false.</p>
 *cupsFlipDuplex: true
 </pre>
 
+<p>Also see the related <tt>APDuplexRequiresFlippedMargins</tt> attribute.</p>
+
+<h3>cupsLanguages</h3>
+
+<p class='summary'>*cupsLanguages: "locale list"</p>
+
+<p>This attribute describes which language localizations are
+included in the PPD. The "locale list" string is a space-delimited
+list of locale names ("en", "en_US", "fr_FR", etc.)</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify Canadian, UK, and US English, and Candian and French French</em> 
+*cupsLanguages: "en_CA en_UK en_US fr_CA fr_FR"
+</pre>
+
 <h3>cupsManualCopies</h3>
+
+<p class='summary'>*cupsManualCopies: boolean</p>
 
 <p>This boolean attribute notifies the RIP filters that the
 destination printer does not support copy generation in
-hardware. The default value is false.</p>
+hardware. The default value is <code>false</code>.</p>
 
 <p>Example:</p>
 
@@ -127,6 +163,8 @@ hardware. The default value is false.</p>
 </pre>
 
 <h3>cupsModelNumber</h3>
+
+<p class='summary'>*cupsModelNumber: number</p>
 
 <p>This integer attribute specifies a printer-specific model
 number. This number can be used by a filter program to adjust
@@ -141,6 +179,8 @@ the output for a specific model of printer.</p>
 
 <h3>cupsPortMonitor</h3>
 
+<p class='summary'>*cupsPortMonitor urischeme/Descriptive Text: "port monitor"</p>
+
 <p>This string attribute specifies printer-specific "port
 monitor" filters that may be used with the printer. The CUPS
 scheduler also looks for the <tt>Protocols</tt> attribute to see
@@ -149,17 +189,29 @@ so, the corresponding port monitor ("bcp" and "tbcp",
 respectively) is listed in the printer's
 <tt>port-monitor-supported</tt> attribute.</p>
 
+<p>The "urischeme" portion of the attribute specifies the URI scheme
+that this port monitor should be used for. Typically this is used to
+pre-select a particular port monitor for each type of connection that
+is supported by the printer. The "port monitor" string can be "none"
+to disable the port monitor for the given URI scheme.</p>
+
 <p>Examples:</p>
 
 <pre class='command'>
 <em>*% Specify a PostScript printer that supports the TBCP protocol</em>
 *Protocols: TBCP PJL
 
+<em>*% Specify that TBCP should be used for socket connections but not USB</em>
+*cupsPortMonitor socket/AppSocket Printing: "tbcp"
+*cupsPortMonitor usb/USB Printing: "none"
+
 <em>*% Specify a printer-specific port monitor for an Epson USB printer</em> 
-*cupsPortMonitor epson-usb/USB Status Monitor: "epson-usb"
+*cupsPortMonitor usb/USB Status Monitor: "epson-usb"
 </pre>
 
 <h3>cupsVersion</h3>
+
+<p class='summary'>*cupsVersion: major.minor</p>
 
 <p>This required attribute describes which version of the CUPS
 PPD file extensions was used. Currently it must be the string
@@ -190,11 +242,18 @@ syntax:</p>
 <p>When the base option is part of the <tt>JCLSetup</tt> section,
 the "command" string contains JCL commands with "\order"
 placeholders for each numbered parameter. The CUPS API handles
-any necessary value quoting for HP-PJL commands.</p>
+any necessary value quoting for HP-PJL commands. For example, if
+the JCL command string is "@PJL SET PASSCODE=\1" and the first
+option value is "1234" then CUPS will output the string
+"@PJL SET PASSCODE=1234".</p>
 
 <p>For non-<tt>JCLSetup</tt> options, the "order" value is a
 number from 1 to N and specifies the order of values as they are
-placed on the stack before the command.</p>
+placed on the stack before the command. For example, if the
+PostScript command string is
+"&lt;&lt;/cupsReal1 2 1 roll&gt;&gt;setpagedevice" and the
+option value is "2.0" then CUPS will output the string
+"2.0 &lt;&lt;/cupsReal1 2 1 roll&gt;&gt;setpagedevice".</p>
 
 <blockquote><b>Note:</b> Currently only CustomPageSize supports
 more than 1 parameter. This restriction is due to value encoding
@@ -221,13 +280,13 @@ allow string values to contain spaces.</blockquote>
 
 	<li><tt>passcode</tt> - a string of numbers value with a
 	minimum of "minimum" numbers and a maximum of "maximum"
-	numbers (passcode strings are not displayed in the user
-	interface)</li>
+	numbers ("minimum" and "maximum" are numbers and passcode
+	strings are not displayed in the user interface)</li>
 
 	<li><tt>password</tt> - a string value with a minimum of
 	"minimum" characters and a maximum of "maximum"
-	characters (password strings are not displayed in the
-	user interface)</li>
+	characters ("minimum" and "maximum" are numbers and password
+	strings are not displayed in the user interface)</li>
 
 	<li><tt>points</tt> - a measurement value in points from
 	"minimum" to "maximum"</li>
@@ -237,7 +296,7 @@ allow string values to contain spaces.</blockquote>
 
 	<li><tt>string</tt> - a string value with a minimum of
 	"minimum" characters and a maximum of "maximum"
-	characters</li>
+	characters ("minimum" and "maximum" are numbers)</li>
 
 </ul>
 
@@ -259,6 +318,19 @@ allow string values to contain spaces.</blockquote>
 *ParamCustomJCLPasscode Code/Key Code: 1 passcode 4 4
 
 
+<em>*% Base PostScript watermark option</em>
+*OpenUI WatermarkText/Watermark Text: PickOne
+*OrderDependency: 10 AnySetup *WatermarkText
+*DefaultWatermarkText: None
+*WatermarkText None: ""
+*WatermarkText Draft: "&lt;&lt;/cupsString1(Draft)&gt;&gt;setpagedevice"
+*CloseUI: *WatermarkText
+
+<em>*% Custom PostScript watermark option</em>
+*CustomWatermarkText True: "&lt;&lt;/cupsString1 2 1 roll&gt;&gt;setpagedevice"
+*ParamCustomWatermarkText Text: 1 string 0 32
+
+
 <em>*% Base PostScript gamma/density option</em> 
 *OpenUI GammaDensity/Gamma and Density: PickOne
 *OrderDependency: 10 AnySetup *GammaDensity
@@ -266,7 +338,7 @@ allow string values to contain spaces.</blockquote>
 *GammaDensity Normal/Normal: "&lt;&lt;/cupsReal1 1.0/cupsReal2 1.0&gt;&gt;setpagedevice"
 *GammaDensity Light/Lighter: "&lt;&lt;/cupsReal1 0.9/cupsReal2 0.67&gt;&gt;setpagedevice"
 *GammaDensity Dark/Darker: "&lt;&lt;/cupsReal1 1.1/cupsReal2 1.5&gt;&gt;setpagedevice"
-*JCLCloseUI: *GammaDensity
+*CloseUI: *GammaDensity
 
 <em>*% Custom PostScript gamma/density option</em> 
 *CustomGammaDensity True: "&lt;&lt;/cupsReal1 3 1 roll/cupsReal2 3 1&gt;&gt;setpagedevice"
@@ -277,14 +349,23 @@ allow string values to contain spaces.</blockquote>
 
 <h2 class='title'><a name='PROFILES'>Color Profiles</a></h2>
 
+<p>CUPS supports two types of color profiles. The first type is
+based on sRGB and is used by the standard CUPS raster filters and
+ESP Ghostscript. The second type is based on ICC profiles and is
+used by the Core Graphics-based filters on MacOS X.</p>
+
+<blockquote><b>Note:</b> At this time, none of the CUPS raster
+filters support ICC profiles. This will be addressed as time
+and resources permit.</blockquote>
+
 <h3>cupsColorProfile</h3>
 
-<p>This string attribute specifies a color profile of the
-form:</p>
+<p class='summary'>*cupsColorProfile Resolution/MediaType: "density
+gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"</p>
 
-<pre class='command'>
-*cupsColorProfile Resolution/MediaType: "density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"
-</pre>
+<p>This string attribute specifies an sRGB-based color profile
+consisting of gamma and density controls and a 3x3 CMY color
+transform matrix.</p>
 
 <p>The <i>Resolution</i> and <i>MediaType</i> values may be "-"
 to act as a wildcard. Otherwise they must match one of the
@@ -323,14 +404,12 @@ function is applied <i>after</i> the CMY transformation:</p>
 
 <h3>cupsICCProfile</h3>
 
-<p>This attribute specifies an ICC color profile of the
-form:</p>
+<p class='summary'>*cupsICCProfile
+ColorModel.MediaType.Resolution/Description: "filename"</p>
 
-<pre class='command'>
-*cupsICCProfile ColorModel.MediaType.Resolution/Description: "filename"
-</pre>
-
-<p>The <tt>ColorModel</tt>, <tt>MediaType</tt>, and
+<p>This attribute specifies an ICC color profile that is
+used to convert the document colors to the device
+colorspace. The <tt>ColorModel</tt>, <tt>MediaType</tt>, and
 <tt>Resolution</tt> keywords specify a selector for color
 profiles. If omitted, the color profile will match any option
 keyword for the corresponding main keyword.</p>
@@ -378,53 +457,76 @@ attributes define the mapping from selector to main keyword:</p>
 </pre>
 
 
-<h2 class='title'><a name='I18N'>I18N Support</a></h2>
+<h2 class='title'><a name='I18N'>Global PPD Support</a></h2>
 
 <p>CUPS 1.2 and higher adds support for PPD files containing multiple
-languages by following the following rules:</p>
+languages by following the following additional rules:</p>
 
 <ol>
 
-	<li>The <tt>LanguageVersion</tt> is <tt>English</tt></li>
+	<li>The <tt>LanguageVersion</tt> MUST be <tt>English</tt></li>
 
-	<li>The <tt>LanguageEncoding</tt> is <tt>ISOLatin1</tt></li>
+	<li>The <tt>LanguageEncoding</tt> MUST be <tt>ISOLatin1</tt></li>
 
-	<li>Main and option keywords may not exceed 34
-	characters, which is a subset of what the Adobe PPD spec
-	allows.</li>
+	<li>The <tt>cupsLanguages</tt> attribute MUST be provided and
+	list each of the supported locales in the PPD file</li>
 
-	<li>Translations are specified using a locale prefix of
+	<li>Main and option keywords MUST NOT exceed 34 (instead of 40)
+	characters to allow room for the locale prefixes in translation
+	attributes</li>
+
+	<li>The main keyword "Translation" MUST NOT be used</li>
+
+	<li>Translation strings included with the main and option
+	keywords MUST NOT contain characters outside the ASCII
+	subset of ISOLatin1 and UTF-8; developers wishing to use
+	characters outside ASCII MUST provide a separate set of
+	English localization attributes for the affected keywords.</li>
+
+	<li>Localizations are specified using a locale prefix of
 	the form "ll" or "ll_CC." where "ll" is the 2-letter ISO
 	language code and "CC" is the 2-letter ISO country
 	code</li>
 
-	<li>Translation strings are encoded using UTF-8.</li>
+	<li>Locale-specific translation strings MUST be encoded
+	using UTF-8.</li>
 
-	<li>Main keywords are translated using any of the
+	<li>Main keywords MUST be localized using one of the
 	following forms:
 	<p><tt>*ll.Translation MainKeyword/translation
 	text: ""</tt><br />
 	<tt>*ll_CC.Translation MainKeyword/translation
 	text: ""</tt></p></li>
 
-	<li>Option keywords are translated using any of the
+	<li>Option keywords MUST be localized using one of the
 	following forms:
 	<p><tt>*ll.MainKeyword OptionKeyword/translation
 	text: ""</tt><br />
 	<tt>*ll_CC.MainKeyword OptionKeyword/translation
 	text: ""</tt></p></li>
 
+	<li>Localization attributes MAY appear anywhere after the
+	first line of the PPD file</li>
+
 </ol>
 
-<p>Examples:</p>
+<blockquote><b>Note:</b>
+We use a <tt>LanguageEncoding</tt> value of <tt>ISOLatin1</tt>
+and limit the allowed base translation strings to ASCII to avoid
+character coding issues that would otherwise occur. In addition,
+requiring the base translation strings to be in English allows
+for easier fallback translation when no localization is provided
+in the PPD file for a given locale.</blockquote>
 
+<p>Examples:</p>
 
 <pre class='command'>
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
+*cupsLanguages: "de_DE fr_FR"
 *ModelName: "Foobar Laser 9999"
 
-<em>*% Localize for French and German</em>
+<em>*% Localize ModelName for French and German</em>
 *fr_FR.Translation ModelName/La Foobar Laser 9999: ""
 *de_DE.Translation ModelName/Foobar LaserDrucken 9999: ""
 
@@ -433,15 +535,15 @@ languages by following the following rules:</p>
 *OpenUI *InputSlot/Paper Source: PickOne
 *OrderDependency: 10 AnySetup *InputSlot
 *DefaultInputSlot: Auto
-<em>*% Localize for French and German</em>
+<em>*% Localize InputSlot for French and German</em>
 *fr_FR.Translation InputSlot/Papier source: ""
 *de_DE.Translation InputSlot/Papiereinzug: ""
 *InputSlot Auto/Default: "&lt;&lt;/ManualFeed false&gt;&gt;setpagedevice"
-<em>*% Localize for French and German</em>
+<em>*% Localize InputSlot=Auto for French and German</em>
 *fr_FR.InputSlot Auto/Par Defaut: ""
 *de_DE.InputSlot Auto/Standard: ""
 *InputSlot Manual/Manual Feed: "&lt;&lt;/ManualFeed true&gt;&gt;setpagedevice"
-<em>*% Localize for French and German</em>
+<em>*% Localize InputSlot=Manual for French and German</em>
 *fr_FR.InputSlot Manual/Manuel mecanisme de alimentation: ""
 *de_DE.InputSlot Manual/Manueller Einzug: ""
 *CloseUI: *InputSlot
@@ -458,7 +560,11 @@ languages by following the following rules:</p>
 
 	<li>Added custom option values support</li>
 
+	<li>Added <tt>APDuplexRequiresFlippedMargin</tt> attribute</li>
+
 	<li>Added <tt>cupsICCProfile</tt> attribute</li>
+
+	<li>Added <tt>cupsLanguages</tt> attribute</li>
 
 	<li>Added <tt>cupsPortMonitor</tt> attribute</li>
 

@@ -166,7 +166,7 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
     * Yes, copy the file...
     */
 
-    while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
+    while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
       write(fd, buffer, bytes);
   }
   else
@@ -322,11 +322,11 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
           break;
       }
       else
-        httpWrite(http, buffer, bytes);
+        httpWrite2(http, buffer, bytes);
 
     if (status == HTTP_CONTINUE)
     {
-      httpWrite(http, buffer, 0);
+      httpWrite2(http, buffer, 0);
 
       while ((status = httpUpdate(http)) == HTTP_CONTINUE);
     }

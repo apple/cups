@@ -458,8 +458,9 @@ cupsdProcessBrowseData(
   * Pull the URI apart to see if this is a local or remote printer...
   */
 
-  httpSeparateURI(uri, method, sizeof(method), username, sizeof(username),
-                  host, sizeof(host), &port, resource, sizeof(resource));
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), username,
+                  sizeof(username), host, sizeof(host), &port, resource,
+		  sizeof(resource));
 
  /*
   * Determine if the URI contains any illegal characters in it...
@@ -1400,8 +1401,8 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	      iface->address.addr.sa_family != AF_INET)
 	    continue;
 
-	  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, iface->hostname,
-	                   iface->port,
+	  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+	                   iface->hostname, iface->port,
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
 			                                    "/printers/%s",
 			   p->name);
@@ -1442,8 +1443,8 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 
         if (iface)
 	{
-	  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, iface->hostname,
-	                   iface->port,
+	  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+	                   iface->hostname, iface->port,
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
 			                                    "/printers/%s",
 			   p->name);
@@ -2235,8 +2236,9 @@ cupsdUpdateCUPSBrowse(void)
   * Pull the URI apart to see if this is a local or remote printer...
   */
 
-  httpSeparateURI(uri, method, sizeof(method), username, sizeof(username),
-                  host, sizeof(host), &port, resource, sizeof(resource));
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), username,
+                  sizeof(username), host, sizeof(host), &port, resource,
+		  sizeof(resource));
 
   DEBUG_printf(("host=\"%s\", ServerName=\"%s\"\n", host, ServerName));
 
@@ -2386,8 +2388,9 @@ cupsdUpdateSLPBrowse(void)
       * Pull the URI apart to see if this is a local or remote printer...
       */
 
-      httpSeparateURI(uri, method, sizeof(method), username, sizeof(username),
-                      host, sizeof(host), &port, resource, sizeof(resource));
+      httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method),
+                      username, sizeof(username), host, sizeof(host), &port,
+		      resource, sizeof(resource));
 
       if (strcasecmp(host, ServerName) == 0)
 	continue;

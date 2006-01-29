@@ -196,20 +196,16 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the device name and options from the URI...
   */
 
-  if (strncmp(argv[0], "usb:", 4))
-    uri = getenv("DEVICE_URI");
-  else
-    uri = argv[0];
+  uri = cupsBackendDeviceURI(argv);
 
-  if (!uri)
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri,
+                      method, sizeof(method), username, sizeof(username),
+		      hostname, sizeof(hostname), &port,
+		      resource, sizeof(resource)) < HTTP_URI_OK)
   {
     fputs("ERROR: No device URI found in argv[0] or in DEVICE_URI environment variable!\n", stderr);
     return (1);
   }
-
-  httpSeparateURI(argv[0], method, sizeof(method), username, sizeof(username),
-                  hostname, sizeof(hostname), &port,
-		  resource, sizeof(resource));
 
  /*
   * See if there are any options...

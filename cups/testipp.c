@@ -144,8 +144,8 @@ ipp_uchar_t	collection[] =			/* Collection buffer */
 
 void	hex_dump(const char *title, ipp_uchar_t *buffer, int bytes);
 void	print_attributes(ipp_t *ipp, int indent);
-int	read_cb(void *data, ipp_uchar_t *buffer, int bytes);
-int	write_cb(void *data, ipp_uchar_t *buffer, int bytes);
+ssize_t	read_cb(void *data, ipp_uchar_t *buffer, size_t bytes);
+ssize_t	write_cb(void *data, ipp_uchar_t *buffer, size_t bytes);
 
 
 /*
@@ -594,10 +594,10 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
  * 'read_cb()' - Read data from a buffer.
  */
 
-int					/* O - Number of bytes read */
+ssize_t					/* O - Number of bytes read */
 read_cb(void        *data,		/* I - Data */
         ipp_uchar_t *buffer,		/* O - Buffer to read */
-	int         bytes)		/* I - Number of bytes to read */
+	size_t      bytes)		/* I - Number of bytes to read */
 {
   int	count;				/* Number of bytes */
 
@@ -621,10 +621,10 @@ read_cb(void        *data,		/* I - Data */
  * 'write_cb()' - Write data into a buffer.
  */
 
-int					/* O - Number of bytes written */
+ssize_t					/* O - Number of bytes written */
 write_cb(void        *data,		/* I - Data */
          ipp_uchar_t *buffer,		/* I - Buffer to write */
-	 int         bytes)		/* I - Number of bytes to write */
+	 size_t      bytes)		/* I - Number of bytes to write */
 {
   int	count;				/* Number of bytes */
 

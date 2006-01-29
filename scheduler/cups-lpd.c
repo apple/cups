@@ -324,8 +324,8 @@ check_printer(const char *name)		/* I - Printer or class name */
   request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
   request->request.op.request_id   = 1;
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   "/printers/%s", name);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, "/printers/%s", name);
 
   language = cupsLangDefault();
 
@@ -428,8 +428,8 @@ print_file(const char    *name,		/* I - Printer or class name */
   request->request.op.operation_id = IPP_PRINT_JOB;
   request->request.op.request_id   = 1;
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   "/printers/%s", name);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, "/printers/%s", name);
 
   language = cupsLangDefault();
 
@@ -1139,8 +1139,8 @@ send_state(const char *dest,		/* I - Destination */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   "/printers/%s", queue);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, "/printers/%s", queue);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
 
@@ -1214,8 +1214,8 @@ send_state(const char *dest,		/* I - Destination */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                "attributes-natural-language", NULL, language->language);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   "/printers/%s", queue);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, "/printers/%s", queue);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);

@@ -368,8 +368,8 @@ show_jobs(const char *command,		/* I - Command name */
   }
   else
   {
-    httpAssembleURIf(resource, sizeof(resource), "ipp", NULL, "localhost", 0,
-	             "/printers/%s", dest);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, resource, sizeof(resource), "ipp",
+                     NULL, "localhost", 0, "/printers/%s", dest);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, resource);
@@ -592,8 +592,8 @@ show_printer(const char *command,	/* I - Command name */
 
   request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-	           "/printers/%s", dest);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, "/printers/%s", dest);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
 

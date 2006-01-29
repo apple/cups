@@ -1145,7 +1145,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * Separate the URI into its components...
 	  */
 
-          httpSeparateURI(con->uri, method, sizeof(method),
+          httpSeparateURI(HTTP_URI_CODING_MOST, con->uri,
+	                  method, sizeof(method),
 	                  userpass, sizeof(userpass),
 			  hostname, sizeof(hostname), &port,
 			  resource, sizeof(resource));
@@ -1883,7 +1884,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 			    "CHUNKED" : "LENGTH",
 			CUPS_LLCAST con->http.data_remaining, con->file);
 
-        if ((bytes = httpRead(HTTP(con), line, sizeof(line))) < 0)
+        if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
 	  return (cupsdCloseClient(con));
 	else if (bytes > 0)
 	{
@@ -2025,7 +2026,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	if (con->http.state != HTTP_POST_SEND)
 	{
-          if ((bytes = httpRead(HTTP(con), line, sizeof(line))) < 0)
+          if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
 	    return (cupsdCloseClient(con));
 	  else if (bytes > 0)
 	  {
@@ -2588,7 +2589,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       }
     }
 
-    if (httpWrite(HTTP(con), buf, bytes) < 0)
+    if (httpWrite2(HTTP(con), buf, bytes) < 0)
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "cupsdWriteClient: %d Write of %d bytes failed!",

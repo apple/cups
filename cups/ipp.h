@@ -310,9 +310,9 @@ typedef enum				/**** IPP status codes... ****/
 
 typedef unsigned char ipp_uchar_t;	/**** Unsigned 8-bit integer/character ****/
 
-/**** New in CUPS 1.1.19 ****/
-typedef int	(*ipp_iocb_t)(void *, ipp_uchar_t *, int);
-					/**** IPP IO Callback Function ****/
+/**** New in CUPS 1.2 ****/
+typedef ssize_t	(*ipp_iocb_t)(void *, ipp_uchar_t *, size_t);
+					/**** IPP IO Callback Function @since CUPS 1.2@ ****/
 
 typedef union				/**** Request Header ****/
 {
@@ -470,11 +470,7 @@ extern ipp_attribute_t	*ippAddCollections(ipp_t *ipp, ipp_tag_t group,
 					   const ipp_t **values);
 extern void		ippDeleteAttribute(ipp_t *ipp, ipp_attribute_t *attr);
 extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp);
-extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking,
-			          ipp_t *parent, ipp_t *ipp);
 extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp);
-extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
-			           ipp_t *parent, ipp_t *ipp);
 
 /**** New in CUPS 1.2 ****/
 extern ipp_attribute_t	*ippAddOctetString(ipp_t *ipp, ipp_tag_t group,
@@ -484,6 +480,10 @@ extern ipp_status_t	ippErrorValue(const char *name);
 extern ipp_t		*ippNewRequest(ipp_op_t op);
 extern const char	*ippOpString(ipp_op_t op);
 extern ipp_op_t		ippOpValue(const char *name);
+extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking,
+			          ipp_t *parent, ipp_t *ipp);
+extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
+			           ipp_t *parent, ipp_t *ipp);
 
 
 /*

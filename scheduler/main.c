@@ -88,7 +88,7 @@ static void	sigchld_handler(int sig);
 static void	sighup_handler(int sig);
 static void	sigterm_handler(int sig);
 static long	select_timeout(int fds);
-static void	usage(void);
+static void	usage(int status);
 
 
 /*
@@ -162,7 +162,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  case 'c' : /* Configuration file */
 	      i ++;
 	      if (i >= argc)
-	        usage();
+	      {
+	        _cupsLangPuts(stderr, _("cupsd: Expected config filename "
+		                        "after \"-c\" option!\n"));
+	        usage(1);
+	      }
 
               if (argv[i][0] == '/')
 	      {
@@ -205,23 +209,32 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      fg = -1;
 	      break;
 
-#ifdef HAVE_LAUNCHD
+          case 'h' : /* Show usage/help */
+	      usage(0);
+	      break;
+
           case 'l' : /* Started by launchd... */
+#ifdef HAVE_LAUNCHD
 	      launchd = 1;
 	      fg      = 1;
-	      break;
+#else
+	      _cupsLangPuts(stderr, _("cupsd: launchd(8) support not compiled "
+	                              "in, running in normal mode.\n"));
+              fg = 0;
 #endif /* HAVE_LAUNCHD */
+	      break;
 
 	  default : /* Unknown option */
-              fprintf(stderr, "cupsd: Unknown option \'%c\' - aborting!\n",
-	              *opt);
-	      usage();
+              _cupsLangPrintf(stderr, _("cupsd: Unknown option \"%c\" - "
+	                                "aborting!\n"), *opt);
+	      usage(1);
 	      break;
 	}
     else
     {
-      fprintf(stderr, "cupsd: Unknown argument \'%s\' - aborting!\n", argv[i]);
-      usage();
+      _cupsLangPrintf(stderr, _("cupsd: Unknown argument \"%s\" - aborting!\n"),
+                      argv[i]);
+      usage(1);
     }
 
   if (!ConfigurationFile)
@@ -2264,10 +2277,17 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
  */
 
 static void
-usage(void)
+usage(int status)			/* O - Exit status */
 {
-  fputs("Usage: cupsd [-c config-file] [-f] [-F]\n", stderr);
-  exit(1);
+  _cupsLangPuts(status ? stderr : stdout,
+                _("Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
+		  "\n"
+		  "-c config-file      Load alternate configuration file\n"
+		  "-f                  Run in the foreground\n"
+		  "-F                  Run in the foreground but detach\n"
+		  "-h                  Show this usage message\n"
+		  "-l                  Run cupsd from launchd(8)\n"));
+  exit(status);
 }
 
 

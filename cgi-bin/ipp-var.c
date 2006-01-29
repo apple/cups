@@ -457,8 +457,9 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
       snprintf(resource, sizeof(resource), "/%s/%s",
                cgiGetVariable("SECTION"), dest);
 
-      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", ippPort(),
-                       "/%s/%s", cgiGetVariable("SECTION"), dest);
+      httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                       "localhost", ippPort(), "/%s/%s",
+		       cgiGetVariable("SECTION"), dest);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                    NULL, uri);
     }
@@ -549,8 +550,9 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
   snprintf(resource, sizeof(resource), "/%s/%s", cgiGetVariable("SECTION"),
            dest);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", ippPort(),
-                   "/%s/%s", cgiGetVariable("SECTION"), dest);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", ippPort(), "/%s/%s", cgiGetVariable("SECTION"),
+		   dest);
 
  /*
   * Build an IPP_PRINT_JOB request, which requires the following
@@ -672,8 +674,8 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
   * Convert the URI to a URL...
   */
 
-  httpSeparateURI(uri, method, sizeof(method), userpass, sizeof(userpass),
-                  hostname, sizeof(hostname), &port,
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), userpass,
+                  sizeof(userpass), hostname, sizeof(hostname), &port,
 		  rawresource, sizeof(rawresource));
 
   if (!strcmp(method, "ipp") ||
@@ -1090,8 +1092,8 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
 
   if (dest)
   {
-    httpAssembleURIf(url, sizeof(url), "ipp", NULL, "localhost", ippPort(),
-                     "/printers/%s", dest);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, url, sizeof(url), "ipp", NULL,
+                     "localhost", ippPort(), "/printers/%s", dest);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, url);
   }

@@ -261,7 +261,7 @@ translate_messages(cups_array_t *cat,	/* I - Message catalog */
 	httpPost(http, "/translate_t");
       }
 
-      httpWrite(http, buffer, bufptr - buffer);
+      httpWrite2(http, buffer, bufptr - buffer);
 
       while ((status = httpUpdate(http)) == HTTP_CONTINUE);
 
@@ -281,7 +281,7 @@ translate_messages(cups_array_t *cat,	/* I - Message catalog */
       bufptr = buffer;
       bufend = buffer + sizeof(buffer) - 1;
 
-      while ((bytes = httpRead(http, bufptr, bufend - bufptr)) > 0)
+      while ((bytes = httpRead2(http, bufptr, bufend - bufptr)) > 0)
         bufptr += bytes;
 
       if (bytes < 0)

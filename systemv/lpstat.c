@@ -928,7 +928,7 @@ show_classes(http_t     *http,		/* I - HTTP connection to server */
       response2 = NULL;
       if (members == NULL && printer_uri != NULL)
       {
-        httpSeparateURI(printer_uri, method, sizeof(method),
+        httpSeparateURI(HTTP_URI_CODING_ALL, printer_uri, method, sizeof(method),
 	                username, sizeof(username), server, sizeof(server),
 			&port, resource, sizeof(resource));
 
@@ -1304,7 +1304,9 @@ show_devices(http_t      *http,		/* I - HTTP connection to server */
 
         if (device == NULL)
 	{
-	  httpSeparate(uri, method, username, hostname, &port, resource);
+	  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method),
+	                  username, sizeof(username), hostname,
+			  sizeof(hostname), &port, resource, sizeof(resource));
           _cupsLangPrintf(stdout,
 	                  _("Output for printer %s is sent to remote "
 			    "printer %s on %s\n"),
@@ -1954,8 +1956,8 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
                 	"requested-attributes",
 		        sizeof(jattrs) / sizeof(jattrs[0]), NULL, jattrs);
 
-	  httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
-	                   "localhost", 0, "/printers/%s", printer);
+	  httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
+	                   "ipp", NULL, "localhost", 0, "/printers/%s", printer);
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	               "printer-uri", NULL, printer_uri);
 

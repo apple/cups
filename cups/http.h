@@ -268,6 +268,17 @@ typedef enum http_uri_status_e		/**** URI separation status @since CUPS1.2@ ****
   HTTP_URI_MISSING_RESOURCE		/* Missing resource in URI (warning) */
 } http_uri_status_t;
 
+typedef enum http_uri_coding_e		/**** URI en/decode flags ****/
+{
+  HTTP_URI_CODING_NONE = 0,		/* Don't en/decode anything */
+  HTTP_URI_CODING_USERNAME = 1,		/* En/decode the username portion */
+  HTTP_URI_CODING_HOSTNAME = 2,		/* En/decode the hostname portion */
+  HTTP_URI_CODING_RESOURCE = 4,		/* En/decode the resource portion */
+  HTTP_URI_CODING_MOST = 7,		/* En/decode all but the query */
+  HTTP_URI_CODING_QUERY = 8,		/* En/decode the query portion */
+  HTTP_URI_CODING_ALL = 15		/* En/decode everything */
+} http_uri_coding_t;
+
 typedef enum http_version_e		/**** HTTP version numbers ****/
 {
   HTTP_0_9 = 9,				/* HTTP/0.9 */
@@ -384,7 +395,7 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 #  endif /* __GNUC__ */
 ;
 extern int		httpPut(http_t *http, const char *uri);
-extern int		httpRead(http_t *http, char *buffer, int length);
+extern int		httpRead(http_t *http, char *buffer, int length) _HTTP_DEPRECATED;
 extern int		httpReconnect(http_t *http);
 extern void		httpSeparate(const char *uri, char *method,
 			             char *username, char *host, int *port,
@@ -394,7 +405,7 @@ extern void		httpSetField(http_t *http, http_field_t field,
 extern const char	*httpStatus(http_status_t status);
 extern int		httpTrace(http_t *http, const char *uri);
 extern http_status_t	httpUpdate(http_t *http);
-extern int		httpWrite(http_t *http, const char *buffer, int length);
+extern int		httpWrite(http_t *http, const char *buffer, int length) _HTTP_DEPRECATED;
 extern char		*httpEncode64(char *out, const char *in) _HTTP_DEPRECATED;
 extern char		*httpDecode64(char *out, const char *in) _HTTP_DEPRECATED;
 extern int		httpGetLength(http_t *http) _HTTP_DEPRECATED;
@@ -434,12 +445,14 @@ extern char		*httpAddrLookup(const http_addr_t *addr,
                                         char *name, int namelen);
 extern char		*httpAddrString(const http_addr_t *addr,
 			                char *s, int slen);
-extern http_uri_status_t httpAssembleURI(char *uri, int urilen,
+extern http_uri_status_t httpAssembleURI(http_uri_coding_t encoding,
+			                 char *uri, int urilen,
 			        	 const char *scheme,
 					 const char *username,
 					 const char *host, int port,
 					 const char *resource);
-extern http_uri_status_t httpAssembleURIf(char *uri, int urilen,
+extern http_uri_status_t httpAssembleURIf(http_uri_coding_t encoding,
+			                  char *uri, int urilen,
 			        	  const char *scheme,
 					  const char *username,
 					  const char *host, int port,
@@ -451,12 +464,16 @@ extern off_t		httpGetLength2(http_t *http);
 extern char		*httpGetSubField2(http_t *http, http_field_t field,
 			                  const char *name, char *value,
 					  int valuelen);
-extern http_uri_status_t httpSeparateURI(const char *uri,
+extern ssize_t		httpRead2(http_t *http, char *buffer, size_t length);
+extern http_uri_status_t httpSeparateURI(http_uri_coding_t decoding,
+			                 const char *uri,
 			        	 char *scheme, int schemelen,
 			        	 char *username, int usernamelen,
 					 char *host, int hostlen, int *port,
 					 char *resource, int resourcelen);
 extern void		httpSetLength(http_t *http, size_t length);
+extern ssize_t		httpWrite2(http_t *http, const char *buffer,
+			           size_t length);
 
 
 /*

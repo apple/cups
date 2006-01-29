@@ -151,8 +151,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
   * Connect to the server...
   */
 
-  httpSeparateURI(uri, method, sizeof(method), userpass, sizeof(userpass),
-                  server, sizeof(server), &port, resource, sizeof(resource));
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), userpass,
+                  sizeof(userpass), server, sizeof(server), &port, resource,
+		  sizeof(resource));
   if ((http = httpConnect(server, port)) == NULL)
   {
     printf("Unable to connect to %s on port %d - %s\n", server, port,
@@ -189,8 +190,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Initialize things...
     */
 
-    httpSeparateURI(uri, method, sizeof(method), userpass, sizeof(userpass),
-		    server, sizeof(server), &port, resource, sizeof(resource));
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), userpass,
+                    sizeof(userpass), server, sizeof(server), &port, resource,
+		    sizeof(resource));
 
     request       = ippNew();
     op            = (ipp_op_t)0;

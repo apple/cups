@@ -209,20 +209,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and printer name from the URI...
   */
 
-  if (getenv("DEVICE_URI") != NULL)
-    /* authentication information is only available in the env var */
-    httpSeparateURI(getenv("DEVICE_URI"), method, sizeof(method),
-                    username, sizeof(username),
-                    hostname, sizeof(hostname), &port,
-		    resource, sizeof(resource));
-  else if (strchr(argv[0], ':') != NULL)
-    httpSeparateURI(argv[0], method, sizeof(method), username, sizeof(username),
-                    hostname, sizeof(hostname), &port,
-		    resource, sizeof(resource));
-  else
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+                      method, sizeof(method), username, sizeof(username),
+		      hostname, sizeof(hostname), &port,
+		      resource, sizeof(resource)) < HTTP_URI_OK)
   {
-    fputs("ERROR: Missing device URI on command-line and no DEVICE_URI environment variable!\n",
-          stderr);
+    fputs("ERROR: Missing device URI on command-line and no DEVICE_URI "
+          "environment variable!\n", stderr);
     return (CUPS_BACKEND_STOP);
   }
 

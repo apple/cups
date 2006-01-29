@@ -266,8 +266,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if (dest)
       {
-	httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                	 "/printers/%s", dest);
+	httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+	                 "localhost", 0, "/printers/%s", dest);
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	             "printer-uri", NULL, uri);
 	ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",

@@ -50,6 +50,7 @@
  *   httpPrintf()         - Print a formatted string to a HTTP connection.
  *   httpPut()            - Send a PUT request to the server.
  *   httpRead()           - Read data from a HTTP connection.
+ *   httpRead2()          - Read data from a HTTP connection.
  *   _httpReadCDSA()      - Read function for CDSA decryption code.
  *   httpReconnect()      - Reconnect to a HTTP server...
  *   httpSetCookie()      - Set the cookie value(s)...
@@ -59,6 +60,7 @@
  *   httpUpdate()         - Update the current HTTP state for incoming data.
  *   httpWait()           - Wait for data available on a connection.
  *   httpWrite()          - Write data to a HTTP connection.
+ *   httpWrite2()         - Write data to a HTTP connection.
  *   _httpWriteCDSA()     - Write function for CDSA encryption code.
  *   http_field()         - Return the field index for a field name.
  *   http_read_ssl()      - Read from a SSL/TLS connection.
@@ -395,7 +397,7 @@ httpFlush(http_t *http)			/* I - HTTP data */
   * Read any data we can...
   */
 
-  while (httpRead(http, buffer, sizeof(buffer)) > 0);
+  while (httpRead2(http, buffer, sizeof(buffer)) > 0);
 
  /*
   * Restore blocking and reset the connection if we didn't get all of
@@ -988,6 +990,11 @@ httpPut(http_t     *http,		/* I - HTTP data */
 
 /*
  * 'httpRead()' - Read data from a HTTP connection.
+ *
+ * This function is deprecated. Use the httpRead2() function which can
+ * read more than 2GB of data.
+ *
+ * @deprecated@
  */
 
 int					/* O - Number of bytes read */
@@ -995,7 +1002,20 @@ httpRead(http_t *http,			/* I - HTTP data */
          char   *buffer,		/* I - Buffer for data */
 	 int    length)			/* I - Maximum number of bytes */
 {
-  int		bytes;			/* Bytes read */
+  return ((int)httpRead2(http, buffer, length));
+}
+
+
+/*
+ * 'httpRead2()' - Read data from a HTTP connection.
+ */
+
+ssize_t					/* O - Number of bytes read */
+httpRead2(http_t *http,			/* I - HTTP data */
+          char   *buffer,		/* I - Buffer for data */
+	  size_t length)		/* I - Maximum number of bytes */
+{
+  ssize_t	bytes;			/* Bytes read */
   char		len[32];		/* Length string */
 
 
@@ -1013,23 +1033,23 @@ httpRead(http_t *http,			/* I - HTTP data */
   if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
       http->data_remaining <= 0)
   {
-    DEBUG_puts("httpRead: Getting chunk length...");
+    DEBUG_puts("httpRead2: Getting chunk length...");
 
     if (httpGets(len, sizeof(len), http) == NULL)
     {
-      DEBUG_puts("httpRead: Could not get length!");
+      DEBUG_puts("httpRead2: Could not get length!");
       return (0);
     }
 
     http->data_remaining = strtoll(len, NULL, 16);
     if (http->data_remaining < 0)
     {
-      DEBUG_puts("httpRead: Negative chunk length!");
+      DEBUG_puts("httpRead2: Negative chunk length!");
       return (0);
     }
   }
 
-  DEBUG_printf(("httpRead: data_remaining=" CUPS_LLFMT "\n",
+  DEBUG_printf(("httpRead2: data_remaining=" CUPS_LLFMT "\n",
                 CUPS_LLCAST http->data_remaining));
 
   if (http->data_remaining <= 0)
@@ -1078,12 +1098,12 @@ httpRead(http_t *http,			/* I - HTTP data */
     else
 #endif /* HAVE_SSL */
     {
-      DEBUG_printf(("httpRead: reading %d bytes from socket into buffer...\n",
+      DEBUG_printf(("httpRead2: reading %d bytes from socket into buffer...\n",
                     bytes));
 
       bytes = recv(http->fd, http->buffer, bytes, 0);
 
-      DEBUG_printf(("httpRead: read %d bytes from socket into buffer...\n",
+      DEBUG_printf(("httpRead2: read %d bytes from socket into buffer...\n",
                     bytes));
     }
 
@@ -1116,7 +1136,7 @@ httpRead(http_t *http,			/* I - HTTP data */
 
     bytes = length;
 
-    DEBUG_printf(("httpRead: grabbing %d bytes from input buffer...\n", bytes));
+    DEBUG_printf(("httpRead2: grabbing %d bytes from input buffer...\n", bytes));
 
     memcpy(buffer, http->buffer, length);
     http->used -= length;
@@ -1138,13 +1158,13 @@ httpRead(http_t *http,			/* I - HTTP data */
     if (!http->blocking && !httpWait(http, 1000))
       return (0);
 
-    DEBUG_printf(("httpRead: reading %d bytes from socket...\n", length));
+    DEBUG_printf(("httpRead2: reading %d bytes from socket...\n", length));
 
     while ((bytes = recv(http->fd, buffer, length, 0)) < 0)
       if (errno != EINTR)
         break;
 
-    DEBUG_printf(("httpRead: read %d bytes from socket...\n", bytes));
+    DEBUG_printf(("httpRead2: read %d bytes from socket...\n", bytes));
   }
 
   if (bytes > 0)
@@ -1190,7 +1210,7 @@ httpRead(http_t *http,			/* I - HTTP data */
 #ifdef DEBUG
   {
     int i, j, ch;
-    printf("httpRead: Read %d bytes:\n", bytes);
+    printf("httpRead2: Read %d bytes:\n", bytes);
     for (i = 0; i < bytes; i += 16)
     {
       printf("   ");
@@ -1635,6 +1655,11 @@ httpWait(http_t *http,			/* I - HTTP data */
 
 /*
  * 'httpWrite()' - Write data to a HTTP connection.
+ *
+ * This function is deprecated. Use the httpWrite2() function which can
+ * write more than 2GB of data.
+ *
+ * @deprecated@
  */
  
 int					/* O - Number of bytes written */
@@ -1642,7 +1667,20 @@ httpWrite(http_t     *http,		/* I - HTTP data */
           const char *buffer,		/* I - Buffer for data */
 	  int        length)		/* I - Number of bytes to write */
 {
-  int	bytes;				/* Bytes written */
+  return ((int)httpWrite2(http, buffer, length));
+}
+
+
+/*
+ * 'httpWrite2()' - Write data to a HTTP connection.
+ */
+ 
+ssize_t					/* O - Number of bytes written */
+httpWrite2(http_t     *http,		/* I - HTTP data */
+           const char *buffer,		/* I - Buffer for data */
+	   size_t     length)		/* I - Number of bytes to write */
+{
+  ssize_t	bytes;			/* Bytes written */
 
 
   DEBUG_printf(("httpWrite(http=%p, buffer=%p, length=%d)\n", http,

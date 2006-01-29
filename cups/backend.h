@@ -43,6 +43,13 @@ typedef enum cups_backend_e		/**** Backend exit codes ****/
 } cups_backend_t;
 
 
+/*
+ * Prototypes...
+ */
+
+extern const char	*cupsBackendDeviceURI(char **argv);
+
+
 #endif /* !_CUPS_BACKEND_H_ */
 
 /*

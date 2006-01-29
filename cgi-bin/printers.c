@@ -392,8 +392,8 @@ show_printer(http_t     *http,		/* I - Connection to server */
 
   request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   "/printers/%s", printer);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, "/printers/%s", printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
                uri);
 

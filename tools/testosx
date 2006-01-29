@@ -8,12 +8,8 @@ if test ! -f tools/testosx; then
 	exit 1
 fi
 
-# Update the current working copy...
-svn up
-rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
-
-# Make everything...
-make all
+# Get the current working copy version...
+rev=`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[a-zA-Z]*//g'`
 
 # Setup an install directory...
 user=`whoami`
@@ -42,6 +38,10 @@ cat >$pkgdir/Resources/postflight <<EOF
 #!/bin/sh
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
+sleep 1
+if test -e /private/var/run/cupsd; then
+        chmod g+w,o+w /private/var/run/cupsd
+fi
 EOF
 chmod 755 $pkgdir/Resources/postflight
 

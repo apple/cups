@@ -85,9 +85,12 @@
  */
 
 static size_t		ipp_length(ipp_t *ipp, int collection);
-static int		ipp_read_http(http_t *http, ipp_uchar_t *buffer, int length);
-static int		ipp_read_file(int *fd, ipp_uchar_t *buffer, int length);
-static int		ipp_write_file(int *fd, ipp_uchar_t *buffer, int length);
+static ssize_t		ipp_read_http(http_t *http, ipp_uchar_t *buffer,
+			              size_t length);
+static ssize_t		ipp_read_file(int *fd, ipp_uchar_t *buffer,
+			              size_t length);
+static ssize_t		ipp_write_file(int *fd, ipp_uchar_t *buffer,
+			               size_t length);
 
 
 /*
@@ -1580,7 +1583,7 @@ ippWrite(http_t *http,			/* I - HTTP connection */
   if (http == NULL)
     return (IPP_ERROR);
 
-  return (ippWriteIO(http, (ipp_iocb_t)httpWrite,
+  return (ippWriteIO(http, (ipp_iocb_t)httpWrite2,
                      http->blocking, NULL, ipp));
 }
 
@@ -2623,10 +2626,10 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
  * 'ipp_read_http()' - Semi-blocking read on a HTTP connection...
  */
 
-static int				/* O - Number of bytes read */
+static ssize_t				/* O - Number of bytes read */
 ipp_read_http(http_t      *http,	/* I - Client connection */
               ipp_uchar_t *buffer,	/* O - Buffer for data */
-	      int         length)	/* I - Total length */
+	      size_t      length)	/* I - Total length */
 {
   int		tbytes,			/* Total bytes read */
 		bytes;			/* Bytes read this pass */
@@ -2718,7 +2721,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
 	}
       }
 
-      if ((bytes = httpRead(http, (char *)buffer, length - tbytes)) <= 0)
+      if ((bytes = httpRead2(http, (char *)buffer, length - tbytes)) <= 0)
         break;
     }
   }
@@ -2740,10 +2743,10 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
  * 'ipp_read_file()' - Read IPP data from a file.
  */
 
-static int				/* O - Number of bytes read */
+static ssize_t				/* O - Number of bytes read */
 ipp_read_file(int         *fd,		/* I - File descriptor */
               ipp_uchar_t *buffer,	/* O - Read buffer */
-	      int         length)	/* I - Number of bytes to read */
+	      size_t      length)	/* I - Number of bytes to read */
 {
   return (read(*fd, buffer, length));
 }
@@ -2753,10 +2756,10 @@ ipp_read_file(int         *fd,		/* I - File descriptor */
  * 'ipp_write_file()' - Write IPP data to a file.
  */
 
-static int				/* O - Number of bytes written */
+static ssize_t				/* O - Number of bytes written */
 ipp_write_file(int         *fd,		/* I - File descriptor */
                ipp_uchar_t *buffer,	/* I - Data to write */
-               int         length)	/* I - Number of bytes to write */
+               size_t      length)	/* I - Number of bytes to write */
 {
   return (write(*fd, buffer, length));
 }

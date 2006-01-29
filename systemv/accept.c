@@ -206,8 +206,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       request = ippNewRequest(op);
 
-      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/printers/%s", argv[i]);
+      httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                       "localhost", 0, "/printers/%s", argv[i]);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                    "printer-uri", NULL, uri);
 

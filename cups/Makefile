@@ -35,6 +35,7 @@ LIBOBJS	=	\
 		attr.o \
 		auth.o \
 		backchannel.o \
+		backend.o \
 		custom.o \
 		dest.o \
 		dir.o \

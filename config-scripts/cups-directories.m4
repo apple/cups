@@ -179,7 +179,11 @@ dnl Setup default locations...
 AC_ARG_WITH(cachedir, [  --with-cachedir         set path for cache files],cachedir="$withval",cachedir="")
 
 if test x$cachedir = x; then
-	CUPS_CACHEDIR="$localstatedir/cache/cups"
+	if test "x$uname" = xDarwin; then
+		CUPS_CACHEDIR="$localstatedir/tmp/cups"
+	else
+		CUPS_CACHEDIR="$localstatedir/cache/cups"
+	fi
 else
 	CUPS_CACHEDIR="$cachedir"
 fi

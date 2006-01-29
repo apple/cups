@@ -444,8 +444,9 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
                      "attributes-natural-language", NULL,
 		     language->language);
 
-        httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
-	                 "localhost", 631, "/printers/%s", printer);
+        httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
+	                 "ipp", NULL, "localhost", 631, "/printers/%s",
+			 printer);
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	             "printer-uri", NULL, printer_uri);
 

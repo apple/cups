@@ -121,8 +121,8 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
   * Create a printer URI...
   */
 
-  if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/printers/%s", printer) != HTTP_URI_OK)
+  if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                       "localhost", 0, "/printers/%s", printer) != HTTP_URI_OK)
   {
     cups_set_error(IPP_INTERNAL_ERROR, NULL);
 
@@ -336,7 +336,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 	      break;
           }
 
-  	  if (httpWrite(http, buffer, bytes) < bytes)
+  	  if (httpWrite2(http, buffer, bytes) < bytes)
             break;
         }
       }
@@ -891,8 +891,8 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
 
   if (mydest)
   {
-    if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                         "/printers/%s", mydest) != HTTP_URI_OK)
+    if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                         "localhost", 0, "/printers/%s", mydest) != HTTP_URI_OK)
     {
       cups_set_error(IPP_INTERNAL_ERROR, NULL);
 
@@ -1552,8 +1552,8 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   * Setup the printer URI...
   */
 
-  if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/printers/%s", name) != HTTP_URI_OK)
+  if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                       "localhost", 0, "/printers/%s", name) != HTTP_URI_OK)
   {
     cups_set_error(IPP_INTERNAL_ERROR, NULL);
 
@@ -1816,8 +1816,8 @@ cups_get_printer_uri(
   * Setup the printer URI...
   */
 
-  if (httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/printers/%s", name) != HTTP_URI_OK)
+  if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                       "localhost", 0, "/printers/%s", name) != HTTP_URI_OK)
   {
     cups_set_error(IPP_INTERNAL_ERROR, NULL);
 
@@ -1877,9 +1877,9 @@ cups_get_printer_uri(
 
       for (i = 0; i < attr->num_values; i ++)
       {
-	httpSeparateURI(attr->values[i].string.text, scheme, sizeof(scheme),
-	                username, sizeof(username), host, hostsize,
-	                port, resource, resourcesize);
+	httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[i].string.text,
+	                scheme, sizeof(scheme), username, sizeof(username),
+			host, hostsize, port, resource, resourcesize);
 	if (!strncmp(resource, "/printers/", 10))
 	{
 	 /*
@@ -1901,9 +1901,9 @@ cups_get_printer_uri(
       {
 	for (i = 0; i < attr->num_values; i ++)
 	{
-	  httpSeparateURI(attr->values[i].string.text, scheme, sizeof(scheme),
-			  username, sizeof(username), host, hostsize,
-			  port, resource, resourcesize);
+	  httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[i].string.text,
+	                  scheme, sizeof(scheme), username, sizeof(username),
+			  host, hostsize, port, resource, resourcesize);
 	  if (!strncmp(resource, "/classes/", 9))
 	  {
 	   /*
@@ -1945,9 +1945,9 @@ cups_get_printer_uri(
     else if ((attr = ippFindAttribute(response, "printer-uri-supported",
                                       IPP_TAG_URI)) != NULL)
     {
-      httpSeparateURI(attr->values[0].string.text, scheme, sizeof(scheme),
-		      username, sizeof(username), host, hostsize,
-		      port, resource, resourcesize);
+      httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text,
+                      scheme, sizeof(scheme), username, sizeof(username),
+		      host, hostsize, port, resource, resourcesize);
       ippDelete(response);
 
       return (1);
