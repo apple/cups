@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c 4943 2006-01-18 20:30:42Z mike $"
+ * "$Id: testhttp.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -325,7 +325,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     fputs("httpSeparateURI(): ", stdout);
     for (i = 0, j = 0; i < (int)(sizeof(uri_tests) / sizeof(uri_tests[0])); i ++)
     {
-      uri_status = httpSeparateURI(uri_tests[i].uri, scheme, sizeof(scheme),
+      uri_status = httpSeparateURI(HTTP_URI_CODING_MOST,
+				   uri_tests[i].uri, scheme, sizeof(scheme),
                                    username, sizeof(username),
 				   hostname, sizeof(hostname), &port,
 				   resource, sizeof(resource));
@@ -390,7 +391,8 @@ main(int  argc,				/* I - Number of command-line arguments */
           strstr(uri_tests[i].uri, "//"))
       {
         k ++;
-	uri_status = httpAssembleURI(buffer, sizeof(buffer),
+	uri_status = httpAssembleURI(HTTP_URI_CODING_MOST,
+				     buffer, sizeof(buffer),
 	                             uri_tests[i].scheme,
 				     uri_tests[i].username,
 	                             uri_tests[i].hostname,
@@ -459,7 +461,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       continue;
     }
 
-    httpSeparateURI(argv[i], scheme, sizeof(scheme), username, sizeof(username),
+    httpSeparateURI(HTTP_URI_CODING_MOST, argv[i], scheme, sizeof(scheme),
+                    username, sizeof(username),
                     hostname, sizeof(hostname), &port,
 		    resource, sizeof(resource));
 
@@ -485,7 +488,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     length = httpGetLength2(http);
     total  = 0;
 
-    while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
+    while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
     {
       total += bytes;
       fwrite(buffer, bytes, 1, out);
@@ -512,5 +515,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c 4943 2006-01-18 20:30:42Z mike $".
+ * End of "$Id: testhttp.c 5023 2006-01-29 14:39:44Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5003 2006-01-27 02:33:36Z mike $"
+# "$Id: Makefile 5023 2006-01-29 14:39:44Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,7 +29,7 @@ include Makedefs
 #
 
 DIRS	=	cups backend berkeley cgi-bin filter locale man pdftops \
-		notifier scheduler systemv
+		notifier scheduler systemv test
 
 #
 # Make all targets...
@@ -107,6 +107,12 @@ install:	installhdrs
 			$(INSTALL_DATA) init/cups.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
 			$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
 			$(INSTALL_DATA) init/cups.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
+		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
+			$(INSTALL_DATA) init/cupsd-launchd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
+			$(INSTALL_SCRIPT) init/cupsd-launchd.sh $(BUILDROOT)/System/Library/StartupItems/PrintingServices/PrintingServices; \
+			$(INSTALL_DATA) init/cups.plist $(BUILDROOT)/System/Library/StartupItems/PrintingServices/StartupParameters.plist; \
+			$(INSTALL_DIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices/Resources/English.lproj; \
+			$(INSTALL_DATA) init/cups.strings $(BUILDROOT)/System/Library/StartupItems/PrintingServices/Resources/English.lproj/Localizable.strings; \
 		else \
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		fi \
@@ -165,5 +171,5 @@ tardist:
 	epm $(EPMFLAGS) -f tardist cups packaging/cups.list
 
 #
-# End of "$Id: Makefile 5003 2006-01-27 02:33:36Z mike $".
+# End of "$Id: Makefile 5023 2006-01-29 14:39:44Z mike $".
 #

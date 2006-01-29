@@ -221,3 +221,8 @@ DT {
 DD {
   margin-left: 5em;
 }
+
+P.summary {
+  margin-left: 5em;
+  font-family: monospace;
+}

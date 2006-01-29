@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c 4931 2006-01-14 20:37:40Z mike $"
+ * "$Id: classes.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -385,8 +385,8 @@ show_class(http_t     *http,		/* I - Connection to server */
 
   request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   "/classes/%s", pclass);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, "/classes/%s", pclass);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
                uri);
 
@@ -459,5 +459,5 @@ show_class(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: classes.c 4931 2006-01-14 20:37:40Z mike $".
+ * End of "$Id: classes.c 5023 2006-01-29 14:39:44Z mike $".
  */

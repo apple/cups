@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c 4991 2006-01-26 15:01:46Z mike $"
+ * "$Id: lpd.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -231,8 +231,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and printer name from the URI...
   */
 
-  httpSeparateURI(argv[0], method, sizeof(method), username, sizeof(username),
-                  hostname, sizeof(hostname), &port,
+  httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+                  method, sizeof(method), username, sizeof(username),
+		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
 
   if (!username[0])
@@ -1223,5 +1224,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c 4991 2006-01-26 15:01:46Z mike $".
+ * End of "$Id: lpd.c 5023 2006-01-29 14:39:44Z mike $".
  */

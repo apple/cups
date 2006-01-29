@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 5008 2006-01-27 19:30:34Z mike $"
+ * "$Id: config.h.in 5020 2006-01-28 13:36:15Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -353,6 +353,15 @@
 
 
 /*
+ * Do we have launchd support?
+ */
+
+#undef HAVE_LAUNCH_H
+#undef HAVE_LAUNCHD
+#define CUPS_DEFAULT_LAUNCHD_CONF ""
+
+
+/*
  * Various scripting languages...
  */
 
@@ -403,5 +412,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 5008 2006-01-27 19:30:34Z mike $".
+ * End of "$Id: config.h.in 5020 2006-01-28 13:36:15Z mike $".
  */

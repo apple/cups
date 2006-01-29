@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c 4933 2006-01-16 00:26:57Z mike $"
+ * "$Id: cupsaddsmb.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -576,8 +576,8 @@ export_dest(const char *dest)		/* I - Destination to export */
 
   request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   "/printers/%s", dest);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, "/printers/%s", dest);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
 
@@ -1026,5 +1026,5 @@ write_option(FILE            *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: cupsaddsmb.c 4933 2006-01-16 00:26:57Z mike $".
+ * End of "$Id: cupsaddsmb.c 5023 2006-01-29 14:39:44Z mike $".
  */

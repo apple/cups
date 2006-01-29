@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h 4822 2005-11-04 21:13:20Z mike $"
+ * "$Id: dirsvc.h 5020 2006-01-28 13:36:15Z mike $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -39,7 +39,8 @@
 #define BROWSE_CUPS	1		/* CUPS */
 #define	BROWSE_SLP	2		/* SLPv2 */
 #define BROWSE_LDAP	4		/* LDAP (not supported yet) */
-#define BROWSE_ALL	7		/* All protocols */
+#define BROWSE_DNSSD	8		/* DNS Service Discovery aka Bonjour */
+#define BROWSE_ALL	15		/* All protocols */
 
 
 /*
@@ -158,5 +159,5 @@ extern void	cupsdUpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id: dirsvc.h 4822 2005-11-04 21:13:20Z mike $".
+ * End of "$Id: dirsvc.h 5020 2006-01-28 13:36:15Z mike $".
  */

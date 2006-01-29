@@ -1,5 +1,5 @@
 /*
- * "$Id: translate.c 4896 2006-01-08 03:57:45Z mike $"
+ * "$Id: translate.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   HTTP-based translation program for the Common UNIX Printing System (CUPS).
  *
@@ -261,7 +261,7 @@ translate_messages(cups_array_t *cat,	/* I - Message catalog */
 	httpPost(http, "/translate_t");
       }
 
-      httpWrite(http, buffer, bufptr - buffer);
+      httpWrite2(http, buffer, bufptr - buffer);
 
       while ((status = httpUpdate(http)) == HTTP_CONTINUE);
 
@@ -281,7 +281,7 @@ translate_messages(cups_array_t *cat,	/* I - Message catalog */
       bufptr = buffer;
       bufend = buffer + sizeof(buffer) - 1;
 
-      while ((bytes = httpRead(http, bufptr, bufend - bufptr)) > 0)
+      while ((bytes = httpRead2(http, bufptr, bufend - bufptr)) > 0)
         bufptr += bytes;
 
       if (bytes < 0)
@@ -444,5 +444,5 @@ write_string(cups_file_t *fp,		/* I - File to write to */
 
 
 /*
- * End of "$Id: translate.c 4896 2006-01-08 03:57:45Z mike $".
+ * End of "$Id: translate.c 5023 2006-01-29 14:39:44Z mike $".
  */

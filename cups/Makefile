@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5000 2006-01-26 23:38:43Z mike $"
+# "$Id: Makefile 5023 2006-01-29 14:39:44Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -35,6 +35,7 @@ LIBOBJS	=	\
 		attr.o \
 		auth.o \
 		backchannel.o \
+		backend.o \
 		custom.o \
 		dest.o \
 		dir.o \
@@ -356,5 +357,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5000 2006-01-26 23:38:43Z mike $".
+# End of "$Id: Makefile 5023 2006-01-29 14:39:44Z mike $".
 #

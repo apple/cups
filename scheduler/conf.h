@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h 4988 2006-01-26 00:53:00Z mike $"
+ * "$Id: conf.h 5020 2006-01-28 13:36:15Z mike $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -192,6 +192,12 @@ VAR CFArrayRef		ServerCertificatesArray	VALUE(NULL);
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
+#ifdef HAVE_LAUNCHD
+VAR int			LaunchdTimeout		VALUE(DEFAULT_TIMEOUT);
+					/* Time after which an idle cupsd will exit */
+VAR char		*LaunchdConf		VALUE(NULL);
+					/* launchd(8) configuration file */
+#endif /* HAVE_LAUNCHD */
 
 /*
  * Prototypes...
@@ -209,5 +215,5 @@ extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h 4988 2006-01-26 00:53:00Z mike $".
+ * End of "$Id: conf.h 5020 2006-01-28 13:36:15Z mike $".
  */

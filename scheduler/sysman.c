@@ -1,5 +1,5 @@
 /*
- * "$Id: sysman.c 5007 2006-01-27 18:25:42Z mike $"
+ * "$Id: sysman.c 5018 2006-01-28 06:06:55Z mike $"
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
@@ -106,11 +106,11 @@ cupsdUpdateSystemMonitor(void)
  * Constants...
  */
 
-#define SYSEVENT_CANSLEEP	0x1	/* Decide whether to allow sleep or not */
-#define SYSEVENT_WILLSLEEP	0x2	/* Computer will go to sleep */
-#define SYSEVENT_WOKE		0x4	/* Computer woke from sleep */
-#define SYSEVENT_NETCHANGED	0x8	/* Network changed */
-#define SYSEVENT_NAMECHANGED	0x10	/* Computer name changed */
+#  define SYSEVENT_CANSLEEP	0x1	/* Decide whether to allow sleep or not */
+#  define SYSEVENT_WILLSLEEP	0x2	/* Computer will go to sleep */
+#  define SYSEVENT_WOKE		0x4	/* Computer woke from sleep */
+#  define SYSEVENT_NETCHANGED	0x8	/* Network changed */
+#  define SYSEVENT_NAMECHANGED	0x10	/* Computer name changed */
 
 
 /* 
@@ -167,7 +167,6 @@ static void	sysEventConfigurationNotifier(SCDynamicStoreRef store,
 		                              CFArrayRef changedKeys,
 					      void *context);
 static void	sysEventTimerNotifier(CFRunLoopTimerRef timer, void *context);
-#endif	/* __APPLE__ */
 
 
 /*
@@ -741,8 +740,9 @@ sysEventTimerNotifier(
     threadData->sysevent.event = 0;
   }
 }
+#endif	/* __APPLE__ */
 
 
 /*
- * End of "$Id: sysman.c 5007 2006-01-27 18:25:42Z mike $".
+ * End of "$Id: sysman.c 5018 2006-01-28 06:06:55Z mike $".
  */

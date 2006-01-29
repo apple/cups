@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 5007 2006-01-27 18:25:42Z mike $"
+ * "$Id: job.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -874,9 +874,9 @@ cupsdLoadAllJobs(void)
 	continue;
       }
 
-      httpSeparateURI(attr->values[0].string.text, method, sizeof(method),
-                      username, sizeof(username), host, sizeof(host), &port,
-		      resource, sizeof(resource));
+      httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, method,
+                      sizeof(method), username, sizeof(username), host,
+		      sizeof(host), &port, resource, sizeof(resource));
 
       if ((dest = cupsdValidateDest(host, resource, &(job->dtype),
                                     NULL)) == NULL)
@@ -2686,5 +2686,5 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 5007 2006-01-27 18:25:42Z mike $".
+ * End of "$Id: job.c 5023 2006-01-29 14:39:44Z mike $".
  */

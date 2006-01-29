@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 4974 2006-01-25 07:04:33Z mike $"
+ * "$Id: socket.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -164,8 +164,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and port number from the URI...
   */
 
-  httpSeparateURI(argv[0], method, sizeof(method), username, sizeof(username),
-                  hostname, sizeof(hostname), &port,
+  httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+                  method, sizeof(method), username, sizeof(username),
+		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
 
   if (port == 0)
@@ -487,5 +488,5 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c 4974 2006-01-25 07:04:33Z mike $".
+ * End of "$Id: socket.c 5023 2006-01-29 14:39:44Z mike $".
  */

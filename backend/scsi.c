@@ -1,5 +1,5 @@
 /*
- * "$Id: scsi.c 4906 2006-01-10 20:53:28Z mike $"
+ * "$Id: scsi.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   SCSI printer backend for the Common UNIX Printing System (CUPS).
  *
@@ -183,8 +183,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Extract the device name and options from the URI...
   */
 
-  httpSeparateURI(argv[0], method, sizeof(method), username, sizeof(username),
-                  hostname, sizeof(hostname), &port,
+  httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+                  method, sizeof(method), username, sizeof(username),
+		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
 
  /*
@@ -219,5 +220,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: scsi.c 4906 2006-01-10 20:53:28Z mike $".
+ * End of "$Id: scsi.c 5023 2006-01-29 14:39:44Z mike $".
  */

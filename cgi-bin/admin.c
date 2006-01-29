@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 4943 2006-01-18 20:30:42Z mike $"
+ * "$Id: admin.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -86,6 +86,15 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+
+  if (!http)
+  {
+    perror("ERROR: Unable to connect to cupsd");
+    fprintf(stderr, "DEBUG: cupsServer()=\"%s\"\n", cupsServer());
+    fprintf(stderr, "DEBUG: ippPort()=%d\n", ippPort());
+    fprintf(stderr, "DEBUG: cupsEncryption()=%d\n", cupsEncryption());
+    exit(1);
+  }
 
  /*
   * Set the web interface section...
@@ -303,8 +312,8 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 
       request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
-      httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                       "/classes/%s", name);
+      httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                       "localhost", 0, "/classes/%s", name);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                    NULL, uri);
 
@@ -408,8 +417,9 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 
   request = ippNewRequest(CUPS_ADD_CLASS);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   "/classes/%s", cgiGetVariable("PRINTER_NAME"));
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, "/classes/%s",
+		   cgiGetVariable("PRINTER_NAME"));
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
@@ -526,8 +536,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
     request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/printers/%s", cgiGetVariable("PRINTER_NAME"));
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s",
+		     cgiGetVariable("PRINTER_NAME"));
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -611,6 +622,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     *    printer-uri
     */
 
+    fputs("DEBUG: Getting list of devices...\n", stderr);
+
     request = ippNewRequest(CUPS_GET_DEVICES);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
@@ -620,11 +633,19 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
+    fprintf(stderr, "DEBUG: http=%p (%s)\n", http, http->hostname);
+
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
+      fputs("DEBUG: Got device list!\n", stderr);
+
       cgiSetIPPVars(response, NULL, NULL, NULL, 0);
       ippDelete(response);
     }
+    else
+      fprintf(stderr,
+              "ERROR: CUPS-Get-Devices request failed with status %x: %s\n",
+	      cupsLastError(), cupsLastErrorString());
 
    /*
     * Let the user choose...
@@ -705,6 +726,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       http_status_t	get_status;	/* Status of GET */
 
 
+      /* TODO: Use cupsGetFile() API... */
       snprintf(uri, sizeof(uri), "/printers/%s.ppd", name);
 
       if (httpGet(http, uri))
@@ -719,7 +741,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       }
       else if ((fd = cupsTempFd(filename, sizeof(filename))) >= 0)
       {
-	while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
+	while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
           write(fd, buffer, bytes);
 
 	close(fd);
@@ -921,8 +943,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
     request = ippNewRequest(CUPS_ADD_PRINTER);
 
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/printers/%s", cgiGetVariable("PRINTER_NAME"));
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s",
+		     cgiGetVariable("PRINTER_NAME"));
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -1055,8 +1078,8 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
   */
 
   if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/printers/%s", printer);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s", printer);
   else
   {
     cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
@@ -1220,8 +1243,8 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
 
     request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/printers/%s", printer);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s", printer);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -1460,8 +1483,9 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
 
     request = ippNewRequest(CUPS_ADD_PRINTER);
 
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/printers/%s", cgiGetVariable("PRINTER_NAME"));
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s",
+		     cgiGetVariable("PRINTER_NAME"));
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, uri);
 
@@ -2323,8 +2347,8 @@ do_delete_class(http_t *http)		/* I - HTTP connection */
   }
 
   if ((pclass = cgiGetVariable("PRINTER_NAME")) != NULL)
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/classes/%s", pclass);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/classes/%s", pclass);
   else
   {
     cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
@@ -2384,8 +2408,8 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
   }
 
   if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     "/printers/%s", printer);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s", printer);
   else
   {
     cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
@@ -3127,8 +3151,9 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
 
   request = ippNewRequest(op);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   is_class ? "/classes/%s" : "/printers/%s", printer);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, is_class ? "/classes/%s" : "/printers/%s",
+		   printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
@@ -3236,8 +3261,9 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
 
     request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     is_class ? "/classes/%s" : "/printers/%s", printer);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, is_class ? "/classes/%s" : "/printers/%s",
+		     printer);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
 
@@ -3322,8 +3348,9 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
 
     request = ippNewRequest(is_class ? CUPS_ADD_CLASS : CUPS_ADD_PRINTER);
 
-    httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                     is_class ? "/classes/%s" : "/printers/%s", printer);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, is_class ? "/classes/%s" : "/printers/%s",
+		     printer);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
 
@@ -3465,8 +3492,9 @@ do_set_sharing(http_t *http)		/* I - HTTP connection */
 
   request = ippNewRequest(is_class ? CUPS_ADD_CLASS : CUPS_ADD_PRINTER);
 
-  httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                   is_class ? "/classes/%s" : "/printers/%s", printer);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, is_class ? "/classes/%s" : "/printers/%s",
+		   printer);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
@@ -3562,5 +3590,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 4943 2006-01-18 20:30:42Z mike $".
+ * End of "$Id: admin.c 5023 2006-01-29 14:39:44Z mike $".
  */

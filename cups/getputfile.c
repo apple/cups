@@ -1,5 +1,5 @@
 /*
- * "$Id: getputfile.c 4984 2006-01-25 21:55:36Z mike $"
+ * "$Id: getputfile.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
@@ -166,7 +166,7 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
     * Yes, copy the file...
     */
 
-    while ((bytes = httpRead(http, buffer, sizeof(buffer))) > 0)
+    while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
       write(fd, buffer, bytes);
   }
   else
@@ -322,11 +322,11 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
           break;
       }
       else
-        httpWrite(http, buffer, bytes);
+        httpWrite2(http, buffer, bytes);
 
     if (status == HTTP_CONTINUE)
     {
-      httpWrite(http, buffer, 0);
+      httpWrite2(http, buffer, 0);
 
       while ((status = httpUpdate(http)) == HTTP_CONTINUE);
     }
@@ -447,5 +447,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: getputfile.c 4984 2006-01-25 21:55:36Z mike $".
+ * End of "$Id: getputfile.c 5023 2006-01-29 14:39:44Z mike $".
  */

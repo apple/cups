@@ -1,5 +1,5 @@
 /*
- * "$Id: lpc.c 4948 2006-01-19 03:23:41Z mike $"
+ * "$Id: lpc.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   "lpc" command for the Common UNIX Printing System (CUPS).
  *
@@ -444,8 +444,9 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
                      "attributes-natural-language", NULL,
 		     language->language);
 
-        httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL,
-	                 "localhost", 631, "/printers/%s", printer);
+        httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
+	                 "ipp", NULL, "localhost", 631, "/printers/%s",
+			 printer);
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	             "printer-uri", NULL, printer_uri);
 
@@ -517,5 +518,5 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c 4948 2006-01-19 03:23:41Z mike $".
+ * End of "$Id: lpc.c 5023 2006-01-29 14:39:44Z mike $".
  */

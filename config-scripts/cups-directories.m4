@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4 4933 2006-01-16 00:26:57Z mike $"
+dnl "$Id: cups-directories.m4 5023 2006-01-29 14:39:44Z mike $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -126,7 +126,9 @@ if test x$rcdir = x; then
 		Darwin*)
 			# Darwin and MacOS X...
 			INITDIR=""
-			INITDDIR="/System/Library/StartupItems/PrintingServices"
+			AC_CHECK_PROG(INITDDIR, launchd, 
+				"/System/Library/LaunchDaemons", 
+				"/System/Library/StartupItems/PrintingServices")
 			;;
 
 		Linux | GNU)
@@ -177,7 +179,11 @@ dnl Setup default locations...
 AC_ARG_WITH(cachedir, [  --with-cachedir         set path for cache files],cachedir="$withval",cachedir="")
 
 if test x$cachedir = x; then
-	CUPS_CACHEDIR="$localstatedir/cache/cups"
+	if test "x$uname" = xDarwin; then
+		CUPS_CACHEDIR="$localstatedir/tmp/cups"
+	else
+		CUPS_CACHEDIR="$localstatedir/cache/cups"
+	fi
 else
 	CUPS_CACHEDIR="$cachedir"
 fi
@@ -279,5 +285,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 4933 2006-01-16 00:26:57Z mike $".
+dnl End of "$Id: cups-directories.m4 5023 2006-01-29 14:39:44Z mike $".
 dnl

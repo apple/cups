@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c 4945 2006-01-18 21:41:17Z mike $"
+ * "$Id: lpmove.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -202,8 +202,8 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
   }
   else
   {
-    httpAssembleURIf(job_uri, sizeof(job_uri), "ipp", NULL, "localhost", 0,
-                     "/printers/%s", src);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s", src);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
         	 job_uri);
   }
@@ -211,8 +211,8 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, cupsUser());
 
-  httpAssembleURIf(printer_uri, sizeof(printer_uri), "ipp", NULL, "localhost", 0,
-                   "/printers/%s", dest);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
+                   "ipp", NULL, "localhost", 0, "/printers/%s", dest);
   ippAddString(request, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri",
                NULL, printer_uri);
 
@@ -233,5 +233,5 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c 4945 2006-01-18 21:41:17Z mike $".
+ * End of "$Id: lpmove.c 5023 2006-01-29 14:39:44Z mike $".
  */

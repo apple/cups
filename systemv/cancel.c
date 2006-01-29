@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c 4948 2006-01-19 03:23:41Z mike $"
+ * "$Id: cancel.c 5023 2006-01-29 14:39:44Z mike $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -266,8 +266,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if (dest)
       {
-	httpAssembleURIf(uri, sizeof(uri), "ipp", NULL, "localhost", 0,
-                	 "/printers/%s", dest);
+	httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+	                 "localhost", 0, "/printers/%s", dest);
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
 	             "printer-uri", NULL, uri);
 	ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
@@ -388,5 +388,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c 4948 2006-01-19 03:23:41Z mike $".
+ * End of "$Id: cancel.c 5023 2006-01-29 14:39:44Z mike $".
  */
