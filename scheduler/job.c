@@ -2262,6 +2262,9 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
                   job->status_buffer->fd);
 
   FD_SET(job->status_buffer->fd, InputSet);
+
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
+                job->id);
 }
 
 

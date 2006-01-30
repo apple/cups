@@ -409,6 +409,13 @@
 #undef HAVE_NOTIFY_POST
 
 
+/*
+ * Do we have DBUS?
+ */
+
+#undef HAVE_DBUS
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

@@ -49,22 +49,23 @@ typedef enum
   CUPSD_EVENT_PRINTER_CHANGED = 0x00ff,	/* All of the above */
 
   /* Individual job events... */
-  CUPSD_EVENT_JOB_CREATED = 0x0100,	/* Send after job is created */
-  CUPSD_EVENT_JOB_COMPLETED = 0x0200,	/* Sent after job is completed */
-  CUPSD_EVENT_JOB_STOPPED = 0x0400,	/* Sent after job is stopped */
-  CUPSD_EVENT_JOB_CONFIG_CHANGED = 0x0800,
+  CUPSD_EVENT_JOB_STATE = 0x0100,	/* Any state change */
+  CUPSD_EVENT_JOB_CREATED = 0x0200,	/* Send after job is created */
+  CUPSD_EVENT_JOB_COMPLETED = 0x0400,	/* Sent after job is completed */
+  CUPSD_EVENT_JOB_STOPPED = 0x0800,	/* Sent after job is stopped */
+  CUPSD_EVENT_JOB_CONFIG_CHANGED = 0x1000,
 					/* Sent after set-job-attributes */
-  CUPSD_EVENT_JOB_PROGRESS = 0x1000,	/* Sent for each page */
+  CUPSD_EVENT_JOB_PROGRESS = 0x2000,	/* Sent for each page */
 
   /* Convenience job event grouping... */
-  CUPSD_EVENT_JOB_STATE_CHANGED = 0x0700,
-					/* CREATED + COMPLETED + STOPPED */
+  CUPSD_EVENT_JOB_STATE_CHANGED = 0x0f00,
+					/* Any state change + CREATED + COMPLETED + STOPPED */
 
   /* Server events... */
-  CUPSD_EVENT_SERVER_RESTARTED = 0x2000,/* Sent after server restarts */
-  CUPSD_EVENT_SERVER_STARTED = 0x4000,	/* Sent when server first starts */
-  CUPSD_EVENT_SERVER_STOPPED = 0x8000,	/* Sent when server is stopped */
-  CUPSD_EVENT_SERVER_AUDIT = 0x10000,	/* Security-related stuff */
+  CUPSD_EVENT_SERVER_RESTARTED = 0x4000,/* Sent after server restarts */
+  CUPSD_EVENT_SERVER_STARTED = 0x8000,	/* Sent when server first starts */
+  CUPSD_EVENT_SERVER_STOPPED = 0x10000,	/* Sent when server is stopped */
+  CUPSD_EVENT_SERVER_AUDIT = 0x20000,	/* Security-related stuff */
 
   /* Everything and nothing... */
   CUPSD_EVENT_NONE = 0,			/* Nothing */

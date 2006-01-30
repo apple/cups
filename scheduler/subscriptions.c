@@ -39,6 +39,7 @@
  *   cupsdUpdateNotifierStatus()   - Read messages from notifiers.
  *   cupsd_compare_subscriptions() - Compare two subscriptions.
  *   cupsd_delete_event()          - Delete a single event...
+ *   cupsd_send_dbus()             - Send a DBUS notification...
  *   cupsd_start_notifier()        - Start a notifier subprocess...
  */
 
@@ -47,6 +48,9 @@
  */
 
 #include "cupsd.h"
+#ifdef HAVE_DBUS
+#  include <dbus/dbus.h>
+#endif /* HAVE_DBUS */
 
 
 /*
@@ -57,6 +61,10 @@ static int	cupsd_compare_subscriptions(cupsd_subscription_t *first,
 		                            cupsd_subscription_t *second,
 		                            void *unused);
 static void	cupsd_delete_event(cupsd_event_t *event);
+#ifdef HAVE_DBUS
+static void	cupsd_send_dbus(cupsd_eventmask_t event, cupsd_printer_t *dest,
+		                cupsd_job_t *job);
+#endif /* HAVE_DBUS */
 static void	cupsd_start_notifier(cupsd_subscription_t *sub);
 
 
@@ -79,7 +87,15 @@ cupsdAddEvent(
   cupsd_subscription_t	*sub;		/* Current subscription */
 
 
+ /*
+  * Keep track of events with any OS-supplied notification mechanisms...
+  */
+
   LastEvent |= event;
+
+#ifdef HAVE_DBUS
+  cupsd_send_dbus(event, dest, job);
+#endif /* HAVE_DBUS */
 
  /*
   * Return if we aren't keeping events...
@@ -1406,6 +1422,86 @@ cupsd_delete_event(cupsd_event_t *event)/* I - Event to delete */
   ippDelete(event->attrs);
   free(event);
 }
+
+
+#ifdef HAVE_DBUS
+/*
+ * 'cupsd_send_dbus()' - Send a DBUS notification...
+ */
+
+static void
+cupsd_send_dbus(cupsd_eventmask_t event,/* I - Event to send */
+                cupsd_printer_t   *dest,/* I - Destination, if any */
+                cupsd_job_t       *job)	/* I - Job, if any */
+{
+  DBusError		error;		/* Error, if any */
+  DBusMessage		*message;	/* Message to send */
+  DBusMessageIter	iter;		/* Iterator for message data */
+  const char		*what;		/* What to send */
+  static DBusConnection	*con = NULL;	/* Connection to DBUS server */
+
+
+ /*
+  * Figure out what to send, if anything...
+  */
+
+  if (event & CUPSD_EVENT_PRINTER_ADDED)
+    what = "PrinterAdded";
+  else if (event & CUPSD_EVENT_PRINTER_DELETED)
+    what = "PrinterRemoved";
+  else if (event & CUPSD_EVENT_PRINTER_CHANGED)
+    what = "QueueChanged";
+  else if (event & CUPSD_EVENT_JOB_CREATED)
+    what = "JobQueuedLocal";
+  else if ((event & CUPSD_EVENT_JOB_STATE) && job &&
+           job->state->values[0].integer == IPP_JOB_PROCESSING)
+    what = "JobStartedLocal";
+  else
+    return;
+
+ /*
+  * Verify connection to DBUS server...
+  */
+
+  if (con && !dbus_connection_get_is_connected(con))
+  {
+    dbus_connection_unref(con);
+    con = NULL;
+  }
+
+  if (!con)
+  {
+    dbus_error_init(&error);
+
+    con = dbus_bus_get(getuid() ? DBUS_BUS_SESSION : DBUS_BUS_SYSTEM, &error);
+    if (!con)
+    {
+      dbus_error_free(&error);
+      return;
+    }
+  }
+
+ /*
+  * Create and send the new message...
+  */
+
+  message = dbus_message_new_signal("/com/redhat/PrinterSpooler",
+				    "com.redhat.PrinterSpooler", what);
+
+  dbus_message_iter_init_append(message, &iter);
+  if (dest)
+    dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &(dest->name));
+  if (job)
+  {
+    dbus_message_iter_append_basic(&iter, DBUS_TYPE_UINT32, &(job->id));
+    dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &(job->username));
+  }
+
+  dbus_connection_send(con, message, NULL);
+  dbus_connection_flush(con);
+  dbus_message_unref(message);
+}
+#endif /* HAVE_DBUS */
 
 
 /*
