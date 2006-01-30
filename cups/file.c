@@ -1421,7 +1421,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       }
 
       if (bytes < 10 || fp->buf[0] != 0x1f ||
-          (unsigned char)fp->buf[1] != 0x8b ||
+          (fp->buf[1] & 255) != 0x8b ||
           fp->buf[2] != 8 || (fp->buf[3] & 0xe0) != 0)
       {
        /*
