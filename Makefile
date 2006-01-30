@@ -109,6 +109,7 @@ install:	installhdrs
 			$(INSTALL_DATA) init/cups.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
 		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
 			$(INSTALL_DATA) init/cupsd-launchd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
+			$(INSTALL_DIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices; \
 			$(INSTALL_SCRIPT) init/cupsd-launchd.sh $(BUILDROOT)/System/Library/StartupItems/PrintingServices/PrintingServices; \
 			$(INSTALL_DATA) init/cups.plist $(BUILDROOT)/System/Library/StartupItems/PrintingServices/StartupParameters.plist; \
 			$(INSTALL_DIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices/Resources/English.lproj; \
