@@ -755,6 +755,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   const char	*dest;			/* Printer or class name */
   ipp_attribute_t *attr;		/* Printer attribute */
   int		modify;			/* Non-zero if we just modified */
+  int		need_restart_job;	/* Need to restart job? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_class(%p[%d], %s)", con,
@@ -885,6 +886,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   * Look for attributes and copy them over as needed...
   */
 
+  need_restart_job = 0;
+
   if ((attr = ippFindAttribute(con->request, "printer-location",
                                IPP_TAG_TEXT)) != NULL)
     cupsdSetString(&pclass->location, attr->values[0].string.text);
@@ -934,7 +937,10 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     if (attr->values[0].integer == IPP_PRINTER_STOPPED)
       cupsdStopPrinter(pclass, 0);
     else
+    {
       cupsdSetPrinterState(pclass, (ipp_pstate_t)(attr->values[0].integer), 0);
+      need_restart_job = 1;
+    }
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) != NULL)
@@ -1051,6 +1057,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     * Clear the printer array as needed...
     */
 
+    need_restart_job = 1;
+
     if (pclass->num_printers > 0)
     {
       free(pclass->printers);
@@ -1096,7 +1104,23 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
   cupsdSetPrinterAttrs(pclass);
   cupsdSaveAllClasses();
-  cupsdCheckJobs();
+
+  if (need_restart_job && pclass->job)
+  {
+    cupsd_job_t *job;
+
+   /*
+    * Stop the current job and then restart it below...
+    */
+
+    job = (cupsd_job_t *)pclass->job;
+
+    cupsdStopJob(job, 1);
+    job->state->values[0].integer = IPP_JOB_PENDING;
+  }
+
+  if (need_restart_job)
+    cupsdCheckJobs();
 
   cupsdWritePrintcap();
 
@@ -1445,6 +1469,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   char		srcfile[1024],		/* Source Script/PPD file */
 		dstfile[1024];		/* Destination Script/PPD file */
   int		modify;			/* Non-zero if we are modifying */
+  int		need_restart_job;	/* Need to restart job? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_printer(%p[%d], %s)", con,
@@ -1574,6 +1599,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Look for attributes and copy them over as needed...
   */
 
+  need_restart_job = 0;
+
   if ((attr = ippFindAttribute(con->request, "printer-location",
                                IPP_TAG_TEXT)) != NULL)
     cupsdSetString(&printer->location, attr->values[0].string.text);
@@ -1588,6 +1615,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
    /*
     * Do we have a valid device URI?
     */
+
+    need_restart_job = 1;
 
     httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, method,
                     sizeof(method), username, sizeof(username), host,
@@ -1648,6 +1677,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   {
     ipp_attribute_t	*supported;	/* port-monitor-supported attribute */
 
+
+    need_restart_job = 1;
 
     supported = ippFindAttribute(printer->attrs, "port-monitor-supported",
                                  IPP_TAG_KEYWORD);
@@ -1715,7 +1746,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     if (attr->values[0].integer == IPP_PRINTER_STOPPED)
       cupsdStopPrinter(printer, 0);
     else
+    {
+      need_restart_job = 1;
       cupsdSetPrinterState(printer, (ipp_pstate_t)(attr->values[0].integer), 0);
+    }
   }
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) != NULL)
@@ -1828,7 +1862,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   if (!printer->device_uri)
-    cupsdSetString(&printer->device_uri, "file:/dev/null");
+    cupsdSetString(&printer->device_uri, "file:///dev/null");
 
  /*
   * See if we have an interface script or PPD file attached to the request...
@@ -1836,6 +1870,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   if (con->filename)
   {
+    need_restart_job = 1;
+
     strlcpy(srcfile, con->filename, sizeof(srcfile));
 
     if ((fp = cupsFileOpen(srcfile, "rb")))
@@ -1924,6 +1960,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   else if ((attr = ippFindAttribute(con->request, "ppd-name",
                                     IPP_TAG_NAME)) != NULL)
   {
+    need_restart_job = 1;
+
     if (!strcmp(attr->values[0].string.text, "raw"))
     {
      /*
@@ -1966,20 +2004,13 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
-  * Make this printer the default if there is none...
-  */
-
-  if (!DefaultPrinter)
-    DefaultPrinter = printer;
-
- /*
   * Update the printer attributes and return...
   */
 
   cupsdSetPrinterAttrs(printer);
   cupsdSaveAllPrinters();
 
-  if (printer->job)
+  if (need_restart_job && printer->job)
   {
     cupsd_job_t *job;
 
@@ -1993,7 +2024,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     job->state->values[0].integer = IPP_JOB_PENDING;
   }
 
-  cupsdCheckJobs();
+  if (need_restart_job)
+    cupsdCheckJobs();
 
   cupsdWritePrintcap();
 
