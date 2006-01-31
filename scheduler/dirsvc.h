@@ -141,11 +141,6 @@ VAR time_t		BrowseSLPRefresh VALUE(0);
  */
 
 extern void	cupsdLoadRemoteCache(void);
-extern void	cupsdProcessBrowseData(const char *uri, cups_ptype_t type,
-		                       ipp_pstate_t state, const char *location,
-				       const char *info, const char *make_model,
-				       int num_attrs, cups_option_t *attrs);
-extern void	cupsdProcessImplicitClasses(void);
 extern void	cupsdSaveRemoteCache(void);
 extern void	cupsdSendBrowseDelete(cupsd_printer_t *p);
 extern void	cupsdSendBrowseList(void);

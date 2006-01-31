@@ -24,8 +24,6 @@
  * Contents:
  *
  *   cupsdLoadRemoteCache()        - Load the remote printer cache.
- *   cupsdProcessBrowseData()      - Process new browse data.
- *   cupsdProcessImplicitClasses() - Create/update implicit classes as needed.
  *   cupsdSaveRemoteCache()        - Save the remote printer cache.
  *   cupsdSendBrowseDelete()       - Send a "browse delete" message for a
  *                                   printer.
@@ -43,6 +41,9 @@
  *                                   protocol.
  *   cupsdUpdatePolling()          - Read status messages from the poll daemons.
  *   cupsdUpdateSLPBrowse()        - Get browsing information via SLP.
+ *   dequote()                     - Remote quotes from a string.
+ *   process_browse_data()         - Process new browse data.
+ *   process_implicit_classes()    - Create/update implicit classes as needed.
  *   slp_attr_callback()           - SLP attribute callback 
  *   slp_dereg_printer()           - SLPDereg() the specified printer
  *   slp_get_attr()                - Get an attribute from an SLP registration.
@@ -59,10 +60,22 @@
 
 
 /*
+ * Local functions...
+ */
+
+static char	*dequote(char *d, const char *s, int dlen);
+static void	process_browse_data(const char *uri, cups_ptype_t type,
+				    ipp_pstate_t state, const char *location,
+				    const char *info, const char *make_model,
+				    int num_attrs, cups_option_t *attrs);
+static void	process_implicit_classes(void);
+
+
+#ifdef HAVE_LIBSLP 
+/*
  * SLP definitions...
  */
 
-#ifdef HAVE_LIBSLP 
 /*
  * SLP service name for CUPS...
  */
@@ -419,644 +432,7 @@ cupsdLoadRemoteCache(void)
   * Do auto-classing if needed...
   */
 
-  cupsdProcessImplicitClasses();
-}
-
-
-/*
- * 'cupsdProcessBrowseData()' - Process new browse data.
- */
-
-void
-cupsdProcessBrowseData(
-    const char    *uri,			/* I - URI of printer/class */
-    cups_ptype_t  type,			/* I - Printer type */
-    ipp_pstate_t  state,		/* I - Printer state */
-    const char    *location,		/* I - Printer location */
-    const char    *info,		/* I - Printer information */
-    const char    *make_model,		/* I - Printer make and model */
-    int		  num_attrs,		/* I - Number of attributes */
-    cups_option_t *attrs)		/* I - Attributes */
-{
-  int		update;			/* Update printer attributes? */
-  char		finaluri[HTTP_MAX_URI],	/* Final URI for printer */
-		method[HTTP_MAX_URI],	/* Method portion of URI */
-		username[HTTP_MAX_URI],	/* Username portion of URI */
-		host[HTTP_MAX_URI],	/* Host portion of URI */
-		resource[HTTP_MAX_URI];	/* Resource portion of URI */
-  int		port;			/* Port portion of URI */
-  char		name[IPP_MAX_NAME],	/* Name of printer */
-		*hptr,			/* Pointer into hostname */
-		*sptr;			/* Pointer into ServerName */
-  char		local_make_model[IPP_MAX_NAME];
-					/* Local make and model */
-  cupsd_printer_t *p;			/* Printer information */
-  const char	*ipp_options;		/* ipp-options value */
-
-
- /*
-  * Pull the URI apart to see if this is a local or remote printer...
-  */
-
-  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), username,
-                  sizeof(username), host, sizeof(host), &port, resource,
-		  sizeof(resource));
-
- /*
-  * Determine if the URI contains any illegal characters in it...
-  */
-
-  if (strncmp(uri, "ipp://", 6) || !host[0] ||
-      (strncmp(resource, "/printers/", 10) &&
-       strncmp(resource, "/classes/", 9)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdProcessBrowseData: Bad printer URI in browse data: %s",
-                    uri);
-    return;
-  }
-
-  if (strchr(resource, '?') ||
-      (!strncmp(resource, "/printers/", 10) && strchr(resource + 10, '/')) ||
-      (!strncmp(resource, "/classes/", 9) && strchr(resource + 9, '/')))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdProcessBrowseData: Bad resource in browse data: %s",
-                    resource);
-    return;
-  }
-
- /*
-  * OK, this isn't a local printer; add any remote options...
-  */
-
-  ipp_options = cupsGetOption("ipp-options", num_attrs, attrs);
-
-  if (BrowseRemoteOptions)
-  {
-    if (BrowseRemoteOptions[0] == '?')
-    {
-     /*
-      * Override server-supplied options...
-      */
-
-      snprintf(finaluri, sizeof(finaluri), "%s%s", uri, BrowseRemoteOptions);
-    }
-    else if (ipp_options)
-    {
-     /*
-      * Combine the server and local options...
-      */
-
-      snprintf(finaluri, sizeof(finaluri), "%s?%s+%s", uri, ipp_options,
-               BrowseRemoteOptions);
-    }
-    else
-    {
-     /*
-      * Just use the local options...
-      */
-
-      snprintf(finaluri, sizeof(finaluri), "%s?%s", uri, BrowseRemoteOptions);
-    }
-
-    uri = finaluri;
-  }
-  else if (ipp_options)
-  {
-   /*
-    * Just use the server-supplied options...
-    */
-
-    snprintf(finaluri, sizeof(finaluri), "%s?%s", uri, ipp_options);
-    uri = finaluri;
-  }
-
- /*
-  * See if we already have it listed in the Printers list, and add it if not...
-  */
-
-  type   |= CUPS_PRINTER_REMOTE;
-  type   &= ~CUPS_PRINTER_IMPLICIT;
-  update = 0;
-  hptr   = strchr(host, '.');
-  sptr   = strchr(ServerName, '.');
-
-  if (sptr != NULL && hptr != NULL)
-  {
-   /*
-    * Strip the common domain name components...
-    */
-
-    while (hptr != NULL)
-    {
-      if (!strcasecmp(hptr, sptr))
-      {
-        *hptr = '\0';
-	break;
-      }
-      else
-        hptr = strchr(hptr + 1, '.');
-    }
-  }
-
-  if (type & CUPS_PRINTER_CLASS)
-  {
-   /*
-    * Remote destination is a class...
-    */
-
-    if (!strncmp(resource, "/classes/", 9))
-      snprintf(name, sizeof(name), "%s@%s", resource + 9, host);
-    else
-      return;
-
-    if ((p = cupsdFindClass(name)) == NULL && BrowseShortNames)
-    {
-      if ((p = cupsdFindClass(resource + 9)) != NULL)
-      {
-        if (p->hostname && strcasecmp(p->hostname, host))
-	{
-	 /*
-	  * Nope, this isn't the same host; if the hostname isn't the local host,
-	  * add it to the other class and then find a class using the full host
-	  * name...
-	  */
-
-	  if (p->type & CUPS_PRINTER_REMOTE)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_INFO,
-	                    "Renamed remote class \"%s\" to \"%s@%s\"...",
-	                    p->name, p->name, p->hostname);
-	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
-                	  "Class \'%s\' deleted by directory services.",
-			  p->name);
-
-            cupsArrayRemove(Printers, p);
-            cupsdSetStringf(&p->name, "%s@%s", p->name, p->hostname);
-	    cupsdSetPrinterAttrs(p);
-	    cupsArrayAdd(Printers, p);
-
-	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
-                	  "Class \'%s\' added by directory services.",
-			  p->name);
-	  }
-
-          p = NULL;
-	}
-	else if (!p->hostname)
-	{
-	 /*
-	  * Hostname not set, so this must be a cached remote printer
-	  * that was created for a pending print job...
-	  */
-
-          cupsdSetString(&p->hostname, host);
-	  cupsdSetString(&p->uri, uri);
-	  cupsdSetString(&p->device_uri, uri);
-          update = 1;
-        }
-      }
-      else
-      {
-       /*
-        * Use the short name for this shared class.
-	*/
-
-        strlcpy(name, resource + 9, sizeof(name));
-      }
-    }
-    else if (p && !p->hostname)
-    {
-     /*
-      * Hostname not set, so this must be a cached remote printer
-      * that was created for a pending print job...
-      */
-
-      cupsdSetString(&p->hostname, host);
-      cupsdSetString(&p->uri, uri);
-      cupsdSetString(&p->device_uri, uri);
-      update = 1;
-    }
-
-    if (!p)
-    {
-     /*
-      * Class doesn't exist; add it...
-      */
-
-      p = cupsdAddClass(name);
-
-      cupsdLogMessage(CUPSD_LOG_INFO, "Added remote class \"%s\"...", name);
-
-      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
-                    "Class \'%s\' added by directory services.", name);
-
-     /*
-      * Force the URI to point to the real server...
-      */
-
-      p->type      = type & ~CUPS_PRINTER_REJECTING;
-      p->accepting = 1;
-      cupsdSetString(&p->uri, uri);
-      cupsdSetString(&p->device_uri, uri);
-      cupsdSetString(&p->hostname, host);
-
-      update = 1;
-    }
-  }
-  else
-  {
-   /*
-    * Remote destination is a printer...
-    */
-
-    if (!strncmp(resource, "/printers/", 10))
-      snprintf(name, sizeof(name), "%s@%s", resource + 10, host);
-    else
-      return;
-
-    if ((p = cupsdFindPrinter(name)) == NULL && BrowseShortNames)
-    {
-      if ((p = cupsdFindPrinter(resource + 10)) != NULL)
-      {
-        if (p->hostname && strcasecmp(p->hostname, host))
-	{
-	 /*
-	  * Nope, this isn't the same host; if the hostname isn't the local host,
-	  * add it to the other printer and then find a printer using the full host
-	  * name...
-	  */
-
-	  if (p->type & CUPS_PRINTER_REMOTE)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_INFO,
-	                    "Renamed remote printer \"%s\" to \"%s@%s\"...",
-	                    p->name, p->name, p->hostname);
-	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
-                	  "Printer \'%s\' deleted by directory services.",
-			  p->name);
-
-	    cupsArrayRemove(Printers, p);
-	    cupsdSetStringf(&p->name, "%s@%s", p->name, p->hostname);
-	    cupsdSetPrinterAttrs(p);
-	    cupsArrayAdd(Printers, p);
-
-	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
-                	  "Printer \'%s\' added by directory services.",
-			  p->name);
-	  }
-
-          p = NULL;
-	}
-	else if (!p->hostname)
-	{
-	 /*
-	  * Hostname not set, so this must be a cached remote printer
-	  * that was created for a pending print job...
-	  */
-
-          cupsdSetString(&p->hostname, host);
-	  cupsdSetString(&p->uri, uri);
-	  cupsdSetString(&p->device_uri, uri);
-          update = 1;
-        }
-      }
-      else
-      {
-       /*
-        * Use the short name for this shared printer.
-	*/
-
-        strlcpy(name, resource + 10, sizeof(name));
-      }
-    }
-    else if (p && !p->hostname)
-    {
-     /*
-      * Hostname not set, so this must be a cached remote printer
-      * that was created for a pending print job...
-      */
-
-      cupsdSetString(&p->hostname, host);
-      cupsdSetString(&p->uri, uri);
-      cupsdSetString(&p->device_uri, uri);
-      update = 1;
-    }
-
-    if (!p)
-    {
-     /*
-      * Printer doesn't exist; add it...
-      */
-
-      p = cupsdAddPrinter(name);
-
-      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
-                    "Printer \'%s\' added by directory services.", name);
-
-      cupsdLogMessage(CUPSD_LOG_INFO, "Added remote printer \"%s\"...", name);
-
-     /*
-      * Force the URI to point to the real server...
-      */
-
-      p->type      = type & ~CUPS_PRINTER_REJECTING;
-      p->accepting = 1;
-      cupsdSetString(&p->hostname, host);
-      cupsdSetString(&p->uri, uri);
-      cupsdSetString(&p->device_uri, uri);
-
-      update = 1;
-    }
-  }
-
- /*
-  * Update the state...
-  */
-
-  p->state       = state;
-  p->browse_time = time(NULL);
-
-  if (type & CUPS_PRINTER_REJECTING)
-  {
-    type &= ~CUPS_PRINTER_REJECTING;
-
-    if (p->accepting)
-    {
-      update       = 1;
-      p->accepting = 0;
-    }
-  }
-  else if (!p->accepting)
-  {
-    update       = 1;
-    p->accepting = 1;
-  }
-
-  if (p->type != type)
-  {
-    p->type = type;
-    update  = 1;
-  }
-
-  if (location && (!p->location || strcmp(p->location, location)))
-  {
-    cupsdSetString(&p->location, location);
-    update = 1;
-  }
-
-  if (info && (!p->info || strcmp(p->info, info)))
-  {
-    cupsdSetString(&p->info, info);
-    update = 1;
-  }
-
-  if (!make_model || !make_model[0])
-  {
-    if (type & CUPS_PRINTER_CLASS)
-      snprintf(local_make_model, sizeof(local_make_model),
-               "Remote Class on %s", host);
-    else
-      snprintf(local_make_model, sizeof(local_make_model),
-               "Remote Printer on %s", host);
-  }
-  else
-    snprintf(local_make_model, sizeof(local_make_model),
-             "%s on %s", make_model, host);
-
-  if (!p->make_model || strcmp(p->make_model, local_make_model))
-  {
-    cupsdSetString(&p->make_model, local_make_model);
-    update = 1;
-  }
-
-  if (type & CUPS_PRINTER_DELETE)
-  {
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
-                  "%s \'%s\' deleted by directory services.",
-		  (type & CUPS_PRINTER_CLASS) ? "Class" : "Printer", p->name);
-
-    cupsdExpireSubscriptions(p, NULL);
- 
-    cupsdDeletePrinter(p, 1);
-    cupsdUpdateImplicitClasses();
-  }
-  else if (update)
-  {
-    cupsdSetPrinterAttrs(p);
-    cupsdUpdateImplicitClasses();
-  }
-
- /*
-  * See if we have a default printer...  If not, make the first printer the
-  * default.
-  */
-
-  if (DefaultPrinter == NULL && Printers != NULL && UseNetworkDefault)
-  {
-   /*
-    * Find the first network default printer and use it...
-    */
-
-    for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-         p;
-	 p = (cupsd_printer_t *)cupsArrayNext(Printers))
-      if (p->type & CUPS_PRINTER_DEFAULT)
-      {
-        DefaultPrinter = p;
-	break;
-      }
-  }
-
- /*
-  * Do auto-classing if needed...
-  */
-
-  cupsdProcessImplicitClasses();
-
- /*
-  * Update the printcap file...
-  */
-
-  cupsdWritePrintcap();
-}
-
-
-/*
- * 'cupsdProcessImplicitClasses()' - Create/update implicit classes as needed.
- */
-
-void
-cupsdProcessImplicitClasses(void)
-{
-  int		i;			/* Looping var */
-  int		update;			/* Update printer attributes? */
-  char		name[IPP_MAX_NAME],	/* Name of printer */
-		*hptr;			/* Pointer into hostname */
-  cupsd_printer_t *p,			/* Printer information */
-		*pclass,		/* Printer class */
-		*first;			/* First printer in class */
-  int		offset,			/* Offset of name */
-		len;			/* Length of name */
-
-
-  if (!ImplicitClasses || !Printers)
-    return;
-
- /*
-  * Loop through all available printers and create classes as needed...
-  */
-
-  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers), len = 0, offset = 0,
-           update = 0, pclass = NULL, first = NULL;
-       p != NULL;
-       p = (cupsd_printer_t *)cupsArrayNext(Printers))
-  {
-   /*
-    * Skip implicit classes...
-    */
-
-    if (p->type & CUPS_PRINTER_IMPLICIT)
-    {
-      len = 0;
-      continue;
-    }
-
-   /*
-    * If len == 0, get the length of this printer name up to the "@"
-    * sign (if any).
-    */
-
-    cupsArraySave(Printers);
-
-    if (len > 0 &&
-	!strncasecmp(p->name, name + offset, len) &&
-	(p->name[len] == '\0' || p->name[len] == '@'))
-    {
-     /*
-      * We have more than one printer with the same name; see if
-      * we have a class, and if this printer is a member...
-      */
-
-      if (pclass && strcasecmp(pclass->name, name))
-      {
-	if (update)
-	  cupsdSetPrinterAttrs(pclass);
-
-	update = 0;
-	pclass = NULL;
-      }
-
-      if (!pclass && (pclass = cupsdFindDest(name)) == NULL)
-      {
-       /*
-	* Need to add the class...
-	*/
-
-	pclass = cupsdAddPrinter(name);
-	cupsArrayAdd(ImplicitPrinters, pclass);
-
-	pclass->type      |= CUPS_PRINTER_IMPLICIT;
-	pclass->accepting = 1;
-	pclass->state     = IPP_PRINTER_IDLE;
-
-        cupsdSetString(&pclass->location, p->location);
-        cupsdSetString(&pclass->info, p->info);
-
-        update = 1;
-
-        cupsdLogMessage(CUPSD_LOG_INFO, "Added implicit class \"%s\"...",
-	                name);
-      }
-
-      if (first != NULL)
-      {
-        for (i = 0; i < pclass->num_printers; i ++)
-	  if (pclass->printers[i] == first)
-	    break;
-
-        if (i >= pclass->num_printers)
-	{
-	  first->in_implicit_class = 1;
-	  cupsdAddPrinterToClass(pclass, first);
-        }
-
-	first = NULL;
-      }
-
-      for (i = 0; i < pclass->num_printers; i ++)
-	if (pclass->printers[i] == p)
-	  break;
-
-      if (i >= pclass->num_printers)
-      {
-	p->in_implicit_class = 1;
-	cupsdAddPrinterToClass(pclass, p);
-	update = 1;
-      }
-    }
-    else
-    {
-     /*
-      * First time around; just get name length and mark it as first
-      * in the list...
-      */
-
-      if ((hptr = strchr(p->name, '@')) != NULL)
-	len = hptr - p->name;
-      else
-	len = strlen(p->name);
-
-      strncpy(name, p->name, len);
-      name[len] = '\0';
-      offset    = 0;
-
-      if ((first = (hptr ? cupsdFindDest(name) : p)) != NULL &&
-	  !(first->type & CUPS_PRINTER_IMPLICIT))
-      {
-       /*
-	* Can't use same name as a local printer; add "Any" to the
-	* front of the name, unless we have explicitly disabled
-	* the "ImplicitAnyClasses"...
-	*/
-
-        if (ImplicitAnyClasses && len < (sizeof(name) - 4))
-	{
-	 /*
-	  * Add "Any" to the class name...
-	  */
-
-          strcpy(name, "Any");
-          strncpy(name + 3, p->name, len);
-	  name[len + 3] = '\0';
-	  offset        = 3;
-	}
-	else
-	{
-	 /*
-	  * Don't create an implicit class if we have a local printer
-	  * with the same name...
-	  */
-
-	  len = 0;
-          cupsArrayRestore(Printers);
-	  continue;
-	}
-      }
-
-      first = p;
-    }
-
-    cupsArrayRestore(Printers);
-  }
-
- /*
-  * Update the last printer class as needed...
-  */
-
-  if (pclass && update)
-    cupsdSetPrinterAttrs(pclass);
+  process_implicit_classes();
 }
 
 
@@ -1361,9 +737,13 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
   cups_ptype_t		type;		/* Printer type */
   cupsd_dirsvc_addr_t	*b;		/* Browse address */
   int			bytes;		/* Length of packet */
-  char			packet[1453];	/* Browse data packet */
-  char			uri[1024];	/* Printer URI */
-  char			options[1024];	/* Browse local options */
+  char			packet[1453],	/* Browse data packet */
+			uri[1024],	/* Printer URI */
+			options[1024],	/* Browse local options */
+			location[1024],	/* printer-location */
+			info[1024],	/* printer-info */
+			make_model[1024];
+					/* printer-make-and-model */
   cupsd_netif_t		*iface;		/* Network interface */
 
 
@@ -1387,6 +767,16 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
     snprintf(options, sizeof(options), " ipp-options=%s", BrowseLocalOptions);
   else
     options[0] = '\0';
+
+ /*
+  * Remove quotes from printer-info, printer-location, and
+  * printer-make-and-model attributes...
+  */
+
+  dequote(location, p->location, sizeof(p->location));
+  dequote(info, p->info, sizeof(p->info));
+  dequote(make_model, p->make_model ? p->make_model : "Unknown",
+          sizeof(make_model));
 
  /*
   * Send a packet to each browse address...
@@ -1423,9 +813,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 			                                    "/printers/%s",
 			   p->name);
 	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
-        	   type, p->state, uri, p->location ? p->location : "",
-		   p->info ? p->info : "",
-		   p->make_model ? p->make_model : "Unknown", options);
+        	   type, p->state, uri, location, info, make_model, options);
 
 	  bytes = strlen(packet);
 
@@ -1465,9 +853,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 			                                    "/printers/%s",
 			   p->name);
 	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
-        	   type, p->state, uri, p->location ? p->location : "",
-		   p->info ? p->info : "",
-		   p->make_model ? p->make_model : "Unknown", options);
+        	   type, p->state, uri, location, info, make_model, options);
 
 	  bytes = strlen(packet);
 
@@ -1491,10 +877,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
       */
 
       snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
-       	       type, p->state, p->uri,
-	       p->location ? p->location : "",
-	       p->info ? p->info : "",
-	       p->make_model ? p->make_model : "Unknown", options);
+       	       type, p->state, p->uri, location, info, make_model, options);
 
       bytes = strlen(packet);
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -2298,7 +1681,7 @@ cupsdUpdateCUPSBrowse(void)
   * Process the browse data...
   */
 
-  cupsdProcessBrowseData(uri, (cups_ptype_t)type, (ipp_pstate_t)state, location,
+  process_browse_data(uri, (cups_ptype_t)type, (ipp_pstate_t)state, location,
                          info, make_model, num_attrs, attrs);
   cupsFreeOptions(num_attrs, attrs);
 }
@@ -2417,10 +1800,10 @@ cupsdUpdateSLPBrowse(void)
       */
 
       if (strstr(uri, "/printers/") != NULL)
-        cupsdProcessBrowseData(uri, p.type, IPP_PRINTER_IDLE, p.location,
+        process_browse_data(uri, p.type, IPP_PRINTER_IDLE, p.location,
 	                  p.info, p.make_model, 0, NULL);
       else if (strstr(uri, "/classes/") != NULL)
-        cupsdProcessBrowseData(uri, p.type | CUPS_PRINTER_CLASS, IPP_PRINTER_IDLE,
+        process_browse_data(uri, p.type | CUPS_PRINTER_CLASS, IPP_PRINTER_IDLE,
 	                  p.location, p.info, p.make_model, 0, NULL);
     }
 
@@ -2433,8 +1816,677 @@ cupsdUpdateSLPBrowse(void)
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdUpdateSLPBrowse() End...");
 }
+#endif /* HAVE_LIBSLP */
 
 
+/*
+ * 'dequote()' - Remote quotes from a string.
+ */
+
+static char *				/* O - Dequoted string */
+dequote(char       *d,			/* I - Destination string */
+        const char *s,			/* I - Source string */
+	int        dlen)		/* I - Destination length */
+{
+  char	*dptr;				/* Pointer into destination */
+
+
+  if (s)
+  {
+    for (dptr = d, dlen --; *s && dlen > 0; s ++)
+      if (*s != '\"')
+      {
+	*dptr++ = *s;
+	dlen --;
+      }
+
+    *dptr = '\0';
+  }
+  else
+    *d = '\0';
+
+  return (d);
+}
+
+
+/*
+ * 'process_browse_data()' - Process new browse data.
+ */
+
+static void
+process_browse_data(
+    const char    *uri,			/* I - URI of printer/class */
+    cups_ptype_t  type,			/* I - Printer type */
+    ipp_pstate_t  state,		/* I - Printer state */
+    const char    *location,		/* I - Printer location */
+    const char    *info,		/* I - Printer information */
+    const char    *make_model,		/* I - Printer make and model */
+    int		  num_attrs,		/* I - Number of attributes */
+    cups_option_t *attrs)		/* I - Attributes */
+{
+  int		update;			/* Update printer attributes? */
+  char		finaluri[HTTP_MAX_URI],	/* Final URI for printer */
+		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  char		name[IPP_MAX_NAME],	/* Name of printer */
+		*hptr,			/* Pointer into hostname */
+		*sptr;			/* Pointer into ServerName */
+  char		local_make_model[IPP_MAX_NAME];
+					/* Local make and model */
+  cupsd_printer_t *p;			/* Printer information */
+  const char	*ipp_options;		/* ipp-options value */
+
+
+ /*
+  * Pull the URI apart to see if this is a local or remote printer...
+  */
+
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), username,
+                  sizeof(username), host, sizeof(host), &port, resource,
+		  sizeof(resource));
+
+ /*
+  * Determine if the URI contains any illegal characters in it...
+  */
+
+  if (strncmp(uri, "ipp://", 6) || !host[0] ||
+      (strncmp(resource, "/printers/", 10) &&
+       strncmp(resource, "/classes/", 9)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "process_browse_data: Bad printer URI in browse data: %s",
+                    uri);
+    return;
+  }
+
+  if (strchr(resource, '?') ||
+      (!strncmp(resource, "/printers/", 10) && strchr(resource + 10, '/')) ||
+      (!strncmp(resource, "/classes/", 9) && strchr(resource + 9, '/')))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "process_browse_data: Bad resource in browse data: %s",
+                    resource);
+    return;
+  }
+
+ /*
+  * OK, this isn't a local printer; add any remote options...
+  */
+
+  ipp_options = cupsGetOption("ipp-options", num_attrs, attrs);
+
+  if (BrowseRemoteOptions)
+  {
+    if (BrowseRemoteOptions[0] == '?')
+    {
+     /*
+      * Override server-supplied options...
+      */
+
+      snprintf(finaluri, sizeof(finaluri), "%s%s", uri, BrowseRemoteOptions);
+    }
+    else if (ipp_options)
+    {
+     /*
+      * Combine the server and local options...
+      */
+
+      snprintf(finaluri, sizeof(finaluri), "%s?%s+%s", uri, ipp_options,
+               BrowseRemoteOptions);
+    }
+    else
+    {
+     /*
+      * Just use the local options...
+      */
+
+      snprintf(finaluri, sizeof(finaluri), "%s?%s", uri, BrowseRemoteOptions);
+    }
+
+    uri = finaluri;
+  }
+  else if (ipp_options)
+  {
+   /*
+    * Just use the server-supplied options...
+    */
+
+    snprintf(finaluri, sizeof(finaluri), "%s?%s", uri, ipp_options);
+    uri = finaluri;
+  }
+
+ /*
+  * See if we already have it listed in the Printers list, and add it if not...
+  */
+
+  type   |= CUPS_PRINTER_REMOTE;
+  type   &= ~CUPS_PRINTER_IMPLICIT;
+  update = 0;
+  hptr   = strchr(host, '.');
+  sptr   = strchr(ServerName, '.');
+
+  if (sptr != NULL && hptr != NULL)
+  {
+   /*
+    * Strip the common domain name components...
+    */
+
+    while (hptr != NULL)
+    {
+      if (!strcasecmp(hptr, sptr))
+      {
+        *hptr = '\0';
+	break;
+      }
+      else
+        hptr = strchr(hptr + 1, '.');
+    }
+  }
+
+  if (type & CUPS_PRINTER_CLASS)
+  {
+   /*
+    * Remote destination is a class...
+    */
+
+    if (!strncmp(resource, "/classes/", 9))
+      snprintf(name, sizeof(name), "%s@%s", resource + 9, host);
+    else
+      return;
+
+    if ((p = cupsdFindClass(name)) == NULL && BrowseShortNames)
+    {
+      if ((p = cupsdFindClass(resource + 9)) != NULL)
+      {
+        if (p->hostname && strcasecmp(p->hostname, host))
+	{
+	 /*
+	  * Nope, this isn't the same host; if the hostname isn't the local host,
+	  * add it to the other class and then find a class using the full host
+	  * name...
+	  */
+
+	  if (p->type & CUPS_PRINTER_REMOTE)
+	  {
+	    cupsdLogMessage(CUPSD_LOG_INFO,
+	                    "Renamed remote class \"%s\" to \"%s@%s\"...",
+	                    p->name, p->name, p->hostname);
+	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
+                	  "Class \'%s\' deleted by directory services.",
+			  p->name);
+
+            cupsArrayRemove(Printers, p);
+            cupsdSetStringf(&p->name, "%s@%s", p->name, p->hostname);
+	    cupsdSetPrinterAttrs(p);
+	    cupsArrayAdd(Printers, p);
+
+	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
+                	  "Class \'%s\' added by directory services.",
+			  p->name);
+	  }
+
+          p = NULL;
+	}
+	else if (!p->hostname)
+	{
+	 /*
+	  * Hostname not set, so this must be a cached remote printer
+	  * that was created for a pending print job...
+	  */
+
+          cupsdSetString(&p->hostname, host);
+	  cupsdSetString(&p->uri, uri);
+	  cupsdSetString(&p->device_uri, uri);
+          update = 1;
+        }
+      }
+      else
+      {
+       /*
+        * Use the short name for this shared class.
+	*/
+
+        strlcpy(name, resource + 9, sizeof(name));
+      }
+    }
+    else if (p && !p->hostname)
+    {
+     /*
+      * Hostname not set, so this must be a cached remote printer
+      * that was created for a pending print job...
+      */
+
+      cupsdSetString(&p->hostname, host);
+      cupsdSetString(&p->uri, uri);
+      cupsdSetString(&p->device_uri, uri);
+      update = 1;
+    }
+
+    if (!p)
+    {
+     /*
+      * Class doesn't exist; add it...
+      */
+
+      p = cupsdAddClass(name);
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "Added remote class \"%s\"...", name);
+
+      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
+                    "Class \'%s\' added by directory services.", name);
+
+     /*
+      * Force the URI to point to the real server...
+      */
+
+      p->type      = type & ~CUPS_PRINTER_REJECTING;
+      p->accepting = 1;
+      cupsdSetString(&p->uri, uri);
+      cupsdSetString(&p->device_uri, uri);
+      cupsdSetString(&p->hostname, host);
+
+      update = 1;
+    }
+  }
+  else
+  {
+   /*
+    * Remote destination is a printer...
+    */
+
+    if (!strncmp(resource, "/printers/", 10))
+      snprintf(name, sizeof(name), "%s@%s", resource + 10, host);
+    else
+      return;
+
+    if ((p = cupsdFindPrinter(name)) == NULL && BrowseShortNames)
+    {
+      if ((p = cupsdFindPrinter(resource + 10)) != NULL)
+      {
+        if (p->hostname && strcasecmp(p->hostname, host))
+	{
+	 /*
+	  * Nope, this isn't the same host; if the hostname isn't the local host,
+	  * add it to the other printer and then find a printer using the full host
+	  * name...
+	  */
+
+	  if (p->type & CUPS_PRINTER_REMOTE)
+	  {
+	    cupsdLogMessage(CUPSD_LOG_INFO,
+	                    "Renamed remote printer \"%s\" to \"%s@%s\"...",
+	                    p->name, p->name, p->hostname);
+	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
+                	  "Printer \'%s\' deleted by directory services.",
+			  p->name);
+
+	    cupsArrayRemove(Printers, p);
+	    cupsdSetStringf(&p->name, "%s@%s", p->name, p->hostname);
+	    cupsdSetPrinterAttrs(p);
+	    cupsArrayAdd(Printers, p);
+
+	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
+                	  "Printer \'%s\' added by directory services.",
+			  p->name);
+	  }
+
+          p = NULL;
+	}
+	else if (!p->hostname)
+	{
+	 /*
+	  * Hostname not set, so this must be a cached remote printer
+	  * that was created for a pending print job...
+	  */
+
+          cupsdSetString(&p->hostname, host);
+	  cupsdSetString(&p->uri, uri);
+	  cupsdSetString(&p->device_uri, uri);
+          update = 1;
+        }
+      }
+      else
+      {
+       /*
+        * Use the short name for this shared printer.
+	*/
+
+        strlcpy(name, resource + 10, sizeof(name));
+      }
+    }
+    else if (p && !p->hostname)
+    {
+     /*
+      * Hostname not set, so this must be a cached remote printer
+      * that was created for a pending print job...
+      */
+
+      cupsdSetString(&p->hostname, host);
+      cupsdSetString(&p->uri, uri);
+      cupsdSetString(&p->device_uri, uri);
+      update = 1;
+    }
+
+    if (!p)
+    {
+     /*
+      * Printer doesn't exist; add it...
+      */
+
+      p = cupsdAddPrinter(name);
+
+      cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
+                    "Printer \'%s\' added by directory services.", name);
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "Added remote printer \"%s\"...", name);
+
+     /*
+      * Force the URI to point to the real server...
+      */
+
+      p->type      = type & ~CUPS_PRINTER_REJECTING;
+      p->accepting = 1;
+      cupsdSetString(&p->hostname, host);
+      cupsdSetString(&p->uri, uri);
+      cupsdSetString(&p->device_uri, uri);
+
+      update = 1;
+    }
+  }
+
+ /*
+  * Update the state...
+  */
+
+  p->state       = state;
+  p->browse_time = time(NULL);
+
+  if (type & CUPS_PRINTER_REJECTING)
+  {
+    type &= ~CUPS_PRINTER_REJECTING;
+
+    if (p->accepting)
+    {
+      update       = 1;
+      p->accepting = 0;
+    }
+  }
+  else if (!p->accepting)
+  {
+    update       = 1;
+    p->accepting = 1;
+  }
+
+  if (p->type != type)
+  {
+    p->type = type;
+    update  = 1;
+  }
+
+  if (location && (!p->location || strcmp(p->location, location)))
+  {
+    cupsdSetString(&p->location, location);
+    update = 1;
+  }
+
+  if (info && (!p->info || strcmp(p->info, info)))
+  {
+    cupsdSetString(&p->info, info);
+    update = 1;
+  }
+
+  if (!make_model || !make_model[0])
+  {
+    if (type & CUPS_PRINTER_CLASS)
+      snprintf(local_make_model, sizeof(local_make_model),
+               "Remote Class on %s", host);
+    else
+      snprintf(local_make_model, sizeof(local_make_model),
+               "Remote Printer on %s", host);
+  }
+  else
+    snprintf(local_make_model, sizeof(local_make_model),
+             "%s on %s", make_model, host);
+
+  if (!p->make_model || strcmp(p->make_model, local_make_model))
+  {
+    cupsdSetString(&p->make_model, local_make_model);
+    update = 1;
+  }
+
+  if (type & CUPS_PRINTER_DELETE)
+  {
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
+                  "%s \'%s\' deleted by directory services.",
+		  (type & CUPS_PRINTER_CLASS) ? "Class" : "Printer", p->name);
+
+    cupsdExpireSubscriptions(p, NULL);
+ 
+    cupsdDeletePrinter(p, 1);
+    cupsdUpdateImplicitClasses();
+  }
+  else if (update)
+  {
+    cupsdSetPrinterAttrs(p);
+    cupsdUpdateImplicitClasses();
+  }
+
+ /*
+  * See if we have a default printer...  If not, make the first printer the
+  * default.
+  */
+
+  if (DefaultPrinter == NULL && Printers != NULL && UseNetworkDefault)
+  {
+   /*
+    * Find the first network default printer and use it...
+    */
+
+    for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+         p;
+	 p = (cupsd_printer_t *)cupsArrayNext(Printers))
+      if (p->type & CUPS_PRINTER_DEFAULT)
+      {
+        DefaultPrinter = p;
+	break;
+      }
+  }
+
+ /*
+  * Do auto-classing if needed...
+  */
+
+  process_implicit_classes();
+
+ /*
+  * Update the printcap file...
+  */
+
+  cupsdWritePrintcap();
+}
+
+
+/*
+ * 'process_implicit_classes()' - Create/update implicit classes as needed.
+ */
+
+static void
+process_implicit_classes(void)
+{
+  int		i;			/* Looping var */
+  int		update;			/* Update printer attributes? */
+  char		name[IPP_MAX_NAME],	/* Name of printer */
+		*hptr;			/* Pointer into hostname */
+  cupsd_printer_t *p,			/* Printer information */
+		*pclass,		/* Printer class */
+		*first;			/* First printer in class */
+  int		offset,			/* Offset of name */
+		len;			/* Length of name */
+
+
+  if (!ImplicitClasses || !Printers)
+    return;
+
+ /*
+  * Loop through all available printers and create classes as needed...
+  */
+
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers), len = 0, offset = 0,
+           update = 0, pclass = NULL, first = NULL;
+       p != NULL;
+       p = (cupsd_printer_t *)cupsArrayNext(Printers))
+  {
+   /*
+    * Skip implicit classes...
+    */
+
+    if (p->type & CUPS_PRINTER_IMPLICIT)
+    {
+      len = 0;
+      continue;
+    }
+
+   /*
+    * If len == 0, get the length of this printer name up to the "@"
+    * sign (if any).
+    */
+
+    cupsArraySave(Printers);
+
+    if (len > 0 &&
+	!strncasecmp(p->name, name + offset, len) &&
+	(p->name[len] == '\0' || p->name[len] == '@'))
+    {
+     /*
+      * We have more than one printer with the same name; see if
+      * we have a class, and if this printer is a member...
+      */
+
+      if (pclass && strcasecmp(pclass->name, name))
+      {
+	if (update)
+	  cupsdSetPrinterAttrs(pclass);
+
+	update = 0;
+	pclass = NULL;
+      }
+
+      if (!pclass && (pclass = cupsdFindDest(name)) == NULL)
+      {
+       /*
+	* Need to add the class...
+	*/
+
+	pclass = cupsdAddPrinter(name);
+	cupsArrayAdd(ImplicitPrinters, pclass);
+
+	pclass->type      |= CUPS_PRINTER_IMPLICIT;
+	pclass->accepting = 1;
+	pclass->state     = IPP_PRINTER_IDLE;
+
+        cupsdSetString(&pclass->location, p->location);
+        cupsdSetString(&pclass->info, p->info);
+
+        update = 1;
+
+        cupsdLogMessage(CUPSD_LOG_INFO, "Added implicit class \"%s\"...",
+	                name);
+      }
+
+      if (first != NULL)
+      {
+        for (i = 0; i < pclass->num_printers; i ++)
+	  if (pclass->printers[i] == first)
+	    break;
+
+        if (i >= pclass->num_printers)
+	{
+	  first->in_implicit_class = 1;
+	  cupsdAddPrinterToClass(pclass, first);
+        }
+
+	first = NULL;
+      }
+
+      for (i = 0; i < pclass->num_printers; i ++)
+	if (pclass->printers[i] == p)
+	  break;
+
+      if (i >= pclass->num_printers)
+      {
+	p->in_implicit_class = 1;
+	cupsdAddPrinterToClass(pclass, p);
+	update = 1;
+      }
+    }
+    else
+    {
+     /*
+      * First time around; just get name length and mark it as first
+      * in the list...
+      */
+
+      if ((hptr = strchr(p->name, '@')) != NULL)
+	len = hptr - p->name;
+      else
+	len = strlen(p->name);
+
+      strncpy(name, p->name, len);
+      name[len] = '\0';
+      offset    = 0;
+
+      if ((first = (hptr ? cupsdFindDest(name) : p)) != NULL &&
+	  !(first->type & CUPS_PRINTER_IMPLICIT))
+      {
+       /*
+	* Can't use same name as a local printer; add "Any" to the
+	* front of the name, unless we have explicitly disabled
+	* the "ImplicitAnyClasses"...
+	*/
+
+        if (ImplicitAnyClasses && len < (sizeof(name) - 4))
+	{
+	 /*
+	  * Add "Any" to the class name...
+	  */
+
+          strcpy(name, "Any");
+          strncpy(name + 3, p->name, len);
+	  name[len + 3] = '\0';
+	  offset        = 3;
+	}
+	else
+	{
+	 /*
+	  * Don't create an implicit class if we have a local printer
+	  * with the same name...
+	  */
+
+	  len = 0;
+          cupsArrayRestore(Printers);
+	  continue;
+	}
+      }
+
+      first = p;
+    }
+
+    cupsArrayRestore(Printers);
+  }
+
+ /*
+  * Update the last printer class as needed...
+  */
+
+  if (pclass && update)
+    cupsdSetPrinterAttrs(pclass);
+}
+
+
+#ifdef HAVE_LIBSLP
 /*
  * 'slp_attr_callback()' - SLP attribute callback 
  */
