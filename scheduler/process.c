@@ -3,7 +3,7 @@
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -23,8 +23,10 @@
  *
  * Contents:
  *
- *   cupsdEndProcess()   - End a process.
- *   cupsdStartProcess() - Start a process.
+ *   cupsdEndProcess()    - End a process.
+ *   cupsdFinishProcess() - Finish a process and get its name.
+ *   cupsdStartProcess()  - Start a process.
+ *   compare_procs()      - Compare two processes.
  */
 
 /*
@@ -33,6 +35,31 @@
 
 #include "cupsd.h"
 #include <grp.h>
+
+
+/*
+ * Process structure...
+ */
+
+typedef struct
+{
+  int	pid;				/* Process ID */
+  char	name[1];			/* Name of process */
+} cupsd_proc_t;
+
+
+/*
+ * Local globals...
+ */
+
+static cups_array_t	*process_array = NULL;
+
+
+/*
+ * Local functions...
+ */
+
+static int	compare_procs(cupsd_proc_t *a, cupsd_proc_t *b);
 
 
 /*
@@ -47,6 +74,34 @@ cupsdEndProcess(int pid,		/* I - Process ID */
     return (kill(pid, SIGKILL));
   else
     return (kill(pid, SIGTERM));
+}
+
+
+/*
+ * 'cupsdFinishProcess()' - Finish a process and get its name.
+ */
+
+const char *				/* O - Process name */
+cupsdFinishProcess(int  pid,		/* I - Process ID */
+                   char *name,		/* I - Name buffer */
+		   int  namelen)	/* I - Size of name buffer */
+{
+  cupsd_proc_t	key,			/* Search key */
+		*proc;			/* Matching process */
+
+
+  key.pid = pid;
+
+  if ((proc = (cupsd_proc_t *)cupsArrayFind(process_array, &key)) != NULL)
+  {
+    strlcpy(name, proc->name, namelen);
+    cupsArrayRemove(process_array, proc);
+    free(proc);
+
+    return (name);
+  }
+  else
+    return ("unknown");
 }
 
 
@@ -66,6 +121,7 @@ cupsdStartProcess(
     int        root,			/* I - Run as root? */
     int        *pid)			/* O - Process ID */
 {
+  cupsd_proc_t		*proc;		/* New process record */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -212,10 +268,38 @@ cupsdStartProcess(
 
     *pid = 0;
   }
+  else
+  {
+    if (!process_array)
+      process_array = cupsArrayNew((cups_array_func_t)compare_procs, NULL);
+ 
+    if (process_array)
+    {
+      if ((proc = calloc(1, sizeof(cupsd_proc_t) + strlen(command))) != NULL)
+      {
+        proc->pid = *pid;
+	strcpy(proc->name, command);
+
+	cupsArrayAdd(process_array, proc);
+      }
+    }
+  }
 
   cupsdReleaseSignals();
 
   return (*pid);
+}
+
+
+/*
+ * 'compare_procs()' - Compare two processes.
+ */
+
+static int				/* O - Result of comparison */
+compare_procs(cupsd_proc_t *a,		/* I - First process */
+              cupsd_proc_t *b)		/* I - Second process */
+{
+  return (a->pid - b->pid);
 }
 
 

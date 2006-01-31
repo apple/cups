@@ -1021,14 +1021,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 #ifdef HAVE_NOTIFY_POST
       if (LastEvent & CUPSD_EVENT_PRINTER_CHANGED)
       {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                "notify_post(\"com.apple.printerListChange\")");
 	notify_post("com.apple.printerListChange");
       }
 
       if (LastEvent & CUPSD_EVENT_PRINTER_STATE_CHANGED)
       {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                "notify_post(\"com.apple.printerHistoryChange\")");
 	notify_post("com.apple.printerHistoryChange");
       }
@@ -1037,7 +1037,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                        CUPSD_EVENT_JOB_CONFIG_CHANGED |
                        CUPSD_EVENT_JOB_PROGRESS))
       {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                "notify_post(\"com.apple.jobChange\")");
 	notify_post("com.apple.jobChange");
       }
@@ -1920,6 +1920,7 @@ process_children(void)
   int		pid;			/* Process ID of child */
   cupsd_job_t	*job;			/* Current job */
   int		i;			/* Looping var */
+  char		name[1024];		/* Process name */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "process_children()");
@@ -1942,12 +1943,11 @@ process_children(void)
   if ((pid = wait(&status)) > 0)
 #endif /* HAVE_WAITPID */
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "process_children: pid = %d, status = %d\n", pid, status);
-
    /*
     * Ignore SIGTERM errors - that comes when a job is cancelled...
     */
+
+    cupsdFinishProcess(pid, name, sizeof(name));
 
     if (status == SIGTERM)
       status = 0;
@@ -1955,18 +1955,19 @@ process_children(void)
     if (status)
     {
       if (WIFEXITED(status))
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d stopped with status %d!", pid,
-	                WEXITSTATUS(status));
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) stopped with status %d!",
+	                pid, name, WEXITSTATUS(status));
       else
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d crashed on signal %d!", pid,
-	                WTERMSIG(status));
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d!",
+	                pid, name, WTERMSIG(status));
 
       if (LogLevel < CUPSD_LOG_DEBUG)
         cupsdLogMessage(CUPSD_LOG_INFO,
 	                "Hint: Try setting the LogLevel to \"debug\" to find out more.");
     }
     else
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "PID %d exited with no errors.", pid);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
+                      pid, name);
 
    /*
     * Delete certificates for CGI processes...
@@ -2014,6 +2015,13 @@ process_children(void)
  	      job->status = status;	/* Filter failed */
 	    else
  	      job->status = -status;	/* Backend failed */
+
+            if (job->printer && !(job->printer->type & CUPS_PRINTER_FAX))
+	    {
+              snprintf(job->printer->state_message,
+	               sizeof(job->printer->state_message), "%s failed", name);
+              cupsdAddPrinterHistory(job->printer);
+	    }
 	  }
 
 	 /*

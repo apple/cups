@@ -192,6 +192,7 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 ;
 
 extern int	cupsdEndProcess(int pid, int force);
+extern const char *cupsdFinishProcess(int pid, char *name, int namelen);
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
 				  int errfd, int backfd, int root, int *pid);
