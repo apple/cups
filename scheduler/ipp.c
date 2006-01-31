@@ -65,6 +65,7 @@
  *   get_printers()              - Get a list of printers.
  *   get_subscription_attrs()    - Get subscription attributes.
  *   get_subscriptions()         - Get subscriptions.
+ *   get_username()              - Get the username associated with a request.
  *   hold_job()                  - Hold a print job.
  *   move_job()                  - Move a job to a new destination.
  *   ppd_add_default()           - Add a PPD default choice.
@@ -160,6 +161,7 @@ static void	get_printers(cupsd_client_t *con, int type);
 static void	get_printer_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_subscription_attrs(cupsd_client_t *con, int sub_id);
 static void	get_subscriptions(cupsd_client_t *con, ipp_attribute_t *uri);
+static const char *get_username(cupsd_client_t *con);
 static void	hold_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	move_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static int	ppd_add_default(const char *option, const char *choice,
@@ -722,7 +724,7 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdSaveAllPrinters();
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" now accepting jobs (\"%s\").", name,
-                  con->username);
+                  get_username(con));
 
  /*
   * Everything was ok, so return OK status...
@@ -1102,10 +1104,10 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, pclass, NULL,
                   "Class \"%s\" modified by \"%s\".", pclass->name,
-        	  con->username);
+        	  get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" modified by \"%s\".",
-                    pclass->name, con->username);
+                    pclass->name, get_username(con));
   }
   else
   {
@@ -1113,10 +1115,10 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, pclass, NULL,
                   "New class \"%s\" added by \"%s\".", pclass->name,
-        	  con->username);
+        	  get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "New class \"%s\" added by \"%s\".",
-                    pclass->name, con->username);
+                    pclass->name, get_username(con));
   }
 
   con->response->request.status.status_code = IPP_OK;
@@ -1999,10 +2001,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
                   "Printer \"%s\" modified by \"%s\".", printer->name,
-        	  con->username);
+        	  get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" modified by \"%s\".",
-                    printer->name, con->username);
+                    printer->name, get_username(con));
   }
   else
   {
@@ -2010,10 +2012,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, printer, NULL,
                   "New printer \"%s\" added by \"%s\".", printer->name,
-        	  con->username);
+        	  get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "New printer \"%s\" added by \"%s\".",
-                    printer->name, con->username);
+                    printer->name, get_username(con));
   }
 
   con->response->request.status.status_code = IPP_OK;
@@ -2343,7 +2345,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdCancelJobs(NULL, username, purge);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "All jobs were %s by \"%s\".",
-                    purge ? "purged" : "cancelled", con->username);
+                    purge ? "purged" : "cancelled", get_username(con));
   }
   else
   {
@@ -2364,7 +2366,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdCancelJobs(dest, username, purge);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "All jobs on \"%s\" were %s by \"%s\".",
-                    dest, purge ? "purged" : "cancelled", con->username);
+                    dest, purge ? "purged" : "cancelled", get_username(con));
   }
 
   con->response->request.status.status_code = IPP_OK;
@@ -2569,7 +2571,6 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
              cupsd_printer_t *p)	/* I - Printer or class */
 {
   int		i;			/* Looping var */
-  ipp_attribute_t *attr;		/* Current attribute */
   char		username[33];		/* Username */
   cupsd_quota_t	*q;			/* Quota data */
   struct passwd	*pw;			/* User password data */
@@ -2589,20 +2590,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   * Figure out who is printing...
   */
 
-  attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
-
-  if (con->username[0])
-    strlcpy(username, con->username, sizeof(username));
-  else if (attr)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "check_quotas: requesting-user-name = \"%s\"",
-                    attr->values[0].string.text);
-
-    strlcpy(username, attr->values[0].string.text, sizeof(username));
-  }
-  else
-    strcpy(username, "anonymous");
+  strlcpy(username, get_username(con), sizeof(username));
 
  /*
   * Check global active job limits for printers and users...
@@ -4672,19 +4660,7 @@ create_subscription(
   * Get the user that is requesting the subscription...
   */
 
-  if (con->username[0])
-    username = con->username;
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
-                                    IPP_TAG_NAME)) != NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "create_subscription: requesting-user-name = \"%s\"",
-                    attr->values[0].string.text);
-
-    username = attr->values[0].string.text;
-  }
-  else
-    username = "anonymous";
+  username = get_username(con);
 
  /*
   * Find the first subscription group attribute; return if we have
@@ -4924,7 +4900,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, printer, NULL,
                 "%s \"%s\" deleted by \"%s\".",
 		(dtype & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
-		dest, con->username);
+		dest, get_username(con));
 
   cupsdExpireSubscriptions(printer, NULL);
  
@@ -4941,7 +4917,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   if (dtype & CUPS_PRINTER_CLASS)
   {
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" deleted by \"%s\".", dest,
-                    con->username);
+                    get_username(con));
 
     cupsdDeletePrinter(printer, 0);
     cupsdSaveAllClasses();
@@ -4949,7 +4925,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   else
   {
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" deleted by \"%s\".", dest,
-                    con->username);
+                    get_username(con));
 
     cupsdDeletePrinter(printer, 0);
     cupsdSaveAllPrinters();
@@ -5348,15 +5324,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "my-jobs",
                                IPP_TAG_BOOLEAN)) != NULL &&
       attr->values[0].boolean)
-  {
-    if (con->username[0])
-      strlcpy(username, con->username, sizeof(username));
-    else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
-                                      IPP_TAG_NAME)) != NULL)
-      strlcpy(username, attr->values[0].string.text, sizeof(username));
-    else
-      strcpy(username, "anonymous");
-  }
+    strlcpy(username, get_username(con), sizeof(username));
   else
     username[0] = '\0';
 
@@ -5926,15 +5894,7 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "my-subscriptions",
                                IPP_TAG_BOOLEAN)) != NULL &&
       attr->values[0].boolean)
-  {
-    if (con->username[0])
-      strlcpy(username, con->username, sizeof(username));
-    else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
-                                      IPP_TAG_NAME)) != NULL)
-      strlcpy(username, attr->values[0].string.text, sizeof(username));
-    else
-      strcpy(username, "anonymous");
-  }
+    strlcpy(username, get_username(con), sizeof(username));
   else
     username[0] = '\0';
 
@@ -5958,6 +5918,26 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
     con->response->request.status.status_code = IPP_OK;
   else
     send_ipp_status(con, IPP_NOT_FOUND, _("No subscriptions found."));
+}
+
+
+/*
+ * 'get_username()' - Get the username associated with a request.
+ */
+
+static const char *			/* O - Username */
+get_username(cupsd_client_t *con)	/* I - Connection */
+{
+  ipp_attribute_t	*attr;		/* Attribute */
+
+
+  if (con->username[0])
+    return (con->username);
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
+                                    IPP_TAG_NAME)) != NULL)
+    return (attr->values[0].string.text);
+  else
+    return ("anonymous");
 }
 
 
@@ -7441,14 +7421,14 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdSaveAllClasses();
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" rejecting jobs (\"%s\").",
-                    name, con->username);
+                    name, get_username(con));
   }
   else
   {
     cupsdSaveAllPrinters();
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" rejecting jobs (\"%s\").",
-                    name, con->username);
+                    name, get_username(con));
   }
 
  /*
@@ -8320,7 +8300,7 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdLogMessage(CUPSD_LOG_INFO,
                   "Default destination set to \"%s\" by \"%s\".", name,
-                  con->username);
+                  get_username(con));
 
  /*
   * Everything was ok, so return OK status...
@@ -8728,9 +8708,10 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   if (dtype & CUPS_PRINTER_CLASS)
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" started by \"%s\".", name,
-                    con->username);
+                    get_username(con));
+  else
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" started by \"%s\".", name,
-                    con->username);
+                    get_username(con));
 
   cupsdCheckJobs();
 
@@ -8815,10 +8796,10 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   if (dtype & CUPS_PRINTER_CLASS)
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" stopped by \"%s\".", name,
-                    con->username);
+                    get_username(con));
   else
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" stopped by \"%s\".", name,
-                    con->username);
+                    get_username(con));
 
  /*
   * Everything was ok, so return OK status...
@@ -9018,7 +8999,6 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
               char           *username,	/* O - Authenticated username */
 	      int            userlen)	/* I - Length of username */
 {
-  ipp_attribute_t	*attr;		/* requesting-user-name attribute */
   cupsd_printer_t	*printer;	/* Printer for job */
 
 
@@ -9039,13 +9019,7 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
   * Get the best authenticated username that is available.
   */
 
-  if (con->username[0])
-    strlcpy(username, con->username, userlen);
-  else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
-                                    IPP_TAG_NAME)) != NULL)
-    strlcpy(username, attr->values[0].string.text, userlen);
-  else
-    strlcpy(username, "anonymous", userlen);
+  strlcpy(username, get_username(con), userlen);
 
  /*
   * Check the username against the owner...
