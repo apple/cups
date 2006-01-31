@@ -162,7 +162,8 @@ static cupsd_var_t	variables[] =
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
   { "TempDir",			&TempDir,		CUPSD_VARTYPE_STRING },
-  { "Timeout",			&Timeout,		CUPSD_VARTYPE_INTEGER }
+  { "Timeout",			&Timeout,		CUPSD_VARTYPE_INTEGER },
+  { "UseNetworkDefault",	&UseNetworkDefault,	CUPSD_VARTYPE_BOOLEAN }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
 

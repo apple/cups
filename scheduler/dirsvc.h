@@ -99,6 +99,8 @@ VAR int			Browsing	VALUE(TRUE),
 					/* Broadcast interval in seconds */
 			BrowseTimeout	VALUE(DEFAULT_TIMEOUT),
 					/* Time out for printers in seconds */
+			UseNetworkDefault VALUE(CUPS_DEFAULT_USE_NETWORK_DEFAULT),
+					/* Use the network default printer? */
 			NumBrowsers	VALUE(0);
 					/* Number of broadcast addresses */
 VAR char		*BrowseLocalOptions

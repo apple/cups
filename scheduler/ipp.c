@@ -3726,6 +3726,30 @@ copy_printer_attrs(
   if (!ra || cupsArrayFind(ra, "printer-state-reasons"))
     add_printer_state_reasons(con, printer);
 
+  if (!ra || cupsArrayFind(ra, "printer-type"))
+  {
+    int type;				/* printer-type value */
+
+
+   /*
+    * Add the CUPS-specific printer-type attribute...
+    */
+
+    type = printer->type;
+
+    if (printer == DefaultPrinter)
+      type |= CUPS_PRINTER_DEFAULT;
+
+    if (!printer->accepting)
+      type |= CUPS_PRINTER_REJECTING;
+
+    if (!printer->shared)
+      type |= CUPS_PRINTER_NOT_SHARED;
+
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type",
+		  type);
+  }
+
   if (!ra || cupsArrayFind(ra, "printer-up-time"))
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                   "printer-up-time", curtime);

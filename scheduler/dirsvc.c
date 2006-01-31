@@ -671,7 +671,7 @@ cupsdProcessBrowseData(
     * Remote destination is a printer...
     */
 
-    if (strncmp(resource, "/printers/", 10) == 0)
+    if (!strncmp(resource, "/printers/", 10))
       snprintf(name, sizeof(name), "%s@%s", resource + 10, host);
     else
       return;
@@ -853,8 +853,21 @@ cupsdProcessBrowseData(
   * default.
   */
 
-  if (DefaultPrinter == NULL && Printers != NULL)
-    DefaultPrinter = (cupsd_printer_t *)cupsArrayFirst(Printers);
+  if (DefaultPrinter == NULL && Printers != NULL && UseNetworkDefault)
+  {
+   /*
+    * Find the first network default printer and use it...
+    */
+
+    for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+         p;
+	 p = (cupsd_printer_t *)cupsArrayNext(Printers))
+      if (p->type & CUPS_PRINTER_DEFAULT)
+      {
+        DefaultPrinter = p;
+	break;
+      }
+  }
 
  /*
   * Do auto-classing if needed...
@@ -918,7 +931,7 @@ cupsdProcessImplicitClasses(void)
     cupsArraySave(Printers);
 
     if (len > 0 &&
-	strncasecmp(p->name, name + offset, len) == 0 &&
+	!strncasecmp(p->name, name + offset, len) &&
 	(p->name[len] == '\0' || p->name[len] == '@'))
     {
      /*
@@ -1363,6 +1376,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
   if (!p->accepting)
     type |= CUPS_PRINTER_REJECTING;
 
+  if (p == DefaultPrinter)
+    type |= CUPS_PRINTER_DEFAULT;
+
  /*
   * Initialize the browse options...
   */
@@ -1383,7 +1399,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
       * Send the browse packet to one or more interfaces...
       */
 
-      if (strcmp(b->iface, "*") == 0)
+      if (!strcmp(b->iface, "*"))
       {
        /*
         * Send to all local interfaces...
@@ -2392,7 +2408,7 @@ cupsdUpdateSLPBrowse(void)
                       username, sizeof(username), host, sizeof(host), &port,
 		      resource, sizeof(resource));
 
-      if (strcasecmp(host, ServerName) == 0)
+      if (!strcasecmp(host, ServerName))
 	continue;
 
      /*
@@ -2464,7 +2480,7 @@ slp_attr_callback(
 
   if (slp_get_attr(attrlist, "(color-supported=", &tmp))
     return (SLP_FALSE);
-  if (strcasecmp(tmp, "true") == 0)
+  if (!strcasecmp(tmp, "true"))
     p->type |= CUPS_PRINTER_COLOR;
 
   if (slp_get_attr(attrlist, "(finishings-supported=", &tmp))

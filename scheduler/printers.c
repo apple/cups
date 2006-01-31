@@ -719,12 +719,32 @@ cupsdDeletePrinter(
 #endif /* __sgi */
 
  /*
-  * If p is the default printer, assign the next one...
-  * TODO: use next network default printer or NULL...
+  * If p is the default printer, assign a different one...
   */
 
   if (p == DefaultPrinter)
-    DefaultPrinter = (cupsd_printer_t *)cupsArrayFirst(Printers);
+  {
+    DefaultPrinter = NULL;
+
+    if (UseNetworkDefault)
+    {
+     /*
+      * Find the first network default printer and use it...
+      */
+
+      cupsd_printer_t	*dp;		/* New default printer */
+
+
+      for (dp = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	   dp;
+	   dp = (cupsd_printer_t *)cupsArrayNext(Printers))
+	if (dp != p && (dp->type & CUPS_PRINTER_DEFAULT))
+	{
+	  DefaultPrinter = p;
+	  break;
+	}
+    }
+  }
 
  /*
   * Remove this printer from any classes and send a browse delete message...
@@ -1422,8 +1442,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   int			num_media;	/* Number of media options */
   cupsd_location_t	*auth;		/* Pointer to authentication element */
   const char		*auth_supported;/* Authentication supported */
-  cups_ptype_t		cupsd_printer_type;
-					/* Printer type data */
+  cups_ptype_t		printer_type;	/* Printer type data */
   ppd_file_t		*ppd;		/* PPD file data */
   ppd_option_t		*input_slot,	/* InputSlot options */
 			*media_type,	/* MediaType options */
@@ -1549,7 +1568,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     }
   }
 
-  cupsd_printer_type = p->type;
+  printer_type = p->type;
 
   p->raw = 0;
 
@@ -1894,7 +1913,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
 	ppdClose(ppd);
 
-        cupsd_printer_type = p->type;
+        printer_type = p->type;
       }
       else if (!access(filename, 0))
       {
@@ -1958,7 +1977,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	  * Tell the client this is really a hard-wired remote printer.
 	  */
 
-          cupsd_printer_type |= CUPS_PRINTER_REMOTE;
+          printer_type |= CUPS_PRINTER_REMOTE;
 
          /*
 	  * Point the printer-uri-supported attribute to the
@@ -2001,18 +2020,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                     "finishings-default", IPP_FINISHINGS_NONE);
     }
   }
-
- /*
-  * Add the CUPS-specific printer-type attribute...
-  */
-
-  if (!p->shared)
-    p->type |= CUPS_PRINTER_NOT_SHARED;
-  else
-    p->type &= ~CUPS_PRINTER_NOT_SHARED;
-
-  ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type",
-                cupsd_printer_type);
 
   DEBUG_printf(("cupsdSetPrinterAttrs: leaving name = %s, type = %x\n", p->name,
                 p->type));
