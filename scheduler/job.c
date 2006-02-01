@@ -3,7 +3,7 @@
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -426,13 +426,13 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     job->status_buffer = NULL;
   }
 
+  printer = job->printer;
+
   if (job->status < 0)
   {
    /*
     * Backend had errors; stop it...
     */
-
-    printer = job->printer;
 
     switch (-job->status)
     {
@@ -540,29 +540,15 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
   else if (job->status > 0)
   {
    /*
-    * Filter had errors; cancel it...
+    * Filter had errors; stop job...
     */
 
-    if (job->current_file < job->num_files)
-      cupsdStartJob(job, job->printer);
-    else
-    {
-      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                    "Job aborted due to filter errors; please consult the "
-		    "error_log file for details.");
-
-      job_history = JobHistory && !(job->dtype & CUPS_PRINTER_REMOTE);
-
-      cupsdCancelJob(job, 0);
-
-      if (job_history)
-      {
-        job->state->values[0].integer = IPP_JOB_ABORTED;
-	cupsdSaveJob(job);
-      }
-
-      cupsdCheckJobs();
-    }
+    cupsdStopJob(job, 1);
+    cupsdSaveJob(job);
+    cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, job->printer, job,
+                  "Job stopped due to filter errors; please consult the "
+		  "error_log file for details.");
+    cupsdCheckJobs();
   }
   else
   {
@@ -572,11 +558,19 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
     if (job->current_file < job->num_files)
     {
+     /*
+      * Start the next file in the job...
+      */
+
       FilterLevel -= job->cost;
       cupsdStartJob(job, job->printer);
     }
     else
     {
+     /*
+      * Close out this job...
+      */
+
       cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                     "Job completed successfully.");
 
@@ -589,6 +583,12 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
         job->state->values[0].integer = IPP_JOB_COMPLETED;
 	cupsdSaveJob(job);
       }
+
+     /*
+      * Clear the printer's state_message and move on...
+      */
+
+      printer->state_message[0] = '\0';
 
       cupsdCheckJobs();
     }
@@ -2429,7 +2429,10 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
                     "Printed %d page(s).", job->sheets->values[0].integer);
     }
     else if (loglevel == CUPSD_LOG_STATE)
+    {
       cupsdSetPrinterReasons(job->printer, message);
+      cupsdAddPrinterHistory(job->printer);
+    }
     else if (loglevel == CUPSD_LOG_ATTR)
     {
      /*
@@ -2437,6 +2440,16 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
       */
 
       /**** TODO ****/
+    }
+    else
+    {
+     /*
+      * Some message to show in the printer-state-message attribute...
+      */
+
+      strlcpy(job->printer->state_message, message,
+              sizeof(job->printer->state_message));
+      cupsdAddPrinterHistory(job->printer);
     }
 
     if (!strchr(job->status_buffer->buffer, '\n'))

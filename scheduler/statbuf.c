@@ -4,7 +4,7 @@
  *   Status buffer routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -304,6 +304,8 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
     else
       cupsdLogMessage(*loglevel, "%s %s", sb->prefix, message);
   }
+  else if (*loglevel < CUPSD_LOG_NONE && LogLevel == CUPSD_LOG_DEBUG2)
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "%s %s", sb->prefix, sb->buffer);
 
  /*
   * Copy the message to the line buffer...
