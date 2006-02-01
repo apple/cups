@@ -4,7 +4,7 @@
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -27,6 +27,7 @@
  *   cupsdNetIFFind()   - Find a network interface.
  *   cupsdNetIFFree()   - Free the current network interface list.
  *   cupsdNetIFUpdate() - Update the network interface list as needed...
+ *   compare_netif()    - Compare two network interfaces.
  *   getifaddrs()       - Get a list of network interfaces on the system.
  *   freeifaddrs()      - Free an interface list...
  */
@@ -38,6 +39,15 @@
 #include "cupsd.h"
 
 #include <net/if.h>
+
+
+/*
+ * Local functions...
+ */
+
+static void	cupsdNetIFFree(void);
+static int	compare_netif(cupsd_netif_t *a, cupsd_netif_t *b);
+
 
 #ifdef HAVE_GETIFADDRS
 /*
@@ -72,8 +82,8 @@ struct ifaddrs				/**** Interface Structure ****/
   void			*ifa_data;	/* Interface statistics */
 };
 
-int	getifaddrs(struct ifaddrs **addrs);
-void	freeifaddrs(struct ifaddrs *addrs);
+static int	getifaddrs(struct ifaddrs **addrs);
+static void	freeifaddrs(struct ifaddrs *addrs);
 #endif /* HAVE_GETIFADDRS */
 
 
@@ -84,7 +94,7 @@ void	freeifaddrs(struct ifaddrs *addrs);
 cupsd_netif_t *				/* O - Network interface data */
 cupsdNetIFFind(const char *name)	/* I - Name of interface */
 {
-  cupsd_netif_t	*temp;			/* Current network interface */
+  cupsd_netif_t	key;			/* Search key */
 
 
  /*
@@ -97,11 +107,9 @@ cupsdNetIFFind(const char *name)	/* I - Name of interface */
   * Search for the named interface...
   */
 
-  for (temp = NetIFList; temp != NULL; temp = temp->next)
-    if (!strcasecmp(name, temp->name))
-      return (temp);
+  strlcpy(key.name, name, sizeof(key.name));
 
-  return (NULL);
+  return ((cupsd_netif_t *)cupsArrayFind(NetIFList, &key));
 }
 
 
@@ -109,23 +117,22 @@ cupsdNetIFFind(const char *name)	/* I - Name of interface */
  * 'cupsdNetIFFree()' - Free the current network interface list.
  */
 
-void
+static void
 cupsdNetIFFree(void)
 {
-  cupsd_netif_t	*next;			/* Next interface in list */
+  cupsd_netif_t	*current;		/* Current interface in array */
 
 
  /*
   * Loop through the interface list and free all the records...
   */
 
-  while (NetIFList != NULL)
+  for (current = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
+       current;
+       current = (cupsd_netif_t *)cupsArrayNext(NetIFList))
   {
-    next = NetIFList->next;
-
-    free(NetIFList);
-
-    NetIFList = next;
+    cupsArrayRemove(NetIFList, current);
+    free(current);
   }
 }
 
@@ -140,12 +147,11 @@ cupsdNetIFUpdate(void)
   int			i,		/* Looping var */
 			match;		/* Matching address? */
   cupsd_listener_t	*lis;		/* Listen address */
-  cupsd_netif_t		*temp,		/* New interface */
-			*prev,		/* Previous interface */
-			*current;	/* Current interface */
+  cupsd_netif_t		*temp;		/* New interface */
   struct ifaddrs	*addrs,		/* Interface address list */
 			*addr;		/* Current interface address */
   http_addrlist_t	*saddr;		/* Current server address */
+  char			hostname[1024];	/* Hostname for address */
 
 
  /*
@@ -163,6 +169,16 @@ cupsdNetIFUpdate(void)
   */
 
   cupsdNetIFFree();
+
+ /*
+  * Make sure we have an array...
+  */
+
+  if (!NetIFList)
+    NetIFList = cupsArrayNew((cups_array_func_t)compare_netif, NULL);
+
+  if (!NetIFList)
+    return;
 
  /*
   * Grab a new list of interfaces...
@@ -187,37 +203,50 @@ cupsdNetIFUpdate(void)
       continue;
 
    /*
-    * OK, we have an IPv4/6 address, so create a new list node...
+    * Try looking up the hostname for the address as needed...
     */
 
-    if ((temp = calloc(1, sizeof(cupsd_netif_t))) == NULL)
+    if (HostNameLookups)
+      httpAddrLookup((http_addr_t *)(addr->ifa_addr), hostname,
+                     sizeof(hostname));
+    else
+    {
+     /*
+      * Map the default server address and localhost to the server name
+      * and localhost, respectively; for all other addresses, use the
+      * dotted notation...
+      */
+
+      if (httpAddrLocalhost((http_addr_t *)(addr->ifa_addr)))
+        strcpy(hostname, "localhost");
+      else
+      {
+        for (saddr = ServerAddrs; saddr; saddr = saddr->next)
+	  if (httpAddrEqual((http_addr_t *)(addr->ifa_addr), &(saddr->addr)))
+	    break;
+
+	if (saddr)
+          strlcpy(hostname, ServerName, sizeof(hostname));
+	else
+          httpAddrString((http_addr_t *)(addr->ifa_addr), hostname,
+	        	 sizeof(hostname));
+      }
+    }
+
+   /*
+    * Create a new address element...
+    */
+
+    if ((temp = calloc(1, sizeof(cupsd_netif_t) +
+                          strlen(hostname))) == NULL)
       break;
 
    /*
-    * Insert the node in sorted order; since we don't expect to
-    * have a lot of network interfaces, we just do a simple linear
-    * search...
-    */
-
-    for (current = NetIFList, prev = NULL;
-         current;
-	 prev = current, current = current->next)
-      if (strcasecmp(addr->ifa_name, current->name) <= 0)
-        break;
-
-    if (current)
-      temp->next = current;
-
-    if (prev)
-      prev->next = temp;
-    else
-      NetIFList = temp;
-
-   /*
-    * Then copy all of the information...
+    * Copy all of the information...
     */
 
     strlcpy(temp->name, addr->ifa_name, sizeof(temp->name));
+    strcpy(temp->hostname, hostname);	/* Safe because hostname is allocated */
 
     if (addr->ifa_addr->sa_family == AF_INET)
     {
@@ -299,34 +328,10 @@ cupsdNetIFUpdate(void)
     }
 
    /*
-    * Finally, try looking up the hostname for the address as needed...
+    * Add it to the array...
     */
 
-    if (HostNameLookups)
-      httpAddrLookup(&(temp->address), temp->hostname, sizeof(temp->hostname));
-    else
-    {
-     /*
-      * Map the default server address and localhost to the server name
-      * and localhost, respectively; for all other addresses, use the
-      * dotted notation...
-      */
-
-      if (httpAddrLocalhost(&(temp->address)))
-        strcpy(temp->hostname, "localhost");
-      else
-      {
-        for (saddr = ServerAddrs; saddr; saddr = saddr->next)
-	  if (httpAddrEqual(&(temp->address), &(saddr->addr)))
-	    break;
-
-	if (saddr)
-          strlcpy(temp->hostname, ServerName, sizeof(temp->hostname));
-	else
-          httpAddrString(&(temp->address), temp->hostname,
-	        	 sizeof(temp->hostname));
-      }
-    }
+    cupsArrayAdd(NetIFList, temp);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdNetIFUpdate: \"%s\" = %s...",
                     temp->name, temp->hostname);
@@ -336,12 +341,24 @@ cupsdNetIFUpdate(void)
 }
 
 
+/*
+ * 'compare_netif()' - Compare two network interfaces.
+ */
+
+static int				/* O - Result of comparison */
+compare_netif(cupsd_netif_t *a,		/* I - First network interface */
+              cupsd_netif_t *b)		/* I - Second network interface */
+{
+  return (strcmp(a->name, b->name));
+}
+
+
 #ifndef HAVE_GETIFADDRS
 /*
  * 'getifaddrs()' - Get a list of network interfaces on the system.
  */
 
-int					/* O - 0 on success, -1 on error */
+static int				/* O - 0 on success, -1 on error */
 getifaddrs(struct ifaddrs **addrs)	/* O - List of interfaces */
 {
   int			sock;		/* Socket */
@@ -517,7 +534,7 @@ getifaddrs(struct ifaddrs **addrs)	/* O - List of interfaces */
  * 'freeifaddrs()' - Free an interface list...
  */
 
-void
+static void
 freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 {
   struct ifaddrs	*next;		/* Next interface in list */

@@ -797,7 +797,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 
         cupsdNetIFUpdate();
 
-        for (iface = NetIFList; iface != NULL; iface = iface->next)
+	for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
+	     iface;
+	     iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
 	{
 	 /*
 	  * Only send to local, IPv4 interfaces...
@@ -835,7 +837,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	*/
 
         while (iface)
-	  if (strcasecmp(b->iface, iface->name))
+	  if (strcmp(b->iface, iface->name))
 	  {
 	    iface = NULL;
 	    break;
@@ -843,7 +845,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	  else if (iface->address.addr.sa_family == AF_INET && iface->port)
 	    break;
 	  else
-	    iface = iface->next;
+            iface = (cupsd_netif_t *)cupsArrayNext(NetIFList);
 
         if (iface)
 	{
@@ -1653,7 +1655,9 @@ cupsdUpdateCUPSBrowse(void)
 
   cupsdNetIFUpdate();
 
-  for (iface = NetIFList; iface != NULL; iface = iface->next)
+  for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
+       iface;
+       iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
     if (!strcasecmp(host, iface->hostname) && port == iface->port)
     {
       cupsFreeOptions(num_attrs, attrs);
