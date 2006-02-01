@@ -1692,22 +1692,28 @@ launchd_sync_conf(void)
 				&kCFTypeDictionaryKeyCallBacks,
 				&kCFTypeDictionaryValueCallBacks)) != NULL)
   {
-    CFDictionaryAddValue(cupsd_dict, CFSTR("Label"), CFSTR("org.cups.cupsd"));
+    CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_LABEL),
+                         CFSTR("org.cups.cupsd"));
     CFDictionaryAddValue(cupsd_dict, CFSTR("Enabled"), kCFBooleanTrue);
-    CFDictionaryAddValue(cupsd_dict, CFSTR("OnDemand"), kCFBooleanTrue);
+    CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_ONDEMAND),
+                         kCFBooleanTrue);
 
     if ((Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)) ||
         cupsArrayCount(ActiveJobs))
-      CFDictionaryAddValue(cupsd_dict, CFSTR("RunAtLoad"), kCFBooleanTrue);
+      CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_RUNATLOAD),
+                           kCFBooleanTrue);
     else
-      CFDictionaryAddValue(cupsd_dict, CFSTR("RunAtLoad"), kCFBooleanFalse);
+      CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_RUNATLOAD),
+                           kCFBooleanFalse);
 
-    CFDictionaryAddValue(cupsd_dict, CFSTR("ServiceIPC"), kCFBooleanTrue);
+    CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_SERVICEIPC),
+			 kCFBooleanTrue);
 
     if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 2,
                                       &kCFTypeArrayCallBacks)) != NULL)
     {
-      CFDictionaryAddValue(cupsd_dict, CFSTR("ProgramArguments"), array);
+      CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_PROGRAMARGUMENTS),
+                           array);
       CFArrayAppendValue(array, CFSTR("/usr/sbin/cupsd"));
       CFArrayAppendValue(array, CFSTR("-l"));
       CFRelease(array);
@@ -1722,7 +1728,7 @@ launchd_sync_conf(void)
 				&kCFTypeDictionaryKeyCallBacks,
 				&kCFTypeDictionaryValueCallBacks)) != NULL)
     {
-      CFDictionaryAddValue(cupsd_dict, CFSTR("Sockets"), sockets);
+      CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_SOCKETS), sockets);
 
      /*
       * Add a Listeners array to the sockets dictionary...
@@ -1752,7 +1758,8 @@ launchd_sync_conf(void)
 					lis->address.un.sun_path, 
 					kCFStringEncodingUTF8)))
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockPathName"),
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_PATHNAME),
 		                     socket_path);
 		CFRelease(socket_path);
 	      }
@@ -1772,14 +1779,16 @@ launchd_sync_conf(void)
 #  ifdef AF_INET6
 	      if (lis->address.addr.sa_family == AF_INET6)
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockFamily"),
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_FAMILY),
 		                     CFSTR("IPv6"));
 		portnum = lis->address.ipv6.sin6_port;
 	      }
 	      else
 #  endif /* AF_INET6 */
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockFamily"),
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_FAMILY),
 		                     CFSTR("IPv4"));
 		portnum = lis->address.ipv4.sin_port;
 	      }
@@ -1794,7 +1803,9 @@ launchd_sync_conf(void)
 
 	      if (value)
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockServiceName"), value);
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_SERVICENAME),
+				     value);
 		CFRelease(value);
 	      }	
 
@@ -1802,7 +1813,9 @@ launchd_sync_conf(void)
 	      if ((value = CFStringCreateWithCString(kCFAllocatorDefault, temp, 
 						     kCFStringEncodingUTF8)))
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockNodeName"), value);
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_NODENAME),
+				     value);
 		CFRelease(value);
 	      }
 	    }
@@ -1831,8 +1844,10 @@ launchd_sync_conf(void)
 	  {
 	    CFArrayAppendValue(array, listener);
 
-	    CFDictionaryAddValue(listener, CFSTR("SockFamily"), CFSTR("IPv4"));
-	    CFDictionaryAddValue(listener, CFSTR("SockType"), CFSTR("dgram"));
+	    CFDictionaryAddValue(listener, CFSTR(LAUNCH_JOBSOCKETKEY_FAMILY),
+	                         CFSTR("IPv4"));
+	    CFDictionaryAddValue(listener, CFSTR(LAUNCH_JOBSOCKETKEY_TYPE),
+	                         CFSTR("dgram"));
 
 	    if ((service = getservbyport(BrowsePort, NULL)))
 	      value = CFStringCreateWithCString(kCFAllocatorDefault, 
@@ -1842,7 +1857,8 @@ launchd_sync_conf(void)
 	      value = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, 
 				     &BrowsePort);
 
-	    CFDictionaryAddValue(listener, CFSTR("SockServiceName"), value);
+	    CFDictionaryAddValue(listener,
+	                         CFSTR(LAUNCH_JOBSOCKETKEY_SERVICENAME), value);
 	    CFRelease(value);
 
 	    CFRelease(listener);
