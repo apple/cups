@@ -44,6 +44,7 @@
 #include "http-private.h"
 #include "globals.h"
 #include <stdlib.h>
+#include <sys/stat.h>
 #ifdef WIN32
 #  include <windows.h>
 #endif /* WIN32 */
@@ -184,6 +185,9 @@ cupsServer(void)
   char		line[1024],		/* Line from file */
 		*value;			/* Value on line */
   int		linenum;		/* Line number in file */
+#ifdef CUPS_DEFAULT_DOMAINSOCKET
+  struct stat	sockinfo;		/* Domain socket information */
+#endif /* CUPS_DEFAULT_DOMAINSOCKET */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
@@ -218,7 +222,13 @@ cupsServer(void)
       }
 
 #ifdef CUPS_DEFAULT_DOMAINSOCKET
-      if (!access(CUPS_DEFAULT_DOMAINSOCKET, 0))
+     /*
+      * If we are compiled with domain socket support, only use the
+      * domain socket if it exists and has the right permissions...
+      */
+
+      if (!stat(CUPS_DEFAULT_DOMAINSOCKET, &sockinfo) &&
+          (sockinfo.st_mode & S_IRWXO) == S_IRWXO)
         server = CUPS_DEFAULT_DOMAINSOCKET;
       else
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */

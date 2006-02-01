@@ -193,20 +193,20 @@ cupsdStartListening(void)
       */
   
       val = 1;
-  #ifdef __sun
+#ifdef __sun
       setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
-  #else
+#else
       setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-  #endif /* __sun */
+#endif /* __sun */
   
      /*
       * Bind to the port we found...
       */
   
-  #ifdef AF_INET6
+#ifdef AF_INET6
       if (lis->address.addr.sa_family == AF_INET6)
       {
-  #  ifdef IPV6_V6ONLY
+#  ifdef IPV6_V6ONLY
        /*
 	* Accept only IPv6 connections on this socket, to avoid
 	* potential security issues and to make all platforms behave
@@ -214,19 +214,19 @@ cupsdStartListening(void)
 	*/
   
 	val = 1;
-  #    ifdef __sun
+#    ifdef __sun
 	setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&val, sizeof(val));
-  #    else
+#    else
 	setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
-  #    endif /* __sun */
-  #  endif /* IPV6_V6ONLY */
+#    endif /* __sun */
+#  endif /* IPV6_V6ONLY */
   
 	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
 		      httpAddrLength(&(lis->address)));
       }
       else
-  #endif /* AF_INET6 */
-  #ifdef AF_LOCAL
+#endif /* AF_INET6 */
+#ifdef AF_LOCAL
       if (lis->address.addr.sa_family == AF_LOCAL)
       {
 	mode_t	mask;			/* Umask setting */
@@ -258,7 +258,7 @@ cupsdStartListening(void)
 	umask(mask);
       }
       else
-  #endif /* AF_LOCAL */
+#endif /* AF_LOCAL */
       status = bind(lis->fd, (struct sockaddr *)&(lis->address),
 		    sizeof(lis->address.ipv4));
   
