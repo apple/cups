@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: http-support.c 5035 2006-02-01 14:58:46Z mike $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1192,7 +1192,9 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
   * or the end of the string.
   */
 
-  for (ptr = dst, end = dst + dstsize - 1; *src && !strchr(term, *src); src ++)
+  for (ptr = dst, end = dst + dstsize - 1;
+       *src && (!term || !strchr(term, *src));
+       src ++)
     if (ptr < end)
     {
       if (*src == '%' && decode)
@@ -1285,5 +1287,5 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 
 
 /*
- * End of "$Id: http-support.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: http-support.c 5035 2006-02-01 14:58:46Z mike $".
  */

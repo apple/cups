@@ -1,9 +1,9 @@
 /*
- * "$Id: process.c 4719 2005-09-28 21:12:44Z mike $"
+ * "$Id: process.c 5046 2006-02-01 22:11:58Z mike $"
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -23,8 +23,10 @@
  *
  * Contents:
  *
- *   cupsdEndProcess()   - End a process.
- *   cupsdStartProcess() - Start a process.
+ *   cupsdEndProcess()    - End a process.
+ *   cupsdFinishProcess() - Finish a process and get its name.
+ *   cupsdStartProcess()  - Start a process.
+ *   compare_procs()      - Compare two processes.
  */
 
 /*
@@ -33,6 +35,31 @@
 
 #include "cupsd.h"
 #include <grp.h>
+
+
+/*
+ * Process structure...
+ */
+
+typedef struct
+{
+  int	pid;				/* Process ID */
+  char	name[1];			/* Name of process */
+} cupsd_proc_t;
+
+
+/*
+ * Local globals...
+ */
+
+static cups_array_t	*process_array = NULL;
+
+
+/*
+ * Local functions...
+ */
+
+static int	compare_procs(cupsd_proc_t *a, cupsd_proc_t *b);
 
 
 /*
@@ -47,6 +74,34 @@ cupsdEndProcess(int pid,		/* I - Process ID */
     return (kill(pid, SIGKILL));
   else
     return (kill(pid, SIGTERM));
+}
+
+
+/*
+ * 'cupsdFinishProcess()' - Finish a process and get its name.
+ */
+
+const char *				/* O - Process name */
+cupsdFinishProcess(int  pid,		/* I - Process ID */
+                   char *name,		/* I - Name buffer */
+		   int  namelen)	/* I - Size of name buffer */
+{
+  cupsd_proc_t	key,			/* Search key */
+		*proc;			/* Matching process */
+
+
+  key.pid = pid;
+
+  if ((proc = (cupsd_proc_t *)cupsArrayFind(process_array, &key)) != NULL)
+  {
+    strlcpy(name, proc->name, namelen);
+    cupsArrayRemove(process_array, proc);
+    free(proc);
+
+    return (name);
+  }
+  else
+    return ("unknown");
 }
 
 
@@ -66,14 +121,60 @@ cupsdStartProcess(
     int        root,			/* I - Run as root? */
     int        *pid)			/* O - Process ID */
 {
+  cupsd_proc_t	*proc;			/* New process record */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction	action;		/* POSIX signal handler */
+  struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#if defined(__APPLE__) && __GNUC__ < 4
+  int		envc;			/* Number of environment variables */
+  char		processPath[1024],	/* CFProcessPath environment variable */
+		linkpath[1024];		/* Link path for symlinks... */
+  int		linkbytes;		/* Bytes for link path */
+#endif /* __APPLE__ && __GNUC__ < 4 */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdStartProcess(\"%s\", %p, %p, %d, %d, %d)",
                   command, argv, envp, infd, outfd, errfd);
+
+#if defined(__APPLE__) && __GNUC__ < 4
+ /*
+  * Add special voodoo magic for MacOS X 10.3 and earlier - this allows
+  * MacOS X programs to access their bundle resources properly...
+  */
+
+  for (envc = 0; envc < MAX_ENV && envp[envc]; envc ++);
+    /* All callers pass in a MAX_ENV element array of environment strings */
+
+  if (envc < (MAX_ENV - 1))
+  {
+   /*
+    * We have room, try to read the symlink path for this command...
+    */
+
+    if ((linkbytes = readlink(linkpath, sizeof(linkpath) - 1)) > 0)
+    {
+     /*
+      * Yes, this is a symlink to the actual program, nul-terminate and
+      * use it...
+      */
+
+      linkpath[linkbytes] = '\0';
+
+      if (linkpath[0] == '/')
+        snprintf(processPath, sizeof(processPath), "CFProcessPath=%s",
+	         linkpath);
+      else
+        snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
+	         dirname(command), linkpath);
+    }
+    else
+      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
+
+    envp[envc++] = processPath;
+    envp[envc]   = NULL;
+  }
+#endif	/* __APPLE__ && __GNUC__ > 3 */
 
  /*
   * Block signals before forking...
@@ -142,10 +243,10 @@ cupsdStartProcess(
       */
 
       if (setgid(Group))
-        exit(errno);
+	exit(errno);
 
       if (setgroups(1, &Group))
-        exit(errno);
+	exit(errno);
 
       if (setuid(User))
         exit(errno);
@@ -156,6 +257,7 @@ cupsdStartProcess(
       * Reset group membership to just the main one we belong to.
       */
 
+      setgid(Group);
       setgroups(1, &Group);
     }
 
@@ -212,6 +314,22 @@ cupsdStartProcess(
 
     *pid = 0;
   }
+  else
+  {
+    if (!process_array)
+      process_array = cupsArrayNew((cups_array_func_t)compare_procs, NULL);
+ 
+    if (process_array)
+    {
+      if ((proc = calloc(1, sizeof(cupsd_proc_t) + strlen(command))) != NULL)
+      {
+        proc->pid = *pid;
+	strcpy(proc->name, command);
+
+	cupsArrayAdd(process_array, proc);
+      }
+    }
+  }
 
   cupsdReleaseSignals();
 
@@ -220,5 +338,17 @@ cupsdStartProcess(
 
 
 /*
- * End of "$Id: process.c 4719 2005-09-28 21:12:44Z mike $".
+ * 'compare_procs()' - Compare two processes.
+ */
+
+static int				/* O - Result of comparison */
+compare_procs(cupsd_proc_t *a,		/* I - First process */
+              cupsd_proc_t *b)		/* I - Second process */
+{
+  return (a->pid - b->pid);
+}
+
+
+/*
+ * End of "$Id: process.c 5046 2006-02-01 22:11:58Z mike $".
  */

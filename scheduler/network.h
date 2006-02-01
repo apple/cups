@@ -1,10 +1,10 @@
 /*
- * "$Id: network.h 4719 2005-09-28 21:12:44Z mike $"
+ * "$Id: network.h 5043 2006-02-01 18:55:16Z mike $"
  *
  *   Network interface definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -29,15 +29,13 @@
 
 typedef struct cupsd_netif_s		/**** Network interface data ****/
 {
-  struct cupsd_netif_s	*next;		/* Next interface in list */
-  char			name[32],	/* Network interface name */
-			hostname[HTTP_MAX_HOST];
-					/* Hostname associated with interface */
   int			is_local,	/* Local (not point-to-point) interface? */
 			port;		/* Listen port */
   http_addr_t		address,	/* Network address */
 			mask,		/* Network mask */
 			broadcast;	/* Broadcast address */
+  char			name[32],	/* Network interface name */
+			hostname[1];	/* Hostname associated with interface */
 } cupsd_netif_t;
 
 
@@ -47,18 +45,17 @@ typedef struct cupsd_netif_s		/**** Network interface data ****/
 
 VAR time_t		NetIFTime	VALUE(0);
 					/* Network interface list time */
-VAR cupsd_netif_t	*NetIFList	VALUE(NULL);
-					/* List of network interfaces */
+VAR cups_array_t	*NetIFList	VALUE(NULL);
+					/* Array of network interfaces */
 
 /*
  * Prototypes...
  */
 
 extern cupsd_netif_t	*cupsdNetIFFind(const char *name);
-extern void		cupsdNetIFFree(void);
 extern void		cupsdNetIFUpdate(void);
 
 
 /*
- * End of "$Id: network.h 4719 2005-09-28 21:12:44Z mike $".
+ * End of "$Id: network.h 5043 2006-02-01 18:55:16Z mike $".
  */

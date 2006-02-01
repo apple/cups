@@ -1,6 +1,7 @@
 {#printer_name=0?:
 {[printer_name]
-<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}</H2>
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}
+{?printer_state_message=?:<SPAN CLASS="message">"{printer_state_message}"</SPAN>}</H2>
 
 <TABLE WIDTH="100%" CLASS="button" CELLSPACING="0" CELLPADDING="0">
 <TR>
@@ -10,7 +11,6 @@
 <B>Location:</B> {printer_location}<BR>
 <B>Class State:</B> {printer_state=3?idle:{printer_state=4?processing:stopped}},
 {printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published.
-{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
 {?member_uris=?:<BR>Members: {member_uris}}
 
 <P>

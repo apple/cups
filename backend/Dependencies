@@ -2,24 +2,28 @@
 
 betest.o: ../cups/string.h ../config.h
 ipp.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
-ipp.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/ppd.h
-ipp.o: ../cups/file.h ../cups/language.h ../cups/array.h ../cups/string.h
+ipp.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/backend.h ../cups/cups.h
+ipp.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+ipp.o: ../cups/language.h ../cups/string.h
 lpd.o: ../cups/backend.h ../cups/http-private.h ../config.h ../cups/http.h
-lpd.o: ../cups/md5.h ../cups/cups.h ../cups/ipp.h ../cups/ppd.h
-lpd.o: ../cups/file.h ../cups/string.h
+lpd.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+lpd.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+lpd.o: ../cups/string.h
 parallel.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-parallel.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/string.h
-parallel.o: ../config.h ieee1284.c ../cups/debug.h
+parallel.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+parallel.o: ../cups/language.h ../cups/string.h ../config.h ieee1284.c
+parallel.o: ../cups/debug.h
 scsi.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-scsi.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/string.h
-scsi.o: ../config.h
+scsi.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+scsi.o: ../cups/language.h ../cups/string.h ../config.h
 serial.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-serial.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/string.h
-serial.o: ../config.h
+serial.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+serial.o: ../cups/language.h ../cups/string.h ../config.h
 socket.o: ../cups/backend.h ../cups/http-private.h ../config.h ../cups/http.h
-socket.o: ../cups/md5.h ../cups/cups.h ../cups/ipp.h ../cups/ppd.h
-socket.o: ../cups/file.h ../cups/string.h
+socket.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+socket.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+socket.o: ../cups/string.h
 test1284.o: ../cups/string.h ../config.h ieee1284.c ../cups/debug.h
 usb.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-usb.o: ../cups/md5.h ../cups/ppd.h ../cups/file.h ../cups/string.h
-usb.o: ../config.h
+usb.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+usb.o: ../cups/language.h ../cups/string.h ../config.h

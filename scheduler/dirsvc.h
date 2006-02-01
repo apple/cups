@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h 5020 2006-01-28 13:36:15Z mike $"
+ * "$Id: dirsvc.h 5031 2006-01-31 03:05:32Z mike $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -99,6 +99,8 @@ VAR int			Browsing	VALUE(TRUE),
 					/* Broadcast interval in seconds */
 			BrowseTimeout	VALUE(DEFAULT_TIMEOUT),
 					/* Time out for printers in seconds */
+			UseNetworkDefault VALUE(CUPS_DEFAULT_USE_NETWORK_DEFAULT),
+					/* Use the network default printer? */
 			NumBrowsers	VALUE(0);
 					/* Number of broadcast addresses */
 VAR char		*BrowseLocalOptions
@@ -139,11 +141,6 @@ VAR time_t		BrowseSLPRefresh VALUE(0);
  */
 
 extern void	cupsdLoadRemoteCache(void);
-extern void	cupsdProcessBrowseData(const char *uri, cups_ptype_t type,
-		                       ipp_pstate_t state, const char *location,
-				       const char *info, const char *make_model,
-				       int num_attrs, cups_option_t *attrs);
-extern void	cupsdProcessImplicitClasses(void);
 extern void	cupsdSaveRemoteCache(void);
 extern void	cupsdSendBrowseDelete(cupsd_printer_t *p);
 extern void	cupsdSendBrowseList(void);
@@ -159,5 +156,5 @@ extern void	cupsdUpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id: dirsvc.h 5020 2006-01-28 13:36:15Z mike $".
+ * End of "$Id: dirsvc.h 5031 2006-01-31 03:05:32Z mike $".
  */

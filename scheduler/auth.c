@@ -1,5 +1,5 @@
 ;/*
- * "$Id: auth.c 4929 2006-01-13 16:38:43Z mike $"
+ * "$Id: auth.c 5043 2006-02-01 18:55:16Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -803,7 +803,9 @@ cupsdCheckAuth(
 
             cupsdNetIFUpdate();
 
-	    for (iface = NetIFList; iface != NULL; iface = iface->next)
+	    for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
+		 iface;
+		 iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
 	    {
 	     /*
 	      * Only check local interfaces...
@@ -848,9 +850,9 @@ cupsdCheckAuth(
 	    * Check the named interface...
 	    */
 
-            for (iface = cupsdNetIFFind(masks->mask.name.name);
-	         iface && !strcasecmp(masks->mask.name.name, iface->name);
-		 iface = iface->next)
+	    for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
+	         iface && !strcmp(masks->mask.name.name, iface->name);
+		 iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
 	    {
               if (iface->address.addr.sa_family == AF_INET)
 	      {
@@ -2125,5 +2127,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 4929 2006-01-13 16:38:43Z mike $".
+ * End of "$Id: auth.c 5043 2006-02-01 18:55:16Z mike $".
  */

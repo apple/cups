@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 5007 2006-01-27 18:25:42Z mike $"
+dnl "$Id: cups-common.m4 5025 2006-01-30 03:49:12Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -213,6 +213,26 @@ case $uname in
 		AC_CHECK_HEADER(notify.h,AC_DEFINE(HAVE_NOTIFY_H))
 		AC_CHECK_FUNCS(notify_post)
                 ;;
+
+	Linux*)
+		dnl Check for DBUS support
+                BACKLIBS=""
+		CUPSDLIBS=""
+
+		AC_PATH_PROG(PKGCONFIG, pkg-config)
+		if test "x$PKGCONFIG" != x; then
+			AC_MSG_CHECKING(for DBUS)
+			if $PKGCONFIG --exists dbus-1; then
+				AC_MSG_RESULT(yes)
+				AC_DEFINE(HAVE_DBUS)
+				CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
+				CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
+			else
+				AC_MSG_RESULT(no)
+			fi
+		fi
+		;;
+
         *)
                 BACKLIBS=""
 		CUPSDLIBS=""
@@ -231,5 +251,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 5007 2006-01-27 18:25:42Z mike $".
+dnl End of "$Id: cups-common.m4 5025 2006-01-30 03:49:12Z mike $".
 dnl

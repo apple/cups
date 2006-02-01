@@ -1,9 +1,9 @@
 /*
- * "$Id: job.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: job.c 5046 2006-02-01 22:11:58Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -426,13 +426,13 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     job->status_buffer = NULL;
   }
 
+  printer = job->printer;
+
   if (job->status < 0)
   {
    /*
     * Backend had errors; stop it...
     */
-
-    printer = job->printer;
 
     switch (-job->status)
     {
@@ -540,29 +540,15 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
   else if (job->status > 0)
   {
    /*
-    * Filter had errors; cancel it...
+    * Filter had errors; stop job...
     */
 
-    if (job->current_file < job->num_files)
-      cupsdStartJob(job, job->printer);
-    else
-    {
-      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                    "Job aborted due to filter errors; please consult the "
-		    "error_log file for details.");
-
-      job_history = JobHistory && !(job->dtype & CUPS_PRINTER_REMOTE);
-
-      cupsdCancelJob(job, 0);
-
-      if (job_history)
-      {
-        job->state->values[0].integer = IPP_JOB_ABORTED;
-	cupsdSaveJob(job);
-      }
-
-      cupsdCheckJobs();
-    }
+    cupsdStopJob(job, 1);
+    cupsdSaveJob(job);
+    cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, job->printer, job,
+                  "Job stopped due to filter errors; please consult the "
+		  "error_log file for details.");
+    cupsdCheckJobs();
   }
   else
   {
@@ -572,11 +558,19 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
     if (job->current_file < job->num_files)
     {
+     /*
+      * Start the next file in the job...
+      */
+
       FilterLevel -= job->cost;
       cupsdStartJob(job, job->printer);
     }
     else
     {
+     /*
+      * Close out this job...
+      */
+
       cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                     "Job completed successfully.");
 
@@ -589,6 +583,12 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
         job->state->values[0].integer = IPP_JOB_COMPLETED;
 	cupsdSaveJob(job);
       }
+
+     /*
+      * Clear the printer's state_message and move on...
+      */
+
+      printer->state_message[0] = '\0';
 
       cupsdCheckJobs();
     }
@@ -1334,6 +1334,8 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 			*optptr,	/* Pointer to options */
 			*valptr;	/* Pointer in value string */
   ipp_attribute_t	*attr;		/* Current attribute */
+  struct stat		backinfo;	/* Backend file information */
+  int			backroot;	/* Run backend as root? */
   int			pid;		/* Process ID of new filter process */
   int			banner_page;	/* 1 if banner page, 0 otherwise */
   int			statusfds[2],	/* Pipes used between the filters and scheduler */
@@ -1347,7 +1349,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 			title[IPP_MAX_NAME],
 					/* Job title string */
 			copies[255],	/* # copies string */
-			*envp[100],	/* Environment variables */
+			*envp[MAX_ENV],	/* Environment variables */
 			charset[255],	/* CHARSET environment variable */
 			class_name[255],/* CLASS environment variable */
 			classification[1024],
@@ -2145,6 +2147,17 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       sscanf(printer->device_uri, "%254[^:]", method);
       snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
 
+     /*
+      * See if the backend needs to run as root...
+      */
+
+      if (RunUser)
+        backroot = 0;
+      else if (lstat(command, &backinfo))
+	backroot = 0;
+      else
+        backroot = !(backinfo.st_mode & (S_IRWXG | S_IRWXO));
+
       argv[0] = sani_uri;
 
       filterfds[slot][0] = -1;
@@ -2179,7 +2192,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
       pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
 			      filterfds[slot][1], statusfds[1],
-			      job->back_pipes[1], 1,
+			      job->back_pipes[1], backroot,
 			      &(job->backend));
 
       if (pid == 0)
@@ -2262,6 +2275,9 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
                   job->status_buffer->fd);
 
   FD_SET(job->status_buffer->fd, InputSet);
+
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
+                job->id);
 }
 
 
@@ -2426,7 +2442,10 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
                     "Printed %d page(s).", job->sheets->values[0].integer);
     }
     else if (loglevel == CUPSD_LOG_STATE)
+    {
       cupsdSetPrinterReasons(job->printer, message);
+      cupsdAddPrinterHistory(job->printer);
+    }
     else if (loglevel == CUPSD_LOG_ATTR)
     {
      /*
@@ -2434,6 +2453,42 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
       */
 
       /**** TODO ****/
+    }
+#ifdef __APPLE__
+    else if (!strncmp(message, "recoverable:", 12))
+    {
+      cupsdSetPrinterReasons(job->printer,
+                             "+com.apple.print.recoverable-warning");
+
+      ptr = message + 12;
+      while (isspace(*ptr & 255))
+        ptr ++;
+
+      cupsdSetString(&job->printer->recoverable, ptr);
+      cupsdAddPrinterHistory(job->printer);
+    }
+    else if (!strncmp(message, "recovered:", 10))
+    {
+      cupsdSetPrinterReasons(job->printer,
+                             "-com.apple.print.recoverable-warning");
+
+      ptr = message + 10;
+      while (isspace(*ptr & 255))
+        ptr ++;
+
+      cupsdSetString(&job->printer->recoverable, ptr);
+      cupsdAddPrinterHistory(job->printer);
+    }
+#endif /* __APPLE__ */
+    else
+    {
+     /*
+      * Some message to show in the printer-state-message attribute...
+      */
+
+      strlcpy(job->printer->state_message, message,
+              sizeof(job->printer->state_message));
+      cupsdAddPrinterHistory(job->printer);
     }
 
     if (!strchr(job->status_buffer->buffer, '\n'))
@@ -2686,5 +2741,5 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: job.c 5046 2006-02-01 22:11:58Z mike $".
  */

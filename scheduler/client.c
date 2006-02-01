@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: client.c 5046 2006-02-01 22:11:58Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3205,7 +3205,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   int		envc;			/* Number of environment variables */
   char		argbuf[10240],		/* Argument buffer */
 		*argv[100],		/* Argument strings */
-		*envp[100];		/* Environment variables */
+		*envp[MAX_ENV];		/* Environment variables */
   char		content_length[1024],	/* CONTENT_LENGTH environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		http_cookie[32768],	/* HTTP_COOKIE environment variable */
@@ -3486,5 +3486,5 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: client.c 5046 2006-02-01 22:11:58Z mike $".
  */

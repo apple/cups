@@ -70,6 +70,10 @@ Basic authentication with membership in the group
 	<TD><CODE><A HREF="cupsd-conf-reference.html#LogFilePerm">LogFilePerm</A></CODE></TD>
 	<TD><CODE>@CUPS_LOG_FILE_PERM@</CODE></TD>
 </TR>
+<TR>
+	<TD><CODE><A HREF="cupsd-conf-reference.html#UseNetworkDefault">UseNetworkDefault</A></CODE></TD>
+	<TD><CODE>@CUPS_USE_NETWORK_DEFAULT@</CODE></TD>
+</TR>
 </TABLE></DIV>
 
 

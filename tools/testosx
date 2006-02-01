@@ -34,15 +34,26 @@ killall cupsd || exit 0
 EOF
 chmod 755 $pkgdir/Resources/preflight
 
-cat >$pkgdir/Resources/postflight <<EOF
+if test -x /bin/launchctl; then
+	cat >$pkgdir/Resources/postflight <<EOF
 #!/bin/sh
+
+# Remove old startup item, we use launchd now...
+rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
+
+# Tell launchd to reload cupsd...
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
-sleep 1
-if test -e /private/var/run/cupsd; then
-        chmod g+w,o+w /private/var/run/cupsd
-fi
 EOF
+else
+	cat >$pkgdir/Resources/postflight <<EOF
+#!/bin/sh
+
+# Start cupsd...
+/usr/sbin/cupsd
+EOF
+fi
+
 chmod 755 $pkgdir/Resources/postflight
 
 # Tag the current revision in the plist and web interface files...

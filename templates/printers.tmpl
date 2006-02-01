@@ -1,6 +1,7 @@
 {#printer_name=0?:
 {[printer_name]
-<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}</H2>
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}
+{?printer_state_message=?:<SPAN CLASS="message">"{printer_state_message}"</SPAN>}</H2>
 
 <TABLE WIDTH="100%" CLASS="button" CELLSPACING="0" CELLPADDING="0">
 <TR>
@@ -12,11 +13,6 @@
 <B>Make and Model:</B> {printer_make_and_model}<BR>
 <B>Printer State:</B> {printer_state=3?idle:{printer_state=4?processing:stopped}},
 {printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published.
-{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
-{?printer_state_history2.printer_state_message=?:<BR><I>"{printer_state_history2.printer_state_message}"</I>}
-{?printer_state_history3.printer_state_message=?:<BR><I>"{printer_state_history3.printer_state_message}"</I>}
-{?printer_state_history4.printer_state_message=?:<BR><I>"{printer_state_history4.printer_state_message}"</I>}
-{?printer_state_history5.printer_state_message=?:<BR><I>"{printer_state_history5.printer_state_message}"</I>}
 {?device_uri=?:<BR><B>Device URI:</B> {device_uri}}
 
 <P>

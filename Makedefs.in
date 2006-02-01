@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in 5020 2006-01-28 13:36:15Z mike $"
+# "$Id: Makedefs.in 5044 2006-02-01 21:35:30Z mike $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -46,7 +46,7 @@ STRIP		=	@STRIP@
 # Installation programs...
 #
 
-INSTALL_BIN	=	$(LIBTOOL) $(INSTALL) -m 755 -s
+INSTALL_BIN	=	$(LIBTOOL) $(INSTALL) -m 755
 INSTALL_CONFIG	=	$(INSTALL) -m @CUPS_CONFIG_FILE_PERM@
 INSTALL_DATA	=	$(INSTALL) -m 644
 INSTALL_DIR	=	$(INSTALL) -d
@@ -208,5 +208,5 @@ DEFAULT_LAUNCHD_CONF	=	@DEFAULT_LAUNCHD_CONF@
 
 
 #
-# End of "$Id: Makedefs.in 5020 2006-01-28 13:36:15Z mike $"
+# End of "$Id: Makedefs.in 5044 2006-02-01 21:35:30Z mike $"
 #

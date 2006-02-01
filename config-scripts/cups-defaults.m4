@@ -103,6 +103,18 @@ else
 fi
 AC_SUBST(CUPS_IMPLICIT_CLASSES)
 
+dnl Default UseNetworkDefault
+AC_ARG_ENABLE(network_default, [  --enable-use-network-default
+                          enable UseNetworkDefault by default, default=yes])
+if test "x$enable_network_default" = xno; then
+	CUPS_USE_NETWORK_DEFAULT="No"
+	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 0)
+else
+	CUPS_USE_NETWORK_DEFAULT="Yes"
+	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 1)
+fi
+AC_SUBST(CUPS_USE_NETWORK_DEFAULT)
+
 
 dnl
 dnl End of "$Id$".

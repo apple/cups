@@ -41,7 +41,7 @@ svn export $url /tmp/cups-$version
 echo Updating version information...
 cd /tmp/cups-$version/config-scripts
 
-sed -e '1,$s/^CUPS_VERSION=.*/CUPS_VERSION='$version'/' \
+sed -e '1,$s/^CUPS_VERSION=.*/CUPS_VERSION='$fileversion'/' \
 	<cups-common.m4 >cups-common.m4.new
 mv cups-common.m4.new cups-common.m4
 cd ..

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: main.c 5042 2006-02-01 18:17:34Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -1021,14 +1021,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 #ifdef HAVE_NOTIFY_POST
       if (LastEvent & CUPSD_EVENT_PRINTER_CHANGED)
       {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                "notify_post(\"com.apple.printerListChange\")");
 	notify_post("com.apple.printerListChange");
       }
 
       if (LastEvent & CUPSD_EVENT_PRINTER_STATE_CHANGED)
       {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                "notify_post(\"com.apple.printerHistoryChange\")");
 	notify_post("com.apple.printerHistoryChange");
       }
@@ -1037,7 +1037,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                        CUPSD_EVENT_JOB_CONFIG_CHANGED |
                        CUPSD_EVENT_JOB_PROGRESS))
       {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                "notify_post(\"com.apple.jobChange\")");
 	notify_post("com.apple.jobChange");
       }
@@ -1692,22 +1692,28 @@ launchd_sync_conf(void)
 				&kCFTypeDictionaryKeyCallBacks,
 				&kCFTypeDictionaryValueCallBacks)) != NULL)
   {
-    CFDictionaryAddValue(cupsd_dict, CFSTR("Label"), CFSTR("org.cups.cupsd"));
+    CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_LABEL),
+                         CFSTR("org.cups.cupsd"));
     CFDictionaryAddValue(cupsd_dict, CFSTR("Enabled"), kCFBooleanTrue);
-    CFDictionaryAddValue(cupsd_dict, CFSTR("OnDemand"), kCFBooleanTrue);
+    CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_ONDEMAND),
+                         kCFBooleanTrue);
 
     if ((Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)) ||
         cupsArrayCount(ActiveJobs))
-      CFDictionaryAddValue(cupsd_dict, CFSTR("RunAtLoad"), kCFBooleanTrue);
+      CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_RUNATLOAD),
+                           kCFBooleanTrue);
     else
-      CFDictionaryAddValue(cupsd_dict, CFSTR("RunAtLoad"), kCFBooleanFalse);
+      CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_RUNATLOAD),
+                           kCFBooleanFalse);
 
-    CFDictionaryAddValue(cupsd_dict, CFSTR("ServiceIPC"), kCFBooleanTrue);
+    CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_SERVICEIPC),
+			 kCFBooleanTrue);
 
     if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 2,
                                       &kCFTypeArrayCallBacks)) != NULL)
     {
-      CFDictionaryAddValue(cupsd_dict, CFSTR("ProgramArguments"), array);
+      CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_PROGRAMARGUMENTS),
+                           array);
       CFArrayAppendValue(array, CFSTR("/usr/sbin/cupsd"));
       CFArrayAppendValue(array, CFSTR("-l"));
       CFRelease(array);
@@ -1722,7 +1728,7 @@ launchd_sync_conf(void)
 				&kCFTypeDictionaryKeyCallBacks,
 				&kCFTypeDictionaryValueCallBacks)) != NULL)
     {
-      CFDictionaryAddValue(cupsd_dict, CFSTR("Sockets"), sockets);
+      CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_SOCKETS), sockets);
 
      /*
       * Add a Listeners array to the sockets dictionary...
@@ -1752,7 +1758,8 @@ launchd_sync_conf(void)
 					lis->address.un.sun_path, 
 					kCFStringEncodingUTF8)))
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockPathName"),
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_PATHNAME),
 		                     socket_path);
 		CFRelease(socket_path);
 	      }
@@ -1772,14 +1779,16 @@ launchd_sync_conf(void)
 #  ifdef AF_INET6
 	      if (lis->address.addr.sa_family == AF_INET6)
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockFamily"),
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_FAMILY),
 		                     CFSTR("IPv6"));
 		portnum = lis->address.ipv6.sin6_port;
 	      }
 	      else
 #  endif /* AF_INET6 */
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockFamily"),
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_FAMILY),
 		                     CFSTR("IPv4"));
 		portnum = lis->address.ipv4.sin_port;
 	      }
@@ -1794,7 +1803,9 @@ launchd_sync_conf(void)
 
 	      if (value)
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockServiceName"), value);
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_SERVICENAME),
+				     value);
 		CFRelease(value);
 	      }	
 
@@ -1802,7 +1813,9 @@ launchd_sync_conf(void)
 	      if ((value = CFStringCreateWithCString(kCFAllocatorDefault, temp, 
 						     kCFStringEncodingUTF8)))
 	      {
-		CFDictionaryAddValue(listener, CFSTR("SockNodeName"), value);
+		CFDictionaryAddValue(listener,
+		                     CFSTR(LAUNCH_JOBSOCKETKEY_NODENAME),
+				     value);
 		CFRelease(value);
 	      }
 	    }
@@ -1831,8 +1844,10 @@ launchd_sync_conf(void)
 	  {
 	    CFArrayAppendValue(array, listener);
 
-	    CFDictionaryAddValue(listener, CFSTR("SockFamily"), CFSTR("IPv4"));
-	    CFDictionaryAddValue(listener, CFSTR("SockType"), CFSTR("dgram"));
+	    CFDictionaryAddValue(listener, CFSTR(LAUNCH_JOBSOCKETKEY_FAMILY),
+	                         CFSTR("IPv4"));
+	    CFDictionaryAddValue(listener, CFSTR(LAUNCH_JOBSOCKETKEY_TYPE),
+	                         CFSTR("dgram"));
 
 	    if ((service = getservbyport(BrowsePort, NULL)))
 	      value = CFStringCreateWithCString(kCFAllocatorDefault, 
@@ -1842,7 +1857,8 @@ launchd_sync_conf(void)
 	      value = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, 
 				     &BrowsePort);
 
-	    CFDictionaryAddValue(listener, CFSTR("SockServiceName"), value);
+	    CFDictionaryAddValue(listener,
+	                         CFSTR(LAUNCH_JOBSOCKETKEY_SERVICENAME), value);
 	    CFRelease(value);
 
 	    CFRelease(listener);
@@ -1920,6 +1936,7 @@ process_children(void)
   int		pid;			/* Process ID of child */
   cupsd_job_t	*job;			/* Current job */
   int		i;			/* Looping var */
+  char		name[1024];		/* Process name */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "process_children()");
@@ -1942,12 +1959,11 @@ process_children(void)
   if ((pid = wait(&status)) > 0)
 #endif /* HAVE_WAITPID */
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "process_children: pid = %d, status = %d\n", pid, status);
-
    /*
     * Ignore SIGTERM errors - that comes when a job is cancelled...
     */
+
+    cupsdFinishProcess(pid, name, sizeof(name));
 
     if (status == SIGTERM)
       status = 0;
@@ -1955,18 +1971,19 @@ process_children(void)
     if (status)
     {
       if (WIFEXITED(status))
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d stopped with status %d!", pid,
-	                WEXITSTATUS(status));
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) stopped with status %d!",
+	                pid, name, WEXITSTATUS(status));
       else
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d crashed on signal %d!", pid,
-	                WTERMSIG(status));
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d!",
+	                pid, name, WTERMSIG(status));
 
       if (LogLevel < CUPSD_LOG_DEBUG)
         cupsdLogMessage(CUPSD_LOG_INFO,
 	                "Hint: Try setting the LogLevel to \"debug\" to find out more.");
     }
     else
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "PID %d exited with no errors.", pid);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
+                      pid, name);
 
    /*
     * Delete certificates for CGI processes...
@@ -2014,6 +2031,13 @@ process_children(void)
  	      job->status = status;	/* Filter failed */
 	    else
  	      job->status = -status;	/* Backend failed */
+
+            if (job->printer && !(job->printer->type & CUPS_PRINTER_FAX))
+	    {
+              snprintf(job->printer->state_message,
+	               sizeof(job->printer->state_message), "%s failed", name);
+              cupsdAddPrinterHistory(job->printer);
+	    }
 	  }
 
 	 /*
@@ -2292,5 +2316,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: main.c 5042 2006-02-01 18:17:34Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 4970 2006-01-24 14:05:45Z mike $"
+ * "$Id: printers.h 5039 2006-02-01 16:29:57Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -80,6 +80,9 @@ typedef struct cupsd_printer_s
   int		num_history;		/* Number of history collections */
   ipp_t		**history;		/* History data */
   int		sequence_number;	/* Increasing sequence number */
+#ifdef __APPLE__
+  char		*recoverable;		/* com.apple.print.recoverable-message */
+#endif /* __APPLE__ */
 } cupsd_printer_t;
 
 
@@ -141,5 +144,5 @@ extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
 
 
 /*
- * End of "$Id: printers.h 4970 2006-01-24 14:05:45Z mike $".
+ * End of "$Id: printers.h 5039 2006-02-01 16:29:57Z mike $".
  */

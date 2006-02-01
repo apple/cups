@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c 4983 2006-01-25 21:53:43Z mike $"
+ * "$Id: file.c 5026 2006-01-30 21:59:02Z mike $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -1421,7 +1421,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       }
 
       if (bytes < 10 || fp->buf[0] != 0x1f ||
-          (unsigned char)fp->buf[1] != 0x8b ||
+          (fp->buf[1] & 255) != 0x8b ||
           fp->buf[2] != 8 || (fp->buf[3] & 0xe0) != 0)
       {
        /*
@@ -1770,5 +1770,5 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * End of "$Id: file.c 4983 2006-01-25 21:53:43Z mike $".
+ * End of "$Id: file.c 5026 2006-01-30 21:59:02Z mike $".
  */

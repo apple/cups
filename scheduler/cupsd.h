@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h 5007 2006-01-27 18:25:42Z mike $"
+ * "$Id: cupsd.h 5046 2006-02-01 22:11:58Z mike $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -85,6 +85,7 @@ extern const char *cups_hstrerror(int);
  * Implementation limits...
  */
 
+#define MAX_ENV			100	/* Maximum number of environment strings */
 #define MAX_USERPASS		33	/* Maximum size of username/password */
 #define MAX_FILTERS		20	/* Maximum number of filters */
 #define MAX_SYSTEM_GROUPS	32	/* Maximum number of system groups */
@@ -192,11 +193,12 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 ;
 
 extern int	cupsdEndProcess(int pid, int force);
+extern const char *cupsdFinishProcess(int pid, char *name, int namelen);
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
 				  int errfd, int backfd, int root, int *pid);
 
 
 /*
- * End of "$Id: cupsd.h 5007 2006-01-27 18:25:42Z mike $".
+ * End of "$Id: cupsd.h 5046 2006-02-01 22:11:58Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 5020 2006-01-28 13:36:15Z mike $"
+ * "$Id: conf.c 5028 2006-01-31 01:16:43Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -162,7 +162,8 @@ static cupsd_var_t	variables[] =
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
   { "TempDir",			&TempDir,		CUPSD_VARTYPE_STRING },
-  { "Timeout",			&Timeout,		CUPSD_VARTYPE_INTEGER }
+  { "Timeout",			&Timeout,		CUPSD_VARTYPE_INTEGER },
+  { "UseNetworkDefault",	&UseNetworkDefault,	CUPSD_VARTYPE_BOOLEAN }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
 
@@ -3123,5 +3124,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 5020 2006-01-28 13:36:15Z mike $".
+ * End of "$Id: conf.c 5028 2006-01-31 01:16:43Z mike $".
  */
