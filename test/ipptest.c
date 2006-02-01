@@ -23,11 +23,12 @@
  *
  * Contents:
  *
- *   main()          - Parse options and do tests.
- *   do_tests()      - Do tests as specified in the test file.
- *   get_tag()       - Get an IPP value or group tag from a name...
- *   get_token()     - Get a token from a file.
- *   print_attr()    - Print an attribute on the screen.
+ *   main()       - Parse options and do tests.
+ *   do_tests()   - Do tests as specified in the test file.
+ *   get_tag()    - Get an IPP value or group tag from a name...
+ *   get_token()  - Get a token from a file.
+ *   print_attr() - Print an attribute on the screen.
+ *   usage()      - Show program usage.
  */
 
 /*
@@ -45,6 +46,13 @@
 
 
 /*
+ * Globals...
+ */
+
+int	Verbosity = 0;			/* Show all attributes? */
+
+
+/*
  * Local functions...
  */
 
@@ -54,6 +62,7 @@ ipp_status_t	ippErrorValue(const char *);
 ipp_tag_t	get_tag(const char *);
 char		*get_token(FILE *, char *, int, int *linenum);
 void		print_attr(ipp_attribute_t *);
+void		usage(const char *option);
 
 
 /*
@@ -66,6 +75,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		i;			/* Looping var */
   int		status;			/* Status of tests... */
+  const char	*uri;			/* URI to use */
+  const char	*testfile;		/* Test file to use */
 
 
  /*
@@ -74,24 +85,54 @@ main(int  argc,				/* I - Number of command-line arguments */
   *     testipp URL testfile
   */
 
-  if (argc < 3)
+  uri      = NULL;
+  testfile = NULL;
+  status   = 0;
+
+  for (i = 1; i < argc; i ++)
   {
-    fputs("Usage: ipptest URL testfile [ ... testfileN ]\n", stderr);
-    return (1);
+    if (argv[i][0] == '-')
+    {
+      if (!strcmp(argv[i], "-v"))
+        Verbosity ++;
+      else
+        usage(argv[i]);
+    }
+    else if (!strncmp(argv[i], "ipp://", 6) ||
+             !strncmp(argv[i], "http://", 7) ||
+             !strncmp(argv[i], "https://", 8))
+    {
+     /*
+      * Set URI...
+      */
+
+      if (!testfile && uri)
+        usage(NULL);
+
+      uri      = argv[i];
+      testfile = NULL;
+    }
+    else
+    {
+     /*
+      * Run test...
+      */
+
+      testfile = argv[i];
+
+      if (!do_tests(uri, testfile))
+        status ++;
+    }
   }
 
- /*
-  * Run tests...
-  */
-
-  for (i = 2, status = 1; status && i < argc; i ++)
-    status = status && do_tests(argv[1], argv[i]);
+  if (!uri || !testfile)
+    usage(NULL);
 
  /*
   * Exit...
   */
 
-  return (!status);
+  return (status);
 }
 
 
@@ -525,7 +566,12 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	printf("        RECEIVED: %lu bytes in response\n",
 	       (unsigned long)ippLength(response));
 
-        if (num_displayed > 0)
+        if (Verbosity)
+	{
+	  for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
+	    print_attr(attrptr);
+        }
+        else if (num_displayed > 0)
 	{
 	  for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
 	    if (attrptr->name)
@@ -782,6 +828,25 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
   }
 
   putchar('\n');
+}
+
+
+/*
+ * 'usage()' - Show program usage.
+ */
+
+void
+usage(const char *option)		/* I - Option string or NULL */
+{
+  if (option)
+    fprintf(stderr, "ipptest: Unknown option \"%s\"!\n", option);
+
+  fputs("Usage: ipptest [options] URL testfile [ ... testfileN ]\n", stderr);
+  fputs("Options:\n", stderr);
+  fputs("\n", stderr);
+  fputs("-v     Show all attributes in response, even on success.\n", stderr);
+
+  exit(1);
 }
 
 
