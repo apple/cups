@@ -3325,6 +3325,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   if (!cupsdStartProcess(buffer, argv, envp, -1, temppipe[1], CGIPipes[1],
                          -1, 0, &temppid))
   {
+    free(input);
     close(tempfd);
     unlink(tempfile);
     return (-1);
@@ -3396,6 +3397,8 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
   close(temppipe[0]);
   close(tempfd);
+
+  free(input);
 
   if (!total)
   {
@@ -5096,9 +5099,9 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
 
   snprintf(command, sizeof(command), "%s/daemon/cups-deviced", ServerBin);
   snprintf(options, sizeof(options),
-           "cups-deviced %d+%d+requested-attributes=%s",
+           "cups-deviced %d+%d+%d+requested-attributes=%s",
            con->request->request.op.request_id,
-           limit ? limit->values[0].integer : 0,
+           limit ? limit->values[0].integer : 0, User,
 	   attrs);
 
   if (cupsdSendCommand(con, command, options, 1))

@@ -198,10 +198,10 @@ cupsdStartProcess(
       */
 
       if (setgid(Group))
-        exit(errno);
+	exit(errno);
 
       if (setgroups(1, &Group))
-        exit(errno);
+	exit(errno);
 
       if (setuid(User))
         exit(errno);
@@ -212,6 +212,7 @@ cupsdStartProcess(
       * Reset group membership to just the main one we belong to.
       */
 
+      setgid(Group);
       setgroups(1, &Group);
     }
 

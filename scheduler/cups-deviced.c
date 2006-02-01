@@ -58,6 +58,7 @@ typedef struct
 
 static int		alarm_tripped;	/* Non-zero if alarm was tripped */
 static cups_array_t	*devs;		/* Device info */
+static int		normal_user;	/* Normal user ID */
 
 
 /*
@@ -87,6 +88,7 @@ main(int  argc,				/* I - Number of command-line args */
 {
   const char	*server_bin;		/* CUPS_SERVERBIN environment variable */
   char		backends[1024];		/* Location of backends */
+  int		request_id;		/* Request ID */
   int		count;			/* Number of devices from backend */
   int		compat;			/* Compatibility device? */
   FILE		*fp;			/* Pipe to device backend */
@@ -113,17 +115,67 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
+  setbuf(stderr, NULL);
+
  /*
   * Check the command-line...
   */
 
-  if (argc != 4)
+  if (argc > 1)
+    request_id = atoi(argv[1]);
+  else
+    request_id = 1;
+
+  if (argc != 5)
   {
-    fputs("Usage: cups-deviced request_id limit options\n", stderr);
+    fputs("Usage: cups-deviced request-id limit user-id options\n", stderr);
+
+    cupsdSendIPPHeader(IPP_BAD_REQUEST, request_id);
+    cupsdSendIPPGroup(IPP_TAG_OPERATION);
+    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+                       "en-US");
+    cupsdSendIPPString(IPP_TAG_TEXT, "status-message",
+                       "Bad command-line arguments passed to cups-deviced!");
+    cupsdSendIPPTrailer();
+
     return (1);
   }
 
-  num_options = cupsParseOptions(argv[3], 0, &options);
+  if (request_id < 1)
+  {
+    fprintf(stderr, "cups-deviced: Bad request ID %d!\n", request_id);
+
+    cupsdSendIPPHeader(IPP_BAD_REQUEST, request_id);
+    cupsdSendIPPGroup(IPP_TAG_OPERATION);
+    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+                       "en-US");
+    cupsdSendIPPString(IPP_TAG_TEXT, "status-message",
+                       "Bad request ID argument passed to cups-deviced!");
+    cupsdSendIPPTrailer();
+
+    return (1);
+  }
+
+  normal_user = atoi(argv[3]);
+  if (normal_user <= 0)
+  {
+    fprintf(stderr, "cups-deviced: Bad user %d!\n", normal_user);
+
+    cupsdSendIPPHeader(IPP_BAD_REQUEST, request_id);
+    cupsdSendIPPGroup(IPP_TAG_OPERATION);
+    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+                       "en-US");
+    cupsdSendIPPString(IPP_TAG_TEXT, "status-message",
+                       "Bad user ID argument passed to cups-deviced!");
+    cupsdSendIPPTrailer();
+
+    return (1);
+  }
+
+  num_options = cupsParseOptions(argv[4], 0, &options);
   requested   = cupsGetOption("requested-attributes", num_options, options);
 
   if (!requested || strstr(requested, "all"))
@@ -154,8 +206,19 @@ main(int  argc,				/* I - Number of command-line args */
 
   if ((dir = cupsDirOpen(backends)) == NULL)
   {
-    fprintf(stderr, "ERROR: [cups-deviced] Unable to open backend directory \"%s\": %s",
-            backends, strerror(errno));
+    fprintf(stderr, "ERROR: [cups-deviced] Unable to open backend directory "
+                    "\"%s\": %s", backends, strerror(errno));
+
+    snprintf(line, sizeof(line), "Unable to open backend directory \"%s\": %s",
+             backends, strerror(errno));
+    cupsdSendIPPHeader(IPP_BAD_REQUEST, request_id);
+    cupsdSendIPPGroup(IPP_TAG_OPERATION);
+    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+                       "en-US");
+    cupsdSendIPPString(IPP_TAG_TEXT, "status-message", line);
+    cupsdSendIPPTrailer();
+
     return (1);
   }
 
@@ -171,6 +234,31 @@ main(int  argc,				/* I - Number of command-line args */
 
   while ((dent = cupsDirRead(dir)) != NULL)
   {
+   /*
+    * Skip entries that are not executable files...
+    */
+
+    if (!S_ISREG(dent->fileinfo.st_mode) ||
+        (dent->fileinfo.st_mode & (S_IRUSR | S_IXUSR)) != (S_IRUSR | S_IXUSR))
+      continue;
+
+   /*
+    * Change effective users depending on the backend permissions...
+    */
+
+    if (!getuid())
+    {
+     /*
+      * Backends without permissions for normal users run as root,
+      * all others run as the unprivileged user...
+      */
+
+      if (!(dent->fileinfo.st_mode & (S_IRWXG | S_IRWXO)))
+        seteuid(0);
+      else
+        seteuid(normal_user);
+    }
+
    /*
     * Run the backend with no arguments and collect the output...
     */
@@ -250,7 +338,8 @@ main(int  argc,				/* I - Number of command-line args */
 	    return (1);
 	  }
 
-          fprintf(stderr, "DEBUG: [cups-deviced] Added device \"%s\"...\n", uri);
+          fprintf(stderr, "DEBUG: [cups-deviced] Added device \"%s\"...\n",
+	          uri);
 	  count ++;
 	}
       }
@@ -262,8 +351,8 @@ main(int  argc,				/* I - Number of command-line args */
       alarm(0);
 
       if (alarm_tripped)
-        fprintf(stderr, "WARNING: [cups-deviced] Backend \"%s\" did not respond within 30 seconds!\n",
-	        dent->filename);
+        fprintf(stderr, "WARNING: [cups-deviced] Backend \"%s\" did not "
+	                "respond within 30 seconds!\n", dent->filename);
 
       pclose(fp);
 
@@ -284,16 +373,23 @@ main(int  argc,				/* I - Number of command-line args */
 	  return (1);
 	}
 
-        fprintf(stderr, "DEBUG: [cups-deviced] Compatibility device \"%s\"...\n",
-	        dent->filename);
+        fprintf(stderr, "DEBUG: [cups-deviced] Compatibility device "
+	                "\"%s\"...\n", dent->filename);
       }
     }
     else
-      fprintf(stderr, "WARNING: [cups-deviced] Unable to execute \"%s\" backend: %s\n",
-              dent->filename, strerror(errno));
+      fprintf(stderr, "WARNING: [cups-deviced] Unable to execute \"%s\" "
+                      "backend: %s\n", dent->filename, strerror(errno));
   }
 
   cupsDirClose(dir);
+
+ /*
+  * Switch back to root as needed...
+  */
+
+  if (!getuid() && geteuid())
+    seteuid(0);
 
  /*
   * Output the list of devices...
@@ -301,7 +397,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   puts("Content-Type: application/ipp\n");
 
-  cupsdSendIPPHeader(IPP_OK, atoi(argv[1]));
+  cupsdSendIPPHeader(IPP_OK, request_id);
   cupsdSendIPPGroup(IPP_TAG_OPERATION);
   cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
   cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language", "en-US");

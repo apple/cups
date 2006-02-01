@@ -391,7 +391,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
   strlcpy(dp->entry.filename, entry->d_name, sizeof(dp->entry.filename));
 
   snprintf(filename, sizeof(filename), "%s/%s", dp->directory, entry->d_name);
-  if (stat(filename, &(dp->entry.fileinfo)))
+  if (lstat(filename, &(dp->entry.fileinfo)))
   {
     DEBUG_printf(("    stat() failed for \"%s\" - %s...\n", filename,
                   strerror(errno)));

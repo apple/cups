@@ -1334,6 +1334,8 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 			*optptr,	/* Pointer to options */
 			*valptr;	/* Pointer in value string */
   ipp_attribute_t	*attr;		/* Current attribute */
+  struct stat		backinfo;	/* Backend file information */
+  int			backroot;	/* Run backend as root? */
   int			pid;		/* Process ID of new filter process */
   int			banner_page;	/* 1 if banner page, 0 otherwise */
   int			statusfds[2],	/* Pipes used between the filters and scheduler */
@@ -2145,6 +2147,17 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       sscanf(printer->device_uri, "%254[^:]", method);
       snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
 
+     /*
+      * See if the backend needs to run as root...
+      */
+
+      if (RunUser)
+        backroot = 0;
+      else if (lstat(command, &backinfo))
+	backroot = 0;
+      else
+        backroot = !(backinfo.st_mode & (S_IRWXG | S_IRWXO));
+
       argv[0] = sani_uri;
 
       filterfds[slot][0] = -1;
@@ -2179,7 +2192,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
       pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
 			      filterfds[slot][1], statusfds[1],
-			      job->back_pipes[1], 1,
+			      job->back_pipes[1], backroot,
 			      &(job->backend));
 
       if (pid == 0)
