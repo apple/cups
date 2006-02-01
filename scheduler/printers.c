@@ -242,6 +242,11 @@ cupsdAddPrinterHistory(
   ippAddBoolean(history, IPP_TAG_PRINTER, "printer-is-shared", p->shared);
   ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-state-message",
                NULL, p->state_message);
+#ifdef __APPLE__
+  if (p->recoverable)
+    ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                 "com.apple.print.recoverable-message", NULL, p->recoverable);
+#endif /* __APPLE__ */
   if (p->num_reasons == 0)
     ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                  "printer-state-reasons", NULL,
@@ -795,6 +800,10 @@ cupsdDeletePrinter(
   cupsdClearString(&p->port_monitor);
   cupsdClearString(&p->op_policy);
   cupsdClearString(&p->error_policy);
+
+#ifdef __APPLE__
+  cupsdClearString(&p->recoverable);
+#endif /* __APPLE__ */
 
   free(p);
 

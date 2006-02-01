@@ -2441,6 +2441,32 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
 
       /**** TODO ****/
     }
+#ifdef __APPLE__
+    else if (!strncmp(message, "recoverable:", 12))
+    {
+      cupsdSetPrinterReasons(job->printer,
+                             "+com.apple.print.recoverable-warning");
+
+      message += 12;
+      while (isspace(*message & 255))
+        message ++;
+
+      cupsdSetString(&job->printer->recoverable, message);
+      cupsdAddPrinterHistory(job->printer);
+    }
+    else if (!strncmp(message, "recovered:", 10))
+    {
+      cupsdSetPrinterReasons(job->printer,
+                             "-com.apple.print.recoverable-warning");
+
+      message += 10;
+      while (isspace(*message & 255))
+        message ++;
+
+      cupsdSetString(&job->printer->recoverable, message);
+      cupsdAddPrinterHistory(job->printer);
+    }
+#endif /* __APPLE__ */
     else
     {
      /*

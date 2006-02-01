@@ -3694,6 +3694,14 @@ copy_printer_attrs(
 
   curtime = time(NULL);
 
+#ifdef __APPLE__
+  if ((!ra || cupsArrayFind(ra, "com.apple.print.recoverable-message")) &&
+      printer->recoverable)
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                 "com.apple.print.recoverable-message", NULL,
+		 printer->recoverable);
+#endif /* __APPLE__ */
+
   if (!ra || cupsArrayFind(ra, "printer-current-time"))
     ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
                ippTimeToDate(curtime));
