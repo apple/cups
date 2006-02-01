@@ -1349,7 +1349,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 			title[IPP_MAX_NAME],
 					/* Job title string */
 			copies[255],	/* # copies string */
-			*envp[100],	/* Environment variables */
+			*envp[MAX_ENV],	/* Environment variables */
 			charset[255],	/* CHARSET environment variable */
 			class_name[255],/* CLASS environment variable */
 			classification[1024],

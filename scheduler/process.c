@@ -121,15 +121,60 @@ cupsdStartProcess(
     int        root,			/* I - Run as root? */
     int        *pid)			/* O - Process ID */
 {
-  cupsd_proc_t		*proc;		/* New process record */
+  cupsd_proc_t	*proc;			/* New process record */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction	action;		/* POSIX signal handler */
+  struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#if defined(__APPLE__) && __GNUC__ < 4
+  int		envc;			/* Number of environment variables */
+  char		processPath[1024],	/* CFProcessPath environment variable */
+		linkpath[1024];		/* Link path for symlinks... */
+  int		linkbytes;		/* Bytes for link path */
+#endif /* __APPLE__ && __GNUC__ < 4 */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdStartProcess(\"%s\", %p, %p, %d, %d, %d)",
                   command, argv, envp, infd, outfd, errfd);
+
+#if defined(__APPLE__) && __GNUC__ < 4
+ /*
+  * Add special voodoo magic for MacOS X 10.3 and earlier - this allows
+  * MacOS X programs to access their bundle resources properly...
+  */
+
+  for (envc = 0; envc < MAX_ENV && envp[envc]; envc ++);
+    /* All callers pass in a MAX_ENV element array of environment strings */
+
+  if (envc < (MAX_ENV - 1))
+  {
+   /*
+    * We have room, try to read the symlink path for this command...
+    */
+
+    if ((linkbytes = readlink(linkpath, sizeof(linkpath) - 1)) > 0)
+    {
+     /*
+      * Yes, this is a symlink to the actual program, nul-terminate and
+      * use it...
+      */
+
+      linkpath[linkbytes] = '\0';
+
+      if (linkpath[0] == '/')
+        snprintf(processPath, sizeof(processPath), "CFProcessPath=%s",
+	         linkpath);
+      else
+        snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
+	         dirname(command), linkpath);
+    }
+    else
+      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
+
+    envp[envc++] = processPath;
+    envp[envc]   = NULL;
+  }
+#endif	/* __APPLE__ && __GNUC__ > 3 */
 
  /*
   * Block signals before forking...

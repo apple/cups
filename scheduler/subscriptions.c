@@ -1516,7 +1516,7 @@ cupsd_start_notifier(
   int	fds[2];				/* Pipe file descriptors */
   int	envc;				/* Number of environment variables */
   char	*argv[4],			/* Command-line arguments */
-	*envp[100],			/* Environment variables */
+	*envp[MAX_ENV],			/* Environment variables */
 	user_data[128],			/* Base-64 encoded user data */
 	scheme[256],			/* notify-recipient-uri scheme */
 	*ptr,				/* Pointer into scheme */

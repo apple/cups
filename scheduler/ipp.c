@@ -3263,7 +3263,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   int		temppid;		/* Process ID of cups-driverd */
   int		temppipe[2];		/* Temporary pipes */
   char		*argv[4],		/* Command-line arguments */
-		*envp[100];		/* Environment */
+		*envp[MAX_ENV];		/* Environment */
   cups_file_t	*src,			/* Source file */
 		*dst;			/* Destination file */
   int		bytes,			/* Bytes from pipe */

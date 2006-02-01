@@ -3,7 +3,7 @@
  *
  *   Environment management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -43,7 +43,7 @@
  */
 
 static int	num_common_env = 0;	/* Number of common env vars */
-static char	*common_env[100];	/* Common env vars */
+static char	*common_env[MAX_ENV];	/* Common env vars */
 
 
 /*
@@ -76,15 +76,15 @@ cupsdInitEnv(void)
 
   cupsdClearEnv();
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && __GNUC__ > 3
  /*
-  * Add special voodoo magic for MacOS X - this allows MacOS X programs
-  * to access their bundle resources properly...
+  * Add special voodoo magic for MacOS X 10.4 and later - this allows MacOS
+  * X programs to access their bundle resources properly...
   */
 
   cupsdSetString(common_env, "<CFProcessPath>");
   num_common_env = 1;
-#endif	/* __APPLE__ */
+#endif	/* __APPLE__ && __GNUC__ > 3 */
 
  /*
   * Set common variables...
