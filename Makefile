@@ -103,17 +103,12 @@ install:	installhdrs
 	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
 		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
-			$(INSTALL_SCRIPT) init/PrintingServices.standard $(BUILDROOT)$(INITDDIR)/PrintingServices; \
+			$(INSTALL_SCRIPT) init/PrintingServices $(BUILDROOT)$(INITDDIR)/PrintingServices; \
 			$(INSTALL_DATA) init/StartupParameters.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
 			$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
 			$(INSTALL_DATA) init/Localizable.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
 		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
 			$(INSTALL_DATA) init/org.cups.cupsd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
-			$(INSTALL_DIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices; \
-			$(INSTALL_SCRIPT) init/PrintingServices.launchd $(BUILDROOT)/System/Library/StartupItems/PrintingServices/PrintingServices; \
-			$(INSTALL_DATA) init/StartupParameters.plist $(BUILDROOT)/System/Library/StartupItems/PrintingServices/StartupParameters.plist; \
-			$(INSTALL_DIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices/Resources/English.lproj; \
-			$(INSTALL_DATA) init/Localizable.strings $(BUILDROOT)/System/Library/StartupItems/PrintingServices/Resources/English.lproj/Localizable.strings; \
 		else \
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		fi \

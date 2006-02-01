@@ -34,22 +34,26 @@ killall cupsd || exit 0
 EOF
 chmod 755 $pkgdir/Resources/preflight
 
-cat >$pkgdir/Resources/postflight <<EOF
-#!/bin/sh
-rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
 if test -x /bin/launchctl; then
-	launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
-	launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
-	sleep 1
-	if test -e /private/var/run/cupsd; then
-	        chmod a+rwx /private/var/run/cupsd
-	fi
-	ln -s PrintingServices.launchd /System/Library/StartupItems/PrintingServices/PrintingServices
+	cat >$pkgdir/Resources/postflight <<EOF
+#!/bin/sh
+
+# Remove old startup item, we use launchd now...
+rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
+
+# Tell launchd to reload cupsd...
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
+EOF
 else
-	ln -s PrintingServices.standard /System/Library/StartupItems/PrintingServices/PrintingServices
+	cat >$pkgdir/Resources/postflight <<EOF
+#!/bin/sh
+
+# Start cupsd...
+/usr/sbin/cupsd
+EOF
 fi
 
-EOF
 chmod 755 $pkgdir/Resources/postflight
 
 # Tag the current revision in the plist and web interface files...
@@ -67,11 +71,6 @@ sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
 # Install CUPS into the Package directory...
 #make INSTALL=$topdir/install-sh BUILDROOT=$pkgdir/Package install
 make BUILDROOT=$pkgdir/Package install
-
-# Install standard startup script and rename launchd startup script...
-temp=$pkgdir/Package/System/Library/StartupItems/PrintingServices
-mv $temp/PrintingServices $temp/PrintingServices.launchd
-/usr/bin/install -c -m 755 init/PrintingServices.standard $temp/PrintingServices.standard
 
 # Figure out where PackageMaker is installled...
 if test -d /Developer/Applications/Utilities/PackageMaker.app; then
