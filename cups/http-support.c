@@ -1192,7 +1192,9 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
   * or the end of the string.
   */
 
-  for (ptr = dst, end = dst + dstsize - 1; *src && !strchr(term, *src); src ++)
+  for (ptr = dst, end = dst + dstsize - 1;
+       *src && (!term || !strchr(term, *src));
+       src ++)
     if (ptr < end)
     {
       if (*src == '%' && decode)
