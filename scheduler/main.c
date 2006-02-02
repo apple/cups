@@ -37,7 +37,7 @@
  *   launchd_reload()          - Tell launchd to reload the configuration
  *                               file to pick up the new listening directives.
  *   launchd_sync_conf()       - Re-write the launchd(8) config file 
- *			         com.easysw.cupsd.plist based on cupsd.conf.
+ *			         org.cups.cupsd.plist based on cupsd.conf.
  *   parent_handler()          - Catch USR1/CHLD signals...
  *   process_children()        - Process all dead children...
  *   sigchld_handler()         - Handle 'child' signals from old processes.
@@ -1643,7 +1643,7 @@ launchd_sync_conf(void)
 {
   int			  i,		/* Looping var */
 			  portnum;	/* Port number */
-  CFMutableDictionaryRef  cupsd_dict,	/* com.easysw.cupsd.plist dictionary */
+  CFMutableDictionaryRef  cupsd_dict,	/* org.cups.cupsd.plist dictionary */
 			  sockets,	/* Sockets dictionary */
 			  listener;	/* Listener dictionary */
   CFDataRef		  resourceData;	/* XML representation of the property list */
@@ -1657,7 +1657,7 @@ launchd_sync_conf(void)
   struct servent	  *service;	/* Services data base entry */
   char			  temp[1024];	/* Temporary buffer for value */
   struct stat		  cupsd_sb,	/* File info for cupsd.conf */
-			  launchd_sb;	/* File info for com.easysw.cupsd.plist */
+			  launchd_sb;	/* File info for org.cups.cupsd.plist */
 
 
  /*
@@ -1676,7 +1676,7 @@ launchd_sync_conf(void)
   }
 
  /*
-  * Time to write a new 'com.easysw.cupsd.plist' file.
+  * Time to write a new 'org.cups.cupsd.plist' file.
   * Create the new dictionary and populate it with values...
   */
 
@@ -1698,8 +1698,10 @@ launchd_sync_conf(void)
       CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_RUNATLOAD),
                            kCFBooleanFalse);
 
+#ifdef LAUNCH_JOBKEY_SERVICEIPC
     CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_SERVICEIPC),
 			 kCFBooleanTrue);
+#endif  /* LAUNCH_JOBKEY_SERVICEIPC */
 
     if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 2,
                                       &kCFTypeArrayCallBacks)) != NULL)
