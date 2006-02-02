@@ -160,6 +160,10 @@ VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
 VAR int			NeedReload	VALUE(RELOAD_ALL);
 					/* Need to load configuration? */
+#ifdef HAVE_LAUNCH_H
+VAR int			Launchd		VALUE(0);
+					/* Running from launchd */
+#endif /* HAVE_LAUNCH_H */
 
 
 /*

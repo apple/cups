@@ -4,7 +4,7 @@
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -293,9 +293,16 @@ cupsdStartListening(void)
                       "cupsdStartListening: Listening to %s:%d on fd %d...",
         	      s, p, lis->fd);
     else
+    {
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "cupsdStartListening: Listening to %s on fd %d...",
         	      s, lis->fd);
+
+      if (chmod(s, 0140777))
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"cupsdStartListening: Unable to change permisssions on "
+			"domain socket \"%s\" - %s", s, strerror(errno));
+    }
 
    /*
     * Save the first port that is bound to the local loopback or
@@ -372,7 +379,7 @@ cupsdStartListening(void)
 void
 cupsdStopListening(void)
 {
-  int		i;		/* Looping var */
+  int			i;		/* Looping var */
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
@@ -392,11 +399,15 @@ cupsdStopListening(void)
 #endif /* WIN32 */
 
 #ifdef AF_LOCAL
-   /*
-    * Remove domain sockets...
-    */
+     /*
+      * Remove domain sockets...
+      */
 
+#  ifdef HAVE_LAUNCH_H
+      if (lis->address.addr.sa_family == AF_LOCAL && !Launchd)
+#  else
       if (lis->address.addr.sa_family == AF_LOCAL)
+#  endif /* HAVE_LAUNCH_H */
 	unlink(lis->address.un.sun_path);
 #endif /* AF_LOCAL */
     }

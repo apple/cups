@@ -140,8 +140,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   struct stat		statbuf;	/* Needed for checking lpsched FIFO */
 #endif /* __sgi */
 #if HAVE_LAUNCHD
-  int			launchd,	/* Started with the -l option? */
-			launchd_idle_exit;
+  int			launchd_idle_exit;
 					/* Idle exit on select timeout? */
 #endif	/* HAVE_LAUNCHD */
 
@@ -150,10 +149,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Check for command-line arguments...
   */
 
-  fg      = 0;
-#if HAVE_LAUNCHD
-  launchd = 0;
-#endif /* HAVE_LAUNCHD */
+  fg = 0;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -216,7 +212,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
           case 'l' : /* Started by launchd... */
 #ifdef HAVE_LAUNCHD
-	      launchd = 1;
+	      Launchd = 1;
 	      fg      = 1;
 #else
 	      _cupsLangPuts(stderr, _("cupsd: launchd(8) support not compiled "
@@ -396,7 +392,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
 #if HAVE_LAUNCHD
-  if (launchd)
+  if (Launchd)
   {
    /*
     * If we were started by launchd make sure the cupsd plist file contains the
@@ -632,7 +628,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
 
 #if HAVE_LAUNCHD
-	if (launchd)
+	if (Launchd)
 	{
 	  if (launchd_sync_conf())
 	  {
@@ -680,7 +676,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * inactivity...
     */
 
-    if (timeout.tv_sec == 86400 && launchd && LaunchdTimeout && 
+    if (timeout.tv_sec == 86400 && Launchd && LaunchdTimeout && 
 	(!Browsing || !(BrowseLocalProtocols & BROWSE_DNSSD) ||
 	 cupsArrayCount(Printers) == 0))
     {
@@ -1495,17 +1491,6 @@ launchd_checkin(void)
 	portnum = ntohs(addr.ipv6.sin6_port);
       else
 #    endif /* AF_INET6 */
-#    ifdef AF_LOCAL
-      if (addr.addr.sa_family == AF_LOCAL)
-      {
-       /*
-	* Make sure the domain socket is accessible to all...
-	*/
-
-	fchmod(lis->fd, 0140777);
-      }
-      else
-#    endif /* AF_LOCAL */
       if (addr.addr.sa_family == AF_INET)
 	portnum = ntohs(addr.ipv4.sin_port);
 
