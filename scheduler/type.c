@@ -196,7 +196,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
     else if (*rule == '+' && current != NULL)
     {
       if (logic != MIME_MAGIC_AND &&
-          current != NULL && current->prev != NULL && current->prev->prev != NULL)
+          current != NULL && current->prev != NULL &&
+	  current->prev->prev != NULL)
       {
        /*
         * OK, we have more than 1 rule in the current tree level...  Make a
@@ -285,7 +286,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
       * Read an extension name or a function...
       */
 
-      for (ptr = name; isalnum(*rule & 255) && (ptr - name) < (sizeof(name) - 1);)
+      ptr = name;
+      while (isalnum(*rule & 255) && (ptr - name) < (sizeof(name) - 1))
         *ptr++ = *rule++;
 
       *ptr       = '\0';
@@ -676,7 +678,7 @@ checkrules(const char      *filename,	/* I - Filename */
 		  "OR",			/* Logical OR of all children */
 		  "MATCH",		/* Filename match */
 		  "ASCII",		/* ASCII characters in range */
-		  "PRINTABLE",		/* Printable characters (32-255) in range */
+		  "PRINTABLE",		/* Printable characters (32-255) */
 		  "STRING",		/* String matches */
 		  "CHAR",		/* Character/byte matches */
 		  "SHORT",		/* Short/16-bit word matches */
@@ -726,7 +728,8 @@ checkrules(const char      *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fb->fp, rules->offset);
-	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer, sizeof(fb->buffer));
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 	  }
 
@@ -767,7 +770,8 @@ checkrules(const char      *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fb->fp, rules->offset);
-	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer, sizeof(fb->buffer));
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 	  }
 
@@ -813,16 +817,18 @@ checkrules(const char      *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fb->fp, rules->offset);
-	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer, sizeof(fb->buffer));
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 
-            DEBUG_printf(("        loaded %d byte fb->buffer at %d, starts with \"%c%c%c%c\"...\n",
+            DEBUG_printf(("        loaded %d byte fb->buffer at %d, starts "
+	                  "with \"%c%c%c%c\"...\n",
 	                  fb->length, fb->offset, fb->buffer[0], fb->buffer[1],
 			  fb->buffer[2], fb->buffer[3]));
 	  }
 
          /*
-	  * Compare the fb->buffer against the string.  If the file is too
+	  * Compare the buffer against the string.  If the file is too
 	  * short then don't compare - it can't match...
 	  */
 
@@ -847,19 +853,21 @@ checkrules(const char      *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fb->fp, rules->offset);
-	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer, sizeof(fb->buffer));
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 	  }
 
          /*
-	  * Compare the fb->buffer against the string.  If the file is too
+	  * Compare the buffer against the string.  If the file is too
 	  * short then don't compare - it can't match...
 	  */
 
 	  if ((rules->offset + rules->length) > (fb->offset + fb->length))
 	    result = 0;
 	  else
-            result = (strncasecmp((char *)fb->buffer + rules->offset - fb->offset,
+            result = (strncasecmp((char *)fb->buffer + rules->offset -
+	                              fb->offset,
 	                          rules->value.stringv, rules->length) == 0);
 	  break;
 
@@ -875,7 +883,8 @@ checkrules(const char      *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fb->fp, rules->offset);
-	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer, sizeof(fb->buffer));
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 	  }
 
@@ -887,7 +896,8 @@ checkrules(const char      *filename,	/* I - Filename */
 	  if (fb->length < 1)
 	    result = 0;
 	  else
-	    result = (fb->buffer[rules->offset - fb->offset] == rules->value.charv);
+	    result = (fb->buffer[rules->offset - fb->offset] ==
+	                  rules->value.charv);
 	  break;
 
       case MIME_MAGIC_SHORT :
@@ -903,7 +913,8 @@ checkrules(const char      *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fb->fp, rules->offset);
-	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer, sizeof(fb->buffer));
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 	  }
 
@@ -935,7 +946,8 @@ checkrules(const char      *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fb->fp, rules->offset);
-	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer, sizeof(fb->buffer));
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 	  }
 
@@ -949,17 +961,19 @@ checkrules(const char      *filename,	/* I - Filename */
 	  else
 	  {
 	    bufptr = fb->buffer + rules->offset - fb->offset;
-	    intv   = (((((bufptr[0] << 8) | bufptr[1]) << 8) | bufptr[2]) << 8) |
-	             bufptr[3];;
+	    intv   = (((((bufptr[0] << 8) | bufptr[1]) << 8) |
+	               bufptr[2]) << 8) | bufptr[3];
 	    result = (intv == rules->value.intv);
 	  }
 	  break;
 
       case MIME_MAGIC_LOCALE :
 #if defined(WIN32) || defined(__EMX__) || defined(__APPLE__)
-          result = (strcmp(rules->value.localev, setlocale(LC_ALL, "")) == 0);
+          result = (strcmp(rules->value.localev,
+	                   setlocale(LC_ALL, "")) == 0);
 #else
-          result = (strcmp(rules->value.localev, setlocale(LC_MESSAGES, "")) == 0);
+          result = (strcmp(rules->value.localev,
+	                   setlocale(LC_MESSAGES, "")) == 0);
 #endif /* __APPLE__ */
 	  break;
 
@@ -976,12 +990,13 @@ checkrules(const char      *filename,	/* I - Filename */
 	    */
 
             cupsFileSeek(fb->fp, rules->offset);
-	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer, sizeof(fb->buffer));
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 	  }
 
          /*
-	  * Compare the fb->buffer against the string.  If the file is too
+	  * Compare the buffer against the string.  If the file is too
 	  * short then don't compare - it can't match...
 	  */
 
@@ -996,7 +1011,8 @@ checkrules(const char      *filename,	/* I - Filename */
 
 	    for (n = 0; n < region; n ++)
 	      if ((result = (memcmp(fb->buffer + rules->offset - fb->offset + n,
-	                            rules->value.stringv, rules->length) == 0)) != 0)
+	                            rules->value.stringv,
+				    rules->length) == 0)) != 0)
 		break;
           }
 	  break;
@@ -1070,7 +1086,7 @@ patmatch(const char *s,		/* I - String to match against */
 
       pat ++;
       if (*pat == '\0')
-        return (1);	/* Last pattern char is *, so everything matches now... */
+        return (1);	/* Last pattern char is *, so everything matches... */
 
      /*
       * Test all remaining combinations until we get to the end of the string.
@@ -1136,8 +1152,8 @@ patmatch(const char *s,		/* I - String to match against */
   }
 
  /*
-  * Done parsing the pattern and string; return 1 if the last character matches
-  * and 0 otherwise...
+  * Done parsing the pattern and string; return 1 if the last character
+  * matches and 0 otherwise...
   */
 
   return (*s == *pat);
