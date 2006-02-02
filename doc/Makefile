@@ -47,6 +47,7 @@ WEBIMAGES	=	\
 			images/delete-printer.gif \
 			images/edit-configuration-file.gif \
 			images/esp-logo.gif \
+			images/export-samba.gif \
 			images/happy.gif \
 			images/help.gif \
 			images/hold-job.gif \
