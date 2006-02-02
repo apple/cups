@@ -176,6 +176,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/backend/parallel
 /usr/lib/cups/backend/scsi
 /usr/lib/cups/backend/serial
+/usr/lib/cups/backend/socket
 /usr/lib/cups/backend/usb
 %dir /usr/lib/cups/cgi-bin
 /usr/lib/cups/cgi-bin/*
