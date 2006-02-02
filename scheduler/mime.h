@@ -46,7 +46,7 @@ extern "C" {
 #  define MIME_MAX_SUPER	16		/* Maximum size of supertype name */
 #  define MIME_MAX_TYPE		IPP_MAX_NAME	/* Maximum size of type name */
 #  define MIME_MAX_FILTER	256		/* Maximum size of filter pathname */
-#  define MIME_MAX_BUFFER	8192		/* Maximum size of file buffer */
+#  define MIME_MAX_BUFFER	4096		/* Maximum size of file buffer */
 
 
 /*
@@ -70,7 +70,7 @@ typedef enum
   MIME_MAGIC_ISTRING			/* Case-insensitive string matches */
 } mime_op_t;
 
-typedef struct mime_magic_str		/**** MIME Magic Data ****/
+typedef struct _mime_magic_s		/**** MIME Magic Data ****/
 {
   struct mime_magic_str	*prev,		/* Previous rule */
 			*next,		/* Next rule */
@@ -92,14 +92,14 @@ typedef struct mime_magic_str		/**** MIME Magic Data ****/
   }		value;
 } mime_magic_t;
 
-typedef struct				/**** MIME Type Data ****/
+typedef struct _mime_type_s		/**** MIME Type Data ****/
 {
   mime_magic_t	*rules;			/* Rules used to detect this type */
   char		super[MIME_MAX_SUPER],	/* Super-type name ("image", "application", etc.) */
 		type[MIME_MAX_TYPE];	/* Type name ("png", "postscript", etc.) */
 } mime_type_t;
 
-typedef struct				/**** MIME Conversion Filter Data ****/
+typedef struct _mime_filter_s		/**** MIME Conversion Filter Data ****/
 {
   mime_type_t	*src,			/* Source type */
 		*dst;			/* Destination type */
@@ -107,7 +107,7 @@ typedef struct				/**** MIME Conversion Filter Data ****/
   char		filter[MIME_MAX_FILTER];/* Filter program to use */
 } mime_filter_t;
 
-typedef struct				/**** MIME Database ****/
+typedef struct _mime_s			/**** MIME Database ****/
 {
   cups_array_t	*types;			/* File types */
   cups_array_t	*filters;		/* Type conversion filters */
