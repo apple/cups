@@ -267,7 +267,10 @@ cupsdLoadRemoteCache(void)
     else if (!strcasecmp(line, "DeviceURI"))
     {
       if (value)
+      {
+	cupsdSetString(&p->uri, value);
 	cupsdSetString(&p->device_uri, value);
+      }
       else
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
