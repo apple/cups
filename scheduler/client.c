@@ -1506,7 +1506,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		break;
 	      }
 
-	      type = mimeFileType(MimeDatabase, filename, NULL);
+	      type = mimeFileType(MimeDatabase, filename, NULL, NULL);
 
               if (cupsdIsCGI(con, filename, &filestats, type))
 	      {
@@ -1661,7 +1661,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		break;
 	      }
 
-	      type = mimeFileType(MimeDatabase, filename, NULL);
+	      type = mimeFileType(MimeDatabase, filename, NULL, NULL);
 
               if (!cupsdIsCGI(con, filename, &filestats, type))
 	      {
@@ -1837,7 +1837,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * Serve a file...
 	      */
 
-	      type = mimeFileType(MimeDatabase, filename, NULL);
+	      type = mimeFileType(MimeDatabase, filename, NULL, NULL);
 	      if (type == NULL)
 		strcpy(line, "text/plain");
 	      else

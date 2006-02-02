@@ -129,7 +129,7 @@ extern mime_type_t	*mimeAddType(mime_t *mime, const char *super,
 extern int		mimeAddTypeRule(mime_type_t *mt, const char *rule);
 extern void		mimeDeleteType(mime_t *mime, mime_type_t *mt);
 extern mime_type_t	*mimeFileType(mime_t *mime, const char *pathname,
-			              int *compression);
+			              const char *filename, int *compression);
 extern mime_type_t	*mimeFirstType(mime_t *mime);
 extern mime_type_t	*mimeNextType(mime_t *mime);
 extern int		mimeNumTypes(mime_t *mime);

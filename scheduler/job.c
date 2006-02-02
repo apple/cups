@@ -1013,7 +1013,7 @@ cupsdLoadAllJobs(void)
 	job->num_files    = fileid;
       }
 
-      job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename,
+      job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename, NULL,
                                                 job->compressions + fileid - 1);
 
       if (job->filetypes[fileid - 1] == NULL)

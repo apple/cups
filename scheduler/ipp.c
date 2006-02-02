@@ -6659,7 +6659,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "print_job: auto-typing file...");
 
-    filetype = mimeFileType(MimeDatabase, con->filename, &compression);
+    filetype = mimeFileType(MimeDatabase, con->filename, NULL, &compression);
 
     if (filetype)
     {
@@ -8042,7 +8042,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "send_document: auto-typing file...");
 
-    filetype = mimeFileType(MimeDatabase, con->filename, &compression);
+    filetype = mimeFileType(MimeDatabase, con->filename, NULL, &compression);
 
     if (filetype)
     {

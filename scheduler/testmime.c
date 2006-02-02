@@ -93,7 +93,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (!mime)
 	mime = mimeLoad("../conf", filter_path);
 
-      src = mimeFileType(mime, argv[i], &compression);
+      src = mimeFileType(mime, argv[i], NULL, &compression);
 
       if (src)
 	printf("%s: %s/%s%s\n", argv[i], src->super, src->type,
@@ -288,7 +288,7 @@ type_dir(mime_t     *mime,		/* I - MIME database */
     if (!S_ISREG(dent->fileinfo.st_mode))
       continue;
 
-    filetype = mimeFileType(mime, filename, &compression);
+    filetype = mimeFileType(mime, filename, NULL, &compression);
 
     if (filetype)
     {

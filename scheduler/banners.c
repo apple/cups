@@ -61,7 +61,7 @@ cupsdAddBanner(const char *name,	/* I - Name of banner */
   * See what the filetype is...
   */
 
-  if ((filetype = mimeFileType(MimeDatabase, filename, NULL)) == NULL)
+  if ((filetype = mimeFileType(MimeDatabase, filename, NULL, NULL)) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_WARN,
                     "cupsdAddBanner: Banner \"%s\" (\"%s\") is of an unknown file type - skipping!",
