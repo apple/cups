@@ -23,7 +23,9 @@
  *
  * Contents:
  *
- *   main() - Main entry for the test program.
+ *   main()        - Main entry for the test program.
+ *   print_rules() - Print the rules for a file type...
+ *   type_dir()    - Show the MIME types for a given directory.
  */
 
 /*
@@ -34,13 +36,15 @@
 #include <stdlib.h>
 #include <cups/string.h>
 #include "mime.h"
+#include <cups/dir.h>
 
 
 /*
  * Local functions...
  */
 
-static void print_rules(mime_magic_t *rules);
+static void	print_rules(mime_magic_t *rules);
+static void	type_dir(mime_t *mime, const char *dirname);
 
 
 /*
@@ -153,6 +157,8 @@ main(int  argc,				/* I - Number of command-line args */
              filter->src->super, filter->src->type,
 	     filter->dst->super, filter->dst->type,
 	     filter->filter, filter->cost);
+
+    type_dir(mime, "..");
   }
 
   return (0);
@@ -244,6 +250,77 @@ print_rules(mime_magic_t *rules)	/* I - Rules to print */
 
     rules = rules->next;
   }
+}
+
+
+/*
+ * 'type_dir()' - Show the MIME types for a given directory.
+ */
+
+static void
+type_dir(mime_t     *mime,		/* I - MIME database */
+         const char *dirname)		/* I - Directory */
+{
+  cups_dir_t	*dir;			/* Directory */
+  cups_dentry_t	*dent;			/* Directory entry */
+  char		filename[1024];		/* File to type */
+  mime_type_t	*filetype;		/* File type */
+  int		compression;		/* Compressed file? */
+  mime_type_t	*pstype;		/* application/vnd.cups-postscript */
+  cups_array_t	*filters;		/* Filters to pstype */
+  mime_filter_t	*filter;		/* Current filter */
+  int		cost;			/* Filter cost */
+
+
+  dir = cupsDirOpen(dirname);
+  if (!dir)
+    return;
+
+  pstype = mimeType(mime, "application", "vnd.cups-postscript");
+
+  while ((dent = cupsDirRead(dir)) != NULL)
+  {
+    snprintf(filename, sizeof(filename), "%s/%s", dirname, dent->filename);
+
+    if (S_ISDIR(dent->fileinfo.st_mode))
+      type_dir(mime, filename);
+
+    if (!S_ISREG(dent->fileinfo.st_mode))
+      continue;
+
+    filetype = mimeFileType(mime, filename, &compression);
+
+    if (filetype)
+    {
+      printf("%s: %s/%s%s\n", filename, filetype->super, filetype->type,
+             compression ? " (compressed)" : "");
+
+      filters = mimeFilter(mime, filetype, pstype, &cost, 10);
+
+      if (!filters)
+	puts("    No filters to convert application/vnd.cups-postscript.");
+      else
+      {
+        printf("    Filter cost = %d\n", cost);
+
+        filter = (mime_filter_t *)cupsArrayFirst(filters);
+	printf("    %s", filter->filter);
+
+	for (filter = (mime_filter_t *)cupsArrayNext(filters);
+	     filter;
+	     filter = (mime_filter_t *)cupsArrayNext(filters))
+	  printf(" | %s", filter->filter);
+
+        putchar('\n');
+
+        cupsArrayDelete(filters);
+      }
+    }
+    else
+      printf("%s: unknown%s\n", filename, compression ? " (compressed)" : "");
+  }
+
+  cupsDirClose(dir);
 }
 
 
