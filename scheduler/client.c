@@ -755,7 +755,7 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
     cupsdLogMessage(CUPSD_LOG_ERROR,
         	    "EncryptClient: Could not find signing key in keychain "
 		    "\"%s\"", ServerCertificate);
-    error = errSSLBadConfiguration;
+    error = errSSLBadCert; /* errSSLBadConfiguration is a better choice, but not available on 10.2.x */
   }
 
   if (!error)

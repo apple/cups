@@ -35,6 +35,9 @@
 
 #include "cupsd.h"
 #include <grp.h>
+#if defined(__APPLE__) && __GNUC__ < 4
+#  include <libgen.h>
+#endif /* __APPLE__ && __GNUC__ < 4 */ 
 
 
 /*
@@ -152,7 +155,7 @@ cupsdStartProcess(
     * We have room, try to read the symlink path for this command...
     */
 
-    if ((linkbytes = readlink(linkpath, sizeof(linkpath) - 1)) > 0)
+    if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
     {
      /*
       * Yes, this is a symlink to the actual program, nul-terminate and

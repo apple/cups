@@ -640,7 +640,9 @@ sysEventPowerNotifier(
 
     case kIOMessageSystemWillNotPowerOff:
     case kIOMessageSystemWillNotSleep:
+#ifdef kIOMessageSystemWillPowerOn
     case kIOMessageSystemWillPowerOn:
+#endif /* kIOMessageSystemWillPowerOn */
     default:
 	sendit = 0;
 	break;

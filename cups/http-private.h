@@ -54,14 +54,14 @@
 #    define closesocket(f) close(f)
 #  endif /* WIN32 */
 
-#  ifdef __sgi
+#  if defined(__sgi) || (defined(__APPLE__) && !defined(_SOCKLEN_T))
 /*
- * IRIX does not define socklen_t, and in fact uses an int instead of
+ * IRIX and MacOS X 10.2.x do not define socklen_t, and in fact use an int instead of
  * unsigned type for length values...
  */
 
 typedef int socklen_t;
-#  endif /* __sgi */
+#  endif /* __sgi || (__APPLE__ && !_SOCKLEN_T) */
 
 #  include "http.h"
 #  include "ipp-private.h"

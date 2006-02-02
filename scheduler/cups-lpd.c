@@ -36,6 +36,7 @@
  * Include necessary headers...
  */
 
+#include <cups/http-private.h>
 #include <cups/cups.h>
 #include <cups/string.h>
 #include <cups/language.h>
