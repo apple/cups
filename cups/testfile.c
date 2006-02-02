@@ -84,8 +84,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     fputs("cupsFileFind: ", stdout);
-    if (cupsFileFind("cat", "/bin", filename, sizeof(filename)) &&
-	cupsFileFind("cat", "/bin:/usr/bin", filename, sizeof(filename)))
+    if (cupsFileFind("cat", "/bin", 1, filename, sizeof(filename)) &&
+	cupsFileFind("cat", "/bin:/usr/bin", 1, filename, sizeof(filename)))
       printf("PASS (%s)\n", filename);
     else
     {

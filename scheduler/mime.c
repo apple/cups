@@ -28,7 +28,6 @@
  *   mimeDeleteType()   - Delete a type from the MIME database.
  *   mimeFirstFilter()  - Get the first filter in the MIME database.
  *   mimeFirstType()    - Get the first type in the MIME database.
- *   mimeNextType()     - Get the next type in the MIME database.
  *   mimeLoad()         - Create a new MIME database from disk.
  *   mimeMerge()        - Merge a MIME database from disk with the current one.
  *   mimeNew()          - Create a new, empty MIME database.
@@ -36,9 +35,12 @@
  *   mimeNextType()     - Get the next type in the MIME database.
  *   mimeNumFilters()   - Get the number of filters in a MIME database.
  *   mimeNumTypes()     - Get the number of types in a MIME database.
- *   load_types()       - Load a xyz.types file...
+ *   add_fcache()       - Add a filter to the filter cache.
+ *   compare_fcache()   - Compare two filter cache entries.
+ *   delete_fcache()    - Free all memory used by the filter cache.
  *   delete_rules()     - Free all memory for the given rule tree.
  *   load_convs()       - Load a xyz.convs file...
+ *   load_types()       - Load a xyz.types file...
  */
 
 /*
@@ -55,13 +57,29 @@
 
 
 /*
+ * Local types...
+ */
+
+typedef struct _mime_fcache_s		/**** Filter cache structure ****/
+{
+  char	*name,				/* Filter name */
+	*path;				/* Full path to filter if available */
+} _mime_fcache_t;
+
+
+/*
  * Local functions...
  */
 
-static void	load_types(mime_t *mime, const char *filename);
-static void	load_convs(mime_t *mime, const char *filename,
-		           const char *filterpath);
+static const char *add_fcache(cups_array_t *filtercache, const char *name,
+		              const char *filterpath);
+static int	compare_fcache(_mime_fcache_t *a, _mime_fcache_t *b);
+static void	delete_fcache(cups_array_t *filtercache);
 static void	delete_rules(mime_magic_t *rules);
+static void	load_convs(mime_t *mime, const char *filename,
+		           const char *filterpath,
+			   cups_array_t *filtercache);
+static void	load_types(mime_t *mime, const char *filename);
 
 
 /*
@@ -192,6 +210,7 @@ mimeMerge(mime_t     *mime,		/* I - MIME database to add to */
   cups_dir_t	*dir;			/* Directory */
   cups_dentry_t	*dent;			/* Directory entry */
   char		filename[1024];		/* Full filename of types/converts file */
+  cups_array_t	*filtercache;		/* Filter cache */
 
 
  /*
@@ -238,6 +257,8 @@ mimeMerge(mime_t     *mime,		/* I - MIME database to add to */
   * Read all the .convs files...
   */
 
+  filtercache = cupsArrayNew((cups_array_func_t)compare_fcache, NULL);
+
   while ((dent = cupsDirRead(dir)) != NULL)
   {
     if (strlen(dent->filename) > 6 &&
@@ -248,9 +269,11 @@ mimeMerge(mime_t     *mime,		/* I - MIME database to add to */
       */
 
       snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->filename);
-      load_convs(mime, filename, filterpath);
+      load_convs(mime, filename, filterpath, filtercache);
     }
   }
+
+  delete_fcache(filtercache);
 
   cupsDirClose(dir);
 
@@ -322,6 +345,276 @@ mimeNumTypes(mime_t *mime)		/* I - MIME database */
     return (0);
   else
     return (cupsArrayCount(mime->types));
+}
+
+
+/*
+ * 'add_fcache()' - Add a filter to the filter cache.
+ */
+
+static const char *			/* O - Full path to filter or NULL */
+add_fcache(cups_array_t *filtercache,	/* I - Filter cache */
+           const char   *name,		/* I - Filter name */
+	   const char   *filterpath)	/* I - Filter path */
+{
+  _mime_fcache_t	key,		/* Search key */
+			*temp;		/* New filter cache */
+  char			path[1024];	/* Full path to filter */
+
+
+  key.name = (char *)name;
+  if ((temp = (_mime_fcache_t *)cupsArrayFind(filtercache, &key)) != NULL)
+    return (temp->path);
+
+  if ((temp = calloc(1, sizeof(_mime_fcache_t))) == NULL)
+    return (NULL);
+
+  temp->name = strdup(name);
+
+  if (cupsFileFind(name, filterpath, 1, path, sizeof(path)))
+    temp->path = strdup(path);
+
+  cupsArrayAdd(filtercache, temp);
+
+  return (temp->path);
+}
+
+
+/*
+ * 'compare_fcache()' - Compare two filter cache entries.
+ */
+
+static int				/* O - Result of comparison */
+compare_fcache(_mime_fcache_t *a,	/* I - First entry */
+               _mime_fcache_t *b)	/* I - Second entry */
+{
+  return (strcmp(a->name, b->name));
+}
+
+
+/*
+ * 'delete_fcache()' - Free all memory used by the filter cache.
+ */
+
+static void
+delete_fcache(cups_array_t *filtercache)/* I - Filter cache */
+{
+  _mime_fcache_t	*current;	/* Current cache entry */
+
+
+  for (current = (_mime_fcache_t *)cupsArrayFirst(filtercache);
+       current;
+       current = (_mime_fcache_t *)cupsArrayNext(filtercache))
+  {
+    free(current->name);
+
+    if (current->path)
+      free(current->path);
+
+    free(current);
+  }
+
+  cupsArrayDelete(filtercache);
+}
+
+
+/*
+ * 'delete_rules()' - Free all memory for the given rule tree.
+ */
+
+static void
+delete_rules(mime_magic_t *rules)	/* I - Rules to free */
+{
+  mime_magic_t	*next;			/* Next rule to free */
+
+
+ /*
+  * Free the rules list, descending recursively to free any child rules.
+  */
+
+  while (rules != NULL)
+  {
+    next = rules->next;
+
+    if (rules->child != NULL)
+      delete_rules(rules->child);
+
+    free(rules);
+    rules = next;
+  }
+}
+
+
+/*
+ * 'load_convs()' - Load a xyz.convs file...
+ */
+
+static void
+load_convs(mime_t       *mime,		/* I - MIME database */
+           const char   *filename,	/* I - Convs file to load */
+           const char   *filterpath,	/* I - Path for filters */
+	   cups_array_t *filtercache)	/* I - Filter program cache */
+{
+  cups_file_t	*fp;			/* Convs file */
+  char		line[1024],		/* Input line from file */
+		*lineptr,		/* Current position in line */
+		super[MIME_MAX_SUPER],	/* Super-type name */
+		type[MIME_MAX_TYPE],	/* Type name */
+		*temp,			/* Temporary pointer */
+		*filter;		/* Filter program */
+  mime_type_t	*temptype,		/* MIME type looping var */
+		*dsttype;		/* Destination MIME type */
+  int		cost;			/* Cost of filter */
+
+
+ /*
+  * First try to open the file...
+  */
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+    return;
+
+ /*
+  * Then read each line from the file, skipping any comments in the file...
+  */
+
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
+  {
+   /*
+    * Skip blank lines and lines starting with a #...
+    */
+
+    if (!line[0] || line[0] == '#')
+      continue;
+
+   /*
+    * Strip trailing whitespace...
+    */
+
+    for (lineptr = line + strlen(line) - 1;
+         lineptr >= line && isspace(*lineptr & 255);
+	 lineptr --)
+      *lineptr = '\0';
+
+   /*
+    * Extract the destination super-type and type names from the middle of
+    * the line.
+    */
+
+    lineptr = line;
+    while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\0')
+      lineptr ++;
+
+    while (*lineptr == ' ' || *lineptr == '\t')
+      lineptr ++;
+
+    temp = super;
+
+    while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
+           (temp - super + 1) < MIME_MAX_SUPER)
+      *temp++ = tolower(*lineptr++ & 255);
+
+    *temp = '\0';
+
+    if (*lineptr != '/')
+      continue;
+
+    lineptr ++;
+    temp = type;
+
+    while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
+           *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
+      *temp++ = tolower(*lineptr++ & 255);
+
+    *temp = '\0';
+
+    if (*lineptr == '\0' || *lineptr == '\n')
+      continue;
+
+    if ((dsttype = mimeType(mime, super, type)) == NULL)
+      continue;
+
+   /*
+    * Then get the cost and filter program...
+    */
+
+    while (*lineptr == ' ' || *lineptr == '\t')
+      lineptr ++;
+
+    if (*lineptr < '0' || *lineptr > '9')
+      continue;
+
+    cost = atoi(lineptr);
+
+    while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\0')
+      lineptr ++;
+    while (*lineptr == ' ' || *lineptr == '\t')
+      lineptr ++;
+
+    if (*lineptr == '\0' || *lineptr == '\n')
+      continue;
+
+    filter = lineptr;
+
+    if (strcmp(filter, "-"))
+    {
+     /*
+      * Verify that the filter exists and is executable...
+      */
+
+      if (!add_fcache(filtercache, filter, filterpath))
+        continue;
+    }
+
+   /*
+    * Finally, get the source super-type and type names from the beginning of
+    * the line.  We do it here so we can support wildcards...
+    */
+
+    lineptr = line;
+    temp    = super;
+
+    while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
+           (temp - super + 1) < MIME_MAX_SUPER)
+      *temp++ = tolower(*lineptr++ & 255);
+
+    *temp = '\0';
+
+    if (*lineptr != '/')
+      continue;
+
+    lineptr ++;
+    temp = type;
+
+    while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
+           *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
+      *temp++ = tolower(*lineptr++ & 255);
+
+    *temp = '\0';
+
+    if (!strcmp(super, "*") && !strcmp(type, "*"))
+    {
+     /*
+      * Force * / * to be "application/octet-stream"...
+      */
+
+      strcpy(super, "application");
+      strcpy(type, "octet-stream");
+    }
+
+   /*
+    * Add the filter to the MIME database, supporting wildcards as needed...
+    */
+
+    for (temptype = (mime_type_t *)cupsArrayFirst(mime->types);
+         temptype;
+	 temptype = (mime_type_t *)cupsArrayNext(mime->types))
+      if ((super[0] == '*' || !strcmp(temptype->super, super)) &&
+          (type[0] == '*' || !strcmp(temptype->type, type)))
+	mimeAddFilter(mime, temptype, dsttype, cost, filter);
+  }
+
+  cupsFileClose(fp);
 }
 
 
@@ -414,216 +707,6 @@ load_types(mime_t     *mime,		/* I - MIME database */
   }
 
   cupsFileClose(fp);
-}
-
-
-/*
- * 'load_convs()' - Load a xyz.convs file...
- */
-
-static void
-load_convs(mime_t     *mime,		/* I - MIME database */
-           const char *filename,	/* I - Convs file to load */
-           const char *filterpath)	/* I - Path for filters */
-{
-  cups_file_t	*fp;			/* Convs file */
-  char		line[1024],		/* Input line from file */
-		*lineptr,		/* Current position in line */
-		super[MIME_MAX_SUPER],	/* Super-type name */
-		type[MIME_MAX_TYPE],	/* Type name */
-		*temp,			/* Temporary pointer */
-		*filter;		/* Filter program */
-  mime_type_t	*temptype,		/* MIME type looping var */
-		*dsttype;		/* Destination MIME type */
-  int		cost;			/* Cost of filter */
-#ifndef WIN32
-  char		filterprog[1024];	/* Full path of filter... */
-#endif /* !WIN32 */
-
-
- /*
-  * First try to open the file...
-  */
-
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
-    return;
-
- /*
-  * Then read each line from the file, skipping any comments in the file...
-  */
-
-  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
-  {
-   /*
-    * Skip blank lines and lines starting with a #...
-    */
-
-    if (!line[0] || line[0] == '#')
-      continue;
-
-   /*
-    * Strip trailing whitespace...
-    */
-
-    for (lineptr = line + strlen(line) - 1;
-         lineptr >= line && isspace(*lineptr & 255);
-	 lineptr --)
-      *lineptr = '\0';
-
-   /*
-    * Extract the destination super-type and type names from the middle of
-    * the line.
-    */
-
-    lineptr = line;
-    while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\0')
-      lineptr ++;
-
-    while (*lineptr == ' ' || *lineptr == '\t')
-      lineptr ++;
-
-    temp = super;
-
-    while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
-           (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = tolower(*lineptr++ & 255);
-
-    *temp = '\0';
-
-    if (*lineptr != '/')
-      continue;
-
-    lineptr ++;
-    temp = type;
-
-    while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
-           *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = tolower(*lineptr++ & 255);
-
-    *temp = '\0';
-
-    if (*lineptr == '\0' || *lineptr == '\n')
-      continue;
-
-    if ((dsttype = mimeType(mime, super, type)) == NULL)
-      continue;
-
-   /*
-    * Then get the cost and filter program...
-    */
-
-    while (*lineptr == ' ' || *lineptr == '\t')
-      lineptr ++;
-
-    if (*lineptr < '0' || *lineptr > '9')
-      continue;
-
-    cost = atoi(lineptr);
-
-    while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\0')
-      lineptr ++;
-    while (*lineptr == ' ' || *lineptr == '\t')
-      lineptr ++;
-
-    if (*lineptr == '\0' || *lineptr == '\n')
-      continue;
-
-    filter = lineptr;
-
-#ifndef WIN32
-    if (strcmp(filter, "-"))
-    {
-     /*
-      * Verify that the filter exists and is executable...
-      */
-
-      if (filter[0] == '/')
-	strlcpy(filterprog, filter, sizeof(filterprog));
-      else if (!cupsFileFind(filter, filterpath, filterprog,
-                             sizeof(filterprog)))
-        continue;
-
-      if (access(filterprog, X_OK))
-	continue;
-    }
-#endif /* !WIN32 */
-
-   /*
-    * Finally, get the source super-type and type names from the beginning of
-    * the line.  We do it here so we can support wildcards...
-    */
-
-    lineptr = line;
-    temp    = super;
-
-    while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
-           (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = tolower(*lineptr++ & 255);
-
-    *temp = '\0';
-
-    if (*lineptr != '/')
-      continue;
-
-    lineptr ++;
-    temp = type;
-
-    while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
-           *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = tolower(*lineptr++ & 255);
-
-    *temp = '\0';
-
-    if (!strcmp(super, "*") && !strcmp(type, "*"))
-    {
-     /*
-      * Force * / * to be "application/octet-stream"...
-      */
-
-      strcpy(super, "application");
-      strcpy(type, "octet-stream");
-    }
-
-   /*
-    * Add the filter to the MIME database, supporting wildcards as needed...
-    */
-
-    for (temptype = (mime_type_t *)cupsArrayFirst(mime->types);
-         temptype;
-	 temptype = (mime_type_t *)cupsArrayNext(mime->types))
-      if ((super[0] == '*' || !strcmp(temptype->super, super)) &&
-          (type[0] == '*' || !strcmp(temptype->type, type)))
-	mimeAddFilter(mime, temptype, dsttype, cost, filter);
-  }
-
-  cupsFileClose(fp);
-}
-
-
-/*
- * 'delete_rules()' - Free all memory for the given rule tree.
- */
-
-static void
-delete_rules(mime_magic_t *rules)	/* I - Rules to free */
-{
-  mime_magic_t	*next;			/* Next rule to free */
-
-
- /*
-  * Free the rules list, descending recursively to free any child rules.
-  */
-
-  while (rules != NULL)
-  {
-    next = rules->next;
-
-    if (rules->child != NULL)
-      delete_rules(rules->child);
-
-    free(rules);
-    rules = next;
-  }
 }
 
 

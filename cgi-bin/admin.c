@@ -3088,15 +3088,15 @@ do_menu(http_t *http)			/* I - HTTP connection */
     * rpcclient...
     */
 
-    if (cupsFileFind("smbclient", getenv("PATH"), line, sizeof(line)) &&
-        cupsFileFind("rpcclient", getenv("PATH"), line, sizeof(line)))
+    if (cupsFileFind("smbclient", getenv("PATH"), 1, line, sizeof(line)) &&
+        cupsFileFind("rpcclient", getenv("PATH"), 1, line, sizeof(line)))
       cgiSetVariable("HAVE_SAMBA", "Y");
     else
     {
-      if (!cupsFileFind("smbclient", getenv("PATH"), line, sizeof(line)))
+      if (!cupsFileFind("smbclient", getenv("PATH"), 1, line, sizeof(line)))
         fputs("ERROR: smbclient not found!\n", stderr);
 
-      if (!cupsFileFind("rpcclient", getenv("PATH"), line, sizeof(line)))
+      if (!cupsFileFind("rpcclient", getenv("PATH"), 1, line, sizeof(line)))
         fputs("ERROR: rpcclient not found!\n", stderr);
     }
   }
