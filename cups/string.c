@@ -3,7 +3,7 @@
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -25,19 +25,240 @@
  *
  * Contents:
  *
- *   _cups_strcpy()      - Copy a string allowing for overlapping strings.
- *   _cups_strdup()      - Duplicate a string.
- *   _cups_strcasecmp()  - Do a case-insensitive comparison.
- *   _cups_strncasecmp() - Do a case-insensitive comparison on up to N chars.
- *   _cups_strlcat()     - Safely concatenate two strings.
- *   _cups_strlcpy()     - Safely copy two strings.
+ *   _cups_sp_alloc()      - Allocate/reference a string.
+ *   _cups_sp_flush()      - Flush the string pool...
+ *   _cups_sp_free()       - Free/dereference a string.
+ *   _cups_sp_statistics() - Return allocation statistics for string pool.
+ *   _cups_strcpy()        - Copy a string allowing for overlapping strings.
+ *   _cups_strdup()        - Duplicate a string.
+ *   _cups_strcasecmp()    - Do a case-insensitive comparison.
+ *   _cups_strncasecmp()   - Do a case-insensitive comparison on up to N chars.
+ *   _cups_strlcat()       - Safely concatenate two strings.
+ *   _cups_strlcpy()       - Safely copy two strings.
+ *   compare_sp_items()    - Compare two string pool items...
  */
 
 /*
  * Include necessary headers...
  */
 
+#include <stdlib.h>
+#include <limits.h>
+#include "debug.h"
 #include "string.h"
+#include "globals.h"
+
+
+/*
+ * Local functions...
+ */
+
+static int	compare_sp_items(_cups_sp_item_t *a, _cups_sp_item_t *b);
+
+
+/*
+ * '_cups_sp_alloc()' - Allocate/reference a string.
+ */
+
+char *					/* O - String pointer */
+_cups_sp_alloc(const char *s)		/* I - String */
+{
+  _cups_globals_t	*cg;		/* Global data */
+  _cups_sp_item_t	*item,		/* String pool item */
+			key;		/* Search key */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!s)
+    return (NULL);
+
+ /*
+  * Get the string pool...
+  */
+
+  cg = _cupsGlobals();
+
+  if (!cg->stringpool)
+    cg->stringpool = cupsArrayNew((cups_array_func_t)compare_sp_items, NULL);
+
+  if (!cg->stringpool)
+    return (NULL);
+
+ /*
+  * See if the string is already in the pool...
+  */
+
+  key.str = (char *)s;
+
+  if ((item = (_cups_sp_item_t *)cupsArrayFind(cg->stringpool, &key)) != NULL)
+  {
+   /*
+    * Found it, return the cached string...
+    */
+
+    item->ref_count ++;
+
+    return (item->str);
+  }
+
+ /*
+  * Not found, so allocate a new one...
+  */
+
+  item = (_cups_sp_item_t *)calloc(1, sizeof(_cups_sp_item_t));
+  if (!item)
+    return (NULL);
+
+  item->ref_count = 1;
+  item->str       = strdup(s);
+
+  if (!item->str)
+  {
+    free(item);
+    return (NULL);
+  }
+
+ /*
+  * Add the string to the pool and return it...
+  */
+
+  cupsArrayAdd(cg->stringpool, item);
+
+  return (item->str);
+}
+
+
+/*
+ * '_cups_sp_flush()' - Flush the string pool...
+ */
+
+void
+_cups_sp_flush(_cups_globals_t *cg)	/* I - Global data */
+{
+  _cups_sp_item_t	*item;		/* Current item */
+
+
+  for (item = (_cups_sp_item_t *)cupsArrayFirst(cg->stringpool);
+       item;
+       item = (_cups_sp_item_t *)cupsArrayNext(cg->stringpool))
+  {
+    free(item->str);
+    free(item);
+  }
+
+  cupsArrayDelete(cg->stringpool);
+}
+
+
+/*
+ * '_cups_sp_free()' - Free/dereference a string.
+ */
+
+void
+_cups_sp_free(const char *s)
+{
+  _cups_globals_t	*cg;		/* Global data */
+  _cups_sp_item_t	*item,		/* String pool item */
+			key;		/* Search key */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!s)
+    return;
+
+ /*
+  * Get the string pool...
+  */
+
+  cg = _cupsGlobals();
+
+  if (!cg->stringpool)
+    return;
+
+ /*
+  * See if the string is already in the pool...
+  */
+
+  key.str = (char *)s;
+
+  if ((item = (_cups_sp_item_t *)cupsArrayFind(cg->stringpool, &key)) != NULL)
+  {
+   /*
+    * Found it, dereference...
+    */
+
+    item->ref_count --;
+
+    if (!item->ref_count)
+    {
+     /*
+      * Remove and free...
+      */
+
+      cupsArrayRemove(cg->stringpool, item);
+
+      free(item->str);
+      free(item);
+    }
+  }
+}
+
+
+/*
+ * '_cups_sp_statistics()' - Return allocation statistics for string pool.
+ */
+
+size_t					/* O - Number of strings */
+_cups_sp_statistics(size_t *alloc_bytes,/* O - Allocated bytes */
+                    size_t *total_bytes)/* O - Total string bytes */
+{
+  size_t		count,		/* Number of strings */
+			abytes,		/* Allocated string bytes */
+			tbytes,		/* Total string bytes */
+			len;		/* Length of string */
+  _cups_sp_item_t	*item;		/* Current item */
+  _cups_globals_t	*cg;		/* Global data */
+
+
+ /*
+  * Loop through strings in pool, counting everything up...
+  */
+
+  cg = _cupsGlobals();
+
+  for (count = 0, abytes = 0, tbytes = 0,
+           item = (_cups_sp_item_t *)cupsArrayFirst(cg->stringpool);
+       item;
+       item = (_cups_sp_item_t *)cupsArrayNext(cg->stringpool))
+  {
+   /*
+    * Count allocated memory, using a 64-bit aligned buffer as a basis.
+    */
+
+    count  += item->ref_count;
+    len    = (strlen(item->str) + 8) & ~7;
+    abytes += sizeof(_cups_sp_item_t) + len;
+    tbytes += item->ref_count * len;
+  }
+
+ /*
+  * Return values...
+  */
+
+  if (alloc_bytes)
+    *alloc_bytes = abytes;
+
+  if (total_bytes)
+    *total_bytes = tbytes;
+
+  return (count);
+}
 
 
 /*
@@ -219,6 +440,18 @@ _cups_strlcpy(char       *dst,		/* O - Destination string */
   return (srclen);
 }
 #endif /* !HAVE_STRLCPY */
+
+
+/*
+ * 'compare_sp_items()' - Compare two string pool items...
+ */
+
+static int				/* O - Result of comparison */
+compare_sp_items(_cups_sp_item_t *a,	/* I - First item */
+                 _cups_sp_item_t *b)	/* I - Second item */
+{
+  return (strcmp(a->str, b->str));
+}
 
 
 /*

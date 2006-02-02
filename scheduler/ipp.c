@@ -412,7 +412,8 @@ cupsdProcessIPPRequest(
 	    * Remote unauthenticated user masquerading as local root...
 	    */
 
-	    cupsdSetString(&(username->values[0].string.text), RemoteRoot);
+	    _cups_sp_free(username->values[0].string.text);
+	    username->values[0].string.text = _cups_sp_alloc(RemoteRoot);
 	  }
 	}
 
@@ -2784,7 +2785,7 @@ copy_attribute(
 	else
 	{
           for (i = 0; i < attr->num_values; i ++)
-	    toattr->values[i].string.text = strdup(attr->values[i].string.text);
+	    toattr->values[i].string.text = _cups_sp_alloc(attr->values[i].string.text);
 	}
         break;
 
@@ -2837,12 +2838,12 @@ copy_attribute(
 	  {
 	    if (!i)
               toattr->values[i].string.charset =
-	          strdup(attr->values[i].string.charset);
+	          _cups_sp_alloc(attr->values[i].string.charset);
 	    else
               toattr->values[i].string.charset =
 	          toattr->values[0].string.charset;
 
-	    toattr->values[i].string.text = strdup(attr->values[i].string.text);
+	    toattr->values[i].string.text = _cups_sp_alloc(attr->values[i].string.text);
           }
         }
         break;
@@ -4148,11 +4149,11 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 
 	    for (i = 0; i < attr->num_values; i ++)
 	    {
-	      free(attr->values[i].string.text);
+	      _cups_sp_free(attr->values[i].string.text);
 	      attr->values[i].string.text = NULL;
 	      if (attr->values[i].string.charset)
 	      {
-		free(attr->values[i].string.charset);
+		_cups_sp_free(attr->values[i].string.charset);
 		attr->values[i].string.charset = NULL;
 	      }
             }
@@ -4167,7 +4168,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 
       attr->value_tag             = IPP_TAG_NAME;
       attr->num_values            = 1;
-      attr->values[0].string.text = strdup(con->http.hostname);
+      attr->values[0].string.text = _cups_sp_alloc(con->http.hostname);
     }
 
     attr->group_tag = IPP_TAG_JOB;
@@ -4249,8 +4250,8 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
-      attr->values[0].string.text = strdup(printer->job_sheets[0]);
-      attr->values[1].string.text = strdup(printer->job_sheets[1]);
+      attr->values[0].string.text = _cups_sp_alloc(printer->job_sheets[0]);
+      attr->values[1].string.text = _cups_sp_alloc(printer->job_sheets[1]);
     }
 
     job->job_sheets = attr;
@@ -6097,17 +6098,18 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     * Free the old hold value and copy the new one over...
     */
 
-    free(attr->values[0].string.text);
+    _cups_sp_free(attr->values[0].string.text);
 
     if (newattr)
     {
       attr->value_tag = newattr->value_tag;
-      attr->values[0].string.text = strdup(newattr->values[0].string.text);
+      attr->values[0].string.text =
+          _cups_sp_alloc(newattr->values[0].string.text);
     }
     else
     {
       attr->value_tag = IPP_TAG_KEYWORD;
-      attr->values[0].string.text = strdup("indefinite");
+      attr->values[0].string.text = _cups_sp_alloc("indefinite");
     }
 
    /*
@@ -6117,7 +6119,8 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     cupsdSetJobHoldUntil(job, attr->values[0].string.text);
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was held by \"%s\".", jobid, username);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was held by \"%s\".", jobid,
+                  username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -6669,8 +6672,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
       if (format)
       {
-	free(format->values[0].string.text);
-	format->values[0].string.text = strdup(mimetype);
+	  _cups_sp_free(format->values[0].string.text);
+
+	format->values[0].string.text = _cups_sp_alloc(mimetype);
       }
       else
         ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
@@ -6887,11 +6891,11 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
 	    for (i = 0; i < attr->num_values; i ++)
 	    {
-	      free(attr->values[i].string.text);
+	      _cups_sp_free(attr->values[i].string.text);
 	      attr->values[i].string.text = NULL;
 	      if (attr->values[i].string.charset)
 	      {
-		free(attr->values[i].string.charset);
+		_cups_sp_free(attr->values[i].string.charset);
 		attr->values[i].string.charset = NULL;
 	      }
             }
@@ -6906,7 +6910,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
       attr->value_tag             = IPP_TAG_NAME;
       attr->num_values            = 1;
-      attr->values[0].string.text = strdup(con->http.hostname);
+      attr->values[0].string.text = _cups_sp_alloc(con->http.hostname);
     }
 
     attr->group_tag = IPP_TAG_JOB;
@@ -6988,8 +6992,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
-      attr->values[0].string.text = strdup(printer->job_sheets[0]);
-      attr->values[1].string.text = strdup(printer->job_sheets[1]);
+      attr->values[0].string.text = _cups_sp_alloc(printer->job_sheets[0]);
+      attr->values[1].string.text = _cups_sp_alloc(printer->job_sheets[1]);
     }
 
     job->job_sheets = attr;
@@ -7599,9 +7603,10 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (attr)
   {
-    free(attr->values[0].string.text);
+    _cups_sp_free(attr->values[0].string.text);
+
     attr->value_tag = IPP_TAG_KEYWORD;
-    attr->values[0].string.text = strdup("no-hold");
+    attr->values[0].string.text = _cups_sp_alloc("no-hold");
   }
 
  /*
@@ -8050,8 +8055,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
       if (format)
       {
-	free(format->values[0].string.text);
-	format->values[0].string.text = strdup(mimetype);
+	_cups_sp_free(format->values[0].string.text);
+	format->values[0].string.text = _cups_sp_alloc(mimetype);
       }
       else
         ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,

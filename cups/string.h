@@ -3,7 +3,7 @@
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -70,6 +70,17 @@ extern "C" {
 
 
 /*
+ * String pool structures...
+ */
+
+typedef struct _cups_sp_item_s		/**** String Pool Item ****/
+{
+  char		*str;			/* String */
+  unsigned int	ref_count;		/* Reference count */
+} _cups_sp_item_t;
+
+
+/*
  * Prototypes...
  */
 
@@ -113,6 +124,14 @@ __attribute__ ((__format__ (__printf__, 3, 4)))
 extern int	_cups_vsnprintf(char *, size_t, const char *, va_list);
 #    define vsnprintf _cups_vsnprintf
 #  endif /* !HAVE_VSNPRINTF */
+
+/*
+ * String pool functions...
+ */
+
+extern char	*_cups_sp_alloc(const char *s);
+extern void	_cups_sp_free(const char *s);
+extern size_t	_cups_sp_statistics(size_t *alloc_bytes, size_t *total_bytes);
 
 
 /*

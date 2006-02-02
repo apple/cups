@@ -521,12 +521,12 @@ cupsdCreateCommonData(void)
       cupsd_banner_t	*banner;	/* Current banner */
 
 
-      attr->values[0].string.text = strdup("none");
+      attr->values[0].string.text = _cups_sp_alloc("none");
 
       for (i = 1, banner = (cupsd_banner_t *)cupsArrayFirst(Banners);
 	   banner;
 	   i ++, banner = (cupsd_banner_t *)cupsArrayNext(Banners))
-	attr->values[i].string.text = strdup(banner->name);
+	attr->values[i].string.text = _cups_sp_alloc(banner->name);
     }
   }
   else
@@ -630,7 +630,7 @@ cupsdCreateCommonData(void)
   attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
                        "printer-op-policy-supported", NumPolicies, NULL, NULL);
   for (i = 0; i < NumPolicies; i ++)
-    attr->values[i].string.text = strdup(Policies[i]->name);
+    attr->values[i].string.text = _cups_sp_alloc(Policies[i]->name);
 }
 
 
@@ -1570,9 +1570,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
     if (attr != NULL)
     {
-      attr->values[0].string.text = strdup(Classification ?
+      attr->values[0].string.text = _cups_sp_alloc(Classification ?
 	                                   Classification : p->job_sheets[0]);
-      attr->values[1].string.text = strdup(Classification ?
+      attr->values[1].string.text = _cups_sp_alloc(Classification ?
 	                                   Classification : p->job_sheets[1]);
     }
   }
@@ -1640,7 +1640,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	for (i = 0; i < p->num_printers; i ++)
 	{
           if (attr != NULL)
-            attr->values[i].string.text = strdup(p->printers[i]->uri);
+            attr->values[i].string.text = _cups_sp_alloc(p->printers[i]->uri);
 
 	  p->type &= ~CUPS_PRINTER_OPTIONS | p->printers[i]->type;
         }
@@ -1651,7 +1651,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	if (attr != NULL)
 	{
 	  for (i = 0; i < p->num_printers; i ++)
-            attr->values[i].string.text = strdup(p->printers[i]->name);
+            attr->values[i].string.text = _cups_sp_alloc(p->printers[i]->name);
         }
       }
     }
@@ -1762,20 +1762,20 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
 	    if (input_slot != NULL)
 	      for (i = 0; i < input_slot->num_choices; i ++, val ++)
-		val->string.text = strdup(input_slot->choices[i].choice);
+		val->string.text = _cups_sp_alloc(input_slot->choices[i].choice);
 
 	    if (media_type != NULL)
 	      for (i = 0; i < media_type->num_choices; i ++, val ++)
-		val->string.text = strdup(media_type->choices[i].choice);
+		val->string.text = _cups_sp_alloc(media_type->choices[i].choice);
 
 	    if (media_quality != NULL)
 	      for (i = 0; i < media_quality->num_choices; i ++, val ++)
-		val->string.text = strdup(media_quality->choices[i].choice);
+		val->string.text = _cups_sp_alloc(media_quality->choices[i].choice);
 
 	    if (page_size != NULL)
 	    {
 	      for (i = 0; i < page_size->num_choices; i ++, val ++)
-		val->string.text = strdup(page_size->choices[i].choice);
+		val->string.text = _cups_sp_alloc(page_size->choices[i].choice);
 
 	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
                 	   NULL, page_size->defchoice);
@@ -1810,7 +1810,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	    for (i = 0, val = attr->values;
 		 i < output_bin->num_choices;
 		 i ++, val ++)
-	      val->string.text = strdup(output_bin->choices[i].choice);
+	      val->string.text = _cups_sp_alloc(output_bin->choices[i].choice);
           }
 	}
 
@@ -1901,19 +1901,19 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
         attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 	                     "port-monitor-supported", i, NULL, NULL);
 
-        attr->values[0].string.text = strdup("none");
+        attr->values[0].string.text = _cups_sp_alloc("none");
 
         for (i = 1, ppdattr = ppdFindAttr(ppd, "cupsPortMonitor", NULL);
 	     ppdattr;
 	     i ++, ppdattr = ppdFindNextAttr(ppd, "cupsPortMonitor", NULL))
-	  attr->values[i].string.text = strdup(ppdattr->value);
+	  attr->values[i].string.text = _cups_sp_alloc(ppdattr->value);
 
         if (ppd->protocols)
 	{
 	  if (strstr(ppd->protocols, "TBCP"))
-	    attr->values[i].string.text = strdup("tbcp");
+	    attr->values[i].string.text = _cups_sp_alloc("tbcp");
 	  else if (strstr(ppd->protocols, "BCP"))
-	    attr->values[i].string.text = strdup("bcp");
+	    attr->values[i].string.text = _cups_sp_alloc("bcp");
 	}
 
        /*

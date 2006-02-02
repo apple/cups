@@ -132,6 +132,9 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 					/* Default printer */
   char			ppd_filename[HTTP_MAX_URI];
 					/* PPD filename */
+
+  /* string.c */
+  cups_array_t		*stringpool;	/* String pool */
 } _cups_globals_t;
 
 
@@ -144,6 +147,7 @@ extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsLangFlush(_cups_globals_t *cg);
 extern void		_cupsCharmapFlush(_cups_globals_t *cg);
 extern void		_cupsNormalizeMapsFlush(_cups_globals_t *cg);
+extern void		_cups_sp_flush(_cups_globals_t *cg);
 
 
 /*

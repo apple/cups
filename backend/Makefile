@@ -87,7 +87,8 @@ betest:	betest.o ../cups/$(LIBCUPS)
 
 test1284:	test1284.o ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/libcups.a \
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

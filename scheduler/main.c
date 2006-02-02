@@ -126,9 +126,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 			browse_time,	/* Next browse send time */
 			senddoc_time,	/* Send-Document time */
 			expire_time;	/* Subscription expire time */
-#ifdef HAVE_MALLINFO
   time_t		mallinfo_time;	/* Malloc information time */
-#endif /* HAVE_MALLINFO */
+  size_t		string_count,	/* String count */
+			alloc_bytes,	/* Allocated string bytes */
+			total_bytes;	/* Total string bytes */
   struct timeval	timeout;	/* select() timeout */
   struct rlimit		limit;		/* Runtime limit */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -550,9 +551,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Loop forever...
   */
 
-#ifdef HAVE_MALLINFO
   mallinfo_time = 0;
-#endif /* HAVE_MALLINFO */
   browse_time   = time(NULL);
   senddoc_time  = time(NULL);
   expire_time   = time(NULL);
@@ -977,13 +976,13 @@ main(int  argc,				/* I - Number of command-line arguments */
       senddoc_time = current_time;
     }
 
-#ifdef HAVE_MALLINFO
    /*
     * Log memory usage every minute...
     */
 
     if ((current_time - mallinfo_time) >= 60 && LogLevel >= CUPSD_LOG_DEBUG)
     {
+#ifdef HAVE_MALLINFO
       struct mallinfo mem;		/* Malloc information */
 
 
@@ -992,9 +991,17 @@ main(int  argc,				/* I - Number of command-line arguments */
                       "mallinfo: arena = %d, used = %d, free = %d\n",
                       mem.arena, mem.usmblks + mem.uordblks,
 		      mem.fsmblks + mem.fordblks);
+#endif /* HAVE_MALLINFO */
+
+      string_count = _cups_sp_statistics(&alloc_bytes, &total_bytes);
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "stringpool: " CUPS_LLFMT " strings, "
+		      CUPS_LLFMT " allocated, " CUPS_LLFMT " total bytes",
+		      CUPS_LLCAST string_count, CUPS_LLCAST alloc_bytes,
+		      CUPS_LLCAST total_bytes);
+
       mallinfo_time = current_time;
     }
-#endif /* HAVE_MALLINFO */
 
    /*
     * Update the root certificate once every 5 minutes...
