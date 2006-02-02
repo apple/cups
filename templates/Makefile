@@ -81,6 +81,8 @@ FILES	=	\
 		printers.tmpl \
 		printers-header.tmpl \
 		restart.tmpl \
+		samba-export.tmpl \
+		samba-exported.tmpl \
 		search.tmpl \
 		set-printer-options-header.tmpl \
 		set-printer-options-trailer.tmpl \

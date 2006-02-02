@@ -2621,7 +2621,7 @@ do_export(http_t *http)			/* I - HTTP connection */
       }
       else
       {
-        cgiCopyTemplateLang("samba-exported");
+        cgiCopyTemplateLang("samba-exported.tmpl");
 	cgiEndHTML();
 	return;
       }
