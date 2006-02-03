@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $"
+# "$Id: Makefile 5055 2006-02-02 18:25:38Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -81,6 +81,8 @@ FILES	=	\
 		printers.tmpl \
 		printers-header.tmpl \
 		restart.tmpl \
+		samba-export.tmpl \
+		samba-exported.tmpl \
 		search.tmpl \
 		set-printer-options-header.tmpl \
 		set-printer-options-trailer.tmpl \
@@ -115,5 +117,5 @@ install: all
 
 
 #
-# End of "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $".
+# End of "$Id: Makefile 5055 2006-02-02 18:25:38Z mike $".
 #

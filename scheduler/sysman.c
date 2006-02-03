@@ -1,5 +1,5 @@
 /*
- * "$Id: sysman.c 5018 2006-01-28 06:06:55Z mike $"
+ * "$Id: sysman.c 5049 2006-02-02 14:50:57Z mike $"
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
@@ -640,7 +640,9 @@ sysEventPowerNotifier(
 
     case kIOMessageSystemWillNotPowerOff:
     case kIOMessageSystemWillNotSleep:
+#ifdef kIOMessageSystemWillPowerOn
     case kIOMessageSystemWillPowerOn:
+#endif /* kIOMessageSystemWillPowerOn */
     default:
 	sendit = 0;
 	break;
@@ -744,5 +746,5 @@ sysEventTimerNotifier(
 
 
 /*
- * End of "$Id: sysman.c 5018 2006-01-28 06:06:55Z mike $".
+ * End of "$Id: sysman.c 5049 2006-02-02 14:50:57Z mike $".
  */

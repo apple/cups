@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c 5026 2006-01-30 21:59:02Z mike $"
+ * "$Id: file.c 5057 2006-02-02 20:38:29Z mike $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -285,7 +285,8 @@ cupsFileEOF(cups_file_t *fp)		/* I - CUPS file */
 const char *				/* O - Full path to file or NULL */
 cupsFileFind(const char *filename,	/* I - File to find */
              const char *path,		/* I - Colon/semicolon-separated path */
-             char       *buffer,	/* I - Filename buffer */
+             int        executable,	/* I - 1 = executable files, 0 = any file/dir */
+	     char       *buffer,	/* I - Filename buffer */
 	     int        bufsize)	/* I - Size of filename buffer */
 {
   char	*bufptr,			/* Current position in buffer */
@@ -330,7 +331,11 @@ cupsFileFind(const char *filename,	/* I - File to find */
 
       strlcpy(bufptr, filename, bufend - bufptr);
 
+#ifdef WIN32
       if (!access(buffer, 0))
+#else
+      if (!access(buffer, executable ? X_OK : 0))
+#endif /* WIN32 */
         return (buffer);
 
       bufptr = buffer;
@@ -1770,5 +1775,5 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * End of "$Id: file.c 5026 2006-01-30 21:59:02Z mike $".
+ * End of "$Id: file.c 5057 2006-02-02 20:38:29Z mike $".
  */

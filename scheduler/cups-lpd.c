@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: cups-lpd.c 5049 2006-02-02 14:50:57Z mike $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,7 @@
  * Include necessary headers...
  */
 
+#include <cups/http-private.h>
 #include <cups/cups.h>
 #include <cups/string.h>
 #include <cups/language.h>
@@ -1437,5 +1438,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: cups-lpd.c 5049 2006-02-02 14:50:57Z mike $".
  */

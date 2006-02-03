@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 5046 2006-02-01 22:11:58Z mike $"
+ * "$Id: job.c 5051 2006-02-02 16:13:16Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1013,7 +1013,7 @@ cupsdLoadAllJobs(void)
 	job->num_files    = fileid;
       }
 
-      job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename,
+      job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename, NULL,
                                                 job->compressions + fileid - 1);
 
       if (job->filetypes[fileid - 1] == NULL)
@@ -2741,5 +2741,5 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 5046 2006-02-01 22:11:58Z mike $".
+ * End of "$Id: job.c 5051 2006-02-02 16:13:16Z mike $".
  */

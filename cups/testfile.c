@@ -1,5 +1,5 @@
 /*
- * "$Id: testfile.c 4942 2006-01-18 19:49:15Z mike $"
+ * "$Id: testfile.c 5057 2006-02-02 20:38:29Z mike $"
  *
  *   File test program for the Common UNIX Printing System (CUPS).
  *
@@ -84,8 +84,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     fputs("cupsFileFind: ", stdout);
-    if (cupsFileFind("cat", "/bin", filename, sizeof(filename)) &&
-	cupsFileFind("cat", "/bin:/usr/bin", filename, sizeof(filename)))
+    if (cupsFileFind("cat", "/bin", 1, filename, sizeof(filename)) &&
+	cupsFileFind("cat", "/bin:/usr/bin", 1, filename, sizeof(filename)))
       printf("PASS (%s)\n", filename);
     else
     {
@@ -442,5 +442,5 @@ read_write_tests(int compression)	/* I - Use compression? */
 
 
 /*
- * End of "$Id: testfile.c 4942 2006-01-18 19:49:15Z mike $".
+ * End of "$Id: testfile.c 5057 2006-02-02 20:38:29Z mike $".
  */

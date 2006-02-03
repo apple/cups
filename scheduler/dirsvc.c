@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 5043 2006-02-01 18:55:16Z mike $"
+ * "$Id: dirsvc.c 5059 2006-02-02 23:17:16Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -267,7 +267,10 @@ cupsdLoadRemoteCache(void)
     else if (!strcasecmp(line, "DeviceURI"))
     {
       if (value)
+      {
+	cupsdSetString(&p->uri, value);
 	cupsdSetString(&p->device_uri, value);
+      }
       else
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2714,5 +2717,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id: dirsvc.c 5043 2006-02-01 18:55:16Z mike $".
+ * End of "$Id: dirsvc.c 5059 2006-02-02 23:17:16Z mike $".
  */

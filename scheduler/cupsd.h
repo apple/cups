@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h 5046 2006-02-01 22:11:58Z mike $"
+ * "$Id: cupsd.h 5053 2006-02-02 18:14:38Z mike $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -160,6 +160,10 @@ VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
 VAR int			NeedReload	VALUE(RELOAD_ALL);
 					/* Need to load configuration? */
+#ifdef HAVE_LAUNCH_H
+VAR int			Launchd		VALUE(0);
+					/* Running from launchd */
+#endif /* HAVE_LAUNCH_H */
 
 
 /*
@@ -200,5 +204,5 @@ extern int	cupsdStartProcess(const char *command, char *argv[],
 
 
 /*
- * End of "$Id: cupsd.h 5046 2006-02-01 22:11:58Z mike $".
+ * End of "$Id: cupsd.h 5053 2006-02-02 18:14:38Z mike $".
  */

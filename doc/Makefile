@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5020 2006-01-28 13:36:15Z mike $"
+# "$Id: Makefile 5054 2006-02-02 18:16:27Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -47,6 +47,7 @@ WEBIMAGES	=	\
 			images/delete-printer.gif \
 			images/edit-configuration-file.gif \
 			images/esp-logo.gif \
+			images/export-samba.gif \
 			images/happy.gif \
 			images/help.gif \
 			images/hold-job.gif \

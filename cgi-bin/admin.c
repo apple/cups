@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: admin.c 5057 2006-02-02 20:38:29Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -2621,7 +2621,7 @@ do_export(http_t *http)			/* I - HTTP connection */
       }
       else
       {
-        cgiCopyTemplateLang("samba-exported");
+        cgiCopyTemplateLang("samba-exported.tmpl");
 	cgiEndHTML();
 	return;
       }
@@ -3088,15 +3088,15 @@ do_menu(http_t *http)			/* I - HTTP connection */
     * rpcclient...
     */
 
-    if (cupsFileFind("smbclient", getenv("PATH"), line, sizeof(line)) &&
-        cupsFileFind("rpcclient", getenv("PATH"), line, sizeof(line)))
+    if (cupsFileFind("smbclient", getenv("PATH"), 1, line, sizeof(line)) &&
+        cupsFileFind("rpcclient", getenv("PATH"), 1, line, sizeof(line)))
       cgiSetVariable("HAVE_SAMBA", "Y");
     else
     {
-      if (!cupsFileFind("smbclient", getenv("PATH"), line, sizeof(line)))
+      if (!cupsFileFind("smbclient", getenv("PATH"), 1, line, sizeof(line)))
         fputs("ERROR: smbclient not found!\n", stderr);
 
-      if (!cupsFileFind("rpcclient", getenv("PATH"), line, sizeof(line)))
+      if (!cupsFileFind("rpcclient", getenv("PATH"), 1, line, sizeof(line)))
         fputs("ERROR: rpcclient not found!\n", stderr);
     }
   }
@@ -3590,5 +3590,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: admin.c 5057 2006-02-02 20:38:29Z mike $".
  */

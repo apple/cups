@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 5042 2006-02-01 18:17:34Z mike $"
+ * "$Id: main.c 5056 2006-02-02 19:46:32Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -37,7 +37,7 @@
  *   launchd_reload()          - Tell launchd to reload the configuration
  *                               file to pick up the new listening directives.
  *   launchd_sync_conf()       - Re-write the launchd(8) config file 
- *			         com.easysw.cupsd.plist based on cupsd.conf.
+ *			         org.cups.cupsd.plist based on cupsd.conf.
  *   parent_handler()          - Catch USR1/CHLD signals...
  *   process_children()        - Process all dead children...
  *   sigchld_handler()         - Handle 'child' signals from old processes.
@@ -126,9 +126,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 			browse_time,	/* Next browse send time */
 			senddoc_time,	/* Send-Document time */
 			expire_time;	/* Subscription expire time */
-#ifdef HAVE_MALLINFO
   time_t		mallinfo_time;	/* Malloc information time */
-#endif /* HAVE_MALLINFO */
+  size_t		string_count,	/* String count */
+			alloc_bytes,	/* Allocated string bytes */
+			total_bytes;	/* Total string bytes */
   struct timeval	timeout;	/* select() timeout */
   struct rlimit		limit;		/* Runtime limit */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -139,8 +140,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   struct stat		statbuf;	/* Needed for checking lpsched FIFO */
 #endif /* __sgi */
 #if HAVE_LAUNCHD
-  int			launchd,	/* Started with the -l option? */
-			launchd_idle_exit;
+  int			launchd_idle_exit;
 					/* Idle exit on select timeout? */
 #endif	/* HAVE_LAUNCHD */
 
@@ -149,10 +149,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Check for command-line arguments...
   */
 
-  fg      = 0;
-#if HAVE_LAUNCHD
-  launchd = 0;
-#endif /* HAVE_LAUNCHD */
+  fg = 0;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -215,7 +212,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
           case 'l' : /* Started by launchd... */
 #ifdef HAVE_LAUNCHD
-	      launchd = 1;
+	      Launchd = 1;
 	      fg      = 1;
 #else
 	      _cupsLangPuts(stderr, _("cupsd: launchd(8) support not compiled "
@@ -395,7 +392,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
 #if HAVE_LAUNCHD
-  if (launchd)
+  if (Launchd)
   {
    /*
     * If we were started by launchd make sure the cupsd plist file contains the
@@ -550,9 +547,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Loop forever...
   */
 
-#ifdef HAVE_MALLINFO
   mallinfo_time = 0;
-#endif /* HAVE_MALLINFO */
   browse_time   = time(NULL);
   senddoc_time  = time(NULL);
   expire_time   = time(NULL);
@@ -633,7 +628,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
 
 #if HAVE_LAUNCHD
-	if (launchd)
+	if (Launchd)
 	{
 	  if (launchd_sync_conf())
 	  {
@@ -681,7 +676,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * inactivity...
     */
 
-    if (timeout.tv_sec == 86400 && launchd && LaunchdTimeout && 
+    if (timeout.tv_sec == 86400 && Launchd && LaunchdTimeout && 
 	(!Browsing || !(BrowseLocalProtocols & BROWSE_DNSSD) ||
 	 cupsArrayCount(Printers) == 0))
     {
@@ -977,13 +972,13 @@ main(int  argc,				/* I - Number of command-line arguments */
       senddoc_time = current_time;
     }
 
-#ifdef HAVE_MALLINFO
    /*
     * Log memory usage every minute...
     */
 
     if ((current_time - mallinfo_time) >= 60 && LogLevel >= CUPSD_LOG_DEBUG)
     {
+#ifdef HAVE_MALLINFO
       struct mallinfo mem;		/* Malloc information */
 
 
@@ -992,9 +987,17 @@ main(int  argc,				/* I - Number of command-line arguments */
                       "mallinfo: arena = %d, used = %d, free = %d\n",
                       mem.arena, mem.usmblks + mem.uordblks,
 		      mem.fsmblks + mem.fordblks);
+#endif /* HAVE_MALLINFO */
+
+      string_count = _cups_sp_statistics(&alloc_bytes, &total_bytes);
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "stringpool: " CUPS_LLFMT " strings, "
+		      CUPS_LLFMT " allocated, " CUPS_LLFMT " total bytes",
+		      CUPS_LLCAST string_count, CUPS_LLCAST alloc_bytes,
+		      CUPS_LLCAST total_bytes);
+
       mallinfo_time = current_time;
     }
-#endif /* HAVE_MALLINFO */
 
    /*
     * Update the root certificate once every 5 minutes...
@@ -1488,17 +1491,6 @@ launchd_checkin(void)
 	portnum = ntohs(addr.ipv6.sin6_port);
       else
 #    endif /* AF_INET6 */
-#    ifdef AF_LOCAL
-      if (addr.addr.sa_family == AF_LOCAL)
-      {
-       /*
-	* Make sure the domain socket is accessible to all...
-	*/
-
-	fchmod(lis->fd, 0140777);
-      }
-      else
-#    endif /* AF_LOCAL */
       if (addr.addr.sa_family == AF_INET)
 	portnum = ntohs(addr.ipv4.sin_port);
 
@@ -1651,7 +1643,7 @@ launchd_sync_conf(void)
 {
   int			  i,		/* Looping var */
 			  portnum;	/* Port number */
-  CFMutableDictionaryRef  cupsd_dict,	/* com.easysw.cupsd.plist dictionary */
+  CFMutableDictionaryRef  cupsd_dict,	/* org.cups.cupsd.plist dictionary */
 			  sockets,	/* Sockets dictionary */
 			  listener;	/* Listener dictionary */
   CFDataRef		  resourceData;	/* XML representation of the property list */
@@ -1665,7 +1657,7 @@ launchd_sync_conf(void)
   struct servent	  *service;	/* Services data base entry */
   char			  temp[1024];	/* Temporary buffer for value */
   struct stat		  cupsd_sb,	/* File info for cupsd.conf */
-			  launchd_sb;	/* File info for com.easysw.cupsd.plist */
+			  launchd_sb;	/* File info for org.cups.cupsd.plist */
 
 
  /*
@@ -1684,7 +1676,7 @@ launchd_sync_conf(void)
   }
 
  /*
-  * Time to write a new 'com.easysw.cupsd.plist' file.
+  * Time to write a new 'org.cups.cupsd.plist' file.
   * Create the new dictionary and populate it with values...
   */
 
@@ -1706,8 +1698,10 @@ launchd_sync_conf(void)
       CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_RUNATLOAD),
                            kCFBooleanFalse);
 
+#ifdef LAUNCH_JOBKEY_SERVICEIPC
     CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_SERVICEIPC),
 			 kCFBooleanTrue);
+#endif  /* LAUNCH_JOBKEY_SERVICEIPC */
 
     if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 2,
                                       &kCFTypeArrayCallBacks)) != NULL)
@@ -2316,5 +2310,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 5042 2006-02-01 18:17:34Z mike $".
+ * End of "$Id: main.c 5056 2006-02-02 19:46:32Z mike $".
  */

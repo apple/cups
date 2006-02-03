@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 4973 2006-01-25 02:36:02Z mike $"
+ * "$Id: http-private.h 5049 2006-02-02 14:50:57Z mike $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -54,14 +54,14 @@
 #    define closesocket(f) close(f)
 #  endif /* WIN32 */
 
-#  ifdef __sgi
+#  if defined(__sgi) || (defined(__APPLE__) && !defined(_SOCKLEN_T))
 /*
- * IRIX does not define socklen_t, and in fact uses an int instead of
+ * IRIX and MacOS X 10.2.x do not define socklen_t, and in fact use an int instead of
  * unsigned type for length values...
  */
 
 typedef int socklen_t;
-#  endif /* __sgi */
+#  endif /* __sgi || (__APPLE__ && !_SOCKLEN_T) */
 
 #  include "http.h"
 #  include "ipp-private.h"
@@ -123,5 +123,5 @@ extern const char *hstrerror(int error);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 4973 2006-01-25 02:36:02Z mike $".
+ * End of "$Id: http-private.h 5049 2006-02-02 14:50:57Z mike $".
  */

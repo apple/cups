@@ -1,5 +1,5 @@
 /*
- * "$Id: process.c 5046 2006-02-01 22:11:58Z mike $"
+ * "$Id: process.c 5049 2006-02-02 14:50:57Z mike $"
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,9 @@
 
 #include "cupsd.h"
 #include <grp.h>
+#if defined(__APPLE__) && __GNUC__ < 4
+#  include <libgen.h>
+#endif /* __APPLE__ && __GNUC__ < 4 */ 
 
 
 /*
@@ -152,7 +155,7 @@ cupsdStartProcess(
     * We have room, try to read the symlink path for this command...
     */
 
-    if ((linkbytes = readlink(linkpath, sizeof(linkpath) - 1)) > 0)
+    if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
     {
      /*
       * Yes, this is a symlink to the actual program, nul-terminate and
@@ -350,5 +353,5 @@ compare_procs(cupsd_proc_t *a,		/* I - First process */
 
 
 /*
- * End of "$Id: process.c 5046 2006-02-01 22:11:58Z mike $".
+ * End of "$Id: process.c 5049 2006-02-02 14:50:57Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5044 2006-02-01 21:35:30Z mike $"
+# "$Id: Makefile 5047 2006-02-02 05:14:15Z mike $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -87,7 +87,8 @@ betest:	betest.o ../cups/$(LIBCUPS)
 
 test1284:	test1284.o ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/libcups.a
+	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/libcups.a \
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -178,5 +179,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5044 2006-02-01 21:35:30Z mike $".
+# End of "$Id: Makefile 5047 2006-02-02 05:14:15Z mike $".
 #

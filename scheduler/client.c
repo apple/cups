@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5046 2006-02-01 22:11:58Z mike $"
+ * "$Id: client.c 5051 2006-02-02 16:13:16Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -755,7 +755,7 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
     cupsdLogMessage(CUPSD_LOG_ERROR,
         	    "EncryptClient: Could not find signing key in keychain "
 		    "\"%s\"", ServerCertificate);
-    error = errSSLBadConfiguration;
+    error = errSSLBadCert; /* errSSLBadConfiguration is a better choice, but not available on 10.2.x */
   }
 
   if (!error)
@@ -1506,7 +1506,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		break;
 	      }
 
-	      type = mimeFileType(MimeDatabase, filename, NULL);
+	      type = mimeFileType(MimeDatabase, filename, NULL, NULL);
 
               if (cupsdIsCGI(con, filename, &filestats, type))
 	      {
@@ -1661,7 +1661,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		break;
 	      }
 
-	      type = mimeFileType(MimeDatabase, filename, NULL);
+	      type = mimeFileType(MimeDatabase, filename, NULL, NULL);
 
               if (!cupsdIsCGI(con, filename, &filestats, type))
 	      {
@@ -1837,7 +1837,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * Serve a file...
 	      */
 
-	      type = mimeFileType(MimeDatabase, filename, NULL);
+	      type = mimeFileType(MimeDatabase, filename, NULL, NULL);
 	      if (type == NULL)
 		strcpy(line, "text/plain");
 	      else
@@ -3486,5 +3486,5 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5046 2006-02-01 22:11:58Z mike $".
+ * End of "$Id: client.c 5051 2006-02-02 16:13:16Z mike $".
  */
