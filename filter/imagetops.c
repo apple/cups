@@ -892,7 +892,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   * End the job with the appropriate JCL command or CTRL-D otherwise.
   */
 
-  ppdEmitJCLEnd(ppd, stdout);
+  if (ppd && ppd->jcl_end)
+    ppdEmitJCLEnd(ppd, stdout);
+  else
+    putchar(0x04);
 
  /*
   * Close files...
