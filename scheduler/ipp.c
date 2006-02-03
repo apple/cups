@@ -6657,9 +6657,15 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Auto-type the file...
     */
 
+    ipp_attribute_t	*doc_name;	/* document-name attribute */
+
+
     cupsdLogMessage(CUPSD_LOG_DEBUG, "print_job: auto-typing file...");
 
-    filetype = mimeFileType(MimeDatabase, con->filename, NULL, &compression);
+    doc_name = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME);
+    filetype = mimeFileType(MimeDatabase, con->filename,
+                            doc_name ? doc_name->values[0].string.text : NULL,
+			    &compression);
 
     if (filetype)
     {
@@ -8040,9 +8046,15 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Auto-type the file...
     */
 
+    ipp_attribute_t	*doc_name;	/* document-name attribute */
+
+
     cupsdLogMessage(CUPSD_LOG_DEBUG, "send_document: auto-typing file...");
 
-    filetype = mimeFileType(MimeDatabase, con->filename, NULL, &compression);
+    doc_name = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME);
+    filetype = mimeFileType(MimeDatabase, con->filename,
+                            doc_name ? doc_name->values[0].string.text : NULL,
+			    &compression);
 
     if (filetype)
     {
