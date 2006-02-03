@@ -72,7 +72,7 @@ typedef enum
 
 typedef struct _mime_magic_s		/**** MIME Magic Data ****/
 {
-  struct mime_magic_str	*prev,		/* Previous rule */
+  struct _mime_magic_s	*prev,		/* Previous rule */
 			*next,		/* Next rule */
 			*parent,	/* Parent rules */
 			*child;		/* Child rules */
