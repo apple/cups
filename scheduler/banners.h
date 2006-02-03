@@ -26,9 +26,9 @@
  * Banner information structure...
  */
 
-typedef struct
+typedef struct				/**** Banner file information ****/
 {
-  char		name[256];		/* Name of banner */
+  char		*name;			/* Name of banner */
   mime_type_t	*filetype;		/* Filetype for banner */
 } cupsd_banner_t;
 
