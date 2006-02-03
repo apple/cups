@@ -142,7 +142,7 @@ depend:
 #
 
 install:	all installhdrs $(INSTALLSTATIC)
-	$(INSTALL_DIR) $(LIBDIR)
+	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
@@ -162,7 +162,7 @@ installstatic:
 	fi
 
 installhdrs:
-	$(INSTALL_DIR) $(INCLUDEDIR)/cups
+	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
 	for file in $(HEADERS); do \
 		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
 	done

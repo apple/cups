@@ -61,7 +61,7 @@ depend:
 #
 
 install:	all
-	$(INSTALL_DIR) $(SERVERBIN)/backend
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/backend
 	for file in $(RBACKENDS); do \
 		$(LIBTOOL) $(INSTALL) -m 700 $$file $(SERVERBIN)/backend; \
 	done

@@ -3,7 +3,7 @@
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2005 by Easy Software Products.
+#   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -137,23 +137,23 @@ clean:
 #
 
 install:	all
-	$(INSTALL_DIR) $(DATADIR)/banners
+	$(INSTALL_DIR) -m 755 $(DATADIR)/banners
 	for file in $(BANNERS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
 	done
-	$(INSTALL_DIR) $(DATADIR)/charmaps
+	$(INSTALL_DIR) -m 755 $(DATADIR)/charmaps
 	for file in $(CHARMAPS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/charmaps; \
 	done
-	$(INSTALL_DIR) $(DATADIR)/charsets
+	$(INSTALL_DIR) -m 755 $(DATADIR)/charsets
 	for file in $(CHARSETS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/charsets; \
 	done
-	$(INSTALL_DIR) $(DATADIR)/data
+	$(INSTALL_DIR) -m 755 $(DATADIR)/data
 	for file in $(DATAFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/data; \
 	done
-	$(INSTALL_DIR) $(DATADIR)/profiles
+	$(INSTALL_DIR) -m 755 $(DATADIR)/profiles
 
 
 #

@@ -3,7 +3,7 @@
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2005 by Easy Software Products.
+#   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -110,7 +110,7 @@ clean:
 #
 
 install: all
-	$(INSTALL_DIR) $(DATADIR)/templates
+	$(INSTALL_DIR) -m 755 $(DATADIR)/templates
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/templates; \
 	done

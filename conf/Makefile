@@ -51,7 +51,7 @@ clean:
 #
 
 install:	all
-	$(INSTALL_DIR) $(SERVERROOT)
+	$(INSTALL_DIR) -m 755 $(SERVERROOT)
 	for file in $(KEEP); do \
 		if test -r $(SERVERROOT)/$$file ; then \
 			$(INSTALL_CONFIG) $$file $(SERVERROOT)/$$file.N ; \
@@ -67,7 +67,7 @@ install:	all
 		$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
 	done
 	-if test x$(PAMDIR) != x$(BUILDROOT); then \
-		$(INSTALL_DIR) $(PAMDIR); \
+		$(INSTALL_DIR) -m 755 $(PAMDIR); \
 		if test -r $(PAMDIR)/cups/$(PAMFILE) ; then \
 			$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups.N ; \
 		else \

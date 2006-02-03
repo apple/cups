@@ -3,7 +3,7 @@
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
-#   CUPS filter changes Copyright 1997-2005 by Easy Software Products.
+#   CUPS filter changes Copyright 1997-2006 by Easy Software Products.
 #   Xpdf code Copyright 1996-1999 by Derek B. Noonburg
 #
 
@@ -122,7 +122,7 @@ depend:
 #
 
 install:	all
-	$(INSTALL_DIR) $(SERVERBIN)/filter
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/filter
 	$(INSTALL_BIN) pdftops $(SERVERBIN)/filter
 
 

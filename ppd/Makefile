@@ -53,7 +53,7 @@ clean:
 #
 
 install:	all
-	$(INSTALL_DIR) $(DATADIR)/model
+	$(INSTALL_DIR) -m 755 $(DATADIR)/model
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/model; \
 	done

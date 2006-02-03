@@ -3,7 +3,7 @@
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -56,11 +56,11 @@ depend:
 #
 
 install:	all
-	$(INSTALL_DIR) $(BINDIR)
+	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_BIN) lpq $(BINDIR)
 	$(INSTALL_BIN) lpr $(BINDIR)
 	$(INSTALL_BIN) lprm $(BINDIR)
-	$(INSTALL_DIR) $(SBINDIR)
+	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) lpc $(SBINDIR)
 
 

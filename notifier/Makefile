@@ -3,7 +3,7 @@
 #
 #   Notifier makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -49,7 +49,7 @@ clean:
 #
 
 install:	all
-	$(INSTALL_DIR) $(SERVERBIN)/notifier
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/notifier
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
 	done

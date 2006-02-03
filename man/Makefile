@@ -3,7 +3,7 @@
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2005 by Easy Software Products.
+#   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -91,19 +91,19 @@ depend:
 #
 
 install:	all
-	$(INSTALL_DIR) $(MANDIR)/man1
+	$(INSTALL_DIR) -m 755 $(MANDIR)/man1
 	for file in $(MAN1); do \
 		echo Installing $$file in $(MANDIR)/man1...; \
 		$(INSTALL_MAN) $$file $(MANDIR)/man1; \
 	done
 	$(RM) $(MANDIR)/man1/cancel.$(MAN1EXT)
 	$(LN) lp.$(MAN1EXT) $(MANDIR)/man1/cancel.$(MAN1EXT)
-	$(INSTALL_DIR) $(MANDIR)/man5
+	$(INSTALL_DIR) -m 755 $(MANDIR)/man5
 	for file in $(MAN5); do \
 		echo Installing $$file in $(MANDIR)/man5...; \
 		$(INSTALL_MAN) $$file $(MANDIR)/man5; \
 	done
-	$(INSTALL_DIR) $(AMANDIR)/man$(MAN8DIR)
+	$(INSTALL_DIR) -m 755 $(AMANDIR)/man$(MAN8DIR)
 	for file in $(MAN8); do \
 		echo Installing $$file in $(AMANDIR)/man$(MAN8DIR)...; \
 		$(INSTALL_MAN) $$file $(AMANDIR)/man$(MAN8DIR); \
