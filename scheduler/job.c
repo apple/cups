@@ -1360,6 +1360,8 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 					/* CONTENT_TYPE environment variable */
 			device_uri[1024],
 					/* DEVICE_URI environment variable */
+			final_content_type[1024],
+					/* FINAL_CONTENT_TYPE environment variable */
 			lang[255],	/* LANG environment variable */
 			ppd[1024],	/* PPD environment variable */
 			printer_name[255],
@@ -1496,8 +1498,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to add decompression filter - %s",
                       strerror(errno));
 
-      if (filters != NULL)
-        free(filters);
+      cupsArrayDelete(filters);
 
       job->current_file ++;
 
@@ -1529,8 +1530,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to add port monitor - %s",
                       strerror(errno));
 
-      if (filters != NULL)
-        free(filters);
+      cupsArrayDelete(filters);
 
       job->current_file ++;
 
@@ -1625,8 +1625,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
                       "cupsdStartJob: Unable to allocate %d bytes for option buffer for job %d!",
                       i, job->id);
 
-      if (filters != NULL)
-        free(filters);
+      cupsArrayDelete(filters);
 
       FilterLevel -= job->cost;
 
@@ -1880,6 +1879,27 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
   envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
 
+  if (envc > (MAX_ENV - 11))
+  {
+    cupsdLogMessage(CUPSD_LOG_EMERG,
+                    "Too many environment variables defined, unable to print "
+		    "job #%d!", job->id);
+    snprintf(printer->state_message, sizeof(printer->state_message),
+             "Too many environment variables defined, unable to print job #%d!",
+	     job->id);
+
+    cupsdAddPrinterHistory(printer);
+
+    cupsArrayDelete(filters);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                  "Job canceled because the server could not pass the required "
+		  "environment variables.");
+
+    cupsdCancelJob(job, 0);
+    return;
+  }
+
   envp[envc ++] = charset;
   envp[envc ++] = lang;
   envp[envc ++] = ppd;
@@ -1887,6 +1907,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   envp[envc ++] = content_type;
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
+
+  if ((filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
+  {
+    snprintf(final_content_type, sizeof(final_content_type),
+             "FINAL_CONTENT_TYPE=%s/%s",
+	     filter->dst->super, filter->dst->type);
+    envp[envc ++] = final_content_type;
+  }
 
   if (Classification && !banner_page)
   {
@@ -1936,8 +1964,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
     cupsdAddPrinterHistory(printer);
 
-    if (filters != NULL)
-      free(filters);
+    cupsArrayDelete(filters);
 
     cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                   "Job canceled because the server could not create the job status pipes.");
@@ -1971,8 +1998,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
     cupsdAddPrinterHistory(printer);
 
-    if (filters != NULL)
-      free(filters);
+    cupsArrayDelete(filters);
 
     cupsdClosePipe(statusfds);
     cupsdCancelJob(job, 0);

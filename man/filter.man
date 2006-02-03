@@ -3,7 +3,7 @@
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH filter 1 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
+.TH filter 1 "Common UNIX Printing System" "3 February 2006" "Easy Software Products"
 .SH NAME
 filter \- cups file conversion filter interfaces
 .SH SYNOPSIS
@@ -35,9 +35,9 @@ new document types to CUPS. Each filter is capable of converting from one
 or more input formats to another format that can either be printed directly
 or piped into another filter to get it to a printable format.
 .LP
-Filters must be capable of reading from a filename on the command-line
+Filters \fBmust\fR be capable of reading from a filename on the command-line
 or from the standard input, copying the standard input to a temporary
-file as required by the file format. All output must be sent to the
+file as required by the file format. All output \fBmust\fR be sent to the
 standard output.
 .LP
 The command name (argv[0]) is set to the name of the destination printer.
@@ -70,6 +70,10 @@ The root directory of the server.
 DEVICE_URI
 .br
 The device-uri associated with the printer.
+.TP 5
+FINAL_CONTENT_TYPE
+.br
+The MIME type associated with the printer (e.g. application/vnd.cups-postscript).
 .TP 5
 LANG
 .br
@@ -112,12 +116,10 @@ only filter.  Typically the interface script will be provided via the
 \fBlpadmin(8)\fR command using the \fI-i\fR option.
 .SH SEE ALSO
 backend(1), cupsd(8),
-CUPS Interface Design Description,
-CUPS Software Administrators Manual,
-CUPS Software Programmers Manual,
-http://localhost:631/documentation.html
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"
