@@ -474,7 +474,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	                      "Canceling job %d since it could not be sent after %d tries.",
 	        	      job->id, JobRetryLimit);
 
-	      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+	      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, printer, job,
                 	    "Job canceled since it could not be sent after %d tries.",
 			    JobRetryLimit);
 
@@ -545,7 +545,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
     cupsdStopJob(job, 1);
     cupsdSaveJob(job);
-    cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, job->printer, job,
+    cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
                   "Job stopped due to filter errors; please consult the "
 		  "error_log file for details.");
     cupsdCheckJobs();
@@ -563,7 +563,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
       */
 
       FilterLevel -= job->cost;
-      cupsdStartJob(job, job->printer);
+      cupsdStartJob(job, printer);
     }
     else
     {
@@ -571,7 +571,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
       * Close out this job...
       */
 
-      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, printer, job,
                     "Job completed successfully.");
 
       job_history = JobHistory && !(job->dtype & CUPS_PRINTER_REMOTE);
@@ -585,10 +585,12 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
       }
 
      /*
-      * Clear the printer's state_message and move on...
+      * Clear the printer's state_message and state_reasons and move on...
       */
 
       printer->state_message[0] = '\0';
+
+      cupsdSetPrinterReasons(printer, "");
 
       cupsdCheckJobs();
     }
