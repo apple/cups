@@ -111,7 +111,7 @@ main(int  argc,				/* I - Number of command-line args */
       sscanf(argv[i], "%15[^/]/%31s", super, type);
       dst = mimeType(mime, super, type);
 
-      filters = mimeFilter(mime, src, dst, &cost, 10);
+      filters = mimeFilter(mime, src, dst, &cost);
 
       if (!filters)
       {
@@ -295,7 +295,7 @@ type_dir(mime_t     *mime,		/* I - MIME database */
       printf("%s: %s/%s%s\n", filename, filetype->super, filetype->type,
              compression ? " (compressed)" : "");
 
-      filters = mimeFilter(mime, filetype, pstype, &cost, 10);
+      filters = mimeFilter(mime, filetype, pstype, &cost);
 
       if (!filters)
 	puts("    No filters to convert application/vnd.cups-postscript.");

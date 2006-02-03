@@ -1410,7 +1410,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     */
 
     filters = mimeFilter(MimeDatabase, job->filetypes[job->current_file],
-                         printer->filetype, &(job->cost), MAX_FILTERS - 1);
+                         printer->filetype, &(job->cost));
 
     if (!filters)
     {

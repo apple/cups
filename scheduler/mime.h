@@ -141,7 +141,7 @@ extern mime_filter_t	*mimeAddFilter(mime_t *mime, mime_type_t *src,
 				       const char *filter);
 extern void		mimeDeleteFilter(mime_t *mime, mime_filter_t *filter);
 extern cups_array_t	*mimeFilter(mime_t *mime, mime_type_t *src,
-			            mime_type_t *dst, int *cost, int max_depth);
+			            mime_type_t *dst, int *cost);
 extern mime_filter_t	*mimeFirstFilter(mime_t *mime);
 extern mime_filter_t	*mimeNextFilter(mime_t *mime);
 extern int		mimeNumFilters(mime_t *mime);
