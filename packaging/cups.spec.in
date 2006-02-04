@@ -101,6 +101,11 @@ if test -x /sbin/chkconfig; then
 	/sbin/chkconfig cups on
 fi
 
+# Restart cupsd if we are upgrading...
+if test $1 -gt 1; then
+	/etc/init.d/cups start
+fi
+
 # these lines automatically start cupsd after installation; commented out
 # by request...
 #if test -f /sbin/init.d/cups; then
@@ -132,6 +137,7 @@ fi
 rm -rf $RPM_BUILD_ROOT
 
 %files
+%docdir /usr/share/doc/cups
 %defattr(-,root,root)
 %dir /etc/cups
 %config(noreplace) /etc/cups/*.conf
