@@ -1551,7 +1551,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   best = con->best;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdIsAuthorized: level=AUTH_%s, type=AUTH_%s, satisfy=AUTH_SATISFY_%s, num_names=%d",
+                  "cupsdIsAuthorized: level=AUTH_%s, type=AUTH_%s, "
+		  "satisfy=AUTH_SATISFY_%s, num_names=%d",
                   levels[best->level], types[best->type],
 	          best->satisfy ? "ANY" : "ALL", best->num_names);
 
@@ -1650,7 +1651,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   * See if encryption is required...
   */
 
-  if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls)
+  if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
+      best->satisfy == AUTH_SATISFY_ALL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsAuthorized: Need upgrade to TLS...");
