@@ -253,11 +253,7 @@ cupsdReadConfiguration(void)
     NumRelays = 0;
   }
 
-  if (NumListeners > 0)
-  {
-    free(Listeners);
-    NumListeners = 0;
-  }
+  cupsdDeleteAllListeners();
 
  /*
   * String options...
@@ -548,7 +544,7 @@ cupsdReadConfiguration(void)
   * as an error and exit!
   */
 
-  if (NumListeners == 0)
+  if (cupsArrayCount(Listeners) == 0)
   {
    /*
     * No listeners!
@@ -706,16 +702,8 @@ cupsdReadConfiguration(void)
     MaxClients = MaxFDs / 3;
   }
 
-  if ((Clients = calloc(sizeof(cupsd_client_t), MaxClients)) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdReadConfiguration: Unable to allocate memory for %d clients: %s",
-                    MaxClients, strerror(errno));
-    exit(1);
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_INFO, "Configured for up to %d clients.",
-                    MaxClients);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Configured for up to %d clients.",
+                  MaxClients);
 
  /*
   * Check the MaxActiveJobs setting; limit to 1/3 the available
@@ -1964,12 +1952,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         * Allocate another listener...
 	*/
 
-	if (NumListeners == 0)
-          lis = malloc(sizeof(cupsd_listener_t));
-	else
-          lis = realloc(Listeners, (NumListeners + 1) * sizeof(cupsd_listener_t));
+        if (!Listeners)
+	  Listeners = cupsArrayNew(NULL, NULL);
 
-	if (!lis)
+	if (!Listeners)
 	{
           cupsdLogMessage(CUPSD_LOG_ERROR,
 	                  "Unable to allocate %s at line %d - %s.",
@@ -1977,14 +1963,20 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
           break;
 	}
 
-	Listeners = lis;
-	lis      += NumListeners;
+        if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
+	{
+          cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Unable to allocate %s at line %d - %s.",
+	                  line, linenum, strerror(errno));
+          break;
+	}
+
+        cupsArrayAdd(Listeners, lis);
 
        /*
         * Copy the current address and log it...
 	*/
 
-	memset(lis, 0, sizeof(cupsd_listener_t));
 	memcpy(&(lis->address), &(addr->addr), sizeof(lis->address));
 	lis->fd = -1;
 
@@ -1992,7 +1984,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         if (!strcasecmp(line, "SSLPort") || !strcasecmp(line, "SSLListen"))
           lis->encryption = HTTP_ENCRYPT_ALWAYS;
 #endif /* HAVE_SSL */
-
 
 	httpAddrString(&lis->address, temp, sizeof(temp));
 
@@ -2009,8 +2000,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 #endif /* AF_LOCAL */
 	cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv4)", temp,
                         ntohs(lis->address.ipv4.sin_port));
-
-	NumListeners ++;
       }
 
      /*

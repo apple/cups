@@ -36,7 +36,7 @@
  *                               listening fds.
  *   launchd_reload()          - Tell launchd to reload the configuration
  *                               file to pick up the new listening directives.
- *   launchd_sync_conf()       - Re-write the launchd(8) config file 
+ *   launchd_sync_conf()       - Re-write the launchd(8) config file
  *			         org.cups.cupsd.plist based on cupsd.conf.
  *   parent_handler()          - Catch USR1/CHLD signals...
  *   process_children()        - Process all dead children...
@@ -109,13 +109,13 @@ static int	stop_scheduler = 0;	/* Should the scheduler stop? */
  */
 
 int					/* O - Exit status */
-main(int  argc,				/* I - Number of command-line arguments */
+main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int			i;		/* Looping var */
   char			*opt;		/* Option character */
   int			fg;		/* Run in the foreground */
-  int			fds;		/* Number of ready descriptors select returns */
+  int			fds;		/* Number of ready descriptors */
   fd_set		*input,		/* Input set for select() */
 			*output;	/* Output set for select() */
   cupsd_client_t	*con;		/* Current client */
@@ -202,7 +202,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      fg = 1;
 	      break;
 
-          case 'F' : /* Run in foreground, but still disconnect from terminal... */
+          case 'F' : /* Run in foreground, but disconnect from terminal... */
 	      fg = -1;
 	      break;
 
@@ -291,7 +291,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
       else if (WIFEXITED(i))
       {
-        fprintf(stderr, "cupsd: Child exited with status %d!\n", WEXITSTATUS(i));
+        fprintf(stderr, "cupsd: Child exited with status %d!\n",
+	        WEXITSTATUS(i));
 	return (2);
       }
       else
@@ -578,14 +579,13 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Close any idle clients...
       */
 
-      if (NumClients > 0)
+      if (cupsArrayCount(Clients) > 0)
       {
-        for (i = NumClients, con = Clients; i > 0; i --, con ++)
+	for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
+	     con;
+	     con = (cupsd_client_t *)cupsArrayNext(Clients))
 	  if (con->http.state == HTTP_WAITING)
-	  {
 	    cupsdCloseClient(con);
-	    con --;
-	  }
 	  else
 	    con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 
@@ -607,7 +607,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       * if the reload timeout has elapsed...
       */
 
-      if ((NumClients == 0 && (!job || NeedReload != RELOAD_ALL)) ||
+      if ((cupsArrayCount(Clients) == 0 &&
+           (!job || NeedReload != RELOAD_ALL)) ||
           (time(NULL) - ReloadTime) >= ReloadTimeout)
       {
        /*
@@ -676,7 +677,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * inactivity...
     */
 
-    if (timeout.tv_sec == 86400 && Launchd && LaunchdTimeout && 
+    if (timeout.tv_sec == 86400 && Launchd && LaunchdTimeout &&
 	(!Browsing || !(BrowseLocalProtocols & BROWSE_DNSSD) ||
 	 cupsArrayCount(Printers) == 0))
     {
@@ -741,12 +742,16 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       cupsdLogMessage(CUPSD_LOG_EMERG, s);
 
-      for (i = 0, con = Clients; i < NumClients; i ++, con ++)
+      for (i = 0, con = (cupsd_client_t *)cupsArrayFirst(Clients);
+	   con;
+	   i ++, con = (cupsd_client_t *)cupsArrayNext(Clients))
         cupsdLogMessage(CUPSD_LOG_EMERG,
 	                "Clients[%d] = %d, file = %d, state = %d",
 	                i, con->http.fd, con->file, con->http.state);
 
-      for (i = 0, lis = Listeners; i < NumListeners; i ++, lis ++)
+      for (i = 0, lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+           lis;
+	   i ++, lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
         cupsdLogMessage(CUPSD_LOG_EMERG, "Listeners[%d] = %d", i, lis->fd);
 
       cupsdLogMessage(CUPSD_LOG_EMERG, "BrowseSocket = %d", BrowseSocket);
@@ -873,7 +878,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Check for new connections on the "listen" sockets...
     */
 
-    for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+         lis;
+	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
       if (lis->fd >= 0 && FD_ISSET(lis->fd, input))
       {
         FD_CLR(lis->fd, input);
@@ -884,7 +891,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Check for new data on the client sockets...
     */
 
-    for (i = NumClients, con = Clients; i > 0; i --, con ++)
+    for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
+	 con;
+	 con = (cupsd_client_t *)cupsArrayNext(Clients))
     {
      /*
       * Process the input buffer...
@@ -892,14 +901,16 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if (FD_ISSET(con->http.fd, input) || con->http.used)
       {
+        int fd = con->file;
+
+
         FD_CLR(con->http.fd, input);
 
         if (!cupsdReadClient(con))
 	{
-	  if (con->pipe_pid)
-	    FD_CLR(con->file, input);
+	  if (fd >= 0)
+	    FD_CLR(fd, input);
 
-	  con --;
 	  continue;
 	}
       }
@@ -939,10 +950,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	if (!con->pipe_pid || con->file_ready)
           if (!cupsdWriteClient(con))
-	  {
-	    con --;
 	    continue;
-	  }
       }
 
      /*
@@ -957,7 +965,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 	                con->http.fd, Timeout);
 
         cupsdCloseClient(con);
-        con --;
         continue;
       }
     }
@@ -976,21 +983,21 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Log memory usage every minute...
     */
 
-    if ((current_time - mallinfo_time) >= 60 && LogLevel >= CUPSD_LOG_DEBUG)
+    if ((current_time - mallinfo_time) >= 60 && LogLevel >= CUPSD_LOG_DEBUG2)
     {
 #ifdef HAVE_MALLINFO
       struct mallinfo mem;		/* Malloc information */
 
 
       mem = mallinfo();
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "mallinfo: arena = %d, used = %d, free = %d\n",
                       mem.arena, mem.usmblks + mem.uordblks,
 		      mem.fsmblks + mem.fordblks);
 #endif /* HAVE_MALLINFO */
 
       string_count = _cups_sp_statistics(&alloc_bytes, &total_bytes);
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "stringpool: " CUPS_LLFMT " strings, "
 		      CUPS_LLFMT " allocated, " CUPS_LLFMT " total bytes",
 		      CUPS_LLCAST string_count, CUPS_LLCAST alloc_bytes,
@@ -1359,6 +1366,7 @@ static void
 launchd_checkin(void)
 {
   int			i,		/* Looping var */
+			count,		/* Numebr of listeners */
 			portnum;	/* Port number */
   launch_data_t		ld_msg,		/* Launch data message */
 			ld_resp,	/* Launch data response */
@@ -1381,12 +1389,12 @@ launchd_checkin(void)
   ld_msg = launch_data_new_string(LAUNCH_KEY_CHECKIN);
   if ((ld_resp = launch_msg(ld_msg)) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, 
+    cupsdLogMessage(CUPSD_LOG_ERROR,
 		    "launchd_checkin: launch_msg(\"" LAUNCH_KEY_CHECKIN
 		    "\") IPC failure");
     exit(EXIT_FAILURE);
   }
-  
+
   if (launch_data_get_type(ld_resp) == LAUNCH_DATA_ERRNO)
   {
     errno = launch_data_get_errno(ld_resp);
@@ -1399,8 +1407,8 @@ launchd_checkin(void)
   * Get the "run-at-load" setting...
   */
 
-  if ((ld_runatload = launch_data_dict_lookup(ld_resp,
-                                              LAUNCH_JOBKEY_RUNATLOAD)) != NULL &&
+  if ((ld_runatload =
+           launch_data_dict_lookup(ld_resp, LAUNCH_JOBKEY_RUNATLOAD)) != NULL &&
       launch_data_get_type(ld_runatload) == LAUNCH_DATA_BOOL)
     runatload = launch_data_get_bool(ld_runatload);
   else
@@ -1425,7 +1433,7 @@ launchd_checkin(void)
                     "launchd_checkin: No sockets found to answer requests on!");
     exit(EXIT_FAILURE);
   }
-  
+
  /*
   * Get the array of listener sockets...
   */
@@ -1446,32 +1454,32 @@ launchd_checkin(void)
    /*
     * Free the listeners array built from cupsd.conf...
     */
-  
-    if (NumListeners > 0)
-      free(Listeners);
-  
-    NumListeners = launch_data_array_get_count(ld_array);
-    Listeners    = calloc(NumListeners, sizeof(cupsd_listener_t));
 
-    if (!Listeners)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "launchd_checkin: Unable to allocate new Listeners - %s.",
-                      strerror(errno));
-      exit(EXIT_FAILURE);
-    }
+    cupsDeleteAllListeners();
 
    /*
-    * Note: launchd wants us to access the array in ascending order,
-    * thus "i" counts up and not down as we normally do elsewhere...
+    * Create a new array of listeners from the launchd data...
     */
 
-    for (i = 0, lis = Listeners; i < NumListeners; i ++, lis ++)
+    Listeners = cupsArrayNew(NULL, NULL);
+    count     = launch_data_array_get_count(ld_array);
+
+    for (i = 0; i < count; i ++)
     {
      /*
       * Copy the current address and log it...
       */
-  
+
+      if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+                	"launchd_checkin: Unable to allocate listener - %s.",
+                	strerror(errno));
+	exit(EXIT_FAILURE);
+      }
+
+      cupsArrayAdd(Listeners, lis);
+
       tmp     = launch_data_array_get_index(ld_array, i);
       lis->fd = launch_data_get_fd(tmp);
       addrlen = sizeof(lis->address);
@@ -1482,10 +1490,10 @@ launchd_checkin(void)
 	                "launchd_checkin: Unable to get local address - %s",
 			strerror(errno));
       }
-    
+
 #  ifdef HAVE_SSL
       portnum = 0;
-  
+
 #    ifdef AF_INET6
       if (addr.addr.sa_family == AF_INET6)
 	portnum = ntohs(addr.ipv6.sin6_port);
@@ -1588,17 +1596,17 @@ launchd_reload(void)
 
     if (WIFSIGNALED(child_status))
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "launchd_reload: %s pid %d crashed on signal %d!", 
+                      "launchd_reload: %s pid %d crashed on signal %d!",
 		      basename(argv[0]), child_pid, WTERMSIG(child_status));
     else
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "launchd_reload: %s pid %d stopped with status %d!", 
+                      "launchd_reload: %s pid %d stopped with status %d!",
 		      basename(argv[0]), child_pid, WEXITSTATUS(child_status));
 
    /*
     * Do it again with the load command...
     */
-  
+
     argv[1] = "load";
 
     if (cupsdStartProcess(argv[0], argv, NULL, -1, -1, -1, -1, 1,
@@ -1634,7 +1642,7 @@ launchd_reload(void)
 
 
 /*
- * 'launchd_sync_conf()' - Re-write the launchd(8) config file 
+ * 'launchd_sync_conf()' - Re-write the launchd(8) config file
  *			   org.cups.cupsd.plist based on cupsd.conf.
  */
 
@@ -1646,7 +1654,7 @@ launchd_sync_conf(void)
   CFMutableDictionaryRef  cupsd_dict,	/* org.cups.cupsd.plist dictionary */
 			  sockets,	/* Sockets dictionary */
 			  listener;	/* Listener dictionary */
-  CFDataRef		  resourceData;	/* XML representation of the property list */
+  CFDataRef		  resourceData;	/* XML property list */
   CFMutableArrayRef	  array;	/* Array */
   CFNumberRef		  socket_mode;	/* Domain socket mode bits */
   CFStringRef		  socket_path;	/* Domain socket path */
@@ -1665,12 +1673,12 @@ launchd_sync_conf(void)
   * time then there's nothing to do...
   */
 
-  if (!stat(ConfigurationFile, &cupsd_sb) && 
-      !stat(LaunchdConf, &launchd_sb) && 
+  if (!stat(ConfigurationFile, &cupsd_sb) &&
+      !stat(LaunchdConf, &launchd_sb) &&
       launchd_sb.st_mtimespec.tv_sec >= cupsd_sb.st_mtimespec.tv_sec)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "launchd_sync_conf: Nothing to do, pid=%d.", 
+                    "launchd_sync_conf: Nothing to do, pid=%d.",
 		    (int)getpid());
     return (0);
   }
@@ -1716,7 +1724,7 @@ launchd_sync_conf(void)
    /*
     * Add a sockets dictionary...
     */
-  
+
     if ((sockets = (CFMutableDictionaryRef)CFDictionaryCreateMutable(
 				kCFAllocatorDefault, 0,
 				&kCFTypeDictionaryKeyCallBacks,
@@ -1727,7 +1735,7 @@ launchd_sync_conf(void)
      /*
       * Add a Listeners array to the sockets dictionary...
       */
-    
+
       if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 0,
                                         &kCFTypeArrayCallBacks)) != NULL)
       {
@@ -1736,8 +1744,10 @@ launchd_sync_conf(void)
        /*
 	* For each listener add a dictionary to the listeners array...
 	*/
-      
-        for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+
+	for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+	     lis;
+	     lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
 	{
 	  if ((listener = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
 				&kCFTypeDictionaryKeyCallBacks,
@@ -1748,8 +1758,8 @@ launchd_sync_conf(void)
 #  ifdef AF_LOCAL
 	    if (lis->address.addr.sa_family == AF_LOCAL)
 	    {
-	      if ((socket_path = CFStringCreateWithCString(kCFAllocatorDefault, 
-					lis->address.un.sun_path, 
+	      if ((socket_path = CFStringCreateWithCString(kCFAllocatorDefault,
+					lis->address.un.sun_path,
 					kCFStringEncodingUTF8)))
 	      {
 		CFDictionaryAddValue(listener,
@@ -1788,11 +1798,11 @@ launchd_sync_conf(void)
 	      }
 
 	      if ((service = getservbyport(portnum, NULL)))
-		value = CFStringCreateWithCString(kCFAllocatorDefault, 
-						  service->s_name, 
+		value = CFStringCreateWithCString(kCFAllocatorDefault,
+						  service->s_name,
 						  kCFStringEncodingUTF8);
 	      else
-		value = CFNumberCreate(kCFAllocatorDefault, 
+		value = CFNumberCreate(kCFAllocatorDefault,
 				       kCFNumberIntType, &portnum);
 
 	      if (value)
@@ -1804,7 +1814,7 @@ launchd_sync_conf(void)
 	      }	
 
 	      httpAddrString(&lis->address, temp, sizeof(temp));
-	      if ((value = CFStringCreateWithCString(kCFAllocatorDefault, temp, 
+	      if ((value = CFStringCreateWithCString(kCFAllocatorDefault, temp,
 						     kCFStringEncodingUTF8)))
 	      {
 		CFDictionaryAddValue(listener,
@@ -1824,10 +1834,10 @@ launchd_sync_conf(void)
      /*
       * Add the BrowseSocket to the sockets dictionary...
       */
-      
+
       if (Browsing && (BrowseRemoteProtocols & BROWSE_CUPS))
       {
-	if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 0, 
+	if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 0,
 					  &kCFTypeArrayCallBacks)) != NULL)
 	{
 	  CFDictionaryAddValue(sockets, CFSTR("BrowseSockets"), array);
@@ -1844,11 +1854,11 @@ launchd_sync_conf(void)
 	                         CFSTR("dgram"));
 
 	    if ((service = getservbyport(BrowsePort, NULL)))
-	      value = CFStringCreateWithCString(kCFAllocatorDefault, 
-						service->s_name, 
+	      value = CFStringCreateWithCString(kCFAllocatorDefault,
+						service->s_name,
 						kCFStringEncodingUTF8);
 	    else
-	      value = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, 
+	      value = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType,
 				     &BrowsePort);
 
 	    CFDictionaryAddValue(listener,
@@ -1866,11 +1876,11 @@ launchd_sync_conf(void)
     }
 
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "launchd_sync_conf: Updating \"%s\", pid=%d\n", 
+                    "launchd_sync_conf: Updating \"%s\", pid=%d\n",
 		    LaunchdConf, (int)getpid());
-  
-    if ((fileURL = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, 
-				(const unsigned char *)LaunchdConf, 
+
+    if ((fileURL = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
+				(const unsigned char *)LaunchdConf,
 				strlen(LaunchdConf), false)))
     {
       if ((resourceData = CFPropertyListCreateXMLData(kCFAllocatorDefault,
@@ -1882,7 +1892,7 @@ launchd_sync_conf(void)
 	  cupsdLogMessage(CUPSD_LOG_WARN,
 	                  "launchd_sync_conf: "
 			  "CFURLWriteDataAndPropertiesToResource(\"%s\") "
-			  "failed: %d\n", 
+			  "failed: %d\n",
 			  LaunchdConf, (int)errorCode);
         }
 
@@ -1973,7 +1983,8 @@ process_children(void)
 
       if (LogLevel < CUPSD_LOG_DEBUG)
         cupsdLogMessage(CUPSD_LOG_INFO,
-	                "Hint: Try setting the LogLevel to \"debug\" to find out more.");
+	                "Hint: Try setting the LogLevel to \"debug\" to find "
+			"out more.");
     }
     else
       cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
@@ -2125,9 +2136,8 @@ sigterm_handler(int sig)		/* I - Signal */
  */
 
 static long				/* O - Number of seconds */
-select_timeout(int fds)			/* I - Number of ready descriptors select returned */
+select_timeout(int fds)			/* I - Number of descriptors returned */
 {
-  int			i;		/* Looping var */
   long			timeout;	/* Timeout for select */
   time_t		now;		/* Current time */
   cupsd_client_t	*con;		/* Client information */
@@ -2142,7 +2152,9 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * processed; if so, the timeout should be 0...
   */
 
-  for (i = NumClients, con = Clients; i > 0; i --, con ++)
+  for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
+       con;
+       con = (cupsd_client_t *)cupsArrayNext(Clients))
     if (con->http.used > 0)
       return (0);
 
@@ -2152,7 +2164,7 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * timeout, just make it 1 second.
   */
 
-  if (fds || NumClients > 50)
+  if (fds || cupsArrayCount(Clients) > 50)
     return (1);
 
  /*
@@ -2174,7 +2186,9 @@ select_timeout(int fds)			/* I - Number of ready descriptors select returned */
   * Check the activity and close old clients...
   */
 
-  for (i = NumClients, con = Clients; i > 0; i --, con ++)
+  for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
+       con;
+       con = (cupsd_client_t *)cupsArrayNext(Clients))
     if ((con->http.activity + Timeout) < timeout)
     {
       timeout = con->http.activity + Timeout;

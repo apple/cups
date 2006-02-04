@@ -3,7 +3,7 @@
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -82,13 +82,9 @@ VAR int			ListenBackLog	VALUE(SOMAXCONN),
 					/* Local port to use */
 VAR http_encryption_t	LocalEncryption	VALUE(HTTP_ENCRYPT_IF_REQUESTED);
 					/* Local port encryption to use */
-VAR int			NumListeners	VALUE(0);
-					/* Number of listening sockets */
-VAR cupsd_listener_t	*Listeners	VALUE(NULL);
+VAR cups_array_t	*Listeners	VALUE(NULL);
 					/* Listening sockets */
-VAR int			NumClients	VALUE(0);
-					/* Number of HTTP clients */
-VAR cupsd_client_t	*Clients	VALUE(NULL);
+VAR cups_array_t	*Clients	VALUE(NULL);
 					/* HTTP clients */
 VAR http_addrlist_t	*ServerAddrs	VALUE(NULL);
 					/* Server address(es) */
@@ -107,6 +103,7 @@ VAR cupsd_statbuf_t	*CGIStatusBuffer VALUE(NULL);
 extern void	cupsdAcceptClient(cupsd_listener_t *lis);
 extern void	cupsdCloseAllClients(void);
 extern int	cupsdCloseClient(cupsd_client_t *con);
+extern void	cupsdDeleteAllListeners(void);
 extern int	cupsdEncryptClient(cupsd_client_t *con);
 extern int	cupsdIsCGI(cupsd_client_t *con, const char *filename,
 		           struct stat *filestats, mime_type_t *type);

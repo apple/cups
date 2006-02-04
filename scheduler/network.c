@@ -144,8 +144,7 @@ cupsdNetIFFree(void)
 void
 cupsdNetIFUpdate(void)
 {
-  int			i,		/* Looping var */
-			match;		/* Matching address? */
+  int			match;		/* Matching address? */
   cupsd_listener_t	*lis;		/* Listen address */
   cupsd_netif_t		*temp;		/* New interface */
   struct ifaddrs	*addrs,		/* Interface address list */
@@ -285,7 +284,9 @@ cupsdNetIFUpdate(void)
     * Determine which port to use when advertising printers...
     */
 
-    for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+         lis;
+	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
     {
       match = 0;
 

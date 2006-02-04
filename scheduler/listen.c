@@ -24,10 +24,11 @@
  *
  * Contents:
  *
- *   cupsdPauseListening()  - Clear input polling on all listening sockets...
- *   cupsdResumeListening() - Set input polling on all listening sockets...
- *   cupsdStartListening()  - Create all listening sockets...
- *   cupsdStopListening()   - Close all listening sockets...
+ *   cupsdDeleteAllListeners() - Delete all listeners.
+ *   cupsdPauseListening()     - Clear input polling on all listening sockets...
+ *   cupsdResumeListening()    - Set input polling on all listening sockets...
+ *   cupsdStartListening()     - Create all listening sockets...
+ *   cupsdStopListening()      - Close all listening sockets...
  */
 
 /*
@@ -48,26 +49,47 @@
 
 
 /*
+ * 'cupsdDeleteAllListeners()' - Delete all listeners.
+ */
+
+void
+cupsdDeleteAllListeners(void)
+{
+  cupsd_listener_t	*lis;		/* Current listening socket */
+
+
+  for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+       lis;
+       lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+    free(lis);
+
+  cupsArrayDelete(Listeners);
+  Listeners = NULL;
+}
+
+
+/*
  * 'cupsdPauseListening()' - Clear input polling on all listening sockets...
  */
 
 void
 cupsdPauseListening(void)
 {
-  int			i;		/* Looping var */
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
-  if (NumListeners < 1)
+  if (cupsArrayCount(Listeners) < 1)
     return;
 
-  if (NumClients == MaxClients)
+  if (cupsArrayCount(Clients) == MaxClients)
     cupsdLogMessage(CUPSD_LOG_WARN,
                     "Max clients reached, holding new connections...");
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdPauseListening: Clearing input bits...");
 
-  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+       lis;
+       lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
     if (lis->fd >= 0)
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -86,19 +108,20 @@ cupsdPauseListening(void)
 void
 cupsdResumeListening(void)
 {
-  int			i;		/* Looping var */
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
-  if (NumListeners < 1)
+  if (cupsArrayCount(Listeners) < 1)
     return;
 
-  if (NumClients >= (MaxClients - 1))
+  if (cupsArrayCount(Clients) >= (MaxClients - 1))
     cupsdLogMessage(CUPSD_LOG_WARN, "Resuming new connection processing...");
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdResumeListening: Setting input bits...");
 
-  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+       lis;
+       lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
     if (lis->fd >= 0)
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -117,8 +140,7 @@ void
 cupsdStartListening(void)
 {
   int			status;		/* Bind result */
-  int			i,		/* Looping var */
-			p,		/* Port number */
+  int			p,		/* Port number */
 			val;		/* Parameter value */
   cupsd_listener_t	*lis;		/* Current listening socket */
   char			s[256];		/* String addresss */
@@ -132,8 +154,8 @@ cupsdStartListening(void)
 		};
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdStartListening: NumListeners=%d",
-                  NumListeners);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdStartListening: %d Listeners",
+                  cupsArrayCount(Listeners));
 
  /*
   * Get the server's IP address...
@@ -151,8 +173,10 @@ cupsdStartListening(void)
   * Setup socket listeners...
   */
 
-  for (i = NumListeners, lis = Listeners, LocalPort = 0, have_domain = NULL;
-       i > 0; i --, lis ++)
+  for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners), LocalPort = 0,
+           have_domain = NULL;
+       lis;
+       lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
   {
     httpAddrString(&(lis->address), s, sizeof(s));
 
@@ -177,9 +201,9 @@ cupsdStartListening(void)
      /*
       * Create a socket for listening...
       */
-  
+
       lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0);
-  
+
       if (lis->fd == -1)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -187,22 +211,22 @@ cupsdStartListening(void)
 			s, p, strerror(errno));
 	continue;
       }
-  
+
      /*
       * Set things up to reuse the local address for this port.
       */
-  
+
       val = 1;
 #ifdef __sun
       setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
 #else
       setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
 #endif /* __sun */
-  
+
      /*
       * Bind to the port we found...
       */
-  
+
 #ifdef AF_INET6
       if (lis->address.addr.sa_family == AF_INET6)
       {
@@ -212,7 +236,7 @@ cupsdStartListening(void)
 	* potential security issues and to make all platforms behave
 	* the same.
 	*/
-  
+
 	val = 1;
 #    ifdef __sun
 	setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&val, sizeof(val));
@@ -220,7 +244,7 @@ cupsdStartListening(void)
 	setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
 #    endif /* __sun */
 #  endif /* IPV6_V6ONLY */
-  
+
 	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
 		      httpAddrLength(&(lis->address)));
       }
@@ -230,38 +254,38 @@ cupsdStartListening(void)
       if (lis->address.addr.sa_family == AF_LOCAL)
       {
 	mode_t	mask;			/* Umask setting */
-  
-  
+
+
        /*
 	* Remove any existing domain socket file...
 	*/
-  
+
 	unlink(lis->address.un.sun_path);
-  
+
        /*
 	* Save the curent umask and set it to 0...
 	*/
-  
+
 	mask = umask(0);
-  
+
        /*
 	* Bind the domain socket...
 	*/
-  
+
 	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
 		      httpAddrLength(&(lis->address)));
-  
+
        /*
 	* Restore the umask...
 	*/
-  
+
 	umask(mask);
       }
       else
 #endif /* AF_LOCAL */
       status = bind(lis->fd, (struct sockaddr *)&(lis->address),
 		    sizeof(lis->address.ipv4));
-  
+
       if (status < 0)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -271,11 +295,11 @@ cupsdStartListening(void)
 	lis->fd = -1;
 	continue;
       }
-  
+
      /*
       * Listen for new clients.
       */
-  
+
       if (listen(lis->fd, ListenBackLog) < 0)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -286,7 +310,6 @@ cupsdStartListening(void)
     }
 
     fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
-  
 
     if (p)
       cupsdLogMessage(CUPSD_LOG_INFO,
@@ -379,7 +402,6 @@ cupsdStartListening(void)
 void
 cupsdStopListening(void)
 {
-  int			i;		/* Looping var */
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
@@ -388,7 +410,9 @@ cupsdStopListening(void)
 
   cupsdPauseListening();
 
-  for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+  for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+       lis;
+       lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
   {
     if (lis->fd != -1)
     {

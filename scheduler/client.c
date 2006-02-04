@@ -80,10 +80,10 @@ static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 void
 cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 {
-  int			i;		/* Looping var */
   int			count;		/* Count of connections on a host */
   int			val;		/* Parameter value */
-  cupsd_client_t	*con;		/* New client pointer */
+  cupsd_client_t	*con,		/* New client pointer */
+			*tempcon;	/* Temporary client pointer */
   http_addrlist_t	*addrlist,	/* List of adddresses for host */
 			*addr;		/* Current address */
   socklen_t		addrlen;	/* Length of address */
@@ -93,23 +93,28 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdAcceptClient(lis=%p) %d NumClients = %d",
-                  lis, lis->fd, NumClients);
+                  "cupsdAcceptClient(lis=%p) %d Clients = %d",
+                  lis, lis->fd, cupsArrayCount(Clients));
 
  /*
   * Make sure we don't have a full set of clients already...
   */
 
-  if (NumClients == MaxClients)
+  if (cupsArrayCount(Clients) == MaxClients)
     return;
 
  /*
   * Get a pointer to the next available client...
   */
 
-  con = Clients + NumClients;
+  if (!Clients)
+    Clients = cupsArrayNew(NULL, NULL);
 
-  memset(con, 0, sizeof(cupsd_client_t));
+  if (!Clients)
+    return;
+
+  con = calloc(1, sizeof(cupsd_client_t));
+
   con->http.activity = time(NULL);
   con->file          = -1;
   con->http.hostaddr = &(con->clientaddr);
@@ -125,6 +130,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to accept client connection - %s.",
                     strerror(errno));
+    free(con);
     return;
   }
 
@@ -156,8 +162,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   * Check the number of clients on the same address...
   */
 
-  for (i = 0, count = 0; i < NumClients; i ++)
-    if (httpAddrEqual(Clients[i].http.hostaddr, con->http.hostaddr))
+  for (count = 0, tempcon = (cupsd_client_t *)cupsArrayFirst(Clients);
+       tempcon;
+       tempcon = (cupsd_client_t *)cupsArrayNext(Clients))
+    if (httpAddrEqual(tempcon->http.hostaddr, con->http.hostaddr))
     {
       count ++;
       if (count >= MaxClientsPerHost)
@@ -170,8 +178,9 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     {
       last_dos = time(NULL);
       cupsdLogMessage(CUPSD_LOG_WARN,
-                      "Possible DoS attack - more than %d clients connecting from %s!",
-	              MaxClientsPerHost, Clients[i].http.hostname);
+                      "Possible DoS attack - more than %d clients connecting "
+		      "from %s!",
+	              MaxClientsPerHost, tempcon->http.hostname);
     }
 
 #ifdef WIN32
@@ -180,6 +189,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     close(con->http.fd);
 #endif /* WIN32 */
 
+    free(con);
     return;
   }
 
@@ -241,6 +251,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     cupsdLogMessage(CUPSD_LOG_WARN,
                     "Name lookup failed - connection from %s closed!",
                     con->http.hostname);
+
+    free(con);
     return;
   }
 
@@ -285,6 +297,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
       cupsdLogMessage(CUPSD_LOG_WARN,
                       "IP lookup failed - connection from %s closed!",
                       con->http.hostname);
+      free(con);
       return;
     }
   }
@@ -341,6 +354,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     }
   }
 
+  cupsArrayAdd(Clients, con);
+
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdAcceptClient: %d connected to server on %s:%d",
                   con->http.fd, con->servername, con->serverport);
@@ -370,13 +385,11 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
                   con->http.fd);
   FD_SET(con->http.fd, InputSet);
 
-  NumClients ++;
-
  /*
   * Temporarily suspend accept()'s until we lose a client...
   */
 
-  if (NumClients == MaxClients)
+  if (cupsArrayCount(Clients) == MaxClients)
     cupsdPauseListening();
 
 #ifdef HAVE_SSL
@@ -407,8 +420,13 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 void
 cupsdCloseAllClients(void)
 {
-  while (NumClients > 0)
-    cupsdCloseClient(Clients);
+  cupsd_client_t	*con;		/* Current client */
+
+
+  for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
+       con;
+       con = (cupsd_client_t *)cupsArrayNext(Clients))
+    cupsdCloseClient(con);
 }
 
 
@@ -608,17 +626,16 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
     * limit...
     */
 
-    if (NumClients == MaxClients)
+    if (cupsArrayCount(Clients) == MaxClients)
       cupsdResumeListening();
 
    /*
     * Compact the list of clients as necessary...
     */
 
-    NumClients --;
+    cupsArrayRemove(Clients, con);
 
-    if (con < (Clients + NumClients))
-      memmove(con, con + 1, (Clients + NumClients - con) * sizeof(cupsd_client_t));
+    free(con);
   }
 
   return (partial);
