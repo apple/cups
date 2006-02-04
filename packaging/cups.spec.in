@@ -94,44 +94,31 @@ rm -rf $RPM_BUILD_ROOT
 make BUILDROOT=$RPM_BUILD_ROOT install
 
 %post
-ldconfig
-
-if test -x /sbin/chkconfig; then
-	/sbin/chkconfig --add cups
-	/sbin/chkconfig cups on
-fi
+/sbin/chkconfig --add cups
+/sbin/chkconfig cups on
 
 # Restart cupsd if we are upgrading...
 if test $1 -gt 1; then
-	/etc/init.d/cups start
+	/sbin/service cups start
 fi
 
-# these lines automatically start cupsd after installation; commented out
-# by request...
-#if test -f /sbin/init.d/cups; then
-#	/sbin/init.d/cups start
-#fi
-#if test -f /etc/rc.d/init.d/cups; then
-#	/etc/rc.d/init.d/cups start
-#fi
-#if test -f /etc/init.d/cups; then
-#	/etc/init.d/cups start
-#fi
+%post libs
+/sbin/ldconfig
 
 %preun
-if test -f /sbin/init.d/cups; then
-	/sbin/init.d/cups stop
-fi
-if test -f /etc/rc.d/init.d/cups; then
-	/etc/rc.d/init.d/cups stop
-fi
-if test -f /etc/init.d/cups; then
-	/etc/init.d/cups stop
-fi
 
-if test -x /sbin/chkconfig; then
+if test $1 = 0; then
+	/sbin/service cups stop
 	/sbin/chkconfig --del cups
 fi
+
+%postun
+if test $1 -ge 1; then
+	/sbin/service restart
+fi
+
+%postun libs
+/sbin/ldconfig
 
 %clean
 rm -rf $RPM_BUILD_ROOT
