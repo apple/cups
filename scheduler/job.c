@@ -2508,7 +2508,7 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
       cupsdAddPrinterHistory(job->printer);
     }
 #endif /* __APPLE__ */
-    else
+    else if (loglevel <= CUPSD_LOG_INFO)
     {
      /*
       * Some message to show in the printer-state-message attribute...
