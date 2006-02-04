@@ -97,8 +97,7 @@ typedef struct
 
 typedef struct
 {
-  char			location[HTTP_MAX_URI];
-					/* Location of resource */
+  char			*location;	/* Location of resource */
   ipp_op_t		op;		/* IPP operation */
   int			limit,		/* Limit for these types of requests */
 			length,		/* Length of location string */
@@ -122,9 +121,7 @@ typedef struct cupsd_client_s cupsd_client_t;
  * Globals...
  */
 
-VAR int			NumLocations	VALUE(0);
-					/* Number of authorization locations */
-VAR cupsd_location_t	*Locations	VALUE(NULL);
+VAR cups_array_t	*Locations	VALUE(NULL);
 					/* Authorization locations */
 VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
 					/* Default AuthType, if not specified */

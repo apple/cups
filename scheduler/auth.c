@@ -45,6 +45,7 @@
  *   cupsdIsAuthorized()       - Check to see if the user is authorized...
  *   add_allow()               - Add an allow mask to the location.
  *   add_deny()                - Add a deny mask to the location.
+ *   compare_locations()       - Compare two locations.
  *   cups_crypt()              - Encrypt the password using the DES or MD5
  *                               algorithms, as needed.
  *   pam_func()                - PAM conversation function.
@@ -81,6 +82,8 @@
 
 static cupsd_authmask_t	*add_allow(cupsd_location_t *loc);
 static cupsd_authmask_t	*add_deny(cupsd_location_t *loc);
+static int		compare_locations(cupsd_location_t *a,
+			                  cupsd_location_t *b);
 #if !HAVE_LIBPAM
 static char		*cups_crypt(const char *pw, const char *salt);
 #endif /* !HAVE_LIBPAM */
@@ -125,28 +128,30 @@ cupsdAddLocation(const char *location)	/* I - Location path */
 
 
  /*
+  * Make sure the locations array is created...
+  */
+
+  if (!Locations)
+    Locations = cupsArrayNew((cups_array_func_t)compare_locations, NULL);
+
+  if (!Locations)
+    return (NULL);
+
+ /*
   * Try to allocate memory for the new location.
   */
 
-  if (NumLocations == 0)
-    temp = malloc(sizeof(cupsd_location_t));
-  else
-    temp = realloc(Locations, sizeof(cupsd_location_t) * (NumLocations + 1));
-
-  if (temp == NULL)
+  if ((temp = calloc(1, sizeof(cupsd_location_t))) == NULL)
     return (NULL);
-
-  Locations = temp;
-  temp      += NumLocations;
-  NumLocations ++;
 
  /*
   * Initialize the record and copy the name over...
   */
 
-  memset(temp, 0, sizeof(cupsd_location_t));
-  strlcpy(temp->location, location, sizeof(temp->location));
-  temp->length = strlen(temp->location);
+  temp->location = strdup(location);
+  temp->length   = strlen(temp->location);
+
+  cupsArrayAdd(Locations, temp);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAddLocation: added location \'%s\'",
                   location);
@@ -218,7 +223,7 @@ cupsdAllowHost(cupsd_location_t *loc,	/* I - Location to add to */
   if ((temp = add_allow(loc)) == NULL)
     return;
 
-  if (strcasecmp(name, "@LOCAL") == 0)
+  if (!strcasecmp(name, "@LOCAL"))
   {
    /*
     * Allow *interface*...
@@ -228,7 +233,7 @@ cupsdAllowHost(cupsd_location_t *loc,	/* I - Location to add to */
     temp->mask.name.name   = strdup("*");
     temp->mask.name.length = 1;
   }
-  else if (strncasecmp(name, "@IF(", 4) == 0)
+  else if (!strncasecmp(name, "@IF(", 4))
   {
    /*
     * Allow *interface*...
@@ -900,8 +905,8 @@ cupsdCheckAuth(
 
 	  if (name_len >= masks->mask.name.length &&
 	      masks->mask.name.name[0] == '.' &&
-	      strcasecmp(name + name_len - masks->mask.name.length,
-	                 masks->mask.name.name) == 0)
+	      !strcasecmp(name + name_len - masks->mask.name.length,
+	                  masks->mask.name.name))
 	    return (1);
           break;
 
@@ -1006,18 +1011,10 @@ cupsdCopyLocation(
     cupsd_location_t **loc)		/* IO - Original location */
 {
   int			i;		/* Looping var */
-  int			locindex;	/* Index into Locations array */
   cupsd_location_t	*temp;		/* New location */
   char			location[HTTP_MAX_URI];
 					/* Location of resource */
 
-
- /*
-  * Add the new location, updating the original location
-  * pointer as needed...
-  */
-
-  locindex = *loc - Locations;
 
  /*
   * Use a local copy of location because cupsdAddLocation may cause
@@ -1028,8 +1025,6 @@ cupsdCopyLocation(
 
   if ((temp = cupsdAddLocation(location)) == NULL)
     return (NULL);
-
-  *loc = Locations + locindex;
 
  /*
   * Copy the information from the original location to the new one.
@@ -1053,7 +1048,8 @@ cupsdCopyLocation(
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "cupsdCopyLocation: Unable to allocate memory for %d names: %s",
                       temp->num_names, strerror(errno));
-      NumLocations --;
+
+      cupsdDeleteLocation(temp);
       return (NULL);
     }
 
@@ -1064,7 +1060,7 @@ cupsdCopyLocation(
 	                "cupsdCopyLocation: Unable to copy name \"%s\": %s",
                         (*loc)->names[i], strerror(errno));
 
-	NumLocations --;
+        cupsdDeleteLocation(temp);
 	return (NULL);
       }
   }
@@ -1080,7 +1076,7 @@ cupsdCopyLocation(
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "cupsdCopyLocation: Unable to allocate memory for %d allow rules: %s",
                       temp->num_allow, strerror(errno));
-      NumLocations --;
+      cupsdDeleteLocation(temp);
       return (NULL);
     }
 
@@ -1096,7 +1092,7 @@ cupsdCopyLocation(
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "cupsdCopyLocation: Unable to copy allow name \"%s\": %s",
                 	      (*loc)->allow[i].mask.name.name, strerror(errno));
-	      NumLocations --;
+              cupsdDeleteLocation(temp);
 	      return (NULL);
 	    }
 	    break;
@@ -1118,7 +1114,7 @@ cupsdCopyLocation(
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "cupsdCopyLocation: Unable to allocate memory for %d deny rules: %s",
                       temp->num_deny, strerror(errno));
-      NumLocations --;
+      cupsdDeleteLocation(temp);
       return (NULL);
     }
 
@@ -1134,7 +1130,7 @@ cupsdCopyLocation(
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "cupsdCopyLocation: Unable to copy deny name \"%s\": %s",
                 	      (*loc)->deny[i].mask.name.name, strerror(errno));
-	      NumLocations --;
+              cupsdDeleteLocation(temp);
 	      return (NULL);
 	    }
 	    break;
@@ -1156,7 +1152,6 @@ cupsdCopyLocation(
 void
 cupsdDeleteAllLocations(void)
 {
-  int			i;		/* Looping var */
   cupsd_location_t	*loc;		/* Current location */
 
 
@@ -1164,18 +1159,17 @@ cupsdDeleteAllLocations(void)
   * Free all of the allow/deny records first...
   */
 
-  for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
+  for (loc = (cupsd_location_t *)cupsArrayFirst(Locations);
+       loc;
+       loc = (cupsd_location_t *)cupsArrayNext(Locations))
     cupsdDeleteLocation(loc);
 
  /*
   * Then free the location array...
   */
 
-  if (NumLocations > 0)
-    free(Locations);
-
-  Locations    = NULL;
-  NumLocations = 0;
+  cupsArrayDelete(Locations);
+  Locations = NULL;
 }
 
 
@@ -1190,6 +1184,8 @@ cupsdDeleteLocation(
   int			i;		/* Looping var */
   cupsd_authmask_t	*mask;		/* Current mask */
 
+
+  cupsArrayRemove(Locations, loc);
 
   for (i = loc->num_names - 1; i >= 0; i --)
     free(loc->names[i]);
@@ -1210,6 +1206,9 @@ cupsdDeleteLocation(
 
   if (loc->num_deny > 0)
     free(loc->deny);
+
+  free(loc->location);
+  free(loc);
 }
 
 
@@ -1233,7 +1232,7 @@ cupsdDenyHost(cupsd_location_t *loc,	/* I - Location to add to */
   if ((temp = add_deny(loc)) == NULL)
     return;
 
-  if (strcasecmp(name, "@LOCAL") == 0)
+  if (!strcasecmp(name, "@LOCAL"))
   {
    /*
     * Deny *interface*...
@@ -1243,7 +1242,7 @@ cupsdDenyHost(cupsd_location_t *loc,	/* I - Location to add to */
     temp->mask.name.name   = strdup("*");
     temp->mask.name.length = 1;
   }
-  else if (strncasecmp(name, "@IF(", 4) == 0)
+  else if (!strncasecmp(name, "@IF(", 4))
   {
    /*
     * Deny *interface*...
@@ -1312,7 +1311,6 @@ cupsd_location_t *			/* O - Location that matches */
 cupsdFindBest(const char   *path,	/* I - Resource path */
               http_state_t state)	/* I - HTTP state/request */
 {
-  int			i;		/* Looping var */
   char			uri[HTTP_MAX_URI],
 					/* URI in request... */
 			*uriptr;	/* Pointer into URI */
@@ -1370,7 +1368,9 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
   best    = NULL;
   bestlen = 0;
 
-  for (i = NumLocations, loc = Locations; i > 0; i --, loc ++)
+  for (loc = (cupsd_location_t *)cupsArrayFirst(Locations);
+       loc;
+       loc = (cupsd_location_t *)cupsArrayNext(Locations))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindBest: Location %s Limit %x",
                     loc->location, loc->limit);
@@ -1382,7 +1382,7 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
       */
 
       if (loc->length > bestlen &&
-          strncasecmp(uri, loc->location, loc->length) == 0 &&
+          !strncasecmp(uri, loc->location, loc->length) &&
 	  loc->location[0] == '/' &&
 	  (limit & loc->limit) != 0)
       {
@@ -1425,18 +1425,12 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
 cupsd_location_t *			/* O - Location that matches */
 cupsdFindLocation(const char *location)	/* I - Connection */
 {
-  int		i;			/* Looping var */
+  cupsd_location_t	key;		/* Search key */
 
 
- /*
-  * Loop through the list of locations to find a match...
-  */
+  key.location = (char *)location;
 
-  for (i = 0; i < NumLocations; i ++)
-    if (!strcasecmp(Locations[i].location, location))
-      return (Locations + i);
-
-  return (NULL);
+  return ((cupsd_location_t *)cupsArrayFind(Locations, &key));
 }
 
 
@@ -1478,8 +1472,8 @@ cupsdGetMD5Passwd(const char *username,	/* I - Username */
       continue;
     }
 
-    if (strcmp(username, tempuser) == 0 &&
-        (group == NULL || strcmp(group, tempgroup) == 0))
+    if (!strcmp(username, tempuser) &&
+        (group == NULL || !strcmp(group, tempgroup)))
     {
      /*
       * Found the password entry!
@@ -1889,6 +1883,18 @@ add_deny(cupsd_location_t *loc)		/* I - Location to add to */
 }
 
 
+/*
+ * 'compare_locations()' - Compare two locations.
+ */
+
+static int				/* O - Result of comparison */
+compare_locations(cupsd_location_t *a,	/* I - First location */
+                  cupsd_location_t *b)	/* I - Second location */
+{
+  return (strcmp(b->location, a->location));
+}
+
+
 #if !HAVE_LIBPAM
 /*
  * 'cups_crypt()' - Encrypt the password using the DES or MD5 algorithms,
@@ -1899,7 +1905,7 @@ static char *				/* O - Encrypted password */
 cups_crypt(const char *pw,		/* I - Password string */
            const char *salt)		/* I - Salt (key) string */
 {
-  if (strncmp(salt, "$1$", 3) == 0)
+  if (!strncmp(salt, "$1$", 3))
   {
    /*
     * Use MD5 passwords without the benefit of PAM; this is for
