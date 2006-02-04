@@ -99,6 +99,7 @@ make BUILDROOT=$RPM_BUILD_ROOT install
 
 # Restart cupsd if we are upgrading...
 if test $1 -gt 1; then
+	/sbin/service cups stop
 	/sbin/service cups start
 fi
 
@@ -106,7 +107,6 @@ fi
 /sbin/ldconfig
 
 %preun
-
 if test $1 = 0; then
 	/sbin/service cups stop
 	/sbin/chkconfig --del cups
@@ -114,7 +114,8 @@ fi
 
 %postun
 if test $1 -ge 1; then
-	/sbin/service restart
+	/sbin/service stop
+	/sbin/service start
 fi
 
 %postun libs
