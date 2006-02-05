@@ -167,9 +167,7 @@ AC_TRY_COMPILE([#include <time.h>],[struct tm t;
 	AC_MSG_RESULT(no))
 
 dnl See if we have POSIX ACL support...
-dnl TODO: Linux/Solaris/IRIX/etc. version
-
-AC_CHECK_FUNCS(acl_init)
+AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
 
 dnl Flags for "ar" command...
 case $uname in

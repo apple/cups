@@ -4,7 +4,7 @@
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -39,7 +39,9 @@
 #include "cupsd.h"
 #ifdef HAVE_ACL_INIT
 #  include <sys/acl.h>
-#  include <membership.h>
+#  ifdef HAVE_MEMBERSHIP_H
+#    include <membership.h>
+#  endif /* HAVE_MEMBERSHIP_H */
 #endif /* HAVE_ACL_INIT */
 
 
@@ -102,7 +104,9 @@ cupsdAddCert(int        pid,		/* I - Process ID */
     acl_t		acl;		/* ACL information */
     acl_entry_t		entry;		/* ACL entry */
     acl_permset_t	permset;	/* Permissions */
+#  ifdef HAVE_MBR_UID_TO_UUID
     uuid_t		group;		/* Group ID */
+#  endif /* HAVE_MBR_UID_TO_UUID */
 #endif /* HAVE_ACL_INIT */
 
 
@@ -112,6 +116,9 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 
     fchmod(fd, 0440);
     fchown(fd, RunUser, SystemGroupIDs[0]);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddCert: NumSystemGroups=%d",
+                    NumSystemGroups);
 
 #ifdef HAVE_ACL_INIT
     if (NumSystemGroups > 1)
@@ -131,10 +138,16 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 
         acl_create_entry(&acl, &entry);
 	acl_get_permset(entry, &permset);
+#ifdef HAVE_MBR_UID_TO_UUID
 	acl_add_perm(permset, ACL_READ_DATA);
 	acl_set_tag_type(entry, ACL_EXTENDED_ALLOW);
 	mbr_gid_to_uuid((gid_t)SystemGroupIDs[i], group);
 	acl_set_qualifier(entry, &group);
+#else
+	acl_add_perm(permset, ACL_READ);
+	acl_set_tag_type(entry, ACL_GROUP);
+        acl_set_qualifier(entry, SystemGroupIDs + i);
+#endif /* HAVE_MBR_UID_TO_UUID */
 	acl_set_permset(entry, permset);
       }
 

@@ -4,7 +4,7 @@
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -78,7 +78,7 @@ VAR int			NumSystemGroups		VALUE(0);
 					/* Number of system group names */
 VAR char		*SystemGroups[MAX_SYSTEM_GROUPS];
 					/* System group names */
-VAR int			SystemGroupIDs[MAX_SYSTEM_GROUPS];
+VAR gid_t		SystemGroupIDs[MAX_SYSTEM_GROUPS];
 					/* System group IDs */
 VAR char		*AccessLog		VALUE(NULL),
 					/* Access log filename */
