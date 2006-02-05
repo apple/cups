@@ -114,8 +114,8 @@ fi
 
 %postun
 if test $1 -ge 1; then
-	/sbin/service stop
-	/sbin/service start
+	/sbin/service cups stop
+	/sbin/service cups start
 fi
 
 %postun libs

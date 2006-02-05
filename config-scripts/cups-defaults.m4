@@ -115,6 +115,97 @@ else
 fi
 AC_SUBST(CUPS_USE_NETWORK_DEFAULT)
 
+dnl Determine the correct username and group for this OS...
+AC_ARG_WITH(cups-user, [  --with-cups-user        set default user for CUPS],
+	CUPS_USER="$withval",
+	AC_MSG_CHECKING(for default print user)
+	if test -f /etc/passwd; then
+		CUPS_USER=""
+		for user in lp lpd guest daemon nobody; do
+			if test "`grep \^${user}: /etc/passwd`" != ""; then
+				CUPS_USER="$user"
+				AC_MSG_RESULT($user)
+				break;
+			fi
+		done
+
+		if test x$CUPS_USER = x; then
+			CUPS_USER="nobody"
+			AC_MSG_RESULT(not found, using "$CUPS_USER")
+		fi
+	else
+		CUPS_USER="nobody"
+		AC_MSG_RESULT(no password file, using "$CUPS_USER")
+	fi)
+
+AC_ARG_WITH(cups-group, [  --with-cups-group       set default group for CUPS],
+	CUPS_GROUP="$withval",
+	AC_MSG_CHECKING(for default print group)
+	if test -f /etc/group; then
+		if test x$uname = xDarwin; then
+			GROUP_LIST="nobody"
+		else
+			GROUP_LIST="lp nobody"
+		fi
+
+		CUPS_GROUP=""
+		for group in $GROUP_LIST; do
+			if test "`grep \^${group}: /etc/group`" != ""; then
+				CUPS_GROUP="$group"
+				AC_MSG_RESULT($group)
+				break;
+			fi
+		done
+
+		if test x$CUPS_GROUP = x; then
+			CUPS_GROUP="nobody"
+			AC_MSG_RESULT(not found, using "$CUPS_GROUP")
+		fi
+	else
+		CUPS_GROUP="nobody"
+		AC_MSG_RESULT(no group file, using "$CUPS_GROUP")
+	fi)
+
+AC_ARG_WITH(system-groups, [  --with-system-groups    set default system groups for CUPS],
+	CUPS_SYSTEM_GROUPS="$withval",
+	if test x$uname = xDarwin; then
+		GROUP_LIST="lp admin"
+	else
+		GROUP_LIST="lpadmin sys system root"
+	fi
+
+	AC_MSG_CHECKING(for default system groups)
+	if test -f /etc/group; then
+		CUPS_SYSTEM_GROUPS=""
+		for group in $GROUP_LIST; do
+			if test "`grep \^${group}: /etc/group`" != ""; then
+				if test "x$CUPS_SYSTEM_GROUPS" = x; then
+					CUPS_SYSTEM_GROUPS="$group"
+				else
+					CUPS_SYSTEM_GROUPS="$CUPS_SYSTEM_GROUPS $group"
+				fi
+			fi
+		done
+
+		if test "x$CUPS_SYSTEM_GROUPS" = x; then
+			CUPS_SYSTEM_GROUPS="$GROUP_LIST"
+			AC_MSG_RESULT(no groups found, using "$CUPS_SYSTEM_GROUPS")
+		else
+			AC_MSG_RESULT("$CUPS_SYSTEM_GROUPS")
+		fi
+	else
+		CUPS_SYSTEM_GROUPS="$GROUP_LIST"
+		AC_MSG_RESULT(no group file, using "$CUPS_SYSTEM_GROUPS")
+	fi)
+
+AC_SUBST(CUPS_USER)
+AC_SUBST(CUPS_GROUP)
+AC_SUBST(CUPS_SYSTEM_GROUPS)
+
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SYSTEM_GROUPS, "$CUPS_SYSTEM_GROUPS")
+
 
 dnl
 dnl End of "$Id$".

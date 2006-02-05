@@ -59,10 +59,13 @@ rm -rf tools
 cd ..
 
 echo -n Archiving...gz
-tar czf cups-$version-r$rev-source.tar.gz cups-$version
+tar czf cups-$fileversion-source.tar.gz cups-$version
 echo -n ...bz2
-tar cjf cups-$version-r$rev-source.tar.bz2 cups-$version
+tar cjf cups-$fileversion-source.tar.bz2 cups-$version
 echo "..."
+
+echo Removing temporary files...
+rm -rf cups-$version
 
 echo "Done!"
 

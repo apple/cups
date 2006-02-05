@@ -30,6 +30,8 @@
  *   get_addr_and_mask()      - Get an IP address and netmask.
  *   parse_aaa()              - Parse authentication, authorization, and
  *                              access control lines.
+ *   parse_groups()           - Parse system group names in a string.
+ *   parse_protocols()        - Parse browse protocols in a string.
  *   read_configuration()     - Read a configuration file.
  *   read_location()          - Read a <Location path> definition.
  *   read_policy()            - Read a <Policy name> definition.
@@ -190,6 +192,8 @@ static int		get_addr_and_mask(const char *value, unsigned *ip,
 			                  unsigned *mask);
 static int		parse_aaa(cupsd_location_t *loc, char *line,
 			          char *value, int linenum);
+static int		parse_groups(const char *s);
+static int		parse_protocols(const char *s);
 static int		read_configuration(cups_file_t *fp);
 static int		read_location(cups_file_t *fp, char *name, int linenum);
 static int		read_policy(cups_file_t *fp, char *name, int linenum);
@@ -311,42 +315,6 @@ cupsdReadConfiguration(void)
     cupsdSetString(&TempDir, getenv("TMPDIR"));
 
  /*
-  * Find the default system group: "sys", "system", or "root"...
-  */
-
-  group = getgrnam(CUPS_DEFAULT_GROUP);
-  endgrent();
-
-  NumSystemGroups = 0;
-
-  if (group != NULL)
-  {
-   /*
-    * Found the group, use it!
-    */
-
-    cupsdSetString(&SystemGroups[0], CUPS_DEFAULT_GROUP);
-
-    SystemGroupIDs[0] = group->gr_gid;
-  }
-  else
-  {
-   /*
-    * Find the group associated with GID 0...
-    */
-
-    group = getgrgid(0);
-    endgrent();
-
-    if (group != NULL)
-      cupsdSetString(&SystemGroups[0], group->gr_name);
-    else
-      cupsdSetString(&SystemGroups[0], "unknown");
-
-    SystemGroupIDs[0] = 0;
-  }
-
- /*
   * Find the default user...
   */
 
@@ -387,37 +355,38 @@ cupsdReadConfiguration(void)
   * Numeric options...
   */
 
-  ConfigFilePerm      = CUPS_DEFAULT_CONFIG_FILE_PERM;
-  DefaultAuthType     = AUTH_BASIC;
-  JobRetryLimit       = 5;
-  JobRetryInterval    = 300;
-  FileDevice          = FALSE;
-  FilterLevel         = 0;
-  FilterLimit         = 0;
-  FilterNice          = 0;
-  HostNameLookups     = FALSE;
-  ImplicitClasses     = CUPS_DEFAULT_IMPLICIT_CLASSES;
-  ImplicitAnyClasses  = FALSE;
-  HideImplicitMembers = TRUE;
-  KeepAlive           = TRUE;
-  KeepAliveTimeout    = DEFAULT_KEEPALIVE;
-  ListenBackLog       = SOMAXCONN;
-  LogFilePerm         = CUPS_DEFAULT_LOG_FILE_PERM;
-  LogLevel            = CUPSD_LOG_ERROR;
-  MaxClients          = 100;
-  MaxClientsPerHost   = 0;
-  MaxLogSize          = 1024 * 1024;
-  MaxPrinterHistory   = 10;
-  MaxRequestSize      = 0;
-  ReloadTimeout	      = 60;
-  RootCertDuration    = 300;
-  RunAsUser           = FALSE;
-  Timeout             = DEFAULT_TIMEOUT;
+  ConfigFilePerm        = CUPS_DEFAULT_CONFIG_FILE_PERM;
+  DefaultAuthType       = AUTH_BASIC;
+  JobRetryLimit         = 5;
+  JobRetryInterval      = 300;
+  FileDevice            = FALSE;
+  FilterLevel           = 0;
+  FilterLimit           = 0;
+  FilterNice            = 0;
+  HostNameLookups       = FALSE;
+  ImplicitClasses       = CUPS_DEFAULT_IMPLICIT_CLASSES;
+  ImplicitAnyClasses    = FALSE;
+  HideImplicitMembers   = TRUE;
+  KeepAlive             = TRUE;
+  KeepAliveTimeout      = DEFAULT_KEEPALIVE;
+  ListenBackLog         = SOMAXCONN;
+  LogFilePerm           = CUPS_DEFAULT_LOG_FILE_PERM;
+  LogLevel              = CUPSD_LOG_ERROR;
+  MaxClients            = 100;
+  MaxClientsPerHost     = 0;
+  MaxLogSize            = 1024 * 1024;
+  MaxPrinterHistory     = 10;
+  MaxRequestSize        = 0;
+  ReloadTimeout	        = 60;
+  RootCertDuration      = 300;
+  RunAsUser             = FALSE;
+  Timeout               = DEFAULT_TIMEOUT;
+  NumSystemGroups       = 0;
 
   BrowseInterval        = DEFAULT_INTERVAL;
   BrowsePort            = ippPort();
-  BrowseLocalProtocols  = BROWSE_CUPS; /* TODO: Use configure option */
-  BrowseRemoteProtocols = BROWSE_CUPS; /* TODO: Use configure option */
+  BrowseLocalProtocols  = parse_protocols(CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS);
+  BrowseRemoteProtocols = parse_protocols(CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS);
   BrowseShortNames      = CUPS_DEFAULT_BROWSE_SHORT_NAMES;
   BrowseTimeout         = DEFAULT_TIMEOUT;
   Browsing              = CUPS_DEFAULT_BROWSING;
@@ -474,7 +443,25 @@ cupsdReadConfiguration(void)
   */
 
   if (NumSystemGroups == 0)
-    NumSystemGroups ++;
+  {
+    if (!parse_groups(CUPS_DEFAULT_SYSTEM_GROUPS))
+    {
+     /*
+      * Find the group associated with GID 0...
+      */
+
+      group = getgrgid(0);
+      endgrent();
+
+      if (group != NULL)
+	cupsdSetString(&SystemGroups[0], group->gr_name);
+      else
+	cupsdSetString(&SystemGroups[0], "unknown");
+
+      SystemGroupIDs[0] = 0;
+      NumSystemGroups   = 1;
+    }
+  }
 
  /*
   * Get the access control list for browsing...
@@ -1784,6 +1771,141 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
 
 /*
+ * 'parse_groups()' - Parse system group names in a string.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+parse_groups(const char *s)		/* I - Space-delimited groups */
+{
+  int		status;			/* Return status */
+  char		value[1024],		/* Value string */
+		*valstart,		/* Pointer into value */
+		*valend,		/* End of value */
+		quote;			/* Quote character */
+  struct group	*group;			/* Group */
+
+
+ /*
+  * Make a copy of the string and parse out the groups...
+  */
+
+  strlcpy(value, s, sizeof(value));
+
+  status   = 1;
+  valstart = value;
+
+  while (*valstart && NumSystemGroups < MAX_SYSTEM_GROUPS)
+  {
+    if (*valstart == '\'' || *valstart == '\"')
+    {
+     /*
+      * Scan quoted name...
+      */
+
+      quote = *valstart++;
+
+      for (valend = valstart; *valend; valend ++)
+	if (*valend == quote)
+	  break;
+    }
+    else
+    {
+     /*
+      * Scan space or comma-delimited name...
+      */
+
+      for (valend = valstart; *valend; valend ++)
+	if (isspace(*valend) || *valend == ',')
+	  break;
+    }
+
+    if (*valend)
+      *valend++ = '\0';
+
+    group = getgrnam(valstart);
+    if (group)
+    {
+      cupsdSetString(SystemGroups + NumSystemGroups, valstart);
+      SystemGroupIDs[NumSystemGroups] = group->gr_gid;
+
+      NumSystemGroups ++;
+    }
+    else
+      status = 0;
+
+    endgrent();
+
+    valstart = valend;
+
+    while (*valstart == ',' || isspace(*valstart))
+      valstart ++;
+  }
+
+  return (status);
+}
+
+
+/*
+ * 'parse_protocols()' - Parse browse protocols in a string.
+ */
+
+static int				/* O - Browse protocol bits */
+parse_protocols(const char *s)		/* I - Space-delimited protocols */
+{
+  int	protocols;			/* Browse protocol bits */
+  char	value[1024],			/* Value string */
+	*valstart,			/* Pointer into value */
+	*valend;			/* End of value */
+
+
+ /*
+  * Loop through the value string,...
+  */
+
+  strlcpy(value, s, sizeof(value));
+
+  protocols = 0;
+
+  for (valstart = value; *valstart;)
+  {
+   /*
+    * Get the current space/comma-delimited protocol name...
+    */
+
+    for (valend = valstart; *valend; valend ++)
+      if (isspace(*valend & 255) || *valend == ',')
+	break;
+
+    if (*valend)
+      *valend++ = '\0';
+
+   /*
+    * Add the protocol to the bitmask...
+    */
+
+    if (!strcasecmp(valstart, "cups"))
+      protocols |= BROWSE_CUPS;
+    else if (!strcasecmp(valstart, "slp"))
+      protocols |= BROWSE_SLP;
+    else if (!strcasecmp(valstart, "ldap"))
+      protocols |= BROWSE_LDAP;
+    else if (!strcasecmp(valstart, "dnssd") || !strcasecmp(valstart, "bonjour"))
+      protocols |= BROWSE_DNSSD;
+    else if (!strcasecmp(valstart, "all"))
+      protocols |= BROWSE_ALL;
+    else
+      return (-1);
+
+    for (valstart = valend; *valstart; valstart ++)
+      if (!isspace(*valstart & 255) || *valstart != ',')
+	break;
+  }
+
+  return (protocols);
+}
+
+
+/*
  * 'read_configuration()' - Read a configuration file.
  */
 
@@ -1800,8 +1922,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 					/* Temporary buffer 2 for value */
 			*ptr,		/* Pointer into line/temp */
 			*value,		/* Pointer to value */
-			*valueptr,	/* Pointer into value */
-			quote;		/* Quote character */
+			*valueptr;	/* Pointer into value */
   int			valuelen;	/* Length of value */
   cupsd_var_t		*var;		/* Current variable */
   http_addrlist_t	*addrlist,	/* Address list */
@@ -2115,66 +2236,25 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
              !strcasecmp(line, "BrowseRemoteProtocols"))
     {
      /*
-      * "BrowseProtocol name [... name]"
+      * "BrowseProtocols name [... name]"
+      * "BrowseLocalProtocols name [... name]"
+      * "BrowseRemoteProtocols name [... name]"
       */
 
-      if (strcasecmp(line, "BrowseLocalProtocols"))
-        BrowseRemoteProtocols = 0;
-      if (strcasecmp(line, "BrowseRemoteProtocols"))
-        BrowseLocalProtocols = 0;
+      int protocols = parse_protocols(value);
 
-      for (; *value;)
+      if (protocols < 0)
       {
-        for (valuelen = 0; value[valuelen]; valuelen ++)
-	  if (isspace(value[valuelen]) || value[valuelen] == ',')
-	    break;
-
-        if (value[valuelen])
-        {
-	  value[valuelen] = '\0';
-	  valuelen ++;
-	}
-
-        if (!strcasecmp(value, "cups"))
-	{
-	  if (strcasecmp(line, "BrowseLocalProtocols"))
-	    BrowseRemoteProtocols |= BROWSE_CUPS;
-	  if (strcasecmp(line, "BrowseRemoteProtocols"))
-	    BrowseLocalProtocols |= BROWSE_CUPS;
-	}
-        else if (!strcasecmp(value, "slp"))
-	{
-	  if (strcasecmp(line, "BrowseLocalProtocols"))
-	    BrowseRemoteProtocols |= BROWSE_SLP;
-	  if (strcasecmp(line, "BrowseRemoteProtocols"))
-	    BrowseLocalProtocols |= BROWSE_SLP;
-	}
-        else if (!strcasecmp(value, "ldap"))
-	{
-	  if (strcasecmp(line, "BrowseLocalProtocols"))
-	    BrowseRemoteProtocols |= BROWSE_LDAP;
-	  if (strcasecmp(line, "BrowseRemoteProtocols"))
-	    BrowseLocalProtocols |= BROWSE_LDAP;
-	}
-        else if (!strcasecmp(value, "all"))
-	{
-	  if (strcasecmp(line, "BrowseLocalProtocols"))
-	    BrowseRemoteProtocols |= BROWSE_ALL;
-	  if (strcasecmp(line, "BrowseRemoteProtocols"))
-	    BrowseLocalProtocols |= BROWSE_ALL;
-	}
-	else
-	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Unknown browse protocol \"%s\" on line %d.",
-	                  value, linenum);
-          break;
-	}
-
-        for (value += valuelen; *value; value ++)
-	  if (!isspace(*value) || *value != ',')
-	    break;
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unknown browse protocol \"%s\" on line %d.",
+	                value, linenum);
+        break;
       }
+
+      if (strcasecmp(line, "BrowseLocalProtocols"))
+        BrowseRemoteProtocols = protocols;
+      if (strcasecmp(line, "BrowseRemoteProtocols"))
+        BrowseLocalProtocols = protocols;
     }
     else if (!strcasecmp(line, "BrowseAllow") ||
              !strcasecmp(line, "BrowseDeny"))
@@ -2592,60 +2672,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
     else if (!strcasecmp(line, "SystemGroup"))
     {
      /*
-      * System (admin) group(s)...
+      * SystemGroup (admin) group(s)...
       */
 
-      for (i = NumSystemGroups; *value && i < MAX_SYSTEM_GROUPS;)
-      {
-        if (*value == '\'' || *value == '\"')
-	{
-	 /*
-	  * Scan quoted name...
-	  */
-
-	  quote = *value++;
-
-	  for (valueptr = value; *valueptr; valueptr ++)
-	    if (*valueptr == quote)
-	      break;
-	}
-	else
-	{
-	 /*
-	  * Scan space or comma-delimited name...
-	  */
-
-          for (valueptr = value; *valueptr; valueptr ++)
-	    if (isspace(*valueptr) || *valueptr == ',')
-	      break;
-        }
-
-        if (*valueptr)
-          *valueptr++ = '\0';
-
-        group = getgrnam(value);
-        if (group)
-	{
-          cupsdSetString(SystemGroups + i, value);
-	  SystemGroupIDs[i] = group->gr_gid;
-
-	  i ++;
-	}
-	else
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Unknown SystemGroup \"%s\" on line %d, ignoring!",
-	                  value, linenum);
-
-        endgrent();
-
-        value = valueptr;
-
-        while (*value == ',' || isspace(*value))
-	  value ++;
-      }
-
-      if (i)
-        NumSystemGroups = i;
+      if (!parse_groups(value))
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unknown SystemGroup \"%s\" on line %d, ignoring!",
+	                value, linenum);
     }
     else if (!strcasecmp(line, "HostNameLookups"))
     {
