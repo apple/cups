@@ -131,11 +131,14 @@ install:	all
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) -m 755 $(LOGDIR)
 	echo Creating $(REQUESTS)...
-	$(INSTALL_DIR) -m 710 -g $(CUPS_GROUP) $(REQUESTS)
+	$(INSTALL_DIR) -m 710 $(REQUESTS)
+	-chgrp $(CUPS_GROUP) $(REQUESTS)
 	echo Creating $(REQUESTS)/tmp...
-	$(INSTALL_DIR) -m 1770 -g $(CUPS_GROUP) $(REQUESTS)/tmp
+	$(INSTALL_DIR) -m 1770 $(REQUESTS)/tmp
+	-chgrp $(CUPS_GROUP) $(REQUESTS)/tmp
 	echo Creating $(CACHEDIR)...
-	$(INSTALL_DIR) -m 775 -g $(CUPS_GROUP) $(CACHEDIR)
+	$(INSTALL_DIR) -m 775 $(CACHEDIR)
+	-chgrp $(CUPS_GROUP) $(CACHEDIR)
 #	echo Creating $(CACHEDIR)/ppd...
 #	$(INSTALL_DIR) -m 755 $(CACHEDIR)/ppd
 
