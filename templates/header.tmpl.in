@@ -2,12 +2,13 @@
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
-	<TITLE>{title} - @CUPS_VERSION@</TITLE>
+	<TITLE>{title} - CUPS @CUPS_VERSION@</TITLE>
 	<!-- Prevent caching of CGI content -->
 	<META HTTP-EQUIV="Expires" CONTENT="now">
 	<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
 	{refresh_page?<META HTTP-EQUIV="Refresh" CONTENT="{refresh_page}">:}
 	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/favicon.ico" TYPE="image/x-icon">
 </HEAD>
 <BODY>
 <TABLE WIDTH="100%" STYLE="height: 100%;" BORDER="0" CELLSPACING="0" CELLPADDING="0" SUMMARY="{title}">
