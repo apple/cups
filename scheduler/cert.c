@@ -128,6 +128,11 @@ cupsdAddCert(int        pid,		/* I - Process ID */
       * groups can access it...
       */
 
+#  ifdef HAVE_MBR_UID_TO_UUID
+     /*
+      * On MacOS X, ACLs use UUIDs instead of GIDs...
+      */
+
       acl = acl_init(NumSystemGroups - 1);
 
       for (i = 1; i < NumSystemGroups; i ++)
@@ -138,18 +143,78 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 
         acl_create_entry(&acl, &entry);
 	acl_get_permset(entry, &permset);
-#ifdef HAVE_MBR_UID_TO_UUID
 	acl_add_perm(permset, ACL_READ_DATA);
 	acl_set_tag_type(entry, ACL_EXTENDED_ALLOW);
 	mbr_gid_to_uuid((gid_t)SystemGroupIDs[i], group);
 	acl_set_qualifier(entry, &group);
-#else
-	acl_add_perm(permset, ACL_READ);
-	acl_set_tag_type(entry, ACL_GROUP);
-        acl_set_qualifier(entry, SystemGroupIDs + i);
-#endif /* HAVE_MBR_UID_TO_UUID */
 	acl_set_permset(entry, permset);
       }
+#  else
+     /*
+      * POSIX ACLs need permissions for owner, group, other, and mask
+      * in addition to the rest of the system groups...
+      */
+
+      acl = acl_init(NumSystemGroups + 3);
+
+      /* Owner */
+      acl_create_entry(&acl, &entry);
+      acl_get_permset(entry, &permset);
+      acl_add_perm(permset, ACL_READ);
+      acl_set_tag_type(entry, ACL_USER_OBJ);
+      acl_set_permset(entry, permset);
+
+      /* Group */
+      acl_create_entry(&acl, &entry);
+      acl_get_permset(entry, &permset);
+      acl_add_perm(permset, ACL_READ);
+      acl_set_tag_type(entry, ACL_GROUP_OBJ);
+      acl_set_permset(entry, permset);
+
+      /* Others */
+      acl_create_entry(&acl, &entry);
+      acl_get_permset(entry, &permset);
+      acl_add_perm(permset, ACL_READ);
+      acl_set_tag_type(entry, ACL_OTHER);
+      acl_set_permset(entry, permset);
+
+      /* Mask */
+      acl_create_entry(&acl, &entry);
+      acl_get_permset(entry, &permset);
+      acl_add_perm(permset, ACL_READ);
+      acl_set_tag_type(entry, ACL_MASK);
+      acl_set_permset(entry, permset);
+
+      for (i = 1; i < NumSystemGroups; i ++)
+      {
+       /*
+        * Add each group ID to the ACL...
+	*/
+
+        acl_create_entry(&acl, &entry);
+	acl_get_permset(entry, &permset);
+	acl_add_perm(permset, ACL_READ);
+	acl_set_tag_type(entry, ACL_GROUP);
+	acl_set_qualifier(entry, SystemGroupIDs + i);
+	acl_set_permset(entry, permset);
+      }
+
+      if (acl_valid(acl))
+      {
+        char *text, *textptr;
+
+        cupsdLogMessage(CUPSD_LOG_ERROR, "ACL did not validate: %s",
+	                strerror(errno));
+        text = acl_to_text(acl, NULL);
+	for (textptr = strchr(text, '\n');
+	     textptr;
+	     textptr = strchr(textptr + 1, '\n'))
+	  *textptr = ',';
+
+	cupsdLogMessage(CUPSD_LOG_ERROR, "ACL: %s", text);
+	free(text);
+      }
+#  endif /* HAVE_MBR_UID_TO_UUID */
 
       if (acl_set_fd(fd, acl))
 	cupsdLogMessage(CUPSD_LOG_ERROR,
