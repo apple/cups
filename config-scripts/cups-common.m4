@@ -204,7 +204,6 @@ case $uname in
 
 		dnl Check for the new membership functions in MacOSX 10.4 (Tiger)...
 		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))
-		AC_CHECK_HEADER(membershipPriv.h,AC_DEFINE(HAVE_MEMBERSHIPPRIV_H))
 		AC_CHECK_FUNCS(mbr_uid_to_uuid)
 
 		dnl Check for notify_post support

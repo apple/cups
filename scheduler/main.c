@@ -1455,7 +1455,7 @@ launchd_checkin(void)
     * Free the listeners array built from cupsd.conf...
     */
 
-    cupsDeleteAllListeners();
+    cupsdDeleteAllListeners();
 
    /*
     * Create a new array of listeners from the launchd data...
@@ -1649,8 +1649,7 @@ launchd_reload(void)
 static int				/* O - 1 if the file was updated */
 launchd_sync_conf(void)
 {
-  int			  i,		/* Looping var */
-			  portnum;	/* Port number */
+  int			  portnum;	/* Port number */
   CFMutableDictionaryRef  cupsd_dict,	/* org.cups.cupsd.plist dictionary */
 			  sockets,	/* Sockets dictionary */
 			  listener;	/* Listener dictionary */

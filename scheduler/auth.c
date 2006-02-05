@@ -77,9 +77,6 @@
 #ifdef HAVE_MEMBERSHIP_H
 #  include <membership.h>
 #endif /* HAVE_MEMBERSHIP_H */
-#ifdef HAVE_MEMBERSHIPPRIV_H
-#  include <membershipPriv.h>
-#endif /* HAVE_MEMBERSHIPPRIV_H */
 
 
 /*
@@ -952,11 +949,11 @@ cupsdCheckGroup(
   int			i;		/* Looping var */
   struct group		*group;		/* System group info */
   char			junk[33];	/* MD5 password (not used) */
-#ifdef HAVE_MEMBERSHIPPRIV_H
+#ifdef HAVE_MBR_UID_TO_UUID
   uuid_t		useruuid,	/* UUID for username */
 			groupuuid;	/* UUID for groupname */
   int			is_member;	/* True if user is a member of group */
-#endif /* HAVE_MEMBERSHIPPRIV_H */
+#endif /* HAVE_MBR_UID_TO_UUID */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -1001,11 +998,12 @@ cupsdCheckGroup(
   * Check group membership through MacOS X membership API...
   */
 
-  if (!mbr_user_name_to_uuid((char *)username, useruuid))
-    if (!mbr_group_name_to_uuid((char *)groupname, groupuuid))
-      if (!mbr_check_membership(useruuid, groupuuid, &is_member))
-	if (is_member)
-	  return (1);
+  if (user && group)
+    if (!mbr_uid_to_uuid(user->pw_uid, useruuid))
+      if (!mbr_gid_to_uuid(group->gr_gid, groupuuid))
+	if (!mbr_check_membership(useruuid, groupuuid, &is_member))
+	  if (is_member)
+	    return (1);
 #endif /* HAVE_MBR_UID_TO_UUID */
 
  /*
