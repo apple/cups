@@ -100,7 +100,7 @@ static const char * const lang_encodings[] =
 			  "windows-1256",	"windows-1257",
 			  "windows-1258",	"koi8-r",
 			  "koi8-u",		"iso-8859-11",
-			  "iso-8859-16",	"unknown",
+			  "iso-8859-16",	"mac-roman",
 			  "unknown",		"unknown",
 			  "unknown",		"unknown",
 			  "unknown",		"unknown",
@@ -290,7 +290,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 		  "CP1250",	"CP1251",	"CP1252",	"CP1253",
 		  "CP1254",	"CP1255",	"CP1256",	"CP1257",
 		  "CP1258",	"KOI8R",	"KOI8U",	"ISO885911",
-		  "ISO885916",	"",		"",		"",
+		  "ISO885916",	"MACROMAN",	"",		"",
 
 		  "",		"",		"",		"",
 		  "",		"",		"",		"",

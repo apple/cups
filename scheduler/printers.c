@@ -48,6 +48,7 @@
  *   add_printer_formats()       - Add document-format-supported values for
  *                                 a printer.
  *   compare_printers()          - Compare two printers.
+ *   transcode_nickname()        - Convert the PPD NickName to UTF-8...
  *   write_irix_config()         - Update the config files used by the IRIX
  *                                 desktop tools.
  *   write_irix_state()          - Update the status files used by IRIX
@@ -59,6 +60,7 @@
  */
 
 #include "cupsd.h"
+#include <cups/transcode.h>
 
 
 /*
@@ -68,6 +70,7 @@
 static void	add_printer_filter(cupsd_printer_t *p, const char *filter);
 static void	add_printer_formats(cupsd_printer_t *p);
 static int	compare_printers(void *first, void *second, void *data);
+static void	transcode_nickname(cupsd_printer_t *p, ppd_file_t *ppd);
 #ifdef __sgi
 static void	write_irix_config(cupsd_printer_t *p);
 static void	write_irix_state(cupsd_printer_t *p);
@@ -1658,15 +1661,22 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	                "pages-per-minute", ppd->throughput);
 
         if (ppd->nickname)
-          cupsdSetString(&p->make_model, ppd->nickname);
+	{
+	 /*
+	  * The NickName can be localized in the character set specified
+	  * by the LanugageEncoding attribute.  Convert as needed to
+	  * UTF-8...
+	  */
+
+          transcode_nickname(p, ppd);
+	}
 	else if (ppd->modelname)
           cupsdSetString(&p->make_model, ppd->modelname);
 	else
 	  cupsdSetString(&p->make_model, "Bad PPD File");
 
-        if (p->make_model)
-	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                       "printer-make-and-model", NULL, p->make_model);
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                     "printer-make-and-model", NULL, p->make_model);
 
        /*
 	* Add media options from the PPD file...
@@ -2738,6 +2748,88 @@ compare_printers(void *first,		/* I - First printer */
 {
   return (strcasecmp(((cupsd_printer_t *)first)->name,
                      ((cupsd_printer_t *)second)->name));
+}
+
+
+/*
+ * 'transcode_nickname()' - Convert the PPD NickName to UTF-8...
+ */
+
+static void
+transcode_nickname(cupsd_printer_t *p,	/* I - Printer */
+                   ppd_file_t      *ppd)/* I - PPD file */
+{
+  cups_utf8_t		utf8[256];	/* UTF-8 version of nickname */
+  cups_encoding_t	encoding;	/* Encoding of PPD file */
+  const char		*nickptr;	/* Pointer into nickname */
+
+
+ /*
+  * See if we need to convert to UTF-8...
+  */
+
+  if (!ppd->lang_encoding || !strcasecmp(ppd->lang_encoding, "UTF-8"))
+  {
+   /*
+    * No language encoding, or encoding uses the non-standard UTF-8
+    * value, so no transcoding is required...
+    */
+
+    goto no_transcode;
+  }
+
+  for (nickptr = ppd->nickname; *nickptr; nickptr ++)
+    if (*nickptr & 0x80)
+      break;
+
+  if (!*nickptr)
+  {
+   /*
+    * No non-ASCII characters, so no transcoding is required...
+    */
+
+    goto no_transcode;
+  }
+
+ /*
+  * OK, we need to transcode...
+  */
+
+  if (!strcasecmp(ppd->lang_encoding, "ISOLatin1"))
+    encoding = CUPS_ISO8859_1;
+  else if (!strcasecmp(ppd->lang_encoding, "ISOLatin2"))
+    encoding = CUPS_ISO8859_2;
+  else if (!strcasecmp(ppd->lang_encoding, "ISOLatin5"))
+    encoding = CUPS_ISO8859_5;
+  else if (!strcasecmp(ppd->lang_encoding, "JIS83-RKSJ"))
+    encoding = CUPS_WINDOWS_932;
+  else if (!strcasecmp(ppd->lang_encoding, "MacStandard"))
+    encoding = CUPS_MAC_ROMAN;
+  else if (!strcasecmp(ppd->lang_encoding, "WindowsANSI"))
+    encoding = CUPS_WINDOWS_1252;
+  else
+  {
+   /*
+    * Unknown encoding, treat as UTF-8...
+    */
+
+    goto no_transcode;
+  }
+
+  cupsCharsetToUTF8(utf8, ppd->nickname, sizeof(utf8), encoding);
+
+  cupsdSetString(&p->make_model, (char *)utf8);
+
+  return;
+
+ /*
+  * Yeah, yeah, gotos are evil, but code bloat is more evil...
+  */
+
+  no_transcode:
+
+  cupsdSetString(&p->make_model, ppd->nickname);
+  return;
 }
 
 

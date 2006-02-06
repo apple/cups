@@ -59,6 +59,7 @@ CHARMAPS =	\
 		iso-8859-9.txt \
 		koi8-r.txt \
 		koi8-u.txt \
+		mac-roman.txt \
 		unibreak.txt \
 		uni-comb.txt \
 		uni-fold.txt \
