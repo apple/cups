@@ -156,7 +156,7 @@ cupsdAddLocation(const char *location)	/* I - Location path */
 
   cupsArrayAdd(Locations, temp);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAddLocation: added location \'%s\'",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddLocation: added location \'%s\'",
                   location);
 
  /*

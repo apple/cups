@@ -164,7 +164,7 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
   if (cost)
     *cost = 0;
 
-  if (!mime || !src || !dst || !cost)
+  if (!mime || !src || !dst)
     return (NULL);
 
  /*
@@ -215,6 +215,10 @@ find_filters(mime_t           *mime,	/* I - MIME database */
 			*listptr;	/* Pointer in list */
 
 
+  DEBUG_printf(("find_filters(mime=%p, src=%p(%s/%s), dst=%p(%s/%s), "
+                "cost=%p, list=%p)\n", mime, src, src->super, src->type,
+		dst, dst->super, dst->type, cost, list));
+
  /*
   * See if there is a filter that can convert the files directly...
   */
@@ -225,6 +229,8 @@ find_filters(mime_t           *mime,	/* I - MIME database */
     * Got a direct filter!
     */
 
+    DEBUG_puts("Direct filter found!");
+
     if ((mintemp = cupsArrayNew(NULL, NULL)) == NULL)
       return (NULL);
 
@@ -233,7 +239,7 @@ find_filters(mime_t           *mime,	/* I - MIME database */
     mincost = current->cost;
 
     DEBUG_puts("    Found direct filter:");
-    DEBUG_printf(("    %s (cost=%d)\n", mintemp->filter, mincost));
+    DEBUG_printf(("    %s (cost=%d)\n", current->filter, mincost));
   }
   else
   {
@@ -322,7 +328,8 @@ find_filters(mime_t           *mime,	/* I - MIME database */
       printf("    %s\n", current->filter);
 #endif /* DEBUG */
 
-    *cost = mincost;
+    if (cost)
+      *cost = mincost;
 
     return (mintemp);
   }

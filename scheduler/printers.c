@@ -24,7 +24,6 @@
  * Contents:
  *
  *   cupsdAddPrinter()           - Add a printer to the system.
- *   cupsdAddPrinterFilter()     - Add a MIME filter for a printer.
  *   cupsdAddPrinterHistory()    - Add the current printer state to the history.
  *   cupsdAddPrinterUser()       - Add a user to the ACL.
  *   cupsdDeleteAllPrinters()    - Delete all printers from the system.
@@ -45,6 +44,9 @@
  *   cupsdWritePrintcap()        - Write a pseudo-printcap file for older
  *                                 applications that need it...
  *   cupsdSanitizeURI()          - Sanitize a device URI...
+ *   add_printer_filter()        - Add a MIME filter for a printer.
+ *   add_printer_formats()       - Add document-format-supported values for
+ *                                 a printer.
  *   compare_printers()          - Compare two printers.
  *   write_irix_config()         - Update the config files used by the IRIX
  *                                 desktop tools.
@@ -63,6 +65,8 @@
  * Local functions...
  */
 
+static void	add_printer_filter(cupsd_printer_t *p, const char *filter);
+static void	add_printer_formats(cupsd_printer_t *p);
 static int	compare_printers(void *first, void *second, void *data);
 #ifdef __sgi
 static void	write_irix_config(cupsd_printer_t *p);
@@ -138,63 +142,6 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   */
 
   return (p);
-}
-
-
-/*
- * 'cupsdAddPrinterFilter()' - Add a MIME filter for a printer.
- */
-
-void
-cupsdAddPrinterFilter(
-    cupsd_printer_t  *p,		/* I - Printer to add to */
-    const char       *filter)		/* I - Filter to add */
-{
-  char		super[MIME_MAX_SUPER],	/* Super-type for filter */
-		type[MIME_MAX_TYPE],	/* Type for filter */
-		program[1024];		/* Program/filter name */
-  int		cost;			/* Cost of filter */
-  mime_type_t	*temptype;		/* MIME type looping var */
-
-
- /*
-  * Range check input...
-  */
-
-  if (p == NULL || p->filetype == NULL || filter == NULL)
-    return;
-
- /*
-  * Parse the filter string; it should be in the following format:
-  *
-  *     super/type cost program
-  */
-
-  if (sscanf(filter, "%15[^/]/%31s%d%1023s", super, type, &cost, program) != 4)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdAddPrinterFilter: Invalid filter string \"%s\"!",
-                    filter);
-    return;
-  }
-
- /*
-  * Add the filter to the MIME database, supporting wildcards as needed...
-  */
-
-  for (temptype = mimeFirstType(MimeDatabase);
-       temptype;
-       temptype = mimeNextType(MimeDatabase))
-    if (((super[0] == '*' && strcasecmp(temptype->super, "printer")) ||
-         !strcasecmp(temptype->super, super)) &&
-        (type[0] == '*' || !strcasecmp(temptype->type, type)))
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Adding filter %s/%s %s/%s %d %s",
-                      temptype->super, temptype->type,
-		      p->filetype->super, p->filetype->type,
-                      cost, program);
-      mimeAddFilter(MimeDatabase, temptype, p->filetype, cost, program);
-    }
 }
 
 
@@ -464,11 +411,6 @@ cupsdCreateCommonData(void)
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
                "document-format-default", NULL, "application/octet-stream");
 
-  /* document-format-supported */
-  ippAddStrings(CommonData, IPP_TAG_PRINTER,
-                (ipp_tag_t)(IPP_TAG_MIMETYPE | IPP_TAG_COPY),
-                "document-format-supported", NumMimeTypes, NULL, MimeTypes);
-
   /* generated-natural-language-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
                "generated-natural-language-supported", NULL, DefaultLanguage);
@@ -514,7 +456,7 @@ cupsdCreateCommonData(void)
 
     if (attr == NULL)
       cupsdLogMessage(CUPSD_LOG_EMERG,
-                      "cupsdSetPrinterAttrs: Unable to allocate memory for "
+                      "Unable to allocate memory for "
                       "job-sheets-supported attribute: %s!", strerror(errno));
     else if (!Classification || ClassifyOverride)
     {
@@ -931,8 +873,7 @@ cupsdLoadAllPrinters(void)
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
     if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "cupsdLoadAllPrinters: Unable to open %s - %s", line,
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open %s - %s", line,
 		      strerror(errno));
     return;
   }
@@ -963,8 +904,7 @@ cupsdLoadAllPrinters(void)
         * Add the printer and a base file type...
 	*/
 
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "cupsdLoadAllPrinters: Loading printer %s...", value);
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "Loading printer %s...", value);
 
         p = cupsdAddPrinter(value);
 	p->accepting = 1;
@@ -1748,9 +1688,10 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
         if (num_media == 0)
 	{
-	  cupsdLogMessage(CUPSD_LOG_CRIT, "cupsdSetPrinterAttrs: The PPD file for printer %s "
-	                     "contains no media options and is therefore "
-			     "invalid!", p->name);
+	  cupsdLogMessage(CUPSD_LOG_CRIT,
+	                  "The PPD file for printer %s "
+	                  "contains no media options and is therefore "
+			  "invalid!", p->name);
 	}
 	else
 	{
@@ -1856,7 +1797,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	* handle "raw" printing by users.
 	*/
 
-        cupsdAddPrinterFilter(p, "application/vnd.cups-raw 0 -");
+        add_printer_filter(p, "application/vnd.cups-raw 0 -");
 
        /*
 	* Add any filters in the PPD file...
@@ -1866,7 +1807,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	for (i = 0; i < ppd->num_filters; i ++)
 	{
           DEBUG_printf(("ppd->filters[%d] = \"%s\"\n", i, ppd->filters[i]));
-          cupsdAddPrinterFilter(p, ppd->filters[i]);
+          add_printer_filter(p, ppd->filters[i]);
 	}
 
 	if (ppd->num_filters == 0)
@@ -1875,7 +1816,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	  * If there are no filters, add a PostScript printing filter.
 	  */
 
-          cupsdAddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
+          add_printer_filter(p, "application/vnd.cups-postscript 0 -");
         }
 
        /*
@@ -1948,13 +1889,13 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	* handle "raw" printing by users.
 	*/
 
-        cupsdAddPrinterFilter(p, "application/vnd.cups-raw 0 -");
+        add_printer_filter(p, "application/vnd.cups-raw 0 -");
 
        /*
         * Add a PostScript filter, since this is still possibly PS printer.
 	*/
 
-	cupsdAddPrinterFilter(p, "application/vnd.cups-postscript 0 -");
+	add_printer_filter(p, "application/vnd.cups-postscript 0 -");
       }
       else
       {
@@ -1975,7 +1916,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
 	  snprintf(filename, sizeof(filename), "*/* 0 %s/interfaces/%s",
 	           ServerRoot, p->name);
-	  cupsdAddPrinterFilter(p, filename);
+	  add_printer_filter(p, filename);
 	}
 	else if (p->device_uri &&
 	         !strncmp(p->device_uri, "ipp://", 6) &&
@@ -2029,6 +1970,12 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                     "finishings-default", IPP_FINISHINGS_NONE);
     }
   }
+
+ /*
+  * Populate the document-format-supported attribute...
+  */
+
+  add_printer_formats(p);
 
   DEBUG_printf(("cupsdSetPrinterAttrs: leaving name = %s, type = %x\n", p->name,
                 p->type));
@@ -2625,6 +2572,158 @@ cupsdSanitizeURI(const char *uri,	/* I - Original device URI */
   */
 
   return (buffer);
+}
+
+
+/*
+ * 'add_printer_filter()' - Add a MIME filter for a printer.
+ */
+
+static void
+add_printer_filter(
+    cupsd_printer_t  *p,		/* I - Printer to add to */
+    const char       *filter)		/* I - Filter to add */
+{
+  char		super[MIME_MAX_SUPER],	/* Super-type for filter */
+		type[MIME_MAX_TYPE],	/* Type for filter */
+		program[1024];		/* Program/filter name */
+  int		cost;			/* Cost of filter */
+  mime_type_t	*temptype;		/* MIME type looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (p == NULL || p->filetype == NULL || filter == NULL)
+    return;
+
+ /*
+  * Parse the filter string; it should be in the following format:
+  *
+  *     super/type cost program
+  */
+
+  if (sscanf(filter, "%15[^/]/%31s%d%1023s", super, type, &cost, program) != 4)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "%s: invalid filter string \"%s\"!",
+                    p->name, filter);
+    return;
+  }
+
+ /*
+  * Add the filter to the MIME database, supporting wildcards as needed...
+  */
+
+  for (temptype = mimeFirstType(MimeDatabase);
+       temptype;
+       temptype = mimeNextType(MimeDatabase))
+    if (((super[0] == '*' && strcasecmp(temptype->super, "printer")) ||
+         !strcasecmp(temptype->super, super)) &&
+        (type[0] == '*' || !strcasecmp(temptype->type, type)))
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "add_printer_filter: %s: adding filter %s/%s %s/%s %d %s",
+                      p->name, temptype->super, temptype->type,
+		      p->filetype->super, p->filetype->type,
+                      cost, program);
+      mimeAddFilter(MimeDatabase, temptype, p->filetype, cost, program);
+    }
+}
+
+
+/*
+ * 'add_printer_formats()' - Add document-format-supported values for a printer.
+ */
+
+static void
+add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
+{
+  int		i;			/* Looping var */
+  mime_type_t	*type;			/* Current MIME type */
+  cups_array_t	*filters;		/* Filters */
+  int		num_types;		/* Number of supported types */
+  const char	**types;		/* Array of supported type names */
+  char		mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
+					/* MIME type name */
+
+
+ /*
+  * Raw (and remote) queues advertise all of the supported MIME
+  * types...
+  */
+
+  if (p->raw)
+  {
+    ippAddStrings(p->attrs, IPP_TAG_PRINTER,
+                  (ipp_tag_t)(IPP_TAG_MIMETYPE | IPP_TAG_COPY),
+                  "document-format-supported", NumMimeTypes, NULL, MimeTypes);
+    return;
+  }
+
+ /*
+  * Otherwise, loop through the supported MIME types and see if there
+  * are filters for them...
+  */
+
+  if ((types = calloc(NumMimeTypes, sizeof(char *))) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_EMERG,
+                    "Unable to allocate memory for \"%s\" MIME type list!",
+		    p->name);
+    return;
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_printer_formats: %d types, %d filters",
+                  mimeNumTypes(MimeDatabase), mimeNumFilters(MimeDatabase));
+
+  types[0] = _cups_sp_alloc("application/octet-stream");
+
+  for (num_types = 1, type = mimeFirstType(MimeDatabase);
+       type;
+       type = mimeNextType(MimeDatabase))
+  {
+    if (!strcasecmp(type->super, "application") &&
+	!strcasecmp(type->type, "octet-stream"))
+      continue;
+
+    snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
+
+    if ((filters = mimeFilter(MimeDatabase, type, p->filetype, NULL)) != NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "add_printer_formats: %s: %s needs %d filters",
+                      p->name, mimetype, cupsArrayCount(filters));
+
+      cupsArrayDelete(filters);
+      types[num_types] = _cups_sp_alloc(mimetype);
+      num_types ++;
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "add_printer_formats: %s: %s not supported",
+                      p->name, mimetype);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "add_printer_formats: %s: %d supported types",
+		  p->name, num_types);
+
+ /*
+  * Add the file formats that can be filtered...
+  */
+
+  ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
+                "document-format-supported", num_types, NULL, types);
+
+ /*
+  * Free the temporary data...
+  */
+
+  for (i = 0; i < num_types; i ++)
+    _cups_sp_free(types[i]);
+
+  free(types);
 }
 
 

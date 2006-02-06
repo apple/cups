@@ -844,9 +844,11 @@ cupsdReadConfiguration(void)
     }
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,"NumPolicies=%d", NumPolicies);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadConfiguration: NumPolicies=%d",
+                  NumPolicies);
   for (i = 0; i < NumPolicies; i ++)
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Policies[%d]=\"%s\"", i,
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdReadConfiguration: Policies[%d]=\"%s\"", i,
                     Policies[i]->name);
 
  /*
@@ -882,7 +884,7 @@ cupsdReadConfiguration(void)
     if (NumMimeTypes)
     {
       for (i = 0; i < NumMimeTypes; i ++)
-	free((void *)MimeTypes[i]);
+	_cups_sp_free(MimeTypes[i]);
 
       free(MimeTypes);
     }
@@ -924,11 +926,32 @@ cupsdReadConfiguration(void)
     {
       snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
 
-      MimeTypes[i] = strdup(mimetype);
+      MimeTypes[i] = _cups_sp_alloc(mimetype);
     }
 
     if (i < NumMimeTypes)
-      MimeTypes[i] = strdup("application/octet-stream");
+      MimeTypes[i] = _cups_sp_alloc("application/octet-stream");
+
+    if (LogLevel == CUPSD_LOG_DEBUG2)
+    {
+      mime_filter_t	*filter;	/* Current filter */
+
+
+      for (type = mimeFirstType(MimeDatabase);
+           type;
+	   type = mimeNextType(MimeDatabase))
+	cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadConfiguration: type %s/%s",
+		        type->super, type->type);
+
+      for (filter = mimeFirstFilter(MimeDatabase);
+           filter;
+	   filter = mimeNextFilter(MimeDatabase))
+	cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                "cupsdReadConfiguration: filter %s/%s to %s/%s %d %s",
+		        filter->src->super, filter->src->type,
+		        filter->dst->super, filter->dst->type,
+		        filter->cost, filter->filter);
+    }
 
    /*
     * Load banners...

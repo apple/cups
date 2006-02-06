@@ -85,7 +85,7 @@ cupsdPauseListening(void)
     cupsdLogMessage(CUPSD_LOG_WARN,
                     "Max clients reached, holding new connections...");
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdPauseListening: Clearing input bits...");
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdPauseListening: Clearing input bits...");
 
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
@@ -117,7 +117,8 @@ cupsdResumeListening(void)
   if (cupsArrayCount(Clients) >= (MaxClients - 1))
     cupsdLogMessage(CUPSD_LOG_WARN, "Resuming new connection processing...");
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdResumeListening: Setting input bits...");
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdResumeListening: Setting input bits...");
 
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
@@ -154,7 +155,7 @@ cupsdStartListening(void)
 		};
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdStartListening: %d Listeners",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartListening: %d Listeners",
                   cupsArrayCount(Listeners));
 
  /*
@@ -166,8 +167,8 @@ cupsdStartListening(void)
 
   if ((ServerAddrs = httpAddrGetList(ServerName, AF_UNSPEC, NULL)) == NULL)
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdStartListening: Unable to find IP address for "
-		    "server name \"%s\"!\n", ServerName);
+                    "Unable to find IP address for server name \"%s\"!\n",
+		    ServerName);
 
  /*
   * Setup socket listeners...
@@ -207,7 +208,7 @@ cupsdStartListening(void)
       if (lis->fd == -1)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"cupsdStartListening: Unable to open listen socket for address %s:%d - %s.",
+			"Unable to open listen socket for address %s:%d - %s.",
 			s, p, strerror(errno));
 	continue;
       }
@@ -289,7 +290,7 @@ cupsdStartListening(void)
       if (status < 0)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"cupsdStartListening: Unable to bind socket for address %s:%d - %s.",
+			"Unable to bind socket for address %s:%d - %s.",
 			s, p, strerror(errno));
 	close(lis->fd);
 	lis->fd = -1;
@@ -303,7 +304,7 @@ cupsdStartListening(void)
       if (listen(lis->fd, ListenBackLog) < 0)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"cupsdStartListening: Unable to listen for clients on address %s:%d - %s.",
+			"Unable to listen for clients on address %s:%d - %s.",
 			s, p, strerror(errno));
 	exit(errno);
       }
@@ -312,19 +313,17 @@ cupsdStartListening(void)
     fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
 
     if (p)
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "cupsdStartListening: Listening to %s:%d on fd %d...",
+      cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d on fd %d...",
         	      s, p, lis->fd);
     else
     {
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "cupsdStartListening: Listening to %s on fd %d...",
+      cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s on fd %d...",
         	      s, lis->fd);
 
       if (chmod(s, 0140777))
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"cupsdStartListening: Unable to change permisssions on "
-			"domain socket \"%s\" - %s", s, strerror(errno));
+			"Unable to change permisssions on domain socket "
+			"\"%s\" - %s", s, strerror(errno));
     }
 
    /*
@@ -405,7 +404,7 @@ cupsdStopListening(void)
   cupsd_listener_t	*lis;		/* Current listening socket */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdStopListening: closing all listen sockets.");
 
   cupsdPauseListening();

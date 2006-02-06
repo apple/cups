@@ -185,7 +185,7 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
 
   cupsdSetStringf(common_env + num_common_env, "%s=%s", name, value);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSetEnv: %s\n",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetEnv: %s\n",
                   common_env[num_common_env]);
 
   num_common_env ++;

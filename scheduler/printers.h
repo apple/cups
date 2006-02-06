@@ -110,7 +110,6 @@ VAR cupsd_policy_t	*DefaultPolicyPtr
  */
 
 extern cupsd_printer_t	*cupsdAddPrinter(const char *name);
-extern void		cupsdAddPrinterFilter(cupsd_printer_t *p, const char *filter);
 extern void		cupsdAddPrinterHistory(cupsd_printer_t *p);
 extern void		cupsdAddPrinterUser(cupsd_printer_t *p, const char *username);
 extern cupsd_quota_t	*cupsdAddQuota(cupsd_printer_t *p, const char *username);
