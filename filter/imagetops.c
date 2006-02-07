@@ -3,7 +3,7 @@
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -81,9 +81,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 		xpage,			/* Current x page */
 		ypage,			/* Current y page */
 		page;			/* Current page number */
-  int		x0, y0,			/* Corners of the page in image coords */
-		x1, y1;
-  cups_ib_t		*row;			/* Current row */
+  int		xc0, yc0,			/* Corners of the page in image coords */
+		xc1, yc1;
+  cups_ib_t	*row;			/* Current row */
   int		y;			/* Current Y coordinate in image */
   int		colorspace;		/* Output colorspace */
   int		out_offset,		/* Offset into output buffer */
@@ -99,7 +99,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   float		zoom;			/* Zoom facter */
   int		xppi, yppi;		/* Pixels-per-inch */
   int		hue, sat;		/* Hue and saturation adjustment */
-  int		realcopies;		/* Real copies being printed */
+  int		realcopies,		/* Real copies being printed */
+		emit_jcl;		/* Emit JCL? */
   float		left, top;		/* Left and top of image */
   char		filename[1024];		/* Name of file to print */
   time_t	curtime;		/* Current time */
@@ -192,10 +193,32 @@ main(int  argc,				/* I - Number of command-line arguments */
     Collate = 1;
 
   if ((val = cupsGetOption("gamma", num_options, options)) != NULL)
+  {
+   /*
+    * Get gamma value from 1 to 10000...
+    */
+
     g = atoi(val) * 0.001f;
 
+    if (g < 0.001f)
+      g = 0.001f;
+    else if (g > 10.0f)
+      g = 10.0f;
+  }
+
   if ((val = cupsGetOption("brightness", num_options, options)) != NULL)
+  {
+   /*
+    * Get brightness value from 10 to 1000.
+    */
+
     b = atoi(val) * 0.01f;
+
+    if (b < 0.1f)
+      b = 0.1f;
+    else if (b > 10.0f)
+      b = 10.0f;
+  }
 
   if ((val = cupsGetOption("scaling", num_options, options)) != NULL)
     zoom = atoi(val) * 0.01;
@@ -262,6 +285,13 @@ main(int  argc,				/* I - Number of command-line arguments */
   if ((val = cupsGetOption("mirror", num_options, options)) != NULL &&
       strcasecmp(val, "True") == 0)
     Flip = 1;
+
+  if ((val = cupsGetOption("emit-jcl", num_options, options)) != NULL &&
+      (!strcasecmp(val, "false") || !strcasecmp(val, "off") ||
+       !strcasecmp(val, "no") || !strcmp(val, "0")))
+    emit_jcl = 0;
+  else
+    emit_jcl = 1;
 
  /*
   * Open the input image to print...
@@ -557,7 +587,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Write any JCL commands that are needed to print PostScript code...
   */
 
-  ppdEmitJCL(ppd, stdout, atoi(argv[1]), argv[2], argv[3]);
+  if (emit_jcl)
+    ppdEmitJCL(ppd, stdout, atoi(argv[1]), argv[2], argv[3]);
 
  /*
   * Start sending the document with any commands needed...
@@ -796,21 +827,21 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         puts("gsave");
 
-	x0 = cupsImageGetWidth(img) * xpage / xpages;
-	x1 = cupsImageGetWidth(img) * (xpage + 1) / xpages - 1;
-	y0 = cupsImageGetHeight(img) * ypage / ypages;
-	y1 = cupsImageGetHeight(img) * (ypage + 1) / ypages - 1;
+	xc0 = cupsImageGetWidth(img) * xpage / xpages;
+	xc1 = cupsImageGetWidth(img) * (xpage + 1) / xpages - 1;
+	yc0 = cupsImageGetHeight(img) * ypage / ypages;
+	yc1 = cupsImageGetHeight(img) * (ypage + 1) / ypages - 1;
 
         printf("%.1f %.1f translate\n", left, top);
 
 	printf("%.3f %.3f scale\n\n",
-	       xprint * 72.0 / (x1 - x0 + 1),
-	       yprint * 72.0 / (y1 - y0 + 1));
+	       xprint * 72.0 / (xc1 - xc0 + 1),
+	       yprint * 72.0 / (yc1 - yc0 + 1));
 
 	if (LanguageLevel == 1)
 	{
-	  printf("/picture %d string def\n", (x1 - x0 + 1) * abs(colorspace));
-	  printf("%d %d 8[1 0 0 -1 0 1]", (x1 - x0 + 1), (y1 - y0 + 1));
+	  printf("/picture %d string def\n", (xc1 - xc0 + 1) * abs(colorspace));
+	  printf("%d %d 8[1 0 0 -1 0 1]", (xc1 - xc0 + 1), (yc1 - yc0 + 1));
 
           if (colorspace == CUPS_IMAGE_WHITE)
             puts("{currentfile picture readhexstring pop} image");
@@ -818,10 +849,10 @@ main(int  argc,				/* I - Number of command-line arguments */
             printf("{currentfile picture readhexstring pop} false %d colorimage\n",
 	           abs(colorspace));
 
-          for (y = y0; y <= y1; y ++)
+          for (y = yc0; y <= yc1; y ++)
           {
-            cupsImageGetRow(img, x0, y, x1 - x0 + 1, row);
-            ps_hex(row, (x1 - x0 + 1) * abs(colorspace), y == y1);
+            cupsImageGetRow(img, xc0, y, xc1 - xc0 + 1, row);
+            ps_hex(row, (xc1 - xc0 + 1) * abs(colorspace), y == yc1);
           }
 	}
 	else
@@ -844,7 +875,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		 "/Width %d"
 		 "/Height %d"
 		 "/BitsPerComponent 8",
-		 x1 - x0 + 1, y1 - y0 + 1);
+		 xc1 - xc0 + 1, yc1 - yc0 + 1);
 
           switch (colorspace)
 	  {
@@ -861,19 +892,19 @@ main(int  argc,				/* I - Number of command-line arguments */
 
           fputs("/DataSource currentfile /ASCII85Decode filter", stdout);
 
-          if (((x1 - x0 + 1) / xprint) < 100.0)
+          if (((xc1 - xc0 + 1) / xprint) < 100.0)
             fputs("/Interpolate true", stdout);
 
           puts("/cupsImageMatrix[1 0 0 -1 0 1]>>image");
 
-          for (y = y0, out_offset = 0; y <= y1; y ++)
+          for (y = yc0, out_offset = 0; y <= yc1; y ++)
           {
-            cupsImageGetRow(img, x0, y, x1 - x0 + 1, row + out_offset);
+            cupsImageGetRow(img, xc0, y, xc1 - xc0 + 1, row + out_offset);
 
-            out_length = (x1 - x0 + 1) * abs(colorspace) + out_offset;
+            out_length = (xc1 - xc0 + 1) * abs(colorspace) + out_offset;
             out_offset = out_length & 3;
 
-            ps_ascii85(row, out_length, y == y1);
+            ps_ascii85(row, out_length, y == yc1);
 
             if (out_offset > 0)
               memcpy(row, row + out_length - out_offset, out_offset);
@@ -892,10 +923,13 @@ main(int  argc,				/* I - Number of command-line arguments */
   * End the job with the appropriate JCL command or CTRL-D otherwise.
   */
 
-  if (ppd && ppd->jcl_end)
-    ppdEmitJCLEnd(ppd, stdout);
-  else
-    putchar(0x04);
+  if (emit_jcl)
+  {
+    if (ppd && ppd->jcl_end)
+      ppdEmitJCLEnd(ppd, stdout);
+    else
+      putchar(0x04);
+  }
 
  /*
   * Close files...

@@ -3,7 +3,7 @@
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -60,7 +60,7 @@ int	Flip = 0,			/* Flip/mirror pages */
 	YPosition = 0,			/* Vertical position on page */
 	Collate = 0,			/* Collate copies? */
 	Copies = 1;			/* Number of copies */
-int	Floyd16x16[16][16] =		/* Traditional Floyd ordered dither */
+int	Floyd16xc16[16][16] =		/* Traditional Floyd ordered dither */
 	{
 	  { 0,   128, 32,  160, 8,   136, 40,  168,
 	    2,   130, 34,  162, 10,  138, 42,  170 },
@@ -212,8 +212,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 			xtemp,		/* Bitmap width in pixels */
 			ytemp,		/* Bitmap height in pixels */
 			page;		/* Current page number */
-  int			x0, y0,		/* Corners of the page in image coords */
-			x1, y1;
+  int			xc0, yc0,		/* Corners of the page in image coords */
+			xc1, yc1;
   ppd_file_t		*ppd;		/* PPD file */
   ppd_choice_t		*choice,	/* PPD option choice */
 			**choices;	/* List of marked choices */
@@ -407,10 +407,32 @@ main(int  argc,				/* I - Number of command-line arguments */
     Collate = 1;
 
   if ((val = cupsGetOption("gamma", num_options, options)) != NULL)
+  {
+   /*
+    * Get gamma value from 1 to 10000...
+    */
+
     g = atoi(val) * 0.001f;
 
+    if (g < 0.001f)
+      g = 0.001f;
+    else if (g > 10.0f)
+      g = 10.0f;
+  }
+
   if ((val = cupsGetOption("brightness", num_options, options)) != NULL)
+  {
+   /*
+    * Get brightness value from 10 to 1000.
+    */
+
     b = atoi(val) * 0.01f;
+
+    if (b < 0.1f)
+      b = 0.1f;
+    else if (b > 10.0f)
+      b = 10.0f;
+  }
 
   if ((val = cupsGetOption("scaling", num_options, options)) != NULL)
     zoom = atoi(val) * 0.01;
@@ -1234,20 +1256,20 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	if (Orientation & 1)
 	{
-	  x0    = img->xsize * ypage / ypages;
-	  x1    = img->xsize * (ypage + 1) / ypages - 1;
-	  y0    = img->ysize * xpage / xpages;
-	  y1    = img->ysize * (xpage + 1) / xpages - 1;
+	  xc0    = img->xsize * ypage / ypages;
+	  xc1    = img->xsize * (ypage + 1) / ypages - 1;
+	  yc0    = img->ysize * xpage / xpages;
+	  yc1    = img->ysize * (xpage + 1) / xpages - 1;
 
 	  xtemp = header.HWResolution[0] * yprint;
 	  ytemp = header.HWResolution[1] * xprint;
 	}
 	else
 	{
-	  x0    = img->xsize * xpage / xpages;
-	  x1    = img->xsize * (xpage + 1) / xpages - 1;
-	  y0    = img->ysize * ypage / ypages;
-	  y1    = img->ysize * (ypage + 1) / ypages - 1;
+	  xc0    = img->xsize * xpage / xpages;
+	  xc1    = img->xsize * (xpage + 1) / xpages - 1;
+	  yc0    = img->ysize * ypage / ypages;
+	  yc1    = img->ysize * (ypage + 1) / ypages - 1;
 
 	  xtemp = header.HWResolution[0] * xprint;
 	  ytemp = header.HWResolution[1] * yprint;
@@ -1262,10 +1284,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  */
 
           if (Flip)
-	    z = cupsImageZoomNew(img, x0, y0, x1, y1, -xtemp, ytemp,
+	    z = cupsImageZoomNew(img, xc0, yc0, xc1, yc1, -xtemp, ytemp,
 	                         Orientation & 1, zoom_type);
           else
-	    z = cupsImageZoomNew(img, x0, y0, x1, y1, xtemp, ytemp,
+	    z = cupsImageZoomNew(img, xc0, yc0, xc1, yc1, xtemp, ytemp,
 	                         Orientation & 1, zoom_type);
 
          /*
@@ -1670,7 +1692,7 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 64 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               for (x = xsize ; x > 0; x --)
               {
@@ -1758,7 +1780,7 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               for (x = xsize; x > 0; x --)
               {
@@ -1782,7 +1804,7 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
 	      dither  = Floyd8x8[y & 7];
 
               for (x = xsize; x > 0; x --)
@@ -1806,7 +1828,7 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  cptr ++;
 		  mptr ++;
@@ -1876,7 +1898,7 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               switch (z)
 	      {
@@ -1931,7 +1953,7 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
 	      dither  = Floyd8x8[y & 7];
               r0 += z;
 
@@ -1946,7 +1968,7 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  ptr ++;
         	}
@@ -2045,7 +2067,7 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 128 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               for (x = xsize ; x > 0; x --)
               {
@@ -2080,9 +2102,9 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
               for (x = xsize ; x > 0; x --, r0 += 4)
               {
 	       	if ((r0[0] & 63) > dither[x & 7])
-        	  *ptr ^= (0xc0 & OnPixels[r0[0]]);
+        	  *ptr ^= (0x0 & OnPixels[r0[0]]);
         	else
-        	  *ptr ^= (0xc0 & OffPixels[r0[0]]);
+        	  *ptr ^= (0x0 & OffPixels[r0[0]]);
 
         	if ((r0[1] & 63) > dither[x & 7])
         	  *ptr ^= (0x30 & OnPixels[r0[1]]);
@@ -2148,7 +2170,7 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               for (x = xsize; x > 0; x --)
               {
@@ -2175,7 +2197,7 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
 	      dither  = Floyd8x8[y & 7];
 
               for (x = xsize; x > 0; x --)
@@ -2204,7 +2226,7 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  cptr ++;
 		  mptr ++;
@@ -2286,7 +2308,7 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
               r0      += z;
 
               for (x = xsize; x > 0; x --, r0 += 4)
@@ -2305,7 +2327,7 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
 	      break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
 	      dither  = Floyd8x8[y & 7];
               r0      += z;
 
@@ -2320,7 +2342,7 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  ptr ++;
         	}
@@ -2412,7 +2434,7 @@ format_K(cups_page_header2_t *header,	/* I - Page header */
   {
     case 1 :
         bitmask = 0x80 >> (bitoffset & 7);
-        dither  = Floyd16x16[y & 15];
+        dither  = Floyd16xc16[y & 15];
 
         for (x = xsize; x > 0; x --)
         {
@@ -2430,7 +2452,7 @@ format_K(cups_page_header2_t *header,	/* I - Page header */
         break;
 
     case 2 :
-        bitmask = 0xc0 >> (bitoffset & 7);
+        bitmask = 0x0 >> (bitoffset & 7);
         dither  = Floyd8x8[y & 7];
 
         for (x = xsize; x > 0; x --)
@@ -2444,7 +2466,7 @@ format_K(cups_page_header2_t *header,	/* I - Page header */
 	    bitmask >>= 2;
 	  else
 	  {
-	    bitmask = 0xc0;
+	    bitmask = 0x0;
 
 	    ptr ++;
           }
@@ -2537,7 +2559,7 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 128 >> (bitoffset & 7);
-              dither  = Floyd16x16[y & 15];
+              dither  = Floyd16xc16[y & 15];
 
               for (x = xsize ; x > 0; x --, r0 += 4)
               {
@@ -2572,9 +2594,9 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
               for (x = xsize ; x > 0; x --, r0 += 4)
               {
 	       	if ((r0[3] & 63) > dither[x & 7])
-        	  *ptr ^= (0xc0 & OnPixels[r0[3]]);
+        	  *ptr ^= (0x0 & OnPixels[r0[3]]);
         	else
-        	  *ptr ^= (0xc0 & OffPixels[r0[3]]);
+        	  *ptr ^= (0x0 & OffPixels[r0[3]]);
 
         	if ((r0[0] & 63) > dither[x & 7])
         	  *ptr ^= (0x30 & OnPixels[r0[0]]);
@@ -2657,7 +2679,7 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-              dither  = Floyd16x16[y & 15];
+              dither  = Floyd16xc16[y & 15];
 
               for (x = xsize; x > 0; x --)
               {
@@ -2684,7 +2706,7 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
               dither  = Floyd8x8[y & 7];
 
               for (x = xsize; x > 0; x --)
@@ -2713,7 +2735,7 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  cptr ++;
 		  mptr ++;
@@ -2795,7 +2817,7 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-              dither  = Floyd16x16[y & 15];
+              dither  = Floyd16xc16[y & 15];
 	      if (z == 0)
 	        r0 += 3;
 	      else
@@ -2817,7 +2839,7 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
 	      break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
               dither  = Floyd8x8[y & 7];
               if (z == 0)
 	        r0 += 3;
@@ -2835,7 +2857,7 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  ptr ++;
         	}
@@ -2950,7 +2972,7 @@ format_KCMYcm(cups_page_header2_t *header,/* I - Page header */
         switch (header->cupsBitsPerColor)
         {
           case 1 :
-              dither  = Floyd16x16[y & 15];
+              dither  = Floyd16xc16[y & 15];
 
               for (x = xsize ; x > 0; x --)
               {
@@ -3015,7 +3037,7 @@ format_KCMYcm(cups_page_header2_t *header,/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-              dither  = Floyd16x16[y & 15];
+              dither  = Floyd16xc16[y & 15];
 
               for (x = xsize; x > 0; x --)
               {
@@ -3095,7 +3117,7 @@ format_KCMYcm(cups_page_header2_t *header,/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-              dither  = Floyd16x16[y & 15];
+              dither  = Floyd16xc16[y & 15];
 
               switch (z)
 	      {
@@ -3281,7 +3303,7 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 128 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               for (x = xsize ; x > 0; x --)
               {
@@ -3315,9 +3337,9 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
               for (x = xsize ; x > 0; x --, r0 += 3)
               {
 	       	if ((r0[0] & 63) > dither[x & 7])
-        	  *ptr ^= (0xc0 & OnPixels[r0[0]]);
+        	  *ptr ^= (0x0 & OnPixels[r0[0]]);
         	else
-        	  *ptr ^= (0xc0 & OffPixels[r0[0]]);
+        	  *ptr ^= (0x0 & OffPixels[r0[0]]);
 
         	if ((r0[1] & 63) > dither[x & 7])
         	  *ptr ^= (0x30 & OnPixels[r0[1]]);
@@ -3392,7 +3414,7 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               for (x = xsize; x > 0; x --)
               {
@@ -3416,7 +3438,7 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
 	      dither  = Floyd8x8[y & 7];
 
               for (x = xsize; x > 0; x --)
@@ -3440,7 +3462,7 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  cptr ++;
 		  mptr ++;
@@ -3516,7 +3538,7 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               switch (z)
 	      {
@@ -3571,7 +3593,7 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
 	      dither  = Floyd8x8[y & 7];
               r0 += z;
 
@@ -3586,7 +3608,7 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  ptr ++;
         	}
@@ -3678,7 +3700,7 @@ format_W(cups_page_header2_t *header,	/* I - Page header */
   {
     case 1 :
         bitmask = 0x80 >> (bitoffset & 7);
-        dither  = Floyd16x16[y & 15];
+        dither  = Floyd16xc16[y & 15];
 
         for (x = xsize; x > 0; x --)
         {
@@ -3696,7 +3718,7 @@ format_W(cups_page_header2_t *header,	/* I - Page header */
         break;
 
     case 2 :
-        bitmask = 0xc0 >> (bitoffset & 7);
+        bitmask = 0x0 >> (bitoffset & 7);
         dither  = Floyd8x8[y & 7];
 
         for (x = xsize; x > 0; x --)
@@ -3710,7 +3732,7 @@ format_W(cups_page_header2_t *header,	/* I - Page header */
 	    bitmask >>= 2;
 	  else
 	  {
-	    bitmask = 0xc0;
+	    bitmask = 0x0;
 
 	    ptr ++;
           }
@@ -3802,7 +3824,7 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 64 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               for (x = xsize ; x > 0; x --, r0 += 3)
               {
@@ -3902,7 +3924,7 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               for (x = xsize; x > 0; x --)
               {
@@ -3926,7 +3948,7 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
 	      dither  = Floyd8x8[y & 7];
 
               for (x = xsize; x > 0; x --)
@@ -3950,7 +3972,7 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  cptr ++;
 		  mptr ++;
@@ -4020,7 +4042,7 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-	      dither  = Floyd16x16[y & 15];
+	      dither  = Floyd16xc16[y & 15];
 
               switch (z)
 	      {
@@ -4075,7 +4097,7 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
 	      dither  = Floyd8x8[y & 7];
               z       = 2 - z;
               r0      += z;
@@ -4091,7 +4113,7 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  ptr ++;
         	}
@@ -4192,7 +4214,7 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 128 >> (bitoffset & 7);
-              dither  = Floyd16x16[y & 15];
+              dither  = Floyd16xc16[y & 15];
 
               for (x = xsize ; x > 0; x --, r0 += 4)
               {
@@ -4228,9 +4250,9 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
               for (x = xsize ; x > 0; x --, r0 += 4)
               {
 	       	if ((r0[2] & 63) > dither[x & 7])
-        	  *ptr ^= (0xc0 & OnPixels[r0[2]]);
+        	  *ptr ^= (0x0 & OnPixels[r0[2]]);
         	else
-        	  *ptr ^= (0xc0 & OffPixels[r0[2]]);
+        	  *ptr ^= (0x0 & OffPixels[r0[2]]);
 
         	if ((r0[1] & 63) > dither[x & 7])
         	  *ptr ^= (0x30 & OnPixels[r0[1]]);
@@ -4313,7 +4335,7 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-              dither  = Floyd16x16[y & 15];
+              dither  = Floyd16xc16[y & 15];
 
               for (x = xsize; x > 0; x --)
               {
@@ -4341,7 +4363,7 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
               dither  = Floyd8x8[y & 7];
 
               for (x = xsize; x > 0; x --)
@@ -4370,7 +4392,7 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  cptr ++;
 		  mptr ++;
@@ -4452,7 +4474,7 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
         {
           case 1 :
               bitmask = 0x80 >> (bitoffset & 7);
-              dither  = Floyd16x16[y & 15];
+              dither  = Floyd16xc16[y & 15];
 
               if (z < 3)
 	        r0 += 2 - z;
@@ -4475,7 +4497,7 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
               break;
 
           case 2 :
-              bitmask = 0xc0 >> (bitoffset & 7);
+              bitmask = 0x0 >> (bitoffset & 7);
               dither  = Floyd8x8[y & 7];
               if (z == 3)
 	        r0 += 3;
@@ -4493,7 +4515,7 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
 		  bitmask >>= 2;
 		else
 		{
-		  bitmask = 0xc0;
+		  bitmask = 0x0;
 
 		  ptr ++;
         	}

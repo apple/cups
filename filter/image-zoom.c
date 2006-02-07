@@ -92,10 +92,10 @@ cupsImageZoomFill(cups_izoom_t *z,	/* I - Zoom record to fill */
 cups_izoom_t *
 cupsImageZoomNew(
     cups_image_t  *img,			/* I - cupsImage to zoom */
-    int           x0,			/* I - Upper-lefthand corner */
-    int           y0,			/* I - ... */
-    int           x1,			/* I - Lower-righthand corner */
-    int           y1,			/* I - ... */
+    int           xc0,			/* I - Upper-lefthand corner */
+    int           yc0,			/* I - ... */
+    int           xc1,			/* I - Lower-righthand corner */
+    int           yc1,			/* I - ... */
     int           xsize,		/* I - Final width of image */
     int           ysize,		/* I - Final height of image */
     int           rotated,		/* I - Non-zero if image is rotated 90 degs */
@@ -107,8 +107,8 @@ cupsImageZoomNew(
 
   if (xsize > CUPS_IMAGE_MAX_WIDTH ||
       ysize > CUPS_IMAGE_MAX_HEIGHT ||
-      (x1 - x0) > CUPS_IMAGE_MAX_WIDTH ||
-      (y1 - y0) > CUPS_IMAGE_MAX_HEIGHT)
+      (xc1 - xc0) > CUPS_IMAGE_MAX_WIDTH ||
+      (yc1 - yc0) > CUPS_IMAGE_MAX_HEIGHT)
     return (NULL);		/* Protect against integer overflow */
 
   if ((z = (cups_izoom_t *)calloc(1, sizeof(cups_izoom_t))) == NULL)
@@ -132,10 +132,10 @@ cupsImageZoomNew(
 
   if (rotated)
   {
-    z->xorig   = x1;
-    z->yorig   = y0;
-    z->width   = y1 - y0 + 1;
-    z->height  = x1 - x0 + 1;
+    z->xorig   = xc1;
+    z->yorig   = yc0;
+    z->width   = yc1 - yc0 + 1;
+    z->height  = xc1 - xc0 + 1;
     z->xsize   = xsize;
     z->ysize   = ysize;
     z->xmod    = z->width % z->xsize;
@@ -159,10 +159,10 @@ cupsImageZoomNew(
   }
   else
   {
-    z->xorig   = x0;
-    z->yorig   = y0;
-    z->width   = x1 - x0 + 1;
-    z->height  = y1 - y0 + 1;
+    z->xorig   = xc0;
+    z->yorig   = yc0;
+    z->width   = xc1 - xc0 + 1;
+    z->height  = yc1 - yc0 + 1;
     z->xsize   = xsize;
     z->ysize   = ysize;
     z->xmod    = z->width % z->xsize;
