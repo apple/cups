@@ -28,8 +28,9 @@ include Makedefs
 # Directories to make...
 #
 
-DIRS	=	cups backend berkeley cgi-bin filter locale man pdftops \
-		notifier scheduler systemv test
+DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
+		notifier pdftops scheduler systemv test
+
 
 #
 # Make all targets...
@@ -42,6 +43,7 @@ all:
 		(cd $$dir ; $(MAKE) $(MFLAGS)) || exit 1;\
 	done
 
+
 #
 # Remove object and target files...
 #
@@ -51,6 +53,7 @@ clean:
 		echo Cleaning in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) clean) || exit 1;\
 	done
+
 
 #
 # Make dependencies
@@ -165,6 +168,7 @@ pkg:
 
 tardist:
 	epm $(EPMFLAGS) -f tardist cups packaging/cups.list
+
 
 #
 # End of "$Id$".
