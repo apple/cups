@@ -42,6 +42,7 @@
  */
 
 #include "common.h"
+#include <math.h>
 #include <cups/file.h>
 #include <cups/array.h>
 
@@ -84,10 +85,7 @@ typedef struct				/**** Page information ****/
   char		*label;			/* Page label */
   off_t		offset;			/* Offset to start of page */
   ssize_t	length;			/* Number of bytes for page */
-  float		left,			/* Left position */
-		bottom,			/* Bottom position */
-		right,			/* Right position */
-		top;			/* Top position */
+  int		lbrt[4];		/* PageBoundingBox */
   char		*input_slot,		/* Input slot option or NULL */
 		*manual_feed;		/* Manual feed option or NULL */
 } page_info_t;
@@ -103,6 +101,7 @@ const char	*PageRanges = NULL;	/* Range of pages selected */
 const char	*PageSet = NULL;	/* All, Even, Odd pages */
 int		Order = 0,		/* 0 = normal, 1 = reverse pages */
 		Flip = 0,		/* Flip/mirror pages */
+		FitPlot = 0,		/* Fit pages to media */
 		NUp = 1,		/* Number of pages on each sheet (1, 2, 4) */
 		Collate = 0,		/* Collate copies? */
 		Copies = 1,		/* Number of copies */
@@ -116,7 +115,8 @@ int		Order = 0,		/* 0 = normal, 1 = reverse pages */
  * Local functions...
  */
 
-static page_info_t	*add_page(const char *label, off_t offset);
+static page_info_t	*add_page(const char *label, off_t offset,
+			          const int *lbrt);
 static int		check_range(int page);
 static void		copy_bytes(cups_file_t *fp, off_t offset,
 			           size_t length);
@@ -130,7 +130,7 @@ static void		include_feature(ppd_file_t *ppd, const char *line,
 #define			is_last_page(p)		(NUp > 1 && (((p)+1) % NUp) == 0)
 #define 		is_not_last_page(p)	(NUp > 1 && ((p) % NUp) != 0)
 static char		*psgets(char *buf, size_t *bytes, FILE *fp);
-static void		start_nup(int number, int show_border);
+static void		start_nup(int number, int show_border, const int *lbrt);
 
 
 /*
@@ -156,6 +156,8 @@ main(int  argc,				/* I - Number of command-line args */
   int		sloworder;		/* 1 if we need to order manually */
   int		slowduplex;		/* 1 if we need an even page count */
   char		line[8192];		/* Line buffer */
+  int		lbrt[4],		/* BoundingBox */
+		pagelbrt[4];		/* PageBoundingBox */
   size_t	len;			/* Length of line buffer */
   float		g;			/* Gamma correction value */
   float		b;			/* Brightness factor */
@@ -346,6 +348,11 @@ main(int  argc,				/* I - Number of command-line args */
       (!strcasecmp(val, "true") || !strcasecmp(val, "on") ||
        !strcasecmp(val, "yes")))
     Flip = 1;
+
+  if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
+      (!strcasecmp(val, "true") || !strcasecmp(val, "on") ||
+       !strcasecmp(val, "yes")))
+    FitPlot = 1;
 
   if ((val = cupsGetOption("emit-jcl", num_options, options)) != NULL &&
       (!strcasecmp(val, "false") || !strcasecmp(val, "off") ||
@@ -543,8 +550,14 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     puts("%%Pages: (atend)");
+    printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n", PageLeft, PageBottom,
+           PageRight, PageTop);
 
-    level = 0;
+    level   = 0;
+    lbrt[0] = 0;
+    lbrt[1] = 0;
+    lbrt[2] = (int)PageWidth;
+    lbrt[3] = (int)PageLength;
 
     while (!feof(fp))
     {
@@ -629,6 +642,12 @@ main(int  argc,				/* I - Number of command-line args */
 	  sent_setup = 1;
           do_setup(ppd, Copies, Collate, slowcollate, g, b);
 	}
+      }
+      else if (!strncmp(line, "%%BoundingBox:", 14) && level == 0)
+      {
+        if (sscanf(line + 14, "%d%d%d%d", pagelbrt + 0, pagelbrt + 1,
+	           pagelbrt + 2, pagelbrt + 3) == 4)
+	  memcpy(lbrt, pagelbrt, sizeof(lbrt));
       }
       else if (!strncmp(line, "%%Page:", 7) && level == 0)
         break;
@@ -825,7 +844,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  sprintf(label, "%d", page);
 
 	if (slowcollate || sloworder)
-	  pageinfo = add_page(label, cupsFileTell(temp));
+	  pageinfo = add_page(label, cupsFileTell(temp), lbrt);
 	else
 	  pageinfo = NULL;
 
@@ -845,11 +864,17 @@ main(int  argc,				/* I - Number of command-line args */
 	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 	  }
 
-	  start_nup(NumPages, 1);
+	  start_nup(NumPages, 1, lbrt);
 	}
 
 	NumPages ++;
 	real_page ++;
+      }
+      else if (!strncmp(line, "%%BoundingBox:", 14) && level == 0 && pageinfo)
+      {
+        if (sscanf(line + 14, "%d%d%d%d", pagelbrt + 0, pagelbrt + 1,
+	           pagelbrt + 2, pagelbrt + 3) == 4)
+	  memcpy(pageinfo->lbrt, pagelbrt, sizeof(pageinfo->lbrt));
       }
       else if (!strncmp(line, "%%BeginBinary:", 14) ||
                (!strncmp(line, "%%BeginData:", 12) &&
@@ -948,7 +973,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (is_not_last_page(NumPages))
       {
-	start_nup(NUp - 1, 0);
+	start_nup(NUp - 1, 0, lbrt);
         end_nup(NUp - 1);
       }
 
@@ -965,7 +990,7 @@ main(int  argc,				/* I - Number of command-line args */
 	page ++;
 	ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 
-	start_nup(NUp - 1, 0);
+	start_nup(NUp - 1, 0, lbrt);
 	puts("showpage");
         end_nup(NUp - 1);
       }
@@ -995,14 +1020,14 @@ main(int  argc,				/* I - Number of command-line args */
 	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 	    }
 
-	    start_nup(number, 1);
+	    start_nup(number, 1, pageinfo->lbrt);
 	    copy_bytes(temp, pageinfo->offset, pageinfo->length);
 	    end_nup(number);
 	  }
 
           if (is_not_last_page(NumPages))
 	  {
-	    start_nup(NUp - 1, 0);
+	    start_nup(NUp - 1, 0, lbrt);
             end_nup(NUp - 1);
 	  }
 
@@ -1019,7 +1044,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    page ++;
 	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 
-	    start_nup(NUp - 1, 0);
+	    start_nup(NUp - 1, 0, lbrt);
 	    puts("showpage");
             end_nup(NUp - 1);
 	  }
@@ -1047,12 +1072,10 @@ main(int  argc,				/* I - Number of command-line args */
 	      fprintf(stderr, "PAGE: %d %d\n", page,
 	              slowcollate ? 1 : Copies);
 
-            if (NUp == 1)
-	    {
-	      pageinfo = (page_info_t *)cupsArrayIndex(Pages, basepage);
+	    pageinfo = (page_info_t *)cupsArrayIndex(Pages, basepage);
 
+            if (NUp == 1)
               printf("%%%%Page: %s %d\n", pageinfo->label, page);
-            }
 	    else
               printf("%%%%Page: %d %d\n", page, page);
 
@@ -1062,7 +1085,7 @@ main(int  argc,				/* I - Number of command-line args */
 
             if (basepage >= page_count)
 	    {
-	      start_nup(NUp - 1, 0);
+	      start_nup(NUp - 1, 0, pageinfo->lbrt);
 	      puts("showpage");
               end_nup(NUp - 1);
 	    }
@@ -1074,14 +1097,14 @@ main(int  argc,				/* I - Number of command-line args */
 	      {
 	        pageinfo = (page_info_t *)cupsArrayIndex(Pages, number);
 
-		start_nup(number, 1);
+		start_nup(number, 1, pageinfo->lbrt);
 		copy_bytes(temp, pageinfo->offset, pageinfo->length);
 		end_nup(number);
 	      }
 
               if (is_not_last_page(number))
 	      {
-		start_nup(NUp - 1, 0);
+		start_nup(NUp - 1, 0, lbrt);
         	end_nup(NUp - 1);
 	      }
 	    }
@@ -1294,7 +1317,8 @@ check_range(int page)	/* I - Page number */
 
 static page_info_t *			/* O - New page info object */
 add_page(const char *label,		/* I - Page label */
-         off_t      offset)		/* I - Offset in file */
+         off_t      offset,		/* I - Offset in file */
+	 const int  *lbrt)		/* I - BoundingBox for page */
 {
   page_info_t	*pageinfo;		/* New page info object */
 
@@ -1318,10 +1342,8 @@ add_page(const char *label,		/* I - Page label */
 
   pageinfo->label  = strdup(label);
   pageinfo->offset = offset;
-  pageinfo->left   = PageLeft;
-  pageinfo->bottom = PageBottom;
-  pageinfo->right  = PageRight;
-  pageinfo->top    = PageTop;
+
+  memcpy(pageinfo->lbrt, lbrt, sizeof(pageinfo->lbrt));
 
   cupsArrayAdd(Pages, pageinfo);
 
@@ -1678,8 +1700,9 @@ psgets(char   *buf,			/* I  - Buffer to read into */
  */
 
 static void
-start_nup(int number,			/* I - Page number */
-          int show_border)		/* I - Show the page border? */
+start_nup(int       number,		/* I - Page number */
+          int       show_border,	/* I - Show the page border? */
+	  const int *lbrt)		/* I - Page BoundingBox */ 
 {
   int	pos;				/* Position on page */
   int	x, y;				/* Relative position of subpage */
@@ -1695,8 +1718,8 @@ start_nup(int number,			/* I - Page number */
     printf("%.1f 0.0 translate -1 1 scale\n", PageWidth);
 
   pos = number % NUp;
-  pw  = PageRight - PageLeft;
-  pl  = PageTop - PageBottom;
+  pw  = lbrt[2] - lbrt[0];
+  pl  = lbrt[3] - lbrt[1];
 
   fprintf(stderr, "DEBUG: pw = %.1f, pl = %.1f\n", pw, pl);
   fprintf(stderr, "DEBUG: PageLeft = %.1f, PageRight = %.1f\n", PageLeft, PageRight);
@@ -1718,14 +1741,34 @@ start_nup(int number,			/* I - Page number */
 
   if (Duplex && NUp > 1 && ((number / NUp) & 1))
     printf("%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
-  else if (NUp > 1)
+  else if (NUp > 1 || FitPlot)
     printf("%.1f %.1f translate\n", PageLeft, PageBottom);
 
   switch (NUp)
   {
     default :
-        w = PageWidth;
-	l = PageLength;
+        if (FitPlot)
+	{
+          w = PageRight - PageLeft;
+          l = w * pl / pw;
+
+          if (l > (PageTop - PageBottom))
+          {
+            l = PageTop - PageBottom;
+            w = l * pw / pl;
+          }
+
+          tx = 0.5 * (PageRight - PageLeft - w);
+          ty = 0.5 * (PageTop - PageBottom - l);
+
+	  printf("%.1f %.1f translate %.3f %.3f scale\n", tx, ty, w / pw,
+	         l / pl);
+	}
+	else
+	{
+          w = PageWidth;
+	  l = PageLength;
+	}
 	break;
 
     case 2 :
@@ -2035,7 +2078,8 @@ start_nup(int number,			/* I - Page number */
     * Clip the page that follows to the bounding box of the page...
     */
 
-    printf("0 0 %.1f %.1f ESPrc\n", PageWidth, PageLength);
+    printf("%d %d translate\n", -lbrt[0], -lbrt[1]);
+    printf("0 0 %.1f %.1f ESPrc\n", w, l);
   }
 }
 

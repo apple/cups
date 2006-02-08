@@ -227,7 +227,7 @@ imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) \
 
 pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS) -lm
 
 
 #
