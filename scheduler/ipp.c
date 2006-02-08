@@ -2349,8 +2349,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI?
     */
 
-    if (!strncmp(resource, "/printers/", 10) ||
-        !strncmp(resource, "/classes/", 9))
+    if ((!strncmp(resource, "/printers/", 10) && resource[10]) ||
+        (!strncmp(resource, "/classes/", 9) && resource[9]))
     {
       send_ipp_status(con, IPP_NOT_FOUND,
                       _("The printer or class was not found."));

@@ -179,7 +179,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (num_dests == 0)
         num_dests = cupsGetDests(&dests);
 
-      if (strcmp(argv[i], "-") == 0)
+      if (!strcmp(argv[i], "-"))
       {
        /*
         * Delete the current job...
@@ -307,8 +307,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
 	_cupsLangPrintf(stderr, _("%s: %s failed: %s\n"), argv[0],
 	        	op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
-        		response ? ippErrorString(response->request.status.status_code) :
-		        	   ippErrorString(cupsLastError()));
+        		cupsLastErrorString());
 
 	if (response)
 	  ippDelete(response);

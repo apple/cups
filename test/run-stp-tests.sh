@@ -5,7 +5,7 @@
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
 #
-#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -31,6 +31,18 @@
 make
 
 #
+# Figure out the proper echo options...
+#
+
+if (echo "testing\c"; echo 1,2,3) | grep c >/dev/null; then
+        ac_n=-n
+        ac_c=
+else
+        ac_n=
+        ac_c='\c'
+fi
+
+#
 # Greet the tester...
 #
 
@@ -53,9 +65,10 @@ echo "2 - Basic conformance test, some load testing (minimum 256MB VM, 50MB disk
 echo "3 - Basic conformance test, extreme load testing (minimum 1GB VM, 500MB disk)"
 echo "4 - Basic conformance test, torture load testing (minimum 2GB VM, 1GB disk)"
 echo ""
-echo "Please enter the number of the test you wish to perform:"
+echo $ac_n "Enter the number of the test you wish to perform: [1] $ac_c"
 
 read testtype
+echo ""
 
 case "$testtype" in
 	0)
@@ -103,8 +116,10 @@ echo "0 - Do not do SSL/TLS encryption tests"
 echo "1 - Create a SSL/TLS certificate and key, but do not require encryption"
 echo "2 - Create a SSL/TLS certificate and key and require encryption"
 echo ""
+echo $ac_n "Enter the number of the SSL/TLS tests to perform: [0] $ac_c"
 
 read ssltype
+echo ""
 
 case "$ssltype" in
 	1 | 2)
@@ -125,7 +140,7 @@ EOF
 		;;
 
 	*)
-		echo "Not using SSL/TLS ($ssltype)..."
+		echo "Not using SSL/TLS..."
 		ssltype=0
 		;;
 esac
@@ -157,9 +172,10 @@ echo "This test script can use the Valgrind software from:"
 echo ""
 echo "    http://developer.kde.org/~sewardj/"
 echo ""
-echo "Please enter Y to use Valgrind or N to not use Valgrind:"
+echo $ac_n "Enter Y to use Valgrind or N to not use Valgrind: [N] $ac_c"
 
 read usevalgrind
+echo ""
 
 case "$usevalgrind" in
 	Y* | y*)
@@ -200,6 +216,7 @@ ln -s $root/backend/serial /tmp/cups-$user/bin/backend
 ln -s $root/backend/socket /tmp/cups-$user/bin/backend
 ln -s $root/backend/usb /tmp/cups-$user/bin/backend
 ln -s $root/cgi-bin /tmp/cups-$user/bin
+ln -s $root/monitor /tmp/cups-$user/bin
 ln -s $root/notifier /tmp/cups-$user/bin
 ln -s $root/scheduler /tmp/cups-$user/bin/daemon
 ln -s $root/filter/hpgltops /tmp/cups-$user/bin/filter
@@ -385,7 +402,7 @@ fi
 
 echo "Scheduler is PID $cupsd; run debugger now if you need to."
 echo ""
-echo "Press ENTER to continue..."
+echo $ac_n "Press ENTER to continue... $ac_c"
 read junk
 
 IPP_PORT=$port; export IPP_PORT
@@ -404,7 +421,7 @@ done
 # Create the test report source file...
 #
 
-strfile=cups-str-1.2-`date +%Y-%m-%d`-`whoami`.shtml
+strfile=cups-str-1.2-`date +%Y-%m-%d`-`whoami`.html
 
 rm -f $strfile
 cat str-header.html >$strfile
@@ -415,7 +432,7 @@ cat str-header.html >$strfile
 
 echo "Running IPP compliance tests..."
 
-echo "<H1>IPP Compliance Tests</H1>" >>$strfile
+echo "<H1>1 - IPP Compliance Tests</H1>" >>$strfile
 echo "<P>This section provides the results to the IPP compliance tests" >>$strfile
 echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfile
 echo `date "+%Y-%m-%d"` by `whoami` on `hostname`. >>$strfile
@@ -443,7 +460,7 @@ echo "</PRE>" >>$strfile
 
 echo "Running command tests..."
 
-echo "<H1>Command Tests</H1>" >>$strfile
+echo "<H1>2 - Command Tests</H1>" >>$strfile
 echo "<P>This section provides the results to the command tests" >>$strfile
 echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfile
 echo `date "+%Y-%m-%d"` by `whoami` on `hostname`. >>$strfile
@@ -489,7 +506,7 @@ kill $cupsd
 # Append the log files for post-mortim...
 #
 
-echo "<H1>Log Files</H1>" >>$strfile
+echo "<H1>3 - Log Files</H1>" >>$strfile
 
 echo "<H2>access_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
@@ -521,14 +538,6 @@ echo "Formatting reports..."
 
 cat str-trailer.html >>$strfile
 
-htmlfile=`basename $strfile .shtml`.html
-pdffile=`basename $strfile .shtml`.pdf
-
-htmldoc --numbered --verbose --titleimage ../doc/images/cups-large.gif \
-	-f $htmlfile $strfile
-htmldoc --numbered --verbose --titleimage ../doc/images/cups-large.gif \
-	-f $pdffile $strfile
-
 echo ""
 
 if test $fail != 0; then
@@ -542,10 +551,9 @@ if test "x$valgrind" != x; then
 fi
 
 echo ""
-echo "See the following files for details:"
+echo "See the following file for details:"
 echo ""
-echo "    $htmlfile"
-echo "    $pdffile"
+echo "    $strfile"
 echo ""
 
 #
