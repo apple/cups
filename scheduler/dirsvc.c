@@ -124,7 +124,14 @@ cupsdLoadRemoteCache(void)
   int			linenum;	/* Current line number */
   char			line[1024],	/* Line from file */
 			*value,		/* Pointer to value */
-			*valueptr;	/* Pointer into value */
+			*valueptr,	/* Pointer into value */
+			scheme[32],	/* Scheme portion of URI */
+			username[64],	/* Username portion of URI */
+			host[HTTP_MAX_HOST],
+					/* Hostname portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port number */
   cupsd_printer_t	*p;		/* Current printer */
   time_t		now;		/* Current time */
 
@@ -268,6 +275,11 @@ cupsdLoadRemoteCache(void)
     {
       if (value)
       {
+	httpSeparateURI(HTTP_URI_CODING_ALL, value, scheme, sizeof(scheme),
+	                username, sizeof(username), host, sizeof(host), &port,
+			resource, sizeof(resource));
+
+	cupsdSetString(&p->hostname, host);
 	cupsdSetString(&p->uri, value);
 	cupsdSetString(&p->device_uri, value);
       }
