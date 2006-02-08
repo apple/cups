@@ -2270,7 +2270,7 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
        sub;
        sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
-    if (!sub->job && sub->expire < timeout)
+    if (!sub->job && sub->expire && sub->expire < timeout)
     {
       timeout = sub->expire;
       why     = "expire subscription";

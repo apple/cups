@@ -155,7 +155,7 @@ static void	get_default(cupsd_client_t *con);
 static void	get_devices(cupsd_client_t *con);
 static void	get_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
-static void	get_notifications(cupsd_client_t *con, int id);
+static void	get_notifications(cupsd_client_t *con);
 static void	get_ppds(cupsd_client_t *con);
 static void	get_printers(cupsd_client_t *con, int type);
 static void	get_printer_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -428,9 +428,12 @@ cupsdProcessIPPRequest(
 	*/
 
         if (uri)
-          cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                  "cupsdProcessIPPRequest: URI=\"%s\"",
-	                  uri->values[0].string.text);
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s %s",
+                	  ippOpString(con->request->request.op.operation_id),
+			  uri->values[0].string.text);
+        else
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s",
+                	  ippOpString(con->request->request.op.operation_id));
 
 	switch (con->request->request.op.operation_id)
 	{
@@ -574,7 +577,7 @@ cupsdProcessIPPRequest(
 	      break;
 
           case IPP_GET_NOTIFICATIONS :
-	      get_notifications(con, sub_id);
+	      get_notifications(con);
 	      break;
 
 	  default :
@@ -2592,6 +2595,48 @@ cancel_subscription(
     cupsd_client_t *con,		/* I - Client connection */
     int            sub_id)		/* I - Subscription ID */
 {
+  http_status_t		status;		/* Policy status */
+  cupsd_subscription_t	*sub;		/* Subscription */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cancel_subscription(con=%p[%d], sub_id=%d)",
+                  con, con->http.fd, sub_id);
+
+ /*
+  * Is the subscription ID valid?
+  */
+
+  if ((sub = cupsdFindSubscription(sub_id)) == NULL)
+  {
+   /*
+    * Bad subscription ID...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("notify-subscription-id %d no good!"), sub_id);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr :
+                                             DefaultPolicyPtr,
+                                 con, sub->owner)) != HTTP_OK)
+  {
+    send_http_error(con, status);
+    return;
+  }
+
+ /*
+  * Cancel the subscription...
+  */
+
+  cupsdDeleteSubscription(sub, 1);
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -4641,6 +4686,17 @@ create_subscription(
   unsigned		mask;		/* notify-events */
 
 
+#ifdef DEBUG
+  for (attr = con->request->attrs; attr; attr = attr->next)
+  {
+    if (attr->group_tag != IPP_TAG_ZERO)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "g%04x v%04x %s", attr->group_tag,
+                      attr->value_tag, attr->name);
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "----SEP----");
+  }
+#endif /* DEBUG */
+
  /*
   * Is the destination valid?
   */
@@ -4798,8 +4854,12 @@ create_subscription(
       attr = attr->next;
     }
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "recipient=\"%s\"", recipient);
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "pullmethod=\"%s\"", pullmethod);
+    if (recipient)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "recipient=\"%s\"", recipient);
+    if (pullmethod)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "pullmethod=\"%s\"", pullmethod);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "notify-lease-duration=%d", lease);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "notify-time-interval=%d", interval);
 
     if (!recipient && !pullmethod)
       break;
@@ -4818,7 +4878,7 @@ create_subscription(
       }
     }
 
-    if (MaxLeaseDuration && lease > MaxLeaseDuration)
+    if (MaxLeaseDuration && (lease == 0 || lease > MaxLeaseDuration))
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "create_subscription: Limiting notify-lease-duration to "
@@ -4853,7 +4913,7 @@ create_subscription(
 
     sub->interval = interval;
     sub->lease    = lease;
-    sub->expire   = time(NULL) + lease;
+    sub->expire   = lease ? time(NULL) + lease : 0;
 
     cupsdSetString(&sub->owner, username);
 
@@ -5424,9 +5484,135 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
  */
 
 static void
-get_notifications(cupsd_client_t *con,	/* I - Client connection */
-                  int            id)	/* I - Subscription ID */
+get_notifications(cupsd_client_t *con)	/* I - Client connection */
 {
+  int			i, j;		/* Looping vars */
+  http_status_t		status;		/* Policy status */
+  cupsd_subscription_t	*sub;		/* Subscription */
+  ipp_attribute_t	*ids,		/* notify-subscription-ids */
+			*sequences;	/* notify-sequence-numbers */
+  int			min_seq;	/* Minimum sequence number */
+  int			interval;	/* Poll interval */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_subscription_attrs(con=%p[%d])",
+                  con, con->http.fd);
+
+ /*
+  * Get subscription attributes...
+  */
+
+  ids       = ippFindAttribute(con->request, "notify-subscription-ids",
+                               IPP_TAG_INTEGER);
+  sequences = ippFindAttribute(con->request, "notify-sequence-numbers",
+                               IPP_TAG_INTEGER);
+
+  if (!ids)
+  {
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("Missing notify-subscription-ids attribute!"));
+    return;
+  }
+
+ /*
+  * Are the subscription IDs valid?
+  */
+
+  for (i = 0, interval = 60; i < ids->num_values; i ++)
+  {
+    if ((sub = cupsdFindSubscription(ids->values[i].integer)) == NULL)
+    {
+     /*
+      * Bad subscription ID...
+      */
+
+      send_ipp_status(con, IPP_NOT_FOUND,
+                      _("notify-subscription-id %d no good!"),
+		      ids->values[i].integer);
+      return;
+    }
+
+   /*
+    * Check policy...
+    */
+
+    if ((status = cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr :
+                                               DefaultPolicyPtr,
+                                   con, sub->owner)) != HTTP_OK)
+    {
+      send_http_error(con, status);
+      return;
+    }
+
+   /*
+    * Check the subscription type and update the interval accordingly.
+    */
+
+    if (sub->job && sub->job->state->values[0].integer == IPP_JOB_PROCESSING &&
+        interval > 10)
+      interval = 10;
+    else if (sub->job && sub->job->state->values[0].integer >= IPP_JOB_STOPPED)
+      interval = 0;
+    else if (sub->dest && sub->dest->state == IPP_PRINTER_PROCESSING &&
+             interval > 30)
+      interval = 30;
+  }
+
+ /*
+  * Tell the client to poll again in N seconds...
+  */
+
+  if (interval > 0)
+    ippAddInteger(con->response, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
+                  "notify-get-interval", interval);
+
+  ippAddInteger(con->response, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
+                "printer-up-time", time(NULL));
+
+ /*
+  * Copy the subscription event attributes to the response.
+  */
+
+  con->response->request.status.status_code =
+      interval ? IPP_OK : IPP_OK_EVENTS_COMPLETE;
+
+  for (i = 0; i < ids->num_values; i ++)
+  {
+   /*
+    * Get the subscription and sequence number...
+    */
+
+    sub = cupsdFindSubscription(ids->values[i].integer);
+
+    if (sequences && i < sequences->num_values)
+      min_seq = sequences->values[i].integer;
+    else
+      min_seq = 1;
+
+   /*
+    * If we don't have any new events, nothing to do here...
+    */
+
+    if (min_seq > (sub->first_event_id + sub->num_events))
+      continue;
+
+   /*
+    * Otherwise copy all of the new events...
+    */
+
+    if (sub->first_event_id > min_seq)
+      j = 0;
+    else
+      j = min_seq - sub->first_event_id;
+
+    for (; j < sub->num_events; j ++)
+    {
+      ippAddSeparator(con->response);
+
+      copy_attrs(con->response, sub->events[j]->attrs, NULL,
+        	 IPP_TAG_EVENT_NOTIFICATION, 0);
+    }
+  }
 }
 
 
@@ -7637,6 +7823,76 @@ renew_subscription(
     cupsd_client_t *con,		/* I - Client connection */
     int            sub_id)		/* I - Subscription ID */
 {
+  http_status_t		status;		/* Policy status */
+  cupsd_subscription_t	*sub;		/* Subscription */
+  ipp_attribute_t	*lease;		/* notify-lease-duration */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "renew_subscription(con=%p[%d], sub_id=%d)",
+                  con, con->http.fd, sub_id);
+
+ /*
+  * Is the subscription ID valid?
+  */
+
+  if ((sub = cupsdFindSubscription(sub_id)) == NULL)
+  {
+   /*
+    * Bad subscription ID...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("notify-subscription-id %d no good!"), sub_id);
+    return;
+  }
+
+  if (sub->job)
+  {
+   /*
+    * Job subscriptions cannot be renewed...
+    */
+
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Job subscriptions cannot be renewed!"));
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr :
+                                             DefaultPolicyPtr,
+                                 con, sub->owner)) != HTTP_OK)
+  {
+    send_http_error(con, status);
+    return;
+  }
+
+ /*
+  * Renew the subscription...
+  */
+
+  lease = ippFindAttribute(con->request, "notify-lease-duration",
+                           IPP_TAG_INTEGER);
+
+  sub->lease = lease ? lease->values[0].integer : DefaultLeaseDuration;
+
+  if (MaxLeaseDuration && (sub->lease == 0 || sub->lease > MaxLeaseDuration))
+  {
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "renew_subscription: Limiting notify-lease-duration to "
+		    "%d seconds.",
+		    MaxLeaseDuration);
+    sub->lease = MaxLeaseDuration;
+  }
+
+  sub->expire = sub->lease ? time(NULL) + sub->lease : 0;
+
+  cupsdSaveAllSubscriptions();
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 

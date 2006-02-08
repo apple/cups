@@ -510,10 +510,13 @@ do_tests(const char *uri,		/* I - URI to connect on */
     request->request.op.operation_id = op;
     request->request.op.request_id   = 1;
 
-#ifdef DEBUG
-    for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
-      print_attr(attrptr);
-#endif /* DEBUG */
+    if (Verbosity)
+    {
+      printf("%s:\n", ippOpString(op));
+
+      for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
+	print_attr(attrptr);
+    }
 
     printf("    %-60.60s [", name);
     fflush(stdout);
@@ -531,7 +534,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
       puts("FAIL]");
       printf("        ERROR %04x (%s) @ %s\n", cupsLastError(),
-	     ippErrorString(cupsLastError()), ctime(&curtime));
+	     cupsLastErrorString(), ctime(&curtime));
       pass = 0;
     }
     else
@@ -599,8 +602,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	  puts("        BAD STATUS");
 
 	printf("        status-code = %04x (%s)\n",
-	       response->request.status.status_code,
-	       ippErrorString(response->request.status.status_code));
+	       cupsLastError(), cupsLastErrorString());
 
         for (i = 0; i < num_expects; i ++)
 	  if (ippFindAttribute(response, expects[i], IPP_TAG_ZERO) == NULL)
@@ -637,18 +639,45 @@ get_tag(const char *name)		/* I - Name of value/group tag */
   int			i;		/* Looping var */
   static const char	* const names[] =
 		{			/* Value/group tag names */
-		  "zero", "operation", "job", "end", "printer",
-		  "unsupported-group", "subscription", "event-notification",
-		  "", "", "", "", "",
-		  "", "", "", "unsupported-value", "default",
-		  "unknown", "novalue", "", "notsettable",
-		  "deleteattr", "anyvalue", "", "", "", "", "", "",
-		  "", "", "", "integer", "boolean", "enum", "", "",
-		  "", "", "", "", "", "", "", "", "", "", "string",
-		  "date", "resolution", "range", "collection",
-		  "textlang", "namelang", "", "", "", "", "", "", "",
-		  "", "", "", "text", "name", "", "keyword", "uri",
-		  "urischeme", "charset", "language", "mimetype"
+		  "zero",		/* 0x00 */
+		  "operation",		/* 0x01 */
+		  "job",		/* 0x02 */
+		  "end",		/* 0x03 */
+		  "printer",		/* 0x04 */
+		  "unsupported-group",	/* 0x05 */
+		  "subscription",	/* 0x06 */
+		  "event-notification",	/* 0x07 */
+		  "", "", "", "", "", "", "", "",
+		  "unsupported-value",	/* 0x10 */
+		  "default",		/* 0x11 */
+		  "unknown",		/* 0x12 */
+		  "novalue",		/* 0x13 */
+		  "",
+		  "notsettable",	/* 0x15 */
+		  "deleteattr",		/* 0x16 */
+		  "anyvalue",		/* 0x17 */
+		  "", "", "", "", "", "", "", "", "",
+		  "integer",		/* 0x21 */
+		  "boolean",		/* 0x22 */
+		  "enum",		/* 0x23 */
+		  "", "", "", "", "", "", "", "", "", "", "", "",
+		  "string",		/* 0x30 */
+		  "date",		/* 0x31 */
+		  "resolution",		/* 0x32 */
+		  "range",		/* 0x33 */
+		  "collection",		/* 0x34 */
+		  "textlang",		/* 0x35 */
+		  "namelang",		/* 0x36 */
+		  "", "", "", "", "", "", "", "", "", "",
+		  "text",		/* 0x41 */
+		  "name",		/* 0x42 */
+		  "",
+		  "keyword",		/* 0x44 */
+		  "uri",		/* 0x45 */
+		  "urischeme",		/* 0x46 */
+		  "charset",		/* 0x47 */
+		  "language",		/* 0x48 */
+		  "mimetype"		/* 0x49 */
 		};
 
 

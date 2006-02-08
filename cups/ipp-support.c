@@ -55,7 +55,8 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		  "successful-ok-ignored-subscriptions",
 		  "successful-ok-ignored-notifications",
 		  "successful-ok-too-many-events",
-		  "successful-ok-but-cancel-subscription"
+		  "successful-ok-but-cancel-subscription",
+		  "successful-ok-events-complete"
 		},
 		* const ipp_status_400s[] =	/* Client errors */
 		{
@@ -174,7 +175,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
   * See if the error code is a known value...
   */
 
-  if (error >= IPP_OK && error <= IPP_OK_BUT_CANCEL_SUBSCRIPTION)
+  if (error >= IPP_OK && error <= IPP_OK_EVENTS_COMPLETE)
     return (ipp_status_oks[error]);
   else if (error == IPP_REDIRECTION_OTHER_SITE)
     return ("redirection-other-site");

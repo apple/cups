@@ -668,10 +668,12 @@ cupsdExpireSubscriptions(
   for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
        sub;
        sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
-    if ((sub->expire <= curtime && dest && sub->dest == dest) ||
+    if ((!sub->job && !dest && sub->expire && sub->expire <= curtime) ||
+        (dest && sub->dest == dest) ||
 	(job && sub->job == job))
     {
-      cupsdLogMessage(CUPSD_LOG_INFO, "Subscription %d has expired...", sub->id);
+      cupsdLogMessage(CUPSD_LOG_INFO, "Subscription %d has expired...",
+                      sub->id);
 
       cupsdDeleteSubscription(sub, 0);
 
@@ -973,7 +975,10 @@ cupsdLoadAllSubscriptions(void)
       */
 
       if (value && isdigit(*value & 255))
-        sub->lease = atoi(value);
+      {
+        sub->lease  = atoi(value);
+        sub->expire = sub->lease ? time(NULL) + sub->lease : 0;
+      }
       else
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
