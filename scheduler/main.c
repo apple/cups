@@ -1078,7 +1078,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   cupsdStopServer();
 
-  cupsdStopAllJobs();
+  cupsdFreeAllJobs();
 
   cupsdStopSystemMonitor();
 

@@ -310,6 +310,7 @@ cupsdUpdateSystemMonitor(void)
       Sleeping = 1;
 
       cupsdStopAllJobs();
+      cupsdSaveAllJobs();
 
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
            p;

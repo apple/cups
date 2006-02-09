@@ -37,10 +37,12 @@
  *                                or held jobs for a user.
  *   cupsdHoldJob()             - Hold the specified job.
  *   cupsdLoadAllJobs()         - Load all jobs from disk.
+ *   cupsdLoadJob()             - Load a single job...
  *   cupsdMoveJob()             - Move the specified job to a different
  *                                destination.
  *   cupsdReleaseJob()          - Release the specified job.
  *   cupsdRestartJob()          - Restart the specified job.
+ *   cupsdSaveAllJobs()         - Save a summary of all jobs to disk.
  *   cupsdSaveJob()             - Save a job to disk.
  *   cupsdSetJobHoldUntil()     - Set the hold time for a job...
  *   cupsdSetJobPriority()      - Set the priority of a job, moving it up/down
@@ -48,6 +50,8 @@
  *   cupsdStartJob()            - Start a print job.
  *   cupsdStopAllJobs()         - Stop all print jobs.
  *   cupsdStopJob()             - Stop a print job.
+ *   cupsdUnloadCompletedJobs() - Flush completed job history from memory.
+ *   cupsdUnloadJob()           - Unload a job from memory.
  *   cupsdUpdateJob()           - Read a status update from a job's filters.
  *   compare_active_jobs()      - Compare the job IDs and priorities of two jobs.
  *   compare_jobs()             - Compare the job IDs of two jobs.
@@ -153,6 +157,7 @@ cupsdCancelJob(cupsd_job_t *job,	/* I - Job to cancel */
   cupsArrayRemove(ActiveJobs, job);
 
   job->state->values[0].integer = IPP_JOB_CANCELLED;
+  job->state_value              = IPP_JOB_CANCELLED;
 
   set_time(job, "time-at-completed");
 
@@ -285,7 +290,10 @@ cupsdCheckJobs(void)
     if (job->state->values[0].integer == IPP_JOB_HELD &&
         job->hold_until &&
 	job->hold_until < time(NULL))
+    {
       job->state->values[0].integer = IPP_JOB_PENDING;
+      job->state_value              = IPP_JOB_PENDING;
+    }
 
    /*
     * Start pending jobs if the destination is available...
@@ -444,6 +452,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
 	  cupsdStopJob(job, 0);
 	  job->state->values[0].integer = IPP_JOB_PENDING;
+	  job->state_value              = IPP_JOB_PENDING;
 	  cupsdSaveJob(job);
 
 	 /*
@@ -580,6 +589,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
       if (job_history)
       {
         job->state->values[0].integer = IPP_JOB_COMPLETED;
+        job->state_value              = IPP_JOB_COMPLETED;
 	cupsdSaveJob(job);
       }
 
@@ -610,6 +620,7 @@ cupsdFreeAllJobs(void)
   cupsdHoldSignals();
 
   cupsdStopAllJobs();
+  cupsdSaveAllJobs();
 
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
        job;
@@ -710,6 +721,7 @@ cupsdHoldJob(cupsd_job_t *job)		/* I - Job data */
   DEBUG_puts("cupsdHoldJob: setting state to held...");
 
   job->state->values[0].integer = IPP_JOB_HELD;
+  job->state_value              = IPP_JOB_HELD;
 
   cupsdSaveJob(job);
 
@@ -858,6 +870,8 @@ cupsdLoadAllJobs(void)
 	continue;
       }
 
+      job->state_value = (ipp_jstate_t)job->state->values[0].integer;
+
       if ((attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI)) == NULL)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -936,12 +950,18 @@ cupsdLoadAllJobs(void)
           attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
 
         if (attr == NULL)
+	{
           job->state->values[0].integer = IPP_JOB_PENDING;
+          job->state_value              = IPP_JOB_PENDING;
+	}
 	else
           cupsdSetJobHoldUntil(job, attr->values[0].string.text);
       }
       else if (job->state->values[0].integer == IPP_JOB_PROCESSING)
+      {
         job->state->values[0].integer = IPP_JOB_PENDING;
+        job->state_value              = IPP_JOB_PENDING;
+      }
     }
 
  /*
@@ -1020,6 +1040,16 @@ cupsdLoadAllJobs(void)
 
 
 /*
+ * 'cupsdLoadJob()' - Load a single job...
+ */
+
+void
+cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
+{
+}
+
+
+/*
  * 'cupsdMoveJob()' - Move the specified job to a different destination.
  */
 
@@ -1074,6 +1104,7 @@ cupsdReleaseJob(cupsd_job_t *job)	/* I - Job */
     DEBUG_puts("cupsdReleaseJob: setting state to pending...");
 
     job->state->values[0].integer = IPP_JOB_PENDING;
+    job->state_value              = IPP_JOB_PENDING;
     cupsdSaveJob(job);
     cupsdCheckJobs();
   }
@@ -1093,9 +1124,79 @@ cupsdRestartJob(cupsd_job_t *job)	/* I - Job */
   {
     job->tries = 0;
     job->state->values[0].integer = IPP_JOB_PENDING;
+    job->state_value              = IPP_JOB_PENDING;
     cupsdSaveJob(job);
     cupsdCheckJobs();
   }
+}
+
+
+/*
+ * 'cupsdSaveAllJobs()' - Save a summary of all jobs to disk.
+ */
+
+void
+cupsdSaveAllJobs(void)
+{
+  int		i;			/* Looping var */
+  cups_file_t	*fp;			/* Job cache file */
+  char		temp[1024];		/* Temporary string */
+  cupsd_job_t	*job;			/* Current job */
+  time_t	curtime;		/* Current time */
+  struct tm	*curdate;		/* Current date */
+
+
+  snprintf(temp, sizeof(temp), "%s/job.cache", CacheDir);
+  if ((fp = cupsFileOpen(temp, "w")) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to save job.cache - %s",
+                    strerror(errno));
+    return;
+  }
+  else
+    cupsdLogMessage(CUPSD_LOG_INFO, "Saving job.cache...");
+
+ /*
+  * Restrict access to the file...
+  */
+
+  fchown(cupsFileNumber(fp), getuid(), Group);
+  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+
+ /*
+  * Write a small header to the file...
+  */
+
+  curtime = time(NULL);
+  curdate = localtime(&curtime);
+  strftime(temp, sizeof(temp) - 1, "%Y-%m-%d %H:%M", curdate);
+
+  cupsFilePuts(fp, "# Job cache file for " CUPS_SVERSION "\n");
+  cupsFilePrintf(fp, "# Written by cupsd on %s\n", temp);
+  cupsFilePrintf(fp, "NextJobId %d\n", NextJobId);
+
+ /*
+  * Write each job known to the system...
+  */
+
+  for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
+       job;
+       job = (cupsd_job_t *)cupsArrayNext(Jobs))
+  {
+    cupsFilePrintf(fp, "<Job %d>\n", job->id);
+    cupsFilePrintf(fp, "State %d\n", job->state_value);
+    cupsFilePrintf(fp, "Priority %d\n", job->priority);
+    cupsFilePrintf(fp, "Username %s\n", job->username);
+    cupsFilePrintf(fp, "Destination %s\n", job->dest);
+    cupsFilePrintf(fp, "DestType %d\n", job->dtype);
+    cupsFilePrintf(fp, "NumFiles %d\n", job->num_files);
+    for (i = 0; i < job->num_files; i ++)
+      cupsFilePrintf(fp, "File %d %s/%s %d\n", i + 1, job->filetypes[i]->super,
+                     job->filetypes[i]->type, job->compressions[i]);
+    cupsFilePuts(fp, "</Job>\n");
+  }
+
+  cupsFileClose(fp);
 }
 
 
@@ -1541,6 +1642,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   */
 
   job->state->values[0].integer = IPP_JOB_PROCESSING;
+  job->state_value              = IPP_JOB_PROCESSING;
   job->status  = 0;
   job->printer = printer;
   printer->job = job;
@@ -2300,6 +2402,7 @@ cupsdStopAllJobs(void)
     {
       cupsdStopJob(job, 1);
       job->state->values[0].integer = IPP_JOB_PENDING;
+      job->state_value              = IPP_JOB_PENDING;
     }
 }
 
@@ -2335,6 +2438,7 @@ cupsdStopJob(cupsd_job_t *job,		/* I - Job */
                   job->printer->state);
 
   job->state->values[0].integer = IPP_JOB_STOPPED;
+  job->state_value              = IPP_JOB_STOPPED;
   job->printer->job = NULL;
   job->printer      = NULL;
 
@@ -2385,6 +2489,26 @@ cupsdStopJob(cupsd_job_t *job,		/* I - Job */
 
     job->status_buffer = NULL;
   }
+}
+
+
+/*
+ * 'cupsdUnloadCompletedJobs()' - Flush completed job history from memory.
+ */
+
+void
+cupsdUnloadCompletedJobs(void)
+{
+}
+
+
+/*
+ * 'cupsdUnloadJob()' - Unload a job from memory.
+ */
+
+void
+cupsdUnloadJob(cupsd_job_t *job)	/* I - Job */
+{
 }
 
 
@@ -2712,6 +2836,7 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "set_hold_until: hold_until = %d", (int)holdtime);
 
   job->state->values[0].integer = IPP_JOB_HELD;
+  job->state_value              = IPP_JOB_HELD;
   job->hold_until               = holdtime;
 
  /*

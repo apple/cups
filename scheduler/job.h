@@ -3,7 +3,7 @@
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -30,17 +30,19 @@ typedef struct cupsd_job_s
 {
   int			id,		/* Job ID */
 			priority;	/* Job priority */
-  ipp_attribute_t	*state;		/* Job state */
-  ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
-  time_t		hold_until;	/* Hold expiration date/time */
+  ipp_jstate_t		state_value;	/* Cached job-state */
   char			*username;	/* Printing user */
   char			*dest;		/* Destination printer or class */
   cups_ptype_t		dtype;		/* Destination type (class/remote bits) */
-  ipp_attribute_t	*job_sheets;	/* Job sheets (NULL if none) */
   int			num_files;	/* Number of files in job */
-  int			current_file;	/* Current file in job */
   mime_type_t		**filetypes;	/* File types */
   int			*compressions;	/* Compression status of each file */
+  time_t		access_time;	/* Last access time */
+  ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
+  time_t		hold_until;	/* Hold expiration date/time */
+  ipp_attribute_t	*state;		/* Job state */
+  ipp_attribute_t	*job_sheets;	/* Job sheets (NULL if none) */
+  int			current_file;	/* Current file in job */
   ipp_t			*attrs;		/* Job attributes */
   cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
   int			print_pipes[2],	/* Print data pipes */
@@ -98,20 +100,24 @@ extern void		cupsdCleanJobs(void);
 extern void		cupsdDeleteJob(cupsd_job_t *job);
 extern cupsd_job_t	*cupsdFindJob(int id);
 extern void		cupsdFinishJob(cupsd_job_t *job);
+extern void		cupsdUnloadCompletedJobs(void);
 extern void		cupsdFreeAllJobs(void);
 extern int		cupsdGetPrinterJobCount(const char *dest);
 extern int		cupsdGetUserJobCount(const char *username);
 extern void		cupsdHoldJob(cupsd_job_t *job);
 extern void		cupsdLoadAllJobs(void);
+extern void		cupsdLoadJob(cupsd_job_t *job);
 extern void		cupsdMoveJob(cupsd_job_t *job, const char *dest);
 extern void		cupsdReleaseJob(cupsd_job_t *job);
 extern void		cupsdRestartJob(cupsd_job_t *job);
+extern void		cupsdSaveAllJobs(void);
 extern void		cupsdSaveJob(cupsd_job_t *job);
 extern void		cupsdSetJobHoldUntil(cupsd_job_t *job, const char *when);
 extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
 extern void		cupsdStartJob(cupsd_job_t *job, cupsd_printer_t *printer);
 extern void		cupsdStopAllJobs(void);
 extern void		cupsdStopJob(cupsd_job_t *job, int force);
+extern void		cupsdUnloadJob(cupsd_job_t *job);
 extern void		cupsdUpdateJob(cupsd_job_t *job);
 
 
