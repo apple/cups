@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Check for global symbols that don't need to be made global...
+#
+
+for file in *.o; do
+	echo -n "$file: "
+
+	functions=""
+
+	for function in `nm -g $file | grep "T " | awk '{print $3}'`; do
+		found=""
+		for file2 in *.o; do
+			if test "$file" = "$file2"; then
+				continue;
+			fi
+
+			found=`nm -g $file2 | grep $function`
+			if test "$found" != ""; then
+				break;
+			fi
+		done
+
+		if test -z "$found"; then
+			functions="$functions $function"
+		fi
+	done
+
+	if test -z "$functions"; then
+		echo "OK"
+	else
+		echo $functions
+	fi
+done

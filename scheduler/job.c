@@ -90,6 +90,9 @@ static mime_filter_t	gziptoany_filter =
 static int	compare_active_jobs(void *first, void *second, void *data);
 static int	compare_jobs(void *first, void *second, void *data);
 static int	ipp_length(ipp_t *ipp);
+static void	load_job_cache(const char *filename);
+static void	load_next_job_id(const char *filename);
+static void	load_request_root(void);
 static void	set_time(cupsd_job_t *job, const char *name);
 static void	set_hold_until(cupsd_job_t *job, time_t holdtime);
 
@@ -736,30 +739,14 @@ cupsdHoldJob(cupsd_job_t *job)		/* I - Job data */
 void
 cupsdLoadAllJobs(void)
 {
-  cups_dir_t		*dir;		/* Directory */
-  cups_dentry_t		*dent;		/* Directory entry */
-  char			filename[1024];	/* Full filename of job file */
-  cups_file_t		*fp;		/* Job file */
-  cupsd_job_t		*job;		/* New job */
-  int			jobid,		/* Current job ID */
-			fileid;		/* Current file ID */
-  ipp_attribute_t	*attr;		/* Job attribute */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
-  const char		*dest;		/* Destination */
-  mime_type_t		**filetypes;	/* New filetypes array */
-  int			*compressions;	/* New compressions array */
+  char		filename[1024];		/* Full filename of job.cache file */
+  struct stat	fileinfo,		/* Information on job.cache file */
+		dirinfo;		/* Information on RequestRoot dir */
+
 
 
  /*
-  * First create the job lists...
+  * Create the job arrays as needed...
   */
 
   if (!Jobs)
@@ -769,267 +756,43 @@ cupsdLoadAllJobs(void)
     ActiveJobs = cupsArrayNew(compare_active_jobs, NULL);
 
  /*
-  * Then open the requests directory...
+  * See whether the job.cache file is older than the RequestRoot directory...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Scanning %s for jobs...", RequestRoot);
+  snprintf(filename, sizeof(filename), "%s/job.cache", CacheDir);
 
-  if ((dir = cupsDirOpen(RequestRoot)) == NULL)
+  if (stat(filename, &fileinfo))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to open spool directory \"%s\": %s",
-                    RequestRoot, strerror(errno));
-    return;
+    fileinfo.st_mtime = 0;
+
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to get file information for \"%s\" - %s",
+		      filename, strerror(errno));
+  }
+
+  if (stat(RequestRoot, &dirinfo))
+  {
+    dirinfo.st_mtime = 0;
+
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to get directory information for \"%s\" - %s",
+		      RequestRoot, strerror(errno));
   }
 
  /*
-  * Read all the c##### files...
+  * Load the most recent source for job data...
   */
 
-  while ((dent = cupsDirRead(dir)) != NULL)
-    if (strlen(dent->filename) >= 6 && dent->filename[0] == 'c')
-    {
-     /*
-      * Allocate memory for the job...
-      */
+  if (dirinfo.st_mtime > fileinfo.st_mtime)
+  {
+    load_request_root();
 
-      if ((job = calloc(sizeof(cupsd_job_t), 1)) == NULL)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Ran out of memory for jobs!");
-	cupsDirClose(dir);
-	return;
-      }
-
-      if ((job->attrs = ippNew()) == NULL)
-      {
-        free(job);
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Ran out of memory for job attributes!");
-	cupsDirClose(dir);
-	return;
-      }
-
-     /*
-      * Assign the job ID...
-      */
-
-      job->id             = atoi(dent->filename + 1);
-      job->back_pipes[0]  = -1;
-      job->back_pipes[1]  = -1;
-      job->print_pipes[0] = -1;
-      job->print_pipes[1] = -1;
-
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "Loading attributes for job %d...",
-                      job->id);
-
-      if (job->id >= NextJobId)
-        NextJobId = job->id + 1;
-
-     /*
-      * Load the job control file...
-      */
-
-      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->filename);
-      if ((fp = cupsFileOpen(filename, "r")) == NULL)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to open job control file \"%s\" - %s!",
-	                filename, strerror(errno));
-	ippDelete(job->attrs);
-	free(job);
-	unlink(filename);
-	continue;
-      }
-      else
-      {
-        if (ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL,
-	              job->attrs) != IPP_DATA)
-	{
-          cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Unable to read job control file \"%s\"!",
-	                  filename);
-	  cupsFileClose(fp);
-	  ippDelete(job->attrs);
-	  free(job);
-	  unlink(filename);
-	  continue;
-	}
-
-	cupsFileClose(fp);
-      }
-
-      if ((job->state = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM)) == NULL)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Missing or bad job-state attribute in control "
-			"file \"%s\"!",
-	                filename);
-	ippDelete(job->attrs);
-	free(job);
-	unlink(filename);
-	continue;
-      }
-
-      job->state_value = (ipp_jstate_t)job->state->values[0].integer;
-
-      if ((attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI)) == NULL)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "No job-printer-uri attribute in control file \"%s\"!",
-	                filename);
-	ippDelete(job->attrs);
-	free(job);
-	unlink(filename);
-	continue;
-      }
-
-      httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, method,
-                      sizeof(method), username, sizeof(username), host,
-		      sizeof(host), &port, resource, sizeof(resource));
-
-      if ((dest = cupsdValidateDest(host, resource, &(job->dtype),
-                                    NULL)) == NULL)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to queue job for destination \"%s\"!",
-	                attr->values[0].string.text);
-	ippDelete(job->attrs);
-	free(job);
-	unlink(filename);
-	continue;
-      }
-
-      cupsdSetString(&job->dest, dest);
-
-      job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
-                                         IPP_TAG_INTEGER);
-      job->job_sheets = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
-
-      if ((attr = ippFindAttribute(job->attrs, "job-priority",
-                                   IPP_TAG_INTEGER)) == NULL)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Missing or bad job-priority attribute in control "
-			"file \"%s\"!", filename);
-	ippDelete(job->attrs);
-	free(job);
-	unlink(filename);
-	continue;
-      }
-      job->priority = attr->values[0].integer;
-
-      if ((attr = ippFindAttribute(job->attrs, "job-originating-user-name",
-                                   IPP_TAG_NAME)) == NULL)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Missing or bad job-originating-user-name attribute "
-			"in control file \"%s\"!", filename);
-	ippDelete(job->attrs);
-	free(job);
-	unlink(filename);
-	continue;
-      }
-      cupsdSetString(&job->username, attr->values[0].string.text);
-
-     /*
-      * Insert the job into the array, sorting by job priority and ID...
-      */
-
-      cupsArrayAdd(Jobs, job);
-      if (job->state->values[0].integer < IPP_JOB_STOPPED)
-        cupsArrayAdd(ActiveJobs,job);
-
-     /*
-      * Set the job hold-until time and state...
-      */
-
-      if (job->state->values[0].integer == IPP_JOB_HELD)
-      {
-	if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
-	                             IPP_TAG_KEYWORD)) == NULL)
-          attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
-
-        if (attr == NULL)
-	{
-          job->state->values[0].integer = IPP_JOB_PENDING;
-          job->state_value              = IPP_JOB_PENDING;
-	}
-	else
-          cupsdSetJobHoldUntil(job, attr->values[0].string.text);
-      }
-      else if (job->state->values[0].integer == IPP_JOB_PROCESSING)
-      {
-        job->state->values[0].integer = IPP_JOB_PENDING;
-        job->state_value              = IPP_JOB_PENDING;
-      }
-    }
-
- /*
-  * Read all the d##### files...
-  */
-
-  cupsDirRewind(dir);
-
-  while ((dent = cupsDirRead(dir)) != NULL)
-    if (strlen(dent->filename) > 7 && dent->filename[0] == 'd' &&
-        strchr(dent->filename, '-'))
-    {
-     /*
-      * Find the job...
-      */
-
-      jobid  = atoi(dent->filename + 1);
-      fileid = atoi(strchr(dent->filename, '-') + 1);
-
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "Auto-typing document file %s...",
-                      dent->filename);
-
-      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->filename);
-
-      if ((job = cupsdFindJob(jobid)) == NULL)
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Orphaned print file \"%s\"!",
-	                filename);
-        unlink(filename);
-	continue;
-      }
-
-      if (fileid > job->num_files)
-      {
-        if (job->num_files == 0)
-	{
-	  compressions = (int *)calloc(fileid, sizeof(int));
-	  filetypes    = (mime_type_t **)calloc(fileid, sizeof(mime_type_t *));
-	}
-	else
-	{
-	  compressions = (int *)realloc(job->compressions,
-	                                sizeof(int) * fileid);
-	  filetypes    = (mime_type_t **)realloc(job->filetypes,
-	                                         sizeof(mime_type_t *) * fileid);
-        }
-
-        if (compressions == NULL || filetypes == NULL)
-	{
-          cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Ran out of memory for job file types!");
-	  continue;
-	}
-
-        job->compressions = compressions;
-        job->filetypes    = filetypes;
-	job->num_files    = fileid;
-      }
-
-      job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename, NULL,
-                                                job->compressions + fileid - 1);
-
-      if (job->filetypes[fileid - 1] == NULL)
-        job->filetypes[fileid - 1] = mimeType(MimeDatabase, "application",
-	                                      "vnd.cups-raw");
-    }
-
-  cupsDirClose(dir);
+    load_next_job_id(filename);
+  }
+  else
+    load_job_cache(filename);
 
  /*
   * Clean out old jobs as needed...
@@ -1149,12 +912,13 @@ cupsdSaveAllJobs(void)
   snprintf(temp, sizeof(temp), "%s/job.cache", CacheDir);
   if ((fp = cupsFileOpen(temp, "w")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to save job.cache - %s",
-                    strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create job cache file \"%s\" - %s",
+                    temp, strerror(errno));
     return;
   }
-  else
-    cupsdLogMessage(CUPSD_LOG_INFO, "Saving job.cache...");
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Saving job cache file \"%s\"...", temp);
 
  /*
   * Restrict access to the file...
@@ -2794,6 +2558,578 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
   }
 
   return (bytes);
+}
+
+
+/*
+ * 'load_job_cache()' - Load jobs from the job.cache file.
+ */
+
+static void
+load_job_cache(const char *filename)	/* I - job.cache filename */
+{
+  cups_file_t	*fp;			/* job.cache file */
+  char		line[1024],		/* Line buffer */
+		*value;			/* Value on line */
+  int		linenum;		/* Line number in file */
+  cupsd_job_t	*job;			/* Current job */
+  int		jobid;			/* Job ID */
+
+
+ /*
+  * Open the job.cache file...
+  */
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  {
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to open job cache file \"%s\": %s",
+                      filename, strerror(errno));
+
+    load_request_root();
+
+    return;
+  }
+
+ /*
+  * Read entries from the job cache file and create jobs as needed.
+  */
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Loading job cache file \"%s\"...",
+                  filename);
+
+  linenum = 0;
+  job     = NULL;
+
+  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+  {
+    if (!strcasecmp(line, "NextJobId"))
+    {
+      if (value)
+        NextJobId = atoi(value);
+    }
+    else if (!strcasecmp(line, "<Job"))
+    {
+      if (job)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing </Job> directive on line %d!",
+	                linenum);
+        continue;
+      }
+
+      if (!value)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing job ID on line %d!", linenum);
+	continue;
+      }
+
+      jobid = atoi(value);
+
+      if (jobid < 1)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad job ID %d on line %d!", jobid,
+	                linenum);
+        continue;
+      }
+
+      job = calloc(1, sizeof(cupsd_job_t));
+      if (!job)
+      {
+        cupsdLogMessage(CUPSD_LOG_EMERG,
+	                "Unable to allocate memory for job %d!", jobid);
+        break;
+      }
+
+      job->id             = jobid;
+      job->back_pipes[0]  = -1;
+      job->back_pipes[1]  = -1;
+      job->print_pipes[0] = -1;
+      job->print_pipes[1] = -1;
+    }
+    else if (!job)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+	              "Missing <Job #> directive on line %d!", linenum);
+      continue;
+    }
+    else if (!strcasecmp(line, "</Job>"))
+    {
+      cupsArrayAdd(Jobs, job);
+
+      if (job->state_value < IPP_JOB_CANCELLED)
+      {
+        cupsArrayAdd(ActiveJobs, job);
+	cupsdLoadJob(job);
+      }
+
+      job = NULL;
+    }
+    else if (!value)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing valuee on line %d!", linenum);
+      continue;
+    }
+    else if (!strcasecmp(line, "State"))
+    {
+      job->state_value = atoi(value);
+    }
+    else if (!strcasecmp(line, "Priority"))
+    {
+      job->priority = atoi(value);
+    }
+    else if (!strcasecmp(line, "Username"))
+    {
+      cupsdSetString(&job->username, value);
+    }
+    else if (!strcasecmp(line, "Destination"))
+    {
+      cupsdSetString(&job->dest, value);
+    }
+    else if (!strcasecmp(line, "DestType"))
+    {
+      job->dtype = (cups_ptype_t)atoi(value);
+    }
+    else if (!strcasecmp(line, "NumFiles"))
+    {
+      job->num_files = atoi(value);
+
+      if (job->num_files < 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Bad NumFiles value %d on line %d!",
+	                job->num_files, linenum);
+        job->num_files = 0;
+	continue;
+      }
+
+      if (job->num_files > 0)
+      {
+	char	dfilename[1024];	/* Job data filename */
+
+
+        snprintf(dfilename, sizeof(dfilename), "%s/d%05d-001", RequestRoot,
+	         job->id);
+        if (access(dfilename, 0))
+	{
+	  cupsdLogMessage(CUPSD_LOG_INFO,
+	                  "Data files for job %d have gone away!", job->id);
+          job->num_files = 0;
+	  continue;
+	}
+
+        job->filetypes    = calloc(job->num_files, sizeof(mime_type_t *));
+	job->compressions = calloc(job->num_files, sizeof(int));
+
+        if (!job->filetypes || !job->compressions)
+	{
+	  cupsdLogMessage(CUPSD_LOG_EMERG,
+	                  "Unable to allocate memory for %d files!",
+	                  job->num_files);
+          break;
+	}
+      }
+    }
+    else if (!strcasecmp(line, "File"))
+    {
+      int	number,			/* File number */
+		compression;		/* Compression value */
+      char	super[MIME_MAX_SUPER],	/* MIME super type */
+		type[MIME_MAX_TYPE];	/* MIME type */
+
+
+      if (sscanf(value, "%d%*[ \t]%15[^/]/%255s%d", &number, super, type,
+                 &compression) != 4)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File on line %d!", linenum);
+	continue;
+      }
+
+      if (number < 1 || number > job->num_files)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File number %d on line %d!",
+	                number, linenum);
+        continue;
+      }
+
+      number --;
+
+      job->compressions[number] = compression;
+      job->filetypes[number]    = mimeType(MimeDatabase, super, type);
+
+      if (!job->filetypes[number])
+      {
+       /*
+        * If the original MIME type is unknown, auto-type it!
+	*/
+
+	char	dfilename[1024];	/* Job data filename */
+
+
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unknown MIME type %s/%s for file %d of job %d!",
+	                super, type, number + 1, job->id);
+
+        snprintf(dfilename, sizeof(dfilename), "%s/d%05d-%03d", RequestRoot,
+	         job->id, number + 1);
+        job->filetypes[number] = mimeFileType(MimeDatabase, dfilename, NULL,
+	                                      job->compressions + number);
+
+       /*
+        * If that didn't work, assume it is raw...
+	*/
+
+        if (!job->filetypes[number])
+	  job->filetypes[number] = mimeType(MimeDatabase, "application",
+	                                    "vnd.cups-raw");
+      }
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown %s directive on line %d!",
+                      line, linenum);
+  }
+
+  cupsFileClose(fp);
+}
+
+
+/*
+ * 'load_next_job_id()' - Load the NextJobId value from the job.cache file.
+ */
+
+static void
+load_next_job_id(const char *filename)	/* I - job.cache filename */
+{
+  cups_file_t	*fp;			/* job.cache file */
+  char		line[1024],		/* Line buffer */
+		*value;			/* Value on line */
+  int		linenum;		/* Line number in file */
+
+
+ /*
+  * Read the NextJobId directive from the job.cache file and use
+  * the value (if any).
+  */
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  {
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to open job cache file \"%s\": %s",
+                      filename, strerror(errno));
+
+    return;
+  }
+
+  cupsdLogMessage(CUPSD_LOG_INFO,
+                  "Loading NextJobId from job cache file \"%s\"...", filename);
+
+  linenum = 0;
+
+  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+  {
+    if (!strcasecmp(line, "NextJobId"))
+    {
+      if (value)
+        NextJobId = atoi(value);
+
+      break;
+    }
+  }
+
+  cupsFileClose(fp);
+}
+
+
+/*
+ * 'load_request_root()' - Load jobs from the RequestRoot directory.
+ */
+
+static void
+load_request_root(void)
+{
+  cups_dir_t		*dir;		/* Directory */
+  cups_dentry_t		*dent;		/* Directory entry */
+  char			filename[1024];	/* Full filename of job file */
+  cups_file_t		*fp;		/* Job file */
+  cupsd_job_t		*job;		/* New job */
+  int			jobid,		/* Current job ID */
+			fileid;		/* Current file ID */
+  ipp_attribute_t	*attr;		/* Job attribute */
+  char			scheme[32],	/* Scheme portion of URI */
+			username[64],	/* Username portion of URI */
+			host[HTTP_MAX_HOST],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
+  const char		*dest;		/* Destination */
+  mime_type_t		**filetypes;	/* New filetypes array */
+  int			*compressions;	/* New compressions array */
+
+
+ /*
+  * Open the requests directory...
+  */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Scanning %s for jobs...", RequestRoot);
+
+  if ((dir = cupsDirOpen(RequestRoot)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to open spool directory \"%s\": %s",
+                    RequestRoot, strerror(errno));
+    return;
+  }
+
+ /*
+  * Read all the c##### files...
+  */
+
+  while ((dent = cupsDirRead(dir)) != NULL)
+    if (strlen(dent->filename) >= 6 && dent->filename[0] == 'c')
+    {
+     /*
+      * Allocate memory for the job...
+      */
+
+      if ((job = calloc(sizeof(cupsd_job_t), 1)) == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Ran out of memory for jobs!");
+	cupsDirClose(dir);
+	return;
+      }
+
+      if ((job->attrs = ippNew()) == NULL)
+      {
+        free(job);
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Ran out of memory for job attributes!");
+	cupsDirClose(dir);
+	return;
+      }
+
+     /*
+      * Assign the job ID...
+      */
+
+      job->id             = atoi(dent->filename + 1);
+      job->back_pipes[0]  = -1;
+      job->back_pipes[1]  = -1;
+      job->print_pipes[0] = -1;
+      job->print_pipes[1] = -1;
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Loading attributes for job %d...",
+                      job->id);
+
+      if (job->id >= NextJobId)
+        NextJobId = job->id + 1;
+
+     /*
+      * Load the job control file...
+      */
+
+      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->filename);
+      if ((fp = cupsFileOpen(filename, "r")) == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to open job control file \"%s\" - %s!",
+	                filename, strerror(errno));
+	ippDelete(job->attrs);
+	free(job);
+	unlink(filename);
+	continue;
+      }
+      else
+      {
+        if (ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL,
+	              job->attrs) != IPP_DATA)
+	{
+          cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Unable to read job control file \"%s\"!",
+	                  filename);
+	  cupsFileClose(fp);
+	  ippDelete(job->attrs);
+	  free(job);
+	  unlink(filename);
+	  continue;
+	}
+
+	cupsFileClose(fp);
+      }
+
+      if ((job->state = ippFindAttribute(job->attrs, "job-state", IPP_TAG_ENUM)) == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Missing or bad job-state attribute in control "
+			"file \"%s\"!",
+	                filename);
+	ippDelete(job->attrs);
+	free(job);
+	unlink(filename);
+	continue;
+      }
+
+      job->state_value = (ipp_jstate_t)job->state->values[0].integer;
+
+      if ((attr = ippFindAttribute(job->attrs, "job-printer-uri", IPP_TAG_URI)) == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "No job-printer-uri attribute in control file \"%s\"!",
+	                filename);
+	ippDelete(job->attrs);
+	free(job);
+	unlink(filename);
+	continue;
+      }
+
+      httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, scheme,
+                      sizeof(scheme), username, sizeof(username), host,
+		      sizeof(host), &port, resource, sizeof(resource));
+
+      if ((dest = cupsdValidateDest(host, resource, &(job->dtype),
+                                    NULL)) == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to queue job for destination \"%s\"!",
+	                attr->values[0].string.text);
+	ippDelete(job->attrs);
+	free(job);
+	unlink(filename);
+	continue;
+      }
+
+      cupsdSetString(&job->dest, dest);
+
+      job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
+                                         IPP_TAG_INTEGER);
+      job->job_sheets = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
+
+      if ((attr = ippFindAttribute(job->attrs, "job-priority",
+                                   IPP_TAG_INTEGER)) == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Missing or bad job-priority attribute in control "
+			"file \"%s\"!", filename);
+	ippDelete(job->attrs);
+	free(job);
+	unlink(filename);
+	continue;
+      }
+      job->priority = attr->values[0].integer;
+
+      if ((attr = ippFindAttribute(job->attrs, "job-originating-user-name",
+                                   IPP_TAG_NAME)) == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Missing or bad job-originating-user-name attribute "
+			"in control file \"%s\"!", filename);
+	ippDelete(job->attrs);
+	free(job);
+	unlink(filename);
+	continue;
+      }
+      cupsdSetString(&job->username, attr->values[0].string.text);
+
+     /*
+      * Insert the job into the array, sorting by job priority and ID...
+      */
+
+      cupsArrayAdd(Jobs, job);
+      if (job->state->values[0].integer < IPP_JOB_STOPPED)
+        cupsArrayAdd(ActiveJobs,job);
+
+     /*
+      * Set the job hold-until time and state...
+      */
+
+      if (job->state->values[0].integer == IPP_JOB_HELD)
+      {
+	if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
+	                             IPP_TAG_KEYWORD)) == NULL)
+          attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+        if (attr == NULL)
+          job->state->values[0].integer = IPP_JOB_PENDING;
+	else
+          cupsdSetJobHoldUntil(job, attr->values[0].string.text);
+      }
+      else if (job->state->values[0].integer == IPP_JOB_PROCESSING)
+        job->state->values[0].integer = IPP_JOB_PENDING;
+      else if (job->state->values[0].integer > IPP_JOB_STOPPED)
+        cupsdUnloadJob(job);
+    }
+
+ /*
+  * Read all the d##### files...
+  */
+
+  cupsDirRewind(dir);
+
+  job = NULL;
+
+  while ((dent = cupsDirRead(dir)) != NULL)
+    if (strlen(dent->filename) > 7 && dent->filename[0] == 'd' &&
+        strchr(dent->filename, '-'))
+    {
+     /*
+      * Find the job...
+      */
+
+      jobid  = atoi(dent->filename + 1);
+      fileid = atoi(strchr(dent->filename, '-') + 1);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Auto-typing document file %s...",
+                      dent->filename);
+
+      snprintf(filename, sizeof(filename), "%s/%s", RequestRoot, dent->filename);
+
+      if (!job || job->id != jobid)
+      {
+	if ((job = cupsdFindJob(jobid)) == NULL)
+	{
+          cupsdLogMessage(CUPSD_LOG_ERROR, "Orphaned print file \"%s\"!",
+	                  filename);
+          unlink(filename);
+	  continue;
+	}
+      }
+
+      if (fileid > job->num_files)
+      {
+        if (job->num_files == 0)
+	{
+	  compressions = (int *)calloc(fileid, sizeof(int));
+	  filetypes    = (mime_type_t **)calloc(fileid, sizeof(mime_type_t *));
+	}
+	else
+	{
+	  compressions = (int *)realloc(job->compressions,
+	                                sizeof(int) * fileid);
+	  filetypes    = (mime_type_t **)realloc(job->filetypes,
+	                                         sizeof(mime_type_t *) * fileid);
+        }
+
+        if (compressions == NULL || filetypes == NULL)
+	{
+          cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Ran out of memory for job file types!");
+	  continue;
+	}
+
+        job->compressions = compressions;
+        job->filetypes    = filetypes;
+	job->num_files    = fileid;
+      }
+
+      job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, filename, NULL,
+                                                job->compressions + fileid - 1);
+
+      if (job->filetypes[fileid - 1] == NULL)
+        job->filetypes[fileid - 1] = mimeType(MimeDatabase, "application",
+	                                      "vnd.cups-raw");
+    }
+
+  cupsDirClose(dir);
 }
 
 
