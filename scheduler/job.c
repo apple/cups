@@ -1639,7 +1639,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
   for (attr = job->attrs->attrs; attr != NULL; attr = attr->next)
   {
-    if (strcmp(attr->name, "copies") == 0 &&
+    if (!strcmp(attr->name, "copies") &&
 	attr->value_tag == IPP_TAG_INTEGER)
     {
      /*
@@ -1649,7 +1649,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       if (!banner_page)
         sprintf(copies, "%d", attr->values[0].integer);
     }
-    else if (strcmp(attr->name, "job-name") == 0 &&
+    else if (!strcmp(attr->name, "job-name") &&
 	     (attr->value_tag == IPP_TAG_NAME ||
 	      attr->value_tag == IPP_TAG_NAMELANG))
       strlcpy(title, attr->values[0].string.text, sizeof(title));
@@ -1667,24 +1667,26 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	  attr->value_tag == IPP_TAG_BEGIN_COLLECTION) /* Not yet supported */
 	continue;
 
-      if (strncmp(attr->name, "time-", 5) == 0)
+      if (!strncmp(attr->name, "time-", 5))
 	continue;
 
-      if (strncmp(attr->name, "job-", 4) == 0 &&
+      if (!strncmp(attr->name, "job-", 4) &&
           !(printer->type & CUPS_PRINTER_REMOTE))
 	continue;
 
-      if (strncmp(attr->name, "job-", 4) == 0 &&
-          strcmp(attr->name, "job-billing") != 0 &&
-          strcmp(attr->name, "job-sheets") != 0 &&
-          strcmp(attr->name, "job-hold-until") != 0 &&
-	  strcmp(attr->name, "job-priority") != 0)
+      if (!strncmp(attr->name, "job-", 4) &&
+          strcmp(attr->name, "job-billing") &&
+          strcmp(attr->name, "job-sheets") &&
+          strcmp(attr->name, "job-hold-until") &&
+	  strcmp(attr->name, "job-priority"))
 	continue;
 
-      if ((strcmp(attr->name, "page-label") == 0 ||
-           strcmp(attr->name, "page-border") == 0 ||
-           strncmp(attr->name, "number-up", 9) == 0 ||
-	   strcmp(attr->name, "page-set") == 0) &&
+      if ((!strcmp(attr->name, "page-label") ||
+           !strcmp(attr->name, "page-border") ||
+           !strncmp(attr->name, "number-up", 9) ||
+	   !strcmp(attr->name, "page-set") ||
+	   !strcasecmp(attr->name, "AP_FIRSTPAGE_InputSlot") ||
+	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed")) &&
 	  banner_page)
         continue;
 
