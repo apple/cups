@@ -86,7 +86,7 @@ typedef struct				/**** Page information ****/
   off_t		offset;			/* Offset to start of page */
   ssize_t	length;			/* Number of bytes for page */
   int		lbrt[4];		/* PageBoundingBox */
-  char		*input_slot,		/* Input slot option or NULL */
+  const char	*input_slot,		/* Input slot option or NULL */
 		*manual_feed;		/* Manual feed option or NULL */
 } page_info_t;
 
@@ -163,7 +163,7 @@ main(int  argc,				/* I - Number of command-line args */
   float		b;			/* Brightness factor */
   int		level;			/* Nesting level for embedded files */
   int		nbytes,			/* Number of bytes read */
-		tbytes;			/* Total bytes to read for binary data */
+		tbytes;			/* Bytes to read for binary data */
   int		page;			/* Current page sequence number */
   int		real_page;		/* "Real" page number in document */
   int		page_count;		/* Page count for NUp */
@@ -175,10 +175,13 @@ main(int  argc,				/* I - Number of command-line args */
 		sent_prolog,		/* Did we send the prolog commands? */
 		sent_setup,		/* Did we send the setup commands? */
 		emit_jcl;		/* Emit JCL? */
-//  float		min_order;		/* Minimum output order for selection */
+  float		min_order;		/* Minimum output order for selection */
   char		label[256];		/* Page label */
   page_info_t	*pageinfo;		/* Page information */
-
+  const char	*ap_input_slot,		/* First page InputSlot option */
+		*ap_manual_feed,	/* First page ManualFeed option */
+		*input_slot,		/* Original InputSlot option */
+		*manual_feed;		/* Original ManualFeed option */
 
  /*
   * Make sure status messages are not buffered...
@@ -360,6 +363,47 @@ main(int  argc,				/* I - Number of command-line args */
     emit_jcl = 0;
   else
     emit_jcl = 1;
+
+ /*
+  * Handle input slot/manual feed selections...
+  */
+
+  if ((choice = ppdFindMarkedChoice(ppd, "InputSlot")) != NULL)
+    input_slot = choice->choice;
+  else
+    input_slot = NULL;
+
+  if ((choice = ppdFindMarkedChoice(ppd, "ManualFeed")) != NULL)
+    manual_feed = choice->choice;
+  else
+    manual_feed = NULL;
+
+  ap_input_slot  = cupsGetOption("AP_FIRSTPAGE_InputSlot", num_options,
+                                 options);
+  ap_manual_feed = cupsGetOption("AP_FIRSTPAGE_ManualFeed", num_options,
+                                 options);
+  min_order      = 999.0f;
+
+  if (ppd && (ap_input_slot || ap_manual_feed))
+  {
+   /*
+    * The first page/sheet will be using different options than
+    * the rest, so figure out the minimum order dependency for
+    * each of the options...
+    */
+
+    if ((option = ppdFindOption(ppd, "PageRegion")) != NULL &&
+        option->order < min_order)
+      min_order = option->order;
+
+    if ((option = ppdFindOption(ppd, "InputSlot")) != NULL &&
+        option->order < min_order)
+      min_order = option->order;
+
+    if ((option = ppdFindOption(ppd, "ManualFeed")) != NULL &&
+        option->order < min_order)
+      min_order = option->order;
+  }
 
   if (ppd && ppd->manual_copies && Duplex && Copies > 1)
   {
@@ -651,7 +695,8 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (!strncmp(line, "%%Page:", 7) && level == 0)
         break;
-      else if (!strncmp(line, "%%IncludeFeature:", 17) && level == 0 && NUp == 1)
+      else if (!strncmp(line, "%%IncludeFeature:", 17) && level == 0 &&
+               NUp == 1 && !FitPlot)
         include_feature(ppd, line, NULL);
       else if (!strncmp(line, "%%BeginBinary:", 14) ||
                (!strncmp(line, "%%BeginData:", 12) &&
@@ -844,7 +889,23 @@ main(int  argc,				/* I - Number of command-line args */
 	  sprintf(label, "%d", page);
 
 	if (slowcollate || sloworder)
+	{
 	  pageinfo = add_page(label, cupsFileTell(temp), lbrt);
+
+          if (ap_input_slot || ap_manual_feed)
+	  {
+	    if (page == 0)
+	    {
+	      pageinfo->input_slot  = ap_input_slot;
+	      pageinfo->manual_feed = ap_manual_feed;
+	    }
+	    else if (page == (1 + Duplex))
+	    {
+	      pageinfo->input_slot  = input_slot;
+	      pageinfo->manual_feed = manual_feed;
+	    }
+	  }
+	}
 	else
 	  pageinfo = NULL;
 
@@ -860,6 +921,27 @@ main(int  argc,				/* I - Number of command-line args */
 	    else
               printf("%%%%Page: %s %d\n", label, page);
 
+            if (ap_input_slot || ap_manual_feed)
+	    {
+	      if (page == 0)
+	      {
+	        if (ap_input_slot)
+	          ppdMarkOption(ppd, "InputSlot", ap_input_slot);
+		if (ap_manual_feed)
+		  ppdMarkOption(ppd, "ManualFeed", ap_manual_feed);
+	      }
+	      else if (page == (1 + Duplex))
+	      {
+	        if (input_slot)
+	          ppdMarkOption(ppd, "InputSlot", input_slot);
+		if (manual_feed)
+		  ppdMarkOption(ppd, "ManualFeed", manual_feed);
+	      }
+
+              ppdEmitAfterOrder(ppd, stdout, PPD_ORDER_DOCUMENT, 1, min_order);
+              ppdEmitAfterOrder(ppd, stdout, PPD_ORDER_ANY, 1, min_order);
+	    }
+
 	    page ++;
 	    ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 	  }
@@ -870,9 +952,10 @@ main(int  argc,				/* I - Number of command-line args */
 	NumPages ++;
 	real_page ++;
       }
-      else if (!strncmp(line, "%%BoundingBox:", 14) && level == 0 && pageinfo)
+      else if (!strncmp(line, "%%PageBoundingBox:", 18) && level == 0 &&
+               pageinfo)
       {
-        if (sscanf(line + 14, "%d%d%d%d", pagelbrt + 0, pagelbrt + 1,
+        if (sscanf(line + 18, "%d%d%d%d", pagelbrt + 0, pagelbrt + 1,
 	           pagelbrt + 2, pagelbrt + 3) == 4)
 	  memcpy(pageinfo->lbrt, pagelbrt, sizeof(pageinfo->lbrt));
       }
@@ -913,7 +996,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  tbytes -= nbytes;
 	}
       }
-      else if (!strncmp(line, "%%IncludeFeature:", 17))
+      else if (!strncmp(line, "%%IncludeFeature:", 17) && level == 0 &&
+               NUp == 1 && !FitPlot)
       {
        /*
         * Embed printer commands as needed...
@@ -927,10 +1011,10 @@ main(int  argc,				/* I - Number of command-line args */
 	    include_feature(ppd, line, temp);
 	}
       }
-      else if (!strncmp(line, "%%BeginFeature:", 15) && NUp > 1)
+      else if (!strncmp(line, "%%BeginFeature:", 15) && (NUp > 1 || FitPlot))
       {
        /*
-        * Strip page options for N-up > 1...
+        * Strip page options for N-up > 1 or "fitplot"...
 	*/
 
         do
@@ -1016,6 +1100,17 @@ main(int  argc,				/* I - Number of command-line args */
               else
         	printf("%%%%Page: %d %d\n", page, page);
 
+              if (pageinfo->input_slot || pageinfo->manual_feed)
+	      {
+		if (pageinfo->input_slot)
+	          ppdMarkOption(ppd, "InputSlot", pageinfo->input_slot);
+		if (pageinfo->manual_feed)
+		  ppdMarkOption(ppd, "ManualFeed", pageinfo->manual_feed);
+
+        	ppdEmitAfterOrder(ppd, stdout, PPD_ORDER_DOCUMENT, 1, min_order);
+        	ppdEmitAfterOrder(ppd, stdout, PPD_ORDER_ANY, 1, min_order);
+              }
+
 	      page ++;
 	      ppdEmit(ppd, stdout, PPD_ORDER_PAGE);
 	    }
@@ -1078,6 +1173,17 @@ main(int  argc,				/* I - Number of command-line args */
               printf("%%%%Page: %s %d\n", pageinfo->label, page);
 	    else
               printf("%%%%Page: %d %d\n", page, page);
+
+            if (pageinfo->input_slot || pageinfo->manual_feed)
+	    {
+	      if (pageinfo->input_slot)
+		ppdMarkOption(ppd, "InputSlot", pageinfo->input_slot);
+	      if (pageinfo->manual_feed)
+		ppdMarkOption(ppd, "ManualFeed", pageinfo->manual_feed);
+
+              ppdEmitAfterOrder(ppd, stdout, PPD_ORDER_DOCUMENT, 1, min_order);
+              ppdEmitAfterOrder(ppd, stdout, PPD_ORDER_ANY, 1, min_order);
+            }
 
 	    page ++;
 
