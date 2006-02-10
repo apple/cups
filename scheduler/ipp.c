@@ -1120,7 +1120,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     job = (cupsd_job_t *)pclass->job;
 
     cupsdStopJob(job, 1);
+
     job->state->values[0].integer = IPP_JOB_PENDING;
+    job->state_value              = IPP_JOB_PENDING;
   }
 
   if (need_restart_job)
@@ -1226,7 +1228,7 @@ add_job_state_reasons(
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job_state_reasons(%p[%d], %d)",
                   con, con->http.fd, job ? job->id : 0);
 
-  switch (job ? job->state->values[0].integer : IPP_JOB_CANCELLED)
+  switch (job ? job->state_value : IPP_JOB_CANCELLED)
   {
     case IPP_JOB_PENDING :
         if (job->dtype & CUPS_PRINTER_CLASS)
@@ -2025,7 +2027,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     job = (cupsd_job_t *)printer->job;
 
     cupsdStopJob(job, 1);
+
     job->state->values[0].integer = IPP_JOB_PENDING;
+    job->state_value              = IPP_JOB_PENDING;
   }
 
   if (need_restart_job)
@@ -2200,7 +2204,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
   * See if the job has been completed...
   */
 
-  if (job->state->values[0].integer != IPP_JOB_HELD)
+  if (job->state_value != IPP_JOB_HELD)
   {
    /*
     * Return a "not-possible" error...
@@ -2487,7 +2491,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
         for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	     job;
 	     job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-	  if (job->state->values[0].integer <= IPP_JOB_PROCESSING &&
+	  if (job->state_value <= IPP_JOB_PROCESSING &&
 	      !strcasecmp(job->dest, dest))
 	    break;
 
@@ -2559,12 +2563,12 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * we can't cancel...
   */
 
-  if (job->state->values[0].integer >= IPP_JOB_CANCELLED)
+  if (job->state_value >= IPP_JOB_CANCELLED)
   {
     send_ipp_status(con, IPP_NOT_POSSIBLE,
                     _("Job #%d is already %s - can\'t cancel."), jobid,
-		    job->state->values[0].integer == IPP_JOB_CANCELLED ? "cancelled" :
-		    job->state->values[0].integer == IPP_JOB_ABORTED ? "aborted" :
+		    job->state_value == IPP_JOB_CANCELLED ? "cancelled" :
+		    job->state_value == IPP_JOB_ABORTED ? "aborted" :
 		    "completed");
     return;
   }
@@ -3692,17 +3696,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-more-info", NULL, job_uri);
 
-  if (job->state->values[0].integer > IPP_JOB_PROCESSING &&
+  if (job->state_value > IPP_JOB_PROCESSING &&
       (!ra || cupsArrayFind(ra, "job-preserved")))
-  {
-    char	filename[1024];		/* Job data file */
-
-
-    snprintf(filename, sizeof(filename), "%s/d%05d-001", RequestRoot,
-             job->id);
     ippAddBoolean(con->response, IPP_TAG_JOB, "job-preserved",
-                  !access(filename, 0));
-  }
+                  job->num_files > 0);
 
   if (!ra || cupsArrayFind(ra, "job-printer-up-time"))
     ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
@@ -4278,6 +4275,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
     job->hold_until = time(NULL) + 60;
 
   job->state->values[0].integer = IPP_JOB_HELD;
+  job->state_value              = IPP_JOB_HELD;
 
   if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
       Classification)
@@ -4440,7 +4438,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
+                job->state_value);
 
   con->response->request.status.status_code = IPP_OK;
 
@@ -5283,6 +5281,8 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * Copy attributes...
   */
 
+  cupsdLoadJob(job);
+
   ra = create_requested_array(con->request);
   copy_job_attrs(con, job, ra);
   cupsArrayDelete(ra);
@@ -5457,10 +5457,15 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     if (username[0] && strcasecmp(username, job->username))
       continue;
 
-    if (completed && job->state->values[0].integer <= IPP_JOB_STOPPED)
+    if (completed && job->state_value <= IPP_JOB_STOPPED)
       continue;
 
     if (job->id < first_job_id)
+      continue;
+
+    cupsdLoadJob(job);
+
+    if (!job->attrs)
       continue;
 
     if (count > 0)
@@ -5548,10 +5553,10 @@ get_notifications(cupsd_client_t *con)	/* I - Client connection */
     * Check the subscription type and update the interval accordingly.
     */
 
-    if (sub->job && sub->job->state->values[0].integer == IPP_JOB_PROCESSING &&
+    if (sub->job && sub->job->state_value == IPP_JOB_PROCESSING &&
         interval > 10)
       interval = 10;
-    else if (sub->job && sub->job->state->values[0].integer >= IPP_JOB_STOPPED)
+    else if (sub->job && sub->job->state_value >= IPP_JOB_STOPPED)
       interval = 0;
     else if (sub->dest && sub->dest->state == IPP_PRINTER_PROCESSING &&
              interval > 30)
@@ -6497,7 +6502,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     * See if the job has been completed...
     */
 
-    if (job->state->values[0].integer > IPP_JOB_STOPPED)
+    if (job->state_value > IPP_JOB_STOPPED)
     {
      /*
       * Return a "not-possible" error...
@@ -6544,7 +6549,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
       */
 
       if (strcasecmp(job->dest, src) ||
-          job->state->values[0].integer > IPP_JOB_STOPPED)
+          job->state_value > IPP_JOB_STOPPED)
 	continue;
 
      /*
@@ -7165,6 +7170,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     job->state->values[0].integer = IPP_JOB_HELD;
+    job->state_value              = IPP_JOB_HELD;
     cupsdSetJobHoldUntil(job, attr->values[0].string.text);
   }
 
@@ -7364,7 +7370,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
+                job->state_value);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -7762,7 +7768,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
   * See if job is "held"...
   */
 
-  if (job->state->values[0].integer != IPP_JOB_HELD)
+  if (job->state_value != IPP_JOB_HELD)
   {
    /*
     * Nope - return a "not possible" error...
@@ -7980,7 +7986,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
   * See if job is in any of the "completed" states...
   */
 
-  if (job->state->values[0].integer <= IPP_JOB_PROCESSING)
+  if (job->state_value <= IPP_JOB_PROCESSING)
   {
    /*
     * Nope - return a "not possible" error...
@@ -7995,7 +8001,9 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
   * See if we have retained the job files...
   */
 
-  if (!JobFiles && job->state->values[0].integer > IPP_JOB_STOPPED)
+  cupsdLoadJob(job);
+
+  if (!job->attrs ||job->num_files == 0)
   {
    /*
     * Nope - return a "not possible" error...
@@ -8418,16 +8426,22 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
       cupsdUpdateQuota(printer, job->username, 0, kbytes);
     }
 
-    if (job->state->values[0].integer == IPP_JOB_STOPPED)
+    if (job->state_value == IPP_JOB_STOPPED)
+    {
       job->state->values[0].integer = IPP_JOB_PENDING;
-    else if (job->state->values[0].integer == IPP_JOB_HELD)
+      job->state_value              = IPP_JOB_PENDING;
+    }
+    else if (job->state_value == IPP_JOB_HELD)
     {
       if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
                                    IPP_TAG_KEYWORD)) == NULL)
 	attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
 
       if (!attr || !strcmp(attr->values[0].string.text, "no-hold"))
+      {
 	job->state->values[0].integer = IPP_JOB_PENDING;
+	job->state_value              = IPP_JOB_PENDING;
+      }
     }
 
     cupsdSaveJob(job);
@@ -8452,6 +8466,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     if (!attr || !strcmp(attr->values[0].string.text, "no-hold"))
     {
       job->state->values[0].integer = IPP_JOB_HELD;
+      job->state_value              = IPP_JOB_HELD;
       job->hold_until               = time(NULL) + 60;
       cupsdSaveJob(job);
     }
@@ -8470,7 +8485,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job ? job->state->values[0].integer : IPP_JOB_CANCELLED);
+                job ? job->state_value : IPP_JOB_CANCELLED);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -8721,7 +8736,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * See if the job has been completed...
   */
 
-  if (job->state->values[0].integer > IPP_JOB_STOPPED)
+  if (job->state_value > IPP_JOB_STOPPED)
   {
    /*
     * Return a "not-possible" error...
@@ -8748,6 +8763,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
  /*
   * See what the user wants to change.
   */
+
+  cupsdLoadJob(job);
 
   for (attr = con->request->attrs; attr; attr = attr->next)
   {
@@ -8805,7 +8822,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
           attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
       }
-      else if (job->state->values[0].integer >= IPP_JOB_PROCESSING)
+      else if (job->state_value >= IPP_JOB_PROCESSING)
       {
 	send_ipp_status(con, IPP_NOT_POSSIBLE,
 	                _("Job is completed and cannot be changed."));
@@ -8833,19 +8850,22 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	{
 	  case IPP_JOB_PENDING :
 	  case IPP_JOB_HELD :
-	      if (job->state->values[0].integer > IPP_JOB_HELD)
+	      if (job->state_value > IPP_JOB_HELD)
 	      {
 		send_ipp_status(con, IPP_NOT_POSSIBLE,
 		                _("Job state cannot be changed."));
 		return;
 	      }
               else if (con->response->request.status.status_code == IPP_OK)
+	      {
 		job->state->values[0].integer = attr->values[0].integer;
+		job->state_value              = attr->values[0].integer;
+	      }
 	      break;
 
 	  case IPP_JOB_PROCESSING :
 	  case IPP_JOB_STOPPED :
-	      if (job->state->values[0].integer != attr->values[0].integer)
+	      if (job->state_value != attr->values[0].integer)
 	      {
 		send_ipp_status(con, IPP_NOT_POSSIBLE,
 		                _("Job state cannot be changed."));
@@ -8856,7 +8876,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	  case IPP_JOB_CANCELLED :
 	  case IPP_JOB_ABORTED :
 	  case IPP_JOB_COMPLETED :
-	      if (job->state->values[0].integer > IPP_JOB_PROCESSING)
+	      if (job->state_value > IPP_JOB_PROCESSING)
 	      {
 		send_ipp_status(con, IPP_NOT_POSSIBLE,
 		                _("Job state cannot be changed."));
@@ -8869,6 +8889,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		if (JobHistory)
 		{
                   job->state->values[0].integer = attr->values[0].integer;
+                  job->state_value              = attr->values[0].integer;
 		  cupsdSaveJob(job);
 		}
 	      }

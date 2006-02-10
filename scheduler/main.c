@@ -839,12 +839,15 @@ main(int  argc,				/* I - Number of command-line args */
       cupsdUpdateNotifierStatus();
 
    /*
-    * Expire subscriptions as needed...
+    * Expire subscriptions and unload completed jobs as needed...
     */
 
-    if (cupsArrayCount(Subscriptions) > 0 && current_time > expire_time)
+    if (current_time > expire_time)
     {
-      cupsdExpireSubscriptions(NULL, NULL);
+      if (cupsArrayCount(Subscriptions) > 0)
+        cupsdExpireSubscriptions(NULL, NULL);
+
+      cupsdUnloadCompletedJobs();
 
       expire_time = current_time;
     }

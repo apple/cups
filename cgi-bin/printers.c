@@ -351,6 +351,7 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
     * Delete the response...
     */
 
+    cupsArrayDelete(printers);
     ippDelete(response);
   }
   else

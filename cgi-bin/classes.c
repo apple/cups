@@ -344,6 +344,7 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
     * Delete the response...
     */
 
+    cupsArrayDelete(classes);
     ippDelete(response);
   }
   else

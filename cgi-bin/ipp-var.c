@@ -1248,6 +1248,7 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     if (count > 0)
       cgiCopyTemplateLang("pager.tmpl");
 
+    cupsArrayDelete(jobs);
     ippDelete(response);
   }
 }
