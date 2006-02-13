@@ -221,6 +221,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/cupsd.8.gz
 /usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz
+/usr/share/man/man8/cups-deviced.8.gz
+/usr/share/man/man8/cups-driverd.8.gz
 /usr/share/man/man8/cups-polld.8.gz
 /usr/share/man/man8/lpadmin.8.gz
 /usr/share/man/man8/lpc.8.gz
@@ -238,9 +240,9 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-,root,root)
 %dir /usr/share/man/man1
-/usr/share/man/man1/backend.1.gz
 /usr/share/man/man1/cups-config.1.gz
-/usr/share/man/man1/filter.1.gz
+%dir /usr/share/man/man7
+/usr/share/man/man7/*
 
 /usr/bin/cups-config
 %dir /usr/include/cups
