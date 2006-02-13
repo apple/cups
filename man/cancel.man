@@ -1,7 +1,7 @@
 .\"
 .\" "$Id$"
 .\"
-.\"   accept/reject man page for the Common UNIX Printing System (CUPS).
+.\"   cancel man page for the Common UNIX Printing System (CUPS).
 .\"
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
@@ -21,35 +21,29 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH accept 8 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH cancel 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
-accept/reject \- accept/reject jobs sent to a destination
+cancel - cancel jobs
 .SH SYNOPSIS
-.B accept
+.B cancel
 [ -E ] [ -U
 .I username
-] [ -h
+] [ -a ] [ -h
 .I hostname[:port]
-] destination(s)
-.br
-.B reject
-[ -E ] [ -U
+] [ -u 
 .I username
-] [ -h
-.I hostname[:port]
-] [ -r
-.I reason
-] destination(s)
+] [
+.I id
+] [
+.I destination
+] [
+.I destination-id
+]
 .SH DESCRIPTION
-\fIaccept\fR instructs the printing system to accept print jobs to the
-specified destinations.
-.LP
-\fIreject\fR instructs the printing system to reject print jobs to the
-specified destinations. The \fI-r\fR option sets the reason for rejecting
-print jobs. If not specified the reason defaults to "Reason Unknown".
+\fIcancel\fR cancels existing print jobs. The \fI-a\fR option will remove
+all jobs from the specified destination.
 .SH OPTIONS
-The following options are supported by both \fIaccept\fR and
-\fIreject\fR:
+The following options are recognized by \fIlp\fR:
 .TP 5
 -E
 .br
@@ -57,28 +51,30 @@ Forces encryption when connecting to the server.
 .TP 5
 -U username
 .br
-Sets the username that is sent when connecting to the server.
+Specifies the username to use when connecting to the server.
+.TP 5
+-a
+.br
+Cancel all jobs on the named destination, or all jobs on all
+destinations if none is provided.
 .TP 5
 -h hostname[:port]
 .br
 Chooses an alternate server.
 .TP 5
--r "reason"
+-u username
 .br
-Sets the reason string that is shown for a printer that is
-rejecting jobs.
+Cancels jobs owned by \fIusername\fR.
 .SH COMPATIBILITY
 Unlike the System V printing system, CUPS allows printer names to
 contain any printable character except SPACE, TAB, "/", or "#".
 Also, printer and class names are \fInot\fR case-sensitive.
-.LP
-The CUPS versions of \fIaccept\fR and \fIreject\fR may ask the
-user for an access password depending on the printing system
-configuration. This differs from the System V versions which
-require the root user to execute these commands.
+.SH NOTES
+Administrators wishing to prevent unauthorized cancellation of
+jobs via the \fI-u\fR option should require authentication for
+Cancel-Jobs operations in \fIcupsd.conf(5)\fR.
 .SH SEE ALSO
-\fIcancel(1)\fR, \fIcupsenable(8)\fR, \fIlp(1)\fR,
-\fIlpadmin(8)\fR, \fIlpstat(1)\fR,
+\fIlp(1)\fR, \fIlpmove(8)\fR, \fIlpstat(1)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT

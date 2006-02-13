@@ -3,7 +3,7 @@
 .\"
 .\"   cupsd man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,41 +21,58 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd 8 "Common UNIX Printing System" "18 July 2002" "Easy Software Products"
+.TH cupsd 8 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 cupsd \- common unix printing system daemon
 .SH SYNOPSIS
 .B cupsd
-[ \-c
+[ -c
 .I config-file
-] [ \-f ] [ \-F ]
+] [ -f ] [ -F ] [ -h ] [ -l ]
 .SH DESCRIPTION
 \fIcupsd\fR is the scheduler for the Common UNIX Printing System. It
 implements a printing system based upon the Internet Printing Protocol,
 version 1.1.  If no options are specified on the command-line then the
-default configuration file (usually \fI/etc/cups/cupsd.conf\fR) will be
+default configuration file \fI@CUPS_SERVERROOT@/cupsd.conf\fR will be
 used.
-.PP
-The \fI-f\fR option forces \fIcupsd\fR to run in the foreground; the
-default is to run in the background as a "daemon".
-.PP
-The \fI-F\fR option forces \fIcupsd\fR to run in the foreground
-but detaches the process from the controlling terminal and
-current directory. This is useful for running \fIcupsd\fR from
-\fIinit\fR.
+.SH OPTIONS
+.TP 5
+-c config-file
+.br
+Uses the named configuration file.
+.TP 5
+-f
+.br
+Run \fIcupsd\fR in the foreground; the default is to run in the
+background as a "daemon".
+.TP 5
+-F
+.br
+Run \fIcupsd\fR in the foreground but detach the process from the
+controlling terminal and current directory. This is useful for
+running \fIcupsd\fR from \fIinit(8)\fR.
+.TP 5
+-h
+.br
+Shows the program usage.
+.TP 5
+-l
+.br
+This option is passed to \fIcupsd\fR when it is run from
+\fIlaunchd(8)\fR.
 .SH COMPATIBILITY
 \fIcupsd\fR implements all of the required IPP/1.1 attributes and
 operations. It also implements several CUPS-specific administration
 operations.
 .SH SEE ALSO
-backend(1), classes.conf(5), cupsd.conf(5), filter(1), mime.convs(5),
-mime.types(5), printers.conf(5),
-CUPS Implementation of IPP,
-CUPS Interface Design Description,
-CUPS Software Administrators Manual,
-http://localhost:631/documentation.html
+\fIbackend(7)\fR, \fIclasses.conf(5)\fR, \fIcups-deviced(8)\fR,
+\fIcups-driverd(8)\fR, \fIcups-lpd(8)\fR, \fIcups-polld(8)\fR,
+\fIcupsd.conf(5)\fR, \fIfilter(7)\fR, \fIlaunchd(8)\fR,
+\fImime.convs(5)\fR, \fImime.types(5)\fR, \fIprinters.conf(5)\fR,
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

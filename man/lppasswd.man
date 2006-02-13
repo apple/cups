@@ -3,7 +3,7 @@
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,41 +21,50 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lppasswd 1 "Common UNIX Printing System" "7 June 2001" "Easy Software Products"
+.TH lppasswd 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 lppasswd \- add, change, or delete digest passwords.
 .SH SYNOPSIS
 .B lppasswd
-[ -a ] [ -g
-.I groupname
-] [ -x ] [
+[
 .I username
 ]
+.br
+.B lppasswd
+-a [ -g
+.I groupname
+]
+.I username
+.br
+.B lppasswd
+-x
+.I username
 .SH DESCRIPTION
-\fIlppasswd\fR adds, changes, or deletes passwords in the CUPS digest
-password file, \fIpasswd.md5\fR. When run by a normal user, \fIlppasswd\fR
-will prompt for the old and new passwords. When run by the super-user,
-\fIlppasswd\fR can add new accounts (\fI-a username\fR), change existing
-accounts (\fIusername\fR), or delete accounts (\fI-x username\fR) in the
-digest password file. Digest usernames do not have to match local UNIX
-usernames, but only UNIX usernames are supported by the CUPS client programs
-(\fIlp(1)\fR, \fIlpr(1)\fR, etc.)
-.LP
-The \fI-g\fR option specifies a group other than the system group - "sys",
-"system", or "root", depending on the operating system.
+\fIlppasswd\fR adds, changes, or deletes passwords in the CUPS
+digest password file, \fIpasswd.md5\fR. When run by a normal
+user, \fIlppasswd\fR will prompt for the old and new passwords.
+When run by the super-user, \fIlppasswd\fR can add new accounts
+(\fI-a username\fR), change existing accounts (\fIusername\fR),
+or delete accounts (\fI-x username\fR) in the digest password
+file. Digest usernames do not have to match local UNIX usernames.
+.SH OPTIONS
+\fIlppasswd\fR supports the following options:
+.TP 5
+-g groupname
+.br
+Specifies a group other than the default system group.
 .SH SECURITY ISSUES
-The \fIlppasswd\fR command is installed setuid to root. While every attempt
-has been made to make it secure against exploits that could grant super-user
-priviledges to unpriviledged users, paranoid system administrators may wish
-to disable or change the ownership of the program to an unpriviledged
-account.
+The \fIlppasswd\fR command is installed setuid to root. While
+every attempt has been made to make it secure against exploits
+that could grant super-user priviledges to unprivileged users,
+paranoid system administrators may wish to disable or change the
+ownership of the program to an unprivileged account.
 .SH SEE ALSO
-lp(1), lpr(1),
-CUPS Software Administrators Manual,
-CUPS Software Users Manual,
-http://localhost:631/documentation.html
+\fIlp(1)\fR, \fIlpr(1)\fR,
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

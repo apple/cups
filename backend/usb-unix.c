@@ -5,7 +5,7 @@
  *
  *   This file is included from "usb.c" when compiled on UNIX/Linux.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -246,7 +246,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  {
 	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
 	            rbytes);
-            cupsBackchannelWrite(backbuf, rbytes, 1.0);
+            cupsBackChannelWrite(backbuf, rbytes, 1.0);
           }
 	}
 

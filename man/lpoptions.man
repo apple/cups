@@ -3,7 +3,7 @@
 .\"
 .\"   lpoptions man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,108 +21,124 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpoptions 1 "Common UNIX Printing System" "21 October 2002" "Easy Software Products"
+.TH lpoptions 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 lpoptions \- display or set printer options and defaults
 .SH SYNOPSIS
 .B lpoptions
-[ -h
-.I server
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
 ] -d
-.I dest[/instance]
+.I destination[/instance]
 [ -o
-.I option=value
+.I option[=value]
 ] ... [ -o
-.I option=value
+.I option[=value]
 ]
 .br
 .B lpoptions
-[ -h
-.I server
-] [ -E ] [ -p
-.I dest[/instance]
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
+] [ -p
+.I destination[/instance]
 ] -l
 .br
 .B lpoptions
-[ -h
-.I server
-] [ -E ] [ -o
-.I option=value
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
+] [ -o
+.I option[=value]
 ] ... [ -o
-.I option=value
+.I option[=value]
 ] [ -p
-.I dest[/instance]
+.I destination[/instance]
 ] -r
 .I option
 .br
 .B lpoptions
-[ -h
-.I server
-] [ -E ] -x
-.I dest[/instance]
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
+] -x
+.I destination[/instance]
 .SH DESCRIPTION
-\fBlpoptions\fR displays or sets printer options and defaults.
-\fBlpoptions\fR shows the default printer options when run with no
+\fIlpoptions\fR displays or sets printer options and defaults.
+\fIlpoptions\fR shows the default printer options when run with no
 arguments. Other options include:
 .TP 5
-\-E
+-E
 .br
 Enables encryption when communicating with the CUPS server.
 .TP 5
-\-d \fIdest[/instance]\fR
+-U username
 .br
-Sets the default printer to \fIdest\fR. If \fIinstance\fR is supplied then
-that particular instance is used. This option overrides the system default
-printer for the current user.
+Uses an alternate username.
 .TP 5
-\-h \fIserver\fR
+-d destination[/instance]
 .br
-Specifies the CUPS server to communicate with.
+Sets the default printer to \fIdestination\fR. If \fIinstance\fR
+is supplied then that particular instance is used. This option
+overrides the system default printer for the current user.
 .TP 5
-\-l
+-h server[:port]
+.br
+Uses an alternate server.
+.TP 5
+-l
 .br
 Lists the printer specific options and their current settings.
 .TP 5
-\-o \fIoption=value\fR
+-o option[=value]
 .br
 Specifies a new option for the named destination.
 .TP 5
-\-p \fIdest[/instance]\fR
+-p destination[/instance]
 .br
-Sets the destination and instance, if specified, for any options that follow.
-If the named instance does not exist then it is created.
+Sets the destination and instance, if specified, for any options
+that follow. If the named instance does not exist then it is
+created.
 .TP 5
-\-r \fIoption\fR
+-r option
 .br
 Removes the specified option for the named destination.
 .TP 5
-\-x \fIdest[/instance]\fR
+-x destination[/instance]
 .br
-Removes the options for the named destination and instance, if specified.
-If the named instance does not exist then this does nothing.
+Removes the options for the named destination and instance, if
+specified. If the named instance does not exist then this does
+nothing.
 .LP
-If no options are specified using the \fI-o\fR option then the current
-options for the named printer are reported on the standard output.
+If no options are specified using the \fI-o\fR option, then the
+current options for the named printer are reported on the
+standard output.
 .LP
-Options set with the \fBlpoptions\fR command are used by the \fBlp(1)\fR
-and \fBlpr(1)\fR commands when submitting jobs.
+Options set with the \fIlpoptions\fR command are used by the
+\fIlp(1)\fR and \fIlpr(1)\fR commands when submitting jobs.
 .SH ROOT ACCOUNT OPTIONS
-When run by the root user, \fBlpoptions\fR gets and sets default
+When run by the root user, \fIlpoptions\fR gets and sets default
 options and instances for \fIall users\fR in the
 /etc/cups/lpoptions file.
 .SH COMPATIBILITY
-The \fBlpoptions\fR command is unique to CUPS.
+The \fIlpoptions\fR command is unique to CUPS.
 .SH FILES
-~/.lpoptions - user defaults and instances created by non-root users.
+~/.lpoptions - user defaults and instances created by non-root
+users.
 .br
-/etc/cups/lpoptions - system-wide defaults and instances created by the root
-user.
+/etc/cups/lpoptions - system-wide defaults and instances created
+by the root user.
 .SH SEE ALSO
-cancel(1), lp(1),
-CUPS Software Users Manual,
-http://localhost:631/documentation.html
+\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpr(1)\fR,
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

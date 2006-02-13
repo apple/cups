@@ -64,7 +64,7 @@ static void	cups_setup(fd_set *set, struct timeval *tval,
  */
 
 int					/* O - Bytes read or -1 on error */
-cupsBackchannelRead(char   *buffer,	/* I - Buffer to read */
+cupsBackChannelRead(char   *buffer,	/* I - Buffer to read */
                     int    bytes,	/* I - Bytes to read */
 		    double timeout)	/* I - Timeout in seconds */
 {
@@ -111,7 +111,7 @@ cupsBackchannelRead(char   *buffer,	/* I - Buffer to read */
  */
 
 int					/* O - Bytes written or -1 on error */
-cupsBackchannelWrite(
+cupsBackChannelWrite(
     const char *buffer,			/* I - Buffer to write */
     int        bytes,			/* I - Bytes to write */
     double     timeout)			/* I - Timeout in seconds */

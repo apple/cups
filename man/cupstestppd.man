@@ -3,7 +3,7 @@
 .\"
 .\"   cupstestppd man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupstestppd 1 "Common UNIX Printing System" "1 August 2003" "Easy Software Products"
+.TH cupstestppd 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 cupstestppd \- test conformance of ppd files
 .SH SYNOPSIS
@@ -40,20 +40,29 @@ any other output are sent to the standard output.
 The first form of \fIcupstestppd\fR tests one or more PPD files
 on the command-line. The second form tests the PPD file provided
 on the standard input.
-.LP
-The \fI-q\fR option specifies that no information should be displayed.
-.LP
-The \fI-r\fR option relaxes the PPD conformance requirements so
-that common whitespace, control character, and formatting
-problems are not treated as hard errors.
-.LP
-The \fI-v\fR option specifies that detailed conformance testing
-results should be displayed rather than the concise PASS/FAIL/ERROR
-status.
-.LP
-The \fI-vv\fR option specifies that all information in the PPD
-file should be displayed in addition to the detailed conformance
-testing results.
+.SH OPTIONS
+\fIcupstestppd\fR supports the following options:
+.TP 5
+-q
+.br
+Specifies that no information should be displayed.
+.TP 5
+-r
+.br
+Relaxes the PPD conformance requirements so that common
+whitespace, control character, and formatting problems are not
+treated as hard errors.
+.TP 5
+-v
+.br
+Specifies that detailed conformance testing results should be
+displayed rather than the concise PASS/FAIL/ERROR status.
+.TP 5
+-vv
+.br
+Specifies that all information in the PPD file should be
+displayed in addition to the detailed conformance testing
+results.
 .LP
 The \fI-q\fR, \fI-v\fR, and \fI-vv\fR options are mutually exclusive.
 .SH EXIT STATUS
@@ -94,12 +103,13 @@ that do not conform:
 
 .fi
 .SH SEE ALSO
-CUPS Software Administrators Manual,
-CUPS Software Programmers Manual,
-http://localhost:631/documentation.html,
+\fIlpadmin(8)\fR,
+.br
+http://localhost:631/help
+.br
 Adobe PostScript Printer Description File Format Specification, Version 4.3.
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

@@ -3,7 +3,7 @@
 .\"
 .\"   mime.convs man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,17 +21,17 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH mime.convs 5 "Common UNIX Printing System" "22 June 2000" "Easy Software Products"
+.TH mime.convs 5 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 mime.convs \- mime type conversion file for cups
 .SH DESCRIPTION
-The \fImime.convs\fR file defines the filters that are available for
-converting files from one format to another. The standard filters
-support text, PDF, PostScript, HP-GL/2, and many types of image files.
+The \fImime.convs\fR file defines the filters that are available
+for converting files from one format to another. The standard
+filters support text, PDF, PostScript, HP-GL/2, and many types of
+image files.
 .LP
-Additional filters can be added to the \fImime.convs\fR file or to
-other files in the configuration directory (\fB/etc/cups\fR) with
-the extension ".convs".
+Additional filters can be added to the \fImime.convs\fR file or
+(preferably) to other files in the CUPS configuration directory.
 .LP
 Each line in the \fImime.types\fR file is a comment, blank, or filter
 line. Comment lines start with the # character. Filter lines specify
@@ -44,11 +44,12 @@ super/type super/type cost filter
 application/postscript application/vnd.cups-raster 50 pstoraster
 .fi
 .SH SEE ALSO
-classes.conf(5), cupsd(8), cupsd.conf(5), mime.types(5), printers.conf(5),
-CUPS Software Administrators Manual,
-http://localhost:631/documentation.html
+\fIclasses.conf(5)\fR, \fIcupsd(8)\fR, \fIcupsd.conf(5)\fR,
+\fImime.types(5)\fR, \fIprinters.conf(5)\fR,
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

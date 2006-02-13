@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lprm 1 "Common UNIX Printing System" "27 January 2006" "Easy Software Products"
+.TH lprm 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 lprm \- cancel print jobs
 .SH SYNOPSIS
@@ -29,34 +29,46 @@ lprm \- cancel print jobs
 [ -E ] [ -U
 .I username
 ] [ -h
-.I hostname[:port]
+.I server[:port]
 ] [ -P
-.I destination
+.I destination[/instance]
 ] [ - ] [
 .I job ID(s)
 ]
 .SH DESCRIPTION
-\fBlprm\fR cancels print jobs that have been queued for printing. The \fI-P\fR
-option specifies the destination printer or class.
-.LP
-If no arguments are supplied, the current job on the default destination is
-cancelled. You can specify one or more job ID numbers to cancel those jobs,
-or use the \fI\-\fR option to cancel all jobs.
-.LP
-The \fI-E\fR option forces encryption when connecting to the server.
-.LP
-The \fI-U\fR option specifies the username to use when connecting to the server.
-.LP
-The \fI-h\fR option an alternate server to use.
+\fIlprm\fR cancels print jobs that have been queued for printing.
+If no arguments are supplied, the current job on the default
+destination is cancelled. You can specify one or more job ID
+numbers to cancel those jobs or use the \fI-\fR option to cancel
+all jobs.
+.SH OPTIONS
+The \fIlprm\fR command supports the following options:
+.TP 5
+-E
+.br
+Forces encryption when connecting to the server.
+.TP 5
+-P destination[/instance]
+.br
+Specifies the destination printer or class.
+.TP 5
+-U username
+.br
+Specifies an alternate username.
+.TP 5
+-h server[:port]
+.br
+Specifies and alternate server.
 .SH COMPATIBILITY
-The CUPS version of \fIlprm\fR is compatible with the standard Berkeley
-\fIlprm\fR command.
+The CUPS version of \fIlprm\fR is compatible with the standard
+Berkeley \fIlprm\fR command.
 .SH SEE ALSO
-cancel(1), lp(1), lpstat(1), lpr(1),
+\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpq(1)\fR, \fIlpr(1)\fR,
+\fIlpstat(1)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

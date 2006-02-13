@@ -3,7 +3,7 @@
 .\"
 .\"   cups-polld man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,26 +21,27 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cups-polld 8 "Common UNIX Printing System" "10 May 2000" "Easy Software Products"
+.TH cups-polld 8 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 cups-polld \- cups printer polling daemon
 .SH SYNOPSIS
 .B cups-polld
 .I address ipp-port interval browse-port
 .SH DESCRIPTION
-\fBcups-polld\fR polls remote servers for a list of available printers
-and printer classes every \fIinterval\fR seconds. Printer and class
-information is then broadcast to the localhost interface (127.0.0.1)
-for reception by \fBcupsd(8)\fR.
+\fIcups-polld\fR polls remote servers for a list of available
+printers and printer classes every \fIinterval\fR seconds.
+Printer and class information is then broadcast to the localhost
+interface (127.0.0.1) on the specified browse port for reception
+by \fIcupsd(8)\fR.
 .PP
-This program is started automatically by \fBcupsd\fR for each
-BrowsePoll directive found in the \fBcupsd.conf\fR file.
+This program is started automatically by \fIcupsd\fR for every
+\fIBrowsePoll\fR directive found in the \fIcupsd.conf(5)\fR file.
 .SH SEE ALSO
-cupsd.conf(5),
-CUPS Software Administrators Manual,
-http://localhost:631/documentation.html
+\fIcupsd(8)\fR, \fIcupsd.conf(5)\fR,
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

@@ -3,7 +3,7 @@
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,208 +21,332 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "4 November 2005" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
 The \fIcupsd.conf\fR file configures the CUPS scheduler, \fIcupsd(8)\fR.  It
-is normally located in the \fI/etc/cups\fR directory.
+is normally located in the \fI@CUPS_SERVERROOT@\fR directory.
 .LP
 Each line in the file can be a configuration directive, a blank line,
 or a comment. Comment lines start with the # character. The
 configuration directives are intentionally similar to those used by the
 popular Apache web server software and are described below.
 .SH DIRECTIVES
-The following directives are understood by \fIcupsd\fR. Consult the CUPS
-Software Administrators Manual for a detailed description:
+The following directives are understood by \fIcupsd(8)\fR. Consult the
+on-line help for detailed descriptions:
 .TP 5
-AccessLog
+AccessLog filename
+.TP 5
+AccessLog syslog
 .br
 Defines the access log filename.
 .TP 5
-Allow
+Allow all
+.TP 5
+Allow none
+.TP 5
+Allow host.domain.com
+.TP 5
+Allow *.domain.com
+.TP 5
+Allow ip-address
+.TP 5
+Allow ip-address/netmask
+.TP 5
+Allow ip-address/mm
+.TP 5
+Allow @IF(name)
+.TP 5
+Allow @LOCAL
 .br
 Allows access from the named hosts or addresses.
 .TP 5
-AuthClass
-.br
-Specifies the authentication class (User, Group, System)
+AuthClass User
 .TP 5
-AuthGroupName
-.br
-Specifies the authentication group.
+AuthClass Group
 .TP 5
-AuthType
+AuthClass System
 .br
-Specifies the authentication type (None, Basic, Digest)
+Specifies the authentication class (User, Group, System) -
+\fBthis directive is deprecated\fR.
 .TP 5
-AutoPurgeJobs
+AuthGroupName group-name
+.br
+Specifies the authentication group - \fBthis directive is
+deprecated\fR.
+.TP 5
+AuthType None
+.TP 5
+AuthType Basic
+.TP 5
+AuthType BasicDigest
+.TP 5
+AuthType Digest
+.br
+Specifies the authentication type (None, Basic, BasicDigest, Digest)
+.TP 5
+AutoPurgeJobs Yes
+.TP 5
+AutoPurgeJobs No
 .br
 Specifies whether to purge job history data automatically when
 it is no longer required for quotas.
 .TP 5
-BrowseAddress
+BrowseAddress ip-address
+.TP 5
+BrowseAddress @IF(name)
+.TP 5
+BrowseAddress @LOCAL
 .br
 Specifies a broadcast address for outgoing printer information packets.
 .TP 5
-BrowseAllow
+BrowseAllow all
+.TP 5
+BrowseAllow none
+.TP 5
+BrowseAllow host.domain.com
+.TP 5
+BrowseAllow *.domain.com
+.TP 5
+BrowseAllow ip-address
+.TP 5
+BrowseAllow ip-address/netmask
+.TP 5
+BrowseAllow ip-address/mm
+.TP 5
+BrowseAllow @IF(name)
+.TP 5
+BrowseAllow @LOCAL
 .br
 Allows incoming printer information packets from the named host or address.
 .TP 5
-BrowseDeny
+BrowseDeny all
+.TP 5
+BrowseDeny none
+.TP 5
+BrowseDeny host.domain.com
+.TP 5
+BrowseDeny *.domain.com
+.TP 5
+BrowseDeny ip-address
+.TP 5
+BrowseDeny ip-address/netmask
+.TP 5
+BrowseDeny ip-address/mm
+.TP 5
+BrowseDeny @IF(name)
+.TP 5
+BrowseDeny @LOCAL
 .br
 Denies incoming printer information packets from the named host or address.
 .TP 5
-BrowseInterval
+BrowseInterval seconds
 .br
 Specifies the maximum interval between printer information broadcasts.
 .TP 5
-BrowseOrder
+BrowseOrder allow,deny
+.TP 5
+BrowseOrder deny,allow
 .br
 Specifies the order of printer information access control (allow,deny or deny,allow)
 .TP 5
-BrowsePoll
+BrowsePoll host-or-ip-address
 .br
 Specifies a server to poll for printer information.
 .TP 5
-BrowsePort
+BrowsePort port
 .br
 Specifies the port to listen to for printer information packets.
 .TP 5
-BrowseProtocols
+BrowseProtocols [All] [CUPS] [DNSSD] [LDAP] [SLP]
 .br
 Specifies the protocols to use for printer browsing.
 .TP 5
-BrowseLocalProtocols
+BrowseLocalProtocols [All] [CUPS] [DNSSD] [LDAP] [SLP]
 .br
 Specifies the protocols to use for local printer browsing.
 .TP 5
-BrowseRemoteProtocols
+BrowseRemoteProtocols [All] [CUPS] [DNSSD] [LDAP] [SLP]
 .br
 Specifies the protocols to use for remote printer browsing.
 .TP 5
-BrowseRelay
+BrowseRelay from-address to-address
 .br
 Specifies that printer information packets should be relayed from one host or
 network to another.
 .TP 5
-BrowseShortNames
+BrowseShortNames Yes
+.TP 5
+BrowseShortNames No
 .br
 Specifies whether remote printers will use short names ("printer") or not
 ("printer@server"). This option is ignored if more than one remote printer
 exists with the same name.
 .TP 5
-BrowseTimeout
+BrowseTimeout seconds
 .br
 Specifies the maximum interval between printer information updates before
 remote printers will be removed from the list of available printers.
 .TP 5
-Browsing
+Browsing Yes
+.TP 5
+Browsing No
 .br
 Specifies whether or not remote printer browsing should be enabled.
 .TP 5
-Classification
+Classification banner
 .br
 Specifies the security classification of the server.
 .TP 5
-ClassifyOverride
+ClassifyOverride Yes
+.TP 5
+ClassifyOverride No
 .br
 Specifies whether to allow users to override the classification
 of individual print jobs.
 .TP 5
-ConfigFilePerm
+ConfigFilePerm mode
 .br
 Specifies the permissions for all configuration files that the scheduler
 writes.
 .TP 5
-DataDir
+DataDir path
 .br
 Specified the directory where data files can be found.
 .TP 5
-DefaultAuthType
+DefaultAuthType Basic
+.TP 5
+DefaultAuthType BasicDigest
+.TP 5
+DefaultAuthType Digest
 .br
 Specifies the default type of authentication to use.
 .TP 5
-DefaultCharset
+DefaultCharset charset
 .br
 Specifies the default character set to use for text.
 .TP 5
-DefaultLanguage
+DefaultLanguage locale
 .br
 Specifies the default language to use for text and web content.
 .TP 5
-DefaultPolicy
+DefaultPolicy policy-name
 .br
 Specifies the default access policy to use.
 .TP 5
-Deny
+Deny all
+.TP 5
+Deny none
+.TP 5
+Deny host.domain.com
+.TP 5
+Deny *.domain.com
+.TP 5
+Deny ip-address
+.TP 5
+Deny ip-address/netmask
+.TP 5
+Deny ip-address/mm
+.TP 5
+Deny @IF(name)
+.TP 5
+Deny @LOCAL
 .br
 Denies access to the named host or address.
 .TP 5
-DocumentRoot
+DocumentRoot directory
 .br
 Specifies the root directory for the internal web server documents.
 .TP 5
-Encryption
+Encryption IfRequested
+.TP 5
+Encryption Never
+.TP 5
+Encryption Required
 .br
 Specifies the level of encryption that is required for a particular
 location.
 .TP 5
-ErrorLog
+ErrorLog filename
+.TP 5
+ErrorLog syslog
 .br
 Specifies the error log filename.
 .TP 5
-FileDevice
+FileDevice Yes
+.TP 5
+FileDevice No
 .br
 Specifies whether the file pseudo-device can be used for new
 printer queues.
 .TP 5
-FilterLimit
+FilterLimit limit
 .br
 Specifies the maximum cost of filters that are run concurrently.
 .TP 5
-FilterNice
+FilterNice nice-value
 .br
 Specifies the scheduling priority ("nice" value) of filters that
 are run to print a job.
 .TP 5
-FontPath
+FontPath directory[:directory:...]
 .br
 Specifies the search path for fonts.
 .TP 5
-Group
+Group group-name-or-number
 .br
 Specifies the group name or ID that will be used when executing
 external programs.
 .TP 5
-HideImplicitMembers
+HideImplicitMembers Yes
+.TP 5
+HideImplicitMembers No
 .br
 Specifies whether to hide members of implicit classes.
 .TP 5
-HostNameLookups
+HostNameLookups Yes
+.TP 5
+HostNameLookups No
+.TP 5
+HostNameLookups Double
 .br
 Specifies whether or not to do reverse lookups on client addresses.
 .TP 5
-ImplicitAnyClasses
+ImplicitAnyClasses Yes
+.TP 5
+ImplicitAnyClasses No
 .br
 Specifies whether or not to create implicit classes for local and
 remote printers, e.g. "AnyPrinter" from "Printer", "Printer@server1",
 and "Printer@server2".
 .TP 5
-ImplicitClasses
+ImplicitClasses Yes
+.TP 5
+ImplicitClasses No
 .br
 Specifies whether or not to create implicit classes from identical
 remote printers.
 .TP 5
-Include
+Include filename
 .br
 Includes the named file.
 .TP 5
-JobRetryInterval
+KeepAlive Yes
+.TP 5
+KeepAlive No
+.br
+Specifies whether to support HTTP keep-alive connections.
+.TP 5
+KeepAliveTimeout seconds
+.br
+Specifies the amount of time that connections are kept alive.
+.TP 5
+JobRetryInterval seconds
 .br
 Specifies the interval between retries of jobs in seconds.
 .TP 5
-JobRetryLimit
+JobRetryLimit count
 .br
 Specifies the number of retries that are done for jobs.
 .TP 5
@@ -248,7 +372,9 @@ LimitRequestBody
 .br
 Specifies the maximum size of any print job request.
 .TP 5
-Listen
+Listen ip-address:port
+.TP 5
+Listen *:port
 .br
 Listens to the specified address and port.
 .TP 5
@@ -256,53 +382,75 @@ Listens to the specified address and port.
 .br
 Specifies access control for the named location.
 .TP 5
-LogFilePerm
+LogFilePerm mode
 .br
 Specifies the permissions for all log files that the scheduler writes.
 .TP 5
-LogLevel
-.br
-Specifies the logging level (none, warn, error, info, debug, or debug2)
+LogLevel alert
 .TP 5
-MaxClients
+LogLevel crit
+.TP 5
+LogLevel debug2
+.TP 5
+LogLevel debug
+.TP 5
+LogLevel emerg
+.TP 5
+LogLevel error
+.TP 5
+LogLevel info
+.TP 5
+LogLevel none
+.TP 5
+LogLevel notice
+.TP 5
+LogLevel warn
+.br
+Specifies the logging level for the ErrorLog file.
+.TP 5
+MaxClients number
 .br
 Specifies the maximum number of simultaneous clients to support.
 .TP 5
-MaxClientsPerHost
+MaxClientsPerHost number
 .br
 Specifies the maximum number of simultaneous clients to support from a
 single address.
 .TP 5
-MaxCopies
+MaxCopies number
 .br
 Specifies the maximum number of copies that a user can print of each job.
 .TP 5
-MaxJobs
+MaxJobs number
 .br
 Specifies the maximum number of simultaneous jobs to support.
 .TP 5
-MaxJobsPerPrinter
+MaxJobsPerPrinter number
 .br
 Specifies the maximum number of simultaneous jobs per printer to support.
 .TP 5
-MaxJobsPerUser
+MaxJobsPerUser number
 .br
 Specifies the maximum number of simultaneous jobs per user to support.
 .TP 5
-MaxLogSize
+MaxLogSize number-bytes
 .br
 Specifies the maximum size of the log files before they are
 rotated (0 to disable rotation)
 .TP 5
-MaxRequestSize
+MaxRequestSize number-bytes
 .br
 Specifies the maximum request/file size in bytes (0 for no limit)
 .TP 5
-Order
+Order allow,deny
+.TP 5
+Order deny,allow
 .br
 Specifies the order of HTTP access control (allow,deny or deny,allow)
 .TP 5
-PageLog
+PageLog filename
+.TP 5
+PageLog syslog
 .br
 Specifies the page log filename.
 .TP 5
@@ -314,93 +462,119 @@ Passes the specified environment variable(s) to child processes.
 .br
 Specifies access control for the named policy.
 .TP 5
-Port
+Port number
 .br
 Specifies a port number to listen to for HTTP requests.
 .TP 5
-PreserveJobFiles
+PreserveJobFiles Yes
+.TP 5
+PreserveJobFiles No
 .br
 Specifies whether or not to preserve job files after they are printed.
 .TP 5
-PreserveJobHistory
+PreserveJobHistory Yes
+.TP 5
+PreserveJobHistory No
 .br
 Specifies whether or not to preserve the job history after they are
 printed.
 .TP 5
 Printcap
-.br
-Specifies the filename for a printcap file that is updated automatically
-with a list of available printers (needed for legacy applications)
 .TP 5
-PrintcapFormat
+Printcap filename
+.br
+Specifies the filename for a printcap file that is updated
+automatically with a list of available printers (needed for
+legacy applications); specifying Printcap with no filename
+disables printcap generation.
+.TP 5
+PrintcapFormat bsd
+.TP 5
+PrintcapFormat solaris
 .br
 Specifies the format of the printcap file.
 .TP 5
 PrintcapGUI
-.br
-Specifies whether to generate option panel definition files on some
-operating systems.
 .TP 5
-ReloadTimeout
+PrintcapGUI gui-program-filename
+.br
+Specifies whether to generate option panel definition files on
+some operating systems. When provided with no program filename,
+disables option panel definition files.
+.TP 5
+ReloadTimeout seconds
 .br
 Specifies the amount of time to wait for job completion before
 restarting the scheduler.
 .TP 5
-RemoteRoot
+RemoteRoot user-name
 .br
 Specifies the username that is associated with unauthenticated root
 accesses.
 .TP 5
-RequestRoot
+RequestRoot directory
 .br
 Specifies the directory to store print jobs and other HTTP request
 data.
 .TP 5
-Require
+Require group group-name-list
+.TP 5
+Require user user-name-list
+.TP 5
+Require valid-user
 .br
 Specifies that user or group authentication is required.
 .TP 5
-RIPCache
+RIPCache bytes
 .br
 Specifies the maximum amount of memory to use when converting images
 and PostScript files to bitmaps for a printer.
 .TP 5
-RunAsUser
-.br
-Specifies that the scheduler should run as the unpriviledged user
-set with the User directive.
+Satisfy all
 .TP 5
-Satisfy
+Satisfy any
 .br
 Specifies whether all or any limits set for a Location must be
 satisfied to allow access.
 .TP 5
-ServerAdmin
+ServerAdmin user@domain.com
 .br
 Specifies the email address of the server administrator.
 .TP 5
-ServerBin
+ServerBin directory
 .br
 Specifies the directory where backends, CGIs, daemons, and filters may
 be found.
 .TP 5
-ServerCertificate
+ServerCertificate filename
 .br
 Specifies the encryption certificate to use.
 .TP 5
-ServerKey
+ServerKey filename
 .br
 Specifies the encryption key to use.
 .TP 5
-ServerName
+ServerName hostname-or-ip-address
 .br
 Specifies the fully-qualified hostname of the server.
 .TP 5
-ServerRoot
+ServerRoot directory
 .br
 Specifies the directory where the server configuration files can be found.
 .TP 5
-ServerTokens
+ServerTokens Full
+.TP 5
+ServerTokens Major
+.TP 5
+ServerTokens Minimal
+.TP 5
+ServerTokens Minor
+.TP 5
+ServerTokens None
+.TP 5
+ServerTokens OS
+.TP 5
+ServerTokens ProductOnly
 .br
 Specifies what information is included in the Server header of HTTP
 responses.
@@ -417,27 +591,29 @@ SSLPort
 .br
 Listens on the specified port for encrypted connections.
 .TP 5
-SystemGroup
+SystemGroup group-name [group-name ...]
 .br
-Specifies the group to use for System class authentication.
+Specifies the group(s) to use for System class authentication.
 .TP 5
-TempDir
+TempDir directory
 .br
 Specifies the directory where temporary files are stored.
 .TP 5
-Timeout
+Timeout seconds
 .br
 Specifies the HTTP request timeout in seconds.
 .TP 5
-User
+User user-name
 .br
 Specifies the user name or ID that is used when running external programs.
 .SH SEE ALSO
-classes.conf(5), cupsd(8), mime.convs(5), mime.types(5), printers.conf(5),
-CUPS Software Administrators Manual,
-http://localhost:631/documentation.html
+\fIclasses.conf(5)\fR, \fIcupsd(8)\fR, \fImime.convs(5)\fR,
+\fImime.types(5)\fR, \fIprinters.conf(5)\fR,
+\fIsubscriptions.conf(5)\fR,
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

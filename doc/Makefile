@@ -111,9 +111,12 @@ HELPFILES	=	\
 			help/subscriptions-conf-reference.html \
 			help/man-accept.html \
 			help/man-backend.html \
+			help/man-cancel.html \
+			help/man-classes.conf.html \
 			help/man-cupsaddsmb.html \
 			help/man-cups-config.html \
 			help/man-cupsd.html \
+			help/man-cupsd.conf.html \
 			help/man-cupsenable.html \
 			help/man-cups-lpd.html \
 			help/man-cups-polld.html \
@@ -130,6 +133,9 @@ HELPFILES	=	\
 			help/man-lpr.html \
 			help/man-lprm.html \
 			help/man-lpstat.html \
+			help/man-mime.convs.html \
+			help/man-mime.types.html \
+			help/man-printers.conf.html \
 			help/network.html \
 			help/overview.html \
 			help/spec-ipp.html \

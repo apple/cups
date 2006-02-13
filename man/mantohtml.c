@@ -3,7 +3,7 @@
  *
  *   Man page to HTML conversion program.
  *
- *   Copyright 2004-2005 by Easy Software Products.
+ *   Copyright 2004-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -56,6 +56,9 @@ main(int  argc,				/* I - Number of command-line args */
 		*outfile;		/* Output file */
   char		line[1024],		/* Line from file */
 		*lineptr,		/* Pointer into line */
+		*endptr,		/* Pointer to end of current */
+		endchar,		/* End character */
+		*paren,			/* Pointer to parenthesis */
 		name[1024];		/* Man page name */
   int		section,		/* Man page section */
 		pre,			/* Preformatted */
@@ -155,12 +158,11 @@ main(int  argc,				/* I - Number of command-line args */
         sscanf(line + 4, "%s%d", name, &section);
 
         fprintf(outfile,
-	        "\t<title>%s</title>\n"
+	        "\t<title>%s(%d)</title>\n"
 	        "</head>\n"
 	        "<body>\n"
-		"<h2 class='title'><a name=\'%s.%d\'>%s(%d)</a></h2>\n"
 		"%s",
-	        name, name, section, name, section, start_fonts[font]);
+	        name, section, start_fonts[font]);
       }
       else if (section < 0)
         continue;
@@ -191,10 +193,22 @@ main(int  argc,				/* I - Number of command-line args */
 	  list = 0;
 	}
 
+        line[strlen(line) - 1] = '\0';	/* Strip LF */
+
         if (line[2] == 'H')
-	  fputs("<h3>", outfile);
+	  fputs("<h2><a name='", outfile);
 	else
-	  fputs("<h4>", outfile);
+	  fputs("<h3><a name='", outfile);
+
+        for (lineptr = line + 4; *lineptr; lineptr ++)
+	  if (*lineptr == '\"')
+	    continue;
+	  else if (*lineptr == ' ')
+	    putc_entity('_', outfile);
+	  else
+	    putc_entity(*lineptr, outfile);
+
+	fputs("'>", outfile);
 
         for (lineptr = line + 4; *lineptr; lineptr ++)
 	  if (*lineptr == '\"')
@@ -205,10 +219,10 @@ main(int  argc,				/* I - Number of command-line args */
 
             first = 1;
 	  }
-	  else if (*lineptr != '\n')
+	  else
 	  {
 	    if (first)
-	      putc_entity(toupper(*lineptr), outfile);
+	      putc_entity(*lineptr, outfile);
 	    else
 	      putc_entity(tolower(*lineptr), outfile);
 
@@ -216,9 +230,9 @@ main(int  argc,				/* I - Number of command-line args */
           }
 
         if (line[2] == 'H')
-	  fprintf(outfile, "</h3>\n%s", start_fonts[font]);
+	  fprintf(outfile, "</a></h2>\n%s", start_fonts[font]);
 	else
-	  fprintf(outfile, "</h4>\n%s", start_fonts[font]);
+	  fprintf(outfile, "</a></h3>\n%s", start_fonts[font]);
       }
       else if (!strncmp(line, ".LP", 3) || !strncmp(line, ".PP", 3))
       {
@@ -499,7 +513,79 @@ process_text:
 
       for (lineptr = line; *lineptr; lineptr ++)
       {
-        if (*lineptr == '\\')
+        if (!strncmp(lineptr, "http://", 7))
+	{
+	 /*
+	  * Embed URL...
+	  */
+
+          for (endptr = lineptr + 7;
+	       *endptr && !isspace(*endptr & 255);
+	       endptr ++);
+
+          endchar = *endptr;
+	  *endptr = '\0';
+
+          fprintf(outfile, "<a href='%s'>%s</a>", lineptr, lineptr);
+	  *endptr = endchar;
+	  lineptr = endptr - 1;
+	}
+	else if (!strncmp(lineptr, "\\fI", 3) &&
+	         (endptr = strstr(lineptr, "\\fR")) != NULL &&
+		 (paren = strchr(lineptr, '(')) != NULL &&
+		 paren < endptr)
+        {
+	 /*
+	  * Link to man page?
+	  */
+
+          char	manfile[1024],		/* Man page filename */
+		manurl[1024];		/* Man page URL */
+
+
+         /*
+	  * See if the man file is available locally...
+	  */
+
+          lineptr += 3;
+	  endchar = *paren;
+	  *paren  = '\0';
+
+	  snprintf(manfile, sizeof(manfile), "%s.man", lineptr);
+	  snprintf(manurl, sizeof(manurl), "man-%s.html?TOPIC=Man+Pages",
+	           lineptr);
+
+	  *paren  = endchar;
+	  endchar = *endptr;
+	  *endptr = '\0';
+
+	  if (access(manfile, 0))
+	  {
+	   /*
+	    * Not a local man page, just do it italic...
+	    */
+
+	    fputs("<i>", outfile);
+	    while (*lineptr)
+	      putc_entity(*lineptr++, outfile);
+	    fputs("</i>", outfile);
+	  }
+	  else
+	  {
+	   /*
+	    * Local man page, do a link...
+	    */
+
+	    fprintf(outfile, "<a href='%s'>", manurl);
+	    while (*lineptr)
+	      putc_entity(*lineptr++, outfile);
+	    fputs("</a>", outfile);
+	  }
+
+          *endptr = endchar;
+	  lineptr = endptr + 2;
+	}
+        else if (*lineptr == '\\')
 	{
 	  lineptr ++;
 	  if (!*lineptr)

@@ -3,7 +3,7 @@
  *
  *   Device scanning mini-daemon for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -130,30 +130,12 @@ main(int  argc,				/* I - Number of command-line args */
   {
     fputs("Usage: cups-deviced request-id limit user-id options\n", stderr);
 
-    cupsdSendIPPHeader(IPP_BAD_REQUEST, request_id);
-    cupsdSendIPPGroup(IPP_TAG_OPERATION);
-    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
-    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
-                       "en-US");
-    cupsdSendIPPString(IPP_TAG_TEXT, "status-message",
-                       "Bad command-line arguments passed to cups-deviced!");
-    cupsdSendIPPTrailer();
-
     return (1);
   }
 
   if (request_id < 1)
   {
     fprintf(stderr, "cups-deviced: Bad request ID %d!\n", request_id);
-
-    cupsdSendIPPHeader(IPP_BAD_REQUEST, request_id);
-    cupsdSendIPPGroup(IPP_TAG_OPERATION);
-    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
-    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
-                       "en-US");
-    cupsdSendIPPString(IPP_TAG_TEXT, "status-message",
-                       "Bad request ID argument passed to cups-deviced!");
-    cupsdSendIPPTrailer();
 
     return (1);
   }
@@ -162,15 +144,6 @@ main(int  argc,				/* I - Number of command-line args */
   if (normal_user <= 0)
   {
     fprintf(stderr, "cups-deviced: Bad user %d!\n", normal_user);
-
-    cupsdSendIPPHeader(IPP_BAD_REQUEST, request_id);
-    cupsdSendIPPGroup(IPP_TAG_OPERATION);
-    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
-    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
-                       "en-US");
-    cupsdSendIPPString(IPP_TAG_TEXT, "status-message",
-                       "Bad user ID argument passed to cups-deviced!");
-    cupsdSendIPPTrailer();
 
     return (1);
   }
@@ -208,16 +181,6 @@ main(int  argc,				/* I - Number of command-line args */
   {
     fprintf(stderr, "ERROR: [cups-deviced] Unable to open backend directory "
                     "\"%s\": %s", backends, strerror(errno));
-
-    snprintf(line, sizeof(line), "Unable to open backend directory \"%s\": %s",
-             backends, strerror(errno));
-    cupsdSendIPPHeader(IPP_BAD_REQUEST, request_id);
-    cupsdSendIPPGroup(IPP_TAG_OPERATION);
-    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
-    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
-                       "en-US");
-    cupsdSendIPPString(IPP_TAG_TEXT, "status-message", line);
-    cupsdSendIPPTrailer();
 
     return (1);
   }

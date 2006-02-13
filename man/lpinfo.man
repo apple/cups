@@ -3,7 +3,7 @@
 .\"
 .\"   lpinfo man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,40 +21,54 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpinfo 8 "Common UNIX Printing System" "23 January 2001" "Easy Software Products"
+.TH lpinfo 8 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 lpinfo \- show available devices or drivers
 .SH SYNOPSIS
 .B lpinfo
-[ -E ] [ -l ] [ -m ] [ -v ]
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
+] [ -l ] -m
+.br
+.B lpinfo
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
+] [ -l ] -v
 .SH DESCRIPTION
-\fBlpinfo\fR lists the available devices or drivers known to the CUPS
-server. One of the \fI-m\fR or \fI-v\fR options must be specified to
-get any output:
+\fIlpinfo\fR lists the available devices or drivers known to the
+CUPS server. The first form (\fI-m\fR) lists the available
+drivers, while the second form (\fI-v\fR) lists the available
+devices.
+.SH OPTIONS
+\fIlpinfo\fR accepts the following options:
 .TP 5
-\-E
+-E
 .br
 Forces encryption when connecting to the server.
 .TP 5
-\-l
+-U username
+.br
+Sets the username to use when connecting to the server.
+.TP 5
+-h server[:port]
+.br
+Selects an alternate server.
+.TP 5
+-l
 .br
 Shows a "long" listing of devices or drivers.
-.TP 5
-\-m
-.br
-Shows the available printer drivers on the system.
-.TP 5
-\-v
-.br
-Shows the available printer devices on the system.
 .SH COMPATIBILITY
-The \fBlpinfo\fR command is unique to CUPS.
+The \fIlpinfo\fR command is unique to CUPS.
 .SH SEE ALSO
-lpadmin(8),
-CUPS Software Administrators Manual,
-http://localhost:631/documentation.html
+\fIlpadmin(8)\fR,
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

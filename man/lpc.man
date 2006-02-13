@@ -3,7 +3,7 @@
 .\"
 .\"   lpc man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2005 by Easy Software Products.
+.\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpc 8 "Common UNIX Printing System" "22 September 1999" "Easy Software Products"
+.TH lpc 8 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 lpc \- line printer control program
 .SH SYNOPSIS
@@ -32,20 +32,23 @@ lpc \- line printer control program
 .I parameter(s)
 ] ]
 .SH DESCRIPTION
-\fIlpc\fR provides limited control over printer and class queues provided by
-CUPS. It can also be used to query the state of queues.
+\fIlpc\fR provides limited control over printer and class queues
+provided by CUPS. It can also be used to query the state of
+queues.
 .LP
-If no command is specified on the command-line, \fRlpc\fR will display a
-prompt and accept commands from the standard input.
+If no command is specified on the command-line, \fRlpc\fR will
+display a prompt and accept commands from the standard input.
 .SH COMMANDS
-The \fIlpc\fR program accepts a subset of commands accepted by the Berkeley
-\fIlpc\fR program of the same name:
+The \fIlpc\fR program accepts a subset of commands accepted by
+the Berkeley \fIlpc\fR program of the same name:
 .TP 5
-\fIexit
+exit
 .br
 Exits the command interpreter.
 .TP 5
-help \fI[command]\fR
+help [command]
+.TP 5
+? [command]
 .br
 Displays a short help message.
 .TP 5
@@ -53,28 +56,25 @@ quit
 .br
 Exits the command interpreter.
 .TP 5
-status \fI[queue]\fR
+status [queue]
 .br
 Displays the status of one or more printer or class queues.
-.TP 5
-? \fI[command]\fR
-.br
-Display a short help message.
 .SH LIMITATIONS
-Since \fIlpc\fR is geared towards the Berkeley printing system, it is impossible
-to use \fIlpc\fR to configure printer or class queues provided by CUPS.  To
-configure printer or class queues you must use the \fIlpadmin(8)\fR command
-or another CUPS-compatible client with that functionality.
+Since \fIlpc\fR is geared towards the Berkeley printing system,
+it is impossible to use \fIlpc\fR to configure printer or class
+queues provided by CUPS.  To configure printer or class queues
+you must use the \fIlpadmin(8)\fR command or another
+CUPS-compatible client with that functionality.
 .SH COMPATIBILITY
-The CUPS version of \fIlpc\fR does not implement all of the standard Berkeley
-commands.
+The CUPS version of \fIlpc\fR does not implement all of the
+standard Berkeley or LPRng commands.
 .SH SEE ALSO
-accept(8), cancel(1), disable(8), enable(8), lp(1), lpr(1), lprm(1),
-lpstat(1), reject(8),
-CUPS Software Administrators Manual,
-http://localhost:631/documentation.html
+\fIaccept(8)\fR, \fIcancel(1)\fR, \fIcupsenable(8)\fR,
+\fIlp(1)\fR, \fIlpr(1)\fR, \fIlprm(1)\fR, \fIlpstat(1)\fR,
+.br
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2005 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

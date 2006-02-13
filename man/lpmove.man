@@ -21,13 +21,13 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpmove 8 "Common UNIX Printing System" "18 January 2006" "Easy Software Products"
+.TH lpmove 8 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 lpmove \- move a job or all jobs to a new destination
 .SH SYNOPSIS
 .B lpmove
 [ -E ] [ -h
-.I hostname[:port]
+.I server[:port]
 ] [ -U
 .I username
 ]
@@ -35,7 +35,7 @@ lpmove \- move a job or all jobs to a new destination
 .br
 .B lpmove
 [ -E ] [ -h
-.I hostname[:port]
+.I server[:port]
 ] [ -U
 .I username
 ]
@@ -51,17 +51,25 @@ number or the old destination and job ID:
      lpmove oldprinter-123 newprinter
 .fi
 .SH OPTIONS
-The \fI-E\fR option forces encryption when connecting to the server.
-.LP
-The \fI-U\fR option specifies an alternate username.
-.LP
-The \fI-h\fR option specifies an alternate server.
+The \fIlpmove\fR command supports the following options:
+.TP 5
+-E
+.br
+Forces encryption when connecting to the server.
+.TP 5
+-U username
+.br
+Specifies an alternate username.
+.TP 5
+-h server[:port]
+.br
+Specifies an alternate server.
 .SH SEE ALSO
-cancel(1), lp(1)
+\fIcancel(1)\fR, \fIlp(1)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

@@ -21,89 +21,107 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpr 1 "Common UNIX Printing System" "18 January 2006" "Easy Software Products"
+.TH lpr 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
 .SH NAME
 lpr \- print files
 .SH SYNOPSIS
 .B lpr
 [ -E ] [ -H
-.I hostname[:port]
-] [ \-U
+.I server[:port]
+] [ -U
 .I username
-] [ \-P
-.I destination
-] [ \-#
+] [ -P
+.I destination[/instance]
+] [ -#
 .I num-copies
-[ \-l ] [ \-o
-.I option
-] [ \-p] [ \-r ] [ \-C/J/T
+[ -h ] [ -l ] [ -m ] [ -o
+.I option[=value]
+] [ -p] [ -q ] [ -r ] [ -C/J/T
 .I title
 ] [
 .I file(s)
 ]
 .SH DESCRIPTION
-\fBlpr\fR submits files for printing. Files named on the command line are sent
-to the named printer (or the system default destination if no destination is
-specified). If no files are listed on the command-line \fBlpr\fR reads the
-print file from the standard input.
+\fIlpr\fR submits files for printing. Files named on the command
+line are sent to the named printer (or the system default
+destination if no destination is specified). If no files are
+listed on the command-line, \fIlpr\fR reads the print file from
+the standard input.
 .SH OPTIONS
-The following options are recognized by \fBlpr\fR:
+The following options are recognized by \fIlpr\fR:
 .TP 5
-\-E
+-E
 .br
 Forces encryption when connecting to the server.
 .TP 5
-\-P \fIdestination\fR
+-H server[:port]
+.br
+Specifies an alternate server.
+.TP 5
+-C "name"
+.TP 5
+-J "name"
+.TP 5
+-T "name"
+.br
+Sets the job name.
+.TP 5
+-P destination[/instance]
 .br
 Prints files to the named printer.
 .TP 5
-\-# \fIcopies\fR
+-U username
+.br
+Specifies an alternate username.
+.TP 5
+-# \fIcopies\fR
 .br
 Sets the number of copies to print from 1 to 100.
 .TP 5
-\-C \fIname\fR
+-h
 .br
-Sets the job name.
+Disables banner printing. This option is equivalent to "-o
+job-sheets=none".
 .TP 5
-\-J \fIname\fR
+-l
 .br
-Sets the job name.
+Specifies that the print file is already formatted for the
+destination and should be sent without filtering. This option is
+equivalent to "-o raw".
 .TP 5
-\-T \fIname\fR
+-m
 .br
-Sets the job name.
+Send an email on job completion.
 .TP 5
-\-U \fIusername\fR
-.br
-Sets the user name.
-.TP 5
-\-l
-.br
-Specifies that the print file is already formatted for the destination and
-should be sent without filtering. This option is equivalent to "-oraw".
-.TP 5
-\-o \fIoption\fR
+-o option[=value]
 .br
 Sets a job option.
 .TP 5
-\-p
+-p
 .br
-Specifies that the print file should be formatted with a shaded header with
-the date, time, job name, and page number. This option is equivalent to
-"-oprettyprint" and is only useful when printing text files.
+Specifies that the print file should be formatted with a shaded
+header with the date, time, job name, and page number. This
+option is equivalent to "-o prettyprint" and is only useful when
+printing text files.
 .TP 5
-\-r
+-q
 .br
-Specifies that the named print files should be deleted after printing them.
+Hold job for printing.
+.TP 5
+-r
+.br
+Specifies that the named print files should be deleted after
+printing them.
 .SH COMPATIBILITY
-The "c", "d", "f", "g", "i", "m", "n", "t", "v", and "w" options are not
-supported by CUPS and will produce a warning message if used.
+The "c", "d", "f", "g", "i", "n", "t", "v", and "w" options
+are not supported by CUPS and produce a warning message if used.
 .SH SEE ALSO
-cancel(1), lp(1), lpstat(1),
+\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpq(1)\fR, \fIlprm(1)\fR,
+\fIlpstat(1)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

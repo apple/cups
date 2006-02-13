@@ -58,6 +58,7 @@ case "$uname" in
 		# *BSD
 		MAN1EXT=1
 		MAN5EXT=5
+		MAN7EXT=7
 		MAN8EXT=8
 		MAN8DIR=8
 		;;
@@ -65,6 +66,7 @@ case "$uname" in
 		# SGI IRIX
 		MAN1EXT=1
 		MAN5EXT=5
+		MAN7EXT=7
 		MAN8EXT=1m
 		MAN8DIR=1
 		;;
@@ -72,6 +74,7 @@ case "$uname" in
 		# Solaris and HP-UX
 		MAN1EXT=1
 		MAN5EXT=5
+		MAN7EXT=7
 		MAN8EXT=1m
 		MAN8DIR=1m
 		;;
@@ -79,6 +82,7 @@ case "$uname" in
 		# Linux and GNU Hurd
 		MAN1EXT=1.gz
 		MAN5EXT=5.gz
+		MAN7EXT=7.gz
 		MAN8EXT=8.gz
 		MAN8DIR=8
 		;;
@@ -86,6 +90,7 @@ case "$uname" in
 		# All others
 		MAN1EXT=1
 		MAN5EXT=5
+		MAN7EXT=7
 		MAN8EXT=8
 		MAN8DIR=8
 		;;
@@ -93,6 +98,7 @@ esac
 
 AC_SUBST(MAN1EXT)
 AC_SUBST(MAN5EXT)
+AC_SUBST(MAN7EXT)
 AC_SUBST(MAN8EXT)
 AC_SUBST(MAN8DIR)
 

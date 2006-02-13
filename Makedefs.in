@@ -172,6 +172,7 @@ STATEDIR	=	$(BUILDROOT)@CUPS_STATEDIR@
 
 MAN1EXT		=	@MAN1EXT@
 MAN5EXT		=	@MAN5EXT@
+MAN7EXT		=	@MAN7EXT@
 MAN8EXT		=	@MAN8EXT@
 MAN8DIR		=	@MAN8DIR@
 
@@ -186,7 +187,7 @@ DEFAULT_LAUNCHD_CONF	=	@DEFAULT_LAUNCHD_CONF@
 #
 
 .SILENT:
-.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .8 .8.gz .a .c .cxx .h .man .o .gz
+.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .cxx .h .man .o .gz
 
 .c.o:
 	echo Compiling $<...
@@ -196,12 +197,12 @@ DEFAULT_LAUNCHD_CONF	=	@DEFAULT_LAUNCHD_CONF@
 	echo Compiling $<...
 	$(CXX) $(OPTIM) $(CXXFLAGS) -c $<
 
-.man.1 .man.1m .man.5 .man.8:
+.man.1 .man.1m .man.5 .man.7 .man.8:
 	echo Linking $<...
 	$(RM) $@
 	$(LN) $< $@
 
-.man.1.gz .man.1m.gz .man.5.gz .man.8.gz .man.gz:
+.man.1.gz .man.1m.gz .man.5.gz .man.7.gz .man.8.gz .man.gz:
 	echo -n Compressing $<...
 	$(RM) $@
 	gzip -v9 <$< >$@

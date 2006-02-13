@@ -361,7 +361,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	  {
 	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
 	            rbytes);
-            cupsBackchannelWrite(resource, rbytes, 1.0);
+            cupsBackChannelWrite(resource, rbytes, 1.0);
           }
 	}
 

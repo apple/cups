@@ -50,8 +50,10 @@ sinclude(config-scripts/cups-scripting.m4)
 
 AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh cups-config
           conf/cupsd.conf conf/pam.std doc/index.html
-	  doc/help/standard.html templates/edit-config.tmpl
-	  templates/header.tmpl)
+	  doc/help/standard.html man/cups-deviced.man
+	  man/cups-driverd.man man/cups-lpd.man man/cupsaddsmb.man
+	  man/cupsd.man man/cupsd.conf.man
+	  templates/edit-config.tmpl templates/header.tmpl)
 
 chmod +x cups-config
 
