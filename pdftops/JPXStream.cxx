@@ -12,6 +12,7 @@
 #pragma implementation
 #endif
 
+#include <limits.h>
 #include "gmem.h"
 #include "Error.h"
 #include "JArithmeticDecoder.h"
@@ -783,7 +784,7 @@ GBool JPXStream::readCodestream(Guint len) {
   int segType;
   GBool haveSIZ, haveCOD, haveQCD, haveSOT;
   Guint precinctSize, style;
-  Guint segLen, capabilities, nTiles, comp, i, j, r;
+  Guint segLen, capabilities, comp, i, j, r;
 
   //----- main header
   haveSIZ = haveCOD = haveQCD = haveSOT = gFalse;
@@ -818,13 +819,14 @@ GBool JPXStream::readCodestream(Guint len) {
 	            / img.xTileSize;
       img.nYTiles = (img.ySize - img.yTileOffset + img.yTileSize - 1)
 	            / img.yTileSize;
-      nTiles = img.nXTiles * img.nYTiles;
       // check for overflow before allocating memory
-      if (nTiles == 0 || nTiles / img.nXTiles != img.nYTiles) {
+      if (img.nXTiles <= 0 || img.nYTiles <= 0 ||
+	  img.nXTiles >= INT_MAX / img.nYTiles) {
 	error(getPos(), "Bad tile count in JPX SIZ marker segment");
 	return gFalse;
       }
-      img.tiles = (JPXTile *)gmallocn(nTiles, sizeof(JPXTile));
+      img.tiles = (JPXTile *)gmallocn(img.nXTiles * img.nYTiles,
+				      sizeof(JPXTile));
       for (i = 0; i < img.nXTiles * img.nYTiles; ++i) {
 	img.tiles[i].tileComps = (JPXTileComp *)gmallocn(img.nComps,
 							 sizeof(JPXTileComp));

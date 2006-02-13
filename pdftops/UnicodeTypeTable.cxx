@@ -1,6 +1,6 @@
 //========================================================================
 //
-// UnicodeMapTables.cc
+// UnicodeTypeTable.cc
 //
 // Copyright 2004 Glyph & Cog, LLC
 //

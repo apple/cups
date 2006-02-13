@@ -13,6 +13,7 @@
 #endif
 
 #include <stdlib.h>
+#include <limits.h>
 #include "GList.h"
 #include "Error.h"
 #include "JArithmeticDecoder.h"
@@ -681,6 +682,10 @@ JBIG2Bitmap::JBIG2Bitmap(Guint segNumA, int wA, int hA):
   w = wA;
   h = hA;
   line = (wA + 7) >> 3;
+  if (w <= 0 || h <= 0 || line <= 0 || h >= (INT_MAX - 1) / line) {
+    data = NULL;
+    return;
+  }
   // need to allocate one extra guard byte for use in combine()
   data = (Guchar *)gmalloc(h * line + 1);
   data[h * line] = 0;
@@ -692,6 +697,10 @@ JBIG2Bitmap::JBIG2Bitmap(Guint segNumA, JBIG2Bitmap *bitmap):
   w = bitmap->w;
   h = bitmap->h;
   line = bitmap->line;
+  if (w <= 0 || h <= 0 || line <= 0 || h >= (INT_MAX - 1) / line) {
+    data = NULL;
+    return;
+  }
   // need to allocate one extra guard byte for use in combine()
   data = (Guchar *)gmalloc(h * line + 1);
   memcpy(data, bitmap->data, h * line);
@@ -720,7 +729,7 @@ JBIG2Bitmap *JBIG2Bitmap::getSlice(Guint x, Guint y, Guint wA, Guint hA) {
 }
 
 void JBIG2Bitmap::expand(int newH, Guint pixel) {
-  if (newH <= h) {
+  if (newH <= h || line <= 0 || newH >= (INT_MAX - 1) / line) {
     return;
   }
   // need to allocate one extra guard byte for use in combine()
@@ -2293,6 +2302,14 @@ void JBIG2Stream::readHalftoneRegionSeg(Guint segNum, GBool imm,
       !readLong(&gridX) || !readLong(&gridY) ||
       !readUWord(&stepX) || !readUWord(&stepY)) {
     goto eofError;
+  }
+  if (w == 0 || h == 0 || w >= INT_MAX / h) {
+    error(getPos(), "Bad bitmap size in JBIG2 halftone segment");
+    return;
+  }
+  if (gridH == 0 || gridW >= INT_MAX / gridH) {
+    error(getPos(), "Bad grid size in JBIG2 halftone segment");
+    return;
   }
 
   // get pattern dictionary

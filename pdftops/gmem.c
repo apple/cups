@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <limits.h>
 #include "gmem.h"
 
 #ifdef DEBUG_MEM
@@ -63,7 +64,7 @@ void *gmalloc(int size) {
   int lst;
   unsigned long *trl, *p;
 
-  if (size == 0)
+  if (size <= 0)
     return NULL;
   size1 = gMemDataSize(size);
   if (!(mem = (char *)malloc(size1 + gMemHdrSize + gMemTrlSize))) {
@@ -86,7 +87,7 @@ void *gmalloc(int size) {
 #else
   void *p;
 
-  if (size == 0)
+  if (size <= 0)
     return NULL;
   if (!(p = malloc(size))) {
     fprintf(stderr, "Out of memory\n");
@@ -102,7 +103,7 @@ void *grealloc(void *p, int size) {
   void *q;
   int oldSize;
 
-  if (size == 0) {
+  if (size <= 0) {
     if (p)
       gfree(p);
     return NULL;
@@ -120,7 +121,7 @@ void *grealloc(void *p, int size) {
 #else
   void *q;
 
-  if (size == 0) {
+  if (size <= 0) {
     if (p)
       free(p);
     return NULL;
@@ -140,8 +141,11 @@ void *grealloc(void *p, int size) {
 void *gmallocn(int nObjs, int objSize) {
   int n;
 
+  if (nObjs == 0) {
+    return NULL;
+  }
   n = nObjs * objSize;
-  if (objSize == 0 || n / objSize != nObjs) {
+  if (objSize <= 0 || nObjs < 0 || nObjs >= INT_MAX / objSize) {
     fprintf(stderr, "Bogus memory allocation size\n");
     exit(1);
   }
@@ -151,8 +155,14 @@ void *gmallocn(int nObjs, int objSize) {
 void *greallocn(void *p, int nObjs, int objSize) {
   int n;
 
+  if (nObjs == 0) {
+    if (p) {
+      gfree(p);
+    }
+    return NULL;
+  }
   n = nObjs * objSize;
-  if (objSize == 0 || n / objSize != nObjs) {
+  if (objSize <= 0 || nObjs < 0 || nObjs >= INT_MAX / objSize) {
     fprintf(stderr, "Bogus memory allocation size\n");
     exit(1);
   }
