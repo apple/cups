@@ -128,7 +128,11 @@ httpAddrConnect(
     * Close this socket and move to the next address...
     */
 
+#ifdef WIN32
     closesocket(*sock);
+#else
+    close(*sock);
+#endif /* WIN32 */
 
     addrlist = addrlist->next;
   }

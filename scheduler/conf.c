@@ -1102,7 +1102,7 @@ check_permissions(const char *filename,	/* I - File/directory name */
     }
   }
 
-  if (dir_created || (fileinfo.st_mode & 0777) != mode)
+  if (dir_created || (fileinfo.st_mode & 07777) != mode)
   {
     cupsdLogMessage(CUPSD_LOG_WARN, "Repairing access permissions of \"%s\"", filename);
 
