@@ -3,7 +3,7 @@
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -323,6 +323,9 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   ppd_choice_t	*c;			/* Choice pointer */
 
 
+  DEBUG_printf(("ppdMarkOption(ppd=%p, option=\"%s\", choice=\"%s\")\n",
+        	ppd, option, choice));
+
  /*
   * Range check input...
   */
@@ -465,7 +468,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	  */
 
 	  for (j = 0; j < ppd->num_sizes; j ++)
-	    ppd->sizes[i].marked = !strcasecmp(ppd->sizes[i].name,
+	    ppd->sizes[j].marked = !strcasecmp(ppd->sizes[j].name,
 		                               choice);
 
 	 /*
@@ -477,7 +480,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	  {
 	    if ((o = ppdFindOption(ppd, "PageRegion")) != NULL)
 	      for (j = 0; j < o->num_choices; j ++)
-        	o->choices[i].marked = 0;
+        	o->choices[j].marked = 0;
 	  }
 	  else
 	  {
