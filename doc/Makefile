@@ -28,30 +28,25 @@ include ../Makedefs
 # Document files...
 #
 
+LANGUAGES	=	ja
 WEBPAGES	=	cups.css cupsdoc.css index.html robots.txt
-WEBIMAGES	=	\
-			favicon.ico \
+WEBBUTTONS	=	\
 			images/accept-jobs.gif \
 			images/add-class.gif \
 			images/add-printer.gif \
 			images/add-this-printer.gif \
-			images/bottom-left.gif \
-			images/bottom-right.gif \
 			images/cancel.gif \
 			images/cancel-all-jobs.gif \
 			images/cancel-job.gif \
 			images/change-settings.gif \
-			images/classes.gif \
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \
 			images/edit-configuration-file.gif \
-			images/esp-logo.gif \
 			images/export-samba.gif \
 			images/happy.gif \
 			images/help.gif \
 			images/hold-job.gif \
-			images/logo.gif \
 			images/manage-classes.gif \
 			images/manage-jobs.gif \
 			images/manage-printers.gif \
@@ -60,9 +55,6 @@ WEBIMAGES	=	\
 			images/modify-printer.gif \
 			images/move-job.gif \
 			images/move-jobs.gif \
-			images/printer-idle.gif \
-			images/printer-processing.gif \
-			images/printer-stopped.gif \
 			images/print-test-page.gif \
 			images/publish-printer.gif \
 			images/reject-jobs.gif \
@@ -84,16 +76,27 @@ WEBIMAGES	=	\
 			images/start-printer.gif \
 			images/stop-class.gif \
 			images/stop-printer.gif \
-			images/tab-left.gif \
-			images/tab-right.gif \
-			images/top-left.gif \
-			images/top-middle.gif \
-			images/top-right.gif \
 			images/unpublish-printer.gif \
 			images/use-default-config.gif \
 			images/view-access-log.gif \
 			images/view-error-log.gif \
 			images/view-page-log.gif
+WEBIMAGES	=	\
+			favicon.ico \
+			images/bottom-left.gif \
+			images/bottom-right.gif \
+			images/classes.gif \
+			images/esp-logo.gif \
+			images/happy.gif \
+			images/logo.gif \
+			images/printer-idle.gif \
+			images/printer-processing.gif \
+			images/printer-stopped.gif \
+			images/tab-left.gif \
+			images/tab-right.gif \
+			images/top-left.gif \
+			images/top-middle.gif \
+			images/top-right.gif
 HELPFILES	=	\
 			help/access_log-reference.html \
 			help/api-array.html \
@@ -174,6 +177,12 @@ install:	all
 	$(INSTALL_DIR) -m 755 $(DOCDIR)/images
 	for file in $(WEBIMAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
+	done
+	for lang in $(LANGUAGES); do \
+		$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
+		for file in $(WEBIMAGES); do \
+			$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
+		done \
 	done
 
 

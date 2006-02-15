@@ -28,6 +28,7 @@ include ../Makedefs
 # Template files...
 #
 
+LANGUAGES =	ja
 FILES	=	\
 		add-class.tmpl \
 		add-printer.tmpl \
@@ -113,6 +114,14 @@ install: all
 	$(INSTALL_DIR) -m 755 $(DATADIR)/templates
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/templates; \
+	done
+	for lang in $(LANGUAGES); do \
+		$(INSTALL_DIR) -m 755 $(DATADIR)/templates/$$lang; \
+		for file in $(FILES); do \
+			if test -e $$lang/$$file; then \
+				$(INSTALL_DATA) $$lang/$$file $(DATADIR)/templates/$$lang; \
+			fi \
+		done \
 	done
 
 

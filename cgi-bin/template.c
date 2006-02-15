@@ -101,13 +101,18 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
     for (i = 0; lang[i] && i < 15; i ++)
       if (isalnum(lang[i] & 255))
         locale[i] = tolower(lang[i]);
-      else
+      else if (lang[i] == '-')
         locale[i] = '_';
+      else
+        break;
 
     locale[i] = '\0';
   }
   else
     locale[0] = '\0';
+
+  fprintf(stderr, "DEBUG: cupsCopyTemplateLang: locale=\"%s\"...\n",
+          locale);
 
  /*
   * See if we have a template file for this language...

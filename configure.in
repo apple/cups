@@ -53,7 +53,8 @@ AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh cups-config
 	  doc/help/standard.html man/cups-deviced.man
 	  man/cups-driverd.man man/cups-lpd.man man/cupsaddsmb.man
 	  man/cupsd.man man/cupsd.conf.man
-	  templates/edit-config.tmpl templates/header.tmpl)
+	  templates/edit-config.tmpl templates/header.tmpl
+	  templates/ja/header.tmpl)
 
 chmod +x cups-config
 
