@@ -53,6 +53,7 @@
 #include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
+#include <errno.h>
 #ifdef HAVE_LANGINFO_H
 #  include <langinfo.h>
 #endif /* HAVE_LANGINFO_H */
@@ -523,7 +524,9 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
   if (charset[0])
   {
-    for (i = 0; i < (int)(sizeof(locale_encodings) / sizeof(locale_encodings[0])); i ++)
+    for (i = 0;
+         i < (int)(sizeof(locale_encodings) / sizeof(locale_encodings[0]));
+	 i ++)
       if (!strcasecmp(charset, locale_encodings[i]))
       {
 	encoding = (cups_encoding_t)i;
@@ -539,13 +542,18 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * See if we already have this language/country loaded...
   */
 
-  snprintf(real, sizeof(real), "%s_%s", langname, country);
+  if (country[0])
+  {
+    snprintf(real, sizeof(real), "%s_%s", langname, country);
 
-  if ((lang = cups_cache_lookup(real, encoding)) != NULL)
-    return (lang);
+    if ((lang = cups_cache_lookup(real, encoding)) != NULL)
+      return (lang);
 
-  snprintf(filename, sizeof(filename), "%s/%s/cups_%s", cg->localedir,
-           real, real);
+    snprintf(filename, sizeof(filename), "%s/%s/cups_%s.po", cg->localedir,
+             real, real);
+  }
+  else
+    filename[0] = '\0';			/* anti-compiler-warning-code */
 
   if (!country[0] || access(filename, 0))
   {
@@ -556,7 +564,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     if ((lang = cups_cache_lookup(langname, encoding)) != NULL)
       return (lang);
 
-    snprintf(filename, sizeof(filename), "%s/%s/cups_%s", cg->localedir,
+    snprintf(filename, sizeof(filename), "%s/%s/cups_%s.po", cg->localedir,
              langname, langname);
 
     if (access(filename, 0))
@@ -565,8 +573,10 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       * No generic localization, so use POSIX...
       */
 
+      DEBUG_printf(("access(\"%s\", 0): %s\n", filename, strerror(errno)));
+
       strcpy(real, "C");
-      snprintf(filename, sizeof(filename), "%s/C/cups_C", cg->localedir);
+      snprintf(filename, sizeof(filename), "%s/C/cups_C.po", cg->localedir);
     }
     else
       strcpy(real, langname);
@@ -593,12 +603,14 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     lang->next     = cg->lang_cache;
     cg->lang_cache = lang;
   }
+  else
+  {
+   /*
+    * Free all old strings as needed...
+    */
 
- /*
-  * Free all old strings as needed...
-  */
-
-  _cupsMessageFree(lang->strings);
+    _cupsMessageFree(lang->strings);
+  }
 
  /*
   * Then assign the language and encoding fields...
@@ -701,6 +713,8 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
   int			length;		/* Length of combined strings */
 
 
+  DEBUG_printf(("_cupsMessageLoad(filename=\"%s\")\n", filename));
+
  /*
   * Create an array to hold the messages...
   */
@@ -723,10 +737,12 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
   *     msgid "some text"
   *     msgstr "localized text"
   *
-  * The localized text can span multiple lines using the form:
+  * The ID and localized text can span multiple lines using the form:
   *
-  *     msgid "some long text"
-  *     msgstr "localized text spanning "
+  *     msgid ""
+  *     "some long text"
+  *     msgstr ""
+  *     "localized text spanning "
   *     "multiple lines"
   */
 
@@ -771,6 +787,17 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
 
     if (!strncmp(s, "msgid", 5))
     {
+     /*
+      * Add previous message as needed...
+      */
+
+      if (m)
+        cupsArrayAdd(a, m);
+
+     /*
+      * Create a new message with the given msgid string...
+      */
+
       if ((m = (_cups_message_t *)calloc(1, sizeof(_cups_message_t))) == NULL)
       {
         cupsFileClose(fp);
@@ -778,43 +805,63 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
       }
 
       m->id = strdup(ptr);
-      cupsArrayAdd(a, m);
     }
-    else if ((s[0] == '\"' || !strncmp(s, "msgstr", 6)) && m)
+    else if (s[0] == '\"' && m)
     {
+     /*
+      * Append to current string...
+      */
+
+      length = strlen(m->str ? m->str : m->id);
+
+      if ((temp = realloc(m->str ? m->str : m->id,
+                          length + strlen(ptr) + 1)) == NULL)
+      {
+	cupsFileClose(fp);
+	return (a);
+      }
+
       if (m->str)
       {
        /*
-	* Append the string...
+        * Copy the new portion to the end of the msgstr string - safe
+	* to use strcpy because the buffer is allocated to the correct
+	* size...
 	*/
 
-	length = strlen(m->str);
-
-	if ((temp = realloc(m->str, length + strlen(ptr) + 1)) == NULL)
-	{
-	  cupsFileClose(fp);
-	  return (a);
-	}
-	else
-	  m->str = temp;
-
-       /*
-        * Copy the new portion at the end - safe because the buffer is
-	* allocated to the correct size...
-	*/
+        m->str = temp;
 
 	strcpy(m->str + length, ptr);
       }
       else
       {
        /*
-	* Set the string...
+        * Copy the new portion to the end of the msgid string - safe
+	* to use strcpy because the buffer is allocated to the correct
+	* size...
 	*/
 
-	m->str = strdup(ptr);
+        m->id = temp;
+
+	strcpy(m->id + length, ptr);
       }
     }
+    else if (!strncmp(s, "msgstr", 6) && m)
+    {
+     /*
+      * Set the string...
+      */
+
+      m->str = strdup(ptr);
+    }
   }
+
+ /*
+  * Add the last message string to the array as needed...
+  */
+
+  if (m)
+    cupsArrayAdd(a, m);
 
  /*
   * Close the message catalog file and return the new array...
