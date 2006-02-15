@@ -201,6 +201,9 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
 			*urlend;	/* End of URL */
 
 
+  fprintf(stderr, "DEBUG: show_all_printers(http=%p, user=\"%s\")\n",
+          http, user);
+
  /*
   * Show the standard header...
   */
@@ -381,6 +384,9 @@ show_printer(http_t     *http,		/* I - Connection to server */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
   char		refresh[1024];		/* Refresh URL */
 
+
+  fprintf(stderr, "DEBUG: show_printer(http=%p, printer=\"%s\")\n",
+          http, printer);
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following

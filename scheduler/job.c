@@ -290,6 +290,10 @@ cupsdCheckJobs(void)
 
   DEBUG_puts("cupsdCheckJobs()");
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdCheckJobs: %d active jobs, sleeping=%d, reload=%d",
+                  cupsArrayCount(ActiveJobs), Sleeping, NeedReload);
+
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
@@ -297,6 +301,9 @@ cupsdCheckJobs(void)
    /*
     * Start held jobs if they are ready...
     */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCheckJobs: Job %d: state_value=%d",
+                    job->id, job->state_value);
 
     if (job->state_value == IPP_JOB_HELD &&
         job->hold_until &&

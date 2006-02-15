@@ -73,9 +73,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     op = CUPS_ACCEPT_JOBS;
   else if (!strcmp(command, "reject"))
     op = CUPS_REJECT_JOBS;
-  else if (!strcmp(command, "disable"))
+  else if (!strcmp(command, "cupsdisable") || !strcmp(command, "disable"))
     op = IPP_PAUSE_PRINTER;
-  else if (!strcmp(command, "enable"))
+  else if (!strcmp(command, "cupsenable") || !strcmp(command, "enable"))
     op = IPP_RESUME_PRINTER;
   else
   {

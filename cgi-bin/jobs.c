@@ -164,10 +164,10 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
   request = ippNewRequest(op);
 
+  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
+
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
                NULL, uri);
-
-  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
 
   if ((user = getenv("REMOTE_USER")) == NULL)
     user = "guest";

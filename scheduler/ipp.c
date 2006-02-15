@@ -2233,10 +2233,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to authenticate "
-		      "job #%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -2551,10 +2548,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to delete job #%d "
-		      "owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -6263,9 +6257,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("Not authorized to hold job #%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -6520,10 +6512,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if (!validate_user(job, con, job->username, username, sizeof(username)))
     {
-      send_ipp_status(con, IPP_FORBIDDEN,
-                      _("You are not authorized to move job #%d owned "
-			"by \"%s\"!"),
-                      job->id, job->username);
+      send_http_error(con, HTTP_UNAUTHORIZED);
       return;
     }
 
@@ -7784,10 +7773,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to release job id "
-		      "%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -8020,10 +8006,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to restart job id "
-		      "%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -8230,10 +8213,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to send document "
-		      "for job #%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -8753,10 +8733,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to alter job id "
-		      "%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
