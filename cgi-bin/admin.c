@@ -85,6 +85,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Connect to the HTTP server...
   */
 
+  fputs("DEBUG: admin.cgi started...\n", stderr);
+
   http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
   if (!http)
@@ -95,6 +97,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     fprintf(stderr, "DEBUG: cupsEncryption()=%d\n", cupsEncryption());
     exit(1);
   }
+
+  fprintf(stderr, "DEBUG: http=%p\n", http);
 
  /*
   * Set the web interface section...
@@ -112,6 +116,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Nope, send the administration menu...
     */
 
+    fputs("DEBUG: No form data, showing main menu...\n", stderr);
+
     do_menu(http);
   }
   else if ((op = cgiGetVariable("OP")) != NULL)
@@ -119,6 +125,8 @@ main(int  argc,				/* I - Number of command-line arguments */
    /*
     * Do the operation...
     */
+
+    fprintf(stderr, "DEBUG: op=\"%s\"...\n", op);
 
     if (!strcmp(op, "redirect"))
     {
@@ -1073,6 +1081,8 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
 
   title = cgiText(_("Set Printer Options"));
 
+  fprintf(stderr, "DEBUG: do_config_printer(http=%p)\n", http);
+
  /*
   * Get the printer name...
   */
@@ -1089,17 +1099,23 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
     return;
   }
 
+  fprintf(stderr, "DEBUG: printer=\"%s\", uri=\"%s\"...\n", printer, uri);
+
  /*
   * Get the PPD file...
   */
 
-  if ((filename = cupsGetPPD(printer)) == NULL)
+  if ((filename = cupsGetPPD2(http, printer)) == NULL)
   {
+    fputs("DEBUG: No PPD file!?!\n", stderr);
+
     cgiStartHTML(title);
     cgiShowIPPError(_("Unable to get PPD file!"));
     cgiEndHTML();
     return;
   }
+
+  fprintf(stderr, "DEBUG: Got PPD file: \"%s\"\n", filename);
 
   if ((ppd = ppdOpenFile(filename)) == NULL)
   {
@@ -1149,6 +1165,8 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
    /*
     * Show the options to the user...
     */
+
+    fputs("DEBUG: Showing options...\n", stderr);
 
     ppdLocalize(ppd);
 
@@ -1408,6 +1426,8 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
    /*
     * Set default options...
     */
+
+    fputs("DEBUG: Setting options...\n", stderr);
 
     out = cupsTempFile2(tempfile, sizeof(tempfile));
     in  = cupsFileOpen(filename, "r");
