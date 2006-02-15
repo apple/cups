@@ -1696,7 +1696,6 @@ launchd_sync_conf(void)
   {
     CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_LABEL),
                          CFSTR("org.cups.cupsd"));
-    CFDictionaryAddValue(cupsd_dict, CFSTR("Enabled"), kCFBooleanTrue);
     CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_ONDEMAND),
                          kCFBooleanTrue);
 
