@@ -302,8 +302,9 @@ cupsdCheckJobs(void)
     * Start held jobs if they are ready...
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCheckJobs: Job %d: state_value=%d",
-                    job->id, job->state_value);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdCheckJobs: Job %d: state_value=%d, loaded=%s",
+                    job->id, job->state_value, job->attrs ? "yes" : "no");
 
     if (job->state_value == IPP_JOB_HELD &&
         job->hold_until &&
@@ -2959,6 +2960,11 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     else if (!strcasecmp(line, "State"))
     {
       job->state_value = atoi(value);
+
+      if (job->state_value < IPP_JOB_PENDING)
+        job->state_value = IPP_JOB_PENDING;
+      else if (job->state_value > IPP_JOB_COMPLETED)
+        job->state_value = IPP_JOB_COMPLETED;
     }
     else if (!strcasecmp(line, "Priority"))
     {

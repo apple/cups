@@ -233,7 +233,7 @@ cupsdAddEvent(
 	    ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
 	        	 "job-name", NULL, attr->values[0].string.text);
 
-	  switch (job->state->values[0].integer)
+	  switch (job->state_value)
 	  {
 	    case IPP_JOB_PENDING :
         	if (dest && dest->state == IPP_PRINTER_STOPPED)
@@ -1459,7 +1459,7 @@ cupsd_send_dbus(cupsd_eventmask_t event,/* I - Event to send */
   else if (event & CUPSD_EVENT_JOB_CREATED)
     what = "JobQueuedLocal";
   else if ((event & CUPSD_EVENT_JOB_STATE) && job &&
-           job->state->values[0].integer == IPP_JOB_PROCESSING)
+           job->state_value == IPP_JOB_PROCESSING)
     what = "JobStartedLocal";
   else
     return;

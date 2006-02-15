@@ -599,7 +599,7 @@ main(int  argc,				/* I - Number of command-line args */
       for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	   job;
 	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-        if (job->state->values[0].integer == IPP_JOB_PROCESSING)
+        if (job->state_value == IPP_JOB_PROCESSING)
 	  break;
 
      /*
@@ -2005,8 +2005,7 @@ process_children(void)
     for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	 job;
 	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-      if (job->state != NULL &&
-          job->state->values[0].integer == IPP_JOB_PROCESSING)
+      if (job->state_value == IPP_JOB_PROCESSING)
       {
 	for (i = 0; job->filters[i]; i ++)
           if (job->filters[i] == pid)
@@ -2245,7 +2244,7 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
     for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	 job;
 	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-      if (job->state->values[0].integer <= IPP_JOB_PROCESSING)
+      if (job->state_value <= IPP_JOB_PROCESSING)
       {
 	timeout = now + 10;
 	why     = "process active jobs";

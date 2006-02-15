@@ -2203,6 +2203,7 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
     */
 
     job->state->values[0].integer = IPP_JOB_PENDING;
+    job->state_value              = IPP_JOB_PENDING;
 
     cupsdSaveJob(job);
   }
