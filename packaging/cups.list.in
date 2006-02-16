@@ -413,10 +413,10 @@ d 0755 root sys $AMANDIR/man$MAN8DIR -
 d 0755 root sys $MANDIR -
 d 0755 root sys $MANDIR/man1 -
 d 0755 root sys $MANDIR/man5 -
+d 0755 root sys $MANDIR/man7 -
 
-f 0644 root sys $MANDIR/man1/backend.$MAN1EXT man/backend.$MAN1EXT
+f 0644 root sys $MANDIR/man1/cancel.$MAN1EXT man/cancel.$MAN1EXT
 f 0644 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.$MAN1EXT
-f 0644 root sys $MANDIR/man1/filter.$MAN1EXT man/filter.$MAN1EXT
 f 0644 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.$MAN1EXT
 f 0644 root sys $MANDIR/man1/lppasswd.$MAN1EXT man/lppasswd.$MAN1EXT
 f 0644 root sys $MANDIR/man1/lpq.$MAN1EXT man/lpq.$MAN1EXT
@@ -424,13 +424,15 @@ f 0644 root sys $MANDIR/man1/lprm.$MAN1EXT man/lprm.$MAN1EXT
 f 0644 root sys $MANDIR/man1/lpr.$MAN1EXT man/lpr.$MAN1EXT
 f 0644 root sys $MANDIR/man1/lpstat.$MAN1EXT man/lpstat.$MAN1EXT
 f 0644 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.$MAN1EXT
-l 0644 root sys $MANDIR/man1/cancel.$MAN1EXT lp.$MAN1EXT
 
 f 0644 root sys $MANDIR/man5/classes.conf.$MAN5EXT man/classes.conf.$MAN5EXT
 f 0644 root sys $MANDIR/man5/cupsd.conf.$MAN5EXT man/cupsd.conf.$MAN5EXT
 f 0644 root sys $MANDIR/man5/mime.convs.$MAN5EXT man/mime.convs.$MAN5EXT
 f 0644 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.$MAN5EXT
 f 0644 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.$MAN5EXT
+
+f 0644 root sys $MANDIR/man7/backend.$MAN7EXT man/backend.$MAN7EXT
+f 0644 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
 
 f 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT man/accept.$MAN8EXT
 l 0644 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.$MAN8EXT
