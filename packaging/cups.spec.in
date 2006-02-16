@@ -24,7 +24,7 @@
 #         WWW: http://www.cups.org
 #
 
-Summary: Common Unix Printing System
+Summary: Common UNIX Printing System
 Name: cups
 Version: @CUPS_VERSION@
 Release: 0
@@ -45,19 +45,24 @@ Obsoletes: lpd, lpr, LPRng
 Provides: lpd, lpr, LPRng
 
 %package devel
-Summary: Common Unix Printing System - development environment
+Summary: Common UNIX Printing System - development environment
 Group: Development/Libraries
 Requires: %{name}-libs = %{epoch}:%{version}
 
 %package libs
-Summary: Common Unix Printing System - shared libraries
+Summary: Common UNIX Printing System - shared libraries
 Group: System Environment/Libraries
 Provides: libcups1
 
 %package lpd
-Summary: Common Unix Printing System - LPD support
+Summary: Common UNIX Printing System - LPD support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version} xinetd
+
+%package ja
+Summary: Common UNIX Printing System - Japanese support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
 
 %description
 The Common UNIX Printing System provides a portable printing layer for 
@@ -77,6 +82,10 @@ UNIX® operating systems. This package contains the CUPS shared libraries.
 %description lpd
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides LPD client support.
+
+%description ja
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Japanese support.
 
 %prep
 %setup
@@ -200,8 +209,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/whatsnew.html
 %dir /usr/share/doc/cups/images
 /usr/share/doc/cups/images/*
-%dir /usr/share/locale
-/usr/share/locale/*
+/usr/share/locale/fr/cups_fr.po
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
@@ -266,6 +274,15 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/daemon/cups-lpd
 %dir /usr/share/man/man8
 /usr/share/man/man8/cups-lpd.8.gz
+
+%files ja
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/ja
+%dir /usr/share/doc/cups/ja/images
+/usr/share/doc/cups/ja/images/*
+%dir /usr/share/cups/templates/ja
+/usr/share/cups/templates/ja/*
+/usr/share/locale/ja/cups_ja.po
 
 #
 # End of "$Id$".

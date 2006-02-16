@@ -61,7 +61,7 @@ install:	all
 	$(INSTALL_DIR) -m 755 $(LOCALEDIR)
 	for loc in $(LOCALES) ; do \
 		$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
-		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc ; \
+		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
 	done
 
 

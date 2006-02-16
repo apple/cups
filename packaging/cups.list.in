@@ -97,6 +97,9 @@
 %provides cups-lpd 1:@CUPS_VERSION@
 %format all
 
+%subpackage ja
+%description Common UNIX Printing System - Japanese support
+
 %subpackage
 
 
@@ -289,7 +292,11 @@ d 0755 root sys $STATEDIR -
 d 0750 root sys $STATEDIR/certs -
 
 # Data files
-f 0644 root sys $LOCALEDIR/ja/cups_ja locale/cups_ja.po
+f 0644 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
+
+%subpackage ja
+f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
+%subpackage
 
 d 0755 root sys $DATADIR -
 
@@ -302,6 +309,7 @@ f 0644 root sys $DATADIR/banners/topsecret data/topsecret
 f 0644 root sys $DATADIR/banners/unclassified data/unclassified
 
 d 0755 root sys $DATADIR/charsets -
+f 0644 root sys $DATADIR/charsets data/*.txt
 f 0644 root sys $DATADIR/charsets/windows-874 data/windows-874
 f 0644 root sys $DATADIR/charsets/windows-1250 data/windows-1250
 f 0644 root sys $DATADIR/charsets/windows-1251 data/windows-1251
@@ -341,6 +349,12 @@ f 0644 root sys $DATADIR/model ppd/*.ppd
 
 d 0755 root sys $DATADIR/templates -
 c 0644 root sys $DATADIR/templates templates/*.tmpl
+
+# Japanese template files
+%subpackage ja
+d 0755 root sys $DATADIR/templates/ja
+f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
+%subpackage
 
 # Config files
 d 0755 root sys $SERVERROOT -
@@ -384,6 +398,14 @@ f 0644 root sys $DOCDIR/help doc/*-reference.html
 d 0755 root sys $DOCDIR/images -
 f 0644 root sys $DOCDIR/images doc/images/*.gif
 f 0644 root sys $DOCDIR/robots.txt doc/robots.txt
+
+# Japanese documentation files
+%subpackage ja
+d 0755 root sys $DOCDIR/ja
+f 0644 root sys $DOCDIR/ja doc/ja/*.html
+d 0755 root sys $DOCDIR/ja/images -
+f 0644 root sys $DOCDIR/ja/images doc/ja/images/*.gif
+%subpackage
 
 # Man pages
 d 0755 root sys $AMANDIR -

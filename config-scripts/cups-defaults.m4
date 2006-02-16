@@ -169,7 +169,7 @@ AC_ARG_WITH(cups-group, [  --with-cups-group       set default group for CUPS],
 AC_ARG_WITH(system-groups, [  --with-system-groups    set default system groups for CUPS],
 	CUPS_SYSTEM_GROUPS="$withval",
 	if test x$uname = xDarwin; then
-		GROUP_LIST="lp admin"
+		GROUP_LIST="admin"
 	else
 		GROUP_LIST="lpadmin sys system root"
 	fi

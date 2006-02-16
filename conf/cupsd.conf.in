@@ -11,7 +11,7 @@
 LogLevel info
 
 # Administrator user group...
-SystemGroup @CUPS_GROUP@
+SystemGroup @CUPS_SYSTEM_GROUPS@
 
 # Only listen for connections from the local machine.
 Listen localhost:@DEFAULT_IPP_PORT@

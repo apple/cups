@@ -44,7 +44,6 @@ WEBBUTTONS	=	\
 			images/delete-printer.gif \
 			images/edit-configuration-file.gif \
 			images/export-samba.gif \
-			images/happy.gif \
 			images/help.gif \
 			images/hold-job.gif \
 			images/manage-classes.gif \
@@ -175,12 +174,12 @@ install:	all
 		$(INSTALL_MAN) $$file $(DOCDIR)/help; \
 	done
 	$(INSTALL_DIR) -m 755 $(DOCDIR)/images
-	for file in $(WEBIMAGES); do \
+	for file in $(WEBIMAGES) $(WEBBUTTONS); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
 	done
 	for lang in $(LANGUAGES); do \
 		$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
-		for file in $(WEBIMAGES); do \
+		for file in $(WEBBUTTONS); do \
 			$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
 		done \
 	done
