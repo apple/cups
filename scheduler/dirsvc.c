@@ -3,7 +3,7 @@
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -174,7 +174,21 @@ cupsdLoadRemoteCache(void)
         cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                "cupsdLoadRemoteCache: Loading printer %s...", value);
 
-        p = cupsdAddPrinter(value);
+        if ((p = cupsdFindDest(value)) != NULL)
+	{
+	  if (p->type & CUPS_PRINTER_CLASS)
+	  {
+	    cupsdLogMessage(CUPSD_LOG_WARN,
+	                    "Cached remote printer \"%s\" conflicts with "
+			    "existing class!",
+	                    value);
+	    p = NULL;
+	    continue;
+	  }
+	}
+	else
+          p = cupsdAddPrinter(value);
+
 	p->accepting   = 1;
 	p->state       = IPP_PRINTER_IDLE;
 	p->type        |= CUPS_PRINTER_REMOTE;
@@ -210,7 +224,11 @@ cupsdLoadRemoteCache(void)
         cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                "cupsdLoadRemoteCache: Loading class %s...", value);
 
-        p = cupsdAddClass(value);
+        if ((p = cupsdFindDest(value)) != NULL)
+	  p->type = CUPS_PRINTER_CLASS;
+	else
+          p = cupsdAddClass(value);
+
 	p->accepting   = 1;
 	p->state       = IPP_PRINTER_IDLE;
 	p->type        |= CUPS_PRINTER_REMOTE;
