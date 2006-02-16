@@ -150,6 +150,8 @@ $STATEDIR=@CUPS_STATEDIR@
 
 $CUPS_USER=@CUPS_USER@
 $CUPS_GROUP=@CUPS_GROUP@
+$CUPS_PRIMARY_SYSTEM_GROUP=@CUPS_PRIMARY_SYSTEM_GROUP@
+$CUPS_PERM=0@CUPS_CONFIG_FILE_PERM@
 
 $MAN1EXT=@MAN1EXT@
 $MAN5EXT=@MAN5EXT@
@@ -284,12 +286,12 @@ l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
 
 # Directories
 d 0755 root sys $LOGDIR -
-d 0750 root sys $REQUESTS -
-d 0750 root sys $REQUESTS/tmp -
-d 0755 root sys $CACHEDIR -
-d 0755 root sys $CACHEDIR/ppd -
-d 0755 root sys $STATEDIR -
-d 0750 root sys $STATEDIR/certs -
+d 0710 root $CUPS_GROUP $REQUESTS -
+d 1770 root $CUPS_GROUP $REQUESTS/tmp -
+d 0775 root $CUPS_GROUP $CACHEDIR -
+#d 0755 root $CUPS_GROUP $CACHEDIR/ppd -
+d 0755 root $CUPS_GROUP $STATEDIR -
+d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 
 # Data files
 f 0644 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
@@ -358,11 +360,12 @@ f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
 
 # Config files
 d 0755 root sys $SERVERROOT -
-d 0755 root sys $SERVERROOT/interfaces -
-d 0755 root sys $SERVERROOT/ppd -
-c 0640 root sys $SERVERROOT conf/*.conf
-c 0640 root sys $SERVERROOT/mime.convs conf/mime.convs
-c 0640 root sys $SERVERROOT/mime.types conf/mime.types
+d 0755 root $CUPS_GROUP $SERVERROOT/interfaces -
+d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT conf/*.conf
+f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
+f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/mime.convs conf/mime.convs
+f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/mime.types conf/mime.types
 
 %if PAMDIR
 d 0755 root sys $PAMDIR -

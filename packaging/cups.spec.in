@@ -241,9 +241,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir /var/cache/cups
 %dir /var/log/cups
 %dir /var/run/cups
-%attr(0711,lp,root) %dir /var/run/cups/certs
-%attr(0710,lp,root) %dir /var/spool/cups
-%attr(1770,lp,root) %dir /var/spool/cups/tmp
+%attr(0711,lp,sys) %dir /var/run/cups/certs
+%attr(0710,lp,sys) %dir /var/spool/cups
+%attr(1770,lp,sys) %dir /var/spool/cups/tmp
 
 %files devel
 %defattr(-,root,root)

@@ -120,6 +120,7 @@ install:	all
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/driver
 	echo Creating $(SERVERROOT)...
 	$(INSTALL_DIR) -m 755 $(SERVERROOT)
+	-chgrp $(CUPS_GROUP) $(SERVERROOT)
 	echo Creating $(SERVERROOT)/interfaces...
 	$(INSTALL_DIR) -m 755 $(SERVERROOT)/interfaces
 	-chgrp $(CUPS_GROUP) $(SERVERROOT)/interfaces
@@ -129,7 +130,8 @@ install:	all
 	echo Creating $(STATEDIR)...
 	$(INSTALL_DIR) -m 755 $(STATEDIR)
 	echo Creating $(STATEDIR)/certs...
-	$(INSTALL_DIR) -m 711 $(STATEDIR)/certs
+	$(INSTALL_DIR) -m 511 $(STATEDIR)/certs
+	-chgrp $(CUPS_PRIMARY_SYSTEM_GROUP) $(STATEDIR)/certs
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) -m 755 $(LOGDIR)
 	echo Creating $(REQUESTS)...
@@ -143,6 +145,7 @@ install:	all
 	-chgrp $(CUPS_GROUP) $(CACHEDIR)
 #	echo Creating $(CACHEDIR)/ppd...
 #	$(INSTALL_DIR) -m 755 $(CACHEDIR)/ppd
+#	-chgrp $(CUPS_GROUP) $(CACHEDIR)/ppd
 
 
 #

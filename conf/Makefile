@@ -55,16 +55,20 @@ install:	all
 	for file in $(KEEP); do \
 		if test -r $(SERVERROOT)/$$file ; then \
 			$(INSTALL_CONFIG) $$file $(SERVERROOT)/$$file.N ; \
+			chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file.N; \
 		else \
 			$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
+			chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file; \
 		fi ; \
 	done
 	$(INSTALL_CONFIG) cupsd.conf $(SERVERROOT)/cupsd.conf.default
+	-chgrp $(CUPS_GROUP) $(SERVERROOT)/cupsd.conf.default
 	for file in $(REPLACE); do \
 		if test -r $(SERVERROOT)/$$file ; then \
 			$(MV) $(SERVERROOT)/$$file $(SERVERROOT)/$$file.O ; \
 		fi ; \
 		$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
+		chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file; \
 	done
 	-if test x$(PAMDIR) != x$(BUILDROOT); then \
 		$(INSTALL_DIR) -m 755 $(PAMDIR); \
