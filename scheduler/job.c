@@ -697,7 +697,7 @@ cupsdGetPrinterJobCount(
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs), count = 0;
        job;
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-    if (!strcasecmp(job->dest, dest))
+    if (job->dest && !strcasecmp(job->dest, dest))
       count ++;
 
   return (count);
