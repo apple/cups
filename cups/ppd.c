@@ -34,17 +34,18 @@
  *
  * Contents:
  *
- *   _ppd_attr_compare()    - Compare two attributes.
  *   ppdClose()             - Free all memory used by the PPD file.
  *   ppdErrorString()       - Returns the text assocated with a status.
  *   ppdLastError()         - Return the status from the last ppdOpen*().
  *   ppdOpen()              - Read a PPD file into memory.
+ *   ppdOpen2()             - Read a PPD file into memory.
  *   ppdOpenFd()            - Read a PPD file into memory.
  *   ppdOpenFile()          - Read a PPD file into memory.
  *   ppdSetConformance()    - Set the conformance level for PPD files.
  *   ppd_add_attr()         - Add an attribute to the PPD data.
  *   ppd_add_choice()       - Add a choice to an option.
  *   ppd_add_size()         - Add a page size.
+ *   ppd_compare_attrs()    - Compare two attributes.
  *   ppd_compare_coptions() - Compare two custom options.
  *   ppd_compare_cparams()  - Compare two custom parameters.
  *   ppd_compare_options()  - Compare two options.
@@ -97,7 +98,9 @@ static ppd_attr_t	*ppd_add_attr(ppd_file_t *ppd, const char *name,
 				      const char *value);
 static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
 static ppd_size_t	*ppd_add_size(ppd_file_t *ppd, const char *name);
-static int		ppd_compare_coptions(ppd_coption_t *a, ppd_coption_t *b);
+static int		ppd_compare_attrs(ppd_attr_t *a, ppd_attr_t *b);
+static int		ppd_compare_coptions(ppd_coption_t *a,
+			                     ppd_coption_t *b);
 static int		ppd_compare_cparams(ppd_cparam_t *a, ppd_cparam_t *b);
 static int		ppd_compare_options(ppd_option_t *a, ppd_option_t *b);
 static int		ppd_decode(char *string);
@@ -113,26 +116,6 @@ static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
 static int		ppd_read(cups_file_t *fp, char *keyword, char *option,
 			         char *text, char **string, int ignoreblank,
 				 _cups_globals_t *cg);
-
-
-/*
- * '_ppd_attr_compare()' - Compare two attributes.
- */
-
-int					/* O - Result of comparison */
-_ppd_attr_compare(ppd_attr_t **a,	/* I - First attribute */
-                  ppd_attr_t **b)	/* I - Second attribute */
-{
-  int	ret;				/* Result of comparison */
-
-
-  if ((ret = strcasecmp((*a)->name, (*b)->name)) != 0)
-    return (ret);
-  else if ((*a)->spec[0] && (*b)->spec[0])
-    return (strcasecmp((*a)->spec, (*b)->spec));
-  else
-    return (0);
-}
 
 
 /*
@@ -442,6 +425,16 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 					/* Global data */
   static const char * const ui_keywords[] =
 			{
+#ifdef CUPS_USE_FULL_UI_KEYWORDS_LIST
+ /*
+  * Adobe defines some 41 keywords as "UI", meaning that they are
+  * user interface elements and that they should be treated as such
+  * even if the PPD creator doesn't use Open/CloseUI around them.
+  *
+  * Since this can cause previously invisible options to appear and
+  * confuse users, the default is to only treat the PageSize and
+  * PageRegion keywords this way.
+  */
 			  /* Boolean keywords */
 			  "BlackSubstitution",
 			  "Booklet",
@@ -486,6 +479,10 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 			  "StapleWhen",
 			  "StapleX",
 			  "StapleY"
+#else /* !CUPS_USE_FULL_UI_KEYWORDS_LIST */
+			  "PageRegion",
+			  "PageSize"
+#endif /* CUPS_USE_FULL_UI_KEYWORDS_LIST */
 			};
 
 
@@ -651,17 +648,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
         if (!group)
 	{
-          if (strcmp(keyword, "Collate") && strcmp(keyword, "Duplex") &&
-              strcmp(keyword, "InputSlot") && strcmp(keyword, "ManualFeed") &&
-              strcmp(keyword, "MediaType") && strcmp(keyword, "MediaColor") &&
-              strcmp(keyword, "MediaWeight") && strcmp(keyword, "OutputBin") &&
-              strcmp(keyword, "OutputMode") && strcmp(keyword, "OutputOrder") &&
-	      strcmp(keyword, "PageSize") && strcmp(keyword, "PageRegion"))
-	    group = ppd_get_group(ppd, "Extra", _("Extra"), cg);
-	  else
-	    group = ppd_get_group(ppd, "General", _("General"), cg);
-
-          if (group == NULL)
+          if ((group = ppd_get_group(ppd, "General", _("General"), cg)) == NULL)
 	    goto error;
 
           DEBUG_printf(("Adding to group %s...\n", group->text));
@@ -1158,17 +1145,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         option = ppd_get_option(subgroup, name);
       else if (group == NULL)
       {
-        if (strcmp(name, "Collate") && strcmp(name, "Duplex") &&
-            strcmp(name, "InputSlot") && strcmp(name, "ManualFeed") &&
-            strcmp(name, "MediaType") && strcmp(name, "MediaColor") &&
-            strcmp(name, "MediaWeight") && strcmp(name, "OutputBin") &&
-            strcmp(name, "OutputMode") && strcmp(name, "OutputOrder") &&
-	    strcmp(name, "PageSize") && strcmp(name, "PageRegion"))
-	  group = ppd_get_group(ppd, "Extra", _("Extra"), cg);
-	else
-	  group = ppd_get_group(ppd, "General", _("General"), cg);
-
-        if (group == NULL)
+	if ((group = ppd_get_group(ppd, "General", _("General"), cg)) == NULL)
 	  goto error;
 
         DEBUG_printf(("Adding to group %s...\n", group->text));
@@ -1728,14 +1705,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   }
 
  /*
-  * Sort the attributes...
-  */
-
-  if (ppd->num_attrs > 1)
-    qsort(ppd->attrs, ppd->num_attrs, sizeof(ppd_attr_t *),
-          (int (*)(const void *, const void *))_ppd_attr_compare);
-
- /*
   * Return the PPD file structure...
   */
 
@@ -1903,6 +1872,14 @@ ppd_add_attr(ppd_file_t *ppd,		/* I - PPD file data */
     return (NULL);
 
  /*
+  * Create the array as needed...
+  */
+
+  if (!ppd->sorted_attrs)
+    ppd->sorted_attrs = cupsArrayNew((cups_array_func_t)ppd_compare_attrs,
+                                     NULL);
+
+ /*
   * Allocate memory for the new attribute...
   */
 
@@ -1932,6 +1909,12 @@ ppd_add_attr(ppd_file_t *ppd,		/* I - PPD file data */
   strlcpy(temp->spec, spec, sizeof(temp->spec));
   strlcpy(temp->text, text, sizeof(temp->text));
   temp->value = (char *)value;
+
+ /*
+  * Add the attribute to the sorted array...
+  */
+
+  cupsArrayAdd(ppd->sorted_attrs, temp);
 
  /*
   * Return the attribute...
@@ -1999,6 +1982,26 @@ ppd_add_size(ppd_file_t *ppd,		/* I - PPD file */
   strlcpy(size->name, name, sizeof(size->name));
 
   return (size);
+}
+
+
+/*
+ * 'ppd_compare_attrs()' - Compare two attributes.
+ */
+
+static int				/* O - Result of comparison */
+ppd_compare_attrs(ppd_attr_t *a,	/* I - First attribute */
+                  ppd_attr_t *b)	/* I - Second attribute */
+{
+  int	ret;				/* Result of comparison */
+
+
+  if ((ret = strcasecmp(a->name, b->name)) != 0)
+    return (ret);
+  else if (a->spec[0] && b->spec[0])
+    return (strcasecmp(a->spec, b->spec));
+  else
+    return (0);
 }
 
 
@@ -2645,6 +2648,19 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
     *lineptr = '\0';
 
     DEBUG_printf(("LINE = \"%s\"\n", line));
+
+   /*
+    * The dynamically created PPDs for older style Mac OS X
+    * drivers include a large blob of data inserted as comments
+    * at the end of the file.  As an optimization we can stop
+    * reading the PPD when we get to the start of this data.
+    */
+
+    if (!strcmp(line, "*%APLWORKSET START"))
+    {
+      free(line);
+      return (0);
+    }
 
     if (ch == EOF && lineptr == line)
     {

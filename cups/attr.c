@@ -4,7 +4,7 @@
  *   PPD model-specific attribute routines for the Common UNIX Printing System
  *   (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -39,13 +39,6 @@
 
 
 /*
- * Private function...
- */
-
-extern int	_ppd_attr_compare(ppd_attr_t **a, ppd_attr_t **b);
-
-
-/*
  * 'ppdFindAttr()' - Find the first matching attribute...
  *
  * @since CUPS 1.1.19@
@@ -56,64 +49,30 @@ ppdFindAttr(ppd_file_t *ppd,	/* I - PPD file data */
             const char *name,	/* I - Attribute name */
             const char *spec)	/* I - Specifier string or NULL */
 {
-  ppd_attr_t	key,		/* Search key */
-		*keyptr,	/* Pointer to key */
-		**match;	/* Matching attribute */
+  ppd_attr_t	key;		/* Search key */
 
 
  /*
   * Range check input...
   */
 
-  if (ppd == NULL || name == NULL || ppd->num_attrs == 0)
+  if (!ppd || !name || ppd->num_attrs == 0)
     return (NULL);
 
  /*
-  * Do a binary search for a matching attribute...
+  * Search for a matching attribute...
   */
 
   memset(&key, 0, sizeof(key));
-  strncpy(key.name, name, sizeof(key.name) - 1);
+  strlcpy(key.name, name, sizeof(key.name));
   if (spec)
-    strncpy(key.spec, spec, sizeof(key.spec) - 1);
-
-  keyptr = &key;
-
-  match = bsearch(&keyptr, ppd->attrs, ppd->num_attrs, sizeof(ppd_attr_t *),
-                  (int (*)(const void *, const void *))_ppd_attr_compare);
-
-  if (match == NULL)
-  {
-   /* 
-    * No match!
-    */
-
-    ppd->cur_attr = -1;
-    return (NULL);
-  }
-
-  if (match > ppd->attrs && spec == NULL)
-  {
-   /*
-    * Find the first attribute with the same name...
-    */
-
-    while (match > ppd->attrs)
-    {
-      if (strcmp(match[-1]->name, name) != 0)
-        break;
-
-      match --;
-    }
-  }
+    strlcpy(key.spec, spec, sizeof(key.spec));
 
  /*
-  * Save the current attribute and return its value...
+  * Return the first matching attribute, if any...
   */
 
-  ppd->cur_attr = match - ppd->attrs;
-
-  return (*match);
+  return ((ppd_attr_t *)cupsArrayFind(ppd->sorted_attrs, &key));
 }
 
 
@@ -128,46 +87,36 @@ ppdFindNextAttr(ppd_file_t *ppd,	/* I - PPD file data */
                 const char *name,	/* I - Attribute name */
 		const char *spec)	/* I - Specifier string or NULL */
 {
-  ppd_attr_t	**match;		/* Matching attribute */
+  ppd_attr_t	*attr;			/* Current attribute */
 
 
  /*
   * Range check input...
   */
 
-  if (ppd == NULL || name == NULL || ppd->num_attrs == 0 || ppd->cur_attr < 0)
+  if (!ppd || !name || ppd->num_attrs == 0 ||
+      !cupsArrayCurrent(ppd->sorted_attrs))
     return (NULL);
 
  /*
   * See if there are more attributes to return...
   */
 
-  ppd->cur_attr ++;
-
-  if (ppd->cur_attr >= ppd->num_attrs)
-  {
-   /*
-    * Nope...
-    */
-
-    ppd->cur_attr = -1;
+  if ((attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs)) == NULL)
     return (NULL);
-  }
 
  /*
   * Check the next attribute to see if it is a match...
   */
 
-  match = ppd->attrs + ppd->cur_attr;
-
-  if (strcmp((*match)->name, name) != 0 ||
-      (spec != NULL && strcmp((*match)->spec, spec) != 0))
+  if (strcasecmp(attr->name, name) || (spec && strcasecmp(attr->spec, spec)))
   {
    /*
-    * Nope...
+    * Nope, reset the current pointer to the end of the array...
     */
 
-    ppd->cur_attr = -1;
+    cupsArrayIndex(ppd->sorted_attrs, cupsArrayCount(ppd->sorted_attrs));
+
     return (NULL);
   }
   
@@ -175,7 +124,7 @@ ppdFindNextAttr(ppd_file_t *ppd,	/* I - PPD file data */
   * Return the next attribute's value...
   */
 
-  return (*match);
+  return (attr);
 }
 
 

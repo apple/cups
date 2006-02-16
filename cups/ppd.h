@@ -311,13 +311,14 @@ typedef struct ppd_file_s		/**** PPD File ****/
   /**** New in CUPS 1.1.19 ****/
   char		*protocols;		/* Protocols (BCP, TBCP) string @since CUPS 1.1.19@ */
   char		*pcfilename;		/* PCFileName string @since CUPS 1.1.19@ */
-  int		num_attrs;		/* Number of attributes @since CUPS 1.1.19@ */
-  int		cur_attr;		/* Current attribute @since CUPS 1.1.19@ */
-  ppd_attr_t	**attrs;		/* Attributes @since CUPS 1.1.19@ */
+  int		num_attrs;		/* Number of attributes @since CUPS 1.1.19@ @private@ */
+  int		cur_attr;		/* Current attribute @since CUPS 1.1.19@ @private@ */
+  ppd_attr_t	**attrs;		/* Attributes @since CUPS 1.1.19@ @private@ */
 
   /**** New in CUPS 1.2 ****/
-  cups_array_t	*options;		/* Option lookup array @since CUPS 1.2@ */
-  cups_array_t	*coptions;		/* Custom options array @since CUPS 1.2@ */
+  cups_array_t	*sorted_attrs;		/* Attribute lookup array @since CUPS 1.2@ @private@ */
+  cups_array_t	*options;		/* Option lookup array @since CUPS 1.2@ @private@ */
+  cups_array_t	*coptions;		/* Custom options array @since CUPS 1.2@ @private@ */
 } ppd_file_t;
 
 
@@ -373,7 +374,9 @@ extern ppd_coption_t	*ppdFindCustomOption(ppd_file_t *ppd,
 extern ppd_cparam_t	*ppdFindCustomParam(ppd_coption_t *opt,
 			                    const char *name);
 extern ppd_cparam_t	*ppdFirstCustomParam(ppd_coption_t *opt);
+extern ppd_option_t	*ppdFirstOption(ppd_file_t *ppd);
 extern ppd_cparam_t	*ppdNextCustomParam(ppd_coption_t *opt);
+extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd);
 extern int		ppdLocalize(ppd_file_t *ppd);
 extern ppd_file_t	*ppdOpen2(cups_file_t *fp);
 

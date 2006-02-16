@@ -42,7 +42,7 @@
  *   cupsArrayRemove()  - Remove an element from the array.
  *   cupsArrayRestore() - Reset the current element to the last cupsArraySave.
  *   cupsArraySave()    - Mark the current element for a later cupsArrayRestore.
- *   cups_find()        - Find an element in the array...
+ *   cups_array_find()  - Find an element in the array...
  */
 
 /*
@@ -78,6 +78,7 @@ struct _cups_array_s			/**** CUPS array structure ****/
 			alloc_elements,	/* Allocated array elements */
 			current,	/* Current element */
 			insert,		/* Last inserted element */
+			unique,		/* Are all elements unique? */
 			num_saved,	/* Number of saved elements */
 			saved[_CUPS_MAXSAVE];
 					/* Saved elements */
@@ -91,22 +92,22 @@ struct _cups_array_s			/**** CUPS array structure ****/
  * Local functions...
  */
 
-static int	cups_find(cups_array_t *a, void *e, int prev, int *rdiff);
+static int	cups_array_add(cups_array_t *a, void *e, int insert);
+static int	cups_array_find(cups_array_t *a, void *e, int prev, int *rdiff);
 
 
 /*
  * 'cupsArrayAdd()' - Add an element to the array.
+ *
+ * When adding an element to a sorted array, non-unique elements are
+ * appended at the end of the run.  For unsorted arrays, the element
+ * is inserted at the end of the array.
  */
 
 int					/* O - 1 on success, 0 on failure */
 cupsArrayAdd(cups_array_t *a,		/* I - Array */
              void         *e)		/* I - Element */
 {
-  int	i,				/* Looping var */
-	current,			/* Current element */
-	diff;				/* Comparison with current element */
-
-
   DEBUG_printf(("cupsArrayAdd(a=%p, e=%p)\n", a, e));
 
  /*
@@ -120,112 +121,10 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
   }
 
  /*
-  * Verify we have room for the new element...
+  * Append the element...
   */
 
-  if (a->num_elements >= a->alloc_elements)
-  {
-   /*
-    * Allocate additional elements; start with 16 elements, then
-    * double the size until 1024 elements, then add 1024 elements
-    * thereafter...
-    */
-
-    void	**temp;			/* New array elements */
-    int		count;			/* New allocation count */
-
-
-    if (a->alloc_elements == 0)
-    {
-      count = 16;
-      temp  = malloc(count * sizeof(void *));
-    }
-    else
-    {
-      if (a->alloc_elements < 1024)
-        count = a->alloc_elements * 2;
-      else
-        count = a->alloc_elements + 1024;
-
-      temp = realloc(a->elements, count * sizeof(void *));
-    }
-
-    DEBUG_printf(("cupsArrayAdd: count=%d\n", count));
-
-    if (!temp)
-    {
-      DEBUG_puts("cupsAddAdd: allocation failed, returning 0");
-      return (0);
-    }
-
-    a->alloc_elements = count;
-    a->elements       = temp;
-  }
-
- /*
-  * Find the insertion point for the new element; if there is no
-  * compare function or elements, just add it to the end...
-  */
-
-  if (!a->num_elements || !a->compare)
-  {
-   /*
-    * Append to the end...
-    */
-
-    current = a->num_elements;
-  }
-  else
-  {
-   /*
-    * Do a binary search for the insertion point...
-    */
-
-    current = cups_find(a, e, a->insert, &diff);
-
-    if (diff > 0)
-      current ++;
-  }
-
- /*
-  * Insert or append the element...
-  */
-
-  if (current < a->num_elements)
-  {
-   /*
-    * Shift other elements to the right...
-    */
-
-    memmove(a->elements + current + 1, a->elements + current,
-            (a->num_elements - current) * sizeof(void *));
-
-    if (a->current >= current)
-      a->current ++;
-
-    for (i = 0; i < a->num_saved; i ++)
-      if (a->saved[i] >= current)
-	a->saved[i] ++;
-
-    DEBUG_printf(("cupsArrayAdd: insert element at index %d...\n", current));
-  }
-#ifdef DEBUG
-  else
-    printf("cupsArrayAdd: append element at %d...\n", current);
-#endif /* DEBUG */
-
-  a->elements[current] = e;
-  a->num_elements ++;
-  a->insert = current;
-
-#ifdef DEBUG
-  for (current = 0; current < a->num_elements; current ++)
-    printf("cupsArrayAdd: a->elements[%d]=%p\n", current, a->elements[current]);
-#endif /* DEBUG */
-
-  DEBUG_puts("cupsArrayAdd: returning 1");
-
-  return (1);
+  return (cups_array_add(a, e, 0));
 }
 
 
@@ -251,6 +150,7 @@ cupsArrayClear(cups_array_t *a)		/* I - Array */
   a->num_elements = 0;
   a->current      = -1;
   a->insert       = -1;
+  a->unique       = 1;
   a->num_saved    = 0;
 }
 
@@ -357,6 +257,7 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
   da->data      = a->data;
   da->current   = a->current;
   da->insert    = a->insert;
+  da->unique    = a->unique;
   da->num_saved = a->num_saved;
 
   memcpy(da->saved, a->saved, sizeof(a->saved));
@@ -421,12 +322,24 @@ cupsArrayFind(cups_array_t *a,		/* I - Array */
   * Yes, look for a match...
   */
 
-  current = cups_find(a, e, a->current, &diff);
+  current = cups_array_find(a, e, a->current, &diff);
   if (!diff)
   {
    /*
-    * Found a match...
+    * Found a match!  If the array does not contain unique values, find
+    * the first element that is the same...
     */
+
+    if (!a->unique && a->compare)
+    {
+     /*
+      * The array is not unique, find the first match...
+      */
+
+      while (current > 0 && !(*(a->compare))(e, a->elements[current - 1],
+                                             a->data))
+        current --;
+    }
 
     a->current = current;
 
@@ -489,18 +402,15 @@ cupsArrayIndex(cups_array_t *a,		/* I - Array */
 /*
  * 'cupsArrayInsert()' - Insert an element in the array.
  *
- * When inserting an element in a sorted array, this function works
- * just like cupsArrayAdd().  For unsorted arrays, the element is
- * inserted at the beginning of the array.
+ * When inserting an element in a sorted array, non-unique elements are
+ * inserted at the beginning of the run.  For unsorted arrays, the element
+ * is inserted at the beginning of the array.
  */
 
 int					/* O - 0 on failure, 1 on success */
 cupsArrayInsert(cups_array_t *a,	/* I - Array */
 		void         *e)	/* I - Element */
 {
-  int	i;				/* Looping var */
-
-
   DEBUG_printf(("cupsArrayInsert(a=%p, e=%p)\n", a, e));
 
  /*
@@ -514,80 +424,10 @@ cupsArrayInsert(cups_array_t *a,	/* I - Array */
   }
 
  /*
-  * Inserting into a sorted array is the same as adding...
-  */
-
-  if (a->compare)
-    return (cupsArrayAdd(a, e));
-
- /*
-  * Verify we have room for the new element...
-  */
-
-  if (a->num_elements >= a->alloc_elements)
-  {
-   /*
-    * Allocate additional elements; start with 16 elements, then
-    * double the size until 1024 elements, then add 1024 elements
-    * thereafter...
-    */
-
-    void	**temp;			/* New array elements */
-    int		count;			/* New allocation count */
-
-
-    if (a->alloc_elements == 0)
-    {
-      count = 16;
-      temp  = malloc(count * sizeof(void *));
-    }
-    else
-    {
-      if (a->alloc_elements < 1024)
-        count = a->alloc_elements * 2;
-      else
-        count = a->alloc_elements + 1024;
-
-      temp = realloc(a->elements, count * sizeof(void *));
-    }
-
-    DEBUG_printf(("cupsArrayInsert: count=%d\n", count));
-
-    if (!temp)
-    {
-      DEBUG_puts("cupsAddInsert: allocation failed, returning 0");
-      return (0);
-    }
-
-    a->alloc_elements = count;
-    a->elements       = temp;
-  }
-
- /*
   * Insert the element...
   */
 
-  memmove(a->elements + 1, a->elements, a->num_elements * sizeof(void *));
-
-  if (a->current >= 0)
-    a->current ++;
-
-  for (i = 0; i < a->num_saved; i ++)
-    if (a->saved[i] >= 0)
-      a->saved[i] ++;
-
-  a->elements[0] = e;
-  a->num_elements ++;
-  a->insert = 0;
-
-#ifdef DEBUG
-  for (i = 0; i < a->num_elements; i ++)
-    printf("cupsArrayInsert: a->elements[%d]=%p\n", i, a->elements[i]);
-#endif /* DEBUG */
-
-  DEBUG_puts("cupsArrayInsert: returning 1");
-
-  return (1);
+  return (cups_array_add(a, e, 1));
 }
 
 
@@ -639,6 +479,7 @@ cupsArrayNew(cups_array_func_t f,	/* I - Comparison function */
   a->current   = -1;
   a->insert    = -1;
   a->num_saved = 0;
+  a->unique    = 1;
 
   return (a);
 }
@@ -721,7 +562,7 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
   if (!a->num_elements)
     return (0);
 
-  current = cups_find(a, e, a->current, &diff);
+  current = cups_array_find(a, e, a->current, &diff);
   if (diff)
     return (0);
 
@@ -744,6 +585,9 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
   for (i = 0; i < a->num_saved; i ++)
     if (current <= a->saved[i])
       a->saved[i] --;
+
+  if (a->num_elements <= 1)
+    a->unique = 1;
 
   return (1);
 }
@@ -795,14 +639,182 @@ cupsArraySave(cups_array_t *a)		/* I - Array */
 
 
 /*
- * 'cups_find()' - Find an element in the array...
+ * 'cups_array_add()' - Insert or append an element to the array...
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+cups_array_add(cups_array_t *a,		/* I - Array */
+               void         *e,		/* I - Element to add */
+	       int          insert)	/* I - 1 = insert, 0 = append */
+{
+  int	i,				/* Looping var */
+	current,			/* Current element */
+	diff;				/* Comparison with current element */
+
+
+  DEBUG_printf(("cups_array_add(a=%p, e=%p, insert=%d)\n", a, e, insert));
+
+ /*
+  * Verify we have room for the new element...
+  */
+
+  if (a->num_elements >= a->alloc_elements)
+  {
+   /*
+    * Allocate additional elements; start with 16 elements, then
+    * double the size until 1024 elements, then add 1024 elements
+    * thereafter...
+    */
+
+    void	**temp;			/* New array elements */
+    int		count;			/* New allocation count */
+
+
+    if (a->alloc_elements == 0)
+    {
+      count = 16;
+      temp  = malloc(count * sizeof(void *));
+    }
+    else
+    {
+      if (a->alloc_elements < 1024)
+        count = a->alloc_elements * 2;
+      else
+        count = a->alloc_elements + 1024;
+
+      temp = realloc(a->elements, count * sizeof(void *));
+    }
+
+    DEBUG_printf(("cups_array_add: count=%d\n", count));
+
+    if (!temp)
+    {
+      DEBUG_puts("cupsAddAdd: allocation failed, returning 0");
+      return (0);
+    }
+
+    a->alloc_elements = count;
+    a->elements       = temp;
+  }
+
+ /*
+  * Find the insertion point for the new element; if there is no
+  * compare function or elements, just add it to the beginning or end...
+  */
+
+  if (!a->num_elements || !a->compare)
+  {
+   /*
+    * No elements or comparison function, insert/append as needed...
+    */
+
+    if (insert)
+      current = 0;			/* Insert at beginning */
+    else
+      current = a->num_elements;	/* Append to the end */
+  }
+  else
+  {
+   /*
+    * Do a binary search for the insertion point...
+    */
+
+    current = cups_array_find(a, e, a->insert, &diff);
+
+    if (diff > 0)
+    {
+     /*
+      * Insert after the current element...
+      */
+
+      current ++;
+    }
+    else if (!diff)
+    {
+     /*
+      * Compared equal, make sure we add to the begining or end of
+      * the current run of equal elements...
+      */
+
+      a->unique = 0;
+
+      if (insert)
+      {
+       /*
+        * Insert at beginning of run...
+	*/
+
+	while (current > 0 && !(*(a->compare))(e, a->elements[current - 1],
+                                               a->data))
+          current --;
+      }
+      else
+      {
+       /*
+        * Append at end of run...
+	*/
+
+	do
+	{
+          current ++;
+	}
+	while (current < a->num_elements &&
+               !(*(a->compare))(e, a->elements[current], a->data));
+      }
+    }
+  }
+
+ /*
+  * Insert or append the element...
+  */
+
+  if (current < a->num_elements)
+  {
+   /*
+    * Shift other elements to the right...
+    */
+
+    memmove(a->elements + current + 1, a->elements + current,
+            (a->num_elements - current) * sizeof(void *));
+
+    if (a->current >= current)
+      a->current ++;
+
+    for (i = 0; i < a->num_saved; i ++)
+      if (a->saved[i] >= current)
+	a->saved[i] ++;
+
+    DEBUG_printf(("cups_array_add: insert element at index %d...\n", current));
+  }
+#ifdef DEBUG
+  else
+    printf("cups_array_add: append element at %d...\n", current);
+#endif /* DEBUG */
+
+  a->elements[current] = e;
+  a->num_elements ++;
+  a->insert = current;
+
+#ifdef DEBUG
+  for (current = 0; current < a->num_elements; current ++)
+    printf("cups_array_add: a->elements[%d]=%p\n", current, a->elements[current]);
+#endif /* DEBUG */
+
+  DEBUG_puts("cups_array_add: returning 1");
+
+  return (1);
+}
+
+
+/*
+ * 'cups_array_find()' - Find an element in the array...
  */
 
 static int				/* O - Index of match */
-cups_find(cups_array_t *a,		/* I - Array */
-          void         *e,		/* I - Element */
-	  int          prev,		/* I - Previous index */
-	  int          *rdiff)		/* O - Difference of match */
+cups_array_find(cups_array_t *a,	/* I - Array */
+        	void         *e,	/* I - Element */
+		int          prev,	/* I - Previous index */
+		int          *rdiff)	/* O - Difference of match */
 {
   int	left,				/* Left side of search */
 	right,				/* Right side of search */
@@ -810,7 +822,7 @@ cups_find(cups_array_t *a,		/* I - Array */
 	diff;				/* Comparison with current element */
 
 
-  DEBUG_printf(("cups_find(a=%p, e=%p, prev=%d, rdiff=%p)\n", a, e, prev,
+  DEBUG_printf(("cups_array_find(a=%p, e=%p, prev=%d, rdiff=%p)\n", a, e, prev,
                 rdiff));
 
   if (a->compare)
@@ -819,7 +831,7 @@ cups_find(cups_array_t *a,		/* I - Array */
     * Do a binary search for the element...
     */
 
-    DEBUG_puts("cups_find: binary search");
+    DEBUG_puts("cups_array_find: binary search");
 
     if (prev >= 0 && prev < a->num_elements)
     {
@@ -835,7 +847,7 @@ cups_find(cups_array_t *a,		/* I - Array */
         * Exact or edge match, return it!
 	*/
 
-        DEBUG_printf(("cups_find: Returning %d, diff=%d\n", prev, diff));
+        DEBUG_printf(("cups_array_find: Returning %d, diff=%d\n", prev, diff));
 
 	*rdiff = diff;
 
@@ -875,7 +887,7 @@ cups_find(cups_array_t *a,		/* I - Array */
       current = (left + right) / 2;
       diff    = (*(a->compare))(e, a->elements[current], a->data);
 
-      DEBUG_printf(("cups_find: left=%d, right=%d, current=%d, diff=%d\n",
+      DEBUG_printf(("cups_array_find: left=%d, right=%d, current=%d, diff=%d\n",
                     left, right, current, diff));
 
       if (diff == 0)
@@ -908,7 +920,7 @@ cups_find(cups_array_t *a,		/* I - Array */
     * Do a linear pointer search...
     */
 
-    DEBUG_puts("cups_find: linear search");
+    DEBUG_puts("cups_array_find: linear search");
 
     diff = 0;
 
@@ -921,7 +933,7 @@ cups_find(cups_array_t *a,		/* I - Array */
   * Return the closest element and the difference...
   */
 
-  DEBUG_printf(("cups_find: Returning %d, diff=%d\n", current, diff));
+  DEBUG_printf(("cups_array_find: Returning %d, diff=%d\n", current, diff));
 
   *rdiff = diff;
 

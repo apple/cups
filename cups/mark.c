@@ -31,6 +31,8 @@
  *   ppdFindChoice()       - Return a pointer to an option choice.
  *   ppdFindMarkedChoice() - Return the marked choice for the specified option.
  *   ppdFindOption()       - Return a pointer to the specified option.
+ *   ppdFirstOption()      - Return the first option in the PPD file.
+ *   ppdNextOption()       - Return the next option in the PPD file.
  *   ppdIsMarked()         - Check to see if an option is marked...
  *   ppdMarkDefaults()     - Mark all default options in the PPD file.
  *   ppdMarkOption()       - Mark an option in a PPD file.
@@ -519,6 +521,42 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   */
 
   return (ppdConflicts(ppd));
+}
+
+
+/*
+ * 'ppdFirstOption()' - Return the first option in the PPD file.
+ *
+ * Options are returned from all groups in sorted order.
+ *
+ * @since CUPS 1.2@
+ */
+
+ppd_option_t *				/* O - First option or NULL */
+ppdFirstOption(ppd_file_t *ppd)		/* I - PPD file */
+{
+  if (!ppd)
+    return (NULL);
+  else
+    return ((ppd_option_t *)cupsArrayFirst(ppd->options));
+}
+
+
+/*
+ * 'ppdNextOption()' - Return the next option in the PPD file.
+ *
+ * Options are returned from all groups in sorted order.
+ *
+ * @since CUPS 1.2@
+ */
+
+ppd_option_t *				/* O - Next option or NULL */
+ppdNextOption(ppd_file_t *ppd)		/* I - PPD file */
+{
+  if (!ppd)
+    return (NULL);
+  else
+    return ((ppd_option_t *)cupsArrayNext(ppd->options));
 }
 
 
