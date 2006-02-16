@@ -50,3 +50,6 @@ testcgi.o: ../cups/array.h help-index.h
 testhi.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 testhi.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 testhi.o: ../cups/array.h help-index.h
+testtemplate.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+testtemplate.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+testtemplate.o: ../cups/language.h ../cups/array.h help-index.h

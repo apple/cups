@@ -34,13 +34,15 @@
  */
 
 #include "cgi-private.h"
+#include <errno.h>
 
 
 /*
  * Local functions...
  */
 
-static void	cgi_copy(FILE *out, FILE *in, int element, char term);
+static void	cgi_copy(FILE *out, FILE *in, int element, char term,
+		         int indent);
 static void	cgi_puts(const char *s, FILE *out);
 
 
@@ -56,18 +58,25 @@ cgiCopyTemplateFile(FILE       *out,	/* I - Output file */
   FILE	*in;				/* Input file */
 
 
+  fprintf(stderr, "DEBUG: cgiCopyTemplateFile(out=%p, tmpl=\"%s\")\n", out,
+          tmpl);
+
  /*
   * Open the template file...
   */
 
   if ((in = fopen(tmpl, "r")) == NULL)
+  {
+    fprintf(stderr, "ERROR: Unable to open template file \"%s\" - %s\n",
+            tmpl, strerror(errno));
     return;
+  }
 
  /*
   * Parse the file to the end...
   */
 
-  cgi_copy(out, in, 0, 0);
+  cgi_copy(out, in, 0, 0, 0);
 
  /*
   * Close the template file and return...
@@ -92,6 +101,8 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
   FILE		*in;			/* Input file */
 
 
+  fprintf(stderr, "DEBUG: cgiCopyTemplateLang(tmpl=\"%s\")\n", tmpl);
+
  /*
   * Convert the language to a locale name...
   */
@@ -111,8 +122,7 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
   else
     locale[0] = '\0';
 
-  fprintf(stderr, "DEBUG: cupsCopyTemplateLang: locale=\"%s\"...\n",
-          locale);
+  fprintf(stderr, "DEBUG: locale=\"%s\"...\n", locale);
 
  /*
   * See if we have a template file for this language...
@@ -130,18 +140,24 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
       snprintf(filename, sizeof(filename), "%s/%s", directory, tmpl);
   }
 
+  fprintf(stderr, "DEBUG: Template file is \"%s\"...\n", filename);
+
  /*
   * Open the template file...
   */
 
   if ((in = fopen(filename, "r")) == NULL)
+  {
+    fprintf(stderr, "ERROR: Unable to open template file \"%s\" - %s\n",
+            filename, strerror(errno));
     return;
+  }
 
  /*
   * Parse the file to the end...
   */
 
-  cgi_copy(stdout, in, 0, 0);
+  cgi_copy(stdout, in, 0, 0, 0);
 
  /*
   * Close the template file and return...
@@ -200,25 +216,29 @@ cgiSetServerVersion(void)
  */
 
 static void
-cgi_copy(FILE *out,		/* I - Output file */
-         FILE *in,		/* I - Input file */
-	 int  element,		/* I - Element number (0 to N) */
-	 char term)		/* I - Terminating character */
+cgi_copy(FILE *out,			/* I - Output file */
+         FILE *in,			/* I - Input file */
+	 int  element,			/* I - Element number (0 to N) */
+	 char term,			/* I - Terminating character */
+	 int  indent)			/* I - Debug info indentation */
 {
-  int		ch;		/* Character from file */
-  char		op;		/* Operation */
-  char		name[255],	/* Name of variable */
-		*nameptr,	/* Pointer into name */
-		innername[255],	/* Inner comparison name */
-		*innerptr,	/* Pointer into inner name */
-		*s;		/* String pointer */
-  const char	*value;		/* Value of variable */
-  const char	*innerval;	/* Inner value */
-  const char	*outptr;	/* Output string pointer */
-  char		outval[1024],	/* Formatted output string */
-		compare[1024];	/* Comparison string */
-  int		result;		/* Result of comparison */
+  int		ch;			/* Character from file */
+  char		op;			/* Operation */
+  char		name[255],		/* Name of variable */
+		*nameptr,		/* Pointer into name */
+		innername[255],		/* Inner comparison name */
+		*innerptr,		/* Pointer into inner name */
+		*s;			/* String pointer */
+  const char	*value;			/* Value of variable */
+  const char	*innerval;		/* Inner value */
+  const char	*outptr;		/* Output string pointer */
+  char		outval[1024],		/* Formatted output string */
+		compare[1024];		/* Comparison string */
+  int		result;			/* Result of comparison */
 
+
+  fprintf(stderr, "DEBUG: %*sStarting at file position %ld...\n", indent, "",
+          ftell(in));
 
  /*
   * Parse the file to the end...
@@ -245,6 +265,8 @@ cgi_copy(FILE *out,		/* I - Output file */
 
       if (s == name && isspace(ch & 255))
       {
+        fprintf(stderr, "DEBUG: %*sLone { at %ld...\n", indent, "", ftell(in));
+
         if (out)
 	{
           putc('{', out);
@@ -253,6 +275,10 @@ cgi_copy(FILE *out,		/* I - Output file */
 
 	continue;
       }
+
+      if (ch == '}')
+	fprintf(stderr, "DEBUG: %*s\"{%s}\" at %ld...\n", indent, "", name,
+        	ftell(in));
 
      /*
       * See if it has a value...
@@ -315,16 +341,24 @@ cgi_copy(FILE *out,		/* I - Output file */
 
 	pos = ftell(in);
 
+        fprintf(stderr, "DEBUG: %*sLooping on \"%s\" at %ld, count=%d...\n",
+	        indent, "", name + 1, pos, count);
+
         if (count > 0)
 	{
           for (i = 0; i < count; i ++)
 	  {
-	    fseek(in, pos, SEEK_SET);
-	    cgi_copy(out, in, i, '}');
+	    if (i)
+	      fseek(in, pos, SEEK_SET);
+
+	    cgi_copy(out, in, i, '}', indent + 2);
 	  }
         }
 	else
-	  cgi_copy(NULL, in, 0, '}');
+	  cgi_copy(NULL, in, 0, '}', indent + 2);
+
+        fprintf(stderr, "DEBUG: %*sFinished looping on \"%s\"...\n", indent,
+	        "", name + 1);
 
         continue;
       }
@@ -380,21 +414,22 @@ cgi_copy(FILE *out,		/* I - Output file */
       *   {name!value?true:false}    Not equal
       */
 
+      op = ch;
+
       if (ch == '?')
       {
        /*
         * Test for existance...
 	*/
 
-        result = cgiGetArray(name, element) != NULL && outptr[0];
+        result     = cgiGetArray(name, element) != NULL && outptr[0];
+	compare[0] = '\0';
       }
       else
       {
        /*
         * Compare to a string...
 	*/
-
-        op = ch;
 
 	for (s = compare; (ch = getc(in)) != EOF;)
           if (ch == '?')
@@ -451,7 +486,12 @@ cgi_copy(FILE *out,		/* I - Output file */
         *s = '\0';
 
         if (ch != '?')
+	{
+	  fprintf(stderr,
+	          "DEBUG: %*sBad terminator '%c' at file position %ld...\n",
+	          indent, "", ch, ftell(in));
 	  return;
+	}
 
        /*
         * Do the comparison...
@@ -477,14 +517,21 @@ cgi_copy(FILE *out,		/* I - Output file */
 	}
       }
 
+      fprintf(stderr,
+              "DEBUG: %*sStarting \"{%s%c%s\" at %ld, result=%d...\n",
+	      indent, "", name, op, compare, ftell(in), result);
+
       if (result)
       {
        /*
 	* Comparison true; output first part and ignore second...
 	*/
 
-	cgi_copy(out, in, element, ':');
-	cgi_copy(NULL, in, element, '}');
+        fprintf(stderr, "DEBUG: %*sOutput first part...\n", indent, "");
+	cgi_copy(out, in, element, ':', indent + 2);
+
+        fprintf(stderr, "DEBUG: %*sSkip second part...\n", indent, "");
+	cgi_copy(NULL, in, element, '}', indent + 2);
       }
       else
       {
@@ -492,9 +539,15 @@ cgi_copy(FILE *out,		/* I - Output file */
 	* Comparison false; ignore first part and output second...
 	*/
 
-	cgi_copy(NULL, in, element, ':');
-	cgi_copy(out, in, element, '}');
+        fprintf(stderr, "DEBUG: %*sSkip first part...\n", indent, "");
+	cgi_copy(NULL, in, element, ':', indent + 2);
+
+        fprintf(stderr, "DEBUG: %*sOutput second part...\n", indent, "");
+	cgi_copy(out, in, element, '}', indent + 2);
       }
+
+      fprintf(stderr, "DEBUG: %*sFinished \"{%s%c%s\", out=%p...\n", indent, "",
+              name, op, compare, out);
     }
     else if (ch == '\\')	/* Quoted char */
     {
@@ -505,6 +558,17 @@ cgi_copy(FILE *out,		/* I - Output file */
     }
     else if (out)
       putc(ch, out);
+
+  if (ch == EOF)
+    fprintf(stderr, "DEBUG: %*sReturning at file position %ld on EOF...\n",
+	    indent, "", ftell(in), ch);
+  else
+    fprintf(stderr,
+            "DEBUG: %*sReturning at file position %ld on character '%c'...\n",
+	    indent, "", ftell(in), ch);
+
+  if (ch == EOF && term)
+    fprintf(stderr, "ERROR: %*sSaw EOF, expected '%c'!\n", indent, "", term);
 
  /*
   * Flush any pending output...
