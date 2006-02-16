@@ -561,7 +561,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 
   if (ch == EOF)
     fprintf(stderr, "DEBUG: %*sReturning at file position %ld on EOF...\n",
-	    indent, "", ftell(in), ch);
+	    indent, "", ftell(in));
   else
     fprintf(stderr,
             "DEBUG: %*sReturning at file position %ld on character '%c'...\n",
