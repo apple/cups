@@ -102,11 +102,10 @@ esac
 #### OS-Independent Stuff
 
 #
-# Set the timezone, if possible...  This allows the
-# scheduler and all child processes to know the local
-# timezone when reporting dates and times to the user. 
-# If no timezone information is found, then Greenwich
-# Mean Time (GMT) will probably be used.
+# Set the timezone, if possible...  This allows the scheduler and
+# all child processes to know the local timezone when reporting
+# dates and times to the user.  If no timezone information is
+# found, then Greenwich Mean Time (GMT) will probably be used.
 #
 
 for file in /etc/TIMEZONE /etc/rc.config /etc/sysconfig/clock; do
@@ -126,6 +125,15 @@ fi
 if test "x$TZ" != x; then
 	export TZ
 fi
+
+#
+# Don't use TMPDIR environment variable from init script, as that can
+# cause cupsd to set TempDir to a user's temporary directory instead
+# of the default...
+#
+
+unset TMPDIR
+
 
 #
 # See if the CUPS server (cupsd) is running...

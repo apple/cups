@@ -1,8 +1,11 @@
-CHANGES.txt - 01/29/2006
+CHANGES.txt - 02/16/2006
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The init script now unsets the TMPDIR environment
+	  variable to prevent user temporary directories from
+	  being used by cupsd accidentally (STR #1424)
 	- Added support for launchd on MacOS X.
 	- Added support for notify_post on MacOS X.
 	- Added support for DBUS on Linux.
