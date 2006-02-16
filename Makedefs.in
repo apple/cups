@@ -33,6 +33,7 @@ CXX		=	@LIBTOOL@ @CXX@
 DSO		=	@DSO@
 HTMLDOC		=	@HTMLDOC@
 INSTALL		=	@INSTALL@
+LD		=	@LD@
 LIBTOOL		=	@LIBTOOL@
 LN		=	@LN@ -sf
 MV		=	@MV@

@@ -38,7 +38,7 @@ if test x$enable_shared != xno; then
 		HP-UX*)
 			LIBCUPS="libcups.sl.2"
 			LIBCUPSIMAGE="libcupsimage.sl.2"
-			DSO="ld"
+			DSO="\$(LD)"
 			DSOFLAGS="$DSOFLAGS -b -z +h \$@"
 			;;
 		IRIX)
