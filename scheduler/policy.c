@@ -236,10 +236,7 @@ cupsdDeleteAllPolicies(void)
   for (i = NumPolicies, p = Policies; i > 0; i --, p ++)
   {
     for (j = (*p)->num_ops, po = (*p)->ops; j > 0; j --, po ++)
-    {
       cupsdDeleteLocation(*po);
-      free(*po);
-    }
 
     if ((*p)->num_ops > 0)
       free((*p)->ops);
