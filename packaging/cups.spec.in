@@ -278,6 +278,7 @@ rm -rf $RPM_BUILD_ROOT
 %files ja
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/ja
+/usr/share/doc/cups/ja/index.html
 %dir /usr/share/doc/cups/ja/images
 /usr/share/doc/cups/ja/images/*
 %dir /usr/share/cups/templates/ja
