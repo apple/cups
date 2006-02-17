@@ -71,6 +71,7 @@ static const _ipp_option_t ipp_options[] =
   { "job-page-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "job-priority",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "job-quota-period",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "job-uuid",			IPP_TAG_URI,		IPP_TAG_JOB },
   { "landscape",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { "media",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { "mirror",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },

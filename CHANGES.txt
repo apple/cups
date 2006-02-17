@@ -1,8 +1,10 @@
-CHANGES.txt - 02/16/2006
+CHANGES.txt - 02/17/2006
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The scheduler now creates a job-uuid attribute that
+	  uniquely identifies a job on a network (STR #1410)
 	- The init script now unsets the TMPDIR environment
 	  variable to prevent user temporary directories from
 	  being used by cupsd accidentally (STR #1424)

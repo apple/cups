@@ -30,6 +30,7 @@
  *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
  *                                 upon the job and printer state...
  *   add_job_subscriptions()     - Add any subcriptions for a job.
+ *   add_job_uuid()              - Add job-uuid attribute to a job.
  *   add_printer()               - Add a printer to the system.
  *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
  *                                 based upon the printer state...
@@ -123,6 +124,7 @@ static int	add_file(cupsd_client_t *con, cupsd_job_t *job, mime_type_t *filetype
 		         int compression);
 static void	add_job_state_reasons(cupsd_client_t *con, cupsd_job_t *job);
 static void	add_job_subscriptions(cupsd_client_t *con, cupsd_job_t *job);
+static void	add_job_uuid(cupsd_client_t *con, cupsd_job_t *job);
 static void	add_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	add_printer_state_reasons(cupsd_client_t *con, cupsd_printer_t *p);
 static void	add_queued_job_count(cupsd_client_t *con, cupsd_printer_t *p);
@@ -1450,6 +1452,58 @@ add_job_subscriptions(
 
   job->attrs->last    = prev;
   job->attrs->current = prev;
+}
+
+
+/*
+ * 'add_job_uuid()' - Add job-uuid attribute to a job.
+ *
+ * See RFC 4122 for the definition of UUIDs and the format.
+ */
+
+static void
+add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
+             cupsd_job_t    *job)	/* I - Job */
+{
+  char			uuid[1024];	/* job-uuid string */
+  ipp_attribute_t	*attr;		/* job-uuid attribute */
+  _cups_md5_state_t	md5state;	/* MD5 state */
+  unsigned char		md5sum[16];	/* MD5 digest/sum */
+
+
+ /*
+  * First see if the job already has a job-uuid attribute; if so, return...
+  */
+
+  if ((attr = ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI)) != NULL)
+    return;
+
+ /*
+  * No job-uuid attribute, so build a version 3 UUID with the local job
+  * ID at the end; see RFC 4122 for details.  Start with the MD5 sum of
+  * the server name and port that the client connected to...
+  */
+
+  snprintf(uuid, sizeof(uuid), "%s:%d:%d", con->servername, con->serverport,
+           job->id);
+
+  _cups_md5_init(&md5state);
+  _cups_md5_append(&md5state, (unsigned char *)uuid, strlen(uuid));
+  _cups_md5_finish(&md5state, md5sum);
+
+ /*
+  * Format the UUID URI using the MD5 sum and job ID.
+  */
+
+  snprintf(uuid, sizeof(uuid),
+           "urn:uuid:%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
+	   "%02x%02x%02x%02x%02x%02x",
+	   md5sum[0], md5sum[1], md5sum[2], md5sum[3], md5sum[4], md5sum[5],
+	   (md5sum[6] & 15) | 0x30, md5sum[7], (md5sum[8] & 0x3f) | 0x40,
+	   md5sum[9], md5sum[10], md5sum[11], md5sum[12], md5sum[13],
+	   md5sum[14], md5sum[15]);
+
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uuid", NULL, uuid);
 }
 
 
@@ -4118,6 +4172,8 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   job->dtype   = dtype;
   job->attrs   = con->request;
   con->request = NULL;
+
+  add_job_uuid(con, job);
 
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
@@ -7004,6 +7060,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   job->dtype   = dtype;
   job->attrs   = con->request;
   con->request = NULL;
+
+  add_job_uuid(con, job);
 
  /*
   * Copy the rest of the job info...
