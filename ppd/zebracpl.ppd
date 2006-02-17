@@ -33,7 +33,7 @@
 *Product:	"(ESP Ghostscript)"
 *cupsVersion:	1.2
 *cupsManualCopies: False
-*cupsFilter:	"application/vnd.cups-raster 0 rastertodymo"
+*cupsFilter:	"application/vnd.cups-raster 0 rastertolabel"
 *% cupsModelNumber is 16 for EPL1 line mode, 17 for EPL2 page mode,
 *% 18 for ZPL mode, and 19 for CPCL mode.
 *cupsModelNumber: 19

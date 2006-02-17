@@ -56,6 +56,7 @@
  *   compare_active_jobs()      - Compare the job IDs and priorities of two
  *                                jobs.
  *   compare_jobs()             - Compare the job IDs of two jobs.
+ *   free_job()                 - Free all memory used by a job.
  *   ipp_length()               - Compute the size of the buffer needed to
  *                                hold the textual IPP attributes.
  *   load_job_cache()           - Load jobs from the job.cache file.
@@ -96,6 +97,7 @@ static mime_filter_t	gziptoany_filter =
 
 static int	compare_active_jobs(void *first, void *second, void *data);
 static int	compare_jobs(void *first, void *second, void *data);
+static void	free_job(cupsd_job_t *job);
 static int	ipp_length(ipp_t *ipp);
 static void	load_job_cache(const char *filename);
 static void	load_next_job_id(const char *filename);
@@ -152,12 +154,6 @@ cupsdCancelJob(cupsd_job_t *job,	/* I - Job to cancel */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCancelJob: id = %d", job->id);
 
  /*
-  * Remove the job from the active list...
-  */
-
-  cupsArrayRemove(ActiveJobs, job);
-
- /*
   * Stop any processes that are working on the current job...
   */
 
@@ -165,8 +161,6 @@ cupsdCancelJob(cupsd_job_t *job,	/* I - Job to cancel */
     cupsdStopJob(job, 0);
 
   cupsdLoadJob(job);
-
-  cupsArrayRemove(ActiveJobs, job);
 
   if (job->attrs)
     job->state->values[0].integer = IPP_JOB_CANCELLED;
@@ -176,6 +170,12 @@ cupsdCancelJob(cupsd_job_t *job,	/* I - Job to cancel */
   set_time(job, "time-at-completed");
 
   cupsdExpireSubscriptions(NULL, job);
+
+ /*
+  * Remove the job from the active list...
+  */
+
+  cupsArrayRemove(ActiveJobs, job);
 
  /*
   * Remove any authentication data...
@@ -239,13 +239,7 @@ cupsdCancelJob(cupsd_job_t *job,	/* I - Job to cancel */
     * Free all memory used...
     */
 
-    if (job->attrs)
-      ippDelete(job->attrs);
-
-    cupsdClearString(&job->username);
-    cupsdClearString(&job->dest);
-
-    free(job);
+    free_job(job);
   }
 }
 
@@ -410,7 +404,7 @@ cupsdCleanJobs(void)
   cupsd_job_t	*job;			/* Current job */
 
 
-  if (!MaxJobs)
+  if (MaxJobs <= 0)
     return;
 
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
@@ -660,15 +654,7 @@ cupsdFreeAllJobs(void)
     cupsArrayRemove(Jobs, job);
     cupsArrayRemove(ActiveJobs, job);
 
-    ippDelete(job->attrs);
-
-    if (job->num_files > 0)
-    {
-      free(job->compressions);
-      free(job->filetypes);
-    }
-
-    free(job);
+    free_job(job);
   }
 
   cupsdReleaseSignals();
@@ -828,7 +814,8 @@ cupsdLoadAllJobs(void)
   * Clean out old jobs as needed...
   */
 
-  cupsdCleanJobs();
+  if (MaxJobs > 0 && cupsArrayCount(Jobs) >= MaxJobs)
+    cupsdCleanJobs();
 }
 
 
@@ -1240,6 +1227,9 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
   cups_file_t	*fp;			/* Job file */
 
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSaveJob(job=%p(%d)): job->attrs=%p",
+                  job, job->id, job->attrs);
+
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, job->id);
 
   if ((fp = cupsFileOpen(filename, "w")) == NULL)
@@ -1253,7 +1243,12 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
   fchmod(cupsFileNumber(fp), 0600);
   fchown(cupsFileNumber(fp), RunUser, Group);
 
-  ippWriteIO(fp, (ipp_iocb_t)cupsFileWrite, 1, NULL, job->attrs);
+  job->attrs->state = IPP_IDLE;
+
+  if (ippWriteIO(fp, (ipp_iocb_t)cupsFileWrite, 1, NULL,
+                 job->attrs) != IPP_DATA)
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to write job control file \"%s\"!",
+	            filename);
 
   cupsFileClose(fp);
 }
@@ -2740,6 +2735,28 @@ compare_jobs(void *first,		/* I - First job */
 	     void *data)		/* I - App data (not used) */
 {
   return (((cupsd_job_t *)first)->id - ((cupsd_job_t *)second)->id);
+}
+
+
+/*
+ * 'free_job()' - Free all memory used by a job.
+ */
+
+static void
+free_job(cupsd_job_t *job)		/* I - Job */
+{
+  cupsdClearString(&job->username);
+  cupsdClearString(&job->dest);
+
+  if (job->num_files > 0)
+  {
+    free(job->compressions);
+    free(job->filetypes);
+  }
+
+  ippDelete(job->attrs);
+
+  free(job);
 }
 
 

@@ -33,7 +33,7 @@
 *Product:	"(ESP Ghostscript)"
 *cupsVersion:	1.2
 *cupsManualCopies: False
-*cupsFilter:	"application/vnd.cups-raster 0 rastertodymo"
+*cupsFilter:	"application/vnd.cups-raster 0 rastertolabel"
 *cupsModelNumber: 0
 *ModelName:     "DYMO Label Printer"
 *ShortNickName: "DYMO Label Printer"

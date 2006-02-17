@@ -4129,7 +4129,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   * Make sure we aren't over our limit...
   */
 
-  if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
+  if (MaxJobs && cupsArrayCount(Jobs) >= MaxJobs)
     cupsdCleanJobs();
 
   if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
@@ -7016,7 +7016,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Make sure we aren't over our limit...
   */
 
-  if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
+  if (MaxJobs && cupsArrayCount(Jobs) >= MaxJobs)
     cupsdCleanJobs();
 
   if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)

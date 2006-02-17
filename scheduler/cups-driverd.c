@@ -688,6 +688,13 @@ load_ppds(const char *d,		/* I - Actual directory */
   while ((dent = cupsDirRead(dir)) != NULL)
   {
    /*
+    * Skip files/directories starting with "."...
+    */
+
+    if (dent->filename[0] == '.')
+      continue;
+
+   /*
     * See if this is a file...
     */
 
