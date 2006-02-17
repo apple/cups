@@ -26,7 +26,7 @@ msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
 "POT-Creation-Date: 2006-02-15 19:50-0500\n"
-"PO-Revision-Date: 2006-01-21 11:31+0900\n"
+"PO-Revision-Date: 2006-02-17 11:17+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -3347,84 +3347,78 @@ msgid "%s: Unable to connect to server\n"
 msgstr "%s: サーバに接続できません\n"
 
 #: cups/notify.c:91
-#, fuzzy
 msgid "Print Job:"
-msgstr "ジョブの削除"
+msgstr "ジョブの印刷:"
 
 #: cups/notify.c:96
 msgid "pending"
-msgstr ""
+msgstr "保留"
 
 #: cups/notify.c:99
 msgid "held"
-msgstr ""
+msgstr "ホールド"
 
 #: cups/notify.c:102 cups/notify.c:143
 msgid "processing"
-msgstr ""
+msgstr "処理中"
 
 #: cups/notify.c:105 cups/notify.c:146
 msgid "stopped"
-msgstr ""
+msgstr "停止"
 
 #: cups/notify.c:108
 msgid "canceled"
-msgstr ""
+msgstr "キャンセル"
 
 #: cups/notify.c:111
 msgid "aborted"
-msgstr ""
+msgstr "停止"
 
 #: cups/notify.c:114
 msgid "completed"
-msgstr ""
+msgstr "完了"
 
 #: cups/notify.c:117 cups/notify.c:149
-#, fuzzy
 msgid "unknown"
 msgstr "未知"
 
 #: cups/notify.c:126
 msgid "untitled"
-msgstr ""
+msgstr "タイトルなし"
 
 #: cups/notify.c:135
-#, fuzzy
 msgid "Printer:"
-msgstr "プリンタ"
+msgstr "プリンタ:"
 
 #: cups/notify.c:140
 msgid "idle"
-msgstr ""
+msgstr "待機中"
 
 #: scheduler/ipp.c:5513
-#, fuzzy
 msgid "Missing notify-subscription-ids attribute!"
-msgstr "requesting-user-name 属性が設定されていません!"
+msgstr "notify-subscription-ids 属性がありません!"
 
 #: scheduler/ipp.c:7851
-#, fuzzy
 msgid "Job subscriptions cannot be renewed!"
-msgstr "リクエストにサブスクリプション属性がありません!"
+msgstr "ジョブサブスクリプションが更新されていません!"
 
 #: scheduler/main.c:163
-#, fuzzy
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
-msgstr "lp: -H オプションのあとにはホールド名が必要です!\n"
+msgstr "cupsd: -c オプションのあとには設定ファイル名が必要です!\n"
 
 #: scheduler/main.c:218
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
-msgstr ""
+msgstr "cupsd: launchd(8) サポートがコンパイルされていないので、通常モードで動作します。\n"
 
 #: scheduler/main.c:225
-#, fuzzy, c-format
+#, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting!\n"
-msgstr "%s: '%c' は未知のオプションです!\n"
+msgstr "cupsd: \"%c\" は未知のオプションです - 停止します!\n"
 
 #: scheduler/main.c:232
-#, fuzzy, c-format
+#, c-format
 msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
-msgstr "lpadmin: '%s' は未知の引数です!\n"
+msgstr "cupsd: \"%s\" は未知の引数です - 停止します!\n"
 
 #: scheduler/main.c:2315
 msgid ""
@@ -3436,19 +3430,26 @@ msgid ""
 "-h                  Show this usage message\n"
 "-l                  Run cupsd from launchd(8)\n"
 msgstr ""
+"使い方: cupsd [-c 設定ファイル] [-f] [-F] [-h] [-l]\n"
+"\n"
+"-c 設定ファイル     別の設定ファイルをロードする\n"
+"-f                  フォアグラウンドで実行する\n"
+"-F                  フォアグラウンドで実行するが detach する\n"
+"-h                  この使用例を表示する\n"
+"-l                  launchd(8) から cupsd を実行する\n"
 
 #: systemv/cupstestppd.c:1343
-#, fuzzy, c-format
+#, c-format
 msgid "        WARN    Line %d only contains whitespace!\n"
-msgstr "        警告    %s は相当するオプションがありません!\n"
+msgstr "        警告    %d 行が空白だけです!\n"
 
 #: systemv/cupstestppd.c:1361
 msgid ""
 "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
-msgstr ""
+msgstr "        警告    ファイルが CR、LF、CR LF の行末を混在して含んでいます!\n"
 
 #: systemv/cupstestppd.c:1366
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF!\n"
-msgstr ""
+msgstr "        警告    非 Windows PPD ファイルは、CR LF でなく LF のみを行末に使うべきです!\n"

@@ -49,7 +49,7 @@ AC_SUBST(MAKEDEFS)
 sinclude(config-scripts/cups-scripting.m4)
 
 AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh cups-config
-          conf/cupsd.conf conf/pam.std doc/index.html
+          conf/cupsd.conf conf/pam.std doc/index.html doc/ja/index.html
 	  doc/help/standard.html man/cups-deviced.man
 	  man/cups-driverd.man man/cups-lpd.man man/cupsaddsmb.man
 	  man/cupsd.man man/cupsd.conf.man

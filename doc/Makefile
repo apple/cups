@@ -179,6 +179,7 @@ install:	all
 	done
 	for lang in $(LANGUAGES); do \
 		$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
+		$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
 		for file in $(WEBBUTTONS); do \
 			$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
 		done \

@@ -1,4 +1,4 @@
-CREDITS.txt - 04/26/2003
+CREDITS.txt - 02/17/2006
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -15,6 +15,7 @@ like to thank the following individuals for their contributions:
     Wang Jian           - CUPS RPM corrections.
     Roderick Johnstone  - Beta tester of the millenium.
     Till Kamppeter      - Bug fixes, beta testing, evangelism.
+    Kenshi Muto         - Japanese localization, patches, and testing.
     Kiko                - Bug fixes.
     Sergey V. Kovalyov  - ESP Print Pro and CUPS beta tester.
     Mark Lawrence       - Microsoft interoperability testing.
@@ -28,6 +29,8 @@ like to thank the following individuals for their contributions:
     Petter Reinholdtsen - HP-UX compiler stuff.
     Stuart Stevens      - HP JetDirect IPP information.
     Andrea Suatoni      - IRIX desktop integration and testing.
+    Tomohiro Kato       - Japanese localization.
+    Tim Waugh           - Lots of patches, testing, and Linux integration.
 
 If I've missed someone, please let me know by sending an email to
 "mike@easysw.com".
