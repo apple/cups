@@ -1481,11 +1481,12 @@ add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
  /*
   * No job-uuid attribute, so build a version 3 UUID with the local job
   * ID at the end; see RFC 4122 for details.  Start with the MD5 sum of
-  * the server name and port that the client connected to...
+  * the ServerName, server name and port that the client connected to,
+  * and local job ID...
   */
 
-  snprintf(uuid, sizeof(uuid), "%s:%d:%d", con->servername, con->serverport,
-           job->id);
+  snprintf(uuid, sizeof(uuid), "%s:%s:%d:%d", ServerName, con->servername,
+	   con->serverport, job->id);
 
   _cups_md5_init(&md5state);
   _cups_md5_append(&md5state, (unsigned char *)uuid, strlen(uuid));
