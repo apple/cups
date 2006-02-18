@@ -26,8 +26,8 @@
 
 include ../Makedefs
 
-RBACKENDS =	lpd
-UBACKENDS =	ipp parallel scsi serial socket usb
+RBACKENDS =	ipp lpd
+UBACKENDS =	parallel scsi serial socket usb
 TARGETS	=	betest test1284 $(RBACKENDS) $(UBACKENDS)
 OBJS	=	betest.o ipp.o lpd.o parallel.o scsi.o \
 		serial.o socket.o test1284.o usb.o

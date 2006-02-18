@@ -8407,6 +8407,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   * Add the file to the job...
   */
 
+  cupsdLoadJob(job);
+
   if (add_file(con, job, filetype, compression))
     return;
 

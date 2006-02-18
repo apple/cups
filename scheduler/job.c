@@ -1454,7 +1454,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   int			statusfds[2],	/* Pipes used with the scheduler */
 			filterfds[2][2];/* Pipes used between filters */
   int			envc;		/* Number of environment variables */
-  char			*argv[8],	/* Filter command-line arguments */
+  char			**argv,		/* Filter command-line arguments */
 			sani_uri[1024],	/* Sanitized DEVICE_URI env var */
 			filename[1024],	/* Job filename */
 			command[1024],	/* Full path to command */
@@ -1480,6 +1480,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 					/* PRINTER env variable */
 			rip_max_cache[255];
 					/* RIP_MAX_CACHE env variable */
+  int			remote_job;	/* Remote print job? */
   static char		*options = NULL;/* Full list of options */
   static int		optlength = 0;	/* Length of option buffer */
 
@@ -1599,10 +1600,17 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   FilterLevel += job->cost;
 
  /*
+  * Determine if we are printing to a remote printer...
+  */
+
+  remote_job = printer->raw && job->num_files > 1 &&
+               !strncmp(printer->device_uri, "ipp://", 6);
+
+ /*
   * Add decompression filters, if any...
   */
 
-  if (job->compressions[job->current_file])
+  if (!remote_job && job->compressions[job->current_file])
   {
    /*
     * Add gziptoany filter to the front of the list...
@@ -1883,6 +1891,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	  case IPP_TAG_KEYWORD :
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
+	  case IPP_TAG_URI :
 	      for (valptr = attr->values[i].string.text; *valptr;)
 	      {
 	        if (strchr(" \t\n\\\'\"", *valptr))
@@ -1916,11 +1925,16 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   *
   * This allows legacy printer drivers that use the old System V
   * printing interface to be used by CUPS.
+  *
+  * For remote jobs, we send all of the files in the argument list.
   */
 
+  if (remote_job)
+    argv = calloc(7 + job->num_files, sizeof(char *));
+  else
+    argv = calloc(8, sizeof(char *));
+
   sprintf(jobid, "%d", job->id);
-  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
-           job->id, job->current_file + 1);
 
   argv[0] = printer->name;
   argv[1] = jobid;
@@ -1928,13 +1942,26 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   argv[3] = title;
   argv[4] = copies;
   argv[5] = options;
-  argv[6] = filename;
-  argv[7] = NULL;
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "[Job %d] argv = \"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
-		  "\"%s\",\"%s\"", job->id, argv[0], argv[1], argv[2],
-		  argv[3], argv[4], argv[5], argv[6]);
+  if (remote_job)
+  {
+    for (i = 0; i < job->num_files; i ++)
+    {
+      snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+               job->id, i + 1);
+      argv[6 + i] = strdup(filename);
+    }
+  }
+  else
+  {
+    snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+             job->id, job->current_file + 1);
+    argv[6] = filename;
+  }
+
+  for (i = 0; argv[i]; i ++)
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "[Job %d] argv[%d]=\"%s\"", job->id, i, argv[i]);
 
  /*
   * Create environment variable strings for the filters...
@@ -2050,7 +2077,10 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"DEVICE_URI=%s\"",
                       job->id, i, sani_uri);
 
-  job->current_file ++;
+  if (remote_job)
+    job->current_file = job->num_files;
+  else
+    job->current_file ++;
 
  /*
   * Now create processes for all of the filters...
@@ -2070,6 +2100,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                   "Job canceled because the server could not create the job "
 		  "status pipes.");
+
+    if (remote_job)
+    {
+      for (i = 0; i < job->num_files; i ++)
+        free(argv[i + 6]);
+    }
+
+    free(argv);
 
     cupsdCancelJob(job, 0);
     return;
@@ -2103,6 +2141,15 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     cupsArrayDelete(filters);
 
     cupsdClosePipe(statusfds);
+
+    if (remote_job)
+    {
+      for (i = 0; i < job->num_files; i ++)
+        free(argv[i + 6]);
+    }
+
+    free(argv);
+
     cupsdCancelJob(job, 0);
     return;
   }
@@ -2142,6 +2189,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
                       "Job canceled because the server could not create the "
 		      "filter pipes.");
 
+        if (remote_job)
+	{
+	  for (i = 0; i < job->num_files; i ++)
+            free(argv[i + 6]);
+	}
+
+	free(argv);
+
 	cupsdCancelJob(job, 0);
 	return;
       }
@@ -2169,6 +2224,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                 	  "Job canceled because the server could not create "
 			  "the backend pipes.");
+
+            if (remote_job)
+	    {
+	      for (i = 0; i < job->num_files; i ++)
+        	free(argv[i + 6]);
+	    }
+
+	    free(argv);
 
 	    cupsdCancelJob(job, 0);
 	    return;
@@ -2208,6 +2271,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                 	  "Job canceled because the server could not open the "
 			  "output file.");
+
+            if (remote_job)
+	    {
+	      for (i = 0; i < job->num_files; i ++)
+        	free(argv[i + 6]);
+	    }
+
+	    free(argv);
 
 	    cupsdCancelJob(job, 0);
 	    return;
@@ -2260,6 +2331,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                     "Job canceled because the server could not execute a "
 		    "filter.");
+
+      if (remote_job)
+      {
+	for (i = 0; i < job->num_files; i ++)
+          free(argv[i + 6]);
+      }
+
+      free(argv);
 
       cupsdCancelJob(job, 0);
       return;
@@ -2315,6 +2394,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                       "Job canceled because the server could not open a file.");
 
+        if (remote_job)
+	{
+	  for (i = 0; i < job->num_files; i ++)
+            free(argv[i + 6]);
+	}
+
+	free(argv);
+
 	cupsdCancelJob(job, 0);
 	return;
       }
@@ -2357,6 +2444,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
                       "Job canceled because the server could not execute "
 		      "the backend.");
 
+        if (remote_job)
+	{
+	  for (i = 0; i < job->num_files; i ++)
+            free(argv[i + 6]);
+	}
+
+	free(argv);
+
         cupsdCancelJob(job, 0);
 	return;
       }
@@ -2397,6 +2492,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
       cupsdClosePipe(job->print_pipes);
     }
   }
+
+  if (remote_job)
+  {
+    for (i = 0; i < job->num_files; i ++)
+      free(argv[i + 6]);
+  }
+
+  free(argv);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdStartJob: Closing filter pipes for slot %d "
@@ -2863,6 +2966,7 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
       case IPP_TAG_KEYWORD :
       case IPP_TAG_CHARSET :
       case IPP_TAG_LANGUAGE :
+      case IPP_TAG_URI :
          /*
 	  * Strings can contain characters that need quoting.  We need
 	  * at least 2 * len + 2 characters to cover the quotes and

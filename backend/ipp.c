@@ -62,20 +62,23 @@ static char	*password = NULL;	/* Password for device URI */
 static char	pstmpname[1024] = "";	/* Temporary PostScript file name */
 #endif /* __APPLE__ */
 static char	tmpfilename[1024] = "";	/* Temporary spool file name */
+static int	job_cancelled = 0;	/* Job cancelled? */
 
 
 /*
  * Local functions...
  */
 
-void		check_printer_state(http_t *http, const char *uri,
+static void	cancel_job(http_t *http, const char *uri, int id,
+		           const char *resource, const char *user, int version);
+static void	check_printer_state(http_t *http, const char *uri,
 		                    const char *resource, const char *user,
 				    int version);
-const char	*password_cb(const char *);
-int		report_printer_state(ipp_t *ipp);
+static const char *password_cb(const char *);
+static int	report_printer_state(ipp_t *ipp);
 
 #ifdef __APPLE__
-int		run_pictwps_filter(char **argv, const char *filename);
+static int	run_pictwps_filter(char **argv, const char *filename);
 #endif /* __APPLE__ */
 static void	sigterm_handler(int sig);
 
@@ -89,7 +92,7 @@ static void	sigterm_handler(int sig);
  */
 
 int					/* O - Exit status */
-main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
+main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		i;			/* Looping var */
@@ -103,7 +106,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		name[255],		/* Name of option */
 		value[255],		/* Value of option */
 		*ptr;			/* Pointer into name or value */
-  char		*filename;		/* File to print */
+  int		num_files;		/* Number of files to print */
+  char		**files,		/* Files to print */
+		*filename;		/* Pointer to single filename */
   int		port;			/* Port number (not used) */
   char		uri[HTTP_MAX_URI];	/* Updated URI without user/pass */
   ipp_status_t	ipp_status;		/* Status of IPP request */
@@ -115,19 +120,19 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		waitprinter;		/* Wait for printer ready? */
   ipp_attribute_t *job_id_attr;		/* job-id attribute */
   int		job_id;			/* job-id value */
-  ipp_attribute_t *job_sheets;		/* job-media-sheets-completed attribute */
-  ipp_attribute_t *job_state;		/* job-state attribute */
-  ipp_attribute_t *copies_sup;		/* copies-supported attribute */
-  ipp_attribute_t *format_sup;		/* document-format-supported attribute */
+  ipp_attribute_t *job_sheets;		/* job-media-sheets-completed */
+  ipp_attribute_t *job_state;		/* job-state */
+  ipp_attribute_t *copies_sup;		/* copies-supported */
+  ipp_attribute_t *format_sup;		/* document-format-supported */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
-  ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs attribute */
+  ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
   int		copies;			/* Number of copies remaining */
   const char	*content_type;		/* CONTENT_TYPE environment variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;		/* IPP version */
-  int		reasons;		/* Number of printer-state-reasons shown */
+  int		reasons;		/* Number of printer-state-reasons */
   static const char * const pattrs[] =
 		{			/* Printer attributes we want */
 		  "copies-supported",
@@ -183,26 +188,23 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     else
       s = argv[0];
 
-    printf("network %s \"Unknown\" \"Internet Printing Protocol (%s)\"\n", s, s);
+    printf("network %s \"Unknown\" \"Internet Printing Protocol (%s)\"\n",
+           s, s);
     return (CUPS_BACKEND_OK);
   }
-  else if (argc < 6 || argc > 7)
+  else if (argc < 6)
   {
-    fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
+    fprintf(stderr,
+            "Usage: %s job-id user title copies options [file ... fileN]\n",
             argv[0]);
     return (CUPS_BACKEND_STOP);
   }
 
  /*
-  * Get the content type...
+  * Get the (final) content type...
   */
 
-  if (argc > 6)
-    content_type = getenv("CONTENT_TYPE");
-  else
-    content_type = "application/vnd.cups-raw";
-
-  if (content_type == NULL)
+  if ((content_type = getenv("FINAL_CONTENT_TYPE")) == NULL)
     content_type = "application/octet-stream";
 
  /*
@@ -255,10 +257,26 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       }
 
     close(fd);
-    filename = tmpfilename;
+
+   /*
+    * Point to the single file from stdin...
+    */
+
+    filename  = tmpfilename;
+    files     = &filename;
+    num_files = 1;
   }
   else
-    filename = argv[6];
+  {
+   /*
+    * Point to the files on the command-line...
+    */
+
+    num_files = argc - 6;
+    files     = argv + 6;
+  }
+
+  fprintf(stderr, "DEBUG: %d files to send in job...\n", num_files);
 
  /*
   * See if there are any options...
@@ -474,7 +492,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        fprintf(stderr, "INFO: Unable to connect to %s, queuing on next printer in class...\n",
+        fprintf(stderr,
+	        "INFO: Unable to connect to %s, queuing on next printer in "
+		"class...\n",
 	        hostname);
 
         if (argc == 6 || strcmp(filename, argv[6]))
@@ -492,7 +512,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       if (errno == ECONNREFUSED || errno == EHOSTDOWN ||
           errno == EHOSTUNREACH)
       {
-	fprintf(stderr, "INFO: Network host \'%s\' is busy; will retry in 30 seconds...\n",
+	fprintf(stderr,
+	        "INFO: Network host \'%s\' is busy; will retry in 30 "
+		"seconds...\n",
                 hostname);
 	sleep(30);
       }
@@ -574,7 +596,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* Switch to IPP/1.0...
 	*/
 
-	fputs("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n", stderr);
+	fputs("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n",
+	      stderr);
 	version = 0;
 	httpReconnect(http);
       }
@@ -640,7 +663,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
                                 	 IPP_TAG_BOOLEAN);
 
     if (printer_state == NULL ||
-	(printer_state->values[0].integer > IPP_PRINTER_PROCESSING && waitprinter) ||
+	(printer_state->values[0].integer > IPP_PRINTER_PROCESSING &&
+	 waitprinter) ||
 	printer_accepting == NULL ||
 	!printer_accepting->values[0].boolean)
     {
@@ -651,7 +675,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * available printer in the class.
       */
 
-      fprintf(stderr, "INFO: Unable to queue job on %s, queuing on next printer in class...\n",
+      fprintf(stderr,
+              "INFO: Unable to queue job on %s, queuing on next printer in "
+	      "class...\n",
 	      hostname);
 
       ippDelete(supported);
@@ -684,6 +710,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   reasons = 0;
+  job_id  = 0;
 
   while (copies > 0)
   {
@@ -691,7 +718,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Build the IPP request...
     */
 
-    request = ippNewRequest(IPP_PRINT_JOB);
+    if (job_cancelled)
+      break;
+
+    if (num_files > 1)
+      request = ippNewRequest(IPP_CREATE_JOB);
+    else
+      request = ippNewRequest(IPP_PRINT_JOB);
+
     request->request.op.version[1] = version;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
@@ -719,12 +753,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     num_options = cupsParseOptions(argv[5], 0, &options);
 
 #ifdef __APPLE__
-    if (content_type != NULL && strcasecmp(content_type, "application/pictwps") == 0)
+    if (content_type != NULL &&
+        !strcasecmp(content_type, "application/pictwps") && num_files == 1)
     {
       if (format_sup != NULL)
       {
 	for (i = 0; i < format_sup->num_values; i ++)
-	  if (strcasecmp(content_type, format_sup->values[i].string.text) == 0)
+	  if (!strcasecmp(content_type, format_sup->values[i].string.text))
 	    break;
       }
 
@@ -752,7 +787,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     if (content_type != NULL && format_sup != NULL)
     {
       for (i = 0; i < format_sup->num_values; i ++)
-        if (strcasecmp(content_type, format_sup->values[i].string.text) == 0)
+        if (!strcasecmp(content_type, format_sup->values[i].string.text))
           break;
 
       if (i < format_sup->num_values)
@@ -792,14 +827,19 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Do the request...
     */
 
-    if ((response = cupsDoFileRequest(http, request, resource, filename)) == NULL)
-      ipp_status = cupsLastError();
+    if (num_files > 1)
+      response = cupsDoRequest(http, request, resource);
     else
-      ipp_status = response->request.status.status_code;
+      response = cupsDoFileRequest(http, request, resource, files[0]);
+
+    ipp_status = cupsLastError();
 
     if (ipp_status > IPP_OK_CONFLICT)
     {
       job_id = 0;
+
+      if (job_cancelled)
+        break;
 
       if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
 	  ipp_status == IPP_PRINTER_BUSY)
@@ -809,7 +849,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       }
       else
         fprintf(stderr, "ERROR: Print file was not accepted (%s)!\n",
-	        ippErrorString(ipp_status));
+	        cupsLastErrorString());
     }
     else if ((job_id_attr = ippFindAttribute(response, "job-id",
                                              IPP_TAG_INTEGER)) == NULL)
@@ -823,8 +863,47 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       fprintf(stderr, "NOTICE: Print file accepted - job ID %d.\n", job_id);
     }
 
-    if (response)
-      ippDelete(response);
+    ippDelete(response);
+
+    if (job_cancelled)
+      break;
+
+    if (job_id && num_files > 1)
+    {
+      for (i = 0; i < num_files; i ++)
+      {
+	request = ippNewRequest(IPP_SEND_DOCUMENT);
+
+	request->request.op.version[1] = version;
+
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+        	     NULL, uri);
+
+        ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
+	              job_id);
+
+	if (argv[2][0])
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                       "requesting-user-name", NULL, argv[2]);
+
+        if ((i + 1) == num_files)
+	  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
+
+        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+	             "document-format", NULL, content_type);
+
+        ippDelete(cupsDoFileRequest(http, request, resource, files[i]));
+
+	if (cupsLastError() > IPP_OK_CONFLICT)
+	{
+	  ipp_status = cupsLastError();
+
+	  fprintf(stderr, "ERROR: Unable to add file %d to job: %s\n",
+	          job_id, cupsLastErrorString());
+	  break;
+	}
+      }
+    }
 
     if (ipp_status <= IPP_OK_CONFLICT && argc > 6)
     {
@@ -846,7 +925,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     fputs("INFO: Waiting for job to complete...\n", stderr);
 
-    for (;;)
+    for (; !job_cancelled;)
     {
      /*
       * Build an IPP_GET_JOB_ATTRIBUTES request...
@@ -876,10 +955,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       if (!copies_sup)
 	httpReconnect(http);
 
-      if ((response = cupsDoRequest(http, request, resource)) == NULL)
-	ipp_status = cupsLastError();
-      else
-	ipp_status = response->request.status.status_code;
+      response   = cupsDoRequest(http, request, resource);
+      ipp_status = cupsLastError();
 
       if (ipp_status == IPP_NOT_FOUND)
       {
@@ -898,8 +975,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
 	    ipp_status != IPP_PRINTER_BUSY)
 	{
-	  if (response)
-	    ippDelete(response);
+	  ippDelete(response);
 
           fprintf(stderr, "ERROR: Unable to get job %d attributes (%s)!\n",
 	          job_id, ippErrorString(ipp_status));
@@ -907,7 +983,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	}
       }
 
-      if (response != NULL)
+      if (response)
       {
 	if ((job_state = ippFindAttribute(response, "job-state",
 	                                  IPP_TAG_ENUM)) != NULL)
@@ -922,7 +998,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	    if ((job_sheets = ippFindAttribute(response, 
 	                                       "job-media-sheets-completed",
 	                                       IPP_TAG_INTEGER)) != NULL)
-	      fprintf(stderr, "PAGE: total %d\n", job_sheets->values[0].integer);
+	      fprintf(stderr, "PAGE: total %d\n",
+	              job_sheets->values[0].integer);
 
 	    ippDelete(response);
 	    break;
@@ -930,8 +1007,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	}
       }
 
-      if (response)
-	ippDelete(response);
+      ippDelete(response);
 
      /*
       * Check the printer state and report it if necessary...
@@ -948,11 +1024,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Check the printer state and report it if necessary...
+  * Cancel the job as needed...
   */
 
-/*      if (!copies_sup)
-	httpReconnect(http);*/
+  if (job_cancelled && job_id)
+    cancel_job(http, uri, job_id, resource, argv[2], version);
+
+ /*
+  * Check the printer state and report it if necessary...
+  */
 
   check_printer_state(http, uri, resource, argv[2], version);
 
@@ -962,8 +1042,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   httpClose(http);
 
-  if (supported)
-    ippDelete(supported);
+  ippDelete(supported);
 
  /*
   * Remove the temporary file(s) if necessary...
@@ -986,10 +1065,50 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
+ * 'cancel_job()' - Cancel a print job.
+ */
+
+static void
+cancel_job(http_t     *http,		/* I - HTTP connection */
+           const char *uri,		/* I - printer-uri */
+	   int        id,		/* I - job-id */
+	   const char *resource,	/* I - Resource path */
+	   const char *user,		/* I - requesting-user-name */
+	   int        version)		/* I - IPP version */
+{
+  ipp_t	*request;			/* Cancel-Job request */
+
+
+  fputs("INFO: Cancelling print job...\n", stderr);
+
+  request = ippNewRequest(IPP_CANCEL_JOB);
+  request->request.op.version[1] = version;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id", id);
+
+  if (user && user[0])
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                 "requesting-user-name", NULL, user);
+
+ /*
+  * Do the request...
+  */
+
+  ippDelete(cupsDoRequest(http, request, resource));
+
+  if (cupsLastError() > IPP_OK_CONFLICT)
+    fprintf(stderr, "ERROR: Unable to cancel job %d: %s\n", id,
+            cupsLastErrorString());
+}
+
+
+/*
  * 'check_printer_state()' - Check the printer state...
  */
 
-void
+static void
 check_printer_state(
     http_t      *http,			/* I - HTTP connection */
     const char  *uri,			/* I - Printer URI */
@@ -1034,7 +1153,7 @@ check_printer_state(
  * 'password_cb()' - Disable the password prompt for cupsDoFileRequest().
  */
 
-const char *				/* O - Password  */
+static const char *			/* O - Password  */
 password_cb(const char *prompt)		/* I - Prompt (not used) */
 {
   (void)prompt;
@@ -1065,7 +1184,7 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
  * 'report_printer_state()' - Report the printer state.
  */
 
-int					/* O - Number of reasons shown */
+static int				/* O - Number of reasons shown */
 report_printer_state(ipp_t *ipp)	/* I - IPP response */
 {
   int			i;		/* Looping var */
@@ -1183,7 +1302,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
  * PostScript file for printing...
  */
 
-int					/* O - Exit status of filter */
+static int				/* O - Exit status of filter */
 run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
                    const char *filename)/* I - Filename */
 {
@@ -1351,8 +1470,19 @@ sigterm_handler(int sig)		/* I - Signal */
 {
   (void)sig;	/* remove compiler warnings... */
 
+  if (!job_cancelled)
+  {
+   /*
+    * Flag that the job should be cancelled...
+    */
+
+    job_cancelled = 1;
+    return;
+  }
+
  /*
-  * Remove the temporary file(s) if necessary...
+  * The scheduler already tried to cancel us once, now just terminate
+  * after removing our temp files!
   */
 
   if (tmpfilename[0])
