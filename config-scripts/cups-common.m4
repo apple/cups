@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -167,9 +167,6 @@ AC_TRY_COMPILE([#include <time.h>],[struct tm t;
 	AC_DEFINE(HAVE_TM_GMTOFF),
 	AC_MSG_RESULT(no))
 
-dnl See if we have POSIX ACL support...
-AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
-
 dnl Flags for "ar" command...
 case $uname in
         Darwin* | *BSD*)
@@ -183,6 +180,9 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl Extra platform-specific libraries...
+BACKLIBS=""
+CUPSDLIBS=""
+
 case $uname in
         Darwin*)
                 BACKLIBS="-framework IOKit"
@@ -214,9 +214,6 @@ case $uname in
 
 	Linux*)
 		dnl Check for DBUS support
-                BACKLIBS=""
-		CUPSDLIBS=""
-
 		AC_PATH_PROG(PKGCONFIG, pkg-config)
 		if test "x$PKGCONFIG" != x; then
 			AC_MSG_CHECKING(for DBUS)
@@ -230,12 +227,14 @@ case $uname in
 			fi
 		fi
 		;;
-
-        *)
-                BACKLIBS=""
-		CUPSDLIBS=""
-                ;;
 esac
+
+dnl See if we have POSIX ACL support...
+SAVELIBS="$LIBS"
+LIBS=""
+AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
+CUPSDLIBS="$CUPSDLIBS $LIBS"
+LIBS="$SAVELIBS"
 
 AC_SUBST(BACKLIBS)
 AC_SUBST(CUPSDLIBS)

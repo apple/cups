@@ -4,7 +4,7 @@
 # 
 #   CUPS configuration utility.
 #
-#   Copyright 2001-2005 by Easy Software Products, all rights reserved.
+#   Copyright 2001-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -36,6 +36,7 @@ sysconfdir=@sysconfdir@
 cups_datadir=@CUPS_DATADIR@
 cups_serverbin=@CUPS_SERVERBIN@
 cups_serverroot=@CUPS_SERVERROOT@
+INSTALLSTATIC=@INSTALLSTATIC@
 
 # flags for C++ compiler:
 CFLAGS=""
@@ -116,7 +117,11 @@ while test $# -gt 0; do
 	    echo $cups_serverroot
 	    ;;
 	--static)
-	    static=yes
+	    if test -z "$INSTALLSTATIC"; then
+	        echo "WARNING: Static libraries not installed!" >&2
+	    else
+	        static=yes
+	    fi
 	    ;;
 	--version)
 	    echo $VERSION
