@@ -776,10 +776,12 @@ main(int  argc,				/* I - Number of command-line args */
         filename = pstmpname;
 
        /*
-	* Change the MIME type to application/postscript...
+	* Change the MIME type to application/postscript and change the
+	* number of copies to 1...
 	*/
 
 	content_type = "application/postscript";
+	copies       = 1;
       }
     }
 #endif /* __APPLE__ */
