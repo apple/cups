@@ -182,6 +182,7 @@ AC_SUBST(ARFLAGS)
 dnl Extra platform-specific libraries...
 BACKLIBS=""
 CUPSDLIBS=""
+DBUSDIR=""
 
 case $uname in
         Darwin*)
@@ -223,7 +224,8 @@ case $uname in
 				    dbus_message_iter_init_append,
 				    AC_DEFINE(HAVE_DBUS)
 				    CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
-				    CUPSDLIBS="`$PKGCONFIG --libs dbus-1`")
+				    CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
+				    DBUSDIR="/etc/dbus-1/system.d")
 			else
 				AC_MSG_RESULT(no)
 			fi
@@ -240,6 +242,7 @@ LIBS="$SAVELIBS"
 
 AC_SUBST(BACKLIBS)
 AC_SUBST(CUPSDLIBS)
+AC_SUBST(DBUSDIR)
 
 dnl New default port definition for IPP...
 AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP ],

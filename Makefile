@@ -116,6 +116,10 @@ install:	installhdrs
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		fi \
 	fi
+	if test "x$(DBUSDIR)" != "x"; then \
+		$(INSTALL_DIR) $(BUILDROOT)$(DBUSDIR); \
+		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/cups.conf; \
+	fi
 
 
 #
@@ -123,7 +127,7 @@ install:	installhdrs
 #
 
 installsrc:
-	gnutar --dereference --exclude=CVS -cf - . | gnutar -C $(SRCROOT) -xf -
+	gnutar --dereference --exclude=.svn -cf - . | gnutar -C $(SRCROOT) -xf -
 
 installhdrs:
 	(cd cups ; $(MAKE) $(MFLAGS) installhdrs) || exit 1;\

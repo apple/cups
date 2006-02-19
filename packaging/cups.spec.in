@@ -143,6 +143,11 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cups/mime.types
 /etc/cups/mime.convs
 %dir /etc/cups/ppd
+
+# DBUS
+/etc/dbus-1/system.d/*
+
+# PAM
 %dir /etc/pam.d
 /etc/pam.d/*
 
