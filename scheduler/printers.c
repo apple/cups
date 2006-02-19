@@ -2600,14 +2600,8 @@ add_printer_filter(
 		program[1024];		/* Program/filter name */
   int		cost;			/* Cost of filter */
   mime_type_t	*temptype;		/* MIME type looping var */
+  char		filename[1024];		/* Full filter filename */
 
-
- /*
-  * Range check input...
-  */
-
-  if (p == NULL || p->filetype == NULL || filter == NULL)
-    return;
 
  /*
   * Parse the filter string; it should be in the following format:
@@ -2620,6 +2614,28 @@ add_printer_filter(
     cupsdLogMessage(CUPSD_LOG_ERROR, "%s: invalid filter string \"%s\"!",
                     p->name, filter);
     return;
+  }
+
+ /*
+  * See if the filter program exists; if not, stop the printer and flag
+  * the error!
+  */
+
+  if (program[0] == '/')
+    strlcpy(filename, program, sizeof(filename));
+  else
+    snprintf(filename, sizeof(filename), "%s/filter/%s", ServerBin, program);
+
+  if (access(filename, X_OK))
+  {
+    snprintf(p->state_message, sizeof(p->state_message),
+             "Filter \"%s\" for printer \"%s\" not available: %s",
+	     program, p->name, strerror(errno));
+    cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 0);
+    cupsdSetPrinterReasons(p, "+cups-missing-filter-error");
+    cupsdAddPrinterHistory(p);
+
+    cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
   }
 
  /*
