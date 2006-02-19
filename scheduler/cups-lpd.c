@@ -23,6 +23,14 @@
  *
  * Contents:
  *
+ *   main()           - Process an incoming LPD request...
+ *   create_job()     - Create a new print job.
+ *   get_printer()    - Get the named printer and its options.
+ *   print_file()     - Add a file to the current job.
+ *   recv_print_job() - Receive a print job from the client.
+ *   remove_jobs()    - Cancel one or more jobs.
+ *   send_state()     - Send the queue state.
+ *   smart_gets()     - Get a line of text, removing the trailing CR and/or LF.
  */
 
 /*
@@ -44,6 +52,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+
+#ifdef HAVE_INTTYPES_H
+#  include <inttypes.h>
+#endif /* HAVE_INTTYPES_H */
+
+#ifdef HAVE_COREFOUNDATION_H
+#  include <CoreFoundation/CoreFoundation.h>
+#endif /* HAVE_COREFOUNDATION_H */
+#ifdef HAVE_CFPRIV_H
+#  include <CoreFoundation/CFPriv.h>
+#endif /* HAVE_CFPRIV_H */
 
 
 /*
@@ -212,10 +231,15 @@ main(int  argc,				/* I - Number of command-line arguments */
   command = line[0];
   dest    = line + 1;
 
-  for (list = dest + 1; *list && !isspace(*list & 255); list ++);
+  if (command == 0x02)
+    list = NULL;
+  else
+  {
+    for (list = dest + 1; *list && !isspace(*list & 255); list ++);
 
-  while (isspace(*list & 255))
-    *list++ = '\0';
+    while (isspace(*list & 255))
+      *list++ = '\0';
+  }
 
  /*
   * Do the command...
@@ -413,83 +437,314 @@ get_printer(http_t        *http,	/* I - HTTP connection */
   if (options)
     *options = NULL;
 
-  strlcpy(dest, name, destsize);
-  if ((value = strchr(dest, '/')) != NULL)
-    *value = '\0';
-
  /*
-  * Setup the Get-Printer-Attributes request...
+  * If the queue name contains a space, lookup the printer-name using
+  * the printer-info value...
   */
 
-  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
-
-  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                   "localhost", 0, "/printers/%s", dest);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, uri);
-
-  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                "requested-attributes",
-		(int)(sizeof(requested) / sizeof(requested[0])),
-                NULL, requested);
-
- /*
-  * Do the request...
-  */
-
-  response = cupsDoRequest(http, request, "/");
-
-  if (!response || cupsLastError() > IPP_OK_CONFLICT)
+  if (strchr(name, ' '))
   {
-    syslog(LOG_ERR, "Unable to check printer status - %s",
-           cupsLastErrorString());
+   /*
+    * Lookup the printer-info...
+    */
+
+    ipp_attribute_t	*accepting_attr,/* printer-is-accepting-jobs */
+			*info_attr,	/* printer-info */
+			*name_attr,	/* printer-name */
+			*shared_attr,	/* printer-is-shared */
+			*state_attr;	/* printer-state */
+
+
+   /*
+    * Setup the CUPS-Get-Printers request...
+    */
+
+    request = ippNewRequest(CUPS_GET_PRINTERS);
+
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                  "requested-attributes",
+		  (int)(sizeof(requested) / sizeof(requested[0])),
+                  NULL, requested);
+
+   /*
+    * Do the request...
+    */
+
+    response = cupsDoRequest(http, request, "/");
+
+    if (!response || cupsLastError() > IPP_OK_CONFLICT)
+    {
+      syslog(LOG_ERR, "Unable to get list of printers - %s",
+             cupsLastErrorString());
+
+      ippDelete(response);
+
+      return (-1);
+    }
+
+   /*
+    * Scan the response for printers...
+    */
+
+    *dest = '\0';
+    attr  = response->attrs;
+
+    while (attr)
+    {
+     /*
+      * Skip to the next printer...
+      */
+
+      while (attr && attr->group_tag != IPP_TAG_PRINTER)
+        attr = attr->next;
+
+      if (!attr)
+        break;
+
+     /*
+      * Get all of the attributes for the current printer...
+      */
+
+      accepting_attr = NULL;
+      info_attr      = NULL;
+      name_attr      = NULL;
+      shared_attr    = NULL;
+      state_attr     = NULL;
+
+      while (attr && attr->group_tag == IPP_TAG_PRINTER)
+      {
+        if (!strcmp(attr->name, "printer-is-accepting-jobs") &&
+	    attr->value_tag == IPP_TAG_BOOLEAN)
+	  accepting_attr = attr;
+	else if (!strcmp(attr->name, "printer-info") &&
+	         attr->value_tag == IPP_TAG_TEXT)
+	  info_attr = attr;
+	else if (!strcmp(attr->name, "printer-name") &&
+	         attr->value_tag == IPP_TAG_NAME)
+	  name_attr = attr;
+	else if (!strcmp(attr->name, "printer-is-shared") &&
+	         attr->value_tag == IPP_TAG_BOOLEAN)
+	  shared_attr = attr;
+	else if (!strcmp(attr->name, "printer-state") &&
+	         attr->value_tag == IPP_TAG_ENUM)
+	  state_attr = attr;
+
+        attr = attr->next;
+      }
+
+      if (info_attr && name_attr &&
+          !strcasecmp(name, info_attr->values[0].string.text))
+      {
+       /*
+        * Found a match, use this one!
+	*/
+
+	strlcpy(dest, name_attr->values[0].string.text, destsize);
+
+	if (accepting && accepting_attr)
+	  *accepting = accepting_attr->values[0].boolean;
+
+	if (shared && shared_attr)
+	  *shared = shared_attr->values[0].boolean;
+
+	if (state && state_attr)
+	  *state = (ipp_pstate_t)state_attr->values[0].integer;
+
+        break;
+      }
+    }
 
     ippDelete(response);
 
-    return (-1);
-  }
+    if (!*dest)
+    {
+      syslog(LOG_ERR, "Unable to find \"%s\" in list of printers!", name);
 
-  strlcpy(dest, name, destsize);
+      return (-1);
+    }
+
+    name = dest;
+  }
+  else
+  {
+   /*
+    * Otherwise treat it as a queue name optionally with an instance name.
+    */
+
+    strlcpy(dest, name, destsize);
+    if ((value = strchr(dest, '/')) != NULL)
+      *value = '\0';
+
+   /*
+    * Setup the Get-Printer-Attributes request...
+    */
+
+    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s", dest);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+        	 NULL, uri);
+
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                  "requested-attributes",
+		  (int)(sizeof(requested) / sizeof(requested[0])),
+                  NULL, requested);
+
+   /*
+    * Do the request...
+    */
+
+    response = cupsDoRequest(http, request, "/");
+
+    if (!response || cupsLastError() > IPP_OK_CONFLICT)
+    {
+      syslog(LOG_ERR, "Unable to check printer status - %s",
+             cupsLastErrorString());
+
+      ippDelete(response);
+
+      return (-1);
+    }
+
+   /*
+    * Get values from the response...
+    */
+
+    if (accepting)
+    {
+      if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
+                        	   IPP_TAG_BOOLEAN)) == NULL)
+	syslog(LOG_ERR, "No printer-is-accepting-jobs attribute found in "
+                	"response from server!");
+      else
+	*accepting = attr->values[0].boolean;
+    }
+
+    if (shared)
+    {
+      if ((attr = ippFindAttribute(response, "printer-is-shared",
+                        	   IPP_TAG_BOOLEAN)) == NULL)
+      {
+	syslog(LOG_ERR, "No printer-is-shared attribute found in "
+                	"response from server!");
+	*shared = 1;
+      }
+      else
+	*shared = attr->values[0].boolean;
+    }
+
+    if (state)
+    {
+      if ((attr = ippFindAttribute(response, "printer-state",
+                        	   IPP_TAG_INTEGER)) == NULL)
+	syslog(LOG_ERR, "No printer-state attribute found in "
+                	"response from server!");
+      else
+	*state = (ipp_pstate_t)attr->values[0].integer;
+    }
+
+    ippDelete(response);
+  }
 
  /*
-  * Get values from the response...
+  * Override shared value for LPD using system-specific APIs...
   */
 
-  if (accepting)
+#ifdef HAVE_CFPRIV_H /* MacOS X */
+  if (shared && *shared)
   {
-    if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
-                        	 IPP_TAG_BOOLEAN)) == NULL)
-      syslog(LOG_ERR, "No printer-is-accepting-jobs attribute found in "
-                      "response from server!");
-    else
-      *accepting = attr->values[0].boolean;
-  }
+    CFURLRef		prefsurl;	/* */
+    CFDataRef		xmldata;	/* */
+    CFPropertyListRef	plist;		/* */
+    CFStringRef		queueid;	/* */
+    CFArrayRef		lprqarray;	/* */
+    CFBooleanRef	serverflag;	/* */
+    Boolean		prefsok;	/* */
+    static const char printerprefsfile[] =
+        "/Library/Preferences/com.apple.printservice.plist";
+					/* Preferences file */
 
-  if (shared)
-  {
-    if ((attr = ippFindAttribute(response, "printer-is-shared",
-                        	 IPP_TAG_BOOLEAN)) == NULL)
+
+   /*
+    * See if we are running on MacOS X Server...
+    */
+
+    CFDictionaryRef versdict = _CFCopyServerVersionDictionary();
+
+    if (versdict)
     {
-      syslog(LOG_ERR, "No printer-is-shared attribute found in "
-                      "response from server!");
-      *shared = 1;
+     /*
+      * Yes, use the LPR sharing preference...
+      */
+
+      CFRelease(versdict);
+
+      *shared = 0;
+
+      prefsurl = CFURLCreateFromFileSystemRepresentation(
+                     kCFAllocatorDefault, 
+		     (const UInt8 *)printerprefsfile, 
+		     (CFIndex)strlen(printerprefsfile), 
+		     false);
+      if (prefsurl)
+      {
+        prefsok = CFURLCreateDataAndPropertiesFromResource(
+	              kCFAllocatorDefault, prefsurl, &xmldata, 
+		      NULL, NULL, NULL);
+        if (prefsok)
+	{
+	  plist = CFPropertyListCreateFromXMLData(kCFAllocatorDefault, xmldata, 
+						  kCFPropertyListImmutable, NULL);
+	  if (plist)
+	  {
+	    serverflag = (CFBooleanRef)CFDictionaryGetValue(
+	                     (CFDictionaryRef)plist, CFSTR("serviceState"));
+
+            if (serverflag && CFBooleanGetValue(serverflag))
+	    {
+	      lprqarray = (CFArrayRef)CFDictionaryGetValue(
+	                      (CFDictionaryRef)plist, CFSTR("lprSharedQueues"));
+
+	      if (lprqarray)
+	      {
+	        queueid = CFStringCreateWithCString(CFAllocatorGetDefault(), 
+						    dest,
+						    kCFStringEncodingUTF8);
+
+                if (queueid)
+		{
+	          *shared = CFArrayContainsValue(
+		        	lprqarray,
+		        	CFRangeMake(0, CFArrayGetCount(lprqarray)),
+				queueid);
+
+                  CFRelease(queueid);
+		}
+
+                CFRelease(lprqarray);
+	      }
+	    }
+
+            if (serverflag)
+	      CFRelease(serverflag);
+
+	    CFRelease(plist);
+	  }
+
+	  CFRelease(prefsok);
+	}
+
+	CFRelease(prefsurl);
+      }
+
+      if (!shared)
+	syslog(LOG_ERR, "Warning - Print Service sharing disabled for LPD "
+	                "on queue: %s", name);
     }
-    else
-      *shared = attr->values[0].boolean;
   }
-
-  if (state)
-  {
-    if ((attr = ippFindAttribute(response, "printer-state",
-                        	 IPP_TAG_INTEGER)) == NULL)
-      syslog(LOG_ERR, "No printer-state attribute found in "
-                      "response from server!");
-    else
-      *state = (ipp_pstate_t)attr->values[0].integer;
-  }
-
-  ippDelete(response);
+#endif	/* HAVE_CFPRIV_H */
 
  /*
   * Next look for the printer in the lpoptions file...
@@ -497,7 +752,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 
   num_options = 0;
 
-  if (options)
+  if (options && shared && accepting)
   {
     if ((cups_serverroot = getenv("CUPS_SERVERROOT")) == NULL)
       cups_serverroot = CUPS_SERVERROOT;
@@ -539,6 +794,8 @@ get_printer(http_t        *http,	/* I - HTTP connection */
       cupsFileClose(fp);
     }
   }
+  else if (options)
+    *options = NULL;
 
  /*
   * Return the number of options for this destination...
