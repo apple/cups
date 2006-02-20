@@ -1,5 +1,5 @@
 /*
- * "$Id: banners.c 5051 2006-02-02 16:13:16Z mike $"
+ * "$Id: banners.c 5062 2006-02-03 16:36:24Z mike $"
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
@@ -79,7 +79,7 @@ cupsdAddBanner(const char *name,	/* I - Name of banner */
   * Copy the new banner data over...
   */
 
-  strlcpy(temp->name, name, sizeof(temp->name));
+  temp->name     = strdup(name);
   temp->filetype = filetype;
 
   cupsArrayAdd(Banners, temp);
@@ -96,7 +96,7 @@ cupsdFindBanner(const char *name)	/* I - Name of banner */
   cupsd_banner_t	key;		/* Search key */
 
 
-  strlcpy(key.name, name, sizeof(key.name));
+  key.name = (char *)name;
 
   return ((cupsd_banner_t *)cupsArrayFind(Banners, &key));
 }
@@ -115,7 +115,10 @@ cupsdFreeBanners(void)
   for (temp = (cupsd_banner_t *)cupsArrayFirst(Banners);
        temp;
        temp = (cupsd_banner_t *)cupsArrayNext(Banners))
+  {
+    free(temp->name);
     free(temp);
+  }
 
   cupsArrayDelete(Banners);
   Banners = NULL;
@@ -170,7 +173,8 @@ cupsdLoadBanners(const char *d)		/* I - Directory to search */
     if (S_ISDIR(dent->fileinfo.st_mode))
       continue;
 
-    if (dent->filename[0] == '~')
+    if (dent->filename[0] == '~' ||
+        dent->filename[strlen(dent->filename) - 1] == '~')
       continue;
 
     if ((ext = strrchr(dent->filename, '.')) != NULL)
@@ -208,5 +212,5 @@ compare_banners(
 
 
 /*
- * End of "$Id: banners.c 5051 2006-02-02 16:13:16Z mike $".
+ * End of "$Id: banners.c 5062 2006-02-03 16:36:24Z mike $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: classes.c 4988 2006-01-26 00:53:00Z mike $"
+ * "$Id: classes.c 5083 2006-02-06 02:57:43Z mike $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -337,8 +337,7 @@ cupsdLoadAllClasses(void)
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
     if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "cupsdLoadAllClasses: Unable to open %s - %s", line,
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open %s - %s", line,
 		      strerror(errno));
     return;
   }
@@ -365,8 +364,7 @@ cupsdLoadAllClasses(void)
 
       if (p == NULL && value)
       {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "cupsdLoadAllClasses: Loading class %s...", value);
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "Loading class %s...", value);
 
         p = cupsdAddClass(value);
 	p->accepting = 1;
@@ -841,5 +839,5 @@ cupsdUpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c 4988 2006-01-26 00:53:00Z mike $".
+ * End of "$Id: classes.c 5083 2006-02-06 02:57:43Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: banners.h 4968 2006-01-24 03:56:31Z mike $"
+ * "$Id: banners.h 5062 2006-02-03 16:36:24Z mike $"
  *
  *   Banner definitions for the Common UNIX Printing System (CUPS).
  *
@@ -26,9 +26,9 @@
  * Banner information structure...
  */
 
-typedef struct
+typedef struct				/**** Banner file information ****/
 {
-  char		name[256];		/* Name of banner */
+  char		*name;			/* Name of banner */
   mime_type_t	*filetype;		/* Filetype for banner */
 } cupsd_banner_t;
 
@@ -52,5 +52,5 @@ extern void		cupsdLoadBanners(const char *d);
 
 
 /*
- * End of "$Id: banners.h 4968 2006-01-24 03:56:31Z mike $".
+ * End of "$Id: banners.h 5062 2006-02-03 16:36:24Z mike $".
  */

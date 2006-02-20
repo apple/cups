@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 4494 2005-02-18 02:18:11Z mike $"
+# "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $"
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
-#   CUPS filter changes Copyright 1997-2005 by Easy Software Products.
+#   CUPS filter changes Copyright 1997-2006 by Easy Software Products.
 #   Xpdf code Copyright 1996-1999 by Derek B. Noonburg
 #
 
@@ -122,7 +122,7 @@ depend:
 #
 
 install:	all
-	$(INSTALL_DIR) $(SERVERBIN)/filter
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/filter
 	$(INSTALL_BIN) pdftops $(SERVERBIN)/filter
 
 
@@ -154,5 +154,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 4494 2005-02-18 02:18:11Z mike $".
+# End of "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: env.c 5046 2006-02-01 22:11:58Z mike $"
+ * "$Id: env.c 5094 2006-02-09 01:00:26Z mike $"
  *
  *   Environment management routines for the Common UNIX Printing System (CUPS).
  *
@@ -76,15 +76,18 @@ cupsdInitEnv(void)
 
   cupsdClearEnv();
 
-#if defined(__APPLE__) && __GNUC__ > 3
+#if defined(__APPLE__)
  /*
   * Add special voodoo magic for MacOS X 10.4 and later - this allows MacOS
   * X programs to access their bundle resources properly...
+  *
+  * This string is replaced in cupsdStartProcess() when we are running on
+  * versions of MacOS X prior to 10.4...
   */
 
   cupsdSetString(common_env, "<CFProcessPath>");
   num_common_env = 1;
-#endif	/* __APPLE__ && __GNUC__ > 3 */
+#endif	/* __APPLE__ */
 
  /*
   * Set common variables...
@@ -185,7 +188,7 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
 
   cupsdSetStringf(common_env + num_common_env, "%s=%s", name, value);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSetEnv: %s\n",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetEnv: %s\n",
                   common_env[num_common_env]);
 
   num_common_env ++;
@@ -222,5 +225,5 @@ cupsdSetEnvf(const char *name,		/* I - Name of variable */
 
 
 /*
- * End of "$Id: env.c 5046 2006-02-01 22:11:58Z mike $".
+ * End of "$Id: env.c 5094 2006-02-09 01:00:26Z mike $".
  */

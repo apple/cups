@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>ホーム - CUPS @CUPS_VERSION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/favicon.ico" TYPE="image/x-icon">
+</HEAD>
+<BODY>
+<TABLE WIDTH="100%" STYLE="height: 100%;" BORDER="0" CELLSPACING="0" CELLPADDING="0" SUMMARY="Common UNIX Printing System @CUPS_VERSION@">
+<TR CLASS="HEADER">
+<TD VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG SRC="/images/top-left.gif" WIDTH="15" HEIGHT="80" ALT=""></TD>
+<TD VALIGN="TOP" WIDTH="55" ROWSPAN="2"><IMG SRC="/images/top-middle.gif" WIDTH="55" HEIGHT="80" ALT=""></TD>
+<TD WIDTH="100%" HEIGHT="60"><H1>Common UNIX Printing System @CUPS_VERSION@</H1></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG
+SRC="/images/top-right.gif" WIDTH="15" HEIGHT="15" ALT=""></TD>
+</TR>
+<TR CLASS="HEADER"><TD WIDTH="100%" VALIGN="BOTTOM" NOWRAP>
+
+<A CLASS="sel" HREF="/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;ホーム&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/admin/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;管理&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/classes/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;クラス&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/help/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;ドキュメント/ヘルプ&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/jobs/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;ジョブ&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/printers/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;プリンタ&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+</TD></TR>
+<TR CLASS="page">
+<TD WIDTH="15">&nbsp;</TD>
+<TD COLSPAN="2" WIDTH="100%" VALIGN="TOP" CLASS="page">
+
+<H2 CLASS="title">ようこそ!</H2>
+
+<P>この Web ページでは、システム管理作業はもちろん、プリンタやジョブ
+の監視ができます。作業を行うには、上にあるタブをクリックするか、下の
+ボタンをクリックしてください。</P>
+
+<P>
+<A HREF="/help/"><IMG SRC="/images/help.gif" CLASS="button" ALT="Help"></A>
+<A HREF="/admin?OP=add-class"><IMG SRC="/images/add-class.gif" CLASS="button" ALT="クラスの追加"></A>
+<A HREF="/admin?OP=add-printer"><IMG SRC="/images/add-printer.gif" CLASS="button" ALT="プリンタの追加"></A>
+<A HREF="/classes"><IMG SRC="/images/manage-classes.gif" CLASS="button" ALT="クラスの管理"></A>
+<A HREF="/jobs"><IMG SRC="/images/manage-jobs.gif" CLASS="button" ALT="ジョブの管理"></A>
+<A HREF="/printers"><IMG SRC="/images/manage-printers.gif" CLASS="button" ALT="プリンタの管理"></A>
+<A HREF="/admin"><IMG SRC="/images/manage-server.gif" CLASS="button" ALT="サーバの管理"></A>
+</P>
+
+<P><I>ユーザ名とパスワードを尋ねられたら、あなたのユーザ名とパスワード、
+あるいは、ユーザ名 "root" とそのパスワードを入力してください。</I></P>
+
+<H2 CLASS="title">CUPS について</H2>
+
+<P>
+<IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
+STYLE="padding-right: 10px;" ALT="ご機嫌なコンピュータとプリンタ">
+
+<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
+ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
+STYLE="padding-left: 10px; padding-bottom: 10px;"
+ALT="Easy Software Products"></A>
+
+CUPS は、UNIX<SUP>&reg;</SUP> ベースのオペレーティングシステムのための、
+ポータブルな印刷レイヤを提供します。標準印刷ソリューションを促進する
+ために、<A HREF="http://www.easysw.com">Easy Software
+Products</a> によって開発および保守されています。CUPS は
+MacOS<SUP>&reg;</SUP> X および多くの Linux<SUP>&reg;</SUP>
+ディストリビューションで採用されている標準印刷システムです。</P>
+
+<P>CUPS は
+印刷ジョブとキューの管理に <A HREF="http://www.pwg.org/ipp/"
+TARGET="_blank">Internet Printing Protocol ("IPP")</A>
+を基礎として使い、ネットワークプリンタのブラウズ、
+実世界の印刷をサポートするための印刷オプションに基づく
+PostScript Printer Description ("PPD") の機能を追加しています。<BR CLEAR="ALL"></P>
+
+<H2 CLASS="title">プリンタドライバと支援</H2>
+
+<P>プリンタドライバと支援については、公式 CUPS サイトを訪れてください:</P>
+
+<PRE>
+    <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
+</PRE>
+
+<P>CUPS の商用サポート、および <A
+HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> と呼ばれる
+拡張バージョンは、以下の場所で入手可能です:</P>
+
+<PRE>
+    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
+</PRE>
+
+</TD>
+<TD WIDTH="15">&nbsp;</TD>
+</TR>
+<TR CLASS="header">
+<TD VALIGN="BOTTOM" WIDTH="15"><IMG SRC="/images/bottom-left.gif"
+WIDTH="15" HEIGHT="15" ALT=""></TD>
+<TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
+
+<P><SMALL>The Common UNIX Printing System, CUPS, and the CUPS logo are the
+trademark property of <A HREF="http://www.easysw.com">Easy Software
+Products</A>. CUPS is copyright 1997-2006 by Easy Software Products,
+All Rights Reserved.</SMALL></P>
+
+</TD>
+
+<TD ALIGN="RIGHT" VALIGN="BOTTOM" WIDTH="15"><IMG SRC="/images/bottom-right.gif"
+WIDTH="15" HEIGHT="15" ALT=""></TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>

@@ -1,5 +1,5 @@
 /*
- * "$Id: process.c 5049 2006-02-02 14:50:57Z mike $"
+ * "$Id: process.c 5094 2006-02-09 01:00:26Z mike $"
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
@@ -146,37 +146,26 @@ cupsdStartProcess(
   * MacOS X programs to access their bundle resources properly...
   */
 
-  for (envc = 0; envc < MAX_ENV && envp[envc]; envc ++);
-    /* All callers pass in a MAX_ENV element array of environment strings */
-
-  if (envc < (MAX_ENV - 1))
+  if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
   {
    /*
-    * We have room, try to read the symlink path for this command...
+    * Yes, this is a symlink to the actual program, nul-terminate and
+    * use it...
     */
 
-    if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
-    {
-     /*
-      * Yes, this is a symlink to the actual program, nul-terminate and
-      * use it...
-      */
+    linkpath[linkbytes] = '\0';
 
-      linkpath[linkbytes] = '\0';
-
-      if (linkpath[0] == '/')
-        snprintf(processPath, sizeof(processPath), "CFProcessPath=%s",
-	         linkpath);
-      else
-        snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
-	         dirname(command), linkpath);
-    }
+    if (linkpath[0] == '/')
+      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s",
+	       linkpath);
     else
-      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
-
-    envp[envc++] = processPath;
-    envp[envc]   = NULL;
+      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
+	       dirname(command), linkpath);
   }
+  else
+    snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
+
+  envp[0] = processPath;		/* Replace <CFProcessPath> string */
 #endif	/* __APPLE__ && __GNUC__ > 3 */
 
  /*
@@ -353,5 +342,5 @@ compare_procs(cupsd_proc_t *a,		/* I - First process */
 
 
 /*
- * End of "$Id: process.c 5049 2006-02-02 14:50:57Z mike $".
+ * End of "$Id: process.c 5094 2006-02-09 01:00:26Z mike $".
  */

@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 4869 2005-12-06 02:43:40Z mike $"
+# "$Id: Makefile 5111 2006-02-16 02:08:09Z mike $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2005 by Easy Software Products.
+#   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -25,10 +25,10 @@
 include ../Makedefs
 
 CGIS	=	admin.cgi classes.cgi help.cgi jobs.cgi printers.cgi
-TARGETS	=	libcgi.a $(CGIS) testcgi testhi
+TARGETS	=	libcgi.a $(CGIS) testcgi testhi testtemplate
 LIBOBJS	=	help-index.o html.o ipp-var.o search.o template.o var.o
 OBJS	=	$(LIBOBJS) admin.o classes.o help.o \
-		jobs.o printers.o testcgi.o testhi.o
+		jobs.o printers.o testcgi.o testhi.o testtemplate.o
 
 
 #
@@ -59,7 +59,7 @@ depend:
 #
 
 install:	all
-	$(INSTALL_DIR) $(SERVERBIN)/cgi-bin
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/cgi-bin
 	for file in $(CGIS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/cgi-bin; \
 	done
@@ -140,6 +140,15 @@ testhi:	testhi.o ../Makedefs libcgi.a
 
 
 #
+# testtemplate
+#
+
+testtemplate:	testtemplate.o ../Makedefs libcgi.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testtemplate.o libcgi.a $(LIBS)
+
+
+#
 # Dependencies...
 #
 
@@ -147,5 +156,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 4869 2005-12-06 02:43:40Z mike $".
+# End of "$Id: Makefile 5111 2006-02-16 02:08:09Z mike $".
 #

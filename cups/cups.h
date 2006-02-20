@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 4973 2006-01-25 02:36:02Z mike $"
+ * "$Id: cups.h 5099 2006-02-13 02:46:10Z mike $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -218,8 +218,8 @@ extern int		cupsSetDests2(http_t *http, int num_dests,
 			              cups_dest_t *dests);
 
 /**** New in CUPS 1.2 ****/
-extern int		cupsBackchannelRead(char *buffer, int bytes, double timeout);
-extern int		cupsBackchannelWrite(const char *buffer, int bytes,
+extern int		cupsBackChannelRead(char *buffer, int bytes, double timeout);
+extern int		cupsBackChannelWrite(const char *buffer, int bytes,
 			                     double timeout);
 extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 					   cups_option_t *options,
@@ -237,5 +237,5 @@ extern cups_file_t	*cupsTempFile2(char *filename, int len);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 4973 2006-01-25 02:36:02Z mike $".
+ * End of "$Id: cups.h 5099 2006-02-13 02:46:10Z mike $".
  */

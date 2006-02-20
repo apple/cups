@@ -530,7 +530,7 @@ private:
   short getWhiteCode();
   short getBlackCode();
   short lookBits(int n);
-  void eatBits(int n) { inputBits -= n; }
+  void eatBits(int n) { if ((inputBits -= n) < 0) inputBits = 0; }
 };
 
 //------------------------------------------------------------------------

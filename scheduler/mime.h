@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h 5058 2006-02-02 21:58:45Z mike $"
+ * "$Id: mime.h 5061 2006-02-03 16:32:18Z mike $"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -72,7 +72,7 @@ typedef enum
 
 typedef struct _mime_magic_s		/**** MIME Magic Data ****/
 {
-  struct mime_magic_str	*prev,		/* Previous rule */
+  struct _mime_magic_s	*prev,		/* Previous rule */
 			*next,		/* Next rule */
 			*parent,	/* Parent rules */
 			*child;		/* Child rules */
@@ -141,7 +141,7 @@ extern mime_filter_t	*mimeAddFilter(mime_t *mime, mime_type_t *src,
 				       const char *filter);
 extern void		mimeDeleteFilter(mime_t *mime, mime_filter_t *filter);
 extern cups_array_t	*mimeFilter(mime_t *mime, mime_type_t *src,
-			            mime_type_t *dst, int *cost, int max_depth);
+			            mime_type_t *dst, int *cost);
 extern mime_filter_t	*mimeFirstFilter(mime_t *mime);
 extern mime_filter_t	*mimeNextFilter(mime_t *mime);
 extern int		mimeNumFilters(mime_t *mime);
@@ -152,5 +152,5 @@ extern int		mimeNumFilters(mime_t *mime);
 #endif /* !_CUPS_MIME_H_ */
 
 /*
- * End of "$Id: mime.h 5058 2006-02-02 21:58:45Z mike $".
+ * End of "$Id: mime.h 5061 2006-02-03 16:32:18Z mike $".
  */

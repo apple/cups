@@ -1,5 +1,5 @@
 /*
- * "$Id: getputfile.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: getputfile.c 5103 2006-02-14 19:27:42Z mike $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
@@ -260,7 +260,8 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
           const char *resource,		/* I - Resource name */
 	  int        fd)		/* I - File descriptor */
 {
-  int		bytes;			/* Number of bytes read */
+  int		bytes,			/* Number of bytes read */
+		retries;		/* Number of retries */
   char		buffer[8192];		/* Buffer for file */
   http_status_t	status;			/* HTTP status from server */
 
@@ -283,6 +284,8 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
  /*
   * Then send PUT requests to the HTTP server...
   */
+
+  retries = 0;
 
   do
   {
@@ -331,6 +334,26 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
       while ((status = httpUpdate(http)) == HTTP_CONTINUE);
     }
 
+    if (status == HTTP_ERROR && !retries)
+    {
+      DEBUG_printf(("cupsPutFd: retry on status %d\n", status));
+
+      retries ++;
+
+      /* Flush any error message... */
+      httpFlush(http);
+
+      /* Reconnect... */
+      if (httpReconnect(http))
+      {
+        status = HTTP_ERROR;
+        break;
+      }
+
+      /* Try again... */
+      continue;
+    }
+
     DEBUG_printf(("cupsPutFd: status=%d\n", status));
 
     if (status == HTTP_UNAUTHORIZED)
@@ -377,7 +400,8 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
     }
 #endif /* HAVE_SSL */
   }
-  while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED);
+  while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED ||
+         (status == HTTP_ERROR && retries < 2));
 
  /*
   * See if we actually put the file or an error...
@@ -447,5 +471,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: getputfile.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: getputfile.c 5103 2006-02-14 19:27:42Z mike $".
  */

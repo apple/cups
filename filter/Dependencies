@@ -115,7 +115,8 @@ common.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 common.o: ../cups/language.h ../cups/string.h ../config.h
 pstops.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 pstops.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-pstops.o: ../cups/language.h ../cups/string.h ../config.h
+pstops.o: ../cups/language.h ../cups/string.h ../config.h ../cups/file.h
+pstops.o: ../cups/array.h
 raster.o: raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 raster.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 raster.o: ../cups/string.h ../config.h

@@ -3,7 +3,8 @@
 <HEAD>
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
 	<TITLE>Home - CUPS @CUPS_VERSION@</TITLE>
-	<LINK REL=STYLESHEET TYPE="text/css" HREF="/cups.css">
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/favicon.ico" TYPE="image/x-icon">
 </HEAD>
 <BODY>
 <TABLE WIDTH="100%" STYLE="height: 100%;" BORDER="0" CELLSPACING="0" CELLPADDING="0" SUMMARY="Common UNIX Printing System @CUPS_VERSION@">

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4965 2006-01-21 06:12:17Z mike $"
+# "$Id: Makefile 5114 2006-02-16 12:28:29Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -47,14 +47,21 @@ clean:
 
 
 #
+# Update dependencies...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
 install:	all
-	$(INSTALL_DIR) $(LOCALEDIR)
+	$(INSTALL_DIR) -m 755 $(LOCALEDIR)
 	for loc in $(LOCALES) ; do \
-		$(INSTALL_DIR) $(LOCALEDIR)/$$loc ; \
-		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc ; \
+		$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
+		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
 	done
 
 
@@ -95,5 +102,5 @@ translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
 
 
 #
-# End of "$Id: Makefile 4965 2006-01-21 06:12:17Z mike $".
+# End of "$Id: Makefile 5114 2006-02-16 12:28:29Z mike $".
 #

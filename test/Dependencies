@@ -1,4 +1,5 @@
 # DO NOT DELETE
 
 ipptest.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-ipptest.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/language.h
+ipptest.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
+ipptest.o: ../cups/file.h ../cups/language.h ../cups/language.h

@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: socket.c 5099 2006-02-13 02:46:10Z mike $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -375,7 +375,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	  {
 	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
 	            rbytes);
-            cupsBackchannelWrite(resource, rbytes, 1.0);
+            cupsBackChannelWrite(resource, rbytes, 1.0);
           }
 	}
 
@@ -454,7 +454,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	  {
 	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
 		    rbytes);
-	    cupsBackchannelWrite(resource, rbytes, 1.0);
+	    cupsBackChannelWrite(resource, rbytes, 1.0);
 	  }
 	  else
 	    break;
@@ -488,5 +488,5 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: socket.c 5099 2006-02-13 02:46:10Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c 5043 2006-02-01 18:55:16Z mike $"
+ * "$Id: network.c 5069 2006-02-04 05:24:35Z mike $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -144,8 +144,7 @@ cupsdNetIFFree(void)
 void
 cupsdNetIFUpdate(void)
 {
-  int			i,		/* Looping var */
-			match;		/* Matching address? */
+  int			match;		/* Matching address? */
   cupsd_listener_t	*lis;		/* Listen address */
   cupsd_netif_t		*temp;		/* New interface */
   struct ifaddrs	*addrs,		/* Interface address list */
@@ -285,7 +284,9 @@ cupsdNetIFUpdate(void)
     * Determine which port to use when advertising printers...
     */
 
-    for (i = NumListeners, lis = Listeners; i > 0; i --, lis ++)
+    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+         lis;
+	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
     {
       match = 0;
 
@@ -589,5 +590,5 @@ freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
 
 
 /*
- * End of "$Id: network.c 5043 2006-02-01 18:55:16Z mike $".
+ * End of "$Id: network.c 5069 2006-02-04 05:24:35Z mike $".
  */

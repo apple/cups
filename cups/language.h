@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h 4903 2006-01-10 20:02:46Z mike $"
+ * "$Id: language.h 5085 2006-02-06 13:27:53Z mike $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -75,6 +75,7 @@ typedef enum cups_encoding_e		/**** Language Encodings ****/
   CUPS_KOI8_U,				/* KOI-8-U */
   CUPS_ISO8859_11,			/* ISO-8859-11 */
   CUPS_ISO8859_16,			/* ISO-8859-16 */
+  CUPS_MAC_ROMAN,			/* MacRoman */
   CUPS_ENCODING_SBCS_END = 63,		/* End of single-bybte encodings @private@ */
 
   CUPS_WINDOWS_932,			/* Japanese JIS X0208-1990 */
@@ -118,5 +119,5 @@ extern cups_lang_t	*cupsLangGet(const char *language);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h 4903 2006-01-10 20:02:46Z mike $".
+ * End of "$Id: language.h 5085 2006-02-06 13:27:53Z mike $".
  */

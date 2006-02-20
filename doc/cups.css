@@ -20,7 +20,7 @@ PRE {
 }
 
 PRE.command {
-  margin-left: 3em;
+  margin-left: 36pt;
 }
 
 PRE EM {
@@ -30,13 +30,13 @@ PRE EM {
 P.command {
   color: #7f0000;
   font-family: monospace;
-  margin-left: 3em;
+  margin-left: 36pt;
 }
 
 BLOCKQUOTE {
   background: #cccc99;
   border: solid thin #999966;
-  padding: 10px;
+  padding: 10pt;
 }
 
 A:link, A:visited {
@@ -57,7 +57,7 @@ A.sel, TR.sel {
 }
 
 TR.sel TD {
-  padding: 4;
+  padding: 4pt;
 }
 
 A.unsel {
@@ -76,7 +76,7 @@ INPUT[TYPE="TEXT"], TEXTAREA {
 
 INPUT[TYPE="IMAGE"] {
   border: none;
-  padding: 2;
+  padding: 2pt;
   vertical-align: bottom;
 }
 
@@ -91,25 +91,25 @@ TR.header, TR.header TH, TH.header, TR.trailer, TR.trailer TH, TH.trailer {
 TR.page, TD.page {
   background-color: #eeeebb;
   height: 100%;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 20pt;
+  padding-bottom: 20pt;
 }
 
 TR.data, TD.data, TR.data TD {
   padding: 5;
-  border-bottom: solid 2px #000000;
+  border-bottom: solid 2pt #000000;
 }
 
 TR.data TH {
-  border-bottom: solid 2px #000000;
-  padding-top: 10;
-  padding-left: 5;
+  border-bottom: solid 2pt #000000;
+  padding-top: 10pt;
+  padding-left: 5pt;
   text-align: left;
 }
 
 DIV.table TABLE {
   border: solid thin #999966;
-  border-spacing: 0px;
+  border-spacing: 0;
   margin-left: auto;
   margin-right: auto;
 }
@@ -125,7 +125,7 @@ DIV.table CAPTION {
 
 DIV.table TABLE TD {
   border: solid thin #bbbb88;
-  padding-top: 5px;
+  padding-top: 5pt;
 }
 
 DIV.table TABLE TH {
@@ -135,7 +135,7 @@ DIV.table TABLE TH {
 }
 
 TH.label {
-  padding-top: 10;
+  padding-top: 10pt;
   text-align: right;
   vertical-align: top;
 }
@@ -164,12 +164,12 @@ H3 SPAN.info {
 }
 
 H2.title, H3.title {
-  border-bottom: solid 2px #000000;
+  border-bottom: solid 2pt #000000;
 }
 
 IMG.button {
   border: none;
-  padding: 2;
+  padding: 2pt;
   vertical-align: middle;
 }
 
@@ -177,8 +177,8 @@ DIV.sidebar {
   background: #ddddaa;
   border: solid 2px #cccc99;
   float: right;
-  margin-left: 10px;
-  padding: 5;
+  margin-left: 10pt;
+  padding: 5pt;
   width: 25%;
 }
 
@@ -186,44 +186,44 @@ DIV.sidebar P.l0 {
   margin-bottom: 0;
   margin-left: 0;
   margin-right: 0;
-  margin-top: 1em;
+  margin-top: 12pt;
 }
 
 DIV.sidebar P.l1 {
   margin-bottom: 0;
-  margin-left: 3em;
+  margin-left: 36pt;
   margin-right: 0;
   margin-top: 0;
-  text-indent: -2em;
+  text-indent: -18pt;
 }
 
 DIV.sidebar P.l2 {
   font-style: italic;
   margin-bottom: 0;
-  margin-left: 4em;
+  margin-left: 54pt;
   margin-right: 0;
   margin-top: 0;
-  text-indent: -2em;
+  text-indent: -18pt;
 }
 
 TABLE.pager {
   background: #cccc99;
   border: solid thin #999966;
-  margin-top: 10px;
-  padding: 2px;
+  margin-top: 10pt;
+  padding: 2pt;
 }
 
 DT {
-  margin-left: 3em;
-  margin-top: 1em;
+  margin-left: 36pt;
+  margin-top: 12pt;
 }
 
 DD {
-  margin-left: 5em;
+  margin-left: 54pt;
 }
 
 P.summary {
-  margin-left: 5em;
+  margin-left: 54pt;
   font-family: monospace;
 }
 

@@ -1,9 +1,9 @@
 #
-# "$Id: Makedefs.in 5044 2006-02-01 21:35:30Z mike $"
+# "$Id: Makedefs.in 5136 2006-02-19 18:46:46Z mike $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -33,6 +33,7 @@ CXX		=	@LIBTOOL@ @CXX@
 DSO		=	@DSO@
 HTMLDOC		=	@HTMLDOC@
 INSTALL		=	@INSTALL@
+LD		=	@LD@
 LIBTOOL		=	@LIBTOOL@
 LN		=	@LN@ -sf
 MV		=	@MV@
@@ -61,6 +62,7 @@ INSTALL_SCRIPT	=	$(INSTALL) -m 755
 CUPS_USER	=	@CUPS_USER@
 CUPS_GROUP	=	@CUPS_GROUP@
 CUPS_SYSTEM_GROUPS =	@CUPS_SYSTEM_GROUPS@
+CUPS_PRIMARY_SYSTEM_GROUP =	@CUPS_PRIMARY_SYSTEM_GROUP@
 
 #
 # Default permissions...
@@ -172,6 +174,7 @@ STATEDIR	=	$(BUILDROOT)@CUPS_STATEDIR@
 
 MAN1EXT		=	@MAN1EXT@
 MAN5EXT		=	@MAN5EXT@
+MAN7EXT		=	@MAN7EXT@
 MAN8EXT		=	@MAN8EXT@
 MAN8DIR		=	@MAN8DIR@
 
@@ -179,6 +182,7 @@ PAMDIR		=	$(BUILDROOT)@PAMDIR@
 PAMFILE		=	@PAMFILE@
 
 DEFAULT_LAUNCHD_CONF	=	@DEFAULT_LAUNCHD_CONF@
+DBUSDIR		=	@DBUSDIR@
 
 
 #
@@ -186,7 +190,7 @@ DEFAULT_LAUNCHD_CONF	=	@DEFAULT_LAUNCHD_CONF@
 #
 
 .SILENT:
-.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .8 .8.gz .a .c .cxx .h .man .o .gz
+.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .cxx .h .man .o .gz
 
 .c.o:
 	echo Compiling $<...
@@ -196,17 +200,17 @@ DEFAULT_LAUNCHD_CONF	=	@DEFAULT_LAUNCHD_CONF@
 	echo Compiling $<...
 	$(CXX) $(OPTIM) $(CXXFLAGS) -c $<
 
-.man.1 .man.1m .man.5 .man.8:
+.man.1 .man.1m .man.5 .man.7 .man.8:
 	echo Linking $<...
 	$(RM) $@
 	$(LN) $< $@
 
-.man.1.gz .man.1m.gz .man.5.gz .man.8.gz .man.gz:
+.man.1.gz .man.1m.gz .man.5.gz .man.7.gz .man.8.gz .man.gz:
 	echo -n Compressing $<...
 	$(RM) $@
 	gzip -v9 <$< >$@
 
 
 #
-# End of "$Id: Makedefs.in 5044 2006-02-01 21:35:30Z mike $"
+# End of "$Id: Makedefs.in 5136 2006-02-19 18:46:46Z mike $"
 #

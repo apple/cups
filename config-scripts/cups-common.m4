@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-common.m4 5025 2006-01-30 03:49:12Z mike $"
+dnl "$Id: cups-common.m4 5136 2006-02-19 18:46:46Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -53,6 +53,7 @@ fi
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(HTMLDOC,htmldoc)
+AC_PATH_PROG(LD,ld)
 AC_PATH_PROG(LN,ln)
 AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(RM,rm)
@@ -166,11 +167,6 @@ AC_TRY_COMPILE([#include <time.h>],[struct tm t;
 	AC_DEFINE(HAVE_TM_GMTOFF),
 	AC_MSG_RESULT(no))
 
-dnl See if we have POSIX ACL support...
-dnl TODO: Linux/Solaris/IRIX/etc. version
-
-AC_CHECK_FUNCS(acl_init)
-
 dnl Flags for "ar" command...
 case $uname in
         Darwin* | *BSD*)
@@ -184,6 +180,10 @@ esac
 AC_SUBST(ARFLAGS)
 
 dnl Extra platform-specific libraries...
+BACKLIBS=""
+CUPSDLIBS=""
+DBUSDIR=""
+
 case $uname in
         Darwin*)
                 BACKLIBS="-framework IOKit"
@@ -206,7 +206,6 @@ case $uname in
 
 		dnl Check for the new membership functions in MacOSX 10.4 (Tiger)...
 		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))
-		AC_CHECK_HEADER(membershipPriv.h,AC_DEFINE(HAVE_MEMBERSHIPPRIV_H))
 		AC_CHECK_FUNCS(mbr_uid_to_uuid)
 
 		dnl Check for notify_post support
@@ -216,31 +215,34 @@ case $uname in
 
 	Linux*)
 		dnl Check for DBUS support
-                BACKLIBS=""
-		CUPSDLIBS=""
-
 		AC_PATH_PROG(PKGCONFIG, pkg-config)
 		if test "x$PKGCONFIG" != x; then
 			AC_MSG_CHECKING(for DBUS)
 			if $PKGCONFIG --exists dbus-1; then
 				AC_MSG_RESULT(yes)
-				AC_DEFINE(HAVE_DBUS)
-				CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
-				CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
+				AC_CHECK_LIB(dbus-1,
+				    dbus_message_iter_init_append,
+				    AC_DEFINE(HAVE_DBUS)
+				    CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
+				    CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
+				    DBUSDIR="/etc/dbus-1/system.d")
 			else
 				AC_MSG_RESULT(no)
 			fi
 		fi
 		;;
-
-        *)
-                BACKLIBS=""
-		CUPSDLIBS=""
-                ;;
 esac
+
+dnl See if we have POSIX ACL support...
+SAVELIBS="$LIBS"
+LIBS=""
+AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
+CUPSDLIBS="$CUPSDLIBS $LIBS"
+LIBS="$SAVELIBS"
 
 AC_SUBST(BACKLIBS)
 AC_SUBST(CUPSDLIBS)
+AC_SUBST(DBUSDIR)
 
 dnl New default port definition for IPP...
 AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP ],
@@ -251,5 +253,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 5025 2006-01-30 03:49:12Z mike $".
+dnl End of "$Id: cups-common.m4 5136 2006-02-19 18:46:46Z mike $".
 dnl

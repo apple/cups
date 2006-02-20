@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5047 2006-02-02 05:14:15Z mike $"
+# "$Id: Makefile 5131 2006-02-18 05:31:36Z mike $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -26,8 +26,8 @@
 
 include ../Makedefs
 
-RBACKENDS =	lpd
-UBACKENDS =	ipp parallel scsi serial socket usb
+RBACKENDS =	ipp lpd
+UBACKENDS =	parallel scsi serial socket usb
 TARGETS	=	betest test1284 $(RBACKENDS) $(UBACKENDS)
 OBJS	=	betest.o ipp.o lpd.o parallel.o scsi.o \
 		serial.o socket.o test1284.o usb.o
@@ -61,7 +61,7 @@ depend:
 #
 
 install:	all
-	$(INSTALL_DIR) $(SERVERBIN)/backend
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/backend
 	for file in $(RBACKENDS); do \
 		$(LIBTOOL) $(INSTALL) -m 700 $$file $(SERVERBIN)/backend; \
 	done
@@ -179,5 +179,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5047 2006-02-02 05:14:15Z mike $".
+# End of "$Id: Makefile 5131 2006-02-18 05:31:36Z mike $".
 #

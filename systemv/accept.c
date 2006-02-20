@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: accept.c 5104 2006-02-15 03:21:04Z mike $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -73,9 +73,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     op = CUPS_ACCEPT_JOBS;
   else if (!strcmp(command, "reject"))
     op = CUPS_REJECT_JOBS;
-  else if (!strcmp(command, "disable"))
+  else if (!strcmp(command, "cupsdisable") || !strcmp(command, "disable"))
     op = IPP_PAUSE_PRINTER;
-  else if (!strcmp(command, "enable"))
+  else if (!strcmp(command, "cupsenable") || !strcmp(command, "enable"))
     op = IPP_RESUME_PRINTER;
   else
   {
@@ -286,5 +286,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: accept.c 5104 2006-02-15 03:21:04Z mike $".
  */

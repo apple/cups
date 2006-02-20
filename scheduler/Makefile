@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 5007 2006-01-27 18:25:42Z mike $"
+# "$Id: Makefile 5116 2006-02-16 12:52:32Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -120,24 +120,32 @@ install:	all
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/driver
 	echo Creating $(SERVERROOT)...
 	$(INSTALL_DIR) -m 755 $(SERVERROOT)
+	-chgrp $(CUPS_GROUP) $(SERVERROOT)
 	echo Creating $(SERVERROOT)/interfaces...
-	$(INSTALL_DIR) -m 755 -g $(CUPS_GROUP) $(SERVERROOT)/interfaces
+	$(INSTALL_DIR) -m 755 $(SERVERROOT)/interfaces
+	-chgrp $(CUPS_GROUP) $(SERVERROOT)/interfaces
 	echo Creating $(SERVERROOT)/ppd...
-	$(INSTALL_DIR) -m 755 -g $(CUPS_GROUP) $(SERVERROOT)/ppd
+	$(INSTALL_DIR) -m 755 $(SERVERROOT)/ppd
+	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ppd
 	echo Creating $(STATEDIR)...
 	$(INSTALL_DIR) -m 755 $(STATEDIR)
 	echo Creating $(STATEDIR)/certs...
-	$(INSTALL_DIR) -m 711 $(STATEDIR)/certs
+	$(INSTALL_DIR) -m 511 $(STATEDIR)/certs
+	-chgrp $(CUPS_PRIMARY_SYSTEM_GROUP) $(STATEDIR)/certs
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) -m 755 $(LOGDIR)
 	echo Creating $(REQUESTS)...
-	$(INSTALL_DIR) -m 710 -g $(CUPS_GROUP) $(REQUESTS)
+	$(INSTALL_DIR) -m 710 $(REQUESTS)
+	-chgrp $(CUPS_GROUP) $(REQUESTS)
 	echo Creating $(REQUESTS)/tmp...
-	$(INSTALL_DIR) -m 1770 -g $(CUPS_GROUP) $(REQUESTS)/tmp
+	$(INSTALL_DIR) -m 1770 $(REQUESTS)/tmp
+	-chgrp $(CUPS_GROUP) $(REQUESTS)/tmp
 	echo Creating $(CACHEDIR)...
-	$(INSTALL_DIR) -m 775 -g $(CUPS_GROUP) $(CACHEDIR)
+	$(INSTALL_DIR) -m 775 $(CACHEDIR)
+	-chgrp $(CUPS_GROUP) $(CACHEDIR)
 #	echo Creating $(CACHEDIR)/ppd...
 #	$(INSTALL_DIR) -m 755 $(CACHEDIR)/ppd
+#	-chgrp $(CUPS_GROUP) $(CACHEDIR)/ppd
 
 
 #
@@ -240,5 +248,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5007 2006-01-27 18:25:42Z mike $".
+# End of "$Id: Makefile 5116 2006-02-16 12:52:32Z mike $".
 #

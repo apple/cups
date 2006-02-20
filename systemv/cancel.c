@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: cancel.c 5091 2006-02-08 18:39:56Z mike $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -179,7 +179,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (num_dests == 0)
         num_dests = cupsGetDests(&dests);
 
-      if (strcmp(argv[i], "-") == 0)
+      if (!strcmp(argv[i], "-"))
       {
        /*
         * Delete the current job...
@@ -307,8 +307,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
 	_cupsLangPrintf(stderr, _("%s: %s failed: %s\n"), argv[0],
 	        	op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
-        		response ? ippErrorString(response->request.status.status_code) :
-		        	   ippErrorString(cupsLastError()));
+        		cupsLastErrorString());
 
 	if (response)
 	  ippDelete(response);
@@ -388,5 +387,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: cancel.c 5091 2006-02-08 18:39:56Z mike $".
  */

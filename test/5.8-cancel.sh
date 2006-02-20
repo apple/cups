@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: 5.8-cancel.sh 4494 2005-02-18 02:18:11Z mike $"
+# "$Id: 5.8-cancel.sh 5091 2006-02-08 18:39:56Z mike $"
 #
 #   Test the cancel command.
 #
-#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -37,8 +37,8 @@ echo ""
 
 echo "Cancel All Test"
 echo ""
-echo "    cancel -a -"
-../systemv/cancel -a - 2>&1
+echo "    cancel -a"
+../systemv/cancel -a 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -48,5 +48,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.8-cancel.sh 4494 2005-02-18 02:18:11Z mike $".
+# End of "$Id: 5.8-cancel.sh 5091 2006-02-08 18:39:56Z mike $".
 #

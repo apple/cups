@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: parallel.c 5099 2006-02-13 02:46:10Z mike $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -361,7 +361,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	  {
 	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
 	            rbytes);
-            cupsBackchannelWrite(resource, rbytes, 1.0);
+            cupsBackChannelWrite(resource, rbytes, 1.0);
           }
 	}
 
@@ -728,5 +728,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: parallel.c 5099 2006-02-13 02:46:10Z mike $".
  */

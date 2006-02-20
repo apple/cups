@@ -1,5 +1,5 @@
 /*
- * "$Id: subscriptions.c 5046 2006-02-01 22:11:58Z mike $"
+ * "$Id: subscriptions.c 5108 2006-02-15 19:33:09Z mike $"
  *
  *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -233,7 +233,7 @@ cupsdAddEvent(
 	    ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
 	        	 "job-name", NULL, attr->values[0].string.text);
 
-	  switch (job->state->values[0].integer)
+	  switch (job->state_value)
 	  {
 	    case IPP_JOB_PENDING :
         	if (dest && dest->state == IPP_PRINTER_STOPPED)
@@ -668,10 +668,12 @@ cupsdExpireSubscriptions(
   for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
        sub;
        sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
-    if ((sub->expire <= curtime && dest && sub->dest == dest) ||
+    if ((!sub->job && !dest && sub->expire && sub->expire <= curtime) ||
+        (dest && sub->dest == dest) ||
 	(job && sub->job == job))
     {
-      cupsdLogMessage(CUPSD_LOG_INFO, "Subscription %d has expired...", sub->id);
+      cupsdLogMessage(CUPSD_LOG_INFO, "Subscription %d has expired...",
+                      sub->id);
 
       cupsdDeleteSubscription(sub, 0);
 
@@ -973,7 +975,10 @@ cupsdLoadAllSubscriptions(void)
       */
 
       if (value && isdigit(*value & 255))
-        sub->lease = atoi(value);
+      {
+        sub->lease  = atoi(value);
+        sub->expire = sub->lease ? time(NULL) + sub->lease : 0;
+      }
       else
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -1454,7 +1459,7 @@ cupsd_send_dbus(cupsd_eventmask_t event,/* I - Event to send */
   else if (event & CUPSD_EVENT_JOB_CREATED)
     what = "JobQueuedLocal";
   else if ((event & CUPSD_EVENT_JOB_STATE) && job &&
-           job->state->values[0].integer == IPP_JOB_PROCESSING)
+           job->state_value == IPP_JOB_PROCESSING)
     what = "JobStartedLocal";
   else
     return;
@@ -1632,5 +1637,5 @@ cupsd_start_notifier(
 
 
 /*
- * End of "$Id: subscriptions.c 5046 2006-02-01 22:11:58Z mike $".
+ * End of "$Id: subscriptions.c 5108 2006-02-15 19:33:09Z mike $".
  */

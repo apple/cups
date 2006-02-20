@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5008 2006-01-27 19:30:34Z mike $"
+# "$Id: Makefile 5126 2006-02-17 16:11:30Z mike $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -51,23 +51,27 @@ clean:
 #
 
 install:	all
-	$(INSTALL_DIR) $(SERVERROOT)
+	$(INSTALL_DIR) -m 755 $(SERVERROOT)
 	for file in $(KEEP); do \
 		if test -r $(SERVERROOT)/$$file ; then \
 			$(INSTALL_CONFIG) $$file $(SERVERROOT)/$$file.N ; \
+			chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file.N || true; \
 		else \
 			$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
+			chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file || true; \
 		fi ; \
 	done
 	$(INSTALL_CONFIG) cupsd.conf $(SERVERROOT)/cupsd.conf.default
+	-chgrp $(CUPS_GROUP) $(SERVERROOT)/cupsd.conf.default
 	for file in $(REPLACE); do \
 		if test -r $(SERVERROOT)/$$file ; then \
 			$(MV) $(SERVERROOT)/$$file $(SERVERROOT)/$$file.O ; \
 		fi ; \
 		$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
+		chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file || true; \
 	done
 	-if test x$(PAMDIR) != x$(BUILDROOT); then \
-		$(INSTALL_DIR) $(PAMDIR); \
+		$(INSTALL_DIR) -m 755 $(PAMDIR); \
 		if test -r $(PAMDIR)/cups/$(PAMFILE) ; then \
 			$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups.N ; \
 		else \
@@ -77,5 +81,5 @@ install:	all
 
 
 #
-# End of "$Id: Makefile 5008 2006-01-27 19:30:34Z mike $".
+# End of "$Id: Makefile 5126 2006-02-17 16:11:30Z mike $".
 #

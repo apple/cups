@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5023 2006-01-29 14:39:44Z mike $"
+# "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -142,7 +142,7 @@ depend:
 #
 
 install:	all installhdrs $(INSTALLSTATIC)
-	$(INSTALL_DIR) $(LIBDIR)
+	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
@@ -162,7 +162,7 @@ installstatic:
 	fi
 
 installhdrs:
-	$(INSTALL_DIR) $(INCLUDEDIR)/cups
+	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
 	for file in $(HEADERS); do \
 		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
 	done
@@ -357,5 +357,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5023 2006-01-29 14:39:44Z mike $".
+# End of "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $".
 #

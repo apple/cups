@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: http.c 5103 2006-02-14 19:27:42Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1311,11 +1311,15 @@ httpReconnect(http_t *http)		/* I - HTTP data */
   */
 
   if (http->fd >= 0)
+  {
 #ifdef WIN32
     closesocket(http->fd);
 #else
     close(http->fd);
 #endif /* WIN32 */
+
+    http->fd = -1;
+  }
 
  /*
   * Connect to the server...
@@ -2573,5 +2577,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP data */
 
 
 /*
- * End of "$Id: http.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: http.c 5103 2006-02-14 19:27:42Z mike $".
  */

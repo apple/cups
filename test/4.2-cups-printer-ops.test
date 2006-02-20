@@ -1,5 +1,5 @@
 #
-# "$Id: 4.2-cups-printer-ops.test 4837 2005-11-14 04:13:13Z mike $"
+# "$Id: 4.2-cups-printer-ops.test 5091 2006-02-08 18:39:56Z mike $"
 #
 #   Verify that the CUPS printer operations work.
 #
@@ -235,7 +235,28 @@
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
 }
+{
+	# The name of the test...
+	NAME "Set Default Printer to Test1"
+
+	# The operation to use
+	OPERATION cups-set-default
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
 
 #
-# End of "$Id: 4.2-cups-printer-ops.test 4837 2005-11-14 04:13:13Z mike $"
+# End of "$Id: 4.2-cups-printer-ops.test 5091 2006-02-08 18:39:56Z mike $"
 #

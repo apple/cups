@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: util.c 5064 2006-02-03 16:51:05Z mike $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1531,6 +1531,7 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
   cups_lang_t	*language;		/* Language to use */
   int		jobid;			/* New job ID */
+  const char	*base;			/* Basename of current filename */
 
 
   DEBUG_printf(("cupsPrintFiles(http=%p, name=\"%s\", num_files=%d, "
@@ -1685,6 +1686,18 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                    "requesting-user-name", NULL, cupsUser());
+
+     /*
+      * Add the original document filename...
+      */
+
+      if ((base = strrchr(files[i], '/')) != NULL)
+        base ++;
+      else
+        base = files[i];
+
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "document-name",
+                   NULL, base);
 
      /*
       * Is this the last document?
@@ -1990,5 +2003,5 @@ cups_set_error(ipp_status_t status,	/* I - IPP status code */
 
 
 /*
- * End of "$Id: util.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: util.c 5064 2006-02-03 16:51:05Z mike $".
  */

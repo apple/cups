@@ -23,7 +23,7 @@ dnl         WWW: http://www.cups.org
 dnl
 
 
-AC_ARG_ENABLE(launchd, [  --enable-launchd            turn on launchd support, default=yes])
+AC_ARG_ENABLE(launchd, [  --enable-launchd        turn on launchd support, default=yes])
 
 DEFAULT_LAUNCHD_CONF=""
 LAUNCHDLIBS=""

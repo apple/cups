@@ -1,0 +1,28 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+
+<H2 CLASS="title">新しいプリンタの追加</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">名前:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>("/"、"#"、空白を除く適当な表示可能文字を含めることができます)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">場所:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>("Lab 1" のように人間が読みやすい場所)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">説明:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>("HP LaserJet with Duplexer" のように人間が読みやすい説明)</SMALL></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/continue.gif" ALT="続ける"></TD>
+</TR>
+</TABLE>
+
+</FORM>

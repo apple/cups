@@ -8,7 +8,7 @@ function reset_config()
 "\\n" +
 "\\n" +
 "# Administrator user group...\\n" +
-"SystemGroup @CUPS_GROUP@\\n" +
+"SystemGroup @CUPS_SYSTEM_GROUPS@\\n" +
 "\\n" +
 "\\n" +
 "# Only listen for connections from the local machine.\\n" +

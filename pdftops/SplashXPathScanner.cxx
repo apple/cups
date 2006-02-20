@@ -186,7 +186,7 @@ GBool SplashXPathScanner::getNextSpan(int y, int *x0, int *x1) {
 }
 
 void SplashXPathScanner::computeIntersections(int y) {
-  SplashCoord ySegMin, ySegMax, xx0, xx1;
+  SplashCoord xSegMin, xSegMax, ySegMin, ySegMax, xx0, xx1;
   SplashXPathSeg *seg;
   int i, j;
 
@@ -236,19 +236,27 @@ void SplashXPathScanner::computeIntersections(int y) {
     } else if (seg->flags & splashXPathVert) {
       xx0 = xx1 = seg->x0;
     } else {
-      if (ySegMin <= y) {
-	// intersection with top edge
-	xx0 = seg->x0 + ((SplashCoord)y - seg->y0) * seg->dxdy;
+      if (seg->x0 < seg->x1) {
+	xSegMin = seg->x0;
+	xSegMax = seg->x1;
       } else {
-	// x coord of segment endpoint with min y coord
-	xx0 = (seg->flags & splashXPathFlip) ? seg->x1 : seg->x0;
+	xSegMin = seg->x1;
+	xSegMax = seg->x0;
       }
-      if (ySegMax >= y + 1) {
-	// intersection with bottom edge
-	xx1 = seg->x0 + ((SplashCoord)y + 1 - seg->y0) * seg->dxdy;
-      } else {
-	// x coord of segment endpoint with max y coord
-	xx1 = (seg->flags & splashXPathFlip) ? seg->x0 : seg->x1;
+      // intersection with top edge
+      xx0 = seg->x0 + ((SplashCoord)y - seg->y0) * seg->dxdy;
+      // intersection with bottom edge
+      xx1 = seg->x0 + ((SplashCoord)y + 1 - seg->y0) * seg->dxdy;
+      // the segment may not actually extend to the top and/or bottom edges
+      if (xx0 < xSegMin) {
+	xx0 = xSegMin;
+      } else if (xx0 > xSegMax) {
+	xx0 = xSegMax;
+      }
+      if (xx1 < xSegMin) {
+	xx1 = xSegMin;
+      } else if (xx1 > xSegMax) {
+	xx1 = xSegMax;
       }
     }
     if (xx0 < xx1) {

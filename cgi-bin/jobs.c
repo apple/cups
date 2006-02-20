@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c 4931 2006-01-14 20:37:40Z mike $"
+ * "$Id: jobs.c 5104 2006-02-15 03:21:04Z mike $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -164,10 +164,10 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
   request = ippNewRequest(op);
 
+  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
+
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
                NULL, uri);
-
-  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
 
   if ((user = getenv("REMOTE_USER")) == NULL)
     user = "guest";
@@ -199,5 +199,5 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: jobs.c 4931 2006-01-14 20:37:40Z mike $".
+ * End of "$Id: jobs.c 5104 2006-02-15 03:21:04Z mike $".
  */

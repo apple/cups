@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5051 2006-02-02 16:13:16Z mike $"
+ * "$Id: ipp.c 5131 2006-02-18 05:31:36Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -30,6 +30,7 @@
  *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
  *                                 upon the job and printer state...
  *   add_job_subscriptions()     - Add any subcriptions for a job.
+ *   add_job_uuid()              - Add job-uuid attribute to a job.
  *   add_printer()               - Add a printer to the system.
  *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
  *                                 based upon the printer state...
@@ -123,6 +124,7 @@ static int	add_file(cupsd_client_t *con, cupsd_job_t *job, mime_type_t *filetype
 		         int compression);
 static void	add_job_state_reasons(cupsd_client_t *con, cupsd_job_t *job);
 static void	add_job_subscriptions(cupsd_client_t *con, cupsd_job_t *job);
+static void	add_job_uuid(cupsd_client_t *con, cupsd_job_t *job);
 static void	add_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	add_printer_state_reasons(cupsd_client_t *con, cupsd_printer_t *p);
 static void	add_queued_job_count(cupsd_client_t *con, cupsd_printer_t *p);
@@ -155,7 +157,7 @@ static void	get_default(cupsd_client_t *con);
 static void	get_devices(cupsd_client_t *con);
 static void	get_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
-static void	get_notifications(cupsd_client_t *con, int id);
+static void	get_notifications(cupsd_client_t *con);
 static void	get_ppds(cupsd_client_t *con);
 static void	get_printers(cupsd_client_t *con, int type);
 static void	get_printer_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -428,9 +430,12 @@ cupsdProcessIPPRequest(
 	*/
 
         if (uri)
-          cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                  "cupsdProcessIPPRequest: URI=\"%s\"",
-	                  uri->values[0].string.text);
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s %s",
+                	  ippOpString(con->request->request.op.operation_id),
+			  uri->values[0].string.text);
+        else
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s",
+                	  ippOpString(con->request->request.op.operation_id));
 
 	switch (con->request->request.op.operation_id)
 	{
@@ -574,7 +579,7 @@ cupsdProcessIPPRequest(
 	      break;
 
           case IPP_GET_NOTIFICATIONS :
-	      get_notifications(con, sub_id);
+	      get_notifications(con);
 	      break;
 
 	  default :
@@ -1117,7 +1122,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     job = (cupsd_job_t *)pclass->job;
 
     cupsdStopJob(job, 1);
+
     job->state->values[0].integer = IPP_JOB_PENDING;
+    job->state_value              = IPP_JOB_PENDING;
   }
 
   if (need_restart_job)
@@ -1223,7 +1230,7 @@ add_job_state_reasons(
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job_state_reasons(%p[%d], %d)",
                   con, con->http.fd, job ? job->id : 0);
 
-  switch (job ? job->state->values[0].integer : IPP_JOB_CANCELLED)
+  switch (job ? job->state_value : IPP_JOB_CANCELLED)
   {
     case IPP_JOB_PENDING :
         if (job->dtype & CUPS_PRINTER_CLASS)
@@ -1445,6 +1452,59 @@ add_job_subscriptions(
 
   job->attrs->last    = prev;
   job->attrs->current = prev;
+}
+
+
+/*
+ * 'add_job_uuid()' - Add job-uuid attribute to a job.
+ *
+ * See RFC 4122 for the definition of UUIDs and the format.
+ */
+
+static void
+add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
+             cupsd_job_t    *job)	/* I - Job */
+{
+  char			uuid[1024];	/* job-uuid string */
+  ipp_attribute_t	*attr;		/* job-uuid attribute */
+  _cups_md5_state_t	md5state;	/* MD5 state */
+  unsigned char		md5sum[16];	/* MD5 digest/sum */
+
+
+ /*
+  * First see if the job already has a job-uuid attribute; if so, return...
+  */
+
+  if ((attr = ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI)) != NULL)
+    return;
+
+ /*
+  * No job-uuid attribute, so build a version 3 UUID with the local job
+  * ID at the end; see RFC 4122 for details.  Start with the MD5 sum of
+  * the ServerName, server name and port that the client connected to,
+  * and local job ID...
+  */
+
+  snprintf(uuid, sizeof(uuid), "%s:%s:%d:%d", ServerName, con->servername,
+	   con->serverport, job->id);
+
+  _cups_md5_init(&md5state);
+  _cups_md5_append(&md5state, (unsigned char *)uuid, strlen(uuid));
+  _cups_md5_finish(&md5state, md5sum);
+
+ /*
+  * Format the UUID URI using the MD5 sum and job ID.
+  */
+
+  snprintf(uuid, sizeof(uuid),
+           "urn:uuid:%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
+	   "%02x%02x%02x%02x%02x%02x",
+	   md5sum[0], md5sum[1], md5sum[2], md5sum[3], md5sum[4], md5sum[5],
+	   (md5sum[6] & 15) | 0x30, md5sum[7], (md5sum[8] & 0x3f) | 0x40,
+	   md5sum[9], md5sum[10], md5sum[11], md5sum[12], md5sum[13],
+	   md5sum[14], md5sum[15]);
+
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uuid", NULL, uuid);
 }
 
 
@@ -2022,7 +2082,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     job = (cupsd_job_t *)printer->job;
 
     cupsdStopJob(job, 1);
+
     job->state->values[0].integer = IPP_JOB_PENDING;
+    job->state_value              = IPP_JOB_PENDING;
   }
 
   if (need_restart_job)
@@ -2197,7 +2259,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
   * See if the job has been completed...
   */
 
-  if (job->state->values[0].integer != IPP_JOB_HELD)
+  if (job->state_value != IPP_JOB_HELD)
   {
    /*
     * Return a "not-possible" error...
@@ -2226,10 +2288,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to authenticate "
-		      "job #%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -2346,8 +2405,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     * Bad URI?
     */
 
-    if (!strncmp(resource, "/printers/", 10) ||
-        !strncmp(resource, "/classes/", 9))
+    if ((!strncmp(resource, "/printers/", 10) && resource[10]) ||
+        (!strncmp(resource, "/classes/", 9) && resource[9]))
     {
       send_ipp_status(con, IPP_NOT_FOUND,
                       _("The printer or class was not found."));
@@ -2484,7 +2543,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
         for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	     job;
 	     job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-	  if (job->state->values[0].integer <= IPP_JOB_PROCESSING &&
+	  if (job->state_value <= IPP_JOB_PROCESSING &&
 	      !strcasecmp(job->dest, dest))
 	    break;
 
@@ -2544,10 +2603,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to delete job #%d "
-		      "owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -2556,12 +2612,12 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * we can't cancel...
   */
 
-  if (job->state->values[0].integer >= IPP_JOB_CANCELLED)
+  if (job->state_value >= IPP_JOB_CANCELLED)
   {
     send_ipp_status(con, IPP_NOT_POSSIBLE,
                     _("Job #%d is already %s - can\'t cancel."), jobid,
-		    job->state->values[0].integer == IPP_JOB_CANCELLED ? "cancelled" :
-		    job->state->values[0].integer == IPP_JOB_ABORTED ? "aborted" :
+		    job->state_value == IPP_JOB_CANCELLED ? "cancelled" :
+		    job->state_value == IPP_JOB_ABORTED ? "aborted" :
 		    "completed");
     return;
   }
@@ -2592,6 +2648,48 @@ cancel_subscription(
     cupsd_client_t *con,		/* I - Client connection */
     int            sub_id)		/* I - Subscription ID */
 {
+  http_status_t		status;		/* Policy status */
+  cupsd_subscription_t	*sub;		/* Subscription */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cancel_subscription(con=%p[%d], sub_id=%d)",
+                  con, con->http.fd, sub_id);
+
+ /*
+  * Is the subscription ID valid?
+  */
+
+  if ((sub = cupsdFindSubscription(sub_id)) == NULL)
+  {
+   /*
+    * Bad subscription ID...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("notify-subscription-id %d no good!"), sub_id);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr :
+                                             DefaultPolicyPtr,
+                                 con, sub->owner)) != HTTP_OK)
+  {
+    send_http_error(con, status);
+    return;
+  }
+
+ /*
+  * Cancel the subscription...
+  */
+
+  cupsdDeleteSubscription(sub, 1);
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -3647,17 +3745,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-more-info", NULL, job_uri);
 
-  if (job->state->values[0].integer > IPP_JOB_PROCESSING &&
+  if (job->state_value > IPP_JOB_PROCESSING &&
       (!ra || cupsArrayFind(ra, "job-preserved")))
-  {
-    char	filename[1024];		/* Job data file */
-
-
-    snprintf(filename, sizeof(filename), "%s/d%05d-001", RequestRoot,
-             job->id);
     ippAddBoolean(con->response, IPP_TAG_JOB, "job-preserved",
-                  !access(filename, 0));
-  }
+                  job->num_files > 0);
 
   if (!ra || cupsArrayFind(ra, "job-printer-up-time"))
     ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
@@ -4038,7 +4129,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   * Make sure we aren't over our limit...
   */
 
-  if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
+  if (MaxJobs && cupsArrayCount(Jobs) >= MaxJobs)
     cupsdCleanJobs();
 
   if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
@@ -4082,6 +4173,8 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   job->dtype   = dtype;
   job->attrs   = con->request;
   con->request = NULL;
+
+  add_job_uuid(con, job);
 
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
@@ -4200,6 +4293,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
                              "job-state", IPP_JOB_STOPPED);
+  job->state_value = job->state->values[0].integer;
   job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                               "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
@@ -4233,6 +4327,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
     job->hold_until = time(NULL) + 60;
 
   job->state->values[0].integer = IPP_JOB_HELD;
+  job->state_value              = IPP_JOB_HELD;
 
   if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
       Classification)
@@ -4395,7 +4490,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
+                job->state_value);
 
   con->response->request.status.status_code = IPP_OK;
 
@@ -4641,6 +4736,17 @@ create_subscription(
   unsigned		mask;		/* notify-events */
 
 
+#ifdef DEBUG
+  for (attr = con->request->attrs; attr; attr = attr->next)
+  {
+    if (attr->group_tag != IPP_TAG_ZERO)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "g%04x v%04x %s", attr->group_tag,
+                      attr->value_tag, attr->name);
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "----SEP----");
+  }
+#endif /* DEBUG */
+
  /*
   * Is the destination valid?
   */
@@ -4798,8 +4904,12 @@ create_subscription(
       attr = attr->next;
     }
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "recipient=\"%s\"", recipient);
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "pullmethod=\"%s\"", pullmethod);
+    if (recipient)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "recipient=\"%s\"", recipient);
+    if (pullmethod)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "pullmethod=\"%s\"", pullmethod);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "notify-lease-duration=%d", lease);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "notify-time-interval=%d", interval);
 
     if (!recipient && !pullmethod)
       break;
@@ -4818,7 +4928,7 @@ create_subscription(
       }
     }
 
-    if (MaxLeaseDuration && lease > MaxLeaseDuration)
+    if (MaxLeaseDuration && (lease == 0 || lease > MaxLeaseDuration))
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "create_subscription: Limiting notify-lease-duration to "
@@ -4853,7 +4963,7 @@ create_subscription(
 
     sub->interval = interval;
     sub->lease    = lease;
-    sub->expire   = time(NULL) + lease;
+    sub->expire   = lease ? time(NULL) + lease : 0;
 
     cupsdSetString(&sub->owner, username);
 
@@ -5223,6 +5333,8 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * Copy attributes...
   */
 
+  cupsdLoadJob(job);
+
   ra = create_requested_array(con->request);
   copy_job_attrs(con, job, ra);
   cupsArrayDelete(ra);
@@ -5397,10 +5509,15 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     if (username[0] && strcasecmp(username, job->username))
       continue;
 
-    if (completed && job->state->values[0].integer <= IPP_JOB_STOPPED)
+    if (completed && job->state_value <= IPP_JOB_STOPPED)
       continue;
 
     if (job->id < first_job_id)
+      continue;
+
+    cupsdLoadJob(job);
+
+    if (!job->attrs)
       continue;
 
     if (count > 0)
@@ -5424,9 +5541,135 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
  */
 
 static void
-get_notifications(cupsd_client_t *con,	/* I - Client connection */
-                  int            id)	/* I - Subscription ID */
+get_notifications(cupsd_client_t *con)	/* I - Client connection */
 {
+  int			i, j;		/* Looping vars */
+  http_status_t		status;		/* Policy status */
+  cupsd_subscription_t	*sub;		/* Subscription */
+  ipp_attribute_t	*ids,		/* notify-subscription-ids */
+			*sequences;	/* notify-sequence-numbers */
+  int			min_seq;	/* Minimum sequence number */
+  int			interval;	/* Poll interval */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_subscription_attrs(con=%p[%d])",
+                  con, con->http.fd);
+
+ /*
+  * Get subscription attributes...
+  */
+
+  ids       = ippFindAttribute(con->request, "notify-subscription-ids",
+                               IPP_TAG_INTEGER);
+  sequences = ippFindAttribute(con->request, "notify-sequence-numbers",
+                               IPP_TAG_INTEGER);
+
+  if (!ids)
+  {
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("Missing notify-subscription-ids attribute!"));
+    return;
+  }
+
+ /*
+  * Are the subscription IDs valid?
+  */
+
+  for (i = 0, interval = 60; i < ids->num_values; i ++)
+  {
+    if ((sub = cupsdFindSubscription(ids->values[i].integer)) == NULL)
+    {
+     /*
+      * Bad subscription ID...
+      */
+
+      send_ipp_status(con, IPP_NOT_FOUND,
+                      _("notify-subscription-id %d no good!"),
+		      ids->values[i].integer);
+      return;
+    }
+
+   /*
+    * Check policy...
+    */
+
+    if ((status = cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr :
+                                               DefaultPolicyPtr,
+                                   con, sub->owner)) != HTTP_OK)
+    {
+      send_http_error(con, status);
+      return;
+    }
+
+   /*
+    * Check the subscription type and update the interval accordingly.
+    */
+
+    if (sub->job && sub->job->state_value == IPP_JOB_PROCESSING &&
+        interval > 10)
+      interval = 10;
+    else if (sub->job && sub->job->state_value >= IPP_JOB_STOPPED)
+      interval = 0;
+    else if (sub->dest && sub->dest->state == IPP_PRINTER_PROCESSING &&
+             interval > 30)
+      interval = 30;
+  }
+
+ /*
+  * Tell the client to poll again in N seconds...
+  */
+
+  if (interval > 0)
+    ippAddInteger(con->response, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
+                  "notify-get-interval", interval);
+
+  ippAddInteger(con->response, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
+                "printer-up-time", time(NULL));
+
+ /*
+  * Copy the subscription event attributes to the response.
+  */
+
+  con->response->request.status.status_code =
+      interval ? IPP_OK : IPP_OK_EVENTS_COMPLETE;
+
+  for (i = 0; i < ids->num_values; i ++)
+  {
+   /*
+    * Get the subscription and sequence number...
+    */
+
+    sub = cupsdFindSubscription(ids->values[i].integer);
+
+    if (sequences && i < sequences->num_values)
+      min_seq = sequences->values[i].integer;
+    else
+      min_seq = 1;
+
+   /*
+    * If we don't have any new events, nothing to do here...
+    */
+
+    if (min_seq > (sub->first_event_id + sub->num_events))
+      continue;
+
+   /*
+    * Otherwise copy all of the new events...
+    */
+
+    if (sub->first_event_id > min_seq)
+      j = 0;
+    else
+      j = min_seq - sub->first_event_id;
+
+    for (; j < sub->num_events; j ++)
+    {
+      ippAddSeparator(con->response);
+
+      copy_attrs(con->response, sub->events[j]->attrs, NULL,
+        	 IPP_TAG_EVENT_NOTIFICATION, 0);
+    }
+  }
 }
 
 
@@ -6072,9 +6315,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("Not authorized to hold job #%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -6311,7 +6552,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     * See if the job has been completed...
     */
 
-    if (job->state->values[0].integer > IPP_JOB_STOPPED)
+    if (job->state_value > IPP_JOB_STOPPED)
     {
      /*
       * Return a "not-possible" error...
@@ -6329,10 +6570,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if (!validate_user(job, con, job->username, username, sizeof(username)))
     {
-      send_ipp_status(con, IPP_FORBIDDEN,
-                      _("You are not authorized to move job #%d owned "
-			"by \"%s\"!"),
-                      job->id, job->username);
+      send_http_error(con, HTTP_UNAUTHORIZED);
       return;
     }
 
@@ -6358,7 +6596,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
       */
 
       if (strcasecmp(job->dest, src) ||
-          job->state->values[0].integer > IPP_JOB_STOPPED)
+          job->state_value > IPP_JOB_STOPPED)
 	continue;
 
      /*
@@ -6657,9 +6895,15 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Auto-type the file...
     */
 
+    ipp_attribute_t	*doc_name;	/* document-name attribute */
+
+
     cupsdLogMessage(CUPSD_LOG_DEBUG, "print_job: auto-typing file...");
 
-    filetype = mimeFileType(MimeDatabase, con->filename, NULL, &compression);
+    doc_name = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME);
+    filetype = mimeFileType(MimeDatabase, con->filename,
+                            doc_name ? doc_name->values[0].string.text : NULL,
+			    &compression);
 
     if (filetype)
     {
@@ -6772,7 +7016,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Make sure we aren't over our limit...
   */
 
-  if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
+  if (MaxJobs && cupsArrayCount(Jobs) >= MaxJobs)
     cupsdCleanJobs();
 
   if (cupsArrayCount(Jobs) >= MaxJobs && MaxJobs)
@@ -6817,6 +7061,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   job->dtype   = dtype;
   job->attrs   = con->request;
   con->request = NULL;
+
+  add_job_uuid(con, job);
 
  /*
   * Copy the rest of the job info...
@@ -6929,6 +7175,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
                              "job-state", IPP_JOB_PENDING);
+  job->state_value = job->state->values[0].integer;
   job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                               "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
@@ -6973,6 +7220,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     job->state->values[0].integer = IPP_JOB_HELD;
+    job->state_value              = IPP_JOB_HELD;
     cupsdSetJobHoldUntil(job, attr->values[0].string.text);
   }
 
@@ -7172,7 +7420,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state->values[0].integer);
+                job->state_value);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -7570,7 +7818,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
   * See if job is "held"...
   */
 
-  if (job->state->values[0].integer != IPP_JOB_HELD)
+  if (job->state_value != IPP_JOB_HELD)
   {
    /*
     * Nope - return a "not possible" error...
@@ -7586,10 +7834,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to release job id "
-		      "%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -7631,6 +7876,76 @@ renew_subscription(
     cupsd_client_t *con,		/* I - Client connection */
     int            sub_id)		/* I - Subscription ID */
 {
+  http_status_t		status;		/* Policy status */
+  cupsd_subscription_t	*sub;		/* Subscription */
+  ipp_attribute_t	*lease;		/* notify-lease-duration */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "renew_subscription(con=%p[%d], sub_id=%d)",
+                  con, con->http.fd, sub_id);
+
+ /*
+  * Is the subscription ID valid?
+  */
+
+  if ((sub = cupsdFindSubscription(sub_id)) == NULL)
+  {
+   /*
+    * Bad subscription ID...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("notify-subscription-id %d no good!"), sub_id);
+    return;
+  }
+
+  if (sub->job)
+  {
+   /*
+    * Job subscriptions cannot be renewed...
+    */
+
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Job subscriptions cannot be renewed!"));
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr :
+                                             DefaultPolicyPtr,
+                                 con, sub->owner)) != HTTP_OK)
+  {
+    send_http_error(con, status);
+    return;
+  }
+
+ /*
+  * Renew the subscription...
+  */
+
+  lease = ippFindAttribute(con->request, "notify-lease-duration",
+                           IPP_TAG_INTEGER);
+
+  sub->lease = lease ? lease->values[0].integer : DefaultLeaseDuration;
+
+  if (MaxLeaseDuration && (sub->lease == 0 || sub->lease > MaxLeaseDuration))
+  {
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "renew_subscription: Limiting notify-lease-duration to "
+		    "%d seconds.",
+		    MaxLeaseDuration);
+    sub->lease = MaxLeaseDuration;
+  }
+
+  sub->expire = sub->lease ? time(NULL) + sub->lease : 0;
+
+  cupsdSaveAllSubscriptions();
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 
@@ -7718,7 +8033,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
   * See if job is in any of the "completed" states...
   */
 
-  if (job->state->values[0].integer <= IPP_JOB_PROCESSING)
+  if (job->state_value <= IPP_JOB_PROCESSING)
   {
    /*
     * Nope - return a "not possible" error...
@@ -7733,7 +8048,9 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
   * See if we have retained the job files...
   */
 
-  if (!JobFiles && job->state->values[0].integer > IPP_JOB_STOPPED)
+  cupsdLoadJob(job);
+
+  if (!job->attrs ||job->num_files == 0)
   {
    /*
     * Nope - return a "not possible" error...
@@ -7750,10 +8067,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to restart job id "
-		      "%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -7960,10 +8274,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to send document "
-		      "for job #%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
@@ -8040,9 +8351,15 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Auto-type the file...
     */
 
+    ipp_attribute_t	*doc_name;	/* document-name attribute */
+
+
     cupsdLogMessage(CUPSD_LOG_DEBUG, "send_document: auto-typing file...");
 
-    filetype = mimeFileType(MimeDatabase, con->filename, NULL, &compression);
+    doc_name = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME);
+    filetype = mimeFileType(MimeDatabase, con->filename,
+                            doc_name ? doc_name->values[0].string.text : NULL,
+			    &compression);
 
     if (filetype)
     {
@@ -8089,6 +8406,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
  /*
   * Add the file to the job...
   */
+
+  cupsdLoadJob(job);
 
   if (add_file(con, job, filetype, compression))
     return;
@@ -8150,16 +8469,22 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
       cupsdUpdateQuota(printer, job->username, 0, kbytes);
     }
 
-    if (job->state->values[0].integer == IPP_JOB_STOPPED)
+    if (job->state_value == IPP_JOB_STOPPED)
+    {
       job->state->values[0].integer = IPP_JOB_PENDING;
-    else if (job->state->values[0].integer == IPP_JOB_HELD)
+      job->state_value              = IPP_JOB_PENDING;
+    }
+    else if (job->state_value == IPP_JOB_HELD)
     {
       if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
                                    IPP_TAG_KEYWORD)) == NULL)
 	attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
 
       if (!attr || !strcmp(attr->values[0].string.text, "no-hold"))
+      {
 	job->state->values[0].integer = IPP_JOB_PENDING;
+	job->state_value              = IPP_JOB_PENDING;
+      }
     }
 
     cupsdSaveJob(job);
@@ -8184,6 +8509,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     if (!attr || !strcmp(attr->values[0].string.text, "no-hold"))
     {
       job->state->values[0].integer = IPP_JOB_HELD;
+      job->state_value              = IPP_JOB_HELD;
       job->hold_until               = time(NULL) + 60;
       cupsdSaveJob(job);
     }
@@ -8202,7 +8528,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job ? job->state->values[0].integer : IPP_JOB_CANCELLED);
+                job ? job->state_value : IPP_JOB_CANCELLED);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -8453,7 +8779,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * See if the job has been completed...
   */
 
-  if (job->state->values[0].integer > IPP_JOB_STOPPED)
+  if (job->state_value > IPP_JOB_STOPPED)
   {
    /*
     * Return a "not-possible" error...
@@ -8470,16 +8796,15 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_ipp_status(con, IPP_FORBIDDEN,
-                    _("You are not authorized to alter job id "
-		      "%d owned by \"%s\"!"),
-                    jobid, job->username);
+    send_http_error(con, HTTP_UNAUTHORIZED);
     return;
   }
 
  /*
   * See what the user wants to change.
   */
+
+  cupsdLoadJob(job);
 
   for (attr = con->request->attrs; attr; attr = attr->next)
   {
@@ -8537,7 +8862,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
           attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
       }
-      else if (job->state->values[0].integer >= IPP_JOB_PROCESSING)
+      else if (job->state_value >= IPP_JOB_PROCESSING)
       {
 	send_ipp_status(con, IPP_NOT_POSSIBLE,
 	                _("Job is completed and cannot be changed."));
@@ -8565,19 +8890,22 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	{
 	  case IPP_JOB_PENDING :
 	  case IPP_JOB_HELD :
-	      if (job->state->values[0].integer > IPP_JOB_HELD)
+	      if (job->state_value > IPP_JOB_HELD)
 	      {
 		send_ipp_status(con, IPP_NOT_POSSIBLE,
 		                _("Job state cannot be changed."));
 		return;
 	      }
               else if (con->response->request.status.status_code == IPP_OK)
+	      {
 		job->state->values[0].integer = attr->values[0].integer;
+		job->state_value              = attr->values[0].integer;
+	      }
 	      break;
 
 	  case IPP_JOB_PROCESSING :
 	  case IPP_JOB_STOPPED :
-	      if (job->state->values[0].integer != attr->values[0].integer)
+	      if (job->state_value != attr->values[0].integer)
 	      {
 		send_ipp_status(con, IPP_NOT_POSSIBLE,
 		                _("Job state cannot be changed."));
@@ -8588,7 +8916,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	  case IPP_JOB_CANCELLED :
 	  case IPP_JOB_ABORTED :
 	  case IPP_JOB_COMPLETED :
-	      if (job->state->values[0].integer > IPP_JOB_PROCESSING)
+	      if (job->state_value > IPP_JOB_PROCESSING)
 	      {
 		send_ipp_status(con, IPP_NOT_POSSIBLE,
 		                _("Job state cannot be changed."));
@@ -8601,6 +8929,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		if (JobHistory)
 		{
                   job->state->values[0].integer = attr->values[0].integer;
+                  job->state_value              = attr->values[0].integer;
 		  cupsdSaveJob(job);
 		}
 	      }
@@ -9084,5 +9413,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 5051 2006-02-02 16:13:16Z mike $".
+ * End of "$Id: ipp.c 5131 2006-02-18 05:31:36Z mike $".
  */

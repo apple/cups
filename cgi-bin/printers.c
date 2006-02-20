@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: printers.c 5104 2006-02-15 03:21:04Z mike $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -201,6 +201,9 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
 			*urlend;	/* End of URL */
 
 
+  fprintf(stderr, "DEBUG: show_all_printers(http=%p, user=\"%s\")\n",
+          http, user);
+
  /*
   * Show the standard header...
   */
@@ -351,6 +354,7 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
     * Delete the response...
     */
 
+    cupsArrayDelete(printers);
     ippDelete(response);
   }
   else
@@ -380,6 +384,9 @@ show_printer(http_t     *http,		/* I - Connection to server */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
   char		refresh[1024];		/* Refresh URL */
 
+
+  fprintf(stderr, "DEBUG: show_printer(http=%p, printer=\"%s\")\n",
+          http, printer);
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -466,5 +473,5 @@ show_printer(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: printers.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: printers.c 5104 2006-02-15 03:21:04Z mike $".
  */

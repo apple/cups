@@ -1,11 +1,11 @@
 /*
- * "$Id: usb-unix.c 4881 2005-12-15 22:03:40Z mike $"
+ * "$Id: usb-unix.c 5099 2006-02-13 02:46:10Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
  *   This file is included from "usb.c" when compiled on UNIX/Linux.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -246,7 +246,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  {
 	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
 	            rbytes);
-            cupsBackchannelWrite(backbuf, rbytes, 1.0);
+            cupsBackChannelWrite(backbuf, rbytes, 1.0);
           }
 	}
 
@@ -616,5 +616,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c 4881 2005-12-15 22:03:40Z mike $".
+ * End of "$Id: usb-unix.c 5099 2006-02-13 02:46:10Z mike $".
  */

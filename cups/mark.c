@@ -1,9 +1,9 @@
 /*
- * "$Id: mark.c 4980 2006-01-25 19:57:45Z mike $"
+ * "$Id: mark.c 5119 2006-02-16 15:52:06Z mike $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -31,6 +31,8 @@
  *   ppdFindChoice()       - Return a pointer to an option choice.
  *   ppdFindMarkedChoice() - Return the marked choice for the specified option.
  *   ppdFindOption()       - Return a pointer to the specified option.
+ *   ppdFirstOption()      - Return the first option in the PPD file.
+ *   ppdNextOption()       - Return the next option in the PPD file.
  *   ppdIsMarked()         - Check to see if an option is marked...
  *   ppdMarkDefaults()     - Mark all default options in the PPD file.
  *   ppdMarkOption()       - Mark an option in a PPD file.
@@ -323,6 +325,9 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   ppd_choice_t	*c;			/* Choice pointer */
 
 
+  DEBUG_printf(("ppdMarkOption(ppd=%p, option=\"%s\", choice=\"%s\")\n",
+        	ppd, option, choice));
+
  /*
   * Range check input...
   */
@@ -465,7 +470,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	  */
 
 	  for (j = 0; j < ppd->num_sizes; j ++)
-	    ppd->sizes[i].marked = !strcasecmp(ppd->sizes[i].name,
+	    ppd->sizes[j].marked = !strcasecmp(ppd->sizes[j].name,
 		                               choice);
 
 	 /*
@@ -477,7 +482,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	  {
 	    if ((o = ppdFindOption(ppd, "PageRegion")) != NULL)
 	      for (j = 0; j < o->num_choices; j ++)
-        	o->choices[i].marked = 0;
+        	o->choices[j].marked = 0;
 	  }
 	  else
 	  {
@@ -520,6 +525,42 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 
 
 /*
+ * 'ppdFirstOption()' - Return the first option in the PPD file.
+ *
+ * Options are returned from all groups in sorted order.
+ *
+ * @since CUPS 1.2@
+ */
+
+ppd_option_t *				/* O - First option or NULL */
+ppdFirstOption(ppd_file_t *ppd)		/* I - PPD file */
+{
+  if (!ppd)
+    return (NULL);
+  else
+    return ((ppd_option_t *)cupsArrayFirst(ppd->options));
+}
+
+
+/*
+ * 'ppdNextOption()' - Return the next option in the PPD file.
+ *
+ * Options are returned from all groups in sorted order.
+ *
+ * @since CUPS 1.2@
+ */
+
+ppd_option_t *				/* O - Next option or NULL */
+ppdNextOption(ppd_file_t *ppd)		/* I - PPD file */
+{
+  if (!ppd)
+    return (NULL);
+  else
+    return ((ppd_option_t *)cupsArrayNext(ppd->options));
+}
+
+
+/*
  * 'ppd_defaults()' - Set the defaults for this group and all sub-groups.
  */
 
@@ -545,5 +586,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c 4980 2006-01-25 19:57:45Z mike $".
+ * End of "$Id: mark.c 5119 2006-02-16 15:52:06Z mike $".
  */

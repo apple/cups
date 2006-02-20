@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5045 2006-02-01 21:48:01Z mike $"
+# "$Id: Makefile 5136 2006-02-19 18:46:46Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,8 +28,9 @@ include Makedefs
 # Directories to make...
 #
 
-DIRS	=	cups backend berkeley cgi-bin filter locale man pdftops \
-		notifier scheduler systemv test
+DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
+		notifier pdftops scheduler systemv test
+
 
 #
 # Make all targets...
@@ -42,6 +43,7 @@ all:
 		(cd $$dir ; $(MAKE) $(MFLAGS)) || exit 1;\
 	done
 
+
 #
 # Remove object and target files...
 #
@@ -51,6 +53,7 @@ clean:
 		echo Cleaning in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) clean) || exit 1;\
 	done
+
 
 #
 # Make dependencies
@@ -113,6 +116,10 @@ install:	installhdrs
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		fi \
 	fi
+	if test "x$(DBUSDIR)" != "x"; then \
+		$(INSTALL_DIR) $(BUILDROOT)$(DBUSDIR); \
+		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/cups.conf; \
+	fi
 
 
 #
@@ -120,7 +127,7 @@ install:	installhdrs
 #
 
 installsrc:
-	gnutar --dereference --exclude=CVS -cf - . | gnutar -C $(SRCROOT) -xf -
+	gnutar --dereference --exclude=.svn -cf - . | gnutar -C $(SRCROOT) -xf -
 
 installhdrs:
 	(cd cups ; $(MAKE) $(MFLAGS) installhdrs) || exit 1;\
@@ -166,6 +173,7 @@ pkg:
 tardist:
 	epm $(EPMFLAGS) -f tardist cups packaging/cups.list
 
+
 #
-# End of "$Id: Makefile 5045 2006-02-01 21:48:01Z mike $".
+# End of "$Id: Makefile 5136 2006-02-19 18:46:46Z mike $".
 #

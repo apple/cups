@@ -1,5 +1,5 @@
 /*
- * "$Id: backchannel.c 4828 2005-11-11 12:53:38Z mike $"
+ * "$Id: backchannel.c 5099 2006-02-13 02:46:10Z mike $"
  *
  *   Backchannel functions for the Common UNIX Printing System (CUPS).
  *
@@ -64,7 +64,7 @@ static void	cups_setup(fd_set *set, struct timeval *tval,
  */
 
 int					/* O - Bytes read or -1 on error */
-cupsBackchannelRead(char   *buffer,	/* I - Buffer to read */
+cupsBackChannelRead(char   *buffer,	/* I - Buffer to read */
                     int    bytes,	/* I - Bytes to read */
 		    double timeout)	/* I - Timeout in seconds */
 {
@@ -111,7 +111,7 @@ cupsBackchannelRead(char   *buffer,	/* I - Buffer to read */
  */
 
 int					/* O - Bytes written or -1 on error */
-cupsBackchannelWrite(
+cupsBackChannelWrite(
     const char *buffer,			/* I - Buffer to write */
     int        bytes,			/* I - Bytes to write */
     double     timeout)			/* I - Timeout in seconds */
@@ -197,5 +197,5 @@ cups_setup(fd_set         *set,		/* I - Set for select() */
 
 
 /*
- * End of "$Id: backchannel.c 4828 2005-11-11 12:53:38Z mike $".
+ * End of "$Id: backchannel.c 5099 2006-02-13 02:46:10Z mike $".
  */

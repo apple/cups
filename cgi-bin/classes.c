@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: classes.c 5097 2006-02-10 04:06:23Z mike $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -344,6 +344,7 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
     * Delete the response...
     */
 
+    cupsArrayDelete(classes);
     ippDelete(response);
   }
   else
@@ -459,5 +460,5 @@ show_class(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: classes.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: classes.c 5097 2006-02-10 04:06:23Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.c 4871 2005-12-07 00:41:11Z mike $"
+ * "$Id: policy.c 5122 2006-02-17 15:41:40Z mike $"
  *
  *   Policy routines for the Common UNIX Printing System (CUPS).
  *
@@ -236,10 +236,7 @@ cupsdDeleteAllPolicies(void)
   for (i = NumPolicies, p = Policies; i > 0; i --, p ++)
   {
     for (j = (*p)->num_ops, po = (*p)->ops; j > 0; j --, po ++)
-    {
       cupsdDeleteLocation(*po);
-      free(*po);
-    }
 
     if ((*p)->num_ops > 0)
       free((*p)->ops);
@@ -333,5 +330,5 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 
 
 /*
- * End of "$Id: policy.c 4871 2005-12-07 00:41:11Z mike $".
+ * End of "$Id: policy.c 5122 2006-02-17 15:41:40Z mike $".
  */

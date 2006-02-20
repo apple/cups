@@ -1,9 +1,9 @@
 /*
- * "$Id: server.c 4993 2006-01-26 19:27:40Z mike $"
+ * "$Id: server.c 5095 2006-02-09 16:22:48Z mike $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -223,5 +223,5 @@ cupsdStopServer(void)
 
 
 /*
- * End of "$Id: server.c 4993 2006-01-26 19:27:40Z mike $".
+ * End of "$Id: server.c 5095 2006-02-09 16:22:48Z mike $".
  */

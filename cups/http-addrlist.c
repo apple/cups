@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addrlist.c 4976 2006-01-25 15:07:40Z mike $"
+ * "$Id: http-addrlist.c 5103 2006-02-14 19:27:42Z mike $"
  *
  *   HTTP address list routines for the Common UNIX Printing System (CUPS).
  *
@@ -128,7 +128,11 @@ httpAddrConnect(
     * Close this socket and move to the next address...
     */
 
+#ifdef WIN32
     closesocket(*sock);
+#else
+    close(*sock);
+#endif /* WIN32 */
 
     addrlist = addrlist->next;
   }
@@ -589,5 +593,5 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
 
 /*
- * End of "$Id: http-addrlist.c 4976 2006-01-25 15:07:40Z mike $".
+ * End of "$Id: http-addrlist.c 5103 2006-02-14 19:27:42Z mike $".
  */

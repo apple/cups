@@ -1,10 +1,10 @@
 /*
- * "$Id: auth.h 4812 2005-10-25 18:23:10Z mike $"
+ * "$Id: auth.h 5069 2006-02-04 05:24:35Z mike $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -97,8 +97,7 @@ typedef struct
 
 typedef struct
 {
-  char			location[HTTP_MAX_URI];
-					/* Location of resource */
+  char			*location;	/* Location of resource */
   ipp_op_t		op;		/* IPP operation */
   int			limit,		/* Limit for these types of requests */
 			length,		/* Length of location string */
@@ -122,9 +121,7 @@ typedef struct cupsd_client_s cupsd_client_t;
  * Globals...
  */
 
-VAR int			NumLocations	VALUE(0);
-					/* Number of authorization locations */
-VAR cupsd_location_t	*Locations	VALUE(NULL);
+VAR cups_array_t	*Locations	VALUE(NULL);
 					/* Authorization locations */
 VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
 					/* Default AuthType, if not specified */
@@ -159,5 +156,5 @@ extern http_status_t	cupsdIsAuthorized(cupsd_client_t *con, const char *owner);
 
 
 /*
- * End of "$Id: auth.h 4812 2005-10-25 18:23:10Z mike $".
+ * End of "$Id: auth.h 5069 2006-02-04 05:24:35Z mike $".
  */

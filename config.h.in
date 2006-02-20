@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 5028 2006-01-31 01:16:43Z mike $"
+ * "$Id: config.h.in 5082 2006-02-05 21:58:58Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -398,7 +398,6 @@
  */
 
 #undef HAVE_MEMBERSHIP_H
-#undef HAVE_MEMBERSHIPPRIV_H
 #undef HAVE_MBR_UID_TO_UUID
 
 
@@ -420,5 +419,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 5028 2006-01-31 01:16:43Z mike $".
+ * End of "$Id: config.h.in 5082 2006-02-05 21:58:58Z mike $".
  */

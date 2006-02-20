@@ -1,0 +1,84 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   cancel man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636 USA
+.\"
+.\"       Voice: (301) 373-9600
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cancel 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.SH NAME
+cancel - cancel jobs
+.SH SYNOPSIS
+.B cancel
+[ -E ] [ -U
+.I username
+] [ -a ] [ -h
+.I hostname[:port]
+] [ -u 
+.I username
+] [
+.I id
+] [
+.I destination
+] [
+.I destination-id
+]
+.SH DESCRIPTION
+\fIcancel\fR cancels existing print jobs. The \fI-a\fR option will remove
+all jobs from the specified destination.
+.SH OPTIONS
+The following options are recognized by \fIlp\fR:
+.TP 5
+-E
+.br
+Forces encryption when connecting to the server.
+.TP 5
+-U username
+.br
+Specifies the username to use when connecting to the server.
+.TP 5
+-a
+.br
+Cancel all jobs on the named destination, or all jobs on all
+destinations if none is provided.
+.TP 5
+-h hostname[:port]
+.br
+Chooses an alternate server.
+.TP 5
+-u username
+.br
+Cancels jobs owned by \fIusername\fR.
+.SH COMPATIBILITY
+Unlike the System V printing system, CUPS allows printer names to
+contain any printable character except SPACE, TAB, "/", or "#".
+Also, printer and class names are \fInot\fR case-sensitive.
+.SH NOTES
+Administrators wishing to prevent unauthorized cancellation of
+jobs via the \fI-u\fR option should require authentication for
+Cancel-Jobs operations in \fIcupsd.conf(5)\fR.
+.SH SEE ALSO
+\fIlp(1)\fR, \fIlpmove(8)\fR, \fIlpstat(1)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id$".
+.\"

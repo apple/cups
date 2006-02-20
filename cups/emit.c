@@ -1,9 +1,9 @@
 /*
- * "$Id: emit.c 4980 2006-01-25 19:57:45Z mike $"
+ * "$Id: emit.c 5086 2006-02-07 02:45:26Z mike $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -926,5 +926,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c 4980 2006-01-25 19:57:45Z mike $".
+ * End of "$Id: emit.c 5086 2006-02-07 02:45:26Z mike $".
  */

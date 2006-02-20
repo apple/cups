@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $"
+# "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $"
 #
 #   Notifier makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -49,7 +49,7 @@ clean:
 #
 
 install:	all
-	$(INSTALL_DIR) $(SERVERBIN)/notifier
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/notifier
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
 	done
@@ -87,5 +87,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 4950 2006-01-19 16:07:57Z mike $".
+# End of "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $".
 #

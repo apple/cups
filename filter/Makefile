@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 5000 2006-01-26 23:38:43Z mike $"
+# "$Id: Makefile 5089 2006-02-08 04:05:01Z mike $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2005 by Easy Software Products.
+#   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -72,7 +72,7 @@ depend:
 #
 
 install:	all installhdrs $(INSTALLSTATIC)
-	$(INSTALL_DIR) $(SERVERBIN)/filter
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/filter
 	for file in $(FILTERS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
 	done
@@ -98,7 +98,7 @@ installstatic:
 	fi
 
 installhdrs:
-	$(INSTALL_DIR) $(INCLUDEDIR)/cups
+	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
 
@@ -227,7 +227,7 @@ imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) \
 
 pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS) -lm
 
 
 #
@@ -284,5 +284,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5000 2006-01-26 23:38:43Z mike $".
+# End of "$Id: Makefile 5089 2006-02-08 04:05:01Z mike $".
 #

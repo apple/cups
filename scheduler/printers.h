@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 5039 2006-02-01 16:29:57Z mike $"
+ * "$Id: printers.h 5083 2006-02-06 02:57:43Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -110,7 +110,6 @@ VAR cupsd_policy_t	*DefaultPolicyPtr
  */
 
 extern cupsd_printer_t	*cupsdAddPrinter(const char *name);
-extern void		cupsdAddPrinterFilter(cupsd_printer_t *p, const char *filter);
 extern void		cupsdAddPrinterHistory(cupsd_printer_t *p);
 extern void		cupsdAddPrinterUser(cupsd_printer_t *p, const char *username);
 extern cupsd_quota_t	*cupsdAddQuota(cupsd_printer_t *p, const char *username);
@@ -144,5 +143,5 @@ extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
 
 
 /*
- * End of "$Id: printers.h 5039 2006-02-01 16:29:57Z mike $".
+ * End of "$Id: printers.h 5083 2006-02-06 02:57:43Z mike $".
  */

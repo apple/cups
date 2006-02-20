@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec 4787 2005-10-13 20:13:21Z mike $"
+# "$Id: cups.spec.in 5136 2006-02-19 18:46:46Z mike $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -24,7 +24,7 @@
 #         WWW: http://www.cups.org
 #
 
-Summary: Common Unix Printing System
+Summary: Common UNIX Printing System
 Name: cups
 Version: @CUPS_VERSION@
 Release: 0
@@ -45,19 +45,24 @@ Obsoletes: lpd, lpr, LPRng
 Provides: lpd, lpr, LPRng
 
 %package devel
-Summary: Common Unix Printing System - development environment
+Summary: Common UNIX Printing System - development environment
 Group: Development/Libraries
 Requires: %{name}-libs = %{epoch}:%{version}
 
 %package libs
-Summary: Common Unix Printing System - shared libraries
+Summary: Common UNIX Printing System - shared libraries
 Group: System Environment/Libraries
 Provides: libcups1
 
 %package lpd
-Summary: Common Unix Printing System - LPD support
+Summary: Common UNIX Printing System - LPD support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version} xinetd
+
+%package ja
+Summary: Common UNIX Printing System - Japanese support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
 
 %description
 The Common UNIX Printing System provides a portable printing layer for 
@@ -78,6 +83,10 @@ UNIX® operating systems. This package contains the CUPS shared libraries.
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides LPD client support.
 
+%description ja
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Japanese support.
+
 %prep
 %setup
 
@@ -94,44 +103,38 @@ rm -rf $RPM_BUILD_ROOT
 make BUILDROOT=$RPM_BUILD_ROOT install
 
 %post
-ldconfig
+/sbin/chkconfig --add cups
+/sbin/chkconfig cups on
 
-if test -x /sbin/chkconfig; then
-	/sbin/chkconfig --add cups
-	/sbin/chkconfig cups on
+# Restart cupsd if we are upgrading...
+if test $1 -gt 1; then
+	/sbin/service cups stop
+	/sbin/service cups start
 fi
 
-# these lines automatically start cupsd after installation; commented out
-# by request...
-#if test -f /sbin/init.d/cups; then
-#	/sbin/init.d/cups start
-#fi
-#if test -f /etc/rc.d/init.d/cups; then
-#	/etc/rc.d/init.d/cups start
-#fi
-#if test -f /etc/init.d/cups; then
-#	/etc/init.d/cups start
-#fi
+%post libs
+/sbin/ldconfig
 
 %preun
-if test -f /sbin/init.d/cups; then
-	/sbin/init.d/cups stop
-fi
-if test -f /etc/rc.d/init.d/cups; then
-	/etc/rc.d/init.d/cups stop
-fi
-if test -f /etc/init.d/cups; then
-	/etc/init.d/cups stop
-fi
-
-if test -x /sbin/chkconfig; then
+if test $1 = 0; then
+	/sbin/service cups stop
 	/sbin/chkconfig --del cups
 fi
+
+%postun
+if test $1 -ge 1; then
+	/sbin/service cups stop
+	/sbin/service cups start
+fi
+
+%postun libs
+/sbin/ldconfig
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
+%docdir /usr/share/doc/cups
 %defattr(-,root,root)
 %dir /etc/cups
 %config(noreplace) /etc/cups/*.conf
@@ -140,6 +143,11 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cups/mime.types
 /etc/cups/mime.convs
 %dir /etc/cups/ppd
+
+# DBUS
+/etc/dbus-1/system.d/*
+
+# PAM
 %dir /etc/pam.d
 /etc/pam.d/*
 
@@ -187,6 +195,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/lib/cups/driver
 %dir /usr/lib/cups/filter
 /usr/lib/cups/filter/*
+%dir /usr/lib/cups/monitor
+/usr/lib/cups/monitor/*
 %dir /usr/lib/cups/notifier
 /usr/lib/cups/notifier/*
 
@@ -204,8 +214,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/whatsnew.html
 %dir /usr/share/doc/cups/images
 /usr/share/doc/cups/images/*
-%dir /usr/share/locale
-/usr/share/locale/*
+/usr/share/locale/fr/cups_fr.po
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
@@ -225,6 +234,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/cupsd.8.gz
 /usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz
+/usr/share/man/man8/cups-deviced.8.gz
+/usr/share/man/man8/cups-driverd.8.gz
 /usr/share/man/man8/cups-polld.8.gz
 /usr/share/man/man8/lpadmin.8.gz
 /usr/share/man/man8/lpc.8.gz
@@ -235,16 +246,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /var/cache/cups
 %dir /var/log/cups
 %dir /var/run/cups
-%attr(0711,lp,root) %dir /var/run/cups/certs
-%attr(0710,lp,root) %dir /var/spool/cups
-%attr(1770,lp,root) %dir /var/spool/cups/tmp
+%attr(0711,lp,sys) %dir /var/run/cups/certs
+%attr(0710,lp,sys) %dir /var/spool/cups
+%attr(1770,lp,sys) %dir /var/spool/cups/tmp
 
 %files devel
 %defattr(-,root,root)
 %dir /usr/share/man/man1
-/usr/share/man/man1/backend.1.gz
 /usr/share/man/man1/cups-config.1.gz
-/usr/share/man/man1/filter.1.gz
+%dir /usr/share/man/man7
+/usr/share/man/man7/*
 
 /usr/bin/cups-config
 %dir /usr/include/cups
@@ -269,6 +280,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/cups-lpd.8.gz
 
+%files ja
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/ja
+/usr/share/doc/cups/ja/index.html
+%dir /usr/share/doc/cups/ja/images
+/usr/share/doc/cups/ja/images/*
+%dir /usr/share/cups/templates/ja
+/usr/share/cups/templates/ja/*
+/usr/share/locale/ja/cups_ja.po
+
 #
-# End of "$Id: cups.spec 4787 2005-10-13 20:13:21Z mike $".
+# End of "$Id: cups.spec.in 5136 2006-02-19 18:46:46Z mike $".
 #

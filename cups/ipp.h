@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: ipp.h 5090 2006-02-08 17:08:01Z mike $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -269,6 +269,7 @@ typedef enum				/**** IPP status codes... ****/
   IPP_OK_IGNORED_NOTIFICATIONS,
   IPP_OK_TOO_MANY_EVENTS,
   IPP_OK_BUT_CANCEL_SUBSCRIPTION,
+  IPP_OK_EVENTS_COMPLETE,
   IPP_REDIRECTION_OTHER_SITE = 0x300,
   IPP_BAD_REQUEST = 0x0400,
   IPP_FORBIDDEN,
@@ -496,5 +497,5 @@ extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: ipp.h 5090 2006-02-08 17:08:01Z mike $".
  */

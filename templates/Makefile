@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 5055 2006-02-02 18:25:38Z mike $"
+# "$Id: Makefile 5110 2006-02-15 21:42:46Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2005 by Easy Software Products.
+#   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -28,6 +28,7 @@ include ../Makedefs
 # Template files...
 #
 
+LANGUAGES =	ja
 FILES	=	\
 		add-class.tmpl \
 		add-printer.tmpl \
@@ -110,12 +111,20 @@ clean:
 #
 
 install: all
-	$(INSTALL_DIR) $(DATADIR)/templates
+	$(INSTALL_DIR) -m 755 $(DATADIR)/templates
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/templates; \
+	done
+	for lang in $(LANGUAGES); do \
+		$(INSTALL_DIR) -m 755 $(DATADIR)/templates/$$lang; \
+		for file in $(FILES); do \
+			if test -e $$lang/$$file; then \
+				$(INSTALL_DATA) $$lang/$$file $(DATADIR)/templates/$$lang; \
+			fi \
+		done \
 	done
 
 
 #
-# End of "$Id: Makefile 5055 2006-02-02 18:25:38Z mike $".
+# End of "$Id: Makefile 5110 2006-02-15 21:42:46Z mike $".
 #
