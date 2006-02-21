@@ -34,6 +34,7 @@
 
 #include <cups/string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 
 /*

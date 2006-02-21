@@ -24,6 +24,14 @@
 #         WWW: http://www.cups.org
 #
 
+# Conditional build options (--with name/--without name):
+#
+#   dbus     - Enable/disable DBUS support (default = enable)
+
+%{!?_with_dbus: %{!?_without_dbus: %define _with_dbus --with-dbus}}
+%{?_with_dbus: %define _dbus --enable-dbus}
+%{!?_with_dbus: %define _dbus --disble-dbus}
+
 Summary: Common UNIX Printing System
 Name: cups
 Version: @CUPS_VERSION@
@@ -91,7 +99,7 @@ UNIX® operating systems. This package provides Japanese support.
 %setup
 
 %build
-CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" ./configure
+CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" ./configure %{_dbus}
 
 # If we got this far, all prerequisite libraries must be here.
 make
@@ -144,8 +152,10 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cups/mime.convs
 %dir /etc/cups/ppd
 
+%if %{?_with_dbus:1}%{!?_with_dbus:0}
 # DBUS
 /etc/dbus-1/system.d/*
+%endif
 
 # PAM
 %dir /etc/pam.d

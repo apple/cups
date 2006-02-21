@@ -184,6 +184,8 @@ BACKLIBS=""
 CUPSDLIBS=""
 DBUSDIR=""
 
+AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
+
 case $uname in
         Darwin*)
                 BACKLIBS="-framework IOKit"
@@ -215,19 +217,21 @@ case $uname in
 
 	Linux*)
 		dnl Check for DBUS support
-		AC_PATH_PROG(PKGCONFIG, pkg-config)
-		if test "x$PKGCONFIG" != x; then
-			AC_MSG_CHECKING(for DBUS)
-			if $PKGCONFIG --exists dbus-1; then
-				AC_MSG_RESULT(yes)
-				AC_CHECK_LIB(dbus-1,
-				    dbus_message_iter_init_append,
-				    AC_DEFINE(HAVE_DBUS)
-				    CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
-				    CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
-				    DBUSDIR="/etc/dbus-1/system.d")
-			else
-				AC_MSG_RESULT(no)
+		if test "x$enable_dbus" != xno; then
+			AC_PATH_PROG(PKGCONFIG, pkg-config)
+			if test "x$PKGCONFIG" != x; then
+				AC_MSG_CHECKING(for DBUS)
+				if $PKGCONFIG --exists dbus-1; then
+					AC_MSG_RESULT(yes)
+					AC_CHECK_LIB(dbus-1,
+					    dbus_message_iter_init_append,
+					    AC_DEFINE(HAVE_DBUS)
+					    CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
+					    CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
+					    DBUSDIR="/etc/dbus-1/system.d")
+				else
+					AC_MSG_RESULT(no)
+				fi
 			fi
 		fi
 		;;
