@@ -23,6 +23,9 @@
  *
  * Contents:
  *
+ *   main()       - Convert a man page to HTML.
+ *   put_entity() - Put a single character, using entities as needed.
+ *   put_line()   - Put a whole string for a line.
  */
 
 /*
@@ -56,7 +59,8 @@ main(int  argc,				/* I - Number of command-line args */
 		*lineptr,		/* Pointer into line */
 		name[1024],		/* Heading anchor name */
 		*nameptr;		/* Pointer into anchor name */
-  int		inheading,		/* Inside a heading? */
+  int		rfc,			/* RFC # */
+		inheading,		/* Inside a heading? */
 		inpre,			/* Inside preformatted text? */
 		intoc,			/* Inside table-of-contents? */
 		toclevel,		/* Current table-of-contents level */
@@ -113,7 +117,7 @@ main(int  argc,				/* I - Number of command-line args */
 	       "\t<style type='text/css'><!--\n"
 	       "\th1, h2, h3 { font-family: sans-serif; }\n"
 	       "\tp, pre { font-family: monospace; }\n"
-	       "\th1.title, h2.title, h3.title { border-bottom: solid "
+	       "\th2.title, h3.title, h3.title { border-bottom: solid "
 	       "2px #000000; }\n"
 	       "\t--></style>\n");
 
@@ -123,6 +127,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   linenum = 0;
+  rfc     = 0;
 
   while (cupsFileGets(infile, line, sizeof(line)))
   {
@@ -138,6 +143,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (!line[0])
       break;
+    else if (!strncasecmp(line, "Request for Comments:", 21))
+      rfc = atoi(line + 21);
   }
 
  /*
@@ -154,7 +161,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   for (lineptr = line; isspace(*lineptr & 255); lineptr ++);
 
-  cupsFilePrintf(outfile, "<title>%s", lineptr);
+  cupsFilePrintf(outfile, "<title>RFC %d: %s", rfc, lineptr);
 
   while (cupsFileGets(infile, line, sizeof(line)))
   {
@@ -340,7 +347,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
 
       strlcpy(name, line, sizeof(name));
-      for (nameptr = name, level = 0; *nameptr;)
+      for (nameptr = name, level = 1; *nameptr;)
         if (isdigit(*nameptr & 255))
 	{
 	  while (isdigit(*nameptr & 255))
@@ -356,7 +363,8 @@ main(int  argc,				/* I - Number of command-line args */
 	else
 	  nameptr ++;
 
-      cupsFilePrintf(outfile, "\n<h%d class='title'><a name='s%s'>", level, name);
+      cupsFilePrintf(outfile, "\n<h%d class='title'><a name='s%s'>", level,
+                     name);
       put_line(outfile, line);
 
       intoc     = 0;
@@ -378,7 +386,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (!inheading)
       {
-        cupsFilePuts(outfile, "\n<h1 class='title'>");
+        cupsFilePuts(outfile, "\n<h2 class='title'>");
         inheading = -1;
       }
 
@@ -395,7 +403,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (inheading)
   {
     if (inheading < 0)
-      cupsFilePuts(outfile, "</h1>\n");
+      cupsFilePuts(outfile, "</h2>\n");
     else
       cupsFilePrintf(outfile, "</a></h%d>\n", inheading);
   }

@@ -386,6 +386,8 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
 
   bytes = fp->ptr - fp->buf;
 
+  DEBUG_printf(("    Flushing %ld bytes...\n", (long)bytes));
+
   if (bytes > 0)
   {
 #ifdef HAVE_LIBZ
@@ -907,8 +909,10 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 {
   va_list	ap;			/* Argument list */
   size_t	bytes;			/* Formatted size */
-  char		buf[2048];		/* Formatted text */
+  char		buf[8192];		/* Formatted text */
 
+
+  DEBUG_printf(("cupsFilePrintf(fp=%p, format=\"%s\", ...)\n", fp, format));
 
   if (!fp || !format || (fp->mode != 'w' && fp->mode != 's'))
     return (-1);
@@ -916,6 +920,9 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
   va_start(ap, format);
   bytes = vsnprintf(buf, sizeof(buf), format, ap);
   va_end(ap);
+
+  if (bytes >= sizeof(buf))
+    return (-1);
 
   if (fp->mode == 's')
     return (cups_write(fp, buf, bytes));
@@ -1336,6 +1343,9 @@ cups_compress(cups_file_t *fp,		/* I - CUPS file */
               const char  *buf,		/* I - Buffer */
 	      size_t      bytes)	/* I - Number bytes */
 {
+  DEBUG_printf(("cups_compress(fp=%p, buf=%p, bytes=%ld)\n", fp, buf,
+                (long)bytes));
+
  /*
   * Update the CRC...
   */
@@ -1355,10 +1365,16 @@ cups_compress(cups_file_t *fp,		/* I - CUPS file */
     * Flush the current buffer...
     */
 
+    DEBUG_printf(("    avail_in=%d, avail_out=%d\n", fp->stream.avail_in,
+                  fp->stream.avail_out));
+
     if (fp->stream.avail_out < (int)(sizeof(fp->cbuf) / 8))
     {
       if (cups_write(fp, (char *)fp->cbuf, fp->stream.next_out - fp->cbuf) < 0)
         return (-1);
+
+      fp->stream.next_out  = fp->cbuf;
+      fp->stream.avail_out = sizeof(fp->cbuf);
     }
 
     deflate(&(fp->stream), Z_NO_FLUSH);
@@ -1733,6 +1749,9 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 		count;			/* Count this time */
 
 
+  DEBUG_printf(("cups_write(fp=%p, buf=%p, bytes=%ld)\n", fp, buf,
+                (long)bytes));
+
  /*
   * Loop until all bytes are written...
   */
@@ -1756,6 +1775,8 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
       else
         return (-1);
     }
+
+    DEBUG_printf(("    count=%ld\n", (long)count));
 
    /*
     * Update the counts for the last write call...

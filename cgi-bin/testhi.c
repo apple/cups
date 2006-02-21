@@ -38,7 +38,7 @@
  * Local functions...
  */
 
-static void	list_nodes(const char *title, int num_nodes, help_node_t **nodes);
+static void	list_nodes(const char *title, cups_array_t *nodes);
 
 
 /*
@@ -59,8 +59,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   hi = helpLoadIndex("testhi.index", ".");
 
-  list_nodes("nodes", hi->num_nodes, hi->nodes);
-  list_nodes("sorted", hi->num_nodes, hi->sorted);
+  list_nodes("nodes", hi->nodes);
+  list_nodes("sorted", hi->sorted);
 
  /*
   * Do any searches...
@@ -72,7 +72,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (search)
     {
-      list_nodes(argv[1], search->num_nodes, search->sorted);
+      list_nodes(argv[1], search->sorted);
       helpDeleteIndex(search);
     }
     else
@@ -94,20 +94,22 @@ main(int  argc,				/* I - Number of command-line arguments */
  */
 
 static void
-list_nodes(const char  *title,		/* I - Title string */
-           int         num_nodes,	/* I - Number of nodes */
-	   help_node_t **nodes)		/* I - Nodes */
+list_nodes(const char   *title,		/* I - Title string */
+	   cups_array_t *nodes)		/* I - Nodes */
 {
-  int	i;				/* Looping var */
+  int		i;			/* Looping var */
+  help_node_t	*node;			/* Current node */
 
 
-  printf("%s (%d nodes):\n", title, num_nodes);
-  for (i = 0; i < num_nodes; i ++)
-    if (nodes[i]->anchor)
-      printf("    %d: %s#%s \"%s\"\n", i, nodes[i]->filename, nodes[i]->anchor,
-             nodes[i]->text);
+  printf("%s (%d nodes):\n", title, cupsArrayCount(nodes));
+  for (i = 1, node = (help_node_t *)cupsArrayFirst(nodes);
+       node;
+       i ++, node = (help_node_t *)cupsArrayNext(nodes))
+    if (node->anchor)
+      printf("    %d: %s#%s \"%s\"\n", i, node->filename, node->anchor,
+             node->text);
     else
-      printf("    %d: %s \"%s\"\n", i, nodes[i]->filename, nodes[i]->text);
+      printf("    %d: %s \"%s\"\n", i, node->filename, node->text);
 }
 
 

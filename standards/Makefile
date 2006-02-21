@@ -105,7 +105,8 @@ install:	all
 #
 
 rfctohtml:	rfctohtml.o ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a $(LIBZ)
+	$(CC) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a \
+		$(COMMONLIBS) $(LIBZ)
 
 
 #

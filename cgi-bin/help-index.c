@@ -3,7 +3,7 @@
  *
  *   On-line help index routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -29,9 +29,7 @@
  *   helpSaveIndex()            - Save a help index to disk.
  *   helpSearchIndex()          - Search an index.
  *   help_compile_search()      - Convert a search string into a regular expression.
- *   help_create_sorted()       - Create the sorted node array.
  *   help_delete_node()         - Free all memory used by a node.
- *   help_insert_node()         - Insert a node in an index.
  *   help_load_directory()      - Load a directory of files into an index.
  *   help_load_file()           - Load a HTML files into an index.
  *   help_new_node()            - Create a new node and add it to an index.
@@ -51,9 +49,7 @@
  * Local functions...
  */
 
-static void		help_create_sorted(help_index_t *hi);
 static void		help_delete_node(help_node_t *n);
-static void		help_insert_node(help_index_t *hi, help_node_t *n);
 static int		help_load_directory(help_index_t *hi,
 			                    const char *directory,
 					    const char *relative);
@@ -65,8 +61,8 @@ static help_node_t	*help_new_node(const char *filename, const char *anchor,
 			               const char *section, const char *text,
 				       time_t mtime, off_t offset,
 				       size_t length);
-static int		help_sort_by_name(const void *p1, const void *p2);
-static int		help_sort_by_score(const void *p1, const void *p2);
+static int		help_sort_by_name(help_node_t *p1, help_node_t *p2);
+static int		help_sort_by_score(help_node_t *p1, help_node_t *p2);
 
 
 /*
@@ -74,9 +70,9 @@ static int		help_sort_by_score(const void *p1, const void *p2);
  */
 
 void
-helpDeleteIndex(help_index_t *hi)
+helpDeleteIndex(help_index_t *hi)	/* I - Help index */
 {
-  int	i;				/* Looping var */
+  help_node_t	*node;			/* Current node */
 
 
   DEBUG_printf(("helpDeleteIndex(hi=%p)\n", hi));
@@ -84,16 +80,19 @@ helpDeleteIndex(help_index_t *hi)
   if (!hi)
     return;
 
-  if (!hi->search)
+  for (node = (help_node_t *)cupsArrayFirst(hi->nodes);
+       node;
+       node = (help_node_t *)cupsArrayNext(hi->nodes))
   {
-    for (i = 0; i < hi->num_nodes; i ++)
-      help_delete_node(hi->nodes[i]);
+    cupsArrayRemove(hi->nodes, node);
+    cupsArrayRemove(hi->sorted, node);
+
+    if (!hi->search)
+      help_delete_node(node);
   }
 
-  free(hi->nodes);
-
-  if (hi->sorted)
-    free(hi->sorted);
+  cupsArrayDelete(hi->nodes);
+  cupsArrayDelete(hi->sorted);
 
   free(hi);
 }
@@ -103,13 +102,12 @@ helpDeleteIndex(help_index_t *hi)
  * 'helpFindNode()' - Find a node in an index.
  */
 
-help_node_t **				/* O - Node pointer or NULL */
+help_node_t *				/* O - Node pointer or NULL */
 helpFindNode(help_index_t *hi,		/* I - Index */
              const char   *filename,	/* I - Filename */
              const char   *anchor)	/* I - Anchor */
 {
-  help_node_t	key,			/* Search key */
-		*ptr;			/* Pointer to key */
+  help_node_t	key;			/* Search key */
 
 
   DEBUG_printf(("helpFindNode(hi=%p, filename=\"%s\", anchor=\"%s\")\n",
@@ -128,14 +126,12 @@ helpFindNode(help_index_t *hi,		/* I - Index */
 
   key.filename = (char *)filename;
   key.anchor   = (char *)anchor;
-  ptr          = &key;
 
  /*
   * Return any match...
   */
 
-  return ((help_node_t **)bsearch(&ptr, hi->nodes, hi->num_nodes,
-                                  sizeof(help_node_t *), help_sort_by_name));
+  return ((help_node_t *)cupsArrayFind(hi->nodes, &key));
 }
 
 
@@ -160,7 +156,6 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
   off_t		offset;			/* Offset into file */
   size_t	length;			/* Length in bytes */
   int		update;			/* Update? */
-  int		i;			/* Looping var */
   help_node_t	*node;			/* Current node */
 
 
@@ -171,7 +166,19 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
   * Create a new, empty index.
   */
 
-  hi = (help_index_t *)calloc(1, sizeof(help_index_t));
+  if ((hi = (help_index_t *)calloc(1, sizeof(help_index_t))) == NULL)
+    return (NULL);
+
+  hi->nodes  = cupsArrayNew((cups_array_func_t)help_sort_by_name, NULL);
+  hi->sorted = cupsArrayNew((cups_array_func_t)help_sort_by_score, NULL);
+
+  if (!hi->nodes || !hi->sorted)
+  {
+    cupsArrayDelete(hi->nodes);
+    cupsArrayDelete(hi->sorted);
+    free(hi);
+    return (NULL);
+  }
 
  /*
   * Try loading the existing index file...
@@ -266,9 +273,9 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 				  mtime, offset, length)) == NULL)
           break;
 
-	help_insert_node(hi, node);
-
 	node->score = -1;
+
+	cupsArrayAdd(hi->nodes, node);
       }
     }
 
@@ -285,32 +292,27 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
   * Remove any files that are no longer installed...
   */
 
-  for (i = 0; i < hi->num_nodes;)
-  {
-    if (hi->nodes[i]->score < 0)
+  for (node = (help_node_t *)cupsArrayFirst(hi->nodes);
+       node;
+       node = (help_node_t *)cupsArrayNext(hi->nodes))
+    if (node->score < 0)
     {
      /*
       * Delete this node...
       */
 
-      help_delete_node(hi->nodes[i]);
-
-      hi->num_nodes --;
-      if (i < hi->num_nodes)
-        memmove(hi->nodes + i, hi->nodes + i + 1,
-	        (hi->num_nodes - i) * sizeof(help_node_t *));
-
-      update = 1;
+      cupsArrayRemove(hi->nodes, node);
+      help_delete_node(node);
     }
-    else
-    {
-     /*
-      * Keep this node...
-      */
 
-      i ++;
-    }
-  }
+ /*
+  * Add nodes to the sorted array...
+  */
+
+  for (node = (help_node_t *)cupsArrayFirst(hi->nodes);
+       node;
+       node = (help_node_t *)cupsArrayNext(hi->nodes))
+    cupsArrayAdd(hi->sorted, node);
 
  /*
   * Save the index if we updated it...
@@ -318,12 +320,6 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 
   if (update)
     helpSaveIndex(hi, hifile);
-
- /*
-  * Create the sorted array...
-  */
-
-  help_create_sorted(hi);
 
  /*
   * Return the index...
@@ -342,7 +338,6 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
               const char   *hifile)	/* I - Index filename */
 {
   cups_file_t	*fp;			/* Index file */
-  int		i;			/* Looping var */
   help_node_t	*node;			/* Current node */
 
 
@@ -363,13 +358,13 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
 
   cupsFilePuts(fp, "HELPV1\n");
 
-  for (i = 0; i < hi->num_nodes; i ++)
+  for (node = (help_node_t *)cupsArrayFirst(hi->nodes);
+       node;
+       node = (help_node_t *)cupsArrayNext(hi->nodes))
   {
    /*
     * Write the current node with/without the anchor...
     */
-
-    node = hi->nodes[i];
 
     if (node->anchor)
     {
@@ -389,9 +384,11 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
     }
   }
 
+  cupsFileFlush(fp);
+
   if (cupsFileClose(fp) < 0)
     return (-1);
-  else if (i < hi->num_nodes)
+  else if (node)
     return (-1);
   else
     return (0);
@@ -408,9 +405,8 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
 		const char   *section,	/* I - Limit search to this section */
 		const char   *filename)	/* I - Limit search to this file */
 {
-  int		i;			/* Looping var */
   help_index_t	*search;		/* Search index */
-  help_node_t	**n;			/* Current node */
+  help_node_t	*node;			/* Current node */
   void		*sc;			/* Search context */
   int		matches;		/* Number of matches */
 
@@ -426,17 +422,27 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   if (!hi || !query)
     return (NULL);
 
-  for (i = 0, n = hi->nodes; i < hi->num_nodes; i ++, n ++)
-    n[0]->score = 0;
+ /*
+  * Reset the scores of all nodes to 0...
+  */
+
+  for (node = (help_node_t *)cupsArrayFirst(hi->nodes);
+       node;
+       node = (help_node_t *)cupsArrayNext(hi->nodes))
+    node->score = 0;
+
+ /*
+  * Find the first node to search in...
+  */
 
   if (filename)
   {
-    n = helpFindNode(hi, filename, NULL);
-    if (!n)
+    node = helpFindNode(hi, filename, NULL);
+    if (!node)
       return (NULL);
   }
   else
-    n = hi->nodes;
+    node = (help_node_t *)cupsArrayFirst(hi->nodes);
 
  /*
   * Convert the query into a regular expression...
@@ -457,6 +463,18 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
     return (NULL);
   }
 
+  search->nodes  = cupsArrayNew((cups_array_func_t)help_sort_by_name, NULL);
+  search->sorted = cupsArrayNew((cups_array_func_t)help_sort_by_score, NULL);
+  
+  if (!search->nodes || !search->sorted)
+  {
+    cupsArrayDelete(search->nodes);
+    cupsArrayDelete(search->sorted);
+    free(search);
+    cgiFreeSearch(sc);
+    return (NULL);
+  }
+
   search->search = 1;
 
  /*
@@ -464,20 +482,21 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   * search index...
   */
 
-  for (i = n - hi->nodes; i < hi->num_nodes; i ++, n ++)
-    if (section && strcmp(n[0]->section, section))
+  for (; node; node = (help_node_t *)cupsArrayNext(hi->nodes))
+    if (section && strcmp(node->section, section))
       continue;
-    else if (filename && strcmp(n[0]->filename, filename))
+    else if (filename && strcmp(node->filename, filename))
       continue;
-    else if ((matches = cgiDoSearch(sc, n[0]->text)) > 0)
+    else if ((matches = cgiDoSearch(sc, node->text)) > 0)
     {
      /*
       * Found a match, add the node to the search index...
       */
 
-      help_insert_node(search, *n);
+      node->score = matches;
 
-      n[0]->score = matches;
+      cupsArrayAdd(search->nodes, node);      
+      cupsArrayAdd(search->sorted, node);      
     }
 
  /*
@@ -487,57 +506,10 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   cgiFreeSearch(sc);
 
  /*
-  * Sort the results...
-  */
-
-  help_create_sorted(search);
-
- /*
   * Return the results...
   */
 
   return (search);
-}
-
-
-/*
- * 'help_create_sorted()' - Create the sorted node array.
- */
-
-static void
-help_create_sorted(help_index_t *hi)	/* I - Index */
-{
-  DEBUG_printf(("help_create_sorted(hi=%p)\n", hi));
-
- /*
-  * Free any existing sorted array...
-  */
-
-  if (hi->sorted)
-    free(hi->sorted);
-
- /*
-  * Create a new sorted array...
-  */
-
-  hi->sorted = calloc(hi->num_nodes, sizeof(help_node_t *));
-
-  if (!hi->sorted)
-    return;
-
- /*
-  * Copy the nodes to the new array...
-  */
-
-  memcpy(hi->sorted, hi->nodes, hi->num_nodes * sizeof(help_node_t *));
-
- /*
-  * Sort the new array by score and text.
-  */
-
-  if (hi->num_nodes > 1)
-    qsort(hi->sorted, hi->num_nodes, sizeof(help_node_t *),
-          help_sort_by_score);
 }
 
 
@@ -570,104 +542,6 @@ help_delete_node(help_node_t *n)	/* I - Node */
 
 
 /*
- * 'help_insert_node()' - Insert a node in an index.
- */
-
-static void
-help_insert_node(help_index_t *hi,	/* I - Index */
-                 help_node_t  *n)	/* I - Node */
-{
-  int		current,		/* Current node */
-		left,			/* Left side */
-		right,			/* Right side */
-		diff;			/* Difference between nodes */
-  help_node_t	**temp;			/* Temporary node pointer */
-
-
-  DEBUG_printf(("help_insert_node(hi=%p, n=%p)\n", hi, n));
-
- /*
-  * Allocate memory as needed...
-  */
-
-  if (hi->num_nodes >= hi->alloc_nodes)
-  {
-   /*
-    * Expand the array in 128 node increments...
-    */
-
-    hi->alloc_nodes += 128;
-    if (hi->alloc_nodes == 128)
-      temp = (help_node_t **)malloc(hi->alloc_nodes * sizeof(help_node_t *));
-    else
-      temp = (help_node_t **)realloc(hi->nodes,
-                                     hi->alloc_nodes * sizeof(help_node_t *));
-
-    if (!temp)
-      return;
-
-    hi->nodes = temp;
-  }
-
- /*
-  * Find the insertion point...
-  */
-
-  if (hi->num_nodes == 0 ||
-      help_sort_by_name(&n, hi->nodes + hi->num_nodes - 1) > 0)
-  {
-   /*
-    * Last node...
-    */
-
-    hi->nodes[hi->num_nodes] = n;
-    hi->num_nodes ++;
-    return;
-  }
-  else if (help_sort_by_name(&n, hi->nodes) < 0)
-  {
-   /*
-    * First node...
-    */
-
-    memmove(hi->nodes + 1, hi->nodes, hi->num_nodes * sizeof(help_node_t *));
-    hi->nodes[0] = n;
-    hi->num_nodes ++;
-    return;
-  }
-
- /*
-  * Otherwise, do a binary insertion...
-  */
-
-  left    = 0;
-  right   = hi->num_nodes - 1;
-
-  do
-  {
-    current = (left + right) / 2;
-    diff    = help_sort_by_name(&n, hi->nodes + current);
-
-    if (!diff)
-      break;
-    else if (diff < 0)
-      right = current;
-    else
-      left = current;
-  }
-  while ((right - left) > 1);
-
-  if (diff > 0)
-    current ++;
-
-  memmove(hi->nodes + current + 1, hi->nodes + current,
-          (hi->num_nodes - current) * sizeof(help_node_t *));
-  hi->nodes[current] = n;
-  hi->num_nodes ++;
-}
-
-
-/*
  * 'help_load_directory()' - Load a directory of files into an index.
  */
 
@@ -677,14 +551,13 @@ help_load_directory(
     const char   *directory,		/* I - Directory */
     const char   *relative)		/* I - Relative path */
 {
-  int		i;			/* Looping var */
   cups_dir_t	*dir;			/* Directory file */
   cups_dentry_t	*dent;			/* Directory entry */
   char		*ext,			/* Pointer to extension */
 		filename[1024],		/* Full filename */
 		relname[1024];		/* Relative filename */
   int		update;			/* Updated? */
-  help_node_t	**node;			/* Current node */
+  help_node_t	*node;			/* Current node */
 
 
   DEBUG_printf(("help_load_directory(hi=%p, directory=\"%s\", relative=\"%s\")\n",
@@ -701,6 +574,13 @@ help_load_directory(
 
   while ((dent = cupsDirRead(dir)) != NULL)
   {
+   /*
+    * Skip "." files...
+    */
+
+    if (dent->filename[0] == '.')
+      continue;
+
    /*
     * Get absolute and relative filenames...
     */
@@ -729,16 +609,16 @@ help_load_directory(
 	* index is up-to-date...
 	*/
 
-        if (node[0]->mtime == dent->fileinfo.st_mtime)
+        if (node->mtime == dent->fileinfo.st_mtime)
 	{
 	 /*
 	  * Same modification time, so mark all of the nodes
 	  * for this file as up-to-date...
 	  */
 
-          for (i = node - hi->nodes; i < hi->num_nodes; i ++, node ++)
-	    if (!strcmp(node[0]->filename, relname))
-	      node[0]->score = 0;
+          for (; node; node = (help_node_t *)cupsArrayNext(hi->nodes))
+	    if (!strcmp(node->filename, relname))
+	      node->score = 0;
 	    else
 	      break;
 
@@ -779,8 +659,7 @@ help_load_file(
     time_t       mtime)			/* I - Modification time */
 {
   cups_file_t	*fp;			/* HTML file */
-  help_node_t	*node,			/* Current node */
-		**n;			/* Node pointer */
+  help_node_t	*node;			/* Current node */
   char		line[1024],		/* Line from file */
                 section[1024],		/* Section */
 		*ptr,			/* Pointer into line */
@@ -924,14 +803,14 @@ help_load_file(
         break;
       }
 
-      if ((n = helpFindNode(hi, relative, anchor)) != NULL)
+      if ((node = helpFindNode(hi, relative, anchor)) != NULL)
       {
        /*
 	* Node already in the index, so replace the text and other
 	* data...
 	*/
 
-        node = n[0];
+        cupsArrayRemove(hi->nodes, node);
 
         if (node->section)
 	  free(node->section);
@@ -952,7 +831,6 @@ help_load_file(
 	*/
 
         node = help_new_node(relative, anchor, section, text, mtime, offset, 0);
-	help_insert_node(hi, node);
       }
 
      /*
@@ -978,6 +856,11 @@ help_load_file(
 
       *text = '\0';
 
+     /*
+      * (Re)add the node to the array...
+      */
+
+      cupsArrayAdd(hi->nodes, node);
       break;
     }
 
@@ -1013,9 +896,11 @@ help_new_node(const char   *filename,	/* I - Filename */
   help_node_t	*n;			/* Node */
 
 
-  DEBUG_printf(("help_new_node(filename=\"%s\", anchor=\"%s\", text=\"%s\", mtime=%ld, offset=%ld, length=%ld)\n",
+  DEBUG_printf(("help_new_node(filename=\"%s\", anchor=\"%s\", text=\"%s\", "
+                "mtime=%ld, offset=%ld, length=%ld)\n",
                 filename ? filename : "(nil)", anchor ? anchor : "(nil)",
-		text ? text : "(nil)", mtime, offset, length));
+		text ? text : "(nil)", (long)mtime, (long)offset,
+		(long)length));
 
   n = (help_node_t *)calloc(1, sizeof(help_node_t));
   if (!n)
@@ -1038,30 +923,27 @@ help_new_node(const char   *filename,	/* I - Filename */
  */
 
 static int				/* O - Difference */
-help_sort_by_name(const void *p1,	/* I - First node */
-                  const void *p2)	/* I - Second node */
+help_sort_by_name(help_node_t *n1,	/* I - First node */
+                  help_node_t *n2)	/* I - Second node */
 {
-  help_node_t	**n1,			/* First node */
-		**n2;			/* Second node */
   int		diff;			/* Difference */
 
 
-  DEBUG_printf(("help_sort_by_name(p1=%p, p2=%p)\n", p1, p2));
+  DEBUG_printf(("help_sort_by_name(n1=%p(%s#%s), n2=%p(%s#%s)\n",
+                n1, n1->filename, n1->anchor ? n1->anchor : "",
+		n2, n2->filename, n2->anchor ? n2->anchor : ""));
 
-  n1 = (help_node_t **)p1;
-  n2 = (help_node_t **)p2;
-
-  if ((diff = strcmp(n1[0]->filename, n2[0]->filename)) != 0)
+  if ((diff = strcmp(n1->filename, n2->filename)) != 0)
     return (diff);
 
-  if (!n1[0]->anchor && !n2[0]->anchor)
+  if (!n1->anchor && !n2->anchor)
     return (0);
-  else if (!n1[0]->anchor)
+  else if (!n1->anchor)
     return (-1);
-  else if (!n2[0]->anchor)
+  else if (!n2->anchor)
     return (1);
   else
-    return (strcmp(n1[0]->anchor, n2[0]->anchor));
+    return (strcmp(n1->anchor, n2->anchor));
 }
 
 
@@ -1070,31 +952,29 @@ help_sort_by_name(const void *p1,	/* I - First node */
  */
 
 static int				/* O - Difference */
-help_sort_by_score(const void *p1,	/* I - First node */
-                   const void *p2)	/* I - Second node */
+help_sort_by_score(help_node_t *n1,	/* I - First node */
+                   help_node_t *n2)	/* I - Second node */
 {
-  help_node_t	**n1,			/* First node */
-		**n2;			/* Second node */
   int		diff;			/* Difference */
 
 
-  DEBUG_printf(("help_sort_by_score(p1=%p, p2=%p)\n", p1, p2));
+  DEBUG_printf(("help_sort_by_score(n1=%p(%d \"%s\" \"%s\"), "
+                "n2=%p(%d \"%s\" \"%s\")\n",
+                n1, n1->score, n1->section ? n1->section : "", n1->text,
+                n2, n2->score, n2->section ? n2->section : "", n2->text));
 
-  n1 = (help_node_t **)p1;
-  n2 = (help_node_t **)p2;
+  if (n1->score != n2->score)
+    return (n1->score - n2->score);
 
-  if (n1[0]->score != n2[0]->score)
-    return (n1[0]->score - n2[0]->score);
-
-  if (n1[0]->section && !n2[0]->section)
+  if (n1->section && !n2->section)
     return (1);
-  else if (!n1[0]->section && n2[0]->section)
+  else if (!n1->section && n2->section)
     return (-1);
-  else if (n1[0]->section && n2[0]->section &&
-           (diff = strcmp(n1[0]->section, n2[0]->section)) != 0)
+  else if (n1->section && n2->section &&
+           (diff = strcmp(n1->section, n2->section)) != 0)
     return (diff);
 
-  return (strcasecmp(n1[0]->text, n2[0]->text));
+  return (strcasecmp(n1->text, n2->text));
 }
 
 

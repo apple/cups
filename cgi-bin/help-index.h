@@ -3,7 +3,7 @@
  *
  *   On-line help index definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -25,6 +25,12 @@
 #ifndef _CUPS_HELP_INDEX_H_
 #  define _CUPS_HELP_INDEX_H_
 
+/*
+ * Include necessary headers...
+ */
+
+#  include <cups/array.h>
+
 
 /*
  * Data structures...
@@ -44,11 +50,9 @@ typedef struct				/**** Help node structure... ****/
 
 typedef struct				/**** Help index structure ****/
 {
-  int		search,			/* 1 = search index, 0 = normal */
-		num_nodes,		/* Number of nodes */
-		alloc_nodes;		/* Allocated nodes */
-  help_node_t	**nodes;		/* Nodes sorted by filename */
-  help_node_t	**sorted;		/* Nodes sorted by score + text */
+  int		search;			/* 1 = search index, 0 = normal */
+  cups_array_t	*nodes;			/* Nodes sorted by filename */
+  cups_array_t	*sorted;		/* Nodes sorted by score + text */
 } help_index_t;
 
 
@@ -57,8 +61,8 @@ typedef struct				/**** Help index structure ****/
  */
 
 extern void		helpDeleteIndex(help_index_t *hi);
-extern help_node_t	**helpFindNode(help_index_t *hi, const char *filename,
-			               const char *anchor);
+extern help_node_t	*helpFindNode(help_index_t *hi, const char *filename,
+			              const char *anchor);
 extern help_index_t	*helpLoadIndex(const char *hifile, const char *directory);
 extern int		helpSaveIndex(help_index_t *hi, const char *hifile);
 extern help_index_t	*helpSearchIndex(help_index_t *hi, const char *query,
