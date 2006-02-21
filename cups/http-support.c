@@ -104,9 +104,10 @@ static char		*http_copy_encode(char *dst, const char *src,
  * 'httpAssembleURI()' - Assemble a uniform resource identifier from its
  *                       components.
  *
- * This function properly escapes all reserved characters in a URI.  You
- * should use this function in place of traditional string functions
- * whenever you need to create a URI string.
+ * This function escapes reserved characters in the URI depending on the
+ * value of the "encoding" argument.  You should use this function in
+ * place of traditional string functions whenever you need to create a
+ * URI string.
  *
  * @since CUPS 1.2@
  */
@@ -351,9 +352,10 @@ httpAssembleURI(
  *                        components with a formatted resource.
  *
  * This function creates a formatted version of the resource string
- * argument "resourcef" and properly escapes all reserved characters
- * in a URI.  You should use this function in place of traditional
- * string functions whenever you need to create a URI string.
+ * argument "resourcef" and escapes reserved characters in the URI
+ * depending on the value of the "encoding" argument.  You should use
+ * this function in place of traditional string functions whenever
+ * you need to create a URI string.
  *
  * @since CUPS 1.2@
  */
@@ -408,6 +410,11 @@ httpAssembleURIf(
 
 /*
  * 'httpDecode64()' - Base64-decode a string.
+ *
+ * This function is deprecated. Use the httpDecode64_2() function instead
+ * which provides buffer length arguments.
+ *
+ * @deprecated@
  */
 
 char *					/* O - Decoded string */
@@ -531,6 +538,11 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
 
 /*
  * 'httpEncode64()' - Base64-encode a string.
+ *
+ * This function is deprecated. Use the httpEncode64_2() function instead
+ * which provides buffer length arguments.
+ *
+ * @deprecated@
  */
 
 char *					/* O - Encoded string */
@@ -733,6 +745,10 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
 /*
  * 'httpSeparate()' - Separate a Universal Resource Identifier into its
  *                    components.
+ *
+ * This function is deprecated; use the httpSeparateURI() function instead.
+ *
+ * @deprecated@
  */
 
 void
@@ -753,7 +769,10 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
  * 'httpSeparate2()' - Separate a Universal Resource Identifier into its
  *                     components.
  *
+ * This function is deprecated; use the httpSeparateURI() function instead.
+ *
  * @since CUPS 1.1.21@
+ * @deprecated@
  */
 
 void

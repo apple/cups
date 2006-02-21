@@ -20,7 +20,7 @@
 
   Array API introduction for the Common UNIX Printing System (CUPS).
 
-  Copyright 1997-2005 by Easy Software Products.
+  Copyright 1997-2006 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
   property of Easy Software Products and are protected by Federal
@@ -85,6 +85,8 @@ library:</p>
 	<li><a href='#cupsArrayDup'><tt>cupsArrayDup()</tt></a> </li>
 	<li><a href='#cupsArrayFind'><tt>cupsArrayFind()</tt></a> </li>
 	<li><a href='#cupsArrayFirst'><tt>cupsArrayFirst()</tt></a> </li>
+	<li><a href='#cupsArrayIndex'><tt>cupsArrayIndex()</tt></a> </li>
+	<li><a href='#cupsArrayInsert'><tt>cupsArrayInsert()</tt></a> </li>
 	<li><a href='#cupsArrayLast'><tt>cupsArrayLast()</tt></a> </li>
 	<li><a href='#cupsArrayNew'><tt>cupsArrayNew()</tt></a> </li>
 	<li><a href='#cupsArrayNext'><tt>cupsArrayNext()</tt></a> </li>
@@ -96,7 +98,11 @@ library:</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsArrayAdd'>cupsArrayAdd()</a></h3>
 <h4>Description</h4>
-<p>Add an element to the array.</p>
+<p>Add an element to the array.
+
+When adding an element to a sorted array, non-unique elements are
+appended at the end of the run.  For unsorted arrays, the element
+is inserted at the end of the array.</p>
 <h4>Syntax</h4>
 <pre>
 int
@@ -241,6 +247,50 @@ cupsArrayFirst(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>First element or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsArrayIndex'>cupsArrayIndex()</a></h3>
+<h4>Description</h4>
+<p>Get the N-th element in the array.</p>
+<h4>Syntax</h4>
+<pre>
+void *
+cupsArrayIndex(
+    <a href='#cups_array_t'>cups_array_t</a> * a,
+    int n);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>a</tt></td><td>Array</td></tr>
+<tr><td><tt>n</tt></td><td>Index into array, starting at 0</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>N-th element or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsArrayInsert'>cupsArrayInsert()</a></h3>
+<h4>Description</h4>
+<p>Insert an element in the array.
+
+When inserting an element in a sorted array, non-unique elements are
+inserted at the beginning of the run.  For unsorted arrays, the element
+is inserted at the beginning of the array.</p>
+<h4>Syntax</h4>
+<pre>
+int
+cupsArrayInsert(
+    <a href='#cups_array_t'>cups_array_t</a> * a,
+    void * e);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>a</tt></td><td>Array</td></tr>
+<tr><td><tt>e</tt></td><td>Element</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on failure, 1 on success</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsArrayLast'>cupsArrayLast()</a></h3>
 <h4>Description</h4>

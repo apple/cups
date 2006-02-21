@@ -20,7 +20,7 @@
 
   HTTP and IPP API introduction for the Common UNIX Printing System (CUPS).
 
-  Copyright 1997-2005 by Easy Software Products.
+  Copyright 1997-2006 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
   property of Easy Software Products and are protected by Federal
@@ -41,7 +41,11 @@
 
 <h2 class='title'>Introduction</h2>
 
-<p>The CUPS HTTP and IPP APIs provide...</p>
+<p>The CUPS HTTP and IPP APIs provide low-level access to the
+HTTP and IPP protocols and CUPS scheduler. They are typically
+used by monitoring and administration programs to perform
+specific functions not supported by the high-level CUPS API
+functions.</p>
 
 <h2 class='title'>General Usage</h2>
 
@@ -69,52 +73,21 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#FUNCTIONS'>Functions</a></li>
 	<li><a href='#STRUCTURES'>Structures</a></li>
 	<li><a href='#TYPES'>Types</a></li>
+	<li><a href='#UNIONS'>Unions</a></li>
 </ul>
 <!-- NEW PAGE -->
 <h2 class='title'><a name='ENUMERATIONS'>Enumerations</a></h2>
 <ul>
-	<li><a href='#cups_ptype_e'><tt>cups_ptype_e</tt></a> </li>
 	<li><a href='#http_auth_e'><tt>http_auth_e</tt></a> </li>
 	<li><a href='#http_encoding_e'><tt>http_encoding_e</tt></a> </li>
 	<li><a href='#http_encryption_e'><tt>http_encryption_e</tt></a> </li>
 	<li><a href='#http_field_e'><tt>http_field_e</tt></a> </li>
 	<li><a href='#http_keepalive_e'><tt>http_keepalive_e</tt></a> </li>
 	<li><a href='#http_status_e'><tt>http_status_e</tt></a> </li>
+	<li><a href='#ipp_res_e'><tt>ipp_res_e</tt></a> </li>
+	<li><a href='#ipp_status_e'><tt>ipp_status_e</tt></a> </li>
+	<li><a href='#ipp_tag_e'><tt>ipp_tag_e</tt></a> </li>
 </ul>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cups_ptype_e'>cups_ptype_e</a></h3>
-<h4>Description</h4>
-<p>Not a typedef'd enum so we can OR</p>
-<h4>Values</h4>
-<div class='table'><table align='center' border='1' width='80%'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>CUPS_PRINTER_AUTHENTICATED</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Printer requires authentication </td></tr>
-<tr><td><tt>CUPS_PRINTER_BIND</tt> </td><td>Can bind output</td></tr>
-<tr><td><tt>CUPS_PRINTER_BW</tt> </td><td>Can do B&amp;W printing</td></tr>
-<tr><td><tt>CUPS_PRINTER_CLASS</tt> </td><td>Printer class</td></tr>
-<tr><td><tt>CUPS_PRINTER_COLLATE</tt> </td><td>Can collage copies</td></tr>
-<tr><td><tt>CUPS_PRINTER_COLOR</tt> </td><td>Can do color printing</td></tr>
-<tr><td><tt>CUPS_PRINTER_COPIES</tt> </td><td>Can do copies</td></tr>
-<tr><td><tt>CUPS_PRINTER_COVER</tt> </td><td>Can cover output</td></tr>
-<tr><td><tt>CUPS_PRINTER_DEFAULT</tt> </td><td>Default printer on network</td></tr>
-<tr><td><tt>CUPS_PRINTER_DELETE</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Delete printer </td></tr>
-<tr><td><tt>CUPS_PRINTER_DUPLEX</tt> </td><td>Can do duplexing</td></tr>
-<tr><td><tt>CUPS_PRINTER_FAX</tt> </td><td>Fax queue</td></tr>
-<tr><td><tt>CUPS_PRINTER_IMPLICIT</tt> </td><td>Implicit class</td></tr>
-<tr><td><tt>CUPS_PRINTER_LARGE</tt> </td><td>Can do D/E/A1/A0</td></tr>
-<tr><td><tt>CUPS_PRINTER_LOCAL</tt> </td><td>Local printer or class</td></tr>
-<tr><td><tt>CUPS_PRINTER_MEDIUM</tt> </td><td>Can do Tabloid/B/C/A3/A2</td></tr>
-<tr><td><tt>CUPS_PRINTER_NOT_SHARED</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Printer is not shared </td></tr>
-<tr><td><tt>CUPS_PRINTER_OPTIONS</tt> </td><td>~(CLASS | REMOTE | IMPLICIT)</td></tr>
-<tr><td><tt>CUPS_PRINTER_PUNCH</tt> </td><td>Can punch output</td></tr>
-<tr><td><tt>CUPS_PRINTER_REJECTING</tt> </td><td>Printer is rejecting jobs</td></tr>
-<tr><td><tt>CUPS_PRINTER_REMOTE</tt> </td><td>Remote printer or class</td></tr>
-<tr><td><tt>CUPS_PRINTER_SMALL</tt> </td><td>Can do Letter/Legal/A4</td></tr>
-<tr><td><tt>CUPS_PRINTER_SORT</tt> </td><td>Can sort output</td></tr>
-<tr><td><tt>CUPS_PRINTER_STAPLE</tt> </td><td>Can staple output</td></tr>
-<tr><td><tt>CUPS_PRINTER_VARIABLE</tt> </td><td>Can do variable sizes</td></tr>
-</tbody></table></div>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='http_auth_e'>http_auth_e</a></h3>
 <h4>Description</h4>
@@ -252,52 +225,123 @@ require CUPS 1.1 or higher.</p>
 <tr><td><tt>HTTP_USE_PROXY</tt> </td><td>Must use a proxy to access this URI</td></tr>
 </tbody></table></div>
 <!-- NEW PAGE -->
+<h3 class='title'><a name='ipp_res_e'>ipp_res_e</a></h3>
+<h4>Description</h4>
+<p>Types and structures...</p>
+<h4>Values</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>IPP_RES_PER_CM</tt> </td><td>Pixels per centimeter</td></tr>
+<tr><td><tt>IPP_RES_PER_INCH</tt> </td><td>Pixels per inch</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='ipp_status_e'>ipp_status_e</a></h3>
+<h4>Description</h4>
+<p>IPP status codes...</p>
+<h4>Values</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>IPP_ATTRIBUTES</tt> </td><td>client-error-attributes-or-values-not-supported</td></tr>
+<tr><td><tt>IPP_ATTRIBUTES_NOT_SETTABLE</tt> </td><td>client-error-attributes-not-settable</td></tr>
+<tr><td><tt>IPP_BAD_REQUEST</tt> </td><td>client-error-bad-request</td></tr>
+<tr><td><tt>IPP_CHARSET</tt> </td><td>client-error-charset-not-supported</td></tr>
+<tr><td><tt>IPP_COMPRESSION_ERROR</tt> </td><td>client-error-compression-error</td></tr>
+<tr><td><tt>IPP_COMPRESSION_NOT_SUPPORTED</tt> </td><td>client-error-compression-not-supported</td></tr>
+<tr><td><tt>IPP_CONFLICT</tt> </td><td>client-error-conflicting-attributes</td></tr>
+<tr><td><tt>IPP_DEVICE_ERROR</tt> </td><td>server-error-device-error</td></tr>
+<tr><td><tt>IPP_DOCUMENT_ACCESS_ERROR</tt> </td><td>client-error-document-access-error</td></tr>
+<tr><td><tt>IPP_DOCUMENT_FORMAT</tt> </td><td>client-error-document-format-not-supported</td></tr>
+<tr><td><tt>IPP_DOCUMENT_FORMAT_ERROR</tt> </td><td>client-error-document-format-error</td></tr>
+<tr><td><tt>IPP_ERROR_JOB_CANCELLED</tt> </td><td>server-error-job-canceled</td></tr>
+<tr><td><tt>IPP_FORBIDDEN</tt> </td><td>client-error-forbidden</td></tr>
+<tr><td><tt>IPP_GONE</tt> </td><td>client-error-gone</td></tr>
+<tr><td><tt>IPP_IGNORED_ALL_NOTIFICATIONS</tt> </td><td>client-error-ignored-all-notifications</td></tr>
+<tr><td><tt>IPP_IGNORED_ALL_SUBSCRIPTIONS</tt> </td><td>client-error-ignored-all-subscriptions</td></tr>
+<tr><td><tt>IPP_INTERNAL_ERROR</tt> </td><td>server-error-internal-error</td></tr>
+<tr><td><tt>IPP_MULTIPLE_JOBS_NOT_SUPPORTED</tt> </td><td>server-error-multiple-document-jobs-not-supported</td></tr>
+<tr><td><tt>IPP_NOT_ACCEPTING</tt> </td><td>server-error-not-accepting-jobs</td></tr>
+<tr><td><tt>IPP_NOT_AUTHENTICATED</tt> </td><td>client-error-not-authenticated</td></tr>
+<tr><td><tt>IPP_NOT_AUTHORIZED</tt> </td><td>client-error-not-authorized</td></tr>
+<tr><td><tt>IPP_NOT_FOUND</tt> </td><td>client-error-not-found</td></tr>
+<tr><td><tt>IPP_NOT_POSSIBLE</tt> </td><td>client-error-not-possible</td></tr>
+<tr><td><tt>IPP_OK</tt> </td><td>successful-ok</td></tr>
+<tr><td><tt>IPP_OK_BUT_CANCEL_SUBSCRIPTION</tt> </td><td>successful-ok-but-cancel-subscription</td></tr>
+<tr><td><tt>IPP_OK_CONFLICT</tt> </td><td>successful-ok-conflicting-attributes</td></tr>
+<tr><td><tt>IPP_OK_EVENTS_COMPLETE</tt> </td><td>successful-ok-events-complete</td></tr>
+<tr><td><tt>IPP_OK_IGNORED_NOTIFICATIONS</tt> </td><td>successful-ok-ignored-notifications</td></tr>
+<tr><td><tt>IPP_OK_IGNORED_SUBSCRIPTIONS</tt> </td><td>successful-ok-ignored-subscriptions</td></tr>
+<tr><td><tt>IPP_OK_SUBST</tt> </td><td>successful-ok-ignored-or-substituted-attributes</td></tr>
+<tr><td><tt>IPP_OK_TOO_MANY_EVENTS</tt> </td><td>successful-ok-too-many-events</td></tr>
+<tr><td><tt>IPP_OPERATION_NOT_SUPPORTED</tt> </td><td>server-error-operation-not-supported</td></tr>
+<tr><td><tt>IPP_PRINTER_BUSY</tt> </td><td>server-error-busy</td></tr>
+<tr><td><tt>IPP_PRINTER_IS_DEACTIVATED</tt> </td><td>server-error-printer-is-deactivated</td></tr>
+<tr><td><tt>IPP_PRINT_SUPPORT_FILE_NOT_FOUND</tt> </td><td>client-error-print-support-file-not-found</td></tr>
+<tr><td><tt>IPP_REDIRECTION_OTHER_SITE</tt> </td><td></td></tr>
+<tr><td><tt>IPP_REQUEST_ENTITY</tt> </td><td>client-error-request-entity-too-large</td></tr>
+<tr><td><tt>IPP_REQUEST_VALUE</tt> </td><td>client-error-request-value-too-long</td></tr>
+<tr><td><tt>IPP_SERVICE_UNAVAILABLE</tt> </td><td>server-error-service-unavailable</td></tr>
+<tr><td><tt>IPP_TEMPORARY_ERROR</tt> </td><td>server-error-temporary-error</td></tr>
+<tr><td><tt>IPP_TIMEOUT</tt> </td><td>client-error-timeout</td></tr>
+<tr><td><tt>IPP_TOO_MANY_SUBSCRIPTIONS</tt> </td><td>client-error-too-many-subscriptions</td></tr>
+<tr><td><tt>IPP_URI_SCHEME</tt> </td><td>client-error-uri-scheme-not-supported</td></tr>
+<tr><td><tt>IPP_VERSION_NOT_SUPPORTED</tt> </td><td>server-error-version-not-supported</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='ipp_tag_e'>ipp_tag_e</a></h3>
+<h4>Description</h4>
+<p>Format tags for attributes...</p>
+<h4>Values</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>IPP_TAG_ADMINDEFINE</tt> </td><td>Admin-defined value</td></tr>
+<tr><td><tt>IPP_TAG_BEGIN_COLLECTION</tt> </td><td>Beginning of collection value</td></tr>
+<tr><td><tt>IPP_TAG_BOOLEAN</tt> </td><td>Boolean value</td></tr>
+<tr><td><tt>IPP_TAG_CHARSET</tt> </td><td>Character set value</td></tr>
+<tr><td><tt>IPP_TAG_COPY</tt> </td><td>Bitflag for copied attribute values</td></tr>
+<tr><td><tt>IPP_TAG_DATE</tt> </td><td>Date/time value</td></tr>
+<tr><td><tt>IPP_TAG_DEFAULT</tt> </td><td>Default value</td></tr>
+<tr><td><tt>IPP_TAG_DELETEATTR</tt> </td><td>Delete-attribute value</td></tr>
+<tr><td><tt>IPP_TAG_END</tt> </td><td>End-of-attributes</td></tr>
+<tr><td><tt>IPP_TAG_END_COLLECTION</tt> </td><td>End of collection value</td></tr>
+<tr><td><tt>IPP_TAG_ENUM</tt> </td><td>Enumeration value</td></tr>
+<tr><td><tt>IPP_TAG_EVENT_NOTIFICATION</tt> </td><td>Event group</td></tr>
+<tr><td><tt>IPP_TAG_INTEGER</tt> </td><td>Integer value</td></tr>
+<tr><td><tt>IPP_TAG_JOB</tt> </td><td>Job group</td></tr>
+<tr><td><tt>IPP_TAG_KEYWORD</tt> </td><td>Keyword value</td></tr>
+<tr><td><tt>IPP_TAG_LANGUAGE</tt> </td><td>Language value</td></tr>
+<tr><td><tt>IPP_TAG_MASK</tt> </td><td>Mask for copied attribute values</td></tr>
+<tr><td><tt>IPP_TAG_MEMBERNAME</tt> </td><td>Collection member name value</td></tr>
+<tr><td><tt>IPP_TAG_MIMETYPE</tt> </td><td>MIME media type value</td></tr>
+<tr><td><tt>IPP_TAG_NAME</tt> </td><td>Name value</td></tr>
+<tr><td><tt>IPP_TAG_NAMELANG</tt> </td><td>Name-with-language value</td></tr>
+<tr><td><tt>IPP_TAG_NOTSETTABLE</tt> </td><td>Not-settable value</td></tr>
+<tr><td><tt>IPP_TAG_NOVALUE</tt> </td><td>No-value value</td></tr>
+<tr><td><tt>IPP_TAG_OPERATION</tt> </td><td>Operation group</td></tr>
+<tr><td><tt>IPP_TAG_PRINTER</tt> </td><td>Printer group</td></tr>
+<tr><td><tt>IPP_TAG_RANGE</tt> </td><td>Range value</td></tr>
+<tr><td><tt>IPP_TAG_RESOLUTION</tt> </td><td>Resolution value</td></tr>
+<tr><td><tt>IPP_TAG_STRING</tt> </td><td>Octet string value</td></tr>
+<tr><td><tt>IPP_TAG_SUBSCRIPTION</tt> </td><td>Subscription group</td></tr>
+<tr><td><tt>IPP_TAG_TEXT</tt> </td><td>Text value</td></tr>
+<tr><td><tt>IPP_TAG_TEXTLANG</tt> </td><td>Text-with-language value</td></tr>
+<tr><td><tt>IPP_TAG_UNKNOWN</tt> </td><td>Unknown value</td></tr>
+<tr><td><tt>IPP_TAG_UNSUPPORTED_GROUP</tt> </td><td>Unsupported attributes group</td></tr>
+<tr><td><tt>IPP_TAG_UNSUPPORTED_VALUE</tt> </td><td>Unsupported value</td></tr>
+<tr><td><tt>IPP_TAG_URI</tt> </td><td>URI value</td></tr>
+<tr><td><tt>IPP_TAG_URISCHEME</tt> </td><td>URI scheme value</td></tr>
+<tr><td><tt>IPP_TAG_ZERO</tt> </td><td>Zero tag - used for separators</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
 <h2 class='title'><a name='FUNCTIONS'>Functions</a></h2>
 <ul>
-	<li><a href='#cupsAddDest'><tt>cupsAddDest()</tt></a> </li>
-	<li><a href='#cupsAddOption'><tt>cupsAddOption()</tt></a> </li>
-	<li><a href='#cupsCancelJob'><tt>cupsCancelJob()</tt></a> </li>
 	<li><a href='#cupsDoAuthentication'><tt>cupsDoAuthentication()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
 	<li><a href='#cupsDoFileRequest'><tt>cupsDoFileRequest()</tt></a> </li>
+	<li><a href='#cupsDoRequest'><tt>cupsDoRequest()</tt></a> </li>
 	<li><a href='#cupsEncodeOptions'><tt>cupsEncodeOptions()</tt></a> </li>
 	<li><a href='#cupsEncodeOptions2'><tt>cupsEncodeOptions2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#cupsEncryption'><tt>cupsEncryption()</tt></a> </li>
-	<li><a href='#cupsFreeDests'><tt>cupsFreeDests()</tt></a> </li>
-	<li><a href='#cupsFreeJobs'><tt>cupsFreeJobs()</tt></a> </li>
-	<li><a href='#cupsFreeOptions'><tt>cupsFreeOptions()</tt></a> </li>
-	<li><a href='#cupsGetClasses'><tt>cupsGetClasses()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
-	<li><a href='#cupsGetDefault'><tt>cupsGetDefault()</tt></a> </li>
-	<li><a href='#cupsGetDefault2'><tt>cupsGetDefault2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
-	<li><a href='#cupsGetDest'><tt>cupsGetDest()</tt></a> </li>
-	<li><a href='#cupsGetDests'><tt>cupsGetDests()</tt></a> </li>
-	<li><a href='#cupsGetDests2'><tt>cupsGetDests2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
-	<li><a href='#cupsGetFd'><tt>cupsGetFd()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
-	<li><a href='#cupsGetFile'><tt>cupsGetFile()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
-	<li><a href='#cupsGetJobs'><tt>cupsGetJobs()</tt></a> </li>
-	<li><a href='#cupsGetJobs2'><tt>cupsGetJobs2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
-	<li><a href='#cupsGetOption'><tt>cupsGetOption()</tt></a> </li>
-	<li><a href='#cupsGetPPD'><tt>cupsGetPPD()</tt></a> </li>
-	<li><a href='#cupsGetPPD2'><tt>cupsGetPPD2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
-	<li><a href='#cupsGetPassword'><tt>cupsGetPassword()</tt></a> </li>
-	<li><a href='#cupsGetPrinters'><tt>cupsGetPrinters()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
-	<li><a href='#cupsLastError'><tt>cupsLastError()</tt></a> </li>
-	<li><a href='#cupsLastErrorString'><tt>cupsLastErrorString()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#cupsMarkOptions'><tt>cupsMarkOptions()</tt></a> </li>
-	<li><a href='#cupsParseOptions'><tt>cupsParseOptions()</tt></a> </li>
-	<li><a href='#cupsPrintFile'><tt>cupsPrintFile()</tt></a> </li>
-	<li><a href='#cupsPrintFile2'><tt>cupsPrintFile2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
-	<li><a href='#cupsPrintFiles'><tt>cupsPrintFiles()</tt></a> </li>
-	<li><a href='#cupsPrintFiles2'><tt>cupsPrintFiles2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
-	<li><a href='#cupsPutFd'><tt>cupsPutFd()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
-	<li><a href='#cupsPutFile'><tt>cupsPutFile()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
-	<li><a href='#cupsServer'><tt>cupsServer()</tt></a> </li>
-	<li><a href='#cupsSetDests'><tt>cupsSetDests()</tt></a> </li>
-	<li><a href='#cupsSetDests2'><tt>cupsSetDests2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
-	<li><a href='#cupsSetEncryption'><tt>cupsSetEncryption()</tt></a> </li>
-	<li><a href='#cupsSetPasswordCB'><tt>cupsSetPasswordCB()</tt></a> </li>
-	<li><a href='#cupsSetServer'><tt>cupsSetServer()</tt></a> </li>
-	<li><a href='#cupsSetUser'><tt>cupsSetUser()</tt></a> </li>
-	<li><a href='#cupsUser'><tt>cupsUser()</tt></a> </li>
 	<li><a href='#httpAddrAny'><tt>httpAddrAny()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpAddrEqual'><tt>httpAddrEqual()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpAddrLength'><tt>httpAddrLength()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
@@ -306,27 +350,35 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#httpAddrString'><tt>httpAddrString()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpAssembleURI'><tt>httpAssembleURI()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpAssembleURIf'><tt>httpAssembleURIf()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#httpBlocking'><tt>httpBlocking()</tt></a> </li>
 	<li><a href='#httpCheck'><tt>httpCheck()</tt></a> </li>
 	<li><a href='#httpClearCookie'><tt>httpClearCookie()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
+	<li><a href='#httpClearFields'><tt>httpClearFields()</tt></a> </li>
 	<li><a href='#httpClose'><tt>httpClose()</tt></a> </li>
 	<li><a href='#httpConnect'><tt>httpConnect()</tt></a> </li>
 	<li><a href='#httpConnectEncrypt'><tt>httpConnectEncrypt()</tt></a> </li>
-	<li><a href='#httpDecode64'><tt>httpDecode64()</tt></a> </li>
+	<li><a href='#httpDecode64'><tt>httpDecode64()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#httpDecode64_2'><tt>httpDecode64_2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#httpDelete'><tt>httpDelete()</tt></a> </li>
-	<li><a href='#httpEncode64'><tt>httpEncode64()</tt></a> </li>
+	<li><a href='#httpEncode64'><tt>httpEncode64()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#httpEncode64_2'><tt>httpEncode64_2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#httpEncryption'><tt>httpEncryption()</tt></a> </li>
+	<li><a href='#httpError'><tt>httpError()</tt></a> </li>
 	<li><a href='#httpFlush'><tt>httpFlush()</tt></a> </li>
 	<li><a href='#httpFlushWrite'><tt>httpFlushWrite()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpGet'><tt>httpGet()</tt></a> </li>
+	<li><a href='#httpGetBlocking'><tt>httpGetBlocking()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#httpGetCookie'><tt>httpGetCookie()</tt></a> </li>
 	<li><a href='#httpGetDateString'><tt>httpGetDateString()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#httpGetDateString2'><tt>httpGetDateString2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpGetDateTime'><tt>httpGetDateTime()</tt></a> </li>
+	<li><a href='#httpGetFd'><tt>httpGetFd()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#httpGetField'><tt>httpGetField()</tt></a> </li>
 	<li><a href='#httpGetHostByName'><tt>httpGetHostByName()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#httpGetHostname'><tt>httpGetHostname()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#httpGetLength'><tt>httpGetLength()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#httpGetLength2'><tt>httpGetLength2()</tt></a> </li>
+	<li><a href='#httpGetLength'><tt>httpGetLength()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
+	<li><a href='#httpGetLength2'><tt>httpGetLength2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#httpGetStatus'><tt>httpGetStatus()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpGetSubField'><tt>httpGetSubField()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#httpGetSubField2'><tt>httpGetSubField2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpGets'><tt>httpGets()</tt></a> </li>
@@ -337,11 +389,11 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#httpMD5String'><tt>httpMD5String()</tt></a> </li>
 	<li><a href='#httpOptions'><tt>httpOptions()</tt></a> </li>
 	<li><a href='#httpPost'><tt>httpPost()</tt></a> </li>
-	<li><a href='#httpPrintf'><tt>httpPrintf()</tt></a> </li>
 	<li><a href='#httpPut'><tt>httpPut()</tt></a> </li>
-	<li><a href='#httpRead'><tt>httpRead()</tt></a> </li>
+	<li><a href='#httpRead'><tt>httpRead()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
+	<li><a href='#httpRead2'><tt>httpRead2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpReconnect'><tt>httpReconnect()</tt></a> </li>
-	<li><a href='#httpSeparate'><tt>httpSeparate()</tt></a> </li>
+	<li><a href='#httpSeparate'><tt>httpSeparate()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#httpSeparate2'><tt>httpSeparate2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#httpSeparateURI'><tt>httpSeparateURI()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpSetCookie'><tt>httpSetCookie()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
@@ -351,7 +403,8 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#httpTrace'><tt>httpTrace()</tt></a> </li>
 	<li><a href='#httpUpdate'><tt>httpUpdate()</tt></a> </li>
 	<li><a href='#httpWait'><tt>httpWait()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
-	<li><a href='#httpWrite'><tt>httpWrite()</tt></a> </li>
+	<li><a href='#httpWrite'><tt>httpWrite()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
+	<li><a href='#httpWrite2'><tt>httpWrite2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ippAddBoolean'><tt>ippAddBoolean()</tt></a> </li>
 	<li><a href='#ippAddBooleans'><tt>ippAddBooleans()</tt></a> </li>
 	<li><a href='#ippAddCollection'><tt>ippAddCollection()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
@@ -376,92 +429,19 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#ippFindNextAttribute'><tt>ippFindNextAttribute()</tt></a> </li>
 	<li><a href='#ippLength'><tt>ippLength()</tt></a> </li>
 	<li><a href='#ippNew'><tt>ippNew()</tt></a> </li>
+	<li><a href='#ippNewRequest'><tt>ippNewRequest()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ippOpString'><tt>ippOpString()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ippOpValue'><tt>ippOpValue()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ippPort'><tt>ippPort()</tt></a> </li>
 	<li><a href='#ippRead'><tt>ippRead()</tt></a> </li>
 	<li><a href='#ippReadFile'><tt>ippReadFile()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
-	<li><a href='#ippReadIO'><tt>ippReadIO()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
+	<li><a href='#ippReadIO'><tt>ippReadIO()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ippSetPort'><tt>ippSetPort()</tt></a> </li>
 	<li><a href='#ippTimeToDate'><tt>ippTimeToDate()</tt></a> </li>
 	<li><a href='#ippWrite'><tt>ippWrite()</tt></a> </li>
 	<li><a href='#ippWriteFile'><tt>ippWriteFile()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
-	<li><a href='#ippWriteIO'><tt>ippWriteIO()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
+	<li><a href='#ippWriteIO'><tt>ippWriteIO()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 </ul>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsAddDest'>cupsAddDest()</a></h3>
-<h4>Description</h4>
-<p>Add a destination to the list of destinations.
-
-Use the cupsSaveDests() function to save the updated list of destinations
-to the user's lpoptions file.</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsAddDest(
-    const <a href='#char'>char</a> * name,
-    const <a href='#char'>char</a> * instance,
-    int num_dests,
-    <a href='#cups_dest_t'>cups_dest_t</a> ** dests);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name</tt></td><td>Name of destination</td></tr>
-<tr><td><tt>instance</tt></td><td>Instance of destination or NULL for none/primary</td></tr>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>New number of destinations</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsAddOption'>cupsAddOption()</a></h3>
-<h4>Description</h4>
-<p>Add an option to an option array.</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsAddOption(
-    const <a href='#char'>char</a> * name,
-    const <a href='#char'>char</a> * value,
-    int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> ** options);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name</tt></td><td>Name of option</td></tr>
-<tr><td><tt>value</tt></td><td>Value of option</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Pointer to options</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of options</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsCancelJob'>cupsCancelJob()</a></h3>
-<h4>Description</h4>
-<p>Cancel a print job on the default server.
-
-Use the cupsLastError() and cupsLastErrorString() functions to get
-the cause of any failure.</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsCancelJob(
-    const <a href='#char'>char</a> * name,
-    int job);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name</tt></td><td>Name of printer or class</td></tr>
-<tr><td><tt>job</tt></td><td>Job ID</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>1 on success, 0 on failure</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsDoAuthentication'>cupsDoAuthentication()</a></h3>
 <h4>Description</h4>
@@ -476,8 +456,8 @@ status, prior to resubmitting your request.
 int
 cupsDoAuthentication(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * method,
-    const <a href='#char'>char</a> * resource);
+    const char * method,
+    const char * resource);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -492,18 +472,19 @@ cupsDoAuthentication(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsDoFileRequest'>cupsDoFileRequest()</a></h3>
 <h4>Description</h4>
-<p>Do an IPP request.
+<p>Do an IPP request with a file.
 
-This function sends any IPP request to the specified server, retrying
-and authenticating as necessary.</p>
+This function sends the IPP request to the specified server, retrying
+and authenticating as necessary.  The request is freed with ippDelete()
+after receiving a valid IPP response.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_t'>ipp_t</a> *
 cupsDoFileRequest(
     <a href='#http_t'>http_t</a> * http,
     <a href='#ipp_t'>ipp_t</a> * request,
-    const <a href='#char'>char</a> * resource,
-    const <a href='#char'>char</a> * filename);
+    const char * resource,
+    const char * filename);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -513,6 +494,32 @@ cupsDoFileRequest(
 <tr><td><tt>request</tt></td><td>IPP request</td></tr>
 <tr><td><tt>resource</tt></td><td>HTTP resource for POST</td></tr>
 <tr><td><tt>filename</tt></td><td>File to send or NULL for none</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Response data</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsDoRequest'>cupsDoRequest()</a></h3>
+<h4>Description</h4>
+<p>Do an IPP request.
+
+This function sends the IPP request to the specified server, retrying
+and authenticating as necessary.  The request is freed with ippDelete()
+after receiving a valid IPP response.</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#ipp_t'>ipp_t</a> *
+cupsDoRequest(
+    <a href='#http_t'>http_t</a> * http,
+    <a href='#ipp_t'>ipp_t</a> * request,
+    const char * resource);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
+<tr><td><tt>request</tt></td><td>IPP request</td></tr>
+<tr><td><tt>resource</tt></td><td>HTTP resource for POST</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Response data</p>
@@ -530,7 +537,7 @@ void
 cupsEncodeOptions(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> * options);
+    cups_option_t * options);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -558,7 +565,7 @@ void
 cupsEncodeOptions2(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> * options,
+    cups_option_t * options,
     ipp_tag_t group_tag);
 </pre>
 <h4>Arguments</h4>
@@ -572,839 +579,6 @@ cupsEncodeOptions2(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsEncryption'>cupsEncryption()</a></h3>
-<h4>Description</h4>
-<p>Get the default encryption settings.
-
-The default encryption setting comes from the CUPS_ENCRYPTION
-environment variable, then the ~/.cupsrc file, and finally the
-/etc/cups/client.conf file. If not set, the default is
-HTTP_ENCRYPT_IF_REQUESTED.</p>
-<h4>Syntax</h4>
-<pre>
-<a href='#http_encryption_t'>http_encryption_t</a>
-cupsEncryption(void);
-</pre>
-<h4>Arguments</h4>
-<p>None.</p>
-<h4>Returns</h4>
-<p>Encryption settings</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsFreeDests'>cupsFreeDests()</a></h3>
-<h4>Description</h4>
-<p>Free the memory used by the list of destinations.</p>
-<h4>Syntax</h4>
-<pre>
-void
-cupsFreeDests(
-    int num_dests,
-    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsFreeJobs'>cupsFreeJobs()</a></h3>
-<h4>Description</h4>
-<p>Free memory used by job data.</p>
-<h4>Syntax</h4>
-<pre>
-void
-cupsFreeJobs(
-    int num_jobs,
-    <a href='#cups_job_t'>cups_job_t</a> * jobs);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>num_jobs</tt></td><td>Number of jobs</td></tr>
-<tr><td><tt>jobs</tt></td><td>Jobs</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsFreeOptions'>cupsFreeOptions()</a></h3>
-<h4>Description</h4>
-<p>Free all memory used by options.</p>
-<h4>Syntax</h4>
-<pre>
-void
-cupsFreeOptions(
-    int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> * options);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Pointer to options</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='cupsGetClasses'>cupsGetClasses()</a></h3>
-<h4>Description</h4>
-<p>Get a list of printer classes from the default server.
-
-This function is deprecated - use cupsGetDests() instead.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsGetClasses(
-    <a href='#char'>char</a> *** classes);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>classes</tt></td><td>Classes</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of classes</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsGetDefault'>cupsGetDefault()</a></h3>
-<h4>Description</h4>
-<p>Get the default printer or class for the default server.
-
-This function returns the default printer or class as defined by
-the LPDEST or PRINTER environment variables. If these environment
-variables are not set, the server default destination is returned.
-Applications should use the cupsGetDests() and cupsGetDest() functions
-to get the user-defined default printer, as this function does not
-support the lpoptions-defined default printer.</p>
-<h4>Syntax</h4>
-<pre>
-const <a href='#char'>char</a> *
-cupsGetDefault(void);
-</pre>
-<h4>Arguments</h4>
-<p>None.</p>
-<h4>Returns</h4>
-<p>Default printer or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetDefault2'>cupsGetDefault2()</a></h3>
-<h4>Description</h4>
-<p>Get the default printer or class for the specified server.
-
-This function returns the default printer or class as defined by
-the LPDEST or PRINTER environment variables. If these environment
-variables are not set, the server default destination is returned.
-Applications should use the cupsGetDests() and cupsGetDest() functions
-to get the user-defined default printer, as this function does not
-support the lpoptions-defined default printer.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-const <a href='#char'>char</a> *
-cupsGetDefault2(
-    <a href='#http_t'>http_t</a> * http);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Default printer or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsGetDest'>cupsGetDest()</a></h3>
-<h4>Description</h4>
-<p>Get the named destination from the list.
-
-Use the cupsGetDests() or cupsGetDests2() functions to get a
-list of supported destinations for the current user.</p>
-<h4>Syntax</h4>
-<pre>
-<a href='#cups_dest_t'>cups_dest_t</a> *
-cupsGetDest(
-    const <a href='#char'>char</a> * name,
-    const <a href='#char'>char</a> * instance,
-    int num_dests,
-    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name</tt></td><td>Name of destination</td></tr>
-<tr><td><tt>instance</tt></td><td>Instance of destination</td></tr>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Destination pointer or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsGetDests'>cupsGetDests()</a></h3>
-<h4>Description</h4>
-<p>Get the list of destinations from the default server.</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsGetDests(
-    <a href='#cups_dest_t'>cups_dest_t</a> ** dests);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of destinations</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetDests2'>cupsGetDests2()</a></h3>
-<h4>Description</h4>
-<p>Get the list of destinations from the specified server.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsGetDests2(
-    <a href='#http_t'>http_t</a> * http,
-    <a href='#cups_dest_t'>cups_dest_t</a> ** dests);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of destinations</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsGetFd'>cupsGetFd()</a></h3>
-<h4>Description</h4>
-<p>Get a file from the server.
-
-This function returns HTTP_OK when the file is successfully retrieved.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-http_status_t
-cupsGetFd(
-    <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * resource,
-    int fd);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
-<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
-<tr><td><tt>fd</tt></td><td>File descriptor</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Status</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsGetFile'>cupsGetFile()</a></h3>
-<h4>Description</h4>
-<p>Get a file from the server.
-
-This function returns HTTP_OK when the file is successfully retrieved.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-http_status_t
-cupsGetFile(
-    <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * resource,
-    const <a href='#char'>char</a> * filename);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
-<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
-<tr><td><tt>filename</tt></td><td>Filename</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Status</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsGetJobs'>cupsGetJobs()</a></h3>
-<h4>Description</h4>
-<p>Get the jobs from the default server.</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsGetJobs(
-    <a href='#cups_job_t'>cups_job_t</a> ** jobs,
-    const <a href='#char'>char</a> * mydest,
-    int myjobs,
-    int completed);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>jobs</tt></td><td>Job data</td></tr>
-<tr><td><tt>mydest</tt></td><td>Only show jobs for dest?</td></tr>
-<tr><td><tt>myjobs</tt></td><td>Only show my jobs?</td></tr>
-<tr><td><tt>completed</tt></td><td>Only show completed jobs?</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of jobs</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetJobs2'>cupsGetJobs2()</a></h3>
-<h4>Description</h4>
-<p>Get the jobs from the specified server.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsGetJobs2(
-    <a href='#http_t'>http_t</a> * http,
-    <a href='#cups_job_t'>cups_job_t</a> ** jobs,
-    const <a href='#char'>char</a> * mydest,
-    int myjobs,
-    int completed);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>jobs</tt></td><td>Job data</td></tr>
-<tr><td><tt>mydest</tt></td><td>Only show jobs for dest?</td></tr>
-<tr><td><tt>myjobs</tt></td><td>Only show my jobs?</td></tr>
-<tr><td><tt>completed</tt></td><td>Only show completed jobs?</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of jobs</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsGetOption'>cupsGetOption()</a></h3>
-<h4>Description</h4>
-<p>Get an option value.</p>
-<h4>Syntax</h4>
-<pre>
-const <a href='#char'>char</a> *
-cupsGetOption(
-    const <a href='#char'>char</a> * name,
-    int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> * options);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name</tt></td><td>Name of option</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Option value or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsGetPPD'>cupsGetPPD()</a></h3>
-<h4>Description</h4>
-<p>Get the PPD file for a printer on the default server.
-
-For classes, cupsGetPPD() returns the PPD file for the first printer
-in the class.</p>
-<h4>Syntax</h4>
-<pre>
-const <a href='#char'>char</a> *
-cupsGetPPD(
-    const <a href='#char'>char</a> * name);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name</tt></td><td>Printer name</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Filename for PPD file</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetPPD2'>cupsGetPPD2()</a></h3>
-<h4>Description</h4>
-<p>Get the PPD file for a printer from the specified server.
-
-For classes, cupsGetPPD2() returns the PPD file for the first printer
-in the class.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-const <a href='#char'>char</a> *
-cupsGetPPD2(
-    <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * name);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>name</tt></td><td>Printer name</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Filename for PPD file</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsGetPassword'>cupsGetPassword()</a></h3>
-<h4>Description</h4>
-<p>Get a password from the user.
-
-Returns NULL if the user does not provide a password.</p>
-<h4>Syntax</h4>
-<pre>
-const <a href='#char'>char</a> *
-cupsGetPassword(
-    const <a href='#char'>char</a> * prompt);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>prompt</tt></td><td>Prompt string</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Password</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='cupsGetPrinters'>cupsGetPrinters()</a></h3>
-<h4>Description</h4>
-<p>Get a list of printers from the default server.
-
-This function is deprecated - use cupsGetDests() instead.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsGetPrinters(
-    <a href='#char'>char</a> *** printers);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>printers</tt></td><td>Printers</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of printers</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsLastError'>cupsLastError()</a></h3>
-<h4>Description</h4>
-<p>Return the last IPP status code.</p>
-<h4>Syntax</h4>
-<pre>
-ipp_status_t
-cupsLastError(void);
-</pre>
-<h4>Arguments</h4>
-<p>None.</p>
-<h4>Returns</h4>
-<p>IPP status code from last request</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsLastErrorString'>cupsLastErrorString()</a></h3>
-<h4>Description</h4>
-<p>Return the last IPP status-message.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-const <a href='#char'>char</a> *
-cupsLastErrorString(void);
-</pre>
-<h4>Arguments</h4>
-<p>None.</p>
-<h4>Returns</h4>
-<p>status-message text from last request</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsMarkOptions'>cupsMarkOptions()</a></h3>
-<h4>Description</h4>
-<p>Mark command-line options in a PPD file.</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsMarkOptions(
-    ppd_file_t * ppd,
-    int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> * options);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>1 if conflicting</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsParseOptions'>cupsParseOptions()</a></h3>
-<h4>Description</h4>
-<p>Parse options from a command-line argument.
-
-This function converts space-delimited name/value pairs according
-to the PAPI text option ABNF specification. Collection values
-(&quot;name={a=... b=... c=...}&quot;) are stored with the curley brackets
-intact - use cupsParseOptions() on the value to extract the collection
-attributes.</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsParseOptions(
-    const <a href='#char'>char</a> * arg,
-    int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> ** options);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>arg</tt></td><td>Argument to parse</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options found</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of options found</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsPrintFile'>cupsPrintFile()</a></h3>
-<h4>Description</h4>
-<p>Print a file to a printer or class on the default server.</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsPrintFile(
-    const <a href='#char'>char</a> * name,
-    const <a href='#char'>char</a> * filename,
-    const <a href='#char'>char</a> * title,
-    int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> * options);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
-<tr><td><tt>filename</tt></td><td>File to print</td></tr>
-<tr><td><tt>title</tt></td><td>Title of job</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Job ID</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsPrintFile2'>cupsPrintFile2()</a></h3>
-<h4>Description</h4>
-<p>Print a file to a printer or class on the specified server.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsPrintFile2(
-    <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * name,
-    const <a href='#char'>char</a> * filename,
-    const <a href='#char'>char</a> * title,
-    int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> * options);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
-<tr><td><tt>filename</tt></td><td>File to print</td></tr>
-<tr><td><tt>title</tt></td><td>Title of job</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Job ID</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsPrintFiles'>cupsPrintFiles()</a></h3>
-<h4>Description</h4>
-<p>Print one or more files to a printer or class on the default server.</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsPrintFiles(
-    const <a href='#char'>char</a> * name,
-    int num_files,
-    const <a href='#char'>char</a> ** files,
-    const <a href='#char'>char</a> * title,
-    int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> * options);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
-<tr><td><tt>num_files</tt></td><td>Number of files</td></tr>
-<tr><td><tt>files</tt></td><td>File(s) to print</td></tr>
-<tr><td><tt>title</tt></td><td>Title of job</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Job ID</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsPrintFiles2'>cupsPrintFiles2()</a></h3>
-<h4>Description</h4>
-<p>Print one or more files to a printer or class on the specified server.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsPrintFiles2(
-    <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * name,
-    int num_files,
-    const <a href='#char'>char</a> ** files,
-    const <a href='#char'>char</a> * title,
-    int num_options,
-    <a href='#cups_option_t'>cups_option_t</a> * options);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
-<tr><td><tt>num_files</tt></td><td>Number of files</td></tr>
-<tr><td><tt>files</tt></td><td>File(s) to print</td></tr>
-<tr><td><tt>title</tt></td><td>Title of job</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Job ID</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsPutFd'>cupsPutFd()</a></h3>
-<h4>Description</h4>
-<p>Put a file on the server.
-
-This function returns HTTP_CREATED when the file is stored successfully.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-http_status_t
-cupsPutFd(
-    <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * resource,
-    int fd);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
-<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
-<tr><td><tt>fd</tt></td><td>File descriptor</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Status</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsPutFile'>cupsPutFile()</a></h3>
-<h4>Description</h4>
-<p>Put a file on the server.
-
-This function returns HTTP_CREATED when the file is stored successfully.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-http_status_t
-cupsPutFile(
-    <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * resource,
-    const <a href='#char'>char</a> * filename);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
-<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
-<tr><td><tt>filename</tt></td><td>Filename</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Status</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsServer'>cupsServer()</a></h3>
-<h4>Description</h4>
-<p>Return the hostname/address of the default server.
-
-The returned value can be a fully-qualified hostname, a numeric
-IPv4 or IPv6 address, or a domain socket pathname.</p>
-<h4>Syntax</h4>
-<pre>
-const <a href='#char'>char</a> *
-cupsServer(void);
-</pre>
-<h4>Arguments</h4>
-<p>None.</p>
-<h4>Returns</h4>
-<p>Server name</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsSetDests'>cupsSetDests()</a></h3>
-<h4>Description</h4>
-<p>Save the list of destinations for the default server.
-
-This function saves the destinations to /etc/cups/lpoptions when run
-as root and ~/.lpoptions when run as a normal user.</p>
-<h4>Syntax</h4>
-<pre>
-void
-cupsSetDests(
-    int num_dests,
-    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsSetDests2'>cupsSetDests2()</a></h3>
-<h4>Description</h4>
-<p>Save the list of destinations for the specified server.
-
-This function saves the destinations to /etc/cups/lpoptions when run
-as root and ~/.lpoptions when run as a normal user.
-
-</p>
-<h4>Syntax</h4>
-<pre>
-int
-cupsSetDests2(
-    <a href='#http_t'>http_t</a> * http,
-    int num_dests,
-    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>0 on success, -1 on error</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsSetEncryption'>cupsSetEncryption()</a></h3>
-<h4>Description</h4>
-<p>Set the encryption preference.</p>
-<h4>Syntax</h4>
-<pre>
-void
-cupsSetEncryption(
-    <a href='#http_encryption_t'>http_encryption_t</a> e);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>e</tt></td><td>New encryption preference</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsSetPasswordCB'>cupsSetPasswordCB()</a></h3>
-<h4>Description</h4>
-<p>Set the password callback for CUPS.
-
-Pass NULL to restore the default (console) password callback.</p>
-<h4>Syntax</h4>
-<pre>
-void
-cupsSetPasswordCB(
-    cups_password_cb_t cb);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>cb</tt></td><td>Callback function</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsSetServer'>cupsSetServer()</a></h3>
-<h4>Description</h4>
-<p>Set the default server name.
-
-The &quot;server&quot; string can be a fully-qualified hostname, a numeric
-IPv4 or IPv6 address, or a domain socket pathname. Pass NULL to
-restore the default server name.</p>
-<h4>Syntax</h4>
-<pre>
-void
-cupsSetServer(
-    const <a href='#char'>char</a> * server);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>server</tt></td><td>Server name</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsSetUser'>cupsSetUser()</a></h3>
-<h4>Description</h4>
-<p>Set the default user name.
-
-Pass NULL to restore the default user name.</p>
-<h4>Syntax</h4>
-<pre>
-void
-cupsSetUser(
-    const <a href='#char'>char</a> * user);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>user</tt></td><td>User name</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cupsUser'>cupsUser()</a></h3>
-<h4>Description</h4>
-<p>Return the current user's name.</p>
-<h4>Syntax</h4>
-<pre>
-const <a href='#char'>char</a> *
-cupsUser(void);
-</pre>
-<h4>Arguments</h4>
-<p>None.</p>
-<h4>Returns</h4>
-<p>User name</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpAddrAny'>httpAddrAny()</a></h3>
 <h4>Description</h4>
@@ -1446,7 +620,7 @@ httpAddrEqual(
 <tr><td><tt>addr2</tt></td><td>Second address</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
-<p>1 if equal, 0 if !=</p>
+<p>1 if equal, 0 if not</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpAddrLength'>httpAddrLength()</a></h3>
 <h4>Description</h4>
@@ -1495,10 +669,10 @@ httpAddrLocalhost(
 </p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpAddrLookup(
     const <a href='#http_addr_t'>http_addr_t</a> * addr,
-    <a href='#char'>char</a> * name,
+    char * name,
     int namelen);
 </pre>
 <h4>Arguments</h4>
@@ -1514,15 +688,15 @@ httpAddrLookup(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpAddrString'>httpAddrString()</a></h3>
 <h4>Description</h4>
-<p>Convert an IP address to a dotted string.
+<p>Convert an address to a numeric string.
 
 </p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpAddrString(
     const <a href='#http_addr_t'>http_addr_t</a> * addr,
-    <a href='#char'>char</a> * s,
+    char * s,
     int slen);
 </pre>
 <h4>Arguments</h4>
@@ -1534,34 +708,37 @@ httpAddrString(
 <tr><td><tt>slen</tt></td><td>Length of string</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
-<p>IP string</p>
+<p>Numeric address string</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpAssembleURI'>httpAssembleURI()</a></h3>
 <h4>Description</h4>
 <p>Assemble a uniform resource identifier from its
 components.
 
-This function properly escapes all reserved characters in a URI.  You
-should use this function in place of traditional string functions
-whenever you need to create a URI string.
+This function escapes reserved characters in the URI depending on the
+value of the &quot;encoding&quot; argument.  You should use this function in
+place of traditional string functions whenever you need to create a
+URI string.
 
 </p>
 <h4>Syntax</h4>
 <pre>
 http_uri_status_t
 httpAssembleURI(
-    <a href='#char'>char</a> * uri,
+    http_uri_coding_t encoding,
+    char * uri,
     int urilen,
-    const <a href='#char'>char</a> * scheme,
-    const <a href='#char'>char</a> * username,
-    const <a href='#char'>char</a> * host,
+    const char * scheme,
+    const char * username,
+    const char * host,
     int port,
-    const <a href='#char'>char</a> * resource);
+    const char * resource);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
+<tr><td><tt>encoding</tt></td><td>Encoding flags</td></tr>
 <tr><td><tt>uri</tt></td><td>URI buffer</td></tr>
 <tr><td><tt>urilen</tt></td><td>Size of URI buffer</td></tr>
 <tr><td><tt>scheme</tt></td><td>Scheme name</td></tr>
@@ -1579,28 +756,31 @@ httpAssembleURI(
 components with a formatted resource.
 
 This function creates a formatted version of the resource string
-argument &quot;resourcef&quot; and properly escapes all reserved characters
-in a URI.  You should use this function in place of traditional
-string functions whenever you need to create a URI string.
+argument &quot;resourcef&quot; and escapes reserved characters in the URI
+depending on the value of the &quot;encoding&quot; argument.  You should use
+this function in place of traditional string functions whenever
+you need to create a URI string.
 
 </p>
 <h4>Syntax</h4>
 <pre>
 http_uri_status_t
 httpAssembleURIf(
-    <a href='#char'>char</a> * uri,
+    http_uri_coding_t encoding,
+    char * uri,
     int urilen,
-    const <a href='#char'>char</a> * scheme,
-    const <a href='#char'>char</a> * username,
-    const <a href='#char'>char</a> * host,
+    const char * scheme,
+    const char * username,
+    const char * host,
     int port,
-    const <a href='#char'>char</a> * resourcef,
+    const char * resourcef,
     ...);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
+<tr><td><tt>encoding</tt></td><td>Encoding flags</td></tr>
 <tr><td><tt>uri</tt></td><td>URI buffer</td></tr>
 <tr><td><tt>urilen</tt></td><td>Size of URI buffer</td></tr>
 <tr><td><tt>scheme</tt></td><td>Scheme name</td></tr>
@@ -1612,6 +792,26 @@ httpAssembleURIf(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>URI status</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='httpBlocking'>httpBlocking()</a></h3>
+<h4>Description</h4>
+<p>Set blocking/non-blocking behavior on a connection.</p>
+<h4>Syntax</h4>
+<pre>
+void
+httpBlocking(
+    <a href='#http_t'>http_t</a> * http,
+    int b);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>b</tt></td><td>1 = blocking, 0 = non-blocking</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='httpCheck'>httpCheck()</a></h3>
 <h4>Description</h4>
@@ -1646,7 +846,25 @@ httpClearCookie(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>Connection</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='httpClearFields'>httpClearFields()</a></h3>
+<h4>Description</h4>
+<p>Clear HTTP request fields.</p>
+<h4>Syntax</h4>
+<pre>
+void
+httpClearFields(
+    <a href='#http_t'>http_t</a> * http);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -1664,7 +882,7 @@ httpClose(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>Connection to close</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -1676,7 +894,7 @@ httpClose(
 <pre>
 <a href='#http_t'>http_t</a> *
 httpConnect(
-    const <a href='#char'>char</a> * host,
+    const char * host,
     int port);
 </pre>
 <h4>Arguments</h4>
@@ -1696,7 +914,7 @@ httpConnect(
 <pre>
 <a href='#http_t'>http_t</a> *
 httpConnectEncrypt(
-    const <a href='#char'>char</a> * host,
+    const char * host,
     int port,
     <a href='#http_encryption_t'>http_encryption_t</a> encryption);
 </pre>
@@ -1711,15 +929,20 @@ httpConnectEncrypt(
 <h4>Returns</h4>
 <p>New HTTP connection</p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='httpDecode64'>httpDecode64()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpDecode64'>httpDecode64()</a></h3>
 <h4>Description</h4>
-<p>Base64-decode a string.</p>
+<p>Base64-decode a string.
+
+This function is deprecated. Use the httpDecode64_2() function instead
+which provides buffer length arguments.
+
+</p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpDecode64(
-    <a href='#char'>char</a> * out,
-    const <a href='#char'>char</a> * in);
+    char * out,
+    const char * in);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1738,11 +961,11 @@ httpDecode64(
 </p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpDecode64_2(
-    <a href='#char'>char</a> * out,
+    char * out,
     int * outlen,
-    const <a href='#char'>char</a> * in);
+    const char * in);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1763,27 +986,32 @@ httpDecode64_2(
 int
 httpDelete(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * uri);
+    const char * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>uri</tt></td><td>URI to delete</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Status of call (0 = success)</p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='httpEncode64'>httpEncode64()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpEncode64'>httpEncode64()</a></h3>
 <h4>Description</h4>
-<p>Base64-encode a string.</p>
+<p>Base64-encode a string.
+
+This function is deprecated. Use the httpEncode64_2() function instead
+which provides buffer length arguments.
+
+</p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpEncode64(
-    <a href='#char'>char</a> * out,
-    const <a href='#char'>char</a> * in);
+    char * out,
+    const char * in);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1802,11 +1030,11 @@ httpEncode64(
 </p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpEncode64_2(
-    <a href='#char'>char</a> * out,
+    char * out,
     int outlen,
-    const <a href='#char'>char</a> * in,
+    const char * in,
     int inlen);
 </pre>
 <h4>Arguments</h4>
@@ -1835,11 +1063,29 @@ httpEncryption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>e</tt></td><td>New encryption preference</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>-1 on error, 0 on success</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='httpError'>httpError()</a></h3>
+<h4>Description</h4>
+<p>Get the last error on a connection.</p>
+<h4>Syntax</h4>
+<pre>
+int
+httpError(
+    <a href='#http_t'>http_t</a> * http);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Error code (errno) value</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='httpFlush'>httpFlush()</a></h3>
 <h4>Description</h4>
@@ -1854,7 +1100,7 @@ httpFlush(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -1874,7 +1120,7 @@ httpFlushWrite(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Bytes written or -1 on error</p>
@@ -1887,17 +1133,55 @@ httpFlushWrite(
 int
 httpGet(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * uri);
+    const char * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>uri</tt></td><td>URI to get</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Status of call (0 = success)</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpGetBlocking'>httpGetBlocking()</a></h3>
+<h4>Description</h4>
+<p>Get the blocking/non-block state of a connection.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+int
+httpGetBlocking(
+    <a href='#http_t'>http_t</a> * http);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>1 if blocking, 0 if non-blocking</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='httpGetCookie'>httpGetCookie()</a></h3>
+<h4>Description</h4>
+<p>Get any cookie data from the response.</p>
+<h4>Syntax</h4>
+<pre>
+const char *
+httpGetCookie(
+    <a href='#http_t'>http_t</a> * http);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connecion</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Cookie data or NULL</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpGetDateString'>httpGetDateString()</a></h3>
 <h4>Description</h4>
@@ -1906,7 +1190,7 @@ httpGet(
 </p>
 <h4>Syntax</h4>
 <pre>
-const <a href='#char'>char</a> *
+const char *
 httpGetDateString(
     time_t t);
 </pre>
@@ -1926,10 +1210,10 @@ httpGetDateString(
 </p>
 <h4>Syntax</h4>
 <pre>
-const <a href='#char'>char</a> *
+const char *
 httpGetDateString2(
     time_t t,
-    <a href='#char'>char</a> * s,
+    char * s,
     int slen);
 </pre>
 <h4>Arguments</h4>
@@ -1950,7 +1234,7 @@ httpGetDateString2(
 <pre>
 time_t
 httpGetDateTime(
-    const <a href='#char'>char</a> * s);
+    const char * s);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1960,6 +1244,46 @@ httpGetDateTime(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>UNIX time</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpGetFd'>httpGetFd()</a></h3>
+<h4>Description</h4>
+<p>Get the file descriptor associated with a connection.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+int
+httpGetFd(
+    <a href='#http_t'>http_t</a> * http);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>File descriptor or -1 if none</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='httpGetField'>httpGetField()</a></h3>
+<h4>Description</h4>
+<p>Get a field value from a request/response.</p>
+<h4>Syntax</h4>
+<pre>
+const char *
+httpGetField(
+    <a href='#http_t'>http_t</a> * http,
+    http_field_t field);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>field</tt></td><td>Field to get</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Field value</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpGetHostByName'>httpGetHostByName()</a></h3>
 <h4>Description</h4>
@@ -1971,7 +1295,7 @@ address records for the specified name.
 <pre>
 struct hostent *
 httpGetHostByName(
-    const <a href='#char'>char</a> * name);
+    const char * name);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -1992,9 +1316,9 @@ get the local hostname with domain.
 </p>
 <h4>Syntax</h4>
 <pre>
-const <a href='#char'>char</a> *
+const char *
 httpGetHostname(
-    <a href='#char'>char</a> * s,
+    char * s,
     int slen);
 </pre>
 <h4>Arguments</h4>
@@ -2007,7 +1331,7 @@ httpGetHostname(
 <h4>Returns</h4>
 <p>FQDN for this system</p>
 <!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpGetLength'>httpGetLength()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpGetLength'>httpGetLength()</a></h3>
 <h4>Description</h4>
 <p>Get the amount of data remaining from the
 content-length or transfer-encoding fields.
@@ -2026,18 +1350,20 @@ httpGetLength(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Content length</p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='httpGetLength2'>httpGetLength2()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpGetLength2'>httpGetLength2()</a></h3>
 <h4>Description</h4>
 <p>Get the amount of data remaining from the
 content-length or transfer-encoding fields.
 
 This function returns the complete content length, even for
-content larger than 2^31 - 1.</p>
+content larger than 2^31 - 1.
+
+</p>
 <h4>Syntax</h4>
 <pre>
 off_t
@@ -2048,10 +1374,30 @@ httpGetLength2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Content length</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpGetStatus'>httpGetStatus()</a></h3>
+<h4>Description</h4>
+<p>Get the status of the last HTTP request.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+http_status_t
+httpGetStatus(
+    <a href='#http_t'>http_t</a> * http);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>HTTP status</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpGetSubField'>httpGetSubField()</a></h3>
 <h4>Description</h4>
@@ -2060,18 +1406,18 @@ httpGetLength2(
 </p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpGetSubField(
     <a href='#http_t'>http_t</a> * http,
     http_field_t field,
-    const <a href='#char'>char</a> * name,
-    <a href='#char'>char</a> * value);
+    const char * name,
+    char * value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>field</tt></td><td>Field index</td></tr>
 <tr><td><tt>name</tt></td><td>Name of sub-field</td></tr>
 <tr><td><tt>value</tt></td><td>Value string</td></tr>
@@ -2086,19 +1432,19 @@ httpGetSubField(
 </p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpGetSubField2(
     <a href='#http_t'>http_t</a> * http,
     http_field_t field,
-    const <a href='#char'>char</a> * name,
-    <a href='#char'>char</a> * value,
+    const char * name,
+    char * value,
     int valuelen);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>field</tt></td><td>Field index</td></tr>
 <tr><td><tt>name</tt></td><td>Name of sub-field</td></tr>
 <tr><td><tt>value</tt></td><td>Value string</td></tr>
@@ -2112,9 +1458,9 @@ httpGetSubField2(
 <p>Get a line of text from a HTTP connection.</p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpGets(
-    <a href='#char'>char</a> * line,
+    char * line,
     int length,
     <a href='#http_t'>http_t</a> * http);
 </pre>
@@ -2124,7 +1470,7 @@ httpGets(
 <tbody>
 <tr><td><tt>line</tt></td><td>Line to read into</td></tr>
 <tr><td><tt>length</tt></td><td>Max length of buffer</td></tr>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Line or NULL</p>
@@ -2137,13 +1483,13 @@ httpGets(
 int
 httpHead(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * uri);
+    const char * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>uri</tt></td><td>URI for head</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
@@ -2168,12 +1514,12 @@ httpInitialize(void);
 <p>Compute the MD5 sum of the username:group:password.</p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpMD5(
-    const <a href='#char'>char</a> * username,
-    const <a href='#char'>char</a> * realm,
-    const <a href='#char'>char</a> * passwd,
-    <a href='#char'>char</a> md5[33]);
+    const char * username,
+    const char * realm,
+    const char * passwd,
+    char md5[33]);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2194,12 +1540,12 @@ with the server-supplied nonce value, method, and
 request-uri.</p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpMD5Final(
-    const <a href='#char'>char</a> * nonce,
-    const <a href='#char'>char</a> * method,
-    const <a href='#char'>char</a> * resource,
-    <a href='#char'>char</a> md5[33]);
+    const char * nonce,
+    const char * method,
+    const char * resource,
+    char md5[33]);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2218,10 +1564,10 @@ httpMD5Final(
 <p>Convert an MD5 sum to a character string.</p>
 <h4>Syntax</h4>
 <pre>
-<a href='#char'>char</a> *
+char *
 httpMD5String(
-    const unsigned <a href='#char'>char</a> * sum,
-    <a href='#char'>char</a> md5[33]);
+    const unsigned char * sum,
+    char md5[33]);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2241,13 +1587,13 @@ httpMD5String(
 int
 httpOptions(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * uri);
+    const char * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>uri</tt></td><td>URI for options</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
@@ -2261,39 +1607,17 @@ httpOptions(
 int
 httpPost(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * uri);
+    const char * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>uri</tt></td><td>URI for post</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Status of call (0 = success)</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='httpPrintf'>httpPrintf()</a></h3>
-<h4>Description</h4>
-<p>Print a formatted string to a HTTP connection.</p>
-<h4>Syntax</h4>
-<pre>
-int
-httpPrintf(
-    <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * format,
-    ...);
-</pre>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
-<tr><td><tt>format</tt></td><td>printf-style format string</td></tr>
-<tr><td><tt>...</tt></td><td>Additional args as needed</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of bytes written</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='httpPut'>httpPut()</a></h3>
 <h4>Description</h4>
@@ -2303,34 +1627,63 @@ httpPrintf(
 int
 httpPut(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * uri);
+    const char * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>uri</tt></td><td>URI to put</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Status of call (0 = success)</p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='httpRead'>httpRead()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpRead'>httpRead()</a></h3>
 <h4>Description</h4>
-<p>Read data from a HTTP connection.</p>
+<p>Read data from a HTTP connection.
+
+This function is deprecated. Use the httpRead2() function which can
+read more than 2GB of data.
+
+</p>
 <h4>Syntax</h4>
 <pre>
 int
 httpRead(
     <a href='#http_t'>http_t</a> * http,
-    <a href='#char'>char</a> * buffer,
+    char * buffer,
     int length);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>buffer</tt></td><td>Buffer for data</td></tr>
+<tr><td><tt>length</tt></td><td>Maximum number of bytes</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes read</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpRead2'>httpRead2()</a></h3>
+<h4>Description</h4>
+<p>Read data from a HTTP connection.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+ssize_t
+httpRead2(
+    <a href='#http_t'>http_t</a> * http,
+    char * buffer,
+    size_t length);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>buffer</tt></td><td>Buffer for data</td></tr>
 <tr><td><tt>length</tt></td><td>Maximum number of bytes</td></tr>
 </tbody></table></div>
@@ -2339,7 +1692,7 @@ httpRead(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='httpReconnect'>httpReconnect()</a></h3>
 <h4>Description</h4>
-<p>Reconnect to a HTTP server...</p>
+<p>Reconnect to a HTTP server.</p>
 <h4>Syntax</h4>
 <pre>
 int
@@ -2350,25 +1703,29 @@ httpReconnect(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, non-zero on failure</p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='httpSeparate'>httpSeparate()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpSeparate'>httpSeparate()</a></h3>
 <h4>Description</h4>
 <p>Separate a Universal Resource Identifier into its
-components.</p>
+components.
+
+This function is deprecated; use the httpSeparateURI() function instead.
+
+</p>
 <h4>Syntax</h4>
 <pre>
 void
 httpSeparate(
-    const <a href='#char'>char</a> * uri,
-    <a href='#char'>char</a> * scheme,
-    <a href='#char'>char</a> * username,
-    <a href='#char'>char</a> * host,
+    const char * uri,
+    char * scheme,
+    char * username,
+    char * host,
     int * port,
-    <a href='#char'>char</a> * resource);
+    char * resource);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2389,20 +1746,23 @@ httpSeparate(
 <p>Separate a Universal Resource Identifier into its
 components.
 
+This function is deprecated; use the httpSeparateURI() function instead.
+
+
 </p>
 <h4>Syntax</h4>
 <pre>
 void
 httpSeparate2(
-    const <a href='#char'>char</a> * uri,
-    <a href='#char'>char</a> * scheme,
+    const char * uri,
+    char * scheme,
     int schemelen,
-    <a href='#char'>char</a> * username,
+    char * username,
     int usernamelen,
-    <a href='#char'>char</a> * host,
+    char * host,
     int hostlen,
     int * port,
-    <a href='#char'>char</a> * resource,
+    char * resource,
     int resourcelen);
 </pre>
 <h4>Arguments</h4>
@@ -2433,21 +1793,23 @@ components.
 <pre>
 http_uri_status_t
 httpSeparateURI(
-    const <a href='#char'>char</a> * uri,
-    <a href='#char'>char</a> * scheme,
+    http_uri_coding_t decoding,
+    const char * uri,
+    char * scheme,
     int schemelen,
-    <a href='#char'>char</a> * username,
+    char * username,
     int usernamelen,
-    <a href='#char'>char</a> * host,
+    char * host,
     int hostlen,
     int * port,
-    <a href='#char'>char</a> * resource,
+    char * resource,
     int resourcelen);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
+<tr><td><tt>decoding</tt></td><td>Decoding flags</td></tr>
 <tr><td><tt>uri</tt></td><td>Universal Resource Identifier</td></tr>
 <tr><td><tt>scheme</tt></td><td>Scheme (http, https, etc.)</td></tr>
 <tr><td><tt>schemelen</tt></td><td>Size of scheme buffer</td></tr>
@@ -2472,7 +1834,7 @@ httpSeparateURI(
 void
 httpSetCookie(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * cookie);
+    const char * cookie);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -2493,13 +1855,13 @@ void
 httpSetField(
     <a href='#http_t'>http_t</a> * http,
     http_field_t field,
-    const <a href='#char'>char</a> * value);
+    const char * value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>field</tt></td><td>Field index</td></tr>
 <tr><td><tt>value</tt></td><td>Value</td></tr>
 </tbody></table></div>
@@ -2522,7 +1884,7 @@ httpSetLength(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>length</tt></td><td>Length (0 for chunked)</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
@@ -2533,7 +1895,7 @@ httpSetLength(
 <p>Return a short string describing a HTTP status code.</p>
 <h4>Syntax</h4>
 <pre>
-const <a href='#char'>char</a> *
+const char *
 httpStatus(
     http_status_t status);
 </pre>
@@ -2554,13 +1916,13 @@ httpStatus(
 int
 httpTrace(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * uri);
+    const char * uri);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>uri</tt></td><td>URI for trace</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
@@ -2579,7 +1941,7 @@ httpUpdate(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>HTTP status</p>
@@ -2600,28 +1962,57 @@ httpWait(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>msec</tt></td><td>Milliseconds to wait</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>1 if data is available, 0 otherwise</p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='httpWrite'>httpWrite()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpWrite'>httpWrite()</a></h3>
 <h4>Description</h4>
-<p>Write data to a HTTP connection.</p>
+<p>Write data to a HTTP connection.
+
+This function is deprecated. Use the httpWrite2() function which can
+write more than 2GB of data.
+
+</p>
 <h4>Syntax</h4>
 <pre>
 int
 httpWrite(
     <a href='#http_t'>http_t</a> * http,
-    const <a href='#char'>char</a> * buffer,
+    const char * buffer,
     int length);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>buffer</tt></td><td>Buffer for data</td></tr>
+<tr><td><tt>length</tt></td><td>Number of bytes to write</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes written</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpWrite2'>httpWrite2()</a></h3>
+<h4>Description</h4>
+<p>Write data to a HTTP connection.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+ssize_t
+httpWrite2(
+    <a href='#http_t'>http_t</a> * http,
+    const char * buffer,
+    size_t length);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
 <tr><td><tt>buffer</tt></td><td>Buffer for data</td></tr>
 <tr><td><tt>length</tt></td><td>Number of bytes to write</td></tr>
 </tbody></table></div>
@@ -2630,21 +2021,21 @@ httpWrite(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddBoolean'>ippAddBoolean()</a></h3>
 <h4>Description</h4>
-<p>Add a boolean attribute to an IPP request.</p>
+<p>Add a boolean attribute to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippAddBoolean(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
-    <a href='#char'>char</a> value);
+    const char * name,
+    char value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>value</tt></td><td>Value of attribute</td></tr>
@@ -2661,15 +2052,15 @@ ippAddBoolean(
 ippAddBooleans(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     int num_values,
-    const <a href='#char'>char</a> * values);
+    const char * values);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>num_values</tt></td><td>Number of values</td></tr>
@@ -2689,14 +2080,14 @@ ippAddBooleans(
 ippAddCollection(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     <a href='#ipp_t'>ipp_t</a> * value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>value</tt></td><td>Value</td></tr>
@@ -2715,7 +2106,7 @@ ippAddCollection(
 ippAddCollections(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     int num_values,
     const <a href='#ipp_t'>ipp_t</a> ** values);
 </pre>
@@ -2723,7 +2114,7 @@ ippAddCollections(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>num_values</tt></td><td>Number of values</td></tr>
@@ -2734,21 +2125,21 @@ ippAddCollections(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddDate'>ippAddDate()</a></h3>
 <h4>Description</h4>
-<p>Add a date attribute to an IPP request.</p>
+<p>Add a date attribute to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippAddDate(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     const <a href='#ipp_uchar_t'>ipp_uchar_t</a> * value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>value</tt></td><td>Value</td></tr>
@@ -2758,7 +2149,7 @@ ippAddDate(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddInteger'>ippAddInteger()</a></h3>
 <h4>Description</h4>
-<p>Add a integer attribute to an IPP request.</p>
+<p>Add a integer attribute to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
@@ -2766,14 +2157,14 @@ ippAddInteger(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
     ipp_tag_t type,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     int value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>type</tt></td><td>Type of attribute</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
@@ -2792,7 +2183,7 @@ ippAddIntegers(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
     ipp_tag_t type,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     int num_values,
     const int * values);
 </pre>
@@ -2800,7 +2191,7 @@ ippAddIntegers(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>type</tt></td><td>Type of attribute</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
@@ -2812,7 +2203,7 @@ ippAddIntegers(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ippAddOctetString'>ippAddOctetString()</a></h3>
 <h4>Description</h4>
-<p>Add an octetString value to an IPP request.
+<p>Add an octetString value to an IPP message.
 
 </p>
 <h4>Syntax</h4>
@@ -2821,7 +2212,7 @@ ippAddIntegers(
 ippAddOctetString(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     const void * data,
     int datalen);
 </pre>
@@ -2829,7 +2220,7 @@ ippAddOctetString(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>data</tt></td><td>octetString data</td></tr>
@@ -2840,14 +2231,14 @@ ippAddOctetString(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddRange'>ippAddRange()</a></h3>
 <h4>Description</h4>
-<p>Add a range of values to an IPP request.</p>
+<p>Add a range of values to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippAddRange(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     int lower,
     int upper);
 </pre>
@@ -2855,7 +2246,7 @@ ippAddRange(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>lower</tt></td><td>Lower value</td></tr>
@@ -2866,14 +2257,14 @@ ippAddRange(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddRanges'>ippAddRanges()</a></h3>
 <h4>Description</h4>
-<p>Add ranges of values to an IPP request.</p>
+<p>Add ranges of values to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippAddRanges(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     int num_values,
     const int * lower,
     const int * upper);
@@ -2882,7 +2273,7 @@ ippAddRanges(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>num_values</tt></td><td>Number of values</td></tr>
@@ -2894,14 +2285,14 @@ ippAddRanges(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddResolution'>ippAddResolution()</a></h3>
 <h4>Description</h4>
-<p>Add a resolution value to an IPP request.</p>
+<p>Add a resolution value to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippAddResolution(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     ipp_res_t units,
     int xres,
     int yres);
@@ -2910,7 +2301,7 @@ ippAddResolution(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>units</tt></td><td>Units for resolution</td></tr>
@@ -2922,14 +2313,14 @@ ippAddResolution(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddResolutions'>ippAddResolutions()</a></h3>
 <h4>Description</h4>
-<p>Add resolution values to an IPP request.</p>
+<p>Add resolution values to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippAddResolutions(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     int num_values,
     ipp_res_t units,
     const int * xres,
@@ -2939,7 +2330,7 @@ ippAddResolutions(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>num_values</tt></td><td>Number of values</td></tr>
@@ -2952,7 +2343,7 @@ ippAddResolutions(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddSeparator'>ippAddSeparator()</a></h3>
 <h4>Description</h4>
-<p>Add a group separator to an IPP request.</p>
+<p>Add a group separator to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
@@ -2963,14 +2354,14 @@ ippAddSeparator(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>New attribute</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddString'>ippAddString()</a></h3>
 <h4>Description</h4>
-<p>Add a language-encoded string to an IPP request.</p>
+<p>Add a language-encoded string to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
@@ -2978,15 +2369,15 @@ ippAddString(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
     ipp_tag_t type,
-    const <a href='#char'>char</a> * name,
-    const <a href='#char'>char</a> * charset,
-    const <a href='#char'>char</a> * value);
+    const char * name,
+    const char * charset,
+    const char * value);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>type</tt></td><td>Type of attribute</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
@@ -2998,7 +2389,7 @@ ippAddString(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippAddStrings'>ippAddStrings()</a></h3>
 <h4>Description</h4>
-<p>Add language-encoded strings to an IPP request.</p>
+<p>Add language-encoded strings to an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
@@ -3006,16 +2397,16 @@ ippAddStrings(
     <a href='#ipp_t'>ipp_t</a> * ipp,
     ipp_tag_t group,
     ipp_tag_t type,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     int num_values,
-    const <a href='#char'>char</a> * charset,
-    const <a href='#char'>char</a> *const * values);
+    const char * charset,
+    const char *const * values);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>group</tt></td><td>IPP group</td></tr>
 <tr><td><tt>type</tt></td><td>Type of attribute</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
@@ -3047,7 +2438,7 @@ ippDateToTime(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippDelete'>ippDelete()</a></h3>
 <h4>Description</h4>
-<p>Delete an IPP request.</p>
+<p>Delete an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 void
@@ -3058,14 +2449,14 @@ ippDelete(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ippDeleteAttribute'>ippDeleteAttribute()</a></h3>
 <h4>Description</h4>
-<p>Delete a single attribute in an IPP request.
+<p>Delete a single attribute in an IPP message.
 
 </p>
 <h4>Syntax</h4>
@@ -3079,7 +2470,7 @@ ippDeleteAttribute(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>attr</tt></td><td>Attribute to delete</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
@@ -3090,7 +2481,7 @@ ippDeleteAttribute(
 <p>Return a name for the given status code.</p>
 <h4>Syntax</h4>
 <pre>
-const <a href='#char'>char</a> *
+const char *
 ippErrorString(
     ipp_status_t error);
 </pre>
@@ -3112,7 +2503,7 @@ ippErrorString(
 <pre>
 ipp_status_t
 ippErrorValue(
-    const <a href='#char'>char</a> * name);
+    const char * name);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -3131,14 +2522,14 @@ ippErrorValue(
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippFindAttribute(
     <a href='#ipp_t'>ipp_t</a> * ipp,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     ipp_tag_t type);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>type</tt></td><td>Type of attribute</td></tr>
 </tbody></table></div>
@@ -3153,14 +2544,14 @@ ippFindAttribute(
 <a href='#ipp_attribute_t'>ipp_attribute_t</a> *
 ippFindNextAttribute(
     <a href='#ipp_t'>ipp_t</a> * ipp,
-    const <a href='#char'>char</a> * name,
+    const char * name,
     ipp_tag_t type);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 <tr><td><tt>name</tt></td><td>Name of attribute</td></tr>
 <tr><td><tt>type</tt></td><td>Type of attribute</td></tr>
 </tbody></table></div>
@@ -3169,7 +2560,7 @@ ippFindNextAttribute(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippLength'>ippLength()</a></h3>
 <h4>Description</h4>
-<p>Compute the length of an IPP request.</p>
+<p>Compute the length of an IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 size_t
@@ -3180,14 +2571,14 @@ ippLength(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ipp</tt></td><td>IPP request</td></tr>
+<tr><td><tt>ipp</tt></td><td>IPP message</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
-<p>Size of IPP request</p>
+<p>Size of IPP message</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippNew'>ippNew()</a></h3>
 <h4>Description</h4>
-<p>Allocate a new IPP request.</p>
+<p>Allocate a new IPP message.</p>
 <h4>Syntax</h4>
 <pre>
 <a href='#ipp_t'>ipp_t</a> *
@@ -3196,7 +2587,31 @@ ippNew(void);
 <h4>Arguments</h4>
 <p>None.</p>
 <h4>Returns</h4>
-<p>New IPP request</p>
+<p>New IPP message</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ippNewRequest'>ippNewRequest()</a></h3>
+<h4>Description</h4>
+<p>Allocate a new IPP request message.
+
+The new request message is initialized with the attributes-charset and
+attributes-natural-language attributes added. The
+attributes-natural-language value is derived from the current locale.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#ipp_t'>ipp_t</a> *
+ippNewRequest(
+    ipp_op_t op);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>op</tt></td><td>Operation code</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>IPP request message</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ippOpString'>ippOpString()</a></h3>
 <h4>Description</h4>
@@ -3205,7 +2620,7 @@ ippNew(void);
 </p>
 <h4>Syntax</h4>
 <pre>
-const <a href='#char'>char</a> *
+const char *
 ippOpString(
     ipp_op_t op);
 </pre>
@@ -3227,7 +2642,7 @@ ippOpString(
 <pre>
 ipp_op_t
 ippOpValue(
-    const <a href='#char'>char</a> * name);
+    const char * name);
 </pre>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
@@ -3253,7 +2668,7 @@ ippPort(void);
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippRead'>ippRead()</a></h3>
 <h4>Description</h4>
-<p>Read data for an IPP request from a HTTP connection.</p>
+<p>Read data for an IPP message from a HTTP connection.</p>
 <h4>Syntax</h4>
 <pre>
 ipp_state_t
@@ -3273,7 +2688,7 @@ ippRead(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ippReadFile'>ippReadFile()</a></h3>
 <h4>Description</h4>
-<p>Read data for an IPP request from a file.
+<p>Read data for an IPP message from a file.
 
 </p>
 <h4>Syntax</h4>
@@ -3293,9 +2708,9 @@ ippReadFile(
 <h4>Returns</h4>
 <p>Current state</p>
 <!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ippReadIO'>ippReadIO()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ippReadIO'>ippReadIO()</a></h3>
 <h4>Description</h4>
-<p>Read data for an IPP request.
+<p>Read data for an IPP message.
 
 </p>
 <h4>Syntax</h4>
@@ -3359,7 +2774,7 @@ ippTimeToDate(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ippWrite'>ippWrite()</a></h3>
 <h4>Description</h4>
-<p>Write data for an IPP request to a HTTP connection.</p>
+<p>Write data for an IPP message to a HTTP connection.</p>
 <h4>Syntax</h4>
 <pre>
 ipp_state_t
@@ -3379,7 +2794,7 @@ ippWrite(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ippWriteFile'>ippWriteFile()</a></h3>
 <h4>Description</h4>
-<p>Write data for an IPP request to a file.
+<p>Write data for an IPP message to a file.
 
 </p>
 <h4>Syntax</h4>
@@ -3399,9 +2814,9 @@ ippWriteFile(
 <h4>Returns</h4>
 <p>Current state</p>
 <!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ippWriteIO'>ippWriteIO()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ippWriteIO'>ippWriteIO()</a></h3>
 <h4>Description</h4>
-<p>Write data for an IPP request.
+<p>Write data for an IPP message.
 
 </p>
 <h4>Syntax</h4>
@@ -3421,7 +2836,7 @@ ippWriteIO(
 <tr><td><tt>dst</tt></td><td>Destination</td></tr>
 <tr><td><tt>cb</tt></td><td>Write callback function</td></tr>
 <tr><td><tt>blocking</tt></td><td>Use blocking IO?</td></tr>
-<tr><td><tt>parent</tt></td><td>Parent IPP request</td></tr>
+<tr><td><tt>parent</tt></td><td>Parent IPP message</td></tr>
 <tr><td><tt>ipp</tt></td><td>IPP data</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
@@ -3429,81 +2844,10 @@ ippWriteIO(
 <!-- NEW PAGE -->
 <h2 class='title'><a name='STRUCTURES'>Structures</a></h2>
 <ul>
-	<li><a href='#cups_dest_s'><tt>cups_dest_s</tt></a> </li>
-	<li><a href='#cups_job_s'><tt>cups_job_s</tt></a> </li>
-	<li><a href='#cups_option_s'><tt>cups_option_s</tt></a> </li>
 	<li><a href='#http_addrlist_s'><tt>http_addrlist_s</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#http_s'><tt>http_s</tt></a> </li>
 	<li><a href='#ipp_attribute_s'><tt>ipp_attribute_s</tt></a> </li>
-	<li><a href='#ipp_str'><tt>ipp_str</tt></a> </li>
+	<li><a href='#ipp_s'><tt>ipp_s</tt></a> </li>
 </ul>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cups_dest_s'>cups_dest_s</a></h3>
-<h4>Description</h4>
-<p>Destination</p>
-<h4>Definition</h4>
-<pre>
-struct cups_dest_s
-{
-  <a href='#char'>char</a> *name, * instance;
-  int is_default;
-  int num_options;
-  <a href='#cups_option_t'>cups_option_t</a> * options;
-};
-</pre>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>instance</tt> </td><td>Local instance name or NULL</td></tr>
-<tr><td><tt>is_default</tt> </td><td>Is this printer the default?</td></tr>
-<tr><td><tt>num_options</tt> </td><td>Number of options</td></tr>
-<tr><td><tt>options</tt> </td><td>Options</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cups_job_s'>cups_job_s</a></h3>
-<h4>Description</h4>
-<p>Job</p>
-<h4>Definition</h4>
-<pre>
-struct cups_job_s
-{
-  <a href='#char'>char</a> *dest, *title, *user, * format;
-  int id;
-  int size, priority;
-  time_t completed_time, creation_time, processing_time;
-  ipp_jstate_t state;
-};
-</pre>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>format</tt> </td><td>Document format</td></tr>
-<tr><td><tt>id</tt> </td><td>The job ID</td></tr>
-<tr><td><tt>priority</tt> </td><td>Priority (1-100)</td></tr>
-<tr><td><tt>processing_time</tt> </td><td>Time the job was processed</td></tr>
-<tr><td><tt>state</tt> </td><td>Job state</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cups_option_s'>cups_option_s</a></h3>
-<h4>Description</h4>
-<p>Types and structures...</p>
-<h4>Definition</h4>
-<pre>
-struct cups_option_s
-{
-  <a href='#char'>char</a> * name;
-  <a href='#char'>char</a> * value;
-};
-</pre>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name</tt> </td><td>Name of option</td></tr>
-<tr><td><tt>value</tt> </td><td>Value of option</td></tr>
-</tbody></table></div>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='http_addrlist_s'>http_addrlist_s</a></h3>
 <h4>Description</h4>
@@ -3527,79 +2871,6 @@ struct http_addrlist_s
 <tr><td><tt>next</tt> </td><td>Pointer to next address in list</td></tr>
 </tbody></table></div>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='http_s'>http_s</a></h3>
-<h4>Description</h4>
-<p>HTTP connection structure.</p>
-<h4>Definition</h4>
-<pre>
-struct http_s
-{
-  time_t activity;
-  <a href='#http_addrlist_t'>http_addrlist_t</a> * addrlist;
-  int auth_type;
-  int blocking;
-  <a href='#char'>char</a> buffer[HTTP_MAX_BUFFER];
-  <a href='#char'>char</a> * cookie;
-  <a href='#char'>char</a> * data;
-  <a href='#http_encoding_t'>http_encoding_t</a> data_encoding;
-  off_t data_remaining;
-  int digest_tries;
-  <a href='#http_encryption_t'>http_encryption_t</a> encryption;
-  int error;
-  http_status_t expect;
-  int fd;
-  <a href='#char'>char</a> hostname[HTTP_MAX_HOST], fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
-  <a href='#http_addr_t'>http_addr_t</a> * hostaddr;
-  fd_set * input_set;
-  http_keepalive_t keep_alive;
-  _cups_md5_state_t md5_state;
-  <a href='#char'>char</a> nonce[HTTP_MAX_VALUE];
-  int nonce_count;
-  <a href='#http_state_t'>http_state_t</a> state;
-  http_status_t status;
-  void * tls;
-  int used;
-  <a href='#char'>char</a> authstring[HTTP_MAX_VALUE], userpass[HTTP_MAX_VALUE];
-  http_version_t version;
-  <a href='#char'>char</a> wbuffer[HTTP_MAX_BUFFER];
-  int wused;
-};
-</pre>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>activity</tt> </td><td>Time since last read/write</td></tr>
-<tr><td><tt>addrlist</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>List of valid addresses </td></tr>
-<tr><td><tt>auth_type</tt> </td><td>Authentication in use</td></tr>
-<tr><td><tt>blocking</tt> </td><td>To block or not to block</td></tr>
-<tr><td><tt>buffer[HTTP_MAX_BUFFER]</tt> </td><td>Buffer for incoming data</td></tr>
-<tr><td><tt>cookie</tt> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></td><td>Cookie value(s) </td></tr>
-<tr><td><tt>data</tt> </td><td>Pointer to data buffer</td></tr>
-<tr><td><tt>data_encoding</tt> </td><td>Chunked or not</td></tr>
-<tr><td><tt>data_remaining</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Number of bytes left </td></tr>
-<tr><td><tt>digest_tries</tt> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></td><td>Number of tries for digest auth </td></tr>
-<tr><td><tt>encryption</tt> </td><td>Encryption requirements</td></tr>
-<tr><td><tt>error</tt> </td><td>Last error on read</td></tr>
-<tr><td><tt>expect</tt> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></td><td>Expect: header </td></tr>
-<tr><td><tt>fd</tt> </td><td>File descriptor for this socket</td></tr>
-<tr><td><tt>fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE]</tt> </td><td>Field values</td></tr>
-<tr><td><tt>hostaddr</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Current host address and port </td></tr>
-<tr><td><tt>input_set</tt> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></td><td>select() set for httpWait() </td></tr>
-<tr><td><tt>keep_alive</tt> </td><td>Keep-alive supported?</td></tr>
-<tr><td><tt>md5_state</tt> </td><td>MD5 state</td></tr>
-<tr><td><tt>nonce[HTTP_MAX_VALUE]</tt> </td><td>Nonce value</td></tr>
-<tr><td><tt>nonce_count</tt> </td><td>Nonce count</td></tr>
-<tr><td><tt>state</tt> </td><td>State of client</td></tr>
-<tr><td><tt>status</tt> </td><td>Status of last request</td></tr>
-<tr><td><tt>tls</tt> </td><td>TLS state information</td></tr>
-<tr><td><tt>used</tt> </td><td>Number of bytes used in buffer</td></tr>
-<tr><td><tt>userpass[HTTP_MAX_VALUE]</tt> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></td><td>Username:password string </td></tr>
-<tr><td><tt>version</tt> </td><td>Protocol version</td></tr>
-<tr><td><tt>wbuffer[HTTP_MAX_BUFFER]</tt> </td><td>Buffer for outgoing data</td></tr>
-<tr><td><tt>wused</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Write buffer bytes used </td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_attribute_s'>ipp_attribute_s</a></h3>
 <h4>Description</h4>
 <p>Attribute</p>
@@ -3607,7 +2878,7 @@ struct http_s
 <pre>
 struct ipp_attribute_s
 {
-  <a href='#char'>char</a> * name;
+  char * name;
   struct <a href='#ipp_attribute_s'>ipp_attribute_s</a> * next;
   int num_values;
   ipp_tag_t group_tag, value_tag;
@@ -3625,15 +2896,17 @@ struct ipp_attribute_s
 <tr><td><tt>values[1]</tt> </td><td>Values</td></tr>
 </tbody></table></div>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='ipp_str'>ipp_str</a></h3>
+<h3 class='title'><a name='ipp_s'>ipp_s</a></h3>
 <h4>Description</h4>
 <p>IPP Request/Response/Notification</p>
 <h4>Definition</h4>
 <pre>
-struct ipp_str
+struct ipp_s
 {
-  <a href='#ipp_attribute_t'>ipp_attribute_t</a> *attrs, *last, * current;
+  <a href='#ipp_attribute_t'>ipp_attribute_t</a> * attrs;
+  <a href='#ipp_attribute_t'>ipp_attribute_t</a> * current;
   ipp_tag_t curtag;
+  <a href='#ipp_attribute_t'>ipp_attribute_t</a> * last;
   <a href='#ipp_attribute_t'>ipp_attribute_t</a> * prev;
   <a href='#ipp_request_t'>ipp_request_t</a> request;
   ipp_state_t state;
@@ -3643,8 +2916,10 @@ struct ipp_str
 <div class='table'><table align='center' border='1' width='80%'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
+<tr><td><tt>attrs</tt> </td><td>Attributes</td></tr>
 <tr><td><tt>current</tt> </td><td>Current attribute (for read/write)</td></tr>
 <tr><td><tt>curtag</tt> </td><td>Current attribute group tag</td></tr>
+<tr><td><tt>last</tt> </td><td>Last attribute in list</td></tr>
 <tr><td><tt>prev</tt> </td><td>Previous attribute (for read)</td></tr>
 <tr><td><tt>request</tt> </td><td>Request header</td></tr>
 <tr><td><tt>state</tt> </td><td>State of request</td></tr>
@@ -3652,62 +2927,18 @@ struct ipp_str
 <!-- NEW PAGE -->
 <h2 class='title'><a name='TYPES'>Types</a></h2>
 <ul>
-	<li><a href='#char'><tt>char</tt></a> </li>
-	<li><a href='#cups_dest_t'><tt>cups_dest_t</tt></a> </li>
-	<li><a href='#cups_job_t'><tt>cups_job_t</tt></a> </li>
-	<li><a href='#cups_option_t'><tt>cups_option_t</tt></a> </li>
-	<li><a href='#cups_ptype_t'><tt>cups_ptype_t</tt></a> </li>
 	<li><a href='#http_addrlist_t'><tt>http_addrlist_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#http_auth_t'><tt>http_auth_t</tt></a> </li>
 	<li><a href='#http_encoding_t'><tt>http_encoding_t</tt></a> </li>
 	<li><a href='#http_encryption_t'><tt>http_encryption_t</tt></a> </li>
 	<li><a href='#http_t'><tt>http_t</tt></a> </li>
 	<li><a href='#ipp_attribute_t'><tt>ipp_attribute_t</tt></a> </li>
-	<li><a href='#ipp_iocb_t'><tt>ipp_iocb_t</tt></a> </li>
+	<li><a href='#ipp_iocb_t'><tt>ipp_iocb_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ipp_request_t'><tt>ipp_request_t</tt></a> </li>
 	<li><a href='#ipp_t'><tt>ipp_t</tt></a> </li>
+	<li><a href='#ipp_uchar_t'><tt>ipp_uchar_t</tt></a> </li>
 	<li><a href='#ipp_value_t'><tt>ipp_value_t</tt></a> </li>
 </ul>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='char'>char</a></h3>
-<h4>Description</h4>
-<p>Printer Options</p>
-<h4>Definition</h4>
-<pre>
-typedef const * (*charcups_password_cb_t)(const <a href='#char'>char</a> *);
-</pre>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cups_dest_t'>cups_dest_t</a></h3>
-<h4>Description</h4>
-<p>Destination</p>
-<h4>Definition</h4>
-<pre>
-typedef struct <a href='#cups_dest_s'>cups_dest_s</a> cups_dest_t;
-</pre>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cups_job_t'>cups_job_t</a></h3>
-<h4>Description</h4>
-<p>Job</p>
-<h4>Definition</h4>
-<pre>
-typedef struct <a href='#cups_job_s'>cups_job_s</a> cups_job_t;
-</pre>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cups_option_t'>cups_option_t</a></h3>
-<h4>Description</h4>
-<p>Types and structures...</p>
-<h4>Definition</h4>
-<pre>
-typedef struct <a href='#cups_option_s'>cups_option_s</a> cups_option_t;
-</pre>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='cups_ptype_t'>cups_ptype_t</a></h3>
-<h4>Description</h4>
-<p>Printer Type/Capability Bits</p>
-<h4>Definition</h4>
-<pre>
-typedef unsigned cups_ptype_t;
-</pre>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='http_addrlist_t'>http_addrlist_t</a></h3>
 <h4>Description</h4>
@@ -3749,7 +2980,7 @@ typedef enum <a href='#http_encryption_e'>http_encryption_e</a> http_encryption_
 <p>HTTP connection structure.</p>
 <h4>Definition</h4>
 <pre>
-typedef struct <a href='#http_s'>http_s</a> http_t;
+typedef struct _http_s http_t;
 </pre>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_attribute_t'>ipp_attribute_t</a></h3>
@@ -3760,12 +2991,12 @@ typedef struct <a href='#http_s'>http_s</a> http_t;
 typedef struct <a href='#ipp_attribute_s'>ipp_attribute_s</a> ipp_attribute_t;
 </pre>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='ipp_iocb_t'>ipp_iocb_t</a></h3>
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ipp_iocb_t'>ipp_iocb_t</a></h3>
 <h4>Description</h4>
-<p>IPP IO Callback Function</p>
+<p>IPP IO Callback Function </p>
 <h4>Definition</h4>
 <pre>
-typedef int (*ipp_iocb_t)(void *, <a href='#ipp_uchar_t'>ipp_uchar_t</a> *, int);
+typedef ssize_t (*ipp_iocb_t)(void *, <a href='#ipp_uchar_t'>ipp_uchar_t</a> *, size_t);
 </pre>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_request_t'>ipp_request_t</a></h3>
@@ -3773,7 +3004,7 @@ typedef int (*ipp_iocb_t)(void *, <a href='#ipp_uchar_t'>ipp_uchar_t</a> *, int)
 <p>Request Header</p>
 <h4>Definition</h4>
 <pre>
-typedef union ipp_request_t;
+typedef union <a href='#ipp_request_u'>ipp_request_u</a> ipp_request_t;
 </pre>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_t'>ipp_t</a></h3>
@@ -3781,7 +3012,15 @@ typedef union ipp_request_t;
 <p>Attribute Value</p>
 <h4>Definition</h4>
 <pre>
-typedef struct <a href='#ipp_str'>ipp_str</a> ipp_t;
+typedef struct <a href='#ipp_s'>ipp_s</a> ipp_t;
+</pre>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='ipp_uchar_t'>ipp_uchar_t</a></h3>
+<h4>Description</h4>
+<p>IPP status codes...</p>
+<h4>Definition</h4>
+<pre>
+typedef typedef unsigned char ipp_uchar_t;
 </pre>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_value_t'>ipp_value_t</a></h3>
@@ -3789,7 +3028,51 @@ typedef struct <a href='#ipp_str'>ipp_str</a> ipp_t;
 <p>New in CUPS 1.1.19</p>
 <h4>Definition</h4>
 <pre>
-typedef union ipp_value_t;
+typedef union <a href='#ipp_value_u'>ipp_value_u</a> ipp_value_t;
 </pre>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='UNIONS'>Unions</a></h2>
+<ul>
+	<li><a href='#ipp_request_u'><tt>ipp_request_u</tt></a> </li>
+	<li><a href='#ipp_value_u'><tt>ipp_value_u</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='ipp_request_u'>ipp_request_u</a></h3>
+<h4>Description</h4>
+<p>Request Header</p>
+<h4>Definition</h4>
+<pre>
+union ipp_request_u
+{
+};
+</pre>
+<h4>Members</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='ipp_value_u'>ipp_value_u</a></h3>
+<h4>Description</h4>
+<p>New in CUPS 1.1.19</p>
+<h4>Definition</h4>
+<pre>
+union ipp_value_u
+{
+  char boolean;
+  <a href='#ipp_t'>ipp_t</a> * collection;
+  <a href='#ipp_uchar_t'>ipp_uchar_t</a> date[11];
+  int integer;
+};
+</pre>
+<h4>Members</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>boolean</tt> </td><td>Boolean value</td></tr>
+<tr><td><tt>collection</tt> </td><td>Collection value</td></tr>
+<tr><td><tt>date[11]</tt> </td><td>Date/time value</td></tr>
+<tr><td><tt>integer</tt> </td><td>Integer/enumerated value</td></tr>
+</tbody></table></div>
 </body>
 </html>

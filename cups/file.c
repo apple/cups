@@ -8,7 +8,7 @@
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -439,7 +439,7 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
  * 'cupsFileGetConf()' - Get a line from a configuration file...
  */
 
-char *					/* O  - Line read of NULL on eof/error */
+char *					/* O  - Line read or NULL on eof/error */
 cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
                 char        *buf,	/* O  - String buffer */
 		size_t      buflen,	/* I  - Size of string buffer */

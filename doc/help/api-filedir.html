@@ -97,6 +97,7 @@ library:</p>
 	<li><a href='#cupsFileClose'><tt>cupsFileClose()</tt></a> </li>
 	<li><a href='#cupsFileCompression'><tt>cupsFileCompression()</tt></a> </li>
 	<li><a href='#cupsFileEOF'><tt>cupsFileEOF()</tt></a> </li>
+	<li><a href='#cupsFileFind'><tt>cupsFileFind()</tt></a> </li>
 	<li><a href='#cupsFileFlush'><tt>cupsFileFlush()</tt></a> </li>
 	<li><a href='#cupsFileGetChar'><tt>cupsFileGetChar()</tt></a> </li>
 	<li><a href='#cupsFileGetConf'><tt>cupsFileGetConf()</tt></a> </li>
@@ -243,6 +244,38 @@ cupsFileEOF(
 <h4>Returns</h4>
 <p>1 on EOF, 0 otherwise</p>
 <!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileFind'>cupsFileFind()</a></h3>
+<h4>Description</h4>
+<p>Find a file using the specified path.
+
+This function allows the paths in the path string to be separated by
+colons (UNIX standard) or semicolons (Windows standard) and stores the
+result in the buffer supplied.  If the file cannot be found in any of
+the supplied paths, NULL is returned. A NULL path only matches the
+current directory.</p>
+<h4>Syntax</h4>
+<pre>
+const char *
+cupsFileFind(
+    const char * filename,
+    const char * path,
+    int executable,
+    char * buffer,
+    int bufsize);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>filename</tt></td><td>File to find</td></tr>
+<tr><td><tt>path</tt></td><td>Colon/semicolon-separated path</td></tr>
+<tr><td><tt>executable</tt></td><td>1 = executable files, 0 = any file/dir</td></tr>
+<tr><td><tt>buffer</tt></td><td>Filename buffer</td></tr>
+<tr><td><tt>bufsize</tt></td><td>Size of filename buffer</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Full path to file or NULL</p>
+<!-- NEW PAGE -->
 <h3 class='title'><a name='cupsFileFlush'>cupsFileFlush()</a></h3>
 <h4>Description</h4>
 <p>Flush pending output.</p>
@@ -303,7 +336,7 @@ cupsFileGetConf(
 <tr><td><tt>linenum</tt></td><td>Current line number</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
-<p>Line read of NULL on eof/error</p>
+<p>Line read or NULL on eof/error</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsFileGets'>cupsFileGets()</a></h3>
 <h4>Description</h4>

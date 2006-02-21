@@ -147,7 +147,8 @@ cupsEncryption(void)
 /*
  * 'cupsGetPassword()' - Get a password from the user.
  *
- * Returns NULL if the user does not provide a password.
+ * Uses the current password callback function. Returns NULL if the
+ * user does not provide a password.
  */
 
 const char *				/* O - Password */

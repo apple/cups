@@ -214,6 +214,11 @@ cupsGetDest(const char  *name,		/* I - Name of destination */
 
 /*
  * 'cupsGetDests()' - Get the list of destinations from the default server.
+ *
+ * Starting with CUPS 1.2, the returned list of destinations include the
+ * printer-info, printer-is-accepting-jobs, printer-is-shared,
+ * printer-make-and-model, printer-state, printer-state-change-time,
+ * printer-state-reasons, and printer-type attributes as options.
  */
 
 int					/* O - Number of destinations */
@@ -240,6 +245,11 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 
 /*
  * 'cupsGetDests2()' - Get the list of destinations from the specified server.
+ *
+ * Starting with CUPS 1.2, the returned list of destinations include the
+ * printer-info, printer-is-accepting-jobs, printer-is-shared,
+ * printer-make-and-model, printer-state, printer-state-change-time,
+ * printer-state-reasons, and printer-type attributes as options.
  *
  * @since CUPS 1.1.21@
  */

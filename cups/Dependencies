@@ -57,6 +57,8 @@ options.o: file.h language.h debug.h
 page.o: ppd.h array.h file.h string.h ../config.h
 ppd.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h array.h
 ppd.o: file.h language.h i18n.h normalize.h transcode.h debug.h
+request.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
+request.o: array.h file.h language.h i18n.h normalize.h transcode.h debug.h
 snprintf.o: string.h ../config.h
 string.o: debug.h string.h ../config.h globals.h cups.h ipp.h http.h md5.h
 string.o: ppd.h array.h file.h language.h i18n.h normalize.h transcode.h

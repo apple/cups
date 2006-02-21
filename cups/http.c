@@ -25,21 +25,30 @@
  *
  * Contents:
  *
+ *   httpBlocking()       - Set blocking/non-blocking behavior on a connection.
  *   httpCheck()          - Check to see if there is a pending response from
  *                          the server.
  *   httpClearCookie()    - Clear the cookie value(s).
+ *   httpClearFields()    - Clear HTTP request fields.
  *   httpClose()          - Close an HTTP connection...
  *   httpConnect()        - Connect to a HTTP server.
  *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
  *   httpDelete()         - Send a DELETE request to the server.
  *   httpEncryption()     - Set the required encryption on the link.
+ *   httpError()          - Get the last error on a connection.
  *   httpFlush()          - Flush data from a HTTP connection.
  *   httpFlushWrite()     - Flush data in write buffer.
  *   httpGet()            - Send a GET request to the server.
+ *   httpGetBlocking()    - Get the blocking/non-block state of a connection.
+ *   httpGetCookie()      - Get any cookie data from the response.
+ *   httpGetFd()          - Get the file descriptor associated with a
+ *                          connection.
+ *   httpGetField()       - Get a field value from a request/response.
  *   httpGetLength()      - Get the amount of data remaining from the
  *                          content-length or transfer-encoding fields.
  *   httpGetLength2()     - Get the amount of data remaining from the
  *                          content-length or transfer-encoding fields.
+ *   httpGetStatus()      - Get the status of the last HTTP request.
  *   httpGetSubField()    - Get a sub-field value.
  *   httpGets()           - Get a line of text from a HTTP connection.
  *   httpHead()           - Send a HEAD request to the server.
@@ -159,11 +168,24 @@ static const char * const http_fields[] =
 
 
 /*
+ * 'httpBlocking()' - Set blocking/non-blocking behavior on a connection.
+ */
+
+void
+httpBlocking(http_t *http,		/* I - HTTP connection */
+             int    b)			/* I - 1 = blocking, 0 = non-blocking */
+{
+  if (http)
+    http->blocking = b;
+}
+
+
+/*
  * 'httpCheck()' - Check to see if there is a pending response from the server.
  */
 
-int				/* O - 0 = no data, 1 = data available */
-httpCheck(http_t *http)		/* I - HTTP connection */
+int					/* O - 0 = no data, 1 = data available */
+httpCheck(http_t *http)			/* I - HTTP connection */
 {
   return (httpWait(http, 0));
 }
@@ -176,7 +198,7 @@ httpCheck(http_t *http)		/* I - HTTP connection */
  */
 
 void
-httpClearCookie(http_t *http)			/* I - Connection */
+httpClearCookie(http_t *http)		/* I - HTTP connection */
 {
   if (!http)
     return;
@@ -190,11 +212,26 @@ httpClearCookie(http_t *http)			/* I - Connection */
 
 
 /*
+ * 'httpClearFields()' - Clear HTTP request fields.
+ */
+
+void
+httpClearFields(http_t *http)		/* I - HTTP connection */
+{
+  if (http)
+  {
+    memset(http->fields, 0, sizeof(http->fields));
+    httpSetField(http, HTTP_FIELD_HOST, http->hostname);
+  }
+}
+
+
+/*
  * 'httpClose()' - Close an HTTP connection...
  */
 
 void
-httpClose(http_t *http)		/* I - Connection to close */
+httpClose(http_t *http)			/* I - HTTP connection */
 {
   DEBUG_printf(("httpClose(http=%p)\n", http));
 
@@ -334,7 +371,7 @@ httpConnectEncrypt(
  */
 
 int					/* O - Status of call (0 = success) */
-httpDelete(http_t     *http,		/* I - HTTP data */
+httpDelete(http_t     *http,		/* I - HTTP connection */
            const char *uri)		/* I - URI to delete */
 {
   return (http_send(http, HTTP_DELETE, uri));
@@ -346,7 +383,7 @@ httpDelete(http_t     *http,		/* I - HTTP data */
  */
 
 int					/* O - -1 on error, 0 on success */
-httpEncryption(http_t            *http,	/* I - HTTP data */
+httpEncryption(http_t            *http,	/* I - HTTP connection */
                http_encryption_t e)	/* I - New encryption preference */
 {
   DEBUG_printf(("httpEncryption(http=%p, e=%d)\n", http, e));
@@ -374,11 +411,25 @@ httpEncryption(http_t            *http,	/* I - HTTP data */
 
 
 /*
+ * 'httpError()' - Get the last error on a connection.
+ */
+
+int					/* O - Error code (errno) value */
+httpError(http_t *http)			/* I - HTTP connection */
+{
+  if (http)
+    return (http->error);
+  else
+    return (EINVAL);
+}
+
+
+/*
  * 'httpFlush()' - Flush data from a HTTP connection.
  */
 
 void
-httpFlush(http_t *http)			/* I - HTTP data */
+httpFlush(http_t *http)			/* I - HTTP connection */
 {
   char	buffer[8192];			/* Junk buffer */
   int	blocking;			/* To block or not to block */
@@ -437,7 +488,7 @@ httpFlush(http_t *http)			/* I - HTTP data */
  */
 
 int					/* O - Bytes written or -1 on error */
-httpFlushWrite(http_t *http)		/* I - HTTP data */
+httpFlushWrite(http_t *http)		/* I - HTTP connection */
 {
   int	bytes;				/* Bytes written */
 
@@ -463,10 +514,159 @@ httpFlushWrite(http_t *http)		/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpGet(http_t     *http,		/* I - HTTP data */
+httpGet(http_t     *http,		/* I - HTTP connection */
         const char *uri)		/* I - URI to get */
 {
   return (http_send(http, HTTP_GET, uri));
+}
+
+
+/*
+ * 'httpGetBlocking()' - Get the blocking/non-block state of a connection.
+ *
+ * @since CUPS 1.2@
+ */
+
+int					/* O - 1 if blocking, 0 if non-blocking */
+httpGetBlocking(http_t *http)		/* I - HTTP connection */
+{
+  return (http ? http->blocking : 0);
+}
+
+
+/*
+ * 'httpGetCookie()' - Get any cookie data from the response.
+ */
+
+const char *				/* O - Cookie data or NULL */
+httpGetCookie(http_t *http)		/* I - HTTP connecion */
+{
+  return (http ? http->cookie : NULL);
+}
+
+
+/*
+ * 'httpGetFd()' - Get the file descriptor associated with a connection.
+ *
+ * @since CUPS 1.2@
+ */
+
+int					/* O - File descriptor or -1 if none */
+httpGetFd(http_t *http)			/* I - HTTP connection */
+{
+  return (http ? http->fd : -1);
+}
+
+
+/*
+ * 'httpGetField()' - Get a field value from a request/response.
+ */
+
+const char *				/* O - Field value */
+httpGetField(http_t       *http,	/* I - HTTP connection */
+             http_field_t field)	/* I - Field to get */
+{
+  if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
+    return (NULL);
+  else
+    return (http->fields[field]);
+}
+
+
+/*
+ * 'httpGetLength()' - Get the amount of data remaining from the
+ *                     content-length or transfer-encoding fields.
+ *
+ * This function is deprecated and will not return lengths larger than
+ * 2^31 - 1; use httpGetLength2() instead.
+ *
+ * @deprecated@
+ */
+
+int					/* O - Content length */
+httpGetLength(http_t *http)		/* I - HTTP connection */
+{
+ /*
+  * Get the read content length and return the 32-bit value.
+  */
+
+  if (http)
+  {
+    httpGetLength2(http);
+
+    return (http->_data_remaining);
+  }
+  else
+    return (-1);
+}
+
+
+/*
+ * 'httpGetLength2()' - Get the amount of data remaining from the
+ *                      content-length or transfer-encoding fields.
+ *
+ * This function returns the complete content length, even for
+ * content larger than 2^31 - 1.
+ *
+ * @since CUPS 1.2@
+ */
+
+off_t					/* O - Content length */
+httpGetLength2(http_t *http)		/* I - HTTP connection */
+{
+  DEBUG_printf(("httpGetLength2(http=%p), state=%d\n", http, http->state));
+
+  if (!http)
+    return (-1);
+
+  if (!strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
+  {
+    DEBUG_puts("httpGetLength2: chunked request!");
+
+    http->data_encoding  = HTTP_ENCODE_CHUNKED;
+    http->data_remaining = 0;
+  }
+  else
+  {
+    http->data_encoding = HTTP_ENCODE_LENGTH;
+
+   /*
+    * The following is a hack for HTTP servers that don't send a
+    * content-length or transfer-encoding field...
+    *
+    * If there is no content-length then the connection must close
+    * after the transfer is complete...
+    */
+
+    if (http->fields[HTTP_FIELD_CONTENT_LENGTH][0] == '\0')
+      http->data_remaining = 2147483647;
+    else
+      http->data_remaining = strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
+                                     NULL, 10);
+
+    DEBUG_printf(("httpGetLength2: content_length=" CUPS_LLFMT "\n",
+                  CUPS_LLCAST http->data_remaining));
+  }
+
+  if (http->data_remaining <= INT_MAX)
+    http->_data_remaining = (int)http->data_remaining;
+  else
+    http->_data_remaining = INT_MAX;
+
+  return (http->data_remaining);
+}
+
+
+/*
+ * 'httpGetStatus()' - Get the status of the last HTTP request.
+ *
+ * @since CUPS 1.2@
+ */
+
+http_status_t				/* O - HTTP status */
+httpGetStatus(http_t *http)		/* I - HTTP connection */
+{
+  return (http ? http->status : HTTP_ERROR);
 }
 
 
@@ -477,7 +677,7 @@ httpGet(http_t     *http,		/* I - HTTP data */
  */
 
 char *					/* O - Value or NULL */
-httpGetSubField(http_t       *http,	/* I - HTTP data */
+httpGetSubField(http_t       *http,	/* I - HTTP connection */
                 http_field_t field,	/* I - Field index */
                 const char   *name,	/* I - Name of sub-field */
 		char         *value)	/* O - Value string */
@@ -493,7 +693,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP data */
  */
 
 char *					/* O - Value or NULL */
-httpGetSubField2(http_t       *http,	/* I - HTTP data */
+httpGetSubField2(http_t       *http,	/* I - HTTP connection */
                  http_field_t field,	/* I - Field index */
                  const char   *name,	/* I - Name of sub-field */
 		 char         *value,	/* O - Value string */
@@ -508,8 +708,7 @@ httpGetSubField2(http_t       *http,	/* I - HTTP data */
                 http, field, name, value, valuelen));
 
   if (!http || !name || !value || valuelen < 2 ||
-      field < HTTP_FIELD_ACCEPT_LANGUAGE ||
-      field > HTTP_FIELD_WWW_AUTHENTICATE)
+      field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
     return (NULL);
 
   end = value + valuelen - 1;
@@ -615,87 +814,13 @@ httpGetSubField2(http_t       *http,	/* I - HTTP data */
 
 
 /*
- * 'httpGetLength()' - Get the amount of data remaining from the
- *                     content-length or transfer-encoding fields.
- *
- * This function is deprecated and will not return lengths larger than
- * 2^31 - 1; use httpGetLength2() instead.
- *
- * @since CUPS 1.2@
- */
-
-int					/* O - Content length */
-httpGetLength(http_t *http)		/* I - HTTP data */
-{
- /*
-  * Get the read content length and return the 32-bit value.
-  */
-
-  httpGetLength2(http);
-
-  return (http->_data_remaining);
-}
-
-
-/*
- * 'httpGetLength2()' - Get the amount of data remaining from the
- *                      content-length or transfer-encoding fields.
- *
- * This function returns the complete content length, even for
- * content larger than 2^31 - 1.
- */
-
-off_t					/* O - Content length */
-httpGetLength2(http_t *http)		/* I - HTTP data */
-{
-  DEBUG_printf(("httpGetLength2(http=%p), state=%d\n", http, http->state));
-
-  if (!strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
-  {
-    DEBUG_puts("httpGetLength2: chunked request!");
-
-    http->data_encoding  = HTTP_ENCODE_CHUNKED;
-    http->data_remaining = 0;
-  }
-  else
-  {
-    http->data_encoding = HTTP_ENCODE_LENGTH;
-
-   /*
-    * The following is a hack for HTTP servers that don't send a
-    * content-length or transfer-encoding field...
-    *
-    * If there is no content-length then the connection must close
-    * after the transfer is complete...
-    */
-
-    if (http->fields[HTTP_FIELD_CONTENT_LENGTH][0] == '\0')
-      http->data_remaining = 2147483647;
-    else
-      http->data_remaining = strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
-                                     NULL, 10);
-
-    DEBUG_printf(("httpGetLength2: content_length=" CUPS_LLFMT "\n",
-                  CUPS_LLCAST http->data_remaining));
-  }
-
-  if (http->data_remaining <= INT_MAX)
-    http->_data_remaining = (int)http->data_remaining;
-  else
-    http->_data_remaining = INT_MAX;
-
-  return (http->data_remaining);
-}
-
-
-/*
  * 'httpGets()' - Get a line of text from a HTTP connection.
  */
 
 char *					/* O - Line or NULL */
 httpGets(char   *line,			/* I - Line to read into */
          int    length,			/* I - Max length of buffer */
-	 http_t *http)			/* I - HTTP data */
+	 http_t *http)			/* I - HTTP connection */
 {
   char	*lineptr,			/* Pointer into line */
 	*lineend,			/* End of line */
@@ -842,7 +967,7 @@ httpGets(char   *line,			/* I - Line to read into */
  */
 
 int					/* O - Status of call (0 = success) */
-httpHead(http_t     *http,		/* I - HTTP data */
+httpHead(http_t     *http,		/* I - HTTP connection */
          const char *uri)		/* I - URI for head */
 {
   return (http_send(http, HTTP_HEAD, uri));
@@ -923,7 +1048,7 @@ httpInitialize(void)
  */
 
 int					/* O - Status of call (0 = success) */
-httpOptions(http_t     *http,		/* I - HTTP data */
+httpOptions(http_t     *http,		/* I - HTTP connection */
             const char *uri)		/* I - URI for options */
 {
   return (http_send(http, HTTP_OPTIONS, uri));
@@ -935,7 +1060,7 @@ httpOptions(http_t     *http,		/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpPost(http_t     *http,		/* I - HTTP data */
+httpPost(http_t     *http,		/* I - HTTP connection */
          const char *uri)		/* I - URI for post */
 {
   return (http_send(http, HTTP_POST, uri));
@@ -944,10 +1069,12 @@ httpPost(http_t     *http,		/* I - HTTP data */
 
 /*
  * 'httpPrintf()' - Print a formatted string to a HTTP connection.
+ *
+ * @private@
  */
 
 int					/* O - Number of bytes written */
-httpPrintf(http_t     *http,		/* I - HTTP data */
+httpPrintf(http_t     *http,		/* I - HTTP connection */
            const char *format,		/* I - printf-style format string */
 	   ...)				/* I - Additional args as needed */
 {
@@ -981,7 +1108,7 @@ httpPrintf(http_t     *http,		/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpPut(http_t     *http,		/* I - HTTP data */
+httpPut(http_t     *http,		/* I - HTTP connection */
         const char *uri)		/* I - URI to put */
 {
   return (http_send(http, HTTP_PUT, uri));
@@ -998,7 +1125,7 @@ httpPut(http_t     *http,		/* I - HTTP data */
  */
 
 int					/* O - Number of bytes read */
-httpRead(http_t *http,			/* I - HTTP data */
+httpRead(http_t *http,			/* I - HTTP connection */
          char   *buffer,		/* I - Buffer for data */
 	 int    length)			/* I - Maximum number of bytes */
 {
@@ -1008,10 +1135,12 @@ httpRead(http_t *http,			/* I - HTTP data */
 
 /*
  * 'httpRead2()' - Read data from a HTTP connection.
+ *
+ * @since CUPS 1.2@
  */
 
 ssize_t					/* O - Number of bytes read */
-httpRead2(http_t *http,			/* I - HTTP data */
+httpRead2(http_t *http,			/* I - HTTP connection */
           char   *buffer,		/* I - Buffer for data */
 	  size_t length)		/* I - Maximum number of bytes */
 {
@@ -1287,11 +1416,11 @@ _httpReadCDSA(
 
 
 /*
- * 'httpReconnect()' - Reconnect to a HTTP server...
+ * 'httpReconnect()' - Reconnect to a HTTP server.
  */
 
 int					/* O - 0 on success, non-zero on failure */
-httpReconnect(http_t *http)		/* I - HTTP data */
+httpReconnect(http_t *http)		/* I - HTTP connection */
 {
   http_addrlist_t	*addr;		/* Connected address */
 
@@ -1399,7 +1528,7 @@ httpSetCookie(http_t     *http,		/* I - Connection */
  */
 
 void
-httpSetField(http_t       *http,	/* I - HTTP data */
+httpSetField(http_t       *http,	/* I - HTTP connection */
              http_field_t field,	/* I - Field index */
 	     const char   *value)	/* I - Value */
 {
@@ -1420,7 +1549,7 @@ httpSetField(http_t       *http,	/* I - HTTP data */
  */
 
 void
-httpSetLength(http_t *http,		/* I - HTTP data */
+httpSetLength(http_t *http,		/* I - HTTP connection */
               size_t length)		/* I - Length (0 for chunked) */
 {
   if (!http)
@@ -1445,7 +1574,7 @@ httpSetLength(http_t *http,		/* I - HTTP data */
  */
 
 int					/* O - Status of call (0 = success) */
-httpTrace(http_t     *http,		/* I - HTTP data */
+httpTrace(http_t     *http,		/* I - HTTP connection */
           const char *uri)		/* I - URI for trace */
 {
   return (http_send(http, HTTP_TRACE, uri));
@@ -1457,7 +1586,7 @@ httpTrace(http_t     *http,		/* I - HTTP data */
  */
 
 http_status_t				/* O - HTTP status */
-httpUpdate(http_t *http)		/* I - HTTP data */
+httpUpdate(http_t *http)		/* I - HTTP connection */
 {
   char		line[32768],		/* Line from connection... */
 		*value;			/* Pointer to value on line */
@@ -1636,7 +1765,7 @@ httpUpdate(http_t *http)		/* I - HTTP data */
  */
 
 int					/* O - 1 if data is available, 0 otherwise */
-httpWait(http_t *http,			/* I - HTTP data */
+httpWait(http_t *http,			/* I - HTTP connection */
          int    msec)			/* I - Milliseconds to wait */
 {
  /*
@@ -1667,7 +1796,7 @@ httpWait(http_t *http,			/* I - HTTP data */
  */
  
 int					/* O - Number of bytes written */
-httpWrite(http_t     *http,		/* I - HTTP data */
+httpWrite(http_t     *http,		/* I - HTTP connection */
           const char *buffer,		/* I - Buffer for data */
 	  int        length)		/* I - Number of bytes to write */
 {
@@ -1677,10 +1806,12 @@ httpWrite(http_t     *http,		/* I - HTTP data */
 
 /*
  * 'httpWrite2()' - Write data to a HTTP connection.
+ *
+ * @since CUPS 1.2@
  */
  
 ssize_t					/* O - Number of bytes written */
-httpWrite2(http_t     *http,		/* I - HTTP data */
+httpWrite2(http_t     *http,		/* I - HTTP connection */
            const char *buffer,		/* I - Buffer for data */
 	   size_t     length)		/* I - Number of bytes to write */
 {
@@ -1860,7 +1991,7 @@ http_field(const char *name)	/* I - String name */
  */
 
 static int				/* O - Bytes read */
-http_read_ssl(http_t *http,		/* I - HTTP data */
+http_read_ssl(http_t *http,		/* I - HTTP connection */
 	      char   *buf,		/* I - Buffer to store data */
 	      int    len)		/* I - Length of buffer */
 {
@@ -1907,7 +2038,7 @@ http_read_ssl(http_t *http,		/* I - HTTP data */
  */
 
 static int			/* O - 0 on success, non-zero on error */
-http_send(http_t       *http,	/* I - HTTP data */
+http_send(http_t       *http,	/* I - HTTP connection */
           http_state_t request,	/* I - Request code */
 	  const char   *uri)	/* I - URI */
 {
@@ -2036,7 +2167,7 @@ http_send(http_t       *http,	/* I - HTTP data */
  */
 
 static int				/* O - Status of connection */
-http_setup_ssl(http_t *http)		/* I - HTTP data */
+http_setup_ssl(http_t *http)		/* I - HTTP connection */
 {
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
@@ -2166,7 +2297,7 @@ http_setup_ssl(http_t *http)		/* I - HTTP data */
  */
 
 static void
-http_shutdown_ssl(http_t *http)	/* I - HTTP data */
+http_shutdown_ssl(http_t *http)	/* I - HTTP connection */
 {
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;	/* Context for encryption */
@@ -2211,7 +2342,7 @@ http_shutdown_ssl(http_t *http)	/* I - HTTP data */
  */
 
 static int			/* O - Status of connection */
-http_upgrade(http_t *http)	/* I - HTTP data */
+http_upgrade(http_t *http)	/* I - HTTP connection */
 {
   int		ret;		/* Return value */
   http_t	myhttp;		/* Local copy of HTTP data */
@@ -2302,7 +2433,7 @@ http_upgrade(http_t *http)	/* I - HTTP data */
  */
 
 static int				/* O - 1 if data is available, 0 otherwise */
-http_wait(http_t *http,			/* I - HTTP data */
+http_wait(http_t *http,			/* I - HTTP connection */
           int    msec)			/* I - Milliseconds to wait */
 {
 #ifndef WIN32
@@ -2404,7 +2535,7 @@ http_wait(http_t *http,			/* I - HTTP data */
  */
  
 static int				/* O - Number of bytes written */
-http_write(http_t     *http,		/* I - HTTP data */
+http_write(http_t     *http,		/* I - HTTP connection */
           const char *buffer,		/* I - Buffer for data */
 	  int        length)		/* I - Number of bytes to write */
 {
@@ -2492,7 +2623,7 @@ http_write(http_t     *http,		/* I - HTTP data */
  */
 
 static int				/* O - Number bytes written */
-http_write_chunk(http_t     *http,	/* I - HTTP data */
+http_write_chunk(http_t     *http,	/* I - HTTP connection */
                  const char *buffer,	/* I - Buffer to write */
 		 int        length)	/* I - Length of buffer */
 {
@@ -2535,7 +2666,7 @@ http_write_chunk(http_t     *http,	/* I - HTTP data */
  */
 
 static int				/* O - Bytes written */
-http_write_ssl(http_t     *http,	/* I - HTTP data */
+http_write_ssl(http_t     *http,	/* I - HTTP connection */
 	       const char *buf,		/* I - Buffer holding data */
 	       int        len)		/* I - Length of buffer */
 {

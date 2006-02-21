@@ -286,7 +286,7 @@ typedef enum http_version_e		/**** HTTP version numbers ****/
   HTTP_1_1 = 101			/* HTTP/1.1 */
 } http_version_t;
 
-typedef union http_addr_u		/**** Socket address union, which
+typedef union _http_addr_u		/**** Socket address union, which
 					 **** makes using IPv6 and other
 					 **** address types easier and
 					 **** more portable. @since CUPS 1.2@
@@ -313,7 +313,7 @@ typedef struct http_addrlist_s		/**** Socket address list, which is
   http_addr_t		addr;		/* Address */
 } http_addrlist_t;
 
-typedef struct http_s			/**** HTTP connection structure. ****/
+typedef struct _http_s			/**** HTTP connection structure. ****/
 {
   int			fd;		/* File descriptor for this socket */
   int			blocking;	/* To block or not to block */
@@ -365,23 +365,22 @@ typedef struct http_s			/**** HTTP connection structure. ****/
  * Prototypes...
  */
 
-#  define		httpBlocking(http,b)	(http)->blocking = (b)
+extern void		httpBlocking(http_t *http, int b);
 extern int		httpCheck(http_t *http);
-#  define		httpClearFields(http)	memset((http)->fields, 0, sizeof((http)->fields)),\
-						httpSetField((http), HTTP_FIELD_HOST, (http)->hostname)
+extern void		httpClearFields(http_t *http);
 extern void		httpClose(http_t *http);
 extern http_t		*httpConnect(const char *host, int port);
 extern http_t		*httpConnectEncrypt(const char *host, int port,
 			                    http_encryption_t encryption);
 extern int		httpDelete(http_t *http, const char *uri);
 extern int		httpEncryption(http_t *http, http_encryption_t e);
-#  define		httpError(http) ((http)->error)
+extern int		httpError(http_t *http);
 extern void		httpFlush(http_t *http);
 extern int		httpGet(http_t *http, const char *uri);
 extern char		*httpGets(char *line, int length, http_t *http);
 extern const char	*httpGetDateString(time_t t);
 extern time_t		httpGetDateTime(const char *s);
-#  define		httpGetField(http,field)	(http)->fields[field]
+extern const char	*httpGetField(http_t *http, http_field_t field);
 extern struct hostent	*httpGetHostByName(const char *name);
 extern char		*httpGetSubField(http_t *http, http_field_t field,
 			                 const char *name, char *value);
@@ -417,7 +416,7 @@ extern char		*httpMD5String(const unsigned char *, char [33]);
 
 /**** New in CUPS 1.1.19 ****/
 extern void		httpClearCookie(http_t *http);
-#define httpGetCookie(http) ((http)->cookie)
+extern const char	*httpGetCookie(http_t *http);
 extern void		httpSetCookie(http_t *http, const char *cookie);
 extern int		httpWait(http_t *http, int msec);
 
@@ -458,9 +457,12 @@ extern http_uri_status_t httpAssembleURIf(http_uri_coding_t encoding,
 					  const char *host, int port,
 					  const char *resourcef, ...);
 extern int		httpFlushWrite(http_t *http);
+extern int		httpGetBlocking(http_t *http);
 extern const char	*httpGetDateString2(time_t t, char *s, int slen);
+extern int		httpGetFd(http_t *http);
 extern const char	*httpGetHostname(char *s, int slen);
 extern off_t		httpGetLength2(http_t *http);
+extern http_status_t	httpGetStatus(http_t *http);
 extern char		*httpGetSubField2(http_t *http, http_field_t field,
 			                  const char *name, char *value,
 					  int valuelen);

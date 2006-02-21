@@ -147,6 +147,7 @@ extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsLangFlush(_cups_globals_t *cg);
 extern void		_cupsCharmapFlush(_cups_globals_t *cg);
 extern void		_cupsNormalizeMapsFlush(_cups_globals_t *cg);
+extern void		_cupsSetError(ipp_status_t status, const char *message);
 extern void		_cups_sp_flush(_cups_globals_t *cg);
 
 

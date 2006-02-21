@@ -103,6 +103,7 @@ enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
 };
 
 typedef const char *(*cups_password_cb_t)(const char *);
+					/**** Password callback ****/
 
 typedef struct cups_option_s		/**** Printer Options ****/
 {
@@ -122,16 +123,16 @@ typedef struct cups_dest_s		/**** Destination ****/
 typedef struct cups_job_s		/**** Job ****/
 {
   int		id;			/* The job ID */
-  char		*dest,			/* Printer or class name */
-		*title,			/* Title/job name */
-		*user,			/* User the submitted the job */
-		*format;		/* Document format */
+  char		*dest;			/* Printer or class name */
+  char		*title;			/* Title/job name */
+  char		*user;			/* User the submitted the job */
+  char		*format;		/* Document format */
   ipp_jstate_t	state;			/* Job state */
-  int		size,			/* Size in kilobytes */
-		priority;		/* Priority (1-100) */
-  time_t	completed_time,		/* Time the job was completed */
-		creation_time,		/* Time the job was created */
-		processing_time;	/* Time the job was processed */
+  int		size;			/* Size in kilobytes */
+  int		priority;		/* Priority (1-100) */
+  time_t	completed_time;		/* Time the job was completed */
+  time_t	creation_time;		/* Time the job was created */
+  time_t	processing_time;	/* Time the job was processed */
 } cups_job_t;
 
 
@@ -140,9 +141,11 @@ typedef struct cups_job_s		/**** Job ****/
  */
 
 extern int		cupsCancelJob(const char *printer, int job);
-#define			cupsDoRequest(http,request,resource) cupsDoFileRequest((http),(request),(resource),NULL)
 extern ipp_t		*cupsDoFileRequest(http_t *http, ipp_t *request,
-			                   const char *resource, const char *filename);
+			                   const char *resource,
+					   const char *filename);
+extern ipp_t		*cupsDoRequest(http_t *http, ipp_t *request,
+			               const char *resource);
 extern http_encryption_t cupsEncryption(void);
 extern void		cupsFreeJobs(int num_jobs, cups_job_t *jobs);
 extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED;
@@ -218,8 +221,9 @@ extern int		cupsSetDests2(http_t *http, int num_dests,
 			              cups_dest_t *dests);
 
 /**** New in CUPS 1.2 ****/
-extern int		cupsBackChannelRead(char *buffer, int bytes, double timeout);
-extern int		cupsBackChannelWrite(const char *buffer, int bytes,
+extern ssize_t		cupsBackChannelRead(char *buffer, size_t bytes,
+			                    double timeout);
+extern ssize_t		cupsBackChannelWrite(const char *buffer, size_t bytes,
 			                     double timeout);
 extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 					   cups_option_t *options,

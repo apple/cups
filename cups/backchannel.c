@@ -3,7 +3,7 @@
  *
  *   Backchannel functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -63,9 +63,9 @@ static void	cups_setup(fd_set *set, struct timeval *tval,
  * @since CUPS 1.2@
  */
 
-int					/* O - Bytes read or -1 on error */
+ssize_t					/* O - Bytes read or -1 on error */
 cupsBackChannelRead(char   *buffer,	/* I - Buffer to read */
-                    int    bytes,	/* I - Bytes to read */
+                    size_t bytes,	/* I - Bytes to read */
 		    double timeout)	/* I - Timeout in seconds */
 {
   fd_set	input;			/* Input set */
@@ -110,17 +110,17 @@ cupsBackChannelRead(char   *buffer,	/* I - Buffer to read */
  * @since CUPS 1.2@
  */
 
-int					/* O - Bytes written or -1 on error */
+ssize_t					/* O - Bytes written or -1 on error */
 cupsBackChannelWrite(
     const char *buffer,			/* I - Buffer to write */
-    int        bytes,			/* I - Bytes to write */
+    size_t     bytes,			/* I - Bytes to write */
     double     timeout)			/* I - Timeout in seconds */
 {
   fd_set	output;			/* Output set */
   struct timeval tval;			/* Timeout value */
   int		status;			/* Select status */
-  int		count,			/* Current bytes */
-		total;			/* Total bytes */
+  ssize_t	count;			/* Current bytes */
+  size_t	total;			/* Total bytes */
 
 
  /*
