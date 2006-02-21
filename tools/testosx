@@ -63,10 +63,6 @@ sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
 sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
 	-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
 	<packaging/cups-info.plist.in >packaging/cups-info.plist
-sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
-	<doc/index.html.in >doc/index.html
-sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
-	<templates/header.tmpl.in >templates/header.tmpl
 
 # Install CUPS into the Package directory...
 #make INSTALL=$topdir/install-sh BUILDROOT=$pkgdir/Package install
