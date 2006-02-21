@@ -127,7 +127,7 @@ typedef enum ppd_status_e		/**** Status Codes @since CUPS 1.1.19@ ****/
   PPD_BAD_CUSTOM_PARAM			/* Bad custom parameter */
 } ppd_status_t;
 
-typedef enum ppd_conform_e		/**** Conformance Levels ****/
+typedef enum ppd_conform_e		/**** Conformance Levels @since CUPS 1.1.19@ ****/
 {
   PPD_CONFORM_RELAXED,			/* Relax whitespace and control char */
   PPD_CONFORM_STRICT			/* Require strict conformance */

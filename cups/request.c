@@ -414,7 +414,7 @@ cupsDoRequest(http_t     *http,		/* I - HTTP connection to server */
  * '_cupsSetError()' - Set the last IPP status code and status-message.
  */
 
-static void
+void
 _cupsSetError(ipp_status_t status,	/* I - IPP status code */
                const char   *message)	/* I - status-message value */
 {
