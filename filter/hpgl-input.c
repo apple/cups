@@ -3,7 +3,7 @@
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -125,6 +125,9 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
 
         default : /* HP RTL/PCL control */
             while ((i = getc(fp)) != EOF && !isupper(i & 255));
+
+	    if (i == EOF)
+	      return (-1);
             break;
       }
   } while (ch < ' ');
@@ -133,7 +136,19 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
   name[1] = getc(fp);
   name[2] = '\0';
 
-  if (strcasecmp(name, "LB") == 0)
+  if (name[1] < ' ')
+  {
+   /*
+    * If we get here, then more than likely we are faced with a raw PCL
+    * file which we can't handle - abort!
+    */
+
+    fputs("ERROR: Invalid HP-GL/2 command seen, unable to print file!\n",
+          stderr);
+    return (-1);
+  }
+
+  if (!strcasecmp(name, "LB"))
   {
     bufptr = buf;
     while ((ch = getc(fp)) != StringTerminator)
@@ -145,7 +160,7 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
     p[num_params].value.string = strdup(buf);
     num_params ++;
   }
-  else if (strcasecmp(name, "SM") == 0)
+  else if (!strcasecmp(name, "SM"))
   {
     buf[0] = getc(fp);
     buf[1] = '\0';
@@ -153,7 +168,7 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
     p[num_params].value.string = strdup(buf);
     num_params ++;
   }
-  else if (strcasecmp(name, "DT") == 0)
+  else if (!strcasecmp(name, "DT"))
   {
     if ((buf[0] = getc(fp)) != ';')
     {
@@ -163,7 +178,7 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
       num_params ++;
     }
   }
-  else if (strcasecmp(name, "PE") == 0)
+  else if (!strcasecmp(name, "PE"))
   {
     bufptr = buf;
     while ((ch = getc(fp)) != ';')
