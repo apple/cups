@@ -1024,6 +1024,7 @@ httpSeparateURI(
 		    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		    "0123456789"
 	            "-._~"
+		    "%"
 		    "!$&'()*+,;=", *ptr))
 	{
 	  *host = '\0';
