@@ -30,7 +30,7 @@
 
 %{!?_with_dbus: %{!?_without_dbus: %define _with_dbus --with-dbus}}
 %{?_with_dbus: %define _dbus --enable-dbus}
-%{!?_with_dbus: %define _dbus --disble-dbus}
+%{!?_with_dbus: %define _dbus --disable-dbus}
 
 Summary: Common UNIX Printing System
 Name: cups
