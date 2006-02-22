@@ -64,6 +64,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   ipp_t		*response;		/* IPP response data */
   size_t	length;			/* Content-Length value */
   http_status_t	status;			/* Status of HTTP request */
+  ipp_state_t	state;			/* State of IPP processing */
   FILE		*file;			/* File to send */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
@@ -161,6 +162,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     httpSetLength(http, length);
     httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
     httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
+    httpSetExpect(http, HTTP_CONTINUE);
 
     DEBUG_printf(("cupsDoFileRequest: authstring=\"%s\"\n", http->authstring));
 
@@ -182,16 +184,34 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     }
 
    /*
-    * Send the IPP data and wait for the response...
+    * Wait up to 1 second for a 100-continue response...
     */
 
-    DEBUG_puts("cupsDoFileRequest: ipp write...");
+    if (httpWait(http, 1000))
+      status = httpUpdate(http);
+    else
+      status = HTTP_CONTINUE;
 
-    request->state = IPP_IDLE;
-    status         = HTTP_CONTINUE;
+    if (status == HTTP_CONTINUE)
+    {
+     /*
+      * Send the IPP data...
+      */
 
-    if (ippWrite(http, request) != IPP_ERROR)
-      if (filename != NULL)
+      DEBUG_puts("cupsDoFileRequest: ipp write...");
+
+      request->state = IPP_IDLE;
+
+      while ((state = ippWrite(http, request)) != IPP_DATA)
+        if (state == IPP_ERROR)
+	  break;
+	else if (httpCheck(http))
+	{
+	  if ((status = httpUpdate(http)) != HTTP_CONTINUE)
+	    break;
+        }
+
+      if (state == IPP_DATA && filename)
       {
         DEBUG_puts("cupsDoFileRequest: file write...");
 
@@ -213,6 +233,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
             break;
         }
       }
+    }
 
    /*
     * Get the server's return status...

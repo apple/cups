@@ -1,8 +1,10 @@
-CHANGES.txt - 02/17/2006
+CHANGES.txt - 02/22/2006
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- CUPS now implements the HTTP/1.1 Expect header (STR
+	  #1407)
 	- Options in PPD files are no longer automatically put in
 	  an "Extra" group; rather, all options that are not
 	  inside an Open/CloseGroup will be placed in the

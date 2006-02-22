@@ -295,6 +295,7 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
     httpClearFields(http);
     httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
     httpSetField(http, HTTP_FIELD_TRANSFER_ENCODING, "chunked");
+    httpSetExpect(http, HTTP_CONTINUE);
 
     if (httpPut(http, resource))
     {
@@ -311,21 +312,31 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
     }
 
    /*
-    * Copy the file...
+    * Wait up to 1 second for a 100-continue response...
     */
 
-    lseek(fd, 0, SEEK_SET);
+    if (httpWait(http, 1000))
+      status = httpUpdate(http);
+    else
+      status = HTTP_CONTINUE;
 
-    status = HTTP_CONTINUE;
+    if (status == HTTP_CONTINUE)
+    {
+     /*
+      * Copy the file...
+      */
 
-    while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
-      if (httpCheck(http))
-      {
-        if ((status = httpUpdate(http)) != HTTP_CONTINUE)
-          break;
-      }
-      else
-        httpWrite2(http, buffer, bytes);
+      lseek(fd, 0, SEEK_SET);
+
+      while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+	if (httpCheck(http))
+	{
+          if ((status = httpUpdate(http)) != HTTP_CONTINUE)
+            break;
+	}
+	else
+          httpWrite2(http, buffer, bytes);
+    }
 
     if (status == HTTP_CONTINUE)
     {

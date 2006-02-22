@@ -242,6 +242,8 @@ typedef enum http_status_e		/**** HTTP status codes ****/
   HTTP_REQUEST_TOO_LARGE,		/* Request entity too large */
   HTTP_URI_TOO_LONG,			/* URI too long */
   HTTP_UNSUPPORTED_MEDIATYPE,		/* The requested media type is unsupported */
+  HTTP_REQUESTED_RANGE,			/* The requested range is not satisfiable */
+  HTTP_EXPECTATION_FAILED,		/* The expectation given in an Expect header field was not met */
   HTTP_UPGRADE_REQUIRED = 426,		/* Upgrade to SSL/TLS required */
 
   HTTP_SERVER_ERROR = 500,		/* Internal server error */
@@ -473,6 +475,7 @@ extern http_uri_status_t httpSeparateURI(http_uri_coding_t decoding,
 			        	 char *username, int usernamelen,
 					 char *host, int hostlen, int *port,
 					 char *resource, int resourcelen);
+extern void		httpSetExpect(http_t *http, http_status_t expect);
 extern void		httpSetLength(http_t *http, size_t length);
 extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 			           size_t length);

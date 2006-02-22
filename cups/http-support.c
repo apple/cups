@@ -1158,6 +1158,9 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
         return ("Not Implemented");
     case HTTP_NOT_SUPPORTED :
         return ("Not Supported");
+    case HTTP_EXPECTATION_FAILED :
+        return ("Expectation Failed");
+
     default :
         return ("Unknown");
   }

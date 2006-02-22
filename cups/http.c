@@ -63,6 +63,7 @@
  *   _httpReadCDSA()      - Read function for CDSA decryption code.
  *   httpReconnect()      - Reconnect to a HTTP server...
  *   httpSetCookie()      - Set the cookie value(s)...
+ *   httpSetExpect()      - Set the Expect: header in a request.
  *   httpSetField()       - Set the value of an HTTP header.
  *   httpSetLength()      - Set the content-length and transfer-encoding.
  *   httpTrace()          - Send an TRACE request to the server.
@@ -222,6 +223,8 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
   {
     memset(http->fields, 0, sizeof(http->fields));
     httpSetField(http, HTTP_FIELD_HOST, http->hostname);
+
+    http->expect = (http_status_t)0;
   }
 }
 
@@ -1524,6 +1527,23 @@ httpSetCookie(http_t     *http,		/* I - Connection */
 
 
 /*
+ * 'httpSetExpect()' - Set the Expect: header in a request.
+ *
+ * Currently only HTTP_CONTINUE is supported for the "expect" argument.
+ *
+ * @since CUPS 1.2@
+ */
+
+void
+httpSetExpect(http_t        *http,	/* I - HTTP connection */
+              http_status_t expect)	/* I - HTTP status to expect (HTTP_CONTINUE) */
+{
+  if (http)
+    http->expect = expect;
+}
+
+
+/*
  * 'httpSetField()' - Set the value of an HTTP header.
  */
 
@@ -2143,6 +2163,14 @@ http_send(http_t       *http,	/* I - HTTP connection */
 
   if (http->cookie)
     if (httpPrintf(http, "Cookie: $Version=0; %s\r\n", http->cookie) < 1)
+    {
+      http->status = HTTP_ERROR;
+      return (-1);
+    }
+
+  if (http->expect == HTTP_CONTINUE &&
+      (http->state == HTTP_POST_RECV || http->state == HTTP_PUT_RECV))
+    if (httpPrintf(http, "Expect: 100-continue\r\n") < 1)
     {
       http->status = HTTP_ERROR;
       return (-1);

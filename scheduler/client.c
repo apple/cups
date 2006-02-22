@@ -1346,11 +1346,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 #endif /* HAVE_SSL */
       }
 
-      if (con->http.expect)
-      {
-        /**** TODO: send expected header ****/
-      }
-
       if (!cupsdSendHeader(con, HTTP_OK, NULL))
 	return (cupsdCloseClient(con));
 
@@ -1401,9 +1396,30 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	return (cupsdCloseClient(con));
       }
 
-      if (con->http.expect)
+      if (con->http.expect &&
+          (con->operation == HTTP_POST || con->operation == HTTP_PUT))
       {
-        /**** TODO: send expected header ****/
+        if (con->http.expect == HTTP_CONTINUE)
+	{
+	 /*
+	  * Send 100-continue header...
+	  */
+
+	  if (!cupsdSendHeader(con, HTTP_CONTINUE, NULL))
+	    return (cupsdCloseClient(con));
+	}
+	else
+	{
+	 /*
+	  * Send 417-expectation-failed header...
+	  */
+
+	  if (!cupsdSendHeader(con, HTTP_EXPECTATION_FAILED, NULL))
+	    return (cupsdCloseClient(con));
+
+	  httpPrintf(HTTP(con), "Content-Length: 0\r\n");
+	  httpPrintf(HTTP(con), "\r\n");
+	}
       }
 
       switch (con->http.state)
@@ -2382,6 +2398,15 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
                  con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
+
+  if (code == HTTP_CONTINUE)
+  {
+    if (httpPrintf(HTTP(con), "\r\n") < 0)
+      return (0);
+    else
+      return (1);
+  }
+
   if (httpPrintf(HTTP(con), "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
     return (0);
   if (ServerHeader)
