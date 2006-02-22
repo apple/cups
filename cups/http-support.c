@@ -1003,7 +1003,25 @@ httpSeparateURI(
     else
     {
      /*
-      * Grab hostname or IPv4 address...
+      * Validate the hostname or IPv4 address first...
+      */
+
+      for (ptr = (char *)uri; *ptr; ptr ++)
+        if (strchr(":?/", *ptr))
+	  break;
+        else if (!strchr("abcdefghijklmnopqrstuvwxyz"
+			 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+			 "0123456789"
+	        	 "-._~"
+			 "%"
+			 "!$&'()*+,;=", *ptr))
+	{
+	  *host = '\0';
+	  return (HTTP_URI_BAD_HOSTNAME);
+	}
+
+     /*
+      * Then copy the hostname or IPv4 address to the buffer...
       */
 
       uri = http_copy_decode(host, uri, hostlen, ":?/",
@@ -1014,22 +1032,6 @@ httpSeparateURI(
         *host = '\0';
         return (HTTP_URI_BAD_HOSTNAME);
       }
-
-     /*
-      * Validate value...
-      */
-
-      for (ptr = host; *ptr; ptr ++)
-        if (!strchr("abcdefghijklmnopqrstuvwxyz"
-		    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		    "0123456789"
-	            "-._~"
-		    "%"
-		    "!$&'()*+,;=", *ptr))
-	{
-	  *host = '\0';
-	  return (HTTP_URI_BAD_HOSTNAME);
-	}
     }
 
    /*
