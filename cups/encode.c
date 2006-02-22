@@ -59,14 +59,22 @@ typedef struct
 static const _ipp_option_t ipp_options[] =
 {
   { "blackplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "blackplot-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { "brightness",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "brightness-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "columns",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "columns-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "copies",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "copies-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "document-format",		IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
   { "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { "finishings-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "fitplot",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "fitplot-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { "gamma",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "gamma-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "hue",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "hue-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "job-k-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "job-page-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "job-priority",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
@@ -75,7 +83,9 @@ static const _ipp_option_t ipp_options[] =
   { "landscape",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { "media",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { "mirror",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "mirror-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { "natural-scaling",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "natural-scaling-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "notify-charset",		IPP_TAG_CHARSET,	IPP_TAG_SUBSCRIPTION },
   { "notify-events",		IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
   { "notify-lease-time",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
@@ -85,15 +95,25 @@ static const _ipp_option_t ipp_options[] =
   { "notify-time-interval",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
   { "notify-user-data",		IPP_TAG_STRING,		IPP_TAG_SUBSCRIPTION },
   { "number-up",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "number-up-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "orientation-requested",	IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { "orientation-requested-default", IPP_TAG_ENUM,	IPP_TAG_PRINTER },
   { "page-bottom",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "page-bottom-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "page-left",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "page-left-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "page-ranges",		IPP_TAG_RANGE,		IPP_TAG_JOB },
+  { "page-ranges-default",	IPP_TAG_RANGE,		IPP_TAG_PRINTER },
   { "page-right",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "page-right-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "page-top",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "page-top-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "penwidth",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "penwidth-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "ppi",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "ppi-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "prettyprint",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "prettyprint-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { "printer-is-accepting-jobs",IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { "printer-is-shared",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
@@ -106,12 +126,19 @@ static const _ipp_option_t ipp_options[] =
   { "printer-type",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "printer-uri",		IPP_TAG_URI,		IPP_TAG_OPERATION },
   { "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { "print-quality-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "queued-job-count",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "raw",			IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
+  { "resolution",		IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
+  { "resolution-default",	IPP_TAG_RESOLUTION,	IPP_TAG_PRINTER },
   { "saturation",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "saturation-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "scaling",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { "scaling-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "sides",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
-  { "wrap",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB }
+  { "sides-default",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
+  { "wrap",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { "wrap-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER }
 };
 
 
@@ -172,16 +199,17 @@ cupsEncodeOptions2(
 		*sep;			/* Option separator */
   ipp_attribute_t *attr;		/* IPP attribute */
   ipp_tag_t	value_tag;		/* IPP value tag */
+  cups_option_t	*option;		/* Current option */
 
 
-  DEBUG_printf(("cupsEncodeOptions2(ipp=%p, num_options=%d, options=%p, group_tag=%x)\n",
-                ipp, num_options, options, group_tag));
+  DEBUG_printf(("cupsEncodeOptions2(ipp=%p, num_options=%d, options=%p, "
+                "group_tag=%x)\n", ipp, num_options, options, group_tag));
 
  /*
   * Range check input...
   */
 
-  if (ipp == NULL || num_options < 1 || options == NULL)
+  if (!ipp || num_options < 1 || !options)
     return;
 
  /*
@@ -209,7 +237,7 @@ cupsEncodeOptions2(
   * Then loop through the options...
   */
 
-  for (i = 0; i < num_options; i ++)
+  for (i = num_options, option = options; i > 0; i --, option ++)
   {
     _ipp_option_t	key,		/* Search key */
 			*match;		/* Matching attribute */
@@ -219,16 +247,16 @@ cupsEncodeOptions2(
     * Skip document format options that are handled above...
     */
 
-    if (!strcasecmp(options[i].name, "raw") ||
-        !strcasecmp(options[i].name, "document-format") ||
-	!options[i].name[0])
+    if (!strcasecmp(option->name, "raw") ||
+        !strcasecmp(option->name, "document-format") ||
+	!option->name[0])
       continue;
 
    /*
     * Figure out the proper value and group tags for this option...
     */
 
-    key.name = options[i].name;
+    key.name = option->name;
     match    = (_ipp_option_t *)bsearch(&key, ipp_options,
                                         sizeof(ipp_options) /
 					    sizeof(ipp_options[0]),
@@ -244,19 +272,33 @@ cupsEncodeOptions2(
 
       value_tag = match->value_tag;
     }
-    else if (group_tag != IPP_TAG_JOB)
-      continue;
-    else if (!strcasecmp(options[i].value, "true") ||
-             !strcasecmp(options[i].value, "false"))
-      value_tag = IPP_TAG_BOOLEAN;
     else
-      value_tag = IPP_TAG_NAME;
+    {
+      int	namelen;		/* Length of name */
+
+
+      namelen = strlen(option->name);
+
+      if (namelen < 9 || strcmp(option->name + namelen - 8, "-default"))
+      {
+	if (group_tag != IPP_TAG_JOB)
+          continue;
+      }
+      else if (group_tag != IPP_TAG_PRINTER)
+        continue;
+
+      if (!strcasecmp(option->value, "true") ||
+          !strcasecmp(option->value, "false"))
+	value_tag = IPP_TAG_BOOLEAN;
+      else
+	value_tag = IPP_TAG_NAME;
+    }
 
    /*
     * Count the number of values...
     */
 
-    for (count = 1, sep = options[i].value; *sep; sep ++)
+    for (count = 1, sep = option->value; *sep; sep ++)
     {
       if (*sep == '\'')
       {
@@ -293,7 +335,7 @@ cupsEncodeOptions2(
     }
 
     DEBUG_printf(("cupsEncodeOptions2: option = \'%s\', count = %d\n",
-                  options[i].name, count));
+                  option->name, count));
 
    /*
     * Allocate memory for the attribute values...
@@ -320,7 +362,7 @@ cupsEncodeOptions2(
     * Copy the name over...
     */
 
-    if ((attr->name = strdup(options[i].name)) == NULL)
+    if ((attr->name = strdup(option->name)) == NULL)
     {
      /*
       * Ran out of memory!
@@ -336,7 +378,7 @@ cupsEncodeOptions2(
       * Make a copy of the value we can fiddle with...
       */
 
-      if ((copy = strdup(options[i].value)) == NULL)
+      if ((copy = strdup(option->value)) == NULL)
       {
        /*
 	* Ran out of memory!
@@ -354,7 +396,7 @@ cupsEncodeOptions2(
       * Since we have a single value, use the value directly...
       */
 
-      val  = options[i].value;
+      val  = option->value;
       copy = NULL;
     }
 
@@ -456,7 +498,7 @@ cupsEncodeOptions2(
 	    else
 	      attr->values[j].resolution.yres = attr->values[j].resolution.xres;
 
-	    if (strcasecmp(s, "dpc") == 0)
+	    if (!strcasecmp(s, "dpc"))
               attr->values[j].resolution.units = IPP_RES_PER_CM;
             else
               attr->values[j].resolution.units = IPP_RES_PER_INCH;

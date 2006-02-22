@@ -179,10 +179,10 @@ extern void		cupsEncodeOptions(ipp_t *ipp, int num_options,
 extern void		cupsFreeOptions(int num_options, cups_option_t *options);
 extern const char	*cupsGetOption(const char *name, int num_options,
 			               cups_option_t *options);
-extern int		cupsParseOptions(const char *arg, int num_options,
-			                 cups_option_t **options);
 extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
 			                cups_option_t *options);
+extern int		cupsParseOptions(const char *arg, int num_options,
+			                 cups_option_t **options);
 
 extern const char	*cupsGetPassword(const char *prompt);
 extern const char	*cupsServer(void);
@@ -231,6 +231,8 @@ extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 extern const char	*cupsLastErrorString(void);
 extern char		*cupsNotifySubject(cups_lang_t *lang, ipp_t *event);
 extern char		*cupsNotifyText(cups_lang_t *lang, ipp_t *event);
+extern int		cupsRemoveOption(const char *name, int num_options,
+			                 cups_option_t **options);
 extern cups_file_t	*cupsTempFile2(char *filename, int len);
 
 

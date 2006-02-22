@@ -308,6 +308,25 @@ cupsdLoadRemoteCache(void)
 	return;
       }
     }
+    else if (!strcasecmp(line, "Option") && value)
+    {
+     /*
+      * Option name value
+      */
+
+      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+
+      if (!*valueptr)
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of remote.cache.", linenum);
+      else
+      {
+        for (; *valueptr && isspace(*valueptr & 255); *valueptr++ = '\0');
+
+        p->num_options = cupsAddOption(value, valueptr, p->num_options,
+	                               &(p->options));
+      }
+    }
     else if (!strcasecmp(line, "State"))
     {
      /*
@@ -482,6 +501,7 @@ cupsdSaveRemoteCache(void)
   cupsd_printer_t	*printer;	/* Current printer class */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
+  cups_option_t		*option;	/* Current option */
 
 
  /*
@@ -581,6 +601,11 @@ cupsdSaveRemoteCache(void)
     for (i = 0; i < printer->num_users; i ++)
       cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
               printer->users[i]);
+
+    for (i = printer->num_options, option = printer->options;
+         i > 0;
+	 i --, option ++)
+      cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
 
     if (printer->type & CUPS_PRINTER_CLASS)
       cupsFilePuts(fp, "</Class>\n");

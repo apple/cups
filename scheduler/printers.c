@@ -44,6 +44,8 @@
  *   cupsdWritePrintcap()        - Write a pseudo-printcap file for older
  *                                 applications that need it...
  *   cupsdSanitizeURI()          - Sanitize a device URI...
+ *   add_printer_defaults()      - Add name-default attributes to the printer
+ *                                 attributes.
  *   add_printer_filter()        - Add a MIME filter for a printer.
  *   add_printer_formats()       - Add document-format-supported values for
  *                                 a printer.
@@ -67,6 +69,7 @@
  * Local functions...
  */
 
+static void	add_printer_defaults(cupsd_printer_t *p);
 static void	add_printer_filter(cupsd_printer_t *p, const char *filter);
 static void	add_printer_formats(cupsd_printer_t *p);
 static int	compare_printers(void *first, void *second, void *data);
@@ -401,15 +404,9 @@ cupsdCreateCommonData(void)
 		sizeof(compressions) / sizeof(compressions[0]),
 		NULL, compressions);
 
-  /* TODO: move to printer-specific section! */
-  /* copies-default */
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "copies-default", 1);
-
   /* copies-supported */
   ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
 
-  /* TODO: move to printer-specific section! */
   /* document-format-default */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
                "document-format-default", NULL, "application/octet-stream");
@@ -423,20 +420,10 @@ cupsdCreateCommonData(void)
                 "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]),
 		NULL, versions);
 
-  /* TODO: move to printer-specific section! */
-  /* job-hold-until-default */
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-               "job-hold-until-default", NULL, "no-hold");
-
   /* job-hold-until-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                 "job-hold-until-supported", sizeof(holds) / sizeof(holds[0]),
 		NULL, holds);
-
-  /* TODO: move to printer-specific section! */
-  /* job-priority-default */
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "job-priority-default", 50);
 
   /* job-priority-supported */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -503,7 +490,6 @@ cupsdCreateCommonData(void)
 		(int)(sizeof(notify_attrs) / sizeof(notify_attrs[0])),
 		NULL, notify_attrs);
 
-  /* TODO: move to printer-specific section! */
   /* notify-lease-duration-default */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                "notify-lease-duration-default", DefaultLeaseDuration);
@@ -536,11 +522,6 @@ cupsdCreateCommonData(void)
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "notify-schemes-supported", NULL, "mailto");
 
-  /* TODO: move to printer-specific section! */
-  /* number-up-default */
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "number-up-default", 1);
-
   /* number-up-supported */
   ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                  "number-up-supported", sizeof(nups) / sizeof(nups[0]), nups);
@@ -549,11 +530,6 @@ cupsdCreateCommonData(void)
   ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                  "operations-supported",
                  sizeof(ops) / sizeof(ops[0]) + JobFiles - 1, (int *)ops);
-
-  /* TODO: move to printer-specific section! */
-  /* orientation-requested-default */
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                "orientation-requested-default", IPP_PORTRAIT);
 
   /* orientation-requested-supported */
   ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
@@ -745,10 +721,13 @@ cupsdDeletePrinter(
   cupsdClearString(&p->port_monitor);
   cupsdClearString(&p->op_policy);
   cupsdClearString(&p->error_policy);
+  cupsdClearString(&p->browse_attrs);
 
 #ifdef __APPLE__
   cupsdClearString(&p->recoverable);
 #endif /* __APPLE__ */
+
+  cupsFreeOptions(p->num_options, p->options);
 
   free(p);
 
@@ -999,6 +978,25 @@ cupsdLoadAllPrinters(void)
 	return;
       }
     }
+    else if (!strcasecmp(line, "Option") && value)
+    {
+     /*
+      * Option name value
+      */
+
+      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+
+      if (!*valueptr)
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
+      else
+      {
+        for (; *valueptr && isspace(*valueptr & 255); *valueptr++ = '\0');
+
+        p->num_options = cupsAddOption(value, valueptr, p->num_options,
+	                               &(p->options));
+      }
+    }
     else if (!strcasecmp(line, "PortMonitor"))
     {
       if (value && strcmp(value, "none"))
@@ -1242,6 +1240,7 @@ cupsdSaveAllPrinters(void)
   cupsd_printer_t	*printer;	/* Current printer class */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
+  cups_option_t		*option;	/* Current option */
 
 
  /*
@@ -1363,6 +1362,11 @@ cupsdSaveAllPrinters(void)
     if (printer->error_policy)
       cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
 
+    for (i = printer->num_options, option = printer->options;
+         i > 0;
+	 i --, option ++)
+      cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+
     cupsFilePuts(fp, "</Printer>\n");
 
 #ifdef __sgi
@@ -1385,32 +1389,31 @@ cupsdSaveAllPrinters(void)
 void
 cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 {
-  char			uri[HTTP_MAX_URI];
-					/* URI for printer */
-  char			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			i;		/* Looping var */
-  char			filename[1024];	/* Name of PPD file */
-  int			num_media;	/* Number of media options */
-  cupsd_location_t	*auth;		/* Pointer to authentication element */
-  const char		*auth_supported;/* Authentication supported */
-  cups_ptype_t		printer_type;	/* Printer type data */
-  ppd_file_t		*ppd;		/* PPD file data */
-  ppd_option_t		*input_slot,	/* InputSlot options */
-			*media_type,	/* MediaType options */
-			*page_size,	/* PageSize options */
-			*output_bin,	/* OutputBin options */
-			*media_quality;	/* EFMediaQualityMode options */
-  ppd_attr_t		*ppdattr;	/* PPD attribute */
-  ipp_attribute_t	*attr;		/* Attribute data */
-  ipp_value_t		*val;		/* Attribute value */
-  int			num_finishings;	/* Number of finishings */
-  ipp_finish_t		finishings[5];	/* finishings-supported values */
+  char		uri[HTTP_MAX_URI];	/* URI for printer */
+  char		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		i;			/* Looping var */
+  char		filename[1024];		/* Name of PPD file */
+  int		num_media;		/* Number of media options */
+  cupsd_location_t *auth;		/* Pointer to authentication element */
+  const char	*auth_supported;	/* Authentication supported */
+  cups_ptype_t	printer_type;		/* Printer type data */
+  ppd_file_t	*ppd;			/* PPD file data */
+  ppd_option_t	*input_slot,		/* InputSlot options */
+		*media_type,		/* MediaType options */
+		*page_size,		/* PageSize options */
+		*output_bin,		/* OutputBin options */
+		*media_quality,		/* EFMediaQualityMode options */
+		*duplex;		/* Duplex options */
+  ppd_attr_t	*ppdattr;		/* PPD attribute */
+  ipp_attribute_t *attr;		/* Attribute data */
+  ipp_value_t	*val;			/* Attribute value */
+  int		num_finishings;		/* Number of finishings */
+  ipp_finish_t	finishings[5];		/* finishings-supported values */
   static const char * const sides[3] =	/* sides-supported values */
 		{
-		  "one",
-		  "two-long-edge",
-		  "two-short-edge"
+		  "one-sided",
+		  "two-sided-long-edge",
+		  "two-sided-short-edge"
 		};
 
 
@@ -1699,9 +1702,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
         if (num_media == 0)
 	{
 	  cupsdLogMessage(CUPSD_LOG_CRIT,
-	                  "The PPD file for printer %s "
-	                  "contains no media options and is therefore "
-			  "invalid!", p->name);
+	                  "The PPD file for printer %s contains no media "
+	                  "options and is therefore invalid!", p->name);
 	}
 	else
 	{
@@ -1728,21 +1730,21 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	      for (i = 0; i < page_size->num_choices; i ++, val ++)
 		val->string.text = _cups_sp_alloc(page_size->choices[i].choice);
 
-	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	   NULL, page_size->defchoice);
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	                   "media-default", NULL, page_size->defchoice);
             }
 	    else if (input_slot != NULL)
-	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	   NULL, input_slot->defchoice);
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	                   "media-default", NULL, input_slot->defchoice);
 	    else if (media_type != NULL)
-	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	   NULL, media_type->defchoice);
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	                   "media-default", NULL, media_type->defchoice);
 	    else if (media_quality != NULL)
-	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	   NULL, media_quality->defchoice);
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	                   "media-default", NULL, media_quality->defchoice);
 	    else
-	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-default",
-                	   NULL, "none");
+	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	                   "media-default", NULL, "none");
           }
         }
 
@@ -1769,14 +1771,28 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
         * Duplexing, etc...
 	*/
 
-	if (ppdFindOption(ppd, "Duplex") != NULL)
+	if ((duplex = ppdFindOption(ppd, "Duplex")) == NULL)
+	  if ((duplex = ppdFindOption(ppd, "EFDuplex")) == NULL)
+	    if ((duplex = ppdFindOption(ppd, "EFDuplexing")) == NULL)
+	      if ((duplex = ppdFindOption(ppd, "KD03Duplex")) == NULL)
+		duplex = ppdFindOption(ppd, "JCLDuplex");
+
+	if (duplex && duplex->num_choices > 1)
 	{
 	  p->type |= CUPS_PRINTER_DUPLEX;
 
-	  ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "sides-supported",
-                	3, NULL, sides);
-	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "sides-default",
-                       NULL, "one");
+	  ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	                "sides-supported", 3, NULL, sides);
+
+          if (!strcasecmp(duplex->defchoice, "DuplexTumble"))
+	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	        	 "sides-default", NULL, "two-sided-short-edge");
+          else if (!strcasecmp(duplex->defchoice, "DuplexNoTumble"))
+	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	        	 "sides-default", NULL, "two-sided-long-edge");
+	  else
+	    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	        	 "sides-default", NULL, "one-sided");
 	}
 
 	if (ppdFindOption(ppd, "Collate") != NULL)
@@ -1883,16 +1899,18 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
         pstatus = ppdLastError(&pline);
 
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PPD file for %s cannot be loaded!", p->name);
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PPD file for %s cannot be loaded!",
+	                p->name);
 
 	if (pstatus <= PPD_ALLOC_ERROR)
 	  cupsdLogMessage(CUPSD_LOG_ERROR, "%s", strerror(errno));
         else
-	  cupsdLogMessage(CUPSD_LOG_ERROR, "%s on line %d.", ppdErrorString(pstatus),
-	             pline);
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "%s on line %d.",
+	                  ppdErrorString(pstatus), pline);
 
-        cupsdLogMessage(CUPSD_LOG_INFO, "Hint: Run \"cupstestppd %s\" and fix any errors.",
-	           filename);
+        cupsdLogMessage(CUPSD_LOG_INFO,
+	                "Hint: Run \"cupstestppd %s\" and fix any errors.",
+	                filename);
 
        /*
 	* Add a filter from application/vnd.cups-raw to printer/name to
@@ -1915,7 +1933,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
 	snprintf(filename, sizeof(filename), "%s/interfaces/%s", ServerRoot,
 	         p->name);
-	if (access(filename, X_OK) == 0)
+	if (!access(filename, X_OK))
 	{
 	 /*
 	  * Yes, we have a System V style interface script; use it!
@@ -1989,6 +2007,12 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
   DEBUG_printf(("cupsdSetPrinterAttrs: leaving name = %s, type = %x\n", p->name,
                 p->type));
+
+ /*
+  * Add name-default attributes...
+  */
+
+  add_printer_defaults(p);
 
 #ifdef __sgi
  /*
@@ -2583,6 +2607,65 @@ cupsdSanitizeURI(const char *uri,	/* I - Original device URI */
   */
 
   return (buffer);
+}
+
+
+/*
+ * 'add_printer_defaults()' - Add name-default attributes to the printer attributes.
+ */
+
+static void
+add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
+{
+  int		i;			/* Looping var */
+  int		num_options;		/* Number of default options */
+  cups_option_t	*options,		/* Default options */
+		*option;		/* Current option */
+  char		name[256];		/* name-default */
+
+
+ /*
+  * Add all of the default options from the .conf files...
+  */
+
+  for (num_options = 0, i = p->num_options, option = p->options;
+       i > 0;
+       i --, option ++)
+  {
+    snprintf(name, sizeof(name), "%s-default", option->name);
+    num_options = cupsAddOption(name, option->value, num_options, &options);
+  }
+
+ /*
+  * Convert options to IPP attributes...
+  */
+
+  cupsEncodeOptions2(p->attrs, num_options, options, IPP_TAG_PRINTER);
+  cupsFreeOptions(num_options, options);
+
+ /*
+  * Add standard -default attributes as needed...
+  */
+
+  if (!cupsGetOption("copies", p->num_options, p->options))
+    ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "copies-default",
+                  1);
+
+  if (!cupsGetOption("job-hold-until", p->num_options, p->options))
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                 "job-hold-until-default", NULL, "no-hold");
+
+  if (!cupsGetOption("job-priority", p->num_options, p->options))
+    ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "job-priority-default", 50);
+
+  if (!cupsGetOption("number-up", p->num_options, p->options))
+    ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "number-up-default", 1);
+
+  if (!cupsGetOption("orientation-requested", p->num_options, p->options))
+    ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                  "orientation-requested-default", IPP_PORTRAIT);
 }
 
 

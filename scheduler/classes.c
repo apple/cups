@@ -410,6 +410,25 @@ cupsdLoadAllClasses(void)
       if (value)
         cupsdSetString(&p->location, value);
     }
+    else if (!strcasecmp(line, "Option") && value)
+    {
+     /*
+      * Option name value
+      */
+
+      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+
+      if (!*valueptr)
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of classes.conf.", linenum);
+      else
+      {
+        for (; *valueptr && isspace(*valueptr & 255); *valueptr++ = '\0');
+
+        p->num_options = cupsAddOption(value, valueptr, p->num_options,
+	                               &(p->options));
+      }
+    }
     else if (!strcasecmp(line, "Printer"))
     {
       if (!value)
@@ -683,6 +702,7 @@ cupsdSaveAllClasses(void)
   int			i;		/* Looping var */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
+  cups_option_t		*option;	/* Current option */
 
 
  /*
@@ -800,6 +820,11 @@ cupsdSaveAllClasses(void)
       cupsFilePrintf(fp, "OpPolicy %s\n", pclass->op_policy);
     if (pclass->error_policy)
       cupsFilePrintf(fp, "ErrorPolicy %s\n", pclass->error_policy);
+
+    for (i = pclass->num_options, option = pclass->options;
+         i > 0;
+	 i --, option ++)
+      cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
 
     cupsFilePuts(fp, "</Class>\n");
   }

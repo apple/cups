@@ -80,6 +80,9 @@ typedef struct cupsd_printer_s
   int		num_history;		/* Number of history collections */
   ipp_t		**history;		/* History data */
   int		sequence_number;	/* Increasing sequence number */
+  int		num_options;		/* Number of default options */
+  cups_option_t	*options;		/* Default options */
+  char		*browse_attrs;		/* Attributes sent with browse data */
 #ifdef __APPLE__
   char		*recoverable;		/* com.apple.print.recoverable-message */
 #endif /* __APPLE__ */
