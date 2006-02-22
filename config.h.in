@@ -1,9 +1,7 @@
 /*
- * "$Id: config.h.in 5082 2006-02-05 21:58:58Z mike $"
+ * "$Id: config.h.in 5144 2006-02-21 20:44:01Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
- *
- *   @configure_input@
  *
  *   Copyright 1997-2006 by Easy Software Products.
  *
@@ -419,5 +417,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 5082 2006-02-05 21:58:58Z mike $".
+ * End of "$Id: config.h.in 5144 2006-02-21 20:44:01Z mike $".
  */

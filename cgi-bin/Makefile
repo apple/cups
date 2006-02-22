@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5111 2006-02-16 02:08:09Z mike $"
+# "$Id: Makefile 5145 2006-02-22 00:25:14Z mike $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -125,27 +125,30 @@ printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 # testcgi
 #
 
-testcgi:	testcgi.o ../Makedefs libcgi.a
+testcgi:	testcgi.o ../Makedefs libcgi.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testcgi.o libcgi.a $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ testcgi.o libcgi.a ../cups/libcups.a \
+		$(COMMONLIBS) $(SSLLIBS) $(LIBZ)
 
 
 #
 # testhi
 #
 
-testhi:	testhi.o ../Makedefs libcgi.a
+testhi:	testhi.o ../Makedefs libcgi.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testhi.o libcgi.a $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ testhi.o libcgi.a ../cups/libcups.a \
+		$(COMMONLIBS) $(SSLLIBS) $(LIBZ)
 
 
 #
 # testtemplate
 #
 
-testtemplate:	testtemplate.o ../Makedefs libcgi.a
+testtemplate:	testtemplate.o ../Makedefs libcgi.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testtemplate.o libcgi.a $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ testtemplate.o libcgi.a ../cups/libcups.a \
+		$(COMMONLIBS) $(SSLLIBS) $(LIBZ)
 
 
 #
@@ -156,5 +159,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5111 2006-02-16 02:08:09Z mike $".
+# End of "$Id: Makefile 5145 2006-02-22 00:25:14Z mike $".
 #

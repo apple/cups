@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.h 5047 2006-02-02 05:14:15Z mike $"
+ * "$Id: globals.h 5138 2006-02-21 10:49:06Z mike $"
  *
  *   Global variable definitions for the Common UNIX Printing System (CUPS).
  *
@@ -147,6 +147,7 @@ extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsLangFlush(_cups_globals_t *cg);
 extern void		_cupsCharmapFlush(_cups_globals_t *cg);
 extern void		_cupsNormalizeMapsFlush(_cups_globals_t *cg);
+extern void		_cupsSetError(ipp_status_t status, const char *message);
 extern void		_cups_sp_flush(_cups_globals_t *cg);
 
 
@@ -160,5 +161,5 @@ extern void		_cups_sp_flush(_cups_globals_t *cg);
 #endif /* !_CUPS_GLOBALS_H_ */
 
 /*
- * End of "$Id: globals.h 5047 2006-02-02 05:14:15Z mike $".
+ * End of "$Id: globals.h 5138 2006-02-21 10:49:06Z mike $".
  */

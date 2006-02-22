@@ -19,6 +19,7 @@ if test $# = 0; then
 	svn up
 	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
 	version="1.2svn"
+	revision="-r$rev"
 	fileversion="1.2svn-r$rev"
 	fileurl="ftp://ftp.easysw.com/pub/cups/test/cups-$fileversion-source.tar.bz2"
 	url="."
@@ -26,6 +27,7 @@ else
 	echo Creating tag for release...
 	rev="1"
 	version=$1
+	revision=""
 	fileversion=$1
 	fileurl="ftp://ftp.easysw.com/pub/cups/$version/cups-$fileversion-source.tar.bz2"
 	url="https://svn.easysw.com/public/cups/tags/release-$version"
@@ -42,6 +44,7 @@ echo Updating version information...
 cd /tmp/cups-$version/config-scripts
 
 sed -e '1,$s/^CUPS_VERSION=.*/CUPS_VERSION='$fileversion'/' \
+	-e '1,$s/^CUPS_REVISION=.*/CUPS_REVISION='$revision'/' \
 	<cups-common.m4 >cups-common.m4.new
 mv cups-common.m4.new cups-common.m4
 cd ..

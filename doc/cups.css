@@ -15,15 +15,15 @@ KBD {
 }
 
 PRE {
-  color: #7f0000;
   font-family: monospace;
 }
 
 PRE.command {
+  color: #7f0000;
   margin-left: 36pt;
 }
 
-PRE EM {
+PRE.command EM {
   color: #3f0000;
 }
 

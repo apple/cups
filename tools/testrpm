@@ -9,10 +9,14 @@
 if test ! -f tools/testrpm; then
         echo "Run this script from the top-level CUPS source directory, e.g.:"
         echo ""
-        echo "    tools/testrpm"
+        echo "    tools/testrpm [rpmbuild options]"
         echo ""
         exit 1
 fi
+
+# Strip command-line arguments so we don't create a release tag...
+args="$*"
+shift $#
 
 # Get a snapshot of the current source...
 . tools/makesrcdist
@@ -21,7 +25,7 @@ fi
 echo Building rpm...
 rm -f /usr/src/redhat/RPMS/i386/cups*.rpm
 rm -f /usr/src/redhat/SRPMS/cups*.rpm
-rpmbuild -ta cups-$fileversion-source.tar.bz2
+rpmbuild -ta $args cups-$fileversion-source.tar.bz2
 
 #
 # End of "$Id$".

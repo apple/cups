@@ -1,9 +1,9 @@
 /*
- * "$Id: http-addr.c 4950 2006-01-19 16:07:57Z mike $"
+ * "$Id: http-addr.c 5138 2006-02-21 10:49:06Z mike $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -72,7 +72,7 @@ httpAddrAny(const http_addr_t *addr)	/* I - Address to check */
  * @since CUPS 1.2@
  */
 
-int						/* O - 1 if equal, 0 if != */
+int						/* O - 1 if equal, 0 if not */
 httpAddrEqual(const http_addr_t *addr1,		/* I - First address */
               const http_addr_t *addr2)		/* I - Second address */
 {
@@ -163,10 +163,11 @@ httpAddrLocalhost(
  * @since CUPS 1.2@
  */
 
-char *						/* O - Host name */
-httpAddrLookup(const http_addr_t *addr,		/* I - Address to lookup */
-               char              *name,		/* I - Host name buffer */
-	       int               namelen)	/* I - Size of name buffer */
+char *					/* O - Host name */
+httpAddrLookup(
+    const http_addr_t *addr,		/* I - Address to lookup */
+    char              *name,		/* I - Host name buffer */
+    int               namelen)		/* I - Size of name buffer */
 {
   DEBUG_printf(("httpAddrLookup(addr=%p, name=%p, namelen=%d)\n",
                 addr, name, namelen));
@@ -239,15 +240,15 @@ httpAddrLookup(const http_addr_t *addr,		/* I - Address to lookup */
 
 
 /*
- * 'httpAddrString()' - Convert an IP address to a dotted string.
+ * 'httpAddrString()' - Convert an address to a numeric string.
  *
  * @since CUPS 1.2@
  */
 
-char *						/* O - IP string */
-httpAddrString(const http_addr_t *addr,		/* I - Address to convert */
-               char              *s,		/* I - String buffer */
-	       int               slen)		/* I - Length of string */
+char *					/* O - Numeric address string */
+httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
+               char              *s,	/* I - String buffer */
+	       int               slen)	/* I - Length of string */
 {
   DEBUG_printf(("httpAddrString(addr=%p, s=%p, slen=%d)\n",
                 addr, s, slen));
@@ -540,5 +541,5 @@ httpGetHostname(char *s,		/* I - String buffer for name */
 
 
 /*
- * End of "$Id: http-addr.c 4950 2006-01-19 16:07:57Z mike $".
+ * End of "$Id: http-addr.c 5138 2006-02-21 10:49:06Z mike $".
  */

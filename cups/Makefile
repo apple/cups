@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $"
+# "$Id: Makefile 5138 2006-02-21 10:49:06Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -61,6 +61,7 @@ LIBOBJS	=	\
 		options.o \
 		page.o \
 		ppd.o \
+		request.o \
 		snprintf.o \
 		string.o \
 		tempfile.o \
@@ -328,7 +329,7 @@ apihelp:
 		array.h array.c >../doc/help/api-array.html
 	mxmldoc --section "Programming" --title "CUPS API" \
 		--intro api-cups.shtml \
-		cups.h auth.c dest.c encode.c getputfile.c language.c \
+		cups.h dest.c getputfile.c language.c \
 		options.c tempfile.c usersys.c \
 		util.c >../doc/help/api-cups.html
 	mxmldoc --section "Programming" --title "File and Directory APIs" \
@@ -340,10 +341,9 @@ apihelp:
 		ppd.c >../doc/help/api-ppd.html
 	mxmldoc --section "Programming" --title "HTTP and IPP APIs" \
 		--intro api-httpipp.shtml \
-		cups.h http.h ipp.h \
-		auth.c dest.c encode.c getputfile.c http.c http-addr.c \
-		http-support.c ipp.c ipp-support.c md5passwd.c options.c \
-		usersys.c util.c >../doc/help/api-httpipp.html
+		http.h ipp.h auth.c encode.c http.c http-addr.c \
+		http-support.c ipp.c ipp-support.c md5passwd.c \
+		request.c >../doc/help/api-httpipp.html
 	mxmldoc --section "Programming" --title "Filter and Backend APIs" \
 		--intro api-filter.shtml \
 		backchannel.c >../doc/help/api-filter.html
@@ -357,5 +357,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $".
+# End of "$Id: Makefile 5138 2006-02-21 10:49:06Z mike $".
 #

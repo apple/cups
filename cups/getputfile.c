@@ -1,5 +1,5 @@
 /*
- * "$Id: getputfile.c 5103 2006-02-14 19:27:42Z mike $"
+ * "$Id: getputfile.c 5138 2006-02-21 10:49:06Z mike $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
@@ -60,7 +60,7 @@
  * @since CUPS 1.1.20@
  */
 
-http_status_t				/* O - Status */
+http_status_t				/* O - HTTP status */
 cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
 	  const char *resource,		/* I - Resource name */
 	  int        fd)		/* I - File descriptor */
@@ -188,7 +188,7 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
  * @since CUPS 1.1.20@
  */
 
-http_status_t				/* O - Status */
+http_status_t				/* O - HTTP status */
 cupsGetFile(http_t     *http,		/* I - HTTP connection to server */
 	    const char *resource,	/* I - Resource name */
 	    const char *filename)	/* I - Filename */
@@ -255,7 +255,7 @@ cupsGetFile(http_t     *http,		/* I - HTTP connection to server */
  * @since CUPS 1.1.20@
  */
 
-http_status_t				/* O - Status */
+http_status_t				/* O - HTTP status */
 cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
           const char *resource,		/* I - Resource name */
 	  int        fd)		/* I - File descriptor */
@@ -422,7 +422,7 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
  * @since CUPS 1.1.20@
  */
 
-http_status_t				/* O - Status */
+http_status_t				/* O - HTTP status */
 cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
             const char *resource,	/* I - Resource name */
 	    const char *filename)	/* I - Filename */
@@ -471,5 +471,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: getputfile.c 5103 2006-02-14 19:27:42Z mike $".
+ * End of "$Id: getputfile.c 5138 2006-02-21 10:49:06Z mike $".
  */

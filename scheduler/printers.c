@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5132 2006-02-19 14:57:11Z mike $"
+ * "$Id: printers.c 5143 2006-02-21 19:13:01Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -2621,21 +2621,24 @@ add_printer_filter(
   * the error!
   */
 
-  if (program[0] == '/')
-    strlcpy(filename, program, sizeof(filename));
-  else
-    snprintf(filename, sizeof(filename), "%s/filter/%s", ServerBin, program);
-
-  if (access(filename, X_OK))
+  if (strcmp(program, "-"))
   {
-    snprintf(p->state_message, sizeof(p->state_message),
-             "Filter \"%s\" for printer \"%s\" not available: %s",
-	     program, p->name, strerror(errno));
-    cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 0);
-    cupsdSetPrinterReasons(p, "+cups-missing-filter-error");
-    cupsdAddPrinterHistory(p);
+    if (program[0] == '/')
+      strlcpy(filename, program, sizeof(filename));
+    else
+      snprintf(filename, sizeof(filename), "%s/filter/%s", ServerBin, program);
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
+    if (access(filename, X_OK))
+    {
+      snprintf(p->state_message, sizeof(p->state_message),
+               "Filter \"%s\" for printer \"%s\" not available: %s",
+	       program, p->name, strerror(errno));
+      cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 0);
+      cupsdSetPrinterReasons(p, "+cups-missing-filter-error");
+      cupsdAddPrinterHistory(p);
+
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
+    }
   }
 
  /*
@@ -3106,5 +3109,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 5132 2006-02-19 14:57:11Z mike $".
+ * End of "$Id: printers.c 5143 2006-02-21 19:13:01Z mike $".
  */

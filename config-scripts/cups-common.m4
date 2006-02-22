@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 5136 2006-02-19 18:46:46Z mike $"
+dnl "$Id: cups-common.m4 5144 2006-02-21 20:44:01Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -30,9 +30,15 @@ AC_CONFIG_HEADER(config.h)
 
 dnl Versio number information...
 CUPS_VERSION="1.2svn"
+CUPS_REVISION=""
+if test -z "$CUPS_REVISION" -a -d .svn; then
+	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
+fi
+
 AC_SUBST(CUPS_VERSION)
-AC_DEFINE_UNQUOTED(CUPS_SVERSION, "CUPS v$CUPS_VERSION")
-AC_DEFINE_UNQUOTED(CUPS_MINIMAL, "CUPS/$CUPS_VERSION")
+AC_SUBST(CUPS_REVISION)
+AC_DEFINE_UNQUOTED(CUPS_SVERSION, "CUPS v$CUPS_VERSION$CUPS_REVISION")
+AC_DEFINE_UNQUOTED(CUPS_MINIMAL, "CUPS/$CUPS_VERSION$CUPS_REVISION")
 
 dnl Default compiler flags...
 CFLAGS="${CFLAGS:=}"
@@ -184,6 +190,8 @@ BACKLIBS=""
 CUPSDLIBS=""
 DBUSDIR=""
 
+AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
+
 case $uname in
         Darwin*)
                 BACKLIBS="-framework IOKit"
@@ -215,19 +223,21 @@ case $uname in
 
 	Linux*)
 		dnl Check for DBUS support
-		AC_PATH_PROG(PKGCONFIG, pkg-config)
-		if test "x$PKGCONFIG" != x; then
-			AC_MSG_CHECKING(for DBUS)
-			if $PKGCONFIG --exists dbus-1; then
-				AC_MSG_RESULT(yes)
-				AC_CHECK_LIB(dbus-1,
-				    dbus_message_iter_init_append,
-				    AC_DEFINE(HAVE_DBUS)
-				    CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
-				    CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
-				    DBUSDIR="/etc/dbus-1/system.d")
-			else
-				AC_MSG_RESULT(no)
+		if test "x$enable_dbus" != xno; then
+			AC_PATH_PROG(PKGCONFIG, pkg-config)
+			if test "x$PKGCONFIG" != x; then
+				AC_MSG_CHECKING(for DBUS)
+				if $PKGCONFIG --exists dbus-1; then
+					AC_MSG_RESULT(yes)
+					AC_CHECK_LIB(dbus-1,
+					    dbus_message_iter_init_append,
+					    AC_DEFINE(HAVE_DBUS)
+					    CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
+					    CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
+					    DBUSDIR="/etc/dbus-1/system.d")
+				else
+					AC_MSG_RESULT(no)
+				fi
 			fi
 		fi
 		;;
@@ -253,5 +263,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 5136 2006-02-19 18:46:46Z mike $".
+dnl End of "$Id: cups-common.m4 5144 2006-02-21 20:44:01Z mike $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: mantohtml.c 5099 2006-02-13 02:46:10Z mike $"
+ * "$Id: mantohtml.c 5142 2006-02-21 14:52:34Z mike $"
  *
  *   Man page to HTML conversion program.
  *
@@ -34,6 +34,7 @@
 
 #include <cups/string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 
 /*
@@ -724,5 +725,5 @@ strmove(char       *d,			/* I - Destination */
 
 
 /*
- * End of "$Id: mantohtml.c 5099 2006-02-13 02:46:10Z mike $".
+ * End of "$Id: mantohtml.c 5142 2006-02-21 14:52:34Z mike $".
  */

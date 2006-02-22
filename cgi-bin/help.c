@@ -43,10 +43,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   help_index_t	*hi,			/* Help index */
 		*si;			/* Search index */
-  help_node_t	**n;			/* Current help node */
-  int		i, j;			/* Looping vars */
+  help_node_t	*n;			/* Current help node */
+  int		i;			/* Looping var */
   const char	*query;			/* Search query */
-  const char	*server_root;		/* CUPS_SERVERROOT environment variable */
+  const char	*cache_dir;		/* CUPS_CACHEDIR environment variable */
   const char	*docroot;		/* CUPS_DOCROOT environment variable */
   const char	*helpfile;		/* Current help file */
   const char	*topic;			/* Current topic */
@@ -74,10 +74,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Load the help index...
   */
 
-  if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
-    server_root = CUPS_SERVERROOT;
+  if ((cache_dir = getenv("CUPS_CACHEDIR")) == NULL)
+    cache_dir = CUPS_CACHEDIR;
 
-  snprintf(filename, sizeof(filename), "%s/help.index", server_root);
+  snprintf(filename, sizeof(filename), "%s/help.index", cache_dir);
 
   if ((docroot = getenv("CUPS_DOCROOT")) == NULL)
     docroot = CUPS_DOCROOT;
@@ -100,7 +100,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     return (1);
   }
 
-  fprintf(stderr, "hi->num_nodes=%d\n", hi->num_nodes);
+  fprintf(stderr, "DEBUG: %d nodes in help index...\n",
+          cupsArrayCount(hi->nodes));
 
  /*
   * See if we are viewing a file...
@@ -154,13 +155,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     cgiSetVariable("HELPFILE", helpfile);
-    cgiSetVariable("HELPTITLE", n[0]->text);
+    cgiSetVariable("HELPTITLE", n->text);
 
    /*
     * Send a standard page header...
     */
 
-    cgiStartHTML(n[0]->text);
+    cgiStartHTML(n->text);
   }
   else
   {
@@ -181,34 +182,37 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (si)
   {
-    help_node_t	**nn;			/* Parent node */
+    help_node_t	*nn;			/* Parent node */
 
 
-    fprintf(stderr, "si=%p, si->num_nodes=%d, si->sorted=%p\n", si,
-            si->num_nodes, si->sorted);
+    fprintf(stderr,
+            "DEBUG: si=%p, si->sorted=%p, cupsArrayCount(si->sorted)=%d\n", si,
+            si->sorted, cupsArrayCount(si->sorted));
 
-    for (i = 0, n = si->sorted; i < si->num_nodes; i ++, n ++)
+    for (n = (help_node_t *)cupsArrayFirst(si->sorted);
+         n;
+	 n = (help_node_t *)cupsArrayNext(si->sorted))
     {
-      if (helpfile && n[0]->anchor)
-        snprintf(line, sizeof(line), "#%s", n[0]->anchor);
-      else if (n[0]->anchor)
-        snprintf(line, sizeof(line), "/help/%s?QUERY=%s#%s", n[0]->filename,
-	         query ? query : "", n[0]->anchor);
+      if (helpfile && n->anchor)
+        snprintf(line, sizeof(line), "#%s", n->anchor);
+      else if (n->anchor)
+        snprintf(line, sizeof(line), "/help/%s?QUERY=%s#%s", n->filename,
+	         query ? query : "", n->anchor);
       else
-        snprintf(line, sizeof(line), "/help/%s?QUERY=%s", n[0]->filename,
+        snprintf(line, sizeof(line), "/help/%s?QUERY=%s", n->filename,
 	         query ? query : "");
 
-      cgiSetArray("QTEXT", i, n[0]->text);
+      cgiSetArray("QTEXT", i, n->text);
       cgiSetArray("QLINK", i, line);
 
-      if (!helpfile && n[0]->anchor)
+      if (!helpfile && n->anchor)
       {
-        nn = helpFindNode(hi, n[0]->filename, NULL);
+        nn = helpFindNode(hi, n->filename, NULL);
 
-        snprintf(line, sizeof(line), "/help/%s?QUERY=%s", nn[0]->filename,
+        snprintf(line, sizeof(line), "/help/%s?QUERY=%s", nn->filename,
 	         query ? query : "");
 
-        cgiSetArray("QPTEXT", i, nn[0]->text);
+        cgiSetArray("QPTEXT", i, nn->text);
 	cgiSetArray("QPLINK", i, line);
       }
       else
@@ -217,7 +221,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	cgiSetArray("QPLINK", i, "");
       }
 
-      fprintf(stderr, "DEBUG: [%d] = \"%s\" @ \"%s\"\n", i, n[0]->text, line);
+      fprintf(stderr, "DEBUG: [%d] = \"%s\" @ \"%s\"\n", i, n->text, line);
     }
 
     helpDeleteIndex(si);
@@ -227,71 +231,76 @@ main(int  argc,				/* I - Number of command-line arguments */
   * OK, now list the bookmarks within the index...
   */
 
-  for (i = hi->num_nodes, j = 0, n = hi->sorted, section = NULL;
-       i > 0;
-       i --, n ++)
+  for (i = 0, section = NULL, n = (help_node_t *)cupsArrayFirst(hi->sorted);
+       n;
+       n = (help_node_t *)cupsArrayNext(hi->sorted))
   {
-    if (n[0]->anchor)
+    if (n->anchor)
       continue;
 
    /*
     * Add a section link as needed...
     */
 
-    if (n[0]->section &&
-        (!section || strcmp(n[0]->section, section)))
+    if (n->section &&
+        (!section || strcmp(n->section, section)))
     {
      /*
       * Add a link for this node...
       */
 
       snprintf(line, sizeof(line), "/help/?TOPIC=%s&QUERY=%s",
-               cgiFormEncode(topic_data, n[0]->section, sizeof(topic_data)),
+               cgiFormEncode(topic_data, n->section, sizeof(topic_data)),
 	       query ? query : "");
-      cgiSetArray("BMLINK", j, line);
-      cgiSetArray("BMTEXT", j, n[0]->section);
-      cgiSetArray("BMINDENT", j, "0");
+      cgiSetArray("BMLINK", i, line);
+      cgiSetArray("BMTEXT", i, n->section);
+      cgiSetArray("BMINDENT", i, "0");
 
-      j ++;
-      section = n[0]->section;
+      i ++;
+      section = n->section;
     }
 
-    if (!topic || strcmp(n[0]->section, topic))
+    if (!topic || strcmp(n->section, topic))
       continue;
 
    /*
     * Add a link for this node...
     */
 
-    snprintf(line, sizeof(line), "/help/%s?TOPIC=%s&QUERY=%s", n[0]->filename,
-             cgiFormEncode(topic_data, n[0]->section, sizeof(topic_data)),
+    snprintf(line, sizeof(line), "/help/%s?TOPIC=%s&QUERY=%s", n->filename,
+             cgiFormEncode(topic_data, n->section, sizeof(topic_data)),
 	     query ? query : "");
-    cgiSetArray("BMLINK", j, line);
-    cgiSetArray("BMTEXT", j, n[0]->text);
-    cgiSetArray("BMINDENT", j, "1");
+    cgiSetArray("BMLINK", i, line);
+    cgiSetArray("BMTEXT", i, n->text);
+    cgiSetArray("BMINDENT", i, "1");
 
-    j ++;
+    i ++;
 
-    if (helpfile && !strcmp(helpfile, n[0]->filename))
+    if (helpfile && !strcmp(helpfile, n->filename))
     {
-      int		ii;		/* Looping var */
-      help_node_t	**nn;		/* Pointer to sub-node */
+      help_node_t	*nn;		/* Pointer to sub-node */
 
 
-      for (ii = hi->num_nodes, nn = hi->sorted; ii > 0; ii --, nn ++)
-        if (nn[0]->anchor && !strcmp(helpfile, nn[0]->filename))
+      cupsArraySave(hi->sorted);
+
+      for (nn = (help_node_t *)cupsArrayFirst(hi->sorted);
+           nn;
+	   nn = (help_node_t *)cupsArrayNext(hi->sorted))
+        if (nn->anchor && !strcmp(helpfile, nn->filename))
 	{
 	 /*
 	  * Add a link for this node...
 	  */
 
-	  snprintf(line, sizeof(line), "#%s", nn[0]->anchor);
-	  cgiSetArray("BMLINK", j, line);
-	  cgiSetArray("BMTEXT", j, nn[0]->text);
-	  cgiSetArray("BMINDENT", j, "2");
+	  snprintf(line, sizeof(line), "#%s", nn->anchor);
+	  cgiSetArray("BMLINK", i, line);
+	  cgiSetArray("BMTEXT", i, nn->text);
+	  cgiSetArray("BMINDENT", i, "2");
 
-	  j ++;
+	  i ++;
 	}
+
+      cupsArrayRestore(hi->sorted);
     }
   }
 

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 4966 2006-01-23 00:41:22Z mike $"
+# "$Id: Makefile 5143 2006-02-21 19:13:01Z mike $"
 #
 #   Standards makefile for the Common UNIX Printing System (CUPS).
 #
@@ -105,9 +105,10 @@ install:	all
 #
 
 rfctohtml:	rfctohtml.o ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a $(LIBZ)
+	$(CC) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a \
+		$(COMMONLIBS) $(LIBZ)
 
 
 #
-# End of "$Id: Makefile 4966 2006-01-23 00:41:22Z mike $".
+# End of "$Id: Makefile 5143 2006-02-21 19:13:01Z mike $".
 #

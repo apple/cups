@@ -20,7 +20,7 @@
 
   Filter and backend API introduction for the Common UNIX Printing System (CUPS).
 
-  Copyright 1997-2005 by Easy Software Products.
+  Copyright 1997-2006 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
   property of Easy Software Products and are protected by Federal
@@ -41,14 +41,16 @@
 
 <h2 class='title'>Introduction</h2>
 
-<p>The CUPS filter and backend APIs provide...</p>
+<p>The CUPS filter and backend APIs define standard exit codes
+and provide access to the backchannel data stream. They are only
+used when writing backends, filters, and port monitors.</p>
 
 <h2 class='title'>General Usage</h2>
 
 <p>The <var>&lt;cups/backend.h&gt;</var> and
 <var>&lt;cups/cups.h&gt;</var> header files must be included to
 use the <tt>CUPS_BACKEND_</tt> constants and
-<tt>cupsBackchannel</tt> functions, respectively.</p>
+<tt>cupsBackChannel</tt> functions, respectively.</p>
 
 <p>Programs using these functions must be linked to the CUPS
 library: <var>libcups.a</var>, <var>libcups.so.2</var>,
@@ -71,11 +73,11 @@ library:</p>
 <!-- NEW PAGE -->
 <h2 class='title'><a name='FUNCTIONS'>Functions</a></h2>
 <ul>
-	<li><a href='#cupsBackchannelRead'><tt>cupsBackchannelRead()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#cupsBackchannelWrite'><tt>cupsBackchannelWrite()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsBackChannelRead'><tt>cupsBackChannelRead()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsBackChannelWrite'><tt>cupsBackChannelWrite()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 </ul>
 <!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsBackchannelRead'>cupsBackchannelRead()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsBackChannelRead'>cupsBackChannelRead()</a></h3>
 <h4>Description</h4>
 <p>Read data from the backchannel.
 
@@ -87,10 +89,10 @@ for data indefinitely.
 </p>
 <h4>Syntax</h4>
 <pre>
-int
-cupsBackchannelRead(
+ssize_t
+cupsBackChannelRead(
     char * buffer,
-    int bytes,
+    size_t bytes,
     double timeout);
 </pre>
 <h4>Arguments</h4>
@@ -104,7 +106,7 @@ cupsBackchannelRead(
 <h4>Returns</h4>
 <p>Bytes read or -1 on error</p>
 <!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsBackchannelWrite'>cupsBackchannelWrite()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsBackChannelWrite'>cupsBackChannelWrite()</a></h3>
 <h4>Description</h4>
 <p>Write data to the backchannel.
 
@@ -116,10 +118,10 @@ indefinitely.
 </p>
 <h4>Syntax</h4>
 <pre>
-int
-cupsBackchannelWrite(
+ssize_t
+cupsBackChannelWrite(
     const char * buffer,
-    int bytes,
+    size_t bytes,
     double timeout);
 </pre>
 <h4>Arguments</h4>

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h 5119 2006-02-16 15:52:06Z mike $"
+ * "$Id: ppd.h 5139 2006-02-21 12:56:27Z mike $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -127,7 +127,7 @@ typedef enum ppd_status_e		/**** Status Codes @since CUPS 1.1.19@ ****/
   PPD_BAD_CUSTOM_PARAM			/* Bad custom parameter */
 } ppd_status_t;
 
-typedef enum ppd_conform_e		/**** Conformance Levels ****/
+typedef enum ppd_conform_e		/**** Conformance Levels @since CUPS 1.1.19@ ****/
 {
   PPD_CONFORM_RELAXED,			/* Relax whitespace and control char */
   PPD_CONFORM_STRICT			/* Require strict conformance */
@@ -391,5 +391,5 @@ extern ppd_file_t	*ppdOpen2(cups_file_t *fp);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h 5119 2006-02-16 15:52:06Z mike $".
+ * End of "$Id: ppd.h 5139 2006-02-21 12:56:27Z mike $".
  */

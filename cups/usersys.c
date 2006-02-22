@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c 5041 2006-02-01 16:54:50Z mike $"
+ * "$Id: usersys.c 5138 2006-02-21 10:49:06Z mike $"
  *
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
@@ -147,7 +147,8 @@ cupsEncryption(void)
 /*
  * 'cupsGetPassword()' - Get a password from the user.
  *
- * Returns NULL if the user does not provide a password.
+ * Uses the current password callback function. Returns NULL if the
+ * user does not provide a password.
  */
 
 const char *				/* O - Password */
@@ -469,5 +470,5 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
 
 
 /*
- * End of "$Id: usersys.c 5041 2006-02-01 16:54:50Z mike $".
+ * End of "$Id: usersys.c 5138 2006-02-21 10:49:06Z mike $".
  */
