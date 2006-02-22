@@ -128,7 +128,7 @@ printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcgi.a
 testcgi:	testcgi.o ../Makedefs libcgi.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testcgi.o libcgi.a ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(SSLLIBS) $(LIBZ)
 
 
 #
@@ -138,7 +138,7 @@ testcgi:	testcgi.o ../Makedefs libcgi.a ../cups/libcups.a
 testhi:	testhi.o ../Makedefs libcgi.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testhi.o libcgi.a ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(SSLLIBS) $(LIBZ)
 
 
 #
@@ -148,7 +148,7 @@ testhi:	testhi.o ../Makedefs libcgi.a ../cups/libcups.a
 testtemplate:	testtemplate.o ../Makedefs libcgi.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testtemplate.o libcgi.a ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(SSLLIBS) $(LIBZ)
 
 
 #
