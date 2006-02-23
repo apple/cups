@@ -31,6 +31,9 @@
 #  include <slp.h>
 #endif /* HAVE_LIBSLP */
 
+#ifdef HAVE_OPENLDAP
+#  include <ldap.h>
+#endif /* HAVE_OPENLDAP */
 
 /*
  * Browse protocols...
@@ -38,7 +41,7 @@
 
 #define BROWSE_CUPS	1		/* CUPS */
 #define	BROWSE_SLP	2		/* SLPv2 */
-#define BROWSE_LDAP	4		/* LDAP (not supported yet) */
+#define BROWSE_LDAP	4		/* LDAP */
 #define BROWSE_DNSSD	8		/* DNS Service Discovery aka Bonjour */
 #define BROWSE_ALL	15		/* All protocols */
 
@@ -135,6 +138,23 @@ VAR time_t		BrowseSLPRefresh VALUE(0);
 					/* Next SLP refresh time */
 #endif /* HAVE_LIBSLP */
 
+#ifdef HAVE_LDAP
+#  ifdef HAVE_OPENLDAP
+VAR LDAP		*BrowseLDAPHandle VALUE(NULL);
+					/* Handle to LDAP server */
+#  endif /* HAVE_OPENLDAP */
+VAR time_t		BrowseLDAPRefresh VALUE(0);
+					/* Next LDAP refresh time */
+VAR char		*BrowseLDAPBindDN VALUE(NULL),
+					/* LDAP login DN */
+			*BrowseLDAPDN	VALUE(NULL),
+					/* LDAP search DN */
+			*BrowseLDAPPassword VALUE(NULL),
+					/* LDAP login password */
+			*BrowseLDAPServer VALUE(NULL);
+					/* LDAP server to use */
+#endif /* HAVE_LDAP */
+
 
 /*
  * Prototypes...
@@ -145,12 +165,18 @@ extern void	cupsdSaveRemoteCache(void);
 extern void	cupsdSendBrowseDelete(cupsd_printer_t *p);
 extern void	cupsdSendBrowseList(void);
 extern void	cupsdSendCUPSBrowse(cupsd_printer_t *p);
+#ifdef HAVE_LDAP
+extern void	cupsdSendLDAPBrowse(cupsd_printer_t *p);
+#endif /* HAVE_LDAP */
 extern void	cupsdSendSLPBrowse(cupsd_printer_t *p);
 extern void	cupsdStartBrowsing(void);
 extern void	cupsdStartPolling(void);
 extern void	cupsdStopBrowsing(void);
 extern void	cupsdStopPolling(void);
 extern void	cupsdUpdateCUPSBrowse(void);
+#ifdef HAVE_LDAP
+extern void	cupsdUpdateLDAPBrowse(void);
+#endif /* HAVE_LDAP */
 extern void	cupsdUpdatePolling(void);
 extern void	cupsdUpdateSLPBrowse(void);
 

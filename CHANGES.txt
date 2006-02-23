@@ -1,8 +1,9 @@
-CHANGES.txt - 02/22/2006
+CHANGES.txt - 02/23/2006
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added LDAP printer browsing support (STR #338)
 	- Added official support for printer maintenance commands
 	  via the CUPS Command file format and hooks in the
 	  printer-type and web interfaces (STR #932)

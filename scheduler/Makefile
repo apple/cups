@@ -155,14 +155,15 @@ install:	all
 cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libmime.a \
-		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(PAMLIBS) \
+		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		$(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS) $(LIBS)
 
 cupsd-static:	$(CUPSDOBJS) libmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libmime.a \
-		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(PAMLIBS) ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS)
+		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
+		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
+		$(LIBMALLOC) $(CUPSDLIBS)
 
 
 #

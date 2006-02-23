@@ -254,10 +254,18 @@
 
 
 /*
- * Do we have the OpenSLP library?
+ * Do we have the SLP library?
  */
 
 #undef HAVE_LIBSLP
+
+
+/*
+ * Do we have an LDAP library?
+ */
+
+#undef HAVE_LDAP
+#undef HAVE_OPENLDAP
 
 
 /*

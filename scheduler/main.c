@@ -865,10 +865,16 @@ main(int  argc,				/* I - Number of command-line args */
         cupsdUpdatePolling();
 
 #ifdef HAVE_LIBSLP
-      if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_SLP) &&
+      if ((BrowseRemoteProtocols & BROWSE_SLP) &&
           BrowseSLPRefresh <= current_time)
         cupsdUpdateSLPBrowse();
 #endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_LDAP
+      if ((BrowseRemoteProtocols & BROWSE_LDAP) &&
+          BrowseLDAPRefresh <= current_time)
+        cupsdUpdateLDAPBrowse();
+#endif /* HAVE_LDAP */
     }
 
     if (Browsing && BrowseLocalProtocols && current_time > browse_time)
@@ -2208,6 +2214,14 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
       why     = "update SLP browsing";
     }
 #endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_LDAP
+    if ((BrowseLocalProtocols & BROWSE_LDAP) && (BrowseLDAPRefresh < timeout))
+    {
+      timeout = BrowseLDAPRefresh;
+      why     = "update LDAP browsing";
+    }
+#endif /* HAVE_LDAP */
 
     if (BrowseLocalProtocols & BROWSE_CUPS)
     {

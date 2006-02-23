@@ -89,6 +89,12 @@ static cupsd_var_t	variables[] =
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
   { "AutoPurgeJobs", 		&JobAutoPurge,		CUPSD_VARTYPE_BOOLEAN },
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
+#ifdef HAVE_LDAP
+  { "BrowseLDAPBindDN",		&BrowseLDAPBindDN,	CUPSD_VARTYPE_STRING },
+  { "BrowseLDAPDN",		&BrowseLDAPDN,		CUPSD_VARTYPE_STRING },
+  { "BrowseLDAPPassword",	&BrowseLDAPPassword,	CUPSD_VARTYPE_STRING },
+  { "BrowseLDAPServer",		&BrowseLDAPServer,	CUPSD_VARTYPE_STRING },
+#endif /* HAVE_LDAP */
   { "BrowseLocalOptions",	&BrowseLocalOptions,	CUPSD_VARTYPE_STRING },
   { "BrowsePort",		&BrowsePort,		CUPSD_VARTYPE_INTEGER },
   { "BrowseRemoteOptions",	&BrowseRemoteOptions,	CUPSD_VARTYPE_STRING },
@@ -394,6 +400,13 @@ cupsdReadConfiguration(void)
 
   cupsdClearString(&BrowseLocalOptions);
   cupsdClearString(&BrowseRemoteOptions);
+
+#ifdef HAVE_LDAP
+  cupsdClearString(&BrowseLDAPBindDN);
+  cupsdClearString(&BrowseLDAPDN);
+  cupsdClearString(&BrowseLDAPPassword);
+  cupsdClearString(&BrowseLDAPServer);
+#endif /* HAVE_LDAP */
 
   JobHistory          = DEFAULT_HISTORY;
   JobFiles            = DEFAULT_FILES;
