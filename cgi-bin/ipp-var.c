@@ -1151,7 +1151,10 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     if ((var = cgiGetVariable("ORDER")) != NULL)
       ascending = !strcasecmp(var, "asc");
     else
-      ascending = 1;
+    {
+      ascending = !which_jobs || !strcasecmp(which_jobs, "not-completed");
+      cgiSetVariable("ORDER", ascending ? "asc" : "dec");
+    }
 
     if (ascending)
     {
