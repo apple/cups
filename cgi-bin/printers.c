@@ -24,6 +24,7 @@
  * Contents:
  *
  *   main()              - Main entry for CGI.
+ *   print_command()     - Send a print command to the printer.
  *   show_all_printers() - Show all printers...
  *   show_printer()      - Show a single printer.
  */
@@ -33,12 +34,14 @@
  */
 
 #include "cgi-private.h"
+#include <errno.h>
 
 
 /*
  * Local functions...
  */
 
+void	print_command(http_t *http, const char *printer, const char *command);
 void	show_all_printers(http_t *http, const char *username);
 void	show_printer(http_t *http, const char *printer);
 
@@ -145,6 +148,10 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       show_printer(http, printer);
   }
+  else if (!strcasecmp(op, "print-self-test-page") && printer)
+    print_command(http, printer, "PrintSelfTestPage");
+  else if (!strcasecmp(op, "clean-print-heads") && printer)
+    print_command(http, printer, "Clean all");
   else if (!strcasecmp(op, "print-test-page") && printer)
     cgiPrintTestPage(http, printer);
   else if (!strcasecmp(op, "move-jobs") && printer)
@@ -179,6 +186,124 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
+ * 'print_command()' - Send a print command to the printer.
+ */
+
+void
+print_command(http_t     *http,		/* I - Connection to server */
+              const char *printer,	/* I - Printer */
+	      const char *command)	/* I - Command to send */
+{
+  cups_file_t	*fp;			/* File pointer */
+  char		filename[1024];		/* Temporary file */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  char		uri[HTTP_MAX_URI],	/* Printer URI */
+		resource[1024],		/* POST resource path */
+		refresh[1024];		/* Refresh URL */
+  const char	*user;			/* Username */
+
+
+ /*
+  * See who is logged in...
+  */
+
+  if ((user = getenv("REMOTE_USER")) == NULL)
+    user = "guest";
+
+ /*
+  * Create the CUPS command file to print...
+  */
+
+  if ((fp = cupsTempFile2(filename, sizeof(filename))) == NULL)
+  {
+    cgiStartHTML(cgiText(_("Printer Maintenance")));
+    cgiSetVariable("MESSAGE", _("Unable to create temporary file:"));
+    cgiSetVariable("ERROR", strerror(errno));
+    cgiCopyTemplateLang("error.tmpl");
+    cgiEndHTML();
+    return;
+  }
+
+  cupsFilePuts(fp, "#CUPS-COMMAND\n");
+  cupsFilePrintf(fp, "%s\n", command);
+  cupsFileClose(fp);
+
+ /*
+  * Point to the printer...
+  */
+
+  snprintf(resource, sizeof(resource), "/printers/%s", printer);
+
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", ippPort(), "/printers/%s", printer);
+
+ /*
+  * Build an IPP_PRINT_JOB request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  *    requesting-user-name
+  *    document-format
+  */
+
+  request = ippNewRequest(IPP_PRINT_JOB);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+               "requesting-user-name", NULL, user);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
+               NULL, "Printer Maintenance");
+
+  ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+               NULL, "application/postscript");
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  if ((response = cupsDoFileRequest(http, request, resource,
+                                    filename)) != NULL)
+  {
+    cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+
+    ippDelete(response);
+  }
+
+  unlink(filename);
+
+  if (cupsLastError() <= IPP_OK_CONFLICT)
+  {
+   /*
+    * Automatically reload the printer status page...
+    */
+
+    cgiFormEncode(uri, resource, sizeof(uri));
+    snprintf(refresh, sizeof(refresh), "2;%s", uri);
+    cgiSetVariable("refresh_page", refresh);
+  }
+
+  cgiStartHTML(cgiText(_("Printer Maintenance")));
+
+  if (cupsLastError() > IPP_OK_CONFLICT)
+    cgiShowIPPError(_("Unable to send maintenance job:"));
+  else
+  {
+    cgiSetVariable("PRINTER_NAME", printer);
+
+    cgiCopyTemplateLang("maintenance.tmpl");
+  }
+
+  cgiEndHTML();
+}
+
+
+/*
  * 'show_all_printers()' - Show all printers...
  */
 
@@ -190,7 +315,8 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
   ipp_t			*request,	/* IPP request */
 			*response;	/* IPP response */
   cups_array_t		*printers;	/* Array of printer objects */
-  ipp_attribute_t	*printer;	/* Printer object */
+  ipp_attribute_t	*printer,	/* Printer object */
+			*attr;		/* Current attribute */
   int			ascending,	/* Order of printers (0 = descending) */
 			first,		/* First printer to show */
 			count;		/* Number of printers */
@@ -284,14 +410,42 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
       for (i = 0, printer = (ipp_attribute_t *)cupsArrayIndex(printers, first);
 	   i < CUPS_PAGE_MAX && printer;
 	   i ++, printer = (ipp_attribute_t *)cupsArrayNext(printers))
+      {
         cgiSetIPPObjectVars(printer, NULL, i);
+
+        cgiSetArray("cupscommand", i, "0");
+
+	for (attr = printer; attr; attr = attr->next)
+	  if (attr->group_tag != IPP_TAG_PRINTER || !attr->name)
+	    break;
+	  else if (!strcmp(attr->name, "printer-type"))
+	  {
+            if (attr->values[0].integer & CUPS_PRINTER_COMMANDS)
+	      cgiSetArray("cupscommand", i, "1");
+	    break;
+	  }
+      }
     }
     else
     {
       for (i = 0, printer = (ipp_attribute_t *)cupsArrayIndex(printers, count - first - 1);
 	   i < CUPS_PAGE_MAX && printer;
 	   i ++, printer = (ipp_attribute_t *)cupsArrayPrev(printers))
+      {
         cgiSetIPPObjectVars(printer, NULL, i);
+
+        cgiSetArray("cupscommand", i, "0");
+
+	for (attr = printer; attr; attr = attr->next)
+	  if (attr->group_tag == IPP_TAG_ZERO || !attr->name)
+	    break;
+	  else if (!strcmp(attr->name, "printer-type"))
+	  {
+            if (attr->values[0].integer & CUPS_PRINTER_COMMANDS)
+	      cgiSetArray("cupscommand", i, "1");
+	    break;
+	  }
+      }
     }
 
    /*
@@ -418,6 +572,14 @@ show_printer(http_t     *http,		/* I - Connection to server */
     */
 
     cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+
+    if ((attr = ippFindAttribute(response, "printer-type",
+                                 IPP_TAG_ENUM)) != NULL)
+    {
+      cgiSetVariable("cupscommand",
+                     (attr->values[0].integer & CUPS_PRINTER_COMMANDS) ?
+		         "1" : "0");
+    }
 
     if (printer && (attr = ippFindAttribute(response, "printer-state",
                                             IPP_TAG_ENUM)) != NULL &&

@@ -2725,6 +2725,15 @@ add_printer_filter(
   }
 
  /*
+  * Mark the CUPS_PRINTER_COMMANDS bit if we have a filter for
+  * application/vnd.cups-command...
+  */
+
+  if (!strcasecmp(super, "application") &&
+      !strcasecmp(type, "vnd.cups-command"))
+    p->type |= CUPS_PRINTER_COMMANDS;
+
+ /*
   * Add the filter to the MIME database, supporting wildcards as needed...
   */
 

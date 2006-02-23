@@ -1,4 +1,4 @@
-{#printer_name=0?:
+{printer_type?:}{#printer_name=0?:
 {[printer_name]
 <H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}
 {?printer_state_message=?:<SPAN CLASS="message">"{printer_state_message}"</SPAN>}</H2>
@@ -18,6 +18,10 @@
 <P>
 <A HREF="{printer_uri_supported}?op=print-test-page">
 <IMG SRC="/images/print-test-page.gif" ALT="Print Test Page" CLASS="button"></A>
+{?cupscommand=1?<A HREF="{printer_uri_supported}?op=clean-print-heads">
+<IMG SRC="/images/clean-print-heads.gif" ALT="Clean Print Heads" CLASS="button"></A>
+<A HREF="{printer_uri_supported}?op=print-self-test-page">
+<IMG SRC="/images/print-self-test-page.gif" ALT="Print Self Test Page" CLASS="button"></A>:}
 {printer_state=5?
 <A HREF="{admin_uri}?op=start-printer&amp;printer_name={printer_name}">
 <IMG SRC="/images/start-printer.gif" ALT="Start Printer" CLASS="button"></A>

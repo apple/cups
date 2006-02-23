@@ -58,6 +58,7 @@ FILES	=	\
 		job-restart.tmpl \
 		jobs.tmpl \
 		jobs-header.tmpl \
+		maintenance.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
 		option-boolean.tmpl \

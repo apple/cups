@@ -39,6 +39,7 @@ WEBBUTTONS	=	\
 			images/cancel-all-jobs.gif \
 			images/cancel-job.gif \
 			images/change-settings.gif \
+			images/clean-print-heads.gif \
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \
@@ -54,6 +55,7 @@ WEBBUTTONS	=	\
 			images/modify-printer.gif \
 			images/move-job.gif \
 			images/move-jobs.gif \
+			images/print-self-test-page.gif \
 			images/print-test-page.gif \
 			images/publish-printer.gif \
 			images/reject-jobs.gif \
@@ -140,6 +142,7 @@ HELPFILES	=	\
 			help/man-printers.conf.html \
 			help/network.html \
 			help/overview.html \
+			help/spec-command.html \
 			help/spec-ipp.html \
 			help/spec-ppd.html \
 			help/standard.html \

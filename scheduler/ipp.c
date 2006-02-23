@@ -8673,7 +8673,7 @@ set_printer_defaults(
 					       printer->num_options,
 					       &(printer->options));
           cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "Setting %s to %d...", attr->name, value);
+	                  "Setting %s to %s...", attr->name, value);
           break;
 
       case IPP_TAG_RANGE :
@@ -8683,7 +8683,7 @@ set_printer_defaults(
 					       printer->num_options,
 					       &(printer->options));
           cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "Setting %s to %d...", attr->name, value);
+	                  "Setting %s to %s...", attr->name, value);
           break;
 
       case IPP_TAG_RESOLUTION :
@@ -8695,7 +8695,7 @@ set_printer_defaults(
 					       printer->num_options,
 					       &(printer->options));
           cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "Setting %s to %d...", attr->name, value);
+	                  "Setting %s to %s...", attr->name, value);
           break;
 
       default :

@@ -3,6 +3,9 @@ CHANGES.txt - 02/22/2006
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Added official support for printer maintenance commands
+	  via the CUPS Command file format and hooks in the
+	  printer-type and web interfaces (STR #932)
 	- The HP-GL/2 filter could get in an infinite loop trying
 	  to convert HP-PCL files (STR #1415)
 	- CUPS now implements the HTTP/1.1 Expect header (STR
