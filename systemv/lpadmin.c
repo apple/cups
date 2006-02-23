@@ -1870,8 +1870,14 @@ set_printer_options(
         while (isspace(*keyptr & 255))
 	  keyptr ++;
 
-        if (!strcmp(keyword, "PageRegion"))
-	  choice = ppdFindMarkedChoice(ppd, "PageSize");
+        if (!strcmp(keyword, "PageRegion") ||
+	    !strcmp(keyword, "PageSize") ||
+	    !strcmp(keyword, "PaperDimension") ||
+	    !strcmp(keyword, "ImageableArea"))
+	{
+	  if ((choice = ppdFindMarkedChoice(ppd, "PageSize")) == NULL)
+	    choice = ppdFindMarkedChoice(ppd, "PageRegion");
+        }
 	else
 	  choice = ppdFindMarkedChoice(ppd, keyword);
 
