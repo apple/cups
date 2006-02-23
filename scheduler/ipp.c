@@ -1472,12 +1472,15 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     cupsdSetJobHoldUntil(job, attr->values[0].string.text);
   }
   else if (job->attrs->request.op.operation_id == IPP_CREATE_JOB)
-    job->hold_until = time(NULL) + 60;
-
-  if (job->attrs->request.op.operation_id == IPP_CREATE_JOB)
   {
+    job->hold_until = time(NULL) + 60;
     job->state->values[0].integer = IPP_JOB_HELD;
     job->state_value              = IPP_JOB_HELD;
+  }
+  else
+  {
+    job->state->values[0].integer = IPP_JOB_PENDING;
+    job->state_value              = IPP_JOB_PENDING;
   }
 
   if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
