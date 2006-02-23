@@ -8481,6 +8481,7 @@ set_printer_defaults(
     if (attr->group_tag != IPP_TAG_PRINTER || !attr->name)
       continue;
 
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_printer_defaults: %s", attr->name);
 
     if (!strcmp(attr->name, "job-sheets-default"))
     {
@@ -8638,6 +8639,8 @@ set_printer_defaults(
           printer->num_options = cupsRemoveOption(name,
 						  printer->num_options,
 						  &(printer->options));
+          cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "Deleting %s", attr->name);
           break;
 
       case IPP_TAG_NAME :
@@ -8647,6 +8650,9 @@ set_printer_defaults(
 	                                       attr->values[0].string.text,
 					       printer->num_options,
 					       &(printer->options));
+          cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "Setting %s to \"%s\"...", attr->name,
+			  attr->values[0].string.text);
           break;
 
       case IPP_TAG_BOOLEAN :
@@ -8655,6 +8661,9 @@ set_printer_defaults(
 					           "true" : "false",
 					       printer->num_options,
 					       &(printer->options));
+          cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "Setting %s to %s...", attr->name,
+			  attr->values[0].boolean ? "true" : "false");
           break;
 
       case IPP_TAG_INTEGER :
@@ -8663,6 +8672,8 @@ set_printer_defaults(
           printer->num_options = cupsAddOption(name, value,
 					       printer->num_options,
 					       &(printer->options));
+          cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "Setting %s to %d...", attr->name, value);
           break;
 
       case IPP_TAG_RANGE :
@@ -8671,6 +8682,8 @@ set_printer_defaults(
           printer->num_options = cupsAddOption(name, value,
 					       printer->num_options,
 					       &(printer->options));
+          cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "Setting %s to %d...", attr->name, value);
           break;
 
       case IPP_TAG_RESOLUTION :
@@ -8681,6 +8694,8 @@ set_printer_defaults(
           printer->num_options = cupsAddOption(name, value,
 					       printer->num_options,
 					       &(printer->options));
+          cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "Setting %s to %d...", attr->name, value);
           break;
 
       default :

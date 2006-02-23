@@ -1714,8 +1714,10 @@ set_printer_options(
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* IPP attribute */
   ipp_op_t	op;			/* Operation to perform */
-  const char	*val,			/* Option value */
-		*ppdfile;		/* PPD filename */
+  const char	*ppdfile;		/* PPD filename */
+  int		ppdchanged;		/* PPD changed? */
+  ppd_file_t	*ppd;			/* PPD file */
+  ppd_choice_t	*choice;		/* Marked choice */
   char		uri[HTTP_MAX_URI],	/* URI for printer/class */
 		line[1024],		/* Line from PPD file */
 		keyword[1024],		/* Keyword from Default line */
@@ -1724,7 +1726,7 @@ set_printer_options(
   FILE		*in,			/* PPD file */
 		*out;			/* Temporary file */
   int		outfd;			/* Temporary file descriptor */
-  const char	*protocol;		/* Protocol */
+  const char	*protocol;		/* Old protocol option */
 
 
   DEBUG_printf(("set_printer_options(%p, \"%s\", %d, %p)\n", http, printer,
@@ -1763,7 +1765,8 @@ set_printer_options(
     * See what kind of printer or class it is...
     */
 
-    if ((attr = ippFindAttribute(response, "printer-type", IPP_TAG_ENUM)) != NULL)
+    if ((attr = ippFindAttribute(response, "printer-type",
+                                 IPP_TAG_ENUM)) != NULL)
     {
       if (attr->values[0].integer & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
       {
@@ -1795,7 +1798,17 @@ set_printer_options(
   * Add the options...
   */
 
-  cupsEncodeOptions(request, num_options, options);
+  cupsEncodeOptions2(request, num_options, options, IPP_TAG_PRINTER);
+
+  if ((protocol = cupsGetOption("protocol", num_options, options)) != NULL)
+  {
+    if (!strcasecmp(protocol, "bcp"))
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "port-monitor",
+                   NULL, "bcp");
+    else if (!strcasecmp(protocol, "tbcp"))
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "port-monitor",
+                   NULL, "tbcp");
+  }
 
   if (op == CUPS_ADD_PRINTER)
     ppdfile = cupsGetPPD(printer);
@@ -1807,6 +1820,10 @@ set_printer_options(
    /*
     * Set default options in the PPD file...
     */
+
+    ppd = ppdOpenFile(ppdfile);
+    ppdMarkDefaults(ppd);
+    cupsMarkOptions(ppd, num_options, options);
 
     if ((outfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
@@ -1830,20 +1847,12 @@ set_printer_options(
       return (1);
     }
 
-    out      = fdopen(outfd, "wb");
-    protocol = cupsGetOption("protocol", num_options, options);    
+    out        = fdopen(outfd, "wb");
+    ppdchanged = 0;
 
     while (get_line(line, sizeof(line), in) != NULL)
     {
-      if (!strncmp(line, "*cupsProtocol:", 14) && protocol)
-      {
-       /*
-        * Set a new output protocol (BCP or TBCP) below...
-	*/
-
-        continue;
-      }
-      else if (strncmp(line, "*Default", 8))
+      if (strncmp(line, "*Default", 8))
         fprintf(out, "%s\n", line);
       else
       {
@@ -1857,32 +1866,36 @@ set_printer_options(
 	  if (*keyptr == ':' || isspace(*keyptr & 255))
 	    break;
 
-        *keyptr = '\0';
+        *keyptr++ = '\0';
+        while (isspace(*keyptr & 255))
+	  keyptr ++;
 
         if (!strcmp(keyword, "PageRegion"))
-	  val = cupsGetOption("PageSize", num_options, options);
+	  choice = ppdFindMarkedChoice(ppd, "PageSize");
 	else
-	  val = cupsGetOption(keyword, num_options, options);
+	  choice = ppdFindMarkedChoice(ppd, keyword);
 
-        if (val != NULL)
-	  fprintf(out, "*Default%s: %s\n", keyword, val);
+        if (choice && strcmp(choice->choice, keyptr))
+	{
+	  fprintf(out, "*Default%s: %s\n", keyword, choice->choice);
+	  ppdchanged = 1;
+	}
 	else
 	  fprintf(out, "%s\n", line);
       }
     }
 
-    if (protocol)
-      fprintf(out, "*cupsProtocol: \"%s\"\n", protocol);
-
     fclose(in);
     fclose(out);
     close(outfd);
+    ppdClose(ppd);
 
    /*
     * Do the request...
     */
 
-    response = cupsDoFileRequest(http, request, "/admin/", tempfile);
+    ippDelete(cupsDoFileRequest(http, request, "/admin/",
+                                ppdchanged ? tempfile : NULL));
 
    /*
     * Clean up temp files... (TODO: catch signals in case we CTRL-C during
@@ -1898,14 +1911,13 @@ set_printer_options(
     * No PPD file - just set the options...
     */
 
-    response = cupsDoRequest(http, request, "/admin/");
+    ippDelete(cupsDoRequest(http, request, "/admin/"));
   }
 
  /*
   * Check the response...
   */
 
-  ippDelete(response);
   if (cupsLastError() > IPP_OK_CONFLICT)
   {
     _cupsLangPrintf(stderr, "lpadmin: %s\n", cupsLastErrorString());
