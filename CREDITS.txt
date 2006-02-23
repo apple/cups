@@ -1,4 +1,4 @@
-CREDITS.txt - 02/17/2006
+CREDITS.txt - 02/23/2006
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -31,6 +31,7 @@ like to thank the following individuals for their contributions:
     Andrea Suatoni      - IRIX desktop integration and testing.
     Tomohiro Kato       - Japanese localization.
     Tim Waugh           - Lots of patches, testing, and Linux integration.
+    Yugami              - LDAP browsing support.
 
 If I've missed someone, please let me know by sending an email to
 "mike@easysw.com".
