@@ -112,10 +112,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if ((helpfile = getenv("PATH_INFO")) != NULL)
     helpfile ++;
-  else if (strstr(argv[0], "help.cgi"))
-    helpfile = NULL;
-  else
-    helpfile = argv[0];
 
   if (helpfile)
   {

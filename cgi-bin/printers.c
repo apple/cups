@@ -86,10 +86,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   * See if we are displaying a printer or all printers...
   */
 
-  if (!strcmp(argv[0], "/") || strstr(argv[0], "printers.cgi"))
-    printer = NULL;
-  else
-    printer = argv[0];
+  if ((printer = getenv("PATH_INFO")) != NULL)
+    printer ++;
 
  /*
   * See who is logged in...

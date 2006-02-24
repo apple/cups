@@ -83,10 +83,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   * See if we are displaying a printer or all classes...
   */
 
-  if (!strcmp(argv[0], "/") || strstr(argv[0], "classes.cgi"))
-    pclass = NULL;
-  else
-    pclass = argv[0];
+  if ((pclass = getenv("PATH_INFO")) != NULL)
+    pclass ++;
 
  /*
   * See who is logged in...

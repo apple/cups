@@ -5127,7 +5127,7 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
 
   snprintf(command, sizeof(command), "%s/daemon/cups-deviced", ServerBin);
   snprintf(options, sizeof(options),
-           "cups-deviced %d+%d+%d+requested-attributes=%s",
+           "%d+%d+%d+requested-attributes=%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0, User,
 	   attrs);
@@ -5669,7 +5669,7 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 
   snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
   snprintf(options, sizeof(options),
-           "cups-driverd list+%d+%d+requested-attributes=%s%s%s",
+           "list+%d+%d+requested-attributes=%s%s%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0,
 	   attrs,
