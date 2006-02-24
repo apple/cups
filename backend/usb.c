@@ -72,7 +72,7 @@ int	print_device(const char *uri, const char *hostname,
 
 #ifdef __APPLE__
 #  include "usb-darwin.c"
-#elif defined(__linux) || defined(__sun) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#elif defined(__linux) || defined(__sun) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
 #  include "usb-unix.c"
 #else
 /*

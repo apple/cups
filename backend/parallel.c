@@ -686,7 +686,7 @@ list_devices(void)
       printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
     }
   }
-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
   char	device[255];		/* Device filename */
