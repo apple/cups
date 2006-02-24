@@ -1,8 +1,10 @@
-CHANGES.txt - 02/23/2006
+CHANGES.txt - 02/24/2006
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- Implicit classes that timed out could cause the
+	  scheduler to crash (STR #1439)
 	- Added DragonFly support in local device backends (STR
 	  #1362)
 	- Added LDAP printer browsing support (STR #338)

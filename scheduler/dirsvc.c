@@ -792,7 +792,8 @@ cupsdSendBrowseList(void)
 		      p->name);
 
         cupsdLogMessage(CUPSD_LOG_INFO,
-	                "Remote destination \"%s\" has timed out; deleting it...",
+	                "Remote destination \"%s\" has timed out; "
+			"deleting it...",
 	                p->name);
 
         cupsArraySave(Printers);
@@ -805,7 +806,8 @@ cupsdSendBrowseList(void)
 
 
 /*
- * 'cupsdSendCUPSBrowse()' - Send new browsing information using the CUPS protocol.
+ * 'cupsdSendCUPSBrowse()' - Send new browsing information using the CUPS
+ *                           protocol.
  */
 
 void
@@ -2253,6 +2255,7 @@ process_browse_data(
   int		update;			/* Update printer attributes? */
   char		finaluri[HTTP_MAX_URI],	/* Final URI for printer */
 		name[IPP_MAX_NAME],	/* Name of printer */
+		newname[IPP_MAX_NAME],	/* New name of printer */
 		*hptr,			/* Pointer into hostname */
 		*sptr;			/* Pointer into ServerName */
   char		local_make_model[IPP_MAX_NAME];
@@ -2391,10 +2394,8 @@ process_browse_data(
                 	  "Class \'%s\' deleted by directory services.",
 			  p->name);
 
-            cupsArrayRemove(Printers, p);
-            cupsdSetStringf(&p->name, "%s@%s", p->name, p->hostname);
-	    cupsdSetPrinterAttrs(p);
-	    cupsArrayAdd(Printers, p);
+            snprintf(newname, sizeof(newname), "%s@%s", p->name, p->hostname);
+            cupsdRenamePrinter(p, newname);
 
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                 	  "Class \'%s\' added by directory services.",
@@ -2496,10 +2497,8 @@ process_browse_data(
                 	  "Printer \'%s\' deleted by directory services.",
 			  p->name);
 
-	    cupsArrayRemove(Printers, p);
-	    cupsdSetStringf(&p->name, "%s@%s", p->name, p->hostname);
-	    cupsdSetPrinterAttrs(p);
-	    cupsArrayAdd(Printers, p);
+            snprintf(newname, sizeof(newname), "%s@%s", p->name, p->hostname);
+            cupsdRenamePrinter(p, newname);
 
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                 	  "Printer \'%s\' added by directory services.",
@@ -2767,6 +2766,9 @@ process_implicit_classes(void)
 
         cupsdLogMessage(CUPSD_LOG_INFO, "Added implicit class \"%s\"...",
 	                name);
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
+                      "Implicit class \'%s\' added by directory services.",
+		      name);
       }
 
       if (first != NULL)

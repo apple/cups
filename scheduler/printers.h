@@ -126,6 +126,7 @@ extern cupsd_quota_t	*cupsdFindQuota(cupsd_printer_t *p, const char *username);
 extern void		cupsdFreePrinterUsers(cupsd_printer_t *p);
 extern void		cupsdFreeQuotas(cupsd_printer_t *p);
 extern void		cupsdLoadAllPrinters(void);
+extern void		cupsdRenamePrinter(cupsd_printer_t *p, const char *name);
 extern void		cupsdSaveAllPrinters(void);
 extern void		cupsdSetPrinterAttrs(cupsd_printer_t *p);
 extern void		cupsdSetPrinterReasons(cupsd_printer_t *p, const char *s);

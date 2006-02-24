@@ -32,6 +32,7 @@
  *   cupsdFindPrinter()          - Find a printer in the list.
  *   cupsdFreePrinterUsers()     - Free allow/deny users.
  *   cupsdLoadAllPrinters()      - Load printers from the printers.conf file.
+ *   cupsdRenamePrinter()        - Rename a printer.
  *   cupsdSaveAllPrinters()      - Save all printer definitions to the
  *                                 printers.conf file.
  *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD
@@ -1222,6 +1223,53 @@ cupsdLoadAllPrinters(void)
   }
 
   cupsFileClose(fp);
+}
+
+
+/*
+ * 'cupsdRenamePrinter()' - Rename a printer.
+ */
+
+void
+cupsdRenamePrinter(
+    cupsd_printer_t *p,			/* I - Printer */
+    const char      *name)		/* I - New name */
+{
+ /*
+  * Remove the printer from the array(s) first...
+  */
+
+  cupsArrayRemove(Printers, p);
+
+  if (p->type & CUPS_PRINTER_IMPLICIT)
+    cupsArrayRemove(ImplicitPrinters, p);
+
+ /*
+  * Rename the printer type...
+  */
+
+  mimeDeleteType(MimeDatabase, p->filetype);
+  p->filetype = mimeAddType(MimeDatabase, "printer", name);
+
+ /*
+  * Rename the printer...
+  */
+
+  cupsdSetStringf(&p->name, name);
+
+ /*
+  * Reset printer attributes...
+  */
+
+  cupsdSetPrinterAttrs(p);
+
+ /*
+  * Add the printer back to the printer array(s)...
+  */
+
+  cupsArrayAdd(Printers, p);
+  if (p->type & CUPS_PRINTER_IMPLICIT)
+    cupsArrayAdd(ImplicitPrinters, p);
 }
 
 

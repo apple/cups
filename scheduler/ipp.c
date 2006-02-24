@@ -773,6 +773,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   const char	*dest;			/* Printer or class name */
   ipp_attribute_t *attr;		/* Printer attribute */
   int		modify;			/* Non-zero if we just modified */
+  char		newname[IPP_MAX_NAME];	/* New class name */
   int		need_restart_job;	/* Need to restart job? */
 
 
@@ -864,9 +865,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
     if (ImplicitAnyClasses)
     {
-      cupsArrayRemove(Printers, pclass);
-      cupsdSetStringf(&pclass->name, "Any%s", resource + 9);
-      cupsArrayAdd(Printers, pclass);
+      snprintf(newname, sizeof(newname), "Any%s", resource + 9);
+      cupsdRenamePrinter(pclass, newname);
     }
     else
       cupsdDeletePrinter(pclass, 1);
@@ -884,11 +884,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     * Rename the remote class to "Class"...
     */
 
-    cupsdDeletePrinterFilters(pclass);
-    cupsArrayRemove(Printers, pclass);
-    cupsdSetStringf(&pclass->name, "%s@%s", resource + 9, pclass->hostname);
-    cupsdSetPrinterAttrs(pclass);
-    cupsArrayAdd(Printers, pclass);
+    snprintf(newname, sizeof(newname), "%s@%s", resource + 9, pclass->hostname);
+    cupsdRenamePrinter(pclass, newname);
 
    /*
     * Add the class as a new local class...
@@ -1993,6 +1990,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   char		srcfile[1024],		/* Source Script/PPD file */
 		dstfile[1024];		/* Destination Script/PPD file */
   int		modify;			/* Non-zero if we are modifying */
+  char		newname[IPP_MAX_NAME];	/* New printer name */
   int		need_restart_job;	/* Need to restart job? */
 
 
@@ -2083,9 +2081,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     if (ImplicitAnyClasses)
     {
-      cupsArrayRemove(Printers, printer);
-      cupsdSetStringf(&printer->name, "Any%s", resource + 10);
-      cupsArrayAdd(Printers, printer);
+      snprintf(newname, sizeof(newname), "Any%s", resource + 10);
+      cupsdRenamePrinter(printer, newname);
     }
     else
       cupsdDeletePrinter(printer, 1);
@@ -2103,11 +2100,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     * Rename the remote printer to "Printer@server"...
     */
 
-    cupsdDeletePrinterFilters(printer);
-    cupsArrayRemove(Printers, printer);
-    cupsdSetStringf(&printer->name, "%s@%s", resource + 10, printer->hostname);
-    cupsdSetPrinterAttrs(printer);
-    cupsArrayAdd(Printers, printer);
+    snprintf(newname, sizeof(newname), "%s@%s", resource + 10,
+             printer->hostname);
+    cupsdRenamePrinter(printer, newname);
 
    /*
     * Add the printer as a new local printer...
