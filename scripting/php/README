@@ -39,20 +39,25 @@ QUICK REFERENCE DOCUMENTATION
     can be used as a quick reference to the supported functions:
 
 
-cups_cancel_job()
+    CUPS_CANCEL_JOB
 
     Cancels a job on the named destination:
 
-        $status = cups_cancel_job($dest, $id);
+        bool cups_cancel_job(string dest, int id)
 
     The return value is TRUE on success and FALSE on failure.
 
+    Example:
 
-cups_get_dests()
+        if (!cups_cancel_job("myprinter", 123))
+	  print("Unable to cancel job: " . cups_last_error_string() . "\n");
+
+
+    CUPS_GET_DESTS
 
     Gets a list of available destinations:
 
-        $dests = cups_get_dests();
+        array cups_get_dests()
 
     The return value is an array of objects with the following
     properties:
@@ -62,12 +67,16 @@ cups_get_dests()
 	is_default  TRUE if the printer or class is the default destination
 	options     Associative array of options and their values
 
+    Example:
 
-cups_get_jobs()
+        $dest = cups_get_dests();
+
+
+    CUPS_GET_JOBS
 
     Gets a list of jobs:
 
-        $jobs = cups_get_jobs("dest", myjobs, completed);
+        array cups_get_jobs(string dest, bool myjobs, int completed)
 
     The "dest" string can be blank for jobs on all destinations.
     Pass TRUE for "myjobs" to only get jobs for the current user.
@@ -89,38 +98,60 @@ cups_get_jobs()
         creation_time     Time the job was created
         processing_time   Time the job was processed
 
+    Example:
 
-    cups_last_error()
+        $jobs = cups_get_jobs("", FALSE, -1);
+
+
+    CUPS_LAST_ERROR
     
     Returns the IPP status code for the most recent request:
+
+        int cups_last_error()
+
+    Example:
 
         $error = cups_last_error();
 
 
-    cups_last_error_string()
+    CUPS_LAST_ERROR_STRING
     
     Returns the IPP status-message string for the most recent request:
+
+        string cups_last_error_string()
+
+    Example:
 
         $message = cups_last_error_string();
 
 
-    cups_print_file()
+    CUPS_PRINT_FILE
 
     Prints a single file to a printer or class:
+
+        int cups_print_file(string dest, string filename, string title,
+	                    array options)
+
+    The return value is the job ID or 0 if there was an error.
+
+    Example:
 
         $options = array("name" => "value", "name2" => "value2");
 	$id      = cups_print_file("dest", "filename", "title", $options);
 
-    The return value is the job ID or 0 if there was an error.
 
-
-    cups_print_files()
+    CUPS_PRINT_FILES
 
     Prints one or more files to a printer or class:
+
+        int cups_print_files(string dest, array files, string title,
+	                     array options);
+
+    The return value is the job ID or 0 if there was an error.
+
+    Example:
 
         $files   = array("file1", "file2", "file3");
         $options = array("name" => "value", "name2" => "value2");
 	$id      = cups_print_file("dest", $files, "title", $options);
-
-    The return value is the job ID or 0 if there was an error.
 
