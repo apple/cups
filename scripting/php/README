@@ -1,21 +1,126 @@
-README - 04/08/2003
+README - 02/25/2006
 -------------------
 
-This directory contains a dynamically loadable CUPS extension
-module for PHP 4.  To compile it type:
+INTRODUCTION
 
-    make
+    This directory contains a dynamically loadable CUPS extension
+    module for PHP 4 and 5.  The CUPS 1.2 module has been
+    substantially updated to provide an API more consistent with
+    the C API and is NOT compatible with the CUPS 1.1 module.
 
-To install it, type:
 
-    make install
+COMPILING AND INSTALLING
 
-Questions should be reported to the CUPS newsgroups/mailing
-lists at:
+    Run "make" to compile the PHP CUPS extension:
 
-    http://www.cups.org/newsgroups.php
+	make
 
-Bug reports and enhancement requests can be submitted via the
-form at:
+    To install it, type:
 
-    http://www.cups.org/str.php
+	make install
+
+
+RESOURCES AND SUPPORT
+
+    Questions should be reported to the CUPS newsgroups/mailing
+    lists at:
+
+	http://www.cups.org/newsgroups.php
+
+    Bug reports and enhancement requests can be submitted via the
+    form at:
+
+	http://www.cups.org/str.php
+
+
+QUICK REFERENCE DOCUMENTATION
+
+    In lieu of actual documentation, the following definitions
+    can be used as a quick reference to the supported functions:
+
+
+cups_cancel_job()
+
+    Cancels a job on the named destination:
+
+        $status = cups_cancel_job($dest, $id);
+
+    The return value is TRUE on success and FALSE on failure.
+
+
+cups_get_dests()
+
+    Gets a list of available destinations:
+
+        $dests = cups_get_dests();
+
+    The return value is an array of objects with the following
+    properties:
+
+        name        The name of the printer or class
+	instance    The instance of the printer or class
+	is_default  TRUE if the printer or class is the default destination
+	options     Associative array of options and their values
+
+
+cups_get_jobs()
+
+    Gets a list of jobs:
+
+        $jobs = cups_get_jobs("dest", myjobs, completed);
+
+    The "dest" string can be blank for jobs on all destinations.
+    Pass TRUE for "myjobs" to only get jobs for the current user.
+    The "completed" argument can be 0 for pending jobs, 1 for
+    completed jobs, and -1 for all jobs.
+
+    The return value is an array of objects with the following
+    properties:
+
+        id                The job ID
+        dest              Printer or class name
+        title             Title/job name
+        user              User the submitted the job
+        format            Document format
+        state             Job state
+        size              Size in kilobytes
+        priority          Priority (1-100)
+        completed_time    Time the job was completed
+        creation_time     Time the job was created
+        processing_time   Time the job was processed
+
+
+    cups_last_error()
+    
+    Returns the IPP status code for the most recent request:
+
+        $error = cups_last_error();
+
+
+    cups_last_error_string()
+    
+    Returns the IPP status-message string for the most recent request:
+
+        $message = cups_last_error_string();
+
+
+    cups_print_file()
+
+    Prints a single file to a printer or class:
+
+        $options = array("name" => "value", "name2" => "value2");
+	$id      = cups_print_file("dest", "filename", "title", $options);
+
+    The return value is the job ID or 0 if there was an error.
+
+
+    cups_print_files()
+
+    Prints one or more files to a printer or class:
+
+        $files   = array("file1", "file2", "file3");
+        $options = array("name" => "value", "name2" => "value2");
+	$id      = cups_print_file("dest", $files, "title", $options);
+
+    The return value is the job ID or 0 if there was an error.
+
