@@ -111,7 +111,12 @@ main(int  argc,				/* I - Number of command-line arguments */
     fprintf(stderr, "argv[%d]=\"%s\"\n", i, argv[i]);
 
   if ((helpfile = getenv("PATH_INFO")) != NULL)
+  {
     helpfile ++;
+
+    if (!*helpfile)
+      helpfile = NULL;
+  }
 
   if (helpfile)
   {
