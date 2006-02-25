@@ -222,6 +222,9 @@ cupsdReadConfiguration(void)
   struct group	*group;			/* Default group */
   char		*old_serverroot,	/* Old ServerRoot */
 		*old_requestroot;	/* Old RequestRoot */
+  const char	*tmpdir;		/* TMPDIR environment variable */
+  struct stat	tmpinfo;		/* Temporary directory info */
+
 
  /*
   * Save the old root paths...
@@ -315,10 +318,7 @@ cupsdReadConfiguration(void)
 
   cupsdSetString(&RIPCache, "8m");
 
-  if (getenv("TMPDIR") == NULL)
-    cupsdSetString(&TempDir, CUPS_REQUESTS "/tmp");
-  else
-    cupsdSetString(&TempDir, getenv("TMPDIR"));
+  cupsdSetString(&TempDir, NULL);
 
  /*
   * Find the default user...
@@ -627,6 +627,41 @@ cupsdReadConfiguration(void)
   check_permissions(ServerRoot, "classes.conf", 0600, RunUser, Group, 0, 0);
   check_permissions(ServerRoot, "printers.conf", 0600, RunUser, Group, 0, 0);
   check_permissions(ServerRoot, "passwd.md5", 0600, User, Group, 0, 0);
+
+ /*
+  * Update TempDir to the default if it hasn't been set already...
+  */
+
+  if (!TempDir)
+  {
+    if ((tmpdir = getenv("TMPDIR")) != NULL)
+    {
+     /*
+      * TMPDIR is defined, see if it is OK for us to use...
+      */
+
+      if (stat(tmpdir, &tmpinfo))
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to access TMPDIR (%s): %s",
+	                tmpdir, strerror(errno));
+      else if (!S_ISDIR(tmpinfo.st_mode))
+        cupsdLogMessage(CUPSD_LOG_ERROR, "TMPDIR (%s) is not a directory!",
+	                tmpdir);
+      else if ((tmpinfo.st_uid != User || !(tmpinfo.st_mode & S_IWUSR)) &&
+               (tmpinfo.st_gid != Group || !(tmpinfo.st_mode & S_IWGRP)) &&
+	       !(tmpinfo.st_mode & S_IWOTH))
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "TMPDIR (%s) has the wrong permissions!", tmpdir);
+      else
+        cupsdSetString(&TempDir, tmpdir);
+
+      if (!TempDir)
+        cupsdLogMessage(CUPSD_LOG_INFO, "Using default TempDir of %s/tmp...",
+	                RequestRoot);
+    }
+
+    if (!TempDir)
+      cupsdSetStringf(&TempDir, "%s/tmp", RequestRoot);
+  }
 
  /*
   * Make sure the request and temporary directories have the right
