@@ -26,12 +26,13 @@ include ../../Makedefs
 
 
 #
-# Where to install the PHP module...
+# Where to install and how to compile the PHP module...
 #
 
 PHPDIR	=	`php-config --extension-dir`
-OPTIONS	=	`php-config --includes` -I../.. -DCOMPILE_DL_PHPCUPS
+OPTIONS	=	-I../.. `php-config --includes`
 PHPLIBS	=	`php-config --ldflags` `php-config --libs`
+
 
 #
 # Object files...
