@@ -29,7 +29,8 @@ include Makedefs
 #
 
 DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
-		notifier pdftops scheduler systemv test
+		notifier pdftops scheduler systemv test \
+		$(PHPDIR)
 
 
 #
@@ -117,8 +118,8 @@ install:	installhdrs
 		fi \
 	fi
 	if test "x$(DBUSDIR)" != "x"; then \
-		$(INSTALL_DIR) $(BUILDROOT)$(DBUSDIR); \
-		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/cups.conf; \
+		$(INSTALL_DIR) $(DBUSDIR); \
+		$(INSTALL_DATA) packaging/cups-dbus.conf $(DBUSDIR)/cups.conf; \
 	fi
 
 

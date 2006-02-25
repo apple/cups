@@ -29,9 +29,9 @@ include ../../Makedefs
 # Where to install and how to compile the PHP module...
 #
 
-PHPDIR	=	`php-config --extension-dir`
-OPTIONS	=	-I../.. `php-config --includes`
-PHPLIBS	=	`php-config --ldflags` `php-config --libs`
+PHPDIR	=	$(BUILDROOT)`$(PHPCONFIG) --extension-dir`
+OPTIONS	=	-I../.. `$(PHPCONFIG) --includes`
+PHPLIBS	=	`$(PHPCONFIG) --ldflags` `$(PHPCONFIG) --libs`
 
 
 #

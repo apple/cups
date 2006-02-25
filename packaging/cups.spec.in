@@ -27,10 +27,13 @@
 # Conditional build options (--with name/--without name):
 #
 #   dbus     - Enable/disable DBUS support (default = enable)
+#   php      - Enable/disable PHP support (default = enable)
 
 %{!?_with_dbus: %{!?_without_dbus: %define _with_dbus --with-dbus}}
 %{?_with_dbus: %define _dbus --enable-dbus}
 %{!?_with_dbus: %define _dbus --disable-dbus}
+
+%{!?_with_php: %{!?_without_php: %define _with_php --with-php}}
 
 Summary: Common UNIX Printing System
 Name: cups
@@ -72,6 +75,13 @@ Summary: Common UNIX Printing System - Japanese support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
+%if %{?_with_php:1}%{!?_with_php:0}
+%package php
+Summary: Common UNIX Printing System - PHP support
+Group: Development/Languages
+Requires: %{name}-libs = %{epoch}:%{version}
+%endif
+
 %description
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. It has been developed by Easy Software Products 
@@ -95,11 +105,17 @@ UNIX® operating systems. This package provides LPD client support.
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Japanese support.
 
+%if %{?_with_php:1}%{!?_with_php:0}
+%description php
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides PHP support.
+%endif
+
 %prep
 %setup
 
 %build
-CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" ./configure %{_dbus}
+CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" ./configure %{_dbus} %{_without_php}
 
 # If we got this far, all prerequisite libraries must be here.
 make
@@ -299,6 +315,13 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups/templates/ja
 /usr/share/cups/templates/ja/*
 /usr/share/locale/ja/cups_ja.po
+
+%if %{?_with_php:1}%{!?_with_php:0}
+%files php
+# PHP
+/usr/lib/php/modules/*
+%endif
+
 
 #
 # End of "$Id$".

@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Scripting configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -66,9 +66,22 @@ fi
 
 AC_DEFINE_UNQUOTED(CUPS_PHP, "$CUPS_PHP")
 
-if test "x$CUPS_PHP" != x; then
+if test "x$CUPS_PHP" = x; then
+	CUPS_PHP="no"
+else
 	AC_DEFINE(HAVE_PHP)
 fi
+
+PHPDIR=""
+if test "x$CUPS_PHP" != xno; then
+	AC_PATH_PROG(PHPCONFIG, php-config)
+
+	if test "x$PHPCONFIG" != x; then
+		PHPDIR="scripting/php"
+	fi
+fi
+
+AC_SUBST(PHPDIR)
 
 dnl Do we have Python?
 AC_ARG_WITH(python, [  --with-python           set Python interpreter for web interfaces ],
