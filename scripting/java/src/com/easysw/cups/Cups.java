@@ -1,13 +1,13 @@
 package com.easysw.cups;
 
 /**
- * @version 1.00 06-NOV-2002
+ * @version 1.2 26-FEB-2006
  * @author  Easy Software Products
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -19,11 +19,11 @@ package com.easysw.cups;
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *         WWW: http://www.cups.org/
  */
 
 /**
@@ -31,7 +31,7 @@ package com.easysw.cups;
  * reading and writing data, and performing common CUPS operations.
  *
  * @author	TDB
- * @version	1.0.1
+ * @version	1.2
  * @since	JDK1.3
  */
 
@@ -1175,7 +1175,9 @@ public class Cups
             
       a = new IPPAttribute( IPPDefs.TAG_OPERATION, IPPDefs.TAG_URI,
                             "printer-uri" );
-      a.addString( "", site + "/printers/" + printer_name );  
+      String p_uri = "ipp://" + address + ":" +
+	     port + "/printers/" + printer_name;
+      a.addString( "", p_uri );
       ipp.addAttribute(a);
 
       if (doRequest("cupsGetPrinterAttributes"))
