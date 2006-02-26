@@ -70,12 +70,12 @@ install:	all
 		$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
 		chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file || true; \
 	done
-	-if test x$(PAMDIR) != x$(BUILDROOT); then \
-		$(INSTALL_DIR) -m 755 $(PAMDIR); \
-		if test -r $(PAMDIR)/cups/$(PAMFILE) ; then \
-			$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups.N ; \
+	-if test x$(PAMDIR) != x; then \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(PAMDIR); \
+		if test -r $(BUILDROOT)$(PAMDIR)/cups/$(PAMFILE) ; then \
+			$(INSTALL_DATA) $(PAMFILE) $(BUILDROOT)$(PAMDIR)/cups.N ; \
 		else \
-			$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups ; \
+			$(INSTALL_DATA) $(PAMFILE) $(BUILDROOT)$(PAMDIR)/cups ; \
 		fi ; \
 	fi
 

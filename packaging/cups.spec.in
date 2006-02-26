@@ -319,7 +319,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{?_with_php:1}%{!?_with_php:0}
 %files php
 # PHP
-/usr/lib/php/modules/*
+/usr/lib/php*
 %endif
 
 

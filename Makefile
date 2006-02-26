@@ -118,8 +118,9 @@ install:	installhdrs
 		fi \
 	fi
 	if test "x$(DBUSDIR)" != "x"; then \
-		$(INSTALL_DIR) $(DBUSDIR); \
-		$(INSTALL_DATA) packaging/cups-dbus.conf $(DBUSDIR)/cups.conf; \
+		echo Installing cups.conf in $(DBUSDIR)...;\
+		$(INSTALL_DIR) $(BUILDROOT)$(DBUSDIR); \
+		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/cups.conf; \
 	fi
 
 
