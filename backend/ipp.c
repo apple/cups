@@ -26,7 +26,9 @@
  * Contents:
  *
  *   main()                 - Send a file to the printer or server.
+ *   cancel_job()           - Cancel a print job.
  *   check_printer_state()  - Check the printer state...
+ *   compress_files()       - Compress print files...
  *   password_cb()          - Disable the password prompt for
  *                            cupsDoFileRequest().
  *   report_printer_state() - Report the printer state.
@@ -74,6 +76,9 @@ static void	cancel_job(http_t *http, const char *uri, int id,
 static void	check_printer_state(http_t *http, const char *uri,
 		                    const char *resource, const char *user,
 				    int version);
+#ifdef HAVE_LIBZ
+static void	compress_files(int num_files, char **files);
+#endif /* HAVE_LIBZ */
 static const char *password_cb(const char *);
 static int	report_printer_state(ipp_t *ipp);
 
@@ -116,7 +121,8 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_t		*request,		/* IPP request */
 		*response,		/* IPP response */
 		*supported;		/* get-printer-attributes response */
-  int		waitjob,		/* Wait for job complete? */
+  int		compression,		/* Do compression of the job data? */
+		waitjob,		/* Wait for job complete? */
 		waitprinter;		/* Wait for printer ready? */
   ipp_attribute_t *job_id_attr;		/* job-id attribute */
   int		job_id;			/* job-id value */
@@ -225,63 +231,10 @@ main(int  argc,				/* I - Number of command-line args */
     cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
 
  /*
-  * If we have 7 arguments, print the file named on the command-line.
-  * Otherwise, copy stdin to a temporary file and print the temporary
-  * file.
-  */
-
-  if (argc == 6)
-  {
-   /*
-    * Copy stdin to a temporary file...
-    */
-
-    int  fd;		/* Temporary file */
-    char buffer[8192];	/* Buffer for copying */
-    int  bytes;		/* Number of bytes read */
-
-
-    if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
-    {
-      perror("ERROR: unable to create temporary file");
-      return (CUPS_BACKEND_FAILED);
-    }
-
-    while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-      if (write(fd, buffer, bytes) < bytes)
-      {
-        perror("ERROR: unable to write to temporary file");
-	close(fd);
-	unlink(tmpfilename);
-	return (CUPS_BACKEND_FAILED);
-      }
-
-    close(fd);
-
-   /*
-    * Point to the single file from stdin...
-    */
-
-    filename  = tmpfilename;
-    files     = &filename;
-    num_files = 1;
-  }
-  else
-  {
-   /*
-    * Point to the files on the command-line...
-    */
-
-    num_files = argc - 6;
-    files     = argv + 6;
-  }
-
-  fprintf(stderr, "DEBUG: %d files to send in job...\n", num_files);
-
- /*
   * See if there are any options...
   */
 
+  compression = 0;
   version     = 1;
   waitjob     = 1;
   waitprinter = 1;
@@ -385,6 +338,15 @@ main(int  argc,				/* I - Number of command-line args */
 	          value);
 	}
       }
+#ifdef HAVE_LIBZ
+      else if (!strcasecmp(name, "compression"))
+      {
+        compression = !strcasecmp(value, "true") ||
+	              !strcasecmp(value, "yes") ||
+	              !strcasecmp(value, "on") ||
+	              !strcasecmp(value, "gzip");
+      }
+#endif /* HAVE_LIBZ */
       else
       {
        /*
@@ -396,6 +358,74 @@ main(int  argc,				/* I - Number of command-line args */
       }
     }
   }
+
+ /*
+  * If we have 7 arguments, print the file named on the command-line.
+  * Otherwise, copy stdin to a temporary file and print the temporary
+  * file.
+  */
+
+  if (argc == 6)
+  {
+   /*
+    * Copy stdin to a temporary file...
+    */
+
+    int		fd;			/* File descriptor */
+    cups_file_t	*fp;			/* Temporary file */
+    char	buffer[8192];		/* Buffer for copying */
+    int		bytes;			/* Number of bytes read */
+
+
+    if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
+    {
+      perror("ERROR: unable to create temporary file");
+      return (CUPS_BACKEND_FAILED);
+    }
+
+    if ((fp = cupsFileOpenFd(fd, compression ? "w9" : "w")) == NULL)
+    {
+      perror("ERROR: unable to open temporary file");
+      close(fd);
+      unlink(tmpfilename);
+      return (CUPS_BACKEND_FAILED);
+    }
+
+    while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+      if (cupsFileWrite(fp, buffer, bytes) < bytes)
+      {
+        perror("ERROR: unable to write to temporary file");
+	cupsFileClose(fp);
+	unlink(tmpfilename);
+	return (CUPS_BACKEND_FAILED);
+      }
+
+    cupsFileClose(fp);
+
+   /*
+    * Point to the single file from stdin...
+    */
+
+    filename  = tmpfilename;
+    files     = &filename;
+    num_files = 1;
+  }
+  else
+  {
+   /*
+    * Point to the files on the command-line...
+    */
+
+    num_files = argc - 6;
+    files     = argv + 6;
+
+#ifdef HAVE_LIBZ
+    if (compression)
+      compress_files(num_files, files);
+#endif /* HAVE_LIBZ */
+  }
+
+  fprintf(stderr, "DEBUG: %d files to send in job...\n", num_files);
 
  /*
   * Set the authentication info, if any...
@@ -745,6 +775,12 @@ main(int  argc,				/* I - Number of command-line args */
 
     fprintf(stderr, "DEBUG: job-name = \"%s\"\n", argv[3]);
 
+#ifdef HAVE_LIBZ
+    if (compression)
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                   "compression", NULL, "gzip");
+#endif /* HAVE_LIBZ */
+
    /*
     * Handle options on the command-line...
     */
@@ -1053,6 +1089,14 @@ main(int  argc,				/* I - Number of command-line args */
   if (tmpfilename[0])
     unlink(tmpfilename);
 
+#ifdef HAVE_LIBZ
+  if (compression)
+  {
+    for (i = 0; i < num_files; i ++)
+      unlink(files[i]);
+  }
+#endif /* HAVE_LIBZ */
+
 #ifdef __APPLE__
   if (pstmpname[0])
     unlink(pstmpname);
@@ -1149,6 +1193,77 @@ check_printer_state(
     ippDelete(response);
   }
 }
+
+
+#ifdef HAVE_LIBZ
+/*
+ * 'compress_files()' - Compress print files...
+ */
+
+static void
+compress_files(int  num_files,		/* I - Number of files */
+               char **files)		/* I - Files */
+{
+  int		i,			/* Looping var */
+		fd;			/* Temporary file descriptor */
+  ssize_t	bytes;			/* Bytes read/written */
+  size_t	total;			/* Total bytes read */
+  cups_file_t	*in,			/* Input file */
+		*out;			/* Output file */
+  struct stat	outinfo;		/* Output file information */
+  char		filename[1024],		/* Temporary filename */
+		buffer[65536];		/* Copy buffer */
+
+
+  fprintf(stderr, "DEBUG: Compressing %d job files...\n", num_files);
+  for (i = 0; i < num_files; i ++)
+  {
+    if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
+    {
+      perror("ERROR: Unable to create temporary compressed print file");
+      exit(CUPS_BACKEND_FAILED);
+    }
+
+    if ((out = cupsFileOpenFd(fd, "w9")) == NULL)
+    {
+      perror("ERROR: Unable to open temporary compressed print file");
+      exit(CUPS_BACKEND_FAILED);
+    }
+
+    if ((in = cupsFileOpen(files[i], "r")) == NULL)
+    {
+      fprintf(stderr, "ERROR: Unable to open print file \"%s\": %s\n",
+              files[i], strerror(errno));
+      cupsFileClose(out);
+      exit(CUPS_BACKEND_FAILED);
+    }
+
+    total = 0;
+    while ((bytes = cupsFileRead(in, buffer, sizeof(buffer))) > 0)
+      if (cupsFileWrite(out, buffer, bytes) < bytes)
+      {
+        fprintf(stderr, "ERROR: Unable to write %d bytes to \"%s\": %s\n",
+	        bytes, filename, strerror(errno));
+        cupsFileClose(in);
+        cupsFileClose(out);
+	exit(CUPS_BACKEND_FAILED);
+      }
+      else
+        total += bytes;
+
+    cupsFileClose(out);
+    cupsFileClose(in);
+
+    files[i] = strdup(filename);
+
+    if (!stat(filename, &outinfo))
+      fprintf(stderr,
+              "DEBUG: File %d compressed to %.1f%% of original size, "
+	      CUPS_LLFMT " bytes...\n",
+              i + 1, 100.0 * outinfo.st_size / total, outinfo.st_size);
+  }
+}
+#endif /* HAVE_LIBZ */
 
 
 /*

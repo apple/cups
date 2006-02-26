@@ -1149,8 +1149,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
   size_t	bytes;			/* Number bytes in buffer */
 
 
-  DEBUG_printf(("cupsFileSeek(fp=%p, pos=%ld)\n", fp, (long)pos));
-  DEBUG_printf(("    fp->pos=%ld\n", (long)fp->pos));
+  DEBUG_printf(("cupsFileSeek(fp=%p, pos=" CUPS_LLFMT ")\n", fp, pos));
+  DEBUG_printf(("    fp->pos=" CUPS_LLFMT "\n", fp->pos));
+  DEBUG_printf(("    fp->ptr=%p, fp->end=%p\n", fp->ptr, fp->end));
 
  /*
   * Range check input...
@@ -1158,6 +1159,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
 
   if (!fp || pos < 0 || fp->mode != 'r')
     return (-1);
+
+  if (fp->pos == pos)
+    return (pos);
 
  /*
   * Figure out the number of bytes in the current buffer, and then
@@ -1206,7 +1210,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     */
 
 #ifdef HAVE_LIBZ
-    if (fp->compressed)
+    if (fp->compressed || !fp->ptr)
     {
       while ((bytes = cups_fill(fp)) > 0)
         if (pos >= fp->pos && pos < (fp->pos + bytes))
