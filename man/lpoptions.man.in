@@ -128,11 +128,11 @@ options and instances for \fIall users\fR in the
 .SH COMPATIBILITY
 The \fIlpoptions\fR command is unique to CUPS.
 .SH FILES
-~/.lpoptions - user defaults and instances created by non-root
+~/.cups/lpoptions - user defaults and instances created by non-root
 users.
 .br
-/etc/cups/lpoptions - system-wide defaults and instances created
-by the root user.
+@CUPS_SERVERROOT@/lpoptions - system-wide defaults and instances
+created by the root user.
 .SH SEE ALSO
 \fIcancel(1)\fR, \fIlp(1)\fR, \fIlpr(1)\fR,
 .br

@@ -44,6 +44,7 @@
 #include "globals.h"
 #include <stdlib.h>
 #include <ctype.h>
+#include <sys/stat.h>
 
 #ifdef HAVE_NOTIFY_H
 #  include <notify.h>
@@ -100,7 +101,7 @@ cupsAddDest(const char  *name,		/* I  - Name of destination */
   for (i = num_dests; i > 0; i --, dest ++)
     if (strcasecmp(name, dest->name) < 0)
       break;
-    else if (strcasecmp(name, dest->name) == 0 &&
+    else if (!strcasecmp(name, dest->name) &&
              instance != NULL && dest->instance != NULL &&
              strcasecmp(instance, dest->instance) < 0)
       break;
@@ -262,7 +263,7 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dest;			/* Destination pointer */
   const char	*home;			/* HOME environment variable */
-  char		filename[1024];		/* Local ~/.lpoptions file */
+  char		filename[1024];		/* Local ~/.cups/lpoptions file */
   const char	*defprinter;		/* Default printer */
   char		name[1024],		/* Copy of printer name */
 		*instance;		/* Pointer to instance name */
@@ -345,7 +346,7 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
   }
 
  /*
-  * Load the /etc/cups/lpoptions and ~/.lpoptions files...
+  * Load the /etc/cups/lpoptions and ~/.cups/lpoptions files...
   */
 
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
@@ -353,13 +354,16 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
 
   if ((home = getenv("HOME")) != NULL)
   {
-    snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
+    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
+    if (access(filename, 0))
+      snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
+
     num_dests = cups_get_dests(filename, num_dests, dests);
   }
 
  /*
   * Validate the current default destination - this prevents old
-  * Default lines in /etc/cups/lpoptions and ~/.lpoptions from
+  * Default lines in /etc/cups/lpoptions and ~/.cups/lpoptions from
   * pointing to a non-existent printer or class...
   */
 
@@ -411,7 +415,7 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
  * 'cupsSetDests()' - Save the list of destinations for the default server.
  *
  * This function saves the destinations to /etc/cups/lpoptions when run
- * as root and ~/.lpoptions when run as a normal user.
+ * as root and ~/.cups/lpoptions when run as a normal user.
  */
 
 void
@@ -438,7 +442,7 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
  * 'cupsSetDests2()' - Save the list of destinations for the specified server.
  *
  * This function saves the destinations to /etc/cups/lpoptions when run
- * as root and ~/.lpoptions when run as a normal user.
+ * as root and ~/.cups/lpoptions when run as a normal user.
  *
  * @since CUPS 1.1.21@
  */
@@ -496,7 +500,24 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
     */
 
     if ((home = getenv("HOME")) != NULL)
+    {
+     /*
+      * Remove the old ~/.lpoptions file...
+      */
+
       snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
+      unlink(filename);
+
+     /*
+      * Create ~/.cups subdirectory...
+      */
+
+      snprintf(filename, sizeof(filename), "%s/.cups", home);
+      if (access(filename, 0))
+        mkdir(filename, 0700);
+
+      snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
+    }
   }
 #endif /* !WIN32 */
 
@@ -544,7 +565,7 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
         if (temp && (val = cupsGetOption(option->name, temp->num_options,
 	                                 temp->options)) != NULL)
 	{
-	  if (strcasecmp(val, option->value) == 0)
+	  if (!strcasecmp(val, option->value))
 	    continue;
 	}
 

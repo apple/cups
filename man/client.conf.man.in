@@ -1,0 +1,58 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   client.conf man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636 USA
+.\"
+.\"       Voice: (301) 373-9600
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH client.conf 5 "Common UNIX Printing System" "25 February 2006" "Easy Software Products"
+.SH NAME
+client.conf \- client configuration file for cups
+.SH DESCRIPTION
+The \fIclient.conf\fR file configures the CUPS client and is 
+normally located in the \fI@CUPS_SERVERROOT@\fR or \fI~/.cups\fR
+directory. Each line in the file can be a configuration
+directive, a blank line, or a comment. Comment lines start with
+the # character.
+.SH DIRECTIVES
+The following directives are understood by the client. Consult the
+on-line help for detailed descriptions:
+.TP 5
+Encryption IfRequested
+.TP 5
+Encryption Never
+.TP 5
+Encryption Required
+.br
+Specifies the level of encryption that is required for a particular
+location.
+.TP 5
+ServerName hostname-or-ip-address[:port]
+.TP 5
+ServerName /domain/socket
+.br
+Specifies the address and optionally the port to use when
+connecting to the server
+.SH SEE ALSO
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2006 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id$".
+.\"

@@ -26,15 +26,16 @@
  *
  * Contents:
  *
- *   cupsEncryption()    - Get the default encryption settings.
- *   cupsGetPassword()   - Get a password from the user.
- *   cupsServer()        - Return the hostname of the default server.
- *   cupsSetEncryption() - Set the encryption preference.
- *   cupsSetPasswordCB() - Set the password callback for CUPS.
- *   cupsSetServer()     - Set the default server name.
- *   cupsSetUser()       - Set the default user name.
- *   cupsUser()          - Return the current users name.
- *   _cupsGetPassword()  - Get a password from the user.
+ *   cupsEncryption()        - Get the default encryption settings.
+ *   cupsGetPassword()       - Get a password from the user.
+ *   cupsServer()            - Return the hostname of the default server.
+ *   cupsSetEncryption()     - Set the encryption preference.
+ *   cupsSetPasswordCB()     - Set the password callback for CUPS.
+ *   cupsSetServer()         - Set the default server name.
+ *   cupsSetUser()           - Set the default user name.
+ *   cupsUser()              - Return the current users name.
+ *   _cupsGetPassword()      - Get a password from the user.
+ *   cups_open_client_conf() - Open the client.conf file.
  */
 
 /*
@@ -51,6 +52,13 @@
 
 
 /*
+ * Local functions...
+ */
+
+static cups_file_t	*cups_open_client_conf(void);
+
+
+/*
  * 'cupsEncryption()' - Get the default encryption settings.
  *
  * The default encryption setting comes from the CUPS_ENCRYPTION
@@ -64,7 +72,6 @@ cupsEncryption(void)
 {
   cups_file_t	*fp;			/* client.conf file */
   char		*encryption;		/* CUPS_ENCRYPTION variable */
-  const char	*home;			/* Home directory of user */
   char		line[1024],		/* Line from file */
 		*value;			/* Value on line */
   int		linenum;		/* Line number */
@@ -84,26 +91,13 @@ cupsEncryption(void)
     if ((encryption = getenv("CUPS_ENCRYPTION")) == NULL)
     {
      /*
-      * Next check to see if we have a $HOME/.cupsrc or client.conf file...
+      * No, open the client.conf file...
       */
 
-      if ((home = getenv("HOME")) != NULL)
-      {
-	snprintf(line, sizeof(line), "%s/.cupsrc", home);
-	fp = cupsFileOpen(line, "r");
-      }
-      else
-	fp = NULL;
-
-      if (fp == NULL)
-      {
-	snprintf(line, sizeof(line), "%s/client.conf", cg->cups_serverroot);
-	fp = cupsFileOpen(line, "r");
-      }
-
+      fp         = cups_open_client_conf();
       encryption = "IfRequested";
 
-      if (fp != NULL)
+      if (fp)
       {
        /*
 	* Read the config file and look for an Encryption line...
@@ -181,7 +175,6 @@ cupsServer(void)
 {
   cups_file_t	*fp;			/* client.conf file */
   char		*server;		/* Pointer to server name */
-  const char	*home;			/* Home directory of user */
   char		*port;			/* Port number */
   char		line[1024],		/* Line from file */
 		*value;			/* Value on line */
@@ -205,22 +198,10 @@ cupsServer(void)
     if ((server = getenv("CUPS_SERVER")) == NULL)
     {
      /*
-      * Next check to see if we have a $HOME/.cupsrc or client.conf file...
+      * No environment variable, try the client.conf file...
       */
 
-      if ((home = getenv("HOME")) != NULL)
-      {
-	snprintf(line, sizeof(line), "%s/.cupsrc", home);
-	fp = cupsFileOpen(line, "r");
-      }
-      else
-	fp = NULL;
-
-      if (fp == NULL)
-      {
-	snprintf(line, sizeof(line), "%s/client.conf", cg->cups_serverroot);
-	fp = cupsFileOpen(line, "r");
-      }
+      fp = cups_open_client_conf();
 
 #ifdef CUPS_DEFAULT_DOMAINSOCKET
      /*
@@ -235,7 +216,7 @@ cupsServer(void)
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */
       server = "localhost";
 
-      if (fp != NULL)
+      if (fp)
       {
        /*
 	* Read the config file and look for a ServerName line...
@@ -467,6 +448,39 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
   return (getpass(prompt));
 }
 #endif /* WIN32 */
+
+
+/*
+ * 'cups_open_client_conf()' - Open the client.conf file.
+ */
+
+static cups_file_t *			/* O - File or NULL */
+cups_open_client_conf(void)
+{
+  cups_file_t	*fp;			/* File */
+  const char	*home;			/* Home directory of user */
+  char		filename[1024];		/* Filename */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
+  if ((home = getenv("HOME")) != NULL)
+  {
+   /*
+    * Look for ~/.cups/client.conf or ~/.cupsrc...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
+    if ((fp = cupsFileOpen(filename, "r")) != NULL)
+      return (fp);
+
+    snprintf(filename, sizeof(filename), "%s/.cupsrc", home);
+    if ((fp = cupsFileOpen(filename, "r")) != NULL)
+      return (fp);
+  }
+
+  snprintf(filename, sizeof(filename), "%s/client.conf", cg->cups_serverroot);
+  return (cupsFileOpen(filename, "r"));
+}
 
 
 /*
