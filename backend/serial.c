@@ -659,7 +659,7 @@ list_devices(void)
 #endif /* __hpux || __sgi || __sun || __FreeBSD__ || __OpenBSD__ */
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-  int	i;		/* Looping var */
+  int	i, j;		/* Looping vars */
   int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */
 
@@ -688,6 +688,21 @@ list_devices(void)
       close(fd);
       printf("serial serial:%s?baud=230400 \"Unknown\" \"USB Serial Port #%d\"\n",
              device, i + 1);
+    }
+  }
+
+  for (i = 0; i < 64; i ++)
+  {
+    for (j = 0; j < 8; j ++)
+    {
+      sprintf(device, "/dev/ttyQ%02de%d", i, j);
+      if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
+      {
+        close(fd);
+        printf("serial serial:%s?baud=115200 \"Unknown\" "
+	       "\"Equinox ESP %d Port #%d\"\n",
+               device, i, j + 1);
+      }
     }
   }
 #elif defined(__sgi)
