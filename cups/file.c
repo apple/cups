@@ -684,6 +684,9 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   http_addrlist_t *addrlist;		/* Host address list */
 
 
+  DEBUG_printf(("cupsFileOpen(filename=\"%s\", mode=\"%s\")\n", filename,
+                mode));
+
  /*
   * Range check input...
   */
@@ -773,6 +776,8 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
 {
   cups_file_t	*fp;			/* New CUPS file */
 
+
+  DEBUG_printf(("cupsFileOpenFd(fd=%d, mode=\"%s\")\n", fd, mode));
 
  /*
   * Range check input...
@@ -1161,7 +1166,19 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     return (-1);
 
   if (fp->pos == pos)
+  {
+   /*
+    * No seeking necessary...
+    */
+
+    if (fp->ptr)
+    {
+      fp->ptr = fp->buf;
+      fp->eof = 0;
+    }
+
     return (pos);
+  }
 
  /*
   * Figure out the number of bytes in the current buffer, and then
@@ -1223,7 +1240,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
 #endif /* HAVE_LIBZ */
     {
       fp->pos = lseek(fp->fd, pos, SEEK_SET);
-      DEBUG_printf(("    lseek() returned %ld...\n", (long)fp->pos));
+      DEBUG_printf(("    lseek() returned " CUPS_LLFMT "...\n", fp->pos));
       fp->ptr = NULL;
       fp->end = NULL;
     }
@@ -1404,8 +1421,9 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 
 
   DEBUG_printf(("cups_fill(fp=%p)\n", fp));
-  DEBUG_printf(("    fp->ptr=%p, fp->end=%p, fp->buf=%p, fp->pos=%ld\n",
-                fp->ptr, fp->end, fp->buf, (long)fp->pos));
+  DEBUG_printf(("    fp->ptr=%p, fp->end=%p, fp->buf=%p, "
+                "fp->pos=" CUPS_LLFMT ", fp->eof=%d\n",
+                fp->ptr, fp->end, fp->buf, fp->pos, fp->eof));
 
  /*
   * Update the "pos" element as needed...
@@ -1415,6 +1433,8 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
     fp->pos += fp->end - fp->buf;
 
 #ifdef HAVE_LIBZ
+  DEBUG_printf(("    fp->compressed=%d\n", fp->compressed));
+
   while (!fp->ptr || fp->compressed)
   {
    /*
@@ -1429,7 +1449,6 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       */
 
       fp->compressed = 0;
-      fp->pos        = 0;
 
      /*
       * Read the first bytes in the file to determine if we have a gzip'd
@@ -1441,6 +1460,9 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
        /*
 	* Can't read from file!
 	*/
+
+        DEBUG_printf(("    cups_read() returned " CUPS_LLFMT "!\n",
+	              CUPS_LLCAST bytes));
 
 	return (-1);
       }
@@ -1455,6 +1477,8 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 
 	fp->ptr = fp->buf;
 	fp->end = fp->buf + bytes;
+
+        DEBUG_printf(("    returning " CUPS_LLFMT "!\n", CUPS_LLCAST bytes));
 
 	return (bytes);
       }
