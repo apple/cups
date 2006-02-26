@@ -896,7 +896,8 @@ cgiSetIPPObjectVars(
 	    break;
 
 	case IPP_TAG_URI :
-	    if (strchr(attr->values[i].string.text, ':') != NULL)
+	    if (strchr(attr->values[i].string.text, ':') &&
+	        strcmp(name, "device_uri"))
 	    {
 	     /*
 	      * Rewrite URIs...
