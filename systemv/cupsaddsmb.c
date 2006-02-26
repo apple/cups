@@ -564,8 +564,8 @@ export_dest(const char *dest)		/* I - Destination to export */
   {
     _cupsLangPrintf(stderr,
                     _("cupsaddsmb: No PPD file for printer \"%s\" - "
-		      "skipping!\n"),
-        	    dest);
+		      "%s\n"),
+        	    dest, cupsLastErrorString());
     httpClose(http);
     return (0);
   }
