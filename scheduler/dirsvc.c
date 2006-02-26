@@ -686,8 +686,8 @@ cupsdSendBrowseList(void)
   * Compute the update and timeout times...
   */
 
-  ut = time(NULL) - BrowseInterval;
-  to = time(NULL) - BrowseTimeout;
+  to = time(NULL);
+  ut = to - BrowseInterval;
 
  /*
   * Figure out how many printers need an update...
@@ -784,7 +784,7 @@ cupsdSendBrowseList(void)
 
     if (p->type & CUPS_PRINTER_REMOTE)
     {
-      if (p->browse_time < to)
+      if (p->browse_expire < to)
       {
 	cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
                       "%s \'%s\' deleted by directory services (timeout).",
@@ -819,7 +819,6 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
   int			bytes;		/* Length of packet */
   char			packet[1453],	/* Browse data packet */
 			uri[1024],	/* Printer URI */
-			options[1024],	/* Browse local options */
 			location[1024],	/* printer-location */
 			info[1024],	/* printer-info */
 			make_model[1024];
@@ -838,15 +837,6 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 
   if (p == DefaultPrinter)
     type |= CUPS_PRINTER_DEFAULT;
-
- /*
-  * Initialize the browse options...
-  */
-
-  if (BrowseLocalOptions)
-    snprintf(options, sizeof(options), " ipp-options=%s", BrowseLocalOptions);
-  else
-    options[0] = '\0';
 
  /*
   * Remove quotes from printer-info, printer-location, and
@@ -894,8 +884,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
 			                                    "/printers/%s",
 			   p->name);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
-        	   type, p->state, uri, location, info, make_model, options);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+        	   type, p->state, uri, location, info, make_model,
+		   p->browse_attrs ? p->browse_attrs : "");
 
 	  bytes = strlen(packet);
 
@@ -934,8 +925,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
 			                                    "/printers/%s",
 			   p->name);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
-        	   type, p->state, uri, location, info, make_model, options);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+        	   type, p->state, uri, location, info, make_model,
+		   p->browse_attrs ? p->browse_attrs : "");
 
 	  bytes = strlen(packet);
 
@@ -958,8 +950,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
       * the default server name...
       */
 
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
-       	       type, p->state, p->uri, location, info, make_model, options);
+      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+       	       type, p->state, p->uri, location, info, make_model,
+	       p->browse_attrs ? p->browse_attrs : "");
 
       bytes = strlen(packet);
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -975,11 +968,12 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	*/
 
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdSendBrowseList: sendto failed for browser %d - %s.",
+	                "cupsdSendBrowseList: sendto failed for browser "
+			"%d - %s.",
 	                b - Browsers + 1, strerror(errno));
 
         if (i > 1)
-	  memcpy(b, b + 1, (i - 1) * sizeof(cupsd_dirsvc_addr_t));
+	  memmove(b, b + 1, (i - 1) * sizeof(cupsd_dirsvc_addr_t));
 
 	b --;
 	NumBrowsers --;
@@ -1953,7 +1947,6 @@ cupsdUpdateCUPSBrowse(void)
   process_browse_data(uri, host, resource, (cups_ptype_t)type,
                       (ipp_pstate_t)state, location, info, make_model,
 		      num_attrs, attrs);
-  cupsFreeOptions(num_attrs, attrs);
 }
 
 
@@ -2252,6 +2245,7 @@ process_browse_data(
     int		  num_attrs,		/* I - Number of attributes */
     cups_option_t *attrs)		/* I - Attributes */
 {
+  int		i;			/* Looping var */
   int		update;			/* Update printer attributes? */
   char		finaluri[HTTP_MAX_URI],	/* Final URI for printer */
 		name[IPP_MAX_NAME],	/* Name of printer */
@@ -2261,7 +2255,8 @@ process_browse_data(
   char		local_make_model[IPP_MAX_NAME];
 					/* Local make and model */
   cupsd_printer_t *p;			/* Printer information */
-  const char	*ipp_options;		/* ipp-options value */
+  const char	*ipp_options,		/* ipp-options value */
+		*lease_duration;	/* lease-duration value */
 
 
  /*
@@ -2576,6 +2571,23 @@ process_browse_data(
   p->state       = state;
   p->browse_time = time(NULL);
 
+  if ((lease_duration = cupsGetOption("lease-duration", num_attrs,
+                                      attrs)) != NULL)
+  {
+   /*
+    * Grab the lease-duration for the browse data; anything less then 1
+    * second or more than 1 week gets the default BrowseTimeout...
+    */
+
+    i = atoi(lease_duration);
+    if (i < 1 || i > 604800)
+      i = BrowseTimeout;
+
+    p->browse_expire = p->browse_time + i;
+  }
+  else
+    p->browse_expire = p->browse_time + BrowseTimeout;
+
   if (type & CUPS_PRINTER_REJECTING)
   {
     type &= ~CUPS_PRINTER_REJECTING;
@@ -2629,6 +2641,39 @@ process_browse_data(
     update = 1;
   }
 
+  if (p->num_options)
+  {
+    if (!update && !(type & CUPS_PRINTER_DELETE))
+    {
+     /*
+      * See if we need to update the attributes...
+      */
+
+      if (p->num_options != num_attrs)
+	update = 1;
+      else
+      {
+	for (i = 0; i < num_attrs; i ++)
+          if (strcmp(attrs[i].name, p->options[i].name) ||
+	      (!attrs[i].value != !p->options[i].value) ||
+	      (attrs[i].value && strcmp(attrs[i].value, p->options[i].value)))
+          {
+	    update = 1;
+	    break;
+          }
+      }
+    }
+
+   /*
+    * Free the old options...
+    */
+
+    cupsFreeOptions(p->num_options, p->options);
+  }
+
+  p->num_options = num_attrs;
+  p->options     = attrs;
+
   if (type & CUPS_PRINTER_DELETE)
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
@@ -2647,8 +2692,8 @@ process_browse_data(
   }
 
  /*
-  * See if we have a default printer...  If not, make the first printer the
-  * default.
+  * See if we have a default printer...  If not, make the first network
+  * default printer the default.
   */
 
   if (DefaultPrinter == NULL && Printers != NULL && UseNetworkDefault)

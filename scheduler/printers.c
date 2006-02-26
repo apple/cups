@@ -722,7 +722,9 @@ cupsdDeletePrinter(
   cupsdClearString(&p->port_monitor);
   cupsdClearString(&p->op_policy);
   cupsdClearString(&p->error_policy);
-  cupsdClearString(&p->browse_attrs);
+
+  if (p->browse_attrs)
+    free(p->browse_attrs);
 
 #ifdef __APPLE__
   cupsdClearString(&p->recoverable);
@@ -1437,9 +1439,10 @@ cupsdSaveAllPrinters(void)
 void
 cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 {
+  int		i,			/* Looping var */
+		length;			/* Length of browse attributes */
   char		uri[HTTP_MAX_URI];	/* URI for printer */
   char		resource[HTTP_MAX_URI];	/* Resource portion of URI */
-  int		i;			/* Looping var */
   char		filename[1024];		/* Name of PPD file */
   int		num_media;		/* Number of media options */
   cupsd_location_t *auth;		/* Pointer to authentication element */
@@ -1457,6 +1460,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   ipp_value_t	*val;			/* Attribute value */
   int		num_finishings;		/* Number of finishings */
   ipp_finish_t	finishings[5];		/* finishings-supported values */
+  cups_option_t	*option;		/* Current printer option */
   static const char * const sides[3] =	/* sides-supported values */
 		{
 		  "one-sided",
@@ -2044,6 +2048,99 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                      "finishings-supported", num_finishings, (int *)finishings);
       ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                     "finishings-default", IPP_FINISHINGS_NONE);
+    }
+  }
+
+ /*
+  * Copy the printer options into a browse attributes string we can re-use.
+  */
+
+  if (!(p->type & CUPS_PRINTER_REMOTE))
+  {
+    const char	*valptr;		/* Pointer into value */
+    char	*attrptr;		/* Pointer into attribute string */
+
+
+   /*
+    * Free the old browse attributes as needed...
+    */
+
+    if (p->browse_attrs)
+      free(p->browse_attrs);
+
+   /*
+    * Compute the length of all attributes + job-sheets, lease-duration,
+    * and BrowseLocalOptions.
+    */
+
+    for (length = 1, i = p->num_options, option = p->options;
+         i > 0;
+	 i --, option ++)
+    {
+      length += strlen(option->name) + 2;
+
+      if (option->value)
+      {
+        for (valptr = option->value; *valptr; valptr ++)
+	  if (strchr(" \"\'\\", *valptr))
+	    length += 2;
+	  else
+	    length ++;
+      }
+    }
+
+    length += 13 + strlen(p->job_sheets[0]) + strlen(p->job_sheets[1]);
+    length += 32;
+    if (BrowseLocalOptions)
+      length += 12 + strlen(BrowseLocalOptions); 
+
+   /*
+    * Allocate the new string...
+    */
+ 
+    if ((p->browse_attrs = calloc(1, length)) == NULL)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to allocate %d bytes for browse data!",
+		      length);
+    else
+    {
+     /*
+      * Got the allocated string, now copy the options and attributes over...
+      */
+
+      sprintf(p->browse_attrs, "job-sheets=%s,%s lease-duration=%d",
+              p->job_sheets[0], p->job_sheets[1], BrowseTimeout);
+      attrptr = p->browse_attrs + strlen(p->browse_attrs);
+
+      if (BrowseLocalOptions)
+      {
+        sprintf(attrptr, " ipp-options=%s", BrowseLocalOptions);
+        attrptr += strlen(attrptr);
+      }
+
+      for (i = p->num_options, option = p->options;
+           i > 0;
+	   i --, option ++)
+      {
+        *attrptr++ = ' ';
+	strcpy(attrptr, option->name);
+	attrptr += strlen(attrptr);
+
+	if (option->value)
+	{
+	  *attrptr++ = '=';
+
+          for (valptr = option->value; *valptr; valptr ++)
+	  {
+	    if (strchr(" \"\'\\", *valptr))
+	      *attrptr++ = '\\';
+
+	    *attrptr++ = *valptr;
+	  }
+	}
+      }
+
+      *attrptr = '\0';
     }
   }
 
@@ -2680,8 +2777,13 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
        i > 0;
        i --, option ++)
   {
-    snprintf(name, sizeof(name), "%s-default", option->name);
-    num_options = cupsAddOption(name, option->value, num_options, &options);
+    if (strcmp(option->name, "ipp-options") &&
+	strcmp(option->name, "job-sheets") &&
+        strcmp(option->name, "lease-duration"))
+    {
+      snprintf(name, sizeof(name), "%s-default", option->name);
+      num_options = cupsAddOption(name, option->value, num_options, &options);
+    }
   }
 
  /*

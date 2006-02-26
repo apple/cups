@@ -60,6 +60,8 @@ typedef struct cupsd_printer_s
   time_t	state_time;		/* Time at this state */
   char		*job_sheets[2];		/* Banners/job sheets */
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
+  char		*browse_attrs;		/* Attributes sent with browse data */
+  time_t	browse_expire;		/* Expiration time for printer */
   time_t	browse_time;		/* Last time update was sent/received */
   char		*device_uri;		/* Device URI */
   char		*port_monitor;		/* Port monitor */
@@ -82,7 +84,6 @@ typedef struct cupsd_printer_s
   int		sequence_number;	/* Increasing sequence number */
   int		num_options;		/* Number of default options */
   cups_option_t	*options;		/* Default options */
-  char		*browse_attrs;		/* Attributes sent with browse data */
 #ifdef __APPLE__
   char		*recoverable;		/* com.apple.print.recoverable-message */
 #endif /* __APPLE__ */

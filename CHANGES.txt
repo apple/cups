@@ -1,8 +1,11 @@
-CHANGES.txt - 02/24/2006
+CHANGES.txt - 02/25/2006
 ------------------------
 
 CHANGES IN CUPS V1.2.0b1
 
+	- The CUPS browse protocol now supports passing of
+	  default options and browse timeout values from the
+	  server to the clients (STR #800)
 	- Implicit classes that timed out could cause the
 	  scheduler to crash (STR #1439)
 	- Added DragonFly support in local device backends (STR
