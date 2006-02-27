@@ -156,7 +156,7 @@ print_synopsis(void)
  * 'print_utf8()' - Print UTF-8 string with (optional) message.
  */
 
-void
+static void
 print_utf8(const char	     *msg,	/* I - Message String */
 	   const cups_utf8_t *src)	/* I - UTF-8 Source String */
 {
@@ -174,7 +174,7 @@ print_utf8(const char	     *msg,	/* I - Message String */
  * 'print_utf16()' - Print UTF-16 string with (optional) message.
  */
 
-void
+static void
 print_utf16(const char	       *msg,	/* I - Message String */
 	    const cups_utf16_t *src)	/* I - UTF-16 Source String */
 {
@@ -191,7 +191,7 @@ print_utf16(const char	       *msg,	/* I - Message String */
  * 'print_utf32()' - Print UTF-32 string with (optional) message.
  */
 
-void
+static void
 print_utf32(const char	       *msg,	/* I - Message String */
 	    const cups_utf32_t *src)	/* I - UTF-32 Source String */
 {
