@@ -2070,7 +2070,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
           }
 	  _cupsLangPuts(stdout, _("\tOn fault: no alert\n"));
 	  _cupsLangPuts(stdout, _("\tAfter fault: continue\n"));
-	      // TODO update to use printer-error-policy
+	      /* TODO update to use printer-error-policy */
           if (allowed)
 	  {
 	    _cupsLangPuts(stdout, _("\tUsers allowed:\n"));
@@ -2183,7 +2183,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
               }
 	      _cupsLangPuts(stdout, _("\tOn fault: no alert\n"));
 	      _cupsLangPuts(stdout, _("\tAfter fault: continue\n"));
-		  // TODO update to use printer-error-policy
+		  /* TODO update to use printer-error-policy */
               if (allowed)
 	      {
 		_cupsLangPuts(stdout, _("\tUsers allowed:\n"));
