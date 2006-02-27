@@ -76,9 +76,9 @@ get_device_id(
 #ifdef __linux
   int	length;				/* Length of device ID info */
 #endif /* __linux */
-#ifdef __sun
+#if defined(__sun) && defined(ECPPIOC_GETDEVID)
   struct ecpp_device_id did;		/* Device ID buffer */
-#endif /* __sun */
+#endif /* __sun && ECPPIOC_GETDEVID */
 
   DEBUG_printf(("get_device_id(fd=%d, device_id=%p, device_id_size=%d, "
                 "make_model=%p, make_model_size=%d, scheme=\"%s\", "

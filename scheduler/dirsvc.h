@@ -32,6 +32,9 @@
 #endif /* HAVE_LIBSLP */
 
 #ifdef HAVE_OPENLDAP
+#  ifdef __sun
+#    include <lber.h>
+#  endif /* __sun */
 #  include <ldap.h>
 #endif /* HAVE_OPENLDAP */
 
