@@ -116,7 +116,7 @@ typedef struct cupsd_authdata_s		/**** Authentication data ****/
  */
 
 #if defined(__hpux) && defined(HAVE_LIBPAM)
-static cupsd_authdata_t	*auth_datat;	/* Current client being authenticated */
+static cupsd_authdata_t	*auth_data;	/* Current client being authenticated */
 #endif /* __hpux && HAVE_LIBPAM */
 
 

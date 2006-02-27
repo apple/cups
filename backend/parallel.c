@@ -40,8 +40,13 @@
 #include <errno.h>
 #include <cups/string.h>
 #include <signal.h>
-#include <sys/select.h>
 #include "ieee1284.c"
+
+#ifdef __hpux
+#  include <sys/time.h>
+#else
+#  include <sys/select.h>
+#endif /* __hpux */
 
 #ifdef WIN32
 #  include <io.h>

@@ -51,7 +51,11 @@
 #  include <unistd.h>
 #  include <fcntl.h>
 #  include <termios.h>
-#  include <sys/select.h>
+#  ifdef __hpux
+#    include <sys/time.h>
+#  else
+#    include <sys/select.h>
+#  endif /* __hpux */
 #  ifdef HAVE_SYS_IOCTL_H
 #    include <sys/ioctl.h>
 #  endif /* HAVE_SYS_IOCTL_H */

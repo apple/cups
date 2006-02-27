@@ -39,7 +39,9 @@
 #include "string.h"
 #include "file.h"
 #include "debug.h"
-#include <zlib.h>
+#ifdef HAVE_LIBZ
+#  include <zlib.h>
+#endif /* HAVE_LIBZ */
 
 
 /*

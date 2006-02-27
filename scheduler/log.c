@@ -36,10 +36,7 @@
 
 #include "cupsd.h"
 #include <stdarg.h>
-
-#ifdef HAVE_VSYSLOG
-#  include <syslog.h>
-#endif /* HAVE_VSYSLOG */
+#include <syslog.h>
 
 
 /*

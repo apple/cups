@@ -37,6 +37,10 @@
 #include <cups/array.h>
 #include <cups/dir.h>
 
+#ifdef __hpux
+#  define seteuid(uid) setresuid(-1, (uid), -1)
+#endif /* __hpux */
+
 
 /*
  * Device information structure...
