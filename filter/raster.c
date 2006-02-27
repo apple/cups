@@ -36,11 +36,15 @@
  *
  *   cupsRasterClose()        - Close a raster stream.
  *   cupsRasterOpen()         - Open a raster stream.
- *   cupsRasterReadHeader()   - Read a V1 raster page header.
- *   cupsRasterReadHeader2()  - Read a V2 raster page header.
+ *   cupsRasterReadHeader()   - Read a raster page header and store it in a
+ *                              V1 page header structure.
+ *   cupsRasterReadHeader2()  - Read a raster page header and store it in a
+ *                              V2 page header structure.
  *   cupsRasterReadPixels()   - Read raster pixels.
- *   cupsRasterWriteHeader()  - Write a V1 raster page header.
- *   cupsRasterWriteHeader2() - Write a V2 raster page header.
+ *   cupsRasterWriteHeader()  - Write a raster page header from a V1 page
+ *                              header structure.
+ *   cupsRasterWriteHeader2() - Write a raster page header from a V2 page
+ *                              header structure.
  *   cupsRasterWritePixels()  - Write raster pixels.
  *   cups_raster_update()     - Update the raster header and row count for the
  *                              current page.
@@ -153,7 +157,8 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
 
 
 /*
- * 'cupsRasterReadHeader()' - Read a V1 raster page header.
+ * 'cupsRasterReadHeader()' - Read a raster page header and store it in a
+ *                            V1 page header structure.
  */
 
 unsigned				/* O - 1 on success, 0 on fail */
@@ -179,7 +184,8 @@ cupsRasterReadHeader(
 
 
 /*
- * 'cupsRasterReadHeader2()' - Read a V2 raster page header.
+ * 'cupsRasterReadHeader2()' - Read a raster page header and store it in a
+ *                             V2 page header structure.
  *
  * @since CUPS 1.2@
  */
@@ -395,7 +401,8 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 
 
 /*
- * 'cupsRasterWriteHeader()' - Write a V2 raster page header.
+ * 'cupsRasterWriteHeader()' - Write a raster page header from a V1 page
+ *                             header structure.
  */
  
 unsigned				/* O - 1 on success, 0 on failure */
@@ -426,7 +433,8 @@ cupsRasterWriteHeader(
 
 
 /*
- * 'cupsRasterWriteHeader2()' - Write a V2 raster page header.
+ * 'cupsRasterWriteHeader2()' - Write a raster page header from a V2 page
+ *                              header structure.
  *
  * @since CUPS 1.2@
  */

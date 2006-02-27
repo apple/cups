@@ -104,6 +104,17 @@ installhdrs:
 
 
 #
+# Automatic API help files...
+#
+
+apihelp:
+	echo Generating CUPS API help files...
+	mxmldoc --section "Programming" --title "Raster API" \
+		--intro api-raster.shtml \
+		raster.h interpret.c raster.c >../doc/help/api-raster.html
+
+
+#
 # formtops
 #
 

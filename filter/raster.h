@@ -290,7 +290,7 @@ typedef struct cups_page_header2_s	/**** Version 2 Page Header @since CUPS 1.2@ 
   /**** Version 2 Dictionary Values ****/
   unsigned	cupsNumColors;		/* Number of colors @since CUPS 1.2@ */
   float		cupsBorderlessScalingFactor;
-					/* Scaling that was applied to page data */
+					/* Scaling that was applied to page data @since CUPS 1.2@ */
   float		cupsPageSize[2];	/* Floating point PageSize (scaling *
   					 * factor not applied) @since CUPS 1.2@ */
   float		cupsImagingBBox[4];	/* Floating point ImagingBoundingBox *

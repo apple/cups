@@ -106,6 +106,7 @@ HELPFILES	=	\
 			help/api-filter.html \
 			help/api-httpipp.html \
 			help/api-ppd.html \
+			help/api-raster.html \
 			help/classes-conf-reference.html \
 			help/client-conf-reference.html \
 			help/cupsd-conf-reference.html \
