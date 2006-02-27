@@ -3,7 +3,7 @@
  *
  *   cupsImage zoom routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -25,13 +25,13 @@
  *
  * Contents:
  *
- *   cupsImageZoomDelete() - Free a zoom record...
- *   cupsImageZoomFill()   - Fill a zoom record...
- *   cupsImageZoomNew()    - Allocate a pixel zoom record...
- *   zoom_bilinear()       - Fill a zoom record with image data utilizing
- *                           bilinear interpolation.
- *   zoom_nearest()        - Fill a zoom record quickly using nearest-neighbor
- *                           sampling.
+ *   _cupsImageZoomDelete() - Free a zoom record...
+ *   _cupsImageZoomFill()   - Fill a zoom record...
+ *   _cupsImageZoomNew()    - Allocate a pixel zoom record...
+ *   zoom_bilinear()        - Fill a zoom record with image data utilizing
+ *                            bilinear interpolation.
+ *   zoom_nearest()         - Fill a zoom record quickly using nearest-neighbor
+ *                            sampling.
  */
 
 /*
@@ -50,11 +50,11 @@ static void	zoom_nearest(cups_izoom_t *z, int iy);
 
 
 /*
- * 'cupsImageZoomDelete()' - Free a zoom record...
+ * '_cupsImageZoomDelete()' - Free a zoom record...
  */
 
 void
-cupsImageZoomDelete(cups_izoom_t *z)	/* I - Zoom record to free */
+_cupsImageZoomDelete(cups_izoom_t *z)	/* I - Zoom record to free */
 {
   free(z->rows[0]);
   free(z->rows[1]);
@@ -64,13 +64,13 @@ cupsImageZoomDelete(cups_izoom_t *z)	/* I - Zoom record to free */
 
 
 /*
- * 'cupsImageZoomFill()' - Fill a zoom record with image data utilizing bilinear
+ * '_cupsImageZoomFill()' - Fill a zoom record with image data utilizing bilinear
  *                         interpolation.
  */
 
 void
-cupsImageZoomFill(cups_izoom_t *z,	/* I - Zoom record to fill */
-              int     iy)	/* I - Zoom image row */
+_cupsImageZoomFill(cups_izoom_t *z,	/* I - Zoom record to fill */
+                   int     iy)		/* I - Zoom image row */
 {
   switch (z->type)
   {
@@ -86,11 +86,11 @@ cupsImageZoomFill(cups_izoom_t *z,	/* I - Zoom record to fill */
 
 
 /*
- * 'cupsImageZoomNew()' - Allocate a pixel zoom record...
+ * '_cupsImageZoomNew()' - Allocate a pixel zoom record...
  */
 
 cups_izoom_t *
-cupsImageZoomNew(
+_cupsImageZoomNew(
     cups_image_t  *img,			/* I - cupsImage to zoom */
     int           xc0,			/* I - Upper-lefthand corner */
     int           yc0,			/* I - ... */

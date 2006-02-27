@@ -1286,10 +1286,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  */
 
           if (Flip)
-	    z = cupsImageZoomNew(img, xc0, yc0, xc1, yc1, -xtemp, ytemp,
+	    z = _cupsImageZoomNew(img, xc0, yc0, xc1, yc1, -xtemp, ytemp,
 	                         Orientation & 1, zoom_type);
           else
-	    z = cupsImageZoomNew(img, xc0, yc0, xc1, yc1, xtemp, ytemp,
+	    z = _cupsImageZoomNew(img, xc0, yc0, xc1, yc1, xtemp, ytemp,
 	                         Orientation & 1, zoom_type);
 
          /*
@@ -1327,9 +1327,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (iy != last_iy)
 	    {
 	      if (zoom_type != CUPS_IZOOM_FAST && (iy - last_iy) > 1)
-        	cupsImageZoomFill(z, iy);
+        	_cupsImageZoomFill(z, iy);
 
-              cupsImageZoomFill(z, iy + z->yincr);
+              _cupsImageZoomFill(z, iy + z->yincr);
 
               last_iy = iy;
 	    }
@@ -1449,7 +1449,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  * Free memory used for the "zoom" engine...
 	  */
 
-          cupsImageZoomDelete(z);
+          _cupsImageZoomDelete(z);
         }
       }
 

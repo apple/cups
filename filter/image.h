@@ -3,7 +3,7 @@
  *
  *   Image library definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -51,13 +51,6 @@ typedef enum cups_icspace_e		/**** Image colorspaces ****/
   CUPS_IMAGE_RGB = 3,			/* Red, green, and blue */
   CUPS_IMAGE_RGB_CMYK = 4		/* Use RGB or CMYK */
 } cups_icspace_t;
-
-typedef enum cups_iztype_e		/**** Image zoom type ****/
-{
-  CUPS_IZOOM_FAST,			/* Use nearest-neighbor sampling */
-  CUPS_IZOOM_NORMAL,			/* Use bilinear interpolation */
-  CUPS_IZOOM_BEST			/* Use bicubic interpolation */
-} cups_iztype_t;
 
 
 /*
@@ -133,11 +126,6 @@ extern void		cupsImageWhiteToRGB(const cups_ib_t *in,
 			                    cups_ib_t *out, int count);
 extern void		cupsImageWhiteToWhite(const cups_ib_t *in,
 			                      cups_ib_t *out, int count);
-extern void		cupsImageZoomDelete(cups_izoom_t *z);
-extern void		cupsImageZoomFill(cups_izoom_t *z, int iy);
-extern cups_izoom_t	*cupsImageZoomNew(cups_image_t *img, int x0, int y0,
-			                  int x1, int y1, int xsize, int ysize,
-					  int rotated, cups_iztype_t type);
 
 
 #  ifdef __cplusplus

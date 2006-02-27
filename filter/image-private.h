@@ -4,7 +4,7 @@
  *   Private image library definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -74,6 +74,13 @@
 /*
  * Types and structures...
  */
+
+typedef enum cups_iztype_e		/**** Image zoom type ****/
+{
+  CUPS_IZOOM_FAST,			/* Use nearest-neighbor sampling */
+  CUPS_IZOOM_NORMAL,			/* Use bilinear interpolation */
+  CUPS_IZOOM_BEST			/* Use bicubic interpolation */
+} cups_iztype_t;
 
 struct cups_ic_s;
 
@@ -199,6 +206,12 @@ extern int		_cupsImageReadTIFF(cups_image_t *img, FILE *fp,
 					   cups_icspace_t secondary,
 			                   int saturation, int hue,
 					   const cups_ib_t *lut);
+extern void		_cupsImageZoomDelete(cups_izoom_t *z);
+extern void		_cupsImageZoomFill(cups_izoom_t *z, int iy);
+extern cups_izoom_t	*_cupsImageZoomNew(cups_image_t *img, int xc0, int yc0,
+			                   int xc1, int yc1, int xsize,
+					   int ysize, int rotated,
+					   cups_iztype_t type);
 
 
 #endif /* !_CUPS_IMAGE_PRIVATE_H_ */
