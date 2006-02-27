@@ -294,8 +294,6 @@ d 0755 root $CUPS_GROUP $STATEDIR -
 d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 
 # Data files
-f 0644 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
-
 %subpackage ja
 f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
 %subpackage

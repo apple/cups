@@ -240,7 +240,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/whatsnew.html
 %dir /usr/share/doc/cups/images
 /usr/share/doc/cups/images/*
-/usr/share/locale/fr/cups_fr.po
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz

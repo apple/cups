@@ -28,7 +28,7 @@ include ../Makedefs
 # Locales...
 #
 
-LOCALES	=	fr ja
+LOCALES	=	ja
 
 
 #
