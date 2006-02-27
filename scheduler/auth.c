@@ -1,4 +1,4 @@
-;/*
+/*
  * "$Id$"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
