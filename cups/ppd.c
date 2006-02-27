@@ -262,8 +262,6 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
         case PPD_CUSTOM_PASSWORD :
         case PPD_CUSTOM_STRING :
             ppd_free(cparam->current.custom_string);
-            ppd_free(cparam->minimum.custom_string);
-            ppd_free(cparam->maximum.custom_string);
 	    break;
 
 	default :
@@ -832,17 +830,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd->fonts[ppd->num_fonts] = strdup(name);
       ppd->num_fonts ++;
     }
-#if 0
-    else if (!strcmp(keyword, "ParamCustomPageSize"))
-    {
-      if (!strcmp(name, "Width"))
-        sscanf(string, "%*s%*s%f%f", ppd->custom_min + 0,
-	       ppd->custom_max + 0);
-      else if (!strcmp(name, "Height"))
-        sscanf(string, "%*s%*s%f%f", ppd->custom_min + 1,
-	       ppd->custom_max + 1);
-    }
-#endif /* 0 */
     else if (!strncmp(keyword, "ParamCustom", 11))
     {
       ppd_coption_t	*coption;	/* Custom option */
@@ -906,14 +893,14 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       else if (!strcmp(ctype, "passcode"))
       {
         cparam->type = PPD_CUSTOM_PASSCODE;
-	cparam->minimum.custom_passcode = strdup(cminimum);
-	cparam->maximum.custom_passcode = strdup(cmaximum);
+	cparam->minimum.custom_passcode = atoi(cminimum);
+	cparam->maximum.custom_passcode = atoi(cmaximum);
       }
       else if (!strcmp(ctype, "password"))
       {
         cparam->type = PPD_CUSTOM_PASSWORD;
-	cparam->minimum.custom_password = strdup(cminimum);
-	cparam->maximum.custom_password = strdup(cmaximum);
+	cparam->minimum.custom_password = atoi(cminimum);
+	cparam->maximum.custom_password = atoi(cmaximum);
       }
       else if (!strcmp(ctype, "points"))
       {
@@ -930,8 +917,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       else if (!strcmp(ctype, "string"))
       {
         cparam->type = PPD_CUSTOM_STRING;
-	cparam->minimum.custom_string = strdup(cminimum);
-	cparam->maximum.custom_string = strdup(cmaximum);
+	cparam->minimum.custom_string = atoi(cminimum);
+	cparam->maximum.custom_string = atoi(cmaximum);
       }
       else
       {

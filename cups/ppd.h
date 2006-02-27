@@ -232,6 +232,18 @@ typedef enum ppd_cptype_e		/**** Custom Parameter Type @since CUPS 1.2@ ****/
   PPD_CUSTOM_STRING			/* String of characters */
 } ppd_cptype_t;
 
+typedef union ppd_cplimit_u		/**** Custom Parameter Limit @since CUPS 1.2@ ****/
+{
+  float		custom_curve;		/* Gamma value */
+  int		custom_int;		/* Integer value */
+  float		custom_invcurve;	/* Gamma value */
+  int		custom_passcode;	/* Passcode length */
+  int		custom_password;	/* Password length */
+  float		custom_points;		/* Measurement value */
+  float		custom_real;		/* Real value */
+  int		custom_string;		/* String length */
+} ppd_cplimit_t;
+
 typedef union ppd_cpvalue_u		/**** Custom Parameter Value @since CUPS 1.2@ ****/
 {
   float		custom_curve;		/* Gamma value */
@@ -250,9 +262,9 @@ typedef struct ppd_cparam_s		/**** Custom Parameter @since CUPS 1.2@ ****/
   char		text[PPD_MAX_TEXT];	/* Human-readable text */
   int		order;			/* Order (0 to N) */
   ppd_cptype_t	type;			/* Parameter type */
-  ppd_cpvalue_t	minimum,		/* Minimum value */
-		maximum,		/* Maximum value */
-		current;		/* Current value */
+  ppd_cplimit_t	minimum,		/* Minimum value */
+		maximum;		/* Maximum value */
+  ppd_cpvalue_t	current;		/* Current value */
 } ppd_cparam_t;
 
 typedef struct ppd_coption_s		/**** Custom Option @since CUPS 1.2@ ****/

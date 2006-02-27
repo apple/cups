@@ -3,7 +3,7 @@
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2006 by Easy Software Products.
+#   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -117,6 +117,7 @@ HELPFILES	=	\
 			help/man-backend.html \
 			help/man-cancel.html \
 			help/man-classes.conf.html \
+			help/man-client.conf.html \
 			help/man-cupsaddsmb.html \
 			help/man-cups-config.html \
 			help/man-cupsd.html \

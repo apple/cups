@@ -43,7 +43,7 @@
  * Include necessary headers...
  */
 
-#include "ppd.h"
+#include "cups.h"
 #include "string.h"
 #include "debug.h"
 
@@ -355,7 +355,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
     return (0);
 
 
-  if (!strncasecmp(choice, "Custom.", 7) /* TODO || strchr(choice, '=') */ )
+  if (!strncasecmp(choice, "Custom.", 7))
   {
    /*
     * Handle a custom option...
@@ -381,13 +381,6 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
       ppd_coption_t	*coption;	/* Custom option */
       ppd_cparam_t	*cparam;	/* Custom parameter */
       char		units[33];	/* Custom points units */
-
-
-     /*
-      * TODO: Detect and support custom option values using the
-      * collection format "{Name1=foo Name2=bar}".  For now, just
-      * support Custom.value for single-valued custom options.
-      */
 
       if ((coption = ppdFindCustomOption(ppd, option)) != NULL)
       {
@@ -433,6 +426,75 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	      break;
 	}
       }
+    }
+  }
+  else if (choice[0] == '{')
+  {
+   /*
+    * Handle multi-value custom options...
+    */
+
+    ppd_coption_t	*coption;	/* Custom option */
+    ppd_cparam_t	*cparam;	/* Custom parameter */
+    char		units[33];	/* Custom points units */
+    int			num_vals;	/* Number of values */
+    cups_option_t	*vals,		/* Values */
+			*val;		/* Value */
+
+
+    if ((c = ppdFindChoice(o, "Custom")) == NULL)
+      return (0);
+
+    if ((coption = ppdFindCustomOption(ppd, option)) != NULL)
+    {
+      num_vals = cupsParseOptions(choice + 1, 0, &vals);
+
+      for (i = 0, val = vals; i < num_vals; i ++, val ++)
+      {
+        if ((cparam = ppdFindCustomParam(coption, val->name)) == NULL)
+	  continue;
+
+	switch (cparam->type)
+	{
+	  case PPD_CUSTOM_CURVE :
+	  case PPD_CUSTOM_INVCURVE :
+	  case PPD_CUSTOM_REAL :
+	      cparam->current.custom_real = atof(val->value);
+	      break;
+
+	  case PPD_CUSTOM_POINTS :
+	      if (sscanf(val->value, "%f%s", &(cparam->current.custom_points),
+	        	 units) < 2)
+		strcpy(units, "pt");
+
+              if (!strcasecmp(units, "cm"))
+		cparam->current.custom_points *= 72.0 / 2.54;	      
+              else if (!strcasecmp(units, "mm"))
+		cparam->current.custom_points *= 72.0 / 25.4;	      
+              else if (!strcasecmp(units, "m"))
+		cparam->current.custom_points *= 72.0 / 0.0254;	      
+              else if (!strcasecmp(units, "in"))
+		cparam->current.custom_points *= 72.0;	      
+              else if (!strcasecmp(units, "ft"))
+		cparam->current.custom_points *= 12 * 72.0;	      
+	      break;
+
+	  case PPD_CUSTOM_INT :
+	      cparam->current.custom_int = atoi(val->value);
+	      break;
+
+	  case PPD_CUSTOM_PASSCODE :
+	  case PPD_CUSTOM_PASSWORD :
+	  case PPD_CUSTOM_STRING :
+	      if (cparam->current.custom_string)
+		free(cparam->current.custom_string);
+
+	      cparam->current.custom_string = strdup(val->value);
+	      break;
+	}
+      }
+
+      cupsFreeOptions(num_vals, vals);
     }
   }
   else
