@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-02-26 15:35-0500\n"
+"POT-Creation-Date: 2006-02-26 20:42-0500\n"
 "PO-Revision-Date: 2006-02-17 11:17+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
@@ -1179,6 +1179,7 @@ msgstr ""
 "    適合テスト結果詳細\n"
 
 #: systemv/cupstestppd.c:307 systemv/cupstestppd.c:326
+#: systemv/cupstestppd.c:325
 #, c-format
 msgid "        WARN    %s has no corresponding options!\n"
 msgstr "        警告    %s は相当するオプションがありません!\n"
@@ -1213,11 +1214,30 @@ msgstr "        警告    %s は相当するオプションがありません!\n
 #: systemv/cupstestppd.c:800 systemv/cupstestppd.c:820
 #: systemv/cupstestppd.c:851 systemv/cupstestppd.c:873
 #: systemv/cupstestppd.c:921 systemv/cupstestppd.c:950
-#: systemv/cupstestppd.c:971
+#: systemv/cupstestppd.c:971 systemv/cupstestppd.c:343
+#: systemv/cupstestppd.c:361 systemv/cupstestppd.c:376
+#: systemv/cupstestppd.c:412 systemv/cupstestppd.c:440
+#: systemv/cupstestppd.c:460 systemv/cupstestppd.c:482
+#: systemv/cupstestppd.c:502 systemv/cupstestppd.c:522
+#: systemv/cupstestppd.c:542 systemv/cupstestppd.c:560
+#: systemv/cupstestppd.c:578 systemv/cupstestppd.c:599
+#: systemv/cupstestppd.c:618 systemv/cupstestppd.c:638
+#: systemv/cupstestppd.c:658 systemv/cupstestppd.c:678
+#: systemv/cupstestppd.c:698 systemv/cupstestppd.c:716
+#: systemv/cupstestppd.c:733 systemv/cupstestppd.c:755
+#: systemv/cupstestppd.c:773 systemv/cupstestppd.c:790
+#: systemv/cupstestppd.c:808 systemv/cupstestppd.c:824
+#: systemv/cupstestppd.c:844 systemv/cupstestppd.c:875
+#: systemv/cupstestppd.c:897 systemv/cupstestppd.c:945
+#: systemv/cupstestppd.c:974 systemv/cupstestppd.c:995
+#: systemv/cupstestppd.c:1050 systemv/cupstestppd.c:1075
+#: systemv/cupstestppd.c:1095 systemv/cupstestppd.c:1116
+#: systemv/cupstestppd.c:1138 systemv/cupstestppd.c:1172
 msgid " FAIL\n"
 msgstr " 失敗\n"
 
 #: systemv/cupstestppd.c:321 systemv/cupstestppd.c:340
+#: systemv/cupstestppd.c:364
 msgid ""
 "      **FAIL**  REQUIRED DefaultImageableArea\n"
 "                REF: Page 102, section 5.15.\n"
@@ -1226,6 +1246,7 @@ msgstr ""
 "                REF: 102 ページ、セクション 5.15。\n"
 
 #: systemv/cupstestppd.c:336 systemv/cupstestppd.c:355
+#: systemv/cupstestppd.c:379
 #, c-format
 msgid ""
 "      **FAIL**  BAD DefaultImageableArea %s!\n"
@@ -1235,10 +1256,12 @@ msgstr ""
 "                REF: 102 ページ、セクション 5.15。\n"
 
 #: systemv/cupstestppd.c:346 systemv/cupstestppd.c:365
+#: systemv/cupstestppd.c:389
 msgid "        PASS    DefaultImageableArea\n"
 msgstr "        合格    DefaultImageableArea\n"
 
 #: systemv/cupstestppd.c:357 systemv/cupstestppd.c:376
+#: systemv/cupstestppd.c:400
 msgid ""
 "      **FAIL**  REQUIRED DefaultPaperDimension\n"
 "                REF: Page 103, section 5.15.\n"
@@ -1247,6 +1270,7 @@ msgstr ""
 "                REF: 103 ページ、セクション 5.15。\n"
 
 #: systemv/cupstestppd.c:372 systemv/cupstestppd.c:391
+#: systemv/cupstestppd.c:415
 #, c-format
 msgid ""
 "      **FAIL**  BAD DefaultPaperDimension %s!\n"
@@ -1256,10 +1280,12 @@ msgstr ""
 "                REF: 103 ページ、セクション 5.15。\n"
 
 #: systemv/cupstestppd.c:380 systemv/cupstestppd.c:399
+#: systemv/cupstestppd.c:423
 msgid "        PASS    DefaultPaperDimension\n"
 msgstr "        合格    DefaultPaperDimension\n"
 
 #: systemv/cupstestppd.c:400 systemv/cupstestppd.c:419
+#: systemv/cupstestppd.c:443
 #, c-format
 msgid ""
 "      **FAIL**  BAD Default%s %s\n"
@@ -1269,11 +1295,13 @@ msgstr ""
 "                REF: 40 ページ、セクション 4.5。\n"
 
 #: systemv/cupstestppd.c:409 systemv/cupstestppd.c:428
+#: systemv/cupstestppd.c:452
 #, c-format
 msgid "        PASS    Default%s\n"
 msgstr "        合格    Default%s\n"
 
 #: systemv/cupstestppd.c:420 systemv/cupstestppd.c:439
+#: systemv/cupstestppd.c:463
 #, c-format
 msgid ""
 "      **FAIL**  REQUIRED Default%s\n"
@@ -1283,10 +1311,12 @@ msgstr ""
 "                REF: 40 ページ、セクション 4.5。\n"
 
 #: systemv/cupstestppd.c:432 systemv/cupstestppd.c:451
+#: systemv/cupstestppd.c:475
 msgid "        PASS    FileVersion\n"
 msgstr "        合格    FileVersion\n"
 
 #: systemv/cupstestppd.c:442 systemv/cupstestppd.c:461
+#: systemv/cupstestppd.c:485
 msgid ""
 "      **FAIL**  REQUIRED FileVersion\n"
 "                REF: Page 56, section 5.3.\n"
@@ -1295,10 +1325,12 @@ msgstr ""
 "                REF: 56 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:452 systemv/cupstestppd.c:471
+#: systemv/cupstestppd.c:495
 msgid "        PASS    FormatVersion\n"
 msgstr "        合格    FormatVersion\n"
 
 #: systemv/cupstestppd.c:462 systemv/cupstestppd.c:481
+#: systemv/cupstestppd.c:505
 msgid ""
 "      **FAIL**  REQUIRED FormatVersion\n"
 "                REF: Page 56, section 5.3.\n"
@@ -1307,10 +1339,12 @@ msgstr ""
 "                REF: 56 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:472 systemv/cupstestppd.c:491
+#: systemv/cupstestppd.c:515
 msgid "        PASS    LanguageEncoding\n"
 msgstr "        合格    LanguageEncoding\n"
 
 #: systemv/cupstestppd.c:482 systemv/cupstestppd.c:501
+#: systemv/cupstestppd.c:525
 msgid ""
 "      **FAIL**  REQUIRED LanguageEncoding\n"
 "                REF: Pages 56-57, section 5.3.\n"
@@ -1319,10 +1353,12 @@ msgstr ""
 "                REF: 56-57 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:492 systemv/cupstestppd.c:511
+#: systemv/cupstestppd.c:535
 msgid "        PASS    LanguageVersion\n"
 msgstr "        合格    LanguageVersion\n"
 
 #: systemv/cupstestppd.c:502 systemv/cupstestppd.c:521
+#: systemv/cupstestppd.c:545
 msgid ""
 "      **FAIL**  REQUIRED LanguageVersion\n"
 "                REF: Pages 57-58, section 5.3.\n"
@@ -1331,6 +1367,7 @@ msgstr ""
 "                REF: 57-58 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:520 systemv/cupstestppd.c:539
+#: systemv/cupstestppd.c:563
 msgid ""
 "      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
 "                REF: Page 211, table D.1.\n"
@@ -1339,10 +1376,12 @@ msgstr ""
 "                REF: 211 ページ、表 D.1。\n"
 
 #: systemv/cupstestppd.c:528 systemv/cupstestppd.c:547
+#: systemv/cupstestppd.c:571
 msgid "        PASS    Manufacturer\n"
 msgstr "        合格    Manufacturer\n"
 
 #: systemv/cupstestppd.c:538 systemv/cupstestppd.c:557
+#: systemv/cupstestppd.c:581
 msgid ""
 "      **FAIL**  REQUIRED Manufacturer\n"
 "                REF: Pages 58-59, section 5.3.\n"
@@ -1351,6 +1390,7 @@ msgstr ""
 "                REF: 58-59 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:559 systemv/cupstestppd.c:578
+#: systemv/cupstestppd.c:602
 #, c-format
 msgid ""
 "      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
@@ -1360,10 +1400,12 @@ msgstr ""
 "                REF: 59-60 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:568 systemv/cupstestppd.c:587
+#: systemv/cupstestppd.c:611
 msgid "        PASS    ModelName\n"
 msgstr "        合格    ModelName\n"
 
 #: systemv/cupstestppd.c:578 systemv/cupstestppd.c:597
+#: systemv/cupstestppd.c:621
 msgid ""
 "      **FAIL**  REQUIRED ModelName\n"
 "                REF: Pages 59-60, section 5.3.\n"
@@ -1372,10 +1414,12 @@ msgstr ""
 "                REF: 59-60 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:588 systemv/cupstestppd.c:607
+#: systemv/cupstestppd.c:631
 msgid "        PASS    NickName\n"
 msgstr "        合格    NickName\n"
 
 #: systemv/cupstestppd.c:598 systemv/cupstestppd.c:617
+#: systemv/cupstestppd.c:641
 msgid ""
 "      **FAIL**  REQUIRED NickName\n"
 "                REF: Page 60, section 5.3.\n"
@@ -1384,10 +1428,12 @@ msgstr ""
 "                REF: 60 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:608 systemv/cupstestppd.c:627
+#: systemv/cupstestppd.c:651
 msgid "        PASS    PageSize\n"
 msgstr "        合格    PageSize\n"
 
 #: systemv/cupstestppd.c:618 systemv/cupstestppd.c:637
+#: systemv/cupstestppd.c:661
 msgid ""
 "      **FAIL**  REQUIRED PageSize\n"
 "                REF: Pages 99-100, section 5.14.\n"
@@ -1396,10 +1442,12 @@ msgstr ""
 "                REF: 99-100 ページ、セクション 5.14。\n"
 
 #: systemv/cupstestppd.c:628 systemv/cupstestppd.c:647
+#: systemv/cupstestppd.c:671
 msgid "        PASS    PageRegion\n"
 msgstr "        合格    PageRegion\n"
 
 #: systemv/cupstestppd.c:638 systemv/cupstestppd.c:657
+#: systemv/cupstestppd.c:681
 msgid ""
 "      **FAIL**  REQUIRED PageRegion\n"
 "                REF: Page 100, section 5.14.\n"
@@ -1408,10 +1456,12 @@ msgstr ""
 "                REF: 100 ページ、セクション 5.14。\n"
 
 #: systemv/cupstestppd.c:648 systemv/cupstestppd.c:667
+#: systemv/cupstestppd.c:691
 msgid "        PASS    PCFileName\n"
 msgstr "        合格    PCFileName\n"
 
 #: systemv/cupstestppd.c:658 systemv/cupstestppd.c:677
+#: systemv/cupstestppd.c:701
 msgid ""
 "      **FAIL**  REQUIRED PCFileName\n"
 "                REF: Pages 61-62, section 5.3.\n"
@@ -1420,6 +1470,7 @@ msgstr ""
 "                REF: 61-62 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:676 systemv/cupstestppd.c:695
+#: systemv/cupstestppd.c:719
 msgid ""
 "      **FAIL**  BAD Product - not \"(string)\".\n"
 "                REF: Page 62, section 5.3.\n"
@@ -1428,10 +1479,12 @@ msgstr ""
 "                REF: 62 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:683 systemv/cupstestppd.c:702
+#: systemv/cupstestppd.c:726
 msgid "        PASS    Product\n"
 msgstr "        合格    Product\n"
 
 #: systemv/cupstestppd.c:693 systemv/cupstestppd.c:712
+#: systemv/cupstestppd.c:736
 msgid ""
 "      **FAIL**  REQUIRED Product\n"
 "                REF: Page 62, section 5.3.\n"
@@ -1440,6 +1493,7 @@ msgstr ""
 "                REF: 62 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:715 systemv/cupstestppd.c:734
+#: systemv/cupstestppd.c:758
 msgid ""
 "      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
 "                REF: Pages 62-64, section 5.3.\n"
@@ -1448,10 +1502,12 @@ msgstr ""
 "                REF: 62-64 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:723 systemv/cupstestppd.c:742
+#: systemv/cupstestppd.c:766
 msgid "        PASS    PSVersion\n"
 msgstr "        合格    PSVersion\n"
 
 #: systemv/cupstestppd.c:733 systemv/cupstestppd.c:752
+#: systemv/cupstestppd.c:776
 msgid ""
 "      **FAIL**  REQUIRED PSVersion\n"
 "                REF: Pages 62-64, section 5.3.\n"
@@ -1460,6 +1516,7 @@ msgstr ""
 "                REF: 62-64 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:750 systemv/cupstestppd.c:769
+#: systemv/cupstestppd.c:793
 msgid ""
 "      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
 "                REF: Pages 64-65, section 5.3.\n"
@@ -1468,10 +1525,12 @@ msgstr ""
 "                REF: 64-65 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:758 systemv/cupstestppd.c:777
+#: systemv/cupstestppd.c:801
 msgid "        PASS    ShortNickName\n"
 msgstr "        合格    ShortNickName\n"
 
 #: systemv/cupstestppd.c:768 systemv/cupstestppd.c:787
+#: systemv/cupstestppd.c:811
 msgid ""
 "      **FAIL**  REQUIRED ShortNickName\n"
 "                REF: Page 64-65, section 5.3.\n"
@@ -1480,6 +1539,7 @@ msgstr ""
 "                REF: 64-65 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:784 systemv/cupstestppd.c:803
+#: systemv/cupstestppd.c:827
 msgid ""
 "      **FAIL**  BAD JobPatchFile attribute in file\n"
 "                REF: Page 24, section 3.4.\n"
@@ -1488,6 +1548,7 @@ msgstr ""
 "                REF: 24 ページ、セクション 3.4。\n"
 
 #: systemv/cupstestppd.c:804 systemv/cupstestppd.c:823
+#: systemv/cupstestppd.c:847
 msgid ""
 "      **FAIL**  REQUIRED PageSize\n"
 "                REF: Page 41, section 5.\n"
@@ -1498,6 +1559,7 @@ msgstr ""
 "                REF: 99 ページ、セクション 5.14。\n"
 
 #: systemv/cupstestppd.c:835 systemv/cupstestppd.c:854
+#: systemv/cupstestppd.c:878
 #, c-format
 msgid ""
 "      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
@@ -1509,6 +1571,7 @@ msgstr ""
 "                REF: 102 ページ、セクション 5.15。\n"
 
 #: systemv/cupstestppd.c:857 systemv/cupstestppd.c:876
+#: systemv/cupstestppd.c:900
 #, c-format
 msgid ""
 "      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
@@ -1520,6 +1583,7 @@ msgstr ""
 "                REF: 103 ページ、セクション 5.15。\n"
 
 #: systemv/cupstestppd.c:905 systemv/cupstestppd.c:924
+#: systemv/cupstestppd.c:948
 #, c-format
 msgid ""
 "      **FAIL**  Bad %s choice %s!\n"
@@ -1529,6 +1593,7 @@ msgstr ""
 "                REF: 84 ページ、セクション 5.9\n"
 
 #: systemv/cupstestppd.c:934 systemv/cupstestppd.c:953
+#: systemv/cupstestppd.c:977
 #, c-format
 msgid ""
 "      **FAIL**  REQUIRED %s does not define choice None!\n"
@@ -1538,6 +1603,7 @@ msgstr ""
 "                REF: 122 ページ、セクション 5.17\n"
 
 #: systemv/cupstestppd.c:955 systemv/cupstestppd.c:974
+#: systemv/cupstestppd.c:998
 #, c-format
 msgid ""
 "      **FAIL**  Bad %s choice %s!\n"
@@ -1547,10 +1613,12 @@ msgstr ""
 "                REF: 122 ページ、セクション 5.17\n"
 
 #: systemv/cupstestppd.c:967 systemv/cupstestppd.c:986
+#: systemv/cupstestppd.c:1186
 msgid " PASS\n"
 msgstr " 合格\n"
 
 #: systemv/cupstestppd.c:976 systemv/cupstestppd.c:997
+#: systemv/cupstestppd.c:1197
 #, c-format
 msgid ""
 "        WARN    Duplex option keyword %s should be named Duplex or "
@@ -1562,10 +1630,12 @@ msgstr ""
 "                REF: 122 ページ、セクション 5.17\n"
 
 #: systemv/cupstestppd.c:986 systemv/cupstestppd.c:1007
+#: systemv/cupstestppd.c:1207
 msgid "        WARN    Default choices conflicting!\n"
 msgstr "        警告    デフォルトの選択肢が衝突しています!\n"
 
 #: systemv/cupstestppd.c:994 systemv/cupstestppd.c:1015
+#: systemv/cupstestppd.c:1215
 #, c-format
 msgid ""
 "        WARN    Obsolete PPD version %.1f!\n"
@@ -1575,6 +1645,7 @@ msgstr ""
 "                REF: 42 ページ、セクション 5.2。\n"
 
 #: systemv/cupstestppd.c:1002 systemv/cupstestppd.c:1023
+#: systemv/cupstestppd.c:1223
 msgid ""
 "        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
 "                REF: Pages 56-57, section 5.3.\n"
@@ -1583,6 +1654,7 @@ msgstr ""
 "                REF: 56-57 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:1010 systemv/cupstestppd.c:1031
+#: systemv/cupstestppd.c:1231
 msgid ""
 "        WARN    Manufacturer required by PPD 4.3 spec.\n"
 "                REF: Pages 58-59, section 5.3.\n"
@@ -1591,6 +1663,7 @@ msgstr ""
 "                REF: 58-59 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:1023 systemv/cupstestppd.c:1044
+#: systemv/cupstestppd.c:1244
 msgid ""
 "        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
 "                REF: Pages 61-62, section 5.3.\n"
@@ -1599,6 +1672,7 @@ msgstr ""
 "                REF: 61-62 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:1031 systemv/cupstestppd.c:1052
+#: systemv/cupstestppd.c:1252
 msgid ""
 "        WARN    ShortNickName required by PPD 4.3 spec.\n"
 "                REF: Pages 64-65, section 5.3.\n"
@@ -1607,6 +1681,7 @@ msgstr ""
 "                REF: 64-65 ページ、セクション 5.3。\n"
 
 #: systemv/cupstestppd.c:1048 systemv/cupstestppd.c:1069
+#: systemv/cupstestppd.c:1269
 msgid ""
 "        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
 "                REF: Pages 78-79, section 5.7.\n"
@@ -1616,6 +1691,7 @@ msgstr ""
 "                REF: 78-79 ページ、セクション 5.7。\n"
 
 #: systemv/cupstestppd.c:1057 systemv/cupstestppd.c:1078
+#: systemv/cupstestppd.c:1278
 msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
 "                REF: Pages 78-79, section 5.7.\n"
@@ -1625,6 +1701,7 @@ msgstr ""
 "                REF: 78-79 ページ、セクション 5.7。\n"
 
 #: systemv/cupstestppd.c:1085 systemv/cupstestppd.c:1106
+#: systemv/cupstestppd.c:1306
 #, c-format
 msgid ""
 "        WARN    %s shares a common prefix with %s\n"
@@ -1634,15 +1711,18 @@ msgstr ""
 "                REF: 15 ページ、セクション 3.2。\n"
 
 #: systemv/cupstestppd.c:1097 systemv/cupstestppd.c:1118
+#: systemv/cupstestppd.c:1318
 #, c-format
 msgid "    %d ERROR%s FOUND\n"
 msgstr "    %d 個のエラー%s が見つかりました\n"
 
 #: systemv/cupstestppd.c:1100 systemv/cupstestppd.c:1121
+#: systemv/cupstestppd.c:1321
 msgid "    NO ERRORS FOUND\n"
 msgstr "    エラーは見つかりませんでした\n"
 
 #: systemv/cupstestppd.c:1360 systemv/cupstestppd.c:1465
+#: systemv/cupstestppd.c:1665
 #, c-format
 msgid ""
 "        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
@@ -1652,6 +1732,7 @@ msgstr ""
 "                (constraint=\"%s %s %s %s\")\n"
 
 #: systemv/cupstestppd.c:1376 systemv/cupstestppd.c:1481
+#: systemv/cupstestppd.c:1681
 msgid ""
 "Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
 "gz]]\n"
@@ -3530,18 +3611,18 @@ msgstr ""
 "-h                  この使用例を表示する\n"
 "-l                  launchd(8) から cupsd を実行する\n"
 
-#: systemv/cupstestppd.c:1343
+#: systemv/cupstestppd.c:1343 systemv/cupstestppd.c:1543
 #, c-format
 msgid "        WARN    Line %d only contains whitespace!\n"
 msgstr "        警告    %d 行が空白だけです!\n"
 
-#: systemv/cupstestppd.c:1361
+#: systemv/cupstestppd.c:1361 systemv/cupstestppd.c:1561
 msgid ""
 "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
 msgstr ""
 "        警告    ファイルが CR、LF、CR LF の行末を混在して含んでいます!\n"
 
-#: systemv/cupstestppd.c:1366
+#: systemv/cupstestppd.c:1366 systemv/cupstestppd.c:1566
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF!\n"
@@ -3564,3 +3645,43 @@ msgstr "ジョブを移動できません"
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
 msgstr ""
 "cupsaddsmb: プリンタ \"%s\" の PPD ファイルがありません - スキップします!\n"
+
+#: systemv/cupstestppd.c:346
+#, fuzzy, c-format
+msgid "      **FAIL**  %s %s does not exist!\n"
+msgstr "ジョブ #%s は存在しません!"
+
+#: systemv/cupstestppd.c:1053
+#, c-format
+msgid "      **FAIL**  Bad language \"%s\"!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1078
+#, c-format
+msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1098
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s contains 8-bit "
+"characters!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1119
+#, c-format
+msgid ""
+"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1141
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s choice %s contains "
+"8-bit characters!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:1175
+#, c-format
+msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
+msgstr ""

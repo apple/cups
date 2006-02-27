@@ -1004,6 +1004,182 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  }
       }
 
+      if ((attr = ppdFindAttr(ppd, "cupsLanguages", NULL)) != NULL &&
+          attr->value)
+      {
+       /*
+        * This file contains localizations, check them...
+	*/
+
+        char	*languages,		/* Copy of attribute value */
+		*langstart,		/* Start of current language */
+		*langptr,		/* Pointer into languages */
+		keyword[PPD_MAX_NAME];	/* Localization keyword */
+
+
+        languages = strdup(attr->value);
+	for (langptr = languages; *langptr;)
+	{
+	 /*
+	  * Skip leading whitespace...
+	  */
+
+	  while (isspace(*langptr & 255))
+	    langptr ++;
+
+	  if (!*langptr)
+	    break;
+
+         /*
+	  * Find the end of this language name...
+	  */
+
+	  for (langstart = langptr;
+	       *langptr && !isspace(*langptr & 255);
+	       langptr ++);
+
+          if (*langptr)
+	    *langptr++ = '\0';
+
+          j = strlen(langstart);
+	  if (j != 2 && j != 5)
+	  {
+	    if (verbose >= 0)
+	    {
+	      if (!errors && !verbose)
+		_cupsLangPuts(stdout, _(" FAIL\n"));
+
+	      _cupsLangPrintf(stdout,
+	                      _("      **FAIL**  Bad language \"%s\"!\n"),
+			      langstart);
+            }
+
+	    errors ++;
+	    continue;
+	  }
+
+         /*
+	  * Loop through all options and choices...
+	  */
+
+          for (option = ppdFirstOption(ppd);
+	       option;
+	       option = ppdNextOption(ppd))
+	  {
+	    snprintf(keyword, sizeof(keyword), "%s.Translation", langstart);
+	    if (!ppdFindAttr(ppd, keyword, option->keyword))
+	    {
+	      if (verbose >= 0)
+	      {
+		if (!errors && !verbose)
+		  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		_cupsLangPrintf(stdout,
+	                	_("      **FAIL**  Missing \"%s\" translation "
+				  "string for option %s!\n"),
+				langstart, option->keyword);
+              }
+
+	      errors ++;
+	    }
+
+            for (ptr = option->text; *ptr; ptr ++)
+	      if (*ptr & 128)
+	        break;
+
+            if (*ptr)
+	    {
+	      if (verbose >= 0)
+	      {
+		if (!errors && !verbose)
+		  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		_cupsLangPrintf(stdout,
+	                	_("      **FAIL**  Default translation "
+				  "string for option %s contains 8-bit "
+				  "characters!\n"),
+				option->keyword);
+              }
+
+	      errors ++;
+	    }
+
+	    snprintf(keyword, sizeof(keyword), "%s.%s", langstart,
+	             option->keyword);
+            for (j = 0; j < option->num_choices; j ++)
+	    {
+	      if (!ppdFindAttr(ppd, keyword, option->choices[j].choice))
+	      {
+		if (verbose >= 0)
+		{
+		  if (!errors && !verbose)
+		    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		  _cupsLangPrintf(stdout,
+	                	  _("      **FAIL**  Missing \"%s\" "
+				    "translation string for option %s, "
+				    "choice %s!\n"),
+				  langstart, option->keyword,
+				  option->choices[j].choice);
+        	}
+
+		errors ++;
+	      }
+
+              for (ptr = option->choices[j].text; *ptr; ptr ++)
+		if (*ptr & 128)
+	          break;
+
+              if (*ptr)
+	      {
+		if (verbose >= 0)
+		{
+		  if (!errors && !verbose)
+		    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		  _cupsLangPrintf(stdout,
+	                	  _("      **FAIL**  Default translation "
+				    "string for option %s choice %s contains "
+				    "8-bit characters!\n"),
+				  option->keyword,
+				  option->choices[j].choice);
+        	}
+
+		errors ++;
+	      }
+            }
+	  }
+        }
+      }
+
+      for (attr = ppdFindAttr(ppd, "cupsFilter", NULL);
+           attr;
+	   attr = ppdFindNextAttr(ppd, "cupsFilter", NULL))
+      {
+        char	super[16],		/* Filter super type */
+		type[256],		/* Filter type */
+		program[256];		/* Filter program */
+	int	cost;			/* Filter cost */
+
+
+        if (!attr->value ||
+	    sscanf(attr->value, "%15[^/]/%255s%d%255s", super, type, &cost,
+	           program) != 4)
+        {
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	    _cupsLangPrintf(stdout,
+	                    _("      **FAIL**  Bad cupsFilter value \"%s\"!\n"),
+			    attr->value ? attr->value : "");
+          }
+
+	  errors ++;
+	}
+      }
+
       if (errors)
 	status = ERROR_CONFORMANCE;
       else if (!verbose)
