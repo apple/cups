@@ -302,31 +302,55 @@ main(int  argc,			/* I - Number of command-line arguments */
           attr->value)
         ppdversion = (int)(10 * atof(attr->value) + 0.5);
 
-      if (verbose > 0)
+     /*
+      * Look for default keywords with no matching option...
+      */
+
+      for (i = 0; i < ppd->num_attrs; i ++)
       {
-       /*
-        * Look for default keywords with no matching option...
-	*/
+	attr = ppd->attrs[i];
 
-        for (i = 0; i < ppd->num_attrs; i ++)
+        if (!strcmp(attr->name, "DefaultColorSpace") ||
+	    !strcmp(attr->name, "DefaultFont") ||
+	    !strcmp(attr->name, "DefaultImageableArea") ||
+	    !strcmp(attr->name, "DefaultOutputOrder") ||
+	    !strcmp(attr->name, "DefaultPaperDimension") ||
+	    !strcmp(attr->name, "DefaultTransfer"))
+	  continue;
+
+	if (!strncmp(attr->name, "Default", 7))
 	{
-	  attr = ppd->attrs[i];
-
-          if (!strcmp(attr->name, "DefaultColorSpace") ||
-	      !strcmp(attr->name, "DefaultFont") ||
-	      !strcmp(attr->name, "DefaultImageableArea") ||
-	      !strcmp(attr->name, "DefaultOutputOrder") ||
-	      !strcmp(attr->name, "DefaultPaperDimension") ||
-	      !strcmp(attr->name, "DefaultTransfer"))
-	    continue;
-	      
-	  if (!strncmp(attr->name, "Default", 7) &&
-	      !ppdFindOption(ppd, attr->name + 7))
+	  if ((option = ppdFindOption(ppd, attr->name + 7)) == NULL)
             _cupsLangPrintf(stdout,
 	                    _("        WARN    %s has no corresponding "
 			      "options!\n"),
 	                    attr->name);
-        }
+          else if (strcmp(attr->value, "Unknown"))
+	  {
+	   /*
+	    * Check that the default option value matches a choice...
+	    */
+
+	    for (j = 0; j < option->num_choices; j ++)
+	      if (!strcmp(option->choices[j].choice, attr->value))
+	        break;
+
+            if (j >= option->num_choices)
+	    {
+	      if (verbose >= 0)
+	      {
+		if (!errors && !verbose)
+		  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		_cupsLangPrintf(stdout,
+	                        _("      **FAIL**  %s %s does not exist!\n"),
+				attr->name, attr->value);
+              }
+
+	      errors ++;
+	    }
+	  }
+	}
       }
 
       if ((attr = ppdFindAttr(ppd, "DefaultImageableArea", NULL)) == NULL)
