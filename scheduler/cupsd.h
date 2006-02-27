@@ -65,6 +65,9 @@
  */
 
 #ifndef HAVE_HSTRERROR
+#  ifdef hstrerror
+#    undef hstrerror
+#  endif /* hstrerror */
 #  define hstrerror cups_hstrerror
 
 extern const char *cups_hstrerror(int);

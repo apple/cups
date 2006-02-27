@@ -1307,7 +1307,7 @@ recv_print_job(
  * 'remove_jobs()' - Cancel one or more jobs.
  */
 
-int					/* O - Command status */
+static int				/* O - Command status */
 remove_jobs(const char *dest,		/* I - Destination */
             const char *agent,		/* I - User agent */
 	    const char *list)		/* I - List of jobs or users */
@@ -1392,7 +1392,7 @@ remove_jobs(const char *dest,		/* I - Destination */
  * 'send_state()' - Send the queue state.
  */
 
-int					/* O - Command status */
+static int				/* O - Command status */
 send_state(const char *queue,		/* I - Destination */
            const char *list,		/* I - Job or user */
 	   int        longstatus)	/* I - List of jobs or users */
@@ -1657,7 +1657,7 @@ send_state(const char *queue,		/* I - Destination */
  * 'smart_gets()' - Get a line of text, removing the trailing CR and/or LF.
  */
 
-char *					/* O - Line read or NULL */
+static char *				/* O - Line read or NULL */
 smart_gets(char *s,			/* I - Pointer to line buffer */
            int  len,			/* I - Size of line buffer */
 	   FILE *fp)			/* I - File to read from */

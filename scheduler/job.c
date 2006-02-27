@@ -2868,7 +2868,7 @@ free_job(cupsd_job_t *job)		/* I - Job */
  *		    the textual IPP attributes.
  */
 
-int					/* O - Size of attribute buffer */
+static int				/* O - Size of attribute buffer */
 ipp_length(ipp_t *ipp)			/* I - IPP request */
 {
   int			bytes; 		/* Number of bytes */

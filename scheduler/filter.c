@@ -199,7 +199,7 @@ compare_filters(mime_filter_t *f0,	/* I - First filter */
  * 'find_filters()' - Find the filters to convert from one type to another.
  */
 
-cups_array_t *				/* O - Array of filters to run */
+static cups_array_t *			/* O - Array of filters to run */
 find_filters(mime_t           *mime,	/* I - MIME database */
              mime_type_t      *src,	/* I - Source file type */
 	     mime_type_t      *dst,	/* I - Destination file type */
