@@ -2185,7 +2185,7 @@ start_nup(int       number,		/* I - Page number */
     */
 
     printf("%d %d translate\n", -lbrt[0], -lbrt[1]);
-    printf("0 0 %.1f %.1f ESPrc\n", w, l);
+    printf("0 0 %d %d ESPrc\n", lbrt[2] - lbrt[0], lbrt[3] - lbrt[1]);
   }
 }
 
