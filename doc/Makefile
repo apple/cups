@@ -40,6 +40,7 @@ WEBBUTTONS	=	\
 			images/cancel-job.gif \
 			images/change-settings.gif \
 			images/clean-print-heads.gif \
+			images/clear.gif \
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \

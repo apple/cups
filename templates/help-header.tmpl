@@ -4,7 +4,9 @@
 <P ALIGN="CENTER"><B>Search in
 {HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:All Documents}}:</B> <INPUT
 TYPE="TEXT" NAME="QUERY" VALUE="{?QUERY}" SIZE="60"> <INPUT
-TYPE="IMAGE" SRC="/images/search.gif" ALT="Search"></P>
+TYPE="IMAGE" SRC="/images/search.gif" ALT="Search">
+<A HREF="/help/{?HELPFILE}{QUERY?{TOPIC??TOPIC={TOPIC}:}:}"><IMG
+SRC="/images/clear.gif" ALT="Clear" CLASS="button"></A></P>
 
 </FORM>
 
@@ -24,5 +26,14 @@ TYPE="IMAGE" SRC="/images/search.gif" ALT="Search"></P>
 {[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
 {QTEXT?</UL>:}
 :<P>No matches found.</P>}
-{HELPTITLE?<HR NOSHADE>:}:}
-{HELPTITLE?<H1>{HELPTITLE}</H1>:}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}</H1>:<H1>CUPS Help Pages</H1>
+
+<P>This is the CUPS on-line help interface. Enter search words
+above or click on any of the documentation links to display
+on-line help information.</P>
+
+<P>If you are new to CUPS, read the "<a
+href="overview.html">Overview of CUPS</a>" page. Veteran users
+should read the "<a href="whatsnew.html">What's New in CUPS
+1.2</a>" page.</P>}

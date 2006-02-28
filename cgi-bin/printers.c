@@ -87,7 +87,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   if ((printer = getenv("PATH_INFO")) != NULL)
+  {
     printer ++;
+
+    if (!*printer)
+      printer = NULL;
+  }
 
  /*
   * See who is logged in...

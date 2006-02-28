@@ -84,7 +84,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   if ((pclass = getenv("PATH_INFO")) != NULL)
+  {
     pclass ++;
+
+    if (!*pclass)
+      pclass = NULL;
+  }
 
  /*
   * See who is logged in...
