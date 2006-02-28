@@ -181,6 +181,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   topic = cgiGetVariable("TOPIC");
   si    = helpSearchIndex(hi, query, topic, helpfile);
 
+  fprintf(stderr, "DEBUG: query=\"%s\", topic=\"%s\"\n", query, topic);
+
   if (si)
   {
     help_node_t	*nn;			/* Parent node */
@@ -190,9 +192,9 @@ main(int  argc,				/* I - Number of command-line arguments */
             "DEBUG: si=%p, si->sorted=%p, cupsArrayCount(si->sorted)=%d\n", si,
             si->sorted, cupsArrayCount(si->sorted));
 
-    for (n = (help_node_t *)cupsArrayFirst(si->sorted);
+    for (i = 0, n = (help_node_t *)cupsArrayFirst(si->sorted);
          n;
-	 n = (help_node_t *)cupsArrayNext(si->sorted))
+	 i ++, n = (help_node_t *)cupsArrayNext(si->sorted))
     {
       if (helpfile && n->anchor)
         snprintf(line, sizeof(line), "#%s", n->anchor);
