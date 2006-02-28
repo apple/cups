@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5089 2006-02-08 04:05:01Z mike $"
+# "$Id: Makefile 5192 2006-02-27 03:08:47Z mike $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -101,6 +101,17 @@ installhdrs:
 	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
+
+
+#
+# Automatic API help files...
+#
+
+apihelp:
+	echo Generating CUPS API help files...
+	mxmldoc --section "Programming" --title "Raster API" \
+		--intro api-raster.shtml \
+		raster.h interpret.c raster.c >../doc/help/api-raster.html
 
 
 #
@@ -284,5 +295,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5089 2006-02-08 04:05:01Z mike $".
+# End of "$Id: Makefile 5192 2006-02-27 03:08:47Z mike $".
 #

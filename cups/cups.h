@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 5138 2006-02-21 10:49:06Z mike $"
+ * "$Id: cups.h 5156 2006-02-23 04:24:32Z mike $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -99,7 +99,8 @@ enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_DELETE = 0x100000,	/* Delete printer @since CUPS 1.2@ */
   CUPS_PRINTER_NOT_SHARED = 0x200000,	/* Printer is not shared @since CUPS 1.2@ */
   CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication @since CUPS 1.2@ */
-  CUPS_PRINTER_OPTIONS = 0x66fffc	/* ~(CLASS | REMOTE | IMPLICIT) */
+  CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands @since CUPS 1.2@ */
+  CUPS_PRINTER_OPTIONS = 0xe6fffc	/* ~(CLASS | REMOTE | IMPLICIT) */
 };
 
 typedef const char *(*cups_password_cb_t)(const char *);
@@ -179,10 +180,10 @@ extern void		cupsEncodeOptions(ipp_t *ipp, int num_options,
 extern void		cupsFreeOptions(int num_options, cups_option_t *options);
 extern const char	*cupsGetOption(const char *name, int num_options,
 			               cups_option_t *options);
-extern int		cupsParseOptions(const char *arg, int num_options,
-			                 cups_option_t **options);
 extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
 			                cups_option_t *options);
+extern int		cupsParseOptions(const char *arg, int num_options,
+			                 cups_option_t **options);
 
 extern const char	*cupsGetPassword(const char *prompt);
 extern const char	*cupsServer(void);
@@ -231,6 +232,8 @@ extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 extern const char	*cupsLastErrorString(void);
 extern char		*cupsNotifySubject(cups_lang_t *lang, ipp_t *event);
 extern char		*cupsNotifyText(cups_lang_t *lang, ipp_t *event);
+extern int		cupsRemoveOption(const char *name, int num_options,
+			                 cups_option_t **options);
 extern cups_file_t	*cupsTempFile2(char *filename, int len);
 
 
@@ -241,5 +244,5 @@ extern cups_file_t	*cupsTempFile2(char *filename, int len);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 5138 2006-02-21 10:49:06Z mike $".
+ * End of "$Id: cups.h 5156 2006-02-23 04:24:32Z mike $".
  */

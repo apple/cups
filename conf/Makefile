@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5126 2006-02-17 16:11:30Z mike $"
+# "$Id: Makefile 5185 2006-02-26 15:27:14Z mike $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -70,16 +70,16 @@ install:	all
 		$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
 		chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file || true; \
 	done
-	-if test x$(PAMDIR) != x$(BUILDROOT); then \
-		$(INSTALL_DIR) -m 755 $(PAMDIR); \
-		if test -r $(PAMDIR)/cups/$(PAMFILE) ; then \
-			$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups.N ; \
+	-if test x$(PAMDIR) != x; then \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(PAMDIR); \
+		if test -r $(BUILDROOT)$(PAMDIR)/cups/$(PAMFILE) ; then \
+			$(INSTALL_DATA) $(PAMFILE) $(BUILDROOT)$(PAMDIR)/cups.N ; \
 		else \
-			$(INSTALL_DATA) $(PAMFILE) $(PAMDIR)/cups ; \
+			$(INSTALL_DATA) $(PAMFILE) $(BUILDROOT)$(PAMDIR)/cups ; \
 		fi ; \
 	fi
 
 
 #
-# End of "$Id: Makefile 5126 2006-02-17 16:11:30Z mike $".
+# End of "$Id: Makefile 5185 2006-02-26 15:27:14Z mike $".
 #

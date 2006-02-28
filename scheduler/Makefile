@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5116 2006-02-16 12:52:32Z mike $"
+# "$Id: Makefile 5157 2006-02-23 20:58:57Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -155,14 +155,15 @@ install:	all
 cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libmime.a \
-		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(PAMLIBS) \
+		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		$(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS) $(LIBS)
 
 cupsd-static:	$(CUPSDOBJS) libmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libmime.a \
-		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(PAMLIBS) ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS)
+		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
+		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
+		$(LIBMALLOC) $(CUPSDLIBS)
 
 
 #
@@ -248,5 +249,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5116 2006-02-16 12:52:32Z mike $".
+# End of "$Id: Makefile 5157 2006-02-23 20:58:57Z mike $".
 #

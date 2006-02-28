@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-deviced.c 5099 2006-02-13 02:46:10Z mike $"
+ * "$Id: cups-deviced.c 5194 2006-02-27 20:57:07Z mike $"
  *
  *   Device scanning mini-daemon for the Common UNIX Printing System (CUPS).
  *
@@ -36,6 +36,10 @@
 #include "util.h"
 #include <cups/array.h>
 #include <cups/dir.h>
+
+#ifdef __hpux
+#  define seteuid(uid) setresuid(-1, (uid), -1)
+#endif /* __hpux */
 
 
 /*
@@ -496,5 +500,5 @@ sigalrm_handler(int sig)		/* I - Signal number */
 
 
 /*
- * End of "$Id: cups-deviced.c 5099 2006-02-13 02:46:10Z mike $".
+ * End of "$Id: cups-deviced.c 5194 2006-02-27 20:57:07Z mike $".
  */

@@ -1,5 +1,5 @@
-;/*
- * "$Id: auth.c 5083 2006-02-06 02:57:43Z mike $"
+/*
+ * "$Id: auth.c 5197 2006-02-27 21:30:20Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -116,7 +116,7 @@ typedef struct cupsd_authdata_s		/**** Authentication data ****/
  */
 
 #if defined(__hpux) && defined(HAVE_LIBPAM)
-static cupsd_authdata_t	*auth_datat;	/* Current client being authenticated */
+static cupsd_authdata_t	*auth_data;	/* Current client being authenticated */
 #endif /* __hpux && HAVE_LIBPAM */
 
 
@@ -2156,5 +2156,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 5083 2006-02-06 02:57:43Z mike $".
+ * End of "$Id: auth.c 5197 2006-02-27 21:30:20Z mike $".
  */

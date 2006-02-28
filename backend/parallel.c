@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c 5099 2006-02-13 02:46:10Z mike $"
+ * "$Id: parallel.c 5194 2006-02-27 20:57:07Z mike $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -40,8 +40,13 @@
 #include <errno.h>
 #include <cups/string.h>
 #include <signal.h>
-#include <sys/select.h>
 #include "ieee1284.c"
+
+#ifdef __hpux
+#  include <sys/time.h>
+#else
+#  include <sys/select.h>
+#endif /* __hpux */
 
 #ifdef WIN32
 #  include <io.h>
@@ -686,7 +691,7 @@ list_devices(void)
       printf("direct parallel:%s \"Unknown\" \"Parallel Port #%d\"\n", device, i + 1);
     }
   }
-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */
   char	device[255];		/* Device filename */
@@ -728,5 +733,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c 5099 2006-02-13 02:46:10Z mike $".
+ * End of "$Id: parallel.c 5194 2006-02-27 20:57:07Z mike $".
  */

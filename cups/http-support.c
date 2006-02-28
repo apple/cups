@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c 5138 2006-02-21 10:49:06Z mike $"
+ * "$Id: http-support.c 5149 2006-02-22 19:10:22Z mike $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1003,7 +1003,25 @@ httpSeparateURI(
     else
     {
      /*
-      * Grab hostname or IPv4 address...
+      * Validate the hostname or IPv4 address first...
+      */
+
+      for (ptr = (char *)uri; *ptr; ptr ++)
+        if (strchr(":?/", *ptr))
+	  break;
+        else if (!strchr("abcdefghijklmnopqrstuvwxyz"
+			 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+			 "0123456789"
+	        	 "-._~"
+			 "%"
+			 "!$&'()*+,;=", *ptr))
+	{
+	  *host = '\0';
+	  return (HTTP_URI_BAD_HOSTNAME);
+	}
+
+     /*
+      * Then copy the hostname or IPv4 address to the buffer...
       */
 
       uri = http_copy_decode(host, uri, hostlen, ":?/",
@@ -1014,21 +1032,6 @@ httpSeparateURI(
         *host = '\0';
         return (HTTP_URI_BAD_HOSTNAME);
       }
-
-     /*
-      * Validate value...
-      */
-
-      for (ptr = host; *ptr; ptr ++)
-        if (!strchr("abcdefghijklmnopqrstuvwxyz"
-		    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		    "0123456789"
-	            "-._~"
-		    "!$&'()*+,;=", *ptr))
-	{
-	  *host = '\0';
-	  return (HTTP_URI_BAD_HOSTNAME);
-	}
     }
 
    /*
@@ -1158,6 +1161,9 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
         return ("Not Implemented");
     case HTTP_NOT_SUPPORTED :
         return ("Not Supported");
+    case HTTP_EXPECTATION_FAILED :
+        return ("Expectation Failed");
+
     default :
         return ("Unknown");
   }
@@ -1306,5 +1312,5 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 
 
 /*
- * End of "$Id: http-support.c 5138 2006-02-21 10:49:06Z mike $".
+ * End of "$Id: http-support.c 5149 2006-02-22 19:10:22Z mike $".
  */

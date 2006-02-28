@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1284.c 4903 2006-01-10 20:02:46Z mike $"
+ * "$Id: ieee1284.c 5198 2006-02-27 21:58:43Z mike $"
  *
  *   IEEE-1284 support functions for the Common UNIX Printing System (CUPS).
  *
@@ -76,9 +76,9 @@ get_device_id(
 #ifdef __linux
   int	length;				/* Length of device ID info */
 #endif /* __linux */
-#ifdef __sun
+#if defined(__sun) && defined(ECPPIOC_GETDEVID)
   struct ecpp_device_id did;		/* Device ID buffer */
-#endif /* __sun */
+#endif /* __sun && ECPPIOC_GETDEVID */
 
   DEBUG_printf(("get_device_id(fd=%d, device_id=%p, device_id_size=%d, "
                 "make_model=%p, make_model_size=%d, scheme=\"%s\", "
@@ -369,5 +369,5 @@ get_device_id(
 
 
 /*
- * End of "$Id: ieee1284.c 4903 2006-01-10 20:02:46Z mike $".
+ * End of "$Id: ieee1284.c 5198 2006-02-27 21:58:43Z mike $".
  */

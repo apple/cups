@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: lpstat.c 5199 2006-02-27 22:01:02Z mike $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -2070,7 +2070,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
           }
 	  _cupsLangPuts(stdout, _("\tOn fault: no alert\n"));
 	  _cupsLangPuts(stdout, _("\tAfter fault: continue\n"));
-	      // TODO update to use printer-error-policy
+	      /* TODO update to use printer-error-policy */
           if (allowed)
 	  {
 	    _cupsLangPuts(stdout, _("\tUsers allowed:\n"));
@@ -2183,7 +2183,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
               }
 	      _cupsLangPuts(stdout, _("\tOn fault: no alert\n"));
 	      _cupsLangPuts(stdout, _("\tAfter fault: continue\n"));
-		  // TODO update to use printer-error-policy
+		  /* TODO update to use printer-error-policy */
               if (allowed)
 	      {
 		_cupsLangPuts(stdout, _("\tUsers allowed:\n"));
@@ -2246,5 +2246,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: lpstat.c 5199 2006-02-27 22:01:02Z mike $".
  */

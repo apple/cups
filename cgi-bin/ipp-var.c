@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c 5097 2006-02-10 04:06:23Z mike $"
+ * "$Id: ipp-var.c 5184 2006-02-26 15:13:44Z mike $"
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -896,7 +896,8 @@ cgiSetIPPObjectVars(
 	    break;
 
 	case IPP_TAG_URI :
-	    if (strchr(attr->values[i].string.text, ':') != NULL)
+	    if (strchr(attr->values[i].string.text, ':') &&
+	        strcmp(name, "device_uri"))
 	    {
 	     /*
 	      * Rewrite URIs...
@@ -1151,7 +1152,10 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     if ((var = cgiGetVariable("ORDER")) != NULL)
       ascending = !strcasecmp(var, "asc");
     else
-      ascending = 1;
+    {
+      ascending = !which_jobs || !strcasecmp(which_jobs, "not-completed");
+      cgiSetVariable("ORDER", ascending ? "asc" : "dec");
+    }
 
     if (ascending)
     {
@@ -1273,5 +1277,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 5097 2006-02-10 04:06:23Z mike $".
+ * End of "$Id: ipp-var.c 5184 2006-02-26 15:13:44Z mike $".
  */

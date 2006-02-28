@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 5124 2006-02-17 16:05:21Z mike $"
+# "$Id: Makefile 5192 2006-02-27 03:08:47Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2006 by Easy Software Products.
+#   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -39,6 +39,7 @@ WEBBUTTONS	=	\
 			images/cancel-all-jobs.gif \
 			images/cancel-job.gif \
 			images/change-settings.gif \
+			images/clean-print-heads.gif \
 			images/continue.gif \
 			images/delete-class.gif \
 			images/delete-printer.gif \
@@ -54,6 +55,7 @@ WEBBUTTONS	=	\
 			images/modify-printer.gif \
 			images/move-job.gif \
 			images/move-jobs.gif \
+			images/print-self-test-page.gif \
 			images/print-test-page.gif \
 			images/publish-printer.gif \
 			images/reject-jobs.gif \
@@ -104,6 +106,7 @@ HELPFILES	=	\
 			help/api-filter.html \
 			help/api-httpipp.html \
 			help/api-ppd.html \
+			help/api-raster.html \
 			help/classes-conf-reference.html \
 			help/client-conf-reference.html \
 			help/cupsd-conf-reference.html \
@@ -115,6 +118,7 @@ HELPFILES	=	\
 			help/man-backend.html \
 			help/man-cancel.html \
 			help/man-classes.conf.html \
+			help/man-client.conf.html \
 			help/man-cupsaddsmb.html \
 			help/man-cups-config.html \
 			help/man-cupsd.html \
@@ -140,6 +144,7 @@ HELPFILES	=	\
 			help/man-printers.conf.html \
 			help/network.html \
 			help/overview.html \
+			help/spec-command.html \
 			help/spec-ipp.html \
 			help/spec-ppd.html \
 			help/standard.html \

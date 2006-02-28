@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c 5099 2006-02-13 02:46:10Z mike $"
+ * "$Id: serial.c 5194 2006-02-27 20:57:07Z mike $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -51,7 +51,11 @@
 #  include <unistd.h>
 #  include <fcntl.h>
 #  include <termios.h>
-#  include <sys/select.h>
+#  ifdef __hpux
+#    include <sys/time.h>
+#  else
+#    include <sys/select.h>
+#  endif /* __hpux */
 #  ifdef HAVE_SYS_IOCTL_H
 #    include <sys/ioctl.h>
 #  endif /* HAVE_SYS_IOCTL_H */
@@ -653,13 +657,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 void
 list_devices(void)
 {
-#if defined(__hpux) || defined(__sgi) || defined(__sun) || defined(__FreeBSD__) || defined(__OpenBSD__)
+#if defined(__hpux) || defined(__sgi) || defined(__sun) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
   static char	*funky_hex = "0123456789abcdefghijklmnopqrstuvwxyz";
 				/* Funky hex numbering used for some devices */
 #endif /* __hpux || __sgi || __sun || __FreeBSD__ || __OpenBSD__ */
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-  int	i;		/* Looping var */
+  int	i, j;		/* Looping vars */
   int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */
 
@@ -688,6 +692,21 @@ list_devices(void)
       close(fd);
       printf("serial serial:%s?baud=230400 \"Unknown\" \"USB Serial Port #%d\"\n",
              device, i + 1);
+    }
+  }
+
+  for (i = 0; i < 64; i ++)
+  {
+    for (j = 0; j < 8; j ++)
+    {
+      sprintf(device, "/dev/ttyQ%02de%d", i, j);
+      if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
+      {
+        close(fd);
+        printf("serial serial:%s?baud=115200 \"Unknown\" "
+	       "\"Equinox ESP %d Port #%d\"\n",
+               device, i, j + 1);
+      }
     }
   }
 #elif defined(__sgi)
@@ -903,7 +922,7 @@ list_devices(void)
       printf("serial serial:%s?baud=38400 \"Unknown\" \"Serial Port #%d\"\n",
              device, i + 1);
   }
-#elif defined(__FreeBSD__) || defined(__OpenBSD__)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
   int	i, j;		/* Looping vars */
   int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */
@@ -1111,5 +1130,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c 5099 2006-02-13 02:46:10Z mike $".
+ * End of "$Id: serial.c 5194 2006-02-27 20:57:07Z mike $".
  */

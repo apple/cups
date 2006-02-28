@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 4860 2005-12-01 22:07:26Z mike $"
+ * "$Id: log.c 5194 2006-02-27 20:57:07Z mike $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -36,10 +36,7 @@
 
 #include "cupsd.h"
 #include <stdarg.h>
-
-#ifdef HAVE_VSYSLOG
-#  include <syslog.h>
-#endif /* HAVE_VSYSLOG */
+#include <syslog.h>
 
 
 /*
@@ -549,5 +546,5 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c 4860 2005-12-01 22:07:26Z mike $".
+ * End of "$Id: log.c 5194 2006-02-27 20:57:07Z mike $".
  */

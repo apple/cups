@@ -1,5 +1,5 @@
 /*
- * "$Id: testdirsvc.c 4821 2005-11-04 19:36:39Z mike $"
+ * "$Id: testdirsvc.c 5178 2006-02-26 00:24:23Z mike $"
  *
  *   Browsing test program for the Common UNIX Printing System (CUPS).
  *
@@ -55,10 +55,13 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		i,			/* Looping var */
 		printer,		/* Current printer */
 		num_printers,		/* Number of printers */
+		pclass,			/* Current printer class */
+		num_pclasses,		/* Number of printer classes */
 		server,			/* Current server */
 		num_servers,		/* Number of servers */
 		count,			/* Number of printers sent this cycle */
 		interval,		/* Browse Interval */
+		lease,			/* Browse lease-duration */
 		continuous,		/* Run continuously? */
 		port,			/* Browse port */
 		sock,			/* Browse socket */
@@ -106,8 +109,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   num_printers = 10;
+  num_pclasses = 5;
   num_servers  = 1;
   interval     = 30;
+  lease        = 60;
   port         = 0;
   verbose      = 0;
   continuous   = 0;
@@ -117,8 +122,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     if (!strcmp(argv[i], "-c"))
       continuous = 1;
-    if (!strcmp(argv[i], "-v"))
-      verbose = 1;
     else if (!strcmp(argv[i], "-i"))
     {
       i ++;
@@ -127,11 +130,27 @@ main(int  argc,				/* I - Number of command-line arguments */
       else
         usage();
     }
+    else if (!strcmp(argv[i], "-l"))
+    {
+      i ++;
+      if (i < argc)
+        lease = atoi(argv[i]);
+      else
+        usage();
+    }
     else if (!strcmp(argv[i], "-o"))
     {
       i ++;
       if (i < argc)
         options = argv[i];
+      else
+        usage();
+    }
+    else if (!strcmp(argv[i], "-C"))
+    {
+      i ++;
+      if (i < argc)
+        num_pclasses = atoi(argv[i]);
       else
         usage();
     }
@@ -151,6 +170,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       else
         usage();
     }
+    else if (!strcmp(argv[i], "-v"))
+      verbose = 1;
     else if (isdigit(argv[i][0] & 255))
     {
       port = atoi(argv[i]);
@@ -159,7 +180,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       usage();
   }
 
-  if (num_printers <= 0 || num_servers <= 0 || interval <= 0 || port <= 0)
+  if ((num_printers <= 0 && num_pclasses <= 0) || num_servers <= 0 ||
+      interval <= 0 || lease < 1 || port <= 0)
     usage();
 
  /*
@@ -207,7 +229,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     printf("Sending %d printers from %d servers...\n", num_printers,
            num_servers);
 
-    count   = num_servers * num_printers / interval + 1;
+    count   = num_servers * (num_printers + num_pclasses) / interval + 1;
     curtime = time(NULL);
     curdate = localtime(&curtime);
     seconds = interval;
@@ -227,11 +249,45 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         snprintf(packet, sizeof(packet),
 	         "%x %x ipp://testserver-%d/printers/%s-%d \"Server Room %d\" "
-		 "\"Test Printer %d\" \"Acme Blazer 2000\"%s%s\n",
+		 "\"Test Printer %d\" \"Acme Blazer 2000\"%s%s "
+		 "lease-duration=%d\n",
                  CUPS_PRINTER_REMOTE, IPP_PRINTER_IDLE, server + 1,
 		 names[printer % 26], printer / 26 + 1, server + 1,
 		 printer + 1, options ? " ipp-options=" : "",
-		 options ? options : "");
+		 options ? options : "", lease);
+
+        if (verbose)
+	  printf("[%02d:%02d:%02d] %s", curdate->tm_hour, curdate->tm_min,
+	         curdate->tm_sec, packet);
+
+        if (sendto(sock, packet, strlen(packet), 0,
+	           (struct sockaddr *)&addr, sizeof(addr)) < 0)
+	  perror("Unabled to send packet");
+      }
+    }
+
+
+    for (i = 0, pclass = 0; pclass < num_pclasses; pclass ++)
+    {
+      for (server = 0; server < num_servers; server ++, i ++)
+      {
+        if (i == count)
+	{
+	  seconds --;
+	  i = 0;
+	  sleep(1);
+	  curtime = time(NULL);
+	  curdate = localtime(&curtime);
+	}
+
+        snprintf(packet, sizeof(packet),
+	         "%x %x ipp://testserver-%d/classes/class-%s-%d \"Server Room %d\" "
+		 "\"Test Class %d\" \"Acme Blazer 2000\"%s%s "
+		 "lease-duration=%d\n",
+                 CUPS_PRINTER_REMOTE | CUPS_PRINTER_CLASS, IPP_PRINTER_IDLE,
+		 server + 1, names[pclass % 26], pclass / 26 + 1, server + 1,
+		 pclass + 1, options ? " ipp-options=" : "",
+		 options ? options : "", lease);
 
         if (verbose)
 	  printf("[%02d:%02d:%02d] %s", curdate->tm_hour, curdate->tm_min,
@@ -265,11 +321,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 void
 usage(void)
 {
-  puts("Usage: testdirsvc [-i interval] [-o ipp-options] [-p printers] [-s servers] [-v] port");
+  puts("Usage: testdirsvc [-c] [-i interval] [-l lease-duration] "
+       "[-o ipp-options] [-p printers] "
+       "[-C classes] [-s servers] [-v] port");
   exit(0);
 }
 
 
 /*
- * End of "$Id: testdirsvc.c 4821 2005-11-04 19:36:39Z mike $".
+ * End of "$Id: testdirsvc.c 5178 2006-02-26 00:24:23Z mike $".
  */

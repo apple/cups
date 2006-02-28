@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: cupsaddsmb.c 5187 2006-02-26 20:36:03Z mike $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -564,8 +564,8 @@ export_dest(const char *dest)		/* I - Destination to export */
   {
     _cupsLangPrintf(stderr,
                     _("cupsaddsmb: No PPD file for printer \"%s\" - "
-		      "skipping!\n"),
-        	    dest);
+		      "%s\n"),
+        	    dest, cupsLastErrorString());
     httpClose(http);
     return (0);
   }
@@ -1026,5 +1026,5 @@ write_option(FILE            *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: cupsaddsmb.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: cupsaddsmb.c 5187 2006-02-26 20:36:03Z mike $".
  */

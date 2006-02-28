@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5083 2006-02-06 02:57:43Z mike $"
+ * "$Id: client.c 5200 2006-02-28 00:10:32Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -515,7 +515,9 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
     free(conn);
 
 #  elif defined(HAVE_CDSASSL)
-    SSLClose((SSLContextRef)con->http.tls);
+    while (SSLClose((SSLContextRef)con->http.tls) == errSSLWouldBlock)
+      usleep(1000);
+
     SSLDisposeContext((SSLContextRef)con->http.tls);
 #  endif /* HAVE_LIBSSL */
 
@@ -755,6 +757,7 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
 #elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error info */
   SSLContextRef	conn;			/* New connection */
+  CFArrayRef	certificatesArray;	/* Array containing certificates */
   int		allowExpired;		/* Allow expired certificates? */
   int		allowAnyRoot;		/* Allow any root certificate? */
 
@@ -764,10 +767,9 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
   allowExpired = 1;
   allowAnyRoot = 1;
 
-  if (!ServerCertificatesArray)
-    ServerCertificatesArray = get_cdsa_server_certs();
+  certificatesArray = get_cdsa_server_certs();
 
-  if (!ServerCertificatesArray)
+  if (!certificatesArray)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
         	    "EncryptClient: Could not find signing key in keychain "
@@ -794,22 +796,23 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
   if (!error && allowAnyRoot)
     error = SSLSetAllowsAnyRoot(conn, true);
 
-  if (!error && ServerCertificatesArray)
-  {
-    error = SSLSetCertificate(conn, ServerCertificatesArray);
+  if (!error)
+    error = SSLSetCertificate(conn, certificatesArray);
 
+  if (certificatesArray)
+  {
+    CFRelease(certificatesArray);
+    certificatesArray = NULL;
+  }
+
+  if (!error)
+  {
    /*
     * Perform SSL/TLS handshake
     */
-  
-    if (!error)
-    {
-      do
-      {
-	error = SSLHandshake(conn);
-      }
-      while (error == errSSLWouldBlock);
-    }
+
+    while ((error = SSLHandshake(conn)) == errSSLWouldBlock)
+      usleep(1000);
   }
 
   if (error)
@@ -889,10 +892,7 @@ cupsdIsCGI(cupsd_client_t *con,		/* I - Client connection */
 
     filename = strrchr(filename, '/') + 1; /* Filename always absolute */
 
-    if (options)
-      cupsdSetStringf(&con->options, "%s %s", filename, options);
-    else
-      cupsdSetStringf(&con->options, "%s", filename);
+    cupsdSetString(&con->options, options);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -910,9 +910,9 @@ cupsdIsCGI(cupsd_client_t *con,		/* I - Client connection */
     cupsdSetString(&con->command, CUPS_JAVA);
 
     if (options)
-      cupsdSetStringf(&con->options, "java %s %s", filename, options);
+      cupsdSetStringf(&con->options, "%s %s", filename, options);
     else
-      cupsdSetStringf(&con->options, "java %s", filename);
+      cupsdSetString(&con->options, filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -931,9 +931,9 @@ cupsdIsCGI(cupsd_client_t *con,		/* I - Client connection */
     cupsdSetString(&con->command, CUPS_PERL);
 
     if (options)
-      cupsdSetStringf(&con->options, "perl %s %s", filename, options);
+      cupsdSetStringf(&con->options, "%s %s", filename, options);
     else
-      cupsdSetStringf(&con->options, "perl %s", filename);
+      cupsdSetString(&con->options, filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -952,9 +952,9 @@ cupsdIsCGI(cupsd_client_t *con,		/* I - Client connection */
     cupsdSetString(&con->command, CUPS_PHP);
 
     if (options)
-      cupsdSetStringf(&con->options, "php %s %s", filename, options);
+      cupsdSetStringf(&con->options, "%s %s", filename, options);
     else
-      cupsdSetStringf(&con->options, "php %s", filename);
+      cupsdSetString(&con->options, filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -973,9 +973,9 @@ cupsdIsCGI(cupsd_client_t *con,		/* I - Client connection */
     cupsdSetString(&con->command, CUPS_PYTHON);
 
     if (options)
-      cupsdSetStringf(&con->options, "python %s %s", filename, options);
+      cupsdSetStringf(&con->options, "%s %s", filename, options);
     else
-      cupsdSetStringf(&con->options, "python %s", filename);
+      cupsdSetString(&con->options, filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsCGI: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -1346,11 +1346,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 #endif /* HAVE_SSL */
       }
 
-      if (con->http.expect)
-      {
-        /**** TODO: send expected header ****/
-      }
-
       if (!cupsdSendHeader(con, HTTP_OK, NULL))
 	return (cupsdCloseClient(con));
 
@@ -1401,9 +1396,30 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	return (cupsdCloseClient(con));
       }
 
-      if (con->http.expect)
+      if (con->http.expect &&
+          (con->operation == HTTP_POST || con->operation == HTTP_PUT))
       {
-        /**** TODO: send expected header ****/
+        if (con->http.expect == HTTP_CONTINUE)
+	{
+	 /*
+	  * Send 100-continue header...
+	  */
+
+	  if (!cupsdSendHeader(con, HTTP_CONTINUE, NULL))
+	    return (cupsdCloseClient(con));
+	}
+	else
+	{
+	 /*
+	  * Send 417-expectation-failed header...
+	  */
+
+	  if (!cupsdSendHeader(con, HTTP_EXPECTATION_FAILED, NULL))
+	    return (cupsdCloseClient(con));
+
+	  httpPrintf(HTTP(con), "Content-Length: 0\r\n");
+	  httpPrintf(HTTP(con), "\r\n");
+	}
       }
 
       switch (con->http.state)
@@ -1447,38 +1463,48 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		cupsdSetStringf(&con->command, "%s/cgi-bin/admin.cgi",
 		                ServerBin);
 
-		if ((ptr = strchr(con->uri + 6, '?')) != NULL)
-		  cupsdSetStringf(&con->options, "admin%s", ptr);
-		else
-		  cupsdSetString(&con->options, "admin");
+		cupsdSetString(&con->options, strchr(con->uri + 6, '?'));
 	      }
               else if (!strncmp(con->uri, "/printers", 9))
 	      {
 		cupsdSetStringf(&con->command, "%s/cgi-bin/printers.cgi",
 		                ServerBin);
-		cupsdSetString(&con->options, con->uri + 9);
+
+                if (con->uri[9] && con->uri[10])
+		  cupsdSetString(&con->options, con->uri + 9);
+		else
+		  cupsdSetString(&con->options, NULL);
 	      }
 	      else if (!strncmp(con->uri, "/classes", 8))
 	      {
 		cupsdSetStringf(&con->command, "%s/cgi-bin/classes.cgi",
 		                ServerBin);
-		cupsdSetString(&con->options, con->uri + 8);
+
+                if (con->uri[8] && con->uri[9])
+		  cupsdSetString(&con->options, con->uri + 8);
+		else
+		  cupsdSetString(&con->options, NULL);
 	      }
 	      else if (!strncmp(con->uri, "/jobs", 5))
 	      {
 		cupsdSetStringf(&con->command, "%s/cgi-bin/jobs.cgi",
 		                ServerBin);
-                cupsdSetString(&con->options, con->uri + 5);
+
+                if (con->uri[5] && con->uri[6])
+		  cupsdSetString(&con->options, con->uri + 5);
+		else
+		  cupsdSetString(&con->options, NULL);
 	      }
 	      else
 	      {
 		cupsdSetStringf(&con->command, "%s/cgi-bin/help.cgi",
 		                ServerBin);
-                cupsdSetString(&con->options, con->uri + 5);
-	      }
 
-              if (con->options[0] == '/')
-	        _cups_strcpy(con->options, con->options + 1);
+                if (con->uri[5] && con->uri[6])
+		  cupsdSetString(&con->options, con->uri + 5);
+		else
+		  cupsdSetString(&con->options, NULL);
+	      }
 
               if (!cupsdSendCommand(con, con->command, con->options, 0))
 	      {
@@ -1623,41 +1649,52 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		cupsdSetStringf(&con->command, "%s/cgi-bin/admin.cgi",
 		                ServerBin);
 
-		if ((ptr = strchr(con->uri + 6, '?')) != NULL)
-		  cupsdSetStringf(&con->options, "admin%s", ptr);
-		else
-		  cupsdSetString(&con->options, "admin");
+		cupsdSetString(&con->options, strchr(con->uri + 6, '?'));
 	      }
               else if (!strncmp(con->uri, "/printers", 9))
 	      {
 		cupsdSetStringf(&con->command, "%s/cgi-bin/printers.cgi",
 		                ServerBin);
-		cupsdSetString(&con->options, con->uri + 9);
+
+                if (con->uri[9] && con->uri[10])
+		  cupsdSetString(&con->options, con->uri + 9);
+		else
+		  cupsdSetString(&con->options, NULL);
 	      }
 	      else if (!strncmp(con->uri, "/classes", 8))
 	      {
 		cupsdSetStringf(&con->command, "%s/cgi-bin/classes.cgi",
 		                ServerBin);
-		cupsdSetString(&con->options, con->uri + 8);
+
+                if (con->uri[8] && con->uri[9])
+		  cupsdSetString(&con->options, con->uri + 8);
+		else
+		  cupsdSetString(&con->options, NULL);
 	      }
 	      else if (!strncmp(con->uri, "/jobs", 5))
 	      {
 		cupsdSetStringf(&con->command, "%s/cgi-bin/jobs.cgi",
 		                ServerBin);
-		cupsdSetString(&con->options, con->uri + 5);
+
+                if (con->uri[5] && con->uri[6])
+		  cupsdSetString(&con->options, con->uri + 5);
+		else
+		  cupsdSetString(&con->options, NULL);
 	      }
 	      else
 	      {
 		cupsdSetStringf(&con->command, "%s/cgi-bin/help.cgi",
 		                ServerBin);
-		cupsdSetString(&con->options, con->uri + 5);
+
+                if (con->uri[5] && con->uri[6])
+		  cupsdSetString(&con->options, con->uri + 5);
+		else
+		  cupsdSetString(&con->options, NULL);
 	      }
 
-	      if (con->options[0] == '/')
-		_cups_strcpy(con->options, con->options + 1);
-
               cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                      "cupsdReadClient: %d command=\"%s\", options = \"%s\"",
+	                      "cupsdReadClient: %d command=\"%s\", "
+			      "options = \"%s\"",
 	        	      con->http.fd, con->command, con->options);
 
 	      if (con->http.version <= HTTP_1_0)
@@ -2382,6 +2419,15 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
                  con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
+
+  if (code == HTTP_CONTINUE)
+  {
+    if (httpPrintf(HTTP(con), "\r\n") < 0)
+      return (0);
+    else
+      return (1);
+  }
+
   if (httpPrintf(HTTP(con), "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
     return (0);
   if (ServerHeader)
@@ -2792,7 +2838,7 @@ check_if_modified(
  * To create a self-signed certificate for testing use the certtool.
  * Executing the following as root will do it:
  *
- *     certtool c c v k=CUPS
+ *     certtool c k=/Library/Keychains/System.keychain
  */
 
 static CFArrayRef			/* O - Array of certificates */
@@ -2848,19 +2894,19 @@ get_cdsa_server_certs(void)
 	  * to array as well.
 	  */
 
-	  ca = CFArrayCreate(NULL, (const void **)&identity, 1, NULL);
+	  ca = CFArrayCreate(NULL, (const void **)&identity, 1, &kCFTypeArrayCallBacks);
 
 	  if (ca == nil)
 	    cupsdLogMessage(CUPSD_LOG_ERROR, "CFArrayCreate error");
 	}
 
-	/*CFRelease(identity);*/
+	CFRelease(identity);
       }
 
-      /*CFRelease(srchRef);*/
+      CFRelease(srchRef);
     }
 
-    /*CFRelease(kcRef);*/
+    CFRelease(kcRef);
   }
 
   return (ca);
@@ -3215,19 +3261,21 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 {
   int		i;			/* Looping var */
   int		pid;			/* Process ID */
-  char		*commptr;		/* Command string pointer */
+  char		*commptr,		/* Command string pointer */
+		commch;			/* Command string character */
   char		*uriptr;		/* URI string pointer */
   int		fds[2];			/* Pipe FDs */
   int		argc;			/* Number of arguments */
   int		envc;			/* Number of environment variables */
   char		argbuf[10240],		/* Argument buffer */
 		*argv[100],		/* Argument strings */
-		*envp[MAX_ENV + 16];	/* Environment variables */
+		*envp[MAX_ENV + 17];	/* Environment variables */
   char		content_length[1024],	/* CONTENT_LENGTH environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		http_cookie[32768],	/* HTTP_COOKIE environment variable */
 		http_user_agent[1024],	/* HTTP_USER_AGENT environment variable */
 		lang[1024],		/* LANG environment variable */
+		path_info[1024],	/* PATH_INFO environment variable */
 		*query_string,		/* QUERY_STRING env variable */
 		remote_addr[1024],	/* REMOTE_ADDR environment variable */
 		remote_host[1024],	/* REMOTE_HOST environment variable */
@@ -3240,10 +3288,12 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
  /*
   * Parse a copy of the options string, which is of the form:
   *
-  *     name argument+argument+argument
-  *     name?argument+argument+argument
-  *     name param=value&param=value
-  *     name?param=value&param=value
+  *     argument+argument+argument
+  *     ?argument+argument+argument
+  *     param=value&param=value
+  *     ?param=value&param=value
+  *     /name?argument+argument+argument
+  *     /name?param=value&param=value
   *
   * If the string contains an "=" character after the initial name,
   * then we treat it as a HTTP GET form request and make a copy of
@@ -3257,86 +3307,99 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
                   "pipe_command: command=\"%s\", options=\"%s\"",
                   command, options);
 
-  strlcpy(argbuf, options, sizeof(argbuf));
-
-  argv[0]      = argbuf;
+  argv[0]      = command;
   query_string = NULL;
 
-  for (commptr = argbuf, argc = 1; *commptr != '\0' && argc < 99; commptr ++)
+  if (options)
+    strlcpy(argbuf, options, sizeof(argbuf));
+  else
+    argbuf[0] = '\0';
+
+  if (argbuf[0] == '/')
   {
    /*
-    * Break arguments whenever we see a + or space...
+    * Found some trailing path information, set PATH_INFO...
     */
 
-    if (*commptr == ' ' || *commptr == '+' || (*commptr == '?' && argc == 1))
+    if ((commptr = strchr(argbuf, '?')) == NULL)
+      commptr = argbuf + strlen(argbuf);
+
+    commch   = *commptr;
+    *commptr = '\0';
+    snprintf(path_info, sizeof(path_info), "PATH_INFO=%s", argbuf);
+    *commptr = commch;
+  }
+  else
+  {
+    commptr      = argbuf;
+    path_info[0] = '\0';
+  }
+
+  if (*commptr == '?' && con->operation == HTTP_GET)
+  {
+    commptr ++;
+    cupsdSetStringf(&query_string, "QUERY_STRING=%s", commptr);
+  }
+
+  argc = 1;
+
+  if (*commptr)
+  {
+    argv[argc ++] = commptr;
+
+    for (; *commptr && argc < 99; commptr ++)
     {
      /*
-      * Terminate the current string and skip trailing whitespace...
+      * Break arguments whenever we see a + or space...
       */
 
-      *commptr++ = '\0';
-
-      while (*commptr == ' ')
-        commptr ++;
-
-     /*
-      * If we don't have a blank string, save it as another argument...
-      */
-
-      if (*commptr)
+      if (*commptr == ' ' || *commptr == '+')
       {
-        argv[argc] = commptr;
-	argc ++;
+	while (*commptr == ' ' || *commptr == '+')
+	  *commptr++ = '\0';
+
+       /*
+	* If we don't have a blank string, save it as another argument...
+	*/
+
+	if (*commptr)
+	{
+	  argv[argc] = commptr;
+	  argc ++;
+	}
+	else
+	  break;
       }
-      else
-        break;
+      else if (*commptr == '%' && isxdigit(commptr[1] & 255) &&
+               isxdigit(commptr[2] & 255))
+      {
+       /*
+	* Convert the %xx notation to the individual character.
+	*/
 
-     /*
-      * If we see an "=" in the remaining string, make a copy of it since
-      * it will be query data...
-      */
+	if (commptr[1] >= '0' && commptr[1] <= '9')
+          *commptr = (commptr[1] - '0') << 4;
+	else
+          *commptr = (tolower(commptr[1]) - 'a' + 10) << 4;
 
-      if (argc == 2 && strchr(commptr, '=') && con->operation == HTTP_GET)
-	cupsdSetStringf(&query_string, "QUERY_STRING=%s", commptr);
+	if (commptr[2] >= '0' && commptr[2] <= '9')
+          *commptr |= commptr[2] - '0';
+	else
+          *commptr |= tolower(commptr[2]) - 'a' + 10;
 
-     /*
-      * Don't skip the first non-blank character...
-      */
+	_cups_strcpy(commptr + 1, commptr + 3);
 
-      commptr --;
-    }
-    else if (*commptr == '%' && isxdigit(commptr[1] & 255) &&
-             isxdigit(commptr[2] & 255))
-    {
-     /*
-      * Convert the %xx notation to the individual character.
-      */
+       /*
+	* Check for a %00 and break if that is the case...
+	*/
 
-      if (commptr[1] >= '0' && commptr[1] <= '9')
-        *commptr = (commptr[1] - '0') << 4;
-      else
-        *commptr = (tolower(commptr[1]) - 'a' + 10) << 4;
-
-      if (commptr[2] >= '0' && commptr[2] <= '9')
-        *commptr |= commptr[2] - '0';
-      else
-        *commptr |= tolower(commptr[2]) - 'a' + 10;
-
-      _cups_strcpy(commptr + 1, commptr + 3);
-
-     /*
-      * Check for a %00 and break if that is the case...
-      */
-
-      if (!*commptr)
-        break;
+	if (!*commptr)
+          break;
+      }
     }
   }
 
   argv[argc] = NULL;
-
-  if (argv[0][0] == '\0')
-    argv[0] = strrchr(command, '/') + 1;
 
  /*
   * Setup the environment variables as needed...
@@ -3372,6 +3435,9 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   envp[envc ++] = remote_addr;
   envp[envc ++] = remote_host;
   envp[envc ++] = script_name;
+
+  if (path_info[0])
+    envp[envc ++] = path_info;
 
   if (con->username[0])
   {
@@ -3503,5 +3569,5 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5083 2006-02-06 02:57:43Z mike $".
+ * End of "$Id: client.c 5200 2006-02-28 00:10:32Z mike $".
  */

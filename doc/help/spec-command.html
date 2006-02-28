@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>CUPS Command File Format</title>
+	<meta name='keywords' content='Programming, CUPS Command File Format'>
+	<link rel='stylesheet' type='text/css' href='../cups.css'>
+</head>
+<body>
+<!--
+  "$Id$"
+
+  CUPS command file format specification for the Common UNIX Printing
+  System (CUPS).
+
+  Copyright 1997-2006 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Easy Software Products and are protected by Federal
+  copyright law.  Distribution and use rights are outlined in the file
+  "LICENSE.txt" which should have been included with this file.  If this
+  file is missing or damaged please contact Easy Software Products
+  at:
+
+      Attn: CUPS Licensing Information
+      Easy Software Products
+      44141 Airport View Drive, Suite 204
+      Hollywood, Maryland 20636 USA
+
+      Voice: (301) 373-9600
+      EMail: cups-info@cups.org
+        WWW: http://www.cups.org
+-->
+
+<h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
+
+<p>This specification describes the CUPS command file format
+(application/vnd.cups-command) which is used to send printer
+maintenance commands to a printer in a device-independent way.
+The current specification supports basic maintenance functions
+such as head cleaning and self-test pages.</p>
+
+<p>Printer drivers advertise support for the CUPS command file
+format by providing a filter for the
+<var>application/vnd.cups-command</var> file type. Applications
+can determine if a printer supports printing of CUPS command
+files by checking the <code>printer-type</code> attribute for the
+<code>CUPS_PRINTER_COMMANDS</code> capability bit.</p>
+
+<h2 class='title'><a name='SYNTAX'>File Syntax</a></h2>
+
+<p>CUPS command files are ASCII text files.  The first line of a
+CUPS command file MUST contain:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+</pre>
+
+<p>After that, each line is either a command or a comment.
+Comments begin with the # character, e.g.:</p>
+
+<pre class='command'>
+# This is a comment
+</pre>
+
+<p>The printer commands are described below. Printer commands are
+case-insensitive, so "PRINTSELFTESTPAGE", "printselftestpage",
+and "PrintSelfTestPage" are equivalent. Commands that accept
+arguments have their arguments on the same line separated by
+whitespace.</p>
+
+<h2 class='title'><a name='COMMANDS'>Commands</a></h2>
+
+<h3>Clean</h3>
+
+<p class='summary'>Clean colorname</p>
+
+<p>Does a standard print head cleaning.  If a printer does not
+support cleaning of individual colors or cartridges, then all
+print heads are cleaned. Command filters MUST support the "all"
+colorname. Other standard color names include "black", "color",
+"photo", "cyan", "magenta", "yellow", "light-cyan",
+"light-magenta", "light-black", "light-gray", and
+"dark-gray".</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+Clean all
+</pre>
+
+<h3>PrintSelfTestPage</h3>
+
+<p class='summary'>PrintSelfTestPage</p>
+
+<p>Print a self-test page on the printer. Typically this page
+shows if all jets on a print head are functioning properly.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+PrintSelfTestPage
+</pre>
+
+</body>
+</html>

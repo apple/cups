@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c 4990 2006-01-26 02:21:45Z mike $"
+ * "$Id: cupstestppd.c 5189 2006-02-27 01:45:57Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -302,31 +302,55 @@ main(int  argc,			/* I - Number of command-line arguments */
           attr->value)
         ppdversion = (int)(10 * atof(attr->value) + 0.5);
 
-      if (verbose > 0)
+     /*
+      * Look for default keywords with no matching option...
+      */
+
+      for (i = 0; i < ppd->num_attrs; i ++)
       {
-       /*
-        * Look for default keywords with no matching option...
-	*/
+	attr = ppd->attrs[i];
 
-        for (i = 0; i < ppd->num_attrs; i ++)
+        if (!strcmp(attr->name, "DefaultColorSpace") ||
+	    !strcmp(attr->name, "DefaultFont") ||
+	    !strcmp(attr->name, "DefaultImageableArea") ||
+	    !strcmp(attr->name, "DefaultOutputOrder") ||
+	    !strcmp(attr->name, "DefaultPaperDimension") ||
+	    !strcmp(attr->name, "DefaultTransfer"))
+	  continue;
+
+	if (!strncmp(attr->name, "Default", 7))
 	{
-	  attr = ppd->attrs[i];
-
-          if (!strcmp(attr->name, "DefaultColorSpace") ||
-	      !strcmp(attr->name, "DefaultFont") ||
-	      !strcmp(attr->name, "DefaultImageableArea") ||
-	      !strcmp(attr->name, "DefaultOutputOrder") ||
-	      !strcmp(attr->name, "DefaultPaperDimension") ||
-	      !strcmp(attr->name, "DefaultTransfer"))
-	    continue;
-	      
-	  if (!strncmp(attr->name, "Default", 7) &&
-	      !ppdFindOption(ppd, attr->name + 7))
+	  if ((option = ppdFindOption(ppd, attr->name + 7)) == NULL)
             _cupsLangPrintf(stdout,
 	                    _("        WARN    %s has no corresponding "
 			      "options!\n"),
 	                    attr->name);
-        }
+          else if (strcmp(attr->value, "Unknown"))
+	  {
+	   /*
+	    * Check that the default option value matches a choice...
+	    */
+
+	    for (j = 0; j < option->num_choices; j ++)
+	      if (!strcmp(option->choices[j].choice, attr->value))
+	        break;
+
+            if (j >= option->num_choices)
+	    {
+	      if (verbose >= 0)
+	      {
+		if (!errors && !verbose)
+		  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		_cupsLangPrintf(stdout,
+	                        _("      **FAIL**  %s %s does not exist!\n"),
+				attr->name, attr->value);
+              }
+
+	      errors ++;
+	    }
+	  }
+	}
       }
 
       if ((attr = ppdFindAttr(ppd, "DefaultImageableArea", NULL)) == NULL)
@@ -980,6 +1004,182 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  }
       }
 
+      if ((attr = ppdFindAttr(ppd, "cupsLanguages", NULL)) != NULL &&
+          attr->value)
+      {
+       /*
+        * This file contains localizations, check them...
+	*/
+
+        char	*languages,		/* Copy of attribute value */
+		*langstart,		/* Start of current language */
+		*langptr,		/* Pointer into languages */
+		keyword[PPD_MAX_NAME];	/* Localization keyword */
+
+
+        languages = strdup(attr->value);
+	for (langptr = languages; *langptr;)
+	{
+	 /*
+	  * Skip leading whitespace...
+	  */
+
+	  while (isspace(*langptr & 255))
+	    langptr ++;
+
+	  if (!*langptr)
+	    break;
+
+         /*
+	  * Find the end of this language name...
+	  */
+
+	  for (langstart = langptr;
+	       *langptr && !isspace(*langptr & 255);
+	       langptr ++);
+
+          if (*langptr)
+	    *langptr++ = '\0';
+
+          j = strlen(langstart);
+	  if (j != 2 && j != 5)
+	  {
+	    if (verbose >= 0)
+	    {
+	      if (!errors && !verbose)
+		_cupsLangPuts(stdout, _(" FAIL\n"));
+
+	      _cupsLangPrintf(stdout,
+	                      _("      **FAIL**  Bad language \"%s\"!\n"),
+			      langstart);
+            }
+
+	    errors ++;
+	    continue;
+	  }
+
+         /*
+	  * Loop through all options and choices...
+	  */
+
+          for (option = ppdFirstOption(ppd);
+	       option;
+	       option = ppdNextOption(ppd))
+	  {
+	    snprintf(keyword, sizeof(keyword), "%s.Translation", langstart);
+	    if (!ppdFindAttr(ppd, keyword, option->keyword))
+	    {
+	      if (verbose >= 0)
+	      {
+		if (!errors && !verbose)
+		  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		_cupsLangPrintf(stdout,
+	                	_("      **FAIL**  Missing \"%s\" translation "
+				  "string for option %s!\n"),
+				langstart, option->keyword);
+              }
+
+	      errors ++;
+	    }
+
+            for (ptr = option->text; *ptr; ptr ++)
+	      if (*ptr & 128)
+	        break;
+
+            if (*ptr)
+	    {
+	      if (verbose >= 0)
+	      {
+		if (!errors && !verbose)
+		  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		_cupsLangPrintf(stdout,
+	                	_("      **FAIL**  Default translation "
+				  "string for option %s contains 8-bit "
+				  "characters!\n"),
+				option->keyword);
+              }
+
+	      errors ++;
+	    }
+
+	    snprintf(keyword, sizeof(keyword), "%s.%s", langstart,
+	             option->keyword);
+            for (j = 0; j < option->num_choices; j ++)
+	    {
+	      if (!ppdFindAttr(ppd, keyword, option->choices[j].choice))
+	      {
+		if (verbose >= 0)
+		{
+		  if (!errors && !verbose)
+		    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		  _cupsLangPrintf(stdout,
+	                	  _("      **FAIL**  Missing \"%s\" "
+				    "translation string for option %s, "
+				    "choice %s!\n"),
+				  langstart, option->keyword,
+				  option->choices[j].choice);
+        	}
+
+		errors ++;
+	      }
+
+              for (ptr = option->choices[j].text; *ptr; ptr ++)
+		if (*ptr & 128)
+	          break;
+
+              if (*ptr)
+	      {
+		if (verbose >= 0)
+		{
+		  if (!errors && !verbose)
+		    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		  _cupsLangPrintf(stdout,
+	                	  _("      **FAIL**  Default translation "
+				    "string for option %s choice %s contains "
+				    "8-bit characters!\n"),
+				  option->keyword,
+				  option->choices[j].choice);
+        	}
+
+		errors ++;
+	      }
+            }
+	  }
+        }
+      }
+
+      for (attr = ppdFindAttr(ppd, "cupsFilter", NULL);
+           attr;
+	   attr = ppdFindNextAttr(ppd, "cupsFilter", NULL))
+      {
+        char	super[16],		/* Filter super type */
+		type[256],		/* Filter type */
+		program[256];		/* Filter program */
+	int	cost;			/* Filter cost */
+
+
+        if (!attr->value ||
+	    sscanf(attr->value, "%15[^/]/%255s%d%255s", super, type, &cost,
+	           program) != 4)
+        {
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	    _cupsLangPrintf(stdout,
+	                    _("      **FAIL**  Bad cupsFilter value \"%s\"!\n"),
+			    attr->value ? attr->value : "");
+          }
+
+	  errors ++;
+	}
+      }
+
       if (errors)
 	status = ERROR_CONFORMANCE;
       else if (!verbose)
@@ -1487,5 +1687,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c 4990 2006-01-26 02:21:45Z mike $".
+ * End of "$Id: cupstestppd.c 5189 2006-02-27 01:45:57Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 5108 2006-02-15 19:33:09Z mike $"
+ * "$Id: main.c 5157 2006-02-23 20:58:57Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -865,10 +865,16 @@ main(int  argc,				/* I - Number of command-line args */
         cupsdUpdatePolling();
 
 #ifdef HAVE_LIBSLP
-      if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_SLP) &&
+      if ((BrowseRemoteProtocols & BROWSE_SLP) &&
           BrowseSLPRefresh <= current_time)
         cupsdUpdateSLPBrowse();
 #endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_LDAP
+      if ((BrowseRemoteProtocols & BROWSE_LDAP) &&
+          BrowseLDAPRefresh <= current_time)
+        cupsdUpdateLDAPBrowse();
+#endif /* HAVE_LDAP */
     }
 
     if (Browsing && BrowseLocalProtocols && current_time > browse_time)
@@ -2209,6 +2215,14 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
     }
 #endif /* HAVE_LIBSLP */
 
+#ifdef HAVE_LDAP
+    if ((BrowseLocalProtocols & BROWSE_LDAP) && (BrowseLDAPRefresh < timeout))
+    {
+      timeout = BrowseLDAPRefresh;
+      why     = "update LDAP browsing";
+    }
+#endif /* HAVE_LDAP */
+
     if (BrowseLocalProtocols & BROWSE_CUPS)
     {
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
@@ -2324,5 +2338,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 5108 2006-02-15 19:33:09Z mike $".
+ * End of "$Id: main.c 5157 2006-02-23 20:58:57Z mike $".
  */

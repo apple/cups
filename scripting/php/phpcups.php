@@ -1,10 +1,11 @@
+#!/usr/bin/php -f
 <?
 //
 // "$Id: phpcups.php 3603 2003-04-11 18:42:52Z mike $"
 //
 //   PHP test script for the Common UNIX Printing System (CUPS).
 //
-//   Copyright 1997-2003 by Easy Software Products, all rights reserved.
+//   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 //
 //   These coded instructions, statements, and computer programs are the
 //   property of Easy Software Products and are protected by Federal
@@ -16,36 +17,51 @@
 //       Attn: CUPS Licensing Information
 //       Easy Software Products
 //       44141 Airport View Drive, Suite 204
-//       Hollywood, Maryland 20636-3111 USA
+//       Hollywood, Maryland 20636 USA
 //
 //       Voice: (301) 373-9603
 //       EMail: cups-info@cups.org
-//         WWW: http://www.cups.org
+//         WWW: http://www.cups.org/
 //
 
 // Make sure the module is loaded...
-if(!extension_loaded('phpcups')) {
-	dl('phpcups.so');
+if(!extension_loaded("phpcups"))
+{
+  dl("phpcups.so");
 }
 
 // Get the list of functions in the module...
-$module    = 'phpcups';
+$module    = "phpcups";
 $functions = get_extension_funcs($module);
 
-echo "Functions available in the $module extension:<br>\n";
+print("Functions available in the $module extension:\n");
 
-foreach($functions as $func) {
-    echo $func."<br>\n";
+foreach ($functions as $func)
+{
+  print("$func\n");
 }
-echo "<br>\n";
 
-$function = 'confirm_' . $module . '_compiled';
-if (extension_loaded($module)) {
-	$str = $function($module);
-} else {
-	$str = "Module $module is not compiled into PHP";
-}
-echo "$str\n";
+print("\n");
+
+print("cups_get_dests:\n");
+print_r(cups_get_dests());
+
+print("cups_get_jobs(\"\", 0, -1):\n");
+print_r(cups_get_jobs("", 0, -1));
+
+print("cups_print_file(\"test\", \"../../test/testfile.jpg\", "
+     ."\"testfile.jpg\", ...):\n");
+print_r(cups_print_file("test", "../../test/testfile.jpg", "testfile.jpg",
+                        array("scaling" => "100",
+			      "page-label" => "testfile.jpg")));
+
+print("cups_print_files(\"test\", array(\"../../test/testfile.jpg\", "
+     ."\"../../test/testfile.ps\"), \"testfiles\", ...):\n");
+print_r(cups_print_files("test", array("../../test/testfile.jpg",
+                                       "../../test/testfile.ps"),
+                         "testfiles",
+                         array("scaling" => "100",
+			       "page-label" => "testfile.jpg")));
 
 //
 // End of "$Id: phpcups.php 3603 2003-04-11 18:42:52Z mike $".

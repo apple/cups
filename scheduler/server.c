@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c 5095 2006-02-09 16:22:48Z mike $"
+ * "$Id: server.c 5200 2006-02-28 00:10:32Z mike $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -152,18 +152,6 @@ cupsdStopServer(void)
     Clients = NULL;
   }
 
-#if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
- /*
-  * Free all of the certificates...
-  */
-
-  if (ServerCertificatesArray)
-  {
-    CFRelease(ServerCertificatesArray);
-    ServerCertificatesArray = NULL;
-  }
-#endif /* HAVE_SSL && HAVE_CDSASSL */
-
  /*
   * Close the pipe for CGI processes...
   */
@@ -223,5 +211,5 @@ cupsdStopServer(void)
 
 
 /*
- * End of "$Id: server.c 5095 2006-02-09 16:22:48Z mike $".
+ * End of "$Id: server.c 5200 2006-02-28 00:10:32Z mike $".
  */

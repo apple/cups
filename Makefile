@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5136 2006-02-19 18:46:46Z mike $"
+# "$Id: Makefile 5185 2006-02-26 15:27:14Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,7 +29,8 @@ include Makedefs
 #
 
 DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
-		notifier pdftops scheduler systemv test
+		notifier pdftops scheduler systemv test \
+		$(PHPDIR)
 
 
 #
@@ -117,6 +118,7 @@ install:	installhdrs
 		fi \
 	fi
 	if test "x$(DBUSDIR)" != "x"; then \
+		echo Installing cups.conf in $(DBUSDIR)...;\
 		$(INSTALL_DIR) $(BUILDROOT)$(DBUSDIR); \
 		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/cups.conf; \
 	fi
@@ -175,5 +177,5 @@ tardist:
 
 
 #
-# End of "$Id: Makefile 5136 2006-02-19 18:46:46Z mike $".
+# End of "$Id: Makefile 5185 2006-02-26 15:27:14Z mike $".
 #

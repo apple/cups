@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 5117 2006-02-16 14:10:43Z mike $"
+ * "$Id: dirsvc.c 5178 2006-02-26 00:24:23Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -64,12 +64,27 @@
  */
 
 static char	*dequote(char *d, const char *s, int dlen);
-static void	process_browse_data(const char *uri, cups_ptype_t type,
+static int	is_local_queue(const char *uri, char *host, int hostlen,
+		               char *resource, int resourcelen);
+static void	process_browse_data(const char *uri, const char *host,
+		                    const char *resource, cups_ptype_t type,
 				    ipp_pstate_t state, const char *location,
 				    const char *info, const char *make_model,
 				    int num_attrs, cups_option_t *attrs);
 static void	process_implicit_classes(void);
 
+
+#ifdef HAVE_OPENLDAP
+static const char * const ldap_attrs[] =/* CUPS LDAP attributes */
+		{
+		  "printerDescription",
+		  "printerLocation",
+		  "printerMakeAndModel",
+		  "printerType",
+		  "printerURI",
+		  NULL
+		};
+#endif /* HAVE_OPENLDAP */
 
 #ifdef HAVE_LIBSLP 
 /*
@@ -308,6 +323,25 @@ cupsdLoadRemoteCache(void)
 	return;
       }
     }
+    else if (!strcasecmp(line, "Option") && value)
+    {
+     /*
+      * Option name value
+      */
+
+      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+
+      if (!*valueptr)
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of remote.cache.", linenum);
+      else
+      {
+        for (; *valueptr && isspace(*valueptr & 255); *valueptr++ = '\0');
+
+        p->num_options = cupsAddOption(value, valueptr, p->num_options,
+	                               &(p->options));
+      }
+    }
     else if (!strcasecmp(line, "State"))
     {
      /*
@@ -482,6 +516,7 @@ cupsdSaveRemoteCache(void)
   cupsd_printer_t	*printer;	/* Current printer class */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
+  cups_option_t		*option;	/* Current option */
 
 
  /*
@@ -582,6 +617,11 @@ cupsdSaveRemoteCache(void)
       cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
               printer->users[i]);
 
+    for (i = printer->num_options, option = printer->options;
+         i > 0;
+	 i --, option ++)
+      cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+
     if (printer->type & CUPS_PRINTER_CLASS)
       cupsFilePuts(fp, "</Class>\n");
     else
@@ -646,8 +686,8 @@ cupsdSendBrowseList(void)
   * Compute the update and timeout times...
   */
 
-  ut = time(NULL) - BrowseInterval;
-  to = time(NULL) - BrowseTimeout;
+  to = time(NULL);
+  ut = to - BrowseInterval;
 
  /*
   * Figure out how many printers need an update...
@@ -715,6 +755,11 @@ cupsdSendBrowseList(void)
 	if (BrowseLocalProtocols & BROWSE_SLP)
           cupsdSendSLPBrowse(p);
 #endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_LDAP
+	if (BrowseLocalProtocols & BROWSE_LDAP)
+          cupsdSendLDAPBrowse(p);
+#endif /* HAVE_LDAP */
       }
     }
 
@@ -739,7 +784,7 @@ cupsdSendBrowseList(void)
 
     if (p->type & CUPS_PRINTER_REMOTE)
     {
-      if (p->browse_time < to)
+      if (p->browse_expire < to)
       {
 	cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
                       "%s \'%s\' deleted by directory services (timeout).",
@@ -747,7 +792,8 @@ cupsdSendBrowseList(void)
 		      p->name);
 
         cupsdLogMessage(CUPSD_LOG_INFO,
-	                "Remote destination \"%s\" has timed out; deleting it...",
+	                "Remote destination \"%s\" has timed out; "
+			"deleting it...",
 	                p->name);
 
         cupsArraySave(Printers);
@@ -760,7 +806,8 @@ cupsdSendBrowseList(void)
 
 
 /*
- * 'cupsdSendCUPSBrowse()' - Send new browsing information using the CUPS protocol.
+ * 'cupsdSendCUPSBrowse()' - Send new browsing information using the CUPS
+ *                           protocol.
  */
 
 void
@@ -772,7 +819,6 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
   int			bytes;		/* Length of packet */
   char			packet[1453],	/* Browse data packet */
 			uri[1024],	/* Printer URI */
-			options[1024],	/* Browse local options */
 			location[1024],	/* printer-location */
 			info[1024],	/* printer-info */
 			make_model[1024];
@@ -791,15 +837,6 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 
   if (p == DefaultPrinter)
     type |= CUPS_PRINTER_DEFAULT;
-
- /*
-  * Initialize the browse options...
-  */
-
-  if (BrowseLocalOptions)
-    snprintf(options, sizeof(options), " ipp-options=%s", BrowseLocalOptions);
-  else
-    options[0] = '\0';
 
  /*
   * Remove quotes from printer-info, printer-location, and
@@ -847,8 +884,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
 			                                    "/printers/%s",
 			   p->name);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
-        	   type, p->state, uri, location, info, make_model, options);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+        	   type, p->state, uri, location, info, make_model,
+		   p->browse_attrs ? p->browse_attrs : "");
 
 	  bytes = strlen(packet);
 
@@ -887,8 +925,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
 			                                    "/printers/%s",
 			   p->name);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
-        	   type, p->state, uri, location, info, make_model, options);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+        	   type, p->state, uri, location, info, make_model,
+		   p->browse_attrs ? p->browse_attrs : "");
 
 	  bytes = strlen(packet);
 
@@ -911,8 +950,9 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
       * the default server name...
       */
 
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"%s\n",
-       	       type, p->state, p->uri, location, info, make_model, options);
+      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+       	       type, p->state, p->uri, location, info, make_model,
+	       p->browse_attrs ? p->browse_attrs : "");
 
       bytes = strlen(packet);
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -928,17 +968,143 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	*/
 
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdSendBrowseList: sendto failed for browser %d - %s.",
+	                "cupsdSendBrowseList: sendto failed for browser "
+			"%d - %s.",
 	                b - Browsers + 1, strerror(errno));
 
         if (i > 1)
-	  memcpy(b, b + 1, (i - 1) * sizeof(cupsd_dirsvc_addr_t));
+	  memmove(b, b + 1, (i - 1) * sizeof(cupsd_dirsvc_addr_t));
 
 	b --;
 	NumBrowsers --;
       }
     }
 }
+
+
+#ifdef HAVE_OPENLDAP
+/*
+ * cupsdSendLDAPBrowse()' - Send LDAP printer registrations.
+ */
+
+void 
+cupsdSendLDAPBrowse(cupsd_printer_t *p)	/* I - Printer to register */
+{
+  int		i;			/* Looping var... */
+  LDAPMod	mods[7];		/* The 7 attributes we will be adding */
+  LDAPMod	*pmods[8];		/* Pointers to the 7 attributes + NULL */
+  LDAPMessage	*res;			/* Search result token */
+  char		*cn_value[2],		/* Change records */
+		*uri[2],
+		*info[2],
+		*location[2],
+		*make_model[2],
+		*type[2],
+		typestring[255],	/* String to hold printer-type */
+		filter[256],		/* Search filter for possible UPDATEs */
+		dn[1024];		/* DN of the printer we are adding */
+  int		rc;			/* LDAP status */
+  static const char * const objectClass_values[] =
+		{			/* The 3 objectClass's we use in */
+		  "top",		/* our LDAP entries              */
+		  "device",
+		  "cupsPrinter",
+		  NULL
+		};
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendLDAPBrowse: %s\n", p->name);
+
+ /*
+  * Everything in ldap is ** so we fudge around it...
+  */
+
+  sprintf(typestring, "%u", p->type);
+
+  cn_value[0]   = p->info;
+  cn_value[1]   = NULL;
+  info[0]       = p->info;
+  info[1]       = NULL;
+  location[0]   = p->location;
+  location[1]   = NULL;
+  make_model[0] = p->make_model;
+  make_model[1] = NULL;
+  type[0]       = typestring;
+  type[1]       = NULL;
+  uri[0]        = p->uri;
+  uri[1]        = NULL;
+
+  snprintf(filter, sizeof(filter),
+           "(&(objectclass=cupsPrinter)(printerDescription~=%s))", p->info);
+
+  ldap_search_s(BrowseLDAPHandle, BrowseLDAPDN, LDAP_SCOPE_SUBTREE,
+                filter, (char **)ldap_attrs, 0, &res);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendLDAPBrowse: Searching \"%s\"",
+                  filter);
+
+  mods[0].mod_type = "cn";
+  mods[0].mod_values = cn_value;
+  mods[1].mod_type = "printerDescription";
+  mods[1].mod_values = info;
+  mods[2].mod_type = "printerURI";
+  mods[2].mod_values = uri;
+  mods[3].mod_type = "printerLocation";
+  mods[3].mod_values = location;
+  mods[4].mod_type = "printerMakeAndModel";
+  mods[4].mod_values = make_model;
+  mods[5].mod_type = "printerType";
+  mods[5].mod_values = type;
+  mods[6].mod_type = "objectClass";
+  mods[6].mod_values = (char **)objectClass_values;
+
+  snprintf(dn, sizeof(dn), "cn=%s,ou=printers,%s", p->info, BrowseLDAPDN);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendLDAPBrowse: dn=\"%s\"", dn);
+
+  if (ldap_count_entries(BrowseLDAPHandle, res) > 0)
+  {
+   /*
+    * Printer has already been registered, modify the current
+    * registration...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdSendLDAPBrowse: Replacing entry...");
+
+    for (i = 0; i < 7; i ++)
+    {
+      pmods[i]         = mods + i;
+      pmods[i]->mod_op = LDAP_MOD_REPLACE;
+    }
+    pmods[i] = NULL;
+
+    if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "LDAP modify for %s failed with status %d: %s",
+                      p->name, rc, ldap_err2string(rc));
+  }
+  else 
+  {
+   /*
+    * Printer has already been registered, modify the current
+    * registration...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdSendLDAPBrowse: Adding entry...");
+
+    for (i = 0; i < 7; i ++)
+    {
+      pmods[i]         = mods + i;
+      pmods[i]->mod_op = LDAP_MOD_REPLACE;
+    }
+    pmods[i] = NULL;
+
+    if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "LDAP add for %s failed with status %d: %s",
+                      p->name, rc, ldap_err2string(rc));
+  }
+}
+#endif /* HAVE_OPENLDAP */
 
 
 #ifdef HAVE_LIBSLP
@@ -1090,6 +1256,7 @@ cupsdSendSLPBrowse(cupsd_printer_t *p)	/* I - Printer to register */
            "(printer-info=%s),"
            "(printer-more-info=%s),"
            "(printer-make-and-model=%s),"
+	   "(printer-type=%d),"
 	   "(charset-supported=utf-8),"
 	   "(natural-language-configured=%s),"
 	   "(natural-language-supported=de,en,es,fr,it),"
@@ -1099,7 +1266,7 @@ cupsdSendSLPBrowse(cupsd_printer_t *p)	/* I - Printer to register */
 	   "(multiple-document-jobs-supported=true)"
 	   "(ipp-versions-supported=1.0,1.1)",
 	   p->uri, authentication->values[0].string.text, p->name, location,
-	   info, p->uri, make_model, DefaultLanguage,
+	   info, p->uri, make_model, p->type, DefaultLanguage,
            p->type & CUPS_PRINTER_COLOR ? "true" : "false",
            finishings,
            p->type & CUPS_PRINTER_DUPLEX ?
@@ -1243,6 +1410,79 @@ cupsdStartBrowsing(void)
     BrowseSLPRefresh = 0;
   }
 #endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_OPENLDAP
+  if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_LDAP)
+  {
+    if (!BrowseLDAPDN)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Need to set BrowseLDAPDN to use LDAP browsing!");
+      BrowseLocalProtocols &= ~BROWSE_LDAP;
+      BrowseRemoteProtocols &= ~BROWSE_LDAP;
+    }
+    else
+    {
+     /* 
+      * Open LDAP handle...
+      */
+
+      int		rc;		/* LDAP API status */
+      int		version = 3;	/* LDAP version */
+      struct berval	bv = {0, ""};	/* SASL bind value */
+
+
+     /*
+      * LDAP stuff currently only supports ldapi EXTERNAL SASL binds...
+      */
+
+      if (!BrowseLDAPServer || !strcasecmp(BrowseLDAPServer, "localhost")) 
+        rc = ldap_initialize(&BrowseLDAPHandle, "ldapi:///");
+      else	
+	rc = ldap_initialize(&BrowseLDAPHandle, BrowseLDAPServer);
+
+      if (rc != LDAP_SUCCESS)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to initialize LDAP; disabling LDAP browsing!");
+	BrowseLocalProtocols &= ~BROWSE_LDAP;
+	BrowseRemoteProtocols &= ~BROWSE_LDAP;
+      }
+      else if (ldap_set_option(BrowseLDAPHandle, LDAP_OPT_PROTOCOL_VERSION,
+                               (const void *)&version) != LDAP_SUCCESS)
+      {
+	ldap_unbind_ext(BrowseLDAPHandle, NULL, NULL);
+	BrowseLDAPHandle = NULL;
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to set LDAP protocol version; "
+			"disabling LDAP browsing!");
+	BrowseLocalProtocols &= ~BROWSE_LDAP;
+	BrowseRemoteProtocols &= ~BROWSE_LDAP;
+      }
+      else
+      {
+	if (!BrowseLDAPServer || !strcasecmp(BrowseLDAPServer, "localhost"))
+	  rc = ldap_sasl_bind_s(BrowseLDAPHandle, NULL, "EXTERNAL", &bv, NULL,
+	                        NULL, NULL);
+	else
+	  rc = ldap_bind_s(BrowseLDAPHandle, BrowseLDAPBindDN,
+	                   BrowseLDAPPassword, LDAP_AUTH_SIMPLE);
+
+	if (rc != LDAP_SUCCESS)
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Unable to bind to LDAP server; "
+			  "disabling LDAP browsing!");
+	  ldap_unbind_ext(BrowseLDAPHandle, NULL, NULL);
+	  BrowseLocalProtocols &= ~BROWSE_LDAP;
+	  BrowseRemoteProtocols &= ~BROWSE_LDAP;
+	}
+      }
+    }
+
+    BrowseLDAPRefresh = 0;
+  }
+#endif /* HAVE_OPENLDAP */
 }
 
 
@@ -1384,15 +1624,26 @@ cupsdStopBrowsing(void)
   }
 
 #ifdef HAVE_LIBSLP
-  if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_SLP)
+  if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_SLP) &&
+      BrowseSLPHandle)
   {
    /* 
     * Close SLP handle...
     */
 
     SLPClose(BrowseSLPHandle);
+    BrowseSLPHandle = NULL;
   }
 #endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_OPENDAP
+  if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_LDAP) &&
+      BrowseLDAPHandle)
+  {
+    ldap_unbind(BrowseLDAPHandle);
+    BrowseLDAPHandle = NULL;
+  }
+#endif /* HAVE_OPENLDAP */
 }
 
 
@@ -1446,15 +1697,11 @@ cupsdUpdateCUPSBrowse(void)
   unsigned	type;			/* Printer type */
   unsigned	state;			/* Printer state */
   char		uri[HTTP_MAX_URI],	/* Printer URI */
-		method[HTTP_MAX_URI],	/* Method portion of URI */
-		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI],	/* Resource portion of URI */
 		info[IPP_MAX_NAME],	/* Information string */
 		location[IPP_MAX_NAME],	/* Location string */
 		make_model[IPP_MAX_NAME];/* Make and model string */
-  int		port;			/* Port portion of URI */
-  cupsd_netif_t	*iface;			/* Network interface */
   int		num_attrs;		/* Number of attributes */
   cups_option_t	*attrs;			/* Attributes */
 
@@ -1670,32 +1917,11 @@ cupsdUpdateCUPSBrowse(void)
   * Pull the URI apart to see if this is a local or remote printer...
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), username,
-                  sizeof(username), host, sizeof(host), &port, resource,
-		  sizeof(resource));
-
-  DEBUG_printf(("host=\"%s\", ServerName=\"%s\"\n", host, ServerName));
-
- /*
-  * Check for packets from the local server...
-  */
-
-  if (!strcasecmp(host, ServerName) && port == LocalPort)
+  if (is_local_queue(uri, host, sizeof(host), resource, sizeof(resource)))
   {
     cupsFreeOptions(num_attrs, attrs);
     return;
   }
-
-  cupsdNetIFUpdate();
-
-  for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
-       iface;
-       iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
-    if (!strcasecmp(host, iface->hostname) && port == iface->port)
-    {
-      cupsFreeOptions(num_attrs, attrs);
-      return;
-    }
 
  /*
   * Do relaying...
@@ -1718,10 +1944,97 @@ cupsdUpdateCUPSBrowse(void)
   * Process the browse data...
   */
 
-  process_browse_data(uri, (cups_ptype_t)type, (ipp_pstate_t)state, location,
-                         info, make_model, num_attrs, attrs);
-  cupsFreeOptions(num_attrs, attrs);
+  process_browse_data(uri, host, resource, (cups_ptype_t)type,
+                      (ipp_pstate_t)state, location, info, make_model,
+		      num_attrs, attrs);
 }
+
+
+#ifdef HAVE_OPENLDAP
+/*
+ * 'cupsdUpdateLDAPBrowse()' - Scan for new printers via LDAP...
+ */
+
+void
+cupsdUpdateLDAPBrowse(void)
+{
+  char		uri[HTTP_MAX_URI],	/* Printer URI */
+		host[HTTP_MAX_URI],	/* Hostname */
+		resource[HTTP_MAX_URI],	/* Resource path */
+		location[1024],		/* Printer location */
+		info[1024],		/* Printer information */
+		make_model[1024],	/* Printer make and model */
+		**value;		/* Holds the returned data from LDAP */
+  int		type;			/* Printer type */
+  int		rc;			/* LDAP status */
+  int		limit;			/* Size limit */
+  LDAPMessage	*res,			/* LDAP search results */
+		  *e;			/* Current entry from search */
+
+
+ /*
+  * Search for printers...
+  */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "UpdateLDAPBrowse: %s", ServerName);
+
+  BrowseLDAPRefresh = time(NULL) + BrowseInterval;
+
+  rc = ldap_search_s(BrowseLDAPHandle, BrowseLDAPDN, LDAP_SCOPE_SUBTREE,
+                     "(objectclass=cupsPrinter)", (char **)ldap_attrs, 0, &res);
+  if (rc != LDAP_SUCCESS) 
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "LDAP search returned error %d: %s", rc,
+		    ldap_err2string(rc));
+    return;
+  }
+
+  limit = ldap_count_entries(BrowseLDAPHandle, res);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "LDAP search returned %d entries", limit);
+  if (limit < 1)
+    return;
+
+ /*
+  * Loop through the available printers...
+  */
+
+  if ((e = ldap_first_entry(BrowseLDAPHandle, res)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get LDAP printer entry!");
+    return;
+  }
+
+  while (e)
+  {
+    value = ldap_get_values(BrowseLDAPHandle, e, "printerDescription");
+    strlcpy(info, *value, sizeof(info));
+    ldap_value_free(value);
+
+    value = ldap_get_values(BrowseLDAPHandle, e, "printerLocation");
+    strlcpy(location, *value, sizeof(location));
+    ldap_value_free(value);
+
+    value = ldap_get_values(BrowseLDAPHandle, e, "printerMakeAndModel");
+    strlcpy(make_model, *value, sizeof(make_model));
+    ldap_value_free(value);
+
+    value = ldap_get_values(BrowseLDAPHandle, e, "printerType");
+    type = atoi(*value);
+    ldap_value_free(value);
+
+    value = ldap_get_values(BrowseLDAPHandle, e, "printerURI");
+    strlcpy(uri, *value, sizeof(uri));
+    ldap_value_free(value);
+
+    if (!is_local_queue(uri, host, sizeof(host), resource, sizeof(resource)))
+      process_browse_data(uri, host, resource, type, IPP_PRINTER_IDLE,
+                          location, info, make_model, 0, NULL);
+
+    e = ldap_next_entry(BrowseLDAPHandle, e);
+  }
+}
+#endif /* HAVE_OPENLDAP */
 
 
 /*
@@ -1762,22 +2075,13 @@ cupsdUpdatePolling(void)
 void
 cupsdUpdateSLPBrowse(void)
 {
-  slpsrvurl_t		*s,		/* Temporary list of service URLs */
-			*next;		/* Next service in list */
-  cupsd_printer_t	p;		/* Printer information */
-  const char		*uri;		/* Pointer to printer URI */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
-			username[HTTP_MAX_URI],
-					/* Username portion of URI */
-			host[HTTP_MAX_URI],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
+  slpsrvurl_t	*s,			/* Temporary list of service URLs */
+		*next;			/* Next service in list */
+  cupsd_printer_t p;			/* Printer information */
+  const char	*uri;			/* Pointer to printer URI */
+  char		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
 
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdUpdateSLPBrowse() Start...");
 
  /*
   * Reset the refresh time...
@@ -1824,34 +2128,21 @@ cupsdUpdateSLPBrowse(void)
       * Pull the URI apart to see if this is a local or remote printer...
       */
 
-      httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method),
-                      username, sizeof(username), host, sizeof(host), &port,
-		      resource, sizeof(resource));
-
-      if (!strcasecmp(host, ServerName))
-	continue;
-
-     /*
-      * OK, at least an IPP printer, see if it is a CUPS printer or
-      * class...
-      */
-
-      if (strstr(uri, "/printers/") != NULL)
-        process_browse_data(uri, p.type, IPP_PRINTER_IDLE, p.location,
-	                  p.info, p.make_model, 0, NULL);
-      else if (strstr(uri, "/classes/") != NULL)
-        process_browse_data(uri, p.type | CUPS_PRINTER_CLASS, IPP_PRINTER_IDLE,
-	                  p.location, p.info, p.make_model, 0, NULL);
+      if (!is_local_queue(uri, host, sizeof(host), resource, sizeof(resource)))
+        process_browse_data(uri, host, resource, p.type, IPP_PRINTER_IDLE,
+	                    p.location,  p.info, p.make_model, 0, NULL);
     }
 
    /*
     * Free this listing...
     */
 
+    cupsdClearString(&p.info);
+    cupsdClearString(&p.location);
+    cupsdClearString(&p.make_model);
+
     free(s);
   }       
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdUpdateSLPBrowse() End...");
 }
 #endif /* HAVE_LIBSLP */
 
@@ -1887,12 +2178,65 @@ dequote(char       *d,			/* I - Destination string */
 
 
 /*
+ * 'is_local_queue()' - Determine whether the URI points at a local queue.
+ */
+
+static int				/* O - 1 = local, 0 = remote, -1 = bad URI */
+is_local_queue(const char *uri,		/* I - Printer URI */
+               char       *host,	/* O - Host string */
+	       int        hostlen,	/* I - Length of host buffer */
+               char       *resource,	/* O - Resource string */
+	       int        resourcelen)	/* I - Length of resource buffer */
+{
+  char		scheme[32],		/* Scheme portion of URI */
+		username[HTTP_MAX_URI];	/* Username portion of URI */
+  int		port;			/* Port portion of URI */
+  cupsd_netif_t	*iface;			/* Network interface */
+
+
+ /*
+  * Pull the URI apart to see if this is a local or remote printer...
+  */
+
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
+                      username, sizeof(username), host, hostlen, &port,
+		      resource, resourcelen) < HTTP_URI_OK)
+    return (-1);
+
+  DEBUG_printf(("host=\"%s\", ServerName=\"%s\"\n", host, ServerName));
+
+ /*
+  * Check for local server addresses...
+  */
+
+  if (!strcasecmp(host, ServerName) && port == LocalPort)
+    return (1);
+
+  cupsdNetIFUpdate();
+
+  for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
+       iface;
+       iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
+    if (!strcasecmp(host, iface->hostname) && port == iface->port)
+      return (1);
+
+ /*
+  * If we get here, the printer is remote...
+  */
+
+  return (0);
+}
+
+
+/*
  * 'process_browse_data()' - Process new browse data.
  */
 
 static void
 process_browse_data(
     const char    *uri,			/* I - URI of printer/class */
+    const char    *host,		/* I - Hostname */
+    const char    *resource,		/* I - Resource path */
     cups_ptype_t  type,			/* I - Printer type */
     ipp_pstate_t  state,		/* I - Printer state */
     const char    *location,		/* I - Printer location */
@@ -1901,29 +2245,19 @@ process_browse_data(
     int		  num_attrs,		/* I - Number of attributes */
     cups_option_t *attrs)		/* I - Attributes */
 {
+  int		i;			/* Looping var */
   int		update;			/* Update printer attributes? */
   char		finaluri[HTTP_MAX_URI],	/* Final URI for printer */
-		method[HTTP_MAX_URI],	/* Method portion of URI */
-		username[HTTP_MAX_URI],	/* Username portion of URI */
-		host[HTTP_MAX_URI],	/* Host portion of URI */
-		resource[HTTP_MAX_URI];	/* Resource portion of URI */
-  int		port;			/* Port portion of URI */
-  char		name[IPP_MAX_NAME],	/* Name of printer */
+		name[IPP_MAX_NAME],	/* Name of printer */
+		newname[IPP_MAX_NAME],	/* New name of printer */
 		*hptr,			/* Pointer into hostname */
 		*sptr;			/* Pointer into ServerName */
   char		local_make_model[IPP_MAX_NAME];
 					/* Local make and model */
   cupsd_printer_t *p;			/* Printer information */
-  const char	*ipp_options;		/* ipp-options value */
+  const char	*ipp_options,		/* ipp-options value */
+		*lease_duration;	/* lease-duration value */
 
-
- /*
-  * Pull the URI apart to see if this is a local or remote printer...
-  */
-
-  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), username,
-                  sizeof(username), host, sizeof(host), &port, resource,
-		  sizeof(resource));
 
  /*
   * Determine if the URI contains any illegal characters in it...
@@ -2055,10 +2389,8 @@ process_browse_data(
                 	  "Class \'%s\' deleted by directory services.",
 			  p->name);
 
-            cupsArrayRemove(Printers, p);
-            cupsdSetStringf(&p->name, "%s@%s", p->name, p->hostname);
-	    cupsdSetPrinterAttrs(p);
-	    cupsArrayAdd(Printers, p);
+            snprintf(newname, sizeof(newname), "%s@%s", p->name, p->hostname);
+            cupsdRenamePrinter(p, newname);
 
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                 	  "Class \'%s\' added by directory services.",
@@ -2160,10 +2492,8 @@ process_browse_data(
                 	  "Printer \'%s\' deleted by directory services.",
 			  p->name);
 
-	    cupsArrayRemove(Printers, p);
-	    cupsdSetStringf(&p->name, "%s@%s", p->name, p->hostname);
-	    cupsdSetPrinterAttrs(p);
-	    cupsArrayAdd(Printers, p);
+            snprintf(newname, sizeof(newname), "%s@%s", p->name, p->hostname);
+            cupsdRenamePrinter(p, newname);
 
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                 	  "Printer \'%s\' added by directory services.",
@@ -2241,6 +2571,23 @@ process_browse_data(
   p->state       = state;
   p->browse_time = time(NULL);
 
+  if ((lease_duration = cupsGetOption("lease-duration", num_attrs,
+                                      attrs)) != NULL)
+  {
+   /*
+    * Grab the lease-duration for the browse data; anything less then 1
+    * second or more than 1 week gets the default BrowseTimeout...
+    */
+
+    i = atoi(lease_duration);
+    if (i < 1 || i > 604800)
+      i = BrowseTimeout;
+
+    p->browse_expire = p->browse_time + i;
+  }
+  else
+    p->browse_expire = p->browse_time + BrowseTimeout;
+
   if (type & CUPS_PRINTER_REJECTING)
   {
     type &= ~CUPS_PRINTER_REJECTING;
@@ -2294,6 +2641,39 @@ process_browse_data(
     update = 1;
   }
 
+  if (p->num_options)
+  {
+    if (!update && !(type & CUPS_PRINTER_DELETE))
+    {
+     /*
+      * See if we need to update the attributes...
+      */
+
+      if (p->num_options != num_attrs)
+	update = 1;
+      else
+      {
+	for (i = 0; i < num_attrs; i ++)
+          if (strcmp(attrs[i].name, p->options[i].name) ||
+	      (!attrs[i].value != !p->options[i].value) ||
+	      (attrs[i].value && strcmp(attrs[i].value, p->options[i].value)))
+          {
+	    update = 1;
+	    break;
+          }
+      }
+    }
+
+   /*
+    * Free the old options...
+    */
+
+    cupsFreeOptions(p->num_options, p->options);
+  }
+
+  p->num_options = num_attrs;
+  p->options     = attrs;
+
   if (type & CUPS_PRINTER_DELETE)
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
@@ -2312,8 +2692,8 @@ process_browse_data(
   }
 
  /*
-  * See if we have a default printer...  If not, make the first printer the
-  * default.
+  * See if we have a default printer...  If not, make the first network
+  * default printer the default.
   */
 
   if (DefaultPrinter == NULL && Printers != NULL && UseNetworkDefault)
@@ -2431,6 +2811,9 @@ process_implicit_classes(void)
 
         cupsdLogMessage(CUPSD_LOG_INFO, "Added implicit class \"%s\"...",
 	                name);
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
+                      "Implicit class \'%s\' added by directory services.",
+		      name);
       }
 
       if (first != NULL)
@@ -2535,15 +2918,12 @@ slp_attr_callback(
     SLPError   errcode,			/* I - Parsing status for this attr */
     void       *cookie)			/* I - Current printer */
 {
-  char			*tmp = 0;
+  char			*tmp = 0;	/* Temporary string */
   cupsd_printer_t	*p = (cupsd_printer_t*)cookie;
+					/* Current printer */
 
 
- /*
-  * Let the compiler know we won't be using these...
-  */
-
-  (void)hslp;
+  (void)hslp;				/* anti-compiler-warning-code */
 
  /*
   * Bail if there was an error
@@ -2558,33 +2938,16 @@ slp_attr_callback(
 
   memset(p, 0, sizeof(cupsd_printer_t));
 
-  p->type = CUPS_PRINTER_REMOTE;
-
   if (slp_get_attr(attrlist, "(printer-location=", &(p->location)))
     return (SLP_FALSE);
   if (slp_get_attr(attrlist, "(printer-info=", &(p->info)))
     return (SLP_FALSE);
   if (slp_get_attr(attrlist, "(printer-make-and-model=", &(p->make_model)))
     return (SLP_FALSE);
-
-  if (slp_get_attr(attrlist, "(color-supported=", &tmp))
-    return (SLP_FALSE);
-  if (!strcasecmp(tmp, "true"))
-    p->type |= CUPS_PRINTER_COLOR;
-
-  if (slp_get_attr(attrlist, "(finishings-supported=", &tmp))
-    return (SLP_FALSE);
-  if (strstr(tmp, "staple"))
-    p->type |= CUPS_PRINTER_STAPLE;
-  if (strstr(tmp, "bind"))
-    p->type |= CUPS_PRINTER_BIND;
-  if (strstr(tmp, "punch"))
-    p->type |= CUPS_PRINTER_PUNCH;
-
-  if (slp_get_attr(attrlist, "(sides-supported=", &tmp))
-    return (SLP_FALSE);
-  if (strstr(tmp,"two-sided"))
-    p->type |= CUPS_PRINTER_DUPLEX;
+  if (!slp_get_attr(attrlist, "(printer-type=", &tmp))
+    p->type = atoi(tmp);
+  else
+    p->type = CUPS_PRINTER_REMOTE;
 
   cupsdClearString(&tmp);
 
@@ -2747,5 +3110,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id: dirsvc.c 5117 2006-02-16 14:10:43Z mike $".
+ * End of "$Id: dirsvc.c 5178 2006-02-26 00:24:23Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h 5078 2006-02-05 03:36:35Z mike $"
+ * "$Id: conf.h 5200 2006-02-28 00:10:32Z mike $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -186,9 +186,6 @@ VAR char		*ServerCertificate	VALUE(NULL);
 #  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
 VAR char		*ServerKey		VALUE(NULL);
 					/* Server key file */
-#  else
-VAR CFArrayRef		ServerCertificatesArray	VALUE(NULL);
-					/* Array containing certificates */
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
@@ -215,5 +212,5 @@ extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h 5078 2006-02-05 03:36:35Z mike $".
+ * End of "$Id: conf.h 5200 2006-02-28 00:10:32Z mike $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in 5124 2006-02-17 16:05:21Z mike $"
+dnl "$Id: configure.in 5182 2006-02-26 04:10:27Z mike $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -37,6 +37,7 @@ sinclude(config-scripts/cups-compiler.m4)
 sinclude(config-scripts/cups-image.m4)
 sinclude(config-scripts/cups-network.m4)
 sinclude(config-scripts/cups-slp.m4)
+sinclude(config-scripts/cups-ldap.m4)
 sinclude(config-scripts/cups-ssl.m4)
 sinclude(config-scripts/cups-pam.m4)
 sinclude(config-scripts/cups-threads.m4)
@@ -50,14 +51,14 @@ sinclude(config-scripts/cups-scripting.m4)
 
 AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh cups-config
           conf/cupsd.conf conf/pam.std doc/index.html doc/ja/index.html
-	  doc/help/standard.html man/cups-deviced.man
+	  doc/help/standard.html man/client.conf.man man/cups-deviced.man
 	  man/cups-driverd.man man/cups-lpd.man man/cupsaddsmb.man
-	  man/cupsd.man man/cupsd.conf.man
+	  man/cupsd.man man/cupsd.conf.man man/lpoptions.man
 	  templates/edit-config.tmpl templates/header.tmpl
 	  templates/ja/header.tmpl)
 
 chmod +x cups-config
 
 dnl
-dnl End of "$Id: configure.in 5124 2006-02-17 16:05:21Z mike $".
+dnl End of "$Id: configure.in 5182 2006-02-26 04:10:27Z mike $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 5144 2006-02-21 20:44:01Z mike $"
+ * "$Id: config.h.in 5157 2006-02-23 20:58:57Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -254,10 +254,18 @@
 
 
 /*
- * Do we have the OpenSLP library?
+ * Do we have the SLP library?
  */
 
 #undef HAVE_LIBSLP
+
+
+/*
+ * Do we have an LDAP library?
+ */
+
+#undef HAVE_LDAP
+#undef HAVE_OPENLDAP
 
 
 /*
@@ -417,5 +425,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 5144 2006-02-21 20:44:01Z mike $".
+ * End of "$Id: config.h.in 5157 2006-02-23 20:58:57Z mike $".
  */

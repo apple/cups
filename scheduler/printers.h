@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 5083 2006-02-06 02:57:43Z mike $"
+ * "$Id: printers.h 5178 2006-02-26 00:24:23Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -60,6 +60,8 @@ typedef struct cupsd_printer_s
   time_t	state_time;		/* Time at this state */
   char		*job_sheets[2];		/* Banners/job sheets */
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
+  char		*browse_attrs;		/* Attributes sent with browse data */
+  time_t	browse_expire;		/* Expiration time for printer */
   time_t	browse_time;		/* Last time update was sent/received */
   char		*device_uri;		/* Device URI */
   char		*port_monitor;		/* Port monitor */
@@ -80,6 +82,8 @@ typedef struct cupsd_printer_s
   int		num_history;		/* Number of history collections */
   ipp_t		**history;		/* History data */
   int		sequence_number;	/* Increasing sequence number */
+  int		num_options;		/* Number of default options */
+  cups_option_t	*options;		/* Default options */
 #ifdef __APPLE__
   char		*recoverable;		/* com.apple.print.recoverable-message */
 #endif /* __APPLE__ */
@@ -123,6 +127,7 @@ extern cupsd_quota_t	*cupsdFindQuota(cupsd_printer_t *p, const char *username);
 extern void		cupsdFreePrinterUsers(cupsd_printer_t *p);
 extern void		cupsdFreeQuotas(cupsd_printer_t *p);
 extern void		cupsdLoadAllPrinters(void);
+extern void		cupsdRenamePrinter(cupsd_printer_t *p, const char *name);
 extern void		cupsdSaveAllPrinters(void);
 extern void		cupsdSetPrinterAttrs(cupsd_printer_t *p);
 extern void		cupsdSetPrinterReasons(cupsd_printer_t *p, const char *s);
@@ -143,5 +148,5 @@ extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
 
 
 /*
- * End of "$Id: printers.h 5083 2006-02-06 02:57:43Z mike $".
+ * End of "$Id: printers.h 5178 2006-02-26 00:24:23Z mike $".
  */

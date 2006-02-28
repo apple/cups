@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c 5083 2006-02-06 02:57:43Z mike $"
+ * "$Id: filter.c 5196 2006-02-27 21:23:00Z mike $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -199,7 +199,7 @@ compare_filters(mime_filter_t *f0,	/* I - First filter */
  * 'find_filters()' - Find the filters to convert from one type to another.
  */
 
-cups_array_t *				/* O - Array of filters to run */
+static cups_array_t *			/* O - Array of filters to run */
 find_filters(mime_t           *mime,	/* I - MIME database */
              mime_type_t      *src,	/* I - Source file type */
 	     mime_type_t      *dst,	/* I - Destination file type */
@@ -360,5 +360,5 @@ lookup(mime_t      *mime,		/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c 5083 2006-02-06 02:57:43Z mike $".
+ * End of "$Id: filter.c 5196 2006-02-27 21:23:00Z mike $".
  */

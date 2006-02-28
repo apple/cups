@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c 5052 2006-02-02 16:21:13Z mike $"
+ * "$Id: type.c 5180 2006-02-26 01:31:45Z mike $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -544,11 +544,11 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
   mime_type_t		*type;		/* File type */
 
 
-  DEBUG_printf(("mimeFileType(mime=%p, pathname=\"%s\", basename=\"%s\", "
+  DEBUG_printf(("mimeFileType(mime=%p, pathname=\"%s\", filename=\"%s\", "
                 "compression=%p)\n",
                 mime, pathname ? pathname : "(nil)",
 		filename ? filename : "(nil)",
-		basenamecompression));
+		compression));
 
  /*
   * Range check input parameters...
@@ -690,8 +690,8 @@ checkrules(const char      *filename,	/* I - Filename */
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("checkrules(filename=\"%s\", fp=%p, rules=%p)\n", filename,
-                fp, rules));
+  DEBUG_printf(("checkrules(filename=\"%s\", fb=%p, rules=%p)\n", filename,
+                fb, rules));
 
   if (rules == NULL)
     return (0);
@@ -1161,5 +1161,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c 5052 2006-02-02 16:21:13Z mike $".
+ * End of "$Id: type.c 5180 2006-02-26 01:31:45Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c 5099 2006-02-13 02:46:10Z mike $"
+ * "$Id: usb-unix.c 5162 2006-02-24 03:15:13Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -394,7 +394,7 @@ list_devices(void)
   }
 #elif defined(__hpux)
 #elif defined(__osf)
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
   int   i;                      /* Looping var */
   char  device[255];            /* Device filename */
 
@@ -616,5 +616,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c 5099 2006-02-13 02:46:10Z mike $".
+ * End of "$Id: usb-unix.c 5162 2006-02-24 03:15:13Z mike $".
  */

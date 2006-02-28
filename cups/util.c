@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 5138 2006-02-21 10:49:06Z mike $"
+ * "$Id: util.c 5165 2006-02-24 21:20:30Z mike $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -819,7 +819,10 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
   if (!http || !name)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    if (!http)
+      _cupsSetError(IPP_INTERNAL_ERROR, "No HTTP connection!");
+    else
+      _cupsSetError(IPP_INTERNAL_ERROR, "No printer name!");
 
     return (NULL);
   }
@@ -1491,7 +1494,7 @@ cups_get_printer_uri(
   if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                        "localhost", 0, "/printers/%s", name) != HTTP_URI_OK)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, "Unable to create printer-uri!");
 
     *host     = '\0';
     *resource = '\0';
@@ -1628,6 +1631,8 @@ cups_get_printer_uri(
     ippDelete(response);
   }
 
+  _cupsSetError(IPP_INTERNAL_ERROR, "No printer-uri found!");
+
   *host     = '\0';
   *resource = '\0';
 
@@ -1636,5 +1641,5 @@ cups_get_printer_uri(
 
 
 /*
- * End of "$Id: util.c 5138 2006-02-21 10:49:06Z mike $".
+ * End of "$Id: util.c 5165 2006-02-24 21:20:30Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 5131 2006-02-18 05:31:36Z mike $"
+ * "$Id: job.c 5196 2006-02-27 21:23:00Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2868,7 +2868,7 @@ free_job(cupsd_job_t *job)		/* I - Job */
  *		    the textual IPP attributes.
  */
 
-int					/* O - Size of attribute buffer */
+static int				/* O - Size of attribute buffer */
 ipp_length(ipp_t *ipp)			/* I - IPP request */
 {
   int			bytes; 		/* Number of bytes */
@@ -3424,5 +3424,5 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 5131 2006-02-18 05:31:36Z mike $".
+ * End of "$Id: job.c 5196 2006-02-27 21:23:00Z mike $".
  */

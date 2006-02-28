@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 5138 2006-02-21 10:49:06Z mike $"
+ * "$Id: http.c 5200 2006-02-28 00:10:32Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -63,6 +63,7 @@
  *   _httpReadCDSA()      - Read function for CDSA decryption code.
  *   httpReconnect()      - Reconnect to a HTTP server...
  *   httpSetCookie()      - Set the cookie value(s)...
+ *   httpSetExpect()      - Set the Expect: header in a request.
  *   httpSetField()       - Set the value of an HTTP header.
  *   httpSetLength()      - Set the content-length and transfer-encoding.
  *   httpTrace()          - Send an TRACE request to the server.
@@ -222,6 +223,8 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
   {
     memset(http->fields, 0, sizeof(http->fields));
     httpSetField(http, HTTP_FIELD_HOST, http->hostname);
+
+    http->expect = (http_status_t)0;
   }
 }
 
@@ -1386,31 +1389,32 @@ _httpReadCDSA(
   OSStatus	result;			/* Return value */
   ssize_t	bytes;			/* Number of bytes read */
 
-
-  for (;;)
-  {
+  do
     bytes = recv((int)connection, data, *dataLength, 0);
+  while (bytes == -1 && errno == EINTR);
 
-    if (bytes > 0)
-    {
-      result      = (bytes == *dataLength);
-      *dataLength = bytes;
-
-      return (result);
-    }
+  if (bytes == *dataLength)
+    result = 0;
+  else if (bytes > 0)
+  {
+    *dataLength = bytes;
+    result = errSSLWouldBlock;
+  }
+  else
+  {
+    *dataLength = 0;
 
     if (bytes == 0)
-      return (errSSLClosedAbort);
-
-    if (errno == EAGAIN)
-      return (errSSLWouldBlock);
-
-    if (errno == EPIPE)
-      return (errSSLClosedAbort);
-
-    if (errno != EINTR)
-      return (errSSLInternal);
+      result = errSSLClosedAbort;
+    else if (errno == EAGAIN)
+      result = errSSLWouldBlock;
+    else if (errno == EPIPE)
+      result = errSSLClosedAbort;
+    else
+      result = errSSLInternal;
   }
+
+  return result;
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
 
@@ -1520,6 +1524,23 @@ httpSetCookie(http_t     *http,		/* I - Connection */
     http->cookie = strdup(cookie);
   else
     http->cookie = NULL;
+}
+
+
+/*
+ * 'httpSetExpect()' - Set the Expect: header in a request.
+ *
+ * Currently only HTTP_CONTINUE is supported for the "expect" argument.
+ *
+ * @since CUPS 1.2@
+ */
+
+void
+httpSetExpect(http_t        *http,	/* I - HTTP connection */
+              http_status_t expect)	/* I - HTTP status to expect (HTTP_CONTINUE) */
+{
+  if (http)
+    http->expect = expect;
 }
 
 
@@ -1941,28 +1962,30 @@ _httpWriteCDSA(
   OSStatus	result;			/* Return value */
   ssize_t	bytes;			/* Number of bytes read */
 
-
-  for (;;)
-  {
+  do
     bytes = write((int)connection, data, *dataLength);
+  while (bytes == -1 && errno == EINTR);
 
-    if (bytes >= 0)
-    {
-      result      = (bytes == *dataLength) ? 0 : errSSLWouldBlock;
-      *dataLength = bytes;
-
-      return (result);
-    }
-
-    if (errno == EAGAIN)
-      return (errSSLWouldBlock);
-
-    if (errno == EPIPE)
-      return (errSSLClosedAbort);
-
-    if (errno != EINTR)
-      return (errSSLInternal);
+  if (bytes == *dataLength)
+    result = 0;
+  else if (bytes >= 0)
+  {
+    *dataLength = bytes;
+    result = errSSLWouldBlock;
   }
+  else
+  {
+    *dataLength = 0;
+  
+    if (errno == EAGAIN)
+      result = errSSLWouldBlock;
+    else if (errno == EPIPE)
+      result = errSSLClosedAbort;
+    else
+      result = errSSLInternal;
+  }
+
+  return result;
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
 
@@ -2018,8 +2041,13 @@ http_read_ssl(http_t *http,		/* I - HTTP connection */
 	result = 0;
 	break;
     case errSSLWouldBlock :
-	errno = EAGAIN;
-	result = -1;
+	if (processed)
+	  result = (int)processed;
+	else
+	{
+	  result = -1;
+	  errno = EINTR;
+	}
 	break;
     default :
 	errno = EPIPE;
@@ -2148,6 +2176,14 @@ http_send(http_t       *http,	/* I - HTTP connection */
       return (-1);
     }
 
+  if (http->expect == HTTP_CONTINUE &&
+      (http->state == HTTP_POST_RECV || http->state == HTTP_PUT_RECV))
+    if (httpPrintf(http, "Expect: 100-continue\r\n") < 1)
+    {
+      http->status = HTTP_ERROR;
+      return (-1);
+    }
+
   if (httpPrintf(http, "\r\n") < 1)
   {
     http->status = HTTP_ERROR;
@@ -2270,7 +2306,10 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
     error = SSLSetAllowsAnyRoot(conn, true);
 
   if (!error)
-    error = SSLHandshake(conn);
+  {
+    while ((error = SSLHandshake(conn)) == errSSLWouldBlock)
+      usleep(1000);
+  }
 
   if (error != 0)
   {
@@ -2327,7 +2366,9 @@ http_shutdown_ssl(http_t *http)	/* I - HTTP connection */
   free(conn);
 
 #  elif defined(HAVE_CDSASSL)
-  SSLClose((SSLContextRef)http->tls);
+  while (SSLClose((SSLContextRef)http->tls) == errSSLWouldBlock)
+    usleep(1000);
+
   SSLDisposeContext((SSLContextRef)http->tls);
 #  endif /* HAVE_LIBSSL */
 
@@ -2692,8 +2733,13 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 	result = 0;
 	break;
     case errSSLWouldBlock :
-	errno = EAGAIN;
-	result = -1;
+	if (processed)
+	  result = (int)processed;
+	else
+	{
+	  result = -1;
+	  errno = EINTR;
+	}
 	break;
     default :
 	errno = EPIPE;
@@ -2708,5 +2754,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 5138 2006-02-21 10:49:06Z mike $".
+ * End of "$Id: http.c 5200 2006-02-28 00:10:32Z mike $".
  */

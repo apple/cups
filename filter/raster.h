@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h 4998 2006-01-26 21:59:54Z mike $"
+ * "$Id: raster.h 5192 2006-02-27 03:08:47Z mike $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -290,7 +290,7 @@ typedef struct cups_page_header2_s	/**** Version 2 Page Header @since CUPS 1.2@ 
   /**** Version 2 Dictionary Values ****/
   unsigned	cupsNumColors;		/* Number of colors @since CUPS 1.2@ */
   float		cupsBorderlessScalingFactor;
-					/* Scaling that was applied to page data */
+					/* Scaling that was applied to page data @since CUPS 1.2@ */
   float		cupsPageSize[2];	/* Floating point PageSize (scaling *
   					 * factor not applied) @since CUPS 1.2@ */
   float		cupsImagingBBox[4];	/* Floating point ImagingBoundingBox *
@@ -350,5 +350,5 @@ extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h 4998 2006-01-26 21:59:54Z mike $".
+ * End of "$Id: raster.h 5192 2006-02-27 03:08:47Z mike $".
  */
