@@ -60,7 +60,7 @@ TR.sel TD {
   padding: 4pt;
 }
 
-A.unsel {
+A.unsel, A.unsel:visited {
   background-color: #666633;
   color: #e8e8b8;
 }
@@ -135,7 +135,7 @@ DIV.table TABLE TH {
 }
 
 TH.label {
-  padding-top: 10pt;
+  padding-top: 5pt;
   text-align: right;
   vertical-align: top;
 }
