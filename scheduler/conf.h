@@ -186,9 +186,6 @@ VAR char		*ServerCertificate	VALUE(NULL);
 #  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
 VAR char		*ServerKey		VALUE(NULL);
 					/* Server key file */
-#  else
-VAR CFArrayRef		ServerCertificatesArray	VALUE(NULL);
-					/* Array containing certificates */
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 

@@ -244,6 +244,8 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
     ppd_free(ppd->attrs);
   }
 
+  cupsArrayDelete(ppd->sorted_attrs);
+
  /*
   * Free custom options...
   */

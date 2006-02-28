@@ -152,18 +152,6 @@ cupsdStopServer(void)
     Clients = NULL;
   }
 
-#if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
- /*
-  * Free all of the certificates...
-  */
-
-  if (ServerCertificatesArray)
-  {
-    CFRelease(ServerCertificatesArray);
-    ServerCertificatesArray = NULL;
-  }
-#endif /* HAVE_SSL && HAVE_CDSASSL */
-
  /*
   * Close the pipe for CGI processes...
   */

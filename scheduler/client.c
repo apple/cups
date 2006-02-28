@@ -515,7 +515,9 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
     free(conn);
 
 #  elif defined(HAVE_CDSASSL)
-    SSLClose((SSLContextRef)con->http.tls);
+    while (SSLClose((SSLContextRef)con->http.tls) == errSSLWouldBlock)
+      usleep(1000);
+
     SSLDisposeContext((SSLContextRef)con->http.tls);
 #  endif /* HAVE_LIBSSL */
 
@@ -755,6 +757,7 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
 #elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error info */
   SSLContextRef	conn;			/* New connection */
+  CFArrayRef	certificatesArray;	/* Array containing certificates */
   int		allowExpired;		/* Allow expired certificates? */
   int		allowAnyRoot;		/* Allow any root certificate? */
 
@@ -764,10 +767,9 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
   allowExpired = 1;
   allowAnyRoot = 1;
 
-  if (!ServerCertificatesArray)
-    ServerCertificatesArray = get_cdsa_server_certs();
+  certificatesArray = get_cdsa_server_certs();
 
-  if (!ServerCertificatesArray)
+  if (!certificatesArray)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
         	    "EncryptClient: Could not find signing key in keychain "
@@ -794,22 +796,23 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
   if (!error && allowAnyRoot)
     error = SSLSetAllowsAnyRoot(conn, true);
 
-  if (!error && ServerCertificatesArray)
-  {
-    error = SSLSetCertificate(conn, ServerCertificatesArray);
+  if (!error)
+    error = SSLSetCertificate(conn, certificatesArray);
 
+  if (certificatesArray)
+  {
+    CFRelease(certificatesArray);
+    certificatesArray = NULL;
+  }
+
+  if (!error)
+  {
    /*
     * Perform SSL/TLS handshake
     */
-  
-    if (!error)
-    {
-      do
-      {
-	error = SSLHandshake(conn);
-      }
-      while (error == errSSLWouldBlock);
-    }
+
+    while ((error = SSLHandshake(conn)) == errSSLWouldBlock)
+      usleep(1000);
   }
 
   if (error)
@@ -2835,7 +2838,7 @@ check_if_modified(
  * To create a self-signed certificate for testing use the certtool.
  * Executing the following as root will do it:
  *
- *     certtool c c v k=CUPS
+ *     certtool c k=/Library/Keychains/System.keychain
  */
 
 static CFArrayRef			/* O - Array of certificates */
@@ -2891,19 +2894,19 @@ get_cdsa_server_certs(void)
 	  * to array as well.
 	  */
 
-	  ca = CFArrayCreate(NULL, (const void **)&identity, 1, NULL);
+	  ca = CFArrayCreate(NULL, (const void **)&identity, 1, &kCFTypeArrayCallBacks);
 
 	  if (ca == nil)
 	    cupsdLogMessage(CUPSD_LOG_ERROR, "CFArrayCreate error");
 	}
 
-	/*CFRelease(identity);*/
+	CFRelease(identity);
       }
 
-      /*CFRelease(srchRef);*/
+      CFRelease(srchRef);
     }
 
-    /*CFRelease(kcRef);*/
+    CFRelease(kcRef);
   }
 
   return (ca);

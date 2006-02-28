@@ -1389,31 +1389,32 @@ _httpReadCDSA(
   OSStatus	result;			/* Return value */
   ssize_t	bytes;			/* Number of bytes read */
 
-
-  for (;;)
-  {
+  do
     bytes = recv((int)connection, data, *dataLength, 0);
+  while (bytes == -1 && errno == EINTR);
 
-    if (bytes > 0)
-    {
-      result      = (bytes == *dataLength);
-      *dataLength = bytes;
-
-      return (result);
-    }
+  if (bytes == *dataLength)
+    result = 0;
+  else if (bytes > 0)
+  {
+    *dataLength = bytes;
+    result = errSSLWouldBlock;
+  }
+  else
+  {
+    *dataLength = 0;
 
     if (bytes == 0)
-      return (errSSLClosedAbort);
-
-    if (errno == EAGAIN)
-      return (errSSLWouldBlock);
-
-    if (errno == EPIPE)
-      return (errSSLClosedAbort);
-
-    if (errno != EINTR)
-      return (errSSLInternal);
+      result = errSSLClosedAbort;
+    else if (errno == EAGAIN)
+      result = errSSLWouldBlock;
+    else if (errno == EPIPE)
+      result = errSSLClosedAbort;
+    else
+      result = errSSLInternal;
   }
+
+  return result;
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
 
@@ -1961,28 +1962,30 @@ _httpWriteCDSA(
   OSStatus	result;			/* Return value */
   ssize_t	bytes;			/* Number of bytes read */
 
-
-  for (;;)
-  {
+  do
     bytes = write((int)connection, data, *dataLength);
+  while (bytes == -1 && errno == EINTR);
 
-    if (bytes >= 0)
-    {
-      result      = (bytes == *dataLength) ? 0 : errSSLWouldBlock;
-      *dataLength = bytes;
-
-      return (result);
-    }
-
-    if (errno == EAGAIN)
-      return (errSSLWouldBlock);
-
-    if (errno == EPIPE)
-      return (errSSLClosedAbort);
-
-    if (errno != EINTR)
-      return (errSSLInternal);
+  if (bytes == *dataLength)
+    result = 0;
+  else if (bytes >= 0)
+  {
+    *dataLength = bytes;
+    result = errSSLWouldBlock;
   }
+  else
+  {
+    *dataLength = 0;
+  
+    if (errno == EAGAIN)
+      result = errSSLWouldBlock;
+    else if (errno == EPIPE)
+      result = errSSLClosedAbort;
+    else
+      result = errSSLInternal;
+  }
+
+  return result;
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
 
@@ -2038,8 +2041,13 @@ http_read_ssl(http_t *http,		/* I - HTTP connection */
 	result = 0;
 	break;
     case errSSLWouldBlock :
-	errno = EAGAIN;
-	result = -1;
+	if (processed)
+	  result = (int)processed;
+	else
+	{
+	  result = -1;
+	  errno = EINTR;
+	}
 	break;
     default :
 	errno = EPIPE;
@@ -2298,7 +2306,10 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
     error = SSLSetAllowsAnyRoot(conn, true);
 
   if (!error)
-    error = SSLHandshake(conn);
+  {
+    while ((error = SSLHandshake(conn)) == errSSLWouldBlock)
+      usleep(1000);
+  }
 
   if (error != 0)
   {
@@ -2355,7 +2366,9 @@ http_shutdown_ssl(http_t *http)	/* I - HTTP connection */
   free(conn);
 
 #  elif defined(HAVE_CDSASSL)
-  SSLClose((SSLContextRef)http->tls);
+  while (SSLClose((SSLContextRef)http->tls) == errSSLWouldBlock)
+    usleep(1000);
+
   SSLDisposeContext((SSLContextRef)http->tls);
 #  endif /* HAVE_LIBSSL */
 
@@ -2720,8 +2733,13 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 	result = 0;
 	break;
     case errSSLWouldBlock :
-	errno = EAGAIN;
-	result = -1;
+	if (processed)
+	  result = (int)processed;
+	else
+	{
+	  result = -1;
+	  errno = EINTR;
+	}
 	break;
     default :
 	errno = EPIPE;
