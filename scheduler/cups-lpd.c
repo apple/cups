@@ -732,8 +732,6 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 
 	    CFRelease(plist);
 	  }
-
-	  CFRelease(prefsok);
 	}
 
 	CFRelease(prefsurl);
