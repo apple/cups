@@ -29,7 +29,12 @@ include ../Makedefs
 #
 
 LANGUAGES	=	ja
-WEBPAGES	=	cups.css cupsdoc.css index.html robots.txt
+WEBPAGES	=	\
+			cups.css \
+			cupsdoc.css \
+			favicon.ico \
+			index.html \
+			robots.txt
 WEBBUTTONS	=	\
 			images/accept-jobs.gif \
 			images/add-class.gif \
@@ -84,7 +89,6 @@ WEBBUTTONS	=	\
 			images/view-error-log.gif \
 			images/view-page-log.gif
 WEBIMAGES	=	\
-			favicon.ico \
 			images/bottom-left.gif \
 			images/bottom-right.gif \
 			images/classes.gif \
