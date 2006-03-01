@@ -39,39 +39,39 @@ Basic authentication with membership in the group
 	<TH>Value</TH>
 </TR>
 <TR>
-	<TD><CODE><A HREF="cupsd-conf-reference.html#Browsing">Browsing</A></CODE></TD>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#Browsing">Browsing</A></CODE></TD>
 	<TD><CODE>@CUPS_BROWSING@</CODE></TD>
 </TR>
 <TR>
-	<TD><CODE><A HREF="cupsd-conf-reference.html#BrowseLocalProtocols">BrowseLocalProtocols</A></CODE></TD>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#BrowseLocalProtocols">BrowseLocalProtocols</A></CODE></TD>
 	<TD><CODE>@CUPS_BROWSE_LOCAL_PROTOCOLS@</CODE></TD>
 </TR>
 <TR>
-	<TD><CODE><A HREF="cupsd-conf-reference.html#BrowseRemoteProtocols">BrowseRemoteProtocols</A></CODE></TD>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#BrowseRemoteProtocols">BrowseRemoteProtocols</A></CODE></TD>
 	<TD><CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE></TD>
 </TR>
 <TR>
-	<TD><CODE><A HREF="cupsd-conf-reference.html#BrowseShortNames">BrowseShortNames</A></CODE></TD>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#BrowseShortNames">BrowseShortNames</A></CODE></TD>
 	<TD><CODE>@CUPS_BROWSE_SHORT_NAMES@</CODE></TD>
 </TR>
 <TR>
-	<TD><CODE><A HREF="cupsd-conf-reference.html#ConfigFilePerm">ConfigFilePerm</A></CODE></TD>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#ConfigFilePerm">ConfigFilePerm</A></CODE></TD>
 	<TD><CODE>@CUPS_CONFIG_FILE_PERM@</CODE></TD>
 </TR>
 <TR>
-	<TD><CODE><A HREF="cupsd-conf-reference.html#DefaultShared">DefaultShared</A></CODE></TD>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#DefaultShared">DefaultShared</A></CODE></TD>
 	<TD><CODE>@CUPS_DEFAULT_SHARED@</CODE></TD>
 </TR>
 <TR>
-	<TD><CODE><A HREF="cupsd-conf-reference.html#ImplicitClasses">ImplicitClasses</A></CODE></TD>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#ImplicitClasses">ImplicitClasses</A></CODE></TD>
 	<TD><CODE>@CUPS_IMPLICIT_CLASSES@</CODE></TD>
 </TR>
 <TR>
-	<TD><CODE><A HREF="cupsd-conf-reference.html#LogFilePerm">LogFilePerm</A></CODE></TD>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#LogFilePerm">LogFilePerm</A></CODE></TD>
 	<TD><CODE>@CUPS_LOG_FILE_PERM@</CODE></TD>
 </TR>
 <TR>
-	<TD><CODE><A HREF="cupsd-conf-reference.html#UseNetworkDefault">UseNetworkDefault</A></CODE></TD>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#UseNetworkDefault">UseNetworkDefault</A></CODE></TD>
 	<TD><CODE>@CUPS_USE_NETWORK_DEFAULT@</CODE></TD>
 </TR>
 </TABLE></DIV>
@@ -88,7 +88,7 @@ Basic authentication with membership in the group
 	<TD><VAR>@CUPS_SERVERROOT@</VAR></TD>
 	<TD>The location of configuration files such as
 	<VAR>printers.conf</VAR>. Overridden by the <A
-	HREF="cupsd-conf-reference.html#ServerRoot"><CODE>ServerRoot</CODE></A>
+	HREF="ref-cupsd-conf.html#ServerRoot"><CODE>ServerRoot</CODE></A>
 	directive in <VAR>cupsd.conf</VAR>.</TD>
 </TR>
 <TR>
@@ -107,7 +107,7 @@ Basic authentication with membership in the group
 	<TD><VAR>@CUPS_SERVERBIN@</VAR></TD>
 	<TD>The location of server programs such as backends and
 	filters. Overridden by the <A
-	HREF="cupsd-conf-reference.html#ServerBin"><CODE>ServerBin</CODE></A>
+	HREF="ref-cupsd-conf.html#ServerBin"><CODE>ServerBin</CODE></A>
 	directive in <VAR>cupsd.conf</VAR>.</TD>
 </TR>
 <TR>
@@ -118,14 +118,14 @@ Basic authentication with membership in the group
 	<TD><VAR>@CUPS_DATADIR@</VAR></TD>
 	<TD>The location of data files such as fonts. Overridden
 	by the <A
-	HREF="cupsd-conf-reference.html#DataDir"><CODE>DataDir</CODE></A>
+	HREF="ref-cupsd-conf.html#DataDir"><CODE>DataDir</CODE></A>
 	directive in <VAR>cupsd.conf</VAR>.</TD>
 </TR>
 <TR>
 	<TD><VAR>@CUPS_DOCROOT@</VAR></TD>
 	<TD>The location of documentation files. Overridden by
 	the <A
-	HREF="cupsd-conf-reference.html#DocumentRoot"><CODE>DocumentRoot</CODE></A>
+	HREF="ref-cupsd-conf.html#DocumentRoot"><CODE>DocumentRoot</CODE></A>
 	directive in <VAR>cupsd.conf</VAR>.</TD>
 </TR>
 <TR>
@@ -137,7 +137,7 @@ Basic authentication with membership in the group
 	<TD>The location of cache files such as
 	<VAR>ppds.dat</VAR> and <VAR>remote.cache</VAR>.
 	Overridden by the <A
-	HREF="cupsd-conf-reference.html#CacheDir"><CODE>CacheDir</CODE></A>
+	HREF="ref-cupsd-conf.html#CacheDir"><CODE>CacheDir</CODE></A>
 	directive in <VAR>cupsd.conf</VAR>.</TD>
 </TR>
 <TR>
@@ -145,25 +145,25 @@ Basic authentication with membership in the group
 	<TD>The location of the <VAR>access_log</VAR>,
 	<VAR>error_log</VAR>, and <VAR>page_log</VAR> files.
 	Overridden by the <A
-	HREF="cupsd-conf-reference.html#AccessLog"><CODE>AccessLog</CODE></A>,
+	HREF="ref-cupsd-conf.html#AccessLog"><CODE>AccessLog</CODE></A>,
 	<A
-	HREF="cupsd-conf-reference.html#ErrorLog"><CODE>ErrorLog</CODE></A>,
+	HREF="ref-cupsd-conf.html#ErrorLog"><CODE>ErrorLog</CODE></A>,
 	<A
-	HREF="cupsd-conf-reference.html#PageLog"><CODE>PageLog</CODE></A>,
+	HREF="ref-cupsd-conf.html#PageLog"><CODE>PageLog</CODE></A>,
 	directive in <VAR>cupsd.conf</VAR>.</TD>
 </TR>
 <TR>
 	<TD><VAR>@CUPS_STATEDIR@</VAR></TD>
 	<TD>The location of the domain socket file and state data
 	such as authentication certificates. Overridden by the <A
-	HREF="cupsd-conf-reference.html#StateDir"><CODE>StateDir</CODE></A>
+	HREF="ref-cupsd-conf.html#StateDir"><CODE>StateDir</CODE></A>
 	directive in <VAR>cupsd.conf</VAR>.</TD>
 </TR>
 <TR>
 	<TD><VAR>@CUPS_REQUESTS@</VAR></TD>
 	<TD>The location of spooled print jobs. Overridden by the
 	<A
-	HREF="cupsd-conf-reference.html#RequestRoot"><CODE>RequestRoot</CODE></A>
+	HREF="ref-cupsd-conf.html#RequestRoot"><CODE>RequestRoot</CODE></A>
 	directive in <VAR>cupsd.conf</VAR>.</TD>
 </TR>
 </TABLE></DIV>

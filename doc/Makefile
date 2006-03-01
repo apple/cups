@@ -101,7 +101,6 @@ WEBIMAGES	=	\
 			images/top-middle.gif \
 			images/top-right.gif
 HELPFILES	=	\
-			help/access_log-reference.html \
 			help/api-array.html \
 			help/api-cups.html \
 			help/api-filedir.html \
@@ -109,30 +108,23 @@ HELPFILES	=	\
 			help/api-httpipp.html \
 			help/api-ppd.html \
 			help/api-raster.html \
-			help/classes-conf-reference.html \
-			help/client-conf-reference.html \
-			help/cupsd-conf-reference.html \
-			help/error_log-reference.html \
-			help/page_log-reference.html \
-			help/printers-conf-reference.html \
-			help/subscriptions-conf-reference.html \
 			help/man-accept.html \
 			help/man-backend.html \
 			help/man-cancel.html \
 			help/man-classes.conf.html \
 			help/man-client.conf.html \
-			help/man-cupsaddsmb.html \
 			help/man-cups-config.html \
-			help/man-cupsd.html \
-			help/man-cupsd.conf.html \
-			help/man-cupsenable.html \
 			help/man-cups-lpd.html \
 			help/man-cups-polld.html \
+			help/man-cupsaddsmb.html \
+			help/man-cupsd.conf.html \
+			help/man-cupsd.html \
+			help/man-cupsenable.html \
 			help/man-cupstestppd.html \
 			help/man-filter.html \
+			help/man-lp.html \
 			help/man-lpadmin.html \
 			help/man-lpc.html \
-			help/man-lp.html \
 			help/man-lpinfo.html \
 			help/man-lpmove.html \
 			help/man-lpoptions.html \
@@ -146,6 +138,14 @@ HELPFILES	=	\
 			help/man-printers.conf.html \
 			help/network.html \
 			help/overview.html \
+			help/ref-access_log.html \
+			help/ref-classes-conf.html \
+			help/ref-client-conf.html \
+			help/ref-cupsd-conf.html \
+			help/ref-error_log.html \
+			help/ref-page_log.html \
+			help/ref-printers-conf.html \
+			help/ref-subscriptions-conf.html \
 			help/spec-command.html \
 			help/spec-ipp.html \
 			help/spec-ppd.html \

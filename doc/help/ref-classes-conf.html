@@ -1,22 +1,22 @@
 <HTML>
 <!-- SECTION: References -->
 <HEAD>
-	<TITLE>printers.conf</TITLE>
+	<TITLE>classes.conf</TITLE>
 </HEAD>
 <BODY>
 
 <P>The CUPS scheduler (cupsd) uses the
-<VAR>/etc/cups/printers.conf</VAR> file to store the list of
-available printers. This file contains only locally defined
-printers, not remote printers that are created automatically via
+<VAR>/etc/cups/classes.conf</VAR> file to store the list of
+available classes. This file contains only locally defined
+classes, not remote classes that are created automatically via
 browsing. Each directive is listed on a line by itself followed
 by its value. Comments are introduced using the number sign ("#")
 character at the beginning of a line.</P>
 
-<P>While the printer configuration file consists of plain text
-and can be modified using your favorite text editor, you should
+<P>While the class configuration file consists of plain text and
+can be modified using your favorite text editor, you should
 normally use the <CODE>lpadmin(8)</CODE> command, web interface,
-or any of the available GUIs to manage your printers instead. If
+or any of the available GUIs to manage your classes instead. If
 you do choose to edit this file manually, you will need to
 restart the scheduler to make them active.</P>
 
@@ -38,13 +38,13 @@ is also set by the <CODE>accept(8)</CODE> and
 <CODE>reject(8)</CODE> commands:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/accept printername
-/usr/sbin/reject printername</KBD>
+<KBD>/usr/sbin/accept classname
+/usr/sbin/reject classname</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -64,35 +64,55 @@ name to the <VAR>requesting-user-name-allowed</VAR> attribute
 which can be set by the <CODE>lpadmin(8)</CODE> command:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -u allow:foo_user,@bar_group</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -u allow:foo_user,@bar_group</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 This directive cannot be used with <A
 HREF="#DenyUser"><CODE>DenyUser</CODE></A>.</P>
 
 
-<H3 CLASS="title"><A NAME="DefaultPrinter">DefaultPrinter</A></H3>
+<H3 CLASS="title"><A NAME="Class">Class</A></H3>
 
 <H4>Examples</H4>
 
 <PRE CLASS="command">
-&lt;DefaultPrinter name&gt;
+&lt;Class name&gt;
 ...
-&lt;/Printer&gt;
+&lt;/Class&gt;
 </PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>DefaultPrinter</CODE> directive begins a printer
+<P>The <CODE>Class</CODE> directive begins a class definition.
+Classes are added using the <CODE>lpadmin(8)</CODE> command:
+
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p printername -c classname</KBD>
+</PRE>
+
+
+<H3 CLASS="title"><A NAME="DefaultClass">DefaultClass</A></H3>
+
+<H4>Examples</H4>
+
+<PRE CLASS="command">
+&lt;DefaultClass name&gt;
+...
+&lt;/Class&gt;
+</PRE>
+
+<H4>Description</H4>
+
+<P>The <CODE>DefaultClass</CODE> directive begins a class
 definition as the default server destination. The default server
 destination can be set using the <CODE>lpadmin(8)</CODE>
 command:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -d printername</KBD>
+<KBD>/usr/sbin/lpadmin -d classname</KBD>
 </PRE>
 
 <P>Note that the server default destination settings can be
@@ -116,38 +136,14 @@ name to the <VAR>requesting-user-name-denied</VAR> attribute
 which can be set by the <CODE>lpadmin(8)</CODE> command:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -u deny:foo_user,@bar_group</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -u deny:foo_user,@bar_group</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A> directive.
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.
 This directive cannot be used with <A
 HREF="#AllowUser"><CODE>AllowUser</CODE></A></P>
-
-
-<H3 CLASS="title"><A NAME="DeviceURI">DeviceURI</A></H3>
-
-<H4>Examples</H4>
-
-<PRE CLASS="command">
-DeviceURI socket://foo.bar.com:9100
-</PRE>
-
-<H4>Description</H4>
-
-<P>The <CODE>DeviceURI</CODE> directive defines the value of the 
-<VAR>device-uri-attribute</VAR> attribute. It is normally set
-using the <CODE>lpadmin(8)</CODE> command:</P>
-
-<PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -v device-uri</KBD>
-</PRE>
-
-<P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
 
 
 <H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H3>
@@ -168,7 +164,7 @@ printer. The <CODE>lpadmin(8)</CODE> command sets the current
 error policy:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -o printer-error-policy=stop-printer</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -o printer-error-policy=stop-printer</KBD>
 </PRE>
 
 <P>The following values are supported:</P>
@@ -180,7 +176,7 @@ error policy:</P>
 
 	<LI><CODE>retry-job</CODE> - Retry the job after waiting
 	for N seconds; the <VAR>cupsd.conf</VAR> <A
-	HREF="cupsd-conf-reference.html#JobRetryInterval"><CODE>JobRetryInterval</CODE></A>
+	HREF="ref-cupsd-conf.html#JobRetryInterval"><CODE>JobRetryInterval</CODE></A>
 	directive controls the value of N</LI>
 
 	<LI><CODE>stop-printer</CODE> - Stop the printer and keep
@@ -190,8 +186,8 @@ error policy:</P>
 </UL>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -200,7 +196,7 @@ directive.</P>
 <H4>Examples</H4>
 
 <PRE CLASS="command">
-Info My Printer
+Info My Class
 </PRE>
 
 <H4>Description</H4>
@@ -210,12 +206,12 @@ Info My Printer
 <CODE>lpadmin(8)</CODE> command:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -D "My Printer"</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -D "My Class"</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -236,7 +232,7 @@ job. The <CODE>lpadmin(8)</CODE> command is normally used to set
 the default banners:
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -o job-sheets-default=none,standard</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -o job-sheets-default=none,standard</KBD>
 </PRE>
 
 <P>If only one banner file is specified, it will be printed
@@ -273,8 +269,8 @@ files:</P>
 </UL>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -293,12 +289,12 @@ KLimit 1234
 <CODE>lpadmin(8)</CODE> command:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -o job-k-limit=1234</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -o job-k-limit=1234</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -317,12 +313,12 @@ Location Building 3321
 <CODE>lpadmin(8)</CODE> command:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -L "Building 3321"</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -L "Building 3321"</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -342,17 +338,17 @@ that is used for the printer. The <CODE>lpadmin(8)</CODE> command
 sets the current operation policy:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -o printer-op-policy=default</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -o printer-op-policy=default</KBD>
 </PRE>
 
 <P>The default policy is named "default". All policies correspond
 to those defined using the <VAR>cupsd.conf</VAR> <A
-HREF="cupsd-conf-reference.html#Policy"><CODE>Policy</CODE></A>
+HREF="ref-cupsd-conf.html#Policy"><CODE>Policy</CODE></A>
 directive.</P>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -371,54 +367,12 @@ PageLimit 1234
 <CODE>lpadmin(8)</CODE> command:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -o job-page-limit=1234</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -o job-page-limit=1234</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
-
-
-<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="PortMonitor">PortMonitor</A></H3>
-
-<H4>Examples</H4>
-
-<PRE CLASS="command">
-PortMonitor bcp
-PortMonitor none
-PortMonitor tbcp
-</PRE>
-
-<H4>Description</H4>
-
-<P>The <CODE>PortMonitor</CODE> directive sets the filter program that
-is used for every print job, typically to encode or package the print
-data in a format acceptable for a particular printer interface. It is
-set using the <CODE>lpadmin(8)</CODE> command:</P>
-
-<PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -o port-monitor=tbcp</KBD>
-</PRE>
-
-<P>The following standard port monitors are included with CUPS:</P>
-
-<UL>
-
-	<LI><CODE>bcp</CODE> - Encode PostScript print data using
-	the Adobe Binary Control Protocol (BCP)</LI>
-
-	<LI><CODE>none</CODE> - Do not use a port monitor</LI>
-
-	<LI><CODE>tbcp</CODE> - Encode PostScript print data
-	using the Adobe Tagged Binary Control Protocol
-	(TBCP)</LI>
-
-</UL>
-
-<P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -427,20 +381,25 @@ directive.</P>
 <H4>Examples</H4>
 
 <PRE CLASS="command">
-&lt;Printer name&gt;
-...
-&lt;/Printer&gt;
+Printer bcp
+Printer none
+Printer tbcp
 </PRE>
 
 <H4>Description</H4>
 
-<P>The <CODE>Printer</CODE> directive begins a printer
-definition. Printers are added using the <CODE>lpadmin(8)</CODE>
-command:
+<P>The <CODE>Printer</CODE> directive adds a printer to a class.
+Printers are added to a class using the <CODE>lpadmin(8)</CODE>
+command:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername ...</KBD>
+<KBD>/usr/sbin/lpadmin -p printername -c classname</KBD>
 </PRE>
+
+<P>This directive must appear inside a <A
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
+directive.</P>
 
 
 <H3 CLASS="title"><A NAME="QuotaPeriod">QuotaPeriod</A></H3>
@@ -460,12 +419,12 @@ the  <VAR>job-quota-period</VAR> attribute. Typical values are
 command:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -o job-quota-period=604800</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -o job-quota-period=604800</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -487,12 +446,12 @@ values, respectively. The <CODE>lpadmin(8)</CODE> command sets
 the current state:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/lpadmin -p printername -o printer-is-shared=true</KBD>
+<KBD>/usr/sbin/lpadmin -p classname -o printer-is-shared=true</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -515,13 +474,13 @@ enumeration values 3 and 5, respectively. The
 commands set the current state:</P>
 
 <PRE CLASS="command">
-<KBD>/usr/sbin/cupsenable printername</KBD>
-<KBD>/usr/sbin/cupsdisable printername</KBD>
+<KBD>/usr/sbin/cupsenable classname</KBD>
+<KBD>/usr/sbin/cupsdisable classname</KBD>
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -543,16 +502,16 @@ following are some example messages:</P>
 StateMessage Connected to host_name...
 StateMessage Connecting to printer_queue on port port_number...
 StateMessage Network host host_name is busy; will retry in 30 seconds...
-StateMessage Printer busy; will retry in 10 seconds...
-StateMessage Printer is busy; retrying print job...
+StateMessage Class busy; will retry in 10 seconds...
+StateMessage Class is busy; retrying print job...
 StateMessage Print file accepted - job ID id_number.
 StateMessage Ready to print.
 StateMessage Waiting for job to complete
 </PRE>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 
@@ -572,8 +531,8 @@ queue. It is mapped to the <VAR>printer-state-change-time</VAR>
 attribute.</P>
 
 <P>This directive must appear inside a <A
-HREF="#Printer"><CODE>Printer</CODE></A> or <A
-HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+HREF="#Class"><CODE>Class</CODE></A> or <A
+HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
 directive.</P>
 
 

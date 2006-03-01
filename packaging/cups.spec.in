@@ -232,10 +232,10 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*.*
 %dir /usr/share/doc/cups/help
-/usr/share/doc/cups/help/*-reference.html
 /usr/share/doc/cups/help/man-*.html
 /usr/share/doc/cups/help/network.html
 /usr/share/doc/cups/help/overview.html
+/usr/share/doc/cups/help/ref-*.html
 /usr/share/doc/cups/help/standard.html
 /usr/share/doc/cups/help/whatsnew.html
 %dir /usr/share/doc/cups/images
