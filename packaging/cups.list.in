@@ -404,6 +404,7 @@ f 0644 root sys $DOCDIR/help doc/help/man-*.html
 f 0644 root sys $DOCDIR/help doc/help/ref-*.html
 d 0755 root sys $DOCDIR/images -
 f 0644 root sys $DOCDIR/images doc/images/*.gif
+f 0644 root sys $DOCDIR/images doc/images/*.png
 f 0644 root sys $DOCDIR/robots.txt doc/robots.txt
 
 # Japanese documentation files

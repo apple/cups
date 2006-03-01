@@ -103,7 +103,8 @@ WEBIMAGES	=	\
 			images/tab-right.gif \
 			images/top-left.gif \
 			images/top-middle.gif \
-			images/top-right.gif
+			images/top-right.gif \
+			images/web-test-page.gif
 HELPFILES	=	\
 			help/api-array.html \
 			help/api-cups.html \
@@ -112,6 +113,7 @@ HELPFILES	=	\
 			help/api-httpipp.html \
 			help/api-ppd.html \
 			help/api-raster.html \
+			help/design.html \
 			help/man-accept.html \
 			help/man-backend.html \
 			help/man-cancel.html \
@@ -141,6 +143,7 @@ HELPFILES	=	\
 			help/man-mime.types.html \
 			help/man-printers.conf.html \
 			help/network.html \
+			help/options.html \
 			help/overview.html \
 			help/ref-access_log.html \
 			help/ref-classes-conf.html \

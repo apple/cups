@@ -33,6 +33,11 @@ P.command {
   margin-left: 36pt;
 }
 
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
 BLOCKQUOTE {
   background: #cccc99;
   border: solid thin #999966;
