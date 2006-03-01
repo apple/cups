@@ -88,6 +88,7 @@ WEBIMAGES	=	\
 			images/bottom-left.gif \
 			images/bottom-right.gif \
 			images/classes.gif \
+			images/cups-block-diagram.gif \
 			images/esp-logo.gif \
 			images/happy.gif \
 			images/logo.gif \
