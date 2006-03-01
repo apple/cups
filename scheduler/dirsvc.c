@@ -843,8 +843,8 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
   * printer-make-and-model attributes...
   */
 
-  dequote(location, p->location, sizeof(p->location));
-  dequote(info, p->info, sizeof(p->info));
+  dequote(location, p->location, sizeof(location));
+  dequote(info, p->info, sizeof(info));
   dequote(make_model, p->make_model ? p->make_model : "Unknown",
           sizeof(make_model));
 
