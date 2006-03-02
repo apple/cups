@@ -56,6 +56,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		directory[1024];	/* Directory */
   cups_file_t	*fp;			/* Help file */
   char		line[1024];		/* Line from file */
+  int		printable;		/* Show printable version? */
 
 
  /*
@@ -63,6 +64,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   cgiInitialize();
+
+  printable = cgiGetVariable("PRINTABLE") != NULL;
 
  /*
   * Set the web interface section...
@@ -92,7 +95,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     perror(filename);
 
-    cgiStartHTML("Help");
+    cgiStartHTML(cgiText(_("Help")));
     cgiSetVariable("ERROR", "Unable to load help index!");
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
@@ -133,7 +136,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       perror(filename);
 
-      cgiStartHTML("Help");
+      cgiStartHTML(cgiText(_("Help")));
       cgiSetVariable("ERROR", "Unable to access help file!");
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -143,7 +146,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if ((n = helpFindNode(hi, helpfile, NULL)) == NULL)
     {
-      cgiStartHTML("Help");
+      cgiStartHTML(cgiText(_("Help")));
       cgiSetVariable("ERROR", "Help file not in index!");
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -162,7 +165,10 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Send a standard page header...
     */
 
-    cgiStartHTML(n->text);
+    if (printable)
+      puts("Content-Type: text/html;charset=utf-8\n");
+    else
+      cgiStartHTML(n->text);
   }
   else
   {
@@ -170,7 +176,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Send a standard page header...
     */
 
-    cgiStartHTML("Help");
+    cgiStartHTML(cgiText(_("Help")));
   }
 
  /*
@@ -311,7 +317,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Show the search and bookmark content...
   */
 
-  cgiCopyTemplateLang("help-header.tmpl");
+  if (!helpfile || !printable)
+    cgiCopyTemplateLang("help-header.tmpl");
+  else
+    cgiCopyTemplateLang("help-printable.tmpl");
 
  /*
   * If we are viewing a file, copy it in now...
@@ -353,7 +362,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Send a standard trailer...
   */
 
-  cgiEndHTML();
+  if (!printable)
+    cgiEndHTML();
+  else
+    puts("</BODY>\n</HTML>");
 
  /*
   * Delete the index...

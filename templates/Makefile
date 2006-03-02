@@ -50,6 +50,7 @@ FILES	=	\
 		error-op.tmpl \
 		header.tmpl \
 		help-header.tmpl \
+		help-printable.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
 		job-move.tmpl \

@@ -87,7 +87,8 @@ WEBBUTTONS	=	\
 			images/use-default-config.gif \
 			images/view-access-log.gif \
 			images/view-error-log.gif \
-			images/view-page-log.gif
+			images/view-page-log.gif \
+			images/view-printable-version.gif
 WEBIMAGES	=	\
 			images/bottom-left.gif \
 			images/bottom-right.gif \
