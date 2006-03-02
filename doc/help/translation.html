@@ -1,132 +1,54 @@
 <HTML>
+<!-- SECTION: Getting Started -->
 <HEAD>
-	<META NAME="COPYRIGHT" CONTENT="Copyright 2001-2003, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-TRANS-1.1">
-	<META NAME="Author" CONTENT="Easy Software Products">
-	<TITLE>CUPS Translation Guide</TITLE>
+	<TITLE>Translating CUPS</TITLE>
 </HEAD>
 <BODY>
 
-<H1>Scope</H1>
+<P>Thanks to its extensive use of templates, images, and message
+catalogs, CUPS can be easily translated (or customized!) to suit
+your needs. This help file will guide you through the CUPS
+localization files so you can get the most out of it.</P>
 
-<H2>Identification</H2>
+<H2 CLASS="title"><A NAME="INTRO">Getting Started</A></H2>
 
-<P>This translation guide provides instructions for creating
-translations of the CUPS message catalogs and web pages for the
-Common UNIX Printing System ("CUPS") Version 1.1 software.
+<H2 CLASS="title"><A NAME="CATALOGS">Message Catalogs</A></H2>
 
-<EMBED SRC="system-overview.shtml">
+<P>CUPS message catalogs are GNU gettext ".po" text files that
+provide a list of localized message strings for the CUPS
+software. Message catalogs are named <VAR>cups_ll.po</VAR> or
+<VAR>cups_ll_CC.po</VAR>, where "ll" is the standard 2-letter
+abbreviation for the language and "CC" is the standard 2-letter
+abbreviation for the country. Each message catalog file is stored
+in a subdirectory named <VAR>ll</VAR> or <VAR>ll_CC</VAR> to
+match the trailing portion of the message catalog filename.</P>
 
-<H2>Document Overview</H2>
+<P>When translating a new message catalog, copy the
+<VAR>cups.pot</VAR> message catalog file in the <VAR>locale</VAR>
+subdirectory of the CUPS source code. For example, to start
+translating the message catalog to Canadian French, you would
+type the following commands:</P>
 
-<P>This translation guide is organized into the following
-sections:
+<PRE CLASS="command">
+cd locale
+cp cups.pot fr_CA.po
+</PRE>
 
-<UL>
-	<LI>1 - Scope</LI>
-	<LI>2 - References</LI>
-	<LI>3 - Character Sets</LI>
-	<LI>4 - Message Catalogs</LI>
-	<LI>5 - Web Interfaces</LI>
-	<LI>A - Glossary</LI>
-</UL>
-
-<EMBED SRC="references.shtml">
-
-
-<H1>Character Sets</H1>
-
-<P>CUPS uses character set files to define the mapping of local
-character sets to Unicode code points, as well as the fonts that
-should be used for different ranges of characters.
-
-<P>CUPS includes files for common 8-bit encodings as well as
-UTF-8 for Unicode text. The format of these files is described
-in the CUPS Interface Design Description (IDD) document. 
-Current character sets are enumerated in the CUPS API, so in
-order to add a new character set you must patch the CUPS source
-as well as provide a new charset file.
-
-<P>CUPS 1.1 supports the following character sets:
-
-<UL>
-
-	<LI>iso-8859-1
-	<LI>iso-8859-2
-	<LI>iso-8859-3
-	<LI>iso-8859-4
-	<LI>iso-8859-5
-	<LI>iso-8859-6
-	<LI>iso-8859-7
-	<LI>iso-8859-8
-	<LI>iso-8859-9
-	<LI>iso-8859-10
-	<LI>iso-8859-13
-	<LI>iso-8859-14
-	<LI>iso-8859-15
-	<LI>koi8-r
-	<LI>koi8-u
-	<LI>us-ascii
-	<LI>utf-8
-	<LI>windows-874
-	<LI>windows-1250
-	<LI>windows-1251
-	<LI>windows-1252
-	<LI>windows-1253
-	<LI>windows-1254
-	<LI>windows-1255
-	<LI>windows-1256
-	<LI>windows-1257
-	<LI>windows-1258
-
-</UL>
-
-<H1>Message Catalogs</H1>
-
-<P>CUPS message catalogs are text files that identify the
-default character set for the locale and a list of localized
-message strings for the CUPS software. The format of the
-message catalog files is described in the CUPS IDD.
-
-<P>Message catalogs are named <VAR>cups_ll</VAR>,
-<VAR>cups_ll_CC</VAR>, or <VAR>cups_ll_CC.charset</VAR>, where
-"ll" is the standard 2-letter abbreviation for the language,
-"CC" is the standard 2-letter abbreviation for the country, and
-"charset" is the charset name which may differ from the list
-above.
-
-<P>Each message catalog file is stored in a subdirectory named
-<VAR>ll</VAR>, <VAR>ll_CC</VAR>, or <VAR>ll_CC.charset</VAR> to
-match the trailing portion of the message catalog filename.
-
-<P>When translating a new message catalog, copy the <VAR>cups_C</VAR>
-message catalog file to a new subdirectory; to translate the
-message catalog to Canadian French, you would type the following
-commands:
-
-<UL><PRE>
-<KBD>cd locale <I>ENTER</I></KBD>
-<KBD>mkdir fr_CA <I>ENTER</I></KBD>
-<KBD>cp C/cups_C fr_CA/cups_fr_CA <I>ENTER</I></KBD>
-</PRE></UL>
-
-<P>Alternatively, you could copy the existing <VAR>cups_fr</VAR>
-message catalog and then make any changes necessary.
+<P>Alternatively, you could copy the existing <VAR>fr.po</VAR>
+message catalog and then make any necessary changes.</P>
 
 <P>Once you have make your copy of the file, edit it using your
-favorite text editor to translate the text to the desired
-language. Be sure to preserve any numbers starting in the first
-column, as they indicate a new message number - you'll see this
-for the HTTP status messages.
+favorite text editor or translation program to translate the text
+to the desired language.</P>
 
 <P>Finally, add your locale to the list of locales in the
-makefile and run the following command to install it:
+makefile and run the following command to install it:</P>
 
-<UL><PRE>
-<KBD>make install <I>ENTER</I></KBD>
-</PRE></UL>
+<PRE CLASS="command">
+make install
+</PRE>
 
-<H1>Web Interfaces</H1>
+<H2 CLASS="title"><A NAME="WEB">Web Interfaces</A></H2>
 
 <P>The CUPS scheduler provides a web interface that can be used
 to do many common printing and administration tasks. The built-in
@@ -134,7 +56,7 @@ web server supports localization of web pages through the use of
 subdirectories for each locale, e.g. "fr" for French, "de" for
 German, "fr_ca" for French in Canada, and so forth.
 
-<H2>Template Files</H2>
+<H3>Template Files</H3>
 
 <P>Template files are HTML files with special formatting
 characters in them that allow substition of variables and
@@ -151,7 +73,7 @@ in the appropriate subdirectories under
 French template files should be stored in the
 <VAR>/usr/share/cups/templates/fr_CA</VAR> directory.
 
-<H3>Inserting Attributes and Values</H3>
+<H4>Inserting Attributes and Values</H4>
 
 <P>Template files consist of HTML with variable substitutions
 for named inside curley braces "{name}". Variable names are
@@ -174,7 +96,7 @@ as-is.</P>
 <P>To substitute an empty string if the variable is undefined, use
 <CODE>{?NAME}</CODE> instead.</P>
 
-<H3>Array Substitutions</H3>
+<H4>Array Substitutions</H4>
 
 <P>The number of array elements can be inserted using
 <CODE>{#NAME}</CODE>. If the array is undefined then 0 is
@@ -187,7 +109,7 @@ bracket ("]") and closing brace ("}") is repeated for as many elements as
 are in the named array. For example, the following template will display
 a list of each job in the <CODE>job_id</CODE> array:</P>
 
-<UL><PRE>
+<PRE CLASS="command">
 &lt;TABLE&gt;
 &lt;TR&gt;
 	&lt;TH&gt;Job ID&lt;/TH&gt;
@@ -203,23 +125,23 @@ a list of each job in the <CODE>job_id</CODE> array:</P>
 &lt;/TR&gt;
 }
 &lt;/TABLE&gt;
-</PRE></UL>
+</PRE>
 
 <P>Arrays can be nested, however all elements within the curley
 braces ("{" and "}") are indexed using the innermost array.</P>
 
-<H3>Conditional Tests</H3>
+<H4>Conditional Tests</H4>
 
 <P>Templates can also test variables against specific values and
 conditionally include text in the template. The format is:
 
-<UL><PRE>
+<PRE CLASS="command">
 {<I>variable</I>?<I>true</I>:<I>false</I>}
 {<I>variable</I>=<I>value</I>?<I>true</I>:<I>false</I>}
 {<I>variable</I>!<I>value</I>?<I>true</I>:<I>false</I>}
 {<I>variable</I>&lt;<I>value</I>?<I>true</I>:<I>false</I>}
 {<I>variable</I>><I>value</I>?<I>true</I>:<I>false</I>}
-</PRE></UL>
+</PRE>
 
 <P>where <VAR>true</VAR> is the text that is included if the
 condition is true and <VAR>false</VAR> is the text that is
@@ -256,7 +178,7 @@ to test:
 </TR>
 </TABLE></CENTER>
 
-<H3>Template File List</H3>
+<H4>Template File List</H4>
 
 <P>The following template files are used by the web interface:
 
@@ -464,20 +386,22 @@ to test:
 
 </DL>
 
-<H2>CGI Programs</H2>
+<H3>CGI Programs</H3>
 
-<P>CUPS uses four CGI programs to manage the dynamic web interfaces:
+<P>CUPS uses five CGI programs to manage the dynamic web interfaces:
 
 <UL>
 
 	<LI><CODE>admin.cgi</CODE></LI>
 	<LI><CODE>classes.cgi</CODE></LI>
+	<LI><CODE>help.cgi</CODE></LI>
 	<LI><CODE>jobs.cgi</CODE></LI>
 	<LI><CODE>printers.cgi</CODE></LI>
 
 </UL>
 
-<H3>admin.cgi</H3>
+
+<H4>admin.cgi</H4>
 
 <P>The <CODE>admin.cgi</CODE> program handles all of the printer
 and class administration functions and is run for all direct
@@ -613,7 +537,7 @@ specify the action requested.
 </DL>
 
 
-<H3>classes.cgi</H3>
+<H4>classes.cgi</H4>
 
 <P>The <CODE>classes.cgi</CODE> program is responsible for
 listing class information, including jobs destined for that
@@ -647,7 +571,15 @@ each class.
 
 </DL>
 
-<H3>jobs.cgi</H3>
+
+<H4>help.cgi</H4>
+
+<P>The <CODE>help.cgi</CODE> program handles all of the on-line
+help functions and is run for all direct accesses to the
+<VAR>/help</VAR> resource.</P>
+
+
+<H4>jobs.cgi</H4>
 
 <P>The <CODE>jobs.cgi</CODE> program handles all of the job
 functions and is run for all direct accesses to the <VAR>/jobs</VAR>
@@ -693,7 +625,8 @@ requested.
 
 </DL>
 
-<H3>printers.cgi</H3>
+
+<H4>printers.cgi</H4>
 
 <P>The <CODE>printers.cgi</CODE> program is responsible for
 listing printer information, including jobs destined for that
@@ -726,9 +659,6 @@ each printer.
 	<DD>Print a PostScript test page.</DD>
 
 </DL>
-
-
-<EMBED SRC="glossary.shtml">
 
 </BODY>
 </HTML>
