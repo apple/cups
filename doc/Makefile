@@ -104,6 +104,11 @@ WEBIMAGES	=	\
 			images/top-left.gif \
 			images/top-middle.gif \
 			images/top-right.gif \
+			images/web-add-this-printer.gif \
+			images/web-password.gif \
+			images/web-printer-driver.gif \
+			images/web-printer-status.gif \
+			images/web-set-printer-options.gif \
 			images/web-test-page.gif
 HELPFILES	=	\
 			help/api-array.html \
@@ -113,7 +118,7 @@ HELPFILES	=	\
 			help/api-httpipp.html \
 			help/api-ppd.html \
 			help/api-raster.html \
-			help/design.html \
+			help/glossary.html \
 			help/man-accept.html \
 			help/man-backend.html \
 			help/man-cancel.html \
@@ -153,10 +158,16 @@ HELPFILES	=	\
 			help/ref-page_log.html \
 			help/ref-printers-conf.html \
 			help/ref-subscriptions-conf.html \
+			help/security.html \
+			help/spec-cmp.html \
 			help/spec-command.html \
+			help/spec-design.html \
 			help/spec-ipp.html \
 			help/spec-ppd.html \
+			help/spec-raster.html \
+			help/spec-stp.html \
 			help/standard.html \
+			help/translation.html
 			help/whatsnew.html
 
 
