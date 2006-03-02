@@ -152,7 +152,6 @@ static cupsd_var_t	variables[] =
   { "RemoteRoot",		&RemoteRoot,		CUPSD_VARTYPE_STRING },
   { "RequestRoot",		&RequestRoot,		CUPSD_VARTYPE_STRING },
   { "RIPCache",			&RIPCache,		CUPSD_VARTYPE_STRING },
-  { "RunAsUser", 		&RunAsUser,		CUPSD_VARTYPE_BOOLEAN },
   { "RootCertDuration",		&RootCertDuration,	CUPSD_VARTYPE_INTEGER },
   { "ServerAdmin",		&ServerAdmin,		CUPSD_VARTYPE_STRING },
   { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_STRING },
@@ -385,7 +384,6 @@ cupsdReadConfiguration(void)
   MaxRequestSize        = 0;
   ReloadTimeout	        = 60;
   RootCertDuration      = 300;
-  RunAsUser             = FALSE;
   Timeout               = DEFAULT_TIMEOUT;
   NumSystemGroups       = 0;
 
@@ -446,10 +444,7 @@ cupsdReadConfiguration(void)
   if (!status)
     return (0);
 
-  if (RunAsUser)
-    RunUser = User;
-  else
-    RunUser = getuid();
+  RunUser = getuid();
 
  /*
   * Use the default system group if none was supplied in cupsd.conf...

@@ -428,11 +428,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  if (RunAsUser)
-    sigset(SIGHUP, sigterm_handler);
-  else
-    sigset(SIGHUP, sighup_handler);
-
+  sigset(SIGHUP, sighup_handler);
   sigset(SIGPIPE, SIG_IGN);
   sigset(SIGTERM, sigterm_handler);
 #elif defined(HAVE_SIGACTION)
@@ -440,12 +436,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   sigemptyset(&action.sa_mask);
   sigaddset(&action.sa_mask, SIGHUP);
-
-  if (RunAsUser)
-    action.sa_handler = sigterm_handler;
-  else
-    action.sa_handler = sighup_handler;
-
+  action.sa_handler = sighup_handler;
   sigaction(SIGHUP, &action, NULL);
 
   sigemptyset(&action.sa_mask);
@@ -458,11 +449,7 @@ main(int  argc,				/* I - Number of command-line args */
   action.sa_handler = sigterm_handler;
   sigaction(SIGTERM, &action, NULL);
 #else
-  if (RunAsUser)
-    signal(SIGHUP, sigterm_handler);
-  else
-    signal(SIGHUP, sighup_handler);
-
+  signal(SIGHUP, sighup_handler);
   signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
@@ -519,18 +506,6 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   cupsdStartSystemMonitor();
-
- /*
-  * If the administrator has configured the server to run as an unpriviledged
-  * user, change to that user now...
-  */
-
-  if (RunAsUser)
-  {
-    setgid(Group);
-    setgroups(1, &Group);
-    setuid(User);
-  }
 
  /*
   * Catch signals...

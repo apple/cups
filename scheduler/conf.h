@@ -160,8 +160,6 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Timeout before reload from SIGHUP */
 			RootCertDuration	VALUE(300),
 					/* Root certificate update interval */
-			RunAsUser		VALUE(FALSE),
-					/* Run as unpriviledged user? */
 			RunUser,	/* User to run as, used for files */
 			PrintcapFormat		VALUE(PRINTCAP_BSD),
 					/* Format of printcap file? */
