@@ -167,7 +167,7 @@ HELPFILES	=	\
 			help/spec-raster.html \
 			help/spec-stp.html \
 			help/standard.html \
-			help/translation.html
+			help/translation.html \
 			help/whatsnew.html
 
 
