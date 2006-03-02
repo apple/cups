@@ -174,7 +174,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
       /* Others */
       acl_create_entry(&acl, &entry);
       acl_get_permset(entry, &permset);
-      acl_add_perm(permset, ACL_READ);
+      acl_add_perm(permset, 0);
       acl_set_tag_type(entry, ACL_OTHER);
       acl_set_permset(entry, permset);
 
