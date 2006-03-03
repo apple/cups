@@ -1,190 +1,174 @@
-INSTALL - CUPS v1.2.0a1 - 01/07/2003
-------------------------------------
+INSTALL - CUPS v1.2b1 - 2006-03-03
+----------------------------------
 
 This file describes how to compile and install CUPS from source
 code. For more information on CUPS see the file called
 "README.txt".  A complete change log can be found in
 "CHANGES.txt".
 
-**** IF YOU HAVE A NON-POSTSCRIPT PRINTER, YOU WILL ALSO  ****
-**** NEED TO INSTALL ESP GHOSTSCRIPT OR A PATCHED VERSION ****
-**** OF THE STANDARD GHOSTSCRIPT RELEASES.                ****
+**** IF YOU HAVE A NON-POSTSCRIPT PRINTER, YOU WILL ALSO    ****
+**** NEED TO INSTALL ESP GHOSTSCRIPT AFTER YOU INSTALL CUPS ****
 
 
 BEFORE YOU BEGIN
 
-You'll need ANSI-compliant C and C++ compilers, plus a make
-program and Bourne shell.  The GNU compiler tools work well -
-we've tested the current CUPS code against GCC 2.95.x with
-excellent results.
+    You'll need ANSI-compliant C and C++ compilers, plus a make
+    program and Bourne shell.  The GNU compiler tools work well -
+    we've tested the current CUPS code against several versions
+    of GCC with excellent results.
 
-The makefiles used by the project should work with all versions
-of make.  We've tested them with GNU make as well as the make
-programs shipped by Compaq, HP, SGI, and Sun.  FreeBSD users
-should use GNU make (gmake).
+    The makefiles used by the project should work with all
+    versions of make.  We've tested them with GNU make as well as
+    the make programs shipped by Compaq, HP, SGI, and Sun. 
+    FreeBSD users should use GNU make (gmake).
 
-Besides these tools you'll want the following libraries:
+    Besides these tools you'll want the JPEG, PNG, TIFF, and ZLIB
+    libraries for image support, the CDSA, GNU TLS, or OpenSSL
+    libraries for encryption support, and the OpenLDAP and
+    OpenSLP libraries for directory services support. CUPS will
+    compile and run without these, however you'll miss out on
+    many of the features provided by CUPS.
 
-    - JPEG 6b or higher
-    - PNG 1.0.6 or higher
-    - TIFF 3.4 or higher
-    - ZLIB 1.1.3 or higher
-
-CUPS will compile and run without these, however you'll miss out on
-many of the features provided by CUPS.
-
-Also, please note that CUPS no longer includes the Ghostscript-
-based pstoraster filter.  You *must* download Ghostscript
-separately and patch it using the files in the pstoraster
-subdirectory, or download the ESP Ghostscript distribution from
-the CUPS web site. For more information see the README file in
-the pstoraster subdirectory.
+    Also, please note that CUPS no longer includes the
+    Ghostscript- based pstoraster filter.  You *must* download
+    ESP Ghostscript separately from the CUPS web site if you want
+    to print PostScript files to non-PostScript printers.
 
 
-COMPILING FROM CVS
+COMPILING FROM SUBVERSION
 
-The CUPS CVS repository doesn't hold a copy of the pre-built
-configure script.  You'll need to run the GNU autoconf software
-(2.52 or higher) before compiling the software from CVS:
+    The CUPS Subversion repository doesn't hold a copy of the
+    pre-built configure script.  You'll need to run the GNU
+    autoconf software (2.52 or higher) before compiling the
+    software from Subversion:
 
-    autoconf ENTER
+	autoconf -f
 
 
 CONFIGURATION
 
-CUPS uses GNU autoconf, so you should find the usual "configure"
-script in the main CUPS source directory.  To configure CUPS for
-your system, type:
+    CUPS uses GNU autoconf, so you should find the usual
+    "configure" script in the main CUPS source directory.  To
+    configure CUPS for your system, type:
 
-    ./configure ENTER
+	./configure
 
-The default installation will put the CUPS software in the
-"/etc", "/usr", and "/var" directories on your system, which
-will overwrite any existing printing commands on your system.
-Use the "--prefix" option to install the CUPS software in
-another location:
+    The default installation will put the CUPS software in the
+    "/etc", "/usr", and "/var" directories on your system, which
+    will overwrite any existing printing commands on your system.
+    Use the "--prefix" option to install the CUPS software in
+    another location:
 
-    ./configure --prefix=/some/directory ENTER
+	./configure --prefix=/some/directory
 
-If the PNG, JPEG, TIFF, and ZLIB libraries are not installed in
-a system default location (typically "/usr/include" and
-"/usr/lib") you'll need to set the CFLAGS, CXXFLAGS, DSOFLAGS,
-and LDFLAGS environment variables prior to running configure:
+    To see a complete list of configuration options, use the
+    --help option:
 
-    setenv CFLAGS "-I/some/directory" ENTER
-    setenv CXXFLAGS "-I/some/directory" ENTER
-    setenv DSOFLAGS "-L/some/directory" ENTER
-    setenv LDFLAGS "-L/some/directory" ENTER
-    ./configure ... ENTER
+        ./configure --help
 
-or:
+    If any of the dependent libraries are not installed in a
+    system default location (typically "/usr/include" and
+    "/usr/lib") you'll need to set the CFLAGS, CPPFLAGS,
+    CXXFLAGS, DSOFLAGS, and LDFLAGS environment variables prior
+    to running configure:
 
-    CFLAGS="-I/some/directory"; export CFLAGS ENTER
-    CXXFLAGS="-I/some/directory"; export CXXFLAGS ENTER
-    DSOFLAGS="-L/some/directory"; export DSOFLAGS ENTER
-    LDFLAGS="-L/some/directory"; export LDFLAGS ENTER
-    ./configure ... ENTER
+	setenv CFLAGS "-I/some/directory"
+	setenv CPPFLAGS "-I/some/directory"
+	setenv CXXFLAGS "-I/some/directory"
+	setenv DSOFLAGS "-L/some/directory"
+	setenv LDFLAGS "-L/some/directory"
+	./configure ...
 
-To enable support for encryption, you'll also want to add the
-"--enable-ssl" option:
+    or:
 
-    ./configure --enable-ssl
+	CFLAGS="-I/some/directory" \
+	CPPFLAGS="-I/some/directory" \
+	CXXFLAGS="-I/some/directory" \
+	DSOFLAGS="-L/some/directory" \
+	LDFLAGS="-L/some/directory" \
+	./configure ...
 
-SSL and TLS support require the OpenSSL library, available at:
+    Once you have configured things, just type:
 
-    http://www.openssl.org
+	make ENTER
 
-If the OpenSSL header files and libraries are not in a standard
-location, specify the locations of these files using the
---with-openssl-includes and --with-openssl-libs directives:
+    or if you have FreeBSD, NetBSD, or OpenBSD type:
 
-    ./configure --enable-ssl \
-        --with-openssl-includes=/foo/bar/include \
-        --with-openssl-libs=/foo/bar/lib
+	gmake ENTER
 
-See the file "ENCRYPTION.txt" for information on using the
-encryption support in CUPS.
-
-Once you have configured things, just type:
-
-    make ENTER
-
-or if you have FreeBSD, NetBSD, or OpenBSD type:
-
-    gmake ENTER
-
-to build the software.
+    to build the software.
 
 
 INSTALLING THE SOFTWARE
 
-Once you have built the software you need to install it.  The
-"install" target provides a quick way to install the software on
-your local system:
+    Once you have built the software you need to install it.  The
+    "install" target provides a quick way to install the software
+    on your local system:
 
-    make install ENTER
+	make install ENTER
 
-or for FreeBSD, NetBSD, or OpenBSD:
+    or for FreeBSD, NetBSD, or OpenBSD:
 
-    gmake install ENTER
+	gmake install ENTER
 
-You can also build binary packages that can be installed on other
-machines using the RPM spec file ("cups.spec") or EPM list file
-("cups.list").  The latter also supports building of binary RPMs,
-so it may be more convenient to use - we use EPM to build all of
-our binary distributions.
+    You can also build binary packages that can be installed on
+    other machines using the RPM spec file
+    ("packaging/cups.spec") or EPM list file
+    ("packaging/cups.list").  The latter also supports building
+    of binary RPMs, so it may be more convenient to use - we use
+    EPM to build all of our binary distributions.
 
-You can find the RPM software at:
+    You can find the RPM software at:
 
-    http://www.rpm.org
+	http://www.rpm.org/
 
-The EPM software is at:
+    The EPM software is available at:
 
-    http://www.easysw.com/epm/
+	http://www.easysw.com/epm/
 
 
 CREATING BINARY DISTRIBUTIONS WITH EPM
 
-The top level makefile supports generation of many types of binary
-distributions using EPM.  To build a binary distribution type:
+    The top level makefile supports generation of many types of binary
+    distributions using EPM.  To build a binary distribution type:
 
-    make <format> ENTER
+	make <format> ENTER
 
-or
+    or
 
-    gmake <format> ENTER
+	gmake <format> ENTER
 
-for FreeBSD, NetBSD, and OpenBSD.  The <format> target is one of
-the following:
+    for FreeBSD, NetBSD, and OpenBSD.  The <format> target is one of
+    the following:
 
-    epm      - Builds a portable shell script and tar file based
-               distribution.  This format will also backup your
-	       existing printing system if you decide to remove
-	       CUPS at some future time.
-    aix      - Builds an AIX binary distribution.
-    bsd      - Builds a *BSD binary distribution.
-    deb      - Builds a Debian binary distribution.
-    depot    - Builds a HP-UX binary distribution.
-    pkg      - Builds a Solaris binary distribution.
-    rpm      - Builds a RPM binary distribution.
-    tardist  - Builds an IRIX binary distribution.
+	epm       - Builds a script + tarfile package
+	aix       - Builds an AIX package
+	bsd       - Builds a *BSD package
+	deb       - Builds a Debian package
+	depot     - Builds a HP-UX package (also swinstall)
+	inst      - Builds an IRIX package (also tardist)
+	osx       - Builds a MacOS X package
+	pkg       - Builds a Solaris package
+	rpm       - Builds a RPM package
+	setld     - Build a Tru64 UNIX package
+	slackware - Build a Slackware package
+	swinstall - Build a HP-UX package (also depot)
+	tardist   - Builds an IRIX package (also inst)
 
 
 REPORTING PROBLEMS
 
-If you have problems, READ THE DOCUMENTATION FIRST!  If the
-documentation does not solve your problems please send an email
-to "cups-support@cups.org".  Include your operating system and
-version, compiler and version, and any errors or problems you've
-run into. The "/var/log/cups/error_log" file should also be sent,
-as it often helps to determine the cause of your problem.
+    If you have problems, READ THE DOCUMENTATION FIRST!  If the
+    documentation does not solve your problems, please post a
+    message on the "cups.general" forum at:
 
-If you are running a version of Linux, be sure to provide the
-Linux distribution you have, too.
+        http://www.cups.org/newsgroups.php
 
-Please note that the "cups-support@cups.org" email address goes
-to the CUPS developers; they are busy people, so your email may
-go unanswered for days or weeks.  In general, only general build
-or distribution problems will actually get answered - for
-end-user support see the "README.txt" for a summary of the
-resources available.
+    Include your operating system and version, compiler and
+    version, and any errors or problems you've run into. The
+    "config.log" file and the output from the configure script
+    and make should also be sent, as it often helps to determine
+    the cause of your problem.
+
+    If you are running a version of Linux, be sure to provide the
+    Linux distribution you have, too.

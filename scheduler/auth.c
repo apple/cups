@@ -1618,7 +1618,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   if (!strcasecmp(con->http.hostname, "localhost"))
   {
    /*
-    * Access from localhost (127.0.0.1 or :::1) is always allowed...
+    * Access from localhost (127.0.0.1 or ::1) is always allowed...
     */
 
     auth = AUTH_ALLOW;

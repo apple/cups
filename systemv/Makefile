@@ -43,7 +43,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) disable enable reject
+	$(RM) $(OBJS) $(TARGETS) cupsdisable cupsenable reject
 
 
 #
@@ -87,10 +87,10 @@ install:	all
 accept:	accept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o accept accept.o $(LIBS)
-	$(RM) reject enable disable
+	$(RM) reject cupsenable cupsdisable
 	$(LN) accept reject
-	$(LN) accept enable
-	$(LN) accept disable
+	$(LN) accept cupsenable
+	$(LN) accept cupsdisable
 
 
 #

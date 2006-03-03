@@ -125,6 +125,10 @@ VAR cups_array_t	*Locations	VALUE(NULL);
 					/* Authorization locations */
 VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
 					/* Default AuthType, if not specified */
+#ifdef HAVE_SSL
+VAR http_encryption_t	DefaultEncryption VALUE(HTTP_ENCRYPT_REQUIRED);
+					/* Default encryption for authentication */
+#endif /* HAVE_SSL */
 
 
 /*

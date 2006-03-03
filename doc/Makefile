@@ -120,6 +120,7 @@ HELPFILES	=	\
 			help/api-ppd.html \
 			help/api-raster.html \
 			help/glossary.html \
+			help/license.html \
 			help/man-accept.html \
 			help/man-backend.html \
 			help/man-cancel.html \
@@ -207,7 +208,7 @@ install:	all
 		$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
 		$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
 		for file in $(WEBBUTTONS); do \
-			if test -e $$lang/$$file; then \
+			if test -f $$lang/$$file; then \
 				$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
 			fi \
 		done \

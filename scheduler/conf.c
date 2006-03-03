@@ -362,6 +362,9 @@ cupsdReadConfiguration(void)
 
   ConfigFilePerm        = CUPS_DEFAULT_CONFIG_FILE_PERM;
   DefaultAuthType       = AUTH_BASIC;
+#ifdef HAVE_SSL
+  DefaultEncryption     = HTTP_ENCRYPT_REQUIRED;
+#endif /* HAVE_SSL */
   JobRetryLimit         = 5;
   JobRetryInterval      = 300;
   FileDevice            = FALSE;
@@ -2667,6 +2670,28 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	return (0);
       }
     }
+#ifdef HAVE_SSL
+    else if (!strcasecmp(line, "DefaultEncryption"))
+    {
+     /*
+      * DefaultEncryption {Never,IfRequested,Required}
+      */
+
+      if (!value || !strcasecmp(value, "never"))
+	DefaultEncryption = HTTP_ENCRYPT_NEVER;
+      else if (!strcasecmp(value, "required"))
+	DefaultEncryption = HTTP_ENCRYPT_REQUIRED;
+      else if (!strcasecmp(value, "ifrequested"))
+	DefaultEncryption = HTTP_ENCRYPT_IF_REQUESTED;
+      else
+      {
+	cupsdLogMessage(CUPSD_LOG_WARN,
+	                "Unknown default encryption %s on line %d.",
+	                value, linenum);
+	return (0);
+      }
+    }
+#endif /* HAVE_SSL */
     else if (!strcasecmp(line, "User"))
     {
      /*

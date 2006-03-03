@@ -22,6 +22,9 @@ function reset_config()
 "BrowseAllow @LOCAL\\n" +
 "\\n" +
 "\\n" +
+"# Authenticate against system accounts by default...\\n" +
+"DefaultAuthType Basic\\n" +
+"\\n" +
 "# Restrict access to the server...\\n" +
 "<Location />\\n" +
 "  Order allow,deny\\n" +
@@ -41,9 +44,6 @@ function reset_config()
 "  Order allow,deny\\n" +
 "  Allow localhost\\n" +
 "</Location>\\n" +
-"\\n" +
-"# Authenticate against system accounts by default...\\n" +
-"DefaultAuthType Basic\\n" +
 "\\n" +
 "# Set the default printer/job policies...\\n" +
 "<Policy default>\\n" +

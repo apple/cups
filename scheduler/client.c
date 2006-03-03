@@ -41,6 +41,7 @@
  *   get_file()              - Get a filename and state info.
  *   install_conf_file()     - Install a configuration file.
  *   is_path_absolute()      - Is a path absolute and free of relative elements.
+ *   make_certificate()      - Make a self-signed SSL/TLS certificate.
  *   pipe_command()          - Pipe the output of a command to the remote client.
  */
 
@@ -54,6 +55,9 @@
 #ifdef HAVE_CDSASSL
 #  include <Security/Security.h>
 #endif /* HAVE_CDSASSL */
+#ifdef HAVE_GNUTLS
+#  include <gnutls/x509.h>
+#endif /* HAVE_GNUTLS */
 
 
 /*
@@ -69,6 +73,9 @@ static char		*get_file(cupsd_client_t *con, struct stat *filestats,
 			          char *filename, int len);
 static http_status_t	install_conf_file(cupsd_client_t *con);
 static int		is_path_absolute(const char *path);
+#ifdef HAVE_GNUTLS
+static void		make_certificate(void);
+#endif /* HAVE_GNUTLS */
 static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 			             char *command, char *options, int root);
 
@@ -698,6 +705,20 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
   gnutls_certificate_server_credentials *credentials;
 					/* TLS credentials */
 
+
+ /*
+  * Verify that we have a certificate...
+  */
+
+  if (access(ServerKey, 0) || access(ServerCertificate, 0))
+  {
+   /*
+    * Nope, make a self-signed certificate...
+    */
+
+    make_certificate();
+  }
+
  /*
   * Create the SSL object and perform the SSL handshake...
   */
@@ -727,7 +748,7 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
   gnutls_init(&(conn->session), GNUTLS_SERVER);
   gnutls_set_default_priority(conn->session);
   gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(conn->session, con->http.fd);
+  gnutls_transport_set_ptr(conn->session, (gnutls_transport_ptr)con->http.fd);
 
   error = gnutls_handshake(conn->session);
 
@@ -2257,6 +2278,21 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
                http_status_t  code)	/* I - Error code */
 {
  /*
+  * Force client to upgrade for authentication if that is how the
+  * server is configured...
+  */
+
+  if (code == HTTP_UNAUTHORIZED &&
+      DefaultEncryption == HTTP_ENCRYPT_REQUIRED &&
+      strcasecmp(con->http.hostname, "localhost") &&
+      !con->http.tls)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdSendError: Encryption before authentication!");
+    code = HTTP_UPGRADE_REQUIRED;
+  }
+
+ /*
   * Put the request in the access_log file...
   */
 
@@ -2416,12 +2452,20 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
                 http_status_t  code,	/* I - HTTP status code */
 	        char           *type)	/* I - MIME type of document */
 {
+ /*
+  * Send the HTTP status header...
+  */
+
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
                  con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
 
   if (code == HTTP_CONTINUE)
   {
+   /*
+    * 100-continue doesn't send any headers...
+    */
+
     if (httpPrintf(HTTP(con), "\r\n") < 0)
       return (0);
     else
@@ -2589,17 +2633,19 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
             if (!strncasecmp(buf, "Location:", 9))
   	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL);
 	    else if (!strncasecmp(buf, "Status:", 7))
-  	      cupsdSendHeader(con, atoi(buf + 7), NULL);
+  	      cupsdSendError(con, atoi(buf + 7));
 	    else
+	    {
   	      cupsdSendHeader(con, HTTP_OK, NULL);
 
-	    if (con->http.version == HTTP_1_1)
-	    {
-	      con->http.data_encoding = HTTP_ENCODE_CHUNKED;
+	      if (con->http.version == HTTP_1_1)
+	      {
+		con->http.data_encoding = HTTP_ENCODE_CHUNKED;
 
-	      if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n") < 0)
-		return (0);
-	    }
+		if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n") < 0)
+		  return (0);
+	      }
+            }
 
 	    con->sent_header = 1;
 	  }
@@ -2646,26 +2692,26 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
         return (1);
       }
       else if (bytes == 0)
-      {
         con->http.activity = time(NULL);
-        return (1);
-      }
     }
 
-    if (httpWrite2(HTTP(con), buf, bytes) < 0)
+    if (bytes > 0)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdWriteClient: %d Write of %d bytes failed!",
-                      con->http.fd, bytes);
+      if (httpWrite2(HTTP(con), buf, bytes) < 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                	"cupsdWriteClient: %d Write of %d bytes failed!",
+                	con->http.fd, bytes);
 
-      cupsdCloseClient(con);
-      return (0);
+	cupsdCloseClient(con);
+	return (0);
+      }
+
+      con->bytes += bytes;
+
+      if (con->http.state == HTTP_WAITING)
+	bytes = 0;
     }
-
-    con->bytes += bytes;
-
-    if (con->http.state == HTTP_WAITING)
-      bytes = 0;
   }
 
   if (bytes <= 0)
@@ -3245,6 +3291,148 @@ is_path_absolute(const char *path)	/* I - Input path */
 
   return (1);
 }
+
+
+#ifdef HAVE_GNUTLS
+/*
+ * 'make_certificate()' - Make a self-signed SSL/TLS certificate.
+ */
+
+static void
+make_certificate(void)
+{
+  gnutls_x509_crt	crt;		/* Self-signed certificate */
+  gnutls_x509_privkey	key;		/* Encryption key */
+  cups_lang_t		*language;	/* Default language info */
+  cups_file_t		*fp;		/* Key/cert file */
+  unsigned char		buffer[8192];	/* Buffer for x509 data */
+  size_t		bytes;		/* Number of bytes of data */
+  unsigned char		serial[4];	/* Serial number buffer */
+  time_t		curtime;	/* Current time */
+  int			result;		/* Result of GNU TLS calls */
+
+
+ /*
+  * Create the encryption key...
+  */
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Generating server key...");
+
+  gnutls_x509_privkey_init(&key);
+  gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, 2048, 0);
+
+ /*
+  * Save it...
+  */
+
+  bytes = sizeof(buffer);
+
+  if ((result = gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM,
+                                           buffer, &bytes)) < 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to export server key - %s",
+                    gnutls_strerror(result));
+    gnutls_x509_privkey_deinit(key);
+    return;
+  }
+  else if ((fp = cupsFileOpen(ServerKey, "w")) != NULL)
+  {
+    cupsFileWrite(fp, (char *)buffer, bytes);
+    cupsFileClose(fp);
+
+    cupsdLogMessage(CUPSD_LOG_INFO, "Created server key file \"%s\"...",
+		    ServerKey);
+  }
+  else
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create server key file \"%s\" - %s",
+		    ServerKey, strerror(errno));
+    gnutls_x509_privkey_deinit(key);
+    return;
+  }
+
+ /*
+  * Create the self-signed certificate...
+  */
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Generating self-signed certificate...");
+
+  language  = cupsLangDefault();
+  curtime   = time(NULL);
+  serial[0] = curtime >> 24;
+  serial[1] = curtime >> 16;
+  serial[2] = curtime >> 8;
+  serial[3] = curtime;
+
+  gnutls_x509_crt_init(&crt);
+  if (strlen(language->language) == 5)
+    gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_COUNTRY_NAME, 0,
+                                  language->language + 3, 2);
+  else
+    gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_COUNTRY_NAME, 0,
+                                  "US", 2);
+  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_COMMON_NAME, 0,
+                                ServerName, strlen(ServerName));
+  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
+                                ServerName, strlen(ServerName));
+  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
+                                0, "Unknown", 7);
+  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0,
+                                "Unknown", 7);
+  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_LOCALITY_NAME, 0,
+                                "Unknown", 7);
+  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_PKCS9_EMAIL, 0,
+                                ServerAdmin, strlen(ServerAdmin));
+  gnutls_x509_crt_set_key(crt, key);
+  gnutls_x509_crt_set_serial(crt, serial, sizeof(serial));
+  gnutls_x509_crt_set_activation_time(crt, curtime);
+  gnutls_x509_crt_set_expiration_time(crt, curtime + 10 * 365 * 86400);
+  gnutls_x509_crt_set_ca_status(crt, 0);
+  gnutls_x509_crt_set_subject_alternative_name(crt, GNUTLS_SAN_DNSNAME,
+                                               ServerName);
+  gnutls_x509_crt_set_key_purpose_oid(crt, GNUTLS_KP_TLS_WWW_SERVER, 0);
+  gnutls_x509_crt_set_key_usage(crt, GNUTLS_KEY_KEY_ENCIPHERMENT);
+  gnutls_x509_crt_set_version(crt, 3);
+
+  bytes = sizeof(buffer);
+  if (gnutls_x509_crt_get_key_id(crt, 0, buffer, &bytes) >= 0)
+    gnutls_x509_crt_set_subject_key_id(crt, buffer, bytes);
+
+  gnutls_x509_crt_sign(crt, crt, key);
+
+ /*
+  * Save it...
+  */
+
+  bytes = sizeof(buffer);
+  if ((result = gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM,
+                                       buffer, &bytes)) < 0)
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to export server certificate - %s",
+		    gnutls_strerror(result));
+  else if ((fp = cupsFileOpen(ServerCertificate, "w")) != NULL)
+  {
+    cupsFileWrite(fp, (char *)buffer, bytes);
+    cupsFileClose(fp);
+
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Created 10-year server certificate file \"%s\"...",
+		    ServerCertificate);
+  }
+  else
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create server certificate file \"%s\" - %s",
+		    ServerCertificate, strerror(errno));
+
+ /*
+  * Cleanup...
+  */
+
+  gnutls_x509_crt_deinit(crt);
+  gnutls_x509_privkey_deinit(key);
+}
+#endif /* HAVE_GNUTLS */
 
 
 /*

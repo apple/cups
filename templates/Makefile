@@ -120,7 +120,7 @@ install: all
 	for lang in $(LANGUAGES); do \
 		$(INSTALL_DIR) -m 755 $(DATADIR)/templates/$$lang; \
 		for file in $(FILES); do \
-			if test -e $$lang/$$file; then \
+			if test -f $$lang/$$file; then \
 				$(INSTALL_DATA) $$lang/$$file $(DATADIR)/templates/$$lang; \
 			fi \
 		done \
