@@ -140,5 +140,29 @@ variety of denial of service attacks:</P>
 
 </OL>
 
+<H2 CLASS="title"><A NAME="ENCRYPTION">Encryption Issues</A></H2>
+
+<P>CUPS supports 128-bit SSL 3.0 and TLS 1.0 encryption of
+network connections via the OpenSSL, GNU TLS, and CDSA encryption
+libraries. In additional to the potential security issues posed
+by the SSL and TLS protocols, CUPS currently has the following
+additional issue:</P>
+
+<OL>
+
+	<LI>Certification validation/revocation; currently CUPS
+	does not validate or revoke server or client certificates
+	when establishing a secure connection. This can
+	potentially lead to "man in the middle" and
+	impersonation/spoofing attacks over unsecured networks.
+	Future versions of CUPS will support both validation and
+	revocation of server certificates.
+
+	<P><B>Recommendation:</B> Do not depend on encryption for
+	security when connecting to servers over the Internet or
+	untrusted WAN links.</P></LI>
+
+</OL>
+
 </BODY>
 </HTML>
