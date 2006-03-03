@@ -1,167 +1,144 @@
 <HTML>
+<!-- SECTION: Getting Started -->
 <HEAD>
-	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2003, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-SSR-1.2">
-	<META NAME="Author" CONTENT="Easy Software Products">
-	<TITLE>CUPS Software Security Report</TITLE>
+	<TITLE>Server Security</TITLE>
 </HEAD>
 <BODY>
 
-<H1>Scope</H1>
+<P>In the default "standalone" configuration, there are few
+potential security risks - the CUPS server does not accept remote
+connections, and only accepts shared printer information from the
+local subnet. When you share printers and/or enable remote
+adminstration, you expose your system to potential unauthorized
+access. This help page provides an analysis of possible CUPS
+security concerns and describes how to better secure your
+server.</P>
 
-<H2>Identification</H2>
+<H2 CLASS="title"><A NAME="AUTHENTICATION">Authentication Issues</A></H2>
 
-<P>This software security report provides an analysis of possible security
-concerns for the Common UNIX Printing System ("CUPS") Version 1.2.</P>
-
-<EMBED SRC="system-overview.shtml">
-
-<H2>Document Overview</H2>
-
-<P>This software security report is organized into the following sections:</P>
-
-<UL>
-	<LI>1 - Scope</LI>
-	<LI>2 - References</LI>
-	<LI>3 - Local Access Risks</LI>
-	<LI>4 - Remote Access Risks</LI>
-	<LI>A - Glossary</LI>
-</UL>
-
-<EMBED SRC="references.shtml">
-
-<H1>Local Access Risks</H1>
-
-<P>Local access risks are those that can be exploited only with a local user
-account. This section does not address issues related to dissemination of the
-root password or other security issues associated with the UNIX operating
-system.
-
-<H2>Security Breaches</H2>
-
-<P>There is one known security vulnerability with local access:
+<P>When you enable remote administration, the server will use
+Basic authentication for adminstration tasks. The current CUPS
+server supports Basic, Digest, and local certificate
+authentication:</P>
 
 <OL>
 
-	<LI>Device URIs are passed to backend filters in argv[0] and in
-	an environment variable. Since device URIs can contain
-	usernames and passwords it may be possible for a local user to
-	gain access to a remote resource.
+	<LI>Basic authentication essentially places the clear
+	text of the username and password on the network.
 
-	<P>We recommend that any password-protected accounts used for
-	remote printing have limited access priviledges so that the
-	possible damages can be minimized.
+	<P>Since CUPS uses the system username and password
+	account information, the authentication information could
+	be used to gain access to possibly privileged accounts on
+	the server.</P>
 
-	<P>The device URI is "sanitized" (the username and password are
-	removed) when sent to an IPP client so that a remote user
-	cannot exploit this vulnerability.
+	<P><B>Recommendation:</B> Enable encryption to hide the
+	username and password information.</P></LI>
 
-</OL>
+	<LI>Digest authentication uses an MD5 checksum of the
+	username, password, and domain ("CUPS"), so the original
+	username and password is not sent over the network.
 
-<H1>Remote Access Risks</H1>
+	<P>The current implementation does not authenticate the
+	entire message and uses the client's IP address for the
+	nonce value, making it possible to launch "man in the
+	middle" and replay attacks from the same client.</P>
 
-<P>Remote access risks are those that can be exploited without a local user
-account and/or from a remote system. This section does not address issues
-related to network or firewall security.
-
-<H2>Denial of Service Attacks</H2>
-
-<P>Like all Internet services, the CUPS server is vulnerable to denial of
-service attacks, including:
-
-<OL>
-
-	<LI>Establishing multiple connections to the server until the server
-	will accept no more.
-
-	<P>This cannot be protected against by the current software. It
-	is possible that future versions of the CUPS software could be
-	configured to limit the number of connections allowed from a
-	single host, however that still would not prevent a distributed
-	attack.
-
-	<LI>Repeatedly opening and closing connections to the server as fast
-	as possible.
-
-	<P>There is no easy way of protecting against this in the CUPS
-	software. If the attack is coming from outside the local
-	network it might be possible to filter such an attack, however
-	once the connection request has been received by the server it
-	must at least accept the connection to find out who is
-	connecting.
-
-	<LI>Flooding the network with broadcast packets on port 631.
-
-	<P>It might be possible to disable browsing if this condition
-	is detected by the CUPS software, however if there are large
-	numbers of printers available on the network such an algorithm
-	might think that an attack was occurring when instead a valid
-	update was being received.
-
-	<LI>Sending partial IPP requests; specifically, sending part of an
-	attribute value and then stopping transmission.
-
-	<P>The current code is structured to read and write the IPP
-	request data on-the-fly, so there is no easy way to protect
-	against this for large attribute values.
-
-	<LI>Sending large/long print jobs to printers, preventing other users
-	from printing.
-
-	<P>There are limited facilities for protecting against large print
-	jobs (the <CODE>MaxRequestSize</CODE> attribute), however this will
-	not protect printers from malicious users and print files that
-	generate hundreds or thousands of pages. In general, we recommend
-	restricting printer access to known hosts or networks, and adding
-	user-level access control as needed for expensive printers.
-
-</OL>
-
-<H2>Security Breaches</H2>
-
-<P>The current CUPS server supports Basic, Digest, and local certificate
-authentication:
-
-<OL>
-
-	<LI>Basic authentication essentially places the clear text of
-	the username and password on the network. Since CUPS uses the
-	UNIX username and password account information, the
-	authentication information could be used to gain access to
-	accounts (possibly priviledged accounts) on the server.
-
-	<LI>Digest authentication uses an MD5 checksum of the username,
-	password, and domain ("CUPS"), so the original username and
-	password is not sent over the network. However, the current
-	implementation does not authenticate the entire message and
-	uses the client's IP address for the nonce value, making it
-	possible to launch "man in the middle" and replay attacks from
-	the same client.  The next minor release of CUPS will support
-	Digest authentication of the entire message body, effectively
-	stopping these methods of attack.
+	<P><B>Recommendation:</B> Enable encryption to hide the
+	username and password information.</P></LI></LI>
 
 	<LI>Local certificate authentication passes 128-bit
 	"certificates" that identify an authenticated user.
-	Certificates are created on-the-fly from random data and stored
-	in files under <CODE>/etc/cups/certs</CODE>. They have
-	restricted read permissions: root + system for the root
-	certificate, and lp + system for CGI certificates. Because
-	certificates are only available on the local system, the CUPS
-	server does not accept local authentication unless the client
-	is connected to the localhost address (127.0.0.1.)
+	Certificates are created on-the-fly from random data and
+	stored in files under <VAR>/var/run/cups/certs</VAR>.
+	They have restricted read permissions: root +
+	system-group(s) for the root certificate, and lp +
+	system-group(s) for CGI certificates.
+
+	<P>Because certificates are only available on the local
+	system, the CUPS server does not accept local
+	authentication unless the client is connected to the
+	loopback interface (127.0.0.1 or ::1) or domain
+	socket.</P>
+
+	<P><B>Recommendation:</B> Ensure that unauthorized users
+	are not added to the system group(s).</P></LI></LI>
 
 </OL>
 
-<P>The default CUPS configuration disables remote administration. We do
-not recommend that remote administration be enabled for all hosts.
-However, if you have a trusted network or subnet, access can be
-restricted accordingly.
+<H2 CLASS="title"><A NAME="DOS">Denial of Service Attacks</A></H2>
 
-Also, we highly recommend using Digest authentication when possible.
-Unfortunately, most web browsers do not support Digest authentication
-at this time.
+<P>When printer sharing or remote administration is enabled, the
+CUPS server, like all Internet services, is vulnerable to a
+variety of denial of service attacks:</P>
 
-<EMBED SRC="glossary.shtml">
+<OL>
+
+	<LI>Establishing multiple connections to the server until
+	the server will accept no more.
+
+	<P>This cannot be protected against by any known
+	software. The <CODE>MaxClientsPerHost</CODE> directive
+	can be used to configure CUPS to limit the number of
+	connections allowed from a single host, however that does
+	not prevent a distributed attack.</P>
+
+	<P><B>Recommendation:</B> Limit access to trusted systems
+	and networks.</P></LI>
+
+	<LI>Repeatedly opening and closing connections to the
+	server as fast as possible.
+
+	<P>There is no easy way of protecting against this in the
+	CUPS software. If the attack is coming from outside the
+	local network, it may be possible to filter such an
+	attack. However, once the connection request has been
+	received by the server it must at least accept the
+	connection to find out who is connecting.</P>
+
+	<P><B>Recommendation:</B> None.</P></LI>
+
+	<LI>Flooding the network with broadcast packets on port
+	631.
+
+	<P>It might be possible to disable browsing if this
+	condition is detected by the CUPS software, however if
+	there are large numbers of printers available on the
+	network such an algorithm might think that an attack was
+	occurring when instead a valid update was being
+	received.</P>
+
+	<P><B>Recommendation:</B> Block browse packets from
+	foreign or untrusted networks using a router or
+	firewall.</P></LI>
+
+	<LI>Sending partial IPP requests; specifically, sending
+	part of an attribute value and then stopping
+	transmission.
+
+	<P>The current code will wait up to 1 second before
+	timing out the partial value and closing the connection.
+	This will slow the server responses to valid requests and
+	may lead to dropped browsing packets, but will otherwise
+	not affect the operation of the server.</P>
+
+	<P><B>Recommendation:</B> Block IPP packets from foreign
+	or untrusted networks using a router or
+	firewall.</P></LI>
+
+	<LI>Sending large/long print jobs to printers, preventing
+	other users from printing.
+
+	<P>There are limited facilities for protecting against
+	large print jobs (the <CODE>MaxRequestSize</CODE>
+	attribute), however this will not protect printers from
+	malicious users and print files that generate hundreds or
+	thousands of pages.</P>
+
+	<P><B>Recommendation:</B> Restrict printer access to
+	known hosts or networks, and add user-level access
+	controls as needed for expensive printers.</P></LI>
+
+</OL>
 
 </BODY>
 </HTML>
