@@ -31,7 +31,7 @@ include ../Makedefs
 LANGUAGES	=	ja
 WEBPAGES	=	\
 			cups.css \
-			cupsdoc.css \
+			cups-printable.css \
 			favicon.ico \
 			index.html \
 			robots.txt
@@ -207,7 +207,9 @@ install:	all
 		$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
 		$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
 		for file in $(WEBBUTTONS); do \
-			$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
+			if test -e $$lang/$$file; then \
+				$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
+			fi \
 		done \
 	done
 
