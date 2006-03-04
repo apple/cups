@@ -40,7 +40,6 @@ WEBBUTTONS	=	\
 			images/button-add-class.gif \
 			images/button-add-printer.gif \
 			images/button-add-this-printer.gif \
-			images/button-cancel.gif \
 			images/button-cancel-all-jobs.gif \
 			images/button-cancel-job.gif \
 			images/button-change-settings.gif \
@@ -209,11 +208,11 @@ install:	all
 		$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
 		if test -f $$lang/index.html; then \
 			$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
-		fi \
+		fi; \
 		for file in $(WEBBUTTONS); do \
 			if test -f $$lang/$$file; then \
 				$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
-			fi \
+			fi; \
 		done \
 	done
 
