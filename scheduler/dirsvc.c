@@ -641,10 +641,11 @@ cupsdSendBrowseDelete(
     cupsd_printer_t *p)			/* I - Printer to delete */
 {
  /*
-  * Only announce if browsing is enabled...
+  * Only announce if browsing is enabled and this is a local queue...
   */
 
-  if (!Browsing || !p->shared)
+  if (!Browsing || !p->shared ||
+      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     return;
 
  /*
