@@ -539,6 +539,8 @@ httpGetBlocking(http_t *http)		/* I - HTTP connection */
 
 /*
  * 'httpGetCookie()' - Get any cookie data from the response.
+ *
+ * @since CUPS 1.1.19@
  */
 
 const char *				/* O - Cookie data or NULL */

@@ -115,6 +115,10 @@ DD {
   margin-left: 54pt;
 }
 
+DL.category DT {
+  font-weight: bold;
+}
+
 P.summary {
   margin-left: 54pt;
   font-family: monospace;
