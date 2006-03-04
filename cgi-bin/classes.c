@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c 5160 2006-02-24 01:14:18Z mike $"
+ * "$Id: classes.c 5202 2006-02-28 19:37:03Z mike $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -84,7 +84,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   if ((pclass = getenv("PATH_INFO")) != NULL)
+  {
     pclass ++;
+
+    if (!*pclass)
+      pclass = NULL;
+  }
 
  /*
   * See who is logged in...
@@ -458,5 +463,5 @@ show_class(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: classes.c 5160 2006-02-24 01:14:18Z mike $".
+ * End of "$Id: classes.c 5202 2006-02-28 19:37:03Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $"
+# "$Id: Makefile 5222 2006-03-03 18:57:56Z mike $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -43,7 +43,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) disable enable reject
+	$(RM) $(OBJS) $(TARGETS) cupsdisable cupsenable reject
 
 
 #
@@ -87,10 +87,10 @@ install:	all
 accept:	accept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o accept accept.o $(LIBS)
-	$(RM) reject enable disable
+	$(RM) reject cupsenable cupsdisable
 	$(LN) accept reject
-	$(LN) accept enable
-	$(LN) accept disable
+	$(LN) accept cupsenable
+	$(LN) accept cupsdisable
 
 
 #
@@ -191,5 +191,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $".
+# End of "$Id: Makefile 5222 2006-03-03 18:57:56Z mike $".
 #

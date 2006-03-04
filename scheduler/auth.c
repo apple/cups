@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 5197 2006-02-27 21:30:20Z mike $"
+ * "$Id: auth.c 5222 2006-03-03 18:57:56Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -1618,7 +1618,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   if (!strcasecmp(con->http.hostname, "localhost"))
   {
    /*
-    * Access from localhost (127.0.0.1 or :::1) is always allowed...
+    * Access from localhost (127.0.0.1 or ::1) is always allowed...
     */
 
     auth = AUTH_ALLOW;
@@ -2156,5 +2156,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 5197 2006-02-27 21:30:20Z mike $".
+ * End of "$Id: auth.c 5222 2006-03-03 18:57:56Z mike $".
  */

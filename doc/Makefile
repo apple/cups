@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5192 2006-02-27 03:08:47Z mike $"
+# "$Id: Makefile 5224 2006-03-04 02:00:43Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,64 +29,71 @@ include ../Makedefs
 #
 
 LANGUAGES	=	ja
-WEBPAGES	=	cups.css cupsdoc.css index.html robots.txt
-WEBBUTTONS	=	\
-			images/accept-jobs.gif \
-			images/add-class.gif \
-			images/add-printer.gif \
-			images/add-this-printer.gif \
-			images/cancel.gif \
-			images/cancel-all-jobs.gif \
-			images/cancel-job.gif \
-			images/change-settings.gif \
-			images/clean-print-heads.gif \
-			images/continue.gif \
-			images/delete-class.gif \
-			images/delete-printer.gif \
-			images/edit-configuration-file.gif \
-			images/export-samba.gif \
-			images/help.gif \
-			images/hold-job.gif \
-			images/manage-classes.gif \
-			images/manage-jobs.gif \
-			images/manage-printers.gif \
-			images/manage-server.gif \
-			images/modify-class.gif \
-			images/modify-printer.gif \
-			images/move-job.gif \
-			images/move-jobs.gif \
-			images/print-self-test-page.gif \
-			images/print-test-page.gif \
-			images/publish-printer.gif \
-			images/reject-jobs.gif \
-			images/release-job.gif \
-			images/restart-job.gif \
-			images/save-changes.gif \
-			images/search.gif \
-			images/set-allowed-users.gif \
-			images/set-as-default.gif \
-			images/set-printer-options.gif \
-			images/show-active.gif \
-			images/show-all.gif \
-			images/show-completed.gif \
-			images/show-next.gif \
-			images/show-previous.gif \
-			images/sort-ascending.gif \
-			images/sort-descending.gif \
-			images/start-class.gif \
-			images/start-printer.gif \
-			images/stop-class.gif \
-			images/stop-printer.gif \
-			images/unpublish-printer.gif \
-			images/use-default-config.gif \
-			images/view-access-log.gif \
-			images/view-error-log.gif \
-			images/view-page-log.gif
-WEBIMAGES	=	\
+WEBPAGES	=	\
+			cups.css \
+			cups-printable.css \
 			favicon.ico \
+			index.html \
+			robots.txt
+WEBBUTTONS	=	\
+			images/button-accept-jobs.gif \
+			images/button-add-class.gif \
+			images/button-add-printer.gif \
+			images/button-add-this-printer.gif \
+			images/button-cancel.gif \
+			images/button-cancel-all-jobs.gif \
+			images/button-cancel-job.gif \
+			images/button-change-settings.gif \
+			images/button-clean-print-heads.gif \
+			images/button-clear.gif \
+			images/button-continue.gif \
+			images/button-delete-class.gif \
+			images/button-delete-printer.gif \
+			images/button-edit-configuration-file.gif \
+			images/button-export-samba.gif \
+			images/button-help.gif \
+			images/button-hold-job.gif \
+			images/button-manage-classes.gif \
+			images/button-manage-jobs.gif \
+			images/button-manage-printers.gif \
+			images/button-manage-server.gif \
+			images/button-modify-class.gif \
+			images/button-modify-printer.gif \
+			images/button-move-job.gif \
+			images/button-move-jobs.gif \
+			images/button-print-self-test-page.gif \
+			images/button-print-test-page.gif \
+			images/button-publish-printer.gif \
+			images/button-reject-jobs.gif \
+			images/button-release-job.gif \
+			images/button-restart-job.gif \
+			images/button-save-changes.gif \
+			images/button-search.gif \
+			images/button-set-allowed-users.gif \
+			images/button-set-as-default.gif \
+			images/button-set-printer-options.gif \
+			images/button-show-active.gif \
+			images/button-show-all.gif \
+			images/button-show-completed.gif \
+			images/button-show-next.gif \
+			images/button-show-previous.gif \
+			images/button-sort-ascending.gif \
+			images/button-sort-descending.gif \
+			images/button-start-class.gif \
+			images/button-start-printer.gif \
+			images/button-stop-class.gif \
+			images/button-stop-printer.gif \
+			images/button-unpublish-printer.gif \
+			images/button-use-default-config.gif \
+			images/button-view-access-log.gif \
+			images/button-view-error-log.gif \
+			images/button-view-page-log.gif \
+			images/button-view-printable-version.gif
+WEBIMAGES	=	\
 			images/bottom-left.gif \
 			images/bottom-right.gif \
 			images/classes.gif \
+			images/cups-block-diagram.gif \
 			images/esp-logo.gif \
 			images/happy.gif \
 			images/logo.gif \
@@ -97,9 +104,14 @@ WEBIMAGES	=	\
 			images/tab-right.gif \
 			images/top-left.gif \
 			images/top-middle.gif \
-			images/top-right.gif
+			images/top-right.gif \
+			images/web-add-this-printer.gif \
+			images/web-password.gif \
+			images/web-printer-driver.gif \
+			images/web-printer-status.gif \
+			images/web-set-printer-options.gif \
+			images/web-test-page.gif
 HELPFILES	=	\
-			help/access_log-reference.html \
 			help/api-array.html \
 			help/api-cups.html \
 			help/api-filedir.html \
@@ -107,30 +119,26 @@ HELPFILES	=	\
 			help/api-httpipp.html \
 			help/api-ppd.html \
 			help/api-raster.html \
-			help/classes-conf-reference.html \
-			help/client-conf-reference.html \
-			help/cupsd-conf-reference.html \
-			help/error_log-reference.html \
-			help/page_log-reference.html \
-			help/printers-conf-reference.html \
-			help/subscriptions-conf-reference.html \
+			help/cgi.html \
+			help/glossary.html \
+			help/license.html \
 			help/man-accept.html \
 			help/man-backend.html \
 			help/man-cancel.html \
 			help/man-classes.conf.html \
 			help/man-client.conf.html \
-			help/man-cupsaddsmb.html \
 			help/man-cups-config.html \
-			help/man-cupsd.html \
-			help/man-cupsd.conf.html \
-			help/man-cupsenable.html \
 			help/man-cups-lpd.html \
 			help/man-cups-polld.html \
+			help/man-cupsaddsmb.html \
+			help/man-cupsd.conf.html \
+			help/man-cupsd.html \
+			help/man-cupsenable.html \
 			help/man-cupstestppd.html \
 			help/man-filter.html \
+			help/man-lp.html \
 			help/man-lpadmin.html \
 			help/man-lpc.html \
-			help/man-lp.html \
 			help/man-lpinfo.html \
 			help/man-lpmove.html \
 			help/man-lpoptions.html \
@@ -143,11 +151,26 @@ HELPFILES	=	\
 			help/man-mime.types.html \
 			help/man-printers.conf.html \
 			help/network.html \
+			help/options.html \
 			help/overview.html \
+			help/ref-access_log.html \
+			help/ref-classes-conf.html \
+			help/ref-client-conf.html \
+			help/ref-cupsd-conf.html \
+			help/ref-error_log.html \
+			help/ref-page_log.html \
+			help/ref-printers-conf.html \
+			help/ref-subscriptions-conf.html \
+			help/security.html \
+			help/spec-cmp.html \
 			help/spec-command.html \
+			help/spec-design.html \
 			help/spec-ipp.html \
 			help/spec-ppd.html \
+			help/spec-raster.html \
+			help/spec-stp.html \
 			help/standard.html \
+			help/translation.html \
 			help/whatsnew.html
 
 
@@ -184,9 +207,13 @@ install:	all
 	done
 	for lang in $(LANGUAGES); do \
 		$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
-		$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
+		if test -f $$lang/index.html; then \
+			$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
+		fi \
 		for file in $(WEBBUTTONS); do \
-			$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
+			if test -f $$lang/$$file; then \
+				$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
+			fi \
 		done \
 	done
 

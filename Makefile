@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5185 2006-02-26 15:27:14Z mike $"
+# "$Id: Makefile 5217 2006-03-02 21:24:01Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -146,36 +146,18 @@ check test:	all
 
 
 #
-# Make software distributions using EPM (http://www.easysw.com/epm)...
+# Make software distributions using EPM (http://www.easysw.com/epm/)...
 #
 
 EPMFLAGS	=	-v
 
-aix:
-	epm $(EPMFLAGS) -f aix cups packaging/cups.list
-
-bsd:
-	epm $(EPMFLAGS) -f bsd cups packaging/cups.list
+aix bsd deb depot inst osx pkg rpm setld slackware swinstall tardist:
+	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
 
 epm:
 	epm $(EPMFLAGS) cups packaging/cups.list
 
-rpm:
-	epm $(EPMFLAGS) -f rpm cups packaging/cups.list
-
-deb:
-	epm $(EPMFLAGS) -f deb cups packaging/cups.list
-
-depot:
-	epm $(EPMFLAGS) -f depot cups packaging/cups.list
-
-pkg:
-	epm $(EPMFLAGS) -f pkg cups packaging/cups.list
-
-tardist:
-	epm $(EPMFLAGS) -f tardist cups packaging/cups.list
-
 
 #
-# End of "$Id: Makefile 5185 2006-02-26 15:27:14Z mike $".
+# End of "$Id: Makefile 5217 2006-03-02 21:24:01Z mike $".
 #

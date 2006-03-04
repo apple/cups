@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 5092 2006-02-09 00:54:31Z mike $"
+ * "$Id: pstops.c 5205 2006-02-28 21:05:24Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -2185,11 +2185,11 @@ start_nup(int       number,		/* I - Page number */
     */
 
     printf("%d %d translate\n", -lbrt[0], -lbrt[1]);
-    printf("0 0 %.1f %.1f ESPrc\n", w, l);
+    printf("0 0 %d %d ESPrc\n", lbrt[2] - lbrt[0], lbrt[3] - lbrt[1]);
   }
 }
 
 
 /*
- * End of "$Id: pstops.c 5092 2006-02-09 00:54:31Z mike $".
+ * End of "$Id: pstops.c 5205 2006-02-28 21:05:24Z mike $".
  */

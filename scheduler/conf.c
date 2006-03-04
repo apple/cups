@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 5167 2006-02-25 02:11:44Z mike $"
+ * "$Id: conf.c 5222 2006-03-03 18:57:56Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -152,7 +152,6 @@ static cupsd_var_t	variables[] =
   { "RemoteRoot",		&RemoteRoot,		CUPSD_VARTYPE_STRING },
   { "RequestRoot",		&RequestRoot,		CUPSD_VARTYPE_STRING },
   { "RIPCache",			&RIPCache,		CUPSD_VARTYPE_STRING },
-  { "RunAsUser", 		&RunAsUser,		CUPSD_VARTYPE_BOOLEAN },
   { "RootCertDuration",		&RootCertDuration,	CUPSD_VARTYPE_INTEGER },
   { "ServerAdmin",		&ServerAdmin,		CUPSD_VARTYPE_STRING },
   { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_STRING },
@@ -363,6 +362,9 @@ cupsdReadConfiguration(void)
 
   ConfigFilePerm        = CUPS_DEFAULT_CONFIG_FILE_PERM;
   DefaultAuthType       = AUTH_BASIC;
+#ifdef HAVE_SSL
+  DefaultEncryption     = HTTP_ENCRYPT_REQUIRED;
+#endif /* HAVE_SSL */
   JobRetryLimit         = 5;
   JobRetryInterval      = 300;
   FileDevice            = FALSE;
@@ -385,7 +387,6 @@ cupsdReadConfiguration(void)
   MaxRequestSize        = 0;
   ReloadTimeout	        = 60;
   RootCertDuration      = 300;
-  RunAsUser             = FALSE;
   Timeout               = DEFAULT_TIMEOUT;
   NumSystemGroups       = 0;
 
@@ -446,10 +447,7 @@ cupsdReadConfiguration(void)
   if (!status)
     return (0);
 
-  if (RunAsUser)
-    RunUser = User;
-  else
-    RunUser = getuid();
+  RunUser = getuid();
 
  /*
   * Use the default system group if none was supplied in cupsd.conf...
@@ -2672,6 +2670,28 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	return (0);
       }
     }
+#ifdef HAVE_SSL
+    else if (!strcasecmp(line, "DefaultEncryption"))
+    {
+     /*
+      * DefaultEncryption {Never,IfRequested,Required}
+      */
+
+      if (!value || !strcasecmp(value, "never"))
+	DefaultEncryption = HTTP_ENCRYPT_NEVER;
+      else if (!strcasecmp(value, "required"))
+	DefaultEncryption = HTTP_ENCRYPT_REQUIRED;
+      else if (!strcasecmp(value, "ifrequested"))
+	DefaultEncryption = HTTP_ENCRYPT_IF_REQUESTED;
+      else
+      {
+	cupsdLogMessage(CUPSD_LOG_WARN,
+	                "Unknown default encryption %s on line %d.",
+	                value, linenum);
+	return (0);
+      }
+    }
+#endif /* HAVE_SSL */
     else if (!strcasecmp(line, "User"))
     {
      /*
@@ -3217,5 +3237,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 5167 2006-02-25 02:11:44Z mike $".
+ * End of "$Id: conf.c 5222 2006-03-03 18:57:56Z mike $".
  */

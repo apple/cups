@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5160 2006-02-24 01:14:18Z mike $"
+ * "$Id: printers.c 5202 2006-02-28 19:37:03Z mike $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -87,7 +87,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   if ((printer = getenv("PATH_INFO")) != NULL)
+  {
     printer ++;
+
+    if (!*printer)
+      printer = NULL;
+  }
 
  /*
   * See who is logged in...
@@ -633,5 +638,5 @@ show_printer(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: printers.c 5160 2006-02-24 01:14:18Z mike $".
+ * End of "$Id: printers.c 5202 2006-02-28 19:37:03Z mike $".
  */

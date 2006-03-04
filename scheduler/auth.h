@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h 5069 2006-02-04 05:24:35Z mike $"
+ * "$Id: auth.h 5222 2006-03-03 18:57:56Z mike $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -125,6 +125,10 @@ VAR cups_array_t	*Locations	VALUE(NULL);
 					/* Authorization locations */
 VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
 					/* Default AuthType, if not specified */
+#ifdef HAVE_SSL
+VAR http_encryption_t	DefaultEncryption VALUE(HTTP_ENCRYPT_REQUIRED);
+					/* Default encryption for authentication */
+#endif /* HAVE_SSL */
 
 
 /*
@@ -156,5 +160,5 @@ extern http_status_t	cupsdIsAuthorized(cupsd_client_t *con, const char *owner);
 
 
 /*
- * End of "$Id: auth.h 5069 2006-02-04 05:24:35Z mike $".
+ * End of "$Id: auth.h 5222 2006-03-03 18:57:56Z mike $".
  */

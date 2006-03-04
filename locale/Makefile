@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5193 2006-02-27 20:27:07Z mike $"
+# "$Id: Makefile 5224 2006-03-04 02:00:43Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -28,7 +28,7 @@ include ../Makedefs
 # Locales...
 #
 
-LOCALES	=	ja
+LANGUAGES	=	ja
 
 
 #
@@ -59,7 +59,7 @@ depend:
 
 install:	all
 	$(INSTALL_DIR) -m 755 $(LOCALEDIR)
-	for loc in $(LOCALES) ; do \
+	for loc in $(LANGUAGES) ; do \
 		$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
 		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
 	done
@@ -81,7 +81,7 @@ pot:
 	     -e '1,$$s/charset=CHARSET/charset=utf-8/'; \
 	 cat cups.footer) > cups.pot.N
 	mv cups.pot.N cups.pot
-	for loc in $(LOCALES) ; do \
+	for loc in $(LANGUAGES) ; do \
 		echo Merging changes into cups_$$loc.po... ; \
 		msgmerge -o cups_$$loc.po cups_$$loc.po cups.pot ; \
 	done
@@ -102,5 +102,5 @@ translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
 
 
 #
-# End of "$Id: Makefile 5193 2006-02-27 20:27:07Z mike $".
+# End of "$Id: Makefile 5224 2006-03-04 02:00:43Z mike $".
 #

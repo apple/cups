@@ -128,8 +128,8 @@ is based on the Xpdf software. For binary distribution licensing
 of this software, please contact:
 
      Derek B. Noonburg
-     Email: derekn@foolabs.com
-     WWW: http://www.foolabs.com/xpdf/
+     Email: derekn@glyphandcog.com
+     WWW: http://www.glyphandcog.com/
 
 
 SUPPORT

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c 5196 2006-02-27 21:23:00Z mike $"
+ * "$Id: cups-lpd.c 5204 2006-02-28 20:32:43Z mike $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -732,8 +732,6 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 
 	    CFRelease(plist);
 	  }
-
-	  CFRelease(prefsok);
 	}
 
 	CFRelease(prefsurl);
@@ -1708,5 +1706,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c 5196 2006-02-27 21:23:00Z mike $".
+ * End of "$Id: cups-lpd.c 5204 2006-02-28 20:32:43Z mike $".
  */

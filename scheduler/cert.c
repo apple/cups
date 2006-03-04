@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c 5080 2006-02-05 18:28:27Z mike $"
+ * "$Id: cert.c 5213 2006-03-02 00:37:34Z mike $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -174,7 +174,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
       /* Others */
       acl_create_entry(&acl, &entry);
       acl_get_permset(entry, &permset);
-      acl_add_perm(permset, ACL_READ);
+      acl_add_perm(permset, 0);
       acl_set_tag_type(entry, ACL_OTHER);
       acl_set_permset(entry, permset);
 
@@ -415,5 +415,5 @@ cupsdInitCerts(void)
 
 
 /*
- * End of "$Id: cert.c 5080 2006-02-05 18:28:27Z mike $".
+ * End of "$Id: cert.c 5213 2006-03-02 00:37:34Z mike $".
  */

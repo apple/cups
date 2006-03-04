@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5156 2006-02-23 04:24:32Z mike $"
+# "$Id: Makefile 5222 2006-03-03 18:57:56Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -50,6 +50,7 @@ FILES	=	\
 		error-op.tmpl \
 		header.tmpl \
 		help-header.tmpl \
+		help-printable.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
 		job-move.tmpl \
@@ -119,7 +120,7 @@ install: all
 	for lang in $(LANGUAGES); do \
 		$(INSTALL_DIR) -m 755 $(DATADIR)/templates/$$lang; \
 		for file in $(FILES); do \
-			if test -e $$lang/$$file; then \
+			if test -f $$lang/$$file; then \
 				$(INSTALL_DATA) $$lang/$$file $(DATADIR)/templates/$$lang; \
 			fi \
 		done \
@@ -127,5 +128,5 @@ install: all
 
 
 #
-# End of "$Id: Makefile 5156 2006-02-23 04:24:32Z mike $".
+# End of "$Id: Makefile 5222 2006-03-03 18:57:56Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 5178 2006-02-26 00:24:23Z mike $"
+ * "$Id: dirsvc.c 5223 2006-03-04 01:10:17Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -641,10 +641,11 @@ cupsdSendBrowseDelete(
     cupsd_printer_t *p)			/* I - Printer to delete */
 {
  /*
-  * Only announce if browsing is enabled...
+  * Only announce if browsing is enabled and this is a local queue...
   */
 
-  if (!Browsing || !p->shared)
+  if (!Browsing || !p->shared ||
+      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     return;
 
  /*
@@ -843,8 +844,8 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
   * printer-make-and-model attributes...
   */
 
-  dequote(location, p->location, sizeof(p->location));
-  dequote(info, p->info, sizeof(p->info));
+  dequote(location, p->location, sizeof(location));
+  dequote(info, p->info, sizeof(info));
   dequote(make_model, p->make_model ? p->make_model : "Unknown",
           sizeof(make_model));
 
@@ -3110,5 +3111,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id: dirsvc.c 5178 2006-02-26 00:24:23Z mike $".
+ * End of "$Id: dirsvc.c 5223 2006-03-04 01:10:17Z mike $".
  */
