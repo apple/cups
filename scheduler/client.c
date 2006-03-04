@@ -2277,6 +2277,7 @@ int					/* O - 1 if successful, 0 otherwise */
 cupsdSendError(cupsd_client_t *con,	/* I - Connection */
                http_status_t  code)	/* I - Error code */
 {
+#ifdef HAVE_SSL
  /*
   * Force client to upgrade for authentication if that is how the
   * server is configured...
@@ -2291,6 +2292,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
                     "cupsdSendError: Encryption before authentication!");
     code = HTTP_UPGRADE_REQUIRED;
   }
+#endif /* HAVE_SSL */
 
  /*
   * Put the request in the access_log file...
