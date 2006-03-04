@@ -28,7 +28,7 @@ include ../Makedefs
 # Config files...
 #
 
-KEEP	=	client.conf cupsd.conf
+KEEP	=	cupsd.conf
 REPLACE	=	mime.convs mime.types
 
 
