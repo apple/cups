@@ -28,7 +28,7 @@ include ../Makedefs
 # Locales...
 #
 
-LOCALES	=	ja
+LANGUAGES	=	ja
 
 
 #
@@ -59,7 +59,7 @@ depend:
 
 install:	all
 	$(INSTALL_DIR) -m 755 $(LOCALEDIR)
-	for loc in $(LOCALES) ; do \
+	for loc in $(LANGUAGES) ; do \
 		$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
 		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
 	done
@@ -81,7 +81,7 @@ pot:
 	     -e '1,$$s/charset=CHARSET/charset=utf-8/'; \
 	 cat cups.footer) > cups.pot.N
 	mv cups.pot.N cups.pot
-	for loc in $(LOCALES) ; do \
+	for loc in $(LANGUAGES) ; do \
 		echo Merging changes into cups_$$loc.po... ; \
 		msgmerge -o cups_$$loc.po cups_$$loc.po cups.pot ; \
 	done

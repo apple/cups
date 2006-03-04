@@ -28,7 +28,7 @@
 %copyright 1993-2006 by Easy Software Products, All Rights Reserved.
 %vendor Easy Software Products
 %license LICENSE.txt
-%readme README.txt
+%readme packaging/cups.license
 %version @CUPS_VERSION@
 %description The Common UNIX Printing System provides a portable printing
 %description layer for UNIX(r) operating systems.  It has been developed by
@@ -396,7 +396,9 @@ d 0755 root sys $DOCDIR -
 f 0644 root sys $DOCDIR doc/*.css
 f 0644 root sys $DOCDIR doc/*.html
 d 0755 root sys $DOCDIR/help -
+f 0644 root sys $DOCDIR/help/cgi.html doc/help/cgi.html
 f 0644 root sys $DOCDIR/help/glossary.html doc/help/glossary.html
+f 0644 root sys $DOCDIR/help/license.html doc/help/license.html
 f 0644 root sys $DOCDIR/help/network.html doc/help/network.html
 f 0644 root sys $DOCDIR/help/options.html doc/help/options.html
 f 0644 root sys $DOCDIR/help/overview.html doc/help/overview.html

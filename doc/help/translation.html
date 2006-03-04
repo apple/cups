@@ -12,6 +12,316 @@ localization files so you can get the most out of it.</P>
 
 <H2 CLASS="title"><A NAME="INTRO">Getting Started</A></H2>
 
+<P>Start by downloading the CUPS source code from <A
+HREF="http://www.cups.org/software.php"
+TARGET="_blank">www.cups.org</A>. After you extract the files
+from the source archive, you will want to copy the following
+files and directories:</P>
+
+<UL>
+
+	<LI><VAR>doc/images/button-*.gif</VAR> - the web
+	interface button images</LI>
+
+	<LI><VAR>doc/images/button-*.scm</VAR> - the Gimp scripts
+	we use to generate the web interface button images</LI>
+
+	<LI><VAR>doc/index.html</VAR> - the web interface home
+	page</LI>
+
+	<LI><VAR>locale/cups.pot</VAR> - the message catalog</LI>
+
+	<LI><VAR>templates/*.tmpl</VAR> - the web interface
+	template files</LI>
+
+</UL>
+
+<P>With the exception of the message catalogs, localization files
+are  placed in subdirectories under the <VAR>doc</VAR> and
+<VAR>templates</VAR> using the locale name. Locale names are
+either <VAR>ll</VAR> or <VAR>ll_CC</VAR>, where "ll" is the
+2-letter language code and "CC" is the 2-letter country code.</P>
+
+<P>All non-image files must be encoded using the UTF-8 character
+set.</P>
+
+
+<H2 CLASS="title"><A NAME="SUBMIT">Submitting a Translation for CUPS</A></H2>
+
+<P>To submit a translation for inclusion in CUPS, translate all
+of the button images, template files, the
+<VAR>index.html.in</VAR> file, and the message catalog. Place
+these files in the correct subdirectory in the CUPS source code
+archive and run the following command to create an archive with
+your files:</P>
+
+<PRE CLASS="command">
+tar cvf <I>ll_CC</I>.tar.gz doc/<I>ll_CC</I> locale/<I>ll_CC</I>.po templates/<I>ll_CC</I>
+</PRE>
+
+<P>Replace "ll_CC" with the locale name for your translation.
+Once you have created the archive, go to the <A
+HREF="http://www.cups.org/str.php" TARGET="_blank">CUPS Bugs
+&amp; Features</A> page and submit a bug report, attaching the
+translation to the report.</P>
+
+
+<H2 CLASS="title"><A NAME="IMAGES">Button Images</A></H2>
+
+<P>The web interface button images are used to activate functions
+on the CUPS web pages. Table 1 lists the button images and the
+English text labels for those buttons. Use the supplied Gimp
+scripts to create button images that match the CUPS web interface
+and save them in the <VAR>doc/ll_CC/images</VAR> subdirectory.
+The Gimp button scripts can be installed using the following
+command:</P>
+
+<PRE CLASS="command">
+cp doc/images/button*.scm ~/.gimp-2.2/scripts
+</PRE>
+
+<P>If you have already started the Gimp application, choose
+<VAR>Refresh Scripts</VAR> from the <VAR>Xtns->Script-Fu</VAR>
+sub-menu. The button scripts will be available under a new
+<VAR>Btns</VAR menu in the Gimp tool window.</P>
+
+<P>When you have created all of the button images, edit the
+<VAR>doc/Makefile</VAR> file and add the locale name to the
+<CODE>LANGUAGES</CODE> variable. You can then run "make
+install" in the <VAR>doc</VAR> subdirectory to test the
+translated buttons.</P>
+
+<DIV CLASS="table"><TABLE SUMMARY="Web Interface Buttons">
+<CAPTION>Table 1: Web Interface Buttons</CAPTION>
+<THEAD>
+<TR>
+	<TH>Filename</TH>
+	<TH>Text</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>button-accept-jobs.gif</TD>
+	<TD>Accept Jobs</TD>
+</TR>
+<TR>
+	<TD>button-add-class.gif</TD>
+	<TD>Add Class</TD>
+</TR>
+<TR>
+	<TD>button-add-printer.gif</TD>
+	<TD>Add Printer</TD>
+</TR>
+<TR>
+	<TD>button-add-this-printer.gif</TD>
+	<TD>Add This Printer</TD>
+</TR>
+<TR>
+	<TD>button-cancel-all-jobs.gif</TD>
+	<TD>Cancel All Jobs</TD>
+</TR>
+<TR>
+	<TD>button-cancel-job.gif</TD>
+	<TD>Cancel Job</TD>
+</TR>
+<TR>
+	<TD>button-change-settings.gif</TD>
+	<TD>Change Settings</TD>
+</TR>
+<TR>
+	<TD>button-clean-print-heads.gif</TD>
+	<TD>Clean Print Heads</TD>
+</TR>
+<TR>
+	<TD>button-clear.gif</TD>
+	<TD>Clear</TD>
+</TR>
+<TR>
+	<TD>button-continue.gif</TD>
+	<TD>Continue</TD>
+</TR>
+<TR>
+	<TD>button-delete-class.gif</TD>
+	<TD>Delete Class</TD>
+</TR>
+<TR>
+	<TD>button-delete-printer.gif</TD>
+	<TD>Delete Printer</TD>
+</TR>
+<TR>
+	<TD>button-edit-configuration-file.gif</TD>
+	<TD>Edit Configuration File</TD>
+</TR>
+<TR>
+	<TD>button-export-samba.gif</TD>
+	<TD>Export Printers to Samba</TD>
+</TR>
+<TR>
+	<TD>button-help.gif</TD>
+	<TD>Help</TD>
+</TR>
+<TR>
+	<TD>button-hold-job.gif</TD>
+	<TD>Hold Job</TD>
+</TR>
+<TR>
+	<TD>button-manage-classes.gif</TD>
+	<TD>Manage Classes</TD>
+</TR>
+<TR>
+	<TD>button-manage-jobs.gif</TD>
+	<TD>Manage Jobs</TD>
+</TR>
+<TR>
+	<TD>button-manage-printers.gif</TD>
+	<TD>Manage Printers</TD>
+</TR>
+<TR>
+	<TD>button-manage-server.gif</TD>
+	<TD>Manage Server</TD>
+</TR>
+<TR>
+	<TD>button-modify-class.gif</TD>
+	<TD>Modify Class</TD>
+</TR>
+<TR>
+	<TD>button-modify-printer.gif</TD>
+	<TD>Modify Printer</TD>
+</TR>
+<TR>
+	<TD>button-move-job.gif</TD>
+	<TD>Move Job</TD>
+</TR>
+<TR>
+	<TD>button-move-jobs.gif</TD>
+	<TD>Move All Jobs</TD>
+</TR>
+<TR>
+	<TD>button-print-self-test-page.gif</TD>
+	<TD>Print Self-Test Page</TD>
+</TR>
+<TR>
+	<TD>button-print-test-page.gif</TD>
+	<TD>Print Test Page</TD>
+</TR>
+<TR>
+	<TD>button-publish-printer.gif</TD>
+	<TD>Publish Printer</TD>
+</TR>
+<TR>
+	<TD>button-reject-jobs.gif</TD>
+	<TD>Reject Jobs</TD>
+</TR>
+<TR>
+	<TD>button-release-job.gif</TD>
+	<TD>Release Job</TD>
+</TR>
+<TR>
+	<TD>button-restart-job.gif</TD>
+	<TD>Reprint Job</TD>
+</TR>
+<TR>
+	<TD>button-save-changes.gif</TD>
+	<TD>Save Changes</TD>
+</TR>
+<TR>
+	<TD>button-search.gif</TD>
+	<TD>Search</TD>
+</TR>
+<TR>
+	<TD>button-set-allowed-users.gif</TD>
+	<TD>Set Allowed Users</TD>
+</TR>
+<TR>
+	<TD>button-set-as-default.gif</TD>
+	<TD>Set As Default</TD>
+</TR>
+<TR>
+	<TD>button-set-printer-options.gif</TD>
+	<TD>Set Printer Options</TD>
+</TR>
+<TR>
+	<TD>button-show-active.gif</TD>
+	<TD>Show Active Jobs</TD>
+</TR>
+<TR>
+	<TD>button-show-all.gif</TD>
+	<TD>Show All Jobs</TD>
+</TR>
+<TR>
+	<TD>button-show-completed.gif</TD>
+	<TD>Show Completed Jobs</TD>
+</TR>
+<TR>
+	<TD>button-show-next.gif</TD>
+	<TD>Show Next</TD>
+</TR>
+<TR>
+	<TD>button-show-previous.gif</TD>
+	<TD>Show Previous</TD>
+</TR>
+<TR>
+	<TD>button-sort-ascending.gif</TD>
+	<TD>Show Ascending</TD>
+</TR>
+<TR>
+	<TD>button-sort-descending.gif</TD>
+	<TD>Show Descending</TD>
+</TR>
+<TR>
+	<TD>button-start-class.gif</TD>
+	<TD>Start Class</TD>
+</TR>
+<TR>
+	<TD>button-start-printer.gif</TD>
+	<TD>Start Printer</TD>
+</TR>
+<TR>
+	<TD>button-stop-class.gif</TD>
+	<TD>Stop Class</TD>
+</TR>
+<TR>
+	<TD>button-stop-printer.gif</TD>
+	<TD>Stop Printer</TD>
+</TR>
+<TR>
+	<TD>button-unpublish-printer.gif</TD>
+	<TD>Unpublish Printer</TD>
+</TR>
+<TR>
+	<TD>button-use-default-config.gif</TD>
+	<TD>Use Default Configuration File</TD>
+</TR>
+<TR>
+	<TD>button-view-access-log.gif</TD>
+	<TD>View Access Log</TD>
+</TR>
+<TR>
+	<TD>button-view-error-log.gif</TD>
+	<TD>View Error Log</TD>
+</TR>
+<TR>
+	<TD>button-view-page-log.gif</TD>
+	<TD>View Page Log</TD>
+</TR>
+<TR>
+	<TD>button-view-printable-version.gif</TD>
+	<TD>View Printable Version</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
+
+
+<H2 CLASS="title"><A NAME="HOMEPAGE">The Home Page</A></H2>
+
+<P>The <VAR>index.html</VAR> file is a complete HTML file that is
+displayed when the user visits "http://localhost:631/". Edit the
+existing <VAR>doc/index.html</VAR> and save it in the
+<VAR>doc/ll_CC</VAR> subdirectory so that the makefile can
+install it. Run "make install" in the <VAR>doc</VAR> subdirectory
+to test the new home page.</P>
+
+
 <H2 CLASS="title"><A NAME="CATALOGS">Message Catalogs</A></H2>
 
 <P>CUPS message catalogs are GNU gettext ".po" text files that
@@ -19,9 +329,7 @@ provide a list of localized message strings for the CUPS
 software. Message catalogs are named <VAR>cups_ll.po</VAR> or
 <VAR>cups_ll_CC.po</VAR>, where "ll" is the standard 2-letter
 abbreviation for the language and "CC" is the standard 2-letter
-abbreviation for the country. Each message catalog file is stored
-in a subdirectory named <VAR>ll</VAR> or <VAR>ll_CC</VAR> to
-match the trailing portion of the message catalog filename.</P>
+abbreviation for the country.</P>
 
 <P>When translating a new message catalog, copy the
 <VAR>cups.pot</VAR> message catalog file in the <VAR>locale</VAR>
@@ -34,57 +342,341 @@ cd locale
 cp cups.pot fr_CA.po
 </PRE>
 
-<P>Alternatively, you could copy the existing <VAR>fr.po</VAR>
+<P>Alternatively, you can copy the existing <VAR>fr.po</VAR>
 message catalog and then make any necessary changes.</P>
 
 <P>Once you have make your copy of the file, edit it using your
 favorite text editor or translation program to translate the text
 to the desired language.</P>
 
-<P>Finally, add your locale to the list of locales in the
-makefile and run the following command to install it:</P>
+<P>Finally, add your locale to the <CODE>LANGUAGES</CODE>
+variable in the <VAR>locale/Makefile</VAR> file and run the "make
+install" command in the <VAR>locale</VAR> subdirectory to test
+the translation.</P>
 
-<PRE CLASS="command">
-make install
-</PRE>
 
-<H2 CLASS="title"><A NAME="WEB">Web Interfaces</A></H2>
+<H2 CLASS="title"><A NAME="TEMPLATES">Template Files</A></H2>
 
 <P>The CUPS scheduler provides a web interface that can be used
 to do many common printing and administration tasks. The built-in
 web server supports localization of web pages through the use of
 subdirectories for each locale, e.g. "fr" for French, "de" for
-German, "fr_ca" for French in Canada, and so forth.
-
-<H3>Template Files</H3>
+German, "fr_ca" for French in Canada, and so forth.</P>
 
 <P>Template files are HTML files with special formatting
-characters in them that allow substition of variables and
-arrays. The CUPS CGI programs (<CODE>admin.cgi</CODE>,
-<CODE>classes.cgi</CODE>, <CODE>jobs.cgi</CODE>, and
-<CODE>printers.cgi</CODE>) use these template file to provide
-dynamic content for the web interface. Template files are
-installed in the <VAR>/usr/share/cups/templates</VAR> directory
-by default.  
+characters in them that allow substition of variables and arrays.
+The CUPS CGI programs (<CODE>admin.cgi</CODE>,
+<CODE>classes.cgi</CODE>, <CODE>help.cgi</CODE>,
+<CODE>jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) use these
+template file to provide dynamic content for the web interface.
+Template files are installed in the
+<VAR>/usr/share/cups/templates</VAR> directory by default. Table
+2 lists the various template files and their purpose.</P>
 
-<P>Translated versions of the template files should be installed
-in the appropriate subdirectories under
-<VAR>/usr/share/cups/templates</VAR>. For example, Canadian
-French template files should be stored in the
-<VAR>/usr/share/cups/templates/fr_CA</VAR> directory.
+<P>Translated versions of the template files should be saved in
+the <VAR>templates/ll_CC</VAR> subdirectory. For example,
+Canadian French template files should be saved in the
+<VAR>templates/fr_CA</VAR> subdirectory. After you have
+translated all of the templates, add the locale to the
+<CODE>LANGUAGES</CODE> variable in the
+<VAR>templates/Makefile</VAR> and run "make install" in the
+<VAR>templates</VAR> subdirectory to test the translation.</P>
 
-<H4>Inserting Attributes and Values</H4>
+<DIV CLASS="table"><TABLE SUMMARY="Web Interface Template Files">
+<CAPTION>Table 2: Web Interface Template Files</CAPTION>
+<THEAD>
+<TR>
+	<TH>Filename</TH>
+	<TH>Purpose</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>add-class.tmpl</TD>
+	<TD>This is the initial form that is shown to add a new
+	printer class.</TD>
+</TR>
+<TR>
+	<TD>add-printer.tmpl</TD>
+	<TD>This is the initial form that is shown to add a new
+	printer.</TD>
+</TR>
+<TR>
+	<TD>admin.tmpl</TD>
+	<TD>This is the main administration page.</TD>
+</TR>
+<TR>
+	<TD>choose-device.tmpl</TD>
+	<TD>This is the form that shows the list of available
+	devices.</TD>
+</TR>
+<TR>
+	<TD>choose-make.tmpl</TD>
+	<TD>This is the form that shows the list of available
+	manufacturers.</TD>
+</TR>
+<TR>
+	<TD>choose-model.tmpl</TD>
+	<TD>This is the form that shows the list of available
+	printer models/drivers.</TD>
+</TR>
+<TR>
+	<TD>choose-serial.tmpl</TD>
+	<TD>This is the form that allows the user to choose
+	a serial port and any options.</TD>
+</TR>
+<TR>
+	<TD>choose-uri.tmpl</TD>
+	<TD>This is the form that allows the user to enter
+	a device URI for network printers.</TD>
+</TR>
+<TR>
+	<TD>class-added.tmpl</TD>
+	<TD>This template shows the "class added" message.</TD>
+</TR>
+<TR>
+	<TD>class-confirm.tmpl</TD>
+	<TD>This is the template used to confirm the
+	deletion of a class.</TD>
+</TR>
+<TR>
+	<TD>class-deleted.tmpl</TD>
+	<TD>This template shows the "class deleted" message.</TD>
+</TR>
+<TR>
+	<TD>class-jobs-header.tmpl</TD>
+	<TD>This template shows the "jobs" header for jobs in a
+	class.</TD>
+</TR>
+<TR>
+	<TD>class-modified.tmpl</TD>
+	<TD>This template shows the "class modified" message.</TD>
+</TR>
+<TR>
+	<TD>classes.tmpl</TD>
+	<TD>This template shows one or more printer classes.</TD>
+</TR>
+<TR>
+	<TD>classes-header.tmpl</TD>
+	<TD>This template shows the "showing N of M classes" header in
+	the class list.</TD>
+</TR>
+<TR>
+	<TD>edit-config.tmpl</TD>
+	<TD>This is the cupsd.conf editor page.</TD>
+</TR>
+<TR>
+	<TD>error.tmpl</TD>
+	<TD>This template displays a generic error message.</TD>
+</TR>
+<TR>
+	<TD>error-op.tmpl</TD>
+	<TD>This is the "unknown operation" error page.</TD>
+</TR>
+<TR>
+	<TD>header.tmpl</TD>
+	<TD>This template is used as the standard header on all dynamic
+	content.</TD>
+</TR>
+<TR>
+	<TD>help-header.tmpl</TD>
+	<TD>This is the top part of the help page.</TD>
+</TR>
+<TR>
+	<TD>help-printable.tmpl</TD>
+	<TD>This is the standard page header for the printable
+	version of help files.</TD>
+</TR>
+<TR>
+	<TD>job-cancel.tmpl</TD>
+	<TD>This template shows "job cancelled".</TD>
+</TR>
+<TR>
+	<TD>job-hold.tmpl</TD>
+	<TD>This template shows "job held".</TD>
+</TR>
+<TR>
+	<TD>job-move.tmpl</TD>
+	<TD>This template shows the move-job form.</TD>
+</TR>
+<TR>
+	<TD>job-moved.tmpl</TD>
+	<TD>This template shows "job moved".</TD>
+</TR>
+<TR>
+	<TD>job-release.tmpl</TD>
+	<TD>This template shows "job released".</TD>
+</TR>
+<TR>
+	<TD>job-restart.tmpl</TD>
+	<TD>This template shows "job reprinted".</TD>
+</TR>
+<TR>
+	<TD>jobs.tmpl</TD>
+	<TD>This template is used to list the print jobs on a server,
+	class, or printer.</TD>
+</TR>
+<TR>
+	<TD>jobs-header.tmpl</TD>
+	<TD>This template shows the "showing N or M jobs" header in the
+	jobs list.</TD>
+</TR>
+<TR>
+	<TD>maintenance.tmpl</TD>
+	<TD>This template shows "maintenance commands sent".</TD>
+</TR>
+<TR>
+	<TD>modify-class.tmpl</TD>
+	<TD>This template is used as the first form when modifying a
+	class.</TD>
+</TR>
+<TR>
+	<TD>modify-printer.tmpl</TD>
+	<TD>This template is used as the first form when modifying a
+	printer.</TD>
+</TR>
+<TR>
+	<TD>option-boolean.tmpl</TD>
+	<TD>This template is used to select a boolean PPD option.</TD>
+</TR>
+<TR>
+	<TD>option-conflict.tmpl</TD>
+	<TD>This template shows the conflicting options.</TD>
+</TR>
+<TR>
+	<TD>option-header.tmpl</TD>
+	<TD>This template is used to start a PPD option group.</TD>
+</TR>
+<TR>
+	<TD>option-pickmany.tmpl</TD>
+	<TD>This template is used to select a multi-valued PPD option.</TD>
+</TR>
+<TR>
+	<TD>option-pickone.tmpl</TD>
+	<TD>This template is used to select a single-valued PPD option.</TD>
+</TR>
+<TR>
+	<TD>option-trailer.tmpl</TD>
+	<TD>This template is used to end a PPD option group.</TD>
+</TR>
+<TR>
+	<TD>pager.tmpl</TD>
+	<TD>This template shows the previous/next pager bar.</TD>
+</TR>
+<TR>
+	<TD>printer-accept.tmpl</TD>
+	<TD>This template shows "printer now accepting jobs".</TD>
+</TR>
+<TR>
+	<TD>printer-added.tmpl</TD>
+	<TD>This template shows "printer added".</TD>
+</TR>
+<TR>
+	<TD>printer-configured.tmpl</TD>
+	<TD>This template shows "printer configured".</TD>
+</TR>
+<TR>
+	<TD>printer-confirm.tmpl</TD>
+	<TD>This template asks the user to confirm the deletion
+	of a printer.</TD>
+</TR>
+<TR>
+	<TD>printer-default.tmpl</TD>
+	<TD>This template shows "default printer set".</TD>
+</TR>
+<TR>
+	<TD>printer-deleted.tmpl</TD>
+	<TD>This template shows "printer deleted".</TD>
+</TR>
+<TR>
+	<TD>printer-jobs-header.tmpl</TD>
+	<TD>This templates shows the "jobs" header for jobs on a
+	printer.</TD>
+</TR>
+<TR>
+	<TD>printer-modified.tmpl</TD>
+	<TD>This template shows "printer modified".</TD>
+</TR>
+<TR>
+	<TD>printer-purge.tmpl</TD>
+	<TD>This template shows "printer has been purged of all jobs".</TD>
+</TR>
+<TR>
+	<TD>printer-reject.tmpl</TD>
+	<TD>This template shows "printer now rejecting jobs".</TD>
+</TR>
+<TR>
+	<TD>printer-start.tmpl</TD>
+	<TD>This template shows "printer started".</TD>
+</TR>
+<TR>
+	<TD>printer-stop.tmpl</TD>
+	<TD>This template shows "printer stopped".</TD>
+</TR>
+<TR>
+	<TD>printers.tmpl</TD>
+	<TD>This template is used to list information on one or more
+	printers.</TD>
+</TR>
+<TR>
+	<TD>printers-header.tmpl</TD>
+	<TD>This template shows the "showing printer N of M" header in
+	the printers list.</TD>
+</TR>
+<TR>
+	<TD>restart.tmpl</TD>
+	<TD>This template shows "server restarting".</TD>
+</TR>
+<TR>
+	<TD>samba-export.tmpl</TD>
+	<TD>This template shows the export printers to Samba form.</TD>
+</TR>
+<TR>
+	<TD>samba-exported.tmpl</TD>
+	<TD>This template shows "printers exported to Samba".</TD>
+</TR>
+<TR>
+	<TD>search.tmpl</TD>
+	<TD>This template shows the search form.</TD>
+</TR>
+<TR>
+	<TD>set-printer-options-header.tmpl</TD>
+	<TD>This template shows the first part of the set printer options
+	form.</TD>
+</TR>
+<TR>
+	<TD>set-printer-options-trailer.tmpl</TD>
+	<TD>This template shows the last part of the set printer options
+	form.</TD>
+</TR>
+<TR>
+	<TD>test-page.tmpl</TD>
+	<TD>This template shows "test page printed".</TD>
+</TR>
+<TR>
+	<TD>trailer.tmpl</TD>
+	<TD>This template is used as the standard trailer on all dynamic
+	content.</TD>
+</TR>
+<TR>
+	<TD>users.tmpl</TD>
+	<TD>This template shows the set allowed users form.</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
 
-<P>Template files consist of HTML with variable substitutions
-for named inside curley braces "{name}". Variable names are
-generally the IPP attribute names with the hyphen ("-") replaced
-by the underscore ("_") character. For example, the
+<H3><A NAME="VARIABLE">Inserting Attributes and Values</A></H3>
+
+<P>Template files consist of HTML with variable substitutions for
+named inside curley braces "{name}". Variable names are generally
+the IPP attribute names with the hyphen ("-") replaced by the
+underscore ("_") character. For example, the
 <TT>job-printer-uri</TT> attribute is renamed to
-<TT>job_printer_uri</TT>.
+<TT>job_printer_uri</TT>.</P>
 
-<P>Curley braces ("{" and "}") to indicate substitutions, and
-the backslash ("\") character for quoting. To insert any of
-these special characters as-is you need to use the HTML
+<P>Curley braces ("{" and "}") to indicate substitutions, and the
+backslash ("\") character for quoting. To insert any of these
+special characters as-is you need to use the HTML
 <CODE>&amp;name;</CODE> mechanism or prefix each special
 character with the backslash ("\".)</P>
 
@@ -93,21 +685,22 @@ character with the backslash ("\".)</P>
 undefined then the <CODE>{NAME}</CODE> string is output
 as-is.</P>
 
-<P>To substitute an empty string if the variable is undefined, use
-<CODE>{?NAME}</CODE> instead.</P>
+<P>To substitute an empty string if the variable is undefined,
+use <CODE>{?NAME}</CODE> instead.</P>
 
-<H4>Array Substitutions</H4>
+<H3>Array Substitutions</H3>
 
 <P>The number of array elements can be inserted using
-<CODE>{#NAME}</CODE>. If the array is undefined then 0 is
-output. The current array element (starting at 1) is inserted
-with <CODE>{#}</CODE>.</P>
+<CODE>{#NAME}</CODE>. If the array is undefined then 0 is output.
+The current array element (starting at 1) is inserted with
+<CODE>{#}</CODE>.</P>
 
-<P>Arrays are handled using <CODE>{[NAME]</CODE> at the beginning of a
-section and <CODE>}</CODE> at the end. The information between the closing
-bracket ("]") and closing brace ("}") is repeated for as many elements as
-are in the named array. For example, the following template will display
-a list of each job in the <CODE>job_id</CODE> array:</P>
+<P>Arrays are handled using <CODE>{[NAME]</CODE> at the beginning
+of a section and <CODE>}</CODE> at the end. The information
+between the closing bracket ("]") and closing brace ("}") is
+repeated for as many elements as are in the named array. For
+example, the following template will display a list of each job
+in the <CODE>job_id</CODE> array:</P>
 
 <PRE CLASS="command">
 &lt;TABLE&gt;
@@ -130,10 +723,10 @@ a list of each job in the <CODE>job_id</CODE> array:</P>
 <P>Arrays can be nested, however all elements within the curley
 braces ("{" and "}") are indexed using the innermost array.</P>
 
-<H4>Conditional Tests</H4>
+<H3>Conditional Tests</H3>
 
 <P>Templates can also test variables against specific values and
-conditionally include text in the template. The format is:
+conditionally include text in the template. The format is:</P>
 
 <PRE CLASS="command">
 {<I>variable</I>?<I>true</I>:<I>false</I>}
@@ -146,15 +739,15 @@ conditionally include text in the template. The format is:
 <P>where <VAR>true</VAR> is the text that is included if the
 condition is true and <VAR>false</VAR> is the text that is
 included if the condition is false. A value of <CODE>#</CODE> is
-replaced with the current element number (starting at 1.)
+replaced with the current element number (starting at 1.) The
+character after the variable name specifies the condition to
+test. Table 3 shows the available test conditions.</P>
 
-<P>The character after the variable name specifies the condition
-to test:
-
-<CENTER><TABLE BORDER="1">
+<DIV CLASS="table"><TABLE SUMMARY="Template Substitution Conditions">
+<CAPTION>Table 3: Template Substitution Conditions</CAPTION>
 <TR>
-	<TH WIDTH="5%">Char</TH>
-	<TH WIDTH="50%">Condition</TH>
+	<TH>Char</TH>
+	<TH>Condition</TH>
 </TR>
 <TR>
 	<TD>?</TD>
@@ -176,219 +769,12 @@ to test:
 	<TD>></TD>
 	<TD>True if <VAR>variable</VAR> is greater than <VAR>value</VAR>.</TD>
 </TR>
-</TABLE></CENTER>
+</TABLE></DIV>
 
-<H4>Template File List</H4>
+<H3><A NAME="CGI">CGI Programs</A></H3>
 
-<P>The following template files are used by the web interface:
-
-<DL>
-
-<DT>add-class.tmpl
-
-	<DD>This is the initial form that is shown to add a new
-	printer class.
-
-<DT>add-printer.tmpl
-
-        <DD>This is the initial form that is shown to add a new
-	printer.
-
-<DT>admin-op.tmpl
-
-        <DD>This is the template that is used to display an error
-	message when the admin interface sees an undefined
-	operation name.
-
-<DT>admin.tmpl
-
-        <DD>This is the template that shows the initial menu of
-	operations (add a class, manage classes, etc.)
-
-<DT>choose-device.tmpl
-
-        <DD>This is the form that shows the list of available
-	devices.
-
-<DT>choose-make.tmpl
-
-        <DD>This is the form that shows the list of available
-	manufacturers.
-
-<DT>choose-members.tmpl
-
-        <DD>This is the form that shows the list of available
-	printers that can be added to a class.
-
-<DT>choose-model.tmpl
-
-        <DD>This is the form that shows the list of available
-	printer models/drivers.
-
-<DT>choose-serial.tmpl
-
-        <DD>This is the form that allows the user to choose
-	a serial port and any options.
-
-<DT>choose-uri.tmpl
-
-        <DD>This is the form that allows the user to enter
-	a device URI for network printers.
-
-<DT>class-added.tmpl
-
-        <DD>This template shows the "class added" message.
-
-<DT>class-confirm.tmpl
-
-        <DD>This is the template used to confirm the
-	deletion of a class.
-
-<DT>class-deleted.tmpl
-
-        <DD>This template shows the "class deleted" message.
-
-<DT>classes.tmpl
-
-        <DD>This template shows one or more printer classes.
-
-<DT>class-modified.tmpl
-
-        <DD>This template shows the "class modified" message.
-
-<DT>config-printer.tmpl
-
-	<DD>This template starts the printer configuration form.
-
-<DT>config-printer2.tmpl
-
-	<DD>This template ends the printer configuration form.
-
-<DT>error.tmpl
-
-	<DD>This template displays a generic error message.
-
-<DT>header.tmpl
-
-	<DD>This template is used as the standard header on all dynamic
-	content.
-
-<DT>job-cancel.tmpl
-
-	<DD>This template shows "job cancelled".
-
-<DT>job-hold.tmpl
-
-	<DD>This template shows "job held".
-
-<DT>job-op.tmpl
-
-	<DD>This is the template that is used to display an
-	error message when the job interface sees an undefined
-	operation name.
-
-<DT>job-release.tmpl
-
-	<DD>This template shows "job released".
-
-<DT>job-restart.tmpl
-
-	<DD>This template shows "job restarted".
-
-<DT>jobs.tmpl
-
-	<DD>This template is used to list the print jobs on a server,
-	class, or printer.
-
-<DT>modify-class.tmpl
-
-	<DD>This template is used as the first form when modifying a
-	class.
-
-<DT>modify-printer.tmpl
-
-	<DD>This template is used as the first form when modifying a
-	printer.
-
-<DT>option-boolean.tmpl
-
-	<DD>This template is used to select a boolean PPD option.
-
-<DT>option-header.tmpl
-
-	<DD>This template is used to start a PPD option group.
-
-<DT>option-pickmany.tmpl
-
-	<DD>This template is used to select a multi-valued PPD option.
-
-<DT>option-pickone.tmpl
-
-	<DD>This template is used to select a single-valued PPD option.
-
-<DT>option-trailer.tmpl
-
-	<DD>This template is used to end a PPD option group.
-
-<DT>printer-accept.tmpl
-
-	<DD>This template shows "printer now accepting jobs".
-
-<DT>printer-added.tmpl
-
-	<DD>This template shows "printer added".
-
-<DT>printer-configured.tmpl
-
-	<DD>This template shows "printer configured".
-
-<DT>printer-confirm.tmpl
-
-	<DD>This template asks the user to confirm the deletion of a printer.
-
-<DT>printer-deleted.tmpl
-
-	<DD>This template shows "printer deleted".
-
-<DT>printer-modified.tmpl
-
-	<DD>This template shows "printer modified".
-
-<DT>printer-purge.tmpl
-
-	<DD>This template shows "printer has been purged of all jobs".
-
-<DT>printer-reject.tmpl
-
-	<DD>This template shows "printer now rejecting jobs".
-
-<DT>printer-start.tmpl
-
-	<DD>This template shows "printer started".
-
-<DT>printers.tmpl
-
-	<DD>This template is used to list information on one or more
-	printers.
-
-<DT>printer-stop.tmpl
-
-	<DD>This template shows "printer stopped".
-
-<DT>test-page.tmpl
-
-	<DD>This template shows "test page printed".
-
-<DT>trailer.tmpl
-
-	<DD>This template is used as the standard trailer on all dynamic
-	content.
-
-</DL>
-
-<H3>CGI Programs</H3>
-
-<P>CUPS uses five CGI programs to manage the dynamic web interfaces:
+<P>CUPS uses five CGI programs to manage the dynamic web
+interfaces:</P>
 
 <UL>
 
@@ -400,265 +786,265 @@ to test:
 
 </UL>
 
+<P>Each CGI program accepts standard form variables such as
+<CODE>OP</CODE> for the operation to perform,
+<CODE>PRINTER_NAME</CODE> for the printer or class name to
+operate on, <CODE>QUERY</CODE> for any search words,
+<CODE>FIRST</CODE> for the first class, job, or printer to
+display, and <CODE>ORDER</CODE> to control the order that
+classes, jobs, or printers are displayed.</P>
 
-<H4>admin.cgi</H4>
+<P>In addition, the <CODE>classes.cgi</CODE>,
+<CODE>jobs.cgi</CODE>, and <CODE>printers.cgi</CODE> programs
+support a <CODE>WHICH_JOBS</CODE> variable to control which jobs
+are displayed. Table 4 lists the supported values.</P>
+
+<DIV CLASS="table"><TABLE SUMMARY="WHICH_JOBS Values">
+<CAPTION>Table 4: WHICH_JOBS Values</CAPTION>
+<THEAD>
+<TR>
+	<TH>OP Value</TH>
+	<TH>Description</TH>
+</TR>
+</THEAD>
+<TR>
+	<TD>all</TD>
+	<TD>Show all jobs</TD>
+</TR>
+<TR>
+	<TD>completed</TD>
+	<TD>Show completed jobs</TD>
+</TR>
+<TR>
+	<TD>not-completed</TD>
+	<TD>Show active jobs</TD>
+</TR>
+</TABLE></DIV>
+
+<H4><A NAME="admin.cgi">admin.cgi</A></H4>
 
 <P>The <CODE>admin.cgi</CODE> program handles all of the printer
 and class administration functions and is run for all direct
-accesses to the <VAR>/admin</VAR> resource. For most operations it uses the
-<CODE>PRINTER_NAME</CODE> and <CODE>OP</CODE> form variables to
-specify the action requested.
+accesses to the <VAR>/admin</VAR> resource. For most operations
+it uses the <CODE>PRINTER_NAME</CODE> and <CODE>OP</CODE> form
+variables to specify the action requested. Table 5 shows the
+supported <CODE>OP</CODE> values.</P>
 
-<P>The following <CODE>OP</CODE> values are supported:
+<DIV CLASS="table"><TABLE SUMMARY="admin.cgi OP Values">
+<CAPTION>Table 5: admin.cgi OP Values</CAPTION>
+<THEAD>
+<TR>
+	<TH>OP Value</TH>
+	<TH>Description</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>accept-jobs</TD>
+	<TD>Accepts jobs on the named destination.</TD>
+</TR>
+<TR>
+	<TD>add-class</TD>
+	<TD>Adds a new printer class.</TD>
+</TR>
+<TR>
+	<TD>add-printer</TD>
+	<TD>Adds a new printer.</TD>
+</TR>
+<TR>
+	<TD>config-server</TD>
+	<TD>Configures the server.</TD>
+</TR>
+<TR>
+	<TD>delete-class</TD>
+	<TD>Deletes a printer class. The form variable <CODE>CONFIRM</CODE>
+	may be set to any value to bypass the confirmation page.</TD>
+</TR>
+<TR>
+	<TD>delete-printer</TD>
+	<TD>Deletes a printer. The form variable <CODE>CONFIRM</CODE>
+	may be set to any value to bypass the confirmation page.</TD>
+</TR>
+<TR>
+	<TD>export-samba</TD>
+	<TD>Exports printers to Samba.</TD>
+</TR>
+<TR>
+	<TD>modify-class</TD>
+	<TD>Modifies a printer class.</TD>
+</TR>
+<TR>
+	<TD>modify-printer</TD>
+	<TD>Modifies a printer.</TD>
+</TR>
+<TR>
+	<TD>purge-jobs</TD>
+	<TD>Purges all jobs on the named destination.</TD>
+</TR>
+<TR>
+	<TD>redirect</TD>
+	<TD>Redirects the web browser to the location referenced by
+	the URL form variable.</TD>
+</TR>
+<TR>
+	<TD>reject-jobs</TD>
+	<TD>Rejects new jobs on the named destination.</TD>
+</TR>
+<TR>
+	<TD>set-allowed-users</TD>
+	<TD>Sets the allowed users for a destination.</TD>
+</TR>
+<TR>
+	<TD>set-as-default</TD>
+	<TD>Sets the default destination.</TD>
+</TR>
+<TR>
+	<TD>set-printer-options</TD>
+	<TD>Sets the default options for a printer.</TD>
+</TR>
+<TR>
+	<TD>set-sharing</TD>
+	<TD>Sets the printer-is-shared attribute for a destination.</TD>
+</TR>
+<TR>
+	<TD>start-class</TD>
+	<TD>Starts the named class.</TD>
+</TR>
+<TR>
+	<TD>start-printer</TD>
+	<TD>Starts the named printer.</TD>
+</TR>
+<TR>
+	<TD>stop-class</TD>
+	<TD>Stops the named class.</TD>
+</TR>
+<TR>
+	<TD>stop-printer</TD>
+	<TD>Stops the named printer.</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
 
-<DL>
-
-<DT>accept-jobs</DT>
-
-	<DD>Accepts jobs on the named destination.</DD>
-
-<DT>add-class</DT>
-
-	<DD>Adds a new printer class. This operation also adds
-	several other form variables:
-
-	<DL>
-
-	<DT>MEMBER_URIS</DT>
-
-		<DD>Sets the members of the class. Multiple
-		<CODE>MEMBER_URIS</CODE> values can be
-		provided.</DD>
-
-	<DT>PRINTER_INFO</DT>
-
-		<DD>Sets the printer-info attribute for the
-		printer class, which is usually the printer
-		description.</DD>
-
-	<DT>PRINTER_LOCATION</DT>
-
-		<DD>Sets the printer-location attribute for the
-		printer class.</DD>
-
-	</DL>
-
-	</DD>
-
-<DT>add-printer</DT>
-
-	<DD>Adds a new printer. This operation also adds several other
-	form variables:
-
-	<DL>
-
-	<DT>BAUDRATE</DT>
-
-		<DD>Sets the baud rate for serial devices.</DD>
-
-	<DT>BITS</DT>
-
-		<DD>Sets the number of data bits for serial devices.</DD>
-
-	<DT>DEVICE_URI</DT>
-
-		<DD>Sets the device URI for the printer.</DD>
-
-	<DT>FLOW</DT>
-
-		<DD>Sets the flow control for serial devices.</DD>
-
-	<DT>PARITY</DT>
-
-		<DD>Sets the parity checking for serial devices.</DD>
-
-	<DT>PPD_NAME</DT>
-
-		<DD>Sets the driver name for the printer ("raw" for a
-		raw queue.)</DD>
-
-	<DT>PRINTER_INFO</DT>
-
-		<DD>Sets the printer-info attribute for the
-		printer, which is usually the printer
-		description.</DD>
-
-	<DT>PRINTER_LOCATION</DT>
-
-		<DD>Sets the printer-location attribute for the
-		printer.</DD>
-
-	</DL>
-
-	</DD>
-
-<DT>config-printer</DT>
-
-	<DD>Configures an existing printer. This operation uses
-	form variables of the same name as the options in the
-	printer's PPD file.</DD>
-
-<DT>delete-class</DT>
-
-	<DD>Deletes a printer class. The form variable <CODE>CONFIRM</CODE>
-	may be set to any value to bypass the confirmation page.</DD>
-
-<DT>delete-printer</DT>
-
-	<DD>Deletes a printer. The form variable <CODE>CONFIRM</CODE>
-	may be set to any value to bypass the confirmation page.</DD>
-
-<DT>modify-class</DT>
-
-	<DD>Modifies a printer class. See the add-class operation for a
-	list of form variables.</DD>
-
-<DT>modify-printer</DT>
-
-	<DD>Modifies a printer. See the add-printer operation for a
-	list of form variables.</DD>
-
-<DT>purge-jobs</DT>
-
-	<DD>Purges all jobs on the named destination.</DD>
-
-<DT>reject-jobs</DT>
-
-	<DD>Rejects new jobs on the named destination.</DD>
-
-<DT>start-printer</DT>
-
-	<DD>Starts the named destination.</DD>
-
-<DT>stop-printer</DT>
-
-	<DD>Stops the named destination.</DD>
-
-</DL>
-
-
-<H4>classes.cgi</H4>
+<H4><A NAME="classes.cgi">classes.cgi</A></H4>
 
 <P>The <CODE>classes.cgi</CODE> program is responsible for
 listing class information, including jobs destined for that
-class. It is for all direct accesses to the <VAR>/classes</VAR> resource
-and supports the optional form variables <CODE>OP</CODE> and
-<CODE>WHICH_JOBS</CODE>. If no form variables are supplied then
-the CGI lists all or a specific class and the active jobs on
-each class.
+class. It is for all direct accesses to the <VAR>/classes</VAR>
+resource and supports the optional form variables <CODE>OP</CODE>
+and <CODE>WHICH_JOBS</CODE>. If no form variables are supplied
+then the CGI lists all or a specific class and the active jobs on
+each class. Table 6 shows the supported <CODE>OP</CODE>
+values.</P>
 
-<P>The following <CODE>WHICH_JOBS</CODE> values are supported:
-
-<DL>
-
-<DT>completed</DT>
-
-	<DD>Show only the completed jobs.</DD>
-
-<DT>not-completed</DT>
-
-	<DD>Show only the active jobs.</DD>
-
-</DL>
-
-<P>The following <CODE>OP</CODE> values are supported:
-
-<DL>
-
-<DT>print-test-page</DT>
-
-	<DD>Print a PostScript test page.</DD>
-
-</DL>
+<DIV CLASS="table"><TABLE SUMMARY="classes.cgi OP Values">
+<CAPTION>Table 6: classes.cgi OP Values</CAPTION>
+<THEAD>
+<TR>
+	<TH>OP Value</TH>
+	<TH>Description</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>move-jobs</TD>
+	<TD>Moves the jobs on this class to another destination.</TD>
+</TR>
+<TR>
+	<TD>print-test-page</TD>
+	<TD>Prints the standard PostScript test page.</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
 
 
-<H4>help.cgi</H4>
+<H4><A NAME="help.cgi">help.cgi</A></H4>
 
 <P>The <CODE>help.cgi</CODE> program handles all of the on-line
 help functions and is run for all direct accesses to the
 <VAR>/help</VAR> resource.</P>
 
 
-<H4>jobs.cgi</H4>
+<H4><A NAME="jobs.cgi">jobs.cgi</A></H4>
 
 <P>The <CODE>jobs.cgi</CODE> program handles all of the job
-functions and is run for all direct accesses to the <VAR>/jobs</VAR>
-resource. For most operations it uses the
-<CODE>JOB_ID</CODE>, <CODE>OP</CODE>, and
-<CODE>WHICH_JOBS</CODE> form variables to specify the action
-requested.
+functions and is run for all direct accesses to the
+<VAR>/jobs</VAR> resource. For most operations it uses the
+<CODE>JOB_ID</CODE>, <CODE>OP</CODE>, and <CODE>WHICH_JOBS</CODE>
+form variables to specify the action requested. Table 7 shows the
+supported <CODE>OP</CODE> values.</P>
 
-<P>The following <CODE>WHICH_JOBS</CODE> values are supported:
-
-<DL>
-
-<DT>completed</DT>
-
-	<DD>Show only the completed jobs.</DD>
-
-<DT>not-completed</DT>
-
-	<DD>Show only the active jobs.</DD>
-
-</DL>
-
-<P>The following <CODE>OP</CODE> values are supported:
-
-<DL>
-
-<DT>job-cancel</DT>
-
-	<DD>Cancels a job.</DD>
-
-<DT>job-hold</DT>
-
-	<DD>Holds a job indefinitely.</DD>
-
-<DT>job-release</DT>
-
-	<DD>Releases a job for printing.</DD>
-
-<DT>job-restart</DT>
-
-	<DD>Restarts a stopped, cancelled, completed, or aborted
-	print job.</DD>
-
-</DL>
+<DIV CLASS="table"><TABLE SUMMARY="jobs.cgi OP Values">
+<CAPTION>Table 7: jobs.cgi OP Values</CAPTION>
+<THEAD>
+<TR>
+	<TH>OP Value</TH>
+	<TH>Description</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>cancel-job</TD>
+	<TD>Cancels a job.</TD>
+</TR>
+<TR>
+	<TD>hold-job</TD>
+	<TD>Holds a job indefinitely.</TD>
+</TR>
+<TR>
+	<TD>move-job</TD>
+	<TD>Moves a job to another destination.</TD>
+</TR>
+<TR>
+	<TD>release-job</TD>
+	<TD>Releases a job for printing.</TD>
+</TR>
+<TR>
+	<TD>restart-job</TD>
+	<TD>Restarts/reprints a stopped, cancelled, completed, or aborted
+	print job.</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
 
 
-<H4>printers.cgi</H4>
+<H4><A NAME="printers.cgi">printers.cgi</A></H4>
 
 <P>The <CODE>printers.cgi</CODE> program is responsible for
 listing printer information, including jobs destined for that
-printer. It is for all direct accesses to the <VAR>/printers</VAR> resource
-and supports the optional form variables <CODE>OP</CODE> and
-<CODE>WHICH_JOBS</CODE>. If no form variables are supplied then
-the CGI lists all or a specific printer and the active jobs on
-each printer.
+printer. It is for all direct accesses to the
+<VAR>/printers</VAR> resource and supports the optional form
+variables <CODE>OP</CODE> and <CODE>WHICH_JOBS</CODE>. If no form
+variables are supplied then the CGI lists all printers or a
+specific printer and the active jobs on that printer. Table 8
+shows the supported <CODE>OP</CODE> values.</P>
 
-<P>The following <CODE>WHICH_JOBS</CODE> values are supported:
-
-<DL>
-
-<DT>completed</DT>
-
-	<DD>Show only the completed jobs.</DD>
-
-<DT>not-completed</DT>
-
-	<DD>Show only the active jobs.</DD>
-
-</DL>
-
-<P>The following <CODE>OP</CODE> values are supported:
-
-<DL>
-
-<DT>print-test-page</DT>
-
-	<DD>Print a PostScript test page.</DD>
-
-</DL>
+<DIV CLASS="table"><TABLE SUMMARY="printers.cgi OP Values">
+<CAPTION>Table 8: printers.cgi OP Values</CAPTION>
+<THEAD>
+<TR>
+	<TH>OP Value</TH>
+	<TH>Description</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>clean-print-heads</TD>
+	<TD>Clean the print heads.</TD>
+</TR>
+<TR>
+	<TD>move-jobs</TD>
+	<TD>Move all jobs to a different destination.</TD>
+</TR>
+<TR>
+	<TD>print-self-test-page</TD>
+	<TD>Print a printer self-test page.</TD>
+</TR>
+<TR>
+	<TD>print-test-page</TD>
+	<TD>Print a PostScript test page.</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
 
 </BODY>
 </HTML>

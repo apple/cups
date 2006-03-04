@@ -5,34 +5,34 @@
 
 <P>
 <A HREF="/admin?op=add-printer"><IMG
-SRC="/images/add-printer.gif" ALT="Add Printer" CLASS="button"></A>
-<A HREF="/printers/"><IMG SRC="/images/manage-printers.gif"
+SRC="/images/button-add-printer.gif" ALT="Add Printer" CLASS="button"></A>
+<A HREF="/printers/"><IMG SRC="/images/button-manage-printers.gif"
 ALT="Manage Printers" CLASS="button"></A>
 {have_samba?<A HREF="/admin/?op=export-samba"><IMG
-SRC="/images/export-samba.gif" ALT="Export Printers to Samba"
+SRC="/images/button-export-samba.gif" ALT="Export Printers to Samba"
 CLASS="button"></A>:}
 </P>
 
 {#device_uri=0?:<P><B>New Printers Found:</B></P><UL>{[device_uri]
 <LI>{device_make_and_model} ({device_info})
 <A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
-SRC="/images/add-this-printer.gif" ALT="Add This Printer" CLASS="button"
+SRC="/images/button-add-this-printer.gif" ALT="Add This Printer" CLASS="button"
 ALIGN="MIDDLE"></A></LI>
 }</UL>}
 
 <H2 CLASS="title">Classes</H2>
 
 <P>
-<A HREF="/admin?op=add-class"><IMG SRC="/images/add-class.gif"
+<A HREF="/admin?op=add-class"><IMG SRC="/images/button-add-class.gif"
 ALT="Add Class" CLASS="button"></A>
-<A HREF="/classes/"><IMG SRC="/images/manage-classes.gif"
+<A HREF="/classes/"><IMG SRC="/images/button-manage-classes.gif"
 ALT="Manage Classes" CLASS="button"></A>
 </P>
 
 <H2 CLASS="title">Jobs</H2>
 
 <P>
-<A HREF="/jobs/"><IMG SRC="/images/manage-jobs.gif" ALT="Manage
+<A HREF="/jobs/"><IMG SRC="/images/button-manage-jobs.gif" ALT="Manage
 Jobs" CLASS="button"></A>
 </P>
 
@@ -42,16 +42,16 @@ Jobs" CLASS="button"></A>
 
 <P>
 <A HREF="/admin?op=config-server"><IMG
-SRC="/images/edit-configuration-file.gif" ALT="Edit Configuration
+SRC="/images/button-edit-configuration-file.gif" ALT="Edit Configuration
 File" CLASS="button"></A>
 <A HREF="/admin/log/access_log" TARGET="_blank"><IMG
-SRC="/images/view-access-log.gif" ALT="View Access Log"
+SRC="/images/button-view-access-log.gif" ALT="View Access Log"
 CLASS="button"></A>
 <A HREF="/admin/log/error_log" TARGET="_blank"><IMG
-SRC="/images/view-error-log.gif" ALT="View Error Log"
+SRC="/images/button-view-error-log.gif" ALT="View Error Log"
 CLASS="button"></A>
 <A HREF="/admin/log/page_log" TARGET="_blank"><IMG
-SRC="/images/view-page-log.gif" ALT="View Page Log"
+SRC="/images/button-view-page-log.gif" ALT="View Page Log"
 CLASS="button"></A>
 </P>
 
@@ -66,7 +66,7 @@ CLASS="button"></A>
 <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
 <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting</P>
 
-<P><INPUT TYPE="IMAGE" SRC="/images/change-settings.gif" ALT="Change Settings"></P>
+<P><INPUT TYPE="IMAGE" SRC="/images/button-change-settings.gif" ALT="Change Settings"></P>
 
 </FORM>
 

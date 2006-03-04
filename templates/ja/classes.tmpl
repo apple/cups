@@ -17,38 +17,38 @@
 
 <P>
 <A HREF="{printer_uri_supported}?op=print-test-page">
-<IMG SRC="/images/print-test-page.gif" ALT="テストページの印刷" CLASS="button"></A>
+<IMG SRC="/images/button-print-test-page.gif" ALT="テストページの印刷" CLASS="button"></A>
 {printer_state=5?
 <A HREF="{admin_uri}?op=start-class&amp;printer_name={printer_name}&amp;is_class=Y">
-<IMG SRC="/images/start-class.gif" ALT="クラスを開始" CLASS="button"></A>
+<IMG SRC="/images/button-start-class.gif" ALT="クラスを開始" CLASS="button"></A>
 :
 <A HREF="{admin_uri}?op=stop-class&amp;printer_name={printer_name}&amp;is_class=Y">
-<IMG SRC="/images/stop-class.gif" ALT="クラスを停止" CLASS="button"></A>
+<IMG SRC="/images/button-stop-class.gif" ALT="クラスを停止" CLASS="button"></A>
 }
 {printer_is_accepting_jobs=0?
 <A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={printer_name}&amp;is_class=Y">
-<IMG SRC="/images/accept-jobs.gif" ALT="ジョブを受け付け" CLASS="button"></A>
+<IMG SRC="/images/button-accept-jobs.gif" ALT="ジョブを受け付け" CLASS="button"></A>
 :
 <A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={printer_name}&amp;is_class=Y">
-<IMG SRC="/images/reject-jobs.gif" ALT="ジョブを拒否" CLASS="button"></A>
+<IMG SRC="/images/button-reject-jobs.gif" ALT="ジョブを拒否" CLASS="button"></A>
 }
 <A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={printer_name}&amp;is_class=Y">
-<IMG SRC="/images/cancel-all-jobs.gif" ALT="すべてのジョブをキャンセル" CLASS="button"></A>
+<IMG SRC="/images/button-cancel-all-jobs.gif" ALT="すべてのジョブをキャンセル" CLASS="button"></A>
 {printer_is_shared=0?
 <A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=1&amp;is_class=Y">
-<IMG SRC="/images/publish-printer.gif" ALT="プリンタを公開" CLASS="button"></A>
+<IMG SRC="/images/button-publish-printer.gif" ALT="プリンタを公開" CLASS="button"></A>
 :
 <A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=0&amp;is_class=Y">
-<IMG SRC="/images/unpublish-printer.gif" ALT="プリンタを非公開" CLASS="button"></A>
+<IMG SRC="/images/button-unpublish-printer.gif" ALT="プリンタを非公開" CLASS="button"></A>
 }
 <A HREF="{admin_uri}?op=modify-class&amp;printer_name={printer_name}">
-<IMG SRC="/images/modify-class.gif" ALT="クラスの変更" CLASS="button"></A>
+<IMG SRC="/images/button-modify-class.gif" ALT="クラスの変更" CLASS="button"></A>
 <A HREF="{admin_uri}?op=delete-class&amp;printer_name={printer_name}">
-<IMG SRC="/images/delete-class.gif" ALT="クラスの削除" CLASS="button"></A>
+<IMG SRC="/images/button-delete-class.gif" ALT="クラスの削除" CLASS="button"></A>
 <A HREF="{admin_uri}?op=set-as-default&amp;printer_name={printer_name}&amp;is_class=Y">
-<IMG SRC="/images/set-as-default.gif" ALT="デフォルトに設定" CLASS="button"></A>
+<IMG SRC="/images/button-set-as-default.gif" ALT="デフォルトに設定" CLASS="button"></A>
 <A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={printer_name}&amp;is_class=Y">
-<IMG SRC="/images/set-allowed-users.gif" ALT="許可するユーザの設定" CLASS="button"></A>
+<IMG SRC="/images/button-set-allowed-users.gif" ALT="許可するユーザの設定" CLASS="button"></A>
 </P>
 </TD>
 </TR>
