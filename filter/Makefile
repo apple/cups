@@ -104,6 +104,31 @@ installhdrs:
 
 
 #
+# Uninstall all targets...
+#
+
+uninstall:
+	for file in $(FILTERS); do \
+		$(RM) $(SERVERBIN)/filter/$$file; \
+	done
+	$(RM) $(SERVERBIN)/filter/rastertodymo
+	-$(RMDIR) $(SERVERBIN)/filter
+	-$(RMDIR) $(SERVERBIN)
+	$(RM) $(LIBDIR)/libcupsimage.2.dylib
+	$(RM) $(LIBDIR)/libcupsimage.a
+	$(RM) $(LIBDIR)/libcupsimage.dylib
+	$(RM) $(LIBDIR)/libcupsimage_s.a
+	$(RM) $(LIBDIR)/libcupsimage.sl
+	$(RM) $(LIBDIR)/libcupsimage.sl.2
+	$(RM) $(LIBDIR)/libcupsimage.so
+	$(RM) $(LIBDIR)/libcupsimage.so.2
+	-$(RMDIR) $(LIBDIR)
+	$(RM) $(INCLUDEDIR)/cups/image.h
+	$(RM) $(INCLUDEDIR)/cups/raster.h
+	-$(RMDIR) $(INCLUDEDIR)/cups
+
+
+#
 # Automatic API help files...
 #
 

@@ -73,6 +73,19 @@ install:	all
 
 
 #
+# Uninstall all targets...
+#
+
+uninstall:
+	for file in $(RBACKENDS) $(UBACKENDS); do \
+		$(RM) $(SERVERBIN)/backend/$$file; \
+	done
+	$(RM) $(SERVERBIN)/backend/http
+	-$(RMDIR) $(SERVERBIN)/backend
+	-$(RMDIR) $(SERVERBIN)
+
+
+#
 # betest
 #
 

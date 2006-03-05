@@ -66,6 +66,17 @@ install:	all
 
 
 #
+# Uninstall all targets...
+#
+
+uninstall:
+	for file in $(CGIS); do \
+		$(RM) $(SERVERBIN)/cgi-bin/$$file; \
+	done
+	-$(RMDIR) $(SERVERBIN)/cgi-bin
+
+
+#
 # libcgi.a
 #
 

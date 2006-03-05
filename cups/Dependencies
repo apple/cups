@@ -45,7 +45,8 @@ language.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
 language.o: array.h file.h language.h i18n.h normalize.h transcode.h debug.h
 localize.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
 localize.o: array.h file.h language.h i18n.h normalize.h transcode.h debug.h
-mark.o: ppd.h array.h file.h string.h ../config.h debug.h
+mark.o: cups.h ipp.h http.h string.h ../config.h md5.h ppd.h array.h file.h
+mark.o: language.h debug.h
 md5.o: md5.h string.h ../config.h
 md5passwd.o: http.h string.h ../config.h md5.h
 normalize.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h

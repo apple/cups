@@ -66,6 +66,18 @@ install:	all
 
 
 #
+# Uninstall all targets...
+#
+
+uninstall:
+	for file in $(TARGETS); do \
+		$(RM) $(SERVERBIN)/monitor/$$file; \
+	done
+	-$(RMDIR) $(SERVERBIN)/monitor
+	-$(RMDIR) $(SERVERBIN)
+
+
+#
 # bcp
 #
 

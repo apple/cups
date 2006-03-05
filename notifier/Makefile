@@ -56,6 +56,18 @@ install:	all
 
 
 #
+# Uninstall all targets...
+#
+
+uninstall:
+	for file in $(TARGETS); do \
+		$(RM) $(SERVERBIN)/notifier/$$file; \
+	done
+	-$(RMDIR) $(SERVERBIN)/notifier
+	-$(RMDIR) $(SERVERBIN)
+
+
+#
 # Update dependencies (without system header dependencies...)
 #
 

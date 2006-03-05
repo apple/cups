@@ -109,6 +109,13 @@ clean:
 
 
 #
+# Dummy depend...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
@@ -125,6 +132,23 @@ install: all
 			fi \
 		done \
 	done
+
+
+#
+# Uninstall files...
+#
+
+uninstall:
+	for file in $(FILES); do \
+		$(RM) $(DATADIR)/templates/$$file; \
+	done
+	for lang in $(LANGUAGES); do \
+		for file in $(FILES); do \
+			$(RM) $(DATADIR)/templates/$$lang/$$file; \
+		done \
+		$(RMDIR) $(DATADIR)/templates/$$lang; \
+	done
+	-$(RMDIR) $(DATADIR)/templates
 
 
 #

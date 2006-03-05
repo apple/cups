@@ -149,6 +149,31 @@ install:	all
 
 
 #
+# Uninstall the scheduler...
+#
+
+uninstall:	all
+	$(RM) $(SBINDIR)/cupsd
+	$(RM) $(SERVERBIN)/daemon/cups-deviced
+	$(RM) $(SERVERBIN)/daemon/cups-driverd
+	$(RM) $(SERVERBIN)/daemon/cups-lpd
+	$(RM) $(SERVERBIN)/daemon/cups-polld
+	-$(RMDIR) $(STATEDIR)/certs
+	-$(RMDIR) $(STATEDIR)
+	-$(RMDIR) $(SERVERROOT)/ppd
+	-$(RMDIR) $(SERVERROOT)/interfaces
+	-$(RMDIR) $(SERVERROOT)
+	-$(RMDIR) $(SERVERBIN)/driver
+	-$(RMDIR) $(SERVERBIN)/daemon
+	-$(RMDIR) $(SERVERBIN)
+	-$(RMDIR) $(SBINDIR)
+	-$(RMDIR) $(REQUESTS)/tmp
+	-$(RMDIR) $(REQUESTS)
+	-$(RMDIR) $(LOGDIR)
+	-$(RMDIR) $(CACHEDIR)
+
+
+#
 # Make the scheduler executable, "cupsd".
 #
 

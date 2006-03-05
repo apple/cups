@@ -170,6 +170,26 @@ installhdrs:
 
 
 #
+# Uninstall object and target files...
+#
+
+uninstall:
+	$(RM) $(LIBDIR)/libcups.2.dylib
+	$(RM) $(LIBDIR)/libcups.a
+	$(RM) $(LIBDIR)/libcups.dylib
+	$(RM) $(LIBDIR)/libcups_s.a
+	$(RM) $(LIBDIR)/libcups.sl
+	$(RM) $(LIBDIR)/libcups.sl.2
+	$(RM) $(LIBDIR)/libcups.so
+	$(RM) $(LIBDIR)/libcups.so.2
+	-$(RMDIR) $(LIBDIR)
+	for file in $(HEADERS); do \
+		$(RM) $(INCLUDEDIR)/cups/$$file; \
+	done
+	-$(RMDIR) $(INCLUDEDIR)/cups
+
+
+#
 # libcups.so.2, libcups.sl.2
 #
 

@@ -65,6 +65,19 @@ install:	all
 
 
 #
+# Uninstall all targets...
+#
+
+uninstall:
+	$(RM) $(BINDIR)/lpq
+	$(RM) $(BINDIR)/lpr
+	$(RM) $(BINDIR)/lprm
+	$(RM) $(SBINDIR)/lpc
+	-$(RMDIR) $(SBINDIR)
+	-$(RMDIR) $(BINDIR)
+
+
+#
 # lpc
 #
 

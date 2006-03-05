@@ -81,6 +81,29 @@ install:	all
 
 
 #
+# Uninstall all targets...
+#
+
+uninstall:
+	$(RM) $(BINDIR)/cancel
+	$(RM) $(BINDIR)/cupstestppd
+	$(RM) $(BINDIR)/lp
+	$(RM) $(BINDIR)/lpoptions
+	$(RM) $(BINDIR)/lppasswd
+	$(RM) $(BINDIR)/lpstat
+	-$(RMDIR) $(BINDIR)
+	$(RM) $(SBINDIR)/accept
+	$(RM) $(SBINDIR)/cupsaddsmb
+	$(RM) $(SBINDIR)/cupsdisable
+	$(RM) $(SBINDIR)/cupsenable
+	$(RM) $(SBINDIR)/lpadmin
+	$(RM) $(SBINDIR)/lpinfo
+	$(RM) $(SBINDIR)/lpmove
+	$(RM) $(SBINDIR)/reject
+	-$(RMDIR) $(SBINDIR)
+
+
+#
 # accept
 #
 

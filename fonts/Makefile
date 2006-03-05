@@ -47,6 +47,13 @@ clean:
 
 
 #
+# Dummy depend target...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
@@ -55,6 +62,17 @@ install:	all
 	for file in $(FONTS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/fonts; \
 	done
+
+
+#
+# Uninstall files...
+#
+
+uninstall:
+	for file in $(FONTS); do \
+		$(RM) $(DATADIR)/fonts/$$file; \
+	done
+	$(RMDIR) $(DATADIR)/fonts
 
 
 #

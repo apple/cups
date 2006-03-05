@@ -128,6 +128,31 @@ install:	all
 
 
 #
+# Uninstall files...
+#
+
+uninstall:
+	for file in $(MAN1); do \
+		$(RM) $(MANDIR)/man1/$$file; \
+	done
+	-$(RMDIR) $(MANDIR)/man1
+	for file in $(MAN5); do \
+		$(RM) $(MANDIR)/man5/$$file; \
+	done
+	-$(RMDIR) $(MANDIR)/man5
+	for file in $(MAN7); do \
+		$(RM) $(MANDIR)/man7/$$file; \
+	done
+	-$(RMDIR) $(MANDIR)/man7
+	for file in $(MAN8); do \
+		$(RM) $(AMANDIR)/man$(MAN8DIR)/$$file; \
+	done
+	$(RM) $(AMANDIR)/man$(MAN8DIR)/reject.$(MAN8EXT)
+	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
+	-$(RMDIR) $(AMANDIR)/man$(MAN8DIR)
+
+
+#
 # Make html versions of man pages...
 #
 

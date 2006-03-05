@@ -30,7 +30,8 @@ include Makedefs
 
 DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
 		notifier pdftops scheduler systemv test \
-		$(PHPDIR)
+		$(PHPDIR) \
+		conf data doc fonts ppd templates
 
 
 #
@@ -76,32 +77,20 @@ install:	installhdrs
 		echo Installing in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) install) || exit 1;\
 	done
-	echo Installing in conf...
-	(cd conf; $(MAKE) $(MFLAGS) install)
-	echo Installing in data...
-	(cd data; $(MAKE) $(MFLAGS) install)
-	echo Installing in doc...
-	(cd doc; $(MAKE) $(MFLAGS) install)
-	echo Installing in fonts...
-	(cd fonts; $(MAKE) $(MFLAGS) install)
-	echo Installing in ppd...
-	(cd ppd; $(MAKE) $(MFLAGS) install)
-	echo Installing in templates...
-	(cd templates; $(MAKE) $(MFLAGS) install)
 	echo Installing cups-config script...
-	$(INSTALL_DIR) $(BINDIR)
+	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_SCRIPT) cups-config $(BINDIR)/cups-config
 	echo Installing startup script...
 	if test "x$(INITDIR)" != "x"; then \
-		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/init.d; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/init.d; \
 		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
-		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc0.d; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc0.d; \
 		$(INSTALL_SCRIPT) init/cups.sh  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
-		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc2.d; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc2.d; \
 		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc2.d/S99cups; \
-		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc3.d; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc3.d; \
 		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc3.d/S99cups; \
-		$(INSTALL_DIR) $(BUILDROOT)$(INITDIR)/rc5.d; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc5.d; \
 		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
 	fi
 	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
@@ -109,7 +98,7 @@ install:	installhdrs
 		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
 			$(INSTALL_SCRIPT) init/PrintingServices $(BUILDROOT)$(INITDDIR)/PrintingServices; \
 			$(INSTALL_DATA) init/StartupParameters.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
-			$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
+			$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
 			$(INSTALL_DATA) init/Localizable.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
 		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
 			$(INSTALL_DATA) init/org.cups.cupsd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
@@ -119,7 +108,7 @@ install:	installhdrs
 	fi
 	if test "x$(DBUSDIR)" != "x"; then \
 		echo Installing cups.conf in $(DBUSDIR)...;\
-		$(INSTALL_DIR) $(BUILDROOT)$(DBUSDIR); \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(DBUSDIR); \
 		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/cups.conf; \
 	fi
 
@@ -134,6 +123,51 @@ installsrc:
 installhdrs:
 	(cd cups ; $(MAKE) $(MFLAGS) installhdrs) || exit 1;\
 	(cd filter ; $(MAKE) $(MFLAGS) installhdrs) || exit 1;
+
+
+#
+# Uninstall object and target files...
+#
+
+uninstall:
+	for dir in $(DIRS); do\
+		echo Uninstalling in $$dir... ;\
+		(cd $$dir; $(MAKE) $(MFLAGS) uninstall) || exit 1;\
+	done
+	echo Uninstalling cups-config script...
+	$(RM) $(BINDIR)/cups-config
+	-$(RMDIR) $(BINDIR)
+	echo Uninstalling startup script...
+	if test "x$(INITDIR)" != "x"; then \
+		$(RM) $(BUILDROOT)$(INITDIR)/init.d/cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/init.d; \
+		$(RM)  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc0.d; \
+		$(RM) $(BUILDROOT)$(INITDIR)/rc2.d/S99cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc2.d; \
+		$(RM) $(BUILDROOT)$(INITDIR)/rc3.d/S99cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc3.d; \
+		$(RM) $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc5.d; \
+	fi
+	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
+		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
+			$(RM) $(BUILDROOT)$(INITDDIR)/PrintingServices; \
+			$(RM) $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
+			$(RM) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
+			$(RMDIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
+		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
+			$(RM) $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
+		else \
+			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
+		fi \
+		$(RMDIR) $(BUILDROOT)$(INITDDIR); \
+	fi
+	if test "x$(DBUSDIR)" != "x"; then \
+		echo Uninstalling cups.conf in $(DBUSDIR)...;\
+		$(RM) $(BUILDROOT)$(DBUSDIR)/cups.conf; \
+		$(RMDIR) $(BUILDROOT)$(DBUSDIR); \
+	fi
 
 
 #

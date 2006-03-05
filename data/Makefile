@@ -134,6 +134,13 @@ clean:
 
 
 #
+# Dummy depend...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
@@ -155,6 +162,31 @@ install:	all
 		$(INSTALL_DATA) $$file $(DATADIR)/data; \
 	done
 	$(INSTALL_DIR) -m 755 $(DATADIR)/profiles
+
+
+#
+# Uninstall files...
+#
+
+uninstall:
+	for file in $(BANNERS); do \
+		$(RM) $(DATADIR)/banners/$$file; \
+	done
+	for file in $(CHARMAPS); do \
+		$(RM) $(DATADIR)/charmaps/$$file; \
+	done
+	for file in $(CHARSETS); do \
+		$(RM) $(DATADIR)/charsets/$$file; \
+	done
+	for file in $(DATAFILES); do \
+		$(RM) $(DATADIR)/data/$$file; \
+	done
+	-$(RMDIR) $(DATADIR)/profiles
+	-$(RMDIR) $(DATADIR)/data
+	-$(RMDIR) $(DATADIR)/charsets
+	-$(RMDIR) $(DATADIR)/charmaps
+	-$(RMDIR) $(DATADIR)/banners
+	-$(RMDIR) $(DATADIR)
 
 
 #

@@ -101,6 +101,13 @@ install:	all
 
 
 #
+# Uninstall files...
+#
+
+uninstall:
+
+
+#
 # rfctohtml - make html versions of RFCs...
 #
 

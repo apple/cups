@@ -66,6 +66,18 @@ install:	all
 
 
 #
+# Uninstall files...
+#
+
+uninstall:
+	-for loc in $(LANGUAGES) ; do \
+		$(RM) $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
+		$(RMDIR) $(LOCALEDIR)/$$loc ; \
+	done
+	-$(RMDIR) $(LOCALEDIR)
+
+
+#
 # pot - Creates/updates the cups.pot template file, and merges changes
 #       into existing message catalogs.
 #

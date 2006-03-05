@@ -49,6 +49,13 @@ clean:
 
 
 #
+# Dummy depend...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
@@ -57,6 +64,18 @@ install:	all
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/model; \
 	done
+
+
+#
+# Uninstall files...
+#
+
+uninstall:
+	for file in $(FILES); do \
+		$(RM) $(DATADIR)/model/$$file; \
+	done
+	-$(RMDIR) $(DATADIR)/model
+	-$(RMDIR) $(DATADIR)
 
 
 #

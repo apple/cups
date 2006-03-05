@@ -127,6 +127,16 @@ install:	all
 
 
 #
+# Uninstall the filter...
+#
+
+uninstall:
+	$(RM) $(SERVERBIN)/filter/pdftops
+	-$(RMDIR) $(SERVERBIN)/filter
+	-$(RMDIR) $(SERVERBIN)
+
+
+#
 # pdftops
 #
 

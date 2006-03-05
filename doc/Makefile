@@ -188,6 +188,13 @@ clean:
 
 
 #
+# Dummy depend target...
+#
+
+depend:
+
+
+#
 # Install all documentation files...
 #
 
@@ -215,6 +222,33 @@ install:	all
 			fi; \
 		done \
 	done
+
+
+#
+# Unnstall all documentation files...
+#
+
+uninstall:
+	for file in $(WEBPAGES); do \
+		$(RM) $(DOCDIR)/$$file; \
+	done
+	for file in $(HELPFILES); do \
+		$(INSTALL_MAN) $(DOCDIR)/help/$$file; \
+	done
+	for file in $(WEBIMAGES) $(WEBBUTTONS); do \
+		$(INSTALL_MAN) $(DOCDIR)/images/$$file; \
+	done
+	-for lang in $(LANGUAGES); do \
+		$(RM) $(DOCDIR)/$$lang/index.html; \
+		for file in $(WEBBUTTONS); do \
+			$(RM) $(DOCDIR)/$$lang/images/$$file; \
+		done \
+		$(RMDIR) $(DOCDIR)/$$lang/images; \
+		$(RMDIR) $(DOCDIR)/$$lang; \
+	done
+	-$(RMDIR) $(DOCDIR)/images
+	-$(RMDIR) $(DOCDIR)/help
+	-$(RMDIR) $(DOCDIR)
 
 
 #

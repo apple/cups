@@ -47,6 +47,13 @@ clean:
 
 
 #
+# Dummy depend...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
@@ -77,6 +84,21 @@ install:	all
 		else \
 			$(INSTALL_DATA) $(PAMFILE) $(BUILDROOT)$(PAMDIR)/cups ; \
 		fi ; \
+	fi
+
+
+#
+# Uninstall files...
+#
+
+uninstall:
+	for file in $(KEEP) $(REPLACE) cupsd.conf.default; do \
+		$(RM) $(SERVERROOT)/$$file; \
+	done
+	-$(RMDIR) $(SERVERROOT)
+	-if test x$(PAMDIR) != x; then \
+		$(RM) $(BUILDROOT)$(PAMDIR)/cups; \
+		$(RMDIR) $(BUILDROOT)$(PAMDIR); \
 	fi
 
 
