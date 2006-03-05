@@ -160,7 +160,7 @@ globals_destructor(void *value)		/* I - Data to free */
   if (cg->http)
     httpClose(cg->http);
 
-  _cups_sp_flush(cg);
+  _cupsStrFlush(cg);
   _cupsLangFlush(cg);
   _cupsCharmapFlush(cg);
   _cupsNormalizeMapsFlush(cg);

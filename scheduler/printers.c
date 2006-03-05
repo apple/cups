@@ -454,12 +454,12 @@ cupsdCreateCommonData(void)
       cupsd_banner_t	*banner;	/* Current banner */
 
 
-      attr->values[0].string.text = _cups_sp_alloc("none");
+      attr->values[0].string.text = _cupsStrAlloc("none");
 
       for (i = 1, banner = (cupsd_banner_t *)cupsArrayFirst(Banners);
 	   banner;
 	   i ++, banner = (cupsd_banner_t *)cupsArrayNext(Banners))
-	attr->values[i].string.text = _cups_sp_alloc(banner->name);
+	attr->values[i].string.text = _cupsStrAlloc(banner->name);
     }
   }
   else
@@ -552,7 +552,7 @@ cupsdCreateCommonData(void)
   attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
                        "printer-op-policy-supported", NumPolicies, NULL, NULL);
   for (i = 0; i < NumPolicies; i ++)
-    attr->values[i].string.text = _cups_sp_alloc(Policies[i]->name);
+    attr->values[i].string.text = _cupsStrAlloc(Policies[i]->name);
 }
 
 
@@ -1568,9 +1568,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
     if (attr != NULL)
     {
-      attr->values[0].string.text = _cups_sp_alloc(Classification ?
+      attr->values[0].string.text = _cupsStrAlloc(Classification ?
 	                                   Classification : p->job_sheets[0]);
-      attr->values[1].string.text = _cups_sp_alloc(Classification ?
+      attr->values[1].string.text = _cupsStrAlloc(Classification ?
 	                                   Classification : p->job_sheets[1]);
     }
   }
@@ -1638,7 +1638,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	for (i = 0; i < p->num_printers; i ++)
 	{
           if (attr != NULL)
-            attr->values[i].string.text = _cups_sp_alloc(p->printers[i]->uri);
+            attr->values[i].string.text = _cupsStrAlloc(p->printers[i]->uri);
 
 	  p->type &= ~CUPS_PRINTER_OPTIONS | p->printers[i]->type;
         }
@@ -1649,7 +1649,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	if (attr != NULL)
 	{
 	  for (i = 0; i < p->num_printers; i ++)
-            attr->values[i].string.text = _cups_sp_alloc(p->printers[i]->name);
+            attr->values[i].string.text = _cupsStrAlloc(p->printers[i]->name);
         }
       }
     }
@@ -1767,20 +1767,20 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
 	    if (input_slot != NULL)
 	      for (i = 0; i < input_slot->num_choices; i ++, val ++)
-		val->string.text = _cups_sp_alloc(input_slot->choices[i].choice);
+		val->string.text = _cupsStrAlloc(input_slot->choices[i].choice);
 
 	    if (media_type != NULL)
 	      for (i = 0; i < media_type->num_choices; i ++, val ++)
-		val->string.text = _cups_sp_alloc(media_type->choices[i].choice);
+		val->string.text = _cupsStrAlloc(media_type->choices[i].choice);
 
 	    if (media_quality != NULL)
 	      for (i = 0; i < media_quality->num_choices; i ++, val ++)
-		val->string.text = _cups_sp_alloc(media_quality->choices[i].choice);
+		val->string.text = _cupsStrAlloc(media_quality->choices[i].choice);
 
 	    if (page_size != NULL)
 	    {
 	      for (i = 0; i < page_size->num_choices; i ++, val ++)
-		val->string.text = _cups_sp_alloc(page_size->choices[i].choice);
+		val->string.text = _cupsStrAlloc(page_size->choices[i].choice);
 
 	      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 	                   "media-default", NULL, page_size->defchoice);
@@ -1815,7 +1815,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	    for (i = 0, val = attr->values;
 		 i < output_bin->num_choices;
 		 i ++, val ++)
-	      val->string.text = _cups_sp_alloc(output_bin->choices[i].choice);
+	      val->string.text = _cupsStrAlloc(output_bin->choices[i].choice);
           }
 	}
 
@@ -1920,19 +1920,19 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
         attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 	                     "port-monitor-supported", i, NULL, NULL);
 
-        attr->values[0].string.text = _cups_sp_alloc("none");
+        attr->values[0].string.text = _cupsStrAlloc("none");
 
         for (i = 1, ppdattr = ppdFindAttr(ppd, "cupsPortMonitor", NULL);
 	     ppdattr;
 	     i ++, ppdattr = ppdFindNextAttr(ppd, "cupsPortMonitor", NULL))
-	  attr->values[i].string.text = _cups_sp_alloc(ppdattr->value);
+	  attr->values[i].string.text = _cupsStrAlloc(ppdattr->value);
 
         if (ppd->protocols)
 	{
 	  if (strstr(ppd->protocols, "TBCP"))
-	    attr->values[i].string.text = _cups_sp_alloc("tbcp");
+	    attr->values[i].string.text = _cupsStrAlloc("tbcp");
 	  else if (strstr(ppd->protocols, "BCP"))
-	    attr->values[i].string.text = _cups_sp_alloc("bcp");
+	    attr->values[i].string.text = _cupsStrAlloc("bcp");
 	}
 
        /*
@@ -2949,7 +2949,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_printer_formats: %d types, %d filters",
                   mimeNumTypes(MimeDatabase), mimeNumFilters(MimeDatabase));
 
-  types[0] = _cups_sp_alloc("application/octet-stream");
+  types[0] = _cupsStrAlloc("application/octet-stream");
 
   for (num_types = 1, type = mimeFirstType(MimeDatabase);
        type;
@@ -2968,7 +2968,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
                       p->name, mimetype, cupsArrayCount(filters));
 
       cupsArrayDelete(filters);
-      types[num_types] = _cups_sp_alloc(mimetype);
+      types[num_types] = _cupsStrAlloc(mimetype);
       num_types ++;
     }
     else
@@ -2993,7 +2993,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
   */
 
   for (i = 0; i < num_types; i ++)
-    _cups_sp_free(types[i]);
+    _cupsStrFree(types[i]);
 
   free(types);
 }

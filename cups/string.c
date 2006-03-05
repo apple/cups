@@ -25,10 +25,10 @@
  *
  * Contents:
  *
- *   _cups_sp_alloc()      - Allocate/reference a string.
- *   _cups_sp_flush()      - Flush the string pool...
- *   _cups_sp_free()       - Free/dereference a string.
- *   _cups_sp_statistics() - Return allocation statistics for string pool.
+ *   _cupsStrAlloc()       - Allocate/reference a string.
+ *   _cupsStrFlush()       - Flush the string pool...
+ *   _cupsStrFree()        - Free/dereference a string.
+ *   _cupsStrStatistics()  - Return allocation statistics for string pool.
  *   _cups_strcpy()        - Copy a string allowing for overlapping strings.
  *   _cups_strdup()        - Duplicate a string.
  *   _cups_strcasecmp()    - Do a case-insensitive comparison.
@@ -57,11 +57,11 @@ static int	compare_sp_items(_cups_sp_item_t *a, _cups_sp_item_t *b);
 
 
 /*
- * '_cups_sp_alloc()' - Allocate/reference a string.
+ * '_cupsStrAlloc()' - Allocate/reference a string.
  */
 
 char *					/* O - String pointer */
-_cups_sp_alloc(const char *s)		/* I - String */
+_cupsStrAlloc(const char *s)		/* I - String */
 {
   _cups_globals_t	*cg;		/* Global data */
   _cups_sp_item_t	*item,		/* String pool item */
@@ -132,11 +132,11 @@ _cups_sp_alloc(const char *s)		/* I - String */
 
 
 /*
- * '_cups_sp_flush()' - Flush the string pool...
+ * '_cupsStrFlush()' - Flush the string pool...
  */
 
 void
-_cups_sp_flush(_cups_globals_t *cg)	/* I - Global data */
+_cupsStrFlush(_cups_globals_t *cg)	/* I - Global data */
 {
   _cups_sp_item_t	*item;		/* Current item */
 
@@ -154,11 +154,11 @@ _cups_sp_flush(_cups_globals_t *cg)	/* I - Global data */
 
 
 /*
- * '_cups_sp_free()' - Free/dereference a string.
+ * '_cupsStrFree()' - Free/dereference a string.
  */
 
 void
-_cups_sp_free(const char *s)
+_cupsStrFree(const char *s)		/* I - String to free */
 {
   _cups_globals_t	*cg;		/* Global data */
   _cups_sp_item_t	*item,		/* String pool item */
@@ -211,12 +211,12 @@ _cups_sp_free(const char *s)
 
 
 /*
- * '_cups_sp_statistics()' - Return allocation statistics for string pool.
+ * '_cupsStrStatistics()' - Return allocation statistics for string pool.
  */
 
 size_t					/* O - Number of strings */
-_cups_sp_statistics(size_t *alloc_bytes,/* O - Allocated bytes */
-                    size_t *total_bytes)/* O - Total string bytes */
+_cupsStrStatistics(size_t *alloc_bytes,	/* O - Allocated bytes */
+                   size_t *total_bytes)	/* O - Total string bytes */
 {
   size_t		count,		/* Number of strings */
 			abytes,		/* Allocated string bytes */

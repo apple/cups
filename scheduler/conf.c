@@ -930,7 +930,7 @@ cupsdReadConfiguration(void)
     if (NumMimeTypes)
     {
       for (i = 0; i < NumMimeTypes; i ++)
-	_cups_sp_free(MimeTypes[i]);
+	_cupsStrFree(MimeTypes[i]);
 
       free(MimeTypes);
     }
@@ -972,11 +972,11 @@ cupsdReadConfiguration(void)
     {
       snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
 
-      MimeTypes[i] = _cups_sp_alloc(mimetype);
+      MimeTypes[i] = _cupsStrAlloc(mimetype);
     }
 
     if (i < NumMimeTypes)
-      MimeTypes[i] = _cups_sp_alloc("application/octet-stream");
+      MimeTypes[i] = _cupsStrAlloc("application/octet-stream");
 
     if (LogLevel == CUPSD_LOG_DEBUG2)
     {

@@ -129,9 +129,9 @@ extern int	_cups_vsnprintf(char *, size_t, const char *, va_list);
  * String pool functions...
  */
 
-extern char	*_cups_sp_alloc(const char *s);
-extern void	_cups_sp_free(const char *s);
-extern size_t	_cups_sp_statistics(size_t *alloc_bytes, size_t *total_bytes);
+extern char	*_cupsStrAlloc(const char *s);
+extern void	_cupsStrFree(const char *s);
+extern size_t	_cupsStrStatistics(size_t *alloc_bytes, size_t *total_bytes);
 
 
 /*
