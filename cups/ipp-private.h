@@ -47,8 +47,8 @@ extern "C" {
  * Prototypes for private functions...
  */
 
-extern ipp_attribute_t	*_ipp_add_attr(ipp_t *, int);
-extern void		_ipp_free_attr(ipp_attribute_t *);
+extern ipp_attribute_t	*_ippAddAttr(ipp_t *, int);
+extern void		_ippFreeAttr(ipp_attribute_t *);
 
 
 /*

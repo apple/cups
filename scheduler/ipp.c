@@ -1899,7 +1899,7 @@ add_job_subscriptions(
       * Free and remove this attribute...
       */
 
-      _ipp_free_attr(attr);
+      _ippFreeAttr(attr);
 
       if (prev)
         prev->next = next;
@@ -7056,7 +7056,7 @@ read_ps_job_ticket(cupsd_client_t *con)	/* I - Client connection */
       if (con->request->last == attr2)
         con->request->last = prev2;
 
-      _ipp_free_attr(attr2);
+      _ippFreeAttr(attr2);
     }
 
    /*
@@ -8385,7 +8385,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       if (job->attrs->last == attr2)
         job->attrs->last = job->attrs->prev;
 
-      _ipp_free_attr(attr2);
+      _ippFreeAttr(attr2);
 
      /*
       * Then copy the attribute...
@@ -8424,7 +8424,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
         if (attr2 == job->attrs->last)
 	  job->attrs->last = job->attrs->prev;
 
-        _ipp_free_attr(attr2);
+        _ippFreeAttr(attr2);
       }
     }
     else

@@ -341,7 +341,7 @@ cupsEncodeOptions2(
     * Allocate memory for the attribute values...
     */
 
-    if ((attr = _ipp_add_attr(ipp, count)) == NULL)
+    if ((attr = _ippAddAttr(ipp, count)) == NULL)
     {
      /*
       * Ran out of memory!

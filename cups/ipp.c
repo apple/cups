@@ -57,8 +57,8 @@
  *                            connection.
  *   ippWriteFile()         - Write data for an IPP message to a file.
  *   ippWriteIO()           - Write data for an IPP message.
- *   _ipp_add_attr()        - Add a new attribute to the request.
- *   _ipp_free_attr()       - Free an attribute.
+ *   _ippAddAttr()          - Add a new attribute to the request.
+ *   _ippFreeAttr()         - Free an attribute.
  *   ipp_length()           - Compute the length of an IPP message or
  *                            collection value.
  *   ipp_read_http()        - Semi-blocking read on a HTTP connection...
@@ -111,7 +111,7 @@ ippAddBoolean(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name              = _cups_sp_alloc(name);
@@ -145,7 +145,7 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name      = _cups_sp_alloc(name);
@@ -183,7 +183,7 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name                 = _cups_sp_alloc(name);
@@ -220,7 +220,7 @@ ippAddCollections(
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name      = _cups_sp_alloc(name);
@@ -256,7 +256,7 @@ ippAddDate(ipp_t             *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL || value == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name      = _cups_sp_alloc(name);
@@ -288,7 +288,7 @@ ippAddInteger(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name              = _cups_sp_alloc(name);
@@ -320,7 +320,7 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name      = _cups_sp_alloc(name);
@@ -356,7 +356,7 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
  /*
@@ -402,7 +402,7 @@ ippAddString(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
  /*
@@ -466,7 +466,7 @@ ippAddStrings(
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
  /*
@@ -523,7 +523,7 @@ ippAddRange(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name                  = _cups_sp_alloc(name);
@@ -556,7 +556,7 @@ ippAddRanges(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name      = _cups_sp_alloc(name);
@@ -594,7 +594,7 @@ ippAddResolution(ipp_t      *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
   attr->name                       = _cups_sp_alloc(name);
@@ -629,7 +629,7 @@ ippAddResolutions(ipp_t      *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
   attr->name      = _cups_sp_alloc(name);
@@ -665,7 +665,7 @@ ippAddSeparator(ipp_t *ipp)		/* I - IPP message */
   if (ipp == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 0)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 0)) == NULL)
     return (NULL);
 
   attr->group_tag = IPP_TAG_ZERO;
@@ -743,7 +743,7 @@ ippDelete(ipp_t *ipp)			/* I - IPP message */
   for (attr = ipp->attrs; attr != NULL; attr = next)
   {
     next = attr->next;
-    _ipp_free_attr(attr);
+    _ippFreeAttr(attr);
   }
 
   free(ipp);
@@ -791,7 +791,7 @@ ippDeleteAttribute(
     * Free memory used by the attribute...
     */
 
-    _ipp_free_attr(current);
+    _ippFreeAttr(current);
   }
 }
 
@@ -1254,7 +1254,7 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current)
 	      ipp->prev = ipp->current;
 
-	    attr = ipp->current = _ipp_add_attr(ipp, 1);
+	    attr = ipp->current = _ippAddAttr(ipp, 1);
 
 	    DEBUG_printf(("ippReadIO: membername, ipp->current=%p, ipp->prev=%p\n",
 	                  ipp->current, ipp->prev));
@@ -1280,7 +1280,7 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current)
 	      ipp->prev = ipp->current;
 
-	    attr = ipp->current = _ipp_add_attr(ipp, 1);
+	    attr = ipp->current = _ippAddAttr(ipp, 1);
 
 	    DEBUG_printf(("ippReadIO: name=\'%s\', ipp->current=%p, ipp->prev=%p\n",
 	                  buffer, ipp->current, ipp->prev));
@@ -2400,17 +2400,17 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 
 /*
- * '_ipp_add_attr()' - Add a new attribute to the request.
+ * '_ippAddAttr()' - Add a new attribute to the request.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-_ipp_add_attr(ipp_t *ipp,		/* I - IPP message */
+_ippAddAttr(ipp_t *ipp,		/* I - IPP message */
               int   num_values)		/* I - Number of values */
 {
   ipp_attribute_t	*attr;		/* New attribute */
 
 
-  DEBUG_printf(("_ipp_add_attr(%p, %d)\n", ipp, num_values));
+  DEBUG_printf(("_ippAddAttr(%p, %d)\n", ipp, num_values));
 
   if (ipp == NULL || num_values < 0)
     return (NULL);
@@ -2430,24 +2430,24 @@ _ipp_add_attr(ipp_t *ipp,		/* I - IPP message */
     ipp->last = attr;
   }
 
-  DEBUG_printf(("_ipp_add_attr(): %p\n", attr));
+  DEBUG_printf(("_ippAddAttr(): %p\n", attr));
 
   return (attr);
 }
 
 
 /*
- * '_ipp_free_attr()' - Free an attribute.
+ * '_ippFreeAttr()' - Free an attribute.
  */
 
 void
-_ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
+_ippFreeAttr(ipp_attribute_t *attr)	/* I - Attribute to free */
 {
   int		i;			/* Looping var */
   ipp_value_t	*value;			/* Current value */
 
 
-  DEBUG_printf(("_ipp_free_attr(): %p\n", attr));
+  DEBUG_printf(("_ippFreeAttr(): %p\n", attr));
 
   switch (attr->value_tag)
   {
