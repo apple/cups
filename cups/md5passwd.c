@@ -59,9 +59,9 @@ httpMD5(const char *username,		/* I - User name */
   */
 
   snprintf(line, sizeof(line), "%s:%s:%s", username, realm, passwd);
-  _cups_md5_init(&state);
-  _cups_md5_append(&state, (unsigned char *)line, (int)strlen(line));
-  _cups_md5_finish(&state, sum);
+  _cupsMD5Init(&state);
+  _cupsMD5Append(&state, (unsigned char *)line, (int)strlen(line));
+  _cupsMD5Finish(&state, sum);
 
  /*
   * Return the sum...
@@ -94,9 +94,9 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
   */
 
   snprintf(line, sizeof(line), "%s:%s", method, resource);
-  _cups_md5_init(&state);
-  _cups_md5_append(&state, (unsigned char *)line, (int)strlen(line));
-  _cups_md5_finish(&state, sum);
+  _cupsMD5Init(&state);
+  _cupsMD5Append(&state, (unsigned char *)line, (int)strlen(line));
+  _cupsMD5Finish(&state, sum);
   httpMD5String(sum, a2);
 
  /*
@@ -107,9 +107,9 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
 
   snprintf(line, sizeof(line), "%s:%s:%s", md5, nonce, a2);
 
-  _cups_md5_init(&state);
-  _cups_md5_append(&state, (unsigned char *)line, (int)strlen(line));
-  _cups_md5_finish(&state, sum);
+  _cupsMD5Init(&state);
+  _cupsMD5Append(&state, (unsigned char *)line, (int)strlen(line));
+  _cupsMD5Finish(&state, sum);
 
   return (httpMD5String(sum, md5));
 }

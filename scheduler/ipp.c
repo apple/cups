@@ -1948,9 +1948,9 @@ add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
   snprintf(uuid, sizeof(uuid), "%s:%s:%d:%d", ServerName, con->servername,
 	   con->serverport, job->id);
 
-  _cups_md5_init(&md5state);
-  _cups_md5_append(&md5state, (unsigned char *)uuid, strlen(uuid));
-  _cups_md5_finish(&md5state, md5sum);
+  _cupsMD5Init(&md5state);
+  _cupsMD5Append(&md5state, (unsigned char *)uuid, strlen(uuid));
+  _cupsMD5Finish(&md5state, md5sum);
 
  /*
   * Format the UUID URI using the MD5 sum and job ID.

@@ -60,13 +60,13 @@ extern "C" {
 #  endif /* __cplusplus */
 
 /* Initialize the algorithm. */
-void _cups_md5_init(_cups_md5_state_t *pms);
+void _cupsMD5Init(_cups_md5_state_t *pms);
 
 /* Append a string to the message. */
-void _cups_md5_append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes);
+void _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes);
 
 /* Finish the message and return the digest. */
-void _cups_md5_finish(_cups_md5_state_t *pms, unsigned char digest[16]);
+void _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16]);
 
 #  ifdef __cplusplus
 }  /* end extern "C" */
