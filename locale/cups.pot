@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-02-26 20:42-0500\n"
+"POT-Creation-Date: 2006-03-05 22:39-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,31 +55,32 @@ msgstr ""
 
 #: cups/ppd.c:656 cups/ppd.c:881 cups/ppd.c:1047 cups/ppd.c:662 cups/ppd.c:996
 #: cups/ppd.c:1169 cups/ppd.c:651 cups/ppd.c:983 cups/ppd.c:1148
+#: cups/ppd.c:972 cups/ppd.c:1137
 msgid "General"
 msgstr ""
 
 #: cups/ppd.c:704 cups/ppd.c:1105 cups/ppd.c:710 cups/ppd.c:1224
-#: cups/ppd.c:697 cups/ppd.c:1201
+#: cups/ppd.c:697 cups/ppd.c:1201 cups/ppd.c:1190
 msgid "Media Size"
 msgstr ""
 
 #: cups/ppd.c:706 cups/ppd.c:1107 cups/ppd.c:712 cups/ppd.c:1226
-#: cups/ppd.c:699 cups/ppd.c:1203
+#: cups/ppd.c:699 cups/ppd.c:1203 cups/ppd.c:1192
 msgid "Media Type"
 msgstr ""
 
 #: cups/ppd.c:708 cups/ppd.c:1109 cups/ppd.c:714 cups/ppd.c:1228
-#: cups/ppd.c:701 cups/ppd.c:1205
+#: cups/ppd.c:701 cups/ppd.c:1205 cups/ppd.c:1194
 msgid "Media Source"
 msgstr ""
 
 #: cups/ppd.c:710 cups/ppd.c:1111 cups/ppd.c:716 cups/ppd.c:1230
-#: cups/ppd.c:703 cups/ppd.c:1207
+#: cups/ppd.c:703 cups/ppd.c:1207 cups/ppd.c:1196
 msgid "Output Mode"
 msgstr ""
 
 #: cups/ppd.c:712 cups/ppd.c:1113 cups/ppd.c:718 cups/ppd.c:1232
-#: cups/ppd.c:705 cups/ppd.c:1209
+#: cups/ppd.c:705 cups/ppd.c:1209 cups/ppd.c:1198
 msgid "Resolution"
 msgstr ""
 
@@ -87,11 +88,11 @@ msgstr ""
 msgid "Variable"
 msgstr ""
 
-#: cups/ppd.c:1535 cups/ppd.c:1650 cups/ppd.c:1627
+#: cups/ppd.c:1535 cups/ppd.c:1650 cups/ppd.c:1627 cups/ppd.c:1616
 msgid "Yes"
 msgstr ""
 
-#: cups/ppd.c:1537 cups/ppd.c:1652 cups/ppd.c:1629
+#: cups/ppd.c:1537 cups/ppd.c:1652 cups/ppd.c:1629 cups/ppd.c:1618
 msgid "No"
 msgstr ""
 
@@ -100,12 +101,12 @@ msgid "Auto"
 msgstr ""
 
 #: scheduler/client.c:2247 scheduler/client.c:2251 scheduler/client.c:2274
-#: scheduler/client.c:2308
+#: scheduler/client.c:2308 scheduler/client.c:2349
 msgid "Enter your username and password or the root username and password to access this page."
 msgstr ""
 
 #: scheduler/client.c:2252 scheduler/client.c:2256 scheduler/client.c:2279
-#: scheduler/client.c:2313
+#: scheduler/client.c:2313 scheduler/client.c:2354
 msgid "You must use a https: URL to access this page."
 msgstr ""
 
@@ -703,6 +704,7 @@ msgstr ""
 #: systemv/lpmove.c:84 systemv/accept.c:106 systemv/cancel.c:93
 #: systemv/lpmove.c:89 berkeley/lpq.c:124 systemv/lp.c:136
 #: systemv/lpstat.c:116 berkeley/lpr.c:116 systemv/lp.c:140
+#: systemv/cupsaddsmb.c:98
 #, c-format
 msgid "%s: Sorry, no encryption support compiled in!\n"
 msgstr ""
@@ -2608,7 +2610,7 @@ msgid "Edit Configuration File"
 msgstr ""
 
 #: cgi-bin/admin.c:2135 cgi-bin/admin.c:2147 cgi-bin/admin.c:2179
-#: cgi-bin/admin.c:2191 cgi-bin/printers.c:219
+#: cgi-bin/admin.c:2191 cgi-bin/printers.c:219 cgi-bin/printers.c:224
 msgid "Unable to create temporary file:"
 msgstr ""
 
@@ -2732,15 +2734,17 @@ msgid "Unable to change printer-is-shared attribute:"
 msgstr ""
 
 #: cgi-bin/classes.c:161 cgi-bin/classes.c:208 cgi-bin/classes.c:159
-#: cgi-bin/classes.c:206
+#: cgi-bin/classes.c:206 cgi-bin/classes.c:164 cgi-bin/classes.c:211
 msgid "Classes"
 msgstr ""
 
 #: cgi-bin/classes.c:355 cgi-bin/classes.c:356 cgi-bin/classes.c:354
+#: cgi-bin/classes.c:359
 msgid "Unable to get class list:"
 msgstr ""
 
 #: cgi-bin/classes.c:454 cgi-bin/classes.c:455 cgi-bin/classes.c:453
+#: cgi-bin/classes.c:458
 msgid "Unable to get class status:"
 msgstr ""
 
@@ -2782,15 +2786,18 @@ msgid "Job operation failed:"
 msgstr ""
 
 #: cgi-bin/printers.c:161 cgi-bin/printers.c:208 cgi-bin/printers.c:211
-#: cgi-bin/printers.c:166 cgi-bin/printers.c:335
+#: cgi-bin/printers.c:166 cgi-bin/printers.c:335 cgi-bin/printers.c:171
+#: cgi-bin/printers.c:340
 msgid "Printers"
 msgstr ""
 
 #: cgi-bin/printers.c:362 cgi-bin/printers.c:366 cgi-bin/printers.c:518
+#: cgi-bin/printers.c:523
 msgid "Unable to get printer list:"
 msgstr ""
 
 #: cgi-bin/printers.c:461 cgi-bin/printers.c:468 cgi-bin/printers.c:628
+#: cgi-bin/printers.c:633
 msgid "Unable to get printer status:"
 msgstr ""
 
@@ -2882,11 +2889,11 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: cups/ppd.c:1033 cups/ppd.c:1020
+#: cups/ppd.c:1033 cups/ppd.c:1020 cups/ppd.c:1009
 msgid "Custom"
 msgstr ""
 
-#: cups/ppd.c:1259 cups/ppd.c:1236
+#: cups/ppd.c:1259 cups/ppd.c:1236 cups/ppd.c:1225
 msgid "JCL"
 msgstr ""
 
@@ -2894,17 +2901,17 @@ msgstr ""
 msgid "No authentication information provided!"
 msgstr ""
 
-#: systemv/cupsaddsmb.c:440
+#: systemv/cupsaddsmb.c:440 systemv/cupsaddsmb.c:252
 #, c-format
 msgid "Password for %s required to access %s via SAMBA: "
 msgstr ""
 
-#: systemv/cupsaddsmb.c:451
+#: systemv/cupsaddsmb.c:451 cups/adminutil.c:626
 #, c-format
 msgid "Running command: %s %s -N -U '%s%%%s' -c '%s'\n"
 msgstr ""
 
-#: systemv/cupsaddsmb.c:479
+#: systemv/cupsaddsmb.c:479 cups/adminutil.c:656
 #, c-format
 msgid "cupsaddsmb: Unable to run \"%s\": %s\n"
 msgstr ""
@@ -3251,7 +3258,7 @@ msgstr ""
 msgid "%s: Invalid destination name in list \"%s\"!\n"
 msgstr ""
 
-#: systemv/lpstat.c:571
+#: systemv/lpstat.c:571 systemv/cupsaddsmb.c:156 systemv/cupsaddsmb.c:177
 #, c-format
 msgid "%s: Unable to connect to server\n"
 msgstr ""
@@ -3330,7 +3337,7 @@ msgstr ""
 msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
 msgstr ""
 
-#: scheduler/main.c:2315 scheduler/main.c:2329
+#: scheduler/main.c:2315 scheduler/main.c:2329 scheduler/main.c:2304
 msgid ""
 "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
 "\n"
@@ -3354,15 +3361,16 @@ msgstr ""
 msgid "        WARN    Non-Windows PPD files should use lines ending with only LF, not CR LF!\n"
 msgstr ""
 
-#: cgi-bin/printers.c:218 cgi-bin/printers.c:289
+#: cgi-bin/printers.c:218 cgi-bin/printers.c:289 cgi-bin/printers.c:223
+#: cgi-bin/printers.c:294
 msgid "Printer Maintenance"
 msgstr ""
 
-#: cgi-bin/printers.c:292
+#: cgi-bin/printers.c:292 cgi-bin/printers.c:297
 msgid "Unable to send maintenance job:"
 msgstr ""
 
-#: systemv/cupsaddsmb.c:566
+#: systemv/cupsaddsmb.c:566 systemv/cupsaddsmb.c:233
 #, c-format
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
 msgstr ""
@@ -3400,6 +3408,77 @@ msgstr ""
 #: systemv/cupstestppd.c:1175
 #, c-format
 msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
+msgstr ""
+
+#: cgi-bin/help.c:98 cgi-bin/help.c:139 cgi-bin/help.c:149 cgi-bin/help.c:179
+msgid "Help"
+msgstr ""
+
+#: cups/adminutil.c:233
+#, c-format
+msgid "Missing value on line %d!\n"
+msgstr ""
+
+#: cups/adminutil.c:249
+#, c-format
+msgid "Missing double quote on line %d!\n"
+msgstr ""
+
+#: cups/adminutil.c:266
+#, c-format
+msgid "Bad option + choice on line %d!\n"
+msgstr ""
+
+#: cups/adminutil.c:417
+#, c-format
+msgid "Unable to copy Windows 2000 printer driver files (%d)!\n"
+msgstr ""
+
+#: cups/adminutil.c:445
+#, c-format
+msgid "Unable to copy CUPS printer driver files (%d)!\n"
+msgstr ""
+
+#: cups/adminutil.c:480
+#, c-format
+msgid "Unable to install Windows 2000 printer driver files (%d)!\n"
+msgstr ""
+
+#: cups/adminutil.c:514
+#, c-format
+msgid "Unable to copy Windows 9x printer driver files (%d)!\n"
+msgstr ""
+
+#: cups/adminutil.c:536
+#, c-format
+msgid "Unable to install Windows 9x printer driver files (%d)!\n"
+msgstr ""
+
+#: cups/adminutil.c:547
+msgid "No Windows printer drivers are installed!\n"
+msgstr ""
+
+#: cups/adminutil.c:550
+msgid "Warning, no Windows 2000 printer drivers are installed!\n"
+msgstr ""
+
+#: cups/adminutil.c:568
+#, c-format
+msgid "Unable to set Windows printer driver (%d)!\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:278
+msgid ""
+"Usage: cupsaddsmb [options] printer1 ... printerN\n"
+"       cupsaddsmb [options] -a\n"
+"\n"
+"Options:\n"
+"  -E               Encrypt the connection to the server\n"
+"  -H samba-server  Use the named SAMBA server\n"
+"  -U samba-user    Authenticate using the named SAMBA user\n"
+"  -a               Export all printers\n"
+"  -h cups-server   Use the named CUPS server\n"
+"  -v               Be verbose (show commands)\n"
 msgstr ""
 
 
