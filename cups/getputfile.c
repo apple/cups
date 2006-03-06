@@ -68,6 +68,8 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
   int		bytes;			/* Number of bytes read */
   char		buffer[8192];		/* Buffer for file */
   http_status_t	status;			/* HTTP status from server */
+  char		if_modified_since[HTTP_MAX_VALUE];
+					/* If-Modified-Since header */
 
 
  /*
@@ -89,10 +91,14 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
   * Then send GET requests to the HTTP server...
   */
 
+  strlcpy(if_modified_since, httpGetField(http, HTTP_FIELD_IF_MODIFIED_SINCE),
+          sizeof(if_modified_since));
+
   do
   {
     httpClearFields(http);
     httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
+    httpSetField(http, HTTP_FIELD_IF_MODIFIED_SINCE, if_modified_since);
 
     if (httpGet(http, resource))
     {

@@ -66,6 +66,14 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 			*cups_statedir,	/* CUPS_STATEDIR environment var */
 			*localedir;	/* LOCALDIR environment var */
 
+  /* adminutil.c */
+  time_t		cupsd_update;	/* Last time we got or set cupsd.conf */
+  char			cupsd_hostname[HTTP_MAX_HOST];
+					/* Hostname for connection */
+  int			cupsd_num_settings;
+					/* Number of server settings */
+  cups_option_t		*cupsd_settings;/* Server settings */
+
   /* http.c */
   char			http_date[256];	/* Date+time buffer */
 

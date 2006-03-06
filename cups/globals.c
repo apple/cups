@@ -165,6 +165,8 @@ globals_destructor(void *value)		/* I - Data to free */
   _cupsCharmapFlush(cg);
   _cupsNormalizeMapsFlush(cg);
 
+  cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
+
   free(value);
 }
 

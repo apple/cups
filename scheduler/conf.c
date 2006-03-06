@@ -271,7 +271,7 @@ cupsdReadConfiguration(void)
   * String options...
   */
 
-  cupsdSetString(&ServerName, httpGetHostname(temp, sizeof(temp)));
+  cupsdSetString(&ServerName, httpGetHostname(NULL, temp, sizeof(temp)));
   cupsdSetStringf(&ServerAdmin, "root@%s", temp);
   cupsdSetString(&ServerBin, CUPS_SERVERBIN);
   cupsdSetString(&RequestRoot, CUPS_REQUESTS);

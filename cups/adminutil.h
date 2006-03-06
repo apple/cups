@@ -51,11 +51,11 @@ extern "C" {
  * Constants...
  */
 
+#  define CUPS_SERVER_DEBUG_LOGGING	"_debug_logging"
+#  define CUPS_SERVER_REMOTE_ADMIN	"_remote_admin"
 #  define CUPS_SERVER_REMOTE_PRINTERS	"_remote_printers"
 #  define CUPS_SERVER_SHARE_PRINTERS	"_share_printers"
-#  define CUPS_SERVER_REMOTE_ADMIN	"_remote_admin"
 #  define CUPS_SERVER_USER_CANCEL_ANY	"_user_cancel_any"
-#  define CUPS_SERVER_DEBUG_LOGGING	"_debug_logging"
 
 
 /*

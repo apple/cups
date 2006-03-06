@@ -47,6 +47,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 
 
@@ -55,8 +56,9 @@
  */
 
 static int	do_samba_command(const char *command, const char *address,
-		                 const char *subcommand, const char *username,
-				 const char *password, FILE *logfile);
+		                 const char *subcommand, const char *authfile,
+				 FILE *logfile);
+static void	invalidate_cupsd_cache(_cups_globals_t *cg);
 static void	write_option(cups_file_t *dstfp, int order, const char *name,
 	        	     const char *text, const char *attrname,
 	        	     ipp_attribute_t *suppattr,
@@ -82,6 +84,7 @@ cupsAdminCreateWindowsPPD(
 			*response;	/* IPP response */
   ipp_attribute_t	*suppattr,	/* IPP -supported attribute */
 			*defattr;	/* IPP -default attribute */
+  cups_lang_t		*language;	/* Current language */
   char			line[256],	/* Line from PPD file */
 			junk[256],	/* Extra junk to throw away */
 			*ptr,		/* Pointer into line */
@@ -187,6 +190,7 @@ cupsAdminCreateWindowsPPD(
 
   jcloption = 0;
   linenum   = 0;
+  language  = cupsLangDefault();
 
   while (cupsFileGets(srcfp, line, sizeof(line)))
   {
@@ -230,7 +234,9 @@ cupsAdminCreateWindowsPPD(
     {
       if ((ptr = strchr(line, ':')) == NULL)
       {
-        snprintf(line, sizeof(line), _("Missing value on line %d!\n"), linenum);
+        snprintf(line, sizeof(line),
+	          _cupsLangString(language, _("Missing value on line %d!\n")),
+		  linenum);
         _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
 
         cupsFileClose(srcfp);
@@ -246,7 +252,9 @@ cupsAdminCreateWindowsPPD(
 
       if ((ptr = strchr(ptr, '\"')) == NULL)
       {
-        snprintf(line, sizeof(line), _("Missing double quote on line %d!\n"),
+        snprintf(line, sizeof(line),
+	         _cupsLangString(language,
+		                 _("Missing double quote on line %d!\n")),
 	         linenum);
         _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
 
@@ -263,7 +271,9 @@ cupsAdminCreateWindowsPPD(
 
       if (sscanf(line, "*%40s%*[ \t]%40[^/]", option, choice) != 2)
       {
-        snprintf(line, sizeof(line), _("Bad option + choice on line %d!\n"),
+        snprintf(line, sizeof(line),
+	         _cupsLangString(language,
+		                 _("Bad option + choice on line %d!\n")),
 	         linenum);
         _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
 
@@ -367,11 +377,39 @@ cupsAdminExportSamba(
   int			status;		/* Status of smbclient/rpcclient commands */
   int			have_drivers;	/* Have drivers? */
   char			file[1024],	/* File to test for */
+			authfile[1024],	/* Temporary authentication file */
 			address[1024],	/* Address for command */
-			subcmd[1024];	/* Sub-command */
+			subcmd[1024],	/* Sub-command */
+			message[1024];	/* Error message */
+  cups_file_t		*fp;		/* Authentication file */
+  cups_lang_t		*language;	/* Current language */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
 
+
+ /*
+  * Range check input...
+  */
+
+  if (!dest || !ppd || !samba_server || !samba_user || !samba_password)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    return (0);
+  }
+
+ /*
+  * Create a temporary authentication file for Samba...
+  */
+
+  if ((fp = cupsTempFile2(authfile, sizeof(authfile))) == NULL)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+    return (0);
+  }
+
+  cupsFilePrintf(fp, "username = %s\n", samba_user);
+  cupsFilePrintf(fp, "password = %s\n", samba_password);
+  cupsFileClose(fp);
 
  /*
   * See which drivers are available; the new CUPS v6 and Adobe drivers
@@ -386,6 +424,7 @@ cupsAdminExportSamba(
   */
 
   have_drivers = 0;
+  language     = cupsLangDefault();
 
   snprintf(file, sizeof(file), "%s/drivers/pscript5.dll", cg->cups_datadir);
   if (!access(file, 0))
@@ -410,13 +449,20 @@ cupsAdminExportSamba(
 	     cg->cups_datadir, cg->cups_datadir);
 
     if ((status = do_samba_command("smbclient", address, subcmd,
-                                   samba_user, samba_password, logfile)) != 0)
+                                   authfile, logfile)) != 0)
     {
+      snprintf(message, sizeof(message),
+               _cupsLangString(language,
+	                       _("Unable to copy Windows 2000 printer "
+	                         "driver files (%d)!")), status);
+
+      _cupsSetError(IPP_INTERNAL_ERROR, message);
+
       if (logfile)
-	_cupsLangPrintf(logfile,
-                	_("Unable to copy Windows 2000 printer "
-		          "driver files (%d)!\n"),
-                	status);
+	_cupsLangPrintf(logfile, "%s\n", message);
+
+      unlink(authfile);
+
       return (0);
     }
 
@@ -438,12 +484,20 @@ cupsAdminExportSamba(
 	       cg->cups_datadir, cg->cups_datadir, cg->cups_datadir);
 
       if ((status = do_samba_command("smbclient", address, subcmd,
-                                     samba_user, samba_password, logfile)) != 0)
+                                     authfile, logfile)) != 0)
       {
-        if (logfile)
-	  _cupsLangPrintf(logfile,
-	                  _("Unable to copy CUPS printer driver files (%d)!\n"),
-        		  status);
+	snprintf(message, sizeof(message),
+        	 _cupsLangString(language,
+	                         _("Unable to copy CUPS printer driver "
+				   "files (%d)!")), status);
+
+	_cupsSetError(IPP_INTERNAL_ERROR, message);
+
+	if (logfile)
+	  _cupsLangPrintf(logfile, "%s\n", message);
+
+        unlink(authfile);
+
 	return (0);
       }
       
@@ -473,13 +527,20 @@ cupsAdminExportSamba(
     }
 
     if ((status = do_samba_command("rpcclient", samba_server, subcmd,
-                                   samba_user, samba_password, logfile)) != 0)
+                                   authfile, logfile)) != 0)
     {
+      snprintf(message, sizeof(message),
+               _cupsLangString(language,
+                	       _("Unable to install Windows 2000 printer "
+		        	 "driver files (%d)!")), status);
+
+      _cupsSetError(IPP_INTERNAL_ERROR, message);
+
       if (logfile)
-	_cupsLangPrintf(logfile,
-                	_("Unable to install Windows 2000 printer "
-		          "driver files (%d)!\n"),
-        		status);
+	_cupsLangPrintf(logfile, "%s\n", message);
+
+      unlink(authfile);
+
       return (0);
     }
   }
@@ -507,13 +568,20 @@ cupsAdminExportSamba(
 	     cg->cups_datadir, cg->cups_datadir, cg->cups_datadir);
 
     if ((status = do_samba_command("smbclient", address, subcmd,
-                                   samba_user, samba_password, logfile)) != 0)
+                                   authfile, logfile)) != 0)
     {
+      snprintf(message, sizeof(message),
+               _cupsLangString(language,
+                	       _("Unable to copy Windows 9x printer "
+		        	 "driver files (%d)!")), status);
+
+      _cupsSetError(IPP_INTERNAL_ERROR, message);
+
       if (logfile)
-	_cupsLangPrintf(logfile,
-                	_("Unable to copy Windows 9x printer "
-		          "driver files (%d)!\n"),
-        		status);
+	_cupsLangPrintf(logfile, "%s\n", message);
+
+      unlink(authfile);
+
       return (0);
     }
 
@@ -529,26 +597,40 @@ cupsAdminExportSamba(
 	     dest, dest, dest);
 
     if ((status = do_samba_command("rpcclient", samba_server, subcmd,
-                                   samba_user, samba_password, logfile)) != 0)
+                                   authfile, logfile)) != 0)
     {
+      snprintf(message, sizeof(message),
+               _cupsLangString(language,
+                	       _("Unable to install Windows 9x printer "
+		        	 "driver files (%d)!")), status);
+
+      _cupsSetError(IPP_INTERNAL_ERROR, message);
+
       if (logfile)
-	_cupsLangPrintf(logfile,
-                	_("Unable to install Windows 9x printer "
-		          "driver files (%d)!\n"),
-        		status);
+	_cupsLangPrintf(logfile, "%s\n", message);
+
+      unlink(authfile);
+
       return (0);
     }
   }
 
-  if (logfile)
+  if (logfile && !(have_drivers & 1))
   {
-    if (have_drivers == 0)
-      _cupsLangPuts(logfile,
-                    _("No Windows printer drivers are installed!\n"));
-    else if (have_drivers == 2)
-      _cupsLangPuts(logfile,
-                    _("Warning, no Windows 2000 printer drivers "
-		      "are installed!\n"));
+    if (!have_drivers)
+      strlcpy(message,
+              _cupsLangString(language,
+                	      _("No Windows printer drivers are installed!")),
+              sizeof(message));
+    else
+      strlcpy(message,
+              _cupsLangString(language,
+                	      _("Warning, no Windows 2000 printer drivers "
+				"are installed!")),
+              sizeof(message));
+
+    _cupsSetError(IPP_INTERNAL_ERROR, message);
+    _cupsLangPrintf(logfile, "%s\n", message);
   }
 
   if (have_drivers == 0)
@@ -561,14 +643,24 @@ cupsAdminExportSamba(
   snprintf(subcmd, sizeof(subcmd), "setdriver %s %s", dest, dest);
 
   if ((status = do_samba_command("rpcclient", samba_server, subcmd,
-                                 samba_user, samba_password, logfile)) != 0)
+                                 authfile, logfile)) != 0)
   {
+    snprintf(message, sizeof(message),
+             _cupsLangString(language,
+        		     _("Unable to set Windows printer driver (%d)!\n")),
+        		     status);
+
+    _cupsSetError(IPP_INTERNAL_ERROR, message);
+
     if (logfile)
-      _cupsLangPrintf(logfile,
-                      _("Unable to set Windows printer driver (%d)!\n"),
-        	      status);
+      _cupsLangPrintf(logfile, "%s\n", message);
+
+    unlink(authfile);
+
     return (0);
   }
+
+  unlink(authfile);
 
   return (1);
 }
@@ -584,7 +676,259 @@ _cupsAdminGetServerSettings(
     int           *num_settings,	/* O - Number of settings */
     cups_option_t **settings)		/* O - Settings */
 {
-  return (1);
+  int		fd;			/* Temporary file descriptor */
+  char		cupsdconf[1024],	/* cupsd.conf file */
+		cupsdtemp[1024];	/* Temporary cupsd.conf file */
+  struct stat	cupsdinfo;		/* cupsd.conf file information */
+  http_status_t	status;			/* Status of getting cupsd.conf */
+  cups_file_t	*cupsd;			/* cupsd.conf file */
+  char		line[1024],		/* Line from cupsd.conf file */
+		*value;			/* Value on line */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!http || !num_settings || !settings)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+
+    if (num_settings)
+      *num_settings = 0;
+
+    if (settings)
+      *settings = NULL;
+
+    return (0);
+  }
+
+  *num_settings = 0;
+  *settings     = NULL;
+
+ /*
+  * See if we already have the data we need...
+  */
+
+  httpGetHostname(http, line, sizeof(line));
+
+  if (strcasecmp(cg->cupsd_hostname, line))
+    invalidate_cupsd_cache(cg);
+
+  snprintf(cupsdconf, sizeof(cupsdconf), "%s/cupsd.conf", cg->cups_serverroot);
+  cupsdtemp[0] = '\0';
+
+  if (!strcasecmp(line, "localhost") && !access(cupsdconf, R_OK))
+  {
+   /*
+    * Read the local file rather than using HTTP...
+    */
+
+    if (stat(cupsdconf, &cupsdinfo))
+    {
+      _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+      return (0);
+    }
+    else if (cupsdinfo.st_mtime <= cg->cupsd_update)
+      status = HTTP_NOT_MODIFIED;
+    else
+      status = HTTP_OK;
+  }
+  else
+  {
+   /*
+    * Read cupsd.conf via a HTTP GET request...
+    */
+
+    if ((fd = cupsTempFd(cupsdtemp, sizeof(cupsdtemp))) < 0)
+    {
+      _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+      invalidate_cupsd_cache(cg);
+      return (0);
+    }
+
+    strlcpy(cupsdconf, cupsdtemp, sizeof(cupsdconf));
+
+    status = cupsGetFd(http, "/admin/conf/cupsd.conf", fd);
+
+    close(fd);
+  }
+
+  if (status == HTTP_OK)
+  {
+    if ((cupsd = cupsFileOpen(cupsdconf, "r")) == NULL)
+      _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+  }
+  else
+    cupsd = NULL;
+
+  if (cupsd)
+  {
+   /*
+    * Read the file, keeping track of what settings are enabled...
+    */
+
+    int		remote_access = 0,	/* Remote access allowed? */
+		remote_admin = 0,	/* Remote administration allowed? */
+		browsing = 1,		/* Browsing enabled? */
+		browse_allow = 1,	/* Browse address set? */
+		browse_address = 0,	/* Browse address set? */
+		cancel_policy = 1,	/* Cancel-job policy set? */
+		debug_logging = 0;	/* LogLevel debug set? */
+    int		linenum = 0,		/* Line number in file */
+		in_policy = 0,		/* In a policy section? */
+		in_cancel_job = 0,	/* In a cancel-job section? */
+		in_admin_location = 0;	/* In the /admin location? */
+
+
+    invalidate_cupsd_cache(cg);
+
+    while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
+    {
+      if (!value)
+        continue;
+
+      if (!strcasecmp(line, "Port"))
+      {
+	remote_access = 1;
+      }
+      else if (!strcasecmp(line, "Listen"))
+      {
+	char	*port;			/* Pointer to port number, if any */
+
+
+	if ((port = strrchr(value, ':')) != NULL)
+	  *port = '\0';
+
+	if (strcasecmp(value, "localhost") && strcmp(value, "127.0.0.1"))
+	  remote_access = 1;
+      }
+      else if (!strcasecmp(line, "Browsing"))
+      {
+	browsing = !strcasecmp(value, "yes") || !strcasecmp(value, "on") ||
+	           !strcasecmp(value, "true");
+      }
+      else if (!strcasecmp(line, "BrowseAddress"))
+      {
+	browse_address = 1;
+      }
+      else if (!strcasecmp(line, "BrowseAllow"))
+      {
+	browse_allow = 1;
+      }
+      else if (!strcasecmp(line, "BrowseOrder"))
+      {
+	browse_allow = !strncasecmp(value, "deny,", 5);
+      }
+      else if (!strcasecmp(line, "LogLevel"))
+      {
+	debug_logging = !strncasecmp(value, "debug", 5);
+      }
+      else if (!strcasecmp(line, "<Policy") && !strcasecmp(value, "default"))
+      {
+	in_policy = 1;
+      }
+      else if (!strcasecmp(line, "</Policy>"))
+      {
+	in_policy = 0;
+      }
+      else if (!strcasecmp(line, "<Limit") && in_policy)
+      {
+       /*
+	* See if the policy limit is for the Cancel-Job operation...
+	*/
+
+	char	*valptr;		/* Pointer into value */
+
+
+	while (*value)
+	{
+	  for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+
+	  if (*valptr)
+	    *valptr++ = '\0';
+
+          if (!strcasecmp(value, "cancel-job") || !strcasecmp(value, "all"))
+	  {
+	    in_cancel_job = 1;
+	    break;
+	  }
+
+          for (value = valptr; isspace(*value & 255); value ++);
+	}
+      }
+      else if (!strcasecmp(line, "</Limit>"))
+      {
+	in_cancel_job = 0;
+      }
+      else if (!strcasecmp(line, "Require") && in_cancel_job)
+      {
+	cancel_policy = 0;
+      }
+      else if (!strcasecmp(line, "<Location") && !strcasecmp(value, "/admin"))
+      {
+	in_admin_location = 1;
+      }
+      else if (!strcasecmp(line, "</Location>"))
+      {
+	in_admin_location = 0;
+      }
+      else if (!strcasecmp(line, "Allow") && in_admin_location &&
+               strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1"))
+      {
+	remote_admin = 1;
+      }
+      else if (line[0] != '<')
+        cg->cupsd_num_settings = cupsAddOption(line, value,
+	                                       cg->cupsd_num_settings,
+					       &(cg->cupsd_settings));
+    }
+
+    cupsFileClose(cupsd);
+
+    cg->cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
+                                           (browsing && browse_allow) ?
+					       "1" : "0",
+					   cg->cupsd_num_settings,
+					   &(cg->cupsd_settings));
+
+    cg->cupsd_num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS,
+                                           (remote_access && browsing &&
+					    browse_address) ? "1" : "0",
+					   cg->cupsd_num_settings,
+					   &(cg->cupsd_settings));
+
+    cg->cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ADMIN,
+                                           (remote_access && remote_admin) ?
+					       "1" : "0",
+					   cg->cupsd_num_settings,
+					   &(cg->cupsd_settings));
+
+    cg->cupsd_num_settings = cupsAddOption(CUPS_SERVER_USER_CANCEL_ANY,
+                                           cancel_policy ? "1" : "0",
+					   cg->cupsd_num_settings,
+					   &(cg->cupsd_settings));
+
+    cg->cupsd_num_settings = cupsAddOption(CUPS_SERVER_DEBUG_LOGGING,
+                                           debug_logging ? "1" : "0",
+					   cg->cupsd_num_settings,
+					   &(cg->cupsd_settings));
+  }
+  else if (status != HTTP_NOT_MODIFIED)
+    invalidate_cupsd_cache(cg);
+
+ /*
+  * Remove any temporary files and return the settings array...
+  */
+
+  if (cupsdtemp[0])
+    unlink(cupsdtemp);
+
+  *num_settings = cg->cupsd_num_settings;
+  *settings     = cg->cupsd_settings;
+
+  return (cg->cupsd_num_settings > 0);
 }
 
 
@@ -610,21 +954,17 @@ static int				/* O - Status of command */
 do_samba_command(const char *command,	/* I - Command to run */
                  const char *address,	/* I - Address for command */
                  const char *subcmd,	/* I - Sub-command */
-		 const char *username,	/* I - Samba user */
-		 const char *password,	/* I - Samba password */
+		 const char *authfile,	/* I - Samba authentication file */
 		 FILE *logfile)		/* I - Optional log file */
 {
   int		status;			/* Status of command */
-  char		temp[256];		/* Username+password string */
   int		pid;			/* Process ID of child */
 
 
-  snprintf(temp, sizeof(temp), "%s%%%s", username, password);
-
   if (logfile)
     _cupsLangPrintf(logfile,
-                    _("Running command: %s %s -N -U \'%s%%%s\' -c \'%s\'\n"),
-        	    command, address, username, password, subcmd);
+                    _("Running command: %s %s -N -A %s -c \'%s\'\n"),
+        	    command, address, authfile, subcmd);
 
   if ((pid = fork()) == 0)
   {
@@ -645,7 +985,7 @@ do_samba_command(const char *command,	/* I - Command to run */
     close(2);
     dup(1);
 
-    execlp(command, command, address, "-N", "-U", temp, "-c", subcmd,
+    execlp(command, command, address, "-N", "-A", authfile, "-c", subcmd,
            (char *)0);
     exit(errno);
   }
@@ -670,7 +1010,27 @@ do_samba_command(const char *command,	/* I - Command to run */
 
   DEBUG_printf(("status=%d\n", status));
 
-  return (status);
+  if (WIFEXITED(status))
+    return (WEXITSTATUS(status));
+  else
+    return (-WTERMSIG(status));
+}
+
+
+/*
+ * 'invalidate_cupsd_cache()' - Invalidate the cached cupsd.conf settings.
+ */
+
+static void
+invalidate_cupsd_cache(
+    _cups_globals_t *cg)		/* I - Global data */
+{
+  cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
+
+  cg->cupsd_hostname[0]  = '\0';
+  cg->cupsd_update       = 0;
+  cg->cupsd_num_settings = 0;
+  cg->cupsd_settings     = NULL;
 }
 
 

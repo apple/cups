@@ -490,35 +490,43 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
 
 
 /*
- * 'httpGetHostname()' - Get the FQDN for the local system.
+ * 'httpGetHostname()' - Get the FQDN for the connection or local system.
  *
- * This function uses both gethostname() and gethostbyname() to
- * get the local hostname with domain.
+ * When "http" points to a connected socket, return the hostname or
+ * address that was used in the call to httpConnect() or httpConnectEncrypt().
+ * Otherwise, return the FQDN for the local system using both gethostname()
+ * and gethostbyname() to get the local hostname with domain.
  *
  * @since CUPS 1.2@
  */
 
-const char *				/* O - FQDN for this system */
-httpGetHostname(char *s,		/* I - String buffer for name */
-                int  slen)		/* I - Size of buffer */
+const char *				/* O - FQDN for connection or system */
+httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
+                char   *s,		/* I - String buffer for name */
+                int    slen)		/* I - Size of buffer */
 {
   struct hostent	*host;		/* Host entry to get FQDN */
 
 
- /*
-  * Get the hostname...
-  */
-
-  gethostname(s, slen);
-
-  if (!strchr(s, '.'))
+  if (http)
+    strlcpy(s, http->hostname, slen);
+  else
   {
    /*
-    * The hostname is not a FQDN, so look it up...
+    * Get the hostname...
     */
 
-    if ((host = gethostbyname(s)) != NULL)
-      strlcpy(s, host->h_name, slen);
+    gethostname(s, slen);
+
+    if (!strchr(s, '.'))
+    {
+     /*
+      * The hostname is not a FQDN, so look it up...
+      */
+
+      if ((host = gethostbyname(s)) != NULL)
+	strlcpy(s, host->h_name, slen);
+    }
   }
 
  /*

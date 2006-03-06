@@ -462,7 +462,7 @@ extern int		httpFlushWrite(http_t *http);
 extern int		httpGetBlocking(http_t *http);
 extern const char	*httpGetDateString2(time_t t, char *s, int slen);
 extern int		httpGetFd(http_t *http);
-extern const char	*httpGetHostname(char *s, int slen);
+extern const char	*httpGetHostname(http_t *http, char *s, int slen);
 extern off_t		httpGetLength2(http_t *http);
 extern http_status_t	httpGetStatus(http_t *http);
 extern char		*httpGetSubField2(http_t *http, http_field_t field,

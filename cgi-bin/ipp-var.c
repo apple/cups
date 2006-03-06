@@ -661,7 +661,7 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
     if ((server = getenv("SERVER_NAME")) == NULL)
       server = "";
 
-    httpGetHostname(servername, sizeof(servername));
+    httpGetHostname(NULL, servername, sizeof(servername));
 
    /*
     * Then flag whether we are using SSL on this connection...

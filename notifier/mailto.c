@@ -274,7 +274,8 @@ email_message(const char *to,		/* I - Recipient of message */
 
     fprintf(stderr, "DEBUG: Connected to \"%s\"...\n", mailtoSMTPServer);
 
-    cupsFilePrintf(fp, "HELO %s\r\n", httpGetHostname(hostbuf, sizeof(hostbuf)));
+    cupsFilePrintf(fp, "HELO %s\r\n",
+                   httpGetHostname(NULL, hostbuf, sizeof(hostbuf)));
     fprintf(stderr, "DEBUG: >>> HELO %s\n", hostbuf);
 
     if (!cupsFileGets(fp, response, sizeof(response)) || atoi(response) >= 500)
@@ -413,7 +414,7 @@ load_configuration(void)
     strlcpy(mailtoFrom, server_admin, sizeof(mailtoFrom));
   else
     snprintf(mailtoFrom, sizeof(mailtoFrom), "root@%s",
-             httpGetHostname(line, sizeof(line)));
+             httpGetHostname(NULL, line, sizeof(line)));
 
   strlcpy(mailtoSendmail, "/usr/sbin/sendmail", sizeof(mailtoSendmail));
 

@@ -839,7 +839,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   * Remap local hostname to localhost...
   */
 
-  httpGetHostname(localhost, sizeof(localhost));
+  httpGetHostname(NULL, localhost, sizeof(localhost));
 
   if (!strcasecmp(localhost, hostname))
     strcpy(hostname, "localhost");

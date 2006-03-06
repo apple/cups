@@ -290,7 +290,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fputs("httpGetHostname(): ", stdout);
 
-    if (httpGetHostname(hostname, sizeof(hostname)))
+    if (httpGetHostname(NULL, hostname, sizeof(hostname)))
       printf("PASS (%s)\n", hostname);
     else
     {

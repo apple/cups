@@ -853,7 +853,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       return (CUPS_BACKEND_FAILED);
     }
 
-    httpGetHostname(localhost, sizeof(localhost));
+    httpGetHostname(NULL, localhost, sizeof(localhost));
 
     snprintf(control, sizeof(control),
              "H%.31s\n"		/* RFC 1179, Section 7.2 - host name <= 31 chars */
