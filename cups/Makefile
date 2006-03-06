@@ -31,6 +31,7 @@ include ../Makedefs
 #
 
 LIBOBJS	=	\
+		adminutil.o \
 		array.o \
 		attr.o \
 		auth.o \
@@ -85,6 +86,7 @@ OBJS	=	\
 #
 
 HEADERS	=	\
+		adminutil.h \
 		array.h \
 		cups.h \
 		dir.h \
