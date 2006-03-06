@@ -748,6 +748,12 @@ _cupsAdminGetServerSettings(
       return (0);
     }
 
+    httpClearFields(http);
+
+    if (cg->cupsd_update)
+      httpSetField(http, HTTP_FIELD_IF_MODIFIED_SINCE,
+                   httpGetDateString(cg->cupsd_update));
+
     strlcpy(cupsdconf, cupsdtemp, sizeof(cupsdconf));
 
     status = cupsGetFd(http, "/admin/conf/cupsd.conf", fd);
@@ -783,6 +789,9 @@ _cupsAdminGetServerSettings(
 
 
     invalidate_cupsd_cache(cg);
+
+    cg->cupsd_update = time(NULL);
+    strlcpy(cg->cupsd_hostname, line, sizeof(cg->cupsd_hostname));
 
     while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
     {
