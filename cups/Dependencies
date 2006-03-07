@@ -74,6 +74,8 @@ usersys.o: globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
 usersys.o: normalize.h transcode.h
 util.o: globals.h string.h ../config.h cups.h ipp.h http.h md5.h ppd.h
 util.o: array.h file.h language.h i18n.h normalize.h transcode.h debug.h
+testadmin.o: adminutil.h cups.h ipp.h http.h md5.h ppd.h array.h file.h
+testadmin.o: language.h string.h ../config.h
 testarray.o: ../cups/string.h ../config.h string.h array.h dir.h debug.h
 testfile.o: string.h ../config.h file.h debug.h
 testhttp.o: http.h md5.h string.h ../config.h

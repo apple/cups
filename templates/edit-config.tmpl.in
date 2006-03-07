@@ -81,10 +81,10 @@ function reset_config()
 
 <TEXTAREA NAME="CUPSDCONF" COLS="80" ROWS="25">{CUPSDCONF}</TEXTAREA>
 
-<P><INPUT TYPE="IMAGE" SRC="/images/save-changes.gif"
+<P><INPUT TYPE="IMAGE" SRC="/images/button-save-changes.gif"
 ALT="Save Changes"> <A
 HREF="javascript:reset_config();"><IMG
-SRC="/images/use-default-config.gif" CLASS="button"
+SRC="/images/button-use-default-config.gif" CLASS="button"
 ALT="Use Default Configuration File"></A></P>
 
 </FORM>

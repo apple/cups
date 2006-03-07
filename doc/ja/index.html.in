@@ -65,13 +65,13 @@ BORDER="0" ALT=""></A>
 ボタンをクリックしてください。</P>
 
 <P>
-<A HREF="/help/"><IMG SRC="/images/help.gif" CLASS="button" ALT="Help"></A>
-<A HREF="/admin?OP=add-class"><IMG SRC="/images/add-class.gif" CLASS="button" ALT="クラスの追加"></A>
-<A HREF="/admin?OP=add-printer"><IMG SRC="/images/add-printer.gif" CLASS="button" ALT="プリンタの追加"></A>
-<A HREF="/classes"><IMG SRC="/images/manage-classes.gif" CLASS="button" ALT="クラスの管理"></A>
-<A HREF="/jobs"><IMG SRC="/images/manage-jobs.gif" CLASS="button" ALT="ジョブの管理"></A>
-<A HREF="/printers"><IMG SRC="/images/manage-printers.gif" CLASS="button" ALT="プリンタの管理"></A>
-<A HREF="/admin"><IMG SRC="/images/manage-server.gif" CLASS="button" ALT="サーバの管理"></A>
+<A HREF="/help/"><IMG SRC="/images/button-help.gif" CLASS="button" ALT="Help"></A>
+<A HREF="/admin?OP=add-class"><IMG SRC="/images/button-add-class.gif" CLASS="button" ALT="クラスの追加"></A>
+<A HREF="/admin?OP=add-printer"><IMG SRC="/images/button-add-printer.gif" CLASS="button" ALT="プリンタの追加"></A>
+<A HREF="/classes"><IMG SRC="/images/button-manage-classes.gif" CLASS="button" ALT="クラスの管理"></A>
+<A HREF="/jobs"><IMG SRC="/images/button-manage-jobs.gif" CLASS="button" ALT="ジョブの管理"></A>
+<A HREF="/printers"><IMG SRC="/images/button-manage-printers.gif" CLASS="button" ALT="プリンタの管理"></A>
+<A HREF="/admin"><IMG SRC="/images/button-manage-server.gif" CLASS="button" ALT="サーバの管理"></A>
 </P>
 
 <P><I>ユーザ名とパスワードを尋ねられたら、あなたのユーザ名とパスワード、

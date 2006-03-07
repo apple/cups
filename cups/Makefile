@@ -71,6 +71,7 @@ LIBOBJS	=	\
 		util.o
 OBJS	=	\
 		$(LIBOBJS) \
+		testadmin.o \
 		testarray.o \
 		testfile.o \
 		testhttp.o \
@@ -108,6 +109,7 @@ HEADERS	=	\
 TARGETS	=	\
 		$(LIBCUPS) \
 		libcups.a \
+		testadmin \
 		testarray \
 		testfile \
 		testhttp \
@@ -252,6 +254,9 @@ libcups.a:	$(LIBOBJS)
 #
 # CUPS language bindings for various scripting languages...
 #
+# NOTE: Not currently used or functional - see the scripting/php directory
+#       for the hand-written bindings...
+#
 
 phpcups.so:	$(LIBCUPS) php_cups_wrap.o
 	echo Linking $@...
@@ -268,6 +273,16 @@ php_cups_wrap.o:	php_cups_wrap.c
 php_cups_wrap.c:	cups.h
 	echo Creating $< using SWIG...
 	swig -php -o $@ -module cups cups.h
+
+
+#
+# testadmin (dependency on static CUPS library is intentional)
+#
+
+testadmin:	testadmin.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testadmin.o libcups.a \
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
