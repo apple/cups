@@ -15,8 +15,6 @@ _cupsMessageFree
 _cupsMessageLoad
 _cupsMessageLookup
 _cupsNormalizeMapsFlush
-_cupsRestoreLocale
-_cupsSaveLocale
 _cupsSetError
 _cupsStrAlloc
 _cups_strcpy

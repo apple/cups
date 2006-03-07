@@ -36,6 +36,7 @@
 #  include <stdio.h>
 #  include <stdarg.h>
 #  include <ctype.h>
+#  include <locale.h>
 
 #  ifdef HAVE_STRING_H
 #    include <string.h>
@@ -132,6 +133,16 @@ extern int	_cups_vsnprintf(char *, size_t, const char *, va_list);
 extern char	*_cupsStrAlloc(const char *s);
 extern void	_cupsStrFree(const char *s);
 extern size_t	_cupsStrStatistics(size_t *alloc_bytes, size_t *total_bytes);
+
+
+/*
+ * Floating point number functions...
+ */
+
+extern char	*_cupsStrFormatd(char *buf, char *bufend, double number,
+		                 struct lconv *loc);
+extern double	_cupsStrScand(const char *buf, char **bufptr,
+		              struct lconv *loc);
 
 
 /*

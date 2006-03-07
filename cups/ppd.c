@@ -393,7 +393,6 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 ppd_file_t *				/* O - PPD file record */
 ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 {
-  char			*oldlocale;	/* Old locale settings */
   int			i, j, k;	/* Looping vars */
   int			count;		/* Temporary count */
   ppd_file_t		*ppd;		/* PPD file record */
@@ -420,6 +419,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   ppd_profile_t		*profile;	/* Pointer to color profile */
   char			**filter;	/* Pointer to filter */
   cups_lang_t		*language;	/* Default language */
+  struct lconv		*loc;		/* Locale data */
   int			ui_keyword;	/* Is this line a UI keyword? */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
@@ -554,12 +554,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   */
 
   language = cupsLangDefault();
-
-#ifdef LC_NUMERIC
-  oldlocale = _cupsSaveLocale(LC_NUMERIC, "C");
-#else
-  oldlocale = _cupsSaveLocale(LC_ALL, "C");
-#endif /* LC_NUMERIC */
+  loc      = localeconv();
 
  /*
   * Read lines from the PPD file and add them to the file record...
@@ -772,13 +767,18 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       memset(profile, 0, sizeof(ppd_profile_t));
       strlcpy(profile->resolution, name, sizeof(profile->resolution));
       strlcpy(profile->media_type, text, sizeof(profile->media_type));
-      sscanf(string, "%f%f%f%f%f%f%f%f%f%f%f", &(profile->density),
-	     &(profile->gamma),
-	     profile->matrix[0] + 0, profile->matrix[0] + 1,
-	     profile->matrix[0] + 2, profile->matrix[1] + 0,
-	     profile->matrix[1] + 1, profile->matrix[1] + 2,
-	     profile->matrix[2] + 0, profile->matrix[2] + 1,
-	     profile->matrix[2] + 2);
+
+      profile->density      = _cupsStrScand(string, &sptr, loc);
+      profile->gamma        = _cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[0][0] = _cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[0][1] = _cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[0][2] = _cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[1][0] = _cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[1][1] = _cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[1][2] = _cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[2][0] = _cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[2][1] = _cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[2][2] = _cupsStrScand(sptr, &sptr, loc);
     }
     else if (!strcmp(keyword, "cupsFilter"))
     {
@@ -877,8 +877,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       if (!strcmp(ctype, "curve"))
       {
         cparam->type = PPD_CUSTOM_CURVE;
-	cparam->minimum.custom_curve = atof(cminimum);
-	cparam->maximum.custom_curve = atof(cmaximum);
+	cparam->minimum.custom_curve = _cupsStrScand(cminimum, NULL, loc);
+	cparam->maximum.custom_curve = _cupsStrScand(cmaximum, NULL, loc);
       }
       else if (!strcmp(ctype, "int"))
       {
@@ -889,8 +889,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       else if (!strcmp(ctype, "invcurve"))
       {
         cparam->type = PPD_CUSTOM_INVCURVE;
-	cparam->minimum.custom_invcurve = atof(cminimum);
-	cparam->maximum.custom_invcurve = atof(cmaximum);
+	cparam->minimum.custom_invcurve = _cupsStrScand(cminimum, NULL, loc);
+	cparam->maximum.custom_invcurve = _cupsStrScand(cmaximum, NULL, loc);
       }
       else if (!strcmp(ctype, "passcode"))
       {
@@ -907,14 +907,14 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       else if (!strcmp(ctype, "points"))
       {
         cparam->type = PPD_CUSTOM_POINTS;
-	cparam->minimum.custom_points = atof(cminimum);
-	cparam->maximum.custom_points = atof(cmaximum);
+	cparam->minimum.custom_points = _cupsStrScand(cminimum, NULL, loc);
+	cparam->maximum.custom_points = _cupsStrScand(cmaximum, NULL, loc);
       }
       else if (!strcmp(ctype, "real"))
       {
         cparam->type = PPD_CUSTOM_REAL;
-	cparam->minimum.custom_real = atof(cminimum);
-	cparam->maximum.custom_real = atof(cmaximum);
+	cparam->minimum.custom_real = _cupsStrScand(cminimum, NULL, loc);
+	cparam->maximum.custom_real = _cupsStrScand(cmaximum, NULL, loc);
       }
       else if (!strcmp(ctype, "string"))
       {
@@ -948,9 +948,10 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       }
     }
     else if (!strcmp(keyword, "HWMargins"))
-      sscanf(string, "%f%f%f%f", ppd->custom_margins + 0,
-             ppd->custom_margins + 1, ppd->custom_margins + 2,
-             ppd->custom_margins + 3);
+    {
+      for (i = 0, sptr = string; i < 4; i ++)
+        ppd->custom_margins[i] = _cupsStrScand(sptr, &sptr, loc);
+    }
     else if (!strncmp(keyword, "Custom", 6) && !strcmp(name, "True"))
     {
       ppd_coption_t	*coption;	/* Custom option */
@@ -1344,7 +1345,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     else if (!strcmp(keyword, "OrderDependency") ||
              !strcmp(keyword, "NonUIOrderDependency"))
     {
-      if (sscanf(string, "%f%40s%40s", &order, name, keyword) != 3)
+      order = _cupsStrScand(string, &sptr, loc);
+
+      if (!sptr || sscanf(sptr, "%40s%40s", name, keyword) != 2)
       {
         cg->ppd_status = PPD_BAD_ORDER_DEPENDENCY;
 
@@ -1560,7 +1563,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	goto error;
       }
 
-      sscanf(string, "%f%f", &(size->width), &(size->length));
+      size->width  = _cupsStrScand(string, &sptr, loc);
+      size->length = _cupsStrScand(sptr, NULL, loc);
 
       ppd_free(string);
       string = NULL;
@@ -1581,8 +1585,10 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	goto error;
       }
 
-      sscanf(string, "%f%f%f%f", &(size->left), &(size->bottom),
-	     &(size->right), &(size->top));
+      size->left   = _cupsStrScand(string, &sptr, loc);
+      size->bottom = _cupsStrScand(sptr, &sptr, loc);
+      size->right  = _cupsStrScand(sptr, &sptr, loc);
+      size->top    = _cupsStrScand(sptr, NULL, loc);
 
       ppd_free(string);
       string = NULL;
@@ -1642,12 +1648,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   */
 
   cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-  _cupsRestoreLocale(LC_NUMERIC, oldlocale);
-#else
-  _cupsRestoreLocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
 
 #ifdef DEBUG
   if (!feof(fp))
@@ -1710,12 +1710,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   ppdClose(ppd);
 
   cupsLangFree(language);
-
-#ifdef LC_NUMERIC
-  _cupsRestoreLocale(LC_NUMERIC, oldlocale);
-#else
-  _cupsRestoreLocale(LC_ALL, oldlocale);
-#endif /* LC_NUMERIC */
 
   return (NULL);
 }

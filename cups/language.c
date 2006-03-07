@@ -38,8 +38,6 @@
  *   _cupsMessageFree()     - Free a messages array.
  *   _cupsMessageLoad()     - Load a .po file into a messages array.
  *   _cupsMessageLookup()   - Lookup a message string.
- *   _cupsRestoreLocale()   - Restore the original locale...
- *   _cupsSaveLocale()      - Set the locale and save a copy of the old locale...
  *   appleLangDefault()     - Get the default locale string.
  *   cups_cache_lookup()    - Lookup a language in the cache...
  *   cups_message_compare() - Compare two messages.
@@ -271,15 +269,12 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 			langname[16],	/* Requested language name */
 			country[16],	/* Country code */
 			charset[16],	/* Character set */
-#ifdef CODESET
 			*csptr,		/* Pointer to CODESET string */
-#endif /* CODESET */
 			*ptr,		/* Pointer into language/charset */
 			real[48],	/* Real language name */
 			filename[1024];	/* Filename for language locale file */
   cups_encoding_t	encoding;	/* Encoding to use */
   cups_lang_t		*lang;		/* Current language... */
-  char			*oldlocale;	/* Old locale name */
   _cups_globals_t	*cg = _cupsGlobals();
   					/* Pointer to library globals */
   static const char * const locale_encodings[] =
@@ -328,18 +323,37 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
 #ifdef __APPLE__
  /*
+  * Set the character set to UTF-8...
+  */
+
+  strcpy(charset, "UTF8");
+
+ /*
   * Apple's setlocale doesn't give us the user's localization 
   * preference so we have to look it up this way...
   */
 
-  if (language == NULL)
+  if (!language)
     language = appleLangDefault();
+
 #else
-  if (language == NULL)
+ /*
+  * Set the charset to "unknown"...
+  */
+
+  charset[0] = '\0';
+
+ /*
+  * Use setlocale() to determine the currently set locale, and then
+  * fallback to environment variables to avoid setting the locale,
+  * since setlocale() is not thread-safe!
+  */
+
+  if (!language)
   {
    /*
     * First see if the locale has been set; if it is still "C" or
-    * "POSIX", set the locale to the default...
+    * "POSIX", use the environment to get the default...
     */
 
 #  ifdef LC_MESSAGES
@@ -352,14 +366,46 @@ cupsLangGet(const char *language)	/* I - Language or locale */
                   ptr ? ptr : "(null)"));
 
     if (!ptr || !strcmp(ptr, "C") || !strcmp(ptr, "POSIX"))
-#  ifdef LC_MESSAGES
     {
-      ptr = setlocale(LC_MESSAGES, "");
-      setlocale(LC_CTYPE, "");
+     /*
+      * Get the character set from the LC_CTYPE locale setting...
+      */
+
+      if ((ptr = getenv("LC_CTYPE")) == NULL)
+        if ((ptr = getenv("LC_ALL")) == NULL)
+	  if ((ptr = getenv("LANG")) == NULL)
+	    ptr = "en_US";
+
+      if ((csptr = strchr(ptr, '.')) != NULL)
+      {
+       /*
+        * Extract the character set from the environment...
+	*/
+
+	for (ptr = charset, csptr ++; *csptr; csptr ++)
+	  if (ptr < (charset + sizeof(charset) - 1) && isalnum(*csptr & 255))
+	    *ptr++ = *csptr;
+
+        *ptr = '\0';
+      }
+      else
+      {
+       /*
+        * Default to UTF-8...
+	*/
+
+        strcpy(charset, "UTF8");
+      }
+
+     /*
+      * Get the locale for messages from the LC_MESSAGES locale setting...
+      */
+
+      if ((ptr = getenv("LC_MESSAGES")) == NULL)
+        if ((ptr = getenv("LC_ALL")) == NULL)
+	  if ((ptr = getenv("LANG")) == NULL)
+	    ptr = "en_US";
     }
-#  else
-      ptr = setlocale(LC_ALL, "");
-#  endif /* LC_MESSAGES */
 
     if (ptr)
     {
@@ -380,19 +426,11 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   if (!language)
   {
    /*
-    * Switch to the value of the "LANG" environment variable, and if
-    * that is NULL as well, use "C".
+    * Switch to the POSIX ("C") locale...
     */
 
-    if ((language = getenv("LANG")) == NULL)
-      language = "C";
+    language = "C";
   }
-
- /*
-  * Set the charset to "unknown"...
-  */
-
-  charset[0] = '\0';
 
 #ifdef CODESET
  /*
@@ -400,7 +438,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * this value as the character set...
   */
 
-  if ((csptr = nl_langinfo(CODESET)) != NULL)
+  if (!charset[0] && (csptr = nl_langinfo(CODESET)) != NULL)
   {
    /*
     * Copy all of the letters and numbers in the CODESET string...
@@ -416,22 +454,6 @@ cupsLangGet(const char *language)	/* I - Language or locale */
                   charset));
   }
 #endif /* CODESET */
-
- /*
-  * Set the locale back to POSIX while we do string ops, since
-  * apparently some buggy C libraries break ctype() for non-I18N
-  * chars...
-  */
-
-#if defined(__APPLE__)
-  /* The ctype bug isn't in Apple's libc */
-  (void)locale;			/* anti-compiler-warning-code */
-  (void)oldlocale;		/* anti-compiler-warning-code */
-#elif !defined(LC_CTYPE)
-  oldlocale = _cupsSaveLocale(LC_ALL, "C");
-#else
-  oldlocale = _cupsSaveLocale(LC_CTYPE, "C");
-#endif /* __APPLE__ */
 
  /*
   * Parse the language string passed in to a locale string. "C" is the
@@ -500,18 +522,6 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       charset[0] = '\0';
     }
   }
-
- /*
-  * Restore the locale...
-  */
-
-#if defined(__APPLE__)
-  /* The ctype bug isn't in Apple's libc */
-#elif !defined(LC_CTYPE)
-  _cupsRestoreLocale(LC_ALL, oldlocale);
-#else
-  _cupsRestoreLocale(LC_CTYPE, oldlocale);
-#endif /* __APPLE__ */
 
   DEBUG_printf(("cupsLangGet: langname=\"%s\", country=\"%s\", charset=\"%s\"\n",
                 langname, country, charset));
@@ -897,66 +907,6 @@ _cupsMessageLookup(cups_array_t *a,	/* I - Message array */
     return (match->str);
   else
     return (m);
-}
-
-
-/*
- * '_cupsRestoreLocale()' - Restore the original locale...
- */
-
-void
-_cupsRestoreLocale(int  category,	/* I - Category */
-                   char *oldlocale)	/* I - Old locale or NULL */
-{
-  DEBUG_printf(("_cupsRestoreLocale(category=%d, oldlocale=\"%s\")\n",
-                category, oldlocale));
-
-  if (oldlocale)
-  {
-   /*
-    * Reset the locale and free the locale string...
-    */
-
-    setlocale(category, oldlocale);
-    free(oldlocale);
-  }
-}
-
-
-/*
- * '_cupsSaveLocale()' - Set the locale and save a copy of the old locale...
- */
-
-char *					/* O - Old locale or NULL */
-_cupsSaveLocale(int        category,	/* I - Category */
-                const char *locale)	/* I - New locale or NULL */
-{
-  char	*oldlocale;			/* Old locale */
-
-
-  DEBUG_printf(("_cupsSaveLocale(category=%d, locale=\"%s\")\n",
-                category, locale));
-
- /*
-  * Get the old locale and copy it...
-  */
-
-  if ((oldlocale = setlocale(category, NULL)) != NULL)
-    oldlocale = strdup(oldlocale);
-
-  DEBUG_printf(("    oldlocale=\"%s\"\n", oldlocale ? oldlocale : "(null)"));
-
- /*
-  * Set the new locale...
-  */
-
-  setlocale(category, locale);
-
- /*
-  * Return a copy of the old locale...
-  */
-
-  return (oldlocale);
 }
 
 

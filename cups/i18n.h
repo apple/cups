@@ -60,10 +60,6 @@ typedef struct _cups_message_s		/**** Message catalog entry ****/
  * Prototypes...
  */
 
-/**** New in CUPS 1.1.20 ****/
-extern void		_cupsRestoreLocale(int category, char *oldlocale);
-extern char		*_cupsSaveLocale(int category, const char *locale);
-
 /**** New in CUPS 1.2 ****/
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);
 extern int		_cupsLangPrintf(FILE *fp, const char *message, ...)

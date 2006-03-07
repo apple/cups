@@ -45,28 +45,29 @@
  * 'ppdPageSize()' - Get the page size record for the given size.
  */
 
-ppd_size_t *			/* O - Size record for page or NULL */
-ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
-            const char *name)	/* I - Size name */
+ppd_size_t *				/* O - Size record for page or NULL */
+ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
+            const char *name)		/* I - Size name */
 {
-  int	i;			/* Looping var */
-  float	w, l;			/* Width and length of page */
-  char	units[255];		/* Page size units... */
+  int		i;			/* Looping var */
+  float		w, l;			/* Width and length of page */
+  char		*nameptr;		/* Pointer into name */
+  struct lconv	*loc;			/* Locale data */
 
 
-  if (ppd == NULL)
+  if (!ppd)
     return (NULL);
 
-  if (name != NULL)
+  if (name)
   {
-    if (strncmp(name, "Custom.", 7) == 0 && ppd->variable_sizes)
+    if (!strncmp(name, "Custom.", 7) && ppd->variable_sizes)
     {
      /*
       * Find the custom page size...
       */
 
       for (i = 0; i < ppd->num_sizes; i ++)
-	if (strcmp("Custom", ppd->sizes[i].name) == 0)
+	if (!strcmp("Custom", ppd->sizes[i].name))
           break;
 
       if (i == ppd->num_sizes)
@@ -81,11 +82,16 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
       *    Custom.WIDTHxLENGTH[pt]  - Size in points
       */
 
-      units[0] = '\0';
-      if (sscanf(name + 7, "%fx%f%254s", &w, &l, units) < 2)
+      loc = localeconv();
+      w   = _cupsStrScand(name + 7, &nameptr, loc);
+      if (!nameptr || *nameptr != 'x')
         return (NULL);
 
-      if (strcasecmp(units, "in") == 0)
+      l = _cupsStrScand(nameptr, &nameptr, loc);
+      if (!nameptr)
+        return (NULL);
+
+      if (!strcasecmp(nameptr, "in"))
       {
         ppd->sizes[i].width  = w * 72.0f;
 	ppd->sizes[i].length = l * 72.0f;
@@ -94,7 +100,7 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
 	ppd->sizes[i].right  = w * 72.0f - ppd->custom_margins[2];
 	ppd->sizes[i].top    = l * 72.0f - ppd->custom_margins[3];
       }
-      else if (strcasecmp(units, "cm") == 0)
+      else if (!strcasecmp(nameptr, "cm"))
       {
         ppd->sizes[i].width  = w / 2.54f * 72.0f;
 	ppd->sizes[i].length = l / 2.54f * 72.0f;
@@ -103,7 +109,7 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
 	ppd->sizes[i].right  = w / 2.54f * 72.0f - ppd->custom_margins[2];
 	ppd->sizes[i].top    = l / 2.54f * 72.0f - ppd->custom_margins[3];
       }
-      else if (strcasecmp(units, "mm") == 0)
+      else if (!strcasecmp(nameptr, "mm"))
       {
         ppd->sizes[i].width  = w / 25.4f * 72.0f;
 	ppd->sizes[i].length = l / 25.4f * 72.0f;
@@ -131,7 +137,7 @@ ppdPageSize(ppd_file_t *ppd,	/* I - PPD file record */
       */
 
       for (i = 0; i < ppd->num_sizes; i ++)
-	if (strcmp(name, ppd->sizes[i].name) == 0)
+	if (!strcasecmp(name, ppd->sizes[i].name))
           return (ppd->sizes + i);
     }
   }

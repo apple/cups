@@ -323,6 +323,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   int		i, j;			/* Looping vars */
   ppd_option_t	*o;			/* Option pointer */
   ppd_choice_t	*c;			/* Choice pointer */
+  struct lconv	*loc;			/* Locale data */
 
 
   DEBUG_printf(("ppdMarkOption(ppd=%p, option=\"%s\", choice=\"%s\")\n",
@@ -354,6 +355,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   if ((o = ppdFindOption(ppd, option)) == NULL)
     return (0);
 
+  loc = localeconv();
 
   if (!strncasecmp(choice, "Custom.", 7))
   {
@@ -380,7 +382,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 
       ppd_coption_t	*coption;	/* Custom option */
       ppd_cparam_t	*cparam;	/* Custom parameter */
-      char		units[33];	/* Custom points units */
+      char		*units;		/* Custom points units */
 
       if ((coption = ppdFindCustomOption(ppd, option)) != NULL)
       {
@@ -392,24 +394,27 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	  case PPD_CUSTOM_CURVE :
 	  case PPD_CUSTOM_INVCURVE :
 	  case PPD_CUSTOM_REAL :
-	      cparam->current.custom_real = atof(choice + 7);
+	      cparam->current.custom_real = _cupsStrScand(choice + 7, NULL,
+	                                                  loc);
 	      break;
 
 	  case PPD_CUSTOM_POINTS :
-	      if (sscanf(choice + 7, "%f%s", &(cparam->current.custom_points),
-	                 units) < 2)
-		strcpy(units, "pt");
+	      cparam->current.custom_points = _cupsStrScand(choice + 7,
+	                                                    &units, loc);
 
-              if (!strcasecmp(units, "cm"))
-	        cparam->current.custom_points *= 72.0 / 2.54;	      
-              else if (!strcasecmp(units, "mm"))
-	        cparam->current.custom_points *= 72.0 / 25.4;	      
-              else if (!strcasecmp(units, "m"))
-	        cparam->current.custom_points *= 72.0 / 0.0254;	      
-              else if (!strcasecmp(units, "in"))
-	        cparam->current.custom_points *= 72.0;	      
-              else if (!strcasecmp(units, "ft"))
-	        cparam->current.custom_points *= 12 * 72.0;	      
+              if (units)
+	      {
+        	if (!strcasecmp(units, "cm"))
+	          cparam->current.custom_points *= 72.0 / 2.54;	      
+        	else if (!strcasecmp(units, "mm"))
+	          cparam->current.custom_points *= 72.0 / 25.4;	      
+        	else if (!strcasecmp(units, "m"))
+	          cparam->current.custom_points *= 72.0 / 0.0254;	      
+        	else if (!strcasecmp(units, "in"))
+	          cparam->current.custom_points *= 72.0;	      
+        	else if (!strcasecmp(units, "ft"))
+	          cparam->current.custom_points *= 12 * 72.0;	      
+              }
 	      break;
 
 	  case PPD_CUSTOM_INT :
@@ -436,7 +441,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 
     ppd_coption_t	*coption;	/* Custom option */
     ppd_cparam_t	*cparam;	/* Custom parameter */
-    char		units[33];	/* Custom points units */
+    char		*units;		/* Custom points units */
     int			num_vals;	/* Number of values */
     cups_option_t	*vals,		/* Values */
 			*val;		/* Value */
@@ -459,24 +464,27 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	  case PPD_CUSTOM_CURVE :
 	  case PPD_CUSTOM_INVCURVE :
 	  case PPD_CUSTOM_REAL :
-	      cparam->current.custom_real = atof(val->value);
+	      cparam->current.custom_real = _cupsStrScand(val->value, NULL,
+	                                                  loc);
 	      break;
 
 	  case PPD_CUSTOM_POINTS :
-	      if (sscanf(val->value, "%f%s", &(cparam->current.custom_points),
-	        	 units) < 2)
-		strcpy(units, "pt");
+	      cparam->current.custom_points = _cupsStrScand(val->value, &units,
+	                                                    loc);
 
-              if (!strcasecmp(units, "cm"))
-		cparam->current.custom_points *= 72.0 / 2.54;	      
-              else if (!strcasecmp(units, "mm"))
-		cparam->current.custom_points *= 72.0 / 25.4;	      
-              else if (!strcasecmp(units, "m"))
-		cparam->current.custom_points *= 72.0 / 0.0254;	      
-              else if (!strcasecmp(units, "in"))
-		cparam->current.custom_points *= 72.0;	      
-              else if (!strcasecmp(units, "ft"))
-		cparam->current.custom_points *= 12 * 72.0;	      
+	      if (units)
+	      {
+        	if (!strcasecmp(units, "cm"))
+		  cparam->current.custom_points *= 72.0 / 2.54;	      
+        	else if (!strcasecmp(units, "mm"))
+		  cparam->current.custom_points *= 72.0 / 25.4;	      
+        	else if (!strcasecmp(units, "m"))
+		  cparam->current.custom_points *= 72.0 / 0.0254;	      
+        	else if (!strcasecmp(units, "in"))
+		  cparam->current.custom_points *= 72.0;	      
+        	else if (!strcasecmp(units, "ft"))
+		  cparam->current.custom_points *= 12 * 72.0;	      
+	      }
 	      break;
 
 	  case PPD_CUSTOM_INT :

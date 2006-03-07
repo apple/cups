@@ -381,6 +381,8 @@ extern int		ppdEmitAfterOrder(ppd_file_t *ppd, FILE *fp,
 			                  ppd_section_t section, int limit,
 					  float min_order);
 extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp);
+extern char		*ppdEmitString(ppd_file_t *ppd, ppd_section_t section,
+			               float min_order);
 extern ppd_coption_t	*ppdFindCustomOption(ppd_file_t *ppd,
 			                     const char *keyword);
 extern ppd_cparam_t	*ppdFindCustomParam(ppd_coption_t *opt,
