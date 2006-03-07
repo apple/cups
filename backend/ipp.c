@@ -507,6 +507,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Try connecting to the remote server...
   */
 
+  fputs("STATE: +connecting-to-device\n", stderr);
+
   do
   {
     fprintf(stderr, "INFO: Connecting to %s on port %d...\n", hostname, port);
@@ -563,6 +565,7 @@ main(int  argc,				/* I - Number of command-line args */
   }
   while (http == NULL);
 
+  fputs("STATE: -connecting-to-device\n", stderr);
   fprintf(stderr, "INFO: Connected to %s...\n", hostname);
 
  /*
@@ -1242,8 +1245,8 @@ compress_files(int  num_files,		/* I - Number of files */
     while ((bytes = cupsFileRead(in, buffer, sizeof(buffer))) > 0)
       if (cupsFileWrite(out, buffer, bytes) < bytes)
       {
-        fprintf(stderr, "ERROR: Unable to write %d bytes to \"%s\": %s\n",
-	        bytes, filename, strerror(errno));
+        fprintf(stderr, "ERROR: Unable to write " CUPS_LLFMT " bytes to \"%s\": %s\n",
+	        CUPS_LLCAST bytes, filename, strerror(errno));
         cupsFileClose(in);
         cupsFileClose(out);
 	exit(CUPS_BACKEND_FAILED);

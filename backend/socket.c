@@ -256,6 +256,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   while (copies > 0)
   {
+    fputs("STATE: +connecting-to-device\n", stderr);
+
     for (delay = 5;;)
     {
       if (!httpAddrConnect(addrlist, &fd))
@@ -303,6 +305,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       else
 	break;
     }
+
+    fputs("STATE: -connecting-to-device\n", stderr);
 
    /*
     * Now that we are "connected" to the port, ignore SIGTERM so that we

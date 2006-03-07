@@ -644,6 +644,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     * First try to reserve a port for this connection...
     */
 
+    fputs("STATE: +connecting-to-device\n", stderr);
     fprintf(stderr, "INFO: Attempting to connect to host %s for printer %s\n",
             hostname, printer);
 
@@ -769,12 +770,15 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 #ifdef __APPLE__
         recoverable = 1;
 	fprintf(stderr, "WARNING: recoverable: "
-#else
-	fprintf(stderr, "WARNING: "
-#endif /* __APPLE__ */
 	                "Network host \'%s\' is busy, down, or "
 	                "unreachable; will retry in 30 seconds...\n",
                 hostname);
+#else
+	fprintf(stderr, "WARNING: "
+	                "Network host \'%s\' is busy, down, or "
+	                "unreachable; will retry in 30 seconds...\n",
+                hostname);
+#endif /* __APPLE__ */
 	sleep(30);
       }
       else if (error == EADDRINUSE)
@@ -790,10 +794,11 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 #ifdef __APPLE__
         recoverable = 1;
 	perror("ERROR: recoverable: "
+	       "Unable to connect to printer; will retry in 30 seconds...");
 #else
 	perror("ERROR: "
-#endif /* __APPLE__ */
 	       "Unable to connect to printer; will retry in 30 seconds...");
+#endif /* __APPLE__ */
         sleep(30);
       }
     }
@@ -812,6 +817,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     }
 #endif /* __APPLE__ */
 
+    fputs("STATE: -connecting-to-device\n", stderr);
     fprintf(stderr, "INFO: Connected to %s...\n", hostname);
     fprintf(stderr, "DEBUG: Connected on ports %d (local %d)...\n", port,
             lport);

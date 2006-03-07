@@ -140,6 +140,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Try to open the printer device...
   */
 
+  fputs("STATE: +connecting-to-device\n", stderr);
+
   do
   {
     if ((dev = ieee1394_open(argv[0])) == NULL)
@@ -149,6 +151,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
   }
   while (dev == NULL);
+
+  fputs("STATE: -connecting-to-device\n", stderr);
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we

@@ -223,6 +223,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Open the serial port device...
   */
 
+  fputs("STATE: +connecting-to-device\n", stderr);
+
   do
   {
     if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL | O_NDELAY)) == -1)
@@ -262,6 +264,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     }
   }
   while (fd < 0);
+
+  fputs("STATE: -connecting-to-device\n", stderr);
 
  /*
   * Set any options provided...

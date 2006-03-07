@@ -82,6 +82,8 @@ print_device(const char *uri,		/* I - Device URI */
   * Open the USB port device...
   */
 
+  fputs("STATE: +connecting-to-device\n", stderr);
+
   do
   {
     if ((fd = open_device(uri)) == -1)
@@ -126,6 +128,8 @@ print_device(const char *uri,		/* I - Device URI */
     }
   }
   while (fd < 0);
+
+  fputs("STATE: -connecting-to-device\n", stderr);
 
  /*
   * Set any options provided...

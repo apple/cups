@@ -116,6 +116,8 @@ print_device(const char *resource,	/* I - SCSI device */
   * Open the SCSI device file...
   */
 
+  fputs("STATE: +connecting-to-device\n", stderr);
+
   do
   {
     if ((scsi_fd = open(resource, O_RDWR | O_EXCL)) == -1)
@@ -156,6 +158,8 @@ print_device(const char *resource,	/* I - SCSI device */
     }
   }
   while (scsi_fd == -1);
+
+  fputs("STATE: -connecting-to-device\n", stderr);
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we

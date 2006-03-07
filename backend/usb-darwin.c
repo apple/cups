@@ -674,6 +674,9 @@ int print_device(const char *uri, const char *hostname, const char *resource, co
     USBPrinterInfo	    *activePrinter = NULL;
     USBPrinterClassContext  **classdriver;
     int			    countdown = INITIAL_LOG_INTERVAL;
+
+    fputs("STATE: +connecting-to-device\n", stderr);
+
     do
     {
 	/* */
@@ -746,6 +749,8 @@ int print_device(const char *uri, const char *hostname, const char *resource, co
 	return (status);
     }
     
+    fputs("STATE: -connecting-to-device\n", stderr);
+
     /*
     * Now that we are "connected" to the port, ignore SIGTERM so that we
     * can finish out any page data the driver sends (e.g. to eject the

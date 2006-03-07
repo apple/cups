@@ -264,6 +264,7 @@ cupsdStopSystemMonitor(void)
 void
 cupsdUpdateSystemMonitor(void)
 {
+  int			i;		/* Looping var */
   cupsd_sysevent_t	sysevent;	/* The system event */
   cupsd_printer_t	*p;		/* Printer information */
 
@@ -278,14 +279,25 @@ cupsdUpdateSystemMonitor(void)
     if (sysevent.event & SYSEVENT_CANSLEEP)
     {
      /*
-      * If there are any active printers cancel the sleep request...
+      * If there are active printers that don't have the connecting-to-device
+      * printer-state-reason then cancel the sleep request (i.e. this reason
+      * indicates a job that is not yet connected to the printer)...
       */
 
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
            p;
 	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
+      {
         if (p->job)
-          break;
+        {
+	  for (i = 0; i < p->num_reasons; i ++)
+	    if (!strcmp(p->reasons[i], "connecting-to-device"))
+	      break;
+
+	  if (!p->num_reasons || i >= p->num_reasons)
+	    break;
+        }
+      }
 
       if (p)
       {
