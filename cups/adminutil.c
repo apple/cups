@@ -382,7 +382,7 @@ cupsAdminExportSamba(
     const char *samba_password,		/* I - Samba password */
     FILE       *logfile)		/* I - Log file, if any */
 {
-  int			status;		/* Status of smbclient/rpcclient commands */
+  int			status;		/* Status of Samba commands */
   int			have_drivers;	/* Have drivers? */
   char			file[1024],	/* File to test for */
 			authfile[1024],	/* Temporary authentication file */
@@ -728,7 +728,15 @@ _cupsAdminGetServerSettings(
                                sizeof(cupsdconf), &remote)) == HTTP_OK)
   {
     if ((cupsd = cupsFileOpen(cupsdconf, "r")) == NULL)
-      _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+    {
+      char	message[1024];		/* Message string */
+
+
+      snprintf(message, sizeof(message),
+               _cupsLangString(cupsLangDefault(), _("open of %s failed: %s")),
+               cupsdconf, strerror(errno));
+      _cupsSetError(IPP_INTERNAL_ERROR, message);
+    }
   }
   else
     cupsd = NULL;
@@ -1073,7 +1081,8 @@ _cupsAdminSetServerSettings(
 	}
 	else
 	{
-	  cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
+	  cupsFilePuts(temp, "# Only listen for connections from the local "
+	                     "machine.\n");
 	  cupsFilePrintf(temp, "Listen 127.0.0.1:%d\n", ippPort());
 	}
 
@@ -1096,11 +1105,14 @@ _cupsAdminSetServerSettings(
         if (remote_printers || share_printers)
 	{
 	  if (remote_printers && share_printers)
-	    cupsFilePuts(temp, "# Enable printer sharing and shared printers.\n");
+	    cupsFilePuts(temp,
+	                 "# Enable printer sharing and shared printers.\n");
 	  else if (remote_printers)
-	    cupsFilePuts(temp, "# Show shared printers on the local network.\n");
+	    cupsFilePuts(temp,
+	                 "# Show shared printers on the local network.\n");
 	  else
-	    cupsFilePuts(temp, "# Share local printers on the local network.\n");
+	    cupsFilePuts(temp,
+	                 "# Share local printers on the local network.\n");
 
 	  cupsFilePuts(temp, "Browsing On\n");
 	  cupsFilePuts(temp, "BrowseOrder allow,deny\n");
@@ -1113,7 +1125,8 @@ _cupsAdminSetServerSettings(
         }
 	else
 	{
-	  cupsFilePuts(temp, "# Disable printer sharing and shared printers.\n");
+	  cupsFilePuts(temp,
+	               "# Disable printer sharing and shared printers.\n");
 	  cupsFilePuts(temp, "Browsing Off\n");
 	}
       }
@@ -1124,7 +1137,8 @@ _cupsAdminSetServerSettings(
 
       if (debug_logging)
       {
-        cupsFilePuts(temp, "# Show troubleshooting information in error_log.\n");
+        cupsFilePuts(temp,
+	             "# Show troubleshooting information in error_log.\n");
 	cupsFilePuts(temp, "LogLevel debug\n");
       }
       else
@@ -1149,7 +1163,8 @@ _cupsAdminSetServerSettings(
 	wrote_policy = 1;
 
         if (!user_cancel_any)
-	  cupsFilePuts(temp, "  # Only the owner or an administrator can cancel a job...\n"
+	  cupsFilePuts(temp, "  # Only the owner or an administrator can "
+	                     "cancel a job...\n"
 	                     "  <Limit Cancel-Job>\n"
 	                     "    Order deny,allow\n"
 	                     "    Allow @SYSTEM\n"
@@ -1200,9 +1215,11 @@ _cupsAdminSetServerSettings(
 	wrote_conf_location = 1;
 
 	if (remote_admin)
-          cupsFilePuts(temp, "  # Allow remote access to the configuration files...\n");
+          cupsFilePuts(temp, "  # Allow remote access to the configuration "
+	                     "files...\n");
 	else
-          cupsFilePuts(temp, "  # Restrict access to the configuration files...\n");
+          cupsFilePuts(temp, "  # Restrict access to the configuration "
+	                     "files...\n");
 
         cupsFilePuts(temp, "  Order allow,deny\n");
 
@@ -1216,7 +1233,8 @@ _cupsAdminSetServerSettings(
 	wrote_root_location = 1;
 
 	if (remote_admin && share_printers)
-          cupsFilePuts(temp, "  # Allow shared printing and remote administration...\n");
+          cupsFilePuts(temp, "  # Allow shared printing and remote "
+	                     "administration...\n");
 	else if (remote_admin)
           cupsFilePuts(temp, "  # Allow remote administration...\n");
 	else if (share_printers)
@@ -1295,7 +1313,8 @@ _cupsAdminSetServerSettings(
       wrote_policy = 1;
 
       if (!user_cancel_any)
-	cupsFilePuts(temp, "  # Only the owner or an administrator can cancel a job...\n"
+	cupsFilePuts(temp, "  # Only the owner or an administrator can cancel "
+	                   "a job...\n"
 	                   "  <Limit Cancel-Job>\n"
 	                   "    Order deny,allow\n"
 	                   "    Require user @OWNER @SYSTEM\n"
@@ -1418,7 +1437,8 @@ _cupsAdminSetServerSettings(
     }
     else
     {
-      cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
+      cupsFilePuts(temp,
+                   "# Only listen for connections from the local machine.\n");
       cupsFilePrintf(temp, "Listen 127.0.0.1:%d\n", ippPort());
     }
 
@@ -1431,7 +1451,8 @@ _cupsAdminSetServerSettings(
   if (!wrote_root_location)
   {
     if (remote_admin && share_printers)
-      cupsFilePuts(temp, "# Allow shared printing and remote administration...\n");
+      cupsFilePuts(temp,
+                   "# Allow shared printing and remote administration...\n");
     else if (remote_admin)
       cupsFilePuts(temp, "# Allow remote administration...\n");
     else if (share_printers)
@@ -1471,7 +1492,8 @@ _cupsAdminSetServerSettings(
   if (!wrote_conf_location)
   {
     if (remote_admin)
-      cupsFilePuts(temp, "# Allow remote access to the configuration files...\n");
+      cupsFilePuts(temp,
+                   "# Allow remote access to the configuration files...\n");
     else
       cupsFilePuts(temp, "# Restrict access to the configuration files...\n");
 
@@ -1491,7 +1513,8 @@ _cupsAdminSetServerSettings(
   if (!wrote_policy)
   {
     cupsFilePuts(temp, "<Policy default>\n"
-                       "  # Job-related operations must be done by the owner or an adminstrator...\n"
+                       "  # Job-related operations must be done by the owner "
+		       "or an adminstrator...\n"
                        "  <Limit Send-Document Send-URI Hold-Job Release-Job "
 		       "Restart-Job Purge-Jobs Set-Job-Attributes "
 		       "Create-Job-Subscription Renew-Subscription "
@@ -1501,7 +1524,8 @@ _cupsAdminSetServerSettings(
                        "    Require user @OWNER @SYSTEM\n"
                        "    Order deny,allow\n"
                        "  </Limit>\n"
-                       "  # All administration operations require an adminstrator to authenticate...\n"
+                       "  # All administration operations require an "
+		       "adminstrator to authenticate...\n"
 		       "  <Limit Pause-Printer Resume-Printer "
                        "Set-Printer-Attributes Enable-Printer "
 		       "Disable-Printer Pause-Printer-After-Current-Job "
@@ -1518,7 +1542,8 @@ _cupsAdminSetServerSettings(
                        "</Limit>\n");
 
     if (!user_cancel_any)
-      cupsFilePuts(temp, "  # Only the owner or an administrator can cancel a job...\n"
+      cupsFilePuts(temp, "  # Only the owner or an administrator can cancel "
+                         "a job...\n"
 	                 "  <Limit Cancel-Job>\n"
 	                 "    Require user @OWNER @SYSTEM\n"
 	                 "    Order deny,allow\n"
@@ -1718,9 +1743,15 @@ get_cupsd_conf(
 
     if (stat(name, &info))
     {
-      *name = '\0';
+      char	message[1024];		/* Message string */
 
-      _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+
+      snprintf(message, sizeof(message),
+               _cupsLangString(cupsLangDefault(), _("stat of %s failed: %s")),
+               name, strerror(errno));
+      _cupsSetError(IPP_INTERNAL_ERROR, message);
+
+      *name = '\0';
 
       return (HTTP_SERVER_ERROR);
     }

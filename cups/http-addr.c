@@ -509,7 +509,12 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 
 
   if (http)
-    strlcpy(s, http->hostname, slen);
+  {
+    if (http->hostname[0] == '/')
+      strlcpy(s, "localhost", slen);
+    else
+      strlcpy(s, http->hostname, slen);
+  }
   else
   {
    /*

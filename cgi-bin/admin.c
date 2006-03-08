@@ -337,7 +337,8 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 
       if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
-	if ((attr = ippFindAttribute(response, "member-names", IPP_TAG_NAME)) != NULL)
+	if ((attr = ippFindAttribute(response, "member-names",
+	                             IPP_TAG_NAME)) != NULL)
 	{
 	 /*
           * Mark any current members in the class...
@@ -1143,7 +1144,9 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
   {
     DEBUG_printf(("<LI>%s<UL>\n", group->text));
 
-    for (j = group->num_options, option = group->options; j > 0; j --, option ++)
+    for (j = group->num_options, option = group->options;
+         j > 0;
+	 j --, option ++)
       if ((var = cgiGetVariable(option->keyword)) != NULL)
       {
         DEBUG_printf(("<LI>%s = \"%s\"</LI>\n", option->keyword, var));
@@ -1176,8 +1179,12 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
 
     if (ppdConflicts(ppd))
     {
-      for (i = ppd->num_groups, k = 0, group = ppd->groups; i > 0; i --, group ++)
-	for (j = group->num_options, option = group->options; j > 0; j --, option ++)
+      for (i = ppd->num_groups, k = 0, group = ppd->groups;
+           i > 0;
+	   i --, group ++)
+	for (j = group->num_options, option = group->options;
+	     j > 0;
+	     j --, option ++)
           if (option->conflicted)
 	  {
 	    cgiSetArray("ckeyword", k, option->keyword);
@@ -1544,8 +1551,8 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
 
 
       cgiFormEncode(uri, printer, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "5;/admin/?OP=redirect&URL=/printers/%s",
-               uri);
+      snprintf(refresh, sizeof(refresh),
+               "5;/admin/?OP=redirect&URL=/printers/%s", uri);
       cgiSetVariable("refresh_page", refresh);
 
       cgiStartHTML(title);
@@ -1600,7 +1607,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     if (!_cupsAdminSetServerSettings(http, num_settings, settings))
     {
       cgiStartHTML(cgiText(_("Change Settings")));
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to change server settings:")));
+      cgiSetVariable("MESSAGE",
+                     cgiText(_("Unable to change server settings:")));
       cgiSetVariable("ERROR", cupsLastErrorString());
       cgiCopyTemplateLang("error.tmpl");
     }
@@ -1691,7 +1699,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
     if (status != HTTP_CREATED)
     {
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to upload cupsd.conf file:")));
+      cgiSetVariable("MESSAGE",
+                     cgiText(_("Unable to upload cupsd.conf file:")));
       cgiSetVariable("ERROR", httpStatus(status));
 
       cgiStartHTML(cgiText(_("Edit Configuration File")));
@@ -1734,7 +1743,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     if (stat(filename, &info))
     {
       cgiStartHTML(cgiText(_("Edit Configuration File")));
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to access cupsd.conf file:")));
+      cgiSetVariable("MESSAGE",
+                     cgiText(_("Unable to access cupsd.conf file:")));
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -1746,7 +1756,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     if (info.st_size > (1024 * 1024))
     {
       cgiStartHTML(cgiText(_("Edit Configuration File")));
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to access cupsd.conf file:")));
+      cgiSetVariable("MESSAGE",
+                     cgiText(_("Unable to access cupsd.conf file:")));
       cgiSetVariable("ERROR",
                      cgiText(_("Unable to edit cupsd.conf files larger than "
 		               "1MB!")));
@@ -1769,7 +1780,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       */
 
       cgiStartHTML(cgiText(_("Edit Configuration File")));
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to access cupsd.conf file:")));
+      cgiSetVariable("MESSAGE",
+                     cgiText(_("Unable to access cupsd.conf file:")));
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -2086,11 +2098,9 @@ do_menu(http_t *http)			/* I - HTTP connection */
 
   if (!_cupsAdminGetServerSettings(http, &num_settings, &settings))
   {
-    cgiStartHTML(cgiText(_("Administration")));
-    cgiSetVariable("MESSAGE", cgiText(_("Unable to open cupsd.conf file:")));
-    cgiSetVariable("ERROR", cupsLastErrorString());
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
+    cgiSetVariable("SETTINGS_MESSAGE",
+                   cgiText(_("Unable to open cupsd.conf file:")));
+    cgiSetVariable("SETTINGS_ERROR", cupsLastErrorString());
   }
 
   if ((val = cupsGetOption(CUPS_SERVER_DEBUG_LOGGING, num_settings,
@@ -2112,6 +2122,8 @@ do_menu(http_t *http)			/* I - HTTP connection */
   if ((val = cupsGetOption(CUPS_SERVER_USER_CANCEL_ANY, num_settings,
                            settings)) != NULL && atoi(val))
     cgiSetVariable("USER_CANCEL_ANY", "CHECKED");
+
+  cupsFreeOptions(num_settings, settings);
 
  /*
   * Get the list of printers and their devices...
@@ -2252,7 +2264,8 @@ do_menu(http_t *http)			/* I - HTTP connection */
 	    for (;
 	         options_ptr < (options + sizeof(options) - 1) && *ptr;
 		 ptr ++)
-	      if (isalnum(*ptr & 255) || *ptr == '_' || *ptr == '-' || *ptr == '.')
+	      if (isalnum(*ptr & 255) || *ptr == '_' || *ptr == '-' ||
+	          *ptr == '.')
 	        *options_ptr++ = *ptr;
 	      else if ((*ptr == ' ' || *ptr == '/') && options_ptr[-1] != '_')
 	        *options_ptr++ = '_';
