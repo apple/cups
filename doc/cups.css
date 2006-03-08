@@ -159,7 +159,7 @@ SPAN.info {
   white-space: nowrap;
 }
 
-H3 SPAN.info {
+H2 SPAN.info, H3 SPAN.info {
   float: right;
   font-size: 100%;
 }

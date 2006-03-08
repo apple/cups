@@ -5,77 +5,347 @@
 </HEAD>
 <BODY>
 
-<P>The CUPS scheduler (cupsd) uses the <VAR>/etc/cups/subscriptions.conf</VAR> file 
-to store the list of active subscriptions.  This file contains only locally defined
-classes, but not remote or implicit classes that are created automatically.  
-Each directive is listed on a line by itself followed by its value. 
-Comments are introduced using the number sign ("#") character at the beginning of a line.
+<P>The CUPS scheduler (cupsd) uses the
+<VAR>/etc/cups/subscriptions.conf</VAR> file  to store the list
+of active subscriptions. Each directive is listed on a line by
+itself followed by its value.  Comments are introduced using the
+number sign ("#") character at the beginning of a line.
 
-<P>Since the classes configuration file consists of plain text, you can
-use your favorite text editor to make changes to it.
+<P>While the subscriptions configuration file consists of plain
+text and can be modified using your favorite text editor, you
+should normally use the command-line programs (<A
+HREF="man-lp.html">lp(1)</A> and <A
+HREF="man-lpr.html">lpr(1)</A>) or specific applications via IPP
+requests to manage your subscriptions.</P>
 
-<P>The <VAR>subscription.conf</VAR> file contains many directives that
-determine how the subscriptions behave:</P>
+<H2 CLASS="title"><A NAME="Events">Events</A></H2>
 
-<P ALIGN="CENTER">
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  Events job-completed
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Events</CODE> directive lists the events, separated
+by spaces, that the subscriber is interested in. Table 1 lists
+the supported event names.</P>
+
+<P>The <CODE>Events</CODE> directive must appear inside a <A
+HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
+
+<DIV CLASS="table"><TABLE SUMMARY="Event Names">
+<CAPTION>Table 1: <A NAME="TABLE1">Event Names</A></CAPTION>
+<THEAD>
 <TR>
-<TD VALIGN="TOP">
-
-	<LI><A HREF="#ClassAccepting"><CODE>Accepting</CODE></A>
-	<LI><A HREF="#ClassAllowUser"><CODE>AllowUser</CODE></A>
-	<LI><A HREF="#Class"><CODE>Class</CODE></A>
-	<LI><A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A>
-	<LI><A HREF="#ClassDenyUser"><CODE>DenyUser</CODE></A>
-
-</TD>
-<TD VALIGN="TOP">
-&nbsp;&nbsp;&nbsp;
-</TD>
-<TD VALIGN="TOP">
-
-	<LI><A HREF="#ClassInfo"><CODE>Info</CODE></A>
-	<LI><A HREF="#ClassJobSheets"><CODE>JobSheets</CODE></A>
-	<LI><A HREF="#ClassKLimit"><CODE>KLimit</CODE></A>
-	<LI><A HREF="#ClassLocation"><CODE>Location</CODE></A>
-	<LI><A HREF="#ClassPageLimit"><CODE>PageLimit</CODE></A>
-
-</TD>
-<TD VALIGN="TOP">
-&nbsp;&nbsp;&nbsp;
-</TD>
-<TD VALIGN="TOP">
-
-	<LI><A HREF="#ClassPrinter"><CODE>Printer</CODE></A>
-	<LI><A HREF="#ClassQuotaPeriod"><CODE>QuotaPeriod</CODE></A>
-	<LI><A HREF="#ClassState"><CODE>State</CODE></A>
-	<LI><A HREF="#ClassStateMessage"><CODE>StateMessage</CODE></A>
-
-</TD>
+	<TH>Name</TH>
+	<TH>Description</TH>
 </TR>
-</TABLE>
-</P>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>all</TD>
+	<TD>All events</TD>
+</TR>
+<TR>
+	<TD>job-completed</TD>
+	<TD>Send notification when the job is completed</TD>
+</TR>
+<TR>
+	<TD>job-config-changed</TD>
+	<TD>Send notification when the job is changed</TD>
+</TR>
+<TR>
+	<TD>job-created</TD>
+	<TD>Send notification when a job is created</TD>
+</TR>
+<TR>
+	<TD>job-progress</TD>
+	<TD>Send notification for job progress</TD>
+</TR>
+<TR>
+	<TD>job-state-changed</TD>
+	<TD>Send notification when the job-state changes</TD>
+</TR>
+<TR>
+	<TD>job-stopped</TD>
+	<TD>Send notification when the job is stopped</TD>
+</TR>
+<TR>
+	<TD>printer-added</TD>
+	<TD>Send notification when a printer is added</TD>
+</TR>
+<TR>
+	<TD>printer-changed</TD>
+	<TD>Send notification when a printer is changed</TD>
+</TR>
+<TR>
+	<TD>printer-config-changed</TD>
+	<TD>Send notification when a printer's configuration is changed</TD>
+</TR>
+<TR>
+	<TD>printer-deleted</TD>
+	<TD>Send notification when a printer is deleted</TD>
+</TR>
+<TR>
+	<TD>printer-modified</TD>
+	<TD>Send notification when a printer is modified</TD>
+</TR>
+<TR>
+	<TD>printer-state-changed</TD>
+	<TD>Send notification when the printer-state changes</TD>
+</TR>
+<TR>
+	<TD>printer-stopped</TD>
+	<TD>Send notification when a printer is stopped</TD>
+</TR>
+<TR>
+	<TD>server-audit</TD>
+	<TD>Send notification when a bad request, security error, or
+	authentication error occurs</TD>
+</TR>
+<TR>
+	<TD>server-restarted</TD>
+	<TD>Send notification when the server is restarted</TD>
+</TR>
+<TR>
+	<TD>server-started</TD>
+	<TD>Send notification when the server is initially started</TD>
+</TR>
+<TR>
+	<TD>server-stopped</TD>
+	<TD>Send notification when the server is shutdown</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
 
-<!-- HALF PAGE -->
-<H3><A NAME="ClassAccepting">Accepting</A></H3>
-<HR>
 
-<H4>Examples</H4>
+<H2 CLASS="title"><A NAME="ExpirationTime">ExpirationTime</A></H2>
 
-<UL><PRE>
-Accepting yes
+<H3>Examples</H3>
 
-Accepting no
-</PRE></UL>
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  ExpirationTime 1012563145
+&lt;/Subscription&gt;
+</PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
-<P>The <CODE>Accepting</CODE> directive defines the initial Boolean
-value for the <VAR>printer-is-accepting-job</VAR> attribute which can
-be set by the <CODE>accept</CODE> and <CODE>reject</CODE> commands. 
+<P>The <CODE>ExpirationTime</CODE> directive specifies the
+expiration time of the subscription as a UNIX time value. It is 0
+for subscriptions with no predefined expiration time.</P>
 
-<P>This directive must appear inside a <A HREF="#Class"><CODE>Class</CODE></A> 
-or <A HREF="#DefaultClass"><CODE>DefaultClass</CODE></A> directive.  
+<P>The <CODE>ExpirationTime</CODE> directive must appear inside a
+<A HREF="#Subscription"><CODE>Subscription</CODE></A>
+section.</P>
+
+
+<H2 CLASS="title"><A NAME="Interval">Interval</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  Interval 30
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Interval</CODE> directive specifies the preferred
+time interval for event notifications in seconds.</P>
+
+<P>The <CODE>Interval</CODE> directive must appear inside a <A
+HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
+
+
+<H2 CLASS="title"><A NAME="JobId">JobId</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  JobId 123
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>JobId</CODE> directive specifies the
+<CODE>job-id</CODE> for job subscriptions.</P>
+
+<P>The <CODE>JobId</CODE> directive must appear inside a <A
+HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
+
+
+<H2 CLASS="title"><A NAME="LeaseDuration">LeaseDuration</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  LeaseDuration 
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>LeaseDuration</CODE> directive specifies the number
+of seconds that the subscription is valid. A value of 0 means
+that the subscription will last forever or the life of the print
+job the subscription is attached to.</P>
+
+<P>The <CODE>LeaseDuration</CODE> directive must appear inside a <A
+HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
+
+
+<H2 CLASS="title"><A NAME="NextEventId">NextEventId</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  NextEventId 999
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>NextEventId</CODE> directive specifies the
+<CODE>notify-sequence-number</CODE> value for the next
+notification event. It starts at 1 and increases for every event
+that is delivered for the subscription.</P>
+
+<P>The <CODE>NextEventId</CODE> directive must appear inside a <A
+HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
+
+
+<H2 CLASS="title"><A NAME="NextSubscriptionId">NextSubscriptionId</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+NextSubscriptionId 999
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>NextSubscriptionId</CODE> directive specifies the
+next subscription ID to use. It defaults to 1 more than the
+highest subscription number seen.</P>
+
+
+<H2 CLASS="title"><A NAME="Owner">Owner</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  Owner username
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Owner</CODE> directive specifies the user that owns
+this subscription.</P>
+
+<P>The <CODE>Owner</CODE> directive must appear inside a <A
+HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
+
+
+<H2 CLASS="title"><A NAME="PrinterName">PrinterName</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  PrinterName name
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>PrinterName</CODE> directive specifies the name of
+the printer or class that is associated with this
+subscription.</P>
+
+<P>The <CODE>PrinterName</CODE> directive must appear inside a <A
+HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
+
+
+<H2 CLASS="title"><A NAME="Recipient">Recipient</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  Recipient mailto:foo@domain.com
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Recipient</CODE> directive specifies the
+<CODE>notify-recipient-uri</CODE> value for push-type
+notifications. The URI scheme name determines which notifier
+program is used to send the event(s).</P>
+
+<P>The <CODE>Recipient</CODE> directive must appear inside a <A
+HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
+
+
+<H2 CLASS="title"><A NAME="Subscription">Subscription</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Subscription</CODE> section defines a single
+subscription in the system. Each subscription is assigned a
+unique (to the server) number starting at 1.</P>
+
+
+<H2 CLASS="title"><A NAME="UserData">UserData</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Subscription NNN&gt;
+  ...
+  UserData mailto:bar<40>domain.com
+&lt;/Subscription&gt;
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>UserData</CODE> directive specifies the
+<CODE>notify-user-data</CODE> value, which is normally the "from"
+address used in <CODE>mailto</CODE> notifications. Binary values
+are introduced by encoding the bytes as hexadecimal values inside
+angle brackets, e.g. "<1234>".</P>
+
+<P>The <CODE>UserData</CODE> directive must appear inside a <A
+HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
 
 </BODY>
 </HTML>

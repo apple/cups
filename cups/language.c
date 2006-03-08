@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c 5238 2006-03-07 04:41:42Z mike $"
+ * "$Id: language.c 5243 2006-03-08 02:29:48Z mike $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -265,8 +265,10 @@ cups_lang_t *				/* O - Language data */
 cupsLangGet(const char *language)	/* I - Language or locale */
 {
   int			i;		/* Looping var */
-  char			locale[255],	/* Copy of locale name */
-			langname[16],	/* Requested language name */
+#ifndef __APPLE__
+  char			locale[255];	/* Copy of locale name */
+#endif /* !__APPLE__ */
+  char			langname[16],	/* Requested language name */
 			country[16],	/* Country code */
 			charset[16],	/* Character set */
 			*csptr,		/* Pointer to CODESET string */
@@ -1246,5 +1248,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 5238 2006-03-07 04:41:42Z mike $".
+ * End of "$Id: language.c 5243 2006-03-08 02:29:48Z mike $".
  */

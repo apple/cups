@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-03-05 22:39-0500\n"
+"POT-Creation-Date: 2006-03-09 19:42-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,6 +38,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: cgi-bin/admin.c:1276 cgi-bin/admin.c:1154 cgi-bin/admin.c:1195
+#: cgi-bin/admin.c:1203
 msgid "Options Installed"
 msgstr ""
 
@@ -55,32 +56,38 @@ msgstr ""
 
 #: cups/ppd.c:656 cups/ppd.c:881 cups/ppd.c:1047 cups/ppd.c:662 cups/ppd.c:996
 #: cups/ppd.c:1169 cups/ppd.c:651 cups/ppd.c:983 cups/ppd.c:1148
-#: cups/ppd.c:972 cups/ppd.c:1137
+#: cups/ppd.c:972 cups/ppd.c:1137 cups/ppd.c:646 cups/ppd.c:973
+#: cups/ppd.c:1138
 msgid "General"
 msgstr ""
 
 #: cups/ppd.c:704 cups/ppd.c:1105 cups/ppd.c:710 cups/ppd.c:1224
-#: cups/ppd.c:697 cups/ppd.c:1201 cups/ppd.c:1190
+#: cups/ppd.c:697 cups/ppd.c:1201 cups/ppd.c:1190 cups/ppd.c:692
+#: cups/ppd.c:1191
 msgid "Media Size"
 msgstr ""
 
 #: cups/ppd.c:706 cups/ppd.c:1107 cups/ppd.c:712 cups/ppd.c:1226
-#: cups/ppd.c:699 cups/ppd.c:1203 cups/ppd.c:1192
+#: cups/ppd.c:699 cups/ppd.c:1203 cups/ppd.c:1192 cups/ppd.c:694
+#: cups/ppd.c:1193
 msgid "Media Type"
 msgstr ""
 
 #: cups/ppd.c:708 cups/ppd.c:1109 cups/ppd.c:714 cups/ppd.c:1228
-#: cups/ppd.c:701 cups/ppd.c:1205 cups/ppd.c:1194
+#: cups/ppd.c:701 cups/ppd.c:1205 cups/ppd.c:1194 cups/ppd.c:696
+#: cups/ppd.c:1195
 msgid "Media Source"
 msgstr ""
 
 #: cups/ppd.c:710 cups/ppd.c:1111 cups/ppd.c:716 cups/ppd.c:1230
-#: cups/ppd.c:703 cups/ppd.c:1207 cups/ppd.c:1196
+#: cups/ppd.c:703 cups/ppd.c:1207 cups/ppd.c:1196 cups/ppd.c:698
+#: cups/ppd.c:1197
 msgid "Output Mode"
 msgstr ""
 
 #: cups/ppd.c:712 cups/ppd.c:1113 cups/ppd.c:718 cups/ppd.c:1232
-#: cups/ppd.c:705 cups/ppd.c:1209 cups/ppd.c:1198
+#: cups/ppd.c:705 cups/ppd.c:1209 cups/ppd.c:1198 cups/ppd.c:700
+#: cups/ppd.c:1199
 msgid "Resolution"
 msgstr ""
 
@@ -89,10 +96,12 @@ msgid "Variable"
 msgstr ""
 
 #: cups/ppd.c:1535 cups/ppd.c:1650 cups/ppd.c:1627 cups/ppd.c:1616
+#: cups/ppd.c:1622
 msgid "Yes"
 msgstr ""
 
 #: cups/ppd.c:1537 cups/ppd.c:1652 cups/ppd.c:1629 cups/ppd.c:1618
+#: cups/ppd.c:1624
 msgid "No"
 msgstr ""
 
@@ -2447,88 +2456,89 @@ msgid ""
 "       lppasswd [-g groupname] -x [username]\n"
 msgstr ""
 
-#: cgi-bin/admin.c:125 cgi-bin/admin.c:142
+#: cgi-bin/admin.c:125 cgi-bin/admin.c:142 cgi-bin/admin.c:143
 msgid "Start Printer"
 msgstr ""
 
-#: cgi-bin/admin.c:127 cgi-bin/admin.c:144
+#: cgi-bin/admin.c:127 cgi-bin/admin.c:144 cgi-bin/admin.c:145
 msgid "Stop Printer"
 msgstr ""
 
-#: cgi-bin/admin.c:129 cgi-bin/admin.c:146
+#: cgi-bin/admin.c:129 cgi-bin/admin.c:146 cgi-bin/admin.c:147
 msgid "Start Class"
 msgstr ""
 
-#: cgi-bin/admin.c:131 cgi-bin/admin.c:148
+#: cgi-bin/admin.c:131 cgi-bin/admin.c:148 cgi-bin/admin.c:149
 msgid "Stop Class"
 msgstr ""
 
-#: cgi-bin/admin.c:133 cgi-bin/admin.c:150
+#: cgi-bin/admin.c:133 cgi-bin/admin.c:150 cgi-bin/admin.c:151
 msgid "Accept Jobs"
 msgstr ""
 
-#: cgi-bin/admin.c:135 cgi-bin/admin.c:152
+#: cgi-bin/admin.c:135 cgi-bin/admin.c:152 cgi-bin/admin.c:153
 msgid "Reject Jobs"
 msgstr ""
 
-#: cgi-bin/admin.c:137 cgi-bin/admin.c:154
+#: cgi-bin/admin.c:137 cgi-bin/admin.c:154 cgi-bin/admin.c:155
 msgid "Purge Jobs"
 msgstr ""
 
-#: cgi-bin/admin.c:141 cgi-bin/admin.c:158
+#: cgi-bin/admin.c:141 cgi-bin/admin.c:158 cgi-bin/admin.c:159
 msgid "Set As Default"
 msgstr ""
 
 #: cgi-bin/admin.c:168 cgi-bin/admin.c:179 cgi-bin/admin.c:2690
 #: cgi-bin/admin.c:185 cgi-bin/admin.c:196 cgi-bin/admin.c:2734
+#: cgi-bin/admin.c:186 cgi-bin/admin.c:197 cgi-bin/admin.c:2377
 msgid "Administration"
 msgstr ""
 
-#: cgi-bin/admin.c:224 cgi-bin/admin.c:241
+#: cgi-bin/admin.c:224 cgi-bin/admin.c:241 cgi-bin/admin.c:242
 msgid "Modify Class"
 msgstr ""
 
-#: cgi-bin/admin.c:224 cgi-bin/admin.c:241
+#: cgi-bin/admin.c:224 cgi-bin/admin.c:241 cgi-bin/admin.c:242
 msgid "Add Class"
 msgstr ""
 
-#: cgi-bin/admin.c:385 cgi-bin/admin.c:402
+#: cgi-bin/admin.c:385 cgi-bin/admin.c:402 cgi-bin/admin.c:404
 msgid "The class name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
 
-#: cgi-bin/admin.c:444 cgi-bin/admin.c:462
+#: cgi-bin/admin.c:444 cgi-bin/admin.c:462 cgi-bin/admin.c:464
 msgid "Unable to modify class:"
 msgstr ""
 
-#: cgi-bin/admin.c:445 cgi-bin/admin.c:463
+#: cgi-bin/admin.c:445 cgi-bin/admin.c:463 cgi-bin/admin.c:465
 msgid "Unable to add class:"
 msgstr ""
 
-#: cgi-bin/admin.c:514 cgi-bin/admin.c:532
+#: cgi-bin/admin.c:514 cgi-bin/admin.c:532 cgi-bin/admin.c:534
 msgid "Modify Printer"
 msgstr ""
 
-#: cgi-bin/admin.c:514 cgi-bin/admin.c:532
+#: cgi-bin/admin.c:514 cgi-bin/admin.c:532 cgi-bin/admin.c:534
 msgid "Add Printer"
 msgstr ""
 
-#: cgi-bin/admin.c:583 cgi-bin/admin.c:602
+#: cgi-bin/admin.c:583 cgi-bin/admin.c:602 cgi-bin/admin.c:604
 msgid "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
 
-#: cgi-bin/admin.c:900 cgi-bin/admin.c:930
+#: cgi-bin/admin.c:900 cgi-bin/admin.c:930 cgi-bin/admin.c:932
 msgid "Unable to get list of printer drivers:"
 msgstr ""
 
-#: cgi-bin/admin.c:983 cgi-bin/admin.c:1014
+#: cgi-bin/admin.c:983 cgi-bin/admin.c:1014 cgi-bin/admin.c:1016
 msgid "Unable to modify printer:"
 msgstr ""
 
-#: cgi-bin/admin.c:984 cgi-bin/admin.c:1015
+#: cgi-bin/admin.c:984 cgi-bin/admin.c:1015 cgi-bin/admin.c:1017
 msgid "Unable to add printer:"
 msgstr ""
 
-#: cgi-bin/admin.c:1051 cgi-bin/admin.c:1082
+#: cgi-bin/admin.c:1051 cgi-bin/admin.c:1082 cgi-bin/admin.c:1084
 msgid "Set Printer Options"
 msgstr ""
 
@@ -2536,68 +2546,71 @@ msgstr ""
 #: cgi-bin/admin.c:3112 cgi-bin/admin.c:3213 cgi-bin/admin.c:3449
 #: cgi-bin/admin.c:1095 cgi-bin/admin.c:2374 cgi-bin/admin.c:2435
 #: cgi-bin/admin.c:3156 cgi-bin/admin.c:3258 cgi-bin/admin.c:3496
+#: cgi-bin/admin.c:1097 cgi-bin/admin.c:1846 cgi-bin/admin.c:1907
+#: cgi-bin/admin.c:2405 cgi-bin/admin.c:2507 cgi-bin/admin.c:2745
 msgid "Missing form variable!"
 msgstr ""
 
-#: cgi-bin/admin.c:1076 cgi-bin/admin.c:1113
+#: cgi-bin/admin.c:1076 cgi-bin/admin.c:1113 cgi-bin/admin.c:1115
 msgid "Unable to get PPD file!"
 msgstr ""
 
-#: cgi-bin/admin.c:1084 cgi-bin/admin.c:1123
+#: cgi-bin/admin.c:1084 cgi-bin/admin.c:1123 cgi-bin/admin.c:1125
 msgid "Unable to open PPD file:"
 msgstr ""
 
-#: cgi-bin/admin.c:1241 cgi-bin/admin.c:1282
+#: cgi-bin/admin.c:1241 cgi-bin/admin.c:1282 cgi-bin/admin.c:1290
 msgid "Banners"
 msgstr ""
 
-#: cgi-bin/admin.c:1255 cgi-bin/admin.c:1296
+#: cgi-bin/admin.c:1255 cgi-bin/admin.c:1296 cgi-bin/admin.c:1304
 msgid "Starting Banner"
 msgstr ""
 
-#: cgi-bin/admin.c:1262 cgi-bin/admin.c:1303
+#: cgi-bin/admin.c:1262 cgi-bin/admin.c:1303 cgi-bin/admin.c:1311
 msgid "Ending Banner"
 msgstr ""
 
-#: cgi-bin/admin.c:1280 cgi-bin/admin.c:1321
+#: cgi-bin/admin.c:1280 cgi-bin/admin.c:1321 cgi-bin/admin.c:1329
 msgid "Policies"
 msgstr ""
 
-#: cgi-bin/admin.c:1304 cgi-bin/admin.c:1345
+#: cgi-bin/admin.c:1304 cgi-bin/admin.c:1345 cgi-bin/admin.c:1353
 msgid "Error Policy"
 msgstr ""
 
-#: cgi-bin/admin.c:1331 cgi-bin/admin.c:1372
+#: cgi-bin/admin.c:1331 cgi-bin/admin.c:1372 cgi-bin/admin.c:1380
 msgid "Operation Policy"
 msgstr ""
 
 #: cgi-bin/admin.c:1352 cgi-bin/admin.c:1372 cgi-bin/admin.c:1393
-#: cgi-bin/admin.c:1413
+#: cgi-bin/admin.c:1413 cgi-bin/admin.c:1401 cgi-bin/admin.c:1421
 msgid "PS Binary Protocol"
 msgstr ""
 
-#: cgi-bin/admin.c:1358 cgi-bin/admin.c:1399
+#: cgi-bin/admin.c:1358 cgi-bin/admin.c:1399 cgi-bin/admin.c:1407
 msgid "None"
 msgstr ""
 
-#: cgi-bin/admin.c:1490 cgi-bin/admin.c:1534
+#: cgi-bin/admin.c:1490 cgi-bin/admin.c:1534 cgi-bin/admin.c:1542
 msgid "Unable to set options:"
 msgstr ""
 
 #: cgi-bin/admin.c:1591 cgi-bin/admin.c:1607 cgi-bin/admin.c:1620
 #: cgi-bin/admin.c:2099 cgi-bin/admin.c:2106 cgi-bin/admin.c:1635
 #: cgi-bin/admin.c:1651 cgi-bin/admin.c:1664 cgi-bin/admin.c:2143
-#: cgi-bin/admin.c:2150
+#: cgi-bin/admin.c:2150 cgi-bin/admin.c:1609 cgi-bin/admin.c:1618
 msgid "Change Settings"
 msgstr ""
 
 #: cgi-bin/admin.c:1592 cgi-bin/admin.c:1608 cgi-bin/admin.c:1621
 #: cgi-bin/admin.c:1636 cgi-bin/admin.c:1652 cgi-bin/admin.c:1665
+#: cgi-bin/admin.c:1611
 msgid "Unable to change server settings:"
 msgstr ""
 
 #: cgi-bin/admin.c:2097 cgi-bin/admin.c:2190 cgi-bin/admin.c:2141
-#: cgi-bin/admin.c:2234
+#: cgi-bin/admin.c:2234 cgi-bin/admin.c:1703
 msgid "Unable to upload cupsd.conf file:"
 msgstr ""
 
@@ -2605,41 +2618,46 @@ msgstr ""
 #: cgi-bin/admin.c:2200 cgi-bin/admin.c:2232 cgi-bin/admin.c:2244
 #: cgi-bin/admin.c:2267 cgi-bin/admin.c:2178 cgi-bin/admin.c:2190
 #: cgi-bin/admin.c:2237 cgi-bin/admin.c:2276 cgi-bin/admin.c:2288
-#: cgi-bin/admin.c:2311
+#: cgi-bin/admin.c:2311 cgi-bin/admin.c:1646 cgi-bin/admin.c:1658
+#: cgi-bin/admin.c:1706 cgi-bin/admin.c:1713 cgi-bin/admin.c:1745
+#: cgi-bin/admin.c:1758 cgi-bin/admin.c:1782
 msgid "Edit Configuration File"
 msgstr ""
 
 #: cgi-bin/admin.c:2135 cgi-bin/admin.c:2147 cgi-bin/admin.c:2179
 #: cgi-bin/admin.c:2191 cgi-bin/printers.c:219 cgi-bin/printers.c:224
+#: cgi-bin/admin.c:1647 cgi-bin/admin.c:1659
 msgid "Unable to create temporary file:"
 msgstr ""
 
 #: cgi-bin/admin.c:2233 cgi-bin/admin.c:2245 cgi-bin/admin.c:2268
 #: cgi-bin/admin.c:2277 cgi-bin/admin.c:2289 cgi-bin/admin.c:2312
+#: cgi-bin/admin.c:1747 cgi-bin/admin.c:1760 cgi-bin/admin.c:1784
 msgid "Unable to access cupsd.conf file:"
 msgstr ""
 
-#: cgi-bin/admin.c:2247 cgi-bin/admin.c:2291
+#: cgi-bin/admin.c:2247 cgi-bin/admin.c:2291 cgi-bin/admin.c:1762
 msgid "Unable to edit cupsd.conf files larger than 1MB!"
 msgstr ""
 
-#: cgi-bin/admin.c:2316 cgi-bin/admin.c:2360
+#: cgi-bin/admin.c:2316 cgi-bin/admin.c:2360 cgi-bin/admin.c:1832
 msgid "Delete Class"
 msgstr ""
 
-#: cgi-bin/admin.c:2357 cgi-bin/admin.c:2401
+#: cgi-bin/admin.c:2357 cgi-bin/admin.c:2401 cgi-bin/admin.c:1873
 msgid "Unable to delete class:"
 msgstr ""
 
-#: cgi-bin/admin.c:2377 cgi-bin/admin.c:2421
+#: cgi-bin/admin.c:2377 cgi-bin/admin.c:2421 cgi-bin/admin.c:1893
 msgid "Delete Printer"
 msgstr ""
 
-#: cgi-bin/admin.c:2418 cgi-bin/admin.c:2462
+#: cgi-bin/admin.c:2418 cgi-bin/admin.c:2462 cgi-bin/admin.c:1934
 msgid "Unable to delete printer:"
 msgstr ""
 
-#: cgi-bin/admin.c:2447 cgi-bin/admin.c:2491
+#: cgi-bin/admin.c:2447 cgi-bin/admin.c:2491 cgi-bin/admin.c:2053
+#: cgi-bin/admin.c:2072
 msgid "Export Printers to Samba"
 msgstr ""
 
@@ -2697,39 +2715,41 @@ msgstr ""
 msgid "cupsaddsmb crashed on signal %d"
 msgstr ""
 
-#: cgi-bin/admin.c:2608 cgi-bin/admin.c:2652
+#: cgi-bin/admin.c:2608 cgi-bin/admin.c:2652 cgi-bin/admin.c:2061
 msgid "A Samba username is required to export printer drivers!"
 msgstr ""
 
-#: cgi-bin/admin.c:2612 cgi-bin/admin.c:2656
+#: cgi-bin/admin.c:2612 cgi-bin/admin.c:2656 cgi-bin/admin.c:2065
 msgid "A Samba password is required to export printer drivers!"
 msgstr ""
 
-#: cgi-bin/admin.c:2704 cgi-bin/admin.c:2748
+#: cgi-bin/admin.c:2704 cgi-bin/admin.c:2748 cgi-bin/admin.c:2102
 msgid "Unable to open cupsd.conf file:"
 msgstr ""
 
 #: cgi-bin/admin.c:3144 cgi-bin/admin.c:3400 cgi-bin/admin.c:3189
-#: cgi-bin/admin.c:3447
+#: cgi-bin/admin.c:3447 cgi-bin/admin.c:2438 cgi-bin/admin.c:2696
 msgid "Unable to change printer:"
 msgstr ""
 
 #: cgi-bin/admin.c:3214 cgi-bin/admin.c:3259 cgi-bin/admin.c:3399
 #: cgi-bin/admin.c:3417 cgi-bin/admin.c:3305 cgi-bin/admin.c:3446
-#: cgi-bin/admin.c:3464
+#: cgi-bin/admin.c:3464 cgi-bin/admin.c:2508 cgi-bin/admin.c:2554
+#: cgi-bin/admin.c:2695 cgi-bin/admin.c:2713
 msgid "Set Allowed Users"
 msgstr ""
 
-#: cgi-bin/admin.c:3262 cgi-bin/admin.c:3308
+#: cgi-bin/admin.c:3262 cgi-bin/admin.c:3308 cgi-bin/admin.c:2557
 msgid "Unable to get printer attributes:"
 msgstr ""
 
 #: cgi-bin/admin.c:3450 cgi-bin/admin.c:3488 cgi-bin/admin.c:3506
 #: cgi-bin/admin.c:3497 cgi-bin/admin.c:3536 cgi-bin/admin.c:3554
+#: cgi-bin/admin.c:2746 cgi-bin/admin.c:2785 cgi-bin/admin.c:2803
 msgid "Set Publishing"
 msgstr ""
 
-#: cgi-bin/admin.c:3489 cgi-bin/admin.c:3537
+#: cgi-bin/admin.c:3489 cgi-bin/admin.c:3537 cgi-bin/admin.c:2786
 msgid "Unable to change printer-is-shared attribute:"
 msgstr ""
 
@@ -2889,11 +2909,11 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: cups/ppd.c:1033 cups/ppd.c:1020 cups/ppd.c:1009
+#: cups/ppd.c:1033 cups/ppd.c:1020 cups/ppd.c:1009 cups/ppd.c:1010
 msgid "Custom"
 msgstr ""
 
-#: cups/ppd.c:1259 cups/ppd.c:1236 cups/ppd.c:1225
+#: cups/ppd.c:1259 cups/ppd.c:1236 cups/ppd.c:1225 cups/ppd.c:1226
 msgid "JCL"
 msgstr ""
 
@@ -2911,7 +2931,7 @@ msgstr ""
 msgid "Running command: %s %s -N -U '%s%%%s' -c '%s'\n"
 msgstr ""
 
-#: systemv/cupsaddsmb.c:479 cups/adminutil.c:656
+#: systemv/cupsaddsmb.c:479 cups/adminutil.c:656 cups/adminutil.c:1683
 #, c-format
 msgid "cupsaddsmb: Unable to run \"%s\": %s\n"
 msgstr ""
@@ -3414,17 +3434,17 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: cups/adminutil.c:233
+#: cups/adminutil.c:233 cups/adminutil.c:246
 #, c-format
 msgid "Missing value on line %d!\n"
 msgstr ""
 
-#: cups/adminutil.c:249
+#: cups/adminutil.c:249 cups/adminutil.c:265
 #, c-format
 msgid "Missing double quote on line %d!\n"
 msgstr ""
 
-#: cups/adminutil.c:266
+#: cups/adminutil.c:266 cups/adminutil.c:284
 #, c-format
 msgid "Bad option + choice on line %d!\n"
 msgstr ""
@@ -3462,7 +3482,7 @@ msgstr ""
 msgid "Warning, no Windows 2000 printer drivers are installed!\n"
 msgstr ""
 
-#: cups/adminutil.c:568
+#: cups/adminutil.c:568 cups/adminutil.c:658
 #, c-format
 msgid "Unable to set Windows printer driver (%d)!\n"
 msgstr ""
@@ -3479,6 +3499,54 @@ msgid ""
 "  -a               Export all printers\n"
 "  -h cups-server   Use the named CUPS server\n"
 "  -v               Be verbose (show commands)\n"
+msgstr ""
+
+#: cups/adminutil.c:464
+#, c-format
+msgid "Unable to copy Windows 2000 printer driver files (%d)!"
+msgstr ""
+
+#: cups/adminutil.c:499
+#, c-format
+msgid "Unable to copy CUPS printer driver files (%d)!"
+msgstr ""
+
+#: cups/adminutil.c:542
+#, c-format
+msgid "Unable to install Windows 2000 printer driver files (%d)!"
+msgstr ""
+
+#: cups/adminutil.c:583
+#, c-format
+msgid "Unable to copy Windows 9x printer driver files (%d)!"
+msgstr ""
+
+#: cups/adminutil.c:612
+#, c-format
+msgid "Unable to install Windows 9x printer driver files (%d)!"
+msgstr ""
+
+#: cups/adminutil.c:631
+msgid "No Windows printer drivers are installed!"
+msgstr ""
+
+#: cups/adminutil.c:636
+msgid "Warning, no Windows 2000 printer drivers are installed!"
+msgstr ""
+
+#: cups/adminutil.c:736
+#, c-format
+msgid "open of %s failed: %s"
+msgstr ""
+
+#: cups/adminutil.c:1653
+#, c-format
+msgid "Running command: %s %s -N -A %s -c '%s'\n"
+msgstr ""
+
+#: cups/adminutil.c:1750
+#, c-format
+msgid "stat of %s failed: %s"
 msgstr ""
 
 

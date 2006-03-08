@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-deviced.c 5194 2006-02-27 20:57:07Z mike $"
+ * "$Id: cups-deviced.c 5244 2006-03-08 12:12:12Z mike $"
  *
  *   Device scanning mini-daemon for the Common UNIX Printing System (CUPS).
  *
@@ -276,7 +276,7 @@ main(int  argc,				/* I - Number of command-line args */
         if (!strncasecmp(line, "Usage", 5))
 	  compat = 1;
         else if (sscanf(line,
-	                "%63s%1023s%*[ \t]\"%255[^\"]\"%*[ \t]\"%127[^\"]"
+	                "%63s%1023s%*[ \t]\"%255[^\"]\"%*[ \t]\"%127[^\"]\""
 			"%*[ \t]\"%1023[^\"]",
 	                dclass, uri, make_model, info, device_id) < 4)
         {
@@ -500,5 +500,5 @@ sigalrm_handler(int sig)		/* I - Signal number */
 
 
 /*
- * End of "$Id: cups-deviced.c 5194 2006-02-27 20:57:07Z mike $".
+ * End of "$Id: cups-deviced.c 5244 2006-03-08 12:12:12Z mike $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: policy.c 5122 2006-02-17 15:41:40Z mike $"
+ * "$Id: policy.c 5247 2006-03-08 13:43:38Z mike $"
  *
  *   Policy routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -330,5 +330,5 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 
 
 /*
- * End of "$Id: policy.c 5122 2006-02-17 15:41:40Z mike $".
+ * End of "$Id: policy.c 5247 2006-03-08 13:43:38Z mike $".
  */

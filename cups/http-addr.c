@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c 5235 2006-03-06 13:02:23Z mike $"
+ * "$Id: http-addr.c 5251 2006-03-08 18:34:07Z mike $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -509,7 +509,12 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 
 
   if (http)
-    strlcpy(s, http->hostname, slen);
+  {
+    if (http->hostname[0] == '/')
+      strlcpy(s, "localhost", slen);
+    else
+      strlcpy(s, http->hostname, slen);
+  }
   else
   {
    /*
@@ -538,5 +543,5 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 
 
 /*
- * End of "$Id: http-addr.c 5235 2006-03-06 13:02:23Z mike $".
+ * End of "$Id: http-addr.c 5251 2006-03-08 18:34:07Z mike $".
  */

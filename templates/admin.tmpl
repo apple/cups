@@ -55,6 +55,9 @@ SRC="/images/button-view-page-log.gif" ALT="View Page Log"
 CLASS="button"></A>
 </P>
 
+{SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
+<BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
+
 <FORM METHOD="POST" ACTION="/admin">
 
 <P><B>Basic Server Settings:</B></P>
@@ -68,7 +71,7 @@ CLASS="button"></A>
 
 <P><INPUT TYPE="IMAGE" SRC="/images/button-change-settings.gif" ALT="Change Settings"></P>
 
-</FORM>
+</FORM>}
 
 </TD></TR>
 </TABLE>

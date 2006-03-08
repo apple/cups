@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c 5138 2006-02-21 10:49:06Z mike $"
+ * "$Id: ipp-support.c 5246 2006-03-08 13:22:09Z mike $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -146,10 +146,10 @@ static char	* const ipp_std_ops[] =
 		{
 		  "CUPS-Get-Default",
 		  "CUPS-Get-Printers",
-		  "CUPS-Add-Printer",
+		  "CUPS-Add-Modify-Printer",
 		  "CUPS-Delete-Printer",
 		  "CUPS-Get-Classes",
-		  "CUPS-Add-Class",
+		  "CUPS-Add-Modify-Class",
 		  "CUPS-Delete-Class",
 		  "CUPS-Accept-Jobs",
 		  "CUPS-Reject-Jobs",
@@ -281,6 +281,12 @@ ippOpValue(const char *name)		/* I - Textual name */
     if (!strcasecmp(name, ipp_cups_ops[i]))
       return ((ipp_op_t)(i + 0x4001));
 
+  if (!strcasecmp(name, "CUPS-Add-Class"))
+    return (CUPS_ADD_MODIFY_CLASS);
+
+  if (!strcasecmp(name, "CUPS-Add-Printer"))
+    return (CUPS_ADD_MODIFY_PRINTER);
+
   return ((ipp_op_t)-1);
 }
 
@@ -327,5 +333,5 @@ ippSetPort(int p)			/* I - Port number to use */
 
 
 /*
- * End of "$Id: ipp-support.c 5138 2006-02-21 10:49:06Z mike $".
+ * End of "$Id: ipp-support.c 5246 2006-03-08 13:22:09Z mike $".
  */

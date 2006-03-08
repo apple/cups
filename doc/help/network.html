@@ -13,16 +13,20 @@ print server using the <CODE>ipp</CODE>, <CODE>lpd</CODE>, or
 network interfaces and printer servers and the settings you
 should use with CUPS:</P>
 
-<DIV CLASS="table"><TABLE WIDTH="50%">
-<TR VALIGN="TOP" ALIGN="LEFT">
+<DIV CLASS="table"><TABLE SUMMARY="Common Device URIs">
+<CAPTION>Table 1: Common Device URIs</CAPTION>
+<THEAD>
+<TR>
 	<TH>Model/Manufacturer</TH>
 	<TH>Device URI(s)</TH>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+</THEAD>
+<TBODY>
+<TR>
 	<TD>Apple LaserWriter</TD>
 	<TD>lpd://<I>address</I>/PASSTHRU</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Axis w/o IPP<BR>
 	Axis OfficeBasic<BR>
 	<A HREF="#AXIS">(see directions)</A></TD>
@@ -30,100 +34,101 @@ should use with CUPS:</P>
 	socket://<I>address</I>:9101<BR>
 	socket://<I>address</I>:9102</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Axis w/IPP</TD>
 	<TD>ipp://<I>address</I>/LPT1<BR>
 	ipp://<I>address</I>/LPT2<BR>
 	ipp://<I>address</I>/COM1</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Castelle LANpress<SUP>TM</SUP></TD>
 	<TD>lpd://<I>address</I>/pr1<BR>
 	lpd://<I>address</I>/pr2<BR>
 	lpd://<I>address</I>/pr3</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>DPI NETPrint</TD>
 	<TD>lpd://<I>address</I>/pr1<BR>
 	lpd://<I>address</I>/pr2<BR>
 	lpd://<I>address</I>/pr3</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>DLink DP-301P+</TD>
 	<TD>socket://<I>address</I></TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>EFI&reg; Fiery&reg; RIP</TD>
 	<TD>lpd://<I>address</I>/print</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>EPSON&reg; Multiprotocol Ethernet Interface Board</TD>
 	<TD>socket://<I>address</I></TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Extended System ExtendNET</TD>
 	<TD>lpd://<I>address</I>/pr1<BR>
 	lpd://<I>address</I>/pr2<BR>
 	lpd://<I>address</I>/pr3</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Hewlett Packard JetDirect w/o IPP</TD>
 	<TD>socket://<I>address</I>:9100<BR>
 	socket://<I>address</I>:9101<BR>
 	socket://<I>address</I>:9102</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Hewlett Packard JetDirect w/IPP</TD>
 	<TD>ipp://<I>address</I>/ipp<BR>
 	ipp://<I>address</I>/ipp/port1<BR>
 	ipp://<I>address</I>/ipp/port2<BR>
 	ipp://<I>address</I>/ipp/port3</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Intel® NetportExpress XL, PRO/100</TD>
 	<TD>lpd://<I>address</I>/LPT1_PASSTHRU<BR>
 	lpd://<I>address</I>/LPT2_PASSTHRU<BR>
 	lpd://<I>address</I>/COM1_PASSTHRU</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Lexmark<SUP>TM</SUP> MarkNet</TD>
 	<TD>lpd://<I>address</I>/ps</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Linksys EtherFast&reg;<BR>
 	<A HREF="#LINKSYS">(see directions)</A></TD>
 	<TD>socket://<I>address</I>:4010<BR>
 	socket://<I>address</I>:4020<BR>
 	socket://<I>address</I>:4030</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Linksys PSUS4</TD>
 	<TD>lpd://<I>address</I>/lp</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Kodak&reg;</TD>
 	<TD>lpd://<I>address</I>/ps</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>QMS&reg; CrownNet<SUP>TM</SUP></TD>
 	<TD>lpd://<I>address</I>/ps</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>Tektronix&reg; PhaserShare<SUP>TM</SUP></TD>
 	<TD>socket://<I>address</I>:9100</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>XEROX&reg; 4512 NIC</TD>
 	<TD>lpd://<I>address</I>/PORT1</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>XEROX&reg; XNIC</TD>
 	<TD>lpd://<I>address</I>/PASSTHRU</TD>
 </TR>
-<TR ALIGN="LEFT" VALIGN="TOP">
+<TR>
 	<TD>XEROX&reg; (most others)</TD>
 	<TD>socket://<I>address</I>:5503</TD>
 </TR>
+</TBODY>
 </TABLE></DIV>
 
 <H2 CLASS="title"><A NAME="ADDRESS">Getting the IP Address</A></H2>
@@ -425,7 +430,6 @@ ftp> <KBD>quit</KBD>
 </PRE>
 
 <P>Your Linksys print server is now ready for use!</P>
-
 
 </BODY>
 </HTML>
