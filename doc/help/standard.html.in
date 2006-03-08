@@ -33,7 +33,8 @@ Basic authentication with membership in the group
 
 <H3><A NAME="SETTINGS">Settings</A></H3>
 
-<DIV CLASS="table"><TABLE WIDTH="80%">
+<DIV CLASS="table"><TABLE SUMMARY="Default Values">
+<CAPTION>Table 1: Default Values</CAPTION>
 <TR>
 	<TH>Directive</TH>
 	<TH>Value</TH>
@@ -79,7 +80,8 @@ Basic authentication with membership in the group
 
 <H2 CLASS="title"><A NAME="DIRECTORIES">Directories</A></H2>
 
-<DIV CLASS="table"><TABLE WIDTH="80%">
+<DIV CLASS="table"><TABLE SUMMARY="Directories">
+<CAPTION>Table 2: Directories</CAPTION>
 <TR>
 	<TH>Directory</TH>
 	<TH>Purpose</TH>
