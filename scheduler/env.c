@@ -161,16 +161,9 @@ void
 cupsdSetEnv(const char *name,		/* I - Name of variable */
             const char *value)		/* I - Value of variable */
 {
- /*
-  * Check for room...
-  */
+  int	i,				/* Looping var */
+	namelen;			/* Length of name */
 
-  if (num_common_env >= (int)(sizeof(common_env) / sizeof(common_env[0])))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdSetEnv: Too many environment variables set!");
-    return;
-  }
 
  /*
   * If "value" is NULL, try getting value from current environment...
@@ -183,15 +176,36 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
     return;
 
  /*
+  * See if this variable has already been defined...
+  */
+
+  for (i = 0, namelen = strlen(name); i < num_common_env; i ++)
+    if (!strncmp(common_env[i], name, namelen) && common_env[i][namelen] == '=')
+      break;
+
+  if (i >= num_common_env)
+  {
+   /*
+    * Check for room...
+    */
+
+    if (num_common_env >= (int)(sizeof(common_env) / sizeof(common_env[0])))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdSetEnv: Too many environment variables set!");
+      return;
+    }
+
+    num_common_env ++;
+  }
+
+ /*
   * Set the new environment variable...
   */
 
-  cupsdSetStringf(common_env + num_common_env, "%s=%s", name, value);
+  cupsdSetStringf(common_env + i, "%s=%s", name, value);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetEnv: %s\n",
-                  common_env[num_common_env]);
-
-  num_common_env ++;
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetEnv: %s\n", common_env[i]);
 }
 
 
