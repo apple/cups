@@ -15,22 +15,25 @@ character at the beginning of a line.</P>
 
 <P>While the printer configuration file consists of plain text
 and can be modified using your favorite text editor, you should
-normally use the <CODE>lpadmin(8)</CODE> command, web interface,
-or any of the available GUIs to manage your printers instead. If
-you do choose to edit this file manually, you will need to
-restart the scheduler to make them active.</P>
+normally use the <A HREF="man-lpadmin.html">lpadmin(8)</A>
+command, web interface, or any of the available GUIs to manage
+your printers instead. If you do choose to edit this file
+manually, you will need to restart the scheduler to make them
+active.</P>
 
 
-<H3 CLASS="title"><A NAME="Accepting">Accepting</A></H3>
+<H2 CLASS="title"><A NAME="Accepting">Accepting</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-Accepting yes
-Accepting no
+&lt;Printer name&gt;
+  ...
+  Accepting yes
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>Accepting</CODE> directive defines the initial state
 of the <VAR>printer-is-accepting-jobs</VAR> attribute. This state
@@ -45,19 +48,22 @@ is also set by the <CODE>accept(8)</CODE> and
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><A NAME="AllowUser">AllowUser</A></H3>
+<H2 CLASS="title"><A NAME="AllowUser">AllowUser</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-AllowUser foo_user
-AllowUser @bar_group
+&lt;Printer name&gt;
+  ...
+  AllowUser foo_user
+  AllowUser @bar_group
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>AllowUser</CODE> directive adds a username or group
 name to the <VAR>requesting-user-name-allowed</VAR> attribute
@@ -74,17 +80,17 @@ This directive cannot be used with <A
 HREF="#DenyUser"><CODE>DenyUser</CODE></A>.</P>
 
 
-<H3 CLASS="title"><A NAME="DefaultPrinter">DefaultPrinter</A></H3>
+<H2 CLASS="title"><A NAME="DefaultPrinter">DefaultPrinter</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
 &lt;DefaultPrinter name&gt;
-...
+  ...
 &lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>DefaultPrinter</CODE> directive begins a printer
 definition as the default server destination. The default server
@@ -100,16 +106,19 @@ overridden by the user's default destination settings which are
 normally set using the <CODE>lpoptions(1)</CODE> command.</P>
 
 
-<H3 CLASS="title"><A NAME="DenyUser">DenyUser</A></H3>
+<H2 CLASS="title"><A NAME="DenyUser">DenyUser</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-DenyUser foo_user
-DenyUser @bar_group
+&lt;Printer name&gt;
+  ...
+  DenyUser foo_user
+  DenyUser @bar_group
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>DenyUser</CODE> directive adds a username or group
 name to the <VAR>requesting-user-name-denied</VAR> attribute
@@ -126,15 +135,18 @@ This directive cannot be used with <A
 HREF="#AllowUser"><CODE>AllowUser</CODE></A></P>
 
 
-<H3 CLASS="title"><A NAME="DeviceURI">DeviceURI</A></H3>
+<H2 CLASS="title"><A NAME="DeviceURI">DeviceURI</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-DeviceURI socket://foo.bar.com:9100
+&lt;Printer name&gt;
+  ...
+  DeviceURI socket://foo.bar.com:9100
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>DeviceURI</CODE> directive defines the value of the 
 <VAR>device-uri-attribute</VAR> attribute. It is normally set
@@ -147,20 +159,21 @@ using the <CODE>lpadmin(8)</CODE> command:</P>
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H3>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-ErrorPolicy cancel-job
-ErrorPolicy retry-job
-ErrorPolicy stop-printer
+&lt;Printer name&gt;
+  ...
+  ErrorPolicy cancel-job
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>ErrorPolicy</CODE> directive defines the policy that
 is used when a backend is unable to send a print job to the
@@ -192,18 +205,21 @@ error policy:</P>
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><A NAME="Info">Info</A></H3>
+<H2 CLASS="title"><A NAME="Info">Info</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-Info My Printer
+&lt;Printer name&gt;
+  ...
+  Info My Printer
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>Info</CODE> directive defines the string for the 
 <VAR>printer-info</VAR> attribute. It is normally set using the
@@ -216,18 +232,21 @@ Info My Printer
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><A NAME="JobSheets">JobSheets</A></H3>
+<H2 CLASS="title"><A NAME="JobSheets">JobSheets</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-JobSheets none,standard
+&lt;Printer name&gt;
+  ...
+  JobSheets none,standard
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>JobSheets</CODE> directive specifies the default
 banner pages  to print before and after a print job. In the above
@@ -275,18 +294,21 @@ files:</P>
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><A NAME="KLimit">KLimit</A></H3>
+<H2 CLASS="title"><A NAME="KLimit">KLimit</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-KLimit 1234
+&lt;Printer name&gt;
+  ...
+  KLimit 1234
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>KLimit</CODE> directive defines the value of the 
 <VAR>job-k-limit</VAR> attribute. It is normally set using the
@@ -299,18 +321,21 @@ KLimit 1234
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><A NAME="Location">Location</A></H3>
+<H2 CLASS="title"><A NAME="Location">Location</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-Location Building 3321
+&lt;Printer name&gt;
+  ...
+  Location Building 3321
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>Location</CODE> directive defines the string for the 
 <VAR>printer-location</VAR> attribute. It is normally set using the
@@ -323,19 +348,21 @@ Location Building 3321
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="OpPolicy">OpPolicy</A></H3>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="OpPolicy">OpPolicy</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-OpPolicy default
-OpPolicy mypolicy
+&lt;Printer name&gt;
+  ...
+  OpPolicy default
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>OpPolicy</CODE> directive sets the operation policy
 that is used for the printer. The <CODE>lpadmin(8)</CODE> command
@@ -348,23 +375,52 @@ sets the current operation policy:</P>
 <P>The default policy is named "default". All policies correspond
 to those defined using the <VAR>cupsd.conf</VAR> <A
 HREF="ref-cupsd-conf.html#Policy"><CODE>Policy</CODE></A>
-directive.</P>
+section.</P>
 
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><A NAME="PageLimit">PageLimit</A></H3>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="Option">Option</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-PageLimit 1234
+&lt;Printer name&gt;
+  ...
+  Option name value
+  Option scaling 100
+  Option page-left 72
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
+
+<P>The <CODE>Option</CODE> directive specifies a default job
+template attribute value. It is mapped to
+<CODE>name-default</CODE> in the printer attributes and applied
+to jobs as <CODE>name</CODE>.</P>
+
+<P>This directive must appear inside a <A
+HREF="#Printer"><CODE>Printer</CODE></A> or <A
+HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
+section.</P>
+
+
+<H2 CLASS="title"><A NAME="PageLimit">PageLimit</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+&lt;Printer name&gt;
+  ...
+  PageLimit 1234
+&lt;/Printer&gt;
+</PRE>
+
+<H3>Description</H3>
 
 <P>The <CODE>PageLimit</CODE> directive defines the value of the 
 <VAR>job-page-limit</VAR> attribute. It can be set using the
@@ -377,20 +433,21 @@ PageLimit 1234
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="PortMonitor">PortMonitor</A></H3>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="PortMonitor">PortMonitor</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-PortMonitor bcp
-PortMonitor none
-PortMonitor tbcp
+&lt;Printer name&gt;
+  ...
+  PortMonitor bcp
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>PortMonitor</CODE> directive sets the filter program that
 is used for every print job, typically to encode or package the print
@@ -419,20 +476,20 @@ set using the <CODE>lpadmin(8)</CODE> command:</P>
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><A NAME="Printer">Printer</A></H3>
+<H2 CLASS="title"><A NAME="Printer">Printer</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
 &lt;Printer name&gt;
-...
+  ...
 &lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>Printer</CODE> directive begins a printer
 definition. Printers are added using the <CODE>lpadmin(8)</CODE>
@@ -443,15 +500,18 @@ command:
 </PRE>
 
 
-<H3 CLASS="title"><A NAME="QuotaPeriod">QuotaPeriod</A></H3>
+<H2 CLASS="title"><A NAME="QuotaPeriod">QuotaPeriod</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-QuotaPeriod 604800
+&lt;Printer name&gt;
+  ...
+  QuotaPeriod 604800
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>QuotaPeriod</CODE> directive defines the value of
 the  <VAR>job-quota-period</VAR> attribute. Typical values are
@@ -466,19 +526,21 @@ command:</P>
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="Shared">Shared</A></H3>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="Shared">Shared</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-Shared yes
-Shared no
+&lt;Printer name&gt;
+  ...
+  Shared yes
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>Shared</CODE> directive defines the initial value of
 the <VAR>printer-is-shared</VAR> attribute. The strings
@@ -493,19 +555,21 @@ the current state:</P>
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><A NAME="State">State</A></H3>
+<H2 CLASS="title"><A NAME="State">State</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-State idle
-State stopped
+&lt;Printer name&gt;
+  ...
+  State idle
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>State</CODE> directive defines the initial value of
 the <VAR>printer-state</VAR> attribute. The strings
@@ -522,18 +586,21 @@ commands set the current state:</P>
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><A NAME="StateMessage">StateMessage</A></H3>
+<H2 CLASS="title"><A NAME="StateMessage">StateMessage</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-StateMessage Ready to print.
+&lt;Printer name&gt;
+  ...
+  StateMessage Ready to print.
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>StateMessage</CODE> directive defines the initial
 string for the  <VAR>printer-state-message</VAR> attribute. The
@@ -553,18 +620,21 @@ StateMessage Waiting for job to complete
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
-<H3 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="StateTime">StateTime</A></H3>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="StateTime">StateTime</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
 <PRE CLASS="command">
-StateTime 1133542425
+&lt;Printer name&gt;
+  ...
+  StateTime 1133542425
+&lt;/Printer&gt;
 </PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
 <P>The <CODE>StateTime</CODE> directive defines the UNIX time
 (seconds since Jan 1, 1970) for the last state change of the
@@ -574,7 +644,7 @@ attribute.</P>
 <P>This directive must appear inside a <A
 HREF="#Printer"><CODE>Printer</CODE></A> or <A
 HREF="#DefaultPrinter"><CODE>DefaultPrinter</CODE></A>
-directive.</P>
+section.</P>
 
 
 </BODY>
