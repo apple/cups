@@ -743,7 +743,17 @@ cupsdLoadAllSubscriptions(void)
 
   while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    if (!strcasecmp(line, "<Subscription"))
+    if (!strcasecmp(line, "NextSubscriptionId") && value)
+    {
+     /*
+      * NextSubscriptionId NNN
+      */
+
+      i = atoi(value);
+      if (i >= NextSubscriptionId && i > 0)
+        NextSubscriptionId = i;
+    }
+    else if (!strcasecmp(line, "<Subscription"))
     {
      /*
       * <Subscription #>
@@ -1115,6 +1125,8 @@ cupsdSaveAllSubscriptions(void)
 
   cupsFilePuts(fp, "# Subscription configuration file for " CUPS_SVERSION "\n");
   cupsFilePrintf(fp, "# Written by cupsd on %s\n", temp);
+
+  cupsFilePrintf(fp, "NextSubscriptionId %d\n", NextSubscriptionId);
 
  /*
   * Write every subscription known to the system...
