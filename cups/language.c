@@ -265,8 +265,10 @@ cups_lang_t *				/* O - Language data */
 cupsLangGet(const char *language)	/* I - Language or locale */
 {
   int			i;		/* Looping var */
-  char			locale[255],	/* Copy of locale name */
-			langname[16],	/* Requested language name */
+#ifndef __APPLE__
+  char			locale[255];	/* Copy of locale name */
+#endif /* !__APPLE__ */
+  char			langname[16],	/* Requested language name */
 			country[16],	/* Country code */
 			charset[16],	/* Character set */
 			*csptr,		/* Pointer to CODESET string */
