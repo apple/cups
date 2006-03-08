@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5224 2006-03-04 02:00:43Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -66,6 +66,18 @@ install:	all
 
 
 #
+# Uninstall files...
+#
+
+uninstall:
+	-for loc in $(LANGUAGES) ; do \
+		$(RM) $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
+		$(RMDIR) $(LOCALEDIR)/$$loc ; \
+	done
+	-$(RMDIR) $(LOCALEDIR)
+
+
+#
 # pot - Creates/updates the cups.pot template file, and merges changes
 #       into existing message catalogs.
 #
@@ -102,5 +114,5 @@ translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
 
 
 #
-# End of "$Id: Makefile 5224 2006-03-04 02:00:43Z mike $".
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

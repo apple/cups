@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -65,6 +65,19 @@ install:	all
 
 
 #
+# Uninstall all targets...
+#
+
+uninstall:
+	$(RM) $(BINDIR)/lpq
+	$(RM) $(BINDIR)/lpr
+	$(RM) $(BINDIR)/lprm
+	$(RM) $(SBINDIR)/lpc
+	-$(RMDIR) $(SBINDIR)
+	-$(RMDIR) $(BINDIR)
+
+
+#
 # lpc
 #
 
@@ -108,5 +121,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $".
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

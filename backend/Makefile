@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5131 2006-02-18 05:31:36Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -70,6 +70,19 @@ install:	all
 	done
 	$(RM) $(SERVERBIN)/backend/http
 	$(LN) ipp $(SERVERBIN)/backend/http
+
+
+#
+# Uninstall all targets...
+#
+
+uninstall:
+	for file in $(RBACKENDS) $(UBACKENDS); do \
+		$(RM) $(SERVERBIN)/backend/$$file; \
+	done
+	$(RM) $(SERVERBIN)/backend/http
+	-$(RMDIR) $(SERVERBIN)/backend
+	-$(RMDIR) $(SERVERBIN)
 
 
 #
@@ -179,5 +192,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5131 2006-02-18 05:31:36Z mike $".
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

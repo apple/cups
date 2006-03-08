@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-darwin.c 4548 2005-06-27 02:33:50Z mike $"
+ * "$Id: usb-darwin.c 5241 2006-03-07 22:07:44Z mike $"
  *
  *   USB port on Darwin backend for the Common UNIX Printing System (CUPS).
  *
@@ -674,6 +674,9 @@ int print_device(const char *uri, const char *hostname, const char *resource, co
     USBPrinterInfo	    *activePrinter = NULL;
     USBPrinterClassContext  **classdriver;
     int			    countdown = INITIAL_LOG_INTERVAL;
+
+    fputs("STATE: +connecting-to-device\n", stderr);
+
     do
     {
 	/* */
@@ -746,6 +749,8 @@ int print_device(const char *uri, const char *hostname, const char *resource, co
 	return (status);
     }
     
+    fputs("STATE: -connecting-to-device\n", stderr);
+
     /*
     * Now that we are "connected" to the port, ignore SIGTERM so that we
     * can finish out any page data the driver sends (e.g. to eject the
@@ -1895,5 +1900,5 @@ static CFStringRef CreateEncodedCFString(CFStringRef string)
 }
 
 /*
- * End of "$Id: usb-darwin.c 4548 2005-06-27 02:33:50Z mike $".
+ * End of "$Id: usb-darwin.c 5241 2006-03-07 22:07:44Z mike $".
  */

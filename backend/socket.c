@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 5099 2006-02-13 02:46:10Z mike $"
+ * "$Id: socket.c 5241 2006-03-07 22:07:44Z mike $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -256,6 +256,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   while (copies > 0)
   {
+    fputs("STATE: +connecting-to-device\n", stderr);
+
     for (delay = 5;;)
     {
       if (!httpAddrConnect(addrlist, &fd))
@@ -303,6 +305,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       else
 	break;
     }
+
+    fputs("STATE: -connecting-to-device\n", stderr);
 
    /*
     * Now that we are "connected" to the port, ignore SIGTERM so that we
@@ -488,5 +492,5 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c 5099 2006-02-13 02:46:10Z mike $".
+ * End of "$Id: socket.c 5241 2006-03-07 22:07:44Z mike $".
  */

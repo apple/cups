@@ -1,5 +1,5 @@
 /*
- * "$Id: scsi-irix.c 4703 2005-09-26 19:33:58Z mike $"
+ * "$Id: scsi-irix.c 5241 2006-03-07 22:07:44Z mike $"
  *
  *   IRIX SCSI printer support for the Common UNIX Printing System (CUPS).
  *
@@ -103,6 +103,8 @@ print_device(const char *resource,	/* I - SCSI device */
   * Open the SCSI device file...
   */
 
+  fputs("STATE: +connecting-to-device\n", stderr);
+
   do
   {
     if ((scsi_fd = open(resource, O_RDWR | O_EXCL)) == -1)
@@ -143,6 +145,8 @@ print_device(const char *resource,	/* I - SCSI device */
     }
   }
   while (scsi_fd == -1);
+
+  fputs("STATE: -connecting-to-device\n", stderr);
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
@@ -227,5 +231,5 @@ print_device(const char *resource,	/* I - SCSI device */
 
 
 /*
- * End of "$Id: scsi-irix.c 4703 2005-09-26 19:33:58Z mike $".
+ * End of "$Id: scsi-irix.c 5241 2006-03-07 22:07:44Z mike $".
  */

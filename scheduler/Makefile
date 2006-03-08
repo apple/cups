@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5157 2006-02-23 20:58:57Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -149,6 +149,31 @@ install:	all
 
 
 #
+# Uninstall the scheduler...
+#
+
+uninstall:	all
+	$(RM) $(SBINDIR)/cupsd
+	$(RM) $(SERVERBIN)/daemon/cups-deviced
+	$(RM) $(SERVERBIN)/daemon/cups-driverd
+	$(RM) $(SERVERBIN)/daemon/cups-lpd
+	$(RM) $(SERVERBIN)/daemon/cups-polld
+	-$(RMDIR) $(STATEDIR)/certs
+	-$(RMDIR) $(STATEDIR)
+	-$(RMDIR) $(SERVERROOT)/ppd
+	-$(RMDIR) $(SERVERROOT)/interfaces
+	-$(RMDIR) $(SERVERROOT)
+	-$(RMDIR) $(SERVERBIN)/driver
+	-$(RMDIR) $(SERVERBIN)/daemon
+	-$(RMDIR) $(SERVERBIN)
+	-$(RMDIR) $(SBINDIR)
+	-$(RMDIR) $(REQUESTS)/tmp
+	-$(RMDIR) $(REQUESTS)
+	-$(RMDIR) $(LOGDIR)
+	-$(RMDIR) $(CACHEDIR)
+
+
+#
 # Make the scheduler executable, "cupsd".
 #
 
@@ -249,5 +274,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5157 2006-02-23 20:58:57Z mike $".
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

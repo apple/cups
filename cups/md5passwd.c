@@ -1,5 +1,5 @@
 /*
- * "$Id: md5passwd.c 4828 2005-11-11 12:53:38Z mike $"
+ * "$Id: md5passwd.c 5232 2006-03-05 17:59:19Z mike $"
  *
  *   MD5 password support for the Common UNIX Printing System (CUPS).
  *
@@ -59,9 +59,9 @@ httpMD5(const char *username,		/* I - User name */
   */
 
   snprintf(line, sizeof(line), "%s:%s:%s", username, realm, passwd);
-  _cups_md5_init(&state);
-  _cups_md5_append(&state, (unsigned char *)line, (int)strlen(line));
-  _cups_md5_finish(&state, sum);
+  _cupsMD5Init(&state);
+  _cupsMD5Append(&state, (unsigned char *)line, (int)strlen(line));
+  _cupsMD5Finish(&state, sum);
 
  /*
   * Return the sum...
@@ -94,9 +94,9 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
   */
 
   snprintf(line, sizeof(line), "%s:%s", method, resource);
-  _cups_md5_init(&state);
-  _cups_md5_append(&state, (unsigned char *)line, (int)strlen(line));
-  _cups_md5_finish(&state, sum);
+  _cupsMD5Init(&state);
+  _cupsMD5Append(&state, (unsigned char *)line, (int)strlen(line));
+  _cupsMD5Finish(&state, sum);
   httpMD5String(sum, a2);
 
  /*
@@ -107,9 +107,9 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
 
   snprintf(line, sizeof(line), "%s:%s:%s", md5, nonce, a2);
 
-  _cups_md5_init(&state);
-  _cups_md5_append(&state, (unsigned char *)line, (int)strlen(line));
-  _cups_md5_finish(&state, sum);
+  _cupsMD5Init(&state);
+  _cupsMD5Append(&state, (unsigned char *)line, (int)strlen(line));
+  _cupsMD5Finish(&state, sum);
 
   return (httpMD5String(sum, md5));
 }
@@ -147,5 +147,5 @@ httpMD5String(const unsigned char *sum,	/* I - MD5 sum data */
 
 
 /*
- * End of "$Id: md5passwd.c 4828 2005-11-11 12:53:38Z mike $".
+ * End of "$Id: md5passwd.c 5232 2006-03-05 17:59:19Z mike $".
  */

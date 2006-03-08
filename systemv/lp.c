@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c 4974 2006-01-25 07:04:33Z mike $"
+ * "$Id: lp.c 5235 2006-03-06 13:02:23Z mike $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -287,7 +287,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 	      snprintf(email, sizeof(email), "mailto:%s@%s", cupsUser(),
-	               httpGetHostname(buffer, sizeof(buffer)));
+	               httpGetHostname(NULL, buffer, sizeof(buffer)));
 	      num_options = cupsAddOption("notify-recipient", email,
 	                                  num_options, &options);
 	    }
@@ -838,5 +838,5 @@ sighandler(int s)			/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c 4974 2006-01-25 07:04:33Z mike $".
+ * End of "$Id: lp.c 5235 2006-03-06 13:02:23Z mike $".
  */

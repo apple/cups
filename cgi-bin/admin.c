@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 5107 2006-02-15 19:14:17Z mike $"
+ * "$Id: admin.c 5240 2006-03-07 21:55:29Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,7 @@
  */
 
 #include "cgi-private.h"
+#include <cups/adminutil.h>
 #include <cups/file.h>
 #include <errno.h>
 #include <unistd.h>
@@ -1574,586 +1575,45 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     * Save basic setting changes...
     */
 
-    http_status_t status;		/* PUT status */
-    cups_file_t	*cupsd;			/* cupsd.conf file */
-    char	tempfile[1024];		/* Temporary new cupsd.conf */
-    int		tempfd;			/* Temporary file descriptor */
-    cups_file_t	*temp;			/* Temporary file */
-    char	line[1024],		/* Line from cupsd.conf file */
-		*value;			/* Value on line */
-    const char	*server_root;		/* Location of config files */
-    int		linenum,		/* Line number in file */
-		in_policy,		/* In a policy section? */
-		in_cancel_job,		/* In a cancel-job section? */
-		in_admin_location,	/* In the /admin location? */
-		in_conf_location,	/* In the /admin/conf location? */
-		in_root_location;	/* In the / location? */
-    int		remote_printers,	/* Show remote printers */
-		share_printers,		/* Share local printers */
-		remote_admin,		/* Remote administration allowed? */
-		user_cancel_any,	/* Cancel-job policy set? */
-		debug_logging;		/* LogLevel debug set? */
-    int		wrote_port_listen,	/* Wrote the port/listen lines? */
-		wrote_browsing,		/* Wrote the browsing lines? */
-		wrote_policy,		/* Wrote the policy? */
-		wrote_loglevel,		/* Wrote the LogLevel line? */
-		wrote_admin_location,	/* Wrote the /admin location? */
-		wrote_conf_location,	/* Wrote the /admin/conf location? */
-		wrote_root_location;	/* Wrote the / location? */
-    int		indent;			/* Indentation */
+    int			num_settings;	/* Number of server settings */
+    cups_option_t	*settings;	/* Server settings */
 
 
-   /*
-    * Get form variables...
-    */
+    num_settings = 0;
+    num_settings = cupsAddOption(CUPS_SERVER_DEBUG_LOGGING,
+                                 cgiGetVariable("DEBUG_LOGGING") ? "1" : "0",
+				 num_settings, &settings);
+    num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ADMIN,
+                                 cgiGetVariable("REMOTE_ADMIN") ? "1" : "0",
+				 num_settings, &settings);
+    num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
+                                 cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0",
+				 num_settings, &settings);
+    num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS,
+                                 cgiGetVariable("SHARE_PRINTERS") ? "1" : "0",
+				 num_settings, &settings);
+    num_settings = cupsAddOption(CUPS_SERVER_USER_CANCEL_ANY,
+                                 cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0",
+				 num_settings, &settings);
 
-    remote_printers = cgiGetVariable("REMOTE_PRINTERS") != NULL;
-    share_printers  = cgiGetVariable("SHARE_PRINTERS") != NULL;
-    remote_admin    = cgiGetVariable("REMOTE_ADMIN") != NULL;
-    user_cancel_any = cgiGetVariable("USER_CANCEL_ANY") != NULL;
-    debug_logging   = cgiGetVariable("DEBUG_LOGGING") != NULL;
 
-   /*
-    * Locate the cupsd.conf file...
-    */
-
-    if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
-      server_root = CUPS_SERVERROOT;
-
-    snprintf(line, sizeof(line), "%s/cupsd.conf", server_root);
-
-   /*
-    * Open the cupsd.conf file...
-    */
-
-    if ((cupsd = cupsFileOpen(line, "r")) == NULL)
-    {
-     /*
-      * Unable to open - log an error...
-      */
-
-      cgiStartHTML(cgiText(_("Change Settings")));
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to change server settings:")));
-      cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang("error.tmpl");
-      cgiEndHTML();
-      
-      perror(line);
-      return;
-    }
-
-   /*
-    * Create a temporary file for the new cupsd.conf file...
-    */
-
-    if ((tempfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
+    if (!_cupsAdminSetServerSettings(http, num_settings, settings))
     {
       cgiStartHTML(cgiText(_("Change Settings")));
       cgiSetVariable("MESSAGE", cgiText(_("Unable to change server settings:")));
-      cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang("error.tmpl");
-      cgiEndHTML();
-      
-      perror(tempfile);
-      cupsFileClose(cupsd);
-      return;
-    }
-
-    if ((temp = cupsFileOpenFd(tempfd, "w")) == NULL)
-    {
-      cgiStartHTML(cgiText(_("Change Settings")));
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to change server settings:")));
-      cgiSetVariable("ERROR", strerror(errno));
-      cgiCopyTemplateLang("error.tmpl");
-      cgiEndHTML();
-      
-      perror(tempfile);
-      close(tempfd);
-      unlink(tempfile);
-      cupsFileClose(cupsd);
-      return;
-    }
-
-   /*
-    * Copy the old file to the new, making changes along the way...
-    */
-
-    in_admin_location    = 0;
-    in_cancel_job        = 0;
-    in_conf_location     = 0;
-    in_policy            = 0;
-    in_root_location     = 0;
-    linenum              = 0;
-    wrote_admin_location = 0;
-    wrote_browsing       = 0;
-    wrote_conf_location  = 0;
-    wrote_loglevel       = 0;
-    wrote_policy         = 0;
-    wrote_port_listen    = 0;
-    wrote_root_location  = 0;
-    indent               = 0;
-
-    while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
-    {
-      if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
-      {
-	if (!wrote_port_listen)
-	{
-          wrote_port_listen = 1;
-
-	  if (share_printers || remote_admin)
-	  {
-	    cupsFilePuts(temp, "# Allow remote access\n");
-	    cupsFilePrintf(temp, "Listen *:%d\n", ippPort());
-	  }
-	  else
-	  {
-	    cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
-	    cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
-	  }
-
-#ifdef CUPS_DEFAULT_DOMAINSOCKET
-          cupsFilePuts(temp, "Listen " CUPS_DEFAULT_DOMAINSOCKET "\n");
-#endif /* CUPS_DEFAULT_DOMAINSOCKET */
-	}
-      }
-      else if (!strcasecmp(line, "Browsing") ||
-               !strcasecmp(line, "BrowseAddress") ||
-               !strcasecmp(line, "BrowseAllow") ||
-               !strcasecmp(line, "BrowseDeny") ||
-               !strcasecmp(line, "BrowseOrder"))
-      {
-	if (!wrote_browsing)
-	{
-          wrote_browsing = 1;
-
-          if (remote_printers || share_printers)
-	  {
-	    if (remote_printers && share_printers)
-	      cupsFilePuts(temp, "# Enable printer sharing and shared printers.\n");
-	    else if (remote_printers)
-	      cupsFilePuts(temp, "# Show shared printers on the local network.\n");
-	    else
-	      cupsFilePuts(temp, "# Share local printers on the local network.\n");
-
-	    cupsFilePuts(temp, "Browsing On\n");
-	    cupsFilePuts(temp, "BrowseOrder allow,deny\n");
-
-	    if (remote_printers)
-	      cupsFilePuts(temp, "BrowseAllow @LOCAL\n");
-
-	    if (share_printers)
-	      cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
-          }
-	  else
-	  {
-	    cupsFilePuts(temp, "# Disable printer sharing and shared printers.\n");
-	    cupsFilePuts(temp, "Browsing Off\n");
-	  }
-	}
-      }
-      else if (!strcasecmp(line, "LogLevel"))
-      {
-        wrote_loglevel = 1;
-
-	if (debug_logging)
-	{
-          cupsFilePuts(temp, "# Show troubleshooting information in error_log.\n");
-	  cupsFilePuts(temp, "LogLevel debug\n");
-	}
-	else
-	{
-          cupsFilePuts(temp, "# Show general information in error_log.\n");
-	  cupsFilePuts(temp, "LogLevel info\n");
-	}
-      }
-      else if (!strcasecmp(line, "<Policy") && !strcasecmp(value, "default"))
-      {
-	in_policy = 1;
-
-	cupsFilePrintf(temp, "%s %s>\n", line, value);
-	indent += 2;
-      }
-      else if (!strcasecmp(line, "</Policy>"))
-      {
-	indent -= 2;
-        if (!wrote_policy)
-	{
-	  wrote_policy = 1;
-
-          if (!user_cancel_any)
-	    cupsFilePuts(temp, "  # Only the owner or an administrator can cancel a job...\n"
-	                       "  <Limit Cancel-Job>\n"
-	                       "    Order deny,allow\n"
-	                       "    Allow @SYSTEM\n"
-			       "    Allow @OWNER\n"
-			       "  </Limit>\n");
-        }
-
-	in_policy = 0;
-
-	cupsFilePuts(temp, "</Policy>\n");
-      }
-      else if (!strcasecmp(line, "<Location"))
-      {
-	indent += 2;
-        if (!strcmp(value, "/admin"))
-	  in_admin_location = 1;
-        if (!strcmp(value, "/admin/conf"))
-	  in_conf_location = 1;
-	else if (!strcmp(value, "/"))
-	  in_root_location = 1;
-
-	cupsFilePrintf(temp, "%s %s>\n", line, value);
-      }
-      else if (!strcasecmp(line, "</Location>"))
-      {
-	indent -= 2;
-        if (in_admin_location)
-	{
-	  wrote_admin_location = 1;
-
-	  if (remote_admin)
-            cupsFilePuts(temp, "  # Allow remote administration...\n");
-	  else
-            cupsFilePuts(temp, "  # Restrict access to the admin pages...\n");
-
-          cupsFilePuts(temp, "  Order allow,deny\n");
-
-	  if (remote_admin)
-	    cupsFilePuts(temp, "  Allow @LOCAL\n");
-	  else
-	    cupsFilePuts(temp, "  Allow localhost\n");
-	}
-        else if (in_conf_location)
-	{
-	  wrote_conf_location = 1;
-
-	  if (remote_admin)
-            cupsFilePuts(temp, "  # Allow remote access to the configuration files...\n");
-	  else
-            cupsFilePuts(temp, "  # Restrict access to the configuration files...\n");
-
-          cupsFilePuts(temp, "  Order allow,deny\n");
-
-	  if (remote_admin)
-	    cupsFilePuts(temp, "  Allow @LOCAL\n");
-	  else
-	    cupsFilePuts(temp, "  Allow localhost\n");
-	}
-	else if (in_root_location)
-	{
-	  wrote_root_location = 1;
-
-	  if (remote_admin && share_printers)
-            cupsFilePuts(temp, "  # Allow shared printing and remote administration...\n");
-	  else if (remote_admin)
-            cupsFilePuts(temp, "  # Allow remote administration...\n");
-	  else if (share_printers)
-            cupsFilePuts(temp, "  # Allow shared printing...\n");
-	  else
-            cupsFilePuts(temp, "  # Restrict access to the server...\n");
-
-          cupsFilePuts(temp, "  Order allow,deny\n");
-
-	  if (remote_admin || share_printers)
-	    cupsFilePuts(temp, "  Allow @LOCAL\n");
-	  else
-	    cupsFilePuts(temp, "  Allow localhost\n");
-	}
-
-	in_admin_location = 0;
-	in_conf_location  = 0;
-        in_root_location  = 0;
-
-	cupsFilePuts(temp, "</Location>\n");
-      }
-      else if (!strcasecmp(line, "<Limit") && in_policy)
-      {
-       /*
-	* See if the policy limit is for the Cancel-Job operation...
-	*/
-
-	char	*valptr;		/* Pointer into value */
-
-
-	indent += 2;
-
-        if (!strcasecmp(value, "cancel-job"))
-	{
-	 /*
-	  * Don't write anything for this limit section...
-	  */
-
-	  in_cancel_job = 2;
-	}
-	else
-	{
-	  cupsFilePrintf(temp, "  %s", line);
-
-	  while (*value)
-	  {
-	    for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
-
-	    if (*valptr)
-	      *valptr++ = '\0';
-
-            if (!strcasecmp(value, "cancel-job"))
-	    {
-	     /*
-	      * Write everything except for this definition...
-	      */
-
-	      in_cancel_job = 1;
-	    }
-	    else
-	      cupsFilePrintf(temp, " %s", value);
-
-            for (value = valptr; isspace(*value & 255); value ++);
-	  }
-
-	  cupsFilePuts(temp, ">\n");
-        }
-      }
-      else if (!strcasecmp(line, "</Limit>") && in_cancel_job)
-      {
-	indent -= 2;
-
-        if (in_cancel_job == 1)
-          cupsFilePuts(temp, "  </Limit>\n");
-
-        wrote_policy = 1;
-
-        if (!user_cancel_any)
-	  cupsFilePuts(temp, "  # Only the owner or an administrator can cancel a job...\n"
-	                     "  <Limit Cancel-Job>\n"
-	                     "    Order deny,allow\n"
-	                     "    Require user @OWNER @SYSTEM\n"
-			     "  </Limit>\n");
-
-	in_cancel_job = 0;
-      }
-      else if ((in_admin_location || in_conf_location || in_root_location) &&
-               (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny") ||
-	        !strcasecmp(line, "Order")))
-	continue;
-      else if (in_cancel_job == 2)
-        continue;
-      else if (!strcasecmp(line, "<Limit")  && value)
-	cupsFilePrintf(temp, "  %s %s>\n", line, value);
-      else if (line[0] == '<')
-      {
-        if (value)
-	{
-          cupsFilePrintf(temp, "%*s%s %s>\n", indent, "", line, value);
-	  indent += 2;
-	}
-	else
-	{
-	  if (line[1] == '/')
-	    indent -= 2;
-
-	  cupsFilePrintf(temp, "%*s%s\n", indent, "", line);
-	}
-      }
-      else if (value)
-	cupsFilePrintf(temp, "%*s%s %s\n", indent, "", line, value);
-      else
-	cupsFilePrintf(temp, "%*s%s\n", indent, "", line);
-    }
-
-   /*
-    * Write any missing info...
-    */
-
-    if (!wrote_browsing)
-    {
-      if (remote_printers || share_printers)
-      {
-	if (remote_printers && share_printers)
-	  cupsFilePuts(temp, "# Enable printer sharing and shared printers.\n");
-	else if (remote_printers)
-	  cupsFilePuts(temp, "# Show shared printers on the local network.\n");
-	else
-	  cupsFilePuts(temp, "# Share local printers on the local network.\n");
-
-	cupsFilePuts(temp, "Browsing On\n");
-	cupsFilePuts(temp, "BrowseOrder allow,deny\n");
-
-	if (remote_printers)
-	  cupsFilePuts(temp, "BrowseAllow @LOCAL\n");
-
-	if (share_printers)
-	  cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
-      }
-      else
-      {
-	cupsFilePuts(temp, "# Disable printer sharing and shared printers.\n");
-	cupsFilePuts(temp, "Browsing Off\n");
-      }
-    }
-
-    if (!wrote_loglevel)
-    {
-      if (debug_logging)
-      {
-        cupsFilePuts(temp, "# Show troubleshooting information in error_log.\n");
-	cupsFilePuts(temp, "LogLevel debug\n");
-      }
-      else
-      {
-        cupsFilePuts(temp, "# Show general information in error_log.\n");
-	cupsFilePuts(temp, "LogLevel info\n");
-      }
-    }
-
-    if (!wrote_port_listen)
-    {
-      if (share_printers || remote_admin)
-      {
-	cupsFilePuts(temp, "# Allow remote access\n");
-	cupsFilePrintf(temp, "Listen *:%d\n", ippPort());
-      }
-      else
-      {
-	cupsFilePuts(temp, "# Only listen for connections from the local machine.\n");
-	cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
-      }
-
-#ifdef CUPS_DEFAULT_DOMAINSOCKET
-      cupsFilePuts(temp, "Listen " CUPS_DEFAULT_DOMAINSOCKET "\n");
-#endif /* CUPS_DEFAULT_DOMAINSOCKET */
-    }
-
-    if (!wrote_root_location)
-    {
-      if (remote_admin && share_printers)
-        cupsFilePuts(temp, "# Allow shared printing and remote administration...\n");
-      else if (remote_admin)
-        cupsFilePuts(temp, "# Allow remote administration...\n");
-      else if (share_printers)
-        cupsFilePuts(temp, "# Allow shared printing...\n");
-      else
-        cupsFilePuts(temp, "# Restrict access to the server...\n");
-
-      cupsFilePuts(temp, "<Location />\n"
-                         "  Order allow,deny\n");
-
-      if (remote_admin || share_printers)
-	cupsFilePuts(temp, "  Allow @LOCAL\n");
-      else
-	cupsFilePuts(temp, "  Allow localhost\n");
-
-      cupsFilePuts(temp, "</Location>\n");
-    }
-
-    if (!wrote_admin_location)
-    {
-      if (remote_admin)
-        cupsFilePuts(temp, "# Allow remote administration...\n");
-      else
-        cupsFilePuts(temp, "# Restrict access to the admin pages...\n");
-
-      cupsFilePuts(temp, "<Location /admin>\n"
-                         "  Order allow,deny\n");
-
-      if (remote_admin)
-	cupsFilePuts(temp, "  Allow @LOCAL\n");
-      else
-	cupsFilePuts(temp, "  Allow localhost\n");
-
-      cupsFilePuts(temp, "</Location>\n");
-    }
-
-    if (!wrote_conf_location)
-    {
-      if (remote_admin)
-        cupsFilePuts(temp, "# Allow remote access to the configuration files...\n");
-      else
-        cupsFilePuts(temp, "# Restrict access to the configuration files...\n");
-
-      cupsFilePuts(temp, "<Location /admin/conf>\n"
-                         "  AuthType Basic\n"
-                         "  Require user @SYSTEM\n"
-                         "  Order allow,deny\n");
-
-      if (remote_admin)
-	cupsFilePuts(temp, "  Allow @LOCAL\n");
-      else
-	cupsFilePuts(temp, "  Allow localhost\n");
-
-      cupsFilePuts(temp, "</Location>\n");
-    }
-
-    if (!wrote_policy)
-    {
-      cupsFilePuts(temp, "<Policy default>\n"
-                         "  # Job-related operations must be done by the owner or an adminstrator...\n"
-                         "  <Limit Send-Document Send-URI Hold-Job Release-Job "
-			 "Restart-Job Purge-Jobs Set-Job-Attributes "
-			 "Create-Job-Subscription Renew-Subscription "
-			 "Cancel-Subscription Get-Notifications Reprocess-Job "
-			 "Cancel-Current-Job Suspend-Current-Job Resume-Job "
-			 "CUPS-Move-Job>\n"
-                         "    Require user @OWNER @SYSTEM\n"
-                         "    Order deny,allow\n"
-                         "  </Limit>\n"
-                         "  # All administration operations require an adminstrator to authenticate...\n"
-			 "  <Limit Pause-Printer Resume-Printer "
-                         "Set-Printer-Attributes Enable-Printer "
-			 "Disable-Printer Pause-Printer-After-Current-Job "
-			 "Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer "
-			 "Activate-Printer Restart-Printer Shutdown-Printer "
-			 "Startup-Printer Promote-Job Schedule-Job-After "
-			 "CUPS-Add-Printer CUPS-Delete-Printer "
-			 "CUPS-Add-Class CUPS-Delete-Class "
-			 "CUPS-Accept-Jobs CUPS-Reject-Jobs "
-			 "CUPS-Set-Default CUPS-Add-Device CUPS-Delete-Device>\n"
-                         "    AuthType Basic\n"
-			 "    Require user @SYSTEM\n"
-                         "    Order deny,allow\n"
-                         "</Limit>\n");
-
-      if (!user_cancel_any)
-	cupsFilePuts(temp, "  # Only the owner or an administrator can cancel a job...\n"
-	                   "  <Limit Cancel-Job>\n"
-	                   "    Require user @OWNER @SYSTEM\n"
-	                   "    Order deny,allow\n"
-			   "  </Limit>\n");
-
-      cupsFilePuts(temp, "  <Limit All>\n"
-                         "  Order deny,allow\n"
-                         "  </Limit>\n"
-			 "</Policy>\n");
-    }
-
-    cupsFileClose(cupsd);
-    cupsFileClose(temp);
-
-   /*
-    * Upload the configuration file to the server...
-    */
-
-    status = cupsPutFile(http, "/admin/conf/cupsd.conf", tempfile);
-
-    if (status != HTTP_CREATED)
-    {
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to upload cupsd.conf file:")));
-      cgiSetVariable("ERROR", httpStatus(status));
-      cgiStartHTML(cgiText(_("Change Settings")));
+      cgiSetVariable("ERROR", cupsLastErrorString());
       cgiCopyTemplateLang("error.tmpl");
     }
     else
     {
       cgiSetVariable("refresh_page", "5;/admin/?OP=redirect");
-
       cgiStartHTML(cgiText(_("Change Settings")));
       cgiCopyTemplateLang("restart.tmpl");
     }
 
-    cgiEndHTML();
+    cupsFreeOptions(num_settings, settings);
 
-    unlink(tempfile);
+    cgiEndHTML();
   }
   else if (cgiIsPOST())
   {
@@ -2482,13 +1942,10 @@ do_export(http_t *http)			/* I - HTTP connection */
 		*export_all;		/* Export all printers? */
   int		export_count,		/* Number of printers to export */
 		printer_count;		/* Number of available printers */
+  const char	*name,			/* What name to pull */
+		*dest;			/* Current destination */
+  char		ppd[1024];		/* PPD file */
 
-
- /*
-  * Show header...
-  */
-
-  cgiStartHTML(cgiText(_("Export Printers to Samba")));
 
  /*
   * Get form data...
@@ -2498,163 +1955,6 @@ do_export(http_t *http)			/* I - HTTP connection */
   password     = cgiGetVariable("PASSWORD");
   export_all   = cgiGetVariable("EXPORT_ALL");
   export_count = cgiGetSize("EXPORT_NAME");
-
-  if (username && *username && password && *password && export_count <= 1000)
-  {
-   /*
-    * Do export...
-    */
-
-    char	userpass[1024],		/* Username%password */
-    		*argv[1005];		/* Arguments */
-    int		argc;			/* Number of arguments */
-    int		pid;			/* Process ID of child */
-    int		status;			/* Status of command */
-
-
-    fputs("DEBUG: Export printers...\n", stderr);
-
-   /*
-    * Create the command-line for cupsaddsmb...
-    */
-
-    snprintf(userpass, sizeof(userpass), "%s%%%s", username, password);
-
-    argv[0] = "cupsaddsmb";
-    argv[1] = "-v";
-    argv[2] = "-U";
-    argv[3] = userpass;
-    argc    = 4;
-
-    if (export_all)
-      argv[argc ++] = "-a";
-    else
-    {
-      for (i = 0; i < export_count; i ++)
-        argv[argc ++] = (char *)cgiGetArray("EXPORT_NAME", i);
-    }
-
-    argv[argc] = NULL; 
-
-   /*
-    * Run the command...
-    */
-
-    if ((pid = fork()) == 0)
-    {
-     /*
-      * Child goes here...
-      */
-
-      close(0);
-      open("/dev/null", O_RDONLY);
-      close(1);
-      dup(2);
-
-      execvp("cupsaddsmb", argv);
-      perror("ERROR: Unable to execute cupsaddsmb");
-      exit(20);
-    }
-    else if (pid < 0)
-      cgiSetVariable("ERROR", cgiText(_("Unable to fork process!")));
-    else
-    {
-     /*
-      * Parent goes here, wait for child to finish...
-      */
-
-      while (wait(&status) < 0);
-
-      if (status)
-      {
-        char	message[1024];		/* Error message */
-
-
-	if (WIFEXITED(status))
-	{
-	  switch (WEXITSTATUS(status))
-	  {
-	    case 1 :
-	        cgiSetVariable("ERROR", cgiText(_("Unable to connect to server!")));
-                break;
-
-	    case 2 :
-	        cgiSetVariable("ERROR", cgiText(_("Unable to get printer "
-		                                  "attributes!")));
-                break;
-
-	    case 3 :
-	        cgiSetVariable("ERROR", cgiText(_("Unable to convert PPD file!")));
-                break;
-
-	    case 4 :
-	        cgiSetVariable("ERROR", cgiText(_("Unable to copy Windows 2000 "
-		                                  "printer driver files!")));
-                break;
-
-	    case 5 :
-	        cgiSetVariable("ERROR", cgiText(_("Unable to install Windows "
-		                                  "2000 printer driver files!")));
-                break;
-
-	    case 6 :
-	        cgiSetVariable("ERROR", cgiText(_("Unable to copy Windows 9x "
-		                                  "printer driver files!")));
-                break;
-
-	    case 7 :
-	        cgiSetVariable("ERROR", cgiText(_("Unable to install Windows "
-		                                  "9x printer driver files!")));
-                break;
-
-	    case 8 :
-	        cgiSetVariable("ERROR", cgiText(_("Unable to set Windows "
-		                                  "printer driver!")));
-                break;
-
-	    case 9 :
-	        cgiSetVariable("ERROR", cgiText(_("No printer drivers found!")));
-                break;
-
-	    case 20 :
-	        cgiSetVariable("ERROR", cgiText(_("Unable to execute "
-		                                  "cupsaddsmb command!")));
-                break;
-
-	    default :
-        	snprintf(message, sizeof(message),
-	        	  cgiText(_("cupsaddsmb failed with status %d")),
-	        	 WEXITSTATUS(status));
-
-                cgiSetVariable("ERROR", message);
-		break;
-          }
-	}
-        else
-	{
-          snprintf(message, sizeof(message),
-	            cgiText(_("cupsaddsmb crashed on signal %d")),
-	           WTERMSIG(status));
-
-          cgiSetVariable("ERROR", message);
-	}
-      }
-      else
-      {
-        cgiCopyTemplateLang("samba-exported.tmpl");
-	cgiEndHTML();
-	return;
-      }
-    }
-  }
-  else if (username && !*username)
-    cgiSetVariable("ERROR",
-                   cgiText(_("A Samba username is required to export "
-		             "printer drivers!")));
-  else if (username && (!password || !*password))
-    cgiSetVariable("ERROR",
-                   cgiText(_("A Samba password is required to export "
-		             "printer drivers!")));
 
  /*
   * Get list of available printers...
@@ -2686,9 +1986,10 @@ do_export(http_t *http)			/* I - HTTP connection */
 
       for (i = 0; i < printer_count; i ++)
       {
+        dest = cgiGetArray("PRINTER_NAME", i);
+
         for (j = 0; j < export_count; j ++)
-	  if (!strcasecmp(cgiGetArray("PRINTER_NAME", i),
-	                  cgiGetArray("EXPORT_NAME", j)))
+	  if (!strcasecmp(dest, cgiGetArray("EXPORT_NAME", j)))
             break;
 
         cgiSetArray("PRINTER_EXPORT", i, j < export_count ? "Y" : "");
@@ -2697,9 +1998,66 @@ do_export(http_t *http)			/* I - HTTP connection */
   }
 
  /*
+  * Export or get the printers to export...
+  */
+
+  if (username && *username && password && *password &&
+      (export_all || export_count > 0))
+  {
+   /*
+    * Do export...
+    */
+
+    fputs("DEBUG: Export printers...\n", stderr);
+
+    if (export_all)
+    {
+      name         = "PRINTER_NAME";
+      export_count = cgiGetSize("PRINTER_NAME");
+    }
+    else
+      name = "EXPORT_NAME";
+
+    for (i = 0; i < export_count; i ++)
+    {
+      dest = cgiGetArray(name, i);
+
+      if (!cupsAdminCreateWindowsPPD(http, dest, ppd, sizeof(ppd)))
+        break;
+
+      j = cupsAdminExportSamba(dest, ppd, "localhost", username, password,
+                               stderr);
+
+      unlink(ppd);
+
+      if (!j)
+        break;
+    }
+
+    if (i < export_count)
+      cgiSetVariable("ERROR", cupsLastErrorString());
+    else
+    {
+      cgiStartHTML(cgiText(_("Export Printers to Samba")));
+      cgiCopyTemplateLang("samba-exported.tmpl");
+      cgiEndHTML();
+      return;
+    }
+  }
+  else if (username && !*username)
+    cgiSetVariable("ERROR",
+                   cgiText(_("A Samba username is required to export "
+		             "printer drivers!")));
+  else if (username && (!password || !*password))
+    cgiSetVariable("ERROR",
+                   cgiText(_("A Samba password is required to export "
+		             "printer drivers!")));
+
+ /*
   * Show form...
   */
 
+  cgiStartHTML(cgiText(_("Export Printers to Samba")));
   cgiCopyTemplateLang("samba-export.tmpl");
   cgiEndHTML();
 }
@@ -2712,10 +2070,10 @@ do_export(http_t *http)			/* I - HTTP connection */
 static void
 do_menu(http_t *http)			/* I - HTTP connection */
 {
-  cups_file_t	*cupsd;			/* cupsd.conf file */
-  char		line[1024],		/* Line from cupsd.conf file */
-		*value;			/* Value on line */
-  const char	*server_root;		/* Location of config files */
+  int		num_settings;		/* Number of server settings */
+  cups_option_t	*settings;		/* Server settings */
+  const char	*val;			/* Setting value */
+  char		filename[1024];		/* Temporary filename */
   const char	*datadir;		/* Location of data files */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
@@ -2723,165 +2081,37 @@ do_menu(http_t *http)			/* I - HTTP connection */
 
 
  /*
-  * Locate the cupsd.conf file...
+  * Get the current server settings...
   */
 
-  if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
-    server_root = CUPS_SERVERROOT;
-
-  snprintf(line, sizeof(line), "%s/cupsd.conf", server_root);
-
-  cgiStartHTML(cgiText(_("Administration")));
-
-  printf("<!-- \"%s\" -->\n", line);
-
- /*
-  * Open the cupsd.conf file...
-  */
-
-  if ((cupsd = cupsFileOpen(line, "r")) == NULL)
+  if (!_cupsAdminGetServerSettings(http, &num_settings, &settings))
   {
-   /*
-    * Unable to open - log an error...
-    */
-
+    cgiStartHTML(cgiText(_("Administration")));
     cgiSetVariable("MESSAGE", cgiText(_("Unable to open cupsd.conf file:")));
-    cgiSetVariable("ERROR", strerror(errno));
+    cgiSetVariable("ERROR", cupsLastErrorString());
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
-
-    perror(line);
   }
-  else
-  {
-   /*
-    * Read the file, keeping track of what settings are enabled...
-    */
 
-    int		remote_access = 0,	/* Remote access allowed? */
-		remote_admin = 0,	/* Remote administration allowed? */
-		browsing = 1,		/* Browsing enabled? */
-		browse_allow = 1,	/* Browse address set? */
-		browse_address = 0,	/* Browse address set? */
-		cancel_policy = 1,	/* Cancel-job policy set? */
-		debug_logging = 0;	/* LogLevel debug set? */
-    int		linenum = 0,		/* Line number in file */
-		in_policy = 0,		/* In a policy section? */
-		in_cancel_job = 0,	/* In a cancel-job section? */
-		in_admin_location = 0;	/* In the /admin location? */
+  if ((val = cupsGetOption(CUPS_SERVER_DEBUG_LOGGING, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("DEBUG_LOGGING", "CHECKED");
 
+  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ADMIN, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("REMOTE_ADMIN", "CHECKED");
 
-    while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
-    {
-      if (!strcasecmp(line, "Port"))
-      {
-        remote_access = 1;
-      }
-      else if (!strcasecmp(line, "Listen"))
-      {
-        char	*port;			/* Pointer to port number, if any */
+  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("REMOTE_PRINTERS", "CHECKED");
 
+  if ((val = cupsGetOption(CUPS_SERVER_SHARE_PRINTERS, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("SHARE_PRINTERS", "CHECKED");
 
-	if ((port = strrchr(value, ':')) != NULL)
-	  *port = '\0';
-
-        if (strcasecmp(value, "localhost") && strcmp(value, "127.0.0.1"))
-	  remote_access = 1;
-      }
-      else if (!strcasecmp(line, "Browsing"))
-      {
-        browsing = !strcasecmp(value, "yes") || !strcasecmp(value, "on") ||
-	           !strcasecmp(value, "true");
-      }
-      else if (!strcasecmp(line, "BrowseAddress"))
-      {
-        browse_address = 1;
-      }
-      else if (!strcasecmp(line, "BrowseAllow"))
-      {
-        browse_allow = 1;
-      }
-      else if (!strcasecmp(line, "BrowseOrder"))
-      {
-        browse_allow = !strncasecmp(value, "deny,", 5);
-      }
-      else if (!strcasecmp(line, "LogLevel"))
-      {
-        debug_logging = !strncasecmp(value, "debug", 5);
-      }
-      else if (!strcasecmp(line, "<Policy") && !strcasecmp(value, "default"))
-      {
-        in_policy = 1;
-      }
-      else if (!strcasecmp(line, "</Policy>"))
-      {
-        in_policy = 0;
-      }
-      else if (!strcasecmp(line, "<Limit") && in_policy)
-      {
-       /*
-        * See if the policy limit is for the Cancel-Job operation...
-	*/
-
-        char	*valptr;		/* Pointer into value */
-
-
-        while (*value)
-	{
-	  for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
-
-	  if (*valptr)
-	    *valptr++ = '\0';
-
-          if (!strcasecmp(value, "cancel-job") || !strcasecmp(value, "all"))
-	  {
-	    in_cancel_job = 1;
-	    break;
-	  }
-
-          for (value = valptr; isspace(*value & 255); value ++);
-        }
-      }
-      else if (!strcasecmp(line, "</Limit>"))
-      {
-        in_cancel_job = 0;
-      }
-      else if (!strcasecmp(line, "Require") && in_cancel_job)
-      {
-        cancel_policy = 0;
-      }
-      else if (!strcasecmp(line, "<Location") && !strcasecmp(value, "/admin"))
-      {
-        in_admin_location = 1;
-      }
-      else if (!strcasecmp(line, "</Location>"))
-      {
-        in_admin_location = 0;
-      }
-      else if (!strcasecmp(line, "Allow") && in_admin_location &&
-               strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1"))
-      {
-        remote_admin = 1;
-      }
-    }
-
-    cupsFileClose(cupsd);
-
-    if (browsing && browse_allow)
-      cgiSetVariable("REMOTE_PRINTERS", "CHECKED");
-
-    if (remote_access && browsing && browse_address)
-      cgiSetVariable("SHARE_PRINTERS", "CHECKED");
-
-    if (remote_access && remote_admin)
-      cgiSetVariable("REMOTE_ADMIN", "CHECKED");
-
-    if (cancel_policy)
-      cgiSetVariable("USER_CANCEL_ANY", "CHECKED");
-
-    if (debug_logging)
-      cgiSetVariable("DEBUG_LOGGING", "CHECKED");
-  }
+  if ((val = cupsGetOption(CUPS_SERVER_USER_CANCEL_ANY, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("USER_CANCEL_ANY", "CHECKED");
 
  /*
   * Get the list of printers and their devices...
@@ -3100,32 +2330,38 @@ do_menu(http_t *http)			/* I - HTTP connection */
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
 
-  snprintf(line, sizeof(line), "%s/drivers/pscript5.dll", datadir);
-  if (!access(line, 0))
+  snprintf(filename, sizeof(filename), "%s/drivers/pscript5.dll", datadir);
+  if (!access(filename, R_OK))
   {
    /*
     * Found Windows 2000 driver file, see if we have smbclient and
     * rpcclient...
     */
 
-    if (cupsFileFind("smbclient", getenv("PATH"), 1, line, sizeof(line)) &&
-        cupsFileFind("rpcclient", getenv("PATH"), 1, line, sizeof(line)))
+    if (cupsFileFind("smbclient", getenv("PATH"), 1, filename,
+                     sizeof(filename)) &&
+        cupsFileFind("rpcclient", getenv("PATH"), 1, filename,
+	             sizeof(filename)))
       cgiSetVariable("HAVE_SAMBA", "Y");
     else
     {
-      if (!cupsFileFind("smbclient", getenv("PATH"), 1, line, sizeof(line)))
+      if (!cupsFileFind("smbclient", getenv("PATH"), 1, filename,
+                        sizeof(filename)))
         fputs("ERROR: smbclient not found!\n", stderr);
 
-      if (!cupsFileFind("rpcclient", getenv("PATH"), 1, line, sizeof(line)))
+      if (!cupsFileFind("rpcclient", getenv("PATH"), 1, filename,
+                        sizeof(filename)))
         fputs("ERROR: rpcclient not found!\n", stderr);
     }
   }
   else
-    perror(line);
+    perror(filename);
 
  /*
   * Finally, show the main menu template...
   */
+
+  cgiStartHTML(cgiText(_("Administration")));
 
   cgiCopyTemplateLang("admin.tmpl");
 
@@ -3610,5 +2846,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 5107 2006-02-15 19:14:17Z mike $".
+ * End of "$Id: admin.c 5240 2006-03-07 21:55:29Z mike $".
  */

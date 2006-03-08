@@ -45,14 +45,14 @@ OBJS	=	phpcups.o
 # Targets in this directory...
 #
 
-TARGETS	=	phpcups.so
+PHPCUPS	=	phpcups.so
 
 
 #
 # Make all targets...
 #
 
-all:	$(TARGETS)
+all:	$(PHPCUPS)
 
 
 #
@@ -60,7 +60,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS)
+	$(RM) $(OBJS) $(PHPCUPS)
 
 
 #
@@ -76,9 +76,18 @@ depend:
 #
 
 install:	all
-	echo Installing $(TARGETS) in $(PHPDIR)
+	echo Installing $(PHPCUPS) in $(PHPDIR)
 	$(INSTALL_DIR) $(PHPDIR)
-	cp $(TARGETS) $(PHPDIR)
+	$(INSTALL_BIN) $(PHPCUPS) $(PHPDIR)
+
+
+#
+# Uninstall object and target files...
+#
+
+uninstall:
+	$(RM) $(PHPDIR)/$(PHPCUPS)
+	-$(RMDIR) $(PHPDIR)
 
 
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5164 2006-02-24 20:40:00Z mike $"
+ * "$Id: ipp.c 5232 2006-03-05 17:59:19Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -426,8 +426,8 @@ cupsdProcessIPPRequest(
 	    * Remote unauthenticated user masquerading as local root...
 	    */
 
-	    _cups_sp_free(username->values[0].string.text);
-	    username->values[0].string.text = _cups_sp_alloc(RemoteRoot);
+	    _cupsStrFree(username->values[0].string.text);
+	    username->values[0].string.text = _cupsStrAlloc(RemoteRoot);
 	  }
 	}
 
@@ -1342,8 +1342,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   else
   {
     attr->group_tag = IPP_TAG_JOB;
-    _cups_sp_free(attr->name);
-    attr->name = _cups_sp_alloc("job-originating-user-name");
+    _cupsStrFree(attr->name);
+    attr->name = _cupsStrAlloc("job-originating-user-name");
   }
 
   if ((attr = ippFindAttribute(job->attrs, "job-originating-host-name",
@@ -1381,11 +1381,11 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
 	    for (i = 0; i < attr->num_values; i ++)
 	    {
-	      _cups_sp_free(attr->values[i].string.text);
+	      _cupsStrFree(attr->values[i].string.text);
 	      attr->values[i].string.text = NULL;
 	      if (attr->values[i].string.charset)
 	      {
-		_cups_sp_free(attr->values[i].string.charset);
+		_cupsStrFree(attr->values[i].string.charset);
 		attr->values[i].string.charset = NULL;
 	      }
             }
@@ -1400,7 +1400,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
       attr->value_tag             = IPP_TAG_NAME;
       attr->num_values            = 1;
-      attr->values[0].string.text = _cups_sp_alloc(con->http.hostname);
+      attr->values[0].string.text = _cupsStrAlloc(con->http.hostname);
     }
 
     attr->group_tag = IPP_TAG_JOB;
@@ -1496,8 +1496,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
-      attr->values[0].string.text = _cups_sp_alloc(printer->job_sheets[0]);
-      attr->values[1].string.text = _cups_sp_alloc(printer->job_sheets[1]);
+      attr->values[0].string.text = _cupsStrAlloc(printer->job_sheets[0]);
+      attr->values[1].string.text = _cupsStrAlloc(printer->job_sheets[1]);
     }
 
     job->job_sheets = attr;
@@ -1899,7 +1899,7 @@ add_job_subscriptions(
       * Free and remove this attribute...
       */
 
-      _ipp_free_attr(attr);
+      _ippFreeAttr(attr);
 
       if (prev)
         prev->next = next;
@@ -1948,9 +1948,9 @@ add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
   snprintf(uuid, sizeof(uuid), "%s:%s:%d:%d", ServerName, con->servername,
 	   con->serverport, job->id);
 
-  _cups_md5_init(&md5state);
-  _cups_md5_append(&md5state, (unsigned char *)uuid, strlen(uuid));
-  _cups_md5_finish(&md5state, md5sum);
+  _cupsMD5Init(&md5state);
+  _cupsMD5Append(&md5state, (unsigned char *)uuid, strlen(uuid));
+  _cupsMD5Finish(&md5state, md5sum);
 
  /*
   * Format the UUID URI using the MD5 sum and job ID.
@@ -3283,7 +3283,7 @@ copy_attribute(
 	else
 	{
           for (i = 0; i < attr->num_values; i ++)
-	    toattr->values[i].string.text = _cups_sp_alloc(attr->values[i].string.text);
+	    toattr->values[i].string.text = _cupsStrAlloc(attr->values[i].string.text);
 	}
         break;
 
@@ -3336,12 +3336,12 @@ copy_attribute(
 	  {
 	    if (!i)
               toattr->values[i].string.charset =
-	          _cups_sp_alloc(attr->values[i].string.charset);
+	          _cupsStrAlloc(attr->values[i].string.charset);
 	    else
               toattr->values[i].string.charset =
 	          toattr->values[0].string.charset;
 
-	    toattr->values[i].string.text = _cups_sp_alloc(attr->values[i].string.text);
+	    toattr->values[i].string.text = _cupsStrAlloc(attr->values[i].string.text);
           }
         }
         break;
@@ -6251,18 +6251,18 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     * Free the old hold value and copy the new one over...
     */
 
-    _cups_sp_free(attr->values[0].string.text);
+    _cupsStrFree(attr->values[0].string.text);
 
     if (newattr)
     {
       attr->value_tag = newattr->value_tag;
       attr->values[0].string.text =
-          _cups_sp_alloc(newattr->values[0].string.text);
+          _cupsStrAlloc(newattr->values[0].string.text);
     }
     else
     {
       attr->value_tag = IPP_TAG_KEYWORD;
-      attr->values[0].string.text = _cups_sp_alloc("indefinite");
+      attr->values[0].string.text = _cupsStrAlloc("indefinite");
     }
 
    /*
@@ -6779,9 +6779,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
       if (format)
       {
-	  _cups_sp_free(format->values[0].string.text);
+	  _cupsStrFree(format->values[0].string.text);
 
-	format->values[0].string.text = _cups_sp_alloc(mimetype);
+	format->values[0].string.text = _cupsStrAlloc(mimetype);
       }
       else
         ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
@@ -7056,7 +7056,7 @@ read_ps_job_ticket(cupsd_client_t *con)	/* I - Client connection */
       if (con->request->last == attr2)
         con->request->last = prev2;
 
-      _ipp_free_attr(attr2);
+      _ippFreeAttr(attr2);
     }
 
    /*
@@ -7279,10 +7279,10 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (attr)
   {
-    _cups_sp_free(attr->values[0].string.text);
+    _cupsStrFree(attr->values[0].string.text);
 
     attr->value_tag = IPP_TAG_KEYWORD;
-    attr->values[0].string.text = _cups_sp_alloc("no-hold");
+    attr->values[0].string.text = _cupsStrAlloc("no-hold");
   }
 
  /*
@@ -7803,8 +7803,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
       if (format)
       {
-	_cups_sp_free(format->values[0].string.text);
-	format->values[0].string.text = _cups_sp_alloc(mimetype);
+	_cupsStrFree(format->values[0].string.text);
+	format->values[0].string.text = _cupsStrAlloc(mimetype);
       }
       else
         ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
@@ -8385,7 +8385,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       if (job->attrs->last == attr2)
         job->attrs->last = job->attrs->prev;
 
-      _ipp_free_attr(attr2);
+      _ippFreeAttr(attr2);
 
      /*
       * Then copy the attribute...
@@ -8424,7 +8424,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
         if (attr2 == job->attrs->last)
 	  job->attrs->last = job->attrs->prev;
 
-        _ipp_free_attr(attr2);
+        _ippFreeAttr(attr2);
       }
     }
     else
@@ -9094,5 +9094,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 5164 2006-02-24 20:40:00Z mike $".
+ * End of "$Id: ipp.c 5232 2006-03-05 17:59:19Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5192 2006-02-27 03:08:47Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -101,6 +101,31 @@ installhdrs:
 	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
+
+
+#
+# Uninstall all targets...
+#
+
+uninstall:
+	for file in $(FILTERS); do \
+		$(RM) $(SERVERBIN)/filter/$$file; \
+	done
+	$(RM) $(SERVERBIN)/filter/rastertodymo
+	-$(RMDIR) $(SERVERBIN)/filter
+	-$(RMDIR) $(SERVERBIN)
+	$(RM) $(LIBDIR)/libcupsimage.2.dylib
+	$(RM) $(LIBDIR)/libcupsimage.a
+	$(RM) $(LIBDIR)/libcupsimage.dylib
+	$(RM) $(LIBDIR)/libcupsimage_s.a
+	$(RM) $(LIBDIR)/libcupsimage.sl
+	$(RM) $(LIBDIR)/libcupsimage.sl.2
+	$(RM) $(LIBDIR)/libcupsimage.so
+	$(RM) $(LIBDIR)/libcupsimage.so.2
+	-$(RMDIR) $(LIBDIR)
+	$(RM) $(INCLUDEDIR)/cups/image.h
+	$(RM) $(INCLUDEDIR)/cups/raster.h
+	-$(RMDIR) $(INCLUDEDIR)/cups
 
 
 #
@@ -295,5 +320,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5192 2006-02-27 03:08:47Z mike $".
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

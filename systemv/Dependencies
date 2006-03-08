@@ -6,10 +6,10 @@ accept.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
 cancel.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 cancel.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
 cancel.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
-cupsaddsmb.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-cupsaddsmb.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
-cupsaddsmb.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
-cupsaddsmb.o: ../cups/debug.h
+cupsaddsmb.o: ../cups/string.h ../config.h ../cups/adminutil.h ../cups/cups.h
+cupsaddsmb.o: ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
+cupsaddsmb.o: ../cups/array.h ../cups/file.h ../cups/language.h
+cupsaddsmb.o: ../cups/i18n.h ../cups/debug.h
 cupstestppd.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 cupstestppd.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
 cupstestppd.o: ../cups/file.h ../cups/language.h ../cups/i18n.h

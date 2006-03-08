@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5047 2006-02-02 05:14:15Z mike $"
+ * "$Id: ipp.c 5231 2006-03-05 17:22:27Z mike $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -57,8 +57,8 @@
  *                            connection.
  *   ippWriteFile()         - Write data for an IPP message to a file.
  *   ippWriteIO()           - Write data for an IPP message.
- *   _ipp_add_attr()        - Add a new attribute to the request.
- *   _ipp_free_attr()       - Free an attribute.
+ *   _ippAddAttr()          - Add a new attribute to the request.
+ *   _ippFreeAttr()         - Free an attribute.
  *   ipp_length()           - Compute the length of an IPP message or
  *                            collection value.
  *   ipp_read_http()        - Semi-blocking read on a HTTP connection...
@@ -111,10 +111,10 @@ ippAddBoolean(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
-  attr->name              = _cups_sp_alloc(name);
+  attr->name              = _cupsStrAlloc(name);
   attr->group_tag         = group;
   attr->value_tag         = IPP_TAG_BOOLEAN;
   attr->values[0].boolean = value;
@@ -145,10 +145,10 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
-  attr->name      = _cups_sp_alloc(name);
+  attr->name      = _cupsStrAlloc(name);
   attr->group_tag = group;
   attr->value_tag = IPP_TAG_BOOLEAN;
 
@@ -183,10 +183,10 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
-  attr->name                 = _cups_sp_alloc(name);
+  attr->name                 = _cupsStrAlloc(name);
   attr->group_tag            = group;
   attr->value_tag            = IPP_TAG_BEGIN_COLLECTION;
   attr->values[0].collection = value;
@@ -220,10 +220,10 @@ ippAddCollections(
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
-  attr->name      = _cups_sp_alloc(name);
+  attr->name      = _cupsStrAlloc(name);
   attr->group_tag = group;
   attr->value_tag = IPP_TAG_BEGIN_COLLECTION;
 
@@ -256,10 +256,10 @@ ippAddDate(ipp_t             *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL || value == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
-  attr->name      = _cups_sp_alloc(name);
+  attr->name      = _cupsStrAlloc(name);
   attr->group_tag = group;
   attr->value_tag = IPP_TAG_DATE;
   memcpy(attr->values[0].date, value, 11);
@@ -288,10 +288,10 @@ ippAddInteger(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
-  attr->name              = _cups_sp_alloc(name);
+  attr->name              = _cupsStrAlloc(name);
   attr->group_tag         = group;
   attr->value_tag         = type;
   attr->values[0].integer = value;
@@ -320,10 +320,10 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
-  attr->name      = _cups_sp_alloc(name);
+  attr->name      = _cupsStrAlloc(name);
   attr->group_tag = group;
   attr->value_tag = type;
 
@@ -356,14 +356,14 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
  /*
   * Initialize the attribute data...
   */
 
-  attr->name                     = _cups_sp_alloc(name);
+  attr->name                     = _cupsStrAlloc(name);
   attr->group_tag                = group;
   attr->value_tag                = IPP_TAG_STRING;
   attr->values[0].unknown.length = datalen;
@@ -402,7 +402,7 @@ ippAddString(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
  /*
@@ -432,13 +432,13 @@ ippAddString(ipp_t      *ipp,		/* I - IPP message */
   * Initialize the attribute data...
   */
 
-  attr->name                     = _cups_sp_alloc(name);
+  attr->name                     = _cupsStrAlloc(name);
   attr->group_tag                = group;
   attr->value_tag                = type;
   attr->values[0].string.charset = ((int)type & IPP_TAG_COPY) ? (char *)charset :
-                                   charset ? _cups_sp_alloc(charset) : NULL;
+                                   charset ? _cupsStrAlloc(charset) : NULL;
   attr->values[0].string.text    = ((int)type & IPP_TAG_COPY) ? (char *)value :
-                                   value ? _cups_sp_alloc(value) : NULL;
+                                   value ? _cupsStrAlloc(value) : NULL;
 
   return (attr);
 }
@@ -466,14 +466,14 @@ ippAddStrings(
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
  /*
   * Initialize the attribute data...
   */
 
-  attr->name      = _cups_sp_alloc(name);
+  attr->name      = _cupsStrAlloc(name);
   attr->group_tag = group;
   attr->value_tag = type;
 
@@ -483,7 +483,7 @@ ippAddStrings(
   {
     if (i == 0)
       value->string.charset = ((int)type & IPP_TAG_COPY) ? (char *)charset :
-                                   charset ? _cups_sp_alloc(charset) : NULL;
+                                   charset ? _cupsStrAlloc(charset) : NULL;
     else
       value->string.charset = attr->values[0].string.charset;
 
@@ -495,10 +495,10 @@ ippAddStrings(
 
       if (type == IPP_TAG_LANGUAGE && !strcasecmp(values[i], "C"))
 	value->string.text = ((int)type & IPP_TAG_COPY) ? "en" :
-                                      _cups_sp_alloc("en");
+                                      _cupsStrAlloc("en");
       else
 	value->string.text = ((int)type & IPP_TAG_COPY) ? (char *)values[i] :
-                                      _cups_sp_alloc(values[i]);
+                                      _cupsStrAlloc(values[i]);
     }
   }
 
@@ -523,10 +523,10 @@ ippAddRange(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
-  attr->name                  = _cups_sp_alloc(name);
+  attr->name                  = _cupsStrAlloc(name);
   attr->group_tag             = group;
   attr->value_tag             = IPP_TAG_RANGE;
   attr->values[0].range.lower = lower;
@@ -556,10 +556,10 @@ ippAddRanges(ipp_t      *ipp,		/* I - IPP message */
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
-  attr->name      = _cups_sp_alloc(name);
+  attr->name      = _cupsStrAlloc(name);
   attr->group_tag = group;
   attr->value_tag = IPP_TAG_RANGE;
 
@@ -594,10 +594,10 @@ ippAddResolution(ipp_t      *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 1)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
     return (NULL);
 
-  attr->name                       = _cups_sp_alloc(name);
+  attr->name                       = _cupsStrAlloc(name);
   attr->group_tag                  = group;
   attr->value_tag                  = IPP_TAG_RESOLUTION;
   attr->values[0].resolution.xres  = xres;
@@ -629,10 +629,10 @@ ippAddResolutions(ipp_t      *ipp,	/* I - IPP message */
   if (ipp == NULL || name == NULL || num_values < 1)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, num_values)) == NULL)
+  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
     return (NULL);
 
-  attr->name      = _cups_sp_alloc(name);
+  attr->name      = _cupsStrAlloc(name);
   attr->group_tag = group;
   attr->value_tag = IPP_TAG_RESOLUTION;
 
@@ -665,7 +665,7 @@ ippAddSeparator(ipp_t *ipp)		/* I - IPP message */
   if (ipp == NULL)
     return (NULL);
 
-  if ((attr = _ipp_add_attr(ipp, 0)) == NULL)
+  if ((attr = _ippAddAttr(ipp, 0)) == NULL)
     return (NULL);
 
   attr->group_tag = IPP_TAG_ZERO;
@@ -743,7 +743,7 @@ ippDelete(ipp_t *ipp)			/* I - IPP message */
   for (attr = ipp->attrs; attr != NULL; attr = next)
   {
     next = attr->next;
-    _ipp_free_attr(attr);
+    _ippFreeAttr(attr);
   }
 
   free(ipp);
@@ -791,7 +791,7 @@ ippDeleteAttribute(
     * Free memory used by the attribute...
     */
 
-    _ipp_free_attr(current);
+    _ippFreeAttr(current);
   }
 }
 
@@ -1254,7 +1254,7 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current)
 	      ipp->prev = ipp->current;
 
-	    attr = ipp->current = _ipp_add_attr(ipp, 1);
+	    attr = ipp->current = _ippAddAttr(ipp, 1);
 
 	    DEBUG_printf(("ippReadIO: membername, ipp->current=%p, ipp->prev=%p\n",
 	                  ipp->current, ipp->prev));
@@ -1280,14 +1280,14 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current)
 	      ipp->prev = ipp->current;
 
-	    attr = ipp->current = _ipp_add_attr(ipp, 1);
+	    attr = ipp->current = _ippAddAttr(ipp, 1);
 
 	    DEBUG_printf(("ippReadIO: name=\'%s\', ipp->current=%p, ipp->prev=%p\n",
 	                  buffer, ipp->current, ipp->prev));
 
 	    attr->group_tag  = ipp->curtag;
 	    attr->value_tag  = tag;
-	    attr->name       = _cups_sp_alloc((char *)buffer);
+	    attr->name       = _cupsStrAlloc((char *)buffer);
 	    attr->num_values = 0;
 	  }
 	  else
@@ -1347,7 +1347,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		}
 
 		buffer[n] = '\0';
-		value->string.text = _cups_sp_alloc((char *)buffer);
+		value->string.text = _cupsStrAlloc((char *)buffer);
 		DEBUG_printf(("ippReadIO: value = \'%s\'\n",
 		              value->string.text));
 	        break;
@@ -1427,13 +1427,13 @@ ippReadIO(void       *src,		/* I - Data source */
 		  string[n] = '\0';
                 }
 
-		value->string.charset = _cups_sp_alloc((char *)string);
+		value->string.charset = _cupsStrAlloc((char *)string);
 
                 bufptr += 2 + n;
 		n = (bufptr[0] << 8) | bufptr[1];
 
 		bufptr[2 + n] = '\0';
-                value->string.text = _cups_sp_alloc((char *)bufptr + 2);
+                value->string.text = _cupsStrAlloc((char *)bufptr + 2);
 	        break;
 
             case IPP_TAG_BEGIN_COLLECTION :
@@ -1480,7 +1480,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		}
 
 		buffer[n] = '\0';
-		attr->name = _cups_sp_alloc((char *)buffer);
+		attr->name = _cupsStrAlloc((char *)buffer);
 
                /*
 	        * Since collection members are encoded differently than
@@ -2400,17 +2400,17 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 
 /*
- * '_ipp_add_attr()' - Add a new attribute to the request.
+ * '_ippAddAttr()' - Add a new attribute to the request.
  */
 
 ipp_attribute_t *			/* O - New attribute */
-_ipp_add_attr(ipp_t *ipp,		/* I - IPP message */
+_ippAddAttr(ipp_t *ipp,		/* I - IPP message */
               int   num_values)		/* I - Number of values */
 {
   ipp_attribute_t	*attr;		/* New attribute */
 
 
-  DEBUG_printf(("_ipp_add_attr(%p, %d)\n", ipp, num_values));
+  DEBUG_printf(("_ippAddAttr(%p, %d)\n", ipp, num_values));
 
   if (ipp == NULL || num_values < 0)
     return (NULL);
@@ -2430,24 +2430,24 @@ _ipp_add_attr(ipp_t *ipp,		/* I - IPP message */
     ipp->last = attr;
   }
 
-  DEBUG_printf(("_ipp_add_attr(): %p\n", attr));
+  DEBUG_printf(("_ippAddAttr(): %p\n", attr));
 
   return (attr);
 }
 
 
 /*
- * '_ipp_free_attr()' - Free an attribute.
+ * '_ippFreeAttr()' - Free an attribute.
  */
 
 void
-_ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
+_ippFreeAttr(ipp_attribute_t *attr)	/* I - Attribute to free */
 {
   int		i;			/* Looping var */
   ipp_value_t	*value;			/* Current value */
 
 
-  DEBUG_printf(("_ipp_free_attr(): %p\n", attr));
+  DEBUG_printf(("_ippFreeAttr(): %p\n", attr));
 
   switch (attr->value_tag)
   {
@@ -2463,7 +2463,7 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
 	for (i = 0, value = attr->values;
 	     i < attr->num_values;
 	     i ++, value ++)
-	  _cups_sp_free(value->string.text);
+	  _cupsStrFree(value->string.text);
 	break;
 
     case IPP_TAG_TEXTLANG :
@@ -2473,8 +2473,8 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
 	     i ++, value ++)
 	{
 	  if (value->string.charset && i == 0)
-	    _cups_sp_free(value->string.charset);
-	  _cups_sp_free(value->string.text);
+	    _cupsStrFree(value->string.charset);
+	  _cupsStrFree(value->string.text);
 	}
 	break;
 
@@ -2506,7 +2506,7 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
   }
 
   if (attr->name)
-    _cups_sp_free(attr->name);
+    _cupsStrFree(attr->name);
 
   free(attr);
 }
@@ -2798,5 +2798,5 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c 5047 2006-02-02 05:14:15Z mike $".
+ * End of "$Id: ipp.c 5231 2006-03-05 17:22:27Z mike $".
  */

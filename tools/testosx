@@ -3,13 +3,19 @@
 if test ! -f tools/testosx; then
 	echo "Run this script from the top-level CUPS source directory, e.g.:"
 	echo ""
-	echo "    tools/testosx"
+	echo "    tools/testosx [version]"
 	echo ""
 	exit 1
 fi
 
 # Get the current working copy version...
 rev=`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[a-zA-Z]*//g'`
+
+if test $# = 0; then
+	version="1.2svn-r$rev"
+else
+	version=$1
+fi
 
 # Setup an install directory...
 user=`whoami`
@@ -57,10 +63,10 @@ fi
 chmod 755 $pkgdir/Resources/postflight
 
 # Tag the current revision in the plist and web interface files...
-sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
+sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
 	-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
 	<packaging/cups-desc.plist.in >packaging/cups-desc.plist
-sed -e '1,$s/@CUPS_VERSION@/1.2svn-r'$rev'/g' \
+sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
 	-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
 	<packaging/cups-info.plist.in >packaging/cups-info.plist
 
@@ -91,7 +97,7 @@ $PackageMaker -build -v -p cups.pkg \
 
 # Create a disk image...
 echo Creating MacOS X disk image...
-hdiutil create -ov -srcfolder cups.pkg cups-1.2svn-r$rev.dmg
+hdiutil create -ov -srcfolder cups.pkg cups-$version.dmg
 
 # Cleanup temp files...
 echo Removing temporary files...

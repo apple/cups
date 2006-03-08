@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: testhttp.c 5235 2006-03-06 13:02:23Z mike $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -290,7 +290,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fputs("httpGetHostname(): ", stdout);
 
-    if (httpGetHostname(hostname, sizeof(hostname)))
+    if (httpGetHostname(NULL, hostname, sizeof(hostname)))
       printf("PASS (%s)\n", hostname);
     else
     {
@@ -515,5 +515,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: testhttp.c 5235 2006-03-06 13:02:23Z mike $".
  */

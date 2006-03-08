@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c 5162 2006-02-24 03:15:13Z mike $"
+ * "$Id: usb-unix.c 5241 2006-03-07 22:07:44Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -82,6 +82,8 @@ print_device(const char *uri,		/* I - Device URI */
   * Open the USB port device...
   */
 
+  fputs("STATE: +connecting-to-device\n", stderr);
+
   do
   {
     if ((fd = open_device(uri)) == -1)
@@ -126,6 +128,8 @@ print_device(const char *uri,		/* I - Device URI */
     }
   }
   while (fd < 0);
+
+  fputs("STATE: -connecting-to-device\n", stderr);
 
  /*
   * Set any options provided...
@@ -616,5 +620,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c 5162 2006-02-24 03:15:13Z mike $".
+ * End of "$Id: usb-unix.c 5241 2006-03-07 22:07:44Z mike $".
  */

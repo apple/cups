@@ -1,5 +1,5 @@
 /*
- * "$Id: i18n.h 4924 2006-01-13 01:55:20Z mike $"
+ * "$Id: i18n.h 5238 2006-03-07 04:41:42Z mike $"
  *
  *   (Private) localization support for the Common UNIX Printing System (CUPS).
  *
@@ -60,10 +60,6 @@ typedef struct _cups_message_s		/**** Message catalog entry ****/
  * Prototypes...
  */
 
-/**** New in CUPS 1.1.20 ****/
-extern void		_cupsRestoreLocale(int category, char *oldlocale);
-extern char		*_cupsSaveLocale(int category, const char *locale);
-
 /**** New in CUPS 1.2 ****/
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);
 extern int		_cupsLangPrintf(FILE *fp, const char *message, ...)
@@ -84,5 +80,5 @@ extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
 #endif /* !_CUPS_I18N_H_ */
 
 /*
- * End of "$Id: i18n.h 4924 2006-01-13 01:55:20Z mike $".
+ * End of "$Id: i18n.h 5238 2006-03-07 04:41:42Z mike $".
  */

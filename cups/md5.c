@@ -26,7 +26,7 @@
   ghost@aladdin.com
 
  */
-/*$Id: md5.c 4695 2005-09-23 17:07:14Z mike $ */
+/*$Id: md5.c 5232 2006-03-05 17:59:19Z mike $ */
 /*
   Independent implementation of MD5 (RFC 1321).
 
@@ -273,7 +273,7 @@ _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
 }
 
 void
-_cups_md5_init(_cups_md5_state_t *pms)
+_cupsMD5Init(_cups_md5_state_t *pms)
 {
     pms->count[0] = pms->count[1] = 0;
     pms->abcd[0] = 0x67452301;
@@ -283,7 +283,7 @@ _cups_md5_init(_cups_md5_state_t *pms)
 }
 
 void
-_cups_md5_append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
+_cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
 {
     const unsigned char *p = data;
     int left = nbytes;
@@ -321,7 +321,7 @@ _cups_md5_append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
 }
 
 void
-_cups_md5_finish(_cups_md5_state_t *pms, unsigned char digest[16])
+_cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16])
 {
     static const unsigned char pad[64] = {
 	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -336,9 +336,9 @@ _cups_md5_finish(_cups_md5_state_t *pms, unsigned char digest[16])
     for (i = 0; i < 8; ++i)
 	data[i] = (unsigned char)(pms->count[i >> 2] >> ((i & 3) << 3));
     /* Pad to 56 bytes mod 64. */
-    _cups_md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
+    _cupsMD5Append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
     /* Append the length. */
-    _cups_md5_append(pms, data, 8);
+    _cupsMD5Append(pms, data, 8);
     for (i = 0; i < 16; ++i)
 	digest[i] = (unsigned char)(pms->abcd[i >> 2] >> ((i & 3) << 3));
 }

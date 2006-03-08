@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Fonts makefile for the Common UNIX Printing System (CUPS).
 #
@@ -47,6 +47,13 @@ clean:
 
 
 #
+# Dummy depend target...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
@@ -58,5 +65,16 @@ install:	all
 
 
 #
-# End of "$Id: Makefile 5065 2006-02-03 16:55:30Z mike $".
+# Uninstall files...
+#
+
+uninstall:
+	for file in $(FONTS); do \
+		$(RM) $(DATADIR)/fonts/$$file; \
+	done
+	$(RMDIR) $(DATADIR)/fonts
+
+
+#
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

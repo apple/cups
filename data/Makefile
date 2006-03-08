@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5085 2006-02-06 13:27:53Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -134,6 +134,13 @@ clean:
 
 
 #
+# Dummy depend...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
@@ -158,5 +165,30 @@ install:	all
 
 
 #
-# End of "$Id: Makefile 5085 2006-02-06 13:27:53Z mike $".
+# Uninstall files...
+#
+
+uninstall:
+	for file in $(BANNERS); do \
+		$(RM) $(DATADIR)/banners/$$file; \
+	done
+	for file in $(CHARMAPS); do \
+		$(RM) $(DATADIR)/charmaps/$$file; \
+	done
+	for file in $(CHARSETS); do \
+		$(RM) $(DATADIR)/charsets/$$file; \
+	done
+	for file in $(DATAFILES); do \
+		$(RM) $(DATADIR)/data/$$file; \
+	done
+	-$(RMDIR) $(DATADIR)/profiles
+	-$(RMDIR) $(DATADIR)/data
+	-$(RMDIR) $(DATADIR)/charsets
+	-$(RMDIR) $(DATADIR)/charmaps
+	-$(RMDIR) $(DATADIR)/banners
+	-$(RMDIR) $(DATADIR)
+
+
+#
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

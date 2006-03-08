@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5222 2006-03-03 18:57:56Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -109,6 +109,13 @@ clean:
 
 
 #
+# Dummy depend...
+#
+
+depend:
+
+
+#
 # Install files...
 #
 
@@ -128,5 +135,22 @@ install: all
 
 
 #
-# End of "$Id: Makefile 5222 2006-03-03 18:57:56Z mike $".
+# Uninstall files...
+#
+
+uninstall:
+	for file in $(FILES); do \
+		$(RM) $(DATADIR)/templates/$$file; \
+	done
+	for lang in $(LANGUAGES); do \
+		for file in $(FILES); do \
+			$(RM) $(DATADIR)/templates/$$lang/$$file; \
+		done \
+		$(RMDIR) $(DATADIR)/templates/$$lang; \
+	done
+	-$(RMDIR) $(DATADIR)/templates
+
+
+#
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

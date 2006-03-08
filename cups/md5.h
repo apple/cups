@@ -26,7 +26,7 @@
   ghost@aladdin.com
 
  */
-/*$Id: md5.h 4512 2005-05-12 19:47:56Z mike $ */
+/*$Id: md5.h 5232 2006-03-05 17:59:19Z mike $ */
 /*
   Independent implementation of MD5 (RFC 1321).
 
@@ -60,13 +60,13 @@ extern "C" {
 #  endif /* __cplusplus */
 
 /* Initialize the algorithm. */
-void _cups_md5_init(_cups_md5_state_t *pms);
+void _cupsMD5Init(_cups_md5_state_t *pms);
 
 /* Append a string to the message. */
-void _cups_md5_append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes);
+void _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes);
 
 /* Finish the message and return the digest. */
-void _cups_md5_finish(_cups_md5_state_t *pms, unsigned char digest[16]);
+void _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16]);
 
 #  ifdef __cplusplus
 }  /* end extern "C" */

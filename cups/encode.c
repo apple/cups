@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 5151 2006-02-22 22:43:17Z mike $"
+ * "$Id: encode.c 5230 2006-03-05 17:01:51Z mike $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -341,7 +341,7 @@ cupsEncodeOptions2(
     * Allocate memory for the attribute values...
     */
 
-    if ((attr = _ipp_add_attr(ipp, count)) == NULL)
+    if ((attr = _ippAddAttr(ipp, count)) == NULL)
     {
      /*
       * Ran out of memory!
@@ -552,5 +552,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 5151 2006-02-22 22:43:17Z mike $".
+ * End of "$Id: encode.c 5230 2006-03-05 17:01:51Z mike $".
  */

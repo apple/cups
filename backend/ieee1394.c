@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1394.c 4494 2005-02-18 02:18:11Z mike $"
+ * "$Id: ieee1394.c 5241 2006-03-07 22:07:44Z mike $"
  *
  *   IEEE-1394 backend for the Common UNIX Printing System (CUPS).
  *
@@ -140,6 +140,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   * Try to open the printer device...
   */
 
+  fputs("STATE: +connecting-to-device\n", stderr);
+
   do
   {
     if ((dev = ieee1394_open(argv[0])) == NULL)
@@ -149,6 +151,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
     }
   }
   while (dev == NULL);
+
+  fputs("STATE: -connecting-to-device\n", stderr);
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
@@ -259,5 +263,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: ieee1394.c 4494 2005-02-18 02:18:11Z mike $".
+ * End of "$Id: ieee1394.c 5241 2006-03-07 22:07:44Z mike $".
  */

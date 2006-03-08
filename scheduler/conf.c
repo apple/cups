@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 5222 2006-03-03 18:57:56Z mike $"
+ * "$Id: conf.c 5235 2006-03-06 13:02:23Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -271,7 +271,7 @@ cupsdReadConfiguration(void)
   * String options...
   */
 
-  cupsdSetString(&ServerName, httpGetHostname(temp, sizeof(temp)));
+  cupsdSetString(&ServerName, httpGetHostname(NULL, temp, sizeof(temp)));
   cupsdSetStringf(&ServerAdmin, "root@%s", temp);
   cupsdSetString(&ServerBin, CUPS_SERVERBIN);
   cupsdSetString(&RequestRoot, CUPS_REQUESTS);
@@ -930,7 +930,7 @@ cupsdReadConfiguration(void)
     if (NumMimeTypes)
     {
       for (i = 0; i < NumMimeTypes; i ++)
-	_cups_sp_free(MimeTypes[i]);
+	_cupsStrFree(MimeTypes[i]);
 
       free(MimeTypes);
     }
@@ -972,11 +972,11 @@ cupsdReadConfiguration(void)
     {
       snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
 
-      MimeTypes[i] = _cups_sp_alloc(mimetype);
+      MimeTypes[i] = _cupsStrAlloc(mimetype);
     }
 
     if (i < NumMimeTypes)
-      MimeTypes[i] = _cups_sp_alloc("application/octet-stream");
+      MimeTypes[i] = _cupsStrAlloc("application/octet-stream");
 
     if (LogLevel == CUPSD_LOG_DEBUG2)
     {
@@ -3237,5 +3237,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 5222 2006-03-03 18:57:56Z mike $".
+ * End of "$Id: conf.c 5235 2006-03-06 13:02:23Z mike $".
  */

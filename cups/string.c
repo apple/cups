@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c 5047 2006-02-02 05:14:15Z mike $"
+ * "$Id: string.c 5238 2006-03-07 04:41:42Z mike $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -25,10 +25,12 @@
  *
  * Contents:
  *
- *   _cups_sp_alloc()      - Allocate/reference a string.
- *   _cups_sp_flush()      - Flush the string pool...
- *   _cups_sp_free()       - Free/dereference a string.
- *   _cups_sp_statistics() - Return allocation statistics for string pool.
+ *   _cupsStrAlloc()       - Allocate/reference a string.
+ *   _cupsStrFlush()       - Flush the string pool...
+ *   _cupsStrFormatd()     - Format a floating-point number.
+ *   _cupsStrFree()        - Free/dereference a string.
+ *   _cupsStrScand()       - Scan a string for a floating-point number.
+ *   _cupsStrStatistics()  - Return allocation statistics for string pool.
  *   _cups_strcpy()        - Copy a string allowing for overlapping strings.
  *   _cups_strdup()        - Duplicate a string.
  *   _cups_strcasecmp()    - Do a case-insensitive comparison.
@@ -57,11 +59,11 @@ static int	compare_sp_items(_cups_sp_item_t *a, _cups_sp_item_t *b);
 
 
 /*
- * '_cups_sp_alloc()' - Allocate/reference a string.
+ * '_cupsStrAlloc()' - Allocate/reference a string.
  */
 
 char *					/* O - String pointer */
-_cups_sp_alloc(const char *s)		/* I - String */
+_cupsStrAlloc(const char *s)		/* I - String */
 {
   _cups_globals_t	*cg;		/* Global data */
   _cups_sp_item_t	*item,		/* String pool item */
@@ -132,11 +134,11 @@ _cups_sp_alloc(const char *s)		/* I - String */
 
 
 /*
- * '_cups_sp_flush()' - Flush the string pool...
+ * '_cupsStrFlush()' - Flush the string pool...
  */
 
 void
-_cups_sp_flush(_cups_globals_t *cg)	/* I - Global data */
+_cupsStrFlush(_cups_globals_t *cg)	/* I - Global data */
 {
   _cups_sp_item_t	*item;		/* Current item */
 
@@ -154,11 +156,91 @@ _cups_sp_flush(_cups_globals_t *cg)	/* I - Global data */
 
 
 /*
- * '_cups_sp_free()' - Free/dereference a string.
+ * '_cupsStrFormatd()' - Format a floating-point number.
+ */
+
+char *					/* O - Pointer to end of string */
+_cupsStrFormatd(char         *buf,	/* I - String */
+                char         *bufend,	/* I - End of string buffer */
+		double       number,	/* I - Number to format */
+                struct lconv *loc)	/* I - Locale data */
+{
+  char		*bufptr,		/* Pointer into buffer */
+		temp[1024],		/* Temporary string */
+		*tempdec,		/* Pointer to decimal point */
+		*tempptr;		/* Pointer into temporary string */
+  const char	*dec;			/* Decimal point */
+  int		declen;			/* Length of decimal point */
+
+
+ /*
+  * Format the number using the "%.12f" format and then eliminate
+  * unnecessary trailing 0's.
+  */
+
+  snprintf(temp, sizeof(temp), "%.12f", number);
+  for (tempptr = temp + strlen(temp) - 1;
+       tempptr > temp && *tempptr == '0';
+       *tempptr-- = '\0');
+
+ /*
+  * Next, find the decimal point...
+  */
+
+  if (loc && loc->decimal_point)
+  {
+    dec    = loc->decimal_point;
+    declen = strlen(dec);
+  }
+  else
+  {
+    dec    = ".";
+    declen = 1;
+  }
+
+  if (declen == 1)
+    tempdec = strchr(temp, *dec);
+  else
+    tempdec = strstr(temp, dec);
+
+ /*
+  * Copy everything up to the decimal point...
+  */
+
+  if (tempdec)
+  {
+    for (tempptr = temp, bufptr = buf;
+         tempptr < tempdec && bufptr < bufend;
+	 *bufptr++ = *tempptr++);
+
+    tempdec += declen;
+
+    if (*tempdec && bufptr < bufend)
+    {
+      *bufptr++ = '.';
+
+      while (*tempptr && bufptr < bufend)
+        *bufptr++ = *tempptr++;
+    }
+
+    *bufptr = '\0';
+  }
+  else
+  {
+    strlcpy(buf, temp, bufend - buf + 1);
+    bufptr = buf + strlen(buf);
+  }
+
+  return (bufptr);
+}
+
+
+/*
+ * '_cupsStrFree()' - Free/dereference a string.
  */
 
 void
-_cups_sp_free(const char *s)
+_cupsStrFree(const char *s)		/* I - String to free */
 {
   _cups_globals_t	*cg;		/* Global data */
   _cups_sp_item_t	*item,		/* String pool item */
@@ -211,12 +293,103 @@ _cups_sp_free(const char *s)
 
 
 /*
- * '_cups_sp_statistics()' - Return allocation statistics for string pool.
+ * '_cupsStrScand()' - Scan a string for a floating-point number.
+ *
+ * This function handles the locale-specific BS so that a decimal
+ * point is always the period (".")...
+ */
+
+double					/* O - Number */
+_cupsStrScand(const char   *buf,	/* I - Pointer to number */
+              char         **bufptr,	/* O - New pointer or NULL on error */
+              struct lconv *loc)	/* I - Locale data */
+{
+  char	temp[1024],			/* Temporary buffer */
+	*tempptr;			/* Pointer into temporary buffer */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!buf)
+    return (0.0);
+
+ /*
+  * Skip leading whitespace...
+  */
+
+  while (isspace(*buf & 255))
+    buf ++;
+
+ /*
+  * Copy leading sign, numbers, period, and then numbers...
+  */
+
+  tempptr = temp;
+  if (*buf == '-' || *buf == '+')
+    *tempptr++ = *buf++;
+
+  while (isdigit(*buf & 255))
+    if (tempptr < (temp + sizeof(temp) - 1))
+      *tempptr++ = *buf++;
+    else
+    {
+      if (bufptr)
+	*bufptr = NULL;
+
+      return (0.0);
+    }
+
+  if (*buf == '.')
+  {
+    if (loc && loc->decimal_point)
+    {
+      strlcpy(tempptr, loc->decimal_point, sizeof(temp) - (tempptr - temp));
+      tempptr += strlen(tempptr);
+    }
+    else if (tempptr < (temp + sizeof(temp) - 1))
+      *tempptr++ = '.';
+    else
+    {
+      if (bufptr)
+        *bufptr = NULL;
+
+      return (0.0);
+    }
+
+    while (isdigit(*buf & 255))
+      if (tempptr < (temp + sizeof(temp) - 1))
+	*tempptr++ = *buf++;
+      else
+      {
+	if (bufptr)
+	  *bufptr = NULL;
+
+	return (0.0);
+      }
+  }
+
+ /*
+  * Nul-terminate the temporary string and return the value...
+  */
+
+  if (bufptr)
+    *bufptr = (char *)buf;
+
+  *tempptr = '\0';
+
+  return (strtod(temp, NULL));
+}
+
+
+/*
+ * '_cupsStrStatistics()' - Return allocation statistics for string pool.
  */
 
 size_t					/* O - Number of strings */
-_cups_sp_statistics(size_t *alloc_bytes,/* O - Allocated bytes */
-                    size_t *total_bytes)/* O - Total string bytes */
+_cupsStrStatistics(size_t *alloc_bytes,	/* O - Allocated bytes */
+                   size_t *total_bytes)	/* O - Total string bytes */
 {
   size_t		count,		/* Number of strings */
 			abytes,		/* Allocated string bytes */
@@ -455,5 +628,5 @@ compare_sp_items(_cups_sp_item_t *a,	/* I - First item */
 
 
 /*
- * End of "$Id: string.c 5047 2006-02-02 05:14:15Z mike $".
+ * End of "$Id: string.c 5238 2006-03-07 04:41:42Z mike $".
  */

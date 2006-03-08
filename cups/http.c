@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 5222 2006-03-03 18:57:56Z mike $"
+ * "$Id: http.c 5226 2006-03-04 22:03:18Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -539,6 +539,8 @@ httpGetBlocking(http_t *http)		/* I - HTTP connection */
 
 /*
  * 'httpGetCookie()' - Get any cookie data from the response.
+ *
+ * @since CUPS 1.1.19@
  */
 
 const char *				/* O - Cookie data or NULL */
@@ -2754,5 +2756,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 5222 2006-03-03 18:57:56Z mike $".
+ * End of "$Id: http.c 5226 2006-03-04 22:03:18Z mike $".
  */

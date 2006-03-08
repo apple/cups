@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5138 2006-02-21 10:49:06Z mike $"
+# "$Id: Makefile 5240 2006-03-07 21:55:29Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -31,6 +31,7 @@ include ../Makedefs
 #
 
 LIBOBJS	=	\
+		adminutil.o \
 		array.o \
 		attr.o \
 		auth.o \
@@ -70,6 +71,7 @@ LIBOBJS	=	\
 		util.o
 OBJS	=	\
 		$(LIBOBJS) \
+		testadmin.o \
 		testarray.o \
 		testfile.o \
 		testhttp.o \
@@ -85,6 +87,7 @@ OBJS	=	\
 #
 
 HEADERS	=	\
+		adminutil.h \
 		array.h \
 		cups.h \
 		dir.h \
@@ -106,6 +109,7 @@ HEADERS	=	\
 TARGETS	=	\
 		$(LIBCUPS) \
 		libcups.a \
+		testadmin \
 		testarray \
 		testfile \
 		testhttp \
@@ -170,6 +174,26 @@ installhdrs:
 
 
 #
+# Uninstall object and target files...
+#
+
+uninstall:
+	$(RM) $(LIBDIR)/libcups.2.dylib
+	$(RM) $(LIBDIR)/libcups.a
+	$(RM) $(LIBDIR)/libcups.dylib
+	$(RM) $(LIBDIR)/libcups_s.a
+	$(RM) $(LIBDIR)/libcups.sl
+	$(RM) $(LIBDIR)/libcups.sl.2
+	$(RM) $(LIBDIR)/libcups.so
+	$(RM) $(LIBDIR)/libcups.so.2
+	-$(RMDIR) $(LIBDIR)
+	for file in $(HEADERS); do \
+		$(RM) $(INCLUDEDIR)/cups/$$file; \
+	done
+	-$(RMDIR) $(INCLUDEDIR)/cups
+
+
+#
 # libcups.so.2, libcups.sl.2
 #
 
@@ -230,6 +254,9 @@ libcups.a:	$(LIBOBJS)
 #
 # CUPS language bindings for various scripting languages...
 #
+# NOTE: Not currently used or functional - see the scripting/php directory
+#       for the hand-written bindings...
+#
 
 phpcups.so:	$(LIBCUPS) php_cups_wrap.o
 	echo Linking $@...
@@ -246,6 +273,16 @@ php_cups_wrap.o:	php_cups_wrap.c
 php_cups_wrap.c:	cups.h
 	echo Creating $< using SWIG...
 	swig -php -o $@ -module cups cups.h
+
+
+#
+# testadmin (dependency on static CUPS library is intentional)
+#
+
+testadmin:	testadmin.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testadmin.o libcups.a \
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -357,5 +394,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5138 2006-02-21 10:49:06Z mike $".
+# End of "$Id: Makefile 5240 2006-03-07 21:55:29Z mike $".
 #

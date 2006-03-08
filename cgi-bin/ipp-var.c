@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c 5184 2006-02-26 15:13:44Z mike $"
+ * "$Id: ipp-var.c 5235 2006-03-06 13:02:23Z mike $"
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -661,7 +661,7 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
     if ((server = getenv("SERVER_NAME")) == NULL)
       server = "";
 
-    httpGetHostname(servername, sizeof(servername));
+    httpGetHostname(NULL, servername, sizeof(servername));
 
    /*
     * Then flag whether we are using SSL on this connection...
@@ -1277,5 +1277,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 5184 2006-02-26 15:13:44Z mike $".
+ * End of "$Id: ipp-var.c 5235 2006-03-06 13:02:23Z mike $".
  */

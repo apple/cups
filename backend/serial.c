@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c 5194 2006-02-27 20:57:07Z mike $"
+ * "$Id: serial.c 5241 2006-03-07 22:07:44Z mike $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -223,6 +223,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Open the serial port device...
   */
 
+  fputs("STATE: +connecting-to-device\n", stderr);
+
   do
   {
     if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL | O_NDELAY)) == -1)
@@ -262,6 +264,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     }
   }
   while (fd < 0);
+
+  fputs("STATE: -connecting-to-device\n", stderr);
 
  /*
   * Set any options provided...
@@ -1130,5 +1134,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c 5194 2006-02-27 20:57:07Z mike $".
+ * End of "$Id: serial.c 5241 2006-03-07 22:07:44Z mike $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 5144 2006-02-21 20:44:01Z mike $"
+dnl "$Id: cups-common.m4 5229 2006-03-05 16:48:12Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -63,6 +63,7 @@ AC_PATH_PROG(LD,ld)
 AC_PATH_PROG(LN,ln)
 AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(RM,rm)
+AC_PATH_PROG(RM,rmdir)
 AC_PATH_PROG(SED,sed)
 AC_PATH_PROG(STRIP,strip)
 
@@ -263,5 +264,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 5144 2006-02-21 20:44:01Z mike $".
+dnl End of "$Id: cups-common.m4 5229 2006-03-05 16:48:12Z mike $".
 dnl

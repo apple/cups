@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5087 2006-02-07 03:43:29Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Port monitor makefile for the Common UNIX Printing System (CUPS).
 #
@@ -66,6 +66,18 @@ install:	all
 
 
 #
+# Uninstall all targets...
+#
+
+uninstall:
+	for file in $(TARGETS); do \
+		$(RM) $(SERVERBIN)/monitor/$$file; \
+	done
+	-$(RMDIR) $(SERVERBIN)/monitor
+	-$(RMDIR) $(SERVERBIN)
+
+
+#
 # bcp
 #
 
@@ -91,5 +103,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5087 2006-02-07 03:43:29Z mike $".
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

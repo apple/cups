@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5145 2006-02-22 00:25:14Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -63,6 +63,17 @@ install:	all
 	for file in $(CGIS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/cgi-bin; \
 	done
+
+
+#
+# Uninstall all targets...
+#
+
+uninstall:
+	for file in $(CGIS); do \
+		$(RM) $(SERVERBIN)/cgi-bin/$$file; \
+	done
+	-$(RMDIR) $(SERVERBIN)/cgi-bin
 
 
 #
@@ -159,5 +170,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5145 2006-02-22 00:25:14Z mike $".
+# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
 #

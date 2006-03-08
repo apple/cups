@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: lpd.c 5241 2006-03-07 22:07:44Z mike $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -644,6 +644,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     * First try to reserve a port for this connection...
     */
 
+    fputs("STATE: +connecting-to-device\n", stderr);
     fprintf(stderr, "INFO: Attempting to connect to host %s for printer %s\n",
             hostname, printer);
 
@@ -769,12 +770,15 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 #ifdef __APPLE__
         recoverable = 1;
 	fprintf(stderr, "WARNING: recoverable: "
-#else
-	fprintf(stderr, "WARNING: "
-#endif /* __APPLE__ */
 	                "Network host \'%s\' is busy, down, or "
 	                "unreachable; will retry in 30 seconds...\n",
                 hostname);
+#else
+	fprintf(stderr, "WARNING: "
+	                "Network host \'%s\' is busy, down, or "
+	                "unreachable; will retry in 30 seconds...\n",
+                hostname);
+#endif /* __APPLE__ */
 	sleep(30);
       }
       else if (error == EADDRINUSE)
@@ -790,10 +794,11 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 #ifdef __APPLE__
         recoverable = 1;
 	perror("ERROR: recoverable: "
+	       "Unable to connect to printer; will retry in 30 seconds...");
 #else
 	perror("ERROR: "
-#endif /* __APPLE__ */
 	       "Unable to connect to printer; will retry in 30 seconds...");
+#endif /* __APPLE__ */
         sleep(30);
       }
     }
@@ -812,6 +817,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     }
 #endif /* __APPLE__ */
 
+    fputs("STATE: -connecting-to-device\n", stderr);
     fprintf(stderr, "INFO: Connected to %s...\n", hostname);
     fprintf(stderr, "DEBUG: Connected on ports %d (local %d)...\n", port,
             lport);
@@ -853,7 +859,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       return (CUPS_BACKEND_FAILED);
     }
 
-    httpGetHostname(localhost, sizeof(localhost));
+    httpGetHostname(NULL, localhost, sizeof(localhost));
 
     snprintf(control, sizeof(control),
              "H%.31s\n"		/* RFC 1179, Section 7.2 - host name <= 31 chars */
@@ -1224,5 +1230,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: lpd.c 5241 2006-03-07 22:07:44Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5224 2006-03-04 02:00:43Z mike $"
+# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -40,7 +40,6 @@ WEBBUTTONS	=	\
 			images/button-add-class.gif \
 			images/button-add-printer.gif \
 			images/button-add-this-printer.gif \
-			images/button-cancel.gif \
 			images/button-cancel-all-jobs.gif \
 			images/button-cancel-job.gif \
 			images/button-change-settings.gif \
@@ -189,6 +188,13 @@ clean:
 
 
 #
+# Dummy depend target...
+#
+
+depend:
+
+
+#
 # Install all documentation files...
 #
 
@@ -209,13 +215,40 @@ install:	all
 		$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
 		if test -f $$lang/index.html; then \
 			$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
-		fi \
+		fi; \
 		for file in $(WEBBUTTONS); do \
 			if test -f $$lang/$$file; then \
 				$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
-			fi \
+			fi; \
 		done \
 	done
+
+
+#
+# Unnstall all documentation files...
+#
+
+uninstall:
+	for file in $(WEBPAGES); do \
+		$(RM) $(DOCDIR)/$$file; \
+	done
+	for file in $(HELPFILES); do \
+		$(INSTALL_MAN) $(DOCDIR)/help/$$file; \
+	done
+	for file in $(WEBIMAGES) $(WEBBUTTONS); do \
+		$(INSTALL_MAN) $(DOCDIR)/images/$$file; \
+	done
+	-for lang in $(LANGUAGES); do \
+		$(RM) $(DOCDIR)/$$lang/index.html; \
+		for file in $(WEBBUTTONS); do \
+			$(RM) $(DOCDIR)/$$lang/images/$$file; \
+		done \
+		$(RMDIR) $(DOCDIR)/$$lang/images; \
+		$(RMDIR) $(DOCDIR)/$$lang; \
+	done
+	-$(RMDIR) $(DOCDIR)/images
+	-$(RMDIR) $(DOCDIR)/help
+	-$(RMDIR) $(DOCDIR)
 
 
 #

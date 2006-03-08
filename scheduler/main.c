@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 5216 2006-03-02 17:47:53Z mike $"
+ * "$Id: main.c 5231 2006-03-05 17:22:27Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -980,7 +980,7 @@ main(int  argc,				/* I - Number of command-line args */
 		      mem.fsmblks + mem.fordblks);
 #endif /* HAVE_MALLINFO */
 
-      string_count = _cups_sp_statistics(&alloc_bytes, &total_bytes);
+      string_count = _cupsStrStatistics(&alloc_bytes, &total_bytes);
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "stringpool: " CUPS_LLFMT " strings, "
 		      CUPS_LLFMT " allocated, " CUPS_LLFMT " total bytes",
@@ -2313,5 +2313,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 5216 2006-03-02 17:47:53Z mike $".
+ * End of "$Id: main.c 5231 2006-03-05 17:22:27Z mike $".
  */
