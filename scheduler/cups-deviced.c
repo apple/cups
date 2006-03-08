@@ -276,7 +276,7 @@ main(int  argc,				/* I - Number of command-line args */
         if (!strncasecmp(line, "Usage", 5))
 	  compat = 1;
         else if (sscanf(line,
-	                "%63s%1023s%*[ \t]\"%255[^\"]\"%*[ \t]\"%127[^\"]"
+	                "%63s%1023s%*[ \t]\"%255[^\"]\"%*[ \t]\"%127[^\"]\""
 			"%*[ \t]\"%1023[^\"]",
 	                dclass, uri, make_model, info, device_id) < 4)
         {
