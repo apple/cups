@@ -31,7 +31,6 @@ include ../../Makedefs
 
 PHPDIR	=	$(BUILDROOT)`$(PHPCONFIG) --extension-dir`
 OPTIONS	=	-I../.. `$(PHPCONFIG) --includes`
-PHPLIBS	=	`$(PHPCONFIG) --ldflags` `$(PHPCONFIG) --libs`
 
 
 #
@@ -101,8 +100,8 @@ phpcups.so:	$(OBJS) ../../Makedefs
 	else \
 		DSOFLAGS="$(DSOFLAGS)"; \
 	fi; \
-	echo $(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups -lcups $(PHPLIBS); \
-	$(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups -lcups $(PHPLIBS)
+	echo $(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups $(LIBS); \
+	$(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups $(LIBS)
 
 
 #
