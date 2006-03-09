@@ -46,6 +46,23 @@
 
 
 /*
+ * Test data...
+ */
+
+static const char	*default_code =
+			"[{\n"
+			"%%BeginFeature: *PageRegion Letter\n"
+			"PageRegion=Letter\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *InputSlot Tray\n"
+			"InputSlot=Tray\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n";
+
+
+/*
  * 'main()' - Main entry.
  */
 
@@ -55,6 +72,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   ppd_file_t	*ppd;			/* PPD file loaded from disk */
   int		status;			/* Status of tests (0 = success, 1 = fail) */
+  int		conflicts;		/* Number of conflicts */
+  char		*s;			/* String */
 
 
   status = 0;
@@ -74,6 +93,33 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     printf("FAIL (%s on line %d)\n", ppdErrorString(err), line);
   }
+
+  fputs("ppdMarkDefaults: ", stdout);
+  ppdMarkDefaults(ppd);
+
+  if ((conflicts = ppdConflicts(ppd)) == 0)
+    puts("PASS");
+  else
+  {
+    status ++;
+    printf("FAIL (%d conflicts)\n", conflicts);
+  }
+
+  fputs("ppdEmitString: ", stdout);
+  if ((s = ppdEmitString(ppd, PPD_ORDER_ANY, 0.0)) != NULL &&
+      !strcmp(s, default_code))
+    puts("PASS");
+  else
+  {
+    printf("FAIL (%d bytes instead of %d)\n", s ? strlen(s) : 0,
+           strlen(default_code));
+
+    if (s)
+      puts(s);
+  }
+
+  if (s)
+    free(s);
 
   ppdClose(ppd);
 

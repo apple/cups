@@ -141,8 +141,8 @@
 *StringOption bar: "StringOption=bar"
 *CloseUI: *StringOption
 
-*CustomStringOption True/Custom Stringeger: "StringOption=Custom"
-*ParamCustomStringOption String: 1 string * **********
+*CustomStringOption True/Custom String: "StringOption=Custom"
+*ParamCustomStringOption String: 1 string 1 10
 
 *CloseGroup: Extended
 
