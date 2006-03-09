@@ -1,7 +1,18 @@
-CHANGES.txt - 02/25/2006
+CHANGES.txt - 2006-03-09
 ------------------------
 
-CHANGES IN CUPS V1.2.0b1
+CHANGES IN CUPS V1.2b2
+
+	- Added a cupsArrayUserData() function to retrieve the
+	  user data pointer for an array (useful for typing
+	  arrays)
+	- The ppdEmitString() function did not compute the
+	  required buffer size properly, leading to dropped
+	  characters on the end of the printer commands in pstops
+	  and imagetops (STR #1470)
+
+
+CHANGES IN CUPS V1.2b1
 
 	- The serial backend now supports Equinox 8-port serial
 	  hubs (STR #526)

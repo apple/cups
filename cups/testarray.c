@@ -70,6 +70,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_dir_t	*dir;			/* Current directory */
   cups_dentry_t	*dent;			/* Directory entry */
   char		*saved[32];		/* Saved entries */
+  void		*data;			/* User data for arrays */
 
 
  /*
@@ -84,13 +85,28 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   fputs("cupsArrayNew: ", stdout);
 
-  array = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+  data  = (void *)"testarray";
+  array = cupsArrayNew((cups_array_func_t)strcmp, data);
 
   if (array)
     puts("PASS");
   else
   {
     puts("FAIL (returned NULL, expected pointer)");
+    status ++;
+  }
+
+ /*
+  * cupsArrayUserData()
+  */
+
+  fputs("cupsArrayUserData: ", stdout);
+  if (cupsArrayUserData(array) == data)
+    puts("PASS");
+  else
+  {
+    printf("FAIL (returned %p instead of %p!)\n", cupsArrayUserData(array),
+           data);
     status ++;
   }
 

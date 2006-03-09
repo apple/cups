@@ -73,6 +73,7 @@ extern void		*cupsArrayPrev(cups_array_t *a);
 extern int		cupsArrayRemove(cups_array_t *a, void *e);
 extern void		*cupsArrayRestore(cups_array_t *a);
 extern int		cupsArraySave(cups_array_t *a);
+extern void		*cupsArrayUserData(cups_array_t *a);
 
 #  ifdef __cplusplus
 }
