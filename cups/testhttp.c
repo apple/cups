@@ -497,8 +497,8 @@ main(int  argc,				/* I - Number of command-line arguments */
         current = time(NULL);
         if (current == start) current ++;
         printf("\r" CUPS_LLFMT "/" CUPS_LLFMT " bytes ("
-	       CUPS_LLFMT " bytes/sec)      ", total, length,
-               total / (current - start));
+	       CUPS_LLFMT " bytes/sec)      ", CUPS_LLCAST total,
+	       CUPS_LLCAST length, CUPS_LLCAST (total / (current - start)));
         fflush(stdout);
       }
     }

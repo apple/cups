@@ -111,8 +111,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     puts("PASS");
   else
   {
-    printf("FAIL (%d bytes instead of %d)\n", s ? strlen(s) : 0,
-           strlen(default_code));
+    printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
+           (int)strlen(default_code));
 
     if (s)
       puts(s);

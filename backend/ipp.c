@@ -1263,7 +1263,8 @@ compress_files(int  num_files,		/* I - Number of files */
       fprintf(stderr,
               "DEBUG: File %d compressed to %.1f%% of original size, "
 	      CUPS_LLFMT " bytes...\n",
-              i + 1, 100.0 * outinfo.st_size / total, outinfo.st_size);
+              i + 1, 100.0 * outinfo.st_size / total,
+	      CUPS_LLCAST outinfo.st_size);
   }
 }
 #endif /* HAVE_LIBZ */

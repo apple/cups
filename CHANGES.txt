@@ -3,6 +3,7 @@ CHANGES.txt - 2006-03-09
 
 CHANGES IN CUPS V1.2b2
 
+	- Various compiler warning fixes.
 	- Fixes for Solaris 10 builds against old GNU TLS and
 	  LDAP libraries.
 	- Added a cupsArrayUserData() function to retrieve the

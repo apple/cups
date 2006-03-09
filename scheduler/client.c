@@ -3675,7 +3675,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   }
   else
   {
-    sprintf(content_length, "CONTENT_LENGTH=" CUPS_LLFMT, con->bytes);
+    sprintf(content_length, "CONTENT_LENGTH=" CUPS_LLFMT,
+            CUPS_LLCAST con->bytes);
     snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s",
              con->http.fields[HTTP_FIELD_CONTENT_TYPE]);
 

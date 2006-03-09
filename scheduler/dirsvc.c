@@ -971,7 +971,7 @@ cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "cupsdSendBrowseList: sendto failed for browser "
 			"%d - %s.",
-	                b - Browsers + 1, strerror(errno));
+	                (int)(b - Browsers + 1), strerror(errno));
 
         if (i > 1)
 	  memmove(b, b + 1, (i - 1) * sizeof(cupsd_dirsvc_addr_t));

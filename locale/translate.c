@@ -27,6 +27,10 @@
  *
  * Contents:
  *
+ *   main()               - Main entry.
+ *   save_messages()      - Save messages to a .po file.
+ *   translate_messages() - Translate messages using Google.
+ *   write_string()       - Write a quoted string to a file.
  */
 
 /*
@@ -237,7 +241,7 @@ translate_messages(cups_array_t *cat,	/* I - Message catalog */
     *bufptr++ = '&';
     *bufptr = '\0';
 
-    sprintf(length, "%d", bufptr - buffer);
+    sprintf(length, "%d", (int)(bufptr - buffer));
 
    /*
     * Send the request...
