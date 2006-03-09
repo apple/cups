@@ -5124,7 +5124,7 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
   snprintf(options, sizeof(options),
            "%d+%d+%d+requested-attributes=%s",
            con->request->request.op.request_id,
-           limit ? limit->values[0].integer : 0, User,
+           limit ? limit->values[0].integer : 0, (int)User,
 	   attrs);
 
   if (cupsdSendCommand(con, command, options, 1))
