@@ -374,7 +374,6 @@ list_devices(void)
 	device_id[1024],	/* Device ID string */
 	device_uri[1024],	/* Device URI string */
 	make_model[1024];	/* Make and model */
-  struct ecpp_device_id did;	/* Device ID buffer */
 
 
  /*
@@ -545,7 +544,6 @@ open_device(const char *uri)		/* I - Device URI */
 		device_id[1024],	/* Device ID string */
 		make_model[1024],	/* Make and model */
 		device_uri[1024];	/* Device URI string */
-    struct ecpp_device_id did;		/* Device ID buffer */
 
 
    /*

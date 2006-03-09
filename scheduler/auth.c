@@ -478,7 +478,13 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
             strlcpy(data.username, username, sizeof(data.username));
 	    strlcpy(data.password, password, sizeof(data.password));
 
+#  ifdef __sun
+	    pamdata.conv        = (int (*)(int, struct pam_message **,
+	                                   struct pam_response **,
+					   void *))pam_func;
+#  else
 	    pamdata.conv        = pam_func;
+#  endif /* __sun */
 	    pamdata.appdata_ptr = &data;
 
 #  ifdef __hpux

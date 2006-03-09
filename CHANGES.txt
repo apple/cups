@@ -3,6 +3,8 @@ CHANGES.txt - 2006-03-09
 
 CHANGES IN CUPS V1.2b2
 
+	- Fixes for Solaris 10 builds against old GNU TLS and
+	  LDAP libraries.
 	- Added a cupsArrayUserData() function to retrieve the
 	  user data pointer for an array (useful for typing
 	  arrays)
