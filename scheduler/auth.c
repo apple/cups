@@ -189,7 +189,7 @@ cupsdAddName(cupsd_location_t *loc,	/* I - Location to add to */
   if (temp == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to add name to location %s: %s",
-                    loc->location, strerror(errno));
+                    loc->location ? loc->location : "nil", strerror(errno));
     return;
   }
 
@@ -199,7 +199,7 @@ cupsdAddName(cupsd_location_t *loc,	/* I - Location to add to */
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to duplicate name for location %s: %s",
-                    loc->location, strerror(errno));
+                    loc->location ? loc->location : "nil", strerror(errno));
     return;
   }
 
@@ -221,7 +221,7 @@ cupsdAllowHost(cupsd_location_t *loc,	/* I - Location to add to */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAllowHost(loc=%p(%s), name=\"%s\")",
-                  loc, loc->location, name);
+                  loc, loc->location ? loc->location : "nil", name);
 
   if ((temp = add_allow(loc)) == NULL)
     return;
@@ -1254,7 +1254,7 @@ cupsdDenyHost(cupsd_location_t *loc,	/* I - Location to add to */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDenyHost(loc=%p(%s), name=\"%s\")",
-                  loc, loc->location, name);
+                  loc, loc->location ? loc->location : "nil", name);
 
   if ((temp = add_deny(loc)) == NULL)
     return;
@@ -1400,7 +1400,7 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
        loc = (cupsd_location_t *)cupsArrayNext(Locations))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindBest: Location %s Limit %x",
-                    loc->location, loc->limit);
+                    loc->location ? loc->location : "nil", loc->limit);
 
     if (!strncmp(uri, "/printers/", 10) || !strncmp(uri, "/classes/", 9))
     {
@@ -1408,7 +1408,7 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
       * Use case-insensitive comparison for queue names...
       */
 
-      if (loc->length > bestlen &&
+      if (loc->length > bestlen && loc->location &&
           !strncasecmp(uri, loc->location, loc->length) &&
 	  loc->location[0] == '/' &&
 	  (limit & loc->limit) != 0)
@@ -1423,7 +1423,7 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
       * Use case-sensitive comparison for other URIs...
       */
 
-      if (loc->length > bestlen &&
+      if (loc->length > bestlen && loc->location &&
           !strncmp(uri, loc->location, loc->length) &&
 	  loc->location[0] == '/' &&
 	  (limit & loc->limit) != 0)
