@@ -284,9 +284,9 @@ cupsdAllowIP(cupsd_location_t *loc,	/* I - Location to add to */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdAllowIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
-		  loc, loc->location, address[0], address[1], address[2],
-		  address[3], netmask[0], netmask[1], netmask[2],
-		  netmask[3]);
+		  loc, loc->location ? loc->location : "nil",
+		  address[0], address[1], address[2], address[3],
+		  netmask[0], netmask[1], netmask[2], netmask[3]);
 
   if ((temp = add_allow(loc)) == NULL)
     return;
@@ -1317,9 +1317,9 @@ cupsdDenyIP(cupsd_location_t *loc,	/* I - Location to add to */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "cupsdDenyIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
-		  loc, loc->location, address[0], address[1], address[2],
-		  address[3], netmask[0], netmask[1], netmask[2],
-		  netmask[3]);
+		  loc, loc->location ? loc->location : "nil",
+		  address[0], address[1], address[2], address[3],
+		  netmask[0], netmask[1], netmask[2], netmask[3]);
 
   if ((temp = add_deny(loc)) == NULL)
     return;

@@ -351,9 +351,10 @@ cupsdAddSubscription(
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "cupsdAddSubscription(mask=%x(%s), dest=%p(%s), job=%p(%d), uri=\"%s\")",
-                  mask, cupsdEventName(mask), dest, dest ? dest->name : "",
-	          job, job ? job->id : 0, uri);
+                  "cupsdAddSubscription(mask=%x, dest=%p(%s), job=%p(%d), "
+		  "uri=\"%s\")",
+                  mask, dest, dest ? dest->name : "", job, job ? job->id : 0,
+		  uri);
 
   if (!Subscriptions)
     Subscriptions = cupsArrayNew((cups_array_func_t)cupsd_compare_subscriptions,
@@ -571,6 +572,9 @@ cupsdEventName(
     case CUPSD_EVENT_JOB_PROGRESS :
         return ("job-progress");
 
+    case CUPSD_EVENT_JOB_STATE :
+        return ("job-state");
+
     case CUPSD_EVENT_JOB_STATE_CHANGED :
         return ("job-state-changed");
 
@@ -623,6 +627,8 @@ cupsdEventValue(const char *name)	/* I - Name of event */
     return (CUPSD_EVENT_PRINTER_CONFIG_CHANGED);
   else if (!strcmp(name, "printer-changed"))
     return (CUPSD_EVENT_PRINTER_CHANGED);
+  else if (!strcmp(name, "job-state"))
+    return (CUPSD_EVENT_JOB_STATE);
   else if (!strcmp(name, "job-created"))
     return (CUPSD_EVENT_JOB_CREATED);
   else if (!strcmp(name, "job-completed"))

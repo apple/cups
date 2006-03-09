@@ -149,7 +149,19 @@ esac
 # Information for the server/tests...
 #
 
-user=`whoami`
+user="$USER"
+if test -z "$user"; then
+	if test -x /usr/ucb/whoami; then
+		user=`/usr/ucb/whoami`
+	else
+		user=`whoami`
+	fi
+
+	if test -z "$user"; then
+		user="unknown"
+	fi
+fi
+
 port=8631
 cwd=`pwd`
 root=`dirname $cwd`
@@ -421,7 +433,7 @@ done
 # Create the test report source file...
 #
 
-strfile=cups-str-1.2-`date +%Y-%m-%d`-`whoami`.html
+strfile=cups-str-1.2-`date +%Y-%m-%d`-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile
@@ -435,7 +447,7 @@ echo "Running IPP compliance tests..."
 echo "<H1>1 - IPP Compliance Tests</H1>" >>$strfile
 echo "<P>This section provides the results to the IPP compliance tests" >>$strfile
 echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfile
-echo `date "+%Y-%m-%d"` by `whoami` on `hostname`. >>$strfile
+echo `date "+%Y-%m-%d"` by $user on `hostname`. >>$strfile
 echo "<PRE>" >>$strfile
 
 fail=0
@@ -463,7 +475,7 @@ echo "Running command tests..."
 echo "<H1>2 - Command Tests</H1>" >>$strfile
 echo "<P>This section provides the results to the command tests" >>$strfile
 echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfile
-echo `date "+%Y-%m-%d"` by `whoami` on `hostname`. >>$strfile
+echo `date "+%Y-%m-%d"` by $user on `hostname`. >>$strfile
 echo "<PRE>" >>$strfile
 
 for file in 5*.sh; do
