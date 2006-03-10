@@ -222,7 +222,7 @@ DBUSDIR		=	@DBUSDIR@
 	echo Compiling 32-bit $<...
 	$(CC) $(C32FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
 
-.c..64.o:
+.c.64.o:
 	echo Compiling 64-bit $<...
 	$(CC) $(C64FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
 

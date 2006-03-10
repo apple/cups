@@ -252,7 +252,7 @@ libcups.32.so.2:	$(LIB32OBJS)
 
 libcups.64.so.2:	$(LIB64OBJS)
 	echo Linking 64-bit $@...
-	$(DSO) $(C64FLAGS) $(DSOFLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(C64FLAGS) $(DSOFLAGS) -o $@ $(LIB64OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
