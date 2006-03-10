@@ -147,11 +147,7 @@ if test -n "$GCC"; then
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
 				LIB32CUPSIMAGE="libcupsimage.32.so.2"
-				if test "$prefix" = /; then
-					LIB32DIR=/usr/lib
-				else
-					LIB32DIR="$prefix/lib"
-				fi
+				LIB32DIR="$exec_prefix/lib"
 				if test -d /usr/lib32; then
 					LIB32DIR="${LIB32DIR}32"
 				fi
@@ -167,7 +163,7 @@ if test -n "$GCC"; then
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
 				LIB32CUPSIMAGE="libcupsimage.32.so.2"
-				LIB32DIR="$prefix/lib/32"
+				LIB32DIR="$exec_prefix/lib/32"
 				UNINSTALL32="uninstall32bit"
 			fi
 
@@ -178,7 +174,7 @@ if test -n "$GCC"; then
 				INSTALL64="install64bit"
 				LIB64CUPS="libcups.64.so.2"
 				LIB64CUPSIMAGE="libcupsimage.64.so.2"
-				LIB64DIR="$prefix/lib/64"
+				LIB64DIR="$exec_prefix/lib/64"
 				UNINSTALL64="uninstall64bit"
 			fi
 			;;
@@ -223,7 +219,7 @@ else
 			fi
 
 			if test "x$with_optim" = x; then
-				OPTIM="-fullwarn -woff 1183,1209,1349,3201 $OPTIM"
+				OPTIM="-fullwarn -woff 1183,1209,1349,1506,3201 $OPTIM"
 			fi
 
 			if test "x$enable_32bit" = xyes; then
@@ -233,7 +229,7 @@ else
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
 				LIB32CUPSIMAGE="libcupsimage.32.so.2"
-				LIB32DIR="$prefix/lib32"
+				LIB32DIR="$exec_prefix/lib32"
 				UNINSTALL32="uninstall32bit"
 			fi
 
@@ -244,7 +240,7 @@ else
 				INSTALL64="install64bit"
 				LIB64CUPS="libcups.64.so.2"
 				LIB64CUPSIMAGE="libcupsimage.64.so.2"
-				LIB64DIR="$prefix/lib64"
+				LIB64DIR="$exec_prefix/lib64"
 				UNINSTALL64="uninstall64bit"
 			fi
 			;;

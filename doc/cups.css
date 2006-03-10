@@ -139,6 +139,20 @@ DIV.table TABLE TH {
   border-bottom: solid thin #999966;
 }
 
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 TH.label {
   padding-top: 5pt;
   text-align: right;

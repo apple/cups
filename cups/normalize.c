@@ -103,7 +103,7 @@ static const gencat_t gencat_index[] =	/* General Category Index */
   { CUPS_GENCAT_CS, "Cs" },		/* Other, Surrogate */
   { CUPS_GENCAT_CO, "Co" },		/* Other, Private Use */
   { CUPS_GENCAT_CN, "Cn" },		/* Other, Not Assigned */
-  { 0, NULL }
+  { CUPS_GENCAT_NULL, NULL }
 };
 
 static const char * const bidicat_index[] =
@@ -168,7 +168,7 @@ static const _cups_break_t break_index[] =	/* Line Break Class Index */
   { CUPS_BREAK_SY, "SY" },		/* Symbols Allowing Break After (A) */
   { CUPS_BREAK_XX, "XX" },		/* Unknown (XP) */
   { CUPS_BREAK_ZW, "ZW" },		/* Zero Width Space (A) (norm) */
-  { 0, NULL }
+  { CUPS_BREAK_NULL, NULL }
 };
 
 /*

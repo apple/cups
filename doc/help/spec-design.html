@@ -5,11 +5,330 @@
 </HEAD>
 <BODY>
 
+<P><EM>This document is still being updated for CUPS
+1.2...</EM></P>
+
+<P>This design description documents the overall organization of
+the Common UNIX Printing System. The purpose is not to provide a
+line-by-line description of the CUPS source code, but rather to
+describe the overall architecture and location of key pieces so
+that developers can more easily understand the underlying
+operation of CUPS.</P>
+
+<H2 CLASS="title"><A NAME="INTRO">Introduction</A></H2>
+
 <P>Like most printing systems, CUPS is designed around a central
 print scheduling process that dispatches print jobs, processes
 administrative commands, provides printer status information to
-local and remote programs, and informs users as needed. Figure 1
-shows the basic organization of CUPS.</P>
+local and remote programs, and informs users as needed. <A
+HREF="#FIGURE1">Figure 1</A> shows the basic organization of
+CUPS.</P>
+
+<H3>Scheduler</H3>
+
+<P>The scheduler is a HTTP/1.1 and IPP/1.1 server application
+manages HTTP and IPP requests, printers, classes, jobs,
+subscriptions, and notifications on the system. HTTP is used for
+normal web browser services as well as IPP operation messages
+passed via HTTP POST requests with the
+<CODE>application/ipp</CODE> content type. The scheduler uses a
+series of helper Common Gateway Interface ("CGI") applications to
+provide dynamic web interfaces, and can be configured to run
+additional, site-specific programs or scripts for the web
+interface.</P>
+
+<P>The scheduler is designed as a traditional monolithic,
+single-threaded server process which runs external processes to
+do longer-term operations such as printing, notification,
+device/driver enumeration, and remote printer monitoring. While
+this design does limit the maximum number of simultaneous clients
+that can be supported on a typical system, it also keep resource
+utilization to a minimum and greatly simplifies the scheduler's
+logic.</P>
+
+<DIV CLASS="figure"><TABLE SUMMARY="CUPS Block Diagram">
+<CAPTION>Figure 1: <A NAME="FIGURE1">CUPS Block Diagram</A></CAPTION>
+<TR><TD ALIGN="CENTER"><IMG SRC="../images/cups-block-diagram.gif"
+WIDTH="768" HEIGHT="768" ALT="CUPS Block Diagram"/></TD></TR>
+</TABLE></DIV>
+
+<H4>Job Files</H4>
+
+<P>The scheduler stores job files in a <EM>spool directory</EM>,
+typically <VAR>/var/spool/cups</VAR>. Two types of files will be
+found in the spool directory: <EM>control files</EM> starting
+with the letter "c" ("c00001", "c99999", "c100000", etc.) and
+<EM>data files</EM> starting with the letter "d" ("d00001-001",
+"d99999-001", "d100000-001", etc.) Control files are IPP messages
+based on the original IPP Print-Job or Create-Job messages, while
+data files are the original print files that were submitted for
+printing. There is one control file for every job known to the
+system and 0 or more data files for each job. Data files are
+normally removed after a job has successfully printed, however
+this behavior can be configured.</P>
+
+<H4>Log Files</H4>
+
+<P>The scheduler keeps three kinds of log files which are
+normally stored in the <VAR>/var/log/cups</VAR> directory. The <A
+HREF="ref-access_log.html">access_log</A> file lists every HTTP
+and IPP request that is processed by the scheduler. The <A
+HREF="ref-error_log.html">error_log</A> file contains messages
+from the scheduler and its helper applications that can be used
+to track down problems. The <A
+HREF="ref-page_log.html">page_log</A> file lists every page that
+is printed, allowing for simple print accounting.</P>
+
+<P>Log files are rotated automatically by the scheduler when they
+reach the configured size limit, by default 1MB. If the limit is
+set to 0 then no rotation is performed in the scheduler - this
+mode is often used by Linux distributions so they can use the
+<B>logrotated(8)</B> program to rotate them instead.</P>
+
+<H4>Config Files</H4>
+
+<P>The scheduler uses several configuration files to store the
+server settings (<A HREF="ref-cupsd-conf.html">cupsd.conf</A>),
+available classes (<A
+HREF="ref-classes-conf.html">classes.conf</A>), available
+printers (<A HREF="ref-printers-conf.html">printers.conf</A>),
+current notification subscriptions (<A
+HREF="ref-subscriptions-conf.html">subscriptions.conf</A>), and
+supported file types and filters (<A
+HREF="man-mime.types.html">mime.types</A>, <A
+HREF="man-mime.convs.html">mime.convs</A>). In addition,
+PostScript Printer Description ("PPD") files or interface scripts
+are associated with each printer, and the scheduler has cache
+files for remote printers, PPD files, and current jobs to
+optimize the scheduler's startup speed and availability.</P>
+
+<H3>Berkeley Commands</H3>
+
+<P>CUPS provides the Berkeley <A HREF="man-lpc.html">lpc(8)</A>,
+<A HREF="man-lpq.html">lpq(1)</A>, <A
+HREF="man-lpr.html">lpr(1)</A>, and <A
+HREF="man-lprm.html">lprm(1)</A> commands. In general, they
+function identically to the original Berkeley commands with the
+following exceptions:</P>
+
+<OL>
+
+	<LI>The <B>lpc</B> command currently only supports the
+	"status" sub-command.</LI>
+
+	<LI>The <B>lpr</B> command does not support the format
+	modifier options "1" (TROFF font set 1), "2" (TROFF font
+	set 2), "3" (TROFF font set 3), "4" (TROFF font set 4),
+	"c" (CIFPLOT), "d" (DVI), "f" (FORTRAN), "g" (GNU plot),
+	"i" (indentation), "n" (Ditroff), "r" (Sun raster), "t"
+	(Troff), or "w" (width), as they do not map to the IPP
+	MIME media type based document formats.</LI>
+
+</OL>
+
+<H3>System V Commands</H3>
+
+<P>CUPS provides the System V <A
+HREF="man-accept.html">accept(8)</A>, <A
+HREF="man-cancel.html">cancel(1)</A>, <A
+HREF="man-lp.html">lp(1)</A>, <A
+HREF="man-lpadmin.html">lpadmin(8)</A>, <A
+HREF="man-lpmove.html">lpmove(8)</A>, <A
+HREF="man-lpstat.html">lpstat(1)</A>, and <A
+HREF="man-accept.html">reject(8)</A> commands. In general, they
+function identically to the original System V commands with the
+following exceptions:</P>
+
+<OL>
+
+	<LI>All commands may ask for a password; the System V
+	print spooler requires root access to perform
+	administration tasks, while CUPS allows for more flexible
+	configurations.</LI>
+
+	<LI>The <B>lpadmin</B> command does not implement the
+	Solaris "-A" (alert), "-F" (fault recovery), "-M" (mount
+	form/wheel), "-P" (paper list), "-S" (print wheels), "-T"
+	(type list), "-U" (dialer info), "-W" (wait), "-f" (form
+	name), "-l" (content-type list), "-s" (remote printer),
+	or "-t" (number of trays) options.</LI>
+
+</OL>
+
+<H3>CUPS Commands</H3>
+
+<P>CUPS provides the <A
+HREF="man-cupsaddsmb.html">cupsaddsmb(8)</A>, <A
+HREF="man-cupsenable.html">cupsdisable(8)</A>, <A
+HREF="man-cupsenable.html">cupsenable(8)</A>, <A
+HREF="man-cupstestppd.html">cupstestppd(1)</A>, <A
+HREF="man-lpinfo.html">lpinfo(8)</A>, and <A
+HREF="man-lppasswd.html">lppasswd(1)</A> commands. The
+<B>cupsdisable</B> and <B>cupsenable</B> commands correspond to
+the System V <B>disable</B> and <B>enable</B> commands but have
+been renamed to avoid conflicts with the <B>bash(1)</B> internal
+commands of the same name.</P>
+
+<H3>LPD Support</H3>
+
+<P>LPD client support is provided via the <A
+HREF="man-cups-lpd.html">cups-lpd(8)</A> program. Incoming LPD
+requests are accepted on TCP port 515 by the local
+<B>inetd(8)</B>, <B>launchd(8)</B>, or <B>xinetd(8)</B> process
+and forwarded to the <B>cups-lpd</B> program for conversion to
+the corresponding IPP request(s).</P>
+
+<P>The <B>cups-lpd</B> program conforms, for the most part, to
+RFC 1179: Line Printer Daemon Protocol, but does not enforce the
+privileged source port restriction specified in that document. In
+addition, the banner page and output format options are usually
+overridden via command-line options to the <B>cups-lpd</B>
+program when it is invoked by the corresponding super-daemon
+program.</P>
+
+<H3>Web Interface</H3>
+
+<P>The web interface is supported by five CGI programs. Table 1
+describes the purpose of each of the programs.</P>
+
+<DIV CLASS="table"><TABLE SUMMARY="CGI Programs">
+<CAPTION>Table 1: <A NAME="TABLE1">CGI Programs</A></CAPTION>
+<THEAD>
+<TR>
+	<TH>Program</TH>
+	<TH>Location</TH>
+	<TH>Description</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>admin.cgi</TD>
+	<TD>/admin</TD>
+	<TD>Provides all of the administrative functions</TD>
+</TR>
+<TR>
+	<TD>classes.cgi</TD>
+	<TD>/classes</TD>
+	<TD>Lists classes and provides class management functions</TD>
+</TR>
+<TR>
+	<TD>help.cgi</TD>
+	<TD>/help</TD>
+	<TD>Provides access to on-line help documents</TD>
+</TR>
+<TR>
+	<TD>jobs.cgi</TD>
+	<TD>/jobs</TD>
+	<TD>Lists jobs and provides job management functions</TD>
+</TR>
+<TR>
+	<TD>printers.cgi</TD>
+	<TD>/printers</TD>
+	<TD>Lists printers and provides printer management functions</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
+
+<H3>Notifiers</H3>
+
+<P>Notifiers provide the means for sending event notifications
+from the scheduler. Notifiers are executed with the recipient
+information on the command-line and the event data on the
+standard input.</P>
+
+<P>The <B>mailto</B> notifier is the only notifier included with
+CUPS 1.2 and handles email notifications for the scheduler.
+Additional notifiers can be added as needed without additional
+configuration.</P>
+
+<H3>Filters</H3>
+
+<P>Filters convert job files into a printable format. Multiple
+filters are run, as needed, to convert from the job file format
+to the printable format. A filter program reads from the standard
+input or from a file if a filename is supplied. All filters must
+support a common set of options including printer name, job ID,
+username, job title, number of copies, and job options. All
+output is sent to the standard output.</P>
+
+<P>CUPS provides filters for printing text, PostScript, PDF,
+HP-GL/2, and many types of image files. CUPS also provides
+printer driver filters for HP-PCL, ESC/P, and several types of
+label printers. Additional filters can be added through the use
+of mime.convs and PPD files.</P>
+
+<H3>Port Monitors</H3>
+
+<P>Port monitors handle the device- and channel-specific data
+formatting for a printer. Port monitors use the same interface as
+filters.</P>
+
+<P>CUPS includes two port monitors: the <B>bcp</B> port monitor
+which supports the PostScript Binary Communications Protocol
+("BCP") and the <b>tbcp</b> port monitor which supports the
+PostScript Tagged Binary Communications Protocol ("TBCP").
+Additional port monitors can be added through PPD files.</P>
+
+<H3>Backends</H3>
+
+<P>Backends send print data to the printer and enumerate
+available printers/devices as needed. Backends use the same
+interface as filters.</P>
+
+<P>CUPS includes backends for parallel, serial, SCSI, USB, LPD,
+IPP, and AppSocket (JetDirect) connections. Additional backends
+can be added as needed without additional configuration.</P>
+
+<H2 CLASS="title"><A NAME="PROGRAMMING">Programming Interfaces</A></H2>
+
+<P>CUPS makes use of two general-purpose libraries to provide its
+printing services. The CUPS library provides the general
+communications and management infrastructure while the CUPS
+imaging library provides the image file and raster data
+support.</P>
+
+<H3>CUPS Libary</H3>
+
+<P>The CUPS library contains CUPS-specific convenience functions
+for queuing print jobs, getting printer information, accessing
+resources via HTTP and IPP, and manipulating PPD files. Unlike
+the rest of CUPS, the CUPS API is provided under the terms of the
+GNU LGPL so it may be used by non-GPL applications.</P>
+
+<H3>CUPS Imaging Library</H3>
+
+<P>The CUPS imaging library provides functions for managing large
+images, doing colorspace conversion and color management, scaling
+images for printing, and managing raster page streams. It is used
+by the CUPS image file filters, the PostScript RIP, and all
+raster printers drivers.</P>
+
+<!--<H2 CLASS="title">Network Printing</H2>
+
+<P>Traditionally, network printing has been one of the hardest
+things to get working under UNIX. One reason is because each
+vendor added their own extensions to the LPD protocol (the
+previous standard for network printing), making cross-platform
+printing difficult if not impossible.</P>
+
+<P>Another reason is that you have to administer every network
+printer on every client machine. In some cases you can "clone'
+the printer configuration from a "master' client to each of the
+others, but even that can be time-consuming and error-prone.
+Something better is needed.</P>
+
+<P>CUPS provides "printer browsing", which allows clients to
+automatically see and use printers from any server on a LAN.
+This means that you only need to configure the server and the
+clients will automatically see the printers and classes on
+it.</P>
+
+<P>In addition, CUPS can automatically merge multiple identical
+network printers into "implicit classes". This allows clients to
+send jobs to the implicit class and have them print on the first
+available printer or server. In addition, failsafe and
+load-balancing functions are enabled simply by defining the same
+printer on multiple servers!</P>
 
 <H3>Scheduler</H3>
 
@@ -71,100 +390,7 @@ just PostScript printers. There is one PPD file for each
 printer. PPD files for non-PostScript printers define additional
 filters through <tt>cupsFilter</tt> attributes to support
 printer drivers.</P>
-
-<P ALIGN="CENTER"><IMG SRC="../images/cups-block-diagram.gif"
-WIDTH="768" HEIGHT="768" ALT="CUPS Block Diagram"/><BR>
-<I>Figure 1 - CUPS Block Diagram</I></P>
-
-<H3>CUPS API</H3>
-
-<P>The CUPS API contains CUPS-specific convenience functions for
-queuing print jobs, getting printer information, accessing
-resources via HTTP and IPP, and manipulating PPD files. Unlike
-the rest of CUPS, the CUPS API is provided under the terms of
-the GNU LGPL so it may be used by non-GPL applications.</P>
-
-<H3>Berkeley and System V Commands</H3>
-
-<P>CUPS provides the System V and Berkeley command-line
-interfaces for submitting jobs and checking the printer status.
-The <tt>lpstat</tt> and <tt>lpc status</tt> commands
-also show network printers ("printer@server") when printer
-browsing is enabled.</P>
-
-<P>The System V administation commands are supplied for managing
-printers and classes. The Berkeley printer administration tool
-(<tt>lpc</tt>) is only supported in a "read-only' mode to
-check the current status of the printer queues and
-scheduler.</P>
-
-<H3>Filters</H3>
-
-<P>A filter program reads from the standard input or from a file
-if a filename is supplied. All filters must support a common set
-of options including printer name, job ID, username, job title,
-number of copies, and job options. All output is sent to the
-standard output.</P>
-
-<P>Filters are provided for many file formats and include image
-file and PostScript raster filters that support non-PostScript
-printers. Multiple filters are run in parallel to produce the
-required output format.</P>
-
-<P>The PostScript raster filter is based on the ESP Ghostscript
-core. Instead of using the Ghostscript printer drivers, the CUPS
-filter uses a generic CUPS raster printer driver and
-CUPS-compliant front-end to support any kind of raster printer.
-This allows the same printer driver filter to be used for
-printing raster data from any filter.</P>
-
-<pre>Talk about Apple's use of CUPS...</pre>
-
-<H3>CUPS Imaging</H3>
-
-<P>The CUPS Imaging library provides functions for managing
-large images, doing colorspace conversion and color management,
-scaling images for printing, and managing raster page streams.
-It is used by the CUPS image file filters, the PostScript RIP,
-and all raster printers drivers.</P>
-
-<H3>Backends</H3>
-
-<P>A backend program is a special filter that sends print data
-to a device or network connection. Backends for parallel,
-serial, USB, LPD, IPP, and AppSocket (JetDirect) connections are
-provided in CUPS 1.2.</P>
-
-<P>SAMBA version 2.0.6 and higher includes a SMB backend
-(<tt>smbspool(1)</tt>) that can be used for printing to
-Windows.</P>
-
-<H2 CLASS="title">Network Printing</H2>
-
-<P>Traditionally, network printing has been one of the hardest
-things to get working under UNIX. One reason is because each
-vendor added their own extensions to the LPD protocol (the
-previous standard for network printing), making cross-platform
-printing difficult if not impossible.</P>
-
-<P>Another reason is that you have to administer every network
-printer on every client machine. In some cases you can "clone'
-the printer configuration from a "master' client to each of the
-others, but even that can be time-consuming and error-prone.
-Something better is needed.</P>
-
-<P>CUPS provides "printer browsing", which allows clients to
-automatically see and use printers from any server on a LAN.
-This means that you only need to configure the server and the
-clients will automatically see the printers and classes on
-it.</P>
-
-<P>In addition, CUPS can automatically merge multiple identical
-network printers into "implicit classes". This allows clients to
-send jobs to the implicit class and have them print on the first
-available printer or server. In addition, failsafe and
-load-balancing functions are enabled simply by defining the same
-printer on multiple servers!</P>
+-->
 
 </BODY>
 </HTML>

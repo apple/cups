@@ -1,8 +1,13 @@
-CHANGES.txt - 2006-03-09
+CHANGES.txt - 2006-03-10
 ------------------------
 
 CHANGES IN CUPS V1.2b2
 
+	- Updated the CUPS design description.
+	- Added --enable-32bit and --enable-64bit configure
+	  options to allow building of separate 32/64-bit
+	  libraries on systems that support both environments
+	  (STR #1472)
 	- Various compiler warning fixes.
 	- Fixes for Solaris 10 builds against old GNU TLS and
 	  LDAP libraries.

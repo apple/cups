@@ -954,9 +954,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     }
     else if (!strncmp(keyword, "Custom", 6) && !strcmp(name, "True"))
     {
-      ppd_coption_t	*coption;	/* Custom option */
-
-
       DEBUG_puts("Processing Custom option...");
 
      /*
@@ -987,7 +984,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	}
       }
 
-      if ((coption = ppd_get_coption(ppd, keyword + 6)) == NULL)
+      if (!ppd_get_coption(ppd, keyword + 6))
       {
         cg->ppd_status = PPD_ALLOC_ERROR;
 
