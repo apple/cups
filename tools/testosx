@@ -30,7 +30,8 @@ mkdir -p $pkgdir/Resources
 # Install resource files into the Resources directory...
 echo Installing resource files...
 cp packaging/LICENSE.rtf $pkgdir/Resources/ReadMe.rtf
-cp packaging/WELCOME.rtf $pkgdir/Resources/Welcome.rtf
+sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
+	<packaging/WELCOME.rtf >$pkgdir/Resources/Welcome.rtf
 cp packaging/installer.tif $pkgdir/Resources/background.tif
 
 cat >$pkgdir/Resources/preflight <<EOF
@@ -63,12 +64,14 @@ fi
 chmod 755 $pkgdir/Resources/postflight
 
 # Tag the current revision in the plist and web interface files...
-sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
-	-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
-	<packaging/cups-desc.plist.in >packaging/cups-desc.plist
-sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
-	-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
-	<packaging/cups-info.plist.in >packaging/cups-info.plist
+for file in packaging/cups-desc.plist packaging/cups-info.plist \
+		doc/index.html doc/ja/index.html templates/header.tmpl; do
+	echo Updating $file...
+	sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
+		-e '1,$s/@CUPS_REVISION@//g' \
+		-e '1,$s/@CUPS_RELEASE@/1.2.'$rev'/g' \
+		<$file.in >$file
+done
 
 # Install CUPS into the Package directory...
 #make INSTALL=$topdir/install-sh BUILDROOT=$pkgdir/Package install
