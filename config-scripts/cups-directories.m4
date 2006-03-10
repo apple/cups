@@ -270,7 +270,7 @@ case "$uname" in
 	*)
 		# All others
 		INSTALL_SYSV="install-sysv"
-		CUPS_SERVERBIN="$libdir/cups"
+		CUPS_SERVERBIN="$exec_prefix/lib/cups"
 		;;
 esac
 
