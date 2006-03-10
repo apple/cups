@@ -263,6 +263,28 @@ else
 			if test $PICFLAG = 1; then
 				OPTIM="-KPIC $OPTIM"
 			fi
+
+			if test "x$enable_32bit" = xyes; then
+				# Compiling on a Solaris system, build 32-bit
+				# libraries...
+				C32FLAGS="-xarch=v8"
+				INSTALL32="install32bit"
+				LIB32CUPS="libcups.32.so.2"
+				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32DIR="$exec_prefix/lib/32"
+				UNINSTALL32="uninstall32bit"
+			fi
+
+			if test "x$enable_64bit" = xyes; then
+				# Compiling on a Solaris system, build 64-bit
+				# libraries...
+				C64FLAGS="-xarch=v9 -xcode=pic32"
+				INSTALL64="install64bit"
+				LIB64CUPS="libcups.64.so.2"
+				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64DIR="$exec_prefix/lib/64"
+				UNINSTALL64="uninstall64bit"
+			fi
 			;;
 		UNIX_SVR*)
 			# UnixWare
