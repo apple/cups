@@ -69,8 +69,12 @@ LIBOBJS	=	\
 		transcode.o \
 		usersys.o \
 		util.o
+LIB32OBJS	= $(LIBOBJS:.o=.32.o)
+LIB64OBJS	= $(LIBOBJS:.o=.64.o)
 OBJS	=	\
 		$(LIBOBJS) \
+		$(LIB32OBJS) \
+		$(LIB64OBJS) \
 		testadmin.o \
 		testarray.o \
 		testfile.o \
@@ -108,6 +112,8 @@ HEADERS	=	\
 
 TARGETS	=	\
 		$(LIBCUPS) \
+		$(LIB32CUPS) \
+		$(LIB64CUPS) \
 		libcups.a \
 		testadmin \
 		testarray \
@@ -202,6 +208,24 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
+
+
+#
+# libcups.32.so.2
+#
+
+libcups.32.so.2:	$(LIB32OBJS)
+	echo Linking 32-bit $@...
+	$(DSO) $(C32FLAGS) $(DSOFLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# libcups.64.so.2
+#
+
+libcups.64.so.2:	$(LIB32OBJS)
+	echo Linking 64-bit $@...
+	$(DSO) $(C64FLAGS) $(DSOFLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
