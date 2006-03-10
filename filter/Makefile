@@ -210,18 +210,18 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 # libcupsimage.32.so.2
 #
 
-libcupsimage.32.so.2:	$(LIB32OBJS)
+libcupsimage.32.so.2:	$(IMAGE32OBJS)
 	echo Linking 32-bit $@...
-	$(DSO) $(C32FLAGS) $(DSOFLAGS) -o $@ $(LIB32OBJS) $(DSOLIBS) -lm
+	$(DSO) $(C32FLAGS) $(DSOFLAGS) -o $@ $(IMAGE32OBJS) $(DSOLIBS) -lm
 
 
 #
 # libcupsimage.64.so.2
 #
 
-libcupsimage.64.so.2:	$(LIB32OBJS)
+libcupsimage.64.so.2:	$(IMAGE64OBJS)
 	echo Linking 64-bit $@...
-	$(DSO) $(C64FLAGS) $(DSOFLAGS) -o $@ $(LIB32OBJS) $(DSOLIBS) -lm
+	$(DSO) $(C64FLAGS) $(DSOFLAGS) -o $@ $(IMAGE64OBJS) $(DSOLIBS) -lm
 
 
 #
