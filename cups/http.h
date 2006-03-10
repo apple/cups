@@ -39,6 +39,9 @@
 #    include <winsock2.h>
 #    include <ws2tcpip.h>
 #  else
+#    ifdef __sgi /* IRIX needs this for IPv6 support!?! */
+#      define INET6
+#    endif /* __sgi */
 #    include <unistd.h>
 #    include <sys/time.h>
 #    include <sys/socket.h>
