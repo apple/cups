@@ -55,7 +55,7 @@ if test x$enable_ssl != xno; then
 	    dnl included...
 	    SAVELIBS="$LIBS"
 
-	    AC_CHECK_LIB(gnutls, gnutls_crt_set_dn_by_oid,
+	    AC_CHECK_LIB(gnutls, gnutls_x509_crt_set_dn_by_oid,
 		[SSLLIBS="-lgnutls"
 		 AC_DEFINE(HAVE_SSL)
 		 AC_DEFINE(HAVE_GNUTLS)])
