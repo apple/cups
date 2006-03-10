@@ -34,6 +34,40 @@ AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no],
 		OPTIM="-g"
 	fi])
 
+dnl Setup support for separate 32/64-bit library generation...
+AC_ARG_ENABLE(32bit, [  --enable-32bit          generate 32-bit libraries on 32/64-bit systems, default=no])
+
+C32FLAGS=""
+INSTALL32=""
+LIB32CUPS=""
+LIB32CUPSIMAGE=""
+LIB32DIR=""
+UNINSTALL32=""
+
+AC_SUBST(C32FLAGS)
+AC_SUBST(INSTALL32)
+AC_SUBST(LIB32CUPS)
+AC_SUBST(LIB32CUPSIMAGE)
+AC_SUBST(LIB32DIR)
+AC_SUBST(UNINSTALL32)
+
+AC_ARG_ENABLE(64bit, [  --enable-64bit          generate 64-bit libraries on 32/64-bit systems, default=no])
+
+C64FLAGS=""
+INSTALL64=""
+LIB64CUPS=""
+LIB64CUPSIMAGE=""
+LIB64DIR=""
+UNINSTALL64=""
+
+AC_SUBST(C64FLAGS)
+AC_SUBST(INSTALL64)
+AC_SUBST(LIB64CUPS)
+AC_SUBST(LIB64CUPSIMAGE)
+AC_SUBST(LIB64DIR)
+AC_SUBST(UNINSTALL64)
+
+dnl Position-Independent Executable support on Linux and *BSD...
 AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fpie option, default=no])
 
 dnl Update compiler options...
@@ -79,6 +113,73 @@ if test -n "$GCC"; then
 		# Additional warning options for alpha testing...
 		OPTIM="-Wshadow -Wunused $OPTIM"
 	fi
+
+	case "$uname" in
+		IRIX)
+			if test "x$enable_32bit" = xyes; then
+				# Compiling on an IRIX system, build 32-bit
+				# libraries...
+				C32FLAGS="-n32 -mips3"
+				INSTALL32="install32bit"
+				LIB32CUPS="libcups.32.so.2"
+				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32DIR="$prefix/lib32"
+				UNINSTALL32="uninstall32bit"
+			fi
+
+			if test "x$enable_64bit" = xyes; then
+				# Compiling on an IRIX system, build 64-bit
+				# libraries...
+				C64FLAGS="-64 -mips4"
+				INSTALL64="install64bit"
+				LIB64CUPS="libcups.64.so.2"
+				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64DIR="$prefix/lib64"
+				UNINSTALL64="uninstall64bit"
+			fi
+			;;
+
+		Linux*)
+			if test -a "x$enable_32bit" = xyes; then
+				# Compiling on an 64-bit x86 system, build 32-bit
+				# libraries...
+				C32FLAGS="-m32"
+				INSTALL32="install32bit"
+				LIB32CUPS="libcups.32.so.2"
+				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				if test -d /usr/lib32; then
+					LIB32DIR="$prefix/lib32"
+				else
+					LIB32DIR="$prefix/lib"
+				fi
+				UNINSTALL32="uninstall32bit"
+			fi
+			;;
+
+		SunOS*)
+			if test "x$enable_32bit" = xyes; then
+				# Compiling on a Solaris system, build 32-bit
+				# libraries...
+				C32FLAGS="-m32"
+				INSTALL32="install32bit"
+				LIB32CUPS="libcups.32.so.2"
+				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32DIR="$prefix/lib/32"
+				UNINSTALL32="uninstall32bit"
+			fi
+
+			if test "x$enable_64bit" = xyes; then
+				# Compiling on a Solaris system, build 64-bit
+				# libraries...
+				C64FLAGS="-m64"
+				INSTALL64="install64bit"
+				LIB64CUPS="libcups.64.so.2"
+				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64DIR="$prefix/lib/64"
+				UNINSTALL64="uninstall64bit"
+			fi
+			;;
+	esac
 else
 	case $uname in
 		AIX*)
@@ -118,21 +219,30 @@ else
 				fi
 			fi
 
-			if test $uversion -ge 62 -a "x$with_optim" = x; then
-				OPTIM="$OPTIM -n32 -mips3"
+			if test "x$with_optim" = x; then
+				OPTIM="-fullwarn -woff 1183,1209,1349,3201 $OPTIM"
 			fi
 
-			if test "x$with_optim" = x; then
-				# Show most warnings, but suppress the
-				# ones about arguments not being used,
-				# string constants assigned to const
-				# char *'s, etc.  We only set the warning
-				# options on IRIX 6.2 and higher because
-				# of limitations in the older SGI compiler
-				# tools.
-				if test $uversion -ge 62; then
-					OPTIM="-fullwarn -woff 1183,1209,1349,3201 $OPTIM"
-				fi
+			if test "x$enable_32bit" = xyes; then
+				# Compiling on an IRIX system, build 32-bit
+				# libraries...
+				C32FLAGS="-n32 -mips3"
+				INSTALL32="install32bit"
+				LIB32CUPS="libcups.32.so.2"
+				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32DIR="$prefix/lib32"
+				UNINSTALL32="uninstall32bit"
+			fi
+
+			if test "x$enable_64bit" = xyes; then
+				# Compiling on an IRIX system, build 64-bit
+				# libraries...
+				C64FLAGS="-64 -mips4"
+				INSTALL64="install64bit"
+				LIB64CUPS="libcups.64.so.2"
+				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64DIR="$prefix/lib64"
+				UNINSTALL64="uninstall64bit"
 			fi
 			;;
 		SunOS*)

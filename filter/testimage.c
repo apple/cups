@@ -3,7 +3,7 @@
  *
  *   Image library test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -39,15 +39,18 @@
  * 'main()' - Main entry...
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  image_t	*img;		/* Image to print */
-  int		primary;	/* Primary image colorspace */
-  FILE		*out;		/* Output PPM/PGM file */
-  ib_t		*line;		/* Line from file */
-  int		y;		/* Current line */
+  cups_image_t		*img;		/* Image to print */
+  cups_icspace_t	primary;	/* Primary image colorspace */
+  FILE			*out;		/* Output PPM/PGM file */
+  cups_ib_t		*line;		/* Line from file */
+  int			y,		/* Current line */
+			width,		/* Width of image */
+			height,		/* Height of image */
+			depth;		/* Depth of image */
 
 
   if (argc != 3)
@@ -57,11 +60,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   }
 
   if (strstr(argv[2], ".ppm") != NULL)
-    primary = IMAGE_RGB;
+    primary = CUPS_IMAGE_RGB;
   else
-    primary = IMAGE_WHITE;
+    primary = CUPS_IMAGE_WHITE;
 
-  img = ImageOpen(argv[1], primary, IMAGE_WHITE, 100, 0, NULL);
+  img = cupsImageOpen(argv[1], primary, CUPS_IMAGE_WHITE, 100, 0, NULL);
 
   if (!img)
   {
@@ -74,22 +77,26 @@ main(int  argc,			/* I - Number of command-line arguments */
   if (!out)
   {
     perror(argv[2]);
-    ImageClose(img);
+    cupsImageClose(img);
     return (1);
   }
 
-  line = calloc(img->xsize, img->colorspace);
+  width  = cupsImageGetWidth(img);
+  height = cupsImageGetHeight(img);
+  depth  = cupsImageGetDepth(img);
+  line   = calloc(width, depth);
 
-  fprintf(out, "P%d\n%d\n%d\n255\n", img->colorspace == IMAGE_WHITE ? 5 : 6,
-          img->xsize, img->ysize);
+  fprintf(out, "P%d\n%d\n%d\n255\n",
+          cupsImageGetColorSpace(img) == CUPS_IMAGE_WHITE ? 5 : 6,
+          width, height);
 
-  for (y = 0; y < img->ysize; y ++)
+  for (y = 0; y < height; y ++)
   {
-    ImageGetRow(img, 0, y, img->xsize, line);
-    fwrite(line, img->xsize, img->colorspace, out);
+    cupsImageGetRow(img, 0, y, width, line);
+    fwrite(line, width, depth, out);
   }
 
-  ImageClose(img);
+  cupsImageClose(img);
   fclose(out);
 
   return (0);

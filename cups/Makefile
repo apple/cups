@@ -137,7 +137,8 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) `basename $(LIBCUPS) .2` libcups.dylib
+	$(RM) $(OBJS) $(TARGETS)
+	$(RM) libcups.so libcups.sl libcups.dylib libcups.32.so libcups.64.so
 
 
 #
@@ -152,7 +153,7 @@ depend:
 # Install object and target files...
 #
 
-install:	all installhdrs $(INSTALLSTATIC)
+install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
@@ -178,12 +179,22 @@ installhdrs:
 		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
 	done
 
+install32bit:
+	$(INSTALL_DIR) -m 755 $(LIB32DIR)
+	$(INSTALL_LIB) libcups.32.so.2 $(LIB32DIR)/libcups.so.2
+	$(LN) libcups.so $(LIB32DIR)/libcups.so.2
+
+install64bit:
+	$(INSTALL_DIR) -m 755 $(LIB64DIR)
+	$(INSTALL_LIB) libcups.64.so.2 $(LIB64DIR)/libcups.so.2
+	$(LN) libcups.so $(LIB64DIR)/libcups.so.2
+
 
 #
 # Uninstall object and target files...
 #
 
-uninstall:
+uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	$(RM) $(LIBDIR)/libcups.2.dylib
 	$(RM) $(LIBDIR)/libcups.a
 	$(RM) $(LIBDIR)/libcups.dylib
@@ -197,6 +208,16 @@ uninstall:
 		$(RM) $(INCLUDEDIR)/cups/$$file; \
 	done
 	-$(RMDIR) $(INCLUDEDIR)/cups
+
+uninstall32bit:
+	$(RM) $(LIB32DIR)/libcups.so
+	$(RM) $(LIB32DIR)/libcups.so.2
+	-$(RMDIR) $(LIB32DIR)
+
+uninstall64bit:
+	$(RM) $(LIB64DIR)/libcups.so
+	$(RM) $(LIB64DIR)/libcups.so.2
+	-$(RMDIR) $(LIB64DIR)
 
 
 #

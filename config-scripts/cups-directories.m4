@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -99,10 +99,14 @@ fi
 
 dnl Fix "libdir" variable for IRIX 6.x...
 if test "$libdir" = "\${exec_prefix}/lib"; then
-	if test "$uname" = "IRIX" -a $uversion -ge 62; then
+	if test "$uname" = "IRIX"; then
 		libdir="$exec_prefix/lib32"
 	else
-		libdir="$exec_prefix/lib"
+		if test "$uname" = Linux -a -d /usr/lib64; then
+			libdir="$exec_prefix/lib64"
+		else
+			libdir="$exec_prefix/lib"
+		fi
 	fi
 fi
 
