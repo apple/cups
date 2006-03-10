@@ -2280,7 +2280,8 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   gnutls_init(&(conn->session), GNUTLS_CLIENT);
   gnutls_set_default_priority(conn->session);
   gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(conn->session, (gnutls_transport_ptr)http->fd);
+  gnutls_transport_set_ptr(conn->session,
+                           (gnutls_transport_ptr)((long)http->fd));
 
   if ((gnutls_handshake(conn->session)) != GNUTLS_E_SUCCESS)
   {

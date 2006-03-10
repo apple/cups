@@ -748,7 +748,8 @@ cupsdEncryptClient(cupsd_client_t *con)	/* I - Client to encrypt */
   gnutls_init(&(conn->session), GNUTLS_SERVER);
   gnutls_set_default_priority(conn->session);
   gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(conn->session, (gnutls_transport_ptr)con->http.fd);
+  gnutls_transport_set_ptr(conn->session,
+                           (gnutls_transport_ptr)((long)con->http.fd));
 
   error = gnutls_handshake(conn->session);
 
