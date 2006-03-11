@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cups-lpd 8 "Common UNIX Printing System" "12 Febrary 2006" "Easy Software Products"
+.TH cups-lpd 8 "Common UNIX Printing System" "11 March 2006" "Easy Software Products"
 .SH NAME
 cups-lpd \- receive print jobs and report printer status to lpd clients
 .SH SYNOPSIS
@@ -43,6 +43,11 @@ add the following line to the \fIinetd.conf\fR file to enable the
     printer stream tcp nowait lp @CUPS_SERVERBIN@/daemon/cups-lpd cups-lpd \\
         -o document-format=application/octet-stream
 .fi
+.LP
+.LP
+\fBNote:\fR If you are using Solaris 10 or higher, you must run
+the \fIinetdconv(1m)\fR program to register the changes to the
+inetd.conf file.
 .LP
 If you are using the newer \fIxinetd(8)\fR daemon, create a file
 named \fI/etc/xinetd.d/cups\fR containing the following lines:
@@ -105,7 +110,8 @@ between LPD and IPP Protocols. Since many LPD implementations
 stray from this definition, remote status reporting to LPD
 clients may be unreliable.
 .SH SEE ALSO
-\fIcups(1)\fR, \fIcupsd(8)\fR, \fIinetd(8)\fR, \fIxinetd(8)\fR,
+\fIcups(1)\fR, \fIcupsd(8)\fR, \fIinetconv(1m)\fR,
+\fIinetd(8)\fR, \fIxinetd(8)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
