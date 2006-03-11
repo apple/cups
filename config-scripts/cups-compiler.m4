@@ -157,8 +157,7 @@ if test -n "$GCC"; then
 
 		SunOS*)
 			if test "x$enable_32bit" = xyes; then
-				# Compiling on a Solaris system, build 32-bit
-				# libraries...
+				# Build 32-bit libraries...
 				C32FLAGS="-m32"
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
@@ -168,8 +167,7 @@ if test -n "$GCC"; then
 			fi
 
 			if test "x$enable_64bit" = xyes; then
-				# Compiling on a Solaris system, build 64-bit
-				# libraries...
+				# Build 64-bit libraries...
 				C64FLAGS="-m64"
 				INSTALL64="install64bit"
 				LIB64CUPS="libcups.64.so.2"
@@ -223,8 +221,7 @@ else
 			fi
 
 			if test "x$enable_32bit" = xyes; then
-				# Compiling on an IRIX system, build 32-bit
-				# libraries...
+				# Build 32-bit libraries...
 				C32FLAGS="-n32 -mips3"
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
@@ -234,8 +231,7 @@ else
 			fi
 
 			if test "x$enable_64bit" = xyes; then
-				# Compiling on an IRIX system, build 64-bit
-				# libraries...
+				# Build 64-bit libraries...
 				C64FLAGS="-64 -mips4"
 				INSTALL64="install64bit"
 				LIB64CUPS="libcups.64.so.2"
@@ -267,7 +263,15 @@ else
 			if test "x$enable_32bit" = xyes; then
 				# Compiling on a Solaris system, build 32-bit
 				# libraries...
-				C32FLAGS="-xarch=v8"
+				case `uname -m` in
+					*86 | amd64)
+						C32FLAGS="-xarch=i386"
+						;;
+					*)
+						C32FLAGS="-xarch=v8"
+						;;
+				esac
+
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
 				LIB32CUPSIMAGE="libcupsimage.32.so.2"
@@ -276,9 +280,16 @@ else
 			fi
 
 			if test "x$enable_64bit" = xyes; then
-				# Compiling on a Solaris system, build 64-bit
-				# libraries...
-				C64FLAGS="-xarch=v9 -xcode=pic32"
+				# Build 64-bit libraries...
+				case `uname -m` in
+					*86 | amd64)
+						C64FLAGS="-xarch=amd64 -xcode=pic32"
+						;;
+					*)
+						C64FLAGS="-xarch=v9 -xcode=pic32"
+						;;
+				esac
+
 				INSTALL64="install64bit"
 				LIB64CUPS="libcups.64.so.2"
 				LIB64CUPSIMAGE="libcupsimage.64.so.2"
