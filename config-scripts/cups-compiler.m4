@@ -24,10 +24,13 @@ dnl
 
 dnl Clear the debugging and non-shared library options unless the user asks
 dnl for them...
+ARCHFLAGS=""
 OPTIM=""
+AC_SUBST(ARCHFLAGS)
 AC_SUBST(OPTIM)
 
 AC_ARG_WITH(optim, [  --with-optim="flags"    set optimization flags ])
+AC_ARG_WITH(archflags, [  --with-arch="flags"     set default architecture flags ])
 
 AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no],
 	[if test x$enable_debug = xyes; then
@@ -36,15 +39,16 @@ AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no],
 
 dnl Setup support for separate 32/64-bit library generation...
 AC_ARG_ENABLE(32bit, [  --enable-32bit          generate 32-bit libraries on 32/64-bit systems, default=no])
+AC_ARG_WITH(arch32flags, [  --with-arch32="flags"   specifies 32-bit architecture flags])
 
-C32FLAGS=""
+ARCH32FLAGS=""
 INSTALL32=""
 LIB32CUPS=""
 LIB32CUPSIMAGE=""
 LIB32DIR=""
 UNINSTALL32=""
 
-AC_SUBST(C32FLAGS)
+AC_SUBST(ARCH32FLAGS)
 AC_SUBST(INSTALL32)
 AC_SUBST(LIB32CUPS)
 AC_SUBST(LIB32CUPSIMAGE)
@@ -52,15 +56,16 @@ AC_SUBST(LIB32DIR)
 AC_SUBST(UNINSTALL32)
 
 AC_ARG_ENABLE(64bit, [  --enable-64bit          generate 64-bit libraries on 32/64-bit systems, default=no])
+AC_ARG_WITH(arch64flags, [  --with-arch64="flags"   specifies 64-bit architecture flags])
 
-C64FLAGS=""
+ARCH64FLAGS=""
 INSTALL64=""
 LIB64CUPS=""
 LIB64CUPSIMAGE=""
 LIB64DIR=""
 UNINSTALL64=""
 
-AC_SUBST(C64FLAGS)
+AC_SUBST(ARCH64FLAGS)
 AC_SUBST(INSTALL64)
 AC_SUBST(LIB64CUPS)
 AC_SUBST(LIB64CUPSIMAGE)
@@ -89,16 +94,6 @@ if test -n "$GCC"; then
 	fi
 
 	case $uname in
-		Darwin*)
-			if test "x$with_optim" = x; then
-				if test "x`uname -m`" = xi386; then
-					# Build universal binaries for OSX on Intel...
-					OPTIM="-arch i386 -arch ppc $OPTIM"
-					DSOFLAGS="-arch i386 -arch ppc $DSOFLAGS"
-				fi
-			fi
-			;;
-
 		Linux*)
 			if test x$enable_pie = xyes; then
 				OPTIM="$OPTIM -fpie"
@@ -115,35 +110,75 @@ if test -n "$GCC"; then
 	fi
 
 	case "$uname" in
+		Darwin*)
+			if test -z "$with_archflags"; then
+				if test "x`uname -m`" = xi386; then
+					# Build universal binaries for OSX on Intel...
+					ARCHFLAGS="-arch i386 -arch ppc"
+				fi
+			else
+				ARCHFLAGS="$with_archflags"
+			fi
+			;;
+
 		IRIX)
 			if test "x$enable_32bit" = xyes; then
-				# Compiling on an IRIX system, build 32-bit
-				# libraries...
-				C32FLAGS="-n32 -mips3"
+				# Build 32-bit libraries, 64-bit base...
+				if test -z "$with_arch32flags"; then
+					ARCH32FLAGS="-n32 -mips3"
+				else
+					ARCH32FLAGS="$with_arch32flags"
+				fi
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
 				LIB32CUPSIMAGE="libcupsimage.32.so.2"
 				LIB32DIR="$prefix/lib32"
 				UNINSTALL32="uninstall32bit"
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch64flags"; then
+						ARCHFLAGS="-64 -mips4"
+					else
+						ARCHFLAGS="$with_arch64flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
+				fi
 			fi
 
 			if test "x$enable_64bit" = xyes; then
-				# Compiling on an IRIX system, build 64-bit
-				# libraries...
-				C64FLAGS="-64 -mips4"
+				# Build 64-bit libraries, 32-bit base...
+				if test -z "$with_arch64flags"; then
+					ARCH64FLAGS="-64 -mips4"
+				else
+					ARCH64FLAGS="$with_arch64flags"
+				fi
 				INSTALL64="install64bit"
 				LIB64CUPS="libcups.64.so.2"
 				LIB64CUPSIMAGE="libcupsimage.64.so.2"
 				LIB64DIR="$prefix/lib64"
 				UNINSTALL64="uninstall64bit"
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch32flags"; then
+						ARCHFLAGS="-n32 -mips3"
+					else
+						ARCHFLAGS="$with_arch32flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
+				fi
 			fi
 			;;
 
 		Linux*)
 			if test "x$enable_32bit" = xyes; then
-				# Compiling on an 64-bit x86 system, build 32-bit
-				# libraries...
-				C32FLAGS="-m32"
+				# Build 32-bit libraries, 64-bit base...
+				if test -z "$with_arch32flags"; then
+					ARCH32FLAGS="-m32"
+				else
+					ARCH32FLAGS="$with_arch32flags"
+				fi
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
 				LIB32CUPSIMAGE="libcupsimage.32.so.2"
@@ -152,28 +187,93 @@ if test -n "$GCC"; then
 					LIB32DIR="${LIB32DIR}32"
 				fi
 				UNINSTALL32="uninstall32bit"
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch64flags"; then
+						ARCHFLAGS="-m64"
+					else
+						ARCHFLAGS="$with_arch64flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
+				fi
+			fi
+
+			if test "x$enable_64bit" = xyes; then
+				# Build 64-bit libraries, 32-bit base...
+				if test -z "$with_arch64flags"; then
+					ARCH64FLAGS="-m64"
+				else
+					ARCH64FLAGS="$with_arch64flags"
+				fi
+				INSTALL64="install64bit"
+				LIB64CUPS="libcups.64.so.2"
+				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64DIR="$exec_prefix/lib"
+				if test -d /usr/lib64; then
+					LIB64DIR="${LIB64DIR}64"
+				fi
+				UNINSTALL64="uninstall64bit"
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch32flags"; then
+						ARCHFLAGS="-m32"
+					else
+						ARCHFLAGS="$with_arch32flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
+				fi
 			fi
 			;;
 
 		SunOS*)
 			if test "x$enable_32bit" = xyes; then
-				# Build 32-bit libraries...
-				C32FLAGS="-m32"
+				# Build 32-bit libraries, 64-bit base...
+				if test -z "$with_arch32flags"; then
+					ARCH32FLAGS="-m32"
+				else
+					ARCH32FLAGS="$with_arch32flags"
+				fi
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
 				LIB32CUPSIMAGE="libcupsimage.32.so.2"
 				LIB32DIR="$exec_prefix/lib/32"
 				UNINSTALL32="uninstall32bit"
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch64flags"; then
+						ARCHFLAGS="-m64"
+					else
+						ARCHFLAGS="$with_arch64flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
+				fi
 			fi
 
 			if test "x$enable_64bit" = xyes; then
-				# Build 64-bit libraries...
-				C64FLAGS="-m64"
+				# Build 64-bit libraries, 32-bit base...
+				if test -z "$with_arch64flags"; then
+					ARCH64FLAGS="-m64"
+				else
+					ARCH64FLAGS="$with_arch64flags"
+				fi
 				INSTALL64="install64bit"
 				LIB64CUPS="libcups.64.so.2"
 				LIB64CUPSIMAGE="libcupsimage.64.so.2"
 				LIB64DIR="$exec_prefix/lib/64"
 				UNINSTALL64="uninstall64bit"
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch32flags"; then
+						ARCHFLAGS="-m32"
+					else
+						ARCHFLAGS="$with_arch32flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
+				fi
 			fi
 			;;
 	esac
@@ -221,23 +321,51 @@ else
 			fi
 
 			if test "x$enable_32bit" = xyes; then
-				# Build 32-bit libraries...
-				C32FLAGS="-n32 -mips3"
+				# Build 32-bit libraries, 64-bit base...
+				if test -z "$with_arch32flags"; then
+					ARCH32FLAGS="-n32 -mips3"
+				else
+					ARCH32FLAGS="$with_arch32flags"
+				fi
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
 				LIB32CUPSIMAGE="libcupsimage.32.so.2"
-				LIB32DIR="$exec_prefix/lib32"
+				LIB32DIR="$prefix/lib32"
 				UNINSTALL32="uninstall32bit"
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch64flags"; then
+						ARCHFLAGS="-64 -mips4"
+					else
+						ARCHFLAGS="$with_arch64flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
+				fi
 			fi
 
 			if test "x$enable_64bit" = xyes; then
-				# Build 64-bit libraries...
-				C64FLAGS="-64 -mips4"
+				# Build 64-bit libraries, 32-bit base...
+				if test -z "$with_arch64flags"; then
+					ARCH64FLAGS="-64 -mips4"
+				else
+					ARCH64FLAGS="$with_arch64flags"
+				fi
 				INSTALL64="install64bit"
 				LIB64CUPS="libcups.64.so.2"
 				LIB64CUPSIMAGE="libcupsimage.64.so.2"
-				LIB64DIR="$exec_prefix/lib64"
+				LIB64DIR="$prefix/lib64"
 				UNINSTALL64="uninstall64bit"
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch32flags"; then
+						ARCHFLAGS="-n32 -mips3"
+					else
+						ARCHFLAGS="$with_arch32flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
+				fi
 			fi
 			;;
 		SunOS*)
@@ -250,51 +378,53 @@ else
 				fi
 			fi
 
-			if test "x$with_optim" = x; then
-				# Specify "generic" SPARC output and suppress
-				# all of Sun's questionable warning messages...
-				OPTIM="-w $OPTIM -xarch=generic"
-			fi
-
 			if test $PICFLAG = 1; then
 				OPTIM="-KPIC $OPTIM"
 			fi
 
 			if test "x$enable_32bit" = xyes; then
-				# Compiling on a Solaris system, build 32-bit
-				# libraries...
-				case `uname -m` in
-					*86 | amd64)
-						C32FLAGS="-xarch=i386"
-						;;
-					*)
-						C32FLAGS="-xarch=v8"
-						;;
-				esac
-
+				# Compiling on a Solaris system, build 64-bit
+				# binaries with separate 32-bit libraries...
+				ARCH32FLAGS="-xarch=generic"
 				INSTALL32="install32bit"
 				LIB32CUPS="libcups.32.so.2"
 				LIB32CUPSIMAGE="libcupsimage.32.so.2"
 				LIB32DIR="$exec_prefix/lib/32"
 				UNINSTALL32="uninstall32bit"
-			fi
 
-			if test "x$enable_64bit" = xyes; then
-				# Build 64-bit libraries...
-				case `uname -m` in
-					*86 | amd64)
-						C64FLAGS="-xarch=amd64 -xcode=pic32"
-						;;
-					*)
-						C64FLAGS="-xarch=v9 -xcode=pic32"
-						;;
-				esac
+				if test "x$with_optim" = x; then
+					# Suppress all of Sun's questionable
+					# warning messages, and default to
+					# 64-bit compiles of everything else...
+					OPTIM="-w $OPTIM"
+					CFLAGS="-xarch=generic64 -xcode=pic32 $CFLAGS"
+				fi
+			else
+				if test "x$enable_64bit" = xyes; then
+					# Build 64-bit libraries...
+					ARCH64FLAGS="-xarch=generic64 -xcode=pic32"
+					INSTALL64="install64bit"
+					LIB64CUPS="libcups.64.so.2"
+					LIB64CUPSIMAGE="libcupsimage.64.so.2"
+					LIB64DIR="$exec_prefix/lib/64"
+					UNINSTALL64="uninstall64bit"
 
-				INSTALL64="install64bit"
-				LIB64CUPS="libcups.64.so.2"
-				LIB64CUPSIMAGE="libcupsimage.64.so.2"
-				LIB64DIR="$exec_prefix/lib/64"
-				UNINSTALL64="uninstall64bit"
+					if test "x$with_optim" = x; then
+						# Suppress all of Sun's questionable
+						# warning messages, and default to
+						# 32-bit compiles of everything else...
+						OPTIM="-w $OPTIM"
+						CFLAGS="-xarch=generic $CFLAGS"
+					fi
+				else
+					if test "x$with_optim" = x; then
+						# Suppress all of Sun's questionable
+						# warning messages, and default to
+						# 32-bit compiles of everything else...
+						OPTIM="-w $OPTIM"
+						CFLAGS="-xarch=generic $CFLAGS"
+					fi
+				fi
 			fi
 			;;
 		UNIX_SVR*)

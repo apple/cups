@@ -232,7 +232,7 @@ uninstall64bit:
 
 libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -243,7 +243,7 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 
 libcups.32.so.2:	$(LIB32OBJS)
 	echo Linking 32-bit $@...
-	$(DSO) $(C32FLAGS) $(DSOFLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCH32FLAGS) $(DSOFLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -252,7 +252,7 @@ libcups.32.so.2:	$(LIB32OBJS)
 
 libcups.64.so.2:	$(LIB64OBJS)
 	echo Linking 64-bit $@...
-	$(DSO) $(C64FLAGS) $(DSOFLAGS) -o $@ $(LIB64OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCH64FLAGS) $(DSOFLAGS) -o $@ $(LIB64OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -261,7 +261,7 @@ libcups.64.so.2:	$(LIB64OBJS)
 
 libcups.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ \
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.7.0 \
 		-compatibility_version 2.0.0 \
@@ -287,7 +287,7 @@ libcups_s.a:	$(LIBOBJS)
 
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
-	$(CC) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
 		-version-info 2:7 $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 

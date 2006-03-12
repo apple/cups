@@ -207,7 +207,7 @@ hpgltops:	$(HPGLOBJS) common.o ../cups/$(LIBCUPS)
 
 libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) -lm
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) -lm
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -218,7 +218,7 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 
 libcupsimage.32.so.2:	$(IMAGE32OBJS)
 	echo Linking 32-bit $@...
-	$(DSO) $(C32FLAGS) $(DSOFLAGS) -o $@ $(IMAGE32OBJS) $(DSOLIBS) -lm
+	$(DSO) $(ARCH32FLAGS) $(DSOFLAGS) -o $@ $(IMAGE32OBJS) $(DSOLIBS) -lm
 
 
 #
@@ -227,7 +227,7 @@ libcupsimage.32.so.2:	$(IMAGE32OBJS)
 
 libcupsimage.64.so.2:	$(IMAGE64OBJS)
 	echo Linking 64-bit $@...
-	$(DSO) $(C64FLAGS) $(DSOFLAGS) -o $@ $(IMAGE64OBJS) $(DSOLIBS) -lm
+	$(DSO) $(ARCH64FLAGS) $(DSOFLAGS) -o $@ $(IMAGE64OBJS) $(DSOLIBS) -lm
 
 
 #
@@ -236,7 +236,7 @@ libcupsimage.64.so.2:	$(IMAGE64OBJS)
 
 libcupsimage.2.dylib:	$(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ \
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.2.0 \
 		-compatibility_version 2.0.0 \
@@ -263,7 +263,7 @@ libcupsimage_s.a:	$(IMAGEOBJS)
 
 libcupsimage.la:       $(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
 		-rpath $(LIBDIR) -version-info 2:2
 
 

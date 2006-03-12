@@ -97,11 +97,19 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 #
 # Program options...
 #
-# OPTIM   defines the common compiler optimization/debugging options.
-# OPTIONS defines other compile-time options (currently only -dDEBUG for
-#         extra debug info)
+# ARCHFLAGS     Defines the default architecture build options, used
+#               when compiling separate 32/64-bit libraries.
+# ARCH32FLAGS   Defines the 32-bit architecture build options, used
+#               when compiling separate 32/64-bit libraries.
+# ARCH64FLAGS   Defines the 64-bit architecture build options, used
+#               when compiling separate 32/64-bit libraries.
+# OPTIM         Defines the common compiler optimization/debugging options
+#               for all architectures.
+# OPTIONS       Defines other compile-time options (currently only -DDEBUG
+#               for extra debug info)
 #
 
+ARCHFLAGS	=	@ARCHFLAGS@
 ARFLAGS		=	@ARFLAGS@
 BACKLIBS	=	@BACKLIBS@
 CFLAGS		=	-I.. $(RC_CFLAGS) $(SSLFLAGS) @CPPFLAGS@ @CFLAGS@ \
@@ -130,14 +138,14 @@ LAUNCHDLIBS	=	@LAUNCHDLIBS@
 # Separate 32/64-bit library support...
 #
 
-C32FLAGS	=	@C32FLAGS@
+ARCH32FLAGS	=	@ARCH32FLAGS@
 INSTALL32	=	@INSTALL32@
 LIB32CUPS	=	@LIB32CUPS@
 LIB32CUPSIMAGE	=	@LIB32CUPSIMAGE@
 LIB32DIR	=	$(BUILDROOT)@LIB32DIR@
 UNINSTALL32	=	@UNINSTALL32@
 
-C64FLAGS	=	@C64FLAGS@
+ARCH64FLAGS	=	@ARCH64FLAGS@
 INSTALL64	=	@INSTALL64@
 LIB64CUPS	=	@LIB64CUPS@
 LIB64CUPSIMAGE	=	@LIB64CUPSIMAGE@
@@ -216,19 +224,19 @@ DBUSDIR		=	@DBUSDIR@
 
 .c.o:
 	echo Compiling $<...
-	$(CC) $(OPTIM) $(CFLAGS) -c $<
+	$(CC) $(ARCHFLAGS) $(OPTIM) $(CFLAGS) -c $<
 
 .c.32.o:
 	echo Compiling 32-bit $<...
-	$(CC) $(C32FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
+	$(CC) $(ARCH32FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
 
 .c.64.o:
 	echo Compiling 64-bit $<...
-	$(CC) $(C64FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
+	$(CC) $(ARCH64FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
 
 .cxx.o:
 	echo Compiling $<...
-	$(CXX) $(OPTIM) $(CXXFLAGS) -c $<
+	$(CXX) $(ARCHFLAGS) $(OPTIM) $(CXXFLAGS) -c $<
 
 .man.1 .man.1m .man.5 .man.7 .man.8:
 	echo Linking $<...
