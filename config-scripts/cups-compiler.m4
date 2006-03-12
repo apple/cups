@@ -397,12 +397,12 @@ else
 					# warning messages, and default to
 					# 64-bit compiles of everything else...
 					OPTIM="-w $OPTIM"
-					CFLAGS="-xarch=generic64 -xcode=pic32 $CFLAGS"
+					CFLAGS="-xarch=generic64 $CFLAGS"
 				fi
 			else
 				if test "x$enable_64bit" = xyes; then
 					# Build 64-bit libraries...
-					ARCH64FLAGS="-xarch=generic64 -xcode=pic32"
+					ARCH64FLAGS="-xarch=generic64"
 					INSTALL64="install64bit"
 					LIB64CUPS="libcups.64.so.2"
 					LIB64CUPSIMAGE="libcupsimage.64.so.2"
