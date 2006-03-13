@@ -1692,6 +1692,7 @@ httpUpdate(http_t *http)		/* I - HTTP connection */
 	case HTTP_PUT :
 	    http->state ++;
 	case HTTP_POST_SEND :
+	case HTTP_HEAD :
 	    break;
 
 	default :

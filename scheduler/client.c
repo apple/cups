@@ -2517,14 +2517,14 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
     }
   }
 
-  if (con->language != NULL)
+  if (con->language && strcmp(con->language->language, "C"))
   {
     if (httpPrintf(HTTP(con), "Content-Language: %s\r\n",
                    con->language->language) < 0)
       return (0);
   }
 
-  if (type != NULL)
+  if (type)
   {
     if (!strcmp(type, "text/html"))
     {

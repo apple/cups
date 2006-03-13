@@ -1,5 +1,10 @@
-CHANGES.txt - 2006-03-10
+CHANGES.txt - 2006-03-13
 ------------------------
+
+CHANGES IN CUPS V1.2rc1
+
+	- Fixed support for HEAD requests in the scheduler.
+
 
 CHANGES IN CUPS V1.2b2
 
