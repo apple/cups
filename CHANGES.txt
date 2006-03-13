@@ -3,6 +3,10 @@ CHANGES.txt - 2006-03-13
 
 CHANGES IN CUPS V1.2rc1
 
+	- The Zebra CPCL driver did not use the correct righthand
+	  margin for the 4" wide label sizes.
+	- Fixed a problem with the parsing of fractional real
+	  numbers in PPD files.
 	- Added Spanish localization files (STR #1480)
 	- Fixed localization of a few scheduler messages (STR
 	  #1478)
