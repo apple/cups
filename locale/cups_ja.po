@@ -25,8 +25,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-03-13 08:27-0500\n"
-"PO-Revision-Date: 2006-02-17 11:17+0900\n"
+"POT-Creation-Date: 2006-03-13 08:39-0500\n"
+"PO-Revision-Date: 2006-03-11 18:42+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1135,7 +1135,7 @@ msgstr "cupstestppd: -q オプションは -v オプションと両立できま�
 
 #: systemv/cupstestppd.c:136 systemv/cupstestppd.c:153
 msgid "cupstestppd: The -v option is incompatible with the -q option.\n"
-msgstr "cupstestppd: -v オプションは -q オプションと両立できません。"
+msgstr "cupstestppd: -v オプションは -q オプションと両立できません。\n"
 
 #: systemv/cupstestppd.c:193 systemv/cupstestppd.c:210
 #, c-format
@@ -3680,35 +3680,32 @@ msgstr ""
 
 #: cgi-bin/printers.c:218 cgi-bin/printers.c:289 cgi-bin/printers.c:223
 #: cgi-bin/printers.c:294
-#, fuzzy
 msgid "Printer Maintenance"
-msgstr "プリンタは共有されていません!"
+msgstr "プリンタのメンテナンス"
 
 #: cgi-bin/printers.c:292 cgi-bin/printers.c:297
-#, fuzzy
 msgid "Unable to send maintenance job:"
-msgstr "ジョブを移動できません"
+msgstr "メンテナンスジョブを送れません:"
 
 #: systemv/cupsaddsmb.c:566 systemv/cupsaddsmb.c:233
-#, fuzzy, c-format
+#, c-format
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
-msgstr ""
-"cupsaddsmb: プリンタ \"%s\" の PPD ファイルがありません - スキップします!\n"
+msgstr "cupsaddsmb: プリンタ \"%s\" の PPD ファイルがありません - %s\n"
 
 #: systemv/cupstestppd.c:346
-#, fuzzy, c-format
+#, c-format
 msgid "      **FAIL**  %s %s does not exist!\n"
-msgstr "ジョブ #%s は存在しません!"
+msgstr "      **失敗** %s %s は存在しません!\n"
 
 #: systemv/cupstestppd.c:1053
 #, c-format
 msgid "      **FAIL**  Bad language \"%s\"!\n"
-msgstr ""
+msgstr "      **失敗**  無効な言語 \"%s\" です!\n"
 
 #: systemv/cupstestppd.c:1078
 #, c-format
 msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr ""
+msgstr "      **失敗**  \"%s\" 翻訳文字列 (オプション %s 用) がありません!\n"
 
 #: systemv/cupstestppd.c:1098
 #, c-format
@@ -3716,12 +3713,15 @@ msgid ""
 "      **FAIL**  Default translation string for option %s contains 8-bit "
 "characters!\n"
 msgstr ""
+"      **失敗**  オプション %s のデフォルトの翻訳文字列が8ビット文字を含んでい"
+"ます!\n"
 
 #: systemv/cupstestppd.c:1119
 #, c-format
 msgid ""
 "      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
 msgstr ""
+"      **失敗**  \"%s\" 翻訳文字列 (オプション %s、選択 %s) がありません!\n"
 
 #: systemv/cupstestppd.c:1141
 #, c-format
@@ -3729,75 +3729,72 @@ msgid ""
 "      **FAIL**  Default translation string for option %s choice %s contains "
 "8-bit characters!\n"
 msgstr ""
+"      **失敗**  オプション %s、選択 %s のデフォルトの翻訳文字列が8ビット文字"
+"を含んでいます!\n"
 
 #: systemv/cupstestppd.c:1175
 #, c-format
 msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-msgstr ""
+msgstr "      **失敗**  \"%s\" は不正な cupsFilter 値です!\n"
 
 #: cgi-bin/help.c:98 cgi-bin/help.c:139 cgi-bin/help.c:149 cgi-bin/help.c:179
 msgid "Help"
-msgstr ""
+msgstr "ヘルプ"
 
 #: cups/adminutil.c:233 cups/adminutil.c:246
-#, fuzzy, c-format
+#, c-format
 msgid "Missing value on line %d!\n"
-msgstr "cupsaddsmb: %d 行に値がありません!\n"
+msgstr "%d 行に値がありません!\n"
 
 #: cups/adminutil.c:249 cups/adminutil.c:265
-#, fuzzy, c-format
+#, c-format
 msgid "Missing double quote on line %d!\n"
-msgstr "cupsaddsmb: %d 行に二重引用符がありません!\n"
+msgstr "%d 行に二重引用符がありません!\n"
 
 #: cups/adminutil.c:266 cups/adminutil.c:284
-#, fuzzy, c-format
+#, c-format
 msgid "Bad option + choice on line %d!\n"
-msgstr "cupsaddsmb: %d 行に不正なオプションと選択があります!\n"
+msgstr "%d 行に不正なオプションと選択があります!\n"
 
 #: cups/adminutil.c:417
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to copy Windows 2000 printer driver files (%d)!\n"
-msgstr "Windows 2000 プリンタドライバファイルをコピーできません!"
+msgstr "Windows 2000 プリンタドライバファイルをコピーできません (%d)!\n"
 
 #: cups/adminutil.c:445
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!\n"
-msgstr "cupsaddsmb: CUPS プリンタドライバファイルをコピーできません (%d)!\n"
+msgstr "CUPS プリンタドライバファイルをコピーできません (%d)!\n"
 
 #: cups/adminutil.c:480
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to install Windows 2000 printer driver files (%d)!\n"
-msgstr "Windows 2000 プリンタドライバファイルをインストールできません!"
+msgstr "Windows 2000 プリンタドライバファイルをインストールできません (%)!\n"
 
 #: cups/adminutil.c:514
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to copy Windows 9x printer driver files (%d)!\n"
-msgstr "Windows 9x プリンタドライバファイルをコピーできません!"
+msgstr "Windows 9x プリンタドライバファイルをコピーできません (%d)!\n"
 
 #: cups/adminutil.c:536
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to install Windows 9x printer driver files (%d)!\n"
-msgstr "Windows 9x プリンタドライバファイルをインストールできません!"
+msgstr "Windows 9x プリンタドライバファイルをインストールできません (%d)!\n"
 
 #: cups/adminutil.c:547
-#, fuzzy
 msgid "No Windows printer drivers are installed!\n"
-msgstr "cupsaddsmb: Windows プリンタドライバがインストールされていません!\n"
+msgstr "Windows プリンタドライバがインストールされていません!\n"
 
 #: cups/adminutil.c:550
-#, fuzzy
 msgid "Warning, no Windows 2000 printer drivers are installed!\n"
-msgstr ""
-"cupsaddsmb: 警告: Windows 2000 プリンタドライバがインストールされていませ"
-"ん!\n"
+msgstr "警告: Windows 2000 プリンタドライバがインストールされていません!\n"
 
 #: cups/adminutil.c:568 cups/adminutil.c:658
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to set Windows printer driver (%d)!\n"
-msgstr "Windows プリンタドライバを設定できません!"
+msgstr "Windows プリンタドライバを設定できません (%d)!\n"
 
 #: systemv/cupsaddsmb.c:278
-#, fuzzy
 msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
 "       cupsaddsmb [options] -a\n"
@@ -3810,10 +3807,11 @@ msgid ""
 "  -h cups-server   Use the named CUPS server\n"
 "  -v               Be verbose (show commands)\n"
 msgstr ""
-"Usage: cupsaddsmb [オプション] プリンタ1 ... プリンタN\n"
-"       cupsaddsmb [オプション] -a\n"
+"使い方: cupsaddsmb [オプション] プリンタ1 ... プリンタN\n"
+"        cupsaddsmb [オプション] -a\n"
 "\n"
-"Options:\n"
+"オプション:\n"
+"  -E               サーバとの接続を暗号化する\n"
 "  -H sambaサーバ   指定の SAMBA サーバを使う\n"
 "  -U sambaユーザ   指定の SAMBA ユーザ名で認証する\n"
 "  -a               すべてのプリンタをエキスポートする\n"
@@ -3821,56 +3819,52 @@ msgstr ""
 "  -v               冗長にする (コマンドを表示する)\n"
 
 #: cups/adminutil.c:464
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to copy Windows 2000 printer driver files (%d)!"
-msgstr "Windows 2000 プリンタドライバファイルをコピーできません!"
+msgstr "Windows 2000 プリンタドライバファイルをコピーできません (%d)!"
 
 #: cups/adminutil.c:499
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!"
-msgstr "cupsaddsmb: CUPS プリンタドライバファイルをコピーできません (%d)!\n"
+msgstr "CUPS プリンタドライバファイルをコピーできません (%d)!"
 
 #: cups/adminutil.c:542
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to install Windows 2000 printer driver files (%d)!"
-msgstr "Windows 2000 プリンタドライバファイルをインストールできません!"
+msgstr "Windows 2000 プリンタドライバファイルをインストールできません (%d)!"
 
 #: cups/adminutil.c:583
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to copy Windows 9x printer driver files (%d)!"
-msgstr "Windows 9x プリンタドライバファイルをコピーできません!"
+msgstr "Windows 9x プリンタドライバファイルをコピーできません (%d)!"
 
 #: cups/adminutil.c:612
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to install Windows 9x printer driver files (%d)!"
-msgstr "Windows 9x プリンタドライバファイルをインストールできません!"
+msgstr "Windows 9x プリンタドライバファイルをインストールできません (%d)!"
 
 #: cups/adminutil.c:631
-#, fuzzy
 msgid "No Windows printer drivers are installed!"
-msgstr "cupsaddsmb: Windows プリンタドライバがインストールされていません!\n"
+msgstr "Windows プリンタドライバがインストールされていません!"
 
 #: cups/adminutil.c:636
-#, fuzzy
 msgid "Warning, no Windows 2000 printer drivers are installed!"
-msgstr ""
-"cupsaddsmb: 警告: Windows 2000 プリンタドライバがインストールされていませ"
-"ん!\n"
+msgstr "警告: Windows 2000 プリンタドライバがインストールされていません!"
 
 #: cups/adminutil.c:736
-#, fuzzy, c-format
+#, c-format
 msgid "open of %s failed: %s"
-msgstr "lpadmin: %s 失敗しました: %s\n"
+msgstr "%s のオープンに失敗しました: %s"
 
 #: cups/adminutil.c:1653
-#, fuzzy, c-format
+#, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
-msgstr "コマンドを実行中: %s %s -N -U '%s%%%s' -c '%s'\n"
+msgstr "コマンドを実行中: %s %s -N -A %s -c '%s'\n"
 
 #: cups/adminutil.c:1750
-#, fuzzy, c-format
+#, c-format
 msgid "stat of %s failed: %s"
-msgstr "%s: %s 失敗しました: %s\n"
+msgstr "%s の状態取得に失敗しました: %s"
 
 #: scheduler/ipp.c:3021
 #, fuzzy, c-format
