@@ -343,6 +343,12 @@ _cupsStrScand(const char   *buf,	/* I - Pointer to number */
 
   if (*buf == '.')
   {
+   /*
+    * Read fractional portion of number...
+    */
+
+    buf ++;
+
     if (loc && loc->decimal_point)
     {
       strlcpy(tempptr, loc->decimal_point, sizeof(temp) - (tempptr - temp));
