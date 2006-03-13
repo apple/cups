@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-03-09 19:42-0500\n"
+"POT-Creation-Date: 2006-03-13 08:27-0500\n"
 "PO-Revision-Date: 2006-02-17 11:17+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
@@ -53,37 +53,37 @@ msgstr "補助"
 #: cups/ppd.c:656 cups/ppd.c:881 cups/ppd.c:1047 cups/ppd.c:662 cups/ppd.c:996
 #: cups/ppd.c:1169 cups/ppd.c:651 cups/ppd.c:983 cups/ppd.c:1148
 #: cups/ppd.c:972 cups/ppd.c:1137 cups/ppd.c:646 cups/ppd.c:973
-#: cups/ppd.c:1138
+#: cups/ppd.c:1138 cups/ppd.c:970 cups/ppd.c:1135
 msgid "General"
 msgstr "一般"
 
 #: cups/ppd.c:704 cups/ppd.c:1105 cups/ppd.c:710 cups/ppd.c:1224
 #: cups/ppd.c:697 cups/ppd.c:1201 cups/ppd.c:1190 cups/ppd.c:692
-#: cups/ppd.c:1191
+#: cups/ppd.c:1191 cups/ppd.c:1188
 msgid "Media Size"
 msgstr "用紙サイズ"
 
 #: cups/ppd.c:706 cups/ppd.c:1107 cups/ppd.c:712 cups/ppd.c:1226
 #: cups/ppd.c:699 cups/ppd.c:1203 cups/ppd.c:1192 cups/ppd.c:694
-#: cups/ppd.c:1193
+#: cups/ppd.c:1193 cups/ppd.c:1190
 msgid "Media Type"
 msgstr "用紙形式"
 
 #: cups/ppd.c:708 cups/ppd.c:1109 cups/ppd.c:714 cups/ppd.c:1228
 #: cups/ppd.c:701 cups/ppd.c:1205 cups/ppd.c:1194 cups/ppd.c:696
-#: cups/ppd.c:1195
+#: cups/ppd.c:1195 cups/ppd.c:1192
 msgid "Media Source"
 msgstr "給紙"
 
 #: cups/ppd.c:710 cups/ppd.c:1111 cups/ppd.c:716 cups/ppd.c:1230
 #: cups/ppd.c:703 cups/ppd.c:1207 cups/ppd.c:1196 cups/ppd.c:698
-#: cups/ppd.c:1197
+#: cups/ppd.c:1197 cups/ppd.c:1194
 msgid "Output Mode"
 msgstr "出力モード"
 
 #: cups/ppd.c:712 cups/ppd.c:1113 cups/ppd.c:718 cups/ppd.c:1232
 #: cups/ppd.c:705 cups/ppd.c:1209 cups/ppd.c:1198 cups/ppd.c:700
-#: cups/ppd.c:1199
+#: cups/ppd.c:1199 cups/ppd.c:1196
 msgid "Resolution"
 msgstr "解像度"
 
@@ -92,12 +92,12 @@ msgid "Variable"
 msgstr "可変"
 
 #: cups/ppd.c:1535 cups/ppd.c:1650 cups/ppd.c:1627 cups/ppd.c:1616
-#: cups/ppd.c:1622
+#: cups/ppd.c:1622 cups/ppd.c:1619
 msgid "Yes"
 msgstr "はい"
 
 #: cups/ppd.c:1537 cups/ppd.c:1652 cups/ppd.c:1629 cups/ppd.c:1618
-#: cups/ppd.c:1624
+#: cups/ppd.c:1624 cups/ppd.c:1621
 msgid "No"
 msgstr "いいえ"
 
@@ -106,7 +106,7 @@ msgid "Auto"
 msgstr "自動"
 
 #: scheduler/client.c:2247 scheduler/client.c:2251 scheduler/client.c:2274
-#: scheduler/client.c:2308 scheduler/client.c:2349
+#: scheduler/client.c:2308 scheduler/client.c:2349 scheduler/client.c:2350
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page."
@@ -115,7 +115,7 @@ msgstr ""
 "のユーザ名とパスワードを入力してください。"
 
 #: scheduler/client.c:2252 scheduler/client.c:2256 scheduler/client.c:2279
-#: scheduler/client.c:2313 scheduler/client.c:2354
+#: scheduler/client.c:2313 scheduler/client.c:2354 scheduler/client.c:2355
 msgid "You must use a https: URL to access this page."
 msgstr "このページにアクセスするためには、https: URL を使う必要があります。"
 
@@ -170,7 +170,11 @@ msgstr "%s はサポートされていません!"
 #: scheduler/ipp.c:5326 scheduler/ipp.c:5738 scheduler/ipp.c:6046
 #: scheduler/ipp.c:6337 scheduler/ipp.c:6379 scheduler/ipp.c:7116
 #: scheduler/ipp.c:8081 scheduler/ipp.c:8745 scheduler/ipp.c:8826
-#: scheduler/ipp.c:9001
+#: scheduler/ipp.c:9001 scheduler/ipp.c:4715 scheduler/ipp.c:4958
+#: scheduler/ipp.c:5342 scheduler/ipp.c:5754 scheduler/ipp.c:6062
+#: scheduler/ipp.c:6353 scheduler/ipp.c:6395 scheduler/ipp.c:7132
+#: scheduler/ipp.c:8097 scheduler/ipp.c:8761 scheduler/ipp.c:8842
+#: scheduler/ipp.c:9017
 msgid "The printer or class was not found."
 msgstr "プリンタまたはクラスが見つかりませんでした。"
 
@@ -218,21 +222,21 @@ msgstr "ファイルタイプ用にメモリを割り当てられません!"
 
 #: scheduler/ipp.c:1290 scheduler/ipp.c:4501 scheduler/ipp.c:1316
 #: scheduler/ipp.c:4705 scheduler/ipp.c:1348 scheduler/ipp.c:4804
-#: scheduler/ipp.c:1810 scheduler/ipp.c:4773
+#: scheduler/ipp.c:1810 scheduler/ipp.c:4773 scheduler/ipp.c:4789
 #, c-format
 msgid "Character set \"%s\" not supported!"
 msgstr "文字セット \"%s\" はサポートされていません!"
 
 #: scheduler/ipp.c:1299 scheduler/ipp.c:4510 scheduler/ipp.c:1325
 #: scheduler/ipp.c:4714 scheduler/ipp.c:1357 scheduler/ipp.c:4813
-#: scheduler/ipp.c:1819 scheduler/ipp.c:4782
+#: scheduler/ipp.c:1819 scheduler/ipp.c:4782 scheduler/ipp.c:4798
 #, c-format
 msgid "Language \"%s\" not supported!"
 msgstr "言語 \"%s\" はサポートされていません!"
 
 #: scheduler/ipp.c:1309 scheduler/ipp.c:4520 scheduler/ipp.c:1335
 #: scheduler/ipp.c:4724 scheduler/ipp.c:1367 scheduler/ipp.c:4823
-#: scheduler/ipp.c:1829 scheduler/ipp.c:4792
+#: scheduler/ipp.c:1829 scheduler/ipp.c:4792 scheduler/ipp.c:4808
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)!"
 msgstr "notify-user-data 値が大きすぎます (%d > 63 オクテット)!"
@@ -288,13 +292,13 @@ msgid "Bad printer-state value %d!"
 msgstr "%d は無効な printer-state 値です!"
 
 #: scheduler/ipp.c:1762 scheduler/ipp.c:1800 scheduler/ipp.c:1842
-#: scheduler/ipp.c:8585
+#: scheduler/ipp.c:8585 scheduler/ipp.c:8601
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
 msgstr "\"%s\" は未知の printer-op-policy です。"
 
 #: scheduler/ipp.c:1775 scheduler/ipp.c:1813 scheduler/ipp.c:1855
-#: scheduler/ipp.c:8600
+#: scheduler/ipp.c:8600 scheduler/ipp.c:8616
 #, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr "\"%s\" は未知の printer-error-policy です。"
@@ -327,6 +331,8 @@ msgstr "PPD ファイルをコピーできません!"
 #: scheduler/ipp.c:8672 scheduler/ipp.c:2613 scheduler/ipp.c:2906
 #: scheduler/ipp.c:5189 scheduler/ipp.c:6179 scheduler/ipp.c:7203
 #: scheduler/ipp.c:7418 scheduler/ipp.c:7657 scheduler/ipp.c:8164
+#: scheduler/ipp.c:5205 scheduler/ipp.c:6195 scheduler/ipp.c:7219
+#: scheduler/ipp.c:7434 scheduler/ipp.c:7673 scheduler/ipp.c:8180
 msgid "Got a printer-uri attribute but no job-id!"
 msgstr "printer-uri 属性を取得しましたが、job-id を取得できませんでした!"
 
@@ -342,6 +348,9 @@ msgstr "printer-uri 属性を取得しましたが、job-id を取得できま�
 #: scheduler/ipp.c:2635 scheduler/ipp.c:2978 scheduler/ipp.c:5212
 #: scheduler/ipp.c:6202 scheduler/ipp.c:6425 scheduler/ipp.c:7226
 #: scheduler/ipp.c:7441 scheduler/ipp.c:7680 scheduler/ipp.c:8187
+#: scheduler/ipp.c:5228 scheduler/ipp.c:6218 scheduler/ipp.c:6441
+#: scheduler/ipp.c:7242 scheduler/ipp.c:7457 scheduler/ipp.c:7696
+#: scheduler/ipp.c:8203
 #, c-format
 msgid "Bad job-uri attribute \"%s\"!"
 msgstr "\"%s\" は無効な job-uri 属性です!"
@@ -446,51 +455,52 @@ msgid "Unable to add job for destination \"%s\"!"
 msgstr "宛先 \"%s\" にジョブを追加できません!"
 
 #: scheduler/ipp.c:4469 scheduler/ipp.c:4673 scheduler/ipp.c:4770
-#: scheduler/ipp.c:4739
+#: scheduler/ipp.c:4739 scheduler/ipp.c:4755
 msgid "No subscription attributes in request!"
 msgstr "リクエストにサブスクリプション属性がありません!"
 
 #: scheduler/ipp.c:4559 scheduler/ipp.c:4763 scheduler/ipp.c:4869
-#: scheduler/ipp.c:4838
+#: scheduler/ipp.c:4838 scheduler/ipp.c:4854
 msgid "notify-events not specified!"
 msgstr "notify-events が指定されていません!"
 
 #: scheduler/ipp.c:4577 scheduler/ipp.c:4781 scheduler/ipp.c:4887
-#: scheduler/ipp.c:4856
+#: scheduler/ipp.c:4856 scheduler/ipp.c:4872
 #, c-format
 msgid "Job %d not found!"
 msgstr "ジョブ %d は見つかりません!"
 
 #: scheduler/ipp.c:4827 scheduler/ipp.c:4957 scheduler/ipp.c:5075
-#: scheduler/ipp.c:5044
+#: scheduler/ipp.c:5044 scheduler/ipp.c:5060
 msgid "No default printer"
 msgstr "デフォルトプリンタはありません"
 
 #: scheduler/ipp.c:4930 scheduler/ipp.c:5060 scheduler/ipp.c:5178
-#: scheduler/ipp.c:5147
+#: scheduler/ipp.c:5147 scheduler/ipp.c:5163
 msgid "cups-deviced failed to execute."
 msgstr "cups-deviced の実行に失敗しました。"
 
 #: scheduler/ipp.c:5393 scheduler/ipp.c:5479 scheduler/ipp.c:5722
-#: scheduler/ipp.c:5691
+#: scheduler/ipp.c:5691 scheduler/ipp.c:5707
 msgid "cups-driverd failed to execute."
 msgstr "cups-driverd の実行に失敗しました。"
 
 #: scheduler/ipp.c:5571 scheduler/ipp.c:5594 scheduler/ipp.c:5837
-#: scheduler/ipp.c:5806
+#: scheduler/ipp.c:5806 scheduler/ipp.c:5822
 msgid "No destinations added."
 msgstr "追加された宛先はありません。"
 
 #: scheduler/ipp.c:5794 scheduler/ipp.c:5736 scheduler/ipp.c:2615
 #: scheduler/ipp.c:5530 scheduler/ipp.c:5979 scheduler/ipp.c:7840
 #: scheduler/ipp.c:3070 scheduler/ipp.c:5499 scheduler/ipp.c:5948
-#: scheduler/ipp.c:7330
+#: scheduler/ipp.c:7330 scheduler/ipp.c:3086 scheduler/ipp.c:5515
+#: scheduler/ipp.c:5964 scheduler/ipp.c:7346
 #, c-format
 msgid "notify-subscription-id %d no good!"
 msgstr "notify-subscription-id %d は良くありません!"
 
 #: scheduler/ipp.c:5878 scheduler/ipp.c:5822 scheduler/ipp.c:6065
-#: scheduler/ipp.c:6034
+#: scheduler/ipp.c:6034 scheduler/ipp.c:6050
 #, c-format
 msgid "Job #%s does not exist!"
 msgstr "ジョブ #%s は存在しません!"
@@ -509,13 +519,16 @@ msgstr "ジョブ #%s は存在しません!"
 #: scheduler/ipp.c:2996 scheduler/ipp.c:5230 scheduler/ipp.c:6056
 #: scheduler/ipp.c:6220 scheduler/ipp.c:6398 scheduler/ipp.c:6443
 #: scheduler/ipp.c:7244 scheduler/ipp.c:7459 scheduler/ipp.c:7698
-#: scheduler/ipp.c:8205
+#: scheduler/ipp.c:8205 scheduler/ipp.c:5246 scheduler/ipp.c:6072
+#: scheduler/ipp.c:6236 scheduler/ipp.c:6414 scheduler/ipp.c:6459
+#: scheduler/ipp.c:7260 scheduler/ipp.c:7475 scheduler/ipp.c:7714
+#: scheduler/ipp.c:8221
 #, c-format
 msgid "Job #%d does not exist!"
 msgstr "ジョブ #%d は存在しません!"
 
 #: scheduler/ipp.c:5969 scheduler/ipp.c:5915 scheduler/ipp.c:6150
-#: scheduler/ipp.c:6119
+#: scheduler/ipp.c:6119 scheduler/ipp.c:6135
 msgid "No subscriptions found."
 msgstr "サブスクリプションが見つかりません。"
 
@@ -527,7 +540,8 @@ msgstr ""
 
 #: scheduler/ipp.c:6203 scheduler/ipp.c:8315 scheduler/ipp.c:6250
 #: scheduler/ipp.c:8390 scheduler/ipp.c:6505 scheduler/ipp.c:8728
-#: scheduler/ipp.c:6474 scheduler/ipp.c:8220
+#: scheduler/ipp.c:6474 scheduler/ipp.c:8220 scheduler/ipp.c:6490
+#: scheduler/ipp.c:8236
 #, c-format
 msgid "Job #%d is finished and cannot be altered!"
 msgstr "ジョブ #%d は完了し、変更することはできません!"
@@ -540,32 +554,35 @@ msgstr ""
 "ん!"
 
 #: scheduler/ipp.c:6228 scheduler/ipp.c:6098 scheduler/ipp.c:6353
-#: scheduler/ipp.c:6322
+#: scheduler/ipp.c:6322 scheduler/ipp.c:6338
 msgid "job-printer-uri attribute missing!"
 msgstr "job-printer-uri 属性がありません!"
 
 #: scheduler/ipp.c:6485 scheduler/ipp.c:7847 scheduler/ipp.c:6531
 #: scheduler/ipp.c:7913 scheduler/ipp.c:6783 scheduler/ipp.c:8238
-#: scheduler/ipp.c:6703 scheduler/ipp.c:7728
+#: scheduler/ipp.c:6703 scheduler/ipp.c:7728 scheduler/ipp.c:6719
+#: scheduler/ipp.c:7744
 #, c-format
 msgid "Unsupported compression \"%s\"!"
 msgstr "\"%s\" はサポートされていない圧縮です!"
 
 #: scheduler/ipp.c:6504 scheduler/ipp.c:7866 scheduler/ipp.c:6550
 #: scheduler/ipp.c:7932 scheduler/ipp.c:6802 scheduler/ipp.c:8257
-#: scheduler/ipp.c:6722 scheduler/ipp.c:7747
+#: scheduler/ipp.c:6722 scheduler/ipp.c:7747 scheduler/ipp.c:6738
+#: scheduler/ipp.c:7763
 msgid "No file!?!"
 msgstr "ファイルがありません!?!"
 
 #: scheduler/ipp.c:6522 scheduler/ipp.c:6568 scheduler/ipp.c:6820
-#: scheduler/ipp.c:6740
+#: scheduler/ipp.c:6740 scheduler/ipp.c:6756
 #, c-format
 msgid "Could not scan type \"%s\"!"
 msgstr "タイプ \"%s\" を検査できませんでした!"
 
 #: scheduler/ipp.c:6574 scheduler/ipp.c:7936 scheduler/ipp.c:6620
 #: scheduler/ipp.c:8001 scheduler/ipp.c:6879 scheduler/ipp.c:8332
-#: scheduler/ipp.c:6799 scheduler/ipp.c:7822
+#: scheduler/ipp.c:6799 scheduler/ipp.c:7822 scheduler/ipp.c:6815
+#: scheduler/ipp.c:7838
 #, c-format
 msgid "Unsupported format '%s/%s'!"
 msgstr "'%s/%s' はサポートされていない形式です!"
@@ -580,7 +597,7 @@ msgid "Too many jobs - %d jobs, max jobs is %d."
 msgstr "ジョブが多すぎます - %d ジョブ。最大ジョブ数は %d です。"
 
 #: scheduler/ipp.c:7448 scheduler/ipp.c:7507 scheduler/ipp.c:7768
-#: scheduler/ipp.c:7258
+#: scheduler/ipp.c:7258 scheduler/ipp.c:7274
 #, c-format
 msgid "Job #%d is not held!"
 msgstr "ジョブ #%d はホールドされていません!"
@@ -593,13 +610,13 @@ msgstr ""
 "せん!"
 
 #: scheduler/ipp.c:7592 scheduler/ipp.c:7654 scheduler/ipp.c:7983
-#: scheduler/ipp.c:7473
+#: scheduler/ipp.c:7473 scheduler/ipp.c:7489
 #, c-format
 msgid "Job #%d is not complete!"
 msgstr "ジョブ #%d は完結していません!"
 
 #: scheduler/ipp.c:7608 scheduler/ipp.c:7670 scheduler/ipp.c:8001
-#: scheduler/ipp.c:7491
+#: scheduler/ipp.c:7491 scheduler/ipp.c:7507
 #, c-format
 msgid "Job #%d cannot be restarted - no files!"
 msgstr "ジョブ #%d は再起動できません - ファイルがありません!"
@@ -620,7 +637,8 @@ msgstr ""
 
 #: scheduler/ipp.c:7883 scheduler/ipp.c:8803 scheduler/ipp.c:7949
 #: scheduler/ipp.c:8883 scheduler/ipp.c:8274 scheduler/ipp.c:9225
-#: scheduler/ipp.c:7764 scheduler/ipp.c:8967
+#: scheduler/ipp.c:7764 scheduler/ipp.c:8967 scheduler/ipp.c:7780
+#: scheduler/ipp.c:8983
 #, c-format
 msgid "Bad document-format \"%s\"!"
 msgstr "\"%s\" は不正な document-format です!"
@@ -633,23 +651,23 @@ msgstr ""
 "せん!"
 
 #: scheduler/ipp.c:8371 scheduler/ipp.c:8446 scheduler/ipp.c:8783
-#: scheduler/ipp.c:8275
+#: scheduler/ipp.c:8275 scheduler/ipp.c:8291
 #, c-format
 msgid "%s cannot be changed."
 msgstr "%s は変更できません。"
 
 #: scheduler/ipp.c:8387 scheduler/ipp.c:8462 scheduler/ipp.c:8799
-#: scheduler/ipp.c:8291
+#: scheduler/ipp.c:8291 scheduler/ipp.c:8307
 msgid "Bad job-priority value!"
 msgstr "不正な job-priority 値です!"
 
 #: scheduler/ipp.c:8395 scheduler/ipp.c:8470 scheduler/ipp.c:8807
-#: scheduler/ipp.c:8299
+#: scheduler/ipp.c:8299 scheduler/ipp.c:8315
 msgid "Job is completed and cannot be changed."
 msgstr "ジョブは完結し、変更できません。"
 
 #: scheduler/ipp.c:8409 scheduler/ipp.c:8484 scheduler/ipp.c:8821
-#: scheduler/ipp.c:8313
+#: scheduler/ipp.c:8313 scheduler/ipp.c:8329
 msgid "Bad job-state value!"
 msgstr "不正な job-state 値です!"
 
@@ -657,17 +675,18 @@ msgstr "不正な job-state 値です!"
 #: scheduler/ipp.c:8498 scheduler/ipp.c:8510 scheduler/ipp.c:8521
 #: scheduler/ipp.c:8835 scheduler/ipp.c:8850 scheduler/ipp.c:8861
 #: scheduler/ipp.c:8327 scheduler/ipp.c:8342 scheduler/ipp.c:8353
+#: scheduler/ipp.c:8343 scheduler/ipp.c:8358 scheduler/ipp.c:8369
 msgid "Job state cannot be changed."
 msgstr "ジョブの状態を変更できません。"
 
 #: scheduler/ipp.c:8787 scheduler/ipp.c:8867 scheduler/ipp.c:9209
-#: scheduler/ipp.c:8951
+#: scheduler/ipp.c:8951 scheduler/ipp.c:8967
 #, c-format
 msgid "Unsupported compression attribute %s!"
 msgstr "%s はサポートされていない圧縮属性です!"
 
 #: scheduler/ipp.c:8815 scheduler/ipp.c:8894 scheduler/ipp.c:9236
-#: scheduler/ipp.c:8978
+#: scheduler/ipp.c:8978 scheduler/ipp.c:8994
 #, c-format
 msgid "Unsupported format \"%s\"!"
 msgstr "\"%s\" はサポートされていない形式です!"
@@ -3137,10 +3156,12 @@ msgid "Unknown"
 msgstr "未知"
 
 #: cups/ppd.c:1033 cups/ppd.c:1020 cups/ppd.c:1009 cups/ppd.c:1010
+#: cups/ppd.c:1007
 msgid "Custom"
 msgstr "カスタム"
 
 #: cups/ppd.c:1259 cups/ppd.c:1236 cups/ppd.c:1225 cups/ppd.c:1226
+#: cups/ppd.c:1223
 msgid "JCL"
 msgstr "JCL"
 
@@ -3592,11 +3613,11 @@ msgstr "プリンタ:"
 msgid "idle"
 msgstr "待機中"
 
-#: scheduler/ipp.c:5513 scheduler/ipp.c:5482
+#: scheduler/ipp.c:5513 scheduler/ipp.c:5482 scheduler/ipp.c:5498
 msgid "Missing notify-subscription-ids attribute!"
 msgstr "notify-subscription-ids 属性がありません!"
 
-#: scheduler/ipp.c:7851 scheduler/ipp.c:7341
+#: scheduler/ipp.c:7851 scheduler/ipp.c:7341 scheduler/ipp.c:7357
 msgid "Job subscriptions cannot be renewed!"
 msgstr "ジョブサブスクリプションが更新されていません!"
 
@@ -3850,3 +3871,18 @@ msgstr "コマンドを実行中: %s %s -N -U '%s%%%s' -c '%s'\n"
 #, fuzzy, c-format
 msgid "stat of %s failed: %s"
 msgstr "%s: %s 失敗しました: %s\n"
+
+#: scheduler/ipp.c:3021
+#, fuzzy, c-format
+msgid "Job #%d is already cancelled - can't cancel."
+msgstr "ジョブ #%d はすでに %s です - キャンセルできません。"
+
+#: scheduler/ipp.c:3027
+#, fuzzy, c-format
+msgid "Job #%d is already aborted - can't cancel."
+msgstr "ジョブ #%d はすでに %s です - キャンセルできません。"
+
+#: scheduler/ipp.c:3033
+#, fuzzy, c-format
+msgid "Job #%d is already completed - can't cancel."
+msgstr "ジョブ #%d はすでに %s です - キャンセルできません。"

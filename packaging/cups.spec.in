@@ -70,6 +70,11 @@ Summary: Common UNIX Printing System - LPD support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version} xinetd
 
+%package es
+Summary: Common UNIX Printing System - Spanish support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package ja
 Summary: Common UNIX Printing System - Japanese support
 Group: System Environment/Daemons
@@ -100,6 +105,10 @@ UNIX® operating systems. This package contains the CUPS shared libraries.
 %description lpd
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides LPD client support.
+
+%description es
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Spanish support.
 
 %description ja
 The Common UNIX Printing System provides a portable printing layer for 
@@ -313,6 +322,16 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/daemon/cups-lpd
 %dir /usr/share/man/man8
 /usr/share/man/man8/cups-lpd.8.gz
+
+%files es
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/es
+/usr/share/doc/cups/es/index.html
+%dir /usr/share/doc/cups/es/images
+/usr/share/doc/cups/es/images/*
+%dir /usr/share/cups/templates/es
+/usr/share/cups/templates/es/*
+/usr/share/locale/es/cups_es.po
 
 %files ja
 %defattr(-,root,root)

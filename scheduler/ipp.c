@@ -3014,11 +3014,27 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (job->state_value >= IPP_JOB_CANCELLED)
   {
-    send_ipp_status(con, IPP_NOT_POSSIBLE,
-                    _("Job #%d is already %s - can\'t cancel."), jobid,
-		    job->state_value == IPP_JOB_CANCELLED ? "cancelled" :
-		    job->state_value == IPP_JOB_ABORTED ? "aborted" :
-		    "completed");
+    switch (job->state_value)
+    {
+      case IPP_JOB_CANCELLED :
+	  send_ipp_status(con, IPP_NOT_POSSIBLE,
+                	  _("Job #%d is already cancelled - can\'t cancel."),
+			  jobid);
+          break;
+
+      case IPP_JOB_ABORTED :
+	  send_ipp_status(con, IPP_NOT_POSSIBLE,
+                	  _("Job #%d is already aborted - can\'t cancel."),
+			  jobid);
+          break;
+
+      default :
+	  send_ipp_status(con, IPP_NOT_POSSIBLE,
+                	  _("Job #%d is already completed - can\'t cancel."),
+			  jobid);
+          break;
+    }
+
     return;
   }
 

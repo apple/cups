@@ -28,7 +28,7 @@ include ../Makedefs
 # Document files...
 #
 
-LANGUAGES	=	ja
+LANGUAGES	=	es ja
 WEBPAGES	=	\
 			cups.css \
 			cups-printable.css \

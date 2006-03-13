@@ -97,6 +97,9 @@
 %provides cups-lpd 1:@CUPS_VERSION@
 %format all
 
+%subpackage es
+%description Common UNIX Printing System - Spanish support
+
 %subpackage ja
 %description Common UNIX Printing System - Japanese support
 
@@ -294,6 +297,8 @@ d 0755 root $CUPS_GROUP $STATEDIR -
 d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 
 # Data files
+%subpackage es
+f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
 %subpackage ja
 f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
 %subpackage
@@ -351,6 +356,9 @@ d 0755 root sys $DATADIR/templates -
 c 0644 root sys $DATADIR/templates templates/*.tmpl
 
 # Japanese template files
+%subpackage es
+d 0755 root sys $DATADIR/templates/es
+f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
 %subpackage ja
 d 0755 root sys $DATADIR/templates/ja
 f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
@@ -413,7 +421,12 @@ f 0644 root sys $DOCDIR/images doc/images/*.gif
 f 0644 root sys $DOCDIR/images doc/images/*.png
 f 0644 root sys $DOCDIR/robots.txt doc/robots.txt
 
-# Japanese documentation files
+# Localized documentation files
+%subpackage es
+d 0755 root sys $DOCDIR/es
+f 0644 root sys $DOCDIR/es doc/es/*.html
+d 0755 root sys $DOCDIR/es/images -
+f 0644 root sys $DOCDIR/es/images doc/es/images/*.gif
 %subpackage ja
 d 0755 root sys $DOCDIR/ja
 f 0644 root sys $DOCDIR/ja doc/ja/*.html

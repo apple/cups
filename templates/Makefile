@@ -28,7 +28,7 @@ include ../Makedefs
 # Template files...
 #
 
-LANGUAGES =	ja
+LANGUAGES =	es ja
 FILES	=	\
 		add-class.tmpl \
 		add-printer.tmpl \

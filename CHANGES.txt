@@ -3,6 +3,9 @@ CHANGES.txt - 2006-03-13
 
 CHANGES IN CUPS V1.2rc1
 
+	- Added Spanish localization files (STR #1480)
+	- Fixed localization of a few scheduler messages (STR
+	  #1478)
 	- Fixed support for HEAD requests in the scheduler (STR
 	  #1481).
 
