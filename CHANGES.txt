@@ -3,6 +3,7 @@ CHANGES.txt - 2006-03-14
 
 CHANGES IN CUPS V1.2rc1
 
+	- The Set Allows Users web page did not work (STR #1486)
 	- When the default policy was not set or set to a non-
 	  existing policy, the scheduler did not set the default
 	  policy name to "default" (STR #1484)

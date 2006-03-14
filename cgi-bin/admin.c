@@ -2624,11 +2624,11 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
         	 NULL, uri);
 
     if (num_users == 0)
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
                    "requesting-user-name-allowed", NULL, "all");
     else
     {
-      attr = ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+      attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
                            type, num_users, NULL, NULL);
 
       for (i = 0, ptr = (char *)users; *ptr; i ++)
