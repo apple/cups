@@ -785,6 +785,8 @@ cupsdReadConfiguration(void)
       cupsdLogMessage(CUPSD_LOG_ERROR, "Default policy \"%s\" not found!",
                       DefaultPolicy);
 
+    cupsdSetString(&DefaultPolicy, "default");
+
     if ((DefaultPolicyPtr = cupsdFindPolicy("default")) != NULL)
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "Using policy \"default\" as the default!");

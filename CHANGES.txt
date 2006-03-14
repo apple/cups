@@ -1,8 +1,11 @@
-CHANGES.txt - 2006-03-13
+CHANGES.txt - 2006-03-14
 ------------------------
 
 CHANGES IN CUPS V1.2rc1
 
+	- When the default policy was not set or set to a non-
+	  existing policy, the scheduler did not set the default
+	  policy name to "default" (STR #1484)
 	- The Zebra CPCL driver did not use the correct righthand
 	  margin for the 4" wide label sizes.
 	- Fixed a problem with the parsing of fractional real
