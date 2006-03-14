@@ -168,7 +168,7 @@ cupsAdminCreateWindowsPPD(
   * Create a temporary output file using the destination buffer...
   */
 
-  if ((dstfp = cupsTempFile2(buffer, bufsize)) < 0)
+  if ((dstfp = cupsTempFile2(buffer, bufsize)) == NULL)
   {
     cupsFileClose(srcfp);
 

@@ -298,6 +298,9 @@ else
 			fi
 
 			CFLAGS="-Ae $CFLAGS"
+			# Warning 336 is "empty translation unit"
+			# Warning 829 is passing constant string as char *
+			CXXFLAGS="+W336,829 $CXXFLAGS"
 
 			if test "x$with_optim" = x; then
 				OPTIM="+DAportable $OPTIM"
