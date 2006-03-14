@@ -26,7 +26,7 @@ msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
 "POT-Creation-Date: 2006-03-13 08:39-0500\n"
-"PO-Revision-Date: 2006-03-11 18:42+0900\n"
+"PO-Revision-Date: 2006-03-14 09:29+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -3867,16 +3867,16 @@ msgid "stat of %s failed: %s"
 msgstr "%s の状態取得に失敗しました: %s"
 
 #: scheduler/ipp.c:3021
-#, fuzzy, c-format
+#, c-format
 msgid "Job #%d is already cancelled - can't cancel."
-msgstr "ジョブ #%d はすでに %s です - キャンセルできません。"
+msgstr "ジョブ #%d はすでにキャンセルされています - キャンセルできません。"
 
 #: scheduler/ipp.c:3027
-#, fuzzy, c-format
+#, c-format
 msgid "Job #%d is already aborted - can't cancel."
-msgstr "ジョブ #%d はすでに %s です - キャンセルできません。"
+msgstr "ジョブ #%d はすでに停止されています - キャンセルできません。"
 
 #: scheduler/ipp.c:3033
-#, fuzzy, c-format
+#, c-format
 msgid "Job #%d is already completed - can't cancel."
-msgstr "ジョブ #%d はすでに %s です - キャンセルできません。"
+msgstr "ジョブ #%d はすでに完了しています - キャンセルできません。"
