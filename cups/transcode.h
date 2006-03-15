@@ -98,54 +98,23 @@ typedef struct _cups_vmap_s		/**** VBCS Charmap Struct ****/
  * Prototypes...
  */
 
-/*
- * Utility functions for character set maps
- */
-extern void     *cupsCharmapGet(const cups_encoding_t encoding);
-extern void     cupsCharmapFree(const cups_encoding_t encoding);
 extern void     cupsCharmapFlush(void);
-
-/*
- * Convert UTF-8 to and from legacy character set
- */
-extern int      cupsUTF8ToCharset(char *dest,
-                                  const cups_utf8_t *src,
-                                  const int maxout,
-                                  const cups_encoding_t encoding);
+extern void     cupsCharmapFree(const cups_encoding_t encoding);
+extern void     *cupsCharmapGet(const cups_encoding_t encoding);
 extern int      cupsCharsetToUTF8(cups_utf8_t *dest,
                                   const char *src,
                                   const int maxout,
                                   const cups_encoding_t encoding);
-
-/*
- * Convert UTF-8 to and from UTF-16
- */
-extern int      cupsUTF8ToUTF16(cups_utf16_t *dest,
-                                const cups_utf8_t *src,
-                                const int maxout);
-extern int      cupsUTF16ToUTF8(cups_utf8_t *dest,
-                                const cups_utf16_t *src,
-                                const int maxout);
-
-/*
- * Convert UTF-8 to and from UTF-32
- */
+extern int      cupsUTF8ToCharset(char *dest,
+                                  const cups_utf8_t *src,
+                                  const int maxout,
+                                  const cups_encoding_t encoding);
 extern int      cupsUTF8ToUTF32(cups_utf32_t *dest,
                                 const cups_utf8_t *src,
                                 const int maxout);
 extern int      cupsUTF32ToUTF8(cups_utf8_t *dest,
                                 const cups_utf32_t *src,
                                 const int maxout);
-
-/*
- * Convert UTF-16 to and from UTF-32
- */
-extern int      cupsUTF16ToUTF32(cups_utf32_t *dest,
-                                 const cups_utf16_t *src,
-                                 const int maxout);
-extern int      cupsUTF32ToUTF16(cups_utf16_t *dest,
-                                 const cups_utf32_t *src,
-                                 const int maxout);
 
 #  ifdef __cplusplus
 }

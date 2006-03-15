@@ -48,32 +48,14 @@
 
 
 /*
- * Local Globals...
- */
-
-static const char *program_synopsis[] = /* Program help */
-{
-  "testi18n [-vh]",
-  "         -v  verbose (print each called function and result)",
-  "         -h  help (print this synopsis)",
-  "",
-  "'testi18n' is a utility to test CUPS internationalization",
-  "Copyright 1997-2005 by Easy Software Products.",
-  NULL
-};
-static int	error_count = 0;	/* Total error count */
-
-
-/*
  * Local functions...
  */
 
-static void	print_synopsis(void);
 static void	print_utf8(const char *msg, const cups_utf8_t *src);
 static void	print_utf16(const char *msg, const cups_utf16_t *src);
 static void	print_utf32(const char *msg, const cups_utf32_t *src);
-static int	test_transcode(const int verbose);
-static int	test_normalize(const int verbose);
+static int	test_transcode(void);
+static int	test_normalize(void);
 
 
 /*
@@ -84,71 +66,13 @@ int					/* O - Exit code */
 main(int  argc,				/* I - Argument Count */
      char *argv[])			/* I - Arguments */
 {
-  int		ai;			/* Argument index */
-  char		*ap;			/* Argument pointer */
-  int		verbose;		/* Verbose flag */
   int		errors;			/* Error count */
 
 
- /*
-  * Check for switches...
-  */
+  errors = test_transcode();
+  errors += test_normalize();
 
-  verbose = 0;
-
-  for (ai = 1; ai < argc; ai ++)
-  {
-    ap = argv[ai];
-    if (*ap != '-')
-      break;
-
-    for (ap ++; *ap != '\0'; ap ++)
-    {
-      switch (*ap)
-      {
-	case 'v':			/* verbose */
-	  verbose = 1;
-	  break;
-
-	case 'h':			/* help */
-	  print_synopsis();
-	  return (0);
-
-	default:
-	  print_synopsis();
-	  return (1);
-      }
-    }
-  }
-
- /*
-  * Test all internationalization modules and functions...
-  */
-
-  errors = test_transcode(verbose);
-  error_count += errors;
-  printf("\ntesti18n: %d errors found in 'transcode.c'\n", errors);
-
-  errors = test_normalize(verbose);
-  error_count += errors;
-  printf("\ntesti18n: %d errors found in 'normalize.c'\n", errors);
-
-  return (error_count > 0);
-}
-
-
-/*
- * 'print_synopsis()' - Print program synopsis (help).
- */
-
-static void
-print_synopsis(void)
-{
-  int	i;				/* Looping variable */
-
-
-  for (i = 0; program_synopsis[i]; i ++)
-    puts(program_synopsis[i]);
+  return (errors > 0);
 }
 
 
@@ -160,13 +84,13 @@ static void
 print_utf8(const char	     *msg,	/* I - Message String */
 	   const cups_utf8_t *src)	/* I - UTF-8 Source String */
 {
-  if (msg != NULL)
+  if (msg)
     printf("%s:", msg);
 
   for (; *src; src ++)
     printf(" %02x", *src);
-  printf("\n");
-  return;
+
+  putchar('\n');
 }
 
 
@@ -178,12 +102,13 @@ static void
 print_utf16(const char	       *msg,	/* I - Message String */
 	    const cups_utf16_t *src)	/* I - UTF-16 Source String */
 {
-  if (msg != NULL)
+  if (msg)
     printf("%s:", msg);
+
   for (; *src; src ++)
     printf(" %04x", (int) *src);
-  printf("\n");
-  return;
+
+  putchar('\n');
 }
 
 
@@ -195,12 +120,13 @@ static void
 print_utf32(const char	       *msg,	/* I - Message String */
 	    const cups_utf32_t *src)	/* I - UTF-32 Source String */
 {
-  if (msg != NULL)
+  if (msg)
     printf("%s:", msg);
+
   for (; *src; src ++)
     printf(" %04x", (int) *src);
-  printf("\n");
-  return;
+
+  putchar('\n');
 }
 
 
@@ -209,10 +135,12 @@ print_utf32(const char	       *msg,	/* I - Message String */
  */
 
 static int				/* O - Zero or error count */
-test_transcode(const int verbose)	/* I - Verbose flag */
+test_transcode(void)
 {
   FILE		*fp;			/* File pointer */
   int		count;			/* File line counter */
+  int		status,			/* Status of current test */
+		errors;			/* Error count */
   char		line[1024];		/* File line source string */
   int		len;			/* Length (count) of string */
   char		legsrc[1024];		/* Legacy source string */
@@ -250,116 +178,187 @@ test_transcode(const int verbose)	/* I - Verbose flag */
 
 
  /*
-  * Test with (inserted) and (deleted) leading BOM...
+  * Start with some conversion tests from a UTF-8 test file.
   */
 
-  if (verbose)
+  errors = 0;
+
+  if ((fp = fopen("utf8demo.txt", "r")) == NULL)
   {
-    printf("\ntesti18n: Testing 'transcode.c'...\n");
-    printf(" testing with insert/delete leading BOM...\n");
+    perror("utf8demo.txt");
+    return (1);
   }
 
  /*
-  * Test UTF-8 to UTF-32/EUC-JP on demo file...
+  * cupsUTF8ToUTF32
   */
 
-  if (verbose)
+  fputs("cupsUTF8ToUTF32: ", stdout);
+
+  for (count = 0, status = 0; fgets(line, sizeof(line), fp);)
   {
-    printf("\ntesti18n: Testing UTF-8 source 'utf8demo.txt'...\n");
-    printf(" testing UTF-8 to UTF-32...\n");
-    printf(" testing UTF-8 to EUC-JP...\n");
-  }
-
-  if ((fp = fopen("utf8demo.txt", "r")) == NULL)
-    return (1);
-
-  for (count = 0;;)
-  {
-    if (fgets(line, 1024, fp) == NULL)
-      break;
-
     count ++;
 
-    len = cupsUTF8ToUTF32(utf32dest, (cups_utf8_t *)line, 1024);
-    if (len < 0)
-      printf(" error line: %d (UTF-8 to UTF-32)\n", count);
+    if (cupsUTF8ToUTF32(utf32dest, (cups_utf8_t *)line, 1024) < 0)
+    {
+      printf("FAIL (UTF-8 to UTF-32 on line %d)\n", count);
+      errors ++;
+      status = 1;
+      break;
+    }
+  }
+
+  if (!status)
+    puts("PASS");
+
+ /*
+  * cupsUTF8ToCharset
+  */
+
+  fputs("cupsUTF8ToCharset: ", stdout);
+
+  rewind(fp);
+
+  for (count = 0, status = 0; fgets(line, sizeof(line), fp);)
+  {
+    count ++;
 
     len = cupsUTF8ToCharset(legdest, (cups_utf8_t *)line, 1024, CUPS_EUC_JP);
     if (len < 0)
-      printf(" error line: %d (UTF-8 to EUC-JP)\n", count);
+    {
+      printf("FAIL (UTF-8 to EUC-JP on line %d)\n", count);
+      errors ++;
+      status = 1;
+      break;
+    }
   }
+
+  if (!status)
+    puts("PASS");
 
   fclose(fp);
 
-  if (verbose)
-    printf(" total lines: %d\n", count);
+ /*
+  * Test charmap load for ISO-8859-1...
+  */
+
+  fputs("cupsCharmapGet(CUPS_ISO8859_1): ", stdout);
+
+  if ((vmap = (_cups_vmap_t *)cupsCharmapGet(CUPS_ISO8859_1)) == NULL)
+  {
+    errors ++;
+    puts("FAIL");
+  }
+  else
+  {
+    puts("PASS");
+    printf("    charcount=%d, widecount=%d\n", vmap->charcount,
+           vmap->widecount);
+  }
+
+ /*
+  * Test charmap load for Windows-932 (Shift-JIS)...
+  */
+
+  fputs("cupsCharmapGet(CUPS_WINDOWS_932): ", stdout);
+
+  if ((vmap = (_cups_vmap_t *)cupsCharmapGet(CUPS_WINDOWS_932)) == NULL)
+  {
+    errors ++;
+    puts("FAIL");
+  }
+  else
+  {
+    puts("PASS");
+    printf("    charcount=%d, widecount=%d\n", vmap->charcount,
+           vmap->widecount);
+  }
 
  /*
   * Test VBCS charmap load for EUC-JP...
   */
 
-  if (verbose)
-    printf("\ntesti18n: Loading VBCS charmap EUC-JP (Japanese)...\n");
+  fputs("cupsCharmapGet(CUPS_EUC_JP): ", stdout);
 
-  vmap = (_cups_vmap_t *) cupsCharmapGet(CUPS_EUC_JP);
-  if (vmap == NULL)
-    return (1);
-
-  if (verbose)
+  if ((vmap = (_cups_vmap_t *)cupsCharmapGet(CUPS_EUC_JP)) == NULL)
   {
-    printf(" charcount: %d\n", vmap->charcount);
-    printf(" widecount: %d\n", vmap->widecount);
+    errors ++;
+    puts("FAIL");
+  }
+  else
+  {
+    puts("PASS");
+    printf("    charcount=%d, widecount=%d\n", vmap->charcount,
+           vmap->widecount);
   }
 
  /*
   * Test VBCS charmap load for EUC-TW...
   */
 
-  if (verbose)
-    printf("\ntesti18n: Loading VBCS charmap EUC-TW (Taiwan)...\n");
+  fputs("cupsCharmapGet(CUPS_EUC_TW): ", stdout);
 
-  vmap = (_cups_vmap_t *) cupsCharmapGet(CUPS_EUC_TW);
-  if (vmap == NULL)
-    return (1);
-
-  if (verbose)
+  if ((vmap = (_cups_vmap_t *)cupsCharmapGet(CUPS_EUC_TW)) == NULL)
   {
-    printf(" charcount: %d\n", vmap->charcount);
-    printf(" widecount: %d\n", vmap->widecount);
+    errors ++;
+    puts("FAIL");
+  }
+  else
+  {
+    puts("PASS");
+    printf("    charcount=%d, widecount=%d\n", vmap->charcount,
+           vmap->widecount);
   }
 
  /*
   * Test UTF-8 to legacy charset (ISO 8859-1)...
   */
 
-  if (verbose)
-    printf("\ntesti18n: Testing UTF-8 to ISO 8859-1 (Latin1)...\n");
+  fputs("cupsUTF8ToCharset(CUPS_ISO8859_1): ", stdout);
 
   legdest[0] = 0;
 
   len = cupsUTF8ToCharset(legdest, utf8latin, 1024, CUPS_ISO8859_1);
   if (len < 0)
-    return (1);
-
-  if (verbose)
   {
-    print_utf8(" utf8latin", utf8latin);
-    print_utf8(" legdest  ", (cups_utf8_t *) legdest);
+    printf("FAIL (len=%d)\n", len);
+    errors ++;
   }
+  else
+  {
+    puts("PASS");
+    print_utf8("    utf8latin", utf8latin);
+    print_utf8("    legdest", (cups_utf8_t *)legdest);
+  }
+
+ /*
+  * cupsCharsetToUTF8
+  */
+
+  fputs("cupsCharsetToUTF8(CUPS_ISO8859_1): ", stdout);
 
   strcpy(legsrc, legdest);
 
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_ISO8859_1);
-
   if (len < 0)
-    return (1);
+  {
+    printf("FAIL (len=%d)\n", len);
+    errors ++;
+  }
+  else if (len != strlen((char *)utf8latin))
+  {
+    printf("FAIL (len=%d, expected %d)\n", len, strlen((char *)utf8latin));
+    errors ++;
+  }
+  else if (memcmp(utf8latin, utf8dest, len))
+  {
+    puts("FAIL (results do no match)");
+    errors ++;
+  }
+  else
+    puts("PASS");
 
-  if (len != strlen ((char *) utf8latin))
-    return (1);
-
-  if (memcmp(utf8latin, utf8dest, len) != 0)
-    return (1);
-
+#if 0
  /*
   * Test UTF-8 to Latin-1 (ISO 8859-1) with replacement...
   */
@@ -565,6 +564,7 @@ test_transcode(const int verbose)	/* I - Verbose flag */
     printf("\ntesti18n: Testing cupsCharmapFlush()...\n");
   cupsCharmapFlush();
   return (0);
+#endif /* 0 */
 }
 
 
@@ -573,8 +573,9 @@ test_transcode(const int verbose)	/* I - Verbose flag */
  */
 
 static int				/* O - Zero or error count */
-test_normalize(const int verbose)	/* I - Verbose flag */
+test_normalize(void)
 {
+#if 0
   FILE		*fp;			/* File pointer */
   int		count;			/* File line counter */
   char		line[1024];		/* File line source string */
@@ -782,6 +783,9 @@ test_normalize(const int verbose)	/* I - Verbose flag */
   if (verbose)
     printf("\ntesti18n: Testing cupsNormalizeMapsFlush()...\n");
   cupsNormalizeMapsFlush();
+
+#endif /* 0 */
+
   return (0);
 }
 

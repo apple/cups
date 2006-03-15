@@ -714,7 +714,11 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd->language_level = atoi(string);
     else if (!strcmp(keyword, "LanguageEncoding"))
     {
-      ppd->lang_encoding = string;
+     /*
+      * Say all PPD files are UTF-8, since we convert to UTF-8...
+      */
+
+      ppd->lang_encoding = strdup("UTF-8");
       encoding           = ppd_get_encoding(string);
     }
     else if (!strcmp(keyword, "LanguageVersion"))
@@ -735,7 +739,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 
         cupsCharsetToUTF8(utf8, string, sizeof(utf8), encoding);
-	ppd->nickname = string;
+	ppd->nickname = strdup((char *)utf8);
       }
       else
         ppd->nickname = string;
@@ -1204,13 +1208,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	}
 
       if (text[0])
-      {
-        if (encoding != CUPS_UTF8)
-          cupsCharsetToUTF8((cups_utf8_t *)option->text, text,
-	                     sizeof(option->text), encoding);
-        else
-          strlcpy(option->text, text, sizeof(option->text));
-      }
+        cupsCharsetToUTF8((cups_utf8_t *)option->text, text,
+	                   sizeof(option->text), encoding);
       else
       {
         if (!strcmp(name, "PageSize"))
@@ -1300,13 +1299,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	}
 
       if (text[0])
-      {
-        if (encoding != CUPS_UTF8)
-          cupsCharsetToUTF8((cups_utf8_t *)option->text, text,
-	                     sizeof(option->text), encoding);
-        else
-          strlcpy(option->text, text, sizeof(option->text));
-      }
+        cupsCharsetToUTF8((cups_utf8_t *)option->text, text,
+	                   sizeof(option->text), encoding);
       else
         strlcpy(option->text, name, sizeof(option->text));
 
@@ -1652,13 +1646,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       choice = ppd_add_choice(option, name);
 
       if (text[0])
-      {
-        if (encoding != CUPS_UTF8)
-          cupsCharsetToUTF8((cups_utf8_t *)choice->text, text,
-	                     sizeof(choice->text), encoding);
-        else
-          strlcpy(choice->text, text, sizeof(choice->text));
-      }
+        cupsCharsetToUTF8((cups_utf8_t *)choice->text, text,
+	                   sizeof(choice->text), encoding);
       else if (!strcmp(name, "True"))
         strcpy(choice->text, _("Yes"));
       else if (!strcmp(name, "False"))
@@ -2341,11 +2330,8 @@ ppd_get_group(ppd_file_t      *ppd,	/* I - PPD file */
     memset(group, 0, sizeof(ppd_group_t));
     strlcpy(group->name, name, sizeof(group->name));
 
-    if (encoding != CUPS_UTF8)
-      cupsCharsetToUTF8((cups_utf8_t *)group->text, text,
-	                 sizeof(group->text), encoding);
-    else
-      strlcpy(group->text, text, sizeof(group->text));
+    cupsCharsetToUTF8((cups_utf8_t *)group->text, text,
+	               sizeof(group->text), encoding);
   }
 
   return (group);
