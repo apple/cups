@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-03-14
+CHANGES.txt - 2006-03-15
 ------------------------
 
 CHANGES IN CUPS V1.2rc1
 
+	- The IPv6 support did not compile on Tru64 UNIX (STR
+	  #1488)
 	- ppdOpen2() now converts the NickName and all UI text to
 	  UTF-8 (STR #1475)
 	- The Set Allows Users web page did not work (STR #1486)

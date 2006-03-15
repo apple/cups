@@ -100,6 +100,8 @@ extern "C" {
 #    define s6_addr32	_S6_un._S6_u32
 #  elif defined(__FreeBSD__) || defined(__APPLE__)
 #    define s6_addr32	__u6_addr.__u6_addr32
+#  elif defined(__osf__)
+#    define s6_addr32	s6_un.sa6_laddr
 #  elif defined(WIN32)
 /*
  * Windows only defines byte and 16-bit word members of the union and
