@@ -60,15 +60,6 @@ CHARMAPS =	\
 		koi8-r.txt \
 		koi8-u.txt \
 		mac-roman.txt \
-		unibreak.txt \
-		uni-comb.txt \
-		uni-fold.txt \
-		uni-full.txt \
-		uni-line.txt \
-		uni-nfc.txt \
-		uni-nfd.txt \
-		uni-nfkd.txt \
-		uni-prop.txt \
 		windows-1250.txt \
 		windows-1251.txt \
 		windows-1252.txt \

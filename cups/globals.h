@@ -34,8 +34,6 @@
 #  include "string.h"
 #  include "cups.h"
 #  include "i18n.h"
-#  include "normalize.h"
-#  include "transcode.h"
 
 #  ifdef HAVE_PTHREAD_H
 #    include <pthread.h>
@@ -93,13 +91,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			ipp_unknown[255];
 					/* Unknown error statuses */
 
-  /* normalize.c */
-  _cups_norm_map_t	*normmap_cache;	/* Normalize Map cache */
-  _cups_fold_map_t	*foldmap_cache;	/* Case Fold cache */
-  _cups_prop_map_t	*propmap_cache;	/* Char Prop Map Cache */
-  _cups_comb_map_t	*combmap_cache;	/* Comb Class Map Cache */
-  _cups_break_map_t	*breakmap_cache;/* Line Break Map Cache */
-
   /* language.c */
   cups_lang_t		*lang_cache;	/* Language string cache */
   cups_lang_t		*lang_default;	/* Default language */
@@ -150,11 +141,10 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
  * Prototypes...
  */
 
+extern void		_cupsCharmapFlush(_cups_globals_t *cg);
 extern const char	*_cupsGetPassword(const char *prompt);
 extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsLangFlush(_cups_globals_t *cg);
-extern void		_cupsCharmapFlush(_cups_globals_t *cg);
-extern void		_cupsNormalizeMapsFlush(_cups_globals_t *cg);
 extern void		_cupsSetError(ipp_status_t status, const char *message);
 extern void		_cupsStrFlush(_cups_globals_t *cg);
 
