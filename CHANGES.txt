@@ -6,7 +6,7 @@ CHANGES IN CUPS V1.2rc1
 	- The scheduler now enforces a minimum job cost of 100
 	  when doing FilterLimit checks.
 	- The scheduler would leak file descriptors when printing
-	  to raw queues.
+	  to raw queues (STR #1491)
 	- The IPv6 support did not compile on Tru64 UNIX (STR
 	  #1488)
 	- ppdOpen2() now converts the NickName and all UI text to
@@ -23,7 +23,7 @@ CHANGES IN CUPS V1.2rc1
 	- Fixed localization of a few scheduler messages (STR
 	  #1478)
 	- Fixed support for HEAD requests in the scheduler (STR
-	  #1481).
+	  #1481)
 
 
 CHANGES IN CUPS V1.2b2

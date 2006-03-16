@@ -151,6 +151,9 @@ $SERVERBIN=@CUPS_SERVERBIN@
 $SERVERROOT=@CUPS_SERVERROOT@
 $STATEDIR=@CUPS_STATEDIR@
 
+$LIB32DIR=@LIB32DIR@
+$LIB64DIR=@LIB64DIR@
+
 $CUPS_USER=@CUPS_USER@
 $CUPS_GROUP=@CUPS_GROUP@
 $CUPS_PRIMARY_SYSTEM_GROUP=@CUPS_PRIMARY_SYSTEM_GROUP@
@@ -283,6 +286,26 @@ f 0755 root sys $LIBDIR/libcups.so.2 cups/libcups.so.2
 l 0755 root sys $LIBDIR/libcups.so libcups.so.2
 f 0755 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2
 l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
+%system all
+%subpackage
+%endif
+
+%if LIB32DIR
+%subpackage libs
+f 0755 root sys $LIB32DIR/libcups.so.2 cups/libcups.32.so.2
+l 0755 root sys $LIB32DIR/libcups.so libcups.so.2
+f 0755 root sys $LIB32DIR/libcupsimage.so.2 filter/libcupsimage.32.so.2
+l 0755 root sys $LIB32DIR/libcupsimage.so libcupsimage.so.2
+%system all
+%subpackage
+%endif
+
+%if LIB64DIR
+%subpackage libs
+f 0755 root sys $LIB64DIR/libcups.so.2 cups/libcups.64.so.2
+l 0755 root sys $LIB64DIR/libcups.so libcups.so.2
+f 0755 root sys $LIB64DIR/libcupsimage.so.2 filter/libcupsimage.64.so.2
+l 0755 root sys $LIB64DIR/libcupsimage.so libcupsimage.so.2
 %system all
 %subpackage
 %endif

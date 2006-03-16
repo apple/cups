@@ -34,6 +34,8 @@
 %{!?_with_dbus: %define _dbus --disable-dbus}
 
 %{!?_with_php: %{!?_without_php: %define _with_php --with-php}}
+%{?_with_php: %define _php --with-php}
+%{!?_with_php: %define _php --without-php}
 
 Summary: Common UNIX Printing System
 Name: cups
@@ -125,9 +127,10 @@ UNIX® operating systems. This package provides PHP support.
 
 %build
 %ifarch x86_64
-./configure --enable-32bit %{_dbus} %{_without_php}
+./configure --enable-32bit %{_dbus} %{_php}
 %else
-CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" ./configure %{_dbus} %{_without_php}
+CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" \
+    ./configure %{_dbus} %{_php}
 %endif
 # If we got this far, all prerequisite libraries must be here.
 make
