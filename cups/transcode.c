@@ -966,7 +966,7 @@ conv_vbcs_to_utf8(
       if (!*src)
 	return (-1);
 
-      legchar = (legchar << 8) | (cups_vbcs_t)*src++;
+      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
   
      /*
       * Convert unknown character to Replacement Character...
@@ -992,17 +992,17 @@ conv_vbcs_to_utf8(
       if (!*src || !src[1])
 	return (-1);
 
-      legchar = (legchar << 8) | (cups_vbcs_t)*src++;
-      legchar = (legchar << 8) | (cups_vbcs_t)*src++;
+      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
+      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
     }
     else if (vmap->lead4char[(int)leadchar] == leadchar)
     {
       if (!*src || !src[1] || !src[2])
 	return (-1);
 
-      legchar = (legchar << 8) | (cups_vbcs_t)*src++;
-      legchar = (legchar << 8) | (cups_vbcs_t)*src++;
-      legchar = (legchar << 8) | (cups_vbcs_t)*src++;
+      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
+      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
+      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
     }
     else
       return (-1);
