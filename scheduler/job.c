@@ -1574,6 +1574,14 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   }
 
  /*
+  * Set a minimum cost of 100 for all jobs so that FilterLimit
+  * works with raw queues and other low-cost paths.
+  */
+
+  if (job->cost < 100)
+    job->cost = 100;
+
+ /*
   * See if the filter cost is too high...
   */
 
@@ -2322,6 +2330,13 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
                "Unable to start filter \"%s\" - %s.",
                filter->filter, strerror(errno));
 
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdStartJob: Closing filter pipes for slot %d "
+		      "[ %d %d ]...",
+                      slot, filterfds[slot][0], filterfds[slot][1]);
+
+      cupsdClosePipe(filterfds[slot]);
+
       cupsdAddPrinterHistory(printer);
 
       cupsArrayDelete(filters);
@@ -2370,7 +2385,7 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
       if (RunUser)
         backroot = 0;
-      else if (lstat(command, &backinfo))
+      else if (stat(command, &backinfo))
 	backroot = 0;
       else
         backroot = !(backinfo.st_mode & (S_IRWXG | S_IRWXO));
@@ -2390,6 +2405,13 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 	cupsdAddPrinterHistory(printer);
 
 	cupsdClosePipe(statusfds);
+
+	cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                	"cupsdStartJob: Closing filter pipes for slot %d "
+			"[ %d %d ]...",
+                	!slot, filterfds[!slot][0], filterfds[!slot][1]);
+
+	cupsdClosePipe(filterfds[!slot]);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                       "Job canceled because the server could not open a file.");
@@ -2429,16 +2451,11 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 		 strerror(errno));
 
 	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                "cupsdStartJob: Closing print pipes [ %d %d ]...",
-        	        job->print_pipes[0], job->print_pipes[1]);
+                	"cupsdStartJob: Closing filter pipes for slot %d "
+			"[ %d %d ]...",
+                	!slot, filterfds[!slot][0], filterfds[!slot][1]);
 
-        cupsdClosePipe(job->print_pipes);
-
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                "cupsdStartJob: Closing back pipes [ %d %d ]...",
-        	        job->back_pipes[0], job->back_pipes[1]);
-
-        cupsdClosePipe(job->back_pipes);
+	cupsdClosePipe(filterfds[!slot]);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                       "Job canceled because the server could not execute "
@@ -2482,6 +2499,13 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   {
     filterfds[slot][0] = -1;
     filterfds[slot][1] = -1;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdStartJob: Closing filter pipes for slot %d "
+		    "[ %d %d ]...",
+                    !slot, filterfds[!slot][0], filterfds[!slot][1]);
+
+    cupsdClosePipe(filterfds[!slot]);
 
     if (job->current_file == job->num_files)
     {
