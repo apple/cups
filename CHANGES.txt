@@ -1,8 +1,9 @@
-CHANGES.txt - 2006-03-16
+CHANGES.txt - 2006-03-17
 ------------------------
 
 CHANGES IN CUPS V1.2rc1
 
+	- Fixed transcoding issues (STR #1493)
 	- The scheduler now enforces a minimum job cost of 100
 	  when doing FilterLimit checks.
 	- The scheduler would leak file descriptors when printing

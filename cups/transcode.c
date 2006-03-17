@@ -59,19 +59,19 @@
 
 static int		compare_wide(const void *k1, const void *k2);
 static int		conv_sbcs_to_utf8(cups_utf8_t *dest,
-					  const char *src,
+					  const cups_sbcs_t *src,
 					  int maxout,
 					  const cups_encoding_t encoding);
-static int		conv_utf8_to_sbcs(char *dest,
+static int		conv_utf8_to_sbcs(cups_sbcs_t *dest,
 					  const cups_utf8_t *src,
 					  int maxout,
 					  const cups_encoding_t encoding);
-static int		conv_utf8_to_vbcs(char *dest,
+static int		conv_utf8_to_vbcs(cups_sbcs_t *dest,
 					  const cups_utf8_t *src,
 					  int maxout,
 					  const cups_encoding_t encoding);
 static int		conv_vbcs_to_utf8(cups_utf8_t *dest,
-					  const char *src,
+					  const cups_sbcs_t *src,
 					  int maxout,
 					  const cups_encoding_t encoding);
 static void		free_sbcs_charmap(_cups_cmap_t *sbcs);
@@ -271,9 +271,9 @@ cupsCharsetToUTF8(
   */
 
   if (encoding < CUPS_ENCODING_SBCS_END)
-    return (conv_sbcs_to_utf8(dest, src, maxout, encoding));
+    return (conv_sbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding));
   else if (encoding < CUPS_ENCODING_VBCS_END)
-    return (conv_vbcs_to_utf8(dest, src, maxout, encoding));
+    return (conv_vbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding));
   else
   {
     puts("    Bad encoding, returning -1");
@@ -326,9 +326,9 @@ cupsUTF8ToCharset(
   */
 
   if (encoding < CUPS_ENCODING_SBCS_END)
-    return (conv_utf8_to_sbcs(dest, src, maxout, encoding));
+    return (conv_utf8_to_sbcs((cups_sbcs_t *)dest, src, maxout, encoding));
   else if (encoding < CUPS_ENCODING_VBCS_END)
-    return (conv_utf8_to_vbcs(dest, src, maxout, encoding));
+    return (conv_utf8_to_vbcs((cups_sbcs_t *)dest, src, maxout, encoding));
   else
     return (-1);
 }
@@ -356,11 +356,10 @@ cupsUTF8ToUTF32(
     const cups_utf8_t *src,		/* I - Source string */
     const int         maxout)		/* I - Max output */
 {
-  cups_utf8_t	*first;			/* First character in string */
   size_t	srclen;			/* Source string length */
   int		i;			/* Looping variable */
-  cups_utf32_t	ch;			/* Character value */
-  cups_utf32_t	next;			/* Next character value */
+  cups_utf8_t	ch;			/* Character value */
+  cups_utf8_t	next;			/* Next character value */
   cups_utf32_t	ch32;			/* UTF-32 character value */
 
 
@@ -378,13 +377,12 @@ cupsUTF8ToUTF32(
   * Convert input UTF-8 to output UTF-32 (and insert BOM)...
   */
 
-  first   = (cups_utf8_t *)src;
   *dest++ = 0xfeff;
   srclen  = strlen((char *)src);
 
   for (i = maxout - 1; *src && i > 0; i --)
   {
-    ch = (cups_utf32_t)*src++;
+    ch = *src++;
 
    /*
     * Convert UTF-8 character(s) to UTF-32 character...
@@ -404,7 +402,7 @@ cupsUTF8ToUTF32(
       * Two-octet UTF-8 <= 2047 (Latin-x)...
       */
 
-      next = (cups_utf32_t)*src++;
+      next = *src++;
       if (!next)
 	return (-1);
 
@@ -425,13 +423,13 @@ cupsUTF8ToUTF32(
       * Three-octet UTF-8 <= 65535 (Plane 0 - BMP)...
       */
 
-      next = (cups_utf32_t)*src++;
+      next = *src++;
       if (!next)
 	return (-1);
 
       ch32 = ((ch & 0x0f) << 6) | (next & 0x3f);
 
-      next = (cups_utf32_t)*src++;
+      next = *src++;
       if (!next)
 	return (-1);
 
@@ -452,19 +450,19 @@ cupsUTF8ToUTF32(
       * Four-octet UTF-8...
       */
 
-      next = (cups_utf32_t)*src++;
+      next = *src++;
       if (!next)
 	return (-1);
 
       ch32 = ((ch & 0x07) << 6) | (next & 0x3f);
 
-      next = (cups_utf32_t)*src++;
+      next = *src++;
       if (!next)
 	return (-1);
 
       ch32 = (ch32 << 6) | (next & 0x3f);
 
-      next = (cups_utf32_t)*src++;
+      next = *src++;
       if (!next)
 	return (-1);
 
@@ -662,13 +660,13 @@ compare_wide(const void *k1,		/* I - Key char */
 static int				/* O - Count or -1 on error */
 conv_sbcs_to_utf8(
     cups_utf8_t           *dest,	/* O - Target string */
-    const char            *src,		/* I - Source string */
+    const cups_sbcs_t     *src,		/* I - Source string */
     int                   maxout,	/* I - Max output */
     const cups_encoding_t encoding)	/* I - Encoding */
 {
   _cups_cmap_t	*cmap;			/* Legacy SBCS / Unicode Charset Map */
   cups_ucs2_t	*crow;			/* Pointer to UCS-2 row in 'char2uni' */
-  unsigned long legchar;		/* Legacy character value */
+  cups_sbcs_t	legchar;		/* Legacy character value */
   cups_utf32_t	work[CUPS_MAX_USTRING],	/* Internal UCS-4 string */
 		*workptr;		/* Pointer into string */
 
@@ -687,7 +685,7 @@ conv_sbcs_to_utf8(
   work[0] = 0xfeff;
   for (workptr = work + 1; *src && workptr < (work + CUPS_MAX_USTRING - 1);)
   {
-    legchar = *src++ & 255;
+    legchar = *src++;
 
    /*
     * Convert ASCII verbatim (optimization)...
@@ -728,12 +726,12 @@ conv_sbcs_to_utf8(
 
 static int				/* O - Count or -1 on error */
 conv_utf8_to_sbcs(
-    char                  *dest,	/* O - Target string */
+    cups_sbcs_t           *dest,	/* O - Target string */
     const cups_utf8_t     *src,		/* I - Source string */
     int                   maxout,	/* I - Max output */
     const cups_encoding_t encoding)	/* I - Encoding */
 {
-  char		*start;			/* Start of destination string */
+  cups_sbcs_t	*start;			/* Start of destination string */
   _cups_cmap_t	*cmap;			/* Legacy SBCS / Unicode Charset Map */
   cups_sbcs_t	*srow;			/* Pointer to SBCS row in 'uni2char' */
   cups_utf32_t	unichar;		/* Character value */
@@ -771,7 +769,7 @@ conv_utf8_to_sbcs(
 
     if (unichar < 0x80)
     {
-      *dest++ = (char)unichar;
+      *dest++ = (cups_sbcs_t)unichar;
       continue;
     }
 
@@ -787,7 +785,7 @@ conv_utf8_to_sbcs(
     if (!srow || !*srow)
       *dest++ = '?';
     else
-      *dest++ = (char) (*srow);
+      *dest++ = *srow;
   }
 
   *dest = '\0';
@@ -804,12 +802,12 @@ conv_utf8_to_sbcs(
 
 static int				/* O - Count or -1 on error */
 conv_utf8_to_vbcs(
-    char                  *dest,	/* O - Target string */
+    cups_sbcs_t           *dest,	/* O - Target string */
     const cups_utf8_t     *src,		/* I - Source string */
     int                   maxout,	/* I - Max output */
     const cups_encoding_t encoding)	/* I - Encoding */
 {
-  char		*start;			/* Start of destination string */
+  cups_sbcs_t	*start;			/* Start of destination string */
   _cups_vmap_t	*vmap;			/* Legacy DBCS / Unicode Charset Map */
   cups_vbcs_t	*vrow;			/* Pointer to VBCS row in 'uni2char' */
   cups_utf32_t	unichar;		/* Character value */
@@ -848,7 +846,7 @@ conv_utf8_to_vbcs(
 
     if (unichar < 0x80)
     {
-      *dest++ = (char)unichar;
+      *dest++ = (cups_vbcs_t)unichar;
       continue;
     }
 
@@ -875,10 +873,10 @@ conv_utf8_to_vbcs(
       if (maxout < 5)
         return (-1);
 
-      *dest++ = (char)(legchar >> 24);
-      *dest++ = (char)(legchar >> 16);
-      *dest++ = (char)(legchar >> 8);
-      *dest++ = (char)legchar;
+      *dest++ = (cups_sbcs_t)(legchar >> 24);
+      *dest++ = (cups_sbcs_t)(legchar >> 16);
+      *dest++ = (cups_sbcs_t)(legchar >> 8);
+      *dest++ = (cups_sbcs_t)legchar;
 
       maxout -= 3;
     }
@@ -887,16 +885,16 @@ conv_utf8_to_vbcs(
       if (maxout < 4)
         return (-1);
 
-      *dest++ = (char)(legchar >> 16);
-      *dest++ = (char)(legchar >> 8);
-      *dest++ = (char)legchar;
+      *dest++ = (cups_sbcs_t)(legchar >> 16);
+      *dest++ = (cups_sbcs_t)(legchar >> 8);
+      *dest++ = (cups_sbcs_t)legchar;
 
       maxout -= 2;
     }
     else if (legchar > 0xff)
     {
-      *dest++ = (char)(legchar >> 8);
-      *dest++ = (char)legchar;
+      *dest++ = (cups_sbcs_t)(legchar >> 8);
+      *dest++ = (cups_sbcs_t)legchar;
 
       maxout --;
     }
@@ -917,7 +915,7 @@ conv_utf8_to_vbcs(
 static int				/* O - Count or -1 on error */
 conv_vbcs_to_utf8(
     cups_utf8_t           *dest,	/* O - Target string */
-    const char            *src,		/* I - Source string */
+    const cups_sbcs_t     *src,		/* I - Source string */
     int                   maxout,	/* I - Max output */
     const cups_encoding_t encoding)	/* I - Encoding */
 {
@@ -944,7 +942,7 @@ conv_vbcs_to_utf8(
   work[0] = 0xfeff;
   for (workptr = work + 1; *src && workptr < (work + CUPS_MAX_USTRING - 1);)
   {
-    legchar  = *src++ & 255;
+    legchar  = *src++;
     leadchar = (cups_sbcs_t)legchar;
 
    /*
@@ -966,7 +964,7 @@ conv_vbcs_to_utf8(
       if (!*src)
 	return (-1);
 
-      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
+      legchar = (legchar << 8) | *src++;
   
      /*
       * Convert unknown character to Replacement Character...
@@ -992,17 +990,17 @@ conv_vbcs_to_utf8(
       if (!*src || !src[1])
 	return (-1);
 
-      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
-      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
+      legchar = (legchar << 8) | *src++;
+      legchar = (legchar << 8) | *src++;
     }
     else if (vmap->lead4char[(int)leadchar] == leadchar)
     {
       if (!*src || !src[1] || !src[2])
 	return (-1);
 
-      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
-      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
-      legchar = (legchar << 8) | (cups_vbcs_t)(*src++ & 255);
+      legchar = (legchar << 8) | *src++;
+      legchar = (legchar << 8) | *src++;
+      legchar = (legchar << 8) | *src++;
     }
     else
       return (-1);
@@ -1143,6 +1141,7 @@ get_sbcs_charmap(
     if (cmap->encoding == encoding)
     {
       cmap->used ++;
+      DEBUG_printf(("    returning existing cmap=%p\n", cmap));
       return ((void *)cmap);
     }
   }
@@ -1161,6 +1160,7 @@ get_sbcs_charmap(
   if ((cmap = (_cups_cmap_t *)calloc(1, sizeof(_cups_cmap_t))) == NULL)
   {
     cupsFileClose(fp);
+    DEBUG_puts("    Unable to allocate memory!");
     return (NULL);
   }
 
@@ -1231,6 +1231,8 @@ get_sbcs_charmap(
   cmap->next     = cg->cmap_cache;
   cg->cmap_cache = cmap;
 
+  DEBUG_printf(("    returning new cmap=%p\n", cmap));
+
   return (cmap);
 
  /*
@@ -1242,6 +1244,8 @@ get_sbcs_charmap(
   free_sbcs_charmap(cmap);
 
   cupsFileClose(fp);
+
+  DEBUG_puts("    Error, returning NULL!");
 
   return (NULL);
 }
@@ -1284,6 +1288,7 @@ get_vbcs_charmap(
     if (vmap->encoding == encoding)
     {
       vmap->used ++;
+      DEBUG_printf(("    returning existing vmap=%p\n", vmap));
       return ((void *)vmap);
     }
   }
@@ -1293,14 +1298,20 @@ get_vbcs_charmap(
   */
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  {
+    DEBUG_printf(("    Unable to open file: %s\n", strerror(errno)));
     return (NULL);
+  }
 
  /*
   * Count lines in charmap file...
   */
 
   if ((mapcount = get_charmap_count(fp)) <= 0)
+  {
+    DEBUG_puts("    Unable to get charmap count!");
     return (NULL);
+  }
 
   DEBUG_printf(("    mapcount=%d\n", mapcount));
 
@@ -1311,6 +1322,7 @@ get_vbcs_charmap(
   if ((vmap = (_cups_vmap_t *)calloc(1, sizeof(_cups_vmap_t))) == NULL)
   {
     cupsFileClose(fp);
+    DEBUG_puts("    Unable to allocate memory!");
     return (NULL);
   }
 
@@ -1344,8 +1356,8 @@ get_vbcs_charmap(
 
     i ++;
 
-    DEBUG_printf(("    i=%d, legchar=0x%08lx, unichar=0x%04x\n", i,
-                  legchar, (unsigned)unichar));
+/*    DEBUG_printf(("    i=%d, legchar=0x%08lx, unichar=0x%04x\n", i,
+                  legchar, (unsigned)unichar)); */
 
    /*
     * Save lead char of 2/3/4-byte legacy char...
@@ -1456,6 +1468,8 @@ get_vbcs_charmap(
   vmap->next     = cg->vmap_cache;
   cg->vmap_cache = vmap;
 
+  DEBUG_printf(("    returning new vmap=%p\n", vmap));
+
   return (vmap);
 
  /*
@@ -1467,6 +1481,8 @@ get_vbcs_charmap(
   free_vbcs_charmap(vmap);
 
   cupsFileClose(fp);
+
+  DEBUG_puts("    Error, returning NULL!");
 
   return (NULL);
 }
