@@ -150,6 +150,10 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   * Free all strings at the top level...
   */
 
+  if (!ppd->lang_encoding || strcasecmp(ppd->lang_encoding, "UTF-8"))
+    ppd_free(ppd->nickname);
+
+  ppd_free(ppd->lang_encoding);
   ppd_free(ppd->patches);
   ppd_free(ppd->jcl_begin);
   ppd_free(ppd->jcl_end);

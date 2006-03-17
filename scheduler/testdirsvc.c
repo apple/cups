@@ -129,6 +129,8 @@ main(int  argc,				/* I - Number of command-line arguments */
         interval = atoi(argv[i]);
       else
         usage();
+
+      continuous = 1;
     }
     else if (!strcmp(argv[i], "-l"))
     {
