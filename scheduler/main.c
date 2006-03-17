@@ -1136,7 +1136,12 @@ cupsdOpenPipe(int *fds)			/* O - Pipe file descriptors (2) */
   */
 
   if (pipe(fds))
+  {
+    fds[0] = -1;
+    fds[1] = -1;
+
     return (-1);
+  }
 
  /*
   * Set the "close on exec" flag on each end of the pipe...
@@ -1146,6 +1151,10 @@ cupsdOpenPipe(int *fds)			/* O - Pipe file descriptors (2) */
   {
     close(fds[0]);
     close(fds[1]);
+
+    fds[0] = -1;
+    fds[1] = -1;
+
     return (-1);
   }
 
@@ -1153,6 +1162,10 @@ cupsdOpenPipe(int *fds)			/* O - Pipe file descriptors (2) */
   {
     close(fds[0]);
     close(fds[1]);
+
+    fds[0] = -1;
+    fds[1] = -1;
+
     return (-1);
   }
 

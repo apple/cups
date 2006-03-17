@@ -2094,6 +2094,11 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   * Now create processes for all of the filters...
   */
 
+  filterfds[0][0] = -1;
+  filterfds[0][1] = -1;
+  filterfds[1][0] = -1;
+  filterfds[1][1] = -1;
+
   if (cupsdOpenPipe(statusfds))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create job status pipes - %s.",
@@ -2103,22 +2108,11 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
     cupsdAddPrinterHistory(printer);
 
-    cupsArrayDelete(filters);
-
     cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                   "Job canceled because the server could not create the job "
 		  "status pipes.");
 
-    if (remote_job)
-    {
-      for (i = 0; i < job->num_files; i ++)
-        free(argv[i + 6]);
-    }
-
-    free(argv);
-
-    cupsdCancelJob(job, 0);
-    return;
+    goto abort_job;
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartJob: statusfds = [ %d %d ]",
@@ -2135,7 +2129,6 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   memset(job->filters, 0, sizeof(job->filters));
 
   filterfds[1][0] = open("/dev/null", O_RDONLY);
-  filterfds[1][1] = -1;
 
   if (filterfds[1][0] < 0)
   {
@@ -2146,20 +2139,10 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
     cupsdAddPrinterHistory(printer);
 
-    cupsArrayDelete(filters);
+    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                  "Job canceled because the server could not open /dev/null.");
 
-    cupsdClosePipe(statusfds);
-
-    if (remote_job)
-    {
-      for (i = 0; i < job->num_files; i ++)
-        free(argv[i + 6]);
-    }
-
-    free(argv);
-
-    cupsdCancelJob(job, 0);
-    return;
+    goto abort_job;
   }
 
   fcntl(filterfds[1][0], F_SETFD, fcntl(filterfds[1][0], F_GETFD) | FD_CLOEXEC);
@@ -2188,25 +2171,11 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 		"Unable to create filter pipes - %s.", strerror(errno));
 	cupsdAddPrinterHistory(printer);
 
-	cupsArrayDelete(filters);
-
-	cupsdClosePipe(statusfds);
-	cupsdClosePipe(filterfds[!slot]);
-
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                       "Job canceled because the server could not create the "
 		      "filter pipes.");
 
-        if (remote_job)
-	{
-	  for (i = 0; i < job->num_files; i ++)
-            free(argv[i + 6]);
-	}
-
-	free(argv);
-
-	cupsdCancelJob(job, 0);
-	return;
+        goto abort_job;
       }
     }
     else
@@ -2224,25 +2193,11 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 		    "Unable to create backend pipes - %s.", strerror(errno));
 	    cupsdAddPrinterHistory(printer);
 
-	    cupsArrayDelete(filters);
-
-	    cupsdClosePipe(statusfds);
-	    cupsdClosePipe(filterfds[!slot]);
-
 	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                 	  "Job canceled because the server could not create "
 			  "the backend pipes.");
 
-            if (remote_job)
-	    {
-	      for (i = 0; i < job->num_files; i ++)
-        	free(argv[i + 6]);
-	    }
-
-	    free(argv);
-
-	    cupsdCancelJob(job, 0);
-	    return;
+            goto abort_job;
 	  }
 	}
 	else
@@ -2269,27 +2224,11 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 		     "Unable to open output file \"%s\" - %s.",
 	             printer->device_uri, strerror(errno));
 
-	    cupsdAddPrinterHistory(printer);
-
-	    cupsArrayDelete(filters);
-
-	    cupsdClosePipe(statusfds);
-	    cupsdClosePipe(filterfds[!slot]);
-
 	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                 	  "Job canceled because the server could not open the "
 			  "output file.");
 
-            if (remote_job)
-	    {
-	      for (i = 0; i < job->num_files; i ++)
-        	free(argv[i + 6]);
-	    }
-
-	    free(argv);
-
-	    cupsdCancelJob(job, 0);
-	    return;
+            goto abort_job;
 	  }
 
 	  fcntl(job->print_pipes[1], F_SETFD,
@@ -2330,33 +2269,13 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
                "Unable to start filter \"%s\" - %s.",
                filter->filter, strerror(errno));
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdStartJob: Closing filter pipes for slot %d "
-		      "[ %d %d ]...",
-                      slot, filterfds[slot][0], filterfds[slot][1]);
-
-      cupsdClosePipe(filterfds[slot]);
-
-      cupsdAddPrinterHistory(printer);
-
-      cupsArrayDelete(filters);
-
       cupsdAddPrinterHistory(printer);
 
       cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                     "Job canceled because the server could not execute a "
 		    "filter.");
 
-      if (remote_job)
-      {
-	for (i = 0; i < job->num_files; i ++)
-          free(argv[i + 6]);
-      }
-
-      free(argv);
-
-      cupsdCancelJob(job, 0);
-      return;
+      goto abort_job;
     }
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Started filter %s (PID %d) for job %d.",
@@ -2404,28 +2323,10 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
 	cupsdAddPrinterHistory(printer);
 
-	cupsdClosePipe(statusfds);
-
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                	"cupsdStartJob: Closing filter pipes for slot %d "
-			"[ %d %d ]...",
-                	!slot, filterfds[!slot][0], filterfds[!slot][1]);
-
-	cupsdClosePipe(filterfds[!slot]);
-
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                       "Job canceled because the server could not open a file.");
 
-        if (remote_job)
-	{
-	  for (i = 0; i < job->num_files; i ++)
-            free(argv[i + 6]);
-	}
-
-	free(argv);
-
-	cupsdCancelJob(job, 0);
-	return;
+        goto abort_job;
       }
 
       fcntl(filterfds[slot][1], F_SETFD,
@@ -2450,27 +2351,11 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
         	 "Unable to start backend \"%s\" - %s.", method,
 		 strerror(errno));
 
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                	"cupsdStartJob: Closing filter pipes for slot %d "
-			"[ %d %d ]...",
-                	!slot, filterfds[!slot][0], filterfds[!slot][1]);
-
-	cupsdClosePipe(filterfds[!slot]);
-
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
                       "Job canceled because the server could not execute "
 		      "the backend.");
 
-        if (remote_job)
-	{
-	  for (i = 0; i < job->num_files; i ++)
-            free(argv[i + 6]);
-	}
-
-	free(argv);
-
-        cupsdCancelJob(job, 0);
-	return;
+        goto abort_job;
       }
       else
       {
@@ -2517,6 +2402,15 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
     }
   }
 
+  for (slot = 0; slot < 2; slot ++)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdStartJob: Closing filter pipes for slot %d "
+		    "[ %d %d ]...",
+                    slot, filterfds[slot][0], filterfds[slot][1]);
+    cupsdClosePipe(filterfds[slot]);
+  }
+
   if (remote_job)
   {
     for (i = 0; i < job->num_files; i ++)
@@ -2524,13 +2418,6 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
   }
 
   free(argv);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStartJob: Closing filter pipes for slot %d "
-		  "[ %d %d ]...",
-                  slot, filterfds[slot][0], filterfds[slot][1]);
-
-  cupsdClosePipe(filterfds[slot]);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdStartJob: Closing status output pipe %d...",
@@ -2546,6 +2433,42 @@ cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
                 job->id);
+
+  return;
+
+
+ /*
+  * If we get here, we need to abort the current job and close out all
+  * files and pipes...
+  */
+
+  abort_job:
+
+  for (slot = 0; slot < 2; slot ++)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdStartJob: Closing filter pipes for slot %d "
+		    "[ %d %d ]...",
+                    slot, filterfds[slot][0], filterfds[slot][1]);
+    cupsdClosePipe(filterfds[slot]);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdStartJob: Closing status pipes [ %d %d ]...",
+                  statusfds[0], statusfds[1]);
+  cupsdClosePipe(statusfds);
+
+  cupsArrayDelete(filters);
+
+  if (remote_job)
+  {
+    for (i = 0; i < job->num_files; i ++)
+      free(argv[i + 6]);
+  }
+
+  free(argv);
+
+  cupsdStopJob(job, 0);
 }
 
 
