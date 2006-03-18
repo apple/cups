@@ -3,6 +3,7 @@ CHANGES.txt - 2006-03-17
 
 CHANGES IN CUPS V1.2rc1
 
+	- Fixed a minor memory leak in the PPD API.
 	- Fixed transcoding issues (STR #1493)
 	- The scheduler now enforces a minimum job cost of 100
 	  when doing FilterLimit checks.

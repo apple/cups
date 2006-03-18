@@ -150,10 +150,8 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   * Free all strings at the top level...
   */
 
-  if (!ppd->lang_encoding || strcasecmp(ppd->lang_encoding, "UTF-8"))
-    ppd_free(ppd->nickname);
-
   ppd_free(ppd->lang_encoding);
+  ppd_free(ppd->nickname);
   ppd_free(ppd->patches);
   ppd_free(ppd->jcl_begin);
   ppd_free(ppd->jcl_end);
@@ -746,7 +744,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	ppd->nickname = strdup((char *)utf8);
       }
       else
-        ppd->nickname = string;
+        ppd->nickname = strdup(string);
     }
     else if (!strcmp(keyword, "Product"))
       ppd->product = string;
