@@ -14,13 +14,10 @@ if test ! -f tools/makesrcdist; then
         exit 1
 fi
 
-svn up
-svnrev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
-serial=`expr 102000000 + $svnrev`
-
 if test $# = 0; then
 	echo Updating for snapshot...
-	rev=$svnrev
+	svn up
+	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
 	version="1.2svn"
 	revision="-r$rev"
 	fileversion="1.2svn-r$rev"
@@ -63,18 +60,18 @@ cd ..
 
 echo -n Archiving...gz
 sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
-	-e '1,$s/@CUPS_SERIAL@/'$serial'/' \
 	-e '1,$s/^Release:.*/Release: '$rev'/' \
 	-e '1,$s/^Source:.*/Source: '$fileurl'gz/' \
-	<packaging/cups.spec.in >packaging/cups.spec
+	<cups-$version/packaging/cups.spec.in \
+	>cups-$version/packaging/cups.spec
 tar czf cups-$fileversion-source.tar.gz cups-$version
 
 echo -n ...bz2
 sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
-	-e '1,$s/@CUPS_SERIAL@/'$serial'/' \
 	-e '1,$s/^Release:.*/Release: '$rev'/' \
 	-e '1,$s/^Source:.*/Source: '$fileurl'bz2/' \
-	<packaging/cups.spec.in >packaging/cups.spec
+	<cups-$version/packaging/cups.spec.in \
+	>cups-$version/packaging/cups.spec
 tar cjf cups-$fileversion-source.tar.bz2 cups-$version
 echo "..."
 
