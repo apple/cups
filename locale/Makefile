@@ -24,12 +24,6 @@
 
 include ../Makedefs
 
-#
-# Locales...
-#
-
-LANGUAGES	=	es ja
-
 
 #
 # Make everything...
