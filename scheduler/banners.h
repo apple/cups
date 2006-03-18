@@ -45,9 +45,7 @@ VAR cups_array_t	*Banners	VALUE(NULL);
  * Prototypes...
  */
 
-extern void		cupsdAddBanner(const char *name, const char *filename);
 extern cupsd_banner_t	*cupsdFindBanner(const char *name);
-extern void		cupsdFreeBanners(void);
 extern void		cupsdLoadBanners(const char *d);
 
 

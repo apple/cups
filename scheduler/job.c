@@ -47,11 +47,9 @@
  *   cupsdSetJobHoldUntil()     - Set the hold time for a job...
  *   cupsdSetJobPriority()      - Set the priority of a job, moving it
  *                                up/down in the list as needed.
- *   cupsdStartJob()            - Start a print job.
  *   cupsdStopAllJobs()         - Stop all print jobs.
  *   cupsdStopJob()             - Stop a print job.
  *   cupsdUnloadCompletedJobs() - Flush completed job history from memory.
- *   cupsdUnloadJob()           - Unload a job from memory.
  *   cupsdUpdateJob()           - Read a status update from a jobs filters.
  *   compare_active_jobs()      - Compare the job IDs and priorities of two
  *                                jobs.
@@ -66,6 +64,8 @@
  *   set_time()                 - Set one of the "time-at-xyz" attributes...
  *   set_hold_until()           - Set the hold time and update job-hold-until
  *                                attribute...
+ *   start_job()                - Start a print job.
+ *   unload_job()               - Unload a job from memory.
  */
 
 /*
@@ -104,6 +104,8 @@ static void	load_next_job_id(const char *filename);
 static void	load_request_root(void);
 static void	set_time(cupsd_job_t *job, const char *name);
 static void	set_hold_until(cupsd_job_t *job, time_t holdtime);
+static void	start_job(cupsd_job_t *job, cupsd_printer_t *printer);
+static void	unload_job(cupsd_job_t *job);
 
 
 /*
@@ -387,7 +389,7 @@ cupsdCheckJobs(void)
         if (printer->state == IPP_PRINTER_IDLE ||	/* Printer is idle */
 	    ((printer->type & CUPS_PRINTER_REMOTE) &&	/* Printer is remote */
 	     !printer->job))				/* and not printing */
-	  cupsdStartJob(job, printer);
+	  start_job(job, printer);
       }
     }
   }
@@ -593,7 +595,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
       */
 
       FilterLevel -= job->cost;
-      cupsdStartJob(job, printer);
+      start_job(job, printer);
     }
     else
     {
@@ -1431,1048 +1433,6 @@ cupsdSetJobPriority(
 
 
 /*
- * 'cupsdStartJob()' - Start a print job.
- */
-
-void
-cupsdStartJob(cupsd_job_t     *job,	/* I - Job ID */
-              cupsd_printer_t *printer)	/* I - Printer to print job */
-{
-  int			i;		/* Looping var */
-  int			slot;		/* Pipe slot */
-  cups_array_t		*filters;	/* Filters for job */
-  mime_filter_t		*filter,	/* Current filter */
-			port_monitor;	/* Port monitor filter */
-  char			method[255],	/* Method for output */
-			*optptr,	/* Pointer to options */
-			*valptr;	/* Pointer in value string */
-  ipp_attribute_t	*attr;		/* Current attribute */
-  struct stat		backinfo;	/* Backend file information */
-  int			backroot;	/* Run backend as root? */
-  int			pid;		/* Process ID of new filter process */
-  int			banner_page;	/* 1 if banner page, 0 otherwise */
-  int			statusfds[2],	/* Pipes used with the scheduler */
-			filterfds[2][2];/* Pipes used between filters */
-  int			envc;		/* Number of environment variables */
-  char			**argv,		/* Filter command-line arguments */
-			sani_uri[1024],	/* Sanitized DEVICE_URI env var */
-			filename[1024],	/* Job filename */
-			command[1024],	/* Full path to command */
-			jobid[255],	/* Job ID string */
-			title[IPP_MAX_NAME],
-					/* Job title string */
-			copies[255],	/* # copies string */
-			*envp[MAX_ENV + 11],
-					/* Environment variables */
-			charset[255],	/* CHARSET env variable */
-			class_name[255],/* CLASS env variable */
-			classification[1024],
-					/* CLASSIFICATION env variable */
-			content_type[1024],
-					/* CONTENT_TYPE env variable */
-			device_uri[1024],
-					/* DEVICE_URI env variable */
-			final_content_type[1024],
-					/* FINAL_CONTENT_TYPE env variable */
-			lang[255],	/* LANG env variable */
-			ppd[1024],	/* PPD env variable */
-			printer_name[255],
-					/* PRINTER env variable */
-			rip_max_cache[255];
-					/* RIP_MAX_CACHE env variable */
-  int			remote_job;	/* Remote print job? */
-  static char		*options = NULL;/* Full list of options */
-  static int		optlength = 0;	/* Length of option buffer */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartJob: id = %d, file = %d/%d",
-                  job->id, job->current_file, job->num_files);
-
-  if (job->num_files == 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Job ID %d has no files!  Cancelling it!",
-                    job->id);
-
-    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                  "Job canceled because it has no files.");
-
-    cupsdCancelJob(job, 0);
-    return;
-  }
-
- /*
-  * Figure out what filters are required to convert from
-  * the source to the destination type...
-  */
-
-  filters   = NULL;
-  job->cost = 0;
-
-  if (printer->raw)
-  {
-   /*
-    * Remote jobs and raw queues go directly to the printer without
-    * filtering...
-    */
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "[Job %d] Sending job to queue tagged as raw...", job->id);
-
-    filters = NULL;
-  }
-  else
-  {
-   /*
-    * Local jobs get filtered...
-    */
-
-    filters = mimeFilter(MimeDatabase, job->filetypes[job->current_file],
-                         printer->filetype, &(job->cost));
-
-    if (!filters)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to convert file %d to printable format for "
-		      "job %d!",
-	              job->current_file, job->id);
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "Hint: Do you have ESP Ghostscript installed?");
-
-      if (LogLevel < CUPSD_LOG_DEBUG)
-        cupsdLogMessage(CUPSD_LOG_INFO,
-	                "Hint: Try setting the LogLevel to \"debug\".");
-
-      job->current_file ++;
-
-      if (job->current_file == job->num_files)
-      {
-	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job canceled because it has no files that can be "
-		      "printed.");
-
-        cupsdCancelJob(job, 0);
-      }
-
-      return;
-    }
-
-   /*
-    * Remove NULL ("-") filters...
-    */
-
-    for (filter = (mime_filter_t *)cupsArrayFirst(filters);
-         filter;
-	 filter = (mime_filter_t *)cupsArrayNext(filters))
-      if (!strcmp(filter->filter, "-"))
-        cupsArrayRemove(filters, filter);
-
-    if (cupsArrayCount(filters) == 0)
-    {
-      cupsArrayDelete(filters);
-      filters = NULL;
-    }
-  }
-
- /*
-  * Set a minimum cost of 100 for all jobs so that FilterLimit
-  * works with raw queues and other low-cost paths.
-  */
-
-  if (job->cost < 100)
-    job->cost = 100;
-
- /*
-  * See if the filter cost is too high...
-  */
-
-  if ((FilterLevel + job->cost) > FilterLimit && FilterLevel > 0 &&
-      FilterLimit > 0)
-  {
-   /*
-    * Don't print this job quite yet...
-    */
-
-    cupsArrayDelete(filters);
-
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "Holding job %d because filter limit has been reached.",
-                    job->id);
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStartJob: id=%d, file=%d, cost=%d, level=%d, "
-		    "limit=%d",
-                    job->id, job->current_file, job->cost, FilterLevel,
-		    FilterLimit);
-    return;
-  }
-
-  FilterLevel += job->cost;
-
- /*
-  * Determine if we are printing to a remote printer...
-  */
-
-  remote_job = printer->raw && job->num_files > 1 &&
-               !strncmp(printer->device_uri, "ipp://", 6);
-
- /*
-  * Add decompression filters, if any...
-  */
-
-  if (!remote_job && job->compressions[job->current_file])
-  {
-   /*
-    * Add gziptoany filter to the front of the list...
-    */
-
-    if (!cupsArrayInsert(filters, &gziptoany_filter))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to add decompression filter - %s",
-		      strerror(errno));
-
-      cupsArrayDelete(filters);
-
-      job->current_file ++;
-
-      if (job->current_file == job->num_files)
-      {
-	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job canceled because the print file could not be "
-		      "decompressed.");
-
-        cupsdCancelJob(job, 0);
-      }
-
-      return;
-    }
-  }
-
- /*
-  * Add port monitor, if any...
-  */
-
-  if (printer->port_monitor)
-  {
-   /*
-    * Add port monitor to the end of the list...
-    */
-
-    if (!cupsArrayAdd(filters, &port_monitor))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to add port monitor - %s",
-                      strerror(errno));
-
-      cupsArrayDelete(filters);
-
-      job->current_file ++;
-
-      if (job->current_file == job->num_files)
-      {
-	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job canceled because the port monitor could not be "
-		      "added.");
-
-        cupsdCancelJob(job, 0);
-      }
-
-      return;
-    }
-
-    snprintf(port_monitor.filter, sizeof(port_monitor.filter),
-             "%s/monitor/%s", ServerBin, printer->port_monitor);
-  }
-
- /*
-  * Update the printer and job state to "processing"...
-  */
-
-  job->state->values[0].integer = IPP_JOB_PROCESSING;
-  job->state_value              = IPP_JOB_PROCESSING;
-  job->status  = 0;
-  job->printer = printer;
-  printer->job = job;
-  cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
-
-  if (job->current_file == 0)
-  {
-    set_time(job, "time-at-processing");
-    cupsdOpenPipe(job->back_pipes);
-  }
-
- /*
-  * Determine if we are printing a banner page or not...
-  */
-
-  if (job->job_sheets == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "No job-sheets attribute.");
-    if ((job->job_sheets =
-         ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "... but someone added one without setting job_sheets!");
-  }
-  else if (job->job_sheets->num_values == 1)
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "job-sheets=%s",
-               job->job_sheets->values[0].string.text);
-  else
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "job-sheets=%s,%s",
-               job->job_sheets->values[0].string.text,
-               job->job_sheets->values[1].string.text);
-
-  if (printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
-    banner_page = 0;
-  else if (job->job_sheets == NULL)
-    banner_page = 0;
-  else if (strcasecmp(job->job_sheets->values[0].string.text, "none") != 0 &&
-	   job->current_file == 0)
-    banner_page = 1;
-  else if (job->job_sheets->num_values > 1 &&
-	   strcasecmp(job->job_sheets->values[1].string.text, "none") != 0 &&
-	   job->current_file == (job->num_files - 1))
-    banner_page = 1;
-  else
-    banner_page = 0;
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "banner_page = %d", banner_page);
-
- /*
-  * Building the options string is harder than it needs to be, but
-  * for the moment we need to pass strings for command-line args and
-  * not IPP attribute pointers... :)
-  *
-  * First allocate/reallocate the option buffer as needed...
-  */
-
-  i = ipp_length(job->attrs);
-
-  if (i > optlength)
-  {
-    if (optlength == 0)
-      optptr = malloc(i);
-    else
-      optptr = realloc(options, i);
-
-    if (optptr == NULL)
-    {
-      cupsdLogMessage(CUPSD_LOG_CRIT,
-                      "Unable to allocate %d bytes for option buffer for "
-		      "job %d!", i, job->id);
-
-      cupsArrayDelete(filters);
-
-      FilterLevel -= job->cost;
-
-      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                    "Job canceled because the server ran out of memory.");
-
-      cupsdCancelJob(job, 0);
-      return;
-    }
-
-    options   = optptr;
-    optlength = i;
-  }
-
- /*
-  * Now loop through the attributes and convert them to the textual
-  * representation used by the filters...
-  */
-
-  optptr  = options;
-  *optptr = '\0';
-
-  snprintf(title, sizeof(title), "%s-%d", printer->name, job->id);
-  strcpy(copies, "1");
-
-  for (attr = job->attrs->attrs; attr != NULL; attr = attr->next)
-  {
-    if (!strcmp(attr->name, "copies") &&
-	attr->value_tag == IPP_TAG_INTEGER)
-    {
-     /*
-      * Don't use the # copies attribute if we are printing the job sheets...
-      */
-
-      if (!banner_page)
-        sprintf(copies, "%d", attr->values[0].integer);
-    }
-    else if (!strcmp(attr->name, "job-name") &&
-	     (attr->value_tag == IPP_TAG_NAME ||
-	      attr->value_tag == IPP_TAG_NAMELANG))
-      strlcpy(title, attr->values[0].string.text, sizeof(title));
-    else if (attr->group_tag == IPP_TAG_JOB)
-    {
-     /*
-      * Filter out other unwanted attributes...
-      */
-
-      if (attr->value_tag == IPP_TAG_MIMETYPE ||
-	  attr->value_tag == IPP_TAG_NAMELANG ||
-	  attr->value_tag == IPP_TAG_TEXTLANG ||
-	  (attr->value_tag == IPP_TAG_URI && strcmp(attr->name, "job-uuid")) ||
-	  attr->value_tag == IPP_TAG_URISCHEME ||
-	  attr->value_tag == IPP_TAG_BEGIN_COLLECTION) /* Not yet supported */
-	continue;
-
-      if (!strncmp(attr->name, "time-", 5))
-	continue;
-
-      if (!strncmp(attr->name, "job-", 4) && strcmp(attr->name, "job-uuid") &&
-          !(printer->type & CUPS_PRINTER_REMOTE))
-	continue;
-
-      if (!strncmp(attr->name, "job-", 4) &&
-          strcmp(attr->name, "job-uuid") &&
-          strcmp(attr->name, "job-billing") &&
-          strcmp(attr->name, "job-sheets") &&
-          strcmp(attr->name, "job-hold-until") &&
-	  strcmp(attr->name, "job-priority"))
-	continue;
-
-      if ((!strcmp(attr->name, "page-label") ||
-           !strcmp(attr->name, "page-border") ||
-           !strncmp(attr->name, "number-up", 9) ||
-	   !strcmp(attr->name, "page-set") ||
-	   !strcasecmp(attr->name, "AP_FIRSTPAGE_InputSlot") ||
-	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed")) &&
-	  banner_page)
-        continue;
-
-     /*
-      * Otherwise add them to the list...
-      */
-
-      if (optptr > options)
-	strlcat(optptr, " ", optlength - (optptr - options));
-
-      if (attr->value_tag != IPP_TAG_BOOLEAN)
-      {
-	strlcat(optptr, attr->name, optlength - (optptr - options));
-	strlcat(optptr, "=", optlength - (optptr - options));
-      }
-
-      for (i = 0; i < attr->num_values; i ++)
-      {
-	if (i)
-	  strlcat(optptr, ",", optlength - (optptr - options));
-
-	optptr += strlen(optptr);
-
-	switch (attr->value_tag)
-	{
-	  case IPP_TAG_INTEGER :
-	  case IPP_TAG_ENUM :
-	      snprintf(optptr, optlength - (optptr - options),
-	               "%d", attr->values[i].integer);
-	      break;
-
-	  case IPP_TAG_BOOLEAN :
-	      if (!attr->values[i].boolean)
-		strlcat(optptr, "no", optlength - (optptr - options));
-
-	  case IPP_TAG_NOVALUE :
-	      strlcat(optptr, attr->name,
-	              optlength - (optptr - options));
-	      break;
-
-	  case IPP_TAG_RANGE :
-	      if (attr->values[i].range.lower == attr->values[i].range.upper)
-		snprintf(optptr, optlength - (optptr - options) - 1,
-	        	 "%d", attr->values[i].range.lower);
-              else
-		snprintf(optptr, optlength - (optptr - options) - 1,
-	        	 "%d-%d", attr->values[i].range.lower,
-			 attr->values[i].range.upper);
-	      break;
-
-	  case IPP_TAG_RESOLUTION :
-	      snprintf(optptr, optlength - (optptr - options) - 1,
-	               "%dx%d%s", attr->values[i].resolution.xres,
-		       attr->values[i].resolution.yres,
-		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			   "dpi" : "dpc");
-	      break;
-
-          case IPP_TAG_STRING :
-	  case IPP_TAG_TEXT :
-	  case IPP_TAG_NAME :
-	  case IPP_TAG_KEYWORD :
-	  case IPP_TAG_CHARSET :
-	  case IPP_TAG_LANGUAGE :
-	  case IPP_TAG_URI :
-	      for (valptr = attr->values[i].string.text; *valptr;)
-	      {
-	        if (strchr(" \t\n\\\'\"", *valptr))
-		  *optptr++ = '\\';
-		*optptr++ = *valptr++;
-	      }
-
-	      *optptr = '\0';
-	      break;
-
-          default :
-	      break; /* anti-compiler-warning-code */
-	}
-      }
-
-      optptr += strlen(optptr);
-    }
-  }
-
- /*
-  * Build the command-line arguments for the filters.  Each filter
-  * has 6 or 7 arguments:
-  *
-  *     argv[0] = printer
-  *     argv[1] = job ID
-  *     argv[2] = username
-  *     argv[3] = title
-  *     argv[4] = # copies
-  *     argv[5] = options
-  *     argv[6] = filename (optional; normally stdin)
-  *
-  * This allows legacy printer drivers that use the old System V
-  * printing interface to be used by CUPS.
-  *
-  * For remote jobs, we send all of the files in the argument list.
-  */
-
-  if (remote_job)
-    argv = calloc(7 + job->num_files, sizeof(char *));
-  else
-    argv = calloc(8, sizeof(char *));
-
-  sprintf(jobid, "%d", job->id);
-
-  argv[0] = printer->name;
-  argv[1] = jobid;
-  argv[2] = job->username;
-  argv[3] = title;
-  argv[4] = copies;
-  argv[5] = options;
-
-  if (remote_job)
-  {
-    for (i = 0; i < job->num_files; i ++)
-    {
-      snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
-               job->id, i + 1);
-      argv[6 + i] = strdup(filename);
-    }
-  }
-  else
-  {
-    snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
-             job->id, job->current_file + 1);
-    argv[6] = filename;
-  }
-
-  for (i = 0; argv[i]; i ++)
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "[Job %d] argv[%d]=\"%s\"", job->id, i, argv[i]);
-
- /*
-  * Create environment variable strings for the filters...
-  */
-
-  attr = ippFindAttribute(job->attrs, "attributes-natural-language",
-                          IPP_TAG_LANGUAGE);
-
-  switch (strlen(attr->values[0].string.text))
-  {
-    default :
-       /*
-        * This is an unknown or badly formatted language code; use
-	* the POSIX locale...
-	*/
-
-	strcpy(lang, "LANG=C");
-	break;
-
-    case 2 :
-       /*
-        * Just the language code (ll)...
-	*/
-
-        snprintf(lang, sizeof(lang), "LANG=%s",
-	         attr->values[0].string.text);
-        break;
-
-    case 5 :
-       /*
-        * Language and country code (ll-cc)...
-	*/
-
-        snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c",
-	         attr->values[0].string.text[0],
-		 attr->values[0].string.text[1],
-		 toupper(attr->values[0].string.text[3] & 255),
-		 toupper(attr->values[0].string.text[4] & 255));
-        break;
-  }
-
-  attr = ippFindAttribute(job->attrs, "document-format",
-                          IPP_TAG_MIMETYPE);
-  if (attr != NULL &&
-      (optptr = strstr(attr->values[0].string.text, "charset=")) != NULL)
-    snprintf(charset, sizeof(charset), "CHARSET=%s", optptr + 8);
-  else
-  {
-    attr = ippFindAttribute(job->attrs, "attributes-charset",
-	                    IPP_TAG_CHARSET);
-    snprintf(charset, sizeof(charset), "CHARSET=%s",
-             attr->values[0].string.text);
-  }
-
-  snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s/%s",
-           job->filetypes[job->current_file]->super,
-           job->filetypes[job->current_file]->type);
-  snprintf(device_uri, sizeof(device_uri), "DEVICE_URI=%s",
-           printer->device_uri);
-  cupsdSanitizeURI(printer->device_uri, sani_uri, sizeof(sani_uri));
-  snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
-  snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
-  snprintf(rip_max_cache, sizeof(rip_max_cache), "RIP_MAX_CACHE=%s", RIPCache);
-
-  envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
-
-  envp[envc ++] = charset;
-  envp[envc ++] = lang;
-  envp[envc ++] = ppd;
-  envp[envc ++] = rip_max_cache;
-  envp[envc ++] = content_type;
-  envp[envc ++] = device_uri;
-  envp[envc ++] = printer_name;
-
-  if ((filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
-  {
-    snprintf(final_content_type, sizeof(final_content_type),
-             "FINAL_CONTENT_TYPE=%s/%s",
-	     filter->dst->super, filter->dst->type);
-    envp[envc ++] = final_content_type;
-  }
-
-  if (Classification && !banner_page)
-  {
-    if ((attr = ippFindAttribute(job->attrs, "job-sheets",
-                                 IPP_TAG_NAME)) == NULL)
-      snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
-               Classification);
-    else if (attr->num_values > 1 &&
-             strcmp(attr->values[1].string.text, "none") != 0)
-      snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
-               attr->values[1].string.text);
-    else
-      snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
-               attr->values[0].string.text);
-
-    envp[envc ++] = classification;
-  }
-
-  if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
-  {
-    snprintf(class_name, sizeof(class_name), "CLASS=%s", job->dest);
-    envp[envc ++] = class_name;
-  }
-
-  envp[envc] = NULL;
-
-  for (i = 0; i < envc; i ++)
-    if (strncmp(envp[i], "DEVICE_URI=", 11))
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"%s\"",
-                      job->id, i, envp[i]);
-    else
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"DEVICE_URI=%s\"",
-                      job->id, i, sani_uri);
-
-  if (remote_job)
-    job->current_file = job->num_files;
-  else
-    job->current_file ++;
-
- /*
-  * Now create processes for all of the filters...
-  */
-
-  filterfds[0][0] = -1;
-  filterfds[0][1] = -1;
-  filterfds[1][0] = -1;
-  filterfds[1][1] = -1;
-
-  if (cupsdOpenPipe(statusfds))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create job status pipes - %s.",
-	            strerror(errno));
-    snprintf(printer->state_message, sizeof(printer->state_message),
-             "Unable to create status pipes - %s.", strerror(errno));
-
-    cupsdAddPrinterHistory(printer);
-
-    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                  "Job canceled because the server could not create the job "
-		  "status pipes.");
-
-    goto abort_job;
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartJob: statusfds = [ %d %d ]",
-                  statusfds[0], statusfds[1]);
-
-#ifdef FD_CLOEXEC
-  fcntl(statusfds[0], F_SETFD, FD_CLOEXEC);
-  fcntl(statusfds[1], F_SETFD, FD_CLOEXEC);
-#endif /* FD_CLOEXEC */
-
-  job->status_buffer = cupsdStatBufNew(statusfds[0], "[Job %d]",
-                                           job->id);
-  job->status        = 0;
-  memset(job->filters, 0, sizeof(job->filters));
-
-  filterfds[1][0] = open("/dev/null", O_RDONLY);
-
-  if (filterfds[1][0] < 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open \"/dev/null\" - %s.",
-                    strerror(errno));
-    snprintf(printer->state_message, sizeof(printer->state_message),
-             "Unable to open \"/dev/null\" - %s.", strerror(errno));
-
-    cupsdAddPrinterHistory(printer);
-
-    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                  "Job canceled because the server could not open /dev/null.");
-
-    goto abort_job;
-  }
-
-  fcntl(filterfds[1][0], F_SETFD, fcntl(filterfds[1][0], F_GETFD) | FD_CLOEXEC);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartJob: filterfds[%d] = [ %d %d ]",
-                  1, filterfds[1][0], filterfds[1][1]);
-
-  for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
-       filter;
-       i ++, filter = (mime_filter_t *)cupsArrayNext(filters))
-  {
-    if (filter->filter[0] != '/')
-      snprintf(command, sizeof(command), "%s/filter/%s", ServerBin,
-               filter->filter);
-    else
-      strlcpy(command, filter->filter, sizeof(command));
-
-    if (i < (cupsArrayCount(filters) - 1))
-    {
-      if (cupsdOpenPipe(filterfds[slot]))
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to create job filter pipes - %s.",
-		        strerror(errno));
-	snprintf(printer->state_message, sizeof(printer->state_message),
-		"Unable to create filter pipes - %s.", strerror(errno));
-	cupsdAddPrinterHistory(printer);
-
-	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job canceled because the server could not create the "
-		      "filter pipes.");
-
-        goto abort_job;
-      }
-    }
-    else
-    {
-      if (job->current_file == 1)
-      {
-	if (strncmp(printer->device_uri, "file:", 5) != 0)
-	{
-	  if (cupsdOpenPipe(job->print_pipes))
-	  {
-	    cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "Unable to create job backend pipes - %s.",
-		            strerror(errno));
-	    snprintf(printer->state_message, sizeof(printer->state_message),
-		    "Unable to create backend pipes - %s.", strerror(errno));
-	    cupsdAddPrinterHistory(printer);
-
-	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                	  "Job canceled because the server could not create "
-			  "the backend pipes.");
-
-            goto abort_job;
-	  }
-	}
-	else
-	{
-	  job->print_pipes[0] = -1;
-	  if (!strncmp(printer->device_uri, "file:/dev/", 10) &&
-	      strcmp(printer->device_uri, "file:/dev/null"))
-	    job->print_pipes[1] = open(printer->device_uri + 5,
-	                               O_WRONLY | O_EXCL);
-	  else if (!strncmp(printer->device_uri, "file:///dev/", 12) &&
-	           strcmp(printer->device_uri, "file:///dev/null"))
-	    job->print_pipes[1] = open(printer->device_uri + 7,
-	                               O_WRONLY | O_EXCL);
-	  else
-	    job->print_pipes[1] = open(printer->device_uri + 5,
-	                               O_WRONLY | O_CREAT | O_TRUNC, 0600);
-
-	  if (job->print_pipes[1] < 0)
-	  {
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "Unable to open output file \"%s\" - %s.",
-	                    printer->device_uri, strerror(errno));
-            snprintf(printer->state_message, sizeof(printer->state_message),
-		     "Unable to open output file \"%s\" - %s.",
-	             printer->device_uri, strerror(errno));
-
-	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                	  "Job canceled because the server could not open the "
-			  "output file.");
-
-            goto abort_job;
-	  }
-
-	  fcntl(job->print_pipes[1], F_SETFD,
-        	fcntl(job->print_pipes[1], F_GETFD) | FD_CLOEXEC);
-	}
-
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                "cupsdStartJob: print_pipes = [ %d %d ]",
-                        job->print_pipes[0], job->print_pipes[1]);
-      }
-
-      filterfds[slot][0] = job->print_pipes[0];
-      filterfds[slot][1] = job->print_pipes[1];
-    }
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartJob: filter=\"%s\"",
-                    command);
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStartJob: filterfds[%d]=[ %d %d ]",
-                    slot, filterfds[slot][0], filterfds[slot][1]);
-
-    pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
-                            filterfds[slot][1], statusfds[1],
-		            job->back_pipes[0], 0, job->filters + i);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStartJob: Closing filter pipes for slot %d "
-		    "[ %d %d ]...",
-                    !slot, filterfds[!slot][0], filterfds[!slot][1]);
-
-    cupsdClosePipe(filterfds[!slot]);
-
-    if (pid == 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to start filter \"%s\" - %s.",
-                      filter->filter, strerror(errno));
-      snprintf(printer->state_message, sizeof(printer->state_message),
-               "Unable to start filter \"%s\" - %s.",
-               filter->filter, strerror(errno));
-
-      cupsdAddPrinterHistory(printer);
-
-      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                    "Job canceled because the server could not execute a "
-		    "filter.");
-
-      goto abort_job;
-    }
-
-    cupsdLogMessage(CUPSD_LOG_INFO, "Started filter %s (PID %d) for job %d.",
-                    command, pid, job->id);
-
-    argv[6] = NULL;
-    slot    = !slot;
-  }
-
-  cupsArrayDelete(filters);
-
- /*
-  * Finally, pipe the final output into a backend process if needed...
-  */
-
-  if (strncmp(printer->device_uri, "file:", 5) != 0)
-  {
-    if (job->current_file == 1)
-    {
-      sscanf(printer->device_uri, "%254[^:]", method);
-      snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
-
-     /*
-      * See if the backend needs to run as root...
-      */
-
-      if (RunUser)
-        backroot = 0;
-      else if (stat(command, &backinfo))
-	backroot = 0;
-      else
-        backroot = !(backinfo.st_mode & (S_IRWXG | S_IRWXO));
-
-      argv[0] = sani_uri;
-
-      filterfds[slot][0] = -1;
-      filterfds[slot][1] = open("/dev/null", O_WRONLY);
-
-      if (filterfds[slot][1] < 0)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open \"/dev/null\" - %s.",
-	                strerror(errno));
-	snprintf(printer->state_message, sizeof(printer->state_message),
-        	 "Unable to open \"/dev/null\" - %s.", strerror(errno));
-
-	cupsdAddPrinterHistory(printer);
-
-	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job canceled because the server could not open a file.");
-
-        goto abort_job;
-      }
-
-      fcntl(filterfds[slot][1], F_SETFD,
-            fcntl(filterfds[slot][1], F_GETFD) | FD_CLOEXEC);
-
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartJob: backend=\"%s\"",
-                      command);
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdStartJob: filterfds[%d] = [ %d %d ]",
-        	      slot, filterfds[slot][0], filterfds[slot][1]);
-
-      pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
-			      filterfds[slot][1], statusfds[1],
-			      job->back_pipes[1], backroot,
-			      &(job->backend));
-
-      if (pid == 0)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to start backend \"%s\" - %s.",
-                        method, strerror(errno));
-	snprintf(printer->state_message, sizeof(printer->state_message),
-        	 "Unable to start backend \"%s\" - %s.", method,
-		 strerror(errno));
-
-	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job canceled because the server could not execute "
-		      "the backend.");
-
-        goto abort_job;
-      }
-      else
-      {
-	cupsdLogMessage(CUPSD_LOG_INFO,
-	                "Started backend %s (PID %d) for job %d.",
-	                command, pid, job->id);
-      }
-    }
-
-    if (job->current_file == job->num_files)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdStartJob: Closing print pipes [ %d %d ]...",
-        	      job->print_pipes[0], job->print_pipes[1]);
-
-      cupsdClosePipe(job->print_pipes);
-
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdStartJob: Closing back pipes [ %d %d ]...",
-        	      job->back_pipes[0], job->back_pipes[1]);
-
-      cupsdClosePipe(job->back_pipes);
-    }
-  }
-  else
-  {
-    filterfds[slot][0] = -1;
-    filterfds[slot][1] = -1;
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStartJob: Closing filter pipes for slot %d "
-		    "[ %d %d ]...",
-                    !slot, filterfds[!slot][0], filterfds[!slot][1]);
-
-    cupsdClosePipe(filterfds[!slot]);
-
-    if (job->current_file == job->num_files)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdStartJob: Closing print pipes [ %d %d ]...",
-        	      job->print_pipes[0], job->print_pipes[1]);
-
-      cupsdClosePipe(job->print_pipes);
-    }
-  }
-
-  for (slot = 0; slot < 2; slot ++)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStartJob: Closing filter pipes for slot %d "
-		    "[ %d %d ]...",
-                    slot, filterfds[slot][0], filterfds[slot][1]);
-    cupsdClosePipe(filterfds[slot]);
-  }
-
-  if (remote_job)
-  {
-    for (i = 0; i < job->num_files; i ++)
-      free(argv[i + 6]);
-  }
-
-  free(argv);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStartJob: Closing status output pipe %d...",
-                  statusfds[1]);
-
-  close(statusfds[1]);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStartJob: Adding fd %d to InputSet...",
-                  job->status_buffer->fd);
-
-  FD_SET(job->status_buffer->fd, InputSet);
-
-  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
-                job->id);
-
-  return;
-
-
- /*
-  * If we get here, we need to abort the current job and close out all
-  * files and pipes...
-  */
-
-  abort_job:
-
-  for (slot = 0; slot < 2; slot ++)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStartJob: Closing filter pipes for slot %d "
-		    "[ %d %d ]...",
-                    slot, filterfds[slot][0], filterfds[slot][1]);
-    cupsdClosePipe(filterfds[slot]);
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStartJob: Closing status pipes [ %d %d ]...",
-                  statusfds[0], statusfds[1]);
-  cupsdClosePipe(statusfds);
-
-  cupsArrayDelete(filters);
-
-  if (remote_job)
-  {
-    for (i = 0; i < job->num_files; i ++)
-      free(argv[i + 6]);
-  }
-
-  free(argv);
-
-  cupsdStopJob(job, 0);
-}
-
-
-/*
  * 'cupsdStopAllJobs()' - Stop all print jobs.
  */
 
@@ -2599,28 +1559,7 @@ cupsdUnloadCompletedJobs(void)
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
     if (job->attrs && job->state_value >= IPP_JOB_STOPPED &&
         job->access_time < expire)
-      cupsdUnloadJob(job);
-}
-
-
-/*
- * 'cupsdUnloadJob()' - Unload a job from memory.
- */
-
-void
-cupsdUnloadJob(cupsd_job_t *job)	/* I - Job */
-{
-  if (!job->attrs)
-    return;
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Unloading job %d...", job->id);
-
-  ippDelete(job->attrs);
-
-  job->attrs      = NULL;
-  job->state      = NULL;
-  job->sheets     = NULL;
-  job->job_sheets = NULL;
+      unload_job(job);
 }
 
 
@@ -3293,7 +2232,7 @@ load_request_root(void)
       if (job->state_value < IPP_JOB_STOPPED)
         cupsArrayAdd(ActiveJobs,job);
       else
-        cupsdUnloadJob(job);
+        unload_job(job);
     }
 
   cupsDirClose(dir);
@@ -3367,6 +2306,1069 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
     cupsdSetString(&attr->values[0].string.text, holdstr);
 
   cupsdSaveJob(job);
+}
+
+
+/*
+ * 'start_job()' - Start a print job.
+ */
+
+static void
+start_job(cupsd_job_t     *job,		/* I - Job ID */
+          cupsd_printer_t *printer)	/* I - Printer to print job */
+{
+  int			i;		/* Looping var */
+  int			slot;		/* Pipe slot */
+  cups_array_t		*filters;	/* Filters for job */
+  mime_filter_t		*filter,	/* Current filter */
+			port_monitor;	/* Port monitor filter */
+  char			method[255],	/* Method for output */
+			*optptr,	/* Pointer to options */
+			*valptr;	/* Pointer in value string */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  struct stat		backinfo;	/* Backend file information */
+  int			backroot;	/* Run backend as root? */
+  int			pid;		/* Process ID of new filter process */
+  int			banner_page;	/* 1 if banner page, 0 otherwise */
+  int			statusfds[2],	/* Pipes used with the scheduler */
+			filterfds[2][2];/* Pipes used between filters */
+  int			envc;		/* Number of environment variables */
+  char			**argv,		/* Filter command-line arguments */
+			sani_uri[1024],	/* Sanitized DEVICE_URI env var */
+			filename[1024],	/* Job filename */
+			command[1024],	/* Full path to command */
+			jobid[255],	/* Job ID string */
+			title[IPP_MAX_NAME],
+					/* Job title string */
+			copies[255],	/* # copies string */
+			*envp[MAX_ENV + 11],
+					/* Environment variables */
+			charset[255],	/* CHARSET env variable */
+			class_name[255],/* CLASS env variable */
+			classification[1024],
+					/* CLASSIFICATION env variable */
+			content_type[1024],
+					/* CONTENT_TYPE env variable */
+			device_uri[1024],
+					/* DEVICE_URI env variable */
+			final_content_type[1024],
+					/* FINAL_CONTENT_TYPE env variable */
+			lang[255],	/* LANG env variable */
+			ppd[1024],	/* PPD env variable */
+			printer_name[255],
+					/* PRINTER env variable */
+			rip_max_cache[255];
+					/* RIP_MAX_CACHE env variable */
+  int			remote_job;	/* Remote print job? */
+  static char		*options = NULL;/* Full list of options */
+  static int		optlength = 0;	/* Length of option buffer */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job: id = %d, file = %d/%d",
+                  job->id, job->current_file, job->num_files);
+
+  if (job->num_files == 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Job ID %d has no files!  Cancelling it!",
+                    job->id);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                  "Job canceled because it has no files.");
+
+    cupsdCancelJob(job, 0);
+    return;
+  }
+
+ /*
+  * Figure out what filters are required to convert from
+  * the source to the destination type...
+  */
+
+  filters   = NULL;
+  job->cost = 0;
+
+  if (printer->raw)
+  {
+   /*
+    * Remote jobs and raw queues go directly to the printer without
+    * filtering...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "[Job %d] Sending job to queue tagged as raw...", job->id);
+
+    filters = NULL;
+  }
+  else
+  {
+   /*
+    * Local jobs get filtered...
+    */
+
+    filters = mimeFilter(MimeDatabase, job->filetypes[job->current_file],
+                         printer->filetype, &(job->cost));
+
+    if (!filters)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to convert file %d to printable format for "
+		      "job %d!",
+	              job->current_file, job->id);
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "Hint: Do you have ESP Ghostscript installed?");
+
+      if (LogLevel < CUPSD_LOG_DEBUG)
+        cupsdLogMessage(CUPSD_LOG_INFO,
+	                "Hint: Try setting the LogLevel to \"debug\".");
+
+      job->current_file ++;
+
+      if (job->current_file == job->num_files)
+      {
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                      "Job canceled because it has no files that can be "
+		      "printed.");
+
+        cupsdCancelJob(job, 0);
+      }
+
+      return;
+    }
+
+   /*
+    * Remove NULL ("-") filters...
+    */
+
+    for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+         filter;
+	 filter = (mime_filter_t *)cupsArrayNext(filters))
+      if (!strcmp(filter->filter, "-"))
+        cupsArrayRemove(filters, filter);
+
+    if (cupsArrayCount(filters) == 0)
+    {
+      cupsArrayDelete(filters);
+      filters = NULL;
+    }
+  }
+
+ /*
+  * Set a minimum cost of 100 for all jobs so that FilterLimit
+  * works with raw queues and other low-cost paths.
+  */
+
+  if (job->cost < 100)
+    job->cost = 100;
+
+ /*
+  * See if the filter cost is too high...
+  */
+
+  if ((FilterLevel + job->cost) > FilterLimit && FilterLevel > 0 &&
+      FilterLimit > 0)
+  {
+   /*
+    * Don't print this job quite yet...
+    */
+
+    cupsArrayDelete(filters);
+
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Holding job %d because filter limit has been reached.",
+                    job->id);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "start_job: id=%d, file=%d, cost=%d, level=%d, "
+		    "limit=%d",
+                    job->id, job->current_file, job->cost, FilterLevel,
+		    FilterLimit);
+    return;
+  }
+
+  FilterLevel += job->cost;
+
+ /*
+  * Determine if we are printing to a remote printer...
+  */
+
+  remote_job = printer->raw && job->num_files > 1 &&
+               !strncmp(printer->device_uri, "ipp://", 6);
+
+ /*
+  * Add decompression filters, if any...
+  */
+
+  if (!remote_job && job->compressions[job->current_file])
+  {
+   /*
+    * Add gziptoany filter to the front of the list...
+    */
+
+    if (!cupsArrayInsert(filters, &gziptoany_filter))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to add decompression filter - %s",
+		      strerror(errno));
+
+      cupsArrayDelete(filters);
+
+      job->current_file ++;
+
+      if (job->current_file == job->num_files)
+      {
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                      "Job canceled because the print file could not be "
+		      "decompressed.");
+
+        cupsdCancelJob(job, 0);
+      }
+
+      return;
+    }
+  }
+
+ /*
+  * Add port monitor, if any...
+  */
+
+  if (printer->port_monitor)
+  {
+   /*
+    * Add port monitor to the end of the list...
+    */
+
+    if (!cupsArrayAdd(filters, &port_monitor))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to add port monitor - %s",
+                      strerror(errno));
+
+      cupsArrayDelete(filters);
+
+      job->current_file ++;
+
+      if (job->current_file == job->num_files)
+      {
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                      "Job canceled because the port monitor could not be "
+		      "added.");
+
+        cupsdCancelJob(job, 0);
+      }
+
+      return;
+    }
+
+    snprintf(port_monitor.filter, sizeof(port_monitor.filter),
+             "%s/monitor/%s", ServerBin, printer->port_monitor);
+  }
+
+ /*
+  * Update the printer and job state to "processing"...
+  */
+
+  job->state->values[0].integer = IPP_JOB_PROCESSING;
+  job->state_value              = IPP_JOB_PROCESSING;
+  job->status  = 0;
+  job->printer = printer;
+  printer->job = job;
+  cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
+
+  if (job->current_file == 0)
+  {
+    set_time(job, "time-at-processing");
+    cupsdOpenPipe(job->back_pipes);
+  }
+
+ /*
+  * Determine if we are printing a banner page or not...
+  */
+
+  if (job->job_sheets == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "No job-sheets attribute.");
+    if ((job->job_sheets =
+         ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "... but someone added one without setting job_sheets!");
+  }
+  else if (job->job_sheets->num_values == 1)
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "job-sheets=%s",
+               job->job_sheets->values[0].string.text);
+  else
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "job-sheets=%s,%s",
+               job->job_sheets->values[0].string.text,
+               job->job_sheets->values[1].string.text);
+
+  if (printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
+    banner_page = 0;
+  else if (job->job_sheets == NULL)
+    banner_page = 0;
+  else if (strcasecmp(job->job_sheets->values[0].string.text, "none") != 0 &&
+	   job->current_file == 0)
+    banner_page = 1;
+  else if (job->job_sheets->num_values > 1 &&
+	   strcasecmp(job->job_sheets->values[1].string.text, "none") != 0 &&
+	   job->current_file == (job->num_files - 1))
+    banner_page = 1;
+  else
+    banner_page = 0;
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "banner_page = %d", banner_page);
+
+ /*
+  * Building the options string is harder than it needs to be, but
+  * for the moment we need to pass strings for command-line args and
+  * not IPP attribute pointers... :)
+  *
+  * First allocate/reallocate the option buffer as needed...
+  */
+
+  i = ipp_length(job->attrs);
+
+  if (i > optlength)
+  {
+    if (optlength == 0)
+      optptr = malloc(i);
+    else
+      optptr = realloc(options, i);
+
+    if (optptr == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_CRIT,
+                      "Unable to allocate %d bytes for option buffer for "
+		      "job %d!", i, job->id);
+
+      cupsArrayDelete(filters);
+
+      FilterLevel -= job->cost;
+
+      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                    "Job canceled because the server ran out of memory.");
+
+      cupsdCancelJob(job, 0);
+      return;
+    }
+
+    options   = optptr;
+    optlength = i;
+  }
+
+ /*
+  * Now loop through the attributes and convert them to the textual
+  * representation used by the filters...
+  */
+
+  optptr  = options;
+  *optptr = '\0';
+
+  snprintf(title, sizeof(title), "%s-%d", printer->name, job->id);
+  strcpy(copies, "1");
+
+  for (attr = job->attrs->attrs; attr != NULL; attr = attr->next)
+  {
+    if (!strcmp(attr->name, "copies") &&
+	attr->value_tag == IPP_TAG_INTEGER)
+    {
+     /*
+      * Don't use the # copies attribute if we are printing the job sheets...
+      */
+
+      if (!banner_page)
+        sprintf(copies, "%d", attr->values[0].integer);
+    }
+    else if (!strcmp(attr->name, "job-name") &&
+	     (attr->value_tag == IPP_TAG_NAME ||
+	      attr->value_tag == IPP_TAG_NAMELANG))
+      strlcpy(title, attr->values[0].string.text, sizeof(title));
+    else if (attr->group_tag == IPP_TAG_JOB)
+    {
+     /*
+      * Filter out other unwanted attributes...
+      */
+
+      if (attr->value_tag == IPP_TAG_MIMETYPE ||
+	  attr->value_tag == IPP_TAG_NAMELANG ||
+	  attr->value_tag == IPP_TAG_TEXTLANG ||
+	  (attr->value_tag == IPP_TAG_URI && strcmp(attr->name, "job-uuid")) ||
+	  attr->value_tag == IPP_TAG_URISCHEME ||
+	  attr->value_tag == IPP_TAG_BEGIN_COLLECTION) /* Not yet supported */
+	continue;
+
+      if (!strncmp(attr->name, "time-", 5))
+	continue;
+
+      if (!strncmp(attr->name, "job-", 4) && strcmp(attr->name, "job-uuid") &&
+          !(printer->type & CUPS_PRINTER_REMOTE))
+	continue;
+
+      if (!strncmp(attr->name, "job-", 4) &&
+          strcmp(attr->name, "job-uuid") &&
+          strcmp(attr->name, "job-billing") &&
+          strcmp(attr->name, "job-sheets") &&
+          strcmp(attr->name, "job-hold-until") &&
+	  strcmp(attr->name, "job-priority"))
+	continue;
+
+      if ((!strcmp(attr->name, "page-label") ||
+           !strcmp(attr->name, "page-border") ||
+           !strncmp(attr->name, "number-up", 9) ||
+	   !strcmp(attr->name, "page-set") ||
+	   !strcasecmp(attr->name, "AP_FIRSTPAGE_InputSlot") ||
+	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed")) &&
+	  banner_page)
+        continue;
+
+     /*
+      * Otherwise add them to the list...
+      */
+
+      if (optptr > options)
+	strlcat(optptr, " ", optlength - (optptr - options));
+
+      if (attr->value_tag != IPP_TAG_BOOLEAN)
+      {
+	strlcat(optptr, attr->name, optlength - (optptr - options));
+	strlcat(optptr, "=", optlength - (optptr - options));
+      }
+
+      for (i = 0; i < attr->num_values; i ++)
+      {
+	if (i)
+	  strlcat(optptr, ",", optlength - (optptr - options));
+
+	optptr += strlen(optptr);
+
+	switch (attr->value_tag)
+	{
+	  case IPP_TAG_INTEGER :
+	  case IPP_TAG_ENUM :
+	      snprintf(optptr, optlength - (optptr - options),
+	               "%d", attr->values[i].integer);
+	      break;
+
+	  case IPP_TAG_BOOLEAN :
+	      if (!attr->values[i].boolean)
+		strlcat(optptr, "no", optlength - (optptr - options));
+
+	  case IPP_TAG_NOVALUE :
+	      strlcat(optptr, attr->name,
+	              optlength - (optptr - options));
+	      break;
+
+	  case IPP_TAG_RANGE :
+	      if (attr->values[i].range.lower == attr->values[i].range.upper)
+		snprintf(optptr, optlength - (optptr - options) - 1,
+	        	 "%d", attr->values[i].range.lower);
+              else
+		snprintf(optptr, optlength - (optptr - options) - 1,
+	        	 "%d-%d", attr->values[i].range.lower,
+			 attr->values[i].range.upper);
+	      break;
+
+	  case IPP_TAG_RESOLUTION :
+	      snprintf(optptr, optlength - (optptr - options) - 1,
+	               "%dx%d%s", attr->values[i].resolution.xres,
+		       attr->values[i].resolution.yres,
+		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+			   "dpi" : "dpc");
+	      break;
+
+          case IPP_TAG_STRING :
+	  case IPP_TAG_TEXT :
+	  case IPP_TAG_NAME :
+	  case IPP_TAG_KEYWORD :
+	  case IPP_TAG_CHARSET :
+	  case IPP_TAG_LANGUAGE :
+	  case IPP_TAG_URI :
+	      for (valptr = attr->values[i].string.text; *valptr;)
+	      {
+	        if (strchr(" \t\n\\\'\"", *valptr))
+		  *optptr++ = '\\';
+		*optptr++ = *valptr++;
+	      }
+
+	      *optptr = '\0';
+	      break;
+
+          default :
+	      break; /* anti-compiler-warning-code */
+	}
+      }
+
+      optptr += strlen(optptr);
+    }
+  }
+
+ /*
+  * Build the command-line arguments for the filters.  Each filter
+  * has 6 or 7 arguments:
+  *
+  *     argv[0] = printer
+  *     argv[1] = job ID
+  *     argv[2] = username
+  *     argv[3] = title
+  *     argv[4] = # copies
+  *     argv[5] = options
+  *     argv[6] = filename (optional; normally stdin)
+  *
+  * This allows legacy printer drivers that use the old System V
+  * printing interface to be used by CUPS.
+  *
+  * For remote jobs, we send all of the files in the argument list.
+  */
+
+  if (remote_job)
+    argv = calloc(7 + job->num_files, sizeof(char *));
+  else
+    argv = calloc(8, sizeof(char *));
+
+  sprintf(jobid, "%d", job->id);
+
+  argv[0] = printer->name;
+  argv[1] = jobid;
+  argv[2] = job->username;
+  argv[3] = title;
+  argv[4] = copies;
+  argv[5] = options;
+
+  if (remote_job)
+  {
+    for (i = 0; i < job->num_files; i ++)
+    {
+      snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+               job->id, i + 1);
+      argv[6 + i] = strdup(filename);
+    }
+  }
+  else
+  {
+    snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+             job->id, job->current_file + 1);
+    argv[6] = filename;
+  }
+
+  for (i = 0; argv[i]; i ++)
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "[Job %d] argv[%d]=\"%s\"", job->id, i, argv[i]);
+
+ /*
+  * Create environment variable strings for the filters...
+  */
+
+  attr = ippFindAttribute(job->attrs, "attributes-natural-language",
+                          IPP_TAG_LANGUAGE);
+
+  switch (strlen(attr->values[0].string.text))
+  {
+    default :
+       /*
+        * This is an unknown or badly formatted language code; use
+	* the POSIX locale...
+	*/
+
+	strcpy(lang, "LANG=C");
+	break;
+
+    case 2 :
+       /*
+        * Just the language code (ll)...
+	*/
+
+        snprintf(lang, sizeof(lang), "LANG=%s",
+	         attr->values[0].string.text);
+        break;
+
+    case 5 :
+       /*
+        * Language and country code (ll-cc)...
+	*/
+
+        snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c",
+	         attr->values[0].string.text[0],
+		 attr->values[0].string.text[1],
+		 toupper(attr->values[0].string.text[3] & 255),
+		 toupper(attr->values[0].string.text[4] & 255));
+        break;
+  }
+
+  attr = ippFindAttribute(job->attrs, "document-format",
+                          IPP_TAG_MIMETYPE);
+  if (attr != NULL &&
+      (optptr = strstr(attr->values[0].string.text, "charset=")) != NULL)
+    snprintf(charset, sizeof(charset), "CHARSET=%s", optptr + 8);
+  else
+  {
+    attr = ippFindAttribute(job->attrs, "attributes-charset",
+	                    IPP_TAG_CHARSET);
+    snprintf(charset, sizeof(charset), "CHARSET=%s",
+             attr->values[0].string.text);
+  }
+
+  snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s/%s",
+           job->filetypes[job->current_file]->super,
+           job->filetypes[job->current_file]->type);
+  snprintf(device_uri, sizeof(device_uri), "DEVICE_URI=%s",
+           printer->device_uri);
+  cupsdSanitizeURI(printer->device_uri, sani_uri, sizeof(sani_uri));
+  snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
+  snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
+  snprintf(rip_max_cache, sizeof(rip_max_cache), "RIP_MAX_CACHE=%s", RIPCache);
+
+  envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
+
+  envp[envc ++] = charset;
+  envp[envc ++] = lang;
+  envp[envc ++] = ppd;
+  envp[envc ++] = rip_max_cache;
+  envp[envc ++] = content_type;
+  envp[envc ++] = device_uri;
+  envp[envc ++] = printer_name;
+
+  if ((filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
+  {
+    snprintf(final_content_type, sizeof(final_content_type),
+             "FINAL_CONTENT_TYPE=%s/%s",
+	     filter->dst->super, filter->dst->type);
+    envp[envc ++] = final_content_type;
+  }
+
+  if (Classification && !banner_page)
+  {
+    if ((attr = ippFindAttribute(job->attrs, "job-sheets",
+                                 IPP_TAG_NAME)) == NULL)
+      snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
+               Classification);
+    else if (attr->num_values > 1 &&
+             strcmp(attr->values[1].string.text, "none") != 0)
+      snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
+               attr->values[1].string.text);
+    else
+      snprintf(classification, sizeof(classification), "CLASSIFICATION=%s",
+               attr->values[0].string.text);
+
+    envp[envc ++] = classification;
+  }
+
+  if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+  {
+    snprintf(class_name, sizeof(class_name), "CLASS=%s", job->dest);
+    envp[envc ++] = class_name;
+  }
+
+  envp[envc] = NULL;
+
+  for (i = 0; i < envc; i ++)
+    if (strncmp(envp[i], "DEVICE_URI=", 11))
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"%s\"",
+                      job->id, i, envp[i]);
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"DEVICE_URI=%s\"",
+                      job->id, i, sani_uri);
+
+  if (remote_job)
+    job->current_file = job->num_files;
+  else
+    job->current_file ++;
+
+ /*
+  * Now create processes for all of the filters...
+  */
+
+  filterfds[0][0] = -1;
+  filterfds[0][1] = -1;
+  filterfds[1][0] = -1;
+  filterfds[1][1] = -1;
+
+  if (cupsdOpenPipe(statusfds))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create job status pipes - %s.",
+	            strerror(errno));
+    snprintf(printer->state_message, sizeof(printer->state_message),
+             "Unable to create status pipes - %s.", strerror(errno));
+
+    cupsdAddPrinterHistory(printer);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                  "Job canceled because the server could not create the job "
+		  "status pipes.");
+
+    goto abort_job;
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job: statusfds = [ %d %d ]",
+                  statusfds[0], statusfds[1]);
+
+#ifdef FD_CLOEXEC
+  fcntl(statusfds[0], F_SETFD, FD_CLOEXEC);
+  fcntl(statusfds[1], F_SETFD, FD_CLOEXEC);
+#endif /* FD_CLOEXEC */
+
+  job->status_buffer = cupsdStatBufNew(statusfds[0], "[Job %d]",
+                                           job->id);
+  job->status        = 0;
+  memset(job->filters, 0, sizeof(job->filters));
+
+  filterfds[1][0] = open("/dev/null", O_RDONLY);
+
+  if (filterfds[1][0] < 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open \"/dev/null\" - %s.",
+                    strerror(errno));
+    snprintf(printer->state_message, sizeof(printer->state_message),
+             "Unable to open \"/dev/null\" - %s.", strerror(errno));
+
+    cupsdAddPrinterHistory(printer);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                  "Job canceled because the server could not open /dev/null.");
+
+    goto abort_job;
+  }
+
+  fcntl(filterfds[1][0], F_SETFD, fcntl(filterfds[1][0], F_GETFD) | FD_CLOEXEC);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job: filterfds[%d] = [ %d %d ]",
+                  1, filterfds[1][0], filterfds[1][1]);
+
+  for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
+       filter;
+       i ++, filter = (mime_filter_t *)cupsArrayNext(filters))
+  {
+    if (filter->filter[0] != '/')
+      snprintf(command, sizeof(command), "%s/filter/%s", ServerBin,
+               filter->filter);
+    else
+      strlcpy(command, filter->filter, sizeof(command));
+
+    if (i < (cupsArrayCount(filters) - 1))
+    {
+      if (cupsdOpenPipe(filterfds[slot]))
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to create job filter pipes - %s.",
+		        strerror(errno));
+	snprintf(printer->state_message, sizeof(printer->state_message),
+		"Unable to create filter pipes - %s.", strerror(errno));
+	cupsdAddPrinterHistory(printer);
+
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                      "Job canceled because the server could not create the "
+		      "filter pipes.");
+
+        goto abort_job;
+      }
+    }
+    else
+    {
+      if (job->current_file == 1)
+      {
+	if (strncmp(printer->device_uri, "file:", 5) != 0)
+	{
+	  if (cupsdOpenPipe(job->print_pipes))
+	  {
+	    cupsdLogMessage(CUPSD_LOG_ERROR,
+	                    "Unable to create job backend pipes - %s.",
+		            strerror(errno));
+	    snprintf(printer->state_message, sizeof(printer->state_message),
+		    "Unable to create backend pipes - %s.", strerror(errno));
+	    cupsdAddPrinterHistory(printer);
+
+	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                	  "Job canceled because the server could not create "
+			  "the backend pipes.");
+
+            goto abort_job;
+	  }
+	}
+	else
+	{
+	  job->print_pipes[0] = -1;
+	  if (!strncmp(printer->device_uri, "file:/dev/", 10) &&
+	      strcmp(printer->device_uri, "file:/dev/null"))
+	    job->print_pipes[1] = open(printer->device_uri + 5,
+	                               O_WRONLY | O_EXCL);
+	  else if (!strncmp(printer->device_uri, "file:///dev/", 12) &&
+	           strcmp(printer->device_uri, "file:///dev/null"))
+	    job->print_pipes[1] = open(printer->device_uri + 7,
+	                               O_WRONLY | O_EXCL);
+	  else
+	    job->print_pipes[1] = open(printer->device_uri + 5,
+	                               O_WRONLY | O_CREAT | O_TRUNC, 0600);
+
+	  if (job->print_pipes[1] < 0)
+	  {
+            cupsdLogMessage(CUPSD_LOG_ERROR,
+	                    "Unable to open output file \"%s\" - %s.",
+	                    printer->device_uri, strerror(errno));
+            snprintf(printer->state_message, sizeof(printer->state_message),
+		     "Unable to open output file \"%s\" - %s.",
+	             printer->device_uri, strerror(errno));
+
+	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                	  "Job canceled because the server could not open the "
+			  "output file.");
+
+            goto abort_job;
+	  }
+
+	  fcntl(job->print_pipes[1], F_SETFD,
+        	fcntl(job->print_pipes[1], F_GETFD) | FD_CLOEXEC);
+	}
+
+	cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                "start_job: print_pipes = [ %d %d ]",
+                        job->print_pipes[0], job->print_pipes[1]);
+      }
+
+      filterfds[slot][0] = job->print_pipes[0];
+      filterfds[slot][1] = job->print_pipes[1];
+    }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job: filter=\"%s\"",
+                    command);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "start_job: filterfds[%d]=[ %d %d ]",
+                    slot, filterfds[slot][0], filterfds[slot][1]);
+
+    pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
+                            filterfds[slot][1], statusfds[1],
+		            job->back_pipes[0], 0, job->filters + i);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "start_job: Closing filter pipes for slot %d "
+		    "[ %d %d ]...",
+                    !slot, filterfds[!slot][0], filterfds[!slot][1]);
+
+    cupsdClosePipe(filterfds[!slot]);
+
+    if (pid == 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to start filter \"%s\" - %s.",
+                      filter->filter, strerror(errno));
+      snprintf(printer->state_message, sizeof(printer->state_message),
+               "Unable to start filter \"%s\" - %s.",
+               filter->filter, strerror(errno));
+
+      cupsdAddPrinterHistory(printer);
+
+      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                    "Job canceled because the server could not execute a "
+		    "filter.");
+
+      goto abort_job;
+    }
+
+    cupsdLogMessage(CUPSD_LOG_INFO, "Started filter %s (PID %d) for job %d.",
+                    command, pid, job->id);
+
+    argv[6] = NULL;
+    slot    = !slot;
+  }
+
+  cupsArrayDelete(filters);
+
+ /*
+  * Finally, pipe the final output into a backend process if needed...
+  */
+
+  if (strncmp(printer->device_uri, "file:", 5) != 0)
+  {
+    if (job->current_file == 1)
+    {
+      sscanf(printer->device_uri, "%254[^:]", method);
+      snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
+
+     /*
+      * See if the backend needs to run as root...
+      */
+
+      if (RunUser)
+        backroot = 0;
+      else if (stat(command, &backinfo))
+	backroot = 0;
+      else
+        backroot = !(backinfo.st_mode & (S_IRWXG | S_IRWXO));
+
+      argv[0] = sani_uri;
+
+      filterfds[slot][0] = -1;
+      filterfds[slot][1] = open("/dev/null", O_WRONLY);
+
+      if (filterfds[slot][1] < 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open \"/dev/null\" - %s.",
+	                strerror(errno));
+	snprintf(printer->state_message, sizeof(printer->state_message),
+        	 "Unable to open \"/dev/null\" - %s.", strerror(errno));
+
+	cupsdAddPrinterHistory(printer);
+
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                      "Job canceled because the server could not open a file.");
+
+        goto abort_job;
+      }
+
+      fcntl(filterfds[slot][1], F_SETFD,
+            fcntl(filterfds[slot][1], F_GETFD) | FD_CLOEXEC);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job: backend=\"%s\"",
+                      command);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "start_job: filterfds[%d] = [ %d %d ]",
+        	      slot, filterfds[slot][0], filterfds[slot][1]);
+
+      pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
+			      filterfds[slot][1], statusfds[1],
+			      job->back_pipes[1], backroot,
+			      &(job->backend));
+
+      if (pid == 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to start backend \"%s\" - %s.",
+                        method, strerror(errno));
+	snprintf(printer->state_message, sizeof(printer->state_message),
+        	 "Unable to start backend \"%s\" - %s.", method,
+		 strerror(errno));
+
+	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                      "Job canceled because the server could not execute "
+		      "the backend.");
+
+        goto abort_job;
+      }
+      else
+      {
+	cupsdLogMessage(CUPSD_LOG_INFO,
+	                "Started backend %s (PID %d) for job %d.",
+	                command, pid, job->id);
+      }
+    }
+
+    if (job->current_file == job->num_files)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "start_job: Closing print pipes [ %d %d ]...",
+        	      job->print_pipes[0], job->print_pipes[1]);
+
+      cupsdClosePipe(job->print_pipes);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "start_job: Closing back pipes [ %d %d ]...",
+        	      job->back_pipes[0], job->back_pipes[1]);
+
+      cupsdClosePipe(job->back_pipes);
+    }
+  }
+  else
+  {
+    filterfds[slot][0] = -1;
+    filterfds[slot][1] = -1;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "start_job: Closing filter pipes for slot %d "
+		    "[ %d %d ]...",
+                    !slot, filterfds[!slot][0], filterfds[!slot][1]);
+
+    cupsdClosePipe(filterfds[!slot]);
+
+    if (job->current_file == job->num_files)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "start_job: Closing print pipes [ %d %d ]...",
+        	      job->print_pipes[0], job->print_pipes[1]);
+
+      cupsdClosePipe(job->print_pipes);
+    }
+  }
+
+  for (slot = 0; slot < 2; slot ++)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "start_job: Closing filter pipes for slot %d "
+		    "[ %d %d ]...",
+                    slot, filterfds[slot][0], filterfds[slot][1]);
+    cupsdClosePipe(filterfds[slot]);
+  }
+
+  if (remote_job)
+  {
+    for (i = 0; i < job->num_files; i ++)
+      free(argv[i + 6]);
+  }
+
+  free(argv);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "start_job: Closing status output pipe %d...",
+                  statusfds[1]);
+
+  close(statusfds[1]);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "start_job: Adding fd %d to InputSet...",
+                  job->status_buffer->fd);
+
+  FD_SET(job->status_buffer->fd, InputSet);
+
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
+                job->id);
+
+  return;
+
+
+ /*
+  * If we get here, we need to abort the current job and close out all
+  * files and pipes...
+  */
+
+  abort_job:
+
+  for (slot = 0; slot < 2; slot ++)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "start_job: Closing filter pipes for slot %d "
+		    "[ %d %d ]...",
+                    slot, filterfds[slot][0], filterfds[slot][1]);
+    cupsdClosePipe(filterfds[slot]);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "start_job: Closing status pipes [ %d %d ]...",
+                  statusfds[0], statusfds[1]);
+  cupsdClosePipe(statusfds);
+
+  cupsArrayDelete(filters);
+
+  if (remote_job)
+  {
+    for (i = 0; i < job->num_files; i ++)
+      free(argv[i + 6]);
+  }
+
+  free(argv);
+
+  cupsdStopJob(job, 0);
+}
+
+
+/*
+ * 'unload_job()' - Unload a job from memory.
+ */
+
+static void
+unload_job(cupsd_job_t *job)		/* I - Job */
+{
+  if (!job->attrs)
+    return;
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Unloading job %d...", job->id);
+
+  ippDelete(job->attrs);
+
+  job->attrs      = NULL;
+  job->state      = NULL;
+  job->sheets     = NULL;
+  job->job_sheets = NULL;
 }
 
 

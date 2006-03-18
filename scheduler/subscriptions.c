@@ -25,7 +25,6 @@
  *
  *   cupsdAddEvent()               - Add an event to the global event cache.
  *   cupsdAddSubscription()        - Add a new subscription object.
- *   cupsdDeleteAllEvents()        - Delete all cached events.
  *   cupsdDeleteAllSubscriptions() - Delete all subscriptions.
  *   cupsdDeleteSubscription()     - Delete a subscription object.
  *   cupsdEventName()              - Return a single event name.
@@ -34,12 +33,14 @@
  *   cupsdFindSubscription()       - Find a subscription by ID.
  *   cupsdLoadAllSubscriptions()   - Load all subscriptions from the .conf file.
  *   cupsdSaveAllSubscriptions()   - Save all subscriptions to the .conf file.
- *   cupsdSendNotification()       - Send a notification for the specified event.
  *   cupsdStopAllNotifiers()       - Stop all notifier processes.
  *   cupsdUpdateNotifierStatus()   - Read messages from notifiers.
  *   cupsd_compare_subscriptions() - Compare two subscriptions.
+ *   cupsd_delete_all_events()     - Delete all cached events.
  *   cupsd_delete_event()          - Delete a single event...
  *   cupsd_send_dbus()             - Send a DBUS notification...
+ *   cupsd_send_notification()     - Send a notification for the specified
+ *                                   event.
  *   cupsd_start_notifier()        - Start a notifier subprocess...
  */
 
@@ -60,11 +61,14 @@
 static int	cupsd_compare_subscriptions(cupsd_subscription_t *first,
 		                            cupsd_subscription_t *second,
 		                            void *unused);
+static void	cupsd_delete_all_events(void);
 static void	cupsd_delete_event(cupsd_event_t *event);
 #ifdef HAVE_DBUS
 static void	cupsd_send_dbus(cupsd_eventmask_t event, cupsd_printer_t *dest,
 		                cupsd_job_t *job);
 #endif /* HAVE_DBUS */
+static void	cupsd_send_notification(cupsd_subscription_t *sub,
+		                        cupsd_event_t *event);
 static void	cupsd_start_notifier(cupsd_subscription_t *sub);
 
 
@@ -323,7 +327,7 @@ cupsdAddEvent(
       * Send the notification for this subscription...
       */
 
-      cupsdSendNotification(sub, temp);
+      cupsd_send_notification(sub, temp);
     }
   }
 
@@ -425,27 +429,6 @@ cupsdAddSubscription(
 
 
 /*
- * 'cupsdDeleteAllEvents()' - Delete all cached events.
- */
-
-void
-cupsdDeleteAllEvents(void)
-{
-  int	i;				/* Looping var */
-
-
-  if (MaxEvents <= 0 || !Events)
-    return;
-
-  for (i = 0; i < NumEvents; i ++)
-    cupsd_delete_event(Events[i]);
-
-  free(Events);
-  Events = NULL;
-}
-
-
-/*
  * 'cupsdDeleteAllSubscriptions()' - Delete all subscriptions.
  */
 
@@ -454,6 +437,8 @@ cupsdDeleteAllSubscriptions(void)
 {
   cupsd_subscription_t	*sub;		/* Subscription */
 
+
+  cupsd_delete_all_events();
 
   if (!Subscriptions)
     return;
@@ -1225,83 +1210,6 @@ cupsdSaveAllSubscriptions(void)
 
 
 /*
- * 'cupsdSendNotification()' - Send a notification for the specified event.
- */
-
-void
-cupsdSendNotification(
-    cupsd_subscription_t *sub,		/* I - Subscription object */
-    cupsd_event_t        *event)	/* I - Event to send */
-{
-  ipp_state_t	state;			/* IPP event state */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "cupsdSendNotification(sub=%p(%d), event=%p(%s))\n",
-                  sub, sub->id, event, cupsdEventName(event->event));
-
- /*
-  * Allocate the events array as needed...
-  */
-
-  if (!sub->events)
-  {
-    sub->events = calloc(MaxEvents, sizeof(cupsd_event_t *));
-
-    if (!sub->events)
-    {
-      cupsdLogMessage(CUPSD_LOG_CRIT,
-                      "Unable to allocate memory for subscription #%d!",
-                      sub->id);
-      return;
-    }
-  }
-
- /*
-  * Add the event to the subscription.  Since the events array is
-  * always MaxEvents in length, and since we will have already
-  * removed an event from the subscription cache if we hit the
-  * event cache limit, we don't need to check for overflow here...
-  */
-
-  sub->events[sub->num_events] = event;
-  sub->num_events ++;
-
- /*
-  * Deliver the event...
-  */
-
-  if (sub->recipient)
-  {
-    if (sub->pipe < 0)
-      cupsd_start_notifier(sub);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "sub->pipe=%d", sub->pipe);
-
-    if (sub->pipe >= 0)
-    {
-      event->attrs->state = IPP_IDLE;
-
-      while ((state = ippWriteFile(sub->pipe, event->attrs)) != IPP_DATA)
-        if (state == IPP_ERROR)
-	  break;
-
-      if (state == IPP_ERROR)
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to send event for subscription %d (%s)!",
-			sub->id, sub->recipient);
-    }
-  }
-
- /*
-  * Bump the event sequence number...
-  */
-
-  sub->next_event_id ++;
-}
-
-
-/*
  * 'cupsdStopAllNotifiers()' - Stop all notifier processes.
  */
 
@@ -1388,6 +1296,27 @@ cupsd_compare_subscriptions(
   (void)unused;
 
   return (first->id - second->id);
+}
+
+
+/*
+ * 'cupsd_delete_all_events()' - Delete all cached events.
+ */
+
+static void
+cupsd_delete_all_events(void)
+{
+  int	i;				/* Looping var */
+
+
+  if (MaxEvents <= 0 || !Events)
+    return;
+
+  for (i = 0; i < NumEvents; i ++)
+    cupsd_delete_event(Events[i]);
+
+  free(Events);
+  Events = NULL;
 }
 
 
@@ -1525,6 +1454,83 @@ cupsd_send_dbus(cupsd_eventmask_t event,/* I - Event to send */
   dbus_message_unref(message);
 }
 #endif /* HAVE_DBUS */
+
+
+/*
+ * 'cupsd_send_notification()' - Send a notification for the specified event.
+ */
+
+static void
+cupsd_send_notification(
+    cupsd_subscription_t *sub,		/* I - Subscription object */
+    cupsd_event_t        *event)	/* I - Event to send */
+{
+  ipp_state_t	state;			/* IPP event state */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsd_send_notification(sub=%p(%d), event=%p(%s))\n",
+                  sub, sub->id, event, cupsdEventName(event->event));
+
+ /*
+  * Allocate the events array as needed...
+  */
+
+  if (!sub->events)
+  {
+    sub->events = calloc(MaxEvents, sizeof(cupsd_event_t *));
+
+    if (!sub->events)
+    {
+      cupsdLogMessage(CUPSD_LOG_CRIT,
+                      "Unable to allocate memory for subscription #%d!",
+                      sub->id);
+      return;
+    }
+  }
+
+ /*
+  * Add the event to the subscription.  Since the events array is
+  * always MaxEvents in length, and since we will have already
+  * removed an event from the subscription cache if we hit the
+  * event cache limit, we don't need to check for overflow here...
+  */
+
+  sub->events[sub->num_events] = event;
+  sub->num_events ++;
+
+ /*
+  * Deliver the event...
+  */
+
+  if (sub->recipient)
+  {
+    if (sub->pipe < 0)
+      cupsd_start_notifier(sub);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "sub->pipe=%d", sub->pipe);
+
+    if (sub->pipe >= 0)
+    {
+      event->attrs->state = IPP_IDLE;
+
+      while ((state = ippWriteFile(sub->pipe, event->attrs)) != IPP_DATA)
+        if (state == IPP_ERROR)
+	  break;
+
+      if (state == IPP_ERROR)
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to send event for subscription %d (%s)!",
+			sub->id, sub->recipient);
+    }
+  }
+
+ /*
+  * Bump the event sequence number...
+  */
+
+  sub->next_event_id ++;
+}
 
 
 /*

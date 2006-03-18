@@ -43,8 +43,9 @@
  * Local functions...
  */
 
-int	poll_server(http_t *http, cups_lang_t *language, ipp_op_t op,
-	            int sock, int port, int interval, const char *prefix);
+static int	poll_server(http_t *http, cups_lang_t *language, ipp_op_t op,
+		            int sock, int port, int interval,
+			    const char *prefix);
 
 
 /*
@@ -162,7 +163,7 @@ main(int  argc,				/* I - Number of command-line arguments */
  * 'poll_server()' - Poll the server for the given set of printers or classes.
  */
 
-int					/* O - Number of seconds or -1 on error */
+static int				/* O - Number of seconds or -1 on error */
 poll_server(http_t      *http,		/* I - HTTP connection */
             cups_lang_t *language,	/* I - Language */
 	    ipp_op_t    op,		/* I - Operation code */

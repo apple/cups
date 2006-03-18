@@ -23,12 +23,12 @@
  *
  * Contents:
  *
- *   cupsdClearEnv() - Clear common environment variables.
  *   cupsdInitEnv()  - Initialize the current environment with standard
  *                     variables.
  *   cupsdLoadEnv()  - Copy common environment variables into an array.
  *   cupsdSetEnv()   - Set a common environment variable.
  *   cupsdSetEnvf()  - Set a formatted common environment variable.
+ *   clear_env()     - Clear common environment variables.
  */
 
 /*
@@ -47,20 +47,10 @@ static char	*common_env[MAX_ENV];	/* Common env vars */
 
 
 /*
- * 'cupsdClearEnv()' - Clear common environment variables.
+ * Local functions...
  */
 
-void
-cupsdClearEnv(void)
-{
-  int	i;				/* Looping var */
-
-
-  for (i = 0; i < num_common_env; i ++)
-    cupsdClearString(common_env + i);
-
-  num_common_env = 0;
-}
+static void	clear_env(void);
 
 
 /*
@@ -74,7 +64,7 @@ cupsdInitEnv(void)
   * Clear existing environment variables...
   */
 
-  cupsdClearEnv();
+  clear_env();
 
 #if defined(__APPLE__)
  /*
@@ -235,6 +225,23 @@ cupsdSetEnvf(const char *name,		/* I - Name of variable */
   */
 
   cupsdSetEnv(name, v);
+}
+
+
+/*
+ * 'clear_env()' - Clear common environment variables.
+ */
+
+static void
+clear_env(void)
+{
+  int	i;				/* Looping var */
+
+
+  for (i = 0; i < num_common_env; i ++)
+    cupsdClearString(common_env + i);
+
+  num_common_env = 0;
 }
 
 

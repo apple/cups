@@ -28,9 +28,6 @@
  *   cupsdSendBrowseDelete()       - Send a "browse delete" message for a
  *                                   printer.
  *   cupsdSendBrowseList()         - Send new browsing information as necessary.
- *   cupsdSendCUPSBrowse()         - Send new browsing information using the
- *                                   CUPS protocol.
- *   cupsdSendSLPBrowse()          - Register the specified printer with SLP.
  *   cupsdStartBrowsing()          - Start sending and receiving broadcast
  *                                   information.
  *   cupsdStartPolling()           - Start polling servers as needed.
@@ -44,6 +41,10 @@
  *   dequote()                     - Remote quotes from a string.
  *   process_browse_data()         - Process new browse data.
  *   process_implicit_classes()    - Create/update implicit classes as needed.
+ *   send_cups_browse()            - Send new browsing information using the
+ *                                   CUPS protocol.
+ *   send_ldap_browse()            - Send LDAP printer registrations.
+ *   send_slp_browse()             - Register the specified printer with SLP.
  *   slp_attr_callback()           - SLP attribute callback 
  *   slp_dereg_printer()           - SLPDereg() the specified printer
  *   slp_get_attr()                - Get an attribute from an SLP registration.
@@ -72,6 +73,11 @@ static void	process_browse_data(const char *uri, const char *host,
 				    const char *info, const char *make_model,
 				    int num_attrs, cups_option_t *attrs);
 static void	process_implicit_classes(void);
+static void	send_cups_browse(cupsd_printer_t *p);
+#ifdef HAVE_LDAP
+static void	send_ldap_browse(cupsd_printer_t *p);
+#endif /* HAVE_LDAP */
+static void	send_slp_browse(cupsd_printer_t *p);
 
 
 #ifdef HAVE_OPENLDAP
@@ -659,7 +665,7 @@ cupsdSendBrowseDelete(
   */
 
   if (BrowseLocalProtocols & BROWSE_CUPS)
-    cupsdSendCUPSBrowse(p);
+    send_cups_browse(p);
 #ifdef HAVE_LIBSLP
   if (BrowseLocalProtocols & BROWSE_SLP)
     slp_dereg_printer(p);
@@ -750,16 +756,16 @@ cupsdSendBrowseList(void)
 	p->browse_time = time(NULL);
 
 	if (BrowseLocalProtocols & BROWSE_CUPS)
-          cupsdSendCUPSBrowse(p);
+          send_cups_browse(p);
 
 #ifdef HAVE_LIBSLP
 	if (BrowseLocalProtocols & BROWSE_SLP)
-          cupsdSendSLPBrowse(p);
+          send_slp_browse(p);
 #endif /* HAVE_LIBSLP */
 
 #ifdef HAVE_LDAP
 	if (BrowseLocalProtocols & BROWSE_LDAP)
-          cupsdSendLDAPBrowse(p);
+          send_ldap_browse(p);
 #endif /* HAVE_LDAP */
       }
     }
@@ -804,489 +810,6 @@ cupsdSendBrowseList(void)
     }
   }
 }
-
-
-/*
- * 'cupsdSendCUPSBrowse()' - Send new browsing information using the CUPS
- *                           protocol.
- */
-
-void
-cupsdSendCUPSBrowse(cupsd_printer_t *p)	/* I - Printer to send */
-{
-  int			i;		/* Looping var */
-  cups_ptype_t		type;		/* Printer type */
-  cupsd_dirsvc_addr_t	*b;		/* Browse address */
-  int			bytes;		/* Length of packet */
-  char			packet[1453],	/* Browse data packet */
-			uri[1024],	/* Printer URI */
-			location[1024],	/* printer-location */
-			info[1024],	/* printer-info */
-			make_model[1024];
-					/* printer-make-and-model */
-  cupsd_netif_t		*iface;		/* Network interface */
-
-
- /*
-  * Figure out the printer type value...
-  */
-
-  type = p->type | CUPS_PRINTER_REMOTE;
-
-  if (!p->accepting)
-    type |= CUPS_PRINTER_REJECTING;
-
-  if (p == DefaultPrinter)
-    type |= CUPS_PRINTER_DEFAULT;
-
- /*
-  * Remove quotes from printer-info, printer-location, and
-  * printer-make-and-model attributes...
-  */
-
-  dequote(location, p->location, sizeof(location));
-  dequote(info, p->info, sizeof(info));
-  dequote(make_model, p->make_model ? p->make_model : "Unknown",
-          sizeof(make_model));
-
- /*
-  * Send a packet to each browse address...
-  */
-
-  for (i = NumBrowsers, b = Browsers; i > 0; i --, b ++)
-    if (b->iface[0])
-    {
-     /*
-      * Send the browse packet to one or more interfaces...
-      */
-
-      if (!strcmp(b->iface, "*"))
-      {
-       /*
-        * Send to all local interfaces...
-	*/
-
-        cupsdNetIFUpdate();
-
-	for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
-	     iface;
-	     iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
-	{
-	 /*
-	  * Only send to local, IPv4 interfaces...
-	  */
-
-	  if (!iface->is_local || !iface->port ||
-	      iface->address.addr.sa_family != AF_INET)
-	    continue;
-
-	  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-	                   iface->hostname, iface->port,
-			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
-			                                    "/printers/%s",
-			   p->name);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
-        	   type, p->state, uri, location, info, make_model,
-		   p->browse_attrs ? p->browse_attrs : "");
-
-	  bytes = strlen(packet);
-
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                  "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
-        	          iface->name, packet);
-
-          iface->broadcast.ipv4.sin_port = htons(BrowsePort);
-
-	  sendto(BrowseSocket, packet, bytes, 0,
-		 (struct sockaddr *)&(iface->broadcast),
-		 sizeof(struct sockaddr_in));
-        }
-      }
-      else if ((iface = cupsdNetIFFind(b->iface)) != NULL)
-      {
-       /*
-        * Send to the named interface using the IPv4 address...
-	*/
-
-        while (iface)
-	  if (strcmp(b->iface, iface->name))
-	  {
-	    iface = NULL;
-	    break;
-	  }
-	  else if (iface->address.addr.sa_family == AF_INET && iface->port)
-	    break;
-	  else
-            iface = (cupsd_netif_t *)cupsArrayNext(NetIFList);
-
-        if (iface)
-	{
-	  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-	                   iface->hostname, iface->port,
-			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
-			                                    "/printers/%s",
-			   p->name);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
-        	   type, p->state, uri, location, info, make_model,
-		   p->browse_attrs ? p->browse_attrs : "");
-
-	  bytes = strlen(packet);
-
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                  "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
-        	          iface->name, packet);
-
-          iface->broadcast.ipv4.sin_port = htons(BrowsePort);
-
-	  sendto(BrowseSocket, packet, bytes, 0,
-		 (struct sockaddr *)&(iface->broadcast),
-		 sizeof(struct sockaddr_in));
-        }
-      }
-    }
-    else
-    {
-     /*
-      * Send the browse packet to the indicated address using
-      * the default server name...
-      */
-
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
-       	       type, p->state, p->uri, location, info, make_model,
-	       p->browse_attrs ? p->browse_attrs : "");
-
-      bytes = strlen(packet);
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdSendBrowseList: (%d bytes) %s", bytes, packet);
-
-      if (sendto(BrowseSocket, packet, bytes, 0,
-		 (struct sockaddr *)&(b->to),
-		 sizeof(struct sockaddr_in)) <= 0)
-      {
-       /*
-        * Unable to send browse packet, so remove this address from the
-	* list...
-	*/
-
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdSendBrowseList: sendto failed for browser "
-			"%d - %s.",
-	                (int)(b - Browsers + 1), strerror(errno));
-
-        if (i > 1)
-	  memmove(b, b + 1, (i - 1) * sizeof(cupsd_dirsvc_addr_t));
-
-	b --;
-	NumBrowsers --;
-      }
-    }
-}
-
-
-#ifdef HAVE_OPENLDAP
-/*
- * cupsdSendLDAPBrowse()' - Send LDAP printer registrations.
- */
-
-void 
-cupsdSendLDAPBrowse(cupsd_printer_t *p)	/* I - Printer to register */
-{
-  int		i;			/* Looping var... */
-  LDAPMod	mods[7];		/* The 7 attributes we will be adding */
-  LDAPMod	*pmods[8];		/* Pointers to the 7 attributes + NULL */
-  LDAPMessage	*res;			/* Search result token */
-  char		*cn_value[2],		/* Change records */
-		*uri[2],
-		*info[2],
-		*location[2],
-		*make_model[2],
-		*type[2],
-		typestring[255],	/* String to hold printer-type */
-		filter[256],		/* Search filter for possible UPDATEs */
-		dn[1024];		/* DN of the printer we are adding */
-  int		rc;			/* LDAP status */
-  static const char * const objectClass_values[] =
-		{			/* The 3 objectClass's we use in */
-		  "top",		/* our LDAP entries              */
-		  "device",
-		  "cupsPrinter",
-		  NULL
-		};
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendLDAPBrowse: %s\n", p->name);
-
- /*
-  * Everything in ldap is ** so we fudge around it...
-  */
-
-  sprintf(typestring, "%u", p->type);
-
-  cn_value[0]   = p->info;
-  cn_value[1]   = NULL;
-  info[0]       = p->info;
-  info[1]       = NULL;
-  location[0]   = p->location;
-  location[1]   = NULL;
-  make_model[0] = p->make_model;
-  make_model[1] = NULL;
-  type[0]       = typestring;
-  type[1]       = NULL;
-  uri[0]        = p->uri;
-  uri[1]        = NULL;
-
-  snprintf(filter, sizeof(filter),
-           "(&(objectclass=cupsPrinter)(printerDescription~=%s))", p->info);
-
-  ldap_search_s(BrowseLDAPHandle, BrowseLDAPDN, LDAP_SCOPE_SUBTREE,
-                filter, (char **)ldap_attrs, 0, &res);
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendLDAPBrowse: Searching \"%s\"",
-                  filter);
-
-  mods[0].mod_type = "cn";
-  mods[0].mod_values = cn_value;
-  mods[1].mod_type = "printerDescription";
-  mods[1].mod_values = info;
-  mods[2].mod_type = "printerURI";
-  mods[2].mod_values = uri;
-  mods[3].mod_type = "printerLocation";
-  mods[3].mod_values = location;
-  mods[4].mod_type = "printerMakeAndModel";
-  mods[4].mod_values = make_model;
-  mods[5].mod_type = "printerType";
-  mods[5].mod_values = type;
-  mods[6].mod_type = "objectClass";
-  mods[6].mod_values = (char **)objectClass_values;
-
-  snprintf(dn, sizeof(dn), "cn=%s,ou=printers,%s", p->info, BrowseLDAPDN);
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendLDAPBrowse: dn=\"%s\"", dn);
-
-  if (ldap_count_entries(BrowseLDAPHandle, res) > 0)
-  {
-   /*
-    * Printer has already been registered, modify the current
-    * registration...
-    */
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdSendLDAPBrowse: Replacing entry...");
-
-    for (i = 0; i < 7; i ++)
-    {
-      pmods[i]         = mods + i;
-      pmods[i]->mod_op = LDAP_MOD_REPLACE;
-    }
-    pmods[i] = NULL;
-
-    if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "LDAP modify for %s failed with status %d: %s",
-                      p->name, rc, ldap_err2string(rc));
-  }
-  else 
-  {
-   /*
-    * Printer has already been registered, modify the current
-    * registration...
-    */
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdSendLDAPBrowse: Adding entry...");
-
-    for (i = 0; i < 7; i ++)
-    {
-      pmods[i]         = mods + i;
-      pmods[i]->mod_op = LDAP_MOD_REPLACE;
-    }
-    pmods[i] = NULL;
-
-    if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "LDAP add for %s failed with status %d: %s",
-                      p->name, rc, ldap_err2string(rc));
-  }
-}
-#endif /* HAVE_OPENLDAP */
-
-
-#ifdef HAVE_LIBSLP
-/*
- * 'cupsdSendSLPBrowse()' - Register the specified printer with SLP.
- */
-
-void 
-cupsdSendSLPBrowse(cupsd_printer_t *p)	/* I - Printer to register */
-{
-  char		srvurl[HTTP_MAX_URI],	/* Printer service URI */
-		attrs[8192],		/* Printer attributes */
-		finishings[1024],	/* Finishings to support */
-		make_model[IPP_MAX_NAME * 2],
-					/* Make and model, quoted */
-		location[IPP_MAX_NAME * 2],
-					/* Location, quoted */
-		info[IPP_MAX_NAME * 2],	/* Info, quoted */
-		*src,			/* Pointer to original string */
-		*dst;			/* Pointer to destination string */
-  ipp_attribute_t *authentication;	/* uri-authentication-supported value */
-  SLPError	error;			/* SLP error, if any */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSendSLPBrowse(%p = \"%s\")", p,
-                  p->name);
-
- /*
-  * Make the SLP service URL that conforms to the IANA 
-  * 'printer:' template.
-  */
-
-  snprintf(srvurl, sizeof(srvurl), SLP_CUPS_SRVTYPE ":%s", p->uri);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Service URL = \"%s\"", srvurl);
-
- /*
-  * Figure out the finishings string...
-  */
-
-  if (p->type & CUPS_PRINTER_STAPLE)
-    strcpy(finishings, "staple");
-  else
-    finishings[0] = '\0';
-
-  if (p->type & CUPS_PRINTER_BIND)
-  {
-    if (finishings[0])
-      strlcat(finishings, ",bind", sizeof(finishings));
-    else
-      strcpy(finishings, "bind");
-  }
-
-  if (p->type & CUPS_PRINTER_PUNCH)
-  {
-    if (finishings[0])
-      strlcat(finishings, ",punch", sizeof(finishings));
-    else
-      strcpy(finishings, "punch");
-  }
-
-  if (p->type & CUPS_PRINTER_COVER)
-  {
-    if (finishings[0])
-      strlcat(finishings, ",cover", sizeof(finishings));
-    else
-      strcpy(finishings, "cover");
-  }
-
-  if (p->type & CUPS_PRINTER_SORT)
-  {
-    if (finishings[0])
-      strlcat(finishings, ",sort", sizeof(finishings));
-    else
-      strcpy(finishings, "sort");
-  }
-
-  if (!finishings[0])
-    strcpy(finishings, "none");
-
- /*
-  * Quote any commas in the make and model, location, and info strings...
-  */
-
-  for (src = p->make_model, dst = make_model;
-       src && *src && dst < (make_model + sizeof(make_model) - 2);)
-  {
-    if (*src == ',' || *src == '\\' || *src == ')')
-      *dst++ = '\\';
-
-    *dst++ = *src++;
-  }
-
-  *dst = '\0';
-
-  if (!make_model[0])
-    strcpy(make_model, "Unknown");
-
-  for (src = p->location, dst = location;
-       src && *src && dst < (location + sizeof(location) - 2);)
-  {
-    if (*src == ',' || *src == '\\' || *src == ')')
-      *dst++ = '\\';
-
-    *dst++ = *src++;
-  }
-
-  *dst = '\0';
-
-  if (!location[0])
-    strcpy(location, "Unknown");
-
-  for (src = p->info, dst = info;
-       src && *src && dst < (info + sizeof(info) - 2);)
-  {
-    if (*src == ',' || *src == '\\' || *src == ')')
-      *dst++ = '\\';
-
-    *dst++ = *src++;
-  }
-
-  *dst = '\0';
-
-  if (!info[0])
-    strcpy(info, "Unknown");
-
- /*
-  * Get the authentication value...
-  */
-
-  authentication = ippFindAttribute(p->attrs, "uri-authentication-supported",
-                                    IPP_TAG_KEYWORD);
-
- /*
-  * Make the SLP attribute string list that conforms to
-  * the IANA 'printer:' template.
-  */
-
-  snprintf(attrs, sizeof(attrs),
-           "(printer-uri-supported=%s),"
-           "(uri-authentication-supported=%s>),"
-#ifdef HAVE_SSL
-           "(uri-security-supported=tls>),"
-#else
-           "(uri-security-supported=none>),"
-#endif /* HAVE_SSL */
-           "(printer-name=%s),"
-           "(printer-location=%s),"
-           "(printer-info=%s),"
-           "(printer-more-info=%s),"
-           "(printer-make-and-model=%s),"
-	   "(printer-type=%d),"
-	   "(charset-supported=utf-8),"
-	   "(natural-language-configured=%s),"
-	   "(natural-language-supported=de,en,es,fr,it),"
-           "(color-supported=%s),"
-           "(finishings-supported=%s),"
-           "(sides-supported=one-sided%s),"
-	   "(multiple-document-jobs-supported=true)"
-	   "(ipp-versions-supported=1.0,1.1)",
-	   p->uri, authentication->values[0].string.text, p->name, location,
-	   info, p->uri, make_model, p->type, DefaultLanguage,
-           p->type & CUPS_PRINTER_COLOR ? "true" : "false",
-           finishings,
-           p->type & CUPS_PRINTER_DUPLEX ?
-	       ",two-sided-long-edge,two-sided-short-edge" : "");
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Attributes = \"%s\"", attrs);
-
- /*
-  * Register the printer with the SLP server...
-  */
-
-  error = SLPReg(BrowseSLPHandle, srvurl, BrowseTimeout,
-	         SLP_CUPS_SRVTYPE, attrs, SLP_TRUE, slp_reg_callback, 0);
-
-  if (error != SLP_OK)
-    cupsdLogMessage(CUPSD_LOG_ERROR, "SLPReg of \"%s\" failed with status %d!", p->name,
-                    error);
-}
-#endif /* HAVE_LIBSLP */
 
 
 /*
@@ -2907,7 +2430,488 @@ process_implicit_classes(void)
 }
 
 
+/*
+ * 'send_cups_browse()' - Send new browsing information using the CUPS
+ *                           protocol.
+ */
+
+static void
+send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
+{
+  int			i;		/* Looping var */
+  cups_ptype_t		type;		/* Printer type */
+  cupsd_dirsvc_addr_t	*b;		/* Browse address */
+  int			bytes;		/* Length of packet */
+  char			packet[1453],	/* Browse data packet */
+			uri[1024],	/* Printer URI */
+			location[1024],	/* printer-location */
+			info[1024],	/* printer-info */
+			make_model[1024];
+					/* printer-make-and-model */
+  cupsd_netif_t		*iface;		/* Network interface */
+
+
+ /*
+  * Figure out the printer type value...
+  */
+
+  type = p->type | CUPS_PRINTER_REMOTE;
+
+  if (!p->accepting)
+    type |= CUPS_PRINTER_REJECTING;
+
+  if (p == DefaultPrinter)
+    type |= CUPS_PRINTER_DEFAULT;
+
+ /*
+  * Remove quotes from printer-info, printer-location, and
+  * printer-make-and-model attributes...
+  */
+
+  dequote(location, p->location, sizeof(location));
+  dequote(info, p->info, sizeof(info));
+  dequote(make_model, p->make_model ? p->make_model : "Unknown",
+          sizeof(make_model));
+
+ /*
+  * Send a packet to each browse address...
+  */
+
+  for (i = NumBrowsers, b = Browsers; i > 0; i --, b ++)
+    if (b->iface[0])
+    {
+     /*
+      * Send the browse packet to one or more interfaces...
+      */
+
+      if (!strcmp(b->iface, "*"))
+      {
+       /*
+        * Send to all local interfaces...
+	*/
+
+        cupsdNetIFUpdate();
+
+	for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
+	     iface;
+	     iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
+	{
+	 /*
+	  * Only send to local, IPv4 interfaces...
+	  */
+
+	  if (!iface->is_local || !iface->port ||
+	      iface->address.addr.sa_family != AF_INET)
+	    continue;
+
+	  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+	                   iface->hostname, iface->port,
+			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
+			                                    "/printers/%s",
+			   p->name);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+        	   type, p->state, uri, location, info, make_model,
+		   p->browse_attrs ? p->browse_attrs : "");
+
+	  bytes = strlen(packet);
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                  "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
+        	          iface->name, packet);
+
+          iface->broadcast.ipv4.sin_port = htons(BrowsePort);
+
+	  sendto(BrowseSocket, packet, bytes, 0,
+		 (struct sockaddr *)&(iface->broadcast),
+		 sizeof(struct sockaddr_in));
+        }
+      }
+      else if ((iface = cupsdNetIFFind(b->iface)) != NULL)
+      {
+       /*
+        * Send to the named interface using the IPv4 address...
+	*/
+
+        while (iface)
+	  if (strcmp(b->iface, iface->name))
+	  {
+	    iface = NULL;
+	    break;
+	  }
+	  else if (iface->address.addr.sa_family == AF_INET && iface->port)
+	    break;
+	  else
+            iface = (cupsd_netif_t *)cupsArrayNext(NetIFList);
+
+        if (iface)
+	{
+	  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+	                   iface->hostname, iface->port,
+			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
+			                                    "/printers/%s",
+			   p->name);
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+        	   type, p->state, uri, location, info, make_model,
+		   p->browse_attrs ? p->browse_attrs : "");
+
+	  bytes = strlen(packet);
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                  "cupsdSendBrowseList: (%d bytes to \"%s\") %s", bytes,
+        	          iface->name, packet);
+
+          iface->broadcast.ipv4.sin_port = htons(BrowsePort);
+
+	  sendto(BrowseSocket, packet, bytes, 0,
+		 (struct sockaddr *)&(iface->broadcast),
+		 sizeof(struct sockaddr_in));
+        }
+      }
+    }
+    else
+    {
+     /*
+      * Send the browse packet to the indicated address using
+      * the default server name...
+      */
+
+      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+       	       type, p->state, p->uri, location, info, make_model,
+	       p->browse_attrs ? p->browse_attrs : "");
+
+      bytes = strlen(packet);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdSendBrowseList: (%d bytes) %s", bytes, packet);
+
+      if (sendto(BrowseSocket, packet, bytes, 0,
+		 (struct sockaddr *)&(b->to),
+		 sizeof(struct sockaddr_in)) <= 0)
+      {
+       /*
+        * Unable to send browse packet, so remove this address from the
+	* list...
+	*/
+
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "cupsdSendBrowseList: sendto failed for browser "
+			"%d - %s.",
+	                (int)(b - Browsers + 1), strerror(errno));
+
+        if (i > 1)
+	  memmove(b, b + 1, (i - 1) * sizeof(cupsd_dirsvc_addr_t));
+
+	b --;
+	NumBrowsers --;
+      }
+    }
+}
+
+
+#ifdef HAVE_OPENLDAP
+/*
+ * 'send_ldap_browse()' - Send LDAP printer registrations.
+ */
+
+static void
+send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
+{
+  int		i;			/* Looping var... */
+  LDAPMod	mods[7];		/* The 7 attributes we will be adding */
+  LDAPMod	*pmods[8];		/* Pointers to the 7 attributes + NULL */
+  LDAPMessage	*res;			/* Search result token */
+  char		*cn_value[2],		/* Change records */
+		*uri[2],
+		*info[2],
+		*location[2],
+		*make_model[2],
+		*type[2],
+		typestring[255],	/* String to hold printer-type */
+		filter[256],		/* Search filter for possible UPDATEs */
+		dn[1024];		/* DN of the printer we are adding */
+  int		rc;			/* LDAP status */
+  static const char * const objectClass_values[] =
+		{			/* The 3 objectClass's we use in */
+		  "top",		/* our LDAP entries              */
+		  "device",
+		  "cupsPrinter",
+		  NULL
+		};
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: %s\n", p->name);
+
+ /*
+  * Everything in ldap is ** so we fudge around it...
+  */
+
+  sprintf(typestring, "%u", p->type);
+
+  cn_value[0]   = p->info;
+  cn_value[1]   = NULL;
+  info[0]       = p->info;
+  info[1]       = NULL;
+  location[0]   = p->location;
+  location[1]   = NULL;
+  make_model[0] = p->make_model;
+  make_model[1] = NULL;
+  type[0]       = typestring;
+  type[1]       = NULL;
+  uri[0]        = p->uri;
+  uri[1]        = NULL;
+
+  snprintf(filter, sizeof(filter),
+           "(&(objectclass=cupsPrinter)(printerDescription~=%s))", p->info);
+
+  ldap_search_s(BrowseLDAPHandle, BrowseLDAPDN, LDAP_SCOPE_SUBTREE,
+                filter, (char **)ldap_attrs, 0, &res);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: Searching \"%s\"",
+                  filter);
+
+  mods[0].mod_type = "cn";
+  mods[0].mod_values = cn_value;
+  mods[1].mod_type = "printerDescription";
+  mods[1].mod_values = info;
+  mods[2].mod_type = "printerURI";
+  mods[2].mod_values = uri;
+  mods[3].mod_type = "printerLocation";
+  mods[3].mod_values = location;
+  mods[4].mod_type = "printerMakeAndModel";
+  mods[4].mod_values = make_model;
+  mods[5].mod_type = "printerType";
+  mods[5].mod_values = type;
+  mods[6].mod_type = "objectClass";
+  mods[6].mod_values = (char **)objectClass_values;
+
+  snprintf(dn, sizeof(dn), "cn=%s,ou=printers,%s", p->info, BrowseLDAPDN);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: dn=\"%s\"", dn);
+
+  if (ldap_count_entries(BrowseLDAPHandle, res) > 0)
+  {
+   /*
+    * Printer has already been registered, modify the current
+    * registration...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "send_ldap_browse: Replacing entry...");
+
+    for (i = 0; i < 7; i ++)
+    {
+      pmods[i]         = mods + i;
+      pmods[i]->mod_op = LDAP_MOD_REPLACE;
+    }
+    pmods[i] = NULL;
+
+    if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "LDAP modify for %s failed with status %d: %s",
+                      p->name, rc, ldap_err2string(rc));
+  }
+  else 
+  {
+   /*
+    * Printer has already been registered, modify the current
+    * registration...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "send_ldap_browse: Adding entry...");
+
+    for (i = 0; i < 7; i ++)
+    {
+      pmods[i]         = mods + i;
+      pmods[i]->mod_op = LDAP_MOD_REPLACE;
+    }
+    pmods[i] = NULL;
+
+    if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "LDAP add for %s failed with status %d: %s",
+                      p->name, rc, ldap_err2string(rc));
+  }
+}
+#endif /* HAVE_OPENLDAP */
+
+
 #ifdef HAVE_LIBSLP
+/*
+ * 'send_slp_browse()' - Register the specified printer with SLP.
+ */
+
+static void
+send_slp_browse(cupsd_printer_t *p)	/* I - Printer to register */
+{
+  char		srvurl[HTTP_MAX_URI],	/* Printer service URI */
+		attrs[8192],		/* Printer attributes */
+		finishings[1024],	/* Finishings to support */
+		make_model[IPP_MAX_NAME * 2],
+					/* Make and model, quoted */
+		location[IPP_MAX_NAME * 2],
+					/* Location, quoted */
+		info[IPP_MAX_NAME * 2],	/* Info, quoted */
+		*src,			/* Pointer to original string */
+		*dst;			/* Pointer to destination string */
+  ipp_attribute_t *authentication;	/* uri-authentication-supported value */
+  SLPError	error;			/* SLP error, if any */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "send_slp_browse(%p = \"%s\")", p,
+                  p->name);
+
+ /*
+  * Make the SLP service URL that conforms to the IANA 
+  * 'printer:' template.
+  */
+
+  snprintf(srvurl, sizeof(srvurl), SLP_CUPS_SRVTYPE ":%s", p->uri);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Service URL = \"%s\"", srvurl);
+
+ /*
+  * Figure out the finishings string...
+  */
+
+  if (p->type & CUPS_PRINTER_STAPLE)
+    strcpy(finishings, "staple");
+  else
+    finishings[0] = '\0';
+
+  if (p->type & CUPS_PRINTER_BIND)
+  {
+    if (finishings[0])
+      strlcat(finishings, ",bind", sizeof(finishings));
+    else
+      strcpy(finishings, "bind");
+  }
+
+  if (p->type & CUPS_PRINTER_PUNCH)
+  {
+    if (finishings[0])
+      strlcat(finishings, ",punch", sizeof(finishings));
+    else
+      strcpy(finishings, "punch");
+  }
+
+  if (p->type & CUPS_PRINTER_COVER)
+  {
+    if (finishings[0])
+      strlcat(finishings, ",cover", sizeof(finishings));
+    else
+      strcpy(finishings, "cover");
+  }
+
+  if (p->type & CUPS_PRINTER_SORT)
+  {
+    if (finishings[0])
+      strlcat(finishings, ",sort", sizeof(finishings));
+    else
+      strcpy(finishings, "sort");
+  }
+
+  if (!finishings[0])
+    strcpy(finishings, "none");
+
+ /*
+  * Quote any commas in the make and model, location, and info strings...
+  */
+
+  for (src = p->make_model, dst = make_model;
+       src && *src && dst < (make_model + sizeof(make_model) - 2);)
+  {
+    if (*src == ',' || *src == '\\' || *src == ')')
+      *dst++ = '\\';
+
+    *dst++ = *src++;
+  }
+
+  *dst = '\0';
+
+  if (!make_model[0])
+    strcpy(make_model, "Unknown");
+
+  for (src = p->location, dst = location;
+       src && *src && dst < (location + sizeof(location) - 2);)
+  {
+    if (*src == ',' || *src == '\\' || *src == ')')
+      *dst++ = '\\';
+
+    *dst++ = *src++;
+  }
+
+  *dst = '\0';
+
+  if (!location[0])
+    strcpy(location, "Unknown");
+
+  for (src = p->info, dst = info;
+       src && *src && dst < (info + sizeof(info) - 2);)
+  {
+    if (*src == ',' || *src == '\\' || *src == ')')
+      *dst++ = '\\';
+
+    *dst++ = *src++;
+  }
+
+  *dst = '\0';
+
+  if (!info[0])
+    strcpy(info, "Unknown");
+
+ /*
+  * Get the authentication value...
+  */
+
+  authentication = ippFindAttribute(p->attrs, "uri-authentication-supported",
+                                    IPP_TAG_KEYWORD);
+
+ /*
+  * Make the SLP attribute string list that conforms to
+  * the IANA 'printer:' template.
+  */
+
+  snprintf(attrs, sizeof(attrs),
+           "(printer-uri-supported=%s),"
+           "(uri-authentication-supported=%s>),"
+#ifdef HAVE_SSL
+           "(uri-security-supported=tls>),"
+#else
+           "(uri-security-supported=none>),"
+#endif /* HAVE_SSL */
+           "(printer-name=%s),"
+           "(printer-location=%s),"
+           "(printer-info=%s),"
+           "(printer-more-info=%s),"
+           "(printer-make-and-model=%s),"
+	   "(printer-type=%d),"
+	   "(charset-supported=utf-8),"
+	   "(natural-language-configured=%s),"
+	   "(natural-language-supported=de,en,es,fr,it),"
+           "(color-supported=%s),"
+           "(finishings-supported=%s),"
+           "(sides-supported=one-sided%s),"
+	   "(multiple-document-jobs-supported=true)"
+	   "(ipp-versions-supported=1.0,1.1)",
+	   p->uri, authentication->values[0].string.text, p->name, location,
+	   info, p->uri, make_model, p->type, DefaultLanguage,
+           p->type & CUPS_PRINTER_COLOR ? "true" : "false",
+           finishings,
+           p->type & CUPS_PRINTER_DUPLEX ?
+	       ",two-sided-long-edge,two-sided-short-edge" : "");
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "Attributes = \"%s\"", attrs);
+
+ /*
+  * Register the printer with the SLP server...
+  */
+
+  error = SLPReg(BrowseSLPHandle, srvurl, BrowseTimeout,
+	         SLP_CUPS_SRVTYPE, attrs, SLP_TRUE, slp_reg_callback, 0);
+
+  if (error != SLP_OK)
+    cupsdLogMessage(CUPSD_LOG_ERROR, "SLPReg of \"%s\" failed with status %d!", p->name,
+                    error);
+}
+
+
 /*
  * 'slp_attr_callback()' - SLP attribute callback 
  */

@@ -145,6 +145,7 @@ cupsdStopServer(void)
   cupsdStopBrowsing();
   cupsdStopAllNotifiers();
   cupsdSaveRemoteCache();
+  cupsdDeleteAllCerts();
 
   if (Clients != NULL)
   {

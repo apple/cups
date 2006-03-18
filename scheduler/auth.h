@@ -154,8 +154,6 @@ extern void		cupsdDenyIP(cupsd_location_t *loc, unsigned address[4],
 			            unsigned netmask[4]);
 extern cupsd_location_t	*cupsdFindBest(const char *path, http_state_t state);
 extern cupsd_location_t	*cupsdFindLocation(const char *location);
-extern char		*cupsdGetMD5Passwd(const char *username, const char *group,
-			                   char passwd[33]);
 extern http_status_t	cupsdIsAuthorized(cupsd_client_t *con, const char *owner);
 
 

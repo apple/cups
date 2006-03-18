@@ -332,7 +332,8 @@ cupsdDeleteAllCerts(void)
     free(cert);
   }
 
-  Certs = NULL;
+  Certs        = NULL;
+  RootCertTime = 0;
 }
 
 

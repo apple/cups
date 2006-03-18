@@ -23,10 +23,11 @@
  *
  * Contents:
  *
- *   cupsdAddBanner()   - Add a banner to the array.
  *   cupsdFindBanner()  - Find a named banner.
  *   cupsdLoadBanners() - Load all available banner files...
+ *   add_banner()       - Add a banner to the array.
  *   compare_banners()  - Compare two banners.
+ *   free_banners()     - Free all banners.
  */
 
 /*
@@ -41,49 +42,10 @@
  * Local functions...
  */
 
+static void	add_banner(const char *name, const char *filename);
 static int	compare_banners(const cupsd_banner_t *b0,
 		                const cupsd_banner_t *b1);
-
-
-/*
- * 'cupsdAddBanner()' - Add a banner to the array.
- */
-
-void
-cupsdAddBanner(const char *name,	/* I - Name of banner */
-               const char *filename)	/* I - Filename for banner */
-{
-  mime_type_t		*filetype;	/* Filetype */
-  cupsd_banner_t	*temp;		/* New banner data */
-
-
- /*
-  * See what the filetype is...
-  */
-
-  if ((filetype = mimeFileType(MimeDatabase, filename, NULL, NULL)) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_WARN,
-                    "cupsdAddBanner: Banner \"%s\" (\"%s\") is of an unknown file type - skipping!",
-                    name, filename);
-    return;
-  }
-
- /*
-  * Allocate memory...
-  */
-
-  temp = calloc(1, sizeof(cupsd_banner_t));
-
- /*
-  * Copy the new banner data over...
-  */
-
-  temp->name     = strdup(name);
-  temp->filetype = filetype;
-
-  cupsArrayAdd(Banners, temp);
-}
+static void	free_banners(void);
 
 
 /*
@@ -99,29 +61,6 @@ cupsdFindBanner(const char *name)	/* I - Name of banner */
   key.name = (char *)name;
 
   return ((cupsd_banner_t *)cupsArrayFind(Banners, &key));
-}
-
-
-/*
- * 'cupsdFreeBanners()' - Free all banners.
- */
-
-void
-cupsdFreeBanners(void)
-{
-  cupsd_banner_t	*temp;		/* Current banner */
-
-
-  for (temp = (cupsd_banner_t *)cupsArrayFirst(Banners);
-       temp;
-       temp = (cupsd_banner_t *)cupsArrayNext(Banners))
-  {
-    free(temp->name);
-    free(temp);
-  }
-
-  cupsArrayDelete(Banners);
-  Banners = NULL;
 }
 
 
@@ -142,7 +81,7 @@ cupsdLoadBanners(const char *d)		/* I - Directory to search */
   * Free old banner info...
   */
 
-  cupsdFreeBanners();
+  free_banners();
 
  /*
   * Try opening the banner directory...
@@ -187,7 +126,7 @@ cupsdLoadBanners(const char *d)		/* I - Directory to search */
     * Must be a valid file; add it!
     */
 
-    cupsdAddBanner(dent->filename, filename);
+    add_banner(dent->filename, filename);
   }
 
  /*
@@ -195,6 +134,47 @@ cupsdLoadBanners(const char *d)		/* I - Directory to search */
   */
 
   cupsDirClose(dir);
+}
+
+
+/*
+ * 'add_banner()' - Add a banner to the array.
+ */
+
+static void
+add_banner(const char *name,		/* I - Name of banner */
+           const char *filename)	/* I - Filename for banner */
+{
+  mime_type_t		*filetype;	/* Filetype */
+  cupsd_banner_t	*temp;		/* New banner data */
+
+
+ /*
+  * See what the filetype is...
+  */
+
+  if ((filetype = mimeFileType(MimeDatabase, filename, NULL, NULL)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "add_banner: Banner \"%s\" (\"%s\") is of an unknown file type - skipping!",
+                    name, filename);
+    return;
+  }
+
+ /*
+  * Allocate memory...
+  */
+
+  temp = calloc(1, sizeof(cupsd_banner_t));
+
+ /*
+  * Copy the new banner data over...
+  */
+
+  temp->name     = strdup(name);
+  temp->filetype = filetype;
+
+  cupsArrayAdd(Banners, temp);
 }
 
 
@@ -208,6 +188,29 @@ compare_banners(
     const cupsd_banner_t *b1)		/* I - Second banner */
 {
   return (strcasecmp(b0->name, b1->name));
+}
+
+
+/*
+ * 'free_banners()' - Free all banners.
+ */
+
+void
+free_banners(void)
+{
+  cupsd_banner_t	*temp;		/* Current banner */
+
+
+  for (temp = (cupsd_banner_t *)cupsArrayFirst(Banners);
+       temp;
+       temp = (cupsd_banner_t *)cupsArrayNext(Banners))
+  {
+    free(temp->name);
+    free(temp);
+  }
+
+  cupsArrayDelete(Banners);
+  Banners = NULL;
 }
 
 

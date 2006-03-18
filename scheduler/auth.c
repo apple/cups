@@ -41,13 +41,13 @@
  *   cupsdFindBest()           - Find the location entry that best matches the
  *                               resource.
  *   cupsdFindLocation()       - Find the named location.
- *   cupsdGetMD5Passwd()       - Get an MD5 password.
  *   cupsdIsAuthorized()       - Check to see if the user is authorized...
  *   add_allow()               - Add an allow mask to the location.
  *   add_deny()                - Add a deny mask to the location.
  *   compare_locations()       - Compare two locations.
  *   cups_crypt()              - Encrypt the password using the DES or MD5
  *                               algorithms, as needed.
+ *   get_md5_password()        - Get an MD5 password.
  *   pam_func()                - PAM conversation function.
  *   to64()                    - Base64-encode an integer value...
  */
@@ -90,6 +90,8 @@ static int		compare_locations(cupsd_location_t *a,
 #if !HAVE_LIBPAM
 static char		*cups_crypt(const char *pw, const char *salt);
 #endif /* !HAVE_LIBPAM */
+static char		*get_md5_password(const char *username,
+			                  const char *group, char passwd[33]);
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
@@ -662,7 +664,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	  * Do Basic authentication with the Digest password file...
 	  */
 
-	  if (!cupsdGetMD5Passwd(username, NULL, md5))
+	  if (!get_md5_password(username, NULL, md5))
 	  {
             cupsdLogMessage(CUPSD_LOG_ERROR,
 	                    "cupsdAuthorize: Unknown MD5 username \"%s\"!",
@@ -733,7 +735,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Validate the username and password...
     */
 
-    if (!cupsdGetMD5Passwd(username, NULL, md5))
+    if (!get_md5_password(username, NULL, md5))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
 	              "cupsdAuthorize: Unknown MD5 username \"%s\"!",
@@ -1018,7 +1020,7 @@ cupsdCheckGroup(
   * file...
   */
 
-  if (cupsdGetMD5Passwd(username, groupname, junk) != NULL)
+  if (get_md5_password(username, groupname, junk) != NULL)
     return (1);
 
  /*
@@ -1458,68 +1460,6 @@ cupsdFindLocation(const char *location)	/* I - Connection */
   key.location = (char *)location;
 
   return ((cupsd_location_t *)cupsArrayFind(Locations, &key));
-}
-
-
-/*
- * 'cupsdGetMD5Passwd()' - Get an MD5 password.
- */
-
-char *					/* O - MD5 password string */
-cupsdGetMD5Passwd(const char *username,	/* I - Username */
-                  const char *group,	/* I - Group */
-                  char       passwd[33])/* O - MD5 password string */
-{
-  cups_file_t	*fp;			/* passwd.md5 file */
-  char		filename[1024],		/* passwd.md5 filename */
-		line[256],		/* Line from file */
-		tempuser[33],		/* User from file */
-		tempgroup[33];		/* Group from file */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdGetMD5Passwd(username=\"%s\", group=\"%s\", passwd=%p)",
-                  username, group ? group : "(null)", passwd);
-
-  snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
-  {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open %s - %s", filename,
-                      strerror(errno));
-
-    return (NULL);
-  }
-
-  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
-  {
-    if (sscanf(line, "%32[^:]:%32[^:]:%32s", tempuser, tempgroup, passwd) != 3)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Bad MD5 password line: %s", line);
-      continue;
-    }
-
-    if (!strcmp(username, tempuser) &&
-        (group == NULL || !strcmp(group, tempgroup)))
-    {
-     /*
-      * Found the password entry!
-      */
-
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Found MD5 user %s, group %s...",
-                      username, tempgroup);
-
-      cupsFileClose(fp);
-      return (passwd);
-    }
-  }
-
- /*
-  * Didn't find a password entry - return NULL!
-  */
-
-  cupsFileClose(fp);
-  return (NULL);
 }
 
 
@@ -2045,6 +1985,68 @@ cups_crypt(const char *pw,		/* I - Password string */
   }
 }
 #endif /* !HAVE_LIBPAM */
+
+
+/*
+ * 'get_md5_password()' - Get an MD5 password.
+ */
+
+static char *				/* O - MD5 password string */
+get_md5_password(const char *username,	/* I - Username */
+                 const char *group,	/* I - Group */
+                 char       passwd[33])	/* O - MD5 password string */
+{
+  cups_file_t	*fp;			/* passwd.md5 file */
+  char		filename[1024],		/* passwd.md5 filename */
+		line[256],		/* Line from file */
+		tempuser[33],		/* User from file */
+		tempgroup[33];		/* Group from file */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "get_md5_password(username=\"%s\", group=\"%s\", passwd=%p)",
+                  username, group ? group : "(null)", passwd);
+
+  snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  {
+    if (errno != ENOENT)
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open %s - %s", filename,
+                      strerror(errno));
+
+    return (NULL);
+  }
+
+  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
+  {
+    if (sscanf(line, "%32[^:]:%32[^:]:%32s", tempuser, tempgroup, passwd) != 3)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Bad MD5 password line: %s", line);
+      continue;
+    }
+
+    if (!strcmp(username, tempuser) &&
+        (group == NULL || !strcmp(group, tempgroup)))
+    {
+     /*
+      * Found the password entry!
+      */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Found MD5 user %s, group %s...",
+                      username, tempgroup);
+
+      cupsFileClose(fp);
+      return (passwd);
+    }
+  }
+
+ /*
+  * Didn't find a password entry - return NULL!
+  */
+
+  cupsFileClose(fp);
+  return (NULL);
+}
 
 
 #if HAVE_LIBPAM

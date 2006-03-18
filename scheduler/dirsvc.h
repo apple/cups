@@ -167,11 +167,6 @@ extern void	cupsdLoadRemoteCache(void);
 extern void	cupsdSaveRemoteCache(void);
 extern void	cupsdSendBrowseDelete(cupsd_printer_t *p);
 extern void	cupsdSendBrowseList(void);
-extern void	cupsdSendCUPSBrowse(cupsd_printer_t *p);
-#ifdef HAVE_LDAP
-extern void	cupsdSendLDAPBrowse(cupsd_printer_t *p);
-#endif /* HAVE_LDAP */
-extern void	cupsdSendSLPBrowse(cupsd_printer_t *p);
 extern void	cupsdStartBrowsing(void);
 extern void	cupsdStartPolling(void);
 extern void	cupsdStopBrowsing(void);

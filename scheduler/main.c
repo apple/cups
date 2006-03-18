@@ -26,9 +26,7 @@
  *   main()                    - Main entry for the CUPS scheduler.
  *   cupsdClosePipe()          - Close a pipe as necessary.
  *   cupsdOpenPipe()           - Create a pipe which is closed on exec.
- *   cupsdCatchChildSignals()  - Catch SIGCHLD signals...
  *   cupsdHoldSignals()        - Hold child and termination signals.
- *   cupsdIgnoreChildSignals() - Ignore SIGCHLD signals...
  *   cupsdReleaseSignals()     - Release signals for delivery.
  *   cupsdSetString()          - Set a string value.
  *   cupsdSetStringf()         - Set a formatted string value.
@@ -428,11 +426,18 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGCHLD, sigchld_handler);
   sigset(SIGHUP, sighup_handler);
   sigset(SIGPIPE, SIG_IGN);
   sigset(SIGTERM, sigterm_handler);
 #elif defined(HAVE_SIGACTION)
   memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGTERM);
+  sigaddset(&action.sa_mask, SIGCHLD);
+  action.sa_handler = sigchld_handler;
+  sigaction(SIGCHLD, &action, NULL);
 
   sigemptyset(&action.sa_mask);
   sigaddset(&action.sa_mask, SIGHUP);
@@ -449,6 +454,7 @@ main(int  argc,				/* I - Number of command-line args */
   action.sa_handler = sigterm_handler;
   sigaction(SIGTERM, &action, NULL);
 #else
+  signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
   signal(SIGHUP, sighup_handler);
   signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, sigterm_handler);
@@ -501,17 +507,13 @@ main(int  argc,				/* I - Number of command-line args */
       kill(i, SIGUSR1);
   }
 
+#ifdef __APPLE__
  /*
   * Start power management framework...
   */
 
   cupsdStartSystemMonitor();
-
- /*
-  * Catch signals...
-  */
-
-  cupsdCatchChildSignals();
+#endif /* __APPLE__ */
 
  /*
   * Start any pending print jobs...
@@ -1064,7 +1066,9 @@ main(int  argc,				/* I - Number of command-line args */
 
   cupsdFreeAllJobs();
 
+#ifdef __APPLE__
   cupsdStopSystemMonitor();
+#endif /* __APPLE__ */
 
 #ifdef HAVE_LAUNCHD
  /*
@@ -1178,34 +1182,6 @@ cupsdOpenPipe(int *fds)			/* O - Pipe file descriptors (2) */
 
 
 /*
- * 'cupsdCatchChildSignals()' - Catch SIGCHLD signals...
- */
-
-void
-cupsdCatchChildSignals(void)
-{
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction	action;		/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-
-
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGCHLD, sigchld_handler);
-#elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
-
-  sigemptyset(&action.sa_mask);
-  sigaddset(&action.sa_mask, SIGTERM);
-  sigaddset(&action.sa_mask, SIGCHLD);
-  action.sa_handler = sigchld_handler;
-  sigaction(SIGCHLD, &action, NULL);
-#else
-  signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
-#endif /* HAVE_SIGSET */
-}
-
-
-/*
  * 'cupsdClearString()' - Clear a string.
  */
 
@@ -1244,36 +1220,6 @@ cupsdHoldSignals(void)
   sigaddset(&newmask, SIGTERM);
   sigaddset(&newmask, SIGCHLD);
   sigprocmask(SIG_BLOCK, &newmask, &holdmask);
-#endif /* HAVE_SIGSET */
-}
-
-
-/*
- * 'cupsdIgnoreChildSignals()' - Ignore SIGCHLD signals...
- *
- * We don't really ignore them, we set the signal handler to SIG_DFL,
- * since some OS's rely on signals for the wait4() function to work.
- */
-
-void
-cupsdIgnoreChildSignals(void)
-{
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction	action;		/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-
-
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGCHLD, SIG_DFL);
-#elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
-
-  sigemptyset(&action.sa_mask);
-  sigaddset(&action.sa_mask, SIGCHLD);
-  action.sa_handler = SIG_DFL;
-  sigaction(SIGCHLD, &action, NULL);
-#else
-  signal(SIGCLD, SIG_DFL);	/* No, SIGCLD isn't a typo... */
 #endif /* HAVE_SIGSET */
 }
 

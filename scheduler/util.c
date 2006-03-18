@@ -194,6 +194,7 @@ cupsdSendIPPHeader(
 }
 
 
+#if 0 /* Not currently used */
 /*
  * 'cupsdSendIPPInteger()' - Send an integer attribute.
  */
@@ -225,6 +226,7 @@ cupsdSendIPPInteger(
   putchar(value >> 8);
   putchar(value);
 }
+#endif /* 0 */
 
 
 /*

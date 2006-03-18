@@ -173,10 +173,8 @@ VAR int			Launchd		VALUE(0);
  * Prototypes...
  */
 
-extern void	cupsdCatchChildSignals(void);
 extern void	cupsdClearString(char **s);
 extern void	cupsdHoldSignals(void);
-extern void	cupsdIgnoreChildSignals(void);
 extern void	cupsdReleaseSignals(void);
 extern void	cupsdSetString(char **s, const char *v);
 extern void	cupsdSetStringf(char **s, const char *f, ...)
@@ -189,7 +187,6 @@ extern void	cupsdStopServer(void);
 extern void	cupsdClosePipe(int *fds);
 extern int	cupsdOpenPipe(int *fds);
 
-extern void	cupsdClearEnv(void);
 extern void	cupsdInitEnv(void);
 extern int	cupsdLoadEnv(char *envp[], int envmax);
 extern void	cupsdSetEnv(const char *name, const char *value);

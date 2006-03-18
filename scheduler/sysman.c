@@ -52,38 +52,6 @@
  * common to wake up in a new location.
  */
 
-#ifndef __APPLE__
-/*
- * 'cupsdStartSystemMonitor()' - Start monitoring for system change.
- */
-
-void
-cupsdStartSystemMonitor(void)
-{
-}
-
-
-/*
- * 'cupsdStopSystemMonitor()' - Stop monitoring for system change.
- */
-
-void
-cupsdStopSystemMonitor(void)
-{
-}
-
-
-/*
- * 'cupsdUpdateSystemMonitor()' - Update the current system state.
- */
-
-void
-cupsdUpdateSystemMonitor(void)
-{
-}
-#endif /* !__APPLE__ */
-
-
 #ifdef __APPLE__
 /*
  * This is the Apple-specific system event code.  It works by creating

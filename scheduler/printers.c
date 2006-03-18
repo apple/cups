@@ -28,7 +28,6 @@
  *   cupsdAddPrinterUser()       - Add a user to the ACL.
  *   cupsdDeleteAllPrinters()    - Delete all printers from the system.
  *   cupsdDeletePrinter()        - Delete a printer from the system.
- *   cupsdDeletePrinterFilters() - Delete all MIME filters for a printer.
  *   cupsdFindPrinter()          - Find a printer in the list.
  *   cupsdFreePrinterUsers()     - Free allow/deny users.
  *   cupsdLoadAllPrinters()      - Load printers from the printers.conf file.
@@ -51,6 +50,7 @@
  *   add_printer_formats()       - Add document-format-supported values for
  *                                 a printer.
  *   compare_printers()          - Compare two printers.
+ *   delete_printer_filters()    - Delete all MIME filters for a printer.
  *   write_irix_config()         - Update the config files used by the IRIX
  *                                 desktop tools.
  *   write_irix_state()          - Update the status files used by IRIX
@@ -72,6 +72,7 @@ static void	add_printer_defaults(cupsd_printer_t *p);
 static void	add_printer_filter(cupsd_printer_t *p, const char *filter);
 static void	add_printer_formats(cupsd_printer_t *p);
 static int	compare_printers(void *first, void *second, void *data);
+static void	delete_printer_filters(cupsd_printer_t *p);
 #ifdef __sgi
 static void	write_irix_config(cupsd_printer_t *p);
 static void	write_irix_state(cupsd_printer_t *p);
@@ -700,7 +701,7 @@ cupsdDeletePrinter(
 
   ippDelete(p->attrs);
 
-  cupsdDeletePrinterFilters(p);
+  delete_printer_filters(p);
 
   mimeDeleteType(MimeDatabase, p->filetype);
 
@@ -736,43 +737,6 @@ cupsdDeletePrinter(
   */
 
   cupsArrayRestore(Printers);
-}
-
-
-/*
- * 'cupsdDeletePrinterFilters()' - Delete all MIME filters for a printer.
- */
-
-void
-cupsdDeletePrinterFilters(
-    cupsd_printer_t *p)			/* I - Printer to remove from */
-{
-  mime_filter_t	*filter;		/* MIME filter looping var */
-
-
- /*
-  * Range check input...
-  */
-
-  if (p == NULL)
-    return;
-
- /*
-  * Remove all filters from the MIME database that have a destination
-  * type == printer...
-  */
-
-  for (filter = mimeFirstFilter(MimeDatabase);
-       filter;
-       filter = mimeNextFilter(MimeDatabase))
-    if (filter->dst == p->filetype)
-    {
-     /*
-      * Delete the current filter...
-      */
-
-      mimeDeleteFilter(MimeDatabase, filter);
-    }
 }
 
 
@@ -1480,7 +1444,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   * Clear out old filters, if any...
   */
 
-  cupsdDeletePrinterFilters(p);
+  delete_printer_filters(p);
 
  /*
   * Figure out the authentication that is required for the printer.
@@ -3014,6 +2978,43 @@ compare_printers(void *first,		/* I - First printer */
 {
   return (strcasecmp(((cupsd_printer_t *)first)->name,
                      ((cupsd_printer_t *)second)->name));
+}
+
+
+/*
+ * 'delete_printer_filters()' - Delete all MIME filters for a printer.
+ */
+
+static void
+delete_printer_filters(
+    cupsd_printer_t *p)			/* I - Printer to remove from */
+{
+  mime_filter_t	*filter;		/* MIME filter looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (p == NULL)
+    return;
+
+ /*
+  * Remove all filters from the MIME database that have a destination
+  * type == printer...
+  */
+
+  for (filter = mimeFirstFilter(MimeDatabase);
+       filter;
+       filter = mimeNextFilter(MimeDatabase))
+    if (filter->dst == p->filetype)
+    {
+     /*
+      * Delete the current filter...
+      */
+
+      mimeDeleteFilter(MimeDatabase, filter);
+    }
 }
 
 
