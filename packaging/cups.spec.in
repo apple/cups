@@ -40,6 +40,7 @@
 Summary: Common UNIX Printing System
 Name: cups
 Version: @CUPS_VERSION@
+Serial: @CUPS_SERIAL@
 Release: 0
 Epoch: 1
 License: GPL

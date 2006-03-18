@@ -100,7 +100,6 @@ HEADERS	=	\
 		ipp.h \
 		language.h \
 		md5.h \
-		normalize.h \
 		ppd.h \
 		transcode.h
 

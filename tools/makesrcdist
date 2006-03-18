@@ -14,14 +14,17 @@ if test ! -f tools/makesrcdist; then
         exit 1
 fi
 
+svn up
+svnrev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
+serial=`expr 102000000 + $svnrev`
+
 if test $# = 0; then
 	echo Updating for snapshot...
-	svn up
-	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
+	rev=$svnrev
 	version="1.2svn"
 	revision="-r$rev"
 	fileversion="1.2svn-r$rev"
-	fileurl="ftp://ftp.easysw.com/pub/cups/test/cups-$fileversion-source.tar.bz2"
+	fileurl="ftp://ftp.easysw.com/pub/cups/test/cups-$fileversion-source.tar."
 	url="."
 else
 	echo Creating tag for release...
@@ -29,12 +32,14 @@ else
 	version=$1
 	revision=""
 	fileversion=$1
-	fileurl="ftp://ftp.easysw.com/pub/cups/$version/cups-$fileversion-source.tar.bz2"
+	fileurl="ftp://ftp.easysw.com/pub/cups/$version/cups-$fileversion-source.tar."
 	url="https://svn.easysw.com/public/cups/tags/release-$version"
 
 	svn copy https://svn.easysw.com/public/cups/trunk "$url" \
 		-m "Tag $version" || exit 1
 fi
+
+fileurl=`echo $fileurl | sed -e '1,$s/\\//\\\\\\//g'`
 
 echo Exporting $fileversion...
 rm -rf /tmp/cups-$version
@@ -48,11 +53,6 @@ sed -e '1,$s/^CUPS_VERSION=.*/CUPS_VERSION='$version'/' \
 	<cups-common.m4 >cups-common.m4.new
 mv cups-common.m4.new cups-common.m4
 cd ..
-fileurl=`echo $fileurl | sed -e '1,$s/\\//\\\\\\//g'`
-sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
-	-e '1,$s/^Release:.*/Release: '$rev'/' \
-	-e '1,$s/^Source:.*/Source: '$fileurl'/' \
-	<packaging/cups.spec.in >packaging/cups.spec
 
 echo Configuring...
 autoconf -f
@@ -62,8 +62,19 @@ rm -rf tools
 cd ..
 
 echo -n Archiving...gz
+sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
+	-e '1,$s/@CUPS_SERIAL@/'$serial'/' \
+	-e '1,$s/^Release:.*/Release: '$rev'/' \
+	-e '1,$s/^Source:.*/Source: '$fileurl'gz/' \
+	<packaging/cups.spec.in >packaging/cups.spec
 tar czf cups-$fileversion-source.tar.gz cups-$version
+
 echo -n ...bz2
+sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
+	-e '1,$s/@CUPS_SERIAL@/'$serial'/' \
+	-e '1,$s/^Release:.*/Release: '$rev'/' \
+	-e '1,$s/^Source:.*/Source: '$fileurl'bz2/' \
+	<packaging/cups.spec.in >packaging/cups.spec
 tar cjf cups-$fileversion-source.tar.bz2 cups-$version
 echo "..."
 
