@@ -1,9 +1,9 @@
 dnl
 dnl "$Id$"
 dnl
-dnl   Image library stuff for the Common UNIX Printing System (CUPS).
+dnl   Image library/filter stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -21,6 +21,22 @@ dnl       Voice: (301) 373-9600
 dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
+
+dnl See if we want the image filters included at all...
+AC_ARG_ENABLE(image, [  --enable-image          turn on image filters, default=auto])
+
+IMGFILTERS=""
+if test "x$enable_image" != xno; then
+        AC_MSG_CHECKING(whether to build image filters)
+        if test "x$enable_image" = xyes -o $uname != Darwin; then
+		IMGFILTERS="imagetops imagetoraster"
+                AC_MSG_RESULT(yes)
+        else
+                AC_MSG_RESULT(no)
+        fi
+fi
+
+AC_SUBST(IMGFILTERS)
 
 dnl Save the current libraries since we don't want the image libraries
 dnl included with every program...

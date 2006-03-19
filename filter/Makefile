@@ -26,7 +26,7 @@
 
 include ../Makedefs
 
-FILTERS	=	gziptoany hpgltops texttops pstops imagetops imagetoraster \
+FILTERS	=	gziptoany hpgltops texttops pstops $(IMGFILTERS) \
 		rastertolabel rastertoepson rastertohp
 TARGETS	=	$(FILTERS) \
 		$(LIBCUPSIMAGE) \

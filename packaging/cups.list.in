@@ -154,6 +154,9 @@ $STATEDIR=@CUPS_STATEDIR@
 $LIB32DIR=@LIB32DIR@
 $LIB64DIR=@LIB64DIR@
 
+$IMGFILTERS=@IMGFILTERS@
+$PDFTOPS=@PDFTOPS@
+
 $CUPS_USER=@CUPS_USER@
 $CUPS_GROUP=@CUPS_GROUP@
 $CUPS_PRIMARY_SYSTEM_GROUP=@CUPS_PRIMARY_SYSTEM_GROUP@
@@ -207,9 +210,13 @@ d 0755 root sys $SERVERBIN/driver -
 d 0755 root sys $SERVERBIN/filter -
 f 0755 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
 f 0755 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
+%if $IMGFILTERS
 f 0755 root sys $SERVERBIN/filter/imagetops filter/imagetops
 f 0755 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
+%endif
+%if $PDFTOPS
 f 0755 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
+%endif
 f 0755 root sys $SERVERBIN/filter/pstops filter/pstops
 f 0755 root sys $SERVERBIN/filter/rastertolabel filter/rastertolabel
 l 0755 root sys $SERVERBIN/filter/rastertodymo rastertolabel

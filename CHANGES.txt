@@ -1,8 +1,13 @@
-CHANGES.txt - 2006-03-17
+CHANGES.txt - 2006-03-19
 ------------------------
 
 CHANGES IN CUPS V1.2rc1
 
+	- Added KDE/GNOME icons and a Manage Printers menu item.
+	- Added --enable-image and --enable-pdftops configure
+	  options to control whether the image and PDF filters
+	  are built and installed (default = yes for all
+	  platforms but MacOS X)
 	- Fixed a minor memory leak in the PPD API.
 	- Fixed transcoding issues (STR #1493)
 	- The scheduler now enforces a minimum job cost of 100

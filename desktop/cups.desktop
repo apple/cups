@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Type=Application
-Name=CUPS Web Interface
+Name=Manage Printing
 Comment=CUPS Web Interface
 Exec=htmlview http://localhost:631/
 Icon=cups
