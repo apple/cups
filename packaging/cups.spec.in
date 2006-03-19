@@ -296,6 +296,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0710,lp,sys) %dir /var/spool/cups
 %attr(1770,lp,sys) %dir /var/spool/cups/tmp
 
+# Desktop files
+/usr/share/applications/*
+/usr/share/icons/*
+
 %files devel
 %defattr(-,root,root)
 %dir /usr/share/man/man1
@@ -319,7 +323,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files lpd
 %defattr(-,root,root)
-#/etc/xinetd.d/cups-lpd
+/etc/xinetd.d/cups-lpd
 %dir /usr/lib/cups
 %dir /usr/lib/cups/daemon
 /usr/lib/cups/daemon/cups-lpd

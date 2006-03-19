@@ -29,7 +29,7 @@ include Makedefs
 #
 
 DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
-		notifier pdftops scheduler systemv test \
+		notifier $(PDFTOPS) scheduler systemv test \
 		$(PHPDIR) \
 		conf data doc fonts ppd templates
 
@@ -111,6 +111,24 @@ install:	installhdrs
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(DBUSDIR); \
 		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/cups.conf; \
 	fi
+	if test -d /etc/xinetd.d; then \
+		echo Installing xinetd configuration file for cups-lpd...; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)/etc/xinetd.d; \
+		$(INSTALL_DATA) init/cups-lpd $(BUILDROOT)/etc/xinetd.d/cups-lpd; \
+	fi
+	if test -d /usr/share/applications; then \
+		echo Installing desktop icons...; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/applications; \
+		$(INSTALL_DATA) desktop/cups.desktop $(BUILDROOT)/usr/share/applications; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/icons/hicolor/16x16/apps; \
+		$(INSTALL_DATA) desktop/cups-16.png $(BUILDROOT)/usr/share/icons/hicolor/16x16/apps/cups.png; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/icons/hicolor/32x32/apps; \
+		$(INSTALL_DATA) desktop/cups-32.png $(BUILDROOT)/usr/share/icons/hicolor/32x32/apps/cups.png; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/icons/hicolor/64x64/apps; \
+		$(INSTALL_DATA) desktop/cups-64.png $(BUILDROOT)/usr/share/icons/hicolor/64x64/apps/cups.png; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/icons/hicolor/128x128/apps; \
+		$(INSTALL_DATA) desktop/cups-128.png $(BUILDROOT)/usr/share/icons/hicolor/128x128/apps/cups.png; \
+	fi
 
 
 #
@@ -168,6 +186,12 @@ uninstall:
 		$(RM) $(BUILDROOT)$(DBUSDIR)/cups.conf; \
 		$(RMDIR) $(BUILDROOT)$(DBUSDIR); \
 	fi
+	$(RM) $(BUILDROOT)/etc/xinetd.d/cups-lpd
+	$(RM) $(BUILDROOT)/usr/share/applications/cups.desktop
+	$(RM) $(BUILDROOT)/usr/share/icons/hicolor/16x16/apps/cups.png
+	$(RM) $(BUILDROOT)/usr/share/icons/hicolor/32x32/apps/cups.png
+	$(RM) $(BUILDROOT)/usr/share/icons/hicolor/64x64/apps/cups.png
+	$(RM) $(BUILDROOT)/usr/share/icons/hicolor/128x128/apps/cups.png
 
 
 #

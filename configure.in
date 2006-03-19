@@ -43,13 +43,10 @@ sinclude(config-scripts/cups-pam.m4)
 sinclude(config-scripts/cups-threads.m4)
 sinclude(config-scripts/cups-largefile.m4)
 sinclude(config-scripts/cups-launchd.m4)
-
-MAKEDEFS="../Makedefs"
-AC_SUBST(MAKEDEFS)
-
+sinclude(config-scripts/cups-pdf.m4)
 sinclude(config-scripts/cups-scripting.m4)
 
-AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh cups-config
+AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh init/cups-lpd cups-config
 	  conf/cupsd.conf conf/pam.std doc/index.html
 	  doc/es/index.html doc/ja/index.html
 	  doc/help/standard.html man/client.conf.man

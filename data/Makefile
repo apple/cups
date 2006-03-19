@@ -41,7 +41,6 @@ CHARMAPS =	\
 		euc-jp.txt \
 		euc-kr.txt \
 		euc-tw.txt \
-		i18n_sdd.txt \
 		iso-8859-10.txt \
 		iso-8859-11.txt \
 		iso-8859-13.txt \

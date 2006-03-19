@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=CUPS Web Interface
+Comment=CUPS Web Interface
+Exec=htmlview http://localhost:631/
+Icon=cups
+Terminal=0
+Categories=Application;System;X-Red-Hat-Base;
