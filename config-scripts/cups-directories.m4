@@ -178,6 +178,17 @@ fi
 AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
 
+dnl Xinetd support...
+XINETD=""
+for dir in /private/etc/xinetd.d /etc/xinetd.d /usr/local/etc/xinetd.d; do
+	if test -d $dir; then
+		XINETD="$dir"
+		break
+	fi
+done
+
+AC_SUBST(XINETD)
+
 dnl Setup default locations...
 # Cache data...
 AC_ARG_WITH(cachedir, [  --with-cachedir         set path for cache files],cachedir="$withval",cachedir="")

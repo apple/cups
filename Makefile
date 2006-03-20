@@ -81,7 +81,7 @@ install:	installhdrs
 	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_SCRIPT) cups-config $(BINDIR)/cups-config
 	echo Installing startup script...
-	if test "x$(INITDIR)" != "x"; then \
+	if test "x$(INITDIR)" != x; then \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/init.d; \
 		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc0.d; \
@@ -93,7 +93,7 @@ install:	installhdrs
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc5.d; \
 		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
 	fi
-	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
+	if test "x$(INITDIR)" = x -a "x$(INITDDIR)" != x; then \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
 		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
 			$(INSTALL_SCRIPT) init/PrintingServices $(BUILDROOT)$(INITDDIR)/PrintingServices; \
@@ -106,15 +106,15 @@ install:	installhdrs
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		fi \
 	fi
-	if test "x$(DBUSDIR)" != "x"; then \
+	if test "x$(DBUSDIR)" != x; then \
 		echo Installing cups.conf in $(DBUSDIR)...;\
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(DBUSDIR); \
 		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/cups.conf; \
 	fi
-	if test -d /etc/xinetd.d; then \
+	if test "x$(XINETD)" != x; then \
 		echo Installing xinetd configuration file for cups-lpd...; \
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)/etc/xinetd.d; \
-		$(INSTALL_DATA) init/cups-lpd $(BUILDROOT)/etc/xinetd.d/cups-lpd; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(XINETD); \
+		$(INSTALL_DATA) init/cups-lpd $(BUILDROOT)$(XINETD)/cups-lpd; \
 	fi
 	if test -d /usr/share/applications; then \
 		echo Installing desktop icons...; \
@@ -156,7 +156,7 @@ uninstall:
 	$(RM) $(BINDIR)/cups-config
 	-$(RMDIR) $(BINDIR)
 	echo Uninstalling startup script...
-	if test "x$(INITDIR)" != "x"; then \
+	if test "x$(INITDIR)" != x; then \
 		$(RM) $(BUILDROOT)$(INITDIR)/init.d/cups; \
 		$(RMDIR) $(BUILDROOT)$(INITDIR)/init.d; \
 		$(RM)  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
@@ -168,7 +168,7 @@ uninstall:
 		$(RM) $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
 		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc5.d; \
 	fi
-	if test "x$(INITDIR)" = "x" -a "x$(INITDDIR)" != "x"; then \
+	if test "x$(INITDIR)" = x -a "x$(INITDDIR)" != x; then \
 		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
 			$(RM) $(BUILDROOT)$(INITDDIR)/PrintingServices; \
 			$(RM) $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
@@ -181,7 +181,7 @@ uninstall:
 		fi \
 		$(RMDIR) $(BUILDROOT)$(INITDDIR); \
 	fi
-	if test "x$(DBUSDIR)" != "x"; then \
+	if test "x$(DBUSDIR)" != x; then \
 		echo Uninstalling cups.conf in $(DBUSDIR)...;\
 		$(RM) $(BUILDROOT)$(DBUSDIR)/cups.conf; \
 		$(RMDIR) $(BUILDROOT)$(DBUSDIR); \
