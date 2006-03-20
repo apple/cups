@@ -1,4 +1,4 @@
-CREDITS.txt - 02/23/2006
+CREDITS.txt - 2006-02-23
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd

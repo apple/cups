@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH backend 7 "Common UNIX Printing System" "11 February 2006" "Easy Software Products"
+.TH backend 7 "Common UNIX Printing System" "20 March 2006" "Easy Software Products"
 
 .SH NAME
 backend \- cups backend transmission interfaces
@@ -122,7 +122,7 @@ driver.
 
 .SH PERMISSIONS
 Backends without world execute permissions are run as the root
-user. Otherwise, the backend is run using the unpriviledged user
+user. Otherwise, the backend is run using the unprivileged user
 account, typically "lp".
 
 .SH EXIT CODES

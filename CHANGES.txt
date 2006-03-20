@@ -1,8 +1,9 @@
-CHANGES.txt - 2006-03-19
+CHANGES.txt - 2006-03-20
 ------------------------
 
 CHANGES IN CUPS V1.2rc1
 
+	- Documentation updates (STR #1497)
 	- Added KDE/GNOME icons and a Manage Printers menu item.
 	- Added --enable-image and --enable-pdftops configure
 	  options to control whether the image and PDF filters

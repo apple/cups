@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lppasswd 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH lppasswd 1 "Common UNIX Printing System" "20 March 2006" "Easy Software Products"
 .SH NAME
 lppasswd \- add, change, or delete digest passwords.
 .SH SYNOPSIS
@@ -56,7 +56,7 @@ Specifies a group other than the default system group.
 .SH SECURITY ISSUES
 The \fIlppasswd\fR command is installed setuid to root. While
 every attempt has been made to make it secure against exploits
-that could grant super-user priviledges to unprivileged users,
+that could grant super-user privileges to unprivileged users,
 paranoid system administrators may wish to disable or change the
 ownership of the program to an unprivileged account.
 .SH SEE ALSO

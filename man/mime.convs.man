@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH mime.convs 5 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH mime.convs 5 "Common UNIX Printing System" "20 March 2006" "Easy Software Products"
 .SH NAME
 mime.convs \- mime type conversion file for cups
 .SH DESCRIPTION
@@ -33,7 +33,7 @@ image files.
 Additional filters can be added to the \fImime.convs\fR file or
 (preferably) to other files in the CUPS configuration directory.
 .LP
-Each line in the \fImime.types\fR file is a comment, blank, or filter
+Each line in the \fImime.convs\fR file is a comment, blank, or filter
 line. Comment lines start with the # character. Filter lines specify
 the source and destination MIME types along with a relative cost
 associated with the filter and the filter to run:
