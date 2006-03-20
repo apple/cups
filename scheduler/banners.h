@@ -1,5 +1,5 @@
 /*
- * "$Id: banners.h 5062 2006-02-03 16:36:24Z mike $"
+ * "$Id: banners.h 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Banner definitions for the Common UNIX Printing System (CUPS).
  *
@@ -45,12 +45,10 @@ VAR cups_array_t	*Banners	VALUE(NULL);
  * Prototypes...
  */
 
-extern void		cupsdAddBanner(const char *name, const char *filename);
 extern cupsd_banner_t	*cupsdFindBanner(const char *name);
-extern void		cupsdFreeBanners(void);
 extern void		cupsdLoadBanners(const char *d);
 
 
 /*
- * End of "$Id: banners.h 5062 2006-02-03 16:36:24Z mike $".
+ * End of "$Id: banners.h 5305 2006-03-18 03:05:12Z mike $".
  */

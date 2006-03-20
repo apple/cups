@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 5251 2006-03-08 18:34:07Z mike $"
+ * "$Id: adminutil.c 5288 2006-03-14 02:38:07Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -168,7 +168,7 @@ cupsAdminCreateWindowsPPD(
   * Create a temporary output file using the destination buffer...
   */
 
-  if ((dstfp = cupsTempFile2(buffer, bufsize)) < 0)
+  if ((dstfp = cupsTempFile2(buffer, bufsize)) == NULL)
   {
     cupsFileClose(srcfp);
 
@@ -1927,5 +1927,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 5251 2006-03-08 18:34:07Z mike $".
+ * End of "$Id: adminutil.c 5288 2006-03-14 02:38:07Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: testdirsvc.c 5178 2006-02-26 00:24:23Z mike $"
+ * "$Id: testdirsvc.c 5301 2006-03-17 23:44:33Z mike $"
  *
  *   Browsing test program for the Common UNIX Printing System (CUPS).
  *
@@ -129,6 +129,8 @@ main(int  argc,				/* I - Number of command-line arguments */
         interval = atoi(argv[i]);
       else
         usage();
+
+      continuous = 1;
     }
     else if (!strcmp(argv[i], "-l"))
     {
@@ -329,5 +331,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testdirsvc.c 5178 2006-02-26 00:24:23Z mike $".
+ * End of "$Id: testdirsvc.c 5301 2006-03-17 23:44:33Z mike $".
  */

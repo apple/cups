@@ -1,4 +1,4 @@
-<TABLE CELLPADDING="0" CELLSPACING="0" CLASS="button" WIDTH="100%">
+<TABLE CELLPADDING="0" CELLSPACING="0" CLASS="button" WIDTH="100%" SUMMARY="Administration Tasks">
 <TR><TD VALIGN="TOP" NOWRAP>
 
 <H2 CLASS="title">プリンタ</H2>
@@ -53,6 +53,9 @@ SRC="/images/button-view-page-log.gif" ALT="ページログの表示"
 CLASS="button"></A>
 </P>
 
+{SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
+<BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
+
 <FORM METHOD="POST" ACTION="/admin">
 
 <P><B>基本サーバ設定:</B></P>
@@ -66,7 +69,7 @@ CLASS="button"></A>
 
 <P><INPUT TYPE="IMAGE" SRC="/images/button-change-settings.gif" ALT="設定の変更"></P>
 
-</FORM>
+</FORM>}
 
 </TD></TR>
 </TABLE>

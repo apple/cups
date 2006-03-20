@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: test.ppd 4939 2006-01-17 18:54:33Z mike $"
+*% "$Id: test.ppd 5257 2006-03-09 15:27:27Z mike $"
 *%
 *%   Test PPD file for the Common UNIX Printing System (CUPS).
 *%
@@ -141,8 +141,8 @@
 *StringOption bar: "StringOption=bar"
 *CloseUI: *StringOption
 
-*CustomStringOption True/Custom Stringeger: "StringOption=Custom"
-*ParamCustomStringOption String: 1 string * **********
+*CustomStringOption True/Custom String: "StringOption=Custom"
+*ParamCustomStringOption String: 1 string 1 10
 
 *CloseGroup: Extended
 
@@ -183,5 +183,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: test.ppd 4939 2006-01-17 18:54:33Z mike $".
+*% End of "$Id: test.ppd 5257 2006-03-09 15:27:27Z mike $".
 *%

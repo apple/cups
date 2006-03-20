@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c 5235 2006-03-06 13:02:23Z mike $"
+ * "$Id: testhttp.c 5261 2006-03-09 20:47:49Z mike $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -497,8 +497,8 @@ main(int  argc,				/* I - Number of command-line arguments */
         current = time(NULL);
         if (current == start) current ++;
         printf("\r" CUPS_LLFMT "/" CUPS_LLFMT " bytes ("
-	       CUPS_LLFMT " bytes/sec)      ", total, length,
-               total / (current - start));
+	       CUPS_LLFMT " bytes/sec)      ", CUPS_LLCAST total,
+	       CUPS_LLCAST length, CUPS_LLCAST (total / (current - start)));
         fflush(stdout);
       }
     }
@@ -515,5 +515,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c 5235 2006-03-06 13:02:23Z mike $".
+ * End of "$Id: testhttp.c 5261 2006-03-09 20:47:49Z mike $".
  */

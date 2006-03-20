@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makefile 5311 2006-03-19 13:21:42Z mike $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -26,9 +26,15 @@
 
 include ../Makedefs
 
-FILTERS	=	gziptoany hpgltops texttops pstops imagetops imagetoraster \
+FILTERS	=	gziptoany hpgltops texttops pstops $(IMGFILTERS) \
 		rastertolabel rastertoepson rastertohp
-TARGETS	=	$(FILTERS) testraster
+TARGETS	=	$(FILTERS) \
+		$(LIBCUPSIMAGE) \
+		libcupsimage.a \
+		$(LIB32CUPSIMAGE) \
+		$(LIB64CUPSIMAGE) \
+		testimage \
+		testraster
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -36,18 +42,20 @@ IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
 		image-photocd.o image-pix.o image-png.o image-pnm.o \
 		image-sgi.o image-sgilib.o image-sun.o image-tiff.o \
 		image-zoom.o image.o interpret.o raster.o
+IMAGE32OBJS =	$(IMAGEOBJS:.o=.32.o)
+IMAGE64OBJS =	$(IMAGEOBJS:.o=.64.o)
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
-		imagetops.o imagetoraster.o common.o pstops.o raster.o \
-		rastertolabel.o rastertoepson.o rastertohp.o \
-		texttops.o textcommon.o testraster.o gziptoany.o
+		gziptoany.o imagetops.o imagetoraster.o common.o pstops.o \
+		raster.o rastertoepson.o rastertohp.o rastertolabel.o \
+		testimage.o testraster.o textcommon.o texttops.o
 
 
 #
 # Make all targets...
 #
 
-all:	$(TARGETS) $(LIBCUPSIMAGE) libcupsimage.a
+all:	$(TARGETS)
 
 
 #
@@ -55,8 +63,9 @@ all:	$(TARGETS) $(LIBCUPSIMAGE) libcupsimage.a
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(LIBCUPSIMAGE) libcupsimage.a
-	$(RM) `basename $(LIBCUPSIMAGE) .2` libcupsimage.dylib
+	$(RM) $(OBJS) $(TARGETS)
+	$(RM) libcupsimage.so libcupsimage.sl libcupsimage.dylib
+	$(RM) libcupsimage.32.so libcupsimage.64.so
 
 
 #
@@ -64,14 +73,20 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+	touch Dependencies.tmp
+	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
+	$(RM) Dependencies
+	cp Dependencies.tmp Dependencies
+	sed -r -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
+	sed -r -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
+	$(RM) Dependencies.tmp
 
 
 #
 # Install all targets...
 #
 
-install:	all installhdrs $(INSTALLSTATIC)
+install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/filter
 	for file in $(FILTERS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
@@ -102,12 +117,22 @@ installhdrs:
 	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
 
+install32bit:
+	$(INSTALL_DIR) -m 755 $(LIB32DIR)
+	$(INSTALL_LIB) libcupsimage.32.so.2 $(LIB32DIR)/libcupsimage.so.2
+	$(LN) libcupsimage.so $(LIB32DIR)/libcupsimage.so.2
+
+install64bit:
+	$(INSTALL_DIR) -m 755 $(LIB64DIR)
+	$(INSTALL_LIB) libcupsimage.64.so.2 $(LIB64DIR)/libcupsimage.so.2
+	$(LN) libcupsimage.so $(LIB64DIR)/libcupsimage.so.2
+
 
 #
 # Uninstall all targets...
 #
 
-uninstall:
+uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	for file in $(FILTERS); do \
 		$(RM) $(SERVERBIN)/filter/$$file; \
 	done
@@ -126,6 +151,16 @@ uninstall:
 	$(RM) $(INCLUDEDIR)/cups/image.h
 	$(RM) $(INCLUDEDIR)/cups/raster.h
 	-$(RMDIR) $(INCLUDEDIR)/cups
+
+uninstall32bit:
+	$(RM) $(LIB32DIR)/libcupsimage.so
+	$(RM) $(LIB32DIR)/libcupsimage.so.2
+	-$(RMDIR) $(LIB32DIR)
+
+uninstall64bit:
+	$(RM) $(LIB64DIR)/libcupsimage.so
+	$(RM) $(LIB64DIR)/libcupsimage.so.2
+	-$(RMDIR) $(LIB64DIR)
 
 
 #
@@ -172,9 +207,27 @@ hpgltops:	$(HPGLOBJS) common.o ../cups/$(LIBCUPS)
 
 libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) -lm
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) -lm
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
+
+
+#
+# libcupsimage.32.so.2
+#
+
+libcupsimage.32.so.2:	$(IMAGE32OBJS)
+	echo Linking 32-bit $@...
+	$(DSO) $(ARCH32FLAGS) $(DSOFLAGS) -o $@ $(IMAGE32OBJS) $(DSOLIBS) -lm
+
+
+#
+# libcupsimage.64.so.2
+#
+
+libcupsimage.64.so.2:	$(IMAGE64OBJS)
+	echo Linking 64-bit $@...
+	$(DSO) $(ARCH64FLAGS) $(DSOFLAGS) -o $@ $(IMAGE64OBJS) $(DSOLIBS) -lm
 
 
 #
@@ -183,7 +236,7 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 
 libcupsimage.2.dylib:	$(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ \
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.2.0 \
 		-compatibility_version 2.0.0 \
@@ -198,8 +251,8 @@ libcupsimage.2.dylib:	$(IMAGEOBJS)
 
 libcupsimage_s.a:	$(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -Wl,-berok -o libcupsimage_s.o $(IMAGEOBJS) \
-		$(DSOLIBS) -lm
+	$(DSO) $(DSOFLAGS) -Wl,-berok,-bexport:libcupsimage_s.exp \
+		-o libcupsimage_s.o $(IMAGEOBJS) $(DSOLIBS) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcupsimage_s.o
 
@@ -210,7 +263,7 @@ libcupsimage_s.a:	$(IMAGEOBJS)
 
 libcupsimage.la:       $(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
 		-rpath $(LIBDIR) -version-info 2:2
 
 
@@ -320,5 +373,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
+# End of "$Id: Makefile 5311 2006-03-19 13:21:42Z mike $".
 #

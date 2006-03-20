@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makedefs.in 5314 2006-03-20 19:06:50Z mike $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -74,6 +74,12 @@ CUPS_CONFIG_FILE_PERM = @CUPS_CONFIG_FILE_PERM@
 CUPS_LOG_FILE_PERM = @CUPS_LOG_FILE_PERM@
 
 #
+# Languages to install...
+#
+
+LANGUAGES	=	@LANGUAGES@
+
+#
 # Libraries...
 #
 
@@ -97,11 +103,19 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 #
 # Program options...
 #
-# OPTIM   defines the common compiler optimization/debugging options.
-# OPTIONS defines other compile-time options (currently only -dDEBUG for
-#         extra debug info)
+# ARCHFLAGS     Defines the default architecture build options, used
+#               when compiling separate 32/64-bit libraries.
+# ARCH32FLAGS   Defines the 32-bit architecture build options, used
+#               when compiling separate 32/64-bit libraries.
+# ARCH64FLAGS   Defines the 64-bit architecture build options, used
+#               when compiling separate 32/64-bit libraries.
+# OPTIM         Defines the common compiler optimization/debugging options
+#               for all architectures.
+# OPTIONS       Defines other compile-time options (currently only -DDEBUG
+#               for extra debug info)
 #
 
+ARCHFLAGS	=	@ARCHFLAGS@
 ARFLAGS		=	@ARFLAGS@
 BACKLIBS	=	@BACKLIBS@
 CFLAGS		=	-I.. $(RC_CFLAGS) $(SSLFLAGS) @CPPFLAGS@ @CFLAGS@ \
@@ -114,6 +128,7 @@ CXXLIBS		=	@CXXLIBS@
 DSOFLAGS	=	@DSOFLAGS@
 DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
 IMGLIBS		=	@IMGLIBS@ -lm
+IMGFILTERS	=	@IMGFILTERS@
 LDFLAGS		=	-L../cups -L../filter $(RC_CFLAGS) @LDFLAGS@ $(OPTIM)
 LINKCUPS	=	@LINKCUPS@ $(SSLLIBS)
 LINKCUPSIMAGE	=	@LINKCUPSIMAGE@
@@ -121,10 +136,29 @@ LIBS		=	$(LINKCUPS) $(COMMONLIBS)
 OPTIM		=	@OPTIM@
 OPTIONS		=
 PAMLIBS		=	@PAMLIBS@
+PDFTOPS		=	@PDFTOPS@
 PHPDIR		=	@PHPDIR@
 SSLFLAGS	=	@SSLFLAGS@
 SSLLIBS		=	@SSLLIBS@
 LAUNCHDLIBS	=	@LAUNCHDLIBS@
+
+#
+# Separate 32/64-bit library support...
+#
+
+ARCH32FLAGS	=	@ARCH32FLAGS@
+INSTALL32	=	@INSTALL32@
+LIB32CUPS	=	@LIB32CUPS@
+LIB32CUPSIMAGE	=	@LIB32CUPSIMAGE@
+LIB32DIR	=	$(BUILDROOT)@LIB32DIR@
+UNINSTALL32	=	@UNINSTALL32@
+
+ARCH64FLAGS	=	@ARCH64FLAGS@
+INSTALL64	=	@INSTALL64@
+LIB64CUPS	=	@LIB64CUPS@
+LIB64CUPSIMAGE	=	@LIB64CUPSIMAGE@
+LIB64DIR	=	$(BUILDROOT)@LIB64DIR@
+UNINSTALL64	=	@UNINSTALL64@
 
 #
 # Directories...
@@ -175,6 +209,7 @@ SBINDIR		=	$(BUILDROOT)@sbindir@
 SERVERBIN	= 	$(BUILDROOT)@CUPS_SERVERBIN@
 SERVERROOT	= 	$(BUILDROOT)@CUPS_SERVERROOT@
 STATEDIR	=	$(BUILDROOT)@CUPS_STATEDIR@
+XINETD		=	@XINETD@
 
 MAN1EXT		=	@MAN1EXT@
 MAN5EXT		=	@MAN5EXT@
@@ -194,15 +229,23 @@ DBUSDIR		=	@DBUSDIR@
 #
 
 .SILENT:
-.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .cxx .h .man .o .gz
+.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .cxx .h .man .o .32.o .64.o .gz
 
 .c.o:
 	echo Compiling $<...
-	$(CC) $(OPTIM) $(CFLAGS) -c $<
+	$(CC) $(ARCHFLAGS) $(OPTIM) $(CFLAGS) -c $<
+
+.c.32.o:
+	echo Compiling 32-bit $<...
+	$(CC) $(ARCH32FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
+
+.c.64.o:
+	echo Compiling 64-bit $<...
+	$(CC) $(ARCH64FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
 
 .cxx.o:
 	echo Compiling $<...
-	$(CXX) $(OPTIM) $(CXXFLAGS) -c $<
+	$(CXX) $(ARCHFLAGS) $(OPTIM) $(CXXFLAGS) -c $<
 
 .man.1 .man.1m .man.5 .man.7 .man.8:
 	echo Linking $<...
@@ -216,5 +259,5 @@ DBUSDIR		=	@DBUSDIR@
 
 
 #
-# End of "$Id: Makedefs.in 5229 2006-03-05 16:48:12Z mike $"
+# End of "$Id: Makedefs.in 5314 2006-03-20 19:06:50Z mike $"
 #

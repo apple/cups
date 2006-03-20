@@ -1,0 +1,47 @@
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Buscar en
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:todos los documentos}}:</B> <INPUT
+TYPE="TEXT" NAME="QUERY" VALUE="{?QUERY}" SIZE="60"> <INPUT
+TYPE="IMAGE" SRC="/images/button-search.gif" ALT="Buscar">
+<A HREF="/help/{?HELPFILE}{QUERY?{TOPIC??TOPIC={TOPIC}:}:}"><IMG
+SRC="/images/button-clear.gif" ALT="Borrar" CLASS="button"></A></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar">
+<H3 CLASS="title">Documentos de ayuda en línea</H3>
+
+<P CLASS="l0"><A HREF="/help{QUERY??QUERY={QUERY}:}">Todos los documentos</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</DIV>
+
+{QUERY?<P>Buscar resultados en {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:todos los documentos}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>No hay coincidencias.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}
+<A HREF="/help/{HELPFILE}?PRINTABLE=YES" TARGET="_blank"><IMG
+SRC="/images/button-view-printable-version.gif" ALT="Ver versi&oacute;n imprimible"
+CLASS="button"></A></H1>:<H1>P&aacute;ginas de ayuda de CUPS</H1>
+
+<P>Esta es la interfaz de ayuda en l&iacute;nea de CUPS. Introduzca las palabras
+a buscar aqu&iacute; encima o haga clic en cualquiera de los enlaces de la
+documentaci&oacute;n para visualizar la informaci&oacute;n de ayuda en l&iacute;nea.</P>
+
+<P>Si es nuevo en CUPS, lea la p&aacute;gina "<a
+href="overview.html">Informaci&oacute;n general de CUPS</a>". Los usuarios veteranos
+deber&iacute;an leer la p&aacute;gina "<a href="whatsnew.html">Qu&eacute; hay de nuevo en CUPS
+1.2</a>".</P>
+
+<P>La <A HREF="http://www.cups.org/">p&aacute;gina de inicio de CUPS</A> tambi&eacute;n
+proporciona muchos recursos, incluyendo foros de discusi&oacute;n de usuarios, respuestas
+a preguntas frecuentes, y un formulario para el env&iacute;o de informes de errores y
+peticiones de mejoras.</P>}

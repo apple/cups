@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c 5238 2006-03-07 04:41:42Z mike $"
+ * "$Id: ppd.c 5302 2006-03-18 00:49:17Z mike $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -54,6 +54,8 @@
  *   ppd_free_option()      - Free a single option.
  *   ppd_get_coption()      - Get a custom option record.
  *   ppd_get_cparam()       - Get a custom parameter record.
+ *   ppd_get_encoding()     - Get the CUPS encoding value for the given
+ *                            LanguageEncoding.
  *   ppd_get_group()        - Find or create the named group as needed.
  *   ppd_get_option()       - Find or create the named option as needed.
  *   ppd_read()             - Read a line from a PPD file, skipping comment
@@ -110,8 +112,10 @@ static ppd_coption_t	*ppd_get_coption(ppd_file_t *ppd, const char *name);
 static ppd_cparam_t	*ppd_get_cparam(ppd_coption_t *opt,
 			                const char *param,
 					const char *text);
+static cups_encoding_t	ppd_get_encoding(const char *name);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
-			               const char *text, _cups_globals_t *cg);
+			               const char *text, _cups_globals_t *cg,
+				       cups_encoding_t encoding);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
 static int		ppd_read(cups_file_t *fp, char *keyword, char *option,
 			         char *text, char **string, int ignoreblank,
@@ -146,6 +150,8 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   * Free all strings at the top level...
   */
 
+  ppd_free(ppd->lang_encoding);
+  ppd_free(ppd->nickname);
   ppd_free(ppd->patches);
   ppd_free(ppd->jcl_begin);
   ppd_free(ppd->jcl_end);
@@ -421,6 +427,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   cups_lang_t		*language;	/* Default language */
   struct lconv		*loc;		/* Locale data */
   int			ui_keyword;	/* Is this line a UI keyword? */
+  cups_encoding_t	encoding;	/* Encoding of PPD file */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
   static const char * const ui_keywords[] =
@@ -565,6 +572,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   option     = NULL;
   choice     = NULL;
   ui_keyword = 0;
+  encoding   = CUPS_ISO8859_1;
 
   while ((mask = ppd_read(fp, keyword, name, text, &string, 1, cg)) != 0)
   {
@@ -643,7 +651,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
         if (!group)
 	{
-          if ((group = ppd_get_group(ppd, "General", _("General"), cg)) == NULL)
+          if ((group = ppd_get_group(ppd, "General", _("General"), cg,
+	                             encoding)) == NULL)
 	    goto error;
 
           DEBUG_printf(("Adding to group %s...\n", group->text));
@@ -706,7 +715,14 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     if (!strcmp(keyword, "LanguageLevel"))
       ppd->language_level = atoi(string);
     else if (!strcmp(keyword, "LanguageEncoding"))
-      ppd->lang_encoding = string;
+    {
+     /*
+      * Say all PPD files are UTF-8, since we convert to UTF-8...
+      */
+
+      ppd->lang_encoding = strdup("UTF-8");
+      encoding           = ppd_get_encoding(string);
+    }
     else if (!strcmp(keyword, "LanguageVersion"))
       ppd->lang_version = string;
     else if (!strcmp(keyword, "Manufacturer"))
@@ -718,7 +734,18 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     else if (!strcmp(keyword, "PCFileName"))
       ppd->pcfilename = string;
     else if (!strcmp(keyword, "NickName"))
-      ppd->nickname = string;
+    {
+      if (encoding != CUPS_UTF8)
+      {
+        cups_utf8_t	utf8[256];	/* UTF-8 version of NickName */
+
+
+        cupsCharsetToUTF8(utf8, string, sizeof(utf8), encoding);
+	ppd->nickname = strdup((char *)utf8);
+      }
+      else
+        ppd->nickname = strdup(string);
+    }
     else if (!strcmp(keyword, "Product"))
       ppd->product = string;
     else if (!strcmp(keyword, "ShortNickName"))
@@ -954,9 +981,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     }
     else if (!strncmp(keyword, "Custom", 6) && !strcmp(name, "True"))
     {
-      ppd_coption_t	*coption;	/* Custom option */
-
-
       DEBUG_puts("Processing Custom option...");
 
      /*
@@ -970,7 +994,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
         DEBUG_printf(("%s option not found for %s...\n", keyword + 6, keyword));
 
-	if ((gtemp = ppd_get_group(ppd, "General", _("General"), cg)) == NULL)
+	if ((gtemp = ppd_get_group(ppd, "General", _("General"), cg,
+	                           encoding)) == NULL)
 	{
 	  DEBUG_puts("Unable to get general group!");
 
@@ -987,7 +1012,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	}
       }
 
-      if ((coption = ppd_get_coption(ppd, keyword + 6)) == NULL)
+      if (!ppd_get_coption(ppd, keyword + 6))
       {
         cg->ppd_status = PPD_ALLOC_ERROR;
 
@@ -1135,7 +1160,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         option = ppd_get_option(subgroup, name);
       else if (group == NULL)
       {
-	if ((group = ppd_get_group(ppd, "General", _("General"), cg)) == NULL)
+	if ((group = ppd_get_group(ppd, "General", _("General"), cg,
+	                           encoding)) == NULL)
 	  goto error;
 
         DEBUG_printf(("Adding to group %s...\n", group->text));
@@ -1184,7 +1210,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	}
 
       if (text[0])
-        strlcpy(option->text, text, sizeof(option->text));
+        cupsCharsetToUTF8((cups_utf8_t *)option->text, text,
+	                   sizeof(option->text), encoding);
       else
       {
         if (!strcmp(name, "PageSize"))
@@ -1223,7 +1250,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Find the JCL group, and add if needed...
       */
 
-      group = ppd_get_group(ppd, "JCL", _("JCL"), cg);
+      group = ppd_get_group(ppd, "JCL", _("JCL"), cg, encoding);
 
       if (group == NULL)
 	goto error;
@@ -1273,7 +1300,11 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	  break;
 	}
 
-      strlcpy(option->text, text, sizeof(option->text));
+      if (text[0])
+        cupsCharsetToUTF8((cups_utf8_t *)option->text, text,
+	                   sizeof(option->text), encoding);
+      else
+        strlcpy(option->text, name, sizeof(option->text));
 
       option->section = PPD_ORDER_JCL;
       group = NULL;
@@ -1327,7 +1358,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Find/add the group...
       */
 
-      group = ppd_get_group(ppd, string, sptr, cg);
+      group = ppd_get_group(ppd, string, sptr, cg, encoding);
 
       if (group == NULL)
 	goto error;
@@ -1616,8 +1647,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
       choice = ppd_add_choice(option, name);
 
-      if (mask & PPD_TEXT)
-        strlcpy(choice->text, text, sizeof(choice->text));
+      if (text[0])
+        cupsCharsetToUTF8((cups_utf8_t *)choice->text, text,
+	                   sizeof(choice->text), encoding);
       else if (!strcmp(name, "True"))
         strcpy(choice->text, _("Yes"));
       else if (!strcmp(name, "False"))
@@ -2223,14 +2255,40 @@ ppd_get_cparam(ppd_coption_t *opt,	/* I - PPD file */
 
 
 /*
+ * 'ppd_get_encoding()' - Get the CUPS encoding value for the given
+ *                        LanguageEncoding.
+ */
+
+static cups_encoding_t			/* O - CUPS encoding value */
+ppd_get_encoding(const char *name)	/* I - LanguageEncoding string */
+{
+  if (!strcasecmp(name, "ISOLatin1"))
+    return (CUPS_ISO8859_1);
+  else if (!strcasecmp(name, "ISOLatin2"))
+    return (CUPS_ISO8859_2);
+  else if (!strcasecmp(name, "ISOLatin5"))
+    return (CUPS_ISO8859_5);
+  else if (!strcasecmp(name, "JIS83-RKSJ"))
+    return (CUPS_WINDOWS_932);
+  else if (!strcasecmp(name, "MacStandard"))
+    return (CUPS_MAC_ROMAN);
+  else if (!strcasecmp(name, "WindowsANSI"))
+    return (CUPS_WINDOWS_1252);
+  else
+    return (CUPS_UTF8);
+}
+
+
+/*
  * 'ppd_get_group()' - Find or create the named group as needed.
  */
 
 static ppd_group_t *			/* O - Named group */
-ppd_get_group(ppd_file_t     *ppd,	/* I - PPD file */
-              const char     *name,	/* I - Name of group */
-	      const char     *text,	/* I - Text for group */
-              _cups_globals_t *cg)	/* I - Global data */
+ppd_get_group(ppd_file_t      *ppd,	/* I - PPD file */
+              const char      *name,	/* I - Name of group */
+	      const char      *text,	/* I - Text for group */
+              _cups_globals_t *cg,	/* I - Global data */
+	      cups_encoding_t encoding)	/* I - Encoding of text */
 {
   int		i;			/* Looping var */
   ppd_group_t	*group;			/* Group */
@@ -2273,7 +2331,9 @@ ppd_get_group(ppd_file_t     *ppd,	/* I - PPD file */
 
     memset(group, 0, sizeof(ppd_group_t));
     strlcpy(group->name, name, sizeof(group->name));
-    strlcpy(group->text, text, sizeof(group->text));
+
+    cupsCharsetToUTF8((cups_utf8_t *)group->text, text,
+	               sizeof(group->text), encoding);
   }
 
   return (group);
@@ -2879,5 +2939,5 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c 5238 2006-03-07 04:41:42Z mike $".
+ * End of "$Id: ppd.c 5302 2006-03-18 00:49:17Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h 5196 2006-02-27 21:23:00Z mike $"
+ * "$Id: cupsd.h 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -173,10 +173,8 @@ VAR int			Launchd		VALUE(0);
  * Prototypes...
  */
 
-extern void	cupsdCatchChildSignals(void);
 extern void	cupsdClearString(char **s);
 extern void	cupsdHoldSignals(void);
-extern void	cupsdIgnoreChildSignals(void);
 extern void	cupsdReleaseSignals(void);
 extern void	cupsdSetString(char **s, const char *v);
 extern void	cupsdSetStringf(char **s, const char *f, ...)
@@ -189,7 +187,6 @@ extern void	cupsdStopServer(void);
 extern void	cupsdClosePipe(int *fds);
 extern int	cupsdOpenPipe(int *fds);
 
-extern void	cupsdClearEnv(void);
 extern void	cupsdInitEnv(void);
 extern int	cupsdLoadEnv(char *envp[], int envmax);
 extern void	cupsdSetEnv(const char *name, const char *value);
@@ -207,5 +204,5 @@ extern int	cupsdStartProcess(const char *command, char *argv[],
 
 
 /*
- * End of "$Id: cupsd.h 5196 2006-02-27 21:23:00Z mike $".
+ * End of "$Id: cupsd.h 5305 2006-03-18 03:05:12Z mike $".
  */

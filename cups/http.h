@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h 5235 2006-03-06 13:02:23Z mike $"
+ * "$Id: http.h 5295 2006-03-15 21:16:05Z mike $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -39,6 +39,9 @@
 #    include <winsock2.h>
 #    include <ws2tcpip.h>
 #  else
+#    ifdef __sgi /* IRIX needs this for IPv6 support!?! */
+#      define INET6
+#    endif /* __sgi */
 #    include <unistd.h>
 #    include <sys/time.h>
 #    include <sys/socket.h>
@@ -97,6 +100,8 @@ extern "C" {
 #    define s6_addr32	_S6_un._S6_u32
 #  elif defined(__FreeBSD__) || defined(__APPLE__)
 #    define s6_addr32	__u6_addr.__u6_addr32
+#  elif defined(__osf__)
+#    define s6_addr32	s6_un.sa6_laddr
 #  elif defined(WIN32)
 /*
  * Windows only defines byte and 16-bit word members of the union and
@@ -491,5 +496,5 @@ extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h 5235 2006-03-06 13:02:23Z mike $".
+ * End of "$Id: http.h 5295 2006-03-15 21:16:05Z mike $".
  */

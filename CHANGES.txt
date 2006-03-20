@@ -1,7 +1,59 @@
-CHANGES.txt - 02/25/2006
+CHANGES.txt - 2006-03-20
 ------------------------
 
-CHANGES IN CUPS V1.2.0b1
+CHANGES IN CUPS V1.2rc1
+
+	- Documentation updates (STR #1497)
+	- Added KDE/GNOME icons and a Manage Printers menu item.
+	- Added --enable-image and --enable-pdftops configure
+	  options to control whether the image and PDF filters
+	  are built and installed (default = yes for all
+	  platforms but MacOS X)
+	- Fixed a minor memory leak in the PPD API.
+	- Fixed transcoding issues (STR #1493)
+	- The scheduler now enforces a minimum job cost of 100
+	  when doing FilterLimit checks.
+	- The scheduler would leak file descriptors when printing
+	  to raw queues (STR #1491)
+	- The IPv6 support did not compile on Tru64 UNIX (STR
+	  #1488)
+	- ppdOpen2() now converts the NickName and all UI text to
+	  UTF-8 (STR #1475)
+	- The Set Allows Users web page did not work (STR #1486)
+	- When the default policy was not set or set to a non-
+	  existing policy, the scheduler did not set the default
+	  policy name to "default" (STR #1484)
+	- The Zebra CPCL driver did not use the correct righthand
+	  margin for the 4" wide label sizes.
+	- Fixed a problem with the parsing of fractional real
+	  numbers in PPD files.
+	- Added Spanish localization files (STR #1480)
+	- Fixed localization of a few scheduler messages (STR
+	  #1478)
+	- Fixed support for HEAD requests in the scheduler (STR
+	  #1481)
+
+
+CHANGES IN CUPS V1.2b2
+
+	- Updated the CUPS design description.
+	- Added --enable-32bit and --enable-64bit configure
+	  options to allow building of separate 32/64-bit
+	  libraries on systems that support both environments
+	  (STR #1472)
+	- Various compiler warning fixes.
+	- Fixes for Solaris 10 builds against old GNU TLS and
+	  LDAP libraries.
+	- Added a cupsArrayUserData() function to retrieve the
+	  user data pointer for an array (useful for typing
+	  arrays)
+	- The ppdEmitString() function did not compute the
+	  required buffer size properly, leading to dropped
+	  characters on the end of the printer commands in pstops
+	  and imagetops (STR #1470)
+
+
+CHANGES IN CUPS V1.2b1
 
 	- The serial backend now supports Equinox 8-port serial
 	  hubs (STR #526)

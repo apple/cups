@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-ssl.m4 4800 2005-10-18 18:06:20Z mike $"
+dnl "$Id: cups-ssl.m4 5264 2006-03-10 01:10:36Z mike $"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -55,7 +55,7 @@ if test x$enable_ssl != xno; then
 	    dnl included...
 	    SAVELIBS="$LIBS"
 
-	    AC_CHECK_LIB(gnutls, gnutls_init,
+	    AC_CHECK_LIB(gnutls, gnutls_x509_crt_set_dn_by_oid,
 		[SSLLIBS="-lgnutls"
 		 AC_DEFINE(HAVE_SSL)
 		 AC_DEFINE(HAVE_GNUTLS)])
@@ -105,5 +105,5 @@ AC_SUBST(EXPORT_SSLLIBS)
 
 
 dnl
-dnl End of "$Id: cups-ssl.m4 4800 2005-10-18 18:06:20Z mike $".
+dnl End of "$Id: cups-ssl.m4 5264 2006-03-10 01:10:36Z mike $".
 dnl

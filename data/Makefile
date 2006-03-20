@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makefile 5310 2006-03-19 03:23:34Z mike $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -41,7 +41,6 @@ CHARMAPS =	\
 		euc-jp.txt \
 		euc-kr.txt \
 		euc-tw.txt \
-		i18n_sdd.txt \
 		iso-8859-10.txt \
 		iso-8859-11.txt \
 		iso-8859-13.txt \
@@ -60,15 +59,6 @@ CHARMAPS =	\
 		koi8-r.txt \
 		koi8-u.txt \
 		mac-roman.txt \
-		unibreak.txt \
-		uni-comb.txt \
-		uni-fold.txt \
-		uni-full.txt \
-		uni-line.txt \
-		uni-nfc.txt \
-		uni-nfd.txt \
-		uni-nfkd.txt \
-		uni-prop.txt \
 		windows-1250.txt \
 		windows-1251.txt \
 		windows-1252.txt \
@@ -190,5 +180,5 @@ uninstall:
 
 
 #
-# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
+# End of "$Id: Makefile 5310 2006-03-19 03:23:34Z mike $".
 #

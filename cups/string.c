@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c 5238 2006-03-07 04:41:42Z mike $"
+ * "$Id: string.c 5286 2006-03-13 16:32:28Z mike $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -343,6 +343,12 @@ _cupsStrScand(const char   *buf,	/* I - Pointer to number */
 
   if (*buf == '.')
   {
+   /*
+    * Read fractional portion of number...
+    */
+
+    buf ++;
+
     if (loc && loc->decimal_point)
     {
       strlcpy(tempptr, loc->decimal_point, sizeof(temp) - (tempptr - temp));
@@ -628,5 +634,5 @@ compare_sp_items(_cups_sp_item_t *a,	/* I - First item */
 
 
 /*
- * End of "$Id: string.c 5238 2006-03-07 04:41:42Z mike $".
+ * End of "$Id: string.c 5286 2006-03-13 16:32:28Z mike $".
  */

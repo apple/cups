@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 5251 2006-03-08 18:34:07Z mike $"
+ * "$Id: admin.c 5290 2006-03-14 21:43:57Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -2624,11 +2624,11 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
         	 NULL, uri);
 
     if (num_users == 0)
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
                    "requesting-user-name-allowed", NULL, "all");
     else
     {
-      attr = ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+      attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
                            type, num_users, NULL, NULL);
 
       for (i = 0, ptr = (char *)users; *ptr; i ++)
@@ -2859,5 +2859,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 5251 2006-03-08 18:34:07Z mike $".
+ * End of "$Id: admin.c 5290 2006-03-14 21:43:57Z mike $".
  */

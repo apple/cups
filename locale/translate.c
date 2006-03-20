@@ -1,5 +1,5 @@
 /*
- * "$Id: translate.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: translate.c 5261 2006-03-09 20:47:49Z mike $"
  *
  *   HTTP-based translation program for the Common UNIX Printing System (CUPS).
  *
@@ -27,6 +27,10 @@
  *
  * Contents:
  *
+ *   main()               - Main entry.
+ *   save_messages()      - Save messages to a .po file.
+ *   translate_messages() - Translate messages using Google.
+ *   write_string()       - Write a quoted string to a file.
  */
 
 /*
@@ -237,7 +241,7 @@ translate_messages(cups_array_t *cat,	/* I - Message catalog */
     *bufptr++ = '&';
     *bufptr = '\0';
 
-    sprintf(length, "%d", bufptr - buffer);
+    sprintf(length, "%d", (int)(bufptr - buffer));
 
    /*
     * Send the request...
@@ -444,5 +448,5 @@ write_string(cups_file_t *fp,		/* I - File to write to */
 
 
 /*
- * End of "$Id: translate.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: translate.c 5261 2006-03-09 20:47:49Z mike $".
  */

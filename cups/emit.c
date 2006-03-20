@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c 5238 2006-03-07 04:41:42Z mike $"
+ * "$Id: emit.c 5257 2006-03-09 15:27:27Z mike $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -527,7 +527,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
            !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
           !strcasecmp(choices[i]->choice, "Custom"))
       {
-        bufsize += 37;			/* %%BeginFeature: *CustomPageSize True */
+        bufsize += 37;			/* %%BeginFeature: *CustomPageSize True\n */
         bufsize += 50;			/* Five 9-digit numbers + newline */
       }
       else if (!strcasecmp(choices[i]->choice, "Custom") &&
@@ -535,8 +535,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	                                      choices[i]->option->keyword))
 	           != NULL)
       {
-        bufsize += 23 + strlen(choices[i]->option->keyword);
-					/* %%BeginFeature: *keyword True */
+        bufsize += 17 + strlen(choices[i]->option->keyword) + 6;
+					/* %%BeginFeature: *keyword True\n */
 
         
         for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
@@ -562,16 +562,16 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	}
       }
       else
-        bufsize += 19 + strlen(choices[i]->option->keyword) +
-	           strlen(choices[i]->choice);
-					/* %%BeginFeature: *keyword choice */
+        bufsize += 17 + strlen(choices[i]->option->keyword) + 1 +
+	           strlen(choices[i]->choice) + 1;
+					/* %%BeginFeature: *keyword choice\n */
 
       bufsize += 13;			/* %%EndFeature\n */
       bufsize += 22;			/* } stopped cleartomark\n */
     }
 
     if (choices[i]->code)
-      bufsize += strlen(choices[i]->code);
+      bufsize += strlen(choices[i]->code) + 1;
     else
       bufsize += strlen(ppd_custom_code);
   }
@@ -917,5 +917,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c 5238 2006-03-07 04:41:42Z mike $".
+ * End of "$Id: emit.c 5257 2006-03-09 15:27:27Z mike $".
  */

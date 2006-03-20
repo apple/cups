@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5232 2006-03-05 17:59:19Z mike $"
+ * "$Id: ipp.c 5284 2006-03-13 13:34:24Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3014,11 +3014,27 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (job->state_value >= IPP_JOB_CANCELLED)
   {
-    send_ipp_status(con, IPP_NOT_POSSIBLE,
-                    _("Job #%d is already %s - can\'t cancel."), jobid,
-		    job->state_value == IPP_JOB_CANCELLED ? "cancelled" :
-		    job->state_value == IPP_JOB_ABORTED ? "aborted" :
-		    "completed");
+    switch (job->state_value)
+    {
+      case IPP_JOB_CANCELLED :
+	  send_ipp_status(con, IPP_NOT_POSSIBLE,
+                	  _("Job #%d is already cancelled - can\'t cancel."),
+			  jobid);
+          break;
+
+      case IPP_JOB_ABORTED :
+	  send_ipp_status(con, IPP_NOT_POSSIBLE,
+                	  _("Job #%d is already aborted - can\'t cancel."),
+			  jobid);
+          break;
+
+      default :
+	  send_ipp_status(con, IPP_NOT_POSSIBLE,
+                	  _("Job #%d is already completed - can\'t cancel."),
+			  jobid);
+          break;
+    }
+
     return;
   }
 
@@ -5124,7 +5140,7 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
   snprintf(options, sizeof(options),
            "%d+%d+%d+requested-attributes=%s",
            con->request->request.op.request_id,
-           limit ? limit->values[0].integer : 0, User,
+           limit ? limit->values[0].integer : 0, (int)User,
 	   attrs);
 
   if (cupsdSendCommand(con, command, options, 1))
@@ -9094,5 +9110,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 5232 2006-03-05 17:59:19Z mike $".
+ * End of "$Id: ipp.c 5284 2006-03-13 13:34:24Z mike $".
  */

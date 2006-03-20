@@ -1,5 +1,5 @@
 /*
- * "$Id: testspeed.c 4800 2005-10-18 18:06:20Z mike $"
+ * "$Id: testspeed.c 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Scheduler speed test for the Common UNIX Printing System (CUPS).
  *
@@ -23,8 +23,10 @@
  *
  * Contents:
  *
- *   main() - Send multiple IPP requests and report on the average response
- *            time.
+ *   main()    - Send multiple IPP requests and report on the average response
+ *               time.
+ *   do_test() - Run a test on a specific host...
+ *   usage()   - Show program usage...
  */
 
 /*
@@ -47,9 +49,9 @@
  * Local functions...
  */
 
-int	do_test(const char *server, http_encryption_t encryption,
-		int requests, int verbose);
-void	usage(void);
+static int	do_test(const char *server, http_encryption_t encryption,
+			int requests, int verbose);
+static void	usage(void);
 
 
 /*
@@ -181,7 +183,7 @@ main(int  argc,				/* I - Number of command-line arguments */
  * 'do_test()' - Run a test on a specific host...
  */
 
-int					/* O - Exit status */
+static int				/* O - Exit status */
 do_test(const char        *server,	/* I - Server to use */
         http_encryption_t encryption,	/* I - Encryption to use */
 	int               requests,	/* I - Number of requests to send */
@@ -291,7 +293,7 @@ do_test(const char        *server,	/* I - Server to use */
  * 'usage()' - Show program usage...
  */
 
-void
+static void
 usage(void)
 {
   puts("Usage: testspeed [-c children] [-h] [-r requests] [-v] [-E] hostname");
@@ -301,5 +303,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testspeed.c 4800 2005-10-18 18:06:20Z mike $".
+ * End of "$Id: testspeed.c 5305 2006-03-18 03:05:12Z mike $".
  */

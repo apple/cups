@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 4719 2005-09-28 21:12:44Z mike $"
+ * "$Id: util.c 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Mini-daemon utility functions for the Common UNIX Printing System (CUPS).
  *
@@ -194,6 +194,7 @@ cupsdSendIPPHeader(
 }
 
 
+#if 0 /* Not currently used */
 /*
  * 'cupsdSendIPPInteger()' - Send an integer attribute.
  */
@@ -225,6 +226,7 @@ cupsdSendIPPInteger(
   putchar(value >> 8);
   putchar(value);
 }
+#endif /* 0 */
 
 
 /*
@@ -275,5 +277,5 @@ cupsdSendIPPTrailer(void)
 
 
 /*
- * End of "$Id: util.c 4719 2005-09-28 21:12:44Z mike $".
+ * End of "$Id: util.c 5305 2006-03-18 03:05:12Z mike $".
  */

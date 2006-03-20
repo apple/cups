@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5231 2006-03-05 17:22:27Z mike $"
+ * "$Id: printers.c 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -28,7 +28,6 @@
  *   cupsdAddPrinterUser()       - Add a user to the ACL.
  *   cupsdDeleteAllPrinters()    - Delete all printers from the system.
  *   cupsdDeletePrinter()        - Delete a printer from the system.
- *   cupsdDeletePrinterFilters() - Delete all MIME filters for a printer.
  *   cupsdFindPrinter()          - Find a printer in the list.
  *   cupsdFreePrinterUsers()     - Free allow/deny users.
  *   cupsdLoadAllPrinters()      - Load printers from the printers.conf file.
@@ -51,7 +50,7 @@
  *   add_printer_formats()       - Add document-format-supported values for
  *                                 a printer.
  *   compare_printers()          - Compare two printers.
- *   transcode_nickname()        - Convert the PPD NickName to UTF-8...
+ *   delete_printer_filters()    - Delete all MIME filters for a printer.
  *   write_irix_config()         - Update the config files used by the IRIX
  *                                 desktop tools.
  *   write_irix_state()          - Update the status files used by IRIX
@@ -63,7 +62,6 @@
  */
 
 #include "cupsd.h"
-#include <cups/transcode.h>
 
 
 /*
@@ -74,7 +72,7 @@ static void	add_printer_defaults(cupsd_printer_t *p);
 static void	add_printer_filter(cupsd_printer_t *p, const char *filter);
 static void	add_printer_formats(cupsd_printer_t *p);
 static int	compare_printers(void *first, void *second, void *data);
-static void	transcode_nickname(cupsd_printer_t *p, ppd_file_t *ppd);
+static void	delete_printer_filters(cupsd_printer_t *p);
 #ifdef __sgi
 static void	write_irix_config(cupsd_printer_t *p);
 static void	write_irix_state(cupsd_printer_t *p);
@@ -703,7 +701,7 @@ cupsdDeletePrinter(
 
   ippDelete(p->attrs);
 
-  cupsdDeletePrinterFilters(p);
+  delete_printer_filters(p);
 
   mimeDeleteType(MimeDatabase, p->filetype);
 
@@ -739,43 +737,6 @@ cupsdDeletePrinter(
   */
 
   cupsArrayRestore(Printers);
-}
-
-
-/*
- * 'cupsdDeletePrinterFilters()' - Delete all MIME filters for a printer.
- */
-
-void
-cupsdDeletePrinterFilters(
-    cupsd_printer_t *p)			/* I - Printer to remove from */
-{
-  mime_filter_t	*filter;		/* MIME filter looping var */
-
-
- /*
-  * Range check input...
-  */
-
-  if (p == NULL)
-    return;
-
- /*
-  * Remove all filters from the MIME database that have a destination
-  * type == printer...
-  */
-
-  for (filter = mimeFirstFilter(MimeDatabase);
-       filter;
-       filter = mimeNextFilter(MimeDatabase))
-    if (filter->dst == p->filetype)
-    {
-     /*
-      * Delete the current filter...
-      */
-
-      mimeDeleteFilter(MimeDatabase, filter);
-    }
 }
 
 
@@ -1483,7 +1444,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   * Clear out old filters, if any...
   */
 
-  cupsdDeletePrinterFilters(p);
+  delete_printer_filters(p);
 
  /*
   * Figure out the authentication that is required for the printer.
@@ -1719,14 +1680,21 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	{
 	 /*
 	  * The NickName can be localized in the character set specified
-	  * by the LanugageEncoding attribute.  Convert as needed to
-	  * UTF-8...
+	  * by the LanugageEncoding attribute.  However, ppdOpen2() has
+	  * already converted the ppd->nickname member to UTF-8 for us
+	  * (the original attribute value is available separately)
 	  */
 
-          transcode_nickname(p, ppd);
+          cupsdSetString(&p->make_model, ppd->nickname);
 	}
 	else if (ppd->modelname)
+	{
+	 /*
+	  * Model name can only contain specific characters...
+	  */
+
           cupsdSetString(&p->make_model, ppd->modelname);
+	}
 	else
 	  cupsdSetString(&p->make_model, "Bad PPD File");
 
@@ -3014,84 +2982,39 @@ compare_printers(void *first,		/* I - First printer */
 
 
 /*
- * 'transcode_nickname()' - Convert the PPD NickName to UTF-8...
+ * 'delete_printer_filters()' - Delete all MIME filters for a printer.
  */
 
 static void
-transcode_nickname(cupsd_printer_t *p,	/* I - Printer */
-                   ppd_file_t      *ppd)/* I - PPD file */
+delete_printer_filters(
+    cupsd_printer_t *p)			/* I - Printer to remove from */
 {
-  cups_utf8_t		utf8[256];	/* UTF-8 version of nickname */
-  cups_encoding_t	encoding;	/* Encoding of PPD file */
-  const char		*nickptr;	/* Pointer into nickname */
+  mime_filter_t	*filter;		/* MIME filter looping var */
 
 
  /*
-  * See if we need to convert to UTF-8...
+  * Range check input...
   */
 
-  if (!ppd->lang_encoding || !strcasecmp(ppd->lang_encoding, "UTF-8"))
-  {
-   /*
-    * No language encoding, or encoding uses the non-standard UTF-8
-    * value, so no transcoding is required...
-    */
-
-    goto no_transcode;
-  }
-
-  for (nickptr = ppd->nickname; *nickptr; nickptr ++)
-    if (*nickptr & 0x80)
-      break;
-
-  if (!*nickptr)
-  {
-   /*
-    * No non-ASCII characters, so no transcoding is required...
-    */
-
-    goto no_transcode;
-  }
+  if (p == NULL)
+    return;
 
  /*
-  * OK, we need to transcode...
+  * Remove all filters from the MIME database that have a destination
+  * type == printer...
   */
 
-  if (!strcasecmp(ppd->lang_encoding, "ISOLatin1"))
-    encoding = CUPS_ISO8859_1;
-  else if (!strcasecmp(ppd->lang_encoding, "ISOLatin2"))
-    encoding = CUPS_ISO8859_2;
-  else if (!strcasecmp(ppd->lang_encoding, "ISOLatin5"))
-    encoding = CUPS_ISO8859_5;
-  else if (!strcasecmp(ppd->lang_encoding, "JIS83-RKSJ"))
-    encoding = CUPS_WINDOWS_932;
-  else if (!strcasecmp(ppd->lang_encoding, "MacStandard"))
-    encoding = CUPS_MAC_ROMAN;
-  else if (!strcasecmp(ppd->lang_encoding, "WindowsANSI"))
-    encoding = CUPS_WINDOWS_1252;
-  else
-  {
-   /*
-    * Unknown encoding, treat as UTF-8...
-    */
+  for (filter = mimeFirstFilter(MimeDatabase);
+       filter;
+       filter = mimeNextFilter(MimeDatabase))
+    if (filter->dst == p->filetype)
+    {
+     /*
+      * Delete the current filter...
+      */
 
-    goto no_transcode;
-  }
-
-  cupsCharsetToUTF8(utf8, ppd->nickname, sizeof(utf8), encoding);
-
-  cupsdSetString(&p->make_model, (char *)utf8);
-
-  return;
-
- /*
-  * Yeah, yeah, gotos are evil, but code bloat is more evil...
-  */
-
-  no_transcode:
-
-  cupsdSetString(&p->make_model, ppd->nickname);
-  return;
+      mimeDeleteFilter(MimeDatabase, filter);
+    }
 }
 
 
@@ -3351,5 +3274,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 5231 2006-03-05 17:22:27Z mike $".
+ * End of "$Id: printers.c 5305 2006-03-18 03:05:12Z mike $".
  */

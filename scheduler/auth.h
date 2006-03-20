@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.h 5222 2006-03-03 18:57:56Z mike $"
+ * "$Id: auth.h 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -154,11 +154,9 @@ extern void		cupsdDenyIP(cupsd_location_t *loc, unsigned address[4],
 			            unsigned netmask[4]);
 extern cupsd_location_t	*cupsdFindBest(const char *path, http_state_t state);
 extern cupsd_location_t	*cupsdFindLocation(const char *location);
-extern char		*cupsdGetMD5Passwd(const char *username, const char *group,
-			                   char passwd[33]);
 extern http_status_t	cupsdIsAuthorized(cupsd_client_t *con, const char *owner);
 
 
 /*
- * End of "$Id: auth.h 5222 2006-03-03 18:57:56Z mike $".
+ * End of "$Id: auth.h 5305 2006-03-18 03:05:12Z mike $".
  */

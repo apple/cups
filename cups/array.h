@@ -1,5 +1,5 @@
 /*
- * "$Id: array.h 4970 2006-01-24 14:05:45Z mike $"
+ * "$Id: array.h 5258 2006-03-09 15:40:56Z mike $"
  *
  *   Sorted array definitions for the Common UNIX Printing System (CUPS).
  *
@@ -73,6 +73,7 @@ extern void		*cupsArrayPrev(cups_array_t *a);
 extern int		cupsArrayRemove(cups_array_t *a, void *e);
 extern void		*cupsArrayRestore(cups_array_t *a);
 extern int		cupsArraySave(cups_array_t *a);
+extern void		*cupsArrayUserData(cups_array_t *a);
 
 #  ifdef __cplusplus
 }
@@ -80,5 +81,5 @@ extern int		cupsArraySave(cups_array_t *a);
 #endif /* !_CUPS_ARRAY_H_ */
 
 /*
- * End of "$Id: array.h 4970 2006-01-24 14:05:45Z mike $".
+ * End of "$Id: array.h 5258 2006-03-09 15:40:56Z mike $".
  */

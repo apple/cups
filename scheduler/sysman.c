@@ -1,5 +1,5 @@
 /*
- * "$Id: sysman.c 5241 2006-03-07 22:07:44Z mike $"
+ * "$Id: sysman.c 5305 2006-03-18 03:05:12Z mike $"
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
@@ -51,38 +51,6 @@
  * Once put to sleep, we invalidate all remote printers since it is
  * common to wake up in a new location.
  */
-
-#ifndef __APPLE__
-/*
- * 'cupsdStartSystemMonitor()' - Start monitoring for system change.
- */
-
-void
-cupsdStartSystemMonitor(void)
-{
-}
-
-
-/*
- * 'cupsdStopSystemMonitor()' - Stop monitoring for system change.
- */
-
-void
-cupsdStopSystemMonitor(void)
-{
-}
-
-
-/*
- * 'cupsdUpdateSystemMonitor()' - Update the current system state.
- */
-
-void
-cupsdUpdateSystemMonitor(void)
-{
-}
-#endif /* !__APPLE__ */
-
 
 #ifdef __APPLE__
 /*
@@ -759,5 +727,5 @@ sysEventTimerNotifier(
 
 
 /*
- * End of "$Id: sysman.c 5241 2006-03-07 22:07:44Z mike $".
+ * End of "$Id: sysman.c 5305 2006-03-18 03:05:12Z mike $".
  */

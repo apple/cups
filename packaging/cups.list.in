@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 5224 2006-03-04 02:00:43Z mike $"
+# "$Id: cups.list.in 5311 2006-03-19 13:21:42Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -97,6 +97,9 @@
 %provides cups-lpd 1:@CUPS_VERSION@
 %format all
 
+%subpackage es
+%description Common UNIX Printing System - Spanish support
+
 %subpackage ja
 %description Common UNIX Printing System - Japanese support
 
@@ -147,6 +150,12 @@ $SBINDIR=@sbindir@
 $SERVERBIN=@CUPS_SERVERBIN@
 $SERVERROOT=@CUPS_SERVERROOT@
 $STATEDIR=@CUPS_STATEDIR@
+
+$LIB32DIR=@LIB32DIR@
+$LIB64DIR=@LIB64DIR@
+
+$IMGFILTERS=@IMGFILTERS@
+$PDFTOPS=@PDFTOPS@
 
 $CUPS_USER=@CUPS_USER@
 $CUPS_GROUP=@CUPS_GROUP@
@@ -201,9 +210,13 @@ d 0755 root sys $SERVERBIN/driver -
 d 0755 root sys $SERVERBIN/filter -
 f 0755 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
 f 0755 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
+%if $IMGFILTERS
 f 0755 root sys $SERVERBIN/filter/imagetops filter/imagetops
 f 0755 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
+%endif
+%if $PDFTOPS
 f 0755 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
+%endif
 f 0755 root sys $SERVERBIN/filter/pstops filter/pstops
 f 0755 root sys $SERVERBIN/filter/rastertolabel filter/rastertolabel
 l 0755 root sys $SERVERBIN/filter/rastertodymo rastertolabel
@@ -284,6 +297,26 @@ l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
 %subpackage
 %endif
 
+%if LIB32DIR
+%subpackage libs
+f 0755 root sys $LIB32DIR/libcups.so.2 cups/libcups.32.so.2
+l 0755 root sys $LIB32DIR/libcups.so libcups.so.2
+f 0755 root sys $LIB32DIR/libcupsimage.so.2 filter/libcupsimage.32.so.2
+l 0755 root sys $LIB32DIR/libcupsimage.so libcupsimage.so.2
+%system all
+%subpackage
+%endif
+
+%if LIB64DIR
+%subpackage libs
+f 0755 root sys $LIB64DIR/libcups.so.2 cups/libcups.64.so.2
+l 0755 root sys $LIB64DIR/libcups.so libcups.so.2
+f 0755 root sys $LIB64DIR/libcupsimage.so.2 filter/libcupsimage.64.so.2
+l 0755 root sys $LIB64DIR/libcupsimage.so libcupsimage.so.2
+%system all
+%subpackage
+%endif
+
 # Directories
 d 0755 root sys $LOGDIR -
 d 0710 root $CUPS_GROUP $REQUESTS -
@@ -294,6 +327,8 @@ d 0755 root $CUPS_GROUP $STATEDIR -
 d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 
 # Data files
+%subpackage es
+f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
 %subpackage ja
 f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
 %subpackage
@@ -351,6 +386,9 @@ d 0755 root sys $DATADIR/templates -
 c 0644 root sys $DATADIR/templates templates/*.tmpl
 
 # Japanese template files
+%subpackage es
+d 0755 root sys $DATADIR/templates/es
+f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
 %subpackage ja
 d 0755 root sys $DATADIR/templates/ja
 f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
@@ -413,7 +451,12 @@ f 0644 root sys $DOCDIR/images doc/images/*.gif
 f 0644 root sys $DOCDIR/images doc/images/*.png
 f 0644 root sys $DOCDIR/robots.txt doc/robots.txt
 
-# Japanese documentation files
+# Localized documentation files
+%subpackage es
+d 0755 root sys $DOCDIR/es
+f 0644 root sys $DOCDIR/es doc/es/*.html
+d 0755 root sys $DOCDIR/es/images -
+f 0644 root sys $DOCDIR/es/images doc/es/images/*.gif
 %subpackage ja
 d 0755 root sys $DOCDIR/ja
 f 0644 root sys $DOCDIR/ja doc/ja/*.html
@@ -473,5 +516,5 @@ f 0644 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.$MAN8EXT
 i 0755 root sys cups init/cups.sh
 
 #
-# End of "$Id: cups.list.in 5224 2006-03-04 02:00:43Z mike $".
+# End of "$Id: cups.list.in 5311 2006-03-19 13:21:42Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c 4939 2006-01-17 18:54:33Z mike $"
+ * "$Id: testppd.c 5261 2006-03-09 20:47:49Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -46,6 +46,23 @@
 
 
 /*
+ * Test data...
+ */
+
+static const char	*default_code =
+			"[{\n"
+			"%%BeginFeature: *PageRegion Letter\n"
+			"PageRegion=Letter\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *InputSlot Tray\n"
+			"InputSlot=Tray\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n";
+
+
+/*
  * 'main()' - Main entry.
  */
 
@@ -55,6 +72,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   ppd_file_t	*ppd;			/* PPD file loaded from disk */
   int		status;			/* Status of tests (0 = success, 1 = fail) */
+  int		conflicts;		/* Number of conflicts */
+  char		*s;			/* String */
 
 
   status = 0;
@@ -75,6 +94,33 @@ main(int  argc,				/* I - Number of command-line arguments */
     printf("FAIL (%s on line %d)\n", ppdErrorString(err), line);
   }
 
+  fputs("ppdMarkDefaults: ", stdout);
+  ppdMarkDefaults(ppd);
+
+  if ((conflicts = ppdConflicts(ppd)) == 0)
+    puts("PASS");
+  else
+  {
+    status ++;
+    printf("FAIL (%d conflicts)\n", conflicts);
+  }
+
+  fputs("ppdEmitString: ", stdout);
+  if ((s = ppdEmitString(ppd, PPD_ORDER_ANY, 0.0)) != NULL &&
+      !strcmp(s, default_code))
+    puts("PASS");
+  else
+  {
+    printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
+           (int)strlen(default_code));
+
+    if (s)
+      puts(s);
+  }
+
+  if (s)
+    free(s);
+
   ppdClose(ppd);
 
   return (status);
@@ -82,5 +128,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c 4939 2006-01-17 18:54:33Z mike $".
+ * End of "$Id: testppd.c 5261 2006-03-09 20:47:49Z mike $".
  */

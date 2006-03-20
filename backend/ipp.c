@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5241 2006-03-07 22:07:44Z mike $"
+ * "$Id: ipp.c 5261 2006-03-09 20:47:49Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -1263,7 +1263,8 @@ compress_files(int  num_files,		/* I - Number of files */
       fprintf(stderr,
               "DEBUG: File %d compressed to %.1f%% of original size, "
 	      CUPS_LLFMT " bytes...\n",
-              i + 1, 100.0 * outinfo.st_size / total, outinfo.st_size);
+              i + 1, 100.0 * outinfo.st_size / total,
+	      CUPS_LLCAST outinfo.st_size);
   }
 }
 #endif /* HAVE_LIBZ */
@@ -1618,5 +1619,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 5241 2006-03-07 22:07:44Z mike $".
+ * End of "$Id: ipp.c 5261 2006-03-09 20:47:49Z mike $".
  */

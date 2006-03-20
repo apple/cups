@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 5235 2006-03-06 13:02:23Z mike $"
+ * "$Id: conf.c 5289 2006-03-14 11:54:45Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -784,6 +784,8 @@ cupsdReadConfiguration(void)
     if (DefaultPolicy)
       cupsdLogMessage(CUPSD_LOG_ERROR, "Default policy \"%s\" not found!",
                       DefaultPolicy);
+
+    cupsdSetString(&DefaultPolicy, "default");
 
     if ((DefaultPolicyPtr = cupsdFindPolicy("default")) != NULL)
       cupsdLogMessage(CUPSD_LOG_INFO,
@@ -3237,5 +3239,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 5235 2006-03-06 13:02:23Z mike $".
+ * End of "$Id: conf.c 5289 2006-03-14 11:54:45Z mike $".
  */

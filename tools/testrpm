@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: testrpm 5304 2006-03-18 01:21:37Z mike $"
 #
 # Test script for making RPMs...
 #
@@ -28,5 +28,5 @@ rm -f /usr/src/redhat/SRPMS/cups*.rpm
 rpmbuild -ta $args cups-$fileversion-source.tar.bz2
 
 #
-# End of "$Id$".
+# End of "$Id: testrpm 5304 2006-03-18 01:21:37Z mike $".
 #

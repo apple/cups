@@ -1,6 +1,8 @@
 _cupsAdminGetServerSettings
 _cupsAdminSetServerSettings
 _cupsCharmapFlush
+_cupsCharmapFree
+_cupsCharmapGet
 _cupsEncodingName
 _cupsGetPassword
 _cupsGlobals
@@ -14,14 +16,15 @@ _cupsMD5Init
 _cupsMessageFree
 _cupsMessageLoad
 _cupsMessageLookup
-_cupsNormalizeMapsFlush
 _cupsSetError
 _cupsStrAlloc
-_cups_strcpy
 _cupsStrFlush
+_cupsStrFormatd
 _cupsStrFree
+_cupsStrScand
+_cupsStrStatistics
+_cups_strcpy
 _cups_strlcat
 _cups_strlcpy
-_cupsStrStatistics
 _ippAddAttr
 _ippFreeAttr

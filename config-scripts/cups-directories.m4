@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-directories.m4 5023 2006-01-29 14:39:44Z mike $"
+dnl "$Id: cups-directories.m4 5314 2006-03-20 19:06:50Z mike $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -99,10 +99,14 @@ fi
 
 dnl Fix "libdir" variable for IRIX 6.x...
 if test "$libdir" = "\${exec_prefix}/lib"; then
-	if test "$uname" = "IRIX" -a $uversion -ge 62; then
+	if test "$uname" = "IRIX"; then
 		libdir="$exec_prefix/lib32"
 	else
-		libdir="$exec_prefix/lib"
+		if test "$uname" = Linux -a -d /usr/lib64; then
+			libdir="$exec_prefix/lib64"
+		else
+			libdir="$exec_prefix/lib"
+		fi
 	fi
 fi
 
@@ -173,6 +177,17 @@ fi
 
 AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
+
+dnl Xinetd support...
+XINETD=""
+for dir in /private/etc/xinetd.d /etc/xinetd.d /usr/local/etc/xinetd.d; do
+	if test -d $dir; then
+		XINETD="$dir"
+		break
+	fi
+done
+
+AC_SUBST(XINETD)
 
 dnl Setup default locations...
 # Cache data...
@@ -266,7 +281,7 @@ case "$uname" in
 	*)
 		# All others
 		INSTALL_SYSV="install-sysv"
-		CUPS_SERVERBIN="$libdir/cups"
+		CUPS_SERVERBIN="$exec_prefix/lib/cups"
 		;;
 esac
 
@@ -285,5 +300,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 5023 2006-01-29 14:39:44Z mike $".
+dnl End of "$Id: cups-directories.m4 5314 2006-03-20 19:06:50Z mike $".
 dnl

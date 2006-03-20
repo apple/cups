@@ -1,5 +1,5 @@
 /*
- * "$Id: subscriptions.h 5025 2006-01-30 03:49:12Z mike $"
+ * "$Id: subscriptions.h 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Subscription definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -154,7 +154,6 @@ extern cupsd_subscription_t *
 		cupsdAddSubscription(unsigned mask, cupsd_printer_t *dest,
 		                     cupsd_job_t *job, const char *uri,
 				     int sub_id);
-extern void	cupsdDeleteAllEvents(void);
 extern void	cupsdDeleteAllSubscriptions(void);
 extern void	cupsdDeleteSubscription(cupsd_subscription_t *sub, int update);
 extern const char *
@@ -168,12 +167,10 @@ extern void	cupsdExpireSubscriptions(cupsd_printer_t *dest,
 		                         cupsd_job_t *job);
 extern void	cupsdLoadAllSubscriptions(void);
 extern void	cupsdSaveAllSubscriptions(void);
-extern void	cupsdSendNotification(cupsd_subscription_t *sub,
-		                      cupsd_event_t *event);
 extern void	cupsdStopAllNotifiers(void);
 extern void	cupsdUpdateNotifierStatus(void);
 
 
 /*
- * End of "$Id: subscriptions.h 5025 2006-01-30 03:49:12Z mike $".
+ * End of "$Id: subscriptions.h 5305 2006-03-18 03:05:12Z mike $".
  */

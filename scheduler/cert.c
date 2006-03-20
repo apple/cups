@@ -1,5 +1,5 @@
 /*
- * "$Id: cert.c 5213 2006-03-02 00:37:34Z mike $"
+ * "$Id: cert.c 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -332,7 +332,8 @@ cupsdDeleteAllCerts(void)
     free(cert);
   }
 
-  Certs = NULL;
+  Certs        = NULL;
+  RootCertTime = 0;
 }
 
 
@@ -415,5 +416,5 @@ cupsdInitCerts(void)
 
 
 /*
- * End of "$Id: cert.c 5213 2006-03-02 00:37:34Z mike $".
+ * End of "$Id: cert.c 5305 2006-03-18 03:05:12Z mike $".
  */

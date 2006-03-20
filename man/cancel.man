@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cancel 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH cancel 1 "Common UNIX Printing System" "20 March 2006" "Easy Software Products"
 .SH NAME
 cancel - cancel jobs
 .SH SYNOPSIS
@@ -43,7 +43,7 @@ cancel - cancel jobs
 \fIcancel\fR cancels existing print jobs. The \fI-a\fR option will remove
 all jobs from the specified destination.
 .SH OPTIONS
-The following options are recognized by \fIlp\fR:
+The following options are recognized by \fIcancel\fR:
 .TP 5
 -E
 .br

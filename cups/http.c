@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 5226 2006-03-04 22:03:18Z mike $"
+ * "$Id: http.c 5282 2006-03-13 12:10:33Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1692,6 +1692,7 @@ httpUpdate(http_t *http)		/* I - HTTP connection */
 	case HTTP_PUT :
 	    http->state ++;
 	case HTTP_POST_SEND :
+	case HTTP_HEAD :
 	    break;
 
 	default :
@@ -2280,7 +2281,8 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   gnutls_init(&(conn->session), GNUTLS_CLIENT);
   gnutls_set_default_priority(conn->session);
   gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(conn->session, (gnutls_transport_ptr)http->fd);
+  gnutls_transport_set_ptr(conn->session,
+                           (gnutls_transport_ptr)((long)http->fd));
 
   if ((gnutls_handshake(conn->session)) != GNUTLS_E_SUCCESS)
   {
@@ -2756,5 +2758,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 5226 2006-03-04 22:03:18Z mike $".
+ * End of "$Id: http.c 5282 2006-03-13 12:10:33Z mike $".
  */

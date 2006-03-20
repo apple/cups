@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c 5241 2006-03-07 22:07:44Z mike $"
+ * "$Id: usb-unix.c 5259 2006-03-09 19:22:36Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -374,7 +374,6 @@ list_devices(void)
 	device_id[1024],	/* Device ID string */
 	device_uri[1024],	/* Device URI string */
 	make_model[1024];	/* Make and model */
-  struct ecpp_device_id did;	/* Device ID buffer */
 
 
  /*
@@ -545,7 +544,6 @@ open_device(const char *uri)		/* I - Device URI */
 		device_id[1024],	/* Device ID string */
 		make_model[1024],	/* Make and model */
 		device_uri[1024];	/* Device URI string */
-    struct ecpp_device_id did;		/* Device ID buffer */
 
 
    /*
@@ -620,5 +618,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c 5241 2006-03-07 22:07:44Z mike $".
+ * End of "$Id: usb-unix.c 5259 2006-03-09 19:22:36Z mike $".
  */

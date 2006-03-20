@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5240 2006-03-07 21:55:29Z mike $"
+# "$Id: Makefile 5303 2006-03-18 01:05:59Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -57,7 +57,6 @@ LIBOBJS	=	\
 		mark.o \
 		md5.o \
 		md5passwd.o \
-		normalize.o \
 		notify.o \
 		options.o \
 		page.o \
@@ -69,8 +68,12 @@ LIBOBJS	=	\
 		transcode.o \
 		usersys.o \
 		util.o
+LIB32OBJS	= $(LIBOBJS:.o=.32.o)
+LIB64OBJS	= $(LIBOBJS:.o=.64.o)
 OBJS	=	\
 		$(LIBOBJS) \
+		$(LIB32OBJS) \
+		$(LIB64OBJS) \
 		testadmin.o \
 		testarray.o \
 		testfile.o \
@@ -97,7 +100,6 @@ HEADERS	=	\
 		ipp.h \
 		language.h \
 		md5.h \
-		normalize.h \
 		ppd.h \
 		transcode.h
 
@@ -108,6 +110,8 @@ HEADERS	=	\
 
 TARGETS	=	\
 		$(LIBCUPS) \
+		$(LIB32CUPS) \
+		$(LIB64CUPS) \
 		libcups.a \
 		testadmin \
 		testarray \
@@ -131,7 +135,8 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) `basename $(LIBCUPS) .2` libcups.dylib
+	$(RM) $(OBJS) $(TARGETS)
+	$(RM) libcups.so libcups.sl libcups.dylib libcups.32.so libcups.64.so
 
 
 #
@@ -139,14 +144,20 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+	touch Dependencies.tmp
+	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
+	$(RM) Dependencies
+	cp Dependencies.tmp Dependencies
+	sed -r -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
+	sed -r -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
+	$(RM) Dependencies.tmp
 
 
 #
 # Install object and target files...
 #
 
-install:	all installhdrs $(INSTALLSTATIC)
+install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
@@ -172,12 +183,22 @@ installhdrs:
 		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
 	done
 
+install32bit:
+	$(INSTALL_DIR) -m 755 $(LIB32DIR)
+	$(INSTALL_LIB) libcups.32.so.2 $(LIB32DIR)/libcups.so.2
+	$(LN) libcups.so $(LIB32DIR)/libcups.so.2
+
+install64bit:
+	$(INSTALL_DIR) -m 755 $(LIB64DIR)
+	$(INSTALL_LIB) libcups.64.so.2 $(LIB64DIR)/libcups.so.2
+	$(LN) libcups.so $(LIB64DIR)/libcups.so.2
+
 
 #
 # Uninstall object and target files...
 #
 
-uninstall:
+uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	$(RM) $(LIBDIR)/libcups.2.dylib
 	$(RM) $(LIBDIR)/libcups.a
 	$(RM) $(LIBDIR)/libcups.dylib
@@ -192,6 +213,16 @@ uninstall:
 	done
 	-$(RMDIR) $(INCLUDEDIR)/cups
 
+uninstall32bit:
+	$(RM) $(LIB32DIR)/libcups.so
+	$(RM) $(LIB32DIR)/libcups.so.2
+	-$(RMDIR) $(LIB32DIR)
+
+uninstall64bit:
+	$(RM) $(LIB64DIR)/libcups.so
+	$(RM) $(LIB64DIR)/libcups.so.2
+	-$(RMDIR) $(LIB64DIR)
+
 
 #
 # libcups.so.2, libcups.sl.2
@@ -199,9 +230,27 @@ uninstall:
 
 libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
+
+
+#
+# libcups.32.so.2
+#
+
+libcups.32.so.2:	$(LIB32OBJS)
+	echo Linking 32-bit $@...
+	$(DSO) $(ARCH32FLAGS) $(DSOFLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# libcups.64.so.2
+#
+
+libcups.64.so.2:	$(LIB64OBJS)
+	echo Linking 64-bit $@...
+	$(DSO) $(ARCH64FLAGS) $(DSOFLAGS) -o $@ $(LIB64OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -210,7 +259,7 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 
 libcups.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(DSOFLAGS) -o $@ \
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.7.0 \
 		-compatibility_version 2.0.0 \
@@ -236,7 +285,7 @@ libcups_s.a:	$(LIBOBJS)
 
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
-	$(CC) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
 		-version-info 2:7 $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -394,5 +443,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5240 2006-03-07 21:55:29Z mike $".
+# End of "$Id: Makefile 5303 2006-03-18 01:05:59Z mike $".
 #
