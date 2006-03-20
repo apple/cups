@@ -32,7 +32,8 @@ authentication:</P>
 	the server.</P>
 
 	<P><B>Recommendation:</B> Enable encryption to hide the
-	username and password information.</P></LI>
+	username and password information - this is the default on
+	MacOS X and systems with GNU TLS or OpenSSL installed.</P></LI>
 
 	<LI>Digest authentication uses an MD5 checksum of the
 	username, password, and domain ("CUPS"), so the original
@@ -51,8 +52,8 @@ authentication:</P>
 	Certificates are created on-the-fly from random data and
 	stored in files under <VAR>/var/run/cups/certs</VAR>.
 	They have restricted read permissions: root +
-	system-group(s) for the root certificate, and lp +
-	system-group(s) for CGI certificates.
+	system-group(s) for the root certificate, and lp + lp
+	for CGI certificates.
 
 	<P>Because certificates are only available on the local
 	system, the CUPS server does not accept local
