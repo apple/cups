@@ -24,10 +24,10 @@
 
 include ../Makedefs
 
-TARGETS	=	accept cancel cupsaddsmb cupstestppd lp lpadmin lpinfo \
-		lpmove lpoptions lppasswd lpstat
-OBJS	=	accept.o cancel.o cupsaddsmb.o cupstestppd.o lp.o \
-		lpadmin.o lpinfo.o lpmove.o lpoptions.o lppasswd.o \
+TARGETS	=	accept cancel cupsaddsmb cupstestdsc cupstestppd \
+		lp lpadmin lpinfo lpmove lpoptions lppasswd lpstat
+OBJS	=	accept.o cancel.o cupsaddsmb.o cupstestdsc.o cupstestppd.o \
+		lp.o lpadmin.o lpinfo.o lpmove.o lpoptions.o lppasswd.o \
 		lpstat.o
 
 
@@ -69,6 +69,7 @@ install:	all
 	$(INSTALL_BIN) lpmove $(SBINDIR)
 	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_BIN) cancel $(BINDIR)
+	$(INSTALL_BIN) cupstestdsc $(BINDIR)
 	$(INSTALL_BIN) cupstestppd $(BINDIR)
 	$(RM) $(SBINDIR)/cupsdisable
 	$(LN) accept $(SBINDIR)/cupsdisable
@@ -86,6 +87,7 @@ install:	all
 
 uninstall:
 	$(RM) $(BINDIR)/cancel
+	$(RM) $(BINDIR)/cupstestdsc
 	$(RM) $(BINDIR)/cupstestppd
 	$(RM) $(BINDIR)/lp
 	$(RM) $(BINDIR)/lpoptions
@@ -132,6 +134,15 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsaddsmb cupsaddsmb.o $(LIBS)
+
+
+#
+# cupstestdsc
+#
+
+cupstestdsc:	cupstestdsc.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ cupstestdsc.o $(LIBS)
 
 
 #

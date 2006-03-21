@@ -31,6 +31,7 @@ include ../Makedefs
 
 MAN1	=	cancel.$(MAN1EXT) \
 		cups-config.$(MAN1EXT) \
+		cupstestdsc.$(MAN1EXT) \
 		cupstestppd.$(MAN1EXT) \
 		lp.$(MAN1EXT) \
 		lpoptions.$(MAN1EXT) \

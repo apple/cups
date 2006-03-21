@@ -257,6 +257,7 @@ l 0755 root sys /usr/etc/lpc $SBINDIR/lpc
 # User commands
 d 0755 root sys $BINDIR -
 f 0755 root sys $BINDIR/cancel systemv/cancel
+f 0755 root sys $BINDIR/cupstestdsc systemv/cupstestdsc
 f 0755 root sys $BINDIR/cupstestppd systemv/cupstestppd
 f 0755 root sys $BINDIR/lp systemv/lp
 f 0755 root sys $BINDIR/lpoptions systemv/lpoptions
@@ -473,6 +474,7 @@ d 0755 root sys $MANDIR/man5 -
 d 0755 root sys $MANDIR/man7 -
 
 f 0644 root sys $MANDIR/man1/cancel.$MAN1EXT man/cancel.$MAN1EXT
+f 0644 root sys $MANDIR/man1/cupstestdsc.$MAN1EXT man/cupstestdsc.$MAN1EXT
 f 0644 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.$MAN1EXT
 f 0644 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.$MAN1EXT
 f 0644 root sys $MANDIR/man1/lppasswd.$MAN1EXT man/lppasswd.$MAN1EXT

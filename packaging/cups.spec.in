@@ -215,6 +215,7 @@ rm -rf $RPM_BUILD_ROOT
 #/sbin/rc.d/rc5.d/*
 
 /usr/bin/cancel
+/usr/bin/cupstestdsc
 /usr/bin/cupstestppd
 /usr/bin/lp*
 %dir /usr/lib/cups
@@ -264,6 +265,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
+/usr/share/man/man1/cupstestdsc.1.gz
 /usr/share/man/man1/cupstestppd.1.gz
 /usr/share/man/man1/lp.1.gz
 /usr/share/man/man1/lpoptions.1.gz

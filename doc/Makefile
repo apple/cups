@@ -132,6 +132,7 @@ HELPFILES	=	\
 			help/man-cupsd.conf.html \
 			help/man-cupsd.html \
 			help/man-cupsenable.html \
+			help/man-cupstestdsc.html \
 			help/man-cupstestppd.html \
 			help/man-filter.html \
 			help/man-lp.html \
