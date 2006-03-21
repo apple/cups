@@ -201,6 +201,8 @@ main(int  argc,				/* I - Number of command-line args */
     {
       if (!strncmp(line, "%%EndComments", 13))
         saw_end_comments = 1;
+      else if (line[0] != '%')
+        saw_end_comments = -1;
       else if (!strncmp(line, "%%Pages:", 8))
       {
         if (strstr(line + 8, "(atend)"))
@@ -344,6 +346,9 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (version < 3.0f)
     printf("    Warning: obsolete DSC version %.1f in file!\n", version);
+
+  if (saw_end_comments < 0)
+    puts("    Warning: no %%EndComments comment in file!");
 
   cupsFileClose(fp);
 
