@@ -17,8 +17,9 @@ dir.o: dir.h string.h ../config.h debug.h
 emit.o: ppd.h array.h file.h string.h ../config.h
 encode.o: cups.h ipp.h http.h md5.h ppd.h array.h file.h language.h
 encode.o: ipp-private.h string.h ../config.h debug.h
-file.o: http-private.h ../config.h http.h md5.h ipp-private.h ipp.h string.h
-file.o: ../cups/debug.h file.h
+file.o: http-private.h ../config.h http.h md5.h ipp-private.h ipp.h globals.h
+file.o: string.h cups.h ppd.h array.h file.h language.h i18n.h transcode.h
+file.o: debug.h
 getputfile.o: cups.h ipp.h http.h md5.h ppd.h array.h file.h language.h
 getputfile.o: string.h ../config.h debug.h
 globals.o: http-private.h ../config.h http.h md5.h ipp-private.h ipp.h
@@ -98,8 +99,9 @@ dir.32.o: dir.c  dir.h string.h ../config.h debug.h
 emit.32.o: emit.c  ppd.h array.h file.h string.h ../config.h
 encode.32.o: encode.c  cups.h ipp.h http.h md5.h ppd.h array.h file.h language.h
 encode.32.o: encode.c  ipp-private.h string.h ../config.h debug.h
-file.32.o: file.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h string.h
-file.32.o: file.c  ../cups/debug.h file.h
+file.32.o: file.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h globals.h
+file.32.o: file.c  string.h cups.h ppd.h array.h file.h language.h i18n.h transcode.h
+file.32.o: file.c  debug.h
 getputfile.32.o: getputfile.c  cups.h ipp.h http.h md5.h ppd.h array.h file.h language.h
 getputfile.32.o: getputfile.c  string.h ../config.h debug.h
 globals.32.o: globals.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h
@@ -179,8 +181,9 @@ dir.64.o: dir.c  dir.h string.h ../config.h debug.h
 emit.64.o: emit.c  ppd.h array.h file.h string.h ../config.h
 encode.64.o: encode.c  cups.h ipp.h http.h md5.h ppd.h array.h file.h language.h
 encode.64.o: encode.c  ipp-private.h string.h ../config.h debug.h
-file.64.o: file.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h string.h
-file.64.o: file.c  ../cups/debug.h file.h
+file.64.o: file.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h globals.h
+file.64.o: file.c  string.h cups.h ppd.h array.h file.h language.h i18n.h transcode.h
+file.64.o: file.c  debug.h
 getputfile.64.o: getputfile.c  cups.h ipp.h http.h md5.h ppd.h array.h file.h language.h
 getputfile.64.o: getputfile.c  string.h ../config.h debug.h
 globals.64.o: globals.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h

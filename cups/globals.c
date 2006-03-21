@@ -152,13 +152,16 @@ globals_init()
 static void
 globals_destructor(void *value)		/* I - Data to free */
 {
+  int			i;		/* Looping var */
   _cups_globals_t	*cg;		/* Global data */
 
 
   cg = (_cups_globals_t *)value;
 
-  if (cg->http)
-    httpClose(cg->http);
+  httpClose(cg->http);
+
+  for (i = 0; i < 3; i ++)
+    cupsFileClose(cg->stdio_files[i]);
 
   _cupsStrFlush(cg);
   _cupsLangFlush(cg);

@@ -1,9 +1,12 @@
-CHANGES.txt - 2006-03-20
+CHANGES.txt - 2006-03-21
 ------------------------
 
 CHANGES IN CUPS V1.2rc1
 
 	- Documentation updates (STR #1497)
+	- Added cupsFileGetLine(), cupsFileStderr(),
+	  cupsFileStdin(), and cupsFileStdout() functions to the
+	  CUPS library.
 	- Added a new cupstestdsc program to test the DSC
 	  conformance of PostScript files.
 	- Added KDE/GNOME icons and a Manage Printers menu item.

@@ -35,9 +35,12 @@
  *   cupsFileFlush()       - Flush pending output.
  *   cupsFileGetChar()     - Get a single character from a file.
  *   cupsFileGetConf()     - Get a line from a configuration file...
+ *   cupsFileGetLine()     - Get a CR and/or LF-terminated line that may
+ *                           contain binary data.
  *   cupsFileGets()        - Get a CR and/or LF-terminated line.
  *   cupsFileLock()        - Temporarily lock access to a file.
- *   cupsFileNumber()      - Return the file descriptor associated with a CUPS file.
+ *   cupsFileNumber()      - Return the file descriptor associated with a CUPS
+ *                           file.
  *   cupsFileOpen()        - Open a CUPS file.
  *   cupsFileOpenFd()      - Open a CUPS file using a file descriptor.
  *   cupsFilePeekChar()    - Peek at the next character from a file.
@@ -47,6 +50,9 @@
  *   cupsFileRead()        - Read from a file.
  *   cupsFileRewind()      - Rewind a file.
  *   cupsFileSeek()        - Seek in a file.
+ *   cupsFileStderr()      - Return a CUPS file associated with stderr.
+ *   cupsFileStdin()       - Return a CUPS file associated with stdin.
+ *   cupsFileStdout()      - Return a CUPS file associated with stdout.
  *   cupsFileTell()        - Return the current file position.
  *   cupsFileUnlock()      - Unlock access to a file.
  *   cupsFileWrite()       - Write to a file.
@@ -63,14 +69,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include "http-private.h"
-#include "string.h"
 #include <errno.h>
-#include <cups/debug.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include "http-private.h"
+#include "globals.h"
+#include "debug.h"
 
-#include "file.h"
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */
@@ -99,6 +104,7 @@ struct _cups_file_s			/**** CUPS file structure... ****/
   int		fd;			/* File descriptor */
   char		mode,			/* Mode ('r' or 'w') */
 		compressed,		/* Compression used? */
+		is_stdio,		/* stdin/out/err? */
 		eof,			/* End of file? */
 		buf[4096],		/* Buffer */
 		*ptr,			/* Pointer into buffer */
@@ -135,6 +141,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   int	fd;				/* File descriptor */
   char	mode;				/* Open mode */
   int	status;				/* Return status */
+  int	is_stdio;			/* Is a stdio file? */
 
 
   DEBUG_printf(("cupsFileClose(fp=%p)\n", fp));
@@ -226,8 +233,9 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   * Save the file descriptor we used and free memory...
   */
 
-  fd   = fp->fd;
-  mode = fp->mode;
+  fd       = fp->fd;
+  mode     = fp->mode;
+  is_stdio = fp->is_stdio;
 
   free(fp);
 
@@ -240,7 +248,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
     if (closesocket(fd) < 0)
       status = -1;
   }
-  else
+  else if (!is_stdio)
   {
     if (close(fd) < 0)
       status = -1;
@@ -557,6 +565,78 @@ cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
   }
 
   return (NULL);
+}
+
+
+/*
+ * 'cupsFileGetLine()' - Get a CR and/or LF-terminated line that may
+ *                       contain binary data.
+ *
+ * This function differs from cupsFileGets() in that the trailing CR and LF
+ * are preserved, as is any binary data on the line. The buffer is nul-
+ * terminated, however you should use the returned length to determine
+ * the number of bytes on the line.
+ */
+
+size_t					/* O - Number of bytes on line or 0 on EOF */
+cupsFileGetLine(cups_file_t *fp,	/* I - File to read from */
+                char        *buf,	/* I - Buffer */
+                size_t      buflen)	/* I - Size of buffer */
+{
+  int		ch;			/* Character from file */
+  char		*ptr,			/* Current position in line buffer */
+		*end;			/* End of line buffer */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!fp || (fp->mode != 'r' && fp->mode != 's') || !buf || buflen < 3)
+    return (0);
+
+ /*
+  * Now loop until we have a valid line...
+  */
+
+  for (ptr = buf, end = buf + buflen - 2; ptr < end ;)
+  {
+    if (fp->ptr >= fp->end)
+      if (cups_fill(fp) <= 0)
+        break;
+
+    *ptr++ = ch = *(fp->ptr)++;
+
+    if (ch == '\r')
+    {
+     /*
+      * Check for CR LF...
+      */
+
+      if (fp->ptr >= fp->end)
+	if (cups_fill(fp) <= 0)
+          break;
+
+      if (*(fp->ptr) == '\n')
+        *ptr++ = *(fp->ptr)++;
+
+      break;
+    }
+    else if (ch == '\n')
+    {
+     /*
+      * Line feed ends a line...
+      */
+
+      break;
+    }
+    else
+      *ptr++ = ch;
+  }
+
+  *ptr = '\0';
+
+  return (ptr - buf);
 }
 
 
@@ -1257,6 +1337,102 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
   }
 
   return (fp->pos);
+}
+
+
+/*
+ * 'cupsFileStderr()' - Return a CUPS file associated with stderr.
+ */
+
+cups_file_t *
+cupsFileStderr(void)
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals... */
+
+
+ /*
+  * Open file descriptor 2 as needed...
+  */
+
+  if (!cg->stdio_files[2])
+  {
+   /*
+    * Flush any pending output on the stdio file...
+    */
+
+    fflush(stderr);
+
+   /*
+    * Open file descriptor 2...
+    */
+
+    if ((cg->stdio_files[2] = cupsFileOpenFd(2, "w")) != NULL)
+      cg->stdio_files[2]->is_stdio = 1;
+  }
+
+  return (cg->stdio_files[2]);
+}
+
+
+/*
+ * 'cupsFileStdin()' - Return a CUPS file associated with stdin.
+ */
+
+cups_file_t *
+cupsFileStdin(void)
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals... */
+
+
+ /*
+  * Open file descriptor 0 as needed...
+  */
+
+  if (!cg->stdio_files[0])
+  {
+   /*
+    * Open file descriptor 0...
+    */
+
+    if ((cg->stdio_files[0] = cupsFileOpenFd(0, "r")) != NULL)
+      cg->stdio_files[0]->is_stdio = 1;
+  }
+
+  return (cg->stdio_files[0]);
+}
+
+
+/*
+ * 'cupsFileStdout()' - Return a CUPS file associated with stdout.
+ */
+
+cups_file_t *
+cupsFileStdout(void)
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals... */
+
+
+ /*
+  * Open file descriptor 1 as needed...
+  */
+
+  if (!cg->stdio_files[1])
+  {
+   /*
+    * Flush any pending output on the stdio file...
+    */
+
+    fflush(stdout);
+
+   /*
+    * Open file descriptor 1...
+    */
+
+    if ((cg->stdio_files[1] = cupsFileOpenFd(1, "w")) != NULL)
+      cg->stdio_files[1]->is_stdio = 1;
+  }
+
+  return (cg->stdio_files[1]);
 }
 
 
