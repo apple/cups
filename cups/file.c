@@ -630,8 +630,6 @@ cupsFileGetLine(cups_file_t *fp,	/* I - File to read from */
 
       break;
     }
-    else
-      *ptr++ = ch;
   }
 
   *ptr = '\0';

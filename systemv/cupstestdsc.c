@@ -45,7 +45,7 @@
  * Local functions...
  */
 
-static size_t	getline(cups_file_t *fp, char *buffer, size_t bufsize);
+static int	check_file(const char *filename);
 static void	usage(void);
 
 
@@ -58,7 +58,52 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		i;			/* Looping var */
-  char		*filename;		/* File we are testing */
+  int		status;			/* Status of tests */
+  int		num_files;		/* Number of files tested */
+
+
+ /*
+  * Collect command-line arguments...
+  */
+
+  for (i = 1, num_files = 0, status = 0; i < argc; i ++)
+    if (argv[i][0] == '-')
+    {
+      if (argv[i][1])
+      {
+       /*
+        * Currently the only supported option is "-h" (help)...
+	*/
+
+        usage();
+      }
+      else
+      {
+        num_files ++;
+	status += check_file("(stdin)");
+      }
+    }
+    else
+    {
+      num_files ++;
+      status += check_file(argv[i]);
+    }
+
+  if (!num_files)
+    usage();
+
+  return (status);
+}
+
+
+/*
+ * 'check()' - Main entry for test program.
+ */
+
+static int				/* O - 0 on success, 1 on failure */
+check_file(const char *filename)	/* I - File to read from */
+{
+  int		i;			/* Looping var */
   cups_file_t	*fp;			/* File */
   char		line[1024];		/* Line from file */
   int		ch;			/* Current character */
@@ -80,30 +125,24 @@ main(int  argc,				/* I - Number of command-line args */
 		saw_end_setup,		/* %%EndSetup seen? */
 		saw_page,		/* %%Page seen? */
 		saw_trailer,		/* %%Trailer seen? */
-		saw_eof;		/* %%EOF seen? */
+		saw_eof,		/* %%EOF seen? */
+		saw_long_line;		/* Saw long lines? */
 
 
  /*
-  * Collect command-line arguments...
+  * Open the file...
   */
 
-  for (i = 1, filename = NULL, fp = NULL; i < argc; i ++)
-    if (argv[i][0] == '-')
-    {
-      usage();
-    }
-    else if (fp)
-      usage();
-    else if ((fp = cupsFileOpen(argv[i], "r")) == NULL)
-    {
-      perror(argv[i]);
-      return (1);
-    }
-    else
-      filename = argv[i];
+  if (!strcmp(filename, "(stdin)"))
+    fp = cupsFileStdin();
+  else
+    fp = cupsFileOpen(filename, "r");
 
   if (!fp)
-    usage();
+  {
+    perror(filename);
+    return (1);
+  }
 
  /*
   * Scan the file...
@@ -119,27 +158,35 @@ main(int  argc,				/* I - Number of command-line args */
   saw_end_prolog   = 0;
   saw_end_setup    = 0;
   saw_eof          = 0;
+  saw_long_line    = 0;
   saw_page         = 0;
   saw_pages        = 0;
   saw_trailer      = 0;
   status           = 0;
   version          = 0.0f;
 
-  printf("%s: ", filename);
+  _cupsLangPrintf(stdout, "%s: ", filename);
   fflush(stdout);
 
-  while ((bytes = getline(fp, line, sizeof(line))) > 0)
+  while ((bytes = cupsFileGetLine(fp, line, sizeof(line))) > 0)
   {
     linenum ++;
 
     if (bytes > 255)
     {
-      if (!status)
-        puts("FAIL");
+      if (!saw_long_line)
+      {
+	if (!status)
+          _cupsLangPuts(stdout, _("FAIL\n"));
 
-      status ++;
-      printf("    Line %d is longer than 255 characters (%d)!\n", linenum,
-             (int)bytes);
+	status ++;
+	_cupsLangPrintf(stdout,
+                	_("    Line %d is longer than 255 characters (%d)!\n"
+		          "        REF: Page 25, Line Length\n"),
+			linenum, (int)bytes);
+      }
+
+      saw_long_line ++;
     }
 
     if (linenum == 1)
@@ -147,24 +194,23 @@ main(int  argc,				/* I - Number of command-line args */
       if (strncmp(line, "%!PS-Adobe-", 11))
       {
 	if (!status)
-          puts("FAIL");
+          _cupsLangPuts(stdout, _("FAIL\n"));
 
 	status ++;
-	puts("    Missing %!PS-Adobe-3.0 on first line!");
-	break;
+	_cupsLangPuts(stdout,
+	              _("    Missing %!PS-Adobe-3.0 on first line!\n"
+		        "        REF: Page 17, 3.1 Conforming Documents\n"));
+	cupsFileClose(fp);
+	return (1);
       }
       else
         version = atof(line + 11);
     }
     else if (level > 0)
     {
-      if (!strncmp(line, "%%BeginDocument:", 16) ||
-          !strncmp(line, "%%BeginDocument ", 16) ||
-					/* Adobe Acrobat BUG */
-	  !strncmp(line, "%ADO_BeginApplication", 21))
+      if (!strncmp(line, "%%BeginDocument:", 16))
         level ++;
-      else if (!strncmp(line, "%%EndDocument", 13) ||
-	       !strncmp(line, "%ADO_EndApplication", 19))
+      else if (!strncmp(line, "%%EndDocument", 13))
         level --;
     }
     else if (saw_trailer)
@@ -174,10 +220,13 @@ main(int  argc,				/* I - Number of command-line args */
         if (atoi(line + 8) <= 0)
 	{
 	  if (!status)
-            puts("FAIL");
+            _cupsLangPuts(stdout, _("FAIL\n"));
 
 	  status ++;
-	  printf("    Bad %%%%Pages: on line %d!\n", linenum);
+	  _cupsLangPrintf(stdout,
+	                  _("    Bad %%%%Pages: on line %d!\n"
+		            "        REF: Page 43, %%%%Pages:\n"),
+			  linenum);
 	}
 	else
           saw_pages = 1;
@@ -188,10 +237,12 @@ main(int  argc,				/* I - Number of command-line args */
 	           lbrt + 3) != 4)
         {
 	  if (!status)
-            puts("FAIL");
+            _cupsLangPuts(stdout, _("FAIL\n"));
 
 	  status ++;
-	  printf("    Bad %%%%BoundingBox: on line %d!\n", linenum);
+	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d!\n"
+		        	    "        REF: Page 39, %%%%BoundingBox:\n"),
+			  linenum);
 	}
 	else
           saw_bounding_box = 1;
@@ -210,10 +261,12 @@ main(int  argc,				/* I - Number of command-line args */
 	else if (atoi(line + 8) <= 0)
 	{
 	  if (!status)
-            puts("FAIL");
+            _cupsLangPuts(stdout, _("FAIL\n"));
 
 	  status ++;
-	  printf("    Bad %%%%Pages: on line %d!\n", linenum);
+	  _cupsLangPrintf(stdout, _("    Bad %%%%Pages: on line %d!\n"
+		        	    "        REF: Page 43, %%%%Pages:\n"),
+			  linenum);
 	}
 	else
           saw_pages = 1;
@@ -226,10 +279,12 @@ main(int  argc,				/* I - Number of command-line args */
 	                lbrt + 3) != 4)
         {
 	  if (!status)
-            puts("FAIL");
+            _cupsLangPuts(stdout, _("FAIL\n"));
 
 	  status ++;
-	  printf("    Bad %%%%BoundingBox: on line %d!\n", linenum);
+	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d!\n"
+		        	    "        REF: Page 39, %%%%BoundingBox:\n"),
+			  linenum);
 	}
 	else
           saw_bounding_box = 1;
@@ -252,10 +307,12 @@ main(int  argc,				/* I - Number of command-line args */
         if (sscanf(line + 7, "%255s%d", page_label, &page_number) != 2)
 	{
 	  if (!status)
-            puts("FAIL");
+            _cupsLangPuts(stdout, _("FAIL\n"));
 
 	  status ++;
-	  printf("    Bad %%%%Page: on line %d!\n", linenum);
+	  _cupsLangPrintf(stdout, _("    Bad %%%%Page: on line %d!\n"
+		        	    "        REF: Page 53, %%%%Page:\n"),
+		          linenum);
 	}
 	else
 	  saw_page = 1;
@@ -264,13 +321,9 @@ main(int  argc,				/* I - Number of command-line args */
         saw_begin_prolog = 1;
       else if (!strncmp(line, "%%BeginSetup", 12))
         saw_begin_setup = 1;
-      else if (!strncmp(line, "%%BeginDocument:", 16) ||
-               !strncmp(line, "%%BeginDocument ", 16) ||
-					/* Adobe Acrobat BUG */
-	       !strncmp(line, "%ADO_BeginApplication", 21))
+      else if (!strncmp(line, "%%BeginDocument:", 16))
         level ++;
-      else if (!strncmp(line, "%%EndDocument", 13) ||
-	       !strncmp(line, "%ADO_EndApplication", 19))
+      else if (!strncmp(line, "%%EndDocument", 13))
         level --;
       else if (!strncmp(line, "%%Trailer", 9))
         saw_trailer = 1;
@@ -288,116 +341,82 @@ main(int  argc,				/* I - Number of command-line args */
   if (saw_bounding_box <= 0)
   {
     if (!status)
-      puts("FAIL");
+      _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    puts("    Missing or bad %%BoundingBox: comment!");
+    _cupsLangPuts(stdout, _("    Missing or bad %%BoundingBox: comment!\n"
+		            "        REF: Page 39, %%BoundingBox:\n"));
   }
 
   if (saw_pages <= 0)
   {
     if (!status)
-      puts("FAIL");
+      _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    puts("    Missing or bad %%Pages: comment!");
+    _cupsLangPuts(stdout, _("    Missing or bad %%Pages: comment!\n"
+		            "        REF: Page 43, %%Pages:\n"));
   }
 
   if (!saw_end_comments)
   {
     if (!status)
-      puts("FAIL");
+      _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    puts("    Missing %%EndComments comment!");
+    _cupsLangPuts(stdout, _("    Missing %%EndComments comment!\n"
+		            "        REF: Page 41, %%EndComments\n"));
   }
 
   if (!saw_page)
   {
     if (!status)
-      puts("FAIL");
+      _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    puts("    Missing or bad %%Page: comments!");
+    _cupsLangPuts(stdout, _("    Missing or bad %%Page: comments!\n"
+		            "        REF: Page 53, %%Page:\n"));
   }
 
   if (level < 0)
   {
     if (!status)
-      puts("FAIL");
+      _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    puts("    Too many %%EndDocument comments!");
+    _cupsLangPuts(stdout, _("    Too many %%EndDocument comments!\n"));
   }
   else if (level > 0)
   {
     if (!status)
-      puts("FAIL");
+      _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    puts("    Too many %%BeginDocument comments!");
+    _cupsLangPuts(stdout, _("    Too many %%BeginDocument comments!\n"));
   }
 
+  if (saw_long_line > 1)
+    _cupsLangPrintf(stderr,
+                    _("    Saw %d lines that exceeded 255 characters!\n"),
+                    saw_long_line);
+
   if (!status)
-    puts("PASS");
+    _cupsLangPuts(stdout, _("PASS\n"));
 
   if (binary)
-    puts("    Warning: file contains binary data!");
+    _cupsLangPuts(stdout, _("    Warning: file contains binary data!\n"));
 
   if (version < 3.0f)
-    printf("    Warning: obsolete DSC version %.1f in file!\n", version);
+    _cupsLangPrintf(stdout,
+                    _("    Warning: obsolete DSC version %.1f in file!\n"),
+		    version);
 
   if (saw_end_comments < 0)
-    puts("    Warning: no %%EndComments comment in file!");
+    _cupsLangPuts(stdout, _("    Warning: no %%EndComments comment in file!\n"));
 
   cupsFileClose(fp);
 
   return (status);
-}
-
-
-/*
- * 'getline()' - Get a line from a file.
- */
-
-static size_t				/* O - Bytes in line */
-getline(cups_file_t *fp,		/* I - File */
-        char        *buffer,		/* I - Line buffer */
-	size_t      bufsize)		/* I - Size of buffer */
-{
-  int	ch;				/* Character from file */
-  char	*bufptr,			/* Pointer into buffer */
-	*bufend;			/* End of buffer */
-
-
- /*
-  * Scan the line ending with CR, LF, or CR LF.
-  */
-
-  bufptr = buffer;
-  bufend = buffer + bufsize - 2;
-
-  while ((ch = cupsFileGetChar(fp)) != EOF)
-  {
-    if (bufptr >= bufend)
-      break;
-
-    *bufptr++ = ch;
-
-    if (ch == 0x0d)
-    {
-      if (cupsFilePeekChar(fp) == 0x0a)
-        *bufptr++ = cupsFileGetChar(fp);
-
-      break;
-    }
-    else if (ch == 0x0a)
-      break;
-  }
-
-  *bufptr = '\0';
-       
-  return (bufptr - buffer);
 }
 
 
@@ -408,7 +427,17 @@ getline(cups_file_t *fp,		/* I - File */
 static void
 usage(void)
 {
-  puts("Usage: cupstestdsc filename.ps");
+  _cupsLangPuts(stdout,
+                _("Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
+                  "       cupstestdsc [options] -\n"
+		  "\n"
+		  "Options:\n"
+		  "\n"
+		  "    -h       Show program usage\n"
+		  "\n"
+		  "    Note: this program only validates the DSC comments, "
+		  "not the PostScript itself.\n"));
+  
   exit(1);
 }
 
