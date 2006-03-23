@@ -265,7 +265,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
 int					/* O - CUPS_FILE_NONE or CUPS_FILE_GZIP */
 cupsFileCompression(cups_file_t *fp)	/* I - CUPS file */
 {
-  return (fp->compressed);
+  return (fp ? fp->compressed : CUPS_FILE_NONE);
 }
 
 
@@ -276,7 +276,7 @@ cupsFileCompression(cups_file_t *fp)	/* I - CUPS file */
 int					/* O - 1 on EOF, 0 otherwise */
 cupsFileEOF(cups_file_t *fp)		/* I - CUPS file */
 {
-  return (fp->eof);
+  return (fp ? fp->eof : 1);
 }
 
 
@@ -1441,7 +1441,7 @@ cupsFileStdout(void)
 off_t					/* O - File position */
 cupsFileTell(cups_file_t *fp)		/* I - CUPS file */
 {
-  return (fp->pos);
+  return (fp ? fp->pos : 0);
 }
 
 
