@@ -66,7 +66,9 @@
 
 static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
+#ifdef HAVE_SSL
 static int		encrypt_client(cupsd_client_t *con);
+#endif /* HAVE_SSL */
 #ifdef HAVE_CDSASSL
 static CFArrayRef	get_cdsa_server_certs(void);
 #endif /* HAVE_CDSASSL */
@@ -2465,6 +2467,7 @@ check_if_modified(
 }
 
 
+#ifdef HAVE_SSL
 /*
  * 'encrypt_client()' - Enable encryption for the client...
  */
@@ -2472,7 +2475,7 @@ check_if_modified(
 static int				/* O - 1 on success, 0 on error */
 encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 {
-#ifdef HAVE_LIBSSL
+#  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
   SSL		*conn;			/* Connection for encryption */
   unsigned long	error;			/* Error code */
@@ -2513,7 +2516,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   con->http.tls = conn;
   return (1);
   
-#elif defined(HAVE_GNUTLS)
+#  elif defined(HAVE_GNUTLS)
   http_tls_t	*conn;			/* TLS session object */
   int		error;			/* Error code */
   gnutls_certificate_server_credentials *credentials;
@@ -2590,7 +2593,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   con->http.tls = conn;
   return (1);
 
-#elif defined(HAVE_CDSASSL)
+#  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error info */
   SSLContextRef	conn;			/* New connection */
   CFArrayRef	certificatesArray;	/* Array containing certificates */
@@ -2676,10 +2679,9 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   con->http.tls = conn;
   return (1);
 
-#else
-  return (0);
-#endif /* HAVE_LIBSSL */
+#  endif /* HAVE_LIBSSL */
 }
+#endif /* HAVE_SSL */
 
 
 #ifdef HAVE_CDSASSL

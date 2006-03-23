@@ -126,7 +126,8 @@ static void	add_class(cupsd_client_t *con, ipp_attribute_t *uri);
 static int	add_file(cupsd_client_t *con, cupsd_job_t *job,
 		         mime_type_t *filetype, int compression);
 static cupsd_job_t *add_job(cupsd_client_t *con, ipp_attribute_t *uri,
-		            cupsd_printer_t **dprinter);
+		            cupsd_printer_t **dprinter,
+			    mime_type_t *filetype);
 static void	add_job_state_reasons(cupsd_client_t *con, cupsd_job_t *job);
 static void	add_job_subscriptions(cupsd_client_t *con, cupsd_job_t *job);
 static void	add_job_uuid(cupsd_client_t *con, cupsd_job_t *job);
@@ -1131,7 +1132,8 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 static cupsd_job_t *			/* O - Job object */
 add_job(cupsd_client_t  *con,		/* I - Client connection */
         ipp_attribute_t *uri,		/* I - printer-uri */
-	cupsd_printer_t **dprinter)	/* I - Destination printer */
+	cupsd_printer_t **dprinter,	/* I - Destination printer */
+	mime_type_t     *filetype)	/* I - First print file type, if any */
 {
   http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr;		/* Current attribute */
@@ -1219,8 +1221,28 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   }
 
  /*
-  * Validate job template attributes; for now just copies and page-ranges...
+  * Validate job template attributes; for now just document-format,
+  * copies, and page-ranges...
   */
+
+  if (filetype && printer->filetypes &&
+      !cupsArrayFind(printer->filetypes, filetype))
+  {
+    char	mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
+					/* MIME media type string */
+
+
+    snprintf(mimetype, sizeof(mimetype), "%s/%s", filetype->super,
+             filetype->type);
+
+    send_ipp_status(con, IPP_DOCUMENT_FORMAT,
+                    _("Unsupported format \'%s\'!"), mimetype);
+
+    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
+                 "document-format", NULL, mimetype);
+
+    return (NULL);
+  }
 
   if ((attr = ippFindAttribute(con->request, "copies",
                                IPP_TAG_INTEGER)) != NULL)
@@ -1693,10 +1715,7 @@ add_job_state_reasons(
   switch (job ? job->state_value : IPP_JOB_CANCELLED)
   {
     case IPP_JOB_PENDING :
-        if (job->dtype & CUPS_PRINTER_CLASS)
-	  dest = cupsdFindClass(job->dest);
-	else
-	  dest = cupsdFindPrinter(job->dest);
+	dest = cupsdFindDest(job->dest);
 
         if (dest && dest->state == IPP_PRINTER_STOPPED)
           ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
@@ -4434,7 +4453,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   * Create the job object...
   */
 
-  if ((job = add_job(con, uri, NULL)) == NULL)
+  if ((job = add_job(con, uri, NULL, NULL)) == NULL)
     return;
 
  /*
@@ -6824,7 +6843,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "print_job: request file type is %s/%s.",
-	     filetype->super, filetype->type);
+	          filetype->super, filetype->type);
 
  /*
   * Read any embedded job ticket info from PS files...
@@ -6838,7 +6857,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Create the job object...
   */
 
-  if ((job = add_job(con, uri, &printer)) == NULL)
+  if ((job = add_job(con, uri, &printer, filetype)) == NULL)
     return;
 
  /*
@@ -7846,6 +7865,22 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     return;
   }
 
+  printer = cupsdFindDest(job->dest);
+
+  if (printer->filetypes && !cupsArrayFind(printer->filetypes, filetype))
+  {
+    snprintf(mimetype, sizeof(mimetype), "%s/%s", filetype->super,
+             filetype->type);
+
+    send_ipp_status(con, IPP_DOCUMENT_FORMAT,
+                    _("Unsupported format \'%s\'!"), mimetype);
+
+    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
+                 "document-format", NULL, mimetype);
+
+    return;
+  }
+
   cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "send_document: request file type is %s/%s.",
 	          filetype->super, filetype->type);
@@ -7858,11 +7893,6 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   if (add_file(con, job, filetype, compression))
     return;
-
-  if (job->dtype & CUPS_PRINTER_CLASS)
-    printer = cupsdFindClass(job->dest);
-  else
-    printer = cupsdFindPrinter(job->dest);
 
   if (stat(con->filename, &fileinfo))
     kbytes = 0;
@@ -9099,10 +9129,7 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
   * Check the username against the owner...
   */
 
-  if (job->dtype & CUPS_PRINTER_CLASS)
-    printer = cupsdFindClass(job->dest);
-  else
-    printer = cupsdFindPrinter(job->dest);
+  printer = cupsdFindDest(job->dest);
 
   return (cupsdCheckPolicy(printer ? printer->op_policy_ptr : DefaultPolicyPtr,
                            con, owner) == HTTP_OK);

@@ -67,6 +67,7 @@ typedef struct cupsd_printer_s
   char		*port_monitor;		/* Port monitor */
   int		raw;			/* Raw queue? */
   mime_type_t	*filetype;		/* Pseudo-filetype for printer */
+  cups_array_t	*filetypes;		/* Supported file types */
   void		*job;			/* Current job in queue */
   ipp_t		*attrs;			/* Attributes supported by this printer */
   int		num_printers,		/* Number of printers in class */

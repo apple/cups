@@ -4,6 +4,8 @@ CHANGES.txt - 2006-03-23
 CHANGES IN CUPS V1.2rc1
 
 	- Documentation updates (STR #1497, STR #1498)
+	- CUPS no longer accepts print jobs if a printer does not
+	  support the file format (STR #1501)
 	- Cleaned up the PostScript filter (pstops) so that it
 	  properly supports %%IncludeFeature and page scaling
 	  (STR #1453)

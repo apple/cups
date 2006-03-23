@@ -77,8 +77,9 @@ static void	send_cups_browse(cupsd_printer_t *p);
 #ifdef HAVE_LDAP
 static void	send_ldap_browse(cupsd_printer_t *p);
 #endif /* HAVE_LDAP */
+#ifdef HAVE_LIBSLP
 static void	send_slp_browse(cupsd_printer_t *p);
-
+#endif /* HAVE_LIBSLP */
 
 #ifdef HAVE_OPENLDAP
 static const char * const ldap_attrs[] =/* CUPS LDAP attributes */

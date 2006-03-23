@@ -721,6 +721,8 @@ cupsdDeletePrinter(
   cupsdClearString(&p->op_policy);
   cupsdClearString(&p->error_policy);
 
+  cupsArrayDelete(p->filetypes);
+
   if (p->browse_attrs)
     free(p->browse_attrs);
 
@@ -2882,8 +2884,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
   int		i;			/* Looping var */
   mime_type_t	*type;			/* Current MIME type */
   cups_array_t	*filters;		/* Filters */
-  int		num_types;		/* Number of supported types */
-  const char	**types;		/* Array of supported type names */
+  ipp_attribute_t *attr;		/* document-format-supported attribute */
   char		mimetype[MIME_MAX_SUPER + MIME_MAX_TYPE + 2];
 					/* MIME type name */
 
@@ -2892,6 +2893,9 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
   * Raw (and remote) queues advertise all of the supported MIME
   * types...
   */
+
+  cupsArrayDelete(p->filetypes);
+  p->filetypes = NULL;
 
   if (p->raw)
   {
@@ -2906,20 +2910,12 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
   * are filters for them...
   */
 
-  if ((types = calloc(NumMimeTypes, sizeof(char *))) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_EMERG,
-                    "Unable to allocate memory for \"%s\" MIME type list!",
-		    p->name);
-    return;
-  }
-
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_printer_formats: %d types, %d filters",
                   mimeNumTypes(MimeDatabase), mimeNumFilters(MimeDatabase));
 
-  types[0] = _cupsStrAlloc("application/octet-stream");
+  p->filetypes = cupsArrayNew(NULL, NULL);
 
-  for (num_types = 1, type = mimeFirstType(MimeDatabase);
+  for (type = mimeFirstType(MimeDatabase);
        type;
        type = mimeNextType(MimeDatabase))
   {
@@ -2936,8 +2932,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
                       p->name, mimetype, cupsArrayCount(filters));
 
       cupsArrayDelete(filters);
-      types[num_types] = _cupsStrAlloc(mimetype);
-      num_types ++;
+      cupsArrayAdd(p->filetypes, type);
     }
     else
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -2947,23 +2942,27 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "add_printer_formats: %s: %d supported types",
-		  p->name, num_types);
+		  p->name, cupsArrayCount(p->filetypes) + 1);
 
  /*
   * Add the file formats that can be filtered...
   */
 
-  ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
-                "document-format-supported", num_types, NULL, types);
 
- /*
-  * Free the temporary data...
-  */
+  attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
+                       "document-format-supported",
+		       cupsArrayCount(p->filetypes) + 1, NULL, NULL);
 
-  for (i = 0; i < num_types; i ++)
-    _cupsStrFree(types[i]);
+  attr->values[0].string.text = _cupsStrAlloc("application/octet-stream");
 
-  free(types);
+  for (i = 1, type = (mime_type_t *)cupsArrayFirst(p->filetypes);
+       type;
+       i ++, type = (mime_type_t *)cupsArrayNext(p->filetypes))
+  {
+    snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
+
+    attr->values[i].string.text = _cupsStrAlloc(mimetype);
+  }
 }
 
 
