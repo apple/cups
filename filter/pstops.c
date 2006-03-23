@@ -25,6 +25,30 @@
  *
  * Contents:
  *
+ *   main()               - Main entry...
+ *   add_page()           - Add a page to the pages array...
+ *   check_range()        - Check to see if the current page is selected for
+ *   copy_bytes()         - Copy bytes from the input file to stdout...
+ *   copy_comments()      - Copy all of the comments section...
+ *   copy_dsc()           - Copy a DSC-conforming document...
+ *   copy_non_dsc()       - Copy a document that does not conform to the DSC...
+ *   copy_page()          - Copy a page description...
+ *   copy_prolog()        - Copy the document prolog section...
+ *   copy_setup()         - Copy the document setup section...
+ *   copy_trailer()       - Copy the document trailer...
+ *   do_prolog()          - Send the necessary document prolog commands...
+ *   do_setup()           - Send the necessary document setup commands...
+ *   doc_printf()         - Send a formatted string to stdout and/or the temp
+ *                          file.
+ *   doc_puts()           - Send a nul-terminated string to stdout and/or the
+ *                          temp file.
+ *   doc_write()          - Send data to stdout and/or the temp file.
+ *   end_nup()            - End processing for N-up printing...
+ *   include_feature()    - Include a printer option/feature command.
+ *   parse_text()         - Parse a text value in a comment...
+ *   set_pstops_options() - Set pstops options...
+ *   skip_page()          - Skip past a page that won't be printed...
+ *   start_nup()          - Start processing for N-up printing...
  */
 
 /*
@@ -163,9 +187,9 @@ static void		doc_printf(pstops_doc_t *doc, const char *format, ...);
 static void		doc_puts(pstops_doc_t *doc, const char *s);
 static void		doc_write(pstops_doc_t *doc, const char *s, size_t len);
 static void		end_nup(pstops_doc_t *doc, int number);
-static int		include_feature(const char *line, int num_options,
-			                cups_option_t **options);
-static void		include_font(pstops_doc_t *doc, char *line);
+static int		include_feature(ppd_file_t *ppd, const char *line,
+			                int num_options,
+					cups_option_t **options);
 static char		*parse_text(const char *start, char **end, char *buffer,
 			            size_t bufsize);
 static void		set_pstops_options(pstops_doc_t *doc, ppd_file_t *ppd,
@@ -475,7 +499,13 @@ copy_bytes(cups_file_t *fp,		/* I - File to read from */
 
   nleft = length;
 
-  cupsFileSeek(fp, offset);
+  if (cupsFileSeek(fp, offset) < 0)
+  {
+    fprintf(stderr, "ERROR: Unable to seek to offset " CUPS_LLFMT
+                    " in file - %s\n",
+            CUPS_LLCAST offset, strerror(errno));
+    return;
+  }
 
   while (nleft > 0 || length == 0)
   {
@@ -1179,7 +1209,8 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       */
 
       if (doc->number_up == 1 &&!doc->fitplot)
-	pageinfo->num_options = include_feature(line, pageinfo->num_options,
+	pageinfo->num_options = include_feature(ppd, line,
+	                                        pageinfo->num_options,
                                         	&(pageinfo->options));
     }
     else if (strncmp(line, "%%Include", 9))
@@ -1187,8 +1218,23 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   }
 
   if (doc->number_up == 1)
+  {
+   /*
+    * Update the document's composite and page bounding box...
+    */
+
     memcpy(pageinfo->bounding_box, bounding_box,
            sizeof(pageinfo->bounding_box));
+
+    if (bounding_box[0] < doc->new_bounding_box[0])
+      doc->new_bounding_box[0] = bounding_box[0];
+    if (bounding_box[1] < doc->new_bounding_box[1])
+      doc->new_bounding_box[1] = bounding_box[1];
+    if (bounding_box[2] > doc->new_bounding_box[2])
+      doc->new_bounding_box[2] = bounding_box[2];
+    if (bounding_box[3] > doc->new_bounding_box[3])
+      doc->new_bounding_box[3] = bounding_box[3];
+  }
 
  /*
   * Output the page header as needed...
@@ -1212,19 +1258,6 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       printf("%%%%PageBoundingBox: %d %d %d %d\n",
 	     pageinfo->bounding_box[0], pageinfo->bounding_box[1],
 	     pageinfo->bounding_box[2], pageinfo->bounding_box[3]);
-
-     /*
-      * Update the document's composite and page bounding box...
-      */
-
-      if (bounding_box[0] < doc->new_bounding_box[0])
-        doc->new_bounding_box[0] = bounding_box[0];
-      if (bounding_box[1] < doc->new_bounding_box[1])
-        doc->new_bounding_box[1] = bounding_box[1];
-      if (bounding_box[2] > doc->new_bounding_box[2])
-        doc->new_bounding_box[2] = bounding_box[2];
-      if (bounding_box[3] > doc->new_bounding_box[3])
-        doc->new_bounding_box[3] = bounding_box[3];
     }
   }
 
@@ -1496,7 +1529,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 	*/
 
         if (doc->number_up == 1 && !doc->fitplot)
-	  doc->num_options = include_feature(line, doc->num_options,
+	  doc->num_options = include_feature(ppd, line, doc->num_options,
                                              &(doc->options));
       }
       else
@@ -1559,9 +1592,13 @@ copy_trailer(cups_file_t  *fp,		/* I - File to read from */
   fprintf(stderr, "DEBUG: Wrote %d pages...\n", number);
 
   printf("%%%%Pages: %d\n", number);
-  printf("%%%%BoundingBox: %d %d %d %d\n",
-	 doc->new_bounding_box[0], doc->new_bounding_box[1],
-	 doc->new_bounding_box[2], doc->new_bounding_box[3]);
+  if (doc->number_up > 1 || doc->fitplot)
+    printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
+	   PageLeft, PageBottom, PageRight, PageTop);
+  else
+    printf("%%%%BoundingBox: %d %d %d %d\n",
+	   doc->new_bounding_box[0], doc->new_bounding_box[1],
+	   doc->new_bounding_box[2], doc->new_bounding_box[3]);
 
   return (linelen);
 }
@@ -1817,11 +1854,11 @@ end_nup(pstops_doc_t *doc,		/* I - Document information */
 
 static int				/* O  - New number of options */
 include_feature(
+    ppd_file_t    *ppd,			/* I  - PPD file */
     const char    *line,		/* I  - DSC line */
     int           num_options,		/* I  - Number of options */
     cups_option_t **options)		/* IO - Options */
 {
-#if 0
   char		name[255],		/* Option name */
 		value[255];		/* Option value */
   ppd_option_t	*option;		/* Option in file */
@@ -1834,8 +1871,8 @@ include_feature(
 
   if (sscanf(line + 17, "%254s%254s", name, value) != 2)
   {
-    fprintf(stderr, "ERROR: Bad line: \"%s\"!\n", line);
-    return;
+    fputs("ERROR: Bad %%IncludeFeature: comment!\n", stderr);
+    return (num_options);
   }
 
  /*
@@ -1845,7 +1882,7 @@ include_feature(
   if ((option = ppdFindOption(ppd, name + 1)) == NULL)
   {
     fprintf(stderr, "WARNING: Unknown option \"%s\"!\n", name + 1);
-    return;
+    return (num_options);
   }
 
   if (option->section == PPD_ORDER_EXIT ||
@@ -1853,62 +1890,21 @@ include_feature(
   {
     fprintf(stderr, "WARNING: Option \"%s\" cannot be included via "
                     "IncludeFeature!\n", name + 1);
-    return;
+    return (num_options);
   }
 
   if ((choice = ppdFindChoice(option, value)) == NULL)
   {
     fprintf(stderr, "WARNING: Unknown choice \"%s\" for option \"%s\"!\n",
             value, name + 1);
-    return;
+    return (num_options);
   }
 
  /*
-  * Emit the option...
+  * Add the option to the option array and return...
   */
 
-  if (out)
-  {
-    cupsFilePuts(out, "[{\n");
-    cupsFilePrintf(out, "%%%%BeginFeature: %s %s\n", name, value);
-    if (choice->code && choice->code[0])
-    {
-      if (choice->code[strlen(choice->code) - 1] != '\n')
-	cupsFilePrintf(out, "%s\n", choice->code);
-      else
-	cupsFilePuts(out, choice->code);
-    }
-    cupsFilePuts(out, "%%EndFeature\n");
-    cupsFilePuts(out, "} stopped cleartomark\n");
-  }
-  else
-  {
-    puts("[{");
-    printf("%%%%BeginFeature: %s %s\n", name, value);
-    if (choice->code && choice->code[0])
-    {
-      if (choice->code[strlen(choice->code) - 1] != '\n')
-        printf("%s\n", choice->code);
-      else
-        fputs(choice->code, stdout);
-    }
-    puts("%%EndFeature");
-    puts("} stopped cleartomark");
-  }
-#endif /* 0 */
-
-  return (num_options);
-}
-
-
-/*
- * 'include_font()' - Include a font...
- */
-
-static void
-include_font(pstops_doc_t *doc,		/* I - Document information */
-             char         *line)	/* I - Comment line */
-{
+  return (cupsAddOption(name + 1, value, num_options, options));
 }
 
 
@@ -2477,8 +2473,17 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
   pos   = (number - 1) % doc->number_up;
   pagew = PageRight - PageLeft;
   pagel = PageTop - PageBottom;
-  bboxw = bounding_box[2] - bounding_box[0];
-  bboxl = bounding_box[3] - bounding_box[1];
+
+  if (doc->fitplot)
+  {
+    bboxw = bounding_box[2] - bounding_box[0];
+    bboxl = bounding_box[3] - bounding_box[1];
+  }
+  else
+  {
+    bboxw = PageWidth;
+    bboxl = PageLength;
+  }
 
   fprintf(stderr, "DEBUG: pagew = %.1f, pagel = %.1f\n", pagew, pagel);
   fprintf(stderr, "DEBUG: bboxw = %d, bboxl = %d\n", bboxw, bboxl);
@@ -2842,7 +2847,7 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
     doc_puts(doc, "grestore\n");
   }
 
-  if (doc->number_up > 1 || doc->fitplot)
+  if (doc->fitplot)
   {
    /*
     * Clip the page that follows to the bounding box of the page...
@@ -2852,6 +2857,14 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
                -bounding_box[1]);
     doc_printf(doc, "%d %d %d %d ESPrc\n", bounding_box[0], bounding_box[1],
                bboxw, bboxl);
+  }
+  else if (doc->number_up > 1)
+  {
+   /*
+    * Clip the page that follows to the default page size...
+    */
+
+    doc_printf(doc, "0 0 %d %d ESPrc\n", bboxw, bboxl);
   }
 }
 

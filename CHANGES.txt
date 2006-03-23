@@ -1,9 +1,14 @@
-CHANGES.txt - 2006-03-21
+CHANGES.txt - 2006-03-23
 ------------------------
 
 CHANGES IN CUPS V1.2rc1
 
 	- Documentation updates (STR #1497)
+	- Cleaned up the PostScript filter (pstops) so that it
+	  properly supports %%IncludeFeature and page scaling
+	  (STR #1453)
+	- Fixed the cupsFileRewind() and cupsFileSeek() functions
+	  to work properly with uncompressed files.
 	- Added cupsFileGetLine(), cupsFileStderr(),
 	  cupsFileStdin(), and cupsFileStdout() functions to the
 	  CUPS library.
