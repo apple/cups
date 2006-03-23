@@ -84,9 +84,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   char		op;		/* Last operation on command-line */
 
 
-#ifdef LC_TIME
-  setlocale(LC_TIME, "");
-#endif /* LC_TIME */
+ /*
+  * Set the locale so that times, etc. are displayed properly.
+  */
+
+  setlocale(LC_ALL, "");
 
   http        = NULL;
   num_dests   = 0;

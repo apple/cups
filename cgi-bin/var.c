@@ -239,6 +239,12 @@ cgiInitialize(void)
 
   cupsSetPasswordCB(cgi_passwd);
 
+ /*
+  * Set the locale so that times, etc. are formatted properly...
+  */
+
+  setlocale(LC_ALL, "");
+
 #ifdef DEBUG
  /*
   * Disable output buffering to find bugs...
