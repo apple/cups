@@ -1217,7 +1217,51 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
 off_t					/* O - New file position or -1 */
 cupsFileRewind(cups_file_t *fp)		/* I - CUPS file */
 {
-  return (cupsFileSeek(fp, 0L));
+ /*
+  * Range check input...
+  */
+
+  if (!fp || fp->mode != 'r')
+    return (-1);
+
+ /*
+  * Handle special cases...
+  */
+
+  if (fp->pos == 0)
+  {
+   /*
+    * No seeking necessary...
+    */
+
+    if (fp->ptr)
+    {
+      fp->ptr = fp->buf;
+      fp->eof = 0;
+    }
+
+    return (0);
+  }
+
+ /*
+  * Otherwise, seek in the file and cleanup any compression buffers...
+  */
+
+#ifdef HAVE_LIBZ
+  if (fp->compressed)
+  {
+    inflateEnd(&fp->stream);
+    fp->compressed = 0;
+  }
+#endif /* HAVE_LIBZ */
+
+  lseek(fp->fd, 0, SEEK_SET);
+
+  fp->pos = 0;
+  fp->ptr = NULL;
+  fp->end = NULL;
+
+  return (0);
 }
 
 
@@ -1243,6 +1287,13 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
   if (!fp || pos < 0 || fp->mode != 'r')
     return (-1);
 
+ /*
+  * Handle special cases...
+  */
+
+  if (pos == 0)
+    return (cupsFileRewind(fp));
+
   if (fp->pos == pos)
   {
    /*
@@ -1258,19 +1309,39 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     return (pos);
   }
 
+#ifdef HAVE_LIBZ
+  if (!fp->compressed && !fp->ptr)
+  {
+   /*
+    * Preload a buffer to determine whether the file is compressed...
+    */
+
+    if (cups_fill(fp) < 0)
+      return (-1);
+  }
+#endif /* HAVE_LIBZ */
+
  /*
   * Figure out the number of bytes in the current buffer, and then
   * see if we are outside of it...
   */
 
-  bytes   = fp->end - fp->buf;
+  if (fp->ptr)
+    bytes = fp->end - fp->buf;
+  else
+    bytes = 0;
+
   fp->eof = 0;
+
+  DEBUG_printf(("    bytes=" CUPS_LLFMT "\n", CUPS_LLCAST bytes));
 
   if (pos < fp->pos)
   {
    /*
     * Need to seek backwards...
     */
+
+    DEBUG_puts("    SEEK BACKWARDS");
 
 #ifdef HAVE_LIBZ
     if (fp->compressed)
@@ -1288,14 +1359,17 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
 
       if (bytes <= 0)
         return (-1);
+
+      fp->ptr = fp->buf + pos - fp->pos;
     }
     else
 #endif /* HAVE_LIBZ */
     {
       fp->pos = lseek(fp->fd, pos, SEEK_SET);
-      DEBUG_printf(("    lseek() returned %ld...\n", (long)fp->pos));
       fp->ptr = NULL;
       fp->end = NULL;
+
+      DEBUG_printf(("    lseek() returned %ld...\n", (long)fp->pos));
     }
   }
   else if (pos >= (fp->pos + bytes))
@@ -1304,23 +1378,30 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     * Need to seek forwards...
     */
 
+    DEBUG_puts("    SEEK FORWARDS");
+
 #ifdef HAVE_LIBZ
-    if (fp->compressed || !fp->ptr)
+    if (fp->compressed)
     {
       while ((bytes = cups_fill(fp)) > 0)
+      {
         if (pos >= fp->pos && pos < (fp->pos + bytes))
 	  break;
+      }
 
       if (bytes <= 0)
         return (-1);
+
+      fp->ptr = fp->buf + pos - fp->pos;
     }
     else
 #endif /* HAVE_LIBZ */
     {
       fp->pos = lseek(fp->fd, pos, SEEK_SET);
-      DEBUG_printf(("    lseek() returned " CUPS_LLFMT "...\n", fp->pos));
       fp->ptr = NULL;
       fp->end = NULL;
+
+      DEBUG_printf(("    lseek() returned " CUPS_LLFMT "...\n", fp->pos));
     }
   }
   else
@@ -1330,8 +1411,9 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     * range...
     */
 
+    DEBUG_puts("    SEEK INSIDE BUFFER");
+
     fp->ptr = fp->buf + pos - fp->pos;
-    DEBUG_puts(("    seek inside buffer..."));
   }
 
   return (fp->pos);
