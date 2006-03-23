@@ -758,7 +758,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   {
     number ++;
 
-    if (check_range(doc, number))
+    if (check_range(doc, (number - 1) / doc->number_up + 1))
     {
       fprintf(stderr, "DEBUG: Copying page %d...\n", number);
       linelen = copy_page(fp, doc, ppd, number, line, linelen, linesize);
