@@ -98,6 +98,7 @@ WEBIMAGES	=	\
 			images/printer-idle.gif \
 			images/printer-processing.gif \
 			images/printer-stopped.gif \
+			images/smiley.jpg \
 			images/tab-left.gif \
 			images/tab-right.gif \
 			images/top-left.gif \
@@ -165,6 +166,7 @@ HELPFILES	=	\
 			help/spec-command.html \
 			help/spec-design.html \
 			help/spec-ipp.html \
+			help/spec-postscript.html \
 			help/spec-ppd.html \
 			help/spec-raster.html \
 			help/spec-stp.html \
