@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpadmin 8 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH lpadmin 8 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -129,8 +129,11 @@ Removes the named \fIprinter\fR from \fIclass\fR.  If the
 resulting class becomes empty it is removed.
 .TP 5
 -u allow:user,user,@group
+.TP 5
 -u deny:user,user,@group
+.TP 5
 -u allow:all
+.TP 5
 -u deny:none
 .br
 Sets user-level access control on a printer. Names starting with

@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH filter 7 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH filter 7 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
 .SH NAME
 filter \- cups file conversion filter interface
 .SH SYNOPSIS
@@ -129,7 +129,7 @@ message to the current \fIErrorLog\fR using the "warning" log level.
 
 .SH ENVIRONMENT VARIABLES
 The following environment variables are defined by the CUPS
-server when executing the backend:
+server when executing the filter:
 
 .TP 5
 CHARSET
@@ -162,10 +162,7 @@ The root directory of the server.
 .TP 5
 DEVICE_URI
 .br
-The device-uri associated with the printer; this is provided for
-shell scripts which may not be able to get the passed argv[0]
-string and for backends that require any authentication
-information which is not included in argv[0].
+The device-uri associated with the printer.
 
 .TP 5
 FINAL_CONTENT_TYPE
@@ -182,7 +179,7 @@ The default language locale (typically C or en).
 PATH
 .br
 The standard execution path for external programs that may be run by
-the backend.
+the filter.
 
 .TP 5
 PPD
@@ -214,7 +211,7 @@ The timezone of the server.
 .TP 5
 USER
 .br
-The user executing the backend, typically root; consult the
+The user executing the filter, typically "lp" or "root"; consult the
 \fIcupsd.conf(5)\fR file for the current setting.
 
 .SH COMPATIBILITY

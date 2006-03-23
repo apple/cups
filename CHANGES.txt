@@ -3,7 +3,7 @@ CHANGES.txt - 2006-03-23
 
 CHANGES IN CUPS V1.2rc1
 
-	- Documentation updates (STR #1497)
+	- Documentation updates (STR #1497, STR #1498)
 	- Cleaned up the PostScript filter (pstops) so that it
 	  properly supports %%IncludeFeature and page scaling
 	  (STR #1453)

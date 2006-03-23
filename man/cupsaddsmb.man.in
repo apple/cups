@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 .SH SYNOPSIS
@@ -68,9 +68,11 @@ Exports all known printers. Otherwise only the named printers are
 exported.
 .TP 5
 -h cups-server[:port]
+.br
 Specifies a different CUPS server to use.
 .TP 5
 -v
+.br
 Specifies that verbose information should be shown. This is
 useful for debugging SAMBA configuration problems.
 .SH SAMBA CONFIGURATION

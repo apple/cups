@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -332,6 +332,14 @@ Include filename
 .br
 Includes the named file.
 .TP 5
+JobRetryInterval seconds
+.br
+Specifies the interval between retries of jobs in seconds.
+.TP 5
+JobRetryLimit count
+.br
+Specifies the number of retries that are done for jobs.
+.TP 5
 KeepAlive Yes
 .TP 5
 KeepAlive No
@@ -341,22 +349,6 @@ Specifies whether to support HTTP keep-alive connections.
 KeepAliveTimeout seconds
 .br
 Specifies the amount of time that connections are kept alive.
-.TP 5
-JobRetryInterval seconds
-.br
-Specifies the interval between retries of jobs in seconds.
-.TP 5
-JobRetryLimit count
-.br
-Specifies the number of retries that are done for jobs.
-.TP 5
-KeepAlive
-.br
-Specifies whether or not to support HTTP Keep-Alive.
-.TP 5
-KeepAliveTimeout
-.br
-Specifies the connection timeout for HTTP Keep-Alive.
 .TP 5
 <Limit operations> ... </Limit>
 .br

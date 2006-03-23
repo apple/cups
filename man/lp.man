@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lp 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH lp 1 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
 .SH NAME
 lp - print files
 .SH SYNOPSIS
@@ -34,7 +34,7 @@ lp - print files
 .I hostname[:port]
 ] [ -m ] [ -n
 .I num-copies
-[ -o
+] [ -o
 .I option[=value]
 ] [ -q
 .I priority
@@ -57,7 +57,7 @@ lp - print files
 .I job-id
 ] [ -n
 .I num-copies
-[ -o
+] [ -o
 .I option[=value]
 ] [ -q
 .I priority

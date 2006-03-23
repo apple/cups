@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpstat 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH lpstat 1 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
 .SH NAME
 lpstat \- print cups status information
 .SH SYNOPSIS
@@ -36,7 +36,7 @@ lpstat \- print cups status information
 .I destination(s)
 ] ] [ -c [
 .I class(es)
-] [ -d ] [ -o [
+] ] [ -d ] [ -o [
 .I destination(s)
 ] ] [ -p [
 .I printer(s)
