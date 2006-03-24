@@ -390,7 +390,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     */
 
     authorization += 5;
-    while (isspace(*authorization))
+    while (isspace(*authorization & 255))
       authorization ++;
 
     if ((localuser = cupsdFindCert(authorization)) != NULL)
@@ -414,7 +414,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
 
     authorization += 5;
-    while (isspace(*authorization))
+    while (isspace(*authorization & 255))
       authorization ++;
 
     userlen = sizeof(username);
@@ -580,7 +580,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "cupsdAuthorize: Unknown username \"%s\"!",
         	              username);
-	      return (HTTP_UNAUTHORIZED);
+	      return;
 	    }
 
 #  ifdef HAVE_SHADOW_H
