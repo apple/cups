@@ -62,7 +62,6 @@
 *PageSize w288h216/Label - 4 x 3": "<</PageSize[288 216]/ImagingBBox null>>setpagedevice"
 *PageSize w288h288/Label - 4 x 4": "<</PageSize[288 288]/ImagingBBox null>>setpagedevice"
 *PageSize w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
-*PageSize w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
 *PageSize w288h432/Label - 4 x 6": "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageSize
 
@@ -78,7 +77,6 @@
 *PageRegion w288h216/Label - 4 x 3": "<</PageSize[288 216]/ImagingBBox null>>setpagedevice"
 *PageRegion w288h288/Label - 4 x 4": "<</PageSize[288 288]/ImagingBBox null>>setpagedevice"
 *PageRegion w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
-*PageRegion w288h360/Label - 4 x 5": "<</PageSize[288 360]/ImagingBBox null>>setpagedevice"
 *PageRegion w288h432/Label - 4 x 6": "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageRegion
 
@@ -88,12 +86,11 @@
 *ImageableArea w144h144/Label - 2 x 2": "0 0 144 144"
 *ImageableArea w144h216/Label - 2 x 3": "0 0 144 216"
 *ImageableArea w209h72/Label - 2.9 x 1": "0 0 209 72"
-*ImageableArea w288h144/Label - 4 x 2": "0 0 280.8 144"
-*ImageableArea w288h216/Label - 4 x 3": "0 0 280.8 216"
-*ImageableArea w288h288/Label - 4 x 4": "0 0 280.8 288"
-*ImageableArea w288h360/Label - 4 x 5": "0 0 280.8 360"
-*ImageableArea w288h360/Label - 4 x 5": "0 0 280.8 360"
-*ImageableArea w288h432/Label - 4 x 6": "0 0 280.8 432"
+*ImageableArea w288h144/Label - 4 x 2": "0 0 287 144"
+*ImageableArea w288h216/Label - 4 x 3": "0 0 287 216"
+*ImageableArea w288h288/Label - 4 x 4": "0 0 287 288"
+*ImageableArea w288h360/Label - 4 x 5": "0 0 287 360"
+*ImageableArea w288h432/Label - 4 x 6": "0 0 287 432"
 
 *DefaultPaperDimension: w288h360
 *PaperDimension w144h72/Label - 2 x 1": "144 72"
@@ -105,12 +102,11 @@
 *PaperDimension w288h216/Label - 4 x 3": "288 216"
 *PaperDimension w288h288/Label - 4 x 4": "288 288"
 *PaperDimension w288h360/Label - 4 x 5": "288 360"
-*PaperDimension w288h360/Label - 4 x 5": "288 360"
 *PaperDimension w288h432/Label - 4 x 6": "288 432"
 
 *MaxMediaWidth: "288"
 *MaxMediaHeight: "3600"
-*HWMargins: 0 0 0 0
+*HWMargins: 0 0 1 0
 *CustomPageSize True: "pop pop pop <</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice"
 *ParamCustomPageSize Width: 1 points 36 288
 *ParamCustomPageSize Height: 2 points 36 3600
