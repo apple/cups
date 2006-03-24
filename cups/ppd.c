@@ -36,6 +36,8 @@
  *
  *   ppdClose()             - Free all memory used by the PPD file.
  *   ppdErrorString()       - Returns the text assocated with a status.
+ *   _ppdGetEncoding()      - Get the CUPS encoding value for the given
+ *                            LanguageEncoding.
  *   ppdLastError()         - Return the status from the last ppdOpen*().
  *   ppdOpen()              - Read a PPD file into memory.
  *   ppdOpen2()             - Read a PPD file into memory.
@@ -54,8 +56,6 @@
  *   ppd_free_option()      - Free a single option.
  *   ppd_get_coption()      - Get a custom option record.
  *   ppd_get_cparam()       - Get a custom parameter record.
- *   ppd_get_encoding()     - Get the CUPS encoding value for the given
- *                            LanguageEncoding.
  *   ppd_get_group()        - Find or create the named group as needed.
  *   ppd_get_option()       - Find or create the named option as needed.
  *   ppd_read()             - Read a line from a PPD file, skipping comment
@@ -112,7 +112,6 @@ static ppd_coption_t	*ppd_get_coption(ppd_file_t *ppd, const char *name);
 static ppd_cparam_t	*ppd_get_cparam(ppd_coption_t *opt,
 			                const char *param,
 					const char *text);
-static cups_encoding_t	ppd_get_encoding(const char *name);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 			               const char *text, _cups_globals_t *cg,
 				       cups_encoding_t encoding);
@@ -333,6 +332,31 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
     return (_cupsLangString(cupsLangDefault(), _("Unknown")));
   else
     return (_cupsLangString(cupsLangDefault(), messages[status]));
+}
+
+
+/*
+ * '_ppdGetEncoding()' - Get the CUPS encoding value for the given
+ *                       LanguageEncoding.
+ */
+
+cups_encoding_t				/* O - CUPS encoding value */
+_ppdGetEncoding(const char *name)	/* I - LanguageEncoding string */
+{
+  if (!strcasecmp(name, "ISOLatin1"))
+    return (CUPS_ISO8859_1);
+  else if (!strcasecmp(name, "ISOLatin2"))
+    return (CUPS_ISO8859_2);
+  else if (!strcasecmp(name, "ISOLatin5"))
+    return (CUPS_ISO8859_5);
+  else if (!strcasecmp(name, "JIS83-RKSJ"))
+    return (CUPS_WINDOWS_932);
+  else if (!strcasecmp(name, "MacStandard"))
+    return (CUPS_MAC_ROMAN);
+  else if (!strcasecmp(name, "WindowsANSI"))
+    return (CUPS_WINDOWS_1252);
+  else
+    return (CUPS_UTF8);
 }
 
 
@@ -721,7 +745,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       */
 
       ppd->lang_encoding = strdup("UTF-8");
-      encoding           = ppd_get_encoding(string);
+      encoding           = _ppdGetEncoding(string);
     }
     else if (!strcmp(keyword, "LanguageVersion"))
       ppd->lang_version = string;
@@ -2251,31 +2275,6 @@ ppd_get_cparam(ppd_coption_t *opt,	/* I - PPD file */
   */
 
   return (cparam);
-}
-
-
-/*
- * 'ppd_get_encoding()' - Get the CUPS encoding value for the given
- *                        LanguageEncoding.
- */
-
-static cups_encoding_t			/* O - CUPS encoding value */
-ppd_get_encoding(const char *name)	/* I - LanguageEncoding string */
-{
-  if (!strcasecmp(name, "ISOLatin1"))
-    return (CUPS_ISO8859_1);
-  else if (!strcasecmp(name, "ISOLatin2"))
-    return (CUPS_ISO8859_2);
-  else if (!strcasecmp(name, "ISOLatin5"))
-    return (CUPS_ISO8859_5);
-  else if (!strcasecmp(name, "JIS83-RKSJ"))
-    return (CUPS_WINDOWS_932);
-  else if (!strcasecmp(name, "MacStandard"))
-    return (CUPS_MAC_ROMAN);
-  else if (!strcasecmp(name, "WindowsANSI"))
-    return (CUPS_WINDOWS_1252);
-  else
-    return (CUPS_UTF8);
 }
 
 

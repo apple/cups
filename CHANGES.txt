@@ -4,6 +4,9 @@ CHANGES.txt - 2006-03-23
 CHANGES IN CUPS V1.2rc1
 
 	- Documentation updates (STR #1497, STR #1498)
+	- cups-driverd did not use the LanguageEncoding attribute
+	  in PPD files to convert the NickName to UTF-8 (STR
+	  #1503)
 	- The lpadmin command could not set the
 	  printer-error-policy attribute (STR #1504)
 	- The web interface did not show the time and date in the

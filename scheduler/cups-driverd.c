@@ -43,6 +43,14 @@
 
 #include "util.h"
 #include <cups/dir.h>
+#include <cups/transcode.h>
+
+
+/*
+ * Private PPD functions...
+ */
+
+extern cups_encoding_t	_ppdGetEncoding(const char *name);
 
 
 /*
@@ -641,7 +649,8 @@ load_ppds(const char *d,		/* I - Actual directory */
 		line[256],		/* Line from backend */
 		*ptr,			/* Pointer into name */
 		name[128],		/* Name of PPD file */
-		language[64],		/* PPD language version */
+		lang_version[64],	/* PPD LanguageVersion */
+		lang_encoding[64],	/* PPD LanguageEncoding */
 		country[64],		/* Country code */
 		manufacturer[256],	/* Manufacturer */
 		make_model[256],	/* Make and Model */
@@ -771,11 +780,12 @@ load_ppds(const char *d,		/* I - Actual directory */
     * Now read until we get the NickName field...
     */
 
-    model_name[0]   = '\0';
-    nick_name[0]    = '\0';
-    manufacturer[0] = '\0';
-    device_id[0]    = '\0';
-    strcpy(language, "en");
+    model_name[0]    = '\0';
+    nick_name[0]     = '\0';
+    manufacturer[0]  = '\0';
+    device_id[0]     = '\0';
+    lang_encoding[0] = '\0';
+    strcpy(lang_version, "en");
 
     while (cupsFileGets(fp, line, sizeof(line)) != NULL)
     {
@@ -783,8 +793,10 @@ load_ppds(const char *d,		/* I - Actual directory */
 	sscanf(line, "%*[^\"]\"%255[^\"]", manufacturer);
       else if (!strncmp(line, "*ModelName:", 11))
 	sscanf(line, "%*[^\"]\"%127[^\"]", model_name);
+      else if (!strncmp(line, "*LanguageEncoding:", 18))
+	sscanf(line, "%*[^:]:%63s", lang_encoding);
       else if (!strncmp(line, "*LanguageVersion:", 17))
-	sscanf(line, "%*[^:]:%63s", language);
+	sscanf(line, "%*[^:]:%63s", lang_version);
       else if (!strncmp(line, "*NickName:", 10))
 	sscanf(line, "%*[^\"]\"%255[^\"]", nick_name);
       else if (!strncmp(line, "*1284DeviceId:", 14))
@@ -812,7 +824,8 @@ load_ppds(const char *d,		/* I - Actual directory */
     */
 
     if (nick_name[0])
-      strcpy(make_model, nick_name);
+      cupsCharsetToUTF8((cups_utf8_t *)make_model, nick_name,
+                        sizeof(make_model), _ppdGetEncoding(lang_encoding));
     else
       strcpy(make_model, model_name);
 
@@ -883,12 +896,12 @@ load_ppds(const char *d,		/* I - Actual directory */
       strcpy(manufacturer, "LHAG");
 
    /*
-    * Fix the language as needed...
+    * Fix the lang_version as needed...
     */
 
-    if ((ptr = strchr(language, '-')) != NULL)
+    if ((ptr = strchr(lang_version, '-')) != NULL)
       *ptr++ = '\0';
-    else if ((ptr = strchr(language, '_')) != NULL)
+    else if ((ptr = strchr(lang_version, '_')) != NULL)
       *ptr++ = '\0';
 
     if (ptr)
@@ -910,7 +923,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     }
 
     for (i = 0; i < (int)(sizeof(languages) / sizeof(languages[0])); i ++)
-      if (!strcasecmp(languages[i].version, language))
+      if (!strcasecmp(languages[i].version, lang_version))
         break;
 
     if (i < (int)(sizeof(languages) / sizeof(languages[0])))
@@ -919,8 +932,8 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Found a known language...
       */
 
-      snprintf(language, sizeof(language), "%s%s", languages[i].language, 
-               country);
+      snprintf(lang_version, sizeof(lang_version), "%s%s",
+               languages[i].language, country);
     }
     else
     {
@@ -928,7 +941,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Unknown language; use "xx"...
       */
 
-      strcpy(language, "xx");
+      strcpy(lang_version, "xx");
     }
 
    /*
@@ -945,7 +958,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 
       fprintf(stderr, "DEBUG: [cups-driverd] Adding ppd \"%s\"...\n", name);
 
-      if (!add_ppd(name, language, manufacturer, make_model, device_id,
+      if (!add_ppd(name, lang_version, manufacturer, make_model, device_id,
                    dent->fileinfo.st_mtime, dent->fileinfo.st_size))
       {
         cupsDirClose(dir);
@@ -970,7 +983,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       strlcpy(ppd->record.make, manufacturer, sizeof(ppd->record.make));
       strlcpy(ppd->record.make_and_model, make_model,
               sizeof(ppd->record.make_and_model));
-      strlcpy(ppd->record.natural_language, language,
+      strlcpy(ppd->record.natural_language, lang_version,
               sizeof(ppd->record.natural_language));
       strlcpy(ppd->record.device_id, device_id, sizeof(ppd->record.device_id));
     }
