@@ -3514,7 +3514,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
   * Try the localized banner file under the subdirectory...
   */
 
-  strlcpy(attrname, con->request->attrs->next->values[0].string.text,
+  strlcpy(attrname, job->attrs->attrs->next->values[0].string.text,
           sizeof(attrname));
   if (strlen(attrname) > 2 && attrname[2] == '-')
   {
