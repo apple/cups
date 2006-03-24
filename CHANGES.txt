@@ -4,6 +4,8 @@ CHANGES.txt - 2006-03-23
 CHANGES IN CUPS V1.2rc1
 
 	- Documentation updates (STR #1497, STR #1498)
+	- The scheduler now redirects browsers to https: URLs
+	  when encryption is required.
 	- The scheduler would crash when printing with a banner
 	  (STR #1500)
 	- cups-driverd did not use the LanguageEncoding attribute

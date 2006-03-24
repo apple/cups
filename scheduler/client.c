@@ -1988,8 +1988,13 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
     * Send a human-readable error message.
     */
 
-    char	message[1024];		/* Message for user */
+    char	message[4096],		/* Message for user */
+		urltext[1024],		/* URL redirection text */
+		redirect[1024];		/* Redirection link */
     const char	*text;			/* Status-specific text */
+
+
+    redirect[0] = '\0';
 
     if (code == HTTP_UNAUTHORIZED)
       text = _cupsLangString(con->language,
@@ -1997,9 +2002,21 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 			       "root username and password to access this "
 			       "page."));
     else if (code == HTTP_UPGRADE_REQUIRED)
-      text = _cupsLangString(con->language,
-                             _("You must use a https: URL to access this "
-			       "page."));
+    {
+      text = urltext;
+
+      snprintf(urltext, sizeof(urltext),
+               _cupsLangString(con->language,
+                               _("You must access this page using the URL "
+			         "<A HREF=\"https://%s:%d%s\">"
+				 "https://%s:%d%s</A>.")),
+               con->servername, con->serverport, con->uri,
+	       con->servername, con->serverport, con->uri);
+
+      snprintf(redirect, sizeof(redirect),
+               "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"3;https://%s:%d%s\">\n",
+	       con->servername, con->serverport, con->uri);
+    }
     else
       text = "";
 
@@ -2013,13 +2030,14 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 	     "\t<TITLE>%d %s</TITLE>\n"
 	     "\t<LINK REL=\"STYLESHEET\" TYPE=\"text/css\" "
 	     "HREF=\"/cups.css\">\n"
+	     "%s"
 	     "</HEAD>\n"
              "<BODY>\n"
 	     "<H1>%d %s</H1>\n"
 	     "<P>%s</P>\n"
 	     "</BODY>\n"
 	     "</HTML>\n",
-	     code, httpStatus(code), code, httpStatus(code), text);
+	     code, httpStatus(code), redirect, code, httpStatus(code), text);
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html; charset=utf-8\r\n") < 0)
       return (0);
