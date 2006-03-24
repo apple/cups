@@ -191,6 +191,7 @@ require CUPS 1.1 or higher.</p>
 <tr><td><tt>HTTP_CONTINUE</tt> </td><td>Everything OK, keep going...</td></tr>
 <tr><td><tt>HTTP_CREATED</tt> </td><td>PUT command was successful</td></tr>
 <tr><td><tt>HTTP_ERROR</tt> </td><td>An error response from httpXxxx()</td></tr>
+<tr><td><tt>HTTP_EXPECTATION_FAILED</tt> </td><td>The expectation given in an Expect header field was not met</td></tr>
 <tr><td><tt>HTTP_FORBIDDEN</tt> </td><td>Forbidden to access this URI</td></tr>
 <tr><td><tt>HTTP_GATEWAY_TIMEOUT</tt> </td><td>Gateway connection timed out</td></tr>
 <tr><td><tt>HTTP_GONE</tt> </td><td>Server has gone away</td></tr>
@@ -211,6 +212,7 @@ require CUPS 1.1 or higher.</p>
 <tr><td><tt>HTTP_PAYMENT_REQUIRED</tt> </td><td>Payment required</td></tr>
 <tr><td><tt>HTTP_PRECONDITION</tt> </td><td>Precondition failed</td></tr>
 <tr><td><tt>HTTP_PROXY_AUTHENTICATION</tt> </td><td>Proxy Authentication is Required</td></tr>
+<tr><td><tt>HTTP_REQUESTED_RANGE</tt> </td><td>The requested range is not satisfiable</td></tr>
 <tr><td><tt>HTTP_REQUEST_TIMEOUT</tt> </td><td>Request timed out</td></tr>
 <tr><td><tt>HTTP_REQUEST_TOO_LARGE</tt> </td><td>Request entity too large</td></tr>
 <tr><td><tt>HTTP_RESET_CONTENT</tt> </td><td>Content was reset/recreated</td></tr>
@@ -368,7 +370,7 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#httpFlushWrite'><tt>httpFlushWrite()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpGet'><tt>httpGet()</tt></a> </li>
 	<li><a href='#httpGetBlocking'><tt>httpGetBlocking()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#httpGetCookie'><tt>httpGetCookie()</tt></a> </li>
+	<li><a href='#httpGetCookie'><tt>httpGetCookie()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
 	<li><a href='#httpGetDateString'><tt>httpGetDateString()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#httpGetDateString2'><tt>httpGetDateString2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpGetDateTime'><tt>httpGetDateTime()</tt></a> </li>
@@ -397,6 +399,7 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#httpSeparate2'><tt>httpSeparate2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#httpSeparateURI'><tt>httpSeparateURI()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpSetCookie'><tt>httpSetCookie()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
+	<li><a href='#httpSetExpect'><tt>httpSetExpect()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpSetField'><tt>httpSetField()</tt></a> </li>
 	<li><a href='#httpSetLength'><tt>httpSetLength()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpStatus'><tt>httpStatus()</tt></a> </li>
@@ -1165,9 +1168,11 @@ httpGetBlocking(
 <h4>Returns</h4>
 <p>1 if blocking, 0 if non-blocking</p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='httpGetCookie'>httpGetCookie()</a></h3>
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='httpGetCookie'>httpGetCookie()</a></h3>
 <h4>Description</h4>
-<p>Get any cookie data from the response.</p>
+<p>Get any cookie data from the response.
+
+</p>
 <h4>Syntax</h4>
 <pre>
 const char *
@@ -1308,16 +1313,19 @@ httpGetHostByName(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpGetHostname'>httpGetHostname()</a></h3>
 <h4>Description</h4>
-<p>Get the FQDN for the local system.
+<p>Get the FQDN for the connection or local system.
 
-This function uses both gethostname() and gethostbyname() to
-get the local hostname with domain.
+When &quot;http&quot; points to a connected socket, return the hostname or
+address that was used in the call to httpConnect() or httpConnectEncrypt().
+Otherwise, return the FQDN for the local system using both gethostname()
+and gethostbyname() to get the local hostname with domain.
 
 </p>
 <h4>Syntax</h4>
 <pre>
 const char *
 httpGetHostname(
+    <a href='#http_t'>http_t</a> * http,
     char * s,
     int slen);
 </pre>
@@ -1325,11 +1333,12 @@ httpGetHostname(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection or NULL</td></tr>
 <tr><td><tt>s</tt></td><td>String buffer for name</td></tr>
 <tr><td><tt>slen</tt></td><td>Size of buffer</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
-<p>FQDN for this system</p>
+<p>FQDN for connection or system</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='httpGetLength'>httpGetLength()</a></h3>
 <h4>Description</h4>
@@ -1842,6 +1851,30 @@ httpSetCookie(
 <tbody>
 <tr><td><tt>http</tt></td><td>Connection</td></tr>
 <tr><td><tt>cookie</tt></td><td>Cookie string</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpSetExpect'>httpSetExpect()</a></h3>
+<h4>Description</h4>
+<p>Set the Expect: header in a request.
+
+Currently only HTTP_CONTINUE is supported for the &quot;expect&quot; argument.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+void
+httpSetExpect(
+    <a href='#http_t'>http_t</a> * http,
+    http_status_t expect);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>expect</tt></td><td>HTTP status to expect (HTTP_CONTINUE)</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>

@@ -97,6 +97,7 @@ CUPS 1.1 or higher.</p>
 <tr><td><tt>CUPS_PRINTER_CLASS</tt> </td><td>Printer class</td></tr>
 <tr><td><tt>CUPS_PRINTER_COLLATE</tt> </td><td>Can collage copies</td></tr>
 <tr><td><tt>CUPS_PRINTER_COLOR</tt> </td><td>Can do color printing</td></tr>
+<tr><td><tt>CUPS_PRINTER_COMMANDS</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Printer supports maintenance commands </td></tr>
 <tr><td><tt>CUPS_PRINTER_COPIES</tt> </td><td>Can do copies</td></tr>
 <tr><td><tt>CUPS_PRINTER_COVER</tt> </td><td>Can cover output</td></tr>
 <tr><td><tt>CUPS_PRINTER_DEFAULT</tt> </td><td>Default printer on network</td></tr>
@@ -157,6 +158,7 @@ CUPS 1.1 or higher.</p>
 	<li><a href='#cupsPrintFiles2'><tt>cupsPrintFiles2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#cupsPutFd'><tt>cupsPutFd()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
 	<li><a href='#cupsPutFile'><tt>cupsPutFile()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
+	<li><a href='#cupsRemoveOption'><tt>cupsRemoveOption()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#cupsServer'><tt>cupsServer()</tt></a> </li>
 	<li><a href='#cupsSetDests'><tt>cupsSetDests()</tt></a> </li>
 	<li><a href='#cupsSetDests2'><tt>cupsSetDests2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
@@ -1018,6 +1020,30 @@ cupsPutFile(
 <h4>Returns</h4>
 <p>HTTP status</p>
 <!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsRemoveOption'>cupsRemoveOption()</a></h3>
+<h4>Description</h4>
+<p>Remove an option from an option array.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+int
+cupsRemoveOption(
+    const char * name,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> ** options);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Option name</td></tr>
+<tr><td><tt>num_options</tt></td><td>Current number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>New number of options</p>
+<!-- NEW PAGE -->
 <h3 class='title'><a name='cupsServer'>cupsServer()</a></h3>
 <h4>Description</h4>
 <p>Return the hostname/address of the default server.
@@ -1039,7 +1065,7 @@ cupsServer(void);
 <p>Save the list of destinations for the default server.
 
 This function saves the destinations to /etc/cups/lpoptions when run
-as root and ~/.lpoptions when run as a normal user.</p>
+as root and ~/.cups/lpoptions when run as a normal user.</p>
 <h4>Syntax</h4>
 <pre>
 void
@@ -1062,7 +1088,7 @@ cupsSetDests(
 <p>Save the list of destinations for the specified server.
 
 This function saves the destinations to /etc/cups/lpoptions when run
-as root and ~/.lpoptions when run as a normal user.
+as root and ~/.cups/lpoptions when run as a normal user.
 
 </p>
 <h4>Syntax</h4>

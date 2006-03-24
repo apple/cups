@@ -185,6 +185,7 @@ library:</p>
 	<li><a href='#ppdEmitFd'><tt>ppdEmitFd()</tt></a> </li>
 	<li><a href='#ppdEmitJCL'><tt>ppdEmitJCL()</tt></a> </li>
 	<li><a href='#ppdEmitJCLEnd'><tt>ppdEmitJCLEnd()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#ppdEmitString'><tt>ppdEmitString()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppdErrorString'><tt>ppdErrorString()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
 	<li><a href='#ppdFindAttr'><tt>ppdFindAttr()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
 	<li><a href='#ppdFindChoice'><tt>ppdFindChoice()</tt></a> </li>
@@ -342,8 +343,8 @@ ppdEmitAfterOrder(
 <tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
 <tr><td><tt>fp</tt></td><td>File to write to</td></tr>
 <tr><td><tt>section</tt></td><td>Section to write</td></tr>
-<tr><td><tt>limit</tt></td><td>Non-zero to use min_order, 0 to include all</td></tr>
-<tr><td><tt>min_order</tt></td><td>Lowest order dependency to include</td></tr>
+<tr><td><tt>limit</tt></td><td>Non-zero to use min_order</td></tr>
+<tr><td><tt>min_order</tt></td><td>Lowest OrderDependency</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, -1 on failure</p>
@@ -417,6 +418,38 @@ ppdEmitJCLEnd(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, -1 on failure</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdEmitString'>ppdEmitString()</a></h3>
+<h4>Description</h4>
+<p>Get a string containing the code for marked options.
+
+When &quot;min_order&quot; is greater than zero, this function only includes options
+whose OrderDependency value is greater than or equal to &quot;min_order&quot;.
+Otherwise, all options in the specified section are included in the
+returned string.
+
+The return string is allocated on the heap and should be freed using
+free() when you are done with it.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+char *
+ppdEmitString(
+    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
+    <a href='#ppd_section_t'>ppd_section_t</a> section,
+    float min_order);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
+<tr><td><tt>section</tt></td><td>Section to write</td></tr>
+<tr><td><tt>min_order</tt></td><td>Lowest OrderDependency</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>String containing option code</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ppdErrorString'>ppdErrorString()</a></h3>
 <h4>Description</h4>
@@ -923,7 +956,8 @@ struct ppd_coption_s
 <pre>
 struct ppd_cparam_s
 {
-  <a href='#ppd_cpvalue_t'>ppd_cpvalue_t</a> minimum, maximum, current;
+  <a href='#ppd_cpvalue_t'>ppd_cpvalue_t</a> current;
+  <a href='#ppd_cplimit_t'>ppd_cplimit_t</a> minimum, maximum;
   char name[PPD_MAX_NAME];
   int order;
   char text[PPD_MAX_TEXT];
@@ -935,6 +969,7 @@ struct ppd_cparam_s
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>current</tt> </td><td>Current value</td></tr>
+<tr><td><tt>maximum</tt> </td><td>Maximum value</td></tr>
 <tr><td><tt>name[PPD_MAX_NAME]</tt> </td><td>Parameter name</td></tr>
 <tr><td><tt>order</tt> </td><td>Order (0 to N)</td></tr>
 <tr><td><tt>text[PPD_MAX_TEXT]</tt> </td><td>Human-readable text</td></tr>
@@ -1196,6 +1231,7 @@ struct ppd_size_s
 	<li><a href='#ppd_const_t'><tt>ppd_const_t</tt></a> </li>
 	<li><a href='#ppd_coption_t'><tt>ppd_coption_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppd_cparam_t'><tt>ppd_cparam_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#ppd_cplimit_t'><tt>ppd_cplimit_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppd_cptype_t'><tt>ppd_cptype_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppd_cpvalue_t'><tt>ppd_cpvalue_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppd_emul_t'><tt>ppd_emul_t</tt></a> </li>
@@ -1246,6 +1282,14 @@ typedef struct <a href='#ppd_coption_s'>ppd_coption_s</a> ppd_coption_t;
 <h4>Definition</h4>
 <pre>
 typedef struct <a href='#ppd_cparam_s'>ppd_cparam_s</a> ppd_cparam_t;
+</pre>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cplimit_t'>ppd_cplimit_t</a></h3>
+<h4>Description</h4>
+<p>Custom Parameter Limit </p>
+<h4>Definition</h4>
+<pre>
+typedef union <a href='#ppd_cplimit_u'>ppd_cplimit_u</a> ppd_cplimit_t;
 </pre>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cptype_t'>ppd_cptype_t</a></h3>
@@ -1330,8 +1374,40 @@ typedef enum <a href='#ppd_ui_e'>ppd_ui_e</a> ppd_ui_t;
 <!-- NEW PAGE -->
 <h2 class='title'><a name='UNIONS'>Unions</a></h2>
 <ul>
+	<li><a href='#ppd_cplimit_u'><tt>ppd_cplimit_u</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppd_cpvalue_u'><tt>ppd_cpvalue_u</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 </ul>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cplimit_u'>ppd_cplimit_u</a></h3>
+<h4>Description</h4>
+<p>Custom Parameter Limit </p>
+<h4>Definition</h4>
+<pre>
+union ppd_cplimit_u
+{
+  float custom_curve;
+  int custom_int;
+  float custom_invcurve;
+  int custom_passcode;
+  int custom_password;
+  float custom_points;
+  float custom_real;
+  int custom_string;
+};
+</pre>
+<h4>Members</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>custom_curve</tt> </td><td>Gamma value</td></tr>
+<tr><td><tt>custom_int</tt> </td><td>Integer value</td></tr>
+<tr><td><tt>custom_invcurve</tt> </td><td>Gamma value</td></tr>
+<tr><td><tt>custom_passcode</tt> </td><td>Passcode length</td></tr>
+<tr><td><tt>custom_password</tt> </td><td>Password length</td></tr>
+<tr><td><tt>custom_points</tt> </td><td>Measurement value</td></tr>
+<tr><td><tt>custom_real</tt> </td><td>Real value</td></tr>
+<tr><td><tt>custom_string</tt> </td><td>String length</td></tr>
+</tbody></table></div>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cpvalue_u'>ppd_cpvalue_u</a></h3>
 <h4>Description</h4>
