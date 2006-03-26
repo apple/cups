@@ -94,6 +94,8 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    "mailto", "", "", "user@domain.com", 0, 0 },
 			  { HTTP_URI_OK, "socket://server/",
 			    "socket", "", "server", "/", 9100, 0 },
+			  { HTTP_URI_OK, "socket://192.168.1.1:9101/",
+			    "socket", "", "192.168.1.1", "/", 9101, 9101 },
 			  { HTTP_URI_OK, "ipp://username:password@[v1.fe80::200:1234:5678:9abc+eth0]:999/ipp",
 			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999 },
 			  { HTTP_URI_OK, "http://server/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400",
