@@ -101,6 +101,7 @@ library:</p>
 	<li><a href='#cupsFileFlush'><tt>cupsFileFlush()</tt></a> </li>
 	<li><a href='#cupsFileGetChar'><tt>cupsFileGetChar()</tt></a> </li>
 	<li><a href='#cupsFileGetConf'><tt>cupsFileGetConf()</tt></a> </li>
+	<li><a href='#cupsFileGetLine'><tt>cupsFileGetLine()</tt></a> </li>
 	<li><a href='#cupsFileGets'><tt>cupsFileGets()</tt></a> </li>
 	<li><a href='#cupsFileLock'><tt>cupsFileLock()</tt></a> </li>
 	<li><a href='#cupsFileNumber'><tt>cupsFileNumber()</tt></a> </li>
@@ -113,6 +114,9 @@ library:</p>
 	<li><a href='#cupsFileRead'><tt>cupsFileRead()</tt></a> </li>
 	<li><a href='#cupsFileRewind'><tt>cupsFileRewind()</tt></a> </li>
 	<li><a href='#cupsFileSeek'><tt>cupsFileSeek()</tt></a> </li>
+	<li><a href='#cupsFileStderr'><tt>cupsFileStderr()</tt></a> </li>
+	<li><a href='#cupsFileStdin'><tt>cupsFileStdin()</tt></a> </li>
+	<li><a href='#cupsFileStdout'><tt>cupsFileStdout()</tt></a> </li>
 	<li><a href='#cupsFileTell'><tt>cupsFileTell()</tt></a> </li>
 	<li><a href='#cupsFileUnlock'><tt>cupsFileUnlock()</tt></a> </li>
 	<li><a href='#cupsFileWrite'><tt>cupsFileWrite()</tt></a> </li>
@@ -337,6 +341,34 @@ cupsFileGetConf(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Line read or NULL on eof/error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileGetLine'>cupsFileGetLine()</a></h3>
+<h4>Description</h4>
+<p>Get a CR and/or LF-terminated line that may
+contain binary data.
+
+This function differs from cupsFileGets() in that the trailing CR and LF
+are preserved, as is any binary data on the line. The buffer is nul-
+terminated, however you should use the returned length to determine
+the number of bytes on the line.</p>
+<h4>Syntax</h4>
+<pre>
+size_t
+cupsFileGetLine(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    char * buf,
+    size_t buflen);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>File to read from</td></tr>
+<tr><td><tt>buf</tt></td><td>Buffer</td></tr>
+<tr><td><tt>buflen</tt></td><td>Size of buffer</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes on line or 0 on EOF</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsFileGets'>cupsFileGets()</a></h3>
 <h4>Description</h4>
@@ -577,6 +609,46 @@ cupsFileSeek(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>New file position or -1</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileStderr'>cupsFileStderr()</a></h3>
+<h4>Description</h4>
+<p>Just reposition the current pointer, since we have the right
+range...</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#cups_file_t'>cups_file_t</a> *
+cupsFileStderr(void);
+</pre>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Return a CUPS file associated with stderr.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileStdin'>cupsFileStdin()</a></h3>
+<h4>Description</h4>
+<p>Open file descriptor 2...</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#cups_file_t'>cups_file_t</a> *
+cupsFileStdin(void);
+</pre>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Return a CUPS file associated with stdin.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileStdout'>cupsFileStdout()</a></h3>
+<h4>Description</h4>
+<p>Open file descriptor 0...</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#cups_file_t'>cups_file_t</a> *
+cupsFileStdout(void);
+</pre>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Return a CUPS file associated with stdout.</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsFileTell'>cupsFileTell()</a></h3>
 <h4>Description</h4>

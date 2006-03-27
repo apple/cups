@@ -94,6 +94,7 @@ library:</p>
 	<li><a href='#cupsArrayRemove'><tt>cupsArrayRemove()</tt></a> </li>
 	<li><a href='#cupsArrayRestore'><tt>cupsArrayRestore()</tt></a> </li>
 	<li><a href='#cupsArraySave'><tt>cupsArraySave()</tt></a> </li>
+	<li><a href='#cupsArrayUserData'><tt>cupsArrayUserData()</tt></a> </li>
 </ul>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsArrayAdd'>cupsArrayAdd()</a></h3>
@@ -423,6 +424,24 @@ cupsArraySave(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>1 on success, 0 on failure</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsArrayUserData'>cupsArrayUserData()</a></h3>
+<h4>Description</h4>
+<p>Return the user data for an array.</p>
+<h4>Syntax</h4>
+<pre>
+void *
+cupsArrayUserData(
+    <a href='#cups_array_t'>cups_array_t</a> * a);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>a</tt></td><td>Array</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>User data</p>
 <!-- NEW PAGE -->
 <h2 class='title'><a name='TYPES'>Types</a></h2>
 <ul>

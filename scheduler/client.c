@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5305 2006-03-18 03:05:12Z mike $"
+ * "$Id: client.c 5335 2006-03-24 02:56:20Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -66,7 +66,9 @@
 
 static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
+#ifdef HAVE_SSL
 static int		encrypt_client(cupsd_client_t *con);
+#endif /* HAVE_SSL */
 #ifdef HAVE_CDSASSL
 static CFArrayRef	get_cdsa_server_certs(void);
 #endif /* HAVE_CDSASSL */
@@ -1986,8 +1988,13 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
     * Send a human-readable error message.
     */
 
-    char	message[1024];		/* Message for user */
+    char	message[4096],		/* Message for user */
+		urltext[1024],		/* URL redirection text */
+		redirect[1024];		/* Redirection link */
     const char	*text;			/* Status-specific text */
+
+
+    redirect[0] = '\0';
 
     if (code == HTTP_UNAUTHORIZED)
       text = _cupsLangString(con->language,
@@ -1995,9 +2002,21 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 			       "root username and password to access this "
 			       "page."));
     else if (code == HTTP_UPGRADE_REQUIRED)
-      text = _cupsLangString(con->language,
-                             _("You must use a https: URL to access this "
-			       "page."));
+    {
+      text = urltext;
+
+      snprintf(urltext, sizeof(urltext),
+               _cupsLangString(con->language,
+                               _("You must access this page using the URL "
+			         "<A HREF=\"https://%s:%d%s\">"
+				 "https://%s:%d%s</A>.")),
+               con->servername, con->serverport, con->uri,
+	       con->servername, con->serverport, con->uri);
+
+      snprintf(redirect, sizeof(redirect),
+               "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"3;https://%s:%d%s\">\n",
+	       con->servername, con->serverport, con->uri);
+    }
     else
       text = "";
 
@@ -2011,13 +2030,14 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 	     "\t<TITLE>%d %s</TITLE>\n"
 	     "\t<LINK REL=\"STYLESHEET\" TYPE=\"text/css\" "
 	     "HREF=\"/cups.css\">\n"
+	     "%s"
 	     "</HEAD>\n"
              "<BODY>\n"
 	     "<H1>%d %s</H1>\n"
 	     "<P>%s</P>\n"
 	     "</BODY>\n"
 	     "</HTML>\n",
-	     code, httpStatus(code), code, httpStatus(code), text);
+	     code, httpStatus(code), redirect, code, httpStatus(code), text);
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html; charset=utf-8\r\n") < 0)
       return (0);
@@ -2465,6 +2485,7 @@ check_if_modified(
 }
 
 
+#ifdef HAVE_SSL
 /*
  * 'encrypt_client()' - Enable encryption for the client...
  */
@@ -2472,7 +2493,7 @@ check_if_modified(
 static int				/* O - 1 on success, 0 on error */
 encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 {
-#ifdef HAVE_LIBSSL
+#  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
   SSL		*conn;			/* Connection for encryption */
   unsigned long	error;			/* Error code */
@@ -2513,7 +2534,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   con->http.tls = conn;
   return (1);
   
-#elif defined(HAVE_GNUTLS)
+#  elif defined(HAVE_GNUTLS)
   http_tls_t	*conn;			/* TLS session object */
   int		error;			/* Error code */
   gnutls_certificate_server_credentials *credentials;
@@ -2590,7 +2611,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   con->http.tls = conn;
   return (1);
 
-#elif defined(HAVE_CDSASSL)
+#  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error info */
   SSLContextRef	conn;			/* New connection */
   CFArrayRef	certificatesArray;	/* Array containing certificates */
@@ -2676,10 +2697,9 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   con->http.tls = conn;
   return (1);
 
-#else
-  return (0);
-#endif /* HAVE_LIBSSL */
+#  endif /* HAVE_LIBSSL */
 }
+#endif /* HAVE_SSL */
 
 
 #ifdef HAVE_CDSASSL
@@ -3767,5 +3787,5 @@ send_file(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5305 2006-03-18 03:05:12Z mike $".
+ * End of "$Id: client.c 5335 2006-03-24 02:56:20Z mike $".
  */

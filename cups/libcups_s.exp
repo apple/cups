@@ -28,3 +28,4 @@ _cups_strlcat
 _cups_strlcpy
 _ippAddAttr
 _ippFreeAttr
+_ppdGetEncoding

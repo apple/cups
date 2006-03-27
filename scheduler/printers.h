@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 5305 2006-03-18 03:05:12Z mike $"
+ * "$Id: printers.h 5330 2006-03-23 21:07:20Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -67,6 +67,7 @@ typedef struct cupsd_printer_s
   char		*port_monitor;		/* Port monitor */
   int		raw;			/* Raw queue? */
   mime_type_t	*filetype;		/* Pseudo-filetype for printer */
+  cups_array_t	*filetypes;		/* Supported file types */
   void		*job;			/* Current job in queue */
   ipp_t		*attrs;			/* Attributes supported by this printer */
   int		num_printers,		/* Number of printers in class */
@@ -145,5 +146,5 @@ extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
 
 
 /*
- * End of "$Id: printers.h 5305 2006-03-18 03:05:12Z mike $".
+ * End of "$Id: printers.h 5330 2006-03-23 21:07:20Z mike $".
  */

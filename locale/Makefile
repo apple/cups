@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5308 2006-03-18 13:18:18Z mike $"
+# "$Id: Makefile 5335 2006-03-24 02:56:20Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -79,7 +79,7 @@ uninstall:
 pot:
 	echo Updating cups.pot...
 	cd ..; xgettext -o locale/cups.pot -j --keyword=_ --no-wrap \
-		--copyright-holder="Easy Software Products" \
+		--no-location --copyright-holder="Easy Software Products" \
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c
 	(cat cups.header; \
@@ -89,7 +89,7 @@ pot:
 	mv cups.pot.N cups.pot
 	for loc in $(LANGUAGES) ; do \
 		echo Merging changes into cups_$$loc.po... ; \
-		msgmerge -o cups_$$loc.po cups_$$loc.po cups.pot ; \
+		msgmerge -o cups_$$loc.po --no-location cups_$$loc.po cups.pot ; \
 	done
 
 
@@ -108,5 +108,5 @@ translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
 
 
 #
-# End of "$Id: Makefile 5308 2006-03-18 13:18:18Z mike $".
+# End of "$Id: Makefile 5335 2006-03-24 02:56:20Z mike $".
 #

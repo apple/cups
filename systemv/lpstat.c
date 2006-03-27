@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c 5199 2006-02-27 22:01:02Z mike $"
+ * "$Id: lpstat.c 5331 2006-03-23 21:21:19Z mike $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -84,9 +84,11 @@ main(int  argc,			/* I - Number of command-line arguments */
   char		op;		/* Last operation on command-line */
 
 
-#ifdef LC_TIME
-  setlocale(LC_TIME, "");
-#endif /* LC_TIME */
+ /*
+  * Set the locale so that times, etc. are displayed properly.
+  */
+
+  setlocale(LC_ALL, "");
 
   http        = NULL;
   num_dests   = 0;
@@ -2246,5 +2248,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c 5199 2006-02-27 22:01:02Z mike $".
+ * End of "$Id: lpstat.c 5331 2006-03-23 21:21:19Z mike $".
  */

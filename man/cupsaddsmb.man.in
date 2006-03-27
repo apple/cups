@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsaddsmb.man.in 5099 2006-02-13 02:46:10Z mike $"
+.\" "$Id: cupsaddsmb.man.in 5327 2006-03-23 19:53:24Z mike $"
 .\"
 .\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 .SH SYNOPSIS
@@ -68,9 +68,11 @@ Exports all known printers. Otherwise only the named printers are
 exported.
 .TP 5
 -h cups-server[:port]
+.br
 Specifies a different CUPS server to use.
 .TP 5
 -v
+.br
 Specifies that verbose information should be shown. This is
 useful for debugging SAMBA configuration problems.
 .SH SAMBA CONFIGURATION
@@ -188,5 +190,5 @@ http://www.cups.org/windows/
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsaddsmb.man.in 5099 2006-02-13 02:46:10Z mike $".
+.\" End of "$Id: cupsaddsmb.man.in 5327 2006-03-23 19:53:24Z mike $".
 .\"

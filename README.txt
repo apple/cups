@@ -1,5 +1,5 @@
-README - CUPS v1.2b2 - 2006-03-09
----------------------------------
+README - CUPS v1.2rc1 - 2006-03-24
+----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -26,8 +26,8 @@ INTRODUCTION
     of GPL Ghostscript for CUPS called ESP Ghostscript is
     available separately to support printing of PostScript files
     within the CUPS driver framework.  Sample drivers for Dymo,
-    EPSON, HP, and OKIDATA printers are included that use these
-    filters.
+    EPSON, HP, OKIDATA, and Zebra printers are included that use
+    these filters.
 
     Drivers for thousands of printers are provided with our ESP
     Print Pro software, available at:
@@ -108,9 +108,11 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 	EPSON 9-pin Series             epson9.ppd
 	EPSON 24-pin Series            epson24.ppd
 	HP DeskJet Series              deskjet.ppd
+	HP New DeskJet Series          deskjet2.ppd
 	HP LaserJet Series             laserjet.ppd
 	OKIDATA 9-Pin Series           okidata9.ppd
 	OKIDATA 24-Pin Series          okidat24.ppd
+	Zebra CPCL Label Printer       zebracpl.ppd
 	Zebra EPL1 Label Printer       zebraep1.ppd
 	Zebra EPL2 Label Printer       zebraep2.ppd
 	Zebra ZPL Label Printer        zebra.ppd

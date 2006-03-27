@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpstat.man 5099 2006-02-13 02:46:10Z mike $"
+.\" "$Id: lpstat.man 5327 2006-03-23 19:53:24Z mike $"
 .\"
 .\"   lpstat man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpstat 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH lpstat 1 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
 .SH NAME
 lpstat \- print cups status information
 .SH SYNOPSIS
@@ -36,7 +36,7 @@ lpstat \- print cups status information
 .I destination(s)
 ] ] [ -c [
 .I class(es)
-] [ -d ] [ -o [
+] ] [ -d ] [ -o [
 .I destination(s)
 ] ] [ -p [
 .I printer(s)
@@ -144,5 +144,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpstat.man 5099 2006-02-13 02:46:10Z mike $".
+.\" End of "$Id: lpstat.man 5327 2006-03-23 19:53:24Z mike $".
 .\"

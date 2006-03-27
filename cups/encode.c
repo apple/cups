@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 5230 2006-03-05 17:01:51Z mike $"
+ * "$Id: encode.c 5332 2006-03-23 21:29:42Z mike $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -114,11 +114,13 @@ static const _ipp_option_t ipp_options[] =
   { "ppi-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "prettyprint",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { "prettyprint-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { "printer-error-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
   { "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { "printer-is-accepting-jobs",IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { "printer-is-shared",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { "printer-make-and-model",	IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { "printer-more-info",	IPP_TAG_URI,		IPP_TAG_PRINTER },
+  { "printer-op-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
   { "printer-resolution",	IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
   { "printer-state",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "printer-state-change-time",IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
@@ -552,5 +554,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 5230 2006-03-05 17:01:51Z mike $".
+ * End of "$Id: encode.c 5332 2006-03-23 21:29:42Z mike $".
  */

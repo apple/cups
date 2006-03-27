@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c 4869 2005-12-06 02:43:40Z mike $"
+ * "$Id: var.c 5331 2006-03-23 21:21:19Z mike $"
  *
  *   CGI form variable and array functions.
  *
@@ -238,6 +238,12 @@ cgiInitialize(void)
   */
 
   cupsSetPasswordCB(cgi_passwd);
+
+ /*
+  * Set the locale so that times, etc. are formatted properly...
+  */
+
+  setlocale(LC_ALL, "");
 
 #ifdef DEBUG
  /*
@@ -1020,5 +1026,5 @@ cgi_unlink_file(void)
 
 
 /*
- * End of "$Id: var.c 4869 2005-12-06 02:43:40Z mike $".
+ * End of "$Id: var.c 5331 2006-03-23 21:21:19Z mike $".
  */

@@ -1,9 +1,32 @@
-CHANGES.txt - 2006-03-20
+CHANGES.txt - 2006-03-24
 ------------------------
 
 CHANGES IN CUPS V1.2rc1
 
-	- Documentation updates (STR #1497)
+	- Documentation updates (STR #1497, STR #1498)
+	- The scheduler now redirects browsers to https: URLs
+	  when encryption is required.
+	- The scheduler would crash when printing with a banner
+	  (STR #1500)
+	- cups-driverd did not use the LanguageEncoding attribute
+	  in PPD files to convert the NickName to UTF-8 (STR
+	  #1503)
+	- The lpadmin command could not set the
+	  printer-error-policy attribute (STR #1504)
+	- The web interface did not show the time and date in the
+	  correct format for the locale (STR #1505)
+	- CUPS no longer accepts print jobs if a printer does not
+	  support the file format (STR #1501)
+	- Cleaned up the PostScript filter (pstops) so that it
+	  properly supports %%IncludeFeature and page scaling
+	  (STR #1453)
+	- Fixed the cupsFileRewind() and cupsFileSeek() functions
+	  to work properly with uncompressed files.
+	- Added cupsFileGetLine(), cupsFileStderr(),
+	  cupsFileStdin(), and cupsFileStdout() functions to the
+	  CUPS library.
+	- Added a new cupstestdsc program to test the DSC
+	  conformance of PostScript files.
 	- Added KDE/GNOME icons and a Manage Printers menu item.
 	- Added --enable-image and --enable-pdftops configure
 	  options to control whether the image and PDF filters

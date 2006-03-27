@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5308 2006-03-18 13:18:18Z mike $"
+# "$Id: Makefile 5328 2006-03-23 20:23:19Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -98,6 +98,7 @@ WEBIMAGES	=	\
 			images/printer-idle.gif \
 			images/printer-processing.gif \
 			images/printer-stopped.gif \
+			images/smiley.jpg \
 			images/tab-left.gif \
 			images/tab-right.gif \
 			images/top-left.gif \
@@ -132,6 +133,7 @@ HELPFILES	=	\
 			help/man-cupsd.conf.html \
 			help/man-cupsd.html \
 			help/man-cupsenable.html \
+			help/man-cupstestdsc.html \
 			help/man-cupstestppd.html \
 			help/man-filter.html \
 			help/man-lp.html \
@@ -164,6 +166,7 @@ HELPFILES	=	\
 			help/spec-command.html \
 			help/spec-design.html \
 			help/spec-ipp.html \
+			help/spec-postscript.html \
 			help/spec-ppd.html \
 			help/spec-raster.html \
 			help/spec-stp.html \

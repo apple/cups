@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 5310 2006-03-19 03:23:34Z mike $"
+# "$Id: cups.spec.in 5317 2006-03-21 02:35:37Z mike $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -215,6 +215,7 @@ rm -rf $RPM_BUILD_ROOT
 #/sbin/rc.d/rc5.d/*
 
 /usr/bin/cancel
+/usr/bin/cupstestdsc
 /usr/bin/cupstestppd
 /usr/bin/lp*
 %dir /usr/lib/cups
@@ -264,6 +265,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
+/usr/share/man/man1/cupstestdsc.1.gz
 /usr/share/man/man1/cupstestppd.1.gz
 /usr/share/man/man1/lp.1.gz
 /usr/share/man/man1/lpoptions.1.gz
@@ -358,5 +360,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 5310 2006-03-19 03:23:34Z mike $".
+# End of "$Id: cups.spec.in 5317 2006-03-21 02:35:37Z mike $".
 #

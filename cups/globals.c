@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.c 5294 2006-03-15 21:09:32Z mike $"
+ * "$Id: globals.c 5319 2006-03-21 15:28:29Z mike $"
  *
  *   Global variable access routines for the Common UNIX Printing System (CUPS).
  *
@@ -152,13 +152,16 @@ globals_init()
 static void
 globals_destructor(void *value)		/* I - Data to free */
 {
+  int			i;		/* Looping var */
   _cups_globals_t	*cg;		/* Global data */
 
 
   cg = (_cups_globals_t *)value;
 
-  if (cg->http)
-    httpClose(cg->http);
+  httpClose(cg->http);
+
+  for (i = 0; i < 3; i ++)
+    cupsFileClose(cg->stdio_files[i]);
 
   _cupsStrFlush(cg);
   _cupsLangFlush(cg);
@@ -212,5 +215,5 @@ _cupsGlobals(void)
 
 
 /*
- * End of "$Id: globals.c 5294 2006-03-15 21:09:32Z mike $".
+ * End of "$Id: globals.c 5319 2006-03-21 15:28:29Z mike $".
  */

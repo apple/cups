@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makefile 5317 2006-03-21 02:35:37Z mike $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -31,6 +31,7 @@ include ../Makedefs
 
 MAN1	=	cancel.$(MAN1EXT) \
 		cups-config.$(MAN1EXT) \
+		cupstestdsc.$(MAN1EXT) \
 		cupstestppd.$(MAN1EXT) \
 		lp.$(MAN1EXT) \
 		lpoptions.$(MAN1EXT) \
@@ -180,5 +181,5 @@ mantohtml:	mantohtml.o
 
 
 #
-# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
+# End of "$Id: Makefile 5317 2006-03-21 02:35:37Z mike $".
 #

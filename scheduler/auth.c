@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 5305 2006-03-18 03:05:12Z mike $"
+ * "$Id: auth.c 5336 2006-03-24 16:37:29Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -390,7 +390,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     */
 
     authorization += 5;
-    while (isspace(*authorization))
+    while (isspace(*authorization & 255))
       authorization ++;
 
     if ((localuser = cupsdFindCert(authorization)) != NULL)
@@ -414,7 +414,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
 
     authorization += 5;
-    while (isspace(*authorization))
+    while (isspace(*authorization & 255))
       authorization ++;
 
     userlen = sizeof(username);
@@ -580,7 +580,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "cupsdAuthorize: Unknown username \"%s\"!",
         	              username);
-	      return (HTTP_UNAUTHORIZED);
+	      return;
 	    }
 
 #  ifdef HAVE_SHADOW_H
@@ -2164,5 +2164,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 5305 2006-03-18 03:05:12Z mike $".
+ * End of "$Id: auth.c 5336 2006-03-24 16:37:29Z mike $".
  */

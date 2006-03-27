@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5231 2006-03-05 17:22:27Z mike $"
+ * "$Id: ipp.c 5329 2006-03-23 20:37:36Z mike $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2404,8 +2404,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
  */
 
 ipp_attribute_t *			/* O - New attribute */
-_ippAddAttr(ipp_t *ipp,		/* I - IPP message */
-              int   num_values)		/* I - Number of values */
+_ippAddAttr(ipp_t *ipp,			/* I - IPP message */
+            int   num_values)		/* I - Number of values */
 {
   ipp_attribute_t	*attr;		/* New attribute */
 
@@ -2797,6 +2797,29 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
 }
 
 
+#ifdef __linux
 /*
- * End of "$Id: ipp.c 5231 2006-03-05 17:22:27Z mike $".
+ * The following symbol definitions are provided only for KDE
+ * compatibility during the CUPS 1.2 testing period and will be
+ * removed in a future release of CUPS.  These are PRIVATE APIs
+ * from CUPS 1.1.x that the KDE developers chose to use...
+ */
+
+ipp_attribute_t *			/* O - New attribute */
+_ipp_add(ipp_t *ipp,			/* I - IPP message */
+         int   num_values)		/* I - Number of values */
+{
+  return (_ippAddAttr(ipp, num_values));
+}
+
+void
+_ipp_free(ipp_attribute_t *attr)	/* I - Attribute to free */
+{
+  _ippFreeAttr(attr);
+}
+#endif /* __linux */
+
+
+/*
+ * End of "$Id: ipp.c 5329 2006-03-23 20:37:36Z mike $".
  */

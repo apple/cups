@@ -100,8 +100,8 @@ phpcups.so:	$(OBJS) ../../Makedefs
 	else \
 		DSOFLAGS="$(DSOFLAGS)"; \
 	fi; \
-	echo $(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups $(LIBS); \
-	$(DSO) $$DSOFLAGS -o $@ $(OBJS) -L../../cups $(LIBS)
+	echo $(DSO) $$DSOFLAGS $(ARCHFLAGS) -o $@ $(OBJS) -L../../cups $(LIBS); \
+	$(DSO) $$DSOFLAGS $(ARCHFLAGS) -o $@ $(OBJS) -L../../cups $(LIBS)
 
 
 #
