@@ -3,6 +3,9 @@ CHANGES.txt - 2006-03-28
 
 CHANGES IN CUPS V1.2
 
+	- The RPM spec file incorrectly put duplicate copies of
+	  the Japanese and Spanish web interface templates in the
+	  main cups package (STR #1517)
 	- cupsSetDests() did not explicitly set the permissions
 	  of the /etc/cups/lpoptions file (STR #1508)
 	- The lpq command crashed with the -h option (STR #1515)

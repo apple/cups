@@ -244,7 +244,20 @@ rm -rf $RPM_BUILD_ROOT
 
 /usr/sbin/*
 %dir /usr/share/cups
-/usr/share/cups/*
+%dir /usr/share/cups/banners
+/usr/share/cups/banners/*
+%dir /usr/share/cups/charmaps
+/usr/share/cups/charmaps/*
+%dir /usr/share/cups/data
+/usr/share/cups/data/*
+%dir /usr/share/cups/fonts
+/usr/share/cups/fonts/*
+%dir /usr/share/cups/model
+/usr/share/cups/model/*
+%dir /usr/share/cups/profiles
+/usr/share/cups/profiles/*
+%dir /usr/share/cups/templates
+/usr/share/cups/templates/*.tmpl
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*.*
 %dir /usr/share/doc/cups/help
