@@ -531,6 +531,16 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
     return (-1);
   }
 
+#ifndef WIN32
+ /*
+  * Set the permissions to 0644 when saving to the /etc/cups/lpoptions
+  * file...
+  */
+
+  if (!getuid())
+    fchmod(fileno(fp), 0644);
+#endif /* !WIN32 */
+
  /*
   * Write each printer; each line looks like:
   *

@@ -3,6 +3,8 @@ CHANGES.txt - 2006-03-28
 
 CHANGES IN CUPS V1.2
 
+	- cupsSetDests() did not explicitly set the permissions
+	  of the /etc/cups/lpoptions file (STR #1508)
 	- The lpq command crashed with the -h option (STR #1515)
 
 
