@@ -1,5 +1,10 @@
-CHANGES.txt - 2006-03-24
+CHANGES.txt - 2006-03-28
 ------------------------
+
+CHANGES IN CUPS V1.2
+
+	- The lpq command crashed with the -h option (STR #1515)
+
 
 CHANGES IN CUPS V1.2rc1
 

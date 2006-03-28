@@ -49,6 +49,7 @@
  * Local functions...
  */
 
+static http_t	*connect_server(const char *, http_t *);
 static int	show_jobs(const char *, http_t *, const char *,
 		          const char *, const int, const int);
 static void	show_printer(const char *, http_t *, const char *);
@@ -76,35 +77,23 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dests;			/* Destinations */
   cups_lang_t	*language;		/* Language */
-#ifdef HAVE_SSL
-  http_encryption_t encryption;		/* Encryption? */
-#endif /* HAVE_SSL */
 
 
-  language = cupsLangDefault();
 
- /*
-  * Connect to the scheduler...
-  */
-
-  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
-                                 cupsEncryption())) == NULL)
-  {
-    _cupsLangPrintf(stderr, _("%s: Unable to contact server!\n"), argv[0]);
-    return (1);
-  }
 
  /*
   * Check for command-line options...
   */
 
+  http       = NULL;
   dest       = NULL;
   user       = NULL;
   id         = 0;
   interval   = 0;
   longstatus = 0;
   all        = 0;
-  num_dests  = cupsGetDests(&dests);
+  language   = cupsLangDefault();
+  num_dests  = 0;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '+')
@@ -115,10 +104,10 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
         case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
-	    encryption = HTTP_ENCRYPT_REQUIRED;
+	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 	    if (http)
-	      httpEncryption(http, encryption);
+	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
@@ -166,6 +155,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if ((instance = strchr(dest, '/')) != NULL)
 	      *instance++ = '\0';
 
+            http = connect_server(argv[0], http);
+
+            if (num_dests == 0)
+              num_dests = cupsGetDests2(http, &dests);
+
             if (cupsGetDest(dest, instance, num_dests, dests) == NULL)
 	    {
 	      if (instance)
@@ -186,8 +180,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
         case 'h' : /* Connect to host */
-	    if (http != NULL)
+	    if (http)
+	    {
 	      httpClose(http);
+	      http = NULL;
+	    }
 
 	    if (argv[i][2] != '\0')
               cupsSetServer(argv[i] + 2);
@@ -225,8 +222,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       user = argv[i];
 
+  http = connect_server(argv[0], http);
+
   if (dest == NULL && !all)
   {
+    if (num_dests == 0)
+      num_dests = cupsGetDests2(http, &dests);
+
     for (i = 0; i < num_dests; i ++)
       if (dests[i].is_default)
 	dest = dests[i].name;
@@ -291,6 +293,30 @@ main(int  argc,				/* I - Number of command-line arguments */
   httpClose(http);
 
   return (0);
+}
+
+
+/*
+ * 'connect_server()' - Connect to the server as necessary...
+ */
+
+static http_t *				/* O - New HTTP connection */
+connect_server(const char *command,	/* I - Command name */
+               http_t     *http)	/* I - Current HTTP connection */
+{
+  if (!http)
+  {
+    http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                      cupsEncryption());
+
+    if (http == NULL)
+    {
+      _cupsLangPrintf(stderr, _("%s: Unable to connect to server\n"), command);
+      exit(1);
+    }
+  }
+
+  return (http);
 }
 
 
