@@ -338,22 +338,34 @@ cupsdReadConfiguration(void)
   endpwent();
 
  /*
-  * Find the default group (nobody)...
+  * Find the default group...
   */
 
-  group = getgrnam("nobody");
+  group = getgrnam(CUPS_DEFAULT_GROUP);
   endgrent();
 
-  if (group != NULL)
+  if (group)
     Group = group->gr_gid;
   else
   {
    /*
-    * Use the (historical) NFS nobody group ID (-2 as a 16-bit twos-
-    * complement number...)
+    * Fallback to group "nobody"...
     */
 
-    Group = 65534;
+    group = getgrnam("nobody");
+    endgrent();
+
+    if (group)
+      Group = group->gr_gid;
+    else
+    {
+     /*
+      * Use the (historical) NFS nobody group ID (-2 as a 16-bit twos-
+      * complement number...)
+      */
+
+      Group = 65534;
+    }
   }
 
  /*
