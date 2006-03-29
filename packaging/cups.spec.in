@@ -37,6 +37,10 @@
 %{?_with_php: %define _php --with-php}
 %{!?_with_php: %define _php --without-php}
 
+%{!?_with_static: %{!?_without_static: %define _without_static --without-static}}
+%{?_with_static: %define _static --enable-static}
+%{!?_with_static: %define _static --disable-static}
+
 Summary: Common UNIX Printing System
 Name: cups
 Version: @CUPS_VERSION@
@@ -127,10 +131,10 @@ UNIX® operating systems. This package provides PHP support.
 
 %build
 %ifarch x86_64
-./configure --enable-32bit %{_dbus} %{_php}
+./configure --enable-32bit %{_dbus} %{_php} %{_static}
 %else
 CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" \
-    ./configure %{_dbus} %{_php}
+    ./configure %{_dbus} %{_php} %{_static}
 %endif
 # If we got this far, all prerequisite libraries must be here.
 make
@@ -325,8 +329,11 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/cups-config
 %dir /usr/include/cups
 /usr/include/cups/*
-#/usr/lib/*.a
 /usr/lib*/*.so
+
+%if %{?_with_static:1}%{!?_with_static:0}
+/usr/lib*/*.a
+%endif
 
 %dir /usr/share/doc/cups/help
 /usr/share/doc/cups/help/api*.html

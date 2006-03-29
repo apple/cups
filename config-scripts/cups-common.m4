@@ -79,9 +79,10 @@ fi
 
 dnl Static library option...
 INSTALLSTATIC=""
-AC_ARG_ENABLE(install_static, [  --enable-static         install static libraries, default=no])
+AC_ARG_ENABLE(static, [  --enable-static         install static libraries, default=no])
 
-if test x$enable_install_static = xyes; then
+if test x$enable_static = xyes; then
+	echo Installing static libraries...
 	INSTALLSTATIC="installstatic"
 fi
 

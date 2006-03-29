@@ -162,6 +162,8 @@ $CUPS_GROUP=@CUPS_GROUP@
 $CUPS_PRIMARY_SYSTEM_GROUP=@CUPS_PRIMARY_SYSTEM_GROUP@
 $CUPS_PERM=0@CUPS_CONFIG_FILE_PERM@
 
+$INSTALLSTATIC=@INSTALLSTATIC@
+
 $MAN1EXT=@MAN1EXT@
 $MAN5EXT=@MAN5EXT@
 $MAN8EXT=@MAN8EXT@
@@ -422,8 +424,10 @@ f 0644 root sys $INCLUDEDIR/cups/md5.h cups/md5.h
 f 0644 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
 f 0644 root sys $INCLUDEDIR/cups/raster.h filter/raster.h
 
+%if $INSTALLSTATIC
 f 0644 root sys $LIBDIR/libcups.a cups/libcups.a
 f 0644 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
+%endif
 
 d 0755 root sys $DOCDIR/help -
 f 0644 root sys $DOCDIR/help doc/help/api*.html

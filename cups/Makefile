@@ -172,10 +172,8 @@ install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	if test $(LIBCUPS) != "libcups.a"; then \
-		$(INSTALL_LIB) libcups.a $(LIBDIR); \
-		$(RANLIB) $(LIBDIR)/libcups.a; \
-	fi
+	$(INSTALL_LIB) libcups.a $(LIBDIR)
+	$(RANLIB) $(LIBDIR)/libcups.a
 
 installhdrs:
 	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups

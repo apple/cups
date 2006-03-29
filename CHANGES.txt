@@ -3,6 +3,7 @@ CHANGES.txt - 2006-03-29
 
 CHANGES IN CUPS V1.2
 
+	- "./configure --enable-static" didn't work (STR #1522)
 	- The scheduler was not using the configured default
 	  Group (STR #1521)
 	- The web interface still did not show the localized time
