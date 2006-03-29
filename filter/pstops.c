@@ -738,14 +738,14 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   */
 
   fprintf(stderr, "DEBUG: Before copy_prolog - %s", line);
-  copy_prolog(fp, doc, ppd, line, linelen, linesize);
+  linelen = copy_prolog(fp, doc, ppd, line, linelen, linesize);
 
  /*
   * Then the document setup section...
   */
 
   fprintf(stderr, "DEBUG: Before copy_setup - %s", line);
-  copy_setup(fp, doc, ppd, line, linelen, linesize);
+  linelen = copy_setup(fp, doc, ppd, line, linelen, linesize);
 
  /*
   * Then process pages until we have no more...
