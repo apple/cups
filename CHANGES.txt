@@ -3,6 +3,7 @@ CHANGES.txt - 2006-03-29
 
 CHANGES IN CUPS V1.2
 
+	- Localization updates (STR #1513, STR #1520)
 	- The pstops filter didn't work with some files (STR
 	  #1523)
 	- "./configure --enable-static" didn't work (STR #1522)

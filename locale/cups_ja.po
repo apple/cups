@@ -26,7 +26,7 @@ msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
 "POT-Creation-Date: 2006-03-23 21:52-0500\n"
-"PO-Revision-Date: 2006-03-14 09:29+0900\n"
+"PO-Revision-Date: 2006-03-29 23:44+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -2798,95 +2798,111 @@ msgstr "ジョブ #%d はすでに完了しています - キャンセルでき�
 msgid ""
 "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
 "s:%d%s</A>."
-msgstr ""
+msgstr "このページには URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A> を使ってアクセスする必要があります。"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Unsupported format '%s'!"
-msgstr "'%s/%s' はサポートされていない形式です!"
+msgstr "'%s' はサポートされていない形式です!"
 
-#, fuzzy
 msgid "FAIL\n"
-msgstr " 失敗\n"
+msgstr "失敗\n"
 
 #, c-format
 msgid ""
 "    Line %d is longer than 255 characters (%d)!\n"
 "        REF: Page 25, Line Length\n"
 msgstr ""
+"    %d 行が 255文字より長くなっています (%d)!\n"
+"        REF: 25 ページ、Line Length\n"
 
 msgid ""
 "    Missing %!PS-Adobe-3.0 on first line!\n"
 "        REF: Page 17, 3.1 Conforming Documents\n"
 msgstr ""
+"    先頭行に %!PS-Adobe-3.0 がありません!\n"
+"        REF: 17 ページ、3.1 Conforming Documents\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%Pages: on line %d!\n"
 "        REF: Page 43, %%%%Pages:\n"
 msgstr ""
+"    不正な %%%%Pages: (%d 行)!\n"
+"        REF: 43 ページ、%%%%Pages:\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%BoundingBox: on line %d!\n"
 "        REF: Page 39, %%%%BoundingBox:\n"
 msgstr ""
+"    不正な %%%%BoundingBox: (%d 行)!\n"
+"        REF: 39 ページ、%%%%BoundingBox:\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%Page: on line %d!\n"
 "        REF: Page 53, %%%%Page:\n"
 msgstr ""
+"    不正な %%%%Page: (%d 行)!\n"
+"        REF: 53 ページ、%%%%Page:\n"
 
 #, c-format
 msgid ""
 "    Missing or bad %%BoundingBox: comment!\n"
 "        REF: Page 39, %%BoundingBox:\n"
 msgstr ""
+"    %%BoundingBox: コメントが見つからないか不正です!\n"
+"        REF: 39 ページ、%%BoundingBox:\n"
 
 #, c-format
 msgid ""
 "    Missing or bad %%Pages: comment!\n"
 "        REF: Page 43, %%Pages:\n"
 msgstr ""
+"    %%Pages: コメントが見つからないか不正です!\n"
+"        REF: 43 ページ、%%Pages:\n"
 
 #, c-format
 msgid ""
 "    Missing %%EndComments comment!\n"
 "        REF: Page 41, %%EndComments\n"
 msgstr ""
+"    %%EndComments コメントが見つかりません!\n"
+"        REF: 41 ページ、%%EndComments\n"
 
 #, c-format
 msgid ""
 "    Missing or bad %%Page: comments!\n"
 "        REF: Page 53, %%Page:\n"
 msgstr ""
+"    %Page: コメントが見つからないか不正です!\n"
+"        REF: 53 ページ、%%Page:\n"
 
 #, c-format
 msgid "    Too many %%EndDocument comments!\n"
-msgstr ""
+msgstr "    %%EndDocument コメントが多すぎます!\n"
 
 #, c-format
 msgid "    Too many %%BeginDocument comments!\n"
-msgstr ""
+msgstr "    %%BeginDocument コメントが多すぎます!\n"
 
 #, c-format
 msgid "    Saw %d lines that exceeded 255 characters!\n"
-msgstr ""
+msgstr "    255文字を超える %d 行が見つかりました!\n"
 
-#, fuzzy
 msgid "PASS\n"
-msgstr " 合格\n"
+msgstr "合格\n"
 
 msgid "    Warning: file contains binary data!\n"
-msgstr ""
+msgstr "    警告: ファイルにバイナリデータが含まれています!\n"
 
 #, c-format
 msgid "    Warning: obsolete DSC version %.1f in file!\n"
-msgstr ""
+msgstr "    警告: ファイルは時代遅れの DSC バージョン %.1f です!\n"
 
 #, c-format
 msgid "    Warning: no %%EndComments comment in file!\n"
-msgstr ""
+msgstr "    警告: ファイルに %%EndComments コメントがありません!\n"
 
 msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
@@ -2899,3 +2915,11 @@ msgid ""
 "    Note: this program only validates the DSC comments, not the PostScript "
 "itself.\n"
 msgstr ""
+"使い方: cupstestdsc [オプション] ファイル名.ps [... ファイル名.ps]\n"
+"        cupstestdsc [オプション] -\n"
+"\n"
+"オプション:\n"
+"\n"
+"    -h       プログラムの使い方を表示する\n"
+"\n"
+"    注意: このプログラムは DSC コメントを検証するだけで、PostScript 自身を検証するものではありません。\n"
