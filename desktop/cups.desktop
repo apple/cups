@@ -17,3 +17,5 @@ Type=Application
 X-DCOP-ServiceType=
 X-KDE-SubstituteUID=false
 X-KDE-Username=
+Name[es]=Administrar impresión
+Comment[es]=Interfaz Web de CUPS
