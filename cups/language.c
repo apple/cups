@@ -558,23 +558,23 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   {
     snprintf(real, sizeof(real), "%s_%s", langname, country);
 
-    if ((lang = cups_cache_lookup(real, encoding)) != NULL)
-      return (lang);
-
     snprintf(filename, sizeof(filename), "%s/%s/cups_%s.po", cg->localedir,
              real, real);
   }
   else
+  {
+    strcpy(real, langname);
     filename[0] = '\0';			/* anti-compiler-warning-code */
+  }
+
+  if ((lang = cups_cache_lookup(langname, encoding)) != NULL)
+    return (lang);
 
   if (!country[0] || access(filename, 0))
   {
    /*
     * Country localization not available, look for generic localization...
     */
-
-    if ((lang = cups_cache_lookup(langname, encoding)) != NULL)
-      return (lang);
 
     snprintf(filename, sizeof(filename), "%s/%s/cups_%s.po", cg->localedir,
              langname, langname);
@@ -587,11 +587,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
       DEBUG_printf(("access(\"%s\", 0): %s\n", filename, strerror(errno)));
 
-      strcpy(real, "C");
       snprintf(filename, sizeof(filename), "%s/C/cups_C.po", cg->localedir);
     }
-    else
-      strcpy(real, langname);
   }
 
  /*

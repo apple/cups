@@ -957,7 +957,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       else
         snprintf(locale, sizeof(locale), "%s.%s",
 	         con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], DefaultCharset);
-        
+
       con->language = cupsLangGet(locale);
     }
     else
