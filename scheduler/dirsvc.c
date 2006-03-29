@@ -2471,8 +2471,20 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 
   dequote(location, p->location, sizeof(location));
   dequote(info, p->info, sizeof(info));
-  dequote(make_model, p->make_model ? p->make_model : "Unknown",
-          sizeof(make_model));
+
+  if (p->make_model)
+    dequote(make_model, p->make_model, sizeof(make_model));
+  else if (p->type & CUPS_PRINTER_CLASS)
+  {
+    if (p->num_printers > 0 && p->printers[0]->make_model)
+      strlcpy(make_model, p->printers[0]->make_model, sizeof(make_model));
+    else
+      strlcpy(make_model, "Local Printer Class", sizeof(make_model));
+  }
+  else if (p->raw)
+    strlcpy(make_model, "Local Raw Printer", sizeof(make_model));
+  else
+    strlcpy(make_model, "Local System V Printer", sizeof(make_model));
 
  /*
   * Send a packet to each browse address...

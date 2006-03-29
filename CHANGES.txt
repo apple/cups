@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-03-28
+CHANGES.txt - 2006-03-29
 ------------------------
 
 CHANGES IN CUPS V1.2
 
+	- Local raw and System V printers were not advertised as
+	  such for printer browsing (STR #1502)
 	- The RPM spec file incorrectly put duplicate copies of
 	  the Japanese and Spanish web interface templates in the
 	  main cups package (STR #1517)
