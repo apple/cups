@@ -3,6 +3,8 @@ CHANGES.txt - 2006-03-29
 
 CHANGES IN CUPS V1.2
 
+	- httpAddrGetList() would crash on systems without
+	  getaddrinfo().
 	- Socket URIs without a trailing slash would cause the
 	  port number to not be accepted (STR #1519)
 	- Local raw and System V printers were not advertised as
