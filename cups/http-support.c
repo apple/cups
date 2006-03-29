@@ -1057,7 +1057,7 @@ httpSeparateURI(
 
       *port = strtol(uri + 1, (char **)&uri, 10);
 
-      if (*uri != '/')
+      if (*uri != '/' && *uri)
       {
         *port = 0;
         return (HTTP_URI_BAD_PORT);

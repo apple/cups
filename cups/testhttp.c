@@ -114,6 +114,8 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			  /* Missing resource */
 			  { HTTP_URI_MISSING_RESOURCE, "socket://[::192.168.2.1]",
 			    "socket", "", "::192.168.2.1", "/", 9100, 0 },
+			  { HTTP_URI_MISSING_RESOURCE, "socket://192.168.1.1:9101",
+			    "socket", "", "192.168.1.1", "/", 9101 },
 
 			  /* Bad URI */
 			  { HTTP_URI_BAD_URI, "",

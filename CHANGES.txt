@@ -3,6 +3,8 @@ CHANGES.txt - 2006-03-29
 
 CHANGES IN CUPS V1.2
 
+	- Socket URIs without a trailing slash would cause the
+	  port number to not be accepted (STR #1519)
 	- Local raw and System V printers were not advertised as
 	  such for printer browsing (STR #1502)
 	- The RPM spec file incorrectly put duplicate copies of
