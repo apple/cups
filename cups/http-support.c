@@ -1141,6 +1141,10 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
         return ("Accepted");
     case HTTP_NO_CONTENT :
         return ("No Content");
+    case HTTP_MOVED_PERMANENTLY :
+        return ("Moved Permanently");
+    case HTTP_SEE_OTHER :
+        return ("See Other");
     case HTTP_NOT_MODIFIED :
         return ("Not Modified");
     case HTTP_BAD_REQUEST :

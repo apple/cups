@@ -2246,7 +2246,11 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    */
 
             if (!strncasecmp(buf, "Location:", 9))
+	    {
   	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL);
+	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
+		return (0);
+	    }
 	    else if (!strncasecmp(buf, "Status:", 7))
   	      cupsdSendError(con, atoi(buf + 7));
 	    else

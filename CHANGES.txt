@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-03-29
+CHANGES.txt - 2006-03-30
 ------------------------
 
 CHANGES IN CUPS V1.2
 
+	- The web interface redirection after certain printer
+	  administration tasks was broken (STR #1516)
 	- Web interface authorization could get stuck (STR #1512)
 	- Localization updates (STR #1513, STR #1518, STR #1520)
 	- The pstops filter didn't work with some files (STR

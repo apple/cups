@@ -132,12 +132,20 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (!strcmp(op, "redirect"))
     {
       const char *url;			/* Redirection URL... */
+      char	prefix[1024];		/* URL prefix */
 
+
+      if (getenv("HTTPS"))
+        snprintf(prefix, sizeof(prefix), "https://%s:%s",
+	         getenv("SERVER_NAME"), getenv("SERVER_PORT"));
+      else
+        snprintf(prefix, sizeof(prefix), "http://%s:%s",
+	         getenv("SERVER_NAME"), getenv("SERVER_PORT"));
 
       if ((url = cgiGetVariable("URL")) != NULL)
-        printf("Location: %s\n\n", url);
+        printf("Location: %s%s\n\n", prefix, url);
       else
-        puts("Location: /admin\n");
+        printf("Location: %s/admin\n\n", prefix);
     }
     else if (!strcmp(op, "start-printer"))
       do_printer_op(http, IPP_RESUME_PRINTER, cgiText(_("Start Printer")));
