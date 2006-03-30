@@ -258,8 +258,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/fonts/*
 %dir /usr/share/cups/model
 /usr/share/cups/model/*
-%dir /usr/share/cups/profiles
-/usr/share/cups/profiles/*
 %dir /usr/share/cups/templates
 /usr/share/cups/templates/*.tmpl
 %dir /usr/share/doc/cups
