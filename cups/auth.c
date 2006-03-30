@@ -92,9 +92,13 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * See if we can do local authentication...
   */
 
-  if (!cups_local_auth(http))
+  if (http->digest_tries < 3 && !cups_local_auth(http))
   {
     DEBUG_printf(("cupsDoAuthentication: authstring=\"%s\"\n", http->authstring));
+
+    if (http->status == HTTP_UNAUTHORIZED)
+      http->digest_tries ++;
+
     return (0);
   }
 
