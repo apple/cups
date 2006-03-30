@@ -748,6 +748,18 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   linelen = copy_setup(fp, doc, ppd, line, linelen, linesize);
 
  /*
+  * Copy until we see %%Page:...
+  */
+
+  while (strncmp(line, "%%Page:", 7))
+  {
+    fwrite(line, 1, linelen, stdout);
+
+    if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
+      break;
+  }
+
+ /*
   * Then process pages until we have no more...
   */
 
