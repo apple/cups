@@ -64,6 +64,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   ipp_t		*response;		/* IPP response data */
   size_t	length;			/* Content-Length value */
   http_status_t	status;			/* Status of HTTP request */
+  int		got_status;		/* Did we get the status? */
   ipp_state_t	state;			/* State of IPP processing */
   FILE		*file;			/* File to send */
   struct stat	fileinfo;		/* File information */
@@ -184,54 +185,58 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     }
 
    /*
-    * Wait up to 1 second for a 100-continue response...
+    * Send the IPP data...
     */
 
-    if (httpWait(http, 1000))
-      status = httpUpdate(http);
-    else
-      status = HTTP_CONTINUE;
+    DEBUG_puts("cupsDoFileRequest: ipp write...");
 
-    if (status == HTTP_CONTINUE)
+    request->state = IPP_IDLE;
+    status         = HTTP_CONTINUE;
+    got_status     = 0;
+
+    while ((state = ippWrite(http, request)) != IPP_DATA)
+      if (state == IPP_ERROR)
+	break;
+      else if (httpCheck(http))
+      {
+        got_status = 1;
+
+	if ((status = httpUpdate(http)) != HTTP_CONTINUE)
+	  break;
+      }
+
+    if (!got_status)
     {
      /*
-      * Send the IPP data...
+      * Wait up to 1 second to get the 100-continue response...
       */
 
-      DEBUG_puts("cupsDoFileRequest: ipp write...");
+      if (httpWait(http, 1000))
+        status = httpUpdate(http);
+    }
+    else if (httpCheck(http))
+      status = httpUpdate(http);
 
-      request->state = IPP_IDLE;
+    if (status == HTTP_CONTINUE && state == IPP_DATA && filename)
+    {
+      DEBUG_puts("cupsDoFileRequest: file write...");
 
-      while ((state = ippWrite(http, request)) != IPP_DATA)
-        if (state == IPP_ERROR)
-	  break;
-	else if (httpCheck(http))
+     /*
+      * Send the file...
+      */
+
+      rewind(file);
+
+      while ((bytes = (int)fread(buffer, 1, sizeof(buffer), file)) > 0)
+      {
+	if (httpCheck(http))
 	{
 	  if ((status = httpUpdate(http)) != HTTP_CONTINUE)
 	    break;
         }
 
-      if (state == IPP_DATA && filename)
-      {
-        DEBUG_puts("cupsDoFileRequest: file write...");
-
-       /*
-        * Send the file...
-        */
-
-        rewind(file);
-
-        while ((bytes = (int)fread(buffer, 1, sizeof(buffer), file)) > 0)
-	{
-	  if (httpCheck(http))
-	  {
-	    if ((status = httpUpdate(http)) != HTTP_CONTINUE)
-	      break;
-          }
-
-  	  if (httpWrite2(http, buffer, bytes) < bytes)
-            break;
-        }
+  	if (httpWrite2(http, buffer, bytes) < bytes)
+          break;
       }
     }
 

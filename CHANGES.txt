@@ -1,8 +1,9 @@
-CHANGES.txt - 2006-03-30
+CHANGES.txt - 2006-03-31
 ------------------------
 
 CHANGES IN CUPS V1.2
 
+	- Fixed a CUPS 1.1.x compatibility bug (STR #1528)
 	- The web interface redirection after certain printer
 	  administration tasks was broken (STR #1516)
 	- Web interface authorization could get stuck (STR #1512)
