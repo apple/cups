@@ -590,6 +590,12 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     {
       if (saw_bounding_box)
         fputs("ERROR: Duplicate %%BoundingBox: comment seen!\n", stderr);
+      else if (strstr(line + 14, "(atend)"))
+      {
+       /*
+        * Do nothing for now but use the default imageable area...
+	*/
+      }
       else if (sscanf(line + 14, "%d%d%d%d", doc->bounding_box + 0,
 	              doc->bounding_box + 1, doc->bounding_box + 2,
 		      doc->bounding_box + 3) != 4)
@@ -751,7 +757,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   * Copy until we see %%Page:...
   */
 
-  while (strncmp(line, "%%Page:", 7))
+  while (strncmp(line, "%%Page:", 7) && strncmp(line, "%%Trailer", 9))
   {
     fwrite(line, 1, linelen, stdout);
 
@@ -790,9 +796,9 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   {
     pageinfo = (pstops_page_t *)cupsArrayLast(doc->pages);
 
-    start_nup(doc, doc->number_up - 1, 0, doc->bounding_box);
+    start_nup(doc, doc->number_up, 0, doc->bounding_box);
     doc_puts(doc, "showpage\n");
-    end_nup(doc, doc->number_up - 1);
+    end_nup(doc, doc->number_up);
 
     pageinfo->length = cupsFileTell(doc->temp) - pageinfo->offset;
   }
@@ -814,9 +820,9 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
       printf("%%%%Page: (filler) %d\n", doc->page);
     }
 
-    start_nup(doc, doc->number_up - 1, 0, doc->bounding_box);
+    start_nup(doc, doc->number_up, 0, doc->bounding_box);
     doc_puts(doc, "showpage\n");
-    end_nup(doc, doc->number_up - 1);
+    end_nup(doc, doc->number_up);
 
     pageinfo->length = cupsFileTell(doc->temp) - pageinfo->offset;
   }
@@ -1380,7 +1386,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   {
     if (level == 0 &&
         (!strncmp(line, "%%Page:", 7) ||
-	 !strncmp(line, "%%Trailer:", 10) ||
+	 !strncmp(line, "%%Trailer", 9) ||
 	 !strncmp(line, "%%EOF", 5)))
       break;
     else if (!strncmp(line, "%%BeginDocument", 15) ||
@@ -2412,7 +2418,7 @@ skip_page(cups_file_t *fp,		/* I - File to read from */
   while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
   {
     if (level == 0 &&
-        (!strncmp(line, "%%Page:", 7) || !strncmp(line, "%%Trailer:", 10)))
+        (!strncmp(line, "%%Page:", 7) || !strncmp(line, "%%Trailer", 9)))
       break;
     else if (!strncmp(line, "%%BeginDocument", 15) ||
 	     !strncmp(line, "%ADO_BeginApplication", 21))
