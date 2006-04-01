@@ -269,7 +269,8 @@ _cupsStrFree(const char *s)		/* I - String to free */
 
   key.str = (char *)s;
 
-  if ((item = (_cups_sp_item_t *)cupsArrayFind(cg->stringpool, &key)) != NULL)
+  if ((item = (_cups_sp_item_t *)cupsArrayFind(cg->stringpool, &key)) != NULL &&
+      item->str == s)
   {
    /*
     * Found it, dereference...

@@ -252,6 +252,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/banners/*
 %dir /usr/share/cups/charmaps
 /usr/share/cups/charmaps/*
+%dir /usr/share/cups/charsets
+/usr/share/cups/charsets/*
 %dir /usr/share/cups/data
 /usr/share/cups/data/*
 %dir /usr/share/cups/fonts
