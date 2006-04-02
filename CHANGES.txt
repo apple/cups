@@ -1,8 +1,12 @@
-CHANGES.txt - 2006-03-31
+CHANGES.txt - 2006-04-02
 ------------------------
 
 CHANGES IN CUPS V1.2
 
+	- The language cache, string pool, and transcoding caches
+	  are now process global instead of per-thread to avoid
+	  problems with GNOME and to allow for data sharing
+	  between threads (STR #1530)
 	- Fixed a CUPS 1.1.x compatibility bug (STR #1528)
 	- The web interface redirection after certain printer
 	  administration tasks was broken (STR #1516)

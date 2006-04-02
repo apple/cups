@@ -95,7 +95,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 					/* Unknown error statuses */
 
   /* language.c */
-  cups_lang_t		*lang_cache;	/* Language string cache */
   cups_lang_t		*lang_default;	/* Default language */
 #  ifdef __APPLE__
 #    ifdef HAVE_CF_LOCALE_ID
@@ -112,10 +111,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 
   /* tempfile.c */
   char			tempfile[1024];	/* cupsTempFd/File buffer */
-
-  /* transcode.c */
-  _cups_cmap_t		*cmap_cache;	/* SBCS Charmap Cache */
-  _cups_vmap_t		*vmap_cache;	/* VBCS Charmap Cache */
 
   /* usersys.c */
   http_encryption_t	encryption;	/* Encryption setting */
@@ -134,9 +129,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 					/* Default printer */
   char			ppd_filename[HTTP_MAX_URI];
 					/* PPD filename */
-
-  /* string.c */
-  cups_array_t		*stringpool;	/* String pool */
 } _cups_globals_t;
 
 
@@ -144,12 +136,9 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
  * Prototypes...
  */
 
-extern void		_cupsCharmapFlush(_cups_globals_t *cg);
 extern const char	*_cupsGetPassword(const char *prompt);
 extern _cups_globals_t	*_cupsGlobals(void);
-extern void		_cupsLangFlush(_cups_globals_t *cg);
 extern void		_cupsSetError(ipp_status_t status, const char *message);
-extern void		_cupsStrFlush(_cups_globals_t *cg);
 
 
 /*

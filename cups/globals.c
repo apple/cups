@@ -175,10 +175,6 @@ globals_destructor(void *value)		/* I - Data to free */
   for (i = 0; i < 3; i ++)
     cupsFileClose(cg->stdio_files[i]);
 
-  _cupsStrFlush(cg);
-  _cupsLangFlush(cg);
-  _cupsCharmapFlush(cg);
-
   cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
 
   free(value);

@@ -31,6 +31,7 @@
  * Include necessary headers...
  */
 
+#  include <stdio.h>
 #  include "transcode.h"
 
 #  ifdef __cplusplus
@@ -90,6 +91,7 @@ typedef struct _cups_vmap_s		/**** VBCS Charmap Struct ****/
  * Prototypes...
  */
 
+extern void		_cupsCharmapFlush(void);
 extern void		_cupsCharmapFree(const cups_encoding_t encoding);
 extern void		*_cupsCharmapGet(const cups_encoding_t encoding);
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);

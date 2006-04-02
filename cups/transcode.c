@@ -37,6 +37,7 @@
  *   conv_vbcs_to_utf8() - Convert legacy DBCS/VBCS to UTF-8.
  *   free_sbcs_charmap() - Free memory used by a single byte character set.
  *   free_vbcs_charmap() - Free memory used by a variable byte character set.
+ *   get_charmap()       - Lookup or get a character set map (private).
  *   get_charmap_count() - Count lines in a charmap file.
  *   get_sbcs_charmap()  - Get SBCS Charmap.
  *   get_vbcs_charmap()  - Get DBCS/VBCS Charmap.
@@ -51,6 +52,20 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>
+
+
+/*
+ * Local globals...
+ */
+
+#ifdef HAVE_PTHREAD_H
+static pthread_mutex_t	map_mutex = PTHREAD_MUTEX_INITIALIZER;
+					/* Mutex to control access to maps */
+#endif /* HAVE_PTHREAD_H */
+static _cups_cmap_t	*cmap_cache = NULL;
+					/* SBCS Charmap Cache */
+static _cups_vmap_t	*vmap_cache = NULL;
+					/* VBCS Charmap Cache */
 
 
 /*
@@ -76,6 +91,7 @@ static int		conv_vbcs_to_utf8(cups_utf8_t *dest,
 					  const cups_encoding_t encoding);
 static void		free_sbcs_charmap(_cups_cmap_t *sbcs);
 static void		free_vbcs_charmap(_cups_vmap_t *vbcs);
+static void		*get_charmap(const cups_encoding_t encoding);
 static int		get_charmap_count(cups_file_t *fp);
 static _cups_cmap_t	*get_sbcs_charmap(const cups_encoding_t encoding,
 				          const char *filename);
@@ -88,7 +104,7 @@ static _cups_vmap_t	*get_vbcs_charmap(const cups_encoding_t encoding,
  */
 
 void
-_cupsCharmapFlush(_cups_globals_t *cg)	/* I - Global data */
+_cupsCharmapFlush(void)
 {
   _cups_cmap_t	*cmap,			/* Legacy SBCS / Unicode Charset Map */
 		*cnext;			/* Next Legacy SBCS Charset Map */
@@ -96,24 +112,28 @@ _cupsCharmapFlush(_cups_globals_t *cg)	/* I - Global data */
 		*vnext;			/* Next Legacy VBCS Charset Map */
 
 
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
+
  /*
   * Loop through SBCS charset map cache, free all memory...
   */
 
-  for (cmap = cg->cmap_cache; cmap; cmap = cnext)
+  for (cmap = cmap_cache; cmap; cmap = cnext)
   {
     cnext = cmap->next;
 
     free_sbcs_charmap(cmap);
   }
 
-  cg->cmap_cache = NULL;
+  cmap_cache = NULL;
 
  /*
   * Loop through DBCS/VBCS charset map cache, free all memory...
   */
 
-  for (vmap = cg->vmap_cache; vmap; vmap = vnext)
+  for (vmap = vmap_cache; vmap; vmap = vnext)
   {
     vnext = vmap->next;
 
@@ -122,7 +142,11 @@ _cupsCharmapFlush(_cups_globals_t *cg)	/* I - Global data */
     free(vmap);
   }
 
-  cg->vmap_cache = NULL;
+  vmap_cache = NULL;
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
 }
 
 
@@ -138,21 +162,23 @@ _cupsCharmapFree(
 {
   _cups_cmap_t	*cmap;			/* Legacy SBCS / Unicode Charset Map */
   _cups_vmap_t	*vmap;			/* Legacy VBCS / Unicode Charset Map */
-  _cups_globals_t *cg = _cupsGlobals(); /* Pointer to library globals */
 
 
  /*
   * See if we already have this SBCS charset map loaded...
   */
 
-  for (cmap = cg->cmap_cache; cmap; cmap = cmap->next)
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
+
+  for (cmap = cmap_cache; cmap; cmap = cmap->next)
   {
     if (cmap->encoding == encoding)
     {
       if (cmap->used > 0)
 	cmap->used --;
-
-      return;
+      break;
     }
   }
 
@@ -160,15 +186,19 @@ _cupsCharmapFree(
   * See if we already have this DBCS/VBCS charset map loaded...
   */
 
-  for (vmap = cg->vmap_cache; vmap; vmap = vmap->next)
+  for (vmap = vmap_cache; vmap; vmap = vmap->next)
   {
     if (vmap->encoding == encoding)
     {
       if (vmap->used > 0)
 	vmap->used --;
-      return;
+      break;
     }
   }
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
 }
 
 
@@ -185,8 +215,7 @@ void *					/* O - Charset map pointer */
 _cupsCharmapGet(
     const cups_encoding_t encoding)	/* I - Encoding */
 {
-  char		filename[1024];		/* Filename for charset map file */
-  _cups_globals_t *cg = _cupsGlobals(); /* Global data */
+  void	*charmap;			/* Charset map pointer */
 
 
   DEBUG_printf(("_cupsCharmapGet(encoding=%d)\n", encoding));
@@ -202,24 +231,20 @@ _cupsCharmapGet(
   }
 
  /*
-  * Get the data directory and charset map name...
+  * Lookup or get the charset map pointer and return...
   */
 
-  snprintf(filename, sizeof(filename), "%s/charmaps/%s.txt",
-	   cg->cups_datadir, _cupsEncodingName(encoding));
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
 
-  DEBUG_printf(("    filename=\"%s\"\n", filename));
+  charmap = get_charmap(encoding);
 
- /*
-  * Read charset map input file into cache...
-  */
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
 
-  if (encoding < CUPS_ENCODING_SBCS_END)
-    return (get_sbcs_charmap(encoding, filename));
-  else if (encoding < CUPS_ENCODING_VBCS_END)
-    return (get_vbcs_charmap(encoding, filename));
-  else
-    return (NULL);
+  return (charmap);
 }
 
 
@@ -239,6 +264,9 @@ cupsCharsetToUTF8(
     const int maxout,			/* I - Max output */
     const cups_encoding_t encoding)	/* I - Encoding */
 {
+  int	bytes;				/* Number of bytes converted */
+
+
  /*
   * Check for valid arguments...
   */
@@ -270,15 +298,25 @@ cupsCharsetToUTF8(
   * Convert input legacy charset to UTF-8...
   */
 
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
+
   if (encoding < CUPS_ENCODING_SBCS_END)
-    return (conv_sbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding));
+    bytes = conv_sbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding);
   else if (encoding < CUPS_ENCODING_VBCS_END)
-    return (conv_vbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding));
+    bytes = conv_vbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding);
   else
   {
-    puts("    Bad encoding, returning -1");
-    return (-1);
+    DEBUG_puts("    Bad encoding, returning -1");
+    bytes = -1;
   }
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
+
+  return (bytes);
 }
 
 
@@ -298,6 +336,9 @@ cupsUTF8ToCharset(
     const int		  maxout,	/* I - Max output */
     const cups_encoding_t encoding)	/* I - Encoding */
 {
+  int	bytes;				/* Number of bytes converted */
+
+
  /*
   * Check for valid arguments...
   */
@@ -325,12 +366,22 @@ cupsUTF8ToCharset(
   * Convert input UTF-8 to legacy charset...
   */
 
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
+
   if (encoding < CUPS_ENCODING_SBCS_END)
-    return (conv_utf8_to_sbcs((cups_sbcs_t *)dest, src, maxout, encoding));
+    bytes = conv_utf8_to_sbcs((cups_sbcs_t *)dest, src, maxout, encoding);
   else if (encoding < CUPS_ENCODING_VBCS_END)
-    return (conv_utf8_to_vbcs((cups_sbcs_t *)dest, src, maxout, encoding));
+    bytes = conv_utf8_to_vbcs((cups_sbcs_t *)dest, src, maxout, encoding);
   else
-    return (-1);
+    bytes = -1;
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&map_mutex);
+#endif /* HAVE_PTHREAD_H */
+
+  return (bytes);
 }
 
 
@@ -675,7 +726,7 @@ conv_sbcs_to_utf8(
   * Find legacy charset map in cache...
   */
 
-  if ((cmap = (_cups_cmap_t *)_cupsCharmapGet(encoding)) == NULL)
+  if ((cmap = (_cups_cmap_t *)get_charmap(encoding)) == NULL)
     return (-1);
 
  /*
@@ -714,7 +765,7 @@ conv_sbcs_to_utf8(
   * Convert internal UCS-4 to output UTF-8 (and delete BOM)...
   */
 
-  _cupsCharmapFree(encoding);
+  cmap->used --;
 
   return (cupsUTF32ToUTF8(dest, work, maxout));
 }
@@ -743,7 +794,7 @@ conv_utf8_to_sbcs(
   * Find legacy charset map in cache...
   */
 
-  if ((cmap = (_cups_cmap_t *) _cupsCharmapGet(encoding)) == NULL)
+  if ((cmap = (_cups_cmap_t *)get_charmap(encoding)) == NULL)
     return (-1);
 
  /*
@@ -790,7 +841,7 @@ conv_utf8_to_sbcs(
 
   *dest = '\0';
 
-  _cupsCharmapFree(encoding);
+  cmap->used --;
 
   return ((int)(dest - start));
 }
@@ -820,7 +871,7 @@ conv_utf8_to_vbcs(
   * Find legacy charset map in cache...
   */
 
-  if ((vmap = (_cups_vmap_t *)_cupsCharmapGet(encoding)) == NULL)
+  if ((vmap = (_cups_vmap_t *)get_charmap(encoding)) == NULL)
     return (-1);
 
  /*
@@ -902,7 +953,7 @@ conv_utf8_to_vbcs(
 
   *dest = '\0';
 
-  _cupsCharmapFree(encoding);
+  vmap->used --;
 
   return ((int)(dest - start));
 }
@@ -932,7 +983,7 @@ conv_vbcs_to_utf8(
   * Find legacy charset map in cache...
   */
 
-  if ((vmap = (_cups_vmap_t *)_cupsCharmapGet(encoding)) == NULL)
+  if ((vmap = (_cups_vmap_t *)get_charmap(encoding)) == NULL)
     return (-1);
 
  /*
@@ -1027,7 +1078,7 @@ conv_vbcs_to_utf8(
 
   *workptr = 0;
 
-  _cupsCharmapFree(encoding);
+  vmap->used --;
 
  /*
   * Convert internal UCS-4 to output UTF-8 (and delete BOM)...
@@ -1081,6 +1132,46 @@ free_vbcs_charmap(_cups_vmap_t *vmap)	/* I - Character set */
 
 
 /*
+ * 'get_charmap()' - Lookup or get a character set map (private).
+ *
+ * This code handles single-byte (SBCS), double-byte (DBCS), and
+ * variable-byte (VBCS) character sets _without_ charset escapes...
+ * This code does not handle multiple-byte character sets (MBCS)
+ * (such as ISO-2022-JP) with charset switching via escapes...
+ */
+
+
+void *					/* O - Charset map pointer */
+get_charmap(
+    const cups_encoding_t encoding)	/* I - Encoding */
+{
+  char		filename[1024];		/* Filename for charset map file */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+ /*
+  * Get the data directory and charset map name...
+  */
+
+  snprintf(filename, sizeof(filename), "%s/charmaps/%s.txt",
+	   cg->cups_datadir, _cupsEncodingName(encoding));
+
+  DEBUG_printf(("    filename=\"%s\"\n", filename));
+
+ /*
+  * Read charset map input file into cache...
+  */
+
+  if (encoding < CUPS_ENCODING_SBCS_END)
+    return (get_sbcs_charmap(encoding, filename));
+  else if (encoding < CUPS_ENCODING_VBCS_END)
+    return (get_vbcs_charmap(encoding, filename));
+  else
+    return (NULL);
+}
+
+
+/*
  * 'get_charmap_count()' - Count lines in a charmap file.
  */
 
@@ -1129,19 +1220,19 @@ get_sbcs_charmap(
   cups_ucs2_t	*crow;			/* Pointer to UCS-2 row in 'char2uni' */
   cups_sbcs_t	*srow;			/* Pointer to SBCS row in 'uni2char' */
   char		line[256];		/* Line from charset map file */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
   * See if we already have this SBCS charset map loaded...
   */
 
-  for (cmap = cg->cmap_cache; cmap; cmap = cmap->next)
+  for (cmap = cmap_cache; cmap; cmap = cmap->next)
   {
     if (cmap->encoding == encoding)
     {
       cmap->used ++;
       DEBUG_printf(("    returning existing cmap=%p\n", cmap));
+
       return ((void *)cmap);
     }
   }
@@ -1161,6 +1252,7 @@ get_sbcs_charmap(
   {
     cupsFileClose(fp);
     DEBUG_puts("    Unable to allocate memory!");
+
     return (NULL);
   }
 
@@ -1228,8 +1320,8 @@ get_sbcs_charmap(
   * Add it to the cache and return...
   */
 
-  cmap->next     = cg->cmap_cache;
-  cg->cmap_cache = cmap;
+  cmap->next = cmap_cache;
+  cmap_cache = cmap;
 
   DEBUG_printf(("    returning new cmap=%p\n", cmap));
 
@@ -1273,7 +1365,6 @@ get_vbcs_charmap(
   char		line[256];		/* Line from charset map file */
   int		i;			/* Loop variable */
   int		wide;			/* 32-bit legacy char */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_printf(("get_vbcs_charmap(encoding=%d, filename=\"%s\")\n",
@@ -1283,12 +1374,13 @@ get_vbcs_charmap(
   * See if we already have this DBCS/VBCS charset map loaded...
   */
 
-  for (vmap = cg->vmap_cache; vmap; vmap = vmap->next)
+  for (vmap = vmap_cache; vmap; vmap = vmap->next)
   {
     if (vmap->encoding == encoding)
     {
       vmap->used ++;
       DEBUG_printf(("    returning existing vmap=%p\n", vmap));
+
       return ((void *)vmap);
     }
   }
@@ -1300,6 +1392,7 @@ get_vbcs_charmap(
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
   {
     DEBUG_printf(("    Unable to open file: %s\n", strerror(errno)));
+
     return (NULL);
   }
 
@@ -1310,6 +1403,7 @@ get_vbcs_charmap(
   if ((mapcount = get_charmap_count(fp)) <= 0)
   {
     DEBUG_puts("    Unable to get charmap count!");
+
     return (NULL);
   }
 
@@ -1323,6 +1417,7 @@ get_vbcs_charmap(
   {
     cupsFileClose(fp);
     DEBUG_puts("    Unable to allocate memory!");
+
     return (NULL);
   }
 
@@ -1465,8 +1560,8 @@ get_vbcs_charmap(
   * Add it to the cache and return...
   */
 
-  vmap->next     = cg->vmap_cache;
-  cg->vmap_cache = vmap;
+  vmap->next     = vmap_cache;
+  vmap_cache = vmap;
 
   DEBUG_printf(("    returning new vmap=%p\n", vmap));
 

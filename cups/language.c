@@ -66,6 +66,18 @@
 
 
 /*
+ * Local globals...
+ */
+
+#ifdef HAVE_PTHREAD_H
+static pthread_mutex_t	lang_mutex = PTHREAD_MUTEX_INITIALIZER;
+					/* Mutex to control access to cache */
+#endif /* HAVE_PTHREAD_H */
+static cups_lang_t	*lang_cache = NULL;
+					/* Language string cache */
+
+
+/*
  * Local functions...
  */
 
@@ -204,17 +216,6 @@ cupsLangEncoding(cups_lang_t *lang)	/* I - Language data */
 void
 cupsLangFlush(void)
 {
-  _cupsLangFlush(_cupsGlobals());
-}
-
-
-/*
- * '_cupsLangFlush()' - Flush all language data out of the cache.
- */
-
-void
-_cupsLangFlush(_cups_globals_t *cg)	/* I - Global data */
-{
   cups_lang_t	*lang,			/* Current language */
 		*next;			/* Next language */
 
@@ -223,7 +224,11 @@ _cupsLangFlush(_cups_globals_t *cg)	/* I - Global data */
   * Free all languages in the cache...
   */
 
-  for (lang = cg->lang_cache; lang != NULL; lang = next)
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&lang_mutex);
+#endif /* HAVE_PTHREAD_H */
+
+  for (lang = lang_cache; lang != NULL; lang = next)
   {
    /*
     * Free all messages...
@@ -239,7 +244,11 @@ _cupsLangFlush(_cups_globals_t *cg)	/* I - Global data */
     free(lang);
   }
 
-  cg->lang_cache = NULL;
+  lang_cache = NULL;
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&lang_mutex);
+#endif /* HAVE_PTHREAD_H */
 }
 
 
@@ -252,8 +261,16 @@ _cupsLangFlush(_cups_globals_t *cg)	/* I - Global data */
 void
 cupsLangFree(cups_lang_t *lang)		/* I - Language to free */
 {
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&lang_mutex);
+#endif /* HAVE_PTHREAD_H */
+
   if (lang != NULL && lang->used > 0)
     lang->used --;
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&lang_mutex);
+#endif /* HAVE_PTHREAD_H */
 }
 
 
@@ -567,8 +584,18 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     filename[0] = '\0';			/* anti-compiler-warning-code */
   }
 
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&lang_mutex);
+#endif /* HAVE_PTHREAD_H */
+
   if ((lang = cups_cache_lookup(langname, encoding)) != NULL)
+  {
+#ifdef HAVE_PTHREAD_H
+    pthread_mutex_unlock(&lang_mutex);
+#endif /* HAVE_PTHREAD_H */
+
     return (lang);
+  }
 
   if (!country[0] || access(filename, 0))
   {
@@ -596,7 +623,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * record...
   */
 
-  for (lang = cg->lang_cache; lang != NULL; lang = lang->next)
+  for (lang = lang_cache; lang != NULL; lang = lang->next)
     if (lang->used == 0)
       break;
 
@@ -607,10 +634,16 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     */
 
     if ((lang = calloc(sizeof(cups_lang_t), 1)) == NULL)
-      return (NULL);
+    {
+#ifdef HAVE_PTHREAD_H
+      pthread_mutex_unlock(&lang_mutex);
+#endif /* HAVE_PTHREAD_H */
 
-    lang->next     = cg->lang_cache;
-    cg->lang_cache = lang;
+      return (NULL);
+    }
+
+    lang->next = lang_cache;
+    lang_cache = lang;
   }
   else
   {
@@ -643,6 +676,10 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * Return...
   */
 
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&lang_mutex);
+#endif /* HAVE_PTHREAD_H */
+
   return (lang);
 }
 
@@ -665,7 +702,21 @@ _cupsLangString(cups_lang_t *lang,	/* I - Language */
   if (!lang || !message)
     return (message);
 
+#ifdef HAVE_PTHREAD_H
+  {
+    const char *s;			/* Localized message */
+
+    pthread_mutex_lock(&lang_mutex);
+
+    s = _cupsMessageLookup(lang->strings, message);
+
+    pthread_mutex_unlock(&lang_mutex);
+
+    return (s);
+  }
+#else
   return (_cupsMessageLookup(lang->strings, message));
+#endif /* HAVE_PTHREAD_H */
 }
 
 
@@ -1163,7 +1214,7 @@ cups_cache_lookup(const char      *name,/* I - Name of locale */
   * Loop through the cache and return a match if found...
   */
 
-  for (lang = _cupsGlobals()->lang_cache; lang != NULL; lang = lang->next)
+  for (lang = lang_cache; lang != NULL; lang = lang->next)
   {
     DEBUG_printf(("cups_cache_lookup: lang=%p, language=\"%s\", encoding=%d(%s)\n",
                   lang, lang->language, lang->encoding,
