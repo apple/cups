@@ -143,6 +143,9 @@ _cupsStrFlush(_cups_globals_t *cg)	/* I - Global data */
   _cups_sp_item_t	*item;		/* Current item */
 
 
+  DEBUG_printf(("_cupsStrFlush(cg=%p)\n", cg));
+  DEBUG_printf(("    %d strings in array\n", cupsArrayCount(cg->stringpool)));
+
   for (item = (_cups_sp_item_t *)cupsArrayFirst(cg->stringpool);
        item;
        item = (_cups_sp_item_t *)cupsArrayNext(cg->stringpool))
