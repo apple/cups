@@ -307,7 +307,11 @@ _cupsStrFree(const char *s)		/* I - String to free */
     return;
 
  /*
-  * Get the string pool...
+  * Check the string pool...
+  *
+  * We don't need to lock the mutex yet, as we only want to know if
+  * the stringpool is initialized.  The rest of the code will still
+  * work if it is initialized before we lock...
   */
 
   if (!stringpool)
