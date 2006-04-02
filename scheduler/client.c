@@ -2830,9 +2830,9 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
     else
       return (NULL);
   }
-  else if (con->language != NULL)
+  else if (con->language)
     snprintf(filename, len, "%s/%s%s", DocumentRoot, con->language->language,
-            con->uri);
+             con->uri);
   else
     snprintf(filename, len, "%s%s", DocumentRoot, con->uri);
 
@@ -2844,16 +2844,30 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   * then fallback to the default one...
   */
 
-  if ((status = stat(filename, filestats)) != 0 && con->language != NULL)
+  if ((status = stat(filename, filestats)) != 0 && con->language &&
+      strncmp(con->uri, "/ppd/", 5) &&
+      strncmp(con->uri, "/admin/conf/", 12) &&
+      strncmp(con->uri, "/admin/log/", 11))
   {
    /*
-    * Drop the language prefix and try the current directory...
+    * Drop the country code...
     */
 
-    if (strncmp(con->uri, "/ppd/", 5) &&
-        strncmp(con->uri, "/admin/conf/", 12) &&
-        strncmp(con->uri, "/admin/log/", 11))
+    char	ll[3];			/* Short language name */
+
+
+    strlcpy(ll, con->language->language, sizeof(ll));
+    snprintf(filename, len, "%s/%s%s", DocumentRoot, ll, con->uri);
+
+    if ((ptr = strchr(filename, '?')) != NULL)
+      *ptr = '\0';
+
+    if ((status = stat(filename, filestats)) != 0)
     {
+     /*
+      * Drop the language prefix and try the root directory...
+      */
+
       snprintf(filename, len, "%s%s", DocumentRoot, con->uri);
 
       if ((ptr = strchr(filename, '?')) != NULL)

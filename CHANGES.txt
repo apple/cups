@@ -3,6 +3,8 @@ CHANGES.txt - 2006-04-02
 
 CHANGES IN CUPS V1.2
 
+	- The web interface language selection code did not try
+	  the generic language localization (STR #1531)
 	- The language cache, string pool, and transcoding caches
 	  are now process global instead of per-thread to avoid
 	  problems with GNOME and to allow for data sharing
