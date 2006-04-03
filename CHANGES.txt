@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-04-02
+CHANGES.txt - 2006-04-03
 ------------------------
 
 CHANGES IN CUPS V1.2
 
+	- The PostScript filter now handles files that start with
+	  an incomplete PJL header (PR #6076)
 	- The web interface language selection code did not try
 	  the generic language localization (STR #1531)
 	- The language cache, string pool, and transcoding caches

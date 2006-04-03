@@ -307,9 +307,12 @@ main(int  argc,				/* I - Number of command-line args */
 
     fputs("DEBUG: Skipping PJL header...\n", stderr);
 
-    while (strstr(line, "ENTER LANGUAGE") == NULL)
+    while (strstr(line, "ENTER LANGUAGE") == NULL && strncmp(line, "%!", 2))
       if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
         break;
+
+    if (!strncmp(line, "%!", 2))
+      break;
 
     if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
       break;
