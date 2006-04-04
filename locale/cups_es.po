@@ -23,12 +23,12 @@ msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
 "POT-Creation-Date: 2006-03-23 21:52-0500\n"
-"PO-Revision-Date: 2006-03-13 17:36+0100\n"
+"PO-Revision-Date: 2006-03-25 21:48+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre@tiscali.es>\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
 msgid "Options Installed"
 msgstr "Opciones instaladas"
@@ -77,10 +77,10 @@ msgid ""
 "this page."
 msgstr ""
 "Introduzca su nombre de usuario y contraseña o el nombre de usuario y "
-"contraseña de root para poder acceder a esta página"
+"contraseña de root para poder acceder a esta página."
 
 msgid "You must use a https: URL to access this page."
-msgstr "Debe escribir una URL https para acceder a esta página."
+msgstr "Debe escribir un URL https para acceder a esta página."
 
 #, c-format
 msgid "Bad request version number %d.%d!"
@@ -2863,94 +2863,112 @@ msgid ""
 "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
 "s:%d%s</A>."
 msgstr ""
+"Debe acceder a esta página usando el URL <A HREF=\"https://%s:%d%s\">https://%"
+"s:%d%s</A>."
 
-#, fuzzy, c-format
+#, c-format
 msgid "Unsupported format '%s'!"
-msgstr "No se admite el uso del formato '%s/%s'."
+msgstr "No se admite el uso del formato '%s'."
 
-#, fuzzy
 msgid "FAIL\n"
-msgstr " FALLO\n"
+msgstr "FALLO\n"
 
 #, c-format
 msgid ""
 "    Line %d is longer than 255 characters (%d)!\n"
 "        REF: Page 25, Line Length\n"
 msgstr ""
+"    La línea %d es más larga de 255 caracteres (%d).\n"
+"        REF: Página 25, Longitud de Línea\n"
 
 msgid ""
 "    Missing %!PS-Adobe-3.0 on first line!\n"
 "        REF: Page 17, 3.1 Conforming Documents\n"
 msgstr ""
+"    Falta %!PS-Adobe-3.0 en la primera línea.\n"
+"        REF: Página 17, 3.1 Conformidad de documentos\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%Pages: on line %d!\n"
 "        REF: Page 43, %%%%Pages:\n"
 msgstr ""
+"    %%%%Pages: incorrecto en línea %d.\n"
+"        REF: Página 43, %%%%Pages:\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%BoundingBox: on line %d!\n"
 "        REF: Page 39, %%%%BoundingBox:\n"
 msgstr ""
+"    %%%%BoundingBox: incorrecto en línea %d.\n"
+"        REF: Página 39, %%%%BoundingBox:\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%Page: on line %d!\n"
 "        REF: Page 53, %%%%Page:\n"
 msgstr ""
+"    %%%%Page: incorrecto en línea %d.\n"
+"        REF: Página 53, %%%%Page:\n"
 
 #, c-format
 msgid ""
 "    Missing or bad %%BoundingBox: comment!\n"
 "        REF: Page 39, %%BoundingBox:\n"
 msgstr ""
+"    Falta comentario %%BoundingBox: o incorrecto.\n"
+"        REF: Página 39, %%BoundingBox:\n"
 
 #, c-format
 msgid ""
 "    Missing or bad %%Pages: comment!\n"
 "        REF: Page 43, %%Pages:\n"
 msgstr ""
+"    Falta comentario %%Pages: o incorrecto.\n"
+"        REF: Página 43, %%Pages:\n"
 
 #, c-format
 msgid ""
 "    Missing %%EndComments comment!\n"
 "        REF: Page 41, %%EndComments\n"
 msgstr ""
+"    Falta comentario %%EndComments.\n"
+"        REF: Página 41, %%EndComments\n"
 
 #, c-format
 msgid ""
 "    Missing or bad %%Page: comments!\n"
 "        REF: Page 53, %%Page:\n"
 msgstr ""
+"    Falta comentario %%Page: o incorrecto.\n"
+"        REF: Página 53, %%Page:\n"
 
 #, c-format
 msgid "    Too many %%EndDocument comments!\n"
-msgstr ""
+msgstr "    Demasiados comentarios %%EndDocument.\n"
 
 #, c-format
 msgid "    Too many %%BeginDocument comments!\n"
-msgstr ""
+msgstr "    Demasiados comentarios %%BeginDocument.\n"
 
 #, c-format
 msgid "    Saw %d lines that exceeded 255 characters!\n"
-msgstr ""
+msgstr "    Se han visto %d líneas que exceden de 255 caracteres.\n"
 
-#, fuzzy
 msgid "PASS\n"
-msgstr " PASA\n"
+msgstr "PASA\n"
 
 msgid "    Warning: file contains binary data!\n"
-msgstr ""
+msgstr "    Advertencia: el archivo contiene datos binarios.\n"
 
 #, c-format
 msgid "    Warning: obsolete DSC version %.1f in file!\n"
-msgstr ""
+msgstr "    Advertencia: versión DSC %.1f obsoleta en el archivo.\n"
 
 #, c-format
 msgid "    Warning: no %%EndComments comment in file!\n"
-msgstr ""
+msgstr "    Advertencia: no hay comentario %%EndComments en el archivo.\n"
 
 msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
@@ -2963,3 +2981,13 @@ msgid ""
 "    Note: this program only validates the DSC comments, not the PostScript "
 "itself.\n"
 msgstr ""
+"Uso: cupstestdsc [opciones] nombre_archivo.ps [... nombre_archivo.ps]\n"
+"       cupstestdsc [opciones] -\n"
+"\n"
+"Opciones:\n"
+"\n"
+"    -h       Muestra cómo se usa el programa\n"
+"\n"
+"    Nota: este programa sólo valida los comentarios DSC, no el PostScript "
+"en sí mismo.\n"
+

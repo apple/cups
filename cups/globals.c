@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.c 5319 2006-03-21 15:28:29Z mike $"
+ * "$Id: globals.c 5366 2006-04-02 16:11:04Z mike $"
  *
  *   Global variable access routines for the Common UNIX Printing System (CUPS).
  *
@@ -37,6 +37,7 @@
 
 #include "http-private.h"
 #include "globals.h"
+#include "debug.h"
 #include <stdlib.h>
 
 
@@ -101,6 +102,8 @@ _cupsGlobals(void)
   * Initialize the global data exactly once...
   */
 
+  DEBUG_printf(("_cupsGlobals(): globals_key_once=%d\n", globals_key_once));
+
   pthread_once(&globals_key_once, globals_init);
 
  /*
@@ -109,12 +112,16 @@ _cupsGlobals(void)
 
   if ((globals = (_cups_globals_t *)pthread_getspecific(globals_key)) == NULL)
   {
+    DEBUG_puts("_cupsGlobals: allocating memory for thread...");
+
    /*
     * No, allocate memory as set the pointer for the key...
     */
 
     globals = calloc(1, sizeof(_cups_globals_t));
     pthread_setspecific(globals_key, globals);
+
+    DEBUG_printf(("    globals=%p\n", globals));
 
    /*
     * Initialize variables that have non-zero values
@@ -142,6 +149,9 @@ static void
 globals_init()
 {
   pthread_key_create(&globals_key, globals_destructor);
+
+  DEBUG_printf(("globals_init(): globals_key=%x(%u)\n", globals_key,
+                globals_key));
 }
 
 
@@ -156,16 +166,14 @@ globals_destructor(void *value)		/* I - Data to free */
   _cups_globals_t	*cg;		/* Global data */
 
 
+  DEBUG_printf(("globals_destructor(value=%p)\n", value));
+
   cg = (_cups_globals_t *)value;
 
   httpClose(cg->http);
 
   for (i = 0; i < 3; i ++)
     cupsFileClose(cg->stdio_files[i]);
-
-  _cupsStrFlush(cg);
-  _cupsLangFlush(cg);
-  _cupsCharmapFlush(cg);
 
   cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
 
@@ -215,5 +223,5 @@ _cupsGlobals(void)
 
 
 /*
- * End of "$Id: globals.c 5319 2006-03-21 15:28:29Z mike $".
+ * End of "$Id: globals.c 5366 2006-04-02 16:11:04Z mike $".
  */

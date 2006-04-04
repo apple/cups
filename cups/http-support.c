@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c 5149 2006-02-22 19:10:22Z mike $"
+ * "$Id: http-support.c 5360 2006-03-30 17:02:17Z mike $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1057,7 +1057,7 @@ httpSeparateURI(
 
       *port = strtol(uri + 1, (char **)&uri, 10);
 
-      if (*uri != '/')
+      if (*uri != '/' && *uri)
       {
         *port = 0;
         return (HTTP_URI_BAD_PORT);
@@ -1141,6 +1141,10 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
         return ("Accepted");
     case HTTP_NO_CONTENT :
         return ("No Content");
+    case HTTP_MOVED_PERMANENTLY :
+        return ("Moved Permanently");
+    case HTTP_SEE_OTHER :
+        return ("See Other");
     case HTTP_NOT_MODIFIED :
         return ("Not Modified");
     case HTTP_BAD_REQUEST :
@@ -1312,5 +1316,5 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 
 
 /*
- * End of "$Id: http-support.c 5149 2006-02-22 19:10:22Z mike $".
+ * End of "$Id: http-support.c 5360 2006-03-30 17:02:17Z mike $".
  */

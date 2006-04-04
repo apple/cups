@@ -1,5 +1,5 @@
 /*
- * "$Id: i18n.h 5294 2006-03-15 21:09:32Z mike $"
+ * "$Id: i18n.h 5366 2006-04-02 16:11:04Z mike $"
  *
  *   (Private) localization support for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,7 @@
  * Include necessary headers...
  */
 
+#  include <stdio.h>
 #  include "transcode.h"
 
 #  ifdef __cplusplus
@@ -90,6 +91,7 @@ typedef struct _cups_vmap_s		/**** VBCS Charmap Struct ****/
  * Prototypes...
  */
 
+extern void		_cupsCharmapFlush(void);
 extern void		_cupsCharmapFree(const cups_encoding_t encoding);
 extern void		*_cupsCharmapGet(const cups_encoding_t encoding);
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);
@@ -111,5 +113,5 @@ extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
 #endif /* !_CUPS_I18N_H_ */
 
 /*
- * End of "$Id: i18n.h 5294 2006-03-15 21:09:32Z mike $".
+ * End of "$Id: i18n.h 5366 2006-04-02 16:11:04Z mike $".
  */

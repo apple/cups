@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c 5344 2006-03-26 13:57:00Z mike $"
+ * "$Id: testhttp.c 5350 2006-03-29 15:26:44Z mike $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -114,6 +114,8 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			  /* Missing resource */
 			  { HTTP_URI_MISSING_RESOURCE, "socket://[::192.168.2.1]",
 			    "socket", "", "::192.168.2.1", "/", 9100, 0 },
+			  { HTTP_URI_MISSING_RESOURCE, "socket://192.168.1.1:9101",
+			    "socket", "", "192.168.1.1", "/", 9101 },
 
 			  /* Bad URI */
 			  { HTTP_URI_BAD_URI, "",
@@ -517,5 +519,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c 5344 2006-03-26 13:57:00Z mike $".
+ * End of "$Id: testhttp.c 5350 2006-03-29 15:26:44Z mike $".
  */

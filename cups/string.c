@@ -1,5 +1,5 @@
 /*
- * "$Id: string.c 5286 2006-03-13 16:32:28Z mike $"
+ * "$Id: string.c 5368 2006-04-02 19:23:50Z mike $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
@@ -46,9 +46,24 @@
 
 #include <stdlib.h>
 #include <limits.h>
+#include "array.h"
 #include "debug.h"
 #include "string.h"
-#include "globals.h"
+#ifdef HAVE_PTHREAD_H
+#  include <pthread.h>
+#endif /* HAVE_PTHREAD_H */
+
+
+/*
+ * Local globals...
+ */
+
+#ifdef HAVE_PTHREAD_H
+static pthread_mutex_t	sp_mutex = PTHREAD_MUTEX_INITIALIZER;
+					/* Mutex to control access to pool */
+#endif /* HAVE_PTHREAD_H */
+static cups_array_t	*stringpool = NULL;
+					/* Global string pool */
 
 
 /*
@@ -65,7 +80,6 @@ static int	compare_sp_items(_cups_sp_item_t *a, _cups_sp_item_t *b);
 char *					/* O - String pointer */
 _cupsStrAlloc(const char *s)		/* I - String */
 {
-  _cups_globals_t	*cg;		/* Global data */
   _cups_sp_item_t	*item,		/* String pool item */
 			key;		/* Search key */
 
@@ -81,13 +95,21 @@ _cupsStrAlloc(const char *s)		/* I - String */
   * Get the string pool...
   */
 
-  cg = _cupsGlobals();
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
 
-  if (!cg->stringpool)
-    cg->stringpool = cupsArrayNew((cups_array_func_t)compare_sp_items, NULL);
+  if (!stringpool)
+    stringpool = cupsArrayNew((cups_array_func_t)compare_sp_items, NULL);
 
-  if (!cg->stringpool)
+  if (!stringpool)
+  {
+#ifdef HAVE_PTHREAD_H
+    pthread_mutex_unlock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
+
     return (NULL);
+  }
 
  /*
   * See if the string is already in the pool...
@@ -95,13 +117,17 @@ _cupsStrAlloc(const char *s)		/* I - String */
 
   key.str = (char *)s;
 
-  if ((item = (_cups_sp_item_t *)cupsArrayFind(cg->stringpool, &key)) != NULL)
+  if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, &key)) != NULL)
   {
    /*
     * Found it, return the cached string...
     */
 
     item->ref_count ++;
+
+#ifdef HAVE_PTHREAD_H
+    pthread_mutex_unlock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
 
     return (item->str);
   }
@@ -112,7 +138,13 @@ _cupsStrAlloc(const char *s)		/* I - String */
 
   item = (_cups_sp_item_t *)calloc(1, sizeof(_cups_sp_item_t));
   if (!item)
+  {
+#ifdef HAVE_PTHREAD_H
+    pthread_mutex_unlock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
+
     return (NULL);
+  }
 
   item->ref_count = 1;
   item->str       = strdup(s);
@@ -120,6 +152,11 @@ _cupsStrAlloc(const char *s)		/* I - String */
   if (!item->str)
   {
     free(item);
+
+#ifdef HAVE_PTHREAD_H
+    pthread_mutex_unlock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
+
     return (NULL);
   }
 
@@ -127,7 +164,11 @@ _cupsStrAlloc(const char *s)		/* I - String */
   * Add the string to the pool and return it...
   */
 
-  cupsArrayAdd(cg->stringpool, item);
+  cupsArrayAdd(stringpool, item);
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
 
   return (item->str);
 }
@@ -138,20 +179,32 @@ _cupsStrAlloc(const char *s)		/* I - String */
  */
 
 void
-_cupsStrFlush(_cups_globals_t *cg)	/* I - Global data */
+_cupsStrFlush(void)
 {
   _cups_sp_item_t	*item;		/* Current item */
 
 
-  for (item = (_cups_sp_item_t *)cupsArrayFirst(cg->stringpool);
+  DEBUG_printf(("_cupsStrFlush(cg=%p)\n", cg));
+  DEBUG_printf(("    %d strings in array\n", cupsArrayCount(stringpool)));
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
+
+  for (item = (_cups_sp_item_t *)cupsArrayFirst(stringpool);
        item;
-       item = (_cups_sp_item_t *)cupsArrayNext(cg->stringpool))
+       item = (_cups_sp_item_t *)cupsArrayNext(stringpool))
   {
     free(item->str);
     free(item);
   }
 
-  cupsArrayDelete(cg->stringpool);
+  cupsArrayDelete(stringpool);
+  stringpool = NULL;
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
 }
 
 
@@ -242,7 +295,6 @@ _cupsStrFormatd(char         *buf,	/* I - String */
 void
 _cupsStrFree(const char *s)		/* I - String to free */
 {
-  _cups_globals_t	*cg;		/* Global data */
   _cups_sp_item_t	*item,		/* String pool item */
 			key;		/* Search key */
 
@@ -255,21 +307,28 @@ _cupsStrFree(const char *s)		/* I - String to free */
     return;
 
  /*
-  * Get the string pool...
+  * Check the string pool...
+  *
+  * We don't need to lock the mutex yet, as we only want to know if
+  * the stringpool is initialized.  The rest of the code will still
+  * work if it is initialized before we lock...
   */
 
-  cg = _cupsGlobals();
-
-  if (!cg->stringpool)
+  if (!stringpool)
     return;
 
  /*
   * See if the string is already in the pool...
   */
 
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
+
   key.str = (char *)s;
 
-  if ((item = (_cups_sp_item_t *)cupsArrayFind(cg->stringpool, &key)) != NULL)
+  if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, &key)) != NULL &&
+      item->str == s)
   {
    /*
     * Found it, dereference...
@@ -283,12 +342,16 @@ _cupsStrFree(const char *s)		/* I - String to free */
       * Remove and free...
       */
 
-      cupsArrayRemove(cg->stringpool, item);
+      cupsArrayRemove(stringpool, item);
 
       free(item->str);
       free(item);
     }
   }
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
 }
 
 
@@ -402,19 +465,20 @@ _cupsStrStatistics(size_t *alloc_bytes,	/* O - Allocated bytes */
 			tbytes,		/* Total string bytes */
 			len;		/* Length of string */
   _cups_sp_item_t	*item;		/* Current item */
-  _cups_globals_t	*cg;		/* Global data */
 
 
  /*
   * Loop through strings in pool, counting everything up...
   */
 
-  cg = _cupsGlobals();
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
 
   for (count = 0, abytes = 0, tbytes = 0,
-           item = (_cups_sp_item_t *)cupsArrayFirst(cg->stringpool);
+           item = (_cups_sp_item_t *)cupsArrayFirst(stringpool);
        item;
-       item = (_cups_sp_item_t *)cupsArrayNext(cg->stringpool))
+       item = (_cups_sp_item_t *)cupsArrayNext(stringpool))
   {
    /*
     * Count allocated memory, using a 64-bit aligned buffer as a basis.
@@ -425,6 +489,10 @@ _cupsStrStatistics(size_t *alloc_bytes,	/* O - Allocated bytes */
     abytes += sizeof(_cups_sp_item_t) + len;
     tbytes += item->ref_count * len;
   }
+
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&sp_mutex);
+#endif /* HAVE_PTHREAD_H */
 
  /*
   * Return values...
@@ -634,5 +702,5 @@ compare_sp_items(_cups_sp_item_t *a,	/* I - First item */
 
 
 /*
- * End of "$Id: string.c 5286 2006-03-13 16:32:28Z mike $".
+ * End of "$Id: string.c 5368 2006-04-02 19:23:50Z mike $".
  */

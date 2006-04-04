@@ -1,5 +1,5 @@
 /*
- * "$Id: template.c 5113 2006-02-16 12:02:44Z mike $"
+ * "$Id: template.c 5352 2006-03-29 16:26:38Z mike $"
  *
  *   CGI template function.
  *
@@ -110,7 +110,7 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
   if ((lang = getenv("LANG")) != NULL)
   {
     for (i = 0; lang[i] && i < 15; i ++)
-      if (isalnum(lang[i] & 255))
+      if (isalnum(lang[i] & 255) || lang[i] == '_')
         locale[i] = tolower(lang[i]);
       else if (lang[i] == '-')
         locale[i] = '_';
@@ -638,5 +638,5 @@ cgi_puts(const char *s,			/* I - String to output */
 
 
 /*
- * End of "$Id: template.c 5113 2006-02-16 12:02:44Z mike $".
+ * End of "$Id: template.c 5352 2006-03-29 16:26:38Z mike $".
  */

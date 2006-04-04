@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5311 2006-03-19 13:21:42Z mike $"
+# "$Id: Makefile 5354 2006-03-29 20:55:15Z mike $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -107,10 +107,8 @@ install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	-if test $(LIBCUPSIMAGE) != "libcupsimage.a"; then \
-		$(INSTALL_LIB) libcupsimage.a $(LIBDIR); \
-		$(RANLIB) $(LIBDIR)/libcupsimage.a; \
-	fi
+	$(INSTALL_LIB) libcupsimage.a $(LIBDIR);
+	$(RANLIB) $(LIBDIR)/libcupsimage.a;
 
 installhdrs:
 	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
@@ -373,5 +371,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5311 2006-03-19 13:21:42Z mike $".
+# End of "$Id: Makefile 5354 2006-03-29 20:55:15Z mike $".
 #

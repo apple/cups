@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addrlist.c 5103 2006-02-14 19:27:42Z mike $"
+ * "$Id: http-addrlist.c 5351 2006-03-29 15:36:15Z mike $"
  *
  *   HTTP address list routines for the Common UNIX Printing System (CUPS).
  *
@@ -411,7 +411,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 #  ifdef AF_INET6
           if (host->h_addrtype == AF_INET6)
 	  {
-            first->addr.ipv6.sin6_family = AF_INET6;
+            temp->addr.ipv6.sin6_family = AF_INET6;
 	    memcpy(&(temp->addr.ipv6), host->h_addr_list[i],
 	           sizeof(temp->addr.ipv6));
             temp->addr.ipv6.sin6_port = htons(portnum);
@@ -419,7 +419,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  else
 #  endif /* AF_INET6 */
 	  {
-            first->addr.ipv4.sin_family = AF_INET;
+            temp->addr.ipv4.sin_family = AF_INET;
 	    memcpy(&(temp->addr.ipv4), host->h_addr_list[i],
 	           sizeof(temp->addr.ipv4));
             temp->addr.ipv4.sin_port = htons(portnum);
@@ -593,5 +593,5 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
 
 /*
- * End of "$Id: http-addrlist.c 5103 2006-02-14 19:27:42Z mike $".
+ * End of "$Id: http-addrlist.c 5351 2006-03-29 15:36:15Z mike $".
  */

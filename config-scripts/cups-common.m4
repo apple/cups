@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 5288 2006-03-14 02:38:07Z mike $"
+dnl "$Id: cups-common.m4 5354 2006-03-29 20:55:15Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -79,9 +79,10 @@ fi
 
 dnl Static library option...
 INSTALLSTATIC=""
-AC_ARG_ENABLE(install_static, [  --enable-static         install static libraries, default=no])
+AC_ARG_ENABLE(static, [  --enable-static         install static libraries, default=no])
 
-if test x$enable_install_static = xyes; then
+if test x$enable_static = xyes; then
+	echo Installing static libraries...
 	INSTALLSTATIC="installstatic"
 fi
 
@@ -264,5 +265,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 5288 2006-03-14 02:38:07Z mike $".
+dnl End of "$Id: cups-common.m4 5354 2006-03-29 20:55:15Z mike $".
 dnl

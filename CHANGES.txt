@@ -1,5 +1,41 @@
-CHANGES.txt - 2006-03-24
+CHANGES.txt - 2006-04-03
 ------------------------
+
+CHANGES IN CUPS V1.2
+
+	- The PostScript filter now handles files that start with
+	  an incomplete PJL header (PR #6076)
+	- The web interface language selection code did not try
+	  the generic language localization (STR #1531)
+	- The language cache, string pool, and transcoding caches
+	  are now process global instead of per-thread to avoid
+	  problems with GNOME and to allow for data sharing
+	  between threads (STR #1530)
+	- Fixed a CUPS 1.1.x compatibility bug (STR #1528)
+	- The web interface redirection after certain printer
+	  administration tasks was broken (STR #1516)
+	- Web interface authorization could get stuck (STR #1512)
+	- Localization updates (STR #1513, STR #1518, STR #1520)
+	- The pstops filter didn't work with some files (STR
+	  #1523)
+	- "./configure --enable-static" didn't work (STR #1522)
+	- The scheduler was not using the configured default
+	  Group (STR #1521)
+	- The web interface still did not show the localized time
+	  and date for some locales and systems (STR #1509)
+	- httpAddrGetList() would crash on systems without
+	  getaddrinfo().
+	- Socket URIs without a trailing slash would cause the
+	  port number to not be accepted (STR #1519)
+	- Local raw and System V printers were not advertised as
+	  such for printer browsing (STR #1502)
+	- The RPM spec file incorrectly put duplicate copies of
+	  the Japanese and Spanish web interface templates in the
+	  main cups package (STR #1517)
+	- cupsSetDests() did not explicitly set the permissions
+	  of the /etc/cups/lpoptions file (STR #1508)
+	- The lpq command crashed with the -h option (STR #1515)
+
 
 CHANGES IN CUPS V1.2rc1
 

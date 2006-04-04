@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5335 2006-03-24 02:56:20Z mike $"
+ * "$Id: client.c 5367 2006-04-02 19:00:00Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -957,7 +957,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       else
         snprintf(locale, sizeof(locale), "%s.%s",
 	         con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], DefaultCharset);
-        
+
       con->language = cupsLangGet(locale);
     }
     else
@@ -2246,7 +2246,11 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    */
 
             if (!strncasecmp(buf, "Location:", 9))
+	    {
   	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL);
+	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
+		return (0);
+	    }
 	    else if (!strncasecmp(buf, "Status:", 7))
   	      cupsdSendError(con, atoi(buf + 7));
 	    else
@@ -2826,9 +2830,9 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
     else
       return (NULL);
   }
-  else if (con->language != NULL)
+  else if (con->language)
     snprintf(filename, len, "%s/%s%s", DocumentRoot, con->language->language,
-            con->uri);
+             con->uri);
   else
     snprintf(filename, len, "%s%s", DocumentRoot, con->uri);
 
@@ -2840,16 +2844,30 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   * then fallback to the default one...
   */
 
-  if ((status = stat(filename, filestats)) != 0 && con->language != NULL)
+  if ((status = stat(filename, filestats)) != 0 && con->language &&
+      strncmp(con->uri, "/ppd/", 5) &&
+      strncmp(con->uri, "/admin/conf/", 12) &&
+      strncmp(con->uri, "/admin/log/", 11))
   {
    /*
-    * Drop the language prefix and try the current directory...
+    * Drop the country code...
     */
 
-    if (strncmp(con->uri, "/ppd/", 5) &&
-        strncmp(con->uri, "/admin/conf/", 12) &&
-        strncmp(con->uri, "/admin/log/", 11))
+    char	ll[3];			/* Short language name */
+
+
+    strlcpy(ll, con->language->language, sizeof(ll));
+    snprintf(filename, len, "%s/%s%s", DocumentRoot, ll, con->uri);
+
+    if ((ptr = strchr(filename, '?')) != NULL)
+      *ptr = '\0';
+
+    if ((status = stat(filename, filestats)) != 0)
     {
+     /*
+      * Drop the language prefix and try the root directory...
+      */
+
       snprintf(filename, len, "%s%s", DocumentRoot, con->uri);
 
       if ((ptr = strchr(filename, '?')) != NULL)
@@ -3787,5 +3805,5 @@ send_file(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5335 2006-03-24 02:56:20Z mike $".
+ * End of "$Id: client.c 5367 2006-04-02 19:00:00Z mike $".
  */

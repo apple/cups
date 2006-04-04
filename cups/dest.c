@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c 5182 2006-02-26 04:10:27Z mike $"
+ * "$Id: dest.c 5346 2006-03-28 16:05:19Z mike $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -531,6 +531,16 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
     return (-1);
   }
 
+#ifndef WIN32
+ /*
+  * Set the permissions to 0644 when saving to the /etc/cups/lpoptions
+  * file...
+  */
+
+  if (!getuid())
+    fchmod(fileno(fp), 0644);
+#endif /* !WIN32 */
+
  /*
   * Write each printer; each line looks like:
   *
@@ -998,5 +1008,5 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: dest.c 5182 2006-02-26 04:10:27Z mike $".
+ * End of "$Id: dest.c 5346 2006-03-28 16:05:19Z mike $".
  */

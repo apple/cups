@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 5326 2006-03-23 19:33:35Z mike $"
+ * "$Id: pstops.c 5369 2006-04-03 15:09:58Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -307,9 +307,12 @@ main(int  argc,				/* I - Number of command-line args */
 
     fputs("DEBUG: Skipping PJL header...\n", stderr);
 
-    while (strstr(line, "ENTER LANGUAGE") == NULL)
+    while (strstr(line, "ENTER LANGUAGE") == NULL && strncmp(line, "%!", 2))
       if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
         break;
+
+    if (!strncmp(line, "%!", 2))
+      break;
 
     if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
       break;
@@ -590,6 +593,12 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     {
       if (saw_bounding_box)
         fputs("ERROR: Duplicate %%BoundingBox: comment seen!\n", stderr);
+      else if (strstr(line + 14, "(atend)"))
+      {
+       /*
+        * Do nothing for now but use the default imageable area...
+	*/
+      }
       else if (sscanf(line + 14, "%d%d%d%d", doc->bounding_box + 0,
 	              doc->bounding_box + 1, doc->bounding_box + 2,
 		      doc->bounding_box + 3) != 4)
@@ -738,14 +747,26 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   */
 
   fprintf(stderr, "DEBUG: Before copy_prolog - %s", line);
-  copy_prolog(fp, doc, ppd, line, linelen, linesize);
+  linelen = copy_prolog(fp, doc, ppd, line, linelen, linesize);
 
  /*
   * Then the document setup section...
   */
 
   fprintf(stderr, "DEBUG: Before copy_setup - %s", line);
-  copy_setup(fp, doc, ppd, line, linelen, linesize);
+  linelen = copy_setup(fp, doc, ppd, line, linelen, linesize);
+
+ /*
+  * Copy until we see %%Page:...
+  */
+
+  while (strncmp(line, "%%Page:", 7) && strncmp(line, "%%Trailer", 9))
+  {
+    fwrite(line, 1, linelen, stdout);
+
+    if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
+      break;
+  }
 
  /*
   * Then process pages until we have no more...
@@ -778,9 +799,9 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   {
     pageinfo = (pstops_page_t *)cupsArrayLast(doc->pages);
 
-    start_nup(doc, doc->number_up - 1, 0, doc->bounding_box);
+    start_nup(doc, doc->number_up, 0, doc->bounding_box);
     doc_puts(doc, "showpage\n");
-    end_nup(doc, doc->number_up - 1);
+    end_nup(doc, doc->number_up);
 
     pageinfo->length = cupsFileTell(doc->temp) - pageinfo->offset;
   }
@@ -802,9 +823,9 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
       printf("%%%%Page: (filler) %d\n", doc->page);
     }
 
-    start_nup(doc, doc->number_up - 1, 0, doc->bounding_box);
+    start_nup(doc, doc->number_up, 0, doc->bounding_box);
     doc_puts(doc, "showpage\n");
-    end_nup(doc, doc->number_up - 1);
+    end_nup(doc, doc->number_up);
 
     pageinfo->length = cupsFileTell(doc->temp) - pageinfo->offset;
   }
@@ -1368,7 +1389,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   {
     if (level == 0 &&
         (!strncmp(line, "%%Page:", 7) ||
-	 !strncmp(line, "%%Trailer:", 10) ||
+	 !strncmp(line, "%%Trailer", 9) ||
 	 !strncmp(line, "%%EOF", 5)))
       break;
     else if (!strncmp(line, "%%BeginDocument", 15) ||
@@ -2400,7 +2421,7 @@ skip_page(cups_file_t *fp,		/* I - File to read from */
   while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
   {
     if (level == 0 &&
-        (!strncmp(line, "%%Page:", 7) || !strncmp(line, "%%Trailer:", 10)))
+        (!strncmp(line, "%%Page:", 7) || !strncmp(line, "%%Trailer", 9)))
       break;
     else if (!strncmp(line, "%%BeginDocument", 15) ||
 	     !strncmp(line, "%ADO_BeginApplication", 21))
@@ -2870,5 +2891,5 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 5326 2006-03-23 19:33:35Z mike $".
+ * End of "$Id: pstops.c 5369 2006-04-03 15:09:58Z mike $".
  */

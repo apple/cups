@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h 5238 2006-03-07 04:41:42Z mike $"
+ * "$Id: string.h 5366 2006-04-02 16:11:04Z mike $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -131,6 +131,7 @@ extern int	_cups_vsnprintf(char *, size_t, const char *, va_list);
  */
 
 extern char	*_cupsStrAlloc(const char *s);
+extern void	_cupsStrFlush(void);
 extern void	_cupsStrFree(const char *s);
 extern size_t	_cupsStrStatistics(size_t *alloc_bytes, size_t *total_bytes);
 
@@ -156,5 +157,5 @@ extern double	_cupsStrScand(const char *buf, char **bufptr,
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h 5238 2006-03-07 04:41:42Z mike $".
+ * End of "$Id: string.h 5366 2006-04-02 16:11:04Z mike $".
  */

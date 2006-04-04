@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 5289 2006-03-14 11:54:45Z mike $"
+ * "$Id: conf.c 5353 2006-03-29 20:31:58Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -338,22 +338,34 @@ cupsdReadConfiguration(void)
   endpwent();
 
  /*
-  * Find the default group (nobody)...
+  * Find the default group...
   */
 
-  group = getgrnam("nobody");
+  group = getgrnam(CUPS_DEFAULT_GROUP);
   endgrent();
 
-  if (group != NULL)
+  if (group)
     Group = group->gr_gid;
   else
   {
    /*
-    * Use the (historical) NFS nobody group ID (-2 as a 16-bit twos-
-    * complement number...)
+    * Fallback to group "nobody"...
     */
 
-    Group = 65534;
+    group = getgrnam("nobody");
+    endgrent();
+
+    if (group)
+      Group = group->gr_gid;
+    else
+    {
+     /*
+      * Use the (historical) NFS nobody group ID (-2 as a 16-bit twos-
+      * complement number...)
+      */
+
+      Group = 65534;
+    }
   }
 
  /*
@@ -3239,5 +3251,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 5289 2006-03-14 11:54:45Z mike $".
+ * End of "$Id: conf.c 5353 2006-03-29 20:31:58Z mike $".
  */
