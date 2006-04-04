@@ -212,11 +212,11 @@ d 0755 root sys $SERVERBIN/driver -
 d 0755 root sys $SERVERBIN/filter -
 f 0755 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
 f 0755 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
-%if $IMGFILTERS
+%if IMGFILTERS
 f 0755 root sys $SERVERBIN/filter/imagetops filter/imagetops
 f 0755 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
 %endif
-%if $PDFTOPS
+%if PDFTOPS
 f 0755 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
 %endif
 f 0755 root sys $SERVERBIN/filter/pstops filter/pstops
@@ -424,7 +424,7 @@ f 0644 root sys $INCLUDEDIR/cups/md5.h cups/md5.h
 f 0644 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
 f 0644 root sys $INCLUDEDIR/cups/raster.h filter/raster.h
 
-%if $INSTALLSTATIC
+%if INSTALLSTATIC
 f 0644 root sys $LIBDIR/libcups.a cups/libcups.a
 f 0644 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
 %endif
