@@ -126,6 +126,7 @@
 *OpenUI IntOption/Integer: PickOne
 *OrderDependency: 10 AnySetup *IntOption
 *DefaultIntOption: None
+*IntOption None: ""
 *IntOption 1: "IntOption=1"
 *IntOption 2: "IntOption=2"
 *IntOption 3: "IntOption=3"
@@ -137,6 +138,7 @@
 *OpenUI StringOption/String: PickOne
 *OrderDependency: 10 AnySetup *StringOption
 *DefaultStringOption: None
+*StringOption None: ""
 *StringOption foo: "StringOption=foo"
 *StringOption bar: "StringOption=bar"
 *CloseUI: *StringOption
