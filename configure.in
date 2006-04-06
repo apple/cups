@@ -26,7 +26,6 @@ AC_INIT(cups/cups.h)
 
 sinclude(config-scripts/cups-opsys.m4)
 sinclude(config-scripts/cups-common.m4)
-sinclude(config-scripts/cups-defaults.m4)
 sinclude(config-scripts/cups-directories.m4)
 sinclude(config-scripts/cups-manpages.m4)
 
@@ -43,6 +42,7 @@ sinclude(config-scripts/cups-pam.m4)
 sinclude(config-scripts/cups-threads.m4)
 sinclude(config-scripts/cups-largefile.m4)
 sinclude(config-scripts/cups-launchd.m4)
+sinclude(config-scripts/cups-defaults.m4)
 sinclude(config-scripts/cups-pdf.m4)
 sinclude(config-scripts/cups-scripting.m4)
 
