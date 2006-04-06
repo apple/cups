@@ -3,6 +3,8 @@ CHANGES.txt - 2006-04-06
 
 CHANGES IN CUPS V1.2
 
+	- The scheduler now recognizes PostScript files with PJL
+	  commands that do not include an ENTER LANGUAGE command.
 	- Added --with-printcap configure option.
 	- 64-bit SSL fixes for MacOS X.
 	- The scheduler didn't send some printer state change
