@@ -68,11 +68,10 @@ cupsdInitEnv(void)
 
 #if defined(__APPLE__)
  /*
-  * Add special voodoo magic for MacOS X 10.4 and later - this allows MacOS
-  * X programs to access their bundle resources properly...
+  * Add special voodoo magic for MacOS X - this allows MacOS X 
+  * programs to access their bundle resources properly...
   *
-  * This string is replaced in cupsdStartProcess() when we are running on
-  * versions of MacOS X prior to 10.4...
+  * This string is replaced in cupsdStartProcess()...
   */
 
   cupsdSetString(common_env, "<CFProcessPath>");

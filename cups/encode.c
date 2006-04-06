@@ -364,7 +364,7 @@ cupsEncodeOptions2(
     * Copy the name over...
     */
 
-    if ((attr->name = strdup(option->name)) == NULL)
+    if ((attr->name = _cupsStrAlloc(option->name)) == NULL)
     {
      /*
       * Ran out of memory!
@@ -515,14 +515,14 @@ cupsEncodeOptions2(
 	    */
 
             attr->values[j].unknown.length = strlen(val);
-	    attr->values[j].unknown.data   = strdup(val);
+	    attr->values[j].unknown.data   = _cupsStrAlloc(val);
 
             DEBUG_printf(("cupsEncodeOptions2: Added octet-string value \"%s\"...\n",
 	                  attr->values[j].unknown.data));
             break;
 
 	default :
-            if ((attr->values[j].string.text = strdup(val)) == NULL)
+            if ((attr->values[j].string.text = _cupsStrAlloc(val)) == NULL)
 	    {
 	     /*
 	      * Ran out of memory!
@@ -537,6 +537,9 @@ cupsEncodeOptions2(
             break;
       }
     }
+
+    if (copy)
+      free(copy);
   }
 }
 

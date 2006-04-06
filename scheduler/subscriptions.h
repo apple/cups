@@ -136,8 +136,6 @@ VAR int		MaxEvents VALUE(100),	/* Maximum number of events */
 VAR cupsd_event_t **Events VALUE(NULL);	/* Active events */
 
 VAR unsigned	LastEvent VALUE(0);	/* Last events processed */
-VAR time_t	LastEventTime VALUE(0);	/* Time that the last events were sent */
-
 VAR int		NotifierPipes[2] VALUE2(-1, -1);
 					/* Pipes for notifier error/debug output */
 VAR cupsd_statbuf_t *NotifierStatusBuffer VALUE(NULL);

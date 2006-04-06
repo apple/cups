@@ -56,6 +56,7 @@
  */
 
 #include "common.h"
+#include <limits.h>
 #include <math.h>
 #include <cups/file.h>
 #include <cups/array.h>

@@ -2474,6 +2474,8 @@ check_if_modified(
       while (*ptr != '\0' && *ptr != ';')
         ptr ++;
     }
+    else
+      ptr ++;
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -2616,11 +2618,13 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   return (1);
 
 #  elif defined(HAVE_CDSASSL)
-  OSStatus	error;			/* Error info */
-  SSLContextRef	conn;			/* New connection */
-  CFArrayRef	certificatesArray;	/* Array containing certificates */
-  int		allowExpired;		/* Allow expired certificates? */
-  int		allowAnyRoot;		/* Allow any root certificate? */
+  OSStatus		error;		/* Error info */
+  SSLContextRef		conn;		/* New connection */
+  CFArrayRef		certificatesArray;
+					/* Array containing certificates */
+  int			allowExpired;	/* Allow expired certificates? */
+  int			allowAnyRoot;	/* Allow any root certificate? */
+  cdsa_conn_ref_t	u;		/* Connection reference union */
 
 
   conn         = NULL;
@@ -2645,12 +2649,23 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     error = SSLSetProtocolVersion(conn, kSSLProtocol3);
 
   if (!error)
-    error = SSLSetConnection(conn, (SSLConnectionRef)con->http.fd);
+  {
+   /*
+    * Use a union to resolve warnings about int/pointer size mismatches...
+    */
+
+    u.connection = NULL;
+    u.sock       = con->http.fd;
+    error        = SSLSetConnection(conn, u.connection);
+  }
 
   if (!error)
     error = SSLSetPeerDomainName(conn, ServerName, strlen(ServerName) + 1);
 
-  /* have to do these options before setting server certs */
+ /*
+  * Have to set these options before setting server certs...
+  */
+
   if (!error && allowExpired)
     error = SSLSetAllowsExpiredCerts(conn, true);
 

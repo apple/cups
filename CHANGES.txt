@@ -1,8 +1,15 @@
-CHANGES.txt - 2006-04-03
+CHANGES.txt - 2006-04-06
 ------------------------
 
 CHANGES IN CUPS V1.2
 
+	- Added --with-printcap configure option.
+	- 64-bit SSL fixes for MacOS X.
+	- The scheduler didn't send some printer state change
+	  events.
+	- The scheduler didn't send jobs to busy remote printers.
+	- Fixed some problems with the launchd support.
+	- Added new USB printer backend for MacOS X.
 	- The PostScript filter now handles files that start with
 	  an incomplete PJL header (PR #6076)
 	- The web interface language selection code did not try

@@ -31,7 +31,6 @@
  *   cupsLangEncoding()     - Return the character encoding (us-ascii, etc.)
  *                            for the given language.
  *   cupsLangFlush()        - Flush all language data out of the cache.
- *   _cupsLangFlush()       - Flush all language data out of the cache.
  *   cupsLangFree()         - Free language data.
  *   cupsLangGet()          - Get a language.
  *   _cupsLangString()      - Get a message string.

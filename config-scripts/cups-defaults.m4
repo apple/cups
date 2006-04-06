@@ -111,13 +111,21 @@ AC_SUBST(CUPS_IMPLICIT_CLASSES)
 
 dnl Default UseNetworkDefault
 AC_ARG_ENABLE(network_default, [  --enable-use-network-default
-                          enable UseNetworkDefault by default, default=yes])
-if test "x$enable_network_default" = xno; then
+                          enable UseNetworkDefault by default, default=auto])
+if test "x$enable_network_default" != xno; then
+	AC_MSG_CHECKING(whether to use network default printers)
+	if test "x$enable_network_default" = xyes -o $uname != Darwin; then
+		CUPS_USE_NETWORK_DEFAULT="Yes"
+		AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 1)
+		AC_MSG_RESULT(yes)
+	else
+		CUPS_USE_NETWORK_DEFAULT="No"
+		AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 0)
+		AC_MSG_RESULT(no)
+	fi
+else
 	CUPS_USE_NETWORK_DEFAULT="No"
 	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 0)
-else
-	CUPS_USE_NETWORK_DEFAULT="Yes"
-	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 1)
 fi
 AC_SUBST(CUPS_USE_NETWORK_DEFAULT)
 
@@ -148,12 +156,7 @@ AC_ARG_WITH(cups-group, [  --with-cups-group       set default group for CUPS],
 	CUPS_GROUP="$withval",
 	AC_MSG_CHECKING(for default print group)
 	if test -f /etc/group; then
-		if test x$uname = xDarwin; then
-			GROUP_LIST="nobody"
-		else
-			GROUP_LIST="lp nobody"
-		fi
-
+		GROUP_LIST="lp nobody"
 		CUPS_GROUP=""
 		for group in $GROUP_LIST; do
 			if test "`grep \^${group}: /etc/group`" != ""; then
@@ -215,6 +218,22 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USER, "$CUPS_USER")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SYSTEM_GROUPS, "$CUPS_SYSTEM_GROUPS")
 
+dnl Default printcap file...
+AC_ARG_WITH(printcap, [  --with-printcap     set default printcap file],
+	default_printcap="$withval",
+	default_printcap="/etc/printcap")
+
+if test x$enable_printcap != xno -a x$default_printcap != xno; then
+	if test "x$default_printcap" = "x/etc/printcap" -a "$uname" = "Darwin" -a $uversion -ge 90; then
+		CUPS_DEFAULT_PRINTCAP=""
+	else
+		CUPS_DEFAULT_PRINTCAP="$default_printcap"
+	fi
+else
+	CUPS_DEFAULT_PRINTCAP=""
+fi
+
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTCAP, "$CUPS_DEFAULT_PRINTCAP")
 
 dnl
 dnl End of "$Id$".

@@ -1012,7 +1012,7 @@ main(int  argc,				/* I - Number of command-line args */
     * accumulated.  Don't send these more than once a second...
     */
 
-    if (LastEvent && (time(NULL) - LastEventTime) > 1)
+    if (LastEvent)
     {
 #ifdef HAVE_NOTIFY_POST
       if (LastEvent & CUPSD_EVENT_PRINTER_CHANGED)
@@ -1040,10 +1040,9 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_NOTIFY_POST */
 
      /*
-      * Reset the accumulated events and notification time...
+      * Reset the accumulated events...
       */
 
-      LastEventTime = time(NULL);
       LastEvent     = CUPSD_EVENT_NONE;
     }
   }
@@ -1315,12 +1314,10 @@ launchd_checkin(void)
 			ld_resp,	/* Launch data response */
 			ld_array,	/* Launch data array */
 			ld_sockets,	/* Launch data sockets dictionary */
-			ld_runatload,	/* Run-at-load setting */
 			tmp;		/* Launch data */
   cupsd_listener_t	*lis;		/* Listeners array */
   http_addr_t		addr;		/* Address variable */
   socklen_t		addrlen;	/* Length of address */
-  bool			runatload;	/* Run-at-load setting value */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: pid=%d", (int)getpid());
@@ -1345,26 +1342,6 @@ launchd_checkin(void)
                     strerror(errno));
     exit(EXIT_FAILURE);
   }
-
- /*
-  * Get the "run-at-load" setting...
-  */
-
-  if ((ld_runatload =
-           launch_data_dict_lookup(ld_resp, LAUNCH_JOBKEY_RUNATLOAD)) != NULL &&
-      launch_data_get_type(ld_runatload) == LAUNCH_DATA_BOOL)
-    runatload = launch_data_get_bool(ld_runatload);
-  else
-  {
-    errno = launch_data_get_errno(ld_resp);
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "launchd_checkin: Unable to find Run-at-load setting: %s",
-                    strerror(errno));
-    exit(EXIT_FAILURE);
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: Run-at-load=%s",
-                  runatload ? "true" : "false");
 
  /*
   * Get the sockets dictionary...
@@ -1459,18 +1436,22 @@ launchd_checkin(void)
   {
     if (launch_data_get_type(ld_array) == LAUNCH_DATA_ARRAY)
     {
-      tmp = launch_data_array_get_index(ld_array, 0);
-
-      if (launch_data_get_type(tmp) == LAUNCH_DATA_FD)
+      if ((tmp = launch_data_array_get_index(ld_array, 0)))
       {
-        if (BrowseSocket != -1)
-	  close(BrowseSocket);
-
-	BrowseSocket = launch_data_get_fd(tmp);
-      }
-      else
-	cupsdLogMessage(CUPSD_LOG_WARN,
-	                "launchd_checkin: BrowseSocket not a fd!");
+	if (launch_data_get_type(tmp) == LAUNCH_DATA_FD)
+	{
+	  if (BrowseSocket != -1)
+	    close(BrowseSocket);
+  
+	  BrowseSocket = launch_data_get_fd(tmp);
+	}
+	else
+	  cupsdLogMessage(CUPSD_LOG_WARN,
+			  "launchd_checkin: BrowseSocket not a fd!");
+     }
+     else
+       cupsdLogMessage(CUPSD_LOG_WARN,
+		       "launchd_checkin: BrowseSockets is an empty array!");
    }
    else
      cupsdLogMessage(CUPSD_LOG_WARN,
@@ -2105,13 +2086,6 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   */
 
   if (fds || cupsArrayCount(Clients) > 50)
-    return (1);
-
- /*
-  * If we had a recent event notification, timeout in 1 second...
-  */
-
-  if (LastEvent)
     return (1);
 
  /*

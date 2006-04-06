@@ -243,6 +243,7 @@ cupsdReadConfiguration(void)
   if (NumBrowsers > 0)
   {
     free(Browsers);
+    Browsers = NULL;
 
     NumBrowsers = 0;
   }
@@ -281,7 +282,7 @@ cupsdReadConfiguration(void)
   cupsdSetString(&AccessLog, CUPS_LOGDIR "/access_log");
   cupsdSetString(&ErrorLog, CUPS_LOGDIR "/error_log");
   cupsdSetString(&PageLog, CUPS_LOGDIR "/page_log");
-  cupsdSetString(&Printcap, "/etc/printcap");
+  cupsdSetString(&Printcap, CUPS_DEFAULT_PRINTCAP);
   cupsdSetString(&PrintcapGUI, "/usr/bin/glpoptions");
   cupsdSetString(&FontPath, CUPS_FONTPATH);
   cupsdSetString(&RemoteRoot, "remroot");

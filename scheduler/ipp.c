@@ -8811,11 +8811,19 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
   cupsdStartPrinter(printer, 1);
 
   if (dtype & CUPS_PRINTER_CLASS)
+  {
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" started by \"%s\".", name,
                     get_username(con));
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
+                  "Class \"%s\" started by \"%s\".", name, get_username(con));
+  }
   else
+  {
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" started by \"%s\".", name,
                     get_username(con));
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
+                  "Printer \"%s\" started by \"%s\".", name, get_username(con));
+  }
 
   cupsdCheckJobs();
 
@@ -8899,11 +8907,19 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
   cupsdStopPrinter(printer, 1);
 
   if (dtype & CUPS_PRINTER_CLASS)
+  {
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" stopped by \"%s\".", name,
                     get_username(con));
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
+                  "Class \"%s\" stopped by \"%s\".", name, get_username(con));
+  }
   else
+  {
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" stopped by \"%s\".", name,
                     get_username(con));
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
+                  "Printer \"%s\" stopped by \"%s\".", name, get_username(con));
+  }
 
  /*
   * Everything was ok, so return OK status...

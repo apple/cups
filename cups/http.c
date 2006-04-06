@@ -1388,11 +1388,15 @@ _httpReadCDSA(
     void             *data,		/* I  - Data buffer */
     size_t           *dataLength)	/* IO - Number of bytes */
 {
-  OSStatus	result;			/* Return value */
-  ssize_t	bytes;			/* Number of bytes read */
+  OSStatus	  result;		/* Return value */
+  ssize_t	  bytes;		/* Number of bytes read */
+  cdsa_conn_ref_t u;			/* Connection reference union */
+
+
+  u.connection = connection;
 
   do
-    bytes = recv((int)connection, data, *dataLength, 0);
+    bytes = recv(u.sock, data, *dataLength, 0);
   while (bytes == -1 && errno == EINTR);
 
   if (bytes == *dataLength)
@@ -1962,11 +1966,15 @@ _httpWriteCDSA(
     const void       *data,		/* I  - Data buffer */
     size_t           *dataLength)	/* IO - Number of bytes */
 {
-  OSStatus	result;			/* Return value */
-  ssize_t	bytes;			/* Number of bytes read */
+  OSStatus	  result;		/* Return value */
+  ssize_t	  bytes;		/* Number of bytes read */
+  cdsa_conn_ref_t u;			/* Connection reference union */
+
+
+  u.connection = connection;
 
   do
-    bytes = write((int)connection, data, *dataLength);
+    bytes = write(u.sock, data, *dataLength);
   while (bytes == -1 && errno == EINTR);
 
   if (bytes == *dataLength)
@@ -2295,13 +2303,24 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   conn->credentials = credentials;
 
 #  elif defined(HAVE_CDSASSL)
+  cdsa_conn_ref_t  u;			/* Connection reference union */
+
+
   error = SSLNewContext(false, &conn);
 
   if (!error)
     error = SSLSetIOFuncs(conn, _httpReadCDSA, _httpWriteCDSA);
 
   if (!error)
-    error = SSLSetConnection(conn, (SSLConnectionRef)http->fd);
+  {
+   /*
+    * Use a union to resolve warnings about int/pointer size mismatches...
+    */
+
+    u.connection = NULL;
+    u.sock       = http->fd;
+    error        = SSLSetConnection(conn, u.connection);
+  }
 
   if (!error)
     error = SSLSetAllowsExpiredCerts(conn, true);

@@ -175,6 +175,9 @@ globals_destructor(void *value)		/* I - Data to free */
   for (i = 0; i < 3; i ++)
     cupsFileClose(cg->stdio_files[i]);
 
+  if (cg->last_status_message)
+    free(cg->last_status_message);
+
   cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
 
   free(value);

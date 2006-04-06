@@ -1,68 +1,50 @@
 /*
  * "$Id$"
  *
- *   USB port on Darwin backend for the Common UNIX Printing System (CUPS).
+ * © Copyright 2005-2006 Apple Computer, Inc. All rights reserved.
  *
- *   This file is included from "usb.c" when compiled on MacOS X or Darwin.
+ * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
+ * Inc. ("Apple") in consideration of your agreement to the following
+ * terms, and your use, installation, modification or redistribution of
+ * this Apple software constitutes acceptance of these terms.  If you do
+ * not agree with these terms, please do not use, install, modify or
+ * redistribute this Apple software.
  *
- *   Copyright 2004 Apple Computer, Inc. All rights reserved.
+ * In consideration of your agreement to abide by the following terms, and
+ * subject to these terms, Apple grants you a personal, non-exclusive
+ * license, under Apple's copyrights in this original Apple software (the
+ * "Apple Software"), to use, reproduce, modify and redistribute the Apple
+ * Software, with or without modifications, in source and/or binary forms;
+ * provided that if you redistribute the Apple Software in its entirety and
+ * without modifications, you must retain this notice and the following
+ * text and disclaimers in all such redistributions of the Apple Software. 
+ * Neither the name, trademarks, service marks or logos of Apple Computer,
+ * Inc. may be used to endorse or promote products derived from the Apple
+ * Software without specific prior written permission from Apple.  Except
+ * as expressly stated in this notice, no other rights or licenses, express
+ * or implied, are granted by Apple herein, including but not limited to
+ * any patent rights that may be infringed by your derivative works or by
+ * other works in which the Apple Software may be incorporated.
  *
- *   IMPORTANT:	 This Apple software is supplied to you by Apple Computer,
- *   Inc. ("Apple") in consideration of your agreement to the following
- *   terms, and your use, installation, modification or redistribution of
- *   this Apple software constitutes acceptance of these terms.	 If you do
- *   not agree with these terms, please do not use, install, modify or
- *   redistribute this Apple software.
+ * The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
+ * MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
+ * THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
+ * OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
  *
- *   In consideration of your agreement to abide by the following terms, and
- *   subject to these terms, Apple grants you a personal, non-exclusive
- *   license, under Apple/s copyrights in this original Apple software (the
- *   "Apple Software"), to use, reproduce, modify and redistribute the Apple
- *   Software, with or without modifications, in source and/or binary forms;
- *   provided that if you redistribute the Apple Software in its entirety and
- *   without modifications, you must retain this notice and the following
- *   text and disclaimers in all such redistributions of the Apple Software. 
- *   Neither the name, trademarks, service marks or logos of Apple Computer,
- *   Inc. may be used to endorse or promote products derived from the Apple
- *   Software without specific prior written permission from Apple.  Except
- *   as expressly stated in this notice, no other rights or licenses, express
- *   or implied, are granted by Apple herein, including but not limited to
- *   any patent rights that may be infringed by your derivative works or by
- *   other works in which the Apple Software may be incorporated.
- *
- *   The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
- *   MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
- *   THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
- *   FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
- *   OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
- *
- *   IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
- *   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- *   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- *   INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION,
- *   MODIFICATION AND/OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED
- *   AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
- *   STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
- *   POSSIBILITY OF SUCH DAMAGE.
- *
- * Contents:
- *
- *   print_device() - Send a file to the specified USB port.
- *   list_devices() - List all USB devices.
+ * IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION,
+ * MODIFICATION AND/OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED
+ * AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
+ * STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * Include necessary headers...
+ *   USB port on Darwin backend for the Common UNIX Printing System (CUPS).
  */
-
-#include <CoreFoundation/CoreFoundation.h>
-#include <ApplicationServices/ApplicationServices.h>
-
-#include <IOKit/usb/IOUSBLib.h>
-#include <IOKit/IOCFPlugIn.h>
-#include <mach/mach.h>	
-#include <mach/mach_error.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -70,1834 +52,1286 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
-#include <pthread.h>		/* Used for writegReadMutex */
+#include <sys/sysctl.h>
+#include <libgen.h>
+#include <mach/mach.h>	
+#include <mach/mach_error.h>
+#include <mach/mach_time.h>
+#include <cups/debug.h>
 
-#ifndef kPMPrinterURI
-#  define kPMPrinterURI CFSTR("Printer URI")
-#endif
+#include <CoreFoundation/CoreFoundation.h>
+#include <IOKit/usb/IOUSBLib.h>
+#include <IOKit/IOCFPlugIn.h>
 
-/*
- * Panther/10.3 kIOUSBInterfaceInterfaceID190
- * Jaguar/10.2 kIOUSBInterfaceInterfaceID182
+#include <pthread.h>
+
+/* 
+ * WAITEOF_DELAY is number of seconds we'll wait for responses from
+ * the printer after we've finished sending all the data 
  */
+#define WAITEOF_DELAY			7
+#define DEFAULT_TIMEOUT			60L
 
-#define USB_INTERFACE_KIND  CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID190)
-#define kUSBLanguageEnglish 0x409
+#define	USB_INTERFACE_KIND		CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID190)
+#define kUSBLanguageEnglish		0x409
 
-/*
- * Section 5.3 USB Printing Class spec
- */
-
-#define kUSBPrintingSubclass		1
-#define kUSBPrintingProtocolNoOpen	0
-#define kUSBPrintingProtocolUnidirectional  1
-#define kUSBPrintingProtocolBidirectional   2
-
-#define kUSBPrintClassGetDeviceID	0
-#define kUSBPrintClassGetCentronicsStatus   1
-#define kUSBPrintClassSoftReset		2
-
-/*
- *  Apple MacOS X printer-class plugins
- */
-
-#define kUSBPrinterClassTypeID		(CFUUIDGetConstantUUIDWithBytes(NULL, 0x06, 0x04, 0x7D, 0x16, 0x53, 0xA2, 0x11, 0xD6, 0x92, 0x06, 0x00, 0x30, 0x65, 0x52, 0x45, 0x92))
-
-#define kUSBPrinterClassInterfaceID	(CFUUIDGetConstantUUIDWithBytes(NULL, 0x03, 0x34, 0x6D, 0x74, 0x53, 0xA3, 0x11, 0xD6, 0x9E, 0xA1, 0x76, 0x30, 0x65, 0x52, 0x45, 0x92))
-
-#define kUSBGenericPrinterClassDriver	    CFSTR("/System/Library/Printers/Libraries/USBGenericPrintingClass.plugin")
-#define kUSBGenericTOPrinterClassDriver	    CFSTR("/System/Library/Printers/Libraries/USBGenericTOPrintingClass.plugin")
-
-#define kUSBClassDriverProperty		CFSTR("USB Printing Class")
-#define kUSBPrinterClassDeviceNotOpen	    -9664   /*kPMInvalidIOMContext*/
-
-typedef union
-{
-  char	    b;
-  struct
-  {
-    unsigned	reserved0 : 2;
-    unsigned	paperError : 1;
-    unsigned	select : 1;
-    unsigned	notError : 1;
-    unsigned	reserved1 : 3;
-  } status;
-} CentronicsStatusByte;
-
-typedef struct
-{
-  CFStringRef	manufacturer;	/* manufacturer name */
-  CFStringRef	product;	/* product name */
-  CFStringRef	compatible;	/* compatible product name */
-  CFStringRef	serial;		/* serial number */
-  CFStringRef	command;	/* command set */
-  CFStringRef	ppdURL;		/* url of the selected PPD, if any */
-} USBPrinterAddress;
-
-typedef IOUSBInterfaceInterface190 **USBPrinterInterface;
-
-typedef struct 
-{
-  UInt8	    requestType;
-  UInt8	    request;
-  UInt16    value;
-  UInt16    index;
-  UInt16    length;
-  void	    *buffer;	
-} USBIODeviceRequest;
-
-typedef struct classDriverContext
-{
-  IUNKNOWN_C_GUTS;
-  CFPlugInRef	    plugin;	/* release plugin */
-  IUnknownVTbl	    **factory;	
-  void		*vendorReference;/* vendor class specific usage */
-  UInt32	location;   /* unique location in bus topology */
-  UInt8		interfaceNumber;
-  UInt16	vendorID;
-  UInt16	productID;
-  USBPrinterInterface	interface;  /* identify the device to IOKit */
-  UInt8		outpipe;    /* mandatory bulkOut pipe */
-  UInt8		inpipe;	    /* optional bulkIn pipe */
-  /*
-  **	general class requests
-  */
-  kern_return_t	    (*DeviceRequest)( struct classDriverContext **printer, USBIODeviceRequest *iorequest, UInt16 timeout );
-  kern_return_t (*GetString)( struct classDriverContext **printer, UInt8 whichString, UInt16 language, UInt16 timeout, CFStringRef *result );
-  /*
-  **	standard printer class requests
-  */
-  kern_return_t (*SoftReset)( struct classDriverContext **printer, UInt16 timeout );
-  kern_return_t (*GetCentronicsStatus)( struct classDriverContext **printer, CentronicsStatusByte *result, UInt16 timeout );
-  kern_return_t (*GetDeviceID)( struct classDriverContext **printer, CFStringRef *devid, UInt16 timeout );
-  /*
-  **	standard bulk device requests
-  */
-  kern_return_t	    (*ReadPipe)( struct classDriverContext **printer, UInt8 *buffer, UInt32 *count );
-  kern_return_t	    (*WritePipe)( struct classDriverContext **printer, UInt8 *buffer, UInt32 *count, Boolean eoj );
-  /*
-  **	interface requests
-  */
-  kern_return_t	    (*Open)( struct classDriverContext **printer, UInt32 location, UInt8 protocol );
-  kern_return_t	    (*Abort)( struct classDriverContext **printer );
-  kern_return_t	    (*Close)( struct classDriverContext **printer );
-  /*
-  **	initialize and terminate
-  */
-  kern_return_t	    (*Initialize)( struct classDriverContext **printer, struct classDriverContext **baseclass );
-  kern_return_t	    (*Terminate)( struct classDriverContext **printer );
-} USBPrinterClassContext;
-
-
-typedef struct usbPrinterClassType
-{
-    USBPrinterClassContext  *classdriver;
-    CFUUIDRef		    factoryID;
-    UInt32		    refCount;
-} USBPrinterClassType;
-
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	Constants
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-/*
-    Debugging output to Console
-    DEBUG undefined or
-    DEBUG=0	production code: suppress console output
-
-    DEBUG=1	report errors (non-zero results)
-    DEBUG=2	report all results, generate dumps
-*/
-#if DEBUG==2
-#define DEBUG_ERR(c, x)			    showint(x, c)
-#define DEBUG_DUMP( text, buf, len )	    dump( text, buf, len )
-#define DEBUG_CFString( text, a )	    showcfstring( text, a )
-#define DEBUG_CFCompareString( text, a, b ) cmpcfs( text, a, b )
-#elif DEBUG==1
-#define DEBUG_ERR(c, x)			    if (c) fprintf(stderr, x, c)
-#define DEBUG_DUMP( text, buf, len )
-#define DEBUG_CFString( text, a )
-#define DEBUG_CFCompareString( text, a, b )
-#else
-#define DEBUG_ERR(c, x)
-#define DEBUG_DUMP( text, buf, len )
-#define DEBUG_CFString( text, a )
-#define DEBUG_CFCompareString( text, a, b )
-#endif
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	Type Definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-typedef struct
-{
-    /*
-     *	Tagged/Tranparent Binary Communications Protocol
-     *	TBCP read
-     */
-    Boolean		    tbcpQuoteReads;	    /* enable tbcp on reads */
-    Boolean		    escapeNextRead;	    /* last char of last read buffer was escape */
-    UInt8		    *tbcpReadData;	    /* read buffer */
-    UInt32		    readLength;		    /* read buffer length (all used) */
-    int			    match_endoffset,	    /* partial match of end TBCP sequence */
-			    match_startoffset;	    /* partial match of start TBCP sequence */
-    /*
-     * TBCP write
-     */
-    UInt8		    *tbcpWriteData;	    /* write buffer */
-    UInt32		    tbcpBufferLength,	    /* write buffer allocated length */
-			    tbcpBufferRemaining;    /* write buffer not used */
-
-    Boolean		    sendStatusNextWrite;
-
-} PostScriptData;
-
-typedef struct 
-{
-    CFPlugInRef		    plugin;	    /* valid until plugin is release  */
-    USBPrinterClassContext  **classdriver;  /* usb printer class in user space */
-    CFStringRef		    bundle;	    /* class driver URI */
-    UInt32		    location;	    /* unique location in USB topology */
-    USBPrinterAddress	    address;	    /* topology independent bus address */
-    CFURLRef		    reference;	    /* internal use */
-} USBPrinterInfo;
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	Functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-/*
-**  IOKit to CF functions
-*/
-USBPrinterInfo	    *UsbCopyPrinter( USBPrinterInfo *aPrinter );
-CFMutableArrayRef   UsbGetAllPrinters( void );
-void		    UsbReleasePrinter( USBPrinterInfo *aPrinter );
-void		    UsbReleaseAllPrinters( CFMutableArrayRef printers );
-kern_return_t	    UsbRegistryOpen( USBPrinterAddress *usbAddress, USBPrinterInfo **result );
-kern_return_t	    UsbUnloadClassDriver( USBPrinterInfo *printer );
-kern_return_t	    UsbLoadClassDriver( USBPrinterInfo *printer, CFUUIDRef interfaceID, CFStringRef classDriverBundle );
-CFStringRef	    UsbMakeFullUriAddress( USBPrinterInfo *aPrinter );
-
-int	    UsbSamePrinter( const USBPrinterAddress *lastTime, const USBPrinterAddress *thisTime ); 
-
-OSStatus    UsbGetPrinterAddress( USBPrinterInfo *thePrinter, USBPrinterAddress *address, UInt16 timeout );
-
-
-/*******************************************************************************
-    Contains:	Support IEEE-1284 DeviceID as a CFString.
-
-    Copyright 2000-2005 by Apple Computer, Inc., all rights reserved.
-
-    Description:
-	IEEE-1284 Device ID is referenced in USB and PPDT (1394.3). It allows
-	a computer peripheral to convey information about its required software
-	to the host system.
-	
-	DeviceID is defined as a stream of ASCII bytes, commencing with one 16-bit
-	binary integer in Little-Endian format which describes how many bytes
-	of data are required by the entire DeviceID.
-	
-	The stream of bytes is further characterized as a series of
-	key-value list pairs. In other words each key can be followed by one
-	or more values. Multiple key-value list pairs fill out the DeviceID stream.
-	
-	Some keys are required: COMMAND SET (or CMD), MANUFACTURER (or MFG),
-	and MODEL (or MDL).
-	
-	One needs to read the first two bytes of DeviceID to allocate storage
-	for the complete DeviceID string. Then a second read operation can
-	retrieve the entire string.
-	
-	Often DeviceID is not very large. By allocating a reasonable buffer one
-	can fetch most device's DeviceID string on the first read.
-    
-    A more formal definition of DeviceID.
-
-	<DeviceID> = <Length><Key_ValueList_Pair>+
-
-	<Length> = <low byte of 16 bit integer><high byte of 16 bit integer>
-	<Key_ValueList_Pair> = <Key>:<Value>[,<Value>]*;
-
-	<Key> = <ASCII Byte>+
-	<Value> = <ASCII Byte>+
-	
-	Some keys are defined in the standard. The standard specifies that
-	keys are case sensitive. White space is allowed in the key.
-	
-	The standard does not say that values are case-sensitive.
-	Lexmark is known to ship printers with mixed-case value:
-	    i.e., 'CLASS:Printer'
-
-	Required Keys:
-	    'COMMAND SET' or CMD
-	    MANUFACTURER or MFG
-	    MODEL or MDL
-	
-	Optional Keys:
-	    CLASS
-		Value PRINTER is referenced in the standard.
-		
-	Observed Keys:
-	    SN,SERN
-		Used by Hewlett-Packard for the serial number.
-	
-	
-*******************************************************************************/
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Pragmas
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Constants
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#define kDeviceIDKeyCommand		CFSTR("COMMAND SET:")
-#define kDeviceIDKeyCommandAbbrev	CFSTR( "CMD:" )
-
-#define kDeviceIDKeyManufacturer	CFSTR("MANUFACTURER:")
-#define kDeviceIDKeyManufacturerAbbrev	CFSTR( "MFG:" )
-
-#define kDeviceIDKeyModel		CFSTR("MODEL:")
-#define kDeviceIDKeyModelAbbrev		CFSTR( "MDL:" )
-
-#define kDeviceIDKeySerial		CFSTR("SN:")
-#define kDeviceIDKeySerialAbbrev	CFSTR("SERN:")
-
-#define kDeviceIDKeyCompatible		CFSTR("COMPATIBLITY ID:")
-#define kDeviceIDKeyCompatibleAbbrev	CFSTR("CID:")
-
-/* delimiters */
-#define kDeviceIDKeyValuePairDelimiter	CFSTR(";")
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Type definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Function prototypes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-static CFStringRef CreateEncodedCFString(CFStringRef string);
-static CFRange	DelimitSubstring( CFStringRef stringToSearch, CFStringRef delim, CFRange bounds, CFStringCompareFlags options );
-static void parseOptions(const char *options, char *serial);
-
-CFStringRef
-DeviceIDCreateValueList(    const CFStringRef deviceID,
-			    const CFStringRef abbrevKey,
-			    const CFStringRef key );
-
-static int addPercentEscapes(const unsigned char* src, char* dst, int dstMax);
-static int removePercentEscapes(const char* src, unsigned char* dst, int dstMax);
-
-/* Required to suppress redefinition warnings for these two symbols 
-*/
-#if defined(TCP_NODELAY)
-#undef TCP_NODELAY
-#endif
-#if defined(TCP_MAXSEG)
-#undef TCP_MAXSEG
-#endif
-
-#include <cups/cups.h>
-
-
-#define PRINTER_POLLING_INTERVAL	5   /* seconds */
+#define PRINTER_POLLING_INTERVAL	5				/* seconds */
 #define INITIAL_LOG_INTERVAL		(PRINTER_POLLING_INTERVAL)
 #define SUBSEQUENT_LOG_INTERVAL		(3*INITIAL_LOG_INTERVAL)
 
-/* WAITEOF_DELAY is number of seconds we'll wait for responses from the printer */
-/*  after we've finished sending all the data */
-#define WAITEOF_DELAY		7
+#define kUSBPrinterClassTypeID		(CFUUIDGetConstantUUIDWithBytes(NULL, 0x06, 0x04, 0x7D, 0x16, 0x53, 0xA2, 0x11, 0xD6, 0x92, 0x06, 0x00, 0x30, 0x65, 0x52, 0x45, 0x92))
+#define	kUSBPrinterClassInterfaceID	(CFUUIDGetConstantUUIDWithBytes(NULL, 0x03, 0x34, 0x6D, 0x74, 0x53, 0xA3, 0x11, 0xD6, 0x9E, 0xA1, 0x76, 0x30, 0x65, 0x52, 0x45, 0x92))
 
-#define USB_MAX_STR_SIZE	1024
+#define kUSBClassDriverProperty		CFSTR("USB Printing Class")
 
-
-static volatile int done = 0;
-static int gWaitEOF = false;
-static pthread_cond_t *gReadCompleteConditionPtr = NULL;
-static pthread_mutex_t *gReadMutexPtr = NULL;
+#define kUSBGenericTOPrinterClassDriver	CFSTR("/System/Library/Printers/Libraries/USBGenericTOPrintingClass.plugin")
+#define kUSBPrinterClassDeviceNotOpen	-9664	/*kPMInvalidIOMContext*/
 
 
+#pragma mark -
+/*
+ * Section 5.3 USB Printing Class spec
+ */
+#define kUSBPrintingSubclass			1
+#define kUSBPrintingProtocolNoOpen		0
+#define kUSBPrintingProtocolUnidirectional	1
+#define kUSBPrintingProtocolBidirectional	2
 
-#if DEBUG==2  
+typedef IOUSBInterfaceInterface190	**printer_interface_t;
 
-static char
-hexdigit( char c )
+typedef struct iodevice_request_s		/**** Device request ****/
 {
-    return ( c < 0 || c > 15 )? '?': (c < 10)? c + '0': c - 10 + 'A';
-}
+  UInt8		requestType;			
+  UInt8		request;
+  UInt16	value;
+  UInt16	index;
+  UInt16	length;
+  void		*buffer;	
+} iodevice_request_t;
 
-static char
-asciidigit( char c )
+typedef union {					/**** Centronics status byte ****/
+  char		b;
+  struct {
+    unsigned	reserved0:2;
+    unsigned	paperError:1;
+    unsigned	select:1;
+    unsigned	notError:1;
+    unsigned	reserved1:3;
+  } status;
+} centronics_status_t;
+
+typedef struct classdriver_context_s		/**** Classdriver context ****/
 {
-    return (c< 20 || c > 0x7E)? '.': c;
-}
+  IUNKNOWN_C_GUTS;
+  CFPlugInRef		plugin;			/* release plugin */
+  IUnknownVTbl		**factory;		/* Factory */
+  void			*vendorReference;	/* vendor class specific usage */
+  UInt32		location;		/* unique location in bus topology */
+  UInt8			interfaceNumber;	/* Interface number */
+  UInt16		vendorID;		/* Vendor id */
+  UInt16		productID;		/* Product id */
+  printer_interface_t	interface;		/* identify the device to IOKit */
+  UInt8		  	outpipe;		/* mandatory bulkOut pipe */
+  UInt8			inpipe;			/* optional bulkIn pipe */
 
-void
-dump( char *text, void *s, int len )
-{
-    int i;
-    char *p = (char *) s;
-    char m[1+2*16+1+16+1];
+  /* general class requests */
+  kern_return_t (*DeviceRequest)( struct classdriver_context_s **printer, iodevice_request_t *iorequest, UInt16 timeout );
+  kern_return_t	(*GetString)( struct classdriver_context_s **printer, UInt8 whichString, UInt16 language, UInt16 timeout, CFStringRef *result );
 
-    fprintf( stderr, "%s pointer %x len %d\n", text, (unsigned int) p, len );
+  /* standard printer class requests */
+  kern_return_t	(*SoftReset)( struct classdriver_context_s **printer, UInt16 timeout );
+  kern_return_t	(*GetCentronicsStatus)( struct classdriver_context_s **printer, centronics_status_t *result, UInt16 timeout );
+  kern_return_t	(*GetDeviceID)( struct classdriver_context_s **printer, CFStringRef *devid, UInt16 timeout );
 
-    for ( ; len > 0; len -= 16 )
-    {
-	char *q = p;
-	char *out = m;
-	*out++ = '\t';
-	for ( i = 0; i < 16 && i < len; ++i, ++p )
-	{
-	    *out++ = hexdigit( (*p >> 4) & 0x0F );
-				 *out++ = hexdigit( *p & 0x0F );
-	}
-	for ( ;i < 16; ++i )
-	{
-	    *out++ = ' ';
-	    *out++ = ' ';
-	}
-	*out++ = '\t';
-	for ( i = 0; i < 16 && i < len; ++i, ++q )
-	    *out++ = asciidigit( *q );
-	*out = 0;
-	m[ strlen( m ) ] = '\0';
-	fprintf( stderr,  "%s\n", m );
-    }
-}
+  /* standard bulk device requests */
+  kern_return_t (*ReadPipe)( struct classdriver_context_s **printer, UInt8 *buffer, UInt32 *count );
+  kern_return_t (*WritePipe)( struct classdriver_context_s **printer, UInt8 *buffer, UInt32 *count, Boolean eoj );
 
-void 
-printcfs( char *text, CFStringRef s )
-{
-    char dest[1024];
-    if ( s != NULL )
-    {
-	if ( CFStringGetCString(s, dest, sizeof(dest), kCFStringEncodingUTF8) )
-	    sprintf( dest,  "%s <%s>\n", text, dest );
-	else
-	    sprintf( dest,  "%s [Unknown string]\n", text );
-    } else {
-       sprintf( dest,  "%s [NULL]\n", text );
-    }
-    perror( dest );
-}
+  /* interface requests */
+  kern_return_t (*Open)( struct classdriver_context_s **printer, UInt32 location, UInt8 protocol );
+  kern_return_t (*Abort)( struct classdriver_context_s **printer );
+  kern_return_t (*Close)( struct classdriver_context_s **printer );
 
-void
-cmpcfs( char *text, CFStringRef a, CFStringRef b )
-{
-    CFRange found = {0, 0};
-    
-    printcfs( text, a );
-    printcfs( " ", b );
+  /* initialize and terminate */
+  kern_return_t (*Initialize)( struct classdriver_context_s **printer, struct classdriver_context_s **baseclass );
+  kern_return_t (*Terminate)( struct classdriver_context_s **printer );
 
-    if (a != NULL && b != NULL) {
-	found = CFStringFind( a, b, kCFCompareCaseInsensitive );
-    
-    } else if (a == NULL && b == NULL) {
-	found.length = 1;   /* Match */
-	found.location = 0;
-    } else {
-	found.length = 0;   /* No match. */
-    }
-    
-    if ( found.length > 0 )
-	fprintf( stderr,  "matched @%d:%d\n", (int) found.location, (int) found.length);
-    else
-	fprintf( stderr,  "not matched\n" );
-}
-#endif /*DEBUG==2 */
+} classdriver_context_t;
+
+
+typedef Boolean (*iterator_callback_t)(void *refcon, io_service_t obj);
+
+typedef struct iterator_reference_s {		/**** Iterator reference data */
+  iterator_callback_t callback;
+  void		*userdata;
+  Boolean	keepRunning;
+} iterator_reference_t;
+
+typedef struct printer_data_s {			/**** Printer context data ****/
+  io_service_t		  printerObj;
+  classdriver_context_t  **printerDriver;
+
+  pthread_cond_t	readCompleteCondition;
+  pthread_mutex_t	readMutex;
+  int			done;
+
+  const char		*uri;
+  CFStringRef		make;
+  CFStringRef		model;
+  CFStringRef		serial;
+
+  UInt32		location;
+  Boolean		waitEOF;
+
+} printer_data_t;
+
+
+/*
+ * Local functions...
+ */
+
+static Boolean list_device_callback(void *refcon, io_service_t obj);
+static Boolean find_device_callback(void *refcon, io_service_t obj);
+static void iterate_printers(iterator_callback_t callBack, void *userdata);
+static void device_added(void *userdata, io_iterator_t iterator);
+static void copy_deviceinfo(CFStringRef deviceIDString, CFStringRef *make, CFStringRef *model, CFStringRef *serial);
+static void release_deviceinfo(CFStringRef *make, CFStringRef *model, CFStringRef *serial);
+static kern_return_t load_classdriver(CFStringRef driverPath, printer_interface_t intf, classdriver_context_t ***driver);
+static kern_return_t unload_classdriver(classdriver_context_t ***classDriver);
+static kern_return_t load_printerdriver(printer_data_t *printer);
+static kern_return_t registry_open(printer_data_t *printer);
+static kern_return_t registry_close(printer_data_t *printer);
+static OSStatus copy_deviceid(classdriver_context_t **printer, CFStringRef *deviceID);
+static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, UInt32 *deviceLocation);
+static CFStringRef copy_value_for_key(CFStringRef deviceID, CFStringRef *keys);
+static void parse_options(const char *options, char *serial, UInt32 *location, Boolean *waitEOF);
+static void setup_cfLanguage(void);
+static void *read_thread(void *reference);
+
+
+#if defined(__i386__)
+static pid_t	child_pid;					/* Child PID */
+static void run_ppc_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
+static void sigterm_handler(int sig);				/* SIGTERM handler */
+#endif /* __i386__ */
 
 #ifdef PARSE_PS_ERRORS
-static const char *nextLine (const char *buffer);
-static void parsePSError (char *sockBuffer, int len);
-
-
-static const char *nextLine (const char *buffer)
-{
-    const char *cptr, *lptr = NULL;
-    for (cptr = buffer; *cptr && lptr == NULL; cptr++)
-	if (*cptr == '\n' || *cptr == '\r')
-	    lptr = cptr;
-    return lptr;
-}
-
-static void parsePSError (char *sockBuffer, int len)
-{
-    static char	 gErrorBuffer[1024] = "";
-    static char *gErrorBufferPtr = gErrorBuffer;
-    static char *gErrorBufferEndPtr = gErrorBuffer + sizeof(gErrorBuffer);
-
-    char *pCommentBegin, *pCommentEnd, *pLineEnd;
-    char *logLevel;
-    char logstr[1024];
-    int	 logstrlen;
-
-    if (gErrorBufferPtr + len > gErrorBufferEndPtr - 1)
-	gErrorBufferPtr = gErrorBuffer;
-    if (len > sizeof(gErrorBuffer) - 1)
-	len = sizeof(gErrorBuffer) - 1;
-
-    memcpy(gErrorBufferPtr, (const void *)sockBuffer, len);
-    gErrorBufferPtr += len;
-    *(gErrorBufferPtr + 1) = '\0';
-
-
-    pLineEnd = (char *)nextLine((const char *)gErrorBuffer);
-    while (pLineEnd != NULL)
-    {
-	*pLineEnd++ = '\0';
-
-	pCommentBegin = strstr(gErrorBuffer,"%%[");
-	pCommentEnd = strstr(gErrorBuffer, "]%%");
-	if (pCommentBegin != gErrorBuffer && pCommentEnd != NULL)
-	{
-	    pCommentEnd += 3;		 /* Skip past "]%%" */
-	    *pCommentEnd = '\0';	 /* There's always room for the nul */
-
-	    if (strncasecmp(pCommentBegin, "%%[ Error:", 10) == 0)
-		logLevel = "DEBUG";
-	    else if (strncasecmp(pCommentBegin, "%%[ Flushing", 12) == 0)
-		logLevel = "DEBUG";
-	    else
-		logLevel = "INFO";
-	    
-	    if ((logstrlen = snprintf(logstr, sizeof(logstr), "%s: %s\n", logLevel, pCommentBegin)) >= sizeof(logstr))
-	    {
-		/* If the string was trucnated make sure it has a linefeed before the nul */
-		logstrlen = sizeof(logstr) - 1;
-		logstr[logstrlen - 1] = '\n';
-	    }
-	    write(STDERR_FILENO, logstr, logstrlen);
-	}
-
-	/* move everything over... */
-	strcpy(gErrorBuffer, pLineEnd);
-	gErrorBufferPtr = gErrorBuffer;
-	pLineEnd = (char *)nextLine((const char *)gErrorBuffer);
-    }
-}
+static const char *next_line (const char *buffer);
+static void parse_pserror (char *sockBuffer, int len);
 #endif /* PARSE_PS_ERRORS */
 
-void *
-readthread( void *reference )
-{
-    /*
-    **	post a read to the device and write results to stdout
-    **	the final pending read will be Aborted in the main thread
-    */
-    UInt8		    readbuffer[512];
-    UInt32		    rbytes;
-    kern_return_t	    readstatus;
-    USBPrinterClassContext  **classdriver = (USBPrinterClassContext **) reference;
-
-    
-    do
-    {
-	rbytes = sizeof(readbuffer) - 1;
-	readstatus = (*classdriver)->ReadPipe( classdriver, readbuffer, &rbytes );
-	if ( kIOReturnSuccess == readstatus && rbytes > 0 )
-	{
-	    write( STDOUT_FILENO, readbuffer, rbytes );
-	    /* cntrl-d is echoed by the printer.
-	    * NOTES: 
-	    *	Xerox Phaser 6250D doesn't echo the cntrl-d.
-	    *	Xerox Phaser 6250D doesn't always send the product query.
-	    */
-	    if (gWaitEOF && readbuffer[rbytes-1] == 0x4)
-		break;
-#ifdef PARSE_PS_ERRORS
-	    parsePSError(readbuffer, rbytes);
-#endif
-	}
-    } while ( gWaitEOF || !done );  /* Abort from main thread tests error here */
-
-    /* Let the other thread (main thread) know that we have
-    * completed the read thread...
-    */
-    pthread_mutex_lock(gReadMutexPtr);
-    pthread_cond_signal(gReadCompleteConditionPtr);
-    pthread_mutex_unlock(gReadMutexPtr);
-
-    return NULL;
-}
+#pragma mark -
 
 /*
-* 'print_device()' - Send a file to the specified USB port.
-*/
-
-int print_device(const char *uri, const char *hostname, const char *resource, const char *options, int fd, int copies)
-{
-    UInt32	wbytes,		/* Number of bytes written */
-		buffersize = 2048;
-    size_t	nbytes;		/* Number of bytes read */
-    off_t	tbytes;		/* Total number of bytes written */
-    char	*buffer,	/* Output buffer */
-		*bufptr;	/* Pointer into buffer */
-
-   pthread_cond_t   readCompleteCondition;
-   pthread_mutex_t  readMutex;
-   pthread_t	    thr;
-   int		    thread_created = 0;
-
-    USBPrinterInfo	*targetPrinter = NULL;
-    CFMutableArrayRef	usbPrinters;
-    char		manufacturer_buf[USB_MAX_STR_SIZE],
-			product_buf[USB_MAX_STR_SIZE],
-			serial_buf[USB_MAX_STR_SIZE];
-    CFStringRef		manufacturer;
-    CFStringRef		product;
-    CFStringRef		serial;
-
-    OSStatus		status = noErr;
-
-
-    #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-	struct sigaction action;    /* Actions for POSIX signals */
-    #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-
-    fprintf(stderr, "INFO: Opening the print file and connection...\n");
-
-    parseOptions(options, serial_buf);
-
-    if (resource[0] == '/')
-      resource++;
-
-    removePercentEscapes(hostname,	manufacturer_buf,   sizeof(manufacturer_buf));
-    removePercentEscapes(resource,	product_buf,	    sizeof(product_buf));
-
-    manufacturer = CFStringCreateWithCString(NULL, manufacturer_buf, kCFStringEncodingUTF8);
-    product	 = CFStringCreateWithCString(NULL, product_buf,	     kCFStringEncodingUTF8);
-    serial	 = CFStringCreateWithCString(NULL, serial_buf,	     kCFStringEncodingUTF8);
-
-    USBPrinterInfo	    *activePrinter = NULL;
-    USBPrinterClassContext  **classdriver;
-    int			    countdown = INITIAL_LOG_INTERVAL;
-
-    fputs("STATE: +connecting-to-device\n", stderr);
-
-    do
-    {
-	/* */
-	/*  given a manufacturer and product, bind to a specific printer on the bus */
-	/* */
-	usbPrinters = UsbGetAllPrinters();
-	/* */
-	/*  if we have at least one element of the URI, find a printer module that matches */
-	/* */
-	if ( NULL != usbPrinters && (manufacturer || product ) )
-	{
-	    int i,
-		numPrinters =  CFArrayGetCount(usbPrinters);
-	    for ( i = 0; i < numPrinters; ++i ) 
-	    {
-		int		match = FALSE;
-		USBPrinterInfo	*printer = (USBPrinterInfo *) CFArrayGetValueAtIndex( usbPrinters, i );
-		if ( printer )
-		{
-		    match = printer->address.manufacturer && manufacturer? CFEqual(printer->address.manufacturer, manufacturer ): FALSE;
-		    if ( match )
-		    {
-			match = printer->address.product && product? CFEqual(printer->address.product, product ): FALSE;
-		    }
-		    if ( match && serial )  
-		    {
-			/* Note with old queues (pre Panther) the CUPS uri may have no serial number (serial==NULL). */
-			/*  In this case, we will ignore serial number (as before), and we'll match to the first */
-			/*  printer that agrees with manufacturer and product. */
-			/* If the CUPS uri does include a serial number, we'll enter this clause */
-			/*  which requires the printer's serial number to match the CUPS serial number. */
-			/* The net effect is that for printers with a serial number, */
-			/*  new queues must match the serial number, while old queues match any printer  */
-			/*  that satisfies the manufacturer/product match. */
-			/* */
-			match = printer->address.serial? CFEqual(printer->address.serial, serial ): FALSE;
-		    }
-		    if ( match )
-		    {
-			targetPrinter = UsbCopyPrinter( printer );
-			break;	/* for, compare partial address to address for each printer on usb bus */
-		    }
-		}
-	    }
-	}
-	UsbReleaseAllPrinters( usbPrinters );
-	if ( NULL != targetPrinter )
-	    status = UsbRegistryOpen( &targetPrinter->address, &activePrinter );
-
-	if ( NULL == activePrinter )
-	{
-	    sleep( PRINTER_POLLING_INTERVAL );
-	    countdown -= PRINTER_POLLING_INTERVAL;
-	    if ( !countdown )
-	    {
-		/* periodically, write to the log so someone knows we're waiting */
-		if (NULL == targetPrinter)
-		    fprintf( stderr, "WARNING: Printer not responding\n" );
-		else
-		    fprintf( stderr, "INFO: Printer busy\n" );
-		countdown = SUBSEQUENT_LOG_INTERVAL;	/* subsequent log entries, every 30 minutes */
-	    }
-	}
-    } while ( NULL == activePrinter );
-
-    classdriver = activePrinter->classdriver;
-    if ( NULL == classdriver )
-    {
-	perror("ERROR: Unable to open USB Printing Class port");
-	return (status);
-    }
-    
-    fputs("STATE: -connecting-to-device\n", stderr);
-
-    /*
-    * Now that we are "connected" to the port, ignore SIGTERM so that we
-    * can finish out any page data the driver sends (e.g. to eject the
-    * current page...  Only ignore SIGTERM if we are printing data from
-    * stdin (otherwise you can't cancel raw jobs...)
-    */
-    
-    if (fd != 0)
-    {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-	sigset(SIGTERM, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
-	memset(&action, 0, sizeof(action));
-	
-	sigemptyset(&action.sa_mask);
-	action.sa_handler = SIG_IGN;
-	sigaction(SIGTERM, &action, NULL);
-#else
-	signal(SIGTERM, SIG_IGN);
-#endif /* HAVE_SIGSET */
-    }
-
-    buffer = malloc( buffersize );
-    if ( !buffer ) {
-	fprintf( stderr, "ERROR: Couldn't allocate internal buffer\n" );
-	status = -1;
-    }
-    else
-    {
-	fprintf(stderr, "INFO: Sending the print file...\n");
-	if (pthread_cond_init(&readCompleteCondition, NULL) == 0)
-	{
-	    gReadCompleteConditionPtr = &readCompleteCondition;
-	    
-	    if (pthread_mutex_init(&readMutex, NULL) == 0)
-	    {
-		gReadMutexPtr = &readMutex;
-
-		if (pthread_create(&thr, NULL, readthread, classdriver ) > 0)
-		    fprintf(stderr, "WARNING: Couldn't create read channel\n");
-		else
-		    thread_created = 1;
-	    }
-	}
-    }
-    /*
-    * the main thread sends the print file...
-    */
-    while (noErr == status && copies > 0)
-    {
-	copies --;
-	if (STDIN_FILENO != fd)
-	{
-	    fputs("PAGE: 1 1", stderr);
-	    lseek( fd, 0, SEEK_SET );	/* rewind */
-	}
-
-	tbytes = 0;
-	while (noErr == status && (nbytes = read(fd, buffer, buffersize)) > 0)
-	{
-	    /*
-	    * Write the print data to the printer...
-	    */
-
-	    tbytes += nbytes;
-	    bufptr = buffer;
-
-	    while (nbytes > 0 && noErr == status )
-	    {
-		wbytes = nbytes;
-		status = (*classdriver)->WritePipe( classdriver, (UInt8*)bufptr, &wbytes, 0 /*nbytes > wbytes? 0: feof(fp)*/ );
-		if (wbytes < 0 || noErr != status)
-		{
-		    OSStatus err;
-		    err = (*classdriver)->Abort( classdriver );
-		    fprintf(stderr, "ERROR: %ld: Unable to send print file to printer (canceled %ld)\n", status, err );
-		    break;
-		}
-
-		nbytes -= wbytes;
-		bufptr += wbytes;
-	    }
-
-	    if (fd != 0 && noErr == status)
-		fprintf(stderr, "INFO: Sending print file, %qd bytes...\n", (off_t)tbytes);
-	}
-    }
-    done = 1;	/* stop scheduling reads */
-
-    if ( thread_created )
-    {
-	/* Give the read thread WAITEOF_DELAY seconds to complete all the data. If
-	* we are not signaled in that time then force the thread to exit by setting
-	* the waiteof to be false. Plese note that this relies on us using the timeout
-	* class driver.
-	*/
-	struct timespec sleepUntil = { time(NULL) + WAITEOF_DELAY, 0 };
-	pthread_mutex_lock(&readMutex);
-	if (pthread_cond_timedwait(&readCompleteCondition, &readMutex, (const struct timespec *)&sleepUntil) != 0)
-	    gWaitEOF = false;
-	pthread_mutex_unlock(&readMutex);
-	pthread_join( thr,NULL);		/* wait for the child thread to return */
-    }
-
-    (*classdriver)->Close( classdriver );   /* forces the read to stop incase we are doing a blocking read */
-    UsbUnloadClassDriver( activePrinter );
-    /*
-    * Close the socket connection and input file and return...
-    */
-    free( buffer );
-
-    if (STDIN_FILENO != fd)
-	close(fd);
-
-    if (gReadCompleteConditionPtr != NULL)
-	pthread_cond_destroy(gReadCompleteConditionPtr);
-    if (gReadMutexPtr != NULL)
-	pthread_mutex_destroy(gReadMutexPtr);
-
-    return status == kIOReturnSuccess? 0: status;
-}
-
-static Boolean
-encodecfstr( CFStringRef cfsrc, char *dst, long len )
-{
-    return CFStringGetCString(cfsrc, dst, len, kCFStringEncodingUTF8 );
-}
-
-/*
-* 'list_devices()' - List all USB devices.
-*/
-void list_devices(void)
-{
-    char		encodedManufacturer[1024];
-    char		encodedProduct[1024];
-    char		uri[1024];
-    CFMutableArrayRef	usbBusPrinters = UsbGetAllPrinters();
-    CFIndex		i, numPrinters = NULL != usbBusPrinters? CFArrayGetCount( usbBusPrinters ): 0;
-    
-    puts("direct usb \"Unknown\" \"USB Printer (usb)\"");
-    for ( i = 0;  i < numPrinters; ++i )
-    {
-	USBPrinterInfo	    *printer = (USBPrinterInfo *) CFArrayGetValueAtIndex( usbBusPrinters, i );
-
-	if ( printer ) 
-	{
-	    CFStringRef addressRef = UsbMakeFullUriAddress( printer );
-	    if ( addressRef )
-	    {
-		if ( CFStringGetCString(addressRef, uri, sizeof(uri), kCFStringEncodingUTF8) ) {
-	    
-		    encodecfstr( printer->address.manufacturer, encodedManufacturer, sizeof(encodedManufacturer) );
-		    encodecfstr( printer->address.product, encodedProduct, sizeof(encodedProduct) );
-		    printf("direct %s \"%s %s\" \"%s\"\n", uri, encodedManufacturer, encodedProduct, encodedProduct);
-		}
-	    }
-	}
-    }
-    UsbReleaseAllPrinters( usbBusPrinters );
-    fflush(NULL);
-}
-
-
-static void parseOptions(const char *options, char *serial)
-{
-    char    *serialnumber;  /* ?serial=<serial> or ?location=<location> */
-    char    optionName[255],	/* Name of option */
-	    value[255],		/* Value of option */
-	    *ptr;		/* Pointer into name or value */
-
-    if (serial)
-	*serial = '\0';
-
-    if (!options)
-	return;
-
-    serialnumber = NULL;
-
-    while (*options != '\0')
-    {
-	/*
-	* Get the name...
-	*/
-	for (ptr = optionName; *options && *options != '=' && *options != '+' && *options != '&'; )
-	    *ptr++ = *options++;
-
-	*ptr = '\0';
-	value[0] = '\0';
-
-	if (*options == '=')
-	{
-	    /*
-	    * Get the value...
-	    */
-	    
-	    options ++;
-	    
-	    for (ptr = value; *options && *options != '+' && *options != '&';)
-		*ptr++ = *options++;
-
-	    *ptr = '\0';
-	    
-	    if (*options == '+' || *options == '&')
-		options ++;
-	}
-	else if (*options == '+' || *options == '&')
-	{
-	    options ++;
-	}
-
-	/*
-	* Process the option...
-	*/
-	if (strcasecmp(optionName, "waiteof") == 0)
-	{
-	    if (strcasecmp(value, "on") == 0 ||
-		strcasecmp(value, "yes") == 0 ||
-		strcasecmp(value, "true") == 0)
-	    {
-		gWaitEOF = true;
-	    }
-	    else if (strcasecmp(value, "off") == 0 ||
-		    strcasecmp(value, "no") == 0 ||
-		    strcasecmp(value, "false") == 0)
-	    {
-		gWaitEOF = false;
-	    }
-	    else
-	    {
-		fprintf(stderr, "WARNING: Boolean expected for waiteof option \"%s\"\n", value);
-	    }
-	}
-	else if (strcasecmp(optionName, "serial") == 0 ||
-		 strcasecmp(optionName, "location") == 0 )
-	{
-	    strcpy(serial, value);
-	    serialnumber = serial;
-	}
-    }
-
-    return;
-}
-
-
-/*!
- * @function  addPercentEscapes
- * @abstract  Encode a string with percent escapes
- *
- * @param  src	    The source C string
- * @param  dst	    Desination buffer
- * @param  dstMax   Size of desination buffer
- *
- * @result    A non-zero return value for errors
+ * 'list_devices()' - List all USB devices.
  */
-static int addPercentEscapes(const unsigned char* src, char* dst, int dstMax)
+
+void list_devices()
 {
-  unsigned char c;
-  char	    *dstEnd = dst + dstMax - 1; /* -1 to leave room for the NUL */
+  puts("direct usb \"Unknown\" \"USB Printer (usb)\"");
+  iterate_printers(list_device_callback, NULL);
+}
 
-  while (*src)
-  {
-    c = *src++;
 
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || 
-	(c >= '0' && c <= '9') || (c == '.' || c == '-'	 || c == '*' || c == '_'))
-    {
-      if (dst >= dstEnd)
-	return -1;
+/*
+ * 'print_device()' - Print a file to a USB device.
+ */
 
-      *dst++ = c;
+int					/* O - Exit status */
+print_device(const char *uri,		/* I - Device URI */
+             const char *hostname,	/* I - Hostname/manufacturer */
+             const char *resource,	/* I - Resource/modelname */
+	     const char *options,	/* I - Device options/serial number */
+	     int        fd,		/* I - File descriptor to print */
+	     int        copies,		/* I - Copies to print */
+	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
+	     char	*argv[])	/* I - Command-line arguments */
+{
+  printer_data_t  printer_data = { 0x0 };		/* Printer context */
+  char		  serial[1024];				/* Serial number buffer */
+  OSStatus	  status = noErr;			/* Function results */
+  pthread_t	  thr;					/* Read thread */
+  char		  buffer[2048];				/* Write buffer */
+  int		  thread_created = 0;			/* Thread created? */
+  int		  countdown = INITIAL_LOG_INTERVAL;	/* Logging interval */
+  pthread_cond_t  *readCompleteConditionPtr = NULL;	/* Read complete condition */
+  pthread_mutex_t *readMutexPtr = NULL;			/* Read mutex */
+
+  setup_cfLanguage();
+  parse_options(options, serial, &printer_data.location, &printer_data.waitEOF);
+
+  if (resource[0] == '/')
+    resource++;
+
+  printer_data.uri = uri;
+  printer_data.make   = CFStringCreateWithCString(NULL, hostname, kCFStringEncodingUTF8);
+  printer_data.model  = CFStringCreateWithCString(NULL, resource, kCFStringEncodingUTF8);
+  printer_data.serial = CFStringCreateWithCString(NULL, serial, kCFStringEncodingUTF8);
+
+  fputs("STATE: +connecting-to-device\n", stderr);
+
+  do {
+    if (printer_data.printerObj != 0x0) {
+      IOObjectRelease(printer_data.printerObj);			
+      unload_classdriver(&printer_data.printerDriver);
+      printer_data.printerObj = 0x0;
+      printer_data.printerDriver = 0x0;
     }
-    else
-    {
-      if (dst >= dstEnd - 2)
-	return -1;
 
-      snprintf(dst, dstEnd - dst, "%%%02x", c);
-      dst += 3;
+    fprintf(stderr, "INFO: Looking for '%s %s'\n", hostname, resource);
+    iterate_printers(find_device_callback, &printer_data);		
+
+    fprintf(stderr, "INFO: Opening Connection\n");
+    status = registry_open(&printer_data);
+#if defined(__i386__)
+    /*
+     * If we were unable to load the class drivers for this printer it's probably because they're ppc-only.
+     * In this case try to fork & exec this backend as a ppc executable so we can use them...
+     */
+    if (status == -2 /* kPMInvalidIOMContext */) {
+      run_ppc_backend(argc, argv, fd);
+      /* Never returns here */
+    }
+#endif /* __i386__ */
+
+    if (status != noErr) {
+      sleep( PRINTER_POLLING_INTERVAL );
+      countdown -= PRINTER_POLLING_INTERVAL;
+      if ( countdown <= 0 ) {
+	fprintf(stderr, "INFO: Printer busy (status:0x%08x)\n", (int)status);
+	countdown = SUBSEQUENT_LOG_INTERVAL;	/* subsequent log entries, every 15 seconds */
+      }
+    }
+  } while (status != noErr);
+
+  fputs("STATE: -connecting-to-device\n", stderr);
+
+  /*
+   * Now that we are "connected" to the port, ignore SIGTERM so that we
+   * can finish out any page data the driver sends (e.g. to eject the
+   * current page...  Only ignore SIGTERM if we are printing data from
+   * stdin (otherwise you can't cancel raw jobs...)
+   */
+
+  if (!fd) {
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+    sigset(SIGTERM, SIG_IGN);
+#elif defined(HAVE_SIGACTION)
+    memset(&action, 0, sizeof(action));
+
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_IGN;
+    sigaction(SIGTERM, &action, NULL);
+#else
+    signal(SIGTERM, SIG_IGN);
+#endif /* HAVE_SIGSET */
+  }
+
+  if (status == noErr) {
+    if (pthread_cond_init(&printer_data.readCompleteCondition, NULL) == 0)	
+      readCompleteConditionPtr = &printer_data.readCompleteCondition;
+
+    if (pthread_mutex_init(&printer_data.readMutex, NULL) == 0)
+      readMutexPtr = &printer_data.readMutex;
+
+    if (pthread_create(&thr, NULL, read_thread, &printer_data) == 0)
+      thread_created = 1;
+
+    if (thread_created == 0) 
+      fprintf(stderr, "WARNING: Couldn't create read channel\n");
+  }
+
+  /*
+   * The main thread sends the print file...
+   */
+
+  while (status == noErr && copies-- > 0) {
+    UInt32		wbytes;			/* Number of bytes written */
+    ssize_t		nbytes;			/* Number of bytes read */
+    off_t		tbytes = 0;		/* Total number of bytes written */
+
+    fprintf(stderr, "INFO: Sending data\n");
+
+    if (STDIN_FILENO != fd) {
+      fputs("PAGE: 1 1", stderr);
+      lseek( fd, 0, SEEK_SET );
+    }
+
+    while (status == noErr && (nbytes = read(fd, buffer, sizeof(buffer))) > 0) {
+      char *bufptr = buffer;
+      tbytes += nbytes;
+
+      while (nbytes > 0 && status == noErr) {
+	wbytes = nbytes;
+	status = (*(printer_data.printerDriver))->WritePipe( printer_data.printerDriver, (UInt8*)bufptr, &wbytes, 0 /* nbytes > wbytes? 0: feof(fp) */ );
+	if (wbytes < 0 || noErr != status) {
+	  OSStatus err = (*(printer_data.printerDriver))->Abort(printer_data.printerDriver);
+	  fprintf(stderr, "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n", status, err);
+	  break;
+	}
+
+	nbytes -= wbytes;
+	bufptr += wbytes;
+      }
+
+      if (fd != 0 && status == noErr)
+	fprintf(stderr, "DEBUG: Sending print file, %qd bytes...\n", (off_t)tbytes);
     }
   }
 
-  *dst = '\0';
-  return 0;
+  if (thread_created) {
+    /* Signal the read thread that we are done... */
+    printer_data.done = 1;
+
+    /* Give the read thread WAITEOF_DELAY seconds to complete all the data. If
+     * we are not signaled in that time then force the thread to exit by setting
+     * the waiteof to be false. Plese note that this relies on us using the timeout
+     * class driver.
+     */
+    struct timespec sleepUntil = { time(NULL) + WAITEOF_DELAY, 0 };
+    pthread_mutex_lock(&printer_data.readMutex);
+    if (pthread_cond_timedwait(&printer_data.readCompleteCondition, &printer_data.readMutex, (const struct timespec *)&sleepUntil) != 0)
+      printer_data.waitEOF = false;
+    pthread_mutex_unlock(&printer_data.readMutex);
+    pthread_join( thr,NULL);				/* wait for the child thread to return */
+  }
+
+  /*
+   * Close the connection and input file and general clean up...
+   */
+  registry_close(&printer_data);
+
+  if (STDIN_FILENO != fd)
+    close(fd);
+
+  if (readCompleteConditionPtr != NULL)
+    pthread_cond_destroy(&printer_data.readCompleteCondition);
+
+  if (readMutexPtr != NULL)
+    pthread_mutex_destroy(&printer_data.readMutex);
+
+  if (printer_data.make != NULL)
+    CFRelease(printer_data.make);
+
+  if (printer_data.model != NULL)
+    CFRelease(printer_data.model);
+
+  if (printer_data.serial != NULL)
+    CFRelease(printer_data.serial);
+
+  if (printer_data.printerObj != 0x0)
+    IOObjectRelease(printer_data.printerObj);
+
+  return status;
+}
+
+#pragma mark -
+/*
+ * 'list_device_callback()' - list_device iterator callback.
+ */
+
+static Boolean list_device_callback(void *refcon, io_service_t obj)
+{
+  Boolean keepRunning = (obj != 0x0);
+
+  if (keepRunning) {
+    CFStringRef deviceIDString = NULL;
+    UInt32 deviceLocation = 0;
+
+    copy_devicestring(obj, &deviceIDString, &deviceLocation);
+    if (deviceIDString != NULL) {
+      CFStringRef make = NULL,  model = NULL, serial = NULL;
+      char uristr[1024], makestr[1024], modelstr[1024], serialstr[1024], optionsstr[1024];
+
+      copy_deviceinfo(deviceIDString, &make, &model, &serial);
+
+      modelstr[0] = '/';
+
+      CFStringGetCString(make, makestr, sizeof(makestr),    kCFStringEncodingUTF8);
+      CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1, kCFStringEncodingUTF8);
+
+      optionsstr[0] = '\0';
+      if (serial != NULL)
+      {
+        CFStringGetCString(serial, serialstr, sizeof(serialstr), kCFStringEncodingUTF8);
+	snprintf(optionsstr, sizeof(optionsstr), "?serial=%s", serialstr);
+      }
+      else if (deviceLocation != 0)
+      {
+	snprintf(optionsstr, sizeof(optionsstr), "?location=%lx", deviceLocation);
+      }
+
+      httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
+      strncat(uristr, optionsstr, sizeof(uristr));
+
+      printf("direct %s \"%s %s\" \"%s\"\n", uristr, makestr, &modelstr[1], &modelstr[1]);
+
+      release_deviceinfo(&make, &model, &serial);
+      CFRelease(deviceIDString);
+    }
+  }
+
+  return keepRunning;
+}
+
+
+/*
+ * 'find_device_callback()' - print_device iterator callback.
+ */
+
+static Boolean find_device_callback(void *refcon, io_service_t obj)
+{
+  Boolean keepLooking = true;
+
+  if (obj != 0x0 && refcon != NULL) {
+    CFStringRef idString = NULL;
+    UInt32 location = -1;
+    printer_data_t *userData = (printer_data_t *)refcon;
+
+    copy_devicestring(obj, &idString, &location);
+    if (idString != NULL) {
+      CFStringRef make = NULL,  model = NULL, serial = NULL;
+
+      copy_deviceinfo(idString, &make, &model, &serial);
+      if (CFStringCompare(make, userData->make, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
+	if (CFStringCompare(model, userData->model, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
+	  if (userData->serial != NULL) {
+	    if (serial != NULL && CFStringCompare(model, userData->model, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
+	      IOObjectRetain(obj);
+	      userData->printerObj = obj;
+	      keepLooking = false;
+	    }
+	  }
+	  else {
+	    if (userData->printerObj != 0) {
+	      IOObjectRetain(userData->printerObj);
+	    }
+	    userData->printerObj = obj;
+	    IOObjectRetain(obj);
+
+	    if (userData->location == 0 || userData->location == location) {
+	      keepLooking = false;
+	    }
+	  }
+	}
+      }
+
+      release_deviceinfo(&make, &model, &serial);
+      CFRelease(idString);
+    }
+  }
+  else {		
+    keepLooking = (refcon != NULL && ((printer_data_t *)refcon)->printerObj == 0);
+  }
+
+  return keepLooking;
+}
+
+
+#pragma mark -
+/*
+ * 'iterate_printers()' - iterate over all the printers.
+ */
+
+static void iterate_printers(iterator_callback_t callBack, void *userdata)
+{
+  mach_port_t	masterPort = 0x0;
+  kern_return_t kr = IOMasterPort (bootstrap_port, &masterPort);
+
+  if (kr == kIOReturnSuccess && masterPort != 0x0) {
+    io_iterator_t addIterator = 0x0;
+
+    iterator_reference_t reference = { callBack, userdata, true };
+    IONotificationPortRef addNotification = IONotificationPortCreate(masterPort);
+
+    int klass = kUSBPrintingClass;
+    int subklass = kUSBPrintingSubclass;
+
+    CFNumberRef usb_klass = CFNumberCreate(NULL, kCFNumberIntType, &klass);
+    CFNumberRef usb_subklass = CFNumberCreate(NULL, kCFNumberIntType, &subklass);
+    CFMutableDictionaryRef usbPrinterMatchDictionary = IOServiceMatching(kIOUSBInterfaceClassName);
+
+    CFDictionaryAddValue(usbPrinterMatchDictionary, CFSTR("bInterfaceClass"), usb_klass);
+    CFDictionaryAddValue(usbPrinterMatchDictionary, CFSTR("bInterfaceSubClass"), usb_subklass);
+
+    CFRelease(usb_klass);
+    CFRelease(usb_subklass);
+
+    kr = IOServiceAddMatchingNotification(addNotification, kIOMatchedNotification, usbPrinterMatchDictionary, &device_added, &reference, &addIterator);
+    if (addIterator != 0x0) {
+      device_added (&reference, addIterator);
+
+      if (reference.keepRunning) {
+	CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(addNotification), kCFRunLoopDefaultMode);
+	CFRunLoopRun();
+      }
+      IOObjectRelease(addIterator);
+    }
+    mach_port_deallocate(mach_task_self(), masterPort);
+  }
+}
+
+
+/*
+ * 'device_added()' - device added notifier.
+ */
+
+static void device_added(void *userdata, io_iterator_t iterator)
+{	
+  iterator_reference_t *reference = userdata;
+
+  io_service_t obj;
+  while (reference->keepRunning && (obj = IOIteratorNext(iterator)) != 0x0) {
+    if (reference->callback != NULL) {
+      reference->keepRunning = reference->callback(reference->userdata, obj);
+    }
+    IOObjectRelease(obj);
+  }
+
+  /* One last call to the call back now that we are not longer have printers left to iterate...
+   */
+  if (reference->keepRunning)
+    reference->keepRunning = reference->callback(reference->userdata, 0x0);
+
+  if (!reference->keepRunning) {
+    CFRunLoopStop(CFRunLoopGetCurrent());
+  }
+}
+
+
+#pragma mark -
+/*
+ * 'copy_deviceinfo()' - Copy strings from the 1284 device ID.
+ */
+
+static void copy_deviceinfo(CFStringRef deviceIDString, CFStringRef *make, CFStringRef *model, CFStringRef *serial)
+{	
+  CFStringRef modelKeys[]  = { CFSTR("MDL:"), CFSTR("MODEL:"), NULL };
+  CFStringRef makeKeys[]   = { CFSTR("MFG:"), CFSTR("MANUFACTURER:"), NULL };
+  CFStringRef serialKeys[] = { CFSTR("SN:"),  CFSTR("SERN:"), NULL };
+
+  if (make != NULL)
+    *make = copy_value_for_key(deviceIDString, makeKeys);
+  if (model != NULL)
+    *model = copy_value_for_key(deviceIDString, modelKeys);
+  if (serial != NULL)
+    *serial = copy_value_for_key(deviceIDString, serialKeys);
+}
+
+
+/*
+ * 'release_deviceinfo()' - Release deviceinfo strings.
+ */
+
+static void release_deviceinfo(CFStringRef *make, CFStringRef *model, CFStringRef *serial)
+{
+  if (make != NULL && *make != NULL) {
+    CFRelease(*make);
+    *make = NULL;
+  }
+
+  if (model != NULL && *model != NULL) {
+    CFRelease(*model);
+    *model = NULL;
+  }
+
+  if (serial != NULL && *serial != NULL) {
+    CFRelease(*serial);
+    *serial = NULL;
+  }
+}
+
+
+#pragma mark -
+/*
+ * 'load_classdriver()' - Load a classdriver.
+ */
+
+static kern_return_t load_classdriver(CFStringRef driverPath, printer_interface_t intf, classdriver_context_t ***printerDriver)
+{
+  kern_return_t kr = kUSBPrinterClassDeviceNotOpen;
+  classdriver_context_t **driver = NULL;
+  CFStringRef bundle = (driverPath == NULL ? kUSBGenericTOPrinterClassDriver : driverPath);
+
+  if ( NULL != bundle ) {
+    CFURLRef url = CFURLCreateWithFileSystemPath(NULL, bundle, kCFURLPOSIXPathStyle, true);
+    CFPlugInRef plugin = (url != NULL ? CFPlugInCreate(NULL, url) : NULL);
+
+    if (url != NULL) 
+      CFRelease(url);
+
+    if (plugin != NULL) {
+      CFArrayRef factories = CFPlugInFindFactoriesForPlugInTypeInPlugIn(kUSBPrinterClassTypeID, plugin);
+      if (factories != NULL && CFArrayGetCount(factories) > 0)  {
+	CFUUIDRef factoryID = CFArrayGetValueAtIndex(factories, 0);
+	IUnknownVTbl **iunknown = CFPlugInInstanceCreate(NULL, factoryID, kUSBPrinterClassTypeID);
+	if (NULL != iunknown) {
+	  kr = (*iunknown)->QueryInterface(iunknown, CFUUIDGetUUIDBytes(kUSBPrinterClassInterfaceID), (LPVOID *)&driver);
+	  if (kr == kIOReturnSuccess && driver != NULL) {					
+	    classdriver_context_t **genericDriver = NULL;
+	    if (driverPath != NULL && CFStringCompare(driverPath, kUSBGenericTOPrinterClassDriver, 0) != kCFCompareEqualTo) {
+	      kr = load_classdriver(NULL, intf, &genericDriver);
+	    }
+
+	    if (kr == kIOReturnSuccess) {
+	      (*driver)->interface = intf;
+	      (*driver)->Initialize(driver, genericDriver);
+
+	      (*driver)->plugin = plugin;
+	      (*driver)->interface = intf;
+	      *printerDriver = driver;
+	    }
+	  }
+	  (*iunknown)->Release(iunknown);
+	}
+	CFRelease(factories);
+      }
+    }
+  }
+
+#ifdef DEBUG
+  char bundlestr[1024];
+  CFStringGetCString(bundle, bundlestr, sizeof(bundlestr), kCFStringEncodingUTF8);
+  fprintf(stderr, "DEBUG:load_classdriver(%s) (kr:0x%08x)\n", bundlestr, (int)kr);
+#endif /* DEBUG */
+
+  return kr;
+}
+
+
+/*
+ * 'unload_classdriver()' - Unload a classdriver.
+ */
+
+static kern_return_t unload_classdriver(classdriver_context_t ***classDriver)
+{
+  if (*classDriver != NULL) {
+    (**classDriver)->Release(*classDriver);
+    *classDriver = NULL;
+  }
+
+  return kIOReturnSuccess;
+}
+
+
+/*
+ * 'load_printerdriver()' - Load a vendor's (or generic) classdriver.
+ */
+
+static kern_return_t load_printerdriver(printer_data_t *printer)
+{
+  IOCFPlugInInterface **iodev = NULL;
+  SInt32 score;
+
+  kern_return_t kr = IOCreatePlugInInterfaceForService(printer->printerObj, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &iodev, &score);
+  if (kr == kIOReturnSuccess) {
+    printer_interface_t intf;
+    HRESULT res = (*iodev)->QueryInterface(iodev, USB_INTERFACE_KIND, (LPVOID *) &intf);
+    if (res == noErr) {
+      CFMutableDictionaryRef properties = NULL;
+
+      kr = IORegistryEntryCreateCFProperties(printer->printerObj, &properties, NULL, kNilOptions);
+      if (kr == kIOReturnSuccess) {
+	CFStringRef driverBundlePath = NULL;
+	if (properties != NULL) {
+	  driverBundlePath = (CFStringRef) CFDictionaryGetValue(properties, kUSBClassDriverProperty);
+	}
+	kr = load_classdriver(driverBundlePath, intf, &printer->printerDriver);
+      }
+
+      if (kr != kIOReturnSuccess)
+	(*intf)->Release(intf);
+    }
+    IODestroyPlugInInterface(iodev);
+  }
+  return kr;
+}
+
+
+/*
+ * 'registry_open()' - Open a connection to the printer.
+ */
+
+static kern_return_t registry_open(printer_data_t *printer)
+{
+  kern_return_t kr = load_printerdriver(printer);
+  if (kr != kIOReturnSuccess) {
+    kr = -2;
+  }
+
+  if (printer->printerDriver != NULL) {
+    kr = (*(printer->printerDriver))->Open(printer->printerDriver, printer->location, kUSBPrintingProtocolBidirectional);
+    if (kr != kIOReturnSuccess || (*(printer->printerDriver))->interface == NULL) {
+      kr = (*(printer->printerDriver))->Open(printer->printerDriver, printer->location, kUSBPrintingProtocolUnidirectional);
+      if (kr == kIOReturnSuccess) {
+	if ((*(printer->printerDriver))->interface == NULL) {
+	  (*(printer->printerDriver))->Close(printer->printerDriver);
+	  kr = -1;
+	}
+      }
+    }
+  }
+
+  if (kr != kIOReturnSuccess) {
+    unload_classdriver(&printer->printerDriver);
+  }
+
+  return kr;
+}
+
+
+/*
+ * 'registry_close()' - Close the connection to the printer.
+ */
+
+static kern_return_t registry_close(printer_data_t *printer)
+{
+  if (printer->printerDriver != NULL) {
+    (*(printer->printerDriver))->Close(printer->printerDriver);
+  }
+  unload_classdriver(&printer->printerDriver);
+  return kIOReturnSuccess;
+}
+
+
+/*
+ * 'copy_deviceid()' - Copy the 1284 device id string.
+ */
+
+static OSStatus copy_deviceid(classdriver_context_t **printer, CFStringRef *deviceID)
+{
+  CFStringRef devID = NULL,
+
+  deviceMake = NULL,
+  deviceModel = NULL,
+  deviceSerial = NULL;
+
+  OSStatus err = (*printer)->GetDeviceID(printer, &devID, DEFAULT_TIMEOUT);
+
+  copy_deviceinfo(devID, &deviceMake, &deviceModel, &deviceSerial);
+
+  if (deviceMake == NULL || deviceModel == NULL || deviceSerial == NULL) {
+    IOUSBDeviceDescriptor	desc;
+    iodevice_request_t		request;
+
+    request.requestType = USBmakebmRequestType( kUSBIn,  kUSBStandard, kUSBDevice );
+    request.request = kUSBRqGetDescriptor;
+    request.value = (kUSBDeviceDesc << 8) | 0;
+    request.index = 0;
+    request.length = sizeof(desc);
+    request.buffer = &desc;
+    err = (*printer)->DeviceRequest(printer, &request, DEFAULT_TIMEOUT);
+    if (err == kIOReturnSuccess) {
+      CFMutableStringRef newDevID = CFStringCreateMutable(NULL, 0);
+
+      if (deviceMake == NULL) {
+	CFStringRef data = NULL;
+	err = (*printer)->GetString(printer, desc.iManufacturer, kUSBLanguageEnglish, DEFAULT_TIMEOUT, &data);
+	if (data != NULL) {
+	  CFStringAppendFormat(newDevID, NULL, CFSTR("MFG:%@;"), data);
+	  CFRelease(data);
+	}
+      }
+
+      if (deviceModel == NULL) {
+	CFStringRef data = NULL;
+	err = (*printer)->GetString(printer, desc.iProduct, kUSBLanguageEnglish, DEFAULT_TIMEOUT, &data);
+	if (data != NULL) {
+	  CFStringAppendFormat(newDevID, NULL, CFSTR("MDL:%@;"), data);
+	  CFRelease(data);
+	}
+      }
+
+      if (deviceSerial == NULL && desc.iSerialNumber != 0) {
+	CFStringRef data = NULL;
+	err = (*printer)->GetString(printer, desc.iSerialNumber, kUSBLanguageEnglish, DEFAULT_TIMEOUT, &data);
+	if (data != NULL) {
+	  CFStringAppendFormat(newDevID, NULL, CFSTR("SERN:%@;"), data);
+	  CFRelease(data);
+	}
+      }
+
+      if (devID != NULL) {
+	CFStringAppend(newDevID, devID);
+	CFRelease(devID);
+      }
+
+      *deviceID = newDevID;
+    }
+  }
+  else {
+    *deviceID = devID;
+  }
+  release_deviceinfo(&deviceMake, &deviceModel, &deviceSerial);
+
+  return err;
+}
+
+
+/*
+ * 'copy_devicestring()' - Copy the 1284 device id string.
+ */
+
+static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, UInt32 *deviceLocation)
+{
+  IOCFPlugInInterface **iodev = NULL;
+  SInt32 score;
+
+  kern_return_t kr = IOCreatePlugInInterfaceForService(usbInterface, kIOUSBInterfaceUserClientTypeID, 
+						       kIOCFPlugInInterfaceID, &iodev, &score);
+  if (kr == kIOReturnSuccess) {
+    printer_interface_t intf;
+
+    HRESULT res = (*iodev)->QueryInterface(iodev, USB_INTERFACE_KIND, (LPVOID *) &intf);
+    if (res == noErr) {
+      /* ignore the result for location id... */
+      (void)(*intf)->GetLocationID(intf, deviceLocation);
+
+      CFMutableDictionaryRef properties = NULL;
+      kr = IORegistryEntryCreateCFProperties(usbInterface, &properties, NULL, kNilOptions);
+      if (kIOReturnSuccess == kr) {
+	classdriver_context_t **klassDriver = NULL;
+	CFStringRef driverBundlePath = NULL;
+
+	if (properties != NULL) {
+	  driverBundlePath = (CFStringRef) CFDictionaryGetValue(properties, kUSBClassDriverProperty);
+	}
+
+	kr = load_classdriver(driverBundlePath, intf, &klassDriver);
+	if (kr != kIOReturnSuccess && driverBundlePath != NULL)
+	  kr = load_classdriver(NULL, intf, &klassDriver);
+	if (kr == kIOReturnSuccess && klassDriver != NULL) {				
+	  kr = copy_deviceid(klassDriver, deviceID);						
+	}
+	unload_classdriver(&klassDriver);
+
+	if (properties != NULL)
+	  CFRelease(properties);
+      }
+
+      /* (*intf)->Release(intf); */
+    }		
+    IODestroyPlugInInterface(iodev);
+  }
+}
+
+
+#pragma mark -
+/*
+ * 'copy_value_for_key()' - Copy value string associated with a key.
+ */
+
+static CFStringRef copy_value_for_key(CFStringRef deviceID, CFStringRef *keys)
+{
+  CFStringRef	value = NULL;
+  CFArrayRef	kvPairs = deviceID != NULL ? CFStringCreateArrayBySeparatingStrings(NULL, deviceID, CFSTR(";")) : NULL;
+  CFIndex	max = kvPairs != NULL ? CFArrayGetCount(kvPairs) : 0;
+  CFIndex	idx = 0;
+
+  while (idx < max && value == NULL) {
+    CFStringRef kvpair = CFArrayGetValueAtIndex(kvPairs, idx);
+    CFIndex idxx = 0;
+    while (keys[idxx] != NULL && value == NULL) {			
+      CFRange range = CFStringFind(kvpair, keys[idxx], kCFCompareCaseInsensitive);
+      if (range.length != -1) {
+	if (range.location != 0) {
+	  CFMutableStringRef theString = CFStringCreateMutableCopy(NULL, 0, kvpair);
+	  CFStringTrimWhitespace(theString);
+	  range = CFStringFind(theString, keys[idxx], kCFCompareCaseInsensitive);
+	  if (range.location == 0) {
+	    value = CFStringCreateWithSubstring(NULL, theString, CFRangeMake(range.length, CFStringGetLength(theString) - range.length));
+	  }
+	  CFRelease(theString);
+	}
+	else {
+	  CFStringRef theString = CFStringCreateWithSubstring(NULL, kvpair, CFRangeMake(range.length, CFStringGetLength(kvpair) - range.length));
+	  CFMutableStringRef theString2 = CFStringCreateMutableCopy(NULL, 0, theString);
+	  CFRelease(theString);
+
+	  CFStringTrimWhitespace(theString2);
+	  value = theString2;
+	}
+      }
+      idxx++;
+    }
+    idx++;
+  }
+
+  if (kvPairs != NULL)
+    CFRelease(kvPairs);	
+  return value;
+}
+
+
+#pragma mark -
+/*
+ * 'parse_options()' - Parse uri options.
+ */
+
+static void parse_options(const char *options, char *serial, UInt32 *location, Boolean *waitEOF)
+{
+  char	*serialnumber;		/* ?serial=<serial> or ?location=<location> */
+  char	optionName[255],	/* Name of option */
+	value[255],		/* Value of option */
+	*ptr;			/* Pointer into name or value */
+
+  if (serial)
+    *serial = '\0';
+  if (location)
+    *location = 0;
+
+  if (!options)
+    return;
+
+  serialnumber = NULL;
+
+  while (*options != '\0') {
+    /* Get the name... */
+    for (ptr = optionName; *options && *options != '=' && *options != '+'; )
+      *ptr++ = *options++;
+
+    *ptr = '\0';
+    value[0] = '\0';
+
+    if (*options == '=') {
+      /* Get the value... */
+      options ++;
+
+      for (ptr = value; *options && *options != '+';)
+	*ptr++ = *options++;
+
+      *ptr = '\0';
+
+      if (*options == '+')
+	options ++;
+    }
+    else if (*options == '+') {
+      options ++;
+    }
+
+    /*
+     * Process the option...
+     */
+    if (strcasecmp(optionName, "waiteof") == 0) {
+      if (strcasecmp(value, "on") == 0 ||
+	  strcasecmp(value, "yes") == 0 ||
+	  strcasecmp(value, "true") == 0) {
+	*waitEOF = true;
+      }
+      else if (strcasecmp(value, "off")   == 0 ||
+	       strcasecmp(value, "no")    == 0 ||
+	       strcasecmp(value, "false") == 0) {
+	*waitEOF = false;
+      }
+      else {
+	fprintf(stderr, "WARNING: Boolean expected for waiteof option \"%s\"\n", value);
+      }
+    }
+    else if (strcasecmp(optionName, "serial") == 0) {
+      strcpy(serial, value);
+      serialnumber = serial;
+    }
+    else if (strcasecmp(optionName, "location") == 0 && location) {
+      *location = strtol(value, NULL, 16);
+    }
+  }
+
+  return;
 }
 
 
 /*!
- * @function	removePercentEscapes
- * @abstract	Returns a string with any percent escape sequences replaced with their equivalent character
+ * @function	setup_cfLanguage
+ * @abstract	Convert the contents of the CUPS 'LANG' environment
+ *		variable into a one element CF array of languages.
  *
- * @param	src	Source buffer
- * @param	srclen	Number of bytes in source buffer
- * @param	dst	Desination buffer
- * @param	dstMax	Size of desination buffer
- *
- * @result	A non-zero return value for errors
+ * @discussion	Each submitted job comes with a natural language. CUPS passes
+ * 		that language in an environment variable. We take that language
+ * 		and jam it into the AppleLanguages array so that CF will use
+ * 		it when reading localized resources. We need to do this before
+ * 		any CF code reads and caches the languages array, so this function
+ *		should be called early in main()
  */
-static int removePercentEscapes(const char* src, unsigned char* dst, int dstMax)
+static void setup_cfLanguage(void)
 {
-    int c;
-    const unsigned char *dstEnd = dst + dstMax;
+  CFStringRef	lang[1] = {NULL};
+  CFArrayRef	langArray = NULL;
+  const char	*requestedLang = NULL;
 
-    while (*src && dst < dstEnd)
-    {
-	c = *src++;
+  requestedLang = getenv("LANG");
+  if (requestedLang != NULL) {
+    lang[0] = CFStringCreateWithCString(kCFAllocatorDefault, requestedLang, kCFStringEncodingUTF8);
+    langArray = CFArrayCreate(kCFAllocatorDefault, (const void **)lang, sizeof(lang) / sizeof(lang[0]), &kCFTypeArrayCallBacks);
 
-	if (c == '%')
-	{
-	    sscanf(src, "%02x", &c);
-	    src += 2;
-	}
-	*dst++ = (char)c;
-    }
+    CFPreferencesSetAppValue(CFSTR("AppleLanguages"), langArray, kCFPreferencesCurrentApplication);
+    DEBUG_printf((stderr, "DEBUG: usb: AppleLanguages = \"%s\"\n", requestedLang));
 
-    if (dst >= dstEnd)
-	return -1;
-
-    *dst = '\0';
-    return 0;
+    CFRelease(lang[0]);
+    CFRelease(langArray);
+  } else {
+    fprintf(stderr, "DEBUG: usb: LANG environment variable missing.\n");
+  }
 }
 
-/*-----------------------------------------------------------------------------*
-
-	DelimitSubstring
-
-	Desc:	Search a string from a starting location, looking for a given
-		delimiter. Return the range from the start of the search to the
-		delimiter, or end of string (whichever is shorter).
-
-	In:	stringToSearch	    string which contains a substring that we search
-		delim		    string which marks the end of the string 
-		bounds		    start and length of substring of stringToSearch
-		options		    case sensitive, anchored, etc.
-
-	Out:	Range up to the delimiter.
-
-*-----------------------------------------------------------------------------*/
-static CFRange
-DelimitSubstring( CFStringRef stringToSearch, CFStringRef delim, CFRange bounds, CFStringCompareFlags options )
+#pragma mark -
+#if defined(__i386__)
+/*!
+ * @function	run_ppc_backend
+ *
+ * @abstract	Starts child backend process running as a ppc executable.
+ *
+ * @result	Never returns; always calls exit().
+ *
+ * @discussion	
+ */
+static void run_ppc_backend(int argc, char *argv[], int fd)
 {
-    CFRange	where_delim,	/* where the delimiter was found */
-		value;
-    /* */
-    /*	trim leading space by changing bounds */
-    /* */
-    while ( bounds.length > 0 && CFStringFindWithOptions( stringToSearch, CFSTR(" "), bounds, kCFCompareAnchored, &where_delim ) )
-    {
-	++bounds.location;  /* drop a leading ' ' */
-	--bounds.length;
-    }
-    value = bounds;	    /* assume match to the end of string, may be NULL */
-    /* */
-    /*	find the delimiter in the remaining string */
-    /* */
-    if (  bounds.length > 0 && CFStringFindWithOptions( stringToSearch, delim, bounds, options, &where_delim ) )
-    {
-	/* */
-	/* match to the delimiter */
-	/* */
-	value.length = where_delim.location /* delim */ - bounds.location /* start of search */;
-    }
-    DEBUG_CFString( "\tFind target", stringToSearch );
-    DEBUG_CFString( "\tFind pattern", delim );
-    DEBUG_ERR( (int) value.location, "\t\tFound %d\n" );
-    DEBUG_ERR( (int) value.length, " length %d"	 );
+  int	i;
+  int	exitstatus = 0;
+  int	childstatus;
+  pid_t	waitpid_status;
+  char	*my_argv[32];
+  char	*usb_ppc_status;
 
-    return value;
-}
+  /*
+   * If we're running as i386 and couldn't load the class driver (because they'it's
+   * ppc-only) then try to re-exec ourselves in ppc mode to try again. If we don't have
+   * a ppc architecture we may be running i386 again so guard against this by setting
+   * and testing an environment variable...
+   */
+  usb_ppc_status = getenv("USB_PPC_STATUS");
 
+  if (usb_ppc_status == NULL) {
+    /* Catch SIGTERM if we are _not_ printing data from
+     * stdin (otherwise you can't cancel raw jobs...)
+     */
 
-/*-----------------------------------------------------------------------------*
-
-	DeviceIDCreateValueList
-
-	Desc:	Create a new string for the value list of the specified key.
-		The key may be specified as two strings (an abbreviated form
-		and a standard form). NULL can be passed for either form of 
-		the key.
-		
-		(Although passing NULL for both forms of the key is considered
-		 bad form[!] it is handled correctly.)
-
-	In:	deviceID    the device's IEEE-1284 DeviceID key-value list
-		abbrevKey   the key we're interested in (NULL allowed)
-		key	    
-
-	Out:	CFString    the value list 
-		or NULL	    key wasn't found in deviceID
-
-*-----------------------------------------------------------------------------*/
-CFStringRef
-DeviceIDCreateValueList( const CFStringRef deviceID, const CFStringRef abbrevKey, const CFStringRef key )
-{
-    CFRange	found = CFRangeMake( -1,0);   /* note CFStringFind sets length 0 if string not found */
-    CFStringRef valueList = NULL;
-
-    DEBUG_CFString( "---------DeviceIDCreateValueList DeviceID:", deviceID );
-    DEBUG_CFString( "---------DeviceIDCreateValueList key:", key );
-    DEBUG_CFString( "---------DeviceIDCreateValueList abbrevkey:", abbrevKey );
-   if ( NULL != deviceID && NULL != abbrevKey )
-	found = CFStringFind( deviceID, abbrevKey, kCFCompareCaseInsensitive );
-    if (  NULL != deviceID && NULL != key && found.length <= 0 )
-	found = CFStringFind( deviceID, key, kCFCompareCaseInsensitive );
-    if ( found.length > 0 )
-    {
-	/* the key is at found */
-	/* the value follows the key until we reach the semi-colon, or end of string */
-	/* */
-	CFRange search = CFRangeMake( found.location + found.length,
-				  CFStringGetLength( deviceID ) - (found.location + found.length) );
-	/* */
-	/* finally extract the string */
-	/* */
-	valueList = CFStringCreateWithSubstring ( kCFAllocatorDefault, deviceID,
-						  DelimitSubstring( deviceID, kDeviceIDKeyValuePairDelimiter, search, kCFCompareCaseInsensitive ) );
-    DEBUG_CFString( "---------DeviceIDCreateValueList:", valueList );
-    }
-    return valueList;
-
-}
-
-
-
-/******************************************************************************/
-
-/*-----------------------------------------------------------------------------*
-
-CompareSameString
-
-Desc:	Return the CFCompare result for two strings, either or both of which
-	can be NULL.
-
-In:
-	a	current value
-	b	last value
-
-Out:
-	0	if the strings match
-	non-zero    if the strings don't match
-
-*-----------------------------------------------------------------------------*/
-static int
-CompareSameString( const CFStringRef a, const CFStringRef b )
-{
-    if ( NULL == a && NULL == b )
-	return 0;
-    else if ( NULL != a && NULL != b )
-	return CFStringCompare( a, b, kCFCompareAnchored );
-    else
-	return 1;   /* one of a or b is NULL this time, but wasn't last time */
-}
-
-
-/******************************************************************************/
-kern_return_t
-UsbLoadClassDriver( USBPrinterInfo *printer, CFUUIDRef interfaceID, CFStringRef classDriverBundle )
-{
-    kern_return_t   kr = kUSBPrinterClassDeviceNotOpen;
-    if ( NULL != classDriverBundle )
-	printer->bundle = classDriverBundle;	/* vendor-specific class override */
-    else
-#ifdef TIMEOUT
-	classDriverBundle = kUSBGenericTOPrinterClassDriver;	/*  supply the generic TIMEOUT class driver */
+    if (fd != 0) {
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+      sigset(SIGTERM, sigterm_handler);
+#elif defined(HAVE_SIGACTION)
+      struct sigaction action;	/* Actions for POSIX signals */
+      memset(&action, 0, sizeof(action));
+      sigaddset(&action.sa_mask, SIGTERM);
+      action.sa_handler = sigterm_handler;
+      sigaction(SIGTERM, &action, NULL);
 #else
-	classDriverBundle = kUSBGenericPrinterClassDriver;  /*	supply the generic  class driver */
-#endif
-    DEBUG_CFString( "UsbLoadClassDriver classDriverBundle", classDriverBundle );
-    if ( NULL != classDriverBundle )
-    {
-	USBPrinterClassContext	**classdriver = NULL;
-	CFURLRef		classDriverURL = CFURLCreateWithFileSystemPath( NULL, classDriverBundle, kCFURLPOSIXPathStyle, TRUE );
-	CFPlugInRef		plugin = NULL == classDriverURL? NULL: CFPlugInCreate( NULL, classDriverURL );
-	if ( NULL != plugin)
-	{
-	    /* See if this plug-in implements the Test type. */
-	    CFArrayRef factories =  CFPlugInFindFactoriesForPlugInTypeInPlugIn( kUSBPrinterClassTypeID, plugin );
+      signal(SIGTERM, sigterm_handler);
+#endif /* HAVE_SIGSET */
+    }
 
-	    /* If there are factories for the requested type, attempt to */
-	    /* get the IUnknown interface. */
-	    DEBUG_ERR( 0, "UsbLoadClassDriver plugin %x\n" );
-	    if (NULL != factories && CFArrayGetCount(factories) > 0) 
-	    {
-		/* Get the factory ID for the first location in the array of IDs. */
-		CFUUIDRef factoryID = CFArrayGetValueAtIndex( factories, 0 );
-		/* Use the factory ID to get an IUnknown interface. */
-		/* Here the code for the PlugIn is loaded. */
-		IUnknownVTbl **iunknown = CFPlugInInstanceCreate( NULL, factoryID, kUSBPrinterClassTypeID );
-		/* If this is an IUnknown interface, query for the Test interface. */
-		DEBUG_ERR( 0, "UsbLoadClassDriver factories %x\n" );
-		if (NULL != iunknown)
-		{
-		    DEBUG_ERR( 0, "UsbLoadClassDriver CFPlugInInstanceCreate %x\n" );
-		    kr = (*iunknown)->QueryInterface( iunknown, CFUUIDGetUUIDBytes(interfaceID), (LPVOID *) &classdriver );
+    if ((child_pid = fork()) == 0) {
+      /* Child comes here. */
+      setenv("USB_PPC_STATUS", "1", false);
 
-		    (*iunknown)->Release( iunknown );
-		    if ( S_OK == kr && NULL != classdriver )
-		    {
-			DEBUG_ERR( kr, "UsbLoadClassDriver QueryInterface %x\n" );
-			printer->plugin = plugin;
-			kr = (*classdriver)->Initialize( classdriver, printer->classdriver );
-			
-			kr = kIOReturnSuccess;
-			printer->classdriver = classdriver;
-		    }
-		    else
-		    {
-			DEBUG_ERR( kr, "UsbLoadClassDriver QueryInterface FAILED %x\n" );
-		    }
-		}
-		else
-		{
-		    DEBUG_ERR( kr, "UsbLoadClassDriver CFPlugInInstanceCreate FAILED %x\n" );
-		}
-	    }
-	    else
-	    {
-		DEBUG_ERR( kr, "UsbLoadClassDriver factories FAILED %x\n" );
-	    }
-	}
+      /* Tell the kernel we want the next exec call to favor the ppc architecture... */
+      int mib[] = { CTL_KERN, KERN_AFFINITY, 1, 1 };
+      int namelen = 4;
+      sysctl(mib, namelen, NULL, NULL, NULL, 0);
+
+      /* Set up the arguments and call exec... */
+      for (i = 0; i < argc && i < (sizeof(my_argv)/sizeof(my_argv[0])) - 1; i++)
+	my_argv[i] = argv[i];
+
+      my_argv[i] = NULL;
+
+      execv("/usr/libexec/cups/backend/usb", my_argv);
+
+      fprintf(stderr, "DEBUG: execv: %s\n", strerror(errno));
+      exitstatus = errno;
+    }
+    else if (child_pid > 0) {
+      /* Parent comes here. 
+       *
+       * Close the fds we won't be using then wait for the child backend to exit.
+       */
+      close(fd);
+      close(1);
+
+      fprintf(stderr, "DEBUG: Started usb(ppc) backend (PID %d)\n", (int)child_pid);
+
+      while ((waitpid_status = waitpid(child_pid, &childstatus, 0)) == (pid_t)-1 && errno == EINTR)
+        usleep(1000);
+
+      if (WIFSIGNALED(childstatus)) {
+	exitstatus = WTERMSIG(childstatus);
+	fprintf(stderr, "DEBUG: usb(ppc) backend %d crashed on signal %d!\n", child_pid, exitstatus);
+      }
+      else {
+	if ((exitstatus = WEXITSTATUS(childstatus)) != 0)
+	  fprintf(stderr, "DEBUG: usb(ppc) backend %d stopped with status %d!\n", child_pid, exitstatus);
 	else
-	{
-	    DEBUG_ERR( kr, "UsbLoadClassDriver plugin FAILED %x\n" );
-	}
-	if ( kr != kIOReturnSuccess || NULL == plugin || NULL == classdriver )
-	{
-	    UsbUnloadClassDriver( printer );
-	}
+	  fprintf(stderr, "DEBUG: PID %d exited with no errors\n", child_pid);
+      }
     }
-    
-    return kr;
-}
-
-
-kern_return_t
-UsbUnloadClassDriver( USBPrinterInfo *printer )
-{
-    DEBUG_ERR( kIOReturnSuccess, "UsbUnloadClassDriver %x\n" );
-    if ( NULL != printer->classdriver )
-	(*printer->classdriver)->Release( printer->classdriver );
-    printer->classdriver = NULL;
-    
-    if ( NULL != printer->plugin )
-	CFRelease( printer->plugin );
-    printer->plugin = NULL;
-    
-    return kIOReturnSuccess;
-}
-
-
-/*-----------------------------------------------------------------------------*
-
-    UsbAddressDispose
-
-    Desc:   deallocates anything used to create a persistent printer address
-
-    In: address	    the printer address we've created
-
-    Out:    <none>
-
-*-----------------------------------------------------------------------------*/
-void
-UsbAddressDispose( USBPrinterAddress *address )
-{
-    if ( address->product != NULL ) CFRelease( address->product );
-    if ( address->manufacturer != NULL ) CFRelease( address->manufacturer );
-    if ( address->serial != NULL ) CFRelease( address->serial );
-    if ( address->command != NULL ) CFRelease( address->command );
-
-    address->product =
-    address->manufacturer =
-    address->serial =
-    address->command = NULL;
-
-}
-
-/*-----------------------------------------------------------------------------*
-
-    UsbGetPrinterAddress
-
-    Desc:   Given a printer we're enumerating, discover it's persistent
-    reference.
-
-    A "persistent reference" is one which enables us to identify
-    a printer regardless of where it resides on the USB topology,
-    and enumeration sequence.
-
-    To do this, we actually construct a reference from information
-    buried inside the printer. First we look at the USB device
-    descripton: an ideally defined device will support strings for
-    manufacturer and product id, and serial number. The serial number
-    will be unique for each printer.
-
-    Our prefered identification fetches the IEEE-1284 device id string.
-    This transparently handled IEEE-1284 compatible printers which
-    connected over a USB-parallel cable. Only if we can't get all the
-    information to uniquely identify the printer do we try the strings
-    referenced in the printer's USB device descriptor. (These strings
-    are typically absent in a USB-parallel cable.)
-
-    If a device doesn't support serial numbers we have a problem:
-    we can't distinguish between two identical printers. Unique serial
-    numbers allow us to distinguish between two same-model, same-manufacturer
-    USB printers.
-
-    In:
-	thePrinter	iterator required for fetching device descriptor
-	devRefNum	required to configure the interface
-
-    Out:
-	address->manufacturer
-	address->product
-	address->serial
-		Any (and all) of these may be NULL if we can't retrieve
-		information for IEEE1284 DeviceID or the USB device
-		descriptor. Caller should be prepared to handle such a case.
-	address->command
-		May be updated.
-
-*-----------------------------------------------------------------------------*/
-OSStatus
-UsbGetPrinterAddress( USBPrinterInfo *thePrinter, USBPrinterAddress *address, UInt16 timeout )
-{
-
-    /* */
-    /*	start by assuming the device is not IEEE-1284 compliant */
-    /*	and that we can't read in the required strings. */
-    /* */
-    OSStatus		    err;
-    CFStringRef		    deviceId = NULL;
-    USBPrinterClassContext  **printer = NULL == thePrinter? NULL: thePrinter->classdriver;
-    
-    address->manufacturer =
-    address->product =
-    address->compatible =
-    address->serial =
-    address->command = NULL;
-
-    DEBUG_DUMP( "UsbGetPrinterAddress thePrinter", thePrinter, sizeof(USBPrinterInfo) );
-
-    err = (*printer)->GetDeviceID( printer, &deviceId, timeout );
-    if ( noErr == err && NULL != deviceId )
-    {
-	/* the strings embedded here are defined in the IEEE1284 spec */
-	/* */
-	/*  use the MFG/MANUFACTURER for the manufacturer */
-	/*  and the MDL/MODEL for the product */
-	/*  there is no serial number defined in IEEE1284 */
-	/*	but it's been observed in recent HP printers */
-	/* */
-	address->command = DeviceIDCreateValueList( deviceId, kDeviceIDKeyCommandAbbrev, kDeviceIDKeyCommand );
-
-	address->product = DeviceIDCreateValueList( deviceId, kDeviceIDKeyModelAbbrev, kDeviceIDKeyModel );
-	address->compatible = DeviceIDCreateValueList( deviceId, kDeviceIDKeyCompatibleAbbrev, kDeviceIDKeyCompatible );
-
-	address->manufacturer = DeviceIDCreateValueList( deviceId, kDeviceIDKeyManufacturerAbbrev, kDeviceIDKeyManufacturer );
-
-	address->serial = DeviceIDCreateValueList( deviceId, kDeviceIDKeySerialAbbrev, kDeviceIDKeySerial );
-	CFRelease( deviceId );
+    else {
+      /* fork() error */
+      fprintf(stderr, "DEBUG: fork: %s\n", strerror(errno));
+      exitstatus = errno;
     }
-    DEBUG_CFString( "UsbGetPrinterAddress DeviceID address->product", address->product );
-    DEBUG_CFString( "UsbGetPrinterAddress DeviceID address->compatible", address->compatible );
-    DEBUG_CFString( "UsbGetPrinterAddress DeviceID address->manufacturer", address->manufacturer );
-    DEBUG_CFString( "UsbGetPrinterAddress DeviceID address->serial", address->serial );
+  }
+  else {
+    fprintf(stderr, "DEBUG: usb child running i386 again\n");
+    exitstatus = ENOENT;
+  }
 
-    if ( NULL == address->product || NULL == address->manufacturer || NULL == address->serial )
-    {
-	/* */
-	/*  if the manufacturer or the product or serial number were not specified in DeviceID */
-	/*	try to construct the address using USB English string descriptors */
-	/* */
-	IOUSBDeviceDescriptor	desc;
-	USBIODeviceRequest	request;
-				
-	request.requestType = USBmakebmRequestType( kUSBIn,  kUSBStandard, kUSBDevice );
-	request.request = kUSBRqGetDescriptor;
-	request.value = (kUSBDeviceDesc << 8) | 0;
-	request.index = 0;  /* not kUSBLanguageEnglish*/
-	request.length = sizeof(desc);
-	request.buffer = &desc;
-	err = (*printer)->DeviceRequest( printer, &request, timeout );
-	DEBUG_ERR( (kern_return_t) err, "UsbGetPrinterAddress: GetDescriptor %x" );
-	if ( kIOReturnSuccess == err )
-	{
-	    /* once we've retrieved the device descriptor */
-	    /*	try to fill in missing pieces of information */
-	    /* */
-	    /*	Don't override any information already retrieved from DeviceID. */
-
-	    if ( NULL == address->product)
-	    {
-		err = (*printer)->GetString( printer, desc.iProduct, kUSBLanguageEnglish, timeout, &address->product );
-		if ( kIOReturnSuccess != err || address->product == NULL) {
-		    address->product = CFSTR("Unknown");
-		}		 
-	    }
-	    DEBUG_CFString( "UsbGetPrinterAddress: UsbGetString address->product\n", address->product );
-
-	    if ( NULL == address->manufacturer )
-	    {
-		err = (*printer)->GetString( printer, desc.iManufacturer, kUSBLanguageEnglish, timeout, &address->manufacturer );
-		if (kIOReturnSuccess != err || address->manufacturer == NULL) {
-		    address->manufacturer = CFSTR("Unknown");
-		}
-	    }
-	    DEBUG_CFString( "UsbGetPrinterAddress: UsbGetString address->manufacturer\n", address->manufacturer );
-
-	    if ( NULL == address->serial )
-	    {
-		/* if the printer doesn't have a serial number, use locationId */
-		if ( 0 == desc.iSerialNumber )
-		{
-		    address->serial = CFStringCreateWithFormat( NULL, NULL, CFSTR("%lx"), (*printer)->location );
-		}
-		else
-		{
-		    err = (*printer)->GetString( printer, desc.iSerialNumber, kUSBLanguageEnglish, timeout, &address->serial );
-		    /* trailing NULs aren't handled correctly in URI */
-		    if ( address->serial )
-		    {
-			UniChar	    nulbyte = { 0 };
-			CFStringRef trim = CFStringCreateWithCharacters(NULL, &nulbyte, 1);
-			CFMutableStringRef newserial = CFStringCreateMutableCopy(NULL, 0, address->serial);
-
-			CFStringTrim( newserial, trim );
-
-			CFRelease(trim);
-			CFRelease( address->serial );
-
-			address->serial = newserial;
-		    }
-		}
-	    }
-	    DEBUG_CFString( "UsbGetPrinterAddress: UsbGetString address->serial\n", address->serial );
-	}
-    }
-    if ( NULL != address->product)
-	CFRetain(address->product);	    /* UsbGetString is really a UsbCopyString. */
-    if ( NULL != address->manufacturer )
-	CFRetain( address->manufacturer );
-    if ( NULL != address->serial )
-	CFRetain( address->serial );
-    return err;
+  exit(exitstatus);
 }
 
-
-/*-----------------------------------------------------------------------------*
-
-UsbSamePrinter
-
-	Desc:	match two Usb printer address; return TRUE if they are the same.
-
-	In:	a   the persistent address found last time
-		b   the persistent address found this time
-
-	Out:	non-zero iff the addresses are the same
-
-*-----------------------------------------------------------------------------*/
-int
-UsbSamePrinter( const USBPrinterAddress *a, const USBPrinterAddress *b )
-{
-    int result = 0;
-    DEBUG_CFCompareString( "UsbSamePrinter serial", a->serial, b->serial );
-    DEBUG_CFCompareString( "UsbSamePrinter product", a->product, b->product );
-    DEBUG_CFCompareString( "UsbSamePrinter manufacturer", a->manufacturer, b->manufacturer );
-
-    result = !CompareSameString( a->serial, b->serial );
-    if ( result )  result = !CompareSameString( a->product, b->product );
-    if ( result ) result = !CompareSameString( a->manufacturer, b->manufacturer );
-
-    return result;
-}
-
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Method:	UsbMakeFullUriAddress
-
-    Input Parameters:
-
-    Output Parameters:
-
-    Description:
-	Fill in missing address information
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-CFStringRef
-UsbMakeFullUriAddress( USBPrinterInfo *printer )
-{
-    /* */
-    /*	fill in missing address information. */
-    /* */
-    CFMutableStringRef printerUri = CFStringCreateMutableCopy(kCFAllocatorDefault, 0, CFSTR("usb://") );
-    if ( NULL != printerUri )
-    {
-	CFStringRef serial = printer->address.serial;
-
-	CFStringAppend(printerUri, printer->address.manufacturer? CreateEncodedCFString( printer->address.manufacturer ): CFSTR("Unknown") );
-	CFStringAppend(printerUri, CFSTR("/") );
-
-	CFStringAppend(printerUri, printer->address.product? CreateEncodedCFString( printer->address.product ): CFSTR("Unknown") );
-
-	/*Handle the common case where there is no serial number (S450?) */
-	CFStringAppend(printerUri, serial == NULL? CFSTR("?location="): CFSTR("?serial=") );
-	if ( serial == NULL)
-	    serial = CFStringCreateWithFormat( NULL, NULL, CFSTR("%lx"), printer->location );
-
-	 CFStringAppend(printerUri,  serial? CreateEncodedCFString( serial ): CFSTR("Unknown") );
-    }
-    
-    return printerUri;
-}
-
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Method:	UsbGetAllPrinters
-
-    Input Parameters:
-
-    Output Parameters:
-	array of all USB printers on the system
-
-    Description:
-	Build a list of USB printers by iterating IOKit USB objects
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-CFMutableArrayRef
-UsbGetAllPrinters( void )
-{
-    kern_return_t	kr;	/* kernel errors */
-    mach_port_t		master_device_port = 0;
-    io_service_t	usbInterface = 0;
-    io_iterator_t	iter = 0;
-    CFMutableArrayRef	printers = CFArrayCreateMutable( NULL, 0, NULL );   /* all printers */
-
-    do
-    {
-
-	kr = IOMasterPort( bootstrap_port, &master_device_port );
-	DEBUG_ERR( kr, "UsbGetAllPrinters IOMasterPort %x\n" );
-	if(kIOReturnSuccess != kr)  break;
-
-	{
-	    CFDictionaryRef	usbMatch = NULL;
-	    
-	    /* iterate over all interfaces.  */
-	    usbMatch = IOServiceMatching(kIOUSBInterfaceClassName);
-	    if ( !usbMatch ) break;
-	    DEBUG_ERR( kr, "UsbGetAllPrinters IOServiceMatching %x\n" );
-	
-	    /* IOServiceGetMatchingServices() consumes the usbMatch reference so we don't need to release it. */
-	    kr = IOServiceGetMatchingServices(master_device_port, usbMatch, &iter);
-	    usbMatch = NULL;
-	    
-	    DEBUG_ERR( kr, "UsbGetAllPrinters IOServiceGetMatchingServices %x\n" );
-	    if(kIOReturnSuccess != kr || iter == NULL)	break;
-	}
-	
-	while (	 NULL != (usbInterface = IOIteratorNext(iter))	)
-	{
-	    IOCFPlugInInterface	    **iodev;
-	    USBPrinterInterface	    intf;
-	    HRESULT		    res;
-	    SInt32		    score;
-	    CFMutableDictionaryRef  properties;
-	    CFStringRef		    classDriver = NULL;
-
-	    kr = IORegistryEntryCreateCFProperties( usbInterface, &properties, kCFAllocatorDefault, kNilOptions);
-	    if ( kIOReturnSuccess == kr && NULL != properties)
-	    {
-		classDriver = (CFStringRef) CFDictionaryGetValue( properties, kUSBClassDriverProperty );
-		if ( NULL != classDriver )
-		    CFRetain( classDriver );
-		CFRelease( properties );
-	    }	 
-
-	    kr = IOCreatePlugInInterfaceForService( usbInterface,
-							kIOUSBInterfaceUserClientTypeID, 
-							kIOCFPlugInInterfaceID,
-							&iodev,
-							&score);
-		
-	    DEBUG_ERR( kr, "UsbGetAllPrinters IOCreatePlugInInterfaceForService %x\n" );
-	    if ( kIOReturnSuccess == kr )
-	    {
-		UInt8		    intfClass = 0;
-		UInt8		    intfSubClass = 0;
- 
-		res = (*iodev)->QueryInterface( iodev, USB_INTERFACE_KIND, (LPVOID *) &intf);
-		DEBUG_ERR( (kern_return_t) res, "UsbGetAllPrinters QueryInterface %x\n" );
-
-	       (*iodev)->Release(iodev);
-		if ( noErr != res ) break;
- 
-		kr = (*intf)->GetInterfaceClass(intf, &intfClass);
-		DEBUG_ERR(kr, "UsbGetAllPrinters GetInterfaceClass %x\n");
-		if ( kIOReturnSuccess == kr )
-		    kr = (*intf)->GetInterfaceSubClass(intf, &intfSubClass);
-		DEBUG_ERR(kr, "UsbGetAllPrinters GetInterfaceSubClass %x\n");
-		
-		if ( kIOReturnSuccess == kr &&
-			kUSBPrintingClass == intfClass &&
-			kUSBPrintingSubclass == intfSubClass )
-		{
-
-		    USBPrinterInfo	    printer,
-					    *printerInfo;
-		    /*
-		    For each type of printer specified in the lookup spec array, find
-		    all of that type of printer and add the results to the list of found
-		    printers.
-		    */
-		    /* create this printer's persistent address */
-		    memset( &printer, 0, sizeof(USBPrinterInfo) );
-		    kr = (*intf)->GetLocationID(intf, &printer.location);
-		    DEBUG_ERR(kr, "UsbGetAllPrinters GetLocationID %x\n");
-		    if ( kIOReturnSuccess == kr )
-		    {
-			kr = UsbLoadClassDriver( &printer, kUSBPrinterClassInterfaceID, classDriver );
-			DEBUG_ERR(kr, "UsbGetAllPrinters UsbLoadClassDriver %x\n");
-			if ( kIOReturnSuccess == kr && printer.classdriver )
-			{
-			    (*(printer.classdriver))->interface = intf;
-			    kr = UsbGetPrinterAddress( &printer, &printer.address, 60000L );
-			    { 
-				/* always unload the driver */
-				/*  but don't mask last error */
-				kern_return_t unload_err = UsbUnloadClassDriver( &printer );
-				if ( kIOReturnSuccess == kr )
-				    kr = unload_err;
-			    }
-			}
-		    }
-		    
-		    printerInfo = UsbCopyPrinter( &printer );
-		    if ( NULL != printerInfo )
-			CFArrayAppendValue( printers, (const void *) printerInfo );	/* keep track of it */
-
-		 } /* if there's a printer */
-		kr = (*intf)->Release(intf);
-	    } /* if IOCreatePlugInInterfaceForService */
-	    
-	    IOObjectRelease(usbInterface);
-	    usbInterface = NULL;
-	    
-	} /* while there's an interface */
-    } while ( 0 );
-
-    if (iter) 
-    {
-	IOObjectRelease(iter);
-	iter = 0;
-    }
-
-    if (master_device_port) 
-    {
-	mach_port_deallocate(mach_task_self(), master_device_port);
-	master_device_port = 0;
-    }
-    return printers;
-
-} /* UsbGetAllPrinters */
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Method:	UsbReleasePrinter
-
-    Input Parameters:
-
-    Output Parameters:
-
-    Description:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-void
-UsbReleasePrinter( USBPrinterInfo *printer )
-{
-    if ( printer )
-    {
-	UsbUnloadClassDriver( printer );
-	if ( NULL != printer->address.manufacturer )
-	    CFRelease( printer->address.manufacturer );
-	if ( NULL != printer->address.product )
-	    CFRelease( printer->address.product );
-	if ( NULL != printer->address.serial )
-	    CFRelease( printer->address.serial );
-	if ( NULL != printer->address.command )
-	    CFRelease( printer->address.command );
-	if ( NULL != printer->bundle )
-	    CFRelease( printer->bundle );
-	free( printer );
-   }
-}
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Method:	UsbReleaseAllPrinters
-
-    Input Parameters:
-
-    Output Parameters:
-
-    Description:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-void
-UsbReleaseAllPrinters( CFMutableArrayRef printers )
-{
-    if ( NULL != printers )
-    {
-	CFIndex i,
-		numPrinters = CFArrayGetCount(printers);
-	for ( i = 0; i < numPrinters; ++i ) 
-	    UsbReleasePrinter( (USBPrinterInfo *) CFArrayGetValueAtIndex( printers, i ) );
-	CFRelease( printers );		
-    }
-}
-
-USBPrinterInfo *
-UsbCopyPrinter( USBPrinterInfo *aPrinter )
-{
-    /* */
-    /*	note this does not copy interface information, just address information */
-    /* */
-    USBPrinterInfo *printerInfo = (USBPrinterInfo *) calloc( 1, sizeof(USBPrinterInfo));
-    if ( NULL != printerInfo && NULL != aPrinter )
-    {
-	printerInfo->location = aPrinter->location;
-	if ( NULL != (printerInfo->address.manufacturer = aPrinter->address.manufacturer) )
-	    CFRetain( printerInfo->address.manufacturer );
-	if ( NULL != (printerInfo->address.product = aPrinter->address.product) )
-	    CFRetain( printerInfo->address.product );
-	if ( NULL != (printerInfo->address.serial = aPrinter->address.serial) )
-	    CFRetain( printerInfo->address.serial );
-	if ( NULL != (printerInfo->address.command = aPrinter->address.command) )
-	    CFRetain( printerInfo->address.command );
-	if ( NULL != (printerInfo->bundle = aPrinter->bundle) )
-	    CFRetain( printerInfo->bundle );
-    }
-    
-    return printerInfo;
-}
-
-/*-----------------------------------------------------------------------------*
-
-	UsbRegistryOpen
-
-	Desc:	opens the USB printer which matches the supplied printerAddress
-
-	In:	myContext->printerAddress   persistent name which identifies the printer
-
-	Out:	myContext->usbDeviceRef	    current IOKit address of this printer
-*-----------------------------------------------------------------------------*/
-kern_return_t
-UsbRegistryOpen( USBPrinterAddress *usbAddress, USBPrinterInfo **result )
-{
-    kern_return_t	kr = -1;    /* indeterminate failure */
-    CFMutableArrayRef	printers = UsbGetAllPrinters();
-    CFIndex		numPrinters = NULL != printers? CFArrayGetCount( printers): 0;
-    CFIndex		i;
-
-    *result = NULL; /* nothing matched */
-    for ( i = 0; i < numPrinters; ++i )
-    {
-	USBPrinterInfo	*thisPrinter = (USBPrinterInfo *) CFArrayGetValueAtIndex( printers, i );
-	if (  NULL != thisPrinter && UsbSamePrinter( usbAddress, &thisPrinter->address ) ) 
-	{
-	    *result = UsbCopyPrinter( thisPrinter );	/* retains reference */
-	    if ( NULL != *result )
-	    {
-		/* */
-		/*  if we can't find a bi-di interface, settle for a known uni-directional interface */
-		/* */
-		USBPrinterClassContext **printer = NULL;
-		/* */
-		/*  setup the default class driver */
-		/*  If one is specified, allow the vendor driver to override our default implementation */
-		/* */
-		kr = UsbLoadClassDriver( *result, kUSBPrinterClassInterfaceID, NULL );
-		if ( kIOReturnSuccess == kr && (*result)->bundle )
-		    kr = UsbLoadClassDriver( *result, kUSBPrinterClassInterfaceID, (*result)->bundle );
-		if ( kIOReturnSuccess == kr && NULL != (*result)->classdriver )
-		{
-		    printer = (*result)->classdriver;
-		    kr = (*printer)->Open( printer, (*result)->location, kUSBPrintingProtocolBidirectional );
-		    if ( kIOReturnSuccess != kr || NULL == (*printer)->interface )
-			kr = (*printer)->Open( printer, (*result)->location, kUSBPrintingProtocolUnidirectional );
-		    /*	it's possible kIOReturnSuccess == kr && NULL == (*printer)->interface */
-		    /*	    in the event that we can't open either Bidirectional or Unidirectional interface */
-		    if ( kIOReturnSuccess == kr )
-		    {
-			if ( NULL == (*printer)->interface )
-			{
-			    (*printer)->Close( printer );
-			    UsbReleasePrinter( *result );
-			    *result = NULL;
-			}
-		    }
-		}
-	    }
-	    break;
-	}
-    }
-    UsbReleaseAllPrinters( printers ); /* but, copied printer is retained */
-    DEBUG_ERR( kr, "UsbRegistryOpen return %x\n" );
-
-    return kr;
-}
-
-/*!
- * @function	CreateEncodedCFString
- *
- * @abstract	Create an encoded version of the string parameter 
- *		so that it can be included in a URI.
- *
- * @param   string  A CFStringRef of the string to be encoded.
- * @result  An encoded CFString.
- *
- * @discussion	This function will change all characters in string into URL acceptable format
- *		by encoding the text using the US-ASCII coded character set.  The following
- *		are invalid characters: the octets 00-1F, 7F, and 80-FF hex.  Also called out
- *		are the chars "<", ">", """, "#", "{", "}", "|", "\", "^", "~", "[", "]", "`".
- *		The reserved characters for URL syntax are also to be encoded: (so don't pass
- *		in a full URL here!) ";", "/", "?", ":", "@", "=", "%", and "&".
+/*
+ * 'sigterm_handler()' - SIGTERM handler.
  */
-static CFStringRef CreateEncodedCFString(CFStringRef string)
-{
-    CFStringRef result = NULL;
-    char *bufferUTF8 = NULL;
-    char *bufferEncoded = NULL;
 
-    if (string != NULL)
-    {
-	CFIndex bufferSizeUTF8 = (3 * CFStringGetLength(string));
-	if ((bufferUTF8 = (char*)malloc(bufferSizeUTF8)) != NULL)
-	{
-	    CFStringGetCString(string, bufferUTF8, bufferSizeUTF8, kCFStringEncodingUTF8);
-	    {
-		UInt16 bufferSizeEncoded = (3 * strlen(bufferUTF8)) + 1;
-		if ((bufferEncoded = (char*)malloc(bufferSizeEncoded)) != NULL)
-		{
-		    addPercentEscapes(bufferUTF8, bufferEncoded, bufferSizeEncoded);
-		    result = CFStringCreateWithCString(kCFAllocatorDefault, bufferEncoded, kCFStringEncodingUTF8);
-		}
-	    }
-	}
+static void sigterm_handler(int sig)
+{
+  /* If we started a child process pass the signal on to it...
+   */
+  if (child_pid)
+    kill(child_pid, sig);
+
+  exit(1);
+}
+
+#endif /* __i386__ */
+
+
+#ifdef PARSE_PS_ERRORS
+/*
+ * 'next_line()' - Find the next line in a buffer.
+ */
+
+static const char *next_line (const char *buffer)
+{
+  const char *cptr, *lptr = NULL;
+
+  for (cptr = buffer; *cptr && lptr == NULL; cptr++)
+    if (*cptr == '\n' || *cptr == '\r')
+      lptr = cptr;
+  return lptr;
+}
+
+
+/*
+ * 'parse_pserror()' - Scan the backchannel data for postscript errors.
+ */
+
+static void parse_pserror (char *sockBuffer, int len)
+{
+  static char  gErrorBuffer[1024] = "";
+  static char *gErrorBufferPtr = gErrorBuffer;
+  static char *gErrorBufferEndPtr = gErrorBuffer + sizeof(gErrorBuffer);
+
+  char *pCommentBegin, *pCommentEnd, *pLineEnd;
+  char *logLevel;
+  char logstr[1024];
+  int  logstrlen;
+
+  if (gErrorBufferPtr + len > gErrorBufferEndPtr - 1)
+    gErrorBufferPtr = gErrorBuffer;
+  if (len > sizeof(gErrorBuffer) - 1)
+    len = sizeof(gErrorBuffer) - 1;
+
+  memcpy(gErrorBufferPtr, (const void *)sockBuffer, len);
+  gErrorBufferPtr += len;
+  *(gErrorBufferPtr + 1) = '\0';
+
+
+  pLineEnd = (char *)next_line((const char *)gErrorBuffer);
+  while (pLineEnd != NULL) {
+    *pLineEnd++ = '\0';
+
+    pCommentBegin = strstr(gErrorBuffer,"%%[");
+    pCommentEnd = strstr(gErrorBuffer, "]%%");
+    if (pCommentBegin != gErrorBuffer && pCommentEnd != NULL) {
+      pCommentEnd += 3;            /* Skip past "]%%" */
+      *pCommentEnd = '\0';         /* There's always room for the nul */
+
+      if (strncasecmp(pCommentBegin, "%%[ Error:", 10) == 0)
+	logLevel = "DEBUG";
+      else if (strncasecmp(pCommentBegin, "%%[ Flushing", 12) == 0)
+	logLevel = "DEBUG";
+      else
+	logLevel = "INFO";
+
+      if ((logstrlen = snprintf(logstr, sizeof(logstr), "%s: %s\n", logLevel, pCommentBegin)) >= sizeof(logstr)) {
+	/* If the string was trucnated make sure it has a linefeed before the nul */
+	logstrlen = sizeof(logstr) - 1;
+	logstr[logstrlen - 1] = '\n';
+      }
+      write(STDERR_FILENO, logstr, logstrlen);
     }
 
-    if (bufferUTF8)	free(bufferUTF8);
-    if (bufferEncoded)	free(bufferEncoded);
-
-    return result;
+    /* move everything over... */
+    strcpy(gErrorBuffer, pLineEnd);
+    gErrorBufferPtr = gErrorBuffer;
+    pLineEnd = (char *)next_line((const char *)gErrorBuffer);
+  }
 }
+#endif /* PARSE_PS_ERRORS */
+
+
+/*
+ * 'read_thread()' - A thread to read the backchannel data.
+ */
+
+static void *read_thread(void *reference)
+{
+  /* post a read to the device and write results to stdout
+   * the final pending read will be Aborted in the main thread
+   */
+  UInt8				readbuffer[512];
+  UInt32			rbytes;
+  kern_return_t			readstatus;
+  printer_data_t		*userData = (printer_data_t *)reference;
+  classdriver_context_t	**classdriver = userData->printerDriver;
+  struct mach_timebase_info	timeBaseInfo;
+  uint64_t			start,
+				delay;
+
+  /* Calculate what 250 milliSeconds are in mach absolute time...
+   */
+  mach_timebase_info(&timeBaseInfo);
+  delay = ((uint64_t)250000000 * (uint64_t)timeBaseInfo.denom) / (uint64_t)timeBaseInfo.numer;
+
+  do {
+    /* Remember when we started so we can throttle the loop after the read call...
+     */
+    start = mach_absolute_time();
+
+    rbytes = sizeof(readbuffer) - 1;
+    readstatus = (*classdriver)->ReadPipe( classdriver, readbuffer, &rbytes );
+    if ( kIOReturnSuccess == readstatus && rbytes > 0 ) {
+
+      cupsBackChannelWrite((char*)readbuffer, rbytes, 1.0);
+
+      /* cntrl-d is echoed by the printer.
+       * NOTES: 
+       *   Xerox Phaser 6250D doesn't echo the cntrl-d.
+       *   Xerox Phaser 6250D doesn't always send the product query.
+       */
+      if (userData->waitEOF && readbuffer[rbytes-1] == 0x4)
+	break;
+#ifdef PARSE_PS_ERRORS
+      parse_pserror(readbuffer, rbytes);
+#endif
+    }
+
+    /* Make sure this loop executes no more than once every 250 miliseconds...
+     */
+    if ((readstatus != kIOReturnSuccess || rbytes == 0) && (userData->waitEOF || !userData->done))
+      mach_wait_until(start + delay);
+
+  } while ( userData->waitEOF || !userData->done );	/* Abort from main thread tests error here */
+
+  /* Let the other thread (main thread) know that we have completed the read thread...
+   */
+  pthread_mutex_lock(&userData->readMutex);
+  pthread_cond_signal(&userData->readCompleteCondition);
+  pthread_mutex_unlock(&userData->readMutex);
+
+  return NULL;
+}
+
 
 /*
  * End of "$Id$".

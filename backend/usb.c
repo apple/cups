@@ -63,7 +63,7 @@
 void	list_devices(void);
 int	print_device(const char *uri, const char *hostname,
 	             const char *resource, const char *options,
-		     int fp, int copies);
+		     int fp, int copies, int argc, char *argv[]);
 
 
 /*
@@ -109,7 +109,9 @@ print_device(const char *uri,		/* I - Device URI */
              const char *resource,	/* I - Resource/modelname */
 	     const char *options,	/* I - Device options/serial number */
 	     int        fp,		/* I - File descriptor to print */
-	     int        copies)		/* I - Copies to print */
+	     int        copies,		/* I - Copies to print */
+	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
+	     char	*argv[])	/* I - Command-line arguments */
 {
  /*
   * Can't print, so just reference the arguments to eliminate compiler
@@ -124,6 +126,8 @@ print_device(const char *uri,		/* I - Device URI */
   (void)options;
   (void)fp;
   (void)copies;
+  (void)argc;
+  (void)argv;
 
   return (CUPS_BACKEND_FAILED);
 }
@@ -251,7 +255,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Finally, send the print file...
   */
 
-  status = print_device(uri, hostname, resource, options, fp, copies);
+  status = print_device(uri, hostname, resource, options, fp, copies, argc, argv);
 
  /*
   * Close the input file and return...

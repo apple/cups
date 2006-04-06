@@ -56,7 +56,9 @@ print_device(const char *uri,		/* I - Device URI */
              const char *resource,	/* I - Resource/modelname */
 	     const char *options,	/* I - Device options/serial number */
 	     int        fp,		/* I - File descriptor to print */
-	     int        copies)		/* I - Copies to print */
+	     int        copies,		/* I - Copies to print */
+	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
+	     char	*argv[])	/* I - Command-line arguments */
 {
   int		fd;			/* USB device */
   int		rbytes;			/* Number of bytes read */
@@ -77,6 +79,8 @@ print_device(const char *uri,		/* I - Device URI */
   unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
 #endif /* __linux */
 
+  (void)argc;
+  (void)argv;
 
  /*
   * Open the USB port device...

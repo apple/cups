@@ -100,6 +100,15 @@ typedef struct
 
 typedef SSLConnectionRef http_tls_t;
 
+typedef union _cdsa_conn_ref_u		/**** CDSA Connection reference union
+					 **** used to resolve 64-bit casting
+					 **** warnings.
+					 ****/
+{
+  SSLConnectionRef connection;		/* SSL connection pointer */
+  int		   sock;		/* Socket */
+} cdsa_conn_ref_t;
+
 extern OSStatus	_httpReadCDSA(SSLConnectionRef connection, void *data,
 		              size_t *dataLength);
 extern OSStatus	_httpWriteCDSA(SSLConnectionRef connection, const void *data,

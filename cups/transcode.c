@@ -49,6 +49,7 @@
 
 #include "globals.h"
 #include "debug.h"
+#include <limits.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>

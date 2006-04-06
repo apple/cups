@@ -119,7 +119,6 @@ cupsdStartServer(void)
 
   LastEvent     = CUPSD_EVENT_PRINTER_CHANGED | CUPSD_EVENT_JOB_STATE_CHANGED |
                   CUPSD_EVENT_SERVER_STARTED;
-  LastEventTime = 0;
 
   started = 1;
 }

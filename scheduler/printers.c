@@ -2271,6 +2271,11 @@ cupsdSetPrinterState(
 
   if (old_state != s)
   {
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE_CHANGED, p, NULL,
+		  "%s \"%s\" state changed.",
+		  (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
+		  p->name);
+
    /*
     * Let the browse code know this needs to be updated...
     */

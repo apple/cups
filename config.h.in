@@ -71,6 +71,13 @@
 
 
 /*
+ * Default printcap file...
+ */
+
+#define CUPS_DEFAULT_PRINTCAP	"/etc/printcap"
+
+
+/*
  * Maximum number of file descriptors to support.
  */
 
