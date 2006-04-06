@@ -140,31 +140,34 @@ cupsdStartProcess(
                   command, argv, envp, infd, outfd, errfd);
 
 #if defined(__APPLE__)
- /*
-  * Add special voodoo magic for MacOS X - this allows MacOS X 
-  * programs to access their bundle resources properly...
-  */
-
-  if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
+  if (envp)
   {
    /*
-    * Yes, this is a symlink to the actual program, nul-terminate and
-    * use it...
+    * Add special voodoo magic for MacOS X - this allows MacOS X 
+    * programs to access their bundle resources properly...
     */
 
-    linkpath[linkbytes] = '\0';
+    if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
+    {
+     /*
+      * Yes, this is a symlink to the actual program, nul-terminate and
+      * use it...
+      */
 
-    if (linkpath[0] == '/')
-      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s",
-	       linkpath);
+      linkpath[linkbytes] = '\0';
+
+      if (linkpath[0] == '/')
+	snprintf(processPath, sizeof(processPath), "CFProcessPath=%s",
+		 linkpath);
+      else
+	snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
+		 dirname(command), linkpath);
+    }
     else
-      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
-	       dirname(command), linkpath);
-  }
-  else
-    snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
+      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
 
-  envp[0] = processPath;		/* Replace <CFProcessPath> string */
+    envp[0] = processPath;		/* Replace <CFProcessPath> string */
+  }
 #endif	/* __APPLE__ */
 
  /*
