@@ -107,6 +107,8 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 #  ifdef HAVE_MBR_UID_TO_UUID
     uuid_t		group;		/* Group ID */
 #  endif /* HAVE_MBR_UID_TO_UUID */
+    static int		acls_not_supported = 0;
+					/* Only warn once */
 #endif /* HAVE_ACL_INIT */
 
 
@@ -201,7 +203,8 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 
       if (acl_valid(acl))
       {
-        char *text, *textptr;
+        char *text, *textptr;		/* Temporary string */
+
 
         cupsdLogMessage(CUPSD_LOG_ERROR, "ACL did not validate: %s",
 	                strerror(errno));
@@ -217,9 +220,16 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 #  endif /* HAVE_MBR_UID_TO_UUID */
 
       if (acl_set_fd(fd, acl))
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"Unable to set ACLs on root certificate \"%s\" - %s",
-			filename, strerror(errno));
+      {
+	if (errno != EOPNOTSUPP || !acls_not_supported)
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Unable to set ACLs on root certificate \"%s\" - %s",
+			  filename, strerror(errno));
+
+	if (errno == EOPNOTSUPP)
+	  acls_not_supported = 1;
+      }
+
       acl_free(acl);
     }
 #endif /* HAVE_ACL_INIT */

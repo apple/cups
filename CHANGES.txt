@@ -3,6 +3,8 @@ CHANGES.txt - 2006-04-07
 
 CHANGES IN CUPS V1.2
 
+	- The scheduler now only warns about unsupported ACLs
+	  once (STR #1532)
 	- The "fitplot" option did not work with output from
 	  Mozilla (STR #1542)
 	- The imagetops filter did not work with Level 2 or 3
