@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-04-06
+CHANGES.txt - 2006-04-07
 ------------------------
 
 CHANGES IN CUPS V1.2
 
+	- The imagetops filter did not work with Level 2 or 3
+	  printers (STR #1533)
 	- The scheduler now recognizes PostScript files with PJL
 	  commands that do not include an ENTER LANGUAGE command.
 	- Added --with-printcap configure option.

@@ -873,7 +873,7 @@ main(int  argc,				/* I - Number of command-line arguments */
           }
 
           printf("<<"
-                 "/cupsImageType 1"
+                 "/ImageType 1"
 		 "/Width %d"
 		 "/Height %d"
 		 "/BitsPerComponent 8",
@@ -892,12 +892,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 		break;
           }
 
-          fputs("/DataSource currentfile /ASCII85Decode filter", stdout);
+          fputs("\n/DataSource currentfile/ASCII85Decode filter", stdout);
 
           if (((xc1 - xc0 + 1) / xprint) < 100.0)
             fputs("/Interpolate true", stdout);
 
-          puts("/cupsImageMatrix[1 0 0 -1 0 1]>>image");
+          puts("/ImageMatrix[1 0 0 -1 0 1]>>image");
 
           for (y = yc0, out_offset = 0; y <= yc1; y ++)
           {
