@@ -438,12 +438,10 @@ check_range(pstops_doc_t *doc,		/* I - Document information */
     * See if we only print even or odd pages...
     */
 
-    if (!strcasecmp(doc->page_set, "even") &&
-        ((page - 1) % (doc->number_up << 1)) < doc->number_up)
+    if (!strcasecmp(doc->page_set, "even") && (page & 1))
       return (0);
 
-    if (!strcasecmp(doc->page_set, "odd") &&
-        ((page - 1) % (doc->number_up << 1)) >= doc->number_up)
+    if (!strcasecmp(doc->page_set, "odd") && !(page & 1))
       return (0);
   }
 
@@ -796,7 +794,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   * Finish up the last page(s)...
   */
 
-  if (number && is_not_last_page(number))
+  if (number && is_not_last_page(number) && cupsArrayLast(doc->pages))
   {
     pageinfo = (pstops_page_t *)cupsArrayLast(doc->pages);
 
