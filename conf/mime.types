@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types 4590 2005-08-24 19:25:49Z mike $"
+# "$Id: mime.types 5375 2006-04-06 20:10:55Z mike $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -77,7 +77,9 @@ application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				(contains(0,1024,"LANGUAGE=POSTSCRIPT") \
 				 contains(0,1024,"LANGUAGE = Postscript") \
 				 contains(0,1024,"LANGUAGE = PostScript") \
-				 contains(0,1024,"LANGUAGE = POSTSCRIPT"))
+				 contains(0,1024,"LANGUAGE = POSTSCRIPT") \
+				 (contains(0,1024,<0a>%!) + \
+				  !contains(0,1024,"ENTER LANGUAGE")))
 application/vnd.hp-HPGL		hpgl string(0,<1B>&)\
 				string(0,<1B>E<1B>%0B) \
 				string(0,<1B>%-1B) string(0,<201B>)\
@@ -165,5 +167,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #application/octet-stream
 
 #
-# End of "$Id: mime.types 4590 2005-08-24 19:25:49Z mike $".
+# End of "$Id: mime.types 5375 2006-04-06 20:10:55Z mike $".
 #

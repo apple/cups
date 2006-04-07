@@ -1,5 +1,5 @@
 /*
- * "$Id: subscriptions.h 5305 2006-03-18 03:05:12Z mike $"
+ * "$Id: subscriptions.h 5373 2006-04-06 20:03:32Z mike $"
  *
  *   Subscription definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -136,8 +136,6 @@ VAR int		MaxEvents VALUE(100),	/* Maximum number of events */
 VAR cupsd_event_t **Events VALUE(NULL);	/* Active events */
 
 VAR unsigned	LastEvent VALUE(0);	/* Last events processed */
-VAR time_t	LastEventTime VALUE(0);	/* Time that the last events were sent */
-
 VAR int		NotifierPipes[2] VALUE2(-1, -1);
 					/* Pipes for notifier error/debug output */
 VAR cupsd_statbuf_t *NotifierStatusBuffer VALUE(NULL);
@@ -172,5 +170,5 @@ extern void	cupsdUpdateNotifierStatus(void);
 
 
 /*
- * End of "$Id: subscriptions.h 5305 2006-03-18 03:05:12Z mike $".
+ * End of "$Id: subscriptions.h 5373 2006-04-06 20:03:32Z mike $".
  */

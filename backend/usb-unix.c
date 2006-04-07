@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c 5259 2006-03-09 19:22:36Z mike $"
+ * "$Id: usb-unix.c 5373 2006-04-06 20:03:32Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -56,7 +56,9 @@ print_device(const char *uri,		/* I - Device URI */
              const char *resource,	/* I - Resource/modelname */
 	     const char *options,	/* I - Device options/serial number */
 	     int        fp,		/* I - File descriptor to print */
-	     int        copies)		/* I - Copies to print */
+	     int        copies,		/* I - Copies to print */
+	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
+	     char	*argv[])	/* I - Command-line arguments */
 {
   int		fd;			/* USB device */
   int		rbytes;			/* Number of bytes read */
@@ -77,6 +79,8 @@ print_device(const char *uri,		/* I - Device URI */
   unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
 #endif /* __linux */
 
+  (void)argc;
+  (void)argv;
 
  /*
   * Open the USB port device...
@@ -618,5 +622,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c 5259 2006-03-09 19:22:36Z mike $".
+ * End of "$Id: usb-unix.c 5373 2006-04-06 20:03:32Z mike $".
  */

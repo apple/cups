@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5330 2006-03-23 21:07:20Z mike $"
+ * "$Id: printers.c 5373 2006-04-06 20:03:32Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -2271,6 +2271,11 @@ cupsdSetPrinterState(
 
   if (old_state != s)
   {
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE_CHANGED, p, NULL,
+		  "%s \"%s\" state changed.",
+		  (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
+		  p->name);
+
    /*
     * Let the browse code know this needs to be updated...
     */
@@ -3273,5 +3278,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 5330 2006-03-23 21:07:20Z mike $".
+ * End of "$Id: printers.c 5373 2006-04-06 20:03:32Z mike $".
  */

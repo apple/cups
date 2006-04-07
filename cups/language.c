@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c 5366 2006-04-02 16:11:04Z mike $"
+ * "$Id: language.c 5373 2006-04-06 20:03:32Z mike $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -31,7 +31,6 @@
  *   cupsLangEncoding()     - Return the character encoding (us-ascii, etc.)
  *                            for the given language.
  *   cupsLangFlush()        - Flush all language data out of the cache.
- *   _cupsLangFlush()       - Flush all language data out of the cache.
  *   cupsLangFree()         - Free language data.
  *   cupsLangGet()          - Get a language.
  *   _cupsLangString()      - Get a message string.
@@ -1296,5 +1295,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 5366 2006-04-02 16:11:04Z mike $".
+ * End of "$Id: language.c 5373 2006-04-06 20:03:32Z mike $".
  */

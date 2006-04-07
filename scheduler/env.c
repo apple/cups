@@ -1,5 +1,5 @@
 /*
- * "$Id: env.c 5305 2006-03-18 03:05:12Z mike $"
+ * "$Id: env.c 5373 2006-04-06 20:03:32Z mike $"
  *
  *   Environment management routines for the Common UNIX Printing System (CUPS).
  *
@@ -68,11 +68,10 @@ cupsdInitEnv(void)
 
 #if defined(__APPLE__)
  /*
-  * Add special voodoo magic for MacOS X 10.4 and later - this allows MacOS
-  * X programs to access their bundle resources properly...
+  * Add special voodoo magic for MacOS X - this allows MacOS X 
+  * programs to access their bundle resources properly...
   *
-  * This string is replaced in cupsdStartProcess() when we are running on
-  * versions of MacOS X prior to 10.4...
+  * This string is replaced in cupsdStartProcess()...
   */
 
   cupsdSetString(common_env, "<CFProcessPath>");
@@ -246,5 +245,5 @@ clear_env(void)
 
 
 /*
- * End of "$Id: env.c 5305 2006-03-18 03:05:12Z mike $".
+ * End of "$Id: env.c 5373 2006-04-06 20:03:32Z mike $".
  */

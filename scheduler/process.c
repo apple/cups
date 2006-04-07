@@ -1,5 +1,5 @@
 /*
- * "$Id: process.c 5094 2006-02-09 01:00:26Z mike $"
+ * "$Id: process.c 5376 2006-04-06 20:32:07Z mike $"
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
@@ -35,9 +35,9 @@
 
 #include "cupsd.h"
 #include <grp.h>
-#if defined(__APPLE__) && __GNUC__ < 4
+#if defined(__APPLE__)
 #  include <libgen.h>
-#endif /* __APPLE__ && __GNUC__ < 4 */ 
+#endif /* __APPLE__ */ 
 
 
 /*
@@ -128,45 +128,47 @@ cupsdStartProcess(
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-#if defined(__APPLE__) && __GNUC__ < 4
-  int		envc;			/* Number of environment variables */
+#if defined(__APPLE__)
   char		processPath[1024],	/* CFProcessPath environment variable */
 		linkpath[1024];		/* Link path for symlinks... */
   int		linkbytes;		/* Bytes for link path */
-#endif /* __APPLE__ && __GNUC__ < 4 */
+#endif /* __APPLE__ */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdStartProcess(\"%s\", %p, %p, %d, %d, %d)",
                   command, argv, envp, infd, outfd, errfd);
 
-#if defined(__APPLE__) && __GNUC__ < 4
- /*
-  * Add special voodoo magic for MacOS X 10.3 and earlier - this allows
-  * MacOS X programs to access their bundle resources properly...
-  */
-
-  if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
+#if defined(__APPLE__)
+  if (envp)
   {
    /*
-    * Yes, this is a symlink to the actual program, nul-terminate and
-    * use it...
+    * Add special voodoo magic for MacOS X - this allows MacOS X 
+    * programs to access their bundle resources properly...
     */
 
-    linkpath[linkbytes] = '\0';
+    if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
+    {
+     /*
+      * Yes, this is a symlink to the actual program, nul-terminate and
+      * use it...
+      */
 
-    if (linkpath[0] == '/')
-      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s",
-	       linkpath);
+      linkpath[linkbytes] = '\0';
+
+      if (linkpath[0] == '/')
+	snprintf(processPath, sizeof(processPath), "CFProcessPath=%s",
+		 linkpath);
+      else
+	snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
+		 dirname(command), linkpath);
+    }
     else
-      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
-	       dirname(command), linkpath);
-  }
-  else
-    snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
+      snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
 
-  envp[0] = processPath;		/* Replace <CFProcessPath> string */
-#endif	/* __APPLE__ && __GNUC__ > 3 */
+    envp[0] = processPath;		/* Replace <CFProcessPath> string */
+  }
+#endif	/* __APPLE__ */
 
  /*
   * Block signals before forking...
@@ -342,5 +344,5 @@ compare_procs(cupsd_proc_t *a,		/* I - First process */
 
 
 /*
- * End of "$Id: process.c 5094 2006-02-09 01:00:26Z mike $".
+ * End of "$Id: process.c 5376 2006-04-06 20:32:07Z mike $".
  */

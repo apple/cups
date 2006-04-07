@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 5353 2006-03-29 20:31:58Z mike $"
+ * "$Id: conf.c 5373 2006-04-06 20:03:32Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -243,6 +243,7 @@ cupsdReadConfiguration(void)
   if (NumBrowsers > 0)
   {
     free(Browsers);
+    Browsers = NULL;
 
     NumBrowsers = 0;
   }
@@ -281,7 +282,7 @@ cupsdReadConfiguration(void)
   cupsdSetString(&AccessLog, CUPS_LOGDIR "/access_log");
   cupsdSetString(&ErrorLog, CUPS_LOGDIR "/error_log");
   cupsdSetString(&PageLog, CUPS_LOGDIR "/page_log");
-  cupsdSetString(&Printcap, "/etc/printcap");
+  cupsdSetString(&Printcap, CUPS_DEFAULT_PRINTCAP);
   cupsdSetString(&PrintcapGUI, "/usr/bin/glpoptions");
   cupsdSetString(&FontPath, CUPS_FONTPATH);
   cupsdSetString(&RemoteRoot, "remroot");
@@ -3251,5 +3252,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 5353 2006-03-29 20:31:58Z mike $".
+ * End of "$Id: conf.c 5373 2006-04-06 20:03:32Z mike $".
  */

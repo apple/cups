@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 5157 2006-02-23 20:58:57Z mike $"
+ * "$Id: config.h.in 5373 2006-04-06 20:03:32Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -68,6 +68,13 @@
  */
 
 #define CUPS_DEFAULT_IPP_PORT	631
+
+
+/*
+ * Default printcap file...
+ */
+
+#define CUPS_DEFAULT_PRINTCAP	"/etc/printcap"
 
 
 /*
@@ -425,5 +432,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 5157 2006-02-23 20:58:57Z mike $".
+ * End of "$Id: config.h.in 5373 2006-04-06 20:03:32Z mike $".
  */

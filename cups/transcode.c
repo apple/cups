@@ -1,5 +1,5 @@
 /*
- * "$Id: transcode.c 5366 2006-04-02 16:11:04Z mike $"
+ * "$Id: transcode.c 5373 2006-04-06 20:03:32Z mike $"
  *
  *   Transcoding support for the Common UNIX Printing System (CUPS).
  *
@@ -49,6 +49,7 @@
 
 #include "globals.h"
 #include "debug.h"
+#include <limits.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>
@@ -1584,5 +1585,5 @@ get_vbcs_charmap(
 
 
 /*
- * End of "$Id: transcode.c 5366 2006-04-02 16:11:04Z mike $"
+ * End of "$Id: transcode.c 5373 2006-04-06 20:03:32Z mike $"
  */

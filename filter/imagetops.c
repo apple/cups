@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c 5099 2006-02-13 02:46:10Z mike $"
+ * "$Id: imagetops.c 5379 2006-04-07 13:48:37Z mike $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -873,7 +873,7 @@ main(int  argc,				/* I - Number of command-line arguments */
           }
 
           printf("<<"
-                 "/cupsImageType 1"
+                 "/ImageType 1"
 		 "/Width %d"
 		 "/Height %d"
 		 "/BitsPerComponent 8",
@@ -892,12 +892,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 		break;
           }
 
-          fputs("/DataSource currentfile /ASCII85Decode filter", stdout);
+          fputs("\n/DataSource currentfile/ASCII85Decode filter", stdout);
 
           if (((xc1 - xc0 + 1) / xprint) < 100.0)
             fputs("/Interpolate true", stdout);
 
-          puts("/cupsImageMatrix[1 0 0 -1 0 1]>>image");
+          puts("/ImageMatrix[1 0 0 -1 0 1]>>image");
 
           for (y = yc0, out_offset = 0; y <= yc1; y ++)
           {
@@ -1063,5 +1063,5 @@ ps_ascii85(cups_ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c 5099 2006-02-13 02:46:10Z mike $".
+ * End of "$Id: imagetops.c 5379 2006-04-07 13:48:37Z mike $".
  */

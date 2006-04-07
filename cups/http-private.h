@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 5049 2006-02-02 14:50:57Z mike $"
+ * "$Id: http-private.h 5373 2006-04-06 20:03:32Z mike $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -100,6 +100,15 @@ typedef struct
 
 typedef SSLConnectionRef http_tls_t;
 
+typedef union _cdsa_conn_ref_u		/**** CDSA Connection reference union
+					 **** used to resolve 64-bit casting
+					 **** warnings.
+					 ****/
+{
+  SSLConnectionRef connection;		/* SSL connection pointer */
+  int		   sock;		/* Socket */
+} cdsa_conn_ref_t;
+
 extern OSStatus	_httpReadCDSA(SSLConnectionRef connection, void *data,
 		              size_t *dataLength);
 extern OSStatus	_httpWriteCDSA(SSLConnectionRef connection, const void *data,
@@ -123,5 +132,5 @@ extern const char *hstrerror(int error);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 5049 2006-02-02 14:50:57Z mike $".
+ * End of "$Id: http-private.h 5373 2006-04-06 20:03:32Z mike $".
  */
