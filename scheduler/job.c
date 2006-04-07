@@ -1067,26 +1067,31 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
  */
 
 void
-cupsdMoveJob(cupsd_job_t *job,		/* I - Job */
-             const char  *dest)		/* I - Destination */
+cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
+             cupsd_printer_t *p)	/* I - Destination printer or class */
 {
   ipp_attribute_t	*attr;		/* job-printer-uri attribute */
-  cupsd_printer_t	*p;		/* Destination printer or class */
+  const char		*olddest;	/* Old destination */
+  cupsd_printer_t	*oldp;		/* Old pointer */
 
-
- /*
-  * Find the printer...
-  */
-
-  if ((p = cupsdFindDest(dest)) == NULL)
-    return;
 
  /*
   * Don't move completed jobs...
   */
 
-  if (job->state_value >= IPP_JOB_PROCESSING)
+  if (job->state_value > IPP_JOB_STOPPED)
     return;
+
+ /*
+  * Get the old destination...
+  */
+
+  olddest = job->dest;
+
+  if (job->printer)
+    oldp = job->printer;
+  else
+    oldp = cupsdFindDest(olddest);
 
  /*
   * Change the destination information...
@@ -1094,13 +1099,21 @@ cupsdMoveJob(cupsd_job_t *job,		/* I - Job */
 
   cupsdLoadJob(job);
 
-  cupsdSetString(&job->dest, dest);
+  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, oldp, job,
+                "Job #%d moved from %s to %s.", job->id, olddest,
+		p->name);
+
+  cupsdSetString(&job->dest, p->name);
   job->dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE |
                           CUPS_PRINTER_IMPLICIT);
 
   if ((attr = ippFindAttribute(job->attrs, "job-printer-uri",
                                IPP_TAG_URI)) != NULL)
     cupsdSetString(&(attr->values[0].string.text), p->uri);
+
+  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, p, job,
+                "Job #%d moved from %s to %s.", job->id, olddest,
+		p->name);
 
   cupsdSaveJob(job);
 }

@@ -1489,10 +1489,13 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     cupsdSetJobHoldUntil(job, attr->values[0].string.text);
+
+    job->state->values[0].integer = IPP_JOB_HELD;
+    job->state_value              = IPP_JOB_HELD;
   }
   else if (job->attrs->request.op.operation_id == IPP_CREATE_JOB)
   {
-    job->hold_until = time(NULL) + 60;
+    job->hold_until               = time(NULL) + 60;
     job->state->values[0].integer = IPP_JOB_HELD;
     job->state_value              = IPP_JOB_HELD;
   }
@@ -6525,7 +6528,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     * Move the job to a different printer or class...
     */
 
-    cupsdMoveJob(job, dest);
+    cupsdMoveJob(job, dprinter);
   }
   else
   {
@@ -6557,7 +6560,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
       * Move the job to a different printer or class...
       */
 
-      cupsdMoveJob(job, dest);
+      cupsdMoveJob(job, dprinter);
     }
   }
 

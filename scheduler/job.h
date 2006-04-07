@@ -107,7 +107,7 @@ extern int		cupsdGetUserJobCount(const char *username);
 extern void		cupsdHoldJob(cupsd_job_t *job);
 extern void		cupsdLoadAllJobs(void);
 extern void		cupsdLoadJob(cupsd_job_t *job);
-extern void		cupsdMoveJob(cupsd_job_t *job, const char *dest);
+extern void		cupsdMoveJob(cupsd_job_t *job, cupsd_printer_t *p);
 extern void		cupsdReleaseJob(cupsd_job_t *job);
 extern void		cupsdRestartJob(cupsd_job_t *job);
 extern void		cupsdSaveAllJobs(void);

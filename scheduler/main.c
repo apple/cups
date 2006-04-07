@@ -1189,7 +1189,7 @@ cupsdClearString(char **s)		/* O - String value */
 {
   if (s && *s)
   {
-    free(*s);
+    _cupsStrFree(*s);
     *s = NULL;
   }
 }
@@ -1255,10 +1255,10 @@ cupsdSetString(char       **s,		/* O - New string */
     return;
 
   if (*s)
-    free(*s);
+    _cupsStrFree(*s);
 
   if (v)
-    *s = strdup(v);
+    *s = _cupsStrAlloc(v);
   else
     *s = NULL;
 }
@@ -1289,13 +1289,13 @@ cupsdSetStringf(char       **s,		/* O - New string */
     vsnprintf(v, sizeof(v), f, ap);
     va_end(ap);
 
-    *s = strdup(v);
+    *s = _cupsStrAlloc(v);
   }
   else
     *s = NULL;
 
   if (olds)
-    free(olds);
+    _cupsStrFree(olds);
 }
 
 

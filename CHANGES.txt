@@ -3,6 +3,10 @@ CHANGES.txt - 2006-04-07
 
 CHANGES IN CUPS V1.2
 
+	- The scheduler was not always using the string pool,
+	  causing random crashes.
+	- The lpmove and the web interface's Move Job button did
+	  not work with stopped jobs (STR #1534)
 	- The PostScript filter did not handle the page-set
 	  option properly with number-up printing (STR #1543)
 	- The scheduler now only warns about unsupported ACLs
