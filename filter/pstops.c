@@ -1287,22 +1287,101 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   * Copy any page setup commands...
   */
 
+  if (first_page)
+  {
+    doc_puts(doc, "%%BeginPageSetup\n");
+
+    if (pageinfo->num_options > 0)
+    {
+      int		i;		/* Looping var */
+      ppd_option_t	*option;	/* PPD option */
+      int		min_order;	/* Minimum OrderDependency value */
+      char		*doc_setup,	/* DocumentSetup commands to send */
+			*any_setup;	/* AnySetup commands to send */
+
+
+     /*
+      * Yes, figure out the minimum OrderDependency value...
+      */
+
+      if ((option = ppdFindOption(ppd, "PageRegion")) != NULL)
+	min_order = option->order;
+      else
+	min_order = 999.0f;
+
+      for (i = 0; i < pageinfo->num_options; i ++)
+	if ((option = ppdFindOption(ppd, pageinfo->options[i].name)) != NULL &&
+            option->order < min_order)
+          min_order = option->order;
+
+     /*
+      * Mark and extract them...
+      */
+
+      cupsMarkOptions(ppd, pageinfo->num_options, pageinfo->options);
+
+      doc_setup = ppdEmitString(ppd, PPD_ORDER_DOCUMENT, min_order);
+      any_setup = ppdEmitString(ppd, PPD_ORDER_ANY, min_order);
+
+     /*
+      * Then send them out...
+      */
+
+      if (doc_setup)
+	doc_puts(doc, doc_setup);
+
+      if (any_setup)
+	doc_puts(doc, any_setup);
+
+     /*
+      * Free the command strings...
+      */
+
+      if (doc_setup)
+	free(doc_setup);
+
+      if (any_setup)
+	free(any_setup);
+    }
+  }
+
+ /*
+  * Prep for the start of the page description...
+  */
+
+  start_nup(doc, number, 1, bounding_box);
+
+ /*
+  * Copy page setup commands as needed...
+  */
+
   if (!strncmp(line, "%%BeginPageSetup", 16))
   {
-   /*
-    * Copy page setup commands...
-    */
+    int	feature = 0;			/* In a Begin/EndFeature block? */
 
-    doc_write(doc, line, linelen);
 
     while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
     {
       if (!strncmp(line, "%%EndPageSetup", 14))
         break;
+      else if (!strncmp(line, "%%BeginFeature:", 15))
+      {
+        feature = 1;
+
+	if (doc->number_up > 1 || doc->fitplot)
+	  continue;
+      }
+      else if (!strncmp(line, "%%EndFeature:", 13))
+      {
+        feature = 0;
+
+	if (doc->number_up > 1 || doc->fitplot)
+	  continue;
+      }
       else if (!strncmp(line, "%%Include", 9))
         continue;
 
-      if (doc->number_up == 1 && !doc->fitplot)
+      if (!feature || (doc->number_up == 1 && !doc->fitplot))
 	doc_write(doc, line, linelen);
     }
 
@@ -1312,73 +1391,14 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
     if (linelen > 0)
       linelen = cupsFileGetLine(fp, line, linesize);
-
-    if (pageinfo->num_options == 0)
-      doc_puts(doc, "%%EndPageSetup\n");
-  }
-  else if (first_page && pageinfo->num_options > 0)
-    doc_puts(doc, "%%BeginPageSetup\n");
-
-  if (first_page && pageinfo->num_options > 0)
-  {
-    int		i;			/* Looping var */
-    ppd_option_t *option;		/* PPD option */
-    int		min_order;		/* Minimum OrderDependency value */
-    char	*doc_setup,		/* DocumentSetup commands to send */
-		*any_setup;		/* AnySetup commands to send */
-
-
-   /*
-    * Yes, figure out the minimum OrderDependency value...
-    */
-
-    if ((option = ppdFindOption(ppd, "PageRegion")) != NULL)
-      min_order = option->order;
-    else
-      min_order = 999.0f;
-
-    for (i = 0; i < pageinfo->num_options; i ++)
-      if ((option = ppdFindOption(ppd, pageinfo->options[i].name)) != NULL &&
-          option->order < min_order)
-        min_order = option->order;
-
-   /*
-    * Mark and extract them...
-    */
-
-    cupsMarkOptions(ppd, pageinfo->num_options, pageinfo->options);
-
-    doc_setup = ppdEmitString(ppd, PPD_ORDER_DOCUMENT, min_order);
-    any_setup = ppdEmitString(ppd, PPD_ORDER_ANY, min_order);
-
-   /*
-    * Then send them out...
-    */
-
-    if (doc_setup)
-      doc_puts(doc, doc_setup);
-
-    if (any_setup)
-      doc_puts(doc, any_setup);
-
-   /*
-    * Free the command strings...
-    */
-
-    if (doc_setup)
-      free(doc_setup);
-
-    if (any_setup)
-      free(any_setup);
-
-    doc_puts(doc, "%%EndPageSetup\n");
   }
 
  /*
-  * Prep for the start of the page description...
+  * Finish the PageSetup section as needed...
   */
 
-  start_nup(doc, number, 1, bounding_box);
+  if (first_page)
+    doc_puts(doc, "%%EndPageSetup\n");
 
  /*
   * Read the rest of the page description...
