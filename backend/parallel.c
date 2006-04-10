@@ -466,8 +466,6 @@ list_devices(void)
     strcpy(basedevice, "/dev/parallel/");
   else if (!access("/dev/printers/", 0))
     strcpy(basedevice, "/dev/printers/");
-  else if (!access("/dev/par0", 0))
-    strcpy(basedevice, "/dev/par");
   else
     strcpy(basedevice, "/dev/lp");
 
