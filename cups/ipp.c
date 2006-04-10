@@ -2806,14 +2806,14 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
  */
 
 ipp_attribute_t *			/* O - New attribute */
-_ipp_add(ipp_t *ipp,			/* I - IPP message */
-         int   num_values)		/* I - Number of values */
+_ipp_add_attr(ipp_t *ipp,		/* I - IPP message */
+              int   num_values)		/* I - Number of values */
 {
   return (_ippAddAttr(ipp, num_values));
 }
 
 void
-_ipp_free(ipp_attribute_t *attr)	/* I - Attribute to free */
+_ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
 {
   _ippFreeAttr(attr);
 }
