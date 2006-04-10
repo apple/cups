@@ -105,21 +105,30 @@ cat_ppd(const char *uri)		/* I - PPD URI */
      /*
       * Actually display the PPD file...
       */
-      puts("*PS-Adobe-4.3");
+      puts("*PPD-Adobe: \"4.3\"");
 
+      puts("*LanguageEncoding: ISOLatin1");
+      puts("*LanguageVersion: English");
       puts("*Manufacturer: \"Test\"");
+      puts("*FileVersion: \"1.0\"");
+      puts("*FormatVersion: \"4.3\"");
+      puts("*PSVersion: \"(3010) 1\"");
+      printf("*PCFileName: \"%s\"\n", models[i][0]);
+
+      printf("*Product: \"(%s)\"\n", models[i][1]);
       printf("*ModelName: \"Test %s\"\n", models[i][1]);
       printf("*NickName: \"Test %s\"\n", models[i][1]);
+      printf("*ShortNickName: \"Test %s\"\n", models[i][1]);
 
       puts("*OpenUI PageSize: PickOne"); 
-      puts("*OrderDependency PageSize: 10 AnySetup");
+      puts("*OrderDependency: 10 AnySetup *PageSetup");
       puts("*DefaultPageSize: Letter");
       puts("*PageSize Letter: \"<</PageSize[612 792]>>setpagedevice\"");
       puts("*PageSize A4: \"<</PageSize[585 842]>>setpagedevice\"");
       puts("*CloseUI: *PageSize");
 
       puts("*OpenUI PageRegion: PickOne"); 
-      puts("*OrderDependency PageRegion: 10 AnySetup");
+      puts("*OrderDependency: 10 AnySetup *PageRegion");
       puts("*DefaultPageRegion: Letter");
       puts("*PageRegion Letter: \"<</PageRegion[612 792]>>setpagedevice\"");
       puts("*PageRegion A4: \"<</PageRegion[585 842]>>setpagedevice\"");
