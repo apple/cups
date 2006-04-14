@@ -44,9 +44,10 @@ typedef struct cupsd_job_s
   ipp_attribute_t	*job_sheets;	/* Job sheets (NULL if none) */
   int			current_file;	/* Current file in job */
   ipp_t			*attrs;		/* Job attributes */
-  cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
   int			print_pipes[2],	/* Print data pipes */
-			back_pipes[2];	/* Backchannel pipes */
+			back_pipes[2],	/* Backchannel pipes */
+			status_pipes[2];/* Status pipes */
+  cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
   int			cost;		/* Filtering cost */
   int			filters[MAX_FILTERS + 1];
 					/* Filter process IDs, 0 terminated */

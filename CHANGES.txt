@@ -1,7 +1,16 @@
-CHANGES.txt - 2006-04-07
+CHANGES.txt - 2006-04-14
 ------------------------
 
-CHANGES IN CUPS V1.2
+CHANGES IN CUPS V1.2rc3
+
+	- The scheduler didn't keep track of the status pipes
+	  properly, leading to a bad select() for multi-file jobs
+	  (STR #1559)
+	- The cupstestdsc program didn't validate the ordinal
+	  page number value for %%Page: comments.
+
+
+CHANGES IN CUPS V1.2rc2
 
 	- The scheduler was not always using the string pool,
 	  causing random crashes.
@@ -99,7 +108,7 @@ CHANGES IN CUPS V1.2rc1
 	  #1488)
 	- ppdOpen2() now converts the NickName and all UI text to
 	  UTF-8 (STR #1475)
-	- The Set Allows Users web page did not work (STR #1486)
+	- The Set Allowed Users web page did not work (STR #1486)
 	- When the default policy was not set or set to a non-
 	  existing policy, the scheduler did not set the default
 	  policy name to "default" (STR #1484)
