@@ -161,12 +161,10 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #
 # Raw print file support...
 #
-# Uncomment the following type and the application/octet-stream
-# filter line in mime.convs to allow raw file printing without the
-# -oraw option.
+# Comment the following type to prevent raw file printing.
 #
 
-#application/octet-stream
+application/octet-stream
 
 #
 # End of "$Id$".

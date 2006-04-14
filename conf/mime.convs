@@ -107,9 +107,8 @@ image/x-sun-raster	application/vnd.cups-raster	100	imagetoraster
 #
 # Raw filter...
 #
-# Uncomment the following filter and the application/octet-stream type
-# in mime.types to allow printing of arbitrary files without the -oraw
-# option.
+# Uncomment the following filter to allow printing of arbitrary files
+# without the -oraw option.
 #
 
 #application/octet-stream	application/vnd.cups-raw	0	-
