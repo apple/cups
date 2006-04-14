@@ -3,6 +3,9 @@ CHANGES.txt - 2006-04-14
 
 CHANGES IN CUPS V1.2rc3
 
+	- Updated the default mime.types file to support printing
+	  of files that do not have a locally-recognized MIME
+	  media type to raw or System V queues.
 	- Updated the serial port detection code on Linux (STR
 	  #1562)
 	- Added some more error checking to httpGetHostname()
