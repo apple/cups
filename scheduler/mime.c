@@ -97,15 +97,6 @@ mimeDelete(mime_t *mime)		/* I - MIME database */
     return;
 
  /*
-  * Loop through the file types and delete any rules...
-  */
-
-  for (type = (mime_type_t *)cupsArrayFirst(mime->types);
-       type;
-       type = (mime_type_t *)cupsArrayNext(mime->types))
-    mimeDeleteType(mime, type);
-
- /*
   * Loop through filters and free them...
   */
 
@@ -113,6 +104,15 @@ mimeDelete(mime_t *mime)		/* I - MIME database */
        filter;
        filter = (mime_filter_t *)cupsArrayNext(mime->filters))
     mimeDeleteFilter(mime, filter);
+
+ /*
+  * Loop through the file types and delete any rules...
+  */
+
+  for (type = (mime_type_t *)cupsArrayFirst(mime->types);
+       type;
+       type = (mime_type_t *)cupsArrayNext(mime->types))
+    mimeDeleteType(mime, type);
 
  /*
   * Free the types and filters arrays, and then the MIME database structure.

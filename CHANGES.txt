@@ -3,6 +3,8 @@ CHANGES.txt - 2006-04-14
 
 CHANGES IN CUPS V1.2rc3
 
+	- The mimeDelete() function freed the types before the
+	  filters, but the filters needed the type data (STR #1558)
 	- The scheduler didn't keep track of the status pipes
 	  properly, leading to a bad select() for multi-file jobs
 	  (STR #1559)
