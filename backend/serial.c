@@ -87,6 +87,11 @@
 #  include <IOKit/IOBSD.h>
 #endif /* __APPLE__ */
 
+#if defined(__linux) && defined(TIOCGSERIAL)
+#  include <linux/serial.h>
+#  include <linux/ioctl.h>
+#endif /* __linux && TIOCGSERIAL */
+
 
 /*
  * Local functions...
@@ -663,21 +668,48 @@ list_devices(void)
 {
 #if defined(__hpux) || defined(__sgi) || defined(__sun) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
   static char	*funky_hex = "0123456789abcdefghijklmnopqrstuvwxyz";
-				/* Funky hex numbering used for some devices */
+					/* Funky hex numbering used for some *
+					 * devices                           */
 #endif /* __hpux || __sgi || __sun || __FreeBSD__ || __OpenBSD__ */
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
-  int	i, j;		/* Looping vars */
-  int	fd;		/* File descriptor */
-  char	device[255];	/* Device filename */
+#ifdef __linux
+  int			i, j;		/* Looping vars */
+  int			fd;		/* File descriptor */
+  char			device[255];	/* Device filename */
+#  ifdef TIOCGSERIAL
+  struct serial_struct	serinfo;	/* serial port info */
+#  endif /* TIOCGSERIAL */
 
 
   for (i = 0; i < 100; i ++)
   {
     sprintf(device, "/dev/ttyS%d", i);
+
     if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
     {
+#  ifdef TIOCGSERIAL
+     /*
+      * See if this port exists...
+      */
+
+      serinfo.reserved_char[0] = 0;
+
+      if (!ioctl(fd, TIOCGSERIAL, &serinfo))
+      {
+	if (serinfo.type == PORT_UNKNOWN)
+	{
+	 /*
+	  * Nope...
+	  */
+
+	  close(fd);
+	  continue;
+	}
+      }
+#  endif /* TIOCGSERIAL */
+
       close(fd);
+
 #  if defined(_ARCH_PPC) || defined(powerpc) || defined(__powerpc)
       printf("serial serial:%s?baud=230400 \"Unknown\" \"Serial Port #%d\"\n",
              device, i + 1);
@@ -824,13 +856,13 @@ list_devices(void)
   {
     sprintf(device, "/dev/cua/%c", 'a' + i);
     if (access(device, 0) == 0)
-#ifdef B115200
+#  ifdef B115200
       printf("serial serial:%s?baud=115200 \"Unknown\" \"Serial Port #%d\"\n",
              device, i + 1);
-#else
+#  else
       printf("serial serial:%s?baud=38400 \"Unknown\" \"Serial Port #%d\"\n",
              device, i + 1);
-#endif /* B115200 */
+#  endif /* B115200 */
   }
 
  /*
@@ -1063,7 +1095,6 @@ list_devices(void)
   CFMutableDictionaryRef	classesToMatch;
   io_object_t			serialService;
 
-  printf("serial serial \"Unknown\" \"Serial Printer (serial)\"\n");
 
   kernResult = IOMasterPort(MACH_PORT_NULL, &masterPort);
   if (KERN_SUCCESS != kernResult)
@@ -1117,8 +1148,8 @@ list_devices(void)
 	      CFRelease(bsdPathAsCFString);
 
 	      if (result)
-		printf("serial serial:%s?baud=115200 \"Unknown\" \"%s\"\n", bsdPath,
-		       serialName);
+		printf("serial serial:%s?baud=115200 \"Unknown\" \"%s\"\n",
+		       bsdPath, serialName);
 	    }
 	  }
 	}
@@ -1126,7 +1157,11 @@ list_devices(void)
 	IOObjectRelease(serialService);
       }
 
-      IOObjectRelease(serialPortIterator);    /* Release the iterator. */
+     /*
+      * Release the iterator.
+      */
+
+      IOObjectRelease(serialPortIterator);
     }
   }
 #endif
