@@ -3,6 +3,8 @@ CHANGES.txt - 2006-04-14
 
 CHANGES IN CUPS V1.2rc3
 
+	- The title of some administration pages was not
+	  localized (STR #1548)
 	- The edit-config.tmpl file was not generated or
 	  installed for the Spanish or Japanese localizations
 	  (STR #1547)

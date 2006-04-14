@@ -1182,7 +1182,7 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
 
     ppdLocalize(ppd);
 
-    cgiStartHTML("Set Printer Options");
+    cgiStartHTML(cgiText(_("Set Printer Options")));
     cgiCopyTemplateLang("set-printer-options-header.tmpl");
 
     if (ppdConflicts(ppd))
@@ -1451,7 +1451,7 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
     if (!in || !out)
     {
       cgiSetVariable("ERROR", strerror(errno));
-      cgiStartHTML("Set Printer Options");
+      cgiStartHTML(cgiText(_("Set Printer Options")));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
@@ -1814,7 +1814,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     * Show the current config file...
     */
 
-    cgiStartHTML("Edit Configuration File");
+    cgiStartHTML(cgiText(_("Edit Configuration File")));
 
     printf("<!-- \"%s\" -->\n", filename);
 
