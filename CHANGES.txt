@@ -3,6 +3,8 @@ CHANGES.txt - 2006-04-14
 
 CHANGES IN CUPS V1.2rc3
 
+	- Added some more error checking to httpGetHostname()
+	  (STR #1561)
 	- The title of some administration pages was not
 	  localized (STR #1548)
 	- The edit-config.tmpl file was not generated or

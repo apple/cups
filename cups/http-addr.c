@@ -508,6 +508,9 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
   struct hostent	*host;		/* Host entry to get FQDN */
 
 
+  if (!s || slen <= 1)
+    return (NULL);
+
   if (http)
   {
     if (http->hostname[0] == '/')
@@ -521,7 +524,8 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
     * Get the hostname...
     */
 
-    gethostname(s, slen);
+    if (gethostname(s, slen) < 0)
+      strlcpy(s, "localhost", slen);
 
     if (!strchr(s, '.'))
     {
@@ -529,7 +533,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
       * The hostname is not a FQDN, so look it up...
       */
 
-      if ((host = gethostbyname(s)) != NULL)
+      if ((host = gethostbyname(s)) != NULL && host->h_name)
 	strlcpy(s, host->h_name, slen);
     }
   }
