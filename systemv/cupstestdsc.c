@@ -27,6 +27,9 @@
  *
  * Contents:
  *
+ *   main()  - Main entry for test program.
+ *   check() - Check a file for conformance.
+ *   usage() - Show program usage.
  */
 
 /*
@@ -97,7 +100,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * 'check()' - Main entry for test program.
+ * 'check()' - Check a file for conformance.
  */
 
 static int				/* O - 0 on success, 1 on failure */
@@ -115,6 +118,7 @@ check_file(const char *filename)	/* I - File to read from */
   int		lbrt[4];		/* Bounding box */
   char		page_label[256];	/* Page label string */
   int		page_number;		/* Page number */
+  int		last_page_number;	/* Last page number seen */
   int		level;			/* Embedded document level */
   int		saw_bounding_box,	/* %%BoundingBox seen? */
 		saw_pages,		/* %%Pages seen? */
@@ -149,6 +153,7 @@ check_file(const char *filename)	/* I - File to read from */
   */
 
   binary           = 0;
+  last_page_number = 0;
   level            = 0;
   linenum          = 0;
   saw_begin_prolog = 0;
@@ -304,7 +309,8 @@ check_file(const char *filename)	/* I - File to read from */
     {
       if (!strncmp(line, "%%Page:", 7))
       {
-        if (sscanf(line + 7, "%255s%d", page_label, &page_number) != 2)
+        if (sscanf(line + 7, "%255s%d", page_label, &page_number) != 2 ||
+	    page_number != (last_page_number + 1) || page_number < 1)
 	{
 	  if (!status)
             _cupsLangPuts(stdout, _("FAIL\n"));
@@ -315,7 +321,10 @@ check_file(const char *filename)	/* I - File to read from */
 		          linenum);
 	}
 	else
-	  saw_page = 1;
+	{
+	  last_page_number = page_number;
+	  saw_page         = 1;
+	}
       }
       else if (!strncmp(line, "%%BeginProlog", 13))
         saw_begin_prolog = 1;
