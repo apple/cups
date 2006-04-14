@@ -3,6 +3,9 @@ CHANGES.txt - 2006-04-14
 
 CHANGES IN CUPS V1.2rc3
 
+	- The edit-config.tmpl file was not generated or
+	  installed for the Spanish or Japanese localizations
+	  (STR #1547)
 	- The mimeDelete() function freed the types before the
 	  filters, but the filters needed the type data (STR #1558)
 	- The scheduler didn't keep track of the status pipes
