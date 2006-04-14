@@ -189,14 +189,19 @@ library:</p>
 	<li><a href='#ppdErrorString'><tt>ppdErrorString()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
 	<li><a href='#ppdFindAttr'><tt>ppdFindAttr()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
 	<li><a href='#ppdFindChoice'><tt>ppdFindChoice()</tt></a> </li>
+	<li><a href='#ppdFindCustomOption'><tt>ppdFindCustomOption()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#ppdFindCustomParam'><tt>ppdFindCustomParam()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppdFindMarkedChoice'><tt>ppdFindMarkedChoice()</tt></a> </li>
 	<li><a href='#ppdFindNextAttr'><tt>ppdFindNextAttr()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
 	<li><a href='#ppdFindOption'><tt>ppdFindOption()</tt></a> </li>
+	<li><a href='#ppdFirstCustomParam'><tt>ppdFirstCustomParam()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppdFirstOption'><tt>ppdFirstOption()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppdIsMarked'><tt>ppdIsMarked()</tt></a> </li>
 	<li><a href='#ppdLastError'><tt>ppdLastError()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
+	<li><a href='#ppdLocalize'><tt>ppdLocalize()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppdMarkDefaults'><tt>ppdMarkDefaults()</tt></a> </li>
 	<li><a href='#ppdMarkOption'><tt>ppdMarkOption()</tt></a> </li>
+	<li><a href='#ppdNextCustomParam'><tt>ppdNextCustomParam()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppdNextOption'><tt>ppdNextOption()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ppdOpen'><tt>ppdOpen()</tt></a> </li>
 	<li><a href='#ppdOpen2'><tt>ppdOpen2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
@@ -515,6 +520,50 @@ ppdFindChoice(
 <h4>Returns</h4>
 <p>Choice pointer or NULL</p>
 <!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdFindCustomOption'>ppdFindCustomOption()</a></h3>
+<h4>Description</h4>
+<p>Find a custom option.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#ppd_coption_t'>ppd_coption_t</a> *
+ppdFindCustomOption(
+    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
+    const char * keyword);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
+<tr><td><tt>keyword</tt></td><td>Custom option name</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Custom option or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdFindCustomParam'>ppdFindCustomParam()</a></h3>
+<h4>Description</h4>
+<p>Find a parameter for a custom option.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#ppd_cparam_t'>ppd_cparam_t</a> *
+ppdFindCustomParam(
+    <a href='#ppd_coption_t'>ppd_coption_t</a> * opt,
+    const char * name);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>opt</tt></td><td>Custom option</td></tr>
+<tr><td><tt>name</tt></td><td>Parameter name</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Custom parameter or NULL</p>
+<!-- NEW PAGE -->
 <h3 class='title'><a name='ppdFindMarkedChoice'>ppdFindMarkedChoice()</a></h3>
 <h4>Description</h4>
 <p>Return the marked choice for the specified option.</p>
@@ -578,6 +627,26 @@ ppdFindOption(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Pointer to option or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdFirstCustomParam'>ppdFirstCustomParam()</a></h3>
+<h4>Description</h4>
+<p>Return the first parameter for a custom option.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#ppd_cparam_t'>ppd_cparam_t</a> *
+ppdFirstCustomParam(
+    <a href='#ppd_coption_t'>ppd_coption_t</a> * opt);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>opt</tt></td><td>Custom option</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Custom parameter or NULL</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdFirstOption'>ppdFirstOption()</a></h3>
 <h4>Description</h4>
@@ -643,6 +712,26 @@ ppdLastError(
 <h4>Returns</h4>
 <p>Status code</p>
 <!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdLocalize'>ppdLocalize()</a></h3>
+<h4>Description</h4>
+<p>Localize the PPD file to the current locale.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+int
+ppdLocalize(
+    <a href='#ppd_file_t'>ppd_file_t</a> * ppd);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on error</p>
+<!-- NEW PAGE -->
 <h3 class='title'><a name='ppdMarkDefaults'>ppdMarkDefaults()</a></h3>
 <h4>Description</h4>
 <p>Mark all default options in the PPD file.</p>
@@ -687,6 +776,26 @@ ppdMarkOption(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of conflicts</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdNextCustomParam'>ppdNextCustomParam()</a></h3>
+<h4>Description</h4>
+<p>Return the next parameter for a custom option.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#ppd_cparam_t'>ppd_cparam_t</a> *
+ppdNextCustomParam(
+    <a href='#ppd_coption_t'>ppd_coption_t</a> * opt);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>opt</tt></td><td>Custom option</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Custom parameter or NULL</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdNextOption'>ppdNextOption()</a></h3>
 <h4>Description</h4>

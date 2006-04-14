@@ -421,7 +421,7 @@ apihelp:
 		file.h file.c dir.h dir.c >../doc/help/api-filedir.html
 	mxmldoc --section "Programming" --title "PPD API" \
 		--intro api-ppd.shtml \
-		ppd.h attr.c emit.c mark.c page.c \
+		ppd.h attr.c custom.c emit.c localize.c mark.c page.c \
 		ppd.c >../doc/help/api-ppd.html
 	mxmldoc --section "Programming" --title "HTTP and IPP APIs" \
 		--intro api-httpipp.shtml \

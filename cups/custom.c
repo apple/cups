@@ -34,6 +34,10 @@
  *
  * Contents:
  *
+ *   ppdFindCustomOption() - Find a custom option.
+ *   ppdFindCustomParam()  - Find a parameter for a custom option.
+ *   ppdFirstCustomParam() - Return the first parameter for a custom option.
+ *   ppdNextCustomParam()  - Return the next parameter for a custom option.
  */
 
 /*
@@ -46,6 +50,8 @@
 
 /*
  * 'ppdFindCustomOption()' - Find a custom option.
+ *
+ * @since CUPS 1.2@
  */
 
 ppd_coption_t *				/* O - Custom option or NULL */
@@ -65,6 +71,8 @@ ppdFindCustomOption(ppd_file_t *ppd,	/* I - PPD file */
 
 /*
  * 'ppdFindCustomParam()' - Find a parameter for a custom option.
+ *
+ * @since CUPS 1.2@
  */
 
 ppd_cparam_t *				/* O - Custom parameter or NULL */
@@ -84,6 +92,8 @@ ppdFindCustomParam(ppd_coption_t *opt,	/* I - Custom option */
 
 /*
  * 'ppdFirstCustomParam()' - Return the first parameter for a custom option.
+ *
+ * @since CUPS 1.2@
  */
 
 ppd_cparam_t *				/* O - Custom parameter or NULL */
@@ -98,6 +108,8 @@ ppdFirstCustomParam(ppd_coption_t *opt)	/* I - Custom option */
 
 /*
  * 'ppdNextCustomParam()' - Return the next parameter for a custom option.
+ *
+ * @since CUPS 1.2@
  */
 
 ppd_cparam_t *				/* O - Custom parameter or NULL */

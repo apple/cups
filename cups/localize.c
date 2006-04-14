@@ -56,6 +56,8 @@ static const char	*ppd_text(ppd_file_t *ppd, const char *keyword,
 
 /*
  * 'ppdLocalize()' - Localize the PPD file to the current locale.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on error */
