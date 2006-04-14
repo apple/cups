@@ -147,7 +147,9 @@ text/css			css
 
 application/vnd.cups-command	string(0,'#CUPS-COMMAND')
 application/vnd.cups-form	string(0,"<CUPSFORM>")
+application/vnd.cups-pdf
 application/vnd.cups-postscript
+application/vnd.cups-ppd	ppd string(0,"*PPD-Adobe:")
 application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 				string(0,<1B>@) \
