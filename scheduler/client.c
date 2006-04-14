@@ -458,10 +458,12 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
   SSL		*conn;			/* Connection for encryption */
   unsigned long	error;			/* Error code */
 #elif defined(HAVE_GNUTLS)
-  http_tls_t     *conn;			/* TLS connection information */
-  int            error;			/* Error code */
+  http_tls_t	*conn;			/* TLS connection information */
+  int		error;			/* Error code */
   gnutls_certificate_server_credentials *credentials;
 					/* TLS credentials */
+#  elif defined(HAVE_CDSASSL)
+  http_tls_t	*conn;			/* CDSA connection information */
 #endif /* HAVE_LIBSSL */
 
 
@@ -530,10 +532,17 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
     free(conn);
 
 #  elif defined(HAVE_CDSASSL)
-    while (SSLClose((SSLContextRef)con->http.tls) == errSSLWouldBlock)
+    conn = (http_tls_t *)(con->http.tls);
+
+    while (SSLClose(conn->session) == errSSLWouldBlock)
       usleep(1000);
 
-    SSLDisposeContext((SSLContextRef)con->http.tls);
+    SSLDisposeContext(conn->session);
+
+    if (conn->certsArray)
+      CFRelease(conn->certsArray);
+
+    free(conn);
 #  endif /* HAVE_LIBSSL */
 
     con->http.tls = NULL;
@@ -2564,7 +2573,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   * Create the SSL object and perform the SSL handshake...
   */
 
-  conn = (http_tls_t *)malloc(sizeof(gnutls_session));
+  conn = (http_tls_t *)malloc(sizeof(http_tls_t));
 
   if (conn == NULL)
     return (0);
@@ -2618,23 +2627,19 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   return (1);
 
 #  elif defined(HAVE_CDSASSL)
-  OSStatus		error;		/* Error info */
-  SSLContextRef		conn;		/* New connection */
-  CFArrayRef		certificatesArray;
-					/* Array containing certificates */
-  int			allowExpired;	/* Allow expired certificates? */
-  int			allowAnyRoot;	/* Allow any root certificate? */
-  cdsa_conn_ref_t	u;		/* Connection reference union */
+  OSStatus	error;			/* Error code */
+  http_tls_t	*conn;			/* CDSA connection information */
+  cdsa_conn_ref_t u;			/* Connection reference union */
 
 
-  conn         = NULL;
-  error        = SSLNewContext(true, &conn);
-  allowExpired = 1;
-  allowAnyRoot = 1;
+  if ((conn = (http_tls_t *)malloc(sizeof(http_tls_t))) == NULL)
+    return (0);
 
-  certificatesArray = get_cdsa_server_certs();
+  error            = 0;
+  conn->session    = NULL;
+  conn->certsArray = get_cdsa_server_certs();
 
-  if (!certificatesArray)
+  if (!conn->certsArray)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
         	    "EncryptClient: Could not find signing key in keychain "
@@ -2643,10 +2648,13 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   }
 
   if (!error)
-    error = SSLSetIOFuncs(conn, _httpReadCDSA, _httpWriteCDSA);
+    error = SSLNewContext(true, &conn->session);
 
   if (!error)
-    error = SSLSetProtocolVersion(conn, kSSLProtocol3);
+    error = SSLSetIOFuncs(conn->session, _httpReadCDSA, _httpWriteCDSA);
+
+  if (!error)
+    error = SSLSetProtocolVersion(conn->session, kSSLProtocol3);
 
   if (!error)
   {
@@ -2656,30 +2664,17 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
     u.connection = NULL;
     u.sock       = con->http.fd;
-    error        = SSLSetConnection(conn, u.connection);
+    error        = SSLSetConnection(conn->session, u.connection);
   }
 
   if (!error)
-    error = SSLSetPeerDomainName(conn, ServerName, strlen(ServerName) + 1);
-
- /*
-  * Have to set these options before setting server certs...
-  */
-
-  if (!error && allowExpired)
-    error = SSLSetAllowsExpiredCerts(conn, true);
-
-  if (!error && allowAnyRoot)
-    error = SSLSetAllowsAnyRoot(conn, true);
+    error = SSLSetAllowsExpiredCerts(conn->session, true);
 
   if (!error)
-    error = SSLSetCertificate(conn, certificatesArray);
+    error = SSLSetAllowsAnyRoot(conn->session, true);
 
-  if (certificatesArray)
-  {
-    CFRelease(certificatesArray);
-    certificatesArray = NULL;
-  }
+  if (!error)
+    error = SSLSetCertificate(conn->session, conn->certsArray);
 
   if (!error)
   {
@@ -2687,7 +2682,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     * Perform SSL/TLS handshake
     */
 
-    while ((error = SSLHandshake(conn)) == errSSLWouldBlock)
+    while ((error = SSLHandshake(conn->session)) == errSSLWouldBlock)
       usleep(1000);
   }
 
@@ -2703,8 +2698,13 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     con->http.error  = error;
     con->http.status = HTTP_ERROR;
 
-    if (conn != NULL)
-      SSLDisposeContext(conn);
+    if (conn->session)
+      SSLDisposeContext(conn->session);
+
+    if (conn->certsArray)
+      CFRelease(conn->certsArray);
+
+    free(conn);
 
     return (0);
   }

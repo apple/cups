@@ -3,6 +3,7 @@ CHANGES.txt - 2006-04-14
 
 CHANGES IN CUPS V1.2rc3
 
+	- More CDSA encryption support fixes (STR #1563)
 	- Updated the default mime.types file to support printing
 	  of files that do not have a locally-recognized MIME
 	  media type to raw or System V queues.
