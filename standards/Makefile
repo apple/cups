@@ -113,7 +113,7 @@ uninstall:
 
 rfctohtml:	rfctohtml.o ../cups/libcups.a
 	$(CC) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ)
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
