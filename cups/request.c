@@ -240,6 +240,8 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       }
     }
 
+    httpFlushWrite(http);
+
    /*
     * Get the server's return status...
     */
@@ -328,20 +330,21 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
       response = ippNew();
 
-      if (ippRead(http, response) == IPP_ERROR)
-      {
-       /*
-        * Delete the response...
-	*/
+      while ((state = ippRead(http, response)) != IPP_DATA)
+	if (state == IPP_ERROR)
+	{
+	 /*
+          * Delete the response...
+	  */
 
-        DEBUG_puts("IPP read error!");
-	ippDelete(response);
-	response = NULL;
+          DEBUG_puts("IPP read error!");
+	  ippDelete(response);
+	  response = NULL;
 
-        _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
+          _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
 
-	break;
-      }
+	  break;
+	}
     }
   }
 

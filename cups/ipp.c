@@ -1034,6 +1034,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
   DEBUG_printf(("ippReadIO(%p, %p, %d, %p, %p)\n", src, cb, blocking,
                 parent, ipp));
+  DEBUG_printf(("ippReadIO: ipp->state=%d\n", ipp->state));
 
   if (src == NULL || ipp == NULL)
     return (IPP_ERROR);
@@ -1527,6 +1528,8 @@ ippReadIO(void       *src,		/* I - Data source */
         break; /* anti-compiler-warning-code */
   }
 
+  DEBUG_printf(("ippReadIO: returning ipp->state=%d!\n", ipp->state));
+
   return (ipp->state);
 }
 
@@ -1672,7 +1675,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
           if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	  {
-	    DEBUG_puts("ippWrite: Could not write IPP header...");
+	    DEBUG_puts("ippWriteIO: Could not write IPP header...");
 	    return (IPP_ERROR);
 	  }
 	}
@@ -1686,9 +1689,9 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	ipp->current = ipp->attrs;
 	ipp->curtag  = IPP_TAG_ZERO;
 
-        DEBUG_printf(("ippWrite: version=%d.%d\n", buffer[0], buffer[1]));
-	DEBUG_printf(("ippWrite: op_status=%04x\n", ipp->request.any.op_status));
-	DEBUG_printf(("ippWrite: request_id=%d\n", ipp->request.any.request_id));
+        DEBUG_printf(("ippWriteIO: version=%d.%d\n", buffer[0], buffer[1]));
+	DEBUG_printf(("ippWriteIO: op_status=%04x\n", ipp->request.any.op_status));
+	DEBUG_printf(("ippWriteIO: request_id=%d\n", ipp->request.any.request_id));
 
        /*
         * If blocking is disabled, stop here...
@@ -1720,7 +1723,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
             if (attr->group_tag == IPP_TAG_ZERO)
 	      continue;
 
-            DEBUG_printf(("ippWrite: wrote group tag = %x\n", attr->group_tag));
+            DEBUG_printf(("ippWriteIO: wrote group tag = %x\n", attr->group_tag));
 	    *bufptr++ = attr->group_tag;
 	  }
 	  else if (attr->group_tag == IPP_TAG_ZERO)
@@ -1751,8 +1754,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	    * Write the value tag, name length, and name string...
 	    */
 
-            DEBUG_printf(("ippWrite: writing value tag = %x\n", attr->value_tag));
-            DEBUG_printf(("ippWrite: writing name = %d, \'%s\'\n", n, attr->name));
+            DEBUG_printf(("ippWriteIO: writing value tag = %x\n", attr->value_tag));
+            DEBUG_printf(("ippWriteIO: writing name = %d, \'%s\'\n", n, attr->name));
 
             *bufptr++ = attr->value_tag;
 	    *bufptr++ = n >> 8;
@@ -1775,11 +1778,11 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	    * and empty name for the collection member attribute...
 	    */
 
-            DEBUG_printf(("ippWrite: writing value tag = %x\n",
+            DEBUG_printf(("ippWriteIO: writing value tag = %x\n",
 	                  IPP_TAG_MEMBERNAME));
-            DEBUG_printf(("ippWrite: writing name = %d, \'%s\'\n", n, attr->name));
-            DEBUG_printf(("ippWrite: writing value tag = %x\n", attr->value_tag));
-            DEBUG_puts("ippWrite: writing name = 0, \'\'\n");
+            DEBUG_printf(("ippWriteIO: writing name = %d, \'%s\'\n", n, attr->name));
+            DEBUG_printf(("ippWriteIO: writing value tag = %x\n", attr->value_tag));
+            DEBUG_puts("ippWriteIO: writing name = 0, \'\'\n");
 
             *bufptr++ = IPP_TAG_MEMBERNAME;
 	    *bufptr++ = 0;
@@ -1810,7 +1813,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  {
                     if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
@@ -1854,7 +1857,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  {
                     if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
@@ -1905,15 +1908,15 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		    * values with a zero-length name...
 		    */
 
-        	    DEBUG_printf(("ippWrite: writing value tag = %x\n",
+        	    DEBUG_printf(("ippWriteIO: writing value tag = %x\n",
 		                  attr->value_tag));
-        	    DEBUG_printf(("ippWrite: writing name = 0, \'\'\n"));
+        	    DEBUG_printf(("ippWriteIO: writing name = 0, \'\'\n"));
 
                     if ((sizeof(buffer) - (bufptr - buffer)) < 3)
 		    {
                       if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	              {
-	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	        	DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	        	return (IPP_ERROR);
 	              }
 
@@ -1933,14 +1936,14 @@ ippWriteIO(void       *dst,		/* I - Destination */
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
 
-                  DEBUG_printf(("ippWrite: writing string = %d, \'%s\'\n", n,
+                  DEBUG_printf(("ippWriteIO: writing string = %d, \'%s\'\n", n,
 		                value->string.text));
 
                   if ((int)(sizeof(buffer) - (bufptr - buffer)) < (n + 2))
 		  {
                     if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
@@ -1977,7 +1980,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  {
                     if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
@@ -2020,7 +2023,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  {
                     if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
@@ -2071,7 +2074,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  {
                     if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
@@ -2128,7 +2131,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		    {
                       if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	              {
-	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	        	DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	        	return (IPP_ERROR);
 	              }
 
@@ -2165,7 +2168,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  {
                     if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
@@ -2226,7 +2229,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  {
                     if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
@@ -2254,7 +2257,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
                   if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	          {
-	            DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	            DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	            return (IPP_ERROR);
 	          }
 
@@ -2287,7 +2290,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		    {
                       if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	              {
-	        	DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	        	DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	        	return (IPP_ERROR);
 	              }
 
@@ -2315,7 +2318,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  {
                     if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	            {
-	              DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	              DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	              return (IPP_ERROR);
 	            }
 
@@ -2342,11 +2345,11 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
           if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
 	  {
-	    DEBUG_puts("ippWrite: Could not write IPP attribute...");
+	    DEBUG_puts("ippWriteIO: Could not write IPP attribute...");
 	    return (IPP_ERROR);
 	  }
 
-          DEBUG_printf(("ippWrite: wrote %d bytes\n", bufptr - buffer));
+          DEBUG_printf(("ippWriteIO: wrote %d bytes\n", bufptr - buffer));
 
 	 /*
           * If blocking is disabled, stop here...
@@ -2380,7 +2383,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	  if ((*cb)(dst, buffer, n) < 0)
 	  {
-	    DEBUG_puts("ippWrite: Could not write IPP end-tag...");
+	    DEBUG_puts("ippWriteIO: Could not write IPP end-tag...");
 	    return (IPP_ERROR);
 	  }
 
