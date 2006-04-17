@@ -74,8 +74,7 @@ install:	all
 		if test -r $(SERVERROOT)/$$file ; then \
 			$(MV) $(SERVERROOT)/$$file $(SERVERROOT)/$$file.O ; \
 		fi ; \
-		$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
-		chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file || true; \
+		$(INSTALL_DATA) $$file $(SERVERROOT) ; \
 	done
 	-if test x$(PAMDIR) != x; then \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(PAMDIR); \

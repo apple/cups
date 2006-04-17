@@ -403,8 +403,8 @@ d 0755 root $CUPS_GROUP $SERVERROOT/interfaces -
 d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
 c $CUPS_PERM root $CUPS_GROUP $SERVERROOT conf/*.conf
 f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
-f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/mime.convs conf/mime.convs
-f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/mime.types conf/mime.types
+f 0644 root $CUPS_GROUP $SERVERROOT/mime.convs conf/mime.convs
+f 0644 root $CUPS_GROUP $SERVERROOT/mime.types conf/mime.types
 
 %if PAMDIR
 d 0755 root sys $PAMDIR -
