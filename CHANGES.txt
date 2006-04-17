@@ -3,6 +3,8 @@ CHANGES.txt - 2006-04-17
 
 CHANGES IN CUPS V1.2rc3
 
+	- cupsDoFileRequest() and cupsDoRequest() now work
+	  properly with non-blocking HTTP connections.
 	- Added Swedish translation (STR #1569)
 	- "make install" now installs the MIME files with world
 	  read permissions (STR #1565)

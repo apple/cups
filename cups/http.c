@@ -867,7 +867,11 @@ httpGets(char   *line,			/* I - Line to read into */
       */
 
       if (!http->blocking && !http_wait(http, 1000))
+      {
+        DEBUG_puts("httpGets: Timed out!");
+        http->error = ETIMEDOUT;
         return (NULL);
+      }
 
 #ifdef HAVE_SSL
       if (http->tls)
@@ -2587,6 +2591,8 @@ http_wait(http_t *http,			/* I - HTTP connection */
   {
     FD_SET(http->fd, http->input_set);
 
+    DEBUG_printf(("http_wait: msec=%d, http->fd=%d\n", msec, http->fd));
+
     if (msec >= 0)
     {
       timeout.tv_sec  = msec / 1000;
@@ -2596,6 +2602,8 @@ http_wait(http_t *http,			/* I - HTTP connection */
     }
     else
       nfds = select(http->fd + 1, http->input_set, NULL, NULL, NULL);
+
+    DEBUG_printf(("http_wait: select() returned %d...\n", nfds));
   }
 #ifdef WIN32
   while (nfds < 0 && WSAGetLastError() == WSAEINTR);
@@ -2604,6 +2612,8 @@ http_wait(http_t *http,			/* I - HTTP connection */
 #endif /* WIN32 */
 
   FD_CLR(http->fd, http->input_set);
+
+  DEBUG_printf(("http_wait: returning with nfds=%d...\n", nfds));
 
   return (nfds > 0);
 }

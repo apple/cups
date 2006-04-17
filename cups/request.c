@@ -240,8 +240,6 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       }
     }
 
-    httpFlushWrite(http);
-
    /*
     * Get the server's return status...
     */
@@ -280,10 +278,15 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     }
     else if (status == HTTP_ERROR)
     {
+      DEBUG_printf(("cupsDoFileRequest: http->error=%d (%s)\n", http->error,
+                    strerror(http->error)));
+
 #ifdef WIN32
-      if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH)
+      if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH &&
+          http->error != ETIMEDOUT)
 #else
-      if (http->error != ENETDOWN && http->error != ENETUNREACH)
+      if (http->error != ENETDOWN && http->error != ENETUNREACH &&
+          http->error != ETIMEDOUT)
 #endif /* WIN32 */
         continue;
       else

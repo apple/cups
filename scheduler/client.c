@@ -901,8 +901,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         con->start     = time(NULL);
         con->operation = con->http.state;
 
-        cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdReadClient: %d %s %s HTTP/%d.%d", con->http.fd,
-	                operation, con->uri,
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdReadClient: %d %s %s HTTP/%d.%d",
+	                con->http.fd, operation, con->uri,
 		        con->http.version / 100, con->http.version % 100);
 
 	con->http.status = HTTP_OK;
@@ -966,6 +966,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       else
         snprintf(locale, sizeof(locale), "%s.%s",
 	         con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], DefaultCharset);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "cupsdReadClient: %d Browser asked for language \"%s\"...",
+                      con->http.fd, locale);
 
       con->language = cupsLangGet(locale);
     }
