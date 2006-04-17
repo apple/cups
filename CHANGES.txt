@@ -3,6 +3,7 @@ CHANGES.txt - 2006-04-17
 
 CHANGES IN CUPS V1.2rc3
 
+	- Added Swedish translation (STR #1569)
 	- "make install" now installs the MIME files with world
 	  read permissions (STR #1565)
 	- More CDSA encryption support fixes (STR #1563)

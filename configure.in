@@ -46,16 +46,23 @@ sinclude(config-scripts/cups-defaults.m4)
 sinclude(config-scripts/cups-pdf.m4)
 sinclude(config-scripts/cups-scripting.m4)
 
+LANGFILES=""
+if test "x$LANGUAGES" != x; then
+	for lang in $LANGUAGES; do
+		LANGFILES="$LANGFILES doc/$lang/index.html"
+		LANGFILES="$LANGFILES templates/$lang/edit-config.tmpl"
+		LANGFILES="$LANGFILES templates/$lang/header.tmpl"
+	done
+fi
+
 AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh init/cups-lpd cups-config
 	  conf/cupsd.conf conf/pam.std doc/index.html
-	  doc/es/index.html doc/ja/index.html
 	  doc/help/standard.html man/client.conf.man
 	  man/cups-deviced.man man/cups-driverd.man
 	  man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
 	  man/cupsd.conf.man man/lpoptions.man
 	  templates/edit-config.tmpl templates/header.tmpl
-	  templates/es/edit-config.tmpl templates/es/header.tmpl
-	  templates/ja/edit-config.tmpl templates/ja/header.tmpl)
+	  $LANGFILES)
 
 chmod +x cups-config
 

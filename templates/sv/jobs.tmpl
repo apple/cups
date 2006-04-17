@@ -1,0 +1,42 @@
+{#job_id=0?:
+<TABLE CELLPADDING="0" CELLSPACING="0" CLASS="button" WIDTH="100%" SUMMARY="Job List">
+<TR CLASS="data">
+<TH>ID&nbsp;</TH>
+<TH>Namn&nbsp;</TH>
+<TH>Användare&nbsp;</TH>
+<TH>Storlek&nbsp;</TH>
+<TH>Sidor&nbsp;</TH>
+<TH>Tillstånd&nbsp;</TH>
+<TH>Kontroll&nbsp;</TH>
+</TR>
+
+{[job_id]
+<TR CLASS="data" VALIGN="TOP">
+<TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}&nbsp;</TD>
+<TD>{?job_name=?Okänt:{job_name}}&nbsp;</TD>
+<TD>{job_originating_user_name}&nbsp;</TD>
+<TD>{job_k_octets}k&nbsp;</TD>
+<TD>{job_media_sheets_completed=0?Okänt:{?job_media_sheets_completed}}</TD>
+<TD>{job_state=3?väntar sedan<BR>{time_at_creation}:{job_state=4?hålls kvar sedan<BR>{time_at_creation}:
+{job_state=5?behandlas sedan<BR>{time_at_processing}:{job_state=6?stoppad kl<BR>{time_at_completed}:
+{job_state=7?cancelled at<BR>{time_at_completed}:{job_state=8?aborted:färdig kl<BR>{time_at_completed}}}}}}}&nbsp;</TD>
+<TD>
+{job_preserved>0?
+<A HREF="/jobs/?op=restart-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/button-restart-job.gif" ALT="Skriv ut jobb igen" CLASS="button"></A>:}
+{job_state=4?
+<A HREF="/jobs/?op=release-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/button-release-job.gif" ALT="Släpp jobb" CLASS="button"></A>:}
+{job_state=3?
+<A HREF="/jobs/?op=hold-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/button-hold-job.gif" ALT="Håll kvar jobb" CLASS="button"></A>:}
+{job_state<7?
+<A HREF="/jobs/?op=cancel-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/button-cancel-job.gif" ALT="Avbryt jobb" CLASS="button"></A>
+<A HREF="/jobs/?op=move-job&amp;job_id={job_id}"><IMG
+SRC="/images/button-move-job.gif" ALT="Flytta jobb" CLASS="button"></A>:}
+&nbsp;</TD>
+</TR>
+}
+</TABLE>
+}

@@ -1,4 +1,4 @@
-CREDITS.txt - 2006-02-23
+CREDITS.txt - 2006-04-17
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -24,10 +24,9 @@ like to thank the following individuals for their contributions:
     Jeff Licquia                   - Bug fixes, beta testing, evangelism.
     Jason McMullan                 - Original CUPS RPM distributions.
     Wes Morgan                     - *BSD fixes.
-    Ulrich Oldendorf               - German locale.
+    Daniel Nylander                - Swedish localization.
     Giulio Orsero                  - Bug fixes and testing.
     Kurt Pfeifle                   - Bug fixes, beta testing, evangelism.
-    Gilles QUERRET                 - French man pages.
     Petter Reinholdtsen            - HP-UX compiler stuff.
     Juan Pablo González Riopedre   - Spanish localization
     Stuart Stevens                 - HP JetDirect IPP information.

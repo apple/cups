@@ -26,7 +26,7 @@ dnl
 dnl Default langugages...
 AC_ARG_WITH(languages, [  --with-languages        set installed languages, default="es ja" ],
 	LANGUAGES="$withval",
-	LANGUAGES="es ja")
+	LANGUAGES="es ja sv")
 AC_SUBST(LANGUAGES)
 
 dnl Default ConfigFilePerm

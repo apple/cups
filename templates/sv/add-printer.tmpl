@@ -1,0 +1,28 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+
+<H2 CLASS="title">Lägg till ny skrivare</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">Namn:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Får innehålla utskrivbara tecken förutom "/", "#", och blanksteg)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Plats:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Läsbar plats såsom "Lab 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Beskrivning:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Läsbar beskrivning såsom "HP LaserJet")</SMALL></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="Fortsätt"></TD>
+</TR>
+</TABLE>
+
+</FORM>
