@@ -49,7 +49,51 @@
  * Globals...
  */
 
-int	Verbosity = 0;			/* Show all attributes? */
+int		Verbosity = 0;		/* Show all attributes? */
+const char	* const TagNames[] =
+		{			/* Value/group tag names */
+		  "zero",		/* 0x00 */
+		  "operation",		/* 0x01 */
+		  "job",		/* 0x02 */
+		  "end",		/* 0x03 */
+		  "printer",		/* 0x04 */
+		  "unsupported-group",	/* 0x05 */
+		  "subscription",	/* 0x06 */
+		  "event-notification",	/* 0x07 */
+		  "", "", "", "", "", "", "", "",
+		  "unsupported-value",	/* 0x10 */
+		  "default",		/* 0x11 */
+		  "unknown",		/* 0x12 */
+		  "novalue",		/* 0x13 */
+		  "",
+		  "notsettable",	/* 0x15 */
+		  "deleteattr",		/* 0x16 */
+		  "anyvalue",		/* 0x17 */
+		  "", "", "", "", "", "", "", "", "",
+		  "integer",		/* 0x21 */
+		  "boolean",		/* 0x22 */
+		  "enum",		/* 0x23 */
+		  "", "", "", "", "", "", "", "", "", "", "", "",
+		  "string",		/* 0x30 */
+		  "date",		/* 0x31 */
+		  "resolution",		/* 0x32 */
+		  "range",		/* 0x33 */
+		  "collection",		/* 0x34 */
+		  "textlang",		/* 0x35 */
+		  "namelang",		/* 0x36 */
+		  "", "", "", "", "", "", "", "", "", "",
+		  "text",		/* 0x41 */
+		  "name",		/* 0x42 */
+		  "",
+		  "keyword",		/* 0x44 */
+		  "uri",		/* 0x45 */
+		  "urischeme",		/* 0x46 */
+		  "charset",		/* 0x47 */
+		  "language",		/* 0x48 */
+		  "mimetype"		/* 0x49 */
+		};
+
+
 
 
 /*
@@ -60,6 +104,7 @@ int		do_tests(const char *, const char *);
 ipp_op_t	ippOpValue(const char *);
 ipp_status_t	ippErrorValue(const char *);
 ipp_tag_t	get_tag(const char *);
+const char	*get_tag_string(ipp_tag_t tag);
 char		*get_token(FILE *, char *, int, int *linenum);
 void		print_attr(ipp_attribute_t *);
 void		usage(const char *option);
@@ -637,55 +682,27 @@ ipp_tag_t				/* O - Value/group tag */
 get_tag(const char *name)		/* I - Name of value/group tag */
 {
   int			i;		/* Looping var */
-  static const char	* const names[] =
-		{			/* Value/group tag names */
-		  "zero",		/* 0x00 */
-		  "operation",		/* 0x01 */
-		  "job",		/* 0x02 */
-		  "end",		/* 0x03 */
-		  "printer",		/* 0x04 */
-		  "unsupported-group",	/* 0x05 */
-		  "subscription",	/* 0x06 */
-		  "event-notification",	/* 0x07 */
-		  "", "", "", "", "", "", "", "",
-		  "unsupported-value",	/* 0x10 */
-		  "default",		/* 0x11 */
-		  "unknown",		/* 0x12 */
-		  "novalue",		/* 0x13 */
-		  "",
-		  "notsettable",	/* 0x15 */
-		  "deleteattr",		/* 0x16 */
-		  "anyvalue",		/* 0x17 */
-		  "", "", "", "", "", "", "", "", "",
-		  "integer",		/* 0x21 */
-		  "boolean",		/* 0x22 */
-		  "enum",		/* 0x23 */
-		  "", "", "", "", "", "", "", "", "", "", "", "",
-		  "string",		/* 0x30 */
-		  "date",		/* 0x31 */
-		  "resolution",		/* 0x32 */
-		  "range",		/* 0x33 */
-		  "collection",		/* 0x34 */
-		  "textlang",		/* 0x35 */
-		  "namelang",		/* 0x36 */
-		  "", "", "", "", "", "", "", "", "", "",
-		  "text",		/* 0x41 */
-		  "name",		/* 0x42 */
-		  "",
-		  "keyword",		/* 0x44 */
-		  "uri",		/* 0x45 */
-		  "urischeme",		/* 0x46 */
-		  "charset",		/* 0x47 */
-		  "language",		/* 0x48 */
-		  "mimetype"		/* 0x49 */
-		};
 
 
-  for (i = 0; i < (sizeof(names) / sizeof(names[0])); i ++)
-    if (!strcasecmp(name, names[i]))
+  for (i = 0; i < (sizeof(TagNames) / sizeof(TagNames[0])); i ++)
+    if (!strcasecmp(name, TagNames[i]))
       return ((ipp_tag_t)i);
 
   return (IPP_TAG_ZERO);
+}
+
+
+/*
+ * 'get_tag_string()' - Get the string associated with a tag.
+ */
+
+const char *				/* O - Tag name string */
+get_tag_string(ipp_tag_t tag)		/* I - IPP tag */
+{
+  if (tag < (ipp_tag_t)(sizeof(TagNames) / sizeof(TagNames[0])))
+    return (TagNames[tag]);
+  else
+    return ("UNKNOWN");
 }
 
 
@@ -797,7 +814,7 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
     return;
   }
 
-  printf("        %s = ", attr->name);
+  printf("        %s (%s) = ", attr->name, get_tag_string(attr->value_tag));
 
   switch (attr->value_tag)
   {
