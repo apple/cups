@@ -320,12 +320,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	if (!strncmp(attr->name, "Default", 7))
 	{
-	  if ((option = ppdFindOption(ppd, attr->name + 7)) == NULL)
-            _cupsLangPrintf(stdout,
-	                    _("        WARN    %s has no corresponding "
-			      "options!\n"),
-	                    attr->name);
-          else if (strcmp(attr->value, "Unknown"))
+	  if ((option = ppdFindOption(ppd, attr->name + 7)) != NULL &&
+              strcmp(attr->value, "Unknown"))
 	  {
 	   /*
 	    * Check that the default option value matches a choice...
@@ -1180,6 +1176,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
       }
 
+      if (ppdFindAttr(ppd, "1284DeviceId", NULL))
+      {
+	if (verbose >= 0)
+	{
+	  if (!errors && !verbose)
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	  _cupsLangPuts(stdout,
+	                _("      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
+			  "                REF: Page 72, section 5.5\n"));
+        }
+
+	errors ++;
+      }
+
       if (errors)
 	status = ERROR_CONFORMANCE;
       else if (!verbose)
@@ -1189,9 +1200,40 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         check_basics(argv[i]);
 
-        if (option &&
-	    strcmp(option->keyword, "Duplex") &&
-	    strcmp(option->keyword, "JCLDuplex"))
+       /*
+	* Look for default keywords with no corresponding option...
+	*/
+
+	for (i = 0; i < ppd->num_attrs; i ++)
+	{
+	  attr = ppd->attrs[i];
+
+          if (!strcmp(attr->name, "DefaultColorSpace") ||
+	      !strcmp(attr->name, "DefaultColorSep") ||
+	      !strcmp(attr->name, "DefaultFont") ||
+	      !strcmp(attr->name, "DefaultImageableArea") ||
+	      !strcmp(attr->name, "DefaultOutputOrder") ||
+	      !strcmp(attr->name, "DefaultPaperDimension") ||
+	      !strcmp(attr->name, "DefaultScreenProc") ||
+	      !strcmp(attr->name, "DefaultTransfer"))
+	    continue;
+
+	  if (!strncmp(attr->name, "Default", 7) && 
+	      !ppdFindOption(ppd, attr->name + 7))
+            _cupsLangPrintf(stdout,
+	                    _("        WARN    %s has no corresponding "
+			      "options!\n"),
+	                    attr->name);
+	}
+
+       /*
+        * Check for old Duplex option names...
+	*/
+
+	if ((option = ppdFindOption(ppd, "EFDuplex")) == NULL)
+          option = ppdFindOption(ppd, "KD03Duplex");
+
+        if (option)
 	{
 	  _cupsLangPrintf(stdout,
 	                  _("        WARN    Duplex option keyword %s "

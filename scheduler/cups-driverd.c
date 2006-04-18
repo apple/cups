@@ -142,7 +142,7 @@ add_ppd(const char *name,		/* I - PPD name */
         const char *natural_language,	/* I - Language(s) */
         const char *make,		/* I - Manufacturer */
 	const char *make_and_model,	/* I - NickName */
-	const char *device_id,		/* I - 1284DeviceId */
+	const char *device_id,		/* I - 1284DeviceID */
         time_t     mtime,		/* I - Modification time */
 	size_t     size)		/* I - File size */
 {
@@ -656,7 +656,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 		make_model[256],	/* Make and Model */
 		model_name[256],	/* ModelName */
 		nick_name[256],		/* NickName */
-		device_id[256];		/* 1284DeviceId */
+		device_id[256];		/* 1284DeviceID */
   ppd_info_t	*ppd,			/* New PPD file */
 		key;			/* Search key */
   int		new_ppd;		/* Is this a new PPD? */
@@ -799,7 +799,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 	sscanf(line, "%*[^:]:%63s", lang_version);
       else if (!strncmp(line, "*NickName:", 10))
 	sscanf(line, "%*[^\"]\"%255[^\"]", nick_name);
-      else if (!strncmp(line, "*1284DeviceId:", 14))
+      else if (!strncasecmp(line, "*1284DeviceID:", 14))
 	sscanf(line, "%*[^\"]\"%255[^\"]", device_id);
       else if (!strncmp(line, "*OpenUI", 7))
       {

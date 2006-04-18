@@ -1,8 +1,12 @@
-CHANGES.txt - 2006-04-17
+CHANGES.txt - 2006-04-18
 ------------------------
 
 CHANGES IN CUPS V1.2rc3
 
+	- cupstestppd now fails PPD files with 1284DeviceId
+	  instead of 1284DeviceID, and cups-driverd uses a
+	  case-insensitive comparison when looking for it (STR
+	  #1573)
 	- cupsDoFileRequest() and cupsDoRequest() now work
 	  properly with non-blocking HTTP connections.
 	- Added Swedish translation (STR #1569)
