@@ -26,11 +26,11 @@
 
 include ../Makedefs
 
-RBACKENDS =	ipp lpd
+RBACKENDS =	ipp lpd snmp
 UBACKENDS =	parallel scsi serial socket usb
 TARGETS	=	betest test1284 $(RBACKENDS) $(UBACKENDS)
 OBJS	=	betest.o ipp.o lpd.o parallel.o scsi.o \
-		serial.o socket.o test1284.o usb.o
+		serial.o snmp.o socket.o test1284.o usb.o
 
 
 #
@@ -163,6 +163,15 @@ scsi.o:	scsi.c scsi-irix.c scsi-linux.c
 serial:	serial.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o serial serial.o $(BACKLIBS) $(LIBS)
+
+
+#
+# snmp
+#
+
+snmp:	snmp.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o snmp snmp.o $(LIBS)
 
 
 #

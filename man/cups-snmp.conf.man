@@ -1,0 +1,77 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   snmp.conf man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636 USA
+.\"
+.\"       Voice: (301) 373-9600
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH snmp.conf 5 "Common UNIX Printing System" "18 April 2006" "Easy Software Products"
+.SH NAME
+snmp.conf \- snmp configuration file for cups
+.SH DESCRIPTION
+The \fIsnmp.conf\fR file configures the CUPS SNMP printer
+discovery backend and is  normally located in the \fI/etc/cups\fR
+directory. Each line in the file can be a configuration
+directive, a blank line, or a comment. Comment lines start with
+the # character.
+.LP
+The SNMP backend uses the SNMPv1 protocol to discover network
+printers, collecting information from the Host MIB along with
+intelligent port probes to determine the correct device URI and
+make and model for each printer. Future versions of CUPS will
+likely support the new Port Monitor MIB as well.
+.SH DIRECTIVES
+The following directives are understood by the SNMP backend.
+Consult the on-line help for detailed descriptions:
+.TP 5
+Address @IF(\fIname\fR)
+.TP 5
+Address @LOCAL
+.TP 5
+Address \fIaddress\fR
+.br
+Sends SNMP broadcast queries to the specified address(es). The
+default address is "@LOCAL" which broadcasts to all LAN
+interfaces.
+.TP 5
+Community \fIname\fR
+.br
+Specifies a SNMP community to query. The default community is
+"public".
+.TP 5
+DebugLevel \fIN\fR
+.br
+Sets the debug logging level to \fIN\fR; 0 disables debug
+logging, 1 enables basic logging, 2 displays SNMP values, and 3
+displays raw hex data.
+.TP 5
+HostNameLookups on
+.TP 5
+HostNameLookups off
+.br
+Specifies whether the addresses of printers should be converted
+to hostnames or left as numeric IP addresses. The default is
+"on".
+.SH SEE ALSO
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2006 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id$".
+.\"

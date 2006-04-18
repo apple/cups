@@ -25,8 +25,9 @@
  *
  * Contents:
  *
- *   get_device_id() - Get the IEEE-1284 device ID string and corresponding
- *                     URI.
+ *   get_device_id()  - Get the IEEE-1284 device ID string and corresponding
+ *                      URI.
+ *   get_make_model() - Get the make and model string from the device ID.
  */
 
 /*
@@ -34,27 +35,38 @@
  */
 
 #include <cups/debug.h>
-#ifdef __linux
-#  include <sys/ioctl.h>
-#  include <linux/lp.h>
-#  define IOCNR_GET_DEVICE_ID		1
-#  define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
-#endif /* __linux */
 
-#ifdef __sun
-#  ifdef __sparc
-#    include <sys/ecppio.h>
-#  else
-#    include <sys/ioccom.h>
-#    include <sys/ecppsys.h>
-#  endif /* __sparc */
-#endif /* __sun */
+
+/*
+ * Prototypes...
+ */
+
+static int	get_make_model(const char *device_id, char *make_model,
+		               int make_model_size);
 
 
 /*
  * 'get_device_id()' - Get the IEEE-1284 device ID string and
  *                     corresponding URI.
  */
+
+#ifndef SNMP_BACKEND
+#  ifdef __linux
+#    include <sys/ioctl.h>
+#    include <linux/lp.h>
+#    define IOCNR_GET_DEVICE_ID		1
+#    define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
+#  endif /* __linux */
+
+#  ifdef __sun
+#    ifdef __sparc
+#      include <sys/ecppio.h>
+#    else
+#      include <sys/ioccom.h>
+#      include <sys/ecppsys.h>
+#    endif /* __sparc */
+#  endif /* __sun */
+
 
 int					/* O - 0 on success, -1 on failure */
 get_device_id(
@@ -70,8 +82,6 @@ get_device_id(
   char	*attr,				/* 1284 attribute */
   	*delim,				/* 1284 delimiter */
 	*uriptr,			/* Pointer into URI */
-	*mfg,				/* Manufacturer string */
-	*mdl,				/* Model string */
 	serial_number[1024];		/* Serial number string */
 #ifdef __linux
   int	length;				/* Length of device ID info */
@@ -175,131 +185,14 @@ get_device_id(
     return (-1);
 
  /*
-  * Look for the description field...
+  * Get the make and model...
   */
 
-  if ((attr = strstr(device_id, "DES:")) != NULL)
-    attr += 4;
-  else if ((attr = strstr(device_id, "DESCRIPTION:")) != NULL)
-    attr += 12;
+  get_make_model(device_id, make_model, make_model_size);
 
-  if (attr)
-  {
-   /*
-    * Make sure the description contains something useful, since some
-    * printer manufacturers (HP) apparently don't follow the standards
-    * they helped to define...
-    *
-    * Here we require the description to be 8 or more characters in length,
-    * containing at least one space and one letter.
-    */
-
-    if ((delim = strchr(attr, ';')) == NULL)
-      delim = attr + strlen(attr);
-
-    if ((delim - attr) < 8)
-      attr = NULL;
-    else
-    {
-      char	*ptr;			/* Pointer into description */
-      int	letters,		/* Number of letters seen */
-		spaces;			/* Number of spaces seen */
-
-
-      for (ptr = attr, letters = 0, spaces = 0; ptr < delim; ptr ++)
-      {
-        if (isspace(*ptr & 255))
-	  spaces ++;
-	else if (isalpha(*ptr & 255))
-	  letters ++;
-
-        if (spaces && letters)
-	  break;
-      }
-
-      if (!spaces || !letters)
-        attr = NULL;
-    }
-  }
-
-  if ((mfg = strstr(device_id, "MANUFACTURER:")) != NULL)
-    mfg += 13;
-  else if ((mfg = strstr(device_id, "MFG:")) != NULL)
-    mfg += 4;
-
-  if ((mdl = strstr(device_id, "MODEL:")) != NULL)
-    mdl += 6;
-  else if ((mdl = strstr(device_id, "MDL:")) != NULL)
-    mdl += 4;
-
-  if (attr)
-  {
-   /*
-    * Use description...
-    */
-
-    if (!strncasecmp(attr, "Hewlett-Packard hp ", 19))
-    {
-     /*
-      * Check for a common HP bug...
-      */
-
-      strlcpy(make_model, "HP ", make_model_size);
-      strlcpy(make_model + 3, attr + 19, make_model_size - 3);
-    }
-    else if (!strncasecmp(attr, "Hewlett-Packard ", 16))
-    {
-      strlcpy(make_model, "HP ", make_model_size);
-      strlcpy(make_model + 3, attr + 16, make_model_size - 3);
-    }
-    else
-    {
-      strlcpy(make_model, attr, make_model_size);
-    }
-  }
-  else if (mfg && mdl)
-  {
-   /*
-    * Build a make-model string from the manufacturer and model attributes...
-    */
-
-    if (!strncasecmp(mfg, "Hewlett-Packard", 15))
-      strlcpy(make_model, "HP", make_model_size);
-    else
-      strlcpy(make_model, mfg, make_model_size);
-
-    if ((delim = strchr(make_model, ';')) != NULL)
-      *delim = '\0';
-
-    if (!strncasecmp(make_model, mdl, strlen(make_model)))
-    {
-     /*
-      * Just copy model string, since it has the manufacturer...
-      */
-
-      strlcpy(make_model, mdl, make_model_size);
-    }
-    else
-    {
-     /*
-      * Concatenate the make and model...
-      */
-
-      strlcat(make_model, " ", make_model_size);
-      strlcat(make_model, mdl, make_model_size);
-    }
-  }
-  else
-  {
-   /*
-    * Use "Unknown" as the printer make and model...
-    */
-
-    strlcpy(make_model, "Unknown", make_model_size);
-  }
-
-  if ((delim = strchr(make_model, ';')) != NULL)
-    *delim = '\0';
+ /*
+  * Then generate a device URI...
+  */
 
   if (scheme && uri && uri_size > 32)
   {
@@ -365,6 +258,202 @@ get_device_id(
   }
 
   return (0);
+}
+#endif /* !SNMP_BACKEND */
+
+
+/*
+ * 'get_make_model()' - Get the make and model string from the device ID.
+ */
+
+int					/* O - 0 on success, -1 on failure */
+get_make_model(
+    const char *device_id,		/* O - 1284 device ID */
+    char       *make_model,		/* O - Make/model */
+    int        make_model_size)		/* I - Size of buffer */
+{
+  char	*attr,				/* 1284 attribute */
+  	*delim,				/* 1284 delimiter */
+	*mfg,				/* Manufacturer string */
+	*mdl;				/* Model string */
+
+
+  DEBUG_printf(("get_make_model(device_id=\"%s\", "
+                "make_model=%p, make_model_size=%d)\n", device_id,
+		make_model, make_model_size));
+
+ /*
+  * Range check input...
+  */
+
+  if (!device_id || !*device_id || !make_model || make_model_size < 32)
+  {
+    DEBUG_puts("get_make_model: Bad args!");
+    return (-1);
+  }
+
+  *make_model = '\0';
+
+ /*
+  * Look for the description field...
+  */
+
+  if ((attr = strstr(device_id, "DES:")) != NULL)
+    attr += 4;
+  else if ((attr = strstr(device_id, "DESCRIPTION:")) != NULL)
+    attr += 12;
+
+  if (attr)
+  {
+   /*
+    * Make sure the description contains something useful, since some
+    * printer manufacturers (HP) apparently don't follow the standards
+    * they helped to define...
+    *
+    * Here we require the description to be 8 or more characters in length,
+    * containing at least one space and one letter.
+    */
+
+    if ((delim = strchr(attr, ';')) == NULL)
+      delim = attr + strlen(attr);
+
+    if ((delim - attr) < 8)
+      attr = NULL;
+    else
+    {
+      char	*ptr;			/* Pointer into description */
+      int	letters,		/* Number of letters seen */
+		spaces;			/* Number of spaces seen */
+
+
+      for (ptr = attr, letters = 0, spaces = 0; ptr < delim; ptr ++)
+      {
+        if (isspace(*ptr & 255))
+	  spaces ++;
+	else if (isalpha(*ptr & 255))
+	  letters ++;
+
+        if (spaces && letters)
+	  break;
+      }
+
+      if (!spaces || !letters)
+        attr = NULL;
+    }
+  }
+
+  if ((mfg = strstr(device_id, "MANUFACTURER:")) != NULL)
+    mfg += 13;
+  else if ((mfg = strstr(device_id, "MFG:")) != NULL)
+    mfg += 4;
+
+  if ((mdl = strstr(device_id, "MODEL:")) != NULL)
+    mdl += 6;
+  else if ((mdl = strstr(device_id, "MDL:")) != NULL)
+    mdl += 4;
+
+  if (mdl)
+  {
+   /*
+    * Build a make-model string from the manufacturer and model attributes...
+    */
+
+    if (mfg)
+    {
+      if (!strncasecmp(mfg, "Hewlett-Packard", 15))
+	strlcpy(make_model, "HP", make_model_size);
+      else
+	strlcpy(make_model, mfg, make_model_size);
+
+      if ((delim = strchr(make_model, ';')) != NULL)
+	*delim = '\0';
+
+      if (!strncasecmp(make_model, mdl, strlen(make_model)))
+      {
+       /*
+	* Just copy model string, since it has the manufacturer...
+	*/
+
+	strlcpy(make_model, mdl, make_model_size);
+      }
+      else
+      {
+       /*
+	* Concatenate the make and model...
+	*/
+
+	strlcat(make_model, " ", make_model_size);
+	strlcat(make_model, mdl, make_model_size);
+      }
+    }
+    else
+    {
+     /*
+      * Just copy model string, since it has the manufacturer...
+      */
+
+      strlcpy(make_model, mdl, make_model_size);
+    }
+  }
+  else if (attr)
+  {
+   /*
+    * Use description...
+    */
+
+    if (!strncasecmp(attr, "Hewlett-Packard hp ", 19))
+    {
+     /*
+      * Check for a common HP bug...
+      */
+
+      strlcpy(make_model, "HP ", make_model_size);
+      strlcpy(make_model + 3, attr + 19, make_model_size - 3);
+    }
+    else if (!strncasecmp(attr, "Hewlett-Packard ", 16))
+    {
+      strlcpy(make_model, "HP ", make_model_size);
+      strlcpy(make_model + 3, attr + 16, make_model_size - 3);
+    }
+    else
+    {
+      strlcpy(make_model, attr, make_model_size);
+    }
+  }
+  else
+  {
+   /*
+    * Use "Unknown" as the printer make and model...
+    */
+
+    strlcpy(make_model, "Unknown", make_model_size);
+  }
+
+ /*
+  * Strip trailing data...
+  */
+
+  if ((delim = strchr(make_model, ';')) != NULL)
+    *delim = '\0';
+
+ /*
+  * Strip trailing whitespace...
+  */
+
+  for (delim = make_model + strlen(make_model) - 1; delim >= make_model; delim --)
+    if (isspace(*delim & 255))
+      *delim = '\0';
+    else
+      break;
+
+ /*
+  * Return...
+  */
+
+  if (make_model[0])
+    return (0);
+  else
+    return (-1);
 }
 
 

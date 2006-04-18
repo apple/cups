@@ -43,6 +43,7 @@ LIBOBJS	=	\
 		emit.o \
 		encode.o \
 		file.o \
+		getifaddrs.o \
 		getputfile.o \
 		globals.o \
 		http.o \

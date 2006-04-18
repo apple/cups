@@ -160,6 +160,7 @@ HELPFILES	=	\
 			help/ref-error_log.html \
 			help/ref-page_log.html \
 			help/ref-printers-conf.html \
+			help/ref-snmp-conf.html \
 			help/ref-subscriptions-conf.html \
 			help/security.html \
 			help/spec-cmp.html \

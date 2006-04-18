@@ -5,58 +5,49 @@
 </HEAD>
 <BODY>
 
-<P>The <VAR>/etc/cups/client.conf</VAR> file contains many
-directives that determine how the client behaves:</P>
+<P>The <VAR>/etc/cups/client.conf</VAR> and
+<VAR>~/.cups/client.conf</VAR> files contain up to two directives
+that determine how the client behaves. Each directive is listed
+on a line by itself followed by its value. Comments are
+introduced using the number sign ("#") character at the beginning
+of a line.</P>
 
-<P ALIGN="CENTER">
-<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
-<TR>
-<TD VALIGN="TOP">
+<H2 CLASS="title"><A NAME="Encryption">Encryption</A></H2>
 
-	<LI><A HREF="#Encryption"><CODE>Encryption</CODE></A>
-	<LI><A HREF="#ServerName"><CODE>ServerName</CODE></A>
+<H3>Examples</H3>
 
-</TD>
-</TR>
-</TABLE>
-</P>
-
-<!-- HALF PAGE -->
-<H3><A NAME="Encryption">Encryption</A></H3>
-<HR>
-
-<H4>Examples</H4>
-
-<UL><PRE>
+<PRE CLASS="command">
 Encryption Never
 Encryption IfRequested
 Encryption Required
 Encryption Always
-</PRE></UL>
+</PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
-<P>The <CODE>Encryption</CODE> directive specifies the default encryption settings for the client.
-The default setting is <VAR>IfRequested</VAR>.
+<P>The <CODE>Encryption</CODE> directive specifies the default
+encryption settings for the client.</P>
+
+<P>The default setting is <VAR>IfRequested</VAR>.</P>
 
 
-<!-- HALF PAGE -->
-<H3><A NAME="ServerName">ServerName</A></H3>
-<HR>
+<H2 CLASS="title"><A NAME="ServerName">ServerName</A></H2>
 
-<H4>Examples</H4>
+<H3>Examples</H3>
 
-<UL><PRE>
+<PRE CLASS="command">
 ServerName foo.bar.com
 ServerName 11.22.33.44
-</PRE></UL>
+</PRE>
 
-<H4>Description</H4>
+<H3>Description</H3>
 
-<P>The <CODE>ServerName</CODE> directive specifies sets the remote server that is to be used
-for all client operations.  That is, it redirects all client requests to the remote server.
+<P>The <CODE>ServerName</CODE> directive specifies sets the
+remote server that is to be used for all client operations.  That
+is, it redirects all client requests to the remote server.</P>
 
-The default is to use the local server ("<VAR>localhost</VAR>").
+<P>The default is to use the local server
+("<VAR>localhost</VAR>") or domain socket, if so configured.</P>
 
 </BODY>
 </HTML>

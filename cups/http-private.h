@@ -133,6 +133,44 @@ extern const char *_cups_hstrerror(int error);
 extern const char *hstrerror(int error);
 #  endif /* !HAVE_HSTRERROR */
 
+
+/*
+ * Some OS's don't have getifaddrs() and freeifaddrs()...
+ */
+
+#  include <net/if.h>
+#  ifdef HAVE_GETIFADDRS
+#    include <ifaddrs.h>
+#  else
+#    include <sys/ioctl.h>
+#    ifdef HAVE_SYS_SOCKIO_H
+#      include <sys/sockio.h>
+#    endif /* HAVE_SYS_SOCKIO_H */
+
+#  ifdef ifa_dstaddr
+#    undef ifa_dstaddr
+#  endif /* ifa_dstaddr */
+#  ifndef ifr_netmask
+#    define ifr_netmask ifr_addr
+#  endif /* !ifr_netmask */
+
+struct ifaddrs				/**** Interface Structure ****/
+{
+  struct ifaddrs	*ifa_next;	/* Next interface in list */
+  char			*ifa_name;	/* Name of interface */
+  unsigned int		ifa_flags;	/* Flags (up, point-to-point, etc.) */
+  struct sockaddr	*ifa_addr,	/* Network address */
+			*ifa_netmask,	/* Address mask */
+			*ifa_dstaddr;	/* Broadcast or destination address */
+  void			*ifa_data;	/* Interface statistics */
+};
+
+static int	_cups_getifaddrs(struct ifaddrs **addrs);
+#    define getifaddrs _cups_getifaddrs
+static void	_cups_freeifaddrs(struct ifaddrs *addrs);
+#    define freeifaddrs _cups_freeifaddrs
+#  endif /* HAVE_GETIFADDRS */
+
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*

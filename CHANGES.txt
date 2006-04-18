@@ -3,6 +3,8 @@ CHANGES.txt - 2006-04-18
 
 CHANGES IN CUPS V1.2rc3
 
+	- Added the SNMP backend for network printer discovery
+	  (STR #1555)
 	- cupstestppd now fails PPD files with 1284DeviceId
 	  instead of 1284DeviceID, and cups-driverd uses a
 	  case-insensitive comparison when looking for it (STR

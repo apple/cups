@@ -42,6 +42,7 @@ MAN1	=	cancel.$(MAN1EXT) \
 		lpstat.$(MAN1EXT)
 MAN5	=	classes.conf.$(MAN5EXT) \
 		client.conf.$(MAN5EXT) \
+		cups-snmp.conf.$(MAN5EXT) \
 		cupsd.conf.$(MAN5EXT) \
 		mime.convs.$(MAN5EXT) \
 		mime.types.$(MAN5EXT) \

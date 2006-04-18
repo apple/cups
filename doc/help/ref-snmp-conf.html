@@ -1,0 +1,100 @@
+<HTML>
+<!-- SECTION: References -->
+<HEAD>
+	<TITLE>snmp.conf</TITLE>
+</HEAD>
+<BODY>
+
+<P>The <VAR>/etc/cups/snmp.conf</VAR> file contains several
+directives that determine how the SNMP printer discovery backend
+behaves. Each directive is listed on a line by itself followed
+by its value. Comments are introduced using the number sign ("#")
+character at the beginning of a line.</P>
+
+<P>The SNMP backend uses the SNMPv1 protocol to discover network
+printers, collecting information from the Host MIB along with
+intelligent port probes to determine the correct device URI and
+make and model for each printer. Future versions of CUPS will
+likely support the new Port Monitor MIB as well.</P>
+
+<H2 CLASS="title"><A NAME="Address">Address</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+Address @LOCAL
+Address @IF(name)
+Address 255.255.255.255
+Address 192.168.2.255
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Address</CODE> directive specifies a broadcast
+address to use when discovering printers. Multiple
+<CODE>Address</CODE> lines can be provided to scan different
+subnets.</P>
+
+<P>The default address is <VAR>@LOCAL</VAR>, which broadcasts to
+all LANs.</P>
+
+
+<H2 CLASS="title"><A NAME="Community">Community</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+Community public
+Community easysw
+Community BigCorp
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Community</CODE> directive specifies a community
+name to use when discovering printers. Multiple
+<CODE>Community</CODE> lines can be provided to scan different
+SNMP communities.</P>
+
+<P>The default community is "public".</P>
+
+
+<H2 CLASS="title"><A NAME="DebugLevel">DebugLevel</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+DebugLevel 0
+DebugLevel 1
+DebugLevel 2
+DebugLevel 3
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>DebugLevel</CODE> directive specifies the debugging
+level to use when searching for network printers. Level 0
+produces no debugging information. Level 1 produces basic
+debugging information. Level 2 adds printing of the SNMP
+messages. Level 3 adds a hex dump of the network data.</P>
+
+<P>The default setting is <VAR>0</VAR>.</P>
+
+<H2 CLASS="title"><A NAME="HostNameLookups">HostNameLookups</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+HostNameLookups on
+HostNameLookups off
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>HostNameLookups</CODE> directive specifies whether printer
+addresses are converted to hostnames or left as numeric IP addresses.</P>
+
+<P>The default setting is <VAR>on</VAR>.</P>
+
+</BODY>
+</HTML>

@@ -19,6 +19,11 @@ scsi.o: ../cups/language.h ../cups/string.h ../config.h
 serial.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 serial.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 serial.o: ../cups/language.h ../cups/string.h ../config.h
+snmp.o: ../cups/backend.h ../cups/http-private.h ../config.h ../cups/http.h
+snmp.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+snmp.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+snmp.o: ../cups/string.h ../cups/array.h ../cups/file.h ieee1284.c
+snmp.o: ../cups/debug.h
 socket.o: ../cups/backend.h ../cups/http-private.h ../config.h ../cups/http.h
 socket.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
 socket.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
