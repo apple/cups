@@ -14,10 +14,10 @@ CLASS="button"></A>:}
 </P>
 
 {#device_uri=0?:<P><B>新しいプリンタが見つかりました:</B></P><UL>{[device_uri]
-<LI>{device_make_and_model} ({device_info})
-<A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
-SRC="/images/button-add-this-printer.gif" ALT="このプリンタを追加" CLASS="button"
-ALIGN="MIDDLE"></A></LI>
+<LI><A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
+SRC="/images/button-add-this-printer.gif" ALT="このプリンタを追加"
+CLASS="button" ALIGN="MIDDLE"></A>
+{device_make_and_model} ({device_info})</LI>
 }</UL>}
 
 <H2 CLASS="title">クラス</H2>
