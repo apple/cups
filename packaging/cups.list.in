@@ -103,6 +103,9 @@
 %subpackage ja
 %description Common UNIX Printing System - Japanese support
 
+%subpackage sv
+%description Common UNIX Printing System - Swedish support
+
 %subpackage
 
 
@@ -190,12 +193,13 @@ f 0755 root sys $SBINDIR/cupsd scheduler/cupsd
 
 d 0755 root sys $SERVERBIN -
 d 0755 root sys $SERVERBIN/backend -
-f 0755 root sys $SERVERBIN/backend/ipp backend/ipp
-l 0755 root sys $SERVERBIN/backend/http ipp
-f 0755 root sys $SERVERBIN/backend/lpd backend/lpd
+f 0700 root sys $SERVERBIN/backend/ipp backend/ipp
+l 0700 root sys $SERVERBIN/backend/http ipp
+f 0700 root sys $SERVERBIN/backend/lpd backend/lpd
 f 0755 root sys $SERVERBIN/backend/parallel backend/parallel
 f 0755 root sys $SERVERBIN/backend/scsi backend/scsi
 f 0755 root sys $SERVERBIN/backend/serial backend/serial
+f 0755 root sys $SERVERBIN/backend/snmp backend/snmp
 f 0755 root sys $SERVERBIN/backend/socket backend/socket
 f 0755 root sys $SERVERBIN/backend/usb backend/usb
 d 0755 root sys $SERVERBIN/cgi-bin -
@@ -334,6 +338,8 @@ d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
 %subpackage ja
 f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
+%subpackage sv
+f 0644 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
 %subpackage
 
 d 0755 root sys $DATADIR -
@@ -395,6 +401,9 @@ f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
 %subpackage ja
 d 0755 root sys $DATADIR/templates/ja
 f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
+%subpackage sv
+d 0755 root sys $DATADIR/templates/sv
+f 0644 root sys $DATADIR/templates/sv templates/sv/*.tmpl
 %subpackage
 
 # Config files
@@ -468,6 +477,11 @@ d 0755 root sys $DOCDIR/ja
 f 0644 root sys $DOCDIR/ja doc/ja/*.html
 d 0755 root sys $DOCDIR/ja/images -
 f 0644 root sys $DOCDIR/ja/images doc/ja/images/*.gif
+%subpackage sv
+d 0755 root sys $DOCDIR/sv
+f 0644 root sys $DOCDIR/sv doc/sv/*.html
+d 0755 root sys $DOCDIR/sv/images -
+f 0644 root sys $DOCDIR/sv/images doc/sv/images/*.gif
 %subpackage
 
 # Man pages
