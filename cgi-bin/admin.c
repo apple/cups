@@ -506,9 +506,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	      int    modify)		/* I - Modify the printer? */
 {
   int		i;			/* Looping var */
-  int		element;		/* Element number */
-  ipp_attribute_t *attr,		/* Current attribute */
-		*last;			/* Last attribute */
+  ipp_attribute_t *attr;		/* Current attribute */
   ipp_t		*request,		/* IPP request */
 		*response,		/* IPP response */
 		*oldinfo;		/* Old printer information */
@@ -855,27 +853,31 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       * Got the list of PPDs, see if the user has selected a make...
       */
 
-      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-
-      if (var == NULL)
+      if (cgiSetIPPVars(response, NULL, NULL, NULL, 0) == 0)
       {
        /*
-	* Let the user choose a make...
+        * No PPD files with this make, try again with all makes...
 	*/
 
-        for (element = 0, attr = response->attrs, last = NULL;
-	     attr != NULL;
-	     attr = attr->next)
-	  if (attr->name && strcmp(attr->name, "ppd-make") == 0)
-	    if (last == NULL ||
-	        strcasecmp(last->values[0].string.text,
-		           attr->values[0].string.text) != 0)
-	    {
-	      cgiSetArray("PPD_MAKE", element, attr->values[0].string.text);
-	      element ++;
-	      last = attr;
-	    }
+        ippDelete(response);
 
+	request = ippNewRequest(CUPS_GET_PPDS);
+
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                     NULL, "ipp://localhost/printers/");
+
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                     "requested-attributes", NULL, "ppd-make");
+
+	if ((response = cupsDoRequest(http, request, "/")) != NULL)
+          cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+
+        cgiStartHTML(title);
+	cgiCopyTemplateLang("choose-make.tmpl");
+        cgiEndHTML();
+      }
+      else if (!var)
+      {
         cgiStartHTML(title);
 	cgiCopyTemplateLang("choose-make.tmpl");
         cgiEndHTML();
@@ -931,7 +933,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
         cgiEndHTML();
       }
 
-      
       ippDelete(response);
     }
     else
