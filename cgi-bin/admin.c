@@ -1837,26 +1837,6 @@ do_delete_class(http_t *http)		/* I - HTTP connection */
   const char	*pclass;		/* Printer class name */
 
 
-  cgiStartHTML(cgiText(_("Delete Class")));
-
-  if (cgiGetVariable("CONFIRM") == NULL)
-  {
-    cgiCopyTemplateLang("class-confirm.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
-  if ((pclass = cgiGetVariable("PRINTER_NAME")) != NULL)
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                     "localhost", 0, "/classes/%s", pclass);
-  else
-  {
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
  /*
   * Build a CUPS_DELETE_CLASS request, which requires the following
   * attributes:
@@ -1876,6 +1856,30 @@ do_delete_class(http_t *http)		/* I - HTTP connection */
   */
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
+
+ /*
+  * Show the results...
+  */
+
+  cgiStartHTML(cgiText(_("Delete Class")));
+
+  if (cgiGetVariable("CONFIRM") == NULL)
+  {
+    cgiCopyTemplateLang("class-confirm.tmpl");
+    cgiEndHTML();
+    return;
+  }
+
+  if ((pclass = cgiGetVariable("PRINTER_NAME")) != NULL)
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/classes/%s", pclass);
+  else
+  {
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiCopyTemplateLang("error.tmpl");
+    cgiEndHTML();
+    return;
+  }
 
   if (cupsLastError() > IPP_OK_CONFLICT)
     cgiShowIPPError(_("Unable to delete class:"));
@@ -1898,26 +1902,6 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
   const char	*printer;		/* Printer printer name */
 
 
-  cgiStartHTML(cgiText(_("Delete Printer")));
-
-  if (cgiGetVariable("CONFIRM") == NULL)
-  {
-    cgiCopyTemplateLang("printer-confirm.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
-  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                     "localhost", 0, "/printers/%s", printer);
-  else
-  {
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
  /*
   * Build a CUPS_DELETE_PRINTER request, which requires the following
   * attributes:
@@ -1937,6 +1921,30 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
   */
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
+
+ /*
+  * Show the results...
+  */
+
+  cgiStartHTML(cgiText(_("Delete Printer")));
+
+  if (cgiGetVariable("CONFIRM") == NULL)
+  {
+    cgiCopyTemplateLang("printer-confirm.tmpl");
+    cgiEndHTML();
+    return;
+  }
+
+  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s", printer);
+  else
+  {
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiCopyTemplateLang("error.tmpl");
+    cgiEndHTML();
+    return;
+  }
 
   if (cupsLastError() > IPP_OK_CONFLICT)
     cgiShowIPPError(_("Unable to delete printer:"));
