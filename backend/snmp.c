@@ -98,7 +98,7 @@
  * The current focus is on printers with internal network cards, although
  * the code also works with many external print servers as well.  Future
  * versions will support scanning for vendor-specific SNMP OIDs and the
- * new PWG Port Monitor MIB.
+ * new PWG Port Monitor MIB and not just the Host MIB OIDs.
  *
  * The backend reads the snmp.conf file from the CUPS_SERVERROOT directory
  * which can contain comments, blank lines, or any number of the following
@@ -118,6 +118,25 @@
  *     Community public
  *     DebugLevel 0
  *     HostNameLookups off
+ *
+ * This backend is known to work with the following network printers and
+ * print servers:
+ *
+ *     Axis OfficeBasic, 5400, 5600
+ *     EPSON
+ *     HP JetDirect
+ *     Lexmark
+ *     Sharp
+ *     Tektronix
+ *     Xerox
+ *
+ * It does not currently work with:
+ *
+ *     DLink
+ *     Linksys
+ *     Netgear
+ *
+ * (for all of these, they do not support the Host MIB)
  */
 
 /*
@@ -492,7 +511,8 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 
             packet->object_type = asn1_get_type(&bufptr, bufend);
 
-	    if ((length = asn1_get_length(&bufptr, bufend)) == 0)
+	    if ((length = asn1_get_length(&bufptr, bufend)) == 0 &&
+	        packet->object_type != ASN1_NULL_VALUE)
 	      packet->error = "Value uses indefinite length";
 	    else
 	    {
