@@ -33,11 +33,23 @@
  *   asn1_debug()              - Decode an ASN1-encoded message.
  *   asn1_encode_snmp()        - Encode a SNMP packet.
  *   asn1_get_integer()        - Get an integer value.
+ *   asn1_get_length()         - Get a value length.
  *   asn1_get_oid()            - Get an OID value.
  *   asn1_get_packed()         - Get a packed integer value.
  *   asn1_get_string()         - Get a string value.
- *   asn1_get_value_length()   - Get a value length.
- *   asn1_get_value_type()     - Get a value type.
+ *   asn1_get_type()           - Get a value type.
+ *   asn1_set_integer()        - Set an integer value.
+ *   asn1_set_length()         - Set a value length.
+ *   asn1_set_oid()            - Set an OID value.
+ *   asn1_set_packed()         - Set a packed integer value.
+ *   asn1_size_integer()       - Figure out the number of bytes needed for an
+ *                               integer value.
+ *   asn1_size_length()        - Figure out the number of bytes needed for a
+ *                               length value.
+ *   asn1_size_oid()           - Figure out the numebr of bytes needed for an
+ *                               OID value.
+ *   asn1_size_packed()        - Figure out the number of bytes needed for a
+ *                               packed integer value.
  *   compare_cache()           - Compare two cache entries.
  *   debug_printf()            - Display some debugging information.
  *   fix_make_model()          - Fix common problems in the make-and-model
@@ -193,10 +205,22 @@ static char		*asn1_get_string(unsigned char **buffer,
 			                 unsigned char *bufend,
 			                 int length, char *string,
 			                 int strsize);
-static int		asn1_get_value_length(unsigned char **buffer,
-			                      unsigned char *bufend);
-static int		asn1_get_value_type(unsigned char **buffer,
-			                    unsigned char *bufend);
+static int		asn1_get_length(unsigned char **buffer,
+			                unsigned char *bufend);
+static int		asn1_get_type(unsigned char **buffer,
+			              unsigned char *bufend);
+static void		asn1_set_integer(unsigned char **buffer,
+			                 int integer);
+static void		asn1_set_length(unsigned char **buffer,
+			                int length);
+static void		asn1_set_oid(unsigned char **buffer,
+			             const int *oid);
+static void		asn1_set_packed(unsigned char **buffer,
+			                int integer);
+static int		asn1_size_integer(int integer);
+static int		asn1_size_length(int length);
+static int		asn1_size_oid(const int *oid);
+static int		asn1_size_packed(int integer);
 static int		compare_cache(snmp_cache_t *a, snmp_cache_t *b);
 static void		debug_printf(const char *format, ...);
 static void		fix_make_model(char *make_model,
@@ -400,75 +424,75 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
   bufptr = buffer;
   bufend = buffer + len;
 
-  if (asn1_get_value_type(&bufptr, bufend) != ASN1_SEQUENCE)
+  if (asn1_get_type(&bufptr, bufend) != ASN1_SEQUENCE)
     packet->error = "Packet does not start with SEQUENCE";
-  else if (asn1_get_value_length(&bufptr, bufend) == 0)
+  else if (asn1_get_length(&bufptr, bufend) == 0)
     packet->error = "SEQUENCE uses indefinite length";
-  else if (asn1_get_value_type(&bufptr, bufend) != ASN1_INTEGER)
+  else if (asn1_get_type(&bufptr, bufend) != ASN1_INTEGER)
     packet->error = "No version number";
-  else if ((length = asn1_get_value_length(&bufptr, bufend)) == 0)
+  else if ((length = asn1_get_length(&bufptr, bufend)) == 0)
     packet->error = "Version uses indefinite length";
   else if ((packet->version = asn1_get_integer(&bufptr, bufend, length))
                != SNMP_VERSION_1)
     packet->error = "Bad SNMP version number";
-  else if (asn1_get_value_type(&bufptr, bufend) != ASN1_OCTET_STRING)
+  else if (asn1_get_type(&bufptr, bufend) != ASN1_OCTET_STRING)
     packet->error = "No community name";
-  else if ((length = asn1_get_value_length(&bufptr, bufend)) == 0)
+  else if ((length = asn1_get_length(&bufptr, bufend)) == 0)
     packet->error = "Community name uses indefinite length";
   else
   {
     asn1_get_string(&bufptr, bufend, length, packet->community,
                     sizeof(packet->community));
 
-    if ((packet->request_type = asn1_get_value_type(&bufptr, bufend))
+    if ((packet->request_type = asn1_get_type(&bufptr, bufend))
             != ASN1_GET_RESPONSE)
       packet->error = "Packet does not contain a Get-Response-PDU";
-    else if (asn1_get_value_length(&bufptr, bufend) == 0)
+    else if (asn1_get_length(&bufptr, bufend) == 0)
       packet->error = "Get-Response-PDU uses indefinite length";
-    else if (asn1_get_value_type(&bufptr, bufend) != ASN1_INTEGER)
+    else if (asn1_get_type(&bufptr, bufend) != ASN1_INTEGER)
       packet->error = "No request-id";
-    else if ((length = asn1_get_value_length(&bufptr, bufend)) == 0)
+    else if ((length = asn1_get_length(&bufptr, bufend)) == 0)
       packet->error = "request-id uses indefinite length";
     else
     {
       packet->request_id = asn1_get_integer(&bufptr, bufend, length);
 
-      if (asn1_get_value_type(&bufptr, bufend) != ASN1_INTEGER)
+      if (asn1_get_type(&bufptr, bufend) != ASN1_INTEGER)
 	packet->error = "No error-status";
-      else if ((length = asn1_get_value_length(&bufptr, bufend)) == 0)
+      else if ((length = asn1_get_length(&bufptr, bufend)) == 0)
 	packet->error = "error-status uses indefinite length";
       else
       {
 	packet->error_status = asn1_get_integer(&bufptr, bufend, length);
 
-	if (asn1_get_value_type(&bufptr, bufend) != ASN1_INTEGER)
+	if (asn1_get_type(&bufptr, bufend) != ASN1_INTEGER)
 	  packet->error = "No error-index";
-	else if ((length = asn1_get_value_length(&bufptr, bufend)) == 0)
+	else if ((length = asn1_get_length(&bufptr, bufend)) == 0)
 	  packet->error = "error-index uses indefinite length";
 	else
 	{
 	  packet->error_index = asn1_get_integer(&bufptr, bufend, length);
 
-          if (asn1_get_value_type(&bufptr, bufend) != ASN1_SEQUENCE)
+          if (asn1_get_type(&bufptr, bufend) != ASN1_SEQUENCE)
 	    packet->error = "No variable-bindings SEQUENCE";
-	  else if (asn1_get_value_length(&bufptr, bufend) == 0)
+	  else if (asn1_get_length(&bufptr, bufend) == 0)
 	    packet->error = "variable-bindings uses indefinite length";
-	  else if (asn1_get_value_type(&bufptr, bufend) != ASN1_SEQUENCE)
+	  else if (asn1_get_type(&bufptr, bufend) != ASN1_SEQUENCE)
 	    packet->error = "No VarBind SEQUENCE";
-	  else if (asn1_get_value_length(&bufptr, bufend) == 0)
+	  else if (asn1_get_length(&bufptr, bufend) == 0)
 	    packet->error = "VarBind uses indefinite length";
-	  else if (asn1_get_value_type(&bufptr, bufend) != ASN1_OID)
+	  else if (asn1_get_type(&bufptr, bufend) != ASN1_OID)
 	    packet->error = "No name OID";
-	  else if ((length = asn1_get_value_length(&bufptr, bufend)) == 0)
+	  else if ((length = asn1_get_length(&bufptr, bufend)) == 0)
 	    packet->error = "Name OID uses indefinite length";
           else
 	  {
 	    asn1_get_oid(&bufptr, bufend, length, packet->object_name,
 	                 SNMP_MAX_OID);
 
-            packet->object_type = asn1_get_value_type(&bufptr, bufend);
+            packet->object_type = asn1_get_type(&bufptr, bufend);
 
-	    if ((length = asn1_get_value_length(&bufptr, bufend)) == 0)
+	    if ((length = asn1_get_length(&bufptr, bufend)) == 0)
 	      packet->error = "Value uses indefinite length";
 	    else
 	    {
@@ -539,8 +563,8 @@ asn1_debug(unsigned char *buffer,	/* I - Buffer */
     * Get value type...
     */
 
-    value_type   = asn1_get_value_type(&buffer, bufend);
-    value_length = asn1_get_value_length(&buffer, bufend);
+    value_type   = asn1_get_type(&buffer, bufend);
+    value_length = asn1_get_length(&buffer, bufend);
 
     switch (value_type)
     {
@@ -621,11 +645,137 @@ asn1_debug(unsigned char *buffer,	/* I - Buffer */
  * 'asn1_encode_snmp()' - Encode a SNMP packet.
  */
 
-static int				/* O - 0 on success, -1 on error */
+static int				/* O - Length on success, -1 on error */
 asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
-                 size_t        len,	/* I - Size of buffer */
+                 size_t        bufsize,	/* I - Size of buffer */
                  snmp_packet_t *packet)	/* I - SNMP packet */
 {
+  unsigned char	*bufptr;		/* Pointer into buffer */
+  int		total,			/* Total length */
+		msglen,			/* Length of entire message */
+		commlen,		/* Length of community string */
+		reqlen,			/* Length of request */
+		listlen,		/* Length of variable list */
+		varlen,			/* Length of variable */
+		namelen,		/* Length of object name OID */
+		valuelen;		/* Length of object value */
+
+
+ /*
+  * Get the lengths of the community string, OID, and message...
+  */
+
+  namelen = asn1_size_oid(packet->object_name);
+
+  switch (packet->object_type)
+  {
+    case ASN1_NULL_VALUE :
+        valuelen = 0;
+	break;
+
+    case ASN1_BOOLEAN :
+        valuelen = asn1_size_integer(packet->object_value.boolean);
+	break;
+
+    case ASN1_INTEGER :
+        valuelen = asn1_size_integer(packet->object_value.integer);
+	break;
+
+    case ASN1_OCTET_STRING :
+        valuelen = strlen(packet->object_value.string);
+	break;
+
+    case ASN1_OID :
+        valuelen = asn1_size_oid(packet->object_value.oid);
+	break;
+
+    default :
+        packet->error = "Unknown object type";
+        return (-1);
+  }
+
+  varlen  = 1 + asn1_size_length(namelen) + namelen +
+            1 + asn1_size_length(valuelen) + valuelen;
+  listlen = 1 + asn1_size_length(varlen) + varlen;
+  reqlen  = 2 + asn1_size_integer(packet->request_id) +
+            2 + asn1_size_integer(packet->error_status) +
+            2 + asn1_size_integer(packet->error_index) +
+            1 + asn1_size_length(listlen) + listlen;
+  commlen = strlen(packet->community);
+  msglen  = 2 + asn1_size_integer(packet->version) +
+            1 + asn1_size_length(commlen) + commlen +
+	    1 + asn1_size_length(reqlen) + reqlen;
+  total   = 1 + asn1_size_length(msglen) + msglen;
+
+  if (total > bufsize)
+  {
+    packet->error = "Message too large for buffer";
+    return (-1);
+  }
+
+ /*
+  * Then format the message...
+  */
+
+  bufptr = buffer;
+
+  *bufptr++ = ASN1_SEQUENCE;		/* SNMPv1 message header */
+  asn1_set_length(&bufptr, msglen);
+
+  asn1_set_integer(&bufptr, packet->version);
+					/* version */
+
+  *bufptr++ = ASN1_OCTET_STRING;	/* community */
+  asn1_set_length(&bufptr, commlen);
+  memcpy(bufptr, packet->community, commlen);
+  bufptr += commlen;
+
+  *bufptr++ = packet->request_type;	/* Get-Request-PDU */
+  asn1_set_length(&bufptr, reqlen);
+
+  asn1_set_integer(&bufptr, packet->request_id);
+
+  asn1_set_integer(&bufptr, packet->error_status);
+
+  asn1_set_integer(&bufptr, packet->error_index);
+
+  *bufptr++ = ASN1_SEQUENCE;		/* variable-bindings */
+  asn1_set_length(&bufptr, listlen);
+
+  *bufptr++ = ASN1_SEQUENCE;		/* variable */
+  asn1_set_length(&bufptr, varlen);
+
+  asn1_set_oid(&bufptr, packet->object_name);
+					/* ObjectName */
+
+  switch (packet->object_type)
+  {
+    case ASN1_NULL_VALUE :
+	*bufptr++ = ASN1_NULL_VALUE;	/* ObjectValue */
+	*bufptr++ = 0;			/* Length */
+        break;
+
+    case ASN1_BOOLEAN :
+        asn1_set_integer(&bufptr, packet->object_value.boolean);
+	break;
+
+    case ASN1_INTEGER :
+        asn1_set_integer(&bufptr, packet->object_value.integer);
+	break;
+
+    case ASN1_OCTET_STRING :
+        *bufptr++ = ASN1_OCTET_STRING;
+	asn1_set_length(&bufptr, valuelen);
+	memcpy(bufptr, packet->object_value.string, valuelen);
+	bufptr += valuelen;
+	break;
+
+    case ASN1_OID :
+        asn1_set_oid(&bufptr, packet->object_value.oid);
+	break;
+  }
+
+  return (bufptr - buffer);
 }
 
 
@@ -648,6 +798,27 @@ asn1_get_integer(
     value = (value << 8) | **buffer;
 
   return (value);
+}
+
+
+/*
+ * 'asn1_get_length()' - Get a value length.
+ */
+
+static int				/* O  - Length */
+asn1_get_length(unsigned char **buffer,	/* IO - Pointer in buffer */
+		unsigned char *bufend)	/* I  - End of buffer */
+{
+  int	length;				/* Length */
+
+
+  length = **buffer;
+  (*buffer) ++;
+
+  if (length & 128)
+    length = asn1_get_integer(buffer, bufend, length & 127);
+
+  return (length);
 }
 
 
@@ -763,35 +934,12 @@ asn1_get_string(
 
 
 /*
- * 'asn1_get_value_length()' - Get a value length.
- */
-
-static int				/* O  - Length */
-asn1_get_value_length(
-    unsigned char **buffer,		/* IO - Pointer in buffer */
-    unsigned char *bufend)		/* I  - End of buffer */
-{
-  int	length;				/* Length */
-
-
-  length = **buffer;
-  (*buffer) ++;
-
-  if (length & 128)
-    length = asn1_get_integer(buffer, bufend, length & 127);
-
-  return (length);
-}
-
-
-/*
- * 'asn1_get_value_type()' - Get a value type.
+ * 'asn1_get_type()' - Get a value type.
  */
 
 static int				/* O  - Type */
-asn1_get_value_type(
-    unsigned char **buffer,		/* IO - Pointer in buffer */
-    unsigned char *bufend)		/* I  - End of buffer */
+asn1_get_type(unsigned char **buffer,	/* IO - Pointer in buffer */
+	      unsigned char *bufend)	/* I  - End of buffer */
 {
   int	type;				/* Type */
 
@@ -803,6 +951,223 @@ asn1_get_value_type(
     type = asn1_get_packed(buffer, bufend);
 
   return (type);
+}
+
+
+/*
+ * 'asn1_set_integer()' - Set an integer value.
+ */
+
+static void
+asn1_set_integer(unsigned char **buffer,/* IO - Pointer in buffer */
+                 int           integer)	/* I  - Integer value */
+{
+  **buffer = ASN1_INTEGER;
+  (*buffer) ++;
+
+  if (integer > 0x7fffff || integer < -0x800000)
+  {
+    **buffer = 4;
+    (*buffer) ++;
+    **buffer = integer >> 24;
+    (*buffer) ++;
+    **buffer = integer >> 16;
+    (*buffer) ++;
+    **buffer = integer >> 8;
+    (*buffer) ++;
+    **buffer = integer;
+    (*buffer) ++;
+  }
+  else if (integer > 0x7fff || integer < -0x8000)
+  {
+    **buffer = 3;
+    (*buffer) ++;
+    **buffer = integer >> 16;
+    (*buffer) ++;
+    **buffer = integer >> 8;
+    (*buffer) ++;
+    **buffer = integer;
+    (*buffer) ++;
+  }
+  else if (integer > 0x7f || integer < -0x80)
+  {
+    **buffer = 2;
+    (*buffer) ++;
+    **buffer = integer >> 8;
+    (*buffer) ++;
+    **buffer = integer;
+    (*buffer) ++;
+  }
+  else
+  {
+    **buffer = 1;
+    (*buffer) ++;
+    **buffer = integer;
+    (*buffer) ++;
+  }
+}
+
+
+/*
+ * 'asn1_set_length()' - Set a value length.
+ */
+
+static void
+asn1_set_length(unsigned char **buffer,	/* IO - Pointer in buffer */
+		int           length)	/* I  - Length value */
+{
+  if (length > 255)
+  {
+    **buffer = 0x82;			/* 2-byte length */
+    (*buffer) ++;
+    **buffer = length >> 8;
+    (*buffer) ++;
+    **buffer = length;
+    (*buffer) ++;
+  }
+  else if (length > 127)
+  {
+    **buffer = 0x81;			/* 1-byte length */
+    (*buffer) ++;
+    **buffer = length;
+    (*buffer) ++;
+  }
+  else
+  {
+    **buffer = length;			/* Length */
+    (*buffer) ++;
+  }
+}
+
+
+/*
+ * 'asn1_set_oid()' - Set an OID value.
+ */
+
+static void
+asn1_set_oid(unsigned char **buffer,	/* IO - Pointer in buffer */
+             const int     *oid)	/* I  - OID value */
+{
+  **buffer = ASN1_OID;
+  (*buffer) ++;
+
+  asn1_set_length(buffer, asn1_size_oid(oid));
+
+  asn1_set_packed(buffer, oid[0] * 40 + oid[1]);
+
+  for (oid += 2; *oid; oid ++)
+    asn1_set_packed(buffer, *oid);
+}
+
+
+/*
+ * 'asn1_set_packed()' - Set a packed integer value.
+ */
+
+static void
+asn1_set_packed(unsigned char **buffer,	/* IO - Pointer in buffer */
+		int           integer)	/* I  - Integer value */
+{
+  if (integer > 0xfffffff)
+  {
+    **buffer = (integer >> 14) & 0x7f;
+    (*buffer) ++;
+  }
+
+  if (integer > 0x1fffff)
+  {
+    **buffer = (integer >> 21) & 0x7f;
+    (*buffer) ++;
+  }
+
+  if (integer > 0x3fff)
+  {
+    **buffer = (integer >> 14) & 0x7f;
+    (*buffer) ++;
+  }
+
+  if (integer > 0x7f)
+  {
+    **buffer = (integer >> 7) & 0x7f;
+    (*buffer) ++;
+  }
+
+  **buffer = integer & 0x7f;
+  (*buffer) ++;
+}
+
+/*
+ * 'asn1_size_integer()' - Figure out the number of bytes needed for an
+ *                         integer value.
+ */
+
+static int				/* O - Size in bytes */
+asn1_size_integer(int integer)		/* I - Integer value */
+{
+  if (integer > 0x7fffff || integer < -0x800000)
+    return (4);
+  else if (integer > 0x7fff || integer < -0x8000)
+    return (3);
+  else if (integer > 0x7f || integer < -0x80)
+    return (2);
+  else
+    return (1);
+}
+
+
+/*
+ * 'asn1_size_length()' - Figure out the number of bytes needed for a
+ *                        length value.
+ */
+
+static int				/* O - Size in bytes */
+asn1_size_length(int length)		/* I - Length value */
+{
+  if (length > 0xff)
+    return (3);
+  else if (length > 0x7f)
+    return (2);
+  else
+    return (1);
+}
+
+
+/*
+ * 'asn1_size_oid()' - Figure out the numebr of bytes needed for an
+ *                     OID value.
+ */
+
+static int				/* O - Size in bytes */
+asn1_size_oid(const int *oid)		/* I - OID value */
+{
+  int	length;				/* Length of value */
+
+
+  for (length = asn1_size_packed(oid[0] * 40 + oid[1]), oid += 2; *oid; oid ++)
+    length += asn1_size_packed(*oid);
+
+  return (length);
+}
+
+
+/*
+ * 'asn1_size_packed()' - Figure out the number of bytes needed for a
+ *                        packed integer value.
+ */
+
+static int				/* O - Size in bytes */
+asn1_size_packed(int integer)		/* I - Integer value */
+{
+  if (integer > 0xfffffff)
+    return (5);
+  else if (integer > 0x1fffff)
+    return (4);
+  else if (integer > 0x3fff)
+    return (3);
+  else if (integer > 0x7f)
+    return (2);
+  else
+    return (1);
 }
 
 
@@ -1641,9 +2006,6 @@ scan_devices(int fd)			/* I - SNMP socket */
 
 /*
  * 'send_snmp_query()' - Send an SNMP query packet.
- *
- * Note: This code does not handle OID numbers > 127 and will need to
- *       be updated when we support the Port Monitor MIB!
  */
 
 static void
@@ -1655,110 +2017,53 @@ send_snmp_query(
     const unsigned request_id,		/* I - Request ID */
     const int      *oid)		/* I - OID */
 {
-  unsigned char	buffer[SNMP_MAX_PACKET],/* SNMP message packet */
-		*bufptr;		/* Pointer into buffer */
-  size_t	commlen,		/* Length of community string */
-		oidlen,			/* Length of OID */
-		len;			/* Length of entire message */
-  const int	*oidptr;		/* Pointer into OID */
+  int		i;			/* Looping var */
+  snmp_packet_t	packet;			/* SNMP message packet */
+  unsigned char	buffer[SNMP_MAX_PACKET];/* SNMP message buffer */
+  int		bytes;			/* Size of message */
   char		addrname[32];		/* Address name */
 
 
  /*
-  * Get the lengths of the community string and OID...
+  * Create the SNMP message...
   */
 
-  commlen = strlen(community);
+  memset(&packet, 0, sizeof(packet));
 
-  for (oidlen = 1, oidptr = oid + 2; *oidptr; oidlen ++, oidptr ++);
+  packet.version      = version;
+  packet.request_type = ASN1_GET_REQUEST;
+  packet.request_id   = request_id;
+  packet.object_type  = ASN1_NULL_VALUE;
+  
+  strlcpy(packet.community, community, sizeof(packet.community));
 
-  len = 5 + commlen + 20 + oidlen + 2;
+  for (i = 0; oid[i]; i ++)
+    packet.object_name[i] = oid[i];
 
-  if (commlen > 255)
-    len += 2;
-  else if (commlen > 127)
-    len ++;
+  bytes = asn1_encode_snmp(buffer, sizeof(buffer), &packet);
 
- /*
-  * Then format the message...
-  */
-
-  bufptr  = buffer;
-
-  *bufptr++ = ASN1_SEQUENCE;		/* SNMPv1 message header */
-  *bufptr++ = len;			/* Length */
-
-  *bufptr++ = ASN1_INTEGER;		/* version */
-  *bufptr++ = 1;			/* Length */
-  *bufptr++ = version;			/* Value */
-
-  *bufptr++ = ASN1_OCTET_STRING;	/* community */
-  if (commlen > 255)
+  if (bytes < 0)
   {
-    *bufptr++ = 0x82;			/* 2-byte length */
-    *bufptr++ = commlen >> 8;
-    *bufptr++ = commlen;
+    fprintf(stderr, "ERROR: Unable to send SNMP query: %s\n", packet.error);
+    return;
   }
-  else if (commlen > 127)
-  {
-    *bufptr++ = 0x81;			/* 1-byte length */
-    *bufptr++ = commlen;
-  }
-  else
-    *bufptr++ = commlen;		/* Length */
-  memcpy(bufptr, community, commlen);
-  bufptr += commlen;			/* Value */
-
-  *bufptr++ = ASN1_GET_REQUEST;		/* Get-Request-PDU */
-  *bufptr++ = 31;			/* Length */
-
-  *bufptr++ = ASN1_INTEGER;		/* request-id */
-  *bufptr++ = 4;			/* Length */
-  *bufptr++ = request_id >> 24;		/* Value */
-  *bufptr++ = request_id >> 16;
-  *bufptr++ = request_id >> 8;
-  *bufptr++ = request_id;
-
-  *bufptr++ = ASN1_INTEGER;		/* error-status */
-  *bufptr++ = 1;			/* Length */
-  *bufptr++ = 0;			/* Value */
-
-  *bufptr++ = ASN1_INTEGER;		/* error-index */
-  *bufptr++ = 1;			/* Length */
-  *bufptr++ = 0;			/* Value */
-
-  *bufptr++ = ASN1_SEQUENCE;		/* variable-bindings */
-  *bufptr++ = oidlen + 6;		/* Length */
-
-  *bufptr++ = ASN1_SEQUENCE;		/* VarBind */
-  *bufptr++ = oidlen + 4;		/* Length */
-  *bufptr++ = ASN1_OID;			/* ObjectName */
-  *bufptr++ = oidlen;			/* Length */
-  *bufptr++ = oid[0] * 40 + oid[1];	/* Value */
-  for (oidptr = oid + 2; *oidptr; oidptr ++)
-    *bufptr++ = *oidptr;
-
-  *bufptr++ = ASN1_NULL_VALUE;		/* ObjectValue */
-  *bufptr++ = 0;			/* Length */
 
  /*
   * Send the message...
   */
 
-  len = bufptr - buffer;
-
   debug_printf("DEBUG: %.3f Sending %d bytes to %s...\n", run_time(),
-               (int)len, httpAddrString(addr, addrname, sizeof(addrname)));
+               bytes, httpAddrString(addr, addrname, sizeof(addrname)));
   if (DebugLevel > 1)
-    asn1_debug(buffer, len, 0);
+    asn1_debug(buffer, bytes, 0);
   if (DebugLevel > 2)
-    hex_debug(buffer, len);
+    hex_debug(buffer, bytes);
 
   addr->ipv4.sin_port = htons(SNMP_PORT);
 
-  if (sendto(fd, buffer, len, 0, (void *)addr, sizeof(addr->ipv4)) < len)
+  if (sendto(fd, buffer, bytes, 0, (void *)addr, sizeof(addr->ipv4)) < bytes)
     fprintf(stderr, "ERROR: Unable to send %d bytes to %s: %s\n",
-            (int)len, addrname, strerror(errno));
+            bytes, addrname, strerror(errno));
 }
 
 
