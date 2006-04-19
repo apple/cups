@@ -514,7 +514,8 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
             packet->object_type = asn1_get_type(&bufptr, bufend);
 
 	    if ((length = asn1_get_length(&bufptr, bufend)) == 0 &&
-	        packet->object_type != ASN1_NULL_VALUE)
+	        packet->object_type != ASN1_NULL_VALUE &&
+	        packet->object_type != ASN1_OCTET_STRING)
 	      packet->error = "Value uses indefinite length";
 	    else
 	    {
