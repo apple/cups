@@ -88,6 +88,7 @@
  *   set_printer_defaults()      - Set printer default options from a request.
  *   start_printer()             - Start a printer.
  *   stop_printer()              - Stop a printer.
+ *   url_encode_attr()           - URL-encode a string attribute.
  *   user_allowed()              - See if a user is allowed to print to a queue.
  *   validate_job()              - Validate printer options and destination.
  *   validate_name()             - Make sure the printer name only contains
@@ -202,6 +203,8 @@ static void	set_printer_defaults(cupsd_client_t *con,
 		                     cupsd_printer_t *printer);
 static void	start_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(cupsd_client_t *con, ipp_attribute_t *uri);
+static void	url_encode_attr(ipp_attribute_t *attr, char *buffer,
+		                int bufsize);
 static int	user_allowed(cupsd_printer_t *p, const char *username);
 static void	validate_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static int	validate_name(const char *name);
@@ -5091,14 +5094,12 @@ static void
 get_devices(cupsd_client_t *con)	/* I - Client connection */
 {
   http_status_t		status;		/* Policy status */
-  int			i;		/* Looping var */
   ipp_attribute_t	*limit,		/* Limit attribute */
 			*requested;	/* requested-attributes attribute */
   char			command[1024],	/* cups-deviced command */
 			options[1024],	/* Options to pass to command */
-			attrs[1024],	/* String for requested attributes */
-			*aptr;		/* Pointer into string */
-  int			alen;		/* Length of attribute value */
+			requested_str[256];
+					/* String for requested attributes */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_devices(%p[%d])", con, con->http.fd);
@@ -5122,48 +5123,16 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
                                IPP_TAG_KEYWORD);
 
   if (requested)
-  {
-    for (i = 0, aptr = attrs; i < requested->num_values; i ++)
-    {
-     /*
-      * Check that we have enough room...
-      */
-
-      alen = strlen(requested->values[i].string.text);
-      if (alen > (sizeof(attrs) - (aptr - attrs) - 2))
-        break;
-
-     /*
-      * Put commas between values...
-      */
-
-      if (i)
-        *aptr++ = ',';
-
-     /*
-      * Add the value to the end of the string...
-      */
-
-      strcpy(aptr, requested->values[i].string.text);
-      aptr += alen;
-    }
-
-   /*
-    * If we have more attribute names than will fit, default to "all"...
-    */
-
-    if (i < requested->num_values)
-      strcpy(attrs, "all");
-  }
+    url_encode_attr(requested, requested_str, sizeof(requested_str));
   else
-    strcpy(attrs, "all");
+    strlcpy(requested_str, "requested-attributes=all", sizeof(requested_str));
 
   snprintf(command, sizeof(command), "%s/daemon/cups-deviced", ServerBin);
   snprintf(options, sizeof(options),
-           "%d+%d+%d+requested-attributes=%s",
+           "%d+%d+%d+%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0, (int)User,
-	   attrs);
+	   requested_str);
 
   if (cupsdSendCommand(con, command, options, 1))
   {
@@ -5631,15 +5600,14 @@ static void
 get_ppds(cupsd_client_t *con)		/* I - Client connection */
 {
   http_status_t		status;		/* Policy status */
-  int			i;		/* Looping var */
   ipp_attribute_t	*limit,		/* Limit attribute */
 			*make,		/* ppd-make attribute */
 			*requested;	/* requested-attributes attribute */
   char			command[1024],	/* cups-deviced command */
 			options[1024],	/* Options to pass to command */
-			attrs[1024],	/* String for requested attributes */
-			*aptr;		/* Pointer into string */
-  int			alen;		/* Length of attribute value */
+			requested_str[256],
+					/* String for requested attributes */
+			make_str[256];	/* Escaped ppd-make string */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppds(%p[%d])", con, con->http.fd);
@@ -5664,50 +5632,20 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
                                IPP_TAG_KEYWORD);
 
   if (requested)
-  {
-    for (i = 0, aptr = attrs; i < requested->num_values; i ++)
-    {
-     /*
-      * Check that we have enough room...
-      */
-
-      alen = strlen(requested->values[i].string.text);
-      if (alen > (sizeof(attrs) - (aptr - attrs) - 2))
-        break;
-
-     /*
-      * Put commas between values...
-      */
-
-      if (i)
-        *aptr++ = ',';
-
-     /*
-      * Add the value to the end of the string...
-      */
-
-      strcpy(aptr, requested->values[i].string.text);
-      aptr += alen;
-    }
-
-   /*
-    * If we have more attribute names than will fit, default to "all"...
-    */
-
-    if (i < requested->num_values)
-      strcpy(attrs, "all");
-  }
+    url_encode_attr(requested, requested_str, sizeof(requested_str));
   else
-    strcpy(attrs, "all");
+    strlcpy(requested_str, "requested-attributes=all", sizeof(requested_str));
+
+  if (make)
+    url_encode_attr(make, make_str, sizeof(make_str));
+  else
+    make_str[0] = '\0';
 
   snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
-  snprintf(options, sizeof(options),
-           "list+%d+%d+requested-attributes=%s%s%s",
+  snprintf(options, sizeof(options), "list+%d+%d+%s%s%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0,
-	   attrs,
-	   make ? "%20ppd-make=" : "",
-	   make ? make->values[0].string.text : "");
+	   requested_str, make ? "%20" : "", make_str);
 
   if (cupsdSendCommand(con, command, options, 0))
   {
@@ -8929,6 +8867,70 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'url_encode_attr()' - URL-encode a string attribute.
+ */
+
+static void
+url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
+                char            *buffer,/* I - String buffer */
+		int             bufsize)/* I - Size of buffer */
+{
+  int	i;				/* Looping var */
+  char	*bufptr,			/* Pointer into buffer */
+	*bufend,			/* End of buffer */
+	*valptr;			/* Pointer into value */
+
+
+  strlcpy(buffer, attr->name, bufsize);
+  bufptr = buffer + strlen(buffer);
+  bufend = buffer + bufsize - 1;
+
+  for (i = 0; i < attr->num_values; i ++)
+  {
+    if (bufptr >= bufend)
+      break;
+
+    if (i)
+      *bufptr++ = ',';
+    else
+      *bufptr++ = '=';
+
+    if (bufptr >= bufend)
+      break;
+
+    *bufptr++ = '\'';
+
+    for (valptr = attr->values[i].string.text;
+         *valptr && bufptr < bufend;
+	 valptr ++)
+      if (*valptr == ' ')
+      {
+        if (bufptr >= (bufend - 2))
+	  break;
+
+        *bufptr++ = '%';
+	*bufptr++ = '2';
+	*bufptr++ = '0';
+      }
+      else if (*valptr == '\'' || *valptr == '\\')
+      {
+        *bufptr++ = '\\';
+        *bufptr++ = *valptr;
+      }
+      else
+        *bufptr++ = *valptr;
+
+    if (bufptr >= bufend)
+      break;
+
+    *bufptr++ = '\'';
+  }
+
+  *bufptr = '\0';
 }
 
 
