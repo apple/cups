@@ -82,13 +82,16 @@ get_device_id(
   char	*attr,				/* 1284 attribute */
   	*delim,				/* 1284 delimiter */
 	*uriptr,			/* Pointer into URI */
+	manufacturer[256],		/* Manufacturer string */
 	serial_number[1024];		/* Serial number string */
+  int	manulen;			/* Length of manufacturer string */
 #ifdef __linux
   int	length;				/* Length of device ID info */
 #endif /* __linux */
 #if defined(__sun) && defined(ECPPIOC_GETDEVID)
   struct ecpp_device_id did;		/* Device ID buffer */
 #endif /* __sun && ECPPIOC_GETDEVID */
+
 
   DEBUG_printf(("get_device_id(fd=%d, device_id=%p, device_id_size=%d, "
                 "make_model=%p, make_model_size=%d, scheme=\"%s\", "
@@ -218,21 +221,62 @@ get_device_id(
       serial_number[0] = '\0';
 
    /*
-    * Generate the device URI from the make_model and serial number strings.
+    * Generate the device URI from the manufacturer, make_model, and
+    * serial number strings.
     */
 
     snprintf(uri, uri_size, "%s://", scheme);
-    for (uriptr = uri + strlen(uri), delim = make_model;
-	 *delim && uriptr < (uri + uri_size - 1);
+
+    if ((attr = strstr(device_id, "MANUFACTURER:")) != NULL)
+      attr += 13;
+    else if ((attr = strstr(device_id, "Manufacturer:")) != NULL)
+      attr += 13;
+    else if ((attr = strstr(device_id, "MFG:")) != NULL)
+      attr += 4;
+
+    if (attr)
+    {
+      strlcpy(manufacturer, attr, sizeof(manufacturer));
+
+      if ((delim = strchr(manufacturer, ';')) != NULL)
+        *delim = '\0';
+
+      if (!strcasecmp(manufacturer, "Hewlett-Packard"))
+        strcpy(manufacturer, "HP");
+    }
+    else
+    {
+      strlcpy(manufacturer, make_model, sizeof(manufacturer));
+
+      if ((delim = strchr(manufacturer, ' ')) != NULL)
+        *delim = '\0';
+    }
+
+    manulen = strlen(manufacturer);
+
+    for (uriptr = uri + strlen(uri), delim = manufacturer;
+	 *delim && uriptr < (uri + uri_size - 3);
 	 delim ++)
       if (*delim == ' ')
       {
-	delim ++;
-	*uriptr++ = '/';
-	break;
+	*uriptr++ = '%';
+	*uriptr++ = '2';
+	*uriptr++ = '0';
       }
       else
 	*uriptr++ = *delim;
+
+    *uriptr++ = '/';
+
+    if (!strncmp(make_model, manufacturer, manulen))
+    {
+      delim = make_model + manulen;
+
+      while (isspace(*delim & 255))
+        delim ++;
+    }
+    else
+      delim = make_model;
 
     for (; *delim && uriptr < (uri + uri_size - 3); delim ++)
       if (*delim == ' ')
@@ -244,17 +288,17 @@ get_device_id(
       else
 	*uriptr++ = *delim;
 
-    *uriptr = '\0';
-
     if (serial_number[0])
     {
      /*
       * Add the serial number to the URI...
       */
 
-      strlcat(uri, "?serial=", uri_size);
-      strlcat(uri, serial_number, uri_size);
+      strlcpy(uriptr, "?serial=", uri_size - (uriptr - uri));
+      strlcat(uriptr, serial_number, uri_size - (uriptr - uri));
     }
+    else
+      *uriptr = '\0';
   }
 
   return (0);
@@ -344,10 +388,14 @@ get_make_model(
 
   if ((mfg = strstr(device_id, "MANUFACTURER:")) != NULL)
     mfg += 13;
+  else if ((mfg = strstr(device_id, "Manufacturer:")) != NULL)
+    mfg += 13;
   else if ((mfg = strstr(device_id, "MFG:")) != NULL)
     mfg += 4;
 
   if ((mdl = strstr(device_id, "MODEL:")) != NULL)
+    mdl += 6;
+  else if ((mdl = strstr(device_id, "Model:")) != NULL)
     mdl += 6;
   else if ((mdl = strstr(device_id, "MDL:")) != NULL)
     mdl += 4;

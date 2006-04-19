@@ -3,6 +3,8 @@ CHANGES.txt - 2006-04-19
 
 CHANGES IN CUPS V1.2rc3
 
+	- The USB backend incorrectly split the manufacturer name
+	  if it contained spaces (STR #1566)
 	- The scheduler would hang when listing PPD files for a
 	  manufacturer whose name contained spaces (STR #1567)
 	- Added the SNMP backend for network printer discovery
