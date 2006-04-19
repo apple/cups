@@ -67,7 +67,7 @@ HostNameLookups off
 .br
 Specifies whether the addresses of printers should be converted
 to hostnames or left as numeric IP addresses. The default is
-"on".
+"off".
 .SH SEE ALSO
 http://localhost:631/help
 .SH COPYRIGHT

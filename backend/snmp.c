@@ -45,6 +45,7 @@
  *                               printer.
  *   read_snmp_conf()          - Read the snmp.conf file.
  *   read_snmp_response()      - Read and parse a SNMP response...
+ *   run_time()                - Return the total running time...
  *   scan_devices()            - Scan for devices using SNMP.
  *   send_snmp_query()         - Send an SNMP query packet.
  *   try_connect()             - Try connecting on a port...
@@ -71,22 +72,27 @@
 /*
  * This backend implements SNMP printer discovery.  It uses a broadcast-
  * based approach to get SNMP response packets from potential printers
- * and then interrogates each responder by trying to connect on port 515,
- * 631, 4010, 4020, 4030, 9100, 9101, and 9102.
+ * and then interrogates each responder by trying to connect on port
+ * 631, 9100, and 515.
  *
  * The backend reads the snmp.conf file from the CUPS_SERVERROOT directory
  * which can contain comments, blank lines, or any number of the following
  * directives:
  *
- *     Community name
  *     Address ip-address
  *     Address @LOCAL
  *     Address @IF(name)
+ *     Community name
+ *     DebugLevel N
+ *     HostNameLookups on
+ *     HostNameLookups off
  *
  * The default is to use:
  *
- *     Community public
  *     Address @LOCAL
+ *     Community public
+ *     DebugLevel 0
+ *     HostNameLookups off
  */
 
 /*
@@ -96,7 +102,6 @@
 #define SNMP_PORT		161	/* SNMP well-known port */
 #define SNMP_MAX_PACKET		1472	/* Maximum size of SNMP packet */
 #define SNMP_VERSION_1		0	/* SNMPv1 */
-#define SNMP_DEVICE_PRINTER	5	/* hrDevicePrinter */
 
 #define ASN1_END_OF_CONTENTS	0x00	/* End-of-contents */
 #define ASN1_BOOLEAN		0x01	/* BOOLEAN */
@@ -149,6 +154,7 @@ static int		open_snmp_socket(void);
 static void		probe_device(snmp_cache_t *device);
 static void		read_snmp_conf(const char *address);
 static void		read_snmp_response(int fd);
+static double		run_time(void);
 static void		scan_devices(int fd);
 static void		send_snmp_query(int fd, http_addr_t *addr, int version,
 			                const char *community,
@@ -174,7 +180,8 @@ static unsigned char	DeviceDescOID[] = { 1, 3, 6, 1, 2, 1, 25, 3,
 			                    2, 1, 3, 1, 0 };
 static unsigned		DeviceTypeRequest;
 static unsigned		DeviceDescRequest;
-static int		HostNameLookups = 1;
+static int		HostNameLookups = 0;
+static struct timeval	StartTime;
 
 
 /*
@@ -633,10 +640,12 @@ hex_debug(const unsigned char *buffer,	/* I - Buffer */
   int	col;				/* Current column */
 
 
+  fputs("DEBUG: Hex dump of packet:\n", stderr);
+
   for (col = 0; len > 0; col ++, buffer ++, len --)
   {
     if ((col & 15) == 0)
-      fputs("DEBUG:", stderr);
+      fprintf(stderr, "DEBUG: %04X ", col);
 
     fprintf(stderr, " %02X", *buffer);
 
@@ -733,7 +742,7 @@ probe_device(snmp_cache_t *device)	/* I - Device */
   * Try connecting via IPP first...
   */
 
-  debug_printf("DEBUG: Probing %s...\n", device->addrname);
+  debug_printf("DEBUG: %.3f Probing %s...\n", run_time(), device->addrname);
 
   if ((http = httpConnect(device->addrname, 631)) != NULL)
   {
@@ -1020,6 +1029,8 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   unsigned	request_id,		/* request-id from packet */
 		error_status;		/* error-status from packet */
   char		community[128];		/* Community name */
+  snmp_cache_t	key,			/* Search key */
+		*device;		/* Matching device */
 
 
  /*
@@ -1041,7 +1052,8 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   else
     httpAddrString(&addr, addrname, sizeof(addrname));
 
-  debug_printf("DEBUG: Received %d bytes from %s...\n", bytes, addrname);
+  debug_printf("DEBUG: %.3f Received %d bytes from %s...\n", run_time(),
+               bytes, addrname);
 
   if (DebugLevel > 1)
     asn1_debug(buffer, bytes, 0);
@@ -1060,6 +1072,12 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
       *bufptr != ASN1_INTEGER || bufptr[1] < 1 || bufptr[1] > 4)
   {
     fprintf(stderr, "ERROR: Bad SNMP packet from %s!\n", addrname);
+
+    if (DebugLevel < 2)
+      asn1_debug(buffer, bytes, 0);
+    if (DebugLevel < 3)
+      hex_debug(buffer, bytes);
+
     return;
   }
 
@@ -1094,6 +1112,12 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   if (*bufptr != ASN1_INTEGER)
   {
     fprintf(stderr, "ERROR: Bad SNMP packet from %s!\n", addrname);
+
+    if (DebugLevel < 2)
+      asn1_debug(buffer, bytes, 0);
+    if (DebugLevel < 3)
+      hex_debug(buffer, bytes);
+
     return;
   }
 
@@ -1122,12 +1146,34 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 
   debug_printf("DEBUG: error-status=%u\n", error_status);
 
+ /*
+  * Find a matching device in the cache...
+  */
+
+  key.address = addr;
+  device      = (snmp_cache_t *)cupsArrayFind(Devices, &key);
+
+ /*
+  * Process the message...
+  */
+
   if (!error_status)
   {
     if (request_id == DeviceTypeRequest)
     {
      /*
-      * Probe to get supported connections...
+      * Got the device type response...
+      */
+
+      if (device)
+      {
+        debug_printf("DEBUG: Discarding duplicate device type for \"%s\"...\n",
+	             addrname);
+        return;
+      }
+
+     /*
+      * Add the device and request the device description...
       */
 
       add_cache(&addr, addrname, NULL, NULL, NULL);
@@ -1143,16 +1189,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 
       char		desc[128],	/* Description string */
 			make_model[256];/* Make and model */
-      snmp_cache_t	key,		/* Search key */
-			*device;	/* Matching device */
 
-
-     /*
-      * Find a matching device in the cache...
-      */
-
-      key.address = addr;
-      device      = (snmp_cache_t *)cupsArrayFind(Devices, &key);
 
       if (!device)
       {
@@ -1200,6 +1237,23 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 
 
 /*
+ * 'run_time()' - Return the total running time...
+ */
+
+static double				/* O - Number of seconds */
+run_time(void)
+{
+  struct timeval	curtime;	/* Current time */
+
+
+  gettimeofday(&curtime, NULL);
+
+  return (curtime.tv_sec - StartTime.tv_sec +
+          0.000001 * (curtime.tv_usec - StartTime.tv_usec));
+}
+
+
+/*
  * 'scan_devices()' - Scan for devices using SNMP.
  */
 
@@ -1210,8 +1264,7 @@ scan_devices(int fd)			/* I - SNMP socket */
 			*community;	/* Current community */
   fd_set		input;		/* Input set for select() */
   struct timeval	timeout;	/* Timeout for select() */
-  time_t		curtime,	/* Current time */
-			endtime;	/* End time for scan */
+  time_t		endtime;	/* End time for scan */
   http_addrlist_t	*addrs,		/* List of addresses */
 			*addr;		/* Current address */
   snmp_cache_t		*device;	/* Current device */
@@ -1221,8 +1274,10 @@ scan_devices(int fd)			/* I - SNMP socket */
   * Setup the request IDs...
   */
 
-  DeviceTypeRequest = time(NULL);
-  DeviceDescRequest = DeviceTypeRequest + 1;
+  gettimeofday(&StartTime, NULL);
+
+  DeviceTypeRequest = StartTime.tv_sec;
+  DeviceDescRequest = StartTime.tv_sec + 1;
 
  /*
   * First send all of the broadcast queries...
@@ -1277,26 +1332,18 @@ scan_devices(int fd)			/* I - SNMP socket */
 
   FD_ZERO(&input);
 
-  while ((curtime = time(NULL)) < endtime)
+  while (time(NULL) < endtime)
   {
-    gettimeofday(&timeout, NULL);
-    debug_printf("DEBUG: select() at %d.%06d...\n",
-        	 (int)timeout.tv_sec, (int)timeout.tv_usec);
-
     timeout.tv_sec  = 1;
     timeout.tv_usec = 0;
 
     FD_SET(fd, &input);
     if (select(fd + 1, &input, NULL, NULL, &timeout) < 0)
     {
-      fprintf(stderr, "ERROR: select() for %d failed: %s\n", fd,
-              strerror(errno));
+      fprintf(stderr, "ERROR: %.3f select() for %d failed: %s\n", run_time(),
+              fd, strerror(errno));
       break;
     }
-
-    gettimeofday(&timeout, NULL);
-    debug_printf("DEBUG: select() returned at %d.%06d...\n",
-        	 (int)timeout.tv_sec, (int)timeout.tv_usec);
 
     if (FD_ISSET(fd, &input))
       read_snmp_response(fd);
@@ -1314,6 +1361,8 @@ scan_devices(int fd)			/* I - SNMP socket */
        device = (snmp_cache_t *)cupsArrayNext(Devices))
     if (!device->uri)
       probe_device(device);
+
+  debug_printf("DEBUG: %.3f Scan complete!\n", run_time());
 }
 
 
@@ -1355,7 +1404,7 @@ send_snmp_query(
 
   *bufptr++ = ASN1_SEQUENCE;		/* SNMPv1 message header */
   *bufptr++ = 5 + commlen + 20 + oidlen + 2;
-					  /* Length */
+					/* Length */
 
   *bufptr++ = ASN1_INTEGER;		/* version */
   *bufptr++ = 1;			/* Length */
@@ -1404,8 +1453,8 @@ send_snmp_query(
 
   len = bufptr - buffer;
 
-  debug_printf("DEBUG: Sending %d bytes to %s...\n", (int)len,
-               httpAddrString(addr, addrname, sizeof(addrname)));
+  debug_printf("DEBUG: %.3f Sending %d bytes to %s...\n", run_time(),
+               (int)len, httpAddrString(addr, addrname, sizeof(addrname)));
   if (DebugLevel > 1)
     asn1_debug(buffer, len, 0);
   if (DebugLevel > 2)
@@ -1432,8 +1481,8 @@ try_connect(http_addr_t *addr,		/* I - Socket address */
   int	status;				/* Connection status */
 
 
-  debug_printf("DEBUG: Trying %s://%s:%d...\n", port == 515 ? "lpd" : "socket",
-               addrname, port);
+  debug_printf("DEBUG: %.3f Trying %s://%s:%d...\n", run_time(),
+               port == 515 ? "lpd" : "socket", addrname, port);
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
