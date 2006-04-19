@@ -1,0 +1,115 @@
+snmp.txt - 2006-04-19
+---------------------
+
+This file lists the "interesting" bits from the command:
+
+    snmpwalk -v 1 -c public HOST .1
+
+for many network print servers and internal cards.  It is mainly here
+for SNMP documentation and development purposes.
+
+
+AXIS 5600
+
+SNMPv2-MIB::sysDescr.0 = STRING: HP ETHERNET MULTI-ENVIRONMENT,ROM J.sp.00,JETDIRECT EX,JD28,EEPROM 6.16.5
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceType.2 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceType.3 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: Hewlett-Packard hp LaserJet 3380
+HOST-RESOURCES-MIB::hrDeviceDescr.2 = STRING: Axis AXIS 5600
+HOST-RESOURCES-MIB::hrDeviceDescr.3 = STRING: Axis AXIS 5600
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::zeroDotZero
+HOST-RESOURCES-MIB::hrDeviceID.2 = OID: SNMPv2-SMI::zeroDotZero
+HOST-RESOURCES-MIB::hrDeviceID.3 = OID: SNMPv2-SMI::zeroDotZero
+SNMPv2-SMI::enterprises.368.2.3.2.601.0 = INTEGER: 9100
+SNMPv2-SMI::enterprises.368.2.3.2.602.0 = INTEGER: 9101
+SNMPv2-SMI::enterprises.368.2.3.2.603.0 = INTEGER: 9102
+
+
+AXIS OfficeBasic
+
+SNMPv2-MIB::sysDescr.0 = STRING: AXIS OfficeBasic Parallel Network Print Server V6.43 Sep  4 2003
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: EPSON Stylus Photo 870
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::zeroDotZero
+
+
+DLink DP-301P+
+
+SNMPv2-MIB::sysDescr.0 = STRING: D-Link DP-301P+ Print Server
+
+
+Genicom ML280
+
+SNMPv2-MIB::sysDescr.0 = STRING: GENICOM microLaser 280
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: MANUFACTURER:GENICOM;MODEL:microLaser 280;
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.3369.1.1.2.4
+
+
+HP LJ4000
+
+SNMPv2-MIB::sysDescr.0 = STRING: HP ETHERNET MULTI-ENVIRONMENT,ROM G.05.34,JETDIRECT,JD30,EEPROM G.08.32
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: HP LaserJet 4000 Series
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.11.2.3.9.1.2.5
+
+
+HP CLJ4550
+
+SNMPv2-MIB::sysDescr.0 = STRING: HP ETHERNET MULTI-ENVIRONMENT,ROM L.20.07,JETDIRECT,JD84,EEPROM L.21.22,CIDATE 07/06/2001
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: HP Color LaserJet 4550
+HOST-RESOURCES-MIB::hrDeviceDescr.2 = STRING: Hewlett-Packard Dynamic RAM Disk
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.11.2.3.9.1.2.14
+
+
+Linksys EPSX3
+
+SNMPv2-MIB::sysDescr.0 = STRING: ETHERNET MULTI-ENVIRONMENT.ROM, JETDIRECT EX, EEPROM 6016
+
+
+NetGear PS113
+
+SNMPv2-MIB::sysDescr.0 = STRING: A SNMP proxy agent.
+
+
+Okidata C7200
+
+SNMPv2-MIB::sysDescr.0 = STRING: OkiLAN 6200e
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceType.2 = OID: HOST-RESOURCES-TYPES::hrDeviceNonVolat
+ileMemory
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: C7200
+HOST-RESOURCES-MIB::hrDeviceDescr.2 = STRING: FLASH0
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.2001.1.1.1.1
+HOST-RESOURCES-MIB::hrDeviceID.2 = OID: SNMPv2-SMI::zeroDotZero
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.1 = STRING: "IEEE 1284"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.2 = STRING: "EtherTalk Phase 2"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.3 = STRING: "LPD"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.4 = STRING: "Netware Rprinter"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.5 = STRING: "Netware Bindery or NDS Pserver"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.6 = STRING: "Raw TCP Port 9100"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.7 = STRING: "FTP"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.8 = STRING: "DLC/LLC"
+SNMPv2-SMI::enterprises.2001.1.1.1.1.1.3530.0 = STRING: "C7200"
+
+
+Xerox N2025
+
+SNMPv2-MIB::sysDescr.0 = STRING: Xerox DocuPrint N2025 Network Laser Printer - 2.12-02 
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceType.2 = OID: HOST-RESOURCES-TYPES::hrDeviceParallelPort
+HOST-RESOURCES-MIB::hrDeviceType.3 = OID: HOST-RESOURCES-TYPES::hrDeviceNetwork
+HOST-RESOURCES-MIB::hrDeviceType.6 = OID: HOST-RESOURCES-TYPES::hrDeviceProcessor
+HOST-RESOURCES-MIB::hrDeviceType.7 = OID: HOST-RESOURCES-TYPES::hrDeviceOther
+HOST-RESOURCES-MIB::hrDeviceType.9 = OID: HOST-RESOURCES-TYPES::hrDeviceVolatileMemory
+HOST-RESOURCES-MIB::hrDeviceType.10 = OID: HOST-RESOURCES-TYPES::hrDeviceNonVolatileMemory
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: Xerox DocuPrint N2025 Network Laser Printer - 2.12-02 
+HOST-RESOURCES-MIB::hrDeviceDescr.2 = STRING: IEEE 1284 port
+HOST-RESOURCES-MIB::hrDeviceDescr.3 = STRING: Ethernet port
+HOST-RESOURCES-MIB::hrDeviceDescr.6 = STRING: Motorola Power PC
+HOST-RESOURCES-MIB::hrDeviceDescr.7 = STRING: USB Port
+HOST-RESOURCES-MIB::hrDeviceDescr.9 = STRING: RAM Memory
+HOST-RESOURCES-MIB::hrDeviceDescr.10 = STRING: ROM Memory
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.253.8.62.1.3.2.17.1
+

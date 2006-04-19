@@ -124,6 +124,7 @@
  *
  *     Axis OfficeBasic, 5400, 5600
  *     EPSON
+ *     Genicom
  *     HP JetDirect
  *     Lexmark
  *     Sharp
@@ -135,6 +136,7 @@
  *     DLink
  *     Linksys
  *     Netgear
+ *     Okidata
  *
  * (for all of these, they do not support the Host MIB)
  */
@@ -1884,7 +1886,25 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
     * Convert the description to a make and model string...
     */
 
-    fix_make_model(make_model, packet.object_value.string, sizeof(make_model));
+    if (strchr(packet.object_value.string, ':') &&
+        strchr(packet.object_value.string, ';'))
+    {
+     /*
+      * Description is the IEEE-1284 device ID...
+      */
+
+      get_make_model(packet.object_value.string, make_model,
+                     sizeof(make_model));
+    }
+    else
+    {
+     /*
+      * Description is plain text...
+      */
+
+      fix_make_model(make_model, packet.object_value.string,
+                     sizeof(make_model));
+    }
 
     if (device->make_and_model)
       free(device->make_and_model);
