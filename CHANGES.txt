@@ -3,6 +3,11 @@ CHANGES.txt - 2006-04-19
 
 CHANGES IN CUPS V1.2rc3
 
+	- Added explicit notes to the cupsaddsmb man page
+	  explaining that the driver filenames are case-sensitive
+	  under UNIX and that they must be all lowercase (Windows
+	  2000) or all UPPERCASE (Windows 95/98/Me) to work (STR
+	  #1568)
 	- The USB backend incorrectly split the manufacturer name
 	  if it contained spaces (STR #1566)
 	- The scheduler would hang when listing PPD files for a

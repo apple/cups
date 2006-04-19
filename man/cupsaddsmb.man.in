@@ -21,9 +21,10 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "19 April 2006" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
+
 .SH SYNOPSIS
 .B cupsaddsmb
 [ -H
@@ -42,12 +43,14 @@ cupsaddsmb \- export printers to samba for windows clients
 ] [ -h
 .I cups-server[:port]
 ] [ -v ] printer [ ... printer ]
+
 .SH DESCRIPTION
 \fIcupsaddsmb\fR exports printers to the SAMBA software (version
 2.2.0 or higher) for use with Windows clients. Depending on the
 SAMBA configuration, you may need to provide a password to
 export the printers. This program requires the Windows printer
 driver files described below.
+
 .SH OPTIONS
 \fIcupsaddsmb\fR supports the following options:
 .TP 5
@@ -75,6 +78,7 @@ Specifies a different CUPS server to use.
 .br
 Specifies that verbose information should be shown. This is
 useful for debugging SAMBA configuration problems.
+
 .SH SAMBA CONFIGURATION
 \fIcupsaddsmb\fR uses the new RPC-based printing support in
 SAMBA 2.2.x to provide printer drivers and PPD files to Windows
@@ -136,6 +140,10 @@ Once you have extracted the driver files, copy them to the
     pscript.ntf
     pscript5.dll
 .fi
+.LP
+\fBNote:\fR Unlike Windows, case is significant - make sure that
+you use the lowercase filenames shown above, otherwise
+\fIcupsaddsmb\fR will fail to export the drivers.
 
 .SH CUPS POSTSCRIPT DRIVERS FOR WINDOWS
 \fIcupsaddsmb\fR can use the CUPS v6 PostScript printer driver
@@ -162,6 +170,10 @@ Once you have extracted the driver files, copy them to the
     pscript.ntf
     pscript5.dll
 .fi
+.LP
+\fBNote:\fR Unlike Windows, case is significant - make sure that
+you use the lowercase filenames shown above, otherwise
+\fIcupsaddsmb\fR will fail to export the drivers.
 
 .SH ADOBE POSTSCRIPT DRIVERS FOR WINDOWS 95, 98, AND ME
 \fIcupsaddsmb\fR can use the Adobe PostScript printer driver for
@@ -182,11 +194,17 @@ Once you have extracted the driver files, copy them to the
     ICONLIB.DLL
     PSMON.DLL
 .fi
+.LP
+\fBNote:\fR Unlike Windows, case is significant - make sure that
+you use the UPPERCASE filenames shown above, otherwise
+\fIcupsaddsmb\fR will fail to export the drivers.
+
 .SH SEE ALSO
 \fIsmbd(8)\fR, \fIsmb.conf(5)\fR,
 http://localhost:631/help
 .br
 http://www.cups.org/windows/
+
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
