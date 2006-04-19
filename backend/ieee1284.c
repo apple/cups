@@ -268,7 +268,7 @@ get_device_id(
 
     *uriptr++ = '/';
 
-    if (!strncmp(make_model, manufacturer, manulen))
+    if (!strncasecmp(make_model, manufacturer, manulen))
     {
       delim = make_model + manulen;
 
