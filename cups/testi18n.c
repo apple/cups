@@ -23,9 +23,8 @@
  *
  * Contents:
  *
- *   main()        - Main entry for internationalization test module.
- *   print_utf8()  - Print UTF-8 string with (optional) message.
- *   print_utf32() - Print UTF-32 string with (optional) message.
+ *   main()       - Main entry for internationalization test module.
+ *   print_utf8() - Print UTF-8 string with (optional) message.
  */
 
 /*
@@ -36,6 +35,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "i18n.h"
 #include "string.h"
@@ -46,7 +46,6 @@
  */
 
 static void	print_utf8(const char *msg, const cups_utf8_t *src);
-static void	print_utf32(const char *msg, const cups_utf32_t *src);
 
 
 /*
@@ -81,17 +80,20 @@ main(int  argc,				/* I - Argument Count */
   cups_utf8_t	utf8taiwan[] =		/* UTF-8 Chinese source */
     { 0x41, 0x20, 0x21, 0x3D, 0x20, 0xE4, 0xB9, 0x82, 0x2E, 0x00 };
     /* "A != <CJK U+4E42>." - use Windows 950 (Big5) or EUC-TW */
-  cups_utf8_t	utf8good[] =		/* UTF-8 good 16-bit source */
-    { 0x41, 0x20, 0xE2, 0x89, 0xA2, 0x20, 0xC3, 0x84, 0x2E, 0x00 };
-    /* "A <NOT IDENTICAL TO> <A WITH DIAERESIS>." */
-  cups_utf8_t	utf8bad[] =		/* UTF-8 bad 16-bit source */
-    { 0x41, 0x20, 0xE2, 0x89, 0xA2, 0x20, 0xF8, 0x84, 0x2E, 0x00 };
-    /* "A <NOT IDENTICAL TO> <...bad stuff...>." */
   cups_utf8_t	utf8dest[1024];		/* UTF-8 destination string */
-  cups_utf32_t	utf32src[1024];		/* UTF-32 source string */
   cups_utf32_t	utf32dest[1024];	/* UTF-32 destination string */
   _cups_vmap_t	 *vmap;			/* VBCS charmap pointer */
 
+
+ /*
+  * Make sure we have a symbolic link from the data directory to a
+  * "charmaps" directory, and then point the library at it...
+  */
+
+  if (access("charmaps", 0))
+    symlink("../data", "charmaps");
+
+  putenv("CUPS_DATADIR=.");
 
  /*
   * Start with some conversion tests from a UTF-8 test file.
@@ -238,7 +240,7 @@ main(int  argc,				/* I - Argument Count */
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_ISO8859_1);
   if (len != strlen((char *)utf8latin))
   {
-    printf("FAIL (len=%d, expected %d)\n", len, strlen((char *)utf8latin));
+    printf("FAIL (len=%d, expected %d)\n", len, (int)strlen((char *)utf8latin));
     print_utf8("    utf8latin", utf8latin);
     print_utf8("    utf8dest", utf8dest);
     errors ++;
@@ -289,7 +291,7 @@ main(int  argc,				/* I - Argument Count */
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_ISO8859_7);
   if (len != strlen((char *)utf8greek))
   {
-    printf("FAIL (len=%d, expected %d)\n", len, strlen((char *)utf8greek));
+    printf("FAIL (len=%d, expected %d)\n", len, (int)strlen((char *)utf8greek));
     print_utf8("    utf8greek", utf8greek);
     print_utf8("    utf8dest", utf8dest);
     errors ++;
@@ -335,7 +337,7 @@ main(int  argc,				/* I - Argument Count */
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_WINDOWS_932);
   if (len != strlen((char *)utf8japan))
   {
-    printf("FAIL (len=%d, expected %d)\n", len, strlen((char *)utf8japan));
+    printf("FAIL (len=%d, expected %d)\n", len, (int)strlen((char *)utf8japan));
     print_utf8("    utf8japan", utf8japan);
     print_utf8("    utf8dest", utf8dest);
     errors ++;
@@ -381,7 +383,7 @@ main(int  argc,				/* I - Argument Count */
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_EUC_JP);
   if (len != strlen((char *)utf8japan))
   {
-    printf("FAIL (len=%d, expected %d)\n", len, strlen((char *)utf8japan));
+    printf("FAIL (len=%d, expected %d)\n", len, (int)strlen((char *)utf8japan));
     print_utf8("    utf8japan", utf8japan);
     print_utf8("    utf8dest", utf8dest);
     errors ++;
@@ -427,7 +429,7 @@ main(int  argc,				/* I - Argument Count */
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_WINDOWS_950);
   if (len != strlen((char *)utf8taiwan))
   {
-    printf("FAIL (len=%d, expected %d)\n", len, strlen((char *)utf8taiwan));
+    printf("FAIL (len=%d, expected %d)\n", len, (int)strlen((char *)utf8taiwan));
     print_utf8("    utf8taiwan", utf8taiwan);
     print_utf8("    utf8dest", utf8dest);
     errors ++;
@@ -473,7 +475,7 @@ main(int  argc,				/* I - Argument Count */
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_EUC_TW);
   if (len != strlen((char *)utf8taiwan))
   {
-    printf("FAIL (len=%d, expected %d)\n", len, strlen((char *)utf8taiwan));
+    printf("FAIL (len=%d, expected %d)\n", len, (int)strlen((char *)utf8taiwan));
     print_utf8("    utf8taiwan", utf8taiwan);
     print_utf8("    utf8dest", utf8dest);
     errors ++;
@@ -548,24 +550,6 @@ print_utf8(const char	     *msg,	/* I - Message String */
 
   for (; *src; src ++)
     printf(" %02x", *src);
-
-  putchar('\n');
-}
-
-
-/*
- * 'print_utf32()' - Print UTF-32 string with (optional) message.
- */
-
-static void
-print_utf32(const char	       *msg,	/* I - Message String */
-	    const cups_utf32_t *src)	/* I - UTF-32 Source String */
-{
-  if (msg)
-    printf("%s:", msg);
-
-  for (; *src; src ++)
-    printf(" %04x", (int) *src);
 
   putchar('\n');
 }
