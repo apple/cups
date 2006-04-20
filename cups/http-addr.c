@@ -52,6 +52,9 @@
 int					/* O - 1 if "any", 0 otherwise */
 httpAddrAny(const http_addr_t *addr)	/* I - Address to check */
 {
+  if (!addr)
+    return (0);
+
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6 &&
       IN6_IS_ADDR_UNSPECIFIED(&(addr->ipv6.sin6_addr)))
@@ -76,6 +79,12 @@ int						/* O - 1 if equal, 0 if not */
 httpAddrEqual(const http_addr_t *addr1,		/* I - First address */
               const http_addr_t *addr2)		/* I - Second address */
 {
+  if (!addr1 && !addr2)
+    return (1);
+
+  if (!addr1 || !addr2)
+    return (0);
+
   if (addr1->addr.sa_family != addr2->addr.sa_family)
     return (0);
 
@@ -102,6 +111,9 @@ httpAddrEqual(const http_addr_t *addr1,		/* I - First address */
 int					/* O - Length in bytes */
 httpAddrLength(const http_addr_t *addr)	/* I - Address */
 {
+  if (!addr)
+    return (0);
+
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6)
     return (sizeof(addr->ipv6));
@@ -131,6 +143,9 @@ int					/* O - 1 if local host, 0 otherwise */
 httpAddrLocalhost(
     const http_addr_t *addr)		/* I - Address to check */
 {
+  if (!addr)
+    return (1);
+
 #ifdef AF_INET6
   if (addr->addr.sa_family == AF_INET6 &&
       IN6_IS_ADDR_LOOPBACK(&(addr->ipv6.sin6_addr)))
