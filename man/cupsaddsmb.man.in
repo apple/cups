@@ -183,8 +183,9 @@ Adobe web site (http://www.adobe.com).
 The Adobe driver does not support the page-label, job-billing, or
 job-hold-until options.
 .LP
-Once you have extracted the driver files, copy them to the
-\fI@CUPS_DATADIR@/drivers\fR directory exactly as named below:
+Once you have installed the driver on a Windows system, copy the
+following files to the \fI@CUPS_DATADIR@/drivers\fR directory
+exactly as named below:
 .nf
 
     [Windows 95, 98, and Me]
