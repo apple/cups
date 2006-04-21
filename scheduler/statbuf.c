@@ -277,7 +277,7 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
   }
   else
   {
-    *loglevel = CUPSD_LOG_ERROR;
+    *loglevel = CUPSD_LOG_DEBUG;
     message   = sb->buffer;
   }
 

@@ -118,7 +118,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
       ippDelete(request);
 
-      _cupsSetError(IPP_NOT_POSSIBLE, NULL);
+      _cupsSetError(IPP_NOT_POSSIBLE, strerror(EISDIR));
 
       return (NULL);
     }

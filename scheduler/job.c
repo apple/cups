@@ -1317,7 +1317,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
                         ((29 - curdate->tm_hour) * 60 + 59 -
 			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
   }
-  else if (!strcmp(when, "evening") || strcmp(when, "night"))
+  else if (!strcmp(when, "evening") || !strcmp(when, "night"))
   {
    /*
     * Hold to 6pm unless local time is > 6pm or < 6am.
