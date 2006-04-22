@@ -1,9 +1,9 @@
-CHANGES.txt - 2006-04-21
+CHANGES.txt - 2006-04-22
 ------------------------
 
 CHANGES IN CUPS V1.2rc3
 
-	- Added a Polish translation (STR #1584)
+	- Added a Polish translation (STR #1584, STR #1586)
 	- More changes to the scheduler to improve battery life
 	  on portable devices (STR #1583)
 	- Changed the default log level for status messages back
