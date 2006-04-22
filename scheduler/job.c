@@ -2143,6 +2143,7 @@ load_next_job_id(const char *filename)	/* I - job.cache filename */
   char		line[1024],		/* Line buffer */
 		*value;			/* Value on line */
   int		linenum;		/* Line number in file */
+  int		next_job_id;		/* NextJobId value from line */
 
 
  /*
@@ -2170,8 +2171,12 @@ load_next_job_id(const char *filename)	/* I - job.cache filename */
     if (!strcasecmp(line, "NextJobId"))
     {
       if (value)
-        NextJobId = atoi(value);
+      {
+        next_job_id = atoi(value);
 
+        if (next_job_id > NextJobId)
+	  NextJobId = next_job_id;
+      }
       break;
     }
   }

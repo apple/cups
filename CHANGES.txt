@@ -3,6 +3,9 @@ CHANGES.txt - 2006-04-22
 
 CHANGES IN CUPS V1.2rc3
 
+	- The next job ID was not computed correctly if the job
+	  cache file got out of sync with the spool directory
+	  (STR #1582)
 	- The PNG image handling code used deprecated functions
 	  from libpng (STR #1587)
 	- Added a Polish translation (STR #1584, STR #1586)
