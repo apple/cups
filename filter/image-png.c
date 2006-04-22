@@ -55,6 +55,15 @@ _cupsImageReadPNG(
   int		y;			/* Looping var */
   png_structp	pp;			/* PNG read pointer */
   png_infop	info;			/* PNG info pointers */
+  png_uint_32	width,			/* Width of image */
+		height;			/* Height of image */
+  int		bit_depth,		/* Bit depth */
+		color_type,		/* Color type */
+		interlace_type,		/* Interlace type */
+		compression_type,	/* Compression type */
+		filter_type;		/* Filter type */
+  png_uint_32	xppm,			/* X pixels per meter */
+		yppm;			/* Y pixels per meter */
   int		bpp;			/* Bytes per pixel */
   int		pass,			/* Current pass */
 		passes;			/* Number of passes required */
@@ -83,44 +92,48 @@ _cupsImageReadPNG(
 
   png_read_info(pp, info);
 
-  fprintf(stderr, "DEBUG: PNG image: %dx%dx%d, color_type=%x (%s%s%s)\n",
-          (int)info->width, (int)info->height, info->bit_depth, info->color_type,
-	  (info->color_type & PNG_COLOR_MASK_COLOR) ? "RGB" : "GRAYSCALE",
-	  (info->color_type & PNG_COLOR_MASK_ALPHA) ? "+ALPHA" : "",
-	  (info->color_type & PNG_COLOR_MASK_PALETTE) ? "+PALETTE" : "");
+  png_get_IHDR(pp, info, &width, &height, &bit_depth, &color_type,
+               &interlace_type, &compression_type, &filter_type);
 
-  if (info->color_type & PNG_COLOR_MASK_PALETTE)
+  fprintf(stderr, "DEBUG: PNG image: %dx%dx%d, color_type=%x (%s%s%s)\n",
+          (int)width, (int)height, bit_depth, color_type,
+	  (color_type & PNG_COLOR_MASK_COLOR) ? "RGB" : "GRAYSCALE",
+	  (color_type & PNG_COLOR_MASK_ALPHA) ? "+ALPHA" : "",
+	  (color_type & PNG_COLOR_MASK_PALETTE) ? "+PALETTE" : "");
+
+  if (color_type & PNG_COLOR_MASK_PALETTE)
     png_set_expand(pp);
-  else if (info->bit_depth < 8)
+  else if (bit_depth < 8)
   {
     png_set_packing(pp);
     png_set_expand(pp);
   }
-  else if (info->bit_depth == 16)
+  else if (bit_depth == 16)
     png_set_strip_16(pp);
 
-  if (info->color_type & PNG_COLOR_MASK_COLOR)
-    img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_RGB : primary;
+  if (color_type & PNG_COLOR_MASK_COLOR)
+    img->colorspace = (primary == CUPS_IMAGE_RGB_CMYK) ? CUPS_IMAGE_RGB :
+                                                         primary;
   else
     img->colorspace = secondary;
 
-  if (info->width == 0 || info->width > CUPS_IMAGE_MAX_WIDTH ||
-      info->height == 0 || info->height > CUPS_IMAGE_MAX_HEIGHT)
+  if (width == 0 || width > CUPS_IMAGE_MAX_WIDTH ||
+      height == 0 || height > CUPS_IMAGE_MAX_HEIGHT)
   {
     fprintf(stderr, "ERROR: PNG image has invalid dimensions %ux%u!\n",
-            (unsigned)info->width, (unsigned)info->height);
+            (unsigned)width, (unsigned)height);
     fclose(fp);
     return (1);
   }
 
-  img->xsize = info->width;
-  img->ysize = info->height;
+  img->xsize = width;
+  img->ysize = height;
 
-  if (info->valid & PNG_INFO_pHYs &&
-      info->phys_unit_type == PNG_RESOLUTION_METER)
+  if ((xppm = png_get_x_pixels_per_meter(pp, info)) != 0 &&
+      (yppm = png_get_y_pixels_per_meter(pp, info)) != 0)
   {
-    img->xppi = (int)((float)info->x_pixels_per_unit * 0.0254);
-    img->yppi = (int)((float)info->y_pixels_per_unit * 0.0254);
+    img->xppi = (int)((float)xppm * 0.0254);
+    img->yppi = (int)((float)yppm * 0.0254);
 
     if (img->xppi == 0 || img->yppi == 0)
     {
@@ -154,8 +167,8 @@ _cupsImageReadPNG(
     * Load one row at a time...
     */
 
-    if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-	info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+    if (color_type == PNG_COLOR_TYPE_GRAY ||
+	color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       in = malloc(img->xsize);
     else
       in = malloc(img->xsize * 3);
@@ -166,8 +179,8 @@ _cupsImageReadPNG(
     * Interlaced images must be loaded all at once...
     */
 
-    if (info->color_type == PNG_COLOR_TYPE_GRAY ||
-	info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+    if (color_type == PNG_COLOR_TYPE_GRAY ||
+	color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       in = malloc(img->xsize * img->ysize);
     else
       in = malloc(img->xsize * img->ysize * 3);
@@ -191,7 +204,7 @@ _cupsImageReadPNG(
         * Output this row...
 	*/
 
-	if (info->color_type & PNG_COLOR_MASK_COLOR)
+	if (color_type & PNG_COLOR_MASK_COLOR)
 	{
 	  if ((saturation != 100 || hue != 0) && bpp > 1)
 	    cupsImageRGBAdjust(inptr, img->xsize, saturation, hue);
@@ -247,7 +260,7 @@ _cupsImageReadPNG(
 
       if (passes > 1)
       {
-	if (info->color_type & PNG_COLOR_MASK_COLOR)
+	if (color_type & PNG_COLOR_MASK_COLOR)
           inptr += img->xsize * 3;
 	else
           inptr += img->xsize;
@@ -255,7 +268,7 @@ _cupsImageReadPNG(
     }
 
   png_read_end(pp, info);
-  png_read_destroy(pp, info, NULL);
+  png_destroy_read_struct(&pp, &info, NULL);
 
   fclose(fp);
   free(in);

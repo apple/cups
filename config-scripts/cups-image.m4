@@ -78,7 +78,7 @@ AC_CHECK_LIB(m, pow)
 
 if test x$enable_png != xno; then
     AC_CHECK_HEADER(png.h,
-	AC_CHECK_LIB(png, png_set_tRNS_to_alpha,
+	AC_CHECK_LIB(png, png_create_read_struct,
 	    AC_DEFINE(HAVE_LIBPNG)
 	    LIBPNG="-lpng -lm"))
 else
