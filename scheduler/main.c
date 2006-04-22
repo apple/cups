@@ -993,11 +993,12 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
    /*
-    * Update the root certificate once every 5 minutes...
+    * Update the root certificate once every 5 minutes if we have client
+    * connections...
     */
 
     if ((current_time - RootCertTime) >= RootCertDuration && RootCertDuration &&
-        !RunUser)
+        !RunUser && cupsArrayCount(Clients))
     {
      /*
       * Update the root certificate...

@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-04-20
+CHANGES.txt - 2006-04-21
 ------------------------
 
 CHANGES IN CUPS V1.2rc3
 
+	- More changes to the scheduler to improve battery life
+	  on portable devices (STR #1583)
 	- Changed the default log level for status messages back
 	  to "DEBUG" to be consistent with CUPS 1.1.x (STR #1579)
 	- The error string was not set properly when

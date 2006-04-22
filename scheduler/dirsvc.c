@@ -799,7 +799,7 @@ cupsdSendBrowseList(void)
 		      (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
 		      p->name);
 
-        cupsdLogMessage(CUPSD_LOG_INFO,
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                "Remote destination \"%s\" has timed out; "
 			"deleting it...",
 	                p->name);
@@ -1907,7 +1907,7 @@ process_browse_data(
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-	    cupsdLogMessage(CUPSD_LOG_INFO,
+	    cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                    "Renamed remote class \"%s\" to \"%s@%s\"...",
 	                    p->name, p->name, p->hostname);
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
@@ -1967,7 +1967,7 @@ process_browse_data(
 
       p = cupsdAddClass(name);
 
-      cupsdLogMessage(CUPSD_LOG_INFO, "Added remote class \"%s\"...", name);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Added remote class \"%s\"...", name);
 
       cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                     "Class \'%s\' added by directory services.", name);
@@ -2010,7 +2010,7 @@ process_browse_data(
 
 	  if (p->type & CUPS_PRINTER_REMOTE)
 	  {
-	    cupsdLogMessage(CUPSD_LOG_INFO,
+	    cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                    "Renamed remote printer \"%s\" to \"%s@%s\"...",
 	                    p->name, p->name, p->hostname);
 	    cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, p, NULL,
@@ -2073,7 +2073,7 @@ process_browse_data(
       cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                     "Printer \'%s\' added by directory services.", name);
 
-      cupsdLogMessage(CUPSD_LOG_INFO, "Added remote printer \"%s\"...", name);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Added remote printer \"%s\"...", name);
 
      /*
       * Force the URI to point to the real server...
@@ -2334,7 +2334,7 @@ process_implicit_classes(void)
 
         update = 1;
 
-        cupsdLogMessage(CUPSD_LOG_INFO, "Added implicit class \"%s\"...",
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "Added implicit class \"%s\"...",
 	                name);
 	cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, p, NULL,
                       "Implicit class \'%s\' added by directory services.",
