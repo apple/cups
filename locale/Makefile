@@ -54,8 +54,10 @@ depend:
 install:	all
 	$(INSTALL_DIR) -m 755 $(LOCALEDIR)
 	for loc in $(LANGUAGES) ; do \
-		$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
-		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
+		if test -f cups_$$loc.po; then \
+			$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
+			$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
+		fi ; \
 	done
 
 

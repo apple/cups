@@ -26,6 +26,7 @@ like to thank the following individuals for their contributions:
     Wes Morgan                     - *BSD fixes.
     Daniel Nylander                - Swedish localization.
     Giulio Orsero                  - Bug fixes and testing.
+    Michal Osowiecki               - Polish localization.
     Kurt Pfeifle                   - Bug fixes, beta testing, evangelism.
     Petter Reinholdtsen            - HP-UX compiler stuff.
     Juan Pablo González Riopedre   - Spanish localization

@@ -1,0 +1,42 @@
+<FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
+<INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">
+<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
+<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
+<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
+<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
+
+<H2 CLASS="title">Producent urządzenia {printer_name}</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">Producent:</TH>
+<TD>
+<SELECT NAME="PPD_MAKE" SIZE="10">
+{[ppd_make]<OPTION VALUE="{ppd_make}" {?current_make={ppd_make}?SELECTED:}>{ppd_make}}
+</SELECT>
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="Dalej"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD>&nbsp;</TD>
+</TR>
+<TR>
+<TH CLASS="label">Lub Zaakceptuj Plik PPD:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="MAX_FILE_SIZE" VALUE="262144"><INPUT
+TYPE="FILE" NAME="PPD_FILE"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-{op}.gif" ALT="{op=add-printer?Dodaj Drukarkę:Modyfikuj Drukarkę}"></TD>
+</TR>
+</TABLE>
+
+</FORM>
