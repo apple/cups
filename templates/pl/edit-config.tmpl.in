@@ -2,42 +2,43 @@
 function reset_config()
 {
   document.cups.CUPSDCONF.value =
-"# Zapisuj ogólne informacje w dzienniku błędów - zmień \\"info\\" na \\"debug\\" aby \\n" +
-"# rozwiązać problemy...\\n" +
+"# Log general information in error_log - change \\"info\\" to \\"debug\\" for\\n" +
+"# troubleshooting...\\n" +
 "LogLevel info\\n" +
 "\\n" +
 "\\n" +
-"# Administrator należy do grupy...\\n" +
+"# Administrator user group...\\n" +
 "SystemGroup @CUPS_SYSTEM_GROUPS@\\n" +
 "\\n" +
 "\\n" +
-"# Nasłuchuj połączeń z maszyny lokalnej.\\n" +
+"# Only listen for connections from the local machine.\\n" +
 "Listen 127.0.0.1:@DEFAULT_IPP_PORT@\\n" +
 "@CUPS_LISTEN_DOMAINSOCKET@\\n" +
 "\\n" +
 "\\n" +
-"# Pokaż udostępnione drukarki w sieci lokalnej.\\n" +
+"# Show shared printers on the local network.\\n" +
 "Browsing On\\n" +
 "BrowseOrder allow,deny\\n" +
 "BrowseAllow @LOCAL\\n" +
 "\\n" +
 "\\n" +
-"# Uwierzytelniaj domyślnie poprzez konta systemowe...\\n" +
+"# Authenticate against system accounts by default...\\n" +
 "DefaultAuthType Basic\\n" +
 "\\n" +
-"# Ogranicz dostęp do serwera...\\n" +
+"# Restrict access to the server...\\n" +
 "<Location />\\n" +
 "  Order allow,deny\\n" +
 "  Allow localhost\\n" +
 "</Location>\\n" +
 "\\n" +
-"# Ogranicz dostęp do stron administracyjnych...\\n" +
+"# Restrict access to the admin pages...\\n" +
 "<Location /admin>\\n" +
+"@ENCRYPTION_REQUIRED\\n" +
 "  Order allow,deny\\n" +
 "  Allow localhost\\n" +
 "</Location>\\n" +
 "\\n" +
-"# Ogranicz dostęp do pliku konfiguracji...\\n" +
+"# Restrict access to configuration files...\\n" +
 "<Location /admin/conf>\\n" +
 "  AuthType Basic\\n" +
 "  Require user @SYSTEM\\n" +
@@ -45,22 +46,22 @@ function reset_config()
 "  Allow localhost\\n" +
 "</Location>\\n" +
 "\\n" +
-"# Określ domyślną politykę drukarek/wydruków...\\n" +
+"# Set the default printer/job policies...\\n" +
 "<Policy default>\\n" +
-"  # Wydruki i operacje na nich muszą być wykonywane przez właściciela lub administratora...\\n" +
+"  # Job-related operations must be done by the owner or an adminstrator...\\n" +
 "  <Limit Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job CUPS-Move-Job>\\n" +
 "    Require user @OWNER @SYSTEM\\n" +
 "    Order deny,allow\\n" +
 "  </Limit>\\n" +
 "\\n" +
-"  # Wszystkie operacje administracyjne wymagają uwierzytelnienia administratora...\\n" +
+"  # All administration operations require an adminstrator to authenticate...\\n" +
 "  <Limit Pause-Printer Resume-Printer Set-Printer-Attributes Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After CUPS-Add-Printer CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>\\n" +
 "    AuthType Basic\\n" +
 "    Require user @SYSTEM\\n" +
 "    Order deny,allow\\n" +
 "  </Limit>\\n" +
 "\\n" +
-"  # Tylko właściciel lub administrator może anulować lub uwierzytelnić wydruk...\\n" +
+"  # Only the owner or an administrator can cancel or authenticate a job...\\n" +
 "  <Limit Cancel-Job CUPS-Authenticate-Job>\\n" +
 "    Require user @OWNER @SYSTEM\\n" +
 "    Order deny,allow\\n" +

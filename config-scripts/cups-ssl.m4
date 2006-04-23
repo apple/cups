@@ -36,6 +36,7 @@ AC_ARG_WITH(openssl-includes, [  --with-openssl-includes set directory for OpenS
 
 SSLFLAGS=""
 SSLLIBS=""
+ENCRYPTION_REQUIRED=""
 
 if test x$enable_ssl != xno; then
     dnl Look for CDSA...
@@ -43,6 +44,7 @@ if test x$enable_ssl != xno; then
 	if test $uname = Darwin; then
 	    AC_CHECK_HEADER(Security/SecureTransport.h,
 		[SSLLIBS="-framework CoreFoundation -framework Security"
+		 ENCRYPTION_REQUIRED="  Encryption Required"
 		 AC_DEFINE(HAVE_SSL)
 		 AC_DEFINE(HAVE_CDSASSL)])
 	fi
@@ -57,6 +59,7 @@ if test x$enable_ssl != xno; then
 
 	    AC_CHECK_LIB(gnutls, gnutls_x509_crt_set_dn_by_oid,
 		[SSLLIBS="-lgnutls"
+		 ENCRYPTION_REQUIRED="  Encryption Required"
 		 AC_DEFINE(HAVE_SSL)
 		 AC_DEFINE(HAVE_GNUTLS)])
 
@@ -84,6 +87,7 @@ if test x$enable_ssl != xno; then
 		AC_CHECK_LIB(ssl,SSL_new,
 		    [SSLFLAGS="-DOPENSSL_DISABLE_OLD_DES_SUPPORT"
 		     SSLLIBS="-lssl $libcrypto"
+		     ENCRYPTION_REQUIRED="  Encryption Required"
 		     AC_DEFINE(HAVE_SSL)
 		     AC_DEFINE(HAVE_LIBSSL)],,
 		    $libcrypto)
@@ -99,6 +103,7 @@ fi
 
 AC_SUBST(SSLFLAGS)
 AC_SUBST(SSLLIBS)
+AC_SUBST(ENCRYPTION_REQUIRED)
 
 EXPORT_SSLLIBS="$SSLLIBS"
 AC_SUBST(EXPORT_SSLLIBS)

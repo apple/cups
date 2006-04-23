@@ -33,6 +33,7 @@ DefaultAuthType Basic
 
 # Restrict access to the admin pages...
 <Location /admin>
+@ENCRYPTION_REQUIRED@
   Order allow,deny
   Allow localhost
 </Location>

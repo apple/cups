@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-04-22
+CHANGES.txt - 2006-04-23
 ------------------------
 
 CHANGES IN CUPS V1.2rc3
 
+	- When configured with SSL support, require encryption by
+	  default when displaying the /admin location (STR #1592)
 	- The next job ID was not computed correctly if the job
 	  cache file got out of sync with the spool directory
 	  (STR #1582)

@@ -8,12 +8,12 @@ function reset_config()
 "\\n" +
 "\\n" +
 "# Administrator user group...\\n" +
-"SystemGroup lpadmin sys root\\n" +
+"SystemGroup @CUPS_SYSTEM_GROUPS@\\n" +
 "\\n" +
 "\\n" +
 "# Only listen for connections from the local machine.\\n" +
-"Listen 127.0.0.1:631\\n" +
-"Listen /usr/var/run/cups/cups.sock\\n" +
+"Listen 127.0.0.1:@DEFAULT_IPP_PORT@\\n" +
+"@CUPS_LISTEN_DOMAINSOCKET@\\n" +
 "\\n" +
 "\\n" +
 "# Show shared printers on the local network.\\n" +
@@ -33,6 +33,7 @@ function reset_config()
 "\\n" +
 "# Restrict access to the admin pages...\\n" +
 "<Location /admin>\\n" +
+"@ENCRYPTION_REQUIRED\\n" +
 "  Order allow,deny\\n" +
 "  Allow localhost\\n" +
 "</Location>\\n" +
