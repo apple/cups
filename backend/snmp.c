@@ -61,6 +61,7 @@
  *   hex_debug()               - Output hex debugging data...
  *   list_devices()            - List all of the devices we found...
  *   open_snmp_socket()        - Open the SNMP broadcast socket.
+ *   password_cb()             - Handle authentication requests.
  *   probe_device()            - Probe a device to discover whether it is a
  *                               printer.
  *   read_snmp_conf()          - Read the snmp.conf file.
@@ -253,6 +254,7 @@ static http_addrlist_t	*get_interface_addresses(const char *ifname);
 static void		hex_debug(unsigned char *buffer, size_t len);
 static void		list_devices(void);
 static int		open_snmp_socket(void);
+static const char	*password_cb(const char *prompt);
 static void		probe_device(snmp_cache_t *device);
 static void		read_snmp_conf(const char *address);
 static void		read_snmp_response(int fd);
@@ -306,6 +308,12 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     fputs("Usage: snmp [host-or-ip-address]\n", stderr);
     return (1);
   }
+
+ /*
+  * Set the password callback for IPP operations...
+  */
+
+  cupsSetPasswordCB(password_cb);
 
  /*
   * Open the SNMP socket...
@@ -1472,6 +1480,22 @@ open_snmp_socket(void)
   }
 
   return (fd);
+}
+
+
+/*
+ * 'password_cb()' - Handle authentication requests.
+ *
+ * All we do right now is return NULL, indicating that no authentication
+ * is possible.
+ */
+
+static const char *			/* O - Password (NULL) */
+password_cb(const char *prompt)		/* I - Prompt message */
+{
+  (void)prompt;				/* Anti-compiler-warning-code */
+
+  return (NULL);
 }
 
 
