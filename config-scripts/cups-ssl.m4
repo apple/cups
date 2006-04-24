@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -44,7 +44,10 @@ if test x$enable_ssl != xno; then
 	if test $uname = Darwin; then
 	    AC_CHECK_HEADER(Security/SecureTransport.h,
 		[SSLLIBS="-framework CoreFoundation -framework Security"
-		 ENCRYPTION_REQUIRED="  Encryption Required"
+		 # MacOS X doesn't (yet) come with pre-installed encryption
+		 # certificates for CUPS, so don't enable encryption on
+		 # /admin just yet...
+		 #ENCRYPTION_REQUIRED="  Encryption Required"
 		 AC_DEFINE(HAVE_SSL)
 		 AC_DEFINE(HAVE_CDSASSL)])
 	fi
