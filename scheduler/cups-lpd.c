@@ -128,6 +128,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   char		hostname[256],		/* Name of client */
 		hostip[256],		/* IP address */
 		*hostfamily;		/* Address family */
+  int		hostlookups;		/* Do hostname lookups? */
 
 
  /*
@@ -143,39 +144,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   openlog("cups-lpd", LOG_PID, LOG_LPR);
 
  /*
-  * Get the address of the client...
-  */
-
-  hostlen = sizeof(hostaddr);
-
-  if (getpeername(0, (struct sockaddr *)&hostaddr, &hostlen))
-  {
-    syslog(LOG_WARNING, "Unable to get client address - %s", strerror(errno));
-    strcpy(hostname, "unknown");
-  }
-  else
-  {
-    httpAddrLookup(&hostaddr, hostname, sizeof(hostname));
-    httpAddrString(&hostaddr, hostip, sizeof(hostip));
-
-#ifdef AF_INET6
-    if (hostaddr.addr.sa_family == AF_INET6)
-      hostfamily = "IPv6";
-    else
-#endif /* AF_INET6 */
-    hostfamily = "IPv4";
-
-    syslog(LOG_INFO, "Connection from %s (%s %s)", hostname, hostfamily,
-           hostip);
-  }
-
- /*
   * Scan the command-line for options...
   */
 
   num_defaults = 0;
   defaults     = NULL;
-
+  hostlookups  = 1;
   num_defaults = cupsAddOption("job-originating-host-name", hostname,
                                num_defaults, &defaults);
 
@@ -198,6 +172,11 @@ main(int  argc,				/* I - Number of command-line arguments */
         	syslog(LOG_WARNING, "Expected option string after -o option!");
             }
 	    break;
+
+        case 'n' : /* Don't do hostname lookups */
+	    hostlookups = 0;
+	    break;
+
 	default :
 	    syslog(LOG_WARNING, "Unknown option \"%c\" ignored!", argv[i][1]);
 	    break;
@@ -206,6 +185,37 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       syslog(LOG_WARNING, "Unknown command-line option \"%s\" ignored!",
              argv[i]);
+
+ /*
+  * Get the address of the client...
+  */
+
+  hostlen = sizeof(hostaddr);
+
+  if (getpeername(0, (struct sockaddr *)&hostaddr, &hostlen))
+  {
+    syslog(LOG_WARNING, "Unable to get client address - %s", strerror(errno));
+    strcpy(hostname, "unknown");
+  }
+  else
+  {
+    httpAddrString(&hostaddr, hostip, sizeof(hostip));
+
+    if (hostlookups)
+      httpAddrLookup(&hostaddr, hostname, sizeof(hostname));
+    else
+      strlcpy(hostname, hostip, sizeof(hostname));
+
+#ifdef AF_INET6
+    if (hostaddr.addr.sa_family == AF_INET6)
+      hostfamily = "IPv6";
+    else
+#endif /* AF_INET6 */
+    hostfamily = "IPv4";
+
+    syslog(LOG_INFO, "Connection from %s (%s %s)", hostname, hostfamily,
+           hostip);
+  }
 
  /*
   * RFC1179 specifies that only 1 daemon command can be received for

@@ -1,8 +1,11 @@
-CHANGES.txt - 2006-04-23
+CHANGES.txt - 2006-04-24
 ------------------------
 
 CHANGES IN CUPS V1.2rc3
 
+	- The cups-lpd program always did reverse lookups on the
+	  client address, which could be a performance problem.
+	  Added a "-n" option to disable lookups.
 	- When configured with SSL support, require encryption by
 	  default when displaying the /admin location (STR #1592)
 	- The next job ID was not computed correctly if the job
