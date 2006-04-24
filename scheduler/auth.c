@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 5336 2006-03-24 16:37:29Z mike $"
+ * "$Id: auth.c 5442 2006-04-20 14:00:02Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -27,17 +27,19 @@
  *   cupsdAddName()            - Add a name to a location...
  *   cupsdAllowHost()          - Add a host name that is allowed to access the
  *                               location.
- *   cupsdAllowIP()            - Add an IP address or network that is allowed to
- *                               access the location.
+ *   cupsdAllowIP()            - Add an IP address or network that is allowed
+ *                               to access the location.
+ *   cupsdAuthorize()          - Validate any authorization credentials.
  *   cupsdCheckAuth()          - Check authorization masks.
  *   cupsdCheckGroup()         - Check for a user's group membership.
  *   cupsdCopyLocation()       - Make a copy of a location...
- *   cupsdDeleteAllLocations() - Free all memory used for location authorization.
+ *   cupsdDeleteAllLocations() - Free all memory used for location
+ *                               authorization.
  *   cupsdDeleteLocation()     - Free all memory used by a location.
- *   cupsdDenyHost()           - Add a host name that is not allowed to access the
- *                               location.
- *   cupsdDenyIP()             - Add an IP address or network that is not allowed
- *                               to access the location.
+ *   cupsdDenyHost()           - Add a host name that is not allowed to access
+ *                               the location.
+ *   cupsdDenyIP()             - Add an IP address or network that is not
+ *                               allowed to access the location.
  *   cupsdFindBest()           - Find the location entry that best matches the
  *                               resource.
  *   cupsdFindLocation()       - Find the named location.
@@ -2164,5 +2166,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 5336 2006-03-24 16:37:29Z mike $".
+ * End of "$Id: auth.c 5442 2006-04-20 14:00:02Z mike $".
  */

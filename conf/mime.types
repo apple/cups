@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types 5375 2006-04-06 20:10:55Z mike $"
+# "$Id: mime.types 5402 2006-04-14 19:21:03Z mike $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -147,7 +147,9 @@ text/css			css
 
 application/vnd.cups-command	string(0,'#CUPS-COMMAND')
 application/vnd.cups-form	string(0,"<CUPSFORM>")
+application/vnd.cups-pdf
 application/vnd.cups-postscript
+application/vnd.cups-ppd	ppd string(0,"*PPD-Adobe:")
 application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 				string(0,<1B>@) \
@@ -159,13 +161,11 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 #
 # Raw print file support...
 #
-# Uncomment the following type and the application/octet-stream
-# filter line in mime.convs to allow raw file printing without the
-# -oraw option.
+# Comment the following type to prevent raw file printing.
 #
 
-#application/octet-stream
+application/octet-stream
 
 #
-# End of "$Id: mime.types 5375 2006-04-06 20:10:55Z mike $".
+# End of "$Id: mime.types 5402 2006-04-14 19:21:03Z mike $".
 #

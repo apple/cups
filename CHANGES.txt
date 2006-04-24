@@ -1,7 +1,70 @@
-CHANGES.txt - 2006-04-07
+CHANGES.txt - 2006-04-24
 ------------------------
 
-CHANGES IN CUPS V1.2
+CHANGES IN CUPS V1.2rc3
+
+	- The cups-lpd program always did reverse lookups on the
+	  client address, which could be a performance problem.
+	  Added a "-n" option to disable lookups.
+	- When configured with SSL support, require encryption by
+	  default when displaying the /admin location (STR #1592)
+	- The next job ID was not computed correctly if the job
+	  cache file got out of sync with the spool directory
+	  (STR #1582)
+	- The PNG image handling code used deprecated functions
+	  from libpng (STR #1587)
+	- Added a Polish translation (STR #1584, STR #1586)
+	- More changes to the scheduler to improve battery life
+	  on portable devices (STR #1583)
+	- Changed the default log level for status messages back
+	  to "DEBUG" to be consistent with CUPS 1.1.x (STR #1579)
+	- The error string was not set properly when
+	  cupsDoFileRequest() was given the name of a directory
+	  (STR #1578)
+	- Fixed handling of job-hold-until (STR #1581)
+	- Added explicit notes to the cupsaddsmb man page
+	  explaining that the driver filenames are case-sensitive
+	  under UNIX and that they must be all lowercase (Windows
+	  2000) or all UPPERCASE (Windows 95/98/Me) to work (STR
+	  #1568)
+	- The USB backend incorrectly split the manufacturer name
+	  if it contained spaces (STR #1566)
+	- The scheduler would hang when listing PPD files for a
+	  manufacturer whose name contained spaces (STR #1567)
+	- Added the SNMP backend for network printer discovery
+	  (STR #1555)
+	- cupstestppd now fails PPD files with 1284DeviceId
+	  instead of 1284DeviceID, and cups-driverd uses a
+	  case-insensitive comparison when looking for it (STR
+	  #1573)
+	- cupsDoFileRequest() and cupsDoRequest() now work
+	  properly with non-blocking HTTP connections.
+	- Added Swedish translation (STR #1569)
+	- "make install" now installs the MIME files with world
+	  read permissions (STR #1565)
+	- More CDSA encryption support fixes (STR #1563)
+	- Updated the default mime.types file to support printing
+	  of files that do not have a locally-recognized MIME
+	  media type to raw or System V queues.
+	- Updated the serial port detection code on Linux (STR
+	  #1562)
+	- Added some more error checking to httpGetHostname()
+	  (STR #1561)
+	- The title of some administration pages was not
+	  localized (STR #1548)
+	- The edit-config.tmpl file was not generated or
+	  installed for the Spanish or Japanese localizations
+	  (STR #1547)
+	- The mimeDelete() function freed the types before the
+	  filters, but the filters needed the type data (STR #1558)
+	- The scheduler didn't keep track of the status pipes
+	  properly, leading to a bad select() for multi-file jobs
+	  (STR #1559)
+	- The cupstestdsc program didn't validate the ordinal
+	  page number value for %%Page: comments.
+
+
+CHANGES IN CUPS V1.2rc2
 
 	- The scheduler was not always using the string pool,
 	  causing random crashes.
@@ -99,7 +162,7 @@ CHANGES IN CUPS V1.2rc1
 	  #1488)
 	- ppdOpen2() now converts the NickName and all UI text to
 	  UTF-8 (STR #1475)
-	- The Set Allows Users web page did not work (STR #1486)
+	- The Set Allowed Users web page did not work (STR #1486)
 	- When the default policy was not set or set to a non-
 	  existing policy, the scheduler did not set the default
 	  policy name to "default" (STR #1484)

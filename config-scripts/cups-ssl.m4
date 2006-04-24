@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-ssl.m4 5264 2006-03-10 01:10:36Z mike $"
+dnl "$Id: cups-ssl.m4 5457 2006-04-24 15:36:12Z mike $"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -36,6 +36,7 @@ AC_ARG_WITH(openssl-includes, [  --with-openssl-includes set directory for OpenS
 
 SSLFLAGS=""
 SSLLIBS=""
+ENCRYPTION_REQUIRED=""
 
 if test x$enable_ssl != xno; then
     dnl Look for CDSA...
@@ -43,6 +44,10 @@ if test x$enable_ssl != xno; then
 	if test $uname = Darwin; then
 	    AC_CHECK_HEADER(Security/SecureTransport.h,
 		[SSLLIBS="-framework CoreFoundation -framework Security"
+		 # MacOS X doesn't (yet) come with pre-installed encryption
+		 # certificates for CUPS, so don't enable encryption on
+		 # /admin just yet...
+		 #ENCRYPTION_REQUIRED="  Encryption Required"
 		 AC_DEFINE(HAVE_SSL)
 		 AC_DEFINE(HAVE_CDSASSL)])
 	fi
@@ -57,6 +62,7 @@ if test x$enable_ssl != xno; then
 
 	    AC_CHECK_LIB(gnutls, gnutls_x509_crt_set_dn_by_oid,
 		[SSLLIBS="-lgnutls"
+		 ENCRYPTION_REQUIRED="  Encryption Required"
 		 AC_DEFINE(HAVE_SSL)
 		 AC_DEFINE(HAVE_GNUTLS)])
 
@@ -84,6 +90,7 @@ if test x$enable_ssl != xno; then
 		AC_CHECK_LIB(ssl,SSL_new,
 		    [SSLFLAGS="-DOPENSSL_DISABLE_OLD_DES_SUPPORT"
 		     SSLLIBS="-lssl $libcrypto"
+		     ENCRYPTION_REQUIRED="  Encryption Required"
 		     AC_DEFINE(HAVE_SSL)
 		     AC_DEFINE(HAVE_LIBSSL)],,
 		    $libcrypto)
@@ -99,11 +106,12 @@ fi
 
 AC_SUBST(SSLFLAGS)
 AC_SUBST(SSLLIBS)
+AC_SUBST(ENCRYPTION_REQUIRED)
 
 EXPORT_SSLLIBS="$SSLLIBS"
 AC_SUBST(EXPORT_SSLLIBS)
 
 
 dnl
-dnl End of "$Id: cups-ssl.m4 5264 2006-03-10 01:10:36Z mike $".
+dnl End of "$Id: cups-ssl.m4 5457 2006-04-24 15:36:12Z mike $".
 dnl

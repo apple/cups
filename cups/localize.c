@@ -1,5 +1,5 @@
 /*
- * "$Id: localize.c 4937 2006-01-17 04:03:22Z mike $"
+ * "$Id: localize.c 5391 2006-04-14 12:26:50Z mike $"
  *
  *   PPD custom option routines for the Common UNIX Printing System (CUPS).
  *
@@ -56,6 +56,8 @@ static const char	*ppd_text(ppd_file_t *ppd, const char *keyword,
 
 /*
  * 'ppdLocalize()' - Localize the PPD file to the current locale.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -183,5 +185,5 @@ ppd_text(ppd_file_t *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: localize.c 4937 2006-01-17 04:03:22Z mike $".
+ * End of "$Id: localize.c 5391 2006-04-14 12:26:50Z mike $".
  */

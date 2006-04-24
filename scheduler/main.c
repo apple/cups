@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 5383 2006-04-07 15:36:10Z mike $"
+ * "$Id: main.c 5448 2006-04-22 03:57:26Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -993,11 +993,12 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
    /*
-    * Update the root certificate once every 5 minutes...
+    * Update the root certificate once every 5 minutes if we have client
+    * connections...
     */
 
     if ((current_time - RootCertTime) >= RootCertDuration && RootCertDuration &&
-        !RunUser)
+        !RunUser && cupsArrayCount(Clients))
     {
      /*
       * Update the root certificate...
@@ -2246,5 +2247,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 5383 2006-04-07 15:36:10Z mike $".
+ * End of "$Id: main.c 5448 2006-04-22 03:57:26Z mike $".
  */

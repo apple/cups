@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c 5241 2006-03-07 22:07:44Z mike $"
+ * "$Id: parallel.c 5387 2006-04-10 02:51:12Z mike $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -466,8 +466,6 @@ list_devices(void)
     strcpy(basedevice, "/dev/parallel/");
   else if (!access("/dev/printers/", 0))
     strcpy(basedevice, "/dev/printers/");
-  else if (!access("/dev/par0", 0))
-    strcpy(basedevice, "/dev/par");
   else
     strcpy(basedevice, "/dev/lp");
 
@@ -737,5 +735,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c 5241 2006-03-07 22:07:44Z mike $".
+ * End of "$Id: parallel.c 5387 2006-04-10 02:51:12Z mike $".
  */

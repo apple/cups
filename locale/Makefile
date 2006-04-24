@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5335 2006-03-24 02:56:20Z mike $"
+# "$Id: Makefile 5449 2006-04-22 04:05:45Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -54,8 +54,10 @@ depend:
 install:	all
 	$(INSTALL_DIR) -m 755 $(LOCALEDIR)
 	for loc in $(LANGUAGES) ; do \
-		$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
-		$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
+		if test -f cups_$$loc.po; then \
+			$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
+			$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
+		fi ; \
 	done
 
 
@@ -108,5 +110,5 @@ translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
 
 
 #
-# End of "$Id: Makefile 5335 2006-03-24 02:56:20Z mike $".
+# End of "$Id: Makefile 5449 2006-04-22 04:05:45Z mike $".
 #

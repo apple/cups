@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5317 2006-03-21 02:35:37Z mike $"
+# "$Id: Makefile 5428 2006-04-18 20:45:30Z mike $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -42,6 +42,7 @@ MAN1	=	cancel.$(MAN1EXT) \
 		lpstat.$(MAN1EXT)
 MAN5	=	classes.conf.$(MAN5EXT) \
 		client.conf.$(MAN5EXT) \
+		cups-snmp.conf.$(MAN5EXT) \
 		cupsd.conf.$(MAN5EXT) \
 		mime.convs.$(MAN5EXT) \
 		mime.types.$(MAN5EXT) \
@@ -181,5 +182,5 @@ mantohtml:	mantohtml.o
 
 
 #
-# End of "$Id: Makefile 5317 2006-03-21 02:35:37Z mike $".
+# End of "$Id: Makefile 5428 2006-04-18 20:45:30Z mike $".
 #

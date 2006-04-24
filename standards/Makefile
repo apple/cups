@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makefile 5409 2006-04-15 11:45:38Z mike $"
 #
 #   Standards makefile for the Common UNIX Printing System (CUPS).
 #
@@ -113,9 +113,9 @@ uninstall:
 
 rfctohtml:	rfctohtml.o ../cups/libcups.a
 	$(CC) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ)
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
-# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
+# End of "$Id: Makefile 5409 2006-04-15 11:45:38Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1284.c 5198 2006-02-27 21:58:43Z mike $"
+ * "$Id: ieee1284.c 5440 2006-04-19 21:36:43Z mike $"
  *
  *   IEEE-1284 support functions for the Common UNIX Printing System (CUPS).
  *
@@ -25,8 +25,9 @@
  *
  * Contents:
  *
- *   get_device_id() - Get the IEEE-1284 device ID string and corresponding
- *                     URI.
+ *   get_device_id()  - Get the IEEE-1284 device ID string and corresponding
+ *                      URI.
+ *   get_make_model() - Get the make and model string from the device ID.
  */
 
 /*
@@ -34,27 +35,38 @@
  */
 
 #include <cups/debug.h>
-#ifdef __linux
-#  include <sys/ioctl.h>
-#  include <linux/lp.h>
-#  define IOCNR_GET_DEVICE_ID		1
-#  define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
-#endif /* __linux */
 
-#ifdef __sun
-#  ifdef __sparc
-#    include <sys/ecppio.h>
-#  else
-#    include <sys/ioccom.h>
-#    include <sys/ecppsys.h>
-#  endif /* __sparc */
-#endif /* __sun */
+
+/*
+ * Prototypes...
+ */
+
+static int	get_make_model(const char *device_id, char *make_model,
+		               int make_model_size);
 
 
 /*
  * 'get_device_id()' - Get the IEEE-1284 device ID string and
  *                     corresponding URI.
  */
+
+#ifndef SNMP_BACKEND
+#  ifdef __linux
+#    include <sys/ioctl.h>
+#    include <linux/lp.h>
+#    define IOCNR_GET_DEVICE_ID		1
+#    define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
+#  endif /* __linux */
+
+#  ifdef __sun
+#    ifdef __sparc
+#      include <sys/ecppio.h>
+#    else
+#      include <sys/ioccom.h>
+#      include <sys/ecppsys.h>
+#    endif /* __sparc */
+#  endif /* __sun */
+
 
 int					/* O - 0 on success, -1 on failure */
 get_device_id(
@@ -70,15 +82,16 @@ get_device_id(
   char	*attr,				/* 1284 attribute */
   	*delim,				/* 1284 delimiter */
 	*uriptr,			/* Pointer into URI */
-	*mfg,				/* Manufacturer string */
-	*mdl,				/* Model string */
+	manufacturer[256],		/* Manufacturer string */
 	serial_number[1024];		/* Serial number string */
+  int	manulen;			/* Length of manufacturer string */
 #ifdef __linux
   int	length;				/* Length of device ID info */
 #endif /* __linux */
 #if defined(__sun) && defined(ECPPIOC_GETDEVID)
   struct ecpp_device_id did;		/* Device ID buffer */
 #endif /* __sun && ECPPIOC_GETDEVID */
+
 
   DEBUG_printf(("get_device_id(fd=%d, device_id=%p, device_id_size=%d, "
                 "make_model=%p, make_model_size=%d, scheme=\"%s\", "
@@ -175,6 +188,157 @@ get_device_id(
     return (-1);
 
  /*
+  * Get the make and model...
+  */
+
+  get_make_model(device_id, make_model, make_model_size);
+
+ /*
+  * Then generate a device URI...
+  */
+
+  if (scheme && uri && uri_size > 32)
+  {
+   /*
+    * Look for the serial number field...
+    */
+
+    if ((attr = strstr(device_id, "SERN:")) != NULL)
+      attr += 5;
+    else if ((attr = strstr(device_id, "SERIALNUMBER:")) != NULL)
+      attr += 13;
+    else if ((attr = strstr(device_id, ";SN:")) != NULL)
+      attr += 4;
+
+    if (attr)
+    {
+      strlcpy(serial_number, attr, sizeof(serial_number));
+
+      if ((delim = strchr(serial_number, ';')) != NULL)
+	*delim = '\0';
+    }
+    else
+      serial_number[0] = '\0';
+
+   /*
+    * Generate the device URI from the manufacturer, make_model, and
+    * serial number strings.
+    */
+
+    snprintf(uri, uri_size, "%s://", scheme);
+
+    if ((attr = strstr(device_id, "MANUFACTURER:")) != NULL)
+      attr += 13;
+    else if ((attr = strstr(device_id, "Manufacturer:")) != NULL)
+      attr += 13;
+    else if ((attr = strstr(device_id, "MFG:")) != NULL)
+      attr += 4;
+
+    if (attr)
+    {
+      strlcpy(manufacturer, attr, sizeof(manufacturer));
+
+      if ((delim = strchr(manufacturer, ';')) != NULL)
+        *delim = '\0';
+
+      if (!strcasecmp(manufacturer, "Hewlett-Packard"))
+        strcpy(manufacturer, "HP");
+    }
+    else
+    {
+      strlcpy(manufacturer, make_model, sizeof(manufacturer));
+
+      if ((delim = strchr(manufacturer, ' ')) != NULL)
+        *delim = '\0';
+    }
+
+    manulen = strlen(manufacturer);
+
+    for (uriptr = uri + strlen(uri), delim = manufacturer;
+	 *delim && uriptr < (uri + uri_size - 3);
+	 delim ++)
+      if (*delim == ' ')
+      {
+	*uriptr++ = '%';
+	*uriptr++ = '2';
+	*uriptr++ = '0';
+      }
+      else
+	*uriptr++ = *delim;
+
+    *uriptr++ = '/';
+
+    if (!strncasecmp(make_model, manufacturer, manulen))
+    {
+      delim = make_model + manulen;
+
+      while (isspace(*delim & 255))
+        delim ++;
+    }
+    else
+      delim = make_model;
+
+    for (; *delim && uriptr < (uri + uri_size - 3); delim ++)
+      if (*delim == ' ')
+      {
+	*uriptr++ = '%';
+	*uriptr++ = '2';
+	*uriptr++ = '0';
+      }
+      else
+	*uriptr++ = *delim;
+
+    if (serial_number[0])
+    {
+     /*
+      * Add the serial number to the URI...
+      */
+
+      strlcpy(uriptr, "?serial=", uri_size - (uriptr - uri));
+      strlcat(uriptr, serial_number, uri_size - (uriptr - uri));
+    }
+    else
+      *uriptr = '\0';
+  }
+
+  return (0);
+}
+#endif /* !SNMP_BACKEND */
+
+
+/*
+ * 'get_make_model()' - Get the make and model string from the device ID.
+ */
+
+int					/* O - 0 on success, -1 on failure */
+get_make_model(
+    const char *device_id,		/* O - 1284 device ID */
+    char       *make_model,		/* O - Make/model */
+    int        make_model_size)		/* I - Size of buffer */
+{
+  char	*attr,				/* 1284 attribute */
+  	*delim,				/* 1284 delimiter */
+	*mfg,				/* Manufacturer string */
+	*mdl;				/* Model string */
+
+
+  DEBUG_printf(("get_make_model(device_id=\"%s\", "
+                "make_model=%p, make_model_size=%d)\n", device_id,
+		make_model, make_model_size));
+
+ /*
+  * Range check input...
+  */
+
+  if (!device_id || !*device_id || !make_model || make_model_size < 32)
+  {
+    DEBUG_puts("get_make_model: Bad args!");
+    return (-1);
+  }
+
+  *make_model = '\0';
+
+ /*
   * Look for the description field...
   */
 
@@ -224,15 +388,62 @@ get_device_id(
 
   if ((mfg = strstr(device_id, "MANUFACTURER:")) != NULL)
     mfg += 13;
+  else if ((mfg = strstr(device_id, "Manufacturer:")) != NULL)
+    mfg += 13;
   else if ((mfg = strstr(device_id, "MFG:")) != NULL)
     mfg += 4;
 
   if ((mdl = strstr(device_id, "MODEL:")) != NULL)
     mdl += 6;
+  else if ((mdl = strstr(device_id, "Model:")) != NULL)
+    mdl += 6;
   else if ((mdl = strstr(device_id, "MDL:")) != NULL)
     mdl += 4;
 
-  if (attr)
+  if (mdl)
+  {
+   /*
+    * Build a make-model string from the manufacturer and model attributes...
+    */
+
+    if (mfg)
+    {
+      if (!strncasecmp(mfg, "Hewlett-Packard", 15))
+	strlcpy(make_model, "HP", make_model_size);
+      else
+	strlcpy(make_model, mfg, make_model_size);
+
+      if ((delim = strchr(make_model, ';')) != NULL)
+	*delim = '\0';
+
+      if (!strncasecmp(make_model, mdl, strlen(make_model)))
+      {
+       /*
+	* Just copy model string, since it has the manufacturer...
+	*/
+
+	strlcpy(make_model, mdl, make_model_size);
+      }
+      else
+      {
+       /*
+	* Concatenate the make and model...
+	*/
+
+	strlcat(make_model, " ", make_model_size);
+	strlcat(make_model, mdl, make_model_size);
+      }
+    }
+    else
+    {
+     /*
+      * Just copy model string, since it has the manufacturer...
+      */
+
+      strlcpy(make_model, mdl, make_model_size);
+    }
+  }
+  else if (attr)
   {
    /*
     * Use description...
@@ -257,38 +468,6 @@ get_device_id(
       strlcpy(make_model, attr, make_model_size);
     }
   }
-  else if (mfg && mdl)
-  {
-   /*
-    * Build a make-model string from the manufacturer and model attributes...
-    */
-
-    if (!strncasecmp(mfg, "Hewlett-Packard", 15))
-      strlcpy(make_model, "HP", make_model_size);
-    else
-      strlcpy(make_model, mfg, make_model_size);
-
-    if ((delim = strchr(make_model, ';')) != NULL)
-      *delim = '\0';
-
-    if (!strncasecmp(make_model, mdl, strlen(make_model)))
-    {
-     /*
-      * Just copy model string, since it has the manufacturer...
-      */
-
-      strlcpy(make_model, mdl, make_model_size);
-    }
-    else
-    {
-     /*
-      * Concatenate the make and model...
-      */
-
-      strlcat(make_model, " ", make_model_size);
-      strlcat(make_model, mdl, make_model_size);
-    }
-  }
   else
   {
    /*
@@ -298,76 +477,34 @@ get_device_id(
     strlcpy(make_model, "Unknown", make_model_size);
   }
 
+ /*
+  * Strip trailing data...
+  */
+
   if ((delim = strchr(make_model, ';')) != NULL)
     *delim = '\0';
 
-  if (scheme && uri && uri_size > 32)
-  {
-   /*
-    * Look for the serial number field...
-    */
+ /*
+  * Strip trailing whitespace...
+  */
 
-    if ((attr = strstr(device_id, "SERN:")) != NULL)
-      attr += 5;
-    else if ((attr = strstr(device_id, "SERIALNUMBER:")) != NULL)
-      attr += 13;
-    else if ((attr = strstr(device_id, ";SN:")) != NULL)
-      attr += 4;
-
-    if (attr)
-    {
-      strlcpy(serial_number, attr, sizeof(serial_number));
-
-      if ((delim = strchr(serial_number, ';')) != NULL)
-	*delim = '\0';
-    }
+  for (delim = make_model + strlen(make_model) - 1; delim >= make_model; delim --)
+    if (isspace(*delim & 255))
+      *delim = '\0';
     else
-      serial_number[0] = '\0';
+      break;
 
-   /*
-    * Generate the device URI from the make_model and serial number strings.
-    */
+ /*
+  * Return...
+  */
 
-    snprintf(uri, uri_size, "%s://", scheme);
-    for (uriptr = uri + strlen(uri), delim = make_model;
-	 *delim && uriptr < (uri + uri_size - 1);
-	 delim ++)
-      if (*delim == ' ')
-      {
-	delim ++;
-	*uriptr++ = '/';
-	break;
-      }
-      else
-	*uriptr++ = *delim;
-
-    for (; *delim && uriptr < (uri + uri_size - 3); delim ++)
-      if (*delim == ' ')
-      {
-	*uriptr++ = '%';
-	*uriptr++ = '2';
-	*uriptr++ = '0';
-      }
-      else
-	*uriptr++ = *delim;
-
-    *uriptr = '\0';
-
-    if (serial_number[0])
-    {
-     /*
-      * Add the serial number to the URI...
-      */
-
-      strlcat(uri, "?serial=", uri_size);
-      strlcat(uri, serial_number, uri_size);
-    }
-  }
-
-  return (0);
+  if (make_model[0])
+    return (0);
+  else
+    return (-1);
 }
 
 
 /*
- * End of "$Id: ieee1284.c 5198 2006-02-27 21:58:43Z mike $".
+ * End of "$Id: ieee1284.c 5440 2006-04-19 21:36:43Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: request.c 5362 2006-03-31 15:26:12Z mike $"
+ * "$Id: request.c 5447 2006-04-21 20:07:51Z mike $"
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
@@ -118,7 +118,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
       ippDelete(request);
 
-      _cupsSetError(IPP_NOT_POSSIBLE, NULL);
+      _cupsSetError(IPP_NOT_POSSIBLE, strerror(EISDIR));
 
       return (NULL);
     }
@@ -278,10 +278,15 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     }
     else if (status == HTTP_ERROR)
     {
+      DEBUG_printf(("cupsDoFileRequest: http->error=%d (%s)\n", http->error,
+                    strerror(http->error)));
+
 #ifdef WIN32
-      if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH)
+      if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH &&
+          http->error != ETIMEDOUT)
 #else
-      if (http->error != ENETDOWN && http->error != ENETUNREACH)
+      if (http->error != ENETDOWN && http->error != ENETUNREACH &&
+          http->error != ETIMEDOUT)
 #endif /* WIN32 */
         continue;
       else
@@ -328,20 +333,21 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
       response = ippNew();
 
-      if (ippRead(http, response) == IPP_ERROR)
-      {
-       /*
-        * Delete the response...
-	*/
+      while ((state = ippRead(http, response)) != IPP_DATA)
+	if (state == IPP_ERROR)
+	{
+	 /*
+          * Delete the response...
+	  */
 
-        DEBUG_puts("IPP read error!");
-	ippDelete(response);
-	response = NULL;
+          DEBUG_puts("IPP read error!");
+	  ippDelete(response);
+	  response = NULL;
 
-        _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
+          _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
 
-	break;
-      }
+	  break;
+	}
     }
   }
 
@@ -463,5 +469,5 @@ _cupsSetError(ipp_status_t status,	/* I - IPP status code */
 
 
 /*
- * End of "$Id: request.c 5362 2006-03-31 15:26:12Z mike $".
+ * End of "$Id: request.c 5447 2006-04-21 20:07:51Z mike $".
  */

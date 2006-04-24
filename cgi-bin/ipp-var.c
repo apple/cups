@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c 5235 2006-03-06 13:02:23Z mike $"
+ * "$Id: ipp-var.c 5425 2006-04-18 19:59:05Z mike $"
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -1035,9 +1035,9 @@ cgiSetIPPVars(ipp_t      *response,	/* I - Response data to be copied... */
     attr = cgiSetIPPObjectVars(attr, prefix, element);
   }
 
-  fprintf(stderr, "DEBUG2: Returing %d from cgiSetIPPVars()...\n", element + 1);
+  fprintf(stderr, "DEBUG2: Returing %d from cgiSetIPPVars()...\n", element);
 
-  return (element + 1);
+  return (element);
 }
 
 
@@ -1277,5 +1277,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 5235 2006-03-06 13:02:23Z mike $".
+ * End of "$Id: ipp-var.c 5425 2006-04-18 19:59:05Z mike $".
  */

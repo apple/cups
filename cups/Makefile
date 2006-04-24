@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5354 2006-03-29 20:55:15Z mike $"
+# "$Id: Makefile 5428 2006-04-18 20:45:30Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -43,6 +43,7 @@ LIBOBJS	=	\
 		emit.o \
 		encode.o \
 		file.o \
+		getifaddrs.o \
 		getputfile.o \
 		globals.o \
 		http.o \
@@ -421,7 +422,7 @@ apihelp:
 		file.h file.c dir.h dir.c >../doc/help/api-filedir.html
 	mxmldoc --section "Programming" --title "PPD API" \
 		--intro api-ppd.shtml \
-		ppd.h attr.c emit.c mark.c page.c \
+		ppd.h attr.c custom.c emit.c localize.c mark.c page.c \
 		ppd.c >../doc/help/api-ppd.html
 	mxmldoc --section "Programming" --title "HTTP and IPP APIs" \
 		--intro api-httpipp.shtml \
@@ -441,5 +442,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5354 2006-03-29 20:55:15Z mike $".
+# End of "$Id: Makefile 5428 2006-04-18 20:45:30Z mike $".
 #

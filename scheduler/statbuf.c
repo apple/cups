@@ -1,5 +1,5 @@
 /*
- * "$Id: statbuf.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: statbuf.c 5447 2006-04-21 20:07:51Z mike $"
  *
  *   Status buffer routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -277,7 +277,7 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
   }
   else
   {
-    *loglevel = CUPSD_LOG_ERROR;
+    *loglevel = CUPSD_LOG_DEBUG;
     message   = sb->buffer;
   }
 
@@ -330,5 +330,5 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
 
 
 /*
- * End of "$Id: statbuf.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: statbuf.c 5447 2006-04-21 20:07:51Z mike $".
  */

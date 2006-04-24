@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c 5057 2006-02-02 20:38:29Z mike $"
+ * "$Id: mime.c 5394 2006-04-14 18:20:04Z mike $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -97,15 +97,6 @@ mimeDelete(mime_t *mime)		/* I - MIME database */
     return;
 
  /*
-  * Loop through the file types and delete any rules...
-  */
-
-  for (type = (mime_type_t *)cupsArrayFirst(mime->types);
-       type;
-       type = (mime_type_t *)cupsArrayNext(mime->types))
-    mimeDeleteType(mime, type);
-
- /*
   * Loop through filters and free them...
   */
 
@@ -113,6 +104,15 @@ mimeDelete(mime_t *mime)		/* I - MIME database */
        filter;
        filter = (mime_filter_t *)cupsArrayNext(mime->filters))
     mimeDeleteFilter(mime, filter);
+
+ /*
+  * Loop through the file types and delete any rules...
+  */
+
+  for (type = (mime_type_t *)cupsArrayFirst(mime->types);
+       type;
+       type = (mime_type_t *)cupsArrayNext(mime->types))
+    mimeDeleteType(mime, type);
 
  /*
   * Free the types and filters arrays, and then the MIME database structure.
@@ -711,5 +711,5 @@ load_types(mime_t     *mime,		/* I - MIME database */
 
 
 /*
- * End of "$Id: mime.c 5057 2006-02-02 20:38:29Z mike $".
+ * End of "$Id: mime.c 5394 2006-04-14 18:20:04Z mike $".
  */

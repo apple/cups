@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 5364 2006-04-01 01:32:50Z mike $"
+# "$Id: cups.spec.in 5449 2006-04-22 04:05:45Z mike $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -86,6 +86,16 @@ Summary: Common UNIX Printing System - Japanese support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
+%package pl
+Summary: Common UNIX Printing System - Polish support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
+%package sv
+Summary: Common UNIX Printing System - Swedish support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %if %{?_with_php:1}%{!?_with_php:0}
 %package php
 Summary: Common UNIX Printing System - PHP support
@@ -119,6 +129,14 @@ UNIX® operating systems. This package provides Spanish support.
 %description ja
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Japanese support.
+
+%description pl
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Polish support.
+
+%description sv
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Swedish support.
 
 %if %{?_with_php:1}%{!?_with_php:0}
 %description php
@@ -230,6 +248,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/backend/parallel
 /usr/lib/cups/backend/scsi
 /usr/lib/cups/backend/serial
+/usr/lib/cups/backend/snmp
 /usr/lib/cups/backend/socket
 /usr/lib/cups/backend/usb
 %dir /usr/lib/cups/cgi-bin
@@ -372,6 +391,26 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/templates/ja/*
 /usr/share/locale/ja/cups_ja.po
 
+%files pl
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/pl
+/usr/share/doc/cups/pl/index.html
+%dir /usr/share/doc/cups/pl/images
+/usr/share/doc/cups/pl/images/*
+%dir /usr/share/cups/templates/pl
+/usr/share/cups/templates/pl/*
+#/usr/share/locale/pl/cups_pl.po
+
+%files sv
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/sv
+/usr/share/doc/cups/sv/index.html
+%dir /usr/share/doc/cups/sv/images
+/usr/share/doc/cups/sv/images/*
+%dir /usr/share/cups/templates/sv
+/usr/share/cups/templates/sv/*
+/usr/share/locale/sv/cups_sv.po
+
 %if %{?_with_php:1}%{!?_with_php:0}
 %files php
 # PHP
@@ -380,5 +419,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 5364 2006-04-01 01:32:50Z mike $".
+# End of "$Id: cups.spec.in 5449 2006-04-22 04:05:45Z mike $".
 #

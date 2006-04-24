@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: http.c 5416 2006-04-17 21:24:17Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -867,7 +867,11 @@ httpGets(char   *line,			/* I - Line to read into */
       */
 
       if (!http->blocking && !http_wait(http, 1000))
+      {
+        DEBUG_puts("httpGets: Timed out!");
+        http->error = ETIMEDOUT;
         return (NULL);
+      }
 
 #ifdef HAVE_SSL
       if (http->tls)
@@ -2041,7 +2045,7 @@ http_read_ssl(http_t *http,		/* I - HTTP connection */
   size_t	processed;		/* Number of bytes processed */
 
 
-  error = SSLRead((SSLContextRef)http->tls, buf, len, &processed);
+  error = SSLRead(((http_tls_t *)http->tls)->session, buf, len, &processed);
 
   switch (error)
   {
@@ -2217,15 +2221,16 @@ static int				/* O - Status of connection */
 http_setup_ssl(http_t *http)		/* I - HTTP connection */
 {
 #  ifdef HAVE_LIBSSL
-  SSL_CTX	*context;	/* Context for encryption */
-  SSL		*conn;		/* Connection for encryption */
+  SSL_CTX	*context;		/* Context for encryption */
+  SSL		*conn;			/* Connection for encryption */
 #  elif defined(HAVE_GNUTLS)
-  http_tls_t	*conn;		/* TLS session object */
+  http_tls_t	*conn;			/* TLS session object */
   gnutls_certificate_client_credentials *credentials;
-				/* TLS credentials */
+					/* TLS credentials */
 #  elif defined(HAVE_CDSASSL)
-  SSLContextRef	conn;		/* Context for encryption */
-  OSStatus	error;		/* Error info */
+  OSStatus	error;			/* Error code */
+  http_tls_t	*conn;			/* CDSA connection information */
+  cdsa_conn_ref_t u;			/* Connection reference union */
 #  endif /* HAVE_LIBSSL */
 
 
@@ -2262,9 +2267,7 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   }
 
 #  elif defined(HAVE_GNUTLS)
-  conn = (http_tls_t *)malloc(sizeof(http_tls_t));
-
-  if (conn == NULL)
+  if ((conn = (http_tls_t *)malloc(sizeof(http_tls_t))) == NULL)
   {
     http->error  = errno;
     http->status = HTTP_ERROR;
@@ -2303,45 +2306,51 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   conn->credentials = credentials;
 
 #  elif defined(HAVE_CDSASSL)
-  cdsa_conn_ref_t  u;			/* Connection reference union */
+  conn = (http_tls_t *)calloc(1, sizeof(http_tls_t));
 
+  if (conn == NULL)
+    return (-1);
 
-  error = SSLNewContext(false, &conn);
-
-  if (!error)
-    error = SSLSetIOFuncs(conn, _httpReadCDSA, _httpWriteCDSA);
-
-  if (!error)
-  {
-   /*
-    * Use a union to resolve warnings about int/pointer size mismatches...
-    */
-
-    u.connection = NULL;
-    u.sock       = http->fd;
-    error        = SSLSetConnection(conn, u.connection);
-  }
-
-  if (!error)
-    error = SSLSetAllowsExpiredCerts(conn, true);
-
-  if (!error)
-    error = SSLSetAllowsAnyRoot(conn, true);
-
-  if (!error)
-  {
-    while ((error = SSLHandshake(conn)) == errSSLWouldBlock)
-      usleep(1000);
-  }
-
-  if (error != 0)
+  if ((error = SSLNewContext(false, &conn->session)))
   {
     http->error  = error;
     http->status = HTTP_ERROR;
 
-    SSLDisposeContext(conn);
+    free(conn);
+    return (-1);
+  }
 
-    close(http->fd);
+ /*
+  * Use a union to resolve warnings about int/pointer size mismatches...
+  */
+
+  u.connection = NULL;
+  u.sock       = http->fd;
+  error        = SSLSetConnection(conn->session, u.connection);
+
+  if (!error)
+    error = SSLSetIOFuncs(conn->session, _httpReadCDSA, _httpWriteCDSA);
+
+  if (!error)
+    error = SSLSetAllowsExpiredCerts(conn->session, true);
+
+  if (!error)
+    error = SSLSetAllowsAnyRoot(conn->session, true);
+
+  if (!error)
+  {
+    while ((error = SSLHandshake(conn->session)) == errSSLWouldBlock)
+      usleep(1000);
+  }
+
+  if (error)
+  {
+    http->error  = error;
+    http->status = HTTP_ERROR;
+
+    SSLDisposeContext(conn->session);
+
+    free(conn);
 
     return (-1);
   }
@@ -2359,11 +2368,11 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
  */
 
 static void
-http_shutdown_ssl(http_t *http)	/* I - HTTP connection */
+http_shutdown_ssl(http_t *http)		/* I - HTTP connection */
 {
 #  ifdef HAVE_LIBSSL
-  SSL_CTX	*context;	/* Context for encryption */
-  SSL		*conn;		/* Connection for encryption */
+  SSL_CTX	*context;		/* Context for encryption */
+  SSL		*conn;			/* Connection for encryption */
 
 
   conn    = (SSL *)(http->tls);
@@ -2374,9 +2383,9 @@ http_shutdown_ssl(http_t *http)	/* I - HTTP connection */
   SSL_free(conn);
 
 #  elif defined(HAVE_GNUTLS)
-  http_tls_t      *conn;	/* Encryption session */
+  http_tls_t      *conn;		/* Encryption session */
   gnutls_certificate_client_credentials *credentials;
-				/* TLS credentials */
+					/* TLS credentials */
 
 
   conn = (http_tls_t *)(http->tls);
@@ -2389,10 +2398,20 @@ http_shutdown_ssl(http_t *http)	/* I - HTTP connection */
   free(conn);
 
 #  elif defined(HAVE_CDSASSL)
-  while (SSLClose((SSLContextRef)http->tls) == errSSLWouldBlock)
+  http_tls_t      *conn;		/* CDSA connection information */
+
+
+  conn = (http_tls_t *)(http->tls);
+
+  while (SSLClose(conn->session) == errSSLWouldBlock)
     usleep(1000);
 
-  SSLDisposeContext((SSLContextRef)http->tls);
+  SSLDisposeContext(conn->session);
+
+  if (conn->certsArray)
+    CFRelease(conn->certsArray);
+
+  free(conn);
 #  endif /* HAVE_LIBSSL */
 
   http->tls = NULL;
@@ -2405,11 +2424,11 @@ http_shutdown_ssl(http_t *http)	/* I - HTTP connection */
  * 'http_upgrade()' - Force upgrade to TLS encryption.
  */
 
-static int			/* O - Status of connection */
-http_upgrade(http_t *http)	/* I - HTTP connection */
+static int				/* O - Status of connection */
+http_upgrade(http_t *http)		/* I - HTTP connection */
 {
-  int		ret;		/* Return value */
-  http_t	myhttp;		/* Local copy of HTTP data */
+  int		ret;			/* Return value */
+  http_t	myhttp;			/* Local copy of HTTP data */
 
 
   DEBUG_printf(("http_upgrade(%p)\n", http));
@@ -2529,7 +2548,7 @@ http_wait(http_t *http,			/* I - HTTP connection */
 #  elif defined(HAVE_CDSASSL)
     size_t bytes;			/* Bytes that are available */
 
-    if (!SSLGetBufferedReadSize((SSLContextRef)http->tls, &bytes) && bytes > 0)
+    if (!SSLGetBufferedReadSize(((http_tls_t *)http->tls)->session, &bytes) && bytes > 0)
       return (1);
 #  endif /* HAVE_LIBSSL */
   }
@@ -2572,6 +2591,8 @@ http_wait(http_t *http,			/* I - HTTP connection */
   {
     FD_SET(http->fd, http->input_set);
 
+    DEBUG_printf(("http_wait: msec=%d, http->fd=%d\n", msec, http->fd));
+
     if (msec >= 0)
     {
       timeout.tv_sec  = msec / 1000;
@@ -2581,6 +2602,8 @@ http_wait(http_t *http,			/* I - HTTP connection */
     }
     else
       nfds = select(http->fd + 1, http->input_set, NULL, NULL, NULL);
+
+    DEBUG_printf(("http_wait: select() returned %d...\n", nfds));
   }
 #ifdef WIN32
   while (nfds < 0 && WSAGetLastError() == WSAEINTR);
@@ -2589,6 +2612,8 @@ http_wait(http_t *http,			/* I - HTTP connection */
 #endif /* WIN32 */
 
   FD_CLR(http->fd, http->input_set);
+
+  DEBUG_printf(("http_wait: returning with nfds=%d...\n", nfds));
 
   return (nfds > 0);
 }
@@ -2745,7 +2770,7 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
   size_t	processed;		/* Number of bytes processed */
 
 
-  error = SSLWrite((SSLContextRef)http->tls, buf, len, &processed);
+  error = SSLWrite(((http_tls_t *)http->tls)->session, buf, len, &processed);
 
   switch (error)
   {
@@ -2777,5 +2802,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: http.c 5416 2006-04-17 21:24:17Z mike $".
  */

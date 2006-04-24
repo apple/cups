@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-image.m4 5311 2006-03-19 13:21:42Z mike $"
+dnl "$Id: cups-image.m4 5451 2006-04-22 21:54:49Z mike $"
 dnl
 dnl   Image library/filter stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -78,7 +78,7 @@ AC_CHECK_LIB(m, pow)
 
 if test x$enable_png != xno; then
     AC_CHECK_HEADER(png.h,
-	AC_CHECK_LIB(png, png_set_tRNS_to_alpha,
+	AC_CHECK_LIB(png, png_create_read_struct,
 	    AC_DEFINE(HAVE_LIBPNG)
 	    LIBPNG="-lpng -lm"))
 else
@@ -110,5 +110,5 @@ AC_SUBST(EXPORT_LIBZ)
 AC_CHECK_HEADER(stdlib.h,AC_DEFINE(HAVE_STDLIB_H))
 
 dnl
-dnl End of "$Id: cups-image.m4 5311 2006-03-19 13:21:42Z mike $".
+dnl End of "$Id: cups-image.m4 5451 2006-04-22 21:54:49Z mike $".
 dnl
