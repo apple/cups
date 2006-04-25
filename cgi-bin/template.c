@@ -44,6 +44,7 @@
 static void	cgi_copy(FILE *out, FILE *in, int element, char term,
 		         int indent);
 static void	cgi_puts(const char *s, FILE *out);
+static void	cgi_puturi(const char *s, FILE *out);
 
 
 /*
@@ -235,6 +236,7 @@ cgi_copy(FILE *out,			/* I - Output file */
   char		outval[1024],		/* Formatted output string */
 		compare[1024];		/* Comparison string */
   int		result;			/* Result of comparison */
+  int		uriencode;		/* Encode as URI */
 
 
   fprintf(stderr, "DEBUG: %*sStarting at file position %ld...\n", indent, "",
@@ -253,9 +255,13 @@ cgi_copy(FILE *out,			/* I - Output file */
       * Get a variable name...
       */
 
+      uriencode = 0;
+
       for (s = name; (ch = getc(in)) != EOF;)
         if (strchr("}]<>=! \t\n", ch))
           break;
+	else if (s == name && ch == '%')
+	  uriencode = 1;
         else if (s > name && ch == '?')
 	  break;
 	else if (s < (name + sizeof(name) - 1))
@@ -399,7 +405,12 @@ cgi_copy(FILE *out,			/* I - Output file */
         */
 
 	if (out)
-	  cgi_puts(outptr, out);
+	{
+	  if (uriencode)
+	    cgi_puturi(outptr, out);
+	  else
+	    cgi_puts(outptr, out);
+        }
 
         continue;
       }
@@ -629,6 +640,26 @@ cgi_puts(const char *s,			/* I - String to output */
       fputs("&quot;", out);
     else if (*s == '&')
       fputs("&amp;", out);
+    else
+      putc(*s, out);
+
+    s ++;
+  }
+}
+
+
+/*
+ * 'cgi_puturi()' - Put a URI string to the output file, quoting as needed...
+ */
+
+static void
+cgi_puturi(const char *s,		/* I - String to output */
+           FILE       *out)		/* I - Output file */
+{
+  while (*s)
+  {
+    if (strchr("%&+ <>#=", *s) || *s & 128)
+      fprintf(out, "%%%02X", *s & 255);
     else
       putc(*s, out);
 
