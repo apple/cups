@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.2
 
 	- Printer names containing "+" were not quoted properly in
 	  the web interface (STR #1600)
+	- The SNMP backend now reports the make and model in the
+	  information string so that the auto-generated printer
+	  name is more useful than just an IP address.
 
 
 CHANGES IN CUPS V1.2rc3

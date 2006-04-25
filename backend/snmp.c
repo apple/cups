@@ -1433,8 +1433,9 @@ list_devices(void)
        cache;
        cache = (snmp_cache_t *)cupsArrayNext(Devices))
     if (cache->uri)
-      printf("network %s \"%s\" \"%s\" \"%s\"\n",
+      printf("network %s \"%s\" \"%s %s\" \"%s\"\n",
              cache->uri,
+	     cache->make_and_model ? cache->make_and_model : "Unknown",
 	     cache->make_and_model ? cache->make_and_model : "Unknown",
 	     cache->addrname, cache->id ? cache->id : "");
 }
