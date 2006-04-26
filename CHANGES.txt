@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-04-25
+CHANGES.txt - 2006-04-26
 ------------------------
 
 CHANGES IN CUPS V1.2
 
+	- The pdftops filter did not validate the length of the
+	  encryption key (STR #1608)
 	- Updated the Polish localization.
 	- "Encryption Required" in the cupsd.conf file now only
 	  requires encryption when the connection is not over the
