@@ -1621,6 +1621,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   */
 
   if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
+      strcasecmp(con->http.hostname, "localhost") &&
       best->satisfy == AUTH_SATISFY_ALL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
