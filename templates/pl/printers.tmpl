@@ -12,7 +12,7 @@
 <B>Położenie:</B> {printer_location}<BR>
 <B>Producent i Typ:</B> {printer_make_and_model}<BR>
 <B>Stan Drukarki:</B> {printer_state=3?bezczynna:{printer_state=4?drukuje:zatrzymana}},
-{printer_is_accepting_jobs=0?odrzuca wydruki:akceptuje wydruki}, {printer_is_shared=0?nie:}  upubliczniona.
+{printer_is_accepting_jobs=0?odrzuca wydruki:akceptuje wydruki}, {printer_is_shared=0?nie:} opublikowana.
 {?device_uri=?:<BR><B>URI Urządzenia:</B> {device_uri}}
 
 <P>
@@ -42,10 +42,10 @@
 <IMG SRC="/images/button-cancel-all-jobs.gif" ALT="Skasuj Wszystkie Wydruki" CLASS="button"></A>
 {printer_is_shared=0?
 <A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=1">
-<IMG SRC="/images/button-publish-printer.gif" ALT="Upublicznij Drukarkę" CLASS="button"></A>
+<IMG SRC="/images/button-publish-printer.gif" ALT="Publikuj Drukarkę" CLASS="button"></A>
 :
 <A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=0">
-<IMG SRC="/images/button-unpublish-printer.gif" ALT="Nie Upubliczniaj Drukarki" CLASS="button"></A>
+<IMG SRC="/images/button-unpublish-printer.gif" ALT="Nie Publikuj Drukarki" CLASS="button"></A>
 }
 <A HREF="{admin_uri}?op=modify-printer&amp;printer_name={%printer_name}">
 <IMG SRC="/images/button-modify-printer.gif" ALT="Modyfikuj Drukarkę" CLASS="button"></A>

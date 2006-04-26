@@ -3,6 +3,7 @@ CHANGES.txt - 2006-04-25
 
 CHANGES IN CUPS V1.2
 
+	- Updated the Polish localization.
 	- Printer names containing "+" were not quoted properly in
 	  the web interface (STR #1600)
 	- The SNMP backend now reports the make and model in the
