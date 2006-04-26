@@ -31,12 +31,13 @@
  * Include necessary headers...
  */
 
-#  include <config.h>
-
 #  include <stdio.h>
+#  include <stdlib.h>
 #  include <stdarg.h>
 #  include <ctype.h>
 #  include <locale.h>
+
+#  include <config.h>
 
 #  ifdef HAVE_STRING_H
 #    include <string.h>

@@ -31,7 +31,8 @@
  * Include necessary headers...
  */
 
-#  include "config.h"
+#  include <stdlib.h>
+#  include <config.h>
 
 #  ifdef __sun
 /*
@@ -165,9 +166,9 @@ struct ifaddrs				/**** Interface Structure ****/
   void			*ifa_data;	/* Interface statistics */
 };
 
-static int	_cups_getifaddrs(struct ifaddrs **addrs);
+extern int	_cups_getifaddrs(struct ifaddrs **addrs);
 #    define getifaddrs _cups_getifaddrs
-static void	_cups_freeifaddrs(struct ifaddrs *addrs);
+extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #    define freeifaddrs _cups_freeifaddrs
 #  endif /* HAVE_GETIFADDRS */
 

@@ -219,7 +219,7 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GROUP, "$CUPS_GROUP")
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SYSTEM_GROUPS, "$CUPS_SYSTEM_GROUPS")
 
 dnl Default printcap file...
-AC_ARG_WITH(printcap, [  --with-printcap     set default printcap file],
+AC_ARG_WITH(printcap, [  --with-printcap         set default printcap file],
 	default_printcap="$withval",
 	default_printcap="/etc/printcap")
 

@@ -40,7 +40,7 @@
  * '_cups_getifaddrs()' - Get a list of network interfaces on the system.
  */
 
-static int				/* O - 0 on success, -1 on error */
+int					/* O - 0 on success, -1 on error */
 _cups_getifaddrs(struct ifaddrs **addrs)/* O - List of interfaces */
 {
   int			sock;		/* Socket */
@@ -216,7 +216,7 @@ _cups_getifaddrs(struct ifaddrs **addrs)/* O - List of interfaces */
  * '_cups_freeifaddrs()' - Free an interface list...
  */
 
-static void
+void
 _cups_freeifaddrs(struct ifaddrs *addrs)/* I - Interface list to free */
 {
   struct ifaddrs	*next;		/* Next interface in list */

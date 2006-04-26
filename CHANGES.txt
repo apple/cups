@@ -3,6 +3,7 @@ CHANGES.txt - 2006-04-26
 
 CHANGES IN CUPS V1.2
 
+	- Fixed support for --enable-pie (STR #1609)
 	- The pdftops filter did not validate the length of the
 	  encryption key (STR #1608)
 	- Updated the Polish localization.

@@ -79,6 +79,9 @@ dnl Update compiler options...
 CXXLIBS=""
 AC_SUBST(CXXLIBS)
 
+PIEFLAGS=""
+AC_SUBST(PIEFLAGS)
+
 if test -n "$GCC"; then
 	if test -z "$OPTIM"; then
 		if test "x$with_optim" = x; then
@@ -96,8 +99,13 @@ if test -n "$GCC"; then
 	case $uname in
 		Linux*)
 			if test x$enable_pie = xyes; then
-				OPTIM="$OPTIM -fpie"
-				LDFLAGS="$LDFLAGS -pie"
+				PIEFLAGS="-pie -fpie"
+			fi
+			;;
+
+		*)
+			if test x$enable_pie = xyes; then
+				echo "Sorry, --enable-pie is not supported on this OS!"
 			fi
 			;;
 	esac
