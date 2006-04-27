@@ -3701,7 +3701,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   * Tell the CGI if we are using encryption...
   */
 
-  if (con->http.encryption == HTTP_ENCRYPT_ALWAYS)
+  if (con->http.tls)
     envp[envc ++] = "HTTPS=ON";
 
  /*
