@@ -27,7 +27,7 @@
 include ../Makedefs
 
 RBACKENDS =	ipp lpd
-UBACKENDS =	parallel scsi serial snmp socket usb
+UBACKENDS =	$(PAP) parallel scsi serial snmp socket usb
 TARGETS	=	betest test1284 $(RBACKENDS) $(UBACKENDS)
 OBJS	=	betest.o ipp.o lpd.o parallel.o scsi.o \
 		serial.o snmp.o socket.o test1284.o usb.o
@@ -134,6 +134,15 @@ ipp:	ipp.o ../cups/$(LIBCUPS)
 lpd:	lpd.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpd lpd.o $(LIBS)
+
+
+#
+# pap
+#
+
+pap:	pap.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o pap pap.o $(BACKLIBS) $(LIBS) -framework AppleTalk
 
 
 #

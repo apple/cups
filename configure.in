@@ -43,6 +43,7 @@ sinclude(config-scripts/cups-threads.m4)
 sinclude(config-scripts/cups-largefile.m4)
 sinclude(config-scripts/cups-launchd.m4)
 sinclude(config-scripts/cups-defaults.m4)
+sinclude(config-scripts/cups-pap.m4)
 sinclude(config-scripts/cups-pdf.m4)
 sinclude(config-scripts/cups-scripting.m4)
 
