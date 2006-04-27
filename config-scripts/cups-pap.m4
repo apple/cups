@@ -22,11 +22,11 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
-# Currently the PAP backend is only supported on MacOS X...
+# Currently the PAP backend is only supported on MacOS X with the AppleTalk
+# SDK installed...
+PAP=""
 if test $uname = Darwin; then
-	PAP="pap"
-else
-	PAP=""
+	AC_CHECK_HEADER(AppleTalk/at_proto.h, PAP="pap")
 fi
 
 AC_SUBST(PAP)
