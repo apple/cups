@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-04-27
+CHANGES.txt - 2006-04-30
 ------------------------
 
 CHANGES IN CUPS V1.2
 
+	- "Use Default Configuration" inserted a broken
+	  configuration file (STR #1624)
 	- Redirects in the web interface did not always preserve
 	  the encrypted status of a connection (STR #1603)
 	- Added the Apple "pap" backend.
