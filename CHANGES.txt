@@ -3,6 +3,11 @@ CHANGES.txt - 2006-04-30
 
 CHANGES IN CUPS V1.2
 
+	- Documentation updates (STR #1618, STR #1620, STR #1622,
+	  STR #1637)
+	- "make test" did not include the SNMP backend in the
+	  test environment (STR #1625)
+	- The EPM packaging files did not work (STR #1621)
 	- "Use Default Configuration" inserted a broken
 	  configuration file (STR #1624)
 	- Redirects in the web interface did not always preserve

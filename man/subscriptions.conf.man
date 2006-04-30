@@ -1,0 +1,98 @@
+.\"
+.\" "$Id: subscriptions.conf.man 5099 2006-02-13 02:46:10Z mike $"
+.\"
+.\"   subscriptions.conf man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636 USA
+.\"
+.\"       Voice: (301) 373-9600
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH subscriptions.conf 5 "Common UNIX Printing System" "30 April 2006" "Easy Software Products"
+.SH NAME
+subscriptions.conf \- subscriptions file for cups
+.SH DESCRIPTION
+The \fIsubscriptions.conf\fR file defines the local subscriptions
+that are active. It is normally located in the \fI/etc/cups\fR
+directory and is generated automatically by the \fIcupsd(8)\fR
+program when subscriptions are created, renewed, or cancelled.
+.LP
+Each line in the file can be a configuration directive, a blank line,
+or a comment. Comment lines start with the # character.
+.SH DIRECTIVES
+.TP 5
+<Subscription NNN> ... </Subscription>
+.br
+Defines a subscription.
+.TP 5
+Events name [ ... name ]
+.br
+Specifies the events that are subscribed.
+.TP 5
+ExpirationTime unix-time
+.br
+Specifies the expiration time of a subscription as a UNIX time
+value in seconds since January 1st, 1970.
+.TP 5
+Interval seconds
+.br
+Specifies the preferred time interval for event notifications in
+seconds.
+.TP 5
+JobId job-id
+.br
+Specifies the job ID associated with the subscription.
+.TP 5
+LeaseDuration seconds
+.br
+Specifies the number of seconds that the subscription is valid
+for. If 0, the subscription does not expire.
+.TP 5
+NextEventId number
+.br
+Specifies the next notify-sequence-number to use for the
+subscription.
+.TP 5
+NextSubscriptionId number
+.br
+Specifies the next subscription-id to use.
+.TP 5
+Owner username
+.br
+Specifies the user that owns the subscription.
+.TP 5
+PrinterName printername
+.br
+Specifies the printer or class associated with the subscription.
+.TP 5
+Recipient uri
+.br
+Specifies the notify-recipient-uri value for push-type notifications.
+.TP 5
+UserData hex-escaped-data
+.br
+Specifies user data to be included in event notifications. This
+is typically the "from" address in mailto: notifications.
+.SH SEE ALSO
+\fIclasses.conf(5)\fR, \fIcupsd(8)\fR, \fIcupsd.conf(5)\fR,
+\fImime.convs(5)\fR, \fImime.types(5)\fR, \fRprinters.conf(5)\fR
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id: subscriptions.conf.man 5099 2006-02-13 02:46:10Z mike $".
+.\"

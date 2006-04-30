@@ -225,6 +225,7 @@ ln -s $root/backend/ipp /tmp/cups-$user/bin/backend
 ln -s $root/backend/lpd /tmp/cups-$user/bin/backend
 ln -s $root/backend/parallel /tmp/cups-$user/bin/backend
 ln -s $root/backend/serial /tmp/cups-$user/bin/backend
+ln -s $root/backend/snmp /tmp/cups-$user/bin/backend
 ln -s $root/backend/socket /tmp/cups-$user/bin/backend
 ln -s $root/backend/usb /tmp/cups-$user/bin/backend
 ln -s $root/cgi-bin /tmp/cups-$user/bin

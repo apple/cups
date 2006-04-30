@@ -929,6 +929,22 @@ policy to use for IPP operation. The default is
 <CODE>default</CODE>.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="DefaultShared">DefaultShared</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+DefaultShared yes
+DefaultShared no
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>DefaultShared</CODE> directive specifies whether
+printers are shared (published) by default. The default is
+<CODE>yes</CODE>.</P>
+
+
 <H2 CLASS="title"><A NAME="Deny">Deny</A></H2>
 
 <H3>Examples</H3>
@@ -2665,6 +2681,28 @@ Timeout 90
 <P>The <CODE>Timeout</CODE> directive controls the amount of time
 to wait before an active HTTP or IPP request times out. The
 default timeout is 300 seconds.</P>
+
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="UseNetworkDefault">UseNetworkDefault</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+UseNetworkDefault yes
+UseNetworkDefault no
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>UseNetworkDefault</CODE> directive controls whether
+the client will use a network/remote printer as a default
+printer. If enabled, the default printer of a server is used as
+the default printer on a client. When multiple servers are
+advertising a default printer, the client's default printer is
+set to the first discovered printer, or to the implicit class for
+the same printer available from multiple servers.</P>
+
+<P>The default is <CODE>yes</CODE>.</P>
 
 
 <H2 CLASS="title"><A NAME="User">User</A></H2>

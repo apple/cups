@@ -28,7 +28,7 @@
 %copyright 1993-2006 by Easy Software Products, All Rights Reserved.
 %vendor Easy Software Products
 %license LICENSE.txt
-%readme packaging/cups.license
+%readme packaging/cups.readme
 %version @CUPS_VERSION@
 %description The Common UNIX Printing System provides a portable printing
 %description layer for UNIX(r) operating systems.  It has been developed by
@@ -172,7 +172,7 @@ $INSTALLSTATIC=@INSTALLSTATIC@
 
 $MAN1EXT=@MAN1EXT@
 $MAN5EXT=@MAN5EXT@
-$MAN8EXT=@MAN8EXT@
+$MAN7EXT=@MAN7EXT@
 $MAN8DIR=@MAN8DIR@
 
 $DSOLIBS=@DSOLIBS@
