@@ -73,7 +73,7 @@ AC_SUBST(LIB64DIR)
 AC_SUBST(UNINSTALL64)
 
 dnl Position-Independent Executable support on Linux and *BSD...
-AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fpie option, default=no])
+AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fPIE option, default=no])
 
 dnl Update compiler options...
 CXXLIBS=""
@@ -99,7 +99,7 @@ if test -n "$GCC"; then
 	case $uname in
 		Linux*)
 			if test x$enable_pie = xyes; then
-				PIEFLAGS="-pie -fpie"
+				PIEFLAGS="-pie -fPIE"
 			fi
 			;;
 
