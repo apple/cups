@@ -197,13 +197,7 @@ int main (int argc, const char * argv[])
   /* Make sure status messages are not buffered... */
   setbuf(stderr, NULL);
 
-  if (argc == 1)
-  {
-    puts("network pap \"Unknown\" \"AppleTalk Printer Access Protocol (pap)\"");
-    return 0;
-  }
-
-  if (argc == 2 && strcmp(argv[1], "-discover") == 0)
+  if (argc == 1 || (argc == 2 && strcmp(argv[1], "-discover") == 0))
   {
     /* Ignore errors returned by listDevices - they may be transitory 
     *  and we don't want cupsd to think that pap is forever unusable.
