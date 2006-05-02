@@ -3,7 +3,7 @@
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -23,11 +23,11 @@
  *
  * Contents:
  *
- *   cupsdGetDateTime()    - Returns a pointer to a date/time string.
- *   cupsdLogMessage()     - Log a message to the error log file.
- *   cupsdLogPage()        - Log a page to the page log file.
- *   cupsdLogRequest()     - Log an HTTP request in Common Log Format.
- *   check_log_file() - Open/rotate a log file if it needs it.
+ *   cupsdGetDateTime() - Returns a pointer to a date/time string.
+ *   cupsdLogMessage()  - Log a message to the error log file.
+ *   cupsdLogPage()     - Log a page to the page log file.
+ *   cupsdLogRequest()  - Log an HTTP request in Common Log Format.
+ *   check_log_file()   - Open/rotate a log file if it needs it.
  */
 
 /*
@@ -425,7 +425,9 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
   * Format the filename as needed...
   */
 
-  if (!*lf || (cupsFileTell(*lf) > MaxLogSize && MaxLogSize > 0))
+  if (!*lf ||
+      (strncmp(logname, "/dev/", 5) && cupsFileTell(*lf) > MaxLogSize &&
+       MaxLogSize > 0))
   {
    /*
     * Handle format strings...
@@ -508,7 +510,8 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
   * Do we need to rotate the log?
   */
 
-  if (cupsFileTell(*lf) > MaxLogSize && MaxLogSize > 0)
+  if (strncmp(filename, "/dev/", 5) && cupsFileTell(*lf) > MaxLogSize &&
+      MaxLogSize > 0)
   {
    /*
     * Rotate log file...
@@ -530,15 +533,12 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
       return (0);
     }
 
-    if (strncmp(filename, "/dev/", 5))
-    {
-     /*
-      * Change ownership and permissions of non-device logs...
-      */
+   /*
+    * Change ownership and permissions of non-device logs...
+    */
 
-      fchown(cupsFileNumber(*lf), RunUser, Group);
-      fchmod(cupsFileNumber(*lf), LogFilePerm);
-    }
+    fchown(cupsFileNumber(*lf), RunUser, Group);
+    fchmod(cupsFileNumber(*lf), LogFilePerm);
   }
 
   return (1);

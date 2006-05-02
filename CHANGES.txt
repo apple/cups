@@ -1,10 +1,12 @@
-CHANGES.txt - 2006-04-30
+CHANGES.txt - 2006-05-02
 ------------------------
 
 CHANGES IN CUPS V1.2
 
 	- Documentation updates (STR #1618, STR #1620, STR #1622,
 	  STR #1637)
+	- The scheduler did not prevent rotation of logs
+	  redirected to /dev/null (STR #1651)
 	- "make test" did not include the SNMP backend in the
 	  test environment (STR #1625)
 	- The EPM packaging files did not work (STR #1621)
