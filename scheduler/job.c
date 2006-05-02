@@ -467,6 +467,16 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     * Backend had errors; stop it...
     */
 
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Backend returned status %d (%s)",
+                    job->id, -job->status,
+		    -job->status == CUPS_BACKEND_FAILED ? "failed" :
+			-job->status == CUPS_BACKEND_AUTH_REQUIRED ?
+			    "authentication required" :
+			-job->status == CUPS_BACKEND_HOLD ? "hold job" :
+			-job->status == CUPS_BACKEND_STOP ? "stop printer" :
+			-job->status == CUPS_BACKEND_CANCEL ? "cancel job" :
+			"unknown");
+
     switch (-job->status)
     {
       default :
