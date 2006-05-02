@@ -318,7 +318,9 @@ static int listDevices(void)
     if (addPercentEscapes(name, encodedName, sizeof(encodedName)) == 0)
     {
       /* Each line is of the form: "class URI "make model" "name" */
-      printf("network pap://%s/%s/LaserWriter \"Unknown\" \"%s\"\n", encodedZone, encodedName, name);
+      printf("network pap://%s/%s/LaserWriter \"%s\" \"%s\"\n",
+             encodedZone, encodedName,
+	     strchr(name, ' ') ? name : "Unknown", name);
     }
   }
   return numberFound;
