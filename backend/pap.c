@@ -93,7 +93,8 @@
 #ifdef HAVE_APPLETALK_AT_PROTO_H
 #  include <AppleTalk/at_proto.h>
 #else
-#define ZIP_DEF_INTERFACE NULL
+/* These definitions come from at_proto.h... */
+#  define ZIP_DEF_INTERFACE NULL
 enum { RUNNING, NOTLOADED, LOADED, OTHERERROR };	/* Appletalk Stack status Function. */
 
 extern int atp_abort(int fd, at_inet_t *dest, u_short tid);
@@ -101,7 +102,7 @@ extern int atp_close(int fd);
 extern int atp_getreq(int fd, at_inet_t *src, char *buf, int *len, int *userdata, int *xo, u_short *tid, u_char *bitmap, int nowait);
 extern int atp_getresp(int fd, u_short *tid, at_resp_t *resp);
 extern int atp_look(int fd);
-extern int atp_open(at_socket *socket);
+extern int atp_open(at_socket *sock);
 extern int atp_sendreq(int fd, at_inet_t *dest, char *buf, int len, int userdata, int xo, int xo_relt, u_short *tid, at_resp_t *resp, at_retry_t *retry, int nowait);
 extern int atp_sendrsp(int fd, at_inet_t *dest, int xo, u_short tid, at_resp_t *resp);
 extern int checkATStack();
@@ -158,7 +159,7 @@ int       gDebug	= 0;		/* Option: causes us to emit debugging info    */
 static int listDevices(void);
 static int printFile(char* name, char* type, char* zone, int fdin, int fdout, int fderr, int copies, int argc);
 static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd, at_inet_t* pap_to, u_char* flowQuantum);
-static int papClose(int abort);
+static int papClose(int abortflag);
 static int papWrite(int sockfd, at_inet_t* dest, u_short tid, u_char connID, u_char flowQuantum, char* data, int len, int eof);
 static int papCloseResp(int sockfd, at_inet_t* dest, int xo, u_short tid, u_char connID);
 static int papSendRequest(int sockfd, at_inet_t* dest, u_char connID, int function, u_char bitmap, int xo, int seqno);
@@ -268,7 +269,7 @@ int main (int argc, const char * argv[])
 static int listDevices(void)
 {
   int  err = noErr;
-  int  index;
+  int  ind;
   int  numberFound;
 
   at_nvestr_t   at_zone;
@@ -315,10 +316,10 @@ static int listDevices(void)
   /* Not required but sort them so they look nice */
   qsort(buf, numberFound, sizeof(at_nbptuple_t), nbptuple_compare);
 
-  for (index = 0; index < numberFound; index++) 
+  for (ind = 0; ind < numberFound; ind++) 
   {
-    memcpy(name, buf[index].enu_entity.object.str, MIN(buf[index].enu_entity.object.len, sizeof(name)-1));
-    name[MIN(buf[index].enu_entity.object.len, sizeof(name)-1)] = '\0';
+    memcpy(name, buf[ind].enu_entity.object.str, MIN(buf[ind].enu_entity.object.len, sizeof(name)-1));
+    name[MIN(buf[ind].enu_entity.object.len, sizeof(name)-1)] = '\0';
 
     if (addPercentEscapes(name, encodedName, sizeof(encodedName)) == 0)
     {
@@ -350,7 +351,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   int	err;
   int	rc;
   int	val;
-  int	len, index;
+  int	len, ind;
 
   char	fileBuffer[4096];    /* File buffer */
   int	fileBufferNbytes;
@@ -671,10 +672,10 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
         break;
     
       case AT_PAP_TYPE_DATA:              /* Data packet */
-        for (len=0, index=0; index < ATP_TRESP_MAX; index++)
+        for (len=0, ind=0; ind < ATP_TRESP_MAX; ind++)
         {
-          if (resp.bitmap & (1 << index))
-            len += resp.resp[index].iov_len;
+          if (resp.bitmap & (1 << ind))
+            len += resp.resp[ind].iov_len;
         }
 
         fprintf(stderr, "DEBUG: <- PAP_DATA %d bytes %s\n", len, IS_PAP_EOF(userdata) ? "with EOF" : "");
@@ -826,7 +827,7 @@ static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd, at_inet_t* ses
   char		data[10], rdata[ATP_DATA_SIZE];
   int		userdata;
   u_char	*puserdata = (u_char *)&userdata;
-  at_socket	socket = 0;
+  at_socket	sock = 0;
   u_short	waitTime;
   int		status;
   at_resp_t	resp;
@@ -843,7 +844,7 @@ static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd, at_inet_t* ses
   errno  = 0;
   result  = 0;
 
-  *fd = atp_open(&socket);
+  *fd = atp_open(&sock);
   if (*fd < 0)
     return -1;
 
@@ -865,7 +866,7 @@ static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd, at_inet_t* ses
   resp.resp[0].iov_base = rdata;
   resp.resp[0].iov_len = sizeof(rdata);
 
-  data[0] = socket;
+  data[0] = sock;
   data[1] = 8;
 
   for (;;)
@@ -939,7 +940,7 @@ Exit:
  *
  * @result  A non-zero return value for errors
  */
-static int papClose(int abort)
+static int papClose(int abortflag)
 {
   int		fd;
   u_short	tmpID;
@@ -1022,7 +1023,7 @@ static int papClose(int abort)
 static int papWrite(int sockfd, at_inet_t* dest, u_short tid, u_char connID, u_char flowQuantum, char* data, int len, int eof)
 {
   int		result;
-  int		index;
+  int		ind;
   u_char*	puserdata;
   at_resp_t	resp;
 
@@ -1040,26 +1041,26 @@ static int papWrite(int sockfd, at_inet_t* dest, u_short tid, u_char connID, u_c
   * response packets to reply to an incoming
   * PAP 'SENDDATA' request
   */
-  for (index = 0; index < flowQuantum; index++)
+  for (ind = 0; ind < flowQuantum; ind++)
   {
-    resp.userdata[index] = 0;
-    puserdata = (u_char *)&resp.userdata[index];
+    resp.userdata[ind] = 0;
+    puserdata = (u_char *)&resp.userdata[ind];
 
     puserdata[PAP_CONNID]  = connID;
     puserdata[PAP_TYPE]    = AT_PAP_TYPE_DATA;
     puserdata[PAP_EOF]    = eof ? 1 : 0;
 
-    resp.resp[index].iov_base = (caddr_t)data;
+    resp.resp[ind].iov_base = (caddr_t)data;
 
     if (data)
       data += AT_PAP_DATA_SIZE;
 
-    resp.resp[index].iov_len = MIN((int)len, (int)AT_PAP_DATA_SIZE);
-    len -= resp.resp[index].iov_len;
+    resp.resp[ind].iov_len = MIN((int)len, (int)AT_PAP_DATA_SIZE);
+    len -= resp.resp[ind].iov_len;
     if (len == 0)
       break;
   }
-  resp.bitmap = (1 << (index + 1)) - 1;
+  resp.bitmap = (1 << (ind + 1)) - 1;
 
   /*
   *  Write out the data as a PAP 'DATA' response
@@ -1238,7 +1239,7 @@ void statusUpdate(char* status, u_char statusLen)
  */
 static int parseUri(const char* argv0, char* name, char* type, char* zone)
 {
-  char  method[255],		/* Method in URI */
+  char  scheme[255],		/* Scheme in URI */
         hostname[1024],		/* Hostname */
         username[255],		/* Username info (not used) */
         resource[1024],		/* Resource info (device and options) */
@@ -1254,13 +1255,11 @@ static int parseUri(const char* argv0, char* name, char* type, char* zone)
   /*
   * Extract the device name and options from the URI...
   */
-  method[0] = username[0] = hostname[0] = resource[0] = '\0';
-  port = 0;
 
-  httpSeparateApple(argv0, method, sizeof(method), 
-			   username, sizeof(username),
-			   hostname, sizeof(hostname), &port,
-			   resource, sizeof(resource), 0);
+  httpSeparateURI(HTTP_URI_CODING_NONE, argv0, scheme, sizeof(scheme), 
+		  username, sizeof(username),
+		  hostname, sizeof(hostname), &port,
+		  resource, sizeof(resource));
 
   /*
   * See if there are any options...
