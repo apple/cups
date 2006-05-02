@@ -26,7 +26,8 @@ dnl
 # SDK installed...
 PAP=""
 if test $uname = Darwin; then
-	AC_CHECK_HEADER(AppleTalk/at_proto.h, PAP="pap")
+	PAP="pap"
+	AC_CHECK_HEADER(AppleTalk/at_proto.h)
 fi
 
 AC_SUBST(PAP)

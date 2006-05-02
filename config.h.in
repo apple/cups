@@ -429,6 +429,13 @@
 #undef HAVE_DBUS
 
 
+/*
+ * Do we have the AppleTalk/at_proto.h header?
+ */
+
+#undef HAVE_APPLETALK_AT_PROTO_H
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
