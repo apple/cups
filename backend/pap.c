@@ -317,10 +317,34 @@ static int listDevices(void)
 
     if (addPercentEscapes(name, encodedName, sizeof(encodedName)) == 0)
     {
-      /* Each line is of the form: "class URI "make model" "name" */
-      printf("network pap://%s/%s/LaserWriter \"%s\" \"%s\"\n",
-             encodedZone, encodedName,
-	     strchr(name, ' ') ? name : "Unknown", name);
+      /* Each line is of the form: "class URI "make model" "info" */
+      char make_model[128],		/* Make and model */
+	   *ptr;
+
+
+      if ((ptr = strchr(name, ' ')) != NULL)
+      {
+       /*
+        * If the printer name contains spaces, it is probably a make and
+	* model...
+	*/
+
+        if (!strncmp(name, "ET00", 4))
+	{
+	 /*
+	  * Drop leading ethernet address info...
+	  */
+
+          strlcpy(make_model, ptr + 1, sizeof(make_model));
+	}
+	else
+	  strlcpy(make_model, name, sizeof(make_model));
+      }
+      else
+        strcpy(make_model, "Unknown");
+
+      printf("network pap://%s/%s/LaserWriter \"%s\" \"%s AppleTalk\"\n",
+             encodedZone, encodedName, make_model, name);
     }
   }
   return numberFound;
