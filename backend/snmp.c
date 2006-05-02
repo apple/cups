@@ -1244,7 +1244,7 @@ fix_make_model(
     const char *old_make_model,		/* I - Old make-and-model string */
     int        make_model_size)		/* I - Size of new string buffer */
 {
-  const char	*mmptr;			/* Pointer into make-and-model string */
+  char	*mmptr;				/* Pointer into make-and-model string */
 
 
  /*
@@ -1259,7 +1259,7 @@ fix_make_model(
     * with a single HP manufacturer prefix...
     */
 
-    mmptr = old_make_model + 15;
+    mmptr = (char *)old_make_model + 15;
 
     while (isspace(*mmptr & 255))
       mmptr ++;
@@ -1292,7 +1292,16 @@ fix_make_model(
     * becomes "Tektronix Phaser 560"...
     */
 
-    _cups_strcpy((char *)mmptr, mmptr + 7);
+    _cups_strcpy(mmptr, mmptr + 7);
+  }
+
+  if ((mmptr = strchr(make_model, ',')) != NULL)
+  {
+   /*
+    * Drop anything after a trailing comma...
+    */
+
+    *mmptr = '\0';
   }
 }
 
