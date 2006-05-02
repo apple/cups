@@ -241,7 +241,7 @@ int main (int argc, const char * argv[])
   /* Extract the device name and options from the URI... */
   parseUri(argv[0], name, type, zone);
 
-  err = printFile(name, type, zone, fileno(fp), STDOUT_FILENO, STDERR_FILENO, copies, argc);
+  err = printFile(name, type, zone, fileno(fp), 3, STDERR_FILENO, copies, argc);
 
   if (fp != stdin)
     fclose(fp);
@@ -510,6 +510,21 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   val = fcntl(fdin, F_GETFL, 0);
   fcntl(fdin, F_SETFL, val | O_NONBLOCK);
 
+  /* Set non-blocking mode on our data destination descriptor */
+  val = fcntl(fdout, F_GETFL, 0);
+  if (val < 0)
+  {
+   /*
+    * Map output to stdout if we don't have the backchannel pipe
+    * available on file descriptor 3...
+    */
+
+    if (fdout == 3 && errno == EBADF)
+      fdout = 1;
+  }
+  else
+    fcntl(fdout, F_SETFL, val | O_NONBLOCK);
+
   fileBufferNbytes = 0;
   fileTbytes = 0;
   fileEOFRead = fileEOFSent = false;
@@ -681,7 +696,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
           char logstr[512];
           int  logstrlen;
           
-          write(fdout, sockBuffer, len);
+	  write(fdout, sockBuffer, len);
           
           sockBuffer[len] = '\0';     /* We always reserve room for the nul so we can use strstr() below*/
           pLineBegin = sockBuffer;
