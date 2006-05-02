@@ -247,6 +247,7 @@ ln -s $root/data/secret /tmp/cups-$user/share/banners
 ln -s $root/data/standard /tmp/cups-$user/share/banners
 ln -s $root/data/topsecret /tmp/cups-$user/share/banners
 ln -s $root/data/unclassified /tmp/cups-$user/share/banners
+ln -s $root/data /tmp/cups-$user/share/charmaps
 ln -s $root/data /tmp/cups-$user/share/charsets
 ln -s $root/data /tmp/cups-$user/share
 ln -s $root/fonts /tmp/cups-$user/share
