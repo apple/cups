@@ -53,7 +53,8 @@
  * Local functions...
  */
 
-static int	exec_code(cups_page_header2_t *header, const char *code);
+static int	exec_code(cups_page_header2_t *header, int *preferred_bits,
+		          const char *code);
 
 
 /*
@@ -64,6 +65,12 @@ static int	exec_code(cups_page_header2_t *header, const char *code);
  * cupsRasterInterpretPPD() - this allows you to do per-page options
  * without manipulating the options array.
  *
+ * The "func" argument specifies an optional callback function that is
+ * called prior to the computation of the final raster data.  The function
+ * can make changes to the cups_page_header2_t data as needed to use a
+ * supported raster format and then returns 0 on success and -1 if the
+ * requested attributes cannot be supported.
+ *
  * @since CUPS 1.2@
  */
 
@@ -72,7 +79,8 @@ cupsRasterInterpretPPD(
     cups_page_header2_t *h,		/* O - Page header */
     ppd_file_t          *ppd,		/* I - PPD file */
     int                 num_options,	/* I - Number of options */
-    cups_option_t       *options)	/* I - Options */
+    cups_option_t       *options,	/* I - Options */
+    cups_interpret_cb_t func)		/* I - Optional page header callback */
 {
   int		i;			/* Looping var */
   int		status;			/* Cummulative status */
@@ -84,6 +92,7 @@ cupsRasterInterpretPPD(
 		bottom,			/* Bottom position */
 		right,			/* Right position */
 		top;			/* Top position */
+  int		preferred_bits;		/* Preferred bits per color */
 
 
  /*
@@ -121,7 +130,8 @@ cupsRasterInterpretPPD(
   * Apply patches and options to the page header...
   */
 
-  status = 0;
+  status         = 0;
+  preferred_bits = 0;
 
   if (ppd)
   {
@@ -130,7 +140,7 @@ cupsRasterInterpretPPD(
     */
 
     if (ppd->patches)
-      status |= exec_code(h, ppd->patches);
+      status |= exec_code(h, &preferred_bits, ppd->patches);
 
    /*
     * Then apply printer options in the proper order...
@@ -139,25 +149,25 @@ cupsRasterInterpretPPD(
     if ((count = ppdCollect(ppd, PPD_ORDER_DOCUMENT, &choices)) > 0)
     {
       for (i = 0; i < count; i ++)
-	status |= exec_code(h, choices[i]->code);
+	status |= exec_code(h, &preferred_bits, choices[i]->code);
     }
 
     if ((count = ppdCollect(ppd, PPD_ORDER_ANY, &choices)) > 0)
     {
       for (i = 0; i < count; i ++)
-	status |= exec_code(h, choices[i]->code);
+	status |= exec_code(h, &preferred_bits, choices[i]->code);
     }
 
     if ((count = ppdCollect(ppd, PPD_ORDER_PROLOG, &choices)) > 0)
     {
       for (i = 0; i < count; i ++)
-	status |= exec_code(h, choices[i]->code);
+	status |= exec_code(h, &preferred_bits, choices[i]->code);
     }
 
     if ((count = ppdCollect(ppd, PPD_ORDER_PAGE, &choices)) > 0)
     {
       for (i = 0; i < count; i ++)
-	status |= exec_code(h, choices[i]->code);
+	status |= exec_code(h, &preferred_bits, choices[i]->code);
     }
   }
 
@@ -229,6 +239,13 @@ cupsRasterInterpretPPD(
   h->cupsImagingBBox[1]    = bottom;
   h->cupsImagingBBox[2]    = right;
   h->cupsImagingBBox[3]    = top;
+
+ /*
+  * Use the callback to validate the page header...
+  */
+
+  if (func && (*func)(h, preferred_bits))
+    return (-1);
 
  /*
   * Compute the bitmap parameters...
@@ -322,8 +339,10 @@ cupsRasterInterpretPPD(
  */
 
 static int				/* O - 0 on success, -1 on error */
-exec_code(cups_page_header2_t *h,	/* O - Page header */
-          const char          *code)	/* I - Option choice to execute */
+exec_code(
+    cups_page_header2_t *h,		/* O - Page header */
+    int                 *preferred_bits,/* O - Preferred bits per color */
+    const char          *code)		/* I - Option choice to execute */
 {
   int	i;				/* Index into array */
   int	type;				/* Type of value */
@@ -527,6 +546,8 @@ exec_code(cups_page_header2_t *h,	/* O - Page header */
       h->cupsMediaType = atoi(value);
     else if (!strcmp(name, "cupsBitsPerColor") && type == CUPS_TYPE_NUMBER)
       h->cupsBitsPerColor = atoi(value);
+    else if (!strcmp(name, "cupsPreferredBitsPerColor") && type == CUPS_TYPE_NUMBER)
+      *preferred_bits = atoi(value);
     else if (!strcmp(name, "cupsColorOrder") && type == CUPS_TYPE_NUMBER)
       h->cupsColorOrder = (cups_order_t)atoi(value);
     else if (!strcmp(name, "cupsColorSpace") && type == CUPS_TYPE_NUMBER)

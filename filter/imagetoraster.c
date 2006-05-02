@@ -26,8 +26,6 @@
  * Contents:
  *
  *   main()          - Main entry...
- *   exec_code()     - Execute PostScript setpagedevice commands as
- *                     appropriate.
  *   format_CMY()    - Convert image data to CMY.
  *   format_CMYK()   - Convert image data to CMYK.
  *   format_K()      - Convert image data to black.
@@ -38,6 +36,7 @@
  *   format_YMC()    - Convert image data to YMC.
  *   format_YMCK()   - Convert image data to YMCK.
  *   make_lut()      - Make a lookup table given gamma and brightness values.
+ *   raster_cb()     - Validate the page header.
  */
 
 /*
@@ -172,7 +171,6 @@ int		Planes[] =		/* Number of planes for each colorspace */
  * Local functions...
  */
  
-static void	exec_code(cups_page_header2_t *header, const char *code);
 static void	format_CMY(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
 static void	format_CMYK(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
 static void	format_K(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
@@ -184,6 +182,7 @@ static void	format_W(cups_page_header2_t *header, unsigned char *row, int y, int
 static void	format_YMC(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
 static void	format_YMCK(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
 static void	make_lut(cups_ib_t *, int, float, float);
+static int	raster_cb(cups_page_header2_t *header, int preferred_bits);
 
 
 /*
@@ -212,12 +211,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 			xtemp,		/* Bitmap width in pixels */
 			ytemp,		/* Bitmap height in pixels */
 			page;		/* Current page number */
-  int			xc0, yc0,		/* Corners of the page in image coords */
+  int			xc0, yc0,	/* Corners of the page in image coords */
 			xc1, yc1;
   ppd_file_t		*ppd;		/* PPD file */
-  ppd_choice_t		*choice,	/* PPD option choice */
-			**choices;	/* List of marked choices */
-  int			count;		/* Number of marked choices */
+  ppd_choice_t		*choice;	/* PPD option choice */
   char			*resolution,	/* Output resolution */
 			*media_type;	/* Media type */
   ppd_profile_t		*profile;	/* Color profile */
@@ -506,31 +503,11 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Set the needed options in the page header...
   */
 
-  memset(&header, 0, sizeof(header));
-  header.HWResolution[0]  = 100;
-  header.HWResolution[1]  = 100;
-  header.cupsBitsPerColor = 1;
-  header.cupsColorOrder   = CUPS_ORDER_CHUNKED;
-  header.cupsColorSpace   = CUPS_CSPACE_K;
-
-  if (ppd && ppd->patches)
-    exec_code(&header, ppd->patches);
-
-  if ((count = ppdCollect(ppd, PPD_ORDER_DOCUMENT, &choices)) > 0)
-    for (i = 0; i < count; i ++)
-      exec_code(&header, choices[i]->code);
-
-  if ((count = ppdCollect(ppd, PPD_ORDER_ANY, &choices)) > 0)
-    for (i = 0; i < count; i ++)
-      exec_code(&header, choices[i]->code);
-
-  if ((count = ppdCollect(ppd, PPD_ORDER_PROLOG, &choices)) > 0)
-    for (i = 0; i < count; i ++)
-      exec_code(&header, choices[i]->code);
-
-  if ((count = ppdCollect(ppd, PPD_ORDER_PAGE, &choices)) > 0)
-    for (i = 0; i < count; i ++)
-      exec_code(&header, choices[i]->code);
+  if (cupsRasterInterpretPPD(&header, ppd, num_options, options, raster_cb))
+  {
+    fputs("ERROR: Bad page setup!\n", stderr);
+    return (1);
+  }
 
  /*
   * Get the media type and resolution that have been chosen...
@@ -555,7 +532,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     case CUPS_CSPACE_W :
         primary   = CUPS_IMAGE_WHITE;
 	secondary = CUPS_IMAGE_WHITE;
-        header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	break;
 
     default :
@@ -564,25 +540,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     case CUPS_CSPACE_RGBW :
         primary   = CUPS_IMAGE_RGB;
 	secondary = CUPS_IMAGE_RGB;
-
-       /*
-        * Ensure that colorimetric colorspaces use at least 8 bits per
-	* component...
-	*/
-
-        if (header.cupsColorSpace >= CUPS_CSPACE_CIEXYZ &&
-	    header.cupsBitsPerColor < 8)
-	  header.cupsBitsPerColor = 8;
-
-	if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
-	{
-	  if (header.cupsBitsPerColor >= 8)
-            header.cupsBitsPerPixel = header.cupsBitsPerColor * 3;
-	  else
-            header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
-	}
-	else
-	  header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	break;
 
     case CUPS_CSPACE_K :
@@ -591,7 +548,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     case CUPS_CSPACE_SILVER :
         primary   = CUPS_IMAGE_BLACK;
 	secondary = CUPS_IMAGE_BLACK;
-        header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	break;
 
     case CUPS_CSPACE_CMYK :
@@ -601,27 +557,12 @@ main(int  argc,				/* I - Number of command-line arguments */
     case CUPS_CSPACE_GMCS :
         primary   = CUPS_IMAGE_CMYK;
 	secondary = CUPS_IMAGE_CMYK;
-
-	if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
-          header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
-	else
-	  header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	break;
 
     case CUPS_CSPACE_CMY :
     case CUPS_CSPACE_YMC :
         primary   = CUPS_IMAGE_CMY;
 	secondary = CUPS_IMAGE_CMY;
-
-	if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
-	{
-	  if (header.cupsBitsPerColor >= 8)
-            header.cupsBitsPerPixel = 24;
-	  else
-            header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
-	}
-	else
-	  header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	break;
 
     case CUPS_CSPACE_KCMYcm :
@@ -629,21 +570,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 	{
           primary   = CUPS_IMAGE_CMY;
 	  secondary = CUPS_IMAGE_CMY;
-
-	  if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
-	    header.cupsBitsPerPixel = 8;
-	  else
-	    header.cupsBitsPerPixel = 1;
 	}
 	else
 	{
           primary   = CUPS_IMAGE_CMYK;
 	  secondary = CUPS_IMAGE_CMYK;
-
-	  if (header.cupsColorOrder == CUPS_ORDER_CHUNKED)
-	    header.cupsBitsPerPixel = header.cupsBitsPerColor * 4;
-	  else
-	    header.cupsBitsPerPixel = header.cupsBitsPerColor;
 	}
 	break;
   }
@@ -1467,184 +1398,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * 'exec_code()' - Execute PostScript setpagedevice commands as appropriate.
- */
-
-static void
-exec_code(cups_page_header2_t *header,	/* I - Page header */
-          const char          *code)	/* I - Option choice to execute */
-{
-  char	*ptr,				/* Pointer into name/value string */
-	name[255],			/* Name of pagedevice entry */
-	value[1024];			/* Value of pagedevice entry */
-
-
-  for (; *code != '\0';)
-  {
-   /*
-    * Search for the start of a dictionary name...
-    */
-
-    while (*code != '/' && *code != '\0')
-      code ++;
-
-    if (*code == '\0')
-      break;
-
-   /*
-    * Get the name...
-    */
-
-    code ++;
-    for (ptr = name; isalnum(*code & 255) && (ptr - name) < (sizeof(name) - 1);)
-      *ptr++ = *code++;
-    *ptr = '\0';
-
-   /*
-    * The parse the value as needed...
-    */
-
-    while (isspace(*code & 255))
-      code ++;
-
-    if (*code == '\0')
-      break;
-
-    if (*code == '[')
-    {
-     /*
-      * Read array of values...
-      */
-
-      code ++;
-      for (ptr = value;
-           *code != ']' && *code != '\0' &&
-	       (ptr - value) < (sizeof(value) - 1);)
-	*ptr++ = *code++;
-      *ptr = '\0';
-    }
-    else if (*code == '(')
-    {
-     /*
-      * Read string value...
-      */
-
-      code ++;
-      for (ptr = value;
-           *code != ')' && *code != '\0' &&
-	       (ptr - value) < (sizeof(value) - 1);)
-        if (*code == '\\')
-	{
-	  code ++;
-	  if (isdigit(*code & 255))
-	    *ptr++ = (char)strtol(code, (char **)&code, 8);
-          else
-	    *ptr++ = *code++;
-	}
-	else
-          *ptr++ = *code++;
-
-      *ptr = '\0';
-    }
-    else if (isdigit(*code & 255) || *code == '-')
-    {
-     /*
-      * Read single number...
-      */
-
-      for (ptr = value;
-           (isdigit(*code & 255) || *code == '-') &&
-	       (ptr - value) < (sizeof(value) - 1);)
-	*ptr++ = *code++;
-      *ptr = '\0';
-    }
-    else
-    {
-     /*
-      * Read a single name...
-      */
-
-      for (ptr = value;
-           (isalnum(*code & 255) || *code == '_') &&
-	       (ptr - value) < (sizeof(value) - 1);)
-	*ptr++ = *code++;
-      *ptr = '\0';
-    }
-
-   /*
-    * Assign the value as needed...
-    */
-
-    if (!strcmp(name, "MediaClass"))
-      strlcpy(header->MediaClass, value, sizeof(header->MediaClass));
-    else if (!strcmp(name, "MediaColor"))
-      strlcpy(header->MediaColor, value, sizeof(header->MediaColor));
-    else if (!strcmp(name, "MediaType"))
-      strlcpy(header->MediaType, value, sizeof(header->MediaType));
-    else if (!strcmp(name, "OutputType"))
-      strlcpy(header->OutputType, value, sizeof(header->OutputType));
-    else if (!strcmp(name, "AdvanceDistance"))
-      header->AdvanceDistance = atoi(value);
-    else if (!strcmp(name, "AdvanceMedia"))
-      header->AdvanceMedia = atoi(value);
-    else if (!strcmp(name, "Collate"))
-      header->Collate = !strcmp(value, "true");
-    else if (!strcmp(name, "CutMedia"))
-      header->CutMedia = (cups_cut_t)atoi(value);
-    else if (!strcmp(name, "Duplex"))
-      header->Duplex = !strcmp(value, "true");
-    else if (!strcmp(name, "HWResolution"))
-      sscanf(value, "%d%d", header->HWResolution + 0, header->HWResolution + 1);
-    else if (!strcmp(name, "InsertSheet"))
-      header->InsertSheet = !strcmp(value, "true");
-    else if (!strcmp(name, "Jog"))
-      header->Jog = atoi(value);
-    else if (!strcmp(name, "LeadingEdge"))
-      header->LeadingEdge = atoi(value);
-    else if (!strcmp(name, "Margins"))
-      sscanf(value, "%d%d", header->Margins + 0, header->Margins + 1);
-    else if (!strcmp(name, "ManualFeed"))
-      header->ManualFeed = !strcmp(value, "true");
-    else if (!strcmp(name, "cupsMediaPosition") || /* Compatibility */
-             !strcmp(name, "MediaPosition"))
-      header->MediaPosition = atoi(value);
-    else if (!strcmp(name, "MediaWeight"))
-      header->MediaWeight = atoi(value);
-    else if (!strcmp(name, "MirrorPrint"))
-      header->MirrorPrint = !strcmp(value, "true");
-    else if (!strcmp(name, "NegativePrint"))
-      header->NegativePrint = !strcmp(value, "true");
-    else if (!strcmp(name, "Orientation"))
-      header->Orientation = atoi(value);
-    else if (!strcmp(name, "OutputFaceUp"))
-      header->OutputFaceUp = !strcmp(value, "true");
-    else if (!strcmp(name, "Separations"))
-      header->Separations = !strcmp(value, "true");
-    else if (!strcmp(name, "TraySwitch"))
-      header->TraySwitch = !strcmp(value, "true");
-    else if (!strcmp(name, "Tumble"))
-      header->Tumble = !strcmp(value, "true");
-    else if (!strcmp(name, "cupsMediaType"))
-      header->cupsMediaType = atoi(value);
-    else if (!strcmp(name, "cupsBitsPerColor"))
-      header->cupsBitsPerColor = atoi(value);
-    else if (!strcmp(name, "cupsColorOrder"))
-      header->cupsColorOrder = (cups_order_t)atoi(value);
-    else if (!strcmp(name, "cupsColorSpace"))
-      header->cupsColorSpace = (cups_cspace_t)atoi(value);
-    else if (!strcmp(name, "cupsCompression"))
-      header->cupsCompression = atoi(value);
-    else if (!strcmp(name, "cupsRowCount"))
-      header->cupsRowCount = atoi(value);
-    else if (!strcmp(name, "cupsRowFeed"))
-      header->cupsRowFeed = atoi(value);
-    else if (!strcmp(name, "cupsRowStep"))
-      header->cupsRowStep = atoi(value);
-  }
-}
-
-
-/*
  * 'format_CMY()' - Convert image data to CMY.
  */
 
@@ -1657,18 +1410,18 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
 	    int	               ysize,	/* I - Height of image data */
 	    int                yerr0,	/* I - Top Y error */
 	    int                yerr1,	/* I - Bottom Y error */
-	    cups_ib_t               *r0,	/* I - Primary image data */
-	    cups_ib_t               *r1)	/* I - Image data for interpolation */
+	    cups_ib_t          *r0,	/* I - Primary image data */
+	    cups_ib_t          *r1)	/* I - Image data for interpolation */
 {
-  cups_ib_t		*ptr,		/* Pointer into row */
-		*cptr,		/* Pointer into cyan */
-		*mptr,		/* Pointer into magenta */
-		*yptr,		/* Pointer into yellow */
-		bitmask;	/* Current mask for pixel */
-  int		bitoffset;	/* Current offset in line */
-  int		bandwidth;	/* Width of a color band */
-  int		x,		/* Current X coordinate on page */
-		*dither;	/* Pointer into dither array */
+  cups_ib_t	*ptr,			/* Pointer into row */
+		*cptr,			/* Pointer into cyan */
+		*mptr,			/* Pointer into magenta */
+		*yptr,			/* Pointer into yellow */
+		bitmask;		/* Current mask for pixel */
+  int		bitoffset;		/* Current offset in line */
+  int		bandwidth;		/* Width of a color band */
+  int		x,			/* Current X coordinate on page */
+		*dither;		/* Pointer into dither array */
 
 
   switch (XPosition)
@@ -2023,7 +1776,7 @@ format_CMY(cups_page_header2_t *header,	/* I - Page header */
  */
 
 static void
-format_CMYK(cups_page_header2_t *header,	/* I - Page header */
+format_CMYK(cups_page_header2_t *header,/* I - Page header */
             unsigned char       *row,	/* IO - Bitmap data for device */
 	    int                 y,	/* I - Current row */
 	    int                 z,	/* I - Current plane */
@@ -2031,19 +1784,19 @@ format_CMYK(cups_page_header2_t *header,	/* I - Page header */
 	    int	                ysize,	/* I - Height of image data */
 	    int                 yerr0,	/* I - Top Y error */
 	    int                 yerr1,	/* I - Bottom Y error */
-	    cups_ib_t                *r0,	/* I - Primary image data */
-	    cups_ib_t                *r1)	/* I - Image data for interpolation */
+	    cups_ib_t           *r0,	/* I - Primary image data */
+	    cups_ib_t           *r1)	/* I - Image data for interpolation */
 {
-  cups_ib_t		*ptr,		/* Pointer into row */
-		*cptr,		/* Pointer into cyan */
-		*mptr,		/* Pointer into magenta */
-		*yptr,		/* Pointer into yellow */
-		*kptr,		/* Pointer into black */
-		bitmask;	/* Current mask for pixel */
-  int		bitoffset;	/* Current offset in line */
-  int		bandwidth;	/* Width of a color band */
-  int		x,		/* Current X coordinate on page */
-		*dither;	/* Pointer into dither array */
+  cups_ib_t	*ptr,			/* Pointer into row */
+		*cptr,			/* Pointer into cyan */
+		*mptr,			/* Pointer into magenta */
+		*yptr,			/* Pointer into yellow */
+		*kptr,			/* Pointer into black */
+		bitmask;		/* Current mask for pixel */
+  int		bitoffset;		/* Current offset in line */
+  int		bandwidth;		/* Width of a color band */
+  int		x,			/* Current X coordinate on page */
+		*dither;		/* Pointer into dither array */
 
 
   switch (XPosition)
@@ -2405,14 +2158,14 @@ format_K(cups_page_header2_t *header,	/* I - Page header */
 	 int	             ysize,	/* I - Height of image data */
 	 int                 yerr0,	/* I - Top Y error */
 	 int                 yerr1,	/* I - Bottom Y error */
-	 cups_ib_t                *r0,	/* I - Primary image data */
-	 cups_ib_t                *r1)	/* I - Image data for interpolation */
+	 cups_ib_t           *r0,	/* I - Primary image data */
+	 cups_ib_t           *r1)	/* I - Image data for interpolation */
 {
-  cups_ib_t		*ptr,		/* Pointer into row */
-		bitmask;	/* Current mask for pixel */
-  int		bitoffset;	/* Current offset in line */
-  int		x,		/* Current X coordinate on page */
-		*dither;	/* Pointer into dither array */
+  cups_ib_t	*ptr,			/* Pointer into row */
+		bitmask;		/* Current mask for pixel */
+  int		bitoffset;		/* Current offset in line */
+  int		x,			/* Current X coordinate on page */
+		*dither;		/* Pointer into dither array */
 
 
   (void)z;
@@ -2515,7 +2268,7 @@ format_K(cups_page_header2_t *header,	/* I - Page header */
  */
 
 static void
-format_KCMY(cups_page_header2_t *header,	/* I - Page header */
+format_KCMY(cups_page_header2_t *header,/* I - Page header */
             unsigned char       *row,	/* IO - Bitmap data for device */
 	    int                 y,	/* I - Current row */
 	    int                 z,	/* I - Current plane */
@@ -2523,19 +2276,19 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
 	    int	                ysize,	/* I - Height of image data */
 	    int                 yerr0,	/* I - Top Y error */
 	    int                 yerr1,	/* I - Bottom Y error */
-	    cups_ib_t                *r0,	/* I - Primary image data */
-	    cups_ib_t                *r1)	/* I - Image data for interpolation */
+	    cups_ib_t           *r0,	/* I - Primary image data */
+	    cups_ib_t           *r1)	/* I - Image data for interpolation */
 {
-  cups_ib_t		*ptr,		/* Pointer into row */
-		*cptr,		/* Pointer into cyan */
-		*mptr,		/* Pointer into magenta */
-		*yptr,		/* Pointer into yellow */
-		*kptr,		/* Pointer into black */
-		bitmask;	/* Current mask for pixel */
-  int		bitoffset;	/* Current offset in line */
-  int		bandwidth;	/* Width of a color band */
-  int		x,		/* Current X coordinate on page */
-		*dither;	/* Pointer into dither array */
+  cups_ib_t	*ptr,			/* Pointer into row */
+		*cptr,			/* Pointer into cyan */
+		*mptr,			/* Pointer into magenta */
+		*yptr,			/* Pointer into yellow */
+		*kptr,			/* Pointer into black */
+		bitmask;		/* Current mask for pixel */
+  int		bitoffset;		/* Current offset in line */
+  int		bandwidth;		/* Width of a color band */
+  int		x,			/* Current X coordinate on page */
+		*dither;		/* Pointer into dither array */
 
 
   switch (XPosition)
@@ -2923,30 +2676,31 @@ format_KCMY(cups_page_header2_t *header,	/* I - Page header */
  */
 
 static void
-format_KCMYcm(cups_page_header2_t *header,/* I - Page header */
-              unsigned char       *row,	/* IO - Bitmap data for device */
-	      int                 y,	/* I - Current row */
-	      int                 z,	/* I - Current plane */
-	      int                 xsize,/* I - Width of image data */
-	      int	          ysize,/* I - Height of image data */
-	      int                 yerr0,/* I - Top Y error */
-	      int                 yerr1,/* I - Bottom Y error */
-	      cups_ib_t                *r0,	/* I - Primary image data */
-	      cups_ib_t                *r1)	/* I - Image data for interpolation */
+format_KCMYcm(
+    cups_page_header2_t *header,	/* I - Page header */
+    unsigned char       *row,		/* IO - Bitmap data for device */
+    int                 y,		/* I - Current row */
+    int                 z,		/* I - Current plane */
+    int                 xsize,		/* I - Width of image data */
+    int                 ysize,		/* I - Height of image data */
+    int                 yerr0,		/* I - Top Y error */
+    int                 yerr1,		/* I - Bottom Y error */
+    cups_ib_t           *r0,		/* I - Primary image data */
+    cups_ib_t           *r1)		/* I - Image data for interpolation */
 {
-  int		pc, pm, py, pk;	/* Cyan, magenta, yellow, and black values */
-  cups_ib_t		*ptr,		/* Pointer into row */
-		*cptr,		/* Pointer into cyan */
-		*mptr,		/* Pointer into magenta */
-		*yptr,		/* Pointer into yellow */
-		*kptr,		/* Pointer into black */
-		*lcptr,		/* Pointer into light cyan */
-		*lmptr,		/* Pointer into light magenta */
-		bitmask;	/* Current mask for pixel */
-  int		bitoffset;	/* Current offset in line */
-  int		bandwidth;	/* Width of a color band */
-  int		x,		/* Current X coordinate on page */
-		*dither;	/* Pointer into dither array */
+  int		pc, pm, py, pk;		/* Cyan, magenta, yellow, and black values */
+  cups_ib_t	*ptr,			/* Pointer into row */
+		*cptr,			/* Pointer into cyan */
+		*mptr,			/* Pointer into magenta */
+		*yptr,			/* Pointer into yellow */
+		*kptr,			/* Pointer into black */
+		*lcptr,			/* Pointer into light cyan */
+		*lmptr,			/* Pointer into light magenta */
+		bitmask;		/* Current mask for pixel */
+  int		bitoffset;		/* Current offset in line */
+  int		bandwidth;		/* Width of a color band */
+  int		x,			/* Current X coordinate on page */
+		*dither;		/* Pointer into dither array */
 
 
   switch (XPosition)
@@ -3260,7 +3014,7 @@ format_KCMYcm(cups_page_header2_t *header,/* I - Page header */
  */
 
 static void
-format_RGBA(cups_page_header2_t *header,	/* I - Page header */
+format_RGBA(cups_page_header2_t *header,/* I - Page header */
             unsigned char       *row,	/* IO - Bitmap data for device */
 	    int                 y,	/* I - Current row */
 	    int                 z,	/* I - Current plane */
@@ -3268,18 +3022,18 @@ format_RGBA(cups_page_header2_t *header,	/* I - Page header */
 	    int	                ysize,	/* I - Height of image data */
 	    int                 yerr0,	/* I - Top Y error */
 	    int                 yerr1,	/* I - Bottom Y error */
-	    cups_ib_t                *r0,	/* I - Primary image data */
-	    cups_ib_t                *r1)	/* I - Image data for interpolation */
+	    cups_ib_t           *r0,	/* I - Primary image data */
+	    cups_ib_t           *r1)	/* I - Image data for interpolation */
 {
-  cups_ib_t		*ptr,		/* Pointer into row */
-		*cptr,		/* Pointer into cyan */
-		*mptr,		/* Pointer into magenta */
-		*yptr,		/* Pointer into yellow */
-		bitmask;	/* Current mask for pixel */
-  int		bitoffset;	/* Current offset in line */
-  int		bandwidth;	/* Width of a color band */
-  int		x,		/* Current X coordinate on page */
-		*dither;	/* Pointer into dither array */
+  cups_ib_t	*ptr,			/* Pointer into row */
+		*cptr,			/* Pointer into cyan */
+		*mptr,			/* Pointer into magenta */
+		*yptr,			/* Pointer into yellow */
+		bitmask;		/* Current mask for pixel */
+  int		bitoffset;		/* Current offset in line */
+  int		bandwidth;		/* Width of a color band */
+  int		x,			/* Current X coordinate on page */
+		*dither;		/* Pointer into dither array */
 
 
   switch (XPosition)
@@ -3671,14 +3425,14 @@ format_W(cups_page_header2_t *header,	/* I - Page header */
 	    int	             ysize,	/* I - Height of image data */
 	    int              yerr0,	/* I - Top Y error */
 	    int              yerr1,	/* I - Bottom Y error */
-	    cups_ib_t             *r0,	/* I - Primary image data */
-	    cups_ib_t             *r1)	/* I - Image data for interpolation */
+	    cups_ib_t        *r0,	/* I - Primary image data */
+	    cups_ib_t        *r1)	/* I - Image data for interpolation */
 {
-  cups_ib_t		*ptr,		/* Pointer into row */
-		bitmask;	/* Current mask for pixel */
-  int		bitoffset;	/* Current offset in line */
-  int		x,		/* Current X coordinate on page */
-		*dither;	/* Pointer into dither array */
+  cups_ib_t	*ptr,			/* Pointer into row */
+		bitmask;		/* Current mask for pixel */
+  int		bitoffset;		/* Current offset in line */
+  int		x,			/* Current X coordinate on page */
+		*dither;		/* Pointer into dither array */
 
 
   (void)z;
@@ -3789,18 +3543,18 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
 	    int	               ysize,	/* I - Height of image data */
 	    int                yerr0,	/* I - Top Y error */
 	    int                yerr1,	/* I - Bottom Y error */
-	    cups_ib_t               *r0,	/* I - Primary image data */
-	    cups_ib_t               *r1)	/* I - Image data for interpolation */
+	    cups_ib_t          *r0,	/* I - Primary image data */
+	    cups_ib_t          *r1)	/* I - Image data for interpolation */
 {
-  cups_ib_t		*ptr,		/* Pointer into row */
-		*cptr,		/* Pointer into cyan */
-		*mptr,		/* Pointer into magenta */
-		*yptr,		/* Pointer into yellow */
-		bitmask;	/* Current mask for pixel */
-  int		bitoffset;	/* Current offset in line */
-  int		bandwidth;	/* Width of a color band */
-  int		x,		/* Current X coordinate on page */
-		*dither;	/* Pointer into dither array */
+  cups_ib_t	*ptr,			/* Pointer into row */
+		*cptr,			/* Pointer into cyan */
+		*mptr,			/* Pointer into magenta */
+		*yptr,			/* Pointer into yellow */
+		bitmask;		/* Current mask for pixel */
+  int		bitoffset;		/* Current offset in line */
+  int		bandwidth;		/* Width of a color band */
+  int		x,			/* Current X coordinate on page */
+		*dither;		/* Pointer into dither array */
 
 
   switch (XPosition)
@@ -4170,7 +3924,7 @@ format_YMC(cups_page_header2_t *header,	/* I - Page header */
  */
 
 static void
-format_YMCK(cups_page_header2_t *header,	/* I - Page header */
+format_YMCK(cups_page_header2_t *header,/* I - Page header */
             unsigned char       *row,	/* IO - Bitmap data for device */
 	    int                 y,	/* I - Current row */
 	    int                 z,	/* I - Current plane */
@@ -4178,19 +3932,19 @@ format_YMCK(cups_page_header2_t *header,	/* I - Page header */
 	    int	                ysize,	/* I - Height of image data */
 	    int                 yerr0,	/* I - Top Y error */
 	    int                 yerr1,	/* I - Bottom Y error */
-	    cups_ib_t                *r0,	/* I - Primary image data */
-	    cups_ib_t                *r1)	/* I - Image data for interpolation */
+	    cups_ib_t           *r0,	/* I - Primary image data */
+	    cups_ib_t           *r1)	/* I - Image data for interpolation */
 {
-  cups_ib_t		*ptr,		/* Pointer into row */
-		*cptr,		/* Pointer into cyan */
-		*mptr,		/* Pointer into magenta */
-		*yptr,		/* Pointer into yellow */
-		*kptr,		/* Pointer into black */
-		bitmask;	/* Current mask for pixel */
-  int		bitoffset;	/* Current offset in line */
-  int		bandwidth;	/* Width of a color band */
-  int		x,		/* Current X coordinate on page */
-		*dither;	/* Pointer into dither array */
+  cups_ib_t	*ptr,			/* Pointer into row */
+		*cptr,			/* Pointer into cyan */
+		*mptr,			/* Pointer into magenta */
+		*yptr,			/* Pointer into yellow */
+		*kptr,			/* Pointer into black */
+		bitmask;		/* Current mask for pixel */
+  int		bitoffset;		/* Current offset in line */
+  int		bandwidth;		/* Width of a color band */
+  int		x,			/* Current X coordinate on page */
+		*dither;		/* Pointer into dither array */
 
 
   switch (XPosition)
@@ -4607,6 +4361,30 @@ make_lut(cups_ib_t  *lut,		/* I - Lookup table */
     else
       *lut++ = v;
   }
+}
+
+
+/*
+ * 'raster_cb()' - Validate the page header.
+ */
+
+static int				/* O - 0 if OK, -1 if not */
+raster_cb(
+    cups_page_header2_t *header,	/* IO - Raster header */
+    int                 preferred_bits)	/* I  - Preferred bits per color */
+{
+ /*
+  * Ensure that colorimetric colorspaces use at least 8 bits per
+  * component...
+  */
+
+  if ((header->cupsColorSpace == CUPS_CSPACE_CIEXYZ ||
+       header->cupsColorSpace == CUPS_CSPACE_CIELab ||
+       header->cupsColorSpace >= CUPS_CSPACE_ICC1) &&
+      header->cupsBitsPerColor < 8)
+    header->cupsBitsPerColor = 8;
+
+  return (0);
 }
 
 

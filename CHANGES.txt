@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.2
 
 	- Documentation updates (STR #1618, STR #1620, STR #1622,
 	  STR #1637)
+	- cupsRasterInterpretPPD() didn't support the
+	  cupsPreferredBitsPerColor attribute, and imagetoraster
+	  didn't use the new API.
 	- The "make test" script did not create all of the necessary
 	  subdirectories for testing (STR #1638)
 	- The scheduler did not prevent rotation of logs
