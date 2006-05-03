@@ -219,6 +219,12 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_LAUNCHD */
 	      break;
 
+          case 'p' : /* Stop immediately for profiling */
+              puts("Warning: -p option is for internal testing use only!");
+	      stop_scheduler = 1;
+	      fg             = 1;
+	      break;
+
 	  default : /* Unknown option */
               _cupsLangPrintf(stderr, _("cupsd: Unknown option \"%c\" - "
 	                                "aborting!\n"), *opt);
