@@ -60,6 +60,7 @@ typedef struct _mime_typelist_s		/**** List of source types ****/
  */
 
 static int		compare_filters(mime_filter_t *, mime_filter_t *);
+static int		compare_srcs(mime_filter_t *, mime_filter_t *);
 static cups_array_t	*find_filters(mime_t *mime, mime_type_t *src,
 			              mime_type_t *dst, int *cost,
 				      _mime_typelist_t *visited);
@@ -114,7 +115,10 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     if (!mime->filters)
       mime->filters = cupsArrayNew((cups_array_func_t)compare_filters, NULL);
 
-    if (!mime->filters)
+    if (!mime->srcs)
+      mime->srcs = cupsArrayNew((cups_array_func_t)compare_srcs, NULL);
+
+    if (!mime->filters || !mime->srcs)
       return (NULL);
 
     if ((temp = calloc(1, sizeof(mime_filter_t))) == NULL)
@@ -130,6 +134,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     strlcpy(temp->filter, filter, sizeof(temp->filter));
 
     cupsArrayAdd(mime->filters, temp);
+    cupsArrayAdd(mime->srcs, temp);
   }
 
  /*
@@ -196,6 +201,24 @@ compare_filters(mime_filter_t *f0,	/* I - First filter */
 
 
 /*
+ * 'compare_srcs()' - Compare two srcs...
+ */
+
+static int				/* O - Comparison result */
+compare_srcs(mime_filter_t *f0,		/* I - First filter */
+             mime_filter_t *f1)		/* I - Second filter */
+{
+  int	i;				/* Result of comparison */
+
+
+  if ((i = strcmp(f0->src->super, f1->src->super)) == 0)
+    i = strcmp(f0->src->type, f1->src->type);
+
+  return (i);
+}
+
+
+/*
  * 'find_filters()' - Find the filters to convert from one type to another.
  */
 
@@ -210,7 +233,8 @@ find_filters(mime_t           *mime,	/* I - MIME database */
 			mincost;	/* Current minimum */
   cups_array_t		*temp,		/* Temporary filter */
 			*mintemp;	/* Current minimum */
-  mime_filter_t		*current;	/* Current filter */
+  mime_filter_t		*current,	/* Current filter */
+			srckey;		/* Source type key */
   _mime_typelist_t	listnode,	/* New list node */
 			*listptr;	/* Pointer in list */
 
@@ -238,6 +262,9 @@ find_filters(mime_t           *mime,	/* I - MIME database */
 
     mincost = current->cost;
 
+    if (!cost)
+      return (mintemp);
+
     DEBUG_puts("    Found direct filter:");
     DEBUG_printf(("    %s (cost=%d)\n", current->filter, mincost));
   }
@@ -261,58 +288,67 @@ find_filters(mime_t           *mime,	/* I - MIME database */
   * OK, now look for filters from the source type to any other type...
   */
 
-  for (current = (mime_filter_t *)cupsArrayFirst(mime->filters);
-       current;
-       current = (mime_filter_t *)cupsArrayNext(mime->filters))
-    if (current->src == src)
+  srckey.src = src;
+
+  for (current = (mime_filter_t *)cupsArrayFind(mime->srcs, &srckey);
+       current && current->src == src;
+       current = (mime_filter_t *)cupsArrayNext(mime->srcs))
+  {
+   /*
+    * See if we have already tried the destination type as a source
+    * type (this avoids extra filter looping...)
+    */
+
+    mime_type_t *current_dst;		/* Current destination type */
+
+
+    for (listptr = list, current_dst = current->dst;
+	 listptr;
+	 listptr = listptr->next)
+      if (current_dst == listptr->src)
+	break;
+
+    if (listptr)
+      continue;
+
+   /*
+    * See if we have any filters that can convert from the destination type
+    * of this filter to the final type...
+    */
+
+    listnode.src = current->src;
+
+    cupsArraySave(mime->srcs);
+    temp = find_filters(mime, current->dst, dst, &tempcost, &listnode);
+    cupsArrayRestore(mime->srcs);
+
+    if (!temp)
+      continue;
+
+    if (!cost)
+      return (temp);
+
+   /*
+    * Found a match; see if this one is less costly than the last (if
+    * any...)
+    */
+
+    if (tempcost < mincost)
     {
-     /*
-      * See if we have already tried the destination type as a source
-      * type (this avoids extra filter looping...)
-      */
-
-      for (listptr = list; listptr; listptr = listptr->next)
-        if (current->dst == listptr->src)
-	  break;
-
-      if (listptr)
-        continue;
+      cupsArrayDelete(mintemp);
 
      /*
-      * See if we have any filters that can convert from the destination type
-      * of this filter to the final type...
+      * Hey, we got a match!  Add the current filter to the beginning of the
+      * filter list...
       */
 
-      listnode.src = current->src;
-
-      cupsArraySave(mime->filters);
-      temp = find_filters(mime, current->dst, dst, &tempcost, &listnode);
-      cupsArrayRestore(mime->filters);
-
-      if (!temp)
-        continue;
-
-     /*
-      * Found a match; see if this one is less costly than the last (if
-      * any...)
-      */
-
-      if (tempcost < mincost)
-      {
-        cupsArrayDelete(mintemp);
-
-       /*
-	* Hey, we got a match!  Add the current filter to the beginning of the
-	* filter list...
-	*/
-
-        mintemp = temp;
-	mincost = tempcost + current->cost;
-	cupsArrayInsert(mintemp, current);
-      }
-      else
-        cupsArrayDelete(temp);
+      mintemp = temp;
+      mincost = tempcost + current->cost;
+      cupsArrayInsert(mintemp, current);
     }
+    else
+      cupsArrayDelete(temp);
+  }
 
   if (mintemp)
   {

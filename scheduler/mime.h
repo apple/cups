@@ -111,6 +111,7 @@ typedef struct _mime_s			/**** MIME Database ****/
 {
   cups_array_t	*types;			/* File types */
   cups_array_t	*filters;		/* Type conversion filters */
+  cups_array_t	*srcs;			/* Filters sorted by source type */
 } mime_t;
 
 

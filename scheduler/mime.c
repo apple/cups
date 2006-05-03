@@ -120,6 +120,7 @@ mimeDelete(mime_t *mime)		/* I - MIME database */
 
   cupsArrayDelete(mime->types);
   cupsArrayDelete(mime->filters);
+  cupsArrayDelete(mime->srcs);
   free(mime);
 }
 
