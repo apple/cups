@@ -595,8 +595,6 @@ exec_code(
       if (sscanf(value, "(%63[^)])", h->cupsRenderingIntent) != 1)
         return (-1);
     }
-    else
-      return (-1);
   }
 
  /*
