@@ -311,6 +311,7 @@ cupsRasterInterpretPPD(
 	*/
 
     case CUPS_CSPACE_RGBA :
+    case CUPS_CSPACE_RGBW :
     case CUPS_CSPACE_CMYK :
     case CUPS_CSPACE_YMCK :
     case CUPS_CSPACE_KCMY :
