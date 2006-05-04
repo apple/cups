@@ -709,7 +709,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  sptr += strlen(sptr);
 	}
 
-      cupsdLogMessage(CUPSD_LOG_EMERG, s);
+      cupsdLogMessage(CUPSD_LOG_EMERG, "%s", s);
 
       strcpy(s, "OutputSet =");
       slen = 11;
@@ -723,7 +723,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  sptr += strlen(sptr);
 	}
 
-      cupsdLogMessage(CUPSD_LOG_EMERG, s);
+      cupsdLogMessage(CUPSD_LOG_EMERG, "%s", s);
 
       for (i = 0, con = (cupsd_client_t *)cupsArrayFirst(Clients);
 	   con;

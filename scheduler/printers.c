@@ -1220,7 +1220,7 @@ cupsdRenamePrinter(
   * Rename the printer...
   */
 
-  cupsdSetStringf(&p->name, name);
+  cupsdSetString(&p->name, name);
 
  /*
   * Reset printer attributes...

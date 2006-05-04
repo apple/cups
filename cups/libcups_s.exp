@@ -6,7 +6,6 @@ _cupsCharmapGet
 _cupsEncodingName
 _cupsGetPassword
 _cupsGlobals
-_cupsLangFlush
 _cupsLangPrintf
 _cupsLangPuts
 _cupsLangString
@@ -23,6 +22,8 @@ _cupsStrFormatd
 _cupsStrFree
 _cupsStrScand
 _cupsStrStatistics
+_cups_getifaddrs
+_cups_freeifaddrs
 _cups_strcpy
 _cups_strlcat
 _cups_strlcpy

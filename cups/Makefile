@@ -271,7 +271,7 @@ libcups.2.dylib:	$(LIBOBJS)
 # libcups_s.a
 #
 
-libcups_s.a:	$(LIBOBJS)
+libcups_s.a:	$(LIBOBJS) libcups_s.exp
 	echo Creating $@...
 	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ) -lm
 	$(RM) $@

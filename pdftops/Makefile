@@ -59,32 +59,11 @@ LIBOBJS	=	\
 		PSOutputDev.o \
 		PSTokenizer.o \
 		SecurityHandler.o \
-		SplashBitmap.o \
-		SplashClip.o \
-		Splash.o \
-		SplashFont.o \
-		SplashFontEngine.o \
-		SplashFontFile.o \
-		SplashFontFileID.o \
-		SplashFTFont.o \
-		SplashFTFontEngine.o \
-		SplashFTFontFile.o \
-		SplashOutputDev.o \
-		SplashPath.o \
-		SplashPattern.o \
-		SplashScreen.o \
-		SplashState.o \
-		SplashT1Font.o \
-		SplashT1FontEngine.o \
-		SplashT1FontFile.o \
-		SplashXPath.o \
-		SplashXPathScanner.o \
 		Stream.o \
 		UnicodeMap.o \
 		UnicodeTypeTable.o \
 		XpdfPluginAPI.o \
 		XRef.o
-
 
 OBJS	=	pdftops.o $(LIBOBJS)
 

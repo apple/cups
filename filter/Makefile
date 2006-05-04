@@ -250,7 +250,7 @@ libcupsimage.2.dylib:	$(IMAGEOBJS)
 # libcupsimage_s.a
 #
 
-libcupsimage_s.a:	$(IMAGEOBJS)
+libcupsimage_s.a:	$(IMAGEOBJS) libcupsimage_s.exp
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -Wl,-berok,-bexport:libcupsimage_s.exp \
 		-o libcupsimage_s.o $(IMAGEOBJS) $(DSOLIBS) -lm
