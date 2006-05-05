@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5261 2006-03-09 20:47:49Z mike $"
+ * "$Id: ipp.c 5495 2006-05-05 17:58:07Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -1215,7 +1215,7 @@ compress_files(int  num_files,		/* I - Number of files */
 		*out;			/* Output file */
   struct stat	outinfo;		/* Output file information */
   char		filename[1024],		/* Temporary filename */
-		buffer[65536];		/* Copy buffer */
+		buffer[32768];		/* Copy buffer */
 
 
   fprintf(stderr, "DEBUG: Compressing %d job files...\n", num_files);
@@ -1619,5 +1619,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 5261 2006-03-09 20:47:49Z mike $".
+ * End of "$Id: ipp.c 5495 2006-05-05 17:58:07Z mike $".
  */

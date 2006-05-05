@@ -1,5 +1,5 @@
 /*
- * "$Id: request.c 5447 2006-04-21 20:07:51Z mike $"
+ * "$Id: request.c 5495 2006-05-05 17:58:07Z mike $"
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
@@ -69,7 +69,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   FILE		*file;			/* File to send */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
-  char		buffer[65536];		/* Output buffer */
+  char		buffer[32768];		/* Output buffer */
 
 
   DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
@@ -469,5 +469,5 @@ _cupsSetError(ipp_status_t status,	/* I - IPP status code */
 
 
 /*
- * End of "$Id: request.c 5447 2006-04-21 20:07:51Z mike $".
+ * End of "$Id: request.c 5495 2006-05-05 17:58:07Z mike $".
  */

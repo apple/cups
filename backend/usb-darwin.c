@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-darwin.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: usb-darwin.c 5488 2006-05-03 19:39:30Z mike $"
  *
  * © Copyright 2005-2006 Apple Computer, Inc. All rights reserved.
  *
@@ -228,7 +228,6 @@ static void parse_pserror (char *sockBuffer, int len);
 
 void list_devices()
 {
-  puts("direct usb \"Unknown\" \"USB Printer (usb)\"");
   iterate_printers(list_device_callback, NULL);
 }
 
@@ -442,13 +441,25 @@ static Boolean list_device_callback(void *refcon, io_service_t obj)
     if (deviceIDString != NULL) {
       CFStringRef make = NULL,  model = NULL, serial = NULL;
       char uristr[1024], makestr[1024], modelstr[1024], serialstr[1024], optionsstr[1024];
+      char idstr[1024];
 
       copy_deviceinfo(deviceIDString, &make, &model, &serial);
 
       modelstr[0] = '/';
 
+      CFStringGetCString(deviceIDString, idstr, sizeof(idstr),    kCFStringEncodingUTF8);
       CFStringGetCString(make, makestr, sizeof(makestr),    kCFStringEncodingUTF8);
       CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1, kCFStringEncodingUTF8);
+
+     /*
+      * Fix common HP 1284 bug...
+      */
+
+      if (!strcasecmp(makestr, "Hewlett-Packard"))
+        strcpy(makestr, "HP");
+
+      if (!strncasecmp(modelstr + 1, "hp ", 3))
+        _cups_strcpy(modelstr + 1, modelstr + 4);
 
       optionsstr[0] = '\0';
       if (serial != NULL)
@@ -464,7 +475,8 @@ static Boolean list_device_callback(void *refcon, io_service_t obj)
       httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
       strncat(uristr, optionsstr, sizeof(uristr));
 
-      printf("direct %s \"%s %s\" \"%s\"\n", uristr, makestr, &modelstr[1], &modelstr[1]);
+      printf("direct %s \"%s %s\" \"%s %s USB\" \"%s\"\n", uristr, makestr,
+             &modelstr[1], makestr, &modelstr[1], idstr);
 
       release_deviceinfo(&make, &model, &serial);
       CFRelease(deviceIDString);
@@ -1334,5 +1346,5 @@ static void *read_thread(void *reference)
 
 
 /*
- * End of "$Id: usb-darwin.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: usb-darwin.c 5488 2006-05-03 19:39:30Z mike $".
  */

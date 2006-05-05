@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: conf.c 5482 2006-05-02 18:13:40Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -2949,6 +2949,11 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       switch (var->type)
       {
         case CUPSD_VARTYPE_INTEGER :
+	    if (!value)
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "Missing integer value for %s on line %d!",
+			      line, linenum);
+	    else
 	    {
 	      int	n;		/* Number */
 	      char	*units;		/* Units */
@@ -2973,11 +2978,15 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    break;
 
 	case CUPSD_VARTYPE_BOOLEAN :
-	    if (!strcasecmp(value, "true") ||
-	        !strcasecmp(value, "on") ||
-		!strcasecmp(value, "enabled") ||
-		!strcasecmp(value, "yes") ||
-		atoi(value) != 0)
+	    if (!value)
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "Missing boolean value for %s on line %d!",
+			      line, linenum);
+            else if (!strcasecmp(value, "true") ||
+	             !strcasecmp(value, "on") ||
+		     !strcasecmp(value, "enabled") ||
+		     !strcasecmp(value, "yes") ||
+		     atoi(value) != 0)
               *((int *)var->ptr) = TRUE;
 	    else if (!strcasecmp(value, "false") ||
 	             !strcasecmp(value, "off") ||
@@ -3252,5 +3261,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: conf.c 5482 2006-05-02 18:13:40Z mike $".
  */

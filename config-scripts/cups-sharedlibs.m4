@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4 5112 2006-02-16 04:41:59Z mike $"
+dnl "$Id: cups-sharedlibs.m4 5466 2006-04-26 19:52:27Z mike $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -152,5 +152,5 @@ AC_SUBST(IMGLIBS)
 AC_SUBST(EXPORT_LDFLAGS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4 5112 2006-02-16 04:41:59Z mike $".
+dnl End of "$Id: cups-sharedlibs.m4 5466 2006-04-26 19:52:27Z mike $".
 dnl

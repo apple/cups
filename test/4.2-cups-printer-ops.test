@@ -1,5 +1,5 @@
 #
-# "$Id: 4.2-cups-printer-ops.test 5091 2006-02-08 18:39:56Z mike $"
+# "$Id: 4.2-cups-printer-ops.test 5493 2006-05-05 16:33:57Z mike $"
 #
 #   Verify that the CUPS printer operations work.
 #
@@ -130,7 +130,7 @@
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
 
-	FILE testps.ppd
+	FILE testhp.ppd
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -205,7 +205,7 @@
 	ATTR enum printer-state 3
 	ATTR boolean printer-is-accepting-jobs true
 
-	FILE testhp.ppd
+	FILE testps.ppd
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -258,5 +258,5 @@
 }
 
 #
-# End of "$Id: 4.2-cups-printer-ops.test 5091 2006-02-08 18:39:56Z mike $"
+# End of "$Id: 4.2-cups-printer-ops.test 5493 2006-05-05 16:33:57Z mike $"
 #

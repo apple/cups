@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c 5394 2006-04-14 18:20:04Z mike $"
+ * "$Id: mime.c 5495 2006-05-05 17:58:07Z mike $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -120,6 +120,7 @@ mimeDelete(mime_t *mime)		/* I - MIME database */
 
   cupsArrayDelete(mime->types);
   cupsArrayDelete(mime->filters);
+  cupsArrayDelete(mime->srcs);
   free(mime);
 }
 
@@ -137,6 +138,17 @@ mimeDeleteFilter(mime_t        *mime,	/* I - MIME database */
 
   cupsArrayRemove(mime->filters, filter);
   free(filter);
+
+ /*
+  * Deleting a filter invalidates the source lookup cache used by
+  * mimeFilter()...
+  */
+
+  if (mime->srcs)
+  {
+    cupsArrayDelete(mime->srcs);
+    mime->srcs = NULL;
+  }
 }
 
 
@@ -628,7 +640,7 @@ load_types(mime_t     *mime,		/* I - MIME database */
 {
   cups_file_t	*fp;			/* Types file */
   int		linelen;		/* Length of line */
-  char		line[65536],		/* Input line from file */
+  char		line[32768],		/* Input line from file */
 		*lineptr,		/* Current position in line */
 		super[MIME_MAX_SUPER],	/* Super-type name */
 		type[MIME_MAX_TYPE],	/* Type name */
@@ -711,5 +723,5 @@ load_types(mime_t     *mime,		/* I - MIME database */
 
 
 /*
- * End of "$Id: mime.c 5394 2006-04-14 18:20:04Z mike $".
+ * End of "$Id: mime.c 5495 2006-05-05 17:58:07Z mike $".
  */

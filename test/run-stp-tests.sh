@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 5262 2006-03-09 21:26:27Z mike $"
+# "$Id: run-stp-tests.sh 5493 2006-05-05 16:33:57Z mike $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -23,6 +23,8 @@
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
+
+argcount=$#
 
 #
 # Make the IPP test program...
@@ -67,7 +69,12 @@ echo "4 - Basic conformance test, torture load testing (minimum 2GB VM, 1GB disk
 echo ""
 echo $ac_n "Enter the number of the test you wish to perform: [1] $ac_c"
 
-read testtype
+if test $# -gt 0; then
+	testtype=$1
+	shift
+else
+	read testtype
+fi
 echo ""
 
 case "$testtype" in
@@ -118,7 +125,12 @@ echo "2 - Create a SSL/TLS certificate and key and require encryption"
 echo ""
 echo $ac_n "Enter the number of the SSL/TLS tests to perform: [0] $ac_c"
 
-read ssltype
+if test $# -gt 0; then
+	ssltype=$1
+	shift
+else
+	read ssltype
+fi
 echo ""
 
 case "$ssltype" in
@@ -186,7 +198,12 @@ echo "    http://developer.kde.org/~sewardj/"
 echo ""
 echo $ac_n "Enter Y to use Valgrind or N to not use Valgrind: [N] $ac_c"
 
-read usevalgrind
+if test $# -gt 0; then
+	usevalgrind=$1
+	shift
+else
+	read usevalgrind
+fi
 echo ""
 
 case "$usevalgrind" in
@@ -203,6 +220,8 @@ esac
 #
 # Start by creating temporary directories for the tests...
 #
+
+echo "Creating directories for test..."
 
 rm -rf /tmp/cups-$user
 mkdir /tmp/cups-$user
@@ -225,6 +244,7 @@ ln -s $root/backend/ipp /tmp/cups-$user/bin/backend
 ln -s $root/backend/lpd /tmp/cups-$user/bin/backend
 ln -s $root/backend/parallel /tmp/cups-$user/bin/backend
 ln -s $root/backend/serial /tmp/cups-$user/bin/backend
+ln -s $root/backend/snmp /tmp/cups-$user/bin/backend
 ln -s $root/backend/socket /tmp/cups-$user/bin/backend
 ln -s $root/backend/usb /tmp/cups-$user/bin/backend
 ln -s $root/cgi-bin /tmp/cups-$user/bin
@@ -246,6 +266,7 @@ ln -s $root/data/secret /tmp/cups-$user/share/banners
 ln -s $root/data/standard /tmp/cups-$user/share/banners
 ln -s $root/data/topsecret /tmp/cups-$user/share/banners
 ln -s $root/data/unclassified /tmp/cups-$user/share/banners
+ln -s $root/data /tmp/cups-$user/share/charmaps
 ln -s $root/data /tmp/cups-$user/share/charsets
 ln -s $root/data /tmp/cups-$user/share
 ln -s $root/fonts /tmp/cups-$user/share
@@ -260,6 +281,8 @@ fi
 #
 # Then create the necessary config files...
 #
+
+echo "Creating cupsd.conf for test..."
 
 if test $ssltype = 2; then
 	encryption="Encryption Required"
@@ -286,7 +309,7 @@ MaxLogSize 0
 AccessLog /tmp/cups-$user/log/access_log
 ErrorLog /tmp/cups-$user/log/error_log
 PageLog /tmp/cups-$user/log/page_log
-LogLevel debug
+LogLevel debug2
 PreserveJobHistory Yes
 <Policy default>
 <Limit All>
@@ -304,6 +327,8 @@ touch /tmp/cups-$user/printers.conf
 #
 # Setup lots of test queues - 500 with PPD files, 500 without...
 #
+
+echo "Creating printers.conf for test..."
 
 i=1
 while test $i -le $nprinters1; do
@@ -349,6 +374,8 @@ cp $root/conf/mime.convs /tmp/cups-$user/mime.convs
 # Setup the paths...
 #
 
+echo "Setting up environment variables for test..."
+
 if test "x$LD_LIBRARY_PATH" = x; then
 	LD_LIBRARY_PATH="$root/cups:$root/filter"
 else
@@ -393,10 +420,10 @@ export HOME
 #
 
 echo "Starting scheduler:"
-echo "    $valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log &"
+echo "    $valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &"
 echo ""
 
-$valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log &
+$valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
 cupsd=$!
 
 #if test -x /usr/bin/strace; then
@@ -412,10 +439,15 @@ if test "x$testtype" = x0; then
 	exit 0
 fi
 
-echo "Scheduler is PID $cupsd; run debugger now if you need to."
-echo ""
-echo $ac_n "Press ENTER to continue... $ac_c"
-read junk
+if test $argcount -eq 0; then
+	echo "Scheduler is PID $cupsd; run debugger now if you need to."
+	echo ""
+	echo $ac_n "Press ENTER to continue... $ac_c"
+	read junk
+else
+	echo "Scheduler is PID $cupsd."
+	sleep 2
+fi
 
 IPP_PORT=$port; export IPP_PORT
 
@@ -442,6 +474,7 @@ cat str-header.html >$strfile
 # Run the IPP tests...
 #
 
+echo ""
 echo "Running IPP compliance tests..."
 
 echo "<H1>1 - IPP Compliance Tests</H1>" >>$strfile
@@ -470,6 +503,7 @@ echo "</PRE>" >>$strfile
 # Run the command tests...
 #
 
+echo ""
 echo "Running command tests..."
 
 echo "<H1>2 - Command Tests</H1>" >>$strfile
@@ -546,8 +580,6 @@ fi
 # Format the reports and tell the user where to find them...
 #
 
-echo "Formatting reports..."
-
 cat str-trailer.html >>$strfile
 
 echo ""
@@ -558,16 +590,10 @@ else
 	echo "All tests were successful."
 fi
 
-if test "x$valgrind" != x; then
-	echo "Valgrind log files can be found in /tmp/cups-$user/log."
-fi
-
-echo ""
-echo "See the following file for details:"
-echo ""
-echo "    $strfile"
+echo "Log files can be found in /tmp/cups-$user/log."
+echo "A HTML report was created in test/$strfile."
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh 5262 2006-03-09 21:26:27Z mike $"
+# End of "$Id: run-stp-tests.sh 5493 2006-05-05 16:33:57Z mike $"
 #

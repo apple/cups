@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5428 2006-04-18 20:45:30Z mike $"
+# "$Id: Makefile 5491 2006-05-04 20:53:35Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -271,7 +271,7 @@ libcups.2.dylib:	$(LIBOBJS)
 # libcups_s.a
 #
 
-libcups_s.a:	$(LIBOBJS)
+libcups_s.a:	$(LIBOBJS) libcups_s.exp
 	echo Creating $@...
 	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ) -lm
 	$(RM) $@
@@ -442,5 +442,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5428 2006-04-18 20:45:30Z mike $".
+# End of "$Id: Makefile 5491 2006-05-04 20:53:35Z mike $".
 #

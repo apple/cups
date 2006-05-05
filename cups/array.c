@@ -1,5 +1,5 @@
 /*
- * "$Id: array.c 5258 2006-03-09 15:40:56Z mike $"
+ * "$Id: array.c 5493 2006-05-05 16:33:57Z mike $"
  *
  *   Sorted array routines for the Common UNIX Printing System (CUPS).
  *
@@ -939,11 +939,14 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 
     DEBUG_puts("cups_array_find: linear search");
 
-    diff = 0;
+    diff = 1;
 
     for (current = 0; current < a->num_elements; current ++)
       if (a->elements[current] == e)
+      {
+        diff = 0;
         break;
+      }
   }
 
  /*
@@ -959,5 +962,5 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 
 
 /*
- * End of "$Id: array.c 5258 2006-03-09 15:40:56Z mike $".
+ * End of "$Id: array.c 5493 2006-05-05 16:33:57Z mike $".
  */

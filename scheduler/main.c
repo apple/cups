@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 5448 2006-04-22 03:57:26Z mike $"
+ * "$Id: main.c 5491 2006-05-04 20:53:35Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -217,6 +217,12 @@ main(int  argc,				/* I - Number of command-line args */
 	                              "in, running in normal mode.\n"));
               fg = 0;
 #endif /* HAVE_LAUNCHD */
+	      break;
+
+          case 'p' : /* Stop immediately for profiling */
+              puts("Warning: -p option is for internal testing use only!");
+	      stop_scheduler = 1;
+	      fg             = 1;
 	      break;
 
 	  default : /* Unknown option */
@@ -703,7 +709,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  sptr += strlen(sptr);
 	}
 
-      cupsdLogMessage(CUPSD_LOG_EMERG, s);
+      cupsdLogMessage(CUPSD_LOG_EMERG, "%s", s);
 
       strcpy(s, "OutputSet =");
       slen = 11;
@@ -717,7 +723,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  sptr += strlen(sptr);
 	}
 
-      cupsdLogMessage(CUPSD_LOG_EMERG, s);
+      cupsdLogMessage(CUPSD_LOG_EMERG, "%s", s);
 
       for (i = 0, con = (cupsd_client_t *)cupsArrayFirst(Clients);
 	   con;
@@ -2247,5 +2253,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 5448 2006-04-22 03:57:26Z mike $".
+ * End of "$Id: main.c 5491 2006-05-04 20:53:35Z mike $".
  */

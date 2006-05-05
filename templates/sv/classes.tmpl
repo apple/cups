@@ -17,35 +17,35 @@
 <A HREF="{printer_uri_supported}?op=print-test-page">
 <IMG SRC="/images/button-print-test-page.gif" ALT="Skriv ut testsida" CLASS="button"></A>
 {printer_state=5?
-<A HREF="{admin_uri}?op=start-class&amp;printer_name={printer_name}&amp;is_class=Y">
+<A HREF="{admin_uri}?op=start-class&amp;printer_name={%printer_name}&amp;is_class=Y">
 <IMG SRC="/images/button-start-class.gif" ALT="Starta klass" CLASS="button"></A>
 :
-<A HREF="{admin_uri}?op=stop-class&amp;printer_name={printer_name}&amp;is_class=Y">
+<A HREF="{admin_uri}?op=stop-class&amp;printer_name={%printer_name}&amp;is_class=Y">
 <IMG SRC="/images/button-stop-class.gif" ALT="Stoppa klass" CLASS="button"></A>
 }
 {printer_is_accepting_jobs=0?
-<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={printer_name}&amp;is_class=Y">
+<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={%printer_name}&amp;is_class=Y">
 <IMG SRC="/images/button-accept-jobs.gif" ALT="Acceptera jobb" CLASS="button"></A>
 :
-<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={printer_name}&amp;is_class=Y">
+<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={%printer_name}&amp;is_class=Y">
 <IMG SRC="/images/button-reject-jobs.gif" ALT="Vägra jobb" CLASS="button"></A>
 }
-<A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={printer_name}&amp;is_class=Y">
+<A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={%printer_name}&amp;is_class=Y">
 <IMG SRC="/images/button-cancel-all-jobs.gif" ALT="Avbryt alla jobb" CLASS="button"></A>
 {printer_is_shared=0?
-<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=1&amp;is_class=Y">
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=1&amp;is_class=Y">
 <IMG SRC="/images/button-publish-printer.gif" ALT="Publicera skrivare" CLASS="button"></A>
 :
-<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={printer_name}&amp;shared=0&amp;is_class=Y">
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=0&amp;is_class=Y">
 <IMG SRC="/images/button-unpublish-printer.gif" ALT="Avpublicera skrivare" CLASS="button"></A>
 }
-<A HREF="{admin_uri}?op=modify-class&amp;printer_name={printer_name}">
+<A HREF="{admin_uri}?op=modify-class&amp;printer_name={%printer_name}">
 <IMG SRC="/images/button-modify-class.gif" ALT="Modifiera klass" CLASS="button"></A>
-<A HREF="{admin_uri}?op=delete-class&amp;printer_name={printer_name}">
+<A HREF="{admin_uri}?op=delete-class&amp;printer_name={%printer_name}">
 <IMG SRC="/images/button-delete-class.gif" ALT="Ta bort klass" CLASS="button"></A>
-<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={printer_name}&amp;is_class=Y">
+<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={%printer_name}&amp;is_class=Y">
 <IMG SRC="/images/button-set-as-default.gif" ALT="Ställ in som standard" CLASS="button"></A>
-<A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={printer_name}&amp;is_class=Y">
+<A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={%printer_name}&amp;is_class=Y">
 <IMG SRC="/images/button-set-allowed-users.gif" ALT="Ställ in tillåtna användare" CLASS="button"></A>
 </P>
 </TD>

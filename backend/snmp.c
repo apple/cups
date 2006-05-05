@@ -1,5 +1,5 @@
 /*
- * "$Id: snmp.c 5453 2006-04-23 12:08:18Z mike $"
+ * "$Id: snmp.c 5479 2006-05-02 15:03:17Z mike $"
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
@@ -1244,7 +1244,7 @@ fix_make_model(
     const char *old_make_model,		/* I - Old make-and-model string */
     int        make_model_size)		/* I - Size of new string buffer */
 {
-  const char	*mmptr;			/* Pointer into make-and-model string */
+  char	*mmptr;				/* Pointer into make-and-model string */
 
 
  /*
@@ -1259,7 +1259,7 @@ fix_make_model(
     * with a single HP manufacturer prefix...
     */
 
-    mmptr = old_make_model + 15;
+    mmptr = (char *)old_make_model + 15;
 
     while (isspace(*mmptr & 255))
       mmptr ++;
@@ -1292,7 +1292,16 @@ fix_make_model(
     * becomes "Tektronix Phaser 560"...
     */
 
-    _cups_strcpy((char *)mmptr, mmptr + 7);
+    _cups_strcpy(mmptr, mmptr + 7);
+  }
+
+  if ((mmptr = strchr(make_model, ',')) != NULL)
+  {
+   /*
+    * Drop anything after a trailing comma...
+    */
+
+    *mmptr = '\0';
   }
 }
 
@@ -1433,8 +1442,9 @@ list_devices(void)
        cache;
        cache = (snmp_cache_t *)cupsArrayNext(Devices))
     if (cache->uri)
-      printf("network %s \"%s\" \"%s\" \"%s\"\n",
+      printf("network %s \"%s\" \"%s %s\" \"%s\"\n",
              cache->uri,
+	     cache->make_and_model ? cache->make_and_model : "Unknown",
 	     cache->make_and_model ? cache->make_and_model : "Unknown",
 	     cache->addrname, cache->id ? cache->id : "");
 }
@@ -2202,5 +2212,5 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 
 
 /*
- * End of "$Id: snmp.c 5453 2006-04-23 12:08:18Z mike $".
+ * End of "$Id: snmp.c 5479 2006-05-02 15:03:17Z mike $".
  */

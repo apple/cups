@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c 5261 2006-03-09 20:47:49Z mike $"
+ * "$Id: testppd.c 5484 2006-05-02 20:38:12Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -78,55 +78,99 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   status = 0;
 
-  fputs("ppdOpenFile: ", stdout);
-
-  if ((ppd = ppdOpenFile("test.ppd")) != NULL)
-    puts("PASS");
-  else
+  if (argc == 1)
   {
-    ppd_status_t	err;		/* Last error in file */
-    int			line;		/* Line number in file */
+    fputs("ppdOpenFile: ", stdout);
+
+    if ((ppd = ppdOpenFile("test.ppd")) != NULL)
+      puts("PASS");
+    else
+    {
+      ppd_status_t	err;		/* Last error in file */
+      int		line;		/* Line number in file */
 
 
-    status ++;
-    err = ppdLastError(&line);
+      status ++;
+      err = ppdLastError(&line);
 
-    printf("FAIL (%s on line %d)\n", ppdErrorString(err), line);
-  }
+      printf("FAIL (%s on line %d)\n", ppdErrorString(err), line);
+    }
 
-  fputs("ppdMarkDefaults: ", stdout);
-  ppdMarkDefaults(ppd);
+    fputs("ppdMarkDefaults: ", stdout);
+    ppdMarkDefaults(ppd);
 
-  if ((conflicts = ppdConflicts(ppd)) == 0)
-    puts("PASS");
-  else
-  {
-    status ++;
-    printf("FAIL (%d conflicts)\n", conflicts);
-  }
+    if ((conflicts = ppdConflicts(ppd)) == 0)
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (%d conflicts)\n", conflicts);
+    }
 
-  fputs("ppdEmitString: ", stdout);
-  if ((s = ppdEmitString(ppd, PPD_ORDER_ANY, 0.0)) != NULL &&
-      !strcmp(s, default_code))
-    puts("PASS");
-  else
-  {
-    printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
-           (int)strlen(default_code));
+    fputs("ppdEmitString: ", stdout);
+    if ((s = ppdEmitString(ppd, PPD_ORDER_ANY, 0.0)) != NULL &&
+	!strcmp(s, default_code))
+      puts("PASS");
+    else
+    {
+      printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
+	     (int)strlen(default_code));
+
+      if (s)
+	puts(s);
+    }
 
     if (s)
-      puts(s);
+      free(s);
+
+    ppdClose(ppd);
   }
+  else
+  {
+    if ((ppd = ppdOpenFile(argv[1])) == NULL)
+    {
+      ppd_status_t	err;		/* Last error in file */
+      int		line;		/* Line number in file */
 
-  if (s)
-    free(s);
 
-  ppdClose(ppd);
+      status ++;
+      err = ppdLastError(&line);
+
+      printf("%s: %s on line %d\n", argv[1], ppdErrorString(err), line);
+    }
+    else
+    {
+      int		i, j, k;	/* Looping vars */
+      ppd_group_t	*group;		/* Option group */
+      ppd_option_t	*option;	/* Option */
+
+
+      ppdLocalize(ppd);
+
+      for (i = ppd->num_groups, group = ppd->groups;
+	   i > 0;
+	   i --, group ++)
+      {
+	printf("%s (%s):\n", group->name, group->text);
+	
+	for (j = group->num_options, option = group->options;
+	     j > 0;
+	     j --, option ++)
+	{
+	  printf("    %s (%s):\n", option->keyword, option->text);
+
+	  for (k = 0; k < option->num_choices; k ++)
+	    printf("        - %s (%s)\n", option->choices[k].choice,
+		   option->choices[k].text);
+	}
+      }
+    }
+  }
 
   return (status);
 }
 
 
 /*
- * End of "$Id: testppd.c 5261 2006-03-09 20:47:49Z mike $".
+ * End of "$Id: testppd.c 5484 2006-05-02 20:38:12Z mike $".
  */

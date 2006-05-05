@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c 5241 2006-03-07 22:07:44Z mike $"
+ * "$Id: lpd.c 5495 2006-05-05 17:58:07Z mike $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -590,7 +590,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 #endif /* __APPLE__ */
   size_t		nbytes;		/* Number of bytes written */
   off_t			tbytes;		/* Total bytes written */
-  char			buffer[65536];	/* Output buffer */
+  char			buffer[32768];	/* Output buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -1230,5 +1230,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c 5241 2006-03-07 22:07:44Z mike $".
+ * End of "$Id: lpd.c 5495 2006-05-05 17:58:07Z mike $".
  */

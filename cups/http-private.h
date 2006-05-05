@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 5428 2006-04-18 20:45:30Z mike $"
+ * "$Id: http-private.h 5466 2006-04-26 19:52:27Z mike $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -31,7 +31,8 @@
  * Include necessary headers...
  */
 
-#  include "config.h"
+#  include <stdlib.h>
+#  include <config.h>
 
 #  ifdef __sun
 /*
@@ -165,14 +166,14 @@ struct ifaddrs				/**** Interface Structure ****/
   void			*ifa_data;	/* Interface statistics */
 };
 
-static int	_cups_getifaddrs(struct ifaddrs **addrs);
+extern int	_cups_getifaddrs(struct ifaddrs **addrs);
 #    define getifaddrs _cups_getifaddrs
-static void	_cups_freeifaddrs(struct ifaddrs *addrs);
+extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #    define freeifaddrs _cups_freeifaddrs
 #  endif /* HAVE_GETIFADDRS */
 
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 5428 2006-04-18 20:45:30Z mike $".
+ * End of "$Id: http-private.h 5466 2006-04-26 19:52:27Z mike $".
  */

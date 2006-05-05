@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5416 2006-04-17 21:24:17Z mike $"
+ * "$Id: client.c 5491 2006-05-04 20:53:35Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -42,7 +42,7 @@
  *   is_path_absolute()      - Is a path absolute and free of relative elements.
  *   make_certificate()      - Make a self-signed SSL/TLS certificate.
  *   pipe_command()          - Pipe the output of a command to the remote client.
- *   send_file()             - Send a file via HTTP.
+ *   write_file()            - Send a file via HTTP.
  */
 
 /*
@@ -83,9 +83,9 @@ static void		make_certificate(void);
 #endif /* HAVE_GNUTLS */
 static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 			             char *command, char *options, int root);
-static int		send_file(cupsd_client_t *con, http_status_t code,
-		        	  char *filename, char *type,
-				  struct stat *filestats);
+static int		write_file(cupsd_client_t *con, http_status_t code,
+		        	   char *filename, char *type,
+				   struct stat *filestats);
 
 
 /*
@@ -1264,7 +1264,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		else
 	          snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
-        	if (!send_file(con, HTTP_OK, filename, line, &filestats))
+        	if (!write_file(con, HTTP_OK, filename, line, &filestats))
 		  return (cupsdCloseClient(con));
 	      }
 	    }
@@ -3701,7 +3701,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   * Tell the CGI if we are using encryption...
   */
 
-  if (con->http.encryption == HTTP_ENCRYPT_ALWAYS)
+  if (con->http.tls)
     envp[envc ++] = "HTTPS=ON";
 
  /*
@@ -3772,19 +3772,19 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
 
 /*
- * 'send_file()' - Send a file via HTTP.
+ * 'write_file()' - Send a file via HTTP.
  */
 
 static int				/* O - 0 on failure, 1 on success */
-send_file(cupsd_client_t *con,		/* I - Client connection */
-          http_status_t  code,		/* I - HTTP status */
-	  char           *filename,	/* I - Filename */
-	  char           *type,		/* I - File type */
-	  struct stat    *filestats)	/* O - File information */
+write_file(cupsd_client_t *con,		/* I - Client connection */
+           http_status_t  code,		/* I - HTTP status */
+	   char           *filename,	/* I - Filename */
+	   char           *type,	/* I - File type */
+	   struct stat    *filestats)	/* O - File information */
 {
   con->file = open(filename, O_RDONLY);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "send_file: %d file=%d", con->http.fd,
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "write_file: %d file=%d", con->http.fd,
                   con->file);
 
   if (con->file < 0)
@@ -3815,7 +3815,7 @@ send_file(cupsd_client_t *con,		/* I - Client connection */
     con->http._data_remaining = INT_MAX;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "send_file: Adding fd %d to OutputSet...", con->http.fd);
+                  "write_file: Adding fd %d to OutputSet...", con->http.fd);
 
   FD_SET(con->http.fd, OutputSet);
 
@@ -3824,5 +3824,5 @@ send_file(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5416 2006-04-17 21:24:17Z mike $".
+ * End of "$Id: client.c 5491 2006-05-04 20:53:35Z mike $".
  */

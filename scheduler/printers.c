@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: printers.c 5491 2006-05-04 20:53:35Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1220,7 +1220,7 @@ cupsdRenamePrinter(
   * Rename the printer...
   */
 
-  cupsdSetStringf(&p->name, name);
+  cupsdSetString(&p->name, name);
 
  /*
   * Reset printer attributes...
@@ -3278,5 +3278,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: printers.c 5491 2006-05-04 20:53:35Z mike $".
  */

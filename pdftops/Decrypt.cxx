@@ -140,6 +140,12 @@ GBool Decrypt::makeFileKey2(int encVersion, int encRevision, int keyLength,
   int len, i, j;
   GBool ok;
 
+
+  // check whether we have non-zero keyLength
+  if ( keyLength < 5 || keyLength > 16 ) {
+    return gFalse;
+  }
+
   // generate file key
   buf = (Guchar *)gmalloc(72 + fileID->getLength());
   if (userPassword) {

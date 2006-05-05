@@ -1,5 +1,5 @@
 /*
- * "$Id: string.h 5366 2006-04-02 16:11:04Z mike $"
+ * "$Id: string.h 5466 2006-04-26 19:52:27Z mike $"
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
@@ -31,12 +31,13 @@
  * Include necessary headers...
  */
 
-#  include <config.h>
-
 #  include <stdio.h>
+#  include <stdlib.h>
 #  include <stdarg.h>
 #  include <ctype.h>
 #  include <locale.h>
+
+#  include <config.h>
 
 #  ifdef HAVE_STRING_H
 #    include <string.h>
@@ -157,5 +158,5 @@ extern double	_cupsStrScand(const char *buf, char **bufptr,
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h 5366 2006-04-02 16:11:04Z mike $".
+ * End of "$Id: string.h 5466 2006-04-26 19:52:27Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: server.c 5493 2006-05-05 16:33:57Z mike $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -146,9 +146,9 @@ cupsdStopServer(void)
   cupsdSaveRemoteCache();
   cupsdDeleteAllCerts();
 
-  if (Clients != NULL)
+  if (Clients)
   {
-    free(Clients);
+    cupsArrayDelete(Clients);
     Clients = NULL;
   }
 
@@ -211,5 +211,5 @@ cupsdStopServer(void)
 
 
 /*
- * End of "$Id: server.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: server.c 5493 2006-05-05 16:33:57Z mike $".
  */

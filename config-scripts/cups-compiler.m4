@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 5288 2006-03-14 02:38:07Z mike $"
+dnl "$Id: cups-compiler.m4 5473 2006-05-01 15:51:09Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -73,11 +73,14 @@ AC_SUBST(LIB64DIR)
 AC_SUBST(UNINSTALL64)
 
 dnl Position-Independent Executable support on Linux and *BSD...
-AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fpie option, default=no])
+AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fPIE option, default=no])
 
 dnl Update compiler options...
 CXXLIBS=""
 AC_SUBST(CXXLIBS)
+
+PIEFLAGS=""
+AC_SUBST(PIEFLAGS)
 
 if test -n "$GCC"; then
 	if test -z "$OPTIM"; then
@@ -96,8 +99,13 @@ if test -n "$GCC"; then
 	case $uname in
 		Linux*)
 			if test x$enable_pie = xyes; then
-				OPTIM="$OPTIM -fpie"
-				LDFLAGS="$LDFLAGS -pie"
+				PIEFLAGS="-pie -fPIE"
+			fi
+			;;
+
+		*)
+			if test x$enable_pie = xyes; then
+				echo "Sorry, --enable-pie is not supported on this OS!"
 			fi
 			;;
 	esac
@@ -467,5 +475,5 @@ if test $uname = HP-UX; then
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4 5288 2006-03-14 02:38:07Z mike $".
+dnl End of "$Id: cups-compiler.m4 5473 2006-05-01 15:51:09Z mike $".
 dnl

@@ -33,7 +33,7 @@ function reset_config()
 "\\n" +
 "# Restrict access to the admin pages...\\n" +
 "<Location /admin>\\n" +
-"@ENCRYPTION_REQUIRED\\n" +
+"@ENCRYPTION_REQUIRED@\\n" +
 "  Order allow,deny\\n" +
 "  Allow localhost\\n" +
 "</Location>\\n" +

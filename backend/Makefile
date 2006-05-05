@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5429 2006-04-18 21:18:51Z mike $"
+# "$Id: Makefile 5469 2006-04-27 13:58:43Z mike $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -27,9 +27,9 @@
 include ../Makedefs
 
 RBACKENDS =	ipp lpd
-UBACKENDS =	parallel scsi serial snmp socket usb
+UBACKENDS =	$(PAP) parallel scsi serial snmp socket usb
 TARGETS	=	betest test1284 $(RBACKENDS) $(UBACKENDS)
-OBJS	=	betest.o ipp.o lpd.o parallel.o scsi.o \
+OBJS	=	betest.o ipp.o lpd.o pap.o parallel.o scsi.o \
 		serial.o snmp.o socket.o test1284.o usb.o
 
 
@@ -137,6 +137,15 @@ lpd:	lpd.o ../cups/$(LIBCUPS)
 
 
 #
+# pap
+#
+
+pap:	pap.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o pap pap.o $(BACKLIBS) $(LIBS) -framework AppleTalk
+
+
+#
 # parallel
 #
 
@@ -201,5 +210,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5429 2006-04-18 21:18:51Z mike $".
+# End of "$Id: Makefile 5469 2006-04-27 13:58:43Z mike $".
 #

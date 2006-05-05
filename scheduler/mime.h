@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.h 5061 2006-02-03 16:32:18Z mike $"
+ * "$Id: mime.h 5487 2006-05-03 19:28:29Z mike $"
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
@@ -111,6 +111,7 @@ typedef struct _mime_s			/**** MIME Database ****/
 {
   cups_array_t	*types;			/* File types */
   cups_array_t	*filters;		/* Type conversion filters */
+  cups_array_t	*srcs;			/* Filters sorted by source type */
 } mime_t;
 
 
@@ -152,5 +153,5 @@ extern int		mimeNumFilters(mime_t *mime);
 #endif /* !_CUPS_MIME_H_ */
 
 /*
- * End of "$Id: mime.h 5061 2006-02-03 16:32:18Z mike $".
+ * End of "$Id: mime.h 5487 2006-05-03 19:28:29Z mike $".
  */

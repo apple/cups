@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-opsys.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id: cups-pam.m4 5466 2006-04-26 19:52:27Z mike $"
 dnl
-dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
+dnl   PAP (AppleTalk) stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl   Copyright 2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -22,22 +22,16 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
-dnl Get the operating system and version number...
-uname=`uname`
-uversion=`uname -r | sed -e '1,$s/^[[^0-9]]*\([[0-9]]*\)\.\([[0-9]]*\).*/\1\2/'`
+# Currently the PAP backend is only supported on MacOS X with the AppleTalk
+# SDK installed...
+PAP=""
+if test $uname = Darwin; then
+	PAP="pap"
+	AC_CHECK_HEADER(AppleTalk/at_proto.h)
+fi
 
-case "$uname" in
-	GNU* | GNU/*)
-		uname="GNU"
-		;;
-	IRIX*)
-		uname="IRIX"
-		;;
-	Linux*)
-		uname="Linux"
-		;;
-esac
+AC_SUBST(PAP)
 
 dnl
-dnl "$Id: cups-opsys.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl End of "$Id: cups-pam.m4 5466 2006-04-26 19:52:27Z mike $".
 dnl

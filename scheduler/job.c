@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 5452 2006-04-22 22:17:32Z mike $"
+ * "$Id: job.c 5494 2006-05-05 17:44:36Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -467,7 +467,36 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     * Backend had errors; stop it...
     */
 
-    switch (-job->status)
+    int exit_code;			/* Exit code from backend */
+
+
+   /*
+    * Convert the status to an exit code.  Due to the way the W* macros are
+    * implemented on MacOS X (bug?), we have to store the exit status in a
+    * variable first and then convert...
+    */
+
+    exit_code = -job->status;
+    if (WIFEXITED(exit_code))
+      exit_code = WEXITSTATUS(exit_code);
+    else
+      exit_code = job->status;
+
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Backend returned status %d (%s)",
+                    job->id, exit_code,
+		    exit_code == CUPS_BACKEND_FAILED ? "failed" :
+			exit_code == CUPS_BACKEND_AUTH_REQUIRED ?
+			    "authentication required" :
+			exit_code == CUPS_BACKEND_HOLD ? "hold job" :
+			exit_code == CUPS_BACKEND_STOP ? "stop printer" :
+			exit_code == CUPS_BACKEND_CANCEL ? "cancel job" :
+			exit_code < 0 ? "crashed" : "unknown");
+
+   /*
+    * Do what needs to be done...
+    */
+
+    switch (exit_code)
     {
       default :
       case CUPS_BACKEND_FAILED :
@@ -3411,5 +3440,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 5452 2006-04-22 22:17:32Z mike $".
+ * End of "$Id: job.c 5494 2006-05-05 17:44:36Z mike $".
  */

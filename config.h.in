@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: config.h.in 5474 2006-05-02 14:20:26Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -429,8 +429,15 @@
 #undef HAVE_DBUS
 
 
+/*
+ * Do we have the AppleTalk/at_proto.h header?
+ */
+
+#undef HAVE_APPLETALK_AT_PROTO_H
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: config.h.in 5474 2006-05-02 14:20:26Z mike $".
  */

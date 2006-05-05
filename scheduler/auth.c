@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 5442 2006-04-20 14:00:02Z mike $"
+ * "$Id: auth.c 5464 2006-04-26 01:34:14Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -1621,6 +1621,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   */
 
   if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
+      strcasecmp(con->http.hostname, "localhost") &&
       best->satisfy == AUTH_SATISFY_ALL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -2166,5 +2167,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 5442 2006-04-20 14:00:02Z mike $".
+ * End of "$Id: auth.c 5464 2006-04-26 01:34:14Z mike $".
  */
