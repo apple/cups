@@ -467,17 +467,25 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     * Backend had errors; stop it...
     */
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Backend returned status %d (%s)",
-                    job->id, -job->status,
-		    -job->status == CUPS_BACKEND_FAILED ? "failed" :
-			-job->status == CUPS_BACKEND_AUTH_REQUIRED ?
-			    "authentication required" :
-			-job->status == CUPS_BACKEND_HOLD ? "hold job" :
-			-job->status == CUPS_BACKEND_STOP ? "stop printer" :
-			-job->status == CUPS_BACKEND_CANCEL ? "cancel job" :
-			"unknown");
+    int exit_code;			/* Exit code from backend */
 
-    switch (-job->status)
+
+    if (WIFEXITED(-job->status))
+      exit_code = WEXITSTATUS(-job->status);
+    else
+      exit_code = job->status;
+
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Backend returned status %d (%s)",
+                    job->id, exit_code,
+		    exit_code == CUPS_BACKEND_FAILED ? "failed" :
+			exit_code == CUPS_BACKEND_AUTH_REQUIRED ?
+			    "authentication required" :
+			exit_code == CUPS_BACKEND_HOLD ? "hold job" :
+			exit_code == CUPS_BACKEND_STOP ? "stop printer" :
+			exit_code == CUPS_BACKEND_CANCEL ? "cancel job" :
+			exit_code < 0 ? "crashed" : "unknown");
+
+    switch (exit_code)
     {
       default :
       case CUPS_BACKEND_FAILED :
