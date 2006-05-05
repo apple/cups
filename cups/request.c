@@ -69,7 +69,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   FILE		*file;			/* File to send */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
-  char		buffer[65536];		/* Output buffer */
+  char		buffer[32768];		/* Output buffer */
 
 
   DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",

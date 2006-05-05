@@ -1215,7 +1215,7 @@ compress_files(int  num_files,		/* I - Number of files */
 		*out;			/* Output file */
   struct stat	outinfo;		/* Output file information */
   char		filename[1024],		/* Temporary filename */
-		buffer[65536];		/* Copy buffer */
+		buffer[32768];		/* Copy buffer */
 
 
   fprintf(stderr, "DEBUG: Compressing %d job files...\n", num_files);

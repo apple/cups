@@ -590,7 +590,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 #endif /* __APPLE__ */
   size_t		nbytes;		/* Number of bytes written */
   off_t			tbytes;		/* Total bytes written */
-  char			buffer[65536];	/* Output buffer */
+  char			buffer[32768];	/* Output buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */

@@ -640,7 +640,7 @@ load_types(mime_t     *mime,		/* I - MIME database */
 {
   cups_file_t	*fp;			/* Types file */
   int		linelen;		/* Length of line */
-  char		line[65536],		/* Input line from file */
+  char		line[32768],		/* Input line from file */
 		*lineptr,		/* Current position in line */
 		super[MIME_MAX_SUPER],	/* Super-type name */
 		type[MIME_MAX_TYPE],	/* Type name */

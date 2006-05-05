@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.2
 
 	- Documentation updates (STR #1618, STR #1620, STR #1622,
 	  STR #1637)
+	- Static file copy buffers reduced from 64k to 32k to
+	  work around bogus MallocDebug library assumptions (STR
+	  #1660)
 	- The scheduler did not decode the backend exit code
 	  properly (STR #1648)
 	- The MacOS X USB backend did not report the 1284 device ID,
