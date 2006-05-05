@@ -473,23 +473,20 @@ is not absolute, it is loaded relative to the
 
 <h4>Customizing the Profile Selection Keywords</h4>
 
-<p>The <tt>ColorModel</tt>, <tt>MediaType</tt>, and
-<tt>Resolution</tt> keywords can be reassigned to different main
-keywords, allowing drivers to do color profile selection based
-on different parameters. The <tt>cupsICCQualifier1</tt>,
-<tt>cupsICCQualifier2</tt>, and <tt>cupsICCQualifier3</tt>
+<p>The <tt>MediaType</tt> and <tt>Resolution</tt> keywords can be
+reassigned to different main keywords, allowing drivers to do
+color profile selection based on different parameters. The
+<tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt>
 attributes define the mapping from selector to main keyword:</p>
 
 <pre class='command'>
-*cupsICCQualifier1: MainKeyword
-*cupsICCQualifier2: MainKeyword
-*cupsICCQualifier3: MainKeyword
+*cupsICCQualifier2: MainKeyword2
+*cupsICCQualifier3: MainKeyword3
 </pre>
 
 <p>The default mapping is as follows:</p>
 
 <pre class='command'>
-*cupsICCQualifier1: ColorModel
 *cupsICCQualifier2: MediaType
 *cupsICCQualifier3: Resolution
 </pre>
