@@ -939,11 +939,14 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 
     DEBUG_puts("cups_array_find: linear search");
 
-    diff = 0;
+    diff = 1;
 
     for (current = 0; current < a->num_elements; current ++)
       if (a->elements[current] == e)
+      {
+        diff = 0;
         break;
+      }
   }
 
  /*

@@ -115,10 +115,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     if (!mime->filters)
       mime->filters = cupsArrayNew((cups_array_func_t)compare_filters, NULL);
 
-    if (!mime->srcs)
-      mime->srcs = cupsArrayNew((cups_array_func_t)compare_srcs, NULL);
-
-    if (!mime->filters || !mime->srcs)
+    if (!mime->filters)
       return (NULL);
 
     if ((temp = calloc(1, sizeof(mime_filter_t))) == NULL)
@@ -134,7 +131,6 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     strlcpy(temp->filter, filter, sizeof(temp->filter));
 
     cupsArrayAdd(mime->filters, temp);
-    cupsArrayAdd(mime->srcs, temp);
   }
 
  /*
@@ -171,6 +167,23 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
 
   if (!mime || !src || !dst)
     return (NULL);
+
+ /*
+  * (Re)build the source lookup array as needed...
+  */
+
+  if (!mime->srcs)
+  {
+    mime_filter_t	*current;	/* Current filter */
+
+
+    mime->srcs = cupsArrayNew((cups_array_func_t)compare_srcs, NULL);
+
+    for (current = mimeFirstFilter(mime);
+         current;
+	 current = mimeNextFilter(mime))
+      cupsArrayAdd(mime->srcs, current);
+  }
 
  /*
   * Find the filters...

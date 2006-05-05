@@ -146,9 +146,9 @@ cupsdStopServer(void)
   cupsdSaveRemoteCache();
   cupsdDeleteAllCerts();
 
-  if (Clients != NULL)
+  if (Clients)
   {
-    free(Clients);
+    cupsArrayDelete(Clients);
     Clients = NULL;
   }
 

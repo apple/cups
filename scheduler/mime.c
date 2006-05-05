@@ -138,6 +138,17 @@ mimeDeleteFilter(mime_t        *mime,	/* I - MIME database */
 
   cupsArrayRemove(mime->filters, filter);
   free(filter);
+
+ /*
+  * Deleting a filter invalidates the source lookup cache used by
+  * mimeFilter()...
+  */
+
+  if (mime->srcs)
+  {
+    cupsArrayDelete(mime->srcs);
+    mime->srcs = NULL;
+  }
 }
 
 

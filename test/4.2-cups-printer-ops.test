@@ -130,7 +130,7 @@
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
 
-	FILE testps.ppd
+	FILE testhp.ppd
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -205,7 +205,7 @@
 	ATTR enum printer-state 3
 	ATTR boolean printer-is-accepting-jobs true
 
-	FILE testhp.ppd
+	FILE testps.ppd
 
 	# What statuses are OK?
 	STATUS successful-ok

@@ -510,7 +510,7 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
   * Do we need to rotate the log?
   */
 
-  if (strncmp(filename, "/dev/", 5) && cupsFileTell(*lf) > MaxLogSize &&
+  if (strncmp(logname, "/dev/", 5) && cupsFileTell(*lf) > MaxLogSize &&
       MaxLogSize > 0)
   {
    /*

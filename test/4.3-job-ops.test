@@ -55,7 +55,7 @@
 }
 {
 	# The name of the test...
-	NAME "Print PostScript Job to Test2"
+	NAME "Print JPEG Job to Test2"
 
 	# The operation to use
 	OPERATION print-job
@@ -71,7 +71,7 @@
         GROUP subscription
 	ATTR uri notify-recipient testnotify
 
-	FILE testfile.ps
+	FILE testfile.jpg
 
 	# What statuses are OK?
 	STATUS successful-ok
