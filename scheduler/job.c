@@ -470,8 +470,15 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     int exit_code;			/* Exit code from backend */
 
 
-    if (WIFEXITED(-job->status))
-      exit_code = WEXITSTATUS(-job->status);
+   /*
+    * Convert the status to an exit code.  Due to the way the W* macros are
+    * implemented on MacOS X (bug?), we have to store the exit status in a
+    * variable first and then convert...
+    */
+
+    exit_code = -job->status;
+    if (WIFEXITED(exit_code))
+      exit_code = WEXITSTATUS(exit_code);
     else
       exit_code = job->status;
 
@@ -484,6 +491,10 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 			exit_code == CUPS_BACKEND_STOP ? "stop printer" :
 			exit_code == CUPS_BACKEND_CANCEL ? "cancel job" :
 			exit_code < 0 ? "crashed" : "unknown");
+
+   /*
+    * Do what needs to be done...
+    */
 
     switch (exit_code)
     {
