@@ -172,18 +172,6 @@ cupsRasterInterpretPPD(
   }
 
  /*
-  * Check parameters...
-  */
-
-  if (!h->HWResolution[0] || !h->HWResolution[1] ||
-      !h->PageSize[0] || !h->PageSize[1] ||
-      (h->cupsBitsPerColor != 1 && h->cupsBitsPerColor != 2 &&
-       h->cupsBitsPerColor != 4 && h->cupsBitsPerColor != 8) ||
-      h->cupsBorderlessScalingFactor < 0.9 ||
-      h->cupsBorderlessScalingFactor > 1.1)
-    return (-1);
-
- /*
   * Allow option override for page scaling...
   */
 
@@ -245,6 +233,19 @@ cupsRasterInterpretPPD(
   */
 
   if (func && (*func)(h, preferred_bits))
+    return (-1);
+
+ /*
+  * Check parameters...
+  */
+
+  if (!h->HWResolution[0] || !h->HWResolution[1] ||
+      !h->PageSize[0] || !h->PageSize[1] ||
+      (h->cupsBitsPerColor != 1 && h->cupsBitsPerColor != 2 &&
+       h->cupsBitsPerColor != 4 && h->cupsBitsPerColor != 8 &&
+       h->cupsBitsPerColor != 16) ||
+      h->cupsBorderlessScalingFactor < 0.9 ||
+      h->cupsBorderlessScalingFactor > 1.1)
     return (-1);
 
  /*
