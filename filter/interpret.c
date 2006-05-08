@@ -1,5 +1,5 @@
 /*
- * "$Id: interpret.c 5490 2006-05-04 19:12:45Z mike $"
+ * "$Id: interpret.c 5497 2006-05-06 00:24:22Z mike $"
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
@@ -172,18 +172,6 @@ cupsRasterInterpretPPD(
   }
 
  /*
-  * Check parameters...
-  */
-
-  if (!h->HWResolution[0] || !h->HWResolution[1] ||
-      !h->PageSize[0] || !h->PageSize[1] ||
-      (h->cupsBitsPerColor != 1 && h->cupsBitsPerColor != 2 &&
-       h->cupsBitsPerColor != 4 && h->cupsBitsPerColor != 8) ||
-      h->cupsBorderlessScalingFactor < 0.9 ||
-      h->cupsBorderlessScalingFactor > 1.1)
-    return (-1);
-
- /*
   * Allow option override for page scaling...
   */
 
@@ -245,6 +233,19 @@ cupsRasterInterpretPPD(
   */
 
   if (func && (*func)(h, preferred_bits))
+    return (-1);
+
+ /*
+  * Check parameters...
+  */
+
+  if (!h->HWResolution[0] || !h->HWResolution[1] ||
+      !h->PageSize[0] || !h->PageSize[1] ||
+      (h->cupsBitsPerColor != 1 && h->cupsBitsPerColor != 2 &&
+       h->cupsBitsPerColor != 4 && h->cupsBitsPerColor != 8 &&
+       h->cupsBitsPerColor != 16) ||
+      h->cupsBorderlessScalingFactor < 0.9 ||
+      h->cupsBorderlessScalingFactor > 1.1)
     return (-1);
 
  /*
@@ -607,5 +608,5 @@ exec_code(
 
 
 /*
- * End of "$Id: interpret.c 5490 2006-05-04 19:12:45Z mike $".
+ * End of "$Id: interpret.c 5497 2006-05-06 00:24:22Z mike $".
  */

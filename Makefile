@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5314 2006-03-20 19:06:50Z mike $"
+# "$Id: Makefile 5498 2006-05-07 16:52:14Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -55,6 +55,25 @@ clean:
 		echo Cleaning in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) clean) || exit 1;\
 	done
+
+
+#
+# Remove all non-distribution files...
+#
+
+distclean:	clean
+	$(RM) Makedefs config.h config.log config.status
+	$(RM) cups-config conf/cupsd.conf conf/pam.std
+	$(RM) doc/help/standard.html doc/index.html
+	$(RM) init/cups.sh init/cups-lpd
+	$(RM) man/cups-deviced.man man/cups-driverd.man
+	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
+	$(RM) man/cupsd.conf.man man/lpoptions.man
+	$(RM) packaging/cups templates/edit-config.tmpl templates/header.tmpl
+	-$(RM) doc/*/index.html
+	-$(RM) templates/*/edit-config.tmpl
+	-$(RM) templates/*/header.tmpl
+	-$(RM) -r autom4te*.cache
 
 
 #
@@ -217,5 +236,5 @@ epm:
 
 
 #
-# End of "$Id: Makefile 5314 2006-03-20 19:06:50Z mike $".
+# End of "$Id: Makefile 5498 2006-05-07 16:52:14Z mike $".
 #
