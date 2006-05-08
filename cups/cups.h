@@ -61,9 +61,9 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION		1.0200
+#  define CUPS_VERSION		1.0300
 #  define CUPS_VERSION_MAJOR	1
-#  define CUPS_VERSION_MINOR	2
+#  define CUPS_VERSION_MINOR	3
 #  define CUPS_VERSION_PATCH	0
 #  define CUPS_DATE_ANY		-1
 
