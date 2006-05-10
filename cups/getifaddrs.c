@@ -182,8 +182,9 @@ _cups_getifaddrs(struct ifaddrs **addrs)/* O - List of interfaces */
 	* Got it, make a copy...
 	*/
 
-	if ((temp->ifa_dstaddr = calloc(1, sizeof(request.ifr_broadaddr))) != NULL)
-	  memcpy(temp->ifa_dstaddr, &(request.ifr_broadaddr),
+	if ((temp->ifa_broadaddr =
+	         calloc(1, sizeof(request.ifr_broadaddr))) != NULL)
+	  memcpy(temp->ifa_broadaddr, &(request.ifr_broadaddr),
 		 sizeof(request.ifr_broadaddr));
       }
     }

@@ -24,13 +24,14 @@
 #
 
 VERSION="@CUPS_VERSION@"
-APIVERSION="1.2"
+APIVERSION="1.3"
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
 includedir=@includedir@
 libdir=@libdir@
+imagelibdir=@libdir@
 datadir=@datadir@
 sysconfdir=@sysconfdir@
 cups_datadir=@CUPS_DATADIR@
@@ -44,13 +45,27 @@ LDFLAGS="@EXPORT_LDFLAGS@"
 LIBS="@EXPORT_SSLLIBS@ @LIBS@"
 IMGLIBS="@EXPORT_LIBTIFF@ @EXPORT_LIBJPEG@ @EXPORT_LIBPNG@ @EXPORT_LIBZ@"
 
-if test $includedir != /usr/include; then
-    CFLAGS="$CFLAGS -I$includedir"
+# Check for local invocation...
+selfdir=`dirname $0`
+
+if test -f "$selfdir/cups/cups.h"; then
+    CFLAGS="-I$selfdir"
+    LDFLAGS="-L$selfdir/cups -L$selfdir/filter $LDFLAGS"
+    libdir="$selfdir/cups"
+    imagelibdir="$selfdir/filter"
+    if test ! -e "$selfdir/cups/raster.h"; then
+        ln -s ../filter/raster.h "$selfdir/cups"
+    fi
+else
+    if test $includedir != /usr/include; then
+	CFLAGS="$CFLAGS -I$includedir"
+    fi
+
+    if test $libdir != /usr/lib -a $libdir != /usr/lib32 -a $libdir != /usr/lib64; then
+	LDFLAGS="$LDFLAGS -L$libdir"
+    fi
 fi
 
-if test $libdir != /usr/lib -a $libdir != /usr/lib32; then
-    LDFLAGS="$LDFLAGS -L$libdir"
-fi
 
 usage ()
 {
@@ -106,7 +121,7 @@ while test $# -gt 0; do
 	        if test $image = no; then
 	            echo $libdir/libcups.a $LIBS
 		else
-	            echo $libdir/libcupsimage.a $IMGLIBS $libdir/libcups.a $LIBS
+	            echo $imagelibdir/libcupsimage.a $IMGLIBS $libdir/libcups.a $LIBS
 		fi
 	    fi
 	    ;;
