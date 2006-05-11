@@ -1284,8 +1284,8 @@ rgb_to_lab(cups_ib_t *val)		/* IO - Color value */
   */
 
   r = pow((val[0] + 14.025) / 269.025, 2.4);
-  g = pow((val[0] + 14.025) / 269.025, 2.4);
-  b = pow((val[0] + 14.025) / 269.025, 2.4);
+  g = pow((val[1] + 14.025) / 269.025, 2.4);
+  b = pow((val[2] + 14.025) / 269.025, 2.4);
 
  /*
   * Convert to CIE XYZ...
@@ -1366,8 +1366,8 @@ rgb_to_xyz(cups_ib_t *val)		/* IO - Color value */
   */
 
   r = pow((val[0] + 14.025) / 269.025, 2.4);
-  g = pow((val[0] + 14.025) / 269.025, 2.4);
-  b = pow((val[0] + 14.025) / 269.025, 2.4);
+  g = pow((val[1] + 14.025) / 269.025, 2.4);
+  b = pow((val[2] + 14.025) / 269.025, 2.4);
 
  /*
   * Convert to CIE XYZ...
