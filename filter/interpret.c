@@ -296,7 +296,7 @@ cupsRasterInterpretPPD(
 	break;
 
     case CUPS_CSPACE_KCMYcm :
-	if (h->cupsBitsPerPixel == 1)
+	if (h->cupsBitsPerColor == 1)
 	{
 	  if (h->cupsColorOrder == CUPS_ORDER_CHUNKED)
 	    h->cupsBitsPerPixel = 8;
