@@ -26,6 +26,7 @@
  * Contents:
  *
  *   main()          - Main entry...
+ *   blank_line()    - Clear a line buffer to the blank value...
  *   format_CMY()    - Convert image data to CMY.
  *   format_CMYK()   - Convert image data to CMYK.
  *   format_K()      - Convert image data to black.
@@ -170,7 +171,8 @@ int		Planes[] =		/* Number of planes for each colorspace */
 /*
  * Local functions...
  */
- 
+
+static void	blank_line(cups_page_header2_t *header, unsigned char *row);
 static void	format_CMY(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
 static void	format_CMYK(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
 static void	format_K(cups_page_header2_t *header, unsigned char *row, int y, int z, int xsize, int ysize, int yerr0, int yerr1, cups_ib_t *r0, cups_ib_t *r1);
@@ -242,8 +244,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 			iy,		/* Current Y coordinate in image */
 			last_iy,	/* Previous Y coordinate in image */
 			yerr0,		/* Top Y error value */
-			yerr1,		/* Bottom Y error value */
-			blank;		/* Blank value */
+			yerr1;		/* Bottom Y error value */
   cups_ib_t		lut[256];	/* Gamma/brightness LUT */
   int			plane,		/* Current color plane */
 			num_planes;	/* Number of color planes */
@@ -656,7 +657,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   fputs("INFO: Loading image file...\n", stderr);
 
-  img = cupsImageOpen(filename, primary, secondary, sat, hue, lut);
+  if (header.cupsColorSpace == CUPS_CSPACE_CIEXYZ ||
+      header.cupsColorSpace == CUPS_CSPACE_CIELab ||
+      header.cupsColorSpace >= CUPS_CSPACE_ICC1)
+    img = cupsImageOpen(filename, primary, secondary, sat, hue, NULL);
+  else
+    img = cupsImageOpen(filename, primary, secondary, sat, hue, lut);
 
   if (argc == 6)
     unlink(filename);
@@ -1177,9 +1183,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   fprintf(stderr, "DEBUG: cupsColorSpace = %d\n", header.cupsColorSpace);
   fprintf(stderr, "DEBUG: img->colorspace = %d\n", img->colorspace);
 
-  row   = malloc(2 * header.cupsBytesPerLine);
-  ras   = cupsRasterOpen(1, CUPS_RASTER_WRITE);
-  blank = img->colorspace < 0 ? 0 : ~0;
+  row = malloc(2 * header.cupsBytesPerLine);
+  ras = cupsRasterOpen(1, CUPS_RASTER_WRITE);
 
   for (i = 0, page = 1; i < Copies; i ++)
     for (xpage = 0; xpage < xpages; xpage ++)
@@ -1229,7 +1234,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
           if (header.cupsHeight > z->ysize && YPosition <= 0)
 	  {
-	    memset(row, blank, header.cupsBytesPerLine);
+	    blank_line(&header, row);
 
             y = header.cupsHeight - z->ysize;
 	    if (YPosition == 0)
@@ -1269,7 +1274,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    * Format this line of raster data for the printer...
 	    */
 
-    	    memset(row, blank, header.cupsBytesPerLine);
+    	    blank_line(&header, row);
 
             r0 = z->rows[z->row];
             r1 = z->rows[1 - z->row];
@@ -1358,7 +1363,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
           if (header.cupsHeight > z->ysize && YPosition >= 0)
 	  {
-	    memset(row, blank, header.cupsBytesPerLine);
+	    blank_line(&header, row);
 
             y = header.cupsHeight - z->ysize;
 	    if (YPosition == 0)
@@ -1394,6 +1399,78 @@ main(int  argc,				/* I - Number of command-line arguments */
   ppdClose(ppd);
 
   return (0);
+}
+
+
+/*
+ * 'blank_line()' - Clear a line buffer to the blank value...
+ */
+
+static void
+blank_line(cups_page_header2_t *header,	/* I - Page header */
+           unsigned char       *row)	/* I - Row buffer */
+{
+  int	count;				/* Remaining bytes */
+
+
+  count = header->cupsBytesPerLine;
+
+  switch (header->cupsColorSpace)
+  {
+    case CUPS_CSPACE_CIEXYZ :
+        while (count > 2)
+	{
+	  *row++ = 242;
+	  *row++ = 255;
+	  *row++ = 255;
+	  count -= 3;
+	}
+	break;
+
+    case CUPS_CSPACE_CIELab :
+    case CUPS_CSPACE_ICC1 :
+    case CUPS_CSPACE_ICC2 :
+    case CUPS_CSPACE_ICC3 :
+    case CUPS_CSPACE_ICC4 :
+    case CUPS_CSPACE_ICC5 :
+    case CUPS_CSPACE_ICC6 :
+    case CUPS_CSPACE_ICC7 :
+    case CUPS_CSPACE_ICC8 :
+    case CUPS_CSPACE_ICC9 :
+    case CUPS_CSPACE_ICCA :
+    case CUPS_CSPACE_ICCB :
+    case CUPS_CSPACE_ICCC :
+    case CUPS_CSPACE_ICCD :
+    case CUPS_CSPACE_ICCE :
+    case CUPS_CSPACE_ICCF :
+        while (count > 2)
+	{
+	  *row++ = 255;
+	  *row++ = 128;
+	  *row++ = 128;
+	  count -= 3;
+	}
+        break;
+
+    case CUPS_CSPACE_K :
+    case CUPS_CSPACE_CMY :
+    case CUPS_CSPACE_CMYK :
+    case CUPS_CSPACE_YMC :
+    case CUPS_CSPACE_YMCK :
+    case CUPS_CSPACE_KCMY :
+    case CUPS_CSPACE_KCMYcm :
+    case CUPS_CSPACE_GMCK :
+    case CUPS_CSPACE_GMCS :
+    case CUPS_CSPACE_WHITE :
+    case CUPS_CSPACE_GOLD :
+    case CUPS_CSPACE_SILVER :
+        memset(row, 0, count);
+	break;
+
+    default :
+        memset(row, 255, count);
+	break;
+  }
 }
 
 

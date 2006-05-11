@@ -3,7 +3,7 @@
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   The color saturation/hue matrix stuff is provided thanks to Mr. Paul
  *   Haeberli at "http://www.sgi.com/grafica/matrix/index.html".
@@ -423,7 +423,8 @@ cupsImageCMYKToRGB(
       else
         *out++ = 0;
 
-      if (cupsImageColorSpace >= CUPS_CSPACE_CIELab)
+      if (cupsImageColorSpace == CUPS_CSPACE_CIELab ||
+          cupsImageColorSpace >= CUPS_CSPACE_ICC1)
         rgb_to_lab(out - 3);
       else if (cupsImageColorSpace == CUPS_CSPACE_CIEXYZ)
         rgb_to_xyz(out - 3);
@@ -852,14 +853,22 @@ cupsImageRGBToRGB(
     if (in != out)
       memcpy(out, in, count * 3);
 
-    if (cupsImageColorSpace >= CUPS_CSPACE_CIEXYZ)
+    if (cupsImageColorSpace == CUPS_CSPACE_CIELab ||
+        cupsImageColorSpace >= CUPS_CSPACE_ICC1)
     {
       while (count > 0)
       {
-	if (cupsImageColorSpace >= CUPS_CSPACE_CIELab)
-          rgb_to_lab(out);
-	else
-          rgb_to_xyz(out);
+        rgb_to_lab(out);
+
+	out += 3;
+	count --;
+      }
+    }
+    else if (cupsImageColorSpace == CUPS_CSPACE_CIEXYZ)
+    {
+      while (count > 0)
+      {
+        rgb_to_xyz(out);
 
 	out += 3;
 	count --;
@@ -958,13 +967,15 @@ cupsImageSetRasterColorSpace(
   * Set the destination colorspace...
   */
 
-  cupsImageColorSpace  = cs;
+  cupsImageColorSpace = cs;
 
  /*
   * Don't use color profiles in colorimetric colorspaces...
   */
 
-  if (cs >= CUPS_CSPACE_CIEXYZ)
+  if (cs == CUPS_CSPACE_CIEXYZ ||
+      cs == CUPS_CSPACE_CIELab ||
+      cs >= CUPS_CSPACE_ICC1)
     cupsImageHaveProfile = 0;
 }
 
@@ -1084,7 +1095,8 @@ cupsImageWhiteToRGB(
       *out++ = *in;
       *out++ = *in++;
 
-      if (cupsImageColorSpace >= CUPS_CSPACE_CIELab)
+      if (cupsImageColorSpace == CUPS_CSPACE_CIELab ||
+          cupsImageColorSpace >= CUPS_CSPACE_ICC1)
         rgb_to_lab(out - 3);
       else if (cupsImageColorSpace == CUPS_CSPACE_CIEXYZ)
         rgb_to_xyz(out - 3);
@@ -1381,24 +1393,24 @@ rgb_to_xyz(cups_ib_t *val)		/* IO - Color value */
   * Output 8-bit values...
   */
 
-  if (ciex < 0.0)
+  if (ciex < 0.0f)
     val[0] = 0;
-  else if (ciex < 255.0)
-    val[0] = (int)ciex;
+  else if (ciex < 1.0f)
+    val[0] = (int)(255.0f * ciex);
   else
     val[0] = 255;
 
-  if (ciey < 0.0)
+  if (ciey < 0.0f)
     val[1] = 0;
-  else if (ciey < 255.0)
-    val[1] = (int)ciey;
+  else if (ciey < 1.0f)
+    val[1] = (int)(255.0f * ciey);
   else
     val[1] = 255;
 
-  if (ciez < 0.0)
+  if (ciez < 0.0f)
     val[2] = 0;
-  else if (ciez < 255.0)
-    val[2] = (int)ciez;
+  else if (ciez < 1.0f)
+    val[2] = (int)(255.0f * ciez);
   else
     val[2] = 255;
 }

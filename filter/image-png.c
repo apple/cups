@@ -216,7 +216,7 @@ _cupsImageReadPNG(
 		break;
 	    case CUPS_IMAGE_RGB :
 	    case CUPS_IMAGE_RGB_CMYK :
-		memcpy(out, inptr, img->xsize * 3);
+		cupsImageRGBToRGB(inptr, out, img->xsize);
 		break;
 	    case CUPS_IMAGE_BLACK :
 		cupsImageRGBToBlack(inptr, out, img->xsize);

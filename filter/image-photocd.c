@@ -7,7 +7,7 @@
  *   is only YCC encoded.  Support for the higher resolution images will
  *   require a lot of extra code...
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -272,39 +272,29 @@ _cupsImageReadPhotoCD(
 	* put it in the image...
 	*/
 
-        if (img->colorspace == CUPS_IMAGE_RGB)
+	switch (img->colorspace)
 	{
-	  if (lut)
-	    cupsImageLut(rgb, 768 * 3, lut);
+	  default :
+	      break;
 
-	  if (rotation)
-            _cupsImagePutCol(img, 511 - y - pass, 0, 768, rgb);
-	  else
-            _cupsImagePutRow(img, 0, y + pass, 768, rgb);
+	  case CUPS_IMAGE_RGB :
+	      cupsImageRGBToRGB(rgb, out, 768);
+	      break;
+	  case CUPS_IMAGE_CMY :
+	      cupsImageRGBToCMY(rgb, out, 768);
+	      break;
+	  case CUPS_IMAGE_CMYK :
+	      cupsImageRGBToCMYK(rgb, out, 768);
+	      break;
 	}
+
+	if (lut)
+	  cupsImageLut(out, 768 * bpp, lut);
+
+	if (rotation)
+          _cupsImagePutCol(img, 511 - y - pass, 0, 768, out);
 	else
-	{
-	  switch (img->colorspace)
-	  {
-	    default :
-	        break;
-
-	    case CUPS_IMAGE_CMY :
-		cupsImageRGBToCMY(rgb, out, 768);
-		break;
-	    case CUPS_IMAGE_CMYK :
-		cupsImageRGBToCMYK(rgb, out, 768);
-		break;
-	  }
-
-	  if (lut)
-	    cupsImageLut(out, 768 * bpp, lut);
-
-	  if (rotation)
-            _cupsImagePutCol(img, 511 - y - pass, 0, 768, out);
-	  else
-            _cupsImagePutRow(img, 0, y + pass, 768, out);
-	}
+          _cupsImagePutRow(img, 0, y + pass, 768, out);
       }
     }
   }

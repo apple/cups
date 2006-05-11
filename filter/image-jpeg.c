@@ -3,7 +3,7 @@
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -195,7 +195,6 @@ _cupsImageReadJPEG(
       cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
     if ((img->colorspace == CUPS_IMAGE_WHITE && cinfo.out_color_space == JCS_GRAYSCALE) ||
-        (img->colorspace == CUPS_IMAGE_RGB && cinfo.out_color_space == JCS_RGB) ||
 	(img->colorspace == CUPS_IMAGE_CMYK && cinfo.out_color_space == JCS_CMYK))
     {
 #ifdef DEBUG
@@ -255,6 +254,9 @@ _cupsImageReadJPEG(
         default :
 	    break;
 
+        case CUPS_IMAGE_RGB :
+            cupsImageRGBToRGB(in, out, img->xsize);
+	    break;
         case CUPS_IMAGE_WHITE :
             cupsImageRGBToWhite(in, out, img->xsize);
             break;

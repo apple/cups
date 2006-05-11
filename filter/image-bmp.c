@@ -3,7 +3,7 @@
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -202,10 +202,7 @@ _cupsImageReadBMP(
 
   for (y = img->ysize - 1; y >= 0; y --)
   {
-    if (img->colorspace == CUPS_IMAGE_RGB)
-      ptr = out;
-    else
-      ptr = in;
+    ptr = in;
 
     switch (depth)
     {
@@ -442,37 +439,33 @@ _cupsImageReadBMP(
           break;
     }
 
-    if (img->colorspace == CUPS_IMAGE_RGB)
+    if (saturation != 100 || hue != 0)
+      cupsImageRGBAdjust(in, img->xsize, saturation, hue);
+
+    switch (img->colorspace)
     {
-      if (saturation != 100 || hue != 0)
-	cupsImageRGBAdjust(out, img->xsize, saturation, hue);
-    }
-    else
-    {
-      if (saturation != 100 || hue != 0)
-	cupsImageRGBAdjust(in, img->xsize, saturation, hue);
+      default :
+	  break;
 
-      switch (img->colorspace)
-      {
-        default :
-	    break;
+      case CUPS_IMAGE_WHITE :
+	  cupsImageRGBToWhite(in, out, img->xsize);
+	  break;
 
-	case CUPS_IMAGE_WHITE :
-	    cupsImageRGBToWhite(in, out, img->xsize);
-	    break;
+      case CUPS_IMAGE_RGB :
+	  cupsImageRGBToRGB(in, out, img->xsize);
+	  break;
 
-	case CUPS_IMAGE_BLACK :
-	    cupsImageRGBToBlack(in, out, img->xsize);
-	    break;
+      case CUPS_IMAGE_BLACK :
+	  cupsImageRGBToBlack(in, out, img->xsize);
+	  break;
 
-	case CUPS_IMAGE_CMY :
-	    cupsImageRGBToCMY(in, out, img->xsize);
-	    break;
+      case CUPS_IMAGE_CMY :
+	  cupsImageRGBToCMY(in, out, img->xsize);
+	  break;
 
-	case CUPS_IMAGE_CMYK :
-	    cupsImageRGBToCMYK(in, out, img->xsize);
-	    break;
-      }
+      case CUPS_IMAGE_CMYK :
+	  cupsImageRGBToCMYK(in, out, img->xsize);
+	  break;
     }
 
     if (lut)
