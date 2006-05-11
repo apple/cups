@@ -1283,9 +1283,9 @@ rgb_to_lab(cups_ib_t *val)		/* IO - Color value */
   * Convert sRGB to linear RGB...
   */
 
-  r = pow(val[0] / 255.0, 0.58823529412);
-  g = pow(val[1] / 255.0, 0.58823529412);
-  b = pow(val[2] / 255.0, 0.58823529412);
+  r = pow((val[0] + 14.025) / 269.025, 2.4);
+  g = pow((val[0] + 14.025) / 269.025, 2.4);
+  b = pow((val[0] + 14.025) / 269.025, 2.4);
 
  /*
   * Convert to CIE XYZ...
@@ -1331,14 +1331,14 @@ rgb_to_lab(cups_ib_t *val)		/* IO - Color value */
     val[0] = 255;
 
   if (ciea < 0.0)
-    val[1] = 128;
+    val[1] = 0;
   else if (ciea < 255.0)
     val[1] = (int)ciea;
   else
     val[1] = 255;
 
   if (cieb < 0.0)
-    val[2] = 128;
+    val[2] = 0;
   else if (cieb < 255.0)
     val[2] = (int)cieb;
   else
@@ -1365,9 +1365,9 @@ rgb_to_xyz(cups_ib_t *val)		/* IO - Color value */
   * Convert sRGB to linear RGB...
   */
 
-  r = pow(val[0] / 255.0, 0.58823529412);
-  g = pow(val[1] / 255.0, 0.58823529412);
-  b = pow(val[2] / 255.0, 0.58823529412);
+  r = pow((val[0] + 14.025) / 269.025, 2.4);
+  g = pow((val[0] + 14.025) / 269.025, 2.4);
+  b = pow((val[0] + 14.025) / 269.025, 2.4);
 
  /*
   * Convert to CIE XYZ...
