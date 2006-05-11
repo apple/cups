@@ -255,7 +255,7 @@
 *MediaType Saved/PrinterDefault: ""
 *MediaType Thermal/Thermal Transfer Media: "<</MediaType(Thermal)>>setpagedevice"
 *MediaType Direct/Direct Thermal Media: "<</MediaType(Direct)>>setpagedevice"
-*CloseUI: *zeMediaType
+*CloseUI: *MediaType
 
 *OpenGroup: PrinterSettings/Printer Settings
 *OpenUI *Darkness/Media Darkness: PickOne

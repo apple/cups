@@ -1,0 +1,219 @@
+*PPD-Adobe: "4.3"
+*%
+*% "$Id$"
+*%
+*%   Sample IntelliBar label printer driver PPD file for the Common UNIX
+*%   Printing System (CUPS).
+*%
+*%   Copyright 2001-2006 by Easy Software Products.
+*%
+*%   These coded instructions, statements, and computer programs are the
+*%   property of Easy Software Products and are protected by Federal
+*%   copyright law.  Distribution and use rights are outlined in the file
+*%   "LICENSE.txt" which should have been included with this file.  If this
+*%   file is missing or damaged please contact Easy Software Products
+*%   at:
+*%
+*%       Attn: CUPS Licensing Information
+*%       Easy Software Products
+*%       44141 Airport View Drive, Suite 204
+*%       Hollywood, Maryland 20636 USA
+*%
+*%       Voice: (301) 373-9600
+*%       EMail: cups-info@cups.org
+*%         WWW: http://www.cups.org
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.2"
+*LanguageVersion: English 
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"INTELBAR.PPD"
+*Manufacturer:	"Intellitech"
+*Product:	"(GNU Ghostscript)"
+*Product:	"(ESP Ghostscript)"
+*cupsVersion:	1.2
+*cupsManualCopies: False
+*cupsFilter:	"application/vnd.cups-raster 0 rastertolabel"
+*cupsModelNumber: 32
+*ModelName:     "Intellitech IntelliBar Label Printer"
+*ShortNickName: "Zebra ZPL Label Printer"
+*NickName:      "Zebra ZPL Label Printer CUPS v1.2"
+*PSVersion:	"(3010.000) 81501"
+*LanguageLevel:	"3"
+*ColorDevice:	False
+*DefaultColorSpace: Gray
+*FileSystem:	False
+*Throughput:	"8"
+*LandscapeOrientation: Plus90
+*TTRasterizer:	Type42
+
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: w288h432
+*PageSize w288h432/Label - 4.00x6.00": "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+
+*OpenUI *PageRegion: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: w288h432
+*PageRegion w288h432/Label - 4.00x6.00": "<</PageSize[288 432]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+
+*DefaultImageableArea: w288h432
+*ImageableArea w288h432/Label - 4.00x6.00": "0 5.76 288 426.24"
+
+*DefaultPaperDimension: w288h432
+*PaperDimension w288h432/Label - 4.00x6.00": "288 432"
+
+*MaxMediaWidth: "630"
+*MaxMediaHeight: "7128"
+*HWMargins: 0 5.76 0 5.76
+*CustomPageSize True: "pop pop pop <</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice"
+*ParamCustomPageSize Width: 1 points 36 630
+*ParamCustomPageSize Height: 2 points 36 7128
+*ParamCustomPageSize WidthOffset: 3 points 0 0
+*ParamCustomPageSize HeightOffset: 4 points 0 0
+*ParamCustomPageSize Orientation: 5 int 0 0
+
+*OpenUI *Resolution/Output Resolution: PickOne
+*OrderDependency: 20 AnySetup *Resolution
+*DefaultResolution: 300dpi
+*Resolution 300dpi/300 DPI: "<</HWResolution[300 300]>>setpagedevice"
+*CloseUI: *Resolution
+
+*OpenGroup: PrinterSettings/Printer Settings
+*OpenUI *inPrintDensity/Print Density: PickOne
+*OrderDependency: 20 DocumentSetup *inPrintDensity
+*DefaultinPrintDensity: Default
+*inPrintDensity Default/PrinterDefault: "<<cupsCompression -1>>setpagedevice"
+*inPrintDensity -15: "<</cupsCompression 0>>setpagedevice"
+*inPrintDensity -14: "<</cupsCompression 3>>setpagedevice"
+*inPrintDensity -13: "<</cupsCompression 6>>setpagedevice"
+*inPrintDensity -12: "<</cupsCompression 10>>setpagedevice"
+*inPrintDensity -11: "<</cupsCompression 13>>setpagedevice"
+*inPrintDensity -10: "<</cupsCompression 16>>setpagedevice"
+*inPrintDensity -9: "<</cupsCompression 20>>setpagedevice"
+*inPrintDensity -8: "<</cupsCompression 23>>setpagedevice"
+*inPrintDensity -7: "<</cupsCompression 26>>setpagedevice"
+*inPrintDensity -6: "<</cupsCompression 30>>setpagedevice"
+*inPrintDensity -5: "<</cupsCompression 33>>setpagedevice"
+*inPrintDensity -4: "<</cupsCompression 36>>setpagedevice"
+*inPrintDensity -3: "<</cupsCompression 40>>setpagedevice"
+*inPrintDensity -2: "<</cupsCompression 43>>setpagedevice"
+*inPrintDensity -1: "<</cupsCompression 46>>setpagedevice"
+*inPrintDensity 0: "<</cupsCompression 50>>setpagedevice"
+*inPrintDensity 1: "<</cupsCompression 53>>setpagedevice"
+*inPrintDensity 2: "<</cupsCompression 56>>setpagedevice"
+*inPrintDensity 3: "<</cupsCompression 60>>setpagedevice"
+*inPrintDensity 4: "<</cupsCompression 63>>setpagedevice"
+*inPrintDensity 5: "<</cupsCompression 66>>setpagedevice"
+*inPrintDensity 6: "<</cupsCompression 70>>setpagedevice"
+*inPrintDensity 7: "<</cupsCompression 73>>setpagedevice"
+*inPrintDensity 8: "<</cupsCompression 76>>setpagedevice"
+*inPrintDensity 9: "<</cupsCompression 80>>setpagedevice"
+*inPrintDensity 10: "<</cupsCompression 83>>setpagedevice"
+*inPrintDensity 11: "<</cupsCompression 86>>setpagedevice"
+*inPrintDensity 12: "<</cupsCompression 90>>setpagedevice"
+*inPrintDensity 13: "<</cupsCompression 93>>setpagedevice"
+*inPrintDensity 14: "<</cupsCompression 96>>setpagedevice"
+*inPrintDensity 15: "<</cupsCompression 100>>setpagedevice"
+*CloseUI: *inPrintDensity
+
+*OpenUI *inPrintRate/Print Speed: PickOne
+*OrderDependency: 20 DocumentSetup *inPrintRate
+*DefaultinPrintRate: Default
+*inPrintRate Default/PrinterDefault: "<</cupsRowFeed 0>>setpagedevice"
+*inPrintRate 15/15 mm/sec.: "<</cupsRowFeed 15>>setpagedevice"
+*inPrintRate 20/20 mm/sec.: "<</cupsRowFeed 20>>setpagedevice"
+*inPrintRate 30/30 mm/sec.: "<</cupsRowFeed 30>>setpagedevice"
+*inPrintRate 40/40 mm/sec.: "<</cupsRowFeed 40>>setpagedevice"
+*inPrintRate 60/60 mm/sec.: "<</cupsRowFeed 60>>setpagedevice"
+*inPrintRate 80/80 mm/sec.: "<</cupsRowFeed 80>>setpagedevice"
+*inPrintRate 100/100 mm/sec.: "<</cupsRowFeed 100>>setpagedevice"
+*inPrintRate 120/120 mm/sec.: "<</cupsRowFeed 120>>setpagedevice"
+*inPrintRate 150/150 mm/sec.: "<</cupsRowFeed 150>>setpagedevice"
+*inPrintRate 200/200 mm/sec.: "<</cupsRowFeed 200>>setpagedevice"
+*inPrintRate 250/250 mm/sec.: "<</cupsRowFeed 250>>setpagedevice"
+*inPrintRate 300/300 mm/sec.: "<</cupsRowFeed 300>>setpagedevice"
+*CloseUI: *inPrintRate
+
+*OpenUI *inTearInterval/Print and Tear: PickOne
+*OrderDependency: 20 DocumentSetup *inTearInterval
+*DefaultinTearInterval: Default
+*inTearInterval Default/PrinterDefault: "<</cupsRowCount -1>>setpagedevice"
+*inTearInterval None/Disabled: "<</cupsRowCount 0>>setpagedevice"
+*inTearInterval 1/Every Label: "<</cupsRowCount 1>>setpagedevice"
+*inTearInterval 2/Every 2 Labels: "<</cupsRowCount 2>>setpagedevice"
+*inTearInterval 3/Every 3 Labels: "<</cupsRowCount 3>>setpagedevice"
+*inTearInterval 4/Every 4 Labels: "<</cupsRowCount 4>>setpagedevice"
+*inTearInterval 5/Every 5 Labels: "<</cupsRowCount 5>>setpagedevice"
+*inTearInterval 6/Every 6 Labels: "<</cupsRowCount 6>>setpagedevice"
+*inTearInterval 7/Every 7 Labels: "<</cupsRowCount 7>>setpagedevice"
+*inTearInterval 8/Every 8 Labels: "<</cupsRowCount 8>>setpagedevice"
+*inTearInterval 9/Every 9 Labels: "<</cupsRowCount 9>>setpagedevice"
+*inTearInterval 10/Every 10 Labels: "<</cupsRowCount 10>>setpagedevice"
+*CloseUI: *inTearInterval
+
+*CustominTearInterval True: "<</cupsRowCount 2 1 roll>>setpagedevice"
+*ParamCustominTearInterval Interval: 1 integer 1 99
+
+*OpenUI *inCutInterval/Print and Cut: PickOne
+*OrderDependency: 20 DocumentSetup *inCutInterval
+*DefaultinCutInterval: Default
+*inCutInterval Default/PrinterDefault: "<</cupsRowStep -1>>setpagedevice"
+*inCutInterval None/Disabled: "<</cupsRowStep 0>>setpagedevice"
+*inCutInterval 1/Every Label: "<</cupsRowStep 1>>setpagedevice"
+*inCutInterval 2/Every 2 Labels: "<</cupsRowStep 2>>setpagedevice"
+*inCutInterval 3/Every 3 Labels: "<</cupsRowStep 3>>setpagedevice"
+*inCutInterval 4/Every 4 Labels: "<</cupsRowStep 4>>setpagedevice"
+*inCutInterval 5/Every 5 Labels: "<</cupsRowStep 5>>setpagedevice"
+*inCutInterval 6/Every 6 Labels: "<</cupsRowStep 6>>setpagedevice"
+*inCutInterval 7/Every 7 Labels: "<</cupsRowStep 7>>setpagedevice"
+*inCutInterval 8/Every 8 Labels: "<</cupsRowStep 8>>setpagedevice"
+*inCutInterval 9/Every 9 Labels: "<</cupsRowStep 9>>setpagedevice"
+*inCutInterval 10/Every 10 Labels: "<</cupsRowStep 10>>setpagedevice"
+*CloseUI: *inCutInterval
+
+*CustominCutInterval True: "<</cupsRowStep 2 1 roll>>setpagedevice"
+*ParamCustominCutInterval Interval: 1 integer 1 99
+*CloseGroup: *PrinterSettings
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+*%
+*% End of "$Id: zebra.ppd 5130 2006-02-17 20:25:33Z mike $".
+*%

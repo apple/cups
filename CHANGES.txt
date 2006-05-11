@@ -1,5 +1,6 @@
-CHANGES.txt - 2006-05-10
+CHANGES.txt - 2006-05-11
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- Added support for IntelliBar label printers.

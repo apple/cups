@@ -30,6 +30,7 @@
  *   EndPage()      - Finish a page of graphics.
  *   CancelJob()    - Cancel the current job...
  *   OutputLine()   - Output a line of graphics.
+ *   PCLCompress()  - Output a PCL (mode 3) compressed line.
  *   ZPLCompress()  - Output a run-length compression sequence.
  *   main()         - Main entry and processing of driver.
  */
@@ -48,16 +49,20 @@
 
 
 /*
- * This driver filter currently supports Dymo and Zebra label printers.
+ * This driver filter currently supports Dymo, Intellitech, and Zebra
+ * label printers.
  *
  * The Dymo portion of the driver has been tested with the 300, 330,
- * and 330 Turbo label printers; it may also work with older models.
+ * and 330 Turbo label printers; it may also work with other models.
  * The Dymo printers support printing at 136, 203, and 300 DPI.
  *
- * The Zebra portion of the driver has been tested with the LP-2844Z label
- * printer; it may also work with other models.  The driver supports EPL
- * line mode, EPL page mode, ZPL, and CPCL as defined in Zebra's on-line
- * developer documentation.
+ * The Intellitech portion of the driver has been tested with the
+ * Intellibar 408, 412, and 808 and supports their PCL variant.
+ *
+ * The Zebra portion of the driver has been tested with the LP-2844,
+ * LP-2844Z, QL-320, and QL-420 label printers; it may also work with
+ * other models.  The driver supports EPL line mode, EPL page mode,
+ * ZPL, and CPCL as defined in Zebra's on-line developer documentation.
  */
 
 /*
@@ -71,13 +76,15 @@
 #define ZEBRA_ZPL	0x12		/* Zebra ZPL-based printers */
 #define ZEBRA_CPCL	0x13		/* Zebra CPCL-based printers */
 
+#define INTELLITECH_PCL	0x20		/* Intellitech PCL-based printers */
+
 
 /*
  * Globals...
  */
 
 unsigned char	*Buffer;		/* Output buffer */
-char		*CompBuffer;		/* Compression buffer */
+unsigned char	*CompBuffer;		/* Compression buffer */
 unsigned char	*LastBuffer;		/* Last buffer */
 int		LastSet;		/* Number of repeat characters */
 int		ModelNumber,		/* cupsModelNumber attribute */
@@ -95,6 +102,7 @@ void	StartPage(ppd_file_t *ppd, cups_page_header_t *header);
 void	EndPage(ppd_file_t *ppd, cups_page_header_t *header);
 void	CancelJob(int sig);
 void	OutputLine(ppd_file_t *ppd, cups_page_header_t *header, int y);
+void	PCLCompress(unsigned char *line, int length);
 void	ZPLCompress(char repeat_char, int repeat_count);
 
 
@@ -146,6 +154,15 @@ Setup(ppd_file_t *ppd)			/* I - PPD file */
         break;
 
     case ZEBRA_CPCL :
+        break;
+
+    case INTELLITECH_PCL :
+       /*
+	* Send a PCL reset sequence.
+	*/
+
+	putchar(0x1b);
+	putchar('E');
         break;
   }
 }
@@ -213,6 +230,9 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   fprintf(stderr, "DEBUG: cupsColorOrder = %d\n", header->cupsColorOrder);
   fprintf(stderr, "DEBUG: cupsColorSpace = %d\n", header->cupsColorSpace);
   fprintf(stderr, "DEBUG: cupsCompression = %d\n", header->cupsCompression);
+  fprintf(stderr, "DEBUG: cupsRowCount = %d\n", header->cupsRowCount);
+  fprintf(stderr, "DEBUG: cupsRowFeed = %d\n", header->cupsRowFeed);
+  fprintf(stderr, "DEBUG: cupsRowStep = %d\n", header->cupsRowStep);
 
  /*
   * Register a signal handler to eject the current page if the
@@ -352,6 +372,108 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
         printf("! 0 %u %u %u %u\r\n", header->HWResolution[0],
 	       header->HWResolution[1], header->cupsHeight,
 	       header->NumCopies);
+        break;
+
+    case INTELLITECH_PCL :
+       /*
+        * Set the media size...
+	*/
+
+	printf("\033&l6D\033&k12H");	/* Set 6 LPI, 10 CPI */
+	printf("\033&l0O");		/* Set portrait orientation */
+
+	switch (header->PageSize[1])
+	{
+	  case 540 : /* Monarch Envelope */
+              printf("\033&l80A");	/* Set page size */
+	      break;
+
+	  case 624 : /* DL Envelope */
+              printf("\033&l90A");	/* Set page size */
+	      break;
+
+	  case 649 : /* C5 Envelope */
+              printf("\033&l91A");	/* Set page size */
+	      break;
+
+	  case 684 : /* COM-10 Envelope */
+              printf("\033&l81A");	/* Set page size */
+	      break;
+
+	  case 756 : /* Executive */
+              printf("\033&l1A");	/* Set page size */
+	      break;
+
+	  case 792 : /* Letter */
+              printf("\033&l2A");	/* Set page size */
+	      break;
+
+	  case 842 : /* A4 */
+              printf("\033&l26A");	/* Set page size */
+	      break;
+
+	  case 1008 : /* Legal */
+              printf("\033&l3A");	/* Set page size */
+	      break;
+
+          default : /* Custom size */
+	      printf("\033!f%dZ", header->PageSize[1] * 300 / 72);
+	      break;
+	}
+
+	printf("\033&l%dP",		/* Set page length */
+               header->PageSize[1] / 12);
+	printf("\033&l0E");		/* Set top margin to 0 */
+        printf("\033&l%dX", header->NumCopies);
+					/* Set number copies */
+        printf("\033&l0L");		/* Turn off perforation skip */
+
+       /*
+        * Print settings...
+	*/
+
+	if (Page == 1)
+	{
+          if (header->cupsRowFeed)	/* inPrintRate */
+	    printf("\033!p%dS", header->cupsRowFeed);
+
+          if (header->cupsCompression != ~0)
+	  				/* inPrintDensity */
+	    printf("\033&d%dA", 30 * header->cupsCompression / 100 - 15);
+
+          if (header->cupsRowCount != ~0)
+					/* inTearInterval */
+	    printf("\033!n%dT", header->cupsRowCount);
+
+          if (header->cupsRowStep != ~0)
+					/* inCutInterval */
+	    printf("\033!n%dC", header->cupsRowStep);
+        }
+
+       /*
+	* Setup graphics...
+	*/
+
+	printf("\033*t%dR", header->HWResolution[0]);
+					/* Set resolution */
+
+	printf("\033*r%dS", header->cupsWidth);
+					/* Set width */
+	printf("\033*r%dT", header->cupsHeight);
+					/* Set height */
+
+	printf("\033&a0H");		/* Set horizontal position */
+	printf("\033&a0V");		/* Set vertical position */
+        printf("\033*r1A");		/* Start graphics */
+        printf("\033*b3M");		/* Set compression */
+
+       /*
+        * Allocate compression buffers...
+	*/
+
+	CompBuffer = malloc(2 * header->cupsBytesPerLine + 1);
+	LastBuffer = malloc(header->cupsBytesPerLine);
+	LastSet    = 0;
         break;
   }
 
@@ -591,6 +713,11 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
         puts("FORM\r");
 	puts("PRINT\r");
 	break;
+
+    case INTELLITECH_PCL :
+        printf("\033*rB");		/* End GFX */
+        printf("\014");			/* Eject current page */
+        break;
   }
 
   fflush(stdout);
@@ -788,7 +915,160 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
 	  fflush(stdout);
 	}
 	break;
+
+    case INTELLITECH_PCL :
+	if (Buffer[0] ||
+            memcmp(Buffer, Buffer + 1, header->cupsBytesPerLine - 1))
+        {
+	  if (Feed)
+	  {
+	    printf("\033*b%dY", Feed);
+	    Feed    = 0;
+	    LastSet = 0;
+	  }
+
+          PCLCompress(Buffer, header->cupsBytesPerLine);
+	}
+	else
+	  Feed ++;
+        break;
   }
+}
+
+
+/*
+ * 'PCLCompress()' - Output a PCL (mode 3) compressed line.
+ */
+
+void
+PCLCompress(unsigned char *line,	/* I - Line to compress */
+            int           length)	/* I - Length of line */
+{
+  unsigned char	*line_ptr,		/* Current byte pointer */
+        	*line_end,		/* End-of-line byte pointer */
+        	*comp_ptr,		/* Pointer into compression buffer */
+        	*start,			/* Start of compression sequence */
+		*seed;			/* Seed buffer pointer */
+  int           count,			/* Count of bytes for output */
+		offset;			/* Offset of bytes for output */
+
+
+ /*
+  * Do delta-row compression...
+  */
+
+  line_ptr = line;
+  line_end = line + length;
+
+  comp_ptr = CompBuffer;
+  seed     = LastBuffer;
+
+  while (line_ptr < line_end)
+  {
+   /*
+    * Find the next non-matching sequence...
+    */
+
+    start = line_ptr;
+
+    if (!LastSet)
+    {
+     /*
+      * The seed buffer is invalid, so do the next 8 bytes, max...
+      */
+
+      offset = 0;
+
+      if ((count = line_end - line_ptr) > 8)
+	count = 8;
+
+      line_ptr += count;
+    }
+    else
+    {
+     /*
+      * The seed buffer is valid, so compare against it...
+      */
+
+      while (*line_ptr == *seed &&
+             line_ptr < line_end)
+      {
+        line_ptr ++;
+        seed ++;
+      }
+
+      if (line_ptr == line_end)
+        break;
+
+      offset = line_ptr - start;
+
+     /*
+      * Find up to 8 non-matching bytes...
+      */
+
+      start = line_ptr;
+      count = 0;
+      while (*line_ptr != *seed &&
+             line_ptr < line_end &&
+             count < 8)
+      {
+        line_ptr ++;
+        seed ++;
+        count ++;
+      }
+    }
+
+   /*
+    * Place mode 3 compression data in the buffer; see HP manuals
+    * for details...
+    */
+
+    if (offset >= 31)
+    {
+     /*
+      * Output multi-byte offset...
+      */
+
+      *comp_ptr++ = ((count - 1) << 5) | 31;
+
+      offset -= 31;
+      while (offset >= 255)
+      {
+        *comp_ptr++ = 255;
+        offset    -= 255;
+      }
+
+      *comp_ptr++ = offset;
+    }
+    else
+    {
+     /*
+      * Output single-byte offset...
+      */
+
+      *comp_ptr++ = ((count - 1) << 5) | offset;
+    }
+
+    memcpy(comp_ptr, start, count);
+    comp_ptr += count;
+  }
+
+  line_ptr = CompBuffer;
+  line_end = comp_ptr;
+
+ /*
+  * Set the length of the data and write it...
+  */
+
+  printf("\033*b%dW", comp_ptr - CompBuffer);
+  fwrite(CompBuffer, comp_ptr - CompBuffer, 1, stdout);
+
+ /*
+  * Save this line as a "seed" buffer for the next...
+  */
+
+  memcpy(LastBuffer, line, length);
+  LastSet = 1;
 }
 
 
@@ -873,7 +1153,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * and return.
     */
 
-    fputs("ERROR: rastertodymo job-id user title copies options [file]\n", stderr);
+    fputs("ERROR: rastertolabel job-id user title copies options [file]\n", stderr);
     return (1);
   }
 
