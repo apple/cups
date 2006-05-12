@@ -36,8 +36,8 @@
 *cupsFilter:	"application/vnd.cups-raster 0 rastertolabel"
 *cupsModelNumber: 32
 *ModelName:     "Intellitech IntelliBar Label Printer"
-*ShortNickName: "Zebra ZPL Label Printer"
-*NickName:      "Zebra ZPL Label Printer CUPS v1.2"
+*ShortNickName: "Intellitech IntelliBar Label Printer"
+*NickName:      "Intellitech IntelliBar Label Printer"
 *PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
@@ -155,7 +155,7 @@
 *CloseUI: *inTearInterval
 
 *CustominTearInterval True: "<</cupsRowCount 2 1 roll>>setpagedevice"
-*ParamCustominTearInterval Interval: 1 integer 1 99
+*ParamCustominTearInterval Interval: 1 int 1 99
 
 *OpenUI *inCutInterval/Print and Cut: PickOne
 *OrderDependency: 20 DocumentSetup *inCutInterval
@@ -175,7 +175,7 @@
 *CloseUI: *inCutInterval
 
 *CustominCutInterval True: "<</cupsRowStep 2 1 roll>>setpagedevice"
-*ParamCustominCutInterval Interval: 1 integer 1 99
+*ParamCustominCutInterval Interval: 1 int 1 99
 *CloseGroup: *PrinterSettings
 
 *DefaultFont: Courier
