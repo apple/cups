@@ -660,7 +660,8 @@ cups_raster_read_header(
 static void
 cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
 {
-  if (r->sync == CUPS_RASTER_SYNCv1 || r->sync == CUPS_RASTER_REVSYNCv1)
+  if (r->sync == CUPS_RASTER_SYNCv1 || r->sync == CUPS_RASTER_REVSYNCv1 ||
+      r->header.cupsNumColors == 0)
   {
    /*
     * Set the "cupsNumColors" field according to the colorspace...
@@ -673,12 +674,7 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
       case CUPS_CSPACE_WHITE :
       case CUPS_CSPACE_GOLD :
       case CUPS_CSPACE_SILVER :
-      case CUPS_CSPACE_ICC1 :
           r->header.cupsNumColors = 1;
-	  break;
-
-      case CUPS_CSPACE_ICC2 :
-          r->header.cupsNumColors = 2;
 	  break;
 
       case CUPS_CSPACE_RGB :
@@ -686,28 +682,10 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
       case CUPS_CSPACE_YMC :
       case CUPS_CSPACE_CIEXYZ :
       case CUPS_CSPACE_CIELab :
+      case CUPS_CSPACE_ICC1 :
+      case CUPS_CSPACE_ICC2 :
       case CUPS_CSPACE_ICC3 :
-          r->header.cupsNumColors = 3;
-	  break;
-
-      case CUPS_CSPACE_RGBA :
-      case CUPS_CSPACE_RGBW :
-      case CUPS_CSPACE_CMYK :
-      case CUPS_CSPACE_YMCK :
-      case CUPS_CSPACE_KCMY :
-      case CUPS_CSPACE_GMCK :
-      case CUPS_CSPACE_GMCS :
       case CUPS_CSPACE_ICC4 :
-          r->header.cupsNumColors = 4;
-	  break;
-
-      case CUPS_CSPACE_KCMYcm :
-          if (r->header.cupsBitsPerPixel < 8)
-            r->header.cupsNumColors = 6;
-	  else
-            r->header.cupsNumColors = 4;
-	  break;
-
       case CUPS_CSPACE_ICC5 :
       case CUPS_CSPACE_ICC6 :
       case CUPS_CSPACE_ICC7 :
@@ -719,8 +697,24 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
       case CUPS_CSPACE_ICCD :
       case CUPS_CSPACE_ICCE :
       case CUPS_CSPACE_ICCF :
-          r->header.cupsNumColors = r->header.cupsColorSpace -
-	                            CUPS_CSPACE_ICC1 + 1;
+          r->header.cupsNumColors = 3;
+	  break;
+
+      case CUPS_CSPACE_RGBA :
+      case CUPS_CSPACE_RGBW :
+      case CUPS_CSPACE_CMYK :
+      case CUPS_CSPACE_YMCK :
+      case CUPS_CSPACE_KCMY :
+      case CUPS_CSPACE_GMCK :
+      case CUPS_CSPACE_GMCS :
+          r->header.cupsNumColors = 4;
+	  break;
+
+      case CUPS_CSPACE_KCMYcm :
+          if (r->header.cupsBitsPerPixel < 8)
+            r->header.cupsNumColors = 6;
+	  else
+            r->header.cupsNumColors = 4;
 	  break;
     }
   }

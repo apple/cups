@@ -1295,9 +1295,9 @@ rgb_to_lab(cups_ib_t *val)		/* IO - Color value */
   * Convert sRGB to linear RGB...
   */
 
-  r = pow((val[0] + 14.025) / 269.025, 2.4);
-  g = pow((val[1] + 14.025) / 269.025, 2.4);
-  b = pow((val[2] + 14.025) / 269.025, 2.4);
+  r = pow((val[0] / 255.0 + 0.055) / 1.055, 2.4);
+  g = pow((val[1] / 255.0 + 0.055) / 1.055, 2.4);
+  b = pow((val[2] / 255.0 + 0.055) / 1.055, 2.4);
 
  /*
   * Convert to CIE XYZ...
@@ -1327,9 +1327,9 @@ rgb_to_lab(cups_ib_t *val)		/* IO - Color value */
   * numbers are from 0 to 255.
   */
 
-  ciel *= 2.55;
-  ciea += 128;
-  cieb += 128;
+  ciel = ciel * 2.55 + 0.5;
+  ciea += 128.5;
+  cieb += 128.5;
 
  /*
   * Output 8-bit values...
@@ -1377,9 +1377,9 @@ rgb_to_xyz(cups_ib_t *val)		/* IO - Color value */
   * Convert sRGB to linear RGB...
   */
 
-  r = pow((val[0] + 14.025) / 269.025, 2.4);
-  g = pow((val[1] + 14.025) / 269.025, 2.4);
-  b = pow((val[2] + 14.025) / 269.025, 2.4);
+  r = pow((val[0] / 255.0 + 0.055) / 1.055, 2.4);
+  g = pow((val[1] / 255.0 + 0.055) / 1.055, 2.4);
+  b = pow((val[2] / 255.0 + 0.055) / 1.055, 2.4);
 
  /*
   * Convert to CIE XYZ...
@@ -1390,27 +1390,27 @@ rgb_to_xyz(cups_ib_t *val)		/* IO - Color value */
   ciez = 0.019334 * r + 0.119193 * g + 0.950227 * b;
 
  /*
-  * Output 8-bit values...
+  * Encode as 8-bit XYZ...
   */
 
   if (ciex < 0.0f)
     val[0] = 0;
-  else if (ciex < 1.0f)
-    val[0] = (int)(255.0f * ciex);
+  else if (ciex < 1.1f)
+    val[0] = (int)(231.8181f * ciex + 0.5);
   else
     val[0] = 255;
 
   if (ciey < 0.0f)
     val[1] = 0;
-  else if (ciey < 1.0f)
-    val[1] = (int)(255.0f * ciey);
+  else if (ciey < 1.1f)
+    val[1] = (int)(231.8181f * ciey + 0.5);
   else
     val[1] = 255;
 
   if (ciez < 0.0f)
     val[2] = 0;
-  else if (ciez < 1.0f)
-    val[2] = (int)(255.0f * ciez);
+  else if (ciez < 1.1f)
+    val[2] = (int)(231.8181f * ciez + 0.5);
   else
     val[2] = 255;
 }
