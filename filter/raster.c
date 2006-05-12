@@ -353,7 +353,9 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 	}
       }
 
-      if (r->header.cupsBitsPerColor == 16 &&
+      if ((r->header.cupsBitsPerColor == 16 ||
+           r->header.cupsBitsPerPixel == 12 ||
+           r->header.cupsBitsPerPixel == 16) &&
           (r->sync == CUPS_RASTER_REVSYNC || r->sync == CUPS_RASTER_REVSYNCv1))
       {
        /*
