@@ -241,9 +241,6 @@ ppd_option_t *				/* O - Pointer to option or NULL */
 ppdFindOption(ppd_file_t *ppd,		/* I - PPD file data */
               const char *option)	/* I - Option/Keyword name */
 {
-  ppd_option_t	key;			/* Option search key */
-
-
  /*
   * Range check input...
   */
@@ -251,13 +248,39 @@ ppdFindOption(ppd_file_t *ppd,		/* I - PPD file data */
   if (!ppd || !option)
     return (NULL);
 
- /*
-  * Search...
-  */
+  if (ppd->options)
+  {
+   /*
+    * Search in the array...
+    */
 
-  strlcpy(key.keyword, option, sizeof(key.keyword));
+    ppd_option_t	key;		/* Option search key */
 
-  return ((ppd_option_t *)cupsArrayFind(ppd->options, &key));
+
+    strlcpy(key.keyword, option, sizeof(key.keyword));
+
+    return ((ppd_option_t *)cupsArrayFind(ppd->options, &key));
+  }
+  else
+  {
+   /*
+    * Search in each group...
+    */
+
+    int			i, j;		/* Looping vars */
+    ppd_group_t		*group;		/* Current group */
+    ppd_option_t	*optptr;	/* Current option */
+
+
+    for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+      for (j = group->num_options, optptr = group->options;
+           j > 0;
+	   j --, optptr ++)
+        if (!strcasecmp(optptr->keyword, option))
+	  return (optptr);
+
+    return (NULL);
+  }
 }
 
 
