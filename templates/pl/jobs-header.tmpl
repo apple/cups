@@ -1,15 +1,15 @@
 <P>{?which_jobs=?<A
-HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
-SRC="/images/button-show-completed.gif" CLASS="button" ALT="Pokaż Zakończone Wydruki"></A>
-<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
-SRC="/images/button-show-all.gif" CLASS="button" ALT="Pokaż Wszystkie Wydruki">:{which_jobs=all?<A
-HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
-SRC="/images/button-show-completed.gif" CLASS="button" ALT="Pokaż Zakończone Wydruki"></A>
-<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
-SRC="/images/button-show-active.gif" CLASS="button" ALT="Pokaż Aktywne Wydruki">:<A
-HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
-SRC="/images/button-show-active.gif" CLASS="button" ALT="Pokaż Aktywne Wydruki"></A>
-<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
-SRC="/images/button-show-all.gif" CLASS="button" ALT="Pokaż Aktywne Wydruki">}}</A></P>
+HREF="{?printer_name=?/zadania:{printer_uri_supported}}?which_jobs=completed"><IMG
+SRC="/images/button-show-completed.gif" CLASS="button" ALT="Wyświetl zakończone zadania"></A>
+<A HREF="{?printer_name=?/zadania:{printer_uri_supported}}?which_jobs=all"><IMG
+SRC="/images/button-show-all.gif" CLASS="button" ALT="Wyświetl wszystkie zadania">:{which_jobs=all?<A
+HREF="{?printer_name=?/zadania:{printer_uri_supported}}?which_jobs=completed"><IMG
+SRC="/images/button-show-completed.gif" CLASS="button" ALT="Wyświetl zakończone zadania"></A>
+<A HREF="{?printer_name=?/zadania:{printer_uri_supported}}"><IMG
+SRC="/images/button-show-active.gif" CLASS="button" ALT="Wyświetl aktywne zadania">:<A
+HREF="{?printer_name=?/zadania:{printer_uri_supported}}"><IMG
+SRC="/images/button-show-active.gif" CLASS="button" ALT="Wyświetl aktywne zadania"></A>
+<A HREF="{?printer_name=?/zadania:{printer_uri_supported}}?which_jobs=all"><IMG
+SRC="/images/button-show-all.gif" CLASS="button" ALT="Wyświetl wszystkie zadania">}}</A></P>
 
-<P ALIGN="CENTER">{total=0?Brak wydruków:Wyświetlam {#job_id} z {total} {?which_jobs=?aktywny{total=1?:ch}:{which_jobs=all?:zakończony{total=1?:ch}}} wydruk{total=1?:ów}}.</P>
+<P ALIGN="CENTER">{total=0?Brak zadań:Wyświetlanie {#job_id} z {total} {?which_jobs=?active:{which_jobs=all?:zakończonych}} zadań{total=1?:}}.</P>

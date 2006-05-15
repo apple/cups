@@ -2,11 +2,11 @@
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 {job_id?<INPUT TYPE="HIDDEN" NAME="JOB_ID" VALUE="{job_id}">:}
 
-<H2 CLASS="title">{job_id?Przenieś Wydruk {job_id}:Przenieś Wszystkie Wydruki}</H2>
+<H2 CLASS="title">{job_id?Przenieś zadanie {job_id}:Przenieś wszystkie zadania}</H2>
 
 <TABLE>
 <TR>
-<TH CLASS="label">Miejsce przeznaczenia:</TH>
+<TH CLASS="label">Nowy cel:</TH>
 <TD>
 <SELECT NAME="JOB_PRINTER_URI" SIZE="10">
 {[job_printer_uri]<OPTION VALUE="{job_printer_uri}">{job_printer_name}}
@@ -15,7 +15,7 @@
 </TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="IMAGE" SRC="/images/button-move-job{job_id?:s}.gif" ALT="{job_id?Przenieś Wydruk:Przenieś Wszystkie Wydruki}"></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-move-job{job_id?:s}.gif" ALT="Przenieś zadania{job_id?:}"></TD>
 </TR>
 </TABLE>
 

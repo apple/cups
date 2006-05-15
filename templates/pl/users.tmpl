@@ -3,7 +3,7 @@
 <INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
 {IS_CLASS?<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="{IS_CLASS}">:}
 
-<H2 CLASS="title">Użytkownicy Uprawnieni do {printer_name}</H2>
+<H2 CLASS="title">Zezwoleni użytkownicy dla {printer_name}</H2>
 
 <TABLE>
 <TR>
@@ -11,14 +11,14 @@
 <TD>
 <INPUT TYPE='TEXT' NAME='users' SIZE='60' VALUE='{?requesting_user_name_allowed}{?requesting_user_name_denied}'>
 <BR>
-<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}>Zezwalaj tym użytkownikom na drukowanie
-<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' {requesting_user_name_denied?checked:}>Zabraniaj tym użytkownikom na drukowania
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' {requesting_user_name_allowed?sprawdzone:}>Pozwól tym użytkownikom na drukowanie
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' {requesting_user_name_denied?sprawdzone:}>Zabroń tym użytkownikom drukowania
 </TD>
 </TR>
 <TR>
 <TD></TD>
 <TD>
-<INPUT TYPE="IMAGE" SRC="/images/button-set-allowed-users.gif" ALT="Ustaw Uprawnienia Użytkowników">
+<INPUT TYPE="IMAGE" SRC="/images/button-set-allowed-users.gif" ALT="Ustaw zezwolonych użytkowników">
 </TD>
 </TR>
 </TABLE>

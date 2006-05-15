@@ -9,7 +9,7 @@
 <INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
 <INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
 
-<H2 CLASS="title">Producent urządzenia {printer_name}</H2>
+<H2 CLASS="title">Producent {printer_name}</H2>
 
 <TABLE>
 <TR>
@@ -22,20 +22,20 @@
 </TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="Dalej"></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="Kontynuuj"></TD>
 </TR>
 <TR>
 <TD></TD>
 <TD>&nbsp;</TD>
 </TR>
 <TR>
-<TH CLASS="label">Lub Zaakceptuj Plik PPD:</TH>
+<TH CLASS="label">Lub dostarcz plik PPD:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="MAX_FILE_SIZE" VALUE="262144"><INPUT
 TYPE="FILE" NAME="PPD_FILE"></TD>
 </TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="IMAGE" SRC="/images/button-{op}.gif" ALT="{op=add-printer?Dodaj Drukarkę:Modyfikuj Drukarkę}"></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-{op}.gif" ALT="{op=add-printer?Dodaj drukarkę:Zmodyfikuj drukarkę}"></TD>
 </TR>
 </TABLE>
 

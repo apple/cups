@@ -1,7 +1,7 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 
-<H2 CLASS="title">Modyfikuj Grupę {printer_name}</H2>
+<H2 CLASS="title">Zmodyfikuj klasę {printer_name}</H2>
 
 <TABLE>
 <TR>
@@ -18,7 +18,7 @@
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"></TD>
 </TR>
 <TR>
-<TH CLASS="label">Składniki:</TH>
+<TH CLASS="label">Elementy:</TH>
 <TD>
 <SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
 {[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
@@ -27,7 +27,7 @@
 </TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="IMAGE" SRC="/images/button-modify-class.gif" ALT="Modyfikuj Grupę"></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-modify-class.gif" ALT="Zmodyfikuj klasę"></TD>
 </TR>
 </TABLE>
 

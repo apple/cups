@@ -879,7 +879,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
   if (job->attrs)
   {
-    if (job->state_value >= IPP_JOB_STOPPED)
+    if (job->state_value > IPP_JOB_STOPPED)
       job->access_time = time(NULL);
 
     return;
@@ -2027,7 +2027,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     {
       cupsArrayAdd(Jobs, job);
 
-      if (job->state_value < IPP_JOB_STOPPED)
+      if (job->state_value <= IPP_JOB_STOPPED)
       {
         cupsArrayAdd(ActiveJobs, job);
 	cupsdLoadJob(job);
@@ -2285,7 +2285,7 @@ load_request_root(void)
 
       cupsArrayAdd(Jobs, job);
 
-      if (job->state_value < IPP_JOB_STOPPED)
+      if (job->state_value <= IPP_JOB_STOPPED)
         cupsArrayAdd(ActiveJobs,job);
       else
         unload_job(job);

@@ -12,37 +12,43 @@ function select_printers() {
 <FORM METHOD="POST" ACTION="/admin/" NAME="export_samba">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba">
 
-<H2 CLASS="title">Eksportuj do Samby</H2>
+<H2 CLASS="title">Wyeksportuj drukarki do Samby</H2>
 
-{error?<P>Nie można wyeksportować do Samby\:</P>
+{error?<P>Nie można wyeksportować drukarek do Samby\:</P>
 <BLOCKQUOTE>{error}</BLOCKQUOTE>
-<P>Przeanalizuj <A HREF="/admin/log/error_log"
-TARGET="_blank">dziennik&nbsp;błędów</A> aby uzyskać więcej informacji.</P>:
-<P>Ta strona umożliwia eksport twoich drukarek do Samby aby klienci Windows mieli do nich dostęp poprzez ikony <VAR>Otoczenia Sieciowego</VAR> lub <VAR>Moje Miejsca Sieciowe</VAR> na swoich komputerach. Musisz uprzednio zainstalować sterownik PostScript dla Windows zgodnie z opisem  w pliku pomocy polecenia <A HREF="/help/man-cupsaddsmb.html" TARGET="_blank">cupsaddsmb(8)</A>.</P>}
+<P>Zobacz plik <A HREF="/admin/log/error_log"
+TARGET="_blank">error_log</A>, aby uzyskać więcej informacji.</P>:
+<P>Ta strona pozwala na wyeksportowanie drukarek do Samby, więc
+klienci Windows mogą mieć do nich dostęp przez ikony <VAR>Otoczenie
+sieciowe</VAR> lub <VAR>Miejsca sieciowe</VAR> na ich
+pulpitach. Poprzednio musisz zainstalować sterowniki drukarek
+Windows PostScript tak, jak to opisano na stronie podręcznika <A
+HREF="/help/man-cupsaddsmb.html"
+TARGET="_blank">cupsaddsmb(8)</A>.</P>}
 
 <TABLE>
 <TR>
-<TH CLASS="label">Printers:</TH>
+<TH CLASS="label">Drukarki:</TH>
 <TD>
 <SELECT NAME="EXPORT_NAME" SIZE="10" MULTIPLE>
 {[printer_name]<OPTION VALUE="{printer_name}"{export_all? SELECTED:{printer_export? SELECTED:}}>{printer_name}}
 </SELECT><BR>
 <INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL"{export_all? CHECKED:}
-onChange="select_printers()"> Export All Printers
+onChange="select_printers()"> Wyeksportuj wszystkie drukarki
 </TD>
 </TR>
 <TR>
-<TH CLASS="label">Samba Username:</TH>
-<TD><INPUT TYPE="TEXT" NAME="USERNAME" VALUE="{?USERNAME}"> (required)</TD>
+<TH CLASS="label">Nazwa użytkownika Samby:</TH>
+<TD><INPUT TYPE="TEXT" NAME="USERNAME" VALUE="{?USERNAME}"> (wymagane)</TD>
 </TR>
 <TR>
-<TH CLASS="label">Samba Password:</TH>
-<TD><INPUT TYPE="PASSWORD" NAME="PASSWORD" VALUE=""> (required)</TD>
+<TH CLASS="label">Hasło Samby:</TH>
+<TD><INPUT TYPE="PASSWORD" NAME="PASSWORD" VALUE=""> (wymagane)</TD>
 </TR>
 <TR>
 <TD></TD>
 <TD><INPUT TYPE="IMAGE" SRC="/images/button-export-samba.gif"
-ALT="Export Printers to Samba"></TD>
+ALT="Wyeksportuj drukarki do Samby"></TD>
 </TR>
 </TABLE>
 
