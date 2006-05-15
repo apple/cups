@@ -1161,7 +1161,7 @@ cupsdStopBrowsing(void)
   }
 #endif /* HAVE_LIBSLP */
 
-#ifdef HAVE_OPENDAP
+#ifdef HAVE_OPENLDAP
   if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_LDAP) &&
       BrowseLDAPHandle)
   {

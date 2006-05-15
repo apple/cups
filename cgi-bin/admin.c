@@ -1489,7 +1489,9 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
 
         *keyptr = '\0';
 
-        if (!strcmp(keyword, "PageRegion"))
+        if (!strcmp(keyword, "PageRegion") ||
+	    !strcmp(keyword, "PaperDimension") ||
+	    !strcmp(keyword, "ImageableArea"))
 	  var = cgiGetVariable("PageSize");
 	else
 	  var = cgiGetVariable(keyword);

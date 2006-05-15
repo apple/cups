@@ -3033,7 +3033,7 @@ write_irix_config(cupsd_printer_t *p)	/* I - Printer to update */
 {
   char		filename[1024];		/* Interface script filename */
   cups_file_t	*fp;			/* Interface script file */
-
+  ipp_attribute_t *attr;		/* Attribute data */
 
 
  /*

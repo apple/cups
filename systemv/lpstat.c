@@ -235,10 +235,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    }
 	    else
 	    {
-	      _cupsLangPuts(stderr,
-	                    _("%s: Error - expected destination after "
-			      "\'-b\' option!\n"),
-			    argv[0]);
+	      _cupsLangPrintf(stderr,
+	                      _("%s: Error - expected destination after "
+			        "\'-b\' option!\n"),
+			      argv[0]);
 
 	      return (1);
 	    }

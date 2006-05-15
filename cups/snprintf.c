@@ -96,7 +96,10 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
       if (*format == '*')
       {
-        // Get width from argument...
+       /*
+        * Get width from argument...
+	*/
+
 	format ++;
 	width = va_arg(ap, int);
 
@@ -125,7 +128,10 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
         if (*format == '*')
 	{
-          // Get precision from argument...
+         /*
+	  * Get precision from argument...
+	  */
+
 	  format ++;
 	  prec = va_arg(ap, int);
 
