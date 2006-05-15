@@ -498,12 +498,16 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   unsigned	remaining;		/* Bytes remaining */
 
 
+#ifdef DEBUG
+  fprintf(stderr, "cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u\n",
+          r, p, len, r->remaining);
+#endif /* DEBUG */
+
   if (r == NULL || r->mode != CUPS_RASTER_WRITE || r->remaining == 0)
     return (0);
 
-  remaining = len;
+  for (remaining = len; remaining > 0; remaining -= bytes, p += bytes)
 
-  while (remaining > 0)
   {
    /*
     * Figure out the number of remaining bytes on the current line...
@@ -547,14 +551,19 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 	  */
 
 	  r->remaining --;
+
 	  if (r->remaining == 0)
 	    return (cups_raster_write(r));
 	  else if (r->count == 256)
 	  {
-	    cups_raster_write(r);
+	    if (cups_raster_write(r) == 0)
+	      return (0);
+
 	    r->count = 0;
 	  }
 	}
+
+	continue;
       }
     }
 
@@ -582,13 +591,11 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 	*/
 
 	r->remaining --;
+
 	if (r->remaining == 0)
 	  return (cups_raster_write(r));
       }
     }
-
-    remaining -= bytes;
-    p         += bytes;
   }
 
   return (len);
@@ -764,6 +771,10 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
   int		count;			/* Count */
 
 
+#ifdef DEBUG
+  fprintf(stderr, "cups_raster_write(r=%p)\n", r);
+#endif /* DEBUG */
+
  /*
   * Write the row repeat count...
   */
@@ -771,7 +782,14 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
   byte = r->count - 1;
 
   if (cups_write(r->fd, &byte, 1) < 1)
+  {
+#ifdef DEBUG
+    fputs("cups_raster_write: Unable to write row repeat count...\n",
+          stderr);
+#endif /* DEBUG */
+
     return (0);
+  }
 
  /*
   * Write using a modified TIFF "packbits" compression...
@@ -790,10 +808,22 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
 
       byte = 0;
       if (cups_write(r->fd, &byte, 1) < 1)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write last pixel count...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
 
       if (cups_write(r->fd, start, r->bpp) < r->bpp)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write last pixel data...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
     }
     else if (!memcmp(start, ptr, r->bpp))
     {
@@ -810,10 +840,22 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       byte = count - 1;
 
       if (cups_write(r->fd, &byte, 1) < 1)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write repeated pixel count...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
 
       if (cups_write(r->fd, start, r->bpp) < r->bpp)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write repeated pixel data...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
     }
     else
     {
@@ -834,12 +876,24 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       byte = 257 - count;
 
       if (cups_write(r->fd, &byte, 1) < 1)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write non-repeating pixel count...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
 
       count *= r->bpp;
 
       if (cups_write(r->fd, start, count) < count)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write non-repeating pixel data...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
     }
   }
 

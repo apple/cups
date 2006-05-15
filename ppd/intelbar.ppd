@@ -35,9 +35,9 @@
 *cupsManualCopies: False
 *cupsFilter:	"application/vnd.cups-raster 0 rastertolabel"
 *cupsModelNumber: 32
-*ModelName:     "Intellitech IntelliBar Label Printer"
-*ShortNickName: "Intellitech IntelliBar Label Printer"
-*NickName:      "Intellitech IntelliBar Label Printer"
+*ModelName:     "Intellitech IntelliBar Series Label Printer"
+*ShortNickName: "Intellitech IntelliBar Series"
+*NickName:      "Intellitech IntelliBar Series Label Printer v1.2"
 *PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
