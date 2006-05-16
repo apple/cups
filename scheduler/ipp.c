@@ -7652,6 +7652,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     return;
   }
 
+  printer = cupsdFindDest(job->dest);
+
  /*
   * See if the job is owned by the requesting user...
   */
@@ -7802,8 +7804,6 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
     return;
   }
-
-  printer = cupsdFindDest(job->dest);
 
   if (printer->filetypes && !cupsArrayFind(printer->filetypes, filetype))
   {
