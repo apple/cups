@@ -135,8 +135,7 @@ extern void		cupsdStopPrinter(cupsd_printer_t *p, int update);
 extern void		cupsdUpdatePrinters(void);
 extern cupsd_quota_t	*cupsdUpdateQuota(cupsd_printer_t *p, const char *username,
 			                  int pages, int k);
-extern const char	*cupsdValidateDest(const char *hostname,
-			        	   const char *resource,
+extern const char	*cupsdValidateDest(const char *uri,
 			        	   cups_ptype_t *dtype,
 					   cupsd_printer_t **printer);
 extern void		cupsdWritePrintcap(void);

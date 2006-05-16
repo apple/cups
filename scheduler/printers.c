@@ -406,10 +406,6 @@ cupsdCreateCommonData(void)
   /* copies-supported */
   ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
 
-  /* document-format-default */
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
-               "document-format-default", NULL, "application/octet-stream");
-
   /* generated-natural-language-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
                "generated-natural-language-supported", NULL, DefaultLanguage);
@@ -2404,18 +2400,25 @@ cupsdUpdatePrinters(void)
 
 const char *				/* O - Printer or class name */
 cupsdValidateDest(
-    const char      *hostname,		/* I - Host name */
-    const char      *resource,		/* I - Resource name */
+    const char      *uri,		/* I - Printer URI */
     cups_ptype_t    *dtype,		/* O - Type (printer or class) */
     cupsd_printer_t **printer)		/* O - Printer pointer */
 {
   cupsd_printer_t	*p;		/* Current printer */
   char			localname[1024],/* Localized hostname */
 			*lptr,		/* Pointer into localized hostname */
-			*sptr;		/* Pointer into server name */
+			*sptr,		/* Pointer into server name */
+			*rptr,		/* Pointer into resource */
+			scheme[32],	/* Scheme portion of URI */
+			username[64],	/* Username portion of URI */
+			hostname[HTTP_MAX_HOST],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
 
 
-  DEBUG_printf(("cupsdValidateDest(\"%s\", \"%s\", %p, %p)\n", hostname, resource,
+  DEBUG_printf(("cupsdValidateDest(uri=\"%s\", dtype=%p, printer=%p)\n", uri,
                 dtype, printer));
 
  /*
@@ -2425,7 +2428,16 @@ cupsdValidateDest(
   if (printer)
     *printer = NULL;
 
-  *dtype = (cups_ptype_t)0;
+  if (dtype)
+    *dtype = (cups_ptype_t)0;
+
+ /*
+  * Pull the hostname and resource from the URI...
+  */
+
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
+                  username, sizeof(username), hostname, sizeof(hostname),
+		  &port, resource, sizeof(resource));
 
  /*
   * See if the resource is a class or printer...
@@ -2437,7 +2449,7 @@ cupsdValidateDest(
     * Class...
     */
 
-    resource += 9;
+    rptr = resource + 9;
   }
   else if (!strncmp(resource, "/printers/", 10))
   {
@@ -2445,7 +2457,7 @@ cupsdValidateDest(
     * Printer...
     */
 
-    resource += 10;
+    rptr = resource + 10;
   }
   else
   {
@@ -2460,17 +2472,19 @@ cupsdValidateDest(
   * See if the printer or class name exists...
   */
 
-  p = cupsdFindDest(resource);
+  p = cupsdFindDest(rptr);
 
-  if (p == NULL && strchr(resource, '@') == NULL)
+  if (p == NULL && strchr(rptr, '@') == NULL)
     return (NULL);
   else if (p != NULL)
   {
     if (printer)
       *printer = p;
 
-    *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
-                        CUPS_PRINTER_REMOTE);
+    if (dtype)
+      *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+                          CUPS_PRINTER_REMOTE);
+
     return (p->name);
   }
 
@@ -2479,7 +2493,7 @@ cupsdValidateDest(
   */
 
   if (!strcasecmp(hostname, "localhost"))
-    hostname = ServerName;
+    strlcpy(hostname, ServerName, sizeof(hostname));
 
   strlcpy(localname, hostname, sizeof(localname));
 
@@ -2521,13 +2535,15 @@ cupsdValidateDest(
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
     if (!strcasecmp(p->hostname, localname) &&
-        !strcasecmp(p->name, resource))
+        !strcasecmp(p->name, rptr))
     {
       if (printer)
         *printer = p;
 
-      *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
-                          CUPS_PRINTER_REMOTE);
+      if (dtype)
+	*dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+                            CUPS_PRINTER_REMOTE);
+
       return (p->name);
     }
 
@@ -2776,6 +2792,10 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
     ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "copies-default",
                   1);
 
+  if (!cupsGetOption("document-format", p->num_options, p->options))
+    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
+        	 "document-format-default", NULL, "application/octet-stream");
+
   if (!cupsGetOption("job-hold-until", p->num_options, p->options))
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                  "job-hold-until-default", NULL, "no-hold");
@@ -2924,10 +2944,6 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
        type;
        type = mimeNextType(MimeDatabase))
   {
-    if (!strcasecmp(type->super, "application") &&
-	!strcasecmp(type->type, "octet-stream"))
-      continue;
-
     snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
 
     if ((filters = mimeFilter(MimeDatabase, type, p->filetype, NULL)) != NULL)
@@ -2953,14 +2969,20 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
   * Add the file formats that can be filtered...
   */
 
+  if ((type = mimeType(MimeDatabase, "application", "octet-stream")) == NULL ||
+      !cupsArrayFind(p->filetypes, type))
+    i = 1;
+  else
+    i = 0;
 
   attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
                        "document-format-supported",
 		       cupsArrayCount(p->filetypes) + 1, NULL, NULL);
 
-  attr->values[0].string.text = _cupsStrAlloc("application/octet-stream");
+  if (i)
+    attr->values[0].string.text = _cupsStrAlloc("application/octet-stream");
 
-  for (i = 1, type = (mime_type_t *)cupsArrayFirst(p->filetypes);
+  for (type = (mime_type_t *)cupsArrayFirst(p->filetypes);
        type;
        i ++, type = (mime_type_t *)cupsArrayNext(p->filetypes))
   {
