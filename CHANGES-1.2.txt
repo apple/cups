@@ -3,6 +3,40 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.1
 
+	- 6-up printing was broken.
+	- The pstops filter did not disable CTRL-D processing on
+	  the printer/RIP.
+	- ppdOpen*() did not load custom options properly (STR
+	  #1680)
+	- "Set Printer Options" in the web interface did not
+	  update the DefaultImageableArea or
+	  DefaultPaperDimension attributes in the PPD file (STR
+	  #1689)
+	- Fixed compile errors (STR #1682, STR #1684, STR #1685,
+	  STR #1690)
+	- The lpstat command displayed the wrong error message
+	  for a missing destination (STR #1683)
+	- Revised and completed the Polish translation (STR
+	  #1669)
+	- Stopped jobs did not show up in the list of active jobs
+	  (STR #1676)
+	- The configure script did not use the GNU TLS
+	  "libgnutls-config" script to find the proper compiler
+	  and linker options.
+	- The imagetoraster filter did not correctly generate
+	  several 1, 2, and 4-bit color modes.
+	- cupsRasterWritePixels() could lose track of the current
+	  output row.
+	- cupsRasterReadPixels() did not automatically swap
+	  12/16-bit chunked pixel data.
+	- Moved the private _cups_raster_s structure out of the
+	  public header.
+	- Updated the CUPS raster format specification to include
+	  encoding rules and colorspace definitions.
+	- The Zebra PPD files had the wrong PostScript code for
+	  the "default" option choices.
+	- The imagetoraster filter did not generate correct CIE
+	  XYZ or Lab color data.
 	- The cups-config script did not work when invoked from a
 	  source directory (STR #1673)
 	- The SNMP backend did not compile on systems that used

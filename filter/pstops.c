@@ -184,7 +184,11 @@ static size_t		copy_trailer(cups_file_t *fp, pstops_doc_t *doc,
 				     size_t linelen, size_t linesize);
 static void		do_prolog(pstops_doc_t *doc, ppd_file_t *ppd);
 static void 		do_setup(pstops_doc_t *doc, ppd_file_t *ppd);
-static void		doc_printf(pstops_doc_t *doc, const char *format, ...);
+static void		doc_printf(pstops_doc_t *doc, const char *format, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#endif /* __GNUC__ */
+;
 static void		doc_puts(pstops_doc_t *doc, const char *s);
 static void		doc_write(pstops_doc_t *doc, const char *s, size_t len);
 static void		end_nup(pstops_doc_t *doc, int number);
@@ -1686,6 +1690,14 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
          ppd_file_t   *ppd)		/* I - PPD file */
 {
  /*
+  * Disable CTRL-D so that embedded files don't cause printing
+  * errors...
+  */
+
+  puts("% Disable CTRL-D as an end-of-file marker...");
+  puts("userdict dup(\\004)cvn{}put (\\004\\004)cvn{}put");
+
+ /*
   * Mark any options from %%IncludeFeature: comments...
   */
 
@@ -1830,7 +1842,7 @@ end_nup(pstops_doc_t *doc,		/* I - Document information */
         int          number)		/* I - Page number */
 {
   if (doc->mirror || Orientation || doc->number_up > 1)
-    puts("userdict /ESPsave get restore");
+    puts("userdict/ESPsave get restore");
 
   switch (doc->number_up)
   {
@@ -2688,7 +2700,7 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 	  }
 	  else
 	  {
-	    x = pos & 1;
+	    x = pos % 2;
 	    y = pos / 2;
 
             if (doc->number_up_layout & PSTOPS_LAYOUT_NEGATEX)
@@ -2707,17 +2719,17 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
             w = l * bboxw / bboxl;
           }
 
-          tx = 0.5 * (pagel - 2 * w);
-          ty = 0.5 * (pagew - 3 * l);
+          tx = 0.5 * (pagel * 0.5 - w);
+          ty = 0.5 * (pagew * 0.333 - l + pagew - pagel);
 
           if (doc->normal_landscape)
-            doc_printf(doc, "0.0 %.1f translate -90 rotate\n", pagel);
+            doc_printf(doc, "0 %d translate -90 rotate\n", bboxl);
 	  else
-	    doc_printf(doc, "%.1f 0.0 translate 90 rotate\n", pagew);
+	    doc_printf(doc, "%d 0 translate 90 rotate\n", bboxw);
 
           doc_printf(doc, "%.1f %.1f translate %.3f %.3f scale\n",
-                     tx + x * y * pagel * 0.5, ty + pagew * 0.333,
-		     w / bboxw, l / bboxl);
+                     tx + x * pagel * 0.5, ty + y * pagew * 0.333,
+		     l / bboxl, w / bboxw);
         }
 	else
 	{
@@ -2753,13 +2765,13 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
             l = w * bboxl / bboxw;
           }
 
-          tx = 0.5 * (pagel - 3 * w);
-          ty = 0.5 * (pagew - 2 * l);
+          tx = 0.5 * (pagel * 0.333 - w + pagel - pagew);
+          ty = 0.5 * (pagew * 0.5 - l);
 
           if (doc->normal_landscape)
-	    doc_printf(doc, "%.1f 0.0 translate 90 rotate\n", pagew);
+	    doc_printf(doc, "%d 0 translate 90 rotate\n", bboxw);
 	  else
-            doc_printf(doc, "0.0 %.1f translate -90 rotate\n", pagel);
+            doc_printf(doc, "0 %d translate -90 rotate\n", bboxl);
 
           doc_printf(doc, "%.1f %.1f translate %.3f %.3f scale\n",
                      tx + x * pagel * 0.333, ty + y * pagew * 0.5,
