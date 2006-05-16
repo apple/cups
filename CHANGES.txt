@@ -1,6 +1,8 @@
-CHANGES.txt - 2006-05-11
+CHANGES.txt - 2006-05-16
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- Added support for setting the document-format-default
+	  attribute on a per-printer basis.
 	- Added support for IntelliBar label printers.
