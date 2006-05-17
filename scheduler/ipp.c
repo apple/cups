@@ -626,6 +626,15 @@ cupsdProcessIPPRequest(
 
     if (cupsdSendHeader(con, HTTP_OK, "application/ipp"))
     {
+#ifdef CUPSD_USE_CHUNKING
+     /*
+      * Because older versions of CUPS (1.1.17 and older) and some IPP
+      * clients do not implement chunking properly, we should not use
+      * chunking by default.  This may become the default in future
+      * CUPS releases, or we might add a configuration directive for
+      * it.
+      */
+
       if (con->http.version == HTTP_1_1)
       {
 	con->http.data_encoding = HTTP_ENCODE_CHUNKED;
@@ -633,6 +642,7 @@ cupsdProcessIPPRequest(
 	httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n");
       }
       else
+#endif /* CUPSD_USE_CHUNKING */
       {
 	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
 	con->http.data_remaining = ippLength(con->response);
