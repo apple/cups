@@ -135,6 +135,8 @@ static const _ipp_option_t ipp_options[] =
   { "raw",			IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
   { "resolution",		IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
   { "resolution-default",	IPP_TAG_RESOLUTION,	IPP_TAG_PRINTER },
+  { "requesting-user-name-allowed",	IPP_TAG_NAME,	IPP_TAG_PRINTER },
+  { "requesting-user-name-denied",	IPP_TAG_NAME,	IPP_TAG_PRINTER },
   { "saturation",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "saturation-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "scaling",			IPP_TAG_INTEGER,	IPP_TAG_JOB },

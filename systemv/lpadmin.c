@@ -466,6 +466,25 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      return (1);
 	    break;
 
+        case 'U' : /* Username */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected username after "
+				  "\'-U\' option!\n"),
+		        	argv[0]);
+	        return (1);
+	      }
+
+              cupsSetUser(argv[i]);
+	    }
+	    break;
+	    
         case 'u' : /* Allow/deny users */
 	    if (argv[i][2])
 	      val = argv[i] + 2;
