@@ -2632,8 +2632,23 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   if (job->current_file == 0)
   {
+   /*
+    * Set the processing time...
+    */
+
     set_time(job, "time-at-processing");
+
+   /*
+    * Create the backchannel pipes and make them non-blocking...
+    */
+
     cupsdOpenPipe(job->back_pipes);
+
+    fcntl(job->back_pipes[0], F_SETFL,
+          fcntl(job->back_pipes[0], F_GETFL) | O_NONBLOCK);
+
+    fcntl(job->back_pipes[1], F_SETFL,
+          fcntl(job->back_pipes[1], F_GETFL) | O_NONBLOCK);
   }
 
  /*
