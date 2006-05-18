@@ -2700,7 +2700,7 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 	  }
 	  else
 	  {
-	    x = pos % 2;
+	    x = pos & 1;
 	    y = pos / 2;
 
             if (doc->number_up_layout & PSTOPS_LAYOUT_NEGATEX)
@@ -2719,17 +2719,16 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
             w = l * bboxw / bboxl;
           }
 
-          tx = 0.5 * (pagel * 0.5 - w);
-          ty = 0.5 * (pagew * 0.333 - l + pagew - pagel);
+          tx = 0.5 * (pagel - 2 * w);
+          ty = 0.5 * (pagew - 3 * l);
 
           if (doc->normal_landscape)
-            doc_printf(doc, "0 %d translate -90 rotate\n", bboxl);
+            doc_printf(doc, "0 %.1f translate -90 rotate\n", pagel);
 	  else
-	    doc_printf(doc, "%d 0 translate 90 rotate\n", bboxw);
+	    doc_printf(doc, "%.1f 0 translate 90 rotate\n", pagew);
 
           doc_printf(doc, "%.1f %.1f translate %.3f %.3f scale\n",
-                     tx + x * pagel * 0.5, ty + y * pagew * 0.333,
-		     l / bboxl, w / bboxw);
+                     tx + x * w, ty + y * l, l / bboxl, w / bboxw);
         }
 	else
 	{
@@ -2765,17 +2764,17 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
             l = w * bboxl / bboxw;
           }
 
-          tx = 0.5 * (pagel * 0.333 - w + pagel - pagew);
-          ty = 0.5 * (pagew * 0.5 - l);
+	  tx = 0.5 * (pagel - 3 * w);
+	  ty = 0.5 * (pagew - 2 * l);
 
           if (doc->normal_landscape)
-	    doc_printf(doc, "%d 0 translate 90 rotate\n", bboxw);
+	    doc_printf(doc, "%.1f 0 translate 90 rotate\n", pagew);
 	  else
-            doc_printf(doc, "0 %d translate -90 rotate\n", bboxl);
+            doc_printf(doc, "0 %.1f translate -90 rotate\n", pagel);
 
           doc_printf(doc, "%.1f %.1f translate %.3f %.3f scale\n",
-                     tx + x * pagel * 0.333, ty + y * pagew * 0.5,
-		     w / bboxw, l / bboxl);
+                     tx + w * x, ty + l * y, w / bboxw, l / bboxl);
+
         }
         break;
 
