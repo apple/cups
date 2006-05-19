@@ -161,7 +161,7 @@ cupsBackChannelWrite(
       * Write error - abort on fatal errors...
       */
 
-      if (errno != EINTR && errno != EAGAIN)
+      if (errno != EINTR)
         return (-1);
     }
     else
