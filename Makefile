@@ -99,8 +99,8 @@ install:	installhdrs
 	echo Installing cups-config script...
 	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_SCRIPT) cups-config $(BINDIR)/cups-config
-	echo Installing startup script...
 	if test "x$(INITDIR)" != x; then \
+		echo Installing init scripts...; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/init.d; \
 		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc0.d; \
@@ -115,13 +115,16 @@ install:	installhdrs
 	if test "x$(INITDIR)" = x -a "x$(INITDDIR)" != x; then \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
 		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
+			echo Installing StartupItems files...; \
 			$(INSTALL_SCRIPT) init/PrintingServices $(BUILDROOT)$(INITDDIR)/PrintingServices; \
 			$(INSTALL_DATA) init/StartupParameters.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
 			$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
 			$(INSTALL_DATA) init/Localizable.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
 		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
+			echo Installing LaunchDaemons configuration file...; \
 			$(INSTALL_DATA) init/org.cups.cupsd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
 		else \
+			echo Installing RC script...; \
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		fi \
 	fi

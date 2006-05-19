@@ -130,9 +130,11 @@ if test x$rcdir = x; then
 		Darwin*)
 			# Darwin and MacOS X...
 			INITDIR=""
-			AC_CHECK_PROG(INITDDIR, launchd, 
-				"/System/Library/LaunchDaemons", 
-				"/System/Library/StartupItems/PrintingServices")
+			if test -x /sbin/launchd; then
+				INITDDIR="/System/Library/LaunchDaemons"
+			else 
+				INITDDIR="/System/Library/StartupItems/PrintingServices"
+			fi
 			;;
 
 		Linux | GNU)
