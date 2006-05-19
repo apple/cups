@@ -774,7 +774,7 @@ cgiSetIPPObjectVars(
 
   fprintf(stderr, "DEBUG2: cgiSetIPPObjectVars(obj=%p, prefix=\"%s\", "
                   "element=%d)\n",
-          obj, prefix, element);
+          obj, prefix ? prefix : "(null)", element);
 
  /*
   * Set common CGI template variables...
@@ -977,7 +977,9 @@ cgiSetIPPVars(ipp_t      *response,	/* I - Response data to be copied... */
 
   fprintf(stderr, "DEBUG2: cgiSetIPPVars(response=%p, filter_name=\"%s\", "
                   "filter_value=\"%s\", prefix=\"%s\", parent_el=%d)\n",
-          response, filter_name, filter_value, prefix, parent_el);
+          response, filter_name ? filter_name : "(null)",
+	  filter_value ? filter_value : "(null)",
+	  prefix ? prefix : "(null)", parent_el);
 
  /*
   * Set common CGI template variables...

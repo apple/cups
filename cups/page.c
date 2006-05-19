@@ -87,7 +87,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       if (!nameptr || *nameptr != 'x')
         return (NULL);
 
-      l = _cupsStrScand(nameptr, &nameptr, loc);
+      l = _cupsStrScand(nameptr + 1, &nameptr, loc);
       if (!nameptr)
         return (NULL);
 

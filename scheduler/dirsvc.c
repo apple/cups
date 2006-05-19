@@ -665,10 +665,10 @@ cupsdSendBrowseDelete(
   * Announce the deletion...
   */
 
-  if (BrowseLocalProtocols & BROWSE_CUPS)
+  if ((BrowseLocalProtocols & BROWSE_CUPS) && BrowseSocket >= 0)
     send_cups_browse(p);
 #ifdef HAVE_LIBSLP
-  if (BrowseLocalProtocols & BROWSE_SLP)
+  if ((BrowseLocalProtocols & BROWSE_SLP) && BrowseSLPHandle)
     slp_dereg_printer(p);
 #endif /* HAVE_LIBSLP */
 }
@@ -934,6 +934,8 @@ cupsdStartBrowsing(void)
 
     BrowseSLPRefresh = 0;
   }
+  else
+    BrowseSLPHandle = NULL;
 #endif /* HAVE_LIBSLP */
 
 #ifdef HAVE_OPENLDAP

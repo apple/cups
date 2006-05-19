@@ -175,7 +175,8 @@ cgi_null_passwd(const char *prompt)	/* I - Prompt string (unused) */
 {
   (void)prompt;
 
-  fprintf(stderr, "DEBUG: cgi_null_passwd(prompt=\"%s\") called!\n", prompt);
+  fprintf(stderr, "DEBUG: cgi_null_passwd(prompt=\"%s\") called!\n",
+          prompt ? prompt : "(null)");
 
   return (NULL);
 }

@@ -3,7 +3,22 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.1
 
-	- 6-up printing was broken.
+	- The web interface support programs crashed on Solaris
+	  (STR #1699)
+	- cupstestppd incorrectly reported problems with
+	  *1284DeviceID attributes (STR #1710)
+	- Browsing could get disabled after a restart (STR #1670)
+	- Custom page sizes were not parsed properly (STR #1709)
+	- The -U option wasn't supported by lpadmin (STR #1702)
+	- The -u option didn't work with lpadmin (STR #1703)
+	- The scheduler did not create non-blocking back-channel
+	  pipes, which caused problems when the printer driver
+	  did not read the back-channel data (STR #1705)
+	- The scheduler no longer uses chunking in responses to
+	  clients - this caused problems with older versions of
+	  CUPS like 1.1.17 (PR #6143)
+	- Automatic raw printing was broken (STR #1667)
+	- 6-up printing was broken (STR #1697)
 	- The pstops filter did not disable CTRL-D processing on
 	  the printer/RIP.
 	- ppdOpen*() did not load custom options properly (STR

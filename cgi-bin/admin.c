@@ -93,7 +93,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (!http)
   {
     perror("ERROR: Unable to connect to cupsd");
-    fprintf(stderr, "DEBUG: cupsServer()=\"%s\"\n", cupsServer());
+    fprintf(stderr, "DEBUG: cupsServer()=\"%s\"\n",
+            cupsServer() ? cupsServer() : "(null)");
     fprintf(stderr, "DEBUG: ippPort()=%d\n", ippPort());
     fprintf(stderr, "DEBUG: cupsEncryption()=%d\n", cupsEncryption());
     exit(1);
@@ -534,8 +535,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 		};
 
 
+  ptr = cgiGetVariable("DEVICE_URI");
   fprintf(stderr, "DEBUG: do_am_printer: DEVICE_URI=\"%s\"\n",
-          cgiGetVariable("DEVICE_URI"));
+          ptr ? ptr : "(null)");
 
   title = cgiText(modify ? _("Modify Printer") : _("Add Printer"));
 
