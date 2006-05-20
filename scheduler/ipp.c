@@ -6828,8 +6828,10 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * See if we need to add the ending sheet...
   */
 
+  attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
+
   if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
-      attr->num_values > 1)
+      attr && attr->num_values > 1)
   {
    /*
     * Yes...
