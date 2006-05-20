@@ -60,6 +60,7 @@ print_device(const char *uri,		/* I - Device URI */
 	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
 	     char	*argv[])	/* I - Command-line arguments */
 {
+  int		usebc;			/* Use backchannel path? */
   int		fd;			/* USB device */
   int		rbytes;			/* Number of bytes read */
   int		wbytes;			/* Number of bytes written */
@@ -81,6 +82,14 @@ print_device(const char *uri,		/* I - Device URI */
 
   (void)argc;
   (void)argv;
+
+ /*
+  * Disable backchannel data when printing to Canon USB printers - apparently
+  * Canon printers will return the IEEE-1284 device ID over and over and over
+  * when they get a read request...
+  */
+
+  usebc = strcasecmp(hostname, "Canon") != 0;
 
  /*
   * Open the USB port device...
@@ -238,7 +247,9 @@ print_device(const char *uri,		/* I - Device URI */
         do
 	{
           FD_ZERO(&input);
-	  FD_SET(fd, &input);
+	  if (usebc)
+	    FD_SET(fd, &input);
+
 	  FD_ZERO(&output);
 	  FD_SET(fd, &output);
         }

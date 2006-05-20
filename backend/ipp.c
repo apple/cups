@@ -276,7 +276,7 @@ main(int  argc,				/* I - Number of command-line args */
             *ptr++ = *optptr++;
 	*ptr = '\0';
 
-	if (*optptr == '+')
+	if (*optptr == '+' || *optptr == '&')
 	  optptr ++;
       }
       else
