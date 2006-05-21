@@ -112,8 +112,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     * Nope - get a new password from the user...
     */
 
-    snprintf(prompt, sizeof(prompt), "Password for %s on %s? ", cupsUser(),
-             http->hostname);
+    snprintf(prompt, sizeof(prompt), _("Password for %s on %s? "), cupsUser(),
+             http->hostname[0] == '/' ? "localhost" : http->hostname);
 
     http->digest_tries  = strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE],
                                       "Digest", 5) != 0;
