@@ -98,8 +98,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * See who is logged in...
   */
 
-  if ((user = getenv("REMOTE_USER")) == NULL)
-    user = "guest";
+  user = getenv("REMOTE_USER");
 
  /*
   * Connect to the HTTP server...
@@ -357,8 +356,9 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
   ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
                 "printer-type-mask", CUPS_PRINTER_CLASS);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-               "requesting-user-name", NULL, user);
+  if (user)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+        	 "requesting-user-name", NULL, user);
 
   cgiGetAttributes(request, "printers.tmpl");
 
