@@ -36,7 +36,7 @@ LIBLDAP=""
 
 if test x$enable_ldap != xno; then
     AC_CHECK_HEADER(ldap.h,
-	AC_CHECK_LIB(ldap, ldap_value_free,
+	AC_CHECK_LIB(ldap, ldap_initialize,
             AC_DEFINE(HAVE_LDAP)
             AC_DEFINE(HAVE_OPENLDAP)
 	    LIBLDAP="-lldap"))

@@ -137,7 +137,8 @@ all:	$(TARGETS)
 
 clean:
 	$(RM) $(OBJS) $(TARGETS)
-	$(RM) libcups.so libcups.sl libcups.dylib libcups.32.so libcups.64.so
+	$(RM) libcups.so libcups.sl libcups.dylib
+	$(RM) -r 32bit 64it
 
 
 #
@@ -242,6 +243,8 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking 32-bit $@...
 	-mkdir 32bit
 	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(RM) 32bit/libcups.so
+	$(LN) libcups.so.2 32bit/libcups.so
 
 
 #
@@ -252,6 +255,8 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking 64-bit $@...
 	-mkdir 64bit
 	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(RM) 64bit/libcups.so
+	$(LN) libcups.so.2 64bit/libcups.so
 
 
 #

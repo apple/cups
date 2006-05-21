@@ -408,7 +408,7 @@ else
 					# warning messages, and default to
 					# 64-bit compiles of everything else...
 					OPTIM="-w $OPTIM"
-					CFLAGS="-xarch=generic64 $CFLAGS"
+					ARCHFLAGS="-xarch=generic64 $ARCHFLAGS"
 				fi
 			else
 				if test "x$enable_64bit" = xyes; then
@@ -425,7 +425,7 @@ else
 						# warning messages, and default to
 						# 32-bit compiles of everything else...
 						OPTIM="-w $OPTIM"
-						CFLAGS="-xarch=generic $CFLAGS"
+						ARCHFLAGS="-xarch=generic $ARCHFLAGS"
 					fi
 				else
 					if test "x$with_optim" = x; then
@@ -433,7 +433,7 @@ else
 						# warning messages, and default to
 						# 32-bit compiles of everything else...
 						OPTIM="-w $OPTIM"
-						CFLAGS="-xarch=generic $CFLAGS"
+						ARCHFLAGS="-xarch=generic $ARCHFLAGS"
 					fi
 				fi
 			fi

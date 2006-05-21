@@ -65,7 +65,7 @@ all:	$(TARGETS)
 clean:
 	$(RM) $(OBJS) $(TARGETS)
 	$(RM) libcupsimage.so libcupsimage.sl libcupsimage.dylib
-	$(RM) libcupsimage.32.so libcupsimage.64.so
+	$(RM) -r 32bit 64bit
 
 
 #
