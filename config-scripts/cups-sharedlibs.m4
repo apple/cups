@@ -33,25 +33,25 @@ if test x$enable_shared != xno; then
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS -Wl,-h,\$@ -G \$(OPTIM)"
+			DSOFLAGS="$DSOFLAGS -Wl,-h,\`basename \$@\` -G \$(OPTIM)"
 			;;
 		HP-UX*)
 			LIBCUPS="libcups.sl.2"
 			LIBCUPSIMAGE="libcupsimage.sl.2"
 			DSO="\$(LD)"
-			DSOFLAGS="$DSOFLAGS -b -z +h \$@"
+			DSOFLAGS="$DSOFLAGS -b -z +h \`basename \$@\`"
 			;;
 		IRIX)
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi2.6,-soname,\$@ -shared \$(OPTIM)"
+			DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi2.6,-soname,\`basename \$@\` -shared \$(OPTIM)"
 			;;
 		OSF1* | Linux | GNU | *BSD*)
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS -Wl,-soname,\$@ -shared \$(OPTIM)"
+			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
 			;;
 		Darwin*)
 			LIBCUPS="libcups.2.dylib"
@@ -71,7 +71,7 @@ if test x$enable_shared != xno; then
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS -Wl,-soname,\$@ -shared \$(OPTIM)"
+			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
 			;;
 	esac
 else
@@ -81,8 +81,15 @@ else
 	DSO=":"
 fi
 
+# 32-bit and 64-bit libraries need variations of the standard
+# DSOFLAGS...
+DSO32FLAGS="$DSOFLAGS"
+DSO64FLAGS="$DSOFLAGS"
+
 AC_SUBST(DSO)
 AC_SUBST(DSOFLAGS)
+AC_SUBST(DSO32FLAGS)
+AC_SUBST(DSO64FLAGS)
 AC_SUBST(LIBCUPS)
 AC_SUBST(LIBCUPSIMAGE)
 
@@ -119,27 +126,35 @@ if test "$DSO" != ":"; then
 	case $uname in
                 HP-UX*)
 			# HP-UX
-                	DSOFLAGS="+s +b $libdir $DSOFLAGS"
-                	LDFLAGS="$LDFLAGS -Wl,+s,+b,$libdir"
-                	EXPORT_LDFLAGS="-Wl,+s,+b,$libdir"
+                	DSOFLAGS="+s +b \$(libdir) $DSOFLAGS"
+                	DSO32FLAGS="+s +b \$(LIB32DIR) $DSO32FLAGS"
+                	DSO64FLAGS="+s +b \$(LIB64DIR) $DSO64FLAGS"
+                	LDFLAGS="$LDFLAGS -Wl,+s,+b,\$(libdir)"
+                	EXPORT_LDFLAGS="-Wl,+s,+b,\$(libdir)"
                 	;;
                 SunOS*)
                 	# Solaris
-                	DSOFLAGS="-R$libdir $DSOFLAGS"
-                	LDFLAGS="$LDFLAGS -R$libdir"
-                	EXPORT_LDFLAGS="-R$libdir"
+                	DSOFLAGS="-R\$(libdir) $DSOFLAGS"
+                	DSO32FLAGS="-R\$(LIB32DIR) $DSO32FLAGS"
+                	DSO64FLAGS="-R\$(LIB64DIR) $DSO64FLAGS"
+                	LDFLAGS="$LDFLAGS -R\$(libdir)"
+                	EXPORT_LDFLAGS="-R\$(libdir)"
                 	;;
                 *BSD*)
                         # *BSD
-                	DSOFLAGS="-Wl,-R$libdir $DSOFLAGS"
-                        LDFLAGS="$LDFLAGS -Wl,-R$libdir"
-                        EXPORT_LDFLAGS="-Wl,-R$libdir"
+                	DSOFLAGS="-Wl,-R\$(libdir) $DSOFLAGS"
+                	DSO32FLAGS="-Wl,-R\$(LIB32DIR) $DSO32FLAGS"
+                	DSO64FLAGS="-Wl,-R\$(LIB64DIR) $DSO64FLAGS"
+                        LDFLAGS="$LDFLAGS -Wl,-R\$(libdir)"
+                        EXPORT_LDFLAGS="-Wl,-R\$(libdir)"
                         ;;
                 Linux | GNU)
                         # Linux and HURD
-                	DSOFLAGS="-Wl,-rpath,$libdir $DSOFLAGS"
-                        LDFLAGS="$LDFLAGS -Wl,-rpath,$libdir"
-                        EXPORT_LDFLAGS="-Wl,-rpath,$libdir"
+                	DSOFLAGS="-Wl,-rpath,\$(libdir) $DSOFLAGS"
+                	DSO32FLAGS="-Wl,-rpath,\$(LIB32DIR) $DSO32FLAGS"
+                	DSO64FLAGS="-Wl,-rpath,\$(LIB64DIR) $DSO64FLAGS"
+                        LDFLAGS="$LDFLAGS -Wl,-rpath,\$(libdir)"
+                        EXPORT_LDFLAGS="-Wl,-rpath,\$(libdir)"
                         ;;
 	esac
 else

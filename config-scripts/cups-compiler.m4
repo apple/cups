@@ -138,8 +138,8 @@ if test -n "$GCC"; then
 					ARCH32FLAGS="$with_arch32flags"
 				fi
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$prefix/lib32"
 				UNINSTALL32="uninstall32bit"
 
@@ -162,8 +162,8 @@ if test -n "$GCC"; then
 					ARCH64FLAGS="$with_arch64flags"
 				fi
 				INSTALL64="install64bit"
-				LIB64CUPS="libcups.64.so.2"
-				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64CUPS="64bit/libcups.so.2"
+				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 				LIB64DIR="$prefix/lib64"
 				UNINSTALL64="uninstall64bit"
 
@@ -188,8 +188,8 @@ if test -n "$GCC"; then
 					ARCH32FLAGS="$with_arch32flags"
 				fi
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$exec_prefix/lib"
 				if test -d /usr/lib32; then
 					LIB32DIR="${LIB32DIR}32"
@@ -215,8 +215,8 @@ if test -n "$GCC"; then
 					ARCH64FLAGS="$with_arch64flags"
 				fi
 				INSTALL64="install64bit"
-				LIB64CUPS="libcups.64.so.2"
-				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64CUPS="64bit/libcups.so.2"
+				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 				LIB64DIR="$exec_prefix/lib"
 				if test -d /usr/lib64; then
 					LIB64DIR="${LIB64DIR}64"
@@ -244,8 +244,8 @@ if test -n "$GCC"; then
 					ARCH32FLAGS="$with_arch32flags"
 				fi
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$exec_prefix/lib/32"
 				UNINSTALL32="uninstall32bit"
 
@@ -268,8 +268,8 @@ if test -n "$GCC"; then
 					ARCH64FLAGS="$with_arch64flags"
 				fi
 				INSTALL64="install64bit"
-				LIB64CUPS="libcups.64.so.2"
-				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64CUPS="64bit/libcups.so.2"
+				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 				LIB64DIR="$exec_prefix/lib/64"
 				UNINSTALL64="uninstall64bit"
 
@@ -339,8 +339,8 @@ else
 					ARCH32FLAGS="$with_arch32flags"
 				fi
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$prefix/lib32"
 				UNINSTALL32="uninstall32bit"
 
@@ -363,8 +363,8 @@ else
 					ARCH64FLAGS="$with_arch64flags"
 				fi
 				INSTALL64="install64bit"
-				LIB64CUPS="libcups.64.so.2"
-				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64CUPS="64bit/libcups.so.2"
+				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 				LIB64DIR="$prefix/lib64"
 				UNINSTALL64="uninstall64bit"
 
@@ -398,8 +398,8 @@ else
 				# binaries with separate 32-bit libraries...
 				ARCH32FLAGS="-xarch=generic"
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$exec_prefix/lib/32"
 				UNINSTALL32="uninstall32bit"
 
@@ -415,8 +415,8 @@ else
 					# Build 64-bit libraries...
 					ARCH64FLAGS="-xarch=generic64"
 					INSTALL64="install64bit"
-					LIB64CUPS="libcups.64.so.2"
-					LIB64CUPSIMAGE="libcupsimage.64.so.2"
+					LIB64CUPS="64bit/libcups.so.2"
+					LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 					LIB64DIR="$exec_prefix/lib/64"
 					UNINSTALL64="uninstall64bit"
 
