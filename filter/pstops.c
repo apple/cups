@@ -891,6 +891,13 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   }
 
  /*
+  * Restore the old showpage operator as needed...
+  */
+
+  if (doc->use_ESPshowpage)
+    puts("userdict/showpage/ESPshowpage load put\n");
+
+ /*
   * Write/copy the trailer...
   */
 
@@ -1065,6 +1072,13 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
       }
     }
   }
+
+ /*
+  * Restore the old showpage operator as needed...
+  */
+
+  if (doc->use_ESPshowpage)
+    puts("userdict/showpage/ESPshowpage load put\n");
 }
 
 
