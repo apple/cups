@@ -45,7 +45,7 @@ if test x$enable_shared != xno; then
 			LIBCUPS="libcups.so.2"
 			LIBCUPSIMAGE="libcupsimage.so.2"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi2.6,-soname,\`basename \$@\` -shared \$(OPTIM)"
+			DSOFLAGS="$DSOFLAGS -set_version,sgi2.6,-soname,\`basename \$@\` -shared \$(OPTIM)"
 			;;
 		OSF1* | Linux | GNU | *BSD*)
 			LIBCUPS="libcups.so.2"
@@ -57,7 +57,7 @@ if test x$enable_shared != xno; then
 			LIBCUPS="libcups.2.dylib"
 			LIBCUPSIMAGE="libcupsimage.2.dylib"
 			DSO="\$(CC)"
-			DSOFLAGS="$DSOFLAGS \$(RC_CFLAGS) -dynamiclib -single_module -lc"
+			DSOFLAGS="$DSOFLAGS -dynamiclib -single_module -lc"
 			;;
 		AIX*)
 			LIBCUPS="libcups_s.a"
@@ -120,42 +120,48 @@ if test "$DSO" != ":"; then
 	DSOLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
 	IMGLIBS=""
 
-	# The *BSD, HP-UX, and Solaris run-time linkers need help when
-	# deciding where to find a DSO.  Add linker options to tell them
-	# where to find the DSO (usually in /usr/lib...  duh!)
+	# Tell the run-time linkers where to find a DSO.  Some platforms
+	# need this option, even when the library is installed in a
+	# standard location...
 	case $uname in
                 HP-UX*)
-			# HP-UX
+			# HP-UX needs the path, even for /usr/lib...
                 	DSOFLAGS="+s +b \$(libdir) $DSOFLAGS"
                 	DSO32FLAGS="+s +b \$(LIB32DIR) $DSO32FLAGS"
                 	DSO64FLAGS="+s +b \$(LIB64DIR) $DSO64FLAGS"
                 	LDFLAGS="$LDFLAGS -Wl,+s,+b,\$(libdir)"
                 	EXPORT_LDFLAGS="-Wl,+s,+b,\$(libdir)"
-                	;;
+			;;
                 SunOS*)
-                	# Solaris
-                	DSOFLAGS="-R\$(libdir) $DSOFLAGS"
-                	DSO32FLAGS="-R\$(LIB32DIR) $DSO32FLAGS"
-                	DSO64FLAGS="-R\$(LIB64DIR) $DSO64FLAGS"
-                	LDFLAGS="$LDFLAGS -R\$(libdir)"
-                	EXPORT_LDFLAGS="-R\$(libdir)"
-                	;;
+                	# Solaris...
+			if test $exec_prefix != /usr; then
+				DSOFLAGS="-R\$(libdir) $DSOFLAGS"
+				DSO32FLAGS="-R\$(LIB32DIR) $DSO32FLAGS"
+				DSO64FLAGS="-R\$(LIB64DIR) $DSO64FLAGS"
+				LDFLAGS="$LDFLAGS -R\$(libdir)"
+				EXPORT_LDFLAGS="-R\$(libdir)"
+			fi
+			;;
                 *BSD*)
-                        # *BSD
-                	DSOFLAGS="-Wl,-R\$(libdir) $DSOFLAGS"
-                	DSO32FLAGS="-Wl,-R\$(LIB32DIR) $DSO32FLAGS"
-                	DSO64FLAGS="-Wl,-R\$(LIB64DIR) $DSO64FLAGS"
-                        LDFLAGS="$LDFLAGS -Wl,-R\$(libdir)"
-                        EXPORT_LDFLAGS="-Wl,-R\$(libdir)"
-                        ;;
-                Linux | GNU)
-                        # Linux and HURD
-                	DSOFLAGS="-Wl,-rpath,\$(libdir) $DSOFLAGS"
-                	DSO32FLAGS="-Wl,-rpath,\$(LIB32DIR) $DSO32FLAGS"
-                	DSO64FLAGS="-Wl,-rpath,\$(LIB64DIR) $DSO64FLAGS"
-                        LDFLAGS="$LDFLAGS -Wl,-rpath,\$(libdir)"
-                        EXPORT_LDFLAGS="-Wl,-rpath,\$(libdir)"
-                        ;;
+                        # *BSD...
+			if test $exec_prefix != /usr; then
+				DSOFLAGS="-Wl,-R\$(libdir) $DSOFLAGS"
+				DSO32FLAGS="-Wl,-R\$(LIB32DIR) $DSO32FLAGS"
+				DSO64FLAGS="-Wl,-R\$(LIB64DIR) $DSO64FLAGS"
+				LDFLAGS="$LDFLAGS -Wl,-R\$(libdir)"
+				EXPORT_LDFLAGS="-Wl,-R\$(libdir)"
+			fi
+			;;
+                IRIX | Linux | GNU)
+                        # IRIX, Linux, and HURD...
+			if test $exec_prefix != /usr; then
+				DSOFLAGS="-Wl,-rpath,\$(libdir) $DSOFLAGS"
+				DSO32FLAGS="-Wl,-rpath,\$(LIB32DIR) $DSO32FLAGS"
+				DSO64FLAGS="-Wl,-rpath,\$(LIB64DIR) $DSO64FLAGS"
+				LDFLAGS="$LDFLAGS -Wl,-rpath,\$(libdir)"
+				EXPORT_LDFLAGS="-Wl,-rpath,\$(libdir)"
+			fi
+			;;
 	esac
 else
 	DSOLIBS=""

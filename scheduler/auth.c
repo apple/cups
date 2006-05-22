@@ -1497,7 +1497,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdIsAuthorized: con->uri=\"%s\", con->best=%p(%s)",
-                  con->uri, con->best, con->best ? con->best->location : "");
+                  con->uri, con->best, con->best ? con->best->location ?
+                			   con->best->location : "(null)" : "");
   if (owner)
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsAuthorized: owner=\"%s\"", owner);
