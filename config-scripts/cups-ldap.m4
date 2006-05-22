@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-ldap.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id: cups-ldap.m4 5563 2006-05-21 17:18:40Z mike $"
 dnl
 dnl   LDAP configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -36,7 +36,7 @@ LIBLDAP=""
 
 if test x$enable_ldap != xno; then
     AC_CHECK_HEADER(ldap.h,
-	AC_CHECK_LIB(ldap, ldap_value_free,
+	AC_CHECK_LIB(ldap, ldap_initialize,
             AC_DEFINE(HAVE_LDAP)
             AC_DEFINE(HAVE_OPENLDAP)
 	    LIBLDAP="-lldap"))
@@ -46,5 +46,5 @@ AC_SUBST(LIBLDAP)
 
 
 dnl
-dnl End of "$Id: cups-ldap.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id: cups-ldap.m4 5563 2006-05-21 17:18:40Z mike $".
 dnl

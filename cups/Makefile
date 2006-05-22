@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5491 2006-05-04 20:53:35Z mike $"
+# "$Id: Makefile 5563 2006-05-21 17:18:40Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -137,7 +137,8 @@ all:	$(TARGETS)
 
 clean:
 	$(RM) $(OBJS) $(TARGETS)
-	$(RM) libcups.so libcups.sl libcups.dylib libcups.32.so libcups.64.so
+	$(RM) libcups.so libcups.sl libcups.dylib
+	$(RM) -r 32bit 64it
 
 
 #
@@ -184,12 +185,12 @@ installhdrs:
 
 install32bit:
 	$(INSTALL_DIR) -m 755 $(LIB32DIR)
-	$(INSTALL_LIB) libcups.32.so.2 $(LIB32DIR)/libcups.so.2
+	$(INSTALL_LIB) 32bit/libcups.so.2 $(LIB32DIR)/libcups.so.2
 	$(LN) libcups.so $(LIB32DIR)/libcups.so.2
 
 install64bit:
 	$(INSTALL_DIR) -m 755 $(LIB64DIR)
-	$(INSTALL_LIB) libcups.64.so.2 $(LIB64DIR)/libcups.so.2
+	$(INSTALL_LIB) 64bit/libcups.so.2 $(LIB64DIR)/libcups.so.2
 	$(LN) libcups.so $(LIB64DIR)/libcups.so.2
 
 
@@ -235,21 +236,27 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 
 
 #
-# libcups.32.so.2
+# 32bit/libcups.so.2
 #
 
-libcups.32.so.2:	$(LIB32OBJS)
+32bit/libcups.so.2:	$(LIB32OBJS)
 	echo Linking 32-bit $@...
-	$(DSO) $(ARCH32FLAGS) $(DSOFLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	-mkdir 32bit
+	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(RM) 32bit/libcups.so
+	$(LN) libcups.so.2 32bit/libcups.so
 
 
 #
-# libcups.64.so.2
+# 64bit/libcups.so.2
 #
 
-libcups.64.so.2:	$(LIB64OBJS)
+64bit/libcups.so.2:	$(LIB64OBJS)
 	echo Linking 64-bit $@...
-	$(DSO) $(ARCH64FLAGS) $(DSOFLAGS) -o $@ $(LIB64OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	-mkdir 64bit
+	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(RM) 64bit/libcups.so
+	$(LN) libcups.so.2 64bit/libcups.so
 
 
 #
@@ -442,5 +449,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5491 2006-05-04 20:53:35Z mike $".
+# End of "$Id: Makefile 5563 2006-05-21 17:18:40Z mike $".
 #

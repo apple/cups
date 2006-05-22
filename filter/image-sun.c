@@ -1,9 +1,9 @@
 /*
- * "$Id: image-sun.c 4741 2005-10-02 04:25:52Z mike $"
+ * "$Id: image-sun.c 5508 2006-05-11 11:41:16Z mike $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -330,45 +330,32 @@ _cupsImageReadSunRaster(
     }
     else
     {
-      if (img->colorspace == CUPS_IMAGE_RGB)
+      if ((saturation != 100 || hue != 0) && bpp > 1)
+	cupsImageRGBAdjust(in, img->xsize, saturation, hue);
+
+      switch (img->colorspace)
       {
-	if (saturation != 100 || hue != 0)
-	  cupsImageRGBAdjust(in, img->xsize, saturation, hue);
+	default :
+	    break;
 
-        if (lut)
-	  cupsImageLut(in, img->xsize * 3, lut);
-
-        _cupsImagePutRow(img, 0, y, img->xsize, in);
+	case CUPS_IMAGE_WHITE :
+	    cupsImageRGBToWhite(in, out, img->xsize);
+	    break;
+	case CUPS_IMAGE_BLACK :
+	    cupsImageRGBToBlack(in, out, img->xsize);
+	    break;
+	case CUPS_IMAGE_CMY :
+	    cupsImageRGBToCMY(in, out, img->xsize);
+	    break;
+	case CUPS_IMAGE_CMYK :
+	    cupsImageRGBToCMYK(in, out, img->xsize);
+	    break;
       }
-      else
-      {
-	if ((saturation != 100 || hue != 0) && bpp > 1)
-	  cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
-	switch (img->colorspace)
-	{
-	  default :
-	      break;
+      if (lut)
+	cupsImageLut(out, img->xsize * bpp, lut);
 
-	  case CUPS_IMAGE_WHITE :
-	      cupsImageRGBToWhite(in, out, img->xsize);
-	      break;
-	  case CUPS_IMAGE_BLACK :
-	      cupsImageRGBToBlack(in, out, img->xsize);
-	      break;
-	  case CUPS_IMAGE_CMY :
-	      cupsImageRGBToCMY(in, out, img->xsize);
-	      break;
-	  case CUPS_IMAGE_CMYK :
-	      cupsImageRGBToCMYK(in, out, img->xsize);
-	      break;
-	}
-
-        if (lut)
-	  cupsImageLut(out, img->xsize * bpp, lut);
-
-        _cupsImagePutRow(img, 0, y, img->xsize, out);
-      }
+      _cupsImagePutRow(img, 0, y, img->xsize, out);
     }
   }
 
@@ -402,5 +389,5 @@ read_unsigned(FILE *fp)			/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c 4741 2005-10-02 04:25:52Z mike $".
+ * End of "$Id: image-sun.c 5508 2006-05-11 11:41:16Z mike $".
  */

@@ -281,7 +281,7 @@
 *OpenUI *zePrintRate/Print Rate: PickOne
 *OrderDependency: 20 AnySetup *zePrintRate
 *DefaultzePrintRate: Default
-*zePrintRate Default/PrinterDefault: Default
+*zePrintRate Default/PrinterDefault: ""
 *zePrintRate 1/1 inch/sec.: ""
 *zePrintRate 1.5/1.5 inch/sec.: ""
 *zePrintRate 2/2 inches/sec.: ""

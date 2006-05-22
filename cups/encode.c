@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: encode.c 5544 2006-05-18 21:00:16Z mike $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -67,6 +67,7 @@ static const _ipp_option_t ipp_options[] =
   { "copies",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "copies-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "document-format",		IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
+  { "document-format-default",	IPP_TAG_MIMETYPE,	IPP_TAG_PRINTER },
   { "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB },
   { "finishings-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "fitplot",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
@@ -88,6 +89,7 @@ static const _ipp_option_t ipp_options[] =
   { "natural-scaling-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "notify-charset",		IPP_TAG_CHARSET,	IPP_TAG_SUBSCRIPTION },
   { "notify-events",		IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
+  { "notify-events-default",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { "notify-lease-time",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
   { "notify-natural-language",	IPP_TAG_LANGUAGE,	IPP_TAG_SUBSCRIPTION },
   { "notify-pull-method",	IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
@@ -133,6 +135,8 @@ static const _ipp_option_t ipp_options[] =
   { "raw",			IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
   { "resolution",		IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
   { "resolution-default",	IPP_TAG_RESOLUTION,	IPP_TAG_PRINTER },
+  { "requesting-user-name-allowed",	IPP_TAG_NAME,	IPP_TAG_PRINTER },
+  { "requesting-user-name-denied",	IPP_TAG_NAME,	IPP_TAG_PRINTER },
   { "saturation",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "saturation-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "scaling",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
@@ -557,5 +561,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: encode.c 5544 2006-05-18 21:00:16Z mike $".
  */

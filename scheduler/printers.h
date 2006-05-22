@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 5330 2006-03-23 21:07:20Z mike $"
+ * "$Id: printers.h 5533 2006-05-16 19:45:14Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -135,8 +135,7 @@ extern void		cupsdStopPrinter(cupsd_printer_t *p, int update);
 extern void		cupsdUpdatePrinters(void);
 extern cupsd_quota_t	*cupsdUpdateQuota(cupsd_printer_t *p, const char *username,
 			                  int pages, int k);
-extern const char	*cupsdValidateDest(const char *hostname,
-			        	   const char *resource,
+extern const char	*cupsdValidateDest(const char *uri,
 			        	   cups_ptype_t *dtype,
 					   cupsd_printer_t **printer);
 extern void		cupsdWritePrintcap(void);
@@ -146,5 +145,5 @@ extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
 
 
 /*
- * End of "$Id: printers.h 5330 2006-03-23 21:07:20Z mike $".
+ * End of "$Id: printers.h 5533 2006-05-16 19:45:14Z mike $".
  */

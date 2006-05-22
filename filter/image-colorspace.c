@@ -1,9 +1,9 @@
 /*
- * "$Id: image-colorspace.c 4767 2005-10-10 19:23:23Z mike $"
+ * "$Id: image-colorspace.c 5520 2006-05-12 16:37:36Z mike $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   The color saturation/hue matrix stuff is provided thanks to Mr. Paul
  *   Haeberli at "http://www.sgi.com/grafica/matrix/index.html".
@@ -423,7 +423,8 @@ cupsImageCMYKToRGB(
       else
         *out++ = 0;
 
-      if (cupsImageColorSpace >= CUPS_CSPACE_CIELab)
+      if (cupsImageColorSpace == CUPS_CSPACE_CIELab ||
+          cupsImageColorSpace >= CUPS_CSPACE_ICC1)
         rgb_to_lab(out - 3);
       else if (cupsImageColorSpace == CUPS_CSPACE_CIEXYZ)
         rgb_to_xyz(out - 3);
@@ -852,14 +853,22 @@ cupsImageRGBToRGB(
     if (in != out)
       memcpy(out, in, count * 3);
 
-    if (cupsImageColorSpace >= CUPS_CSPACE_CIEXYZ)
+    if (cupsImageColorSpace == CUPS_CSPACE_CIELab ||
+        cupsImageColorSpace >= CUPS_CSPACE_ICC1)
     {
       while (count > 0)
       {
-	if (cupsImageColorSpace >= CUPS_CSPACE_CIELab)
-          rgb_to_lab(out);
-	else
-          rgb_to_xyz(out);
+        rgb_to_lab(out);
+
+	out += 3;
+	count --;
+      }
+    }
+    else if (cupsImageColorSpace == CUPS_CSPACE_CIEXYZ)
+    {
+      while (count > 0)
+      {
+        rgb_to_xyz(out);
 
 	out += 3;
 	count --;
@@ -958,13 +967,15 @@ cupsImageSetRasterColorSpace(
   * Set the destination colorspace...
   */
 
-  cupsImageColorSpace  = cs;
+  cupsImageColorSpace = cs;
 
  /*
   * Don't use color profiles in colorimetric colorspaces...
   */
 
-  if (cs >= CUPS_CSPACE_CIEXYZ)
+  if (cs == CUPS_CSPACE_CIEXYZ ||
+      cs == CUPS_CSPACE_CIELab ||
+      cs >= CUPS_CSPACE_ICC1)
     cupsImageHaveProfile = 0;
 }
 
@@ -1084,7 +1095,8 @@ cupsImageWhiteToRGB(
       *out++ = *in;
       *out++ = *in++;
 
-      if (cupsImageColorSpace >= CUPS_CSPACE_CIELab)
+      if (cupsImageColorSpace == CUPS_CSPACE_CIELab ||
+          cupsImageColorSpace >= CUPS_CSPACE_ICC1)
         rgb_to_lab(out - 3);
       else if (cupsImageColorSpace == CUPS_CSPACE_CIEXYZ)
         rgb_to_xyz(out - 3);
@@ -1283,9 +1295,9 @@ rgb_to_lab(cups_ib_t *val)		/* IO - Color value */
   * Convert sRGB to linear RGB...
   */
 
-  r = pow(val[0] / 255.0, 0.58823529412);
-  g = pow(val[1] / 255.0, 0.58823529412);
-  b = pow(val[2] / 255.0, 0.58823529412);
+  r = pow((val[0] / 255.0 + 0.055) / 1.055, 2.4);
+  g = pow((val[1] / 255.0 + 0.055) / 1.055, 2.4);
+  b = pow((val[2] / 255.0 + 0.055) / 1.055, 2.4);
 
  /*
   * Convert to CIE XYZ...
@@ -1315,9 +1327,9 @@ rgb_to_lab(cups_ib_t *val)		/* IO - Color value */
   * numbers are from 0 to 255.
   */
 
-  ciel *= 2.55;
-  ciea += 128;
-  cieb += 128;
+  ciel = ciel * 2.55 + 0.5;
+  ciea += 128.5;
+  cieb += 128.5;
 
  /*
   * Output 8-bit values...
@@ -1331,14 +1343,14 @@ rgb_to_lab(cups_ib_t *val)		/* IO - Color value */
     val[0] = 255;
 
   if (ciea < 0.0)
-    val[1] = 128;
+    val[1] = 0;
   else if (ciea < 255.0)
     val[1] = (int)ciea;
   else
     val[1] = 255;
 
   if (cieb < 0.0)
-    val[2] = 128;
+    val[2] = 0;
   else if (cieb < 255.0)
     val[2] = (int)cieb;
   else
@@ -1365,9 +1377,9 @@ rgb_to_xyz(cups_ib_t *val)		/* IO - Color value */
   * Convert sRGB to linear RGB...
   */
 
-  r = pow(val[0] / 255.0, 0.58823529412);
-  g = pow(val[1] / 255.0, 0.58823529412);
-  b = pow(val[2] / 255.0, 0.58823529412);
+  r = pow((val[0] / 255.0 + 0.055) / 1.055, 2.4);
+  g = pow((val[1] / 255.0 + 0.055) / 1.055, 2.4);
+  b = pow((val[2] / 255.0 + 0.055) / 1.055, 2.4);
 
  /*
   * Convert to CIE XYZ...
@@ -1378,27 +1390,27 @@ rgb_to_xyz(cups_ib_t *val)		/* IO - Color value */
   ciez = 0.019334 * r + 0.119193 * g + 0.950227 * b;
 
  /*
-  * Output 8-bit values...
+  * Encode as 8-bit XYZ...
   */
 
-  if (ciex < 0.0)
+  if (ciex < 0.0f)
     val[0] = 0;
-  else if (ciex < 255.0)
-    val[0] = (int)ciex;
+  else if (ciex < 1.1f)
+    val[0] = (int)(231.8181f * ciex + 0.5);
   else
     val[0] = 255;
 
-  if (ciey < 0.0)
+  if (ciey < 0.0f)
     val[1] = 0;
-  else if (ciey < 255.0)
-    val[1] = (int)ciey;
+  else if (ciey < 1.1f)
+    val[1] = (int)(231.8181f * ciey + 0.5);
   else
     val[1] = 255;
 
-  if (ciez < 0.0)
+  if (ciez < 0.0f)
     val[2] = 0;
-  else if (ciez < 255.0)
-    val[2] = (int)ciez;
+  else if (ciez < 1.1f)
+    val[2] = (int)(231.8181f * ciez + 0.5);
   else
     val[2] = 255;
 }
@@ -1561,5 +1573,5 @@ zshear(float mat[3][3],			/* I - Matrix */
 
 
 /*
- * End of "$Id: image-colorspace.c 4767 2005-10-10 19:23:23Z mike $".
+ * End of "$Id: image-colorspace.c 5520 2006-05-12 16:37:36Z mike $".
  */

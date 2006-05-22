@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c 5192 2006-02-27 03:08:47Z mike $"
+ * "$Id: raster.c 5523 2006-05-15 05:02:43Z mike $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -69,6 +69,24 @@
 #  include <unistd.h>
 #endif /* WIN32 || __EMX__ */
 
+
+/*
+ * Private structures...
+ */
+
+struct _cups_raster_s			/**** Raster stream data ****/
+{
+  unsigned		sync;		/* Sync word from start of stream */
+  int			fd;		/* File descriptor */
+  cups_mode_t		mode;		/* Read/write mode */
+  cups_page_header2_t	header;		/* Raster header for current page */
+  int			count,		/* Current row run-length count */
+			remaining,	/* Remaining rows in page image */
+			bpp;		/* Bytes per pixel/color */
+  unsigned char		*pixels,	/* Pixels for current row */
+			*pend,		/* End of pixel buffer */
+			*pcurrent;	/* Current byte in pixel buffer */
+};
 
 /*
  * Local functions...
@@ -335,7 +353,9 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 	}
       }
 
-      if (r->header.cupsBitsPerColor == 16 &&
+      if ((r->header.cupsBitsPerColor == 16 ||
+           r->header.cupsBitsPerPixel == 12 ||
+           r->header.cupsBitsPerPixel == 16) &&
           (r->sync == CUPS_RASTER_REVSYNC || r->sync == CUPS_RASTER_REVSYNCv1))
       {
        /*
@@ -478,12 +498,16 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   unsigned	remaining;		/* Bytes remaining */
 
 
+#ifdef DEBUG
+  fprintf(stderr, "cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u\n",
+          r, p, len, r->remaining);
+#endif /* DEBUG */
+
   if (r == NULL || r->mode != CUPS_RASTER_WRITE || r->remaining == 0)
     return (0);
 
-  remaining = len;
+  for (remaining = len; remaining > 0; remaining -= bytes, p += bytes)
 
-  while (remaining > 0)
   {
    /*
     * Figure out the number of remaining bytes on the current line...
@@ -527,14 +551,19 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 	  */
 
 	  r->remaining --;
+
 	  if (r->remaining == 0)
 	    return (cups_raster_write(r));
 	  else if (r->count == 256)
 	  {
-	    cups_raster_write(r);
+	    if (cups_raster_write(r) == 0)
+	      return (0);
+
 	    r->count = 0;
 	  }
 	}
+
+	continue;
       }
     }
 
@@ -562,13 +591,11 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 	*/
 
 	r->remaining --;
+
 	if (r->remaining == 0)
 	  return (cups_raster_write(r));
       }
     }
-
-    remaining -= bytes;
-    p         += bytes;
   }
 
   return (len);
@@ -640,7 +667,8 @@ cups_raster_read_header(
 static void
 cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
 {
-  if (r->sync == CUPS_RASTER_SYNCv1 || r->sync == CUPS_RASTER_REVSYNCv1)
+  if (r->sync == CUPS_RASTER_SYNCv1 || r->sync == CUPS_RASTER_REVSYNCv1 ||
+      r->header.cupsNumColors == 0)
   {
    /*
     * Set the "cupsNumColors" field according to the colorspace...
@@ -653,12 +681,7 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
       case CUPS_CSPACE_WHITE :
       case CUPS_CSPACE_GOLD :
       case CUPS_CSPACE_SILVER :
-      case CUPS_CSPACE_ICC1 :
           r->header.cupsNumColors = 1;
-	  break;
-
-      case CUPS_CSPACE_ICC2 :
-          r->header.cupsNumColors = 2;
 	  break;
 
       case CUPS_CSPACE_RGB :
@@ -666,28 +689,10 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
       case CUPS_CSPACE_YMC :
       case CUPS_CSPACE_CIEXYZ :
       case CUPS_CSPACE_CIELab :
+      case CUPS_CSPACE_ICC1 :
+      case CUPS_CSPACE_ICC2 :
       case CUPS_CSPACE_ICC3 :
-          r->header.cupsNumColors = 3;
-	  break;
-
-      case CUPS_CSPACE_RGBA :
-      case CUPS_CSPACE_RGBW :
-      case CUPS_CSPACE_CMYK :
-      case CUPS_CSPACE_YMCK :
-      case CUPS_CSPACE_KCMY :
-      case CUPS_CSPACE_GMCK :
-      case CUPS_CSPACE_GMCS :
       case CUPS_CSPACE_ICC4 :
-          r->header.cupsNumColors = 4;
-	  break;
-
-      case CUPS_CSPACE_KCMYcm :
-          if (r->header.cupsBitsPerPixel < 8)
-            r->header.cupsNumColors = 6;
-	  else
-            r->header.cupsNumColors = 4;
-	  break;
-
       case CUPS_CSPACE_ICC5 :
       case CUPS_CSPACE_ICC6 :
       case CUPS_CSPACE_ICC7 :
@@ -699,8 +704,24 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
       case CUPS_CSPACE_ICCD :
       case CUPS_CSPACE_ICCE :
       case CUPS_CSPACE_ICCF :
-          r->header.cupsNumColors = r->header.cupsColorSpace -
-	                            CUPS_CSPACE_ICC1 + 1;
+          r->header.cupsNumColors = 3;
+	  break;
+
+      case CUPS_CSPACE_RGBA :
+      case CUPS_CSPACE_RGBW :
+      case CUPS_CSPACE_CMYK :
+      case CUPS_CSPACE_YMCK :
+      case CUPS_CSPACE_KCMY :
+      case CUPS_CSPACE_GMCK :
+      case CUPS_CSPACE_GMCS :
+          r->header.cupsNumColors = 4;
+	  break;
+
+      case CUPS_CSPACE_KCMYcm :
+          if (r->header.cupsBitsPerPixel < 8)
+            r->header.cupsNumColors = 6;
+	  else
+            r->header.cupsNumColors = 4;
 	  break;
     }
   }
@@ -750,6 +771,10 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
   int		count;			/* Count */
 
 
+#ifdef DEBUG
+  fprintf(stderr, "cups_raster_write(r=%p)\n", r);
+#endif /* DEBUG */
+
  /*
   * Write the row repeat count...
   */
@@ -757,7 +782,14 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
   byte = r->count - 1;
 
   if (cups_write(r->fd, &byte, 1) < 1)
+  {
+#ifdef DEBUG
+    fputs("cups_raster_write: Unable to write row repeat count...\n",
+          stderr);
+#endif /* DEBUG */
+
     return (0);
+  }
 
  /*
   * Write using a modified TIFF "packbits" compression...
@@ -776,10 +808,22 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
 
       byte = 0;
       if (cups_write(r->fd, &byte, 1) < 1)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write last pixel count...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
 
       if (cups_write(r->fd, start, r->bpp) < r->bpp)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write last pixel data...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
     }
     else if (!memcmp(start, ptr, r->bpp))
     {
@@ -796,10 +840,22 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       byte = count - 1;
 
       if (cups_write(r->fd, &byte, 1) < 1)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write repeated pixel count...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
 
       if (cups_write(r->fd, start, r->bpp) < r->bpp)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write repeated pixel data...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
     }
     else
     {
@@ -820,12 +876,24 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       byte = 257 - count;
 
       if (cups_write(r->fd, &byte, 1) < 1)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write non-repeating pixel count...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
 
       count *= r->bpp;
 
       if (cups_write(r->fd, start, count) < count)
+      {
+#ifdef DEBUG
+        fputs("cups_raster_write: Unable to write non-repeating pixel data...\n", stderr);
+#endif /* DEBUG */
+
         return (0);
+      }
     }
   }
 
@@ -896,5 +964,5 @@ cups_write(int                 fd,	/* I - File descriptor */
 
 
 /*
- * End of "$Id: raster.c 5192 2006-02-27 03:08:47Z mike $".
+ * End of "$Id: raster.c 5523 2006-05-15 05:02:43Z mike $".
  */

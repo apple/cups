@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-ssl.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id: cups-ssl.m4 5524 2006-05-15 13:52:09Z mike $"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -55,18 +55,14 @@ if test x$enable_ssl != xno; then
 
     dnl Then look for GNU TLS...
     if test "x${SSLLIBS}" = "x" -a "x${enable_gnutls}" != "xno"; then
-	AC_CHECK_HEADER(gnutls/gnutls.h,
-	    dnl Save the current libraries so the crypto stuff isn't always
-	    dnl included...
-	    SAVELIBS="$LIBS"
-
-	    AC_CHECK_LIB(gnutls, gnutls_x509_crt_set_dn_by_oid,
-		[SSLLIBS="-lgnutls"
-		 ENCRYPTION_REQUIRED="  Encryption Required"
-		 AC_DEFINE(HAVE_SSL)
-		 AC_DEFINE(HAVE_GNUTLS)])
-
-	    LIBS="$SAVELIBS")
+    	AC_PATH_PROG(LIBGNUTLSCONFIG,libgnutls-config)
+	if test "x$LIBGNUTLSCONFIG" != x; then
+	    SSLLIBS=`$LIBGNUTLSCONFIG --libs`
+	    SSLFLAGS=`$LIBGNUTLSCONFIG --cflags`
+	    ENCRYPTION_REQUIRED="  Encryption Required"
+	    AC_DEFINE(HAVE_SSL)
+	    AC_DEFINE(HAVE_GNUTLS)
+	fi
     fi
 
     dnl Check for the OpenSSL library last...
@@ -104,6 +100,11 @@ if test x$enable_ssl != xno; then
     fi
 fi
 
+if test "x$SSLLIBS" != x; then
+    AC_MSG_RESULT([    Using SSLLIBS="$SSLLIBS"])
+    AC_MSG_RESULT([    Using SSLFLAGS="$SSLFLAGS"])
+fi
+
 AC_SUBST(SSLFLAGS)
 AC_SUBST(SSLLIBS)
 AC_SUBST(ENCRYPTION_REQUIRED)
@@ -113,5 +114,5 @@ AC_SUBST(EXPORT_SSLLIBS)
 
 
 dnl
-dnl End of "$Id: cups-ssl.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id: cups-ssl.m4 5524 2006-05-15 13:52:09Z mike $".
 dnl

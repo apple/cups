@@ -1,4 +1,3 @@
-# Swedish translation of cups
 #
 # "$Id$"
 #
@@ -22,703 +21,719 @@
 #       EMail: cups-info@cups.org
 #         WWW: http://www.cups.org
 #
-# Translated by:
-# Daniel Nylander <po@danielnylander.se>, 2006.
 msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
 "POT-Creation-Date: 2006-05-21 10:07-0400\n"
-"PO-Revision-Date: 2006-04-16 00:55+0100\n"
-"Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
-"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
+"PO-Revision-Date: 2006-05-09 17:20+0200\n"
+"Last-Translator: Piotr Drąg <raven@pmail.pl>\n"
+"Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Options Installed"
-msgstr "Alternativ installerade"
+msgstr "Zainstalowane opcje"
 
 msgid "Class"
-msgstr "Klass"
+msgstr "Klasa"
 
 msgid "Printer"
-msgstr "Skrivare"
+msgstr "Drukarka"
 
 msgid "Extra"
-msgstr "Extra"
+msgstr "Dodatkowe"
 
 msgid "General"
-msgstr "Allmänt"
+msgstr "Ogólne"
 
 msgid "Media Size"
-msgstr "Mediastorlek"
+msgstr "Rozmiar nośnika"
 
 msgid "Media Type"
-msgstr "Mediatyp"
+msgstr "Typ nośnika"
 
 msgid "Media Source"
-msgstr "Mediakälla"
+msgstr "Źródło nośnika"
 
 msgid "Output Mode"
-msgstr "Utmatningsläge"
+msgstr "Tryb wyjścia"
 
 msgid "Resolution"
-msgstr "Upplösning"
+msgstr "Rozdzielczość"
 
 msgid "Variable"
-msgstr "Variabel"
+msgstr "Zmienna"
 
 msgid "Yes"
-msgstr "Ja"
+msgstr "Tak"
 
 msgid "No"
-msgstr "Nej"
+msgstr "Nie"
 
 msgid "Auto"
-msgstr "Auto"
+msgstr "Automatycznie"
 
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page."
 msgstr ""
-"Ange ditt användarnamn och lösenord eller root-användnamnet och lösenord för "
-"att komma åt denna sida."
+"Podaj swoją nazwę użytkownika i hasło lub nazwę użytkownika root i hasło, "
+"aby uzyskać dostęp do tej strony."
 
 msgid "You must use a https: URL to access this page."
-msgstr "Du måste använda en https:-url för att komma åt denna sida."
+msgstr "Musisz użyć URL-a https:, aby uzyskać dostęp do tej strony."
 
 #, c-format
 msgid "Bad request version number %d.%d!"
-msgstr "Felaktigt versionsnummer %d.%d för begäran!"
+msgstr "Błędny numer wersji żądania %d.%d!"
 
 msgid "No attributes in request!"
-msgstr "Inga attribut i begäran!"
+msgstr "Brak właściwości w żądaniu!"
 
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)!"
-msgstr "Attributgrupper fungerar inte (%x < %x)!"
+msgstr "Grupy właściwości są nieuporządkowane (%x < %x)!"
 
 msgid "Missing required attributes!"
-msgstr "Saknar nödvändiga attribut!"
+msgstr "Brakuje wymaganych właściwości!"
 
 #, c-format
 msgid "%s not supported!"
-msgstr "%s stöds inte!"
+msgstr "%s jest nieobsługiwane!"
 
 msgid "The printer or class was not found."
-msgstr "Skrivaren eller klassen hittades inte."
+msgstr "Drukarka lub klasa nie została znaleziona."
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
 msgstr ""
-"Printer-uri måste vara i formatet \"ipp://VÄRDNAMN/classes/KLASSNAMN\"."
+"printer-uri musi być w formie \"ipp://NAZWAKOMPUTERA/classes/NAZWAKLASY\"."
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
-msgstr "Printer-uri \"%s\" innehåller ogiltiga tecken."
+msgstr "printer-uri \"%s\" zawiera nieprawidłowe znaki."
 
 #, c-format
 msgid "A printer named \"%s\" already exists!"
-msgstr "En skrivare med namnet \"%s\" finns redan!"
+msgstr "Drukarka o nazwie \"%s\" już istnieje!"
 
 #, c-format
 msgid "Attempt to set %s printer-state to bad value %d!"
-msgstr "Försök att ställa in %s printer-state till felaktigt värde %d!"
+msgstr "Spróbowano ustawić printer-state %s na błędną wartość %d!"
 
 #, c-format
 msgid "add_class: Unknown printer-op-policy \"%s\"."
-msgstr "add_class: Okänd printer-op-policy \"%s\"."
+msgstr "add_class: nieznane \"%s\" printer-op-policy."
 
 #, c-format
 msgid "add_class: Unknown printer-error-policy \"%s\"."
-msgstr "add_class: Okänd printer-error-policy \"%s\"."
+msgstr "add_class: nieznane \"%s\" printer-error-policy."
 
 msgid "Unable to allocate memory for file types!"
-msgstr "Kunde inte allokera minne för filtyper!"
+msgstr "Nie można przydzielić pamięci dla typów plików!"
 
 #, c-format
 msgid "Character set \"%s\" not supported!"
-msgstr "Teckenkodningen \"%s\" stöds inte!"
+msgstr "Zestaw znaków \"%s\" jest nieobsługiwany!"
 
 #, c-format
 msgid "Language \"%s\" not supported!"
-msgstr "Språket \"%s\" stöds inte!"
+msgstr "Język \"%s\" jest nieobsługiwany!"
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)!"
-msgstr "Värdet för notify-user-data är för stort (%d > 63 okteter)!"
+msgstr "Wartość notify-user-data jest za duża (%d > 63 oktety)!"
 
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
-"Attributet notify-lease-duration kan inte användas med jobbprenumerationer."
+"Właściwość notify-lease-duration nie może być używana z subskrypcjami zadań."
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
 msgstr ""
-"Printer-uri måste vara i formatet \"ipp://VÄRDNAMN/printers/SKRIVARNAMN\"."
+"printer-uri musi być w formie \"ipp://NAZWAKOMPUTERA/printers/NAZWADRUKARKI"
+"\"."
 
 #, c-format
 msgid "A class named \"%s\" already exists!"
-msgstr "En klass med namnet \"%s\" finns redan!"
+msgstr "Klasa o nazwie \"%s\" już istnieje!"
 
 #, c-format
 msgid ""
 "File device URIs have been disabled! To enable, see the FileDevice directive "
 "in \"%s/cupsd.conf\"."
 msgstr ""
-"Felenhets URI:er har blivit inaktiverat! För att aktivera, se direktivet "
-"FileDevice i \"%s/cupsd.conf\"."
+"URI pliku urządzenia zostało wyłączone! Aby włączyć, zobacz dyrektywę "
+"FileDevice w \"%s/cupsd.conf\"."
 
 #, c-format
 msgid "Bad device-uri \"%s\"!"
-msgstr "Felaktig device-uri \"%s\"!"
+msgstr "Błędne \"%s\" device-uri!"
 
 #, c-format
 msgid "Bad port-monitor \"%s\"!"
-msgstr "Felaktig port-monitor \"%s\"!"
+msgstr "Błędne \"%s\" port-monitor!"
 
 #, c-format
 msgid "Bad printer-state value %d!"
-msgstr "Felaktigt värde för printer-state %d!"
+msgstr "Błędne %d printer-state value!"
 
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
-msgstr "Okänd printer-op-policy \"%s\"."
+msgstr "Nieznane \"%s\" printer-op-policy."
 
 #, c-format
 msgid "Unknown printer-error-policy \"%s\"."
-msgstr "Okänd printer-error-policy \"%s\"."
+msgstr "Nieznane \"%s\" printer-error-polic!"
 
 #, c-format
 msgid "Unable to copy interface script - %s!"
-msgstr "Kunde inte kopiera gränssnittsskript - %s!"
+msgstr "Nie można skopiować skryptu interfejsu - %s!"
 
 #, c-format
 msgid "Unable to copy PPD file - %s!"
-msgstr "Kunde inte kopiera PPD-fil - %s!"
+msgstr "Nie można skopiować pliku PPD - %s!"
 
 msgid "Unable to copy PPD file!"
-msgstr "Kunde inte kopiera PPD-fil!"
+msgstr "Nie można skopiować pliku PPD!"
 
 msgid "Got a printer-uri attribute but no job-id!"
-msgstr "Fick ett printer-uri-attribut men inget jobb-id!"
+msgstr "Otrzymano właściwość printer-uri, ale bez job-id!"
 
 #, c-format
 msgid "Bad job-uri attribute \"%s\"!"
-msgstr "Felaktigt attribut för job-uri \"%s\"!"
+msgstr "Błędna właściwość \"%s\" job-uri!"
 
 #, c-format
 msgid "Job #%d doesn't exist!"
-msgstr "Jobb #%d finns inte!"
+msgstr "Zadanie #%d nie istnieje!"
 
 #, c-format
 msgid "Job #%d is not held for authentication!"
-msgstr "Jobb #%d hålls inte kvar för autentisering!"
+msgstr "Zadanie #%d nie zostało wstrzymane do uwierzytelnienia!"
 
 #, c-format
 msgid "You are not authorized to authenticate job #%d owned by \"%s\"!"
-msgstr "Du är inte behörig att autentisera jobb #%d som ägs av \"%s\"!"
+msgstr ""
+"Nie jesteś upoważniony do uwierzytelnienia zadania #%d należącego do \"%s\"!"
 
 msgid "The printer-uri attribute is required!"
-msgstr "Attributet printer-uri krävs!"
+msgstr "Wymagana jest właściwość printer-uri!"
 
 msgid "Missing requesting-user-name attribute!"
-msgstr "Saknar attributet requesting-user-name!"
+msgstr "Brakuje właściwości requesting-user-name!"
 
 #, c-format
 msgid "The printer-uri \"%s\" is not valid."
-msgstr "Printer-uri \"%s\" är inte giltig."
+msgstr "\"%s\" printer-uri jest nieprawidłowe."
 
 #, c-format
 msgid "No active jobs on %s!"
-msgstr "Inga aktiva jobb på %s!"
+msgstr "Brak aktywnych zadań na %s!"
 
 #, c-format
 msgid "You are not authorized to delete job #%d owned by \"%s\"!"
-msgstr "Du är inte behörig att ta bort jobb #%d som ägs av \"%s\"!"
+msgstr "Nie jesteś upoważniony do usunięcia zadania #%d należącego do \"%s\"!"
 
 #, c-format
 msgid "Job #%d is already %s - can't cancel."
-msgstr "Jobb #%d är redan %s - kan inte avbryta."
+msgstr "Zadanie #%d jest już %s - nie można anulować."
 
 msgid "The printer or class is not shared!"
-msgstr "Skrivaren eller klassen är inte delad!"
+msgstr "Drukarka lub klasa nie jest współdzielona!"
 
 #, c-format
 msgid "Destination \"%s\" is not accepting jobs."
-msgstr "Målet \"%s\" accepterar inte jobb."
+msgstr "Cel \"%s\" nie akceptuje zadań."
 
 #, c-format
 msgid "Bad copies value %d."
-msgstr "Felaktigt värde för kopior %d."
+msgstr "Błędna wartość kopii %d."
 
 #, c-format
 msgid "Bad page-ranges values %d-%d."
-msgstr "Felaktiga värden för page-ranges, %d-%d."
+msgstr "Błędne wartości %d-%d page-ranges."
 
 msgid "Too many active jobs."
-msgstr "För många aktiva jobb."
+msgstr "Za dużo aktywnych zadań."
 
 msgid "Quota limit reached."
-msgstr "Kvotgräns nådd."
+msgstr "Przekroczono limit Quoty."
 
 #, c-format
 msgid "Unable to add job for destination \"%s\"!"
-msgstr "Kunde inte lägga till jobb för målet \"%s\"!"
+msgstr "Nie można dodać zadania do celu \"%s\"!"
 
 msgid "No subscription attributes in request!"
-msgstr "Inga prenumerationsattribut i begäran!"
+msgstr "Brak właściwości subskrypcji w żądaniu!"
 
 msgid "notify-events not specified!"
-msgstr "notify-events inte angivet!"
+msgstr "notify-even jest nieokreślone!"
 
 #, c-format
 msgid "Job %d not found!"
-msgstr "Jobb %d hittades inte!"
+msgstr "Nie znaleziono zadania %d!"
 
 msgid "No default printer"
-msgstr "Ingen standardskrivare"
+msgstr "Brak domyślnej drukarki"
 
 msgid "cups-deviced failed to execute."
-msgstr "cups-deviced misslyckades med att starta."
+msgstr "Nie powiodło się wykonanie cups-deviced."
 
 msgid "cups-driverd failed to execute."
-msgstr "cups-driverd misslyckades med att starta."
+msgstr "Nie powiodło się wykonanie cups-driverd."
 
 msgid "No destinations added."
-msgstr "Inga mål tillagda."
+msgstr "Nie dodano celów."
 
 #, c-format
 msgid "notify-subscription-id %d no good!"
-msgstr "notify-subscription-id %d inte bra!"
+msgstr "%d notify-subscription-id nie dobre!"
 
 #, c-format
 msgid "Job #%s does not exist!"
-msgstr "Jobb #%s finns inte!"
+msgstr "Zadanie #%s nie istnieje!"
 
 #, c-format
 msgid "Job #%d does not exist!"
-msgstr "Jobb #%d finns inte!"
+msgstr "Zadanie #%d nie istnieje!"
 
 msgid "No subscriptions found."
-msgstr "Inga prenumerationer hittades."
+msgstr "Nie znaleziono subskrypcji."
 
 #, c-format
 msgid "Not authorized to hold job #%d owned by \"%s\"!"
-msgstr "Inte behörig att hålla kvar jobb #%d som ägs av \"%s\"!"
+msgstr "Nie upoważniony do wstrzymania zadania #%d należącego do \"%s\"!"
 
 #, c-format
 msgid "Job #%d is finished and cannot be altered!"
-msgstr "Jobb #%d är färdigt och kan inte förändras!"
+msgstr "Zadanie #%d zostało zakończone i nie może zostać zmienione!"
 
 #, c-format
 msgid "You are not authorized to move job #%d owned by \"%s\"!"
-msgstr "Du är inte behörig att flytta jobbet #%d som ägs av \"%s\"!"
+msgstr ""
+"Nie jesteś upoważniony do przeniesienia zadania #%d należącego do \"%s\"!"
 
 msgid "job-printer-uri attribute missing!"
-msgstr "Attributet job-printer-uri saknas!"
+msgstr "Brakuje właściwości job-printer-uri!"
 
 #, c-format
 msgid "Unsupported compression \"%s\"!"
-msgstr "Komprimeringen \"%s\" stöds inte!"
+msgstr "Nieobsługiwana kompresja \"%s\"!"
 
 msgid "No file!?!"
-msgstr "Ingen fil!?!"
+msgstr "Brak pliku?!?"
 
 #, c-format
 msgid "Could not scan type \"%s\"!"
-msgstr "Kunde inte söka av typen \"%s\"!"
+msgstr "Nie można przeskanować typu \"%s\"!"
 
 #, c-format
 msgid "Unsupported format '%s/%s'!"
-msgstr "Formatet \"%s/%s\" stöds inte!"
+msgstr "Nieobsługiwany format \"%s/%s\"!"
 
 msgid "Printer not shared!"
-msgstr "Skrivaren är inte delad!"
+msgstr "Drukarka nie jest współdzielona!"
 
 #, c-format
 msgid "Too many jobs - %d jobs, max jobs is %d."
-msgstr "För många jobb - %d jobb, max antal jobb är %d."
+msgstr "Za dużo zadań - jest %d zadań, maksymalnie może być %d."
 
 #, c-format
 msgid "Job #%d is not held!"
-msgstr "Jobb #%d hålls inte kvar!"
+msgstr "Zadanie #%d nie zostało wstrzymane!"
 
 #, c-format
 msgid "You are not authorized to release job id %d owned by \"%s\"!"
-msgstr "Du är inte behörig att släppa jobb-id %d som ägs av \"%s\"!"
+msgstr ""
+"Nie jesteś upoważniony do zwolnienia ID zadania %d należącego do \"%s\"!"
 
 #, c-format
 msgid "Job #%d is not complete!"
-msgstr "Jobb #%d är inte färdigt!"
+msgstr "Zadanie #%d nie zostało zakończone!"
 
 #, c-format
 msgid "Job #%d cannot be restarted - no files!"
-msgstr "Jobb #%d kan inte startas om - inga filer!"
+msgstr "Zadanie #%d nie może zostać ponownie uruchomione - brak plików!"
 
 #, c-format
 msgid "You are not authorized to restart job id %d owned by \"%s\"!"
-msgstr "Du är inte behörig att starta om jobb-id %d som ägs av \"%s\"!"
+msgstr ""
+"Nie jesteś upoważniony do ponownego uruchomienia ID zadania %d należącego do "
+"\"%s\"!"
 
 #, c-format
 msgid "You are not authorized to send document for job #%d owned by \"%s\"!"
-msgstr "Du är inte behörig att skicka dokument för jobb #%d som ägs av \"%s\"!"
+msgstr ""
+"Nie jesteś upoważniony do wysłania dokumentu do zadania %d należącego do \"%s"
+"\"!"
 
 #, c-format
 msgid "Bad document-format \"%s\"!"
-msgstr "Felaktigt document-format \"%s\"!"
+msgstr "Błędne \"%s\" document-format!"
 
 #, c-format
 msgid "You are not authorized to alter job id %d owned by \"%s\"!"
-msgstr "Du är inte behörig att ändra jobb-id %d som ägs av \"%s\"!"
+msgstr ""
+"Nie jesteś upoważniony do zmienienia ID zadania %d należącego do \"%s\"!"
 
 #, c-format
 msgid "%s cannot be changed."
-msgstr "%s kan inte ändras."
+msgstr "%s nie może zostać zmienione."
 
 msgid "Bad job-priority value!"
-msgstr "Felaktigt värde för job-priority!"
+msgstr "Błędna wartość job-priority!"
 
 msgid "Job is completed and cannot be changed."
-msgstr "Jobbet är färdigt och kan inte ändras."
+msgstr "Zadanie zostało zakończone i nie może zostać zmienione."
 
 msgid "Bad job-state value!"
-msgstr "Felaktigt värde för job-state!"
+msgstr "Błędna wartość job-state!"
 
 msgid "Job state cannot be changed."
-msgstr "Jobbtillstånd kan inte ändras."
+msgstr "Stan zadania nie może zostać zmieniony."
 
 #, c-format
 msgid "Unsupported compression attribute %s!"
-msgstr "Komprimeringsattributet %s stöds inte!"
+msgstr "Nieobsługiwana wartość kompresji %s!"
 
 #, c-format
 msgid "Unsupported format \"%s\"!"
-msgstr "Formatet \"%s\" stöds inte!"
+msgstr "Nieobsługiwany format \"%s\"!"
 
 #, c-format
 msgid "%s is not implemented by the CUPS version of lpc.\n"
-msgstr "%s är inte implementerad i CUPS-versionen av lpc.\n"
+msgstr "%s nie jest zaimplementowane przez lpc w wersji CUPS.\n"
 
 msgid ""
 "Commands may be abbreviated.  Commands are:\n"
 "\n"
 "exit    help    quit    status  ?\n"
 msgstr ""
-"Kommandon kan förkortas.  Kommandon är:\n"
+"Polecenia mogą być skracane.  Poleceniami są:\n"
 "\n"
 "exit    help    quit    status  ?\n"
 
 msgid "help\t\tget help on commands\n"
-msgstr "help\t\tfå hjälp för kommandon\n"
+msgstr "help\t\tpomoc o poleceniach\n"
 
 msgid "status\t\tshow status of daemon and queue\n"
-msgstr "status\t\tvisa status för demon och kö\n"
+msgstr "status\t\twyświetla stan demonów i kolejki\n"
 
 msgid "?Invalid help command unknown\n"
-msgstr "?Ogiltigt hjälpkommando okänt\n"
+msgstr "?Nieprawidłowe, nieznane polecenie pomocy\n"
 
 #, c-format
 msgid "\tprinter is on device '%s' speed -1\n"
-msgstr "\tskrivare finns på enhet \"%s\" hastighet -1\n"
+msgstr "\tdrukarka jest na urządzeniu \"%s\" prędkość -1\n"
 
 msgid "\tqueuing is enabled\n"
-msgstr "\tköläggning är aktiverad\n"
+msgstr "\tkolejkowanie jest włączone\n"
 
 msgid "\tqueuing is disabled\n"
-msgstr "\tköläggning är inaktiverad\n"
+msgstr "\tkolejkowanie jest wyłączone\n"
 
 msgid "\tprinting is enabled\n"
-msgstr "\tutskrifter är aktiverat\n"
+msgstr "\tdrukowanie jest włączone\n"
 
 msgid "\tprinting is disabled\n"
-msgstr "\tutskrifter är inaktiverat\n"
+msgstr "\tdrukowanie jest wyłączone"
 
 msgid "\tno entries\n"
-msgstr "\tinga objekt\n"
+msgstr "\tbrak wpisów\n"
 
 #, c-format
 msgid "\t%d entries\n"
-msgstr "\t%d objekt\n"
+msgstr "\t%d wpisów\n"
 
 msgid "\tdaemon present\n"
-msgstr "\tdemon närvarande\n"
+msgstr "\tdemon jest obecny\n"
 
 msgid "lpq: Unable to contact server!\n"
-msgstr "lpq: Kunde inte kontakta server!\n"
+msgstr "lpq: nie można skontaktować się z serwerem!\n"
 
 #, c-format
 msgid "%s: Sorry, no encryption support compiled in!\n"
-msgstr "%s: Tyvärr, inget stöd för kryptering har byggts in!\n"
+msgstr "%s: przepraszam, nie wkompilowano obsługi szyfowania!\n"
 
 #, c-format
 msgid "lpq: Unknown destination \"%s/%s\"!\n"
-msgstr "lpq: Okänt mål \"%s/%s\"!\n"
+msgstr "lpq: nieznany cel \"%s/%s\"!\n"
 
 #, c-format
 msgid "lpq: Unknown destination \"%s\"!\n"
-msgstr "lpq: Okänt mål \"%s\"!\n"
+msgstr "lpq: nieznany cel \"%s\"!\n"
 
 #, c-format
 msgid ""
 "lp: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lp: fel - miljövariabeln %s namnger icke-existerande mål \"%s\"!\n"
+msgstr ""
+"lp: błąd - %s nazw zmiennych środowiskowych z nieistniejącym celem \"%s\"!\n"
 
 msgid "lpq: error - no default destination available.\n"
-msgstr "lpq: fel - inget standardmål tillgängligt.\n"
+msgstr "lpq: błąd - brak dostępnego domyślnego celu.\n"
 
 #, c-format
 msgid "lpq: get-jobs failed: %s\n"
-msgstr "lpq: get-jobs misslyckades: %s\n"
+msgstr "lpq: get-jobs nie powiodło się: %s\n"
 
 msgid ""
 "Rank   Owner      Pri  Job        Files                       Total Size\n"
 msgstr ""
-"Rank   Ägare      Pri  Jobb       Filer                       Total storlek\n"
+"Kolejka   Właściciel      Drukowanie  Zadanie        "
+"Pliki                       Całkowity rozmiar\n"
 
 msgid "Rank    Owner   Job     File(s)                         Total Size\n"
 msgstr ""
-"Rank    Ägare   Jobb    Fil(er)                         Total storlek\n"
+"Kolejka    Właściciel   Zadanie     Pliki                         Całkowity "
+"rozmiar\n"
 
 #, c-format
 msgid "%s: %-33.33s [job %d localhost]\n"
-msgstr "%s: %-33.33s [jobb %d localhost]\n"
+msgstr "%s: %-33.33s [zadanie %d localhost]\n"
 
 #, c-format
 msgid "        %-39.39s %.0f bytes\n"
-msgstr "        %-39.39s %.0f byte\n"
+msgstr "        %-39.39s %.0f bajtów\n"
 
 #, c-format
 msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
-msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f byte\n"
+msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bajtów"
 
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
-msgstr "%-7s %-7.7s %-7d %-31.31s %.0f byte\n"
+msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bajtów\n"
 
 msgid "no entries\n"
-msgstr "inga objekt\n"
+msgstr "brak wpisów\n"
 
 #, c-format
 msgid "lpq: get-printer-attributes failed: %s\n"
-msgstr "lpq: get-printer-attributes misslyckades: %s\n"
+msgstr "lpq: get-printer-attributes nie powiodło się: %s\n"
 
 #, c-format
 msgid "%s is ready\n"
-msgstr "%s är klar\n"
+msgstr "%s jest gotowe\n"
 
 #, c-format
 msgid "%s is ready and printing\n"
-msgstr "%s är klar och skriver ut\n"
+msgstr "%s jest gotowe i drukuje\n"
 
 #, c-format
 msgid "%s is not ready\n"
-msgstr "%s är inte klar\n"
+msgstr "%s nie jest gotowe\n"
 
 msgid "Usage: lpq [-P dest] [-l] [+interval]\n"
-msgstr "Användning: lpq [-P mål] [-l] [+intervall]\n"
+msgstr "Użycie: lpq  [-P cel] [-l] [+odstęp]\n"
 
 #, c-format
 msgid "lpr: error - expected value after -%c option!\n"
-msgstr "lpr: fel - förväntade värde efter flaggan -%c!\n"
+msgstr "lpr: błąd - oczekiwana wartość po opcji -%c!\n"
 
 #, c-format
 msgid ""
 "lpr: warning - '%c' format modifier not supported - output may not be "
 "correct!\n"
 msgstr ""
-"lpr: varning - \"%c\"-formatmodifierare stöds inte - utmatning kanske inte "
-"blir korrekt!\n"
+"lpr - ostrzeżenie - modyfikator formatu \"%c\" jest nieobsługiwany - wyjście "
+"może nie być poprawne!"
 
 msgid "lpr: error - expected option=value after -o option!\n"
-msgstr "lpr: fel - förväntade alternativ=värde efter flaggan -o!\n"
+msgstr "lpr: błąd - oczekiwana opcja=wartość po opcji -o!\n"
 
 msgid "lpr: warning - email notification is not currently supported!\n"
-msgstr "lpr: varning - e-postnotifiering stöds inte för närvarande!\n"
+msgstr ""
+"lpr: ostrzeżenie - powiadamianie na e-mail nie jest teraz obsługiwane!\n"
 
 msgid "lpr: error - expected destination after -P option!\n"
-msgstr "lpr: fel - förväntade mål efter flaggan -P!\n"
+msgstr "lpr: błąd - oczekiwany cel po opcji -P!\n"
 
 msgid "lpr: error - expected copy count after -# option!\n"
-msgstr "lpr: fel - förväntade kopieantal efter flaggan -#!\n"
+msgstr "lpr: błąd - oczekiwany licznik kopiowania po opcji -#!\n"
 
 #, c-format
 msgid "lpr: error - expected name after -%c option!\n"
-msgstr "lpr: fel - förväntade namn efter flaggan -%c!\n"
+msgstr "lpr: błąd - oczekiwana nazwa po opcji -%c!\n"
 
 msgid "lpr: error - expected username after -U option!\n"
-msgstr "lpr: fel - förväntade användarnamn efter flaggan -U!\n"
+msgstr "lpr: błąd - oczekiwana nazwa użytkownika po opcji -U!\n"
 
 #, c-format
 msgid "lpr: error - unknown option '%c'!\n"
-msgstr "lpr: fel - okänd flagga \"%c\"!\n"
+msgstr "lpr: błąd - nieznana opcja \"%c\"!\n"
 
 #, c-format
 msgid "lpr: error - unable to access \"%s\" - %s\n"
-msgstr "lpr: fel - kunde inte komma åt \"%s\" - %s\n"
+msgstr "lpr: błąd - nie można uzyskać dostępu \"%s\" - %s\n"
 
 #, c-format
 msgid "lpr: error - too many files - \"%s\"\n"
-msgstr "lpr: fel - för många filer - \"%s\"\n"
+msgstr "lpr: błąd - za dużo plików - \"%s\"\n"
 
 #, c-format
 msgid ""
 "lpr: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lpr: fel - miljövariabeln %s namnger icke-existerande mål \"%s\"!\n"
+msgstr ""
+"lpr: błąd - %s nazw zmiennych środowiskowych z nieistniejącym celem \"%s\"!\n"
 
 msgid "lpr: error - no default destination available.\n"
-msgstr "lpr: fel - inget standardmål tillgängligt.\n"
+msgstr "lpr: błąd - brak dostępnego domyślnego celu.\n"
 
 msgid "lpr: error - scheduler not responding!\n"
-msgstr "lpr: fel - schemaläggare svarar inte!\n"
+msgstr "lpr: błąd - planista nie odpowiada!\n"
 
 #, c-format
 msgid "lpr: error - unable to create temporary file \"%s\" - %s\n"
-msgstr "lpr: fel - kunde inte skapa temporärfil \"%s\" - %s\n"
+msgstr "lpr: błąd - nie można utworzyć pliku tymczasowego \"%s\" - %s\n"
 
 #, c-format
 msgid "lpr: error - unable to write to temporary file \"%s\" - %s\n"
-msgstr "lpr: fel - kunde inte skriva till temporärfil \"%s\" - %s\n"
+msgstr "lpr: błąd - nie można zapisać do pliku tymczasowego \"%s\" - %s\n"
 
 msgid "lpr: error - stdin is empty, so no job has been sent.\n"
-msgstr "lpr: fel - standard in är tom, så inga jobb har skickats.\n"
+msgstr ""
+"lpr: błąd - standardowe wejście jest puste, więc żadne zadanie nie zostało "
+"wysłane.\n"
 
 #, c-format
 msgid "lpr: error - unable to print file: %s\n"
-msgstr "lpr: fel - kunde inte skriva ut fil: %s\n"
+msgstr "lpr: błąd - nie można wydrukować pliku: %s\n"
 
 msgid "lprm: Unable to contact server!\n"
-msgstr "lprm: Kunde inte kontakta server!\n"
+msgstr "lprm: nie można skontaktować się z serwerem!\n"
 
 #, c-format
 msgid "lprm: Unknown destination \"%s\"!\n"
-msgstr "lprm: Okänt mål \"%s\"!\n"
+msgstr "lprm: nieznany cel \"%s\"!\n"
 
 #, c-format
 msgid "lprm: Unknown option '%c'!\n"
-msgstr "lprm: Okänd flagga \"%c\"!\n"
+msgstr "lprm: nieznana opcja \"%c\"!\n"
 
 msgid "lprm: Job or printer not found!\n"
-msgstr "lprm: Jobb eller skrivare hittades inte!\n"
+msgstr "lprm: zadanie lub drukarka nie została znaleziona!\n"
 
 msgid "lprm: Not authorized to lprm job(s)!\n"
-msgstr "lprm: Inte behörig att ta bort jobb!\n"
+msgstr "lprm: nie upoważniony do zadań lprm!\n"
 
 #, c-format
 msgid "lprm: You don't own job ID %d!\n"
-msgstr "lprm: Du äger inte jobb-id %d!\n"
+msgstr "lprm: nie jesteś właścicielem zadania o ID %d!\n"
 
 msgid "lprm: Unable to lprm job(s)!\n"
-msgstr "lprm: Kunde inte ta bort jobb!\n"
+msgstr "lprm: nie można usunąć zadań używając lprm!\n"
 
 msgid "lprm: Unable to cancel job(s)!\n"
-msgstr "lprm: Kunde inte avbryta jobb!\n"
+msgstr "lprm: nie można anulować zadań!\n"
 
 #, c-format
 msgid "%s: Don't know what to do!\n"
-msgstr "%s: Vet inte vad som ska göras!\n"
+msgstr "%s: nie wiem co robić!\n"
 
 #, c-format
 msgid "%s: Expected server name after -h!\n"
-msgstr "%s: Förväntade servernamn efter -h!\n"
+msgstr "%s: oczekiwana nazwa serwera po -h!\n"
 
 #, c-format
 msgid "%s: Expected reason text after -r!\n"
-msgstr "%s: Förväntade anledningstext efter -r!\n"
+msgstr "%s: oczekiwany warunek tekstu po -r!\n"
 
 #, c-format
 msgid "%s: Unknown option '%c'!\n"
-msgstr "%s: Okänd flagga \"%c\"!\n"
+msgstr "%s: nieznana opcja \"%c\"!\n"
 
 #, c-format
 msgid "%s: Unable to connect to server: %s\n"
-msgstr "%s: Kunde inte ansluta till server: %s\n"
+msgstr "%s: nie można połączyć się z serwerem: %s\n"
 
 #, c-format
 msgid "%s: Operation failed: %s\n"
-msgstr "%s: Åtgärd misslyckades: %s\n"
+msgstr "%s: operacja nie powiodła się: %s\n"
 
 msgid "cancel: Error - expected hostname after '-h' option!\n"
-msgstr "cancel: Fel - förväntade värdnamn efter flaggan \"-h\"!\n"
+msgstr "cancel: błąd - oczekiwana nazwa komputera po opcji \"-h\"!\n"
 
 msgid "cancel: Error - expected username after '-u' option!\n"
-msgstr "cancel: Fel - förväntade användarnamn efter flaggan \"-u\"!\n"
+msgstr "cancel: błąd - oczekiwana nazwa użytkownika po opcji \"-u\"!\n"
 
 #, c-format
 msgid "cancel: Unknown option '%c'!\n"
-msgstr "cancel: Okänd flagga \"%c\"!\n"
+msgstr "cancel: nieznana opcja \"%c\"!\n"
 
 #, c-format
 msgid "cancel: Unknown destination \"%s\"!\n"
-msgstr "cancel: Okänt mål \"%s\"!\n"
+msgstr "cancel: nieznany cel \"%s\"!\n"
 
 msgid "cancel: Unable to contact server!\n"
-msgstr "cancel: Kunde inte kontakta server!\n"
+msgstr "cancel: nie można skontaktować się z serwerem!\n"
 
 #, c-format
 msgid "cancel: %s failed: %s\n"
-msgstr "cancel: %s misslyckades: %s\n"
+msgstr "cancel: %s nie powiodło się: %s\n"
 
 #, c-format
 msgid "cupsaddsmb: Missing value on line %d!\n"
-msgstr "cupsaddsmb: Saknar värde på rad %d!\n"
+msgstr "cupsaddsmb: brakująca wartość w wierszu %d!\n"
 
 #, c-format
 msgid "cupsaddsmb: Missing double quote on line %d!\n"
-msgstr "cupsaddsmb: Saknar citattecken på rad %d!\n"
+msgstr "cupsaddsmb: brakujący cudzysłów w wierszu %d!\n"
 
 #, c-format
 msgid "cupsaddsmb: Bad option + choice on line %d!\n"
-msgstr "cupsaddsmb: Felaktigt alternativ + val på rad %d!\n"
+msgstr "cupsaddsmb: błędna opcja + wybór w wierszu %d!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to connect to server \"%s\" for %s - %s\n"
-msgstr "cupsaddsmb: Kunde inte ansluta till server \"%s\" för %s - %s\n"
+msgstr "cupsaddsmb: nie można połączyć się z serwerem %s\" dla %s - %s\n"
 
 #, c-format
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - skipping!\n"
-msgstr "cupsaddsmb: Ingen PPD-fil för skrivaren \"%s\" - hoppar över!\n"
+msgstr "cupsaddsmb: brak pliku PPD dla drukarki \"%s\" - pomijanie!\n"
 
 #, c-format
 msgid "cupsaddsmb: get-printer-attributes failed for \"%s\": %s\n"
-msgstr "cupsaddsmb: get-printer-attributes misslyckades för \"%s\": %s\n"
+msgstr "cupsaddsmb: get-printer-attributes nie powiodło się dla \"%s\": %s\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to convert PPD file for %s - %s\n"
-msgstr "cupsaddsmb: Kunde inte konvertera PPD-fil för %s - %s\n"
+msgstr "cupsaddsmb: nie można przekonwertować pliku PPD dla %s - %s\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to copy Windows 2000 printer driver files (%d)!\n"
 msgstr ""
-"cupsaddsmb: Kunde inte kopiera filer för Windows 2000-skrivardrivrutin (%"
+"cupsaddsmb: nie można skopiować plików sterownika drukarki Windows 2000 (%"
 "d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to copy CUPS printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Kunde inte kopiera filer för CUPS-skrivardrivrutin (%d)!\n"
+msgstr ""
+"cupsaddsmb: nie można skopiować plików sterownika drukarki CUPS (%d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to install Windows 2000 printer driver files (%d)!\n"
 msgstr ""
-"cupsaddsmb: Kunde inte installera filer för Windows 2000-skrivardrivrutin (%"
+"cupsaddsmb: nie można zainstalować plików sterownika drukarki Windows 2000 (%"
 "d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to copy Windows 9x printer driver files (%d)!\n"
 msgstr ""
-"cupsaddsmb: Kunde inte kopiera filer för Windows 9x-skrivardrivrutin (%d)!\n"
+"cupsaddsmb:  nie można skopiować plików sterownika drukarki Windows 9x (%"
+"d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to install Windows 9x printer driver files (%d)!\n"
 msgstr ""
-"cupsaddsmb: Kunde inte installera filer för Windows 9x-skrivardrivrutin (%"
+"cupsaddsmb: nie można zainstalować plików sterownika drukarki Windows 9x (%"
 "d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to set Windows printer driver (%d)!\n"
-msgstr "cupsaddsmb: Kunde inte ställa in Windows-skrivardrivrutin (%d)!\n"
+msgstr "cupsaddsmb: nie można ustawić sterownika drukarki Windows (%d)!\n"
 
 msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
@@ -731,322 +746,323 @@ msgid ""
 "  -h cups-server   Use the named CUPS server\n"
 "  -v               Be verbose (show commands)\n"
 msgstr ""
-"Användning: cupsaddsmb [flaggor] skrivare1 ... skrivareN\n"
-"       cupsaddsmb [flaggor] -a\n"
+"Użycie: cupsaddsmb [opcje] drukarka1 ... drukarkaN\n"
+"       cupsaddsmb [opcje] -a\n"
 "\n"
-"Flaggor:\n"
-"  -H samba-server  Använd angiven SAMBA-server\n"
-"  -U samba-användare  Autentisera med angiven SAMBA-användare\n"
-"  -a               Exportera alla skrivare\n"
-"  -h cups-server   Använd angiven CUPS-server\n"
-"  -v               Var information (visa kommandon)\n"
+"Opcje:\n"
+"  -H serwer-samby  Używa nazwanego serwera Samby\n"
+"  -U użytkownik-samba    Uwierzytelnia używając nazwanego użytkownika Samby\n"
+"  -a               Eksportuje wszystkie drukarki\n"
+"  -h serwer-cups   Używa nazwanego serwera CUPS\n"
+"  -v               (wyświetla polecenia)\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
-msgstr "cupstestppd: Flaggan -q är inte kompatibel med flaggan -v.\n"
+msgstr "cupstestppd: opcja -q jest niezgodna z opcją -v.\n"
 
 msgid "cupstestppd: The -v option is incompatible with the -q option.\n"
-msgstr "cupstestppd: Flaggan -v är inte kompatibel med flaggan -q.\n"
+msgstr "cupstestppd: opcja -v jest niezgodna z opcją -q.\n"
 
 #, c-format
 msgid ""
 " FAIL\n"
 "      **FAIL**  Unable to open PPD file - %s\n"
 msgstr ""
-" FEL\n"
-"      **FEL**   Kunde inte öppna PPD-fil - %s\n"
+" ZAWIÓDŁ\n"
+"      **ZAWIÓDŁ**  Nie można otworzyć pliku PPD - %s\n"
 
 #, c-format
 msgid ""
 " FAIL\n"
 "      **FAIL**  Unable to open PPD file - %s on line %d.\n"
 msgstr ""
-" FEL\n"
-"      **FEL**   Kunde inte öppna PPD-fil - %s på rad %d.\n"
+" ZAWIÓDŁ\n"
+"      **ZAWIÓDŁ**  Nie można otworzyć pliku PPD - %s w wierszu %d.\n"
 
 msgid "                REF: Page 42, section 5.2.\n"
-msgstr "                REF: Sida 42, sektion 5.2.\n"
+msgstr "                REF: strona 42, sekcja 5.2.\n"
 
 msgid "                REF: Page 20, section 3.4.\n"
-msgstr "                REF: Sida 20, sektion 3.4.\n"
+msgstr "                REF: strona 20, sekcja 3.4.\n"
 
 msgid "                REF: Pages 45-46, section 5.2.\n"
-msgstr "                REF: Sidorna 45-46, sektion 5.2.\n"
+msgstr "                REF: strony 45-46, sekcja 5.2.\n"
 
 msgid "                REF: Pages 42-45, section 5.2.\n"
-msgstr "                REF: Sidorna 42-45, sektion 5.2.\n"
+msgstr "                REF: strony 42-45, sekcja 5.2.\n"
 
 msgid "                REF: Pages 48-49, section 5.2.\n"
-msgstr "                REF: Sidorna 48-49, sektion 5.2.\n"
+msgstr "                REF: strony 48-49, sekcja 5.2.\n"
 
 msgid "                REF: Pages 52-54, section 5.2.\n"
-msgstr "                REF: Sidorna 52-54, sektion 5.2.\n"
+msgstr "                REF: strony 52-54, sekcja 5.2.\n"
 
 msgid "                REF: Page 15, section 3.2.\n"
-msgstr "                REF: Sida 15, sektion 3.2.\n"
+msgstr "                REF: strona 15, sekcja 3.2.\n"
 
 msgid "                REF: Page 15, section 3.1.\n"
-msgstr "                REF: Sida 15, sektion 3.1.\n"
+msgstr "                REF: strona 15, sekcja 3.1.\n"
 
 msgid "                REF: Pages 16-17, section 3.2.\n"
-msgstr "                REF: Sidorna 16-17, sektion 3.2.\n"
+msgstr "                REF: strony 16-17, sekcja 3.2.\n"
 
 msgid "                REF: Page 19, section 3.3.\n"
-msgstr "                REF: Sida 19, sektion 3.3.\n"
+msgstr "                REF: strona 19, sekcja 3.3.\n"
 
 msgid "                REF: Page 27, section 3.5.\n"
-msgstr "                REF: Sida 27, sektion 3.5.\n"
+msgstr "                REF: strona 27, sekcja 3.5.\n"
 
 msgid ""
 "\n"
 "    DETAILED CONFORMANCE TEST RESULTS\n"
 msgstr ""
 "\n"
-"    DETALJERADE TESTRESULTAT\n"
+"    SZCZEGÓŁOWE WYNIKI TESTU ZGODNOŚCI\n"
 
 #, c-format
 msgid "        WARN    %s has no corresponding options!\n"
-msgstr "        VARN    %s har inga motsvarande alternativ!\n"
+msgstr "        OSTRZEŻENIE    %s nie posiada odpowiadających opcji!\n"
 
 msgid " FAIL\n"
-msgstr " FEL\n"
+msgstr " ZAWIÓDŁ\n"
 
 msgid ""
 "      **FAIL**  REQUIRED DefaultImageableArea\n"
 "                REF: Page 102, section 5.15.\n"
 msgstr ""
-"      **FEL**   KRÄVER DefaultImageableArea\n"
-"                REF: Sida 102, sektion 5.15.\n"
+"      **ZAWIÓDŁ**  WYMAGANE DefaultImageableArea\n"
+"                REF: strona 102, sekcja 5.15.\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  BAD DefaultImageableArea %s!\n"
 "                REF: Page 102, section 5.15.\n"
 msgstr ""
-"      **FEL**   FELAKTIG DefaultImageableArea %s!\n"
-"                REF: Sida 102, sektion 5.15.\n"
+"      **ZAWIÓDŁ**  BŁĘDNE DefaultImageableArea %s!\n"
+"                REF: strona 102, sekcja 5.15.\n"
 
 msgid "        PASS    DefaultImageableArea\n"
-msgstr "        OK      DefaultImageableArea\n"
+msgstr "        POWODZENIE    DefaultImageableArea\n"
 
 msgid ""
 "      **FAIL**  REQUIRED DefaultPaperDimension\n"
 "                REF: Page 103, section 5.15.\n"
 msgstr ""
-"      **FEL**   KRÄVER DefaultPaperDimension\n"
-"                REF: Sida 103, sektion 5.15.\n"
+"      **ZAWIÓDŁ**  WYMAGANE DefaultPaperDimension\n"
+"                REF: strona 103, sekcja 5.15.\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  BAD DefaultPaperDimension %s!\n"
 "                REF: Page 103, section 5.15.\n"
 msgstr ""
-"      **FEL**   FELAKTIG DefaultPaperDimension %s!\n"
-"                REF: Sida 103, sektion 5.15.\n"
+"      **ZAWIÓDŁ**  BŁĘDNE DefaultPaperDimension %s!\n"
+"                REF: strona 103, sekcja 5.15.\n"
 
 msgid "        PASS    DefaultPaperDimension\n"
-msgstr "        OK      DefaultPaperDimension\n"
+msgstr "        POWODZENIE    DefaultPaperDimension\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  BAD Default%s %s\n"
 "                REF: Page 40, section 4.5.\n"
 msgstr ""
-"      **FEL**   FELAKTIG Standard%s %s\n"
-"                REF: Sida 40, sektion 4.5.\n"
+"      **ZAWIÓDŁ**  BŁĘDNE Default%s %s\n"
+"                REF: strona 40, sekcja 4.5.\n"
 
 #, c-format
 msgid "        PASS    Default%s\n"
-msgstr "        OK      Standard%s\n"
+msgstr "        POWODZENIE    Default%s\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  REQUIRED Default%s\n"
 "                REF: Page 40, section 4.5.\n"
 msgstr ""
-"      **FEL**   Standard%s KRÄVS\n"
-"                REF: Sida 40, sektion 4.5.\n"
+"      **ZAWIÓDŁ**  WYMAGANE Default%s\n"
+"                REF: strona 40, sekcja 4.5.\n"
 
 msgid "        PASS    FileVersion\n"
-msgstr "        OK      FileVersion\n"
+msgstr "        POWODZENIE    FileVersion\n"
 
 msgid ""
 "      **FAIL**  REQUIRED FileVersion\n"
 "                REF: Page 56, section 5.3.\n"
 msgstr ""
-"      **FEL**   FileVersion KRÄVS\n"
-"                REF: Sida 56, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE FileVersion\n"
+"                REF: strona 56, sekcja 5.3.\n"
 
 msgid "        PASS    FormatVersion\n"
-msgstr "        OK      FormatVersion\n"
+msgstr "        POWODZENIE    FormatVersion\n"
 
 msgid ""
 "      **FAIL**  REQUIRED FormatVersion\n"
 "                REF: Page 56, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER FormatVersion\n"
-"                REF: Sida 56, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE FormatVersion\n"
+"                REF: strona 56, sekcja 5.3.\n"
 
 msgid "        PASS    LanguageEncoding\n"
-msgstr "        OK      LanguageEncoding\n"
+msgstr "        POWODZENIE    LanguageEncoding\n"
 
 msgid ""
 "      **FAIL**  REQUIRED LanguageEncoding\n"
 "                REF: Pages 56-57, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER LanguageEncoding\n"
-"                REF: Sidorna 56-57, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE LanguageEncoding\n"
+"                REF: strony 56-57, sekcja 5.3.\n"
 
 msgid "        PASS    LanguageVersion\n"
-msgstr "        OK      LanguageVersion\n"
+msgstr "        POWODZENIE    LanguageVersion\n"
 
 msgid ""
 "      **FAIL**  REQUIRED LanguageVersion\n"
 "                REF: Pages 57-58, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER LanguageVersion\n"
-"                REF: Sidorna 57-58, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE LanguageVersion\n"
+"                REF: strony 57-58, sekcja 5.3.\n"
 
 msgid ""
 "      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
 "                REF: Page 211, table D.1.\n"
 msgstr ""
-"      **FEL**   FELAKTIG Manufacturer (ska vara \"HP\")\n"
-"                REF: Sida 211, tabell D.1.\n"
+"      **ZAWIÓDŁ**  BŁĘDNE Manufacturer (powinno być \"HP\")\n"
+"                REF: strona 211, tablica D.1.\n"
 
 msgid "        PASS    Manufacturer\n"
-msgstr "        OK      Manufacturer\n"
+msgstr "        POWODZENIE    Manufacturer\n"
 
 msgid ""
 "      **FAIL**  REQUIRED Manufacturer\n"
 "                REF: Pages 58-59, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER Manufacturer\n"
-"                REF: Sidorna 58-59, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE Manufacturer\n"
+"                REF: strony 58-59, sekcja 5.3.\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
 "                REF: Pages 59-60, section 5.3.\n"
 msgstr ""
-"      **FEL**   FELAKTIG ModelName - \"%c\" tillåts inte i sträng.\n"
-"                REF: Sidorna 59-60, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  BŁĘDNE ModelName - \"%c\" nie jest zezwolone w sągu "
+"znaków.\n"
+"                REF: strony 59-60, sekcja 5.3.\n"
 
 msgid "        PASS    ModelName\n"
-msgstr "        OK      ModelName\n"
+msgstr "        POWODZENIE    ModelName\n"
 
 msgid ""
 "      **FAIL**  REQUIRED ModelName\n"
 "                REF: Pages 59-60, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER ModelName\n"
-"                REF: Sidorna 59-60, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE ModelName\n"
+"                REF: strony 59-60, sekcja 5.3.\n"
 
 msgid "        PASS    NickName\n"
-msgstr "        OK      NickName\n"
+msgstr "        POWODZENIE    NickName\n"
 
 msgid ""
 "      **FAIL**  REQUIRED NickName\n"
 "                REF: Page 60, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER NickName\n"
-"                REF: Sida 60, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE NickName\n"
+"                REF: strona 60, sekcja 5.3.\n"
 
 msgid "        PASS    PageSize\n"
-msgstr "        OK      PageSize\n"
+msgstr "        POWODZENIE    PageSize\n"
 
 msgid ""
 "      **FAIL**  REQUIRED PageSize\n"
 "                REF: Pages 99-100, section 5.14.\n"
 msgstr ""
-"      **FEL**   KRÄVER PageSize\n"
-"                REF: Sidorna 99-100, sektion 5.14.\n"
+"      **ZAWIÓDŁ**  WYMAGANE PageSize\n"
+"                REF: strony 99-100, sekcja 5.14.\n"
 
 msgid "        PASS    PageRegion\n"
-msgstr "        OK      PageRegion\n"
+msgstr "        POWODZENIE    PageRegion\n"
 
 msgid ""
 "      **FAIL**  REQUIRED PageRegion\n"
 "                REF: Page 100, section 5.14.\n"
 msgstr ""
-"      **FEL**   KRÄVER PageRegion\n"
-"                REF: Sida 100, sektion 5.14.\n"
+"      **ZAWIÓDŁ**  WYMAGANE PageRegion\n"
+"                REF: strona 100, sekcja 5.14.\n"
 
 msgid "        PASS    PCFileName\n"
-msgstr "        OK      PCFileName\n"
+msgstr "        POWODZENIE    PCFileName\n"
 
 msgid ""
 "      **FAIL**  REQUIRED PCFileName\n"
 "                REF: Pages 61-62, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER PCFileName\n"
-"                REF: Sidorna 61-62, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE PCFileName\n"
+"                REF: strony 61-62, sekcja 5.3.\n"
 
 msgid ""
 "      **FAIL**  BAD Product - not \"(string)\".\n"
 "                REF: Page 62, section 5.3.\n"
 msgstr ""
-"      **FEL**   FELAKTIG Product - inte \"(string)\".\n"
-"                REF: Sida 62, sektion 5.3.\n"
+"      ****  BŁĘDNE Product - nie jest \"(string)\".\n"
+"                REF: strona 62, sekcja 5.3.\n"
 
 msgid "        PASS    Product\n"
-msgstr "        OK      Product\n"
+msgstr "        PASS    Product\n"
 
 msgid ""
 "      **FAIL**  REQUIRED Product\n"
 "                REF: Page 62, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER Product\n"
-"                REF: Sida 62, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE Product\n"
+"                REF: strona 62, sekcja 5.3.\n"
 
 msgid ""
 "      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
 "                REF: Pages 62-64, section 5.3.\n"
 msgstr ""
-"      **FEL**   FELAKTIG PSVersion - inte \"(string) int\".\n"
-"                REF: Sidorna 62-64, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  BŁĘDNE PSVersion - nie jest \"(string) int\".\n"
+"                REF: strony 62-64, sekcja 5.3.\n"
 
 msgid "        PASS    PSVersion\n"
-msgstr "        OK      PSVersion\n"
+msgstr "        POWODZENIE    PSVersion\n"
 
 msgid ""
 "      **FAIL**  REQUIRED PSVersion\n"
 "                REF: Pages 62-64, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER PSVersion\n"
-"                REF: Sidorna 62-64, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE PSVersion\n"
+"                REF: strony 62-64, sekcja 5.3.\n"
 
 msgid ""
 "      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
 "                REF: Pages 64-65, section 5.3.\n"
 msgstr ""
-"      **FEL**   FELAKTIG ShortNickName - längre än 31 tecken.\n"
-"                REF: Sidorna 64-65, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  BŁĘDNE ShortNickName - dłuższe niż 31 znaków.\n"
+"                REF: strony 64-65, sekcja 5.3.\n"
 
 msgid "        PASS    ShortNickName\n"
-msgstr "        OK      ShortNickName\n"
+msgstr "        POWODZENIE    ShortNickName\n"
 
 msgid ""
 "      **FAIL**  REQUIRED ShortNickName\n"
 "                REF: Page 64-65, section 5.3.\n"
 msgstr ""
-"      **FEL**   KRÄVER ShortNickName\n"
-"                REF: Sida 64-65, sektion 5.3.\n"
+"      **ZAWIÓDŁ**  WYMAGANE ShortNickName\n"
+"                REF: strony 64-65, sekcja 5.3.\n"
 
 msgid ""
 "      **FAIL**  BAD JobPatchFile attribute in file\n"
 "                REF: Page 24, section 3.4.\n"
 msgstr ""
-"      **FEL**   FELAKTIGT JobPatchFile-attribut i fil\n"
-"                REF: Sida 24, sektion 3.4.\n"
+"      **ZAWIÓDŁ**  BŁĘDNE JobPatchFile właściwość w pliku\n"
+"                REF: strona 24, sekcja 3.4.\n"
 
 msgid ""
 "      **FAIL**  REQUIRED PageSize\n"
 "                REF: Page 41, section 5.\n"
 "                REF: Page 99, section 5.14.\n"
 msgstr ""
-"      **FEL**   KRÄVER PageSize\n"
-"                REF: Sida 41, sektion 5.\n"
-"                REF: Sida 99, sektion 5.14.\n"
+"      **ZAWIÓDŁ**  WYMAGANE PageSize\n"
+"                REF: strona 41, sekcja 5.\n"
+"                REF: strona 99, sekcja 5.14.\n"
 
 #, c-format
 msgid ""
@@ -1054,9 +1070,9 @@ msgid ""
 "                REF: Page 41, section 5.\n"
 "                REF: Page 102, section 5.15.\n"
 msgstr ""
-"      **FEL**   KRÄVER ImageableArea för PageSize %s\n"
-"                REF: Sida 41, sektion 5.\n"
-"                REF: Sida 102, sektion 5.15.\n"
+"      **ZAWIÓDŁ**  WYMAGANE ImageableArea for PageSize %s\n"
+"                REF: strona 41, sekcja 5.\n"
+"                REF: strona 102, sekcja 5.15.\n"
 
 #, c-format
 msgid ""
@@ -1064,36 +1080,36 @@ msgid ""
 "                REF: Page 41, section 5.\n"
 "                REF: Page 103, section 5.15.\n"
 msgstr ""
-"      **FEL**   KRÄVER PaperDimension för PageSize %s\n"
-"                REF: Sida 41, sektion 5.\n"
-"                REF: Sida 103, sektion 5.15.\n"
+"      **ZAWIÓDŁ**  WYMAGANE PaperDimension dla PageSize %s\n"
+"                REF: strona 41, sekcja 5.\n"
+"                REF: strona 103, sekcja 5.15.\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  Bad %s choice %s!\n"
 "                REF: Page 84, section 5.9\n"
 msgstr ""
-"      **FEL**   Felaktigt %s val %s!\n"
-"                REF: Sida 84, sektion 5.9\n"
+"      **ZAWIÓDŁ**  Błędny %s wybór %s %s!\n"
+"                REF: strona 84, sekcja 5.9\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  REQUIRED %s does not define choice None!\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"      **FEL**   KRÄVER %s definerar inte valet None!\n"
-"                REF: Sida 122, sektion 5.17\n"
+"      **ZAWIÓDŁ**  WYMAGANE %s nie określa braku wyboru!\n"
+"                REF: Page 122, section 5.17\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  Bad %s choice %s!\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"      **FEL**   Felaktigt %s val %s!\n"
-"                REF: Sida 122, sektion 5.17\n"
+"      **ZAWIÓDŁ**  Błędny %s wybór %s!\n"
+"                REF: strona 122, sekcja 5.17\n"
 
 msgid " PASS\n"
-msgstr " OK\n"
+msgstr " POWODZENIE\n"
 
 #, c-format
 msgid ""
@@ -1101,446 +1117,452 @@ msgid ""
 "JCLDuplex!\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"        VARN    Nyckelord för Duplex-alternativet %s bör vara Duplex eller "
-"JCLDuplex!\n"
-"                REF: Sida 122, sektion 5.17\n"
+"        OSTRZEŻENIE    Nazwa słowa kluczowego dupleksu %s powinna być "
+"nazwana Duplex lub JCLDuplex!\n"
+"                REF: strona 122, sekcja 5.17\n"
 
 msgid "        WARN    Default choices conflicting!\n"
-msgstr "        VARN    Standardvalen i konflikt!\n"
+msgstr "        OSTRZEŻENIE    Konfliktowe domyślne wybory!\n"
 
 #, c-format
 msgid ""
 "        WARN    Obsolete PPD version %.1f!\n"
 "                REF: Page 42, section 5.2.\n"
 msgstr ""
-"        VARN    Föråldrad PPD-version %.1f!\n"
-"                REF: Sida 42, sektion 5.2.\n"
+"        OSTRZEŻENIE    Przestarzała wersja PPD %.1f!\n"
+"                REF: strona 42, sekcja 5.2.\n"
 
 msgid ""
 "        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
 "                REF: Pages 56-57, section 5.3.\n"
 msgstr ""
-"        VARN    LanguageEncoding krävs av PPD 4.3-spec.\n"
-"                REF: Sidorna 56-57, sektion 5.3.\n"
+"        OSTRZEŻENIE    LanguageEncoding jest wymagane przez specyfikację PPD "
+"4.3.\n"
+"                REF: strony 56-57, sekcja 5.3.\n"
 
 msgid ""
 "        WARN    Manufacturer required by PPD 4.3 spec.\n"
 "                REF: Pages 58-59, section 5.3.\n"
 msgstr ""
-"        VARN    Manufacturer krävs av PPD 4.3-spec.\n"
-"                REF: Sidorna 58-59, sektion 5.3.\n"
+"        OSTRZEŻENIE    Manufacturer jest wymagane przez specyfikację PPD "
+"4.3.\n"
+"                REF: strony 58-59, sekcja 5.3.\n"
 
 msgid ""
 "        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
 "                REF: Pages 61-62, section 5.3.\n"
 msgstr ""
-"        VARN    PCFileName längre än 8.3 i strid med PPD-spec.\n"
-"                REF: Sidorna 61-62, sektion 5.3.\n"
+"        OSTRZEŻENIE    PCFileName dłuższe niż 8.3 narusza specyfikację PPD.\n"
+"                REF: strony 61-62, sekcja 5.3.\n"
 
 msgid ""
 "        WARN    ShortNickName required by PPD 4.3 spec.\n"
 "                REF: Pages 64-65, section 5.3.\n"
 msgstr ""
-"        VARN    ShortNickName krävs av PPD 4.3-spec.\n"
-"                REF: Sidorna 64-65, sektion 5.3.\n"
+"        OSTRZEŻENIE    ShortNickName jest wymagane przez specyfikację PPD "
+"4.3.\n"
+"                REF: strony 64-65, sekcja 5.3.\n"
 
 msgid ""
 "        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
 "                REF: Pages 78-79, section 5.7.\n"
 msgstr ""
-"        VARN    Protokollen innehåller både PJL och BCP; förväntade TBCP.\n"
-"                REF: Sidorna 78-79, sektion 5.7.\n"
+"        OSTRZEŻENIE    Protokoły zawierają zarówno PJL jak i BCP, oczekiwano "
+"TBCP.\n"
+"                REF: strony 78-79, sekcja 5.7.\n"
 
 msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
 "                REF: Pages 78-79, section 5.7.\n"
 msgstr ""
-"        VARN    Protokollen innehåller PJL men JCL-attributen är inte "
-"inställda.\n"
-"                REF: Sidorna 78-79, sektion 5.7.\n"
+"        OSTRZEŻENIE    Protokoły zawierają PJL, ale właściwości JCL nie są "
+"ustawione.\n"
+"                REF: strony 78-79, sekcja 5.7.\n"
 
 #, c-format
 msgid ""
 "        WARN    %s shares a common prefix with %s\n"
 "                REF: Page 15, section 3.2.\n"
 msgstr ""
-"        VARN    %s delar ett vanligt prefix med %s\n"
-"                REF: Sida 15, sektion 3.2.\n"
+"        OSTRZEŻENIE    %s współdzieli wspólny przedrostek z %s %s\n"
+"                REF: strona 15, sekcja 3.2.\n"
 
 #, c-format
 msgid "    %d ERROR%s FOUND\n"
-msgstr "    %d FEL%s HITTADES\n"
+msgstr "    ZNALEZIONO %d BŁĘDÓW%s\n"
 
 msgid "    NO ERRORS FOUND\n"
-msgstr "    INGA FEL HITTADES\n"
+msgstr "    NIE ZNALEZIONO BŁĘDÓW\n"
 
 #, c-format
 msgid ""
 "        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
 "                (constraint=\"%s %s %s %s\")\n"
 msgstr ""
-"        VARN    \"%s %s\" konfliktar med \"%s %s\"\n"
-"                (begränsare=\"%s %s %s %s\")\n"
+"        OSTRZEŻENIE    \"%s %s\" jest w konflikcie z \"%s %s\"\n"
+"                (constraint=\"%s %s %s %s\")\n"
 
 msgid ""
 "Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
 "gz]]\n"
 "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
 msgstr ""
-"Användning: cupstestppd [-q] [-r] [-v[v]] filnamn1.ppd[.gz] [... filnamnN.ppd"
-"[.gz]]\n"
-"            program | cupstestppd [-q] [-r] [-v[v]] -\n"
+"Użycie: cupstestppd [-q] [-r] [-v[v]] nazwapliku1.ppd[.gz] [... nazwaplikuN."
+"ppd[.gz]]\n"
+"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 msgid "lpstat: Need \"completed\" or \"not-completed\" after -W!\n"
-msgstr "lpstat: Behöver \"completed\" eller \"not-completed\" efter -W!\n"
+msgstr "lpstat: wymagane jest \"completed\" lub \"not-completed\" po -W!\n"
 
 msgid "lpstat: The -b option requires a destination argument.\n"
-msgstr "lpstat: Flaggan -b kräver ett målargument.\n"
+msgstr "lpstat: opcja -b wymaga argumentu docelowego.\n"
 
 msgid "Error: need hostname after '-h' option!\n"
-msgstr "Fel: behöver värdnamn efter flaggan \"-h\"!\n"
+msgstr "Błąd: wymagana jest nazwa komputera po opcji \"-h\"!\n"
 
 #, c-format
 msgid "lpstat: Unknown option '%c'!\n"
-msgstr "lpstat: Okänd flagga \"%c\"!\n"
+msgstr "lpstat: nieznana opcja \"%c\"!\n"
 
 #, c-format
 msgid "lpstat: Invalid destination name in list \"%s\"!\n"
-msgstr "lpstat: Ogiltigt målnamn i listan \"%s\"!\n"
+msgstr "lpstat: nieprawidłowa nazwa celu na liście \"%s\"!\n"
 
 #, c-format
 msgid "lpstat: Unknown destination \"%s\"!\n"
-msgstr "lpstat: Okänt mål \"%s\"!\n"
+msgstr "lpstat: nieznany cel \"%s\"!\n"
 
 #, c-format
 msgid "lpstat: Unable to connect to server %s on port %d: %s\n"
-msgstr "lpstat: Kunde inte ansluta till server %s på port %d: %s\n"
+msgstr "lpstat: nie można połączyć się z serwerem %s na porcie %d: %s\n"
 
 #, c-format
 msgid "lpstat: get-printers failed: %s\n"
-msgstr "lpstat: get-printers misslyckades: %s\n"
+msgstr "lpstat: get-printers nie powiodło się: %s\n"
 
 #, c-format
 msgid "%s accepting requests since Jan 01 00:00\n"
-msgstr "%s accepterar begäran sedan Jan 01 00:00\n"
+msgstr "%s zaakceptowanych żądań od stycznia 01 00:00"
 
 #, c-format
 msgid ""
 "%s not accepting requests since Jan 01 00:00 -\n"
 "\t%s\n"
 msgstr ""
-"%s accepterar inte begäran sedan Jan 01 00:00 -\n"
+"%s nie zaakceptowanych żądań od stycznia 01 00:00 -\n"
 "\t%s\n"
 
 #, c-format
 msgid "%s/%s accepting requests since Jan 01 00:00\n"
-msgstr "%s/%s accepterar begäran sedan Jan 01 00:00\n"
+msgstr "%s/%s zaakceptowanych żądań od stycznia 01 00:00\n"
 
 #, c-format
 msgid ""
 "%s/%s not accepting requests since Jan 01 00:00 -\n"
 "\t%s\n"
 msgstr ""
-"%s/%s accepterar inte begäran sedan Jan 01 00:00 -\n"
+"%s/%s nie zaakceptowanych żądań od stycznia 01 00:00 -\n"
 "\t%s\n"
 
 #, c-format
 msgid "lpstat: get-classes failed: %s\n"
-msgstr "lpstat: get-classes misslyckades: %s\n"
+msgstr "lpstat: get-classes nie powiodło się: %s\n"
 
 #, c-format
 msgid "members of class %s:\n"
-msgstr "medlemmar av klassen %s:\n"
+msgstr "elementy klasy %s:\n"
 
 #, c-format
 msgid "system default destination: %s/%s\n"
-msgstr "systemstandardmål: %s/%s\n"
+msgstr "domyślny cel systemowy: %s/%s\n"
 
 #, c-format
 msgid "system default destination: %s\n"
-msgstr "systemstandardmål: %s\n"
+msgstr "domyślny cel systemowy: %s\n"
 
 #, c-format
 msgid ""
 "lpstat: error - %s environment variable names non-existent destination \"%s"
 "\"!\n"
-msgstr "lpstat: fel - miljövariabeln %s namnger icke-existerande mål \"%s\"!\n"
+msgstr ""
+"lpstat: błąd - %s nazw zmiennych środowiskowych z nieistniejącym celem \"%s"
+"\"!\n"
 
 msgid "no system default destination\n"
-msgstr "inget systemstandardmål\n"
+msgstr "brak domyślnego celu systemowego\n"
 
 #, c-format
 msgid "Output for printer %s is sent to remote printer %s on %s\n"
-msgstr "Utmatning för skrivaren %s skickas till fjärrskrivaren %s på %s\n"
+msgstr "Wyjście dla drukarki % zostało wysłane do zdalnej drukarki %s na %s\n"
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
-msgstr "Utmatning för skrivaren %s skickas till %s\n"
+msgstr "Wyjście dla drukarki % zostało wysłane do %s\n"
 
 #, c-format
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
-msgstr "Utmatning för skrivaren %s/%s skickas till fjärrskrivaren %s på %s\n"
+msgstr ""
+"Wyjście dla drukarki %/%s zostało wysłane do zdalnej drukarki %s na %s\n"
 
 #, c-format
 msgid "Output for printer %s/%s is sent to %s\n"
-msgstr "Utmatning för skrivaren %s/%s skickas till %s\n"
+msgstr "Wyjście dla drukarki %/%s zostało wysłane do %s\n"
 
 #, c-format
 msgid "device for %s: %s\n"
-msgstr "enhet för %s: %s\n"
+msgstr "urządzenie dla %s: %s\n"
 
 #, c-format
 msgid "device for %s/%s: %s\n"
-msgstr "enhet för %s/%s: %s\n"
+msgstr "urządzenie dla %s/%s: %s\n"
 
 #, c-format
 msgid "lpstat: get-jobs failed: %s\n"
-msgstr "lpstat: get-jobs misslyckades: %s\n"
+msgstr "lpstat: get-jobs nie powiodło się: %s\n"
 
 #, c-format
 msgid "\tqueued for %s\n"
-msgstr "\tkölagd för %s\n"
+msgstr "\tzakolejkowane dla%s\n"
 
 #, c-format
 msgid "printer %s is idle.  enabled since %s\n"
-msgstr "skrivare %s är overksam.  aktiverad sedan %s\n"
+msgstr "drukarka %s jest bezczynna. włączona od %s\n"
 
 #, c-format
 msgid "printer %s now printing %s-%d.  enabled since %s\n"
-msgstr "skrivaren %s skriver nu ut %s-%d.  aktiverad sedan %s\n"
+msgstr "drukarka %s drukuje teraz %s-%d. włączona od %s\n"
 
 #, c-format
 msgid "printer %s disabled since %s -\n"
-msgstr "skrivare %s inaktiverad sedan %s -\n"
+msgstr "drukarka %s jest wyłączona od %s -\n"
 
 msgid "\treason unknown\n"
-msgstr "\tokänd anledning\n"
+msgstr "\tnieznana przyczyna\n"
 
 msgid ""
 "\tForm mounted:\n"
 "\tContent types: any\n"
 "\tPrinter types: unknown\n"
 msgstr ""
-"\tFormulär monterat:\n"
-"\tInnehållstyper: alla\n"
-"\tSkrivartyper: okänd\n"
+"\tZamontowana od:\n"
+"\tTypy zawartości: każde\n"
+"\tTypy drukarek: nieznane\n"
 
 #, c-format
 msgid "\tDescription: %s\n"
-msgstr "\tBeskrivning: %s\n"
+msgstr "\tOpis: %s\n"
 
 msgid "\tAlerts:"
-msgstr "\tAlarm:"
+msgstr "\tAlarmy:"
 
 #, c-format
 msgid "\tLocation: %s\n"
-msgstr "\tPlats: %s\n"
+msgstr "\tPołożenie: %s\n"
 
 msgid "\tConnection: remote\n"
-msgstr "\tAnslutning: fjärr\n"
+msgstr "\tPołączenie: zdalne\n"
 
 #, c-format
 msgid "\tInterface: %s.ppd\n"
-msgstr "\tGränssnitt: %s.ppd\n"
+msgstr "\tInterfejs: %s.ppd\n"
 
 msgid "\tConnection: direct\n"
-msgstr "\tAnslutning: direkt\n"
+msgstr "\tPołączenie: bezpośrednie\n"
 
 #, c-format
 msgid "\tInterface: %s/interfaces/%s\n"
-msgstr "\tGränssnitt: %s/interfaces/%s\n"
+msgstr "\tInterfejs: %s/interfejsy/%s\n"
 
 #, c-format
 msgid "\tInterface: %s/ppd/%s.ppd\n"
-msgstr "\tGränssnitt: %s/ppd/%s.ppd\n"
+msgstr "\tInterfejs: %s/ppd/%s.ppd\n"
 
 msgid "\tOn fault: no alert\n"
-msgstr "\tVid fel: inget alarm\n"
+msgstr "\tPrzy niepowodzeniu: brak alarmu\n"
 
 msgid "\tAfter fault: continue\n"
-msgstr "\tEfter fel: fortsätt\n"
+msgstr "\tPo niepowodzeniu: kontynuuj\n"
 
 msgid "\tUsers allowed:\n"
-msgstr "\tTillåtna användare:\n"
+msgstr "\tZezwoleni użytkownicy:\n"
 
 msgid "\tUsers denied:\n"
-msgstr "\tNekade användare:\n"
+msgstr "\tZabronieni użytkownicy:\n"
 
 msgid "\t\t(all)\n"
-msgstr "\t\t(alla)\n"
+msgstr "\t\t(wszystko)\n"
 
 msgid "\tForms allowed:\n"
-msgstr "\tTillåtna format:\n"
+msgstr "\tZezwolone formy:\n"
 
 msgid "\t\t(none)\n"
-msgstr "\t\t(ingen)\n"
+msgstr "\t\t(brak)\n"
 
 msgid "\tBanner required\n"
-msgstr "\tBanner krävs\n"
+msgstr "\tBanner jest wymagany\n"
 
 msgid "\tCharset sets:\n"
-msgstr "\tTeckenkodningar:\n"
+msgstr "\tZestawy znaków:\n"
 
-# Pitch är ett svårt att kort förklara.. 
 msgid "\tDefault pitch:\n"
-msgstr "\tStandardavstånd mellan bildpunkter:\n"
+msgstr "\tDomyślny stopień:\n"
 
 msgid "\tDefault page size:\n"
-msgstr "\tStandardstorlek för sida:\n"
+msgstr "\tDomyślny rozmiar strony:\n"
 
 msgid "\tDefault port settings:\n"
-msgstr "\tStandardportinställningar:\n"
+msgstr "\tDomyślne ustawienia portu:\n"
 
 #, c-format
 msgid "printer %s/%s is idle.  enabled since %s\n"
-msgstr "skrivare %s/%s är overksam.  aktiverad sedan %s\n"
+msgstr "drkarka %s/%s jest bezczynna. włączona od %s\n"
 
 #, c-format
 msgid "printer %s/%s now printing %s-%d.  enabled since %s\n"
-msgstr "skrivaren %s/%s skriver nu ut %s-%d.  aktiverad sedan %s\n"
+msgstr "drukarka %s/%s drukuje teraz %s-%d. włączona od %s\n"
 
 #, c-format
 msgid "printer %s/%s disabled since %s -\n"
-msgstr "skrivare %s/%s inaktiverad sedan %s -\n"
+msgstr "drukarka %s/%s jest wyłączona od %s -\n"
 
 msgid "scheduler is running\n"
-msgstr "schemaläggare körs\n"
+msgstr "planista jest uruchomiony\n"
 
 msgid "scheduler is not running\n"
-msgstr "schemaläggare körs inte\n"
+msgstr "planista nie jest uruchomiony"
 
 #, c-format
 msgid "lpadmin: Unable to connect to server: %s\n"
-msgstr "lpadmin: Kunde inte ansluta till server: %s\n"
+msgstr "lpadmin: nie można połączyć się do serwera: %s\n"
 
 msgid ""
 "lpadmin: Unable to add a printer to the class:\n"
 "         You must specify a printer name first!\n"
 msgstr ""
-"lpadmin: Kunde inte lägga till en skrivare till klassen:\n"
-"         Du måste ange ett skrivarnamn först!\n"
+"lpadmin: nie można dodać drukarki do klasy:\n"
+"         Najpierw musi zostać określona nazwa drukarki!\n"
 
 msgid "lpadmin: Expected class name after '-c' option!\n"
-msgstr "lpadmin: Förväntade klassnamn efter flaggan \"-c\"!\n"
+msgstr "lpadmin: oczekiwana nazwa klasy po opcji \"-c\"!\n"
 
 msgid "lpadmin: Class name can only contain printable characters!\n"
-msgstr "lpadmin: Klassnamn kan endast innehålla skrivbara tecken!\n"
+msgstr "lpadmin: nazwa klasy może zawierać tylko drukowalne znaki!\n"
 
 msgid "lpadmin: Expected printer name after '-d' option!\n"
-msgstr "lpadmin: Förväntade skrivarnamn efter flaggan \"-d\"!\n"
+msgstr "lpadmin: oczekiwana nazw drukarki po opcji \"-d\"!\n"
 
 msgid "lpadmin: Printer name can only contain printable characters!\n"
-msgstr "lpadmin: Skrivarnamn kan endast innehålla skrivbara tecken!\n"
+msgstr "lpadmin: nazwa drukaki może zawierać tylko drukowalne znaki!\n"
 
 msgid "lpadmin: Expected hostname after '-h' option!\n"
-msgstr "lpadmin: Förväntade värdnamn efter flaggan \"-h\"!\n"
+msgstr "lpadmin: oczekiwana nazwa komputera po opcji \"-h\"!\n"
 
 msgid ""
 "lpadmin: Unable to set the interface script:\n"
 "         You must specify a printer name first!\n"
 msgstr ""
-"lpadmin: Kunde inte ställa in gränssnittsskriptet:\n"
-"         Du måste ange ett skrivarnamn först!\n"
+"lpadmin: nie można ustawić skryptu interfejsu:\n"
+"         Najpierw musi zostać określona nazwa drukarki!\n"
 
 msgid "lpadmin: Expected interface after '-i' option!\n"
-msgstr "lpadmin: Förväntade gränssnitt efter flaggan \"-i\"!\n"
+msgstr "lpadmin: oczekiwany interfejs po opcji \"-i\"!\n"
 
 msgid ""
 "lpadmin: Unable to set the interface script or PPD file:\n"
 "         You must specify a printer name first!\n"
 msgstr ""
-"lpadmin: Kunde inte ställa in gränssnittsskriptet eller PPD-fil:\n"
-"         Du måste ange ett skrivarnamn först!\n"
+"lpadmin: nie można ustawić skrypt interfejsu lub pliku PPD:\n"
+"         Najpierw musi zostać określona nazwa drukarki!\n"
 
 msgid "lpadmin: Expected model after '-m' option!\n"
-msgstr "lpadmin: Förväntade modell efter flaggan \"-m\"!\n"
+msgstr "lpadmin: oczekiwany model po opcji \"-m\"!\n"
 
 msgid "lpadmin: Expected name=value after '-o' option!\n"
-msgstr "lpadmin: Förväntade namn=värde efter flaggan \"-o\"!\n"
+msgstr "lpadmin: oczekiwana nazwa=wartość po opcji \"-o\"!\n"
 
 msgid "lpadmin: Expected printer after '-p' option!\n"
-msgstr "lpadmin: Förväntade skrivare efter flaggan \"-p\"!\n"
+msgstr "lpadmin: oczekiwana drukarka po opcji \"-p\"!\n"
 
 msgid ""
 "lpadmin: Unable to remove a printer from the class:\n"
 "         You must specify a printer name first!\n"
 msgstr ""
-"lpadmin: Kunde inte ta bort en skrivare från klassen:\n"
-"         Du måste ange ett skrivarnamn först!\n"
+"lpadmin: nie można usunąć drukarki z klasy:\n"
+"         Najpierw musi zostać określona nazwa drukarki!\n"
 
 msgid "lpadmin: Expected class after '-r' option!\n"
-msgstr "lpadmin: Förväntade klass efter flaggan \"-r\"!\n"
+msgstr "lpadmin: oczekiwana klasa po opcji \"-r\"!\n"
 
 msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
-msgstr "lpadmin: Förväntade allow/deny:användarlista efter flaggan \"-u\"!\n"
+msgstr "lpadmin: oczekiwane allow/deny:userlist po opcji \"-u\"!\n"
 
 #, c-format
 msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
-msgstr "lpadmin: Okänt allow/deny-alternativ \"%s\"!\n"
+msgstr "lpadmin: nieznana opcja zezwól/zabroń \"%s\"!\n"
 
 msgid ""
 "lpadmin: Unable to set the device URI:\n"
 "         You must specify a printer name first!\n"
 msgstr ""
-"lpadmin: Kunde inte ställa in enhets-URI:\n"
-"         Du måste ange ett skrivarnamn först!\n"
+"lpadmin: nie można ustawić URI urządzenia:\n"
+"         Najpierw musi zostać określona nazwa drukarki!\n"
 
 msgid "lpadmin: Expected device URI after '-v' option!\n"
-msgstr "lpadmin: Förväntade enhets-URI efter flaggan \"'-v\"!\n"
+msgstr "lpadmin: oczekiwane URI urządzenia po opcji \"-v\"!\n"
 
 msgid "lpadmin: Expected printer or class after '-x' option!\n"
-msgstr "lpadmin: Förväntade skrivare eller klass efter flaggan \"'-x\"!\n"
+msgstr "lpadmin: oczekiwana drukarka lub klasa po opcji \"-x\"!\n"
 
 msgid ""
 "lpadmin: Unable to set the printer description:\n"
 "         You must specify a printer name first!\n"
 msgstr ""
-"lpadmin: Kunde inte ställa in skrivarbeskrivningen:\n"
-"         Du måste ange ett skrivarnamn först!\n"
+"lpadmin: Unable to set the printer description:\n"
+"         Najpierw musi zostać określona nazwa drukarki!\n"
 
 msgid "lpadmin: Expected description after '-D' option!\n"
-msgstr "lpadmin: Förväntade beskrivning efter flaggan \"'-D\"!\n"
+msgstr "lpadmin: oczekiwany opis po pocji \"-D\"!\n"
 
 msgid "lpadmin: Expected file type(s) after '-I' option!\n"
-msgstr "lpadmin: Förväntade filtyp(er) efter flaggan \"'-I\"!\n"
+msgstr "lpadmin: oczekiwane typy plików po opcji \"-I\"!\n"
 
 msgid "lpadmin: Warning - content type list ignored!\n"
-msgstr "lpadmin: Varning - innehållstyplista ignorerades!\n"
+msgstr "lpadmin: ostrzeżenie - lista typów zawartości została zignorowana!\n"
 
 msgid ""
 "lpadmin: Unable to set the printer location:\n"
 "         You must specify a printer name first!\n"
 msgstr ""
-"lpadmin: Kunde inte ställa in skrivarens plats:\n"
-"         Du måste ange ett skrivarnamn först!\n"
+"lpadmin: nie można ustawić położenia drukarki:\n"
+"         Najpierw musi zostać określona nazwa drukarki!\n"
 
 msgid "lpadmin: Expected location after '-L' option!\n"
-msgstr "lpadmin: Förväntade plats efter flaggan \"-L\"!\n"
+msgstr "lpadmin: oczekiwane położenie po opcji \"-L\"!\n"
 
 msgid ""
 "lpadmin: Unable to set the PPD file:\n"
 "         You must specify a printer name first!\n"
 msgstr ""
-"lpadmin: Kunde inte ställa in PPD-filen:\n"
-"         Du måste ange ett skrivarnamn först!\n"
+"lpadmin: nie można ustawić pliku PPD:\n"
+"         Najpierw musi zostać określona nazwa drukarki!\n"
 
 msgid "lpadmin: Expected PPD after '-P' option!\n"
-msgstr "lpadmin: Förväntade PPD efter flaggan \"'-P\"!\n"
+msgstr "lpadmin: oczekiwany PPD po opcji \"-P\"!\n"
 
 #, c-format
 msgid "lpadmin: Unknown option '%c'!\n"
-msgstr "lpadmin: Okänd flagga \"%c\"!\n"
+msgstr "lpadmin: nieznana opcja \"%c\"!\n"
 
 #, c-format
 msgid "lpadmin: Unknown argument '%s'!\n"
-msgstr "lpadmin: Okänt argument \"%s\"!\n"
+msgstr "lpadmin: nieznany argument \"%s\"!\n"
 
 msgid ""
 "lpadmin: Unable to set the printer options:\n"
 "         You must specify a printer name first!\n"
 msgstr ""
-"lpadmin: Kunde inte ställa in skrivaralternativen:\n"
-"         Du måste ange ett skrivarnamn först!\n"
+"lpadmin: nie można ustawić opcji drukarki:\n"
+"         Najpierw musi zostać określona nazwa drukarki!\n"
 
 msgid ""
 "Usage:\n"
@@ -1553,177 +1575,179 @@ msgid ""
 "                       [-u allow:user,user] [-u deny:user,user]\n"
 "\n"
 msgstr ""
-"Användning:\n"
+"Użycie:\n"
 "\n"
-"    lpadmin [-h server] -d mål\n"
-"    lpadmin [-h server] -x mål\n"
-"    lpadmin [-h server] -p skrivare [-c lägg-till-klass] [-i gränssnitt] [-m "
-"modell]\n"
-"                       [-r ta-bort-klass] [-v enhet] [-D beskrivning]\n"
-"                       [-P ppd-fil] [-o namn=värde]\n"
-"                       [-u allow:användare,användare] [-u deny:användare,"
-"användare]\n"
+"    lpadmin [-h serwer] -d cel\n"
+"    lpadmin [-h serwer] -x cel\n"
+"    lpadmin [-h serwer] -p drukarka [-c dodaj-klasę] [-i interfejs] [-m "
+"model]\n"
+"                       [-r usuń-klasę] [-v urządzenie] [-D opis]\n"
+"                       [-P plik-ppd] [-o nazwa=wartość]\n"
+"                       [-u zezwól:użytkownik,użytkownik] [-u zabroń:"
+"użytkownik,użytkownik]\n"
 "\n"
 
 #, c-format
 msgid "lpadmin: Unable to create temporary file: %s\n"
-msgstr "lpadmin: Kunde inte skapa temporärfil: %s\n"
+msgstr "lpadmin: nie można utworzyć pliku tymczasowego: %s\n"
 
 #, c-format
 msgid "lpadmin: Unable to open file \"%s\": %s\n"
-msgstr "lpadmin: Kunde inte öppna filen \"%s\": %s\n"
+msgstr "lpadmin: nie można otworzyć pliku \"%s\": %s\n"
 
 #, c-format
 msgid "lpadmin: add-printer (set model) failed: %s\n"
-msgstr "lpadmin: add-printer (set model) misslyckades: %s\n"
+msgstr "lpadmin: add-printer (ustawienie modelu) nie powiodło się: %s\n"
 
 #, c-format
 msgid "lpadmin: add-printer (set description) failed: %s\n"
-msgstr "lpadmin: add-printer (set description) misslyckades: %s\n"
+msgstr "lpadmin: add-printer (ustawienie opisu) nie powiodło się: %s\n"
 
 #, c-format
 msgid "lpadmin: add-printer (set location) failed: %s\n"
-msgstr "lpadmin: add-printer (set location) misslyckades: %s\n"
+msgstr "lpadmin: add-printer (ustawienie położenia) nie powiodło się: %s\n"
 
 #, c-format
 msgid "lpadmin: Unable to create temporary file - %s\n"
-msgstr "lpadmin: Kunde inte skapa temporärfil - %s\n"
+msgstr "lpadmin: nie można utworzyć pliku tymczasowego - %s\n"
 
 #, c-format
 msgid "lpadmin: Unable to open PPD file \"%s\" - %s\n"
-msgstr "lpadmin: Kunde inte öppna PPD-filen \"%s\" - %s\n"
+msgstr "lpadmin: nie można utworzyć pliku PPD \"%s\" - %s\n"
 
 #, c-format
 msgid "lpadmin: %s failed: %s\n"
-msgstr "lpadmin: %s misslyckades: %s\n"
+msgstr "lpadmin: %s nie powiodło się: %s\n"
 
 msgid "lp: Expected destination after -d option!\n"
-msgstr "lp: Förväntade mål efter flaggan -d!\n"
+msgstr "lp: oczekiwany cel po opcji -d!\n"
 
 msgid "lp: Expected form after -f option!\n"
-msgstr "lp: Förväntade format efter flaggan -f!\n"
+msgstr "lp: oczekiwana forma po opcji -f!\n"
 
 msgid "lp: Expected hostname after -h option!\n"
-msgstr "lp: Förväntade värdnamn efter flaggan -h!\n"
+msgstr "lp: oczekiwana nazwa komputera po opcji -h!\n"
 
 msgid "lp: Expected job ID after -i option!\n"
-msgstr "lp: Förväntade jobb-id efter flaggan -i!\n"
+msgstr "lp: oczekiwany ID zadania po opcji -i!\n"
 
 msgid "lp: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "lp: Fel - kan inte skriva ut filer och ändra jobb samtidigt!\n"
+msgstr ""
+"lp: błąd - nie można jednocześnie drukować plików i zmieniać zadania!\n"
 
 msgid "lp: Error - bad job ID!\n"
-msgstr "lp: Fel - felaktigt jobb-id!\n"
+msgstr "lp: błąd - błędne ID zadania!\n"
 
 msgid "lp: Expected copies after -n option!\n"
-msgstr "lp: Förväntade kopior efter flaggan -n!\n"
+msgstr "lp: oczekiwane kopie po opcji -n!\n"
 
 msgid "lp: Expected option string after -o option!\n"
-msgstr "lp: Förväntade sträng efter flaggan -o!\n"
+msgstr "lp: oczekiwany łańcuch opcji po opcji -o!\n"
 
 #, c-format
 msgid "lp: Expected priority after -%c option!\n"
-msgstr "lp: Förväntade prioritet efter flaggan -%c!\n"
+msgstr "lp: oczekiwany priorytet po opcji -%c!\n"
 
 msgid "lp: Priority must be between 1 and 100.\n"
-msgstr "lp: Prioritet måste vara mellan 1 och 100.\n"
+msgstr "lp: priorytet musi być między 1 a 100.\n"
 
 msgid "lp: Expected title after -t option!\n"
-msgstr "lp: Förväntade titel efter flaggan -t!\n"
+msgstr "lp: oczekiwany tytuł po opcji -t!\n"
 
 msgid "lp: Expected mode list after -y option!\n"
-msgstr "lp: Förväntade lägeslista efter flaggan -y!\n"
+msgstr "lp: oczekiwana lista trybów po opcji -y!\n"
 
 msgid "lp: Warning - mode option ignored!\n"
-msgstr "lp: Varning - lägesflagga ignorerades!\n"
+msgstr "lp: ostrzeżenie - opcja trybu została zignorowana!\n"
 
 msgid "lp: Expected hold name after -H option!\n"
-msgstr "lp: Förväntade kvarhållningsnamn efter flaggan -H!\n"
+msgstr "lp: oczekiwana wstrzymana nazwa po opcji -H!\n"
 
 msgid "lp: Need job ID (-i) before \"-H restart\"!\n"
-msgstr "lp: Behöver jobb-id (-i) före \"-H restart\"!\n"
+msgstr "lp: wymagany ID zadania (-) przed \"-H restart\"!\n"
 
 msgid "lp: Expected page list after -P option!\n"
-msgstr "lp: Förväntade sidlista efter flaggan -P!\n"
+msgstr "lp: oczekiwana lista stron po opcji -P!\n"
 
 msgid "lp: Expected character set after -S option!\n"
-msgstr "lp: Förväntade teckenkodning efter flaggan -S!\n"
+msgstr "lp: oczekiwany zestaw znaków po opcji -S!\n"
 
 msgid "lp: Warning - character set option ignored!\n"
-msgstr "lp: Varning - flagga för teckenkodning ignorerades!\n"
+msgstr "lp: ostrzeżenie - opcja zestawu znaków została zignorowana!\n"
 
 msgid "lp: Expected content type after -T option!\n"
-msgstr "lp: Förväntade innehållstyp efter flaggan -T!\n"
+msgstr "lp: oczekiwany typ zawartości po opcji -T!\n"
 
 msgid "lp: Warning - content type option ignored!\n"
-msgstr "lp: Varning - flagga för innehållstyp ignorerades!\n"
+msgstr "lp: ostrzeżenie - opcja typu zawartości została zignorowana!\n"
 
 #, c-format
 msgid "lp: Unknown option '%c'!\n"
-msgstr "lp: Okänd flagga \"%c\"!\n"
+msgstr "lp: nieznana opcja \"%c\"!\n"
 
 msgid ""
 "lp: Error - cannot print from stdin if files or a job ID are provided!\n"
 msgstr ""
-"lp: Fel - kan inte skriva ut från standard in om filer eller ett jobb-id "
-"anges!\n"
+"lp: błąd - nie można drukować ze standardowego wejścia, jeśli dostarczone są "
+"pliki lub ID zadania!\n"
 
 #, c-format
 msgid "lp: Unable to access \"%s\" - %s\n"
-msgstr "lp: Kunde inte komma åt \"%s\" - %s\n"
+msgstr "lp: nie można uzyskać dostępu do \"%s\" - %s\n"
 
 #, c-format
 msgid "lp: Too many files - \"%s\"\n"
-msgstr "lp: För många filer - \"%s\"\n"
+msgstr "lp: za dużo plików - \"%s\"\n"
 
 msgid "lp: error - no default destination available.\n"
-msgstr "lp: fel - inget standardmål tillgängligt.\n"
+msgstr "lp: błąd - brak dostępnego domyślnego celu.\n"
 
 msgid "lp: error - scheduler not responding!\n"
-msgstr "lp: fel - schemaläggare svarar inte!\n"
+msgstr "lp: błąd - planista nie odpowiada!\n"
 
 #, c-format
 msgid "lp: unable to create temporary file \"%s\" - %s\n"
-msgstr "lp: kunde inte skapa temporärfil \"%s\" - %s\n"
+msgstr "lp: nie można utworzyć pliku tymczasowego \"%s\" - %s\n"
 
 #, c-format
 msgid "lp: error - unable to write to temporary file \"%s\" - %s\n"
-msgstr "lp: fel - kunde inte skriva till temporärfil \"%s\" - %s\n"
+msgstr "lp: błąd - nie można zapisać do pliku tymczasowego \"%s\" - %s\n"
 
 msgid "lp: stdin is empty, so no job has been sent.\n"
-msgstr "lp: standard in är tom, så inga jobb har skickats.\n"
+msgstr ""
+"lp: standardowe wejście jest puste, więc żadne zadanie nie zostało wysłane.\n"
 
 #, c-format
 msgid "lp: unable to print file: %s\n"
-msgstr "lp: kunde inte skriva ut fil: %s\n"
+msgstr "lp: nie można wydrukować pliku: %s\n"
 
 #, c-format
 msgid "request id is %s-%d (%d file(s))\n"
-msgstr "id för begäran är %s-%d (%d fil(er))\n"
+msgstr "ID żądania to %s-%d (%d plików)\n"
 
 #, c-format
 msgid "lp: restart-job failed: %s\n"
-msgstr "lp: restart-job misslyckades: %s\n"
+msgstr "lp: restart-job nie powiodło się: %s\n"
 
 #, c-format
 msgid "lp: set-job-attributes failed: %s\n"
-msgstr "lp: set-job-attributes misslyckades: %s\n"
+msgstr "lp: set-job-attributes nie powiodło się: %s\n"
 
 #, c-format
 msgid "lpinfo: Unable to connect to server: %s\n"
-msgstr "lpinfo: Kunde inte ansluta till server: %s\n"
+msgstr "lpinfo: nie można połączyć się do serwera: %s\n"
 
 #, c-format
 msgid "lpinfo: Unknown option '%c'!\n"
-msgstr "lpinfo: Okänd flagga \"%c\"!\n"
+msgstr "lpinfo: nieznana opcja \"%c\"!\n"
 
 #, c-format
 msgid "lpinfo: Unknown argument '%s'!\n"
-msgstr "lpinfo: Okänt argument \"%s\"!\n"
+msgstr "lpinfo: nieznany argument \"%s\"!\n"
 
 #, c-format
 msgid "lpinfo: cups-get-devices failed: %s\n"
-msgstr "lpinfo: cups-get-devices misslyckades: %s\n"
+msgstr "lpinfo: cups-get-devices nie powiodło się: %s\n"
 
 #, c-format
 msgid ""
@@ -1732,14 +1756,14 @@ msgid ""
 "        info = %s\n"
 "        make-and-model = %s\n"
 msgstr ""
-"Enhet:  uri = %s\n"
-"        klass = %s\n"
+"Urządzenie: uri = %s\n"
+"        class = %s\n"
 "        info = %s\n"
-"        tillverkare-och-modell = %s\n"
+"        make-and-model = %s\n"
 
 #, c-format
 msgid "lpinfo: cups-get-ppds failed: %s\n"
-msgstr "lpinfo: cups-get-ppds misslyckades: %s\n"
+msgstr "lpinfo: cups-get-ppds nie powiodło się: %s\n"
 
 #, c-format
 msgid ""
@@ -1747,46 +1771,46 @@ msgid ""
 "        natural_language = %s\n"
 "        make-and-model = %s\n"
 msgstr ""
-"Modell: namn = %s\n"
-"        naturligt_språk = %s\n"
-"        tillverkare-och-modell = %s\n"
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
 
 #, c-format
 msgid "lpmove: Unknown option '%c'!\n"
-msgstr "lpmove: Okänd flagga \"%c\"!\n"
+msgstr "lpmove: nieznana opcja \"%c\"!\n"
 
 #, c-format
 msgid "lpmove: Unknown argument '%s'!\n"
-msgstr "lpmove: Okänt argument \"%s\"!\n"
+msgstr "lpmove: nieznany argument \"%s\"!\n"
 
 msgid "Usage: lpmove job dest\n"
-msgstr "Användning: lpmove jobb mål\n"
+msgstr "Użycie: lpmove zadanie cel"
 
 #, c-format
 msgid "lpmove: Unable to connect to server: %s\n"
-msgstr "lpmove: Kunde inte ansluta till server: %s\n"
+msgstr "lpmove: nie można połączyć się z serwerem: %s\n"
 
 #, c-format
 msgid "lpmove: move-job failed: %s\n"
-msgstr "lpmove: move-job misslyckades: %s\n"
+msgstr "lpmove: move-job nie powiodło się: %s\n"
 
 msgid "lpoptions: Unknown printer or class!\n"
-msgstr "lpoptions: Okänd skrivare eller klass!\n"
+msgstr "lpoptions: nieznana drukarka lub klasa!\n"
 
 msgid "lpoptions: No printers!?!\n"
-msgstr "lpoptions: Inga skrivare!?!\n"
+msgstr "lpoptions: brak drukarek?!?\n"
 
 #, c-format
 msgid "lpoptions: Unable to add printer or instance: %s\n"
-msgstr "lpoptions: Kunde inte lägga till skrivare eller instans: %s\n"
+msgstr "lpoptions: nie można dodać drukarki lub przykładu: %s\n"
 
 #, c-format
 msgid "lpoptions: Destination %s has no PPD file!\n"
-msgstr "lpoptions: Målet %s har ingen PPD-fil!\n"
+msgstr "lpopotions: cel %s nie posiada pliku PPD!\n"
 
 #, c-format
 msgid "lpoptions: Unable to open PPD file for %s!\n"
-msgstr "lpoptions: Kunde inte öppna PPD-fil för %s!\n"
+msgstr "lpoptions: nie można otworzyć pliku PPD dla %s!\n"
 
 msgid ""
 "Usage: lpoptions [-h server] [-E] -d printer\n"
@@ -1794,438 +1818,441 @@ msgid ""
 "       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
 "       lpoptions [-h server] [-E] -x printer\n"
 msgstr ""
-"Användning: lpoptions [-h server] [-E] -d skrivare\n"
-"       lpoptions [-h server] [-E] [-p skrivare] -l\n"
-"       lpoptions [-h server] [-E] -p skrivare -o flagga[=värde] ...\n"
-"       lpoptions [-h server] [-E] -x skrivare\n"
+"Użycie: lpoptions [-h serwer] [-E] -d drukarka\n"
+"       lpoptions [-h serwer] [-E] [-p drukarka] -l\n"
+"       lpoptions [-h serwer] [-E] -p drukarka -o opcja[=wartość] ...\n"
+"       lpoptions [-h serwer] [-E] -x drukarka\n"
 
 msgid "lppasswd: Only root can add or delete passwords!\n"
-msgstr "lppasswd: Endast root kan lägga till eller ta bort lösenord!\n"
+msgstr "lppasswd: tylko root może dodać lub usunąć hasła!\n"
 
 msgid "Enter old password:"
-msgstr "Ange gammalt lösenord:"
+msgstr "Podaj stare hasło:"
 
 #, c-format
 msgid "lppasswd: Unable to copy password string: %s\n"
-msgstr "lppasswd: Kunde inte kopiera lösenordssträng: %s\n"
+msgstr "lppasswd: nie można skopiować łańcucha hasła: %s\n"
 
 msgid "Enter password:"
-msgstr "Ange lösenord:"
+msgstr "Podaj hasło:"
 
 msgid "Enter password again:"
-msgstr "Ange lösenord igen:"
+msgstr "Powtórz hasło:"
 
 msgid "lppasswd: Sorry, passwords don't match!\n"
-msgstr "lppasswd: Tyvärr, lösenorden stämmer inte överens!\n"
+msgstr "lppasswd: przepraszam, hasła się nie zgadzają!\n"
 
 msgid ""
 "lppasswd: Sorry, password rejected.\n"
 "Your password must be at least 6 characters long, cannot contain\n"
 "your username, and must contain at least one letter and number.\n"
 msgstr ""
-"lppasswd: Tyvärr, lösenordet vägrades.\n"
-"Ditt lösenord måste vara åtminstone 6 tecken långt, får inte innehålla\n"
-"ditt användarnamn, och måste innehålla åtminstone en bokstav och siffra.\n"
+"lppasswd: przepraszam, hasło zostało odrzucone.\n"
+"Hasło musi mieć co najmniej 6 znaków, nie może zawierać nazwy\n"
+"użytkownika i musi zawierać co najmniej jedną literę i liczbę.\n"
 
 msgid "lppasswd: Password file busy!\n"
-msgstr "lppasswd: Lösenordsfil upptagen!\n"
+msgstr "lppasswd: plik hasła jest zajęty!\n"
 
 #, c-format
 msgid "lppasswd: Unable to open password file: %s\n"
-msgstr "lppasswd: Kunde inte öppna lösenordsfil: %s\n"
+msgstr "lppasswd: nie można otworzyć pliku hasła: %s\n"
 
 #, c-format
 msgid "lppasswd: Unable to write to password file: %s\n"
-msgstr "lppasswd: Kunde inte skriva till lösenordsfil: %s\n"
+msgstr "lppasswd: nie można zapisać do pliku hasła: %s\n"
 
 #, c-format
 msgid "lppasswd: user \"%s\" and group \"%s\" do not exist.\n"
-msgstr "lppasswd: användare \"%s\" och grupp \"%s\" finns inte.\n"
+msgstr "lppasswd: użytkownik \"%s\" i grupa \"%s\" nie istnieją.\n"
 
 msgid "lppasswd: Sorry, password doesn't match!\n"
-msgstr "lppasswd: Tyvärr, lösenord stämmer inte!\n"
+msgstr "lppasswd: przepraszam, hasła się nie zgadzają!\n"
 
 msgid "lppasswd: Password file not updated!\n"
-msgstr "lppasswd: Lösenordsfil inte uppdaterad!\n"
+msgstr "lppasswd: plik hasła nie został zaktualizowany!\n"
 
 #, c-format
 msgid "lppasswd: failed to backup old password file: %s\n"
 msgstr ""
-"lppasswd: misslyckades med att säkerhetskopiera gamla lösenordsfilen: %s\n"
+"lppasswd: utworzenie kopii zapasowej starego pliku hasła nie powiodło się: %"
+"s\n"
 
 #, c-format
 msgid "lppasswd: failed to rename password file: %s\n"
-msgstr "lppasswd: misslyckades med att byta namn på lösenordsfilen: %s\n"
+msgstr "lppasswd: zmiana nazwy pliku hasła nie powiodła się: %s\n"
 
 msgid "Usage: lppasswd [-g groupname]\n"
-msgstr "Användning: lppasswd [-g gruppnamn]\n"
+msgstr "Użycie: lppasswd [-g nazwagrupy]\n"
 
 msgid ""
 "Usage: lppasswd [-g groupname] [username]\n"
 "       lppasswd [-g groupname] -a [username]\n"
 "       lppasswd [-g groupname] -x [username]\n"
 msgstr ""
-"Användning: lppasswd [-g gruppnamn] [användarnamn]\n"
-"            lppasswd [-g gruppnamn] -a [användarnamn]\n"
-"            lppasswd [-g gruppnamn] -x [användarnamn]\n"
+"Użycie: lppasswd [-g nazwagrupy] [nazwaużytkownika]\n"
+"       lppasswd [-g nazwagrupy] -a [nazwaużytkownika]\n"
+"       lppasswd [-g nazwagrupy] -x [nazwaużytkownika]\n"
 
 msgid "Start Printer"
-msgstr "Starta skrivare"
+msgstr "Uruchom drukarkę"
 
 msgid "Stop Printer"
-msgstr "Stoppa skrivare"
+msgstr "Zatrzymaj drukarkę"
 
 msgid "Start Class"
-msgstr "Starta klass"
+msgstr "Uruchom klasę"
 
 msgid "Stop Class"
-msgstr "Stoppa klass"
+msgstr "Zatrzymaj klasę"
 
 msgid "Accept Jobs"
-msgstr "Acceptera jobb"
+msgstr "Zaakceptuj zadania"
 
 msgid "Reject Jobs"
-msgstr "Vägra jobb"
+msgstr "Odrzuć zadania"
 
 msgid "Purge Jobs"
-msgstr "Rensa jobb"
+msgstr "Wyczyść zadania"
 
 msgid "Set As Default"
-msgstr "Ställ in som standard"
+msgstr "Ustaw jako domyślną"
 
 msgid "Administration"
-msgstr "Administration"
+msgstr "Administracja"
 
 msgid "Modify Class"
-msgstr "Ändra klass"
+msgstr "Zmodyfikuj klasę"
 
 msgid "Add Class"
-msgstr "Lägg till klass"
+msgstr "Dodaj klasę"
 
 msgid ""
 "The class name may only contain up to 127 printable characters and may not "
 "contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
-"Klassnamnet får endast innehålla upp till 127 skrivbara tecken och får inte "
-"innehålla blanksteg, snedstreck (/) eller fyrkantstecknet (#)."
+"Nazwa klasy może zawierać tylko do 127 drukowalnych znaków i nie może "
+"zawierać spacji, ukośników (/) lub znaku #."
 
 msgid "Unable to modify class:"
-msgstr "Kunde inte ändra klass:"
+msgstr "Nie można zmodyfikować klasy:"
 
 msgid "Unable to add class:"
-msgstr "Kunde inte lägga till klass:"
+msgstr "Nie można dodać klasy:"
 
 msgid "Modify Printer"
-msgstr "Ändra skrivare"
+msgstr "Zmodyfikuj drukarkę"
 
 msgid "Add Printer"
-msgstr "Lägg till skrivare"
+msgstr "Dodaj drukarkę"
 
 msgid ""
 "The printer name may only contain up to 127 printable characters and may not "
 "contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
-"Skrivarnamnet får endast innehålla upp till 127 skrivbara tecken och får "
-"inte innehålla blanksteg, snedstreck (/) eller fyrkantstecknet (#)."
+"Nazwa drukarki może zawierać tylko do 127 drukowalnych znaków i nie może "
+"zawierać spacji, ukośników (/) lub znaku #."
 
 msgid "Unable to get list of printer drivers:"
-msgstr "Kunde inte få tag på listan av skrivardrivrutiner:"
+msgstr "Nie można uzyskać listy sterowników drukarek:"
 
 msgid "Unable to modify printer:"
-msgstr "Kunde inte ändra skrivare:"
+msgstr "Nie można zmodyfikować drukarki:"
 
 msgid "Unable to add printer:"
-msgstr "Kunde inte lägga till skrivare:"
+msgstr "Nie można dodać drukarki:"
 
 msgid "Set Printer Options"
-msgstr "Ställ in skrivaralternativ"
+msgstr "Ustaw opcje drukarki"
 
 msgid "Missing form variable!"
-msgstr "Saknar formatvariabel!"
+msgstr "Brakująca zmienna formy!"
 
 msgid "Unable to get PPD file!"
-msgstr "Kunde inte få tag på PPD-fil!"
+msgstr "Nie można uzyskać pliku PPD!"
 
 msgid "Unable to open PPD file:"
-msgstr "Kunde inte öppna PPD-fil:"
+msgstr "Nie można otworzyć pliku PPD:"
 
 msgid "Banners"
-msgstr "Bannrar"
+msgstr "Bannery"
 
 msgid "Starting Banner"
-msgstr "Startbanner"
+msgstr "Uruchamianie bannerów"
 
 msgid "Ending Banner"
-msgstr "Slutbanner"
+msgstr "Zakończenie bannerów"
 
 msgid "Policies"
-msgstr "Policy"
+msgstr "Polityki"
 
 msgid "Error Policy"
-msgstr "Felpolicy"
+msgstr "Błąd polityki"
 
 msgid "Operation Policy"
-msgstr "Åtgärdspolicy"
+msgstr "Polityka operacji"
 
 msgid "PS Binary Protocol"
-msgstr "PS Binary-protokoll"
+msgstr "Binarny protokół PS"
 
 msgid "None"
-msgstr "Ingen"
+msgstr "Brak"
 
 msgid "Unable to set options:"
-msgstr "Kunde inte ställa in alternativ:"
+msgstr "Nie można ustawić opcji:"
 
 msgid "Change Settings"
-msgstr "Ändra inställningar"
+msgstr "Zmień ustawienia"
 
 msgid "Unable to change server settings:"
-msgstr "Kunde inte ändra serverinställningar:"
+msgstr "Nie można zmienić ustawień serwera:"
 
 msgid "Unable to upload cupsd.conf file:"
-msgstr "Kunde inte skicka upp filen cupsd.conf:"
+msgstr "Nie można wysłać pliku cupsd.conf:"
 
 msgid "Edit Configuration File"
-msgstr "Redigera konfigurationsfil"
+msgstr "Edytuj plik konfiguracji"
 
 msgid "Unable to create temporary file:"
-msgstr "Kunde inte skapa temporärfil:"
+msgstr "Nie można utworzyć pliku tymczasowego:"
 
 msgid "Unable to access cupsd.conf file:"
-msgstr "Kunde inte komma åt filen cupsd.conf:"
+msgstr "Nie można uzyskać dostępu do pliku cupsd.conf:"
 
 msgid "Unable to edit cupsd.conf files larger than 1MB!"
-msgstr "Kunde inte redigera cupsd.conf-filer större än 1MB!"
+msgstr "Nie można modyfikować plików cupsd.conf dłuższych niż 1MB!"
 
 msgid "Delete Class"
-msgstr "Ta bort klass"
+msgstr "Usuń klasę"
 
 msgid "Unable to delete class:"
-msgstr "Kunde inte ta bort klass:"
+msgstr "Nie można usunąć klasy:"
 
 msgid "Delete Printer"
-msgstr "Ta bort skrivare"
+msgstr "Usuń drukarkę"
 
 msgid "Unable to delete printer:"
-msgstr "Kunde inte ta bort skrivare:"
+msgstr "Nie można usunąć drukarki:"
 
 msgid "Export Printers to Samba"
-msgstr "Exportera skrivare till Samba"
+msgstr "Wyeksportuj drukarki do Samby"
 
 msgid "Unable to fork process!"
-msgstr "Kunde inte grena process!"
+msgstr "Nie można rozdzielić procesu!"
 
 msgid "Unable to connect to server!"
-msgstr "Kunde inte ansluta till server!"
+msgstr "Nie można połączyć się do serwera!"
 
 msgid "Unable to get printer attributes!"
-msgstr "Kunde inte få tag på skrivarattribut!"
+msgstr "Nie można uzyskać właściwości drukarki!"
 
 msgid "Unable to convert PPD file!"
-msgstr "Kunde inte konvertera PPD-fil!"
+msgstr "Nie można przekonwertować pliku PPD!"
 
 msgid "Unable to copy Windows 2000 printer driver files!"
-msgstr "Kunde inte kopiera filer för Windows 2000-skrivardrivrutin!"
+msgstr "Nie można skopiować plików sterownika drukarki Windows 2000!"
 
 msgid "Unable to install Windows 2000 printer driver files!"
-msgstr "Kunde inte installera filer för Windows 2000-skrivardrivrutin!"
+msgstr "Nie można zainstalować plików sterownika drukarki Windows 2000!"
 
 msgid "Unable to copy Windows 9x printer driver files!"
-msgstr "Kunde inte kopiera filer för Windows 9x-skrivardrivrutin!"
+msgstr "Nie można skopiować plików sterownika drukarki Windows 9x!"
 
 msgid "Unable to install Windows 9x printer driver files!"
-msgstr "Kunde inte installera filer för Windows 9x-skrivardrivrutin!"
+msgstr "Nie można zainstalować plików sterownika drukarki Windows 9x!"
 
 msgid "Unable to set Windows printer driver!"
-msgstr "Kunde inte ställa in Windows-skrivardrivrutin!"
+msgstr "Nie można ustawić sterownika drukarki Windows!"
 
 msgid "No printer drivers found!"
-msgstr "Inga skrivardrivrutiner hittades!"
+msgstr "Nie znaleziono sterowników drukarki!"
 
 msgid "Unable to execute cupsaddsmb command!"
-msgstr "Kunde inte starta kommandot cupsaddsmb!"
+msgstr "Nie można wykonać polecenia cupsaddsmb!"
 
 #, c-format
 msgid "cupsaddsmb failed with status %d"
-msgstr "cupsaddsmb misslyckades med status %d"
+msgstr "cupsaddsmb nie powiodło się ze stanem %d"
 
 #, c-format
 msgid "cupsaddsmb crashed on signal %d"
-msgstr "cupsaddsmb krashade på signal %d"
+msgstr "cupsaddsmb wywalił się na sygnale %d"
 
 msgid "A Samba username is required to export printer drivers!"
-msgstr "Ett Samba-användarnamn krävs för att exportera skrivardrivrutiner!"
+msgstr ""
+"Nazwa użytkownika Samby jest wymagana, aby wyeksportować sterowniki drukarek!"
 
 msgid "A Samba password is required to export printer drivers!"
-msgstr "Ett Samba-lösenord krävs för att exportera skrivardrivrutiner!"
+msgstr "Hasło Samby jest wymagany, aby wyeksportować sterowniki drukarek!"
 
 msgid "Unable to open cupsd.conf file:"
-msgstr "Kunde inte öppna filen cupsd.conf:"
+msgstr "Nie można otworzyć pliku cupsd.conf:"
 
 msgid "Unable to change printer:"
-msgstr "Kunde inte byta skrivare:"
+msgstr "Nie można zmienić drukarki:"
 
 msgid "Set Allowed Users"
-msgstr "Ställ in tillåtna användare"
+msgstr "Ustaw zezwolonych użytkowników"
 
 msgid "Unable to get printer attributes:"
-msgstr "Kunde inte få tag på skrivarattribut:"
+msgstr "Nie można uzyskać właściwości drukarki:"
 
 msgid "Set Publishing"
-msgstr "Ställ in publicering"
+msgstr "Ustaw publikowanie"
 
 msgid "Unable to change printer-is-shared attribute:"
-msgstr "Kunde inte ändra attributet printer-is-shared:"
+msgstr "Nie można zmienić właściwości printer-is-shared:"
 
 msgid "Classes"
-msgstr "Klasser"
+msgstr "Klasy"
 
 msgid "Unable to get class list:"
-msgstr "Kunde inte få tag på klasslista:"
+msgstr "Nie można uzyskać listy klas:"
 
 msgid "Unable to get class status:"
-msgstr "Kunde inte få tag på klasstatus:"
+msgstr "Nie można uzyskać stanu klasy:"
 
 msgid "Move Job"
-msgstr "Flytta jobb"
+msgstr "Przenieś zadanie"
 
 msgid "Unable to find destination for job!"
-msgstr "Kunde inte hitta mål för jobb!"
+msgstr "Nie można znaleźć celu dla zadania!"
 
 msgid "Move All Jobs"
-msgstr "Flytta alla jobb"
+msgstr "Przenieś wszystkie zadania"
 
 msgid "Unable to move job"
-msgstr "Kunde inte flytta jobb"
+msgstr "Nie można przenieść zadania"
 
 msgid "Unable to move jobs"
-msgstr "Kunde inte flytta jobb"
+msgstr "Nie można przenieść zadań"
 
 msgid "Print Test Page"
-msgstr "Skriv ut testsida"
+msgstr "Wypróbuj stronę próbną"
 
 msgid "Unable to print test page:"
-msgstr "Kunde inte skriva ut testsida:"
+msgstr "Nie można wydrukować strony testowej:"
 
 msgid "Jobs"
-msgstr "Jobb"
+msgstr "Zadania"
 
 msgid "Job operation failed:"
-msgstr "Jobbåtgärd misslyckades:"
+msgstr "Operacja zadania nie powiodła się:"
 
 msgid "Printers"
-msgstr "Skrivare"
+msgstr "Drukarki"
 
 msgid "Unable to get printer list:"
-msgstr "Kunde inte få tag på skrivarlista:"
+msgstr "Nie można uzyskać listy drukarek:"
 
 msgid "Unable to get printer status:"
-msgstr "Kunde inte få tag på skrivarstatus:"
+msgstr "Nie można uzyskać stanu drukarki:"
 
 msgid "OK"
 msgstr "OK"
 
 msgid "Unable to open PPD file"
-msgstr "Kunde inte öppna PPD-fil"
+msgstr "Nie można otworzyć pliku PPD"
 
 msgid "NULL PPD file pointer"
-msgstr "NOLL PPD-filspekare"
+msgstr "PUSTY wskaźnik pliku PPD"
 
 msgid "Memory allocation error"
-msgstr "Minnesallokeringsfel"
+msgstr "Błąd przydziału pamięci"
 
 msgid "Missing PPD-Adobe-4.x header"
-msgstr "Saknar PPD-Adobe-4.x-huvud"
+msgstr "Brakujący nagłówek PPD-Adobe-4.x"
 
 msgid "Missing value string"
-msgstr "Saknar värdesträng"
+msgstr "Brakujący łańcuch wartości"
 
 msgid "Internal error"
-msgstr "Internt fel"
+msgstr "Błąd wewnętrzny"
 
 msgid "Bad OpenGroup"
-msgstr "Felaktig OpenGroup"
+msgstr "Błędne OpenGroup"
 
 msgid "OpenGroup without a CloseGroup first"
-msgstr "OpenGroup utan en CloseGroup först"
+msgstr "OpenGroup najpierw bez CloseGroup"
 
 msgid "Bad OpenUI/JCLOpenUI"
-msgstr "Felaktig OpenUI/JCLOpenUI"
+msgstr "Błędne OpenUI/JCLOpenUI"
 
 msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
-msgstr "OpenUI/JCLOpenUI utan en CloseUI/JCLCloseUI först"
+msgstr "OpenUI/JCLOpenUI najpierw bez CloseUI/JCLCloseUI"
 
 msgid "Bad OrderDependency"
-msgstr "Felaktig OrderDependency"
+msgstr "Błędne OrderDependency"
 
 msgid "Bad UIConstraints"
-msgstr "Felaktig UIConstraints"
+msgstr "Błędne OrderDependency"
 
 msgid "Missing asterisk in column 1"
-msgstr "Saknar asterisk i kolumn 1"
+msgstr "Brakująca gwiazdka w kolumnie 1"
 
 msgid "Line longer than the maximum allowed (255 characters)"
-msgstr "Rad längre än vad som maximalt tillåts (255 tecken)"
+msgstr "Wiersz dłuższy niż maksymalnie dozwolony (255 znaków)"
 
 msgid "Illegal control character"
-msgstr "Otillåtet kontrolltecken"
+msgstr "Niedozwolony znak kontrolny"
 
 msgid "Illegal main keyword string"
-msgstr "Otillåten huvudnyckelordssträng"
+msgstr "Niedozwolony główny łańcuch słowa kluczowego"
 
 msgid "Illegal option keyword string"
-msgstr "Otillåten alternativnyckelordssträng"
+msgstr "Niedozwolony łańcuch słowa kluczowego opcji"
 
 msgid "Illegal translation string"
-msgstr "Otillåten översättningssträng"
+msgstr "Niedozwolony łańcuch tłumaczenia"
 
 msgid "Illegal whitespace character"
-msgstr "Otillåtet blanktecken"
+msgstr "Niedozwolony biały znak"
 
 msgid "Bad custom parameter"
-msgstr "Felaktig anpassad parameter"
+msgstr "Błędny własny parametr"
 
 msgid "Unknown"
-msgstr "Okänd"
+msgstr "Nieznane"
 
 msgid "Custom"
-msgstr "Anpassad"
+msgstr "Własne"
 
 msgid "JCL"
 msgstr "JCL"
 
 msgid "No authentication information provided!"
-msgstr "Ingen autentiseringsinformation angiven!"
+msgstr "Nie dostarczono informacji o uwierzytelnianiu!"
 
 #, c-format
 msgid "Password for %s required to access %s via SAMBA: "
-msgstr "Lösenord för %s krävs för att komma åt %s via SAMBA: "
+msgstr "Wymagane jest hasło dla %s, aby uzyskać dostęp do %s przez Sambę: "
 
 #, c-format
 msgid "Running command: %s %s -N -U '%s%%%s' -c '%s'\n"
-msgstr "Kör kommando: %s %s -N -U '%s%%%s' -c '%s'\n"
+msgstr "Uruchomione polecenie: %s %s -N -U \"%s%%%s\" -c \"%s\"\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to run \"%s\": %s\n"
-msgstr "cupsaddsmb: Kunde inte köra \"%s\": %s\n"
+msgstr "cupsaddsmb: nie można uruchomić \"%s\": %s\n"
 
 msgid "cupsaddsmb: No Windows printer drivers are installed!\n"
-msgstr "cupsaddsmb: Inga Windows-skrivardrivrutiner är installerade!\n"
+msgstr "cupsaddsmb: nie ma zainstalowanych sterowników drukarek Windows!\n"
 
 msgid "cupsaddsmb: Warning, no Windows 2000 printer drivers are installed!\n"
 msgstr ""
-"cupsaddsmb: Varning, inga Windows 2000-skrivardrivrutiner är installerade!\n"
+"cupsaddsmb: ostrzeżenie, nie ma zainstalowanych sterowników drukarek Windows "
+"2000!\n"
 
 #, c-format
 msgid "lpadmin: Printer %s is already a member of class %s.\n"
-msgstr "lpadmin: Skrivaren %s är redan medlem av klassen %s.\n"
+msgstr "lpadmin: drukarka %s jest już elementem klasy %s.\n"
 
 msgid "lpadmin: No member names were seen!\n"
-msgstr "lpadmin: Inga medlemsnamn sågs!\n"
+msgstr "lpadmin: nie zobaczono żadnych nazw elementów!\n"
 
 #, c-format
 msgid "lpadmin: Printer %s is not a member of class %s.\n"
-msgstr "lpadmin: Skrivaren %s är inte en medlem av klassen %s.\n"
+msgstr "lpadmin: drukarka %s nie jest elementem klasy %s.\n"
 
 #, c-format
 msgid ""
@@ -2235,11 +2262,11 @@ msgid ""
 "        make-and-model = %s\n"
 "        device-id = %s\n"
 msgstr ""
-"Enhet:  uri = %s\n"
-"        klass = %s\n"
+"Urządzenie: uri = %s\n"
+"        class = %s\n"
 "        info = %s\n"
-"        märke-och-modell = %s\n"
-"        enhets-id = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
 
 #, c-format
 msgid ""
@@ -2248,40 +2275,40 @@ msgid ""
 "        make-and-model = %s\n"
 "        device-id = %s\n"
 msgstr ""
-"Modell: namn = %s\n"
-"        naturligt_språk  = %s\n"
-"        märke-och-modell = %s\n"
-"        enhets-id = %s\n"
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
 
 msgid "Usage: lpmove job/src dest\n"
-msgstr "Användning: lpmove jobb/källa mål\n"
+msgstr "Użycie: lpmove zadanie/źródło cel\n"
 
 msgid "lpstat: Need \"completed\", \"not-completed\", or \"all\" after -W!\n"
 msgstr ""
-"lpstat: Behöver \"completed\", \"not-completed\" eller \"all\" efter -W!\n"
+"lpstat: wymagane jest \"completed\", \"not-completed\" lub \"all\" po -W!\n"
 
 #, c-format
 msgid "%s accepting requests since %s\n"
-msgstr "%s accepterar begäran sedan %s\n"
+msgstr "%s zaakceptowanych żądań od %s\n"
 
 #, c-format
 msgid ""
 "%s not accepting requests since %s -\n"
 "\t%s\n"
 msgstr ""
-"%s accepterar inte begäran sedan %s -\n"
+"%s nie zaakceptowanych żądań od %s -\n"
 "\t%s\n"
 
 #, c-format
 msgid "%s/%s accepting requests since %s\n"
-msgstr "%s/%s accepterar begäran sedan %s\n"
+msgstr "%s/%s zaakceptowanych żądań od %s\n"
 
 #, c-format
 msgid ""
 "%s/%s not accepting requests since %s -\n"
 "\t%s\n"
 msgstr ""
-"%s/%s accepterar inte begäran sedan %s -\n"
+"%s/%s nie zaakceptowanych żądań od %s -\n"
 "\t%s\n"
 
 msgid "lpc> "
@@ -2289,286 +2316,293 @@ msgstr "lpc> "
 
 #, c-format
 msgid "%s: Unable to contact server!\n"
-msgstr "%s: Kunde inte kontakta server!\n"
+msgstr "%s: nie można skontaktować się z serwerem!\n"
 
 #, c-format
 msgid "%s: Error - expected username after '-U' option!\n"
-msgstr "%s: Fel - förväntade användarnamn efter flaggan \"-U\"!\n"
+msgstr "%s: błąd - oczekiwana nazwa użytkownika po opcji \"-U\"!\n"
 
 #, c-format
 msgid "%s: Error - unknown destination \"%s/%s\"!\n"
-msgstr "%s: Fel - okänt mål \"%s/%s\"!\n"
+msgstr "%s: błąd - nieznany cel \"%s/%s\"!\n"
 
 #, c-format
 msgid "%s: Unknown destination \"%s\"!\n"
-msgstr "%s: Okänt mål \"%s\"!\n"
+msgstr "%: nieznany cel \"%s\"!\n"
 
 #, c-format
 msgid "%s: Error - expected hostname after '-h' option!\n"
-msgstr "%s: Fel - förväntade värdnamn efter flaggan \"-h\"!\n"
+msgstr "%s: błąd - oczekiwana nazwa komputera po opcji \"-h\"!\n"
 
 #, c-format
 msgid ""
 "%s: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s: fel - miljövariabeln %s namnger icke-existerande mål \"%s\"!\n"
+msgstr ""
+"%s: błąd - %s nazw zmiennych środowiskowych z nieistniejącym celem \"%s\"!\n"
 
 #, c-format
 msgid "%s: error - no default destination available.\n"
-msgstr "%s: fel - inget standardmål tillgängligt.\n"
+msgstr "%s: błąd - brak dostępnego domyślnego celu.\n"
 
 msgid ""
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
 msgstr ""
-"Användning: lpq [-P mål] [-U användarnamn] [-h värdnamn[:port]] [-l] "
-"[+intervall]\n"
+"Użycie: lpq [-P cel] [-U nazwaużytkownika] [-h nazwakomputera[:port]] [-l] "
+"[+przerwanie]\n"
 
 #, c-format
 msgid "%s: Error - expected hostname after '-H' option!\n"
-msgstr "%s: Fel - förväntade värdnamn efter flaggan \"-H\"!\n"
+msgstr "%s: błąd - oczekiwana nazwa komputera po opcji \"-H\"!\n"
 
 #, c-format
 msgid "%s: Error - expected value after '-%c' option!\n"
-msgstr "%s: Fel - förväntade värde efter flaggan \"-%c\"!\n"
+msgstr "%s: błąd - oczekiwana wartość po opcji \"-%c\"!\n"
 
 #, c-format
 msgid ""
 "%s: Warning - '%c' format modifier not supported - output may not be "
 "correct!\n"
 msgstr ""
-"%s: Varning - \"'%c\"- formatmodifieraren stöds inte - utmatning kanske inte "
-"blir korrekt!\n"
+"%s: ostrzeżenie - modyfikator formatu \"%c\" jest nieobsługiwany - wyjście "
+"może nie być prawidłowe!\n"
 
 #, c-format
 msgid "%s: error - expected option=value after '-o' option!\n"
-msgstr "%s: fel - förväntade alternativ=värde efter flaggan \"'-o\"!\n"
+msgstr "%s: błąd - oczekiwana opcja=wartość po opcji \"-o\"!\n"
 
 #, c-format
 msgid "%s: Error - expected destination after '-P' option!\n"
-msgstr "%s: Fel - förväntade mål efter flaggan \"-P\"!\n"
+msgstr "%s: błąd - oczekiwany cel po opcji \"-P\"!\n"
 
 #, c-format
 msgid "%s: Error - expected copy count after '-#' option!\n"
-msgstr "%s: Fel - förväntade antal kopior efter flaggan \"-#\"!\n"
+msgstr "%s: błąd - oczekiwany licznik kopii po opcji \"-#\"!\n"
 
 #, c-format
 msgid "%s: Error - expected name after '-%c' option!\n"
-msgstr "%s: Fel - förväntade namn efter flaggan \"-%c\"!\n"
+msgstr "%s: błąd - oczekiwana nazwa po opcji \"-%c\"!\n"
 
 #, c-format
 msgid "%s: Error - unknown option '%c'!\n"
-msgstr "%s: Fel - okänd flagga \"%c\"!\n"
+msgstr "%s: błąd - nieznana opcja \"%c\"!\n"
 
 #, c-format
 msgid "%s: Error - unable to access \"%s\" - %s\n"
-msgstr "%s: Fel - kunde inte komma åt \"%s\" - %s\n"
+msgstr "%s: błąd - nie można uzyskać dostępu do \"%s\" - %s\n"
 
 #, c-format
 msgid "%s: Error - too many files - \"%s\"\n"
-msgstr "%s: Fel - för många filer - \"%s\"\n"
+msgstr "%s: błąd - za dużo plików - \"%s\"\n"
 
 #, c-format
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s: Fel - miljövariabeln %s namnger icke-existerande mål \"%s\"!\n"
+msgstr ""
+"%s: błąd - %s nazw zmiennych środowiskowych z nieistniejącym celem \"%s\"!\n"
 
 #, c-format
 msgid "%s: Error - no default destination available.\n"
-msgstr "%s: Fel - inget standardmål tillgängligt.\n"
+msgstr "%s: błąd - brak dostępnego domyślnego celu.\n"
 
 #, c-format
 msgid "%s: Error - scheduler not responding!\n"
-msgstr "%s: Fel - schemaläggare svarar inte!\n"
+msgstr "%s: błąd - planista nie odpowiada!\n"
 
 #, c-format
 msgid "%s: Error - unable to create temporary file \"%s\" - %s\n"
-msgstr "%s: Fel - kunde inte skapa temporärfil \"%s\" - %s\n"
+msgstr "%s: błąd - nie można utworzyć pliku tymczasowego \"%s\" - %s\n"
 
 #, c-format
 msgid "%s: Error - unable to write to temporary file \"%s\" - %s\n"
-msgstr "%s: Fel - kunde inte skriva till temporärfil \"%s\" - %s\n"
+msgstr "%s: błąd - nie można zapisać do pliku tymczasowego \"%s\" - %s\n"
 
 #, c-format
 msgid "%s: Error - stdin is empty, so no job has been sent.\n"
-msgstr "%s: Fel - standard in är tom, så inget jobb har skickats.\n"
+msgstr ""
+"%s: błąd - standardowe wejście jest puste, więc żadne zadanie nie zostało "
+"wysłane.\n"
 
 #, c-format
 msgid "%s: Error - unknown destination \"%s\"!\n"
-msgstr "%s: Fel - okänt mål \"%s\"!\n"
+msgstr "%s: błąd - nieznany cel \"%s\"!\n"
 
 #, c-format
 msgid "%s: Error - expected reason text after '-r' option!\n"
-msgstr "%s: Fel - förväntade anledningstext efter flaggan \"'-r\"!\n"
+msgstr "%s: błąd - oczekiwany tekst przyczyny po opcji \"-r\"!\n"
 
 #, c-format
 msgid "%s: Error - expected username after '-u' option!\n"
-msgstr "%s: Fel - förväntade användarnamn efter flaggan \"-u\"!\n"
+msgstr "%s: błąd - oczekiwana nazwa komputera po opcji \"-u\"!\n"
 
 #, c-format
 msgid "%s: %s failed: %s\n"
-msgstr "%s: %s misslyckades: %s\n"
+msgstr "%s: %s nie powiodło się: %s\n"
 
 #, c-format
 msgid "%s: Error - expected destination after '-d' option!\n"
-msgstr "%s: Fel - förväntade mål efter flaggan \"-d\"!\n"
+msgstr "%s: błąd - oczekiwany cel po opcji \"-d\"!\n"
 
 #, c-format
 msgid "%s: Error - expected form after '-f' option!\n"
-msgstr "%s: Fel - förväntade format efter flaggan \"-f\"!\n"
+msgstr "%s: błąd - oczekiwana forma po opcji \"-f\"!\n"
 
 #, c-format
 msgid "%s: Warning - form option ignored!\n"
-msgstr "%s: Varning - formuläralternativ ignorerades!\n"
+msgstr "%s: ostrzeżenie - opcja formy została zignorowana!\n"
 
 #, c-format
 msgid "%s: Expected job ID after '-i' option!\n"
-msgstr "%s: Förväntade jobb-id efter flaggan \"-i\"!\n"
+msgstr "%s: oczekiwany ID zadania po opcji \"-i\"!\n"
 
 #, c-format
 msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "%s: Fel - kan inte skriva ut filer och ändra jobb samtidigt!\n"
+msgstr ""
+"%s: błąd - nie można jednocześnie drukować plików i zmieniać zadania!\n"
 
 #, c-format
 msgid "%s: Error - bad job ID!\n"
-msgstr "%s: Fel - felaktigt jobb-id!\n"
+msgstr "%: błąd - błędny ID zadania!\n"
 
 #, c-format
 msgid "%s: Error - expected copies after '-n' option!\n"
-msgstr "%s: Fel - förväntade kopior efter flaggan \"-n\"!\n"
+msgstr "%: błąd - oczekiwane kopie po opcji \"-n\"!\n"
 
 #, c-format
 msgid "%s: Error - expected option string after '-o' option!\n"
-msgstr "%s: Fel - förväntade alternativsträng efter flaggan \"'-o\"!\n"
+msgstr "%s: błąd - oczekiwany łańcuch tekstowy opcji po opcji \"-o\"!\n"
 
 #, c-format
 msgid "%s: Error - expected priority after '-%c' option!\n"
-msgstr "%s: Fel - förväntade prioritet efter flaggan \"-%c\"!\n"
+msgstr "%s: błąd - oczekiwany priorytet po opcji \"-%c\"!\n"
 
 #, c-format
 msgid "%s: Error - priority must be between 1 and 100.\n"
-msgstr "%s: Fel - prioritet måste vara mellan 1 och 100.\n"
+msgstr "%s: błąd - priorytet musi być między 1 a 100.\n"
 
 #, c-format
 msgid "%s: Error - expected title after '-t' option!\n"
-msgstr "%s: Fel - förväntade titel efter flaggan \"-t\"!\n"
+msgstr "%s: błąd - oczekiwany tytuł po opcji \"-t\"!\n"
 
 #, c-format
 msgid "%s: Error - expected mode list after '-y' option!\n"
-msgstr "%s: Fel - förväntade lägeslista efter flaggan \"-y\"!\n"
+msgstr "%s: błąd - oczekiwana lista trybów po opcji \"-y\"!\n"
 
 #, c-format
 msgid "%s: Warning - mode option ignored!\n"
-msgstr "%s: Varning - lägesflaggan ignorerades!\n"
+msgstr "%s: ostrzeżenie - opcja trybu została zignorowana!\n"
 
 #, c-format
 msgid "%s: Error - expected hold name after '-H' option!\n"
-msgstr "%s: Fel - förväntade kvarhållningsnamn efter flaggan \"-H\"!\n"
+msgstr "%s: błąd - oczekiwana wstrzymana nazwa po opcji \"-H\"!\n"
 
 #, c-format
 msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
-msgstr "%s: Behöver jobb-id (\"-i jobbid\") före \"-H restart\"!\n"
+msgstr "%s: wymagany jest ID zadania (\"-i idzadania\") po \"-H restart\"!"
 
 #, c-format
 msgid "%s: Error - expected page list after '-P' option!\n"
-msgstr "%s: Fel - förväntade sidlista efter flaggan \"-P\"!\n"
+msgstr "%: błąd - oczekiwana lista stron po opcji \"-P\"!\n"
 
 #, c-format
 msgid "%s: Error - expected character set after '-S' option!\n"
-msgstr "%s: Fel - förväntade teckenkodning efter flaggan \"-S\"!\n"
+msgstr "%s: błąd - oczekiwany zestaw znaków po opcji \"-S\"!\n"
 
 #, c-format
 msgid "%s: Warning - character set option ignored!\n"
-msgstr "%s: Varning - flagga för teckenkodning ignorerades!\n"
+msgstr "%s: ostrzeżenie - opcja zestawu znaków została zignorowana!\n"
 
 #, c-format
 msgid "%s: Error - expected content type after '-T' option!\n"
-msgstr "%s: Fel - förväntade innehållstyp efter flaggan \"-T\"!\n"
+msgstr "%s: błąd - oczekiwany typ zawartości po opcji \"-T\"!\n"
 
 #, c-format
 msgid "%s: Warning - content type option ignored!\n"
-msgstr "%s: Varning - flagga för innehållstyp ignorerades!\n"
+msgstr "%s: ostrzeżenie - opcja typu zawartości została zignorowana!\n"
 
 #, c-format
 msgid ""
 "%s: Error - cannot print from stdin if files or a job ID are provided!\n"
 msgstr ""
-"%s: Fel - kan inte skriva ut från standard in om filer eller ett jobb-id "
-"anges!\n"
+"%s: błąd - nie można drukować ze standardowego wejścia, jeśli dostarczone są "
+"pliki lub ID zadania!\n"
 
 #, c-format
 msgid ""
 "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
 "option!\n"
 msgstr ""
-"%s: Fel - behöver \"completed\", \"not-completed\" eller \"all\" efter "
-"flaggan \"-W\"!\n"
+"%s: błąd - wymagane jest \"completed\", \"not-completed\" lub \"all\" po -"
+"W!\n"
 
 #, c-format
 msgid "%s: Error - expected destination after '-b' option!\n"
-msgstr "%s: Fel - förväntade mål efter flaggan \"-b\"!\n"
+msgstr "%: błąd - oczekiwany cel po opcji \"-b\"!\n"
 
 #, c-format
 msgid "%s: Invalid destination name in list \"%s\"!\n"
-msgstr "%s: Ogiltigt målnamn i listan \"%s\"!\n"
+msgstr "%s: nieprawidłowa nazwa celu na liście \"%s\"!\n"
 
 #, c-format
 msgid "%s: Unable to connect to server\n"
-msgstr "%s: Kunde inte ansluta till server\n"
+msgstr "%s: nie można połączyć się z serwerem\n"
 
 msgid "Print Job:"
-msgstr "Utskriftsjobb:"
+msgstr "Zadanie drukowania:"
 
 msgid "pending"
-msgstr "väntar"
+msgstr "oczekujące"
 
 msgid "held"
-msgstr "hålls kvar"
+msgstr "wstrzymane"
 
 msgid "processing"
-msgstr "behandlas"
+msgstr "przetwarzane"
 
 msgid "stopped"
-msgstr "stoppad"
+msgstr "zatrzymane"
 
 msgid "canceled"
-msgstr "avbruten"
+msgstr "anlowane"
 
 msgid "aborted"
-msgstr "avbruten"
+msgstr "przerwane"
 
 msgid "completed"
-msgstr "färdig"
+msgstr "zakończone"
 
 msgid "unknown"
-msgstr "okänd"
+msgstr "nieznane"
 
 msgid "untitled"
-msgstr "namnlös"
+msgstr "nienazwane"
 
 msgid "Printer:"
-msgstr "Skrivare:"
+msgstr "Drukarka:"
 
 msgid "idle"
-msgstr "overksam"
+msgstr "bezczynna"
 
 msgid "Missing notify-subscription-ids attribute!"
-msgstr "Saknar attributet notify-subscription-ids!"
+msgstr "Brakująca właściwość notify-subscription-ids!"
 
 msgid "Job subscriptions cannot be renewed!"
-msgstr "Jobbprenumerationer kan inte förnyas!"
+msgstr "Subskrypcje zadania nie mogą zostać ponowione!"
 
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
-msgstr "cupsd: Förväntade konfigurationsfilnamn efter flaggan \"-c\"!\n"
+msgstr "cupsd: oczekiwana nazwa pliku konfiguracji po opcji \"-c\"!\n"
 
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
-msgstr "cupsd: stöd för launchd(8) inte inbyggt, kör i normalt läge.\n"
+msgstr ""
+"cupsd: obsługa launchd(8) nie została wkompilowana, uruchamianie w normalnym "
+"trybie.\n"
 
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting!\n"
-msgstr "cupsd: Okänd flagga \"%c\" - avbryter!\n"
+msgstr "cupsd: nieznana opcja \"%c\" - przerywanie!\n"
 
 #, c-format
 msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
-msgstr "cupsd: Okänt argument \"%s\" - avbryter!\n"
+msgstr "cupsd: nieznany argument \"%s\" - przerywanie!\n"
 
 msgid ""
 "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
@@ -2579,123 +2613,126 @@ msgid ""
 "-h                  Show this usage message\n"
 "-l                  Run cupsd from launchd(8)\n"
 msgstr ""
-"Användning: cupsd [-c konfigurationsfil] [-f] [-F] [-h] [-l]\n"
+"Użycie: cupsd [-c plik-konfiguracji] [-f] [-F] [-h] [-l]\n"
 "\n"
-"-c konfigurationsfil  Läs in alternativ konfigurationsfil\n"
-"-f                  Kör i förgrunden\n"
-"-F                  Kör i förgrunden med koppla loss\n"
-"-h                  Visa detta användningsmeddelandet\n"
-"-l                  Kör cupsd från launchd(8)\n"
+"-c plik-konfiguracji      Wczytuje alternatywny plik konfiguracji\n"
+"-f                  Uruchamia na przednim planie\n"
+"-F                  Uruchamia na przednim planie, ale odłączone\n"
+"-h                  Wyświetla wiadomości o użyciu\n"
+"-l                  Uruchamia cupsd z launchd(8)\n"
 
 #, c-format
 msgid "        WARN    Line %d only contains whitespace!\n"
-msgstr "        VARN    Rad %d innehåller endast blanktecken!\n"
+msgstr "        OSTRZEŻENIE    Wiersz %d zawiera wyłącznie białe znaki!\n"
 
 msgid ""
 "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
 msgstr ""
-"        VARN    Filen innehåller en blandning av CR, LF och CR LF-radslut!\n"
+"        OSTRZEŻENIE    Plik zawiera mieszaninę zakończeń wierszy CR, LF i CR "
+"LF!\n"
 
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF!\n"
 msgstr ""
-"        VARN    Icke-Windows PPD-filer bör använda radslut med endast LF, "
-"inte CR LF!\n"
+"        OSTRZEŻENIE    Pliki PPD nie pochodzące z Windows powinny używać "
+"tylko zakończeń wierszy LF, nie CR LF!"
 
 msgid "Printer Maintenance"
-msgstr "Skrivarunderhåll"
+msgstr "Konserwacja drukarki"
 
 msgid "Unable to send maintenance job:"
-msgstr "Kunde inte skicka underhållsjobb:"
+msgstr "Nie można wysłać zadania konserwacji:"
 
 #, c-format
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
-msgstr "cupsaddsmb: Ingen PPD-fil för skrivaren \"%s\" - %s\n"
+msgstr "cupsaddsmb: brak pliku PPD dla drukarki \"%s\" - %s\n"
 
 #, c-format
 msgid "      **FAIL**  %s %s does not exist!\n"
-msgstr "      **FEL**   %s %s finns inte!\n"
+msgstr "      **ZAWIÓDŁ**  %s %s nie istnieje!\n"
 
 #, c-format
 msgid "      **FAIL**  Bad language \"%s\"!\n"
-msgstr "      **FEL**   Felaktigt språk \"%s\"!\n"
+msgstr "      **ZAWIÓDŁ**  Błędny język \"%s\"!\n"
 
 #, c-format
 msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr "      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s!\n"
+msgstr ""
+"      **ZAWIÓDŁ**  Brakujący łańcuch tekstowy tłumaczenia \"%s\" dla opcji %"
+"s!\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  Default translation string for option %s contains 8-bit "
 "characters!\n"
 msgstr ""
-"      **FEL**   Standardöversättningssträng för flaggan %s innehåller 8-"
-"bitars tecken!\n"
+"      **ZAWIÓDŁ**  Domyślny łańcuch tekstowy tłumaczenia dla opcji %s "
+"zawiera 8 bitowe znaki!\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
 msgstr ""
-"      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s, val %s!\n"
+"      **ZAWIÓDŁ**  Brakujący łańcuch tekstowy tłumaczenia \"%s\" dla opcji %"
+"s, wybierz %s!\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  Default translation string for option %s choice %s contains "
 "8-bit characters!\n"
 msgstr ""
-"      **FEL**   Standardöversättningssträng för flaggan %s val %s innehåller "
-"8-bitars tecken!\n"
+"      **ZAWIÓDŁ**  Domyślny łańcuch tekstowy tłumaczenia dla opcji %s wyboru "
+"%s zawiera 8 bitowe znaki!\n"
 
 #, c-format
 msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-msgstr "      **FEL**   Felaktigt cupsFilter-värde \"%s\"!\n"
+msgstr "      **ZAWIÓDŁ**  Błędna wartość cupsFilter \"%s\"!\n"
 
 msgid "Help"
-msgstr "Hjälp"
+msgstr "Pomoc"
 
 #, c-format
 msgid "Missing value on line %d!\n"
-msgstr "Saknar värde på rad %d!\n"
+msgstr "Brakująca wartość w wierszu %d!\n"
 
 #, c-format
 msgid "Missing double quote on line %d!\n"
-msgstr "Saknar citattecken på rad %d!\n"
+msgstr "Brakujący cudzysłów w wierszu %d!\n"
 
 #, c-format
 msgid "Bad option + choice on line %d!\n"
-msgstr "Felaktigt alternativ + val på rad %d!\n"
+msgstr "Błędna opcja + wybór w wierszu %d!\n"
 
 #, c-format
 msgid "Unable to copy Windows 2000 printer driver files (%d)!\n"
-msgstr "Kunde inte kopiera filer för Windows 2000-skrivardrivrutiner (%d)!\n"
+msgstr "Nie można skopiować plików sterownika drukarki Windows 2000 (%d)!"
 
 #, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!\n"
-msgstr "Kunde inte kopiera filer för CUPS-skrivardrivrutiner (%d)!\n"
+msgstr "Nie można skopiować plików sterownika drukarki CUPS (%d)!\n"
 
 #, c-format
 msgid "Unable to install Windows 2000 printer driver files (%d)!\n"
-msgstr ""
-"Kunde inte installera filer för Windows 2000-skrivardrivrutiner (%d)!\n"
+msgstr "Nie można zainstalować plików sterownika drukarki Windows 2000 (%d)!"
 
 #, c-format
 msgid "Unable to copy Windows 9x printer driver files (%d)!\n"
-msgstr "Kunde inte kopiera filer för Windows 9x-skrivardrivrutiner (%d)!\n"
+msgstr "Nie można skopiować plików sterownika drukarki Windows 9x (%d)!"
 
 #, c-format
 msgid "Unable to install Windows 9x printer driver files (%d)!\n"
-msgstr "Kunde inte installera filer för Windows 9x-skrivardrivrutiner (%d)!\n"
+msgstr "Nie można zainstalować plików sterownika drukarki Windows 9x (%d)!"
 
 msgid "No Windows printer drivers are installed!\n"
-msgstr "Inga Windows-skrivardrivrutiner är installerade!\n"
+msgstr "Brak zainstalowanych sterowników drukarek Windows!\n"
 
 msgid "Warning, no Windows 2000 printer drivers are installed!\n"
-msgstr "Varning, inga skrivardrivrutiner för Windows 2000 är installerade!\n"
+msgstr "Ostrzeżenie, brak zainstalowanych sterowników drukarek Windows 2000!\n"
 
 #, c-format
 msgid "Unable to set Windows printer driver (%d)!\n"
-msgstr "Kunde inte ställa in Windows-skrivardrivrutin (%d)!\n"
+msgstr "Nie można ustawić sterownika drukarki Windows (%d)!\n"
 
 msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
@@ -2709,178 +2746,175 @@ msgid ""
 "  -h cups-server   Use the named CUPS server\n"
 "  -v               Be verbose (show commands)\n"
 msgstr ""
-"Användning: cupsaddsmb [flaggor] skrivare1 ... skrivareN\n"
-"       cupsaddsmb [flaggor] -a\n"
+"Użycie: cupsaddsmb [opcje] drukarka1 ... drukarkaN\n"
+"       cupsaddsmb [opcje] -a\n"
 "\n"
-"Flaggor:\n"
-"  -E               Kryptera anslutningen till servern\n"
-"  -H samba-server  Använd angiven SAMBA-server\n"
-"  -U samba-user    Autentisera med angiven SAMBA-användare\n"
-"  -a               Exportera alla skrivare\n"
-"  -h cups-server   Använd angiven CUPS-server\n"
-"  -v               Var informativ (visa kommandon)\n"
+"Opcje:\n"
+"  -H serwer-samby  Używa nazwanego serwera Samby\n"
+"  -U użytkownik-samby    Uwierzytelnia używając nazwanego użytkownika Samby\n"
+"  -a               Eksportuje wszystkie drukarki\n"
+"  -h serwer-cups   Używa nazwanego serwera CUPS\n"
+"  -v               (wyświetla polecenia)\n"
 
 #, c-format
 msgid "Unable to copy Windows 2000 printer driver files (%d)!"
-msgstr "Kunde inte kopiera filer för Windows 2000-skrivardrivrutin (%d)!"
+msgstr "Nie można skopiować plików sterowników drukarek Windows 2000 (%d)!"
 
 #, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!"
-msgstr "Kunde inte kopiera filer för CUPS-skrivardrivrutin (%d)!"
+msgstr "Nie można skopiować plików sterowników drukarek CUPS (%d)!"
 
 #, c-format
 msgid "Unable to install Windows 2000 printer driver files (%d)!"
-msgstr "Kunde inte installera filer för Windows 2000-skrivardrivrutin (%d)!"
+msgstr "Nie można zainstalować plików sterowników drukarek Windows 2000 (%d)!"
 
 #, c-format
 msgid "Unable to copy Windows 9x printer driver files (%d)!"
-msgstr "Kunde inte kopiera filer för Windows 9x-skrivardrivrutin (%d)!"
+msgstr "Nie można skopiować plików sterowników drukarek Windows 9x (%d)!"
 
 #, c-format
 msgid "Unable to install Windows 9x printer driver files (%d)!"
-msgstr "Kunde inte installera filer för Windows 9x-skrivardrivrutin (%d)!"
+msgstr "Nie można zainstalować plików sterowników drukarek Windows 9x (%d)!"
 
 msgid "No Windows printer drivers are installed!"
-msgstr "Inga skrivardrivrutiner för Windows 2000 är installerade!"
+msgstr "Brak zainstalowanych sterowników drukarek!"
 
 msgid "Warning, no Windows 2000 printer drivers are installed!"
-msgstr "Varning, inga skrivardrivrutiner för Windows 2000 är installerade!"
+msgstr "Ostrzeżenie, brak zainstalowanych sterowników drukarek Windows 2000!"
 
 #, c-format
 msgid "open of %s failed: %s"
-msgstr "öppnande av %s misslyckades: %s"
+msgstr "otwarcie z %s nie powiodło się: %s"
 
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
-msgstr "Kör kommando: %s %s -N -A %s -c '%s'\n"
+msgstr "Uruchamianie poleceń: %s %s -N -A %s -c \"%s\"\n"
 
 #, c-format
 msgid "stat of %s failed: %s"
-msgstr "status för %s misslyckades: %s"
+msgstr "użycie stat z %s nie powiodło się: %s"
 
 #, c-format
 msgid "Job #%d is already cancelled - can't cancel."
-msgstr "Jobb #%d är redan avbrutet - kan inte avbryta."
+msgstr "Zadanie #%d zostało już anulowane - nie można anulować."
 
 #, c-format
 msgid "Job #%d is already aborted - can't cancel."
-msgstr "Jobb #%d är redan avbrutet - kan inte avbryta."
+msgstr "Zadanie #%d zostało już przerwane - nie można anulować."
 
 #, c-format
 msgid "Job #%d is already completed - can't cancel."
-msgstr "Jobb #%d är redan färdigt - kan inte avbryta."
+msgstr "Zadanie #%d zostało już zakończone - nie można anulować."
 
 #, c-format
 msgid ""
 "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
 "s:%d%s</A>."
 msgstr ""
-"Du måste komma åt sidan med url:en <A HREF=\"https://%s:%d%s\">https://%s:%d%"
-"s</A>."
+"Aby uzyskać dostęp do tej strony, użyj URL-a <A HREF=\"https://%s:%d%s"
+"\">https://%s:%d%s</A>."
 
 #, c-format
 msgid "Unsupported format '%s'!"
-msgstr "Formatet \"%s\" stöds inte!"
+msgstr "Nieobsługiwany format \"%s\"!"
 
 msgid "FAIL\n"
-msgstr "FEL\n"
+msgstr "ZAWIÓDŁ\n"
 
 #, c-format
 msgid ""
 "    Line %d is longer than 255 characters (%d)!\n"
 "        REF: Page 25, Line Length\n"
 msgstr ""
-"    Rad %d är längre än 255 tecken (%d)!\n"
-"        REF: Sida 25, Line Length\n"
 
 msgid ""
 "    Missing %!PS-Adobe-3.0 on first line!\n"
 "        REF: Page 17, 3.1 Conforming Documents\n"
 msgstr ""
-"    Saknar %!PS-Adobe-3.0 på första raden!\n"
-"        REF: Sida 17, 3.1 Conforming Documents\n"
+"    Brakujące %!PS-Adobe-3.0 w pierwszym wierszu!\n"
+"        REF: strona 17, 3.1 Podporządkowywanie dokumentów\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%Pages: on line %d!\n"
 "        REF: Page 43, %%%%Pages:\n"
 msgstr ""
-"    Felaktig %%%%Pages: på rad %d!\n"
-"        REF: Sida 43, %%%%Pages:\n"
+"    Błędne %%%%Pages: w wierszu %d!\n"
+"        REF: strona 43, %%%%Pages:\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%BoundingBox: on line %d!\n"
 "        REF: Page 39, %%%%BoundingBox:\n"
 msgstr ""
-"    Felaktig %%%%BoundingBox: på rad %d!\n"
-"        REF: Sida 39, %%%%BoundingBox:\n"
+"    Błędne %%%%BoundingBox: w wierszu %d!\n"
+"        REF: strona 39, %%%%BoundingBox:\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%Page: on line %d!\n"
 "        REF: Page 53, %%%%Page:\n"
 msgstr ""
-"    Felaktig %%%%Page: på rad %d!\n"
-"        REF: Sida 53, %%%%Page:\n"
+"    Błędne %%%%Page: w wierszu %d!\n"
+"        REF: strona 53, %%%%Page:\n"
 
 #, c-format
 msgid ""
 "    Missing or bad %%BoundingBox: comment!\n"
 "        REF: Page 39, %%BoundingBox:\n"
 msgstr ""
-"    Saknar eller felaktig %%BoundingBox: kommentar!\n"
-"        REF: Sida 39, %%BoundingBox:\n"
+"    Brakujące lub błędne %%BoundingBox: komentarz!\n"
+"        REF: strona 39, %%BoundingBox:\n"
 
 #, c-format
 msgid ""
 "    Missing or bad %%Pages: comment!\n"
 "        REF: Page 43, %%Pages:\n"
 msgstr ""
-"    Saknar eller felaktig %%Pages: kommentar!\n"
-"        REF: Sida 43, %%Pages:\n"
+"    Brakujące lub błędne %%Pages: komentarz!\n"
+"        REF: strona 43, %%Pages:\n"
 
 #, c-format
 msgid ""
 "    Missing %%EndComments comment!\n"
 "        REF: Page 41, %%EndComments\n"
 msgstr ""
-"    Saknar %%EndComments-kommentar!\n"
-"        REF: Sida 41, %%EndComments\n"
+"    Brakujący komentarz %%EndComments!\n"
+"        REF: strona 41, %%EndComments\n"
 
 #, c-format
 msgid ""
 "    Missing or bad %%Page: comments!\n"
 "        REF: Page 53, %%Page:\n"
 msgstr ""
-"    Saknar eller felaktig %%Page: kommentarer!\n"
-"        REF: Sida 53, %%Page:\n"
+"    Brakujące lub błędne %%Page: kometarze!\n"
+"        REF: strona 53, %%Page:\n"
 
 #, c-format
 msgid "    Too many %%EndDocument comments!\n"
-msgstr "    För många %%EndDocument-kommentarer!\n"
+msgstr "    Za dużo komentarzy %%EndDocument!\n"
 
 #, c-format
 msgid "    Too many %%BeginDocument comments!\n"
-msgstr "    För många %%BeginDocument-kommentarer!\n"
+msgstr "    Za dużo komentarzy %%BeginDocument!\n"
 
 #, c-format
 msgid "    Saw %d lines that exceeded 255 characters!\n"
-msgstr "    Såg %d rader som översteg 255 tecken!\n"
+msgstr "    Zobaczono %d wierszy przekraczających 255 znaków!\n"
 
 msgid "PASS\n"
-msgstr "OK\n"
+msgstr "POWODZENIE\n"
 
 msgid "    Warning: file contains binary data!\n"
-msgstr "    Varning: filen innehåller binärdata!\n"
+msgstr "    Ostrzeżenie: plik zawiera dane binarne!\n"
 
 #, c-format
 msgid "    Warning: obsolete DSC version %.1f in file!\n"
-msgstr "    Varning: föråldrad DSC-version %.1f i fil!\n"
+msgstr "    Ostrzeżenie: przestarzała wersja DSC %.1f w pliku!\n"
 
 #, c-format
 msgid "    Warning: no %%EndComments comment in file!\n"
-msgstr "    Varning: ingen %%EndComments-kommentar i fil!\n"
+msgstr "    Ostrzeżenie: brak komentarza %%EndComments w pliku!\n"
 
 msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
@@ -2893,15 +2927,14 @@ msgid ""
 "    Note: this program only validates the DSC comments, not the PostScript "
 "itself.\n"
 msgstr ""
-"Användning: cupstestdsc [flaggor] filnamn.ps [... filnamn.ps]\n"
-"       cupstestdsc [flaggor] -\n"
+"Użycie: cupstestdsc [opcje] nazwapliku.ps [... nazwapliku.ps]\n"
+"       cupstestdsc [opcje] -\n"
 "\n"
-"Flaggor:\n"
+"Opcje:\n"
 "\n"
-"    -h       Visa programanvändning\n"
+"    -h       Wyświetla użycie programu\n"
 "\n"
-"    Notera: detta program validerar endast DSC-kommentarer, inte själva "
-"PostScript.\n"
+"    Uwaga: ten program sprawdza tylko komentarze DSC, nie PostScriptowe..\n"
 
 #, c-format
 msgid "Password for %s on %s? "
@@ -2912,5 +2945,5 @@ msgid ""
 "      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
 "                REF: Page 72, section 5.5\n"
 msgstr ""
-"      **FEL**   Felaktigt %s val %s!\n"
-"                REF: Sida 122, sektion 5.17\n"
+"      **ZAWIÓDŁ**  Błędny %s wybór %s!\n"
+"                REF: strona 122, sekcja 5.17\n"

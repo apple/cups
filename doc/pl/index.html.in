@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
-	<TITLE>Home - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<TITLE>Strona domowa - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
 	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
 	<LINK REL="SHORTCUT ICON" HREF="/favicon.ico" TYPE="image/x-icon">
 </HEAD>
@@ -19,7 +19,7 @@ SRC="/images/top-right.gif" WIDTH="15" HEIGHT="15" ALT=""></TD>
 
 <A CLASS="sel" HREF="/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Strona&nbsp;Główna&nbsp;&nbsp;<IMG
+ALT="">&nbsp;&nbsp;Strona domowa&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
@@ -31,19 +31,19 @@ BORDER="0" ALT=""></A>
 
 &nbsp;<A CLASS="unsel" HREF="/classes/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Grupy&nbsp;&nbsp;<IMG
+ALT="">&nbsp;&nbsp;Klasy&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
 &nbsp;<A CLASS="unsel" HREF="/help/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Dokumentacja/Pomoc&nbsp;&nbsp;<IMG
+ALT="">&nbsp;&nbsp;Dokumentacja/pomoc&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
 &nbsp;<A CLASS="unsel" HREF="/jobs/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
 HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Wydruki&nbsp;&nbsp;<IMG
+ALT="">&nbsp;&nbsp;Zadania&nbsp;&nbsp;<IMG
 SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
 BORDER="0" ALT=""></A>
 
@@ -60,49 +60,59 @@ BORDER="0" ALT=""></A>
 
 <H2 CLASS="title">Witaj!</H2>
 
-<P> Poprzez te strony internetowe możesz kontrolować swoje drukarki i wydruki, ale także 
-administrować systemem wydruku. Klikaj na zakładki powyżej lub poniższe przyciski aby wykonać odpowiednie zadania.</P>
+<P>Te strony WWW pozwalają na monitorowanie drukarek i zadań oraz 
+przeprowadzanie zadań administracyjnych systemu. Naciśnij na dowolną
+powyższą kartę lub poniższy przycisk, aby przeprowadzić zadanie.</P>
 
 <P>
 <A HREF="/help/"><IMG SRC="/images/button-help.gif" CLASS="button" ALT="Pomoc"></A>
 <A HREF="/admin?OP=add-class"><IMG SRC="/images/button-add-class.gif" CLASS="button" ALT="Dodaj klasę"></A>
-<A HREF="/admin?OP=add-printer"><IMG SRC="/images/button-add-printer.gif" CLASS="button" ALT="Dodaj drukarkę"></A>
-<A HREF="/classes"><IMG SRC="/images/button-manage-classes.gif" CLASS="button" ALT="Zarządzaj Klasami"></A>
-<A HREF="/jobs"><IMG SRC="/images/button-manage-jobs.gif" CLASS="button" ALT="Zarządzaj wydrukami"></A>
-<A HREF="/printers"><IMG SRC="/images/button-manage-printers.gif" CLASS="button" ALT="Zarządzaj Drukarkami"></A>
-<A HREF="/admin"><IMG SRC="/images/button-manage-server.gif" CLASS="button" ALT="Zarządzaj Serwerem"></A>
+<A HREF="/admin?OP=add-printer"><IMG SRC="/images/button-add-printer.gif" CLASS="button" ALT="Dodaj drkarkę"></A>
+<A HREF="/classes"><IMG SRC="/images/button-manage-classes.gif" CLASS="button" ALT="Zarządzaj klasami"></A>
+<A HREF="/jobs"><IMG SRC="/images/button-manage-jobs.gif" CLASS="button" ALT="Zarządzaj zadaniami"></A>
+<A HREF="/printers"><IMG SRC="/images/button-manage-printers.gif" CLASS="button" ALT="Zarządzaj drukarkami"></A>
+<A HREF="/admin"><IMG SRC="/images/button-manage-server.gif" CLASS="button" ALT="Zarządzaj serwerem"></A>
 </P>
 
-<P><I>Jeśli zostaniesz poproszony o nazwę użytkownika i hasło, wprowadź swój login i hasło
-lub login "root" i hasło tego użytkownika.</I></P>
+<P><I>Jeśli zostaniesz poproszony o nazwę użytkownika i hasło, podaj
+swój login i hasło lub nazwę użytkownika "root" i hasło.</I></P>
 
-<H2 CLASS="title">O systemie CUPS</H2>
+<H2 CLASS="title">Informacje o CUPS</H2>
 
 <P>
 <IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
-STYLE="padding-right: 10px;" ALT="Zadowolony komputer i drukarka">
+STYLE="padding-right: 10px;" ALT="Szczęśliwy komputer i drukarka">
 
 <A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
 ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
 STYLE="padding-left: 10px; padding-bottom: 10px;"
 ALT="Easy Software Products"></A>
 
-CUPS zapewnia przenośną warstwę drukowania dla systemów bazujących na 
-UNIX<SUP>&reg;</SUP>. Jest rozbudowywany pod opieką <A HREF="http://www.easysw.com">Easy Software
-Products</a> by promować standard drukowania. CUPS jest domyślnym systemem drukowania używanym w MacOS<SUP>&reg;</SUP>&nbsp;X i większości dystrybucji Linuksa<SUP>&reg;</SUP>.</P>
-<P>CUPS stosuje <A HREF="http://www.pwg.org/ipp/"
-TARGET="_blank"> Internetowy Protokół Drukowania ("IPP")</A> jako podstawy do zarządzania wydrukami i ich kolejkami oraz umożliwia przeglądanie drukarek sieciowych i wydruki w oparciu o PostScriptowe Opisy Drukarek ("PPD") by wspierać w drukowaniu każdego użytkownika.<BR CLEAR="ALL"></P>
+CUPS dostarcza przenośną warstwę drukowania dla systemów
+operacyjnych opartych na Uniksie<SUP>&reg;</SUP>. Został napisany
+i utrzymywany przez <A HREF="http://www.easysw.com">Easy Software
+Products</a>, aby wypromować standardowe rozwiązanie drukowania.
+CUPS jest standardowym systemem drukowania używanym na MacOS-ie
+<SUP>&reg;</SUP> X i większości dystrybucji Linuksa<SUP>&reg;</SUP>.</P>
 
-<H2 CLASS="title">Sterowniki Drukarek i Wsparcie</H2>
+<P>CUPS używa <A HREF="http://www.pwg.org/ipp/"
+TARGET="_blank"> Internetowego protokołu drukowania ("IPP")</A>
+jako podstawę zarządzania zadaniami drukowania i kolejkami oraz
+dodaje sieciowe przeglądanie drukarek, a także oparte na
+PostScriptowym opisie drukarek ("PPD") opcje drukowania do
+obsługi prawdziwego drukowania.<BR CLEAR="ALL"></P>
 
-<P>Odwiedź oficjalną stronę CUPS site aby pobrać sterowniki i uzyskać wsparcie:</P>
+<H2 CLASS="title">Sterowniki drukarek i pomoc techniczna</H2>
+
+<P>Odwiedź oficjalną stronę CUPS, aby uzyskać sterowniki drukarek i pomoc techniczną:</P>
 
 <PRE>
     <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
 </PRE>
 
-<P>Komercyjne wsparcie i rozszerzona wersja CUPS zwana <A
-HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> jest dostępna tu:</P>
+<P>Komercyjne wsparcie i ulepszona wersja CUPS o nazwie <A
+HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> są
+dostępne na:</P>
 
 <PRE>
     <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
@@ -116,10 +126,10 @@ HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> jest dostępna tu:</P>
 WIDTH="15" HEIGHT="15" ALT=""></TD>
 <TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
 
-<P><SMALL>The Common UNIX Printing System, CUPS, and the CUPS logo are the  
-trademark property of <A HREF="http://www.easysw.com">Easy Software
-Products</A>. CUPS is copyright 1997-2006 by Easy Software Products,
-All Rights Reserved.</SMALL></P>
+<P><SMALL>Common UNIX Printing System, CUPS i logo CUPS są
+zarejestrowanymi znakami towarowymi <A HREF="http://www.easysw.com">Easy Software
+Products</A>. Copyright 1997-2006 Easy Software Products,
+wszelkie prawa zastrzeżone.</SMALL></P>
 
 </TD>
 

@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 5448 2006-04-22 03:57:26Z mike $"
+ * "$Id: dirsvc.c 5548 2006-05-19 19:38:31Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -665,10 +665,10 @@ cupsdSendBrowseDelete(
   * Announce the deletion...
   */
 
-  if (BrowseLocalProtocols & BROWSE_CUPS)
+  if ((BrowseLocalProtocols & BROWSE_CUPS) && BrowseSocket >= 0)
     send_cups_browse(p);
 #ifdef HAVE_LIBSLP
-  if (BrowseLocalProtocols & BROWSE_SLP)
+  if ((BrowseLocalProtocols & BROWSE_SLP) && BrowseSLPHandle)
     slp_dereg_printer(p);
 #endif /* HAVE_LIBSLP */
 }
@@ -934,6 +934,8 @@ cupsdStartBrowsing(void)
 
     BrowseSLPRefresh = 0;
   }
+  else
+    BrowseSLPHandle = NULL;
 #endif /* HAVE_LIBSLP */
 
 #ifdef HAVE_OPENLDAP
@@ -1161,7 +1163,7 @@ cupsdStopBrowsing(void)
   }
 #endif /* HAVE_LIBSLP */
 
-#ifdef HAVE_OPENDAP
+#ifdef HAVE_OPENLDAP
   if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_LDAP) &&
       BrowseLDAPHandle)
   {
@@ -3128,5 +3130,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id: dirsvc.c 5448 2006-04-22 03:57:26Z mike $".
+ * End of "$Id: dirsvc.c 5548 2006-05-19 19:38:31Z mike $".
  */

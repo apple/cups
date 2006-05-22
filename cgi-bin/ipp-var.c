@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c 5425 2006-04-18 19:59:05Z mike $"
+ * "$Id: ipp-var.c 5571 2006-05-22 18:46:55Z mike $"
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -482,7 +482,7 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
     {
       cgiRewriteURL(job_printer_uri, resource, sizeof(resource), NULL);
       cgiFormEncode(uri, resource, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "2;%s", uri);
+      snprintf(refresh, sizeof(refresh), "2;URL=%s", uri);
       cgiSetVariable("refresh_page", refresh);
     }
 
@@ -598,7 +598,7 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
     */
 
     cgiFormEncode(uri, resource, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "2;%s", uri);
+    snprintf(refresh, sizeof(refresh), "2;URL=%s", uri);
     cgiSetVariable("refresh_page", refresh);
   }
 
@@ -774,7 +774,7 @@ cgiSetIPPObjectVars(
 
   fprintf(stderr, "DEBUG2: cgiSetIPPObjectVars(obj=%p, prefix=\"%s\", "
                   "element=%d)\n",
-          obj, prefix, element);
+          obj, prefix ? prefix : "(null)", element);
 
  /*
   * Set common CGI template variables...
@@ -977,7 +977,9 @@ cgiSetIPPVars(ipp_t      *response,	/* I - Response data to be copied... */
 
   fprintf(stderr, "DEBUG2: cgiSetIPPVars(response=%p, filter_name=\"%s\", "
                   "filter_value=\"%s\", prefix=\"%s\", parent_el=%d)\n",
-          response, filter_name, filter_value, prefix, parent_el);
+          response, filter_name ? filter_name : "(null)",
+	  filter_value ? filter_value : "(null)",
+	  prefix ? prefix : "(null)", parent_el);
 
  /*
   * Set common CGI template variables...
@@ -1277,5 +1279,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 5425 2006-04-18 19:59:05Z mike $".
+ * End of "$Id: ipp-var.c 5571 2006-05-22 18:46:55Z mike $".
  */

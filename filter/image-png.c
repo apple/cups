@@ -1,5 +1,5 @@
 /*
- * "$Id: image-png.c 5452 2006-04-22 22:17:32Z mike $"
+ * "$Id: image-png.c 5508 2006-05-11 11:41:16Z mike $"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -216,7 +216,7 @@ _cupsImageReadPNG(
 		break;
 	    case CUPS_IMAGE_RGB :
 	    case CUPS_IMAGE_RGB_CMYK :
-		memcpy(out, inptr, img->xsize * 3);
+		cupsImageRGBToRGB(inptr, out, img->xsize);
 		break;
 	    case CUPS_IMAGE_BLACK :
 		cupsImageRGBToBlack(inptr, out, img->xsize);
@@ -280,5 +280,5 @@ _cupsImageReadPNG(
 
 
 /*
- * End of "$Id: image-png.c 5452 2006-04-22 22:17:32Z mike $".
+ * End of "$Id: image-png.c 5508 2006-05-11 11:41:16Z mike $".
  */

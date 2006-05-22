@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5495 2006-05-05 17:58:07Z mike $"
+ * "$Id: ipp.c 5553 2006-05-20 12:22:27Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -276,7 +276,7 @@ main(int  argc,				/* I - Number of command-line args */
             *ptr++ = *optptr++;
 	*ptr = '\0';
 
-	if (*optptr == '+')
+	if (*optptr == '+' || *optptr == '&')
 	  optptr ++;
       }
       else
@@ -1619,5 +1619,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 5495 2006-05-05 17:58:07Z mike $".
+ * End of "$Id: ipp.c 5553 2006-05-20 12:22:27Z mike $".
  */

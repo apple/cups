@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 5473 2006-05-01 15:51:09Z mike $"
+dnl "$Id: cups-compiler.m4 5565 2006-05-22 01:08:19Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -138,8 +138,8 @@ if test -n "$GCC"; then
 					ARCH32FLAGS="$with_arch32flags"
 				fi
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$prefix/lib32"
 				UNINSTALL32="uninstall32bit"
 
@@ -162,8 +162,8 @@ if test -n "$GCC"; then
 					ARCH64FLAGS="$with_arch64flags"
 				fi
 				INSTALL64="install64bit"
-				LIB64CUPS="libcups.64.so.2"
-				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64CUPS="64bit/libcups.so.2"
+				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 				LIB64DIR="$prefix/lib64"
 				UNINSTALL64="uninstall64bit"
 
@@ -188,8 +188,8 @@ if test -n "$GCC"; then
 					ARCH32FLAGS="$with_arch32flags"
 				fi
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$exec_prefix/lib"
 				if test -d /usr/lib32; then
 					LIB32DIR="${LIB32DIR}32"
@@ -215,8 +215,8 @@ if test -n "$GCC"; then
 					ARCH64FLAGS="$with_arch64flags"
 				fi
 				INSTALL64="install64bit"
-				LIB64CUPS="libcups.64.so.2"
-				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64CUPS="64bit/libcups.so.2"
+				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 				LIB64DIR="$exec_prefix/lib"
 				if test -d /usr/lib64; then
 					LIB64DIR="${LIB64DIR}64"
@@ -244,8 +244,8 @@ if test -n "$GCC"; then
 					ARCH32FLAGS="$with_arch32flags"
 				fi
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$exec_prefix/lib/32"
 				UNINSTALL32="uninstall32bit"
 
@@ -268,8 +268,8 @@ if test -n "$GCC"; then
 					ARCH64FLAGS="$with_arch64flags"
 				fi
 				INSTALL64="install64bit"
-				LIB64CUPS="libcups.64.so.2"
-				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64CUPS="64bit/libcups.so.2"
+				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 				LIB64DIR="$exec_prefix/lib/64"
 				UNINSTALL64="uninstall64bit"
 
@@ -310,8 +310,11 @@ else
 			# Warning 829 is passing constant string as char *
 			CXXFLAGS="+W336,829 $CXXFLAGS"
 
-			if test "x$with_optim" = x; then
-				OPTIM="+DAportable $OPTIM"
+			if test -z "$with_archflags"; then
+				# Build portable binaries for all HP systems...
+				ARCHFLAGS="+DAportable"
+			else
+				ARCHFLAGS="$with_archflags"
 			fi
 
 			if test $PICFLAG = 1; then
@@ -339,8 +342,8 @@ else
 					ARCH32FLAGS="$with_arch32flags"
 				fi
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$prefix/lib32"
 				UNINSTALL32="uninstall32bit"
 
@@ -363,8 +366,8 @@ else
 					ARCH64FLAGS="$with_arch64flags"
 				fi
 				INSTALL64="install64bit"
-				LIB64CUPS="libcups.64.so.2"
-				LIB64CUPSIMAGE="libcupsimage.64.so.2"
+				LIB64CUPS="64bit/libcups.so.2"
+				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 				LIB64DIR="$prefix/lib64"
 				UNINSTALL64="uninstall64bit"
 
@@ -398,8 +401,8 @@ else
 				# binaries with separate 32-bit libraries...
 				ARCH32FLAGS="-xarch=generic"
 				INSTALL32="install32bit"
-				LIB32CUPS="libcups.32.so.2"
-				LIB32CUPSIMAGE="libcupsimage.32.so.2"
+				LIB32CUPS="32bit/libcups.so.2"
+				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
 				LIB32DIR="$exec_prefix/lib/32"
 				UNINSTALL32="uninstall32bit"
 
@@ -408,33 +411,43 @@ else
 					# warning messages, and default to
 					# 64-bit compiles of everything else...
 					OPTIM="-w $OPTIM"
-					CFLAGS="-xarch=generic64 $CFLAGS"
+				fi
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch64flags"; then
+						ARCHFLAGS="-xarch=generic64"
+					else
+						ARCHFLAGS="$with_arch64flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
 				fi
 			else
 				if test "x$enable_64bit" = xyes; then
 					# Build 64-bit libraries...
 					ARCH64FLAGS="-xarch=generic64"
 					INSTALL64="install64bit"
-					LIB64CUPS="libcups.64.so.2"
-					LIB64CUPSIMAGE="libcupsimage.64.so.2"
+					LIB64CUPS="64bit/libcups.so.2"
+					LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 					LIB64DIR="$exec_prefix/lib/64"
 					UNINSTALL64="uninstall64bit"
+				fi
 
-					if test "x$with_optim" = x; then
-						# Suppress all of Sun's questionable
-						# warning messages, and default to
-						# 32-bit compiles of everything else...
-						OPTIM="-w $OPTIM"
-						CFLAGS="-xarch=generic $CFLAGS"
+				if test "x$with_optim" = x; then
+					# Suppress all of Sun's questionable
+					# warning messages, and default to
+					# 32-bit compiles of everything else...
+					OPTIM="-w $OPTIM"
+				fi
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch32flags"; then
+						ARCHFLAGS="-xarch=generic"
+					else
+						ARCHFLAGS="$with_arch32flags"
 					fi
 				else
-					if test "x$with_optim" = x; then
-						# Suppress all of Sun's questionable
-						# warning messages, and default to
-						# 32-bit compiles of everything else...
-						OPTIM="-w $OPTIM"
-						CFLAGS="-xarch=generic $CFLAGS"
-					fi
+					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 			;;
@@ -475,5 +488,5 @@ if test $uname = HP-UX; then
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4 5473 2006-05-01 15:51:09Z mike $".
+dnl End of "$Id: cups-compiler.m4 5565 2006-05-22 01:08:19Z mike $".
 dnl

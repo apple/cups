@@ -1,9 +1,9 @@
 /*
- * "$Id: image-pnm.c 4741 2005-10-02 04:25:52Z mike $"
+ * "$Id: image-pnm.c 5508 2006-05-11 11:41:16Z mike $"
  *
  *   Portable Any Map file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -261,39 +261,32 @@ _cupsImageReadPNM(
 	  if ((saturation != 100 || hue != 0) && bpp > 1)
 	    cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
-	  if (img->colorspace == CUPS_IMAGE_RGB)
+	  switch (img->colorspace)
 	  {
-	    if (lut)
-	      cupsImageLut(in, img->xsize * 3, lut);
+            default :
+		break;
 
-            _cupsImagePutRow(img, 0, y, img->xsize, in);
+	    case CUPS_IMAGE_WHITE :
+		cupsImageRGBToWhite(in, out, img->xsize);
+		break;
+	    case CUPS_IMAGE_RGB :
+		cupsImageRGBToRGB(in, out, img->xsize);
+		break;
+	    case CUPS_IMAGE_BLACK :
+		cupsImageRGBToBlack(in, out, img->xsize);
+		break;
+	    case CUPS_IMAGE_CMY :
+		cupsImageRGBToCMY(in, out, img->xsize);
+		break;
+	    case CUPS_IMAGE_CMYK :
+		cupsImageRGBToCMYK(in, out, img->xsize);
+		break;
 	  }
-	  else
-	  {
-	    switch (img->colorspace)
-	    {
-              default :
-		  break;
 
-	      case CUPS_IMAGE_WHITE :
-		  cupsImageRGBToWhite(in, out, img->xsize);
-		  break;
-	      case CUPS_IMAGE_BLACK :
-		  cupsImageRGBToBlack(in, out, img->xsize);
-		  break;
-	      case CUPS_IMAGE_CMY :
-		  cupsImageRGBToCMY(in, out, img->xsize);
-		  break;
-	      case CUPS_IMAGE_CMYK :
-		  cupsImageRGBToCMYK(in, out, img->xsize);
-		  break;
-	    }
+	  if (lut)
+	    cupsImageLut(out, img->xsize * bpp, lut);
 
-	    if (lut)
-	      cupsImageLut(out, img->xsize * bpp, lut);
-
-            _cupsImagePutRow(img, 0, y, img->xsize, out);
-	  }
+          _cupsImagePutRow(img, 0, y, img->xsize, out);
   	  break;
     }
   }
@@ -308,5 +301,5 @@ _cupsImageReadPNM(
 
 
 /*
- * End of "$Id: image-pnm.c 4741 2005-10-02 04:25:52Z mike $".
+ * End of "$Id: image-pnm.c 5508 2006-05-11 11:41:16Z mike $".
  */

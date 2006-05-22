@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c 5202 2006-02-28 19:37:03Z mike $"
+ * "$Id: classes.c 5571 2006-05-22 18:46:55Z mike $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -95,8 +95,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * See who is logged in...
   */
 
-  if ((user = getenv("REMOTE_USER")) == NULL)
-    user = "guest";
+  user = getenv("REMOTE_USER");
 
  /*
   * Connect to the HTTP server...
@@ -187,7 +186,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 void
 show_all_classes(http_t     *http,	/* I - Connection to server */
-                  const char *user)	/* I - Username */
+                 const char *user)	/* I - Username */
 {
   int			i;		/* Looping var */
   ipp_t			*request,	/* IPP request */
@@ -221,8 +220,9 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
 
   request = ippNewRequest(CUPS_GET_CLASSES);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-               "requesting-user-name", NULL, user);
+  if (user)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+        	 "requesting-user-name", NULL, user);
 
   cgiGetAttributes(request, "classes.tmpl");
 
@@ -419,7 +419,7 @@ show_class(http_t     *http,		/* I - Connection to server */
       */
 
       cgiFormEncode(uri, pclass, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "10;/classes/%s", uri);
+      snprintf(refresh, sizeof(refresh), "10;URL=/classes/%s", uri);
       cgiSetVariable("refresh_page", refresh);
     }
 
@@ -463,5 +463,5 @@ show_class(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: classes.c 5202 2006-02-28 19:37:03Z mike $".
+ * End of "$Id: classes.c 5571 2006-05-22 18:46:55Z mike $".
  */

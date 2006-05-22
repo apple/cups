@@ -2,6 +2,7 @@
 <!-- SECTION: Specifications -->
 <HEAD>
 	<TITLE>CUPS Raster Format</TITLE>
+	<LINK REL="STYLESHEET" TYPE="test/css" HREF="../cups.css">
 </HEAD>
 <BODY>
 
@@ -37,13 +38,16 @@ is followed immediately by the (uncompressed, raw) raster data
 for that page.</P>
 
 <DIV CLASS="table"><TABLE SUMMARY="CUPS Version 1 Raster Page Device Dictionary">
-<CAPTION>Table 1: CUPS Version 1 Raster Page Device Dictionary</CAPTION>
+<CAPTION><A NAME="TABLE1">Table 1: CUPS Version 1 Raster Page Device Dictionary</A></CAPTION>
+<THEAD>
 <TR>
 	<TH>Bytes</TH>
 	<TH>Type</TH>
 	<TH>Description</TH>
 	<TH>Values</TH>
 </TR>
+</THEAD>
+<TBODY>
 <TR>
 	<TD>0-63</TD>
 	<TD>C String</TD>
@@ -284,9 +288,9 @@ for that page.</P>
 	<TD>400-403</TD>
 	<TD>Unsigned Integer</TD>
 	<TD>cupsColorSpace</TD>
-	<TD>0 = white<BR>
-	1 = RGB<BR>
-	2 = RGBA<BR>
+	<TD>0 = white (sRGB)<BR>
+	1 = RGB (sRGB)<BR>
+	2 = RGBA (sRGB)<BR>
 	3 = black<BR>
 	4 = CMY<BR>
 	5 = YMC<BR>
@@ -301,22 +305,22 @@ for that page.</P>
 	14 = SILVER<BR>
 	15 = CIE XYZ<BR>
 	16 = CIE Lab<BR>
-	17 = RGBW<BR>
-	32 = ICC1<BR>
-	33 = ICC2<BR>
-	34 = ICC3<BR>
-	35 = ICC4<BR>
-	36 = ICC5<BR>
-	37 = ICC6<BR>
-	38 = ICC7<BR>
-	39 = ICC8<BR>
-	40 = ICC9<BR>
-	41 = ICCA (10)<BR>
-	42 = ICCB (11)<BR>
-	43 = ICCC (12)<BR>
-	44 = ICCD (13)<BR>
-	45 = ICCE (14)<BR>
-	46 = ICCF (15)<BR>
+	17 = RGBW (sRGB)<BR>
+	32 = ICC1 (CIE Lab with hint for 1 color)<BR>
+	33 = ICC2 (CIE Lab with hint for 2 colors)<BR>
+	34 = ICC3 (CIE Lab with hint for 3 colors)<BR>
+	35 = ICC4 (CIE Lab with hint for 4 colors)<BR>
+	36 = ICC5 (CIE Lab with hint for 5 colors)<BR>
+	37 = ICC6 (CIE Lab with hint for 6 colors)<BR>
+	38 = ICC7 (CIE Lab with hint for 7 colors)<BR>
+	39 = ICC8 (CIE Lab with hint for 8 colors)<BR>
+	40 = ICC9 (CIE Lab with hint for 9 colors)<BR>
+	41 = ICCA (CIE Lab with hint for 10 colors)<BR>
+	42 = ICCB (CIE Lab with hint for 11 colors)<BR>
+	43 = ICCC (CIE Lab with hint for 12 colors)<BR>
+	44 = ICCD (CIE Lab with hint for 13 colors)<BR>
+	45 = ICCE (CIE Lab with hint for 14 colors)<BR>
+	46 = ICCF (CIE Lab with hint for 15 colors)<BR>
 	</TD>
 </TR>
 <TR>
@@ -343,6 +347,7 @@ for that page.</P>
 	<TD>cupsRowStep</TD>
 	<TD>Driver-specific 0 to 2<SUP>32</SUP> - 1</TD>
 </TR>
+</TBODY>
 </TABLE></DIV>
 
 
@@ -362,13 +367,16 @@ header and is followed immediately by the compressed raster data
 for that page.</P>
 
 <DIV CLASS="table"><TABLE SUMMARY="CUPS Version 2 Raster Page Device Dictionary">
-<CAPTION>Table 2: CUPS Version 2 Raster Page Device Dictionary</CAPTION>
+<CAPTION><A NAME="TABLE2">Table 2: CUPS Version 2 Raster Page Device Dictionary</A></CAPTION>
+<THEAD>
 <TR>
 	<TH>Bytes</TH>
 	<TH>Type</TH>
 	<TH>Description</TH>
 	<TH>Values</TH>
 </TR>
+</THEAD>
+<TBODY>
 <TR>
 	<TD>0-419</TD>
 	<TD>Version 1 header data</TD>
@@ -436,6 +444,7 @@ for that page.</P>
 	<TD>cupsPageSizeName</TD>
 	<TD>Page size name/keyword string from PPD</TD>
 </TR>
+</TBODY>
 </TABLE></DIV>
 
 <H3><A NAME="COMPRESSION">Compressed Raster Data Format</A></H3>
@@ -446,6 +455,7 @@ color values based upon the <CODE>cupsColorOrder</CODE>
 setting:</P>
 
 <DIV CLASS="table"><TABLE SUMMARY="Color Value Sizes">
+<CAPTION><A NAME="TABLE3">Table 3: Color Value Sizes</A></CAPTION>
 <TR>
 	<TH>cupsColorOrder</TH>
 	<TH>Bytes per color value</TH>
@@ -475,8 +485,204 @@ colors are encoded using an initial byte of "257 - count"
 followed by the color value bytes.</P>
 
 
+<H2 CLASS="title"><A NAME="ENCODING">Pixel Value Coding</A></H2>
+
+<P>The following sections describe the encoding and decoding of
+the color values in a CUPS raster file. In general, colors are
+packed into the minimum number of bytes, with special
+consideration provided for efficiency of encoding and access.
+Multi-byte values are stored in the native byte order and
+automatically swapped as needed when reading them using the CUPS
+imaging API.</P>
+
+<H3>CUPS_ORDER_CHUNKED</H3>
+
+<P>The chunked order provides the pixel value packed in a single
+place. Pixel values with 8 or more bits per color are stored as
+an array of colors in order, e.g. for
+<CODE>CUPS_CSPACE_RGB</CODE> you will see 8/16-bits of red, then
+blue, then green, then red, green, blue, etc. Pixel values with
+less than 8 bits per color are packed together as shown in Table
+4. <I>Multi-byte pixel values are stored in the native word
+order, just as for 16-bit color values.</I></P>
+
+<DIV CLASS="table"><TABLE SUMMARY="Chunked Color Values">
+<CAPTION><A NAME="TABLE4">Table 4: Chunked Color Values</A></CAPTION>
+<THEAD>
+<TR>
+	<TH>Bits</TH>
+	<TH>1-color</TH>
+	<TH>3-color</TH>
+	<TH>4-color</TH>
+	<TH>6-color</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>1</TD>
+	<TD>W/W/W/W/W/W/W/W</TD>
+	<TD>0RGB/0RGB</TD>
+	<TD>CMYK/CMYK</TD>
+	<TD>00KCMYcm</TD>
+</TR>
+<TR>
+	<TD>2</TD>
+	<TD>WW/WW/WW/WW</TD>
+	<TD>00RRGGBB</TD>
+	<TD>CCMMYYKK</TD>
+	<TD>N/A</TD>
+</TR>
+<TR>
+	<TD>4</TD>
+	<TD>WWWW/WWWW</TD>
+	<TD>0000RRRRGGGGBBBB<BR>
+	<I>(multi-byte)</I></TD>
+	<TD>CCCCMMMMYYYYKKKK<BR>
+	<I>(multi-byte)</I></TD>
+	<TD>N/A</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
+
+<H3>CUPS_ORDER_BANDED</H3>
+
+<P>The banded order provides each color as a separate line of
+data. Each color plane for a line is written in sequence, e.g.
+for the <CODE>CUPS_CSPACE_CMYK</CODE> colorspace you would see
+all of the cyan pixels for a line followed by the magenta,
+yellow, and black pixels for that line. This is repeated for all
+of the lines on the page. Color values are packed starting with
+the most-significant bit (MSB) first.</P>
+
+<H3>CUPS_ORDER_PLANAR</H3>
+
+<P>The planar order provides each color as a separate page of
+data using a shared page header. Each color plane for a page is
+written in sequence, e.g. for the <CODE>CUPS_CSPACE_CMYK</CODE>
+colorspace you would see all of the cyan pixels for a page
+followed by the magenta, yellow, and black pixels for that page.
+Color values are packed starting with the most-significant bit
+(MSB) first. Each line starts on an 8-bit boundary.</P>
+
+<H3>CUPS_CSPACE_W, CUPS_CSPACE_RGB, CUPS_CSPACE_RGBA, and
+CUPS_CSPACE_RGBW</H3>
+
+<P>These colorspaces use the sRGB colorspace definition and
+whitepoint.</P>
+
+<H3>CUPS_CSPACE_KCMYcm</H3>
+
+<P>When <CODE>cupsBitsPerColor</CODE> is 1, 6 color planes are
+provided - black, cyan, magenta, yellow, light cyan, and light
+magenta. When <CODE>cupsBitsPerColor</CODE> is greater than 1, 4
+color planes are provided using the <CODE>CUPS_CSPACE_KCMY</CODE>
+colorspace instead.</P>
+
+<P>When <CODE>cupsColorOrder</CODE> is
+<CODE>CUPS_ORDER_CHUNKED</CODE>, bit 5 corresponds to black and
+bit 0 corresponds to light magenta. For
+<CODE>CUPS_ORDER_BANDED</CODE> and
+<CODE>CUPS_ORDER_PLANAR</CODE>, each color plane is encoded
+separately.</P>
+
+<H3>CUPS_CSPACE_CIELab and CUPS_CSPACE_ICCn</H3>
+
+<P>These colorspaces map a CIE Lab color value with a D65
+whitepoint to either a 8- or 16-bit per color chunked
+(<CODE>CUPS_ORDER_CHUNKED</CODE>) format; the banded
+(<CODE>CUPS_ORDER_BANDED</CODE>) and planar
+(<CODE>CUPS_ORDER_PLANAR</CODE>) color orders are not
+supported.</P>
+
+<P>The values are encoded and decoded using the following
+formulas:</P>
+
+<UL>
+
+	<LI>8-bit Encoding:<BR>
+	<I>L8 = 2.55 * L + 0.5<BR>
+	a8 = a + 128.5<BR>
+	b8 = b + 128.5<BR>
+	&nbsp;</I></LI>
+
+	<LI>8-bit Decoding:<BR>
+	<I>L = L8 / 2.55<BR>
+	a = a8 - 128<BR>
+	b = b8 - 128<BR>
+	&nbsp;</I></LI>
+
+	<LI>16-bit Encoding:<BR>
+	<I>L16 = 655.35 * L + 0.5<BR>
+	a16 = 256 * (a + 128) + 0.5<BR>
+	b16 = 256 * (b + 128) + 0.5<BR>
+	&nbsp;</I></LI>
+
+	<LI>16-bit Decoding:<BR>
+	<I>L = L16 / 655.35<BR>
+	a = a16 / 256 - 128<BR>
+	b = b16 / 256 - 128<BR>
+	&nbsp;</I></LI>
+
+</UL>
+
+<H3>CUPS_CSPACE_CIEXYZ</H3>
+
+<P>These colorspaces map a CIE XYZ color value with a D65
+whitepoint to either a 8- or 16-bit per color chunked
+(<CODE>CUPS_ORDER_CHUNKED</CODE>) format; the banded
+(<CODE>CUPS_ORDER_BANDED</CODE>) and planar
+(<CODE>CUPS_ORDER_PLANAR</CODE>) color orders are not
+supported.</P>
+
+<P>The values are encoded and decoded using the following
+formulas:</P>
+
+<UL>
+
+	<LI>8-bit Encoding:<BR>
+	<I>X8 = 231.8181 * X + 0.5<BR>
+	Y8 = 231.8181 * Y + 0.5<BR>
+	Z8 = 231.8181 * Z + 0.5<BR>
+	&nbsp;</I></LI>
+
+	<LI>8-bit Decoding:<BR>
+	<I>X = X8 / 231.8181<BR>
+	Y = Y8 / 231.8181<BR>
+	Z = Z8 / 231.8181<BR>
+	&nbsp;</I></LI>
+
+	<LI>16-bit Encoding:<BR>
+	<I>X16 = 59577.2727 * X + 0.5<BR>
+	Y16 = 59577.2727 * Y + 0.5<BR>
+	Z16 = 59577.2727 * Z + 0.5<BR>
+	&nbsp;</I></LI>
+
+	<LI>16-bit Decoding:<BR>
+	<I>X = X16 / 59577.2727<BR>
+	Y = Y16 / 59577.2727<BR>
+	Z = Z16 / 59577.2727<BR>
+	&nbsp;</I></LI>
+
+</UL>
+
+<P>The scaling factor for XYZ values is 1/1.1, or 231.8181 for
+8-bit values and 59577.2727 for 16-bit values. This allows for a
+slight overflow of XYZ values when converting from RGB, improving
+accuracy.</P>
+
 
 <H2 CLASS="title"><A NAME="HISTORY">Change History</A></H2>
+
+<H3>Changes in CUPS 1.2.1</H3>
+
+<ul>
+
+	<li>Added new sections on coding pixel values.</li>
+
+	<li>Clarified definitions of color spaces.</li>
+
+</ul>
+
 
 <H3>Changes in CUPS 1.2</H3>
 

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c 5422 2006-04-18 15:16:00Z mike $"
+ * "$Id: cupstestppd.c 5548 2006-05-19 19:38:31Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -1176,7 +1176,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
       }
 
-      if (ppdFindAttr(ppd, "1284DeviceId", NULL))
+      if ((attr = ppdFindAttr(ppd, "1284DeviceID", NULL)) &&
+          strcmp(attr->name, "1284DeviceID"))
       {
 	if (verbose >= 0)
 	{
@@ -1729,5 +1730,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c 5422 2006-04-18 15:16:00Z mike $".
+ * End of "$Id: cupstestppd.c 5548 2006-05-19 19:38:31Z mike $".
  */

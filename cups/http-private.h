@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 5466 2006-04-26 19:52:27Z mike $"
+ * "$Id: http-private.h 5503 2006-05-10 18:55:39Z mike $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -161,10 +161,22 @@ struct ifaddrs				/**** Interface Structure ****/
   char			*ifa_name;	/* Name of interface */
   unsigned int		ifa_flags;	/* Flags (up, point-to-point, etc.) */
   struct sockaddr	*ifa_addr,	/* Network address */
-			*ifa_netmask,	/* Address mask */
-			*ifa_dstaddr;	/* Broadcast or destination address */
+			*ifa_netmask;	/* Address mask */
+  union
+  {
+    struct sockaddr	*ifu_broadaddr;	/* Broadcast address of this interface. */
+    struct sockaddr	*ifu_dstaddr;	/* Point-to-point destination address. */
+  } ifa_ifu;
+
   void			*ifa_data;	/* Interface statistics */
 };
+
+#  ifndef ifa_broadaddr
+#    define ifa_broadaddr ifa_ifu.ifu_broadaddr
+#  endif /* !ifa_broadaddr */
+#  ifndef ifa_dstaddr
+#    define ifa_dstaddr ifa_ifu.ifu_dstaddr
+#  endif /* !ifa_dstaddr */
 
 extern int	_cups_getifaddrs(struct ifaddrs **addrs);
 #    define getifaddrs _cups_getifaddrs
@@ -175,5 +187,5 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 5466 2006-04-26 19:52:27Z mike $".
+ * End of "$Id: http-private.h 5503 2006-05-10 18:55:39Z mike $".
  */

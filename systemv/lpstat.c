@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c 5331 2006-03-23 21:21:19Z mike $"
+ * "$Id: lpstat.c 5527 2006-05-15 19:37:11Z mike $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -235,10 +235,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    }
 	    else
 	    {
-	      _cupsLangPuts(stderr,
-	                    _("%s: Error - expected destination after "
-			      "\'-b\' option!\n"),
-			    argv[0]);
+	      _cupsLangPrintf(stderr,
+	                      _("%s: Error - expected destination after "
+			        "\'-b\' option!\n"),
+			      argv[0]);
 
 	      return (1);
 	    }
@@ -2248,5 +2248,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c 5331 2006-03-23 21:21:19Z mike $".
+ * End of "$Id: lpstat.c 5527 2006-05-15 19:37:11Z mike $".
  */

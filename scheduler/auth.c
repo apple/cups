@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 5464 2006-04-26 01:34:14Z mike $"
+ * "$Id: auth.c 5567 2006-05-22 15:33:11Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -119,7 +119,7 @@ typedef struct cupsd_authdata_s		/**** Authentication data ****/
  * Local globals...
  */
 
-#if defined(__hpux) && defined(HAVE_LIBPAM)
+#if defined(__hpux) && HAVE_LIBPAM
 static cupsd_authdata_t	*auth_data;	/* Current client being authenticated */
 #endif /* __hpux && HAVE_LIBPAM */
 
@@ -1497,7 +1497,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdIsAuthorized: con->uri=\"%s\", con->best=%p(%s)",
-                  con->uri, con->best, con->best ? con->best->location : "");
+                  con->uri, con->best, con->best ? con->best->location ?
+                			   con->best->location : "(null)" : "");
   if (owner)
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsAuthorized: owner=\"%s\"", owner);
@@ -2167,5 +2168,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 5464 2006-04-26 01:34:14Z mike $".
+ * End of "$Id: auth.c 5567 2006-05-22 15:33:11Z mike $".
  */

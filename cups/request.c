@@ -1,5 +1,5 @@
 /*
- * "$Id: request.c 5495 2006-05-05 17:58:07Z mike $"
+ * "$Id: request.c 5556 2006-05-21 13:55:23Z mike $"
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
@@ -70,6 +70,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
   char		buffer[32768];		/* Output buffer */
+  http_status_t	expect;			/* Expect: header to use */
 
 
   DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
@@ -146,6 +147,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
   response = NULL;
   status   = HTTP_ERROR;
+  expect   = HTTP_CONTINUE;
 
   while (response == NULL)
   {
@@ -163,7 +165,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     httpSetLength(http, length);
     httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
     httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
-    httpSetExpect(http, HTTP_CONTINUE);
+    httpSetExpect(http, expect);
 
     DEBUG_printf(("cupsDoFileRequest: authstring=\"%s\"\n", http->authstring));
 
@@ -312,6 +314,14 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       continue;
     }
 #endif /* HAVE_SSL */
+    else if (status == HTTP_EXPECTATION_FAILED)
+    {
+     /*
+      * Don't try using the Expect: header the next time around...
+      */
+
+      expect = (http_status_t)0;
+    }
     else if (status != HTTP_OK)
     {
       DEBUG_printf(("cupsDoFileRequest: error %d...\n", status));
@@ -469,5 +479,5 @@ _cupsSetError(ipp_status_t status,	/* I - IPP status code */
 
 
 /*
- * End of "$Id: request.c 5495 2006-05-05 17:58:07Z mike $".
+ * End of "$Id: request.c 5556 2006-05-21 13:55:23Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c 5061 2006-02-03 16:32:18Z mike $"
+ * "$Id: testmime.c 5533 2006-05-16 19:45:14Z mike $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -98,6 +98,8 @@ main(int  argc,				/* I - Number of command-line args */
       if (src)
 	printf("%s: %s/%s%s\n", argv[i], src->super, src->type,
 	       compression ? " (gzipped)" : "");
+      else if ((src = mimeType(mime, "application", "octet-stream")) != NULL)
+	printf("%s: application/octet-stream\n", argv[i]);
       else
       {
 	printf("%s: unknown\n", argv[i]);
@@ -158,7 +160,8 @@ main(int  argc,				/* I - Number of command-line args */
 	     filter->dst->super, filter->dst->type,
 	     filter->filter, filter->cost);
 
-    type_dir(mime, "..");
+    type_dir(mime, "../doc");
+    type_dir(mime, "../man");
   }
 
   return (0);
@@ -280,6 +283,9 @@ type_dir(mime_t     *mime,		/* I - MIME database */
 
   while ((dent = cupsDirRead(dir)) != NULL)
   {
+    if (dent->filename[0] == '.')
+      continue;
+
     snprintf(filename, sizeof(filename), "%s/%s", dirname, dent->filename);
 
     if (S_ISDIR(dent->fileinfo.st_mode))
@@ -325,5 +331,5 @@ type_dir(mime_t     *mime,		/* I - MIME database */
 
 
 /*
- * End of "$Id: testmime.c 5061 2006-02-03 16:32:18Z mike $".
+ * End of "$Id: testmime.c 5533 2006-05-16 19:45:14Z mike $".
  */

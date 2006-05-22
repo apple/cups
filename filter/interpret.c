@@ -1,5 +1,5 @@
 /*
- * "$Id: interpret.c 5497 2006-05-06 00:24:22Z mike $"
+ * "$Id: interpret.c 5512 2006-05-11 18:06:58Z mike $"
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
@@ -296,7 +296,7 @@ cupsRasterInterpretPPD(
 	break;
 
     case CUPS_CSPACE_KCMYcm :
-	if (h->cupsBitsPerPixel == 1)
+	if (h->cupsBitsPerColor == 1)
 	{
 	  if (h->cupsColorOrder == CUPS_ORDER_CHUNKED)
 	    h->cupsBitsPerPixel = 8;
@@ -608,5 +608,5 @@ exec_code(
 
 
 /*
- * End of "$Id: interpret.c 5497 2006-05-06 00:24:22Z mike $".
+ * End of "$Id: interpret.c 5512 2006-05-11 18:06:58Z mike $".
  */

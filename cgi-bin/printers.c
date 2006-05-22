@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5202 2006-02-28 19:37:03Z mike $"
+ * "$Id: printers.c 5571 2006-05-22 18:46:55Z mike $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -98,8 +98,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * See who is logged in...
   */
 
-  if ((user = getenv("REMOTE_USER")) == NULL)
-    user = "guest";
+  user = getenv("REMOTE_USER");
 
  /*
   * Connect to the HTTP server...
@@ -287,7 +286,7 @@ print_command(http_t     *http,		/* I - Connection to server */
     */
 
     cgiFormEncode(uri, resource, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "2;%s", uri);
+    snprintf(refresh, sizeof(refresh), "2;URL=%s", uri);
     cgiSetVariable("refresh_page", refresh);
   }
 
@@ -331,7 +330,7 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
 
 
   fprintf(stderr, "DEBUG: show_all_printers(http=%p, user=\"%s\")\n",
-          http, user);
+          http, user ? user : "(null)");
 
  /*
   * Show the standard header...
@@ -357,8 +356,9 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
   ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
                 "printer-type-mask", CUPS_PRINTER_CLASS);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-               "requesting-user-name", NULL, user);
+  if (user)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+        	 "requesting-user-name", NULL, user);
 
   cgiGetAttributes(request, "printers.tmpl");
 
@@ -543,7 +543,7 @@ show_printer(http_t     *http,		/* I - Connection to server */
 
 
   fprintf(stderr, "DEBUG: show_printer(http=%p, printer=\"%s\")\n",
-          http, printer);
+          http, printer ? printer : "(null)");
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -594,7 +594,7 @@ show_printer(http_t     *http,		/* I - Connection to server */
       */
 
       cgiFormEncode(uri, printer, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "10;/printers/%s", uri);
+      snprintf(refresh, sizeof(refresh), "10;URL=/printers/%s", uri);
       cgiSetVariable("refresh_page", refresh);
     }
 
@@ -638,5 +638,5 @@ show_printer(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: printers.c 5202 2006-02-28 19:37:03Z mike $".
+ * End of "$Id: printers.c 5571 2006-05-22 18:46:55Z mike $".
  */

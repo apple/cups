@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c 5400 2006-04-14 19:04:02Z mike $"
+ * "$Id: serial.c 5553 2006-05-20 12:22:27Z mike $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -310,7 +310,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
             *ptr++ = *options++;
 	*ptr = '\0';
 
-	if (*options == '+')
+	if (*options == '+' || *options == '&')
 	  options ++;
       }
       else
@@ -1169,5 +1169,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: serial.c 5400 2006-04-14 19:04:02Z mike $".
+ * End of "$Id: serial.c 5553 2006-05-20 12:22:27Z mike $".
  */

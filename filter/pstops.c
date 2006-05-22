@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 5382 2006-04-07 14:58:44Z mike $"
+ * "$Id: pstops.c 5569 2006-05-22 18:30:52Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -184,7 +184,11 @@ static size_t		copy_trailer(cups_file_t *fp, pstops_doc_t *doc,
 				     size_t linelen, size_t linesize);
 static void		do_prolog(pstops_doc_t *doc, ppd_file_t *ppd);
 static void 		do_setup(pstops_doc_t *doc, ppd_file_t *ppd);
-static void		doc_printf(pstops_doc_t *doc, const char *format, ...);
+static void		doc_printf(pstops_doc_t *doc, const char *format, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#endif /* __GNUC__ */
+;
 static void		doc_puts(pstops_doc_t *doc, const char *s);
 static void		doc_write(pstops_doc_t *doc, const char *s, size_t len);
 static void		end_nup(pstops_doc_t *doc, int number);
@@ -887,6 +891,13 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   }
 
  /*
+  * Restore the old showpage operator as needed...
+  */
+
+  if (doc->use_ESPshowpage)
+    puts("userdict/showpage/ESPshowpage load put\n");
+
+ /*
   * Write/copy the trailer...
   */
 
@@ -1061,6 +1072,13 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
       }
     }
   }
+
+ /*
+  * Restore the old showpage operator as needed...
+  */
+
+  if (doc->use_ESPshowpage)
+    puts("userdict/showpage/ESPshowpage load put\n");
 }
 
 
@@ -1686,6 +1704,14 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
          ppd_file_t   *ppd)		/* I - PPD file */
 {
  /*
+  * Disable CTRL-D so that embedded files don't cause printing
+  * errors...
+  */
+
+  puts("% Disable CTRL-D as an end-of-file marker...");
+  puts("userdict dup(\\004)cvn{}put (\\004\\004)cvn{}put");
+
+ /*
   * Mark any options from %%IncludeFeature: comments...
   */
 
@@ -1830,7 +1856,7 @@ end_nup(pstops_doc_t *doc,		/* I - Document information */
         int          number)		/* I - Page number */
 {
   if (doc->mirror || Orientation || doc->number_up > 1)
-    puts("userdict /ESPsave get restore");
+    puts("userdict/ESPsave get restore");
 
   switch (doc->number_up)
   {
@@ -2711,13 +2737,12 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
           ty = 0.5 * (pagew - 3 * l);
 
           if (doc->normal_landscape)
-            doc_printf(doc, "0.0 %.1f translate -90 rotate\n", pagel);
+            doc_printf(doc, "0 %.1f translate -90 rotate\n", pagel);
 	  else
-	    doc_printf(doc, "%.1f 0.0 translate 90 rotate\n", pagew);
+	    doc_printf(doc, "%.1f 0 translate 90 rotate\n", pagew);
 
           doc_printf(doc, "%.1f %.1f translate %.3f %.3f scale\n",
-                     tx + x * y * pagel * 0.5, ty + pagew * 0.333,
-		     w / bboxw, l / bboxl);
+                     tx + x * w, ty + y * l, l / bboxl, w / bboxw);
         }
 	else
 	{
@@ -2753,17 +2778,17 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
             l = w * bboxl / bboxw;
           }
 
-          tx = 0.5 * (pagel - 3 * w);
-          ty = 0.5 * (pagew - 2 * l);
+	  tx = 0.5 * (pagel - 3 * w);
+	  ty = 0.5 * (pagew - 2 * l);
 
           if (doc->normal_landscape)
-	    doc_printf(doc, "%.1f 0.0 translate 90 rotate\n", pagew);
+	    doc_printf(doc, "%.1f 0 translate 90 rotate\n", pagew);
 	  else
-            doc_printf(doc, "0.0 %.1f translate -90 rotate\n", pagel);
+            doc_printf(doc, "0 %.1f translate -90 rotate\n", pagel);
 
           doc_printf(doc, "%.1f %.1f translate %.3f %.3f scale\n",
-                     tx + x * pagel * 0.333, ty + y * pagew * 0.5,
-		     w / bboxw, l / bboxl);
+                     tx + w * x, ty + l * y, w / bboxw, l / bboxl);
+
         }
         break;
 
@@ -2910,5 +2935,5 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 5382 2006-04-07 14:58:44Z mike $".
+ * End of "$Id: pstops.c 5569 2006-05-22 18:30:52Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: var.c 5331 2006-03-23 21:21:19Z mike $"
+ * "$Id: var.c 5548 2006-05-19 19:38:31Z mike $"
  *
  *   CGI form variable and array functions.
  *
@@ -949,7 +949,8 @@ cgi_passwd(const char *prompt)		/* I - Prompt (not used) */
 {
   (void)prompt;
 
-  fprintf(stderr, "DEBUG: cgi_passwd(prompt=\"%s\") called!\n", prompt);
+  fprintf(stderr, "DEBUG: cgi_passwd(prompt=\"%s\") called!\n",
+          prompt ? prompt : "(null)");
 
  /*
   * Send a 401 (unauthorized) status to the server, so it can notify
@@ -1026,5 +1027,5 @@ cgi_unlink_file(void)
 
 
 /*
- * End of "$Id: var.c 5331 2006-03-23 21:21:19Z mike $".
+ * End of "$Id: var.c 5548 2006-05-19 19:38:31Z mike $".
  */

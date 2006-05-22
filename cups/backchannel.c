@@ -1,5 +1,5 @@
 /*
- * "$Id: backchannel.c 5138 2006-02-21 10:49:06Z mike $"
+ * "$Id: backchannel.c 5550 2006-05-19 20:20:15Z mike $"
  *
  *   Backchannel functions for the Common UNIX Printing System (CUPS).
  *
@@ -161,7 +161,7 @@ cupsBackChannelWrite(
       * Write error - abort on fatal errors...
       */
 
-      if (errno != EINTR && errno != EAGAIN)
+      if (errno != EINTR)
         return (-1);
     }
     else
@@ -197,5 +197,5 @@ cups_setup(fd_set         *set,		/* I - Set for select() */
 
 
 /*
- * End of "$Id: backchannel.c 5138 2006-02-21 10:49:06Z mike $".
+ * End of "$Id: backchannel.c 5550 2006-05-19 20:20:15Z mike $".
  */

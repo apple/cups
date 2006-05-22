@@ -1,9 +1,9 @@
 /*
- * "$Id: image-gif.c 4741 2005-10-02 04:25:52Z mike $"
+ * "$Id: image-gif.c 5508 2006-05-11 11:41:16Z mike $"
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -220,6 +220,8 @@ _cupsImageReadGIF(
         	  break;
               case CUPS_IMAGE_RGB :
               case CUPS_IMAGE_RGB_CMYK :
+        	  for (i = ncolors - 1; i >= 0; i --)
+        	    cupsImageRGBToRGB(cmap[i], cmap[i], 1);
         	  break;
 	    }
 
@@ -693,5 +695,5 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: image-gif.c 4741 2005-10-02 04:25:52Z mike $".
+ * End of "$Id: image-gif.c 5508 2006-05-11 11:41:16Z mike $".
  */

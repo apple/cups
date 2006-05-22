@@ -247,7 +247,7 @@
 *MediaType Saved/PrinterDefault: ""
 *MediaType Thermal/Thermal Transfer Media: "<</MediaType(Thermal)>>setpagedevice"
 *MediaType Direct/Direct Thermal Media: "<</MediaType(Direct)>>setpagedevice"
-*CloseUI: *zeMediaType
+*CloseUI: *MediaType
 
 *OpenGroup: PrinterSettings/Printer Settings
 *OpenUI *Darkness/Media Darkness: PickOne
@@ -289,7 +289,7 @@
 *OpenUI *zePrintRate/Print Rate: PickOne
 *OrderDependency: 20 AnySetup *zePrintRate
 *DefaultzePrintRate: Default
-*zePrintRate Default/PrinterDefault: Default
+*zePrintRate Default/PrinterDefault: ""
 *zePrintRate 1/1 inch/sec.: ""
 *zePrintRate 1.5/1.5 inch/sec.: ""
 *zePrintRate 2/2 inches/sec.: ""

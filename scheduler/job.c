@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 5494 2006-05-05 17:44:36Z mike $"
+ * "$Id: job.c 5543 2006-05-18 20:51:33Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -865,13 +865,6 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   cups_file_t		*fp;		/* Job file */
   int			fileid;		/* Current file ID */
   ipp_attribute_t	*attr;		/* Job attribute */
-  char			scheme[32],	/* Scheme portion of URI */
-			username[64],	/* Username portion of URI */
-			host[HTTP_MAX_HOST],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
   const char		*dest;		/* Destination */
   mime_type_t		**filetypes;	/* New filetypes array */
   int			*compressions;	/* New compressions array */
@@ -879,7 +872,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
   if (job->attrs)
   {
-    if (job->state_value >= IPP_JOB_STOPPED)
+    if (job->state_value > IPP_JOB_STOPPED)
       job->access_time = time(NULL);
 
     return;
@@ -955,11 +948,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       return;
     }
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, scheme,
-                    sizeof(scheme), username, sizeof(username), host,
-		    sizeof(host), &port, resource, sizeof(resource));
-
-    if ((dest = cupsdValidateDest(host, resource, &(job->dtype),
+    if ((dest = cupsdValidateDest(attr->values[0].string.text, &(job->dtype),
                                   NULL)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2027,7 +2016,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     {
       cupsArrayAdd(Jobs, job);
 
-      if (job->state_value < IPP_JOB_STOPPED)
+      if (job->state_value <= IPP_JOB_STOPPED)
       {
         cupsArrayAdd(ActiveJobs, job);
 	cupsdLoadJob(job);
@@ -2285,7 +2274,7 @@ load_request_root(void)
 
       cupsArrayAdd(Jobs, job);
 
-      if (job->state_value < IPP_JOB_STOPPED)
+      if (job->state_value <= IPP_JOB_STOPPED)
         cupsArrayAdd(ActiveJobs,job);
       else
         unload_job(job);
@@ -2643,8 +2632,23 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   if (job->current_file == 0)
   {
+   /*
+    * Set the processing time...
+    */
+
     set_time(job, "time-at-processing");
+
+   /*
+    * Create the backchannel pipes and make them non-blocking...
+    */
+
     cupsdOpenPipe(job->back_pipes);
+
+    fcntl(job->back_pipes[0], F_SETFL,
+          fcntl(job->back_pipes[0], F_GETFL) | O_NONBLOCK);
+
+    fcntl(job->back_pipes[1], F_SETFL,
+          fcntl(job->back_pipes[1], F_GETFL) | O_NONBLOCK);
   }
 
  /*
@@ -3440,5 +3444,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 5494 2006-05-05 17:44:36Z mike $".
+ * End of "$Id: job.c 5543 2006-05-18 20:51:33Z mike $".
  */

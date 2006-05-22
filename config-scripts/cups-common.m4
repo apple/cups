@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id: cups-common.m4 5502 2006-05-08 21:09:15Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -29,7 +29,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Versio number information...
-CUPS_VERSION="1.2svn"
+CUPS_VERSION="1.3svn"
 CUPS_REVISION=""
 if test -z "$CUPS_REVISION" -a -d .svn; then
 	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -265,5 +265,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id: cups-common.m4 5502 2006-05-08 21:09:15Z mike $".
 dnl

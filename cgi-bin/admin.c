@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 5425 2006-04-18 19:59:05Z mike $"
+ * "$Id: admin.c 5571 2006-05-22 18:46:55Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -93,7 +93,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (!http)
   {
     perror("ERROR: Unable to connect to cupsd");
-    fprintf(stderr, "DEBUG: cupsServer()=\"%s\"\n", cupsServer());
+    fprintf(stderr, "DEBUG: cupsServer()=\"%s\"\n",
+            cupsServer() ? cupsServer() : "(null)");
     fprintf(stderr, "DEBUG: ippPort()=%d\n", ippPort());
     fprintf(stderr, "DEBUG: cupsEncryption()=%d\n", cupsEncryption());
     exit(1);
@@ -481,7 +482,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
     char	refresh[1024];		/* Refresh URL */
 
     cgiFormEncode(uri, name, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "5;/admin/?OP=redirect&URL=/classes/%s",
+    snprintf(refresh, sizeof(refresh), "5;URL=/admin/?OP=redirect&URL=/classes/%s",
              uri);
     cgiSetVariable("refresh_page", refresh);
 
@@ -534,8 +535,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 		};
 
 
+  ptr = cgiGetVariable("DEVICE_URI");
   fprintf(stderr, "DEBUG: do_am_printer: DEVICE_URI=\"%s\"\n",
-          cgiGetVariable("DEVICE_URI"));
+          ptr ? ptr : "(null)");
 
   title = cgiText(modify ? _("Modify Printer") : _("Add Printer"));
 
@@ -1041,7 +1043,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	         "5;/admin/?OP=redirect&URL=/printers/%s", uri);
       else
 	snprintf(refresh, sizeof(refresh),
-	         "5;/admin/?OP=set-printer-options&PRINTER_NAME=%s", uri);
+	         "5;URL=/admin/?OP=set-printer-options&PRINTER_NAME=%s", uri);
 
       cgiSetVariable("refresh_page", refresh);
 
@@ -1489,7 +1491,9 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
 
         *keyptr = '\0';
 
-        if (!strcmp(keyword, "PageRegion"))
+        if (!strcmp(keyword, "PageRegion") ||
+	    !strcmp(keyword, "PaperDimension") ||
+	    !strcmp(keyword, "ImageableArea"))
 	  var = cgiGetVariable("PageSize");
 	else
 	  var = cgiGetVariable(keyword);
@@ -1561,7 +1565,7 @@ do_config_printer(http_t *http)		/* I - HTTP connection */
 
       cgiFormEncode(uri, printer, sizeof(uri));
       snprintf(refresh, sizeof(refresh),
-               "5;/admin/?OP=redirect&URL=/printers/%s", uri);
+               "5;URL=/admin/?OP=redirect&URL=/printers/%s", uri);
       cgiSetVariable("refresh_page", refresh);
 
       cgiStartHTML(title);
@@ -1623,7 +1627,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     }
     else
     {
-      cgiSetVariable("refresh_page", "5;/admin/?OP=redirect");
+      cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect");
       cgiStartHTML(cgiText(_("Change Settings")));
       cgiCopyTemplateLang("restart.tmpl");
     }
@@ -1717,7 +1721,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     }
     else
     {
-      cgiSetVariable("refresh_page", "5;/admin/?OP=redirect");
+      cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect");
 
       cgiStartHTML(cgiText(_("Edit Configuration File")));
       cgiCopyTemplateLang("restart.tmpl");
@@ -2478,7 +2482,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
 
     cgiRewriteURL(uri, url, sizeof(url), NULL);
     cgiFormEncode(uri, url, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "5;/admin/?OP=redirect&URL=%s", uri);
+    snprintf(refresh, sizeof(refresh), "5;URL=/admin/?OP=redirect&URL=%s", uri);
     cgiSetVariable("refresh_page", refresh);
 
     cgiStartHTML(title);
@@ -2736,7 +2740,8 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
 
       cgiRewriteURL(uri, url, sizeof(url), NULL);
       cgiFormEncode(uri, url, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "5;/admin/?OP=redirect&URL=%s", uri);
+      snprintf(refresh, sizeof(refresh), "5;URL=/admin/?OP=redirect&URL=%s",
+               uri);
       cgiSetVariable("refresh_page", refresh);
 
       cgiStartHTML(cgiText(_("Set Allowed Users")));
@@ -2826,7 +2831,7 @@ do_set_sharing(http_t *http)		/* I - HTTP connection */
 
     cgiRewriteURL(uri, url, sizeof(url), NULL);
     cgiFormEncode(uri, url, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "5;/admin/?OP=redirect&URL=%s", uri);
+    snprintf(refresh, sizeof(refresh), "5;URL=/admin/?OP=redirect&URL=%s", uri);
     cgiSetVariable("refresh_page", refresh);
 
     cgiStartHTML(cgiText(_("Set Publishing")));
@@ -2888,5 +2893,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 5425 2006-04-18 19:59:05Z mike $".
+ * End of "$Id: admin.c 5571 2006-05-22 18:46:55Z mike $".
  */

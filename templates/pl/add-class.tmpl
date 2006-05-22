@@ -1,7 +1,7 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 
-<H2 CLASS="title">Utwórz Grupę</H2>
+<H2 CLASS="title">Dodaj klasę</H2>
 
 <TABLE>
 <TR>
@@ -17,7 +17,7 @@
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"></TD>
 </TR>
 <TR>
-<TH CLASS="label">Składniki:</TH>
+<TH CLASS="label">Elementy:</TH>
 <TD>
 <SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
 {[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
@@ -26,7 +26,7 @@
 </TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="IMAGE" SRC="/images/button-add-class.gif" ALT="Dodaj Klasę"></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-add-class.gif" ALT="Dodaj klasę"></TD>
 </TR>
 </TABLE>
 

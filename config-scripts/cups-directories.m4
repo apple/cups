@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id: cups-directories.m4 5546 2006-05-19 12:44:15Z mike $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -130,9 +130,11 @@ if test x$rcdir = x; then
 		Darwin*)
 			# Darwin and MacOS X...
 			INITDIR=""
-			AC_CHECK_PROG(INITDDIR, launchd, 
-				"/System/Library/LaunchDaemons", 
-				"/System/Library/StartupItems/PrintingServices")
+			if test -x /sbin/launchd; then
+				INITDDIR="/System/Library/LaunchDaemons"
+			else 
+				INITDDIR="/System/Library/StartupItems/PrintingServices"
+			fi
 			;;
 
 		Linux | GNU)
@@ -300,5 +302,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id: cups-directories.m4 5546 2006-05-19 12:44:15Z mike $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h 5485 2006-05-02 23:59:56Z mike $"
+ * "$Id: raster.h 5516 2006-05-11 23:54:05Z mike $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -303,19 +303,8 @@ typedef struct cups_page_header2_s	/**** Version 2 Page Header @since CUPS 1.2@ 
   char		cupsPageSizeName[64];	/* PageSize name @since CUPS 1.2@ */
 } cups_page_header2_t;
 
-typedef struct _cups_raster_s		/**** Raster stream data ****/
-{
-  unsigned		sync;		/* Sync word from start of stream */
-  int			fd;		/* File descriptor */
-  cups_mode_t		mode;		/* Read/write mode */
-  cups_page_header2_t	header;		/* Raster header for current page */
-  int			count,		/* Current row run-length count */
-			remaining,	/* Remaining rows in page image */
-			bpp;		/* Bytes per pixel/color */
-  unsigned char		*pixels,	/* Pixels for current row */
-			*pend,		/* End of pixel buffer */
-			*pcurrent;	/* Current byte in pixel buffer */
-} cups_raster_t;
+typedef struct _cups_raster_s cups_raster_t;
+					/**** Raster stream data ****/
 
 typedef int (*cups_interpret_cb_t)(cups_page_header2_t *header, int preferred_bits);
 
@@ -353,5 +342,5 @@ extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h 5485 2006-05-02 23:59:56Z mike $".
+ * End of "$Id: raster.h 5516 2006-05-11 23:54:05Z mike $".
  */

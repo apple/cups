@@ -1,9 +1,9 @@
 /*
- * "$Id: image-jpeg.c 4741 2005-10-02 04:25:52Z mike $"
+ * "$Id: image-jpeg.c 5508 2006-05-11 11:41:16Z mike $"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -195,7 +195,6 @@ _cupsImageReadJPEG(
       cupsImageRGBAdjust(in, img->xsize, saturation, hue);
 
     if ((img->colorspace == CUPS_IMAGE_WHITE && cinfo.out_color_space == JCS_GRAYSCALE) ||
-        (img->colorspace == CUPS_IMAGE_RGB && cinfo.out_color_space == JCS_RGB) ||
 	(img->colorspace == CUPS_IMAGE_CMYK && cinfo.out_color_space == JCS_CMYK))
     {
 #ifdef DEBUG
@@ -255,6 +254,9 @@ _cupsImageReadJPEG(
         default :
 	    break;
 
+        case CUPS_IMAGE_RGB :
+            cupsImageRGBToRGB(in, out, img->xsize);
+	    break;
         case CUPS_IMAGE_WHITE :
             cupsImageRGBToWhite(in, out, img->xsize);
             break;
@@ -318,5 +320,5 @@ _cupsImageReadJPEG(
 
 
 /*
- * End of "$Id: image-jpeg.c 4741 2005-10-02 04:25:52Z mike $".
+ * End of "$Id: image-jpeg.c 5508 2006-05-11 11:41:16Z mike $".
  */

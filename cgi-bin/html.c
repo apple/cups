@@ -1,5 +1,5 @@
 /*
- * "$Id: html.c 4921 2006-01-12 21:26:26Z mike $"
+ * "$Id: html.c 5548 2006-05-19 19:38:31Z mike $"
  *
  *   HTML support functions for the Common UNIX Printing System (CUPS).
  *
@@ -175,12 +175,13 @@ cgi_null_passwd(const char *prompt)	/* I - Prompt string (unused) */
 {
   (void)prompt;
 
-  fprintf(stderr, "DEBUG: cgi_null_passwd(prompt=\"%s\") called!\n", prompt);
+  fprintf(stderr, "DEBUG: cgi_null_passwd(prompt=\"%s\") called!\n",
+          prompt ? prompt : "(null)");
 
   return (NULL);
 }
 
 
 /*
- * End of "$Id: html.c 4921 2006-01-12 21:26:26Z mike $".
+ * End of "$Id: html.c 5548 2006-05-19 19:38:31Z mike $".
  */

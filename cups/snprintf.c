@@ -1,5 +1,5 @@
 /*
- * "$Id: snprintf.c 4683 2005-09-21 22:17:44Z mike $"
+ * "$Id: snprintf.c 5527 2006-05-15 19:37:11Z mike $"
  *
  *   snprintf functions for the Common UNIX Printing System (CUPS).
  *
@@ -96,7 +96,10 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
       if (*format == '*')
       {
-        // Get width from argument...
+       /*
+        * Get width from argument...
+	*/
+
 	format ++;
 	width = va_arg(ap, int);
 
@@ -125,7 +128,10 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
         if (*format == '*')
 	{
-          // Get precision from argument...
+         /*
+	  * Get precision from argument...
+	  */
+
 	  format ++;
 	  prec = va_arg(ap, int);
 
@@ -362,6 +368,6 @@ _cups_snprintf(char       *buffer,	/* O - Output buffer */
 
 
 /*
- * End of "$Id: snprintf.c 4683 2005-09-21 22:17:44Z mike $".
+ * End of "$Id: snprintf.c 5527 2006-05-15 19:37:11Z mike $".
  */
 

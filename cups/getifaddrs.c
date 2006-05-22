@@ -1,5 +1,5 @@
 /*
- * "$Id: getifaddrs.c 5466 2006-04-26 19:52:27Z mike $"
+ * "$Id: getifaddrs.c 5503 2006-05-10 18:55:39Z mike $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -182,8 +182,9 @@ _cups_getifaddrs(struct ifaddrs **addrs)/* O - List of interfaces */
 	* Got it, make a copy...
 	*/
 
-	if ((temp->ifa_dstaddr = calloc(1, sizeof(request.ifr_broadaddr))) != NULL)
-	  memcpy(temp->ifa_dstaddr, &(request.ifr_broadaddr),
+	if ((temp->ifa_broadaddr =
+	         calloc(1, sizeof(request.ifr_broadaddr))) != NULL)
+	  memcpy(temp->ifa_broadaddr, &(request.ifr_broadaddr),
 		 sizeof(request.ifr_broadaddr));
       }
     }
@@ -271,5 +272,5 @@ _cups_freeifaddrs(struct ifaddrs *addrs)/* I - Interface list to free */
 
 
 /*
- * End of "$Id: getifaddrs.c 5466 2006-04-26 19:52:27Z mike $".
+ * End of "$Id: getifaddrs.c 5503 2006-05-10 18:55:39Z mike $".
  */

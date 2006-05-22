@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c 5154 2006-02-23 01:36:15Z mike $"
+ * "$Id: lpadmin.c 5544 2006-05-18 21:00:16Z mike $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -466,6 +466,25 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      return (1);
 	    break;
 
+        case 'U' : /* Username */
+	    if (argv[i][2] != '\0')
+	      cupsSetUser(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i >= argc)
+	      {
+	        _cupsLangPrintf(stderr,
+		                _("%s: Error - expected username after "
+				  "\'-U\' option!\n"),
+		        	argv[0]);
+	        return (1);
+	      }
+
+              cupsSetUser(argv[i]);
+	    }
+	    break;
+	    
         case 'u' : /* Allow/deny users */
 	    if (argv[i][2])
 	      val = argv[i] + 2;
@@ -1965,5 +1984,5 @@ validate_name(const char *name)		/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c 5154 2006-02-23 01:36:15Z mike $".
+ * End of "$Id: lpadmin.c 5544 2006-05-18 21:00:16Z mike $".
  */

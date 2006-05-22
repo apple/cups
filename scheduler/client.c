@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5491 2006-05-04 20:53:35Z mike $"
+ * "$Id: client.c 5567 2006-05-22 15:33:11Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1376,7 +1376,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
               cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                      "cupsdReadClient: %d command=\"%s\", "
 			      "options = \"%s\"",
-	        	      con->http.fd, con->command, con->options);
+	        	      con->http.fd, con->command,
+	        	      con->options ? con->options : "(null)");
 
 	      if (con->http.version <= HTTP_1_0)
 		con->http.keep_alive = HTTP_KEEPALIVE_OFF;
@@ -3507,7 +3508,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "pipe_command: command=\"%s\", options=\"%s\"",
-                  command, options);
+                  command, options ? options : "(null)");
 
   argv[0]      = command;
   query_string = NULL;
@@ -3824,5 +3825,5 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5491 2006-05-04 20:53:35Z mike $".
+ * End of "$Id: client.c 5567 2006-05-22 15:33:11Z mike $".
  */

@@ -187,7 +187,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   topic = cgiGetVariable("TOPIC");
   si    = helpSearchIndex(hi, query, topic, helpfile);
 
-  fprintf(stderr, "DEBUG: query=\"%s\", topic=\"%s\"\n", query, topic);
+  fprintf(stderr, "DEBUG: query=\"%s\", topic=\"%s\"\n",
+          query ? query : "(null)", topic ? topic : "(null)");
 
   if (si)
   {
