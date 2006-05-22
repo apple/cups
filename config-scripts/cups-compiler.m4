@@ -310,8 +310,11 @@ else
 			# Warning 829 is passing constant string as char *
 			CXXFLAGS="+W336,829 $CXXFLAGS"
 
-			if test "x$with_optim" = x; then
-				OPTIM="+DAportable $OPTIM"
+			if test -z "$with_archflags"; then
+				# Build portable binaries for all HP systems...
+				ARCHFLAGS="+DAportable"
+			else
+				ARCHFLAGS="$with_archflags"
 			fi
 
 			if test $PICFLAG = 1; then
@@ -408,7 +411,16 @@ else
 					# warning messages, and default to
 					# 64-bit compiles of everything else...
 					OPTIM="-w $OPTIM"
-					ARCHFLAGS="-xarch=generic64 $ARCHFLAGS"
+				fi
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch64flags"; then
+						ARCHFLAGS="-xarch=generic64"
+					else
+						ARCHFLAGS="$with_arch64flags"
+					fi
+				else
+					ARCHFLAGS="$with_archflags"
 				fi
 			else
 				if test "x$enable_64bit" = xyes; then
@@ -419,22 +431,23 @@ else
 					LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
 					LIB64DIR="$exec_prefix/lib/64"
 					UNINSTALL64="uninstall64bit"
+				fi
 
-					if test "x$with_optim" = x; then
-						# Suppress all of Sun's questionable
-						# warning messages, and default to
-						# 32-bit compiles of everything else...
-						OPTIM="-w $OPTIM"
-						ARCHFLAGS="-xarch=generic $ARCHFLAGS"
+				if test "x$with_optim" = x; then
+					# Suppress all of Sun's questionable
+					# warning messages, and default to
+					# 32-bit compiles of everything else...
+					OPTIM="-w $OPTIM"
+				fi
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch32flags"; then
+						ARCHFLAGS="-xarch=generic"
+					else
+						ARCHFLAGS="$with_arch32flags"
 					fi
 				else
-					if test "x$with_optim" = x; then
-						# Suppress all of Sun's questionable
-						# warning messages, and default to
-						# 32-bit compiles of everything else...
-						OPTIM="-w $OPTIM"
-						ARCHFLAGS="-xarch=generic $ARCHFLAGS"
-					fi
+					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 			;;
