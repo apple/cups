@@ -419,7 +419,7 @@ show_class(http_t     *http,		/* I - Connection to server */
       */
 
       cgiFormEncode(uri, pclass, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "10;/classes/%s", uri);
+      snprintf(refresh, sizeof(refresh), "10;URL=/classes/%s", uri);
       cgiSetVariable("refresh_page", refresh);
     }
 

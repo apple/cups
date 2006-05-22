@@ -482,7 +482,7 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
     {
       cgiRewriteURL(job_printer_uri, resource, sizeof(resource), NULL);
       cgiFormEncode(uri, resource, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "2;%s", uri);
+      snprintf(refresh, sizeof(refresh), "2;URL=%s", uri);
       cgiSetVariable("refresh_page", refresh);
     }
 
@@ -598,7 +598,7 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
     */
 
     cgiFormEncode(uri, resource, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "2;%s", uri);
+    snprintf(refresh, sizeof(refresh), "2;URL=%s", uri);
     cgiSetVariable("refresh_page", refresh);
   }
 
