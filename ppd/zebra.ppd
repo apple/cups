@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: zebra.ppd 5510 2006-05-11 17:41:54Z mike $"
+*% "$Id: zebra.ppd 5511 2006-05-11 17:43:12Z mike $"
 *%
 *%   Sample Zebra label printer driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -479,5 +479,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: zebra.ppd 5510 2006-05-11 17:41:54Z mike $".
+*% End of "$Id: zebra.ppd 5511 2006-05-11 17:43:12Z mike $".
 *%

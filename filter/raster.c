@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c 5523 2006-05-15 05:02:43Z mike $"
+ * "$Id: raster.c 5522 2006-05-15 05:02:15Z mike $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -964,5 +964,5 @@ cups_write(int                 fd,	/* I - File descriptor */
 
 
 /*
- * End of "$Id: raster.c 5523 2006-05-15 05:02:43Z mike $".
+ * End of "$Id: raster.c 5522 2006-05-15 05:02:15Z mike $".
  */

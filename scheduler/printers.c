@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5533 2006-05-16 19:45:14Z mike $"
+ * "$Id: printers.c 5535 2006-05-16 19:47:26Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -405,6 +405,10 @@ cupsdCreateCommonData(void)
 
   /* copies-supported */
   ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
+
+  /* document-format-default */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
+               "document-format-default", NULL, "application/octet-stream");
 
   /* generated-natural-language-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
@@ -2400,25 +2404,18 @@ cupsdUpdatePrinters(void)
 
 const char *				/* O - Printer or class name */
 cupsdValidateDest(
-    const char      *uri,		/* I - Printer URI */
+    const char      *hostname,		/* I - Host name */
+    const char      *resource,		/* I - Resource name */
     cups_ptype_t    *dtype,		/* O - Type (printer or class) */
     cupsd_printer_t **printer)		/* O - Printer pointer */
 {
   cupsd_printer_t	*p;		/* Current printer */
   char			localname[1024],/* Localized hostname */
 			*lptr,		/* Pointer into localized hostname */
-			*sptr,		/* Pointer into server name */
-			*rptr,		/* Pointer into resource */
-			scheme[32],	/* Scheme portion of URI */
-			username[64],	/* Username portion of URI */
-			hostname[HTTP_MAX_HOST],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
+			*sptr;		/* Pointer into server name */
 
 
-  DEBUG_printf(("cupsdValidateDest(uri=\"%s\", dtype=%p, printer=%p)\n", uri,
+  DEBUG_printf(("cupsdValidateDest(\"%s\", \"%s\", %p, %p)\n", hostname, resource,
                 dtype, printer));
 
  /*
@@ -2428,16 +2425,7 @@ cupsdValidateDest(
   if (printer)
     *printer = NULL;
 
-  if (dtype)
-    *dtype = (cups_ptype_t)0;
-
- /*
-  * Pull the hostname and resource from the URI...
-  */
-
-  httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
-                  username, sizeof(username), hostname, sizeof(hostname),
-		  &port, resource, sizeof(resource));
+  *dtype = (cups_ptype_t)0;
 
  /*
   * See if the resource is a class or printer...
@@ -2449,7 +2437,7 @@ cupsdValidateDest(
     * Class...
     */
 
-    rptr = resource + 9;
+    resource += 9;
   }
   else if (!strncmp(resource, "/printers/", 10))
   {
@@ -2457,7 +2445,7 @@ cupsdValidateDest(
     * Printer...
     */
 
-    rptr = resource + 10;
+    resource += 10;
   }
   else
   {
@@ -2472,19 +2460,17 @@ cupsdValidateDest(
   * See if the printer or class name exists...
   */
 
-  p = cupsdFindDest(rptr);
+  p = cupsdFindDest(resource);
 
-  if (p == NULL && strchr(rptr, '@') == NULL)
+  if (p == NULL && strchr(resource, '@') == NULL)
     return (NULL);
   else if (p != NULL)
   {
     if (printer)
       *printer = p;
 
-    if (dtype)
-      *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
-                          CUPS_PRINTER_REMOTE);
-
+    *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+                        CUPS_PRINTER_REMOTE);
     return (p->name);
   }
 
@@ -2493,7 +2479,7 @@ cupsdValidateDest(
   */
 
   if (!strcasecmp(hostname, "localhost"))
-    strlcpy(hostname, ServerName, sizeof(hostname));
+    hostname = ServerName;
 
   strlcpy(localname, hostname, sizeof(localname));
 
@@ -2535,15 +2521,13 @@ cupsdValidateDest(
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
     if (!strcasecmp(p->hostname, localname) &&
-        !strcasecmp(p->name, rptr))
+        !strcasecmp(p->name, resource))
     {
       if (printer)
         *printer = p;
 
-      if (dtype)
-	*dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
-                            CUPS_PRINTER_REMOTE);
-
+      *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+                          CUPS_PRINTER_REMOTE);
       return (p->name);
     }
 
@@ -2791,10 +2775,6 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
   if (!cupsGetOption("copies", p->num_options, p->options))
     ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "copies-default",
                   1);
-
-  if (!cupsGetOption("document-format", p->num_options, p->options))
-    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
-        	 "document-format-default", NULL, "application/octet-stream");
 
   if (!cupsGetOption("job-hold-until", p->num_options, p->options))
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -3300,5 +3280,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 5533 2006-05-16 19:45:14Z mike $".
+ * End of "$Id: printers.c 5535 2006-05-16 19:47:26Z mike $".
  */
