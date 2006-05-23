@@ -73,8 +73,9 @@ AC_CHECK_HEADER(zlib.h,
 	LIBZ="-lz"
 	LIBS="$LIBS -lz"))
 
-dnl PNG library uses math library functions...
-AC_CHECK_LIB(m, pow)
+dnl Image libraries use math library functions...
+AC_SEARCH_LIBS(atan2, m)
+AC_SEARCH_LIBS(pow, m)
 
 if test x$enable_png != xno; then
     AC_CHECK_HEADER(png.h,

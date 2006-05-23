@@ -386,7 +386,7 @@ else
 			# Solaris
 			if test -z "$OPTIM"; then
 				if test "x$with_optim" = x; then
-					OPTIM="-xO4"
+					OPTIM="-xO2"
 				else
 					OPTIM="$with_optim $OPTIM"
 				fi
