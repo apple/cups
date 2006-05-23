@@ -38,10 +38,6 @@ fi
 
 AC_SUBST(IMGFILTERS)
 
-dnl Save the current libraries since we don't want the image libraries
-dnl included with every program...
-SAVELIBS="$LIBS"
-
 dnl Check for image libraries...
 AC_ARG_ENABLE(jpeg, [  --enable-jpeg           turn on JPEG support, default=yes])
 AC_ARG_ENABLE(png, [  --enable-png            turn on PNG support, default=yes])
@@ -57,6 +53,14 @@ AC_SUBST(LIBPNG)
 AC_SUBST(LIBTIFF)
 AC_SUBST(LIBZ)
 
+dnl Image libraries use math library functions...
+AC_SEARCH_LIBS(pow, m)
+
+dnl Save the current libraries since we don't want the image libraries
+dnl included with every program...
+SAVELIBS="$LIBS"
+
+dnl JPEG library...
 if test x$enable_jpeg != xno; then
     AC_CHECK_HEADER(jpeglib.h,
 	AC_CHECK_LIB(jpeg, jpeg_destroy_decompress,
@@ -67,25 +71,24 @@ else
     AC_MSG_NOTICE([JPEG support disabled with --disable-jpeg.])
 fi
 
+dnl ZLIB library...
 AC_CHECK_HEADER(zlib.h,
     AC_CHECK_LIB(z, gzgets,
 	AC_DEFINE(HAVE_LIBZ)
 	LIBZ="-lz"
 	LIBS="$LIBS -lz"))
 
-dnl Image libraries use math library functions...
-AC_SEARCH_LIBS(atan2, m)
-AC_SEARCH_LIBS(pow, m)
-
+dnl PNG library...
 if test x$enable_png != xno; then
     AC_CHECK_HEADER(png.h,
 	AC_CHECK_LIB(png, png_create_read_struct,
 	    AC_DEFINE(HAVE_LIBPNG)
-	    LIBPNG="-lpng -lm"))
+	    LIBPNG="-lpng"))
 else
     AC_MSG_NOTICE([PNG support disabled with --disable-png.])
 fi
 
+dnl TIFF library...
 if test x$enable_tiff != xno; then
     AC_CHECK_HEADER(tiff.h,
 	AC_CHECK_LIB(tiff, TIFFReadScanline,
