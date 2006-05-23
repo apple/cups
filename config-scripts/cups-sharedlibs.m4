@@ -117,7 +117,7 @@ if test "$DSO" != ":"; then
 	# rather than to the executables.  This makes things smaller if you
 	# are using any static libraries, and it also allows us to distribute
 	# a single DSO rather than a bunch...
-	DSOLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
+	DSOLIBS="\$(LIBTIFF) \$(LIBPNG) \$(LIBJPEG) \$(LIBZ)"
 	IMGLIBS=""
 
 	# Tell the run-time linkers where to find a DSO.  Some platforms
@@ -165,7 +165,7 @@ if test "$DSO" != ":"; then
 	esac
 else
 	DSOLIBS=""
-	IMGLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
+	IMGLIBS="\$(LIBTIFF) \$(LIBPNG) \$(LIBJPEG) \$(LIBZ)"
 fi
 
 AC_SUBST(DSOLIBS)
