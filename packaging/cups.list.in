@@ -342,7 +342,7 @@ f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
 %subpackage ja
 f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
 %subpackage pl
-#f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
+f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
 %subpackage sv
 f 0644 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
 %subpackage

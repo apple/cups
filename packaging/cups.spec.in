@@ -399,7 +399,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/pl/images/*
 %dir /usr/share/cups/templates/pl
 /usr/share/cups/templates/pl/*
-#/usr/share/locale/pl/cups_pl.po
+/usr/share/locale/pl/cups_pl.po
 
 %files sv
 %defattr(-,root,root)
