@@ -33,13 +33,7 @@
  * Include necessary headers.
  */
 
-#include <cups/backend.h>
-#include <cups/cups.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <cups/string.h>
-#include <signal.h>
+#include "backend-private.h"
 
 #ifdef __hpux
 #  include <sys/modem.h>

@@ -25,51 +25,41 @@
  *
  * Contents:
  *
- *   get_device_id()  - Get the IEEE-1284 device ID string and corresponding
- *                      URI.
- *   get_make_model() - Get the make and model string from the device ID.
+ *   backendGetDeviceID()  - Get the IEEE-1284 device ID string and
+ *                           corresponding URI.
+ *   backendGetMakeModel() - Get the make and model string from the device ID.
  */
 
 /*
  * Include necessary headers.
  */
 
-#include <cups/debug.h>
+#include "backend-private.h"
+
+#ifdef __linux
+#  include <sys/ioctl.h>
+#  include <linux/lp.h>
+#  define IOCNR_GET_DEVICE_ID		1
+#  define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
+#endif /* __linux */
+
+#ifdef __sun
+#  ifdef __sparc
+#    include <sys/ecppio.h>
+#  else
+#    include <sys/ioccom.h>
+#    include <sys/ecppsys.h>
+#  endif /* __sparc */
+#endif /* __sun */
 
 
 /*
- * Prototypes...
+ * 'backendGetDeviceID()' - Get the IEEE-1284 device ID string and
+ *                          corresponding URI.
  */
-
-static int	get_make_model(const char *device_id, char *make_model,
-		               int make_model_size);
-
-
-/*
- * 'get_device_id()' - Get the IEEE-1284 device ID string and
- *                     corresponding URI.
- */
-
-#ifndef SNMP_BACKEND
-#  ifdef __linux
-#    include <sys/ioctl.h>
-#    include <linux/lp.h>
-#    define IOCNR_GET_DEVICE_ID		1
-#    define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
-#  endif /* __linux */
-
-#  ifdef __sun
-#    ifdef __sparc
-#      include <sys/ecppio.h>
-#    else
-#      include <sys/ioccom.h>
-#      include <sys/ecppsys.h>
-#    endif /* __sparc */
-#  endif /* __sun */
-
 
 int					/* O - 0 on success, -1 on failure */
-get_device_id(
+backendGetDeviceID(
     int        fd,			/* I - File descriptor */
     char       *device_id,		/* O - 1284 device ID */
     int        device_id_size,		/* I - Size of buffer */
@@ -93,7 +83,7 @@ get_device_id(
 #endif /* __sun && ECPPIOC_GETDEVID */
 
 
-  DEBUG_printf(("get_device_id(fd=%d, device_id=%p, device_id_size=%d, "
+  DEBUG_printf(("backendGetDeviceID(fd=%d, device_id=%p, device_id_size=%d, "
                 "make_model=%p, make_model_size=%d, scheme=\"%s\", "
 		"uri=%p, uri_size=%d)\n", fd, device_id, device_id_size,
 		make_model, make_model_size, scheme ? scheme : "(null)",
@@ -107,7 +97,7 @@ get_device_id(
       !device_id || device_id_size < 32 ||
       !make_model || make_model_size < 32)
   {
-    DEBUG_puts("get_device_id: Bad args!");
+    DEBUG_puts("backendGetDeviceID: Bad args!");
     return (-1);
   }
 
@@ -155,7 +145,7 @@ get_device_id(
   }
 #  ifdef DEBUG
   else
-    printf("get_device_id: ioctl failed - %s\n", strerror(errno));
+    printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
 #  endif /* DEBUG */
 #endif /* __linux */
 
@@ -178,11 +168,11 @@ get_device_id(
   }
 #  ifdef DEBUG
   else
-    printf("get_device_id: ioctl failed - %s\n", strerror(errno));
+    printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
 #  endif /* DEBUG */
 #endif /* __sun && ECPPIOC_GETDEVID */
 
-  DEBUG_printf(("get_device_id: device_id=\"%s\"\n", device_id));
+  DEBUG_printf(("backendGetDeviceID: device_id=\"%s\"\n", device_id));
 
   if (!*device_id)
     return (-1);
@@ -191,7 +181,7 @@ get_device_id(
   * Get the make and model...
   */
 
-  get_make_model(device_id, make_model, make_model_size);
+  backendGetMakeModel(device_id, make_model, make_model_size);
 
  /*
   * Then generate a device URI...
@@ -303,15 +293,14 @@ get_device_id(
 
   return (0);
 }
-#endif /* !SNMP_BACKEND */
 
 
 /*
- * 'get_make_model()' - Get the make and model string from the device ID.
+ * 'backendGetMakeModel()' - Get the make and model string from the device ID.
  */
 
 int					/* O - 0 on success, -1 on failure */
-get_make_model(
+backendGetMakeModel(
     const char *device_id,		/* O - 1284 device ID */
     char       *make_model,		/* O - Make/model */
     int        make_model_size)		/* I - Size of buffer */
@@ -322,7 +311,7 @@ get_make_model(
 	*mdl;				/* Model string */
 
 
-  DEBUG_printf(("get_make_model(device_id=\"%s\", "
+  DEBUG_printf(("backendGetMakeModel(device_id=\"%s\", "
                 "make_model=%p, make_model_size=%d)\n", device_id,
 		make_model, make_model_size));
 
@@ -332,7 +321,7 @@ get_make_model(
 
   if (!device_id || !*device_id || !make_model || make_model_size < 32)
   {
-    DEBUG_puts("get_make_model: Bad args!");
+    DEBUG_puts("backendGetMakeModel: Bad args!");
     return (-1);
   }
 

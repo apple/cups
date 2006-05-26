@@ -55,30 +55,20 @@ print_device(const char *uri,		/* I - Device URI */
              const char *hostname,	/* I - Hostname/manufacturer */
              const char *resource,	/* I - Resource/modelname */
 	     const char *options,	/* I - Device options/serial number */
-	     int        fp,		/* I - File descriptor to print */
+	     int        print_fd,	/* I - File descriptor to print */
 	     int        copies,		/* I - Copies to print */
 	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
 	     char	*argv[])	/* I - Command-line arguments */
 {
-  int		usebc;			/* Use backchannel path? */
-  int		fd;			/* USB device */
-  int		rbytes;			/* Number of bytes read */
-  int		wbytes;			/* Number of bytes written */
-  size_t	nbytes,			/* Number of bytes read */
-		tbytes;			/* Total number of bytes written */
-  char		buffer[8192],		/* Output buffer */
-		*bufptr,		/* Pointer into buffer */
-		backbuf[1024];		/* Backchannel buffer */
+  int		use_bc;			/* Use backchannel path? */
+  int		device_fd;		/* USB device */
+  size_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
-  fd_set	input,			/* Input set for select() */
-		output;			/* Output set for select() */
-  int		paperout;		/* Paper out? */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;		/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-#ifdef __linux
+#if defined(__linux) && defined(LP_POUTPA)
   unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
-#endif /* __linux */
+  int		paperout;		/* Paper out? */
+#endif /* __linux && LP_POUTPA */
+
 
   (void)argc;
   (void)argv;
@@ -89,7 +79,7 @@ print_device(const char *uri,		/* I - Device URI */
   * when they get a read request...
   */
 
-  usebc = strcasecmp(hostname, "Canon") != 0;
+  use_bc = strcasecmp(hostname, "Canon") != 0;
 
  /*
   * Open the USB port device...
@@ -99,7 +89,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   do
   {
-    if ((fd = open_device(uri)) == -1)
+    if ((device_fd = open_device(uri)) == -1)
     {
       if (getenv("CLASS") != NULL)
       {
@@ -127,7 +117,8 @@ print_device(const char *uri,		/* I - Device URI */
         fputs("INFO: USB port busy; will retry in 30 seconds...\n", stderr);
 	sleep(30);
       }
-      else if (errno == ENXIO || errno == EIO || errno == ENOENT || errno == ENODEV)
+      else if (errno == ENXIO || errno == EIO || errno == ENOENT ||
+               errno == ENODEV)
       {
         fputs("INFO: Printer not connected; will retry in 30 seconds...\n", stderr);
 	sleep(30);
@@ -140,7 +131,7 @@ print_device(const char *uri,		/* I - Device URI */
       }
     }
   }
-  while (fd < 0);
+  while (device_fd < 0);
 
   fputs("STATE: -connecting-to-device\n", stderr);
 
@@ -148,28 +139,25 @@ print_device(const char *uri,		/* I - Device URI */
   * Set any options provided...
   */
 
-  tcgetattr(fd, &opts);
+  tcgetattr(device_fd, &opts);
 
   opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
 
   /**** No options supported yet ****/
 
-  tcsetattr(fd, TCSANOW, &opts);
-
- /*
-  * Check printer status...
-  */
-
-  paperout = 0;
+  tcsetattr(device_fd, TCSANOW, &opts);
 
 #if defined(__linux) && defined(LP_POUTPA)
  /*
   * Show the printer status before we send the file...
   */
 
-  while (!ioctl(fd, LPGETSTATUS, &status))
+  paperout = 0;
+
+  while (!ioctl(device_fd, LPGETSTATUS, &status))
   {
-    fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n", status);
+    fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n",
+            status);
 
     if (status & LP_POUTPA)
     {
@@ -191,146 +179,35 @@ print_device(const char *uri,		/* I - Device URI */
 #endif /* __linux && LP_POUTPA */
 
  /*
-  * Now that we are "connected" to the port, ignore SIGTERM so that we
-  * can finish out any page data the driver sends (e.g. to eject the
-  * current page...  Only ignore SIGTERM if we are printing data from
-  * stdin (otherwise you can't cancel raw jobs...)
-  */
-
-  if (!fp)
-  {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-    sigset(SIGTERM, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
-    memset(&action, 0, sizeof(action));
-
-    sigemptyset(&action.sa_mask);
-    action.sa_handler = SIG_IGN;
-    sigaction(SIGTERM, &action, NULL);
-#else
-    signal(SIGTERM, SIG_IGN);
-#endif /* HAVE_SIGSET */
-  }
-
- /*
   * Finally, send the print file...
   */
 
-  wbytes = 0;
+  tbytes = 0;
 
-  while (copies > 0)
+  while (copies > 0 && tbytes >= 0)
   {
     copies --;
 
-    if (fp != 0)
+    if (print_fd != 0)
     {
       fputs("PAGE: 1 1\n", stderr);
-      lseek(fp, 0, SEEK_SET);
+      lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = 0;
-    while ((nbytes = read(fp, buffer, sizeof(buffer))) > 0)
-    {
-     /*
-      * Write the print data to the printer...
-      */
+    tbytes = backendRunLoop(print_fd, device_fd, 1);
 
-      tbytes += nbytes;
-      bufptr = buffer;
-
-      while (nbytes > 0)
-      {
-       /*
-        * See if we are ready to read or write...
-	*/
-
-        do
-	{
-          FD_ZERO(&input);
-	  if (usebc)
-	    FD_SET(fd, &input);
-
-	  FD_ZERO(&output);
-	  FD_SET(fd, &output);
-        }
-	while (select(fd + 1, &input, &output, NULL, NULL) < 0);
-
-        if (FD_ISSET(fd, &input))
-	{
-	 /*
-	  * Read backchannel data...
-	  */
-
-	  if ((rbytes = read(fd, backbuf, sizeof(backbuf))) > 0)
-	  {
-	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
-	            rbytes);
-            cupsBackChannelWrite(backbuf, rbytes, 1.0);
-          }
-	}
-
-        if (FD_ISSET(fd, &output))
-	{
-	 /*
-	  * Write print data...
-	  */
-
-	  if ((wbytes = write(fd, bufptr, nbytes)) < 0)
-	    if (errno == ENOTTY)
-	      wbytes = write(fd, bufptr, nbytes);
-
-	  if (wbytes < 0)
-	  {
-	   /*
-	    * Check for retryable errors...
-	    */
-
-	    if (errno == ENOSPC)
-	    {
-	      paperout = 1;
-	      fputs("ERROR: Out of paper!\n", stderr);
-	      fputs("STATUS: +media-tray-empty-error\n", stderr);
-	    }
-	    else if (errno != EAGAIN && errno != EINTR)
-	    {
-	      perror("ERROR: Unable to send print file to printer");
-	      break;
-	    }
-	  }
-	  else
-	  {
-	   /*
-	    * Update count and pointer...
-	    */
-
-            if (paperout)
-	    {
-	      fputs("STATUS: -media-tray-empty-error\n", stderr);
-	      paperout = 0;
-	    }
-
-	    nbytes -= wbytes;
-	    bufptr += wbytes;
-	  }
-	}
-      }
-
-      if (wbytes < 0)
-        break;
-
-      if (fp)
-	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
-	        (unsigned long)tbytes);
-    }
+    if (print_fd != 0 && tbytes >= 0)
+      fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
+	      CUPS_LLCAST tbytes);
   }
 
  /*
   * Close the USB port and return...
   */
 
-  close(fd);
+  close(device_fd);
 
-  return (wbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
+  return (tbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }
 
 
@@ -372,9 +249,9 @@ list_devices(void)
 
     if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
     {
-      if (!get_device_id(fd, device_id, sizeof(device_id),
-                         make_model, sizeof(make_model),
-			 "usb", device_uri, sizeof(device_uri)))
+      if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
+                              make_model, sizeof(make_model),
+			      "usb", device_uri, sizeof(device_uri)))
 	printf("direct %s \"%s\" \"%s USB #%d\" \"%s\"\n", device_uri,
 	       make_model, make_model, i + 1, device_id);
 
@@ -401,9 +278,9 @@ list_devices(void)
 
     if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
     {
-      if (!get_device_id(fd, device_id, sizeof(device_id),
-                         make_model, sizeof(make_model),
-			 "usb", device_uri, sizeof(device_uri)))
+      if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
+                              make_model, sizeof(make_model),
+			      "usb", device_uri, sizeof(device_uri)))
 	printf("direct %s \"%s\" \"%s USB #%d\" \"%s\"\n", device_uri,
 	       make_model, make_model, i + 1, device_id);
 
@@ -486,9 +363,9 @@ open_device(const char *uri)		/* I - Device URI */
 
 	if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
 	{
-	  get_device_id(fd, device_id, sizeof(device_id),
-                        make_model, sizeof(make_model),
-			"usb", device_uri, sizeof(device_uri));
+	  backendGetDeviceID(fd, device_id, sizeof(device_id),
+                             make_model, sizeof(make_model),
+			     "usb", device_uri, sizeof(device_uri));
 	}
 	else
 	{
@@ -572,9 +449,9 @@ open_device(const char *uri)		/* I - Device URI */
 	sprintf(device, "/dev/usb/printer%d", i);
 
 	if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
-	  get_device_id(fd, device_id, sizeof(device_id),
-                        make_model, sizeof(make_model),
-			"usb", device_uri, sizeof(device_uri));
+	  backendGetDeviceID(fd, device_id, sizeof(device_id),
+                             make_model, sizeof(make_model),
+			     "usb", device_uri, sizeof(device_uri));
 	else
 	{
 	 /*

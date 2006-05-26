@@ -33,14 +33,7 @@
  * Include necessary headers.
  */
 
-#include <cups/backend.h>
-#include <cups/cups.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <cups/string.h>
-#include <signal.h>
-#include "ieee1284.c"
+#include "backend-private.h"
 
 #ifdef __hpux
 #  include <sys/time.h>
@@ -94,25 +87,20 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		resource[1024],		/* Resource info (device and options) */
 		*options;		/* Pointer to options */
   int		port;			/* Port number (not used) */
-  int		fp;			/* Print file */
+  int		print_fd,		/* Print file */
+		device_fd;		/* Parallel device */
   int		copies;			/* Number of copies to print */
-  int		fd;			/* Parallel device */
-  int		rbytes;			/* Number of bytes read */
-  int		wbytes;			/* Number of bytes written */
-  size_t	nbytes,			/* Number of bytes read */
-		tbytes;			/* Total number of bytes written */
-  char		buffer[8192],		/* Output buffer */
-		*bufptr;		/* Pointer into buffer */
+  size_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
   fd_set	input,			/* Input set for select() */
 		output;			/* Output set for select() */
+#if defined(__linux) && defined(LP_POUTPA)
+  unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
   int		paperout;		/* Paper out? */
+#endif /* __linux && LP_POUTPA */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-#ifdef __linux
-  unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
-#endif /* __linux */
 
 
  /*
@@ -157,8 +145,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 6)
   {
-    fp     = 0;
-    copies = 1;
+    print_fd = 0;
+    copies   = 1;
   }
   else
   {
@@ -166,7 +154,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Try to open the print file...
     */
 
-    if ((fp = open(argv[6], O_RDONLY)) < 0)
+    if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
       perror("ERROR: unable to open print file");
       return (CUPS_BACKEND_FAILED);
@@ -206,7 +194,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-    if ((fd = open(resource, O_WRONLY | O_EXCL)) == -1)
+    if ((device_fd = open(resource, O_WRONLY | O_EXCL)) == -1)
     {
       if (getenv("CLASS") != NULL)
       {
@@ -217,8 +205,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        fputs("INFO: Unable to open parallel port, queuing on next printer in class...\n",
-	      stderr);
+        fputs("INFO: Unable to open parallel port, queuing on next printer "
+	      "in class...\n", stderr);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -231,23 +219,26 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       if (errno == EBUSY)
       {
-        fputs("INFO: Parallel port busy; will retry in 30 seconds...\n", stderr);
+        fputs("INFO: Parallel port busy; will retry in 30 seconds...\n",
+	      stderr);
 	sleep(30);
       }
       else if (errno == ENXIO || errno == EIO || errno == ENOENT)
       {
-        fputs("INFO: Printer not connected; will retry in 30 seconds...\n", stderr);
+        fputs("INFO: Printer not connected; will retry in 30 seconds...\n",
+	      stderr);
 	sleep(30);
       }
       else
       {
-	fprintf(stderr, "ERROR: Unable to open parallel port device file \"%s\": %s\n",
+	fprintf(stderr,
+	        "ERROR: Unable to open parallel port device file \"%s\": %s\n",
 	        resource, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
     }
   }
-  while (fd < 0);
+  while (device_fd < 0);
 
   fputs("STATE: -connecting-to-device\n", stderr);
 
@@ -255,24 +246,20 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Set any options provided...
   */
 
-  tcgetattr(fd, &opts);
+  tcgetattr(device_fd, &opts);
 
   opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
 
   /**** No options supported yet ****/
 
-  tcsetattr(fd, TCSANOW, &opts);
-
- /*
-  * Check printer status...
-  */
-
-  paperout = 0;
+  tcsetattr(device_fd, TCSANOW, &opts);
 
 #if defined(__linux) && defined(LP_POUTPA)
  /*
   * Show the printer status before we send the file...
   */
+
+  paperout = 0;
 
   while (!ioctl(fd, LPGETSTATUS, &status))
   {
@@ -298,146 +285,38 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 #endif /* __linux && LP_POUTPA */
 
  /*
-  * Now that we are "connected" to the port, ignore SIGTERM so that we
-  * can finish out any page data the driver sends (e.g. to eject the
-  * current page...  Only ignore SIGTERM if we are printing data from
-  * stdin (otherwise you can't cancel raw jobs...)
-  */
-
-  if (argc < 7)
-  {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-    sigset(SIGTERM, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
-    memset(&action, 0, sizeof(action));
-
-    sigemptyset(&action.sa_mask);
-    action.sa_handler = SIG_IGN;
-    sigaction(SIGTERM, &action, NULL);
-#else
-    signal(SIGTERM, SIG_IGN);
-#endif /* HAVE_SIGSET */
-  }
-
- /*
   * Finally, send the print file...
   */
 
-  wbytes = 0;
+  tbytes = 0;
 
-  while (copies > 0)
+  while (copies > 0 && tbytes >= 0)
   {
     copies --;
 
-    if (fp != 0)
+    if (print_fd != 0)
     {
       fputs("PAGE: 1 1\n", stderr);
-      lseek(fp, 0, SEEK_SET);
+      lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = 0;
-    while ((nbytes = read(fp, buffer, sizeof(buffer))) > 0)
-    {
-     /*
-      * Write the print data to the printer...
-      */
+    tbytes = backendRunLoop(print_fd, device_fd, 1);
 
-      tbytes += nbytes;
-      bufptr = buffer;
-
-      while (nbytes > 0)
-      {
-       /*
-        * See if we are ready to read or write...
-	*/
-
-        do
-	{
-          FD_ZERO(&input);
-	  FD_SET(fd, &input);
-	  FD_ZERO(&output);
-	  FD_SET(fd, &output);
-        }
-	while (select(fd + 1, &input, &output, NULL, NULL) < 0);
-
-        if (FD_ISSET(fd, &input))
-	{
-	 /*
-	  * Read backchannel data...
-	  */
-
-	  if ((rbytes = read(fd, resource, sizeof(resource))) > 0)
-	  {
-	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
-	            rbytes);
-            cupsBackChannelWrite(resource, rbytes, 1.0);
-          }
-	}
-
-        if (FD_ISSET(fd, &output))
-	{
-	 /*
-	  * Write print data...
-	  */
-
-	  if ((wbytes = write(fd, bufptr, nbytes)) < 0)
-	    if (errno == ENOTTY)
-	      wbytes = write(fd, bufptr, nbytes);
-
-	  if (wbytes < 0)
-	  {
-	   /*
-	    * Check for retryable errors...
-	    */
-
-            if (errno == ENOSPC)
-	    {
-	      paperout = 1;
-	      fputs("ERROR: Out of paper!\n", stderr);
-	      fputs("STATUS: +media-tray-empty-error\n", stderr);
-	    }
-	    else if (errno != EAGAIN && errno != EINTR)
-	    {
-	      perror("ERROR: Unable to send print file to printer");
-	      break;
-	    }
-	  }
-	  else
-	  {
-	   /*
-	    * Update count and pointer...
-	    */
-
-            if (paperout)
-	    {
-	      fputs("STATUS: -media-tray-empty-error\n", stderr);
-	      paperout = 0;
-	    }
-
-	    nbytes -= wbytes;
-	    bufptr += wbytes;
-	  }
-	}
-      }
-
-      if (wbytes < 0)
-        break;
-
-      if (argc > 6)
-	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
-	        (unsigned long)tbytes);
-    }
+    if (print_fd != 0 && tbytes >= 0)
+      fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
+	      CUPS_LLCAST tbytes);
   }
 
  /*
   * Close the socket connection and input file and return...
   */
 
-  close(fd);
-  if (fp != 0)
-    close(fp);
+  close(device_fd);
 
-  return (wbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
+  if (print_fd != 0)
+    close(print_fd);
+
+  return (tbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }
 
 
@@ -485,9 +364,9 @@ list_devices(void)
       * Now grab the IEEE 1284 device ID string...
       */
 
-      if (!get_device_id(fd, device_id, sizeof(device_id),
-                         make_model, sizeof(make_model),
-			 NULL, NULL, 0))
+      if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
+                              make_model, sizeof(make_model),
+			      NULL, NULL, 0))
 	printf("direct parallel:%s \"%s\" \"%s LPT #%d\" \"%s\"\n", device,
 	       make_model, make_model, i + 1, device_id);
       else

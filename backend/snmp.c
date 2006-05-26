@@ -77,17 +77,10 @@
  * Include necessary headers.
  */
 
-#include <cups/backend.h>
 #include <cups/http-private.h>
-#include <cups/cups.h>
-#include <cups/string.h>
+#include "backend-private.h"
 #include <cups/array.h>
 #include <cups/file.h>
-#include <errno.h>
-#include <signal.h>
-
-#define SNMP_BACKEND
-#include "ieee1284.c"
 
 
 /*
@@ -1656,7 +1649,7 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 	if (model)
           strlcpy(temp, model->values[0].string.text, sizeof(temp));
 	else if (info)
-	  get_make_model(info->values[0].string.text, temp, sizeof(temp));
+	  backendGetMakeModel(info->values[0].string.text, temp, sizeof(temp));
 
         fix_make_model(make_model, temp, sizeof(make_model));
 
@@ -1928,8 +1921,8 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
       * Description is the IEEE-1284 device ID...
       */
 
-      get_make_model(packet.object_value.string, make_model,
-                     sizeof(make_model));
+      backendGetMakeModel(packet.object_value.string, make_model,
+                	  sizeof(make_model));
     }
     else
     {
