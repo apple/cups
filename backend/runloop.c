@@ -93,7 +93,7 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
   * Now loop until we are out of data from print_fd...
   */
 
-  for (print_bytes = 0, paperout = 0, total_bytes = 0;;)
+  for (print_bytes = 0, print_ptr = print_buffer, paperout = 0, total_bytes = 0;;)
   {
    /*
     * Use select() to determine whether we have data to copy around...

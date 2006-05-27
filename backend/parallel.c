@@ -92,8 +92,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		copies;			/* Number of copies to print */
   size_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
-  fd_set	input,			/* Input set for select() */
-		output;			/* Output set for select() */
 #if defined(__linux) && defined(LP_POUTPA)
   unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
   int		paperout;		/* Paper out? */
