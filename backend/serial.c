@@ -115,21 +115,23 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		value[255],		/* Value of option */
 		*ptr;			/* Pointer into name or value */
   int		port;			/* Port number (not used) */
-  int		fp;			/* Print file */
   int		copies;			/* Number of copies to print */
-  int		fd;			/* Parallel device */
-  int		rbytes;			/* Number of bytes read */
-  int		wbytes;			/* Number of bytes written */
-  size_t	nbytes,			/* Number of bytes read */
-		tbytes;			/* Total number of bytes written */
+  int		print_fd,		/* Print file */
+		device_fd;		/* Serial device */
+  int		nfds;			/* Maximum file descriptor value + 1 */
+  fd_set	input,			/* Input set for reading */
+		output;			/* Output set for writing */
+  ssize_t	print_bytes,		/* Print bytes read */
+		bc_bytes,		/* Backchannel bytes read */
+		total_bytes,		/* Total bytes written */
+		bytes;			/* Bytes written */
   int		dtrdsr;			/* Do dtr/dsr flow control? */
-  int		bufsize;		/* Size of output buffer for writes */
-  char		buffer[8192],		/* Output buffer */
-		*bufptr;		/* Pointer into buffer */
+  int		print_size;		/* Size of output buffer for writes */
+  char		print_buffer[8192],	/* Print data buffer */
+		*print_ptr,		/* Pointer into print data buffer */
+		bc_buffer[1024];	/* Back-channel data buffer */
   struct termios opts;			/* Serial port options */
   struct termios origopts;		/* Original port options */
-  fd_set	input,			/* Input set for select() */
-		output;			/* Output set for select() */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -177,8 +179,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 6)
   {
-    fp     = 0;
-    copies = 1;
+    print_fd = 0;
+    copies   = 1;
   }
   else
   {
@@ -186,7 +188,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Try to open the print file...
     */
 
-    if ((fp = open(argv[6], O_RDONLY)) < 0)
+    if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
       perror("ERROR: unable to open print file");
       return (CUPS_BACKEND_FAILED);
@@ -226,7 +228,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-    if ((fd = open(resource, O_WRONLY | O_NOCTTY | O_EXCL | O_NDELAY)) == -1)
+    if ((device_fd = open(resource, O_RDWR | O_NOCTTY | O_EXCL |
+                                    O_NDELAY)) == -1)
     {
       if (getenv("CLASS") != NULL)
       {
@@ -262,7 +265,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       }
     }
   }
-  while (fd < 0);
+  while (device_fd < 0);
 
   fputs("STATE: -connecting-to-device\n", stderr);
 
@@ -270,16 +273,18 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Set any options provided...
   */
 
-  tcgetattr(fd, &origopts);
-  tcgetattr(fd, &opts);
+  tcgetattr(device_fd, &origopts);
+  tcgetattr(device_fd, &opts);
 
-  opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
-  opts.c_oflag &= ~OPOST;			/* Don't post-process */
+  opts.c_lflag &= ~(ICANON | ECHO | ISIG);
+					/* Raw mode */
+  opts.c_oflag &= ~OPOST;		/* Don't post-process */
 
-  bufsize = 96;		/* 9600 baud / 10 bits/char / 10Hz */
-  dtrdsr  = 0;		/* No dtr/dsr flow control */
+  print_size = 96;			/* 9600 baud / 10 bits/char / 10Hz */
+  dtrdsr     = 0;			/* No dtr/dsr flow control */
 
-  if (options != NULL)
+  if (options)
+  {
     while (*options)
     {
      /*
@@ -320,7 +325,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
         * Set the baud rate...
 	*/
 
-        bufsize = atoi(value) / 100;
+        print_size = atoi(value) / 100;
 
 #if B19200 == 19200
         cfsetispeed(&opts, atoi(value));
@@ -482,9 +487,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	}
       }
     }
+  }
 
-  tcsetattr(fd, TCSANOW, &opts);
-  fcntl(fd, F_SETFL, 0);
+  tcsetattr(device_fd, TCSANOW, &opts);
+  fcntl(device_fd, F_SETFL, 0);
 
  /*
   * Now that we are "connected" to the port, ignore SIGTERM so that we
@@ -493,7 +499,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * stdin (otherwise you can't cancel raw jobs...)
   */
 
-  if (argc < 7)
+  if (print_fd != 0)
   {
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
     sigset(SIGTERM, SIG_IGN);
@@ -509,133 +515,181 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Finally, send the print file...
+  * Figure out the maximum file descriptor value to use with select()...
   */
 
-  if (bufsize > sizeof(buffer))
-    bufsize = sizeof(buffer);
+  nfds = (print_fd > device_fd ? print_fd : device_fd) + 1;
 
-  wbytes = 0;
+ /*
+  * Finally, send the print file.  Ordinarily we would just use the
+  * backendRunLoop() function, however since we need to use smaller
+  * writes and may need to do DSR/DTR flow control, we duplicate much
+  * of the code here instead...
+  */
+
+  if (print_size > sizeof(print_buffer))
+    print_size = sizeof(print_buffer);
+
+  total_bytes = 0;
 
   while (copies > 0)
   {
     copies --;
 
-    if (fp != 0)
+    if (print_fd != 0)
     {
       fputs("PAGE: 1 1\n", stderr);
-      lseek(fp, 0, SEEK_SET);
+      lseek(print_fd, 0, SEEK_SET);
     }
 
-    if (dtrdsr)
+   /*
+    * Now loop until we are out of data from print_fd...
+    */
+
+    for (print_bytes = 0, print_ptr = print_buffer;;)
     {
      /*
-      * Check the port and sleep until DSR is set...
+      * Use select() to determine whether we have data to copy around...
       */
 
-      int status;
+      FD_ZERO(&input);
+      if (!print_bytes)
+	FD_SET(print_fd, &input);
+      FD_SET(device_fd, &input);
 
+      FD_ZERO(&output);
+      if (print_bytes)
+	FD_SET(device_fd, &output);
 
-      if (!ioctl(fd, TIOCMGET, &status))
-        if (!(status & TIOCM_DSR))
-	{
-	 /*
-	  * Wait for DSR to go high...
-	  */
+      if (select(nfds, &input, &output, NULL, NULL) < 0)
+	continue;			/* Ignore errors here */
 
-	  fputs("DEBUG: DSR is low; waiting for device...\n", stderr);
-
-          do
-	  {
-	    sleep(1);
-	    if (ioctl(fd, TIOCMGET, &status))
-	      break;
-	  }
-	  while (!(status & TIOCM_DSR));
-
-	  fputs("DEBUG: DSR is high; writing to device...\n", stderr);
-        }
-    }
-
-    tbytes = 0;
-    while ((nbytes = read(fp, buffer, bufsize)) > 0)
-    {
      /*
-      * Write the print data to the printer...
+      * Check if we have back-channel data ready...
       */
 
-      tbytes += nbytes;
-      bufptr = buffer;
-
-      while (nbytes > 0)
+      if (FD_ISSET(device_fd, &input))
       {
-       /*
-        * See if we are ready to read or write...
-	*/
-
-        do
+	if ((bc_bytes = read(device_fd, bc_buffer, sizeof(bc_buffer))) > 0)
 	{
-          FD_ZERO(&input);
-	  FD_SET(fd, &input);
-	  FD_ZERO(&output);
-	  FD_SET(fd, &output);
-        }
-	while (select(fd + 1, &input, &output, NULL, NULL) < 0);
-
-        if (FD_ISSET(fd, &input))
-	{
-	 /*
-	  * Read backchannel data...
-	  */
-
-	  if ((rbytes = read(fd, resource, sizeof(resource))) > 0)
-	  {
-	    fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
-	            rbytes);
-            cupsBackChannelWrite(resource, rbytes, 1.0);
-          }
-	}
-
-        if (FD_ISSET(fd, &output))
-	{
-	 /*
-	  * Write print data...
-	  */
-
-	  if ((wbytes = write(fd, bufptr, nbytes)) < 0)
-	    if (errno == ENOTTY)
-	      wbytes = write(fd, bufptr, nbytes);
-
-	  if (wbytes < 0)
-	  {
-	   /*
-	    * Check for retryable errors...
-	    */
-
-	    if (errno != EAGAIN && errno != EINTR)
-	    {
-	      perror("ERROR: Unable to send print file to printer");
-	      break;
-	    }
-	  }
-	  else
-	  {
-	   /*
-	    * Update count and pointer...
-	    */
-
-	    nbytes -= wbytes;
-	    bufptr += wbytes;
-	  }
+	  fprintf(stderr,
+	          "DEBUG: Received " CUPS_LLFMT " bytes of back-channel data!\n",
+	          CUPS_LLCAST bc_bytes);
+          cupsBackChannelWrite(bc_buffer, bc_bytes, 1.0);
 	}
       }
 
-      if (wbytes < 0)
-        break;
+     /*
+      * Check if we have print data ready...
+      */
 
-      if (argc > 6)
-	fprintf(stderr, "INFO: Sending print file, %lu bytes...\n",
-	        (unsigned long)tbytes);
+      if (FD_ISSET(print_fd, &input))
+      {
+	if ((print_bytes = read(print_fd, print_buffer, print_size)) < 0)
+	{
+	 /*
+          * Read error - bail if we don't see EAGAIN or EINTR...
+	  */
+
+	  if (errno != EAGAIN || errno != EINTR)
+	  {
+	    perror("ERROR: Unable to read print data");
+
+            tcsetattr(device_fd, TCSADRAIN, &origopts);
+
+	    close(device_fd);
+
+	    if (print_fd != 0)
+	      close(print_fd);
+
+	    return (CUPS_BACKEND_FAILED);
+	  }
+
+          print_bytes = 0;
+	}
+	else if (print_bytes == 0)
+	{
+	 /*
+          * End of file, break out of the loop...
+	  */
+
+          break;
+	}
+
+	print_ptr = print_buffer;
+      }
+
+     /*
+      * Check if the device is ready to receive data and we have data to
+      * send...
+      */
+
+      if (print_bytes && FD_ISSET(device_fd, &output))
+      {
+	if (dtrdsr)
+	{
+	 /*
+	  * Check the port and sleep until DSR is set...
+	  */
+
+	  int status;
+
+
+	  if (!ioctl(device_fd, TIOCMGET, &status))
+            if (!(status & TIOCM_DSR))
+	    {
+	     /*
+	      * Wait for DSR to go high...
+	      */
+
+	      fputs("DEBUG: DSR is low; waiting for device...\n", stderr);
+
+              do
+	      {
+	       /*
+	        * Poll every 100ms...
+		*/
+
+		usleep(100000);
+
+		if (ioctl(device_fd, TIOCMGET, &status))
+		  break;
+	      }
+	      while (!(status & TIOCM_DSR));
+
+	      fputs("DEBUG: DSR is high; writing to device...\n", stderr);
+            }
+	}
+
+	if ((bytes = write(device_fd, print_ptr, print_bytes)) < 0)
+	{
+	 /*
+          * Write error - bail if we don't see an error we can retry...
+	  */
+
+	  if (errno != EAGAIN && errno != EINTR && errno != ENOTTY)
+	  {
+	    perror("ERROR: Unable to write print data");
+
+            tcsetattr(device_fd, TCSADRAIN, &origopts);
+
+	    close(device_fd);
+
+	    if (print_fd != 0)
+	      close(print_fd);
+
+	    return (CUPS_BACKEND_FAILED);
+	  }
+	}
+	else
+	{
+          fprintf(stderr, "DEBUG: Wrote %d bytes...\n", (int)bytes);
+
+          print_bytes -= bytes;
+	  print_ptr   += bytes;
+	  total_bytes += bytes;
+	}
+      }
     }
   }
 
@@ -643,13 +697,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Close the serial port and input file and return...
   */
 
-  tcsetattr(fd, TCSADRAIN, &origopts);
+  tcsetattr(device_fd, TCSADRAIN, &origopts);
 
-  close(fd);
-  if (fp != 0)
-    close(fp);
+  close(device_fd);
 
-  return (wbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
+  if (print_fd != 0)
+    close(print_fd);
+
+  return (total_bytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }
 
 
