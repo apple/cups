@@ -506,6 +506,9 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp->addr.ipv6.sin6_addr.s6_addr32[3] = htonl(1);
 #  endif /* WIN32 */
 
+        if (!first)
+          first = temp;
+
         addr = temp;
       }
 
@@ -526,6 +529,9 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
         temp->addr.ipv4.sin_family      = AF_INET;
 	temp->addr.ipv4.sin_port        = htons(portnum);
 	temp->addr.ipv4.sin_addr.s_addr = htonl(0x7f000001);
+
+        if (!first)
+          first = temp;
 
         if (addr)
 	  addr->next = temp;
@@ -556,6 +562,9 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
         temp->addr.ipv6.sin6_family = AF_INET6;
 	temp->addr.ipv6.sin6_port   = htons(portnum);
 
+        if (!first)
+          first = temp;
+
         addr = temp;
       }
 
@@ -575,6 +584,9 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
         temp->addr.ipv4.sin_family = AF_INET;
 	temp->addr.ipv4.sin_port   = htons(portnum);
+
+        if (!first)
+          first = temp;
 
         if (addr)
 	  addr->next = temp;
