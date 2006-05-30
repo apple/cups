@@ -49,6 +49,7 @@
  *   set_pstops_options() - Set pstops options...
  *   skip_page()          - Skip past a page that won't be printed...
  *   start_nup()          - Start processing for N-up printing...
+ *   write_labels()       - Write the actual page labels.
  */
 
 /*
@@ -204,6 +205,7 @@ static size_t		skip_page(cups_file_t *fp, char *line, size_t linelen,
 				  size_t linesize);
 static void		start_nup(pstops_doc_t *doc, int number,
 				  int show_border, const int *bounding_box);
+static void		write_labels(pstops_doc_t *doc, int orient);
 
 
 /*
@@ -1856,15 +1858,15 @@ end_nup(pstops_doc_t *doc,		/* I - Document information */
         int          number)		/* I - Page number */
 {
   if (doc->mirror || Orientation || doc->number_up > 1)
-    puts("userdict/ESPsave get restore");
+    doc_puts(doc, "userdict/ESPsave get restore\n");
 
   switch (doc->number_up)
   {
     case 1 :
 	if (doc->use_ESPshowpage)
 	{
-	  WriteLabels(Orientation);
-          puts("ESPshowpage");
+	  write_labels(doc, Orientation);
+          doc_puts(doc, "ESPshowpage\n");
 	}
 	break;
 
@@ -1878,7 +1880,7 @@ end_nup(pstops_doc_t *doc,		/* I - Document information */
 	    * Rotate the labels back to portrait...
 	    */
 
-	    WriteLabels(Orientation - 1);
+	    write_labels(doc, Orientation - 1);
 	  }
 	  else if (Orientation == 0)
 	  {
@@ -1886,7 +1888,7 @@ end_nup(pstops_doc_t *doc,		/* I - Document information */
 	    * Rotate the labels to landscape...
 	    */
 
-	    WriteLabels(doc->normal_landscape ? 1 : 3);
+	    write_labels(doc, doc->normal_landscape ? 1 : 3);
 	  }
 	  else
 	  {
@@ -1894,18 +1896,18 @@ end_nup(pstops_doc_t *doc,		/* I - Document information */
 	    * Rotate the labels to landscape...
 	    */
 
-	    WriteLabels(doc->normal_landscape ? 3 : 1);
+	    write_labels(doc, doc->normal_landscape ? 3 : 1);
 	  }
 
-          puts("ESPshowpage");
+          doc_puts(doc, "ESPshowpage\n");
 	}
         break;
 
     default :
 	if (is_last_page(number) && doc->use_ESPshowpage)
 	{
-	  WriteLabels(Orientation);
-          puts("ESPshowpage");
+	  write_labels(doc, Orientation);
+          doc_puts(doc, "ESPshowpage\n");
 	}
         break;
   }
@@ -2931,6 +2933,52 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 
     doc_printf(doc, "0 0 %d %d ESPrc\n", bboxw, bboxl);
   }
+}
+
+
+/*
+ * 'write_labels()' - Write the actual page labels.
+ *
+ * This function is a copy of the one in common.c since we need to
+ * use doc_puts/doc_printf instead of puts/printf...
+ */
+
+static void
+write_labels(pstops_doc_t *doc,		/* I - Document information */
+             int          orient)	/* I - Orientation of the page */
+{
+  float	width,				/* Width of page */
+	length;				/* Length of page */
+
+
+  doc_puts(doc, "gsave\n");
+
+  if ((orient ^ Orientation) & 1)
+  {
+    width  = PageLength;
+    length = PageWidth;
+  }
+  else
+  {
+    width  = PageWidth;
+    length = PageLength;
+  }
+
+  switch (orient & 3)
+  {
+    case 1 : /* Landscape */
+        doc_printf(doc, "%.1f 0.0 translate 90 rotate\n", length);
+        break;
+    case 2 : /* Reverse Portrait */
+        doc_printf(doc, "%.1f %.1f translate 180 rotate\n", width, length);
+        break;
+    case 3 : /* Reverse Landscape */
+        doc_printf(doc, "0.0 %.1f translate -90 rotate\n", width);
+        break;
+  }
+
+  doc_puts(doc, "ESPwl\n");
+  doc_puts(doc, "grestore\n");
 }
 
 
