@@ -36,6 +36,7 @@
  *   cupsdStopPolling()            - Stop polling servers as needed.
  *   cupsdUpdateCUPSBrowse()       - Update the browse lists using the CUPS
  *                                   protocol.
+ *   cupsdUpdateLDAPBrowse()       - Scan for new printers via LDAP...
  *   cupsdUpdatePolling()          - Read status messages from the poll daemons.
  *   cupsdUpdateSLPBrowse()        - Get browsing information via SLP.
  *   dequote()                     - Remote quotes from a string.
@@ -1526,39 +1527,57 @@ cupsdUpdateLDAPBrowse(void)
   * Loop through the available printers...
   */
 
-  if ((e = ldap_first_entry(BrowseLDAPHandle, res)) == NULL)
+  for (e = ldap_first_entry(BrowseLDAPHandle, res);
+       e;
+       e = ldap_next_entry(BrowseLDAPHandle, e))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get LDAP printer entry!");
-    return;
-  }
+   /*
+    * Get the required values from this entry...
+    */
 
-  while (e)
-  {
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerDescription");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerDescription")) == NULL)
+      continue;
+
     strlcpy(info, *value, sizeof(info));
     ldap_value_free(value);
 
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerLocation");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerLocation")) == NULL)
+      continue;
+
     strlcpy(location, *value, sizeof(location));
     ldap_value_free(value);
 
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerMakeAndModel");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerMakeAndModel")) == NULL)
+      continue;
+
     strlcpy(make_model, *value, sizeof(make_model));
     ldap_value_free(value);
 
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerType");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerType")) == NULL)
+      continue;
+
     type = atoi(*value);
     ldap_value_free(value);
 
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerURI");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerURI")) == NULL)
+      continue;
+
     strlcpy(uri, *value, sizeof(uri));
     ldap_value_free(value);
+
+   /*
+    * Process the entry as browse data...
+    */
 
     if (!is_local_queue(uri, host, sizeof(host), resource, sizeof(resource)))
       process_browse_data(uri, host, resource, type, IPP_PRINTER_IDLE,
                           location, info, make_model, 0, NULL);
 
-    e = ldap_next_entry(BrowseLDAPHandle, e);
   }
 }
 #endif /* HAVE_OPENLDAP */
