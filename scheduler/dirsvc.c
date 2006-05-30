@@ -2715,7 +2715,7 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
   mods[6].mod_type = "objectClass";
   mods[6].mod_values = (char **)objectClass_values;
 
-  snprintf(dn, sizeof(dn), "cn=%s,ou=printers,%s", p->info, BrowseLDAPDN);
+  snprintf(dn, sizeof(dn), "cn=%s,ou=printers,%s", p->name, BrowseLDAPDN);
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: dn=\"%s\"", dn);
 
   if (ldap_count_entries(BrowseLDAPHandle, res) > 0)
@@ -2743,7 +2743,7 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
   else 
   {
    /*
-    * Printer has already been registered, modify the current
+    * Printer has never been registered, add the current
     * registration...
     */
 
@@ -2753,11 +2753,11 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
     for (i = 0; i < 7; i ++)
     {
       pmods[i]         = mods + i;
-      pmods[i]->mod_op = LDAP_MOD_REPLACE;
+      pmods[i]->mod_op = LDAP_MOD_ADD;
     }
     pmods[i] = NULL;
 
-    if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+    if ((rc = ldap_add_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "LDAP add for %s failed with status %d: %s",
                       p->name, rc, ldap_err2string(rc));
