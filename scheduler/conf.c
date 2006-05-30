@@ -1277,33 +1277,14 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
   const char	*maskval,		/* Pointer to start of mask value */
 		*ptr,			/* Pointer into value */
 		*ptr2;			/* ... */
-  static unsigned netmasks[4][4] =	/* Standard IPv4 netmasks... */
-  {
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0xff000000 },
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffff0000 },
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffff00 },
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }
-  };
-#ifdef AF_INET6
-  static unsigned netmasks6[8][4] =	/* Standard IPv6 netmasks... */
-  {
-    { 0xffff0000, 0x00000000, 0x00000000, 0x00000000 },
-    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },
-    { 0xffffffff, 0xffff0000, 0x00000000, 0x00000000 },
-    { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },
-    { 0xffffffff, 0xffffffff, 0xffff0000, 0x00000000 },
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffff0000 },
-    { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }
-  };
-#endif /* AF_INET6 */
 
 
  /*
   * Get the address...
   */
 
-  memset(ip, 0, sizeof(unsigned) * 4);
+  ip[0]   = ip[1]   = ip[2]   = ip[2]   = 0x00000000;
+  mask[0] = mask[1] = mask[2] = mask[3] = 0xffffffff;
 
   if ((maskval = strchr(value, '/')) != NULL)
     maskval ++;
@@ -1334,6 +1315,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 	     ptr2 = strchr(ptr2 + 1, ':'), j ++);
 
         i = 7 - j;
+	ptr ++;
       }
       else if (isxdigit(*ptr & 255))
       {
@@ -1343,9 +1325,9 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 	  return (0);
 
         if (i & 1)
-          ip[i] |= ipval;
+          ip[i / 2] |= ipval;
 	else
-          ip[i] |= ipval << 16;
+          ip[i / 2] |= ipval << 16;
       }
       else
         return (0);
@@ -1354,7 +1336,10 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
         ptr ++;
     }
 
-    ipcount = i;
+    if (*ptr != ']')
+      return (0);
+
+    ptr ++;
 
     if (*ptr && *ptr != '/')
       return (0);
@@ -1371,6 +1356,9 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
     ip[3] |= ((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8;
     ip[0] = ip[1] = ip[2] = 0;
+
+    if (ipcount < 4)
+      mask[3] = (0xffffffff << (32 - 8 * ipcount)) & 0xffffffff;
   }
 
   if (*maskval)
@@ -1381,54 +1369,14 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
     memset(mask, 0, sizeof(unsigned) * 4);
 
-#ifdef AF_INET6
-    if (*maskval == '[')
-    {
-     /*
-      * Get hexadecimal mask value...
-      */
-
-      for (i = 0, ptr = maskval + 1; *ptr && i < 8; i ++)
-      {
-	if (*ptr == ']')
-	  break;
-	else if (!strncmp(ptr, "::", 2))
-	{
-          for (ptr2 = strchr(ptr + 2, ':'), j = 0;
-	       ptr2;
-	       ptr2 = strchr(ptr2 + 1, ':'), j ++);
-
-          i = 7 - j;
-	}
-	else if (isxdigit(*ptr & 255))
-	{
-          ipval = strtoul(ptr, (char **)&ptr, 16);
-
-	  if (ipval > 0xffff)
-	    return (0);
-
-          if (i & 1)
-            mask[i] |= ipval;
-	  else
-            mask[i] |= ipval << 16;
-	}
-	else
-          return (0);
-
-        while (*ptr == ':')
-          ptr ++;
-      }
-
-      if (*ptr)
-	return (0);
-    }
-    else
-#endif /* AF_INET6 */
     if (strchr(maskval, '.'))
     {
      /*
       * Get dotted-decimal mask...
       */
+
+      if (family != AF_INET)
+        return (0);
 
       if (sscanf(maskval, "%u.%u.%u.%u", mask + 0, mask + 1, mask + 2, mask + 3) != 4)
         return (0);
@@ -1447,6 +1395,9 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 #ifdef AF_INET6
       if (family == AF_INET6)
       {
+        if (i > 128)
+	  return (0);
+
         i = 128 - i;
 
 	if (i <= 96)
@@ -1478,25 +1429,20 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
       else
 #endif /* AF_INET6 */
       {
-        i = 32 - i;
+        if (i > 32)
+	  return (0);
 
         mask[0] = 0xffffffff;
         mask[1] = 0xffffffff;
         mask[2] = 0xffffffff;
 
-	if (i > 0)
-          mask[3] = (0xffffffff << i) & 0xffffffff;
+	if (i < 32)
+          mask[3] = (0xffffffff << (32 - i)) & 0xffffffff;
 	else
 	  mask[3] = 0xffffffff;
       }
     }
   }
-#ifdef AF_INET6
-  else if (family == AF_INET6)
-    memcpy(mask, netmasks6[ipcount - 1], sizeof(unsigned) * 4);
-#endif /* AF_INET6 */
-  else
-    memcpy(mask, netmasks[ipcount - 1], sizeof(unsigned) * 4);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "get_addr_and_mask(value=\"%s\", "
@@ -1634,7 +1580,12 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       else
 	cupsdDenyIP(loc, ones, zeros);
     }
+#ifdef AF_INET6
+    else if (value[0] == '*' || value[0] == '.' || 
+             (!isdigit(value[0] & 255) && value[0] != '['))
+#else
     else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
+#endif /* AF_INET6 */
     {
      /*
       * Host or domain name...
@@ -2406,7 +2357,12 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  else
 	    cupsdDenyIP(location, ones, zeros);
 	}
-	else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
+#ifdef AF_INET6
+	else if (value[0] == '*' || value[0] == '.' || 
+        	 (!isdigit(value[0] & 255) && value[0] != '['))
+#else
+	else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
+#endif /* AF_INET6 */
 	{
 	 /*
           * Host or domain name...
@@ -2490,7 +2446,12 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
       */
 
-      if (value[0] == '*' || value[0] == '.' || !isdigit(value[0]))
+#ifdef AF_INET6
+      if (value[0] == '*' || value[0] == '.' || 
+          (!isdigit(value[0] & 255) && value[0] != '['))
+#else
+      if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
+#endif /* AF_INET6 */
       {
        /*
         * Host or domain name...
