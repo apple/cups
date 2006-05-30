@@ -346,6 +346,8 @@ find_filters(mime_t           *mime,	/* I - MIME database */
     * any...)
     */
 
+    tempcost += current->cost;
+
     if (tempcost < mincost)
     {
       cupsArrayDelete(mintemp);
@@ -356,7 +358,7 @@ find_filters(mime_t           *mime,	/* I - MIME database */
       */
 
       mintemp = temp;
-      mincost = tempcost + current->cost;
+      mincost = tempcost;
       cupsArrayInsert(mintemp, current);
     }
     else
