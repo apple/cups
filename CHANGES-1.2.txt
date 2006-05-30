@@ -1,6 +1,28 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.2
+
+	- The scheduler didn't always choose the least costly
+	  filter.
+	- Fixed parsing of IPv6 addresses in Allow, Deny,
+	  BrowseAllow, BrowseDeny, and BrowseRelay directives
+	  (STR #1713)
+	- Printers that were shared via LDAP did not get added to
+	  the LDAP server properly (STR #1733)
+	- LDAP browsing would crash the scheduler if a required
+	  value was missing (STR #1731)
+	- Special cases for the "localhost" hostname did not
+	  work, causing printing to not work when the /etc/hosts
+	  file did not contain a localhost entry (STR #1723)
+	- Updated the Spanish translation (STR #1720)
+	- Reverse-order page output was broken when N-up or
+	  landscape orientations were used (STR #1725)
+	- The parallel, serial, socket, and USB backends needed
+	  print data before they would report back-channel data,
+	  causing problems with several new drivers (STR #1724)
+
+
 CHANGES IN CUPS V1.2.1
 
 	- The web interface support programs crashed on Solaris
