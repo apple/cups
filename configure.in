@@ -47,14 +47,21 @@ sinclude(config-scripts/cups-pap.m4)
 sinclude(config-scripts/cups-pdf.m4)
 sinclude(config-scripts/cups-scripting.m4)
 
+INSTALL_LANGUAGES=""
+UNINSTALL_LANGUAGES=""
 LANGFILES=""
 if test "x$LANGUAGES" != x; then
+	INSTALL_LANGUAGES="install-languages"
+	UNINSTALL_LANGUAGES="uninstall-languages"
 	for lang in $LANGUAGES; do
 		LANGFILES="$LANGFILES doc/$lang/index.html"
 		LANGFILES="$LANGFILES templates/$lang/edit-config.tmpl"
 		LANGFILES="$LANGFILES templates/$lang/header.tmpl"
 	done
 fi
+
+AC_SUBST(INSTALL_LANGUAGES)
+AC_SUBST(UNINSTALL_LANGUAGES)
 
 AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh init/cups-lpd cups-config
 	  conf/cupsd.conf conf/pam.std doc/index.html

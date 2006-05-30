@@ -201,7 +201,7 @@ depend:
 # Install all documentation files...
 #
 
-install:	all
+install:	all $(INSTALL_LANGUAGES)
 	$(INSTALL_DIR) -m 755 $(DOCDIR)
 	for file in $(WEBPAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR); \
@@ -214,6 +214,8 @@ install:	all
 	for file in $(WEBIMAGES) $(WEBBUTTONS); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
 	done
+
+install-languages:
 	for lang in $(LANGUAGES); do \
 		$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
 		if test -f $$lang/index.html; then \
@@ -231,7 +233,7 @@ install:	all
 # Unnstall all documentation files...
 #
 
-uninstall:
+uninstall: $(UNINSTALL_LANGUAGES)
 	for file in $(WEBPAGES); do \
 		$(RM) $(DOCDIR)/$$file; \
 	done
@@ -241,6 +243,11 @@ uninstall:
 	for file in $(WEBIMAGES) $(WEBBUTTONS); do \
 		$(INSTALL_MAN) $(DOCDIR)/images/$$file; \
 	done
+	-$(RMDIR) $(DOCDIR)/images
+	-$(RMDIR) $(DOCDIR)/help
+	-$(RMDIR) $(DOCDIR)
+
+uninstall-languages:
 	-for lang in $(LANGUAGES); do \
 		$(RM) $(DOCDIR)/$$lang/index.html; \
 		for file in $(WEBBUTTONS); do \
@@ -249,9 +256,6 @@ uninstall:
 		$(RMDIR) $(DOCDIR)/$$lang/images; \
 		$(RMDIR) $(DOCDIR)/$$lang; \
 	done
-	-$(RMDIR) $(DOCDIR)/images
-	-$(RMDIR) $(DOCDIR)/help
-	-$(RMDIR) $(DOCDIR)
 
 
 #

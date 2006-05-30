@@ -118,11 +118,13 @@ depend:
 # Install files...
 #
 
-install: all
+install: all $(INSTALL_LANGUAGES)
 	$(INSTALL_DIR) -m 755 $(DATADIR)/templates
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/templates; \
 	done
+
+install-languages:
 	for lang in $(LANGUAGES); do \
 		$(INSTALL_DIR) -m 755 $(DATADIR)/templates/$$lang; \
 		for file in $(FILES); do \
@@ -137,17 +139,19 @@ install: all
 # Uninstall files...
 #
 
-uninstall:
+uninstall: $(UNINSTALL_LANGUAGES)
 	for file in $(FILES); do \
 		$(RM) $(DATADIR)/templates/$$file; \
 	done
+	-$(RMDIR) $(DATADIR)/templates
+
+uninstall-languages:
 	for lang in $(LANGUAGES); do \
 		for file in $(FILES); do \
 			$(RM) $(DATADIR)/templates/$$lang/$$file; \
 		done \
 		$(RMDIR) $(DATADIR)/templates/$$lang; \
 	done
-	-$(RMDIR) $(DATADIR)/templates
 
 
 #

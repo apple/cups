@@ -51,7 +51,9 @@ depend:
 # Install files...
 #
 
-install:	all
+install:	all $(INSTALL_LANGUAGES)
+
+install-languages:
 	$(INSTALL_DIR) -m 755 $(LOCALEDIR)
 	for loc in $(LANGUAGES) ; do \
 		if test -f cups_$$loc.po; then \
@@ -65,12 +67,12 @@ install:	all
 # Uninstall files...
 #
 
-uninstall:
+uninstall: $(UNINSTALL_LANGUAGES)
+
+uninstall-languages:
 	-for loc in $(LANGUAGES) ; do \
 		$(RM) $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
-		$(RMDIR) $(LOCALEDIR)/$$loc ; \
 	done
-	-$(RMDIR) $(LOCALEDIR)
 
 
 #
