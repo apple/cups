@@ -2679,7 +2679,7 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
 
   sprintf(typestring, "%u", p->type);
 
-  cn_value[0]   = p->info;
+  cn_value[0]   = p->name;
   cn_value[1]   = NULL;
   info[0]       = p->info;
   info[1]       = NULL;
@@ -2693,7 +2693,7 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
   uri[1]        = NULL;
 
   snprintf(filter, sizeof(filter),
-           "(&(objectclass=cupsPrinter)(printerDescription~=%s))", p->info);
+           "(&(objectclass=cupsPrinter)(printerURI=%s))", p->uri);
 
   ldap_search_s(BrowseLDAPHandle, BrowseLDAPDN, LDAP_SCOPE_SUBTREE,
                 filter, (char **)ldap_attrs, 0, &res);
