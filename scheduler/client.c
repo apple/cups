@@ -1882,24 +1882,27 @@ cupsdSendCommand(
 
 
   if (con->filename)
-    fd = open(con->filename, O_RDONLY);
-  else
-    fd = open("/dev/null", O_RDONLY);
-
-  if (fd < 0)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdSendCommand: %d Unable to open \"%s\" for reading: %s",
-                    con->http.fd, con->filename ? con->filename : "/dev/null",
-	            strerror(errno));
-    return (0);
-  }
+    fd = open(con->filename, O_RDONLY);
 
-  fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+    if (fd < 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdSendCommand: %d Unable to open \"%s\" for reading: %s",
+                      con->http.fd, con->filename ? con->filename : "/dev/null",
+	              strerror(errno));
+      return (0);
+    }
+
+    fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+  }
+  else
+    fd = -1;
 
   con->pipe_pid = pipe_command(con, fd, &(con->file), command, options, root);
 
-  close(fd);
+  if (fd >= 0)
+    close(fd);
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Started \"%s\" (pid=%d)", command,
                   con->pipe_pid);
