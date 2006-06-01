@@ -1641,6 +1641,14 @@ probe_device(snmp_cache_t *device)	/* I - Device */
  	  info = NULL;
 
        /*
+        * Don't use the printer-make-and-model if it contains a generic
+	* string like "Ricoh IPP Printer"...
+	*/
+
+	if (model && strstr(model->values[0].string.text, "IPP Printer"))
+	  model = NULL;
+
+       /*
         * If we don't have a printer-make-and-model string from the printer
 	* but do have the 1284 device ID string, generate a make-and-model
 	* string from the device ID info...
