@@ -1307,6 +1307,9 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
   if (first_page)
   {
+    char	*page_setup;		/* PageSetup commands to send */
+
+
     doc_puts(doc, "%%BeginPageSetup\n");
 
     if (pageinfo->num_options > 0)
@@ -1361,6 +1364,11 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       if (any_setup)
 	free(any_setup);
     }
+
+    page_setup = ppdEmitString(ppd, PPD_ORDER_PAGE, 0);
+
+    if (page_setup)
+      doc_puts(doc, page_setup);
   }
 
  /*
