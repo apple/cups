@@ -1349,26 +1349,29 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       */
 
       if (doc_setup)
+      {
 	doc_puts(doc, doc_setup);
-
-      if (any_setup)
-	doc_puts(doc, any_setup);
-
-     /*
-      * Free the command strings...
-      */
-
-      if (doc_setup)
 	free(doc_setup);
+      }
 
       if (any_setup)
+      {
+	doc_puts(doc, any_setup);
 	free(any_setup);
+      }
     }
+
+   /*
+    * Output commands for the current page...
+    */
 
     page_setup = ppdEmitString(ppd, PPD_ORDER_PAGE, 0);
 
     if (page_setup)
+    {
       doc_puts(doc, page_setup);
+      free(page_setup);
+    }
   }
 
  /*
