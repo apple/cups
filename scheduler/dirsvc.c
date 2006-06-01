@@ -2681,11 +2681,11 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
 
   cn_value[0]   = p->name;
   cn_value[1]   = NULL;
-  info[0]       = p->info;
+  info[0]       = p->info ? p->info : "Unknown";
   info[1]       = NULL;
-  location[0]   = p->location;
+  location[0]   = p->location ? p->location : "Unknown";
   location[1]   = NULL;
-  make_model[0] = p->make_model;
+  make_model[0] = p->make_model ? p->make_model : "Unknown";
   make_model[1] = NULL;
   type[0]       = typestring;
   type[1]       = NULL;
