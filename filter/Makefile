@@ -118,12 +118,12 @@ installhdrs:
 install32bit:
 	$(INSTALL_DIR) -m 755 $(LIB32DIR)
 	$(INSTALL_LIB) 32bit/libcupsimage.so.2 $(LIB32DIR)/libcupsimage.so.2
-	$(LN) libcupsimage.so $(LIB32DIR)/libcupsimage.so.2
+	$(LN) libcupsimage.so.2 $(LIB32DIR)/libcupsimage.so
 
 install64bit:
 	$(INSTALL_DIR) -m 755 $(LIB64DIR)
 	$(INSTALL_LIB) 64bit/libcupsimage.so.2 $(LIB64DIR)/libcupsimage.so.2
-	$(LN) libcupsimage.so $(LIB64DIR)/libcupsimage.so.2
+	$(LN) libcupsimage.so.2 $(LIB64DIR)/libcupsimage.so
 
 
 #
