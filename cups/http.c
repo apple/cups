@@ -1415,13 +1415,11 @@ _httpReadCDSA(
     *dataLength = 0;
 
     if (bytes == 0)
-      result = errSSLClosedAbort;
+      result = errSSLClosedGraceful;
     else if (errno == EAGAIN)
       result = errSSLWouldBlock;
-    else if (errno == EPIPE)
-      result = errSSLClosedAbort;
     else
-      result = errSSLInternal;
+      result = errSSLClosedAbort;
   }
 
   return result;
@@ -1994,10 +1992,8 @@ _httpWriteCDSA(
   
     if (errno == EAGAIN)
       result = errSSLWouldBlock;
-    else if (errno == EPIPE)
-      result = errSSLClosedAbort;
     else
-      result = errSSLInternal;
+      result = errSSLClosedAbort;
   }
 
   return result;
@@ -2336,6 +2332,9 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
 
   if (!error)
     error = SSLSetAllowsAnyRoot(conn->session, true);
+
+  if (!error)
+    error = SSLSetProtocolVersionEnabled(conn->session, kSSLProtocol2, false);
 
   if (!error)
   {

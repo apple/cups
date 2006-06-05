@@ -54,6 +54,11 @@
 
 #ifdef HAVE_CDSASSL
 #  include <Security/Security.h>
+#  ifdef HAVE_SECBASEPRIV_H
+#    include <Security/SecBasePriv.h>
+#  else
+     extern const char *cssmErrorString(int error);
+#  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_CDSASSL */
 #ifdef HAVE_GNUTLS
 #  include <gnutls/x509.h>
@@ -2662,7 +2667,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     error = SSLSetIOFuncs(conn->session, _httpReadCDSA, _httpWriteCDSA);
 
   if (!error)
-    error = SSLSetProtocolVersion(conn->session, kSSLProtocol3);
+    error = SSLSetProtocolVersionEnabled(conn->session, kSSLProtocol2, false);
 
   if (!error)
   {
@@ -2700,8 +2705,8 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
                     "encrypt_client: Unable to encrypt connection from %s!",
                     con->http.hostname);
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "encrypt_client: CDSA error code is %d", (int)error);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "encrypt_client: %s (%d)",
+                    cssmErrorString(error), (int)error);
 
     con->http.error  = error;
     con->http.status = HTTP_ERROR;
