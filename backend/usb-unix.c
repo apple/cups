@@ -27,8 +27,9 @@
  *
  * Contents:
  *
- *   main()         - Send a file to the specified USB port.
+ *   print_device() - Print a file to a USB device.
  *   list_devices() - List all USB devices.
+ *   open_device()  - Open a USB device...
  */
 
 /*
@@ -323,7 +324,14 @@ open_device(const char *uri)		/* I - Device URI */
 
   if (!strncmp(uri, "usb:/dev/", 9))
 #ifdef __linux
-    return (-1); /* Do not allow direct devices anymore */
+  {
+   /*
+    * Do not allow direct devices anymore...
+    */
+
+    errno = ENODEV;
+    return (-1);
+  }
   else if (!strncmp(uri, "usb://", 6))
   {
    /*
@@ -422,7 +430,14 @@ open_device(const char *uri)		/* I - Device URI */
     return (-1);
   }
 #elif defined(__sun) && defined(ECPPIOC_GETDEVID)
-    return (-1); /* Do not allow direct devices anymore */
+  {
+   /*
+    * Do not allow direct devices anymore...
+    */
+
+    errno = ENODEV;
+    return (-1);
+  }
   else if (!strncmp(uri, "usb://", 6))
   {
    /*
