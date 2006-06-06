@@ -35,8 +35,8 @@
  * Include necessary headers...
  */
 
+#include "http-private.h"
 #include "cups.h"
-#include "ipp.h"
 #include "language.h"
 #include "string.h"
 #include "debug.h"

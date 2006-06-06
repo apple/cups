@@ -320,52 +320,7 @@ typedef struct http_addrlist_s		/**** Socket address list, which is
   http_addr_t		addr;		/* Address */
 } http_addrlist_t;
 
-typedef struct _http_s			/**** HTTP connection structure. ****/
-{
-  int			fd;		/* File descriptor for this socket */
-  int			blocking;	/* To block or not to block */
-  int			error;		/* Last error on read */
-  time_t		activity;	/* Time since last read/write */
-  http_state_t		state;		/* State of client */
-  http_status_t		status;		/* Status of last request */
-  http_version_t	version;	/* Protocol version */
-  http_keepalive_t	keep_alive;	/* Keep-alive supported? */
-  struct sockaddr_in	_hostaddr;	/* Address of connected host @deprecated@ */
-  char			hostname[HTTP_MAX_HOST],
-  					/* Name of connected host */
-			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
-					/* Field values */
-  char			*data;		/* Pointer to data buffer */
-  http_encoding_t	data_encoding;	/* Chunked or not */
-  int			_data_remaining;/* Number of bytes left @deprecated@ */
-  int			used;		/* Number of bytes used in buffer */
-  char			buffer[HTTP_MAX_BUFFER];
-					/* Buffer for incoming data */
-  int			auth_type;	/* Authentication in use */
-  _cups_md5_state_t	md5_state;	/* MD5 state */
-  char			nonce[HTTP_MAX_VALUE];
-					/* Nonce value */
-  int			nonce_count;	/* Nonce count */
-  void			*tls;		/* TLS state information */
-  http_encryption_t	encryption;	/* Encryption requirements */
-  /**** New in CUPS 1.1.19 ****/
-  fd_set		*input_set;	/* select() set for httpWait() @since CUPS 1.1.19@ */
-  http_status_t		expect;		/* Expect: header @since CUPS 1.1.19@ */
-  char			*cookie;	/* Cookie value(s) @since CUPS 1.1.19@ */
-  /**** New in CUPS 1.1.20 ****/
-  char			authstring[HTTP_MAX_VALUE],
-					/* Current Authentication value @since CUPS 1.1.20@ */
-			userpass[HTTP_MAX_VALUE];
-					/* Username:password string @since CUPS 1.1.20@ */
-  int			digest_tries;	/* Number of tries for digest auth @since CUPS 1.1.20@ */
-  /**** New in CUPS 1.2 ****/
-  off_t			data_remaining;	/* Number of bytes left @since CUPS 1.2@ */
-  http_addr_t		*hostaddr;	/* Current host address and port @since CUPS 1.2@ */
-  http_addrlist_t	*addrlist;	/* List of valid addresses @since CUPS 1.2@ */
-  char			wbuffer[HTTP_MAX_BUFFER];
-					/* Buffer for outgoing data */
-  int			wused;		/* Write buffer bytes used @since CUPS 1.2@ */
-} http_t;
+typedef struct _http_s http_t;		/**** HTTP connection type ****/
 
 
 /*

@@ -42,6 +42,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <cups/http-private.h>
 #include <cups/string.h>
 #include <cups/cups.h>
 #include <cups/i18n.h>

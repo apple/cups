@@ -651,8 +651,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     * Do the request and get back a response...
     */
 
-    fprintf(stderr, "DEBUG: http=%p (%s)\n", http, http->hostname);
-
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
       fputs("DEBUG: Got device list!\n", stderr);

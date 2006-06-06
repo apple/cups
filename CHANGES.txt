@@ -1,8 +1,11 @@
-CHANGES.txt - 2006-05-16
+CHANGES.txt - 2006-06-06
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- Moved the definition of the (private) _http_s structure
+	  to http-private.h; code that directly accesses the
+	  http_t members will no longer compile!
 	- Added support for setting the document-format-default
 	  attribute on a per-printer basis.
 	- Added support for IntelliBar label printers.

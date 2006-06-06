@@ -1,4 +1,4 @@
-Design Notes for New Poll/Select API in CUPSD - 2006-06-05
+Design Notes for New Poll/Select API in CUPSD - 2006-06-06
 ----------------------------------------------------------
 
 SUPPORTED APIS
@@ -14,7 +14,7 @@ SUPPORTED APIS
     NetBSD          YES     YES     NO      YES     NO
     OpenBSD         YES     YES     NO      YES     NO
     Solaris         YES     YES     NO      NO      YES
-    Tru64           YES     ???     NO      NO      NO
+    Tru64           YES     YES     NO      NO      NO
     Windows         YES     NO      NO      NO      NO
 
 
@@ -32,29 +32,84 @@ HIGH-LEVEL API
 
 IMPLEMENTATION STRATEGY
 
+    0. Common Stuff
+	a. CUPS array of file descriptor to callback functions
+           and data.
+        b. cupsdStartSelect() creates the array
+	c. cupsdStopSelect() destroys the array and all elements.
+	d. cupsdAddSelect() adds to the array and allocates a
+	   new callback element.
+	e. cupsdRemoveSelect() removes from the array and frees
+	   the callback element.
+
     1. select()
-	a. CUPS array of file descriptor to callback functions and data.
-	b. Input/Output fd_set variables, copied to working copies and then
-           used with select().
-	c. Loop through CUPS array, using FD_ISSET and calling the read/
-           write callbacks as needed.
-	d. cupsdRemoveSelect() clears fd_set bit from main and working
-           sets.
+	a. Input/Output fd_set variables, copied to working
+	   copies and then used with select().
+	b. Loop through CUPS array, using FD_ISSET and calling
+	   the read/ write callbacks as needed.
+	c. cupsdRemoveSelect() clears fd_set bit from main and
+	   working sets.
+	d. cupsdStopSelect() frees all of the memory used by the
+	   CUPS array and fd_set's.
 
     2. poll()
-	a. CUPS array of file descriptor to callback functions and data.
-	b. Regular array of pollfd, sorted the same as the CUPS array.
-	c. Loop through pollfd array, call the corresponding read/write
-           callbacks as needed.
-	d. cupsdAddSelect() adds first to CUPS array, then uses current
-           index to determine insertion point for pollfd array.
-	e. cupsdRemoveSelect() needs to update cupsdDoSelect() loop
-	   counter if <= current index.
+	a. Regular array of pollfd, sorted the same as the CUPS
+	   array.
+	b. Loop through pollfd array, call the corresponding
+	   read/write callbacks as needed.
+	c. cupsdAddSelect() adds first to CUPS array, then uses
+	   current index to determine insertion point for pollfd
+	   array.
+	d. cupsdRemoveSelect() needs to update cupsdDoSelect()
+	   loop counter if <= current index.
+	e. cupsdStopSelect() frees all of the memory used by the
+	   CUPS array and pollfd array.
 
     3. epoll()
-
+	a. cupsdStartSelect() creates epoll file descriptor using
+	   epoll_create() with the maximum fd count, and
+	   allocates an events buffer for the maximum fd count.
+	b. cupsdAdd/RemoveSelect() uses epoll_ctl() to add
+	   (EPOLL_CTL_ADD) or remove (EPOLL_CTL_DEL) a single
+	   event using the level-triggered semantics. The event
+	   user data field is a pointer to the new callback array
+	   element.
+        c. cupsdDoSelect() uses epoll_wait() with the global event
+	   buffer allocated in cupsdStartSelect() and then loops
+	   through the events, using the user data field to find
+	   the callback record.
+        d. cupsdStopSelect() closes the epoll file descriptor and
+	   frees all of the memory used by the event buffer.
 
     4. kqueue()
-
+	b. cupsdStartSelect() creates kqueue file descriptor
+	   using kqyeue() function and allocates a global event
+	   buffer.
+	c. cupsdAdd/RemoveSelect() uses EV_SET and kevent() to
+	   register the changes. The event user data field is a
+	   pointer to the new callback array element.
+	d. cupsdDoSelect() uses kevent() to poll for events and
+	   loops through the events, using the user data field to
+	   find the callback record.
+	e. cupsdStopSelect() closes the kqyeye() file descriptor
+	   and frees all of the memory used by the event buffer.
 
     5. /dev/poll
+	a. cupsdStartSelect() opens /dev/poll and allocates an
+	   array of pollfd structs; on failure to open /dev/poll,
+	   revert to poll() system call.
+	b. cupsdAddSelect() writes a single pollfd struct to
+	   /dev/poll with the new file descriptor and the
+	   POLLIN/POLLOUT flags.
+	c. cupsdRemoveSelect() writes a single pollfd struct to
+	   /dev/poll with the file descriptor and the POLLREMOVE
+	   flag.
+	d. cupsdDoSelect() uses the DP_POLL ioctl to retrieve
+	   events from /dev/poll and then loops through the
+	   returned pollfd array, looking up the file descriptors
+	   as needed.
+	e. cupsdStopSelect() closes /dev/poll and frees the
+	   pollfd array.
+	f. Need to benchmark to see if it is more efficient than
+	   using poll() - this is the only mechanism that is O(n
+	   log n), all of the others are O(n)...

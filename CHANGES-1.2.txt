@@ -3,6 +3,27 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.2
 
+	- CDSA (encryption) support fixes for MacOS X.
+	- The lppasswd program needs to be setuid to root to
+	  create and update the /etc/cups/passwd.md5 file (STR
+	  #1735)
+	- 32/64-bit library installation was broken (STR #1741)
+	- The USB backend now reports a "no such device" error
+	  when using the old filename-based USB URIs instead of
+	  the "success" error.
+	- Increased the HTTP and IPP read timeouts to 10 seconds,
+	  as 1 second was too short on congested networks (STR
+	  #1719)
+	- The SNMP backend now uses the device description over
+	  the printer-make-and-model attribute when the attribute
+	  contains a generic name (STR #1728)
+	- Fixed another file descriptor leak when printing raw
+	  files (STR #1736)
+	- Raw queues were not shared via LDAP (STR #1739)
+	- The pstops filter didn't always embed PageSetup
+	  commands from the PPD file (STR #1740)
+	- "make install" didn't work if you disabled all of the
+	  localizations.
 	- The scheduler didn't always choose the least costly
 	  filter.
 	- Fixed parsing of IPv6 addresses in Allow, Deny,
