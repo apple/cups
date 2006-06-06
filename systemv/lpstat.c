@@ -71,25 +71,58 @@ static void	show_scheduler(http_t *);
  */
 
 int
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i,		/* Looping var */
-		status;		/* Exit status */
-  http_t	*http;		/* Connection to server */
-  int		num_dests;	/* Number of user destinations */
-  cups_dest_t	*dests;		/* User destinations */
-  int		long_status;	/* Long status report? */
-  int		ranking;	/* Show job ranking? */
-  const char	*which;		/* Which jobs to show? */
-  char		op;		/* Last operation on command-line */
+  int		i,			/* Looping var */
+		status;			/* Exit status */
+  http_t	*http;			/* Connection to server */
+  int		num_dests;		/* Number of user destinations */
+  cups_dest_t	*dests;			/* User destinations */
+  int		long_status;		/* Long status report? */
+  int		ranking;		/* Show job ranking? */
+  const char	*which;			/* Which jobs to show? */
+  char		op;			/* Last operation on command-line */
 
 
  /*
   * Set the locale so that times, etc. are displayed properly.
+  *
+  * Unfortunately, while we need the localized time value, we *don't*
+  * want to use the localized charset for the time value, so we need
+  * to set LC_TIME to the locale name with .UTF-8 on the end (if
+  * the locale includes a character set specifier...)
   */
 
   setlocale(LC_ALL, "");
+
+#ifdef LC_TIME
+  {
+    const char	*lc_time;		/* Current LC_TIME value */
+    char	new_lc_time[255],	/* New LC_TIME value */
+		*charset;		/* Pointer to character set */
+
+    if ((lc_time = setlocale(LC_TIME, NULL)) == NULL)
+      lc_time = setlocale(LC_ALL, NULL);
+
+    if (lc_time)
+    {
+      strlcpy(new_lc_time, lc_time, sizeof(new_lc_time));
+      if ((charset = strchr(new_lc_time, '.')) == NULL)
+        charset = new_lc_time + strlen(new_lc_time);
+
+      strlcpy(charset, ".UTF-8", sizeof(new_lc_time) - (charset - new_lc_time));
+    }
+    else
+      strcpy(new_lc_time, "C");
+
+    setlocale(LC_TIME, new_lc_time);
+  }
+#endif /* LC_TIME */
+  
+ /*
+  * Parse command-line options...
+  */
 
   http        = NULL;
   num_dests   = 0;
