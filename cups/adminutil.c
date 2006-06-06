@@ -222,18 +222,18 @@ cupsAdminCreateWindowsPPD(
       */
 
       cupsFilePrintf(dstfp, "*%% Commented out for CUPS Windows Driver...\n"
-                            "*%%%s", line + 1);
+                            "*%%%s\n", line + 1);
       continue;
     }
     else if (!strncmp(line, "*JCLOpenUI", 10))
     {
       jcloption = 1;
-      cupsFilePuts(dstfp, line);
+      cupsFilePrintf(dstfp, "%s\n", line);
     }
     else if (!strncmp(line, "*JCLCloseUI", 11))
     {
       jcloption = 0;
-      cupsFilePuts(dstfp, line);
+      cupsFilePrintf(dstfp, "%s\n", line);
     }
     else if (jcloption &&
              strncmp(line, "*End", 4) &&
@@ -312,12 +312,13 @@ cupsAdminCreateWindowsPPD(
       }
 
       snprintf(ptr + 1, sizeof(line) - (ptr - line + 1),
-               "%%cupsJobTicket: %s=%s\n\"\n*End\n", option, choice);
+               "%%cupsJobTicket: %s=%s\n\"\n*End", option, choice);
 
-      cupsFilePrintf(dstfp, "*%% Changed for CUPS Windows Driver...\n%s", line);
+      cupsFilePrintf(dstfp, "*%% Changed for CUPS Windows Driver...\n%s\n",
+                     line);
     }
     else
-      cupsFilePuts(dstfp, line);
+      cupsFilePrintf(dstfp, "%s\n", line);
   }
 
   cupsFileClose(srcfp);
