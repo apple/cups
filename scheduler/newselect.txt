@@ -1,0 +1,60 @@
+Design Notes for New Poll/Select API in CUPSD - 2006-06-05
+----------------------------------------------------------
+
+SUPPORTED APIS
+
+    OS              select  poll    epoll   kqueue  /dev/poll
+    --------------  ------  ------  ------  ------  ---------
+    AIX             YES     YES     NO      NO      NO
+    FreeBSD         YES     YES     NO      YES     NO
+    HP-UX           YES     YES     NO      NO      NO
+    IRIX            YES     YES     NO      NO      NO
+    Linux           YES     YES     YES     NO      NO
+    MacOS X         YES     YES     NO      YES     NO
+    NetBSD          YES     YES     NO      YES     NO
+    OpenBSD         YES     YES     NO      YES     NO
+    Solaris         YES     YES     NO      NO      YES
+    Tru64           YES     ???     NO      NO      NO
+    Windows         YES     NO      NO      NO      NO
+
+
+HIGH-LEVEL API
+
+    typedef void (*cupsd_selfunc_t)(void *data);
+
+    void cupsdStartSelect(void);
+    void cupsdStopSelect(void);
+    void cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
+                        cupsd_selfunc_t write_cb, void *data);
+    void cupsdRemoveSelect(int fd);
+    int cupsdDoSelect(int timeout);
+
+
+IMPLEMENTATION STRATEGY
+
+    1. select()
+	a. CUPS array of file descriptor to callback functions and data.
+	b. Input/Output fd_set variables, copied to working copies and then
+           used with select().
+	c. Loop through CUPS array, using FD_ISSET and calling the read/
+           write callbacks as needed.
+	d. cupsdRemoveSelect() clears fd_set bit from main and working
+           sets.
+
+    2. poll()
+	a. CUPS array of file descriptor to callback functions and data.
+	b. Regular array of pollfd, sorted the same as the CUPS array.
+	c. Loop through pollfd array, call the corresponding read/write
+           callbacks as needed.
+	d. cupsdAddSelect() adds first to CUPS array, then uses current
+           index to determine insertion point for pollfd array.
+	e. cupsdRemoveSelect() needs to update cupsdDoSelect() loop
+	   counter if <= current index.
+
+    3. epoll()
+
+
+    4. kqueue()
+
+
+    5. /dev/poll
