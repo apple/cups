@@ -869,9 +869,12 @@ cupsdCheckAuth(
 	    */
 
 	    for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
-	         iface && !strcmp(masks->mask.name.name, iface->name);
+	         iface;
 		 iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
 	    {
+              if (strcmp(masks->mask.name.name, iface->name))
+                continue;
+
               if (iface->address.addr.sa_family == AF_INET)
 	      {
 	       /*
