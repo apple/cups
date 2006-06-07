@@ -289,6 +289,11 @@ cupsdReadConfiguration(void)
   cupsdSetString(&ServerHeader, "CUPS/1.2");
   cupsdSetString(&StateDir, CUPS_STATEDIR);
 
+  if (!strcmp(CUPS_DEFAULT_PRINTCAP, "/etc/printers.conf"))
+    PrintcapFormat = PRINTCAP_SOLARIS;
+  else
+    PrintcapFormat = PRINTCAP_BSD;
+
   strlcpy(temp, ConfigurationFile, sizeof(temp));
   if ((slash = strrchr(temp, '/')) != NULL)
     *slash = '\0';

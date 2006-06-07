@@ -34,7 +34,8 @@ AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no],
 	fi])
 
 dnl Setup general architecture flags...
-AC_ARG_WITH(archflags, [  --with-arch="flags"     set default architecture flags ])
+AC_ARG_WITH(archflags, [  --with-archflags="flags"
+                          set default architecture flags ])
 
 if test -z "$with_archflags"; then
 	ARCHFLAGS=""
@@ -46,7 +47,8 @@ AC_SUBST(ARCHFLAGS)
 
 dnl Setup support for separate 32/64-bit library generation...
 AC_ARG_ENABLE(32bit, [  --enable-32bit          generate 32-bit libraries on 32/64-bit systems, default=no])
-AC_ARG_WITH(arch32flags, [  --with-arch32="flags"   specifies 32-bit architecture flags])
+AC_ARG_WITH(arch32flags, [  --with-arch32flags="flags"
+                          specifies 32-bit architecture flags])
 
 ARCH32FLAGS=""
 INSTALL32=""
@@ -63,7 +65,8 @@ AC_SUBST(LIB32DIR)
 AC_SUBST(UNINSTALL32)
 
 AC_ARG_ENABLE(64bit, [  --enable-64bit          generate 64-bit libraries on 32/64-bit systems, default=no])
-AC_ARG_WITH(arch64flags, [  --with-arch64="flags"   specifies 64-bit architecture flags])
+AC_ARG_WITH(arch64flags, [  --with-arch64flags="flags"
+                          specifies 64-bit architecture flags])
 
 ARCH64FLAGS=""
 INSTALL64=""
