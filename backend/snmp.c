@@ -1544,6 +1544,7 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 			  "/ipp/port2",
 			  "/ipp/port3",
 			  "/EPSON_IPP_Printer",
+			  "/printer",
 			  "/LPT1",
 			  "/LPT2",
 			  "/COM1",
@@ -1658,6 +1659,8 @@ probe_device(snmp_cache_t *device)	/* I - Device */
           strlcpy(temp, model->values[0].string.text, sizeof(temp));
 	else if (info)
 	  backendGetMakeModel(info->values[0].string.text, temp, sizeof(temp));
+        else
+	  temp[0] = '\0';
 
         fix_make_model(make_model, temp, sizeof(make_model));
 
