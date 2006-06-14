@@ -1,0 +1,293 @@
+/*
+ * "$Id$"
+ *
+ *   Raster benchmark program for the Common UNIX Printing System (CUPS).
+ *
+ *   Copyright 1997-2006 by Easy Software Products.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights for the CUPS Raster source
+ *   files are outlined in the GNU Library General Public License, located
+ *   in the "pstoraster" directory.  If this file is missing or damaged
+ *   please contact Easy Software Products at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636 USA
+ *
+ *       Voice: (301) 373-9600
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
+ *
+ *   This code and any derivative of it may be used and distributed
+ *   freely under the terms of the GNU General Public License when
+ *   used with GNU Ghostscript or its derivatives.  Use of the code
+ *   (or any derivative of it) with software other than GNU
+ *   GhostScript (or its derivatives) is governed by the CUPS license
+ *   agreement.
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
+ *
+ * Contents:
+ *
+ *   main() - Benchmark the raster read/write functions.
+ */
+
+/*
+ * Include necessary headers...
+ */
+
+#include "raster.h"
+#include <stdlib.h>
+#include <sys/time.h>
+
+
+/*
+ * Constants...
+ */
+
+#define TEST_WIDTH	1024
+#define TEST_HEIGHT	1024
+#define TEST_PAGES	16
+
+
+/*
+ * Local functions...
+ */
+
+static double	read_test(void);
+static double	write_test(int do_random);
+
+
+/*
+ * 'main()' - Benchmark the raster read/write functions.
+ */
+
+int					/* O - Exit status */
+main(void)
+{
+  int		i;			/* Looping var */
+  double	write_secs,		/* Write time */
+		read_secs,		/* Read time */
+		write_random,		/* Total write time for random */
+		write_normal,		/* Total write time for normal */
+		read_time;		/* Total read time */
+
+
+ /*
+  * Run the tests 10 times to get a good average...
+  */
+
+  printf("Test read/write speed of %d pages, %dx%d pixels...\n\n",
+         TEST_PAGES, TEST_WIDTH, TEST_HEIGHT);
+  for (i = 0, read_time = 0.0, write_normal = 0.0, write_random = 0.0; i < 10; i ++)
+  {
+    printf("PASS %d: normal-write", i + 1);
+    fflush(stdout);
+    write_secs = write_test(0);
+    write_normal += write_secs;
+
+    printf(" %.3f, read", write_secs);
+    fflush(stdout);
+    read_secs = read_test();
+    read_time  += read_secs;
+
+    printf(" %.3f, random-write", read_secs);
+    fflush(stdout);
+    write_secs = write_test(1);
+    write_random += write_secs;
+
+    printf(" %.3f, read", write_secs);
+    fflush(stdout);
+    read_secs = read_test();
+    read_time  += read_secs;
+
+    printf(" %.3f\n", read_secs);
+  }
+
+  printf("\nAverage Normal Write Time: %.3f seconds per document\n",
+         write_normal / i);
+  printf("Average Random Write Time: %.3f seconds per document\n",
+         write_random / i);
+  printf("Average Read Time: %.3f seconds per document\n",
+         read_time / i / 2);
+
+  return (0);
+}
+
+
+/*
+ * 'read_test()' - Benchmark the raster read functions.
+ */
+
+double					/* O - Total time in seconds */
+read_test(void)
+{
+  int			y;		/* Looping var */
+  FILE			*fp;		/* Raster file */
+  cups_raster_t		*r;		/* Raster stream */
+  cups_page_header_t	header;		/* Page header */
+  unsigned char		buffer[8 * TEST_WIDTH];
+					/* Read buffer */
+  struct timeval	start, end;	/* Start and end times */
+
+
+ /*
+  * Test read speed...
+  */
+
+  if ((fp = fopen("test.raster", "rb")) == NULL)
+  {
+    perror("Unable to open test.raster");
+    return (0.0);
+  }
+
+  if ((r = cupsRasterOpen(fileno(fp), CUPS_RASTER_READ)) == NULL)
+  {
+    perror("Unable to create raster input stream");
+    fclose(fp);
+    return (0.0);
+  }
+
+  gettimeofday(&start, NULL);
+
+  while (cupsRasterReadHeader(r, &header))
+  {
+    for (y = 0; y < header.cupsHeight; y ++)
+      cupsRasterReadPixels(r, buffer, header.cupsBytesPerLine);
+  }
+
+  cupsRasterClose(r);
+
+  gettimeofday(&end, NULL);
+
+  fclose(fp);
+
+  return (end.tv_sec - start.tv_sec +
+          0.000001 * (end.tv_usec - start.tv_usec));
+}
+
+
+/*
+ * 'write_test()' - Benchmark the raster write functions.
+ */
+
+double					/* O - Total time in seconds */
+write_test(int do_random)		/* I - Do random data? */
+{
+  int			page, x, y;	/* Looping vars */
+  FILE			*fp;		/* Raster file */
+  cups_raster_t		*r;		/* Raster stream */
+  cups_page_header_t	header;		/* Page header */
+  unsigned char		data[2][8 * TEST_WIDTH];
+					/* Raster data to write */
+  struct timeval	start, end;	/* Start and end times */
+
+
+  if (do_random)
+  {
+   /*
+    * Create some random data to test worst-case performance...
+    */
+
+    srand(time(NULL));
+
+    for (x = 0; x < sizeof(data[0]); x ++)
+    {
+      data[0][x] = rand();
+      data[1][x] = rand();
+    }
+  }
+  else
+  {
+   /*
+    * Otherwise, create some non-random data to test the best-case
+    * performance...
+    */
+
+    for (x = 0; x < sizeof(data[0]); x ++)
+    {
+      data[0][x] = x & 255;		/* Gradients */
+      data[1][x] = (x & 128) ? 255 : 0;	/* Alternating */
+    }
+  }
+
+ /*
+  * Test write speed...
+  */
+
+  if ((fp = fopen("test.raster", "wb")) == NULL)
+  {
+    perror("Unable to create test.raster");
+    return (0.0);
+  }
+
+  if ((r = cupsRasterOpen(fileno(fp), CUPS_RASTER_WRITE)) == NULL)
+  {
+    perror("Unable to create raster output stream");
+    fclose(fp);
+    return (0.0);
+  }
+
+  gettimeofday(&start, NULL);
+
+  for (page = 0; page < 16; page ++)
+  {
+    memset(&header, 0, sizeof(header));
+    header.cupsWidth        = 1024;
+    header.cupsHeight       = 1024;
+    header.cupsBytesPerLine = 1024;
+
+    if (page & 1)
+    {
+      header.cupsBytesPerLine *= 2;
+      header.cupsColorSpace = CUPS_CSPACE_CMYK;
+      header.cupsColorOrder = CUPS_ORDER_CHUNKED;
+    }
+    else
+    {
+      header.cupsColorSpace = CUPS_CSPACE_K;
+      header.cupsColorOrder = CUPS_ORDER_BANDED;
+    }
+
+    if (page & 2)
+    {
+      header.cupsBytesPerLine *= 2;
+      header.cupsBitsPerColor = 16;
+      header.cupsBitsPerPixel = (page & 1) ? 64 : 16;
+    }
+    else
+    {
+      header.cupsBitsPerColor = 8;
+      header.cupsBitsPerPixel = (page & 1) ? 32 : 8;
+    }
+
+    cupsRasterWriteHeader(r, &header);
+
+    for (y = 0; y < 1024; y ++)
+    {
+      if (do_random)
+        cupsRasterWritePixels(r, data[y & 1], header.cupsBytesPerLine);
+      else if (y & 128)
+        cupsRasterWritePixels(r, data[1], header.cupsBytesPerLine);
+      else
+        cupsRasterWritePixels(r, data[0], header.cupsBytesPerLine);
+    }
+  }
+
+  cupsRasterClose(r);
+
+  gettimeofday(&end, NULL);
+
+  fclose(fp);
+
+  return (end.tv_sec - start.tv_sec +
+          0.000001 * (end.tv_usec - start.tv_usec));
+}
+
+
+/*
+ * End of "$Id$".
+ */

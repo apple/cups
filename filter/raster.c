@@ -86,6 +86,8 @@ struct _cups_raster_s			/**** Raster stream data ****/
   unsigned char		*pixels,	/* Pixels for current row */
 			*pend,		/* End of pixel buffer */
 			*pcurrent;	/* Current byte in pixel buffer */
+  unsigned char		*wbuffer;	/* Write buffer */
+  int			wsize;		/* Write buffer size */
 };
 
 /*
@@ -767,8 +769,11 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
 {
   unsigned char	*start,			/* Start of sequence */
 		*ptr,			/* Current pointer in sequence */
-		byte;			/* Byte to write */
-  int		count;			/* Count */
+		*pend,			/* End of raster buffer */
+		*plast,			/* Pointer to last pixel */
+		*wptr;			/* Pointer into write buffer */
+  int		bpp,			/* Bytes per pixel */
+		count;			/* Count */
 
 
 #ifdef DEBUG
@@ -776,86 +781,69 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
 #endif /* DEBUG */
 
  /*
+  * Allocate a write buffer as needed...
+  */
+
+  count = r->header.cupsBytesPerLine * 2;
+  if (count > r->wsize)
+  {
+    if (r->wbuffer)
+      wptr = realloc(r->wbuffer, count);
+    else
+      wptr = malloc(count);
+
+    if (!wptr)
+      return (-1);
+
+    r->wbuffer = wptr;
+    r->wsize   = count;
+  }
+
+ /*
   * Write the row repeat count...
   */
 
-  byte = r->count - 1;
-
-  if (cups_write(r->fd, &byte, 1) < 1)
-  {
-#ifdef DEBUG
-    fputs("cups_raster_write: Unable to write row repeat count...\n",
-          stderr);
-#endif /* DEBUG */
-
-    return (0);
-  }
+  bpp     = r->bpp;
+  pend    = r->pend;
+  plast   = pend - bpp;
+  wptr    = r->wbuffer;
+  *wptr++ = r->count - 1;
 
  /*
   * Write using a modified TIFF "packbits" compression...
   */
 
-  for (ptr = r->pixels; ptr < r->pend;)
+  for (ptr = r->pixels; ptr < pend;)
   {
     start = ptr;
-    ptr += r->bpp;
+    ptr += bpp;
 
-    if (ptr == r->pend)
+    if (ptr == pend)
     {
      /*
       * Encode a single pixel at the end...
       */
 
-      byte = 0;
-      if (cups_write(r->fd, &byte, 1) < 1)
-      {
-#ifdef DEBUG
-        fputs("cups_raster_write: Unable to write last pixel count...\n", stderr);
-#endif /* DEBUG */
-
-        return (0);
-      }
-
-      if (cups_write(r->fd, start, r->bpp) < r->bpp)
-      {
-#ifdef DEBUG
-        fputs("cups_raster_write: Unable to write last pixel data...\n", stderr);
-#endif /* DEBUG */
-
-        return (0);
-      }
+      *wptr++ = 0;
+      memcpy(wptr, start, bpp);
+      wptr += bpp;
+      ptr  += bpp;
     }
-    else if (!memcmp(start, ptr, r->bpp))
+    else if (!memcmp(start, ptr, bpp))
     {
      /*
       * Encode a sequence of repeating pixels...
       */
 
-      for (count = 2; count < 128 && ptr < (r->pend - r->bpp); count ++, ptr += r->bpp)
-        if (memcmp(ptr, ptr + r->bpp, r->bpp) != 0)
+      for (count = 2; count < 128 && ptr < plast; count ++, ptr += bpp)
+        if (memcmp(ptr, ptr + bpp, bpp))
 	  break;
 
-      ptr += r->bpp;
+      ptr += bpp;
 
-      byte = count - 1;
-
-      if (cups_write(r->fd, &byte, 1) < 1)
-      {
-#ifdef DEBUG
-        fputs("cups_raster_write: Unable to write repeated pixel count...\n", stderr);
-#endif /* DEBUG */
-
-        return (0);
-      }
-
-      if (cups_write(r->fd, start, r->bpp) < r->bpp)
-      {
-#ifdef DEBUG
-        fputs("cups_raster_write: Unable to write repeated pixel data...\n", stderr);
-#endif /* DEBUG */
-
-        return (0);
-      }
+      *wptr++ = count - 1;
+      memcpy(wptr, start, bpp);
+      wptr += bpp;
     }
     else
     {
@@ -863,41 +851,25 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       * Encode a sequence of non-repeating pixels...
       */
 
-      for (count = 1; count < 127 && ptr < (r->pend - r->bpp); count ++, ptr += r->bpp)
-        if (!memcmp(ptr, ptr + r->bpp, r->bpp))
+      for (count = 1; count < 127 && ptr < plast; count ++, ptr += bpp)
+        if (!memcmp(ptr, ptr + bpp, bpp))
 	  break;
 
-      if (ptr >= (r->pend - r->bpp) && count < 128)
+      if (ptr >= plast && count < 128)
       {
         count ++;
-	ptr += r->bpp;
+	ptr += bpp;
       }
  
-      byte = 257 - count;
+      *wptr++ = 257 - count;
 
-      if (cups_write(r->fd, &byte, 1) < 1)
-      {
-#ifdef DEBUG
-        fputs("cups_raster_write: Unable to write non-repeating pixel count...\n", stderr);
-#endif /* DEBUG */
-
-        return (0);
-      }
-
-      count *= r->bpp;
-
-      if (cups_write(r->fd, start, count) < count)
-      {
-#ifdef DEBUG
-        fputs("cups_raster_write: Unable to write non-repeating pixel data...\n", stderr);
-#endif /* DEBUG */
-
-        return (0);
-      }
+      count *= bpp;
+      memcpy(wptr, start, count);
+      wptr += count;
     }
   }
 
-  return (r->header.cupsBytesPerLine);
+  return (cups_write(r->fd, r->wbuffer, wptr - r->wbuffer));
 }
 
 

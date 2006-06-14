@@ -33,6 +33,7 @@ TARGETS	=	$(FILTERS) \
 		libcupsimage.a \
 		$(LIB32CUPSIMAGE) \
 		$(LIB64CUPSIMAGE) \
+		rasterbench \
 		testimage \
 		testraster
 
@@ -47,7 +48,7 @@ IMAGE64OBJS =	$(IMAGEOBJS:.o=.64.o)
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 		gziptoany.o imagetops.o imagetoraster.o common.o pstops.o \
-		raster.o rastertoepson.o rastertohp.o rastertolabel.o \
+		rasterbench.o rastertoepson.o rastertohp.o rastertolabel.o \
 		testimage.o testraster.o textcommon.o texttops.o
 
 
@@ -357,6 +358,15 @@ rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 testraster:	testraster.o raster.o
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testraster.o raster.o
+
+
+#
+# rasterbench
+#
+
+rasterbench:	rasterbench.o raster.o
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ rasterbench.o raster.o
 
 
 #
