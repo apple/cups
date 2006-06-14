@@ -46,6 +46,7 @@
  *   cupsRasterWriteHeader2() - Write a raster page header from a V2 page
  *                              header structure.
  *   cupsRasterWritePixels()  - Write raster pixels.
+ *   cups_raster_read()       - Read through the raster buffer.
  *   cups_raster_update()     - Update the raster header and row count for the
  *                              current page.
  *   cups_raster_write()      - Write a row of raster data...
@@ -58,7 +59,7 @@
  */
 
 #include "raster.h"
-#include <stdio.h>
+#include <cups/debug.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <cups/string.h>
@@ -86,15 +87,20 @@ struct _cups_raster_s			/**** Raster stream data ****/
   unsigned char		*pixels,	/* Pixels for current row */
 			*pend,		/* End of pixel buffer */
 			*pcurrent;	/* Current byte in pixel buffer */
-  unsigned char		*wbuffer;	/* Write buffer */
-  int			wsize;		/* Write buffer size */
+  unsigned char		*buffer,	/* Read/write buffer */
+			*bufptr,	/* Current (read) position in buffer */
+			*bufend;	/* End of current (read) buffer */
+  int			bufsize;	/* Buffer size */
 };
+
 
 /*
  * Local functions...
  */
 
 static unsigned	cups_raster_read_header(cups_raster_t *r);
+static int	cups_raster_read(cups_raster_t *r, unsigned char *buf,
+		                 int bytes);
 static void	cups_raster_update(cups_raster_t *r);
 static int	cups_raster_write(cups_raster_t *r);
 static int	cups_read(int fd, unsigned char *buf, int bytes);
@@ -110,6 +116,9 @@ cupsRasterClose(cups_raster_t *r)	/* I - Stream to close */
 {
   if (r != NULL)
   {
+    if (r->buffer)
+      free(r->buffer);
+
     if (r->pixels)
       free(r->pixels);
 
@@ -141,8 +150,7 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
     * Open for read - get sync word...
     */
 
-    if (cups_read(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync))
-            < sizeof(r->sync))
+    if (!cups_read(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync)))
     {
       free(r);
       return (NULL);
@@ -271,8 +279,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 	* Read without compression...
 	*/
 
-        if (cups_read(r->fd, ptr, r->header.cupsBytesPerLine) <
-	        r->header.cupsBytesPerLine)
+        if (!cups_raster_read(r, ptr, r->header.cupsBytesPerLine))
 	  return (0);
 
         r->count = 1;
@@ -287,7 +294,8 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 	int		count;		/* Repetition count */
 
 
-        if (cups_read(r->fd, &byte, 1) < 1)
+        
+        if (!cups_raster_read(r, &byte, 1))
 	  return (0);
 
         r->count = byte + 1;
@@ -304,7 +312,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 	  * Get a new repeat count...
 	  */
 
-          if (cups_read(r->fd, &byte, 1) < 1)
+          if (!cups_raster_read(r, &byte, 1))
 	    return (0);
 
 	  if (byte & 128)
@@ -318,7 +326,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
             if (count > bytes)
 	      count = bytes;
 
-            if (cups_read(r->fd, temp, count) < count)
+            if (!cups_raster_read(r, temp, count))
 	      return (0);
 
 	    temp  += count;
@@ -339,7 +347,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 
 	    bytes -= count;
 
-            if (cups_read(r->fd, temp, r->bpp) < r->bpp)
+            if (!cups_raster_read(r, temp, r->bpp))
 	      return (0);
 
 	    temp  += r->bpp;
@@ -638,7 +646,7 @@ cups_raster_read_header(
 
   memset(&(r->header), 0, sizeof(r->header));
 
-  if (cups_read(r->fd, (unsigned char *)&(r->header), len) < len)
+  if (cups_raster_read(r, (unsigned char *)&(r->header), len) < len)
     return (0);
 
  /*
@@ -658,6 +666,105 @@ cups_raster_read_header(
   cups_raster_update(r);
 
   return (1);
+}
+
+
+/*
+ * 'cups_raster_read()' - Read through the raster buffer.
+ */
+
+static int				/* O - Number of bytes read */
+cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
+                 unsigned char *buf,	/* I - Buffer */
+                 int           bytes)	/* I - Number of bytes to read */
+{
+  int		count,			/* Number of bytes read */
+		remaining,		/* Remaining bytes in buffer */
+		total;			/* Total bytes read */
+
+
+  DEBUG_printf(("cups_raster_read(r=%p, buf=%p, bytes=%d)\n", r, buf, bytes));
+
+ /*
+  * Allocate a read buffer as needed...
+  */
+
+  count = 2 * r->header.cupsBytesPerLine;
+
+  if (count > r->count)
+  {
+    int offset = r->bufptr - r->buffer;	/* Offset to current start of buffer */
+    int end = r->bufend - r->buffer;	/* Offset to current end of buffer */
+    unsigned char *rptr;		/* Pointer in read buffer */
+
+    if (r->buffer)
+      rptr = realloc(r->buffer, count);
+    else
+      rptr = malloc(count);
+
+    if (!rptr)
+      return (0);
+
+    r->buffer  = rptr;
+    r->bufptr  = rptr + offset;
+    r->bufend  = rptr + end;
+    r->bufsize = count;
+  }
+
+ /*
+  * Loop until we have read everything...
+  */
+
+  for (total = 0, remaining = r->bufend - r->bufptr;
+       total < bytes;
+       total += count, buf += count)
+  {
+    count = bytes - total;
+
+    DEBUG_printf(("count=%d, remaining=%d, buf=%p...\n", count, remaining,
+                  buf));
+
+    if (remaining == 0)
+    {
+      if (count < 16)
+      {
+       /*
+        * Read into the raster buffer and then copy...
+	*/
+
+        remaining = cups_read(r->fd, r->buffer, r->bufsize);
+	if (remaining <= 0)
+	  return (0);
+
+	r->bufptr = r->buffer + count;
+	r->bufend = r->buffer + remaining;
+	remaining -= count;
+
+        memcpy(buf, r->buffer, count);
+      }
+      else
+      {
+       /*
+        * Read directly into "buf"...
+	*/
+
+	count = cups_read(r->fd, buf, count);
+	if (count <= 0)
+	  return (0);
+      }
+    }
+    else
+    {
+      if (count > remaining)
+        count = remaining;
+
+      memcpy(buf, r->bufptr, count);
+      r->bufptr += count;
+      remaining -= count;
+    }
+  }
+
+  return (total);
 }
 
 
@@ -785,18 +892,18 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
   */
 
   count = r->header.cupsBytesPerLine * 2;
-  if (count > r->wsize)
+  if (count > r->bufsize)
   {
-    if (r->wbuffer)
-      wptr = realloc(r->wbuffer, count);
+    if (r->buffer)
+      wptr = realloc(r->buffer, count);
     else
       wptr = malloc(count);
 
     if (!wptr)
       return (-1);
 
-    r->wbuffer = wptr;
-    r->wsize   = count;
+    r->buffer  = wptr;
+    r->bufsize = count;
   }
 
  /*
@@ -806,7 +913,7 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
   bpp     = r->bpp;
   pend    = r->pend;
   plast   = pend - bpp;
-  wptr    = r->wbuffer;
+  wptr    = r->buffer;
   *wptr++ = r->count - 1;
 
  /*
@@ -869,7 +976,7 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
     }
   }
 
-  return (cups_write(r->fd, r->wbuffer, wptr - r->wbuffer));
+  return (cups_write(r->fd, r->buffer, wptr - r->buffer));
 }
 
 

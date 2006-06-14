@@ -73,7 +73,8 @@ main(void)
 		read_secs,		/* Read time */
 		write_random,		/* Total write time for random */
 		write_normal,		/* Total write time for normal */
-		read_time;		/* Total read time */
+		read_random,		/* Total read time for random */
+		read_normal;		/* Total read time for normal */
 
 
  /*
@@ -82,7 +83,10 @@ main(void)
 
   printf("Test read/write speed of %d pages, %dx%d pixels...\n\n",
          TEST_PAGES, TEST_WIDTH, TEST_HEIGHT);
-  for (i = 0, read_time = 0.0, write_normal = 0.0, write_random = 0.0; i < 10; i ++)
+  for (i = 0, read_normal = 0.0, read_random = 0.0,
+           write_normal = 0.0, write_random = 0.0;
+       i < 10;
+       i ++)
   {
     printf("PASS %d: normal-write", i + 1);
     fflush(stdout);
@@ -92,7 +96,7 @@ main(void)
     printf(" %.3f, read", write_secs);
     fflush(stdout);
     read_secs = read_test();
-    read_time  += read_secs;
+    read_normal += read_secs;
 
     printf(" %.3f, random-write", read_secs);
     fflush(stdout);
@@ -102,17 +106,24 @@ main(void)
     printf(" %.3f, read", write_secs);
     fflush(stdout);
     read_secs = read_test();
-    read_time  += read_secs;
+    read_random += read_secs;
 
     printf(" %.3f\n", read_secs);
   }
 
-  printf("\nAverage Normal Write Time: %.3f seconds per document\n",
+  printf("\nNormal Write Time: %.3f seconds per document\n",
          write_normal / i);
-  printf("Average Random Write Time: %.3f seconds per document\n",
+  printf("Random Write Time: %.3f seconds per document\n",
          write_random / i);
+  printf("Average Write Time: %.3f seconds per document\n",
+         (write_normal + write_random) / 2 / i);
+
+  printf("\nNormal Read Time: %.3f seconds per document\n",
+         read_normal / i);
+  printf("Random Read Time: %.3f seconds per document\n",
+         read_random / i);
   printf("Average Read Time: %.3f seconds per document\n",
-         read_time / i / 2);
+         (read_normal + read_random) / 2 / i);
 
   return (0);
 }
