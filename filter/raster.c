@@ -932,9 +932,8 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       */
 
       *wptr++ = 0;
-      memcpy(wptr, start, bpp);
-      wptr += bpp;
-      ptr  += bpp;
+      for (count = bpp; count > 0; count --)
+        *wptr++ = *start++;
     }
     else if (!memcmp(start, ptr, bpp))
     {
@@ -946,13 +945,12 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
         if (memcmp(ptr, ptr + bpp, bpp))
 	  break;
 
-      ptr += bpp;
-
       *wptr++ = count - 1;
-      memcpy(wptr, start, bpp);
-      wptr += bpp;
+      for (count = bpp; count > 0; count --)
+        *wptr++ = *ptr++;
     }
     else
+#ifdef OPTIMIZE_FOR_COMPRESSION
     {
      /*
       * Encode a sequence of non-repeating pixels...
@@ -974,6 +972,24 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       memcpy(wptr, start, count);
       wptr += count;
     }
+#else /* OPTIMIZE_FOR_SPEED */
+    {
+     /*
+      * Encode a sequence of non-repeating pixels...
+      */
+
+      count = (pend - start) / bpp;
+      if (count > 128)
+        count = 128;
+
+      *wptr++ = 257 - count;
+
+      count *= bpp;
+      memcpy(wptr, start, count);
+      wptr += count;
+      ptr  = start + count;
+    }
+#endif /* OPTIMIZE_FOR_COMPRESSION/SPEED */
   }
 
   return (cups_write(r->fd, r->buffer, wptr - r->buffer));
