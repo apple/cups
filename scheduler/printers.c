@@ -661,7 +661,7 @@ cupsdDeletePrinter(
 	   dp = (cupsd_printer_t *)cupsArrayNext(Printers))
 	if (dp != p && (dp->type & CUPS_PRINTER_DEFAULT))
 	{
-	  DefaultPrinter = p;
+	  DefaultPrinter = dp;
 	  break;
 	}
     }
