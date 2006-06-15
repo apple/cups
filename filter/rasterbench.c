@@ -32,7 +32,10 @@
  *
  * Contents:
  *
- *   main() - Benchmark the raster read/write functions.
+ *   main()           - Benchmark the raster read/write functions.
+ *   compute_median() - Compute the median time for a test.
+ *   read_test()      - Benchmark the raster read functions.
+ *   write_test()     - Benchmark the raster write functions.
  */
 
 /*
@@ -68,7 +71,8 @@ static double	write_test(int do_random);
  */
 
 int					/* O - Exit status */
-main(void)
+main(int  argc,				/* I - Number of command-line args */
+     char *argv[])			/* I - Command-line arguments */
 {
   int		i;			/* Looping var */
   double	secs,			/* Test times */
