@@ -723,8 +723,6 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 
     DEBUG_printf(("count=%d, remaining=%d, buf=%p, bufptr=%p, bufend=%p...\n",
                   count, remaining, buf, r->bufptr, r->bufend));
-//    printf("count=%d, remaining=%d, buf=%p, bufptr=%p, bufend=%p...\n",
-//                  count, remaining, buf, r->bufptr, r->bufend);
 
     if (remaining == 0)
     {
