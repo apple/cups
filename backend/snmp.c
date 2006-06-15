@@ -1544,7 +1544,6 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 			  "/ipp/port2",
 			  "/ipp/port3",
 			  "/EPSON_IPP_Printer",
-			  "/printer",
 			  "/LPT1",
 			  "/LPT2",
 			  "/COM1",
