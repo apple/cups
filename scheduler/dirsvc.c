@@ -2540,7 +2540,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 
 	  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
 	                   iface->hostname, iface->port,
-			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
+			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s" :
 			                                    "/printers/%s",
 			   p->name);
 	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
