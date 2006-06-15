@@ -1356,11 +1356,33 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
     * Parse dotted-decimal IPv4 address...
     */
 
-    family  = AF_INET;
-    ipcount = sscanf(value, "%u.%u.%u.%u", ip + 0, ip + 1, ip + 2, ip + 3);
+    unsigned val[4];			/* IPv4 address values */
 
-    ip[3] |= ((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8;
-    ip[0] = ip[1] = ip[2] = 0;
+
+    family  = AF_INET;
+    ipcount = sscanf(value, "%u.%u.%u.%u", val + 0, val + 1, val + 2, val + 3);
+
+   /*
+    * Range check the IP numbers...
+    */
+
+    for (i = 0; i < ipcount; i ++)
+      if (val[i] > 255)
+        return (0);
+
+   /*
+    * Make sure the trailing values are zeroed, as some C libraries like
+    * glibc apparently like to fill the unused arguments with garbage...
+    */
+
+    for (i = ipcount; i < 4; i ++)
+      val[i] = 0;
+
+   /*
+    * Merge everything into a 32-bit IPv4 address in ip[3]...
+    */
+
+    ip[3] = (((((val[0] << 8) | val[1]) << 8) | val[2]) << 8) | val[3];
 
     if (ipcount < 4)
       mask[3] = (0xffffffff << (32 - 8 * ipcount)) & 0xffffffff;
