@@ -691,7 +691,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 
   count = 2 * r->header.cupsBytesPerLine;
 
-  if (count > r->count)
+  if (count > r->bufsize)
   {
     int offset = r->bufptr - r->buffer;	/* Offset to current start of buffer */
     int end = r->bufend - r->buffer;	/* Offset to current end of buffer */
@@ -721,8 +721,10 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
   {
     count = bytes - total;
 
-    DEBUG_printf(("count=%d, remaining=%d, buf=%p...\n", count, remaining,
-                  buf));
+    DEBUG_printf(("count=%d, remaining=%d, buf=%p, bufptr=%p, bufend=%p...\n",
+                  count, remaining, buf, r->bufptr, r->bufend));
+//    printf("count=%d, remaining=%d, buf=%p, bufptr=%p, bufend=%p...\n",
+//                  count, remaining, buf, r->bufptr, r->bufend);
 
     if (remaining == 0)
     {
@@ -736,11 +738,8 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 	if (remaining <= 0)
 	  return (0);
 
-	r->bufptr = r->buffer + count;
+	r->bufptr = r->buffer;
 	r->bufend = r->buffer + remaining;
-	remaining -= count;
-
-        memcpy(buf, r->buffer, count);
       }
       else
       {
@@ -749,14 +748,53 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 	*/
 
 	count = cups_read(r->fd, buf, count);
+
 	if (count <= 0)
 	  return (0);
+
+	continue;
       }
+    }
+
+   /*
+    * Copy bytes from raster buffer to "buf"...
+    */
+
+    if (count > remaining)
+      count = remaining;
+
+    if (count == 1)
+    {
+     /*
+      * Copy 1 byte...
+      */
+
+      *buf = *(r->bufptr)++;
+      remaining --;
+    }
+    else if (count < 128)
+    {
+     /*
+      * Copy up to 127 bytes without using memcpy(); this is
+      * faster because it avoids an extra function call and is
+      * often further optimized by the compiler...
+      */
+
+      unsigned char	*bufptr;	/* Temporary buffer pointer */
+
+
+      remaining -= count;
+
+      for (bufptr = r->bufptr; count > 0; count --, total ++)
+	*buf++ = *bufptr++;
+
+      r->bufptr = bufptr;
     }
     else
     {
-      if (count > remaining)
-        count = remaining;
+     /*
+      * Use memcpy() for a large read...
+      */
 
       memcpy(buf, r->bufptr, count);
       r->bufptr += count;
@@ -880,7 +918,8 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
 		*plast,			/* Pointer to last pixel */
 		*wptr;			/* Pointer into write buffer */
   int		bpp,			/* Bytes per pixel */
-		count;			/* Count */
+		count,			/* Count */
+		maxrun;			/* Maximum run of 128 * bpp */
 
 
 #ifdef DEBUG
@@ -915,6 +954,7 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
   plast   = pend - bpp;
   wptr    = r->buffer;
   *wptr++ = r->count - 1;
+  maxrun  = 128 * bpp;
 
  /*
   * Write using a modified TIFF "packbits" compression...
@@ -978,13 +1018,12 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       * Encode a sequence of non-repeating pixels...
       */
 
-      count = (pend - start) / bpp;
-      if (count > 128)
-        count = 128;
+      count = pend - start;
+      if (count > maxrun)
+        count = maxrun;
 
-      *wptr++ = 257 - count;
+      *wptr++ = 257 - count / bpp;
 
-      count *= bpp;
       memcpy(wptr, start, count);
       wptr += count;
       ptr  = start + count;
