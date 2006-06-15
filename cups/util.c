@@ -800,6 +800,8 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
             const char *name)		/* I - Printer name */
 {
   int		http_port;		/* Port number */
+  char		http_hostname[HTTP_MAX_HOST];
+					/* Hostname associated with connection */
   http_t	*http2;			/* Alternate HTTP connection */
   int		fd;			/* PPD file */
   char		localhost[HTTP_MAX_URI],/* Local hostname */
@@ -845,8 +847,10 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     strcpy(hostname, "localhost");
 
  /*
-  * Get the port number we are connected to...
+  * Get the hostname and port number we are connected to...
   */
+
+  httpGetHostname(http, http_hostname, sizeof(http_hostname));
 
 #ifdef AF_INET6
   if (http->hostaddr->addr.sa_family == AF_INET6)
@@ -862,7 +866,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   * Reconnect to the correct server as needed...
   */
 
-  if (!strcasecmp(http->hostname, hostname) && port == http_port)
+  if (!strcasecmp(http_hostname, hostname) && port == http_port)
     http2 = http;
   else if ((http2 = httpConnectEncrypt(hostname, port,
                                        cupsEncryption())) == NULL)
@@ -1394,7 +1398,8 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 	     char       *printer,	/* O - Printer name [HTTP_MAX_URI] */
              char       *hostname)	/* O - Hostname [HTTP_MAX_URI] */
 {
-  char	hostbuf[HTTP_MAX_URI];		/* Name of host */
+  char	hostbuf[HTTP_MAX_URI],		/* Name of host */
+	http_hostname[HTTP_MAX_HOST];	/* Hostname associated with connection */
   _cups_globals_t  *cg = _cupsGlobals();/* Pointer to library globals */
 
 
@@ -1415,6 +1420,8 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
   strlcpy(hostbuf, cupsServer(), sizeof(hostbuf));
 
+  httpGetHostname(cg->http, http_hostname, sizeof(http_hostname));
+
   if (hostname != NULL)
     strlcpy(hostname, hostbuf, HTTP_MAX_URI);
   else
@@ -1427,7 +1434,7 @@ cups_connect(const char *name,		/* I - Destination (printer[@host]) */
 
   if (cg->http != NULL)
   {
-    if (!strcasecmp(cg->http->hostname, hostname))
+    if (!strcasecmp(http_hostname, hostname))
       return (printer);
 
     httpClose(cg->http);
@@ -1473,7 +1480,9 @@ cups_get_printer_uri(
   char		uri[HTTP_MAX_URI],	/* printer-uri attribute */
 		scheme[HTTP_MAX_URI],	/* Scheme name */
 		username[HTTP_MAX_URI],	/* Username:password */
-		classname[255];		/* Temporary class name */
+		classname[255],		/* Temporary class name */
+		http_hostname[HTTP_MAX_HOST];
+					/* Hostname associated with connection */
   static const char * const requested_attrs[] =
 		{			/* Requested attributes */
 		  "printer-uri-supported",
@@ -1505,8 +1514,10 @@ cups_get_printer_uri(
   DEBUG_printf(("cups_get_printer_uri: printer-uri=\"%s\"\n", uri));
 
  /*
-  * Get the port number we are connected to...
+  * Get the hostname and port number we are connected to...
   */
+
+  httpGetHostname(http, http_hostname, sizeof(http_hostname));
 
 #ifdef AF_INET6
   if (http->hostaddr->addr.sa_family == AF_INET6)
@@ -1585,7 +1596,7 @@ cups_get_printer_uri(
 	    * Found a class!  Connect to the right server...
 	    */
 
-	    if (!strcasecmp(http->hostname, host) && *port == http_port)
+	    if (!strcasecmp(http_hostname, host) && *port == http_port)
 	      http2 = http;
 	    else if ((http2 = httpConnectEncrypt(host, *port,
 						 cupsEncryption())) == NULL)
