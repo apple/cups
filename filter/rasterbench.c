@@ -51,12 +51,14 @@
 #define TEST_WIDTH	1024
 #define TEST_HEIGHT	1024
 #define TEST_PAGES	16
+#define TEST_PASSES	20
 
 
 /*
  * Local functions...
  */
 
+static double	compute_median(double *secs);
 static double	read_test(void);
 static double	write_test(int do_random);
 
@@ -69,11 +71,14 @@ int					/* O - Exit status */
 main(void)
 {
   int		i;			/* Looping var */
-  double	write_secs,		/* Write time */
-		read_secs,		/* Read time */
+  double	secs,			/* Test times */
+		write_random_secs[TEST_PASSES],
+		read_random_secs[TEST_PASSES],
+		write_normal_secs[TEST_PASSES],
+		read_normal_secs[TEST_PASSES],
 		write_random,		/* Total write time for random */
-		write_normal,		/* Total write time for normal */
 		read_random,		/* Total read time for random */
+		write_normal,		/* Total write time for normal */
 		read_normal;		/* Total read time for normal */
 
 
@@ -85,47 +90,80 @@ main(void)
          TEST_PAGES, TEST_WIDTH, TEST_HEIGHT);
   for (i = 0, read_normal = 0.0, read_random = 0.0,
            write_normal = 0.0, write_random = 0.0;
-       i < 10;
+       i < TEST_PASSES;
        i ++)
   {
-    printf("PASS %d: normal-write", i + 1);
+    printf("PASS %2d: normal-write", i + 1);
     fflush(stdout);
-    write_secs = write_test(0);
-    write_normal += write_secs;
+    secs = write_normal_secs[i] = write_test(0);
 
-    printf(" %.3f, read", write_secs);
+    printf(" %.3f, read", secs);
     fflush(stdout);
-    read_secs = read_test();
-    read_normal += read_secs;
+    secs = read_normal_secs[i] = read_test();
 
-    printf(" %.3f, random-write", read_secs);
+    printf(" %.3f, random-write", secs);
     fflush(stdout);
-    write_secs = write_test(1);
-    write_random += write_secs;
+    secs = write_random_secs[i] = write_test(1);
 
-    printf(" %.3f, read", write_secs);
+    printf(" %.3f, read", secs);
     fflush(stdout);
-    read_secs = read_test();
-    read_random += read_secs;
+    secs = read_random_secs[i] = read_test();
 
-    printf(" %.3f\n", read_secs);
+    printf(" %.3f\n", secs);
   }
 
+  write_random = compute_median(write_random_secs);
+  read_random  = compute_median(read_random_secs);
+  write_normal = compute_median(write_normal_secs);
+  read_normal  = compute_median(read_normal_secs);
+
   printf("\nNormal Write Time: %.3f seconds per document\n",
-         write_normal / i);
+         write_normal);
   printf("Random Write Time: %.3f seconds per document\n",
-         write_random / i);
+         write_random);
   printf("Average Write Time: %.3f seconds per document\n",
-         (write_normal + write_random) / 2 / i);
+         (write_normal + write_random) / 2);
 
   printf("\nNormal Read Time: %.3f seconds per document\n",
-         read_normal / i);
+         read_normal);
   printf("Random Read Time: %.3f seconds per document\n",
-         read_random / i);
+         read_random);
   printf("Average Read Time: %.3f seconds per document\n",
-         (read_normal + read_random) / 2 / i);
+         (read_normal + read_random) / 2);
 
   return (0);
+}
+
+
+/*
+ * 'compute_median()' - Compute the median time for a test.
+ */
+
+static double				/* O - Median time in seconds */
+compute_median(double *secs)		/* I - Array of time samples */
+{
+  int		i, j;			/* Looping vars */
+  double	temp;			/* Swap variable */
+
+
+ /*
+  * Sort the array into ascending order using a quicky bubble sort...
+  */
+
+  for (i = 0; i < (TEST_PASSES - 1); i ++)
+    for (j = i + 1; j < TEST_PASSES; j ++)
+      if (secs[i] > secs[j])
+      {
+        temp    = secs[i];
+	secs[i] = secs[j];
+	secs[j] = temp;
+      }
+
+ /*
+  * Return the average of the middle two samples...
+  */
+
+  return (0.5 * (secs[TEST_PASSES / 2 - 1] + secs[TEST_PASSES / 2]));
 }
 
 
@@ -133,7 +171,7 @@ main(void)
  * 'read_test()' - Benchmark the raster read functions.
  */
 
-double					/* O - Total time in seconds */
+static double				/* O - Total time in seconds */
 read_test(void)
 {
   int			y;		/* Looping var */
@@ -185,7 +223,7 @@ read_test(void)
  * 'write_test()' - Benchmark the raster write functions.
  */
 
-double					/* O - Total time in seconds */
+static double				/* O - Total time in seconds */
 write_test(int do_random)		/* I - Do random data? */
 {
   int			page, x, y;	/* Looping vars */
