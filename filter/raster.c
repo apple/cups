@@ -34,24 +34,26 @@
  *
  * Contents:
  *
- *   cupsRasterClose()        - Close a raster stream.
- *   cupsRasterOpen()         - Open a raster stream.
- *   cupsRasterReadHeader()   - Read a raster page header and store it in a
- *                              V1 page header structure.
- *   cupsRasterReadHeader2()  - Read a raster page header and store it in a
- *                              V2 page header structure.
- *   cupsRasterReadPixels()   - Read raster pixels.
- *   cupsRasterWriteHeader()  - Write a raster page header from a V1 page
- *                              header structure.
- *   cupsRasterWriteHeader2() - Write a raster page header from a V2 page
- *                              header structure.
- *   cupsRasterWritePixels()  - Write raster pixels.
- *   cups_raster_read()       - Read through the raster buffer.
- *   cups_raster_update()     - Update the raster header and row count for the
- *                              current page.
- *   cups_raster_write()      - Write a row of raster data...
- *   cups_read()              - Read bytes from a file.
- *   cups_write()             - Write bytes to a file.
+ *   cupsRasterClose()         - Close a raster stream.
+ *   cupsRasterOpen()          - Open a raster stream.
+ *   cupsRasterReadHeader()    - Read a raster page header and store it in a
+ *                               V1 page header structure.
+ *   cupsRasterReadHeader2()   - Read a raster page header and store it in a
+ *                               V2 page header structure.
+ *   cupsRasterReadPixels()    - Read raster pixels.
+ *   cupsRasterWriteHeader()   - Write a raster page header from a V1 page
+ *                               header structure.
+ *   cupsRasterWriteHeader2()  - Write a raster page header from a V2 page
+ *                               header structure.
+ *   cupsRasterWritePixels()   - Write raster pixels.
+ *   cups_raster_read()        - Read through the raster buffer.
+ *   cups_raster_read_header() - Read a raster page header.
+ *   cups_raster_update()      - Update the raster header and row count for the
+ *                               current page.
+ *   cups_raster_write()       - Write a row of raster data...
+ *   cups_read()               - Read bytes from a file.
+ *   cups_swap()               - Swap bytes in raster data...
+ *   cups_write()              - Write bytes to a file.
  */
 
 /*
