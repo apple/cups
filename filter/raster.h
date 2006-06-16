@@ -60,11 +60,14 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_RASTER_SYNC	0x52615332	/* RaS2 */
-#  define CUPS_RASTER_REVSYNC	0x32536152	/* 2SaR */
+#  define CUPS_RASTER_SYNC	0x52615333	/* RaS3 */
+#  define CUPS_RASTER_REVSYNC	0x33536152	/* 3SaR */
 
 #  define CUPS_RASTER_SYNCv1	0x52615374	/* RaSt */
 #  define CUPS_RASTER_REVSYNCv1	0x74536152	/* tSaR */
+
+#  define CUPS_RASTER_SYNCv2	0x52615332	/* RaS2 */
+#  define CUPS_RASTER_REVSYNCv2	0x32536152	/* 2SaR */
 
 
 /*
@@ -83,7 +86,8 @@ extern "C" {
 typedef enum cups_mode_e		/**** Raster modes ****/
 {
   CUPS_RASTER_READ = 0,			/* Open stream for reading */
-  CUPS_RASTER_WRITE = 1			/* Open stream for writing */
+  CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
+  CUPS_RASTER_WRITE_COMPRESSED = 2	/* Open stream for compressed writing @since CUPS 1.3@ */
 } cups_mode_t;
 
 typedef enum cups_bool_e		/**** Boolean type ****/
