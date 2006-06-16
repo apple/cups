@@ -774,7 +774,7 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
 {
   int		i;			/* Looping var */
   unsigned char	*ptr;			/* Pointer into buffer */
-  char		*compptr;		/* Pointer into compression buffer */
+  unsigned char	*compptr;		/* Pointer into compression buffer */
   char		repeat_char;		/* Repeated character */
   int		repeat_count;		/* Number of repeated characters */
   static const char *hex = "0123456789ABCDEF";

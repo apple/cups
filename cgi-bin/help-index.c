@@ -842,7 +842,7 @@ help_load_file(
 	if (isspace(*ptr & 255))
 	{
 	  while (isspace(*ptr & 255))
-	    *ptr ++;
+	    ptr ++;
 
 	  *text++ = ' ';
         }
