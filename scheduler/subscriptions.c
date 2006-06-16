@@ -36,7 +36,6 @@
  *   cupsdStopAllNotifiers()       - Stop all notifier processes.
  *   cupsdUpdateNotifierStatus()   - Read messages from notifiers.
  *   cupsd_compare_subscriptions() - Compare two subscriptions.
- *   cupsd_delete_all_events()     - Delete all cached events.
  *   cupsd_delete_event()          - Delete a single event...
  *   cupsd_send_dbus()             - Send a DBUS notification...
  *   cupsd_send_notification()     - Send a notification for the specified
@@ -61,7 +60,6 @@
 static int	cupsd_compare_subscriptions(cupsd_subscription_t *first,
 		                            cupsd_subscription_t *second,
 		                            void *unused);
-static void	cupsd_delete_all_events(void);
 static void	cupsd_delete_event(cupsd_event_t *event);
 #ifdef HAVE_DBUS
 static void	cupsd_send_dbus(cupsd_eventmask_t event, cupsd_printer_t *dest,
@@ -114,29 +112,11 @@ cupsdAddEvent(
   }
 
  /*
-  * Allocate memory for the event cache as needed...
-  */
-
-  if (!Events)
-  {
-    Events    = calloc(MaxEvents, sizeof(cupsd_event_t *));
-    NumEvents = 0;
-
-    if (!Events)
-    {
-      cupsdLogMessage(CUPSD_LOG_CRIT,
-                      "Unable to allocate memory for event cache - %s",
-        	      strerror(errno));
-      return;
-    }
-  }
-
- /*
   * Then loop through the subscriptions and add the event to the corresponding
   * caches...
   */
 
-  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions), temp = NULL;
+  for (temp = NULL, sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
        sub;
        sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
   {
@@ -149,185 +129,168 @@ cupsdAddEvent(
 	(sub->job == job || !sub->job))
     {
      /*
-      * Need this event...
+      * Need this event, so create a new event record...
       */
 
-      if (!temp)
+      if ((temp = (cupsd_event_t *)calloc(1, sizeof(cupsd_event_t))) == NULL)
       {
-       /*
-	* Create the new event record...
-	*/
-
-	if ((temp = (cupsd_event_t *)calloc(1, sizeof(cupsd_event_t))) == NULL)
-	{
-	  cupsdLogMessage(CUPSD_LOG_CRIT,
-	                  "Unable to allocate memory for event - %s",
-        	          strerror(errno));
-	  return;
-	}
-
-	temp->event = event;
-	temp->time  = time(NULL);
-	temp->attrs = ippNew();
-	temp->job   = job;
-	temp->dest  = dest;
-
-       /*
-        * Add common event notification attributes...
-	*/
-
-        ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
-	              "notify-subscription-id", sub->id);
-
-	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD,
-	             "notify-subscribed-event", NULL, cupsdEventName(event));
-
-        ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
-	              "printer-up-time", time(NULL));
-
-        va_start(ap, text);
-	vsnprintf(ftext, sizeof(ftext), text, ap);
-	va_end(ap);
-
-	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_TEXT,
-	             "notify-text", NULL, ftext);
-
-        if (dest)
-	{
-	 /*
-	  * Add printer attributes...
-	  */
-
-	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_URI,
-	               "notify-printer-uri", NULL, dest->uri);
-
-	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
-	               "printer-name", NULL, dest->name);
-
-	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
-	                "printer-state", dest->state);
-
-	  if (dest->num_reasons == 0)
-	    ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-	                 IPP_TAG_KEYWORD, "printer-state-reasons", NULL,
-			 dest->state == IPP_PRINTER_STOPPED ? "paused" : "none");
-	  else
-	    ippAddStrings(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-	                  IPP_TAG_KEYWORD, "printer-state-reasons",
-			  dest->num_reasons, NULL,
-			  (const char * const *)dest->reasons);
-
-	  ippAddBoolean(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-	                "printer-is-accepting-jobs", dest->accepting);
-        }
-
-        if (job)
-	{
-	 /*
-	  * Add job attributes...
-	  */
-
-	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
-	                "notify-job-id", job->id);
-	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
-	                "job-state", job->state_value);
-
-          if ((attr = ippFindAttribute(job->attrs, "job-name",
-	                               IPP_TAG_NAME)) != NULL)
-	    ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
-	        	 "job-name", NULL, attr->values[0].string.text);
-
-	  switch (job->state_value)
-	  {
-	    case IPP_JOB_PENDING :
-        	if (dest && dest->state == IPP_PRINTER_STOPPED)
-        	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		               IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			       "printer-stopped");
-        	else
-        	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		               IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			       "none");
-        	break;
-
-	    case IPP_JOB_HELD :
-        	if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD) != NULL ||
-		    ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME) != NULL)
-        	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		               IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			       "job-hold-until-specified");
-        	else
-        	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		               IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			       "job-incoming");
-        	break;
-
-	    case IPP_JOB_PROCESSING :
-        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			     "job-printing");
-        	break;
-
-	    case IPP_JOB_STOPPED :
-        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			     "job-stopped");
-        	break;
-
-	    case IPP_JOB_CANCELLED :
-        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			     "job-canceled-by-user");
-        	break;
-
-	    case IPP_JOB_ABORTED :
-        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			     "aborted-by-system");
-        	break;
-
-	    case IPP_JOB_COMPLETED :
-        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			     "job-completed-successfully");
-        	break;
-	  }
-
-	  ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
-	                "job-impressions-completed",
-			job->sheets ? job->sheets->values[0].integer : 0);
-	}
-
-       /*
-	* Purge an old event as needed...
-	*/
-
-	if (NumEvents >= MaxEvents)
-	{
-	 /*
-	  * Purge the oldest event in the cache...
-	  */
-
-	  cupsd_delete_event(Events[0]);
-
-	  NumEvents --;
-
-	  memmove(Events, Events + 1, NumEvents * sizeof(cupsd_event_t *));
-	}
-
-       /*
-	* Add the new event to the main cache...
-	*/
-
-	Events[NumEvents] = temp;
-	NumEvents ++;
+	cupsdLogMessage(CUPSD_LOG_CRIT,
+	                "Unable to allocate memory for event - %s",
+        	        strerror(errno));
+	return;
       }
 
+      temp->event = event;
+      temp->time  = time(NULL);
+      temp->attrs = ippNew();
+      temp->job   = job;
+      temp->dest  = dest;
+
      /*
-      * Send the notification for this subscription...
+      * Add common event notification attributes...
       */
 
-      cupsd_send_notification(sub, temp);
+      ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_CHARSET,
+                   "notify-charset", NULL, "utf-8");
+
+      ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_LANGUAGE,
+                   "notify-natural-langugage", NULL, "en-US");
+
+      ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
+	            "notify-subscription-id", sub->id);
+
+      ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
+	            "notify-sequence-number", sub->next_event_id);
+
+      ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD,
+	           "notify-subscribed-event", NULL, cupsdEventName(event));
+
+      if (sub->user_data_len > 0)
+        ippAddOctetString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+	                  "notify-user-data", sub->user_data,
+			  sub->user_data_len);
+
+      ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
+	            "printer-up-time", time(NULL));
+
+      va_start(ap, text);
+      vsnprintf(ftext, sizeof(ftext), text, ap);
+      va_end(ap);
+
+      ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_TEXT,
+	           "notify-text", NULL, ftext);
+
+      if (dest)
+      {
+       /*
+	* Add printer attributes...
+	*/
+
+	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_URI,
+	             "notify-printer-uri", NULL, dest->uri);
+
+	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
+	             "printer-name", NULL, dest->name);
+
+	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
+	              "printer-state", dest->state);
+
+	if (dest->num_reasons == 0)
+	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+	               IPP_TAG_KEYWORD, "printer-state-reasons", NULL,
+		       dest->state == IPP_PRINTER_STOPPED ? "paused" : "none");
+	else
+	  ippAddStrings(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+	                IPP_TAG_KEYWORD, "printer-state-reasons",
+			dest->num_reasons, NULL,
+			(const char * const *)dest->reasons);
+
+	ippAddBoolean(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+	              "printer-is-accepting-jobs", dest->accepting);
+      }
+
+      if (job)
+      {
+       /*
+	* Add job attributes...
+	*/
+
+	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
+	              "notify-job-id", job->id);
+	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
+	              "job-state", job->state_value);
+
+        if ((attr = ippFindAttribute(job->attrs, "job-name",
+	                             IPP_TAG_NAME)) != NULL)
+	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
+	               "job-name", NULL, attr->values[0].string.text);
+
+	switch (job->state_value)
+	{
+	  case IPP_JOB_PENDING :
+              if (dest && dest->state == IPP_PRINTER_STOPPED)
+        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
+			     "printer-stopped");
+              else
+        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
+			     "none");
+              break;
+
+	  case IPP_JOB_HELD :
+              if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD) != NULL ||
+		  ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME) != NULL)
+        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
+			     "job-hold-until-specified");
+              else
+        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
+			     "job-incoming");
+              break;
+
+	  case IPP_JOB_PROCESSING :
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
+			   "job-printing");
+              break;
+
+	  case IPP_JOB_STOPPED :
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
+			   "job-stopped");
+              break;
+
+	  case IPP_JOB_CANCELLED :
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
+			   "job-canceled-by-user");
+              break;
+
+	  case IPP_JOB_ABORTED :
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
+			   "aborted-by-system");
+              break;
+
+	  case IPP_JOB_COMPLETED :
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
+		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
+			   "job-completed-successfully");
+              break;
+	}
+
+	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
+	              "job-impressions-completed",
+		      job->sheets ? job->sheets->values[0].integer : 0);
+
+       /*
+	* Send the notification for this subscription...
+	*/
+
+	cupsd_send_notification(sub, temp);
+      }
     }
   }
 
@@ -438,8 +401,6 @@ cupsdDeleteAllSubscriptions(void)
   cupsd_subscription_t	*sub;		/* Subscription */
 
 
-  cupsd_delete_all_events();
-
   if (!Subscriptions)
     return;
 
@@ -462,6 +423,9 @@ cupsdDeleteSubscription(
     cupsd_subscription_t *sub,		/* I - Subscription object */
     int                  update)	/* I - 1 = update subscriptions.conf */
 {
+  int	i;				/* Looping var */
+
+
  /*
   * Close the pipe to the notifier as needed...
   */
@@ -483,7 +447,12 @@ cupsdDeleteSubscription(
   cupsdClearString(&(sub->recipient));
 
   if (sub->events)
+  {
+    for (i = 0; i < sub->num_events; i ++)
+      cupsd_delete_event(sub->events[i]);
+
     free(sub->events);
+  }
 
   free(sub);
 
@@ -1300,27 +1269,6 @@ cupsd_compare_subscriptions(
 
 
 /*
- * 'cupsd_delete_all_events()' - Delete all cached events.
- */
-
-static void
-cupsd_delete_all_events(void)
-{
-  int	i;				/* Looping var */
-
-
-  if (MaxEvents <= 0 || !Events)
-    return;
-
-  for (i = 0; i < NumEvents; i ++)
-    cupsd_delete_event(Events[i]);
-
-  free(Events);
-  Events = NULL;
-}
-
-
-/*
  * 'cupsd_delete_event()' - Delete a single event...
  *
  * Oldest events must be deleted first, otherwise the subscription cache
@@ -1330,43 +1278,6 @@ cupsd_delete_all_events(void)
 static void
 cupsd_delete_event(cupsd_event_t *event)/* I - Event to delete */
 {
-  cupsd_subscription_t	*sub;		/* Current subscription */
-
-
- /*
-  * Loop through the subscriptions and look for the event in the cache...
-  */
-
-  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
-       sub;
-       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
-  {
-   /*
-    * Only check the first event in the subscription cache, since the
-    * caller will only delete the oldest event in the cache...
-    */
-
-    if (sub->num_events > 0 && sub->events[0] == event)
-    {
-     /*
-      * Remove this event...
-      */
-
-      sub->num_events --;
-      sub->first_event_id ++;
-
-      if (sub->num_events > 0)
-      {
-       /*
-        * Shift other events upward in cache...
-	*/
-
-        memmove(sub->events, sub->events + 1,
-	        sub->num_events * sizeof(cupsd_event_t *));
-      }
-    }
-  }
-
  /*
   * Free memory...
   */
@@ -1487,6 +1398,25 @@ cupsd_send_notification(
                       sub->id);
       return;
     }
+  }
+
+ /*
+  * Purge an old event as needed...
+  */
+
+  if (sub->num_events >= MaxEvents)
+  {
+   /*
+    * Purge the oldest event in the cache...
+    */
+
+    cupsd_delete_event(sub->events[0]);
+
+    sub->num_events --;
+    sub->first_event_id ++;
+
+    memmove(sub->events, sub->events + 1,
+	    sub->num_events * sizeof(cupsd_event_t *));
   }
 
  /*
