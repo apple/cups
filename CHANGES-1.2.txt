@@ -3,6 +3,32 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.2
 
+	- Allow/Deny addresses of the form "11.22.33.*" did not
+	  work on Linux (STR #1769)
+	- cupsGetPPD() did not work if the scheduler was only
+	  listening on a domain socket (STR #1766)
+	- The scheduler could crash advertising a class (STR
+	  #1768)
+	- The scheduler could crash if the default printer was
+	  deleted (STR #1776)
+	- Added a new default CUPS raster format (v3) which does
+	  not compress the raster stream in order to provide the
+	  same cupsRasterReadPixels() and cupsRasterWritePixels()
+	  performance as CUPS 1.1.x.
+	- The cupsaddsmb man page listed the wrong files for the
+	  CUPS driver.
+	- Some configure --with options did not work (STR #1746)
+	- "Allow @IF(name)" didn't work if "name" wasn't the
+	  first network interface (STR #1758)
+	- The lpstat command did not use the correct character
+	  set when reporting the date and time (STR #1751)
+	- The cupsaddsmb command and web interface did not update
+	  the Windows PPD files properly, resulting in corrupt
+	  PPD files for the Windows client to use (STR #1750)
+	- The cupsd.conf man page didn't describe the Listen
+	  domain socket syntax (STR #1753)
+	- The scheduler no longer tries to support more than
+	  FD_SETSIZE file descriptors.
 	- CDSA (encryption) support fixes for MacOS X.
 	- The lppasswd program needs to be setuid to root to
 	  create and update the /etc/cups/passwd.md5 file (STR
