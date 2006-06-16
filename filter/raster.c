@@ -70,6 +70,10 @@
 #  include <unistd.h>
 #endif /* WIN32 || __EMX__ */
 
+#define DO_ROW_RLE
+/*#define DO_LINE_RLE*/
+/*#define DO_BEST_RLE*/
+
 
 /*
  * Private structures...
@@ -102,7 +106,7 @@ static unsigned	cups_raster_read_header(cups_raster_t *r);
 static int	cups_raster_read(cups_raster_t *r, unsigned char *buf,
 		                 int bytes);
 static void	cups_raster_update(cups_raster_t *r);
-static int	cups_raster_write(cups_raster_t *r);
+static int	cups_raster_write(cups_raster_t *r, const unsigned char *pixels);
 static int	cups_read(int fd, unsigned char *buf, int bytes);
 static int	cups_write(int fd, const unsigned char *buf, int bytes);
 
@@ -526,6 +530,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
     if ((bytes = remaining) > (r->pend - r->pcurrent))
       bytes = r->pend - r->pcurrent;
 
+#ifdef DO_ROW_RLE
     if (r->count > 0)
     {
      /*
@@ -534,7 +539,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 
       if (memcmp(p, r->pcurrent, bytes))
       {
-        if (!cups_raster_write(r))
+        if (!cups_raster_write(r, r->pixels))
 	  return (0);
 
 	r->count = 0;
@@ -563,10 +568,10 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 	  r->remaining --;
 
 	  if (r->remaining == 0)
-	    return (cups_raster_write(r));
+	    return (cups_raster_write(r, r->pixels));
 	  else if (r->count == 256)
 	  {
-	    if (cups_raster_write(r) == 0)
+	    if (cups_raster_write(r, r->pixels) == 0)
 	      return (0);
 
 	    r->count = 0;
@@ -603,9 +608,35 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 	r->remaining --;
 
 	if (r->remaining == 0)
-	  return (cups_raster_write(r));
+	  return (cups_raster_write(r, r->pixels));
       }
     }
+#else
+    if (bytes == r->header.cupsBytesPerLine)
+    {
+      r->remaining --;
+      r->count = 1;
+
+      if (!cups_raster_write(r, p))
+        return (0);
+    }
+    else
+    {
+      memcpy(r->pcurrent, p, bytes);
+
+      r->pcurrent += bytes;
+
+      if (r->pcurrent >= r->pend)
+      {
+	r->remaining --;
+	r->count    = 1;
+	r->pcurrent = r->pixels;
+
+	if (!cups_raster_write(r, r->pixels))
+          return (0);
+      }
+    }
+#endif /* DO_ROW_RLE */
   }
 
   return (len);
@@ -908,20 +939,22 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
  */
 
 static int				/* O - Number of bytes written */
-cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
+cups_raster_write(
+    cups_raster_t       *r,		/* I - Raster stream */
+    const unsigned char *pixels)	/* I - Pixel data to write */
 {
-  unsigned char	*start,			/* Start of sequence */
-		*ptr,			/* Current pointer in sequence */
-		*pend,			/* End of raster buffer */
-		*plast,			/* Pointer to last pixel */
-		*wptr;			/* Pointer into write buffer */
-  int		bpp,			/* Bytes per pixel */
-		count,			/* Count */
-		maxrun;			/* Maximum run of 128 * bpp */
+  const unsigned char	*start,		/* Start of sequence */
+			*ptr,		/* Current pointer in sequence */
+			*pend,		/* End of raster buffer */
+			*plast;		/* Pointer to last pixel */
+  unsigned char		*wptr;		/* Pointer into write buffer */
+  int			bpp,		/* Bytes per pixel */
+			count,		/* Count */
+			maxrun;		/* Maximum run of 128 * bpp */
 
 
 #ifdef DEBUG
-  fprintf(stderr, "cups_raster_write(r=%p)\n", r);
+  fprintf(stderr, "cups_raster_write(r=%p, pixels=%p)\n", r, pixels);
 #endif /* DEBUG */
 
  /*
@@ -948,7 +981,7 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
   */
 
   bpp     = r->bpp;
-  pend    = r->pend;
+  pend    = pixels + r->header.cupsBytesPerLine;
   plast   = pend - bpp;
   wptr    = r->buffer;
   *wptr++ = r->count - 1;
@@ -958,11 +991,12 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
   * Write using a modified TIFF "packbits" compression...
   */
 
-  for (ptr = r->pixels; ptr < pend;)
+  for (ptr = pixels; ptr < pend;)
   {
     start = ptr;
     ptr += bpp;
 
+#ifdef DO_LINE_RLE
     if (ptr == pend)
     {
      /*
@@ -988,7 +1022,8 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
         *wptr++ = *ptr++;
     }
     else
-#ifdef OPTIMIZE_FOR_COMPRESSION
+#endif /* DO_LINE_RLE */
+#ifdef DO_BEST_RLE
     {
      /*
       * Encode a sequence of non-repeating pixels...
@@ -1010,7 +1045,7 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       memcpy(wptr, start, count);
       wptr += count;
     }
-#else /* OPTIMIZE_FOR_SPEED */
+#else /* !DO_BEST_RLE */
     {
      /*
       * Encode a sequence of non-repeating pixels...
@@ -1026,7 +1061,7 @@ cups_raster_write(cups_raster_t *r)	/* I - Raster stream */
       wptr += count;
       ptr  = start + count;
     }
-#endif /* OPTIMIZE_FOR_COMPRESSION/SPEED */
+#endif /* DO_BEST_RLE */
   }
 
   return (cups_write(r->fd, r->buffer, wptr - r->buffer));

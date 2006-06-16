@@ -286,16 +286,16 @@ write_test(int do_random)		/* I - Do random data? */
 
   gettimeofday(&start, NULL);
 
-  for (page = 0; page < 16; page ++)
+  for (page = 0; page < TEST_PAGES; page ++)
   {
     memset(&header, 0, sizeof(header));
-    header.cupsWidth        = 1024;
-    header.cupsHeight       = 1024;
-    header.cupsBytesPerLine = 1024;
+    header.cupsWidth        = TEST_WIDTH;
+    header.cupsHeight       = TEST_HEIGHT;
+    header.cupsBytesPerLine = TEST_WIDTH;
 
     if (page & 1)
     {
-      header.cupsBytesPerLine *= 2;
+      header.cupsBytesPerLine *= 4;
       header.cupsColorSpace = CUPS_CSPACE_CMYK;
       header.cupsColorOrder = CUPS_ORDER_CHUNKED;
     }
@@ -319,7 +319,7 @@ write_test(int do_random)		/* I - Do random data? */
 
     cupsRasterWriteHeader(r, &header);
 
-    for (y = 0; y < 1024; y ++)
+    for (y = 0; y < TEST_HEIGHT; y ++)
     {
       if (do_random)
         cupsRasterWritePixels(r, data[y & 1], header.cupsBytesPerLine);
