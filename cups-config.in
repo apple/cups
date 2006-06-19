@@ -53,7 +53,7 @@ if test -f "$selfdir/cups/cups.h"; then
     LDFLAGS="-L$selfdir/cups -L$selfdir/filter $LDFLAGS"
     libdir="$selfdir/cups"
     imagelibdir="$selfdir/filter"
-    if test ! -e "$selfdir/cups/raster.h"; then
+    if test ! -f "$selfdir/cups/raster.h"; then
         ln -s ../filter/raster.h "$selfdir/cups"
     fi
 else
