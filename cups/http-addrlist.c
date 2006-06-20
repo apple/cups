@@ -412,7 +412,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
           if (host->h_addrtype == AF_INET6)
 	  {
             temp->addr.ipv6.sin6_family = AF_INET6;
-	    memcpy(&(temp->addr.ipv6), host->h_addr_list[i],
+	    memcpy(&(temp->addr.ipv6.sin6_addr), host->h_addr_list[i],
 	           sizeof(temp->addr.ipv6));
             temp->addr.ipv6.sin6_port = htons(portnum);
 	  }
@@ -420,7 +420,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 #  endif /* AF_INET6 */
 	  {
             temp->addr.ipv4.sin_family = AF_INET;
-	    memcpy(&(temp->addr.ipv4), host->h_addr_list[i],
+	    memcpy(&(temp->addr.ipv4.sin_addr), host->h_addr_list[i],
 	           sizeof(temp->addr.ipv4));
             temp->addr.ipv4.sin_port = htons(portnum);
           }
