@@ -62,6 +62,7 @@
  */
 
 #include "cupsd.h"
+#include <cups/dir.h>
 
 
 /*
@@ -257,6 +258,11 @@ cupsdCreateCommonData(void)
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Attribute data */
+  cups_dir_t		*dir;		/* Notifier directory */
+  cups_dentry_t		*dent;		/* Notifier directory entry */
+  cups_array_t		*notifiers;	/* Notifier array */
+  char			filename[1024],	/* Filename */
+			*notifier;	/* Current notifier */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
@@ -498,11 +504,11 @@ cupsdCreateCommonData(void)
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                "notify-max-events-supported", MaxEvents);
 
-  /* notify-notify-events-default */
+  /* notify-events-default */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "notify-events-default", NULL, "job-completed");
 
-  /* notify-notify-events-supported */
+  /* notify-events-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                 "notify-events-supported",
 		(int)(sizeof(notify_events) / sizeof(notify_events[0])),
@@ -512,10 +518,31 @@ cupsdCreateCommonData(void)
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "notify-pull-method-supported", NULL, "ippget");
 
-  /* TODO: scan notifier directory */
   /* notify-schemes-supported */
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-               "notify-schemes-supported", NULL, "mailto");
+  snprintf(filename, sizeof(filename), "%s/notifier", ServerBin);
+  if ((dir = cupsDirOpen(filename)) != NULL)
+  {
+    notifiers = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+
+    while ((dent = cupsDirRead(dir)) != NULL)
+      if (S_ISREG(dent->fileinfo.st_mode) &&
+          (dent->fileinfo.st_mode & S_IXOTH) != 0)
+        cupsArrayAdd(notifiers, _cupsStrAlloc(dent->filename));
+
+    if (cupsArrayCount(notifiers) > 0)
+    {
+      attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+        	           "notify-schemes-supported",
+			   cupsArrayCount(notifiers), NULL, NULL);
+
+      for (i = 0, notifier = (char *)cupsArrayFirst(notifiers);
+           notifier;
+	   i ++, notifier = (char *)cupsArrayNext(notifiers))
+	attr->values[i].string.text = notifier;
+    }
+
+    cupsArrayDelete(notifiers);
+  }
 
   /* number-up-supported */
   ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
