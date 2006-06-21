@@ -506,8 +506,19 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  */
 
 	  cupsdStopJob(job, 0);
-	  job->state->values[0].integer = IPP_JOB_PENDING;
-	  job->state_value              = IPP_JOB_PENDING;
+
+          if (!(printer->type & CUPS_PRINTER_REMOTE) ||
+	      (printer->type & CUPS_PRINTER_IMPLICIT))
+	  {
+	   /*
+	    * Mark the job as pending again - we'll retry on another
+	    * printer...
+	    */
+
+	    job->state->values[0].integer = IPP_JOB_PENDING;
+	    job->state_value              = IPP_JOB_PENDING;
+          }
+
 	  cupsdSaveJob(job);
 
 	 /*
