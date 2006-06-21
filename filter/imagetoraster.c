@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetoraster.c 5522 2006-05-15 05:02:15Z mike $"
+ * "$Id$"
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
@@ -4310,5 +4310,5 @@ raster_cb(
 
 
 /*
- * End of "$Id: imagetoraster.c 5522 2006-05-15 05:02:15Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: sysman.h 5007 2006-01-27 18:25:42Z mike $"
+ * "$Id$"
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
@@ -45,5 +45,5 @@ extern void	cupsdUpdateSystemMonitor(void);
 
 
 /*
- * End of "$Id: sysman.h 5007 2006-01-27 18:25:42Z mike $".
+ * End of "$Id$".
  */

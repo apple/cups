@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lppasswd.man 5313 2006-03-20 15:29:09Z mike $"
+.\" "$Id$"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -66,5 +66,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lppasswd.man 5313 2006-03-20 15:29:09Z mike $".
+.\" End of "$Id$".
 .\"

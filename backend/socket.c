@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 5241 2006-03-07 22:07:44Z mike $"
+ * "$Id$"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -492,5 +492,5 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c 5241 2006-03-07 22:07:44Z mike $".
+ * End of "$Id$".
  */

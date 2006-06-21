@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id$"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -233,5 +233,5 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id$".
  */

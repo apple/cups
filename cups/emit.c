@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c 5257 2006-03-09 15:27:27Z mike $"
+ * "$Id$"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -917,5 +917,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c 5257 2006-03-09 15:27:27Z mike $".
+ * End of "$Id$".
  */

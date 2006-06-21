@@ -1,5 +1,5 @@
 /*
- * "$Id: mailto.c 5235 2006-03-06 13:02:23Z mike $"
+ * "$Id$"
  *
  *   "mailto" notifier for the Common UNIX Printing System (CUPS).
  *
@@ -795,5 +795,5 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
 
 
 /*
- * End of "$Id: mailto.c 5235 2006-03-06 13:02:23Z mike $".
+ * End of "$Id$".
  */

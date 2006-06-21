@@ -1,5 +1,5 @@
 /*
- * "$Id: env.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id$"
  *
  *   Environment management routines for the Common UNIX Printing System (CUPS).
  *
@@ -245,5 +245,5 @@ clear_env(void)
 
 
 /*
- * End of "$Id: env.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id$".
  */

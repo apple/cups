@@ -1,5 +1,5 @@
 /*
- * "$Id: backend.h 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id$"
  *
  *   Backend definitions for the Common UNIX Printing System (CUPS).
  *
@@ -53,5 +53,5 @@ extern const char	*cupsBackendDeviceURI(char **argv);
 #endif /* !_CUPS_BACKEND_H_ */
 
 /*
- * End of "$Id: backend.h 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c 5104 2006-02-15 03:21:04Z mike $"
+ * "$Id$"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -286,5 +286,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c 5104 2006-02-15 03:21:04Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5308 2006-03-18 13:18:18Z mike $"
+# "$Id$"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -151,5 +151,5 @@ uninstall:
 
 
 #
-# End of "$Id: Makefile 5308 2006-03-18 13:18:18Z mike $".
+# End of "$Id$".
 #

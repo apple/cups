@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lprm.man 5099 2006-02-13 02:46:10Z mike $"
+.\" "$Id$"
 .\"
 .\"   lprm man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -70,5 +70,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lprm.man 5099 2006-02-13 02:46:10Z mike $".
+.\" End of "$Id$".
 .\"

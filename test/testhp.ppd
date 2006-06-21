@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: testhp.ppd 4494 2005-02-18 02:18:11Z mike $"
+*% "$Id$"
 *%
 *%   Test HP PPD file for the Common UNIX Printing System (CUPS).
 *%
@@ -191,5 +191,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: testhp.ppd 4494 2005-02-18 02:18:11Z mike $".
+*% End of "$Id$".
 *%

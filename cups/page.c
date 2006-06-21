@@ -1,5 +1,5 @@
 /*
- * "$Id: page.c 5549 2006-05-19 19:39:28Z mike $"
+ * "$Id$"
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
@@ -193,5 +193,5 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: page.c 5549 2006-05-19 19:39:28Z mike $".
+ * End of "$Id$".
  */

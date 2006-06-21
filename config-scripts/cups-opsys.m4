@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id$"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -39,5 +39,5 @@ case "$uname" in
 esac
 
 dnl
-dnl "$Id: cups-opsys.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id$"
 dnl

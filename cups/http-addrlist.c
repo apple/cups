@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addrlist.c 5351 2006-03-29 15:36:15Z mike $"
+ * "$Id$"
  *
  *   HTTP address list routines for the Common UNIX Printing System (CUPS).
  *
@@ -593,5 +593,5 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
 
 /*
- * End of "$Id: http-addrlist.c 5351 2006-03-29 15:36:15Z mike $".
+ * End of "$Id$".
  */

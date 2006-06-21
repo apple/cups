@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c 5333 2006-03-24 00:52:21Z mike $"
+ * "$Id$"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2938,5 +2938,5 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c 5333 2006-03-24 00:52:21Z mike $".
+ * End of "$Id$".
  */

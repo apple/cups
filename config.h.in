@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 5474 2006-05-02 14:20:26Z mike $"
+ * "$Id$"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -439,5 +439,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 5474 2006-05-02 14:20:26Z mike $".
+ * End of "$Id$".
  */

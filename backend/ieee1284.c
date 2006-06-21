@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1284.c 5440 2006-04-19 21:36:43Z mike $"
+ * "$Id$"
  *
  *   IEEE-1284 support functions for the Common UNIX Printing System (CUPS).
  *
@@ -506,5 +506,5 @@ get_make_model(
 
 
 /*
- * End of "$Id: ieee1284.c 5440 2006-04-19 21:36:43Z mike $".
+ * End of "$Id$".
  */

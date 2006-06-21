@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.h 5366 2006-04-02 16:11:04Z mike $"
+ * "$Id$"
  *
  *   Global variable definitions for the Common UNIX Printing System (CUPS).
  *
@@ -151,5 +151,5 @@ extern void		_cupsSetError(ipp_status_t status, const char *message);
 #endif /* !_CUPS_GLOBALS_H_ */
 
 /*
- * End of "$Id: globals.h 5366 2006-04-02 16:11:04Z mike $".
+ * End of "$Id$".
  */

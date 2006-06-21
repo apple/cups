@@ -1,5 +1,5 @@
 /*
- * "$Id: array.h 5258 2006-03-09 15:40:56Z mike $"
+ * "$Id$"
  *
  *   Sorted array definitions for the Common UNIX Printing System (CUPS).
  *
@@ -81,5 +81,5 @@ extern void		*cupsArrayUserData(cups_array_t *a);
 #endif /* !_CUPS_ARRAY_H_ */
 
 /*
- * End of "$Id: array.h 5258 2006-03-09 15:40:56Z mike $".
+ * End of "$Id$".
  */

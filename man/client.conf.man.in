@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: client.conf.man.in 5182 2006-02-26 04:10:27Z mike $"
+.\" "$Id$"
 .\"
 .\"   client.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -54,5 +54,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: client.conf.man.in 5182 2006-02-26 04:10:27Z mike $".
+.\" End of "$Id$".
 .\"

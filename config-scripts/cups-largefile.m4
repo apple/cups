@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-largefile.m4 4732 2005-09-30 23:23:25Z mike $"
+dnl "$Id$"
 dnl
 dnl   Large file support stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -57,5 +57,5 @@ fi
 AC_CHECK_FUNC(strtoll, AC_DEFINE(HAVE_STRTOLL))
 
 dnl
-dnl End of "$Id: cups-largefile.m4 4732 2005-09-30 23:23:25Z mike $".
+dnl End of "$Id$".
 dnl

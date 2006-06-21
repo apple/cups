@@ -1,5 +1,5 @@
 /*
- * "$Id: image.c 4741 2005-10-02 04:25:52Z mike $"
+ * "$Id$"
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
@@ -841,5 +841,5 @@ get_tile(cups_image_t *img,		/* I - Image */
 
 
 /*
- * End of "$Id: image.c 4741 2005-10-02 04:25:52Z mike $".
+ * End of "$Id$".
  */

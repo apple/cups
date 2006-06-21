@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-image.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id$"
 dnl
 dnl   Image library/filter stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -110,5 +110,5 @@ AC_SUBST(EXPORT_LIBZ)
 AC_CHECK_HEADER(stdlib.h,AC_DEFINE(HAVE_STDLIB_H))
 
 dnl
-dnl End of "$Id: cups-image.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id$".
 dnl

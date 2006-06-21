@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c 5387 2006-04-10 02:51:12Z mike $"
+ * "$Id$"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -735,5 +735,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c 5387 2006-04-10 02:51:12Z mike $".
+ * End of "$Id$".
  */

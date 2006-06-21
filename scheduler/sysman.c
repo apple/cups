@@ -1,5 +1,5 @@
 /*
- * "$Id: sysman.c 5305 2006-03-18 03:05:12Z mike $"
+ * "$Id$"
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
@@ -727,5 +727,5 @@ sysEventTimerNotifier(
 
 
 /*
- * End of "$Id: sysman.c 5305 2006-03-18 03:05:12Z mike $".
+ * End of "$Id$".
  */

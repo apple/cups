@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertolabel.c 5287 2006-03-13 16:41:45Z mike $"
+ * "$Id$"
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -1003,5 +1003,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertolabel.c 5287 2006-03-13 16:41:45Z mike $".
+ * End of "$Id$".
  */

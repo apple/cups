@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-slp.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id$"
 dnl
 dnl   OpenSLP configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -44,5 +44,5 @@ AC_SUBST(LIBSLP)
 
 
 dnl
-dnl End of "$Id: cups-slp.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id$".
 dnl

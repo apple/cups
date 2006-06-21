@@ -1,5 +1,5 @@
 /*
- * "$Id: cgi-private.h 4921 2006-01-12 21:26:26Z mike $"
+ * "$Id$"
  *
  *   Private CGI definitions for the Common UNIX Printing System (CUPS).
  *
@@ -40,5 +40,5 @@
 
 
 /*
- * End of "$Id: cgi-private.h 4921 2006-01-12 21:26:26Z mike $".
+ * End of "$Id$".
  */

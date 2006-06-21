@@ -1,5 +1,5 @@
 /*
- * "$Id: form-main.c 4494 2005-02-18 02:18:11Z mike $"
+ * "$Id$"
  *
  *   CUPS form main entry for the Common UNIX Printing System (CUPS).
  *
@@ -58,5 +58,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: form-main.c 4494 2005-02-18 02:18:11Z mike $".
+ * End of "$Id$".
  */

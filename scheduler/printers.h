@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 5330 2006-03-23 21:07:20Z mike $"
+ * "$Id$"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -146,5 +146,5 @@ extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
 
 
 /*
- * End of "$Id: printers.h 5330 2006-03-23 21:07:20Z mike $".
+ * End of "$Id$".
  */

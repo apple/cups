@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-darwin.c 5488 2006-05-03 19:39:30Z mike $"
+ * "$Id$"
  *
  * © Copyright 2005-2006 Apple Computer, Inc. All rights reserved.
  *
@@ -1346,5 +1346,5 @@ static void *read_thread(void *reference)
 
 
 /*
- * End of "$Id: usb-darwin.c 5488 2006-05-03 19:39:30Z mike $".
+ * End of "$Id$".
  */

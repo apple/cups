@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-char.c 4494 2005-02-18 02:18:11Z mike $"
+ * "$Id$"
  *
  *   HP-GL/2 character processing for the Common UNIX Printing System (CUPS).
  *
@@ -636,5 +636,5 @@ TD_transparent_data(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-char.c 4494 2005-02-18 02:18:11Z mike $".
+ * End of "$Id$".
  */

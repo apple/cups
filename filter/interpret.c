@@ -1,5 +1,5 @@
 /*
- * "$Id: interpret.c 5513 2006-05-11 18:07:25Z mike $"
+ * "$Id$"
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
@@ -608,5 +608,5 @@ exec_code(
 
 
 /*
- * End of "$Id: interpret.c 5513 2006-05-11 18:07:25Z mike $".
+ * End of "$Id$".
  */

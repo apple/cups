@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h 5216 2006-03-02 17:47:53Z mike $"
+ * "$Id$"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -210,5 +210,5 @@ extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 
 
 /*
- * End of "$Id: conf.h 5216 2006-03-02 17:47:53Z mike $".
+ * End of "$Id$".
  */

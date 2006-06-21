@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c 5346 2006-03-28 16:05:19Z mike $"
+ * "$Id$"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -1008,5 +1008,5 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: dest.c 5346 2006-03-28 16:05:19Z mike $".
+ * End of "$Id$".
  */

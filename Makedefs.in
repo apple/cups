@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in 5564 2006-05-22 00:59:11Z mike $"
+# "$Id$"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -263,5 +263,5 @@ DBUSDIR		=	@DBUSDIR@
 
 
 #
-# End of "$Id: Makedefs.in 5564 2006-05-22 00:59:11Z mike $"
+# End of "$Id$"
 #

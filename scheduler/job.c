@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 5545 2006-05-18 21:00:56Z mike $"
+ * "$Id$"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -3455,5 +3455,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 5545 2006-05-18 21:00:56Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: custom.c 5391 2006-04-14 12:26:50Z mike $"
+ * "$Id$"
  *
  *   PPD custom option routines for the Common UNIX Printing System (CUPS).
  *
@@ -123,5 +123,5 @@ ppdNextCustomParam(ppd_coption_t *opt)	/* I - Custom option */
 
 
 /*
- * End of "$Id: custom.c 5391 2006-04-14 12:26:50Z mike $".
+ * End of "$Id$".
  */

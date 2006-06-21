@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c 5360 2006-03-30 17:02:17Z mike $"
+ * "$Id$"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1316,5 +1316,5 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 
 
 /*
- * End of "$Id: http-support.c 5360 2006-03-30 17:02:17Z mike $".
+ * End of "$Id$".
  */

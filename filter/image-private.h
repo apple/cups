@@ -1,5 +1,5 @@
 /*
- * "$Id: image-private.h 5191 2006-02-27 02:47:56Z mike $"
+ * "$Id$"
  *
  *   Private image library definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -217,5 +217,5 @@ extern cups_izoom_t	*_cupsImageZoomNew(cups_image_t *img, int xc0, int yc0,
 #endif /* !_CUPS_IMAGE_PRIVATE_H_ */
 
 /*
- * End of "$Id: image-private.h 5191 2006-02-27 02:47:56Z mike $".
+ * End of "$Id$".
  */

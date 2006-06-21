@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: okidata9.ppd 4880 2005-12-15 16:19:46Z mike $"
+*% "$Id$"
 *%
 *%   Sample OKIDATA 9-Pin driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -123,5 +123,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: okidata9.ppd 4880 2005-12-15 16:19:46Z mike $".
+*% End of "$Id$".
 *%

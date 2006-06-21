@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c 5235 2006-03-06 13:02:23Z mike $"
+ * "$Id$"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -529,5 +529,5 @@ sighandler(int s)			/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c 5235 2006-03-06 13:02:23Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgltops.h 4494 2005-02-18 02:18:11Z mike $"
+ * "$Id$"
  *
  *   HP-GL/2 to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -237,5 +237,5 @@ extern void	OutputTrailer(void);
 extern int	Outputf(const char *format, ...);
 
 /*
- * End of "$Id: hpgltops.h 4494 2005-02-18 02:18:11Z mike $".
+ * End of "$Id$".
  */

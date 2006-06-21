@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 5233 2006-03-06 03:39:28Z mike $"
+ * "$Id$"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -244,5 +244,5 @@ extern cups_file_t	*cupsTempFile2(char *filename, int len);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 5233 2006-03-06 03:39:28Z mike $".
+ * End of "$Id$".
  */

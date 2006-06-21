@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertohp.c 4493 2005-02-18 02:09:53Z mike $"
+ * "$Id$"
  *
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
@@ -884,5 +884,5 @@ main(int  argc,		/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c 4493 2005-02-18 02:09:53Z mike $".
+ * End of "$Id$".
  */

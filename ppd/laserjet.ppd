@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: laserjet.ppd 4905 2006-01-10 20:07:15Z mike $"
+*% "$Id$"
 *%
 *%   Sample HP LaserJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -197,5 +197,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: laserjet.ppd 4905 2006-01-10 20:07:15Z mike $".
+*% End of "$Id$".
 *%

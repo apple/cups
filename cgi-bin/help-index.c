@@ -1,5 +1,5 @@
 /*
- * "$Id: help-index.c 5143 2006-02-21 19:13:01Z mike $"
+ * "$Id$"
  *
  *   On-line help index routines for the Common UNIX Printing System (CUPS).
  *
@@ -979,5 +979,5 @@ help_sort_by_score(help_node_t *n1,	/* I - First node */
 
 
 /*
- * End of "$Id: help-index.c 5143 2006-02-21 19:13:01Z mike $".
+ * End of "$Id$".
  */

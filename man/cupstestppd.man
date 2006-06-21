@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupstestppd.man 5099 2006-02-13 02:46:10Z mike $"
+.\" "$Id$"
 .\"
 .\"   cupstestppd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -111,5 +111,5 @@ Adobe PostScript Printer Description File Format Specification, Version 4.3.
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupstestppd.man 5099 2006-02-13 02:46:10Z mike $".
+.\" End of "$Id$".
 .\"

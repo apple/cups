@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-deviced.c 5244 2006-03-08 12:12:12Z mike $"
+ * "$Id$"
  *
  *   Device scanning mini-daemon for the Common UNIX Printing System (CUPS).
  *
@@ -500,5 +500,5 @@ sigalrm_handler(int sig)		/* I - Signal number */
 
 
 /*
- * End of "$Id: cups-deviced.c 5244 2006-03-08 12:12:12Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupstestdsc.man 5099 2006-02-13 02:46:10Z mike $"
+.\" "$Id$"
 .\"
 .\"   cupstestdsc man page for the Common UNIX Printing System (CUPS).
 .\"

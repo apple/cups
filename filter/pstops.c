@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 5570 2006-05-22 18:31:23Z mike $"
+ * "$Id$"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -2935,5 +2935,5 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 5570 2006-05-22 18:31:23Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: filter.c 5493 2006-05-05 16:33:57Z mike $"
+ * "$Id$"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
@@ -409,5 +409,5 @@ lookup(mime_t      *mime,		/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c 5493 2006-05-05 16:33:57Z mike $".
+ * End of "$Id$".
  */

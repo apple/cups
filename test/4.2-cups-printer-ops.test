@@ -1,5 +1,5 @@
 #
-# "$Id: 4.2-cups-printer-ops.test 5493 2006-05-05 16:33:57Z mike $"
+# "$Id$"
 #
 #   Verify that the CUPS printer operations work.
 #
@@ -258,5 +258,5 @@
 }
 
 #
-# End of "$Id: 4.2-cups-printer-ops.test 5493 2006-05-05 16:33:57Z mike $"
+# End of "$Id$"
 #

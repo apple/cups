@@ -1,5 +1,5 @@
 /*
- * "$Id: testraster.c 4545 2005-06-21 19:26:28Z mike $"
+ * "$Id$"
  *
  *   Raster test program routines for the Common UNIX Printing System (CUPS).
  *
@@ -206,5 +206,5 @@ main(void)
 
 
 /*
- * End of "$Id: testraster.c 4545 2005-06-21 19:26:28Z mike $".
+ * End of "$Id$".
  */

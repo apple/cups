@@ -1,5 +1,5 @@
 /*
- * "$Id: testdriver.c 5390 2006-04-10 19:29:44Z mike $"
+ * "$Id$"
  *
  *   Sample/test driver interface program for the Common UNIX Printing
  *   System (CUPS).
@@ -175,5 +175,5 @@ list_ppds(const char *name)		/* I - Program name */
 
 
 /*
- * End of "$Id: testdriver.c 5390 2006-04-10 19:29:44Z mike $".
+ * End of "$Id$".
  */

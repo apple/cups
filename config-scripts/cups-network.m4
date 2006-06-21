@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id$"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -85,5 +85,5 @@ AC_SUBST(CUPS_DEFAULT_DOMAINSOCKET)
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
 
 dnl
-dnl End of "$Id: cups-network.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id$".
 dnl

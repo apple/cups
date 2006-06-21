@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsaddsmb.man.in 5445 2006-04-20 18:25:40Z mike $"
+.\" "$Id$"
 .\"
 .\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -209,5 +209,5 @@ http://www.cups.org/windows/
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsaddsmb.man.in 5445 2006-04-20 18:25:40Z mike $".
+.\" End of "$Id$".
 .\"

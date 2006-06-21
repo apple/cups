@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id$"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -283,5 +283,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id$".
  */
