@@ -59,6 +59,39 @@ static const char	*default_code =
 			"%%BeginFeature: *InputSlot Tray\n"
 			"InputSlot=Tray\n"
 			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *IntOption None\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *StringOption None\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n";
+
+static const char	*custom_code =
+			"[{\n"
+			"%%BeginFeature: *CustomPageSize True\n"
+			"500\n"
+			"400\n"
+			"0\n"
+			"0\n"
+			"0\n"
+			"PageSize=Custom\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *InputSlot Tray\n"
+			"InputSlot=Tray\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *IntOption None\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *StringOption None\n"
+			"%%EndFeature\n"
 			"} stopped cleartomark\n";
 
 
@@ -107,7 +140,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       printf("FAIL (%d conflicts)\n", conflicts);
     }
 
-    fputs("ppdEmitString: ", stdout);
+    fputs("ppdEmitString (defaults): ", stdout);
     if ((s = ppdEmitString(ppd, PPD_ORDER_ANY, 0.0)) != NULL &&
 	!strcmp(s, default_code))
       puts("PASS");
@@ -115,6 +148,24 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
 	     (int)strlen(default_code));
+
+      if (s)
+	puts(s);
+    }
+
+    if (s)
+      free(s);
+
+    fputs("ppdEmitString (custom size): ", stdout);
+    ppdMarkOption(ppd, "PageSize", "Custom.400x500");
+
+    if ((s = ppdEmitString(ppd, PPD_ORDER_ANY, 0.0)) != NULL &&
+	!strcmp(s, custom_code))
+      puts("PASS");
+    else
+    {
+      printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
+	     (int)strlen(custom_code));
 
       if (s)
 	puts(s);

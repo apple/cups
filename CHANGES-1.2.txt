@@ -3,6 +3,16 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.2
 
+	- Sending raw jobs from a client system could cause the
+	  client's scheduler to eventually crash (STR #1786)
+	- The scheduler now checks that the notifier exists prior
+	  to accepting a new subscription request.
+	- The scheduler now reports the supported
+	  notify-recipient schemes based on the contents of the
+	  ServerBin/notifier directory.
+	- Event notifications did not include the
+	  notify-sequence-number or other required attributes
+	  (STR #1747)
 	- Allow/Deny addresses of the form "11.22.33.*" did not
 	  work on Linux (STR #1769)
 	- cupsGetPPD() did not work if the scheduler was only
