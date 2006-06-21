@@ -4646,8 +4646,8 @@ create_subscription(
   ipp_attribute_t	*attr;		/* Current attribute */
   const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
-  char			method[HTTP_MAX_URI],
-					/* Method portion of URI */
+  char			scheme[HTTP_MAX_URI],
+					/* Scheme portion of URI */
 			userpass[HTTP_MAX_URI],
 					/* Username portion of URI */
 			host[HTTP_MAX_URI],
@@ -4687,8 +4687,8 @@ create_subscription(
                   "cupsdCreateSubscription(con=%p(%d), uri=\"%s\")",
                   con, con->http.fd, uri->values[0].string.text);
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                  sizeof(method), userpass, sizeof(userpass), host,
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                  sizeof(scheme), userpass, sizeof(userpass), host,
 		  sizeof(host), &port, resource, sizeof(resource));
 
   if (!strcmp(resource, "/"))
@@ -4782,10 +4782,54 @@ create_subscription(
     {
       if (!strcmp(attr->name, "notify-recipient") &&
           attr->value_tag == IPP_TAG_URI)
+      {
+       /*
+        * Validate the recipient scheme against the ServerBin/notifier
+	* directory...
+	*/
+
+	char	notifier[1024];		/* Notifier filename */
+
+
         recipient = attr->values[0].string.text;
+
+	if (httpSeparateURI(HTTP_URI_CODING_ALL, recipient, scheme,
+                	    sizeof(scheme), userpass, sizeof(userpass), host,
+			    sizeof(host), &port, resource, sizeof(resource)))
+        {
+          send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                  _("Bad notify-recipient URI \"%s\"!"), recipient);
+	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
+	                "notify-status-code", IPP_URI_SCHEME);
+	  return;
+	}
+
+        snprintf(notifier, sizeof(notifier), "%s/notifier/%s", ServerBin,
+	         scheme);
+        if (access(notifier, X_OK))
+	{
+          send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                  _("notify-recipient URI \"%s\" uses unknown scheme!"),
+			  recipient);
+	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
+	                "notify-status-code", IPP_URI_SCHEME);
+	  return;
+	}
+      }
       else if (!strcmp(attr->name, "notify-pull-method") &&
                attr->value_tag == IPP_TAG_KEYWORD)
+      {
         pullmethod = attr->values[0].string.text;
+
+        if (strcmp(pullmethod, "ippget"))
+	{
+          send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                  _("Bad notify-pull-method \"%s\"!"), pullmethod);
+	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
+	                "notify-status-code", IPP_ATTRIBUTES);
+	  return;
+	}
+      }
       else if (!strcmp(attr->name, "notify-charset") &&
                attr->value_tag == IPP_TAG_CHARSET &&
 	       strcmp(attr->values[0].string.text, "us-ascii") &&
