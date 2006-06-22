@@ -32,6 +32,7 @@
  */
 
 #  include "string.h"
+#  include "http-private.h"
 #  include "cups.h"
 #  include "i18n.h"
 

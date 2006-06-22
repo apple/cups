@@ -36,6 +36,7 @@
  *   cupsdStopPolling()            - Stop polling servers as needed.
  *   cupsdUpdateCUPSBrowse()       - Update the browse lists using the CUPS
  *                                   protocol.
+ *   cupsdUpdateLDAPBrowse()       - Scan for new printers via LDAP...
  *   cupsdUpdatePolling()          - Read status messages from the poll daemons.
  *   cupsdUpdateSLPBrowse()        - Get browsing information via SLP.
  *   dequote()                     - Remote quotes from a string.
@@ -1526,39 +1527,57 @@ cupsdUpdateLDAPBrowse(void)
   * Loop through the available printers...
   */
 
-  if ((e = ldap_first_entry(BrowseLDAPHandle, res)) == NULL)
+  for (e = ldap_first_entry(BrowseLDAPHandle, res);
+       e;
+       e = ldap_next_entry(BrowseLDAPHandle, e))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get LDAP printer entry!");
-    return;
-  }
+   /*
+    * Get the required values from this entry...
+    */
 
-  while (e)
-  {
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerDescription");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerDescription")) == NULL)
+      continue;
+
     strlcpy(info, *value, sizeof(info));
     ldap_value_free(value);
 
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerLocation");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerLocation")) == NULL)
+      continue;
+
     strlcpy(location, *value, sizeof(location));
     ldap_value_free(value);
 
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerMakeAndModel");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerMakeAndModel")) == NULL)
+      continue;
+
     strlcpy(make_model, *value, sizeof(make_model));
     ldap_value_free(value);
 
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerType");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerType")) == NULL)
+      continue;
+
     type = atoi(*value);
     ldap_value_free(value);
 
-    value = ldap_get_values(BrowseLDAPHandle, e, "printerURI");
+    if ((value = ldap_get_values(BrowseLDAPHandle, e,
+                                 "printerURI")) == NULL)
+      continue;
+
     strlcpy(uri, *value, sizeof(uri));
     ldap_value_free(value);
+
+   /*
+    * Process the entry as browse data...
+    */
 
     if (!is_local_queue(uri, host, sizeof(host), resource, sizeof(resource)))
       process_browse_data(uri, host, resource, type, IPP_PRINTER_IDLE,
                           location, info, make_model, 0, NULL);
 
-    e = ldap_next_entry(BrowseLDAPHandle, e);
   }
 }
 #endif /* HAVE_OPENLDAP */
@@ -2521,7 +2540,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 
 	  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
 	                   iface->hostname, iface->port,
-			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
+			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s" :
 			                                    "/printers/%s",
 			   p->name);
 	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
@@ -2660,13 +2679,13 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
 
   sprintf(typestring, "%u", p->type);
 
-  cn_value[0]   = p->info;
+  cn_value[0]   = p->name;
   cn_value[1]   = NULL;
-  info[0]       = p->info;
+  info[0]       = p->info ? p->info : "Unknown";
   info[1]       = NULL;
-  location[0]   = p->location;
+  location[0]   = p->location ? p->location : "Unknown";
   location[1]   = NULL;
-  make_model[0] = p->make_model;
+  make_model[0] = p->make_model ? p->make_model : "Unknown";
   make_model[1] = NULL;
   type[0]       = typestring;
   type[1]       = NULL;
@@ -2674,7 +2693,7 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
   uri[1]        = NULL;
 
   snprintf(filter, sizeof(filter),
-           "(&(objectclass=cupsPrinter)(printerDescription~=%s))", p->info);
+           "(&(objectclass=cupsPrinter)(printerURI=%s))", p->uri);
 
   ldap_search_s(BrowseLDAPHandle, BrowseLDAPDN, LDAP_SCOPE_SUBTREE,
                 filter, (char **)ldap_attrs, 0, &res);
@@ -2696,7 +2715,7 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
   mods[6].mod_type = "objectClass";
   mods[6].mod_values = (char **)objectClass_values;
 
-  snprintf(dn, sizeof(dn), "cn=%s,ou=printers,%s", p->info, BrowseLDAPDN);
+  snprintf(dn, sizeof(dn), "cn=%s,ou=printers,%s", p->name, BrowseLDAPDN);
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: dn=\"%s\"", dn);
 
   if (ldap_count_entries(BrowseLDAPHandle, res) > 0)
@@ -2724,7 +2743,7 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
   else 
   {
    /*
-    * Printer has already been registered, modify the current
+    * Printer has never been registered, add the current
     * registration...
     */
 
@@ -2734,11 +2753,11 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
     for (i = 0; i < 7; i ++)
     {
       pmods[i]         = mods + i;
-      pmods[i]->mod_op = LDAP_MOD_REPLACE;
+      pmods[i]->mod_op = LDAP_MOD_ADD;
     }
     pmods[i] = NULL;
 
-    if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+    if ((rc = ldap_add_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "LDAP add for %s failed with status %d: %s",
                       p->name, rc, ldap_err2string(rc));

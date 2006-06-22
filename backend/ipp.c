@@ -211,7 +211,8 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if ((content_type = getenv("FINAL_CONTENT_TYPE")) == NULL)
-    content_type = "application/octet-stream";
+    if ((content_type = getenv("CONTENT_TYPE")) == NULL)
+      content_type = "application/octet-stream";
 
  /*
   * Extract the hostname and printer name from the URI...

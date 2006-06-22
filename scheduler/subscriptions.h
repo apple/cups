@@ -131,11 +131,9 @@ VAR int		MaxSubscriptions VALUE(100),
 VAR cups_array_t *Subscriptions VALUE(NULL);
 					/* Active subscriptions */
 
-VAR int		MaxEvents VALUE(100),	/* Maximum number of events */
-		NumEvents VALUE(0);	/* Number of active events */
-VAR cupsd_event_t **Events VALUE(NULL);	/* Active events */
+VAR int		MaxEvents VALUE(100);	/* Maximum number of events */
 
-VAR unsigned	LastEvent VALUE(0);	/* Last events processed */
+VAR unsigned	LastEvent VALUE(0);	/* Last event(s) processed */
 VAR int		NotifierPipes[2] VALUE2(-1, -1);
 					/* Pipes for notifier error/debug output */
 VAR cupsd_statbuf_t *NotifierStatusBuffer VALUE(NULL);

@@ -54,6 +54,11 @@
 
 #ifdef HAVE_CDSASSL
 #  include <Security/Security.h>
+#  ifdef HAVE_SECBASEPRIV_H
+#    include <Security/SecBasePriv.h>
+#  else
+     extern const char *cssmErrorString(int error);
+#  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_CDSASSL */
 #ifdef HAVE_GNUTLS
 #  include <gnutls/x509.h>
@@ -1882,24 +1887,27 @@ cupsdSendCommand(
 
 
   if (con->filename)
-    fd = open(con->filename, O_RDONLY);
-  else
-    fd = open("/dev/null", O_RDONLY);
-
-  if (fd < 0)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdSendCommand: %d Unable to open \"%s\" for reading: %s",
-                    con->http.fd, con->filename ? con->filename : "/dev/null",
-	            strerror(errno));
-    return (0);
-  }
+    fd = open(con->filename, O_RDONLY);
 
-  fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+    if (fd < 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "cupsdSendCommand: %d Unable to open \"%s\" for reading: %s",
+                      con->http.fd, con->filename ? con->filename : "/dev/null",
+	              strerror(errno));
+      return (0);
+    }
+
+    fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+  }
+  else
+    fd = -1;
 
   con->pipe_pid = pipe_command(con, fd, &(con->file), command, options, root);
 
-  close(fd);
+  if (fd >= 0)
+    close(fd);
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Started \"%s\" (pid=%d)", command,
                   con->pipe_pid);
@@ -2659,7 +2667,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     error = SSLSetIOFuncs(conn->session, _httpReadCDSA, _httpWriteCDSA);
 
   if (!error)
-    error = SSLSetProtocolVersion(conn->session, kSSLProtocol3);
+    error = SSLSetProtocolVersionEnabled(conn->session, kSSLProtocol2, false);
 
   if (!error)
   {
@@ -2697,8 +2705,8 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
                     "encrypt_client: Unable to encrypt connection from %s!",
                     con->http.hostname);
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "encrypt_client: CDSA error code is %d", (int)error);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "encrypt_client: %s (%d)",
+                    cssmErrorString(error), (int)error);
 
     con->http.error  = error;
     con->http.status = HTTP_ERROR;

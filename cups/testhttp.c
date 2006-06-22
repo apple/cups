@@ -3,7 +3,7 @@
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -311,9 +311,21 @@ main(int  argc,				/* I - Number of command-line arguments */
     addrlist = httpAddrGetList(hostname, AF_UNSPEC, NULL);
     if (addrlist)
     {
-      for (i = 0, addr = addrlist; addr; i ++, addr = addr->next);
+      for (i = 0, addr = addrlist; addr; i ++, addr = addr->next)
+      {
+        char	numeric[1024];		/* Numeric IP address */
 
-      printf("PASS (%d address(es) for %s)\n", i, hostname);
+
+	httpAddrString(&(addr->addr), numeric, sizeof(numeric));
+	if (!strcmp(numeric, "UNKNOWN"))
+	  break;
+      }
+
+      if (addr)
+        printf("FAIL (bad address for %s)\n", hostname);
+      else
+        printf("PASS (%d address(es) for %s)\n", i, hostname);
+
       httpAddrFreeList(addrlist);
     }
     else

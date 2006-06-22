@@ -41,6 +41,7 @@
 #  include <unistd.h>
 #  include <fcntl.h>
 #endif /* WIN32 */
+
 #define DEBUG
 #include "ieee1284.c"
 
@@ -76,8 +77,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     printf("%s:\n", argv[i]);
 
-    get_device_id(fd, device_id, sizeof(device_id), make_model,
-                  sizeof(make_model), "test", uri, sizeof(uri));
+    backendGetDeviceID(fd, device_id, sizeof(device_id), make_model,
+                       sizeof(make_model), "test", uri, sizeof(uri));
 
     printf("    device_id=\"%s\"\n", device_id);
     printf("    make_model=\"%s\"\n", make_model);

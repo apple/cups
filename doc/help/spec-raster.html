@@ -14,9 +14,10 @@ RIPs to device-dependent filters that convert the raster data to
 a printable format.</P>
 
 <P>CUPS 1.0 and 1.1 used a version 1 raster format. CUPS 1.2
-introduces a version 2 format that is a superset of the version 1
-format. Applications using the CUPS Imaging API (the cupsRaster*
-functions) can read both formats without code changes.</P>
+introduces version 2 (compressed) and version 3 (uncompressed)
+formats that are a superset of the version 1 format. Applications
+using the CUPS Imaging API (the cupsRaster* functions) can read
+all formats without code changes.</P>
 
 <P>The registered MIME media type for CUPS raster files is
 <CODE>application/vnd.cups-raster</CODE>.</P>
@@ -485,6 +486,22 @@ colors are encoded using an initial byte of "257 - count"
 followed by the color value bytes.</P>
 
 
+<H2 CLASS="title"><A NAME="V3">Version 3 Raster File Format</A></H2>
+
+<P>A version 3 raster file begins with a 32-bit synchronization
+word: 0x52615333 ("RaS3") for big-endian architectures and
+0x33536152 ("3SaR") for little-endian architectures. The writer
+of the raster file will use the native word order, and the reader
+is responsible for detecting a reversed word order file and
+swapping bytes as needed. The CUPS Imaging API raster functions
+perform this function automatically.</P>
+
+<P>Following the synchronization word are a series of raster
+pages. Each page starts with a version 2 page device dictionary
+header and is followed immediately by the uncompressed raster data
+for that page.</P>
+
+
 <H2 CLASS="title"><A NAME="ENCODING">Pixel Value Coding</A></H2>
 
 <P>The following sections describe the encoding and decoding of
@@ -672,6 +689,15 @@ accuracy.</P>
 
 
 <H2 CLASS="title"><A NAME="HISTORY">Change History</A></H2>
+
+<H3>Changes in CUPS 1.2.2</H3>
+
+<ul>
+
+	<li>Added version 3 (uncompressed) format.</li>
+
+</ul>
+
 
 <H3>Changes in CUPS 1.2.1</H3>
 

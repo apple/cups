@@ -63,7 +63,7 @@
 void	list_devices(void);
 int	print_device(const char *uri, const char *hostname,
 	             const char *resource, const char *options,
-		     int fp, int copies, int argc, char *argv[]);
+		     int print_fd, int copies, int argc, char *argv[]);
 
 
 /*
@@ -108,7 +108,7 @@ print_device(const char *uri,		/* I - Device URI */
              const char *hostname,	/* I - Hostname/manufacturer */
              const char *resource,	/* I - Resource/modelname */
 	     const char *options,	/* I - Device options/serial number */
-	     int        fp,		/* I - File descriptor to print */
+	     int        print_fd,	/* I - File descriptor to print */
 	     int        copies,		/* I - Copies to print */
 	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
 	     char	*argv[])	/* I - Command-line arguments */
@@ -124,7 +124,7 @@ print_device(const char *uri,		/* I - Device URI */
   (void)hostname;
   (void)resource;
   (void)options;
-  (void)fp;
+  (void)print_fd;
   (void)copies;
   (void)argc;
   (void)argv;
@@ -146,7 +146,7 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		fp;			/* Print file */
+  int		print_fd;		/* Print file */
   int		copies;			/* Number of copies to print */
   int		status;			/* Exit status */
   int		port;			/* Port number (not used) */
@@ -232,8 +232,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 6)
   {
-    fp     = 0;
-    copies = 1;
+    print_fd = 0;
+    copies   = 1;
   }
   else
   {
@@ -241,7 +241,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Try to open the print file...
     */
 
-    if ((fp = open(argv[6], O_RDONLY)) < 0)
+    if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
       fprintf(stderr, "ERROR: unable to open print file %s - %s\n",
               argv[6], strerror(errno));
@@ -255,14 +255,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Finally, send the print file...
   */
 
-  status = print_device(uri, hostname, resource, options, fp, copies, argc, argv);
+  status = print_device(uri, hostname, resource, options, print_fd, copies,
+                        argc, argv);
 
  /*
   * Close the input file and return...
   */
 
-  if (fp != 0)
-    close(fp);
+  if (print_fd != 0)
+    close(print_fd);
 
   return (status);
 }

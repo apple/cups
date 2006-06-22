@@ -261,6 +261,13 @@
 
 
 /*
+ * Do we have <Security/SecBasePriv.h>?
+ */
+
+#undef HAVE_SECBASEPRIV_H
+
+
+/*
  * Do we have the SLP library?
  */
 

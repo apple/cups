@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "19 April 2006" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "13 June 2006" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 
@@ -162,13 +162,14 @@ Once you have extracted the driver files, copy them to the
 .nf
 
     [Windows 2000 and higher]
-    cups6.ini
-    cupsui6.dll
-    cupsdrv6.dll
-    ps5ui.dll
-    pscript.hlp
-    pscript.ntf
-    pscript5.dll
+    cups6.inf (from www.cups.org)
+    cups6.ini (from www.cups.org)
+    cupsps6.dll (from www.cups.org)
+    cupsui6.dll (from www.cups.org)
+    ps5ui.dll (from your Windows system)
+    pscript.hlp (from your Windows system)
+    pscript.ntf (from your Windows system)
+    pscript5.dll (from your Windows system)
 .fi
 .LP
 \fBNote:\fR Unlike Windows, case is significant - make sure that

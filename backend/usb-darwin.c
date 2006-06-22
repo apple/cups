@@ -1310,7 +1310,7 @@ static void *read_thread(void *reference)
      */
     start = mach_absolute_time();
 
-    rbytes = sizeof(readbuffer) - 1;
+    rbytes = sizeof(readbuffer);
     readstatus = (*classdriver)->ReadPipe( classdriver, readbuffer, &rbytes );
     if ( kIOReturnSuccess == readstatus && rbytes > 0 ) {
 

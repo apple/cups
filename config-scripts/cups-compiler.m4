@@ -24,22 +24,31 @@ dnl
 
 dnl Clear the debugging and non-shared library options unless the user asks
 dnl for them...
-ARCHFLAGS=""
 OPTIM=""
-AC_SUBST(ARCHFLAGS)
 AC_SUBST(OPTIM)
 
 AC_ARG_WITH(optim, [  --with-optim="flags"    set optimization flags ])
-AC_ARG_WITH(archflags, [  --with-arch="flags"     set default architecture flags ])
-
 AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no],
 	[if test x$enable_debug = xyes; then
 		OPTIM="-g"
 	fi])
 
+dnl Setup general architecture flags...
+AC_ARG_WITH(archflags, [  --with-archflags="flags"
+                          set default architecture flags ])
+
+if test -z "$with_archflags"; then
+	ARCHFLAGS=""
+else
+	ARCHFLAGS="$with_archflags"
+fi
+
+AC_SUBST(ARCHFLAGS)
+
 dnl Setup support for separate 32/64-bit library generation...
 AC_ARG_ENABLE(32bit, [  --enable-32bit          generate 32-bit libraries on 32/64-bit systems, default=no])
-AC_ARG_WITH(arch32flags, [  --with-arch32="flags"   specifies 32-bit architecture flags])
+AC_ARG_WITH(arch32flags, [  --with-arch32flags="flags"
+                          specifies 32-bit architecture flags])
 
 ARCH32FLAGS=""
 INSTALL32=""
@@ -56,7 +65,8 @@ AC_SUBST(LIB32DIR)
 AC_SUBST(UNINSTALL32)
 
 AC_ARG_ENABLE(64bit, [  --enable-64bit          generate 64-bit libraries on 32/64-bit systems, default=no])
-AC_ARG_WITH(arch64flags, [  --with-arch64="flags"   specifies 64-bit architecture flags])
+AC_ARG_WITH(arch64flags, [  --with-arch64flags="flags"
+                          specifies 64-bit architecture flags])
 
 ARCH64FLAGS=""
 INSTALL64=""
@@ -118,17 +128,6 @@ if test -n "$GCC"; then
 	fi
 
 	case "$uname" in
-		Darwin*)
-			if test -z "$with_archflags"; then
-				if test "x`uname -m`" = xi386; then
-					# Build universal binaries for OSX on Intel...
-					ARCHFLAGS="-arch i386 -arch ppc"
-				fi
-			else
-				ARCHFLAGS="$with_archflags"
-			fi
-			;;
-
 		IRIX)
 			if test "x$enable_32bit" = xyes; then
 				# Build 32-bit libraries, 64-bit base...
@@ -149,8 +148,6 @@ if test -n "$GCC"; then
 					else
 						ARCHFLAGS="$with_arch64flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 
@@ -173,8 +170,6 @@ if test -n "$GCC"; then
 					else
 						ARCHFLAGS="$with_arch32flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 			;;
@@ -202,8 +197,6 @@ if test -n "$GCC"; then
 					else
 						ARCHFLAGS="$with_arch64flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 
@@ -229,8 +222,6 @@ if test -n "$GCC"; then
 					else
 						ARCHFLAGS="$with_arch32flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 			;;
@@ -255,8 +246,6 @@ if test -n "$GCC"; then
 					else
 						ARCHFLAGS="$with_arch64flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 
@@ -279,8 +268,6 @@ if test -n "$GCC"; then
 					else
 						ARCHFLAGS="$with_arch32flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 			;;
@@ -313,8 +300,6 @@ else
 			if test -z "$with_archflags"; then
 				# Build portable binaries for all HP systems...
 				ARCHFLAGS="+DAportable"
-			else
-				ARCHFLAGS="$with_archflags"
 			fi
 
 			if test $PICFLAG = 1; then
@@ -353,8 +338,6 @@ else
 					else
 						ARCHFLAGS="$with_arch64flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 
@@ -377,8 +360,6 @@ else
 					else
 						ARCHFLAGS="$with_arch32flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 			;;
@@ -386,7 +367,7 @@ else
 			# Solaris
 			if test -z "$OPTIM"; then
 				if test "x$with_optim" = x; then
-					OPTIM="-xO4"
+					OPTIM="-xO2"
 				else
 					OPTIM="$with_optim $OPTIM"
 				fi
@@ -419,8 +400,6 @@ else
 					else
 						ARCHFLAGS="$with_arch64flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			else
 				if test "x$enable_64bit" = xyes; then
@@ -446,8 +425,6 @@ else
 					else
 						ARCHFLAGS="$with_arch32flags"
 					fi
-				else
-					ARCHFLAGS="$with_archflags"
 				fi
 			fi
 			;;

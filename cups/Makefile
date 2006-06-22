@@ -138,7 +138,7 @@ all:	$(TARGETS)
 clean:
 	$(RM) $(OBJS) $(TARGETS)
 	$(RM) libcups.so libcups.sl libcups.dylib
-	$(RM) -r 32bit 64it
+	$(RM) -r 32bit 64bit
 
 
 #
@@ -186,12 +186,12 @@ installhdrs:
 install32bit:
 	$(INSTALL_DIR) -m 755 $(LIB32DIR)
 	$(INSTALL_LIB) 32bit/libcups.so.2 $(LIB32DIR)/libcups.so.2
-	$(LN) libcups.so $(LIB32DIR)/libcups.so.2
+	$(LN) libcups.so.2 $(LIB32DIR)/libcups.so
 
 install64bit:
 	$(INSTALL_DIR) -m 755 $(LIB64DIR)
 	$(INSTALL_LIB) 64bit/libcups.so.2 $(LIB64DIR)/libcups.so.2
-	$(LN) libcups.so $(LIB64DIR)/libcups.so.2
+	$(LN) libcups.so.2 $(LIB64DIR)/libcups.so
 
 
 #

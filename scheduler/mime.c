@@ -51,6 +51,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include <cups/debug.h>
 #include <cups/dir.h>
 #include <cups/string.h>
 #include "mime.h"
@@ -486,6 +487,8 @@ load_convs(mime_t       *mime,		/* I - MIME database */
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return;
 
+  DEBUG_printf(("\"%s\":\n", filename));
+
  /*
   * Then read each line from the file, skipping any comments in the file...
   */
@@ -495,6 +498,8 @@ load_convs(mime_t       *mime,		/* I - MIME database */
    /*
     * Skip blank lines and lines starting with a #...
     */
+
+    DEBUG_puts(line);
 
     if (!line[0] || line[0] == '#')
       continue;
@@ -544,7 +549,10 @@ load_convs(mime_t       *mime,		/* I - MIME database */
       continue;
 
     if ((dsttype = mimeType(mime, super, type)) == NULL)
+    {
+      DEBUG_printf(("    Destination type %s/%s not found!\n", super, type));
       continue;
+    }
 
    /*
     * Then get the cost and filter program...
@@ -575,7 +583,10 @@ load_convs(mime_t       *mime,		/* I - MIME database */
       */
 
       if (!add_fcache(filtercache, filter, filterpath))
+      {
+        DEBUG_printf(("    Filter %s not found in %s!\n", filter, filterpath)); 
         continue;
+      }
     }
 
    /*
@@ -655,6 +666,8 @@ load_types(mime_t     *mime,		/* I - MIME database */
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return;
 
+  DEBUG_printf(("\"%s\":\n", filename));
+
  /*
   * Then read each line from the file, skipping any comments in the file...
   */
@@ -664,6 +677,8 @@ load_types(mime_t     *mime,		/* I - MIME database */
    /*
     * Skip blank lines and lines starting with a #...
     */
+
+    DEBUG_puts(line);
 
     if (!line[0] || line[0] == '#')
       continue;

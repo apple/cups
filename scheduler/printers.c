@@ -62,6 +62,7 @@
  */
 
 #include "cupsd.h"
+#include <cups/dir.h>
 
 
 /*
@@ -257,6 +258,11 @@ cupsdCreateCommonData(void)
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Attribute data */
+  cups_dir_t		*dir;		/* Notifier directory */
+  cups_dentry_t		*dent;		/* Notifier directory entry */
+  cups_array_t		*notifiers;	/* Notifier array */
+  char			filename[1024],	/* Filename */
+			*notifier;	/* Current notifier */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
@@ -406,10 +412,6 @@ cupsdCreateCommonData(void)
   /* copies-supported */
   ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
 
-  /* document-format-default */
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
-               "document-format-default", NULL, "application/octet-stream");
-
   /* generated-natural-language-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
                "generated-natural-language-supported", NULL, DefaultLanguage);
@@ -502,11 +504,11 @@ cupsdCreateCommonData(void)
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                "notify-max-events-supported", MaxEvents);
 
-  /* notify-notify-events-default */
+  /* notify-events-default */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "notify-events-default", NULL, "job-completed");
 
-  /* notify-notify-events-supported */
+  /* notify-events-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                 "notify-events-supported",
 		(int)(sizeof(notify_events) / sizeof(notify_events[0])),
@@ -516,10 +518,31 @@ cupsdCreateCommonData(void)
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                "notify-pull-method-supported", NULL, "ippget");
 
-  /* TODO: scan notifier directory */
   /* notify-schemes-supported */
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-               "notify-schemes-supported", NULL, "mailto");
+  snprintf(filename, sizeof(filename), "%s/notifier", ServerBin);
+  if ((dir = cupsDirOpen(filename)) != NULL)
+  {
+    notifiers = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+
+    while ((dent = cupsDirRead(dir)) != NULL)
+      if (S_ISREG(dent->fileinfo.st_mode) &&
+          (dent->fileinfo.st_mode & S_IXOTH) != 0)
+        cupsArrayAdd(notifiers, _cupsStrAlloc(dent->filename));
+
+    if (cupsArrayCount(notifiers) > 0)
+    {
+      attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+        	           "notify-schemes-supported",
+			   cupsArrayCount(notifiers), NULL, NULL);
+
+      for (i = 0, notifier = (char *)cupsArrayFirst(notifiers);
+           notifier;
+	   i ++, notifier = (char *)cupsArrayNext(notifiers))
+	attr->values[i].string.text = notifier;
+    }
+
+    cupsArrayDelete(notifiers);
+  }
 
   /* number-up-supported */
   ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -665,7 +688,7 @@ cupsdDeletePrinter(
 	   dp = (cupsd_printer_t *)cupsArrayNext(Printers))
 	if (dp != p && (dp->type & CUPS_PRINTER_DEFAULT))
 	{
-	  DefaultPrinter = p;
+	  DefaultPrinter = dp;
 	  break;
 	}
     }
@@ -2404,18 +2427,25 @@ cupsdUpdatePrinters(void)
 
 const char *				/* O - Printer or class name */
 cupsdValidateDest(
-    const char      *hostname,		/* I - Host name */
-    const char      *resource,		/* I - Resource name */
+    const char      *uri,		/* I - Printer URI */
     cups_ptype_t    *dtype,		/* O - Type (printer or class) */
     cupsd_printer_t **printer)		/* O - Printer pointer */
 {
   cupsd_printer_t	*p;		/* Current printer */
   char			localname[1024],/* Localized hostname */
 			*lptr,		/* Pointer into localized hostname */
-			*sptr;		/* Pointer into server name */
+			*sptr,		/* Pointer into server name */
+			*rptr,		/* Pointer into resource */
+			scheme[32],	/* Scheme portion of URI */
+			username[64],	/* Username portion of URI */
+			hostname[HTTP_MAX_HOST],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
 
 
-  DEBUG_printf(("cupsdValidateDest(\"%s\", \"%s\", %p, %p)\n", hostname, resource,
+  DEBUG_printf(("cupsdValidateDest(uri=\"%s\", dtype=%p, printer=%p)\n", uri,
                 dtype, printer));
 
  /*
@@ -2425,7 +2455,16 @@ cupsdValidateDest(
   if (printer)
     *printer = NULL;
 
-  *dtype = (cups_ptype_t)0;
+  if (dtype)
+    *dtype = (cups_ptype_t)0;
+
+ /*
+  * Pull the hostname and resource from the URI...
+  */
+
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
+                  username, sizeof(username), hostname, sizeof(hostname),
+		  &port, resource, sizeof(resource));
 
  /*
   * See if the resource is a class or printer...
@@ -2437,7 +2476,7 @@ cupsdValidateDest(
     * Class...
     */
 
-    resource += 9;
+    rptr = resource + 9;
   }
   else if (!strncmp(resource, "/printers/", 10))
   {
@@ -2445,7 +2484,7 @@ cupsdValidateDest(
     * Printer...
     */
 
-    resource += 10;
+    rptr = resource + 10;
   }
   else
   {
@@ -2460,17 +2499,19 @@ cupsdValidateDest(
   * See if the printer or class name exists...
   */
 
-  p = cupsdFindDest(resource);
+  p = cupsdFindDest(rptr);
 
-  if (p == NULL && strchr(resource, '@') == NULL)
+  if (p == NULL && strchr(rptr, '@') == NULL)
     return (NULL);
   else if (p != NULL)
   {
     if (printer)
       *printer = p;
 
-    *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
-                        CUPS_PRINTER_REMOTE);
+    if (dtype)
+      *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+                          CUPS_PRINTER_REMOTE);
+
     return (p->name);
   }
 
@@ -2479,7 +2520,7 @@ cupsdValidateDest(
   */
 
   if (!strcasecmp(hostname, "localhost"))
-    hostname = ServerName;
+    strlcpy(hostname, ServerName, sizeof(hostname));
 
   strlcpy(localname, hostname, sizeof(localname));
 
@@ -2521,13 +2562,15 @@ cupsdValidateDest(
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
     if (!strcasecmp(p->hostname, localname) &&
-        !strcasecmp(p->name, resource))
+        !strcasecmp(p->name, rptr))
     {
       if (printer)
         *printer = p;
 
-      *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
-                          CUPS_PRINTER_REMOTE);
+      if (dtype)
+	*dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+                            CUPS_PRINTER_REMOTE);
+
       return (p->name);
     }
 
@@ -2775,6 +2818,10 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
   if (!cupsGetOption("copies", p->num_options, p->options))
     ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "copies-default",
                   1);
+
+  if (!cupsGetOption("document-format", p->num_options, p->options))
+    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
+        	 "document-format-default", NULL, "application/octet-stream");
 
   if (!cupsGetOption("job-hold-until", p->num_options, p->options))
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,

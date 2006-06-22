@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
+.TH cupsd.conf 5 "Common UNIX Printing System" "6 June 2006" "Easy Software Products"
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -367,8 +367,10 @@ Specifies the maximum size of any print job request.
 Listen ip-address:port
 .TP 5
 Listen *:port
+.TP 5
+Listen /path/to/domain/socket
 .br
-Listens to the specified address and port.
+Listens to the specified address and port or domain socket path.
 .TP 5
 <Location /path> ... </Location>
 .br

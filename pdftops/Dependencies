@@ -91,51 +91,6 @@ PSTokenizer.o: ../config.h PSTokenizer.h gtypes.h
 SecurityHandler.o: ../config.h GString.h PDFDoc.h XRef.h gtypes.h Object.h
 SecurityHandler.o: gmem.h Array.h Dict.h Stream.h Catalog.h Page.h Decrypt.h
 SecurityHandler.o: Error.h GlobalParams.h CharTypes.h SecurityHandler.h
-SplashBitmap.o: ../config.h gmem.h SplashErrorCodes.h SplashBitmap.h
-SplashBitmap.o: SplashTypes.h gtypes.h
-SplashClip.o: ../config.h gmem.h SplashErrorCodes.h SplashMath.h
-SplashClip.o: SplashTypes.h gtypes.h SplashPath.h SplashXPath.h
-SplashClip.o: SplashXPathScanner.h SplashClip.h
-Splash.o: ../config.h gmem.h SplashErrorCodes.h SplashMath.h SplashTypes.h
-Splash.o: gtypes.h SplashBitmap.h SplashState.h SplashPath.h SplashXPath.h
-Splash.o: SplashXPathScanner.h SplashPattern.h SplashScreen.h SplashFont.h
-Splash.o: SplashGlyphBitmap.h Splash.h SplashClip.h
-SplashFont.o: ../config.h gmem.h SplashMath.h SplashTypes.h gtypes.h
-SplashFont.o: SplashGlyphBitmap.h SplashFontFile.h SplashFont.h
-SplashFontEngine.o: ../config.h gmem.h GString.h SplashT1FontEngine.h
-SplashFontEngine.o: SplashFTFontEngine.h SplashFontFile.h gtypes.h
-SplashFontEngine.o: SplashTypes.h SplashFontFileID.h SplashFont.h
-SplashFontEngine.o: SplashFontEngine.h
-SplashFontFile.o: ../config.h GString.h SplashFontFile.h gtypes.h
-SplashFontFile.o: SplashTypes.h SplashFontFileID.h
-SplashFontFileID.o: ../config.h SplashFontFileID.h gtypes.h
-SplashFTFont.o: ../config.h
-SplashFTFontEngine.o: ../config.h
-SplashFTFontFile.o: ../config.h
-SplashOutputDev.o: ../config.h gfile.h gtypes.h GlobalParams.h CharTypes.h
-SplashOutputDev.o: Error.h Object.h gmem.h GString.h Array.h Dict.h Stream.h
-SplashOutputDev.o: GfxFont.h Link.h CharCodeToUnicode.h FontEncodingTables.h
-SplashOutputDev.o: FoFiTrueType.h FoFiBase.h SplashBitmap.h SplashTypes.h
-SplashOutputDev.o: SplashGlyphBitmap.h SplashPattern.h SplashScreen.h
-SplashOutputDev.o: SplashPath.h SplashState.h SplashErrorCodes.h
-SplashOutputDev.o: SplashFontEngine.h SplashFont.h SplashFontFile.h
-SplashOutputDev.o: SplashFontFileID.h Splash.h SplashClip.h SplashOutputDev.h
-SplashOutputDev.o: OutputDev.h GfxState.h Function.h
-SplashPath.o: ../config.h gmem.h SplashErrorCodes.h SplashPath.h
-SplashPath.o: SplashTypes.h gtypes.h
-SplashPattern.o: ../config.h SplashMath.h SplashTypes.h gtypes.h
-SplashPattern.o: SplashScreen.h SplashPattern.h
-SplashScreen.o: ../config.h gmem.h SplashMath.h SplashTypes.h gtypes.h
-SplashScreen.o: SplashScreen.h
-SplashState.o: ../config.h gmem.h SplashPattern.h SplashTypes.h gtypes.h
-SplashState.o: SplashScreen.h SplashClip.h SplashState.h
-SplashT1Font.o: ../config.h
-SplashT1FontEngine.o: ../config.h
-SplashT1FontFile.o: ../config.h
-SplashXPath.o: ../config.h gmem.h SplashMath.h SplashTypes.h gtypes.h
-SplashXPath.o: SplashPath.h SplashXPath.h
-SplashXPathScanner.o: ../config.h gmem.h SplashMath.h SplashTypes.h gtypes.h
-SplashXPathScanner.o: SplashXPath.h SplashXPathScanner.h
 Stream.o: ../config.h gmem.h gfile.h gtypes.h Error.h Object.h GString.h
 Stream.o: Array.h Dict.h Stream.h Lexer.h Decrypt.h GfxState.h Function.h
 Stream.o: JBIG2Stream.h JPXStream.h Stream-CCITT.h

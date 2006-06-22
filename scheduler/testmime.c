@@ -71,7 +71,7 @@ main(int  argc,				/* I - Number of command-line args */
   mime        = NULL;
   src         = NULL;
   dst         = NULL;
-  filter_path = "../filter:../pdftops";
+  filter_path = "../filter:../pdftops:" CUPS_SERVERBIN "/filter";
 
   for (i = 1; i < argc; i ++)
     if (!strcmp(argv[i], "-d"))

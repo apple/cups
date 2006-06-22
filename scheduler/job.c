@@ -506,8 +506,19 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  */
 
 	  cupsdStopJob(job, 0);
-	  job->state->values[0].integer = IPP_JOB_PENDING;
-	  job->state_value              = IPP_JOB_PENDING;
+
+          if (!(printer->type & CUPS_PRINTER_REMOTE) ||
+	      (printer->type & CUPS_PRINTER_IMPLICIT))
+	  {
+	   /*
+	    * Mark the job as pending again - we'll retry on another
+	    * printer...
+	    */
+
+	    job->state->values[0].integer = IPP_JOB_PENDING;
+	    job->state_value              = IPP_JOB_PENDING;
+          }
+
 	  cupsdSaveJob(job);
 
 	 /*
@@ -865,13 +876,6 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   cups_file_t		*fp;		/* Job file */
   int			fileid;		/* Current file ID */
   ipp_attribute_t	*attr;		/* Job attribute */
-  char			scheme[32],	/* Scheme portion of URI */
-			username[64],	/* Username portion of URI */
-			host[HTTP_MAX_HOST],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
   const char		*dest;		/* Destination */
   mime_type_t		**filetypes;	/* New filetypes array */
   int			*compressions;	/* New compressions array */
@@ -955,11 +959,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       return;
     }
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, scheme,
-                    sizeof(scheme), username, sizeof(username), host,
-		    sizeof(host), &port, resource, sizeof(resource));
-
-    if ((dest = cupsdValidateDest(host, resource, &(job->dtype),
+    if ((dest = cupsdValidateDest(attr->values[0].string.text, &(job->dtype),
                                   NULL)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3090,28 +3090,6 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   job->status = 0;
   memset(job->filters, 0, sizeof(job->filters));
 
-  filterfds[1][0] = open("/dev/null", O_RDONLY);
-
-  if (filterfds[1][0] < 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open \"/dev/null\" - %s.",
-                    strerror(errno));
-    snprintf(printer->state_message, sizeof(printer->state_message),
-             "Unable to open \"/dev/null\" - %s.", strerror(errno));
-
-    cupsdAddPrinterHistory(printer);
-
-    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                  "Job canceled because the server could not open /dev/null.");
-
-    goto abort_job;
-  }
-
-  fcntl(filterfds[1][0], F_SETFD, fcntl(filterfds[1][0], F_GETFD) | FD_CLOEXEC);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job: filterfds[%d] = [ %d %d ]",
-                  1, filterfds[1][0], filterfds[1][1]);
-
   for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
        filter;
        i ++, filter = (mime_filter_t *)cupsArrayNext(filters))
@@ -3165,36 +3143,43 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 	else
 	{
 	  job->print_pipes[0] = -1;
-	  if (!strncmp(printer->device_uri, "file:/dev/", 10) &&
-	      strcmp(printer->device_uri, "file:/dev/null"))
-	    job->print_pipes[1] = open(printer->device_uri + 5,
-	                               O_WRONLY | O_EXCL);
-	  else if (!strncmp(printer->device_uri, "file:///dev/", 12) &&
-	           strcmp(printer->device_uri, "file:///dev/null"))
-	    job->print_pipes[1] = open(printer->device_uri + 7,
-	                               O_WRONLY | O_EXCL);
+	  if (!strcmp(printer->device_uri, "file:/dev/null") ||
+	      !strcmp(printer->device_uri, "file:///dev/null"))
+	    job->print_pipes[1] = -1;
 	  else
-	    job->print_pipes[1] = open(printer->device_uri + 5,
-	                               O_WRONLY | O_CREAT | O_TRUNC, 0600);
-
-	  if (job->print_pipes[1] < 0)
 	  {
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "Unable to open output file \"%s\" - %s.",
-	                    printer->device_uri, strerror(errno));
-            snprintf(printer->state_message, sizeof(printer->state_message),
-		     "Unable to open output file \"%s\" - %s.",
-	             printer->device_uri, strerror(errno));
+	    if (!strncmp(printer->device_uri, "file:/dev/", 10))
+	      job->print_pipes[1] = open(printer->device_uri + 5,
+	                        	 O_WRONLY | O_EXCL);
+	    else if (!strncmp(printer->device_uri, "file:///dev/", 12))
+	      job->print_pipes[1] = open(printer->device_uri + 7,
+	                        	 O_WRONLY | O_EXCL);
+	    else if (!strncmp(printer->device_uri, "file:///", 8))
+	      job->print_pipes[1] = open(printer->device_uri + 7,
+	                        	 O_WRONLY | O_CREAT | O_TRUNC, 0600);
+	    else
+	      job->print_pipes[1] = open(printer->device_uri + 5,
+	                        	 O_WRONLY | O_CREAT | O_TRUNC, 0600);
 
-	    cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                	  "Job canceled because the server could not open the "
-			  "output file.");
+	    if (job->print_pipes[1] < 0)
+	    {
+              cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "Unable to open output file \"%s\" - %s.",
+	                      printer->device_uri, strerror(errno));
+              snprintf(printer->state_message, sizeof(printer->state_message),
+		       "Unable to open output file \"%s\" - %s.",
+	               printer->device_uri, strerror(errno));
 
-            goto abort_job;
-	  }
+	      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
+                	    "Job canceled because the server could not open the "
+			    "output file.");
 
-	  fcntl(job->print_pipes[1], F_SETFD,
-        	fcntl(job->print_pipes[1], F_GETFD) | FD_CLOEXEC);
+              goto abort_job;
+	    }
+
+	    fcntl(job->print_pipes[1], F_SETFD,
+        	  fcntl(job->print_pipes[1], F_GETFD) | FD_CLOEXEC);
+          }
 	}
 
 	cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -3274,25 +3259,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       argv[0] = sani_uri;
 
       filterfds[slot][0] = -1;
-      filterfds[slot][1] = open("/dev/null", O_WRONLY);
-
-      if (filterfds[slot][1] < 0)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open \"/dev/null\" - %s.",
-	                strerror(errno));
-	snprintf(printer->state_message, sizeof(printer->state_message),
-        	 "Unable to open \"/dev/null\" - %s.", strerror(errno));
-
-	cupsdAddPrinterHistory(printer);
-
-	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                      "Job canceled because the server could not open a file.");
-
-        goto abort_job;
-      }
-
-      fcntl(filterfds[slot][1], F_SETFD,
-            fcntl(filterfds[slot][1], F_GETFD) | FD_CLOEXEC);
+      filterfds[slot][1] = -1;
 
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job: backend=\"%s\"",
                       command);

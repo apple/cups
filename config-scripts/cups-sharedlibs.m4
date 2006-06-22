@@ -117,7 +117,7 @@ if test "$DSO" != ":"; then
 	# rather than to the executables.  This makes things smaller if you
 	# are using any static libraries, and it also allows us to distribute
 	# a single DSO rather than a bunch...
-	DSOLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
+	DSOLIBS="\$(LIBTIFF) \$(LIBPNG) \$(LIBJPEG) \$(LIBZ)"
 	IMGLIBS=""
 
 	# Tell the run-time linkers where to find a DSO.  Some platforms
@@ -126,46 +126,46 @@ if test "$DSO" != ":"; then
 	case $uname in
                 HP-UX*)
 			# HP-UX needs the path, even for /usr/lib...
-                	DSOFLAGS="+s +b \$(libdir) $DSOFLAGS"
-                	DSO32FLAGS="+s +b \$(LIB32DIR) $DSO32FLAGS"
-                	DSO64FLAGS="+s +b \$(LIB64DIR) $DSO64FLAGS"
-                	LDFLAGS="$LDFLAGS -Wl,+s,+b,\$(libdir)"
-                	EXPORT_LDFLAGS="-Wl,+s,+b,\$(libdir)"
+                	DSOFLAGS="+s +b $libdir $DSOFLAGS"
+                	DSO32FLAGS="+s +b $LIB32DIR $DSO32FLAGS"
+                	DSO64FLAGS="+s +b $LIB64DIR $DSO64FLAGS"
+                	LDFLAGS="$LDFLAGS -Wl,+s,+b,$libdir"
+                	EXPORT_LDFLAGS="-Wl,+s,+b,$libdir"
 			;;
                 SunOS*)
                 	# Solaris...
 			if test $exec_prefix != /usr; then
-				DSOFLAGS="-R\$(libdir) $DSOFLAGS"
-				DSO32FLAGS="-R\$(LIB32DIR) $DSO32FLAGS"
-				DSO64FLAGS="-R\$(LIB64DIR) $DSO64FLAGS"
-				LDFLAGS="$LDFLAGS -R\$(libdir)"
-				EXPORT_LDFLAGS="-R\$(libdir)"
+				DSOFLAGS="-R$libdir $DSOFLAGS"
+				DSO32FLAGS="-R$LIB32DIR $DSO32FLAGS"
+				DSO64FLAGS="-R$LIB64DIR $DSO64FLAGS"
+				LDFLAGS="$LDFLAGS -R$libdir"
+				EXPORT_LDFLAGS="-R$libdir"
 			fi
 			;;
                 *BSD*)
                         # *BSD...
 			if test $exec_prefix != /usr; then
-				DSOFLAGS="-Wl,-R\$(libdir) $DSOFLAGS"
-				DSO32FLAGS="-Wl,-R\$(LIB32DIR) $DSO32FLAGS"
-				DSO64FLAGS="-Wl,-R\$(LIB64DIR) $DSO64FLAGS"
-				LDFLAGS="$LDFLAGS -Wl,-R\$(libdir)"
-				EXPORT_LDFLAGS="-Wl,-R\$(libdir)"
+				DSOFLAGS="-Wl,-R$libdir $DSOFLAGS"
+				DSO32FLAGS="-Wl,-R$LIB32DIR $DSO32FLAGS"
+				DSO64FLAGS="-Wl,-R$LIB64DIR $DSO64FLAGS"
+				LDFLAGS="$LDFLAGS -Wl,-R$libdir"
+				EXPORT_LDFLAGS="-Wl,-R$libdir"
 			fi
 			;;
                 IRIX | Linux | GNU)
                         # IRIX, Linux, and HURD...
 			if test $exec_prefix != /usr; then
-				DSOFLAGS="-Wl,-rpath,\$(libdir) $DSOFLAGS"
-				DSO32FLAGS="-Wl,-rpath,\$(LIB32DIR) $DSO32FLAGS"
-				DSO64FLAGS="-Wl,-rpath,\$(LIB64DIR) $DSO64FLAGS"
-				LDFLAGS="$LDFLAGS -Wl,-rpath,\$(libdir)"
-				EXPORT_LDFLAGS="-Wl,-rpath,\$(libdir)"
+				DSOFLAGS="-Wl,-rpath,$libdir $DSOFLAGS"
+				DSO32FLAGS="-Wl,-rpath,$LIB32DIR $DSO32FLAGS"
+				DSO64FLAGS="-Wl,-rpath,$LIB64DIR $DSO64FLAGS"
+				LDFLAGS="$LDFLAGS -Wl,-rpath,$libdir"
+				EXPORT_LDFLAGS="-Wl,-rpath,$libdir"
 			fi
 			;;
 	esac
 else
 	DSOLIBS=""
-	IMGLIBS="\$(LIBPNG) \$(LIBTIFF) \$(LIBJPEG) \$(LIBZ)"
+	IMGLIBS="\$(LIBTIFF) \$(LIBPNG) \$(LIBJPEG) \$(LIBZ)"
 fi
 
 AC_SUBST(DSOLIBS)

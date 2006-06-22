@@ -1,5 +1,5 @@
-README - CUPS v1.2.0 - 2006-05-08
----------------------------------
+README - CUPS v1.2rc1 - 2006-03-24
+----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...

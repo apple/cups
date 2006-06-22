@@ -866,7 +866,7 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if (!http->blocking && !http_wait(http, 1000))
+      if (!http->blocking && !http_wait(http, 10000))
       {
         DEBUG_puts("httpGets: Timed out!");
         http->error = ETIMEDOUT;
@@ -1222,7 +1222,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
     * Buffer small reads for better performance...
     */
 
-    if (!http->blocking && !httpWait(http, 1000))
+    if (!http->blocking && !httpWait(http, 10000))
       return (0);
 
     if (http->data_remaining > sizeof(http->buffer))
@@ -1285,7 +1285,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 #ifdef HAVE_SSL
   else if (http->tls)
   {
-    if (!http->blocking && !httpWait(http, 1000))
+    if (!http->blocking && !httpWait(http, 10000))
       return (0);
 
     bytes = http_read_ssl(http, buffer, length);
@@ -1293,7 +1293,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 #endif /* HAVE_SSL */
   else
   {
-    if (!http->blocking && !httpWait(http, 1000))
+    if (!http->blocking && !httpWait(http, 10000))
       return (0);
 
     DEBUG_printf(("httpRead2: reading %d bytes from socket...\n", length));
@@ -1415,13 +1415,11 @@ _httpReadCDSA(
     *dataLength = 0;
 
     if (bytes == 0)
-      result = errSSLClosedAbort;
+      result = errSSLClosedGraceful;
     else if (errno == EAGAIN)
       result = errSSLWouldBlock;
-    else if (errno == EPIPE)
-      result = errSSLClosedAbort;
     else
-      result = errSSLInternal;
+      result = errSSLClosedAbort;
   }
 
   return result;
@@ -1994,10 +1992,8 @@ _httpWriteCDSA(
   
     if (errno == EAGAIN)
       result = errSSLWouldBlock;
-    else if (errno == EPIPE)
-      result = errSSLClosedAbort;
     else
-      result = errSSLInternal;
+      result = errSSLClosedAbort;
   }
 
   return result;
@@ -2336,6 +2332,9 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
 
   if (!error)
     error = SSLSetAllowsAnyRoot(conn->session, true);
+
+  if (!error)
+    error = SSLSetProtocolVersionEnabled(conn->session, kSSLProtocol2, false);
 
   if (!error)
   {

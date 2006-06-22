@@ -28,7 +28,8 @@ include ../Makedefs
 
 RBACKENDS =	ipp lpd
 UBACKENDS =	$(PAP) parallel scsi serial snmp socket usb
-TARGETS	=	betest test1284 $(RBACKENDS) $(UBACKENDS)
+TARGETS	=	betest test1284 libbackend.a $(RBACKENDS) $(UBACKENDS)
+LIBOBJS	=	ieee1284.o runloop.o
 OBJS	=	betest.o ipp.o lpd.o pap.o parallel.o scsi.o \
 		serial.o snmp.o socket.o test1284.o usb.o
 
@@ -105,6 +106,17 @@ test1284:	test1284.o ../cups/libcups.a
 
 
 #
+# libbackend.a
+#
+
+libbackend.a:	$(LIBOBJS)
+	echo Archiving $@...
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
+	$(RANLIB) $@
+
+
+#
 # ieee1394
 #
 
@@ -149,9 +161,9 @@ pap:	pap.o ../cups/$(LIBCUPS)
 # parallel
 #
 
-parallel:	parallel.o ../cups/$(LIBCUPS)
+parallel:	parallel.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o parallel parallel.o $(LIBS)
+	$(CC) $(LDFLAGS) -o parallel parallel.o libbackend.a $(LIBS)
 
 
 #
@@ -169,37 +181,37 @@ scsi.o:	scsi.c scsi-irix.c scsi-linux.c
 # serial
 #
 
-serial:	serial.o ../cups/$(LIBCUPS)
+serial:	serial.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o serial serial.o $(BACKLIBS) $(LIBS)
+	$(CC) $(LDFLAGS) -o serial serial.o libbackend.a $(BACKLIBS) $(LIBS)
 
 
 #
 # snmp
 #
 
-snmp:	snmp.o ../cups/$(LIBCUPS)
+snmp:	snmp.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o snmp snmp.o $(LIBS)
+	$(CC) $(LDFLAGS) -o snmp snmp.o libbackend.a $(LIBS)
 
 
 #
 # socket
 #
 
-socket:	socket.o ../cups/$(LIBCUPS)
+socket:	socket.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o socket socket.o $(LIBS)
+	$(CC) $(LDFLAGS) -o socket socket.o libbackend.a $(LIBS)
 
 
 #
 # usb
 #
 
-usb:	usb.o ../cups/$(LIBCUPS)
+usb:	usb.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o usb usb.o $(BACKLIBS) $(LIBS)
-usb.o:	usb.c usb-darwin.c usb-unix.c ieee1284.c
+	$(CC) $(LDFLAGS) -o usb usb.o libbackend.a $(BACKLIBS) $(LIBS)
+usb.o:	usb.c usb-darwin.c usb-unix.c
 
 
 #

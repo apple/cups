@@ -18,9 +18,9 @@ if test $# = 0; then
 	echo Updating for snapshot...
 	svn up
 	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
-	version="1.2svn"
+	version="1.3svn"
 	revision="-r$rev"
-	fileversion="1.2svn-r$rev"
+	fileversion="1.3svn-r$rev"
 	fileurl="ftp://ftp.easysw.com/pub/cups/test/cups-$fileversion-source.tar."
 	url="."
 else
@@ -32,7 +32,7 @@ else
 	fileurl="ftp://ftp.easysw.com/pub/cups/$version/cups-$fileversion-source.tar."
 	url="https://svn.easysw.com/public/cups/tags/release-$version"
 
-	svn copy https://svn.easysw.com/public/cups/branches/branch-1.2 "$url" \
+	svn copy https://svn.easysw.com/public/cups/trunk "$url" \
 		-m "Tag $version" || exit 1
 fi
 

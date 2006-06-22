@@ -2742,10 +2742,10 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
       if (!http->blocking)
       {
        /*
-        * Wait up to 1 second for more data on non-blocking sockets...
+        * Wait up to 10 seconds for more data on non-blocking sockets...
 	*/
 
-	if (!httpWait(http, 1000))
+	if (!httpWait(http, 10000))
 	{
 	 /*
           * Signal no data...

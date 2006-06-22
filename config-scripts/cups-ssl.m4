@@ -48,6 +48,7 @@ if test x$enable_ssl != xno; then
 		 # certificates for CUPS, so don't enable encryption on
 		 # /admin just yet...
 		 #ENCRYPTION_REQUIRED="  Encryption Required"
+		 AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
 		 AC_DEFINE(HAVE_SSL)
 		 AC_DEFINE(HAVE_CDSASSL)])
 	fi

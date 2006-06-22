@@ -78,7 +78,7 @@ install:	all
 	$(INSTALL_BIN) lp $(BINDIR)
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
-	$(INSTALL_BIN) -m 4755 -o $(CUPS_USER) -g $(CUPS_GROUP) lppasswd $(BINDIR) || $(INSTALL_BIN) lppasswd $(BINDIR)
+	$(INSTALL_BIN) -m 4755 -o root lppasswd $(BINDIR) || $(INSTALL_BIN) lppasswd $(BINDIR)
 
 
 #
