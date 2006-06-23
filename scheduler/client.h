@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: client.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -121,5 +121,5 @@ extern int	cupsdWriteClient(cupsd_client_t *con);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: client.h 177 2006-06-21 00:20:03Z jlovell $".
  */

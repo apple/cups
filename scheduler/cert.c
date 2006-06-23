@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: cert.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
@@ -426,5 +426,5 @@ cupsdInitCerts(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: cert.c 177 2006-06-21 00:20:03Z jlovell $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: dirsvc.c 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -3149,5 +3149,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: dirsvc.c 181 2006-06-22 20:01:18Z jlovell $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: banners.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
@@ -215,5 +215,5 @@ free_banners(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: banners.c 177 2006-06-21 00:20:03Z jlovell $".
  */

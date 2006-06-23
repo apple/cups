@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: run-stp-tests.sh 177 2006-06-21 00:20:03Z jlovell $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -595,5 +595,5 @@ echo "A HTML report was created in test/$strfile."
 echo ""
 
 #
-# End of "$Id$"
+# End of "$Id: run-stp-tests.sh 177 2006-06-21 00:20:03Z jlovell $"
 #

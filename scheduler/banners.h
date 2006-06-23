@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: banners.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Banner definitions for the Common UNIX Printing System (CUPS).
  *
@@ -50,5 +50,5 @@ extern void		cupsdLoadBanners(const char *d);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: banners.h 177 2006-06-21 00:20:03Z jlovell $".
  */

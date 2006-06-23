@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: util.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Mini-daemon utility definitions for the Common UNIX Printing System (CUPS).
  *
@@ -55,5 +55,5 @@ extern void	cupsdSendIPPTrailer(void);
 #endif /* !_CUPSD_UTIL_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: util.h 177 2006-06-21 00:20:03Z jlovell $".
  */

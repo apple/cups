@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: job.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -121,5 +121,5 @@ extern void		cupsdUpdateJob(cupsd_job_t *job);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: job.h 177 2006-06-21 00:20:03Z jlovell $".
  */

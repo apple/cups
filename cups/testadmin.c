@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testadmin.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Admin function test program for the Common UNIX Printing System (CUPS).
  *
@@ -125,5 +125,5 @@ show_settings(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testadmin.c 177 2006-06-21 00:20:03Z jlovell $".
  */

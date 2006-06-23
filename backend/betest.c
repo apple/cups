@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: betest.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Backend test program for the Common UNIX Printing System (CUPS).
  *
@@ -83,5 +83,5 @@ main(int  argc,		/* I - Number of command-line arguments (7 or 8) */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: betest.c 177 2006-06-21 00:20:03Z jlovell $".
  */

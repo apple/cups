@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: help-index.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   On-line help index definitions for the Common UNIX Printing System (CUPS).
  *
@@ -73,5 +73,5 @@ extern help_index_t	*helpSearchIndex(help_index_t *hi, const char *query,
 #endif /* !_CUPS_HELP_INDEX_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: help-index.h 177 2006-06-21 00:20:03Z jlovell $".
  */

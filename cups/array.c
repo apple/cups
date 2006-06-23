@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: array.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Sorted array routines for the Common UNIX Printing System (CUPS).
  *
@@ -962,5 +962,5 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: array.c 177 2006-06-21 00:20:03Z jlovell $".
  */

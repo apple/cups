@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: mime.c 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   MIME database file routines for the Common UNIX Printing System (CUPS).
  *
@@ -738,5 +738,5 @@ load_types(mime_t     *mime,		/* I - MIME database */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: mime.c 181 2006-06-22 20:01:18Z jlovell $".
  */

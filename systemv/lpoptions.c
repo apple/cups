@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: lpoptions.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -452,5 +452,5 @@ usage(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: lpoptions.c 177 2006-06-21 00:20:03Z jlovell $".
  */

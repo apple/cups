@@ -1,5 +1,5 @@
 dnl
-dnl "$Id$"
+dnl "$Id: cups-launchd.m4 177 2006-06-21 00:20:03Z jlovell $"
 dnl
 dnl   launchd stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -49,5 +49,5 @@ AC_SUBST(DEFAULT_LAUNCHD_CONF)
 AC_SUBST(LAUNCHDLIBS)
 
 dnl
-dnl End of "$Id$".
+dnl End of "$Id: cups-launchd.m4 177 2006-06-21 00:20:03Z jlovell $".
 dnl

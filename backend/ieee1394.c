@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ieee1394.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   IEEE-1394 backend for the Common UNIX Printing System (CUPS).
  *
@@ -263,5 +263,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ieee1394.c 177 2006-06-21 00:20:03Z jlovell $".
  */

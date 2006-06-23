@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: subscriptions.h 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   Subscription definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -168,5 +168,5 @@ extern void	cupsdUpdateNotifierStatus(void);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: subscriptions.h 181 2006-06-22 20:01:18Z jlovell $".
  */

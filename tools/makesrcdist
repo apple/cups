@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: makesrcdist 181 2006-06-22 20:01:18Z jlovell $"
 #
 # makesrcdist - make a source distribution of CUPS.
 #
@@ -81,5 +81,5 @@ rm -rf cups-$version
 echo "Done!"
 
 #
-# End of "$Id$".
+# End of "$Id: makesrcdist 181 2006-06-22 20:01:18Z jlovell $".
 #

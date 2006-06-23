@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: policy.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Policy definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -62,5 +62,5 @@ extern cupsd_location_t	*cupsdFindPolicyOp(cupsd_policy_t *p, ipp_op_t op);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: policy.h 177 2006-06-21 00:20:03Z jlovell $".
  */

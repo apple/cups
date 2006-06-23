@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: cupstestdsc.man 177 2006-06-21 00:20:03Z jlovell $"
 .\"
 .\"   cupstestdsc man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -55,5 +55,5 @@ Specification, Version 3.0.
 .SH COPYRIGHT
 Copyright 2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: cupstestdsc.man 177 2006-06-21 00:20:03Z jlovell $".
 .\"

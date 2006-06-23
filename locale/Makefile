@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 181 2006-06-22 20:01:18Z jlovell $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -112,5 +112,5 @@ translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 181 2006-06-22 20:01:18Z jlovell $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: raster.h 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -346,5 +346,5 @@ extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: raster.h 181 2006-06-22 20:01:18Z jlovell $".
  */

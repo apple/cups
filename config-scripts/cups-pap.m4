@@ -1,5 +1,5 @@
 dnl
-dnl "$Id$"
+dnl "$Id: cups-pap.m4 177 2006-06-21 00:20:03Z jlovell $"
 dnl
 dnl   PAP (AppleTalk) stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -33,5 +33,5 @@ fi
 AC_SUBST(PAP)
 
 dnl
-dnl End of "$Id$".
+dnl End of "$Id: cups-pap.m4 177 2006-06-21 00:20:03Z jlovell $".
 dnl

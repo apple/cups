@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ppd.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -405,5 +405,5 @@ extern ppd_file_t	*ppdOpen2(cups_file_t *fp);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: ppd.h 177 2006-06-21 00:20:03Z jlovell $".
  */

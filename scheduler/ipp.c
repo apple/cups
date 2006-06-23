@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ipp.c 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -9159,5 +9159,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ipp.c 181 2006-06-22 20:01:18Z jlovell $".
  */

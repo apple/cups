@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: quotas.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
@@ -230,5 +230,5 @@ find_quota(cupsd_printer_t *p,		/* I - Printer */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: quotas.c 177 2006-06-21 00:20:03Z jlovell $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testhi.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Help index test program for the Common UNIX Printing System (CUPS).
  *
@@ -114,5 +114,5 @@ list_nodes(const char   *title,		/* I - Title string */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testhi.c 177 2006-06-21 00:20:03Z jlovell $".
  */

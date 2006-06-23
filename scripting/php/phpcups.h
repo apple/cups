@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: phpcups.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   PHP module include file for the Common UNIX Printing System (CUPS).
  *
@@ -75,5 +75,5 @@ PHP_FUNCTION(cups_print_files);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: phpcups.h 177 2006-06-21 00:20:03Z jlovell $".
  */

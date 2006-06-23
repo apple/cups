@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: getputfile.c 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
@@ -488,5 +488,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: getputfile.c 181 2006-06-22 20:01:18Z jlovell $".
  */

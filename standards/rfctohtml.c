@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: rfctohtml.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   RFC file to HTML conversion program.
  *
@@ -501,5 +501,5 @@ put_line(cups_file_t *fp,		/* I - File */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: rfctohtml.c 177 2006-06-21 00:20:03Z jlovell $".
  */

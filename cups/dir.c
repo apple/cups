@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: dir.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Public directory routines for the Common UNIX Printing System (CUPS).
  *
@@ -433,5 +433,5 @@ cupsDirRewind(cups_dir_t *dp)		/* I - Directory */
 #endif /* WIN32 */
 
 /*
- * End of "$Id$".
+ * End of "$Id: dir.c 177 2006-06-21 00:20:03Z jlovell $".
  */

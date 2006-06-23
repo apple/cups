@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: usb-unix.c 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -525,5 +525,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: usb-unix.c 181 2006-06-22 20:01:18Z jlovell $".
  */

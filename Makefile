@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 177 2006-06-21 00:20:03Z jlovell $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -239,5 +239,5 @@ epm:
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 177 2006-06-21 00:20:03Z jlovell $".
 #

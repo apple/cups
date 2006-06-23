@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: http.h 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -451,5 +451,5 @@ extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: http.h 181 2006-06-22 20:01:18Z jlovell $".
  */

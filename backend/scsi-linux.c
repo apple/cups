@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: scsi-linux.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Linux SCSI printer support for the Common UNIX Printing System (CUPS).
  *
@@ -249,5 +249,5 @@ print_device(const char *resource,	/* I - SCSI device */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: scsi-linux.c 177 2006-06-21 00:20:03Z jlovell $".
  */

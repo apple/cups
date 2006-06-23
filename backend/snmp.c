@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: snmp.c 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
@@ -2215,5 +2215,5 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: snmp.c 181 2006-06-22 20:01:18Z jlovell $".
  */

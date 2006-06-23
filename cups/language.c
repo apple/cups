@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: language.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -1295,5 +1295,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: language.c 177 2006-06-21 00:20:03Z jlovell $".
  */

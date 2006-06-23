@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: cupsd.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -204,5 +204,5 @@ extern int	cupsdStartProcess(const char *command, char *argv[],
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: cupsd.h 177 2006-06-21 00:20:03Z jlovell $".
  */

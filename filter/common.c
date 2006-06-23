@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: common.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
@@ -467,5 +467,5 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: common.c 177 2006-06-21 00:20:03Z jlovell $".
  */

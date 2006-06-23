@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: http-private.h 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -236,5 +236,5 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: http-private.h 181 2006-06-22 20:01:18Z jlovell $".
  */

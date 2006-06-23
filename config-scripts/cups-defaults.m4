@@ -1,5 +1,5 @@
 dnl
-dnl "$Id$"
+dnl "$Id: cups-defaults.m4 181 2006-06-22 20:01:18Z jlovell $"
 dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
@@ -248,5 +248,5 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTCAP, "$CUPS_DEFAULT_PRINTCAP")
 
 dnl
-dnl End of "$Id$".
+dnl End of "$Id: cups-defaults.m4 181 2006-06-22 20:01:18Z jlovell $".
 dnl

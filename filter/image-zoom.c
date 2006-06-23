@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: image-zoom.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   cupsImage zoom routines for the Common UNIX Printing System (CUPS).
  *
@@ -366,5 +366,5 @@ zoom_nearest(cups_izoom_t *z,		/* I - Zoom record to fill */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: image-zoom.c 177 2006-06-21 00:20:03Z jlovell $".
  */

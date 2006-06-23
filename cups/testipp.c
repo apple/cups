@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testipp.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   IPP test program for the Common UNIX Printing System (CUPS).
  *
@@ -645,5 +645,5 @@ write_cb(void        *data,		/* I - Data */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testipp.c 177 2006-06-21 00:20:03Z jlovell $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: image-colorspace.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
@@ -1573,5 +1573,5 @@ zshear(float mat[3][3],			/* I - Matrix */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: image-colorspace.c 177 2006-06-21 00:20:03Z jlovell $".
  */

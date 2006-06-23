@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: form.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   CUPS form header file for the Common UNIX Printing System (CUPS).
  *
@@ -173,5 +173,5 @@ extern void	formWrite(tree_t *p);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: form.h 177 2006-06-21 00:20:03Z jlovell $".
  */

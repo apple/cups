@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: image-bmp.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
@@ -535,5 +535,5 @@ read_long(FILE *fp)               /* I - File to read from */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: image-bmp.c 177 2006-06-21 00:20:03Z jlovell $".
  */

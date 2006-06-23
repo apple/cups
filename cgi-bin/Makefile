@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 177 2006-06-21 00:20:03Z jlovell $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -170,5 +170,5 @@ include Dependencies
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 177 2006-06-21 00:20:03Z jlovell $".
 #

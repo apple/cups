@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: encode.c 181 2006-06-22 20:01:18Z jlovell $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -561,5 +561,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: encode.c 181 2006-06-22 20:01:18Z jlovell $".
  */

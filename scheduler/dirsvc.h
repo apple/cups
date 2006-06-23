@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: dirsvc.h 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -180,5 +180,5 @@ extern void	cupsdUpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: dirsvc.h 177 2006-06-21 00:20:03Z jlovell $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testi18n.c 177 2006-06-21 00:20:03Z jlovell $"
  *
  *   Internationalization test for Common UNIX Printing System (CUPS).
  *
@@ -556,5 +556,5 @@ print_utf8(const char	     *msg,	/* I - Message String */
 
 
 /*
- * End of "$Id$"
+ * End of "$Id: testi18n.c 177 2006-06-21 00:20:03Z jlovell $"
  */

@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id$"
+*% "$Id: deskjet.ppd 177 2006-06-21 00:20:03Z jlovell $"
 *%
 *%   Sample HP DeskJet driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
@@ -195,5 +195,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id$".
+*% End of "$Id: deskjet.ppd 177 2006-06-21 00:20:03Z jlovell $".
 *%
