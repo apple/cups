@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 181 2006-06-22 20:01:18Z jlovell $"
+# "$Id: Makefile 5591 2006-05-26 19:51:59Z mike $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -222,5 +222,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 181 2006-06-22 20:01:18Z jlovell $".
+# End of "$Id: Makefile 5591 2006-05-26 19:51:59Z mike $".
 #

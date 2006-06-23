@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: makesrcdist 181 2006-06-22 20:01:18Z jlovell $"
+# "$Id: makesrcdist 5500 2006-05-08 20:32:27Z mike $"
 #
 # makesrcdist - make a source distribution of CUPS.
 #
@@ -18,9 +18,9 @@ if test $# = 0; then
 	echo Updating for snapshot...
 	svn up
 	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
-	version="1.3svn"
+	version="1.2svn"
 	revision="-r$rev"
-	fileversion="1.3svn-r$rev"
+	fileversion="1.2svn-r$rev"
 	fileurl="ftp://ftp.easysw.com/pub/cups/test/cups-$fileversion-source.tar."
 	url="."
 else
@@ -32,7 +32,7 @@ else
 	fileurl="ftp://ftp.easysw.com/pub/cups/$version/cups-$fileversion-source.tar."
 	url="https://svn.easysw.com/public/cups/tags/release-$version"
 
-	svn copy https://svn.easysw.com/public/cups/trunk "$url" \
+	svn copy https://svn.easysw.com/public/cups/branches/branch-1.2 "$url" \
 		-m "Tag $version" || exit 1
 fi
 
@@ -81,5 +81,5 @@ rm -rf cups-$version
 echo "Done!"
 
 #
-# End of "$Id: makesrcdist 181 2006-06-22 20:01:18Z jlovell $".
+# End of "$Id: makesrcdist 5500 2006-05-08 20:32:27Z mike $".
 #

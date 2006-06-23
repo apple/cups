@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: cupsaddsmb.c 5233 2006-03-06 03:39:28Z mike $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -290,5 +290,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupsaddsmb.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: cupsaddsmb.c 5233 2006-03-06 03:39:28Z mike $".
  */

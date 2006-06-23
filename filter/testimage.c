@@ -1,5 +1,5 @@
 /*
- * "$Id: testimage.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: testimage.c 4485 2005-01-03 19:30:00Z mike $"
  *
  *   Image library test program for the Common UNIX Printing System (CUPS).
  *
@@ -104,5 +104,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testimage.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: testimage.c 4485 2005-01-03 19:30:00Z mike $".
  */

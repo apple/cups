@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 181 2006-06-22 20:01:18Z jlovell $"
+ * "$Id: admin.c 5572 2006-05-22 18:47:09Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -650,6 +650,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
    /*
     * Do the request and get back a response...
     */
+
+    fprintf(stderr, "DEBUG: http=%p (%s)\n", http, http->hostname);
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
@@ -2891,5 +2893,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 181 2006-06-22 20:01:18Z jlovell $".
+ * End of "$Id: admin.c 5572 2006-05-22 18:47:09Z mike $".
  */

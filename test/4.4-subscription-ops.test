@@ -1,5 +1,5 @@
 #
-# "$Id: 4.4-subscription-ops.test 177 2006-06-21 00:20:03Z jlovell $"
+# "$Id: 4.4-subscription-ops.test 4840 2005-11-14 21:53:30Z mike $"
 #
 #   Verify that the CUPS subscription operations work.
 #
@@ -118,5 +118,5 @@
 }
 
 #
-# End of "$Id: 4.4-subscription-ops.test 177 2006-06-21 00:20:03Z jlovell $"
+# End of "$Id: 4.4-subscription-ops.test 4840 2005-11-14 21:53:30Z mike $"
 #

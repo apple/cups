@@ -1,5 +1,5 @@
 /*
- * "$Id: request.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: request.c 5555 2006-05-20 13:35:58Z mike $"
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
@@ -479,5 +479,5 @@ _cupsSetError(ipp_status_t status,	/* I - IPP status code */
 
 
 /*
- * End of "$Id: request.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: request.c 5555 2006-05-20 13:35:58Z mike $".
  */

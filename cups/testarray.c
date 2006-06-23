@@ -1,5 +1,5 @@
 /*
- * "$Id: testarray.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: testarray.c 5258 2006-03-09 15:40:56Z mike $"
  *
  *   Array test program for the Common UNIX Printing System (CUPS).
  *
@@ -525,5 +525,5 @@ load_words(const char   *filename,	/* I - File to load */
 
 
 /*
- * End of "$Id: testarray.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: testarray.c 5258 2006-03-09 15:40:56Z mike $".
  */

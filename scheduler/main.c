@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: main.c 5634 2006-06-06 17:48:27Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -357,8 +357,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   getrlimit(RLIMIT_NOFILE, &limit);
 
-  if (limit.rlim_max > CUPS_MAX_FDS)
-    MaxFDs = CUPS_MAX_FDS;
+  if (limit.rlim_max > FD_SETSIZE)
+    MaxFDs = FD_SETSIZE;
   else
     MaxFDs = limit.rlim_max;
 
@@ -2253,5 +2253,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: main.c 5634 2006-06-06 17:48:27Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
-* "$Id: pap.c 177 2006-06-21 00:20:03Z jlovell $"
+* "$Id: pap.c 5480 2006-05-02 15:17:04Z mike $"
 *
 * © Copyright 2004 Apple Computer, Inc. All rights reserved.
 * 

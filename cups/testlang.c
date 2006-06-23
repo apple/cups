@@ -1,5 +1,5 @@
 /*
- * "$Id: testlang.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: testlang.c 4903 2006-01-10 20:02:46Z mike $"
  *
  *   Localization test program for the Common UNIX Printing System (CUPS).
  *
@@ -85,5 +85,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testlang.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: testlang.c 4903 2006-01-10 20:02:46Z mike $".
  */

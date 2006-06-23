@@ -1,5 +1,5 @@
 /*
- * "$Id: notify.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: notify.c 4961 2006-01-20 22:19:13Z mike $"
  *
  *   Notification routines for the Common UNIX Printing System (CUPS).
  *
@@ -207,5 +207,5 @@ cupsNotifyText(cups_lang_t *lang,	/* I - Language data */
 
 
 /*
- * End of "$Id: notify.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: notify.c 4961 2006-01-20 22:19:13Z mike $".
  */

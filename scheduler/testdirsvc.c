@@ -1,5 +1,5 @@
 /*
- * "$Id: testdirsvc.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: testdirsvc.c 5301 2006-03-17 23:44:33Z mike $"
  *
  *   Browsing test program for the Common UNIX Printing System (CUPS).
  *
@@ -331,5 +331,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testdirsvc.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: testdirsvc.c 5301 2006-03-17 23:44:33Z mike $".
  */

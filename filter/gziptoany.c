@@ -1,5 +1,5 @@
 /*
- * "$Id: gziptoany.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: gziptoany.c 4494 2005-02-18 02:18:11Z mike $"
  *
  *   GZIP pre-filter for the Common UNIX Printing System (CUPS).
  *
@@ -127,5 +127,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: gziptoany.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: gziptoany.c 4494 2005-02-18 02:18:11Z mike $".
  */

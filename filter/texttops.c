@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: texttops.c 4680 2005-09-21 09:28:39Z mike $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -1307,5 +1307,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: texttops.c 4680 2005-09-21 09:28:39Z mike $".
  */

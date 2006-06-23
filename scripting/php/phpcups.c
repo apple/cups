@@ -1,5 +1,5 @@
 /*
- * "$Id: phpcups.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: phpcups.c 5171 2006-02-25 08:44:43Z mike $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -454,5 +454,5 @@ PHP_FUNCTION(cups_print_files)
 
 
 /*
- * End of "$Id: phpcups.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: phpcups.c 5171 2006-02-25 08:44:43Z mike $".
  */

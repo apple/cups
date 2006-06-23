@@ -1,5 +1,5 @@
 /*
- * "$Id: rasterbench.c 5667 2006-06-16 10:21:49Z mike $"
+ * "$Id: rasterbench.c 5671 2006-06-16 11:17:39Z mike $"
  *
  *   Raster benchmark program for the Common UNIX Printing System (CUPS).
  *
@@ -351,5 +351,5 @@ write_test(int fd)			/* I - File descriptor to write to */
 
 
 /*
- * End of "$Id: rasterbench.c 5667 2006-06-16 10:21:49Z mike $".
+ * End of "$Id: rasterbench.c 5671 2006-06-16 11:17:39Z mike $".
  */

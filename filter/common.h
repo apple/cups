@@ -1,5 +1,5 @@
 /*
- * "$Id: common.h 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: common.h 4493 2005-02-18 02:09:53Z mike $"
  *
  *   Common filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -88,5 +88,5 @@ extern void	WriteLabels(int orient);
 
 
 /*
- * End of "$Id: common.h 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: common.h 4493 2005-02-18 02:09:53Z mike $".
  */

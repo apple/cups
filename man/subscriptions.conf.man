@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: subscriptions.conf.man 177 2006-06-21 00:20:03Z jlovell $"
+.\" "$Id: subscriptions.conf.man 5099 2006-02-13 02:46:10Z mike $"
 .\"
 .\"   subscriptions.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -94,5 +94,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: subscriptions.conf.man 177 2006-06-21 00:20:03Z jlovell $".
+.\" End of "$Id: subscriptions.conf.man 5099 2006-02-13 02:46:10Z mike $".
 .\"

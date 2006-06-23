@@ -1,5 +1,5 @@
 /*
- * "$Id: testspeed.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: testspeed.c 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Scheduler speed test for the Common UNIX Printing System (CUPS).
  *
@@ -303,5 +303,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testspeed.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: testspeed.c 5305 2006-03-18 03:05:12Z mike $".
  */

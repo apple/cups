@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 181 2006-06-22 20:01:18Z jlovell $"
+ * "$Id: pstops.c 5622 2006-06-01 23:43:21Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -2994,5 +2994,5 @@ write_labels(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 181 2006-06-22 20:01:18Z jlovell $".
+ * End of "$Id: pstops.c 5622 2006-06-01 23:43:21Z mike $".
  */

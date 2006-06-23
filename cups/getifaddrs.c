@@ -1,5 +1,5 @@
 /*
- * "$Id: getifaddrs.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: getifaddrs.c 5504 2006-05-10 18:57:46Z mike $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -272,5 +272,5 @@ _cups_freeifaddrs(struct ifaddrs *addrs)/* I - Interface list to free */
 
 
 /*
- * End of "$Id: getifaddrs.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: getifaddrs.c 5504 2006-05-10 18:57:46Z mike $".
  */

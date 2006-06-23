@@ -1,5 +1,5 @@
 /*
- * "$Id: language.h 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: language.h 5085 2006-02-06 13:27:53Z mike $"
  *
  *   Multi-language support for the Common UNIX Printing System (CUPS).
  *
@@ -119,5 +119,5 @@ extern cups_lang_t	*cupsLangGet(const char *language);
 #endif /* !_CUPS_LANGUAGE_H_ */
 
 /*
- * End of "$Id: language.h 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: language.h 5085 2006-02-06 13:27:53Z mike $".
  */

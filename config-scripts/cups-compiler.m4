@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 181 2006-06-22 20:01:18Z jlovell $"
+dnl "$Id: cups-compiler.m4 5643 2006-06-07 20:58:29Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -465,5 +465,5 @@ if test $uname = HP-UX; then
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4 181 2006-06-22 20:01:18Z jlovell $".
+dnl End of "$Id: cups-compiler.m4 5643 2006-06-07 20:58:29Z mike $".
 dnl

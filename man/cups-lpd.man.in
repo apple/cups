@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-lpd.man.in 177 2006-06-21 00:20:03Z jlovell $"
+.\" "$Id: cups-lpd.man.in 5455 2006-04-24 13:49:59Z mike $"
 .\"
 .\"   cups-lpd man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -123,5 +123,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cups-lpd.man.in 177 2006-06-21 00:20:03Z jlovell $".
+.\" End of "$Id: cups-lpd.man.in 5455 2006-04-24 13:49:59Z mike $".
 .\"

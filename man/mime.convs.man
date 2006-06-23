@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: mime.convs.man 177 2006-06-21 00:20:03Z jlovell $"
+.\" "$Id: mime.convs.man 5313 2006-03-20 15:29:09Z mike $"
 .\"
 .\"   mime.convs man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -51,5 +51,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: mime.convs.man 177 2006-06-21 00:20:03Z jlovell $".
+.\" End of "$Id: mime.convs.man 5313 2006-03-20 15:29:09Z mike $".
 .\"

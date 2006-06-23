@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: globals.c 5373 2006-04-06 20:03:32Z mike $"
  *
  *   Global variable access routines for the Common UNIX Printing System (CUPS).
  *
@@ -226,5 +226,5 @@ _cupsGlobals(void)
 
 
 /*
- * End of "$Id: globals.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: globals.c 5373 2006-04-06 20:03:32Z mike $".
  */

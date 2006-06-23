@@ -1,5 +1,5 @@
 /*
- * "$Id: transcode.h 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: transcode.h 5294 2006-03-15 21:09:32Z mike $"
  *
  *   Transcoding definitions for the Common UNIX Printing System (CUPS).
  *
@@ -84,5 +84,5 @@ extern int	cupsUTF32ToUTF8(cups_utf8_t *dest,
 
 
 /*
- * End of "$Id: transcode.h 177 2006-06-21 00:20:03Z jlovell $"
+ * End of "$Id: transcode.h 5294 2006-03-15 21:09:32Z mike $"
  */

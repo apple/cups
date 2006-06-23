@@ -1,5 +1,5 @@
 /*
- * "$Id: statbuf.h 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: statbuf.h 4613 2005-08-30 12:41:48Z mike $"
  *
  *   Status buffer definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -55,5 +55,5 @@ extern char		*cupsdStatBufUpdate(cupsd_statbuf_t *sb, int *loglevel,
 
 
 /*
- * End of "$Id: statbuf.h 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: statbuf.h 4613 2005-08-30 12:41:48Z mike $".
  */

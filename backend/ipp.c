@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 181 2006-06-22 20:01:18Z jlovell $"
+ * "$Id: ipp.c 5686 2006-06-21 21:02:56Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -1620,5 +1620,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 181 2006-06-22 20:01:18Z jlovell $".
+ * End of "$Id: ipp.c 5686 2006-06-21 21:02:56Z mike $".
  */

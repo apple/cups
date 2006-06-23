@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestdsc.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: cupstestdsc.c 5392 2006-04-14 17:50:39Z mike $"
  *
  *   DSC test program for the Common UNIX Printing System (CUPS).
  *
@@ -452,5 +452,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestdsc.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: cupstestdsc.c 5392 2006-04-14 17:50:39Z mike $".
  */

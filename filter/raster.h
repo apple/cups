@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h 181 2006-06-22 20:01:18Z jlovell $"
+ * "$Id: raster.h 5671 2006-06-16 11:17:39Z mike $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -86,8 +86,7 @@ extern "C" {
 typedef enum cups_mode_e		/**** Raster modes ****/
 {
   CUPS_RASTER_READ = 0,			/* Open stream for reading */
-  CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
-  CUPS_RASTER_WRITE_COMPRESSED = 2	/* Open stream for compressed writing @since CUPS 1.3@ */
+  CUPS_RASTER_WRITE = 1			/* Open stream for writing */
 } cups_mode_t;
 
 typedef enum cups_bool_e		/**** Boolean type ****/
@@ -346,5 +345,5 @@ extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h 181 2006-06-22 20:01:18Z jlovell $".
+ * End of "$Id: raster.h 5671 2006-06-16 11:17:39Z mike $".
  */

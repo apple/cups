@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 181 2006-06-22 20:01:18Z jlovell $"
+ * "$Id: job.c 5686 2006-06-21 21:02:56Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -876,6 +876,13 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   cups_file_t		*fp;		/* Job file */
   int			fileid;		/* Current file ID */
   ipp_attribute_t	*attr;		/* Job attribute */
+  char			scheme[32],	/* Scheme portion of URI */
+			username[64],	/* Username portion of URI */
+			host[HTTP_MAX_HOST],
+					/* Host portion of URI */
+			resource[HTTP_MAX_URI];
+					/* Resource portion of URI */
+  int			port;		/* Port portion of URI */
   const char		*dest;		/* Destination */
   mime_type_t		**filetypes;	/* New filetypes array */
   int			*compressions;	/* New compressions array */
@@ -959,7 +966,11 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       return;
     }
 
-    if ((dest = cupsdValidateDest(attr->values[0].string.text, &(job->dtype),
+    httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
+		    sizeof(host), &port, resource, sizeof(resource));
+
+    if ((dest = cupsdValidateDest(host, resource, &(job->dtype),
                                   NULL)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3422,5 +3433,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 181 2006-06-22 20:01:18Z jlovell $".
+ * End of "$Id: job.c 5686 2006-06-21 21:02:56Z mike $".
  */

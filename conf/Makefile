@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 177 2006-06-21 00:20:03Z jlovell $"
+# "$Id: Makefile 5412 2006-04-17 14:30:53Z mike $"
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -102,5 +102,5 @@ uninstall:
 
 
 #
-# End of "$Id: Makefile 177 2006-06-21 00:20:03Z jlovell $".
+# End of "$Id: Makefile 5412 2006-04-17 14:30:53Z mike $".
 #

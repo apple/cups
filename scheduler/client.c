@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 181 2006-06-22 20:01:18Z jlovell $"
+ * "$Id: client.c 5630 2006-06-05 18:42:53Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3833,5 +3833,5 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 181 2006-06-22 20:01:18Z jlovell $".
+ * End of "$Id: client.c 5630 2006-06-05 18:42:53Z mike $".
  */

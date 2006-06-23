@@ -1,5 +1,5 @@
 //
-// "$Id: pdftops.cxx 177 2006-06-21 00:20:03Z jlovell $"
+// "$Id: pdftops.cxx 4906 2006-01-10 20:53:28Z mike $"
 //
 //   PDF to PostScript filter front-end for the Common UNIX Printing
 //   System (CUPS).
@@ -341,5 +341,5 @@ main(int  argc,				// I - Number of command-line args
 
 
 //
-// End of "$Id: pdftops.cxx 177 2006-06-21 00:20:03Z jlovell $".
+// End of "$Id: pdftops.cxx 4906 2006-01-10 20:53:28Z mike $".
 //

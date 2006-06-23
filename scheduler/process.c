@@ -1,5 +1,5 @@
 /*
- * "$Id: process.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: process.c 5376 2006-04-06 20:32:07Z mike $"
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
@@ -344,5 +344,5 @@ compare_procs(cupsd_proc_t *a,		/* I - First process */
 
 
 /*
- * End of "$Id: process.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: process.c 5376 2006-04-06 20:32:07Z mike $".
  */

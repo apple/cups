@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 177 2006-06-21 00:20:03Z jlovell $"
+# "$Id: Makefile 3572 2003-04-08 19:56:25Z mike $"
 #
 #   PHP Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -112,5 +112,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 177 2006-06-21 00:20:03Z jlovell $".
+# End of "$Id: Makefile 3572 2003-04-08 19:56:25Z mike $".
 #

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in 181 2006-06-22 20:01:18Z jlovell $"
+dnl "$Id: configure.in 5609 2006-05-30 20:31:10Z mike $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -75,5 +75,5 @@ AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh init/cups-lpd cups-config
 chmod +x cups-config
 
 dnl
-dnl End of "$Id: configure.in 181 2006-06-22 20:01:18Z jlovell $".
+dnl End of "$Id: configure.in 5609 2006-05-30 20:31:10Z mike $".
 dnl

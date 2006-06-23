@@ -1,5 +1,5 @@
 /*
- * "$Id: tbcp.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: tbcp.c 5087 2006-02-07 03:43:29Z mike $"
  *
  *   TBCP port monitor for the Common UNIX Printing System (CUPS).
  *
@@ -279,5 +279,5 @@ pswrite(const char *buf,		/* I - Buffer to write */
 
 
 /*
- * End of "$Id: tbcp.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: tbcp.c 5087 2006-02-07 03:43:29Z mike $".
  */

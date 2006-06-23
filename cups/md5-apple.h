@@ -1,5 +1,5 @@
 /*
- * "$Id: md5-apple.h 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: md5-apple.h 5232 2006-03-05 17:59:19Z mike $"
  *
  *   MD5 MacOS X compatibility header for the Common UNIX Printing
  *   System (CUPS).
@@ -35,5 +35,5 @@ void md5_finish(_cups_md5_state_t *pms, unsigned char digest[16])
      { _cupsMD5Finish(pms, digest); }
 
 /*
- * End of "$Id: md5-apple.h 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: md5-apple.h 5232 2006-03-05 17:59:19Z mike $".
  */

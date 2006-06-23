@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.h 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: adminutil.h 5235 2006-03-06 13:02:23Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -85,5 +85,5 @@ extern int	_cupsAdminSetServerSettings(http_t *http,
 #endif /* !_CUPS_ADMINUTIL_H_ */
 
 /*
- * End of "$Id: adminutil.h 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: adminutil.h 5235 2006-03-06 13:02:23Z mike $".
  */

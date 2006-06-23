@@ -1,5 +1,5 @@
 /*
- * "$Id: testcgi.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: testcgi.c 4869 2005-12-06 02:43:40Z mike $"
  *
  *   CGI test program for the Common UNIX Printing System (CUPS).
  *
@@ -80,5 +80,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testcgi.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: testcgi.c 4869 2005-12-06 02:43:40Z mike $".
  */

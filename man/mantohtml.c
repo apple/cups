@@ -1,5 +1,5 @@
 /*
- * "$Id: mantohtml.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: mantohtml.c 5142 2006-02-21 14:52:34Z mike $"
  *
  *   Man page to HTML conversion program.
  *
@@ -725,5 +725,5 @@ strmove(char       *d,			/* I - Destination */
 
 
 /*
- * End of "$Id: mantohtml.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: mantohtml.c 5142 2006-02-21 14:52:34Z mike $".
  */

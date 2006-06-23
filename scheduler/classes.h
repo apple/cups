@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.h 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: classes.h 4719 2005-09-28 21:12:44Z mike $"
  *
  *   Printer class definitions for the Common UNIX Printing System (CUPS).
  *
@@ -42,5 +42,5 @@ extern void		cupsdUpdateImplicitClasses(void);
 
 
 /*
- * End of "$Id: classes.h 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: classes.h 4719 2005-09-28 21:12:44Z mike $".
  */

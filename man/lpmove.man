@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpmove.man 177 2006-06-21 00:20:03Z jlovell $"
+.\" "$Id: lpmove.man 5099 2006-02-13 02:46:10Z mike $"
 .\"
 .\"   lpmove man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -71,5 +71,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpmove.man 177 2006-06-21 00:20:03Z jlovell $".
+.\" End of "$Id: lpmove.man 5099 2006-02-13 02:46:10Z mike $".
 .\"

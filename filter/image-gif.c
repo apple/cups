@@ -1,5 +1,5 @@
 /*
- * "$Id: image-gif.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: image-gif.c 5509 2006-05-11 11:41:36Z mike $"
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
@@ -695,5 +695,5 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
 
 
 /*
- * End of "$Id: image-gif.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: image-gif.c 5509 2006-05-11 11:41:36Z mike $".
  */

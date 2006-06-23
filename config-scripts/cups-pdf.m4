@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-pdf.m4 177 2006-06-21 00:20:03Z jlovell $"
+dnl "$Id: cups-pdf.m4 5466 2006-04-26 19:52:27Z mike $"
 dnl
 dnl   PDF filter configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -39,5 +39,5 @@ fi
 AC_SUBST(PDFTOPS)
 
 dnl
-dnl End of "$Id: cups-pdf.m4 177 2006-06-21 00:20:03Z jlovell $".
+dnl End of "$Id: cups-pdf.m4 5466 2006-04-26 19:52:27Z mike $".
 dnl

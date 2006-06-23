@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-polld.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: cups-polld.c 5305 2006-03-18 03:05:12Z mike $"
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
@@ -402,5 +402,5 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: cups-polld.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: cups-polld.c 5305 2006-03-18 03:05:12Z mike $".
  */

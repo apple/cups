@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1394-linux.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: ieee1394-linux.c 4703 2005-09-26 19:33:58Z mike $"
  *
  *   Linux IEEE-1394 glue for the Common UNIX Printing System (CUPS).
  *
@@ -873,5 +873,5 @@ ieee1394_error(void)
 
 
 /*
- * End of "$Id: ieee1394-linux.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: ieee1394-linux.c 4703 2005-09-26 19:33:58Z mike $".
  */

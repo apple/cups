@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 181 2006-06-22 20:01:18Z jlovell $"
+ * "$Id: ipp.c 5624 2006-06-02 15:15:23Z mike $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -2824,5 +2824,5 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
 
 
 /*
- * End of "$Id: ipp.c 181 2006-06-22 20:01:18Z jlovell $".
+ * End of "$Id: ipp.c 5624 2006-06-02 15:15:23Z mike $".
  */

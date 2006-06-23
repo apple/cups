@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 181 2006-06-22 20:01:18Z jlovell $"
+# "$Id: cups.spec.in 5584 2006-05-24 11:17:55Z mike $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -419,5 +419,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 181 2006-06-22 20:01:18Z jlovell $".
+# End of "$Id: cups.spec.in 5584 2006-05-24 11:17:55Z mike $".
 #

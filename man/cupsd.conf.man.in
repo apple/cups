@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man.in 181 2006-06-22 20:01:18Z jlovell $"
+.\" "$Id: cupsd.conf.man.in 5638 2006-06-06 20:08:13Z mike $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -609,5 +609,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: cupsd.conf.man.in 181 2006-06-22 20:01:18Z jlovell $".
+.\" End of "$Id: cupsd.conf.man.in 5638 2006-06-06 20:08:13Z mike $".
 .\"

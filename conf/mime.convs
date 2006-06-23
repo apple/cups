@@ -1,5 +1,5 @@
 #
-# "$Id: mime.convs 177 2006-06-21 00:20:03Z jlovell $"
+# "$Id: mime.convs 5402 2006-04-14 19:21:03Z mike $"
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
@@ -114,5 +114,5 @@ image/x-sun-raster	application/vnd.cups-raster	100	imagetoraster
 #application/octet-stream	application/vnd.cups-raw	0	-
 
 #
-# End of "$Id: mime.convs 177 2006-06-21 00:20:03Z jlovell $".
+# End of "$Id: mime.convs 5402 2006-04-14 19:21:03Z mike $".
 #

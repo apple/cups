@@ -1,5 +1,5 @@
 /*
- * "$Id: langprintf.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: langprintf.c 4924 2006-01-13 01:55:20Z mike $"
  *
  *   Localized printf/puts functions for the Common UNIX Printing
  *   System (CUPS).
@@ -139,5 +139,5 @@ _cupsLangPuts(FILE        *fp,		/* I - File to write to */
 
 
 /*
- * End of "$Id: langprintf.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: langprintf.c 4924 2006-01-13 01:55:20Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c 181 2006-06-22 20:01:18Z jlovell $"
+ * "$Id: lpq.c 5638 2006-06-06 20:08:13Z mike $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -675,5 +675,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c 181 2006-06-22 20:01:18Z jlovell $".
+ * End of "$Id: lpq.c 5638 2006-06-06 20:08:13Z mike $".
  */

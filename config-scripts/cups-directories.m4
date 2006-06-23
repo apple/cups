@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4 177 2006-06-21 00:20:03Z jlovell $"
+dnl "$Id: cups-directories.m4 5547 2006-05-19 12:44:29Z mike $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -302,5 +302,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 177 2006-06-21 00:20:03Z jlovell $".
+dnl End of "$Id: cups-directories.m4 5547 2006-05-19 12:44:29Z mike $".
 dnl

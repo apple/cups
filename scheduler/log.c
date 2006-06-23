@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 177 2006-06-21 00:20:03Z jlovell $"
+ * "$Id: log.c 5493 2006-05-05 16:33:57Z mike $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -546,5 +546,5 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c 177 2006-06-21 00:20:03Z jlovell $".
+ * End of "$Id: log.c 5493 2006-05-05 16:33:57Z mike $".
  */
