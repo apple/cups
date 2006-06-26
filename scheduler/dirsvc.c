@@ -906,14 +906,21 @@ cupsdStartBrowsing(void)
     fcntl(BrowseSocket, F_SETFD, fcntl(BrowseSocket, F_GETFD) | FD_CLOEXEC);
 
    /*
-    * Finally, add the socket to the input selection set...
+    * Finally, add the socket to the input selection set as needed...
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStartBrowsing: Adding fd %d to InputSet...",
-                    BrowseSocket);
+    if (BrowseRemoteProtocols & BROWSE_CUPS)
+    {
+     /*
+      * We only listen if we want remote printers...
+      */
 
-    FD_SET(BrowseSocket, InputSet);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdStartBrowsing: Adding fd %d to InputSet...",
+                      BrowseSocket);
+
+      FD_SET(BrowseSocket, InputSet);
+    }
   }
   else
     BrowseSocket = -1;
