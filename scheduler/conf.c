@@ -2572,7 +2572,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    strlcpy(temp2, relay->from.mask.name.name, sizeof(temp2));
   
 	  cupsdLogMessage(CUPSD_LOG_INFO, "Relaying from %s to %s:%d (IPv4)",
-			  temp, temp2, ntohs(relay->to.ipv4.sin_port));
+			  temp2, temp, ntohs(relay->to.ipv4.sin_port));
   
 	  NumRelays ++;
 	}
