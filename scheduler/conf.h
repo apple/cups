@@ -74,6 +74,7 @@ VAR char		*ConfigurationFile	VALUE(NULL),
 					/* Directory for request files */
 			*DocumentRoot		VALUE(NULL);
 					/* Root directory for documents */
+VAR int			ServerNameIsIP		VALUE(0);
 VAR int			NumSystemGroups		VALUE(0);
 					/* Number of system group names */
 VAR char		*SystemGroups[MAX_SYSTEM_GROUPS];

@@ -1885,7 +1885,7 @@ process_browse_data(
   hptr   = strchr(host, '.');
   sptr   = strchr(ServerName, '.');
 
-  if (sptr != NULL && hptr != NULL)
+  if (!ServerNameIsIP && sptr != NULL && hptr != NULL)
   {
    /*
     * Strip the common domain name components...

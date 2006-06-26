@@ -468,6 +468,14 @@ cupsdReadConfiguration(void)
   RunUser = getuid();
 
  /*
+  * See if the ServerName is an IP address...
+  */
+
+  for (slash = ServerName; isdigit(*slash & 255) || *slash == '.'; slash ++);
+
+  ServerNameIsIP = !*slash;
+
+ /*
   * Use the default system group if none was supplied in cupsd.conf...
   */
 
