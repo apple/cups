@@ -121,7 +121,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         case 'h' : /* Connect to host */
 	    if (http != NULL)
+	    {
 	      httpClose(http);
+	      http = NULL;
+	    }
 
 	    if (argv[i][2] != '\0')
               cupsSetServer(argv[i] + 2);
