@@ -407,6 +407,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
       ppd_cparam_t	*cparam;	/* Custom parameter */
       char		*units;		/* Custom points units */
 
+
       if ((coption = ppdFindCustomOption(ppd, option)) != NULL)
       {
         if ((cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params)) == NULL)
@@ -455,6 +456,12 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	}
       }
     }
+
+   /*
+    * Make sure that we keep the option marked below...
+    */
+
+    choice = "Custom";
   }
   else if (choice[0] == '{')
   {

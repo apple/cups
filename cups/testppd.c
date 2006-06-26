@@ -72,8 +72,8 @@ static const char	*default_code =
 static const char	*custom_code =
 			"[{\n"
 			"%%BeginFeature: *CustomPageSize True\n"
-			"500\n"
 			"400\n"
+			"500\n"
 			"0\n"
 			"0\n"
 			"0\n"

@@ -50,6 +50,7 @@
 #include <stdlib.h>
 #include "string.h"
 #include <errno.h>
+#include "debug.h"
 
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
@@ -111,6 +112,9 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
   ppd_choice_t	**collect;		/* Collected choices */
 
 
+  DEBUG_printf(("ppdCollect2(ppd=%p, section=%d, min_order=%f, choices=%p)\n",
+                ppd, section, min_order, choices));
+
   if (ppd == NULL)
     return (0);
 
@@ -132,6 +136,8 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
 	for (k = o->num_choices, c = o->choices; k > 0; k --, c ++)
 	  if (c->marked && count < 1000)
 	  {
+	    DEBUG_printf(("ppdCollect2: %s=%s marked...\n", o->keyword,
+	                  c->choice));
             collect[count] = c;
 	    count ++;
 	  }
@@ -142,6 +148,8 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
 	  for (m = o->num_choices, c = o->choices; m > 0; m --, c ++)
 	    if (c->marked && count < 1000)
 	    {
+	      DEBUG_printf(("ppdCollect2: %s=%s marked...\n", o->keyword,
+	                    c->choice));
               collect[count] = c;
 	      count ++;
 	    }
@@ -154,6 +162,8 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
   if (count > 1)
     qsort(collect, count, sizeof(ppd_choice_t *),
           (int (*)(const void *, const void *))ppd_sort);
+
+  DEBUG_printf(("ppdCollect2: %d marked choices...\n", count));
 
  /*
   * Return the array and number of choices; if 0, free the array since
@@ -492,6 +502,9 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
   struct lconv	*loc;			/* Locale data */
 
 
+  DEBUG_printf(("ppdEmitString(ppd=%p, section=%d, min_order=%f)\n",
+                ppd, section, min_order));
+
  /*
   * Range check input...
   */
@@ -527,6 +540,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
            !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
           !strcasecmp(choices[i]->choice, "Custom"))
       {
+        DEBUG_puts("ppdEmitString: Custom size set!");
+
         bufsize += 37;			/* %%BeginFeature: *CustomPageSize True\n */
         bufsize += 50;			/* Five 9-digit numbers + newline */
       }
@@ -580,6 +595,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
   * Allocate memory...
   */
 
+  DEBUG_printf(("ppdEmitString: Allocating %d bytes for string...\n", bufsize));
+
   if ((buffer = calloc(1, bufsize)) == NULL)
   {
     free(choices);
@@ -607,6 +624,9 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
      /*
       * Send DSC comments with option...
       */
+
+      DEBUG_printf(("Adding code for %s=%s...\n", choices[i]->option->keyword,
+                    choices[i]->choice));
 
       if ((!strcasecmp(choices[i]->option->keyword, "PageSize") ||
            !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
@@ -800,6 +820,9 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
       strlcpy(bufptr, "%%EndFeature\n"
 		      "} stopped cleartomark\n", bufend - bufptr + 1);
       bufptr += strlen(bufptr);
+
+      DEBUG_printf(("ppdEmitString: Offset in string is %d...\n",
+                    bufptr - buffer));
     }
     else
     {
