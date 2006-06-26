@@ -3011,7 +3011,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   {
     snprintf(final_content_type, sizeof(final_content_type),
              "FINAL_CONTENT_TYPE=%s/%s",
-	     filter->dst->super, filter->dst->type);
+	     filter->src->super, filter->src->type);
     envp[envc ++] = final_content_type;
   }
 
