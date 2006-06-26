@@ -115,7 +115,7 @@ AC_ARG_WITH(rcdir, [  --with-rcdir            set path for rc scripts],rcdir="$w
 
 if test x$rcdir = x; then
 	case "$uname" in
-		FreeBSD* | OpenBSD*)
+		FreeBSD* | OpenBSD* | MirBsD* | ekkoBSD*)
 			# FreeBSD and OpenBSD
 			INITDIR=""
 			INITDDIR=""
