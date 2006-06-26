@@ -57,7 +57,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   ipp_op_t	op;		/* Operation */
   cups_lang_t	*language;	/* Language */
   int		num_dests;	/* Number of destinations */
-  cups_dest_t	*dests;		/* Destinations */
+  cups_dest_t	*dests,		/* Destinations */
+		*defdest;	/* Default destination */
   http_encryption_t encryption;	/* Encryption? */
 
 
@@ -72,11 +73,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   http       = NULL;
   encryption = cupsEncryption();
   language   = cupsLangDefault();
-  num_dests  = cupsGetDests(&dests);
-
-  for (i = 0; i < num_dests; i ++)
-    if (dests[i].is_default)
-      dest = dests[i].name;
 
  /*
   * Open a connection to the server...
@@ -88,6 +84,10 @@ main(int  argc,			/* I - Number of command-line arguments */
     cupsFreeDests(num_dests, dests);
     return (1);
   }
+
+  num_dests  = cupsGetDests2(http, &dests);
+  defdest    = cupsGetDest(NULL, NULL, num_dests, dests);
+  dest       = defdest ? defdest->name : NULL;
 
  /*
   * Process command-line arguments...
@@ -102,6 +102,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    encryption = HTTP_ENCRYPT_REQUIRED;
 
 	    httpEncryption(http, encryption);
+	    cupsSetEncryption(encryption);
 #else
             _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
@@ -152,9 +153,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    break;
 	    
         case 'h' : /* Connect to host */
-	    if (http != NULL)
-	      httpClose(http);
-
 	    if (argv[i][2] != '\0')
               cupsSetServer(argv[i] + 2);
 	    else
@@ -172,6 +170,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      else
                 cupsSetServer(argv[i]);
 	    }
+
+            httpClose(http);
+            cupsFreeDests(num_dests, dests);
+
+	    if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                   encryption)) == NULL)
+	    {
+	      _cupsLangPuts(stderr, _("lprm: Unable to contact server!\n"));
+	      cupsFreeDests(num_dests, dests);
+	      return (1);
+	    }
+
+	    num_dests  = cupsGetDests2(http, &dests);
+	    defdest    = cupsGetDest(NULL, NULL, num_dests, dests);
+	    dest       = defdest ? defdest->name : NULL;
 	    break;
 
 	default :
