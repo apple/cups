@@ -1158,7 +1158,7 @@ void PSOutputDev::writeHeader(int firstPage, int lastPage,
     break;
   }
 
-  writePSFmt("% Produced by xpdf/pdftops %s\n", xpdfVersion);
+  writePSFmt("%%Producer: xpdf/pdftops %s\n", xpdfVersion);
   xref->getDocInfo(&info);
   if (info.dictLookup("Creator", &obj1)->isString()) {
     writePS("%%Creator: ");
