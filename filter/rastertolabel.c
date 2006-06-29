@@ -372,6 +372,8 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
         printf("! 0 %u %u %u %u\r\n", header->HWResolution[0],
 	       header->HWResolution[1], header->cupsHeight,
 	       header->NumCopies);
+	printf("PAGE-WIDTH %d\r\n", header->cupsWidth);
+	printf("PAGE-HEIGHT %d\r\n", header->cupsWidth);
         break;
 
     case INTELLITECH_PCL :
@@ -710,7 +712,10 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
         * Print the label...
 	*/
 
-        puts("FORM\r");
+	if ((choice = ppdFindMarkedChoice(ppd, "zeMediaTracking")) == NULL ||
+	    strcmp(choice->choice, "Continuous"))
+          puts("FORM\r");
+
 	puts("PRINT\r");
 	break;
 

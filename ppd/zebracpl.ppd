@@ -120,6 +120,14 @@
 *Resolution 203dpi/203 DPI: "<</HWResolution[203 203]>>setpagedevice"
 *CloseUI: *Resolution
 
+*OpenUI *zeMediaTracking/Media Tracking: PickOne
+*OrderDependency: 20 AnySetup *zeMediaTracking
+*DefaultzeMediaTracking: Web
+*zeMediaTracking Continuous: ""
+*zeMediaTracking Web/Non-continuous (Web sensing): ""
+*zeMediaTracking Mark/Non-continuous (Mark sensing): ""
+*CloseUI: *zeMediaTracking
+
 *OpenGroup: PrinterSettings/Printer Settings
 *OpenUI *Darkness/Media Darkness: PickOne
 *OrderDependency: 20 AnySetup *Darkness
