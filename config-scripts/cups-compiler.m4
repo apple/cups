@@ -297,11 +297,6 @@ else
 			# Warning 829 is passing constant string as char *
 			CXXFLAGS="+W336,829 $CXXFLAGS"
 
-			if test -z "$with_archflags"; then
-				# Build portable binaries for all HP systems...
-				ARCHFLAGS="+DAportable"
-			fi
-
 			if test $PICFLAG = 1; then
 				OPTIM="+z $OPTIM"
 			fi
