@@ -89,6 +89,11 @@ cupsdAddEvent(
   cupsd_subscription_t	*sub;		/* Current subscription */
 
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdAddEvent(event=%s, dest=%p(%s), job=%p(%d), text=\"%s\", ...)",
+		  cupsdEventName(event), dest, dest ? dest->name : "",
+		  job, job ? job->id : 0, text);
+
  /*
   * Keep track of events with any OS-supplied notification mechanisms...
   */
@@ -284,13 +289,13 @@ cupsdAddEvent(
 	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
 	              "job-impressions-completed",
 		      job->sheets ? job->sheets->values[0].integer : 0);
-
-       /*
-	* Send the notification for this subscription...
-	*/
-
-	cupsd_send_notification(sub, temp);
       }
+
+     /*
+      * Send the notification for this subscription...
+      */
+
+      cupsd_send_notification(sub, temp);
     }
   }
 
@@ -1379,7 +1384,7 @@ cupsd_send_notification(
   ipp_state_t	state;			/* IPP event state */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsd_send_notification(sub=%p(%d), event=%p(%s))\n",
                   sub, sub->id, event, cupsdEventName(event->event));
 
@@ -1435,13 +1440,16 @@ cupsd_send_notification(
 
   if (sub->recipient)
   {
-    if (sub->pipe < 0)
-      cupsd_start_notifier(sub);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "sub->pipe=%d", sub->pipe);
-
-    if (sub->pipe >= 0)
+    for (;;)
     {
+      if (sub->pipe < 0)
+	cupsd_start_notifier(sub);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "sub->pipe=%d", sub->pipe);
+
+      if (sub->pipe < 0)
+	break;
+
       event->attrs->state = IPP_IDLE;
 
       while ((state = ippWriteFile(sub->pipe, event->attrs)) != IPP_DATA)
@@ -1449,9 +1457,34 @@ cupsd_send_notification(
 	  break;
 
       if (state == IPP_ERROR)
+      {
+        if (errno == EPIPE)
+	{
+	 /*
+	  * Notifier died, try restarting it...
+	  */
+
+          cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "Notifier for subscription %d (%s) went away, "
+			  "retrying!",
+			  sub->id, sub->recipient);
+	  cupsdEndProcess(sub->pid, 0);
+
+	  close(sub->pipe);
+	  sub->pipe = -1;
+          continue;
+	}
+
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Unable to send event for subscription %d (%s)!",
 			sub->id, sub->recipient);
+      }
+
+     /*
+      * If we get this far, break out of the loop...
+      */
+
+      break;
     }
   }
 
