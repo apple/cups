@@ -81,7 +81,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(), encryption)) == NULL)
   {
     _cupsLangPuts(stderr, _("lprm: Unable to contact server!\n"));
-    cupsFreeDests(num_dests, dests);
     return (1);
   }
 
@@ -178,7 +177,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 	                                   encryption)) == NULL)
 	    {
 	      _cupsLangPuts(stderr, _("lprm: Unable to contact server!\n"));
-	      cupsFreeDests(num_dests, dests);
 	      return (1);
 	    }
 
