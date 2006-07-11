@@ -1753,8 +1753,8 @@ compare_active_jobs(void *first,	/* I - First job */
   int	diff;				/* Difference */
 
 
-  if ((diff = ((cupsd_job_t *)first)->priority -
-              ((cupsd_job_t *)second)->priority) != 0)
+  if ((diff = ((cupsd_job_t *)second)->priority -
+              ((cupsd_job_t *)first)->priority) != 0)
     return (diff);
   else
     return (((cupsd_job_t *)first)->id - ((cupsd_job_t *)second)->id);
