@@ -542,6 +542,7 @@ cupsdCreateCommonData(void)
     }
 
     cupsArrayDelete(notifiers);
+    cupsDirClose(dir);
   }
 
   /* number-up-supported */
