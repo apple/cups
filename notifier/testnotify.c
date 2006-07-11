@@ -82,6 +82,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     print_attributes(event, 4);
     ippDelete(event);
+
+   /*
+    * If the recipient URI is "testnotify://nowait", then we exit after each
+    * event...
+    */
+
+    if (!strcmp(argv[1], "testnotify://nowait"))
+      return (0);
   }
 }
 
