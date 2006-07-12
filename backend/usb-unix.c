@@ -65,10 +65,6 @@ print_device(const char *uri,		/* I - Device URI */
   int		device_fd;		/* USB device */
   size_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
-#if defined(__linux) && defined(LP_POUTPA)
-  unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
-  int		paperout;		/* Paper out? */
-#endif /* __linux && LP_POUTPA */
 
 
   (void)argc;
@@ -147,37 +143,6 @@ print_device(const char *uri,		/* I - Device URI */
   /**** No options supported yet ****/
 
   tcsetattr(device_fd, TCSANOW, &opts);
-
-#if defined(__linux) && defined(LP_POUTPA)
- /*
-  * Show the printer status before we send the file...
-  */
-
-  paperout = 0;
-
-  while (!ioctl(device_fd, LPGETSTATUS, &status))
-  {
-    fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n",
-            status);
-
-    if (status & LP_POUTPA)
-    {
-      fputs("WARNING: Media tray empty!\n", stderr);
-      fputs("STATUS: +media-tray-empty-error\n", stderr);
-
-      paperout = 1;
-    }
-
-    if (!(status & LP_PERRORP))
-      fputs("WARNING: Printer fault!\n", stderr);
-    else if (!(status & LP_PSELECD))
-      fputs("WARNING: Printer off-line.\n", stderr);
-    else
-      break;
-
-    sleep(5);
-  }
-#endif /* __linux && LP_POUTPA */
 
  /*
   * Finally, send the print file...

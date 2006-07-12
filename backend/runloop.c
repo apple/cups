@@ -131,13 +131,6 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 	sleep(1);
 	continue;
       }
-
-      if (offline)
-      {
-	fputs("STATE: -offline-error\n", stderr);
-	fputs("INFO: Printer is now on-line.\n", stderr);
-	offline = 0;
-      }
     }
 
    /*
@@ -213,6 +206,15 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 	    paperout = 1;
 	  }
         }
+	else if (errno == ENXIO)
+	{
+	  if (!offline)
+	  {
+	    fputs("STATE: +offline-error\n", stderr);
+	    fputs("INFO: Printer is currently off-line.\n", stderr);
+	    offline = 1;
+	  }
+	}
 	else if (errno != EAGAIN && errno != EINTR && errno != ENOTTY)
 	{
 	  perror("ERROR: Unable to write print data");
@@ -225,6 +227,13 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 	{
 	  fputs("STATUS: -media-tray-empty-error\n", stderr);
 	  paperout = 0;
+	}
+
+	if (offline)
+	{
+	  fputs("STATE: -offline-error\n", stderr);
+	  fputs("INFO: Printer is now on-line.\n", stderr);
+	  offline = 0;
 	}
 
         fprintf(stderr, "DEBUG: Wrote %d bytes of print data...\n", (int)bytes);

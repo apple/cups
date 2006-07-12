@@ -92,10 +92,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		copies;			/* Number of copies to print */
   size_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
-#if defined(__linux) && defined(LP_POUTPA)
-  unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
-  int		paperout;		/* Paper out? */
-#endif /* __linux && LP_POUTPA */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -251,36 +247,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   /**** No options supported yet ****/
 
   tcsetattr(device_fd, TCSANOW, &opts);
-
-#if defined(__linux) && defined(LP_POUTPA)
- /*
-  * Show the printer status before we send the file...
-  */
-
-  paperout = 0;
-
-  while (!ioctl(fd, LPGETSTATUS, &status))
-  {
-    fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n", status);
-
-    if (status & LP_POUTPA)
-    {
-      fputs("WARNING: Media tray empty!\n", stderr);
-      fputs("STATUS: +media-tray-empty-error\n", stderr);
-
-      paperout = 1;
-    }
-
-    if (!(status & LP_PERRORP))
-      fputs("WARNING: Printer fault!\n", stderr);
-    else if (!(status & LP_PSELECD))
-      fputs("WARNING: Printer off-line.\n", stderr);
-    else
-      break;
-
-    sleep(5);
-  }
-#endif /* __linux && LP_POUTPA */
 
  /*
   * Finally, send the print file...
