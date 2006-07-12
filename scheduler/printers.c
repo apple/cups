@@ -642,6 +642,9 @@ cupsdDeletePrinter(
 
   cupsArrayRemove(Printers, p);
 
+  if (p->type & CUPS_PRINTER_IMPLICIT)
+    cupsArrayRemove(ImplicitPrinters, p);
+
  /*
   * Remove the dummy interface/icon/option files under IRIX...
   */
@@ -1257,6 +1260,7 @@ cupsdRenamePrinter(
   */
 
   cupsArrayAdd(Printers, p);
+
   if (p->type & CUPS_PRINTER_IMPLICIT)
     cupsArrayAdd(ImplicitPrinters, p);
 }

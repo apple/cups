@@ -212,10 +212,11 @@ cupsdLoadRemoteCache(void)
 	else
           p = cupsdAddPrinter(value);
 
-	p->accepting   = 1;
-	p->state       = IPP_PRINTER_IDLE;
-	p->type        |= CUPS_PRINTER_REMOTE;
-	p->browse_time = now + BrowseTimeout;
+	p->accepting     = 1;
+	p->state         = IPP_PRINTER_IDLE;
+	p->type          |= CUPS_PRINTER_REMOTE;
+	p->browse_time   = now;
+	p->browse_expire = now + BrowseTimeout;
 
        /*
         * Set the default printer as needed...
@@ -252,10 +253,11 @@ cupsdLoadRemoteCache(void)
 	else
           p = cupsdAddClass(value);
 
-	p->accepting   = 1;
-	p->state       = IPP_PRINTER_IDLE;
-	p->type        |= CUPS_PRINTER_REMOTE;
-	p->browse_time = now + BrowseTimeout;
+	p->accepting     = 1;
+	p->state         = IPP_PRINTER_IDLE;
+	p->type          |= CUPS_PRINTER_REMOTE;
+	p->browse_time   = now;
+	p->browse_expire = now + BrowseTimeout;
 
        /*
         * Set the default printer as needed...
@@ -416,8 +418,8 @@ cupsdLoadRemoteCache(void)
       {
         time_t t = atoi(value);
 
-	if (t > (now + BrowseInterval))
-          p->browse_time = t;
+	if (t > p->browse_expire)
+          p->browse_expire = t;
       }
       else
       {
@@ -591,7 +593,7 @@ cupsdSaveRemoteCache(void)
 
     cupsFilePrintf(fp, "Type %d\n", printer->type);
 
-    cupsFilePrintf(fp, "BrowseTime %d\n", (int)printer->browse_time);
+    cupsFilePrintf(fp, "BrowseTime %d\n", (int)printer->browse_expire);
 
     if (printer->info)
       cupsFilePrintf(fp, "Info %s\n", printer->info);
