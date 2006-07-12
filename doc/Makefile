@@ -158,6 +158,7 @@ HELPFILES	=	\
 			help/ref-client-conf.html \
 			help/ref-cupsd-conf.html \
 			help/ref-error_log.html \
+			help/ref-mailto-conf.html \
 			help/ref-page_log.html \
 			help/ref-printers-conf.html \
 			help/ref-snmp-conf.html \

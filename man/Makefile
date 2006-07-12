@@ -44,6 +44,7 @@ MAN5	=	classes.conf.$(MAN5EXT) \
 		client.conf.$(MAN5EXT) \
 		cups-snmp.conf.$(MAN5EXT) \
 		cupsd.conf.$(MAN5EXT) \
+		mailto.conf.$(MAN5EXT) \
 		mime.convs.$(MAN5EXT) \
 		mime.types.$(MAN5EXT) \
 		printers.conf.$(MAN5EXT) \
