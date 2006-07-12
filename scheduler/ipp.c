@@ -4287,7 +4287,8 @@ copy_printer_attrs(
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
                      "ipp", NULL, con->servername, con->serverport,
-		     "/printers/%s", printer->name);
+		     (printer->type & CUPS_PRINTER_CLASS) ?
+		         "/classes/%s" : "/printers/%s", printer->name);
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
         	 "printer-uri-supported", NULL, printer_uri);
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "printer-uri-supported=\"%s\"",
