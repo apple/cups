@@ -204,6 +204,7 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cups/mime.types
 /etc/cups/mime.convs
 %dir /etc/cups/ppd
+%attr(0700,root,root) %dir /etc/cups/ssl
 
 %if %{?_with_dbus:1}%{!?_with_dbus:0}
 # DBUS

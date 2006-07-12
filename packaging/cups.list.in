@@ -419,6 +419,7 @@ f 0644 root sys $DATADIR/templates/sv templates/sv/*.tmpl
 d 0755 root sys $SERVERROOT -
 d 0755 root $CUPS_GROUP $SERVERROOT/interfaces -
 d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
+d 0700 root $CUPS_GROUP $SERVERROOT/ssl -
 c $CUPS_PERM root $CUPS_GROUP $SERVERROOT conf/*.conf
 f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
 f 0644 root $CUPS_GROUP $SERVERROOT/mime.convs conf/mime.convs
