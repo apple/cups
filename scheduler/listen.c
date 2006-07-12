@@ -331,7 +331,7 @@ cupsdStartListening(void)
     * "any" address...
     */
 
-    if (!LocalPort && p > 0 &&
+    if ((!LocalPort || LocalEncryption == HTTP_ENCRYPT_ALWAYS) && p > 0 &&
         (httpAddrLocalhost(&(lis->address)) ||
          httpAddrAny(&(lis->address))))
     {
@@ -373,6 +373,8 @@ cupsdStartListening(void)
     */
 
     cupsdSetEnv("CUPS_SERVER", have_domain);
+
+    LocalEncryption = HTTP_ENCRYPT_IF_REQUESTED;
   }
   else
   {

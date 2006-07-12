@@ -230,6 +230,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (!strcmp(method, "https"))
     cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
+  else
+    cupsSetEncryption(HTTP_ENCRYPT_IF_REQUESTED);
 
  /*
   * See if there are any options...
