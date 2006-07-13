@@ -292,6 +292,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/network.html
 /usr/share/doc/cups/help/options.html
 /usr/share/doc/cups/help/overview.html
+/usr/share/doc/cups/help/policies.html
 /usr/share/doc/cups/help/ref-*.html
 /usr/share/doc/cups/help/security.html
 /usr/share/doc/cups/help/standard.html

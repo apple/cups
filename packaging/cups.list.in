@@ -464,6 +464,7 @@ f 0644 root sys $DOCDIR/help/license.html doc/help/license.html
 f 0644 root sys $DOCDIR/help/network.html doc/help/network.html
 f 0644 root sys $DOCDIR/help/options.html doc/help/options.html
 f 0644 root sys $DOCDIR/help/overview.html doc/help/overview.html
+f 0644 root sys $DOCDIR/help/policies.html doc/help/policies.html
 f 0644 root sys $DOCDIR/help/security.html doc/help/security.html
 f 0644 root sys $DOCDIR/help/standard.html doc/help/standard.html
 f 0644 root sys $DOCDIR/help/translation.html doc/help/translation.html

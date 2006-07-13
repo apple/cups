@@ -1,0 +1,498 @@
+<HTML>
+<!-- SECTION: Getting Started -->
+<HEAD>
+	<TITLE>Managing Operation Policies</TITLE>
+</HEAD>
+<BODY>
+
+<P>Operation policies are the rules used for each IPP operation
+in CUPS. These rules include things like "user must provide a
+password", "user must be in the system group", "allow only from
+the local system", and so forth. Until CUPS 1.2, these rules were
+largely hardcoded and could only be customized at a very basic
+level.</P>
+
+<P>CUPS 1.2 adds a new fine-grained policy layer which allows you
+to completely redefine the rules for each operation and/or
+printer. Each policy is named and defines access control rules
+for each IPP operation. This document describes how to manage
+policies and their rules.</P>
+
+<H2 CLASS="title"><A NAME="BASICS">The Basics</A></H2>
+
+<P>Operation policies are used for all IPP requests sent to the
+scheduler and are evaluated <em>after</em> the <A
+HREF="ref-cupsd-conf.html#Location"><TT>Location</TT></A> based
+access control rules. This means that operation policies can only
+add additional security restrictions to a request, never relax
+them. Use <TT>Location</TT> based access control rules for
+server-wide limits and operation policies for limits on
+individual printers, tasks, or services.</P>
+
+<P>Policies are stored in the <VAR>cupsd.conf</VAR> file in <A
+HREF="ref-cupsd-conf.html#Policy"><TT>Policy</TT></A> sections.
+Each policy has an alphanumeric name that is used to select it.
+Inside the policy section are one or more <A
+HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A>
+subsections which list the operations that are affected by the
+rules inside it. <A HREF="#LISTING01">Listing 1</A> shows the
+default operation policy, appropriately called "default", that is
+shipped with CUPS.</P>
+
+<PRE CLASS="command">
+<A NAME="LISTING01"><EM>Listing 1: Default Operation Policy</EM></A>
+
+ 1    &lt;Policy default>
+ 2      # Job-related operations must be done by the owner or an
+      adminstrator...
+ 3      &lt;Limit Send-Document Send-URI Hold-Job Release-Job
+      Restart-Job Purge-Jobs Set-Job-Attributes
+      Create-Job-Subscription Renew-Subscription
+      Cancel-Subscription Get-Notifications Reprocess-Job
+      Cancel-Current-Job Suspend-Current-Job Resume-Job
+      CUPS-Move-Job>
+ 4        Require user @OWNER @SYSTEM
+ 5        Order deny,allow
+ 6      &lt;/Limit>
+ 7    
+ 8      # All administration operations require an adminstrator
+      to authenticate...
+ 9      &lt;Limit Pause-Printer Resume-Printer
+      Set-Printer-Attributes Enable-Printer Disable-Printer
+      Pause-Printer-After-Current-Job Hold-New-Jobs
+      Release-Held-New-Jobs Deactivate-Printer Activate-Printer
+      Restart-Printer Shutdown-Printer Startup-Printer
+      Promote-Job Schedule-Job-After CUPS-Add-Printer
+      CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class
+      CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
+10        AuthType Basic
+11        Require user @SYSTEM
+12        Order deny,allow
+13      &lt;/Limit>
+14    
+15      # Only the owner or an administrator can cancel or
+      authenticate a job...
+16      &lt;Limit Cancel-Job CUPS-Authenticate-Job>
+17        Require user @OWNER @SYSTEM
+18        Order deny,allow
+19      &lt;/Limit>
+20    
+21      &lt;Limit All>
+22        Order deny,allow
+23      &lt;/Limit>
+24    &lt;/Policy>
+</PRE>
+
+<P>The policy definition starts with an opening <TT>Policy</TT>
+directive:</P>
+
+<PRE CLASS="command">
+ 1    &lt;Policy default>
+</PRE>
+
+<P>The first <TT>Limit</TT> subsection defines the rules for IPP
+job operations:</P>
+
+<PRE CLASS="command">
+ 3      &lt;Limit Send-Document Send-URI Hold-Job Release-Job
+      Restart-Job Purge-Jobs Set-Job-Attributes
+      Create-Job-Subscription Renew-Subscription
+      Cancel-Subscription Get-Notifications Reprocess-Job
+      Cancel-Current-Job Suspend-Current-Job Resume-Job
+      CUPS-Move-Job>
+ 4        Require user @OWNER @SYSTEM
+ 5        Order deny,allow
+ 6      &lt;/Limit>
+</PRE>
+
+<P>The operation names are listed on a single line
+with spaces separating them. Each name corresponds to the IPP
+operation described in any of the IETF or PWG standards documents
+for the Internet Printing Protocol. <A HREF="#TABLE01">Table
+1</A> lists all of the operations that have been defined along
+with their usage in CUPS.</P>
+
+<P>The access control rules are listed after the <TT>Limit</TT>
+line and are the same as those used for <A
+HREF="ref-cupsd-conf.html#Location"><TT>Location</TT></A>
+sections. In this case, we require the owner of the job
+("@OWNER") or a member of the <A
+HREF="ref-cupsd-conf.html#SystemGroup"><TT>SystemGroup</TT></A>
+("@SYSTEM") to do the operation. Because we do not include an <A
+HREF="ref-cupsd-conf.html#AuthType"><TT>AuthType</TT></A>
+directive here, the user information can come from the IPP
+request itself or the authenticated username from the HTTP
+request. The administrative operations starting on line 9,
+however, <em>do</em> use the <TT>AuthType</TT> directive, and so
+administrative operations need to be authenticated:</P>
+
+<PRE CLASS="command">
+ 9      &lt;Limit Pause-Printer Resume-Printer
+      Set-Printer-Attributes Enable-Printer Disable-Printer
+      Pause-Printer-After-Current-Job Hold-New-Jobs
+      Release-Held-New-Jobs Deactivate-Printer Activate-Printer
+      Restart-Printer Shutdown-Printer Startup-Printer
+      Promote-Job Schedule-Job-After CUPS-Add-Printer
+      CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class
+      CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
+10        AuthType Basic
+11        Require user @SYSTEM
+12        Order deny,allow
+13      &lt;/Limit>
+</PRE>
+
+<P>The "Order deny,allow" line at the end of both <TT>Limit</TT>
+subsections allows the request to come from any system allowed by
+the <TT>Location</TT> sections elsewhere in the
+<VAR>cupsd.conf</VAR> file.</P>
+
+<P>The <TT>Cancel-Job</TT> and <TT>CUPS-Authenticate-Job</TT>
+operations are listed separately to allow the web interface to
+more easily edit their policy without disturbing the rest. Like
+the rest of the job operations, we want the job's owner
+("@OWNER") or an administrator ("@SYSTEM") to do it:</P>
+
+<PRE CLASS="command">
+16      &lt;Limit Cancel-Job CUPS-Authenticate-Job>
+17        Require user @OWNER @SYSTEM
+18        Order deny,allow
+19      &lt;/Limit>
+</PRE>
+
+<P>The last <TT>Limit</TT> subsection in any policy uses the
+special operation name <TT>All</TT>. CUPS will use the rules in
+this subsection for any operation you don't list specifically in
+the policy. In this case, all other operations are allowed
+without a username or authentication:</P>
+
+<PRE CLASS="command">
+21      &lt;Limit All>
+22        Order deny,allow
+23      &lt;/Limit>
+24    &lt;/Policy>
+</PRE>
+
+
+<DIV CLASS="table"><TABLE WIDTH="80%" SUMMARY="IPP Operation Names">
+<CAPTION>Table 1: <A NAME="TABLE01">IPP Operation Names</A></CAPTION>
+<THEAD>
+<TR>
+	<TH>Name</TH>
+	<TH>Used by CUPS?</TH>
+	<TH>Description</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD NOWRAP><TT>Print-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Creates a print job with a single file.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Print-URI</TT></TD>
+	<TD>No</TD>
+	<TD>Create a print job with a single URI.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Validate-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Validates a print request before printing.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Create-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Creates a print job with no files or URIs.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Send-Document</TT></TD>
+	<TD>Yes</TD>
+	<TD>Adds a file to a print job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Send-URI</TT></TD>
+	<TD>No</TD>
+	<TD>Adds a URI to a print job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Cancel-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Cancels a print job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Get-Job-Attributes</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets information and options associated with a job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Get-Jobs</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets a list of jobs.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Get-Printer-Attributes</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets information and options associated with a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Hold-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Holds a print job for printing.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Release-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Releases a print job for printing.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Restart-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Reprints a print job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Pause-Printer</TT></TD>
+	<TD>Yes</TD>
+	<TD>Stops a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Resume-Printer</TT></TD>
+	<TD>Yes</TD>
+	<TD>Starts a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Purge-Jobs</TT></TD>
+	<TD>Yes</TD>
+	<TD>Cancels all jobs on the server or a printer or class
+	and removes the job history information.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Set-Printer-Attributes</TT></TD>
+	<TD>No</TD>
+	<TD>Sets printer or class information; CUPS uses
+	CUPS-Add-Modify-Printer and CUPS-Add-Modify-Class
+	instead.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Set-Job-Attributes</TT></TD>
+	<TD>Yes</TD>
+	<TD>Changes job options.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Get-Printer-Supported-Values</TT></TD>
+	<TD>No</TD>
+	<TD>Gets -supported attributes for a printer based on job
+	options.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Create-Printer-Subscription</TT></TD>
+	<TD>Yes</TD>
+	<TD>Creates an event subscription for a printer or the server.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Create-Job-Subscription</TT></TD>
+	<TD>Yes</TD>
+	<TD>Creates an event subscription for a job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Get-Subscription-Attributes</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets information for an event subscription.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Get-Subscriptions</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets a list of event subscriptions.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Renew-Subscription</TT></TD>
+	<TD>Yes</TD>
+	<TD>Renews an event subscription that is about to expire.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Cancel-Subscription</TT></TD>
+	<TD>Yes</TD>
+	<TD>Cancels an event subscription.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Get-Notifications</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets (pending) events for an event subscription.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Send-Notifications</TT></TD>
+	<TD>No</TD>
+	<TD>Sends events for an event subscription.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Get-Printer-Support-Files</TT></TD>
+	<TD>No</TD>
+	<TD>Gets printer driver files for a Novell client.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Enable-Printer</TT></TD>
+	<TD>Yes</TD>
+	<TD>Starts a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Disable-Printer</TT></TD>
+	<TD>Yes</TD>
+	<TD>Stops a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Pause-Printer-After-Current-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Stops a printer or class after the current job is finished.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Hold-New-Jobs</TT></TD>
+	<TD>No</TD>
+	<TD>Holds new jobs submitted to a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Release-Held-New-Jobs</TT></TD>
+	<TD>No</TD>
+	<TD>Releases jobs that were held because of the
+	Hold-New-Jobs operation.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Deactivate-Printer</TT></TD>
+	<TD>No</TD>
+	<TD>Deactivates a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Activate-Printer</TT></TD>
+	<TD>No</TD>
+	<TD>Activates a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Restart-Printer</TT></TD>
+	<TD>No</TD>
+	<TD>Restarts a printer or class, resuming print jobs as needed.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Shutdown-Printer</TT></TD>
+	<TD>No</TD>
+	<TD>Powers a printer or class off.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Startup-Printer</TT></TD>
+	<TD>No</TD>
+	<TD>Powers a printer or class on.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Reprocess-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Reprints a job on a different printer or class; CUPS has the
+	CUPS-Move-Job operation instead.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Cancel-Current-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Cancels the current job on a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Suspend-Current-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Stops the current job on a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Resume-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Resumes printing of a stopped job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Promote-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Prints a job before others.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Schedule-Job-After</TT></TD>
+	<TD>No</TD>
+	<TD>Prints a job after others.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Get-Default</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets the server/network default printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Get-Printers</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets a list of printers and/or classes.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Add-Modify-Printer</TT></TD>
+	<TD>Yes</TD>
+	<TD>Adds or modifies a printer.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Delete-Printer</TT></TD>
+	<TD>Yes</TD>
+	<TD>Removes a printer.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Get-Classes</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets a list of classes.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Add-Modify-Class</TT></TD>
+	<TD>Yes</TD>
+	<TD>Adds or modifies a class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Delete-Class</TT></TD>
+	<TD>Yes</TD>
+	<TD>Removes a class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Accept-Jobs</TT></TD>
+	<TD>Yes</TD>
+	<TD>Sets a printer's or class' printer-is-accepting-jobs
+	attribute to true.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Reject-Jobs</TT></TD>
+	<TD>Yes</TD>
+	<TD>Sets a printer's or class' printer-is-accepting-jobs
+	attribute to false.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Set-Default</TT></TD>
+	<TD>Yes</TD>
+	<TD>Sets the server/network default printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Get-Devices</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets a list of printer devices.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Get-PPDs</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets a list of printer drivers or manufacturers.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Move-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Moves a job to a different printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Authenticate-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Authenticates a job for printing.</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
+
+
+<H2 CLASS="title"><A NAME="CREATING">Creating Your Own Policies</A></H2>
+
+
+<H2 CLASS="title"><A NAME="DEFAULT">Setting the Default Policy</A></H2>
+
+
+<H2 CLASS="title"><A NAME="SETTING">Setting the Policy for a Printer</A></H2>
+
+
+</BODY>
+</HTML>

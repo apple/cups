@@ -153,6 +153,7 @@ HELPFILES	=	\
 			help/network.html \
 			help/options.html \
 			help/overview.html \
+			help/policies.html \
 			help/ref-access_log.html \
 			help/ref-classes-conf.html \
 			help/ref-client-conf.html \
