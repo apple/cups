@@ -793,6 +793,24 @@ cupsdReadConfiguration(void)
                   MaxClientsPerHost);
 
  /*
+  * Make sure that BrowseTimeout is at least twice the interval...
+  */
+
+  if (BrowseTimeout < (2 * BrowseInterval) || BrowseTimeout <= 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ALERT, "Invalid BrowseTimeout value %d!",
+                    BrowseTimeout);
+
+    if (BrowseInterval)
+      BrowseTimeout = BrowseInterval * 2;
+    else
+      BrowseTimeout = DEFAULT_TIMEOUT;
+
+    cupsdLogMessage(CUPSD_LOG_ALERT, "Reset BrowseTimeout to %d!",
+                    BrowseTimeout);
+  }
+
+ /*
   * Update the default policy, as needed...
   */
 
@@ -2969,7 +2987,12 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 		  n *= 262144;
 	      }
 
-	      *((int *)var->ptr) = n;
+              if (n < 0)
+		cupsdLogMessage(CUPSD_LOG_ERROR,
+	                	"Bad negative integer value for %s on line %d!",
+				line, linenum);
+	      else
+		*((int *)var->ptr) = n;
 	    }
 	    break;
 
