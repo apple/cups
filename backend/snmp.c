@@ -1203,7 +1203,7 @@ static int				/* O - Result of comparison */
 compare_cache(snmp_cache_t *a,		/* I - First cache entry */
               snmp_cache_t *b)		/* I - Second cache entry */
 {
-  return (a->address.ipv4.sin_addr.s_addr - b->address.ipv4.sin_addr.s_addr);
+  return (strcasecmp(a->addrname, b->addrname));
 }
 
 
@@ -1874,8 +1874,8 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   * Find a matching device in the cache...
   */
 
-  key.address = addr;
-  device      = (snmp_cache_t *)cupsArrayFind(Devices, &key);
+  key.addrname = addrname;
+  device       = (snmp_cache_t *)cupsArrayFind(Devices, &key);
 
  /*
   * Process the message...
