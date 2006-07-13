@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH lpadmin 8 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
+.TH lpadmin 8 "Common UNIX Printing System" "13 July 2006" "Easy Software Products"
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -123,6 +123,27 @@ Sets the default banner page(s) to use for print jobs.
 Sets the binary communications program to use when printing,
 "none", "bcp", or "tbcp". The default program is "none".
 .TP 5
+-o printer-error-policy=name
+.br
+Sets the error policy to be used when the printer backend is 
+unable to send the job to the printer. The name must be one of 
+"cancel-job", "retry-job" or "stop-printer". The default error 
+policy is "stop-printer".
+.TP 5
+-o printer-is-shared=true/false
+.br
+Sets the printer to shared/published or unshared/unpublished.
+Shared/published printers are publically announced by the server
+on the LAN based on the browsing configuration in
+\fBcupsd.conf\fR, while unshared/unpublished printers are not
+announced. The default value is "true".
+.TP 5
+-o printer-op-policy=name
+.br
+Sets the IPP operation policy associated with the printer. The
+name must be defined in the \fBcupsd.conf\fR in a Policy section.
+The default operation policy is "default".
+.TP 5
 -r class
 .br
 Removes the named \fIprinter\fR from \fIclass\fR.  If the
@@ -144,7 +165,8 @@ user-level access control off.
 .br
 Sets the \fIdevice-uri\fR attribute of the printer queue.  If
 \fIdevice-uri\fR is a filename it is automatically converted to
-the form \fIfile:///file/name\fR.
+the form \fIfile:///file/name\fR. Use the \fIlpinfo(8)\fR command
+to get a list of supported device URIs and schemes.
 .TP 5
 -D "info"
 .br
@@ -176,7 +198,8 @@ requires the root user to execute this command.
 The CUPS version of \fIlpadmin\fR does not support all of the
 System V or Solaris printing system configuration options.
 .SH SEE ALSO
-\fIaccept(8)\fR, \fIcupsenable(8)\fR, \fIlpoptions(1)\fR,
+\fIaccept(8)\fR, \fIcupsenable(8)\fR, \fIlpinfo(8)\fR,
+\fIlpoptions(1)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
