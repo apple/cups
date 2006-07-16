@@ -83,9 +83,9 @@ static http_status_t	install_conf_file(cupsd_client_t *con);
 static int		is_cgi(cupsd_client_t *con, const char *filename,
 		               struct stat *filestats, mime_type_t *type);
 static int		is_path_absolute(const char *path);
-#ifdef HAVE_GNUTLS
-static void		make_certificate(void);
-#endif /* HAVE_GNUTLS */
+#ifdef HAVE_SSL
+static int		make_certificate(void);
+#endif /* HAVE_SSL */
 static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 			             char *command, char *options, int root);
 static int		write_file(cupsd_client_t *con, http_status_t code,
@@ -2528,6 +2528,20 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
 
  /*
+  * Verify that we have a certificate...
+  */
+
+  if (access(ServerKey, 0) || access(ServerCertificate, 0))
+  {
+   /*
+    * Nope, make a self-signed certificate...
+    */
+
+    if (!make_certificate())
+      return (0);
+  }
+
+ /*
   * Create the SSL context and accept the connection...
   */
 
@@ -2579,7 +2593,8 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     * Nope, make a self-signed certificate...
     */
 
-    make_certificate();
+    if (!make_certificate())
+      return (0);
   }
 
  /*
@@ -2651,6 +2666,16 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   error            = 0;
   conn->session    = NULL;
   conn->certsArray = get_cdsa_server_certs();
+
+  if (!conn->certsArray)
+  {
+   /*
+    * No keychain (yet), make a self-signed certificate...
+    */
+
+    if (make_certificate())
+      conn->certsArray = get_cdsa_server_certs();
+  }
 
   if (!conn->certsArray)
   {
@@ -3316,14 +3341,92 @@ is_path_absolute(const char *path)	/* I - Input path */
 }
 
 
-#ifdef HAVE_GNUTLS
+#ifdef HAVE_SSL
 /*
  * 'make_certificate()' - Make a self-signed SSL/TLS certificate.
  */
 
-static void
+static int				/* O - 1 on success, 0 on failure */
 make_certificate(void)
 {
+#if defined(HAVE_LIBSSL) && defined(HAVE_WAITPID)
+  int	pid,				/* Process ID of command */
+	status;				/* Status of command */
+  char	command[1024],			/* Command */
+	*argv[11],			/* Command-line arguments */
+	*envp[MAX_ENV];			/* Environment variables */
+
+
+ /*
+  * Run the "openssl" command to generate a self-signed certificate
+  * that is good for 10 years:
+  *
+  *     openssl req -new -x509 -keyout ServerKey \
+  *             -out ServerCertificate -days 3650 -nodes
+  */
+
+  if (!cupsFileFind("openssl", getenv("PATH"), 1, command, sizeof(command)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "No SSL certificate and openssl command not found!");
+    return (0);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_INFO,
+                  "Generating SSL server key and certificate...");
+
+  argv[0]  = "openssl";
+  argv[1]  = "req";
+  argv[2]  = "-new";
+  argv[3]  = "-x509";
+  argv[4]  = "-keyout";
+  argv[5]  = ServerKey;
+  argv[6]  = "-out";
+  argv[7]  = ServerCertificate;
+  argv[8]  = "-days";
+  argv[9]  = "3650";
+  argv[10] = "-nodes";
+  argv[11] = NULL;
+
+  cupsdLoadEnv(envp, MAX_ENV);
+
+  if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, 1, &pid))
+    return (0);
+
+  while (waitpid(pid, &status, 0) < 0)
+    if (errno != EINTR)
+    {
+      status = 1;
+      break;
+    }
+
+  cupsdFinishProcess(pid, command, sizeof(command));
+
+  if (status)
+  {
+    if (WIFEXITED(status))
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to create SSL server key and certificate - "
+		      "the openssl command stopped with status %d!",
+	              WEXITSTATUS(status));
+    else
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to create SSL server key and certificate - "
+		      "the openssl command crashed on signal %d!",
+	              WTERMSIG(status));
+  }
+  else
+  {
+    cupsdLogMessage(CUPSD_LOG_INFO, "Created SSL server key file \"%s\"...",
+		    ServerKey);
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Created SSL server certificate file \"%s\"...",
+		    ServerCertificate);
+  }
+
+  return (!status);
+
+#elif defined(HAVE_GNUTLS)
   gnutls_x509_crt	crt;		/* Self-signed certificate */
   gnutls_x509_privkey	key;		/* Encryption key */
   cups_lang_t		*language;	/* Default language info */
@@ -3339,7 +3442,7 @@ make_certificate(void)
   * Create the encryption key...
   */
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Generating server key...");
+  cupsdLogMessage(CUPSD_LOG_INFO, "Generating SSL server key...");
 
   gnutls_x509_privkey_init(&key);
   gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, 2048, 0);
@@ -3353,33 +3456,33 @@ make_certificate(void)
   if ((result = gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM,
                                            buffer, &bytes)) < 0)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to export server key - %s",
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to export SSL server key - %s",
                     gnutls_strerror(result));
     gnutls_x509_privkey_deinit(key);
-    return;
+    return (0);
   }
   else if ((fp = cupsFileOpen(ServerKey, "w")) != NULL)
   {
     cupsFileWrite(fp, (char *)buffer, bytes);
     cupsFileClose(fp);
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "Created server key file \"%s\"...",
+    cupsdLogMessage(CUPSD_LOG_INFO, "Created SSL server key file \"%s\"...",
 		    ServerKey);
   }
   else
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create server key file \"%s\" - %s",
+                    "Unable to create SSL server key file \"%s\" - %s",
 		    ServerKey, strerror(errno));
     gnutls_x509_privkey_deinit(key);
-    return;
+    return (0);
   }
 
  /*
   * Create the self-signed certificate...
   */
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Generating self-signed certificate...");
+  cupsdLogMessage(CUPSD_LOG_INFO, "Generating self-signed SSL certificate...");
 
   language  = cupsLangDefault();
   curtime   = time(NULL);
@@ -3432,7 +3535,7 @@ make_certificate(void)
   if ((result = gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM,
                                        buffer, &bytes)) < 0)
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to export server certificate - %s",
+                    "Unable to export SSL server certificate - %s",
 		    gnutls_strerror(result));
   else if ((fp = cupsFileOpen(ServerCertificate, "w")) != NULL)
   {
@@ -3440,12 +3543,12 @@ make_certificate(void)
     cupsFileClose(fp);
 
     cupsdLogMessage(CUPSD_LOG_INFO,
-                    "Created 10-year server certificate file \"%s\"...",
+                    "Created SSL server certificate file \"%s\"...",
 		    ServerCertificate);
   }
   else
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create server certificate file \"%s\" - %s",
+                    "Unable to create SSL server certificate file \"%s\" - %s",
 		    ServerCertificate, strerror(errno));
 
  /*
@@ -3454,8 +3557,83 @@ make_certificate(void)
 
   gnutls_x509_crt_deinit(crt);
   gnutls_x509_privkey_deinit(key);
+
+  return (1);
+
+#elif defined(HAVE_CDSASSL) && defined(HAVE_WAITPID)
+  int	pid,				/* Process ID of command */
+	status;				/* Status of command */
+  char	command[1024],			/* Command */
+	keychain[1024],			/* Keychain argument */
+	*argv[5],			/* Command-line arguments */
+	*envp[MAX_ENV];			/* Environment variables */
+
+
+ /*
+  * Run the "certtool" command to generate a self-signed certificate:
+  *
+  *     certtool c Z k=ServerCertificate
+  */
+
+  if (!cupsFileFind("certtool", getenv("PATH"), 1, command, sizeof(command)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "No SSL certificate and certtool command not found!");
+    return (0);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_INFO,
+                  "Generating SSL server key and certificate...");
+
+  snprintf(keychain, sizeof(keychain), "k=%s", ServerCertificate);
+
+  argv[0] = "certtool";
+  argv[1] = "c";
+  argv[2] = "Z";
+  argv[3] = keychain;
+  argv[4] = NULL;
+
+  cupsdLoadEnv(envp, MAX_ENV);
+
+  if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, 1, &pid))
+    return (0);
+
+  while (waitpid(pid, &status, 0) < 0)
+    if (errno != EINTR)
+    {
+      status = 1;
+      break;
+    }
+
+  cupsdFinishProcess(pid, command, sizeof(command));
+
+  if (status)
+  {
+    if (WIFEXITED(status))
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to create SSL server key and certificate - "
+		      "the certtool command stopped with status %d!",
+	              WEXITSTATUS(status));
+    else
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to create SSL server key and certificate - "
+		      "the certtool command crashed on signal %d!",
+	              WTERMSIG(status));
+  }
+  else
+  {
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Created SSL server certificate file \"%s\"...",
+		    ServerCertificate);
+  }
+
+  return (!status);
+
+#else
+  return (0);
+#endif /* HAVE_LIBSSL && HAVE_WAITPID */
 }
-#endif /* HAVE_GNUTLS */
+#endif /* HAVE_SSL */
 
 
 /*
