@@ -122,6 +122,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		status;			/* Status of tests... */
   const char	*uri;			/* URI to use */
   const char	*testfile;		/* Test file to use */
+  int		interval;		/* Test interval */
 
 
  /*
@@ -133,6 +134,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   uri      = NULL;
   testfile = NULL;
   status   = 0;
+  interval = 0;
 
   for (i = 1; i < argc; i ++)
   {
@@ -140,6 +142,15 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       if (!strcmp(argv[i], "-v"))
         Verbosity ++;
+      else if (!strcmp(argv[i], "-i"))
+      {
+        i++;
+
+	if (i >= argc)
+	  usage(NULL);
+	else
+	  interval = atoi(argv[i]);
+      }
       else
         usage(argv[i]);
     }
@@ -172,6 +183,19 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (!uri || !testfile)
     usage(NULL);
+
+ /*
+  * Loop if the interval is set...
+  */
+
+  if (interval)
+  {
+    for (;;)
+    {
+      sleep(interval);
+      do_tests(uri, testfile);
+    }
+  }
 
  /*
   * Exit...
@@ -890,7 +914,8 @@ usage(const char *option)		/* I - Option string or NULL */
   fputs("Usage: ipptest [options] URL testfile [ ... testfileN ]\n", stderr);
   fputs("Options:\n", stderr);
   fputs("\n", stderr);
-  fputs("-v     Show all attributes in response, even on success.\n", stderr);
+  fputs("-i N    Repeat the last test file once every N seconds.\n", stderr);
+  fputs("-v      Show all attributes in response, even on success.\n", stderr);
 
   exit(1);
 }
