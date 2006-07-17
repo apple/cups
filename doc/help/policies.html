@@ -39,8 +39,18 @@ rules inside it. <A HREF="#LISTING01">Listing 1</A> shows the
 default operation policy, appropriately called "default", that is
 shipped with CUPS.</P>
 
+<P>The easiest way to add a policy to the <VAR>cupsd.conf</VAR>
+file is to use the web interface. Click on the
+<VAR>Administration</VAR> tab and then the <VAR>Edit
+Configuration File</VAR> button to edit the current
+<VAR>cupsd.conf</VAR> file. Click on the <VAR>Save Changes</VAR>
+button to save the changes and restart the scheduler. If you edit
+the <VAR>cupsd.conf</VAR> file from the console, make sure to <A
+HREF="ref-cupsd-conf.html">restart the cupsd process</A> before
+trying to use the new policy.</P>
+
 <PRE CLASS="command">
-<A NAME="LISTING01"><EM>Listing 1: Default Operation Policy</EM></A>
+<EM>Listing 1: <A NAME="LISTING01">Default Operation Policy</A></EM>
 
  1    &lt;Policy default>
  2      # Job-related operations must be done by the owner or an
@@ -82,6 +92,8 @@ shipped with CUPS.</P>
 23      &lt;/Limit>
 24    &lt;/Policy>
 </PRE>
+
+<H3>The Default CUPS Operation Policy</H3>
 
 <P>The policy definition starts with an opening <TT>Policy</TT>
 directive:</P>
@@ -487,12 +499,179 @@ without a username or authentication:</P>
 
 <H2 CLASS="title"><A NAME="CREATING">Creating Your Own Policies</A></H2>
 
+<P>The easiest way to create a new policy is to start with the
+default policy and then make changes to the copy. The first
+change you'll make is to give the policy a new name. Policy names
+can use the same characters as a printer name, specifically all
+printable characters except space, slash (/), and pound (#):</P>
 
-<H2 CLASS="title"><A NAME="DEFAULT">Setting the Default Policy</A></H2>
+<PRE CLASS="command">
+&lt;Policy mypolicy>
+</PRE>
+
+<P>Then you need to decide exactly what limits you want for the
+policy. For example, if you want to allow any user to cancel any
+other users' jobs, you can change the <TT>Cancel-Job</TT> limits
+to:</P>
+
+<PRE CLASS="command">
+&lt;Limit Cancel-Job>
+  Order deny,allow
+&lt;/Limit>
+</PRE>
+
+<P>The directives inside the <TT>Limit</TT> subsection can use
+any of the normal limiting directives: <A
+HREF="ref-cupsd-conf.html#Allow"><TT>Allow</TT></A>, <A
+HREF="ref-cupsd-conf.html#AuthType"><TT>AuthType</TT></A>, <A
+HREF="ref-cupsd-conf.html#Deny"><TT>Deny</TT></A>, <A
+HREF="ref-cupsd-conf.html#Encryption"><TT>Encryption</TT></A>, <A
+HREF="ref-cupsd-conf.html#Require"><TT>Require</TT></A>, and <A
+HREF="ref-cupsd-conf.html#Satisfy"><TT>Satisfy</TT></A>. <A
+HREF="#TABLE02">Table 2</A> lists some basic "recipes" for
+different access control rules.</P>
+
+<DIV CLASS="table"><TABLE WIDTH="80%" SUMMARY="Access Control Recipes">
+<CAPTION>Table 2: <A NAME="TABLE02">Access Control Recipes</A></CAPTION>
+<THEAD>
+<TR>
+	<TH>Access Level</TH>
+	<TH>Directives to Use</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD>Allow Everyone</TD>
+	<TD><PRE>Order deny,allow
+Allow from all</PRE></TD>
+</TR>
+<TR>
+	<TD>Allow Everyone on the Local Network</TD>
+	<TD><PRE>Order deny,allow
+Allow from @LOCAL</PRE></TD>
+</TR>
+<TR>
+	<TD>Deny Everyone/Disable Operation(s)</TD>
+	<TD><PRE>Order allow,deny
+Deny from all</PRE></TD>
+</TR>
+<TR>
+	<TD>Require Login (System) Password</TD>
+	<TD><PRE>AuthType Basic</PRE></TD>
+</TR>
+<TR>
+	<TD>Require CUPS (lppasswd) Password</TD>
+	<TD><PRE>AuthType BasicDigest</PRE></TD>
+</TR>
+<TR>
+	<TD>Require the Owner of a Job or Subscription</TD>
+	<TD><PRE>Require user @OWNER</PRE></TD>
+</TR>
+<TR>
+	<TD>Require an Administrative User</TD>
+	<TD><PRE>Require user @SYSTEM</PRE></TD>
+</TR>
+<TR>
+	<TD>Require Member of Group "foogroup"</TD>
+	<TD><PRE>Require user @foogroup</PRE></TD>
+</TR>
+<TR>
+	<TD>Require "john" or "mary"</TD>
+	<TD><PRE>Require user john mary</PRE></TD>
+</TR>
+<TR>
+	<TD>Require Encryption</TD>
+	<TD><PRE>Encryption Required</PRE></TD>
+</TR>
+</TABLE></DIV>
 
 
-<H2 CLASS="title"><A NAME="SETTING">Setting the Policy for a Printer</A></H2>
+<H3>Creating a Policy for a Computer Lab</H3>
 
+<P>One common operating scenario is a computer lab. The lab is
+managed by one or more technicians that assist the users of the
+lab and handle the basic administration tasks. <A
+HREF="#LISTING02">Listing 2</A> shows an operation policy that
+only allows access from the lab's subnet, 10.0.2.x, and allows
+the lab technicians, who are members of a special UNIX group for
+that lab called "lab999", to do job, printer, and subscription
+management operations.</P>
+
+<PRE CLASS="command">
+<EM>Listing 2: <A NAME="LISTING02">Operation Policy for a Lab</A></EM>
+
+ 1    &lt;Policy lab999>
+ 2      # Job- and subscription-related operations must be done
+      by the owner, a lab technician, or an adminstrator...
+ 3      &lt;Limit Send-Document Send-URI Hold-Job Release-Job
+      Restart-Job Purge-Jobs Set-Job-Attributes
+      Create-Job-Subscription Renew-Subscription
+      Cancel-Subscription Get-Notifications Reprocess-Job
+      Cancel-Current-Job Suspend-Current-Job Resume-Job
+      CUPS-Move-Job Cancel-Job CUPS-Authenticate-Job>
+ 4        Require user @OWNER @lab999 @SYSTEM
+ 5        Order allow,deny
+ 6        Allow from 10.0.2.0/24
+ 7      &lt;/Limit>
+ 8    
+ 9      # All administration operations require a lab technician
+      or an adminstrator to authenticate...
+10      &lt;Limit Pause-Printer Resume-Printer
+      Set-Printer-Attributes Enable-Printer Disable-Printer
+      Pause-Printer-After-Current-Job Hold-New-Jobs
+      Release-Held-New-Jobs Deactivate-Printer Activate-Printer
+      Restart-Printer Shutdown-Printer Startup-Printer
+      Promote-Job Schedule-Job-After CUPS-Accept-Jobs
+      CUPS-Reject-Jobs CUPS-Set-Default>
+11        AuthType Basic
+12        Require user @lab999 @SYSTEM
+13        Order allow,deny
+14        Allow from 10.0.2.0/24
+15      &lt;/Limit>
+16
+17      # All other operations are allowed from the lab network...
+18      &lt;Limit All>
+19        Order allow,deny
+20        Allow from 10.0.2.0/24
+21      &lt;/Limit>
+22    &lt;/Policy>
+</PRE>
+
+
+<H2 CLASS="title"><A NAME="SELECT">Using Policies</A></H2>
+
+<P>Once you have created a policy, you can use it in two ways.
+The first way is to assign it as the default policy for the
+system using the <A
+HREF="ref-cupsd-conf.html#DefaultPolicy"><TT>DefaultPolicy</TT></A>
+directive in the <VAR>cupsd.conf</VAR> file. For example, add the
+following line to the <VAR>cupsd.conf</VAR> file to use the
+"lab999" policy from the previous section:</P>
+
+<PRE CLASS="command">
+DefaultPolicy lab999
+</PRE>
+
+<P>To associate the policy with one or more printers, use either
+the <A HREF="man-lpadmin.html">lpadmin(8)</A> command or the web
+interface to change the operation policy for each printer. When
+using the <B>lpadmin</B> command, the <TT>-o
+printer-op-policy=name</TT> option sets the operation policy for
+a printer. For example, enter the following command to use the
+"lab999" policy from the previous section with a printer named
+"LaserJet4000":</P>
+
+<PRE CLASS="command">
+lpadmin -p LaserJet4000 -o printer-op-policy=lab999
+</PRE>
+
+<P>To make the same change in the web interface, go to the
+printer's web page, for example
+"http://localhost:631/printers/LaserJet4000", and click on the
+<VAR>Set Printer Options</VAR> button. Scroll down to the bottom
+of the page and choose the desired policy from the pull-down
+list. Click on <VAR>Save Changes</VAR> to change the policy for
+the printer.</P>
 
 </BODY>
 </HTML>
