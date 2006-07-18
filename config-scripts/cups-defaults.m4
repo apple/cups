@@ -24,9 +24,9 @@ dnl         WWW: http://www.cups.org
 dnl
 
 dnl Default langugages...
-AC_ARG_WITH(languages, [  --with-languages        set installed languages, default="es ja" ],
+AC_ARG_WITH(languages, [  --with-languages        set installed languages, default="de es ja pl sv" ],
 	LANGUAGES="$withval",
-	LANGUAGES="es ja pl sv")
+	LANGUAGES="de es ja pl sv")
 AC_SUBST(LANGUAGES)
 
 dnl Default ConfigFilePerm

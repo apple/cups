@@ -76,6 +76,11 @@ Summary: Common UNIX Printing System - LPD support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version} xinetd
 
+%package de
+Summary: Common UNIX Printing System - German support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package es
 Summary: Common UNIX Printing System - Spanish support
 Group: System Environment/Daemons
@@ -372,6 +377,16 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/daemon/cups-lpd
 %dir /usr/share/man/man8
 /usr/share/man/man8/cups-lpd.8.gz
+
+%files de
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/de
+/usr/share/doc/cups/de/index.html
+%dir /usr/share/doc/cups/de/images
+/usr/share/doc/cups/de/images/*
+%dir /usr/share/cups/templates/de
+/usr/share/cups/templates/de/*
+/usr/share/locale/de/cups_de.po
 
 %files es
 %defattr(-,root,root)
