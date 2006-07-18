@@ -3,7 +3,7 @@
  *
  *   Polling daemon for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -24,6 +24,7 @@
  * Contents:
  *
  *   main()        - Open sockets and poll until we are killed...
+ *   dequote()     - Remote quotes from a string.
  *   poll_server() - Poll the server for the given set of printers or classes.
  */
 
@@ -43,8 +44,8 @@
  * Local functions...
  */
 
-static int	poll_server(http_t *http, cups_lang_t *language, ipp_op_t op,
-		            int sock, int port, int interval,
+static char	*dequote(char *d, const char *s, int dlen);
+static int	poll_server(http_t *http, int sock, int port, int interval,
 			    const char *prefix);
 
 
@@ -53,18 +54,17 @@ static int	poll_server(http_t *http, cups_lang_t *language, ipp_op_t op,
  */
 
 int					/* O - Exit status */
-main(int  argc,				/* I - Number of command-line arguments */
+main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  http_t		*http;		/* HTTP connection */
-  cups_lang_t		*language;	/* Language info */
-  int			interval;	/* Polling interval */
-  int			sock;		/* Browser sock */
-  int			port;		/* Browser port */
-  int			val;		/* Socket option value */
-  int			seconds,	/* Seconds left from poll */
-			remain;		/* Total remaining time to sleep */
-  char			prefix[1024];	/* Prefix for log messages */
+  http_t	*http;			/* HTTP connection */
+  int		interval;		/* Polling interval */
+  int		sock;			/* Browser sock */
+  int		port;			/* Browser port */
+  int		val;			/* Socket option value */
+  int		seconds,		/* Seconds left from poll */
+		remain;			/* Total remaining time to sleep */
+  char		prefix[1024];		/* Prefix for log messages */
 
 
  /*
@@ -128,25 +128,22 @@ main(int  argc,				/* I - Number of command-line arguments */
     fprintf(stderr, "ERROR: %s Unable to connect to %s on port %s: %s\n",
             prefix, argv[1], argv[2],
 	    h_errno ? hstrerror(h_errno) : strerror(errno));
-    sleep (interval);
+    sleep(interval);
   }
 
  /*
   * Loop forever, asking for available printers and classes...
   */
 
-  language = cupsLangDefault();
-
   for (;;)
   {
    /*
-    * Get the printers, then the classes...
+    * Get the printers and classes...
     */
 
     remain = interval;
 
-    if ((seconds = poll_server(http, language, CUPS_GET_PRINTERS, sock, port,
-                               interval, prefix)) > 0)
+    if ((seconds = poll_server(http, sock, port, interval, prefix)) > 0)
       remain -= seconds;
 
    /*
@@ -160,13 +157,41 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
+ * 'dequote()' - Remote quotes from a string.
+ */
+
+static char *				/* O - Dequoted string */
+dequote(char       *d,			/* I - Destination string */
+        const char *s,			/* I - Source string */
+	int        dlen)		/* I - Destination length */
+{
+  char	*dptr;				/* Pointer into destination */
+
+
+  if (s)
+  {
+    for (dptr = d, dlen --; *s && dlen > 0; s ++)
+      if (*s != '\"')
+      {
+	*dptr++ = *s;
+	dlen --;
+      }
+
+    *dptr = '\0';
+  }
+  else
+    *d = '\0';
+
+  return (d);
+}
+
+
+/*
  * 'poll_server()' - Poll the server for the given set of printers or classes.
  */
 
 static int				/* O - Number of seconds or -1 on error */
 poll_server(http_t      *http,		/* I - HTTP connection */
-            cups_lang_t *language,	/* I - Language */
-	    ipp_op_t    op,		/* I - Operation code */
 	    int         sock,		/* I - Broadcast sock */
 	    int         port,		/* I - Broadcast port */
 	    int         interval,	/* I - Polling interval */
@@ -178,10 +203,12 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   ipp_t			*request,	/* Request data */
 			*response;	/* Response data */
   ipp_attribute_t	*attr;		/* Current attribute */
-  const char		*uri,		/* printer-uri */
-			*info,		/* printer-info */
-			*location,	/* printer-location */
-			*make_model;	/* printer-make-and-model */
+  const char		*uri;		/* printer-uri */
+  char			info[1024],	/* printer-info */
+			job_sheets[1024],/* job-sheets-default */
+			location[1024],	/* printer-location */
+			make_model[1024];
+					/* printer-make-and-model */
   cups_ptype_t		type;		/* printer-type */
   ipp_pstate_t		state;		/* printer-state */
   int			accepting;	/* printer-is-accepting-jobs */
@@ -189,6 +216,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   char			packet[1540];	/* Data packet */
   static const char * const attrs[] =	/* Requested attributes */
 			{
+			  "job-sheets-default",
 			  "printer-info",
 			  "printer-is-accepting-jobs",
 			  "printer-location",
@@ -210,20 +238,12 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   addr.sin_port        = htons(port);
 
  /*
-  * Build a CUPS_GET_PRINTERS or CUPS_GET_CLASSES request, which requires
-  * only the attributes-charset and attributes-natural-language attributes.
+  * Build a CUPS_GET_PRINTERS request and pass along a list of the
+  * attributes we are interested in along with the types of printers
+  * (and classes) we want.
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = op;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(CUPS_GET_PRINTERS);
 
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", sizeof(attrs) / sizeof(attrs[0]),
@@ -240,17 +260,18 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
-  {
-    if (response->request.status.status_code > IPP_OK_CONFLICT)
-    {
-      fprintf(stderr, "ERROR: %s get-%s failed: %s\n", prefix,
-              op == CUPS_GET_PRINTERS ? "printers" : "classes",
-              ippErrorString(response->request.status.status_code));
-      ippDelete(response);
-      return (-1);
-    }
+  response = cupsDoRequest(http, request, "/");
 
+  if (cupsLastError() > IPP_OK_CONFLICT)
+  {
+    fprintf(stderr, "ERROR: %s CUPS-Get-Printers failed: %s\n", prefix,
+            cupsLastErrorString());
+    ippDelete(response);
+    return (-1);
+  }
+
+  if (response)
+  {
    /*
     * Figure out how many printers/classes we have...
     */
@@ -261,8 +282,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	 attr = ippFindNextAttribute(response, "printer-name", IPP_TAG_NAME),
 	     max_count ++);
 
-    fprintf(stderr, "DEBUG: %s found %d %s.\n", prefix, max_count,
-            op == CUPS_GET_PRINTERS ? "printers" : "classes");
+    fprintf(stderr, "DEBUG: %s Found %d printers.\n", prefix, max_count);
 
     count     = 0;
     seconds   = time(NULL);
@@ -272,58 +292,65 @@ poll_server(http_t      *http,		/* I - HTTP connection */
     * Loop through the printers or classes returned in the list...
     */
 
-    for (attr = response->attrs; attr != NULL; attr = attr->next)
+    for (attr = response->attrs; attr; attr = attr->next)
     {
      /*
       * Skip leading attributes until we hit a printer...
       */
 
-      while (attr != NULL && attr->group_tag != IPP_TAG_PRINTER)
+      while (attr && attr->group_tag != IPP_TAG_PRINTER)
         attr = attr->next;
 
-      if (attr == NULL)
+      if (!attr)
         break;
 
      /*
       * Pull the needed attributes from this printer...
       */
 
-      uri        = NULL;
-      info       = "";
-      location   = "";
-      make_model = "";
-      type       = CUPS_PRINTER_REMOTE;
-      accepting  = 1;
-      state      = IPP_PRINTER_IDLE;
+      uri           = NULL;
+      info[0]       = '\0';
+      job_sheets[0] = '\0';
+      location[0]   = '\0';
+      make_model[0] = '\0';
+      type          = CUPS_PRINTER_REMOTE;
+      accepting     = 1;
+      state         = IPP_PRINTER_IDLE;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (strcmp(attr->name, "printer-uri-supported") == 0 &&
-	    attr->value_tag == IPP_TAG_URI)
+        if (!strcmp(attr->name, "job-sheets-default") &&
+	    (attr->value_tag == IPP_TAG_NAME ||
+	     attr->value_tag == IPP_TAG_KEYWORD))
+	{
+	  if (attr->num_values == 1)
+	    snprintf(job_sheets, sizeof(job_sheets), " job-sheets=%s",
+	             attr->values[0].string.text);
+          else
+	    snprintf(job_sheets, sizeof(job_sheets), " job-sheets=%s,%s",
+	             attr->values[0].string.text,
+	             attr->values[1].string.text);
+	}
+        else if (!strcmp(attr->name, "printer-uri-supported") &&
+	         attr->value_tag == IPP_TAG_URI)
 	  uri = attr->values[0].string.text;
-
-        if (strcmp(attr->name, "printer-info") == 0 &&
-	    attr->value_tag == IPP_TAG_TEXT)
-	  info = attr->values[0].string.text;
-
-        if (strcmp(attr->name, "printer-is-accepting-jobs") == 0 &&
-	    attr->value_tag == IPP_TAG_BOOLEAN)
+        else if (!strcmp(attr->name, "printer-info") &&
+		 attr->value_tag == IPP_TAG_TEXT)
+	  dequote(info, attr->values[0].string.text, sizeof(info));
+        else if (!strcmp(attr->name, "printer-is-accepting-jobs") &&
+	         attr->value_tag == IPP_TAG_BOOLEAN)
 	  accepting = attr->values[0].boolean;
-
-        if (strcmp(attr->name, "printer-location") == 0 &&
-	    attr->value_tag == IPP_TAG_TEXT)
-	  location = attr->values[0].string.text;
-
-        if (strcmp(attr->name, "printer-make-and-model") == 0 &&
-	    attr->value_tag == IPP_TAG_TEXT)
-	  make_model = attr->values[0].string.text;
-
-        if (strcmp(attr->name, "printer-state") == 0 &&
-	    attr->value_tag == IPP_TAG_ENUM)
+        else if (!strcmp(attr->name, "printer-location") &&
+	         attr->value_tag == IPP_TAG_TEXT)
+	  dequote(location, attr->values[0].string.text, sizeof(location));
+        else if (!strcmp(attr->name, "printer-make-and-model") &&
+	         attr->value_tag == IPP_TAG_TEXT)
+	  dequote(make_model, attr->values[0].string.text, sizeof(location));
+        else if (!strcmp(attr->name, "printer-state") &&
+	         attr->value_tag == IPP_TAG_ENUM)
 	  state = (ipp_pstate_t)attr->values[0].integer;
-
-        if (strcmp(attr->name, "printer-type") == 0 &&
-	    attr->value_tag == IPP_TAG_ENUM)
+        else if (!strcmp(attr->name, "printer-type") &&
+	         attr->value_tag == IPP_TAG_ENUM)
 	  type = (cups_ptype_t)attr->values[0].integer;
 
         attr = attr->next;
@@ -350,8 +377,10 @@ poll_server(http_t      *http,		/* I - HTTP connection */
       if (!accepting)
 	type |= CUPS_PRINTER_REJECTING;
 
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\"\n",
-               type, state, uri, location, info, make_model);
+      snprintf(packet, sizeof(packet),
+               "%x %x %s \"%s\" \"%s\" \"%s\" lease-duration=%d%s\n",
+               type, state, uri, location, info, make_model, interval * 2,
+	       job_sheets);
 
       fprintf(stderr, "DEBUG2: %s Sending %s", prefix, packet);
 
@@ -376,21 +405,15 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	*/
 
 	count = 0;
+
 	sleep(1);
       }
 
-      if (attr == NULL)
+      if (!attr)
         break;
     }
 
     ippDelete(response);
-  }
-  else
-  {
-    fprintf(stderr, "ERROR: %s get-%s failed: %s\n", prefix,
-            op == CUPS_GET_PRINTERS ? "printers" : "classes",
-            ippErrorString(cupsLastError()));
-    return (-1);
   }
 
  /*
