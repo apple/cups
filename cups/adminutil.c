@@ -1681,8 +1681,9 @@ do_samba_command(const char *command,	/* I - Command to run */
   {
     status = -1;
 
-    _cupsLangPrintf(stderr, _("cupsaddsmb: Unable to run \"%s\": %s\n"),
-                    command, strerror(errno));
+    if (logfile)
+      _cupsLangPrintf(logfile, _("Unable to run \"%s\": %s\n"),
+                      command, strerror(errno));
   }
   else
   {
