@@ -3,6 +3,69 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.2
 
+	- Documentation updates (STR #1765, STR #1780)
+	- CUPS didn't know about alternate character set names
+	  for Asian text (STR #1819)
+	- The lpoptions -o and -r options did not work unless you
+	  specified a printer.
+	- The lpoptions command incorrectly allowed users to set
+	  printer attributes like printer-type (STR #1791)
+	- httpWait() did not flush the write buffer, causing "bad
+	  request" errors when communicating with CUPS 1.1.x
+	  servers (STR #1717)
+	- Polling did not sanitize the printer description,
+	  location, or make and model strings like broadcasts
+	  did.
+	- Polled printers did not show the server's default
+	  job-sheets option value.
+	- The Samba password prompt was not properly localized
+	  (STR #1814)
+	- Added a German translation (STR #1842)
+	- The scheduler now creates self-signed SSL certficates
+	  automatically when using OpenSSL and CDSA for
+	  encryption, just as for GNU TLS.
+	- The SNMP backend sporatically reported some printers as
+	  "unknown" (STR #1774)
+	- The scheduler now forces BrowseTimeout to be at least
+	  twice the BrowseInterval value and non-zero to avoid
+	  common configuration errors.
+	- The scheduler incorrectly returned printer URIs of the
+	  form "ipp://server/printers/classname" for classes (STR
+	  #1813)
+	- Updated Japanese localization (STR #1805)
+	- The scheduler's SSL certificate/key directory was not
+	  created on installation (STR #1788)
+	- Added a mailto.conf man page and help page (STR #1754)
+	- The parallel and USB backends no longer wait for the
+	  printer to go on-line - this caused problems with
+	  certain printers that don't follow with the IEEE-1284
+	  standard (STR #1738)
+	- The scheduler could crash on a reload when implicit
+	  classes were present (STR #1828)
+	- The IPP backend incorrectly used the CUPS_ENCRYPTION
+	  environment variable to determine the default
+	  encryption mode when printing (STR #1820)
+	- USB printing did not work on Solaris (STR #1756)
+	- The scheduler sorted job priorities in the wrong order
+	  (STR #1811)
+	- The scheduler did not automatically restart notifiers
+	  that exited or crashed (STR #1793)
+	- IPv6 support did not work on NetBSD (STR #1834)
+	- The EPM packaging file did not work (STR #1804)
+	- The scheduler used up the CPU if BrowseRemoteProtocols
+	  was empty (STR #1792)
+	- Custom page sizes did not work (STR #1787)
+	- The SNMP backend could crash on some systems when SNMP
+	  logging was enabled (STR #1789)
+	- Browsing could produce some funny printer names when
+	  ServerName was set to an IP address (STR #1799)
+	- Fixed the log message for BrowseRelay (STR #1798)
+	- Fixes to allow CUPS to compile on MirBSD (STR #1796)
+	- The scheduler incorrectly set the FINAL_CONTENT_TYPE
+	  environment variable (STR #1795)
+	- The pdftops filter incorrectly embedded a "produced by"
+	  comment, causing PDF printing not to work on some
+	  operating systems (STR #1801)
 	- Sending raw jobs from a client system could cause the
 	  client's scheduler to eventually crash (STR #1786)
 	- The scheduler now checks that the notifier exists prior
