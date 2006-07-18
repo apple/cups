@@ -1809,6 +1809,16 @@ httpWait(http_t *http,			/* I - HTTP connection */
     return (1);
 
  /*
+  * Flush pending data, if any...
+  */
+
+  if (http->wused)
+  {
+    if (httpFlushWrite(http) < 0)
+      return (0);
+  }
+
+ /*
   * If not, check the SSL/TLS buffers and do a select() on the connection...
   */
 
