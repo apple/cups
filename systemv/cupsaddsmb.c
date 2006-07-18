@@ -249,7 +249,9 @@ export_dest(http_t     *http,		/* I - Connection to server */
     if (!SAMBAPassword)
     {
       snprintf(prompt, sizeof(prompt),
-               _("Password for %s required to access %s via SAMBA: "),
+               _cupsLangString(cupsLangDefault(),
+	                       _("Password for %s required to access %s via "
+			         "SAMBA: ")),
 	       SAMBAUser, SAMBAServer);
 
       if ((SAMBAPassword = cupsGetPassword(prompt)) == NULL)
