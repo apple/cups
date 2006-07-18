@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <cups/string.h>
 #include <errno.h>
-#include "ipp.h"
+#include "ipp-private.h"
 #ifdef WIN32
 #  include <io.h>
 #else
@@ -281,6 +281,19 @@ main(int  argc,			/* I - Number of command-line arguments */
       puts("PASS");
 
     ippDelete(request);
+
+   /*
+    * Test _ippFindOption() private API...
+    */
+
+    fputs("_ippFindOption(\"printer-type\"): ", stdout);
+    if (_ippFindOption("printer-type"))
+      puts("PASS");
+    else
+    {
+      puts("FAIL");
+      status = 1;
+    }
 
    /*
     * Summarize...

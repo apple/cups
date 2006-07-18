@@ -456,6 +456,7 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
   int		wrote;			/* Wrote definition? */
   cups_dest_t	*dest;			/* Current destination */
   cups_option_t	*option;		/* Current option */
+  _ipp_option_t	*match;			/* Matching attribute for option */
   FILE		*fp;			/* File pointer */
   const char	*home;			/* HOME environment variable */
   char		filename[1024];		/* lpoptions file */
@@ -568,16 +569,23 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
       for (j = dest->num_options, option = dest->options; j > 0; j --, option ++)
       {
        /*
+        * See if this option is a printer attribute; if so, skip it...
+	*/
+
+        if ((match = _ippFindOption(option->name)) != NULL &&
+	    match->group_tag == IPP_TAG_PRINTER)
+	  continue;
+
+       /*
 	* See if the server/global options match these; if so, don't
 	* write 'em.
 	*/
 
-        if (temp && (val = cupsGetOption(option->name, temp->num_options,
-	                                 temp->options)) != NULL)
-	{
-	  if (!strcasecmp(val, option->value))
-	    continue;
-	}
+        if (temp &&
+	    (val = cupsGetOption(option->name, temp->num_options,
+	                         temp->options)) != NULL &&
+            !strcasecmp(val, option->value))
+	  continue;
 
        /*
         * Options don't match, write to the file...
@@ -593,10 +601,35 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
         
         if (option->value[0])
 	{
-	  if (strchr(option->value, ' ') != NULL)
-	    fprintf(fp, " %s=\"%s\"", option->name, option->value);
-          else
+	  if (strchr(option->value, ' ') ||
+	      strchr(option->value, '\\') ||
+	      strchr(option->value, '\"') ||
+	      strchr(option->value, '\''))
+	  {
+	   /*
+	    * Quote the value...
+	    */
+
+	    fprintf(fp, " %s=\"", option->name);
+
+	    for (val = option->value; *val; val ++)
+	    {
+	      if (strchr("\"\'\\", *val))
+	        putc('\\', fp);
+
+              putc(*val, fp);
+	    }
+
+	    putc('\"', fp);
+          }
+	  else
+	  {
+	   /*
+	    * Store the literal value...
+	    */
+
 	    fprintf(fp, " %s=%s", option->name, option->value);
+          }
 	}
 	else
 	  fprintf(fp, " %s", option->name);
