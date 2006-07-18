@@ -164,6 +164,21 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	case 'o' : /* -o option[=value] */
+            if (dest == NULL)
+	    {
+	      if (num_dests == 0)
+		num_dests = cupsGetDests(&dests);
+
+	      if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
+	        dest = dests;
+
+	      for (j = 0; j < dest->num_options; j ++)
+		if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+		  num_options = cupsAddOption(dest->options[j].name,
+	                                      dest->options[j].value,
+	                                      num_options, &options);
+	    }
+
 	    if (argv[i][2])
 	      num_options = cupsParseOptions(argv[i] + 2, num_options, &options);
 	    else
@@ -219,6 +234,21 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	case 'r' : /* -r option (remove) */
+            if (dest == NULL)
+	    {
+	      if (num_dests == 0)
+		num_dests = cupsGetDests(&dests);
+
+	      if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
+	        dest = dests;
+
+	      for (j = 0; j < dest->num_options; j ++)
+		if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+		  num_options = cupsAddOption(dest->options[j].name,
+	                                      dest->options[j].value,
+	                                      num_options, &options);
+	    }
+
 	    if (argv[i][2])
 	      option = argv[i] + 2;
 	    else
@@ -231,7 +261,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    }
 
             for (j = 0; j < num_options; j ++)
-	      if (strcasecmp(options[j].name, option) == 0)
+	      if (!strcasecmp(options[j].name, option))
 	      {
 	       /*
 	        * Remove this option...
