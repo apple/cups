@@ -147,7 +147,7 @@
 
 *OpenUI *inTearInterval/Print and Tear: PickOne
 *OrderDependency: 20 DocumentSetup *inTearInterval
-*DefaultinTearInterval: Default
+*DefaultinTearInterval: None
 *inTearInterval None/Disabled: "<</cupsRowCount 0>>setpagedevice"
 *inTearInterval 1/Every Label: "<</cupsRowCount 1>>setpagedevice"
 *inTearInterval 2/Every 2 Labels: "<</cupsRowCount 2>>setpagedevice"
@@ -166,7 +166,7 @@
 
 *OpenUI *inCutInterval/Print and Cut: PickOne
 *OrderDependency: 20 DocumentSetup *inCutInterval
-*DefaultinCutInterval: Default
+*DefaultinCutInterval: None
 *inCutInterval None/Disabled: "<</cupsRowStep 0>>setpagedevice"
 *inCutInterval 1/Every Label: "<</cupsRowStep 1>>setpagedevice"
 *inCutInterval 2/Every 2 Labels: "<</cupsRowStep 2>>setpagedevice"
