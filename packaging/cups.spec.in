@@ -127,6 +127,10 @@ UNIX® operating systems. This package contains the CUPS shared libraries.
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides LPD client support.
 
+%description de
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides German support.
+
 %description es
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Spanish support.
