@@ -443,13 +443,25 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	  				/* inPrintDensity */
 	    printf("\033&d%dA", 30 * header->cupsCompression / 100 - 15);
 
-          if (header->cupsRowCount != ~0)
-					/* inTearInterval */
-	    printf("\033!n%dT", header->cupsRowCount);
+	  if ((choice = ppdFindMarkedChoice(ppd, "inPrintMode")) != NULL)
+	  {
+	    if (!strcmp(choice->choice, "Standard"))
+	      fputs("\033!p0M", stdout);
+	    else if (!strcmp(choice->choice, "Tear"))
+	    {
+	      fputs("\033!p1M", stdout);
 
-          if (header->cupsRowStep != ~0)
-					/* inCutInterval */
-	    printf("\033!n%dC", header->cupsRowStep);
+              if (header->cupsRowCount)	/* inTearInterval */
+		printf("\033!n%dT", header->cupsRowCount);
+            }
+	    else
+	    {
+	      fputs("\033!p2M", stdout);
+
+              if (header->cupsRowStep)	/* inCutInterval */
+		printf("\033!n%dC", header->cupsRowStep);
+            }
+	  }
         }
 
        /*

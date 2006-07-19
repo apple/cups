@@ -137,10 +137,17 @@
 *inPrintRate 300/300 mm/sec.: "<</cupsRowFeed 300>>setpagedevice"
 *CloseUI: *inPrintRate
 
+*OpenUI *inPrintMode/Print Mode: PickOne
+*OrderDependency: 20 DocumentSetup *inPrintMode
+*DefaultinPrintMode: Standard
+*inPrintMode Standard: ""
+*inPrintMode Tear: ""
+*inPrintMode Cut: ""
+*CloseUI: *inPrintMode
+
 *OpenUI *inTearInterval/Print and Tear: PickOne
 *OrderDependency: 20 DocumentSetup *inTearInterval
 *DefaultinTearInterval: Default
-*inTearInterval Default/PrinterDefault: "<</cupsRowCount -1>>setpagedevice"
 *inTearInterval None/Disabled: "<</cupsRowCount 0>>setpagedevice"
 *inTearInterval 1/Every Label: "<</cupsRowCount 1>>setpagedevice"
 *inTearInterval 2/Every 2 Labels: "<</cupsRowCount 2>>setpagedevice"
@@ -160,7 +167,6 @@
 *OpenUI *inCutInterval/Print and Cut: PickOne
 *OrderDependency: 20 DocumentSetup *inCutInterval
 *DefaultinCutInterval: Default
-*inCutInterval Default/PrinterDefault: "<</cupsRowStep -1>>setpagedevice"
 *inCutInterval None/Disabled: "<</cupsRowStep 0>>setpagedevice"
 *inCutInterval 1/Every Label: "<</cupsRowStep 1>>setpagedevice"
 *inCutInterval 2/Every 2 Labels: "<</cupsRowStep 2>>setpagedevice"
@@ -177,6 +183,16 @@
 *CustominCutInterval True: "<</cupsRowStep 2 1 roll>>setpagedevice"
 *ParamCustominCutInterval Interval: 1 int 1 99
 *CloseGroup: *PrinterSettings
+
+*UIConstraints: *inCutInterval *inPrintMode Standard
+*UIConstraints: *inCutInterval *inPrintMode Tear
+*UIConstraints: *inPrintMode Standard *inCutInterval
+*UIConstraints: *inPrintMode Tear *inCutInterval
+
+*UIConstraints: *inTearInterval *inPrintMode Standard
+*UIConstraints: *inTearInterval *inPrintMode Cut
+*UIConstraints: *inPrintMode Standard *inTearInterval
+*UIConstraints: *inPrintMode Cut *inTearInterval
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
