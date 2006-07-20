@@ -34,9 +34,9 @@
  * C++ magic...
  */
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 extern "C" {
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 
 
 /*
@@ -147,9 +147,9 @@ extern mime_filter_t	*mimeFirstFilter(mime_t *mime);
 extern mime_filter_t	*mimeNextFilter(mime_t *mime);
 extern int		mimeNumFilters(mime_t *mime);
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 }
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 #endif /* !_CUPS_MIME_H_ */
 
 /*

@@ -45,9 +45,9 @@
  * C++ magic...
  */
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 extern "C" {
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 
 
 /*
@@ -62,9 +62,9 @@ extern int	backendGetMakeModel(const char *device_id, char *make_model,
 extern ssize_t	backendRunLoop(int print_fd, int device_fd, int use_bc);
 
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 }
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 #endif /* !_CUPS_BACKEND_PRIVATE_H_ */
 
 
