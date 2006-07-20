@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c 5083 2006-02-06 02:57:43Z mike $"
+ * "$Id: listen.c 5724 2006-07-12 19:42:35Z mike $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -331,7 +331,7 @@ cupsdStartListening(void)
     * "any" address...
     */
 
-    if (!LocalPort && p > 0 &&
+    if ((!LocalPort || LocalEncryption == HTTP_ENCRYPT_ALWAYS) && p > 0 &&
         (httpAddrLocalhost(&(lis->address)) ||
          httpAddrAny(&(lis->address))))
     {
@@ -373,6 +373,8 @@ cupsdStartListening(void)
     */
 
     cupsdSetEnv("CUPS_SERVER", have_domain);
+
+    LocalEncryption = HTTP_ENCRYPT_IF_REQUESTED;
   }
   else
   {
@@ -439,5 +441,5 @@ cupsdStopListening(void)
 
 
 /*
- * End of "$Id: listen.c 5083 2006-02-06 02:57:43Z mike $".
+ * End of "$Id: listen.c 5724 2006-07-12 19:42:35Z mike $".
  */

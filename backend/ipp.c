@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5686 2006-06-21 21:02:56Z mike $"
+ * "$Id: ipp.c 5724 2006-07-12 19:42:35Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -230,6 +230,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (!strcmp(method, "https"))
     cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
+  else
+    cupsSetEncryption(HTTP_ENCRYPT_IF_REQUESTED);
 
  /*
   * See if there are any options...
@@ -1620,5 +1622,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 5686 2006-06-21 21:02:56Z mike $".
+ * End of "$Id: ipp.c 5724 2006-07-12 19:42:35Z mike $".
  */

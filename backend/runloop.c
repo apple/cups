@@ -1,5 +1,5 @@
 /*
- * "$Id: runloop.c 5594 2006-05-27 03:14:03Z mike $"
+ * "$Id: runloop.c 5726 2006-07-12 20:00:11Z mike $"
  *
  *   Common run loop API for the Common UNIX Printing System (CUPS).
  *
@@ -53,6 +53,7 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 		total_bytes,		/* Total bytes written */
 		bytes;			/* Bytes written */
   int		paperout;		/* "Paper out" status */
+  int		offline;		/* "Off-line" status */
   char		print_buffer[8192],	/* Print data buffer */
 		*print_ptr,		/* Pointer into print data buffer */
 		bc_buffer[1024];	/* Back-channel data buffer */
@@ -60,6 +61,9 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
+
+  fprintf(stderr, "DEBUG: backendRunLoop(print_fd=%d, device_fd=%d, use_bc=%d)\n",
+          print_fd, device_fd, use_bc);
 
  /*
   * If we are printing data from a print driver on stdin, ignore SIGTERM
@@ -93,7 +97,7 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
   * Now loop until we are out of data from print_fd...
   */
 
-  for (print_bytes = 0, print_ptr = print_buffer, paperout = 0, total_bytes = 0;;)
+  for (print_bytes = 0, print_ptr = print_buffer, offline = 0, paperout = 0, total_bytes = 0;;)
   {
    /*
     * Use select() to determine whether we have data to copy around...
@@ -106,11 +110,28 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
       FD_SET(device_fd, &input);
 
     FD_ZERO(&output);
-    if (print_bytes)
+    if (print_bytes || !use_bc)
       FD_SET(device_fd, &output);
 
-    if (select(nfds, &input, &output, NULL, NULL) < 0)
-      continue;				/* Ignore errors here */
+    if (use_bc)
+    {
+      if (select(nfds, &input, &output, NULL, NULL) < 0)
+      {
+       /*
+	* Pause printing to clear any pending errors...
+	*/
+
+	if (errno == ENXIO && !offline)
+	{
+	  fputs("STATE: +offline-error\n", stderr);
+	  fputs("INFO: Printer is currently off-line.\n", stderr);
+	  offline = 1;
+	}
+
+	sleep(1);
+	continue;
+      }
+    }
 
    /*
     * Check if we have back-channel data ready...
@@ -158,6 +179,9 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
       }
 
       print_ptr = print_buffer;
+
+      fprintf(stderr, "DEBUG: Read %d bytes of print data...\n",
+              (int)print_bytes);
     }
 
    /*
@@ -182,6 +206,15 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 	    paperout = 1;
 	  }
         }
+	else if (errno == ENXIO)
+	{
+	  if (!offline)
+	  {
+	    fputs("STATE: +offline-error\n", stderr);
+	    fputs("INFO: Printer is currently off-line.\n", stderr);
+	    offline = 1;
+	  }
+	}
 	else if (errno != EAGAIN && errno != EINTR && errno != ENOTTY)
 	{
 	  perror("ERROR: Unable to write print data");
@@ -196,7 +229,14 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 	  paperout = 0;
 	}
 
-        fprintf(stderr, "DEBUG: Wrote %d bytes...\n", (int)bytes);
+	if (offline)
+	{
+	  fputs("STATE: -offline-error\n", stderr);
+	  fputs("INFO: Printer is now on-line.\n", stderr);
+	  offline = 0;
+	}
+
+        fprintf(stderr, "DEBUG: Wrote %d bytes of print data...\n", (int)bytes);
 
         print_bytes -= bytes;
 	print_ptr   += bytes;
@@ -214,5 +254,5 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 
 
 /*
- * End of "$Id: runloop.c 5594 2006-05-27 03:14:03Z mike $".
+ * End of "$Id: runloop.c 5726 2006-07-12 20:00:11Z mike $".
  */

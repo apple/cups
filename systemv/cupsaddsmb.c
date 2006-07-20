@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c 5233 2006-03-06 03:39:28Z mike $"
+ * "$Id: cupsaddsmb.c 5753 2006-07-18 19:53:24Z mike $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -249,7 +249,9 @@ export_dest(http_t     *http,		/* I - Connection to server */
     if (!SAMBAPassword)
     {
       snprintf(prompt, sizeof(prompt),
-               _("Password for %s required to access %s via SAMBA: "),
+               _cupsLangString(cupsLangDefault(),
+	                       _("Password for %s required to access %s via "
+			         "SAMBA: ")),
 	       SAMBAUser, SAMBAServer);
 
       if ((SAMBAPassword = cupsGetPassword(prompt)) == NULL)
@@ -290,5 +292,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupsaddsmb.c 5233 2006-03-06 03:39:28Z mike $".
+ * End of "$Id: cupsaddsmb.c 5753 2006-07-18 19:53:24Z mike $".
  */

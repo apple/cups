@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 5663 2006-06-15 20:36:42Z mike $"
+ * "$Id: util.c 5716 2006-07-11 17:56:57Z mike $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -837,11 +837,15 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
                             resource, sizeof(resource), 0))
     return (NULL);
 
+  DEBUG_printf(("Printer hostname=\"%s\", port=%d\n", hostname, port));
+
  /*
   * Remap local hostname to localhost...
   */
 
   httpGetHostname(NULL, localhost, sizeof(localhost));
+
+  DEBUG_printf(("Local hostname=\"%s\"\n", localhost));
 
   if (!strcasecmp(localhost, hostname))
     strcpy(hostname, "localhost");
@@ -861,6 +865,9 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     http_port = ntohs(http->hostaddr->ipv4.sin_port);
   else
     http_port = ippPort(); 
+
+  DEBUG_printf(("Connection hostname=\"%s\", port=%d\n", http_hostname,
+                http_port));
 
  /*
   * Reconnect to the correct server as needed...
@@ -1652,5 +1659,5 @@ cups_get_printer_uri(
 
 
 /*
- * End of "$Id: util.c 5663 2006-06-15 20:36:42Z mike $".
+ * End of "$Id: util.c 5716 2006-07-11 17:56:57Z mike $".
  */

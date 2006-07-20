@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 5630 2006-06-05 18:42:53Z mike $"
+ * "$Id: http.c 5753 2006-07-18 19:53:24Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -1809,6 +1809,16 @@ httpWait(http_t *http,			/* I - HTTP connection */
     return (1);
 
  /*
+  * Flush pending data, if any...
+  */
+
+  if (http->wused)
+  {
+    if (httpFlushWrite(http) < 0)
+      return (0);
+  }
+
+ /*
   * If not, check the SSL/TLS buffers and do a select() on the connection...
   */
 
@@ -2801,5 +2811,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 5630 2006-06-05 18:42:53Z mike $".
+ * End of "$Id: http.c 5753 2006-07-18 19:53:24Z mike $".
  */

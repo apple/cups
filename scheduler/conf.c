@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 5663 2006-06-15 20:36:42Z mike $"
+ * "$Id: conf.c 5736 2006-07-13 19:59:36Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -468,6 +468,14 @@ cupsdReadConfiguration(void)
   RunUser = getuid();
 
  /*
+  * See if the ServerName is an IP address...
+  */
+
+  for (slash = ServerName; isdigit(*slash & 255) || *slash == '.'; slash ++);
+
+  ServerNameIsIP = !*slash;
+
+ /*
   * Use the default system group if none was supplied in cupsd.conf...
   */
 
@@ -783,6 +791,24 @@ cupsdReadConfiguration(void)
   cupsdLogMessage(CUPSD_LOG_INFO,
                   "Allowing up to %d client connections per host.",
                   MaxClientsPerHost);
+
+ /*
+  * Make sure that BrowseTimeout is at least twice the interval...
+  */
+
+  if (BrowseTimeout < (2 * BrowseInterval) || BrowseTimeout <= 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ALERT, "Invalid BrowseTimeout value %d!",
+                    BrowseTimeout);
+
+    if (BrowseInterval)
+      BrowseTimeout = BrowseInterval * 2;
+    else
+      BrowseTimeout = DEFAULT_TIMEOUT;
+
+    cupsdLogMessage(CUPSD_LOG_ALERT, "Reset BrowseTimeout to %d!",
+                    BrowseTimeout);
+  }
 
  /*
   * Update the default policy, as needed...
@@ -2572,7 +2598,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    strlcpy(temp2, relay->from.mask.name.name, sizeof(temp2));
   
 	  cupsdLogMessage(CUPSD_LOG_INFO, "Relaying from %s to %s:%d (IPv4)",
-			  temp, temp2, ntohs(relay->to.ipv4.sin_port));
+			  temp2, temp, ntohs(relay->to.ipv4.sin_port));
   
 	  NumRelays ++;
 	}
@@ -2961,7 +2987,12 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 		  n *= 262144;
 	      }
 
-	      *((int *)var->ptr) = n;
+              if (n < 0)
+		cupsdLogMessage(CUPSD_LOG_ERROR,
+	                	"Bad negative integer value for %s on line %d!",
+				line, linenum);
+	      else
+		*((int *)var->ptr) = n;
 	    }
 	    break;
 
@@ -3249,5 +3280,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 5663 2006-06-15 20:36:42Z mike $".
+ * End of "$Id: conf.c 5736 2006-07-13 19:59:36Z mike $".
  */

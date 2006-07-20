@@ -1,5 +1,5 @@
 /*
- * "$Id: testnotify.c 4829 2005-11-12 03:15:10Z mike $"
+ * "$Id: testnotify.c 5716 2006-07-11 17:56:57Z mike $"
  *
  *   Test notifier for the Common UNIX Printing System (CUPS).
  *
@@ -82,6 +82,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     print_attributes(event, 4);
     ippDelete(event);
+
+   /*
+    * If the recipient URI is "testnotify://nowait", then we exit after each
+    * event...
+    */
+
+    if (!strcmp(argv[1], "testnotify://nowait"))
+      return (0);
   }
 }
 
@@ -281,5 +289,5 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
 
 
 /*
- * End of "$Id: testnotify.c 4829 2005-11-12 03:15:10Z mike $".
+ * End of "$Id: testnotify.c 5716 2006-07-11 17:56:57Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: snmp.c 5663 2006-06-15 20:36:42Z mike $"
+ * "$Id: snmp.c 5736 2006-07-13 19:59:36Z mike $"
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
@@ -384,7 +384,7 @@ add_cache(http_addr_t *addr,		/* I - Device IP address */
 
   debug_printf("DEBUG: add_cache(addr=%p, addrname=\"%s\", uri=\"%s\", "
                   "id=\"%s\", make_and_model=\"%s\")\n",
-               addr, addrname, uri, id ? id :  "(null)",
+               addr, addrname, uri ? uri : "(null)", id ? id :  "(null)",
 	       make_and_model ? make_and_model : "(null)");
 
   temp = calloc(1, sizeof(snmp_cache_t));
@@ -1203,7 +1203,7 @@ static int				/* O - Result of comparison */
 compare_cache(snmp_cache_t *a,		/* I - First cache entry */
               snmp_cache_t *b)		/* I - Second cache entry */
 {
-  return (a->address.ipv4.sin_addr.s_addr - b->address.ipv4.sin_addr.s_addr);
+  return (strcasecmp(a->addrname, b->addrname));
 }
 
 
@@ -1874,8 +1874,8 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   * Find a matching device in the cache...
   */
 
-  key.address = addr;
-  device      = (snmp_cache_t *)cupsArrayFind(Devices, &key);
+  key.addrname = addrname;
+  device       = (snmp_cache_t *)cupsArrayFind(Devices, &key);
 
  /*
   * Process the message...
@@ -2215,5 +2215,5 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 
 
 /*
- * End of "$Id: snmp.c 5663 2006-06-15 20:36:42Z mike $".
+ * End of "$Id: snmp.c 5736 2006-07-13 19:59:36Z mike $".
  */

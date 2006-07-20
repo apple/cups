@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# "$Id: cups-config.in 5676 2006-06-19 20:28:05Z mike $"
+# "$Id: cups-config.in 5688 2006-06-23 20:33:08Z mike $"
 # 
 #   CUPS configuration utility.
 #
@@ -42,8 +42,8 @@ INSTALLSTATIC=@INSTALLSTATIC@
 # flags for C++ compiler:
 CFLAGS=""
 LDFLAGS="@EXPORT_LDFLAGS@"
-LIBS="@EXPORT_SSLLIBS@ @LIBS@"
-IMGLIBS="@EXPORT_LIBTIFF@ @EXPORT_LIBJPEG@ @EXPORT_LIBPNG@ @EXPORT_LIBZ@"
+LIBS="@EXPORT_SSLLIBS@ @EXPORT_LIBZ@ @LIBS@"
+IMGLIBS="@EXPORT_LIBTIFF@ @EXPORT_LIBJPEG@ @EXPORT_LIBPNG@"
 
 # Check for local invocation...
 selfdir=`dirname $0`
@@ -115,13 +115,13 @@ while test $# -gt 0; do
  	        if test $image = no; then
  	            echo -lcups $LIBS
  		else
- 	            echo -lcupsimage $IMGLIBS -lcups $LIBS
+ 	            echo -lcupsimage -lcups $IMGLIBS $LIBS
  		fi
 	    else
 	        if test $image = no; then
 	            echo $libdir/libcups.a $LIBS
 		else
-	            echo $imagelibdir/libcupsimage.a $IMGLIBS $libdir/libcups.a $LIBS
+	            echo $imagelibdir/libcupsimage.a $libdir/libcups.a $IMGLIBS $LIBS
 		fi
 	    fi
 	    ;;
@@ -150,5 +150,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in 5676 2006-06-19 20:28:05Z mike $".
+# End of "$Id: cups-config.in 5688 2006-06-23 20:33:08Z mike $".
 #

@@ -1,0 +1,105 @@
+<HTML>
+<!-- SECTION: References -->
+<HEAD>
+	<TITLE>mailto.conf</TITLE>
+</HEAD>
+<BODY>
+
+<P>The <VAR>/etc/cups/mailto.conf</VAR> file contains several
+directives that defines the local mail server and email
+notification preferences for CUPS. Each directive is listed on a
+line by itself followed by its value. Comments are introduced
+using the number sign ("#") character at the beginning of a
+line.</P>
+
+
+<H2 CLASS="title"><A NAME="Cc">Cc</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+Cc bigbrother@domain.com
+Cc John Doe &lt;jd@domain.com>
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Cc</CODE> directive specifies an additional
+recipient ("carbon copy") for all email notifications. The
+default is to not send a copy to anyone but the subscriber.</P>
+
+
+<H2 CLASS="title"><A NAME="From">From</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+From printserver@domain.com
+From Your Happy Printer &lt;printserver@domain.com>
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>From</CODE> directive specifies the sender of email
+notifications. The default is the <A
+HREF="ref-cupsd-conf.html#ServerAdmin"><TT>ServerAdmin</TT><A>
+address defined in the <VAR>cupsd.conf</VAR> file.</P>
+
+
+<H2 CLASS="title"><A NAME="Sendmail">Sendmail</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+Sendmail /usr/sbin/sendmail
+Sendmail /usr/lib/sendmail -bm -i
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Sendmail</CODE> directive specifies the command to
+run to deliver an email locally. This directive cannot be used
+with the <TT>SMTPServer</TT> directive, and if both
+<TT>Sendmail</TT> and <TT>SMTPServer</TT> lines appear in the
+<VAR>mailto.conf</VAR> file, only the last line is used. The
+default is <TT>/usr/sbin/sendmail</TT>.</P>
+
+
+<H2 CLASS="title"><A NAME="SMTPServer">SMTPServer</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+SMTPServer mail.domain.com
+SMTPServer 192.168.2.1
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>SMTPServer</CODE> directive specifies a hostname or
+IP address of a (possibly remote) SMTP mail server. This
+directive cannot be used with the <TT>Sendmail</TT> directive,
+and if both <TT>Sendmail</TT> and <TT>SMTPServer</TT> lines
+appear in the <VAR>mailto.conf</VAR> file, only the last line is
+used. The default is to use the <TT>Sendmail</TT> command
+instead.</P>
+
+
+<H2 CLASS="title"><A NAME="Subject">Subject</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+Subject [CUPS]
+Subject URGENT EMAIL NOTIFICATION
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Subject</CODE> directive specifies a prefix string to
+add to the subject of each email notification. The default is to
+not add a prefix string.</P>
+
+
+</BODY>
+</HTML>

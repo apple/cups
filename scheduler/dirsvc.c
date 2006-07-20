@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 5663 2006-06-15 20:36:42Z mike $"
+ * "$Id: dirsvc.c 5724 2006-07-12 19:42:35Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -212,10 +212,11 @@ cupsdLoadRemoteCache(void)
 	else
           p = cupsdAddPrinter(value);
 
-	p->accepting   = 1;
-	p->state       = IPP_PRINTER_IDLE;
-	p->type        |= CUPS_PRINTER_REMOTE;
-	p->browse_time = now + BrowseTimeout;
+	p->accepting     = 1;
+	p->state         = IPP_PRINTER_IDLE;
+	p->type          |= CUPS_PRINTER_REMOTE;
+	p->browse_time   = now;
+	p->browse_expire = now + BrowseTimeout;
 
        /*
         * Set the default printer as needed...
@@ -252,10 +253,11 @@ cupsdLoadRemoteCache(void)
 	else
           p = cupsdAddClass(value);
 
-	p->accepting   = 1;
-	p->state       = IPP_PRINTER_IDLE;
-	p->type        |= CUPS_PRINTER_REMOTE;
-	p->browse_time = now + BrowseTimeout;
+	p->accepting     = 1;
+	p->state         = IPP_PRINTER_IDLE;
+	p->type          |= CUPS_PRINTER_REMOTE;
+	p->browse_time   = now;
+	p->browse_expire = now + BrowseTimeout;
 
        /*
         * Set the default printer as needed...
@@ -416,8 +418,8 @@ cupsdLoadRemoteCache(void)
       {
         time_t t = atoi(value);
 
-	if (t > (now + BrowseInterval))
-          p->browse_time = t;
+	if (t > p->browse_expire)
+          p->browse_expire = t;
       }
       else
       {
@@ -591,7 +593,7 @@ cupsdSaveRemoteCache(void)
 
     cupsFilePrintf(fp, "Type %d\n", printer->type);
 
-    cupsFilePrintf(fp, "BrowseTime %d\n", (int)printer->browse_time);
+    cupsFilePrintf(fp, "BrowseTime %d\n", (int)printer->browse_expire);
 
     if (printer->info)
       cupsFilePrintf(fp, "Info %s\n", printer->info);
@@ -906,14 +908,21 @@ cupsdStartBrowsing(void)
     fcntl(BrowseSocket, F_SETFD, fcntl(BrowseSocket, F_GETFD) | FD_CLOEXEC);
 
    /*
-    * Finally, add the socket to the input selection set...
+    * Finally, add the socket to the input selection set as needed...
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStartBrowsing: Adding fd %d to InputSet...",
-                    BrowseSocket);
+    if (BrowseRemoteProtocols & BROWSE_CUPS)
+    {
+     /*
+      * We only listen if we want remote printers...
+      */
 
-    FD_SET(BrowseSocket, InputSet);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdStartBrowsing: Adding fd %d to InputSet...",
+                      BrowseSocket);
+
+      FD_SET(BrowseSocket, InputSet);
+    }
   }
   else
     BrowseSocket = -1;
@@ -1885,7 +1894,7 @@ process_browse_data(
   hptr   = strchr(host, '.');
   sptr   = strchr(ServerName, '.');
 
-  if (sptr != NULL && hptr != NULL)
+  if (!ServerNameIsIP && sptr != NULL && hptr != NULL)
   {
    /*
     * Strip the common domain name components...
@@ -3149,5 +3158,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id: dirsvc.c 5663 2006-06-15 20:36:42Z mike $".
+ * End of "$Id: dirsvc.c 5724 2006-07-12 19:42:35Z mike $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-defaults.m4 5643 2006-06-07 20:58:29Z mike $"
+dnl "$Id: cups-defaults.m4 5745 2006-07-18 13:45:56Z mike $"
 dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
@@ -24,9 +24,9 @@ dnl         WWW: http://www.cups.org
 dnl
 
 dnl Default langugages...
-AC_ARG_WITH(languages, [  --with-languages        set installed languages, default="es ja" ],
+AC_ARG_WITH(languages, [  --with-languages        set installed languages, default="de es ja pl sv" ],
 	LANGUAGES="$withval",
-	LANGUAGES="es ja pl sv")
+	LANGUAGES="de es ja pl sv")
 AC_SUBST(LANGUAGES)
 
 dnl Default ConfigFilePerm
@@ -248,5 +248,5 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTCAP, "$CUPS_DEFAULT_PRINTCAP")
 
 dnl
-dnl End of "$Id: cups-defaults.m4 5643 2006-06-07 20:58:29Z mike $".
+dnl End of "$Id: cups-defaults.m4 5745 2006-07-18 13:45:56Z mike $".
 dnl

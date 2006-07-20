@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c 5628 2006-06-05 15:25:23Z mike $"
+ * "$Id: usb-unix.c 5726 2006-07-12 20:00:11Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -44,7 +44,7 @@
  * Local functions...
  */
 
-int	open_device(const char *uri);
+int	open_device(const char *uri, int *use_bc);
 
 
 /*
@@ -65,22 +65,10 @@ print_device(const char *uri,		/* I - Device URI */
   int		device_fd;		/* USB device */
   size_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
-#if defined(__linux) && defined(LP_POUTPA)
-  unsigned int	status;			/* Port status (off-line, out-of-paper, etc.) */
-  int		paperout;		/* Paper out? */
-#endif /* __linux && LP_POUTPA */
 
 
   (void)argc;
   (void)argv;
-
- /*
-  * Disable backchannel data when printing to Canon USB printers - apparently
-  * Canon printers will return the IEEE-1284 device ID over and over and over
-  * when they get a read request...
-  */
-
-  use_bc = strcasecmp(hostname, "Canon") != 0;
 
  /*
   * Open the USB port device...
@@ -90,7 +78,15 @@ print_device(const char *uri,		/* I - Device URI */
 
   do
   {
-    if ((device_fd = open_device(uri)) == -1)
+   /*
+    * Disable backchannel data when printing to Canon USB printers - apparently
+    * Canon printers will return the IEEE-1284 device ID over and over and over
+    * when they get a read request...
+    */
+
+    use_bc = strcasecmp(hostname, "Canon") != 0;
+
+    if ((device_fd = open_device(uri, &use_bc)) == -1)
     {
       if (getenv("CLASS") != NULL)
       {
@@ -148,37 +144,6 @@ print_device(const char *uri,		/* I - Device URI */
 
   tcsetattr(device_fd, TCSANOW, &opts);
 
-#if defined(__linux) && defined(LP_POUTPA)
- /*
-  * Show the printer status before we send the file...
-  */
-
-  paperout = 0;
-
-  while (!ioctl(device_fd, LPGETSTATUS, &status))
-  {
-    fprintf(stderr, "DEBUG: LPGETSTATUS returned a port status of %02X...\n",
-            status);
-
-    if (status & LP_POUTPA)
-    {
-      fputs("WARNING: Media tray empty!\n", stderr);
-      fputs("STATUS: +media-tray-empty-error\n", stderr);
-
-      paperout = 1;
-    }
-
-    if (!(status & LP_PERRORP))
-      fputs("WARNING: Printer fault!\n", stderr);
-    else if (!(status & LP_PSELECD))
-      fputs("WARNING: Printer off-line.\n", stderr);
-    else
-      break;
-
-    sleep(5);
-  }
-#endif /* __linux && LP_POUTPA */
-
  /*
   * Finally, send the print file...
   */
@@ -195,7 +160,7 @@ print_device(const char *uri,		/* I - Device URI */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, 1);
+    tbytes = backendRunLoop(print_fd, device_fd, use_bc);
 
     if (print_fd != 0 && tbytes >= 0)
       fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
@@ -277,7 +242,7 @@ list_devices(void)
   {
     sprintf(device, "/dev/usb/printer%d", i);
 
-    if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
+    if ((fd = open(device, O_WRONLY | O_EXCL)) >= 0)
     {
       if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
                               make_model, sizeof(make_model),
@@ -314,8 +279,12 @@ list_devices(void)
  */
 
 int					/* O - File descriptor or -1 on error */
-open_device(const char *uri)		/* I - Device URI */
+open_device(const char *uri,		/* I - Device URI */
+            int        *use_bc)		/* O - Set to 0 for unidirectional */
 {
+  int	fd;				/* File descriptor */
+
+
  /*
   * The generic implementation just treats the URI as a device filename...
   * Specific operating systems may also support using the device serial
@@ -340,7 +309,6 @@ open_device(const char *uri)		/* I - Device URI */
 
     int		i;			/* Looping var */
     int		busy;			/* Are any ports busy? */
-    int		fd;			/* File descriptor */
     char	format[255],		/* Format for device filename */
 		device[255],		/* Device filename */
 		device_id[1024],	/* Device ID string */
@@ -446,7 +414,6 @@ open_device(const char *uri)		/* I - Device URI */
 
     int		i;			/* Looping var */
     int		busy;			/* Are any ports busy? */
-    int		fd;			/* File descriptor */
     char	device[255],		/* Device filename */
 		device_id[1024],	/* Device ID string */
 		make_model[1024],	/* Make and model */
@@ -463,7 +430,7 @@ open_device(const char *uri)		/* I - Device URI */
       {
 	sprintf(device, "/dev/usb/printer%d", i);
 
-	if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
+	if ((fd = open(device, O_WRONLY | O_EXCL)) >= 0)
 	  backendGetDeviceID(fd, device_id, sizeof(device_id),
                              make_model, sizeof(make_model),
 			     "usb", device_uri, sizeof(device_uri));
@@ -481,7 +448,17 @@ open_device(const char *uri)		/* I - Device URI */
         }
 
         if (!strcmp(uri, device_uri))
-	  return (fd);	/* Yes, return this file descriptor... */
+	{
+	 /*
+	  * Yes, return this file descriptor...
+	  */
+
+          fputs("DEBUG: Setting use_bc to 0!\n", stderr);
+
+          *use_bc = 0;
+
+	  return (fd);
+	}
 
        /*
 	* This wasn't the one...
@@ -514,7 +491,15 @@ open_device(const char *uri)		/* I - Device URI */
     return (-1);
   }
 #else
-    return (open(uri + 4, O_RDWR | O_EXCL));
+  {
+    if ((fd = open(uri + 4, O_RDWR | O_EXCL)) < 0)
+    {
+      fd      = open(uri + 4, O_WRONLY | O_EXCL);
+      *use_bc = 0;
+    }
+
+    return (fd);
+  }
 #endif /* __linux */
   else
   {
@@ -525,5 +510,5 @@ open_device(const char *uri)		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c 5628 2006-06-05 15:25:23Z mike $".
+ * End of "$Id: usb-unix.c 5726 2006-07-12 20:00:11Z mike $".
  */

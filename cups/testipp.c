@@ -1,5 +1,5 @@
 /*
- * "$Id: testipp.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: testipp.c 5753 2006-07-18 19:53:24Z mike $"
  *
  *   IPP test program for the Common UNIX Printing System (CUPS).
  *
@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <cups/string.h>
 #include <errno.h>
-#include "ipp.h"
+#include "ipp-private.h"
 #ifdef WIN32
 #  include <io.h>
 #else
@@ -281,6 +281,19 @@ main(int  argc,			/* I - Number of command-line arguments */
       puts("PASS");
 
     ippDelete(request);
+
+   /*
+    * Test _ippFindOption() private API...
+    */
+
+    fputs("_ippFindOption(\"printer-type\"): ", stdout);
+    if (_ippFindOption("printer-type"))
+      puts("PASS");
+    else
+    {
+      puts("FAIL");
+      status = 1;
+    }
 
    /*
     * Summarize...
@@ -645,5 +658,5 @@ write_cb(void        *data,		/* I - Data */
 
 
 /*
- * End of "$Id: testipp.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: testipp.c 5753 2006-07-18 19:53:24Z mike $".
  */

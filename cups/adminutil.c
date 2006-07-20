@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 5638 2006-06-06 20:08:13Z mike $"
+ * "$Id: adminutil.c 5753 2006-07-18 19:53:24Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -1681,8 +1681,9 @@ do_samba_command(const char *command,	/* I - Command to run */
   {
     status = -1;
 
-    _cupsLangPrintf(stderr, _("cupsaddsmb: Unable to run \"%s\": %s\n"),
-                    command, strerror(errno));
+    if (logfile)
+      _cupsLangPrintf(logfile, _("Unable to run \"%s\": %s\n"),
+                      command, strerror(errno));
   }
   else
   {
@@ -1928,5 +1929,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 5638 2006-06-06 20:08:13Z mike $".
+ * End of "$Id: adminutil.c 5753 2006-07-18 19:53:24Z mike $".
  */

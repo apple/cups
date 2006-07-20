@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4 5547 2006-05-19 12:44:29Z mike $"
+dnl "$Id: cups-directories.m4 5696 2006-06-26 18:34:20Z mike $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -115,7 +115,7 @@ AC_ARG_WITH(rcdir, [  --with-rcdir            set path for rc scripts],rcdir="$w
 
 if test x$rcdir = x; then
 	case "$uname" in
-		FreeBSD* | OpenBSD*)
+		FreeBSD* | OpenBSD* | MirBsD* | ekkoBSD*)
 			# FreeBSD and OpenBSD
 			INITDIR=""
 			INITDDIR=""
@@ -302,5 +302,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 5547 2006-05-19 12:44:29Z mike $".
+dnl End of "$Id: cups-directories.m4 5696 2006-06-26 18:34:20Z mike $".
 dnl

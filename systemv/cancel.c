@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c 5091 2006-02-08 18:39:56Z mike $"
+ * "$Id: cancel.c 5696 2006-06-26 18:34:20Z mike $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -121,7 +121,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         case 'h' : /* Connect to host */
 	    if (http != NULL)
+	    {
 	      httpClose(http);
+	      http = NULL;
+	    }
 
 	    if (argv[i][2] != '\0')
               cupsSetServer(argv[i] + 2);
@@ -387,5 +390,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c 5091 2006-02-08 18:39:56Z mike $".
+ * End of "$Id: cancel.c 5696 2006-06-26 18:34:20Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h 5632 2006-06-06 14:46:10Z mike $"
+ * "$Id: http.h 5716 2006-07-11 17:56:57Z mike $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -98,7 +98,7 @@ extern "C" {
 #if defined(AF_INET6) && !defined(s6_addr32)
 #  if defined(__sun)
 #    define s6_addr32	_S6_un._S6_u32
-#  elif defined(__FreeBSD__) || defined(__APPLE__)
+#  elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
 #    define s6_addr32	__u6_addr.__u6_addr32
 #  elif defined(__osf__)
 #    define s6_addr32	s6_un.sa6_laddr
@@ -504,5 +504,5 @@ extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h 5632 2006-06-06 14:46:10Z mike $".
+ * End of "$Id: http.h 5716 2006-07-11 17:56:57Z mike $".
  */

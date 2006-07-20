@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 5643 2006-06-07 20:58:29Z mike $"
+dnl "$Id: cups-compiler.m4 5705 2006-06-30 01:07:29Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -297,11 +297,6 @@ else
 			# Warning 829 is passing constant string as char *
 			CXXFLAGS="+W336,829 $CXXFLAGS"
 
-			if test -z "$with_archflags"; then
-				# Build portable binaries for all HP systems...
-				ARCHFLAGS="+DAportable"
-			fi
-
 			if test $PICFLAG = 1; then
 				OPTIM="+z $OPTIM"
 			fi
@@ -465,5 +460,5 @@ if test $uname = HP-UX; then
 fi
 
 dnl
-dnl End of "$Id: cups-compiler.m4 5643 2006-06-07 20:58:29Z mike $".
+dnl End of "$Id: cups-compiler.m4 5705 2006-06-30 01:07:29Z mike $".
 dnl

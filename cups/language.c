@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: language.c 5753 2006-07-18 19:53:24Z mike $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -560,6 +560,23 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 	encoding = (cups_encoding_t)i;
 	break;
       }
+
+    if (encoding == CUPS_AUTO_ENCODING)
+    {
+     /*
+      * Map alternate names for various character sets...
+      */
+
+      if (!strcasecmp(charset, "iso-2022-jp") ||
+          !strcasecmp(charset, "sjis"))
+	encoding = CUPS_WINDOWS_932;
+      else if (!strcasecmp(charset, "iso-2022-cn"))
+	encoding = CUPS_WINDOWS_936;
+      else if (!strcasecmp(charset, "iso-2022-kr"))
+	encoding = CUPS_WINDOWS_949;
+      else if (!strcasecmp(charset, "big5"))
+	encoding = CUPS_WINDOWS_950;
+    }
   }
 
   DEBUG_printf(("cupsLangGet: encoding=%d(%s)\n", encoding,
@@ -1295,5 +1312,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: language.c 5753 2006-07-18 19:53:24Z mike $".
  */

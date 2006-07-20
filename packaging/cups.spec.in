@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 5584 2006-05-24 11:17:55Z mike $"
+# "$Id: cups.spec.in 5758 2006-07-19 13:31:27Z mike $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -76,6 +76,11 @@ Summary: Common UNIX Printing System - LPD support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version} xinetd
 
+%package de
+Summary: Common UNIX Printing System - German support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package es
 Summary: Common UNIX Printing System - Spanish support
 Group: System Environment/Daemons
@@ -121,6 +126,10 @@ UNIX® operating systems. This package contains the CUPS shared libraries.
 %description lpd
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides LPD client support.
+
+%description de
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides German support.
 
 %description es
 The Common UNIX Printing System provides a portable printing layer for 
@@ -204,6 +213,7 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cups/mime.types
 /etc/cups/mime.convs
 %dir /etc/cups/ppd
+%attr(0700,root,root) %dir /etc/cups/ssl
 
 %if %{?_with_dbus:1}%{!?_with_dbus:0}
 # DBUS
@@ -291,6 +301,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/network.html
 /usr/share/doc/cups/help/options.html
 /usr/share/doc/cups/help/overview.html
+/usr/share/doc/cups/help/policies.html
 /usr/share/doc/cups/help/ref-*.html
 /usr/share/doc/cups/help/security.html
 /usr/share/doc/cups/help/standard.html
@@ -371,6 +382,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/cups-lpd.8.gz
 
+%files de
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/de
+/usr/share/doc/cups/de/index.html
+%dir /usr/share/doc/cups/de/images
+/usr/share/doc/cups/de/images/*
+%dir /usr/share/cups/templates/de
+/usr/share/cups/templates/de/*
+/usr/share/locale/de/cups_de.po
+
 %files es
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/es
@@ -419,5 +440,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 5584 2006-05-24 11:17:55Z mike $".
+# End of "$Id: cups.spec.in 5758 2006-07-19 13:31:27Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-private.h 5230 2006-03-05 17:01:51Z mike $"
+ * "$Id: ipp-private.h 5753 2006-07-18 19:53:24Z mike $"
  *
  *   Private IPP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -44,10 +44,23 @@ extern "C" {
 
 
 /*
+ * Structures...
+ */
+
+typedef struct				/**** Attribute mapping data ****/
+{
+  const char	*name;			/* Option/attribute name */
+  ipp_tag_t	value_tag;		/* Value tag for this attribute */
+  ipp_tag_t	group_tag;		/* Group tag for this attribute */
+} _ipp_option_t;
+
+
+/*
  * Prototypes for private functions...
  */
 
 extern ipp_attribute_t	*_ippAddAttr(ipp_t *, int);
+extern _ipp_option_t	*_ippFindOption(const char *name);
 extern void		_ippFreeAttr(ipp_attribute_t *);
 
 
@@ -61,5 +74,5 @@ extern void		_ippFreeAttr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp-private.h 5230 2006-03-05 17:01:51Z mike $".
+ * End of "$Id: ipp-private.h 5753 2006-07-18 19:53:24Z mike $".
  */

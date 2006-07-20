@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makefile 5736 2006-07-13 19:59:36Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -127,6 +127,9 @@ install:	all
 	echo Creating $(SERVERROOT)/ppd...
 	$(INSTALL_DIR) -m 755 $(SERVERROOT)/ppd
 	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ppd
+	echo Creating $(SERVERROOT)/ssl...
+	$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl
+	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl
 	echo Creating $(STATEDIR)...
 	$(INSTALL_DIR) -m 755 $(STATEDIR)
 	echo Creating $(STATEDIR)/certs...
@@ -274,5 +277,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
+# End of "$Id: Makefile 5736 2006-07-13 19:59:36Z mike $".
 #

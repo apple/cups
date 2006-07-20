@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5686 2006-06-21 21:02:56Z mike $"
+ * "$Id: ipp.c 5736 2006-07-13 19:59:36Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -4334,7 +4334,8 @@ copy_printer_attrs(
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
                      "ipp", NULL, con->servername, con->serverport,
-		     "/printers/%s", printer->name);
+		     (printer->type & CUPS_PRINTER_CLASS) ?
+		         "/classes/%s" : "/printers/%s", printer->name);
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
         	 "printer-uri-supported", NULL, printer_uri);
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "printer-uri-supported=\"%s\"",
@@ -4822,9 +4823,10 @@ create_subscription(
 
         recipient = attr->values[0].string.text;
 
-	if (httpSeparateURI(HTTP_URI_CODING_ALL, recipient, scheme,
-                	    sizeof(scheme), userpass, sizeof(userpass), host,
-			    sizeof(host), &port, resource, sizeof(resource)))
+	if (httpSeparateURI(HTTP_URI_CODING_ALL, recipient,
+	                    scheme, sizeof(scheme), userpass, sizeof(userpass),
+			    host, sizeof(host), &port,
+			    resource, sizeof(resource)) < HTTP_URI_OK)
         {
           send_ipp_status(con, IPP_NOT_POSSIBLE,
 	                  _("Bad notify-recipient URI \"%s\"!"), recipient);
@@ -8808,19 +8810,11 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
   cupsdStartPrinter(printer, 1);
 
   if (dtype & CUPS_PRINTER_CLASS)
-  {
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" started by \"%s\".", name,
                     get_username(con));
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
-                  "Class \"%s\" started by \"%s\".", name, get_username(con));
-  }
   else
-  {
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" started by \"%s\".", name,
                     get_username(con));
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
-                  "Printer \"%s\" started by \"%s\".", name, get_username(con));
-  }
 
   cupsdCheckJobs();
 
@@ -8904,19 +8898,11 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
   cupsdStopPrinter(printer, 1);
 
   if (dtype & CUPS_PRINTER_CLASS)
-  {
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" stopped by \"%s\".", name,
                     get_username(con));
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
-                  "Class \"%s\" stopped by \"%s\".", name, get_username(con));
-  }
   else
-  {
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" stopped by \"%s\".", name,
                     get_username(con));
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
-                  "Printer \"%s\" stopped by \"%s\".", name, get_username(con));
-  }
 
  /*
   * Everything was ok, so return OK status...
@@ -9214,5 +9200,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 5686 2006-06-21 21:02:56Z mike $".
+ * End of "$Id: ipp.c 5736 2006-07-13 19:59:36Z mike $".
  */

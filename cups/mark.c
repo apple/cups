@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c 5529 2006-05-15 20:06:46Z mike $"
+ * "$Id: mark.c 5700 2006-06-26 19:20:39Z mike $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -407,6 +407,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
       ppd_cparam_t	*cparam;	/* Custom parameter */
       char		*units;		/* Custom points units */
 
+
       if ((coption = ppdFindCustomOption(ppd, option)) != NULL)
       {
         if ((cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params)) == NULL)
@@ -455,6 +456,12 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	}
       }
     }
+
+   /*
+    * Make sure that we keep the option marked below...
+    */
+
+    choice = "Custom";
   }
   else if (choice[0] == '{')
   {
@@ -679,5 +686,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c 5529 2006-05-15 20:06:46Z mike $".
+ * End of "$Id: mark.c 5700 2006-06-26 19:20:39Z mike $".
  */

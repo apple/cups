@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5686 2006-06-21 21:02:56Z mike $"
+ * "$Id: printers.c 5724 2006-07-12 19:42:35Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -546,6 +546,7 @@ cupsdCreateCommonData(void)
     }
 
     cupsArrayDelete(notifiers);
+    cupsDirClose(dir);
   }
 
   /* number-up-supported */
@@ -644,6 +645,9 @@ cupsdDeletePrinter(
   */
 
   cupsArrayRemove(Printers, p);
+
+  if (p->type & CUPS_PRINTER_IMPLICIT)
+    cupsArrayRemove(ImplicitPrinters, p);
 
  /*
   * Remove the dummy interface/icon/option files under IRIX...
@@ -1260,6 +1264,7 @@ cupsdRenamePrinter(
   */
 
   cupsArrayAdd(Printers, p);
+
   if (p->type & CUPS_PRINTER_IMPLICIT)
     cupsArrayAdd(ImplicitPrinters, p);
 }
@@ -3307,5 +3312,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 5686 2006-06-21 21:02:56Z mike $".
+ * End of "$Id: printers.c 5724 2006-07-12 19:42:35Z mike $".
  */

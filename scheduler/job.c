@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 5686 2006-06-21 21:02:56Z mike $"
+ * "$Id: job.c 5719 2006-07-11 21:04:48Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1764,8 +1764,8 @@ compare_active_jobs(void *first,	/* I - First job */
   int	diff;				/* Difference */
 
 
-  if ((diff = ((cupsd_job_t *)first)->priority -
-              ((cupsd_job_t *)second)->priority) != 0)
+  if ((diff = ((cupsd_job_t *)second)->priority -
+              ((cupsd_job_t *)first)->priority) != 0)
     return (diff);
   else
     return (((cupsd_job_t *)first)->id - ((cupsd_job_t *)second)->id);
@@ -3022,7 +3022,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   {
     snprintf(final_content_type, sizeof(final_content_type),
              "FINAL_CONTENT_TYPE=%s/%s",
-	     filter->dst->super, filter->dst->type);
+	     filter->src->super, filter->src->type);
     envp[envc ++] = final_content_type;
   }
 
@@ -3433,5 +3433,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 5686 2006-06-21 21:02:56Z mike $".
+ * End of "$Id: job.c 5719 2006-07-11 21:04:48Z mike $".
  */

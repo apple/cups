@@ -1,0 +1,42 @@
+{#job_id=0?:
+<TABLE CELLPADDING="0" CELLSPACING="0" CLASS="button" WIDTH="100%" SUMMARY="Auftragsliste">
+<TR CLASS="data">
+<TH>ID&nbsp;</TH>
+<TH>Name&nbsp;</TH>
+<TH>Benutzer&nbsp;</TH>
+<TH>Gr&ouml;&szlig;e&nbsp;</TH>
+<TH>Seiten&nbsp;</TH>
+<TH>Status&nbsp;</TH>
+<TH>Kontrolle&nbsp;</TH>
+</TR>
+
+{[job_id]
+<TR CLASS="data" VALIGN="TOP">
+<TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}&nbsp;</TD>
+<TD>{?job_name=?Unbekannt:{job_name}}&nbsp;</TD>
+<TD>{job_originating_user_name}&nbsp;</TD>
+<TD>{job_k_octets}k&nbsp;</TD>
+<TD>{job_media_sheets_completed=0?Unbekannt:{?job_media_sheets_completed}}</TD>
+<TD>{job_state=3?schwebend seit<BR>{time_at_creation}:{job_state=4?angehalten seit<BR>{time_at_creation}:
+{job_state=5?verarbeitet seit<BR>{time_at_processing}:{job_state=6?gestoppt um<BR>{time_at_completed}:
+{job_state=7?abgebrochen um<BR>{time_at_completed}:{job_state=8?aborted:beendet um<BR>{time_at_completed}}}}}}}&nbsp;</TD>
+<TD>
+{job_preserved>0?
+<A HREF="/jobs/?op=restart-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/button-restart-job.gif" ALT="Auftrag neu drucken" CLASS="button"></A>:}
+{job_state=4?
+<A HREF="/jobs/?op=release-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/button-release-job.gif" ALT="Auftrag freigeben" CLASS="button"></A>:}
+{job_state=3?
+<A HREF="/jobs/?op=hold-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/button-hold-job.gif" ALT="Auftrag anhalten" CLASS="button"></A>:}
+{job_state<7?
+<A HREF="/jobs/?op=cancel-job&amp;job_id={job_id}&amp;job_printer_uri={job_printer_uri}">
+<IMG SRC="/images/button-cancel-job.gif" ALT="Auftrag abbrechen" CLASS="button"></A>
+<A HREF="/jobs/?op=move-job&amp;job_id={job_id}"><IMG
+SRC="/images/button-move-job.gif" ALT="Auftrag verschieben" CLASS="button"></A>:}
+&nbsp;</TD>
+</TR>
+}
+</TABLE>
+}

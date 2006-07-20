@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 5545 2006-05-18 21:00:56Z mike $"
+ * "$Id: encode.c 5753 2006-07-18 19:53:24Z mike $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -28,6 +28,7 @@
  *   cupsEncodeOptions()   - Encode printer options into IPP attributes.
  *   cupsEncodeOptions2()  - Encode printer options into IPP attributes for
  *                           a group.
+ *   _ippFindOption()      - Find the attribute information for an option.
  *   compare_ipp_options() - Compare two IPP options.
  */
 
@@ -48,13 +49,6 @@
  *
  * **** THIS LIST MUST BE SORTED ****
  */
-
-typedef struct
-{
-  const char	*name;
-  ipp_tag_t	value_tag;
-  ipp_tag_t	group_tag;
-} _ipp_option_t;
 
 static const _ipp_option_t ipp_options[] =
 {
@@ -114,6 +108,8 @@ static const _ipp_option_t ipp_options[] =
   { "ppi-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "prettyprint",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { "prettyprint-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { "print-quality-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "printer-error-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
   { "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { "printer-is-accepting-jobs",IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
@@ -127,14 +123,12 @@ static const _ipp_option_t ipp_options[] =
   { "printer-state-reasons",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { "printer-type",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "printer-uri",		IPP_TAG_URI,		IPP_TAG_OPERATION },
-  { "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB },
-  { "print-quality-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "queued-job-count",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "raw",			IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
-  { "resolution",		IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
-  { "resolution-default",	IPP_TAG_RESOLUTION,	IPP_TAG_PRINTER },
   { "requesting-user-name-allowed",	IPP_TAG_NAME,	IPP_TAG_PRINTER },
   { "requesting-user-name-denied",	IPP_TAG_NAME,	IPP_TAG_PRINTER },
+  { "resolution",		IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
+  { "resolution-default",	IPP_TAG_RESOLUTION,	IPP_TAG_PRINTER },
   { "saturation",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "saturation-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "scaling",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
@@ -243,8 +237,7 @@ cupsEncodeOptions2(
 
   for (i = num_options, option = options; i > 0; i --, option ++)
   {
-    _ipp_option_t	key,		/* Search key */
-			*match;		/* Matching attribute */
+    _ipp_option_t	*match;		/* Matching attribute */
 
 
    /*
@@ -260,16 +253,7 @@ cupsEncodeOptions2(
     * Figure out the proper value and group tags for this option...
     */
 
-    key.name = option->name;
-    match    = (_ipp_option_t *)bsearch(&key, ipp_options,
-                                        sizeof(ipp_options) /
-					    sizeof(ipp_options[0]),
-					sizeof(ipp_options[0]),
-					(int (*)(const void *,
-					         const void *))
-				            compare_ipp_options);
-
-    if (match)
+    if ((match = _ippFindOption(option->name)) != NULL)
     {
       if (match->group_tag != group_tag)
         continue;
@@ -547,6 +531,30 @@ cupsEncodeOptions2(
 
 
 /*
+ * '_ippFindOption()' - Find the attribute information for an option.
+ */
+
+_ipp_option_t *				/* O - Attribute information */
+_ippFindOption(const char *name)	/* I - Option/attribute name */
+{
+  _ipp_option_t	key;			/* Search key */
+
+
+ /*
+  * Lookup the proper value and group tags for this option...
+  */
+
+  key.name = name;
+
+  return ((_ipp_option_t *)bsearch(&key, ipp_options,
+                                   sizeof(ipp_options) / sizeof(ipp_options[0]),
+				   sizeof(ipp_options[0]),
+				   (int (*)(const void *, const void *))
+				       compare_ipp_options));
+}
+
+
+/*
  * 'compare_ipp_options()' - Compare two IPP options.
  */
 
@@ -559,5 +567,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 5545 2006-05-18 21:00:56Z mike $".
+ * End of "$Id: encode.c 5753 2006-07-18 19:53:24Z mike $".
  */

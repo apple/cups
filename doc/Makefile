@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5609 2006-05-30 20:31:10Z mike $"
+# "$Id: Makefile 5736 2006-07-13 19:59:36Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -153,11 +153,13 @@ HELPFILES	=	\
 			help/network.html \
 			help/options.html \
 			help/overview.html \
+			help/policies.html \
 			help/ref-access_log.html \
 			help/ref-classes-conf.html \
 			help/ref-client-conf.html \
 			help/ref-cupsd-conf.html \
 			help/ref-error_log.html \
+			help/ref-mailto-conf.html \
 			help/ref-page_log.html \
 			help/ref-printers-conf.html \
 			help/ref-snmp-conf.html \
