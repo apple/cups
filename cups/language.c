@@ -1288,6 +1288,8 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 	  *d = *d * 8 + *s - '0';
 	  s ++;
 	}
+
+	d ++;
       }
       else
       {
