@@ -384,7 +384,7 @@ add_cache(http_addr_t *addr,		/* I - Device IP address */
 
   debug_printf("DEBUG: add_cache(addr=%p, addrname=\"%s\", uri=\"%s\", "
                   "id=\"%s\", make_and_model=\"%s\")\n",
-               addr, addrname, uri ? uri : "(null)", id ? id :  "(null)",
+               addr, addrname, uri ? uri : "(null)", id ? id : "(null)",
 	       make_and_model ? make_and_model : "(null)");
 
   temp = calloc(1, sizeof(snmp_cache_t));
