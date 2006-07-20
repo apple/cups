@@ -5,7 +5,7 @@
  *
  *   This set of APIs abstracts enumeration of directory entries.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -39,9 +39,9 @@
  * C++ magic...
  */
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 extern "C" {
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 
 
 /*
@@ -67,9 +67,9 @@ extern cups_dentry_t	*cupsDirRead(cups_dir_t *dp);
 extern void		cupsDirRewind(cups_dir_t *dp);
 
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 }
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 #endif /* !_CUPS_DIR_H_ */
 
 /*
