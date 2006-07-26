@@ -1142,7 +1142,7 @@ free_vbcs_charmap(_cups_vmap_t *vmap)	/* I - Character set */
  */
 
 
-void *					/* O - Charset map pointer */
+static void *				/* O - Charset map pointer */
 get_charmap(
     const cups_encoding_t encoding)	/* I - Encoding */
 {
