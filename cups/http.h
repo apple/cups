@@ -39,8 +39,8 @@
 #    include <winsock2.h>
 #    include <ws2tcpip.h>
 #  else
-#    ifdef __sgi /* IRIX needs this for IPv6 support!?! */
-#      define INET6
+#    ifdef __sgi
+#      define INET6			/* IRIX IPv6 support... */
 #    endif /* __sgi */
 #    include <unistd.h>
 #    include <sys/time.h>
@@ -53,6 +53,9 @@
 #    if !defined(__APPLE__) || !defined(TCP_NODELAY)
 #      include <netinet/tcp.h>
 #    endif /* !__APPLE__ || !TCP_NODELAY */
+#    if defined(AF_UNIX) && !defined(AF_LOCAL)
+#      define AF_LOCAL AF_UNIX		/* Older UNIX's have old names... */
+#    endif /* AF_UNIX && !AF_LOCAL */
 #    ifdef AF_LOCAL
 #      include <sys/un.h>
 #    endif /* AF_LOCAL */
