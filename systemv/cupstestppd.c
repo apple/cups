@@ -306,9 +306,9 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Look for default keywords with no matching option...
       */
 
-      for (i = 0; i < ppd->num_attrs; i ++)
+      for (j = 0; j < ppd->num_attrs; j ++)
       {
-	attr = ppd->attrs[i];
+	attr = ppd->attrs[j];
 
         if (!strcmp(attr->name, "DefaultColorSpace") ||
 	    !strcmp(attr->name, "DefaultFont") ||
@@ -327,11 +327,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    * Check that the default option value matches a choice...
 	    */
 
-	    for (j = 0; j < option->num_choices; j ++)
-	      if (!strcmp(option->choices[j].choice, attr->value))
+	    for (k = 0; k < option->num_choices; k ++)
+	      if (!strcmp(option->choices[k].choice, attr->value))
 	        break;
 
-            if (j >= option->num_choices)
+            if (k >= option->num_choices)
 	    {
 	      if (verbose >= 0)
 	      {
@@ -1205,9 +1205,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 	* Look for default keywords with no corresponding option...
 	*/
 
-	for (i = 0; i < ppd->num_attrs; i ++)
+	for (j = 0; j < ppd->num_attrs; j ++)
 	{
-	  attr = ppd->attrs[i];
+	  attr = ppd->attrs[j];
 
           if (!strcmp(attr->name, "DefaultColorSpace") ||
 	      !strcmp(attr->name, "DefaultColorSep") ||
