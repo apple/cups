@@ -33,7 +33,11 @@
  */
 
 #include "backend-private.h"
-#include <sys/select.h>
+#ifdef __hpux
+#  include <sys/time.h>
+#else
+#  include <sys/select.h>
+#endif /* __hpux */
 
 
 /*
