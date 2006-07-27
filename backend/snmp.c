@@ -52,6 +52,7 @@
  *                               packed integer value.
  *   compare_cache()           - Compare two cache entries.
  *   debug_printf()            - Display some debugging information.
+ *   do_request()              - Do a non-blocking IPP request.
  *   fix_make_model()          - Fix common problems in the make-and-model
  *                               string.
  *   free_array()              - Free an array of strings.
@@ -59,7 +60,7 @@
  *   get_interface_addresses() - Get the broadcast address(es) associated
  *                               with an interface.
  *   hex_debug()               - Output hex debugging data...
- *   list_devices()            - List all of the devices we found...
+ *   list_device()             - List a device we found...
  *   open_snmp_socket()        - Open the SNMP broadcast socket.
  *   password_cb()             - Handle authentication requests.
  *   probe_device()            - Probe a device to discover whether it is a
@@ -194,6 +195,13 @@ typedef struct snmp_packet_s		/**** SNMP packet ****/
 
 
 /*
+ * Private CUPS API to set the last error...
+ */
+
+extern void	_cupsSetError(ipp_status_t status, const char *message);
+
+
+/*
  * Local functions...
  */
 
@@ -238,6 +246,8 @@ static int		asn1_size_oid(const int *oid);
 static int		asn1_size_packed(int integer);
 static int		compare_cache(snmp_cache_t *a, snmp_cache_t *b);
 static void		debug_printf(const char *format, ...);
+static ipp_t		*do_request(http_t *http, ipp_t *request,
+			            const char *resource);
 static void		fix_make_model(char *make_model,
 			               const char *old_make_model,
 				       int make_model_size);
@@ -245,7 +255,7 @@ static void		free_array(cups_array_t *a);
 static void		free_cache(void);
 static http_addrlist_t	*get_interface_addresses(const char *ifname);
 static void		hex_debug(unsigned char *buffer, size_t len);
-static void		list_devices(void);
+static void		list_device(snmp_cache_t *cache);
 static int		open_snmp_socket(void);
 static const char	*password_cb(const char *prompt);
 static void		probe_device(snmp_cache_t *device);
@@ -330,12 +340,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   scan_devices(fd);
 
  /*
-  * Display the results...
-  */
-
-  list_devices();
-
- /*
   * Close, free, and return with no errors...
   */
 
@@ -402,6 +406,9 @@ add_cache(http_addr_t *addr,		/* I - Device IP address */
     temp->make_and_model = strdup(make_and_model);
 
   cupsArrayAdd(Devices, temp);
+
+  if (uri)
+    list_device(temp);
 }
 
 
@@ -1228,6 +1235,173 @@ debug_printf(const char *format,	/* I - Printf-style format string */
 
 
 /*
+ * 'do_request()' - Do a non-blocking IPP request.
+ */
+
+static ipp_t *				/* O - Response data or NULL */
+do_request(http_t     *http,		/* I - HTTP connection to server */
+           ipp_t      *request,		/* I - IPP request */
+           const char *resource)	/* I - HTTP resource for POST */
+{
+  ipp_t		*response;		/* IPP response data */
+  http_status_t	status;			/* Status of HTTP request */
+  ipp_state_t	state;			/* State of IPP processing */
+
+
+ /*
+  * Setup the HTTP variables needed...
+  */
+
+  httpClearFields(http);
+  httpSetLength(http, ippLength(request));
+  httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
+
+ /*
+  * Do the POST request...
+  */
+
+  debug_printf("DEBUG: %.3f POST %s...\n", run_time(), resource);
+
+  if (httpPost(http, resource))
+  {
+    if (httpReconnect(http))
+    {
+      _cupsSetError(IPP_DEVICE_ERROR, "Unable to reconnect");
+      return (NULL);
+    }
+    else if (httpPost(http, resource))
+    {
+      _cupsSetError(IPP_GONE, "Unable to POST");
+      return (NULL);
+    }
+  }
+
+ /*
+  * Send the IPP data...
+  */
+
+  request->state = IPP_IDLE;
+  status         = HTTP_CONTINUE;
+
+  while ((state = ippWrite(http, request)) != IPP_DATA)
+    if (state == IPP_ERROR)
+    {
+      status = HTTP_ERROR;
+      break;
+    }
+    else if (httpCheck(http))
+    {
+      if ((status = httpUpdate(http)) != HTTP_CONTINUE)
+	break;
+    }
+
+ /*
+  * Get the server's return status...
+  */
+
+  debug_printf("DEBUG: %.3f Getting response...\n", run_time());
+
+  while (status == HTTP_CONTINUE)
+    if (httpWait(http, 1000))
+      status = httpUpdate(http);
+    else
+    {
+      status      = HTTP_ERROR;
+      http->error = ETIMEDOUT;
+    }
+
+  if (status != HTTP_OK)
+  {
+   /*
+    * Flush any error message...
+    */
+
+    httpFlush(http);
+    response = NULL;
+  }
+  else
+  {
+   /*
+    * Read the response...
+    */
+
+    response = ippNew();
+
+    while ((state = ippRead(http, response)) != IPP_DATA)
+      if (state == IPP_ERROR)
+      {
+       /*
+        * Delete the response...
+	*/
+
+	ippDelete(response);
+	response = NULL;
+
+        _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
+	break;
+      }
+  }
+
+ /*
+  * Delete the original request and return the response...
+  */
+  
+  ippDelete(request);
+
+  if (response)
+  {
+    ipp_attribute_t	*attr;		/* status-message attribute */
+
+
+    attr = ippFindAttribute(response, "status-message", IPP_TAG_TEXT);
+
+    _cupsSetError(response->request.status.status_code,
+                   attr ? attr->values[0].string.text :
+		       ippErrorString(response->request.status.status_code));
+  }
+  else if (status != HTTP_OK)
+  {
+    switch (status)
+    {
+      case HTTP_NOT_FOUND :
+          _cupsSetError(IPP_NOT_FOUND, httpStatus(status));
+	  break;
+
+      case HTTP_UNAUTHORIZED :
+          _cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status));
+	  break;
+
+      case HTTP_FORBIDDEN :
+          _cupsSetError(IPP_FORBIDDEN, httpStatus(status));
+	  break;
+
+      case HTTP_BAD_REQUEST :
+          _cupsSetError(IPP_BAD_REQUEST, httpStatus(status));
+	  break;
+
+      case HTTP_REQUEST_TOO_LARGE :
+          _cupsSetError(IPP_REQUEST_VALUE, httpStatus(status));
+	  break;
+
+      case HTTP_NOT_IMPLEMENTED :
+          _cupsSetError(IPP_OPERATION_NOT_SUPPORTED, httpStatus(status));
+	  break;
+
+      case HTTP_NOT_SUPPORTED :
+          _cupsSetError(IPP_VERSION_NOT_SUPPORTED, httpStatus(status));
+	  break;
+
+      default :
+	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status));
+	  break;
+    }
+  }
+
+  return (response);
+}
+
+
+/*
  * 'fix_make_model()' - Fix common problems in the make-and-model string.
  */
 
@@ -1422,24 +1596,18 @@ hex_debug(unsigned char *buffer,	/* I - Buffer */
 
 
 /*
- * 'list_devices()' - List all of the devices we found...
+ * 'list_device()' - List a device we found...
  */
 
 static void
-list_devices(void)
+list_device(snmp_cache_t *cache)	/* I - Cached device */
 {
-  snmp_cache_t	*cache;			/* Cached device */
-
-
-  for (cache = (snmp_cache_t *)cupsArrayFirst(Devices);
-       cache;
-       cache = (snmp_cache_t *)cupsArrayNext(Devices))
-    if (cache->uri)
-      printf("network %s \"%s\" \"%s %s\" \"%s\"\n",
-             cache->uri,
-	     cache->make_and_model ? cache->make_and_model : "Unknown",
-	     cache->make_and_model ? cache->make_and_model : "Unknown",
-	     cache->addrname, cache->id ? cache->id : "");
+  if (cache->uri)
+    printf("network %s \"%s\" \"%s %s\" \"%s\"\n",
+           cache->uri,
+	   cache->make_and_model ? cache->make_and_model : "Unknown",
+	   cache->make_and_model ? cache->make_and_model : "Unknown",
+	   cache->addrname, cache->id ? cache->id : "");
 }
 
 
@@ -1551,8 +1719,6 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 			};
 
 
-    debug_printf("DEBUG: %s supports IPP!\n", device->addrname);
-
    /*
     * Use non-blocking IO...
     */
@@ -1578,16 +1744,14 @@ probe_device(snmp_cache_t *device)	/* I - Device */
       httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                       device->addrname, 631, resources[i]);
 
-      debug_printf("DEBUG: Trying %s (num_uris=%d)\n", uri, num_uris);
-
       request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                    NULL, uri);
 
-      response = cupsDoRequest(http, request, resources[i]);
+      response = do_request(http, request, resources[i]);
 
-      debug_printf("DEBUG: %s %s (%s)\n", uri,
+      debug_printf("DEBUG: %.3f %s %s (%s)\n", run_time(), uri,
         	   ippErrorString(cupsLastError()), cupsLastErrorString());
 
       if (response && response->request.status.status_code == IPP_OK)
@@ -2211,6 +2375,8 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 
     device->make_and_model = strdup(make_model);
   }
+
+  list_device(device);
 }
 
 
