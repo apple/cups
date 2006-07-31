@@ -288,6 +288,7 @@ static int		DeviceDescOID[] = { 1, 3, 6, 1, 2, 1, 25, 3,
 static unsigned		DeviceTypeRequest;
 static unsigned		DeviceDescRequest;
 static int		HostNameLookups = 0;
+static int		MaxRunTime = 10;
 static struct timeval	StartTime;
 
 
@@ -1735,6 +1736,13 @@ probe_device(snmp_cache_t *device)	/* I - Device */
          i ++)
     {
      /*
+      * Stop early if we are out of time...
+      */
+
+      if (MaxRunTime > 0 && run_time() >= MaxRunTime)
+        break;
+
+     /*
       * Don't look past /ipp if we have found a working URI...
       */
 
@@ -1890,6 +1898,7 @@ read_snmp_conf(const char *address)	/* I - Single address to probe */
   int		linenum;		/* Line number */
   const char	*cups_serverroot;	/* CUPS_SERVERROOT env var */
   const char	*debug;			/* CUPS_DEBUG_LEVEL env var */
+  const char	*runtime;		/* CUPS_MAX_RUN_TIME env var */
 
 
  /*
@@ -1904,6 +1913,9 @@ read_snmp_conf(const char *address)	/* I - Single address to probe */
 
   if ((debug = getenv("CUPS_DEBUG_LEVEL")) != NULL)
     DebugLevel = atoi(debug);
+
+  if ((runtime = getenv("CUPS_MAX_RUN_TIME")) != NULL)
+    MaxRunTime = atoi(runtime);
 
  /*
   * Find the snmp.conf file...
@@ -1941,6 +1953,8 @@ read_snmp_conf(const char *address)	/* I - Single address to probe */
 	                  !strcasecmp(value, "yes") ||
 	                  !strcasecmp(value, "true") ||
 	                  !strcasecmp(value, "double");
+      else if (!strcasecmp(line, "MaxRunTime"))
+        MaxRunTime = atoi(value);
       else
         fprintf(stderr, "ERROR: Unknown directive %s on line %d of %s!\n",
 	        line, linenum, filename);
@@ -2239,7 +2253,9 @@ scan_devices(int fd)			/* I - SNMP socket */
   for (device = (snmp_cache_t *)cupsArrayFirst(Devices);
        device;
        device = (snmp_cache_t *)cupsArrayNext(Devices))
-    if (!device->uri)
+    if (MaxRunTime > 0 && run_time() >= MaxRunTime)
+      break;
+    else if (!device->uri)
       probe_device(device);
 
   debug_printf("DEBUG: %.3f Scan complete!\n", run_time());

@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH snmp.conf 5 "Common UNIX Printing System" "18 April 2006" "Easy Software Products"
+.TH snmp.conf 5 "Common UNIX Printing System" "31 July 2006" "Easy Software Products"
 .SH NAME
 snmp.conf \- snmp configuration file for cups
 .SH DESCRIPTION
@@ -68,6 +68,11 @@ HostNameLookups off
 Specifies whether the addresses of printers should be converted
 to hostnames or left as numeric IP addresses. The default is
 "off".
+.TP 5
+MaxRunTime \fIseconds\fR
+.br
+Specifies the maximum number of seconds that the SNMP backend
+will scan the network for printers.
 .SH SEE ALSO
 http://localhost:631/help
 .SH COPYRIGHT
