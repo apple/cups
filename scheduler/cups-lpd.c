@@ -471,7 +471,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 
     request = ippNewRequest(CUPS_GET_PRINTERS);
 
-    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                   "requested-attributes",
 		  (int)(sizeof(requested) / sizeof(requested[0])),
                   NULL, requested);
@@ -597,7 +597,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
 
-    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                   "requested-attributes",
 		  (int)(sizeof(requested) / sizeof(requested[0])),
                   NULL, requested);
