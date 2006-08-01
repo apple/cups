@@ -260,6 +260,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   * Do the request and get back a response...
   */
 
+  seconds  = time(NULL);
   response = cupsDoRequest(http, request, "/");
 
   if (cupsLastError() > IPP_OK_CONFLICT)
@@ -285,7 +286,6 @@ poll_server(http_t      *http,		/* I - HTTP connection */
     fprintf(stderr, "DEBUG: %s Found %d printers.\n", prefix, max_count);
 
     count     = 0;
-    seconds   = time(NULL);
     max_count = max_count / interval + 1;
 
    /*
