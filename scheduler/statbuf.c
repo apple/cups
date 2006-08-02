@@ -141,6 +141,13 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
 
 
  /*
+  * Clear the errno variable since not all systems clear it after a
+  * successful read...
+  */
+
+  errno = 0;
+
+ /*
   * Check if the buffer already contains a full line...
   */
 

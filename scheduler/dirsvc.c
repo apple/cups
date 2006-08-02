@@ -1609,7 +1609,7 @@ cupsdUpdatePolling(void)
     if (!strchr(PollStatusBuffer->buffer, '\n'))
       break;
 
-  if (ptr == NULL)
+  if (ptr == NULL && errno)
   {
    /*
     * All polling processes have died; stop polling...

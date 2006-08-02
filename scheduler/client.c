@@ -2186,8 +2186,6 @@ cupsdUpdateCGI(void)
   int		loglevel;		/* Log level for message */
 
 
-  errno = 0;
-
   while ((ptr = cupsdStatBufUpdate(CGIStatusBuffer, &loglevel,
                                    message, sizeof(message))) != NULL)
     if (!strchr(CGIStatusBuffer->buffer, '\n'))
