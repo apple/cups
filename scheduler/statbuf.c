@@ -179,6 +179,7 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
 
       *loglevel = CUPSD_LOG_NONE;
       line[0]   = '\0';
+      errno     = 0;
 
       return (line);
     }
