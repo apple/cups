@@ -57,6 +57,15 @@ if test "$sharedstatedir" = "\${prefix}/com" -a "$prefix" = "/"; then
 	sharedstatedir="/usr/com"
 fi
 
+dnl Fix "datarootdir" variable if it hasn't been specified...
+if test "$datarootdir" = "\${prefix}/share"; then
+	if test "$prefix" = "/"; then
+		datarootdir="/usr/share"
+	else
+		datarootdir="$prefix/share"
+	fi
+fi
+
 dnl Fix "datadir" variable if it hasn't been specified...
 if test "$datadir" = "\${prefix}/share"; then
 	if test "$prefix" = "/"; then
@@ -64,6 +73,8 @@ if test "$datadir" = "\${prefix}/share"; then
 	else
 		datadir="$prefix/share"
 	fi
+elif test "$datadir" = "\${datarootdir}"; then
+	datadir="$datarootdir"
 fi
 
 dnl Fix "includedir" variable if it hasn't been specified...

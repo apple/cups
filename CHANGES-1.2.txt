@@ -1,6 +1,24 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.3
+
+	- Updated the build files for Autoconf 2.60 (STR #1853)
+	- The scheduler incorrectly terminated the polling
+	  processes after receiving a partial log line.
+	- The cups-lpd mini-daemon reported "No printer-state
+	  attribute found" errors when reporting the queue status
+	  (PR #6250, STR #1821)
+	- SNMP backend improvements (STR #1737, STR #1742, STR
+	  #1790, STR #1835)
+	- The scheduler erroneously reported an error with the
+	  CGI pipe (STR #1860)
+	- Fixed HP-UX compile problems (STR #1858, STR #1859)
+	- cupstestppd crashed with some PPD files (STR #1864)
+	- The <cups/dir.h> and <cups/file.h> header files did not
+	  work with C++.
+
+
 CHANGES IN CUPS V1.2.2
 
 	- Documentation updates (STR #1765, STR #1780)

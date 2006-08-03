@@ -174,12 +174,16 @@ UNINSTALL64	=	@UNINSTALL64@
 # We have to define these first because autoconf uses ${prefix}
 # and ${exec_prefix} for most of the other directories...
 #
+# The "datarootdir" variable may not get defined if you are using
+# a version of autoconf prior to 2.60.
+#
 # This is immediately followed by definition in ALL CAPS for the
 # needed directories...
 #
 
 bindir		=	@bindir@
 datadir		=	@datadir@
+datarootdir	=	@datarootdir@
 exec_prefix	=	@exec_prefix@
 includedir	=	@includedir@
 infodir		=	@infodir@

@@ -32,6 +32,7 @@ bindir=@bindir@
 includedir=@includedir@
 libdir=@libdir@
 imagelibdir=@libdir@
+datarootdir=@datadir@
 datadir=@datadir@
 sysconfdir=@sysconfdir@
 cups_datadir=@CUPS_DATADIR@
