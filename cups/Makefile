@@ -93,6 +93,7 @@ OBJS	=	\
 HEADERS	=	\
 		adminutil.h \
 		array.h \
+		backend.h \
 		cups.h \
 		dir.h \
 		file.h \
