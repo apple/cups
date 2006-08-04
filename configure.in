@@ -54,9 +54,17 @@ if test "x$LANGUAGES" != x; then
 	INSTALL_LANGUAGES="install-languages"
 	UNINSTALL_LANGUAGES="uninstall-languages"
 	for lang in $LANGUAGES; do
-		LANGFILES="$LANGFILES doc/$lang/index.html"
-		LANGFILES="$LANGFILES templates/$lang/edit-config.tmpl"
-		LANGFILES="$LANGFILES templates/$lang/header.tmpl"
+		if test -f doc/$lang/index.html.in; then
+			LANGFILES="$LANGFILES doc/$lang/index.html"
+		fi
+
+		if test -f templates/$lang/edit-config.tmpl.in; then
+			LANGFILES="$LANGFILES templates/$lang/edit-config.tmpl"
+		fi
+
+		if test -f templates/$lang/header.tmpl.in; then
+			LANGFILES="$LANGFILES templates/$lang/header.tmpl"
+		fi
 	done
 fi
 

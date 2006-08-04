@@ -25,7 +25,9 @@ dnl
 
 dnl Default langugages...
 AC_ARG_WITH(languages, [  --with-languages        set installed languages, default="de es ja pl sv" ],
-	LANGUAGES="$withval",
+	if test "x$withval" != xno; then
+		LANGUAGES="$withval"
+	fi,
 	LANGUAGES="de es ja pl sv")
 AC_SUBST(LANGUAGES)
 
