@@ -3007,7 +3007,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
 
-  if ((filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
+  if (!remote_job &&
+      (filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
   {
     snprintf(final_content_type, sizeof(final_content_type),
              "FINAL_CONTENT_TYPE=%s/%s",
