@@ -1184,9 +1184,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  if (!errors && !verbose)
 	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
-	  _cupsLangPuts(stdout,
-	                _("      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
-			  "                REF: Page 72, section 5.5\n"));
+	  _cupsLangPrintf(stdout,
+	                  _("      **FAIL**  %s must be 1284DeviceID!\n"
+			    "                REF: Page 72, section 5.5\n"),
+			  attr->name);
         }
 
 	errors ++;
