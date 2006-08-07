@@ -1468,7 +1468,7 @@ cupsdUpdateCUPSBrowse(void)
     if (cupsdCheckAuth(address, srcname, len, 1, &(Relays[i].from)))
       if (sendto(BrowseSocket, packet, bytes, 0,
                  (struct sockaddr *)&(Relays[i].to),
-		 sizeof(http_addr_t)) <= 0)
+		 httpAddrLength(&(Relays[i].to))) <= 0)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "cupsdUpdateCUPSBrowse: sendto failed for relay %d - %s.",
@@ -2566,7 +2566,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 
 	  sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(iface->broadcast),
-		 sizeof(struct sockaddr_in));
+		 httpAddrLength(&(iface->broadcast)));
         }
       }
       else if ((iface = cupsdNetIFFind(b->iface)) != NULL)
@@ -2607,7 +2607,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 
 	  sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(iface->broadcast),
-		 sizeof(struct sockaddr_in));
+		 httpAddrLength(&(iface->broadcast)));
         }
       }
     }
@@ -2628,7 +2628,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 
       if (sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(b->to),
-		 sizeof(struct sockaddr_in)) <= 0)
+		 httpAddrLength(&(b->to))) <= 0)
       {
        /*
         * Unable to send browse packet, so remove this address from the
