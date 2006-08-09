@@ -1628,7 +1628,7 @@ launchd_sync_conf(void)
                          kCFBooleanTrue);
 
     if ((Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)) ||
-        cupsArrayCount(ActiveJobs))
+        cupsArrayCount(ActiveJobs) || NumPolled)
       CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_RUNATLOAD),
                            kCFBooleanTrue);
     else
