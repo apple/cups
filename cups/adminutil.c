@@ -784,7 +784,14 @@ _cupsAdminGetServerSettings(
 	if ((port = strrchr(value, ':')) != NULL)
 	  *port = '\0';
 
-	if (strcasecmp(value, "localhost") && strcmp(value, "127.0.0.1"))
+	if (strcasecmp(value, "localhost") && strcmp(value, "127.0.0.1")
+#ifdef AF_LOCAL
+            && *value != '/'
+#endif /* AF_LOCAL */
+#ifdef AF_INET6
+            && strcmp(value, "::1")
+#endif /* AF_INET6 */
+	    )
 	  remote_access = 1;
       }
       else if (!strcasecmp(line, "Browsing"))
@@ -860,7 +867,14 @@ _cupsAdminGetServerSettings(
 	in_location       = 0;
       }
       else if (!strcasecmp(line, "Allow") && in_admin_location &&
-               strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1"))
+               strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1")
+#ifdef AF_LOCAL
+	       && *value != '/'
+#endif /* AF_LOCAL */
+#ifdef AF_INET6
+	       && strcmp(value, "::1")
+#endif /* AF_INET6 */
+	       )
       {
 	remote_admin = 1;
       }
@@ -1084,7 +1098,7 @@ _cupsAdminSetServerSettings(
 	{
 	  cupsFilePuts(temp, "# Only listen for connections from the local "
 	                     "machine.\n");
-	  cupsFilePrintf(temp, "Listen 127.0.0.1:%d\n", ippPort());
+	  cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
 	}
 
 #ifdef CUPS_DEFAULT_DOMAINSOCKET
@@ -1440,7 +1454,7 @@ _cupsAdminSetServerSettings(
     {
       cupsFilePuts(temp,
                    "# Only listen for connections from the local machine.\n");
-      cupsFilePrintf(temp, "Listen 127.0.0.1:%d\n", ippPort());
+      cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
     }
 
 #ifdef CUPS_DEFAULT_DOMAINSOCKET
