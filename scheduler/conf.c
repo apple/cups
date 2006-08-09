@@ -1947,6 +1947,13 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
 
 
  /*
+  * Empty protocol line yields NULL pointer...
+  */
+
+  if (!s)
+    return (0);
+
+ /*
   * Loop through the value string,...
   */
 
