@@ -8050,14 +8050,12 @@ send_ipp_status(cupsd_client_t *con,	/* I - Client connection */
               _cupsLangString(con->language, message), ap);
     va_end(ap);
 
-    cupsdLogMessage(status >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_INFO,
-                    "%s %s: %s",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "%s %s: %s",
 		    ippOpString(con->request->request.op.operation_id),
 		    ippErrorString(status), formatted);
   }
   else
-    cupsdLogMessage(status >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_INFO,
-                    "%s %s",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "%s %s",
 		    ippOpString(con->request->request.op.operation_id),
 		    ippErrorString(status));
 
