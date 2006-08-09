@@ -1260,6 +1260,7 @@ cupsFileRewind(cups_file_t *fp)		/* I - CUPS file */
   fp->pos = 0;
   fp->ptr = NULL;
   fp->end = NULL;
+  fp->eof = 0;
 
   return (0);
 }
