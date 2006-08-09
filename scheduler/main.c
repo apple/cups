@@ -660,7 +660,7 @@ main(int  argc,				/* I - Number of command-line args */
     * inactivity...
     */
 
-    if (timeout.tv_sec == 86400 && Launchd && LaunchdTimeout &&
+    if (timeout.tv_sec == 86400 && Launchd && LaunchdTimeout && !NumPolled &&
 	(!Browsing || !(BrowseLocalProtocols & BROWSE_DNSSD) ||
 	 cupsArrayCount(Printers) == 0))
     {
