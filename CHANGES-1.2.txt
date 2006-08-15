@@ -3,6 +3,24 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.3
 
+	- The cupstestppd utility did not validate translation
+	  strings for custom options properly.
+	- Multi-language PPD files were not properly localized in
+	  the web interface (STR #1913)
+	- The admin page's simple settings options did not check
+	  for local domain socket or IPv6 addresses and did not
+	  use "localhost" as the listen address.
+	- An empty BrowseProtocols, BrowseLocalProtocols, or
+	  BrowseRemoteProtocols line would crash the scheduler
+	  instead of disabling the corresponding browsing options.
+	- The scheduler now logs IPP operation status as debug
+	  messages instead of info or error.
+	- cupsFileRewind() didn't clear the end-of-file state.
+	- cupstestppd didn't report the actual misspelling of the
+	  1284DeviceID attribute (STR #1849) 
+	- BrowseRelay didn't work on Debian (STR #1887)
+	- configure --without-languages didn't work (STR #1879)
+	- Manually added remote printers did not work (STR #1881)
 	- The <cups/backend.h> header was not installed.
 	- Updated the build files for Autoconf 2.60 (STR #1853)
 	- The scheduler incorrectly terminated the polling

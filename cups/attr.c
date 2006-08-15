@@ -89,7 +89,7 @@ ppdFindAttr(ppd_file_t *ppd,		/* I - PPD file data */
 
   for (attr = (ppd_attr_t *)cupsArrayFirst(ppd->sorted_attrs);
        attr;
-       attr = (ppd_attr_t *)cupsArrayFirst(ppd->sorted_attrs))
+       attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs))
   {
     if ((diff = strcasecmp(attr->name, name)) == 0)
       break;

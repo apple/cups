@@ -1010,7 +1010,10 @@ main(int  argc,			/* I - Number of command-line arguments */
         char	*languages,		/* Copy of attribute value */
 		*langstart,		/* Start of current language */
 		*langptr,		/* Pointer into languages */
-		keyword[PPD_MAX_NAME];	/* Localization keyword */
+		keyword[PPD_MAX_NAME],	/* Localization keyword */
+		ckeyword[PPD_MAX_NAME];	/* Custom option keyword */
+	ppd_coption_t	*coption;	/* Custom option */
+	ppd_cparam_t	*cparam;	/* Custom parameter */
 
 
         languages = strdup(attr->value);
@@ -1104,7 +1107,61 @@ main(int  argc,			/* I - Number of command-line arguments */
 	             option->keyword);
             for (j = 0; j < option->num_choices; j ++)
 	    {
-	      if (!ppdFindAttr(ppd, keyword, option->choices[j].choice))
+	      if (!strcasecmp(option->choices[j].choice, "Custom") &&
+	          (coption = ppdFindCustomOption(ppd,
+		                                 option->keyword)) != NULL)
+	      {
+		snprintf(ckeyword, sizeof(ckeyword), "%s.Custom%s",
+		         langstart, option->keyword);
+
+		if (!ppdFindAttr(ppd, ckeyword, "True"))
+		{
+		  if (verbose >= 0)
+		  {
+		    if (!errors && !verbose)
+		      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		    _cupsLangPrintf(stdout,
+	                	    _("      **FAIL**  Missing \"%s\" "
+				      "translation string for option %s, "
+				      "choice %s!\n"),
+				    langstart, ckeyword + 1 + strlen(langstart),
+				    "True");
+        	  }
+
+		  errors ++;
+		}
+
+                if (strcasecmp(option->keyword, "PageSize"))
+		{
+		  for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
+		       cparam;
+		       cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
+		  {
+		    snprintf(ckeyword, sizeof(ckeyword), "%s.ParamCustom%s",
+		             langstart, option->keyword);
+		    if (!ppdFindAttr(ppd, ckeyword, cparam->name))
+		    {
+		      if (verbose >= 0)
+		      {
+			if (!errors && !verbose)
+			  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+			_cupsLangPrintf(stdout,
+	                		_("      **FAIL**  Missing \"%s\" "
+					  "translation string for option %s, "
+					  "choice %s!\n"),
+					langstart,
+					ckeyword + 1 + strlen(langstart),
+				        cparam->name);
+        	      }
+
+		      errors ++;
+		    }
+                  }
+                }
+	      }
+	      else if (!ppdFindAttr(ppd, keyword, option->choices[j].choice))
 	      {
 		if (verbose >= 0)
 		{
