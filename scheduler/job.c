@@ -2414,7 +2414,6 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 					/* PRINTER env variable */
 			rip_max_cache[255];
 					/* RIP_MAX_CACHE env variable */
-  int			remote_job;	/* Remote print job? */
   static char		*options = NULL;/* Full list of options */
   static int		optlength = 0;	/* Length of option buffer */
 
@@ -2556,17 +2555,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   FilterLevel += job->cost;
 
  /*
-  * Determine if we are printing to a remote printer...
-  */
-
-  remote_job = printer->raw && job->num_files > 1 &&
-               !strncmp(printer->device_uri, "ipp://", 6);
-
- /*
   * Add decompression filters, if any...
   */
 
-  if (!remote_job && job->compressions[job->current_file])
+  if (!printer->raw && job->compressions[job->current_file])
   {
    /*
     * Add gziptoany filter to the front of the list...
@@ -2900,7 +2892,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   * For remote jobs, we send all of the files in the argument list.
   */
 
-  if (remote_job)
+  if (printer->remote && job->num_files > 1)
     argv = calloc(7 + job->num_files, sizeof(char *));
   else
     argv = calloc(8, sizeof(char *));
@@ -2914,7 +2906,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   argv[4] = copies;
   argv[5] = options;
 
-  if (remote_job)
+  if (printer->remote && job->num_files > 1)
   {
     for (i = 0; i < job->num_files; i ++)
     {
@@ -3007,7 +2999,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
 
-  if (!remote_job &&
+  if (!printer->remote &&
       (filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
   {
     snprintf(final_content_type, sizeof(final_content_type),
@@ -3049,7 +3041,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"DEVICE_URI=%s\"",
                       job->id, i, sani_uri);
 
-  if (remote_job)
+  if (printer->remote)
     job->current_file = job->num_files;
   else
     job->current_file ++;
@@ -3345,7 +3337,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 		  slot, filterfds[slot][0], filterfds[slot][1]);
   cupsdClosePipe(filterfds[slot]);
 
-  if (remote_job)
+  if (printer->remote && job->num_files > 1)
   {
     for (i = 0; i < job->num_files; i ++)
       free(argv[i + 6]);
@@ -3389,7 +3381,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   cupsArrayDelete(filters);
 
-  if (remote_job)
+  if (printer->remote && job->num_files > 1)
   {
     for (i = 0; i < job->num_files; i ++)
       free(argv[i + 6]);

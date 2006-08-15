@@ -66,6 +66,7 @@ typedef struct cupsd_printer_s
   char		*device_uri;		/* Device URI */
   char		*port_monitor;		/* Port monitor */
   int		raw;			/* Raw queue? */
+  int		remote;			/* Remote queue? */
   mime_type_t	*filetype;		/* Pseudo-filetype for printer */
   cups_array_t	*filetypes;		/* Supported file types */
   void		*job;			/* Current job in queue */

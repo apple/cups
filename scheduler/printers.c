@@ -1488,7 +1488,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     else
       snprintf(resource, sizeof(resource), "/printers/%s", p->name);
 
-    if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL)
+    if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL ||
+        auth->type == AUTH_NONE)
       auth = cupsdFindPolicyOp(p->op_policy_ptr, IPP_PRINT_JOB);
 
     if (auth)
@@ -1568,7 +1569,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
   printer_type = p->type;
 
-  p->raw = 0;
+  p->raw    = 0;
+  p->remote = 0;
 
   if (p->type & CUPS_PRINTER_REMOTE)
   {
@@ -1586,7 +1588,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
         	 p->uri);
 
-    p->raw = 1;
+    p->raw    = 1;
+    p->remote = 1;
   }
   else
   {
@@ -2026,7 +2029,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	  * Print all files directly...
 	  */
 
-	  p->raw = 1;
+	  p->raw    = 1;
+	  p->remote = 1;
 	}
 	else
 	{

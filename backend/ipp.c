@@ -214,6 +214,9 @@ main(int  argc,				/* I - Number of command-line args */
     if ((content_type = getenv("CONTENT_TYPE")) == NULL)
       content_type = "application/octet-stream";
 
+  if (!strncmp(content_type, "printer/", 8))
+    content_type = "application/vnd.cups-raw";
+
  /*
   * Extract the hostname and printer name from the URI...
   */
