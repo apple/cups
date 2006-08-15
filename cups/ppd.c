@@ -2037,10 +2037,8 @@ ppd_compare_attrs(ppd_attr_t *a,	/* I - First attribute */
 
   if ((ret = strcasecmp(a->name, b->name)) != 0)
     return (ret);
-  else if (a->spec[0] && b->spec[0])
-    return (strcasecmp(a->spec, b->spec));
   else
-    return (0);
+    return (strcasecmp(a->spec, b->spec));
 }
 
 

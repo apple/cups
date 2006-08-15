@@ -192,9 +192,17 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
       int		i, j, k;	/* Looping vars */
+      ppd_attr_t	*attr;		/* Current attribute */
       ppd_group_t	*group;		/* Option group */
       ppd_option_t	*option;	/* Option */
+      char		lang[255];	/* LANG environment variable */
 
+
+      if (argc > 2)
+      {
+        snprintf(lang, sizeof(lang), "LANG=%s", argv[2]);
+	putenv(lang);
+      }
 
       ppdLocalize(ppd);
 
@@ -203,7 +211,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	   i --, group ++)
       {
 	printf("%s (%s):\n", group->name, group->text);
-	
+
 	for (j = group->num_options, option = group->options;
 	     j > 0;
 	     j --, option ++)
@@ -215,6 +223,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 		   option->choices[k].text);
 	}
       }
+
+      puts("Attributes:");
+
+      for (attr = (ppd_attr_t *)cupsArrayFirst(ppd->sorted_attrs);
+           attr;
+	   attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs))
+        printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec,
+	       attr->text, attr->value ? attr->value : "");
     }
   }
 
