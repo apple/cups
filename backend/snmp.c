@@ -301,6 +301,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
      char *argv[])			/* I - Command-line arguments */
 {
   int		fd;			/* SNMP socket */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -318,6 +321,23 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   cupsSetPasswordCB(password_cb);
+
+ /*
+  * Catch SIGALRM signals...
+  */
+
+#ifdef HAVE_SIGSET
+  sigset(SIGALRM, alarm_handler);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGALRM);
+  action.sa_handler = alarm_handler;
+  sigaction(SIGALRM, &action, NULL);
+#else
+  signal(SIGALRM, alarm_handler);
+#endif /* HAVE_SIGSET */
 
  /*
   * Open the SNMP socket...
@@ -425,6 +445,10 @@ alarm_handler(int sig)			/* I - Signal number */
   */
 
   (void)sig;
+
+#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
+  signal(SIGALRM, alarm_handler);
+#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
 
   if (DebugLevel)
     write(2, "DEBUG: ALARM!\n", 14);
@@ -1693,7 +1717,11 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 
   debug_printf("DEBUG: %.3f Probing %s...\n", run_time(), device->addrname);
 
-  if ((http = httpConnect(device->addrname, 631)) != NULL)
+  alarm(1);
+  http = httpConnect(device->addrname, 631);
+  alarm(0);
+
+  if (http);
   {
    /*
     * IPP is supported...
@@ -2349,7 +2377,6 @@ try_connect(http_addr_t *addr,		/* I - Socket address */
 
   addr->ipv4.sin_port = htons(port);
 
-  signal(SIGALRM, alarm_handler);
   alarm(1);
 
   status = connect(fd, (void *)addr, httpAddrLength(addr));
