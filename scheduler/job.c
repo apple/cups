@@ -690,7 +690,7 @@ cupsdFreeAllJobs(void)
 
   cupsdHoldSignals();
 
-  cupsdStopAllJobs();
+  cupsdStopAllJobs(1);
   cupsdSaveAllJobs();
 
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
@@ -1483,7 +1483,7 @@ cupsdSetJobPriority(
  */
 
 void
-cupsdStopAllJobs(void)
+cupsdStopAllJobs(int force)		/* I - 1 = Force all filters to stop */
 {
   cupsd_job_t	*job;			/* Current job */
 
@@ -1495,7 +1495,7 @@ cupsdStopAllJobs(void)
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
     if (job->state_value == IPP_JOB_PROCESSING)
     {
-      cupsdStopJob(job, 1);
+      cupsdStopJob(job, force);
       job->state->values[0].integer = IPP_JOB_PENDING;
       job->state_value              = IPP_JOB_PENDING;
     }

@@ -115,7 +115,7 @@ extern void		cupsdSaveAllJobs(void);
 extern void		cupsdSaveJob(cupsd_job_t *job);
 extern void		cupsdSetJobHoldUntil(cupsd_job_t *job, const char *when);
 extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
-extern void		cupsdStopAllJobs(void);
+extern void		cupsdStopAllJobs(int force);
 extern void		cupsdStopJob(cupsd_job_t *job, int force);
 extern void		cupsdUpdateJob(cupsd_job_t *job);
 
