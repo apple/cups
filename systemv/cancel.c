@@ -60,6 +60,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   ipp_op_t	op;			/* Operation */
 
 
+  _cupsSetLocale();
+
  /*
   * Setup to cancel individual print jobs...
   */

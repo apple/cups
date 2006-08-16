@@ -94,6 +94,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
+  _cupsSetLocale();
+
   deletefile  = 0;
   printer     = NULL;
   num_dests   = 0;

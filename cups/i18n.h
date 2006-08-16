@@ -105,6 +105,7 @@ extern const char	*_cupsLangString(cups_lang_t *lang, const char *message);
 extern void		_cupsMessageFree(cups_array_t *a);
 extern cups_array_t	*_cupsMessageLoad(const char *filename);
 extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
+extern void		_cupsSetLocale(void);
 
 #  ifdef __cplusplus
 }

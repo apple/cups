@@ -78,6 +78,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_dest_t	*dests;			/* Printers */
 
 
+  _cupsSetLocale();
+
  /*
   * Parse command-line arguments...
   */

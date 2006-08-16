@@ -117,6 +117,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     return (0);
 #endif /* __sun */
 
+  _cupsSetLocale();
+
   silent      = 0;
   printer     = NULL;
   num_dests   = 0;

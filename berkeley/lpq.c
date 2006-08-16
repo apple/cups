@@ -79,6 +79,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_lang_t	*language;		/* Language */
 
 
+  _cupsSetLocale();
+
  /*
   * Check for command-line options...
   */

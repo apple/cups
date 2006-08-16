@@ -66,6 +66,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*dest;			/* New destination */
 
 
+  _cupsSetLocale();
+
   dest      = NULL;
   dests     = NULL;
   http      = NULL;

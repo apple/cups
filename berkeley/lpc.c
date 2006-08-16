@@ -65,6 +65,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*params;		/* Pointer to parameters */
 
 
+  _cupsSetLocale();
+
  /*
   * Connect to the scheduler...
   */

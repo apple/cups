@@ -69,6 +69,8 @@ main(int  argc,				/* I - Number of command-line arguments */
  		*option;		/* Current option */
 
 
+  _cupsSetLocale();
+
  /*
   * Loop through the command-line arguments...
   */

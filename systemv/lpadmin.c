@@ -92,6 +92,8 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_option_t	*options;	/* Options */
 
 
+  _cupsSetLocale();
+
   http        = NULL;
   printer     = NULL;
   num_options = 0;

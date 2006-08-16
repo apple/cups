@@ -16,6 +16,7 @@ _cupsMessageFree
 _cupsMessageLoad
 _cupsMessageLookup
 _cupsSetError
+_cupsSetLocale
 _cupsStrAlloc
 _cupsStrFlush
 _cupsStrFormatd

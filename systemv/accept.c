@@ -58,6 +58,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		cancel;			/* Cancel jobs? */
 
 
+  _cupsSetLocale();
+
  /*
   * See what operation we're supposed to do...
   */
