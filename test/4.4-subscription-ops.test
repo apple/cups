@@ -18,7 +18,7 @@
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
 
         GROUP subscription
-	ATTR uri notify-recipient testnotify
+	ATTR uri notify-recipient testnotify://
 	ATTR keyword notify-events printer-state-changed
 	ATTR integer notify-lease-duration 5
 
@@ -71,12 +71,12 @@
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
 
         GROUP subscription
-	ATTR uri notify-recipient testnotify
+	ATTR uri notify-recipient testnotify://
 	ATTR keyword notify-events printer-state-changed
 	ATTR integer notify-lease-duration 5
 
         GROUP subscription
-	ATTR uri notify-recipient testnotify
+	ATTR uri notify-recipient testnotify://
 	ATTR keyword notify-events printer-config-changed
 	ATTR integer notify-lease-duration 5
 
