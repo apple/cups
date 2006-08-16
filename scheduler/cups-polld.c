@@ -23,9 +23,11 @@
  *
  * Contents:
  *
- *   main()        - Open sockets and poll until we are killed...
- *   dequote()     - Remote quotes from a string.
- *   poll_server() - Poll the server for the given set of printers or classes.
+ *   main()           - Open sockets and poll until we are killed...
+ *   dequote()        - Remote quotes from a string.
+ *   poll_server()    - Poll the server for the given set of printers or
+ *                      classes.
+ *   sighup_handler() - Handle 'hangup' signals to restart polling.
  */
 
 /*
@@ -38,6 +40,14 @@
 #include <errno.h>
 #include <cups/language.h>
 #include <cups/string.h>
+#include <signal.h>
+
+
+/*
+ * Local globals...
+ */
+
+static int	restart_polling = 1;
 
 
 /*
@@ -47,6 +57,7 @@
 static char	*dequote(char *d, const char *s, int dlen);
 static int	poll_server(http_t *http, int sock, int port, int interval,
 			    const char *prefix);
+static void	sighup_handler(int sig);
 
 
 /*
@@ -65,7 +76,27 @@ main(int  argc,				/* I - Number of command-line args */
   int		seconds,		/* Seconds left from poll */
 		remain;			/* Total remaining time to sleep */
   char		prefix[1024];		/* Prefix for log messages */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
+
+ /*
+  * Catch hangup signals for when the network changes...
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGHUP, sighup_handler);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGHUP);
+  action.sa_handler = sighup_handler;
+  sigaction(SIGHUP, &action, NULL);
+#else
+  signal(SIGHUP, sighup_handler);
+#endif /* HAVE_SIGSET */
 
  /*
   * Don't buffer log messages...
@@ -119,31 +150,35 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
  /*
-  * Open a connection to the server...
-  */
-
-  while ((http = httpConnectEncrypt(argv[1], atoi(argv[2]),
-                                    cupsEncryption())) == NULL)
-  {
-    fprintf(stderr, "ERROR: %s Unable to connect to %s on port %s: %s\n",
-            prefix, argv[1], argv[2],
-	    h_errno ? hstrerror(h_errno) : strerror(errno));
-    sleep(interval);
-  }
-
- /*
   * Loop forever, asking for available printers and classes...
   */
 
-  for (;;)
+  for (http = NULL;;)
   {
+   /*
+    * Open a connection to the server...
+    */
+
+    if (restart_polling || !http)
+    {
+      httpClose(http);
+
+      if ((http = httpConnectEncrypt(argv[1], atoi(argv[2]),
+                                     cupsEncryption())) == NULL)
+      {
+	fprintf(stderr, "ERROR: %s Unable to connect to %s on port %s: %s\n",
+        	prefix, argv[1], argv[2],
+		h_errno ? hstrerror(h_errno) : strerror(errno));
+      }
+    }
+
    /*
     * Get the printers and classes...
     */
 
     remain = interval;
 
-    if ((seconds = poll_server(http, sock, port, interval, prefix)) > 0)
+    if (http && (seconds = poll_server(http, sock, port, interval, prefix)) > 0)
       remain -= seconds;
 
    /*
@@ -421,6 +456,23 @@ poll_server(http_t      *http,		/* I - HTTP connection */
   */
 
   return (time(NULL) - seconds);
+}
+
+
+/*
+ * 'sighup_handler()' - Handle 'hangup' signals to restart polling.
+ */
+
+static void
+sighup_handler(int sig)			/* I - Signal number */
+{
+  (void)sig;
+
+  restart_polling = 1;
+
+#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
+  signal(SIGHUP, sighup_handler);
+#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
 }
 
 

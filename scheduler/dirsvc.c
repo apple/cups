@@ -514,6 +514,23 @@ cupsdLoadRemoteCache(void)
 
 
 /*
+ * 'cupsdRestartPolling()' - Restart polling servers as needed.
+ */
+
+void
+cupsdRestartPolling(void)
+{
+  int			i;		/* Looping var */
+  cupsd_dirsvc_poll_t	*pollp;		/* Current polling server */
+
+
+  for (i = 0, pollp = Polled; i < NumPolled; i ++, pollp ++)
+    if (pollp->pid)
+      kill(pollp->pid, SIGHUP);
+}
+
+
+/*
  * 'cupsdSaveRemoteCache()' - Save the remote printer cache.
  */
 

@@ -350,6 +350,7 @@ cupsdUpdateSystemMonitor(void)
 	  p->browse_time = 0;
 
         cupsdSendBrowseList();
+	cupsdRestartPolling();
       }
       else
         cupsdLogMessage(CUPSD_LOG_DEBUG,

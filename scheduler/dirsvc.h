@@ -164,6 +164,7 @@ VAR char		*BrowseLDAPBindDN VALUE(NULL),
  */
 
 extern void	cupsdLoadRemoteCache(void);
+extern void	cupsdRestartPolling(void);
 extern void	cupsdSaveRemoteCache(void);
 extern void	cupsdSendBrowseDelete(cupsd_printer_t *p);
 extern void	cupsdSendBrowseList(void);
