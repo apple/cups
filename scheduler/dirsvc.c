@@ -1940,6 +1940,9 @@ process_browse_data(
     else
       return;
 
+    if (hptr && !*hptr)
+      *hptr = '.';			/* Resource FQDN */
+
     if ((p = cupsdFindClass(name)) == NULL && BrowseShortNames)
     {
       if ((p = cupsdFindClass(resource + 9)) != NULL)
@@ -2042,6 +2045,9 @@ process_browse_data(
       snprintf(name, sizeof(name), "%s@%s", resource + 10, host);
     else
       return;
+
+    if (hptr && !*hptr)
+      *hptr = '.';			/* Resource FQDN */
 
     if ((p = cupsdFindPrinter(name)) == NULL && BrowseShortNames)
     {
