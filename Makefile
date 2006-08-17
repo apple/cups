@@ -229,13 +229,29 @@ check test:	all
 # Make software distributions using EPM (http://www.easysw.com/epm/)...
 #
 
-EPMFLAGS	=	-v
+EPMFLAGS	=	-v --output-dir dist
 
-aix bsd deb depot inst osx pkg rpm setld slackware swinstall tardist:
+aix bsd deb depot inst pkg rpm setld slackware swinstall tardist:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
 
 epm:
-	epm $(EPMFLAGS) cups packaging/cups.list
+	epm $(EPMFLAGS) -s packaging/installer.gif cups packaging/cups.list
+
+osx:
+	epm $(EPMFLAGS) -f osx -s packaging/installer.tif cups packaging/cups.list
+
+.PHONEY:	dist
+dist:	all
+	$(RM) -r dist
+	$(MAKE) $(MFLAGS) epm
+	case `uname` in \
+		*BSD*) $(MAKE) $(MFLAGS) bsd; ;; \
+		Darwin*) $(MAKE) $(MFLAGS) osx; ;; \
+		HP-UX*) $(MAKE) $(MFLAGS) swinstall; ;; \
+		IRIX*) $(MAKE) $(MFLAGS) tardist; ;; \
+		Linux*) $(MAKE) $(MFLAGS) rpm; ;; \
+		SunOS*) $(MAKE) $(MFLAGS) pkg; ;; \
+	esac
 
 
 #
