@@ -138,7 +138,6 @@ main(int  argc,				/* I - Number of command-line args */
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;		/* IPP version */
-  int		reasons;		/* Number of printer-state-reasons */
   static const char * const pattrs[] =
 		{			/* Printer attributes we want */
 		  "copies-supported",
@@ -748,7 +747,6 @@ main(int  argc,				/* I - Number of command-line args */
   * Then issue the print-job request...
   */
 
-  reasons = 0;
   job_id  = 0;
 
   while (copies > 0)
@@ -1303,6 +1301,8 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 #endif /* __APPLE__ */
 
     exit(CUPS_BACKEND_AUTH_REQUIRED);
+
+    return (NULL);			/* Eliminate compiler warning */
   }
 }
 

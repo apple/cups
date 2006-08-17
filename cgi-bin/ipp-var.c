@@ -110,6 +110,7 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
   */
 
   num_attrs = 0;
+  attrs[0]  = NULL;			/* Eliminate compiler warning */
 
   while ((ch = getc(in)) != EOF)
     if (ch == '\\')

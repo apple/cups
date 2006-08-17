@@ -2042,7 +2042,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     }
     else if (!strcasecmp(line, "State"))
     {
-      job->state_value = atoi(value);
+      job->state_value = (ipp_jstate_t)atoi(value);
 
       if (job->state_value < IPP_JOB_PENDING)
         job->state_value = IPP_JOB_PENDING;

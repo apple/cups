@@ -1430,7 +1430,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
                              "job-state", IPP_JOB_STOPPED);
-  job->state_value = job->state->values[0].integer;
+  job->state_value = (ipp_jstate_t)job->state->values[0].integer;
   job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                               "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
@@ -1924,7 +1924,6 @@ add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
              cupsd_job_t    *job)	/* I - Job */
 {
   char			uuid[1024];	/* job-uuid string */
-  ipp_attribute_t	*attr;		/* job-uuid attribute */
   _cups_md5_state_t	md5state;	/* MD5 state */
   unsigned char		md5sum[16];	/* MD5 digest/sum */
 
@@ -1933,7 +1932,7 @@ add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
   * First see if the job already has a job-uuid attribute; if so, return...
   */
 
-  if ((attr = ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI)) != NULL)
+  if (ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI))
     return;
 
  /*
@@ -4335,7 +4334,7 @@ copy_subscription_attrs(
       */
 
       ippAddString(con->response, IPP_TAG_SUBSCRIPTION,
-                   IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                   (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
                    "notify-events", NULL, name);
     }
     else
@@ -4349,7 +4348,7 @@ copy_subscription_attrs(
           count ++;
 
       attr = ippAddStrings(con->response, IPP_TAG_SUBSCRIPTION,
-                           IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                           (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
                            "notify-events", count, NULL, NULL);
 
       for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
@@ -4645,7 +4644,6 @@ create_subscription(
   http_status_t	status;			/* Policy status */
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
-  const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			scheme[HTTP_MAX_URI],
 					/* Scheme portion of URI */
@@ -4694,24 +4692,20 @@ create_subscription(
 
   if (!strcmp(resource, "/"))
   {
-    dest    = NULL;
     dtype   = (cups_ptype_t)0;
     printer = NULL;
   }
   else if (!strncmp(resource, "/printers", 9) && strlen(resource) <= 10)
   {
-    dest    = NULL;
     dtype   = (cups_ptype_t)0;
     printer = NULL;
   }
   else if (!strncmp(resource, "/classes", 8) && strlen(resource) <= 9)
   {
-    dest    = NULL;
     dtype   = CUPS_PRINTER_CLASS;
     printer = NULL;
   }
-  else if ((dest = cupsdValidateDest(uri->values[0].string.text, &dtype,
-                                     &printer)) == NULL)
+  else if (!cupsdValidateDest(uri->values[0].string.text, &dtype, &printer))
   {
    /*
     * Bad URI...
@@ -6274,8 +6268,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   ipp_attribute_t *attr;		/* Current attribute */
   int		jobid;			/* Job ID */
   cupsd_job_t	*job;			/* Current job */
-  const char	*src,			/* Source printer/class */
-		*dest;			/* Destination */
+  const char	*src;			/* Source printer/class */
   cups_ptype_t	stype,			/* Source type (printer or class) */
 		dtype;			/* Destination type (printer or class) */
   char		scheme[HTTP_MAX_URI],	/* Scheme portion of URI */
@@ -6306,8 +6299,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
     return;
   }
     
-  if ((dest = cupsdValidateDest(attr->values[0].string.text, &dtype,
-                                &dprinter)) == NULL)
+  if (!cupsdValidateDest(attr->values[0].string.text, &dtype, &dprinter))
   {
    /*
     * Bad URI...
@@ -8356,7 +8348,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
               else if (con->response->request.status.status_code == IPP_OK)
 	      {
 		job->state->values[0].integer = attr->values[0].integer;
-		job->state_value              = attr->values[0].integer;
+		job->state_value              = (ipp_jstate_t)attr->values[0].integer;
 	      }
 	      break;
 
@@ -8386,7 +8378,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		if (JobHistory)
 		{
                   job->state->values[0].integer = attr->values[0].integer;
-                  job->state_value              = attr->values[0].integer;
+                  job->state_value              = (ipp_jstate_t)attr->values[0].integer;
 		  cupsdSaveJob(job);
 		}
 	      }

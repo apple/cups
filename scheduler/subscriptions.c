@@ -1245,13 +1245,12 @@ cupsdStopAllNotifiers(void)
 void
 cupsdUpdateNotifierStatus(void)
 {
-  char		*ptr,			/* Pointer to end of line in buffer */
-		message[1024];		/* Pointer to message text */
+  char		message[1024];		/* Pointer to message text */
   int		loglevel;		/* Log level for message */
 
 
-  while ((ptr = cupsdStatBufUpdate(NotifierStatusBuffer, &loglevel,
-                                   message, sizeof(message))) != NULL)
+  while (cupsdStatBufUpdate(NotifierStatusBuffer, &loglevel,
+                            message, sizeof(message)))
     if (!strchr(NotifierStatusBuffer->buffer, '\n'))
       break;
 }
@@ -1506,7 +1505,6 @@ cupsd_start_notifier(
 {
   int	pid;				/* Notifier process ID */
   int	fds[2];				/* Pipe file descriptors */
-  int	envc;				/* Number of environment variables */
   char	*argv[4],			/* Command-line arguments */
 	*envp[MAX_ENV],			/* Environment variables */
 	user_data[128],			/* Base-64 encoded user data */
@@ -1546,7 +1544,7 @@ cupsd_start_notifier(
   * Setup the environment...
   */
 
-  envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
+  cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
 
  /*
   * Create pipes as needed...

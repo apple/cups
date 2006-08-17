@@ -131,7 +131,6 @@ check_file(const char *filename)	/* I - File to read from */
 		saw_end_setup,		/* %%EndSetup seen? */
 		saw_page,		/* %%Page seen? */
 		saw_trailer,		/* %%Trailer seen? */
-		saw_eof,		/* %%EOF seen? */
 		saw_long_line;		/* Saw long lines? */
 
 
@@ -164,7 +163,6 @@ check_file(const char *filename)	/* I - File to read from */
   saw_end_comments = 0;
   saw_end_prolog   = 0;
   saw_end_setup    = 0;
-  saw_eof          = 0;
   saw_long_line    = 0;
   saw_page         = 0;
   saw_pages        = 0;

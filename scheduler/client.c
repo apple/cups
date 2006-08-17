@@ -2274,7 +2274,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 		return (0);
 	    }
 	    else if (!strncasecmp(buf, "Status:", 7))
-  	      cupsdSendError(con, atoi(buf + 7));
+  	      cupsdSendError(con, (http_status_t)atoi(buf + 7));
 	    else
 	    {
   	      cupsdSendHeader(con, HTTP_OK, NULL);

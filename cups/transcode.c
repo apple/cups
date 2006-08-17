@@ -408,7 +408,6 @@ cupsUTF8ToUTF32(
     const cups_utf8_t *src,		/* I - Source string */
     const int         maxout)		/* I - Max output */
 {
-  size_t	srclen;			/* Source string length */
   int		i;			/* Looping variable */
   cups_utf8_t	ch;			/* Character value */
   cups_utf8_t	next;			/* Next character value */
@@ -430,7 +429,6 @@ cupsUTF8ToUTF32(
   */
 
   *dest++ = 0xfeff;
-  srclen  = strlen((char *)src);
 
   for (i = maxout - 1; *src && i > 0; i --)
   {

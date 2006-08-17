@@ -55,7 +55,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   ipp_t		*request;	/* IPP request */
   ipp_t		*response;	/* IPP response */
   ipp_op_t	op;		/* Operation */
-  cups_lang_t	*language;	/* Language */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests,		/* Destinations */
 		*defdest;	/* Default destination */
@@ -74,7 +73,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   response   = NULL;
   http       = NULL;
   encryption = cupsEncryption();
-  language   = cupsLangDefault();
 
  /*
   * Open a connection to the server...

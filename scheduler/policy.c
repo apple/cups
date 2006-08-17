@@ -195,7 +195,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
   {
     cupsdLogMessage(CUPSD_LOG_CRIT, "cupsdCheckPolicy: p=%p, con=%p!", p, con);
 
-    return (0);
+    return ((http_status_t)0);
   }
 
  /*
@@ -205,7 +205,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
   if ((po = cupsdFindPolicyOp(p, con->request->request.op.operation_id)) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0!");
-    return (0);
+    return ((http_status_t)0);
   }
 
   con->best = po;

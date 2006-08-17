@@ -76,7 +76,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 		longstatus;		/* Show file details */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dests;			/* Destinations */
-  cups_lang_t	*language;		/* Language */
 
 
   _cupsSetLocale();
@@ -92,8 +91,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   interval   = 0;
   longstatus = 0;
   all        = 0;
-  language   = cupsLangDefault();
   num_dests  = 0;
+  dests      = NULL;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '+')

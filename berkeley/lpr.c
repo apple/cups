@@ -87,7 +87,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   ssize_t	bytes;			/* Bytes copied */
   off_t		filesize;		/* Size of temp file */
   int		temp;			/* Temporary file descriptor */
-  cups_lang_t	*language;		/* Language information */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Signal action */
   struct sigaction oldaction;		/* Old signal action */
@@ -104,7 +103,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   options     = NULL;
   num_files   = 0;
   title       = NULL;
-  language    = cupsLangDefault();
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
