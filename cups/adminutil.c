@@ -1782,7 +1782,7 @@ get_cupsd_conf(
     * Read cupsd.conf via a HTTP GET request...
     */
 
-    if ((fd = cupsTempFd(name, sizeof(name))) < 0)
+    if ((fd = cupsTempFd(name, namesize)) < 0)
     {
       *name = '\0';
 
