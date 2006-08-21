@@ -132,7 +132,8 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *format_sup;		/* document-format-supported */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
-  int		copies;			/* Number of copies remaining */
+  int		copies,			/* Number of copies for job */
+		copies_remaining;	/* Number of copies remaining */
   const char	*content_type;		/* CONTENT_TYPE environment variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
@@ -738,10 +739,12 @@ main(int  argc,				/* I - Number of command-line args */
   * See if the printer supports multiple copies...
   */
 
+  copies = atoi(argv[4]);
+
   if (copies_sup || argc < 7)
-    copies = 1;
+    copies_remaining = 1;
   else
-    copies = atoi(argv[4]);
+    copies_remaining = copies;
 
  /*
   * Then issue the print-job request...
@@ -749,7 +752,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   job_id  = 0;
 
-  while (copies > 0)
+  while (copies_remaining > 0)
   {
    /*
     * Build the IPP request...
@@ -823,8 +826,9 @@ main(int  argc,				/* I - Number of command-line args */
 	* number of copies to 1...
 	*/
 
-	content_type = "application/postscript";
-	copies       = 1;
+	content_type     = "application/postscript";
+	copies           = 1;
+	copies_remaining = 1;
       }
     }
 #endif /* __APPLE__ */
@@ -852,8 +856,9 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       cupsEncodeOptions(request, num_options, options);
+
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies",
-                    atoi(argv[4]));
+                    copies);
     }
 
     cupsFreeOptions(num_options, options);
@@ -953,13 +958,13 @@ main(int  argc,				/* I - Number of command-line args */
     if (ipp_status <= IPP_OK_CONFLICT && argc > 6)
     {
       fprintf(stderr, "PAGE: 1 %d\n", copies_sup ? atoi(argv[4]) : 1);
-      copies --;
+      copies_remaining --;
     }
     else if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
       break;
     else
-      copies --;
+      copies_remaining --;
 
    /*
     * Wait for the job to complete...
