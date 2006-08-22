@@ -245,12 +245,11 @@ dist:	all
 	$(RM) -r dist
 	$(MAKE) $(MFLAGS) epm
 	case `uname` in \
-		*BSD*) $(MAKE) $(MFLAGS) bsd; ;; \
-		Darwin*) $(MAKE) $(MFLAGS) osx; ;; \
-		HP-UX*) $(MAKE) $(MFLAGS) swinstall; ;; \
-		IRIX*) $(MAKE) $(MFLAGS) tardist; ;; \
-		Linux*) $(MAKE) $(MFLAGS) rpm; ;; \
-		SunOS*) $(MAKE) $(MFLAGS) pkg; ;; \
+		*BSD*) $(MAKE) $(MFLAGS) bsd;; \
+		Darwin*) $(MAKE) $(MFLAGS) osx;; \
+		IRIX*) $(MAKE) $(MFLAGS) tardist;; \
+		Linux*) $(MAKE) $(MFLAGS) rpm;; \
+		SunOS*) $(MAKE) $(MFLAGS) pkg;; \
 	esac
 
 
