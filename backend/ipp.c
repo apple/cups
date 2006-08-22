@@ -742,7 +742,12 @@ main(int  argc,				/* I - Number of command-line args */
   copies = atoi(argv[4]);
 
   if (copies_sup || argc < 7)
+  {
     copies_remaining = 1;
+
+    if (argc < 7)
+      copies = 1;
+  }
   else
     copies_remaining = copies;
 
