@@ -233,6 +233,8 @@ backendGetDeviceID(
 
       if (!strcasecmp(manufacturer, "Hewlett-Packard"))
         strcpy(manufacturer, "HP");
+      else if (!strcasecmp(manufacturer, "Lexmark International"))
+        strcpy(manufacturer, "Lexmark");
     }
     else
     {
@@ -399,6 +401,8 @@ backendGetMakeModel(
     {
       if (!strncasecmp(mfg, "Hewlett-Packard", 15))
 	strlcpy(make_model, "HP", make_model_size);
+      else if (!strncasecmp(mfg, "Lexmark International", 21))
+	strlcpy(make_model, "Lexmark", make_model_size);
       else
 	strlcpy(make_model, mfg, make_model_size);
 
