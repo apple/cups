@@ -648,7 +648,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
     if (state)
     {
       if ((attr = ippFindAttribute(response, "printer-state",
-                        	   IPP_TAG_INTEGER)) == NULL)
+                        	   IPP_TAG_ENUM)) == NULL)
 	syslog(LOG_ERR, "No printer-state attribute found in "
                 	"response from server!");
       else
