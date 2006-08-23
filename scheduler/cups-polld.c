@@ -161,6 +161,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (restart_polling || !http)
     {
+      restart_polling = 0;
       httpClose(http);
 
       if ((http = httpConnectEncrypt(argv[1], atoi(argv[2]),
@@ -185,7 +186,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Sleep for any remaining time...
     */
 
-    if (remain > 0) 
+    if (remain > 0 && !restart_polling)
       sleep(remain);
   }
 }
@@ -444,7 +445,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
 	sleep(1);
       }
 
-      if (!attr)
+      if (!attr || restart_polling)
         break;
     }
 
