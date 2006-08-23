@@ -121,7 +121,7 @@ printers.o: ../cups/array.h ../cups/file.h ../cups/language.h mime.h
 printers.o: ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
 printers.o: ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
 printers.o: auth.h client.h policy.h printers.h classes.h job.h conf.h
-printers.o: banners.h dirsvc.h network.h subscriptions.h
+printers.o: banners.h dirsvc.h network.h subscriptions.h ../cups/dir.h
 process.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 process.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/string.h
 process.o: ../cups/array.h ../cups/cups.h ../cups/ppd.h ../cups/array.h
@@ -196,6 +196,9 @@ cups-polld.o: ../cups/language.h ../cups/string.h
 testdirsvc.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 testdirsvc.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 testdirsvc.o: ../cups/string.h ../config.h
+testlpd.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+testlpd.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testlpd.o: ../cups/string.h ../config.h
 testmime.o: ../cups/string.h ../config.h mime.h ../cups/array.h ../cups/ipp.h
 testmime.o: ../cups/file.h ../cups/dir.h
 testspeed.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
