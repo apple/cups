@@ -172,10 +172,11 @@ typedef enum ipp_jstate_e		/**** Job States.... */
   IPP_JOB_HELD,				/* Job is held for printing */
   IPP_JOB_PROCESSING,			/* Job is currently printing */
   IPP_JOB_STOPPED,			/* Job has been stopped */
-  IPP_JOB_CANCELLED,			/* Job has been cancelled */
+  IPP_JOB_CANCELED,			/* Job has been canceled */
   IPP_JOB_ABORTED,			/* Job has aborted due to error */
   IPP_JOB_COMPLETED			/* Job has completed successfully */
 } ipp_jstate_t;
+#define IPP_JOB_CANCELLED IPP_JOB_CANCELED
 
 typedef enum ipp_pstate_e		/**** Printer States.... */
 {
@@ -304,10 +305,11 @@ typedef enum ipp_status_e		/**** IPP status codes... ****/
   IPP_TEMPORARY_ERROR,			/* server-error-temporary-error */
   IPP_NOT_ACCEPTING,			/* server-error-not-accepting-jobs */
   IPP_PRINTER_BUSY,			/* server-error-busy */
-  IPP_ERROR_JOB_CANCELLED,		/* server-error-job-canceled */
+  IPP_ERROR_JOB_CANCELED,		/* server-error-job-canceled */
   IPP_MULTIPLE_JOBS_NOT_SUPPORTED,	/* server-error-multiple-document-jobs-not-supported */
   IPP_PRINTER_IS_DEACTIVATED		/* server-error-printer-is-deactivated */
 } ipp_status_t;
+#define IPP_ERROR_JOB_CANCELLED IPP_ERROR_JOB_CANCELED
 
 typedef unsigned char ipp_uchar_t;	/**** Unsigned 8-bit integer/character ****/
 

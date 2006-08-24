@@ -104,7 +104,7 @@ cupsNotifySubject(cups_lang_t *lang,	/* I - Language data */
       case IPP_JOB_STOPPED :
           state = _cupsLangString(lang, _("stopped"));
 	  break;
-      case IPP_JOB_CANCELLED :
+      case IPP_JOB_CANCELED :
           state = _cupsLangString(lang, _("canceled"));
 	  break;
       case IPP_JOB_ABORTED :
