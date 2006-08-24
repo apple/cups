@@ -61,6 +61,7 @@ FILES	=	\
 		maintenance.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
+		norestart.tmpl \
 		option-boolean.tmpl \
 		option-conflict.tmpl \
 		option-header.tmpl \

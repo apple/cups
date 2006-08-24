@@ -1,7 +1,7 @@
 <HTML>
 <!-- SECTION: Getting Started -->
 <HEAD>
-	<TITLE>Translating CUPS</TITLE>
+	<TITLE>Translating and Customizing CUPS</TITLE>
 </HEAD>
 <BODY>
 
@@ -20,6 +20,9 @@ files and directories:</P>
 
 <UL>
 
+	<LI><VAR>desktop/cups.desktop</VAR> - the GNOME/KDE
+	desktop file pointing to the CUPS web interface</LI>
+
 	<LI><VAR>doc/images/button-*.gif</VAR> - the web
 	interface button images</LI>
 
@@ -33,14 +36,15 @@ files and directories:</P>
 
 	<LI><VAR>templates/*.tmpl</VAR> - the web interface
 	template files</LI>
-
+	
 </UL>
 
-<P>With the exception of the message catalogs, localization files
-are  placed in subdirectories under the <VAR>doc</VAR> and
-<VAR>templates</VAR> using the locale name. Locale names are
-either <VAR>ll</VAR> or <VAR>ll_CC</VAR>, where "ll" is the
-2-letter language code and "CC" is the 2-letter country code.</P>
+<P>With the exception of the message catalogs and desktop file,
+localization files are  placed in subdirectories under the
+<VAR>doc</VAR> and <VAR>templates</VAR> using the locale name.
+Locale names are either <VAR>ll</VAR> or <VAR>ll_CC</VAR>, where
+"ll" is the 2-letter language code and "CC" is the 2-letter
+country code.</P>
 
 <P>All non-image files must be encoded using the UTF-8 character
 set.</P>
@@ -48,15 +52,16 @@ set.</P>
 
 <H2 CLASS="title"><A NAME="SUBMIT">Submitting a Translation for CUPS</A></H2>
 
-<P>To submit a translation for inclusion in CUPS, translate all
-of the button images, template files, the
+<P>To submit a translation for inclusion in CUPS, translate the
+desktop file, all of the button images, template files, the
 <VAR>index.html.in</VAR> file, and the message catalog. Place
 these files in the correct subdirectory in the CUPS source code
 archive and run the following command to create an archive with
 your files:</P>
 
 <PRE CLASS="command">
-tar cvf <I>ll_CC</I>.tar.gz doc/<I>ll_CC</I> locale/<I>ll_CC</I>.po templates/<I>ll_CC</I>
+tar cvf <I>ll_CC</I>.tar.gz desktop/cups.desktop doc/<I>ll_CC</I> \
+    locale/<I>ll_CC</I>.po templates/<I>ll_CC</I>
 </PRE>
 
 <P>Replace "ll_CC" with the locale name for your translation.
@@ -64,6 +69,19 @@ Once you have created the archive, go to the <A
 HREF="http://www.cups.org/str.php" TARGET="_blank">CUPS Bugs
 &amp; Features</A> page and submit a bug report, attaching the
 translation to the report.</P>
+
+
+<H2 CLASS="title"><A NAME="DESKTOP">The Desktop File</A></H2>
+
+<P>The <VAR>desktop/cups.desktop</VAR> file provides a link to
+the CUPS web interface from desktop environments such as
+GNOME and KDE. To translate this file, add two lines to the
+bottom with the <tt>Name</tt> and <tt>Comment</tt> keys:</P>
+
+<PRE CLASS="command">
+Name[<I>ll_CC</I>]=<I>Translation of "Manage Printing"</I>
+Comment[<I>ll_CC</I>]=<I>Translation of "CUPS Web Interface"</I>
+</PRE>
 
 
 <H2 CLASS="title"><A NAME="IMAGES">Button Images</A></H2>
@@ -86,7 +104,7 @@ sub-menu. The button scripts will be available under a new
 <VAR>Btns</VAR menu in the Gimp tool window.</P>
 
 <P>When you have created all of the button images, edit the
-<VAR>doc/Makefile</VAR> file and add the locale name to the
+<VAR>Makedefs</VAR> file and add the locale name to the
 <CODE>LANGUAGES</CODE> variable. You can then run "make
 install" in the <VAR>doc</VAR> subdirectory to test the
 translated buttons.</P>
@@ -350,7 +368,7 @@ favorite text editor or translation program to translate the text
 to the desired language.</P>
 
 <P>Finally, add your locale to the <CODE>LANGUAGES</CODE>
-variable in the <VAR>locale/Makefile</VAR> file and run the "make
+variable in the <VAR>Makedefs</VAR> file and run the "make
 install" command in the <VAR>locale</VAR> subdirectory to test
 the translation.</P>
 
@@ -379,7 +397,7 @@ Canadian French template files should be saved in the
 <VAR>templates/fr_CA</VAR> subdirectory. After you have
 translated all of the templates, add the locale to the
 <CODE>LANGUAGES</CODE> variable in the
-<VAR>templates/Makefile</VAR> and run "make install" in the
+<VAR>Makedefs</VAR> file and run "make install" in the
 <VAR>templates</VAR> subdirectory to test the translation.</P>
 
 <DIV CLASS="table"><TABLE SUMMARY="Web Interface Template Files">
@@ -534,6 +552,11 @@ translated all of the templates, add the locale to the
 	<TD>modify-printer.tmpl</TD>
 	<TD>This template is used as the first form when modifying a
 	printer.</TD>
+</TR>
+<TR>
+	<TD>norestart.tmpl</TD>
+	<TD>This template shows "server not restarted because no
+	changes were made to the configuration".</TD>
 </TR>
 <TR>
 	<TD>option-boolean.tmpl</TD>

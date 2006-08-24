@@ -1595,39 +1595,97 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
     int			num_settings;	/* Number of server settings */
     cups_option_t	*settings;	/* Server settings */
+    const char		*debug_logging,	/* DEBUG_LOGGING value */
+			*remote_admin,	/* REMOTE_ADMIN value */
+			*remote_printers,
+					/* REMOTE_PRINTERS value */
+			*share_printers,/* SHARE_PRINTERS value */
+			*user_cancel_any;
+					/* USER_CANCEL_ANY value */
 
 
-    num_settings = 0;
-    num_settings = cupsAddOption(CUPS_SERVER_DEBUG_LOGGING,
-                                 cgiGetVariable("DEBUG_LOGGING") ? "1" : "0",
-				 num_settings, &settings);
-    num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ADMIN,
-                                 cgiGetVariable("REMOTE_ADMIN") ? "1" : "0",
-				 num_settings, &settings);
-    num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
-                                 cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0",
-				 num_settings, &settings);
-    num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS,
-                                 cgiGetVariable("SHARE_PRINTERS") ? "1" : "0",
-				 num_settings, &settings);
-    num_settings = cupsAddOption(CUPS_SERVER_USER_CANCEL_ANY,
-                                 cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0",
-				 num_settings, &settings);
+   /*
+    * Get the checkbox values from the form...
+    */
 
+    debug_logging   = cgiGetVariable("DEBUG_LOGGING") ? "1" : "0";
+    remote_admin    = cgiGetVariable("REMOTE_ADMIN") ? "1" : "0";
+    remote_printers = cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0";
+    share_printers  = cgiGetVariable("SHARE_PRINTERS") ? "1" : "0";
+    user_cancel_any = cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0";
 
-    if (!_cupsAdminSetServerSettings(http, num_settings, settings))
+   /*
+    * Get the current server settings...
+    */
+
+    if (!_cupsAdminGetServerSettings(http, &num_settings, &settings))
     {
       cgiStartHTML(cgiText(_("Change Settings")));
       cgiSetVariable("MESSAGE",
                      cgiText(_("Unable to change server settings:")));
       cgiSetVariable("ERROR", cupsLastErrorString());
       cgiCopyTemplateLang("error.tmpl");
+      cgiEndHTML();
+      return;
+    }
+
+   /*
+    * See if the settings have changed...
+    */
+
+    if (strcmp(debug_logging, cupsGetOption(CUPS_SERVER_DEBUG_LOGGING,
+                                            num_settings, settings)) ||
+        strcmp(remote_admin, cupsGetOption(CUPS_SERVER_REMOTE_ADMIN,
+                                           num_settings, settings)) ||
+        strcmp(remote_printers, cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS,
+                                              num_settings, settings)) ||
+        strcmp(share_printers, cupsGetOption(CUPS_SERVER_SHARE_PRINTERS,
+                                             num_settings, settings)) ||
+        strcmp(user_cancel_any, cupsGetOption(CUPS_SERVER_USER_CANCEL_ANY,
+                                              num_settings, settings)))
+    {
+     /*
+      * Settings *have* changed, so save the changes...
+      */
+
+      cupsFreeOptions(num_settings, settings);
+
+      num_settings = 0;
+      num_settings = cupsAddOption(CUPS_SERVER_DEBUG_LOGGING,
+                                   debug_logging, num_settings, &settings);
+      num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ADMIN,
+                                   remote_admin, num_settings, &settings);
+      num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
+                                   remote_printers, num_settings, &settings);
+      num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS,
+                                   share_printers, num_settings, &settings);
+      num_settings = cupsAddOption(CUPS_SERVER_USER_CANCEL_ANY,
+                                   user_cancel_any, num_settings, &settings);
+
+      if (!_cupsAdminSetServerSettings(http, num_settings, settings))
+      {
+	cgiStartHTML(cgiText(_("Change Settings")));
+	cgiSetVariable("MESSAGE",
+                       cgiText(_("Unable to change server settings:")));
+	cgiSetVariable("ERROR", cupsLastErrorString());
+	cgiCopyTemplateLang("error.tmpl");
+      }
+      else
+      {
+	cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect");
+	cgiStartHTML(cgiText(_("Change Settings")));
+	cgiCopyTemplateLang("restart.tmpl");
+      }
     }
     else
     {
+     /*
+      * No changes...
+      */
+
       cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect");
       cgiStartHTML(cgiText(_("Change Settings")));
-      cgiCopyTemplateLang("restart.tmpl");
+      cgiCopyTemplateLang("norestart.tmpl");
     }
 
     cupsFreeOptions(num_settings, settings);

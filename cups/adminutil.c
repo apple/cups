@@ -103,7 +103,7 @@ cupsAdminCreateWindowsPPD(
 			linenum;	/* Current line number */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
-  static const char	*pattrs[] =	/* Printer attributes we want */
+  static const char * const pattrs[] =	/* Printer attributes we want */
 			{
 			  "job-hold-until-supported",
 			  "job-hold-until-default",
@@ -772,17 +772,22 @@ _cupsAdminGetServerSettings(
       if (!value)
         continue;
 
-      if (!strcasecmp(line, "Port"))
-      {
-	remote_access = 1;
-      }
-      else if (!strcasecmp(line, "Listen"))
+      if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
       {
 	char	*port;			/* Pointer to port number, if any */
 
 
 	if ((port = strrchr(value, ':')) != NULL)
 	  *port = '\0';
+	else if (isdigit(*value & 255))
+	{
+	 /*
+	  * Listen on a port number implies remote access...
+	  */
+
+	  remote_access = 1;
+	  continue;
+	}
 
 	if (strcasecmp(value, "localhost") && strcmp(value, "127.0.0.1")
 #ifdef AF_LOCAL
