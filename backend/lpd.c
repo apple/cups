@@ -261,6 +261,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   /* We want to pass utf-8 characters, not re-map them (3071945) */
   sanitize_title = 0;
 
+  /* Get the default timeout from a system preference... */
   {
     CFPropertyListRef	pvalue;		/* Preference value */
     SInt32		toval;		/* Timeout value */

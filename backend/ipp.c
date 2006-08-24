@@ -784,7 +784,13 @@ main(int  argc,				/* I - Number of command-line args */
 
     fprintf(stderr, "DEBUG: requesting-user-name = \"%s\"\n", argv[2]);
 
-    if (argv[3][0])
+   /*
+    * Only add a "job-name" attribute if the remote server supports
+    * copy generation - some IPP implementations like HP's don't seem
+    * to like UTF-8 job names (STR #1837)...
+    */
+
+    if (argv[3][0] && copied_sup)
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
         	   argv[3]);
 
