@@ -790,7 +790,7 @@ main(int  argc,				/* I - Number of command-line args */
     * to like UTF-8 job names (STR #1837)...
     */
 
-    if (argv[3][0] && copied_sup)
+    if (argv[3][0] && copies_sup)
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
         	   argv[3]);
 
