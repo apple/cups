@@ -2827,7 +2827,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdCancelJobs(NULL, username, purge);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "All jobs were %s by \"%s\".",
-                    purge ? "purged" : "cancelled", get_username(con));
+                    purge ? "purged" : "canceled", get_username(con));
   }
   else
   {
@@ -2849,7 +2849,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdCancelJobs(printer->name, username, purge);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "All jobs on \"%s\" were %s by \"%s\".",
-                    printer->name, purge ? "purged" : "cancelled",
+                    printer->name, purge ? "purged" : "canceled",
 		    get_username(con));
   }
 
@@ -2995,7 +2995,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
-  * See if the job is already completed, cancelled, or aborted; if so,
+  * See if the job is already completed, canceled, or aborted; if so,
   * we can't cancel...
   */
 
@@ -3005,7 +3005,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
     {
       case IPP_JOB_CANCELLED :
 	  send_ipp_status(con, IPP_NOT_POSSIBLE,
-                	  _("Job #%d is already cancelled - can\'t cancel."),
+                	  _("Job #%d is already canceled - can\'t cancel."),
 			  jobid);
           break;
 
@@ -3030,12 +3030,12 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                "Job cancelled by \"%s\".", username);
+                "Job canceled by \"%s\".", username);
 
   cupsdCancelJob(job, 0);
   cupsdCheckJobs();
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was cancelled by \"%s\".", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was canceled by \"%s\".", jobid,
                   username);
 
   con->response->request.status.status_code = IPP_OK;

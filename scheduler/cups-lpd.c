@@ -1387,7 +1387,7 @@ remove_jobs(const char *dest,		/* I - Destination */
       return (1);
     }
     else
-      syslog(LOG_INFO, "Job ID %d cancelled", id);
+      syslog(LOG_INFO, "Job ID %d canceled", id);
   }
 
   httpClose(http);

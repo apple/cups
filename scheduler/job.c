@@ -354,7 +354,7 @@ cupsdCheckJobs(void)
 	*/
 
         cupsdLogMessage(CUPSD_LOG_WARN,
-	                "Printer/class %s has gone away; cancelling job %d!",
+	                "Printer/class %s has gone away; canceling job %d!",
 	                job->dest, job->id);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
@@ -2423,7 +2423,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   if (job->num_files == 0)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Job ID %d has no files!  Cancelling it!",
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Job ID %d has no files!  Canceling it!",
                     job->id);
 
     cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
