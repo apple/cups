@@ -273,7 +273,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
 
  /*
-  * If nothing has been cancelled yet, cancel the current job on the specified
+  * If nothing has been canceled yet, cancel the current job on the specified
   * (or default) printer...
   */
 

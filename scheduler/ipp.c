@@ -1691,7 +1691,7 @@ add_job_state_reasons(
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job_state_reasons(%p[%d], %d)",
                   con, con->http.fd, job ? job->id : 0);
 
-  switch (job ? job->state_value : IPP_JOB_CANCELLED)
+  switch (job ? job->state_value : IPP_JOB_CANCELED)
   {
     case IPP_JOB_PENDING :
 	dest = cupsdFindDest(job->dest);
@@ -1726,7 +1726,7 @@ add_job_state_reasons(
 	             "job-state-reasons", NULL, "job-stopped");
         break;
 
-    case IPP_JOB_CANCELLED :
+    case IPP_JOB_CANCELED :
         ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
 	             "job-state-reasons", NULL, "job-canceled-by-user");
         break;
@@ -2999,11 +2999,11 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * we can't cancel...
   */
 
-  if (job->state_value >= IPP_JOB_CANCELLED)
+  if (job->state_value >= IPP_JOB_CANCELED)
   {
     switch (job->state_value)
     {
-      case IPP_JOB_CANCELLED :
+      case IPP_JOB_CANCELED :
 	  send_ipp_status(con, IPP_NOT_POSSIBLE,
                 	  _("Job #%d is already canceled - can\'t cancel."),
 			  jobid);
@@ -7993,7 +7993,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job ? job->state_value : IPP_JOB_CANCELLED);
+                job ? job->state_value : IPP_JOB_CANCELED);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -8362,7 +8362,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      }
 	      break;
 
-	  case IPP_JOB_CANCELLED :
+	  case IPP_JOB_CANCELED :
 	  case IPP_JOB_ABORTED :
 	  case IPP_JOB_COMPLETED :
 	      if (job->state_value > IPP_JOB_PROCESSING)

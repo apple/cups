@@ -267,7 +267,7 @@ cupsdAddEvent(
 			   "job-stopped");
               break;
 
-	  case IPP_JOB_CANCELLED :
+	  case IPP_JOB_CANCELED :
               ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
 		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
 			   "job-canceled-by-user");

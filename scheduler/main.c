@@ -1893,7 +1893,7 @@ process_children(void)
 #endif /* HAVE_WAITPID */
   {
    /*
-    * Ignore SIGTERM errors - that comes when a job is cancelled...
+    * Ignore SIGTERM errors - that comes when a job is canceled...
     */
 
     cupsdFinishProcess(pid, name, sizeof(name));
