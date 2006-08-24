@@ -3350,19 +3350,29 @@ static int				/* O - 1 on success, 0 on failure */
 make_certificate(void)
 {
 #if defined(HAVE_LIBSSL) && defined(HAVE_WAITPID)
-  int	pid,				/* Process ID of command */
-	status;				/* Status of command */
-  char	command[1024],			/* Command */
-	*argv[11],			/* Command-line arguments */
-	*envp[MAX_ENV];			/* Environment variables */
+  int		pid,			/* Process ID of command */
+		status;			/* Status of command */
+  char		command[1024],		/* Command */
+		*argv[11],		/* Command-line arguments */
+		*envp[MAX_ENV + 1],	/* Environment variables */
+		home[1024],		/* HOME environment variable */
+		seedfile[1024];		/* Random number seed file */
+  int		envc,			/* Number of environment variables */
+		bytes;			/* Bytes written */
+  cups_file_t	*fp;			/* Seed file */
 
 
  /*
-  * Run the "openssl" command to generate a self-signed certificate
-  * that is good for 10 years:
+  * Run the "openssl" command to seed the random number generator and
+  * generate a self-signed certificate that is good for 10 years:
+  *
+  *     openssl rand -rand seedfile 1
   *
   *     openssl req -new -x509 -keyout ServerKey \
   *             -out ServerCertificate -days 3650 -nodes
+  *
+  * The seeding step is crucial in ensuring that the openssl command
+  * does not block on systems without sufficient entropy...
   */
 
   if (!cupsFileFind("openssl", getenv("PATH"), 1, command, sizeof(command)))
@@ -3370,6 +3380,88 @@ make_certificate(void)
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "No SSL certificate and openssl command not found!");
     return (0);
+  }
+
+  if (access("/dev/urandom"))
+  {
+   /*
+    * If the system doesn't provide /dev/urandom, then any random source
+    * will probably be blocking-style, so generate some random data to
+    * use as a seed for the certificate.  Note that we have already
+    * seeded the random number generator in cupsdInitCerts()...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Seeding the random number generator...");
+
+    snprintf(home, sizeof(home), "HOME=%s", TempDir);
+
+   /*
+    * Write the seed file...
+    */
+
+    if ((fp = cupsTempFile2(seedfile, sizeof(seedfile))) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create seed file %s - %s",
+                      seedfile, strerror(errno));
+      return (0);
+    }
+
+    for (bytes = 0; bytes < 262144; bytes ++)
+      cupsFilePutChar(fp, random());
+
+    cupsFileClose(fp);
+
+   /*
+    * Run the openssl command to seed its random number generator...
+    */
+
+    argv[0] = "openssl";
+    argv[1] = "rand";
+    argv[2] = "-rand";
+    argv[3] = seedfile;
+    argv[4] = "1";
+    argv[5] = NULL;
+
+    cupsdLoadEnv(envp, MAX_ENV);
+    envp[envc++] = home;
+    
+    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, 1, &pid))
+    {
+      unlink(seedfile);
+      return (0);
+    }
+
+    while (waitpid(pid, &status, 0) < 0)
+      if (errno != EINTR)
+      {
+	status = 1;
+	break;
+      }
+
+    cupsdFinishProcess(pid, command, sizeof(command));
+
+   /*
+    * Remove the seed file, as it is no longer needed...
+    */
+
+    unlink(seedfile);
+
+    if (status)
+    {
+      if (WIFEXITED(status))
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+                	"Unable to seed random number generator - "
+			"the openssl command stopped with status %d!",
+	        	WEXITSTATUS(status));
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+                	"Unable to seed random number generator - "
+			"the openssl command crashed on signal %d!",
+	        	WTERMSIG(status));
+
+      return (0);
+    }
   }
 
   cupsdLogMessage(CUPSD_LOG_INFO,
