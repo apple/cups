@@ -3382,7 +3382,7 @@ make_certificate(void)
     return (0);
   }
 
-  if (access("/dev/urandom"))
+  if (access("/dev/urandom", 0))
   {
    /*
     * If the system doesn't provide /dev/urandom, then any random source
