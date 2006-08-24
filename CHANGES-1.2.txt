@@ -3,6 +3,12 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.3
 
+	- Printer options were not always honored when printing
+	  from Windows clients (STR #1839)
+	- The openssl command would lock up the scheduler when
+	  generating an encryption certificate on some platforms
+	  due to a lack of entropy for the random number
+	  generator (STR #1876)
 	- The web admin page did not recognize that "Listen 631"
 	  enabled remote access (STR #1908)
 	- The web admin page did not check whether changes were
