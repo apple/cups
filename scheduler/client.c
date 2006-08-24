@@ -26,6 +26,7 @@
  *   cupsdAcceptClient()     - Accept a new client.
  *   cupsdCloseAllClients()  - Close all remote clients immediately.
  *   cupsdCloseClient()      - Close a remote client.
+ *   cupsdFlushHeader()      - Flush the header fields to the client.
  *   cupsdReadClient()       - Read data from a client.
  *   cupsdSendCommand()      - Send output from a command via HTTP.
  *   cupsdSendError()        - Send an error message via HTTP.
@@ -674,6 +675,19 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 
 
 /*
+ * 'cupsdFlushHeader()' - Flush the header fields to the client.
+ */
+
+void
+cupsdFlushHeader(cupsd_client_t *con)	/* I - Client to flush to */
+{
+  httpFlushWrite(HTTP(con));
+
+  con->http.data_encoding = HTTP_ENCODE_LENGTH;
+}
+
+
+/*
  * 'cupsdReadClient()' - Read data from a client.
  */
 
@@ -1024,6 +1038,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
+	cupsdFlushHeader(con);
 
         encrypt_client(con);
 #else
@@ -1038,6 +1053,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST, PUT\r\n");
       httpPrintf(HTTP(con), "Content-Length: 0\r\n");
       httpPrintf(HTTP(con), "\r\n");
+      cupsdFlushHeader(con);
     }
     else if (!is_path_absolute(con->uri))
     {
@@ -1065,6 +1081,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
+	cupsdFlushHeader(con);
 
         encrypt_client(con);
 #else
@@ -1105,6 +1122,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	  httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	  httpPrintf(HTTP(con), "\r\n");
+	  cupsdFlushHeader(con);
 	}
       }
 
@@ -1538,6 +1556,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (httpPrintf(HTTP(con), "\r\n") < 0)
 		return (cupsdCloseClient(con));
 
+	      cupsdFlushHeader(con);
+
               cupsdLogRequest(con, HTTP_OK);
 	    }
             else if ((!strncmp(con->uri, "/admin/conf/", 12) &&
@@ -1600,6 +1620,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
             if (httpPrintf(HTTP(con), "\r\n") < 0)
 	      return (cupsdCloseClient(con));
+
+	    cupsdFlushHeader(con);
 
             con->http.state = HTTP_WAITING;
             break;
@@ -2074,6 +2096,8 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   else if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
 
+  cupsdFlushHeader(con);
+
   con->http.state = HTTP_WAITING;
 
   return (1);
@@ -2093,6 +2117,10 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
   * Send the HTTP status header...
   */
 
+  httpFlushWrite(HTTP(con));
+
+  con->http.data_encoding = HTTP_ENCODE_FIELDS;
+
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
                  con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
@@ -2106,7 +2134,10 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
     if (httpPrintf(HTTP(con), "\r\n") < 0)
       return (0);
     else
+    {
+      cupsdFlushHeader(con);
       return (1);
+    }
   }
 
   if (httpPrintf(HTTP(con), "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
@@ -2191,7 +2222,7 @@ cupsdUpdateCGI(void)
     if (!strchr(CGIStatusBuffer->buffer, '\n'))
       break;
 
-  if (ptr == NULL && errno)
+  if (ptr == NULL && !CGIStatusBuffer->bufused)
   {
    /*
     * Fatal error on pipe - should never happen!
@@ -2281,8 +2312,6 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
 	      if (con->http.version == HTTP_1_1)
 	      {
-		con->http.data_encoding = HTTP_ENCODE_CHUNKED;
-
 		if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n") < 0)
 		  return (0);
 	      }
@@ -2310,7 +2339,14 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	  */
 
 	  if (con->field_col == 0)
+	  {
 	    con->got_fields = 1;
+
+            cupsdFlushHeader(con);
+
+	    if (con->http.version == HTTP_1_1)
+	      con->http.data_encoding = HTTP_ENCODE_CHUNKED;
+          }
 	  else
 	    con->field_col = 0;
 	}
@@ -4085,6 +4121,8 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
     return (0);
   if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
+
+  cupsdFlushHeader(con);
 
   con->http.data_encoding  = HTTP_ENCODE_LENGTH;
   con->http.data_remaining = filestats->st_size;

@@ -1717,7 +1717,7 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
       break;
   }
 
-  if (ptr == NULL && errno)
+  if (ptr == NULL && !job->status_buffer->bufused)
   {
    /*
     * See if all of the filters and the backend have returned their

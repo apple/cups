@@ -142,7 +142,8 @@ typedef enum http_auth_e		/**** HTTP authentication types ****/
 typedef enum http_encoding_e		/**** HTTP transfer encoding values ****/
 {
   HTTP_ENCODE_LENGTH,			/* Data is sent with Content-Length */
-  HTTP_ENCODE_CHUNKED			/* Data is chunked */
+  HTTP_ENCODE_CHUNKED,			/* Data is chunked */
+  HTTP_ENCODE_FIELDS			/* Sending HTTP fields */
 } http_encoding_t;
 
 typedef enum http_encryption_e		/**** HTTP encryption values ****/

@@ -141,13 +141,6 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
 
 
  /*
-  * Clear the errno variable since not all systems clear it after a
-  * successful read...
-  */
-
-  errno = 0;
-
- /*
   * Check if the buffer already contains a full line...
   */
 
@@ -179,7 +172,6 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
 
       *loglevel = CUPSD_LOG_NONE;
       line[0]   = '\0';
-      errno     = 0;
 
       return (line);
     }
@@ -201,7 +193,7 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
       lineptr = NULL;
   }
 
-  if (lineptr == NULL)
+  if (!lineptr)
   {
    /*
     * End of file...

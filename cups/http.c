@@ -1100,15 +1100,20 @@ httpPrintf(http_t     *http,		/* I - HTTP connection */
 
   DEBUG_printf(("httpPrintf: %s", buf));
 
-  if (http->wused)
+  if (http->data_encoding == HTTP_ENCODE_FIELDS)
+    return (httpWrite2(http, buf, bytes));
+  else
   {
-    DEBUG_puts("    flushing existing data...");
+    if (http->wused)
+    {
+      DEBUG_puts("    flushing existing data...");
 
-    if (httpFlushWrite(http) < 0)
-      return (-1);
+      if (httpFlushWrite(http) < 0)
+	return (-1);
+    }
+
+    return (http_write(http, buf, bytes));
   }
-
-  return (http_write(http, buf, bytes));
 }
 
 
@@ -1888,7 +1893,7 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       httpFlushWrite(http);
     }
 
-    if ((length + http->wused) <= sizeof(http->wbuffer))
+    if ((length + http->wused) < sizeof(http->wbuffer))
     {
      /*
       * Write to buffer...
@@ -2155,10 +2160,19 @@ http_send(http_t       *http,	/* I - HTTP connection */
       return (-1);
 
  /*
+  * Flush any written data that is pending...
+  */
+
+  if (http->wused)
+    httpFlushWrite(http);
+
+ /*
   * Send the request header...
   */
 
-  http->state = request;
+  http->state         = request;
+  http->data_encoding = HTTP_ENCODE_FIELDS;
+
   if (request == HTTP_POST || request == HTTP_PUT)
     http->state ++;
 
@@ -2211,6 +2225,7 @@ http_send(http_t       *http,	/* I - HTTP connection */
     return (-1);
   }
 
+  httpFlushWrite(http);
   httpGetLength2(http);
   httpClearFields(http);
 
