@@ -220,9 +220,14 @@ uninstall:
 # Run the test suite...
 #
 
-check test:	all
+test:	all
 	echo Running CUPS test suite...
 	cd test; ./run-stp-tests.sh
+
+
+check:	all
+	echo Running CUPS test suite with defaults...
+	cd test; ./run-stp-tests.sh 1 0 n
 
 
 #

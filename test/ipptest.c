@@ -838,7 +838,9 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
     return;
   }
 
-  printf("        %s (%s) = ", attr->name, get_tag_string(attr->value_tag));
+  printf("        %s (%s%s) = ", attr->name,
+         attr->num_values > 1 ? "1setOf " : "",
+	 get_tag_string(attr->value_tag));
 
   switch (attr->value_tag)
   {
