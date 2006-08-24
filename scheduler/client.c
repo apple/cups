@@ -3423,9 +3423,10 @@ make_certificate(void)
     argv[4] = "1";
     argv[5] = NULL;
 
-    cupsdLoadEnv(envp, MAX_ENV);
+    envc = cupsdLoadEnv(envp, MAX_ENV);
     envp[envc++] = home;
-    
+    envp[envc]   = NULL;
+
     if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, 1, &pid))
     {
       unlink(seedfile);
