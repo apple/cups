@@ -61,7 +61,7 @@ your files:</P>
 
 <PRE CLASS="command">
 tar cvf <I>ll_CC</I>.tar.gz desktop/cups.desktop doc/<I>ll_CC</I> \
-    locale/<I>ll_CC</I>.po templates/<I>ll_CC</I>
+    locale/cups_<I>ll_CC</I>.po templates/<I>ll_CC</I>
 </PRE>
 
 <P>Replace "ll_CC" with the locale name for your translation.
@@ -357,10 +357,10 @@ type the following commands:</P>
 
 <PRE CLASS="command">
 cd locale
-cp cups.pot fr_CA.po
+cp cups.pot cups_fr_CA.po
 </PRE>
 
-<P>Alternatively, you can copy the existing <VAR>fr.po</VAR>
+<P>Alternatively, you can copy the existing <VAR>cups_fr.po</VAR>
 message catalog and then make any necessary changes.</P>
 
 <P>Once you have make your copy of the file, edit it using your
