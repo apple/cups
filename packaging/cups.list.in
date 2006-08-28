@@ -160,7 +160,7 @@ $SBINDIR=@sbindir@
 $SERVERBIN=@CUPS_SERVERBIN@
 $SERVERROOT=@CUPS_SERVERROOT@
 $STATEDIR=@CUPS_STATEDIR@
-
+$XINETD=@XINETD@
 $LIB32DIR=@LIB32DIR@
 $LIB64DIR=@LIB64DIR@
 
@@ -563,9 +563,30 @@ d 0755 root sys $AMANDIR/man$MAN8DIR -
 f 0644 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.$MAN8EXT
 %subpackage
 
-# Startup script
-%system all
+# Startup scripts
+%system darwin
+f 0644 root sys /System/Library/LaunchDaemons/org.cups.cupsd.plist init/org.cups.cupsd.plist
+%postinstall <<EOF
+rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
+EOF
+%subpackage lpd
+f 0644 root sys /System/Library/LaunchDaemons/org.cups.cups-lpd.plist init/org.cups.cups-lpd.plist
+%postinstall <<EOF
+rm -f /etc/xinetd.d/cups-lpd
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist
+EOF
+%subpackage
+
+%system !darwin
 i 0755 root sys cups init/cups.sh
+%subpackage lpd
+%if XINETD
+f 0644 root sys $XINETD/cups-lpd init/cups-lpd
+%endif
+%subpackage
 
 #
 # End of "$Id$".

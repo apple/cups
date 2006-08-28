@@ -201,7 +201,7 @@ CHANGES IN CUPS V1.2.2
 	- Special cases for the "localhost" hostname did not
 	  work, causing printing to not work when the /etc/hosts
 	  file did not contain a localhost entry (STR #1723)
-	- Updated the Spanish translation (STR #1720)
+	- Updated the Spanish translation (STR #1720, STR #1770)
 	- Reverse-order page output was broken when N-up or
 	  landscape orientations were used (STR #1725)
 	- The parallel, serial, socket, and USB backends needed
@@ -211,6 +211,24 @@ CHANGES IN CUPS V1.2.2
 
 CHANGES IN CUPS V1.2.1
 
+	- "lprm -h hostname" did not work (STR #1800)
+	- The web interface did not handle reloads properly for
+	  MSIE (STR #1716)
+	- The configure script no longer adds linker rpath
+	  options when they are unnecessary.
+	- The scheduler could crash printing a debug message on
+	  Solaris (STR #1714)
+	- The --enable-32bit and --enable-64bit configure options
+	  did not always work.
+	- The password prompt showed the domain socket address
+	  instead of "localhost" for local authentication (STR
+	  #1706)
+	- The web interface filtered the list of printers even if
+	  the user wasn't logged in (STR #1700)
+	- The IPP backend did not work reliably with some Xerox
+	  printers (STR #1704)
+	- Trailing banners were not added when printing a single
+	  file (STR #1698)
 	- The web interface support programs crashed on Solaris
 	  (STR #1699)
 	- cupstestppd incorrectly reported problems with
@@ -266,7 +284,7 @@ CHANGES IN CUPS V1.2.1
 	  the getifaddrs emulation functions (STR #1668)
 
 
-CHANGES IN CUPS V1.2
+CHANGES IN CUPS V1.2.0
 
 	- Documentation updates (STR #1618, STR #1620, STR #1622,
 	  STR #1637)

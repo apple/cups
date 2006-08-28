@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Disabled</key>
+	<true/>
+	<key>Label</key>
+	<string>org.cups.cups-lpd</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/libexec/cups/daemon/cups-lpd</string>
+		<string>-o</string>
+		<string>document-format=application/octet-stream</string>
+	</array>
+	<key>Sockets</key>
+	<dict>
+		<key>Listeners</key>
+		<dict>
+			<key>SockServiceName</key>
+			<string>printer</string>
+			<key>SockType</key>
+			<string>stream</string>
+		</dict>
+	</dict>
+	<key>UserName</key>
+	<string>lp</string>
+	<key>inetdCompatibility</key>
+	<dict>
+		<key>Wait</key>
+		<false/>
+	</dict>
+</dict>
+</plist>

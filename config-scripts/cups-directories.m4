@@ -193,12 +193,15 @@ AC_SUBST(INITDDIR)
 
 dnl Xinetd support...
 XINETD=""
-for dir in /private/etc/xinetd.d /etc/xinetd.d /usr/local/etc/xinetd.d; do
-	if test -d $dir; then
-		XINETD="$dir"
-		break
-	fi
-done
+
+if test ! -x /sbin/launchd; then
+	for dir in /private/etc/xinetd.d /etc/xinetd.d /usr/local/etc/xinetd.d; do
+		if test -d $dir; then
+			XINETD="$dir"
+			break
+		fi
+	done
+fi
 
 AC_SUBST(XINETD)
 
