@@ -1487,6 +1487,16 @@ fix_make_model(
     _cups_strcpy(mmptr, mmptr + 7);
   }
 
+  if ((mmptr = strstr(make_model, " Network")) != NULL)
+  {
+   /*
+    * Drop unnecessary informational text, e.g. "Xerox DocuPrint N2025
+    * Network LaserJet - 2.12" becomes "Xerox DocuPrint N2025"...
+    */
+
+    *mmptr = '\0';
+  }
+
   if ((mmptr = strchr(make_model, ',')) != NULL)
   {
    /*
