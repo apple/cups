@@ -3392,10 +3392,12 @@ make_certificate(void)
 		*argv[11],		/* Command-line arguments */
 		*envp[MAX_ENV + 1],	/* Environment variables */
 		home[1024],		/* HOME environment variable */
+		infofile[1024],		/* Type-in information for cert */
 		seedfile[1024];		/* Random number seed file */
   int		envc,			/* Number of environment variables */
 		bytes;			/* Bytes written */
-  cups_file_t	*fp;			/* Seed file */
+  cups_file_t	*fp;			/* Seed/info file */
+  int		infofd;			/* Info file descriptor */
 
 
  /*
@@ -3501,6 +3503,25 @@ make_certificate(void)
     }
   }
 
+ /*
+  * Create a file with the certificate information fields...
+  *
+  * Note: This assumes that the default questions are asked by the openssl
+  * command...
+  */
+
+  if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create certificate information file %s - %s",
+                    infofile, strerror(errno));
+    return (0);
+  }
+
+  cupsFilePrintf(fp, ".\n.\n.\n%s\n.\n%s\n%s\n",
+                 ServerName, ServerName, ServerAdmin);
+  cupsFileClose(fp);
+
   cupsdLogMessage(CUPSD_LOG_INFO,
                   "Generating SSL server key and certificate...");
 
@@ -3519,8 +3540,17 @@ make_certificate(void)
 
   cupsdLoadEnv(envp, MAX_ENV);
 
-  if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, 1, &pid))
+  infofd = open(infofile, O_RDONLY);
+
+  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, 1, &pid))
+  {
+    close(infofd);
+    unlink(infofile);
     return (0);
+  }
+
+  close(infofd);
+  unlink(infofile);
 
   while (waitpid(pid, &status, 0) < 0)
     if (errno != EINTR)
