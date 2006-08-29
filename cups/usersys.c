@@ -49,6 +49,7 @@
 #ifdef WIN32
 #  include <windows.h>
 #endif /* WIN32 */
+#include "debug.h"
 
 
 /*
@@ -224,15 +225,21 @@ cupsServer(void)
 
         linenum = 0;
 	while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum) != NULL)
+        {
+          DEBUG_printf(("cupsServer: %d: %s %s\n", linenum, line,
+	                value ? value : "(null)"));
+
 	  if (!strcasecmp(line, "ServerName") && value)
 	  {
 	   /*
 	    * Got it!
 	    */
 
+            DEBUG_puts("cupsServer: Got a ServerName line!");
 	    server = value;
 	    break;
 	  }
+        }
 
 	cupsFileClose(fp);
       }
@@ -242,6 +249,8 @@ cupsServer(void)
     * Copy the server name over and set the port number, if any...
     */
 
+    DEBUG_printf(("cupsServer: Using server \"%s\"...\n", server));
+
     strlcpy(cg->server, server, sizeof(cg->server));
 
     if (cg->server[0] != '/' && (port = strrchr(cg->server, ':')) != NULL &&
@@ -249,6 +258,7 @@ cupsServer(void)
     {
       *port++ = '\0';
 
+      DEBUG_printf(("cupsServer: Using port %d...\n", atoi(port)));
       ippSetPort(atoi(port));
     }
 
@@ -471,11 +481,17 @@ cups_open_client_conf(void)
 
     snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
     if ((fp = cupsFileOpen(filename, "r")) != NULL)
+    {
+      DEBUG_printf(("cups_open_client_conf: Using \"%s\"...\n", filename));
       return (fp);
+    }
 
     snprintf(filename, sizeof(filename), "%s/.cupsrc", home);
     if ((fp = cupsFileOpen(filename, "r")) != NULL)
+    {
+      DEBUG_printf(("cups_open_client_conf: Using \"%s\"...\n", filename));
       return (fp);
+    }
   }
 
   snprintf(filename, sizeof(filename), "%s/client.conf", cg->cups_serverroot);
