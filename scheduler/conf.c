@@ -636,21 +636,21 @@ cupsdReadConfiguration(void)
   * writable by the user and group in the cupsd.conf file...
   */
 
-  check_permissions(CacheDir, NULL, 0775, RunUser, Group, 1, 1);
-/*  check_permissions(CacheDir, "ppd", 0755, RunUser, Group, 1, 1);*/
-
-  check_permissions(StateDir, NULL, 0755, RunUser, Group, 1, 1);
-  check_permissions(StateDir, "certs", RunUser ? 0711 : 0511, User,
-                    SystemGroupIDs[0], 1, 1);
-
-  check_permissions(ServerRoot, NULL, 0755, RunUser, Group, 1, 0);
-  check_permissions(ServerRoot, "ppd", 0755, RunUser, Group, 1, 1);
-  check_permissions(ServerRoot, "ssl", 0700, RunUser, Group, 1, 0);
-  check_permissions(ServerRoot, "cupsd.conf", ConfigFilePerm, RunUser, Group,
-                    0, 0);
-  check_permissions(ServerRoot, "classes.conf", 0600, RunUser, Group, 0, 0);
-  check_permissions(ServerRoot, "printers.conf", 0600, RunUser, Group, 0, 0);
-  check_permissions(ServerRoot, "passwd.md5", 0600, User, Group, 0, 0);
+  if (check_permissions(CacheDir, NULL, 0775, RunUser, Group, 1, 1) < 0 ||
+      check_permissions(StateDir, NULL, 0755, RunUser, Group, 1, 1) < 0 ||
+      check_permissions(StateDir, "certs", RunUser ? 0711 : 0511, User,
+                	SystemGroupIDs[0], 1, 1) < 0 ||
+      check_permissions(ServerRoot, NULL, 0755, RunUser, Group, 1, 0) < 0 ||
+      check_permissions(ServerRoot, "ppd", 0755, RunUser, Group, 1, 1) < 0 ||
+      check_permissions(ServerRoot, "ssl", 0700, RunUser, Group, 1, 0) < 0 ||
+      check_permissions(ServerRoot, "cupsd.conf", ConfigFilePerm, RunUser,
+                        Group, 0, 0) < 0 ||
+      check_permissions(ServerRoot, "classes.conf", 0600, RunUser, Group,
+                        0, 0) < 0 ||
+      check_permissions(ServerRoot, "printers.conf", 0600, RunUser, Group,
+                        0, 0) < 0 ||
+      check_permissions(ServerRoot, "passwd.md5", 0600, User, Group, 0, 0) < 0)
+    return (0);
 
  /*
   * Update TempDir to the default if it hasn't been set already...
@@ -677,14 +677,14 @@ cupsdReadConfiguration(void)
 	                "TMPDIR (%s) has the wrong permissions!", tmpdir);
       else
         cupsdSetString(&TempDir, tmpdir);
-
-      if (!TempDir)
-        cupsdLogMessage(CUPSD_LOG_INFO, "Using default TempDir of %s/tmp...",
-	                RequestRoot);
     }
 
     if (!TempDir)
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO, "Using default TempDir of %s/tmp...",
+	              RequestRoot);
       cupsdSetStringf(&TempDir, "%s/tmp", RequestRoot);
+    }
   }
 
  /*
@@ -692,7 +692,8 @@ cupsdReadConfiguration(void)
   * permissions...
   */
 
-  check_permissions(RequestRoot, NULL, 0710, RunUser, Group, 1, 1);
+  if (check_permissions(RequestRoot, NULL, 0710, RunUser, Group, 1, 1) < 0)
+    return (0);
 
   if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)) ||
       access(TempDir, 0))
@@ -702,7 +703,8 @@ cupsdReadConfiguration(void)
     * is under the spool directory or does not exist...
     */
 
-    check_permissions(TempDir, NULL, 01770, RunUser, Group, 1, 1);
+    if (check_permissions(TempDir, NULL, 01770, RunUser, Group, 1, 1) < 0)
+      return (0);
   }
 
   if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)))
@@ -772,7 +774,7 @@ cupsdReadConfiguration(void)
   if (MaxActiveJobs > (MaxFDs / 3))
     MaxActiveJobs = MaxFDs / 3;
 
-  if (Classification && strcasecmp(Classification, "none") == 0)
+  if (Classification && !strcasecmp(Classification, "none"))
     cupsdClearString(&Classification);
 
   if (Classification)
@@ -1112,7 +1114,7 @@ cupsdReadConfiguration(void)
  * 'check_permissions()' - Fix the mode and ownership of a file or directory.
  */
 
-static int				/* O - 0 on success, -1 on error */
+static int				/* O - 0 on success, -1 on error, 1 on warning */
 check_permissions(const char *filename,	/* I - File/directory name */
                   const char *suffix,	/* I - Additional file/directory name */
                   int        mode,	/* I - Permissions */
@@ -1158,7 +1160,7 @@ check_permissions(const char *filename,	/* I - File/directory name */
       dir_created = 1;
     }
     else
-      return (-1);
+      return (create_dir ? -1 : 1);
   }
 
  /*
@@ -1190,7 +1192,7 @@ check_permissions(const char *filename,	/* I - File/directory name */
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to change ownership of \"%s\" - %s", filename,
 		      strerror(errno));
-      return (-1);
+      return (1);
     }
   }
 
@@ -1203,7 +1205,7 @@ check_permissions(const char *filename,	/* I - File/directory name */
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to change permissions of \"%s\" - %s", filename,
 		      strerror(errno));
-      return (-1);
+      return (1);
     }
   }
 

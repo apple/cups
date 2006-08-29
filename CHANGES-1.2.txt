@@ -3,9 +3,11 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.3
 
+	- The scheduler now aborts if the configuration file and
+	  directory checks fail (STR #1941)
 	- Fixed a problem with ippPort() not using the port
 	  number that was set via the client.conf file or
-	  CUPS_SERVER environment variable.
+	  CUPS_SERVER environment variable (STR #1945)
 	- HTTP headers were not buffered (STR #1899)
 	- Some IPP printers (HP) did not like UTF-8 job names
 	  (STR #1837)

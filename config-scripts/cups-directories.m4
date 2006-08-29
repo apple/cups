@@ -211,7 +211,7 @@ AC_ARG_WITH(cachedir, [  --with-cachedir         set path for cache files],cache
 
 if test x$cachedir = x; then
 	if test "x$uname" = xDarwin; then
-		CUPS_CACHEDIR="$localstatedir/tmp/cups"
+		CUPS_CACHEDIR="$localstatedir/spool/cups/cache"
 	else
 		CUPS_CACHEDIR="$localstatedir/cache/cups"
 	fi
