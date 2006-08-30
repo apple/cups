@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c 5333 2006-03-24 00:52:21Z mike $"
+ * "$Id: ppd.c 5826 2006-08-15 19:04:11Z mike $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -2037,10 +2037,8 @@ ppd_compare_attrs(ppd_attr_t *a,	/* I - First attribute */
 
   if ((ret = strcasecmp(a->name, b->name)) != 0)
     return (ret);
-  else if (a->spec[0] && b->spec[0])
-    return (strcasecmp(a->spec, b->spec));
   else
-    return (0);
+    return (strcasecmp(a->spec, b->spec));
 }
 
 
@@ -2938,5 +2936,5 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c 5333 2006-03-24 00:52:21Z mike $".
+ * End of "$Id: ppd.c 5826 2006-08-15 19:04:11Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5736 2006-07-13 19:59:36Z mike $"
+# "$Id: Makefile 5868 2006-08-23 19:39:39Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -59,6 +59,7 @@ OBJS	=	\
 		cups-lpd.o \
 		cups-polld.o \
 		testdirsvc.o \
+		testlpd.o \
 		testmime.o \
 		testspeed.o \
 		util.o
@@ -70,6 +71,7 @@ TARGETS	=	\
 		cups-polld \
 		libmime.a \
 		testdirsvc \
+		testlpd \
 		testmime \
 		testspeed
 
@@ -251,6 +253,16 @@ testdirsvc:	testdirsvc.o
 
 
 #
+# Make the test program, "testlpd".
+#
+
+testlpd:	testlpd.o ../cups/libcups.a cups-lpd
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o testlpd testlpd.o ../cups/libcups.a \
+		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)
+
+
+#
 # testmime
 #
 
@@ -264,9 +276,10 @@ testmime:	testmime.o libmime.a ../cups/libcups.a
 # Make the test program, "testspeed".
 #
 
-testspeed:	testspeed.o ../cups/$(LIBCUPS)
+testspeed:	testspeed.o ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o testspeed testspeed.o $(LIBS)
+	$(CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/libcups.a \
+		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)
 
 
 #
@@ -277,5 +290,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5736 2006-07-13 19:59:36Z mike $".
+# End of "$Id: Makefile 5868 2006-08-23 19:39:39Z mike $".
 #

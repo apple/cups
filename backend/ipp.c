@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5724 2006-07-12 19:42:35Z mike $"
+ * "$Id: ipp.c 5889 2006-08-24 21:44:35Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -132,13 +132,13 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *format_sup;		/* document-format-supported */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
-  int		copies;			/* Number of copies remaining */
+  int		copies,			/* Number of copies for job */
+		copies_remaining;	/* Number of copies remaining */
   const char	*content_type;		/* CONTENT_TYPE environment variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;		/* IPP version */
-  int		reasons;		/* Number of printer-state-reasons */
   static const char * const pattrs[] =
 		{			/* Printer attributes we want */
 		  "copies-supported",
@@ -213,6 +213,9 @@ main(int  argc,				/* I - Number of command-line args */
   if ((content_type = getenv("FINAL_CONTENT_TYPE")) == NULL)
     if ((content_type = getenv("CONTENT_TYPE")) == NULL)
       content_type = "application/octet-stream";
+
+  if (!strncmp(content_type, "printer/", 8))
+    content_type = "application/vnd.cups-raw";
 
  /*
   * Extract the hostname and printer name from the URI...
@@ -736,19 +739,25 @@ main(int  argc,				/* I - Number of command-line args */
   * See if the printer supports multiple copies...
   */
 
+  copies = atoi(argv[4]);
+
   if (copies_sup || argc < 7)
-    copies = 1;
+  {
+    copies_remaining = 1;
+
+    if (argc < 7)
+      copies = 1;
+  }
   else
-    copies = atoi(argv[4]);
+    copies_remaining = copies;
 
  /*
   * Then issue the print-job request...
   */
 
-  reasons = 0;
   job_id  = 0;
 
-  while (copies > 0)
+  while (copies_remaining > 0)
   {
    /*
     * Build the IPP request...
@@ -775,7 +784,13 @@ main(int  argc,				/* I - Number of command-line args */
 
     fprintf(stderr, "DEBUG: requesting-user-name = \"%s\"\n", argv[2]);
 
-    if (argv[3][0])
+   /*
+    * Only add a "job-name" attribute if the remote server supports
+    * copy generation - some IPP implementations like HP's don't seem
+    * to like UTF-8 job names (STR #1837)...
+    */
+
+    if (argv[3][0] && copies_sup)
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
         	   argv[3]);
 
@@ -822,8 +837,9 @@ main(int  argc,				/* I - Number of command-line args */
 	* number of copies to 1...
 	*/
 
-	content_type = "application/postscript";
-	copies       = 1;
+	content_type     = "application/postscript";
+	copies           = 1;
+	copies_remaining = 1;
       }
     }
 #endif /* __APPLE__ */
@@ -851,8 +867,9 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       cupsEncodeOptions(request, num_options, options);
+
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies",
-                    atoi(argv[4]));
+                    copies);
     }
 
     cupsFreeOptions(num_options, options);
@@ -952,13 +969,13 @@ main(int  argc,				/* I - Number of command-line args */
     if (ipp_status <= IPP_OK_CONFLICT && argc > 6)
     {
       fprintf(stderr, "PAGE: 1 %d\n", copies_sup ? atoi(argv[4]) : 1);
-      copies --;
+      copies_remaining --;
     }
     else if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
       break;
     else
-      copies --;
+      copies_remaining --;
 
    /*
     * Wait for the job to complete...
@@ -1300,6 +1317,8 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 #endif /* __APPLE__ */
 
     exit(CUPS_BACKEND_AUTH_REQUIRED);
+
+    return (NULL);			/* Eliminate compiler warning */
   }
 }
 
@@ -1622,5 +1641,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 5724 2006-07-12 19:42:35Z mike $".
+ * End of "$Id: ipp.c 5889 2006-08-24 21:44:35Z mike $".
  */

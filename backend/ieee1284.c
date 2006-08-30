@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1284.c 5591 2006-05-26 19:51:59Z mike $"
+ * "$Id: ieee1284.c 5866 2006-08-23 03:03:49Z mike $"
  *
  *   IEEE-1284 support functions for the Common UNIX Printing System (CUPS).
  *
@@ -233,6 +233,8 @@ backendGetDeviceID(
 
       if (!strcasecmp(manufacturer, "Hewlett-Packard"))
         strcpy(manufacturer, "HP");
+      else if (!strcasecmp(manufacturer, "Lexmark International"))
+        strcpy(manufacturer, "Lexmark");
     }
     else
     {
@@ -399,6 +401,8 @@ backendGetMakeModel(
     {
       if (!strncasecmp(mfg, "Hewlett-Packard", 15))
 	strlcpy(make_model, "HP", make_model_size);
+      else if (!strncasecmp(mfg, "Lexmark International", 21))
+	strlcpy(make_model, "Lexmark", make_model_size);
       else
 	strlcpy(make_model, mfg, make_model_size);
 
@@ -495,5 +499,5 @@ backendGetMakeModel(
 
 
 /*
- * End of "$Id: ieee1284.c 5591 2006-05-26 19:51:59Z mike $".
+ * End of "$Id: ieee1284.c 5866 2006-08-23 03:03:49Z mike $".
  */

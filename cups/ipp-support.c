@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c 5246 2006-03-08 13:22:09Z mike $"
+ * "$Id: ipp-support.c 5905 2006-08-29 20:48:59Z mike $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
@@ -304,18 +304,47 @@ ippPort(void)
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
+  DEBUG_puts("ippPort()");
+
+  if (!cg->ipp_port)
+  {
+   /*
+    * See if the server definition includes the port number...
+    */
+
+    DEBUG_puts("ippPort: Not initialized...");
+
+    cupsServer();
+
+#ifdef DEBUG
+    if (cg->ipp_port)
+      puts("ippPort: Set via cupsServer()...");
+#endif /* DEBUG */
+  }
+
   if (!cg->ipp_port)
   {
     if ((ipp_port = getenv("IPP_PORT")) != NULL)
+    {
+      DEBUG_puts("ippPort: Set via IPP_PORT...");
       portnum = atoi(ipp_port);
+    }
     else if ((port = getservbyname("ipp", NULL)) == NULL)
+    {
+      DEBUG_puts("ippPort: Set via CUPS_DEFAULT_IPP_PORT...");
       portnum = CUPS_DEFAULT_IPP_PORT;
+    }
     else
+    {
+      DEBUG_puts("ippPort: Set via ipp service entry...");
       portnum = ntohs(port->s_port);
+    }
 
     if (portnum > 0)
       cg->ipp_port = portnum;
   }
+
+  DEBUG_printf(("ippPort: Returning %d...\n", cg->ipp_port));
 
   return (cg->ipp_port);
 }
@@ -328,10 +357,12 @@ ippPort(void)
 void
 ippSetPort(int p)			/* I - Port number to use */
 {
+  DEBUG_printf(("ippSetPort(p=%d)\n", p));
+
   _cupsGlobals()->ipp_port = p;
 }
 
 
 /*
- * End of "$Id: ipp-support.c 5246 2006-03-08 13:22:09Z mike $".
+ * End of "$Id: ipp-support.c 5905 2006-08-29 20:48:59Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c 5235 2006-03-06 13:02:23Z mike $"
+ * "$Id: lpr.c 5838 2006-08-17 14:41:42Z mike $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -87,12 +87,13 @@ main(int  argc,				/* I - Number of command-line arguments */
   ssize_t	bytes;			/* Bytes copied */
   off_t		filesize;		/* Size of temp file */
   int		temp;			/* Temporary file descriptor */
-  cups_lang_t	*language;		/* Language information */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Signal action */
   struct sigaction oldaction;		/* Old signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
+
+  _cupsSetLocale();
 
   deletefile  = 0;
   printer     = NULL;
@@ -102,7 +103,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   options     = NULL;
   num_files   = 0;
   title       = NULL;
-  language    = cupsLangDefault();
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -529,5 +529,5 @@ sighandler(int s)			/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c 5235 2006-03-06 13:02:23Z mike $".
+ * End of "$Id: lpr.c 5838 2006-08-17 14:41:42Z mike $".
  */

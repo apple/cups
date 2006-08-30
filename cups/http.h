@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h 5716 2006-07-11 17:56:57Z mike $"
+ * "$Id: http.h 5889 2006-08-24 21:44:35Z mike $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -39,8 +39,8 @@
 #    include <winsock2.h>
 #    include <ws2tcpip.h>
 #  else
-#    ifdef __sgi /* IRIX needs this for IPv6 support!?! */
-#      define INET6
+#    ifdef __sgi
+#      define INET6			/* IRIX IPv6 support... */
 #    endif /* __sgi */
 #    include <unistd.h>
 #    include <sys/time.h>
@@ -53,6 +53,9 @@
 #    if !defined(__APPLE__) || !defined(TCP_NODELAY)
 #      include <netinet/tcp.h>
 #    endif /* !__APPLE__ || !TCP_NODELAY */
+#    if defined(AF_UNIX) && !defined(AF_LOCAL)
+#      define AF_LOCAL AF_UNIX		/* Older UNIX's have old names... */
+#    endif /* AF_UNIX && !AF_LOCAL */
 #    ifdef AF_LOCAL
 #      include <sys/un.h>
 #    endif /* AF_LOCAL */
@@ -139,7 +142,8 @@ typedef enum http_auth_e		/**** HTTP authentication types ****/
 typedef enum http_encoding_e		/**** HTTP transfer encoding values ****/
 {
   HTTP_ENCODE_LENGTH,			/* Data is sent with Content-Length */
-  HTTP_ENCODE_CHUNKED			/* Data is chunked */
+  HTTP_ENCODE_CHUNKED,			/* Data is chunked */
+  HTTP_ENCODE_FIELDS			/* Sending HTTP fields */
 } http_encoding_t;
 
 typedef enum http_encryption_e		/**** HTTP encryption values ****/
@@ -504,5 +508,5 @@ extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h 5716 2006-07-11 17:56:57Z mike $".
+ * End of "$Id: http.h 5889 2006-08-24 21:44:35Z mike $".
  */

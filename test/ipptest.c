@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c 5741 2006-07-17 18:36:20Z mike $"
+ * "$Id: ipptest.c 5878 2006-08-24 15:55:42Z mike $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -838,7 +838,9 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
     return;
   }
 
-  printf("        %s (%s) = ", attr->name, get_tag_string(attr->value_tag));
+  printf("        %s (%s%s) = ", attr->name,
+         attr->num_values > 1 ? "1setOf " : "",
+	 get_tag_string(attr->value_tag));
 
   switch (attr->value_tag)
   {
@@ -922,5 +924,5 @@ usage(const char *option)		/* I - Option string or NULL */
 
 
 /*
- * End of "$Id: ipptest.c 5741 2006-07-17 18:36:20Z mike $".
+ * End of "$Id: ipptest.c 5878 2006-08-24 15:55:42Z mike $".
  */

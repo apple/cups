@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c 5753 2006-07-18 19:53:24Z mike $"
+ * "$Id: lpoptions.c 5833 2006-08-16 20:05:58Z mike $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -68,6 +68,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*instance,		/* Instance name */ 
  		*option;		/* Current option */
 
+
+  _cupsSetLocale();
 
  /*
   * Loop through the command-line arguments...
@@ -482,5 +484,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c 5753 2006-07-18 19:53:24Z mike $".
+ * End of "$Id: lpoptions.c 5833 2006-08-16 20:05:58Z mike $".
  */

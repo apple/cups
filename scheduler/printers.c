@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5724 2006-07-12 19:42:35Z mike $"
+ * "$Id: printers.c 5828 2006-08-15 21:21:45Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1492,7 +1492,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     else
       snprintf(resource, sizeof(resource), "/printers/%s", p->name);
 
-    if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL)
+    if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL ||
+        auth->type == AUTH_NONE)
       auth = cupsdFindPolicyOp(p->op_policy_ptr, IPP_PRINT_JOB);
 
     if (auth)
@@ -1572,7 +1573,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
   printer_type = p->type;
 
-  p->raw = 0;
+  p->raw    = 0;
+  p->remote = 0;
 
   if (p->type & CUPS_PRINTER_REMOTE)
   {
@@ -1590,7 +1592,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
         	 p->uri);
 
-    p->raw = 1;
+    p->raw    = 1;
+    p->remote = 1;
   }
   else
   {
@@ -2030,7 +2033,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	  * Print all files directly...
 	  */
 
-	  p->raw = 1;
+	  p->raw    = 1;
+	  p->remote = 1;
 	}
 	else
 	{
@@ -3312,5 +3316,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 5724 2006-07-12 19:42:35Z mike $".
+ * End of "$Id: printers.c 5828 2006-08-15 21:21:45Z mike $".
  */

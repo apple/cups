@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 5634 2006-06-06 17:48:27Z mike $"
+ * "$Id: main.c 5878 2006-08-24 15:55:42Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -660,7 +660,7 @@ main(int  argc,				/* I - Number of command-line args */
     * inactivity...
     */
 
-    if (timeout.tv_sec == 86400 && Launchd && LaunchdTimeout &&
+    if (timeout.tv_sec == 86400 && Launchd && LaunchdTimeout && !NumPolled &&
 	(!Browsing || !(BrowseLocalProtocols & BROWSE_DNSSD) ||
 	 cupsArrayCount(Printers) == 0))
     {
@@ -1628,7 +1628,7 @@ launchd_sync_conf(void)
                          kCFBooleanTrue);
 
     if ((Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)) ||
-        cupsArrayCount(ActiveJobs))
+        cupsArrayCount(ActiveJobs) || NumPolled)
       CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_RUNATLOAD),
                            kCFBooleanTrue);
     else
@@ -1893,7 +1893,7 @@ process_children(void)
 #endif /* HAVE_WAITPID */
   {
    /*
-    * Ignore SIGTERM errors - that comes when a job is cancelled...
+    * Ignore SIGTERM errors - that comes when a job is canceled...
     */
 
     cupsdFinishProcess(pid, name, sizeof(name));
@@ -2253,5 +2253,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 5634 2006-06-06 17:48:27Z mike $".
+ * End of "$Id: main.c 5878 2006-08-24 15:55:42Z mike $".
  */

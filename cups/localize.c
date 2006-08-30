@@ -1,5 +1,5 @@
 /*
- * "$Id: localize.c 5391 2006-04-14 12:26:50Z mike $"
+ * "$Id: localize.c 5826 2006-08-15 19:04:11Z mike $"
  *
  *   PPD custom option routines for the Common UNIX Printing System (CUPS).
  *
@@ -80,6 +80,8 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   * Range check input...
   */
 
+  DEBUG_printf(("ppdLocalize(ppd=%p)\n", ppd));
+
   if (!ppd)
     return (-1);
 
@@ -92,6 +94,9 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
 
   strlcpy(ll_CC, lang->language, sizeof(ll_CC));
   strlcpy(ll, lang->language, sizeof(ll));
+
+  DEBUG_printf(("    lang->language=\"%s\", ll=\"%s\", ll_CC=\"%s\"...\n",
+                lang->language, ll, ll_CC));
 
  /*
   * Now lookup all of the groups, options, choices, etc.
@@ -165,16 +170,28 @@ ppd_text(ppd_file_t *ppd,		/* I - PPD file */
   ppd_attr_t	*attr;			/* Current attribute */
 
 
+  DEBUG_printf(("ppd_text(ppd=%p, keyword=\"%s\", spec=\"%s\", "
+                "ll_CC=\"%s\", ll=\"%s\")\n",
+                ppd, keyword, spec, ll_CC, ll));
+
  /*
   * Look for Keyword.ll_CC, then Keyword.ll...
   */
 
-  snprintf(lkeyword, sizeof(lkeyword), "%s.%s", keyword, ll_CC);
+  snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll_CC, keyword);
   if ((attr = ppdFindAttr(ppd, lkeyword, spec)) == NULL)
   {
-    snprintf(lkeyword, sizeof(lkeyword), "%s.%s", keyword, ll);
+    snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll, keyword);
     attr = ppdFindAttr(ppd, lkeyword, spec);
   }
+
+#ifdef DEBUG
+  if (attr)
+    printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec, attr->text,
+           attr->value ? attr->value : "");
+  else
+    puts("    NOT FOUND");
+#endif /* DEBUG */
 
  /*
   * Return text if we find it...
@@ -185,5 +202,5 @@ ppd_text(ppd_file_t *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: localize.c 5391 2006-04-14 12:26:50Z mike $".
+ * End of "$Id: localize.c 5826 2006-08-15 19:04:11Z mike $".
  */

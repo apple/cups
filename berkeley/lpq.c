@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c 5638 2006-06-06 20:08:13Z mike $"
+ * "$Id: lpq.c 5838 2006-08-17 14:41:42Z mike $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -76,8 +76,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 		longstatus;		/* Show file details */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dests;			/* Destinations */
-  cups_lang_t	*language;		/* Language */
 
+
+  _cupsSetLocale();
 
  /*
   * Check for command-line options...
@@ -90,8 +91,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   interval   = 0;
   longstatus = 0;
   all        = 0;
-  language   = cupsLangDefault();
   num_dests  = 0;
+  dests      = NULL;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '+')
@@ -675,5 +676,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c 5638 2006-06-06 20:08:13Z mike $".
+ * End of "$Id: lpq.c 5838 2006-08-17 14:41:42Z mike $".
  */

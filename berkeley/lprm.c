@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c 5719 2006-07-11 21:04:48Z mike $"
+ * "$Id: lprm.c 5878 2006-08-24 15:55:42Z mike $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -55,12 +55,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   ipp_t		*request;	/* IPP request */
   ipp_t		*response;	/* IPP response */
   ipp_op_t	op;		/* Operation */
-  cups_lang_t	*language;	/* Language */
   int		num_dests;	/* Number of destinations */
   cups_dest_t	*dests,		/* Destinations */
 		*defdest;	/* Default destination */
   http_encryption_t encryption;	/* Encryption? */
 
+
+  _cupsSetLocale();
 
  /*
   * Setup to cancel individual print jobs...
@@ -72,7 +73,6 @@ main(int  argc,			/* I - Number of command-line arguments */
   response   = NULL;
   http       = NULL;
   encryption = cupsEncryption();
-  language   = cupsLangDefault();
 
  /*
   * Open a connection to the server...
@@ -273,7 +273,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
 
  /*
-  * If nothing has been cancelled yet, cancel the current job on the specified
+  * If nothing has been canceled yet, cancel the current job on the specified
   * (or default) printer...
   */
 
@@ -294,5 +294,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c 5719 2006-07-11 21:04:48Z mike $".
+ * End of "$Id: lprm.c 5878 2006-08-24 15:55:42Z mike $".
  */

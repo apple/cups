@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5736 2006-07-13 19:59:36Z mike $"
+ * "$Id: ipp.c 5907 2006-08-30 02:18:28Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -630,7 +630,7 @@ cupsdProcessIPPRequest(
 #ifdef CUPSD_USE_CHUNKING
      /*
       * Because older versions of CUPS (1.1.17 and older) and some IPP
-      * clients do not implement chunking properly, we should not use
+      * clients do not implement chunking properly, we cannot use
       * chunking by default.  This may become the default in future
       * CUPS releases, or we might add a configuration directive for
       * it.
@@ -638,23 +638,25 @@ cupsdProcessIPPRequest(
 
       if (con->http.version == HTTP_1_1)
       {
-	con->http.data_encoding = HTTP_ENCODE_CHUNKED;
-
 	httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n");
+	cupsdFlushHeader(con);
+
+	con->http.data_encoding = HTTP_ENCODE_CHUNKED;
       }
       else
 #endif /* CUPSD_USE_CHUNKING */
       {
-	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
-	con->http.data_remaining = ippLength(con->response);
+        size_t	length;			/* Length of response */
 
-        if (con->http.data_remaining < INT_MAX)
-	  con->http._data_remaining = con->http.data_remaining;
-	else
-	  con->http._data_remaining = INT_MAX;
+
+	length = ippLength(con->response);
 
 	httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
-        	   CUPS_LLCAST con->http.data_remaining);
+        	   CUPS_LLCAST length);
+	cupsdFlushHeader(con);
+
+	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
+	con->http.data_remaining = length;
       }
 
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -784,7 +786,6 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   cupsd_printer_t *pclass,		/* Class */
 		*member;		/* Member printer/class */
   cups_ptype_t	dtype;			/* Destination type */
-  const char	*dest;			/* Printer or class name */
   ipp_attribute_t *attr;		/* Printer attribute */
   int		modify;			/* Non-zero if we just modified */
   char		newname[IPP_MAX_NAME];	/* New class name */
@@ -1007,7 +1008,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
                       sizeof(method), username, sizeof(username), host,
 		      sizeof(host), &port, resource, sizeof(resource));
 
-      if ((dest = cupsdValidateDest(host, resource, &dtype, &member)) == NULL)
+      if (!cupsdValidateDest(host, resource, &dtype, &member))
       {
        /*
 	* Bad URI...
@@ -1467,7 +1468,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
                              "job-state", IPP_JOB_STOPPED);
-  job->state_value = job->state->values[0].integer;
+  job->state_value = (ipp_jstate_t)job->state->values[0].integer;
   job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                               "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
@@ -1728,7 +1729,7 @@ add_job_state_reasons(
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job_state_reasons(%p[%d], %d)",
                   con, con->http.fd, job ? job->id : 0);
 
-  switch (job ? job->state_value : IPP_JOB_CANCELLED)
+  switch (job ? job->state_value : IPP_JOB_CANCELED)
   {
     case IPP_JOB_PENDING :
 	dest = cupsdFindDest(job->dest);
@@ -1763,7 +1764,7 @@ add_job_state_reasons(
 	             "job-state-reasons", NULL, "job-stopped");
         break;
 
-    case IPP_JOB_CANCELLED :
+    case IPP_JOB_CANCELED :
         ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
 	             "job-state-reasons", NULL, "job-canceled-by-user");
         break;
@@ -1961,7 +1962,6 @@ add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
              cupsd_job_t    *job)	/* I - Job */
 {
   char			uuid[1024];	/* job-uuid string */
-  ipp_attribute_t	*attr;		/* job-uuid attribute */
   _cups_md5_state_t	md5state;	/* MD5 state */
   unsigned char		md5sum[16];	/* MD5 digest/sum */
 
@@ -1970,7 +1970,7 @@ add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
   * First see if the job already has a job-uuid attribute; if so, return...
   */
 
-  if ((attr = ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI)) != NULL)
+  if (ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI))
     return;
 
  /*
@@ -2872,7 +2872,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdCancelJobs(NULL, username, purge);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "All jobs were %s by \"%s\".",
-                    purge ? "purged" : "cancelled", get_username(con));
+                    purge ? "purged" : "canceled", get_username(con));
   }
   else
   {
@@ -2893,7 +2893,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdCancelJobs(dest, username, purge);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "All jobs on \"%s\" were %s by \"%s\".",
-                    dest, purge ? "purged" : "cancelled", get_username(con));
+                    dest, purge ? "purged" : "canceled", get_username(con));
   }
 
   con->response->request.status.status_code = IPP_OK;
@@ -3043,17 +3043,17 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
-  * See if the job is already completed, cancelled, or aborted; if so,
+  * See if the job is already completed, canceled, or aborted; if so,
   * we can't cancel...
   */
 
-  if (job->state_value >= IPP_JOB_CANCELLED)
+  if (job->state_value >= IPP_JOB_CANCELED)
   {
     switch (job->state_value)
     {
-      case IPP_JOB_CANCELLED :
+      case IPP_JOB_CANCELED :
 	  send_ipp_status(con, IPP_NOT_POSSIBLE,
-                	  _("Job #%d is already cancelled - can\'t cancel."),
+                	  _("Job #%d is already canceled - can\'t cancel."),
 			  jobid);
           break;
 
@@ -3078,12 +3078,12 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                "Job cancelled by \"%s\".", username);
+                "Job canceled by \"%s\".", username);
 
   cupsdCancelJob(job, 0);
   cupsdCheckJobs();
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was cancelled by \"%s\".", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was canceled by \"%s\".", jobid,
                   username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -4382,7 +4382,7 @@ copy_subscription_attrs(
       */
 
       ippAddString(con->response, IPP_TAG_SUBSCRIPTION,
-                   IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                   (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
                    "notify-events", NULL, name);
     }
     else
@@ -4396,7 +4396,7 @@ copy_subscription_attrs(
           count ++;
 
       attr = ippAddStrings(con->response, IPP_TAG_SUBSCRIPTION,
-                           IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                           (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
                            "notify-events", count, NULL, NULL);
 
       for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
@@ -4676,7 +4676,6 @@ create_subscription(
   http_status_t	status;			/* Policy status */
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
-  const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			scheme[HTTP_MAX_URI],
 					/* Scheme portion of URI */
@@ -4725,23 +4724,20 @@ create_subscription(
 
   if (!strcmp(resource, "/"))
   {
-    dest    = NULL;
     dtype   = (cups_ptype_t)0;
     printer = NULL;
   }
   else if (!strncmp(resource, "/printers", 9) && strlen(resource) <= 10)
   {
-    dest    = NULL;
     dtype   = (cups_ptype_t)0;
     printer = NULL;
   }
   else if (!strncmp(resource, "/classes", 8) && strlen(resource) <= 9)
   {
-    dest    = NULL;
     dtype   = CUPS_PRINTER_CLASS;
     printer = NULL;
   }
-  else if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
+  else if (!cupsdValidateDest(host, resource, &dtype, &printer))
   {
    /*
     * Bad URI...
@@ -5734,7 +5730,6 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		  ipp_attribute_t *uri)	/* I - Printer URI */
 {
   http_status_t		status;		/* Policy status */
-  const char		*dest;		/* Destination */
   cups_ptype_t		dtype;		/* Destination type (printer or class) */
   char			method[HTTP_MAX_URI],
 					/* Method portion of URI */
@@ -5760,7 +5755,7 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
                   sizeof(method), username, sizeof(username), host,
 		  sizeof(host), &port, resource, sizeof(resource));
 
-  if ((dest = cupsdValidateDest(host, resource, &dtype, &printer)) == NULL)
+  if (!cupsdValidateDest(host, resource, &dtype, &printer))
   {
    /*
     * Bad URI...
@@ -6269,6 +6264,9 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
   cupsdHoldJob(job);
 
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+                "Job held by user.");
+
   if ((newattr = ippFindAttribute(con->request, "job-hold-until",
                                   IPP_TAG_KEYWORD)) == NULL)
     newattr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_NAME);
@@ -6302,6 +6300,9 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     cupsdSetJobHoldUntil(job, attr->values[0].string.text);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, job->printer, job,
+                  "Job job-hold-until value changed by user.");
   }
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was held by \"%s\".", jobid,
@@ -6323,8 +6324,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   ipp_attribute_t *attr;		/* Current attribute */
   int		jobid;			/* Job ID */
   cupsd_job_t	*job;			/* Current job */
-  const char	*src,			/* Source printer/class */
-		*dest;			/* Destination */
+  const char	*src;			/* Source printer/class */
   cups_ptype_t	stype,			/* Source type (printer or class) */
 		dtype;			/* Destination type (printer or class) */
   char		method[HTTP_MAX_URI],	/* Method portion of URI */
@@ -6359,7 +6359,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
                   sizeof(method), username, sizeof(username), host,
 		  sizeof(host), &port, resource, sizeof(resource));
 
-  if ((dest = cupsdValidateDest(host, resource, &dtype, &dprinter)) == NULL)
+  if (!cupsdValidateDest(host, resource, &dtype, &dprinter))
   {
    /*
     * Bad URI...
@@ -7317,6 +7317,9 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
     attr->value_tag = IPP_TAG_KEYWORD;
     attr->values[0].string.text = _cupsStrAlloc("no-hold");
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, job->printer, job,
+                  "Job job-hold-until value changed by user.");
   }
 
  /*
@@ -7324,6 +7327,9 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdReleaseJob(job);
+
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+                "Job released by user.");
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was released by \"%s\".", jobid,
                   username);
@@ -8004,7 +8010,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job ? job->state_value : IPP_JOB_CANCELLED);
+                job ? job->state_value : IPP_JOB_CANCELED);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
@@ -8053,14 +8059,12 @@ send_ipp_status(cupsd_client_t *con,	/* I - Client connection */
               _cupsLangString(con->language, message), ap);
     va_end(ap);
 
-    cupsdLogMessage(status >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_INFO,
-                    "%s %s: %s",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "%s %s: %s",
 		    ippOpString(con->request->request.op.operation_id),
 		    ippErrorString(status), formatted);
   }
   else
-    cupsdLogMessage(status >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_INFO,
-                    "%s %s",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "%s %s",
 		    ippOpString(con->request->request.op.operation_id),
 		    ippErrorString(status));
 
@@ -8181,6 +8185,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
+  int			event;		/* Events? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_job_attrs(%p[%d], %s)", con,
@@ -8282,6 +8287,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdLoadJob(job);
 
+  event = 0;
+
   for (attr = con->request->attrs; attr; attr = attr->next)
   {
     if (attr->group_tag != IPP_TAG_JOB || !attr->name)
@@ -8345,7 +8352,10 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	return;
       }
       else if (con->response->request.status.status_code == IPP_OK)
+      {
         cupsdSetJobPriority(job, attr->values[0].integer);
+        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
+      }
     }
     else if (!strcmp(attr->name, "job-state"))
     {
@@ -8375,7 +8385,9 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
               else if (con->response->request.status.status_code == IPP_OK)
 	      {
 		job->state->values[0].integer = attr->values[0].integer;
-		job->state_value              = attr->values[0].integer;
+		job->state_value              = (ipp_jstate_t)attr->values[0].integer;
+
+                event |= CUPSD_EVENT_JOB_STATE;
 	      }
 	      break;
 
@@ -8389,7 +8401,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      }
 	      break;
 
-	  case IPP_JOB_CANCELLED :
+	  case IPP_JOB_CANCELED :
 	  case IPP_JOB_ABORTED :
 	  case IPP_JOB_COMPLETED :
 	      if (job->state_value > IPP_JOB_PROCESSING)
@@ -8405,7 +8417,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		if (JobHistory)
 		{
                   job->state->values[0].integer = attr->values[0].integer;
-                  job->state_value              = attr->values[0].integer;
+                  job->state_value              = (ipp_jstate_t)attr->values[0].integer;
 		  cupsdSaveJob(job);
 		}
 	      }
@@ -8450,6 +8462,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	  cupsdReleaseJob(job);
 	else
 	  cupsdHoldJob(job);
+
+        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE;
       }
     }
     else if (attr->value_tag == IPP_TAG_DELETEATTR)
@@ -8470,6 +8484,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	  job->attrs->last = job->attrs->prev;
 
         _ippFreeAttr(attr2);
+
+        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
       }
     }
     else
@@ -8479,6 +8495,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       copy_attribute(job->attrs, attr, 0);
+
+      event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
     }
   }
 
@@ -8487,6 +8505,19 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdSaveJob(job);
+
+ /*
+  * Send events as needed...
+  */
+
+  if (event & CUPSD_EVENT_JOB_STATE)
+    cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+                  job->state_value == IPP_JOB_HELD ?
+		      "Job held by user." : "Job restarted by user.");
+
+  if (event & CUPSD_EVENT_JOB_CONFIG_CHANGED)
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, job->printer, job,
+                  "Job options changed by user.");
 
  /*
   * Start jobs if possible...
@@ -9200,5 +9231,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 5736 2006-07-13 19:59:36Z mike $".
+ * End of "$Id: ipp.c 5907 2006-08-30 02:18:28Z mike $".
  */

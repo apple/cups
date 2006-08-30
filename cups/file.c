@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c 5324 2006-03-23 16:47:46Z mike $"
+ * "$Id: file.c 5812 2006-08-09 22:42:51Z mike $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -1260,6 +1260,7 @@ cupsFileRewind(cups_file_t *fp)		/* I - CUPS file */
   fp->pos = 0;
   fp->ptr = NULL;
   fp->end = NULL;
+  fp->eof = 0;
 
   return (0);
 }
@@ -2080,5 +2081,5 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * End of "$Id: file.c 5324 2006-03-23 16:47:46Z mike $".
+ * End of "$Id: file.c 5812 2006-08-09 22:42:51Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: attr.c 5119 2006-02-16 15:52:06Z mike $"
+ * "$Id: attr.c 5826 2006-08-15 19:04:11Z mike $"
  *
  *   PPD model-specific attribute routines for the Common UNIX Printing System
  *   (CUPS).
@@ -44,13 +44,18 @@
  * @since CUPS 1.1.19@
  */
 
-ppd_attr_t *			/* O - Attribute or NULL if not found */
-ppdFindAttr(ppd_file_t *ppd,	/* I - PPD file data */
-            const char *name,	/* I - Attribute name */
-            const char *spec)	/* I - Specifier string or NULL */
+ppd_attr_t *				/* O - Attribute or NULL if not found */
+ppdFindAttr(ppd_file_t *ppd,		/* I - PPD file data */
+            const char *name,		/* I - Attribute name */
+            const char *spec)		/* I - Specifier string or NULL */
 {
-  ppd_attr_t	key;		/* Search key */
+  ppd_attr_t	key,			/* Search key */
+		*attr;			/* Current attribute */
+  int		diff;			/* Current difference */
 
+
+  DEBUG_printf(("ppdFindAttr(ppd=%p, name=\"%s\", spec=\"%s\")\n", ppd,
+                name ? name : "(null)", spec ? spec : "(null)"));
 
  /*
   * Range check input...
@@ -72,7 +77,36 @@ ppdFindAttr(ppd_file_t *ppd,	/* I - PPD file data */
   * Return the first matching attribute, if any...
   */
 
-  return ((ppd_attr_t *)cupsArrayFind(ppd->sorted_attrs, &key));
+  if ((attr = (ppd_attr_t *)cupsArrayFind(ppd->sorted_attrs, &key)) != NULL)
+    return (attr);
+  else if (spec)
+    return (NULL);
+
+ /*
+  * No match found, loop through the sorted attributes to see if we can
+  * find a "wildcard" match for the attribute...
+  */
+
+  for (attr = (ppd_attr_t *)cupsArrayFirst(ppd->sorted_attrs);
+       attr;
+       attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs))
+  {
+    if ((diff = strcasecmp(attr->name, name)) == 0)
+      break;
+
+    if (diff > 0)
+    {
+     /*
+      * All remaining attributes are > than the one we are trying to find...
+      */
+
+      cupsArrayIndex(ppd->sorted_attrs, cupsArrayCount(ppd->sorted_attrs));
+
+      return (NULL);
+    }
+  }
+
+  return (attr);
 }
 
 
@@ -129,5 +163,5 @@ ppdFindNextAttr(ppd_file_t *ppd,	/* I - PPD file data */
 
 
 /*
- * End of "$Id: attr.c 5119 2006-02-16 15:52:06Z mike $".
+ * End of "$Id: attr.c 5826 2006-08-15 19:04:11Z mike $".
  */

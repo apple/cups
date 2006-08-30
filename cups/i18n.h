@@ -1,5 +1,5 @@
 /*
- * "$Id: i18n.h 5366 2006-04-02 16:11:04Z mike $"
+ * "$Id: i18n.h 5833 2006-08-16 20:05:58Z mike $"
  *
  *   (Private) localization support for the Common UNIX Printing System (CUPS).
  *
@@ -105,6 +105,7 @@ extern const char	*_cupsLangString(cups_lang_t *lang, const char *message);
 extern void		_cupsMessageFree(cups_array_t *a);
 extern cups_array_t	*_cupsMessageLoad(const char *filename);
 extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
+extern void		_cupsSetLocale(void);
 
 #  ifdef __cplusplus
 }
@@ -113,5 +114,5 @@ extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
 #endif /* !_CUPS_I18N_H_ */
 
 /*
- * End of "$Id: i18n.h 5366 2006-04-02 16:11:04Z mike $".
+ * End of "$Id: i18n.h 5833 2006-08-16 20:05:58Z mike $".
  */

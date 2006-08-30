@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5739 2006-07-16 15:21:18Z mike $"
+ * "$Id: client.c 5898 2006-08-28 18:54:10Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -26,6 +26,7 @@
  *   cupsdAcceptClient()     - Accept a new client.
  *   cupsdCloseAllClients()  - Close all remote clients immediately.
  *   cupsdCloseClient()      - Close a remote client.
+ *   cupsdFlushHeader()      - Flush the header fields to the client.
  *   cupsdReadClient()       - Read data from a client.
  *   cupsdSendCommand()      - Send output from a command via HTTP.
  *   cupsdSendError()        - Send an error message via HTTP.
@@ -674,6 +675,19 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 
 
 /*
+ * 'cupsdFlushHeader()' - Flush the header fields to the client.
+ */
+
+void
+cupsdFlushHeader(cupsd_client_t *con)	/* I - Client to flush to */
+{
+  httpFlushWrite(HTTP(con));
+
+  con->http.data_encoding = HTTP_ENCODE_LENGTH;
+}
+
+
+/*
  * 'cupsdReadClient()' - Read data from a client.
  */
 
@@ -1024,6 +1038,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
+	cupsdFlushHeader(con);
 
         encrypt_client(con);
 #else
@@ -1038,6 +1053,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST, PUT\r\n");
       httpPrintf(HTTP(con), "Content-Length: 0\r\n");
       httpPrintf(HTTP(con), "\r\n");
+      cupsdFlushHeader(con);
     }
     else if (!is_path_absolute(con->uri))
     {
@@ -1065,6 +1081,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
+	cupsdFlushHeader(con);
 
         encrypt_client(con);
 #else
@@ -1105,6 +1122,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	  httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	  httpPrintf(HTTP(con), "\r\n");
+	  cupsdFlushHeader(con);
 	}
       }
 
@@ -1538,6 +1556,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (httpPrintf(HTTP(con), "\r\n") < 0)
 		return (cupsdCloseClient(con));
 
+	      cupsdFlushHeader(con);
+
               cupsdLogRequest(con, HTTP_OK);
 	    }
             else if ((!strncmp(con->uri, "/admin/conf/", 12) &&
@@ -1600,6 +1620,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
             if (httpPrintf(HTTP(con), "\r\n") < 0)
 	      return (cupsdCloseClient(con));
+
+	    cupsdFlushHeader(con);
 
             con->http.state = HTTP_WAITING;
             break;
@@ -2074,6 +2096,8 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   else if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
 
+  cupsdFlushHeader(con);
+
   con->http.state = HTTP_WAITING;
 
   return (1);
@@ -2093,6 +2117,10 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
   * Send the HTTP status header...
   */
 
+  httpFlushWrite(HTTP(con));
+
+  con->http.data_encoding = HTTP_ENCODE_FIELDS;
+
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
                  con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
@@ -2106,7 +2134,10 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
     if (httpPrintf(HTTP(con), "\r\n") < 0)
       return (0);
     else
+    {
+      cupsdFlushHeader(con);
       return (1);
+    }
   }
 
   if (httpPrintf(HTTP(con), "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
@@ -2191,7 +2222,7 @@ cupsdUpdateCGI(void)
     if (!strchr(CGIStatusBuffer->buffer, '\n'))
       break;
 
-  if (ptr == NULL && errno)
+  if (ptr == NULL && !CGIStatusBuffer->bufused)
   {
    /*
     * Fatal error on pipe - should never happen!
@@ -2274,15 +2305,13 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 		return (0);
 	    }
 	    else if (!strncasecmp(buf, "Status:", 7))
-  	      cupsdSendError(con, atoi(buf + 7));
+  	      cupsdSendError(con, (http_status_t)atoi(buf + 7));
 	    else
 	    {
   	      cupsdSendHeader(con, HTTP_OK, NULL);
 
 	      if (con->http.version == HTTP_1_1)
 	      {
-		con->http.data_encoding = HTTP_ENCODE_CHUNKED;
-
 		if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n") < 0)
 		  return (0);
 	      }
@@ -2310,7 +2339,14 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	  */
 
 	  if (con->field_col == 0)
+	  {
 	    con->got_fields = 1;
+
+            cupsdFlushHeader(con);
+
+	    if (con->http.version == HTTP_1_1)
+	      con->http.data_encoding = HTTP_ENCODE_CHUNKED;
+          }
 	  else
 	    con->field_col = 0;
 	}
@@ -3350,19 +3386,31 @@ static int				/* O - 1 on success, 0 on failure */
 make_certificate(void)
 {
 #if defined(HAVE_LIBSSL) && defined(HAVE_WAITPID)
-  int	pid,				/* Process ID of command */
-	status;				/* Status of command */
-  char	command[1024],			/* Command */
-	*argv[11],			/* Command-line arguments */
-	*envp[MAX_ENV];			/* Environment variables */
+  int		pid,			/* Process ID of command */
+		status;			/* Status of command */
+  char		command[1024],		/* Command */
+		*argv[11],		/* Command-line arguments */
+		*envp[MAX_ENV + 1],	/* Environment variables */
+		home[1024],		/* HOME environment variable */
+		infofile[1024],		/* Type-in information for cert */
+		seedfile[1024];		/* Random number seed file */
+  int		envc,			/* Number of environment variables */
+		bytes;			/* Bytes written */
+  cups_file_t	*fp;			/* Seed/info file */
+  int		infofd;			/* Info file descriptor */
 
 
  /*
-  * Run the "openssl" command to generate a self-signed certificate
-  * that is good for 10 years:
+  * Run the "openssl" command to seed the random number generator and
+  * generate a self-signed certificate that is good for 10 years:
+  *
+  *     openssl rand -rand seedfile 1
   *
   *     openssl req -new -x509 -keyout ServerKey \
   *             -out ServerCertificate -days 3650 -nodes
+  *
+  * The seeding step is crucial in ensuring that the openssl command
+  * does not block on systems without sufficient entropy...
   */
 
   if (!cupsFileFind("openssl", getenv("PATH"), 1, command, sizeof(command)))
@@ -3371,6 +3419,108 @@ make_certificate(void)
                     "No SSL certificate and openssl command not found!");
     return (0);
   }
+
+  if (access("/dev/urandom", 0))
+  {
+   /*
+    * If the system doesn't provide /dev/urandom, then any random source
+    * will probably be blocking-style, so generate some random data to
+    * use as a seed for the certificate.  Note that we have already
+    * seeded the random number generator in cupsdInitCerts()...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Seeding the random number generator...");
+
+    snprintf(home, sizeof(home), "HOME=%s", TempDir);
+
+   /*
+    * Write the seed file...
+    */
+
+    if ((fp = cupsTempFile2(seedfile, sizeof(seedfile))) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create seed file %s - %s",
+                      seedfile, strerror(errno));
+      return (0);
+    }
+
+    for (bytes = 0; bytes < 262144; bytes ++)
+      cupsFilePutChar(fp, random());
+
+    cupsFileClose(fp);
+
+   /*
+    * Run the openssl command to seed its random number generator...
+    */
+
+    argv[0] = "openssl";
+    argv[1] = "rand";
+    argv[2] = "-rand";
+    argv[3] = seedfile;
+    argv[4] = "1";
+    argv[5] = NULL;
+
+    envc = cupsdLoadEnv(envp, MAX_ENV);
+    envp[envc++] = home;
+    envp[envc]   = NULL;
+
+    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, 1, &pid))
+    {
+      unlink(seedfile);
+      return (0);
+    }
+
+    while (waitpid(pid, &status, 0) < 0)
+      if (errno != EINTR)
+      {
+	status = 1;
+	break;
+      }
+
+    cupsdFinishProcess(pid, command, sizeof(command));
+
+   /*
+    * Remove the seed file, as it is no longer needed...
+    */
+
+    unlink(seedfile);
+
+    if (status)
+    {
+      if (WIFEXITED(status))
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+                	"Unable to seed random number generator - "
+			"the openssl command stopped with status %d!",
+	        	WEXITSTATUS(status));
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+                	"Unable to seed random number generator - "
+			"the openssl command crashed on signal %d!",
+	        	WTERMSIG(status));
+
+      return (0);
+    }
+  }
+
+ /*
+  * Create a file with the certificate information fields...
+  *
+  * Note: This assumes that the default questions are asked by the openssl
+  * command...
+  */
+
+  if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create certificate information file %s - %s",
+                    infofile, strerror(errno));
+    return (0);
+  }
+
+  cupsFilePrintf(fp, ".\n.\n.\n%s\n.\n%s\n%s\n",
+                 ServerName, ServerName, ServerAdmin);
+  cupsFileClose(fp);
 
   cupsdLogMessage(CUPSD_LOG_INFO,
                   "Generating SSL server key and certificate...");
@@ -3390,8 +3540,17 @@ make_certificate(void)
 
   cupsdLoadEnv(envp, MAX_ENV);
 
-  if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, 1, &pid))
+  infofd = open(infofile, O_RDONLY);
+
+  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, 1, &pid))
+  {
+    close(infofd);
+    unlink(infofile);
     return (0);
+  }
+
+  close(infofd);
+  unlink(infofile);
 
   while (waitpid(pid, &status, 0) < 0)
     if (errno != EINTR)
@@ -3993,6 +4152,8 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
   if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
 
+  cupsdFlushHeader(con);
+
   con->http.data_encoding  = HTTP_ENCODE_LENGTH;
   con->http.data_remaining = filestats->st_size;
 
@@ -4011,5 +4172,5 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5739 2006-07-16 15:21:18Z mike $".
+ * End of "$Id: client.c 5898 2006-08-28 18:54:10Z mike $".
  */

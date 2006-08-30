@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5547 2006-05-19 12:44:29Z mike $"
+# "$Id: Makefile 5902 2006-08-29 15:51:19Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -121,8 +121,9 @@ install:	installhdrs
 			$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
 			$(INSTALL_DATA) init/Localizable.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
 		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
-			echo Installing LaunchDaemons configuration file...; \
+			echo Installing LaunchDaemons configuration files...; \
 			$(INSTALL_DATA) init/org.cups.cupsd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
+			$(INSTALL_DATA) init/org.cups.cups-lpd.plist $(BUILDROOT)/System/Library/LaunchDaemons; \
 		else \
 			echo Installing RC script...; \
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
@@ -220,24 +221,44 @@ uninstall:
 # Run the test suite...
 #
 
-check test:	all
+test:	all
 	echo Running CUPS test suite...
 	cd test; ./run-stp-tests.sh
+
+
+check:	all
+	echo Running CUPS test suite with defaults...
+	cd test; ./run-stp-tests.sh 1 0 n
 
 
 #
 # Make software distributions using EPM (http://www.easysw.com/epm/)...
 #
 
-EPMFLAGS	=	-v
+EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 
-aix bsd deb depot inst osx pkg rpm setld slackware swinstall tardist:
+aix bsd deb depot inst pkg rpm setld slackware swinstall tardist:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
 
 epm:
-	epm $(EPMFLAGS) cups packaging/cups.list
+	epm $(EPMFLAGS) -s packaging/installer.gif cups packaging/cups.list
+
+osx:
+	epm $(EPMFLAGS) -f osx -s packaging/installer.tif cups packaging/cups.list
+
+.PHONEY:	dist
+dist:	all
+	$(RM) -r dist
+	$(MAKE) $(MFLAGS) epm
+	case `uname` in \
+		*BSD*) $(MAKE) $(MFLAGS) bsd;; \
+		Darwin*) $(MAKE) $(MFLAGS) osx;; \
+		IRIX*) $(MAKE) $(MFLAGS) tardist;; \
+		Linux*) $(MAKE) $(MFLAGS) rpm;; \
+		SunOS*) $(MAKE) $(MFLAGS) pkg;; \
+	esac
 
 
 #
-# End of "$Id: Makefile 5547 2006-05-19 12:44:29Z mike $".
+# End of "$Id: Makefile 5902 2006-08-29 15:51:19Z mike $".
 #

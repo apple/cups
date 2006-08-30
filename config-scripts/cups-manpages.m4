@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-manpages.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id: cups-manpages.m4 5799 2006-08-03 00:54:38Z mike $"
 dnl
 dnl   Manpage stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -23,6 +23,12 @@ dnl         WWW: http://www.cups.org
 dnl
 
 dnl Fix "mandir" variable...
+if test "$mandir" = "\${datarootdir}/man" -a "$prefix" = "/"; then
+	# New GNU "standards" break previous ones, so make sure we use
+	# the right default location for the operating system...
+	mandir="\${prefix}/man"
+fi
+
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$uname" in
         	Darwin* | Linux | GNU | *BSD* | AIX*)
@@ -103,5 +109,5 @@ AC_SUBST(MAN8EXT)
 AC_SUBST(MAN8DIR)
 
 dnl
-dnl End of "$Id: cups-manpages.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id: cups-manpages.m4 5799 2006-08-03 00:54:38Z mike $".
 dnl

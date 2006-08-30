@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# "$Id: cups-config.in 5688 2006-06-23 20:33:08Z mike $"
+# "$Id: cups-config.in 5799 2006-08-03 00:54:38Z mike $"
 # 
 #   CUPS configuration utility.
 #
@@ -32,6 +32,7 @@ bindir=@bindir@
 includedir=@includedir@
 libdir=@libdir@
 imagelibdir=@libdir@
+datarootdir=@datadir@
 datadir=@datadir@
 sysconfdir=@sysconfdir@
 cups_datadir=@CUPS_DATADIR@
@@ -150,5 +151,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in 5688 2006-06-23 20:33:08Z mike $".
+# End of "$Id: cups-config.in 5799 2006-08-03 00:54:38Z mike $".
 #

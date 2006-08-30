@@ -1,5 +1,5 @@
 /*
- * "$Id: file.h 5319 2006-03-21 15:28:29Z mike $"
+ * "$Id: file.h 5769 2006-07-20 17:17:14Z mike $"
  *
  *   Public file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -8,7 +8,7 @@
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -47,9 +47,9 @@ typedef off_t ssize_t;			/* @private@ */
  * C++ magic...
  */
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 extern "C" {
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 
 
 /*
@@ -103,11 +103,11 @@ extern int		cupsFileUnlock(cups_file_t *fp);
 extern ssize_t		cupsFileWrite(cups_file_t *fp, const char *buf, size_t bytes);
 
 
-#  ifdef _cplusplus
+#  ifdef __cplusplus
 }
-#  endif /* _cplusplus */
+#  endif /* __cplusplus */
 #endif /* !_CUPS_FILE_H_ */
 
 /*
- * End of "$Id: file.h 5319 2006-03-21 15:28:29Z mike $".
+ * End of "$Id: file.h 5769 2006-07-20 17:17:14Z mike $".
  */

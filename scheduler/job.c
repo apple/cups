@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 5719 2006-07-11 21:04:48Z mike $"
+ * "$Id: job.c 5889 2006-08-24 21:44:35Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -354,7 +354,7 @@ cupsdCheckJobs(void)
 	*/
 
         cupsdLogMessage(CUPSD_LOG_WARN,
-	                "Printer/class %s has gone away; cancelling job %d!",
+	                "Printer/class %s has gone away; canceling job %d!",
 	                job->dest, job->id);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
@@ -690,7 +690,7 @@ cupsdFreeAllJobs(void)
 
   cupsdHoldSignals();
 
-  cupsdStopAllJobs();
+  cupsdStopAllJobs(1);
   cupsdSaveAllJobs();
 
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
@@ -1494,7 +1494,7 @@ cupsdSetJobPriority(
  */
 
 void
-cupsdStopAllJobs(void)
+cupsdStopAllJobs(int force)		/* I - 1 = Force all filters to stop */
 {
   cupsd_job_t	*job;			/* Current job */
 
@@ -1506,7 +1506,7 @@ cupsdStopAllJobs(void)
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
     if (job->state_value == IPP_JOB_PROCESSING)
     {
-      cupsdStopJob(job, 1);
+      cupsdStopJob(job, force);
       job->state->values[0].integer = IPP_JOB_PENDING;
       job->state_value              = IPP_JOB_PENDING;
     }
@@ -1728,7 +1728,7 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
       break;
   }
 
-  if (ptr == NULL)
+  if (ptr == NULL && !job->status_buffer->bufused)
   {
    /*
     * See if all of the filters and the backend have returned their
@@ -2053,7 +2053,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     }
     else if (!strcasecmp(line, "State"))
     {
-      job->state_value = atoi(value);
+      job->state_value = (ipp_jstate_t)atoi(value);
 
       if (job->state_value < IPP_JOB_PENDING)
         job->state_value = IPP_JOB_PENDING;
@@ -2425,7 +2425,6 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 					/* PRINTER env variable */
 			rip_max_cache[255];
 					/* RIP_MAX_CACHE env variable */
-  int			remote_job;	/* Remote print job? */
   static char		*options = NULL;/* Full list of options */
   static int		optlength = 0;	/* Length of option buffer */
 
@@ -2435,7 +2434,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   if (job->num_files == 0)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Job ID %d has no files!  Cancelling it!",
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Job ID %d has no files!  Canceling it!",
                     job->id);
 
     cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
@@ -2567,17 +2566,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   FilterLevel += job->cost;
 
  /*
-  * Determine if we are printing to a remote printer...
-  */
-
-  remote_job = printer->raw && job->num_files > 1 &&
-               !strncmp(printer->device_uri, "ipp://", 6);
-
- /*
   * Add decompression filters, if any...
   */
 
-  if (!remote_job && job->compressions[job->current_file])
+  if (!printer->raw && job->compressions[job->current_file])
   {
    /*
     * Add gziptoany filter to the front of the list...
@@ -2911,7 +2903,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   * For remote jobs, we send all of the files in the argument list.
   */
 
-  if (remote_job)
+  if (printer->remote && job->num_files > 1)
     argv = calloc(7 + job->num_files, sizeof(char *));
   else
     argv = calloc(8, sizeof(char *));
@@ -2925,7 +2917,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   argv[4] = copies;
   argv[5] = options;
 
-  if (remote_job)
+  if (printer->remote && job->num_files > 1)
   {
     for (i = 0; i < job->num_files; i ++)
     {
@@ -3018,11 +3010,12 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
 
-  if ((filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
+  if (!printer->remote &&
+      (filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
   {
     snprintf(final_content_type, sizeof(final_content_type),
              "FINAL_CONTENT_TYPE=%s/%s",
-	     filter->src->super, filter->src->type);
+	     filter->dst->super, filter->dst->type);
     envp[envc ++] = final_content_type;
   }
 
@@ -3059,7 +3052,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"DEVICE_URI=%s\"",
                       job->id, i, sani_uri);
 
-  if (remote_job)
+  if (printer->remote)
     job->current_file = job->num_files;
   else
     job->current_file ++;
@@ -3355,7 +3348,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 		  slot, filterfds[slot][0], filterfds[slot][1]);
   cupsdClosePipe(filterfds[slot]);
 
-  if (remote_job)
+  if (printer->remote && job->num_files > 1)
   {
     for (i = 0; i < job->num_files; i ++)
       free(argv[i + 6]);
@@ -3399,7 +3392,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   cupsArrayDelete(filters);
 
-  if (remote_job)
+  if (printer->remote && job->num_files > 1)
   {
     for (i = 0; i < job->num_files; i ++)
       free(argv[i + 6]);
@@ -3433,5 +3426,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 5719 2006-07-11 21:04:48Z mike $".
+ * End of "$Id: job.c 5889 2006-08-24 21:44:35Z mike $".
  */

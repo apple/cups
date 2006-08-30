@@ -45,12 +45,15 @@ if test -x /bin/launchctl; then
 	cat >$pkgdir/Resources/postflight <<EOF
 #!/bin/sh
 
-# Remove old startup item, we use launchd now...
+# Remove old startup item and xinetd config file, we use launchd now...
 rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
+rm -f /etc/xinetd.d/cups-lpd
 
 # Tell launchd to reload cupsd...
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
+launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist
 EOF
 else
 	cat >$pkgdir/Resources/postflight <<EOF

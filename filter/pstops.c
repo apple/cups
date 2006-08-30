@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 5622 2006-06-01 23:43:21Z mike $"
+ * "$Id: pstops.c 5886 2006-08-24 19:53:17Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -1587,6 +1587,10 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
       break;
   }
 
+  puts("%%BeginSetup");
+  
+  do_setup(doc, ppd);
+
   if (!strncmp(line, "%%BeginSetup", 12))
   {
     while (strncmp(line, "%%EndSetup", 10))
@@ -1603,7 +1607,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 	  doc->num_options = include_feature(ppd, line, doc->num_options,
                                              &(doc->options));
       }
-      else
+      else if (strncmp(line, "%%BeginSetup", 12))
         fwrite(line, 1, linelen, stdout);
 
       if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
@@ -1615,10 +1619,6 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
     else
       fputs("ERROR: Missing %%EndSetup!\n", stderr);
   }
-  else
-    puts("%%BeginSetup");
-
-  do_setup(doc, ppd);
 
   puts("%%EndSetup");
 
@@ -2994,5 +2994,5 @@ write_labels(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 5622 2006-06-01 23:43:21Z mike $".
+ * End of "$Id: pstops.c 5886 2006-08-24 19:53:17Z mike $".
  */

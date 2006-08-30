@@ -1,5 +1,5 @@
 /*
- * "$Id: runloop.c 5726 2006-07-12 20:00:11Z mike $"
+ * "$Id: runloop.c 5776 2006-07-26 20:55:13Z mike $"
  *
  *   Common run loop API for the Common UNIX Printing System (CUPS).
  *
@@ -33,7 +33,11 @@
  */
 
 #include "backend-private.h"
-#include <sys/select.h>
+#ifdef __hpux
+#  include <sys/time.h>
+#else
+#  include <sys/select.h>
+#endif /* __hpux */
 
 
 /*
@@ -254,5 +258,5 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 
 
 /*
- * End of "$Id: runloop.c 5726 2006-07-12 20:00:11Z mike $".
+ * End of "$Id: runloop.c 5776 2006-07-26 20:55:13Z mike $".
  */

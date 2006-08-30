@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 5745 2006-07-18 13:45:56Z mike $"
+# "$Id: cups.list.in 5900 2006-08-28 19:26:39Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -122,6 +122,7 @@
 $prefix=@prefix@
 $exec_prefix=@exec_prefix@
 $bindir=@bindir@
+$datarootdir=@datarootdir@
 $datadir=@datadir@
 $includedir=@includedir@
 $infodir=@infodir@
@@ -159,7 +160,7 @@ $SBINDIR=@sbindir@
 $SERVERBIN=@CUPS_SERVERBIN@
 $SERVERROOT=@CUPS_SERVERROOT@
 $STATEDIR=@CUPS_STATEDIR@
-
+$XINETD=@XINETD@
 $LIB32DIR=@LIB32DIR@
 $LIB64DIR=@LIB64DIR@
 
@@ -290,22 +291,22 @@ l 0755 root sys /usr/bsd/lprm $BINDIR/lprm
 %if DSOLIBS
 %subpackage libs
 %system hpux
-f 0755 root sys $LIBDIR/libcups.sl.2 cups/libcups.sl.2
+f 0755 root sys $LIBDIR/libcups.sl.2 cups/libcups.sl.2 nostrip()
 l 0755 root sys $LIBDIR/libcups.sl libcups.sl.2
-f 0755 root sys $LIBDIR/libcupsimage.sl.2 filter/libcupsimage.sl.2
+f 0755 root sys $LIBDIR/libcupsimage.sl.2 filter/libcupsimage.sl.2 nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.2
 %system aix
-f 0755 root sys $LIBDIR/libcups_s.a cups/libcups_s.a
-f 0755 root sys $LIBDIR/libcupsimage_s.a filter/libcupsimage_s.a
+f 0755 root sys $LIBDIR/libcups_s.a cups/libcups_s.a nostrip()
+f 0755 root sys $LIBDIR/libcupsimage_s.a filter/libcupsimage_s.a nostrip()
 %system darwin
-f 0755 root sys $LIBDIR/libcups.2.dylib cups/libcups.2.dylib
+f 0755 root sys $LIBDIR/libcups.2.dylib cups/libcups.2.dylib nostrip()
 l 0755 root sys $LIBDIR/libcups.dylib libcups.2.dylib
-f 0755 root sys $LIBDIR/libcupsimage.2.dylib filter/libcupsimage.2.dylib
+f 0755 root sys $LIBDIR/libcupsimage.2.dylib filter/libcupsimage.2.dylib nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.dylib libcupsimage.2.dylib
 %system !hpux !aix !darwin
-f 0755 root sys $LIBDIR/libcups.so.2 cups/libcups.so.2
+f 0755 root sys $LIBDIR/libcups.so.2 cups/libcups.so.2 nostrip()
 l 0755 root sys $LIBDIR/libcups.so libcups.so.2
-f 0755 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2
+f 0755 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2 nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
 %system all
 %subpackage
@@ -313,9 +314,9 @@ l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
 
 %if LIB32DIR
 %subpackage libs
-f 0755 root sys $LIB32DIR/libcups.so.2 cups/libcups.32.so.2
+f 0755 root sys $LIB32DIR/libcups.so.2 cups/libcups.32.so.2 nostrip()
 l 0755 root sys $LIB32DIR/libcups.so libcups.so.2
-f 0755 root sys $LIB32DIR/libcupsimage.so.2 filter/libcupsimage.32.so.2
+f 0755 root sys $LIB32DIR/libcupsimage.so.2 filter/libcupsimage.32.so.2 nostrip()
 l 0755 root sys $LIB32DIR/libcupsimage.so libcupsimage.so.2
 %system all
 %subpackage
@@ -323,9 +324,9 @@ l 0755 root sys $LIB32DIR/libcupsimage.so libcupsimage.so.2
 
 %if LIB64DIR
 %subpackage libs
-f 0755 root sys $LIB64DIR/libcups.so.2 cups/libcups.64.so.2
+f 0755 root sys $LIB64DIR/libcups.so.2 cups/libcups.64.so.2 nostrip()
 l 0755 root sys $LIB64DIR/libcups.so libcups.so.2
-f 0755 root sys $LIB64DIR/libcupsimage.so.2 filter/libcupsimage.64.so.2
+f 0755 root sys $LIB64DIR/libcupsimage.so.2 filter/libcupsimage.64.so.2 nostrip()
 l 0755 root sys $LIB64DIR/libcupsimage.so libcupsimage.so.2
 %system all
 %subpackage
@@ -342,7 +343,7 @@ d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 
 # Data files
 %subpackage de
-f 0644 root sys $LOCALEDIR/es/cups_de.po locale/cups_de.po
+f 0644 root sys $LOCALEDIR/de/cups_de.po locale/cups_de.po
 %subpackage es
 f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
 %subpackage ja
@@ -562,10 +563,31 @@ d 0755 root sys $AMANDIR/man$MAN8DIR -
 f 0644 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.$MAN8EXT
 %subpackage
 
-# Startup script
-%system all
+# Startup scripts
+%system darwin
+f 0644 root sys /System/Library/LaunchDaemons/org.cups.cupsd.plist init/org.cups.cupsd.plist
+%postinstall <<EOF
+rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
+EOF
+%subpackage lpd
+f 0644 root sys /System/Library/LaunchDaemons/org.cups.cups-lpd.plist init/org.cups.cups-lpd.plist
+%postinstall <<EOF
+rm -f /etc/xinetd.d/cups-lpd
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist
+EOF
+%subpackage
+
+%system !darwin
 i 0755 root sys cups init/cups.sh
+%subpackage lpd
+%if XINETD
+f 0644 root sys $XINETD/cups-lpd init/cups-lpd
+%endif
+%subpackage
 
 #
-# End of "$Id: cups.list.in 5745 2006-07-18 13:45:56Z mike $".
+# End of "$Id: cups.list.in 5900 2006-08-28 19:26:39Z mike $".
 #

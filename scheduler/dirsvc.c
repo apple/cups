@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 5724 2006-07-12 19:42:35Z mike $"
+ * "$Id: dirsvc.c 5889 2006-08-24 21:44:35Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -510,6 +510,23 @@ cupsdLoadRemoteCache(void)
   */
 
   process_implicit_classes();
+}
+
+
+/*
+ * 'cupsdRestartPolling()' - Restart polling servers as needed.
+ */
+
+void
+cupsdRestartPolling(void)
+{
+  int			i;		/* Looping var */
+  cupsd_dirsvc_poll_t	*pollp;		/* Current polling server */
+
+
+  for (i = 0, pollp = Polled; i < NumPolled; i ++, pollp ++)
+    if (pollp->pid)
+      kill(pollp->pid, SIGHUP);
 }
 
 
@@ -1468,7 +1485,7 @@ cupsdUpdateCUPSBrowse(void)
     if (cupsdCheckAuth(address, srcname, len, 1, &(Relays[i].from)))
       if (sendto(BrowseSocket, packet, bytes, 0,
                  (struct sockaddr *)&(Relays[i].to),
-		 sizeof(http_addr_t)) <= 0)
+		 httpAddrLength(&(Relays[i].to))) <= 0)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "cupsdUpdateCUPSBrowse: sendto failed for relay %d - %s.",
@@ -1609,7 +1626,7 @@ cupsdUpdatePolling(void)
     if (!strchr(PollStatusBuffer->buffer, '\n'))
       break;
 
-  if (ptr == NULL)
+  if (ptr == NULL && !PollStatusBuffer->bufused)
   {
    /*
     * All polling processes have died; stop polling...
@@ -1923,6 +1940,9 @@ process_browse_data(
     else
       return;
 
+    if (hptr && !*hptr)
+      *hptr = '.';			/* Resource FQDN */
+
     if ((p = cupsdFindClass(name)) == NULL && BrowseShortNames)
     {
       if ((p = cupsdFindClass(resource + 9)) != NULL)
@@ -2025,6 +2045,9 @@ process_browse_data(
       snprintf(name, sizeof(name), "%s@%s", resource + 10, host);
     else
       return;
+
+    if (hptr && !*hptr)
+      *hptr = '.';			/* Resource FQDN */
 
     if ((p = cupsdFindPrinter(name)) == NULL && BrowseShortNames)
     {
@@ -2566,7 +2589,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 
 	  sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(iface->broadcast),
-		 sizeof(struct sockaddr_in));
+		 httpAddrLength(&(iface->broadcast)));
         }
       }
       else if ((iface = cupsdNetIFFind(b->iface)) != NULL)
@@ -2607,7 +2630,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 
 	  sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(iface->broadcast),
-		 sizeof(struct sockaddr_in));
+		 httpAddrLength(&(iface->broadcast)));
         }
       }
     }
@@ -2628,7 +2651,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 
       if (sendto(BrowseSocket, packet, bytes, 0,
 		 (struct sockaddr *)&(b->to),
-		 sizeof(struct sockaddr_in)) <= 0)
+		 httpAddrLength(&(b->to))) <= 0)
       {
        /*
         * Unable to send browse packet, so remove this address from the
@@ -3158,5 +3181,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id: dirsvc.c 5724 2006-07-12 19:42:35Z mike $".
+ * End of "$Id: dirsvc.c 5889 2006-08-24 21:44:35Z mike $".
  */

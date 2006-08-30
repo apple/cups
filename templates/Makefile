@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5609 2006-05-30 20:31:10Z mike $"
+# "$Id: Makefile 5878 2006-08-24 15:55:42Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -61,6 +61,7 @@ FILES	=	\
 		maintenance.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
+		norestart.tmpl \
 		option-boolean.tmpl \
 		option-conflict.tmpl \
 		option-header.tmpl \
@@ -155,5 +156,5 @@ uninstall-languages:
 
 
 #
-# End of "$Id: Makefile 5609 2006-05-30 20:31:10Z mike $".
+# End of "$Id: Makefile 5878 2006-08-24 15:55:42Z mike $".
 #

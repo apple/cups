@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c 5495 2006-05-05 17:58:07Z mike $"
+ * "$Id: lpd.c 5886 2006-08-24 19:53:17Z mike $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -261,6 +261,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   /* We want to pass utf-8 characters, not re-map them (3071945) */
   sanitize_title = 0;
 
+  /* Get the default timeout from a system preference... */
   {
     CFPropertyListRef	pvalue;		/* Preference value */
     SInt32		toval;		/* Timeout value */
@@ -1230,5 +1231,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c 5495 2006-05-05 17:58:07Z mike $".
+ * End of "$Id: lpd.c 5886 2006-08-24 19:53:17Z mike $".
  */

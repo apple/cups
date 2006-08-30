@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4 5696 2006-06-26 18:34:20Z mike $"
+dnl "$Id: cups-directories.m4 5905 2006-08-29 20:48:59Z mike $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -57,6 +57,15 @@ if test "$sharedstatedir" = "\${prefix}/com" -a "$prefix" = "/"; then
 	sharedstatedir="/usr/com"
 fi
 
+dnl Fix "datarootdir" variable if it hasn't been specified...
+if test "$datarootdir" = "\${prefix}/share"; then
+	if test "$prefix" = "/"; then
+		datarootdir="/usr/share"
+	else
+		datarootdir="$prefix/share"
+	fi
+fi
+
 dnl Fix "datadir" variable if it hasn't been specified...
 if test "$datadir" = "\${prefix}/share"; then
 	if test "$prefix" = "/"; then
@@ -64,6 +73,8 @@ if test "$datadir" = "\${prefix}/share"; then
 	else
 		datadir="$prefix/share"
 	fi
+elif test "$datadir" = "\${datarootdir}"; then
+	datadir="$datarootdir"
 fi
 
 dnl Fix "includedir" variable if it hasn't been specified...
@@ -182,12 +193,15 @@ AC_SUBST(INITDDIR)
 
 dnl Xinetd support...
 XINETD=""
-for dir in /private/etc/xinetd.d /etc/xinetd.d /usr/local/etc/xinetd.d; do
-	if test -d $dir; then
-		XINETD="$dir"
-		break
-	fi
-done
+
+if test ! -x /sbin/launchd; then
+	for dir in /private/etc/xinetd.d /etc/xinetd.d /usr/local/etc/xinetd.d; do
+		if test -d $dir; then
+			XINETD="$dir"
+			break
+		fi
+	done
+fi
 
 AC_SUBST(XINETD)
 
@@ -197,7 +211,7 @@ AC_ARG_WITH(cachedir, [  --with-cachedir         set path for cache files],cache
 
 if test x$cachedir = x; then
 	if test "x$uname" = xDarwin; then
-		CUPS_CACHEDIR="$localstatedir/tmp/cups"
+		CUPS_CACHEDIR="$localstatedir/spool/cups/cache"
 	else
 		CUPS_CACHEDIR="$localstatedir/cache/cups"
 	fi
@@ -302,5 +316,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 5696 2006-06-26 18:34:20Z mike $".
+dnl End of "$Id: cups-directories.m4 5905 2006-08-29 20:48:59Z mike $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: sysman.c 5305 2006-03-18 03:05:12Z mike $"
+ * "$Id: sysman.c 5833 2006-08-16 20:05:58Z mike $"
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
@@ -289,7 +289,7 @@ cupsdUpdateSystemMonitor(void)
 
       Sleeping = 1;
 
-      cupsdStopAllJobs();
+      cupsdStopAllJobs(0);
       cupsdSaveAllJobs();
 
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
@@ -350,6 +350,7 @@ cupsdUpdateSystemMonitor(void)
 	  p->browse_time = 0;
 
         cupsdSendBrowseList();
+	cupsdRestartPolling();
       }
       else
         cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -727,5 +728,5 @@ sysEventTimerNotifier(
 
 
 /*
- * End of "$Id: sysman.c 5305 2006-03-18 03:05:12Z mike $".
+ * End of "$Id: sysman.c 5833 2006-08-16 20:05:58Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: langprintf.c 4924 2006-01-13 01:55:20Z mike $"
+ * "$Id: langprintf.c 5833 2006-08-16 20:05:58Z mike $"
  *
  *   Localized printf/puts functions for the Common UNIX Printing
  *   System (CUPS).
@@ -28,6 +28,7 @@
  *
  *   _cupsLangPrintf() - Print a formatted message string to a file.
  *   _cupsLangPuts()   - Print a static message string to a file.
+ *   _cupsSetLocale()  - Set the current locale.
  */
 
 /*
@@ -139,5 +140,50 @@ _cupsLangPuts(FILE        *fp,		/* I - File to write to */
 
 
 /*
- * End of "$Id: langprintf.c 4924 2006-01-13 01:55:20Z mike $".
+ * '_cupsSetLocale()' - Set the current locale.
+ */
+
+void
+_cupsSetLocale(void)
+{
+#ifdef LC_TIME
+    const char	*lc_time;		/* Current LC_TIME value */
+    char	new_lc_time[255],	/* New LC_TIME value */
+		*charset;		/* Pointer to character set */
+#endif /* LC_TIME */
+
+
+ /*
+  * Set the locale so that times, etc. are displayed properly.
+  *
+  * Unfortunately, while we need the localized time value, we *don't*
+  * want to use the localized charset for the time value, so we need
+  * to set LC_TIME to the locale name with .UTF-8 on the end (if
+  * the locale includes a character set specifier...)
+  */
+
+  setlocale(LC_ALL, "");
+
+#ifdef LC_TIME
+  if ((lc_time = setlocale(LC_TIME, NULL)) == NULL)
+    lc_time = setlocale(LC_ALL, NULL);
+
+  if (lc_time)
+  {
+    strlcpy(new_lc_time, lc_time, sizeof(new_lc_time));
+    if ((charset = strchr(new_lc_time, '.')) == NULL)
+      charset = new_lc_time + strlen(new_lc_time);
+
+    strlcpy(charset, ".UTF-8", sizeof(new_lc_time) - (charset - new_lc_time));
+  }
+  else
+    strcpy(new_lc_time, "C");
+
+  setlocale(LC_TIME, new_lc_time);
+#endif /* LC_TIME */
+}
+
+
+/*
+ * End of "$Id: langprintf.c 5833 2006-08-16 20:05:58Z mike $".
  */

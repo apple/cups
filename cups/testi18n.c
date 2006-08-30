@@ -1,5 +1,5 @@
 /*
- * "$Id: testi18n.c 5444 2006-04-20 18:16:54Z mike $"
+ * "$Id: testi18n.c 5838 2006-08-17 14:41:42Z mike $"
  *
  *   Internationalization test for Common UNIX Printing System (CUPS).
  *
@@ -82,7 +82,6 @@ main(int  argc,				/* I - Argument Count */
     /* "A != <CJK U+4E42>." - use Windows 950 (Big5) or EUC-TW */
   cups_utf8_t	utf8dest[1024];		/* UTF-8 destination string */
   cups_utf32_t	utf32dest[1024];	/* UTF-32 destination string */
-  _cups_vmap_t	 *vmap;			/* VBCS charmap pointer */
 
 
  /*
@@ -190,7 +189,7 @@ main(int  argc,				/* I - Argument Count */
 
   fputs("_cupsCharmapGet(CUPS_EUC_JP): ", stdout);
 
-  if ((vmap = (_cups_vmap_t *)_cupsCharmapGet(CUPS_EUC_JP)) == NULL)
+  if (!_cupsCharmapGet(CUPS_EUC_JP))
   {
     errors ++;
     puts("FAIL");
@@ -204,7 +203,7 @@ main(int  argc,				/* I - Argument Count */
 
   fputs("_cupsCharmapGet(CUPS_EUC_TW): ", stdout);
 
-  if ((vmap = (_cups_vmap_t *)_cupsCharmapGet(CUPS_EUC_TW)) == NULL)
+  if (!_cupsCharmapGet(CUPS_EUC_TW))
   {
     errors ++;
     puts("FAIL");
@@ -556,5 +555,5 @@ print_utf8(const char	     *msg,	/* I - Message String */
 
 
 /*
- * End of "$Id: testi18n.c 5444 2006-04-20 18:16:54Z mike $"
+ * End of "$Id: testi18n.c 5838 2006-08-17 14:41:42Z mike $"
  */

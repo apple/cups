@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 5643 2006-06-07 20:58:29Z mike $"
+ * "$Id: auth.c 5840 2006-08-17 14:55:30Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -89,9 +89,9 @@ static cupsd_authmask_t	*add_allow(cupsd_location_t *loc);
 static cupsd_authmask_t	*add_deny(cupsd_location_t *loc);
 static int		compare_locations(cupsd_location_t *a,
 			                  cupsd_location_t *b);
-#if !HAVE_LIBPAM
+#if !HAVE_LIBPAM && !defined(HAVE_USERSEC_H)
 static char		*cups_crypt(const char *pw, const char *salt);
-#endif /* !HAVE_LIBPAM */
+#endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
 static char		*get_md5_password(const char *username,
 			                  const char *group, char passwd[33]);
 #if HAVE_LIBPAM
@@ -540,7 +540,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	    */
 
 	    char	*authmsg;	/* Authentication message */
-	    char	*loginmsg;	/* Login message */
 	    int		reenter;	/* ??? */
 
 
@@ -1871,7 +1870,7 @@ compare_locations(cupsd_location_t *a,	/* I - First location */
 }
 
 
-#if !HAVE_LIBPAM
+#if !HAVE_LIBPAM && !defined(HAVE_USERSEC_H)
 /*
  * 'cups_crypt()' - Encrypt the password using the DES or MD5 algorithms,
  *                  as needed.
@@ -1991,7 +1990,7 @@ cups_crypt(const char *pw,		/* I - Password string */
     return (crypt(pw, salt));
   }
 }
-#endif /* !HAVE_LIBPAM */
+#endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
 
 
 /*
@@ -2171,5 +2170,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 5643 2006-06-07 20:58:29Z mike $".
+ * End of "$Id: auth.c 5840 2006-08-17 14:55:30Z mike $".
  */

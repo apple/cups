@@ -1,5 +1,5 @@
 /*
- * "$Id: notify.c 4961 2006-01-20 22:19:13Z mike $"
+ * "$Id: notify.c 5878 2006-08-24 15:55:42Z mike $"
  *
  *   Notification routines for the Common UNIX Printing System (CUPS).
  *
@@ -104,7 +104,7 @@ cupsNotifySubject(cups_lang_t *lang,	/* I - Language data */
       case IPP_JOB_STOPPED :
           state = _cupsLangString(lang, _("stopped"));
 	  break;
-      case IPP_JOB_CANCELLED :
+      case IPP_JOB_CANCELED :
           state = _cupsLangString(lang, _("canceled"));
 	  break;
       case IPP_JOB_ABORTED :
@@ -207,5 +207,5 @@ cupsNotifyText(cups_lang_t *lang,	/* I - Language data */
 
 
 /*
- * End of "$Id: notify.c 4961 2006-01-20 22:19:13Z mike $".
+ * End of "$Id: notify.c 5878 2006-08-24 15:55:42Z mike $".
  */

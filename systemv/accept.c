@@ -1,5 +1,5 @@
 /*
- * "$Id: accept.c 5104 2006-02-15 03:21:04Z mike $"
+ * "$Id: accept.c 5833 2006-08-16 20:05:58Z mike $"
  *
  *   "accept", "disable", "enable", and "reject" commands for the Common
  *   UNIX Printing System (CUPS).
@@ -57,6 +57,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   ipp_op_t	op;			/* Operation */
   int		cancel;			/* Cancel jobs? */
 
+
+  _cupsSetLocale();
 
  /*
   * See what operation we're supposed to do...
@@ -286,5 +288,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: accept.c 5104 2006-02-15 03:21:04Z mike $".
+ * End of "$Id: accept.c 5833 2006-08-16 20:05:58Z mike $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.in 5609 2006-05-30 20:31:10Z mike $"
+dnl "$Id: configure.in 5804 2006-08-04 16:51:58Z mike $"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
@@ -54,9 +54,17 @@ if test "x$LANGUAGES" != x; then
 	INSTALL_LANGUAGES="install-languages"
 	UNINSTALL_LANGUAGES="uninstall-languages"
 	for lang in $LANGUAGES; do
-		LANGFILES="$LANGFILES doc/$lang/index.html"
-		LANGFILES="$LANGFILES templates/$lang/edit-config.tmpl"
-		LANGFILES="$LANGFILES templates/$lang/header.tmpl"
+		if test -f doc/$lang/index.html.in; then
+			LANGFILES="$LANGFILES doc/$lang/index.html"
+		fi
+
+		if test -f templates/$lang/edit-config.tmpl.in; then
+			LANGFILES="$LANGFILES templates/$lang/edit-config.tmpl"
+		fi
+
+		if test -f templates/$lang/header.tmpl.in; then
+			LANGFILES="$LANGFILES templates/$lang/header.tmpl"
+		fi
 	done
 fi
 
@@ -75,5 +83,5 @@ AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh init/cups-lpd cups-config
 chmod +x cups-config
 
 dnl
-dnl End of "$Id: configure.in 5609 2006-05-30 20:31:10Z mike $".
+dnl End of "$Id: configure.in 5804 2006-08-04 16:51:58Z mike $".
 dnl

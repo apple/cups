@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestdsc.c 5392 2006-04-14 17:50:39Z mike $"
+ * "$Id: cupstestdsc.c 5838 2006-08-17 14:41:42Z mike $"
  *
  *   DSC test program for the Common UNIX Printing System (CUPS).
  *
@@ -65,6 +65,8 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_files;		/* Number of files tested */
 
 
+  _cupsSetLocale();
+
  /*
   * Collect command-line arguments...
   */
@@ -129,7 +131,6 @@ check_file(const char *filename)	/* I - File to read from */
 		saw_end_setup,		/* %%EndSetup seen? */
 		saw_page,		/* %%Page seen? */
 		saw_trailer,		/* %%Trailer seen? */
-		saw_eof,		/* %%EOF seen? */
 		saw_long_line;		/* Saw long lines? */
 
 
@@ -162,7 +163,6 @@ check_file(const char *filename)	/* I - File to read from */
   saw_end_comments = 0;
   saw_end_prolog   = 0;
   saw_end_setup    = 0;
-  saw_eof          = 0;
   saw_long_line    = 0;
   saw_page         = 0;
   saw_pages        = 0;
@@ -452,5 +452,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestdsc.c 5392 2006-04-14 17:50:39Z mike $".
+ * End of "$Id: cupstestdsc.c 5838 2006-08-17 14:41:42Z mike $".
  */

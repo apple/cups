@@ -1,5 +1,5 @@
 /*
- * "$Id: subscriptions.c 5716 2006-07-11 17:56:57Z mike $"
+ * "$Id: subscriptions.c 5878 2006-08-24 15:55:42Z mike $"
  *
  *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -267,7 +267,7 @@ cupsdAddEvent(
 			   "job-stopped");
               break;
 
-	  case IPP_JOB_CANCELLED :
+	  case IPP_JOB_CANCELED :
               ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
 		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
 			   "job-canceled-by-user");
@@ -1245,13 +1245,12 @@ cupsdStopAllNotifiers(void)
 void
 cupsdUpdateNotifierStatus(void)
 {
-  char		*ptr,			/* Pointer to end of line in buffer */
-		message[1024];		/* Pointer to message text */
+  char		message[1024];		/* Pointer to message text */
   int		loglevel;		/* Log level for message */
 
 
-  while ((ptr = cupsdStatBufUpdate(NotifierStatusBuffer, &loglevel,
-                                   message, sizeof(message))) != NULL)
+  while (cupsdStatBufUpdate(NotifierStatusBuffer, &loglevel,
+                            message, sizeof(message)))
     if (!strchr(NotifierStatusBuffer->buffer, '\n'))
       break;
 }
@@ -1506,7 +1505,6 @@ cupsd_start_notifier(
 {
   int	pid;				/* Notifier process ID */
   int	fds[2];				/* Pipe file descriptors */
-  int	envc;				/* Number of environment variables */
   char	*argv[4],			/* Command-line arguments */
 	*envp[MAX_ENV],			/* Environment variables */
 	user_data[128],			/* Base-64 encoded user data */
@@ -1546,7 +1544,7 @@ cupsd_start_notifier(
   * Setup the environment...
   */
 
-  envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
+  cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
 
  /*
   * Create pipes as needed...
@@ -1624,5 +1622,5 @@ cupsd_start_notifier(
 
 
 /*
- * End of "$Id: subscriptions.c 5716 2006-07-11 17:56:57Z mike $".
+ * End of "$Id: subscriptions.c 5878 2006-08-24 15:55:42Z mike $".
  */

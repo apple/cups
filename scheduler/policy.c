@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.c 5247 2006-03-08 13:43:38Z mike $"
+ * "$Id: policy.c 5838 2006-08-17 14:41:42Z mike $"
  *
  *   Policy routines for the Common UNIX Printing System (CUPS).
  *
@@ -195,7 +195,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
   {
     cupsdLogMessage(CUPSD_LOG_CRIT, "cupsdCheckPolicy: p=%p, con=%p!", p, con);
 
-    return (0);
+    return ((http_status_t)0);
   }
 
  /*
@@ -205,7 +205,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
   if ((po = cupsdFindPolicyOp(p, con->request->request.op.operation_id)) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0!");
-    return (0);
+    return ((http_status_t)0);
   }
 
   con->best = po;
@@ -330,5 +330,5 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 
 
 /*
- * End of "$Id: policy.c 5247 2006-03-08 13:43:38Z mike $".
+ * End of "$Id: policy.c 5838 2006-08-17 14:41:42Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c 5638 2006-06-06 20:08:13Z mike $"
+ * "$Id: lpstat.c 5833 2006-08-16 20:05:58Z mike $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -84,41 +84,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   char		op;			/* Last operation on command-line */
 
 
- /*
-  * Set the locale so that times, etc. are displayed properly.
-  *
-  * Unfortunately, while we need the localized time value, we *don't*
-  * want to use the localized charset for the time value, so we need
-  * to set LC_TIME to the locale name with .UTF-8 on the end (if
-  * the locale includes a character set specifier...)
-  */
+  _cupsSetLocale();
 
-  setlocale(LC_ALL, "");
-
-#ifdef LC_TIME
-  {
-    const char	*lc_time;		/* Current LC_TIME value */
-    char	new_lc_time[255],	/* New LC_TIME value */
-		*charset;		/* Pointer to character set */
-
-    if ((lc_time = setlocale(LC_TIME, NULL)) == NULL)
-      lc_time = setlocale(LC_ALL, NULL);
-
-    if (lc_time)
-    {
-      strlcpy(new_lc_time, lc_time, sizeof(new_lc_time));
-      if ((charset = strchr(new_lc_time, '.')) == NULL)
-        charset = new_lc_time + strlen(new_lc_time);
-
-      strlcpy(charset, ".UTF-8", sizeof(new_lc_time) - (charset - new_lc_time));
-    }
-    else
-      strcpy(new_lc_time, "C");
-
-    setlocale(LC_TIME, new_lc_time);
-  }
-#endif /* LC_TIME */
-  
  /*
   * Parse command-line options...
   */
@@ -2281,5 +2248,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c 5638 2006-06-06 20:08:13Z mike $".
+ * End of "$Id: lpstat.c 5833 2006-08-16 20:05:58Z mike $".
  */

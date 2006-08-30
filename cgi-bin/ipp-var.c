@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c 5572 2006-05-22 18:47:09Z mike $"
+ * "$Id: ipp-var.c 5838 2006-08-17 14:41:42Z mike $"
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -110,6 +110,7 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
   */
 
   num_attrs = 0;
+  attrs[0]  = NULL;			/* Eliminate compiler warning */
 
   while ((ch = getc(in)) != EOF)
     if (ch == '\\')
@@ -1279,5 +1280,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 5572 2006-05-22 18:47:09Z mike $".
+ * End of "$Id: ipp-var.c 5838 2006-08-17 14:41:42Z mike $".
  */

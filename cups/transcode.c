@@ -1,5 +1,5 @@
 /*
- * "$Id: transcode.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: transcode.c 5838 2006-08-17 14:41:42Z mike $"
  *
  *   Transcoding support for the Common UNIX Printing System (CUPS).
  *
@@ -408,7 +408,6 @@ cupsUTF8ToUTF32(
     const cups_utf8_t *src,		/* I - Source string */
     const int         maxout)		/* I - Max output */
 {
-  size_t	srclen;			/* Source string length */
   int		i;			/* Looping variable */
   cups_utf8_t	ch;			/* Character value */
   cups_utf8_t	next;			/* Next character value */
@@ -430,7 +429,6 @@ cupsUTF8ToUTF32(
   */
 
   *dest++ = 0xfeff;
-  srclen  = strlen((char *)src);
 
   for (i = maxout - 1; *src && i > 0; i --)
   {
@@ -1142,7 +1140,7 @@ free_vbcs_charmap(_cups_vmap_t *vmap)	/* I - Character set */
  */
 
 
-void *					/* O - Charset map pointer */
+static void *				/* O - Charset map pointer */
 get_charmap(
     const cups_encoding_t encoding)	/* I - Encoding */
 {
@@ -1585,5 +1583,5 @@ get_vbcs_charmap(
 
 
 /*
- * End of "$Id: transcode.c 5373 2006-04-06 20:03:32Z mike $"
+ * End of "$Id: transcode.c 5838 2006-08-17 14:41:42Z mike $"
  */

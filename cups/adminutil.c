@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 5753 2006-07-18 19:53:24Z mike $"
+ * "$Id: adminutil.c 5878 2006-08-24 15:55:42Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -103,7 +103,7 @@ cupsAdminCreateWindowsPPD(
 			linenum;	/* Current line number */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
-  static const char	*pattrs[] =	/* Printer attributes we want */
+  static const char * const pattrs[] =	/* Printer attributes we want */
 			{
 			  "job-hold-until-supported",
 			  "job-hold-until-default",
@@ -772,19 +772,31 @@ _cupsAdminGetServerSettings(
       if (!value)
         continue;
 
-      if (!strcasecmp(line, "Port"))
-      {
-	remote_access = 1;
-      }
-      else if (!strcasecmp(line, "Listen"))
+      if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
       {
 	char	*port;			/* Pointer to port number, if any */
 
 
 	if ((port = strrchr(value, ':')) != NULL)
 	  *port = '\0';
+	else if (isdigit(*value & 255))
+	{
+	 /*
+	  * Listen on a port number implies remote access...
+	  */
 
-	if (strcasecmp(value, "localhost") && strcmp(value, "127.0.0.1"))
+	  remote_access = 1;
+	  continue;
+	}
+
+	if (strcasecmp(value, "localhost") && strcmp(value, "127.0.0.1")
+#ifdef AF_LOCAL
+            && *value != '/'
+#endif /* AF_LOCAL */
+#ifdef AF_INET6
+            && strcmp(value, "::1")
+#endif /* AF_INET6 */
+	    )
 	  remote_access = 1;
       }
       else if (!strcasecmp(line, "Browsing"))
@@ -860,7 +872,14 @@ _cupsAdminGetServerSettings(
 	in_location       = 0;
       }
       else if (!strcasecmp(line, "Allow") && in_admin_location &&
-               strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1"))
+               strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1")
+#ifdef AF_LOCAL
+	       && *value != '/'
+#endif /* AF_LOCAL */
+#ifdef AF_INET6
+	       && strcmp(value, "::1")
+#endif /* AF_INET6 */
+	       )
       {
 	remote_admin = 1;
       }
@@ -1084,7 +1103,7 @@ _cupsAdminSetServerSettings(
 	{
 	  cupsFilePuts(temp, "# Only listen for connections from the local "
 	                     "machine.\n");
-	  cupsFilePrintf(temp, "Listen 127.0.0.1:%d\n", ippPort());
+	  cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
 	}
 
 #ifdef CUPS_DEFAULT_DOMAINSOCKET
@@ -1440,7 +1459,7 @@ _cupsAdminSetServerSettings(
     {
       cupsFilePuts(temp,
                    "# Only listen for connections from the local machine.\n");
-      cupsFilePrintf(temp, "Listen 127.0.0.1:%d\n", ippPort());
+      cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
     }
 
 #ifdef CUPS_DEFAULT_DOMAINSOCKET
@@ -1768,7 +1787,7 @@ get_cupsd_conf(
     * Read cupsd.conf via a HTTP GET request...
     */
 
-    if ((fd = cupsTempFd(name, sizeof(name))) < 0)
+    if ((fd = cupsTempFd(name, namesize)) < 0)
     {
       *name = '\0';
 
@@ -1929,5 +1948,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 5753 2006-07-18 19:53:24Z mike $".
+ * End of "$Id: adminutil.c 5878 2006-08-24 15:55:42Z mike $".
  */

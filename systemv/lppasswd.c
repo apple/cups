@@ -1,5 +1,5 @@
 /*
- * "$Id: lppasswd.c 4924 2006-01-13 01:55:20Z mike $"
+ * "$Id: lppasswd.c 5833 2006-08-16 20:05:58Z mike $"
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
@@ -101,6 +101,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   struct sigaction action;		/* Signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
 
+
+  _cupsSetLocale();
 
  /*
   * Check to see if stdin, stdout, and stderr are still open...
@@ -509,5 +511,5 @@ usage(FILE *fp)		/* I - File to send usage to */
 
 
 /*
- * End of "$Id: lppasswd.c 4924 2006-01-13 01:55:20Z mike $".
+ * End of "$Id: lppasswd.c 5833 2006-08-16 20:05:58Z mike $".
  */

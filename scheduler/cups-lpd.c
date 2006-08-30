@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c 5455 2006-04-24 13:49:59Z mike $"
+ * "$Id: cups-lpd.c 5878 2006-08-24 15:55:42Z mike $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -471,7 +471,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 
     request = ippNewRequest(CUPS_GET_PRINTERS);
 
-    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                   "requested-attributes",
 		  (int)(sizeof(requested) / sizeof(requested[0])),
                   NULL, requested);
@@ -597,7 +597,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
 
-    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                   "requested-attributes",
 		  (int)(sizeof(requested) / sizeof(requested[0])),
                   NULL, requested);
@@ -648,7 +648,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
     if (state)
     {
       if ((attr = ippFindAttribute(response, "printer-state",
-                        	   IPP_TAG_INTEGER)) == NULL)
+                        	   IPP_TAG_ENUM)) == NULL)
 	syslog(LOG_ERR, "No printer-state attribute found in "
                 	"response from server!");
       else
@@ -1387,7 +1387,7 @@ remove_jobs(const char *dest,		/* I - Destination */
       return (1);
     }
     else
-      syslog(LOG_INFO, "Job ID %d cancelled", id);
+      syslog(LOG_INFO, "Job ID %d canceled", id);
   }
 
   httpClose(http);
@@ -1716,5 +1716,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c 5455 2006-04-24 13:49:59Z mike $".
+ * End of "$Id: cups-lpd.c 5878 2006-08-24 15:55:42Z mike $".
  */
