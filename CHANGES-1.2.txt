@@ -3,6 +3,9 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.3
 
+	- The scheduler did not send job-state or
+	  job-config-changed events when a job was held,
+	  released, or changed (STR #1947)
 	- The scheduler now aborts if the configuration file and
 	  directory checks fail (STR #1941)
 	- Fixed a problem with ippPort() not using the port

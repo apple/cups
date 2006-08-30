@@ -6216,6 +6216,9 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
   cupsdHoldJob(job);
 
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+                "Job held by user.");
+
   if ((newattr = ippFindAttribute(con->request, "job-hold-until",
                                   IPP_TAG_KEYWORD)) == NULL)
     newattr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_NAME);
@@ -6249,6 +6252,9 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     cupsdSetJobHoldUntil(job, attr->values[0].string.text);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, job->printer, job,
+                  "Job job-hold-until value changed by user.");
   }
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was held by \"%s\".", jobid,
@@ -7287,6 +7293,9 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
     attr->value_tag = IPP_TAG_KEYWORD;
     attr->values[0].string.text = _cupsStrAlloc("no-hold");
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, job->printer, job,
+                  "Job job-hold-until value changed by user.");
   }
 
  /*
@@ -7294,6 +7303,9 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdReleaseJob(job);
+
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+                "Job released by user.");
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was released by \"%s\".", jobid,
                   username);
@@ -8156,6 +8168,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 			resource[HTTP_MAX_URI];
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
+  int			event;		/* Events? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_job_attrs(%p[%d], %s)", con,
@@ -8257,6 +8270,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdLoadJob(job);
 
+  event = 0;
+
   for (attr = con->request->attrs; attr; attr = attr->next)
   {
     if (attr->group_tag != IPP_TAG_JOB || !attr->name)
@@ -8320,7 +8335,10 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	return;
       }
       else if (con->response->request.status.status_code == IPP_OK)
+      {
         cupsdSetJobPriority(job, attr->values[0].integer);
+        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
+      }
     }
     else if (!strcmp(attr->name, "job-state"))
     {
@@ -8351,6 +8369,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      {
 		job->state->values[0].integer = attr->values[0].integer;
 		job->state_value              = (ipp_jstate_t)attr->values[0].integer;
+
+                event |= CUPSD_EVENT_JOB_STATE;
 	      }
 	      break;
 
@@ -8425,6 +8445,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	  cupsdReleaseJob(job);
 	else
 	  cupsdHoldJob(job);
+
+        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE;
       }
     }
     else if (attr->value_tag == IPP_TAG_DELETEATTR)
@@ -8445,6 +8467,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	  job->attrs->last = job->attrs->prev;
 
         _ippFreeAttr(attr2);
+
+        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
       }
     }
     else
@@ -8454,6 +8478,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       copy_attribute(job->attrs, attr, 0);
+
+      event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
     }
   }
 
@@ -8462,6 +8488,19 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdSaveJob(job);
+
+ /*
+  * Send events as needed...
+  */
+
+  if (event & CUPSD_EVENT_JOB_STATE)
+    cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+                  job->state_value == IPP_JOB_HELD ?
+		      "Job held by user." : "Job restarted by user.");
+
+  if (event & CUPSD_EVENT_JOB_CONFIG_CHANGED)
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, job->printer, job,
+                  "Job options changed by user.");
 
  /*
   * Start jobs if possible...
