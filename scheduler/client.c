@@ -5,6 +5,9 @@
  *
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
+ *   This file contains Kerberos support code, copyright 2006 by
+ *   Jelmer Vernooij.
+ *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
  *   copyright law.  Distribution and use rights are outlined in the file
@@ -78,7 +81,7 @@ static int		encrypt_client(cupsd_client_t *con);
 #ifdef HAVE_CDSASSL
 static CFArrayRef	get_cdsa_server_certs(void);
 #endif /* HAVE_CDSASSL */
-static char		*get_file(cupsd_client_t *con, struct stat *filestats, 
+static char		*get_file(cupsd_client_t *con, struct stat *filestats,
 			          char *filename, int len);
 static http_status_t	install_conf_file(cupsd_client_t *con);
 static int		is_cgi(cupsd_client_t *con, const char *filename,
@@ -389,7 +392,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   */
 
   val = 1;
-  setsockopt(con->http.fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
+  setsockopt(con->http.fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val));
 
  /*
   * Close this file on all execs...
@@ -1997,9 +2000,12 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
  /*
   * To work around bugs in some proxies, don't use Keep-Alive for some
   * error messages...
+  *
+  * Kerberos authentication doesn't work without Keep-Alive, so
+  * never disable it in that case.
   */
 
-  if (code >= HTTP_BAD_REQUEST)
+  if (code >= HTTP_BAD_REQUEST && con->http.auth_type != AUTH_KERBEROS)
     con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 
  /*
@@ -2019,8 +2025,8 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
     return (0);
 #endif /* HAVE_SSL */
 
-  if ((con->http.version >= HTTP_1_1 && !con->http.keep_alive) ||
-      (code >= HTTP_BAD_REQUEST && code != HTTP_UPGRADE_REQUIRED))
+  if (con->http.version >= HTTP_1_1 &&
+      con->http.keep_alive == HTTP_KEEPALIVE_OFF)
   {
     if (httpPrintf(HTTP(con), "Connection: close\r\n") < 0)
       return (0);
@@ -2044,7 +2050,8 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
       text = _cupsLangString(con->language,
                              _("Enter your username and password or the "
 			       "root username and password to access this "
-			       "page."));
+			       "page. If you are using Kerberos authentication, "
+			       "make sure you have a valid Kerberos ticket."));
     else if (code == HTTP_UPGRADE_REQUIRED)
     {
       text = urltext;
@@ -2166,21 +2173,51 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
       auth_type = DefaultAuthType;
     else
       auth_type = con->best->type;
-      
-    if (auth_type != AUTH_DIGEST)
+
+    if (auth_type == AUTH_BASIC || auth_type == AUTH_BASICDIGEST)
     {
       if (httpPrintf(HTTP(con),
                      "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
 	return (0);
     }
-    else
+    else if (auth_type == AUTH_DIGEST)
     {
       if (httpPrintf(HTTP(con),
                      "WWW-Authenticate: Digest realm=\"CUPS\", nonce=\"%s\"\r\n",
 		     con->http.hostname) < 0)
 	return (0);
     }
+#ifdef HAVE_GSSAPI
+    else if (auth_type == AUTH_KERBEROS && !con->no_negotiate &&
+	     con->gss_output_token.length == 0)
+    {
+      if (httpPrintf(HTTP(con), "WWW-Authenticate: Negotiate\r\n") < 0)
+        return (0);
+    }
+#endif /* HAVE_GSSAPI */
   }
+
+#ifdef HAVE_GSSAPI
+ /*
+  * WWW-Authenticate: Negotiate can be included even for
+  * non-401 replies...
+  */
+
+  if (con->gss_output_token.length > 0)
+  {
+    char	buf[2048];		/* Output token buffer */
+    OM_uint32	minor_status;		/* Minor status code */
+
+
+    httpEncode64_2(buf, sizeof(buf),
+    	           con->gss_output_token.value,
+		   con->gss_output_token.length);
+    gss_release_buffer(&minor_status, &con->gss_output_token);
+
+    if (httpPrintf(HTTP(con), "WWW-Authenticate: Negotiate %s\r\n", buf) < 0)
+      return (0);
+  }
+#endif /* HAVE_GSSAPI */
 
   if (con->language && strcmp(con->language->language, "C"))
   {
@@ -2611,7 +2648,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
   con->http.tls = conn;
   return (1);
-  
+
 #  elif defined(HAVE_GNUTLS)
   http_tls_t	*conn;			/* TLS session object */
   int		error;			/* Error code */
@@ -2656,7 +2693,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   }
 
   gnutls_certificate_allocate_credentials(credentials);
-  gnutls_certificate_set_x509_key_file(*credentials, ServerCertificate, 
+  gnutls_certificate_set_x509_key_file(*credentials, ServerCertificate,
 				       ServerKey, GNUTLS_X509_FMT_PEM);
 
   gnutls_init(&(conn->session), GNUTLS_SERVER);
@@ -2834,8 +2871,8 @@ get_cdsa_server_certs(void)
   else
   {
    /*
-    * Search for "any" identity matching specified key use; 
-    * in this app, we expect there to be exactly one. 
+    * Search for "any" identity matching specified key use;
+    * in this app, we expect there to be exactly one.
     */
 
     err = SecIdentitySearchCreate(kcRef, CSSM_KEYUSE_SIGN, &srchRef);
@@ -2859,8 +2896,8 @@ get_cdsa_server_certs(void)
 	                  "SecIdentitySearchCopyNext CFTypeID failure!");
 	else
 	{
-	 /* 
-	  * Found one. Place it in a CFArray. 
+	 /*
+	  * Found one. Place it in a CFArray.
 	  * TBD: snag other (non-identity) certs from keychain and add them
 	  * to array as well.
 	  */

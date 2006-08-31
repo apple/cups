@@ -443,6 +443,20 @@
 #undef HAVE_APPLETALK_AT_PROTO_H
 
 
+/*
+ * Do we have the GSSAPI support library (for Kerberos support)?
+ */
+
+#undef HAVE_GSSAPI
+#undef HAVE_GSSAPI_H
+#undef HAVE_GSSAPI_GSSAPI_H
+#undef HAVE_GSSAPI_GSSAPI_GENERIC_H
+#undef HAVE_GSSAPI_GSSAPI_KRB5_H
+#undef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY
+#undef HAVE_KRB5_H
+#undef HAVE_HEIMDAL
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

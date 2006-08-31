@@ -55,6 +55,21 @@
 #    define closesocket(f) close(f)
 #  endif /* WIN32 */
 
+#  ifdef HAVE_GSSAPI
+#    ifdef HAVE_GSSAPI_GSSAPI_H
+#      include <gssapi/gssapi.h>
+#    endif /* HAVE_GSSAPI_GSSAPI_H */
+#    ifdef HAVE_GSSAPI_GSSAPI_GENERIC_H
+#      include <gssapi/gssapi_generic.h>
+#    endif /* HAVE_GSSAPI_GSSAPI_GENERIC_H */
+#    ifdef HAVE_GSSAPI_GSSAPI_KRB5_H
+#      include <gssapi/gssapi_krb5.h>
+#    endif /* HAVE_GSSAPI_GSSAPI_KRB5_H */
+#    ifdef HAVE_GSSAPI_H
+#      include <gssapi.h>
+#    endif /* HAVE_GSSAPI_H */
+#  endif /* HAVE_GSSAPI */
+
 #  if defined(__sgi) || (defined(__APPLE__) && !defined(_SOCKLEN_T))
 /*
  * IRIX and MacOS X 10.2.x do not define socklen_t, and in fact use an int instead of
@@ -154,8 +169,8 @@ struct _http_s				/**** HTTP connection structure. ****/
   http_status_t		expect;		/* Expect: header @since CUPS 1.1.19@ */
   char			*cookie;	/* Cookie value(s) @since CUPS 1.1.19@ */
   /**** New in CUPS 1.1.20 ****/
-  char			authstring[HTTP_MAX_VALUE],
-					/* Current Authentication value @since CUPS 1.1.20@ */
+  char			_authstring[HTTP_MAX_VALUE],
+					/* Current Authentication value. @deprecated@ */
 			userpass[HTTP_MAX_VALUE];
 					/* Username:password string @since CUPS 1.1.20@ */
   int			digest_tries;	/* Number of tries for digest auth @since CUPS 1.1.20@ */
@@ -166,6 +181,15 @@ struct _http_s				/**** HTTP connection structure. ****/
   char			wbuffer[HTTP_MAX_BUFFER];
 					/* Buffer for outgoing data */
   int			wused;		/* Write buffer bytes used @since CUPS 1.2@ */
+  /**** New in CUPS 1.3 ****/
+  char			*field_authorization;
+					/* Authorization field @since CUPS 1.3@ */
+  char			*authstring;	/* Current authorization field @since CUPS 1.3 */
+#  ifdef HAVE_GSSAPI
+  gss_OID 		gssmech;	/* Authentication mechanism @since CUPS 1.3@ */
+  gss_ctx_id_t		gssctx;		/* Authentication context @since CUPS 1.3@ */
+  gss_name_t		gssname;	/* Authentication server name @since CUPS 1.3@ */
+#  endif /* HAVE_GSSAPI */
 };
 
 

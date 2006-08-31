@@ -55,6 +55,13 @@ struct cupsd_client_s
   http_addr_t		clientaddr;	/* Client address */
   char			servername[256];/* Server name for connection */
   int			serverport;	/* Server port for connection */
+#ifdef HAVE_GSSAPI
+  int			no_negotiate;	/* Don't offer WWW-Authenticate: Negotiate */
+  gss_buffer_desc 	gss_output_token;
+					/* Output token for Negotiate header */
+  gss_cred_id_t 	gss_delegated_cred;
+					/* Credentials from client header */
+#endif /* HAVE_GSSAPI */
 };
 
 #define HTTP(con) &((con)->http)

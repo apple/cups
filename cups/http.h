@@ -136,7 +136,8 @@ typedef enum http_auth_e		/**** HTTP authentication types ****/
   HTTP_AUTH_MD5,			/* Digest authentication in use */
   HTTP_AUTH_MD5_SESS,			/* MD5-session authentication in use */
   HTTP_AUTH_MD5_INT,			/* Digest authentication in use for body */
-  HTTP_AUTH_MD5_SESS_INT		/* MD5-session authentication in use for body */
+  HTTP_AUTH_MD5_SESS_INT,		/* MD5-session authentication in use for body */
+  HTTP_AUTH_NEGOTIATE			/* GSSAPI authentication in use @since CUPS 1.3@ */
 } http_auth_t;
 
 typedef enum http_encoding_e		/**** HTTP transfer encoding values ****/

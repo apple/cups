@@ -1783,6 +1783,9 @@ free_job(cupsd_job_t *job)		/* I - Job */
 {
   cupsdClearString(&job->username);
   cupsdClearString(&job->dest);
+#ifdef HAVE_GSSAPI
+  cupsdClearString(&job->ccname);
+#endif /* HAVE_GSSAPI */
 
   if (job->num_files > 0)
   {
@@ -2396,7 +2399,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 			title[IPP_MAX_NAME],
 					/* Job title string */
 			copies[255],	/* # copies string */
-			*envp[MAX_ENV + 11],
+			*envp[MAX_ENV + 12],
 					/* Environment variables */
 			charset[255],	/* CHARSET env variable */
 			class_name[255],/* CLASS env variable */
@@ -3030,6 +3033,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     snprintf(class_name, sizeof(class_name), "CLASS=%s", job->dest);
     envp[envc ++] = class_name;
   }
+
+#ifdef HAVE_GSSAPI
+  if (job->ccname)
+    envp[envc ++] = job->ccname;
+#endif /* HAVE_GSSAPI */
 
   envp[envc] = NULL;
 

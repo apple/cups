@@ -17,7 +17,7 @@ dest.o: globals.h string.h ../config.h http-private.h http.h md5.h
 dest.o: ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 dest.o: transcode.h
 dir.o: dir.h string.h ../config.h debug.h
-emit.o: ppd.h array.h file.h string.h ../config.h
+emit.o: ppd.h array.h file.h string.h ../config.h debug.h
 encode.o: cups.h ipp.h http.h md5.h ppd.h array.h file.h language.h
 encode.o: ipp-private.h string.h ../config.h debug.h
 file.o: http-private.h ../config.h http.h md5.h ipp-private.h ipp.h globals.h
@@ -82,7 +82,7 @@ transcode.o: ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 transcode.o: i18n.h transcode.h debug.h
 usersys.o: http-private.h ../config.h http.h md5.h ipp-private.h ipp.h
 usersys.o: globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
-usersys.o: transcode.h
+usersys.o: transcode.h debug.h
 util.o: globals.h string.h ../config.h http-private.h http.h md5.h
 util.o: ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 util.o: transcode.h debug.h
@@ -92,7 +92,8 @@ testarray.o: ../cups/string.h ../config.h string.h array.h dir.h debug.h
 testfile.o: string.h ../config.h file.h debug.h
 testhttp.o: http.h md5.h string.h ../config.h
 testi18n.o: i18n.h transcode.h language.h array.h string.h ../config.h
-testipp.o: ../cups/string.h ../config.h string.h ipp.h http.h md5.h
+testipp.o: ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
+testipp.o: md5.h
 testlang.o: i18n.h transcode.h language.h array.h
 testppd.o: ../cups/string.h ../config.h string.h ppd.h array.h file.h
 # DO NOT DELETE
@@ -114,7 +115,7 @@ dest.32.o: dest.c  globals.h string.h ../config.h http-private.h http.h md5.h
 dest.32.o: dest.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 dest.32.o: dest.c  transcode.h
 dir.32.o: dir.c  dir.h string.h ../config.h debug.h
-emit.32.o: emit.c  ppd.h array.h file.h string.h ../config.h
+emit.32.o: emit.c  ppd.h array.h file.h string.h ../config.h debug.h
 encode.32.o: encode.c  cups.h ipp.h http.h md5.h ppd.h array.h file.h language.h
 encode.32.o: encode.c  ipp-private.h string.h ../config.h debug.h
 file.32.o: file.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h globals.h
@@ -179,7 +180,7 @@ transcode.32.o: transcode.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h lan
 transcode.32.o: transcode.c  i18n.h transcode.h debug.h
 usersys.32.o: usersys.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h
 usersys.32.o: usersys.c  globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
-usersys.32.o: usersys.c  transcode.h
+usersys.32.o: usersys.c  transcode.h debug.h
 util.32.o: util.c  globals.h string.h ../config.h http-private.h http.h md5.h
 util.32.o: util.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 util.32.o: util.c  transcode.h debug.h
@@ -189,7 +190,8 @@ testarray.32.o: testarray.c  ../cups/string.h ../config.h string.h array.h dir.h
 testfile.32.o: testfile.c  string.h ../config.h file.h debug.h
 testhttp.32.o: testhttp.c  http.h md5.h string.h ../config.h
 testi18n.32.o: testi18n.c  i18n.h transcode.h language.h array.h string.h ../config.h
-testipp.32.o: testipp.c  ../cups/string.h ../config.h string.h ipp.h http.h md5.h
+testipp.32.o: testipp.c  ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
+testipp.32.o: testipp.c  md5.h
 testlang.32.o: testlang.c  i18n.h transcode.h language.h array.h
 testppd.32.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h file.h
 # DO NOT DELETE
@@ -211,7 +213,7 @@ dest.64.o: dest.c  globals.h string.h ../config.h http-private.h http.h md5.h
 dest.64.o: dest.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 dest.64.o: dest.c  transcode.h
 dir.64.o: dir.c  dir.h string.h ../config.h debug.h
-emit.64.o: emit.c  ppd.h array.h file.h string.h ../config.h
+emit.64.o: emit.c  ppd.h array.h file.h string.h ../config.h debug.h
 encode.64.o: encode.c  cups.h ipp.h http.h md5.h ppd.h array.h file.h language.h
 encode.64.o: encode.c  ipp-private.h string.h ../config.h debug.h
 file.64.o: file.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h globals.h
@@ -276,7 +278,7 @@ transcode.64.o: transcode.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h lan
 transcode.64.o: transcode.c  i18n.h transcode.h debug.h
 usersys.64.o: usersys.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h
 usersys.64.o: usersys.c  globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
-usersys.64.o: usersys.c  transcode.h
+usersys.64.o: usersys.c  transcode.h debug.h
 util.64.o: util.c  globals.h string.h ../config.h http-private.h http.h md5.h
 util.64.o: util.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 util.64.o: util.c  transcode.h debug.h
@@ -286,6 +288,7 @@ testarray.64.o: testarray.c  ../cups/string.h ../config.h string.h array.h dir.h
 testfile.64.o: testfile.c  string.h ../config.h file.h debug.h
 testhttp.64.o: testhttp.c  http.h md5.h string.h ../config.h
 testi18n.64.o: testi18n.c  i18n.h transcode.h language.h array.h string.h ../config.h
-testipp.64.o: testipp.c  ../cups/string.h ../config.h string.h ipp.h http.h md5.h
+testipp.64.o: testipp.c  ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
+testipp.64.o: testipp.c  md5.h
 testlang.64.o: testlang.c  i18n.h transcode.h language.h array.h
 testppd.64.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h file.h

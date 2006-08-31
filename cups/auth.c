@@ -5,6 +5,9 @@
  *
  *   Copyright 1997-2006 by Easy Software Products.
  *
+ *   This file contains Kerberos support code, copyright 2006 by
+ *   Jelmer Vernooij.
+ *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
  *   copyright law.  Distribution and use rights are outlined in the file
@@ -26,6 +29,8 @@
  * Contents:
  *
  *   cupsDoAuthentication() - Authenticate a request.
+ *   DEBUG_gss_printf()     - Show debug error messages from GSSAPI...
+ *   cups_get_gss_creds()   - Get CUPS service credentials for authentication.
  *   cups_local_auth()      - Get the local authorization certificate if
  *                            available/applicable...
  */
@@ -52,6 +57,13 @@
  * Local functions...
  */
 
+#ifdef HAVE_GSSAPI
+#  ifdef DEBUG
+static void	DEBUG_gss_printf(OM_uint32 major_status, OM_uint32 minor_status,
+				 const char *message);
+#  endif /* DEBUG  */
+static gss_name_t cups_get_gss_creds(http_t *http, const char *service_name);
+#endif /* HAVE_GSSAPI */
 static int	cups_local_auth(http_t *http);
 
 
@@ -74,7 +86,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   char		prompt[1024],		/* Prompt for user */
 		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
-		encode[512];		/* Encoded username:password */
+		encode[2048];		/* Encoded username:password */
 
 
   DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")\n",
@@ -86,7 +98,13 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * Clear the current authentication string...
   */
 
-  http->authstring[0] = '\0';
+  http->_authstring[0] = '\0';
+
+  if (http->authstring && http->authstring != http->_authstring)
+  {
+    free(http->authstring);
+    http->authstring = http->_authstring;
+  }
 
  /*
   * See if we can do local authentication...
@@ -106,7 +124,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * Nope, see if we should retry the current username:password...
   */
 
-  if (http->digest_tries > 1 || !http->userpass[0])
+  if ((http->digest_tries > 1 || !http->userpass[0]) &&
+      strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
   {
    /*
     * Nope - get a new password from the user...
@@ -135,7 +154,58 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * Got a password; encode it for the server...
   */
 
-  if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6))
+  if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
+  {
+#ifdef HAVE_GSSAPI
+   /*
+    * Kerberos authentication...
+    */
+
+    OM_uint32		minor_status,	/* Minor status code */
+			major_status;	/* Major status code */
+    gss_buffer_desc	output_token = GSS_C_EMPTY_BUFFER,
+					/* Output token */
+			input_token = GSS_C_EMPTY_BUFFER;
+					/* Input token */
+
+
+    http->gssname = cups_get_gss_creds(http, "HTTP");
+    major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
+					 &http->gssctx,
+					 http->gssname, http->gssmech,
+					 GSS_C_MUTUAL_FLAG, GSS_C_INDEFINITE,
+					 GSS_C_NO_CHANNEL_BINDINGS,
+					 &input_token, &http->gssmech,
+					 &output_token, NULL, NULL);
+
+    if (GSS_ERROR(major_status))
+    {
+#  ifdef DEBUG
+      DEBUG_gss_printf(major_status, minor_status,
+		       "Unable to initialise security context");
+#  endif /* DEBUG */
+      return (-1);
+    }
+
+#  ifdef DEBUG
+    if (major_status == GSS_S_CONTINUE_NEEDED)
+      DEBUG_gss_printf(major_status, minor_status, "Continuation needed!");
+#  endif /* DEBUG */
+
+    httpEncode64_2(encode, sizeof(encode), output_token.value,
+                   output_token.length);
+
+    http->authstring = malloc(strlen(encode) + 20);
+    sprintf(http->authstring, "Negotiate %s", encode); /* Safe because allocated */
+
+   /*
+    * Copy back what we can to _authstring for backwards compatibility...
+    */
+
+    strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+#endif /* HAVE_GSSAPI */
+  }
+  else if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6))
   {
    /*
     * Basic authentication...
@@ -143,7 +213,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 
     httpEncode64_2(encode, sizeof(encode), http->userpass,
                    strlen(http->userpass));
-    snprintf(http->authstring, sizeof(http->authstring), "Basic %s", encode);
+    snprintf(http->_authstring, sizeof(http->_authstring), "Basic %s", encode);
   }
   else
   {
@@ -156,7 +226,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 
     httpMD5(cupsUser(), realm, strchr(http->userpass, ':') + 1, encode);
     httpMD5Final(nonce, method, resource, encode);
-    snprintf(http->authstring, sizeof(http->authstring),
+    snprintf(http->_authstring, sizeof(http->_authstring),
 	     "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
 	     "uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce,
 	     resource, encode);
@@ -166,6 +236,103 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 
   return (0);
 }
+
+
+#ifdef HAVE_GSSAPI
+#  ifdef DEBUG
+/*
+ * 'DEBUG_gss_printf()' - Show debug error messages from GSSAPI...
+ */
+
+static void
+DEBUG_gss_printf(OM_uint32 major_status,/* I - Major status code */
+                 OM_uint32 minor_status,/* I - Minor status code */
+		 const char *message)	/* I - Prefix for error message */
+{
+  OM_uint32	err_major_status,	/* Major status code for display */
+		err_minor_status;	/* Minor status code for display */
+  OM_uint32	msg_ctx;		/* Message context */
+  gss_buffer_desc major_status_string,	/* Major status message */
+		minor_status_string;	/* Minor status message */
+
+
+  msg_ctx             = 0;
+  major_status_string = GSS_C_EMPTY_BUFFER;
+  minor_status_string = GSS_C_EMPTY_BUFFER;
+  err_major_status    = gss_display_status(&err_minor_status,
+	                        	   major_status,
+					   GSS_C_GSS_CODE,
+					   GSS_C_NO_OID,
+					   &msg_ctx,
+					   &major_status_string);
+
+  if (!GSS_ERROR(err_major_status))
+    err_major_status = gss_display_status(&err_minor_status,
+	                        	  minor_status,
+					  GSS_C_MECH_CODE,
+					  GSS_C_NULL_OID,
+					  &msg_ctx,
+					  &minor_status_string);
+
+  printf("%s: %s, %s\n", message, (char *)major_status_string.value,
+	 (char *)minor_status_string.value);
+
+  gss_release_buffer(&err_minor_status, &major_status_string);
+  gss_release_buffer(&err_minor_status, &minor_status_string);
+}
+#  endif /* DEBUG */
+
+
+/*
+ * 'cups_get_gss_creds()' - Get CUPS service credentials for authentication.
+ */
+
+static gss_name_t			/* O - Server name */
+cups_get_gss_creds(
+    http_t     *http,			/* I - Connection to server */
+    const char *service_name)		/* I - Service name */
+{
+  gss_buffer_desc token = GSS_C_EMPTY_BUFFER;
+					/* Service token */
+  OM_uint32	major_status,		/* Major status code */
+		minor_status;		/* Minor status code */
+  gss_name_t	server_name;		/* Server name */
+  char		buf[1024],		/* Name buffer */
+		fqdn[HTTP_MAX_URI];	/* Server name buffer */
+
+
+ /*
+  * Get a server name we can use for authentication purposes...
+  */
+
+  snprintf(buf, sizeof(buf), "%s@%s", service_name,
+	   httpGetHostname(http, fqdn, sizeof(fqdn)));
+
+  token.value  = buf;
+  token.length = strlen(buf) + 1;
+  server_name  = GSS_C_NO_NAME;
+  major_status = gss_import_name(&minor_status, &token,
+	 			 GSS_C_NT_HOSTBASED_SERVICE,
+				 &server_name);
+
+ /*
+  * Clear the service token after we are done to avoid exposing information...
+  */
+
+  memset(&token, 0, sizeof(token));
+
+  if (GSS_ERROR(major_status))
+  {
+#  ifdef DEBUG
+    DEBUG_gss_printf(major_status, minor_status, "gss_import_name() failed");
+#  endif /* DEBUG */
+
+    return (NULL);
+  }
+
+  return (server_name);
+}
+#endif /* HAVE_GSSAPI */
 
 
 /*
@@ -238,7 +405,11 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * Set the authorization string and return...
   */
 
-  snprintf(http->authstring, sizeof(http->authstring), "Local %s", certificate);
+  http->authstring = malloc(strlen(certificate) + 10);
+  sprintf(http->authstring, "Local %s", certificate);
+
+  /* Copy back to _authstring for backwards compatibility */
+  strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
 
   DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
                 http->authstring));

@@ -55,6 +55,9 @@ typedef struct cupsd_job_s
   int			status;		/* Status code from filters */
   cupsd_printer_t	*printer;	/* Printer this job is assigned to */
   int			tries;		/* Number of tries for this job */
+#ifdef HAVE_GSSAPI
+  char			*ccname;	/* KRB5CCNAME environment variable */
+#endif /* HAVE_GSSAPI */
 } cupsd_job_t;
 
 

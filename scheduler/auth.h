@@ -38,6 +38,7 @@
 #define AUTH_BASIC		1	/* Basic authentication */
 #define AUTH_DIGEST		2	/* Digest authentication */
 #define AUTH_BASICDIGEST	3	/* Basic authentication w/passwd.md5 */
+#define AUTH_KERBEROS		4	/* Kerberos authentication */
 
 #define AUTH_ANON		0	/* Anonymous access */
 #define AUTH_USER		1	/* Must have a valid username/password */

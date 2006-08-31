@@ -186,14 +186,14 @@ cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
-		$(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS) $(LIBS)
+		$(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS) $(LIBS) $(LIBGSSAPI)
 
 cupsd-static:	$(CUPSDOBJS) libmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
-		$(LIBMALLOC) $(CUPSDLIBS)
+		$(LIBMALLOC) $(CUPSDLIBS) $(LIBGSSAPI)
 
 
 #
@@ -279,7 +279,7 @@ testmime:	testmime.o libmime.a ../cups/libcups.a
 testspeed:	testspeed.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

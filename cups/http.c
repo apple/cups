@@ -5,6 +5,9 @@
  *
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
+ *   This file contains Kerberos support code, copyright 2006 by
+ *   Jelmer Vernooij.
+ *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
  *   copyright law.  Distribution and use rights are outlined in the file
@@ -224,6 +227,12 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
     memset(http->fields, 0, sizeof(http->fields));
     httpSetField(http, HTTP_FIELD_HOST, http->hostname);
 
+    if (http->field_authorization)
+    {
+      free(http->field_authorization);
+      http->field_authorization = NULL;
+    }
+
     http->expect = (http_status_t)0;
   }
 }
@@ -259,6 +268,11 @@ httpClose(http_t *http)			/* I - HTTP connection */
 #else
   close(http->fd);
 #endif /* WIN32 */
+
+  httpClearFields(http);
+
+  if (http->authstring && http->authstring != http->_authstring)
+    free(http->authstring);
 
   free(http);
 }
@@ -573,6 +587,16 @@ httpGetField(http_t       *http,	/* I - HTTP connection */
 {
   if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
     return (NULL);
+  else if (field == HTTP_FIELD_AUTHORIZATION && 
+	   http->field_authorization)
+  {
+   /*
+    * Special case for WWW-Authenticate: as its contents can be
+    * longer than HTTP_MAX_VALUE...
+    */
+
+    return (http->field_authorization);
+  }
   else
     return (http->fields[field]);
 }
@@ -1573,6 +1597,19 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
     return;
 
   strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
+
+ /*
+  * Special case for Authorization: as its contents can be
+  * longer than HTTP_MAX_VALUE
+  */
+
+  if (field == HTTP_FIELD_AUTHORIZATION)
+  {
+    if (http->field_authorization)
+      free(http->field_authorization);
+
+    http->field_authorization = strdup(value);
+  }
 }
 
 
@@ -2195,9 +2232,10 @@ http_send(http_t       *http,	/* I - HTTP connection */
   for (i = 0; i < HTTP_FIELD_MAX; i ++)
     if (http->fields[i][0] != '\0')
     {
-      DEBUG_printf(("%s: %s\n", http_fields[i], http->fields[i]));
+      DEBUG_printf(("%s: %s\n", http_fields[i], httpGetField(http, i)));
 
-      if (httpPrintf(http, "%s: %s\r\n", http_fields[i], http->fields[i]) < 1)
+      if (httpPrintf(http, "%s: %s\r\n", http_fields[i], 
+		     httpGetField(http, i)) < 1)
       {
 	http->status = HTTP_ERROR;
 	return (-1);

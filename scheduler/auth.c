@@ -5,6 +5,9 @@
  *
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
+ *   This file contains Kerberos support code, copyright 2006 by
+ *   Jelmer Vernooij.
+ *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
  *   copyright law.  Distribution and use rights are outlined in the file
@@ -49,6 +52,7 @@
  *   compare_locations()       - Compare two locations.
  *   cups_crypt()              - Encrypt the password using the DES or MD5
  *                               algorithms, as needed.
+ *   get_gss_creds()           - Obtain GSS credentials.
  *   get_md5_password()        - Get an MD5 password.
  *   pam_func()                - PAM conversation function.
  *   to64()                    - Base64-encode an integer value...
@@ -92,6 +96,9 @@ static int		compare_locations(cupsd_location_t *a,
 #if !HAVE_LIBPAM && !defined(HAVE_USERSEC_H)
 static char		*cups_crypt(const char *pw, const char *salt);
 #endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
+#ifdef HAVE_GSSAPI
+static gss_cred_id_t	get_gss_creds(const char *service_name);
+#endif /* HAVE_GSSAPI */
 static char		*get_md5_password(const char *username,
 			                  const char *group, char passwd[33]);
 #if HAVE_LIBPAM
@@ -309,8 +316,8 @@ void
 cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 {
   int		type;			/* Authentication type */
-  char		*authorization,		/* Pointer into Authorization string */
-		*ptr,			/* Pointer into string */
+  const char	*authorization;		/* Pointer into Authorization string */
+  char		*ptr,			/* Pointer into string */
 		username[65],		/* Username string */
 		password[33];		/* Password string */
   const char	*localuser;		/* Certificate username */
@@ -356,7 +363,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   * Decode the Authorization string...
   */
 
-  authorization = con->http.fields[HTTP_FIELD_AUTHORIZATION];
+  authorization = httpGetField(&con->http, HTTP_FIELD_AUTHORIZATION);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAuthorize: Authorization=\"%s\"",
                   authorization);
@@ -754,6 +761,111 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
   }
+#ifdef HAVE_GSSAPI
+  else if (!strncmp(authorization, "Negotiate", 9) && type == AUTH_KERBEROS) 
+  {
+    int			len;		/* Length of authorization string */
+    gss_cred_id_t	server_creds;	/* Server credentials */
+    gss_ctx_id_t	context;	/* Authorization context */
+    OM_uint32		major_status,	/* Major status code */
+			minor_status;	/* Minor status code */
+    gss_buffer_desc	input_token = GSS_C_EMPTY_BUFFER,
+					/* Input token from string */
+			output_token = GSS_C_EMPTY_BUFFER;
+					/* Output token for username */
+    gss_name_t		client_name;	/* Client name */
+
+
+    con->gss_output_token.length = 0;
+
+   /*
+    * Find the start of the Kerberos input token...
+    */
+
+    authorization += 9;
+    while (*authorization && isspace(*authorization & 255))
+      authorization ++;
+
+    if (!*authorization)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdAuthorize: No authentication data specified.");
+      return;
+    }
+
+   /*
+    * Get the server credentials...
+    */
+
+    if ((server_creds = get_gss_creds("HTTP")) == NULL)
+    {
+      con->no_negotiate = 1;
+      return;	
+    }
+
+   /*
+    * Decode the authorization string to get the input token...
+    */
+
+    len                = strlen(authorization);
+    input_token.value  = malloc(len);
+    input_token.value  = httpDecode64_2(input_token.value, &len,
+		                        authorization);
+    input_token.length = len;
+
+   /*
+    * Accept the input token to get the authorization info...
+    */
+
+    context      = GSS_C_NO_CONTEXT;
+    client_name  = GSS_C_NO_NAME;
+    major_status = gss_accept_sec_context(&minor_status,
+					  &context,
+					  server_creds, 
+					  &input_token,
+					  GSS_C_NO_CHANNEL_BINDINGS,
+					  &client_name,
+					  NULL,
+					  &con->gss_output_token,
+					  NULL,
+					  NULL,
+					  &con->gss_delegated_cred);
+
+    if (GSS_ERROR(major_status))
+    {
+      cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
+                         "cupsdAuthorize: Error accepting GSSAPI security "
+			 "context");
+      con->no_negotiate = 1;
+      return;
+    }
+
+   /*
+    * Get the username associated with the credentials...
+    */
+
+    if (major_status == GSS_S_COMPLETE)
+    {
+      major_status = gss_display_name(&minor_status, client_name, 
+				      &output_token, NULL);
+      gss_release_name(&minor_status, &client_name);
+
+      if (GSS_ERROR(major_status))
+      {
+	cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
+                           "cupsdAuthorize: Error getting username");
+	con->no_negotiate = 1;
+	return;
+      }
+
+      strlcpy(username, output_token.value, sizeof(username));
+
+      gss_release_buffer(&minor_status, &output_token);
+    }
+    else
+      gss_release_name(&minor_status, &client_name);
+  }
+#endif /* HAVE_GSSAPI */
   else
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -1493,7 +1605,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 		  "NONE",
 		  "BASIC",
 		  "DIGEST",
-		  "BASICDIGEST"
+		  "BASICDIGEST",
+		  "KERBEROS"
 		};
 
 
@@ -1991,6 +2104,78 @@ cups_crypt(const char *pw,		/* I - Password string */
   }
 }
 #endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
+
+
+#ifdef HAVE_GSSAPI
+/*
+ * 'get_gss_creds()' - Obtain GSS credentials.
+ */
+
+static gss_cred_id_t			/* O - Server credentials */
+get_gss_creds(const char *service_name)	/* I - Service name */
+{
+  OM_uint32	major_status,		/* Major status code */
+		minor_status;		/* Minor status code */
+  gss_name_t	server_name;		/* Server name */
+  gss_cred_id_t	server_creds;		/* Server credentials */
+  gss_buffer_desc token = GSS_C_EMPTY_BUFFER;
+					/* Service name token */
+  char		buf[1024],		/* Service name buffer */
+		fqdn[HTTP_MAX_URI];	/* Hostname of server */
+
+
+  snprintf(buf, sizeof(buf), "%s@%s", service_name,
+	   httpGetHostname(NULL, fqdn, sizeof(fqdn)));
+
+  token.value  = buf;
+  token.length = strlen(buf) + 1;
+  server_name  = GSS_C_NO_NAME;
+  major_status = gss_import_name(&minor_status, &token,
+	 			 GSS_C_NT_HOSTBASED_SERVICE,
+				 &server_name);
+
+  memset(&token, 0, sizeof(token));
+
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status, 
+		       "gss_import_name() failed");
+    return (NULL);
+  }
+
+  major_status = gss_display_name(&minor_status, server_name, &token, NULL);
+
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status,
+                       "gss_display_name() failed"); 
+    return (NULL);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Attempting to acquire credentials for %s...", 
+                  (char *)token.value);
+
+  server_creds = GSS_C_NO_CREDENTIAL;
+  major_status = gss_acquire_cred(&minor_status, server_name, GSS_C_INDEFINITE,
+			          GSS_C_NO_OID_SET, GSS_C_ACCEPT,
+				  &server_creds, NULL, NULL);
+  gss_release_name(&minor_status, &server_name);
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status,
+                       "gss_acquire_cred() failed"); 
+    gss_release_buffer(&minor_status, &token);
+    return (NULL);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Credentials acquired successfully for %s.", 
+                  (char *)token.value);
+
+  gss_release_buffer(&minor_status, &token);
+
+  return (server_creds);
+}
+#endif /* HAVE_GSSAPI */
 
 
 /*

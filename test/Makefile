@@ -69,7 +69,7 @@ uninstall:
 ipptest:	ipptest.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o ipptest ipptest.o  ../cups/libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

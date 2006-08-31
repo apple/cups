@@ -5,6 +5,9 @@
  *
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
+ *   This file contains Kerberos support code, copyright 2006 by
+ *   Jelmer Vernooij.
+ *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
  *   copyright law.  Distribution and use rights are outlined in the file
@@ -80,6 +83,7 @@
  *   release_job()               - Release a held print job.
  *   restart_job()               - Restart an old print job.
  *   save_auth_info()            - Save authentication information for a job.
+ *   save_krb5_creds()           - Save Kerberos credentials for a job.
  *   send_document()             - Send a file to a printer or class.
  *   send_http_error()           - Send a HTTP error back to the IPP client.
  *   send_ipp_status()           - Send a status back to the IPP client.
@@ -101,6 +105,10 @@
  */
 
 #include "cupsd.h"
+
+#ifdef HAVE_KRB5_H
+#  include <krb5.h>
+#endif /* HAVE_KRB5_H */
 
 #ifdef HAVE_LIBPAPER
 #  include <paper.h>
@@ -188,6 +196,9 @@ static void	release_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	renew_subscription(cupsd_client_t *con, int sub_id);
 static void	restart_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	save_auth_info(cupsd_client_t *con, cupsd_job_t *job);
+#if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
+static void	save_krb5_creds(cupsd_client_t *con, cupsd_job_t *job);
+#endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 static void	send_document(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	send_http_error(cupsd_client_t *con, http_status_t status);
 static void	send_ipp_status(cupsd_client_t *con, ipp_status_t status,
@@ -246,7 +257,7 @@ cupsdProcessIPPRequest(
  /*
   * Then validate the request header and required attributes...
   */
-  
+
   if (con->request->request.any.version[0] != 1)
   {
    /*
@@ -263,7 +274,7 @@ cupsdProcessIPPRequest(
                     _("Bad request version number %d.%d!"),
 		    con->request->request.any.version[0],
 	            con->request->request.any.version[1]);
-  }  
+  }
   else if (!con->request->attrs)
   {
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
@@ -397,7 +408,7 @@ cupsdProcessIPPRequest(
 	cupsdLogMessage(CUPSD_LOG_DEBUG, "Request attributes follow...");
 
 	for (attr = con->request->attrs; attr; attr = attr->next)
-	  cupsdLogMessage(CUPSD_LOG_DEBUG, 
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 	        	  "attr \"%s\": group_tag = %x, value_tag = %x",
 	        	  attr->name ? attr->name : "(null)", attr->group_tag,
 			  attr->value_tag);
@@ -1238,7 +1249,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   {
     for (i = 0, lowerpagerange = 1; i < attr->num_values; i ++)
     {
-      if (attr->values[i].range.lower < lowerpagerange || 
+      if (attr->values[i].range.lower < lowerpagerange ||
 	  attr->values[i].range.lower > attr->values[i].range.upper)
       {
 	send_ipp_status(con, IPP_BAD_REQUEST,
@@ -1412,7 +1423,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     * the connection...
     */
 
-    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, 
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME,
         	 "job-originating-host-name", NULL, con->http.hostname);
   }
 
@@ -2538,7 +2549,7 @@ apply_printer_defaults(
   int		i,			/* Looping var */
 		num_options;		/* Number of default options */
   cups_option_t	*options,		/* Default options */
-		*option;		/* Current option */	
+		*option;		/* Current option */
 
 
  /*
@@ -2624,7 +2635,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
     httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
                     sizeof(method), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
- 
+
     if (strncmp(resource, "/jobs/", 6))
     {
      /*
@@ -2928,7 +2939,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
        /*
         * No, see if there are any pending jobs...
 	*/
-        
+
         for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	     job;
 	     job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
@@ -2956,7 +2967,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
     httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
                     sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
- 
+
     if (strncmp(resource, "/jobs/", 6))
     {
      /*
@@ -3999,13 +4010,13 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
     if ((!strcmp(system_paper, "Letter") && have_letter) ||
         (!strcmp(system_paper, "A4") && have_a4))
     {
-      num_defaults = ppd_add_default("PageSize", system_paper, 
+      num_defaults = ppd_add_default("PageSize", system_paper,
 				     num_defaults, &defaults);
-      num_defaults = ppd_add_default("PageRegion", system_paper, 
+      num_defaults = ppd_add_default("PageRegion", system_paper,
 				     num_defaults, &defaults);
-      num_defaults = ppd_add_default("PaperDimension", system_paper, 
+      num_defaults = ppd_add_default("PaperDimension", system_paper,
 				     num_defaults, &defaults);
-      num_defaults = ppd_add_default("ImageableArea", system_paper, 
+      num_defaults = ppd_add_default("ImageableArea", system_paper,
 				     num_defaults, &defaults);
     }
   }
@@ -4229,7 +4240,7 @@ copy_printer_attrs(
   if (!ra || cupsArrayFind(ra, "printer-state-change-time"))
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                   "printer-state-change-time", printer->state_time);
-                
+
   if (MaxPrinterHistory > 0 && printer->num_history > 0 &&
       cupsArrayFind(ra, "printer-state-history"))
   {
@@ -4446,7 +4457,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
  /*
   * Save and log the job...
   */
-   
+
   cupsdSaveJob(job);
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d created on \"%s\" by \"%s\".",
@@ -5023,7 +5034,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
 		printer->name, get_username(con));
 
   cupsdExpireSubscriptions(printer, NULL);
- 
+
  /*
   * Remove any old PPD or script files...
   */
@@ -6306,7 +6317,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
                     _("job-printer-uri attribute missing!"));
     return;
   }
-    
+
   if (!cupsdValidateDest(attr->values[0].string.text, &dtype, &dprinter))
   {
    /*
@@ -7542,7 +7553,7 @@ save_auth_info(cupsd_client_t *con,	/* I - Client connection */
   int		i;			/* Looping var */
   char		filename[1024];		/* Job authentication filename */
   cups_file_t	*fp;			/* Job authentication file */
-  char		line[1024];		/* Line for file */
+  char		line[2048];		/* Line for file */
 
 
  /*
@@ -7613,7 +7624,64 @@ save_auth_info(cupsd_client_t *con,	/* I - Client connection */
   */
 
   cupsFileClose(fp);
+
+#if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
+  save_krb5_creds(con, job);
+#endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 }
+
+
+#if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
+/*
+ * 'save_krb5_creds()' - Save Kerberos credentials for the job.
+ */
+
+static void
+save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
+                cupsd_job_t    *job)	/* I - Job */
+{
+  krb5_context	krb_context;		/* Kerberos context */
+  krb5_ccache	ccache;			/* Credentials cache */
+  OM_uint32	major_status,		/* Major status code */
+		minor_status;		/* Minor status code */
+
+
+ /*
+  * Setup a cached context for the job filters to use...
+  */
+
+  if (krb5_init_context(&krb_context))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
+    return;
+  }
+
+#  ifdef HAVE_HEIMDAL
+  if (krb5_cc_gen_new(krb_context, &krb5_fcc_ops, &ccache))
+#  else
+  if (krb5_cc_gen_new(krb_context, &ccache))
+#  endif /* HAVE_HEIMDAL */
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create new credentials");
+    return;
+  }
+
+  major_status = gss_krb5_copy_ccache(&minor_status, con->gss_delegated_cred,
+				      ccache);
+
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
+                       "Unable to import client credentials cache");
+    krb5_cc_destroy(krb_context, ccache);
+    return;
+  }
+
+  cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
+                  krb5_cc_get_name(krb_context, ccache));
+  krb5_cc_close(krb_context, ccache);
+}
+#endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 
 
 /*

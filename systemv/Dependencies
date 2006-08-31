@@ -43,7 +43,7 @@ lppasswd.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 lppasswd.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
 lppasswd.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
 lppasswd.o: ../cups/transcode.h ../cups/md5.h
-lpstat.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lpstat.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
-lpstat.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
-lpstat.o: ../cups/transcode.h ../cups/debug.h
+lpstat.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
+lpstat.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/string.h ../cups/cups.h
+lpstat.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+lpstat.o: ../cups/i18n.h ../cups/transcode.h ../cups/debug.h

@@ -231,7 +231,7 @@ uninstall64bit:
 
 libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -243,7 +243,7 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 32bit/libcups.so.2:	$(LIB32OBJS)
 	echo Linking 32-bit $@...
 	-mkdir 32bit
-	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) 32bit/libcups.so
 	$(LN) libcups.so.2 32bit/libcups.so
 
@@ -255,7 +255,7 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 64bit/libcups.so.2:	$(LIB64OBJS)
 	echo Linking 64-bit $@...
 	-mkdir 64bit
-	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) 64bit/libcups.so
 	$(LN) libcups.so.2 64bit/libcups.so
 
@@ -270,7 +270,7 @@ libcups.2.dylib:	$(LIBOBJS)
 		-install_name $(libdir)/$@ \
 		-current_version 2.7.0 \
 		-compatibility_version 2.0.0 \
-		$(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
 
@@ -281,7 +281,7 @@ libcups.2.dylib:	$(LIBOBJS)
 
 libcups_s.a:	$(LIBOBJS) libcups_s.exp
 	echo Creating $@...
-	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ) -lm
+	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o
 
@@ -293,7 +293,7 @@ libcups_s.a:	$(LIBOBJS) libcups_s.exp
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 2:7 $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		-version-info 2:7 $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -338,7 +338,7 @@ php_cups_wrap.c:	cups.h
 testadmin:	testadmin.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testadmin.o libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -348,7 +348,7 @@ testadmin:	testadmin.o libcups.a
 testarray:	testarray.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testarray.o libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -358,7 +358,7 @@ testarray:	testarray.o libcups.a
 testfile:	testfile.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testfile.o libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -368,7 +368,7 @@ testfile:	testfile.o libcups.a
 testhttp:	testhttp.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -378,7 +378,7 @@ testhttp:	testhttp.o libcups.a
 testipp:	testipp.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testipp.o libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -388,7 +388,7 @@ testipp:	testipp.o libcups.a
 testi18n:	testi18n.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testi18n.o libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -398,7 +398,7 @@ testi18n:	testi18n.o libcups.a
 testlang:	testlang.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -408,7 +408,7 @@ testlang:	testlang.o libcups.a
 testppd:	testppd.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

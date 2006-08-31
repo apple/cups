@@ -1705,6 +1705,15 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       if (loc->level == AUTH_ANON)
 	loc->level = AUTH_USER;
     }
+#ifdef HAVE_GSSAPI
+    else if (!strcasecmp(value, "kerberos"))
+    {
+      loc->type = AUTH_KERBEROS;
+
+      if (loc->level == AUTH_ANON)
+	loc->level = AUTH_USER;
+    }
+#endif /* HAVE_GSSAPI */
     else
     {
       cupsdLogMessage(CUPSD_LOG_WARN,
@@ -2700,6 +2709,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	DefaultAuthType = AUTH_DIGEST;
       else if (!strcasecmp(value, "basicdigest"))
 	DefaultAuthType = AUTH_BASICDIGEST;
+#ifdef HAVE_GSSAPI
+      else if (!strcasecmp(value, "kerberos"))
+        DefaultAuthType = AUTH_KERBEROS;
+#endif /* HAVE_GSSAPI */
       else
       {
 	cupsdLogMessage(CUPSD_LOG_WARN,
@@ -2730,6 +2743,19 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
     }
 #endif /* HAVE_SSL */
+#ifdef HAVE_GSSAPI
+    else if (!strcasecmp(line, "Krb5Keytab"))
+    {
+      cupsdSetStringf(&Krb5Keytab, "KRB5_KTNAME=%s", value);
+      putenv(Krb5Keytab);
+
+#  ifdef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY
+      gsskrb5_register_acceptor_identity(value);
+#  else
+      cupsdSetEnv("KRB5_KTNAME", value);
+#  endif /* HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY */
+    }
+#endif /* HAVE_GSSAPI */
     else if (!strcasecmp(line, "User"))
     {
      /*

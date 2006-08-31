@@ -111,6 +111,10 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Remote root user */
 			*Classification		VALUE(NULL);
 					/* Classification of system */
+#ifdef HAVE_GSSAPI
+VAR char		*Krb5Keytab		VALUE(NULL);
+					/* Kerberos Keytab */
+#endif /* HAVE_GSSAPI */
 VAR uid_t		User			VALUE(1);
 					/* User ID for server */
 VAR gid_t		Group			VALUE(0);
@@ -201,13 +205,18 @@ VAR char		*LaunchdConf		VALUE(NULL);
 
 extern char	*cupsdGetDateTime(time_t t);
 extern int	cupsdReadConfiguration(void);
-extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
+#ifdef HAVE_GSSAPI
+extern int	cupsdLogGSSMessage(int level, int major_status,
+		                   int minor_status,
+		                   const char *message, ...);
+#endif /* HAVE_GSSAPI */
 extern int	cupsdLogMessage(int level, const char *message, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif /* __GNUC__ */
 ;
 extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
+extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 
 
 /*

@@ -83,8 +83,10 @@ AuthType Basic
 AuthType BasicDigest
 .TP 5
 AuthType Digest
+.TP 5
+AuthType Kerberos
 .br
-Specifies the authentication type (None, Basic, BasicDigest, Digest)
+Specifies the authentication type (None, Basic, BasicDigest, Digest, Kerberos)
 .TP 5
 AutoPurgeJobs Yes
 .TP 5
@@ -220,6 +222,8 @@ DefaultAuthType Basic
 DefaultAuthType BasicDigest
 .TP 5
 DefaultAuthType Digest
+.TP 5
+DefaultAuthType Kerberos
 .br
 Specifies the default type of authentication to use.
 .TP 5
@@ -349,6 +353,10 @@ Specifies whether to support HTTP keep-alive connections.
 KeepAliveTimeout seconds
 .br
 Specifies the amount of time that connections are kept alive.
+.TP 5
+Krb5Keytab filename
+.br
+Overrides the Kerberos key tab location.
 .TP 5
 <Limit operations> ... </Limit>
 .br

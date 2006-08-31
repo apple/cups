@@ -54,7 +54,6 @@
 #include <signal.h>
 #include <sys/wait.h>
 
-
 /*
  * Globals...
  */
@@ -458,7 +457,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     const char	*request_root;		/* CUPS_REQUESTROOT env var */
     char	afilename[1024],	/* a##### filename */
-		aline[1024];		/* Line from file */
+		aline[2048];		/* Line from file */
     FILE	*fp;			/* File pointer */
 
 
