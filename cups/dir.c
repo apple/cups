@@ -366,7 +366,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
   * Try reading an entry that is not "." or ".."...
   */
 
-  do
+  for (;;)
   {
     if (readdir_r(dp->dir, (struct dirent *)buffer, &entry))
     {
@@ -381,28 +381,31 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
     }
 
     DEBUG_printf(("    readdir_r() returned \"%s\"...\n", entry->d_name));
+
+    if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+      continue;
+
+   /*
+    * Copy the name over and get the file information...
+    */
+
+    strlcpy(dp->entry.filename, entry->d_name, sizeof(dp->entry.filename));
+
+    snprintf(filename, sizeof(filename), "%s/%s", dp->directory, entry->d_name);
+
+    if (stat(filename, &(dp->entry.fileinfo)))
+    {
+      DEBUG_printf(("    stat() failed for \"%s\" - %s...\n", filename,
+                    strerror(errno)));
+      continue;
+    }
+
+   /*
+    * Return the entry...
+    */
+
+    return (&(dp->entry));
   }
-  while (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."));
-
- /*
-  * Copy the name over and get the file information...
-  */
-
-  strlcpy(dp->entry.filename, entry->d_name, sizeof(dp->entry.filename));
-
-  snprintf(filename, sizeof(filename), "%s/%s", dp->directory, entry->d_name);
-  if (stat(filename, &(dp->entry.fileinfo)))
-  {
-    DEBUG_printf(("    stat() failed for \"%s\" - %s...\n", filename,
-                  strerror(errno)));
-    return (NULL);
-  }
-
- /*
-  * Return the entry...
-  */
-
-  return (&(dp->entry));
 }
 
 
