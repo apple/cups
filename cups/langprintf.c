@@ -28,7 +28,7 @@
  *
  *   _cupsLangPrintf() - Print a formatted message string to a file.
  *   _cupsLangPuts()   - Print a static message string to a file.
- *   _cupsSetLocale()  - Set the current locale.
+ *   _cupsSetLocale()  - Set the current locale and transcode the command-line.
  */
 
 /*
@@ -140,15 +140,18 @@ _cupsLangPuts(FILE        *fp,		/* I - File to write to */
 
 
 /*
- * '_cupsSetLocale()' - Set the current locale.
+ * '_cupsSetLocale()' - Set the current locale and transcode the command-line.
  */
 
 void
-_cupsSetLocale(void)
+_cupsSetLocale(char *argv[])		/* IO - Command-line arguments */
 {
+  int		i;			/* Looping var */
+  char		buffer[8192];		/* Command-line argument buffer */
+  _cups_globals_t *cg;			/* Global data */
 #ifdef LC_TIME
-    const char	*lc_time;		/* Current LC_TIME value */
-    char	new_lc_time[255],	/* New LC_TIME value */
+  const char	*lc_time;		/* Current LC_TIME value */
+  char		new_lc_time[255],	/* New LC_TIME value */
 		*charset;		/* Pointer to character set */
 #endif /* LC_TIME */
 
@@ -181,6 +184,42 @@ _cupsSetLocale(void)
 
   setlocale(LC_TIME, new_lc_time);
 #endif /* LC_TIME */
+
+ /*
+  * Initialize the default language info...
+  */
+
+  cg = _cupsGlobals();
+
+  if (!cg->lang_default)
+    cg->lang_default = cupsLangDefault();
+
+ /*
+  * Transcode the command-line arguments from the locale charset to
+  * UTF-8...
+  */
+
+  if (cg->lang_default->encoding != CUPS_US_ASCII &&
+      cg->lang_default->encoding != CUPS_UTF8)
+  {
+    for (i = 1; argv[i]; i ++)
+    {
+     /*
+      * Try converting from the locale charset to UTF-8...
+      */
+
+      if (cupsCharsetToUTF8((cups_utf8_t *)buffer, argv[i], sizeof(buffer),
+                            cg->lang_default->encoding) < 0)
+        continue;
+
+     /*
+      * Save the new string if it differs from the original...
+      */
+
+      if (strcmp(buffer, argv[i]))
+        argv[i] = strdup(buffer);
+    }
+  }
 }
 
 

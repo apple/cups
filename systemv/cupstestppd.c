@@ -113,7 +113,7 @@ main(int  argc,			/* I - Number of command-line arguments */
                                 "JCL", "PAGE", "PROLOG" };
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Display PPD files for each file listed on the command-line...

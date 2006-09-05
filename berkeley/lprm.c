@@ -61,7 +61,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_encryption_t encryption;	/* Encryption? */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Setup to cancel individual print jobs...

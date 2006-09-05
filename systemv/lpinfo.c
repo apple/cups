@@ -62,7 +62,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		long_status;		/* Long listing? */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
   http        = NULL;
   long_status = 0;

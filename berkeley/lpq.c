@@ -78,7 +78,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_dest_t	*dests;			/* Destinations */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Check for command-line options...

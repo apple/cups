@@ -85,7 +85,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   char		op;			/* Last operation on command-line */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Parse command-line options...

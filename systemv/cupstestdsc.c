@@ -65,7 +65,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_files;		/* Number of files tested */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Collect command-line arguments...
