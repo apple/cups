@@ -200,6 +200,9 @@ cupsRasterInterpretPPD(
     top    = size->top;
 
     strlcpy(h->cupsPageSizeName, size->name, sizeof(h->cupsPageSizeName));
+
+    h->cupsPageSize[0] = size->width;
+    h->cupsPageSize[1] = size->length;
   }
   else
   {
