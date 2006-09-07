@@ -364,8 +364,10 @@ f 0644 root sys $DATADIR/banners/standard data/standard
 f 0644 root sys $DATADIR/banners/topsecret data/topsecret
 f 0644 root sys $DATADIR/banners/unclassified data/unclassified
 
+d 0755 root sys $DATADIR/charmaps -
+f 0644 root sys $DATADIR/charmaps data/*.txt
+
 d 0755 root sys $DATADIR/charsets -
-f 0644 root sys $DATADIR/charsets data/*.txt
 f 0644 root sys $DATADIR/charsets/windows-874 data/windows-874
 f 0644 root sys $DATADIR/charsets/windows-1250 data/windows-1250
 f 0644 root sys $DATADIR/charsets/windows-1251 data/windows-1251
