@@ -29,7 +29,12 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme packaging/cups.readme
+%format rpm
+# Red Hat and their epochs...
+%version 1:@CUPS_VERSION@
+%format !rpm
 %version @CUPS_VERSION@
+%format all
 %description The Common UNIX Printing System provides a portable printing
 %description layer for UNIX(r) operating systems.  It has been developed by
 %description Easy Software Products to promote a standard printing solution
