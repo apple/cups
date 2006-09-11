@@ -854,15 +854,15 @@ main(int  argc,				/* I - Number of command-line args */
 	                            num_options, &options);
     }
 
-    if (copies_sup)
+    if (copies_sup && version > 0)
     {
      /*
       * Only send options if the destination printer supports the copies
-      * attribute.  This is a hack for the HP JetDirect implementation of
-      * IPP, which does not accept extension attributes and incorrectly
-      * reports a client-error-bad-request error instead of the
-      * successful-ok-unsupported-attributes status.  In short, at least
-      * some HP implementations of IPP are non-compliant.
+      * attribute and IPP/1.1.  This is a hack for the HP and Lexmark
+      * implementations of IPP, which do not accept extension attributes
+      * and incorrectly report a client-error-bad-request error instead of
+      * the successful-ok-unsupported-attributes status.  In short, at least
+      * some HP and Lexmark implementations of IPP are non-compliant.
       */
 
       cupsEncodeOptions(request, num_options, options);
@@ -876,7 +876,7 @@ main(int  argc,				/* I - Number of command-line args */
    /*
     * If copies aren't supported, then we are likely dealing with an HP
     * JetDirect.  The HP IPP implementation seems to close the connection
-    * after every request (that is, it does *not* implement HTTP Keep-
+    * after every request - that is, it does *not* implement HTTP Keep-
     * Alive, which is REQUIRED by HTTP/1.1...
     */
 
