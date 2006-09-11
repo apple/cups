@@ -167,9 +167,9 @@ cupsdCancelJob(cupsd_job_t *job,	/* I - Job to cancel */
   cupsdLoadJob(job);
 
   if (job->attrs)
-    job->state->values[0].integer = IPP_JOB_CANCELLED;
+    job->state->values[0].integer = IPP_JOB_CANCELED;
 
-  job->state_value = IPP_JOB_CANCELLED;
+  job->state_value = IPP_JOB_CANCELED;
 
   set_time(job, "time-at-completed");
 
@@ -415,7 +415,7 @@ cupsdCleanJobs(void)
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
        job && cupsArrayCount(Jobs) >= MaxJobs;
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
-    if (job->state_value >= IPP_JOB_CANCELLED)
+    if (job->state_value >= IPP_JOB_CANCELED)
       cupsdCancelJob(job, 1);
 }
 
@@ -567,6 +567,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  }
 	  else if (!strcmp(printer->error_policy, "abort-job"))
 	    cupsdCancelJob(job, 0);
+          else
+	    cupsdSetPrinterState(job->printer, IPP_PRINTER_STOPPED, 1);
           break;
 
       case CUPS_BACKEND_CANCEL :
@@ -1521,16 +1523,7 @@ cupsdStopJob(cupsd_job_t *job,		/* I - Job */
 
   FilterLevel -= job->cost;
 
-  if (job->status < 0 &&
-      !(job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)) &&
-      !(job->printer->type & CUPS_PRINTER_FAX) &&
-      !strcmp(job->printer->error_policy, "stop-printer"))
-    cupsdSetPrinterState(job->printer, IPP_PRINTER_STOPPED, 1);
-  else if (job->printer->state != IPP_PRINTER_STOPPED)
-    cupsdSetPrinterState(job->printer, IPP_PRINTER_IDLE, 0);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStopJob: printer state is %d",
-                  job->printer->state);
+  cupsdSetPrinterState(job->printer, IPP_PRINTER_IDLE, 0);
 
   job->state->values[0].integer = IPP_JOB_STOPPED;
   job->state_value              = IPP_JOB_STOPPED;
