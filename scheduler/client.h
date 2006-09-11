@@ -111,7 +111,7 @@ extern void	cupsdAcceptClient(cupsd_listener_t *lis);
 extern void	cupsdCloseAllClients(void);
 extern int	cupsdCloseClient(cupsd_client_t *con);
 extern void	cupsdDeleteAllListeners(void);
-extern void	cupsdFlushHeader(cupsd_client_t *con);
+extern int	cupsdFlushHeader(cupsd_client_t *con);
 extern void	cupsdPauseListening(void);
 extern int	cupsdProcessIPPRequest(cupsd_client_t *con);
 extern int	cupsdReadClient(cupsd_client_t *con);

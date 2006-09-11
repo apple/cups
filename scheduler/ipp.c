@@ -648,8 +648,11 @@ cupsdProcessIPPRequest(
 
       if (con->http.version == HTTP_1_1)
       {
-	httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n");
-	cupsdFlushHeader(con);
+	if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n") < 0)
+	  return (0);
+
+	if (cupsdFlushHeader(con) < 0)
+	  return (0);
 
 	con->http.data_encoding = HTTP_ENCODE_CHUNKED;
       }
@@ -661,9 +664,12 @@ cupsdProcessIPPRequest(
 
 	length = ippLength(con->response);
 
-	httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
-        	   CUPS_LLCAST length);
-	cupsdFlushHeader(con);
+	if (httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
+        	       CUPS_LLCAST length) < 0)
+	  return (0);
+
+	if (cupsdFlushHeader(con) < 0)
+	  return (0);
 
 	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
 	con->http.data_remaining = length;
