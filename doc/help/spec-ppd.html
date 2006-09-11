@@ -224,6 +224,23 @@ the output for a specific model of printer.</p>
 *cupsModelNumber: 1234
 </pre>
 
+
+<h3>cupsPJLCharset</h3>
+
+<p class='summary'>*cupsPJLCharset: "ISO character set name"</p>
+
+<p>This string attribute specifies the character set that is used
+for strings in PJL commands. If not specified, US-ASCII is
+assumed.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify UTF-8 is used in PJL strings</em>
+*cupsPJLCharset: "UTF-8"
+</pre>
+
+
 <h3>cupsPortMonitor</h3>
 
 <p class='summary'>*cupsPortMonitor urischeme/Descriptive Text: "port monitor"</p>

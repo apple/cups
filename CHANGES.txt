@@ -1,8 +1,11 @@
-CHANGES.txt - 2006-06-06
+CHANGES.txt - 2006-09-11
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- Added support for cupsPJLCharset attribute in PPD files
+	  which specifies the character set that is used in PJL
+	  strings (STR #1969)
 	- Moved the definition of the (private) _http_s structure
 	  to http-private.h; code that directly accesses the
 	  http_t members will no longer compile!

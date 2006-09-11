@@ -351,6 +351,15 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     * of the PJL commands to initialize PJL processing.
     */
 
+    ppd_attr_t	*charset;		/* PJL charset */
+
+
+    if ((charset = ppdFindAttr(ppd, "cupsPJLCharset", NULL)) != NULL)
+    {
+      if (!charset->value || strcasecmp(charset->value, "UTF-8"))
+        charset = NULL;
+    }
+
     fputs("\033%-12345X@PJL\n", fp);
     for (ptr = ppd->jcl_begin + 9; *ptr;)
       if (!strncmp(ptr, "@PJL JOB", 8))
@@ -391,8 +400,8 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
       title = ptr + 1;
 
    /*
-    * Replace double quotes with single quotes so that the title
-    * does not cause a PJL syntax error.
+    * Replace double quotes with single quotes and 8-bit characters with
+    * question marks so that the title does not cause a PJL syntax error.
     */
 
     strlcpy(temp, title, sizeof(temp));
@@ -400,6 +409,8 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     for (ptr = temp; *ptr; ptr ++)
       if (*ptr == '\"')
         *ptr = '\'';
+      else if (charset && (*ptr & 128))
+        *ptr = '?';
 
    /*
     * Send PJL JOB and PJL RDYMSG commands before we enter PostScript mode...
