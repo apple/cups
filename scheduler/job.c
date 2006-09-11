@@ -1198,6 +1198,9 @@ cupsdRestartJob(cupsd_job_t *job)	/* I - Job */
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
     cupsdSaveJob(job);
+
+    cupsArrayAdd(ActiveJobs, job);
+
     cupsdCheckJobs();
   }
 }
@@ -2289,7 +2292,7 @@ load_request_root(void)
       cupsArrayAdd(Jobs, job);
 
       if (job->state_value <= IPP_JOB_STOPPED)
-        cupsArrayAdd(ActiveJobs,job);
+        cupsArrayAdd(ActiveJobs, job);
       else
         unload_job(job);
     }

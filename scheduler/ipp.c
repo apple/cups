@@ -7511,7 +7511,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdLoadJob(job);
 
-  if (!job->attrs ||job->num_files == 0)
+  if (!job->attrs || job->num_files == 0)
   {
    /*
     * Nope - return a "not possible" error...
