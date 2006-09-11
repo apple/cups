@@ -153,6 +153,7 @@ cupsdCancelJob(cupsd_job_t *job,	/* I - Job to cancel */
 {
   int		i;			/* Looping var */
   char		filename[1024];		/* Job filename */
+  cupsd_printer_t *printer;		/* Printer used by job */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCancelJob: id = %d", job->id);
@@ -160,6 +161,8 @@ cupsdCancelJob(cupsd_job_t *job,	/* I - Job to cancel */
  /*
   * Stop any processes that are working on the current job...
   */
+
+  printer = job->printer;
 
   if (job->state_value == IPP_JOB_PROCESSING)
     cupsdStopJob(job, 0);
@@ -172,6 +175,13 @@ cupsdCancelJob(cupsd_job_t *job,	/* I - Job to cancel */
   job->state_value = IPP_JOB_CANCELED;
 
   set_time(job, "time-at-completed");
+
+ /*
+  * Send any pending notifications and then expire them...
+  */
+
+  cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, printer, job,
+                purge ? "Job purged." : "Job canceled.");
 
   cupsdExpireSubscriptions(NULL, job);
 
@@ -269,9 +279,6 @@ cupsdCancelJobs(const char *dest,	/* I - Destination to cancel */
      /*
       * Cancel all jobs matching this destination/user...
       */
-
-      cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                    purge ? "Job purged." : "Job canceled.");
 
       cupsdCancelJob(job, purge);
     }

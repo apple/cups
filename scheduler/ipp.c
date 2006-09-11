@@ -3048,9 +3048,6 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * Cancel the job and return...
   */
 
-  cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                "Job canceled by \"%s\".", username);
-
   cupsdCancelJob(job, 0);
   cupsdCheckJobs();
 
