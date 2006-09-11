@@ -68,6 +68,9 @@
 #    ifdef HAVE_GSSAPI_H
 #      include <gssapi.h>
 #    endif /* HAVE_GSSAPI_H */
+#    ifndef HAVE_GSS_C_NT_HOSTBASED_SERVICE
+#      define GSS_C_NT_HOSTBASED_SERVICE gss_nt_service_name
+#    endif /* !HAVE_GSS_C_NT_HOSTBASED_SERVICE */
 #  endif /* HAVE_GSSAPI */
 
 #  if defined(__sgi) || (defined(__APPLE__) && !defined(_SOCKLEN_T))
