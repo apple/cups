@@ -62,6 +62,7 @@ OBJS	=	\
 		testlpd.o \
 		testmime.o \
 		testspeed.o \
+		testsub.o \
 		util.o
 TARGETS	=	\
 		cupsd \
@@ -73,7 +74,8 @@ TARGETS	=	\
 		testdirsvc \
 		testlpd \
 		testmime \
-		testspeed
+		testspeed \
+		testsub
 
 
 #
@@ -279,6 +281,16 @@ testmime:	testmime.o libmime.a ../cups/libcups.a
 testspeed:	testspeed.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# Make the test program, "testsub".
+#
+
+testsub:	testsub.o ../cups/libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o testsub testsub.o ../cups/libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
