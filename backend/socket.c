@@ -340,11 +340,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       FD_ZERO(&input);
       FD_SET(device_fd, &input);
 
-#ifdef __hpux
-      if (select(device_fd + 1, (int *)&input, NULL, NULL, &timeout) > 0)
-#else
       if (select(device_fd + 1, &input, NULL, NULL, &timeout) > 0)
-#endif /* __hpux */
       {
        /*
 	* Grab the data coming back and spit it out to stderr...

@@ -195,7 +195,7 @@ compare_banners(
  * 'free_banners()' - Free all banners.
  */
 
-void
+static void
 free_banners(void)
 {
   cupsd_banner_t	*temp;		/* Current banner */

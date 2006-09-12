@@ -166,7 +166,7 @@ cupsdUpdateQuota(
  * 'add_quota()' - Add a quota record for this printer and user.
  */
 
-cupsd_quota_t *				/* O - Quota data */
+static cupsd_quota_t *			/* O - Quota data */
 add_quota(cupsd_printer_t *p,		/* I - Printer */
           const char      *username)	/* I - User */
 {
@@ -209,7 +209,7 @@ compare_quotas(const cupsd_quota_t *q1,	/* I - First quota record */
  * 'find_quota()' - Find a quota record.
  */
 
-cupsd_quota_t *				/* O - Quota data */
+static cupsd_quota_t *			/* O - Quota data */
 find_quota(cupsd_printer_t *p,		/* I - Printer */
            const char      *username)	/* I - User */
 {
