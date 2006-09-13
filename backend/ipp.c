@@ -907,6 +907,18 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs("INFO: Printer is busy; retrying print job...\n", stderr);
 	sleep(10);
       }
+      else if ((ipp_status == IPP_BAD_REQUEST ||
+	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version == 1)
+      {
+       /*
+	* Switch to IPP/1.0...
+	*/
+
+	fputs("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n",
+	      stderr);
+	version = 0;
+	httpReconnect(http);
+      }
       else
         fprintf(stderr, "ERROR: Print file was not accepted (%s)!\n",
 	        cupsLastErrorString());
