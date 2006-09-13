@@ -514,8 +514,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
 	  cupsdStopJob(job, 0);
 
-          if (!(printer->type & CUPS_PRINTER_REMOTE) ||
-	      (printer->type & CUPS_PRINTER_IMPLICIT))
+          if (printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
 	  {
 	   /*
 	    * Mark the job as pending again - we'll retry on another
@@ -575,7 +574,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  else if (!strcmp(printer->error_policy, "abort-job"))
 	    cupsdCancelJob(job, 0);
           else
-	    cupsdSetPrinterState(job->printer, IPP_PRINTER_STOPPED, 1);
+	    cupsdSetPrinterState(printer, IPP_PRINTER_STOPPED, 1);
           break;
 
       case CUPS_BACKEND_CANCEL :
@@ -592,7 +591,12 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  */
 
 	  cupsdStopJob(job, 0);
+
 	  cupsdSetJobHoldUntil(job, "indefinite");
+
+	  job->state->values[0].integer = IPP_JOB_HELD;
+	  job->state_value              = IPP_JOB_HELD;
+
 	  cupsdSaveJob(job);
           break;
 
@@ -602,13 +606,22 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  */
 
 	  cupsdStopJob(job, 0);
+
+	  job->state->values[0].integer = IPP_JOB_PENDING;
+	  job->state_value              = IPP_JOB_PENDING;
+
 	  cupsdSaveJob(job);
 	  cupsdSetPrinterState(printer, IPP_PRINTER_STOPPED, 1);
           break;
 
       case CUPS_BACKEND_AUTH_REQUIRED :
 	  cupsdStopJob(job, 0);
+
 	  cupsdSetJobHoldUntil(job, "authenticated");
+
+	  job->state->values[0].integer = IPP_JOB_HELD;
+	  job->state_value              = IPP_JOB_HELD;
+
 	  cupsdSaveJob(job);
 
 	  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
