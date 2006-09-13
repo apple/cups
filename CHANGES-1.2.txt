@@ -1,6 +1,32 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.4
+
+	- The "All Documents" link in the on-line help was
+	  missing a trailing slash (STR #1971)
+	- The Polish web interface translation used the wrong
+	  URLs for the job history (STR #1963)
+	- The "reprint job" button did not work (STR #1956)
+	- The scheduler did not always report printer or job
+	  events properly (STR #1955)
+	- The scheduler always stopped the queue on error,
+	  regardless of the exit code, if the error policy was
+	  set to "stop-printer" (STR #1959)
+	- ppdEmitJCL() included UTF-8 characters in the JCL job
+	  name, which caused problems on some printers (STR
+	  #1959)
+	- Fixed a buffering problem that cause high CPU usage
+	  (STR #1968)
+	- The command-line applications did not convert
+	  command-line strings to UTF-8 as needed (STR #1958)
+	- cupsDirRead() incorrectly aborted when reading a
+	  symbolic link that pointed to a file/directory that did
+	  not exist (STR #1953)
+	- The cupsInterpretRasterPPD() function did not handle
+	  custom page sizes properly.
+
+
 CHANGES IN CUPS V1.2.3
 
 	- The scheduler did not send job-state or
