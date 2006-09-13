@@ -1930,7 +1930,7 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       httpFlushWrite(http);
     }
 
-    if ((length + http->wused) < sizeof(http->wbuffer))
+    if ((length + http->wused) <= sizeof(http->wbuffer))
     {
      /*
       * Write to buffer...
