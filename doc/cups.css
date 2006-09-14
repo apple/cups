@@ -199,6 +199,10 @@ DIV.sidebar {
   margin-left: 10pt;
   padding: 5pt;
   width: 25%;
+  /* These are not implemented by all browsers, but that's OK */
+  border-radius: 10pt;
+  -moz-border-radius: 10pt;
+  box-shadow: 5pt 5pt 5pt #cccccc;
 }
 
 DIV.sidebar P.l0 {
@@ -230,6 +234,10 @@ TABLE.pager {
   border: solid thin #999966;
   margin-top: 10pt;
   padding: 2pt;
+  /* These are not implemented by all browsers, but that's OK */
+  border-radius: 10pt;
+  -moz-border-radius: 10pt;
+  box-shadow: 5pt 5pt 5pt #cccccc;
 }
 
 DT {
