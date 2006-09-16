@@ -2137,6 +2137,16 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
   * Send the HTTP status header...
   */
 
+  if (code == HTTP_CONTINUE)
+  {
+   /*
+    * 100-continue doesn't send any headers...
+    */
+
+    return (httpPrintf(HTTP(con), "HTTP/%d.%d 100 Continue\r\n\r\n",
+		       con->http.version / 100, con->http.version % 100) > 0);
+  }
+
   httpFlushWrite(HTTP(con));
 
   con->http.data_encoding = HTTP_ENCODE_FIELDS;
@@ -2144,21 +2154,6 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
                  con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
-
-  if (code == HTTP_CONTINUE)
-  {
-   /*
-    * 100-continue doesn't send any headers...
-    */
-
-    if (httpPrintf(HTTP(con), "\r\n") < 0)
-      return (0);
-    else if (cupsdFlushHeader(con) < 0)
-      return (0);
-    else
-      return (1);
-  }
-
   if (httpPrintf(HTTP(con), "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
     return (0);
   if (ServerHeader)

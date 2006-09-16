@@ -93,6 +93,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
                 http, method, resource));
   DEBUG_printf(("cupsDoAuthentication: digest_tries=%d, userpass=\"%s\"\n",
                 http->digest_tries, http->userpass));
+  DEBUG_printf(("cupsDoAuthentication: WWW-Authenticate=\"%s\"\n",
+                httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE)));
 
  /*
   * Clear the current authentication string...
@@ -101,10 +103,9 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   http->_authstring[0] = '\0';
 
   if (http->authstring && http->authstring != http->_authstring)
-  {
     free(http->authstring);
-    http->authstring = http->_authstring;
-  }
+
+  http->authstring = http->_authstring;
 
  /*
   * See if we can do local authentication...
@@ -252,19 +253,19 @@ DEBUG_gss_printf(OM_uint32 major_status,/* I - Major status code */
   OM_uint32	err_major_status,	/* Major status code for display */
 		err_minor_status;	/* Minor status code for display */
   OM_uint32	msg_ctx;		/* Message context */
-  gss_buffer_desc major_status_string,	/* Major status message */
-		minor_status_string;	/* Minor status message */
+  gss_buffer_desc major_status_string = GSS_C_EMPTY_BUFFER,
+					/* Major status message */
+		minor_status_string = GSS_C_EMPTY_BUFFER;
+					/* Minor status message */
 
 
-  msg_ctx             = 0;
-  major_status_string = GSS_C_EMPTY_BUFFER;
-  minor_status_string = GSS_C_EMPTY_BUFFER;
-  err_major_status    = gss_display_status(&err_minor_status,
-	                        	   major_status,
-					   GSS_C_GSS_CODE,
-					   GSS_C_NO_OID,
-					   &msg_ctx,
-					   &major_status_string);
+  msg_ctx          = 0;
+  err_major_status = gss_display_status(&err_minor_status,
+	                        	major_status,
+					GSS_C_GSS_CODE,
+					GSS_C_NO_OID,
+					&msg_ctx,
+					&major_status_string);
 
   if (!GSS_ERROR(err_major_status))
     err_major_status = gss_display_status(&err_minor_status,

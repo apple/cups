@@ -225,7 +225,10 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
   if (http)
   {
     memset(http->fields, 0, sizeof(http->fields));
-    httpSetField(http, HTTP_FIELD_HOST, http->hostname);
+    if (http->hostname[0] == '/')
+      httpSetField(http, HTTP_FIELD_HOST, "localhost");
+    else
+      httpSetField(http, HTTP_FIELD_HOST, http->hostname);
 
     if (http->field_authorization)
     {
