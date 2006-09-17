@@ -3,7 +3,7 @@
  *
  *   Search routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -224,6 +224,8 @@ cgiCompileSearch(const char *query)	/* I - Query string */
 
 	*sptr++ = *qptr++;
       }
+
+      *sptr = '\0';
 
      /*
       * For "word1 AND word2", add reciprocal "word2 AND word1"...
