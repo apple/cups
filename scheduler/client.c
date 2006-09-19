@@ -2345,14 +2345,20 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
             if (!strncasecmp(buf, "Location:", 9))
 	    {
   	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL);
+	      con->sent_header = 2;
+
 	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
 		return (0);
 	    }
 	    else if (!strncasecmp(buf, "Status:", 7))
+	    {
   	      cupsdSendError(con, (http_status_t)atoi(buf + 7));
+	      con->sent_header = 2;
+	    }
 	    else
 	    {
   	      cupsdSendHeader(con, HTTP_OK, NULL);
+	      con->sent_header = 1;
 
 	      if (con->http.version == HTTP_1_1)
 	      {
@@ -2360,8 +2366,6 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 		  return (0);
 	      }
             }
-
-	    con->sent_header = 1;
 	  }
 
 	  if (strncasecmp(buf, "Status:", 7))
@@ -2448,9 +2452,9 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
     httpFlushWrite(HTTP(con));
 
-    if (con->http.data_encoding == HTTP_ENCODE_CHUNKED)
+    if (con->http.data_encoding == HTTP_ENCODE_CHUNKED && con->sent_header == 1)
     {
-      if (httpPrintf(HTTP(con), "0\r\n\r\n") < 0)
+      if (httpWrite2(HTTP(con), "", 0) < 0)
       {
         cupsdCloseClient(con);
 	return (0);
