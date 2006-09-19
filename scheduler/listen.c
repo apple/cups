@@ -352,7 +352,8 @@ cupsdStartListening(void)
   if (!LocalPort && !have_domain)
   {
     cupsdLogMessage(CUPSD_LOG_EMERG,
-                    "No Listen or Port lines were found to allow access via localhost!");
+                    "No Listen or Port lines were found to allow access via "
+		    "localhost!");
 
    /*
     * Commit suicide...
@@ -386,7 +387,9 @@ cupsdStartListening(void)
   }
 
   cupsdSetEnv("CUPS_ENCRYPTION", encryptions[LocalEncryption]);
-  cupsdSetEnvf("IPP_PORT", "%d", LocalPort);
+
+  if (LocalPort)
+    cupsdSetEnvf("IPP_PORT", "%d", LocalPort);
 
  /*
   * Resume listening for connections...

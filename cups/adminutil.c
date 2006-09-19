@@ -953,6 +953,8 @@ _cupsAdminSetServerSettings(
 {
   int		i;			/* Looping var */
   http_status_t status;			/* GET/PUT status */
+  const char	*server_port_env;	/* SERVER_PORT env var */
+  int		server_port;		/* IPP port for server */
   cups_file_t	*cupsd;			/* cupsd.conf file */
   char		cupsdconf[1024];	/* cupsd.conf filename */
   int		remote;			/* Remote cupsd.conf file? */
@@ -1086,6 +1088,17 @@ _cupsAdminSetServerSettings(
   wrote_root_location  = 0;
   indent               = 0;
 
+  if ((server_port_env = getenv("SERVER_PORT")) != NULL)
+  {
+    if ((server_port = atoi(server_port_env)) <= 0)
+      server_port = ippPort();
+  }
+  else
+    server_port = ippPort();
+
+  if (server_port <= 0)
+    server_port = IPP_PORT;
+
   while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
   {
     if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
@@ -1097,20 +1110,24 @@ _cupsAdminSetServerSettings(
 	if (share_printers || remote_admin)
 	{
 	  cupsFilePuts(temp, "# Allow remote access\n");
-	  cupsFilePrintf(temp, "Port %d\n", ippPort());
+	  cupsFilePrintf(temp, "Port %d\n", server_port);
 	}
 	else
 	{
 	  cupsFilePuts(temp, "# Only listen for connections from the local "
 	                     "machine.\n");
-	  cupsFilePrintf(temp, "Listen localhost:%d\n", ippPort());
+	  cupsFilePrintf(temp, "Listen localhost:%d\n", server_port);
 	}
 
 #ifdef CUPS_DEFAULT_DOMAINSOCKET
-        if (!access(CUPS_DEFAULT_DOMAINSOCKET, 0))
+        if ((!value || strcmp(CUPS_DEFAULT_DOMAINSOCKET, value)) &&
+	    !access(CUPS_DEFAULT_DOMAINSOCKET, 0))
           cupsFilePuts(temp, "Listen " CUPS_DEFAULT_DOMAINSOCKET "\n");
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */
       }
+      else if (value && value[0] == '/' &&
+               strcmp(CUPS_DEFAULT_DOMAINSOCKET, value))
+        cupsFilePrintf(temp, "Listen %s\n", value);
     }
     else if (!strcasecmp(line, "Browsing") ||
              !strcasecmp(line, "BrowseAddress") ||
