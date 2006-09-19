@@ -1130,7 +1130,7 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 
   if (!compressions || !filetypes)
   {
-    cupsdCancelJob(job, 1);
+    cupsdCancelJob(job, 1, IPP_JOB_ABORTED);
 
     send_ipp_status(con, IPP_INTERNAL_ERROR,
                     _("Unable to allocate memory for file types!"));
@@ -3048,7 +3048,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * Cancel the job and return...
   */
 
-  cupsdCancelJob(job, 0);
+  cupsdCancelJob(job, 0, IPP_JOB_CANCELED);
   cupsdCheckJobs();
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was canceled by \"%s\".", jobid,
@@ -8465,16 +8465,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		return;
 	      }
               else if (con->response->request.status.status_code == IPP_OK)
-	      {
-                cupsdCancelJob(job, 0);
-
-		if (JobHistory)
-		{
-                  job->state->values[0].integer = attr->values[0].integer;
-                  job->state_value              = (ipp_jstate_t)attr->values[0].integer;
-		  cupsdSaveJob(job);
-		}
-	      }
+                cupsdCancelJob(job, 0, (ipp_jstate_t)attr->values[0].integer);
 	      break;
 	}
       }

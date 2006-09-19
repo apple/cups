@@ -60,7 +60,7 @@ DeviceURI uri
 .br
 Specifies the device URI for a printer.
 .TP 5
-ErrorPolicy cancel-job
+ErrorPolicy abort-job
 .TP 5
 ErrorPolicy retry-job
 .TP 5

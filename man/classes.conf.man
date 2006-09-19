@@ -56,7 +56,7 @@ DenyUser [ user @group ... ]
 .br
 Prevents specific users and groups from printing to the printer.
 .TP 5
-ErrorPolicy cancel-job
+ErrorPolicy abort-job
 .TP 5
 ErrorPolicy retry-job
 .TP 5

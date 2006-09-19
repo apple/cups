@@ -2382,6 +2382,9 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
     job->state_value              = IPP_JOB_PENDING;
 
     cupsdSaveJob(job);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, p, job,
+		  "Job stopped due to printer being paused");
   }
 }
 

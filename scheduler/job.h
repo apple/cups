@@ -96,7 +96,8 @@ VAR int			JobRetryLimit	VALUE(5),
  */
 
 extern cupsd_job_t	*cupsdAddJob(int priority, const char *dest);
-extern void		cupsdCancelJob(cupsd_job_t *job, int purge);
+extern void		cupsdCancelJob(cupsd_job_t *job, int purge,
+			               ipp_jstate_t newstate);
 extern void		cupsdCancelJobs(const char *dest, const char *username,
 			                int purge);
 extern void		cupsdCheckJobs(void);

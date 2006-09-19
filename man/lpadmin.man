@@ -127,7 +127,7 @@ Sets the binary communications program to use when printing,
 .br
 Sets the error policy to be used when the printer backend is 
 unable to send the job to the printer. The name must be one of 
-"cancel-job", "retry-job" or "stop-printer". The default error 
+"abort-job", "retry-job" or "stop-printer". The default error 
 policy is "stop-printer".
 .TP 5
 -o printer-is-shared=true/false
