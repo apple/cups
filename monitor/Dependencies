@@ -1,8 +1,8 @@
 # DO NOT DELETE
 
 bcp.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-bcp.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
-bcp.o: ../cups/file.h ../cups/language.h
+bcp.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+bcp.o: ../cups/language.h
 tbcp.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-tbcp.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
-tbcp.o: ../cups/file.h ../cups/language.h
+tbcp.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+tbcp.o: ../cups/language.h

@@ -3,8 +3,8 @@
 pdftops.o: ../cups/string.h ../config.h parseargs.h gtypes.h GString.h gmem.h
 pdftops.o: Object.h Array.h Dict.h Stream.h XRef.h Catalog.h Page.h PDFDoc.h
 pdftops.o: PSOutputDev.h GlobalParams.h CharTypes.h OutputDev.h Error.h
-pdftops.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-pdftops.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+pdftops.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+pdftops.o: ../cups/array.h ../cups/file.h ../cups/language.h
 Annot.o: ../config.h gmem.h Object.h gtypes.h GString.h Array.h Dict.h
 Annot.o: Stream.h Catalog.h Gfx.h Lexer.h Annot.h
 Array.o: ../config.h gmem.h Object.h gtypes.h GString.h Array.h Dict.h

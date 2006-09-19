@@ -35,7 +35,7 @@
  * Include necessary headers...
  */
 
-#include "http.h"
+#include "http-private.h"
 #include "string.h"
 
 

@@ -178,11 +178,11 @@ mime.o: ../cups/array.h ../cups/ipp.h ../cups/file.h
 type.o: ../cups/string.h ../config.h mime.h ../cups/array.h ../cups/ipp.h
 type.o: ../cups/file.h ../cups/debug.h
 cups-deviced.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-cups-deviced.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+cups-deviced.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
 cups-deviced.o: ../cups/language.h ../cups/file.h ../cups/string.h
 cups-deviced.o: ../config.h ../cups/array.h ../cups/dir.h
 cups-driverd.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-cups-driverd.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+cups-driverd.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
 cups-driverd.o: ../cups/language.h ../cups/file.h ../cups/string.h
 cups-driverd.o: ../config.h ../cups/dir.h ../cups/transcode.h
 cups-lpd.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
@@ -193,17 +193,20 @@ cups-polld.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
 cups-polld.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
 cups-polld.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 cups-polld.o: ../cups/language.h ../cups/string.h
-testdirsvc.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-testdirsvc.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testdirsvc.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+testdirsvc.o: ../cups/array.h ../cups/file.h ../cups/language.h
 testdirsvc.o: ../cups/string.h ../config.h
-testlpd.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-testlpd.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-testlpd.o: ../cups/string.h ../config.h
+testlpd.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+testlpd.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/string.h
+testlpd.o: ../config.h
 testmime.o: ../cups/string.h ../config.h mime.h ../cups/array.h ../cups/ipp.h
 testmime.o: ../cups/file.h ../cups/dir.h
-testspeed.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-testspeed.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testspeed.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+testspeed.o: ../cups/array.h ../cups/file.h ../cups/language.h
 testspeed.o: ../cups/language.h ../cups/debug.h
-util.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-util.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-util.o: ../cups/file.h ../cups/string.h ../config.h
+testsub.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+testsub.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
+testsub.o: ../cups/string.h ../config.h
+util.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+util.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/file.h
+util.o: ../cups/string.h ../config.h

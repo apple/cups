@@ -2407,6 +2407,10 @@ cupsdUpdatePrinters(void)
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
   {
+   /*
+    * Remove remote printers if we are no longer browsing...
+    */
+
     if (!Browsing && (p->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_REMOTE)))
     {
       if (p->type & CUPS_PRINTER_IMPLICIT)
@@ -2417,8 +2421,6 @@ cupsdUpdatePrinters(void)
       cupsArrayRestore(Printers);
       continue;
     }
-    else if (!(p->type & CUPS_PRINTER_REMOTE))
-      cupsdSetPrinterAttrs(p);
 
    /*
     * Update the operation policy pointer...
@@ -2426,6 +2428,13 @@ cupsdUpdatePrinters(void)
 
     if ((p->op_policy_ptr = cupsdFindPolicy(p->op_policy)) == NULL)
       p->op_policy_ptr = DefaultPolicyPtr;
+
+   /*
+    * Update printer attributes as needed...
+    */
+
+    if (!(p->type & CUPS_PRINTER_REMOTE))
+      cupsdSetPrinterAttrs(p);
   }
 }
 
