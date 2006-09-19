@@ -450,14 +450,19 @@ c 0644 root sys $PAMDIR/cups conf/@PAMFILE@
 # Developer files
 f 0755 root sys $BINDIR/cups-config cups-config
 d 0755 root sys $INCLUDEDIR/cups -
+f 0644 root sys $INCLUDEDIR/cups/adminutil.h cups/adminutil.h
+f 0644 root sys $INCLUDEDIR/cups/array.h cups/array.h
+f 0644 root sys $INCLUDEDIR/cups/backend.h cups/backend.h
 f 0644 root sys $INCLUDEDIR/cups/cups.h cups/cups.h
+f 0644 root sys $INCLUDEDIR/cups/dir.h cups/dir.h
+f 0644 root sys $INCLUDEDIR/cups/file.h cups/file.h
 f 0644 root sys $INCLUDEDIR/cups/http.h cups/http.h
 f 0644 root sys $INCLUDEDIR/cups/image.h filter/image.h
 f 0644 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
 f 0644 root sys $INCLUDEDIR/cups/language.h cups/language.h
-f 0644 root sys $INCLUDEDIR/cups/md5.h cups/md5.h
 f 0644 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
 f 0644 root sys $INCLUDEDIR/cups/raster.h filter/raster.h
+f 0644 root sys $INCLUDEDIR/cups/transcode.h cups/transcode.h
 
 %if INSTALLSTATIC
 f 0644 root sys $LIBDIR/libcups.a cups/libcups.a

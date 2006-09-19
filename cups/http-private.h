@@ -83,6 +83,7 @@ typedef int socklen_t;
 #  endif /* __sgi || (__APPLE__ && !_SOCKLEN_T) */
 
 #  include "http.h"
+#  include "md5.h"
 #  include "ipp-private.h"
 
 #  if defined HAVE_LIBSSL

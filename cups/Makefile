@@ -101,7 +101,6 @@ HEADERS	=	\
 		i18n.h \
 		ipp.h \
 		language.h \
-		md5.h \
 		ppd.h \
 		transcode.h
 

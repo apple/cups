@@ -61,8 +61,6 @@
 #    endif /* AF_LOCAL */
 #  endif /* WIN32 */
 
-#  include "md5.h"
-
 /*
  * With GCC 3.0 and higher, we can mark old APIs "deprecated" so you get
  * a warning at compile-time.
