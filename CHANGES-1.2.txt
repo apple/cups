@@ -3,6 +3,16 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.4
 
+	- Failsafe printing did not work (PR #6328)
+	- Some web interface redirects did not work (STR #1978)
+	- The web interface change settings button could
+	  introduce a "Port 0" line in cupsd.conf if there was no
+	  loopback connection available (STR #1979)
+	- The web interface change settings and edit
+	  configuration file buttons would truncate the
+	  cupsd.conf file (STR #1976)
+	- The German web interface used the wrong printer icon
+	  images (STR #1973)
 	- The "All Documents" link in the on-line help was
 	  missing a trailing slash (STR #1971)
 	- The Polish web interface translation used the wrong

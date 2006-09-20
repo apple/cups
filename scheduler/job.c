@@ -473,7 +473,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFinishJob: job->status is %d",
                   job->status);
 
-  if (job->status_buffer && job->current_file >= job->num_files)
+  if (job->status_buffer &&
+      (job->status < 0 || job->current_file >= job->num_files))
   {
    /*
     * Close the pipe and clear the input bit.
@@ -543,7 +544,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
 	  cupsdStopJob(job, 0);
 
-          if (printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
+          if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
 	  {
 	   /*
 	    * Mark the job as pending again - we'll retry on another
@@ -1229,14 +1230,21 @@ cupsdRestartJob(cupsd_job_t *job)	/* I - Job */
 
   if (job->state_value == IPP_JOB_STOPPED || job->num_files)
   {
+    ipp_jstate_t	old_state;	/* Old job state */
+
+
     cupsdLoadJob(job);
+
+    old_state = job->state_value;
 
     job->tries = 0;
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
+
     cupsdSaveJob(job);
 
-    cupsArrayAdd(ActiveJobs, job);
+    if (old_state > IPP_JOB_STOPPED)
+      cupsArrayAdd(ActiveJobs, job);
 
     cupsdCheckJobs();
   }
