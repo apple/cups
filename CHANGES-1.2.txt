@@ -3,6 +3,8 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.4
 
+	- Older Lexmark and Tektronix printers did not work with
+	  IPP (STR #1980)
 	- Failsafe printing did not work (PR #6328)
 	- Some web interface redirects did not work (STR #1978)
 	- The web interface change settings button could

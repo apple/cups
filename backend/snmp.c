@@ -1728,12 +1728,14 @@ probe_device(snmp_cache_t *device)	/* I - Device */
   debug_printf("DEBUG: %.3f Probing %s...\n", run_time(), device->addrname);
 
   if (device->make_and_model &&
-      (!strncasecmp(device->make_and_model, "Xerox", 5) ||
-       !strncasecmp(device->make_and_model, "Kyocera", 7)))
+      (!strncasecmp(device->make_and_model, "Kyocera", 7) ||
+       !strncasecmp(device->make_and_model, "Lexmark", 7) ||
+       !strncasecmp(device->make_and_model, "Tektronix", 9) ||
+       !strncasecmp(device->make_and_model, "Xerox", 5)))
   {
    /*
-    * Xerox and Kyocera printers often lock up on IPP probes, so exclude
-    * them from the IPP connection test...
+    * Kyocera, Lexmark, Tektronix, and Xerox printers often lock up on
+    * IPP probes, so exclude them from the IPP connection test...
     */
 
     http = NULL;
