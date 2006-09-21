@@ -3,6 +3,8 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.4
 
+	- The --with-printcap configure option did not work (STR
+	  #1984)
 	- The character set reported by cupsLangGet() did not
 	  always reflect the default character set of a given
 	  locale (STR #1983)
