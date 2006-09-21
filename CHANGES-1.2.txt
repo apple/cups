@@ -3,6 +3,9 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.4
 
+	- The character set reported by cupsLangGet() did not
+	  always reflect the default character set of a given
+	  locale (STR #1983)
 	- Older Lexmark and Tektronix printers did not work with
 	  IPP (STR #1980)
 	- Failsafe printing did not work (PR #6328)
