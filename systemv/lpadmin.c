@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c 5833 2006-08-16 20:05:58Z mike $"
+ * "$Id: lpadmin.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -92,7 +92,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_option_t	*options;	/* Options */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
   http        = NULL;
   printer     = NULL;
@@ -1986,5 +1986,5 @@ validate_name(const char *name)		/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c 5833 2006-08-16 20:05:58Z mike $".
+ * End of "$Id: lpadmin.c 5926 2006-09-05 20:45:47Z mike $".
  */

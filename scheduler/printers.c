@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 5828 2006-08-15 21:21:45Z mike $"
+ * "$Id: printers.c 5970 2006-09-19 20:11:08Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -2386,6 +2386,9 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
     job->state_value              = IPP_JOB_PENDING;
 
     cupsdSaveJob(job);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, p, job,
+		  "Job stopped due to printer being paused");
   }
 }
 
@@ -2411,6 +2414,10 @@ cupsdUpdatePrinters(void)
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
   {
+   /*
+    * Remove remote printers if we are no longer browsing...
+    */
+
     if (!Browsing && (p->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_REMOTE)))
     {
       if (p->type & CUPS_PRINTER_IMPLICIT)
@@ -2421,8 +2428,6 @@ cupsdUpdatePrinters(void)
       cupsArrayRestore(Printers);
       continue;
     }
-    else if (!(p->type & CUPS_PRINTER_REMOTE))
-      cupsdSetPrinterAttrs(p);
 
    /*
     * Update the operation policy pointer...
@@ -2430,6 +2435,13 @@ cupsdUpdatePrinters(void)
 
     if ((p->op_policy_ptr = cupsdFindPolicy(p->op_policy)) == NULL)
       p->op_policy_ptr = DefaultPolicyPtr;
+
+   /*
+    * Update printer attributes as needed...
+    */
+
+    if (!(p->type & CUPS_PRINTER_REMOTE))
+      cupsdSetPrinterAttrs(p);
   }
 }
 
@@ -2877,9 +2889,8 @@ add_printer_filter(
       snprintf(p->state_message, sizeof(p->state_message),
                "Filter \"%s\" for printer \"%s\" not available: %s",
 	       program, p->name, strerror(errno));
-      cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 0);
       cupsdSetPrinterReasons(p, "+cups-missing-filter-error");
-      cupsdAddPrinterHistory(p);
+      cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 0);
 
       cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
     }
@@ -3316,5 +3327,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 5828 2006-08-15 21:21:45Z mike $".
+ * End of "$Id: printers.c 5970 2006-09-19 20:11:08Z mike $".
  */

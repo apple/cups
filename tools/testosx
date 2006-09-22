@@ -53,7 +53,7 @@ rm -f /etc/xinetd.d/cups-lpd
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
-launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist
+launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist || exit 0
 EOF
 else
 	cat >$pkgdir/Resources/postflight <<EOF

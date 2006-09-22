@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5907 2006-08-30 02:18:28Z mike $"
+ * "$Id: ipp.c 5970 2006-09-19 20:11:08Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -638,8 +638,11 @@ cupsdProcessIPPRequest(
 
       if (con->http.version == HTTP_1_1)
       {
-	httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n");
-	cupsdFlushHeader(con);
+	if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n") < 0)
+	  return (0);
+
+	if (cupsdFlushHeader(con) < 0)
+	  return (0);
 
 	con->http.data_encoding = HTTP_ENCODE_CHUNKED;
       }
@@ -651,9 +654,12 @@ cupsdProcessIPPRequest(
 
 	length = ippLength(con->response);
 
-	httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
-        	   CUPS_LLCAST length);
-	cupsdFlushHeader(con);
+	if (httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
+        	       CUPS_LLCAST length) < 0)
+	  return (0);
+
+	if (cupsdFlushHeader(con) < 0)
+	  return (0);
 
 	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
 	con->http.data_remaining = length;
@@ -1121,7 +1127,7 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 
   if (!compressions || !filetypes)
   {
-    cupsdCancelJob(job, 1);
+    cupsdCancelJob(job, 1, IPP_JOB_ABORTED);
 
     send_ipp_status(con, IPP_INTERNAL_ERROR,
                     _("Unable to allocate memory for file types!"));
@@ -3077,10 +3083,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * Cancel the job and return...
   */
 
-  cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
-                "Job canceled by \"%s\".", username);
-
-  cupsdCancelJob(job, 0);
+  cupsdCancelJob(job, 0, IPP_JOB_CANCELED);
   cupsdCheckJobs();
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was canceled by \"%s\".", jobid,
@@ -7521,7 +7524,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdLoadJob(job);
 
-  if (!job->attrs ||job->num_files == 0)
+  if (!job->attrs || job->num_files == 0)
   {
    /*
     * Nope - return a "not possible" error...
@@ -8411,16 +8414,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		return;
 	      }
               else if (con->response->request.status.status_code == IPP_OK)
-	      {
-                cupsdCancelJob(job, 0);
-
-		if (JobHistory)
-		{
-                  job->state->values[0].integer = attr->values[0].integer;
-                  job->state_value              = (ipp_jstate_t)attr->values[0].integer;
-		  cupsdSaveJob(job);
-		}
-	      }
+                cupsdCancelJob(job, 0, (ipp_jstate_t)attr->values[0].integer);
 	      break;
 	}
       }
@@ -9231,5 +9225,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 5907 2006-08-30 02:18:28Z mike $".
+ * End of "$Id: ipp.c 5970 2006-09-19 20:11:08Z mike $".
  */

@@ -2,13 +2,15 @@
 
 lpc.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 lpc.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-lpc.o: ../cups/i18n.h ../cups/debug.h ../cups/string.h ../config.h
+lpc.o: ../cups/i18n.h ../cups/transcode.h ../cups/debug.h ../cups/string.h
+lpc.o: ../config.h
 lpq.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 lpq.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
-lpq.o: ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/debug.h
+lpq.o: ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+lpq.o: ../cups/debug.h
 lpr.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 lpr.o: ../cups/http.h ../cups/md5.h ../cups/ppd.h ../cups/array.h
-lpr.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
+lpr.o: ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h
 lprm.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 lprm.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-lprm.o: ../cups/i18n.h ../cups/string.h ../config.h
+lprm.o: ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h

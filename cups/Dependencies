@@ -82,7 +82,7 @@ transcode.o: ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 transcode.o: i18n.h transcode.h debug.h
 usersys.o: http-private.h ../config.h http.h md5.h ipp-private.h ipp.h
 usersys.o: globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
-usersys.o: transcode.h
+usersys.o: transcode.h debug.h
 util.o: globals.h string.h ../config.h http-private.h http.h md5.h
 util.o: ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 util.o: transcode.h debug.h
@@ -180,7 +180,7 @@ transcode.32.o: transcode.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h lan
 transcode.32.o: transcode.c  i18n.h transcode.h debug.h
 usersys.32.o: usersys.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h
 usersys.32.o: usersys.c  globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
-usersys.32.o: usersys.c  transcode.h
+usersys.32.o: usersys.c  transcode.h debug.h
 util.32.o: util.c  globals.h string.h ../config.h http-private.h http.h md5.h
 util.32.o: util.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 util.32.o: util.c  transcode.h debug.h
@@ -278,7 +278,7 @@ transcode.64.o: transcode.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h lan
 transcode.64.o: transcode.c  i18n.h transcode.h debug.h
 usersys.64.o: usersys.c  http-private.h ../config.h http.h md5.h ipp-private.h ipp.h
 usersys.64.o: usersys.c  globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
-usersys.64.o: usersys.c  transcode.h
+usersys.64.o: usersys.c  transcode.h debug.h
 util.64.o: util.c  globals.h string.h ../config.h http-private.h http.h md5.h
 util.64.o: util.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 util.64.o: util.c  transcode.h debug.h

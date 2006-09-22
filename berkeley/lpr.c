@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c 5838 2006-08-17 14:41:42Z mike $"
+ * "$Id: lpr.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -93,7 +93,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
   deletefile  = 0;
   printer     = NULL;
@@ -529,5 +529,5 @@ sighandler(int s)			/* I - Signal number */
 
 
 /*
- * End of "$Id: lpr.c 5838 2006-08-17 14:41:42Z mike $".
+ * End of "$Id: lpr.c 5926 2006-09-05 20:45:47Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c 5769 2006-07-20 17:17:14Z mike $"
+ * "$Id: language.c 5980 2006-09-21 19:01:55Z mike $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -406,14 +406,6 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
         *ptr = '\0';
       }
-      else
-      {
-       /*
-        * Default to UTF-8...
-	*/
-
-        strcpy(charset, "UTF8");
-      }
 
      /*
       * Get the locale for messages from the LC_MESSAGES locale setting...
@@ -472,6 +464,13 @@ cupsLangGet(const char *language)	/* I - Language or locale */
                   charset));
   }
 #endif /* CODESET */
+
+ /*
+  * If we don't have a character set by now, default to UTF-8...
+  */
+
+  if (!charset[0])
+    strcpy(charset, "UTF8");
 
  /*
   * Parse the language string passed in to a locale string. "C" is the
@@ -1314,5 +1313,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 5769 2006-07-20 17:17:14Z mike $".
+ * End of "$Id: language.c 5980 2006-09-21 19:01:55Z mike $".
  */

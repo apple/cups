@@ -1,5 +1,5 @@
 /*
- * "$Id: quotas.c 5305 2006-03-18 03:05:12Z mike $"
+ * "$Id: quotas.c 5970 2006-09-19 20:11:08Z mike $"
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
@@ -141,7 +141,7 @@ cupsdUpdateQuota(
     if (attr->values[0].integer < curtime)
     {
       if (JobAutoPurge)
-        cupsdCancelJob(job, 1);
+        cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
 
       continue;
     }
@@ -166,7 +166,7 @@ cupsdUpdateQuota(
  * 'add_quota()' - Add a quota record for this printer and user.
  */
 
-cupsd_quota_t *				/* O - Quota data */
+static cupsd_quota_t *			/* O - Quota data */
 add_quota(cupsd_printer_t *p,		/* I - Printer */
           const char      *username)	/* I - User */
 {
@@ -209,7 +209,7 @@ compare_quotas(const cupsd_quota_t *q1,	/* I - First quota record */
  * 'find_quota()' - Find a quota record.
  */
 
-cupsd_quota_t *				/* O - Quota data */
+static cupsd_quota_t *			/* O - Quota data */
 find_quota(cupsd_printer_t *p,		/* I - Printer */
            const char      *username)	/* I - User */
 {
@@ -230,5 +230,5 @@ find_quota(cupsd_printer_t *p,		/* I - Printer */
 
 
 /*
- * End of "$Id: quotas.c 5305 2006-03-18 03:05:12Z mike $".
+ * End of "$Id: quotas.c 5970 2006-09-19 20:11:08Z mike $".
  */

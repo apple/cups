@@ -204,6 +204,9 @@ testmime.o: ../cups/file.h ../cups/dir.h
 testspeed.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 testspeed.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 testspeed.o: ../cups/language.h ../cups/debug.h
+testsub.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
+testsub.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testsub.o: ../cups/debug.h ../cups/string.h ../config.h
 util.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 util.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 util.o: ../cups/file.h ../cups/string.h ../config.h

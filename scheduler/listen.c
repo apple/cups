@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c 5724 2006-07-12 19:42:35Z mike $"
+ * "$Id: listen.c 5970 2006-09-19 20:11:08Z mike $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -352,7 +352,8 @@ cupsdStartListening(void)
   if (!LocalPort && !have_domain)
   {
     cupsdLogMessage(CUPSD_LOG_EMERG,
-                    "No Listen or Port lines were found to allow access via localhost!");
+                    "No Listen or Port lines were found to allow access via "
+		    "localhost!");
 
    /*
     * Commit suicide...
@@ -386,7 +387,9 @@ cupsdStartListening(void)
   }
 
   cupsdSetEnv("CUPS_ENCRYPTION", encryptions[LocalEncryption]);
-  cupsdSetEnvf("IPP_PORT", "%d", LocalPort);
+
+  if (LocalPort)
+    cupsdSetEnvf("IPP_PORT", "%d", LocalPort);
 
  /*
   * Resume listening for connections...
@@ -441,5 +444,5 @@ cupsdStopListening(void)
 
 
 /*
- * End of "$Id: listen.c 5724 2006-07-12 19:42:35Z mike $".
+ * End of "$Id: listen.c 5970 2006-09-19 20:11:08Z mike $".
  */

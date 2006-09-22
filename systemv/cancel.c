@@ -1,5 +1,5 @@
 /*
- * "$Id: cancel.c 5833 2006-08-16 20:05:58Z mike $"
+ * "$Id: cancel.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
@@ -60,7 +60,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   ipp_op_t	op;			/* Operation */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Setup to cancel individual print jobs...
@@ -392,5 +392,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: cancel.c 5833 2006-08-16 20:05:58Z mike $".
+ * End of "$Id: cancel.c 5926 2006-09-05 20:45:47Z mike $".
  */

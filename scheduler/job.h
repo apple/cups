@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h 5833 2006-08-16 20:05:58Z mike $"
+ * "$Id: job.h 5970 2006-09-19 20:11:08Z mike $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -93,7 +93,8 @@ VAR int			JobRetryLimit	VALUE(5),
  */
 
 extern cupsd_job_t	*cupsdAddJob(int priority, const char *dest);
-extern void		cupsdCancelJob(cupsd_job_t *job, int purge);
+extern void		cupsdCancelJob(cupsd_job_t *job, int purge,
+			               ipp_jstate_t newstate);
 extern void		cupsdCancelJobs(const char *dest, const char *username,
 			                int purge);
 extern void		cupsdCheckJobs(void);
@@ -121,5 +122,5 @@ extern void		cupsdUpdateJob(cupsd_job_t *job);
 
 
 /*
- * End of "$Id: job.h 5833 2006-08-16 20:05:58Z mike $".
+ * End of "$Id: job.h 5970 2006-09-19 20:11:08Z mike $".
  */

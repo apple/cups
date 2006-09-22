@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5898 2006-08-28 18:54:10Z mike $"
+ * "$Id: client.c 5972 2006-09-19 20:44:07Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -678,12 +678,14 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
  * 'cupsdFlushHeader()' - Flush the header fields to the client.
  */
 
-void
+int					/* I - Bytes written or -1 on error */
 cupsdFlushHeader(cupsd_client_t *con)	/* I - Client to flush to */
 {
-  httpFlushWrite(HTTP(con));
+  int bytes = httpFlushWrite(HTTP(con));
 
   con->http.data_encoding = HTTP_ENCODE_LENGTH;
+
+  return (bytes);
 }
 
 
@@ -1038,7 +1040,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
-	cupsdFlushHeader(con);
+
+	if (cupsdFlushHeader(con) < 0)
+	  return (cupsdCloseClient(con));
 
         encrypt_client(con);
 #else
@@ -1053,7 +1057,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST, PUT\r\n");
       httpPrintf(HTTP(con), "Content-Length: 0\r\n");
       httpPrintf(HTTP(con), "\r\n");
-      cupsdFlushHeader(con);
+
+      if (cupsdFlushHeader(con) < 0)
+	return (cupsdCloseClient(con));
     }
     else if (!is_path_absolute(con->uri))
     {
@@ -1081,7 +1087,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
-	cupsdFlushHeader(con);
+
+	if (cupsdFlushHeader(con) < 0)
+	  return (cupsdCloseClient(con));
 
         encrypt_client(con);
 #else
@@ -1122,7 +1130,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	  httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	  httpPrintf(HTTP(con), "\r\n");
-	  cupsdFlushHeader(con);
+
+	  if (cupsdFlushHeader(con) < 0)
+	    return (cupsdCloseClient(con));
 	}
       }
 
@@ -1556,7 +1566,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (httpPrintf(HTTP(con), "\r\n") < 0)
 		return (cupsdCloseClient(con));
 
-	      cupsdFlushHeader(con);
+	      if (cupsdFlushHeader(con) < 0)
+		return (cupsdCloseClient(con));
 
               cupsdLogRequest(con, HTTP_OK);
 	    }
@@ -1621,7 +1632,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
             if (httpPrintf(HTTP(con), "\r\n") < 0)
 	      return (cupsdCloseClient(con));
 
-	    cupsdFlushHeader(con);
+	    if (cupsdFlushHeader(con) < 0)
+	      return (cupsdCloseClient(con));
 
             con->http.state = HTTP_WAITING;
             break;
@@ -2096,7 +2108,8 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   else if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
 
-  cupsdFlushHeader(con);
+  if (cupsdFlushHeader(con) < 0)
+    return (0);
 
   con->http.state = HTTP_WAITING;
 
@@ -2117,6 +2130,16 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
   * Send the HTTP status header...
   */
 
+  if (code == HTTP_CONTINUE)
+  {
+   /*
+    * 100-continue doesn't send any headers...
+    */
+
+    return (httpPrintf(HTTP(con), "HTTP/%d.%d 100 Continue\r\n\r\n",
+		       con->http.version / 100, con->http.version % 100) > 0);
+  }
+
   httpFlushWrite(HTTP(con));
 
   con->http.data_encoding = HTTP_ENCODE_FIELDS;
@@ -2124,22 +2147,6 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
   if (httpPrintf(HTTP(con), "HTTP/%d.%d %d %s\r\n", con->http.version / 100,
                  con->http.version % 100, code, httpStatus(code)) < 0)
     return (0);
-
-  if (code == HTTP_CONTINUE)
-  {
-   /*
-    * 100-continue doesn't send any headers...
-    */
-
-    if (httpPrintf(HTTP(con), "\r\n") < 0)
-      return (0);
-    else
-    {
-      cupsdFlushHeader(con);
-      return (1);
-    }
-  }
-
   if (httpPrintf(HTTP(con), "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
     return (0);
   if (ServerHeader)
@@ -2262,7 +2269,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
   if (con->response != NULL)
   {
-    ipp_state = ippWrite(&(con->http), con->response);
+    ipp_state = ippWrite(HTTP(con), con->response);
     bytes     = ipp_state != IPP_ERROR && ipp_state != IPP_DATA;
   }
   else if ((bytes = read(con->file, buf, sizeof(buf) - 1)) > 0)
@@ -2301,14 +2308,20 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
             if (!strncasecmp(buf, "Location:", 9))
 	    {
   	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL);
+	      con->sent_header = 2;
+
 	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
 		return (0);
 	    }
 	    else if (!strncasecmp(buf, "Status:", 7))
+	    {
   	      cupsdSendError(con, (http_status_t)atoi(buf + 7));
+	      con->sent_header = 2;
+	    }
 	    else
 	    {
   	      cupsdSendHeader(con, HTTP_OK, NULL);
+	      con->sent_header = 1;
 
 	      if (con->http.version == HTTP_1_1)
 	      {
@@ -2316,8 +2329,6 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 		  return (0);
 	      }
             }
-
-	    con->sent_header = 1;
 	  }
 
 	  if (strncasecmp(buf, "Status:", 7))
@@ -2342,7 +2353,11 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	  {
 	    con->got_fields = 1;
 
-            cupsdFlushHeader(con);
+            if (cupsdFlushHeader(con) < 0)
+	    {
+	      cupsdCloseClient(con);
+	      return (0);
+	    }
 
 	    if (con->http.version == HTTP_1_1)
 	      con->http.data_encoding = HTTP_ENCODE_CHUNKED;
@@ -2400,9 +2415,9 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
     httpFlushWrite(HTTP(con));
 
-    if (con->http.data_encoding == HTTP_ENCODE_CHUNKED)
+    if (con->http.data_encoding == HTTP_ENCODE_CHUNKED && con->sent_header == 1)
     {
-      if (httpPrintf(HTTP(con), "0\r\n\r\n") < 0)
+      if (httpWrite2(HTTP(con), "", 0) < 0)
       {
         cupsdCloseClient(con);
 	return (0);
@@ -4152,7 +4167,8 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
   if (httpPrintf(HTTP(con), "\r\n") < 0)
     return (0);
 
-  cupsdFlushHeader(con);
+  if (cupsdFlushHeader(con) < 0)
+    return (0);
 
   con->http.data_encoding  = HTTP_ENCODE_LENGTH;
   con->http.data_remaining = filestats->st_size;
@@ -4172,5 +4188,5 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5898 2006-08-28 18:54:10Z mike $".
+ * End of "$Id: client.c 5972 2006-09-19 20:44:07Z mike $".
  */

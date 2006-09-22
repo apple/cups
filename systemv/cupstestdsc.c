@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestdsc.c 5838 2006-08-17 14:41:42Z mike $"
+ * "$Id: cupstestdsc.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   DSC test program for the Common UNIX Printing System (CUPS).
  *
@@ -65,7 +65,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_files;		/* Number of files tested */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Collect command-line arguments...
@@ -452,5 +452,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestdsc.c 5838 2006-08-17 14:41:42Z mike $".
+ * End of "$Id: cupstestdsc.c 5926 2006-09-05 20:45:47Z mike $".
  */

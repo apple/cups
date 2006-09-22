@@ -1,5 +1,5 @@
 /*
- * "$Id: interpret.c 5513 2006-05-11 18:07:25Z mike $"
+ * "$Id: interpret.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
@@ -200,6 +200,9 @@ cupsRasterInterpretPPD(
     top    = size->top;
 
     strlcpy(h->cupsPageSizeName, size->name, sizeof(h->cupsPageSizeName));
+
+    h->cupsPageSize[0] = size->width;
+    h->cupsPageSize[1] = size->length;
   }
   else
   {
@@ -608,5 +611,5 @@ exec_code(
 
 
 /*
- * End of "$Id: interpret.c 5513 2006-05-11 18:07:25Z mike $".
+ * End of "$Id: interpret.c 5926 2006-09-05 20:45:47Z mike $".
  */

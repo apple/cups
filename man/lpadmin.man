@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpadmin.man 5736 2006-07-13 19:59:36Z mike $"
+.\" "$Id: lpadmin.man 5970 2006-09-19 20:11:08Z mike $"
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -127,7 +127,7 @@ Sets the binary communications program to use when printing,
 .br
 Sets the error policy to be used when the printer backend is 
 unable to send the job to the printer. The name must be one of 
-"cancel-job", "retry-job" or "stop-printer". The default error 
+"abort-job", "retry-job" or "stop-printer". The default error 
 policy is "stop-printer".
 .TP 5
 -o printer-is-shared=true/false
@@ -205,5 +205,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
 .\"
-.\" End of "$Id: lpadmin.man 5736 2006-07-13 19:59:36Z mike $".
+.\" End of "$Id: lpadmin.man 5970 2006-09-19 20:11:08Z mike $".
 .\"

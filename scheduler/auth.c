@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 5840 2006-08-17 14:55:30Z mike $"
+ * "$Id: auth.c 5948 2006-09-12 13:58:39Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -482,13 +482,13 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
             strlcpy(data.username, username, sizeof(data.username));
 	    strlcpy(data.password, password, sizeof(data.password));
 
-#  ifdef __sun
+#  if defined(__sun) || defined(__hpux)
 	    pamdata.conv        = (int (*)(int, struct pam_message **,
 	                                   struct pam_response **,
 					   void *))pam_func;
 #  else
 	    pamdata.conv        = pam_func;
-#  endif /* __sun */
+#  endif /* __sun || __hpux */
 	    pamdata.appdata_ptr = &data;
 
 #  ifdef __hpux
@@ -2170,5 +2170,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 5840 2006-08-17 14:55:30Z mike $".
+ * End of "$Id: auth.c 5948 2006-09-12 13:58:39Z mike $".
  */

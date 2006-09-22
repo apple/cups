@@ -1,5 +1,5 @@
 /*
- * "$Id: lpinfo.c 5833 2006-08-16 20:05:58Z mike $"
+ * "$Id: lpinfo.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   "lpinfo" command for the Common UNIX Printing System (CUPS).
  *
@@ -62,7 +62,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		long_status;		/* Long listing? */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
   http        = NULL;
   long_status = 0;
@@ -436,5 +436,5 @@ show_models(http_t *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpinfo.c 5833 2006-08-16 20:05:58Z mike $".
+ * End of "$Id: lpinfo.c 5926 2006-09-05 20:45:47Z mike $".
  */

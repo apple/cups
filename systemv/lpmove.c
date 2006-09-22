@@ -1,5 +1,5 @@
 /*
- * "$Id: lpmove.c 5833 2006-08-16 20:05:58Z mike $"
+ * "$Id: lpmove.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
@@ -66,7 +66,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*dest;			/* New destination */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
   dest      = NULL;
   dests     = NULL;
@@ -235,5 +235,5 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpmove.c 5833 2006-08-16 20:05:58Z mike $".
+ * End of "$Id: lpmove.c 5926 2006-09-05 20:45:47Z mike $".
  */

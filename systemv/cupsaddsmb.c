@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsaddsmb.c 5833 2006-08-16 20:05:58Z mike $"
+ * "$Id: cupsaddsmb.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
@@ -78,7 +78,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_dest_t	*dests;			/* Printers */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Parse command-line arguments...
@@ -294,5 +294,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupsaddsmb.c 5833 2006-08-16 20:05:58Z mike $".
+ * End of "$Id: cupsaddsmb.c 5926 2006-09-05 20:45:47Z mike $".
  */

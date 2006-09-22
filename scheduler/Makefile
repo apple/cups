@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5868 2006-08-23 19:39:39Z mike $"
+# "$Id: Makefile 5940 2006-09-11 18:30:09Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -62,6 +62,7 @@ OBJS	=	\
 		testlpd.o \
 		testmime.o \
 		testspeed.o \
+		testsub.o \
 		util.o
 TARGETS	=	\
 		cupsd \
@@ -73,7 +74,8 @@ TARGETS	=	\
 		testdirsvc \
 		testlpd \
 		testmime \
-		testspeed
+		testspeed \
+		testsub
 
 
 #
@@ -283,6 +285,16 @@ testspeed:	testspeed.o ../cups/libcups.a
 
 
 #
+# Make the test program, "testsub".
+#
+
+testsub:	testsub.o ../cups/libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o testsub testsub.o ../cups/libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
 # Dependencies...
 #
   
@@ -290,5 +302,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5868 2006-08-23 19:39:39Z mike $".
+# End of "$Id: Makefile 5940 2006-09-11 18:30:09Z mike $".
 #

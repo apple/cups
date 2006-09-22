@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 5900 2006-08-28 19:26:39Z mike $"
+# "$Id: cups.list.in 5964 2006-09-19 16:27:29Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -29,7 +29,12 @@
 %vendor Easy Software Products
 %license LICENSE.txt
 %readme packaging/cups.readme
+%format rpm
+# Red Hat and their epochs...
+%version 1:@CUPS_VERSION@
+%format !rpm
 %version @CUPS_VERSION@
+%format all
 %description The Common UNIX Printing System provides a portable printing
 %description layer for UNIX(r) operating systems.  It has been developed by
 %description Easy Software Products to promote a standard printing solution
@@ -364,8 +369,10 @@ f 0644 root sys $DATADIR/banners/standard data/standard
 f 0644 root sys $DATADIR/banners/topsecret data/topsecret
 f 0644 root sys $DATADIR/banners/unclassified data/unclassified
 
+d 0755 root sys $DATADIR/charmaps -
+f 0644 root sys $DATADIR/charmaps data/*.txt
+
 d 0755 root sys $DATADIR/charsets -
-f 0644 root sys $DATADIR/charsets data/*.txt
 f 0644 root sys $DATADIR/charsets/windows-874 data/windows-874
 f 0644 root sys $DATADIR/charsets/windows-1250 data/windows-1250
 f 0644 root sys $DATADIR/charsets/windows-1251 data/windows-1251
@@ -443,7 +450,12 @@ c 0644 root sys $PAMDIR/cups conf/@PAMFILE@
 # Developer files
 f 0755 root sys $BINDIR/cups-config cups-config
 d 0755 root sys $INCLUDEDIR/cups -
+f 0644 root sys $INCLUDEDIR/cups/adminutil.h cups/adminutil.h
+f 0644 root sys $INCLUDEDIR/cups/array.h cups/array.h
+f 0644 root sys $INCLUDEDIR/cups/backend.h cups/backend.h
 f 0644 root sys $INCLUDEDIR/cups/cups.h cups/cups.h
+f 0644 root sys $INCLUDEDIR/cups/dir.h cups/dir.h
+f 0644 root sys $INCLUDEDIR/cups/file.h cups/file.h
 f 0644 root sys $INCLUDEDIR/cups/http.h cups/http.h
 f 0644 root sys $INCLUDEDIR/cups/image.h filter/image.h
 f 0644 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
@@ -451,6 +463,7 @@ f 0644 root sys $INCLUDEDIR/cups/language.h cups/language.h
 f 0644 root sys $INCLUDEDIR/cups/md5.h cups/md5.h
 f 0644 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
 f 0644 root sys $INCLUDEDIR/cups/raster.h filter/raster.h
+f 0644 root sys $INCLUDEDIR/cups/transcode.h cups/transcode.h
 
 %if INSTALLSTATIC
 f 0644 root sys $LIBDIR/libcups.a cups/libcups.a
@@ -589,5 +602,5 @@ f 0644 root sys $XINETD/cups-lpd init/cups-lpd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 5900 2006-08-28 19:26:39Z mike $".
+# End of "$Id: cups.list.in 5964 2006-09-19 16:27:29Z mike $".
 #

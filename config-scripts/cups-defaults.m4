@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-defaults.m4 5804 2006-08-04 16:51:58Z mike $"
+dnl "$Id: cups-defaults.m4 5980 2006-09-21 19:01:55Z mike $"
 dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
@@ -225,7 +225,7 @@ AC_ARG_WITH(printcap, [  --with-printcap         set default printcap file],
 	default_printcap="$withval",
 	default_printcap="default")
 
-if test x$enable_printcap != xno -a x$default_printcap != xno; then
+if test x$default_printcap != xno; then
 	if test "x$default_printcap" = "xdefault"; then
 		case $uname in
 			Darwin*)
@@ -242,6 +242,8 @@ if test x$enable_printcap != xno -a x$default_printcap != xno; then
 				CUPS_DEFAULT_PRINTCAP="/etc/printcap"
 				;;
 		esac
+	else
+		CUPS_DEFAULT_PRINTCAP="$default_printcap"
 	fi
 else
 	CUPS_DEFAULT_PRINTCAP=""
@@ -250,5 +252,5 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTCAP, "$CUPS_DEFAULT_PRINTCAP")
 
 dnl
-dnl End of "$Id: cups-defaults.m4 5804 2006-08-04 16:51:58Z mike $".
+dnl End of "$Id: cups-defaults.m4 5980 2006-09-21 19:01:55Z mike $".
 dnl

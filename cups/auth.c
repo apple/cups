@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 5559 2006-05-21 13:59:42Z mike $"
+ * "$Id: auth.c 5961 2006-09-16 19:08:36Z mike $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -81,6 +81,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
                 http, method, resource));
   DEBUG_printf(("cupsDoAuthentication: digest_tries=%d, userpass=\"%s\"\n",
                 http->digest_tries, http->userpass));
+  DEBUG_printf(("cupsDoAuthentication: WWW-Authenticate=\"%s\"\n",
+                httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE)));
 
  /*
   * Clear the current authentication string...
@@ -249,5 +251,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c 5559 2006-05-21 13:59:42Z mike $".
+ * End of "$Id: auth.c 5961 2006-09-16 19:08:36Z mike $".
  */

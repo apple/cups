@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 5591 2006-05-26 19:51:59Z mike $"
+ * "$Id: socket.c 5948 2006-09-12 13:58:39Z mike $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -340,11 +340,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       FD_ZERO(&input);
       FD_SET(device_fd, &input);
 
-#ifdef __hpux
-      if (select(device_fd + 1, (int *)&input, NULL, NULL, &timeout) > 0)
-#else
       if (select(device_fd + 1, &input, NULL, NULL, &timeout) > 0)
-#endif /* __hpux */
       {
        /*
 	* Grab the data coming back and spit it out to stderr...
@@ -387,5 +383,5 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: socket.c 5591 2006-05-26 19:51:59Z mike $".
+ * End of "$Id: socket.c 5948 2006-09-12 13:58:39Z mike $".
  */

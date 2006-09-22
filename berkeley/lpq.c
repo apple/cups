@@ -1,5 +1,5 @@
 /*
- * "$Id: lpq.c 5838 2006-08-17 14:41:42Z mike $"
+ * "$Id: lpq.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
@@ -78,7 +78,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_dest_t	*dests;			/* Destinations */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Check for command-line options...
@@ -676,5 +676,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c 5838 2006-08-17 14:41:42Z mike $".
+ * End of "$Id: lpq.c 5926 2006-09-05 20:45:47Z mike $".
  */

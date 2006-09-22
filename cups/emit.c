@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c 5700 2006-06-26 19:20:39Z mike $"
+ * "$Id: emit.c 5934 2006-09-11 14:54:40Z mike $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -391,8 +391,8 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
       title = ptr + 1;
 
    /*
-    * Replace double quotes with single quotes so that the title
-    * does not cause a PJL syntax error.
+    * Replace double quotes with single quotes and 8-bit characters with
+    * question marks so that the title does not cause a PJL syntax error.
     */
 
     strlcpy(temp, title, sizeof(temp));
@@ -400,6 +400,8 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     for (ptr = temp; *ptr; ptr ++)
       if (*ptr == '\"')
         *ptr = '\'';
+      else if (*ptr & 128)
+        *ptr = '?';
 
    /*
     * Send PJL JOB and PJL RDYMSG commands before we enter PostScript mode...
@@ -940,5 +942,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c 5700 2006-06-26 19:20:39Z mike $".
+ * End of "$Id: emit.c 5934 2006-09-11 14:54:40Z mike $".
  */

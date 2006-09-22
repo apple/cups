@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c 5833 2006-08-16 20:05:58Z mike $"
+ * "$Id: cupstestppd.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -113,7 +113,7 @@ main(int  argc,			/* I - Number of command-line arguments */
                                 "JCL", "PAGE", "PROLOG" };
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Display PPD files for each file listed on the command-line...
@@ -1790,5 +1790,5 @@ usage(void)
 
 
 /*
- * End of "$Id: cupstestppd.c 5833 2006-08-16 20:05:58Z mike $".
+ * End of "$Id: cupstestppd.c 5926 2006-09-05 20:45:47Z mike $".
  */

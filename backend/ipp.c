@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5889 2006-08-24 21:44:35Z mike $"
+ * "$Id: ipp.c 5956 2006-09-13 18:22:34Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -855,15 +855,15 @@ main(int  argc,				/* I - Number of command-line args */
 	                            num_options, &options);
     }
 
-    if (copies_sup)
+    if (copies_sup && version > 0)
     {
      /*
       * Only send options if the destination printer supports the copies
-      * attribute.  This is a hack for the HP JetDirect implementation of
-      * IPP, which does not accept extension attributes and incorrectly
-      * reports a client-error-bad-request error instead of the
-      * successful-ok-unsupported-attributes status.  In short, at least
-      * some HP implementations of IPP are non-compliant.
+      * attribute and IPP/1.1.  This is a hack for the HP and Lexmark
+      * implementations of IPP, which do not accept extension attributes
+      * and incorrectly report a client-error-bad-request error instead of
+      * the successful-ok-unsupported-attributes status.  In short, at least
+      * some HP and Lexmark implementations of IPP are non-compliant.
       */
 
       cupsEncodeOptions(request, num_options, options);
@@ -877,7 +877,7 @@ main(int  argc,				/* I - Number of command-line args */
    /*
     * If copies aren't supported, then we are likely dealing with an HP
     * JetDirect.  The HP IPP implementation seems to close the connection
-    * after every request (that is, it does *not* implement HTTP Keep-
+    * after every request - that is, it does *not* implement HTTP Keep-
     * Alive, which is REQUIRED by HTTP/1.1...
     */
 
@@ -907,6 +907,18 @@ main(int  argc,				/* I - Number of command-line args */
       {
 	fputs("INFO: Printer is busy; retrying print job...\n", stderr);
 	sleep(10);
+      }
+      else if ((ipp_status == IPP_BAD_REQUEST ||
+	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version == 1)
+      {
+       /*
+	* Switch to IPP/1.0...
+	*/
+
+	fputs("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n",
+	      stderr);
+	version = 0;
+	httpReconnect(http);
       }
       else
         fprintf(stderr, "ERROR: Print file was not accepted (%s)!\n",
@@ -1641,5 +1653,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 5889 2006-08-24 21:44:35Z mike $".
+ * End of "$Id: ipp.c 5956 2006-09-13 18:22:34Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c 5833 2006-08-16 20:05:58Z mike $"
+ * "$Id: lp.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -117,7 +117,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     return (0);
 #endif /* __sun */
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
   silent      = 0;
   printer     = NULL;
@@ -840,5 +840,5 @@ sighandler(int s)			/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c 5833 2006-08-16 20:05:58Z mike $".
+ * End of "$Id: lp.c 5926 2006-09-05 20:45:47Z mike $".
  */

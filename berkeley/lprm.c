@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c 5878 2006-08-24 15:55:42Z mike $"
+ * "$Id: lprm.c 5926 2006-09-05 20:45:47Z mike $"
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
@@ -61,7 +61,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   http_encryption_t encryption;	/* Encryption? */
 
 
-  _cupsSetLocale();
+  _cupsSetLocale(argv);
 
  /*
   * Setup to cancel individual print jobs...
@@ -294,5 +294,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c 5878 2006-08-24 15:55:42Z mike $".
+ * End of "$Id: lprm.c 5926 2006-09-05 20:45:47Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 5889 2006-08-24 21:44:35Z mike $"
+ * "$Id: http.c 5961 2006-09-16 19:08:36Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -222,7 +222,10 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
   if (http)
   {
     memset(http->fields, 0, sizeof(http->fields));
-    httpSetField(http, HTTP_FIELD_HOST, http->hostname);
+    if (http->hostname[0] == '/')
+      httpSetField(http, HTTP_FIELD_HOST, "localhost");
+    else
+      httpSetField(http, HTTP_FIELD_HOST, http->hostname);
 
     http->expect = (http_status_t)0;
   }
@@ -1893,7 +1896,7 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       httpFlushWrite(http);
     }
 
-    if ((length + http->wused) < sizeof(http->wbuffer))
+    if ((length + http->wused) <= sizeof(http->wbuffer))
     {
      /*
       * Write to buffer...
@@ -2826,5 +2829,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 5889 2006-08-24 21:44:35Z mike $".
+ * End of "$Id: http.c 5961 2006-09-16 19:08:36Z mike $".
  */

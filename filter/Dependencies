@@ -90,7 +90,7 @@ interpret.o: ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
 interpret.o: ../cups/array.h ../cups/file.h ../cups/language.h
 raster.o: raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 raster.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-raster.o: ../cups/string.h ../config.h
+raster.o: ../cups/debug.h ../cups/string.h ../config.h
 form-main.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-main.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 form-main.o: ../cups/language.h ../cups/language.h ../cups/string.h
@@ -118,9 +118,9 @@ pstops.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 pstops.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 pstops.o: ../cups/language.h ../cups/string.h ../config.h ../cups/file.h
 pstops.o: ../cups/array.h
-raster.o: raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-raster.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-raster.o: ../cups/string.h ../config.h
+rasterbench.o: raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rasterbench.o: ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+rasterbench.o: ../cups/language.h
 rastertoepson.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 rastertoepson.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
 rastertoepson.o: ../cups/language.h ../cups/ppd.h ../cups/string.h
@@ -237,7 +237,7 @@ interpret.32.o: interpret.c  ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/
 interpret.32.o: interpret.c  ../cups/array.h ../cups/file.h ../cups/language.h
 raster.32.o: raster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 raster.32.o: raster.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-raster.32.o: raster.c  ../cups/string.h ../config.h
+raster.32.o: raster.c  ../cups/debug.h ../cups/string.h ../config.h
 form-main.32.o: form-main.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-main.32.o: form-main.c  ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 form-main.32.o: form-main.c  ../cups/language.h ../cups/language.h ../cups/string.h
@@ -265,9 +265,9 @@ pstops.32.o: pstops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../c
 pstops.32.o: pstops.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 pstops.32.o: pstops.c  ../cups/language.h ../cups/string.h ../config.h ../cups/file.h
 pstops.32.o: pstops.c  ../cups/array.h
-raster.32.o: raster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-raster.32.o: raster.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-raster.32.o: raster.c  ../cups/string.h ../config.h
+rasterbench.32.o: rasterbench.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rasterbench.32.o: rasterbench.c  ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+rasterbench.32.o: rasterbench.c  ../cups/language.h
 rastertoepson.32.o: rastertoepson.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 rastertoepson.32.o: rastertoepson.c  ../cups/ppd.h ../cups/array.h ../cups/file.h
 rastertoepson.32.o: rastertoepson.c  ../cups/language.h ../cups/ppd.h ../cups/string.h
@@ -384,7 +384,7 @@ interpret.64.o: interpret.c  ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/
 interpret.64.o: interpret.c  ../cups/array.h ../cups/file.h ../cups/language.h
 raster.64.o: raster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 raster.64.o: raster.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-raster.64.o: raster.c  ../cups/string.h ../config.h
+raster.64.o: raster.c  ../cups/debug.h ../cups/string.h ../config.h
 form-main.64.o: form-main.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-main.64.o: form-main.c  ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 form-main.64.o: form-main.c  ../cups/language.h ../cups/language.h ../cups/string.h
@@ -412,9 +412,9 @@ pstops.64.o: pstops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../c
 pstops.64.o: pstops.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 pstops.64.o: pstops.c  ../cups/language.h ../cups/string.h ../config.h ../cups/file.h
 pstops.64.o: pstops.c  ../cups/array.h
-raster.64.o: raster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
-raster.64.o: raster.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-raster.64.o: raster.c  ../cups/string.h ../config.h
+rasterbench.64.o: rasterbench.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rasterbench.64.o: rasterbench.c  ../cups/md5.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+rasterbench.64.o: rasterbench.c  ../cups/language.h
 rastertoepson.64.o: rastertoepson.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/md5.h
 rastertoepson.64.o: rastertoepson.c  ../cups/ppd.h ../cups/array.h ../cups/file.h
 rastertoepson.64.o: rastertoepson.c  ../cups/language.h ../cups/ppd.h ../cups/string.h
