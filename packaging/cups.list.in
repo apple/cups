@@ -77,7 +77,7 @@
 %format all
 
 %subpackage libs
-%description Common UNIX Printing System - shared libraries
+%description Shared libraries
 %format rpm
 %provides cups-libs 1:@CUPS_VERSION@
 %format deb
@@ -88,7 +88,7 @@
 %format all
 
 %subpackage devel
-%description Common UNIX Printing System - development environment
+%description Development environment
 %format rpm
 %provides cups-devel 1:@CUPS_VERSION@
 %format deb
@@ -97,25 +97,25 @@
 %format all
 
 %subpackage lpd
-%description Common UNIX Printing System - LPD support
+%description LPD support
 %format rpm
 %provides cups-lpd 1:@CUPS_VERSION@
 %format all
 
 %subpackage de
-%description Common UNIX Printing System - German support
+%description German support
 
 %subpackage es
-%description Common UNIX Printing System - Spanish support
+%description Spanish support
 
 %subpackage ja
-%description Common UNIX Printing System - Japanese support
+%description Japanese support
 
 %subpackage pl
-%description Common UNIX Printing System - Polish support
+%description Polish support
 
 %subpackage sv
-%description Common UNIX Printing System - Swedish support
+%description Swedish support
 
 %subpackage
 
