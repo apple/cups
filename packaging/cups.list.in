@@ -42,14 +42,19 @@
 %description Berkeley command-line interfaces. 
 
 %format rpm
-%provides cups 1:@CUPS_VERSION@
-%provides lpd, lpr, LPRng
-%replaces lpd, lpr, LPRng
+%provides lpd
+%provides lpr
+%provides LPRng
+%replaces lpd
+%replaces lpr
+%replaces LPRng
+%requires cups-libs 1:@CUPS_VERSION@
 
 %format deb
 %provides cupsys
 %provides cupsys-client
 %provides cupsys-bsd
+%requires cups-libs
 
 %format pkg
 %replaces SUNWlpmsg LP Alerts
@@ -73,13 +78,15 @@
 %incompat maint*.print_*.* 0 0 1289999999 1289999999
 %incompat print 0 0 1289999999 1289999999
 %incompat fw_cups 0 0 1289999999 1289999999
+%requires cups.sw.libs
+
+%format portable
+%requires cups-libs
 
 %format all
 
 %subpackage libs
 %description Shared libraries
-%format rpm
-%provides cups-libs 1:@CUPS_VERSION@
 %format deb
 %provides libcups1
 %provides libcupsys2
@@ -89,8 +96,6 @@
 
 %subpackage devel
 %description Development environment
-%format rpm
-%provides cups-devel 1:@CUPS_VERSION@
 %format deb
 %provides libcupsys2-dev
 %provides libcupsimage2-dev
@@ -98,9 +103,6 @@
 
 %subpackage lpd
 %description LPD support
-%format rpm
-%provides cups-lpd 1:@CUPS_VERSION@
-%format all
 
 %subpackage de
 %description German support
