@@ -235,7 +235,7 @@ check:	all
 # Make software distributions using EPM (http://www.easysw.com/epm/)...
 #
 
-EPMFLAGS	=	-v --output-dir dist
+EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 
 aix bsd deb depot inst pkg rpm setld slackware swinstall tardist:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
