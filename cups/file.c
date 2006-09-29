@@ -377,7 +377,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
 int					/* O - 0 on success, -1 on error */
 cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
 {
-  size_t	bytes;			/* Bytes to write */
+  ssize_t	bytes;			/* Bytes to write */
 
 
   DEBUG_printf(("cupsFileFlush(fp=%p)\n", fp));
@@ -991,7 +991,7 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 	       ...)			/* I - Additional args as necessary */
 {
   va_list	ap;			/* Argument list */
-  size_t	bytes;			/* Formatted size */
+  ssize_t	bytes;			/* Formatted size */
   char		buf[8192];		/* Formatted text */
 
 
@@ -1090,7 +1090,7 @@ int					/* O - Number of bytes written or -1 */
 cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
              const char  *s)		/* I - String to write */
 {
-  size_t	bytes;			/* Bytes to write */
+  ssize_t	bytes;			/* Bytes to write */
 
 
  /*
@@ -1149,8 +1149,8 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
              char        *buf,		/* O - Buffer */
 	     size_t      bytes)		/* I - Number of bytes to read */
 {
-  size_t	total,			/* Total bytes read */
-		count;			/* Bytes read */
+  size_t	total;			/* Total bytes read */
+  ssize_t	count;			/* Bytes read */
 
 
   DEBUG_printf(("cupsFileRead(fp=%p, buf=%p, bytes=%ld)\n", fp, buf,
@@ -1274,7 +1274,7 @@ off_t					/* O - New file position or -1 */
 cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
              off_t       pos)		/* I - Position in file */
 {
-  size_t	bytes;			/* Number bytes in buffer */
+  ssize_t	bytes;			/* Number bytes in buffer */
 
 
   DEBUG_printf(("cupsFileSeek(fp=%p, pos=" CUPS_LLFMT ")\n", fp, pos));
@@ -2030,8 +2030,8 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
            const char  *buf,		/* I - Buffer */
 	   size_t      bytes)		/* I - Number bytes */
 {
-  size_t	total,			/* Total bytes written */
-		count;			/* Count this time */
+  size_t	total;			/* Total bytes written */
+  ssize_t	count;			/* Count this time */
 
 
   DEBUG_printf(("cups_write(fp=%p, buf=%p, bytes=%ld)\n", fp, buf,

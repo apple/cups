@@ -1,6 +1,14 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.5
+
+	- The cupsFile functions didn't handle read/write errors
+	  properly (STR #1996)
+	- The DBUS support now works with older versions of the
+	  DBUS library.
+
+
 CHANGES IN CUPS V1.2.4
 
 	- The --with-printcap configure option did not work (STR
