@@ -231,12 +231,13 @@ case $uname in
 				AC_MSG_CHECKING(for DBUS)
 				if $PKGCONFIG --exists dbus-1; then
 					AC_MSG_RESULT(yes)
+					AC_DEFINE(HAVE_DBUS)
+					CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
+					CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
+					DBUSDIR="/etc/dbus-1/system.d"
 					AC_CHECK_LIB(dbus-1,
 					    dbus_message_iter_init_append,
-					    AC_DEFINE(HAVE_DBUS)
-					    CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
-					    CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
-					    DBUSDIR="/etc/dbus-1/system.d")
+					    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
 				else
 					AC_MSG_RESULT(no)
 				fi

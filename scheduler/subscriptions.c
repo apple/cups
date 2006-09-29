@@ -50,6 +50,11 @@
 #include "cupsd.h"
 #ifdef HAVE_DBUS
 #  include <dbus/dbus.h>
+#  ifdef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND
+#    define dbus_message_append_iter_init dbus_message_iter_init_append
+#    define dbus_message_iter_append_string(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_STRING, v)
+#    define dbus_message_iter_append_uint32(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_UINT32, v)
+#  endif /* HAVE_DBUS_MESSAGE_ITER_INIT_APPEND */
 #endif /* HAVE_DBUS */
 
 
@@ -1355,13 +1360,13 @@ cupsd_send_dbus(cupsd_eventmask_t event,/* I - Event to send */
   message = dbus_message_new_signal("/com/redhat/PrinterSpooler",
 				    "com.redhat.PrinterSpooler", what);
 
-  dbus_message_iter_init_append(message, &iter);
+  dbus_message_append_iter_init(message, &iter);
   if (dest)
-    dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &(dest->name));
+    dbus_message_iter_append_string(&iter, &(dest->name));
   if (job)
   {
-    dbus_message_iter_append_basic(&iter, DBUS_TYPE_UINT32, &(job->id));
-    dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &(job->username));
+    dbus_message_iter_append_uint32(&iter, &(job->id));
+    dbus_message_iter_append_string(&iter, &(job->username));
   }
 
   dbus_connection_send(con, message, NULL);

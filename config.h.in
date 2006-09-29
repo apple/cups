@@ -434,6 +434,7 @@
  */
 
 #undef HAVE_DBUS
+#undef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND
 
 
 /*
