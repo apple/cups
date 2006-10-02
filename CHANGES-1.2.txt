@@ -3,6 +3,18 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.5
 
+	- Updated the raw type rule to handle PJL within the
+	  first 4k of a print job (STR #1969)
+	- Added a partial Estonian translation (STR #1957)
+	- Clarified the documentation for the cupsd.conf @LOCAL
+	  and @IF(name) allow/deny functionality (STR #1992)
+	- The PostScript filters did not escape the Title and For
+	  comments in the print job header (STR #1988)
+	- The scheduler would use 100% CPU if browsing was
+	  disabled and the cupsd.conf file contained BrowsePoll
+	  lines (STR #1994)
+	- The cupsDirRead() function did not work properly on
+	  non-POSIX-compliant systems (STR #2001)
 	- The cupsFile functions didn't handle read/write errors
 	  properly (STR #1996)
 	- The DBUS support now works with older versions of the
