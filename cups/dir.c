@@ -347,10 +347,12 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
 cups_dentry_t *				/* O - Directory entry */
 cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 {
-  char		buffer[sizeof(struct dirent) + 1024];
-					/* Directory entry buffer */
   struct dirent	*entry;			/* Pointer to entry */
   char		filename[1024];		/* Full filename */
+#  ifdef HAVE_PTHREAD_H
+  char		buffer[sizeof(struct dirent) + 1024];
+					/* Directory entry buffer */
+#  endif /* HAVE_PTHREAD_H */
 
 
   DEBUG_printf(("cupsDirRead(dp=%p)\n", dp));
@@ -368,6 +370,11 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 
   for (;;)
   {
+#  ifdef HAVE_PTHREAD_H
+   /*
+    * Read the next entry using the reentrant version of readdir...
+    */
+
     if (readdir_r(dp->dir, (struct dirent *)buffer, &entry))
     {
       DEBUG_printf(("    readdir_r() failed - %s\n", strerror(errno)));
@@ -381,6 +388,25 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
     }
 
     DEBUG_printf(("    readdir_r() returned \"%s\"...\n", entry->d_name));
+
+#  else
+   /*
+    * Read the next entry using the original version of readdir...
+    */
+
+    if ((entry = readdir(dp->dir)) == NULL)
+    {
+      DEBUG_puts("    readdir() returned a NULL pointer!");
+      return (NULL);
+    }
+
+    DEBUG_printf(("    readdir() returned \"%s\"...\n", entry->d_name));
+
+#  endif /* HAVE_PTHREAD_H */
+
+   /*
+    * Skip "." and ".."...
+    */
 
     if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
       continue;
