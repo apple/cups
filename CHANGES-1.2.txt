@@ -5,7 +5,7 @@ CHANGES IN CUPS V1.2.5
 
 	- Updated the raw type rule to handle PJL within the
 	  first 4k of a print job (STR #1969)
-	- Added a partial Estonian translation (STR #1957)
+	- Added an Estonian translation (STR #1957)
 	- Clarified the documentation for the cupsd.conf @LOCAL
 	  and @IF(name) allow/deny functionality (STR #1992)
 	- The PostScript filters did not escape the Title and For
