@@ -154,8 +154,8 @@ application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 				string(0,<1B>@) \
 				(contains(0,128,<1B>%-12345X) + \
-				 (contains(0,1024,"LANGUAGE=PCL") \
-				  contains(0,1024,"LANGUAGE = PCL")))
+				 (contains(0,4096,"LANGUAGE=PCL") \
+				  contains(0,4096,"LANGUAGE = PCL")))
 
 ########################################################################
 #
