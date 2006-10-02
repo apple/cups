@@ -1062,7 +1062,7 @@ cupsdStartPolling(void)
   * Don't do anything if we aren't polling...
   */
 
-  if (NumPolled == 0)
+  if (NumPolled == 0 || BrowseSocket < 0)
   {
     PollPipe         = -1;
     PollStatusBuffer = NULL;
