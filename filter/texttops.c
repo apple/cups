@@ -208,8 +208,8 @@ WriteProlog(const char *title,		/* I - Title of job */
   printf("%%cupsRotation: %d\n", (Orientation & 3) * 90);
   puts("%%Creator: texttops/" CUPS_SVERSION);
   printf("%%%%CreationDate: %s\n", curdate);
-  printf("%%%%Title: %s\n", title);
-  printf("%%%%For: %s\n", user);
+  WriteTextComment("Title", title);
+  WriteTextComment("For", user);
   puts("%%Pages: (atend)");
 
  /*

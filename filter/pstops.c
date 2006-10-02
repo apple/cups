@@ -666,10 +666,10 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     fputs("ERROR: No %%Pages: comment in header!\n", stderr);
 
   if (!saw_for)
-    printf("%%%%For: %s\n", doc->user);
+    WriteTextComment("For", doc->user);
 
   if (!saw_title)
-    printf("%%%%Title: %s\n", doc->title);
+    WriteTextComment("Title", doc->title);
 
   if (doc->copies != 1 && (!doc->collate || !doc->slow_collate))
   {
@@ -946,8 +946,8 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
   else
     puts("%%Pages: 1");
 
-  printf("%%%%For: %s\n", doc->user);
-  printf("%%%%Title: %s\n", doc->title);
+  WriteTextComment("For", doc->user);
+  WriteTextComment("Title", doc->title);
 
   if (doc->copies != 1 && (!doc->collate || !doc->slow_collate))
   {

@@ -70,8 +70,8 @@ OutputProlog(char  *title,	/* I - Job title */
   puts("%%Creator: hpgltops/" CUPS_SVERSION);
   strftime(line, sizeof(line), "%c", curtm);
   printf("%%%%CreationDate: %s\n", line);
-  printf("%%%%Title: %s\n", title);
-  printf("%%%%For: %s\n", user);
+  WriteTextComment("Title", title);
+  WriteTextComment("For", user);
   printf("%%cupsRotation: %d\n", (Orientation & 3) * 90);
   puts("%%EndComments");
   puts("%%BeginProlog");

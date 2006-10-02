@@ -3,7 +3,7 @@
  *
  *   Common filter routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -28,6 +28,7 @@
  *   SetCommonOptions() - Set common filter options for media size,
  *                        etc.
  *   UpdatePageVars()   - Update the page variables for the orientation.
+ *   WriteComment()     - Write a DSC comment.
  *   WriteCommon()      - Write common procedures...
  *   WriteLabelProlog() - Write the prolog with the classification
  *                        and page label.
@@ -46,30 +47,31 @@
  * Globals...
  */
 
-int	Orientation = 0,	/* 0 = portrait, 1 = landscape, etc. */
-	Duplex = 0,		/* Duplexed? */
-	LanguageLevel = 1,	/* Language level of printer */
-	ColorDevice = 1;	/* Do color text? */
-float	PageLeft = 18.0f,	/* Left margin */
-	PageRight = 594.0f,	/* Right margin */
-	PageBottom = 36.0f,	/* Bottom margin */
-	PageTop = 756.0f,	/* Top margin */
-	PageWidth = 612.0f,	/* Total page width */
-	PageLength = 792.0f;	/* Total page length */
+int	Orientation = 0,		/* 0 = portrait, 1 = landscape, etc. */
+	Duplex = 0,			/* Duplexed? */
+	LanguageLevel = 1,		/* Language level of printer */
+	ColorDevice = 1;		/* Do color text? */
+float	PageLeft = 18.0f,		/* Left margin */
+	PageRight = 594.0f,		/* Right margin */
+	PageBottom = 36.0f,		/* Bottom margin */
+	PageTop = 756.0f,		/* Top margin */
+	PageWidth = 612.0f,		/* Total page width */
+	PageLength = 792.0f;		/* Total page length */
 
 
 /*
  * 'SetCommonOptions()' - Set common filter options for media size, etc.
  */
 
-ppd_file_t *					/* O - PPD file */
-SetCommonOptions(int           num_options,	/* I - Number of options */
-                 cups_option_t *options,	/* I - Options */
-		 int           change_size)	/* I - Change page size? */
+ppd_file_t *				/* O - PPD file */
+SetCommonOptions(
+    int           num_options,		/* I - Number of options */
+    cups_option_t *options,		/* I - Options */
+    int           change_size)		/* I - Change page size? */
 {
-  ppd_file_t	*ppd;		/* PPD file */
-  ppd_size_t	*pagesize;	/* Current page size */
-  const char	*val;		/* Option value */
+  ppd_file_t	*ppd;			/* PPD file */
+  ppd_size_t	*pagesize;		/* Current page size */
+  const char	*val;			/* Option value */
 
 
 #ifdef LC_TIME
@@ -227,7 +229,7 @@ SetCommonOptions(int           num_options,	/* I - Number of options */
 void
 UpdatePageVars(void)
 {
-  float		temp;		/* Swapping variable */
+  float		temp;			/* Swapping variable */
 
 
   switch (Orientation & 3)
@@ -463,6 +465,77 @@ WriteLabels(int orient)	/* I - Orientation of the page */
 
   puts("ESPwl");
   puts("grestore");
+}
+
+
+/*
+ * 'WriteTextComment()' - Write a DSC text comment.
+ */
+
+void
+WriteTextComment(const char *name,	/* I - Comment name ("Title", etc.) */
+                 const char *value)	/* I - Comment value */
+{
+  int	len;				/* Current line length */
+
+
+ /*
+  * DSC comments are of the form:
+  *
+  *   %%name: value
+  *
+  * The name and value must be limited to 7-bit ASCII for most printers,
+  * so we escape all non-ASCII and ASCII control characters as described
+  * in the Adobe Document Structuring Conventions specification.
+  */
+
+  printf("%%%%%s: (", name);
+  len = 5 + strlen(name);
+
+  while (*value)
+  {
+    if (*value < ' ' || *value >= 127)
+    {
+     /*
+      * Escape this character value...
+      */
+
+      if (len >= 251)			/* Keep line < 254 chars */
+        break;
+
+      printf("\\%03o", *value & 255);
+      len += 4;
+    }
+    else if (*value == '\\')
+    {
+     /*
+      * Escape the backslash...
+      */
+
+      if (len >= 253)			/* Keep line < 254 chars */
+        break;
+
+      putchar('\\');
+      putchar('\\');
+      len += 2;
+    }
+    else
+    {
+     /*
+      * Put this character literally...
+      */
+
+      if (len >= 254)			/* Keep line < 254 chars */
+        break;
+
+      putchar(*value);
+      len ++;
+    }
+
+    value ++;
+  }
+
+  puts(")");
 }
 
 

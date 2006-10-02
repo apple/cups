@@ -609,8 +609,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   puts("%%Creator: imagetops/" CUPS_SVERSION);
   strftime(curdate, sizeof(curdate), "%c", curtm);
   printf("%%%%CreationDate: %s\n", curdate);
-  printf("%%%%Title: %s\n", argv[3]);
-  printf("%%%%For: %s\n", argv[2]);
+  WriteTextComment("Title", argv[3]);
+  WriteTextComment("For", argv[2]);
   if (Orientation & 1)
     puts("%%Orientation: Landscape");
   else
