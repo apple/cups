@@ -20,7 +20,7 @@ like to thank the following individuals for their contributions:
                                      testing.
     Kiko                           - Bug fixes.
     Sergey V. Kovalyov             - ESP Print Pro and CUPS beta tester.
-    Marek Laan                     - Estonian translation.
+    Marek Laane                    - Estonian translation.
     Mark Lawrence                  - Microsoft interoperability testing.
     Jeff Licquia                   - Bug fixes, beta testing, evangelism.
     Jason McMullan                 - Original CUPS RPM distributions.
