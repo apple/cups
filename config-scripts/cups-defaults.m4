@@ -28,7 +28,7 @@ AC_ARG_WITH(languages, [  --with-languages        set installed languages, defau
 	if test "x$withval" != xno; then
 		LANGUAGES="$withval"
 	fi,
-	LANGUAGES="de es ja pl sv")
+	LANGUAGES="de es et ja pl sv")
 AC_SUBST(LANGUAGES)
 
 dnl Default ConfigFilePerm
