@@ -416,8 +416,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/doc/cups/et
 /usr/share/doc/cups/et/index.html
 %dir /usr/share/doc/cups/et/images
-#### Waiting on button images...
-#/usr/share/doc/cups/et/images/*
+/usr/share/doc/cups/et/images/*
 %dir /usr/share/cups/templates/et
 /usr/share/cups/templates/et/*
 /usr/share/locale/et/cups_et.po
