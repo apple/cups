@@ -50,6 +50,7 @@ if test "x$enable_threads" != xno; then
 				if test $uname = SunOS; then
 					PTHREAD_FLAGS="$PTHREAD_FLAGS _POSIX_PTHREAD_SEMANTICS"
 				fi
+				break
 			fi
 		done
 	fi
