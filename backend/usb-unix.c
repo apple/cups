@@ -185,44 +185,52 @@ void
 list_devices(void)
 {
 #ifdef __linux
-  int	i;			/* Looping var */
-  int	fd;			/* File descriptor */
-  char	format[255],		/* Format for device filename */
-	device[255],		/* Device filename */
-	device_id[1024],	/* Device ID string */
-	device_uri[1024],	/* Device URI string */
-	make_model[1024];	/* Make and model */
-
+  int	i;				/* Looping var */
+  int	fd;				/* File descriptor */
+  char	device[255],			/* Device filename */
+	device_id[1024],		/* Device ID string */
+	device_uri[1024],		/* Device URI string */
+	make_model[1024];		/* Make and model */
 
  /*
-  * First figure out which USB printer filename to use...
-  */
-
-  if (!access("/dev/usblp0", 0))
-    strcpy(format, "/dev/usblp%d");
-  else if (!access("/dev/usb/usblp0", 0))
-    strcpy(format, "/dev/usb/usblp%d");
-  else
-    strcpy(format, "/dev/usb/lp%d");
-
- /*
-  * Then open each USB device...
+  * Try to open each USB device...
   */
 
   for (i = 0; i < 16; i ++)
   {
-    sprintf(device, format, i);
+   /*
+    * Linux has a long history of changing the standard filenames used
+    * for USB printer devices.  We get the honor of trying them all...
+    */
 
-    if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
+    sprintf(device, "/dev/usblp%d", i);
+
+    if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
     {
-      if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
-                              make_model, sizeof(make_model),
-			      "usb", device_uri, sizeof(device_uri)))
-	printf("direct %s \"%s\" \"%s USB #%d\" \"%s\"\n", device_uri,
-	       make_model, make_model, i + 1, device_id);
+      if (errno != ENOENT)
+	continue;
 
-      close(fd);
+      sprintf(device, "/dev/usb/lp%d", i);
+
+      if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
+      {
+	if (errno != ENOENT)
+	  continue;
+
+	sprintf(device, "/dev/usb/usblp%d", i);
+
+    	if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
+	  continue;
+      }
     }
+
+    if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
+                            make_model, sizeof(make_model),
+			    "usb", device_uri, sizeof(device_uri)))
+      printf("direct %s \"%s\" \"%s USB #%d\" \"%s\"\n", device_uri,
+	     make_model, make_model, i + 1, device_id);
+
+    close(fd);
   }
 #elif defined(__sgi)
 #elif defined(__sun) && defined(ECPPIOC_GETDEVID)
@@ -309,35 +317,41 @@ open_device(const char *uri,		/* I - Device URI */
 
     int		i;			/* Looping var */
     int		busy;			/* Are any ports busy? */
-    char	format[255],		/* Format for device filename */
-		device[255],		/* Device filename */
+    char	device[255],		/* Device filename */
 		device_id[1024],	/* Device ID string */
 		make_model[1024],	/* Make and model */
 		device_uri[1024];	/* Device URI string */
 
 
    /*
-    * First figure out which USB printer filename to use...
-    */
-
-    if (!access("/dev/usblp0", 0))
-      strcpy(format, "/dev/usblp%d");
-    else if (!access("/dev/usb/usblp0", 0))
-      strcpy(format, "/dev/usb/usblp%d");
-    else
-      strcpy(format, "/dev/usb/lp%d");
-
-   /*
-    * Then find the correct USB device...
+    * Find the correct USB device...
     */
 
     do
     {
       for (busy = 0, i = 0; i < 16; i ++)
       {
-	sprintf(device, format, i);
+       /*
+	* Linux has a long history of changing the standard filenames used
+	* for USB printer devices.  We get the honor of trying them all...
+	*/
 
-	if ((fd = open(device, O_RDWR | O_EXCL)) >= 0)
+	sprintf(device, "/dev/usblp%d", i);
+
+	if ((fd = open(device, O_RDWR | O_EXCL)) < 0 && errno == ENOENT)
+	{
+	  sprintf(device, "/dev/usb/lp%d", i);
+
+	  if ((fd = open(device, O_RDWR | O_EXCL)) < 0 && errno == ENOENT)
+	  {
+	    sprintf(device, "/dev/usb/usblp%d", i);
+
+    	    if ((fd = open(device, O_RDWR | O_EXCL)) < 0 && errno == ENOENT)
+	      continue;
+	  }
+	}
+
+	if (fd >= 0)
 	{
 	  backendGetDeviceID(fd, device_id, sizeof(device_id),
                              make_model, sizeof(make_model),
