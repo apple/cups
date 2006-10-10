@@ -1550,17 +1550,37 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 	case 2 : /* Two options... */
 	   /*
+	    * Check for broken constraints like "* Option"...
+	    */
+
+	    if (cg->ppd_conform == PPD_CONFORM_STRICT &&
+	        (!strcmp(constraint->option1, "*") ||
+	         !strcmp(constraint->choice1, "*")))
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
+
+	   /*
 	    * The following strcpy's are safe, as optionN and
 	    * choiceN are all the same size (size defined by PPD spec...)
 	    */
 
 	    if (constraint->option1[0] == '*')
 	      _cups_strcpy(constraint->option1, constraint->option1 + 1);
+	    else if (cg->ppd_conform == PPD_CONFORM_STRICT)
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
 
 	    if (constraint->choice1[0] == '*')
 	      _cups_strcpy(constraint->option2, constraint->choice1 + 1);
-	    else
-	      _cups_strcpy(constraint->option2, constraint->choice1);
+	    else if (cg->ppd_conform == PPD_CONFORM_STRICT)
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
 
             constraint->choice1[0] = '\0';
             constraint->choice2[0] = '\0';
@@ -1568,15 +1588,40 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	    
 	case 3 : /* Two options, one choice... */
 	   /*
+	    * Check for broken constraints like "* Option"...
+	    */
+
+	    if (cg->ppd_conform == PPD_CONFORM_STRICT &&
+	        (!strcmp(constraint->option1, "*") ||
+	         !strcmp(constraint->choice1, "*") ||
+	         !strcmp(constraint->option2, "*")))
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
+
+	   /*
 	    * The following _cups_strcpy's are safe, as optionN and
 	    * choiceN are all the same size (size defined by PPD spec...)
 	    */
 
 	    if (constraint->option1[0] == '*')
 	      _cups_strcpy(constraint->option1, constraint->option1 + 1);
+	    else if (cg->ppd_conform == PPD_CONFORM_STRICT)
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
 
 	    if (constraint->choice1[0] == '*')
 	    {
+	      if (cg->ppd_conform == PPD_CONFORM_STRICT &&
+	          constraint->option2[0] == '*')
+	      {
+		cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+		goto error;
+	      }
+
 	      _cups_strcpy(constraint->choice2, constraint->option2);
 	      _cups_strcpy(constraint->option2, constraint->choice1 + 1);
               constraint->choice1[0] = '\0';
@@ -1585,17 +1630,60 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	    {
 	      if (constraint->option2[0] == '*')
   	        _cups_strcpy(constraint->option2, constraint->option2 + 1);
+	      else if (cg->ppd_conform == PPD_CONFORM_STRICT)
+	      {
+		cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+		goto error;
+	      }
 
               constraint->choice2[0] = '\0';
 	    }
 	    break;
 	    
 	case 4 : /* Two options, two choices... */
+	   /*
+	    * Check for broken constraints like "* Option"...
+	    */
+
+	    if (cg->ppd_conform == PPD_CONFORM_STRICT &&
+	        (!strcmp(constraint->option1, "*") ||
+	         !strcmp(constraint->choice1, "*") ||
+	         !strcmp(constraint->option2, "*") ||
+	         !strcmp(constraint->choice2, "*")))
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
+
 	    if (constraint->option1[0] == '*')
 	      _cups_strcpy(constraint->option1, constraint->option1 + 1);
+	    else if (cg->ppd_conform == PPD_CONFORM_STRICT)
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
+
+            if (cg->ppd_conform == PPD_CONFORM_STRICT &&
+	        constraint->choice1[0] == '*')
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
 
 	    if (constraint->option2[0] == '*')
   	      _cups_strcpy(constraint->option2, constraint->option2 + 1);
+	    else if (cg->ppd_conform == PPD_CONFORM_STRICT)
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
+
+            if (cg->ppd_conform == PPD_CONFORM_STRICT &&
+	        constraint->choice2[0] == '*')
+	    {
+	      cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	      goto error;
+	    }
 	    break;
       }
 
