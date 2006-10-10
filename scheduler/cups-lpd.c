@@ -150,8 +150,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   num_defaults = 0;
   defaults     = NULL;
   hostlookups  = 1;
-  num_defaults = cupsAddOption("job-originating-host-name", hostname,
-                               num_defaults, &defaults);
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -216,6 +214,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     syslog(LOG_INFO, "Connection from %s (%s %s)", hostname, hostfamily,
            hostip);
   }
+
+  num_defaults = cupsAddOption("job-originating-host-name", hostname,
+                               num_defaults, &defaults);
 
  /*
   * RFC1179 specifies that only 1 daemon command can be received for
