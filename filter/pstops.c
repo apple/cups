@@ -1868,7 +1868,7 @@ static void
 end_nup(pstops_doc_t *doc,		/* I - Document information */
         int          number)		/* I - Page number */
 {
-  if (doc->mirror || Orientation || doc->number_up > 1)
+  if (doc->number_up > 1)
     doc_puts(doc, "userdict/ESPsave get restore\n");
 
   switch (doc->number_up)
@@ -2544,7 +2544,7 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 		bboxl;			/* BoundingBox height */
 
 
-  if (doc->mirror || Orientation || doc->number_up > 1)
+  if (doc->number_up > 1)
     doc_puts(doc, "userdict/ESPsave save put\n");
 
   if (doc->mirror)
