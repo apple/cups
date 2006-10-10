@@ -2407,7 +2407,7 @@ set_pstops_options(
       * turn the hardware collate option off...
       */
 
-      if ((option = ppdFindOption(ppd, "Option")) != NULL &&
+      if ((option = ppdFindOption(ppd, "Collate")) != NULL &&
           !option->conflicted)
 	doc->slow_collate = 0;
       else
@@ -2422,7 +2422,8 @@ set_pstops_options(
   else
     doc->slow_order = 0;
 
-  if ((doc->slow_collate || doc->slow_order) && Duplex)
+  if (Duplex &&
+      (doc->slow_collate || doc->slow_order || (ppd && !ppd->jcl_begin)))
     doc->slow_duplex = 1;
   else
     doc->slow_duplex = 0;
