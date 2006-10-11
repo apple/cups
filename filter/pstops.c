@@ -163,8 +163,8 @@ static int		check_range(pstops_doc_t *doc, int page);
 static void		copy_bytes(cups_file_t *fp, off_t offset,
 			           size_t length);
 static size_t		copy_comments(cups_file_t *fp, pstops_doc_t *doc,
-			              char *line, size_t linelen,
-				      size_t linesize);
+			              ppd_file_t *ppd, char *line,
+				      size_t linelen, size_t linesize);
 static void		copy_dsc(cups_file_t *fp, pstops_doc_t *doc,
 			         ppd_file_t *ppd, char *line, size_t linelen,
 				 size_t linesize);
@@ -542,6 +542,7 @@ copy_bytes(cups_file_t *fp,		/* I - File to read from */
 static size_t				/* O - Length of next line */
 copy_comments(cups_file_t  *fp,		/* I - File to read from */
               pstops_doc_t *doc,	/* I - Document info */
+	      ppd_file_t   *ppd,	/* I - PPD file */
               char         *line,	/* I - Line buffer */
 	      size_t       linelen,	/* I - Length of initial line */
 	      size_t       linesize)	/* I - Size of line buffer */
@@ -589,10 +590,53 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
 
     if (!strncmp(line, "%%Pages:", 8))
     {
+      int	pages;			/* Number of pages */
+
+
       if (saw_pages)
         fputs("ERROR: Duplicate %%Pages: comment seen!\n", stderr);
 
       saw_pages = 1;
+
+      if (Duplex && (pages = atoi(line + 8)) > 0 && pages <= doc->number_up)
+      {
+       /*
+        * Since we will only be printing on a single page, disable duplexing.
+	*/
+
+	Duplex           = 0;
+	doc->slow_duplex = 0;
+
+	if (cupsGetOption("sides", doc->num_options, doc->options))
+	  doc->num_options = cupsAddOption("sides", "one-sided",
+	                                   doc->num_options, &(doc->options));
+
+	if (cupsGetOption("Duplex", doc->num_options, doc->options))
+	  doc->num_options = cupsAddOption("Duplex", "None",
+	                                   doc->num_options, &(doc->options));
+
+	if (cupsGetOption("EFDuplex", doc->num_options, doc->options))
+	  doc->num_options = cupsAddOption("EFDuplex", "None",
+	                                   doc->num_options, &(doc->options));
+
+	if (cupsGetOption("EFDuplexing", doc->num_options, doc->options))
+	  doc->num_options = cupsAddOption("EFDuplexing", "False",
+	                                   doc->num_options, &(doc->options));
+
+	if (cupsGetOption("KD03Duplex", doc->num_options, doc->options))
+	  doc->num_options = cupsAddOption("KD03Duplex", "None",
+	                                   doc->num_options, &(doc->options));
+
+	if (cupsGetOption("JCLDuplex", doc->num_options, doc->options))
+	  doc->num_options = cupsAddOption("JCLDuplex", "None",
+	                                   doc->num_options, &(doc->options));
+
+	ppdMarkOption(ppd, "Duplex", "None");
+	ppdMarkOption(ppd, "EFDuplex", "None");
+	ppdMarkOption(ppd, "EFDuplexing", "False");
+	ppdMarkOption(ppd, "KD03Duplex", "None");
+	ppdMarkOption(ppd, "JCLDuplex", "None");
+      }
     }
     else if (!strncmp(line, "%%BoundingBox:", 14))
     {
@@ -745,7 +789,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   */
 
   fprintf(stderr, "DEBUG: Before copy_comments - %s", line);
-  linelen = copy_comments(fp, doc, line, linelen, linesize);
+  linelen = copy_comments(fp, doc, ppd, line, linelen, linesize);
 
  /*
   * Now find the prolog section, if any...
@@ -860,6 +904,33 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
     for (copy = !doc->slow_order; copy < doc->copies; copy ++)
     {
+     /*
+      * Send end-of-job stuff followed by any start-of-job stuff required
+      * for the JCL options...
+      */
+
+      if (!doc->saw_eof)
+	puts("%%EOF");
+
+      if (doc->emit_jcl)
+      {
+	if (ppd && ppd->jcl_end)
+	  ppdEmitJCLEnd(ppd, stdout);
+	else
+	  putchar(0x04);
+
+        ppdEmitJCL(ppd, stdout, doc->job_id, doc->user, doc->title);
+      }
+
+      puts("%!PS-Adobe-3.0");
+      puts("%%Pages: (atend)");
+      puts("%%BoundingBox: (atend)");
+      puts("%%EndComments");
+
+     /*
+      * Then copy all of the pages...
+      */
+
       pageinfo = doc->slow_order ? (pstops_page_t *)cupsArrayLast(doc->pages) :
                                    (pstops_page_t *)cupsArrayFirst(doc->pages);
 
