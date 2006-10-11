@@ -2423,7 +2423,9 @@ set_pstops_options(
     doc->slow_order = 0;
 
   if (Duplex &&
-      (doc->slow_collate || doc->slow_order || (ppd && !ppd->jcl_begin)))
+       (doc->slow_collate || doc->slow_order ||
+        ((attr = ppdFindAttr(ppd, "cupsEvenDuplex", NULL)) != NULL &&
+	 attr->value && !strcasecmp(attr->value, "true"))))
     doc->slow_duplex = 1;
   else
     doc->slow_duplex = 0;

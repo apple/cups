@@ -106,6 +106,21 @@ default value is <code>true</code>.</p>
 
 <p>Also see the related <tt>cupsFlipDuplex</tt> attribute.</p>
 
+<h3>cupsEvenDuplex</h3>
+
+<p class='summary'>*cupsEvenDuplex: boolean</p>
+
+<p>This boolean attribute notifies the RIP filters that the
+destination printer requires an even number of pages when 2-sided
+printing is selected. The default value is <code>false</code>.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Always send an even number of pages when duplexing</em> 
+*cupsEvenDuplex: true
+</pre>
+
 <h3>cupsFilter</h3>
 
 <p class='summary'>*cupsFilter: "source/type cost program"</p>
@@ -143,7 +158,8 @@ page. The default value is <code>false</code>.</p>
 *cupsFlipDuplex: true
 </pre>
 
-<p>Also see the related <tt>APDuplexRequiresFlippedMargins</tt> attribute.</p>
+<p>Also see the related <tt>APDuplexRequiresFlippedMargins</tt>
+attribute.</p>
 
 <h3>cupsIPPReason</h3>
 
