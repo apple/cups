@@ -1326,7 +1326,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   job->dtype   = printer->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
                                   CUPS_PRINTER_REMOTE);
   job->attrs   = con->request;
-  con->request = NULL;
+  con->request = ippNewRequest(job->attrs->request.op.operation_id);
 
   add_job_uuid(con, job);
   apply_printer_defaults(printer, job);
@@ -3430,8 +3430,8 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
     * Filter attributes as needed...
     */
 
-    if (group != IPP_TAG_ZERO && fromattr->group_tag != group &&
-        fromattr->group_tag != IPP_TAG_ZERO && !fromattr->name)
+    if ((group != IPP_TAG_ZERO && fromattr->group_tag != group &&
+         fromattr->group_tag != IPP_TAG_ZERO) || !fromattr->name)
       continue;
 
     if (!ra || cupsArrayFind(ra, fromattr->name))

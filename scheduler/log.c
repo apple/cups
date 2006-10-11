@@ -413,11 +413,16 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 
   if (!strcmp(AccessLog, "syslog"))
   {
-    syslog(LOG_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT "\n",
+    syslog(LOG_INFO,
+           "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
            con->http.hostname, con->username[0] != '\0' ? con->username : "-",
 	   states[con->operation], con->uri,
 	   con->http.version / 100, con->http.version % 100,
-	   code, CUPS_LLCAST con->bytes);
+	   code, CUPS_LLCAST con->bytes,
+	   con->request ?
+	       ippOpString(con->request->request.op.operation_id) : "-",
+	   con->response ?
+	       ippErrorString(con->response->request.status.status_code) : "-");
 
     return (1);
   }
