@@ -2618,6 +2618,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     * Add gziptoany filter to the front of the list...
     */
 
+    if (!filters)
+      filters = cupsArrayNew(NULL, NULL);
+
     if (!cupsArrayInsert(filters, &gziptoany_filter))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2644,6 +2647,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
    /*
     * Add port monitor to the end of the list...
     */
+
+    if (!filters)
+      filters = cupsArrayNew(NULL, NULL);
 
     if (!cupsArrayAdd(filters, &port_monitor))
     {
