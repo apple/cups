@@ -74,7 +74,6 @@
  *   get_username()              - Get the username associated with a request.
  *   hold_job()                  - Hold a print job.
  *   move_job()                  - Move a job to a new destination.
- *   ppd_add_default()           - Add a PPD default choice.
  *   ppd_parse_line()            - Parse a PPD default line.
  *   print_job()                 - Print a file to a printer or class.
  *   read_ps_line()              - Read a line from a PS file...
@@ -113,17 +112,6 @@
 #ifdef HAVE_LIBPAPER
 #  include <paper.h>
 #endif /* HAVE_LIBPAPER */
-
-
-/*
- * PPD default choice structure...
- */
-
-typedef struct
-{
-  char	option[PPD_MAX_NAME];		/* Main keyword (option name) */
-  char	choice[PPD_MAX_NAME];		/* Option keyword (choice name) */
-} ppd_default_t;
 
 
 /*
@@ -185,8 +173,6 @@ static void	get_subscriptions(cupsd_client_t *con, ipp_attribute_t *uri);
 static const char *get_username(cupsd_client_t *con);
 static void	hold_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	move_job(cupsd_client_t *con, ipp_attribute_t *uri);
-static int	ppd_add_default(const char *option, const char *choice,
-		                int num_defaults, ppd_default_t **defaults);
 static int	ppd_parse_line(const char *line, char *option, int olen,
 		               char *choice, int clen);
 static void	print_job(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -3784,15 +3770,15 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 		*envp[MAX_ENV];		/* Environment */
   cups_file_t	*src,			/* Source file */
 		*dst;			/* Destination file */
+  ppd_file_t	*ppd;			/* PPD file */
   int		bytes,			/* Bytes from pipe */
 		total;			/* Total bytes from pipe */
-  char		buffer[2048],		/* Copy buffer */
-		*ptr;			/* Pointer into buffer */
+  char		buffer[2048];		/* Copy buffer */
   int		i;			/* Looping var */
   char		option[PPD_MAX_NAME],	/* Option name */
 		choice[PPD_MAX_NAME];	/* Choice name */
   int		num_defaults;		/* Number of default options */
-  ppd_default_t	*defaults;		/* Default options */
+  cups_option_t	*defaults;		/* Default options */
   char		cups_protocol[PPD_MAX_LINE];
 					/* cupsProtocol attribute */
   int		have_letter,		/* Have Letter size */
@@ -3933,41 +3919,14 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   * Read the source file and see what page sizes are supported...
   */
 
-  if ((src = cupsFileOpen(tempfile, "rb")) == NULL)
+  if ((ppd = ppdOpenFile(tempfile)) == NULL)
   {
     unlink(tempfile);
     return (-1);
   }
 
-  have_letter = 0;
-  have_a4     = 0;
-
-  while (cupsFileGets(src, buffer, sizeof(buffer)))
-    if (!strncmp(buffer, "*PageSize ", 10))
-    {
-     /*
-      * Strip UI text and command data from the end of the line...
-      */
-
-      if ((ptr = strchr(buffer + 10, '/')) != NULL)
-        *ptr = '\0';
-      if ((ptr = strchr(buffer + 10, ':')) != NULL)
-        *ptr = '\0';
-
-      for (ptr = buffer + 10; isspace(*ptr); ptr ++);
-
-     /*
-      * Look for Letter and A4 page sizes...
-      */
-
-      if (!strcmp(ptr, "Letter"))
-	have_letter = 1;
-
-      if (!strcmp(ptr, "A4"))
-	have_a4 = 1;
-    }
-
-  cupsFileRewind(src);
+  have_letter = ppdPageSize(ppd, "Letter") != NULL;
+  have_a4     = ppdPageSize(ppd, "A4") != NULL;
 
  /*
   * Open the destination (if possible) and set the default options...
@@ -3992,8 +3951,21 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
         if (!ppd_parse_line(buffer, option, sizeof(option),
 	                    choice, sizeof(choice)))
-          num_defaults = ppd_add_default(option, choice, num_defaults,
+        {
+	  ppd_option_t	*ppdo;		/* PPD option */
+
+
+         /*
+	  * Only add the default if the default hasn't already been
+	  * set and the choice exists in the new PPD...
+	  */
+
+	  if (!cupsGetOption(option, num_defaults, defaults) &&
+	      (ppdo = ppdFindOption(ppd, option)) != NULL &&
+	      ppdFindChoice(ppdo, choice))
+            num_defaults = cupsAddOption(option, choice, num_defaults,
 	                                 &defaults);
+        }
       }
       else if (!strncmp(buffer, "*cupsProtocol:", 14))
         strlcpy(cups_protocol, buffer, sizeof(cups_protocol));
@@ -4039,6 +4011,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
         !strcasecmp(DefaultLanguage, "C") ||
         !strcasecmp(DefaultLanguage, "POSIX") ||
 	!strcasecmp(DefaultLanguage, "en") ||
+	!strncasecmp(DefaultLanguage, "en.", 3) ||
 	!strncasecmp(DefaultLanguage, "en_US", 5) ||
 	!strncasecmp(DefaultLanguage, "en_CA", 5) ||
 	!strncasecmp(DefaultLanguage, "fr_CA", 5))
@@ -4049,14 +4022,14 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
       if (have_letter)
       {
-	num_defaults = ppd_add_default("PageSize", "Letter", num_defaults,
-                                       &defaults);
-	num_defaults = ppd_add_default("PageRegion", "Letter", num_defaults,
-                                       &defaults);
-	num_defaults = ppd_add_default("PaperDimension", "Letter", num_defaults,
-                                       &defaults);
-	num_defaults = ppd_add_default("ImageableArea", "Letter", num_defaults,
-                                       &defaults);
+	num_defaults = cupsAddOption("PageSize", "Letter", num_defaults,
+                                     &defaults);
+	num_defaults = cupsAddOption("PageRegion", "Letter", num_defaults,
+                                     &defaults);
+	num_defaults = cupsAddOption("PaperDimension", "Letter", num_defaults,
+                                     &defaults);
+	num_defaults = cupsAddOption("ImageableArea", "Letter", num_defaults,
+                                     &defaults);
       }
     }
     else if (have_a4)
@@ -4065,15 +4038,28 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
       * The rest default to "a4" size...
       */
 
-      num_defaults = ppd_add_default("PageSize", "A4", num_defaults,
-                                     &defaults);
-      num_defaults = ppd_add_default("PageRegion", "A4", num_defaults,
-                                     &defaults);
-      num_defaults = ppd_add_default("PaperDimension", "A4", num_defaults,
-                                     &defaults);
-      num_defaults = ppd_add_default("ImageableArea", "A4", num_defaults,
-                                     &defaults);
+      num_defaults = cupsAddOption("PageSize", "A4", num_defaults,
+                                   &defaults);
+      num_defaults = cupsAddOption("PageRegion", "A4", num_defaults,
+                                   &defaults);
+      num_defaults = cupsAddOption("PaperDimension", "A4", num_defaults,
+                                   &defaults);
+      num_defaults = cupsAddOption("ImageableArea", "A4", num_defaults,
+                                   &defaults);
     }
+  }
+
+  ppdClose(ppd);
+
+ /*
+  * Open the source file for a copy...
+  */
+
+  if ((src = cupsFileOpen(tempfile, "rb")) == NULL)
+  {
+    cupsFreeOptions(num_defaults, defaults);
+    unlink(tempfile);
+    return (-1);
   }
 
  /*
@@ -4082,9 +4068,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
   if ((dst = cupsFileOpen(to, "wb")) == NULL)
   {
-    if (num_defaults > 0)
-      free(defaults);
-
+    cupsFreeOptions(num_defaults, defaults);
     cupsFileClose(src);
     unlink(tempfile);
     return (-1);
@@ -4105,17 +4089,17 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
       if (!ppd_parse_line(buffer, option, sizeof(option),
 	                  choice, sizeof(choice)))
       {
-        for (i = 0; i < num_defaults; i ++)
-	  if (!strcmp(option, defaults[i].option))
-	  {
-	   /*
-	    * Substitute the previous choice...
-	    */
+        const char	*val;		/* Default option value */
 
-	    snprintf(buffer, sizeof(buffer), "*Default%s: %s", option,
-	             defaults[i].choice);
-	    break;
-	  }
+
+        if ((val = cupsGetOption(option, num_defaults, defaults)) != NULL)
+	{
+	 /*
+	  * Substitute the previous choice...
+	  */
+
+	  snprintf(buffer, sizeof(buffer), "*Default%s: %s", option, val);
+	}
       }
     }
 
@@ -4125,8 +4109,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   if (cups_protocol[0])
     cupsFilePrintf(dst, "%s\n", cups_protocol);
 
-  if (num_defaults > 0)
-    free(defaults);
+  cupsFreeOptions(num_defaults, defaults);
 
  /*
   * Close both files and return...
@@ -6533,56 +6516,6 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   con->response->request.status.status_code = IPP_OK;
-}
-
-
-/*
- * 'ppd_add_default()' - Add a PPD default choice.
- */
-
-static int				/* O  - Number of defaults */
-ppd_add_default(
-    const char    *option,		/* I  - Option name */
-    const char    *choice,		/* I  - Choice name */
-    int           num_defaults,		/* I  - Number of defaults */
-    ppd_default_t **defaults)		/* IO - Defaults */
-{
-  int		i;			/* Looping var */
-  ppd_default_t	*temp;			/* Temporary defaults array */
-
-
- /*
-  * First check if the option already has a default value; the PPD spec
-  * says that the first one is used...
-  */
-
-  for (i = 0, temp = *defaults; i < num_defaults; i ++)
-    if (!strcmp(option, temp[i].option))
-      return (num_defaults);
-
- /*
-  * Now add the option...
-  */
-
-  if (num_defaults == 0)
-    temp = malloc(sizeof(ppd_default_t));
-  else
-    temp = realloc(*defaults, (num_defaults + 1) * sizeof(ppd_default_t));
-
-  if (!temp)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "ppd_add_default: Unable to add default value for \"%s\" - %s",
-               option, strerror(errno));
-    return (num_defaults);
-  }
-
-  *defaults = temp;
-  temp      += num_defaults;
-
-  strlcpy(temp->option, option, sizeof(temp->option));
-  strlcpy(temp->choice, choice, sizeof(temp->choice));
-
-  return (num_defaults + 1);
 }
 
 
