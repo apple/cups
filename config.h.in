@@ -148,6 +148,13 @@
 
 
 /*
+ * Do we have <scsi/sg.h>?
+ */
+
+#undef HAVE_SCSI_SG_H
+
+
+/*
  * Use <string.h>, <strings.h>, and/or <bstring.h>?
  */
 

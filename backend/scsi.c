@@ -80,7 +80,7 @@ void	list_devices(void);
 int	print_device(const char *resource, int fd, int copies);
 
 
-#ifdef __linux__
+#if defined(__linux__) && defined(HAVE_SCSI_SG_H)
 #  include "scsi-linux.c"
 #elif defined(__sgi)
 #  include "scsi-irix.c"
@@ -90,7 +90,7 @@ int	print_device(const char *resource, int fd, int copies);
  */
 void	list_devices(void) {}
 int	print_device(const char *resource, int fd, int copies) { return (CUPS_BACKEND_FAILED); }
-#endif /* __linux */
+#endif /* __linux && HAVE_SCSI_SG_H */
 
 
 /*
