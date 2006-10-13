@@ -1687,6 +1687,28 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	    break;
       }
 
+     /*
+      * Handle CustomFoo option constraints...
+      */
+
+      if (!strncasecmp(constraint->option1, "Custom", 6) &&
+          !strcasecmp(constraint->choice1, "True"))
+      {
+        _cups_strcpy(constraint->option1, constraint->option1 + 6);
+	strcpy(constraint->choice1, "Custom");
+      }
+
+      if (!strncasecmp(constraint->option2, "Custom", 6) &&
+          !strcasecmp(constraint->choice2, "True"))
+      {
+        _cups_strcpy(constraint->option2, constraint->option2 + 6);
+	strcpy(constraint->choice2, "Custom");
+      }
+
+     /*
+      * Don't add this one as an attribute...
+      */
+
       ppd_free(string);
       string = NULL;
     }

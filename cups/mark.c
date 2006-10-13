@@ -62,15 +62,14 @@ static void	ppd_defaults(ppd_file_t *ppd, ppd_group_t *g);
 int				/* O - Number of conflicts found */
 ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
 {
-  int		i, j, k,	/* Looping variables */
+  int		i, j,		/* Looping variables */
 		conflicts;	/* Number of conflicts */
   ppd_const_t	*c;		/* Current constraint */
-  ppd_group_t	*g, *sg;	/* Groups */
   ppd_option_t	*o1, *o2;	/* Options */
   ppd_choice_t	*c1, *c2;	/* Choices */
 
 
-  if (ppd == NULL)
+  if (!ppd)
     return (0);
 
  /*
@@ -79,15 +78,8 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
 
   conflicts = 0;
 
-  for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
-  {
-    for (j = g->num_options, o1 = g->options; j > 0; j --, o1 ++)
-      o1->conflicted = 0;
-
-    for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
-      for (k = sg->num_options, o1 = sg->options; k > 0; k --, o1 ++)
-        o1->conflicted = 0;
-  }
+  for (o1 = ppdFirstOption(ppd); o1; o1 = ppdNextOption(ppd))
+    o1->conflicted = 0;
 
  /*
   * Loop through all of the UI constraints and flag any options
@@ -102,9 +94,9 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
 
     o1 = ppdFindOption(ppd, c->option1);
 
-    if (o1 == NULL)
+    if (!o1)
       continue;
-    else if (c->choice1[0] != '\0')
+    else if (c->choice1[0])
     {
      /*
       * This constraint maps to a specific choice.
@@ -122,10 +114,10 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
         if (c1->marked)
 	  break;
 
-      if (j == 0 ||
-          strcasecmp(c1->choice, "None") == 0 ||
-          strcasecmp(c1->choice, "Off") == 0 ||
-          strcasecmp(c1->choice, "False") == 0)
+      if (!j ||
+          !strcasecmp(c1->choice, "None") ||
+          !strcasecmp(c1->choice, "Off") ||
+          !strcasecmp(c1->choice, "False"))
         c1 = NULL;
     }
 
@@ -135,9 +127,9 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
 
     o2 = ppdFindOption(ppd, c->option2);
 
-    if (o2 == NULL)
+    if (!o2)
       continue;
-    else if (c->choice2[0] != '\0')
+    else if (c->choice2[0])
     {
      /*
       * This constraint maps to a specific choice.
@@ -155,10 +147,10 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
         if (c2->marked)
 	  break;
 
-      if (j == 0 ||
-          strcasecmp(c2->choice, "None") == 0 ||
-          strcasecmp(c2->choice, "Off") == 0 ||
-          strcasecmp(c2->choice, "False") == 0)
+      if (!j ||
+          !strcasecmp(c2->choice, "None") ||
+          !strcasecmp(c2->choice, "Off") ||
+          !strcasecmp(c2->choice, "False"))
         c2 = NULL;
     }
 
@@ -166,8 +158,7 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
     * If both options are marked then there is a conflict...
     */
 
-    if (c1 != NULL && c1->marked &&
-        c2 != NULL && c2->marked)
+    if (c1 && c1->marked && c2 && c2->marked)
     {
       DEBUG_printf(("%s->%s conflicts with %s->%s (%s %s %s %s)\n",
                     o1->keyword, c1->choice, o2->keyword, c2->choice,
