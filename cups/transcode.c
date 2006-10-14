@@ -445,6 +445,7 @@ cupsUTF8ToUTF32(
       */
 
       *dest++ = ch;
+      continue;
     }
     else if ((ch & 0xe0) == 0xc0)
     {
@@ -540,7 +541,7 @@ cupsUTF8ToUTF32(
     * Check for UTF-16 surrogate (illegal UTF-8)...
     */
 
-    if (*dest >= 0xd800 && *dest <= 0xdfff)
+    if (ch32 >= 0xd800 && ch32 <= 0xdfff)
       return (-1);
   }
 
