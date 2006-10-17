@@ -236,6 +236,15 @@ extern int		cupsRemoveOption(const char *name, int num_options,
 			                 cups_option_t **options);
 extern cups_file_t	*cupsTempFile2(char *filename, int len);
 
+/**** New in CUPS 1.3 ****/
+extern int		cupsRemoveDest(const char *name,
+			               const char *instance,
+				       int num_dests, cups_dest_t **dests);
+extern void		cupsSetDefaultDest(const char *name,
+			                   const char *instance,
+					   int num_dests,
+					   cups_dest_t *dests);
+
 
 #  ifdef __cplusplus
 }

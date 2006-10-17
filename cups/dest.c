@@ -64,17 +64,20 @@ static int	cups_get_sdests(http_t *http, ipp_op_t op, int num_dests,
 /*
  * 'cupsAddDest()' - Add a destination to the list of destinations.
  *
+ * This function cannot be used to add a new class or printer queue,
+ * it only adds a new container of saved options for the named
+ * destination or instance.
+ *
  * If the named destination already exists, the destination list is
  * returned unchanged.  Adding a new instance of a destination creates
  * a copy of that destination's options.
- *
  * Use the cupsSaveDests() function to save the updated list of
  * destinations to the user's lpoptions file.
  */
 
 int					/* O  - New number of destinations */
-cupsAddDest(const char  *name,		/* I  - Name of destination */
-            const char	*instance,	/* I  - Instance of destination or NULL for none/primary */
+cupsAddDest(const char  *name,		/* I  - Destination name */
+            const char	*instance,	/* I  - Instance name or NULL for none/primary */
             int         num_dests,	/* I  - Number of destinations */
             cups_dest_t **dests)	/* IO - Destinations */
 {
@@ -192,8 +195,8 @@ cupsFreeDests(int         num_dests,	/* I - Number of destinations */
  */
 
 cups_dest_t *				/* O - Destination pointer or NULL */
-cupsGetDest(const char  *name,		/* I - Name of destination (NULL for default destination) */
-            const char	*instance,	/* I - Instance of destination or NULL */
+cupsGetDest(const char  *name,		/* I - Destination name or NULL for the default destination */
+            const char	*instance,	/* I - Instance name or NULL */
             int         num_dests,	/* I - Number of destinations */
             cups_dest_t *dests)		/* I - Destinations */
 {
@@ -446,6 +449,92 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
   */
 
   return (num_dests);
+}
+
+
+/*
+ * 'cupsRemoveDest()' - Remove a destination from the destination list.
+ *
+ * Removing a destination/instance does not delete the class or printer
+ * queue, merely the lpoptions for that destination/instance.  Use the
+ * cupsSetDests() or cupsSetDests2() functions to save the new options
+ * for the user.
+ *
+ * @since CUPS 1.3@
+ */
+
+int					/* O  - New number of destinations */
+cupsRemoveDest(const char  *name,	/* I  - Destination name */
+               const char  *instance,	/* I  - Instance name or NULL */
+	       int         num_dests,	/* I  - Number of destinations */
+	       cups_dest_t **dests)	/* IO - Destinations */
+{
+  int		i;			/* Index into destinations */
+  cups_dest_t	*dest;			/* Pointer to destination */
+
+
+ /*
+  * Find the destination...
+  */
+
+  if ((dest = cupsGetDest(name, instance, num_dests, *dests)) == NULL)
+    return (num_dests);
+
+ /*
+  * Free memory...
+  */
+
+  cupsFreeOptions(dest->num_options, dest->options);
+
+ /*
+  * Remove the destination from the array...
+  */
+
+  num_dests --;
+
+  i = dest - *dests;
+
+  if (i < num_dests)
+    memmove(dest, dest + 1, (num_dests - i) * sizeof(cups_dest_t));
+
+  return (num_dests);
+}
+
+
+/*
+ * 'cupsDestSetDefaultDest()' - Set the default destination.
+ *
+ * @since CUPS 1.3@
+ */
+
+void
+cupsSetDefaultDest(
+    const char  *name,			/* I - Destination name */
+    const char  *instance,		/* I - Instance name or NULL */
+    int         num_dests,		/* I - Number of destinations */
+    cups_dest_t *dests)			/* I - Destinations */
+{
+  int		i;			/* Looping var */
+  cups_dest_t	*dest;			/* Current destination */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!name || num_dests <= 0 || !dests)
+    return;
+
+ /*
+  * Loop through the array and set the "is_default" flag for the matching
+  * destination...
+  */
+
+  for (i = num_dests, dest = dests; i > 0; i --, dest ++)
+    dest->is_default = !strcasecmp(name, dest->name) &&
+                       ((!instance && !dest->instance) ||
+		        (instance && dest->instance &&
+			 !strcasecmp(instance, dest->instance)));
 }
 
 
