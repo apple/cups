@@ -3,7 +3,7 @@
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -25,9 +25,9 @@
  *
  * Contents:
  *
- *   cupsTempFd()    - Create a temporary file.
- *   cupsTempFile()  - Generate a temporary filename.
- *   cupsTempFile2() - Create a temporary CUPS file.
+ *   cupsTempFd()    - Creates a temporary file.
+ *   cupsTempFile()  - Generates a temporary filename.
+ *   cupsTempFile2() - Creates a temporary CUPS file.
  */
 
 /*
@@ -48,12 +48,13 @@
 
 
 /*
- * 'cupsTempFd()' - Create a temporary file.
+ * 'cupsTempFd()' - Creates a temporary file.
  *
- * The temporary filename is stored in the filename buffer.
+ * The temporary filename is returned in the filename buffer.
+ * The temporary file is opened for reading and writing.
  */
 
-int					/* O - New file descriptor */
+int					/* O - New file descriptor or -1 on error */
 cupsTempFd(char *filename,		/* I - Pointer to buffer */
            int  len)			/* I - Size of buffer */
 {
@@ -158,16 +159,16 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * 'cupsTempFile()' - Generate a temporary filename.
+ * 'cupsTempFile()' - Generates a temporary filename.
  *
- * The temporary filename is stored in the filename buffer.
+ * The temporary filename is returned in the filename buffer.
  * This function is deprecated - use cupsTempFd() or cupsTempFile2()
  * instead.
  *
  * @deprecated@
  */
 
-char *					/* O - Filename */
+char *					/* O - Filename or NULL on error */
 cupsTempFile(char *filename,		/* I - Pointer to buffer */
              int  len)			/* I - Size of buffer */
 {
@@ -207,9 +208,10 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * 'cupsTempFile2()' - Create a temporary CUPS file.
+ * 'cupsTempFile2()' - Creates a temporary CUPS file.
  *
- * The temporary filename is stored in the filename buffer.
+ * The temporary filename is returned in the filename buffer.
+ * The temporary file is opened for writing.
  *
  * @since CUPS 1.2@
  */
