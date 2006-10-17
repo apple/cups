@@ -158,8 +158,10 @@ CUPS 1.1 or higher.</p>
 	<li><a href='#cupsPrintFiles2'><tt>cupsPrintFiles2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#cupsPutFd'><tt>cupsPutFd()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
 	<li><a href='#cupsPutFile'><tt>cupsPutFile()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
+	<li><a href='#cupsRemoveDest'><tt>cupsRemoveDest()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
 	<li><a href='#cupsRemoveOption'><tt>cupsRemoveOption()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#cupsServer'><tt>cupsServer()</tt></a> </li>
+	<li><a href='#cupsSetDefaultDest'><tt>cupsSetDefaultDest()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
 	<li><a href='#cupsSetDests'><tt>cupsSetDests()</tt></a> </li>
 	<li><a href='#cupsSetDests2'><tt>cupsSetDests2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#cupsSetEncryption'><tt>cupsSetEncryption()</tt></a> </li>
@@ -176,8 +178,16 @@ CUPS 1.1 or higher.</p>
 <h4>Description</h4>
 <p>Add a destination to the list of destinations.
 
-Use the cupsSaveDests() function to save the updated list of destinations
-to the user's lpoptions file.</p>
+This function cannot be used to add a new class or printer queue,
+it only adds a new container of saved options for the named
+destination or instance.
+
+If the named destination already exists, the destination list is
+returned unchanged.  Adding a new instance of a destination creates
+a copy of that destination's options.
+
+Use the cupsSaveDests() function to save the updated list of
+destinations to the user's lpoptions file.</p>
 <h4>Syntax</h4>
 <pre>
 int
@@ -191,8 +201,8 @@ cupsAddDest(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Name of destination</td></tr>
-<tr><td><tt>instance</tt></td><td>Instance of destination or NULL for none/primary</td></tr>
+<tr><td><tt>name</tt></td><td>Destination name</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL for none/primary</td></tr>
 <tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
 <tr><td><tt>dests</tt></td><td>Destinations</td></tr>
 </tbody></table></div>
@@ -412,8 +422,8 @@ cupsGetDest(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Name of destination</td></tr>
-<tr><td><tt>instance</tt></td><td>Instance of destination</td></tr>
+<tr><td><tt>name</tt></td><td>Destination name or NULL for the default destination</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL</td></tr>
 <tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
 <tr><td><tt>dests</tt></td><td>Destinations</td></tr>
 </tbody></table></div>
@@ -427,7 +437,10 @@ cupsGetDest(
 Starting with CUPS 1.2, the returned list of destinations include the
 printer-info, printer-is-accepting-jobs, printer-is-shared,
 printer-make-and-model, printer-state, printer-state-change-time,
-printer-state-reasons, and printer-type attributes as options.</p>
+printer-state-reasons, and printer-type attributes as options.
+
+Use the cupsFreeDests() function to free the destination list and
+the cupsGetDest() function to find a particular destination.</p>
 <h4>Syntax</h4>
 <pre>
 int
@@ -451,6 +464,9 @@ Starting with CUPS 1.2, the returned list of destinations include the
 printer-info, printer-is-accepting-jobs, printer-is-shared,
 printer-make-and-model, printer-state, printer-state-change-time,
 printer-state-reasons, and printer-type attributes as options.
+
+Use the cupsFreeDests() function to free the destination list and
+the cupsGetDest() function to find a particular destination.
 
 </p>
 <h4>Syntax</h4>
@@ -1020,6 +1036,37 @@ cupsPutFile(
 <h4>Returns</h4>
 <p>HTTP status</p>
 <!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsRemoveDest'>cupsRemoveDest()</a></h3>
+<h4>Description</h4>
+<p>Remove a destination from the destination list.
+
+Removing a destination/instance does not delete the class or printer
+queue, merely the lpoptions for that destination/instance.  Use the
+cupsSetDests() or cupsSetDests2() functions to save the new options
+for the user.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+int
+cupsRemoveDest(
+    const char * name,
+    const char * instance,
+    int num_dests,
+    <a href='#cups_dest_t'>cups_dest_t</a> ** dests);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Destination name</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>New number of destinations</p>
+<!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsRemoveOption'>cupsRemoveOption()</a></h3>
 <h4>Description</h4>
 <p>Remove an option from an option array.
@@ -1059,6 +1106,32 @@ cupsServer(void);
 <p>None.</p>
 <h4>Returns</h4>
 <p>Server name</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsSetDefaultDest'>cupsSetDefaultDest()</a></h3>
+<h4>Description</h4>
+<p>Set the default destination.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+void
+cupsSetDefaultDest(
+    const char * name,
+    const char * instance,
+    int num_dests,
+    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Destination name</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsSetDests'>cupsSetDests()</a></h3>
 <h4>Description</h4>
@@ -1192,9 +1265,10 @@ cupsSetUser(
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsTempFd'>cupsTempFd()</a></h3>
 <h4>Description</h4>
-<p>Create a temporary file.
+<p>Creates a temporary file.
 
-The temporary filename is stored in the filename buffer.</p>
+The temporary filename is returned in the filename buffer.
+The temporary file is opened for reading and writing.</p>
 <h4>Syntax</h4>
 <pre>
 int
@@ -1210,13 +1284,13 @@ cupsTempFd(
 <tr><td><tt>len</tt></td><td>Size of buffer</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
-<p>New file descriptor</p>
+<p>New file descriptor or -1 on error</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='cupsTempFile'>cupsTempFile()</a></h3>
 <h4>Description</h4>
-<p>Generate a temporary filename.
+<p>Generates a temporary filename.
 
-The temporary filename is stored in the filename buffer.
+The temporary filename is returned in the filename buffer.
 This function is deprecated - use cupsTempFd() or cupsTempFile2()
 instead.
 
@@ -1236,13 +1310,14 @@ cupsTempFile(
 <tr><td><tt>len</tt></td><td>Size of buffer</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
-<p>Filename</p>
+<p>Filename or NULL on error</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsTempFile2'>cupsTempFile2()</a></h3>
 <h4>Description</h4>
-<p>Create a temporary CUPS file.
+<p>Creates a temporary CUPS file.
 
-The temporary filename is stored in the filename buffer.
+The temporary filename is returned in the filename buffer.
+The temporary file is opened for writing.
 
 </p>
 <h4>Syntax</h4>

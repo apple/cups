@@ -3,6 +3,10 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.5
 
+	- cupsAddDest() didn't add the parent destination's
+	  options and attributes.
+	- ppdConflicts() did not handle custom option
+	  constraints.
 	- Raw printing of gzip'd files did not work (STR #2009)
 	- The scheduler no longer preserves default option
 	  choices when the new PPD no longer provides the old

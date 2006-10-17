@@ -26,15 +26,22 @@
  *
  * Contents:
  *
- *   cupsAddDest()     - Add a destination to the list of destinations.
- *   cupsFreeDests()   - Free the memory used by the list of destinations.
- *   cupsGetDest()     - Get the named destination from the list.
- *   cupsGetDests()    - Get the list of destinations from the default server.
- *   cupsGetDests2()   - Get the list of destinations from the specified server.
- *   cupsSetDests()    - Set the list of destinations for the default server.
- *   cupsSetDests2()   - Set the list of destinations for the specified server.
- *   cups_get_dests()  - Get destinations from a file.
- *   cups_get_sdests() - Get destinations from a server.
+ *   cupsAddDest()            - Add a destination to the list of destinations.
+ *   cupsFreeDests()          - Free the memory used by the list of
+ *                              destinations.
+ *   cupsGetDest()            - Get the named destination from the list.
+ *   cupsGetDests()           - Get the list of destinations from the default
+ *                              server.
+ *   cupsGetDests2()          - Get the list of destinations from the
+ *                              specified server.
+ *   cupsRemoveDest()         - Remove a destination from the destination list.
+ *   cupsDestSetDefaultDest() - Set the default destination.
+ *   cupsSetDests()           - Set the list of destinations for the default
+ *                              server.
+ *   cupsSetDests2()          - Set the list of destinations for the specified
+ *                              server.
+ *   cups_get_dests()         - Get destinations from a file.
+ *   cups_get_sdests()        - Get destinations from a server.
  */
 
 /*
@@ -71,6 +78,7 @@ static int	cups_get_sdests(http_t *http, ipp_op_t op, int num_dests,
  * If the named destination already exists, the destination list is
  * returned unchanged.  Adding a new instance of a destination creates
  * a copy of that destination's options.
+ *
  * Use the cupsSaveDests() function to save the updated list of
  * destinations to the user's lpoptions file.
  */

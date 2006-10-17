@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-09-11
+CHANGES.txt - 2006-10-17
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- Added new cupsRemoveDest() and cupsSetDefaultDest()
+	  functions.
 	- Added support for cupsPJLCharset attribute in PPD files
 	  which specifies the character set that is used in PJL
 	  strings (STR #1969)

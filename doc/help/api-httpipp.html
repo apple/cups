@@ -101,6 +101,7 @@ require CUPS 1.1 or higher.</p>
 <tr><td><tt>HTTP_AUTH_MD5_INT</tt> </td><td>Digest authentication in use for body</td></tr>
 <tr><td><tt>HTTP_AUTH_MD5_SESS</tt> </td><td>MD5-session authentication in use</td></tr>
 <tr><td><tt>HTTP_AUTH_MD5_SESS_INT</tt> </td><td>MD5-session authentication in use for body</td></tr>
+<tr><td><tt>HTTP_AUTH_NEGOTIATE</tt> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></td><td>GSSAPI authentication in use </td></tr>
 <tr><td><tt>HTTP_AUTH_NONE</tt> </td><td>No authentication in use</td></tr>
 </tbody></table></div>
 <!-- NEW PAGE -->
@@ -112,6 +113,7 @@ require CUPS 1.1 or higher.</p>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>HTTP_ENCODE_CHUNKED</tt> </td><td>Data is chunked</td></tr>
+<tr><td><tt>HTTP_ENCODE_FIELDS</tt> </td><td>Sending HTTP fields</td></tr>
 <tr><td><tt>HTTP_ENCODE_LENGTH</tt> </td><td>Data is sent with Content-Length</td></tr>
 </tbody></table></div>
 <!-- NEW PAGE -->
@@ -256,7 +258,7 @@ require CUPS 1.1 or higher.</p>
 <tr><td><tt>IPP_DOCUMENT_ACCESS_ERROR</tt> </td><td>client-error-document-access-error</td></tr>
 <tr><td><tt>IPP_DOCUMENT_FORMAT</tt> </td><td>client-error-document-format-not-supported</td></tr>
 <tr><td><tt>IPP_DOCUMENT_FORMAT_ERROR</tt> </td><td>client-error-document-format-error</td></tr>
-<tr><td><tt>IPP_ERROR_JOB_CANCELLED</tt> </td><td>server-error-job-canceled</td></tr>
+<tr><td><tt>IPP_ERROR_JOB_CANCELED</tt> </td><td>server-error-job-canceled</td></tr>
 <tr><td><tt>IPP_FORBIDDEN</tt> </td><td>client-error-forbidden</td></tr>
 <tr><td><tt>IPP_GONE</tt> </td><td>client-error-gone</td></tr>
 <tr><td><tt>IPP_IGNORED_ALL_NOTIFICATIONS</tt> </td><td>client-error-ignored-all-notifications</td></tr>
@@ -3010,7 +3012,7 @@ typedef enum <a href='#http_encryption_e'>http_encryption_e</a> http_encryption_
 <!-- NEW PAGE -->
 <h3 class='title'><a name='http_t'>http_t</a></h3>
 <h4>Description</h4>
-<p>HTTP connection structure.</p>
+<p>HTTP connection type</p>
 <h4>Definition</h4>
 <pre>
 typedef struct _http_s http_t;
