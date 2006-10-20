@@ -93,6 +93,7 @@ PIEFLAGS=""
 AC_SUBST(PIEFLAGS)
 
 if test -n "$GCC"; then
+	# Add GCC-specific compiler options...
 	if test -z "$OPTIM"; then
 		if test "x$with_optim" = x; then
 			# Default to optimize-for-size and debug
@@ -273,6 +274,7 @@ if test -n "$GCC"; then
 			;;
 	esac
 else
+	# Add vendor-specific compiler options...
 	case $uname in
 		AIX*)
 			if test -z "$OPTIM"; then
@@ -355,6 +357,16 @@ else
 					else
 						ARCHFLAGS="$with_arch32flags"
 					fi
+				fi
+			fi
+			;;
+		OSF*)
+			# Tru64 UNIX aka Digital UNIX aka OSF/1
+			if test -z "$OPTIM"; then
+				if test "x$with_optim" = x; then
+					OPTIM="-O"
+				else
+					OPTIM="$with_optim"
 				fi
 			fi
 			;;
@@ -449,15 +461,24 @@ else
 	esac
 fi
 
-if test $uname = HP-UX; then
-	# HP-UX 10.20 (at least) needs this definition to get the
-	# h_errno global...
-	OPTIM="$OPTIM -D_XOPEN_SOURCE_EXTENDED"
+# Add general compiler options per platform...
+case $uname in
+	HP-UX*)
+		# HP-UX 10.20 (at least) needs this definition to get the
+		# h_errno global...
+		OPTIM="$OPTIM -D_XOPEN_SOURCE_EXTENDED"
 
-	# HP-UX 11.00 (at least) needs this definition to get the
-	# u_short type used by the IP headers...
-	OPTIM="$OPTIM -D_INCLUDE_HPUX_SOURCE"
-fi
+		# HP-UX 11.00 (at least) needs this definition to get the
+		# u_short type used by the IP headers...
+		OPTIM="$OPTIM -D_INCLUDE_HPUX_SOURCE"
+		;;
+
+	OSF*)
+		# Tru64 UNIX aka Digital UNIX aka OSF/1 need to be told
+		# to be POSIX-compliant...
+		OPTIM="$OPTIM -D_XOPEN_SOURCE=500 -D_XOPEN_SOURCE_EXTENDED -D_OSF_SOURCE"
+		;;
+esac
 
 dnl
 dnl End of "$Id$".
