@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.2.5
 
 	- Updated the configure script for Tru64 UNIX 5.1 (STR
 	  #2033)
+	- Tru64 5.1B's getaddrinfo() and getnameinfo() functions
+	  leak file descriptors (STR #2034)
 	- cupsAddDest() didn't add the parent destination's
 	  options and attributes.
 	- ppdConflicts() did not handle custom option
