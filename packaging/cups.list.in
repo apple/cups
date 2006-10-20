@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 5964 2006-09-19 16:27:29Z mike $"
+# "$Id: cups.list.in 6003 2006-10-02 16:26:04Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -42,14 +42,19 @@
 %description Berkeley command-line interfaces. 
 
 %format rpm
-%provides cups 1:@CUPS_VERSION@
-%provides lpd, lpr, LPRng
-%replaces lpd, lpr, LPRng
+%provides lpd
+%provides lpr
+%provides LPRng
+%replaces lpd
+%replaces lpr
+%replaces LPRng
+%requires cups-libs 1:@CUPS_VERSION@
 
 %format deb
 %provides cupsys
 %provides cupsys-client
 %provides cupsys-bsd
+%requires cups-libs
 
 %format pkg
 %replaces SUNWlpmsg LP Alerts
@@ -73,13 +78,15 @@
 %incompat maint*.print_*.* 0 0 1289999999 1289999999
 %incompat print 0 0 1289999999 1289999999
 %incompat fw_cups 0 0 1289999999 1289999999
+%requires cups.sw.libs
+
+%format portable
+%requires cups-libs
 
 %format all
 
 %subpackage libs
-%description Common UNIX Printing System - shared libraries
-%format rpm
-%provides cups-libs 1:@CUPS_VERSION@
+%description Shared libraries
 %format deb
 %provides libcups1
 %provides libcupsys2
@@ -88,34 +95,32 @@
 %format all
 
 %subpackage devel
-%description Common UNIX Printing System - development environment
-%format rpm
-%provides cups-devel 1:@CUPS_VERSION@
+%description Development environment
 %format deb
 %provides libcupsys2-dev
 %provides libcupsimage2-dev
 %format all
 
 %subpackage lpd
-%description Common UNIX Printing System - LPD support
-%format rpm
-%provides cups-lpd 1:@CUPS_VERSION@
-%format all
+%description LPD support
 
 %subpackage de
-%description Common UNIX Printing System - German support
+%description German support
 
 %subpackage es
-%description Common UNIX Printing System - Spanish support
+%description Spanish support
+
+%subpackage et
+%description Estonian support
 
 %subpackage ja
-%description Common UNIX Printing System - Japanese support
+%description Japanese support
 
 %subpackage pl
-%description Common UNIX Printing System - Polish support
+%description Polish support
 
 %subpackage sv
-%description Common UNIX Printing System - Swedish support
+%description Swedish support
 
 %subpackage
 
@@ -351,6 +356,8 @@ d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 f 0644 root sys $LOCALEDIR/de/cups_de.po locale/cups_de.po
 %subpackage es
 f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
+%subpackage et
+f 0644 root sys $LOCALEDIR/et/cups_et.po locale/cups_et.po
 %subpackage ja
 f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
 %subpackage pl
@@ -420,6 +427,9 @@ f 0644 root sys $DATADIR/templates/de templates/de/*.tmpl
 %subpackage es
 d 0755 root sys $DATADIR/templates/es
 f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
+%subpackage et
+d 0755 root sys $DATADIR/templates/et
+f 0644 root sys $DATADIR/templates/et templates/et/*.tmpl
 %subpackage ja
 d 0755 root sys $DATADIR/templates/ja
 f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
@@ -510,6 +520,11 @@ d 0755 root sys $DOCDIR/es
 f 0644 root sys $DOCDIR/es doc/es/*.html
 d 0755 root sys $DOCDIR/es/images -
 f 0644 root sys $DOCDIR/es/images doc/es/images/*.gif
+%subpackage et
+d 0755 root sys $DOCDIR/et
+f 0644 root sys $DOCDIR/et doc/et/*.html
+d 0755 root sys $DOCDIR/et/images -
+f 0644 root sys $DOCDIR/et/images doc/et/images/*.gif
 %subpackage ja
 d 0755 root sys $DOCDIR/ja
 f 0644 root sys $DOCDIR/ja doc/ja/*.html
@@ -602,5 +617,5 @@ f 0644 root sys $XINETD/cups-lpd init/cups-lpd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 5964 2006-09-19 16:27:29Z mike $".
+# End of "$Id: cups.list.in 6003 2006-10-02 16:26:04Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c 5878 2006-08-24 15:55:42Z mike $"
+ * "$Id: cups-lpd.c 6022 2006-10-10 19:47:03Z mike $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -150,8 +150,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   num_defaults = 0;
   defaults     = NULL;
   hostlookups  = 1;
-  num_defaults = cupsAddOption("job-originating-host-name", hostname,
-                               num_defaults, &defaults);
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -216,6 +214,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     syslog(LOG_INFO, "Connection from %s (%s %s)", hostname, hostfamily,
            hostip);
   }
+
+  num_defaults = cupsAddOption("job-originating-host-name", hostname,
+                               num_defaults, &defaults);
 
  /*
   * RFC1179 specifies that only 1 daemon command can be received for
@@ -1716,5 +1717,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c 5878 2006-08-24 15:55:42Z mike $".
+ * End of "$Id: cups-lpd.c 6022 2006-10-10 19:47:03Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: scsi.c 5023 2006-01-29 14:39:44Z mike $"
+ * "$Id: scsi.c 6032 2006-10-12 19:19:47Z mike $"
  *
  *   SCSI printer backend for the Common UNIX Printing System (CUPS).
  *
@@ -80,7 +80,7 @@ void	list_devices(void);
 int	print_device(const char *resource, int fd, int copies);
 
 
-#ifdef __linux__
+#if defined(__linux__) && defined(HAVE_SCSI_SG_H)
 #  include "scsi-linux.c"
 #elif defined(__sgi)
 #  include "scsi-irix.c"
@@ -90,7 +90,7 @@ int	print_device(const char *resource, int fd, int copies);
  */
 void	list_devices(void) {}
 int	print_device(const char *resource, int fd, int copies) { return (CUPS_BACKEND_FAILED); }
-#endif /* __linux */
+#endif /* __linux && HAVE_SCSI_SG_H */
 
 
 /*
@@ -220,5 +220,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: scsi.c 5023 2006-01-29 14:39:44Z mike $".
+ * End of "$Id: scsi.c 6032 2006-10-12 19:19:47Z mike $".
  */

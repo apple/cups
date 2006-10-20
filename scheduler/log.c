@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 5493 2006-05-05 16:33:57Z mike $"
+ * "$Id: log.c 6027 2006-10-11 21:04:58Z mike $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -362,11 +362,16 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 
   if (!strcmp(AccessLog, "syslog"))
   {
-    syslog(LOG_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT "\n",
+    syslog(LOG_INFO,
+           "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
            con->http.hostname, con->username[0] != '\0' ? con->username : "-",
 	   states[con->operation], con->uri,
 	   con->http.version / 100, con->http.version % 100,
-	   code, CUPS_LLCAST con->bytes);
+	   code, CUPS_LLCAST con->bytes,
+	   con->request ?
+	       ippOpString(con->request->request.op.operation_id) : "-",
+	   con->response ?
+	       ippErrorString(con->response->request.status.status_code) : "-");
 
     return (1);
   }
@@ -546,5 +551,5 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c 5493 2006-05-05 16:33:57Z mike $".
+ * End of "$Id: log.c 6027 2006-10-11 21:04:58Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: imagetops.c 5379 2006-04-07 13:48:37Z mike $"
+ * "$Id: imagetops.c 6003 2006-10-02 16:26:04Z mike $"
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -609,8 +609,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   puts("%%Creator: imagetops/" CUPS_SVERSION);
   strftime(curdate, sizeof(curdate), "%c", curtm);
   printf("%%%%CreationDate: %s\n", curdate);
-  printf("%%%%Title: %s\n", argv[3]);
-  printf("%%%%For: %s\n", argv[2]);
+  WriteTextComment("Title", argv[3]);
+  WriteTextComment("For", argv[2]);
   if (Orientation & 1)
     puts("%%Orientation: Landscape");
   else
@@ -1063,5 +1063,5 @@ ps_ascii85(cups_ib_t *data,		/* I - Data to print */
 
 
 /*
- * End of "$Id: imagetops.c 5379 2006-04-07 13:48:37Z mike $".
+ * End of "$Id: imagetops.c 6003 2006-10-02 16:26:04Z mike $".
  */

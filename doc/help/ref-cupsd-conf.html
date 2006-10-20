@@ -139,7 +139,10 @@ specifies a CIDR netmask, as shown in Table 1.</P>
 
 <P>The <CODE>@LOCAL</CODE> name will allow access from all local
 interfaces. The <CODE>@IF(name)</CODE> name will allow access
-from the named interface.</P>
+from the named interface. In both cases, CUPS only allows access
+from the network that the interface(s) are configured for -
+requests  arriving on the interface from a foreign network will
+<em>not</em> be accepted.</P>
 
 <P>The <CODE>Allow</CODE> directive must appear inside a <A
 HREF="#Location"><CODE>Location</CODE></A> or <A
@@ -353,7 +356,10 @@ or bit count.</P>
 
 <P>The <CODE>@LOCAL</CODE> name will allow browse data from all
 local interfaces. The <CODE>@IF(name)</CODE> name will allow
-browse data from the named interface.</P>
+browse data from the named interface. In both cases, CUPS only
+allows data from the network that the interface(s) are configured
+for - data arriving on the interface from a foreign network will
+<em>not</em> be allowed.</P>
 
 
 <H2 CLASS="title"><A NAME="BrowseDeny">BrowseDeny</A></H2>
@@ -388,7 +394,10 @@ or bit count.</P>
 
 <P>The <CODE>@LOCAL</CODE> name will block browse data from all
 local interfaces. The <CODE>@IF(name)</CODE> name will block
-browse data from the named interface.</P>
+browse data from the named interface. In both cases, CUPS only
+blocks data from the network that the interface(s) are configured
+for - data arriving on the interface from a foreign network will
+<em>not</em> be blocked.</P>
 
 
 <H2 CLASS="title"><A NAME="BrowseInterval">BrowseInterval</A></H2>
@@ -981,7 +990,10 @@ specifies a CIDR netmask, a shown in <A HREF="TABLE1">Table
 
 <P>The <CODE>@LOCAL</CODE> name will deny access from all local
 interfaces. The <CODE>@IF(name)</CODE> name will deny access from
-the named interface.</P>
+the named interface. In both cases, CUPS only denies access from
+the network that the interface(s) are configured for - requests
+arriving on the interface from a foreign network will
+<em>not</em> be denied.</P>
 
 <P>The <CODE>Deny</CODE> directive must appear inside a <A
 HREF="#Location"><CODE>Location</CODE></A> or <A

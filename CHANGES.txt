@@ -1,5 +1,67 @@
-CHANGES.txt - 2006-09-21
+CHANGES.txt - 2006-10-20
 ------------------------
+
+CHANGES IN CUPS V1.2.5
+
+	- Documentation updates (STR #2038)
+	- The SNMP backend no longer uses IPP for Epson printers
+	  (STR #2028)
+	- Updated the configure script for Tru64 UNIX 5.1 (STR
+	  #2033)
+	- Tru64 5.1B's getaddrinfo() and getnameinfo() functions
+	  leak file descriptors (STR #2034)
+	- cupsAddDest() didn't add the parent destination's
+	  options and attributes.
+	- ppdConflicts() did not handle custom option
+	  constraints.
+	- Raw printing of gzip'd files did not work (STR #2009)
+	- The scheduler no longer preserves default option
+	  choices when the new PPD no longer provides the old
+	  default choice (STR #1929)
+	- The Linux SCSI backend is now only built if the SCSI
+	  development headers are installed.
+	- USB printing to Minolta printers did not work (STR
+	  #2019)
+	- Windows clients could not monitor the queue status (STR
+	  #2006)
+	- The scheduler didn't log the operation name in the
+	  access_log file for Create-Job and Print-Job requests.
+	- The PostScript filter now separates collated copies
+	  with any required JCL commands so that JCL-based
+	  finishing options act on the individual copies and not
+	  all of the copies as a single document.
+	- The PostScript filter now disables duplex printing when
+	  printing a 1-page document.
+	- cups-lpd didn't pass the correct
+	  job-originating-host-name value (STR #2023)
+	- Fixed some speling errors in the German message catalog
+	  (STR #2012)
+	- cupstestppd did not catch PPD files with bad
+	  UIConstraints values (STR #2016)
+	- The USB backend did not work with the current udev-
+	  created printers if the first printer was disconnected
+	  (STR #2017)
+	- Mirrored and rotated printing did not work with some
+	  documents (STR #2004)
+	- 2-sided printing with banners did not work properly on
+	  some printers (STR #2018)
+	- Updated the raw type rule to handle PJL within the
+	  first 4k of a print job (STR #1969)
+	- Added an Estonian translation (STR #1957)
+	- Clarified the documentation for the cupsd.conf @LOCAL
+	  and @IF(name) allow/deny functionality (STR #1992)
+	- The PostScript filters did not escape the Title and For
+	  comments in the print job header (STR #1988)
+	- The scheduler would use 100% CPU if browsing was
+	  disabled and the cupsd.conf file contained BrowsePoll
+	  lines (STR #1994)
+	- The cupsDirRead() function did not work properly on
+	  non-POSIX-compliant systems (STR #2001)
+	- The cupsFile functions didn't handle read/write errors
+	  properly (STR #1996)
+	- The DBUS support now works with older versions of the
+	  DBUS library.
+
 
 CHANGES IN CUPS V1.2.4
 

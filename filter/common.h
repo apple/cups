@@ -1,9 +1,9 @@
 /*
- * "$Id: common.h 4493 2005-02-18 02:09:53Z mike $"
+ * "$Id: common.h 6003 2006-10-02 16:26:04Z mike $"
  *
  *   Common filter definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -76,6 +76,7 @@ extern void	WriteCommon(void);
 extern void	WriteLabelProlog(const char *label, float bottom,
 		                 float top, float width);
 extern void	WriteLabels(int orient);
+extern void	WriteTextComment(const char *name, const char *value);
 
 
 /*
@@ -88,5 +89,5 @@ extern void	WriteLabels(int orient);
 
 
 /*
- * End of "$Id: common.h 4493 2005-02-18 02:09:53Z mike $".
+ * End of "$Id: common.h 6003 2006-10-02 16:26:04Z mike $".
  */

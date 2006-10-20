@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 5930 2006-09-07 19:49:34Z mike $"
+dnl "$Id: cups-common.m4 6032 2006-10-12 19:19:47Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -29,7 +29,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Versio number information...
-CUPS_VERSION="1.2.4"
+CUPS_VERSION="1.2.5"
 CUPS_REVISION=""
 if test -z "$CUPS_REVISION" -a -d .svn; then
 	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -132,6 +132,7 @@ AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H))
 AC_CHECK_HEADER(bstring.h,AC_DEFINE(HAVE_BSTRING_H))
 AC_CHECK_HEADER(usersec.h,AC_DEFINE(HAVE_USERSEC_H))
 AC_CHECK_HEADER(sys/ioctl.h,AC_DEFINE(HAVE_SYS_IOCTL_H))
+AC_CHECK_HEADER(scsi/sg.h,AC_DEFINE(HAVE_SCSI_SG_H))
 
 dnl Checks for string functions.
 AC_CHECK_FUNCS(strdup strcasecmp strncasecmp strlcat strlcpy)
@@ -231,12 +232,13 @@ case $uname in
 				AC_MSG_CHECKING(for DBUS)
 				if $PKGCONFIG --exists dbus-1; then
 					AC_MSG_RESULT(yes)
+					AC_DEFINE(HAVE_DBUS)
+					CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
+					CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
+					DBUSDIR="/etc/dbus-1/system.d"
 					AC_CHECK_LIB(dbus-1,
 					    dbus_message_iter_init_append,
-					    AC_DEFINE(HAVE_DBUS)
-					    CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
-					    CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
-					    DBUSDIR="/etc/dbus-1/system.d")
+					    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
 				else
 					AC_MSG_RESULT(no)
 				fi
@@ -265,5 +267,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 5930 2006-09-07 19:49:34Z mike $".
+dnl End of "$Id: cups-common.m4 6032 2006-10-12 19:19:47Z mike $".
 dnl

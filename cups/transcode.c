@@ -1,5 +1,5 @@
 /*
- * "$Id: transcode.c 5838 2006-08-17 14:41:42Z mike $"
+ * "$Id: transcode.c 6038 2006-10-14 15:53:10Z mike $"
  *
  *   Transcoding support for the Common UNIX Printing System (CUPS).
  *
@@ -445,6 +445,7 @@ cupsUTF8ToUTF32(
       */
 
       *dest++ = ch;
+      continue;
     }
     else if ((ch & 0xe0) == 0xc0)
     {
@@ -540,7 +541,7 @@ cupsUTF8ToUTF32(
     * Check for UTF-16 surrogate (illegal UTF-8)...
     */
 
-    if (*dest >= 0xd800 && *dest <= 0xdfff)
+    if (ch32 >= 0xd800 && ch32 <= 0xdfff)
       return (-1);
   }
 
@@ -1583,5 +1584,5 @@ get_vbcs_charmap(
 
 
 /*
- * End of "$Id: transcode.c 5838 2006-08-17 14:41:42Z mike $"
+ * End of "$Id: transcode.c 6038 2006-10-14 15:53:10Z mike $"
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 5630 2006-06-05 18:42:53Z mike $"
+ * "$Id: config.h.in 6032 2006-10-12 19:19:47Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -145,6 +145,13 @@
  */
 
 #undef HAVE_CRYPT_H
+
+
+/*
+ * Do we have <scsi/sg.h>?
+ */
+
+#undef HAVE_SCSI_SG_H
 
 
 /*
@@ -434,6 +441,7 @@
  */
 
 #undef HAVE_DBUS
+#undef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND
 
 
 /*
@@ -446,5 +454,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 5630 2006-06-05 18:42:53Z mike $".
+ * End of "$Id: config.h.in 6032 2006-10-12 19:19:47Z mike $".
  */

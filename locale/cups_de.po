@@ -76,7 +76,7 @@ msgid "Auto"
 msgstr "Automatisch"
 
 msgid "Enter your username and password or the root username and password to access this page."
-msgstr "Für Zugang Benutzername und Passwort (oder Benutzername und Password für root) eingeben."
+msgstr "Für Zugang Benutzername und Passwort (oder Benutzername und Passwort für root) eingeben."
 
 msgid "You must use a https: URL to access this page."
 msgstr "Eine https:-URL ist für den Zugriff erforderlich."
@@ -401,7 +401,7 @@ msgid "status\t\tshow status of daemon and queue\n"
 msgstr "status\t\tzeigt den Status von Diensten und Warteschlangen\n"
 
 msgid "?Invalid help command unknown\n"
-msgstr "?Ungültig Hilfebefehl nicht bekannt\n"
+msgstr "?Ungültiger Hilfebefehl nicht bekannt\n"
 
 #, c-format
 msgid "\tprinter is on device '%s' speed -1\n"
@@ -1884,7 +1884,7 @@ msgid "Unable to add printer:"
 msgstr "Kann Drucker nicht hinzufügen:"
 
 msgid "Set Printer Options"
-msgstr "Druckereinstellugen setzen"
+msgstr "Druckereinstellungen setzen"
 
 msgid "Missing form variable!"
 msgstr "Vermisse Formularvariable!"

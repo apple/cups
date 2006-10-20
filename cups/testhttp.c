@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c 5679 2006-06-20 14:45:15Z mike $"
+ * "$Id: testhttp.c 6003 2006-10-02 16:26:04Z mike $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -84,6 +84,8 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    "http", "username:password", "server", "/", 8080, 8080 },
 			  { HTTP_URI_OK, "http://username:passwor%64@server:8080/directory/filename",
 			    "http", "username:password", "server", "/directory/filename", 8080, 8080 },
+			  { HTTP_URI_OK, "http://[2000::10:100]:631/ipp",
+			    "http", "", "2000::10:100", "/ipp", 631, 631 },
 			  { HTTP_URI_OK, "https://username:passwor%64@server/directory/filename",
 			    "https", "username:password", "server", "/directory/filename", 443, 0 },
 			  { HTTP_URI_OK, "ipp://username:passwor%64@[::1]/ipp",
@@ -531,5 +533,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c 5679 2006-06-20 14:45:15Z mike $".
+ * End of "$Id: testhttp.c 6003 2006-10-02 16:26:04Z mike $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-threads.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id: cups-threads.m4 6012 2006-10-03 22:35:12Z mike $"
 dnl
 dnl   Threading stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -44,6 +44,12 @@ if test "x$enable_threads" != xno; then
 
 			if test $have_pthread = yes; then
 				PTHREAD_FLAGS="-D_THREAD_SAFE -D_REENTRANT"
+
+				# Solaris requires _POSIX_PTHREAD_SEMANTICS to
+				# be POSIX-compliant... :(
+				if test $uname = SunOS; then
+					PTHREAD_FLAGS="$PTHREAD_FLAGS _POSIX_PTHREAD_SEMANTICS"
+				fi
 				break
 			fi
 		done
@@ -53,5 +59,5 @@ fi
 AC_SUBST(PTHREAD_FLAGS)
 
 dnl
-dnl End of "$Id: cups-threads.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id: cups-threads.m4 6012 2006-10-03 22:35:12Z mike $".
 dnl

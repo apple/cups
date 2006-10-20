@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 5940 2006-09-11 18:30:09Z mike $"
+ * "$Id: dirsvc.c 6003 2006-10-02 16:26:04Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1062,7 +1062,7 @@ cupsdStartPolling(void)
   * Don't do anything if we aren't polling...
   */
 
-  if (NumPolled == 0)
+  if (NumPolled == 0 || BrowseSocket < 0)
   {
     PollPipe         = -1;
     PollStatusBuffer = NULL;
@@ -3181,5 +3181,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id: dirsvc.c 5940 2006-09-11 18:30:09Z mike $".
+ * End of "$Id: dirsvc.c 6003 2006-10-02 16:26:04Z mike $".
  */

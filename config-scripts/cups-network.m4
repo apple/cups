@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4 5634 2006-06-06 17:48:27Z mike $"
+dnl "$Id: cups-network.m4 6049 2006-10-20 15:07:21Z mike $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -24,11 +24,16 @@ dnl
 
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(gethostbyaddr, nsl)
-AC_SEARCH_LIBS(getaddrinfo, nsl, AC_DEFINE(HAVE_GETADDRINFO))
 AC_SEARCH_LIBS(getifaddrs, nsl, AC_DEFINE(HAVE_GETIFADDRS))
-AC_SEARCH_LIBS(getnameinfo, nsl, AC_DEFINE(HAVE_GETNAMEINFO))
 AC_SEARCH_LIBS(hstrerror, nsl socket resolv, AC_DEFINE(HAVE_HSTRERROR))
 AC_SEARCH_LIBS(rresvport_af, nsl, AC_DEFINE(HAVE_RRESVPORT_AF))
+
+# Tru64 5.1b leaks file descriptors with these functions; disable until
+# we can come up with a test for this...
+if test "$uname" != "OSF1"; then
+	AC_SEARCH_LIBS(getaddrinfo, nsl, AC_DEFINE(HAVE_GETADDRINFO))
+	AC_SEARCH_LIBS(getnameinfo, nsl, AC_DEFINE(HAVE_GETNAMEINFO))
+fi
 
 AC_CHECK_MEMBER(struct sockaddr.sa_len,,, [#include <sys/socket.h>])
 AC_CHECK_HEADER(sys/sockio.h, AC_DEFINE(HAVE_SYS_SOCKIO_H))
@@ -85,5 +90,5 @@ AC_SUBST(CUPS_DEFAULT_DOMAINSOCKET)
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
 
 dnl
-dnl End of "$Id: cups-network.m4 5634 2006-06-06 17:48:27Z mike $".
+dnl End of "$Id: cups-network.m4 6049 2006-10-20 15:07:21Z mike $".
 dnl

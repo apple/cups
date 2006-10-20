@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types 5402 2006-04-14 19:21:03Z mike $"
+# "$Id: mime.types 6003 2006-10-02 16:26:04Z mike $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -154,8 +154,8 @@ application/vnd.cups-raster	string(0,"RaSt") string(0,"tSaR")
 application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 				string(0,<1B>@) \
 				(contains(0,128,<1B>%-12345X) + \
-				 (contains(0,1024,"LANGUAGE=PCL") \
-				  contains(0,1024,"LANGUAGE = PCL")))
+				 (contains(0,4096,"LANGUAGE=PCL") \
+				  contains(0,4096,"LANGUAGE = PCL")))
 
 ########################################################################
 #
@@ -167,5 +167,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 application/octet-stream
 
 #
-# End of "$Id: mime.types 5402 2006-04-14 19:21:03Z mike $".
+# End of "$Id: mime.types 6003 2006-10-02 16:26:04Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: snmp.c 5976 2006-09-20 22:46:15Z mike $"
+ * "$Id: snmp.c 6049 2006-10-20 15:07:21Z mike $"
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
@@ -1728,13 +1728,14 @@ probe_device(snmp_cache_t *device)	/* I - Device */
   debug_printf("DEBUG: %.3f Probing %s...\n", run_time(), device->addrname);
 
   if (device->make_and_model &&
-      (!strncasecmp(device->make_and_model, "Kyocera", 7) ||
+      (!strncasecmp(device->make_and_model, "Epson", 5) ||
+       !strncasecmp(device->make_and_model, "Kyocera", 7) ||
        !strncasecmp(device->make_and_model, "Lexmark", 7) ||
        !strncasecmp(device->make_and_model, "Tektronix", 9) ||
        !strncasecmp(device->make_and_model, "Xerox", 5)))
   {
    /*
-    * Kyocera, Lexmark, Tektronix, and Xerox printers often lock up on
+    * Epson, Kyocera, Lexmark, Tektronix, and Xerox printers often lock up on
     * IPP probes, so exclude them from the IPP connection test...
     */
 
@@ -2454,5 +2455,5 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 
 
 /*
- * End of "$Id: snmp.c 5976 2006-09-20 22:46:15Z mike $".
+ * End of "$Id: snmp.c 6049 2006-10-20 15:07:21Z mike $".
  */

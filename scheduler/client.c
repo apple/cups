@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 5972 2006-09-19 20:44:07Z mike $"
+ * "$Id: client.c 6027 2006-10-11 21:04:58Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -796,7 +796,19 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	cupsdClearString(&con->command);
 	cupsdClearString(&con->options);
 
-	if (con->language != NULL)
+	if (con->request)
+	{
+	  ippDelete(con->request);
+	  con->request = NULL;
+	}
+
+	if (con->response)
+	{
+	  ippDelete(con->response);
+	  con->response = NULL;
+	}
+
+	if (con->language)
 	{
 	  cupsLangFree(con->language);
 	  con->language = NULL;
@@ -1747,7 +1759,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 			    "CHUNKED" : "LENGTH",
 			CUPS_LLCAST con->http.data_remaining, con->file);
 
-        if (con->request != NULL)
+        if (con->request)
 	{
 	 /*
 	  * Grab any request data from the connection...
@@ -2267,7 +2279,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       con->http.state != HTTP_POST_SEND)
     return (1);
 
-  if (con->response != NULL)
+  if (con->response)
   {
     ipp_state = ippWrite(HTTP(con), con->response);
     bytes     = ipp_state != IPP_ERROR && ipp_state != IPP_DATA;
@@ -2463,13 +2475,13 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       cupsdClearString(&con->filename);
     }
 
-    if (con->request != NULL)
+    if (con->request)
     {
       ippDelete(con->request);
       con->request = NULL;
     }
 
-    if (con->response != NULL)
+    if (con->response)
     {
       ippDelete(con->response);
       con->response = NULL;
@@ -4188,5 +4200,5 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 5972 2006-09-19 20:44:07Z mike $".
+ * End of "$Id: client.c 6027 2006-10-11 21:04:58Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c 5753 2006-07-18 19:53:24Z mike $"
+ * "$Id: dest.c 6044 2006-10-17 20:32:59Z mike $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -64,21 +64,31 @@ static int	cups_get_sdests(http_t *http, ipp_op_t op, int num_dests,
 /*
  * 'cupsAddDest()' - Add a destination to the list of destinations.
  *
- * Use the cupsSaveDests() function to save the updated list of destinations
- * to the user's lpoptions file.
+ * This function cannot be used to add a new class or printer queue,
+ * it only adds a new container of saved options for the named
+ * destination or instance.
+ *
+ * If the named destination already exists, the destination list is
+ * returned unchanged.  Adding a new instance of a destination creates
+ * a copy of that destination's options.
+ *
+ * Use the cupsSaveDests() function to save the updated list of
+ * destinations to the user's lpoptions file.
  */
 
 int					/* O  - New number of destinations */
-cupsAddDest(const char  *name,		/* I  - Name of destination */
-            const char	*instance,	/* I  - Instance of destination or NULL for none/primary */
+cupsAddDest(const char  *name,		/* I  - Destination name */
+            const char	*instance,	/* I  - Instance name or NULL for none/primary */
             int         num_dests,	/* I  - Number of destinations */
             cups_dest_t **dests)	/* IO - Destinations */
 {
   int		i;			/* Looping var */
   cups_dest_t	*dest;			/* Destination pointer */
+  cups_dest_t	*parent;		/* Parent destination */
+  cups_option_t	*option;		/* Current option */
 
 
-  if (name == NULL || dests == NULL)
+  if (!name || !dests)
     return (0);
 
   if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
@@ -98,26 +108,52 @@ cupsAddDest(const char  *name,		/* I  - Name of destination */
 
   *dests = dest;
 
+ /*
+  * Find where to insert the destination...
+  */
+
   for (i = num_dests; i > 0; i --, dest ++)
     if (strcasecmp(name, dest->name) < 0)
       break;
+    else if (!instance && dest->instance)
+      break;
     else if (!strcasecmp(name, dest->name) &&
-             instance != NULL && dest->instance != NULL &&
+             instance  && dest->instance &&
              strcasecmp(instance, dest->instance) < 0)
       break;
 
   if (i > 0)
     memmove(dest + 1, dest, i * sizeof(cups_dest_t));
 
+ /*
+  * Initialize the destination...
+  */
+
   dest->name        = strdup(name);
   dest->is_default  = 0;
   dest->num_options = 0;
   dest->options     = (cups_option_t *)0;
 
-  if (instance == NULL)
+  if (!instance)
     dest->instance = NULL;
   else
+  {
+   /*
+    * Copy options from the primary instance...
+    */
+
     dest->instance = strdup(instance);
+
+    if ((parent = cupsGetDest(name, NULL, num_dests + 1, *dests)) != NULL)
+    {
+      for (i = parent->num_options, option = parent->options;
+           i > 0;
+	   i --, option ++)
+	dest->num_options = cupsAddOption(option->name, option->value,
+	                                  dest->num_options,
+					  &(dest->options));
+    }
+  }
 
   return (num_dests + 1);
 }
@@ -160,18 +196,18 @@ cupsFreeDests(int         num_dests,	/* I - Number of destinations */
  */
 
 cups_dest_t *				/* O - Destination pointer or NULL */
-cupsGetDest(const char  *name,		/* I - Name of destination */
-            const char	*instance,	/* I - Instance of destination */
+cupsGetDest(const char  *name,		/* I - Destination name or NULL for the default destination */
+            const char	*instance,	/* I - Instance name or NULL */
             int         num_dests,	/* I - Number of destinations */
             cups_dest_t *dests)		/* I - Destinations */
 {
   int	comp;				/* Result of comparison */
 
 
-  if (num_dests == 0 || dests == NULL)
+  if (num_dests <= 0 || !dests)
     return (NULL);
 
-  if (name == NULL)
+  if (!name)
   {
    /*
     * NULL name for default printer.
@@ -198,9 +234,9 @@ cupsGetDest(const char  *name,		/* I - Name of destination */
 	return (NULL);
       else if (comp == 0)
       {
-	if ((instance == NULL && dests->instance == NULL) ||
+	if ((!instance && !dests->instance) ||
             (instance != NULL && dests->instance != NULL &&
-	     strcasecmp(instance, dests->instance) == 0))
+	     !strcasecmp(instance, dests->instance)))
 	  return (dests);
       }
 
@@ -220,6 +256,9 @@ cupsGetDest(const char  *name,		/* I - Name of destination */
  * printer-info, printer-is-accepting-jobs, printer-is-shared,
  * printer-make-and-model, printer-state, printer-state-change-time,
  * printer-state-reasons, and printer-type attributes as options.
+ *
+ * Use the cupsFreeDests() function to free the destination list and
+ * the cupsGetDest() function to find a particular destination.
  */
 
 int					/* O - Number of destinations */
@@ -251,6 +290,9 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
  * printer-info, printer-is-accepting-jobs, printer-is-shared,
  * printer-make-and-model, printer-state, printer-state-change-time,
  * printer-state-reasons, and printer-type attributes as options.
+ *
+ * Use the cupsFreeDests() function to free the destination list and
+ * the cupsGetDest() function to find a particular destination.
  *
  * @since CUPS 1.1.21@
  */
@@ -1041,5 +1083,5 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: dest.c 5753 2006-07-18 19:53:24Z mike $".
+ * End of "$Id: dest.c 6044 2006-10-17 20:32:59Z mike $".
  */

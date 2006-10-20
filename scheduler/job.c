@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 5974 2006-09-20 18:42:37Z mike $"
+ * "$Id: job.c 6032 2006-10-12 19:19:47Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2626,6 +2626,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     * Add gziptoany filter to the front of the list...
     */
 
+    if (!filters)
+      filters = cupsArrayNew(NULL, NULL);
+
     if (!cupsArrayInsert(filters, &gziptoany_filter))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2652,6 +2655,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
    /*
     * Add port monitor to the end of the list...
     */
+
+    if (!filters)
+      filters = cupsArrayNew(NULL, NULL);
 
     if (!cupsArrayAdd(filters, &port_monitor))
     {
@@ -3462,5 +3468,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 5974 2006-09-20 18:42:37Z mike $".
+ * End of "$Id: job.c 6032 2006-10-12 19:19:47Z mike $".
  */

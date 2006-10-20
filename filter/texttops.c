@@ -1,5 +1,5 @@
 /*
- * "$Id: texttops.c 4680 2005-09-21 09:28:39Z mike $"
+ * "$Id: texttops.c 6003 2006-10-02 16:26:04Z mike $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -208,8 +208,8 @@ WriteProlog(const char *title,		/* I - Title of job */
   printf("%%cupsRotation: %d\n", (Orientation & 3) * 90);
   puts("%%Creator: texttops/" CUPS_SVERSION);
   printf("%%%%CreationDate: %s\n", curdate);
-  printf("%%%%Title: %s\n", title);
-  printf("%%%%For: %s\n", user);
+  WriteTextComment("Title", title);
+  WriteTextComment("For", user);
   puts("%%Pages: (atend)");
 
  /*
@@ -1307,5 +1307,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c 4680 2005-09-21 09:28:39Z mike $".
+ * End of "$Id: texttops.c 6003 2006-10-02 16:26:04Z mike $".
  */
