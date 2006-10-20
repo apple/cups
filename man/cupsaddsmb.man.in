@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "13 June 2006" "Easy Software Products"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "20 October 2006" "Easy Software Products"
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 
@@ -120,7 +120,7 @@ accordingly on your system as needed.
 The base driver for Windows 2000 and higher is the Microsoft
 PostScript driver, which is available on any system running
 Windows 2000 or higher in the
-%WINDOWS%\\SYSTEM32\\SPOOL\\DRIVERS\\W32X86\\3 folder.
+%WINDIR%\\SYSTEM32\\SPOOL\\DRIVERS\\W32X86\\3 folder.
 .LP
 The CUPS printer driver is preferred over the Microsoft driver
 since it supports the page-label, job-billing, and
@@ -200,6 +200,11 @@ exactly as named below:
 \fBNote:\fR Unlike Windows, case is significant - make sure that
 you use the UPPERCASE filenames shown above, otherwise
 \fIcupsaddsmb\fR will fail to export the drivers.
+
+.SH KNOWN ISSUES
+\fIcupsaddsmb\fR currently only supports 32-bit x86 drivers on
+Windows 2000 and higher. Support for 64-bit x86 drivers will be
+added in a future release.
 
 .SH SEE ALSO
 \fIsmbd(8)\fR, \fIsmb.conf(5)\fR,
