@@ -3985,14 +3985,14 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
     if ((!strcmp(system_paper, "Letter") && have_letter) ||
         (!strcmp(system_paper, "A4") && have_a4))
     {
-      num_defaults = ppd_add_default("PageSize", system_paper,
-				     num_defaults, &defaults);
-      num_defaults = ppd_add_default("PageRegion", system_paper,
-				     num_defaults, &defaults);
-      num_defaults = ppd_add_default("PaperDimension", system_paper,
-				     num_defaults, &defaults);
-      num_defaults = ppd_add_default("ImageableArea", system_paper,
-				     num_defaults, &defaults);
+      num_defaults = cupsAddOption("PageSize", system_paper,
+				   num_defaults, &defaults);
+      num_defaults = cupsAddOption("PageRegion", system_paper,
+				   num_defaults, &defaults);
+      num_defaults = cupsAddOption("PaperDimension", system_paper,
+				   num_defaults, &defaults);
+      num_defaults = cupsAddOption("ImageableArea", system_paper,
+				   num_defaults, &defaults);
     }
   }
 #endif /* HAVE_LIBPAPER */
