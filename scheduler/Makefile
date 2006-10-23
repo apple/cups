@@ -261,7 +261,7 @@ testdirsvc:	testdirsvc.o
 testlpd:	testlpd.o ../cups/libcups.a cups-lpd
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testlpd testlpd.o ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)
+		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(LIBGSSAPI)
 
 
 #
@@ -271,7 +271,7 @@ testlpd:	testlpd.o ../cups/libcups.a cups-lpd
 testmime:	testmime.o libmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)
+		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(LIBGSSAPI)
 
 
 #
@@ -281,7 +281,7 @@ testmime:	testmime.o libmime.a ../cups/libcups.a
 testspeed:	testspeed.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #
@@ -291,7 +291,7 @@ testspeed:	testspeed.o ../cups/libcups.a
 testsub:	testsub.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testsub testsub.o ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #

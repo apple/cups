@@ -357,8 +357,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   getrlimit(RLIMIT_NOFILE, &limit);
 
-  if (limit.rlim_max > CUPS_MAX_FDS)
-    MaxFDs = CUPS_MAX_FDS;
+  if (limit.rlim_max > FD_SETSIZE)
+    MaxFDs = FD_SETSIZE;
   else
     MaxFDs = limit.rlim_max;
 

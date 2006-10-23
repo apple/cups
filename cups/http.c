@@ -248,6 +248,12 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
 void
 httpClose(http_t *http)			/* I - HTTP connection */
 {
+#ifdef HAVE_GSSAPI
+  OM_uint32	minor_status,		/* Minor status code */
+		major_status;		/* Major status code */
+#endif /* HAVE_GSSAPI */
+
+
   DEBUG_printf(("httpClose(http=%p)\n", http));
 
   if (!http)
@@ -271,6 +277,15 @@ httpClose(http_t *http)			/* I - HTTP connection */
 #else
   close(http->fd);
 #endif /* WIN32 */
+
+#ifdef HAVE_GSSAPI
+  if (http->gssctx != GSS_C_NO_CONTEXT)
+    major_status = gss_delete_sec_context(&minor_status, &http->gssctx,
+                                          GSS_C_NO_BUFFER);
+
+  if (http->gssname != GSS_C_NO_NAME)
+    major_status = gss_release_name(&minor_status, &http->gssname);
+#endif /* HAVE_GSSAPI */
 
   httpClearFields(http);
 
@@ -349,6 +364,11 @@ httpConnectEncrypt(
   http->blocking = 1;
   http->activity = time(NULL);
   http->fd       = -1;
+
+#ifdef HAVE_GSSAPI
+  http->gssctx  = GSS_C_NO_CONTEXT;
+  http->gssname = GSS_C_NO_NAME;
+#endif /* HAVE_GSSAPI */
 
  /*
   * Set the encryption status...
@@ -2270,6 +2290,20 @@ http_send(http_t       *http,	/* I - HTTP connection */
   httpGetLength2(http);
   httpClearFields(http);
 
+ /*
+  * The Kerberos authentication string can only be used once...
+  */
+
+  if (http->authstring && !strncmp(http->authstring, "Negotiate", 9))
+  {
+    http->_authstring[0] = '\0';
+
+    if (http->authstring != http->_authstring)
+      free(http->authstring);
+  
+    http->authstring = http->_authstring;
+  }
+
   return (0);
 }
 
@@ -2504,6 +2538,7 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
   */
 
   memcpy(&myhttp, http, sizeof(myhttp));
+  myhttp.field_authorization = NULL;
 
  /*
   * Send an OPTIONS request to the server, requiring SSL or TLS

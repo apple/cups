@@ -783,7 +783,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     */
 
     authorization += 9;
-    while (*authorization && isspace(*authorization & 255))
+    while (isspace(*authorization & 255))
       authorization ++;
 
     if (!*authorization)
@@ -797,7 +797,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Get the server credentials...
     */
 
-    if ((server_creds = get_gss_creds("HTTP")) == NULL)
+    if ((server_creds = get_gss_creds(GSSServiceName)) == NULL)
     {
       con->no_negotiate = 1;
       return;	
@@ -836,6 +836,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
                          "cupsdAuthorize: Error accepting GSSAPI security "
 			 "context");
+
+      if (context != GSS_C_NO_CONTEXT)
+	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
+
       con->no_negotiate = 1;
       return;
     }
@@ -848,19 +852,22 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     {
       major_status = gss_display_name(&minor_status, client_name, 
 				      &output_token, NULL);
-      gss_release_name(&minor_status, &client_name);
 
       if (GSS_ERROR(major_status))
       {
 	cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
                            "cupsdAuthorize: Error getting username");
+	gss_release_name(&minor_status, &client_name);
+	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
 	con->no_negotiate = 1;
 	return;
       }
 
+      gss_release_name(&minor_status, &client_name);
       strlcpy(username, output_token.value, sizeof(username));
 
       gss_release_buffer(&minor_status, &output_token);
+      gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
     }
     else
       gss_release_name(&minor_status, &client_name);
@@ -1736,9 +1743,11 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   * See if encryption is required...
   */
 
-  if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
+  if ((best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
       strcasecmp(con->http.hostname, "localhost") &&
-      best->satisfy == AUTH_SATISFY_ALL)
+      best->satisfy == AUTH_SATISFY_ALL) &&
+      !(best->type == AUTH_KERBEROS || 
+        (best->type == AUTH_NONE && DefaultAuthType == AUTH_KERBEROS)))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsAuthorized: Need upgrade to TLS...");
@@ -2128,7 +2137,7 @@ get_gss_creds(const char *service_name)	/* I - Service name */
 	   httpGetHostname(NULL, fqdn, sizeof(fqdn)));
 
   token.value  = buf;
-  token.length = strlen(buf) + 1;
+  token.length = strlen(buf);
   server_name  = GSS_C_NO_NAME;
   major_status = gss_import_name(&minor_status, &token,
 	 			 GSS_C_NT_HOSTBASED_SERVICE,

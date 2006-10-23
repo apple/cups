@@ -117,7 +117,9 @@ static cupsd_var_t	variables[] =
   { "FilterLimit",		&FilterLimit,		CUPSD_VARTYPE_INTEGER },
   { "FilterNice",		&FilterNice,		CUPSD_VARTYPE_INTEGER },
   { "FontPath",			&FontPath,		CUPSD_VARTYPE_STRING },
-  { "HideImplicitMembers",	&HideImplicitMembers,	CUPSD_VARTYPE_BOOLEAN },
+#ifdef HAVE_GSSAPI
+  { "GSSServiceName",		&GSSServiceName,	CUPSD_VARTYPE_STRING },
+#endif /* HAVE_GSSAPI */
   { "ImplicitClasses",		&ImplicitClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitAnyClasses",	&ImplicitAnyClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },
@@ -288,6 +290,9 @@ cupsdReadConfiguration(void)
   cupsdSetString(&RemoteRoot, "remroot");
   cupsdSetString(&ServerHeader, "CUPS/1.2");
   cupsdSetString(&StateDir, CUPS_STATEDIR);
+#ifdef HAVE_GSSAPI
+  cupsdSetString(&GSSServiceName, CUPS_DEFAULT_GSSSERVICENAME);
+#endif /* HAVE_GSSAPI */
 
   if (!strcmp(CUPS_DEFAULT_PRINTCAP, "/etc/printers.conf"))
     PrintcapFormat = PRINTCAP_SOLARIS;
@@ -1706,7 +1711,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	loc->level = AUTH_USER;
     }
 #ifdef HAVE_GSSAPI
-    else if (!strcasecmp(value, "kerberos"))
+    else if (!strcasecmp(value, "kerberos") ||
+	     !strcasecmp(value, "gssapi"))
     {
       loc->type = AUTH_KERBEROS;
 

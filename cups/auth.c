@@ -168,9 +168,49 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 					/* Output token */
 			input_token = GSS_C_EMPTY_BUFFER;
 					/* Input token */
+    char		*gss_service_name;
+					/* GSS service name */
+    const char		*authorization;
+					/* Pointer into Authorization string */
 
 
-    http->gssname = cups_get_gss_creds(http, "HTTP");
+    if (http->gssname == GSS_C_NO_NAME)
+    {
+      if ((gss_service_name = getenv("CUPS_GSSSERVICENAME")) == NULL)
+	gss_service_name = CUPS_DEFAULT_GSSSERVICENAME;
+      else
+	DEBUG_puts("cupsDoAuthentication: GSS service name set via environment");
+
+      http->gssname = cups_get_gss_creds(http, gss_service_name);
+    }
+
+   /*
+    * Find the start of the Kerberos input token...
+    */
+
+    authorization = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
+
+    authorization += 9;
+    while (*authorization && isspace(*authorization & 255))
+      authorization ++;
+
+    if (*authorization)
+    {
+     /*
+      * For SPNEGO, this is where we'll feed the server's authorization data
+      * back into gss via input_token...
+      */
+    }
+    else
+    {
+      if (http->gssctx != GSS_C_NO_CONTEXT)
+      {
+	major_status = gss_delete_sec_context(&minor_status, &http->gssctx,
+	                                      GSS_C_NO_BUFFER);
+	http->gssctx = GSS_C_NO_CONTEXT;
+      }
+    }
+
     major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
 					 &http->gssctx,
 					 http->gssname, http->gssmech,
@@ -178,6 +218,9 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 					 GSS_C_NO_CHANNEL_BINDINGS,
 					 &input_token, &http->gssmech,
 					 &output_token, NULL, NULL);
+
+    if (input_token.value)
+      free(input_token.value);
 
     if (GSS_ERROR(major_status))
     {
@@ -193,11 +236,16 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
       DEBUG_gss_printf(major_status, minor_status, "Continuation needed!");
 #  endif /* DEBUG */
 
-    httpEncode64_2(encode, sizeof(encode), output_token.value,
-                   output_token.length);
+    if (output_token.length)
+    {
+      httpEncode64_2(encode, sizeof(encode), output_token.value,
+		     output_token.length);
 
-    http->authstring = malloc(strlen(encode) + 20);
-    sprintf(http->authstring, "Negotiate %s", encode); /* Safe because allocated */
+      http->authstring = malloc(strlen(encode) + 11);
+      sprintf(http->authstring, "Negotiate %s", encode); /* Safe because allocated */
+ 
+      major_status = gss_release_buffer(&minor_status, &output_token);
+    }
 
    /*
     * Copy back what we can to _authstring for backwards compatibility...
@@ -310,17 +358,11 @@ cups_get_gss_creds(
 	   httpGetHostname(http, fqdn, sizeof(fqdn)));
 
   token.value  = buf;
-  token.length = strlen(buf) + 1;
+  token.length = strlen(buf);
   server_name  = GSS_C_NO_NAME;
   major_status = gss_import_name(&minor_status, &token,
 	 			 GSS_C_NT_HOSTBASED_SERVICE,
 				 &server_name);
-
- /*
-  * Clear the service token after we are done to avoid exposing information...
-  */
-
-  memset(&token, 0, sizeof(token));
 
   if (GSS_ERROR(major_status))
   {

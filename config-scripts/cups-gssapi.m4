@@ -82,7 +82,23 @@ if test x$enable_gssapi != xno; then
 	fi
 fi
 
+dnl Default GSS service name...
+AC_ARG_WITH(gssservicename, [  --with-gssservicename         set default gss service name],
+	default_gssservicename="$withval",
+	default_gssservicename="default")
+
+if test x$default_gssservicename != xno; then
+	if test "x$default_gssservicename" = "xdefault"; then
+		CUPS_DEFAULT_GSSSERVICENAME="IPP"
+	else
+		CUPS_DEFAULT_GSSSERVICENAME="$default_gssservicename"
+	fi
+else
+	CUPS_DEFAULT_GSSSERVICENAME=""
+fi
+
 AC_SUBST(LIBGSSAPI)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GSSSERVICENAME, "$CUPS_DEFAULT_GSSSERVICENAME")
 
 dnl
 dnl End of "$Id$".

@@ -466,6 +466,13 @@
 #undef HAVE_HEIMDAL
 
 
+/*
+ * Default GSS service name...
+ */
+
+#define CUPS_DEFAULT_GSSSERVICENAME	""
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

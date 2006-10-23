@@ -7576,6 +7576,7 @@ static void
 save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
                 cupsd_job_t    *job)	/* I - Job */
 {
+#  ifndef __APPLE__
   krb5_context	krb_context;		/* Kerberos context */
   krb5_ccache	ccache;			/* Credentials cache */
   OM_uint32	major_status,		/* Major status code */
@@ -7616,6 +7617,7 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
                   krb5_cc_get_name(krb_context, ccache));
   krb5_cc_close(krb_context, ccache);
+#  endif /* !__APPLE__
 }
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 

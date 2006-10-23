@@ -112,6 +112,8 @@ VAR char		*AccessLog		VALUE(NULL),
 			*Classification		VALUE(NULL);
 					/* Classification of system */
 #ifdef HAVE_GSSAPI
+VAR char		*GSSServiceName		VALUE(NULL);
+					/* GSS service name */
 VAR char		*Krb5Keytab		VALUE(NULL);
 					/* Kerberos Keytab */
 #endif /* HAVE_GSSAPI */
