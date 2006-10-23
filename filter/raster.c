@@ -23,13 +23,6 @@
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  *
- *   This code and any derivative of it may be used and distributed
- *   freely under the terms of the GNU General Public License when
- *   used with GNU/GPL Ghostscript or its derivatives.  Use of the
- *   code (or any derivative of it) with software other than GNU/GPL
- *   GhostScript (or its derivatives) is governed by the CUPS license
- *   agreement.
- *
  *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:

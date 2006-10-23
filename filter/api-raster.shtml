@@ -55,6 +55,6 @@ CUPS 1.1 or higher.</p>
 <h2 class='title'>Licensing</h2>
 
 <p>The CUPS raster API is provided under the terms of the GNU
-General Public License, with exceptions for MacOS X-based
+Library General Public License, with exceptions for MacOS X-based
 programs. Please see the CUPS license agreement for more
 information.</p>

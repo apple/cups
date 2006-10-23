@@ -17,12 +17,12 @@ General Public License ("LGPL"), Version 2, with exceptions for
 Apple operating systems and the OpenSSL toolkit. A copy of the
 exceptions and licenses follow this introduction.
 
-The GNU LGPL applies to the CUPS API library, located in the
-"cups" subdirectory of the CUPS source distribution and in the
-"cups" include directory and library files in the binary
-distributions. The GNU GPL applies to the remainder of the CUPS
-distribution, including the "pdftops" filter which is based upon
-Xpdf and the CUPS imaging library.
+The GNU LGPL applies to the CUPS and CUPS Imaging libraries
+located in the "cups" and "filter" subdirectories of the CUPS
+source distribution and in the "cups" include directory and
+library files in the binary distributions. The GNU GPL applies to
+the remainder of the CUPS distribution, including the "pdftops"
+filter which is based upon Xpdf.
 
 For those not familiar with the GNU GPL, the license basically
 allows you to:
@@ -32,22 +32,19 @@ allows you to:
      binary form.
    - Sell verbatim copies of the software for a media fee, or
      sell support for the software.
-   - Distribute or sell printer drivers and filters that use
-     CUPS so long as source code is made available under the
-     GPL.
 
 What this license *does not* allow you to do is make changes or
 add features to CUPS and then sell a binary distribution without
-source code. You must provide source for any new drivers,
-changes, or additions to the software, and all code must be
-provided under the GPL or LGPL as appropriate. The only
-exceptions to this are the portions of the CUPS software covered
-by the Apple operating system license exceptions outlined later
-in this license agreement.
+source code. You must provide source for any changes or additions
+to the software, and all code must be provided under the GPL or
+LGPL as appropriate. The only exceptions to this are the portions
+of the CUPS software covered by the Apple operating system
+license exceptions outlined later in this license agreement.
 
 The GNU LGPL relaxes the "link-to" restriction, allowing you to
-develop applications that use the CUPS API library under other
-licenses and/or conditions as appropriate for your application.
+develop applications that use the CUPS and CUPS Imaging libraries
+under other licenses and/or conditions as appropriate for your
+application, driver, or filter.
 
 
 LICENSE EXCEPTIONS
@@ -155,9 +152,9 @@ BINARY DISTRIBUTION RIGHTS
 
 Easy Software Products also sells rights to the CUPS source code
 under a binary distribution license for vendors that are unable
-to release source code for their drivers, additions, and
-modifications to CUPS under the GNU GPL and LGPL. For
-information please contact us at the address shown above.
+to release source code for their additions and modifications to
+CUPS under the GNU GPL and LGPL. For information please contact
+us at the address shown above.
 
 The Common UNIX Printing System provides a "pdftops" filter that
 is based on the Xpdf software. For binary distribution licensing
