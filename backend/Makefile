@@ -46,7 +46,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) http
+	$(RM) $(OBJS) $(TARGETS) $(LIBOBJS) http
 
 
 #

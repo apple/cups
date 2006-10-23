@@ -106,6 +106,7 @@ main(int  argc,				/* I - Number of command-line args */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
 		resource[1024],		/* Resource info (printer name) */
+		addrname[256],		/* Address name */
 		*optptr,		/* Pointer to URI options */
 		name[255],		/* Name of option */
 		value[255],		/* Value of option */
@@ -572,6 +573,18 @@ main(int  argc,				/* I - Number of command-line args */
 
   fputs("STATE: -connecting-to-device\n", stderr);
   fprintf(stderr, "INFO: Connected to %s...\n", hostname);
+
+#ifdef AF_INET6
+  if (http->hostaddr->addr.sa_family == AF_INET6)
+    fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6)...\n", 
+		    httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
+		    ntohs(http->hostaddr->ipv6.sin6_port));
+  else
+#endif /* AF_INET6 */
+    if (http->hostaddr->addr.sa_family == AF_INET)
+      fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4)...\n",
+		      httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
+		      ntohs(http->hostaddr->ipv4.sin_port));
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for

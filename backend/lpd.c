@@ -582,6 +582,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 			*cptr;		/* Pointer into control file string */
   char			status;		/* Status byte from command */
   char			portname[255];	/* Port name */
+  char			addrname[256];	/* Address name */
   http_addrlist_t	*addrlist,	/* Address list */
 			*addr;		/* Socket address */
   int			copy;		/* Copies written */
@@ -820,8 +821,18 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     fputs("STATE: -connecting-to-device\n", stderr);
     fprintf(stderr, "INFO: Connected to %s...\n", hostname);
-    fprintf(stderr, "DEBUG: Connected on ports %d (local %d)...\n", port,
-            lport);
+
+#ifdef AF_INET6
+    if (addr->addr.addr.sa_family == AF_INET6)
+      fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6) (local port %d)...\n", 
+		      httpAddrString(&addr->addr, addrname, sizeof(addrname)),
+		      ntohs(addr->addr.ipv6.sin6_port), lport);
+    else
+#endif /* AF_INET6 */
+      if (addr->addr.addr.sa_family == AF_INET)
+	fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4) (local port %d)...\n",
+			httpAddrString(&addr->addr, addrname, sizeof(addrname)),
+			ntohs(addr->addr.ipv4.sin_port), lport);
 
    /*
     * Next, open the print file and figure out its size...

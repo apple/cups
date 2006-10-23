@@ -78,7 +78,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		delay;			/* Delay for retries... */
   int		device_fd;		/* AppSocket */
   int		error;			/* Error code (if any) */
-  http_addrlist_t *addrlist;		/* Address list */
+  http_addrlist_t *addrlist,		/* Address list */
+		  *addr;		/* Connected address */
+  char		addrname[256];		/* Address name */
   ssize_t	tbytes;			/* Total number of bytes written */
   struct timeval timeout;		/* Timeout for select() */
   fd_set	input;			/* Input set for select() */
@@ -245,7 +247,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   for (delay = 5;;)
   {
-    if (!httpAddrConnect(addrlist, &device_fd))
+    if ((addr = httpAddrConnect(addrlist, &device_fd)) == NULL)
     {
       error     = errno;
       device_fd = -1;
@@ -293,6 +295,19 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
   fputs("STATE: -connecting-to-device\n", stderr);
+  fprintf(stderr, "INFO: Connected to %s...\n", hostname);
+
+#ifdef AF_INET6
+  if (addr->addr.addr.sa_family == AF_INET6)
+    fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6)...\n", 
+		    httpAddrString(&addr->addr, addrname, sizeof(addrname)),
+		    ntohs(addr->addr.ipv6.sin6_port));
+  else
+#endif /* AF_INET6 */
+    if (addr->addr.addr.sa_family == AF_INET)
+      fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4)...\n",
+		      httpAddrString(&addr->addr, addrname, sizeof(addrname)),
+		      ntohs(addr->addr.ipv4.sin_port));
 
  /*
   * Print everything...
