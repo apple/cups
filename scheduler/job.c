@@ -1764,6 +1764,7 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
       strlcpy(job->printer->state_message, message,
               sizeof(job->printer->state_message));
       cupsdAddPrinterHistory(job->printer);
+      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
     }
 
     if (!strchr(job->status_buffer->buffer, '\n'))
