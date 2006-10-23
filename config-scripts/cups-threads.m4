@@ -45,10 +45,10 @@ if test "x$enable_threads" != xno; then
 			if test $have_pthread = yes; then
 				PTHREAD_FLAGS="-D_THREAD_SAFE -D_REENTRANT"
 
-				# Solaris requires _POSIX_PTHREAD_SEMANTICS to
+				# Solaris requires -D_POSIX_PTHREAD_SEMANTICS to
 				# be POSIX-compliant... :(
 				if test $uname = SunOS; then
-					PTHREAD_FLAGS="$PTHREAD_FLAGS _POSIX_PTHREAD_SEMANTICS"
+					PTHREAD_FLAGS="$PTHREAD_FLAGS -D_POSIX_PTHREAD_SEMANTICS"
 				fi
 				break
 			fi
