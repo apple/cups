@@ -1160,7 +1160,7 @@ void PSOutputDev::writeHeader(int firstPage, int lastPage,
 
   writePSFmt("%%Producer: xpdf/pdftops %s\n", xpdfVersion);
   xref->getDocInfo(&info);
-  if (info.dictLookup("Creator", &obj1)->isString()) {
+  if (info.isDict() && info.dictLookup("Creator", &obj1)->isString()) {
     writePS("%%Creator: ");
     s = obj1.getString();
     if ((s->getChar(0) & 0xff) == 0xfe &&
@@ -1226,7 +1226,7 @@ void PSOutputDev::writeHeader(int firstPage, int lastPage,
     writePS("\n");
   }
   obj1.free();
-  if (info.dictLookup("Title", &obj1)->isString()) {
+  if (info.isDict() && info.dictLookup("Title", &obj1)->isString()) {
     writePS("%%Title: ");
     s = obj1.getString();
     if ((s->getChar(0) & 0xff) == 0xfe &&
