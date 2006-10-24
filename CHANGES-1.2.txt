@@ -1,6 +1,17 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.6
+
+	- The network backends now log the numeric address that
+	  is being used (STR #2046)
+	- Fixed a compile error when using libpaper.
+	- Fixed a compile error when compiling on Solaris with
+	  threading enabled (STR #2049, STR #2050)
+	- Missing printer-state-changed event for
+	  printer-state-message updates (STR #2047)
+
+
 CHANGES IN CUPS V1.2.5
 
 	- Documentation updates (STR #2038)
