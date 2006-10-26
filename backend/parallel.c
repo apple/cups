@@ -88,7 +88,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		*options;		/* Pointer to options */
   int		port;			/* Port number (not used) */
   int		print_fd,		/* Print file */
-		device_fd;		/* Parallel device */
+		device_fd,		/* Parallel device */
+		use_bc;			/* Read back-channel data? */
   int		copies;			/* Number of copies to print */
   size_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
@@ -188,7 +189,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-    if ((device_fd = open(resource, O_WRONLY | O_EXCL)) == -1)
+    if ((device_fd = open(resource, O_RDWR | O_EXCL)) == -1)
+    {
+      device_fd = open(resource, O_WRONLY | O_EXCL);
+      use_bc    = 0;
+    }
+    else
+      use_bc = 1;
+
+    if (device_fd == -1)
     {
       if (getenv("CLASS") != NULL)
       {
@@ -264,7 +273,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, 1);
+    tbytes = backendRunLoop(print_fd, device_fd, use_bc);
 
     if (print_fd != 0 && tbytes >= 0)
       fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
