@@ -778,6 +778,14 @@ list_devices(void)
       printf("serial serial:%s?baud=230400 \"Unknown\" \"USB Serial Port #%d\"\n",
              device, i + 1);
     }
+
+    sprintf(device, "/dev/ttyUSB%d", i);
+    if ((fd = open(device, O_WRONLY | O_NOCTTY | O_NDELAY)) >= 0)
+    {
+      close(fd);
+      printf("serial serial:%s?baud=230400 \"Unknown\" \"USB Serial Port #%d\"\n",
+             device, i + 1);
+    }
   }
 
   for (i = 0; i < 64; i ++)

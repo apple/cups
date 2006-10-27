@@ -3,6 +3,8 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.6
 
+	- The serial backend did not support the new USB serial
+	  filenames on Linux (STR #2061)
 	- The parallel backend did not support bidirectional I/O
 	  properly (STR #2056)
 	- The network backends now log the numeric address that
