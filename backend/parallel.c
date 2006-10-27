@@ -189,13 +189,24 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-    if ((device_fd = open(resource, O_RDWR | O_EXCL)) == -1)
+#ifdef __linux
+   /*
+    * The Linux parallel port driver currently is broken WRT select()
+    * and bidirection I/O...
+    */
+
+    device_fd = open(resource, O_WRONLY | O_EXCL);
+    use_bc    = 0;
+
+#else
+    if ((device_fd = open(resource, O_RDWR | O_EXCL)) < 0)
     {
       device_fd = open(resource, O_WRONLY | O_EXCL);
       use_bc    = 0;
     }
     else
       use_bc = 1;
+#endif /* __linux */
 
     if (device_fd == -1)
     {
