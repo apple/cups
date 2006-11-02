@@ -237,10 +237,8 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
             const char *dests)		/* I - Destinations */
 {
   ipp_t		*request,		/* IPP Request */
-		*response,		/* IPP Response */
-		*jobs;			/* IPP Get Jobs response */
-  ipp_attribute_t *attr,		/* Current attribute */
-		*jattr;			/* Current job attribute */
+		*response;		/* IPP Response */
+  ipp_attribute_t *attr;		/* Current attribute */
   cups_lang_t	*language;		/* Default language */
   char		*printer,		/* Printer name */
 		*device,		/* Device URI */
@@ -251,14 +249,13 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
   const char	*dptr,			/* Pointer into destination list */
 		*ptr;			/* Pointer into printer name */
   int		match;			/* Non-zero if this job matches */
-  char		printer_uri[HTTP_MAX_URI];
-					/* Printer URI */
   static const char *requested[] =	/* Requested attributes */
 		{
-		  "printer-name",
 		  "device-uri",
+		  "printer-is-accepting-jobs",
+		  "printer-name",
 		  "printer-state",
-		  "printer-is-accepting-jobs"
+		  "queued-job-count"
 		};
 
 
@@ -329,21 +326,21 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (!strcmp(attr->name, "printer-name") &&
-	    attr->value_tag == IPP_TAG_NAME)
-	  printer = attr->values[0].string.text;
-
         if (!strcmp(attr->name, "device-uri") &&
 	    attr->value_tag == IPP_TAG_URI)
 	  device = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "printer-state") &&
-	    attr->value_tag == IPP_TAG_ENUM)
-	  pstate = (ipp_pstate_t)attr->values[0].integer;
-
-        if (!strcmp(attr->name, "printer-is-accepting-jobs") &&
-	    attr->value_tag == IPP_TAG_BOOLEAN)
+        else if (!strcmp(attr->name, "printer-is-accepting-jobs") &&
+	         attr->value_tag == IPP_TAG_BOOLEAN)
 	  accepting = attr->values[0].boolean;
+        else if (!strcmp(attr->name, "printer-name") &&
+	         attr->value_tag == IPP_TAG_NAME)
+	  printer = attr->values[0].string.text;
+        else if (!strcmp(attr->name, "printer-state") &&
+	         attr->value_tag == IPP_TAG_ENUM)
+	  pstate = (ipp_pstate_t)attr->values[0].integer;
+        else if (!strcmp(attr->name, "queued-job-count") &&
+	         attr->value_tag == IPP_TAG_INTEGER)
+	  jobcount = attr->values[0].integer;
 
         attr = attr->next;
       }
@@ -395,7 +392,8 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 	       *ptr != '\0' && *dptr != '\0' && *ptr == *dptr;
 	       ptr ++, dptr ++);
 
-          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' || isspace(*dptr & 255)))
+          if (*ptr == '\0' && (*dptr == '\0' || *dptr == ',' ||
+	                       isspace(*dptr & 255)))
 	  {
 	    match = 1;
 	    break;
@@ -421,53 +419,6 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 
       if (match)
       {
-       /*
-	* Build an IPP_GET_JOBS request, which requires the following
-	* attributes:
-	*
-	*    attributes-charset
-	*    attributes-natural-language
-	*    printer-uri
-	*    limit
-	*/
-
-	request = ippNew();
-
-	request->request.op.operation_id = IPP_GET_JOBS;
-	request->request.op.request_id   = 1;
-
-	language = cupsLangDefault();
-
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                     "attributes-charset", NULL,
-		     cupsLangEncoding(language));
-
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                     "attributes-natural-language", NULL,
-		     language->language);
-
-        httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
-	                 "ipp", NULL, "localhost", 631, "/printers/%s",
-			 printer);
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	             "printer-uri", NULL, printer_uri);
-
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-	             "requested-attributes", NULL, "job-id");
-
-        if ((jobs = cupsDoRequest(http, request, "/")) != NULL)
-	{
-	 /*
-	  * Grab the number of jobs for the printer.
-	  */
-
-	  for (jattr = jobs->attrs; jattr != NULL; jattr = jattr->next)
-	    if (jattr->name && !strcmp(jattr->name, "job-id"))
-	      jobcount ++;
-
-          ippDelete(jobs);
-	}
-
        /*
         * Display it...
 	*/
