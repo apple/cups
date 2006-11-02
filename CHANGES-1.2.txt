@@ -3,6 +3,11 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.6
 
+	- The web interface was not localized on Mac OS X (STR
+	  #2075)
+	- "lpc status" did not show the number of queued jobs for
+	  disabled queues (STR #2069)
+	- The lpstat program could hang (STR #2073)
 	- The serial backend did not support the new USB serial
 	  filenames on Linux (STR #2061)
 	- The parallel backend did not support bidirectional I/O
