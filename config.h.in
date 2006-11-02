@@ -421,6 +421,13 @@
 
 
 /*
+ * Do we have CFLocaleCreateCanonicalLocaleIdentifierFromString()?
+ */
+
+#undef HAVE_CF_LOCALE_ID
+
+
+/*
  * Do we have MacOSX 10.4's mbr_XXX functions()?
  */
 

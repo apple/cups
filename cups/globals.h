@@ -98,11 +98,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   /* language.c */
   cups_lang_t		*lang_default;	/* Default language */
 #  ifdef __APPLE__
-#    ifdef HAVE_CF_LOCALE_ID
   char			language[32];	/* Cached language */
-#    else
-  const char		*language;	/* Cached language */
-#    endif /* HAVE_CF_LOCALE_ID */
 #  endif /* __APPLE__ */
 
   /* ppd.c */

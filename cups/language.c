@@ -995,6 +995,7 @@ appleLangDefault(void)
 					/* List of localization data */
   CFStringRef		languageName;	/* Current name */
   CFStringRef		localeName;	/* Canonical from of name */
+  char			*lang;		/* LANG environment variable */
   _cups_globals_t	*cg = _cupsGlobals();
   					/* Pointer to library globals */
 
@@ -1005,38 +1006,43 @@ appleLangDefault(void)
 
   if (!cg->language[0])
   {
-    localizationList =
-        CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
-                                  kCFPreferencesCurrentApplication);
-
-    if (localizationList != NULL)
+    if ((lang = getenv("LANG")))
+      strlcpy(cg->language, lang, sizeof(cg->language));
+    else
     {
-      if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
-	  CFArrayGetCount(localizationList) > 0)
+      localizationList =
+          CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
+                                    kCFPreferencesCurrentApplication);
+
+      if (localizationList != NULL)
       {
-        languageName = CFArrayGetValueAtIndex(localizationList, 0);
+	if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
+	    CFArrayGetCount(localizationList) > 0)
+	{
+          languageName = CFArrayGetValueAtIndex(localizationList, 0);
 
-        if (languageName != NULL &&
-            CFGetTypeID(languageName) == CFStringGetTypeID())
-        {
-	  localeName = CFLocaleCreateCanonicalLocaleIdentifierFromString(
-	                   kCFAllocatorDefault, languageName);
+          if (languageName != NULL &&
+              CFGetTypeID(languageName) == CFStringGetTypeID())
+          {
+	    localeName = CFLocaleCreateCanonicalLocaleIdentifierFromString(
+	                     kCFAllocatorDefault, languageName);
 
-	  if (localeName != NULL)
-	  {
-	    CFStringGetCString(localeName, cg->language, sizeof(cg->language),
-			       kCFStringEncodingASCII);
-	    CFRelease(localeName);
+	    if (localeName != NULL)
+	    {
+	      CFStringGetCString(localeName, cg->language, sizeof(cg->language),
+				 kCFStringEncodingASCII);
+	      CFRelease(localeName);
 
-	    if (!strcmp(cg->language, "en"))
-	      strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
-	    else if (strchr(cg->language, '.') == NULL)
-	      strlcat(cg->language, ".UTF-8", sizeof(cg->language));
-	  }
-        }
+	      if (!strcmp(cg->language, "en"))
+		strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
+	      else if (strchr(cg->language, '.') == NULL)
+		strlcat(cg->language, ".UTF-8", sizeof(cg->language));
+	    }
+          }
+	}
+
+	CFRelease(localizationList);
       }
-
-      CFRelease(localizationList);
     }
   
    /*
@@ -1144,59 +1150,66 @@ appleLangDefault(void)
   char			buff[256];	/* Temporary buffer */
   _cups_globals_t	*cg = _cupsGlobals();
   					/* Pointer to library globals */
+  char			*lang;		/* LANG environment variable */
 
 
  /*
   * Only do the lookup and translation the first time.
   */
 
-  if (cg->language == NULL)
+  if (!cg->language[0])
   {
-    localizationList =
-        CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
-                                  kCFPreferencesCurrentApplication);
-
-    if (localizationList != NULL)
+    if ((lang = getenv("LANG")))
+      strlcpy(cg->language, lang, sizeof(cg->language));
+    else
     {
-      if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
-	  CFArrayGetCount(localizationList) > 0)
+      localizationList =
+          CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
+                                    kCFPreferencesCurrentApplication);
+
+      if (localizationList != NULL)
       {
-	localizationName = CFArrayGetValueAtIndex(localizationList, 0);
-
-	if (localizationName != NULL &&
-            CFGetTypeID(localizationName) == CFStringGetTypeID())
+	if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
+	    CFArrayGetCount(localizationList) > 0)
 	{
-	  CFIndex length = CFStringGetLength(localizationName);
+	  localizationName = CFArrayGetValueAtIndex(localizationList, 0);
 
-	  if (length <= sizeof(buff) &&
-	      CFStringGetCString(localizationName, buff, sizeof(buff),
-	                         kCFStringEncodingASCII))
+	  if (localizationName != NULL &&
+              CFGetTypeID(localizationName) == CFStringGetTypeID())
 	  {
-	    buff[sizeof(buff) - 1] = '\0';
+	    CFIndex length = CFStringGetLength(localizationName);
 
-	    for (i = 0;
-		 i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
-		 i++)
+	    if (length <= sizeof(buff) &&
+		CFStringGetCString(localizationName, buff, sizeof(buff),
+	                           kCFStringEncodingASCII))
 	    {
-	      if (!strcasecmp(buff, apple_name_locale[i].name))
+	      buff[sizeof(buff) - 1] = '\0';
+
+	      for (i = 0;
+		   i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
+		   i++)
 	      {
-		cg->language = apple_name_locale[i].locale;
-		break;
+		if (!strcasecmp(buff, apple_name_locale[i].name))
+		{
+		  strlcpy(cg->language, apple_name_locale[i].locale, 
+			  sizeof(cg->language));
+		  break;
+		}
 	      }
 	    }
 	  }
 	}
-      }
 
-      CFRelease(localizationList);
+	CFRelease(localizationList);
+      }
     }
   
    /*
     * If we didn't find the language, default to en_US...
     */
 
-    if (cg->language == NULL)
-      cg->language = apple_name_locale[0].locale;
+    if (!cg->language[0])
+      strlcpy(cg->language, apple_name_locale[0].locale, sizeof(cg->language));
   }
 
  /*
