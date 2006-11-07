@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 5956 2006-09-13 18:22:34Z mike $"
+ * "$Id: ipp.c 6061 2006-10-23 00:26:52Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -107,6 +107,7 @@ main(int  argc,				/* I - Number of command-line args */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
 		resource[1024],		/* Resource info (printer name) */
+		addrname[256],		/* Address name */
 		*optptr,		/* Pointer to URI options */
 		name[255],		/* Name of option */
 		value[255],		/* Value of option */
@@ -573,6 +574,18 @@ main(int  argc,				/* I - Number of command-line args */
 
   fputs("STATE: -connecting-to-device\n", stderr);
   fprintf(stderr, "INFO: Connected to %s...\n", hostname);
+
+#ifdef AF_INET6
+  if (http->hostaddr->addr.sa_family == AF_INET6)
+    fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6)...\n", 
+		    httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
+		    ntohs(http->hostaddr->ipv6.sin6_port));
+  else
+#endif /* AF_INET6 */
+    if (http->hostaddr->addr.sa_family == AF_INET)
+      fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4)...\n",
+		      httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
+		      ntohs(http->hostaddr->ipv4.sin_port));
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
@@ -1653,5 +1666,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 5956 2006-09-13 18:22:34Z mike $".
+ * End of "$Id: ipp.c 6061 2006-10-23 00:26:52Z mike $".
  */

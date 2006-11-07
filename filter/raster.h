@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h 5671 2006-06-16 11:17:39Z mike $"
+ * "$Id: raster.h 6061 2006-10-23 00:26:52Z mike $"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -22,13 +22,6 @@
  *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
- *
- *   This code and any derivative of it may be used and distributed
- *   freely under the terms of the GNU General Public License when
- *   used with GNU/GPL Ghostscript or its derivatives.  Use of the
- *   code (or any derivative of it) with software other than GNU/GPL
- *   GhostScript (or its derivatives) is governed by the CUPS license
- *   agreement.
  *
  *   This file is subject to the Apple OS-Developed Software exception.
  */
@@ -345,5 +338,5 @@ extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h 5671 2006-06-16 11:17:39Z mike $".
+ * End of "$Id: raster.h 6061 2006-10-23 00:26:52Z mike $".
  */

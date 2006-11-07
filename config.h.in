@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 6032 2006-10-12 19:19:47Z mike $"
+ * "$Id: config.h.in 6073 2006-11-02 20:01:54Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -421,6 +421,13 @@
 
 
 /*
+ * Do we have CFLocaleCreateCanonicalLocaleIdentifierFromString()?
+ */
+
+#undef HAVE_CF_LOCALE_ID
+
+
+/*
  * Do we have MacOSX 10.4's mbr_XXX functions()?
  */
 
@@ -454,5 +461,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 6032 2006-10-12 19:19:47Z mike $".
+ * End of "$Id: config.h.in 6073 2006-11-02 20:01:54Z mike $".
  */

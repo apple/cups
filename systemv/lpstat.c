@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c 5926 2006-09-05 20:45:47Z mike $"
+ * "$Id: lpstat.c 6073 2006-11-02 20:01:54Z mike $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -1695,7 +1695,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	      cups_dest_t *dests,	/* I - User-defined destinations */
               int         long_status)	/* I - Show long status? */
 {
-  int		i;			/* Looping var */
+  int		i, j;			/* Looping vars */
   ipp_t		*request,		/* IPP Request */
 		*response,		/* IPP Response */
 		*jobs;			/* IPP Get Jobs response */
@@ -2038,9 +2038,9 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  if (reasons)
 	  {
 	    _cupsLangPuts(stdout, _("\tAlerts:"));
-	    for (i = 0; i < reasons->num_values; i ++)
+	    for (j = 0; j < reasons->num_values; i ++)
 	      _cupsLangPrintf(stdout, " %s",
-	                      reasons->values[i].string.text);
+	                      reasons->values[j].string.text);
 	    _cupsLangPuts(stdout, "\n");
 	  }
 	}
@@ -2076,16 +2076,16 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
           if (allowed)
 	  {
 	    _cupsLangPuts(stdout, _("\tUsers allowed:\n"));
-	    for (i = 0; i < allowed->num_values; i ++)
+	    for (j = 0; j < allowed->num_values; j ++)
 	      _cupsLangPrintf(stdout, "\t\t%s\n",
-	                      allowed->values[i].string.text);
+	                      allowed->values[j].string.text);
 	  }
 	  else if (denied)
 	  {
 	    _cupsLangPuts(stdout, _("\tUsers denied:\n"));
-	    for (i = 0; i < denied->num_values; i ++)
+	    for (j = 0; j < denied->num_values; j ++)
 	      _cupsLangPrintf(stdout, "\t\t%s\n",
-	                      denied->values[i].string.text);
+	                      denied->values[j].string.text);
 	  }
 	  else
 	  {
@@ -2151,9 +2151,9 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	      if (reasons)
 	      {
 		_cupsLangPuts(stdout, _("\tAlerts:"));
-		for (i = 0; i < reasons->num_values; i ++)
+		for (j = 0; j < reasons->num_values; j ++)
 		  _cupsLangPrintf(stdout, " %s",
-	                	  reasons->values[i].string.text);
+	                	  reasons->values[j].string.text);
 		_cupsLangPuts(stdout, "\n");
 	      }
 	    }
@@ -2189,16 +2189,16 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
               if (allowed)
 	      {
 		_cupsLangPuts(stdout, _("\tUsers allowed:\n"));
-		for (i = 0; i < allowed->num_values; i ++)
+		for (j = 0; j < allowed->num_values; j ++)
 		  _cupsLangPrintf(stdout, "\t\t%s\n",
-	                	  allowed->values[i].string.text);
+	                	  allowed->values[j].string.text);
 	      }
 	      else if (denied)
 	      {
 		_cupsLangPuts(stdout, _("\tUsers denied:\n"));
-		for (i = 0; i < denied->num_values; i ++)
+		for (j = 0; j < denied->num_values; j ++)
 		  _cupsLangPrintf(stdout, "\t\t%s\n",
-	                	  denied->values[i].string.text);
+	                	  denied->values[j].string.text);
 	      }
 	      else
 	      {
@@ -2248,5 +2248,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c 5926 2006-09-05 20:45:47Z mike $".
+ * End of "$Id: lpstat.c 6073 2006-11-02 20:01:54Z mike $".
  */

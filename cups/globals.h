@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.h 5755 2006-07-19 13:29:44Z mike $"
+ * "$Id: globals.h 6073 2006-11-02 20:01:54Z mike $"
  *
  *   Global variable definitions for the Common UNIX Printing System (CUPS).
  *
@@ -98,11 +98,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   /* language.c */
   cups_lang_t		*lang_default;	/* Default language */
 #  ifdef __APPLE__
-#    ifdef HAVE_CF_LOCALE_ID
   char			language[32];	/* Cached language */
-#    else
-  const char		*language;	/* Cached language */
-#    endif /* HAVE_CF_LOCALE_ID */
 #  endif /* __APPLE__ */
 
   /* ppd.c */
@@ -152,5 +148,5 @@ extern void		_cupsSetError(ipp_status_t status, const char *message);
 #endif /* !_CUPS_GLOBALS_H_ */
 
 /*
- * End of "$Id: globals.h 5755 2006-07-19 13:29:44Z mike $".
+ * End of "$Id: globals.h 6073 2006-11-02 20:01:54Z mike $".
  */

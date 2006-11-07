@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6032 2006-10-12 19:19:47Z mike $"
+ * "$Id: job.c 6061 2006-10-23 00:26:52Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1775,6 +1775,7 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
       strlcpy(job->printer->state_message, message,
               sizeof(job->printer->state_message));
       cupsdAddPrinterHistory(job->printer);
+      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
     }
 
     if (!strchr(job->status_buffer->buffer, '\n'))
@@ -3468,5 +3469,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 6032 2006-10-12 19:19:47Z mike $".
+ * End of "$Id: job.c 6061 2006-10-23 00:26:52Z mike $".
  */

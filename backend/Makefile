@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5591 2006-05-26 19:51:59Z mike $"
+# "$Id: Makefile 6061 2006-10-23 00:26:52Z mike $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
@@ -46,7 +46,7 @@ all:	$(TARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) http
+	$(RM) $(OBJS) $(TARGETS) $(LIBOBJS) http
 
 
 #
@@ -222,5 +222,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5591 2006-05-26 19:51:59Z mike $".
+# End of "$Id: Makefile 6061 2006-10-23 00:26:52Z mike $".
 #

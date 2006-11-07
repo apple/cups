@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c 5726 2006-07-12 20:00:11Z mike $"
+ * "$Id: parallel.c 6068 2006-10-27 17:10:34Z mike $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -88,7 +88,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		*options;		/* Pointer to options */
   int		port;			/* Port number (not used) */
   int		print_fd,		/* Print file */
-		device_fd;		/* Parallel device */
+		device_fd,		/* Parallel device */
+		use_bc;			/* Read back-channel data? */
   int		copies;			/* Number of copies to print */
   size_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
@@ -188,7 +189,26 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-    if ((device_fd = open(resource, O_WRONLY | O_EXCL)) == -1)
+#ifdef __linux
+   /*
+    * The Linux parallel port driver currently is broken WRT select()
+    * and bidirection I/O...
+    */
+
+    device_fd = open(resource, O_WRONLY | O_EXCL);
+    use_bc    = 0;
+
+#else
+    if ((device_fd = open(resource, O_RDWR | O_EXCL)) < 0)
+    {
+      device_fd = open(resource, O_WRONLY | O_EXCL);
+      use_bc    = 0;
+    }
+    else
+      use_bc = 1;
+#endif /* __linux */
+
+    if (device_fd == -1)
     {
       if (getenv("CLASS") != NULL)
       {
@@ -264,7 +284,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, 1);
+    tbytes = backendRunLoop(print_fd, device_fd, use_bc);
 
     if (print_fd != 0 && tbytes >= 0)
       fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
@@ -578,5 +598,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c 5726 2006-07-12 20:00:11Z mike $".
+ * End of "$Id: parallel.c 6068 2006-10-27 17:10:34Z mike $".
  */

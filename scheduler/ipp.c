@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6032 2006-10-12 19:19:47Z mike $"
+ * "$Id: ipp.c 6052 2006-10-20 20:35:41Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -4020,14 +4020,14 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
     if ((!strcmp(system_paper, "Letter") && have_letter) ||
         (!strcmp(system_paper, "A4") && have_a4))
     {
-      num_defaults = ppd_add_default("PageSize", system_paper, 
-				     num_defaults, &defaults);
-      num_defaults = ppd_add_default("PageRegion", system_paper, 
-				     num_defaults, &defaults);
-      num_defaults = ppd_add_default("PaperDimension", system_paper, 
-				     num_defaults, &defaults);
-      num_defaults = ppd_add_default("ImageableArea", system_paper, 
-				     num_defaults, &defaults);
+      num_defaults = cupsAddOption("PageSize", system_paper, 
+				   num_defaults, &defaults);
+      num_defaults = cupsAddOption("PageRegion", system_paper, 
+				   num_defaults, &defaults);
+      num_defaults = cupsAddOption("PaperDimension", system_paper, 
+				   num_defaults, &defaults);
+      num_defaults = cupsAddOption("ImageableArea", system_paper, 
+				   num_defaults, &defaults);
     }
   }
 #endif /* HAVE_LIBPAPER */
@@ -9158,5 +9158,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6032 2006-10-12 19:19:47Z mike $".
+ * End of "$Id: ipp.c 6052 2006-10-20 20:35:41Z mike $".
  */

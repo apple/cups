@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c 5360 2006-03-30 17:02:17Z mike $"
+ * "$Id: http-support.c 6061 2006-10-23 00:26:52Z mike $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -595,8 +595,14 @@ httpEncode64_2(char       *out,		/* I - String to write to */
 
     if (outptr < outend)
       *outptr ++ = base64[(in[0] & 255) >> 2];
+
     if (outptr < outend)
-      *outptr ++ = base64[(((in[0] & 255) << 4) | ((in[1] & 255) >> 4)) & 63];
+    {
+      if (inlen > 1)
+        *outptr ++ = base64[(((in[0] & 255) << 4) | ((in[1] & 255) >> 4)) & 63];
+      else
+        *outptr ++ = base64[((in[0] & 255) << 4) & 63];
+    }
 
     in ++;
     inlen --;
@@ -610,7 +616,12 @@ httpEncode64_2(char       *out,		/* I - String to write to */
     }
 
     if (outptr < outend)
-      *outptr ++ = base64[(((in[0] & 255) << 2) | ((in[1] & 255) >> 6)) & 63];
+    {
+      if (inlen > 1)
+        *outptr ++ = base64[(((in[0] & 255) << 2) | ((in[1] & 255) >> 6)) & 63];
+      else
+        *outptr ++ = base64[((in[0] & 255) << 2) & 63];
+    }
 
     in ++;
     inlen --;
@@ -1316,5 +1327,5 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 
 
 /*
- * End of "$Id: http-support.c 5360 2006-03-30 17:02:17Z mike $".
+ * End of "$Id: http-support.c 6061 2006-10-23 00:26:52Z mike $".
  */

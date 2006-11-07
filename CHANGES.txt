@@ -1,5 +1,25 @@
-CHANGES.txt - 2006-10-20
+CHANGES.txt - 2006-11-02
 ------------------------
+
+CHANGES IN CUPS V1.2.6
+
+	- The web interface was not localized on Mac OS X (STR
+	  #2075)
+	- "lpc status" did not show the number of queued jobs for
+	  disabled queues (STR #2069)
+	- The lpstat program could hang (STR #2073)
+	- The serial backend did not support the new USB serial
+	  filenames on Linux (STR #2061)
+	- The parallel backend did not support bidirectional I/O
+	  properly (STR #2056)
+	- The network backends now log the numeric address that
+	  is being used (STR #2046)
+	- Fixed a compile error when using libpaper.
+	- Fixed a compile error when compiling on Solaris with
+	  threading enabled (STR #2049, STR #2050)
+	- Missing printer-state-changed event for
+	  printer-state-message updates (STR #2047)
+
 
 CHANGES IN CUPS V1.2.5
 
