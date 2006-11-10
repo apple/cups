@@ -1126,7 +1126,7 @@ asn1_set_packed(unsigned char **buffer,	/* IO - Pointer in buffer */
 {
   if (integer > 0xfffffff)
   {
-    **buffer = (integer >> 14) & 0x7f;
+    **buffer = (integer >> 28) & 0x7f;
     (*buffer) ++;
   }
 
