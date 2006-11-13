@@ -429,7 +429,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
     con->http.encryption = HTTP_ENCRYPT_ALWAYS;
 
-    encrypt_client(con);
+    if (!encrypt_client(con))
+      cupsdCloseClient(con);
   }
   else
     con->auto_ssl = 1;
@@ -748,7 +749,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
                       "cupsdReadClient: Saw first byte %02X, auto-negotiating SSL/TLS session...",
                       buf[0] & 255);
 
-      encrypt_client(con);
+      if (!encrypt_client(con))
+        return (cupsdCloseClient(con));
+
       return (1);
     }
   }
@@ -1059,7 +1062,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	if (cupsdFlushHeader(con) < 0)
 	  return (cupsdCloseClient(con));
 
-        encrypt_client(con);
+        if (!encrypt_client(con))
+	  return (cupsdCloseClient(con));
 #else
 	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED))
 	  return (cupsdCloseClient(con));
@@ -1106,7 +1110,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	if (cupsdFlushHeader(con) < 0)
 	  return (cupsdCloseClient(con));
 
-        encrypt_client(con);
+        if (!encrypt_client(con))
+	  return (cupsdCloseClient(con));
 #else
 	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED))
 	  return (cupsdCloseClient(con));
@@ -2654,6 +2659,8 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   conn = SSL_new(context);
 
   SSL_set_fd(conn, con->http.fd);
+  SSL_set_timeout(conn, 10);		/* 10-second data timeout */
+
   if (SSL_accept(conn) != 1)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2726,8 +2733,9 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   gnutls_init(&(conn->session), GNUTLS_SERVER);
   gnutls_set_default_priority(conn->session);
   gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(conn->session,
-                           (gnutls_transport_ptr)((long)con->http.fd));
+  gnutls_transport_set_ptr(conn->session, (gnutls_transport_ptr)HTTP(con));
+  gnutls_transport_set_pull_function(conn->session, _httpReadGNUTLS);
+  gnutls_transport_set_push_function(conn->session, _httpWriteGNUTLS);
 
   error = gnutls_handshake(conn->session);
 
@@ -2780,7 +2788,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   if (!conn->certsArray)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-        	    "EncryptClient: Could not find signing key in keychain "
+        	    "encrypt_client: Could not find signing key in keychain "
 		    "\"%s\"", ServerCertificate);
     error = errSSLBadCert; /* errSSLBadConfiguration is a better choice, but not available on 10.2.x */
   }

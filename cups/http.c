@@ -63,7 +63,8 @@
  *   httpPut()            - Send a PUT request to the server.
  *   httpRead()           - Read data from a HTTP connection.
  *   httpRead2()          - Read data from a HTTP connection.
- *   _httpReadCDSA()      - Read function for CDSA decryption code.
+ *   _httpReadCDSA()      - Read function for the CDSA library.
+ *   _httpReadGNUTLS()    - Read function for the GNU TLS library.
  *   httpReconnect()      - Reconnect to a HTTP server...
  *   httpSetCookie()      - Set the cookie value(s)...
  *   httpSetExpect()      - Set the Expect: header in a request.
@@ -74,7 +75,8 @@
  *   httpWait()           - Wait for data available on a connection.
  *   httpWrite()          - Write data to a HTTP connection.
  *   httpWrite2()         - Write data to a HTTP connection.
- *   _httpWriteCDSA()     - Write function for CDSA encryption code.
+ *   _httpWriteCDSA()     - Write function for the CDSA library.
+ *   _httpWriteGNUTLS()   - Write function for the GNU TLS library.
  *   http_field()         - Return the field index for a field name.
  *   http_read_ssl()      - Read from a SSL/TLS connection.
  *   http_send()          - Send a request with all fields and the trailing
@@ -121,7 +123,7 @@
 static http_field_t	http_field(const char *name);
 static int		http_send(http_t *http, http_state_t request,
 			          const char *uri);
-static int		http_wait(http_t *http, int msec);
+static int		http_wait(http_t *http, int msec, int usessl);
 static int		http_write(http_t *http, const char *buffer,
 			           int length);
 static int		http_write_chunk(http_t *http, const char *buffer,
@@ -913,7 +915,7 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if (!http->blocking && !http_wait(http, 10000))
+      if (!http->blocking && !http_wait(http, 10000, 1))
       {
         DEBUG_puts("httpGets: Timed out!");
         http->error = ETIMEDOUT;
@@ -1435,7 +1437,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
 #if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
 /*
- * '_httpReadCDSA()' - Read function for CDSA decryption code.
+ * '_httpReadCDSA()' - Read function for the CDSA library.
  */
 
 OSStatus				/* O  - -1 on error, 0 on success */
@@ -1477,6 +1479,40 @@ _httpReadCDSA(
   return result;
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
+
+
+#if defined(HAVE_SSL) && defined(HAVE_GNUTLS)
+/*
+ * '_httpReadGNUTLS()' - Read function for the GNU TLS library.
+ */
+
+ssize_t					/* O - Number of bytes read or -1 on error */
+_httpReadGNUTLS(
+    gnutls_transport_ptr ptr,		/* I - HTTP connection */
+    void                 *data,		/* I - Buffer */
+    size_t               length)	/* I - Number of bytes to read */
+{
+  http_t	*http;			/* HTTP connection */
+
+
+  http = (http_t *)ptr;
+
+  if (!http->blocking)
+  {
+   /*
+    * Make sure we have data before we read...
+    */
+
+    if (!http_wait(http, 10000, 0))
+    {
+      http->error = ETIMEDOUT;
+      return (-1);
+    }
+  }
+
+  return (recv(http->fd, data, length, 0));
+}
+#endif /* HAVE_SSL && HAVE_GNUTLS */
 
 
 /*
@@ -1887,7 +1923,7 @@ httpWait(http_t *http,			/* I - HTTP connection */
   * If not, check the SSL/TLS buffers and do a select() on the connection...
   */
 
-  return (http_wait(http, msec));
+  return (http_wait(http, msec, 1));
 }
 
 
@@ -2034,7 +2070,7 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
 
 #if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
 /*
- * '_httpWriteCDSA()' - Write function for CDSA encryption code.
+ * '_httpWriteCDSA()' - Write function for the CDSA library.
  */
 
 OSStatus				/* O  - -1 on error, 0 on success */
@@ -2074,6 +2110,22 @@ _httpWriteCDSA(
   return result;
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
+
+
+#if defined(HAVE_SSL) && defined(HAVE_GNUTLS)
+/*
+ * '_httpWriteGNUTLS()' - Write function for the GNU TLS library.
+ */
+
+ssize_t					/* O - Number of bytes written or -1 on error */
+_httpWriteGNUTLS(
+    gnutls_transport_ptr ptr,		/* I - HTTP connection */
+    const void           *data,		/* I - Data buffer */
+    size_t               length)	/* I - Number of bytes to write */
+{
+  return (send(((http_t *)ptr)->fd, data, length, 0));
+}
+#endif /* HAVE_SSL && HAVE_GNUTLS */
 
 
 /*
@@ -2340,6 +2392,10 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   conn = SSL_new(context);
 
   SSL_set_fd(conn, http->fd);
+
+  if (!http->blocking)
+    SSL_set_timeout(conn, 10);		/* 10-second data timeout */
+
   if (SSL_connect(conn) != 1)
   {
 #    ifdef DEBUG
@@ -2388,8 +2444,9 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   gnutls_init(&(conn->session), GNUTLS_CLIENT);
   gnutls_set_default_priority(conn->session);
   gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(conn->session,
-                           (gnutls_transport_ptr)((long)http->fd));
+  gnutls_transport_set_ptr(conn->session, (gnutls_transport_ptr)http);
+  gnutls_transport_set_pull_function(conn->session, _httpReadGNUTLS);
+  gnutls_transport_set_push_function(conn->session, _httpWriteGNUTLS);
 
   if ((gnutls_handshake(conn->session)) != GNUTLS_E_SUCCESS)
   {
@@ -2617,7 +2674,8 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
 
 static int				/* O - 1 if data is available, 0 otherwise */
 http_wait(http_t *http,			/* I - HTTP connection */
-          int    msec)			/* I - Milliseconds to wait */
+          int    msec,			/* I - Milliseconds to wait */
+	  int    usessl)		/* I - Use SSL context? */
 {
 #ifndef WIN32
   struct rlimit		limit;          /* Runtime limit */
@@ -2637,7 +2695,7 @@ http_wait(http_t *http,			/* I - HTTP connection */
   */
 
 #ifdef HAVE_SSL
-  if (http->tls)
+  if (http->tls && usessl)
   {
 #  ifdef HAVE_LIBSSL
     if (SSL_pending((SSL *)(http->tls)))

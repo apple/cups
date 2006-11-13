@@ -110,6 +110,11 @@ typedef struct
   void			*credentials;	/* GNU TLS credentials object */
 } http_tls_t;
 
+extern ssize_t	_httpReadGNUTLS(gnutls_transport_ptr ptr, void *data,
+		                size_t length);
+extern ssize_t	_httpWriteGNUTLS(gnutls_transport_ptr ptr, const void *data,
+		                 size_t length);
+
 #  elif defined(HAVE_CDSASSL)
 /*
  * Darwin's Security framework provides its own SSL/TLS context structure
