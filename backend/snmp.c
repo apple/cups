@@ -1752,7 +1752,7 @@ probe_device(snmp_cache_t *device)	/* I - Device */
     alarm(0);
   }
 
-  if (http);
+  if (http)
   {
    /*
     * IPP is supported...
