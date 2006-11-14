@@ -89,7 +89,8 @@ typedef int socklen_t;
 #  if defined HAVE_LIBSSL
 /*
  * The OpenSSL library provides its own SSL/TLS context structure for its
- * IO and protocol management...
+ * IO and protocol management.  However, we need to provide our own BIO
+ * (basic IO) implementation to do timeouts...
  */
 
 #    include <openssl/err.h>
@@ -97,6 +98,8 @@ typedef int socklen_t;
 #    include <openssl/ssl.h>
 
 typedef SSL http_tls_t;
+
+extern BIO_METHOD *_httpBIOMethods(void);
 
 #  elif defined HAVE_GNUTLS
 /*

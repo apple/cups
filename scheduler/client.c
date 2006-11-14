@@ -2629,6 +2629,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
   SSL		*conn;			/* Connection for encryption */
+  BIO		*bio;			/* BIO data */
   unsigned long	error;			/* Error code */
 
 
@@ -2656,10 +2657,11 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   SSL_CTX_use_PrivateKey_file(context, ServerKey, SSL_FILETYPE_PEM);
   SSL_CTX_use_certificate_file(context, ServerCertificate, SSL_FILETYPE_PEM);
 
-  conn = SSL_new(context);
+  bio = BIO_new(_httpBIOMethods());
+  BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)HTTP(con));
 
-  SSL_set_fd(conn, con->http.fd);
-  SSL_set_timeout(conn, 10);		/* 10-second data timeout */
+  conn = SSL_new(context);
+  SSL_set_bio(conn, bio, bio);
 
   if (SSL_accept(conn) != 1)
   {

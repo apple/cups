@@ -28,6 +28,7 @@
  *
  * Contents:
  *
+ *   _httpBIOMethods()    - Get the OpenSSL BIO methods for HTTP connections.
  *   httpBlocking()       - Set blocking/non-blocking behavior on a connection.
  *   httpCheck()          - Check to see if there is a pending response from
  *                          the server.
@@ -77,6 +78,12 @@
  *   httpWrite2()         - Write data to a HTTP connection.
  *   _httpWriteCDSA()     - Write function for the CDSA library.
  *   _httpWriteGNUTLS()   - Write function for the GNU TLS library.
+ *   http_bio_ctrl()      - Control the HTTP connection.
+ *   http_bio_free()      - Free OpenSSL data.
+ *   http_bio_new()       - Initialize an OpenSSL BIO structure.
+ *   http_bio_puts()      - Send a string for OpenSSL.
+ *   http_bio_read()      - Read data for OpenSSL.
+ *   http_bio_write()     - Write data for OpenSSL.
  *   http_field()         - Return the field index for a field name.
  *   http_read_ssl()      - Read from a SSL/TLS connection.
  *   http_send()          - Send a request with all fields and the trailing
@@ -171,6 +178,45 @@ static const char * const http_fields[] =
 			  "User-Agent",
 			  "WWW-Authenticate"
 			};
+
+
+#if defined(HAVE_SSL) && defined(HAVE_LIBSSL)
+/*
+ * BIO methods for OpenSSL...
+ */
+
+static int		http_bio_write(BIO *h, const char *buf, int num);
+static int		http_bio_read(BIO *h, char *buf, int size);
+static int		http_bio_puts(BIO *h, const char *str);
+static long		http_bio_ctrl(BIO *h, int cmd, long arg1, void *arg2);
+static int		http_bio_new(BIO *h);
+static int		http_bio_free(BIO *data);
+
+static BIO_METHOD	http_bio_methods =
+			{
+			  BIO_TYPE_SOCKET,
+			  "http",
+			  http_bio_write,
+			  http_bio_read,
+			  http_bio_puts,
+			  NULL, /* http_bio_gets, */
+			  http_bio_ctrl,
+			  http_bio_new,
+			  http_bio_free,
+			  NULL,
+			};
+
+
+/*
+ * '_httpBIOMethods()' - Get the OpenSSL BIO methods for HTTP connections.
+ */
+
+BIO_METHOD *				/* O - BIO methods for OpenSSL */
+_httpBIOMethods(void)
+{
+  return (&http_bio_methods);
+}
+#endif /* HAVE_SSL && HAVE_LIBSSL */
 
 
 /*
@@ -2128,6 +2174,143 @@ _httpWriteGNUTLS(
 #endif /* HAVE_SSL && HAVE_GNUTLS */
 
 
+#if defined(HAVE_SSL) && defined(HAVE_LIBSSL)
+/*
+ * 'http_bio_ctrl()' - Control the HTTP connection.
+ */
+
+static long				/* O - Result/data */
+http_bio_ctrl(BIO  *h,			/* I - BIO data */
+              int  cmd,			/* I - Control command */
+	      long arg1,		/* I - First argument */
+	      void *arg2)		/* I - Second argument */
+{
+  switch (cmd)
+  {
+    default :
+        return (0);
+
+    case BIO_CTRL_RESET :
+        h->ptr = NULL;
+	return (0);
+
+    case BIO_C_SET_FILE_PTR :
+        h->ptr  = arg2;
+	h->init = 1;
+	return (1);
+
+    case BIO_C_GET_FILE_PTR :
+        if (arg2)
+	{
+	  *((void **)arg2) = h->ptr;
+	  return (1);
+	}
+	else
+	  return (0);
+        
+    case BIO_CTRL_DUP :
+    case BIO_CTRL_FLUSH :
+        return (1);
+  }
+}
+
+
+/*
+ * 'http_bio_free()' - Free OpenSSL data.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+http_bio_free(BIO *h)			/* I - BIO data */
+{
+  if (!h)
+    return (0);
+
+  if (h->shutdown)
+  {
+    h->init  = 0;
+    h->flags = 0;
+  }
+
+  return (1);
+}
+
+
+/*
+ * 'http_bio_new()' - Initialize an OpenSSL BIO structure.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+http_bio_new(BIO *h)			/* I - BIO data */
+{
+  if (!h)
+    return (0);
+
+  h->init  = 0;
+  h->num   = 0;
+  h->ptr   = NULL;
+  h->flags = 0;
+
+  return (1);
+}
+
+
+/*
+ * 'http_bio_puts()' - Send a string for OpenSSL.
+ */
+
+static int				/* O - Bytes written */
+http_bio_puts(BIO        *h,		/* I - BIO data */
+              const char *str)		/* I - String to write */
+{
+  return (send(((http_t *)h->ptr)->fd, str, strlen(str), 0));
+}
+
+
+/*
+ * 'http_bio_read()' - Read data for OpenSSL.
+ */
+
+static int				/* O - Bytes read */
+http_bio_read(BIO  *h,			/* I - BIO data */
+              char *buf,		/* I - Buffer */
+	      int  size)		/* I - Number of bytes to read */
+{
+  http_t	*http;			/* HTTP connection */
+
+
+  http = (http_t *)h->ptr;
+
+  if (!http->blocking)
+  {
+   /*
+    * Make sure we have data before we read...
+    */
+
+    if (!http_wait(http, 10000, 0))
+    {
+      http->error = ETIMEDOUT;
+      return (-1);
+    }
+  }
+
+  return (recv(http->fd, buf, size, 0));
+}
+
+
+/*
+ * 'http_bio_write()' - Write data for OpenSSL.
+ */
+
+static int				/* O - Bytes written */
+http_bio_write(BIO        *h,		/* I - BIO data */
+               const char *buf,		/* I - Buffer to write */
+	       int        num)		/* I - Number of bytes to write */
+{
+  return (send(((http_t *)h->ptr)->fd, buf, num, 0));
+}
+#endif /* HAVE_SSL && HAVE_LIBSSL */
+
+
 /*
  * 'http_field()' - Return the field index for a field name.
  */
@@ -2371,6 +2554,7 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
   SSL		*conn;			/* Connection for encryption */
+  BIO		*bio;			/* BIO data */
 #  elif defined(HAVE_GNUTLS)
   http_tls_t	*conn;			/* TLS session object */
   gnutls_certificate_client_credentials *credentials;
@@ -2389,12 +2573,11 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
 
   SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
 
+  bio = BIO_new(_httpBIOMethods());
+  BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)http);
+
   conn = SSL_new(context);
-
-  SSL_set_fd(conn, http->fd);
-
-  if (!http->blocking)
-    SSL_set_timeout(conn, 10);		/* 10-second data timeout */
+  SSL_set_bio(conn, bio, bio);
 
   if (SSL_connect(conn) != 1)
   {
