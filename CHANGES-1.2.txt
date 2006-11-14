@@ -1,6 +1,23 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.7
+
+	- The scheduler no longer loads the remote printer cache
+	  when browsing is disabled (STR #2084)
+	- The scheduler no longer writes a new launchd
+	  configuration file if it doesn't have to (STR #2083)
+	- Updated the USB and PAP backends for Mac OS X (STR
+	  #2086)
+	- The scheduler now picks up on changes to IPv6 and DNS
+	  configuration on Mac OS X (STR #2085)
+	- The lpstat program could still hang (STR #2098)
+	- Fixed an inefficiency in the SNMP IPP detection code
+	  (STR #2100)
+	- The SSL negotiation code did not implement short
+	  timeouts (STR #2091)
+
+
 CHANGES IN CUPS V1.2.6
 
 	- The web interface was not localized on Mac OS X (STR
