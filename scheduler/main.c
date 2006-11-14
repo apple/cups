@@ -123,8 +123,11 @@ main(int  argc,				/* I - Number of command-line args */
 			activity,	/* Client activity timer */
 			browse_time,	/* Next browse send time */
 			senddoc_time,	/* Send-Document time */
-			expire_time;	/* Subscription expire time */
-  time_t		mallinfo_time;	/* Malloc information time */
+			expire_time,	/* Subscription expire time */
+#ifndef __APPLE__
+			netif_time,	/* Network interface poll time */
+#endif /* !__APPLE__ */
+			mallinfo_time;	/* Malloc information time */
   size_t		string_count,	/* String count */
 			alloc_bytes,	/* Allocated string bytes */
 			total_bytes;	/* Total string bytes */
@@ -536,6 +539,9 @@ main(int  argc,				/* I - Number of command-line args */
   senddoc_time  = time(NULL);
   expire_time   = time(NULL);
   fds           = 1;
+#ifndef __APPLE__
+  netif_time    = 0;
+#endif /* !__APPLE__ */
 
   while (!stop_scheduler)
   {
@@ -810,8 +816,23 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
 #ifdef __APPLE__
+   /*
+    * Mac OS X provides the SystemConfiguration framework for system
+    * configuration change events...
+    */
+
     if (SysEventPipes[0] >= 0 && FD_ISSET(SysEventPipes[0], input))
       cupsdUpdateSystemMonitor();
+#else
+   /*
+    * All other operating systems need to poll for changes...
+    */
+
+    if ((current_time - netif_time) >= 60)
+    {
+      NetIFUpdate = 1;
+      netif_time  = current_time;
+    }
 #endif	/* __APPLE__ */
 
    /*

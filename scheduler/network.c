@@ -60,7 +60,8 @@ cupsdNetIFFind(const char *name)	/* I - Name of interface */
   * Update the interface list as needed...
   */
 
-  cupsdNetIFUpdate();
+  if (NetIFUpdate)
+    cupsdNetIFUpdate();
 
  /*
   * Search for the named interface...
@@ -113,14 +114,13 @@ cupsdNetIFUpdate(void)
 
 
  /*
-  * Update the network interface list no more often than once a
-  * minute...
+  * Only update the list if we need to...
   */
 
-  if ((time(NULL) - NetIFTime) < 60)
+  if (!NetIFUpdate)
     return;
 
-  NetIFTime = time(NULL);
+  NetIFUpdate = 0;
 
  /*
   * Free the old interfaces...

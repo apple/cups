@@ -115,11 +115,17 @@ static CFRunLoopRef	SysEventRunloop = NULL;
 					/* The runloop. Access must be protected! */
 static CFStringRef	ComputerNameKey = NULL,
 					/* Computer name key */
-			NetworkGlobalKey = NULL,
-					/* Network global key */
+			NetworkGlobalKeyIPv4 = NULL,
+					/* Network global IPv4 key */
+			NetworkGlobalKeyIPv6 = NULL,
+					/* Network global IPv6 key */
+			NetworkGlobalKeyDNS = NULL,
+					/* Network global DNS key */
 			HostNamesKey = NULL,
 					/* Host name key */
-			NetworkInterfaceKey = NULL;
+			NetworkInterfaceKeyIPv4 = NULL,
+					/* Netowrk interface key */
+			NetworkInterfaceKeyIPv6 = NULL;
 					/* Netowrk interface key */
 
 
@@ -306,7 +312,6 @@ cupsdUpdateSystemMonitor(void)
 	}
 	else
 	{
-	 /* TODO: Possibly update when MDNS support is added? */
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "Deregistering local printer \"%s\"", p->name);
 	  cupsdSendBrowseDelete(p);
@@ -332,12 +337,6 @@ cupsdUpdateSystemMonitor(void)
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                "System network configuration changed");
-
-       /*
-        * Force an update of the list of network interfaces in 2 seconds.
-        */
-
-        NetIFTime = time(NULL) - 58;
 
        /*
         * Resetting browse_time before calling cupsdSendBrowseList causes
@@ -407,8 +406,8 @@ sysEventThreadEntry(void)
   SCDynamicStoreRef	store    = NULL;/* System Config dynamic store */
   CFRunLoopSourceRef	powerRLS = NULL,/* Power runloop source */
 			storeRLS = NULL;/* System Config runloop source */
-  CFStringRef		key[3],		/* System Config keys */
-			pattern[1];	/* System Config patterns */
+  CFStringRef		key[5],		/* System Config keys */
+			pattern[2];	/* System Config patterns */
   CFArrayRef		keys = NULL,	/* System Config key array*/
 			patterns = NULL;/* System Config pattern array */
   SCDynamicStoreContext	storeContext;	/* Dynamic store context */
@@ -449,33 +448,58 @@ sysEventThreadEntry(void)
   if (!ComputerNameKey)
     ComputerNameKey = SCDynamicStoreKeyCreateComputerName(NULL);
 
-  if (!NetworkGlobalKey)
-    NetworkGlobalKey =
+  if (!NetworkGlobalKeyIPv4)
+    NetworkGlobalKeyIPv4 =
         SCDynamicStoreKeyCreateNetworkGlobalEntity(NULL,
                                                    kSCDynamicStoreDomainState,
 						   kSCEntNetIPv4);
 
+  if (!NetworkGlobalKeyIPv6)
+    NetworkGlobalKeyIPv6 =
+        SCDynamicStoreKeyCreateNetworkGlobalEntity(NULL,
+                                                   kSCDynamicStoreDomainState,
+						   kSCEntNetIPv6);
+
+  if (!NetworkGlobalKeyDNS)
+    NetworkGlobalKeyDNS = 
+	SCDynamicStoreKeyCreateNetworkGlobalEntity(NULL, 
+						   kSCDynamicStoreDomainState,
+						   kSCEntNetDNS);
+
   if (!HostNamesKey)
     HostNamesKey = SCDynamicStoreKeyCreateHostNames(NULL);
 
-  if (!NetworkInterfaceKey)
-    NetworkInterfaceKey =
+  if (!NetworkInterfaceKeyIPv4)
+    NetworkInterfaceKeyIPv4 =
         SCDynamicStoreKeyCreateNetworkInterfaceEntity(NULL,
 	                                              kSCDynamicStoreDomainState,
 						      kSCCompAnyRegex,
 						      kSCEntNetIPv4);
 
-  if (store && ComputerNameKey && NetworkGlobalKey && HostNamesKey &&
-      NetworkInterfaceKey)
+  if (!NetworkInterfaceKeyIPv6)
+    NetworkInterfaceKeyIPv6 =
+        SCDynamicStoreKeyCreateNetworkInterfaceEntity(NULL,
+	                                              kSCDynamicStoreDomainState,
+						      kSCCompAnyRegex,
+						      kSCEntNetIPv6);
+
+  if (store && ComputerNameKey && HostNamesKey &&
+      NetworkGlobalKeyIPv4 && NetworkGlobalKeyIPv6 && NetworkGlobalKeyDNS &&
+      NetworkInterfaceKeyIPv4 && NetworkInterfaceKeyIPv6)
   {
     key[0]     = ComputerNameKey;
-    key[1]     = NetworkGlobalKey;
-    key[2]     = HostNamesKey;
-    pattern[0] = NetworkInterfaceKey;
+    key[1]     = NetworkGlobalKeyIPv4;
+    key[2]     = NetworkGlobalKeyIPv6;
+    key[3]     = NetworkGlobalKeyDNS;
+    key[4]     = HostNamesKey;
+
+    pattern[0] = NetworkInterfaceKeyIPv4;
+    pattern[1] = NetworkInterfaceKeyIPv6;
 
     keys     = CFArrayCreate(NULL, (const void **)key,
                                     sizeof(key) / sizeof(key[0]),
 				    &kCFTypeArrayCallBacks);
+
     patterns = CFArrayCreate(NULL, (const void **)pattern,
                              sizeof(pattern) / sizeof(pattern[0]),
 			     &kCFTypeArrayCallBacks);
@@ -682,11 +706,16 @@ sysEventConfigurationNotifier(
 
   if (CFArrayContainsValue(changedKeys, range, ComputerNameKey))
     threadData->sysevent.event |= SYSEVENT_NAMECHANGED;
-
-  if (CFArrayContainsValue(changedKeys, range, NetworkGlobalKey) ||
-      CFArrayContainsValue(changedKeys, range, HostNamesKey) ||
-      CFArrayContainsValue(changedKeys, range, NetworkInterfaceKey))
+  else
+  {
     threadData->sysevent.event |= SYSEVENT_NETCHANGED;
+
+   /*
+    * Indicate the network interface list needs updating...
+    */
+
+    NetIFUpdate = 1;
+  }
 
  /*
   * Because we registered for several different kinds of change notifications 
@@ -695,7 +724,7 @@ sysEventConfigurationNotifier(
   */
 
   CFRunLoopTimerSetNextFireDate(threadData->timerRef, 
-  				CFAbsoluteTimeGetCurrent() + 2);
+  				CFAbsoluteTimeGetCurrent() + 5);
 }
 
 

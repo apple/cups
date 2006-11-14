@@ -43,8 +43,8 @@ typedef struct cupsd_netif_s		/**** Network interface data ****/
  * Globals...
  */
 
-VAR time_t		NetIFTime	VALUE(0);
-					/* Network interface list time */
+VAR int			NetIFUpdate	VALUE(1);
+					/* Network interface list needs updating */
 VAR cups_array_t	*NetIFList	VALUE(NULL);
 					/* Array of network interfaces */
 
