@@ -3,6 +3,9 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.7
 
+	- Documentation updates (STR #2089)
+	- The PostScript filter now rotates the bounding box
+	  values as needed (STR #2079)
 	- The scheduler no longer loads the remote printer cache
 	  when browsing is disabled (STR #2084)
 	- The scheduler no longer writes a new launchd
