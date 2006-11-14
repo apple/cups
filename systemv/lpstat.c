@@ -2039,7 +2039,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  if (reasons)
 	  {
 	    _cupsLangPuts(stdout, _("\tAlerts:"));
-	    for (j = 0; j < reasons->num_values; i ++)
+	    for (j = 0; j < reasons->num_values; j ++)
 	      _cupsLangPrintf(stdout, " %s",
 	                      reasons->values[j].string.text);
 	    _cupsLangPuts(stdout, "\n");
