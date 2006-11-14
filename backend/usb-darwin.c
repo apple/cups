@@ -198,12 +198,13 @@ static void copy_deviceinfo(CFStringRef deviceIDString, CFStringRef *make, CFStr
 static void release_deviceinfo(CFStringRef *make, CFStringRef *model, CFStringRef *serial);
 static kern_return_t load_classdriver(CFStringRef driverPath, printer_interface_t intf, classdriver_context_t ***driver);
 static kern_return_t unload_classdriver(classdriver_context_t ***classDriver);
-static kern_return_t load_printerdriver(printer_data_t *printer);
-static kern_return_t registry_open(printer_data_t *printer);
+static kern_return_t load_printerdriver(printer_data_t *printer, CFStringRef *driverBundlePath);
+static kern_return_t registry_open(printer_data_t *printer, CFStringRef *driverBundlePath);
 static kern_return_t registry_close(printer_data_t *printer);
 static OSStatus copy_deviceid(classdriver_context_t **printer, CFStringRef *deviceID);
 static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, UInt32 *deviceLocation);
 static CFStringRef copy_value_for_key(CFStringRef deviceID, CFStringRef *keys);
+static CFStringRef cfstr_create_and_trim(const char *cstr);
 static void parse_options(const char *options, char *serial, UInt32 *location, Boolean *waitEOF);
 static void setup_cfLanguage(void);
 static void *read_thread(void *reference);
@@ -255,6 +256,7 @@ print_device(const char *uri,		/* I - Device URI */
   int		  countdown = INITIAL_LOG_INTERVAL;	/* Logging interval */
   pthread_cond_t  *readCompleteConditionPtr = NULL;	/* Read complete condition */
   pthread_mutex_t *readMutexPtr = NULL;			/* Read mutex */
+  CFStringRef	  driverBundlePath;			/* Class driver path */
 
   setup_cfLanguage();
   parse_options(options, serial, &printer_data.location, &printer_data.waitEOF);
@@ -263,9 +265,10 @@ print_device(const char *uri,		/* I - Device URI */
     resource++;
 
   printer_data.uri = uri;
-  printer_data.make   = CFStringCreateWithCString(NULL, hostname, kCFStringEncodingUTF8);
-  printer_data.model  = CFStringCreateWithCString(NULL, resource, kCFStringEncodingUTF8);
-  printer_data.serial = CFStringCreateWithCString(NULL, serial, kCFStringEncodingUTF8);
+  
+  printer_data.make   = cfstr_create_and_trim(hostname);
+  printer_data.model  = cfstr_create_and_trim(resource);
+  printer_data.serial = cfstr_create_and_trim(serial);
 
   fputs("STATE: +connecting-to-device\n", stderr);
 
@@ -281,7 +284,9 @@ print_device(const char *uri,		/* I - Device URI */
     iterate_printers(find_device_callback, &printer_data);		
 
     fprintf(stderr, "INFO: Opening Connection\n");
-    status = registry_open(&printer_data);
+
+    driverBundlePath = NULL;
+    status = registry_open(&printer_data, &driverBundlePath);
 #if defined(__i386__)
     /*
      * If we were unable to load the class drivers for this printer it's probably because they're ppc-only.
@@ -292,6 +297,26 @@ print_device(const char *uri,		/* I - Device URI */
       /* Never returns here */
     }
 #endif /* __i386__ */
+    if (status ==  -2) {
+     /*
+      * If we still were unable to load the class drivers for this printer log
+      * the error and stop the queue...
+      */
+
+      if (driverBundlePath == NULL || !CFStringGetCString(driverBundlePath, buffer, sizeof(buffer), kCFStringEncodingUTF8))
+        strlcpy(buffer, "USB class driver", sizeof(buffer));
+
+      fprintf(stderr, "STATE: +apple-missing-usbclassdriver-error\n" \
+		      "FATAL: Could not load %s\n", buffer);
+
+      if (driverBundlePath)
+	CFRelease(driverBundlePath);
+
+      return CUPS_BACKEND_STOP;
+    }
+
+    if (driverBundlePath)
+      CFRelease(driverBundlePath);
 
     if (status != noErr) {
       sleep( PRINTER_POLLING_INTERVAL );
@@ -508,7 +533,7 @@ static Boolean find_device_callback(void *refcon, io_service_t obj)
       if (CFStringCompare(make, userData->make, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
 	if (CFStringCompare(model, userData->model, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
 	  if (userData->serial != NULL) {
-	    if (serial != NULL && CFStringCompare(model, userData->model, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
+	    if (serial != NULL && CFStringCompare(serial, userData->serial, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
 	      IOObjectRetain(obj);
 	      userData->printerObj = obj;
 	      keepLooking = false;
@@ -728,9 +753,11 @@ static kern_return_t unload_classdriver(classdriver_context_t ***classDriver)
 
 /*
  * 'load_printerdriver()' - Load a vendor's (or generic) classdriver.
+ *
+ * If driverBundlePath is not NULL on return it is the callers responsbility to release it!
  */
 
-static kern_return_t load_printerdriver(printer_data_t *printer)
+static kern_return_t load_printerdriver(printer_data_t *printer, CFStringRef *driverBundlePath)
 {
   IOCFPlugInInterface **iodev = NULL;
   SInt32 score;
@@ -744,11 +771,10 @@ static kern_return_t load_printerdriver(printer_data_t *printer)
 
       kr = IORegistryEntryCreateCFProperties(printer->printerObj, &properties, NULL, kNilOptions);
       if (kr == kIOReturnSuccess) {
-	CFStringRef driverBundlePath = NULL;
 	if (properties != NULL) {
-	  driverBundlePath = (CFStringRef) CFDictionaryGetValue(properties, kUSBClassDriverProperty);
+	  *driverBundlePath = (CFStringRef) CFDictionaryGetValue(properties, kUSBClassDriverProperty);
 	}
-	kr = load_classdriver(driverBundlePath, intf, &printer->printerDriver);
+	kr = load_classdriver(*driverBundlePath, intf, &printer->printerDriver);
       }
 
       if (kr != kIOReturnSuccess)
@@ -764,9 +790,9 @@ static kern_return_t load_printerdriver(printer_data_t *printer)
  * 'registry_open()' - Open a connection to the printer.
  */
 
-static kern_return_t registry_open(printer_data_t *printer)
+static kern_return_t registry_open(printer_data_t *printer, CFStringRef *driverBundlePath)
 {
-  kern_return_t kr = load_printerdriver(printer);
+  kern_return_t kr = load_printerdriver(printer, driverBundlePath);
   if (kr != kIOReturnSuccess) {
     kr = -2;
   }
@@ -972,6 +998,27 @@ static CFStringRef copy_value_for_key(CFStringRef deviceID, CFStringRef *keys)
   if (kvPairs != NULL)
     CFRelease(kvPairs);	
   return value;
+}
+
+
+/*
+ * 'cfstr_create_and_trim()' - Create a CFString from a c-string and 
+ *			       trim it's whitespace characters.
+ */
+
+CFStringRef cfstr_create_and_trim(const char *cstr)
+{
+  CFStringRef		cfstr;
+  CFMutableStringRef	cfmutablestr = NULL;
+  
+  if ((cfstr = CFStringCreateWithCString(NULL, cstr, kCFStringEncodingUTF8)) != NULL)
+  {
+    if ((cfmutablestr = CFStringCreateMutableCopy(NULL, 1024, cfstr)) != NULL)
+      CFStringTrimWhitespace(cfmutablestr);
+
+    CFRelease(cfstr);
+  }
+  return (CFStringRef) cfmutablestr;
 }
 
 
@@ -1343,7 +1390,6 @@ static void *read_thread(void *reference)
 
   return NULL;
 }
-
 
 /*
  * End of "$Id$".
