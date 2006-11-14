@@ -95,11 +95,14 @@ for this printer driver.</p>
 <p>This boolean attribute notifies the RIP filters that the
 destination printer does not require the top and bottom margins
 of the <tt>ImageableArea</tt> swapped for the back page. The
-default value is <code>true</code>.</p>
+default is <tt>true</tt> when <tt>cupsFlipDuplex</tt>  is <tt>true</tt> and <tt>false</tt> otherwise.</p>
 
 <p>Example:</p>
 
 <pre class='command'>
+<em>*% Flip the back side images</em>
+*cupsFlipDuplex: true
+
 <em>*% Don't swap the top and bottom margins for the back side</em> 
 *APDuplexRequiresFlippedMargin: false
 </pre>
