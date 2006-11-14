@@ -949,7 +949,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 	}
 	else
 	{
-	  printf("%%%%Page: %s %d\n", pageinfo->label, number);
+          printf("%%%%Page: %s %d\n", pageinfo->label, number);
 	  printf("%%%%PageBoundingBox: %d %d %d %d\n",
 		 pageinfo->bounding_box[0], pageinfo->bounding_box[1],
 		 pageinfo->bounding_box[2], pageinfo->bounding_box[3]);
@@ -1262,6 +1262,44 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
         fputs("ERROR: Bad %%PageBoundingBox: comment in file!\n", stderr);
         memcpy(bounding_box, doc->bounding_box,
 	       sizeof(bounding_box));
+      }
+      else if (doc->number_up == 1 && !doc->fitplot)
+      {
+        int	temp_bbox[4];		/* Temporary bounding box */
+
+
+        switch (Orientation)
+	{
+	  case 0 : /* Portrait */
+              break;
+
+	  case 1 : /* Landscape */
+	      temp_bbox[0] = PageWidth - bounding_box[3];
+	      temp_bbox[1] = bounding_box[0];
+	      temp_bbox[2] = PageWidth - bounding_box[1];
+	      temp_bbox[3] = bounding_box[2];
+
+	      memcpy(bounding_box, temp_bbox, sizeof(bounding_box));
+              break;
+
+	  case 2 : /* Reverse Portrait */
+	      temp_bbox[0] = PageWidth - bounding_box[0];
+	      temp_bbox[1] = PageLength - bounding_box[1];
+	      temp_bbox[2] = PageWidth - bounding_box[2];
+	      temp_bbox[3] = PageLength - bounding_box[3];
+
+	      memcpy(bounding_box, temp_bbox, sizeof(bounding_box));
+              break;
+
+	  case 3 : /* Reverse Landscape */
+	      temp_bbox[0] = bounding_box[1];
+	      temp_bbox[1] = PageLength - bounding_box[2];
+	      temp_bbox[2] = bounding_box[3];
+	      temp_bbox[3] = PageLength - bounding_box[0];
+
+	      memcpy(bounding_box, temp_bbox, sizeof(bounding_box));
+              break;
+	}
       }
     }
 #if 0
