@@ -251,6 +251,18 @@ fi
 
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTCAP, "$CUPS_DEFAULT_PRINTCAP")
 
+dnl Default MaxCopies value...
+AC_ARG_WITH(max-copies, [  --with-max-copies       set max copies value, default=100 ],
+	CUPS_MAX_COPIES="$withval",
+	if test "x$uname" = xDarwin; then
+		CUPS_MAX_COPIES="999"
+	else
+		CUPS_MAX_COPIES="100"
+	fi)
+
+AC_SUBST(CUPS_MAX_COPIES)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_MAX_COPIES, $CUPS_MAX_COPIES)
+
 dnl
 dnl End of "$Id$".
 dnl

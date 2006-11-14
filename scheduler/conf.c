@@ -439,7 +439,7 @@ cupsdReadConfiguration(void)
   MaxActiveJobs       = 0;
   MaxJobsPerUser      = 0;
   MaxJobsPerPrinter   = 0;
-  MaxCopies           = 100;
+  MaxCopies           = CUPS_DEFAULT_MAX_COPIES;
 
   cupsdDeleteAllPolicies();
   cupsdClearString(&DefaultPolicy);

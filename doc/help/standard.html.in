@@ -72,6 +72,10 @@ Basic authentication with membership in the group
 	<TD><CODE>@CUPS_LOG_FILE_PERM@</CODE></TD>
 </TR>
 <TR>
+	<TD><CODE><A HREF="ref-cupsd-conf.html#MaxCopies">MaxCopies</A></CODE></TD>
+	<TD><CODE>@CUPS_MAX_COPIES@</CODE></TD>
+</TR>
+<TR>
 	<TD><CODE><A HREF="ref-cupsd-conf.html#UseNetworkDefault">UseNetworkDefault</A></CODE></TD>
 	<TD><CODE>@CUPS_USE_NETWORK_DEFAULT@</CODE></TD>
 </TR>

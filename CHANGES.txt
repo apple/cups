@@ -1,8 +1,10 @@
-CHANGES.txt - 2006-10-17
+CHANGES.txt - 2006-11-14
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- Added a new --with-max-copies configure option (STR
+	  #2090)
 	- Added new cupsRemoveDest() and cupsSetDefaultDest()
 	  functions.
 	- Added support for cupsPJLCharset attribute in PPD files

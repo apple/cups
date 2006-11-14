@@ -133,7 +133,7 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Maximum number of clients */
 			MaxClientsPerHost	VALUE(0),
 					/* Maximum number of clients per host */
-			MaxCopies		VALUE(100),
+			MaxCopies		VALUE(CUPS_DEFAULT_MAX_COPIES),
 					/* Maximum number of copies per job */
 			MaxLogSize		VALUE(1024 * 1024),
 					/* Maximum size of log files */

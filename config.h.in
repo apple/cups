@@ -78,6 +78,13 @@
 
 
 /*
+ * Default MaxCopies value...
+ */
+
+#define CUPS_DEFAULT_MAX_COPIES	100
+
+
+/*
  * Maximum number of file descriptors to support.
  */
 
