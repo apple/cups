@@ -296,6 +296,38 @@ cupsCharsetToUTF8(
   }
 
  /*
+  * Handle ISO-8859-1 to UTF-8 directly...
+  */
+
+  if (encoding == CUPS_ISO8859_1)
+  {
+    int		ch;			/* Character from string */
+    cups_utf8_t	*destptr,		/* Pointer into UTF-8 buffer */
+		*destend;		/* End of UTF-8 buffer */
+
+
+    destptr = dest;
+    destend = dest + maxout - 2;
+
+    while (*src && destptr < destend)
+    {
+      ch = *src++ & 255;
+
+      if (ch & 128)
+      {
+	*destptr++ = 0xc0 | (ch >> 6);
+	*destptr++ = 0x80 | (ch & 0x3f);
+      }
+      else
+	*destptr++ = ch;
+    }
+
+    *destptr = '\0';
+
+    return (destptr - dest);
+  }
+
+ /*
   * Convert input legacy charset to UTF-8...
   */
 
@@ -361,6 +393,45 @@ cupsUTF8ToCharset(
   {
     strlcpy(dest, (char *)src, maxout);
     return (strlen(dest));
+  }
+
+ /*
+  * Handle UTF-8 to ISO-8859-1 directly...
+  */
+
+  if (encoding == CUPS_ISO8859_1)
+  {
+    int		ch;			/* Character from string */
+    char	*destptr,		/* Pointer into ISO-8859-1 buffer */
+		*destend;		/* End of ISO-8859-1 buffer */
+
+
+    destptr = dest;
+    destend = dest + maxout - 1;
+
+    while (*src && destptr < destend)
+    {
+      ch = *src++;
+
+      if ((ch & 0xe0) == 0xc0)
+      {
+	ch = ((ch & 0x1f) << 6) | (*src++ & 0x3f);
+
+	if (ch < 256)
+          *destptr++ = ch;
+	else
+          *destptr++ = '?';
+      }
+      else if ((ch & 0xf0) == 0xe0 ||
+               (ch & 0xf8) == 0xf0)
+        *destptr++ = '?';
+      else if (!(ch & 0x80))
+	*destptr++ = ch;
+    }
+
+    *destptr = '\0';
+
+    return (destptr - dest);
   }
 
  /*
