@@ -1418,8 +1418,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       if (verbose > 0)
       {
         if (errors)
-          _cupsLangPrintf(stdout, _("    %d ERROR%s FOUND\n"),
-			  errors, errors == 1 ? "" : "S");
+          _cupsLangPrintf(stdout, _("    %d ERRORS FOUND\n"), errors);
 	else
 	  _cupsLangPuts(stdout, _("    NO ERRORS FOUND\n"));
       }
