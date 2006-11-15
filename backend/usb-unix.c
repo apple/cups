@@ -84,8 +84,7 @@ print_device(const char *uri,		/* I - Device URI */
     * device ID over and over and over when they get a read request...
     */
 
-    use_bc = strcasecmp(hostname, "Canon") != 0 ||
-             strstr(hostname, "Minolta") != NULL;
+    use_bc = strcasecmp(hostname, "Canon") && !strstr(hostname, "Minolta");
 
     if ((device_fd = open_device(uri, &use_bc)) == -1)
     {
