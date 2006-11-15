@@ -1492,19 +1492,36 @@ _httpReadCDSA(
     void             *data,		/* I  - Data buffer */
     size_t           *dataLength)	/* IO - Number of bytes */
 {
-  OSStatus	  result;		/* Return value */
-  ssize_t	  bytes;		/* Number of bytes read */
-  cdsa_conn_ref_t u;			/* Connection reference union */
+  OSStatus	result;			/* Return value */
+  ssize_t	bytes;			/* Number of bytes read */
+  http_t	*http;			/* HTTP connection */
 
 
-  u.connection = connection;
+  http = (http_t *)connection;
+
+  if (!http->blocking)
+  {
+   /*
+    * Make sure we have data before we read...
+    */
+
+    if (!http_wait(http, 10000, 0))
+    {
+      http->error = ETIMEDOUT;
+      return (-1);
+    }
+  }
 
   do
-    bytes = recv(u.sock, data, *dataLength, 0);
+  {
+    bytes = recv(http->fd, data, *dataLength, 0);
+  }
   while (bytes == -1 && errno == EINTR);
 
   if (bytes == *dataLength)
+  {
     result = 0;
+  }
   else if (bytes > 0)
   {
     *dataLength = bytes;
@@ -1522,7 +1539,7 @@ _httpReadCDSA(
       result = errSSLClosedAbort;
   }
 
-  return result;
+  return (result);
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
 
@@ -2125,19 +2142,23 @@ _httpWriteCDSA(
     const void       *data,		/* I  - Data buffer */
     size_t           *dataLength)	/* IO - Number of bytes */
 {
-  OSStatus	  result;		/* Return value */
-  ssize_t	  bytes;		/* Number of bytes read */
-  cdsa_conn_ref_t u;			/* Connection reference union */
+  OSStatus	result;			/* Return value */
+  ssize_t	bytes;			/* Number of bytes read */
+  http_t	*http;			/* HTTP connection */
 
 
-  u.connection = connection;
+  http = (http_t *)connection;
 
   do
-    bytes = write(u.sock, data, *dataLength);
+  {
+    bytes = write(http->fd, data, *dataLength);
+  }
   while (bytes == -1 && errno == EINTR);
 
   if (bytes == *dataLength)
+  {
     result = 0;
+  }
   else if (bytes >= 0)
   {
     *dataLength = bytes;
@@ -2153,7 +2174,7 @@ _httpWriteCDSA(
       result = errSSLClosedAbort;
   }
 
-  return result;
+  return (result);
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
 
@@ -2562,7 +2583,6 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
 #  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error code */
   http_tls_t	*conn;			/* CDSA connection information */
-  cdsa_conn_ref_t u;			/* Connection reference union */
 #  endif /* HAVE_LIBSSL */
 
 
@@ -2660,9 +2680,7 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   * Use a union to resolve warnings about int/pointer size mismatches...
   */
 
-  u.connection = NULL;
-  u.sock       = http->fd;
-  error        = SSLSetConnection(conn->session, u.connection);
+  error = SSLSetConnection(conn->session, http);
 
   if (!error)
     error = SSLSetIOFuncs(conn->session, _httpReadCDSA, _httpWriteCDSA);

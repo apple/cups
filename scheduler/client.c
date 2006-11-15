@@ -2767,7 +2767,6 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 #  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error code */
   http_tls_t	*conn;			/* CDSA connection information */
-  cdsa_conn_ref_t u;			/* Connection reference union */
 
 
   if ((conn = (http_tls_t *)malloc(sizeof(http_tls_t))) == NULL)
@@ -2805,15 +2804,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     error = SSLSetProtocolVersionEnabled(conn->session, kSSLProtocol2, false);
 
   if (!error)
-  {
-   /*
-    * Use a union to resolve warnings about int/pointer size mismatches...
-    */
-
-    u.connection = NULL;
-    u.sock       = con->http.fd;
-    error        = SSLSetConnection(conn->session, u.connection);
-  }
+    error = SSLSetConnection(conn->session, HTTP(con));
 
   if (!error)
     error = SSLSetAllowsExpiredCerts(conn->session, true);
