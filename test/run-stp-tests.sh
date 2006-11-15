@@ -120,8 +120,8 @@ echo "certificate for testing; these tests currently require the OpenSSL"
 echo "tools:"
 echo ""
 echo "0 - Do not do SSL/TLS encryption tests"
-echo "1 - Create a SSL/TLS certificate and key, but do not require encryption"
-echo "2 - Create a SSL/TLS certificate and key and require encryption"
+echo "1 - Test but do not require encryption"
+echo "2 - Test and require encryption"
 echo ""
 echo $ac_n "Enter the number of the SSL/TLS tests to perform: [0] $ac_c"
 
@@ -134,25 +134,14 @@ fi
 echo ""
 
 case "$ssltype" in
-	1 | 2)
-		if test -f server.key; then
-			echo "Using existing SSL/TLS certificate and key..."
-		else
-			echo "Generating SSL/TLS certificate and key..."
-			openssl req -new -x509 -keyout server.key -out server.crt -days 3650 -nodes >/dev/null <<EOF
-ZZ
-Testland
-Testville
-Test Company
-
-`hostname`
-test@domain.com
-EOF
-		fi
+	1)
+		echo "Will test but not require encryption (1)"
 		;;
-
+	2)
+		echo "Will test and require encryption (2)"
+		;;
 	*)
-		echo "Not using SSL/TLS..."
+		echo "Not using SSL/TLS (0)"
 		ssltype=0
 		;;
 esac
