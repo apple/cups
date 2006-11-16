@@ -1,0 +1,77 @@
+<TABLE CELLPADDING="0" CELLSPACING="0" WIDTH="100%" SUMMARY="Administration Tasks">
+<TR><TD VALIGN="TOP" NOWRAP>
+
+<H2 CLASS="title">Stampanti</H2>
+
+<P>
+<A HREF="/admin?op=add-printer"><IMG
+SRC="/images/button-add-printer.gif" ALT="Aggiungi stampante" CLASS="button"></A>
+<A HREF="/printers/"><IMG SRC="/images/button-manage-printers.gif"
+ALT="Gestione stampanti" CLASS="button"></A>
+{have_samba?<A HREF="/admin/?op=export-samba"><IMG
+SRC="/images/button-export-samba.gif" ALT="Esporta stampanti su Samba"
+CLASS="button"></A>:}
+</P>
+
+{#device_uri=0?:<P><B>Nuove stampanti trovate:</B></P><UL>{[device_uri]
+<LI><A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
+SRC="/images/button-add-this-printer.gif" ALT="Aggiungi questa stampante" CLASS="button"
+ALIGN="MIDDLE"></A>
+{device_make_and_model} ({device_info})</LI>
+}</UL>}
+
+<H2 CLASS="title">Classi</H2>
+
+<P>
+<A HREF="/admin?op=add-class"><IMG SRC="/images/button-add-class.gif"
+ALT="Aggiungi classe" CLASS="button"></A>
+<A HREF="/classes/"><IMG SRC="/images/button-manage-classes.gif"
+ALT="Gestione classi" CLASS="button"></A>
+</P>
+
+<H2 CLASS="title">Operazioni</H2>
+
+<P>
+<A HREF="/jobs/"><IMG SRC="/images/button-manage-jobs.gif" ALT="Gestione
+operazioni" CLASS="button"></A>
+</P>
+
+</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+
+<H2 CLASS="title">Server</H2>
+
+<P>
+<A HREF="/admin?op=config-server"><IMG
+SRC="/images/button-edit-configuration-file.gif" ALT="Modifica file di configurazione"
+CLASS="button"></A>
+<A HREF="/admin/log/access_log" TARGET="_blank"><IMG
+SRC="/images/button-view-access-log.gif" ALT="Mostra registro degli accessi"
+CLASS="button"></A>
+<A HREF="/admin/log/error_log" TARGET="_blank"><IMG
+SRC="/images/button-view-error-log.gif" ALT="Mostra registro degli errori"
+CLASS="button"></A>
+<A HREF="/admin/log/page_log" TARGET="_blank"><IMG
+SRC="/images/button-view-page-log.gif" ALT="Mostra registro delle pagine"
+CLASS="button"></A>
+</P>
+
+{SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
+<BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
+
+<FORM METHOD="POST" ACTION="/admin">
+
+<P><B>Impostazioni di base del server:</B></P>
+
+<P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Mostra stampanti condivise da altri sistemi<BR>
+<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Condividi le stampanti pubblicate connesse a questo sistema<BR>
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Consenti amministrazione remota<BR>
+<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Consenti agli utenti di annullare qualunque operazione (non solo le proprie)<BR>
+<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Salva le informazioni di debug per la risoluzione di problemi</P>
+
+<P><INPUT TYPE="IMAGE" SRC="/images/button-change-settings.gif" ALT="Modifica impostazioni"></P>
+
+</FORM>}
+
+</TD></TR>
+</TABLE>

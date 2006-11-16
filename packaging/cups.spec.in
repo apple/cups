@@ -91,6 +91,11 @@ Summary: Common UNIX Printing System - Estonian support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
+%package it
+Summary: Common UNIX Printing System - Italian support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package ja
 Summary: Common UNIX Printing System - Japanese support
 Group: System Environment/Daemons
@@ -143,6 +148,10 @@ UNIX® operating systems. This package provides Spanish support.
 %description et
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Estonian support.
+
+%description it
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Italian support.
 
 %description ja
 The Common UNIX Printing System provides a portable printing layer for 
@@ -420,6 +429,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups/templates/et
 /usr/share/cups/templates/et/*
 /usr/share/locale/et/cups_et.po
+
+%files it
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/it
+/usr/share/doc/cups/it/index.html
+%dir /usr/share/doc/cups/it/images
+/usr/share/doc/cups/it/images/*
+%dir /usr/share/cups/templates/it
+/usr/share/cups/templates/it/*
+/usr/share/locale/it/cups_it.po
 
 %files ja
 %defattr(-,root,root)

@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>Home - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/favicon.ico" TYPE="image/x-icon">
+</HEAD>
+<BODY>
+<TABLE WIDTH="100%" STYLE="height: 100%;" BORDER="0" CELLSPACING="0" CELLPADDING="0" SUMMARY="Common UNIX Printing System @CUPS_VERSION@">
+<TR CLASS="header">
+<TD VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG SRC="/images/top-left.gif" WIDTH="15" HEIGHT="80" ALT=""></TD>
+<TD VALIGN="TOP" WIDTH="55" ROWSPAN="2"><IMG SRC="/images/top-middle.gif" WIDTH="55" HEIGHT="80" ALT=""></TD>
+<TD WIDTH="100%" HEIGHT="60"><H1>Common UNIX Printing System @CUPS_VERSION@@CUPS_REVISION@</H1></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG
+SRC="/images/top-right.gif" WIDTH="15" HEIGHT="15" ALT=""></TD>
+</TR>
+<TR CLASS="header"><TD WIDTH="100%" VALIGN="BOTTOM" NOWRAP>
+
+<A CLASS="sel" HREF="/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;Principale&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/admin/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;Amministrazione&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/classes/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;Classi&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/help/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;Documentazione/Guida&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/jobs/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;Operazioni&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/printers/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;Stampanti&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+</TD></TR>
+<TR CLASS="page">
+<TD WIDTH="15">&nbsp;</TD>
+<TD COLSPAN="2" WIDTH="100%" VALIGN="TOP" CLASS="page">
+
+<H2 CLASS="title">Benvenuto!</H2>
+
+<P>Queste pagine web ti consentono di controllare le stampanti e le operazioni di stampa nonch&eacute; eseguire operazioni di amministrazione del sistema. Fai clic su ognuna delle schede in alto o sui pulsanti seguenti per effettuare un'operazione.</P>
+
+<P>
+<A HREF="/help/"><IMG SRC="/images/button-help.gif" CLASS="button" ALT="Guida"></A>
+<A HREF="/admin?OP=add-class"><IMG SRC="/images/button-add-class.gif" CLASS="button" ALT="Aggiungi classe"></A>
+<A HREF="/admin?OP=add-printer"><IMG SRC="/images/button-add-printer.gif" CLASS="button" ALT="Aggiungi stampante"></A>
+<A HREF="/classes"><IMG SRC="/images/button-manage-classes.gif" CLASS="button" ALT="Gestione classi"></A>
+<A HREF="/jobs"><IMG SRC="/images/button-manage-jobs.gif" CLASS="button" ALT="Gestione operazioni"></A>
+<A HREF="/printers"><IMG SRC="/images/button-manage-printers.gif" CLASS="button" ALT="Gestione stampanti"></A>
+<A HREF="/admin"><IMG SRC="/images/button-manage-server.gif" CLASS="button" ALT="Gestione server"></A>
+</P>
+
+<P><I>Se ti viene richiesto un nome utente o una password, inserisci il nome utente
+e la password di accesso o il nome utente e la password dell'utente "root".</I></P>
+
+<H2 CLASS="title">Informazioni su CUPS</H2>
+
+<P>
+<IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
+STYLE="padding-right: 10px;" ALT="Computer felice e stampante">
+
+<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
+ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
+STYLE="padding-left: 10px; padding-bottom: 10px;"
+ALT="Easy Software Products"></A>
+
+CUPS fornisce un sottosistema di stampa portabile per
+i sistemi operativi basati su UNIX<SUP>&reg;</SUP>. Sviluppato e
+gestito da <A HREF="http://www.easysw.com">Easy Software
+Products</a> per promuovere una soluzione di stampa standard. CUPS &egrave; il
+sistema di stampa standard utilizzato su MacOS<SUP>&reg;</SUP> X e sulla
+maggior parte delle distribuzioni Linux<SUP>&reg;</SUP>.</P>
+
+<P>CUPS utilizza l'<A HREF="http://www.pwg.org/ipp/"
+TARGET="_blank">Internet Printing Protocol ("IPP")</A> come base per la
+gestione delle operazioni di stampa e delle code e aggiunge la navigazione delle 
+stampanti di rete e opzioni di stampa basate su PostScript Printer
+Description ("PPD") per supportare tutte le necessit&agrave; di stampa.<BR CLEAR="ALL"></P>
+
+<H2 CLASS="title">Driver di stampa e assistenza</H2>
+
+<P>Visita il sito ufficiale di CUPS per i driver di stampa e assistenza:</P>
+
+<PRE>
+    <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
+</PRE>
+
+<P>Supporto commerciale e una versione migliorata di CUPS chiamata <A
+HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> 
+disponibili presso:</P>
+
+<PRE>
+    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
+</PRE>
+
+</TD>
+<TD WIDTH="15">&nbsp;</TD>
+</TR>
+<TR CLASS="header">
+<TD VALIGN="BOTTOM" WIDTH="15"><IMG SRC="/images/bottom-left.gif"
+WIDTH="15" HEIGHT="15" ALT=""></TD>
+<TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
+
+<P><SMALL>Common UNIX Printing System, CUPS, e il logo CUPS sono
+marchi registrati da <A HREF="http://www.easysw.com">Easy Software
+Products</A>. CUPS &egrave; un copyright 1997-2006 di Easy Software Products,
+Tutti i diritti sono riservati.</SMALL></P>
+
+</TD>
+
+<TD ALIGN="RIGHT" VALIGN="BOTTOM" WIDTH="15"><IMG SRC="/images/bottom-right.gif"
+WIDTH="15" HEIGHT="15" ALT=""></TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>
