@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c 6073 2006-11-02 20:01:54Z mike $"
+ * "$Id: lpstat.c 6090 2006-11-14 16:35:27Z mike $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -2038,7 +2038,7 @@ show_printers(http_t      *http,	/* I - HTTP connection to server */
 	  if (reasons)
 	  {
 	    _cupsLangPuts(stdout, _("\tAlerts:"));
-	    for (j = 0; j < reasons->num_values; i ++)
+	    for (j = 0; j < reasons->num_values; j ++)
 	      _cupsLangPrintf(stdout, " %s",
 	                      reasons->values[j].string.text);
 	    _cupsLangPuts(stdout, "\n");
@@ -2248,5 +2248,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c 6073 2006-11-02 20:01:54Z mike $".
+ * End of "$Id: lpstat.c 6090 2006-11-14 16:35:27Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 6027 2006-10-11 21:04:58Z mike $"
+ * "$Id: client.c 6111 2006-11-15 20:28:39Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -426,7 +426,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
     con->http.encryption = HTTP_ENCRYPT_ALWAYS;
 
-    encrypt_client(con);
+    if (!encrypt_client(con))
+      cupsdCloseClient(con);
   }
   else
     con->auto_ssl = 1;
@@ -745,7 +746,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
                       "cupsdReadClient: Saw first byte %02X, auto-negotiating SSL/TLS session...",
                       buf[0] & 255);
 
-      encrypt_client(con);
+      if (!encrypt_client(con))
+        return (cupsdCloseClient(con));
+
       return (1);
     }
   }
@@ -1056,7 +1059,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	if (cupsdFlushHeader(con) < 0)
 	  return (cupsdCloseClient(con));
 
-        encrypt_client(con);
+        if (!encrypt_client(con))
+	  return (cupsdCloseClient(con));
 #else
 	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED))
 	  return (cupsdCloseClient(con));
@@ -1103,7 +1107,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	if (cupsdFlushHeader(con) < 0)
 	  return (cupsdCloseClient(con));
 
-        encrypt_client(con);
+        if (!encrypt_client(con))
+	  return (cupsdCloseClient(con));
 #else
 	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED))
 	  return (cupsdCloseClient(con));
@@ -2587,6 +2592,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
   SSL		*conn;			/* Connection for encryption */
+  BIO		*bio;			/* BIO data */
   unsigned long	error;			/* Error code */
 
 
@@ -2614,9 +2620,12 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   SSL_CTX_use_PrivateKey_file(context, ServerKey, SSL_FILETYPE_PEM);
   SSL_CTX_use_certificate_file(context, ServerCertificate, SSL_FILETYPE_PEM);
 
-  conn = SSL_new(context);
+  bio = BIO_new(_httpBIOMethods());
+  BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)HTTP(con));
 
-  SSL_set_fd(conn, con->http.fd);
+  conn = SSL_new(context);
+  SSL_set_bio(conn, bio, bio);
+
   if (SSL_accept(conn) != 1)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2689,8 +2698,9 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   gnutls_init(&(conn->session), GNUTLS_SERVER);
   gnutls_set_default_priority(conn->session);
   gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(conn->session,
-                           (gnutls_transport_ptr)((long)con->http.fd));
+  gnutls_transport_set_ptr(conn->session, (gnutls_transport_ptr)HTTP(con));
+  gnutls_transport_set_pull_function(conn->session, _httpReadGNUTLS);
+  gnutls_transport_set_push_function(conn->session, _httpWriteGNUTLS);
 
   error = gnutls_handshake(conn->session);
 
@@ -2720,7 +2730,6 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 #  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error code */
   http_tls_t	*conn;			/* CDSA connection information */
-  cdsa_conn_ref_t u;			/* Connection reference union */
 
 
   if ((conn = (http_tls_t *)malloc(sizeof(http_tls_t))) == NULL)
@@ -2743,7 +2752,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   if (!conn->certsArray)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-        	    "EncryptClient: Could not find signing key in keychain "
+        	    "encrypt_client: Could not find signing key in keychain "
 		    "\"%s\"", ServerCertificate);
     error = errSSLBadCert; /* errSSLBadConfiguration is a better choice, but not available on 10.2.x */
   }
@@ -2758,15 +2767,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     error = SSLSetProtocolVersionEnabled(conn->session, kSSLProtocol2, false);
 
   if (!error)
-  {
-   /*
-    * Use a union to resolve warnings about int/pointer size mismatches...
-    */
-
-    u.connection = NULL;
-    u.sock       = con->http.fd;
-    error        = SSLSetConnection(conn->session, u.connection);
-  }
+    error = SSLSetConnection(conn->session, HTTP(con));
 
   if (!error)
     error = SSLSetAllowsExpiredCerts(conn->session, true);
@@ -4200,5 +4201,5 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 6027 2006-10-11 21:04:58Z mike $".
+ * End of "$Id: client.c 6111 2006-11-15 20:28:39Z mike $".
  */

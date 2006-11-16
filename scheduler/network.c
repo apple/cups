@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c 5428 2006-04-18 20:45:30Z mike $"
+ * "$Id: network.c 6090 2006-11-14 16:35:27Z mike $"
  *
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -60,7 +60,8 @@ cupsdNetIFFind(const char *name)	/* I - Name of interface */
   * Update the interface list as needed...
   */
 
-  cupsdNetIFUpdate();
+  if (NetIFUpdate)
+    cupsdNetIFUpdate();
 
  /*
   * Search for the named interface...
@@ -113,14 +114,13 @@ cupsdNetIFUpdate(void)
 
 
  /*
-  * Update the network interface list no more often than once a
-  * minute...
+  * Only update the list if we need to...
   */
 
-  if ((time(NULL) - NetIFTime) < 60)
+  if (!NetIFUpdate)
     return;
 
-  NetIFTime = time(NULL);
+  NetIFUpdate = 0;
 
  /*
   * Free the old interfaces...
@@ -314,5 +314,5 @@ compare_netif(cupsd_netif_t *a,		/* I - First network interface */
 
 
 /*
- * End of "$Id: network.c 5428 2006-04-18 20:45:30Z mike $".
+ * End of "$Id: network.c 6090 2006-11-14 16:35:27Z mike $".
  */

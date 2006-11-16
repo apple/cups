@@ -1,5 +1,5 @@
 /*
- * "$Id: network.h 5043 2006-02-01 18:55:16Z mike $"
+ * "$Id: network.h 6090 2006-11-14 16:35:27Z mike $"
  *
  *   Network interface definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -43,8 +43,8 @@ typedef struct cupsd_netif_s		/**** Network interface data ****/
  * Globals...
  */
 
-VAR time_t		NetIFTime	VALUE(0);
-					/* Network interface list time */
+VAR int			NetIFUpdate	VALUE(1);
+					/* Network interface list needs updating */
 VAR cups_array_t	*NetIFList	VALUE(NULL);
 					/* Array of network interfaces */
 
@@ -57,5 +57,5 @@ extern void		cupsdNetIFUpdate(void);
 
 
 /*
- * End of "$Id: network.h 5043 2006-02-01 18:55:16Z mike $".
+ * End of "$Id: network.h 6090 2006-11-14 16:35:27Z mike $".
  */

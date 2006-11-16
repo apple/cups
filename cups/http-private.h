@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 5504 2006-05-10 18:57:46Z mike $"
+ * "$Id: http-private.h 6111 2006-11-15 20:28:39Z mike $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -70,7 +70,8 @@ typedef int socklen_t;
 #  if defined HAVE_LIBSSL
 /*
  * The OpenSSL library provides its own SSL/TLS context structure for its
- * IO and protocol management...
+ * IO and protocol management.  However, we need to provide our own BIO
+ * (basic IO) implementation to do timeouts...
  */
 
 #    include <openssl/err.h>
@@ -78,6 +79,8 @@ typedef int socklen_t;
 #    include <openssl/ssl.h>
 
 typedef SSL http_tls_t;
+
+extern BIO_METHOD *_httpBIOMethods(void);
 
 #  elif defined HAVE_GNUTLS
 /*
@@ -90,6 +93,11 @@ typedef struct
   gnutls_session	session;	/* GNU TLS session object */
   void			*credentials;	/* GNU TLS credentials object */
 } http_tls_t;
+
+extern ssize_t	_httpReadGNUTLS(gnutls_transport_ptr ptr, void *data,
+		                size_t length);
+extern ssize_t	_httpWriteGNUTLS(gnutls_transport_ptr ptr, const void *data,
+		                 size_t length);
 
 #  elif defined(HAVE_CDSASSL)
 /*
@@ -104,15 +112,6 @@ typedef struct				/**** CDSA connection information ****/
   SSLContextRef		session;	/* CDSA session object */
   CFArrayRef		certsArray;	/* Certificates array */
 } http_tls_t;
-
-typedef union _cdsa_conn_ref_u		/**** CDSA Connection reference union
-					 **** used to resolve 64-bit casting
-					 **** warnings.
-					 ****/
-{
-  SSLConnectionRef connection;		/* SSL connection pointer */
-  int		   sock;		/* Socket */
-} cdsa_conn_ref_t;
 
 extern OSStatus	_httpReadCDSA(SSLConnectionRef connection, void *data,
 		              size_t *dataLength);
@@ -187,5 +186,5 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 5504 2006-05-10 18:57:46Z mike $".
+ * End of "$Id: http-private.h 6111 2006-11-15 20:28:39Z mike $".
  */

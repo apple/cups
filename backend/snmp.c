@@ -1,5 +1,5 @@
 /*
- * "$Id: snmp.c 6049 2006-10-20 15:07:21Z mike $"
+ * "$Id: snmp.c 6090 2006-11-14 16:35:27Z mike $"
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
@@ -1126,7 +1126,7 @@ asn1_set_packed(unsigned char **buffer,	/* IO - Pointer in buffer */
 {
   if (integer > 0xfffffff)
   {
-    **buffer = (integer >> 14) & 0x7f;
+    **buffer = (integer >> 28) & 0x7f;
     (*buffer) ++;
   }
 
@@ -1752,7 +1752,7 @@ probe_device(snmp_cache_t *device)	/* I - Device */
     alarm(0);
   }
 
-  if (http);
+  if (http)
   {
    /*
     * IPP is supported...
@@ -2455,5 +2455,5 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 
 
 /*
- * End of "$Id: snmp.c 6049 2006-10-20 15:07:21Z mike $".
+ * End of "$Id: snmp.c 6090 2006-11-14 16:35:27Z mike $".
  */

@@ -28,6 +28,7 @@ _cups_freeifaddrs
 _cups_strcpy
 _cups_strlcat
 _cups_strlcpy
+_httpBIOMethods
 _ippAddAttr
 _ippFreeAttr
 _ppdGetEncoding

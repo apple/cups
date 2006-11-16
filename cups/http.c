@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 5961 2006-09-16 19:08:36Z mike $"
+ * "$Id: http.c 6111 2006-11-15 20:28:39Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -25,6 +25,7 @@
  *
  * Contents:
  *
+ *   _httpBIOMethods()    - Get the OpenSSL BIO methods for HTTP connections.
  *   httpBlocking()       - Set blocking/non-blocking behavior on a connection.
  *   httpCheck()          - Check to see if there is a pending response from
  *                          the server.
@@ -60,7 +61,8 @@
  *   httpPut()            - Send a PUT request to the server.
  *   httpRead()           - Read data from a HTTP connection.
  *   httpRead2()          - Read data from a HTTP connection.
- *   _httpReadCDSA()      - Read function for CDSA decryption code.
+ *   _httpReadCDSA()      - Read function for the CDSA library.
+ *   _httpReadGNUTLS()    - Read function for the GNU TLS library.
  *   httpReconnect()      - Reconnect to a HTTP server...
  *   httpSetCookie()      - Set the cookie value(s)...
  *   httpSetExpect()      - Set the Expect: header in a request.
@@ -71,7 +73,14 @@
  *   httpWait()           - Wait for data available on a connection.
  *   httpWrite()          - Write data to a HTTP connection.
  *   httpWrite2()         - Write data to a HTTP connection.
- *   _httpWriteCDSA()     - Write function for CDSA encryption code.
+ *   _httpWriteCDSA()     - Write function for the CDSA library.
+ *   _httpWriteGNUTLS()   - Write function for the GNU TLS library.
+ *   http_bio_ctrl()      - Control the HTTP connection.
+ *   http_bio_free()      - Free OpenSSL data.
+ *   http_bio_new()       - Initialize an OpenSSL BIO structure.
+ *   http_bio_puts()      - Send a string for OpenSSL.
+ *   http_bio_read()      - Read data for OpenSSL.
+ *   http_bio_write()     - Write data for OpenSSL.
  *   http_field()         - Return the field index for a field name.
  *   http_read_ssl()      - Read from a SSL/TLS connection.
  *   http_send()          - Send a request with all fields and the trailing
@@ -118,7 +127,7 @@
 static http_field_t	http_field(const char *name);
 static int		http_send(http_t *http, http_state_t request,
 			          const char *uri);
-static int		http_wait(http_t *http, int msec);
+static int		http_wait(http_t *http, int msec, int usessl);
 static int		http_write(http_t *http, const char *buffer,
 			           int length);
 static int		http_write_chunk(http_t *http, const char *buffer,
@@ -166,6 +175,45 @@ static const char * const http_fields[] =
 			  "User-Agent",
 			  "WWW-Authenticate"
 			};
+
+
+#if defined(HAVE_SSL) && defined(HAVE_LIBSSL)
+/*
+ * BIO methods for OpenSSL...
+ */
+
+static int		http_bio_write(BIO *h, const char *buf, int num);
+static int		http_bio_read(BIO *h, char *buf, int size);
+static int		http_bio_puts(BIO *h, const char *str);
+static long		http_bio_ctrl(BIO *h, int cmd, long arg1, void *arg2);
+static int		http_bio_new(BIO *h);
+static int		http_bio_free(BIO *data);
+
+static BIO_METHOD	http_bio_methods =
+			{
+			  BIO_TYPE_SOCKET,
+			  "http",
+			  http_bio_write,
+			  http_bio_read,
+			  http_bio_puts,
+			  NULL, /* http_bio_gets, */
+			  http_bio_ctrl,
+			  http_bio_new,
+			  http_bio_free,
+			  NULL,
+			};
+
+
+/*
+ * '_httpBIOMethods()' - Get the OpenSSL BIO methods for HTTP connections.
+ */
+
+BIO_METHOD *				/* O - BIO methods for OpenSSL */
+_httpBIOMethods(void)
+{
+  return (&http_bio_methods);
+}
+#endif /* HAVE_SSL && HAVE_LIBSSL */
 
 
 /*
@@ -869,7 +917,7 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if (!http->blocking && !http_wait(http, 10000))
+      if (!http->blocking && !http_wait(http, 10000, 1))
       {
         DEBUG_puts("httpGets: Timed out!");
         http->error = ETIMEDOUT;
@@ -1391,7 +1439,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
 #if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
 /*
- * '_httpReadCDSA()' - Read function for CDSA decryption code.
+ * '_httpReadCDSA()' - Read function for the CDSA library.
  */
 
 OSStatus				/* O  - -1 on error, 0 on success */
@@ -1400,19 +1448,36 @@ _httpReadCDSA(
     void             *data,		/* I  - Data buffer */
     size_t           *dataLength)	/* IO - Number of bytes */
 {
-  OSStatus	  result;		/* Return value */
-  ssize_t	  bytes;		/* Number of bytes read */
-  cdsa_conn_ref_t u;			/* Connection reference union */
+  OSStatus	result;			/* Return value */
+  ssize_t	bytes;			/* Number of bytes read */
+  http_t	*http;			/* HTTP connection */
 
 
-  u.connection = connection;
+  http = (http_t *)connection;
+
+  if (!http->blocking)
+  {
+   /*
+    * Make sure we have data before we read...
+    */
+
+    if (!http_wait(http, 10000, 0))
+    {
+      http->error = ETIMEDOUT;
+      return (-1);
+    }
+  }
 
   do
-    bytes = recv(u.sock, data, *dataLength, 0);
+  {
+    bytes = recv(http->fd, data, *dataLength, 0);
+  }
   while (bytes == -1 && errno == EINTR);
 
   if (bytes == *dataLength)
+  {
     result = 0;
+  }
   else if (bytes > 0)
   {
     *dataLength = bytes;
@@ -1430,9 +1495,43 @@ _httpReadCDSA(
       result = errSSLClosedAbort;
   }
 
-  return result;
+  return (result);
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
+
+
+#if defined(HAVE_SSL) && defined(HAVE_GNUTLS)
+/*
+ * '_httpReadGNUTLS()' - Read function for the GNU TLS library.
+ */
+
+ssize_t					/* O - Number of bytes read or -1 on error */
+_httpReadGNUTLS(
+    gnutls_transport_ptr ptr,		/* I - HTTP connection */
+    void                 *data,		/* I - Buffer */
+    size_t               length)	/* I - Number of bytes to read */
+{
+  http_t	*http;			/* HTTP connection */
+
+
+  http = (http_t *)ptr;
+
+  if (!http->blocking)
+  {
+   /*
+    * Make sure we have data before we read...
+    */
+
+    if (!http_wait(http, 10000, 0))
+    {
+      http->error = ETIMEDOUT;
+      return (-1);
+    }
+  }
+
+  return (recv(http->fd, data, length, 0));
+}
+#endif /* HAVE_SSL && HAVE_GNUTLS */
 
 
 /*
@@ -1830,7 +1929,7 @@ httpWait(http_t *http,			/* I - HTTP connection */
   * If not, check the SSL/TLS buffers and do a select() on the connection...
   */
 
-  return (http_wait(http, msec));
+  return (http_wait(http, msec, 1));
 }
 
 
@@ -1977,7 +2076,7 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
 
 #if defined(HAVE_SSL) && defined(HAVE_CDSASSL)
 /*
- * '_httpWriteCDSA()' - Write function for CDSA encryption code.
+ * '_httpWriteCDSA()' - Write function for the CDSA library.
  */
 
 OSStatus				/* O  - -1 on error, 0 on success */
@@ -1986,19 +2085,23 @@ _httpWriteCDSA(
     const void       *data,		/* I  - Data buffer */
     size_t           *dataLength)	/* IO - Number of bytes */
 {
-  OSStatus	  result;		/* Return value */
-  ssize_t	  bytes;		/* Number of bytes read */
-  cdsa_conn_ref_t u;			/* Connection reference union */
+  OSStatus	result;			/* Return value */
+  ssize_t	bytes;			/* Number of bytes read */
+  http_t	*http;			/* HTTP connection */
 
 
-  u.connection = connection;
+  http = (http_t *)connection;
 
   do
-    bytes = write(u.sock, data, *dataLength);
+  {
+    bytes = write(http->fd, data, *dataLength);
+  }
   while (bytes == -1 && errno == EINTR);
 
   if (bytes == *dataLength)
+  {
     result = 0;
+  }
   else if (bytes >= 0)
   {
     *dataLength = bytes;
@@ -2014,9 +2117,162 @@ _httpWriteCDSA(
       result = errSSLClosedAbort;
   }
 
-  return result;
+  return (result);
 }
 #endif /* HAVE_SSL && HAVE_CDSASSL */
+
+
+#if defined(HAVE_SSL) && defined(HAVE_GNUTLS)
+/*
+ * '_httpWriteGNUTLS()' - Write function for the GNU TLS library.
+ */
+
+ssize_t					/* O - Number of bytes written or -1 on error */
+_httpWriteGNUTLS(
+    gnutls_transport_ptr ptr,		/* I - HTTP connection */
+    const void           *data,		/* I - Data buffer */
+    size_t               length)	/* I - Number of bytes to write */
+{
+  return (send(((http_t *)ptr)->fd, data, length, 0));
+}
+#endif /* HAVE_SSL && HAVE_GNUTLS */
+
+
+#if defined(HAVE_SSL) && defined(HAVE_LIBSSL)
+/*
+ * 'http_bio_ctrl()' - Control the HTTP connection.
+ */
+
+static long				/* O - Result/data */
+http_bio_ctrl(BIO  *h,			/* I - BIO data */
+              int  cmd,			/* I - Control command */
+	      long arg1,		/* I - First argument */
+	      void *arg2)		/* I - Second argument */
+{
+  switch (cmd)
+  {
+    default :
+        return (0);
+
+    case BIO_CTRL_RESET :
+        h->ptr = NULL;
+	return (0);
+
+    case BIO_C_SET_FILE_PTR :
+        h->ptr  = arg2;
+	h->init = 1;
+	return (1);
+
+    case BIO_C_GET_FILE_PTR :
+        if (arg2)
+	{
+	  *((void **)arg2) = h->ptr;
+	  return (1);
+	}
+	else
+	  return (0);
+        
+    case BIO_CTRL_DUP :
+    case BIO_CTRL_FLUSH :
+        return (1);
+  }
+}
+
+
+/*
+ * 'http_bio_free()' - Free OpenSSL data.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+http_bio_free(BIO *h)			/* I - BIO data */
+{
+  if (!h)
+    return (0);
+
+  if (h->shutdown)
+  {
+    h->init  = 0;
+    h->flags = 0;
+  }
+
+  return (1);
+}
+
+
+/*
+ * 'http_bio_new()' - Initialize an OpenSSL BIO structure.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+http_bio_new(BIO *h)			/* I - BIO data */
+{
+  if (!h)
+    return (0);
+
+  h->init  = 0;
+  h->num   = 0;
+  h->ptr   = NULL;
+  h->flags = 0;
+
+  return (1);
+}
+
+
+/*
+ * 'http_bio_puts()' - Send a string for OpenSSL.
+ */
+
+static int				/* O - Bytes written */
+http_bio_puts(BIO        *h,		/* I - BIO data */
+              const char *str)		/* I - String to write */
+{
+  return (send(((http_t *)h->ptr)->fd, str, strlen(str), 0));
+}
+
+
+/*
+ * 'http_bio_read()' - Read data for OpenSSL.
+ */
+
+static int				/* O - Bytes read */
+http_bio_read(BIO  *h,			/* I - BIO data */
+              char *buf,		/* I - Buffer */
+	      int  size)		/* I - Number of bytes to read */
+{
+  http_t	*http;			/* HTTP connection */
+
+
+  http = (http_t *)h->ptr;
+
+  if (!http->blocking)
+  {
+   /*
+    * Make sure we have data before we read...
+    */
+
+    if (!http_wait(http, 10000, 0))
+    {
+      http->error = ETIMEDOUT;
+      return (-1);
+    }
+  }
+
+  return (recv(http->fd, buf, size, 0));
+}
+
+
+/*
+ * 'http_bio_write()' - Write data for OpenSSL.
+ */
+
+static int				/* O - Bytes written */
+http_bio_write(BIO        *h,		/* I - BIO data */
+               const char *buf,		/* I - Buffer to write */
+	       int        num)		/* I - Number of bytes to write */
+{
+  return (send(((http_t *)h->ptr)->fd, buf, num, 0));
+}
+#endif /* HAVE_SSL && HAVE_LIBSSL */
 
 
 /*
@@ -2247,6 +2503,7 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
   SSL		*conn;			/* Connection for encryption */
+  BIO		*bio;			/* BIO data */
 #  elif defined(HAVE_GNUTLS)
   http_tls_t	*conn;			/* TLS session object */
   gnutls_certificate_client_credentials *credentials;
@@ -2254,7 +2511,6 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
 #  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error code */
   http_tls_t	*conn;			/* CDSA connection information */
-  cdsa_conn_ref_t u;			/* Connection reference union */
 #  endif /* HAVE_LIBSSL */
 
 
@@ -2265,9 +2521,12 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
 
   SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
 
-  conn = SSL_new(context);
+  bio = BIO_new(_httpBIOMethods());
+  BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)http);
 
-  SSL_set_fd(conn, http->fd);
+  conn = SSL_new(context);
+  SSL_set_bio(conn, bio, bio);
+
   if (SSL_connect(conn) != 1)
   {
 #    ifdef DEBUG
@@ -2316,8 +2575,9 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   gnutls_init(&(conn->session), GNUTLS_CLIENT);
   gnutls_set_default_priority(conn->session);
   gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(conn->session,
-                           (gnutls_transport_ptr)((long)http->fd));
+  gnutls_transport_set_ptr(conn->session, (gnutls_transport_ptr)http);
+  gnutls_transport_set_pull_function(conn->session, _httpReadGNUTLS);
+  gnutls_transport_set_push_function(conn->session, _httpWriteGNUTLS);
 
   if ((gnutls_handshake(conn->session)) != GNUTLS_E_SUCCESS)
   {
@@ -2348,9 +2608,7 @@ http_setup_ssl(http_t *http)		/* I - HTTP connection */
   * Use a union to resolve warnings about int/pointer size mismatches...
   */
 
-  u.connection = NULL;
-  u.sock       = http->fd;
-  error        = SSLSetConnection(conn->session, u.connection);
+  error = SSLSetConnection(conn->session, http);
 
   if (!error)
     error = SSLSetIOFuncs(conn->session, _httpReadCDSA, _httpWriteCDSA);
@@ -2544,7 +2802,8 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
 
 static int				/* O - 1 if data is available, 0 otherwise */
 http_wait(http_t *http,			/* I - HTTP connection */
-          int    msec)			/* I - Milliseconds to wait */
+          int    msec,			/* I - Milliseconds to wait */
+	  int    usessl)		/* I - Use SSL context? */
 {
 #ifndef WIN32
   struct rlimit		limit;          /* Runtime limit */
@@ -2564,7 +2823,7 @@ http_wait(http_t *http,			/* I - HTTP connection */
   */
 
 #ifdef HAVE_SSL
-  if (http->tls)
+  if (http->tls && usessl)
   {
 #  ifdef HAVE_LIBSSL
     if (SSL_pending((SSL *)(http->tls)))
@@ -2829,5 +3088,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 5961 2006-09-16 19:08:36Z mike $".
+ * End of "$Id: http.c 6111 2006-11-15 20:28:39Z mike $".
  */
