@@ -168,6 +168,32 @@
  *            as needed.
  *         e. cupsdStopSelect() closes /dev/poll and frees the
  *            pollfd array.
+ *
+ * PERFORMANCE
+ *
+ *   In tests using the "make test" target with option 0 (keep cupsd
+ *   running) and the "testspeed" program with "-c 50 -r 1000", epoll()
+ *   performed 5.5% slower select(), followed by kqueue() at 16% slower
+ *   than select() and poll() at 18% slower than select().  Similar
+ *   results were seen with twice the number of client connections.
+ *
+ *   The epoll() and kqueue() performance is likely limited by the
+ *   number of system calls used to add/modify/remove file
+ *   descriptors dynamically.  Further optimizations may be possible
+ *   in the area of limiting use of cupsdAddSelect() and
+ *   cupsdRemoveSelect(), however extreme care will be needed to avoid
+ *   excess CPU usage and deadlock conditions.
+ *
+ *   We may be able to improve the poll() implementation simply by
+ *   keeping the pollfd array sync'd with the _cupsd_fd_t array, as that
+ *   will eliminate the rebuilding of the array whenever there is a
+ *   change and eliminate the fd array lookups in the inner loop of
+ *   cupsdDoSelect().
+ *
+ *   Since /dev/poll will never be able to use a shadow array, it may
+ *   not make sense to implement support for it.  ioctl() overhead will
+ *   impact performance as well, so my guess would be that, for CUPS,
+ *   /dev/poll will yield a net performance loss.
  */
 
 /*
