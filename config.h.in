@@ -487,6 +487,15 @@
 #define CUPS_DEFAULT_GSSSERVICENAME	""
 
 
+/*
+ * Select/poll interfaces...
+ */
+
+#undef HAVE_POLL
+#undef HAVE_EPOLL
+#undef HAVE_KQUEUE
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

@@ -90,14 +90,7 @@ cupsdPauseListening(void)
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-    if (lis->fd >= 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdPauseListening: Removing fd %d from InputSet...",
-                      lis->fd);
-
-      FD_CLR(lis->fd, InputSet);
-    }
+    cupsdRemoveSelect(lis->fd);
 }
 
 
@@ -123,13 +116,7 @@ cupsdResumeListening(void)
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-    if (lis->fd >= 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdResumeListening: Adding fd %d to InputSet...",
-                      lis->fd);
-      FD_SET(lis->fd, InputSet);
-    }
+    cupsdAddSelect(lis->fd, (cupsd_selfunc_t)cupsdAcceptClient, NULL, lis);
 }
 
 

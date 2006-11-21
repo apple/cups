@@ -114,7 +114,7 @@ extern void	cupsdDeleteAllListeners(void);
 extern int	cupsdFlushHeader(cupsd_client_t *con);
 extern void	cupsdPauseListening(void);
 extern int	cupsdProcessIPPRequest(cupsd_client_t *con);
-extern int	cupsdReadClient(cupsd_client_t *con);
+extern void	cupsdReadClient(cupsd_client_t *con);
 extern void	cupsdResumeListening(void);
 extern int	cupsdSendCommand(cupsd_client_t *con, char *command,
 		                 char *options, int root);
@@ -125,7 +125,8 @@ extern void	cupsdShutdownClient(cupsd_client_t *con);
 extern void	cupsdStartListening(void);
 extern void	cupsdStopListening(void);
 extern void	cupsdUpdateCGI(void);
-extern int	cupsdWriteClient(cupsd_client_t *con);
+extern void	cupsdWriteClient(cupsd_client_t *con);
+extern void	cupsdWritePipe(cupsd_client_t *con);
 
 
 /*

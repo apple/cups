@@ -945,11 +945,8 @@ cupsdStartBrowsing(void)
       * We only listen if we want remote printers...
       */
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdStartBrowsing: Adding fd %d to InputSet...",
-                      BrowseSocket);
-
-      FD_SET(BrowseSocket, InputSet);
+      cupsdAddSelect(BrowseSocket, (cupsd_selfunc_t)cupsdUpdateCUPSBrowse,
+                     NULL, NULL);
     }
   }
   else
@@ -1150,10 +1147,7 @@ cupsdStartPolling(void)
   * Finally, add the pipe to the input selection set...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStartPolling: Adding fd %d to InputSet...", PollPipe);
-
-  FD_SET(PollPipe, InputSet);
+  cupsdAddSelect(PollPipe, (cupsd_selfunc_t)cupsdUpdatePolling, NULL, NULL);
 }
 
 
@@ -1180,11 +1174,7 @@ cupsdStopBrowsing(void)
     close(BrowseSocket);
 #endif /* WIN32 */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "cupsdStopBrowsing: Removing fd %d from InputSet...",
-		    BrowseSocket);
-
-    FD_CLR(BrowseSocket, InputSet);
+    cupsdRemoveSelect(BrowseSocket);
     BrowseSocket = -1;
   }
 
@@ -1228,9 +1218,7 @@ cupsdStopPolling(void)
     cupsdStatBufDelete(PollStatusBuffer);
     close(PollPipe);
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStopPolling: removing fd %d from InputSet.", PollPipe);
-    FD_CLR(PollPipe, InputSet);
+    cupsdRemoveSelect(PollPipe);
 
     PollPipe         = -1;
     PollStatusBuffer = NULL;

@@ -1,8 +1,13 @@
-CHANGES.txt - 2006-11-14
+CHANGES.txt - 2006-11-21
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- The scheduler now uses poll(), epoll(), or /dev/kqueue
+	  instead of select() when possible (STR #1261)
+	- Added new cupsArrayGetIndex() and cupsArrayGetInsert()
+	  functions to get the current index and insertion
+	  positions of an array.
 	- Added a new --with-max-copies configure option (STR
 	  #2090)
 	- Added new cupsRemoveDest() and cupsSetDefaultDest()

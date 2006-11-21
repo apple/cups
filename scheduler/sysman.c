@@ -160,10 +160,8 @@ cupsdStartSystemMonitor(void)
     return;
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStartSystemMonitor: Adding fd %d to InputSet...",
-                  SysEventPipes[0]);
-  FD_SET(SysEventPipes[0], InputSet);
+  cupsdAddSelect(SysEventPipes[0], (cupsd_selfunc_t)cupsdUpdateSystemMonitor,
+                 NULL, NULL);
 
  /*
   * Set non-blocking mode on the descriptor we will be receiving notification
@@ -220,12 +218,7 @@ cupsdStopSystemMonitor(void)
 
   if (SysEventPipes[0] >= 0)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStopSystemMonitor: Removing fd %d from InputSet...",
-	            SysEventPipes[0]);
-
-    FD_CLR(SysEventPipes[0], InputSet);
-
+    cupsdRemoveSelect(SysEventPipes[0]);
     cupsdClosePipe(SysEventPipes);
   }
 }

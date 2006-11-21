@@ -35,6 +35,7 @@ sinclude(config-scripts/cups-compiler.m4)
 
 sinclude(config-scripts/cups-image.m4)
 sinclude(config-scripts/cups-network.m4)
+sinclude(config-scripts/cups-poll.m4)
 sinclude(config-scripts/cups-slp.m4)
 sinclude(config-scripts/cups-gssapi.m4)
 sinclude(config-scripts/cups-ldap.m4)

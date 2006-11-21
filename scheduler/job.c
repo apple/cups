@@ -480,11 +480,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     * Close the pipe and clear the input bit.
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdFinishJob: Removing fd %d from InputSet...",
-                    job->status_buffer->fd);
-
-    FD_CLR(job->status_buffer->fd, InputSet);
+    cupsdRemoveSelect(job->status_buffer->fd);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "cupsdFinishJob: Closing status pipes [ %d %d ]...",
@@ -1619,11 +1615,7 @@ cupsdStopJob(cupsd_job_t *job,		/* I - Job */
     * Close the pipe and clear the input bit.
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStopJob: Removing fd %d from InputSet...",
-	            job->status_buffer->fd);
-
-    FD_CLR(job->status_buffer->fd, InputSet);
+    cupsdRemoveSelect(job->status_buffer->fd);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdStopJob: Closing status pipes [ %d %d ]...",
@@ -3396,11 +3388,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   free(argv);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "start_job: Adding fd %d to InputSet...",
-                  job->status_buffer->fd);
-
-  FD_SET(job->status_buffer->fd, InputSet);
+  cupsdAddSelect(job->status_buffer->fd, (cupsd_selfunc_t)cupsdUpdateJob, NULL,
+                 job);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
                 job->id);

@@ -168,7 +168,7 @@ struct _http_s				/**** HTTP connection structure. ****/
   void			*tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
   /**** New in CUPS 1.1.19 ****/
-  fd_set		*input_set;	/* select() set for httpWait() @since CUPS 1.1.19@ */
+  fd_set		*input_set;	/* select() set for httpWait() @deprecated@ */
   http_status_t		expect;		/* Expect: header @since CUPS 1.1.19@ */
   char			*cookie;	/* Cookie value(s) @since CUPS 1.1.19@ */
   /**** New in CUPS 1.1.20 ****/

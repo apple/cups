@@ -151,13 +151,17 @@ extern const char *cups_hstrerror(int);
 
 
 /*
+ * Select callback function type...
+ */
+
+typedef void (*cupsd_selfunc_t)(void *data);
+
+
+/*
  * Globals...
  */
 
-VAR int			MaxFDs,		/* Maximum number of files */
-			SetSize;	/* The size of the input/output sets */
-VAR fd_set		*InputSet,	/* Input files for select() */
-			*OutputSet;	/* Output files for select() */
+VAR int			MaxFDs;		/* Maximum number of files */
 
 VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
@@ -201,6 +205,14 @@ extern const char *cupsdFinishProcess(int pid, char *name, int namelen);
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
 				  int errfd, int backfd, int root, int *pid);
+
+extern int	cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
+		               cupsd_selfunc_t write_cb, void *data);
+extern int	cupsdDoSelect(long timeout);
+extern int	cupsdIsSelecting(int fd);
+extern void	cupsdRemoveSelect(int fd);
+extern void	cupsdStartSelect(void);
+extern void	cupsdStopSelect(void);
 
 
 /*

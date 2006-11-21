@@ -126,8 +126,6 @@ main(int  argc,				/* I - Number of command-line args */
   char			*opt;		/* Option character */
   int			fg;		/* Run in the foreground */
   int			fds;		/* Number of ready descriptors */
-  fd_set		*input,		/* Input set for select() */
-			*output;	/* Output set for select() */
   cupsd_client_t	*con;		/* Current client */
   cupsd_job_t		*job;		/* Current job */
   cupsd_listener_t	*lis;		/* Current listener */
@@ -143,7 +141,7 @@ main(int  argc,				/* I - Number of command-line args */
   size_t		string_count,	/* String count */
 			alloc_bytes,	/* Allocated string bytes */
 			total_bytes;	/* Total string bytes */
-  struct timeval	timeout;	/* select() timeout */
+  long			timeout;	/* Timeout for cupsdDoSelect() */
   struct rlimit		limit;		/* Runtime limit */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* Actions for POSIX signals */
@@ -372,33 +370,23 @@ main(int  argc,				/* I - Number of command-line args */
 
   getrlimit(RLIMIT_NOFILE, &limit);
 
+#if !defined(HAVE_POLL) && !defined(HAVE_EPOLL) && !defined(HAVE_KQUEUE)
   if (limit.rlim_max > FD_SETSIZE)
     MaxFDs = FD_SETSIZE;
   else
+#endif /* !HAVE_POLL && !HAVE_EPOLL && !HAVE_KQUEUE */
+#ifdef RLIM_INFINITY
+  if (limit.rlim_max == RLIM_INFINITY)
+    MaxFDs = 16384;
+  else
+#endif /* RLIM_INFINITY */
     MaxFDs = limit.rlim_max;
 
   limit.rlim_cur = MaxFDs;
 
   setrlimit(RLIMIT_NOFILE, &limit);
 
- /*
-  * Allocate memory for the input and output sets...
-  */
-
-  SetSize = (MaxFDs + 31) / 8 + 4;
-  if (SetSize < sizeof(fd_set))
-    SetSize = sizeof(fd_set);
-
-  InputSet  = (fd_set *)calloc(1, SetSize);
-  OutputSet = (fd_set *)calloc(1, SetSize);
-  input     = (fd_set *)calloc(1, SetSize);
-  output    = (fd_set *)calloc(1, SetSize);
-
-  if (InputSet == NULL || OutputSet == NULL || input == NULL || output == NULL)
-  {
-    syslog(LOG_LPR, "Unable to allocate memory for select() sets - exiting!");
-    return (1);
-  }
+  cupsdStartSelect();
 
  /*
   * Read configuration...
@@ -658,18 +646,15 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
    /*
-    * Check for available input or ready output.  If select() returns
-    * 0 or -1, something bad happened and we should exit immediately.
+    * Check for available input or ready output.  If cupsdDoSelect()
+    * returns 0 or -1, something bad happened and we should exit
+    * immediately.
     *
     * Note that we at least have one listening socket open at all
     * times.
     */
 
-    memcpy(input, InputSet, SetSize);
-    memcpy(output, OutputSet, SetSize);
-
-    timeout.tv_sec  = select_timeout(fds);
-    timeout.tv_usec = 0;
+    timeout = select_timeout(fds);
 
 #if HAVE_LAUNCHD
    /*
@@ -678,29 +663,19 @@ main(int  argc,				/* I - Number of command-line args */
     * inactivity...
     */
 
-    if (timeout.tv_sec == 86400 && Launchd && LaunchdTimeout && !NumPolled &&
+    if (timeout == 86400 && Launchd && LaunchdTimeout && !NumPolled &&
 	(!Browsing || !(BrowseLocalProtocols & BROWSE_DNSSD) ||
 	 cupsArrayCount(Printers) == 0))
     {
-      timeout.tv_sec    = LaunchdTimeout;
+      timeout           = LaunchdTimeout;
       launchd_idle_exit = 1;
     }
     else
       launchd_idle_exit = 0;
 #endif	/* HAVE_LAUNCHD */
 
-    if (timeout.tv_sec < 86400)		/* Only use timeout for < 1 day */
-      fds = select(MaxFDs, input, output, NULL, &timeout);
-    else
-      fds = select(MaxFDs, input, output, NULL, NULL);
-
-    if (fds < 0)
+    if ((fds = cupsdDoSelect(timeout)) < 0)
     {
-      char	s[16384],		/* String buffer */
-		*sptr;			/* Pointer into buffer */
-      int	slen;			/* Length of string buffer */
-
-
      /*
       * Got an error from select!
       */
@@ -712,36 +687,8 @@ main(int  argc,				/* I - Number of command-line args */
       * Log all sorts of debug info to help track down the problem.
       */
 
-      cupsdLogMessage(CUPSD_LOG_EMERG, "select() failed - %s!",
+      cupsdLogMessage(CUPSD_LOG_EMERG, "cupsdDoSelect() failed - %s!",
                       strerror(errno));
-
-      strcpy(s, "InputSet =");
-      slen = 10;
-      sptr = s + 10;
-
-      for (i = 0; i < MaxFDs; i ++)
-        if (FD_ISSET(i, InputSet))
-	{
-          snprintf(sptr, sizeof(s) - slen, " %d", i);
-	  slen += strlen(sptr);
-	  sptr += strlen(sptr);
-	}
-
-      cupsdLogMessage(CUPSD_LOG_EMERG, "%s", s);
-
-      strcpy(s, "OutputSet =");
-      slen = 11;
-      sptr = s + 11;
-
-      for (i = 0; i < MaxFDs; i ++)
-        if (FD_ISSET(i, OutputSet))
-	{
-          snprintf(sptr, sizeof(s) - slen, " %d", i);
-	  slen += strlen(sptr);
-	  sptr += strlen(sptr);
-	}
-
-      cupsdLogMessage(CUPSD_LOG_EMERG, "%s", s);
 
       for (i = 0, con = (cupsd_client_t *)cupsArrayFirst(Clients);
 	   con;
@@ -794,67 +741,6 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_LAUNCHD */
 
    /*
-    * Check for status info from job filters...
-    */
-
-    for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
-	 job;
-	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-      if (job->status_buffer && FD_ISSET(job->status_buffer->fd, input))
-      {
-       /*
-        * Clear the input bit to avoid updating the next job
-	* using the same status pipe file descriptor...
-	*/
-
-        FD_CLR(job->status_buffer->fd, input);
-
-       /*
-        * Read any status messages from the filters...
-	*/
-
-        cupsdUpdateJob(job);
-      }
-
-   /*
-    * Update CGI messages as needed...
-    */
-
-    if (CGIPipes[0] >= 0 && FD_ISSET(CGIPipes[0], input))
-      cupsdUpdateCGI();
-
-   /*
-    * Handle system management events as needed...
-    */
-
-#ifdef __APPLE__
-   /*
-    * Mac OS X provides the SystemConfiguration framework for system
-    * configuration change events...
-    */
-
-    if (SysEventPipes[0] >= 0 && FD_ISSET(SysEventPipes[0], input))
-      cupsdUpdateSystemMonitor();
-#else
-   /*
-    * All other operating systems need to poll for changes...
-    */
-
-    if ((current_time - netif_time) >= 60)
-    {
-      NetIFUpdate = 1;
-      netif_time  = current_time;
-    }
-#endif	/* __APPLE__ */
-
-   /*
-    * Update notifier messages as needed...
-    */
-
-    if (NotifierPipes[0] >= 0 && FD_ISSET(NotifierPipes[0], input))
-      cupsdUpdateNotifierStatus();
-
-   /*
     * Expire subscriptions and unload completed jobs as needed...
     */
 
@@ -874,12 +760,6 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (Browsing && BrowseRemoteProtocols)
     {
-      if (BrowseSocket >= 0 && FD_ISSET(BrowseSocket, input))
-        cupsdUpdateCUPSBrowse();
-
-      if (PollPipe >= 0 && FD_ISSET(PollPipe, input))
-        cupsdUpdatePolling();
-
 #ifdef HAVE_LIBSLP
       if ((BrowseRemoteProtocols & BROWSE_SLP) &&
           BrowseSLPRefresh <= current_time)
@@ -900,19 +780,6 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
    /*
-    * Check for new connections on the "listen" sockets...
-    */
-
-    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
-         lis;
-	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-      if (lis->fd >= 0 && FD_ISSET(lis->fd, input))
-      {
-        FD_CLR(lis->fd, input);
-        cupsdAcceptClient(lis);
-      }
-
-   /*
     * Check for new data on the client sockets...
     */
 
@@ -921,61 +788,13 @@ main(int  argc,				/* I - Number of command-line args */
 	 con = (cupsd_client_t *)cupsArrayNext(Clients))
     {
      /*
-      * Process the input buffer...
+      * Process pending data in the input buffer...
       */
 
-      if (FD_ISSET(con->http.fd, input) || con->http.used)
+      if (con->http.used)
       {
-        int fd = con->file;
-
-
-        FD_CLR(con->http.fd, input);
-
-        if (!cupsdReadClient(con))
-	{
-	  if (fd >= 0)
-	    FD_CLR(fd, input);
-
-	  continue;
-	}
-      }
-
-     /*
-      * Write data as needed...
-      */
-
-      if (con->pipe_pid && FD_ISSET(con->file, input))
-      {
-       /*
-        * Keep track of pending input from the file/pipe separately
-	* so that we don't needlessly spin on select() when the web
-	* client is not ready to receive data...
-	*/
-
-	FD_CLR(con->file, input);
-        con->file_ready = 1;
-
-#ifdef DEBUG
-        cupsdLogMessage(CUPSD_LOG_DEBUG2, "main: Data ready file %d!",
-	                con->file);
-#endif /* DEBUG */
-
-	if (!FD_ISSET(con->http.fd, output))
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                  "main: Removing fd %d from InputSet...", con->file);
-	  FD_CLR(con->file, input);
-	  FD_CLR(con->file, InputSet);
-	}
-      }
-
-      if (FD_ISSET(con->http.fd, output))
-      {
-        FD_CLR(con->http.fd, output);
-
-	if (!con->pipe_pid || con->file_ready)
-          if (!cupsdWriteClient(con))
-	    continue;
+        cupsdReadClient(con);
+	continue;
       }
 
      /*
@@ -1135,14 +954,7 @@ main(int  argc,				/* I - Number of command-line args */
       unlink("/var/spool/lp/SCHEDLOCK");
 #endif /* __sgi */
 
- /*
-  * Free memory used by FD sets and return...
-  */
-
-  free(InputSet);
-  free(OutputSet);
-  free(input);
-  free(output);
+  cupsdStopSelect();
 
   return (!stop_scheduler);
 }

@@ -36,6 +36,7 @@
  *   cupsdSendHeader()       - Send an HTTP request.
  *   cupsdUpdateCGI()        - Read status messages from CGI scripts and programs.
  *   cupsdWriteClient()      - Write data to a client as needed.
+ *   cupsdWritePipe()        - Flag that data is available on the CGI pipe.
  *   check_if_modified()     - Decode an "If-Modified-Since" line.
  *   encrypt_client()        - Enable encryption for the client...
  *   get_cdsa_server_certs() - Convert a keychain name into the CFArrayRef
@@ -404,10 +405,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   * Add the socket to the select() input mask.
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdAcceptClient: Adding fd %d to InputSet...",
-                  con->http.fd);
-  FD_SET(con->http.fd, InputSet);
+  cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient, NULL, con);
 
  /*
   * Temporarily suspend accept()'s until we lose a client...
@@ -574,13 +572,7 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 
   if (con->file >= 0)
   {
-    if (FD_ISSET(con->file, InputSet))
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdCloseClient: %d Removing fd %d from InputSet...",
-        	      con->http.fd, con->file);
-      FD_CLR(con->file, InputSet);
-    }
+    cupsdRemoveSelect(con->file);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdCloseClient: %d Closing data file %d.",
@@ -602,11 +594,8 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
       * Only do a partial close so that the encrypted client gets everything.
       */
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdCloseClient: Removing fd %d from OutputSet...",
-        	      con->http.fd);
       shutdown(con->http.fd, 0);
-      FD_CLR(con->http.fd, OutputSet);
+      cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient, NULL, con);
     }
     else
     {
@@ -614,12 +603,8 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
       * Shut the socket down fully...
       */
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdCloseClient: Removing fd %d from InputSet and OutputSet...",
-        	      con->http.fd);
+      cupsdRemoveSelect(con->http.fd);
       close(con->http.fd);
-      FD_CLR(con->http.fd, InputSet);
-      FD_CLR(con->http.fd, OutputSet);
       con->http.fd = -1;
     }
   }
@@ -697,7 +682,7 @@ cupsdFlushHeader(cupsd_client_t *con)	/* I - Client to flush to */
  * 'cupsdReadClient()' - Read data from a client.
  */
 
-int					/* O - 1 on success, 0 on error */
+void
 cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 {
   char			line[32768],	/* Line from client... */
@@ -726,7 +711,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
   if (con->http.error)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadClient: http error seen...");
-    return (cupsdCloseClient(con));
+    cupsdCloseClient(con);
+    return;
   }
 
 #ifdef HAVE_SSL
@@ -750,9 +736,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
                       buf[0] & 255);
 
       if (!encrypt_client(con))
-        return (cupsdCloseClient(con));
+        cupsdCloseClient(con);
 
-      return (1);
+      return;
     }
   }
 #endif /* HAVE_SSL */
@@ -768,7 +754,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	{
 	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                  "cupsdReadClient: httpGets returned EOF...");
-          return (cupsdCloseClient(con));
+	  cupsdCloseClient(con);
+	  return;
 	}
 
        /*
@@ -831,7 +818,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                      "Bad request line \"%s\" from %s!", line,
 	                      con->http.hostname);
 	      cupsdSendError(con, HTTP_BAD_REQUEST);
-	      return (cupsdCloseClient(con));
+	      cupsdCloseClient(con);
+	      return;
 	  case 2 :
 	      con->http.version = HTTP_0_9;
 	      break;
@@ -842,7 +830,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		                "Bad request line \"%s\" from %s!", line,
 	                        con->http.hostname);
 		cupsdSendError(con, HTTP_BAD_REQUEST);
-		return (cupsdCloseClient(con));
+		cupsdCloseClient(con);
+		return;
 	      }
 
 	      if (major < 2)
@@ -856,7 +845,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      else
 	      {
 	        cupsdSendError(con, HTTP_NOT_SUPPORTED);
-	        return (cupsdCloseClient(con));
+		cupsdCloseClient(con);
+		return;
 	      }
 	      break;
 	}
@@ -901,7 +891,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad URI \"%s\" in request!",
 	                    con->uri);
 	    cupsdSendError(con, HTTP_METHOD_NOT_ALLOWED);
-	    return (cupsdCloseClient(con));
+	    cupsdCloseClient(con);
+	    return;
 	  }
 
          /*
@@ -934,7 +925,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad operation \"%s\"!", operation);
 	  cupsdSendError(con, HTTP_BAD_REQUEST);
-	  return (cupsdCloseClient(con));
+	  cupsdCloseClient(con);
+	  return;
 	}
 
         con->start     = time(NULL);
@@ -957,12 +949,16 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         * Parse incoming parameters until the status changes...
 	*/
 
-        status = httpUpdate(HTTP(con));
+        while ((status = httpUpdate(HTTP(con))) == HTTP_CONTINUE)
+	  if (con->http.used == 0 ||
+	      !memchr(con->http.buffer, '\n', con->http.used))
+	    break;
 
 	if (status != HTTP_OK && status != HTTP_CONTINUE)
 	{
 	  cupsdSendError(con, HTTP_BAD_REQUEST);
-	  return (cupsdCloseClient(con));
+	  cupsdCloseClient(con);
+	  return;
 	}
 	break;
 
@@ -1029,7 +1025,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       */
 
       if (!cupsdSendError(con, HTTP_BAD_REQUEST))
-	return (cupsdCloseClient(con));
+      {
+	cupsdCloseClient(con);
+	return;
+      }
     }
     else if (con->operation == HTTP_OPTIONS)
     {
@@ -1040,7 +1039,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       if (con->best && con->best->type != AUTH_NONE)
       {
 	if (!cupsdSendHeader(con, HTTP_UNAUTHORIZED, NULL))
-	  return (cupsdCloseClient(con));
+	{
+	  cupsdCloseClient(con);
+	  return;
+	}
       }
 
       if (!strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") &&
@@ -1052,7 +1054,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	*/
 
 	if (!cupsdSendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL))
-	  return (cupsdCloseClient(con));
+	{
+	  cupsdCloseClient(con);
+	  return;
+	}
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
@@ -1060,25 +1065,40 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	httpPrintf(HTTP(con), "\r\n");
 
 	if (cupsdFlushHeader(con) < 0)
-	  return (cupsdCloseClient(con));
+        {
+	  cupsdCloseClient(con);
+	  return;
+	}
 
         if (!encrypt_client(con))
-	  return (cupsdCloseClient(con));
+        {
+	  cupsdCloseClient(con);
+	  return;
+	}
 #else
 	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED))
-	  return (cupsdCloseClient(con));
+	{
+	  cupsdCloseClient(con);
+	  return;
+	}
 #endif /* HAVE_SSL */
       }
 
       if (!cupsdSendHeader(con, HTTP_OK, NULL))
-	return (cupsdCloseClient(con));
+      {
+	cupsdCloseClient(con);
+	return;
+      }
 
       httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST, PUT\r\n");
       httpPrintf(HTTP(con), "Content-Length: 0\r\n");
       httpPrintf(HTTP(con), "\r\n");
 
       if (cupsdFlushHeader(con) < 0)
-	return (cupsdCloseClient(con));
+      {
+	cupsdCloseClient(con);
+	return;
+      }
     }
     else if (!is_path_absolute(con->uri))
     {
@@ -1087,7 +1107,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       */
 
       if (!cupsdSendError(con, HTTP_FORBIDDEN))
-	return (cupsdCloseClient(con));
+      {
+	cupsdCloseClient(con);
+	return;
+      }
     }
     else
     {
@@ -1100,7 +1123,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	*/
 
 	if (!cupsdSendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL))
-	  return (cupsdCloseClient(con));
+	{
+	  cupsdCloseClient(con);
+	  return;
+	}
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
 	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
@@ -1108,13 +1134,22 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	httpPrintf(HTTP(con), "\r\n");
 
 	if (cupsdFlushHeader(con) < 0)
-	  return (cupsdCloseClient(con));
+        {
+	  cupsdCloseClient(con);
+	  return;
+	}
 
         if (!encrypt_client(con))
-	  return (cupsdCloseClient(con));
+        {
+	  cupsdCloseClient(con);
+	  return;
+	}
 #else
 	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED))
-	  return (cupsdCloseClient(con));
+	{
+	  cupsdCloseClient(con);
+	  return;
+	}
 #endif /* HAVE_SSL */
       }
 
@@ -1124,7 +1159,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                "cupsdReadClient: Unauthorized request for %s...\n",
 	                con->uri);
 	cupsdSendError(con, status);
-	return (cupsdCloseClient(con));
+	cupsdCloseClient(con);
+	return;
       }
 
       if (con->http.expect &&
@@ -1137,7 +1173,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  */
 
 	  if (!cupsdSendHeader(con, HTTP_CONTINUE, NULL))
-	    return (cupsdCloseClient(con));
+	  {
+	    cupsdCloseClient(con);
+	    return;
+	  }
 	}
 	else
 	{
@@ -1146,13 +1185,19 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  */
 
 	  if (!cupsdSendHeader(con, HTTP_EXPECTATION_FAILED, NULL))
-	    return (cupsdCloseClient(con));
+	  {
+	    cupsdCloseClient(con);
+	    return;
+	  }
 
 	  httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	  httpPrintf(HTTP(con), "\r\n");
 
 	  if (cupsdFlushHeader(con) < 0)
-	    return (cupsdCloseClient(con));
+          {
+	    cupsdCloseClient(con);
+	    return;
+	  }
 	}
       }
 
@@ -1174,7 +1219,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      else
 	      {
 		if (!cupsdSendError(con, HTTP_NOT_FOUND))
-		  return (cupsdCloseClient(con));
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
 
 		break;
 	      }
@@ -1243,7 +1291,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
               if (!cupsdSendCommand(con, con->command, con->options, 0))
 	      {
 		if (!cupsdSendError(con, HTTP_NOT_FOUND))
-		  return (cupsdCloseClient(con));
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
               }
 	      else
         	cupsdLogRequest(con, HTTP_OK);
@@ -1264,7 +1315,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
 	      if (!cupsdSendError(con, HTTP_FORBIDDEN))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      break;
 	    }
@@ -1278,7 +1332,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                               sizeof(buf))) == NULL)
 	      {
 		if (!cupsdSendError(con, HTTP_NOT_FOUND))
-		  return (cupsdCloseClient(con));
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
 
 		break;
 	      }
@@ -1295,7 +1352,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         	if (!cupsdSendCommand(con, con->command, con->options, 0))
 		{
 		  if (!cupsdSendError(con, HTTP_NOT_FOUND))
-		    return (cupsdCloseClient(con));
+		  {
+		    cupsdCloseClient(con);
+		    return;
+		  }
         	}
 		else
         	  cupsdLogRequest(con, HTTP_OK);
@@ -1308,7 +1368,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (!check_if_modified(con, &filestats))
               {
         	if (!cupsdSendError(con, HTTP_NOT_MODIFIED))
-		  return (cupsdCloseClient(con));
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
 	      }
 	      else
               {
@@ -1318,7 +1381,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	          snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
         	if (!write_file(con, HTTP_OK, filename, line, &filestats))
-		  return (cupsdCloseClient(con));
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
 	      }
 	    }
             break;
@@ -1342,7 +1408,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
               if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      break;
             }
@@ -1353,7 +1422,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
               if (!cupsdSendError(con, HTTP_BAD_REQUEST))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      break;
 	    }
@@ -1445,7 +1517,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                               sizeof(buf))) == NULL)
 	      {
 		if (!cupsdSendError(con, HTTP_NOT_FOUND))
-		  return (cupsdCloseClient(con));
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
 
 		break;
 	      }
@@ -1459,7 +1534,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		*/
 
 		if (!cupsdSendError(con, HTTP_UNAUTHORIZED))
-		  return (cupsdCloseClient(con));
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
 	      }
 	    }
 	    break;
@@ -1479,7 +1557,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
 	      if (!cupsdSendError(con, HTTP_FORBIDDEN))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      break;
 	    }
@@ -1502,7 +1583,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
               if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      break;
             }
@@ -1513,7 +1597,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
               if (!cupsdSendError(con, HTTP_BAD_REQUEST))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      break;
 	    }
@@ -1533,7 +1620,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    if (con->file < 0)
 	    {
 	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 	    }
 
 	    fchmod(con->file, 0640);
@@ -1544,7 +1634,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	case HTTP_DELETE :
 	case HTTP_TRACE :
             cupsdSendError(con, HTTP_NOT_IMPLEMENTED);
-	    return (cupsdCloseClient(con));
+	    cupsdCloseClient(con);
+	    return;
 
 	case HTTP_HEAD :
             if (!strncmp(con->uri, "/printers/", 10) &&
@@ -1562,7 +1653,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      else
 	      {
 		if (!cupsdSendError(con, HTTP_NOT_FOUND))
-		  return (cupsdCloseClient(con));
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
 
 		break;
 	      }
@@ -1581,13 +1675,22 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
               if (!cupsdSendHeader(con, HTTP_OK, "text/html"))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      if (httpPrintf(HTTP(con), "\r\n") < 0)
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      if (cupsdFlushHeader(con) < 0)
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
               cupsdLogRequest(con, HTTP_OK);
 	    }
@@ -1604,7 +1707,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
 	      if (!cupsdSendError(con, HTTP_FORBIDDEN))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      break;
 	    }
@@ -1612,14 +1718,20 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                                  sizeof(buf))) == NULL)
 	    {
 	      if (!cupsdSendHeader(con, HTTP_NOT_FOUND, "text/html"))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
               cupsdLogRequest(con, HTTP_NOT_FOUND);
 	    }
 	    else if (!check_if_modified(con, &filestats))
             {
               if (!cupsdSendError(con, HTTP_NOT_MODIFIED))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
               cupsdLogRequest(con, HTTP_NOT_MODIFIED);
 	    }
@@ -1636,24 +1748,39 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
               if (!cupsdSendHeader(con, HTTP_OK, line))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      if (httpPrintf(HTTP(con), "Last-Modified: %s\r\n",
 	                     httpGetDateString(filestats.st_mtime)) < 0)
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
 	      if (httpPrintf(HTTP(con), "Content-Length: %lu\r\n",
 	                     (unsigned long)filestats.st_size) < 0)
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 
               cupsdLogRequest(con, HTTP_OK);
 	    }
 
             if (httpPrintf(HTTP(con), "\r\n") < 0)
-	      return (cupsdCloseClient(con));
+	    {
+	      cupsdCloseClient(con);
+	      return;
+	    }
 
 	    if (cupsdFlushHeader(con) < 0)
-	      return (cupsdCloseClient(con));
+            {
+	      cupsdCloseClient(con);
+	      return;
+	    }
 
             con->http.state = HTTP_WAITING;
             break;
@@ -1679,35 +1806,45 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 			    "CHUNKED" : "LENGTH",
 			CUPS_LLCAST con->http.data_remaining, con->file);
 
-        if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
-	  return (cupsdCloseClient(con));
-	else if (bytes > 0)
+        do
 	{
-	  con->bytes += bytes;
-
-          cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                  "cupsdReadClient: %d writing %d bytes to %d",
-	                  con->http.fd, bytes, con->file);
-
-          if (write(con->file, line, bytes) < bytes)
+          if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
 	  {
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "cupsdReadClient: Unable to write %d bytes to %s: %s",
-	                    bytes, con->filename, strerror(errno));
-
-	    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdReadClient: Closing data file %d...",
-        	            con->file);
-
-	    close(con->file);
-	    con->file = -1;
-	    unlink(con->filename);
-	    cupsdClearString(&con->filename);
-
-            if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
-	      return (cupsdCloseClient(con));
+	    cupsdCloseClient(con);
+	    return;
 	  }
-	}
+	  else if (bytes > 0)
+	  {
+	    con->bytes += bytes;
+
+            cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                    "cupsdReadClient: %d writing %d bytes to %d",
+	                    con->http.fd, bytes, con->file);
+
+            if (write(con->file, line, bytes) < bytes)
+	    {
+              cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "cupsdReadClient: Unable to write %d bytes to %s: %s",
+	                      bytes, con->filename, strerror(errno));
+
+	      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                      "cupsdReadClient: Closing data file %d...",
+        	              con->file);
+
+	      close(con->file);
+	      con->file = -1;
+	      unlink(con->filename);
+	      cupsdClearString(&con->filename);
+
+              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
+	    }
+	  }
+        }
+	while (con->http.state == HTTP_PUT_RECV && con->http.used > 0);
 
         if (con->http.state == HTTP_WAITING)
 	{
@@ -1740,7 +1877,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    cupsdClearString(&con->filename);
 
             if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
-	      return (cupsdCloseClient(con));
+	    {
+	      cupsdCloseClient(con);
+	      return;
+	    }
 	  }
 
          /*
@@ -1754,7 +1894,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  */
 
           if (!cupsdSendError(con, status))
-	    return (cupsdCloseClient(con));
+	  {
+	    cupsdCloseClient(con);
+	    return;
+	  }
 	}
         break;
 
@@ -1767,94 +1910,112 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 			    "CHUNKED" : "LENGTH",
 			CUPS_LLCAST con->http.data_remaining, con->file);
 
-        if (con->request)
+        do
 	{
-	 /*
-	  * Grab any request data from the connection...
-	  */
-
-	  if ((ipp_state = ippRead(&(con->http), con->request)) == IPP_ERROR)
+          if (con->request)
 	  {
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "cupsdReadClient: %d IPP Read Error!",
-			    con->http.fd);
+	   /*
+	    * Grab any request data from the connection...
+	    */
 
-	    cupsdSendError(con, HTTP_BAD_REQUEST);
-	    return (cupsdCloseClient(con));
-	  }
-	  else if (ipp_state != IPP_DATA)
-	  {
-            if (con->http.state == HTTP_POST_SEND)
-	    {
-	      cupsdSendError(con, HTTP_BAD_REQUEST);
-	      return (cupsdCloseClient(con));
-	    }
-
-	    break;
-          }
-	  else
-	    con->bytes += ippLength(con->request);
-	}
-
-        if (con->file < 0 && con->http.state != HTTP_POST_SEND)
-	{
-         /*
-	  * Create a file as needed for the request data...
-	  */
-
-          cupsdSetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
-	  con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
-
-          cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadClient: %d REQUEST %s=%d", con->http.fd,
-	                  con->filename, con->file);
-
-	  if (con->file < 0)
-	  {
-	    if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
-	      return (cupsdCloseClient(con));
-	  }
-
-	  fchmod(con->file, 0640);
-	  fchown(con->file, RunUser, Group);
-          fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
-	}
-
-	if (con->http.state != HTTP_POST_SEND)
-	{
-          if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
-	    return (cupsdCloseClient(con));
-	  else if (bytes > 0)
-	  {
-	    con->bytes += bytes;
-
-            cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdReadClient: %d writing %d bytes to %d",
-	                    con->http.fd, bytes, con->file);
-
-            if (write(con->file, line, bytes) < bytes)
+	    if ((ipp_state = ippRead(&(con->http), con->request)) == IPP_ERROR)
 	    {
               cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "cupsdReadClient: Unable to write %d bytes to %s: %s",
-	        	      bytes, con->filename, strerror(errno));
+	                      "cupsdReadClient: %d IPP Read Error!",
+			      con->http.fd);
 
-	      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                      "cupsdReadClient: Closing file %d...",
-        		      con->file);
+	      cupsdSendError(con, HTTP_BAD_REQUEST);
+	      cupsdCloseClient(con);
+	      return;
+	    }
+	    else if (ipp_state != IPP_DATA)
+	    {
+              if (con->http.state == HTTP_POST_SEND)
+	      {
+		cupsdSendError(con, HTTP_BAD_REQUEST);
+		cupsdCloseClient(con);
+		return;
+	      }
 
-	      close(con->file);
-	      con->file = -1;
-	      unlink(con->filename);
-	      cupsdClearString(&con->filename);
+	      break;
+            }
+	    else
+	      con->bytes += ippLength(con->request);
+	  }
 
-              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
-		return (cupsdCloseClient(con));
+          if (con->file < 0 && con->http.state != HTTP_POST_SEND)
+	  {
+           /*
+	    * Create a file as needed for the request data...
+	    */
+
+            cupsdSetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
+	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
+
+            cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadClient: %d REQUEST %s=%d", con->http.fd,
+	                    con->filename, con->file);
+
+	    if (con->file < 0)
+	    {
+	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
+	    }
+
+	    fchmod(con->file, 0640);
+	    fchown(con->file, RunUser, Group);
+            fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
+	  }
+
+	  if (con->http.state != HTTP_POST_SEND)
+	  {
+            if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
+	    {
+	      cupsdCloseClient(con);
+	      return;
+	    }
+	    else if (bytes > 0)
+	    {
+	      con->bytes += bytes;
+
+              cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                      "cupsdReadClient: %d writing %d bytes to %d",
+	                      con->http.fd, bytes, con->file);
+
+              if (write(con->file, line, bytes) < bytes)
+	      {
+        	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                	"cupsdReadClient: Unable to write %d bytes to %s: %s",
+	        		bytes, con->filename, strerror(errno));
+
+		cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                	"cupsdReadClient: Closing file %d...",
+        			con->file);
+
+		close(con->file);
+		con->file = -1;
+		unlink(con->filename);
+		cupsdClearString(&con->filename);
+
+        	if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
+	      }
+	    }
+	    else if (con->http.state == HTTP_POST_RECV)
+              return;
+	    else if (con->http.state != HTTP_POST_SEND)
+	    {
+	      cupsdCloseClient(con);
+	      return;
 	    }
 	  }
-	  else if (con->http.state == HTTP_POST_RECV)
-            return (1); /* ??? */
-	  else if (con->http.state != HTTP_POST_SEND)
-	    return (cupsdCloseClient(con));
-	}
+        }
+	while (con->http.state == HTTP_POST_RECV && con->http.used > 0);
 
 	if (con->http.state == HTTP_POST_SEND)
 	{
@@ -1895,7 +2056,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
               }
 
               if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE))
-		return (cupsdCloseClient(con));
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 	    }
 
 	    if (con->command)
@@ -1903,7 +2067,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (!cupsdSendCommand(con, con->command, con->options, 0))
 	      {
 		if (!cupsdSendError(con, HTTP_NOT_FOUND))
-		  return (cupsdCloseClient(con));
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
               }
 	      else
         	cupsdLogRequest(con, HTTP_OK);
@@ -1911,7 +2078,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  }
 
           if (con->request)
-	    return (cupsdProcessIPPRequest(con));
+	  {
+	    cupsdProcessIPPRequest(con);
+	    return;
+	  }
 	}
         break;
 
@@ -1920,9 +2090,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
   }
 
   if (!con->http.keep_alive && con->http.state == HTTP_WAITING)
-    return (cupsdCloseClient(con));
-  else
-    return (1);
+    cupsdCloseClient(con);
 }
 
 
@@ -1974,14 +2142,7 @@ cupsdSendCommand(
 
   fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdSendCommand: Adding fd %d to InputSet...", con->file);
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdSendCommand: Adding fd %d to OutputSet...",
-                  con->http.fd);
-
-  FD_SET(con->file, InputSet);
-  FD_SET(con->http.fd, OutputSet);
+  cupsdAddSelect(con->file, (cupsd_selfunc_t)cupsdWritePipe, NULL, con);
 
   con->sent_header = 0;
   con->file_ready  = 0;
@@ -2300,7 +2461,7 @@ cupsdUpdateCGI(void)
  * 'cupsdWriteClient()' - Write data to a client as needed.
  */
 
-int					/* O - 1 if success, 0 if fail */
+void
 cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 {
   int		bytes;			/* Number of bytes written */
@@ -2319,7 +2480,28 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
   if (con->http.state != HTTP_GET_SEND &&
       con->http.state != HTTP_POST_SEND)
-    return (1);
+    return;
+
+  if (con->pipe_pid)
+  {
+   /*
+    * Make sure we select on the CGI output...
+    */
+
+    cupsdAddSelect(con->file, (cupsd_selfunc_t)cupsdWritePipe, NULL, con);
+
+    if (!con->file_ready)
+    {
+     /*
+      * Try again later when there is CGI output available...
+      */
+
+      cupsdRemoveSelect(con->http.fd);
+      return;
+    }
+
+    con->file_ready = 0;
+  }
 
   if (con->response)
   {
@@ -2365,7 +2547,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	      con->sent_header = 2;
 
 	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
-		return (0);
+		return;
 	    }
 	    else if (!strncasecmp(buf, "Status:", 7))
 	    {
@@ -2380,7 +2562,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	      if (con->http.version == HTTP_1_1)
 	      {
 		if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n") < 0)
-		  return (0);
+		  return;
 	      }
             }
 	  }
@@ -2410,7 +2592,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
             if (cupsdFlushHeader(con) < 0)
 	    {
 	      cupsdCloseClient(con);
-	      return (0);
+	      return;
 	    }
 
 	    if (con->http.version == HTTP_1_1)
@@ -2435,7 +2617,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
         httpPrintf(HTTP(con), "%s", buf);
 
         con->http.activity = time(NULL);
-        return (1);
+        return;
       }
       else if (bytes == 0)
         con->http.activity = time(NULL);
@@ -2450,7 +2632,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
                 	con->http.fd, bytes);
 
 	cupsdCloseClient(con);
-	return (0);
+	return;
       }
 
       con->bytes += bytes;
@@ -2474,27 +2656,17 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       if (httpWrite2(HTTP(con), "", 0) < 0)
       {
         cupsdCloseClient(con);
-	return (0);
+	return;
       }
     }
 
     con->http.state = HTTP_WAITING;
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdWriteClient: Removing fd %d from OutputSet...",
-                    con->http.fd);
-
-    FD_CLR(con->http.fd, OutputSet);
+    cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient, NULL, con);
 
     if (con->file >= 0)
     {
-      if (FD_ISSET(con->file, InputSet))
-      {
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                "cupsdWriteClient: Removing fd %d from InputSet...",
-                        con->file);
-	FD_CLR(con->file, InputSet);
-      }
+      cupsdRemoveSelect(con->file);
 
       if (con->pipe_pid)
 	cupsdEndProcess(con->pipe_pid, 0);
@@ -2535,25 +2707,28 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     if (!con->http.keep_alive)
     {
       cupsdCloseClient(con);
-      return (0);
-    }
-  }
-  else
-  {
-    con->file_ready = 0;
-
-    if (con->pipe_pid && !FD_ISSET(con->file, InputSet))
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdWriteClient: Adding fd %d to InputSet...",
-		      con->file);
-      FD_SET(con->file, InputSet);
+      return;
     }
   }
 
   con->http.activity = time(NULL);
+}
 
-  return (1);
+
+/*
+ * 'cupsdWritePipe()' - Flag that data is available on the CGI pipe.
+ */
+
+void
+cupsdWritePipe(cupsd_client_t *con)	/* I - Client connection */
+{
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdWritePipe: CGI output on fd %d...",
+                  con->file);
+
+  con->file_ready = 1;
+
+  cupsdRemoveSelect(con->file);
+  cupsdAddSelect(con->http.fd, NULL, (cupsd_selfunc_t)cupsdWriteClient, con);
 }
 
 
@@ -4228,10 +4403,8 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
   else
     con->http._data_remaining = INT_MAX;
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "write_file: Adding fd %d to OutputSet...", con->http.fd);
-
-  FD_SET(con->http.fd, OutputSet);
+  cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient,
+                 (cupsd_selfunc_t)cupsdWriteClient, con);
 
   return (1);
 }

@@ -1226,10 +1226,7 @@ cupsdStopAllNotifiers(void)
 
   if (NotifierPipes[0] >= 0)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStopAllNotifiers: Removing fd %d from InputSet...",
-	            NotifierPipes[0]);
-    FD_CLR(NotifierPipes[0], InputSet);
+    cupsdRemoveSelect(NotifierPipes[0]);
 
     cupsdStatBufDelete(NotifierStatusBuffer);
 
@@ -1571,11 +1568,8 @@ cupsd_start_notifier(
 
     NotifierStatusBuffer = cupsdStatBufNew(NotifierPipes[0], "[Notifier]");
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "start_notifier: Adding fd %d to InputSet...",
-		    NotifierPipes[0]);
-
-    FD_SET(NotifierPipes[0], InputSet);
+    cupsdAddSelect(NotifierPipes[0], (cupsd_selfunc_t)cupsdUpdateNotifierStatus,
+                   NULL, NULL);
   }
 
   if (cupsdOpenPipe(fds))

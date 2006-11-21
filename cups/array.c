@@ -25,27 +25,29 @@
  *
  * Contents:
  *
- *   cupsArrayAdd()      - Add an element to the array.
- *   cupsArrayClear()    - Clear the array.
- *   cupsArrayCount()    - Get the number of elements in the array.
- *   cupsArrayCurrent()  - Return the current element in the array.
- *   cupsArrayDelete()   - Free all memory used by the array.
- *   cupsArrayDup()      - Duplicate the array.
- *   cupsArrayFind()     - Find an element in the array.
- *   cupsArrayFirst()    - Get the first element in the array.
- *   cupsArrayIndex()    - Get the N-th element in the array.
- *   cupsArrayInsert()   - Insert an element in the array.
- *   cupsArrayLast()     - Get the last element in the array.
- *   cupsArrayNew()      - Create a new array.
- *   cupsArrayNext()     - Get the next element in the array.
- *   cupsArrayPrev()     - Get the previous element in the array.
- *   cupsArrayRemove()   - Remove an element from the array.
- *   cupsArrayRestore()  - Reset the current element to the last cupsArraySave.
- *   cupsArraySave()     - Mark the current element for a later
- *                         cupsArrayRestore.
- *   cupsArrayUserData() - Return the user data for an array.
- *   cups_array_add()    - Insert or append an element to the array...
- *   cups_array_find()   - Find an element in the array...
+ *   cupsArrayAdd()       - Add an element to the array.
+ *   cupsArrayClear()     - Clear the array.
+ *   cupsArrayCount()     - Get the number of elements in the array.
+ *   cupsArrayCurrent()   - Return the current element in the array.
+ *   cupsArrayDelete()    - Free all memory used by the array.
+ *   cupsArrayDup()       - Duplicate the array.
+ *   cupsArrayFind()      - Find an element in the array.
+ *   cupsArrayFirst()     - Get the first element in the array.
+ *   cupsArrayGetIndex()  - Get the index of the current element.
+ *   cupsArrayGetInsert() - Get the index of the last inserted element.
+ *   cupsArrayIndex()     - Get the N-th element in the array.
+ *   cupsArrayInsert()    - Insert an element in the array.
+ *   cupsArrayLast()      - Get the last element in the array.
+ *   cupsArrayNew()       - Create a new array.
+ *   cupsArrayNext()      - Get the next element in the array.
+ *   cupsArrayPrev()      - Get the previous element in the array.
+ *   cupsArrayRemove()    - Remove an element from the array.
+ *   cupsArrayRestore()   - Reset the current element to the last cupsArraySave.
+ *   cupsArraySave()      - Mark the current element for a later
+ *                          cupsArrayRestore.
+ *   cupsArrayUserData()  - Return the user data for an array.
+ *   cups_array_add()     - Insert or append an element to the array...
+ *   cups_array_find()    - Find an element in the array...
  */
 
 /*
@@ -386,6 +388,38 @@ cupsArrayFirst(cups_array_t *a)		/* I - Array */
 
 
 /*
+ * 'cupsArrayGetIndex()' - Get the index of the current element.
+ *
+ * @since CUPS 1.3@
+ */
+
+int					/* O - Index of the current element */
+cupsArrayGetIndex(cups_array_t *a)	/* I - Array */
+{
+  if (!a)
+    return (-1);
+  else
+    return (a->current);
+}
+
+
+/*
+ * 'cupsArrayGetInsert()' - Get the index of the last inserted element.
+ *
+ * @since CUPS 1.3@
+ */
+
+int					/* O - Index of the last inserted element */
+cupsArrayGetInsert(cups_array_t *a)	/* I - Array */
+{
+  if (!a)
+    return (-1);
+  else
+    return (a->insert);
+}
+
+
+/*
  * 'cupsArrayIndex()' - Get the N-th element in the array.
  */
 
@@ -582,8 +616,10 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
   if (current <= a->current)
     a->current --;
 
-  if (current <= a->insert)
+  if (current < a->insert)
     a->insert --;
+  else if (current == a->insert)
+    a->insert = -1;
 
   for (i = 0; i < a->num_saved; i ++)
     if (current <= a->saved[i])

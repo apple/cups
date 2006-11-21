@@ -111,6 +111,9 @@
 #  include <sys/time.h>
 #  include <sys/resource.h>
 #endif /* !WIN32 */
+#ifdef HAVE_POLL
+#  include <sys/poll.h>
+#endif /* HAVE_POLL */
 
 
 /*
@@ -308,9 +311,6 @@ httpClose(http_t *http)			/* I - HTTP connection */
     return;
 
   httpAddrFreeList(http->addrlist);
-
-  if (http->input_set)
-    free(http->input_set);
 
   if (http->cookie)
     free(http->cookie);
@@ -2878,12 +2878,13 @@ http_wait(http_t *http,			/* I - HTTP connection */
           int    msec,			/* I - Milliseconds to wait */
 	  int    usessl)		/* I - Use SSL context? */
 {
-#ifndef WIN32
-  struct rlimit		limit;          /* Runtime limit */
-  int			set_size;	/* Size of select set */
-#endif /* !WIN32 */
+#ifdef HAVE_POLL
+  struct pollfd		pfd;		/* Polled file descriptor */
+#else
+  fd_set		input_set;	/* select() input set */
   struct timeval	timeout;	/* Timeout */
-  int			nfds;		/* Result from select() */
+#endif /* HAVE_POLL */
+  int			nfds;		/* Result from select()/poll() */
 
 
   DEBUG_printf(("http_wait(http=%p, msec=%d)\n", http, msec));
@@ -2914,41 +2915,20 @@ http_wait(http_t *http,			/* I - HTTP connection */
 #endif /* HAVE_SSL */
 
  /*
-  * Then try doing a select() to poll the socket...
+  * Then try doing a select() or poll() to poll the socket...
   */
 
-  if (!http->input_set)
-  {
-#ifdef WIN32
-   /*
-    * Windows has a fixed-size select() structure, different (surprise,
-    * surprise!) from all UNIX implementations.  Just allocate this
-    * fixed structure...
-    */
+#ifdef HAVE_POLL
+  pfd.fd     = http->fd;
+  pfd.events = POLLIN;
 
-    http->input_set = calloc(1, sizeof(fd_set));
+  while ((nfds = poll(&pfd, 1, msec)) < 0 && errno == EINTR);
+
 #else
-   /*
-    * Allocate the select() input set based upon the max number of file
-    * descriptors available for this process...
-    */
-
-    getrlimit(RLIMIT_NOFILE, &limit);
-
-    set_size = (limit.rlim_cur + 31) / 8 + 4;
-    if (set_size < sizeof(fd_set))
-      set_size = sizeof(fd_set);
-
-    http->input_set = calloc(1, set_size);
-#endif /* WIN32 */
-
-    if (!http->input_set)
-      return (0);
-  }
-
   do
   {
-    FD_SET(http->fd, http->input_set);
+    FD_ZERO(&input_set);
+    FD_SET(http->fd, &input_set);
 
     DEBUG_printf(("http_wait: msec=%d, http->fd=%d\n", msec, http->fd));
 
@@ -2957,20 +2937,19 @@ http_wait(http_t *http,			/* I - HTTP connection */
       timeout.tv_sec  = msec / 1000;
       timeout.tv_usec = (msec % 1000) * 1000;
 
-      nfds = select(http->fd + 1, http->input_set, NULL, NULL, &timeout);
+      nfds = select(http->fd + 1, &input_set, NULL, NULL, &timeout);
     }
     else
-      nfds = select(http->fd + 1, http->input_set, NULL, NULL, NULL);
+      nfds = select(http->fd + 1, &input_set, NULL, NULL, NULL);
 
     DEBUG_printf(("http_wait: select() returned %d...\n", nfds));
   }
-#ifdef WIN32
+#  ifdef WIN32
   while (nfds < 0 && WSAGetLastError() == WSAEINTR);
-#else
+#  else
   while (nfds < 0 && errno == EINTR);
-#endif /* WIN32 */
-
-  FD_CLR(http->fd, http->input_set);
+#  endif /* WIN32 */
+#endif /* HAVE_POLL */
 
   DEBUG_printf(("http_wait: returning with nfds=%d...\n", nfds));
 

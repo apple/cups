@@ -43,6 +43,7 @@ CUPSDOBJS =	\
 		printers.o \
 		process.o \
 		quotas.o \
+		select.o \
 		server.o \
 		statbuf.o \
 		subscriptions.o \

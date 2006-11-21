@@ -661,11 +661,8 @@ cupsdProcessIPPRequest(
 	con->http.data_remaining = length;
       }
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdProcessIPPRequest: Adding fd %d to OutputSet...",
-        	      con->http.fd);
-
-      FD_SET(con->http.fd, OutputSet);
+      cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient,
+                     (cupsd_selfunc_t)cupsdWriteClient, con);
 
      /*
       * Tell the caller the response header was sent successfully...
@@ -3759,7 +3756,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
            const char     *from,	/* I - Source file */
            const char     *to)		/* I - Destination file */
 {
-  fd_set	*input;			/* select() input set */
+  fd_set	input;			/* select() input set */
   struct timeval timeout;		/* select() timeout */
   int		maxfd;			/* Maximum file descriptor for select() */
   char		tempfile[1024];		/* Temporary PPD file */
@@ -3812,24 +3809,12 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
   cupsdOpenPipe(temppipe);
 
-  if ((input = calloc(1, SetSize)) == NULL)
-  {
-    close(tempfd);
-    unlink(tempfile);
-
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "copy_model: Unable to allocate %d bytes for select()...",
-                    SetSize);
-    return (-1);
-  }
-
   cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "copy_model: Running \"cups-driverd cat %s\"...", from);
 
   if (!cupsdStartProcess(buffer, argv, envp, -1, temppipe[1], CGIPipes[1],
                          -1, 0, &temppid))
   {
-    free(input);
     close(tempfd);
     unlink(tempfile);
     return (-1);
@@ -3856,13 +3841,14 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
     bytes = 0;
 
-    FD_SET(temppipe[0], input);
-    FD_SET(CGIPipes[0], input);
+    FD_ZERO(&input);
+    FD_SET(temppipe[0], &input);
+    FD_SET(CGIPipes[0], &input);
 
     timeout.tv_sec  = 30;
     timeout.tv_usec = 0;
 
-    if ((i = select(maxfd, input, NULL, NULL, &timeout)) < 0)
+    if ((i = select(maxfd, &input, NULL, NULL, &timeout)) < 0)
     {
       if (errno == EINTR)
         continue;
@@ -3878,7 +3864,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
       break;
     }
 
-    if (FD_ISSET(temppipe[0], input))
+    if (FD_ISSET(temppipe[0], &input))
     {
      /*
       * Read the PPD file from the pipe, and write it to the PPD file.
@@ -3895,14 +3881,12 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 	break;
     }
 
-    if (FD_ISSET(CGIPipes[0], input))
+    if (FD_ISSET(CGIPipes[0], &input))
       cupsdUpdateCGI();
   }
 
   close(temppipe[0]);
   close(tempfd);
-
-  free(input);
 
   if (!total)
   {
