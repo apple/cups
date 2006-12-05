@@ -237,7 +237,7 @@ check:	all
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 
-aix bsd deb depot inst pkg rpm setld slackware swinstall tardist:
+aix bsd deb depot inst pkg setld slackware swinstall tardist:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
 
 epm:
@@ -245,6 +245,9 @@ epm:
 
 osx:
 	epm $(EPMFLAGS) -f osx -s packaging/installer.tif cups packaging/cups.list
+
+rpm:
+	epm $(EPMFLAGS) -f rpm -s packaging/installer.gif cups packaging/cups.list
 
 .PHONEY:	dist
 dist:	all
