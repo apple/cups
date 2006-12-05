@@ -2796,50 +2796,36 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
   */
 
   memcpy(&myhttp, http, sizeof(myhttp));
-  myhttp.field_authorization = NULL;
 
  /*
   * Send an OPTIONS request to the server, requiring SSL or TLS
   * encryption on the link...
   */
 
-  httpClearFields(&myhttp);
-  httpSetField(&myhttp, HTTP_FIELD_CONNECTION, "upgrade");
-  httpSetField(&myhttp, HTTP_FIELD_UPGRADE, "TLS/1.0, SSL/2.0, SSL/3.0");
+  httpClearFields(http);
+  httpSetField(http, HTTP_FIELD_CONNECTION, "upgrade");
+  httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.0, SSL/2.0, SSL/3.0");
 
-  if ((ret = httpOptions(&myhttp, "*")) == 0)
+  if ((ret = httpOptions(http, "*")) == 0)
   {
    /*
     * Wait for the secure connection...
     */
 
-    while (httpUpdate(&myhttp) == HTTP_CONTINUE);
+    while (httpUpdate(http) == HTTP_CONTINUE);
   }
 
-  httpFlush(&myhttp);
+  httpFlush(http);
 
  /*
-  * Copy the HTTP data back over, if any...
+  * Restore the HTTP request data...
   */
 
-  http->fd         = myhttp.fd;
-  http->error      = myhttp.error;
-  http->activity   = myhttp.activity;
-  http->status     = myhttp.status;
-  http->version    = myhttp.version;
-  http->keep_alive = myhttp.keep_alive;
-  http->used       = myhttp.used;
-
-  if (http->used)
-    memcpy(http->buffer, myhttp.buffer, http->used);
-
-  http->auth_type   = myhttp.auth_type;
-  http->nonce_count = myhttp.nonce_count;
-
-  memcpy(http->nonce, myhttp.nonce, sizeof(http->nonce));
-
-  http->tls        = myhttp.tls;
-  http->encryption = myhttp.encryption;
+  memcpy(http->fields, myhttp.fields, sizeof(http->fields));
+  http->data_encoding   = myhttp.data_encoding;
+  http->data_remaining  = myhttp.data_remaining;
+  http->_data_remaining = myhttp._data_remaining;
+  http->expect          = myhttp.expect;
 
  /*
   * See if we actually went secure...
