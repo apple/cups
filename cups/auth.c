@@ -87,6 +87,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
 		encode[2048];		/* Encoded username:password */
+  _cups_globals_t *cg;			/* Global data */
 
 
   DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")\n",
@@ -132,8 +133,15 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     * Nope - get a new password from the user...
     */
 
-    snprintf(prompt, sizeof(prompt), _("Password for %s on %s? "), cupsUser(),
-             http->hostname[0] == '/' ? "localhost" : http->hostname);
+    cg = _cupsGlobals();
+
+    if (!cg->lang_default)
+      cg->lang_default = cupsLangDefault();
+
+    snprintf(prompt, sizeof(prompt),
+             _cupsLangString(cg->lang_default, _("Password for %s on %s? ")),
+	     cupsUser(),
+	     http->hostname[0] == '/' ? "localhost" : http->hostname);
 
     http->digest_tries  = strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE],
                                       "Digest", 5) != 0;
