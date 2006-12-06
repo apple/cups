@@ -1729,14 +1729,16 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 
   if (device->make_and_model &&
       (!strncasecmp(device->make_and_model, "Epson", 5) ||
+       !strncasecmp(device->make_and_model, "HP ", 3) ||
+       !strncasecmp(device->make_and_model, "Hewlett", 7) ||
        !strncasecmp(device->make_and_model, "Kyocera", 7) ||
        !strncasecmp(device->make_and_model, "Lexmark", 7) ||
        !strncasecmp(device->make_and_model, "Tektronix", 9) ||
        !strncasecmp(device->make_and_model, "Xerox", 5)))
   {
    /*
-    * Epson, Kyocera, Lexmark, Tektronix, and Xerox printers often lock up on
-    * IPP probes, so exclude them from the IPP connection test...
+    * Epson, HP, Kyocera, Lexmark, Tektronix, and Xerox printers often lock
+    * up on IPP probes, so exclude them from the IPP connection test...
     */
 
     http = NULL;
@@ -1769,9 +1771,9 @@ probe_device(snmp_cache_t *device)	/* I - Device */
     static const char * const resources[] =
 			{		/* Common resource paths for IPP */
 			  "/ipp",
-			  "/ipp/port2",
-			  "/ipp/port3",
-			  "/EPSON_IPP_Printer",
+			  /*"/ipp/port2",*/
+			  /*"/ipp/port3",*/
+			  /*"/EPSON_IPP_Printer",*/
 			  "/LPT1",
 			  "/LPT2",
 			  "/COM1",
