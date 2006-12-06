@@ -366,9 +366,26 @@ cupsMarkOptions(
     }
     else if (!strcasecmp(optptr->name, "output-bin"))
     {
-      if (cupsGetOption("OutputBin", num_options, options) == NULL)
+      if (!cupsGetOption("OutputBin", num_options, options))
         if (ppdMarkOption(ppd, "OutputBin", optptr->value))
           conflict = 1;
+    }
+    else if (!strcasecmp(optptr->name, "multiple-document-handling"))
+    {
+      if (!cupsGetOption("Collate", num_options, options) &&
+          ppdFindOption(ppd, "Collate"))
+      {
+        if (strcasecmp(optptr->value, "separate-documents-uncollated-copies"))
+	{
+	  if (ppdMarkOption(ppd, "Collate", "True"))
+            conflict = 1;
+        }
+	else
+	{
+	  if (ppdMarkOption(ppd, "Collate", "False"))
+            conflict = 1;
+        }
+      }
     }
     else if (ppdMarkOption(ppd, optptr->name, optptr->value))
       conflict = 1;
