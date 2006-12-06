@@ -171,7 +171,7 @@ _cupsImageReadSunRaster(
 
   for (y = 0; y < img->ysize; y ++)
   {
-    if (ras_depth != 8 || ras_maplength > 0)
+    if ((ras_depth != 8 && ras_depth != 24) || ras_maplength > 0)
       p = scanline;
     else
       p = in;
@@ -221,12 +221,12 @@ _cupsImageReadSunRaster(
           *p = 0;
 
 	if (bit > 1)
+          bit >>= 1;
+	else
 	{
           bit = 128;
           scanptr ++;
 	}
-	else
-          bit >>= 1;
       }
     }
     else if (ras_depth == 1)
@@ -253,12 +253,12 @@ _cupsImageReadSunRaster(
 	}
 
 	if (bit > 1)
+          bit >>= 1;
+	else
 	{
           bit = 128;
           scanptr ++;
 	}
-	else
-          bit >>= 1;
       }
     }
     else if (ras_depth == 8 && ras_maplength > 0)
