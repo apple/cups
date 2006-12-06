@@ -738,8 +738,18 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
     * after the transfer is complete...
     */
 
-    if (http->fields[HTTP_FIELD_CONTENT_LENGTH][0] == '\0')
-      http->data_remaining = 2147483647;
+    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
+    {
+     /*
+      * Default content length is 0 for errors and 2^31-1 for other
+      * successful requests...
+      */
+
+      if (http->status >= HTTP_MULTIPLE_CHOICES)
+        http->data_remaining = 0;
+      else
+        http->data_remaining = 2147483647;
+    }
     else
       http->data_remaining = strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
                                      NULL, 10);
