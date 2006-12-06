@@ -206,7 +206,7 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 	  if (!paperout)
 	  {
 	    fputs("ERROR: Out of paper!\n", stderr);
-	    fputs("STATE: +media-tray-empty-error\n", stderr);
+	    fputs("STATE: +media-empty-error\n", stderr);
 	    paperout = 1;
 	  }
         }
@@ -229,7 +229,7 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
       {
         if (paperout)
 	{
-	  fputs("STATE: -media-tray-empty-error\n", stderr);
+	  fputs("STATE: -media-empty-error\n", stderr);
 	  paperout = 0;
 	}
 
