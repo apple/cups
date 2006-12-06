@@ -29,6 +29,7 @@ sinclude(config-scripts/cups-common.m4)
 sinclude(config-scripts/cups-directories.m4)
 sinclude(config-scripts/cups-manpages.m4)
 
+sinclude(config-scripts/cups-3264.m4)
 sinclude(config-scripts/cups-sharedlibs.m4)
 sinclude(config-scripts/cups-libtool.m4)
 sinclude(config-scripts/cups-compiler.m4)

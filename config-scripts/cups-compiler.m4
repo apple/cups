@@ -46,41 +46,15 @@ fi
 AC_SUBST(ARCHFLAGS)
 
 dnl Setup support for separate 32/64-bit library generation...
-AC_ARG_ENABLE(32bit, [  --enable-32bit          generate 32-bit libraries on 32/64-bit systems, default=no])
 AC_ARG_WITH(arch32flags, [  --with-arch32flags="flags"
                           specifies 32-bit architecture flags])
-
 ARCH32FLAGS=""
-INSTALL32=""
-LIB32CUPS=""
-LIB32CUPSIMAGE=""
-LIB32DIR=""
-UNINSTALL32=""
-
 AC_SUBST(ARCH32FLAGS)
-AC_SUBST(INSTALL32)
-AC_SUBST(LIB32CUPS)
-AC_SUBST(LIB32CUPSIMAGE)
-AC_SUBST(LIB32DIR)
-AC_SUBST(UNINSTALL32)
 
-AC_ARG_ENABLE(64bit, [  --enable-64bit          generate 64-bit libraries on 32/64-bit systems, default=no])
 AC_ARG_WITH(arch64flags, [  --with-arch64flags="flags"
                           specifies 64-bit architecture flags])
-
 ARCH64FLAGS=""
-INSTALL64=""
-LIB64CUPS=""
-LIB64CUPSIMAGE=""
-LIB64DIR=""
-UNINSTALL64=""
-
 AC_SUBST(ARCH64FLAGS)
-AC_SUBST(INSTALL64)
-AC_SUBST(LIB64CUPS)
-AC_SUBST(LIB64CUPSIMAGE)
-AC_SUBST(LIB64DIR)
-AC_SUBST(UNINSTALL64)
 
 dnl Position-Independent Executable support on Linux and *BSD...
 AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fPIE option, default=no])
@@ -137,11 +111,6 @@ if test -n "$GCC"; then
 				else
 					ARCH32FLAGS="$with_arch32flags"
 				fi
-				INSTALL32="install32bit"
-				LIB32CUPS="32bit/libcups.so.2"
-				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
-				LIB32DIR="$prefix/lib32"
-				UNINSTALL32="uninstall32bit"
 
 				if test -z "$with_archflags"; then
 					if test -z "$with_arch64flags"; then
@@ -159,11 +128,6 @@ if test -n "$GCC"; then
 				else
 					ARCH64FLAGS="$with_arch64flags"
 				fi
-				INSTALL64="install64bit"
-				LIB64CUPS="64bit/libcups.so.2"
-				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
-				LIB64DIR="$prefix/lib64"
-				UNINSTALL64="uninstall64bit"
 
 				if test -z "$with_archflags"; then
 					if test -z "$with_arch32flags"; then
@@ -183,14 +147,6 @@ if test -n "$GCC"; then
 				else
 					ARCH32FLAGS="$with_arch32flags"
 				fi
-				INSTALL32="install32bit"
-				LIB32CUPS="32bit/libcups.so.2"
-				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
-				LIB32DIR="$exec_prefix/lib"
-				if test -d /usr/lib32; then
-					LIB32DIR="${LIB32DIR}32"
-				fi
-				UNINSTALL32="uninstall32bit"
 
 				if test -z "$with_archflags"; then
 					if test -z "$with_arch64flags"; then
@@ -208,14 +164,6 @@ if test -n "$GCC"; then
 				else
 					ARCH64FLAGS="$with_arch64flags"
 				fi
-				INSTALL64="install64bit"
-				LIB64CUPS="64bit/libcups.so.2"
-				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
-				LIB64DIR="$exec_prefix/lib"
-				if test -d /usr/lib64; then
-					LIB64DIR="${LIB64DIR}64"
-				fi
-				UNINSTALL64="uninstall64bit"
 
 				if test -z "$with_archflags"; then
 					if test -z "$with_arch32flags"; then
@@ -235,11 +183,6 @@ if test -n "$GCC"; then
 				else
 					ARCH32FLAGS="$with_arch32flags"
 				fi
-				INSTALL32="install32bit"
-				LIB32CUPS="32bit/libcups.so.2"
-				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
-				LIB32DIR="$exec_prefix/lib/32"
-				UNINSTALL32="uninstall32bit"
 
 				if test -z "$with_archflags"; then
 					if test -z "$with_arch64flags"; then
@@ -257,11 +200,6 @@ if test -n "$GCC"; then
 				else
 					ARCH64FLAGS="$with_arch64flags"
 				fi
-				INSTALL64="install64bit"
-				LIB64CUPS="64bit/libcups.so.2"
-				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
-				LIB64DIR="$exec_prefix/lib/64"
-				UNINSTALL64="uninstall64bit"
 
 				if test -z "$with_archflags"; then
 					if test -z "$with_arch32flags"; then
@@ -323,11 +261,6 @@ else
 				else
 					ARCH32FLAGS="$with_arch32flags"
 				fi
-				INSTALL32="install32bit"
-				LIB32CUPS="32bit/libcups.so.2"
-				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
-				LIB32DIR="$prefix/lib32"
-				UNINSTALL32="uninstall32bit"
 
 				if test -z "$with_archflags"; then
 					if test -z "$with_arch64flags"; then
@@ -345,11 +278,6 @@ else
 				else
 					ARCH64FLAGS="$with_arch64flags"
 				fi
-				INSTALL64="install64bit"
-				LIB64CUPS="64bit/libcups.so.2"
-				LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
-				LIB64DIR="$prefix/lib64"
-				UNINSTALL64="uninstall64bit"
 
 				if test -z "$with_archflags"; then
 					if test -z "$with_arch32flags"; then
@@ -388,11 +316,6 @@ else
 				# Compiling on a Solaris system, build 64-bit
 				# binaries with separate 32-bit libraries...
 				ARCH32FLAGS="-xarch=generic"
-				INSTALL32="install32bit"
-				LIB32CUPS="32bit/libcups.so.2"
-				LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
-				LIB32DIR="$exec_prefix/lib/32"
-				UNINSTALL32="uninstall32bit"
 
 				if test "x$with_optim" = x; then
 					# Suppress all of Sun's questionable
@@ -412,11 +335,6 @@ else
 				if test "x$enable_64bit" = xyes; then
 					# Build 64-bit libraries...
 					ARCH64FLAGS="-xarch=generic64"
-					INSTALL64="install64bit"
-					LIB64CUPS="64bit/libcups.so.2"
-					LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
-					LIB64DIR="$exec_prefix/lib/64"
-					UNINSTALL64="uninstall64bit"
 				fi
 
 				if test "x$with_optim" = x; then
