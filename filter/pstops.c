@@ -909,23 +909,26 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
       * for the JCL options...
       */
 
-      if (!doc->saw_eof)
-	puts("%%EOF");
-
-      if (doc->emit_jcl)
+      if (number)
       {
-	if (ppd && ppd->jcl_end)
-	  ppdEmitJCLEnd(ppd, stdout);
-	else
-	  putchar(0x04);
+	if (!doc->saw_eof)
+	  puts("%%EOF");
 
-        ppdEmitJCL(ppd, stdout, doc->job_id, doc->user, doc->title);
+	if (doc->emit_jcl)
+	{
+	  if (ppd && ppd->jcl_end)
+	    ppdEmitJCLEnd(ppd, stdout);
+	  else
+	    putchar(0x04);
+
+          ppdEmitJCL(ppd, stdout, doc->job_id, doc->user, doc->title);
+	}
+
+	puts("%!PS-Adobe-3.0");
+	puts("%%Pages: (atend)");
+	puts("%%BoundingBox: (atend)");
+	puts("%%EndComments");
       }
-
-      puts("%!PS-Adobe-3.0");
-      puts("%%Pages: (atend)");
-      puts("%%BoundingBox: (atend)");
-      puts("%%EndComments");
 
      /*
       * Then copy all of the pages...
