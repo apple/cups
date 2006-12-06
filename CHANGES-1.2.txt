@@ -3,6 +3,9 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.8
 
+	- Some types of Sun raster files did not print correctly
+	  (STR #2107)
+	- Raw PBM files did not print correctly (STR #2106)
 	- The SNMP backend no longer uses IPP with HP printers,
 	  as some recent firmware versions appear to not work
 	  (STR #2055)
