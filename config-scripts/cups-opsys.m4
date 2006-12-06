@@ -22,9 +22,10 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
-dnl Get the operating system and version number...
+dnl Get the operating system, version number, and architecture...
 uname=`uname`
 uversion=`uname -r | sed -e '1,$s/^[[^0-9]]*\([[0-9]]*\)\.\([[0-9]]*\).*/\1\2/'`
+uarch=`uname -m`
 
 case "$uname" in
 	GNU* | GNU/*)

@@ -52,6 +52,32 @@ AC_SUBST(LIB64DIR)
 AC_SUBST(UNINSTALL64)
 
 case "$uname" in
+	HP-UX*)
+		if test "x$enable_32bit" = xyes; then
+			# Build 32-bit libraries, 64-bit base...
+			INSTALL32="install32bit"
+			LIB32CUPS="32bit/libcups.so.2"
+			LIB32CUPSIMAGE="32bit/libcupsimage.so.2"
+			LIB32DIR="$exec_prefix/lib"
+			if test -d /usr/lib/hpux32; then
+				LIB32DIR="${LIB32DIR}/hpux32"
+			fi
+			UNINSTALL32="uninstall32bit"
+		fi
+
+		if test "x$enable_64bit" = xyes; then
+			# Build 64-bit libraries, 32-bit base...
+			INSTALL64="install64bit"
+			LIB64CUPS="64bit/libcups.so.2"
+			LIB64CUPSIMAGE="64bit/libcupsimage.so.2"
+			LIB64DIR="$exec_prefix/lib"
+			if test -d /usr/lib/hpux64; then
+				LIB64DIR="${LIB64DIR}/hpux64"
+			fi
+			UNINSTALL64="uninstall64bit"
+		fi
+		;;
+
 	IRIX)
 		if test "x$enable_32bit" = xyes; then
 			INSTALL32="install32bit"

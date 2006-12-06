@@ -36,10 +36,20 @@ if test x$enable_shared != xno; then
 			DSOFLAGS="$DSOFLAGS -Wl,-h,\`basename \$@\` -G \$(OPTIM)"
 			;;
 		HP-UX*)
-			LIBCUPS="libcups.sl.2"
-			LIBCUPSIMAGE="libcupsimage.sl.2"
-			DSO="\$(LD)"
-			DSOFLAGS="$DSOFLAGS -b -z +h \`basename \$@\`"
+			case "$uarch" in
+				ia64)
+					LIBCUPS="libcups.so.2"
+					LIBCUPSIMAGE="libcupsimage.so.2"
+					DSO="\$(CC)"
+					DSOFLAGS="$DSOFLAGS -Wl,-b,-z,+h,\`basename \$@\`"
+					;;
+				*)
+					LIBCUPS="libcups.sl.2"
+					LIBCUPSIMAGE="libcupsimage.sl.2"
+					DSO="\$(LD)"
+					DSOFLAGS="$DSOFLAGS -b -z +h \`basename \$@\`"
+					;;
+			esac
 			;;
 		IRIX)
 			LIBCUPS="libcups.so.2"
@@ -126,9 +136,18 @@ if test "$DSO" != ":"; then
 	case $uname in
                 HP-UX*)
 			# HP-UX needs the path, even for /usr/lib...
-                	DSOFLAGS="+s +b $libdir $DSOFLAGS"
-                	DSO32FLAGS="+s +b $LIB32DIR $DSO32FLAGS"
-                	DSO64FLAGS="+s +b $LIB64DIR $DSO64FLAGS"
+			case "$uarch" in
+				ia64)
+					DSOFLAGS="-Wl,+s,+b,$libdir $DSOFLAGS"
+					DSO32FLAGS="-Wl,+s,+b,$LIB32DIR $DSO32FLAGS"
+					DSO64FLAGS="-Wl,+s,+b,$LIB64DIR $DSO64FLAGS"
+					;;
+				*)
+                			DSOFLAGS="+s +b $libdir $DSOFLAGS"
+                			DSO32FLAGS="+s +b $LIB32DIR $DSO32FLAGS"
+                			DSO64FLAGS="+s +b $LIB64DIR $DSO64FLAGS"
+					;;
+			esac
                 	LDFLAGS="$LDFLAGS -Wl,+s,+b,$libdir"
                 	EXPORT_LDFLAGS="-Wl,+s,+b,$libdir"
 			;;
