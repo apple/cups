@@ -1321,7 +1321,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
   * Get the address...
   */
 
-  ip[0]   = ip[1]   = ip[2]   = ip[2]   = 0x00000000;
+  ip[0]   = ip[1]   = ip[2]   = ip[3]   = 0x00000000;
   mask[0] = mask[1] = mask[2] = mask[3] = 0xffffffff;
 
   if ((maskval = strchr(value, '/')) != NULL)
@@ -1506,7 +1506,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "get_addr_and_mask(value=\"%s\", "
-                  "ip=[%08x:%08x:%08x:%08x], mask=[%08x:%08x:%08x:%08x]",
+                  "ip=[%08x:%08x:%08x:%08x], mask=[%08x:%08x:%08x:%08x])",
              value, ip[0], ip[1], ip[2], ip[3], mask[0], mask[1], mask[2],
 	     mask[3]);
 
