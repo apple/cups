@@ -5331,7 +5331,10 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     return;
   }
   else
+  {
+    dtype &= CUPS_PRINTER_CLASS;
     dmask = CUPS_PRINTER_CLASS;
+  }
 
  /*
   * Check policy...
