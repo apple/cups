@@ -1,6 +1,34 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.8
+
+	- The SNMP backend no longer uses IPP with HP printers,
+	  as some recent firmware versions appear to not work
+	  (STR #2055)
+	- cupsMarkOptions() did not handle the
+	  multiple-document-handling option (STR #2135)
+	- lpstat did not show the local job ID of active printers
+	  (STR #2125)
+	- The backends incorrectly used STATUS:
+	  media-tray-empty-error messages for out-of-paper
+	  conditions (STR #2123, STR #2124)
+	- cupsGetPPD2() returned the wrong error when the PPD
+	  file did not exist (STR #2122)
+	- cupsDoAuthentication() did not translate the password
+	  prompt (STR #2121)
+	- httpGetLength2() did not handle error messages without
+	  content correctly (STR #2133)
+	- Added support for 32/64-bit libraries on HP-UX Itanium
+	  systems (STR #2115)
+	- Fixed a configure script problem with the 32/64-bit
+	  library support (STR #2114)
+	- The PostScript filter did not properly output document
+	  setup commands for reversed output (STR #2111)
+	- The scheduler did not parse IPv6 netmasks properly (STR
+	  #2117)
+
+
 CHANGES IN CUPS V1.2.7
 
 	- Documentation updates (STR #2089)
