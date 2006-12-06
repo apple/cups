@@ -1649,7 +1649,8 @@ cups_get_printer_uri(
     ippDelete(response);
   }
 
-  _cupsSetError(IPP_INTERNAL_ERROR, "No printer-uri found!");
+  if (cupsLastError() != IPP_NOT_FOUND)
+    _cupsSetError(IPP_INTERNAL_ERROR, "No printer-uri found!");
 
   *host     = '\0';
   *resource = '\0';
