@@ -202,7 +202,7 @@ _cupsImageReadPNM(
             else
             {
               bit = 128;
-              inptr ++;
+              outptr ++;
             }
           }
           break;
