@@ -1482,7 +1482,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     */
 
     if (job->hold_until < curtime)
-      job->hold_until += 24 * 60 * 60 * 60;
+      job->hold_until += 24 * 60 * 60;
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetJobHoldUntil: hold_until = %d",
