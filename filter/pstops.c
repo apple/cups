@@ -205,6 +205,9 @@ static size_t		skip_page(cups_file_t *fp, char *line, size_t linelen,
 				  size_t linesize);
 static void		start_nup(pstops_doc_t *doc, int number,
 				  int show_border, const int *bounding_box);
+static void		write_label_prolog(pstops_doc_t *doc, const char *label,
+			                   float bottom, float top,
+					   float width);
 static void		write_labels(pstops_doc_t *doc, int orient);
 
 
@@ -665,12 +668,12 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     else if (!strncmp(line, "%%For:", 6))
     {
       saw_for = 1;
-      printf("%s\n", line);
+      doc_printf(doc, "%s\n", line);
     }
     else if (!strncmp(line, "%%Title:", 8))
     {
       saw_title = 1;
-      printf("%s\n", line);
+      doc_printf(doc, "%s\n", line);
     }
     else if (!strncmp(line, "%cupsRotation:", 14))
     {
@@ -697,7 +700,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
       break;
     }
     else if (strncmp(line, "%!", 2) && strncmp(line, "%cups", 5))
-      printf("%s\n", line);
+      doc_printf(doc, "%s\n", line);
 
     if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
       break;
@@ -722,15 +725,15 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     * that are required...
     */
 
-    printf("%%%%Requirements: numcopies(%d)%s%s\n", doc->copies,
-           doc->collate ? " collate" : "",
-	   Duplex ? " duplex" : "");
+    doc_printf(doc, "%%%%Requirements: numcopies(%d)%s%s\n", doc->copies,
+               doc->collate ? " collate" : "",
+	       Duplex ? " duplex" : "");
 
    /*
     * Apple uses RBI comments for various non-PPD options...
     */
 
-    printf("%%RBINumCopies: %d\n", doc->copies);
+    doc_printf(doc, "%%RBINumCopies: %d\n", doc->copies);
   }
   else
   {
@@ -739,18 +742,18 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     */
 
     if (Duplex)
-      puts("%%Requirements: duplex");
+      doc_puts(doc, "%%Requirements: duplex\n");
 
    /*
     * Apple uses RBI comments for various non-PPD options...
     */
 
-    puts("%RBINumCopies: 1");
+    doc_puts(doc, "%RBINumCopies: 1\n");
   }
 
-  puts("%%Pages: (atend)");
-  puts("%%BoundingBox: (atend)");
-  puts("%%EndComments");
+  doc_puts(doc, "%%Pages: (atend)\n");
+  doc_puts(doc, "%%BoundingBox: (atend)\n");
+  doc_puts(doc, "%%EndComments\n");
 
   return (linelen);
 }
@@ -811,7 +814,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
   while (strncmp(line, "%%Page:", 7) && strncmp(line, "%%Trailer", 9))
   {
-    fwrite(line, 1, linelen, stdout);
+    doc_write(doc, line, linelen);
 
     if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
       break;
@@ -909,25 +912,36 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
       * for the JCL options...
       */
 
-      if (number)
+      if (number && doc->emit_jcl && ppd && ppd->jcl_end)
       {
-	if (!doc->saw_eof)
-	  puts("%%EOF");
+       /*
+        * Send the trailer...
+	*/
 
-	if (doc->emit_jcl)
-	{
-	  if (ppd && ppd->jcl_end)
-	    ppdEmitJCLEnd(ppd, stdout);
-	  else
-	    putchar(0x04);
+        puts("%%Trailer");
+	printf("%%%%Pages: %d\n", cupsArrayCount(doc->pages));
+	if (doc->number_up > 1 || doc->fitplot)
+	  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
+		 PageLeft, PageBottom, PageRight, PageTop);
+	else
+	  printf("%%%%BoundingBox: %d %d %d %d\n",
+		 doc->new_bounding_box[0], doc->new_bounding_box[1],
+		 doc->new_bounding_box[2], doc->new_bounding_box[3]);
+        puts("%%EOF");
 
-          ppdEmitJCL(ppd, stdout, doc->job_id, doc->user, doc->title);
-	}
+       /*
+        * Start a new document...
+	*/
+
+        ppdEmitJCLEnd(ppd, stdout);
+        ppdEmitJCL(ppd, stdout, doc->job_id, doc->user, doc->title);
 
 	puts("%!PS-Adobe-3.0");
-	puts("%%Pages: (atend)");
-	puts("%%BoundingBox: (atend)");
-	puts("%%EndComments");
+	
+        pageinfo = (pstops_page_t *)cupsArrayFirst(doc->pages);
+	copy_bytes(doc->temp, 0, pageinfo->offset);
+
+	number = 0;
       }
 
      /*
@@ -1639,13 +1653,13 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
     if (!strncmp(line, "%%BeginSetup", 12) || !strncmp(line, "%%Page:", 7))
       break;
 
-    fwrite(line, 1, linelen, stdout);
+    doc_write(doc, line, linelen);
 
     if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
       break;
   }
 
-  puts("%%BeginProlog");
+  doc_puts(doc, "%%BeginProlog\n");
 
   do_prolog(doc, ppd);
 
@@ -1658,7 +1672,7 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
           !strncmp(line, "%%Page:", 7))
         break;
 
-      fwrite(line, 1, linelen, stdout);
+      doc_write(doc, line, linelen);
     }
 
     if (!strncmp(line, "%%EndProlog", 11))
@@ -1667,7 +1681,7 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
       fputs("ERROR: Missing %%EndProlog!\n", stderr);
   }
 
-  puts("%%EndProlog");
+  doc_puts(doc, "%%EndProlog\n");
 
   return (linelen);
 }
@@ -1693,13 +1707,13 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
     if (!strncmp(line, "%%Page:", 7))
       break;
 
-    fwrite(line, 1, linelen, stdout);
+    doc_write(doc, line, linelen);
 
     if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
       break;
   }
 
-  puts("%%BeginSetup");
+  doc_puts(doc, "%%BeginSetup\n");
   
   do_setup(doc, ppd);
 
@@ -1720,7 +1734,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
                                              &(doc->options));
       }
       else if (strncmp(line, "%%BeginSetup", 12))
-        fwrite(line, 1, linelen, stdout);
+        doc_write(doc, line, linelen);
 
       if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
 	break;
@@ -1732,7 +1746,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
       fputs("ERROR: Missing %%EndSetup!\n", stderr);
   }
 
-  puts("%%EndSetup");
+  doc_puts(doc, "%%EndSetup\n");
 
   return (linelen);
 }
@@ -1795,18 +1809,25 @@ static void
 do_prolog(pstops_doc_t *doc,		/* I - Document information */
           ppd_file_t   *ppd)		/* I - PPD file */
 {
+  char	*ps;				/* PS commands */
+
+
  /*
   * Send the document prolog commands...
   */
 
   if (ppd && ppd->patches)
   {
-    puts("%%BeginFeature: *JobPatchFile 1");
-    puts(ppd->patches);
-    puts("%%EndFeature");
+    doc_puts(doc, "%%BeginFeature: *JobPatchFile 1\n");
+    doc_puts(doc, ppd->patches);
+    doc_puts(doc, "\n%%EndFeature\n");
   }
 
-  ppdEmit(ppd, stdout, PPD_ORDER_PROLOG);
+  if ((ps = ppdEmitString(ppd, PPD_ORDER_PROLOG, 0.0)) != NULL)
+  {
+    doc_puts(doc, ps);
+    free(ps);
+  }
 
  /*
   * Define ESPshowpage here so that applications that define their
@@ -1814,9 +1835,8 @@ do_prolog(pstops_doc_t *doc,		/* I - Document information */
   */
 
   if (doc->use_ESPshowpage)
-    puts("userdict/ESPshowpage/showpage load put\n"
-	 "userdict/showpage{}put");
-
+    doc_puts(doc, "userdict/ESPshowpage/showpage load put\n"
+	          "userdict/showpage{}put\n");
 }
 
 
@@ -1828,13 +1848,16 @@ static void
 do_setup(pstops_doc_t *doc,		/* I - Document information */
          ppd_file_t   *ppd)		/* I - PPD file */
 {
+  char	*ps;				/* PS commands */
+
+
  /*
   * Disable CTRL-D so that embedded files don't cause printing
   * errors...
   */
 
-  puts("% Disable CTRL-D as an end-of-file marker...");
-  puts("userdict dup(\\004)cvn{}put (\\004\\004)cvn{}put");
+  doc_puts(doc, "% Disable CTRL-D as an end-of-file marker...\n");
+  doc_puts(doc, "userdict dup(\\004)cvn{}put (\\004\\004)cvn{}put\n");
 
  /*
   * Mark any options from %%IncludeFeature: comments...
@@ -1846,8 +1869,17 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
   * Send all the printer-specific setup commands...
   */
 
-  ppdEmit(ppd, stdout, PPD_ORDER_DOCUMENT);
-  ppdEmit(ppd, stdout, PPD_ORDER_ANY);
+  if ((ps = ppdEmitString(ppd, PPD_ORDER_DOCUMENT, 0.0)) != NULL)
+  {
+    doc_puts(doc, ps);
+    free(ps);
+  }
+
+  if ((ps = ppdEmitString(ppd, PPD_ORDER_ANY, 0.0)) != NULL)
+  {
+    doc_puts(doc, ps);
+    free(ps);
+  }
 
  /*
   * Set the number of copies for the job...
@@ -1855,11 +1887,13 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
 
   if (doc->copies != 1 && (!doc->collate || !doc->slow_collate))
   {
-    printf("%%RBIBeginNonPPDFeature: *NumCopies %d\n", doc->copies);
-    printf("%d/languagelevel where{pop languagelevel 2 ge}{false}ifelse\n"
-           "{1 dict begin/NumCopies exch def currentdict end setpagedevice}\n"
-	   "{userdict/#copies 3 -1 roll put}ifelse\n", doc->copies);
-    puts("%RBIEndNonPPDFeature");
+    doc_printf(doc, "%%RBIBeginNonPPDFeature: *NumCopies %d\n", doc->copies);
+    doc_printf(doc,
+               "%d/languagelevel where{pop languagelevel 2 ge}{false}ifelse\n"
+               "{1 dict begin/NumCopies exch def currentdict end "
+	       "setpagedevice}\n"
+	       "{userdict/#copies 3 -1 roll put}ifelse\n", doc->copies);
+    doc_puts(doc, "%RBIEndNonPPDFeature\n");
   }
 
  /*
@@ -1867,7 +1901,7 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
   */
 
   if (doc->number_up > 1)
-    puts("userdict/setpagedevice{pop}bind put");
+    doc_puts(doc, "userdict/setpagedevice{pop}bind put\n");
 
  /*
   * Changes to the transfer function must be made AFTER any
@@ -1875,15 +1909,31 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
   */
 
   if (doc->gamma != 1.0f || doc->brightness != 1.0f)
-    printf("{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
-	   "ifelse %.3f mul } bind settransfer\n", doc->gamma,
-	   doc->brightness);
+    doc_printf(doc, "{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
+	            "ifelse %.3f mul } bind settransfer\n",
+	       doc->gamma, doc->brightness);
 
  /*
   * Make sure we have rectclip and rectstroke procedures of some sort...
   */
 
-  WriteCommon();
+  doc_puts(doc,
+           "% x y w h ESPrc - Clip to a rectangle.\n"
+	   "userdict/ESPrc/rectclip where{pop/rectclip load}\n"
+	   "{{newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto\n"
+	   "neg 0 rlineto closepath clip newpath}bind}ifelse put\n");
+
+  doc_puts(doc,
+           "% x y w h ESPrf - Fill a rectangle.\n"
+	   "userdict/ESPrf/rectfill where{pop/rectfill load}\n"
+	   "{{gsave newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto\n"
+	   "neg 0 rlineto closepath fill grestore}bind}ifelse put\n");
+
+  doc_puts(doc,
+           "% x y w h ESPrs - Stroke a rectangle.\n"
+	   "userdict/ESPrs/rectstroke where{pop/rectstroke load}\n"
+	   "{{gsave newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto\n"
+	   "neg 0 rlineto closepath stroke grestore}bind}ifelse put\n");
 
  /*
   * Write the page and label prologs...
@@ -1897,13 +1947,14 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
     */
 
     if (Orientation & 1)
-      WriteLabelProlog(doc->page_label, PageBottom,
-                       PageWidth - PageLength + PageTop, PageLength);
+      write_label_prolog(doc, doc->page_label, PageBottom,
+                         PageWidth - PageLength + PageTop, PageLength);
     else
-      WriteLabelProlog(doc->page_label, PageLeft, PageRight, PageLength);
+      write_label_prolog(doc, doc->page_label, PageLeft, PageRight,
+                         PageLength);
   }
   else
-    WriteLabelProlog(doc->page_label, PageBottom, PageTop, PageWidth);
+    write_label_prolog(doc, doc->page_label, PageBottom, PageTop, PageWidth);
 }
 
 
@@ -3059,6 +3110,123 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 
     doc_printf(doc, "0 0 %d %d ESPrc\n", bboxw, bboxl);
   }
+}
+
+
+/*
+ * 'write_label_prolog()' - Write the prolog with the classification
+ *                          and page label.
+ */
+
+static void
+write_label_prolog(pstops_doc_t *doc,	/* I - Document info */
+                   const char   *label,	/* I - Page label */
+		   float        bottom,	/* I - Bottom position in points */
+		   float        top,	/* I - Top position in points */
+		   float        width)	/* I - Width in points */
+{
+  const char	*classification;	/* CLASSIFICATION environment variable */
+  const char	*ptr;			/* Temporary string pointer */
+
+
+ /*
+  * First get the current classification...
+  */
+
+  if ((classification = getenv("CLASSIFICATION")) == NULL)
+    classification = "";
+  if (strcmp(classification, "none") == 0)
+    classification = "";
+
+ /*
+  * If there is nothing to show, bind an empty 'write labels' procedure
+  * and return...
+  */
+
+  if (!classification[0] && (label == NULL || !label[0]))
+  {
+    doc_puts(doc, "userdict/ESPwl{}bind put\n");
+    return;
+  }
+
+ /*
+  * Set the classification + page label string...
+  */
+
+  doc_puts(doc, "userdict");
+  if (!strcmp(classification, "confidential"))
+    doc_puts(doc, "/ESPpl(CONFIDENTIAL");
+  else if (!strcmp(classification, "classified"))
+    doc_puts(doc, "/ESPpl(CLASSIFIED");
+  else if (!strcmp(classification, "secret"))
+    doc_puts(doc, "/ESPpl(SECRET");
+  else if (!strcmp(classification, "topsecret"))
+    doc_puts(doc, "/ESPpl(TOP SECRET");
+  else if (!strcmp(classification, "unclassified"))
+    doc_puts(doc, "/ESPpl(UNCLASSIFIED");
+  else
+  {
+    doc_puts(doc, "/ESPpl(");
+
+    for (ptr = classification; *ptr; ptr ++)
+    {
+      if (*ptr < 32 || *ptr > 126)
+        doc_printf(doc, "\\%03o", *ptr);
+      else if (*ptr == '_')
+        doc_puts(doc, " ");
+      else if (*ptr == '(' || *ptr == ')' || *ptr == '\\')
+	doc_printf(doc, "\\%c", *ptr);
+      else
+        doc_printf(doc, "%c", *ptr);
+    }
+  }
+
+  if (label)
+  {
+    if (classification[0])
+      doc_puts(doc, " - ");
+
+   /*
+    * Quote the label string as needed...
+    */
+
+    for (ptr = label; *ptr; ptr ++)
+    {
+      if (*ptr < 32 || *ptr > 126)
+        doc_printf(doc, "\\%03o", *ptr);
+      else if (*ptr == '(' || *ptr == ')' || *ptr == '\\')
+	doc_printf(doc, "\\%c", *ptr);
+      else
+        doc_printf(doc, "%c", *ptr);
+    }
+  }
+
+  doc_puts(doc, ")put\n");
+
+ /*
+  * Then get a 14 point Helvetica-Bold font...
+  */
+
+  doc_puts(doc, "userdict/ESPpf /Helvetica-Bold findfont 14 scalefont put\n");
+
+ /*
+  * Finally, the procedure to write the labels on the page...
+  */
+
+  doc_puts(doc, "userdict/ESPwl{\n");
+  doc_puts(doc, "  ESPpf setfont\n");
+  doc_printf(doc, "  ESPpl stringwidth pop dup 12 add exch -0.5 mul %.0f add\n",
+             width * 0.5f);
+  doc_puts(doc, "  1 setgray\n");
+  doc_printf(doc, "  dup 6 sub %.0f 3 index 20 ESPrf\n", bottom - 2.0);
+  doc_printf(doc, "  dup 6 sub %.0f 3 index 20 ESPrf\n", top - 18.0);
+  doc_puts(doc, "  0 setgray\n");
+  doc_printf(doc, "  dup 6 sub %.0f 3 index 20 ESPrs\n", bottom - 2.0);
+  doc_printf(doc, "  dup 6 sub %.0f 3 index 20 ESPrs\n", top - 18.0);
+  doc_printf(doc, "  dup %.0f moveto ESPpl show\n", bottom + 2.0);
+  doc_printf(doc, "  %.0f moveto ESPpl show\n", top - 14.0);
+  doc_puts(doc, "pop\n");
+  doc_puts(doc, "}bind put\n");
 }
 
 
