@@ -33,6 +33,7 @@
  */
 
 #  include "image.h"
+#  include "raster.h"
 #  include <cups/cups.h>
 #  include <cups/debug.h>
 #  include <cups/string.h>
@@ -212,6 +213,10 @@ extern cups_izoom_t	*_cupsImageZoomNew(cups_image_t *img, int xc0, int yc0,
 			                   int xc1, int yc1, int xsize,
 					   int ysize, int rotated,
 					   cups_iztype_t type);
+
+extern int		_cupsRasterExecPS(cups_page_header2_t *h,
+			                  int *preferred_bits,
+			                  const char *code);
 
 
 #endif /* !_CUPS_IMAGE_PRIVATE_H_ */

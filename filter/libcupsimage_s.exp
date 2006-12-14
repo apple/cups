@@ -13,3 +13,4 @@ _cupsImageReadTIFF
 _cupsImageZoomDelete
 _cupsImageZoomFill
 _cupsImageZoomNew
+_cupsRasterExecPS

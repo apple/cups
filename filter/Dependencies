@@ -71,9 +71,10 @@ image-zoom.o: ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 image.o: image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
 image.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 image.o: ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
-interpret.o: ../cups/string.h ../config.h raster.h ../cups/cups.h
-interpret.o: ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
-interpret.o: ../cups/file.h ../cups/language.h
+interpret.o: ../cups/string.h ../config.h image-private.h image.h raster.h
+interpret.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+interpret.o: ../cups/array.h ../cups/file.h ../cups/language.h
+interpret.o: ../cups/debug.h
 raster.o: raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
 raster.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 raster.o: ../cups/string.h ../config.h
@@ -198,9 +199,10 @@ image-zoom.32.o: image-zoom.c  ../cups/language.h ../cups/debug.h ../cups/string
 image.32.o: image.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
 image.32.o: image.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 image.32.o: image.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
-interpret.32.o: interpret.c  ../cups/string.h ../config.h raster.h ../cups/cups.h
-interpret.32.o: interpret.c  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
-interpret.32.o: interpret.c  ../cups/file.h ../cups/language.h
+interpret.32.o: interpret.c  ../cups/string.h ../config.h image-private.h image.h raster.h
+interpret.32.o: interpret.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+interpret.32.o: interpret.c  ../cups/array.h ../cups/file.h ../cups/language.h
+interpret.32.o: interpret.c  ../cups/debug.h
 raster.32.o: raster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
 raster.32.o: raster.c  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 raster.32.o: raster.c  ../cups/string.h ../config.h
@@ -325,9 +327,10 @@ image-zoom.64.o: image-zoom.c  ../cups/language.h ../cups/debug.h ../cups/string
 image.64.o: image.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
 image.64.o: image.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 image.64.o: image.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
-interpret.64.o: interpret.c  ../cups/string.h ../config.h raster.h ../cups/cups.h
-interpret.64.o: interpret.c  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
-interpret.64.o: interpret.c  ../cups/file.h ../cups/language.h
+interpret.64.o: interpret.c  ../cups/string.h ../config.h image-private.h image.h raster.h
+interpret.64.o: interpret.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+interpret.64.o: interpret.c  ../cups/array.h ../cups/file.h ../cups/language.h
+interpret.64.o: interpret.c  ../cups/debug.h
 raster.64.o: raster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
 raster.64.o: raster.c  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 raster.64.o: raster.c  ../cups/string.h ../config.h

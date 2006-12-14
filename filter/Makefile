@@ -26,6 +26,7 @@
 
 include ../Makedefs
 
+
 FILTERS	=	gziptoany hpgltops texttops pstops $(IMGFILTERS) \
 		rastertolabel rastertoepson rastertohp
 TARGETS	=	$(FILTERS) \
@@ -355,9 +356,10 @@ rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 # testraster
 #
 
-testraster:	testraster.o raster.o
+testraster:	testraster.o ../cups/libcups.a libcupsimage.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testraster.o raster.o
+	$(CC) $(LDFLAGS) -o $@ testraster.o libcupsimage.a ../cups/libcups.a \
+		$(IMGLIBS) $(DSOLIBS) $(LIBS)
 
 
 #

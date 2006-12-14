@@ -25,9 +25,6 @@
  *
  * Contents:
  *
- *   cupsRasterInterpretPPD() - Interpret PPD commands to create a page header.
- *   exec_code()              - Execute PostScript setpagedevice commands as
- *                              appropriate.
  */
 
 /*
@@ -35,26 +32,74 @@
  */
 
 #include <cups/string.h>
-#include "raster.h"
+#include "image-private.h"
 #include <stdlib.h>
 
 
 /*
- * Value types for PS code...
+ * Stack values for the PostScript mini-interpreter...
  */
 
-#define CUPS_TYPE_NUMBER	0	/* Integer or real number */
-#define CUPS_TYPE_NAME		1	/* Name */
-#define CUPS_TYPE_STRING	2	/* String */
-#define CUPS_TYPE_ARRAY		3	/* Array of integers */
+typedef enum
+{
+  CUPS_PS_NAME,
+  CUPS_PS_NUMBER,
+  CUPS_PS_STRING,
+  CUPS_PS_BOOLEAN,
+  CUPS_PS_NULL,
+  CUPS_PS_START_ARRAY,
+  CUPS_PS_END_ARRAY,
+  CUPS_PS_START_DICT,
+  CUPS_PS_END_DICT,
+  CUPS_PS_COPY,
+  CUPS_PS_DUP,
+  CUPS_PS_INDEX,
+  CUPS_PS_POP,
+  CUPS_PS_ROLL,
+  CUPS_PS_SETPAGEDEVICE,
+  CUPS_PS_OTHER
+} _cups_ps_type_t;
+
+typedef struct
+{
+  _cups_ps_type_t	type;		/* Object type */
+  union
+  {
+    int		boolean;		/* Boolean value */
+    char	name[64];		/* Name value */
+    double	number;			/* Number value */
+    char	other[64];		/* Other operator */
+    char	string[64];		/* Sring value */
+  }			value;		/* Value */
+} _cups_ps_obj_t;
+
+typedef struct
+{
+  int			num_objs,	/* Number of objects on stack */
+			alloc_objs;	/* Number of allocated objects */
+  _cups_ps_obj_t	*objs;		/* Objects in stack */
+} _cups_ps_stack_t;
 
 
 /*
  * Local functions...
  */
 
-static int	exec_code(cups_page_header2_t *header, int *preferred_bits,
-		          const char *code);
+static int		copy_stack(_cups_ps_stack_t *st, int count);
+static void		delete_stack(_cups_ps_stack_t *st);
+static _cups_ps_obj_t	*index_stack(_cups_ps_stack_t *st, int n);
+static _cups_ps_stack_t	*new_stack(void);
+static _cups_ps_obj_t	*pop_stack(_cups_ps_stack_t *st);
+static _cups_ps_obj_t	*push_stack(_cups_ps_stack_t *st,
+			            _cups_ps_obj_t *obj);
+static int		roll_stack(_cups_ps_stack_t *st, int s, int c);
+static _cups_ps_obj_t	*scan_ps(_cups_ps_stack_t *st, char **ptr);
+static int		set_page_device(_cups_ps_stack_t *st,
+			                cups_page_header2_t *h,
+			                int *preferred_bits);
+#ifdef DEBUG
+static void		DEBUG_object(_cups_ps_obj_t *obj);
+#endif /* DEBUG */
 
 
 /*
@@ -71,6 +116,10 @@ static int	exec_code(cups_page_header2_t *header, int *preferred_bits,
  * supported raster format and then returns 0 on success and -1 if the
  * requested attributes cannot be supported.
  *
+ * cupsRasterInterpretPPD() supports a subset of the PostScript language.
+ * Currently only the [, ], <<, >>, copy, dup, index, pop, roll, and
+ * setpagedevice operators are supported.
+ *
  * @since CUPS 1.2@
  */
 
@@ -82,11 +131,9 @@ cupsRasterInterpretPPD(
     cups_option_t       *options,	/* I - Options */
     cups_interpret_cb_t func)		/* I - Optional page header callback */
 {
-  int		i;			/* Looping var */
   int		status;			/* Cummulative status */
-  int		count;			/* Number of marked choices */
+  char		*code;			/* Code to run */
   const char	*val;			/* Option value */
-  ppd_choice_t	**choices;		/* List of marked choices */
   ppd_size_t	*size;			/* Current size */
   float		left,			/* Left position */
 		bottom,			/* Bottom position */
@@ -140,34 +187,34 @@ cupsRasterInterpretPPD(
     */
 
     if (ppd->patches)
-      status |= exec_code(h, &preferred_bits, ppd->patches);
+      status |= _cupsRasterExecPS(h, &preferred_bits, ppd->patches);
 
    /*
     * Then apply printer options in the proper order...
     */
 
-    if ((count = ppdCollect(ppd, PPD_ORDER_DOCUMENT, &choices)) > 0)
+    if ((code = ppdEmitString(ppd, PPD_ORDER_DOCUMENT, 0.0)) != NULL)
     {
-      for (i = 0; i < count; i ++)
-	status |= exec_code(h, &preferred_bits, choices[i]->code);
+      status |= _cupsRasterExecPS(h, &preferred_bits, code);
+      free(code);
     }
 
-    if ((count = ppdCollect(ppd, PPD_ORDER_ANY, &choices)) > 0)
+    if ((code = ppdEmitString(ppd, PPD_ORDER_ANY, 0.0)) != NULL)
     {
-      for (i = 0; i < count; i ++)
-	status |= exec_code(h, &preferred_bits, choices[i]->code);
+      status |= _cupsRasterExecPS(h, &preferred_bits, code);
+      free(code);
     }
 
-    if ((count = ppdCollect(ppd, PPD_ORDER_PROLOG, &choices)) > 0)
+    if ((code = ppdEmitString(ppd, PPD_ORDER_PROLOG, 0.0)) != NULL)
     {
-      for (i = 0; i < count; i ++)
-	status |= exec_code(h, &preferred_bits, choices[i]->code);
+      status |= _cupsRasterExecPS(h, &preferred_bits, code);
+      free(code);
     }
 
-    if ((count = ppdCollect(ppd, PPD_ORDER_PAGE, &choices)) > 0)
+    if ((code = ppdEmitString(ppd, PPD_ORDER_PAGE, 0.0)) != NULL)
     {
-      for (i = 0; i < count; i ++)
-	status |= exec_code(h, &preferred_bits, choices[i]->code);
+      status |= _cupsRasterExecPS(h, &preferred_bits, code);
+      free(code);
     }
   }
 
@@ -340,267 +387,140 @@ cupsRasterInterpretPPD(
 
 
 /*
- * 'exec_code()' - Execute PostScript setpagedevice commands as appropriate.
+ * '_cupsRasterExecPS()' - Execute PostScript code to initialize a page header.
  */
 
-static int				/* O - 0 on success, -1 on error */
-exec_code(
+int					/* O - 0 on success, -1 on error */
+_cupsRasterExecPS(
     cups_page_header2_t *h,		/* O - Page header */
     int                 *preferred_bits,/* O - Preferred bits per color */
-    const char          *code)		/* I - Option choice to execute */
+    const char          *code)		/* I - PS code to execute */
 {
-  int	i;				/* Index into array */
-  int	type;				/* Type of value */
-  char	*ptr,				/* Pointer into name/value string */
-	name[255],			/* Name of pagedevice entry */
-	value[1024];			/* Value of pagedevice entry */
+  _cups_ps_stack_t	*st;		/* PostScript value stack */
+  _cups_ps_obj_t	*obj;		/* Object from top of stack */
+  char			*codecopy,	/* Copy of code */
+			*codeptr;	/* Pointer into copy of code */
 
+
+  DEBUG_printf(("_cupsRasterExecPS(h=%p, preferred_bits=%p, code=\"%s\")\n",
+                h, preferred_bits, code ? code : "(null)"));
 
  /*
   * Range check input...
   */
 
-  if (!code || !h)
+  if (!h || !code)
     return (-1);
 
  /*
-  * Parse the code string...
+  * Copy the PostScript code and create a stack...
   */
 
-  while (*code)
+  if ((codecopy = strdup(code)) == NULL)
+    return (-1);
+
+  if ((st = new_stack()) == NULL)
   {
-   /*
-    * Search for the start of a dictionary name...
-    */
-
-    while (*code && *code != '/')
-      code ++;
-
-    if (!*code)
-      break;
-
-   /*
-    * Get the name...
-    */
-
-    code ++;
-    for (ptr = name; isalnum(*code & 255); code ++)
-      if (ptr < (name + sizeof(name) - 1))
-        *ptr++ = *code;
-      else
-        return (-1);
-
-    *ptr = '\0';
-
-   /*
-    * Then parse the value as needed...
-    */
-
-    while (isspace(*code & 255))
-      code ++;
-
-    if (!*code)
-      break;
-
-    if (*code == '[')
-    {
-     /*
-      * Read array of values...
-      */
-
-      type = CUPS_TYPE_ARRAY;
-
-      for (ptr = value; *code && *code != ']'; code ++)
-        if (ptr < (value + sizeof(value) - 1))
-	  *ptr++ = *code;
-	else
-	  return (-1);
-
-      if (*code == ']')
-        *ptr++ = *code++;
-
-      *ptr = '\0';
-    }
-    else if (*code == '(')
-    {
-     /*
-      * Read string value...
-      */
-
-      type = CUPS_TYPE_STRING;
-
-      for (ptr = value; *code && *code != ')'; code ++)
-        if (ptr < (value + sizeof(value) - 1))
-	  *ptr++ = *code;
-	else
-	  return (-1);
-
-      if (*code == ')')
-        *ptr++ = *code++;
-
-      *ptr = '\0';
-    }
-    else if (isdigit(*code & 255) || *code == '-' || *code == '.')
-    {
-     /*
-      * Read single number...
-      */
-
-      type = CUPS_TYPE_NUMBER;
-
-      for (ptr = value;
-           isdigit(*code & 255) || *code == '-' || *code == '.';
-	   code ++)
-        if (ptr < (value + sizeof(value) - 1))
-	  *ptr++ = *code;
-	else
-	  return (-1);
-
-      *ptr = '\0';
-    }
-    else
-    {
-     /*
-      * Read a single name...
-      */
-
-      type = CUPS_TYPE_NAME;
-
-      for (ptr = value; isalnum(*code & 255) || *code == '_'; code ++) 
-        if (ptr < (value + sizeof(value) - 1))
-	  *ptr++ = *code;
-	else
-	  return (-1);
-
-      *ptr = '\0';
-    }
-
-   /*
-    * Assign the value as needed...
-    */
-
-    if (!strcmp(name, "MediaClass") && type == CUPS_TYPE_STRING)
-    {
-      if (sscanf(value, "(%63[^)])", h->MediaClass) != 1)
-        return (-1);
-    }
-    else if (!strcmp(name, "MediaColor") && type == CUPS_TYPE_STRING)
-    {
-      if (sscanf(value, "(%63[^)])", h->MediaColor) != 1)
-        return (-1);
-    }
-    else if (!strcmp(name, "MediaType") && type == CUPS_TYPE_STRING)
-    {
-      if (sscanf(value, "(%63[^)])", h->MediaType) != 1)
-        return (-1);
-    }
-    else if (!strcmp(name, "OutputType") && type == CUPS_TYPE_STRING)
-    {
-      if (sscanf(value, "(%63[^)])", h->OutputType) != 1)
-        return (-1);
-    }
-    else if (!strcmp(name, "AdvanceDistance") && type == CUPS_TYPE_NUMBER)
-      h->AdvanceDistance = atoi(value);
-    else if (!strcmp(name, "AdvanceMedia") && type == CUPS_TYPE_NUMBER)
-      h->AdvanceMedia = atoi(value);
-    else if (!strcmp(name, "Collate") && type == CUPS_TYPE_NAME)
-      h->Collate = !strcmp(value, "true");
-    else if (!strcmp(name, "CutMedia") && type == CUPS_TYPE_NUMBER)
-      h->CutMedia = (cups_cut_t)atoi(value);
-    else if (!strcmp(name, "Duplex") && type == CUPS_TYPE_NAME)
-      h->Duplex = !strcmp(value, "true");
-    else if (!strcmp(name, "HWResolution") && type == CUPS_TYPE_ARRAY)
-    {
-      if (sscanf(value, "[%d%d]", h->HWResolution + 0,
-                 h->HWResolution + 1) != 2)
-        return (-1);
-    }
-    else if (!strcmp(name, "InsertSheet") && type == CUPS_TYPE_NAME)
-      h->InsertSheet = !strcmp(value, "true");
-    else if (!strcmp(name, "Jog") && type == CUPS_TYPE_NUMBER)
-      h->Jog = atoi(value);
-    else if (!strcmp(name, "LeadingEdge") && type == CUPS_TYPE_NUMBER)
-      h->LeadingEdge = atoi(value);
-    else if (!strcmp(name, "ManualFeed") && type == CUPS_TYPE_NAME)
-      h->ManualFeed = !strcmp(value, "true");
-    else if ((!strcmp(name, "cupsMediaPosition") || /* Compatibility */
-              !strcmp(name, "MediaPosition")) && type == CUPS_TYPE_NUMBER)
-      h->MediaPosition = atoi(value);
-    else if (!strcmp(name, "MediaWeight") && type == CUPS_TYPE_NUMBER)
-      h->MediaWeight = atoi(value);
-    else if (!strcmp(name, "MirrorPrint") && type == CUPS_TYPE_NAME)
-      h->MirrorPrint = !strcmp(value, "true");
-    else if (!strcmp(name, "NegativePrint") && type == CUPS_TYPE_NAME)
-      h->NegativePrint = !strcmp(value, "true");
-    else if (!strcmp(name, "Orientation") && type == CUPS_TYPE_NUMBER)
-      h->Orientation = atoi(value);
-    else if (!strcmp(name, "OutputFaceUp") && type == CUPS_TYPE_NAME)
-      h->OutputFaceUp = !strcmp(value, "true");
-    else if (!strcmp(name, "PageSize") && type == CUPS_TYPE_ARRAY)
-    {
-      if (sscanf(value, "[%f%f]", h->cupsPageSize + 0, h->cupsPageSize + 1) != 2)
-        return (-1);
-    }
-    else if (!strcmp(name, "Separations") && type == CUPS_TYPE_NAME)
-      h->Separations = !strcmp(value, "true");
-    else if (!strcmp(name, "TraySwitch") && type == CUPS_TYPE_NAME)
-      h->TraySwitch = !strcmp(value, "true");
-    else if (!strcmp(name, "Tumble") && type == CUPS_TYPE_NAME)
-      h->Tumble = !strcmp(value, "true");
-    else if (!strcmp(name, "cupsMediaType") && type == CUPS_TYPE_NUMBER)
-      h->cupsMediaType = atoi(value);
-    else if (!strcmp(name, "cupsBitsPerColor") && type == CUPS_TYPE_NUMBER)
-      h->cupsBitsPerColor = atoi(value);
-    else if (!strcmp(name, "cupsPreferredBitsPerColor") && type == CUPS_TYPE_NUMBER)
-      *preferred_bits = atoi(value);
-    else if (!strcmp(name, "cupsColorOrder") && type == CUPS_TYPE_NUMBER)
-      h->cupsColorOrder = (cups_order_t)atoi(value);
-    else if (!strcmp(name, "cupsColorSpace") && type == CUPS_TYPE_NUMBER)
-      h->cupsColorSpace = (cups_cspace_t)atoi(value);
-    else if (!strcmp(name, "cupsCompression") && type == CUPS_TYPE_NUMBER)
-      h->cupsCompression = atoi(value);
-    else if (!strcmp(name, "cupsRowCount") && type == CUPS_TYPE_NUMBER)
-      h->cupsRowCount = atoi(value);
-    else if (!strcmp(name, "cupsRowFeed") && type == CUPS_TYPE_NUMBER)
-      h->cupsRowFeed = atoi(value);
-    else if (!strcmp(name, "cupsRowStep") && type == CUPS_TYPE_NUMBER)
-      h->cupsRowStep = atoi(value);
-    else if (!strcmp(name, "cupsBorderlessScalingFactor") &&
-             type == CUPS_TYPE_NUMBER)
-      h->cupsBorderlessScalingFactor = atof(value);
-    else if (!strncmp(name, "cupsInteger", 11) && type == CUPS_TYPE_NUMBER)
-    {
-      if ((i = atoi(name + 11)) >= 0 || i > 15)
-        return (-1);
-
-      h->cupsInteger[i] = atoi(value);
-    }
-    else if (!strncmp(name, "cupsReal", 8) && type == CUPS_TYPE_NUMBER)
-    {
-      if ((i = atoi(name + 8)) >= 0 || i > 15)
-        return (-1);
-
-      h->cupsReal[i] = atof(value);
-    }
-    else if (!strncmp(name, "cupsString", 10) && type == CUPS_TYPE_STRING)
-    {
-      if ((i = atoi(name + 10)) >= 0 || i > 15)
-        return (-1);
-
-      if (sscanf(value, "(%63[^)])", h->cupsString[i]) != 1)
-        return (-1);
-    }
-    else if (!strcmp(name, "cupsMarkerType") && type == CUPS_TYPE_STRING)
-    {
-      if (sscanf(value, "(%63[^)])", h->cupsMarkerType) != 1)
-        return (-1);
-    }
-    else if (!strcmp(name, "cupsRenderingIntent") && type == CUPS_TYPE_STRING)
-    {
-      if (sscanf(value, "(%63[^)])", h->cupsRenderingIntent) != 1)
-        return (-1);
-    }
+    free(codecopy);
+    return (-1);
   }
+
+ /*
+  * Parse the PS string until we run out of data...
+  */
+
+  codeptr = codecopy;
+
+  while ((obj = scan_ps(st, &codeptr)) != NULL)
+  {
+#ifdef DEBUG
+    printf("    (%d): ", st->num_objs);
+    DEBUG_object(obj);
+    putchar('\n');
+#endif /* DEBUG */
+
+    switch (obj->type)
+    {
+      default :
+          /* Do nothing for regular values */
+	  break;
+
+      case CUPS_PS_COPY :
+          pop_stack(st);
+	  if ((obj = pop_stack(st)) != NULL)
+	    copy_stack(st, (int)obj->value.number);
+          break;
+
+      case CUPS_PS_DUP :
+          pop_stack(st);
+	  copy_stack(st, 1);
+          break;
+
+      case CUPS_PS_INDEX :
+          pop_stack(st);
+	  if ((obj = pop_stack(st)) != NULL)
+	    index_stack(st, (int)obj->value.number);
+          break;
+
+      case CUPS_PS_POP :
+          pop_stack(st);
+          pop_stack(st);
+          break;
+
+      case CUPS_PS_ROLL :
+          pop_stack(st);
+	  if ((obj = pop_stack(st)) != NULL)
+	  {
+            int		c;		/* Count */
+
+
+            c = (int)obj->value.number;
+
+	    if ((obj = pop_stack(st)) != NULL)
+	      roll_stack(st, (int)obj->value.number, c);
+	  }
+          break;
+
+      case CUPS_PS_SETPAGEDEVICE :
+          pop_stack(st);
+	  set_page_device(st, h, preferred_bits);
+          break;
+
+      case CUPS_PS_OTHER :
+          DEBUG_printf(("    Unknown operator \"%s\"!\n", obj->value.other));
+          break;
+    }
+
+    if (obj->type == CUPS_PS_OTHER)
+      break;
+  }
+
+ /*
+  * Cleanup...
+  */
+
+  free(codecopy);
+
+  if (st->num_objs > 0)
+  {
+#ifdef DEBUG
+    fputs("    Stack not empty:", stdout);
+
+    for (obj = st->objs + st->num_objs - 1; obj >= st->objs; obj --)
+    {
+      putchar(' ');
+      DEBUG_object(obj);
+    }
+
+    putchar('\n');
+#endif /* DEBUG */
+
+    delete_stack(st);
+
+    return (-1);
+  }
+
+  delete_stack(st);
 
  /*
   * Return success...
@@ -608,6 +528,842 @@ exec_code(
 
   return (0);
 }
+
+
+/*
+ * 'copy_stack()' - Copy the top N stack objects.
+ */
+
+static int				/* O - 0 on success, -1 on error */
+copy_stack(_cups_ps_stack_t *st,	/* I - Stack */
+           int              c)		/* I - Number of objects to copy */
+{
+  int	n;				/* Index */
+
+
+  if (c < 0)
+    return (-1);
+  else if (c == 0)
+    return (0);
+
+  if ((n = st->num_objs - c) < 0)
+    return (-1);
+
+  while (c > 0)
+  {
+    if (!push_stack(st, st->objs + n))
+      return (-1);
+
+    n ++;
+    c --;
+  }
+
+  return (0);
+}
+
+
+/*
+ * 'delete_stack()' - Free memory used by a stack.
+ */
+
+static void
+delete_stack(_cups_ps_stack_t *st)	/* I - Stack */
+{
+  free(st->objs);
+  free(st);
+}
+
+
+/*
+ * 'index_stack()' - Copy the Nth value on the stack.
+ */
+
+static _cups_ps_obj_t	*		/* O - New object */
+index_stack(_cups_ps_stack_t *st,	/* I - Stack */
+            int              n)		/* I - Object index */
+{
+  if (n < 0 || (n = st->num_objs - n - 1) < 0)
+    return (NULL);
+
+  return (push_stack(st, st->objs + n));
+}
+
+
+/*
+ * 'new_stack()' - Create a new stack.
+ */
+
+static _cups_ps_stack_t	*		/* O - New stack */
+new_stack(void)
+{
+  _cups_ps_stack_t	*st;		/* New stack */
+
+
+  if ((st = calloc(1, sizeof(_cups_ps_stack_t))) == NULL)
+    return (NULL);
+
+  st->alloc_objs = 32;
+
+  if ((st->objs = calloc(32, sizeof(_cups_ps_obj_t))) == NULL)
+  {
+    free(st);
+    return (NULL);
+  }
+  else
+    return (st);
+}
+
+
+/*
+ * 'pop_stock()' - Pop the top object off the stack.
+ */
+
+static _cups_ps_obj_t	*		/* O - Object */
+pop_stack(_cups_ps_stack_t *st)		/* I - Stack */
+{
+  if (st->num_objs > 0)
+  {
+    st->num_objs --;
+
+    return (st->objs + st->num_objs);
+  }
+  else
+    return (NULL);
+}
+
+
+/*
+ * 'push_stack()' - Push an object on the stack.
+ */
+
+static _cups_ps_obj_t	*		/* O - New object */
+push_stack(_cups_ps_stack_t *st,	/* I - Stack */
+           _cups_ps_obj_t   *obj)	/* I - Object */
+{
+  _cups_ps_obj_t	*temp;		/* New object */
+
+
+  if (st->num_objs >= st->alloc_objs)
+  {
+
+
+    st->alloc_objs += 32;
+
+    if ((temp = realloc(st->objs, st->alloc_objs *
+                                  sizeof(_cups_ps_obj_t))) == NULL)
+      return (NULL);
+
+    st->objs = temp;
+    memset(temp + st->num_objs, 0, 32 * sizeof(_cups_ps_obj_t));
+  }
+
+  temp = st->objs + st->num_objs;
+  st->num_objs ++;
+
+  memcpy(temp, obj, sizeof(_cups_ps_obj_t));
+
+  return (temp);
+}
+
+
+/*
+ * 'roll_stack()' - Rotate stack objects.
+ */
+
+static int				/* O - 0 on success, -1 on error */
+roll_stack(_cups_ps_stack_t *st,	/* I - Stack */
+           int              s,		/* I - Amount to shift */
+	   int              c)		/* I - Number of objects */
+{
+  _cups_ps_obj_t	*temp;		/* Temporary array of objects */
+  int			n;		/* Index into array */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (c < 0)
+    return (-1);
+  else if (c == 0)
+    return (0);
+
+  if ((n = st->num_objs - c) < 0)
+    return (-1);
+
+  s %= c;
+
+  if (s == 0)
+    return (0);
+
+ /*
+  * Copy N objects and move things around...
+  */
+
+  if (s < 0)
+  {
+   /*
+    * Shift down...
+    */
+
+    s = -s;
+
+    if ((temp = calloc(s, sizeof(_cups_ps_obj_t))) == NULL)
+      return (-1);
+
+    memcpy(temp, st->objs + n, s * sizeof(_cups_ps_obj_t));
+    memmove(st->objs + n, st->objs + n + s, (c - s) * sizeof(_cups_ps_obj_t));
+    memcpy(st->objs + n + c - s, temp, s * sizeof(_cups_ps_obj_t));
+  }
+  else
+  {
+   /*
+    * Shift up...
+    */
+
+    if ((temp = calloc(s, sizeof(_cups_ps_obj_t))) == NULL)
+      return (-1);
+
+    memcpy(temp, st->objs + n + c - s, s * sizeof(_cups_ps_obj_t));
+    memmove(st->objs + n + s, st->objs + n,
+            (c - s) * sizeof(_cups_ps_obj_t));
+    memcpy(st->objs + n, temp, s * sizeof(_cups_ps_obj_t));
+  }
+
+  free(temp);
+
+  return (0);
+}
+
+
+/*
+ * 'scan_ps()' - Scan a string for the next PS object.
+ */
+
+static _cups_ps_obj_t	*		/* O  - New object or NULL on EOF */
+scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
+        char             **ptr)		/* IO - String pointer */
+{
+  _cups_ps_obj_t	obj;		/* Current object */
+  char			*start,		/* Start of object */
+			*cur,		/* Current position */
+			*valptr,	/* Pointer into value string */
+			*valend;	/* End of value string */
+  int			parens;		/* Parenthesis nesting level */
+
+
+ /*
+  * Skip leading whitespace...
+  */
+
+  for (cur = *ptr; *cur; cur ++)
+  {
+    if (*cur == '%')
+    {
+     /*
+      * Comment, skip to end of line...
+      */
+
+      for (cur ++; *cur && *cur != '\n' && *cur != '\r'; cur ++);
+    }
+    else if (!isspace(*cur & 255))
+      break;
+  }
+
+  if (!*cur)
+  {
+    *ptr = NULL;
+
+    return (NULL);
+  }
+
+ /*
+  * See what we have...
+  */
+
+  memset(&obj, 0, sizeof(obj));
+
+  switch (*cur)
+  {
+    case '(' :				/* (string) */
+        obj.type = CUPS_PS_STRING;
+	start    = cur;
+
+	for (cur ++, parens = 1, valptr = obj.value.string,
+	         valend = obj.value.string + sizeof(obj.value.string) - 1;
+             *cur;
+	     cur ++)
+	{
+	  if (*cur == ')' && parens == 1)
+	    break;
+
+          if (*cur == '(')
+	    parens ++;
+	  else if (*cur == ')')
+	    parens --;
+
+          if (valptr >= valend)
+	  {
+	    *ptr = start;
+
+	    return (NULL);
+	  }
+
+	  if (*cur == '\\')
+	  {
+	   /*
+	    * Decode escaped character...
+	    */
+
+	    cur ++;
+
+            if (*cur == 'b')
+	      *valptr++ = '\b';
+	    else if (*cur == 'f')
+	      *valptr++ = '\f';
+	    else if (*cur == 'n')
+	      *valptr++ = '\n';
+	    else if (*cur == 'r')
+	      *valptr++ = '\r';
+	    else if (*cur == 't')
+	      *valptr++ = '\t';
+	    else if (*cur >= '0' && *cur <= '7')
+	    {
+	      int ch = *cur - '0';
+
+              if (cur[1] >= '0' && cur[1] <= '7')
+	      {
+	        cur ++;
+		ch = (ch << 3) + *cur - '0';
+	      }
+
+              if (cur[1] >= '0' && cur[1] <= '7')
+	      {
+	        cur ++;
+		ch = (ch << 3) + *cur - '0';
+	      }
+
+	      *valptr++ = ch;
+	    }
+	    else if (*cur == '\r')
+	    {
+	      if (cur[1] == '\n')
+	        cur ++;
+	    }
+	    else if (*cur != '\n')
+	      *valptr++ = *cur;
+	  }
+	  else
+	    *valptr++ = *cur;
+	}
+
+	if (*cur != ')')
+	{
+	  *ptr = start;
+
+	  return (NULL);
+	}
+
+	cur ++;
+        break;
+
+    case '[' :				/* Start array */
+        obj.type = CUPS_PS_START_ARRAY;
+	cur ++;
+        break;
+
+    case ']' :				/* End array */
+        obj.type = CUPS_PS_END_ARRAY;
+	cur ++;
+        break;
+
+    case '<' :				/* Start dictionary or hex string */
+        if (cur[1] == '<')
+	{
+	  obj.type = CUPS_PS_START_DICT;
+	  cur += 2;
+	}
+	else
+	{
+          obj.type = CUPS_PS_STRING;
+	  start    = cur;
+
+	  for (cur ++, valptr = obj.value.string,
+	           valend = obj.value.string + sizeof(obj.value.string) - 1;
+               *cur;
+	       cur ++)
+	  {
+	    int	ch;			/* Current character */
+
+
+
+            if (*cur == '>')
+	      break;
+	    else if (valptr >= valend || !isxdigit(*cur & 255))
+	    {
+	      *ptr = start;
+	      return (NULL);
+	    }
+
+            if (*cur >= '0' && *cur <= '9')
+	      ch = (*cur - '0') << 4;
+	    else
+	      ch = (tolower(*cur) - 'a' + 10) << 4;
+
+	    if (isxdigit(cur[1] & 255))
+	    {
+	      cur ++;
+
+              if (*cur >= '0' && *cur <= '9')
+		ch |= *cur - '0';
+	      else
+		ch |= tolower(*cur) - 'a' + 10;
+            }
+
+	    *valptr++ = ch;
+          }
+
+          if (*cur != '>')
+	  {
+	    *ptr = start;
+	    return (NULL);
+	  }
+
+	  cur ++;
+	}
+        break;
+
+    case '>' :				/* End dictionary? */
+        if (cur[1] == '>')
+	{
+	  obj.type = CUPS_PS_END_DICT;
+	  cur += 2;
+	}
+	else
+	{
+	  obj.type           = CUPS_PS_OTHER;
+	  obj.value.other[0] = *cur;
+
+	  cur ++;
+	}
+        break;
+
+    case '{' :				/* Start/end procedure */
+    case '}' :
+	obj.type           = CUPS_PS_OTHER;
+	obj.value.other[0] = *cur;
+
+	cur ++;
+        break;
+
+    case '-' :				/* Possible number */
+    case '+' :
+        if (!isdigit(cur[1] & 255) && cur[1] != '.')
+	{
+	  obj.type           = CUPS_PS_OTHER;
+	  obj.value.other[0] = *cur;
+
+	  cur ++;
+	  break;
+	}
+
+    case '0' :				/* Number */
+    case '1' :
+    case '2' :
+    case '3' :
+    case '4' :
+    case '5' :
+    case '6' :
+    case '7' :
+    case '8' :
+    case '9' :
+    case '.' :
+        obj.type = CUPS_PS_NUMBER;
+
+        start = cur;
+	for (cur ++; *cur; cur ++)
+	  if (!isdigit(*cur & 255))
+	    break;
+
+        if (*cur == '#')
+	{
+	 /*
+	  * Integer with radix...
+	  */
+
+          obj.value.number = strtol(cur + 1, &cur, atoi(start));
+	  break;
+	}
+	else if (strchr(".Ee()<>[]{}/%", *cur) || isspace(*cur & 255))
+	{
+	 /*
+	  * Integer or real number...
+	  */
+
+	  obj.value.number = _cupsStrScand(start, &cur, localeconv());
+          break;
+	}
+	else
+	  cur = start;
+
+    default :				/* Operator/variable name */
+        start = cur;
+
+	if (*cur == '/')
+	{
+	  obj.type = CUPS_PS_NAME;
+          valptr   = obj.value.name;
+          valend   = obj.value.name + sizeof(obj.value.name) - 1;
+	  cur ++;
+	}
+	else
+	{
+	  obj.type = CUPS_PS_OTHER;
+          valptr   = obj.value.other;
+          valend   = obj.value.other + sizeof(obj.value.other) - 1;
+	}
+
+	while (*cur)
+	{
+	  if (strchr("()<>[]{}/%", *cur) || isspace(*cur & 255))
+	    break;
+	  else if (valptr < valend)
+	    *valptr++ = *cur++;
+	  else
+	  {
+	    *ptr = start;
+	    return (NULL);
+	  }
+	}
+
+        if (obj.type == CUPS_PS_OTHER)
+	{
+          if (!strcmp(obj.value.other, "true"))
+	  {
+	    obj.type          = CUPS_PS_BOOLEAN;
+	    obj.value.boolean = 1;
+	  }
+	  else if (!strcmp(obj.value.other, "false"))
+	  {
+	    obj.type          = CUPS_PS_BOOLEAN;
+	    obj.value.boolean = 0;
+	  }
+	  else if (!strcmp(obj.value.other, "null"))
+	    obj.type = CUPS_PS_NULL;
+	  else if (!strcmp(obj.value.other, "copy"))
+	    obj.type = CUPS_PS_COPY;
+	  else if (!strcmp(obj.value.other, "dup"))
+	    obj.type = CUPS_PS_DUP;
+	  else if (!strcmp(obj.value.other, "index"))
+	    obj.type = CUPS_PS_INDEX;
+	  else if (!strcmp(obj.value.other, "pop"))
+	    obj.type = CUPS_PS_POP;
+	  else if (!strcmp(obj.value.other, "roll"))
+	    obj.type = CUPS_PS_ROLL;
+	  else if (!strcmp(obj.value.other, "setpagedevice"))
+	    obj.type = CUPS_PS_SETPAGEDEVICE;
+	}
+	break;
+  }
+
+ /*
+  * Save the current position in the string and return the new object...
+  */
+
+  *ptr = cur;
+
+  return (push_stack(st, &obj));
+}
+
+
+/*
+ * 'set_page_device()' - Simulate the PostScript setpagedevice operator.
+ */
+
+static int				/* O - 0 on success, -1 on error */
+set_page_device(
+    _cups_ps_stack_t    *st,		/* I - Stack */
+    cups_page_header2_t *h,		/* O - Page header */
+    int                 *preferred_bits)/* O - Preferred bits per color */
+{
+  int			i;		/* Index into array */
+  _cups_ps_obj_t	*obj,		/* Current object */
+			*end;		/* End of dictionary */
+  const char		*name;		/* Attribute name */
+
+
+ /*
+  * Make sure we have a dictionary on the stack...
+  */
+
+  if (st->num_objs == 0)
+    return (-1);
+
+  obj = end = st->objs + st->num_objs - 1;
+
+  if (obj->type != CUPS_PS_END_DICT)
+    return (-1);
+
+  obj --;
+
+  while (obj > st->objs)
+  {
+    if (obj->type == CUPS_PS_START_DICT)
+      break;
+
+    obj --;
+  }
+
+  if (obj < st->objs)
+    return (-1);
+
+ /*
+  * Found the start of the dictionary, empty the stack to this point...
+  */
+
+  st->num_objs = obj - st->objs;
+
+ /*
+  * Now pull /name and value pairs from the dictionary...
+  */
+
+  for (obj ++; obj < end; obj ++)
+  {
+   /*
+    * Grab the name...
+    */
+
+    if (obj->type != CUPS_PS_NAME)
+      return (-1);
+
+    name = obj->value.name;
+    obj ++;
+
+   /*
+    * Then grab the value...
+    */
+
+    if (!strcmp(name, "MediaClass") && obj->type == CUPS_PS_STRING)
+      strlcpy(h->MediaClass, obj->value.string, sizeof(h->MediaClass));
+    else if (!strcmp(name, "MediaColor") && obj->type == CUPS_PS_STRING)
+      strlcpy(h->MediaColor, obj->value.string, sizeof(h->MediaColor));
+    else if (!strcmp(name, "MediaType") && obj->type == CUPS_PS_STRING)
+      strlcpy(h->MediaType, obj->value.string, sizeof(h->MediaType));
+    else if (!strcmp(name, "OutputType") && obj->type == CUPS_PS_STRING)
+      strlcpy(h->OutputType, obj->value.string, sizeof(h->OutputType));
+    else if (!strcmp(name, "AdvanceDistance") && obj->type == CUPS_PS_NUMBER)
+      h->AdvanceDistance = (unsigned)obj->value.number;
+    else if (!strcmp(name, "AdvanceMedia") && obj->type == CUPS_PS_NUMBER)
+      h->AdvanceMedia = (unsigned)obj->value.number;
+    else if (!strcmp(name, "Collate") && obj->type == CUPS_PS_BOOLEAN)
+      h->Collate = (unsigned)obj->value.number;
+    else if (!strcmp(name, "CutMedia") && obj->type == CUPS_PS_NUMBER)
+      h->CutMedia = (cups_cut_t)(unsigned)obj->value.number;
+    else if (!strcmp(name, "Duplex") && obj->type == CUPS_PS_BOOLEAN)
+      h->Duplex = (unsigned)obj->value.boolean;
+    else if (!strcmp(name, "HWResolution") && obj->type == CUPS_PS_START_ARRAY)
+    {
+      if (obj[1].type == CUPS_PS_NUMBER && obj[2].type == CUPS_PS_NUMBER &&
+          obj[3].type == CUPS_PS_END_ARRAY)
+      {
+        h->HWResolution[0] = (unsigned)obj[1].value.number;
+	h->HWResolution[1] = (unsigned)obj[2].value.number;
+	obj += 3;
+      }
+      else
+        return (-1);
+    }
+    else if (!strcmp(name, "InsertSheet") && obj->type == CUPS_PS_BOOLEAN)
+      h->InsertSheet = (unsigned)obj->value.boolean;
+    else if (!strcmp(name, "Jog") && obj->type == CUPS_PS_NUMBER)
+      h->Jog = (unsigned)obj->value.number;
+    else if (!strcmp(name, "LeadingEdge") && obj->type == CUPS_PS_NUMBER)
+      h->LeadingEdge = (unsigned)obj->value.number;
+    else if (!strcmp(name, "ManualFeed") && obj->type == CUPS_PS_BOOLEAN)
+      h->ManualFeed = (unsigned)obj->value.boolean;
+    else if ((!strcmp(name, "cupsMediaPosition") || /* Compatibility */
+              !strcmp(name, "MediaPosition")) && obj->type == CUPS_PS_NUMBER)
+      h->MediaPosition = (unsigned)obj->value.number;
+    else if (!strcmp(name, "MediaWeight") && obj->type == CUPS_PS_NUMBER)
+      h->MediaWeight = (unsigned)obj->value.number;
+    else if (!strcmp(name, "MirrorPrint") && obj->type == CUPS_PS_BOOLEAN)
+      h->MirrorPrint = (unsigned)obj->value.boolean;
+    else if (!strcmp(name, "NegativePrint") && obj->type == CUPS_PS_BOOLEAN)
+      h->NegativePrint = (unsigned)obj->value.boolean;
+    else if (!strcmp(name, "NumCopies") && obj->type == CUPS_PS_NUMBER)
+      h->NumCopies = (unsigned)obj->value.number;
+    else if (!strcmp(name, "Orientation") && obj->type == CUPS_PS_NUMBER)
+      h->Orientation = (unsigned)obj->value.number;
+    else if (!strcmp(name, "OutputFaceUp") && obj->type == CUPS_PS_BOOLEAN)
+      h->OutputFaceUp = (unsigned)obj->value.boolean;
+    else if (!strcmp(name, "PageSize") && obj->type == CUPS_PS_START_ARRAY)
+    {
+      if (obj[1].type == CUPS_PS_NUMBER && obj[2].type == CUPS_PS_NUMBER &&
+          obj[3].type == CUPS_PS_END_ARRAY)
+      {
+        h->cupsPageSize[0] = obj[1].value.number;
+	h->cupsPageSize[1] = obj[2].value.number;
+
+        h->PageSize[0] = (unsigned)obj[1].value.number;
+	h->PageSize[1] = (unsigned)obj[2].value.number;
+
+	obj += 3;
+      }
+      else
+        return (-1);
+    }
+    else if (!strcmp(name, "Separations") && obj->type == CUPS_PS_BOOLEAN)
+      h->Separations = (unsigned)obj->value.boolean;
+    else if (!strcmp(name, "TraySwitch") && obj->type == CUPS_PS_BOOLEAN)
+      h->TraySwitch = (unsigned)obj->value.boolean;
+    else if (!strcmp(name, "Tumble") && obj->type == CUPS_PS_BOOLEAN)
+      h->Tumble = (unsigned)obj->value.boolean;
+    else if (!strcmp(name, "cupsMediaType") && obj->type == CUPS_PS_NUMBER)
+      h->cupsMediaType = (unsigned)obj->value.number;
+    else if (!strcmp(name, "cupsBitsPerColor") && obj->type == CUPS_PS_NUMBER)
+      h->cupsBitsPerColor = (unsigned)obj->value.number;
+    else if (!strcmp(name, "cupsPreferredBitsPerColor") &&
+             obj->type == CUPS_PS_NUMBER)
+      *preferred_bits = (int)obj->value.number;
+    else if (!strcmp(name, "cupsColorOrder") && obj->type == CUPS_PS_NUMBER)
+      h->cupsColorOrder = (cups_order_t)(unsigned)obj->value.number;
+    else if (!strcmp(name, "cupsColorSpace") && obj->type == CUPS_PS_NUMBER)
+      h->cupsColorSpace = (cups_cspace_t)(unsigned)obj->value.number;
+    else if (!strcmp(name, "cupsCompression") && obj->type == CUPS_PS_NUMBER)
+      h->cupsCompression = (unsigned)obj->value.number;
+    else if (!strcmp(name, "cupsRowCount") && obj->type == CUPS_PS_NUMBER)
+      h->cupsRowCount = (unsigned)obj->value.number;
+    else if (!strcmp(name, "cupsRowFeed") && obj->type == CUPS_PS_NUMBER)
+      h->cupsRowFeed = (unsigned)obj->value.number;
+    else if (!strcmp(name, "cupsRowStep") && obj->type == CUPS_PS_NUMBER)
+      h->cupsRowStep = (unsigned)obj->value.number;
+    else if (!strcmp(name, "cupsBorderlessScalingFactor") &&
+             obj->type == CUPS_PS_NUMBER)
+      h->cupsBorderlessScalingFactor = obj->value.number;
+    else if (!strncmp(name, "cupsInteger", 11) && obj->type == CUPS_PS_NUMBER)
+    {
+      if ((i = atoi(name + 11)) < 0 || i > 15)
+        return (-1);
+
+      h->cupsInteger[i] = (unsigned)obj->value.number;
+    }
+    else if (!strncmp(name, "cupsReal", 8) && obj->type == CUPS_PS_NUMBER)
+    {
+      if ((i = atoi(name + 8)) < 0 || i > 15)
+        return (-1);
+
+      h->cupsReal[i] = obj->value.number;
+    }
+    else if (!strncmp(name, "cupsString", 10) && obj->type == CUPS_PS_STRING)
+    {
+      if ((i = atoi(name + 10)) < 0 || i > 15)
+        return (-1);
+
+      strlcpy(h->cupsString[i], obj->value.string, sizeof(h->cupsString[i]));
+    }
+    else if (!strcmp(name, "cupsMarkerType") && obj->type == CUPS_PS_STRING)
+      strlcpy(h->cupsMarkerType, obj->value.string, sizeof(h->cupsMarkerType));
+    else if (!strcmp(name, "cupsPageSizeName") && obj->type == CUPS_PS_STRING)
+      strlcpy(h->cupsPageSizeName, obj->value.string,
+              sizeof(h->cupsPageSizeName));
+    else if (!strcmp(name, "cupsRenderingIntent") &&
+             obj->type == CUPS_PS_STRING)
+      strlcpy(h->cupsRenderingIntent, obj->value.string,
+              sizeof(h->cupsRenderingIntent));
+    else
+    {
+     /*
+      * Ignore unknown name+value...
+      */
+
+      while (obj[1].type != CUPS_PS_NAME && obj < end)
+        obj ++;
+    }
+  }
+
+  return (0);
+}
+
+
+#ifdef DEBUG
+/*
+ * 'DEBUG_object()' - Print an object's value...
+ */
+
+static void
+DEBUG_object(_cups_ps_obj_t *obj)	/* I - Object to print */
+{
+  switch (obj->type)
+  {
+    case CUPS_PS_NAME :
+	printf("/%s", obj->value.name);
+	break;
+
+    case CUPS_PS_NUMBER :
+	printf("%g", obj->value.number);
+	break;
+
+    case CUPS_PS_STRING :
+	printf("(%s)", obj->value.string);
+	break;
+
+    case CUPS_PS_BOOLEAN :
+	if (obj->value.boolean)
+	  fputs("true", stdout);
+	else
+	  fputs("false", stdout);
+	break;
+
+    case CUPS_PS_NULL :
+	fputs("null", stdout);
+	break;
+
+    case CUPS_PS_START_ARRAY :
+	fputs("[", stdout);
+	break;
+
+    case CUPS_PS_END_ARRAY :
+	fputs("]", stdout);
+	break;
+
+    case CUPS_PS_START_DICT :
+	fputs("<<", stdout);
+	break;
+
+    case CUPS_PS_END_DICT :
+	fputs(">>", stdout);
+	break;
+
+    case CUPS_PS_COPY :
+	fputs("--copy--", stdout);
+        break;
+
+    case CUPS_PS_DUP :
+	fputs("--dup--", stdout);
+        break;
+
+    case CUPS_PS_INDEX :
+	fputs("--index--", stdout);
+        break;
+
+    case CUPS_PS_POP :
+	fputs("--pop--", stdout);
+        break;
+
+    case CUPS_PS_ROLL :
+	fputs("--roll--", stdout);
+        break;
+
+    case CUPS_PS_SETPAGEDEVICE :
+	fputs("--setpagedevice--", stdout);
+        break;
+
+    case CUPS_PS_OTHER :
+	printf("--%s--", obj->value.other);
+	break;
+  }
+}
+#endif /* DEBUG */
 
 
 /*
