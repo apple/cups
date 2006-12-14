@@ -439,6 +439,47 @@ _cupsStrScand(const char   *buf,	/* I - Pointer to number */
       }
   }
 
+  if (*buf == 'e' || *buf == 'E')
+  {
+   /*
+    * Read exponent...
+    */
+
+    if (tempptr < (temp + sizeof(temp) - 1))
+      *tempptr++ = *buf++;
+    else
+    {
+      if (bufptr)
+	*bufptr = NULL;
+
+      return (0.0);
+    }
+
+    if (*buf == '+' || *buf == '-')
+    {
+      if (tempptr < (temp + sizeof(temp) - 1))
+	*tempptr++ = *buf++;
+      else
+      {
+	if (bufptr)
+	  *bufptr = NULL;
+
+	return (0.0);
+      }
+    }
+
+    while (isdigit(*buf & 255))
+      if (tempptr < (temp + sizeof(temp) - 1))
+	*tempptr++ = *buf++;
+      else
+      {
+	if (bufptr)
+	  *bufptr = NULL;
+
+	return (0.0);
+      }
+  }
+
  /*
   * Nul-terminate the temporary string and return the value...
   */
