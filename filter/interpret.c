@@ -25,6 +25,20 @@
  *
  * Contents:
  *
+ *   cupsRasterInterpretPPD() - Interpret PPD commands to create a page header.
+ *   _cupsRasterExecPS()      - Execute PostScript code to initialize a page
+ *                              header.
+ *   copy_stack()             - Copy the top N stack objects.
+ *   delete_stack()           - Free memory used by a stack.
+ *   index_stack()            - Copy the Nth value on the stack.
+ *   new_stack()              - Create a new stack.
+ *   pop_stock()              - Pop the top object off the stack.
+ *   push_stack()             - Push an object on the stack.
+ *   roll_stack()             - Rotate stack objects.
+ *   scan_ps()                - Scan a string for the next PS object.
+ *   setpagedevice()        - Simulate the PostScript setpagedevice operator.
+ *   DEBUG_object()           - Print an objects value...
+ *   DEBUG_stack()            - Print a stack...
  */
 
 /*
@@ -92,13 +106,14 @@ static _cups_ps_stack_t	*new_stack(void);
 static _cups_ps_obj_t	*pop_stack(_cups_ps_stack_t *st);
 static _cups_ps_obj_t	*push_stack(_cups_ps_stack_t *st,
 			            _cups_ps_obj_t *obj);
-static int		roll_stack(_cups_ps_stack_t *st, int s, int c);
+static int		roll_stack(_cups_ps_stack_t *st, int c, int s);
 static _cups_ps_obj_t	*scan_ps(_cups_ps_stack_t *st, char **ptr);
-static int		set_page_device(_cups_ps_stack_t *st,
+static int		setpagedevice(_cups_ps_stack_t *st,
 			                cups_page_header2_t *h,
 			                int *preferred_bits);
 #ifdef DEBUG
 static void		DEBUG_object(_cups_ps_obj_t *obj);
+static void		DEBUG_stack(_cups_ps_stack_t *st);
 #endif /* DEBUG */
 
 
@@ -448,23 +463,47 @@ _cupsRasterExecPS(
       case CUPS_PS_COPY :
           pop_stack(st);
 	  if ((obj = pop_stack(st)) != NULL)
+	  {
 	    copy_stack(st, (int)obj->value.number);
+
+#ifdef DEBUG
+            fputs("    copy: ", stdout);
+	    DEBUG_stack(st);
+#endif /* DEBUG */
+          }
           break;
 
       case CUPS_PS_DUP :
           pop_stack(st);
 	  copy_stack(st, 1);
+
+#ifdef DEBUG
+          fputs("    dup: ", stdout);
+	  DEBUG_stack(st);
+#endif /* DEBUG */
           break;
 
       case CUPS_PS_INDEX :
           pop_stack(st);
 	  if ((obj = pop_stack(st)) != NULL)
+	  {
 	    index_stack(st, (int)obj->value.number);
+
+#ifdef DEBUG
+            fputs("    index: ", stdout);
+	    DEBUG_stack(st);
+#endif /* DEBUG */
+          }
           break;
 
       case CUPS_PS_POP :
           pop_stack(st);
           pop_stack(st);
+
+#ifdef DEBUG
+          fputs("    pop: ", stdout);
+	  DEBUG_stack(st);
+#endif /* DEBUG */
           break;
 
       case CUPS_PS_ROLL :
@@ -477,13 +516,25 @@ _cupsRasterExecPS(
             c = (int)obj->value.number;
 
 	    if ((obj = pop_stack(st)) != NULL)
+	    {
 	      roll_stack(st, (int)obj->value.number, c);
+
+#ifdef DEBUG
+              fputs("    roll:", stdout);
+	      DEBUG_stack(st);
+#endif /* DEBUG */
+            }
 	  }
           break;
 
       case CUPS_PS_SETPAGEDEVICE :
           pop_stack(st);
-	  set_page_device(st, h, preferred_bits);
+	  setpagedevice(st, h, preferred_bits);
+
+#ifdef DEBUG
+          fputs("    setpagedevice: ", stdout);
+	  DEBUG_stack(st);
+#endif /* DEBUG */
           break;
 
       case CUPS_PS_OTHER :
@@ -505,14 +556,7 @@ _cupsRasterExecPS(
   {
 #ifdef DEBUG
     fputs("    Stack not empty:", stdout);
-
-    for (obj = st->objs + st->num_objs - 1; obj >= st->objs; obj --)
-    {
-      putchar(' ');
-      DEBUG_object(obj);
-    }
-
-    putchar('\n');
+    DEBUG_stack(st);
 #endif /* DEBUG */
 
     delete_stack(st);
@@ -672,12 +716,14 @@ push_stack(_cups_ps_stack_t *st,	/* I - Stack */
 
 static int				/* O - 0 on success, -1 on error */
 roll_stack(_cups_ps_stack_t *st,	/* I - Stack */
-           int              s,		/* I - Amount to shift */
-	   int              c)		/* I - Number of objects */
+	   int              c,		/* I - Number of objects */
+           int              s)		/* I - Amount to shift */
 {
   _cups_ps_obj_t	*temp;		/* Temporary array of objects */
   int			n;		/* Index into array */
 
+
+  DEBUG_printf(("    roll_stack(st=%p, s=%d, c=%d)\n", st, s, c));
 
  /*
   * Range check input...
@@ -1077,11 +1123,11 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 
 
 /*
- * 'set_page_device()' - Simulate the PostScript setpagedevice operator.
+ * 'setpagedevice()' - Simulate the PostScript setpagedevice operator.
  */
 
 static int				/* O - 0 on success, -1 on error */
-set_page_device(
+setpagedevice(
     _cups_ps_stack_t    *st,		/* I - Stack */
     cups_page_header2_t *h,		/* O - Page header */
     int                 *preferred_bits)/* O - Preferred bits per color */
@@ -1127,6 +1173,8 @@ set_page_device(
   * Now pull /name and value pairs from the dictionary...
   */
 
+  DEBUG_puts("    Dictionary:");
+
   for (obj ++; obj < end; obj ++)
   {
    /*
@@ -1138,6 +1186,12 @@ set_page_device(
 
     name = obj->value.name;
     obj ++;
+
+#ifdef DEBUG
+    printf("        /%s ", name);
+    DEBUG_object(obj);
+    putchar('\n');
+#endif /* DEBUG */
 
    /*
     * Then grab the value...
@@ -1156,7 +1210,7 @@ set_page_device(
     else if (!strcmp(name, "AdvanceMedia") && obj->type == CUPS_PS_NUMBER)
       h->AdvanceMedia = (unsigned)obj->value.number;
     else if (!strcmp(name, "Collate") && obj->type == CUPS_PS_BOOLEAN)
-      h->Collate = (unsigned)obj->value.number;
+      h->Collate = (unsigned)obj->value.boolean;
     else if (!strcmp(name, "CutMedia") && obj->type == CUPS_PS_NUMBER)
       h->CutMedia = (cups_cut_t)(unsigned)obj->value.number;
     else if (!strcmp(name, "Duplex") && obj->type == CUPS_PS_BOOLEAN)
@@ -1276,6 +1330,8 @@ set_page_device(
       * Ignore unknown name+value...
       */
 
+      DEBUG_printf(("    Unknown name (\"%s\") or value...\n", name));
+
       while (obj[1].type != CUPS_PS_NAME && obj < end)
         obj ++;
     }
@@ -1362,6 +1418,27 @@ DEBUG_object(_cups_ps_obj_t *obj)	/* I - Object to print */
 	printf("--%s--", obj->value.other);
 	break;
   }
+}
+
+
+/*
+ * 'DEBUG_stack()' - Print a stack...
+ */
+
+static void
+DEBUG_stack(_cups_ps_stack_t *st)	/* I - Stack */
+{
+  int			c;		/* Looping var */
+  _cups_ps_obj_t	*obj;		/* Current object on stack */
+
+
+  for (obj = st->objs, c = st->num_objs; c > 0; c --, obj ++)
+  {
+    putchar(' ');
+    DEBUG_object(obj);
+  }
+
+  putchar('\n');
 }
 #endif /* DEBUG */
 

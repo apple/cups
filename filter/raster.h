@@ -76,44 +76,6 @@ extern "C" {
  * Types...
  */
 
-typedef enum cups_mode_e		/**** Raster modes ****/
-{
-  CUPS_RASTER_READ = 0,			/* Open stream for reading */
-  CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
-  CUPS_RASTER_WRITE_COMPRESSED = 2	/* Open stream for compressed writing @since CUPS 1.3@ */
-} cups_mode_t;
-
-typedef enum cups_bool_e		/**** Boolean type ****/
-{
-  CUPS_FALSE = 0,			/* Logical false */
-  CUPS_TRUE = 1				/* Logical true */
-} cups_bool_t;
-
-typedef enum cups_jog_e			/**** Jog attribute values ****/
-{
-  CUPS_JOG_NONE = 0,			/* Never move pages */
-  CUPS_JOG_FILE = 1,			/* Move pages after this file */
-  CUPS_JOG_JOB = 2,			/* Move pages after this job */
-  CUPS_JOG_SET = 3			/* Move pages after this set */
-} cups_jog_t;
-
-typedef enum cups_orient_e		/**** Orientation attribute values ****/
-{
-  CUPS_ORIENT_0 = 0,			/* Don't rotate the page */
-  CUPS_ORIENT_90 = 1,			/* Rotate the page counter-clockwise */
-  CUPS_ORIENT_180 = 2,			/* Turn the page upside down */
-  CUPS_ORIENT_270 = 3			/* Rotate the page clockwise */
-} cups_orient_t;
-
-typedef enum cups_cut_e			/**** CutMedia attribute values ****/
-{
-  CUPS_CUT_NONE = 0,			/* Never cut the roll */
-  CUPS_CUT_FILE = 1,			/* Cut the roll after this file */
-  CUPS_CUT_JOB = 2,			/* Cut the roll after this job */
-  CUPS_CUT_SET = 3,			/* Cut the roll after this set */
-  CUPS_CUT_PAGE = 4			/* Cut the roll after this page */
-} cups_cut_t;
-
 typedef enum cups_adv_e			/**** AdvanceMedia attribute values ****/
 {
   CUPS_ADVANCE_NONE = 0,		/* Never advance the roll */
@@ -123,20 +85,11 @@ typedef enum cups_adv_e			/**** AdvanceMedia attribute values ****/
   CUPS_ADVANCE_PAGE = 4			/* Advance the roll after this page */
 } cups_adv_t;
 
-typedef enum cups_edge_e		/**** LeadingEdge attribute values ****/
+typedef enum cups_bool_e		/**** Boolean type ****/
 {
-  CUPS_EDGE_TOP = 0,			/* Leading edge is the top of the page */
-  CUPS_EDGE_RIGHT = 1,			/* Leading edge is the right of the page */
-  CUPS_EDGE_BOTTOM = 2,			/* Leading edge is the bottom of the page */
-  CUPS_EDGE_LEFT = 3			/* Leading edge is the left of the page */
-} cups_edge_t;
-
-typedef enum cups_order_e		/**** cupsColorOrder attribute values ****/
-{
-  CUPS_ORDER_CHUNKED = 0,		/* CMYK CMYK CMYK ... */
-  CUPS_ORDER_BANDED = 1,		/* CCC MMM YYY KKK ... */
-  CUPS_ORDER_PLANAR = 2			/* CCC ... MMM ... YYY ... KKK ... */
-} cups_order_t;
+  CUPS_FALSE = 0,			/* Logical false */
+  CUPS_TRUE = 1				/* Logical true */
+} cups_bool_t;
 
 typedef enum cups_cspace_e		/**** cupsColorSpace attribute values ****/
 {
@@ -177,6 +130,53 @@ typedef enum cups_cspace_e		/**** cupsColorSpace attribute values ****/
   CUPS_CSPACE_ICCE = 45,		/* ICC-based, 14 colors @since CUPS 1.1.19@ */
   CUPS_CSPACE_ICCF = 46			/* ICC-based, 15 colors @since CUPS 1.1.19@ */
 } cups_cspace_t;
+
+typedef enum cups_cut_e			/**** CutMedia attribute values ****/
+{
+  CUPS_CUT_NONE = 0,			/* Never cut the roll */
+  CUPS_CUT_FILE = 1,			/* Cut the roll after this file */
+  CUPS_CUT_JOB = 2,			/* Cut the roll after this job */
+  CUPS_CUT_SET = 3,			/* Cut the roll after this set */
+  CUPS_CUT_PAGE = 4			/* Cut the roll after this page */
+} cups_cut_t;
+
+typedef enum cups_edge_e		/**** LeadingEdge attribute values ****/
+{
+  CUPS_EDGE_TOP = 0,			/* Leading edge is the top of the page */
+  CUPS_EDGE_RIGHT = 1,			/* Leading edge is the right of the page */
+  CUPS_EDGE_BOTTOM = 2,			/* Leading edge is the bottom of the page */
+  CUPS_EDGE_LEFT = 3			/* Leading edge is the left of the page */
+} cups_edge_t;
+
+typedef enum cups_jog_e			/**** Jog attribute values ****/
+{
+  CUPS_JOG_NONE = 0,			/* Never move pages */
+  CUPS_JOG_FILE = 1,			/* Move pages after this file */
+  CUPS_JOG_JOB = 2,			/* Move pages after this job */
+  CUPS_JOG_SET = 3			/* Move pages after this set */
+} cups_jog_t;
+
+typedef enum cups_mode_e		/**** Raster modes ****/
+{
+  CUPS_RASTER_READ = 0,			/* Open stream for reading */
+  CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
+  CUPS_RASTER_WRITE_COMPRESSED = 2	/* Open stream for compressed writing @since CUPS 1.3@ */
+} cups_mode_t;
+
+typedef enum cups_order_e		/**** cupsColorOrder attribute values ****/
+{
+  CUPS_ORDER_CHUNKED = 0,		/* CMYK CMYK CMYK ... */
+  CUPS_ORDER_BANDED = 1,		/* CCC MMM YYY KKK ... */
+  CUPS_ORDER_PLANAR = 2			/* CCC ... MMM ... YYY ... KKK ... */
+} cups_order_t;
+
+typedef enum cups_orient_e		/**** Orientation attribute values ****/
+{
+  CUPS_ORIENT_0 = 0,			/* Don't rotate the page */
+  CUPS_ORIENT_90 = 1,			/* Rotate the page counter-clockwise */
+  CUPS_ORIENT_180 = 2,			/* Turn the page upside down */
+  CUPS_ORIENT_270 = 3			/* Rotate the page clockwise */
+} cups_orient_t;
 
 
 /*

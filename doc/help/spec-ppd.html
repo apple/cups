@@ -401,7 +401,7 @@ option value is "2.0" then CUPS will output the string
 *CloseUI: *WatermarkText
 
 <em>*% Custom PostScript watermark option</em>
-*CustomWatermarkText True: "&lt;&lt;/cupsString1 2 1 roll&gt;&gt;setpagedevice"
+*CustomWatermarkText True: "&lt;&lt;/cupsString1 3 -1 roll&gt;&gt;setpagedevice"
 *ParamCustomWatermarkText Text: 1 string 0 32
 
 
@@ -415,7 +415,7 @@ option value is "2.0" then CUPS will output the string
 *CloseUI: *GammaDensity
 
 <em>*% Custom PostScript gamma/density option</em> 
-*CustomGammaDensity True: "&lt;&lt;/cupsReal1 3 1 roll/cupsReal2 3 1&gt;&gt;setpagedevice"
+*CustomGammaDensity True: "&lt;&lt;/cupsReal1 3 -1 roll/cupsReal2 5 -1&gt;&gt;setpagedevice"
 *ParamCustomGammaDensity Gamma: 1 curve 0.1 10
 *ParamCustomGammaDensity Density: 2 real 0 2
 </pre>
@@ -626,7 +626,339 @@ in the PPD file for a given locale.</blockquote>
 </pre>
 
 
+<h2 class='title'><a name='RASTERPS'>Writing PostScript Option Commands for Raster Drivers</a></h2>
+
+<p>PPD files are used for both PostScript and non-PostScript printers. For CUPS raster drivers, you use a subset of the PostScript language to set page device attributes such as page size, resolution, and so forth. For example, the following code sets the page size to A4 size:</p>
+
+<pre class='command'>
+*PageSize A4: "&lt;&lt;/PageSize[595 842]&gt;&gt;setpagedevice"
+</pre>
+
+<p>Custom options typically use other operators to organize the values into a key/value dictionary for <tt>setpagedevice</tt>. For example, our previous <tt>CustomWatermarkText</tt> option code uses the <tt>roll</tt> operator to move the custom string value into the dictionary for <tt>setpagedevice</tt>:</p>
+
+<pre class='command'>
+*CustomWatermarkText True: "&lt;&lt;/cupsString1 3 -1 roll&gt;&gt;setpagedevice"
+</pre>
+
+<p>For a custom string value of "My Watermark", CUPS will produce the following PostScript code for the option:</p>
+
+<pre class='command'>
+(My Watermark)
+&lt;&lt;/cupsString1 3 -1 roll&gt;&gt;setpagedevice
+</pre>
+
+<p>The code moves the string value ("My Watermark") from the bottom of the stack to the top, creating a dictionary that looks like:</p>
+
+<pre class='command'>
+&lt;&lt;/cupsString1(My Watermark)&gt;&gt;setpagedevice
+</pre>
+
+<p>The resulting dictionary sets the page device attributes that are sent to your raster driver in the page header.</p>
+
+<h3>Supported PostScript Operators</h3>
+
+<p>CUPS supports the following PostScript operators in addition to the usual PostScript number, string (literal and hex-encoded), boolean, null, and name values:</p>
+
+<ul>
+
+	<li><tt>&lt;&lt;</tt> - Start a dictionary.</li>
+
+	<li><tt>&gt;&gt;</tt> - End a dictionary.</li>
+
+	<li><tt>[</tt> - Start an array.</li>
+
+	<li><tt>]</tt> - End an array.</li>
+
+	<li><tt>copy</tt> - Copy the top N objects on the stack.</li>
+
+	<li><tt>dup</tt> - Copy the top object on the stack.</li>
+
+	<li><tt>index</tt> - Copy the Nth from the top object on the stack.</li>
+
+	<li><tt>pop</tt> - Pop the top object on the stack.</li>
+
+	<li><tt>roll</tt> - Shift the top N objects on the stack.</li>
+
+	<li><tt>setpagedevice</tt> - Set the page header values according to the key/value dictionary on the stack.</li>
+
+</ul>
+
+<h3>Supported Page Device Attributes</h3>
+
+<p>Table 1 shows the supported page device attributes along with PostScript code examples.</p>
+
+<div class='table'>
+<table summary='Supported Page Device Attributes'>
+<caption>Table 1: <a name='TABLE_1'>Supported Page Device Attributes</a></caption>
+<thead>
+<tr>
+	<th>Name(s)</th>
+	<th>Type</th>
+	<th>Description</th>
+	<th>Example(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr valign='top'>
+	<td><tt>AdvanceDistance</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of points to advance roll media after printing.</td>
+	<td><tt>&lt;&lt;/AdvanceDistance 18&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>AdvanceMedia</tt></td>
+	<td>Integer</td>
+	<td>Specifies when to advance the media: 0 = never, 1 = after the file, 2 = after the job, 3 = after the set, and 4 = after the page.</td>
+	<td><tt>&lt;&lt;/AdvanceMedia 4&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Collate</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether collated copies are required.</td>
+	<td><tt>&lt;&lt;/Collate true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>CutMedia</tt></td>
+	<td>Integer</td>
+	<td>Specifies when to cut the media: 0 = never, 1 = after the file, 2 = after the job, 3 = after the set, and 4 = after the page.</td>
+	<td><tt>&lt;&lt;/CutMedia 1&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Duplex</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether 2-sided printing is required.</td>
+	<td><tt>&lt;&lt;/Duplex true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>HWResolution</tt></td>
+	<td>Integer Array</td>
+	<td>Specifies the resolution of the page image in pixels per inch.</td>
+	<td><tt>&lt;&lt;/HWResolution[1200 1200]&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>InsertSheet</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to insert a blank sheet before the job.</td>
+	<td><tt>&lt;&lt;/InsertSheet true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Jog</tt></td>
+	<td>Integer</td>
+	<td>Specifies when to shift the media in the output bin: 0 = never, 1 = after the file, 2 = after the job, 3 = after the set, and 4 = after the page.</td>
+	<td><tt>&lt;&lt;/Jog 2&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>LeadingEdge</tt></td>
+	<td>Integer</td>
+	<td>Specifies the leading edge of the media: 0 = top, 1 = right, 2 = bottom, 3 = left.</td>
+	<td><tt>&lt;&lt;/LeadingEdge 0&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>ManualFeed</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether media should be drawn from the manual feed tray. Note: The <tt>MediaPosition</tt> attribute is preferred over the <tt>ManualFeed</tt> attribute.</td>
+	<td><tt>&lt;&lt;/ManualFeed true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaClass</tt></td>
+	<td>String</td>
+	<td>Specifies a named media.</td>
+	<td><tt>&lt;&lt;/MediaClass (Invoices)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaColor</tt></td>
+	<td>String</td>
+	<td>Specifies the color of the media.</td>
+	<td><tt>&lt;&lt;/MediaColor &gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaPosition</tt></td>
+	<td>Integer</td>
+	<td>Specifies the tray or source of the media.</td>
+	<td><tt>&lt;&lt;/MediaPosition 12&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaType</tt></td>
+	<td>String</td>
+	<td>Specifies the general media type.</td>
+	<td><tt>&lt;&lt;/MediaType (Glossy)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaWeight</tt></td>
+	<td>Integer</td>
+	<td>Specifies the media weight in grams per meter<sup>2</sup>.</td>
+	<td><tt>&lt;&lt;/MediaWeight 100&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MirrorPrint</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to flip the output image horizontally.</td>
+	<td><tt>&lt;&lt;/MirrorPrint true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>NegativePrint</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to invert the output image.</td>
+	<td><tt>&lt;&lt;/NegativePrint true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>NumCopies</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of copies to produce of each page.</td>
+	<td><tt>&lt;&lt;/NumCopies 100&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Orientation</tt></td>
+	<td>Integer</td>
+	<td>Specifies the orientation of the output: 0 = portrait, 1 = landscape rotated counter-clockwise, 2 = upside-down, 3 = landscape rotated clockwise.</td>
+	<td><tt>&lt;&lt;/Orientation 3&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>OutputFaceUp</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to place the media face-up in the output bin/tray.</td>
+	<td><tt>&lt;&lt;/OutputFaceUp true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>OutputType</tt></td>
+	<td>String</td>
+	<td>Specifies the output type name.</td>
+	<td><tt>&lt;&lt;/OutputType (Photo)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>PageSize</tt></td>
+	<td>Integer/Real Array</td>
+	<td>Specifies the width and length/height of the page in points.</td>
+	<td><tt>&lt;&lt;/PageSize[595 842]&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Separations</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to produce color separations.</td>
+	<td><tt>&lt;&lt;/Separations true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>TraySwitch</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to switch trays automatically.</td>
+	<td><tt>&lt;&lt;/TraySwitch true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Tumble</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether the back sides of pages are rotated 180 degrees.</td>
+	<td><tt>&lt;&lt;/Tumble true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsBorderlessScalingFactor</tt></td>
+	<td>Real</td>
+	<td>Specifies the amount to scale the page image dimensions.</td>
+	<td><tt>&lt;&lt;/cupsBorderlessScalingFactor 1.01&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsColorOrder</tt></td>
+	<td>Integer</td>
+	<td>Specifies the order of colors: 0 = chunked, 1 = banded, 2 = planar.</td>
+	<td><tt>&lt;&lt;/cupsColorOrder 0&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsColorSpace</tt></td>
+	<td>Integer</td>
+	<td>Specifies the page image colorspace: 0 = W, 1 = RGB, 2 = RGBA, 3 = K, 4 = CMY, 5 = YMC, 6 = CMYK, 7 = YMCK, 8 = KCMY, 9 = KCMYcm, 10 = GMCK, 11 = GMCS, 12 = White, 13 = Gold, 14 = Silver, 15 = CIE XYZ, 16 = CIE Lab, 17 = RGBW, 32 to 46 = CIE Lab (1 to 15 inks)</td>
+	<td><tt>&lt;&lt;/cupsColorSpace &gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsCompression</tt></td>
+	<td>Integer</td>
+	<td>Specifies a driver compression type/mode.</td>
+	<td><tt>&lt;&lt;/cupsCompression 2&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsInteger0<br>
+	...<br>
+	cupsInteger15</tt></td>
+	<td>Integer</td>
+	<td>Specifies driver integer values.</td>
+	<td><tt>&lt;&lt;/cupsInteger11 1234&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsMarkerType</tt></td>
+	<td>String</td>
+	<td>Specifies the type of ink/toner to use.</td>
+	<td><tt>&lt;&lt;/cupsMarkerType (Black+Color)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsMediaType</tt></td>
+	<td>Integer</td>
+	<td>Specifies a numeric media type.</td>
+	<td><tt>&lt;&lt;/cupsMediaType 999&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsPageSizeName</tt></td>
+	<td>String</td>
+	<td>Specifies the name of the page size.</td>
+	<td><tt>&lt;&lt;/cupsPageSizeName (A4.Full)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsPreferredBitsPerColor</tt></td>
+	<td>Integer</td>
+	<td>Specifies the preferred number of bits per color, typically 8 or 16.</td>
+	<td><tt>&lt;&lt;/cupsPreferredBitsPerColor 16&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsReal0<br>
+	...<br>
+	cupsReal15</tt></td>
+	<td>Real</td>
+	<td>Specifies driver real number values.</td>
+	<td><tt>&lt;&lt;/cupsReal15 1.234&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsRenderingIntent</tt></td>
+	<td>String</td>
+	<td>Specifies the color rendering intent.</td>
+	<td><tt>&lt;&lt;/cupsRenderingIntent (AbsoluteColorimetric)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsRowCount</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of rows of raster data to print on each line for some drivers.</td>
+	<td><tt>&lt;&lt;/cupsRowCount 24&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsRowFeed</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of rows to feed between passes for some drivers.</td>
+	<td><tt>&lt;&lt;/cupsRowFeed 17&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsRowStep</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of lines between columns/rows on the print head for some drivers.</td>
+	<td><tt>&lt;&lt;/cupsRowStep 2&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsString0<br>
+	...<br>
+	cupsString15</tt></td>
+	<td>String</td>
+	<td>Specifies driver string values.</td>
+	<td><tt>&lt;&lt;/cupsString0(String Value)&gt;&gt;setpagedevice</tt></td>
+</tr>
+</tbody>
+</table></div>
+
+
 <h2 class='title'><a name='HISTORY'>Change History</a></h2>
+
+<h3>Changes in CUPS 1.2.8</h3>
+
+<ul>
+
+	<li>Added section on supported PostScript commands for raster
+	drivers</li>
+
+</ul>
 
 <h3>Changes in CUPS 1.2</h3>
 
