@@ -53,6 +53,8 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
   float		w, l;			/* Width and length of page */
   char		*nameptr;		/* Pointer into name */
   struct lconv	*loc;			/* Locale data */
+  ppd_coption_t	*coption;		/* Custom option for page size */
+  ppd_cparam_t	*cparam;		/* Custom option parameter */
 
 
   if (!ppd)
@@ -127,6 +129,23 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
 	ppd->sizes[i].right  = w - ppd->custom_margins[2];
 	ppd->sizes[i].top    = l - ppd->custom_margins[3];
       }
+
+     /*
+      * Update the custom option records for the page size, too...
+      */
+
+      if ((coption = ppdFindCustomOption(ppd, "PageSize")) != NULL)
+      {
+        if ((cparam = ppdFindCustomParam(coption, "Width")) != NULL)
+	  cparam->current.custom_points = w;
+
+        if ((cparam = ppdFindCustomParam(coption, "Height")) != NULL)
+	  cparam->current.custom_points = l;
+      }
+
+     /*
+      * Return the page size...
+      */
 
       return (ppd->sizes + i);
     }

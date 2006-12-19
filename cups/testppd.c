@@ -195,6 +195,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       ppd_attr_t	*attr;		/* Current attribute */
       ppd_group_t	*group;		/* Option group */
       ppd_option_t	*option;	/* Option */
+      ppd_coption_t	*coption;	/* Custom option */
+      ppd_cparam_t	*cparam;	/* Custom parameter */
       char		lang[255];	/* LANG environment variable */
 
 
@@ -221,6 +223,73 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  for (k = 0; k < option->num_choices; k ++)
 	    printf("        - %s (%s)\n", option->choices[k].choice,
 		   option->choices[k].text);
+
+          if ((coption = ppdFindCustomOption(ppd, option->keyword)) != NULL)
+	  {
+	    for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
+	         cparam;
+		 cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
+            {
+	      switch (cparam->type)
+	      {
+	        case PPD_CUSTOM_CURVE :
+		    printf("              %s(%s): PPD_CUSTOM_CURVE (%g to %g)\n",
+		           cparam->name, cparam->text,
+			   cparam->minimum.custom_curve,
+			   cparam->maximum.custom_curve);
+		    break;
+
+	        case PPD_CUSTOM_INT :
+		    printf("              %s(%s): PPD_CUSTOM_INT (%d to %d)\n",
+		           cparam->name, cparam->text,
+			   cparam->minimum.custom_int,
+			   cparam->maximum.custom_int);
+		    break;
+
+	        case PPD_CUSTOM_INVCURVE :
+		    printf("              %s(%s): PPD_CUSTOM_INVCURVE (%g to %g)\n",
+		           cparam->name, cparam->text,
+			   cparam->minimum.custom_invcurve,
+			   cparam->maximum.custom_invcurve);
+		    break;
+
+	        case PPD_CUSTOM_PASSCODE :
+		    printf("              %s(%s): PPD_CUSTOM_PASSCODE (%d to %d)\n",
+		           cparam->name, cparam->text,
+			   cparam->minimum.custom_passcode,
+			   cparam->maximum.custom_passcode);
+		    break;
+
+	        case PPD_CUSTOM_PASSWORD :
+		    printf("              %s(%s): PPD_CUSTOM_PASSWORD (%d to %d)\n",
+		           cparam->name, cparam->text,
+			   cparam->minimum.custom_password,
+			   cparam->maximum.custom_password);
+		    break;
+
+	        case PPD_CUSTOM_POINTS :
+		    printf("              %s(%s): PPD_CUSTOM_POINTS (%g to %g)\n",
+		           cparam->name, cparam->text,
+			   cparam->minimum.custom_points,
+			   cparam->maximum.custom_points);
+		    break;
+
+	        case PPD_CUSTOM_REAL :
+		    printf("              %s(%s): PPD_CUSTOM_REAL (%g to %g)\n",
+		           cparam->name, cparam->text,
+			   cparam->minimum.custom_real,
+			   cparam->maximum.custom_real);
+		    break;
+
+	        case PPD_CUSTOM_STRING :
+		    printf("              %s(%s): PPD_CUSTOM_STRING (%d to %d)\n",
+		           cparam->name, cparam->text,
+			   cparam->minimum.custom_string,
+			   cparam->maximum.custom_string);
+		    break;
+	      }
+	    }
+	  }
 	}
       }
 
