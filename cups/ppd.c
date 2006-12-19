@@ -2370,7 +2370,7 @@ ppd_get_cparam(ppd_coption_t *opt,	/* I - PPD file */
     return (NULL);
 
   strlcpy(cparam->name, param, sizeof(cparam->name));
-  strlcpy(cparam->text, text, sizeof(cparam->text));
+  strlcpy(cparam->text, text[0] ? text : param, sizeof(cparam->text));
 
  /*
   * Add this record to the array...
