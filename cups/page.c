@@ -50,6 +50,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
             const char *name)		/* I - Size name */
 {
   int		i;			/* Looping var */
+  ppd_size_t	*size;			/* Current page size */
   float		w, l;			/* Width and length of page */
   char		*nameptr;		/* Pointer into name */
   struct lconv	*loc;			/* Locale data */
@@ -68,11 +69,11 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       * Find the custom page size...
       */
 
-      for (i = 0; i < ppd->num_sizes; i ++)
-	if (!strcmp("Custom", ppd->sizes[i].name))
+      for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
+	if (!strcmp("Custom", size->name))
           break;
 
-      if (i == ppd->num_sizes)
+      if (!i)
         return (NULL);
 
      /*
@@ -95,40 +96,36 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
 
       if (!strcasecmp(nameptr, "in"))
       {
-        ppd->sizes[i].width  = w * 72.0f;
-	ppd->sizes[i].length = l * 72.0f;
-	ppd->sizes[i].left   = ppd->custom_margins[0];
-	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w * 72.0f - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l * 72.0f - ppd->custom_margins[3];
+        w *= 72.0f;
+	l *= 72.0f;
       }
-      else if (!strcasecmp(nameptr, "cm"))
+      else if (!strcasecmp(nameptr, "ft"))
       {
-        ppd->sizes[i].width  = w / 2.54f * 72.0f;
-	ppd->sizes[i].length = l / 2.54f * 72.0f;
-	ppd->sizes[i].left   = ppd->custom_margins[0];
-	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w / 2.54f * 72.0f - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l / 2.54f * 72.0f - ppd->custom_margins[3];
+        w *= 12.0f * 72.0f;
+	l *= 12.0f * 72.0f;
       }
       else if (!strcasecmp(nameptr, "mm"))
       {
-        ppd->sizes[i].width  = w / 25.4f * 72.0f;
-	ppd->sizes[i].length = l / 25.4f * 72.0f;
-	ppd->sizes[i].left   = ppd->custom_margins[0];
-	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w / 25.4f * 72.0f - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l / 25.4f * 72.0f - ppd->custom_margins[3];
+        w *= 72.0f / 25.4f;
+        l *= 72.0f / 25.4f;
       }
-      else
+      else if (!strcasecmp(nameptr, "cm"))
       {
-        ppd->sizes[i].width  = w;
-	ppd->sizes[i].length = l;
-	ppd->sizes[i].left   = ppd->custom_margins[0];
-	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l - ppd->custom_margins[3];
+        w *= 72.0f / 2.54f;
+        l *= 72.0f / 2.54f;
       }
+      else if (!strcasecmp(nameptr, "m"))
+      {
+        w *= 72.0f / 0.0254f;
+        l *= 72.0f / 0.0254f;
+      }
+
+      size->width  = w;
+      size->length = l;
+      size->left   = ppd->custom_margins[0];
+      size->bottom = ppd->custom_margins[1];
+      size->right  = w - ppd->custom_margins[2];
+      size->top    = l - ppd->custom_margins[3];
 
      /*
       * Update the custom option records for the page size, too...
@@ -147,7 +144,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       * Return the page size...
       */
 
-      return (ppd->sizes + i);
+      return (size);
     }
     else
     {
@@ -155,9 +152,9 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       * Lookup by name...
       */
 
-      for (i = 0; i < ppd->num_sizes; i ++)
-	if (!strcasecmp(name, ppd->sizes[i].name))
-          return (ppd->sizes + i);
+      for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
+	if (!strcmp(name, size->name))
+          return (size);
     }
   }
   else
@@ -166,9 +163,9 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
     * Find default...
     */
 
-    for (i = 0; i < ppd->num_sizes; i ++)
-      if (ppd->sizes[i].marked)
-        return (ppd->sizes + i);
+    for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
+      if (size->marked)
+        return (size);
   }
 
   return (NULL);
