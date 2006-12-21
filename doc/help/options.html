@@ -99,7 +99,12 @@ lpr -o landscape -o scaling=75 -o media=A4 filename.jpg
 <P>The available printer options vary depending on the printer.
 The standard options are described in the "<A
 HREF="#OPTIONS">Standard Printing Options</A>" section
-below.</P>
+below. Printer-specific options are also available and can be
+listed using the <B>lpoptions</B> command:</P>
+
+<PRE CLASS="command">
+lpoptions -p printer -l
+</PRE>
 
 <H3><A NAME="COPIES">Printing Multiple Copies</A></H3>
 
