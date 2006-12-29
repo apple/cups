@@ -98,6 +98,8 @@
  *            new callback element.
  *         e. cupsdRemoveSelect() removes from the array and frees
  *            the callback element.
+ *         f. _cupsd_fd_t provides a reference-counted structure for
+ *            tracking file descriptors that are monitored.
  * 
  *     1. select() O(n)
  *         a. Input/Output fd_set variables, copied to working
@@ -202,7 +204,8 @@
 
 typedef struct _cupsd_fd_s
 {
-  int			fd;		/* File descriptor */
+  int			fd,		/* File descriptor */
+			use;		/* Use count */
   cupsd_selfunc_t	read_cb,	/* Read callback */
 			write_cb;	/* Write callback */
   void			*data;		/* Data pointer for callbacks */
@@ -240,6 +243,11 @@ static fd_set		cupsd_global_input,
 
 static int		compare_fds(_cupsd_fd_t *a, _cupsd_fd_t *b);
 static _cupsd_fd_t	*find_fd(int fd);
+#define			release_fd(f) { \
+			  (f)->use --; \
+			  if (!(f)->use) free((f));\
+			}
+#define			retain_fd(f) (f)->use++
 
 
 /*
@@ -280,7 +288,8 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
     if ((fdptr = calloc(1, sizeof(_cupsd_fd_t))) == NULL)
       return (0);
 
-    fdptr->fd = fd;
+    fdptr->fd  = fd;
+    fdptr->use = 1;
 
     if (!cupsArrayAdd(cupsd_fds, fdptr))
     {
@@ -436,6 +445,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   {
     fdptr = (_cupsd_fd_t *)event->data.ptr;
 
+    retain_fd(fdptr);
+
     if (fdptr->read_cb && (event->events & (EPOLLIN | EPOLLERR | EPOLLHUP)))
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
@@ -449,6 +460,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 	              fdptr->fd);
       (*(fdptr->write_cb))(fdptr->data);
     }
+
+    release_fd(fdptr);
   }
 
 #elif defined(HAVE_KQUEUE)
@@ -485,6 +498,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "event->filter=%d, event->ident=%d",
                     event->filter, (int)event->ident);
 
+    retain_fd(fdptr);
+
     if (fdptr->read_cb && event->filter == EVFILT_READ)
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
@@ -498,6 +513,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 	              fdptr->fd);
       (*(fdptr->write_cb))(fdptr->data);
     }
+
+    release_fd(fdptr);
   }
 
 #elif defined(HAVE_POLL)
@@ -593,6 +610,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
       if ((fdptr = find_fd(pfd->fd)) == NULL)
         continue;
 
+      retain_fd(fdptr);
+
       if (fdptr->read_cb && (pfd->revents & (POLLIN | POLLERR | POLLHUP)))
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
@@ -606,6 +625,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 	                fdptr->fd);
         (*(fdptr->write_cb))(fdptr->data);
       }
+
+      release_fd(fdptr);
     }
   }
 
@@ -659,6 +680,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
          fdptr;
 	 fdptr = (_cupsd_fd_t *)cupsArrayNext(cupsd_fds))
     {
+      retain_fd(fdptr);
+
       if (fdptr->read_cb && FD_ISSET(fdptr->fd, &cupsd_current_input))
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
@@ -672,6 +695,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 	                fdptr->fd);
         (*(fdptr->write_cb))(fdptr->data);
       }
+
+      release_fd(fdptr);
     }
   }
 
@@ -787,7 +812,7 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
   */
 
   cupsArrayRemove(cupsd_fds, fdptr);
-  free(fdptr);
+  release_fd(fdptr);
 }
 
 
