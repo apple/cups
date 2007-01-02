@@ -204,7 +204,8 @@ extern int	cupsdEndProcess(int pid, int force);
 extern const char *cupsdFinishProcess(int pid, char *name, int namelen);
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
-				  int errfd, int backfd, int root, int *pid);
+				  int errfd, int backfd, int sidefd,
+				  int root, int *pid);
 
 extern int	cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
 		               cupsd_selfunc_t write_cb, void *data);

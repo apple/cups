@@ -3,7 +3,7 @@
  *
  *   Common run loop API for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2006 by Easy Software Products, all rights reserved.
+ *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -45,9 +45,11 @@
  */
 
 ssize_t					/* O - Total bytes on success, -1 on error */
-backendRunLoop(int print_fd,		/* I - Print file descriptor */
-               int device_fd,		/* I - Device file descriptor */
-	       int use_bc)		/* I - Use back-channel? */
+backendRunLoop(
+    int  print_fd,			/* I - Print file descriptor */
+    int  device_fd,			/* I - Device file descriptor */
+    int  use_bc,			/* I - Use back-channel? */
+    void (*side_cb)(int, int, int))	/* I - Side-channel callback */
 {
   int		nfds;			/* Maximum file descriptor value + 1 */
   fd_set	input,			/* Input set for reading */
@@ -112,12 +114,14 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
       FD_SET(print_fd, &input);
     if (use_bc)
       FD_SET(device_fd, &input);
+    if (side_cb)
+      FD_SET(CUPS_SC_FD, &input);
 
     FD_ZERO(&output);
     if (print_bytes || !use_bc)
       FD_SET(device_fd, &output);
 
-    if (use_bc)
+    if (use_bc || side_cb)
     {
       if (select(nfds, &input, &output, NULL, NULL) < 0)
       {
@@ -136,6 +140,13 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 	continue;
       }
     }
+
+   /*
+    * Check if we have a side-channel request ready...
+    */
+
+    if (side_cb && FD_ISSET(CUPS_SC_FD, &input))
+      (*side_cb)(print_fd, device_fd, use_bc);
 
    /*
     * Check if we have back-channel data ready...

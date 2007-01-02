@@ -3,7 +3,7 @@
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -27,6 +27,7 @@
  *
  *   main()         - Send a file to the specified parallel port.
  *   list_devices() - List all parallel devices.
+ *   side_cb()      - Handle side-channel requests...
  */
 
 /*
@@ -66,7 +67,8 @@
  * Local functions...
  */
 
-void	list_devices(void);
+static void	list_devices(void);
+static void	side_cb(int print_fd, int device_fd, int use_bc);
 
 
 /*
@@ -284,7 +286,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, use_bc);
+    tbytes = backendRunLoop(print_fd, device_fd, use_bc, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
       fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
@@ -308,7 +310,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
  * 'list_devices()' - List all parallel devices.
  */
 
-void
+static void
 list_devices(void)
 {
 #if defined(__hpux) || defined(__sgi) || defined(__sun)
@@ -594,6 +596,71 @@ list_devices(void)
     }
   }
 #endif
+}
+
+
+/*
+ * 'side_cb()' - Handle side-channel requests...
+ */
+
+static void
+side_cb(int print_fd,			/* I - Print file */
+        int device_fd,			/* I - Device file */
+	int use_bc)			/* I - Using back-channel? */
+{
+  cups_sc_command_t	command;	/* Request command */
+  cups_sc_status_t	status;		/* Request/response status */
+  char			data[2048];	/* Request/response data */
+  int			datalen;	/* Request/response data size */
+
+
+  datalen = sizeof(data);
+
+  if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
+  {
+    fputs("WARNING: Failed to read side-channel request!\n", stderr);
+    return;
+  }
+
+  switch (command)
+  {
+    case CUPS_SC_CMD_DRAIN_OUTPUT :
+        if (tcdrain(device_fd))
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else
+	  status = CUPS_SC_STATUS_OK;
+
+	datalen = 0;
+        break;
+
+    case CUPS_SC_CMD_GET_BIDI :
+        data[0] = use_bc;
+        datalen = 1;
+        break;
+
+    case CUPS_SC_CMD_GET_DEVICE_ID :
+        memset(data, 0, sizeof(data));
+
+        if (backendGetDeviceID(device_fd, data, sizeof(data) - 1,
+	                       NULL, 0, NULL, NULL, 0))
+        {
+	  status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	  datalen = 0;
+	}
+	else
+        {
+	  status  = CUPS_SC_STATUS_OK;
+	  datalen = strlen(data);
+	}
+        break;
+
+    default :
+        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	datalen = 0;
+	break;
+  }
+
+  cupsSideChannelWrite(command, status, data, datalen, 1.0);
 }
 
 

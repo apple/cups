@@ -3813,7 +3813,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
                   "copy_model: Running \"cups-driverd cat %s\"...", from);
 
   if (!cupsdStartProcess(buffer, argv, envp, -1, temppipe[1], CGIPipes[1],
-                         -1, 0, &temppid))
+                         -1, -1, 0, &temppid))
   {
     close(tempfd);
     unlink(tempfile);

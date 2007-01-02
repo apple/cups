@@ -1580,7 +1580,8 @@ launchd_reload(void)
   argv[2] = LaunchdConf;
   argv[3] = NULL;
 
-  if (cupsdStartProcess(argv[0], argv, NULL, -1, -1, -1, -1, 1, &child_pid) < 0)
+  if (cupsdStartProcess(argv[0], argv, NULL, -1, -1, -1, -1, -1, 1,
+                        &child_pid) < 0)
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "launchd_reload: Unable to execute %s - %s", argv[0],
                     strerror(errno));
@@ -1607,7 +1608,7 @@ launchd_reload(void)
 
     argv[1] = "load";
 
-    if (cupsdStartProcess(argv[0], argv, NULL, -1, -1, -1, -1, 1,
+    if (cupsdStartProcess(argv[0], argv, NULL, -1, -1, -1, -1, -1, 1,
                           &child_pid) < 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,

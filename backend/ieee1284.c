@@ -3,7 +3,7 @@
  *
  *   IEEE-1284 support functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -93,16 +93,16 @@ backendGetDeviceID(
   * Range check input...
   */
 
-  if (fd < 0 ||
-      !device_id || device_id_size < 32 ||
-      !make_model || make_model_size < 32)
+  if (fd < 0 || !device_id || device_id_size < 32)
   {
     DEBUG_puts("backendGetDeviceID: Bad args!");
     return (-1);
   }
 
   *device_id  = '\0';
-  *make_model = '\0';
+
+  if (make_model)
+    *make_model = '\0';
 
   if (uri)
     *uri = '\0';
@@ -181,7 +181,8 @@ backendGetDeviceID(
   * Get the make and model...
   */
 
-  backendGetMakeModel(device_id, make_model, make_model_size);
+  if (make_model)
+    backendGetMakeModel(device_id, make_model, make_model_size);
 
  /*
   * Then generate a device URI...

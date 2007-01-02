@@ -3,7 +3,7 @@
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -27,6 +27,7 @@
  *
  *   main()         - Send a file to the printer or server.
  *   list_devices() - List all serial devices.
+ *   side_cb()      - Handle side-channel requests...
  */
 
 /*
@@ -91,7 +92,8 @@
  * Local functions...
  */
 
-void	list_devices(void);
+static void	list_devices(void);
+static void	side_cb(int print_fd, int device_fd, int use_bc);
 
 
 /*
@@ -556,6 +558,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       if (!print_bytes)
 	FD_SET(print_fd, &input);
       FD_SET(device_fd, &input);
+      FD_SET(CUPS_SC_FD, &input);
 
       FD_ZERO(&output);
       if (print_bytes)
@@ -563,6 +566,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       if (select(nfds, &input, &output, NULL, NULL) < 0)
 	continue;			/* Ignore errors here */
+
+     /*
+      * Check if we have a side-channel request ready...
+      */
+
+      if (FD_ISSET(CUPS_SC_FD, &input))
+        side_cb(print_fd, device_fd, 1);
 
      /*
       * Check if we have back-channel data ready...
@@ -712,7 +722,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
  * 'list_devices()' - List all serial devices.
  */
 
-void
+static void
 list_devices(void)
 {
 #if defined(__hpux) || defined(__sgi) || defined(__sun) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
@@ -1222,6 +1232,55 @@ list_devices(void)
     }
   }
 #endif
+}
+
+
+/*
+ * 'side_cb()' - Handle side-channel requests...
+ */
+
+static void
+side_cb(int print_fd,			/* I - Print file */
+        int device_fd,			/* I - Device file */
+	int use_bc)			/* I - Using back-channel? */
+{
+  cups_sc_command_t	command;	/* Request command */
+  cups_sc_status_t	status;		/* Request/response status */
+  char			data[2048];	/* Request/response data */
+  int			datalen;	/* Request/response data size */
+
+
+  datalen = sizeof(data);
+
+  if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
+  {
+    fputs("WARNING: Failed to read side-channel request!\n", stderr);
+    return;
+  }
+
+  switch (command)
+  {
+    case CUPS_SC_CMD_DRAIN_OUTPUT :
+        if (tcdrain(device_fd))
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else
+	  status = CUPS_SC_STATUS_OK;
+
+	datalen = 0;
+        break;
+
+    case CUPS_SC_CMD_GET_BIDI :
+        data[0] = use_bc;
+        datalen = 1;
+        break;
+
+    default :
+        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	datalen = 0;
+	break;
+  }
+
+  cupsSideChannelWrite(command, status, data, datalen, 1.0);
 }
 
 

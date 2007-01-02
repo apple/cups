@@ -121,6 +121,7 @@ cupsdStartProcess(
     int        outfd,			/* I - Standard output file descriptor */
     int        errfd,			/* I - Standard error file descriptor */
     int        backfd,			/* I - Backchannel file descriptor */
+    int        sidefd,			/* I - Sidechannel file descriptor */
     int        root,			/* I - Run as root? */
     int        *pid)			/* O - Process ID */
 {
@@ -216,6 +217,12 @@ cupsdStartProcess(
       else
         open("/dev/null", O_RDWR);
       fcntl(3, F_SETFL, O_NDELAY);
+    }
+    if (sidefd != 4 && sidefd > 0)
+    {
+      close(4);
+      dup(sidefd);
+      fcntl(4, F_SETFL, O_NDELAY);
     }
 
    /*

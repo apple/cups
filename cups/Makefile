@@ -63,6 +63,7 @@ LIBOBJS	=	\
 		page.o \
 		ppd.o \
 		request.o \
+		sidechannel.o \
 		snprintf.o \
 		string.o \
 		tempfile.o \
@@ -102,6 +103,7 @@ HEADERS	=	\
 		ipp.h \
 		language.h \
 		ppd.h \
+		sidechannel.h \
 		transcode.h
 
 
@@ -438,7 +440,7 @@ apihelp:
 		request.c >../doc/help/api-httpipp.html
 	mxmldoc --section "Programming" --title "Filter and Backend APIs" \
 		--intro api-filter.shtml \
-		backchannel.c >../doc/help/api-filter.html
+		backchannel.c sidechannel.c sidechannel.h >../doc/help/api-filter.html
 
 
 #

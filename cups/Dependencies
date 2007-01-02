@@ -73,6 +73,7 @@ ppd.o: transcode.h debug.h
 request.o: globals.h string.h ../config.h http-private.h http.h md5.h
 request.o: ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 request.o: transcode.h debug.h
+sidechannel.o: sidechannel.h string.h ../config.h
 snprintf.o: string.h ../config.h
 string.o: array.h debug.h string.h ../config.h
 tempfile.o: globals.h string.h ../config.h http-private.h http.h md5.h
@@ -171,6 +172,7 @@ ppd.32.o: ppd.c  transcode.h debug.h
 request.32.o: request.c  globals.h string.h ../config.h http-private.h http.h md5.h
 request.32.o: request.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 request.32.o: request.c  transcode.h debug.h
+sidechannel.32.o: sidechannel.c  sidechannel.h string.h ../config.h
 snprintf.32.o: snprintf.c  string.h ../config.h
 string.32.o: string.c  array.h debug.h string.h ../config.h
 tempfile.32.o: tempfile.c  globals.h string.h ../config.h http-private.h http.h md5.h
@@ -269,6 +271,7 @@ ppd.64.o: ppd.c  transcode.h debug.h
 request.64.o: request.c  globals.h string.h ../config.h http-private.h http.h md5.h
 request.64.o: request.c  ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h i18n.h
 request.64.o: request.c  transcode.h debug.h
+sidechannel.64.o: sidechannel.c  sidechannel.h string.h ../config.h
 snprintf.64.o: snprintf.c  string.h ../config.h
 string.64.o: string.c  array.h debug.h string.h ../config.h
 tempfile.64.o: tempfile.c  globals.h string.h ../config.h http-private.h http.h md5.h

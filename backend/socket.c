@@ -3,7 +3,7 @@
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -25,7 +25,8 @@
  *
  * Contents:
  *
- *   main() - Send a file to the printer or server.
+ *   main()    - Send a file to the printer or server.
+ *   side_cb() - Handle side-channel requests...
  */
 
 /*
@@ -48,6 +49,13 @@
 #  include <arpa/inet.h>
 #  include <netdb.h>
 #endif /* WIN32 */
+
+
+/*
+ * Local functions...
+ */
+
+static void	side_cb(int print_fd, int device_fd, int use_bc);
 
 
 /*
@@ -325,7 +333,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, 1);
+    tbytes = backendRunLoop(print_fd, device_fd, 1, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
       fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
@@ -394,6 +402,55 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     fputs("INFO: Ready to print.\n", stderr);
 
   return (tbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
+}
+
+
+/*
+ * 'side_cb()' - Handle side-channel requests...
+ */
+
+static void
+side_cb(int print_fd,			/* I - Print file */
+        int device_fd,			/* I - Device file */
+	int use_bc)			/* I - Using back-channel? */
+{
+  cups_sc_command_t	command;	/* Request command */
+  cups_sc_status_t	status;		/* Request/response status */
+  char			data[2048];	/* Request/response data */
+  int			datalen;	/* Request/response data size */
+
+
+  datalen = sizeof(data);
+
+  if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
+  {
+    fputs("WARNING: Failed to read side-channel request!\n", stderr);
+    return;
+  }
+
+  switch (command)
+  {
+    case CUPS_SC_CMD_DRAIN_OUTPUT :
+       /*
+        * Our sockets disable the Nagle algorithm and data is sent immediately.
+	*/
+
+        status  = CUPS_SC_STATUS_OK;
+	datalen = 0;
+        break;
+
+    case CUPS_SC_CMD_GET_BIDI :
+        data[0] = use_bc;
+        datalen = 1;
+        break;
+
+    default :
+        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	datalen = 0;
+	break;
+  }
+
+  cupsSideChannelWrite(command, status, data, datalen, 1.0);
 }
 
 

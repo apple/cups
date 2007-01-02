@@ -127,6 +127,8 @@ cupsdAddJob(int        priority,	/* I - Job priority */
   job->back_pipes[1]   = -1;
   job->print_pipes[0]  = -1;
   job->print_pipes[1]  = -1;
+  job->side_pipes[0]   = -1;
+  job->side_pipes[1]   = -1;
   job->status_pipes[0] = -1;
   job->status_pipes[1] = -1;
 
@@ -1609,6 +1611,12 @@ cupsdStopJob(cupsd_job_t *job,		/* I - Job */
 
   cupsdClosePipe(job->back_pipes);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdStopJob: Closing side pipes [ %d %d ]...",
+                  job->side_pipes[0], job->side_pipes[1]);
+
+  cupsdClosePipe(job->side_pipes);
+
   if (job->status_buffer)
   {
    /*
@@ -2068,6 +2076,8 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       job->back_pipes[1]   = -1;
       job->print_pipes[0]  = -1;
       job->print_pipes[1]  = -1;
+      job->side_pipes[0]   = -1;
+      job->side_pipes[1]   = -1;
       job->status_pipes[0] = -1;
       job->status_pipes[1] = -1;
 
@@ -2323,6 +2333,8 @@ load_request_root(void)
       job->back_pipes[1]   = -1;
       job->print_pipes[0]  = -1;
       job->print_pipes[1]  = -1;
+      job->side_pipes[0]   = -1;
+      job->side_pipes[1]   = -1;
       job->status_pipes[0] = -1;
       job->status_pipes[1] = -1;
 
@@ -2693,6 +2705,18 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
     fcntl(job->back_pipes[1], F_SETFL,
           fcntl(job->back_pipes[1], F_GETFL) | O_NONBLOCK);
+
+   /*
+    * Create the side-channel pipes and make them non-blocking...
+    */
+
+    socketpair(AF_LOCAL, SOCK_STREAM, 0, job->side_pipes);
+
+    fcntl(job->side_pipes[0], F_SETFL,
+          fcntl(job->side_pipes[0], F_GETFL) | O_NONBLOCK);
+
+    fcntl(job->side_pipes[1], F_SETFL,
+          fcntl(job->side_pipes[1], F_GETFL) | O_NONBLOCK);
   }
 
  /*
@@ -3235,7 +3259,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
     pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
                             filterfds[slot][1], job->status_pipes[1],
-		            job->back_pipes[0], 0, job->filters + i);
+		            job->back_pipes[0], job->side_pipes[0], 0,
+			    job->filters + i);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "start_job: Closing filter pipes for slot %d "
@@ -3305,8 +3330,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
       pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
 			      filterfds[slot][1], job->status_pipes[1],
-			      job->back_pipes[1], backroot,
-			      &(job->backend));
+			      job->back_pipes[1], job->side_pipes[1],
+			      backroot, &(job->backend));
 
       if (pid == 0)
       {
@@ -3343,6 +3368,12 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
         	      job->back_pipes[0], job->back_pipes[1]);
 
       cupsdClosePipe(job->back_pipes);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "start_job: Closing side pipes [ %d %d ]...",
+        	      job->side_pipes[0], job->side_pipes[1]);
+
+      cupsdClosePipe(job->side_pipes);
 
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		      "start_job: Closing status output pipe %d...",

@@ -46,6 +46,7 @@ typedef struct cupsd_job_s
   ipp_t			*attrs;		/* Job attributes */
   int			print_pipes[2],	/* Print data pipes */
 			back_pipes[2],	/* Backchannel pipes */
+			side_pipes[2],	/* Sidechannel pipes */
 			status_pipes[2];/* Status pipes */
   cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
   int			cost;		/* Filtering cost */

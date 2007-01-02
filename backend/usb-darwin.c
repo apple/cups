@@ -58,12 +58,14 @@
 #include <mach/mach_error.h>
 #include <mach/mach_time.h>
 #include <cups/debug.h>
+#include <cups/sidechannel.h>
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
 
 #include <pthread.h>
+
 
 /* 
  * WAITEOF_DELAY is number of seconds we'll wait for responses from
@@ -86,6 +88,7 @@
 
 #define kUSBGenericTOPrinterClassDriver	CFSTR("/System/Library/Printers/Libraries/USBGenericTOPrintingClass.plugin")
 #define kUSBPrinterClassDeviceNotOpen	-9664	/*kPMInvalidIOMContext*/
+#define kWriteBufferSize		2048
 
 
 #pragma mark -
@@ -183,6 +186,17 @@ typedef struct printer_data_s {			/**** Printer context data ****/
   UInt32		location;
   Boolean		waitEOF;
 
+  pthread_cond_t	reqWaitCompCond;
+  pthread_mutex_t	reqWaitMutex;
+  pthread_mutex_t	waitCloseMutex;
+  pthread_mutex_t	writeCompMutex;
+  int			writeDone;
+  int			reqWaitDone;
+  int			reqWqitFlag;
+  int			directionalFlag;	/* 0=uni, 1=bidi */
+  ssize_t		dataSize;
+  ssize_t		dataOffset;
+  char			dataBuffer[kWriteBufferSize];
 } printer_data_t;
 
 
@@ -208,6 +222,12 @@ static CFStringRef cfstr_create_and_trim(const char *cstr);
 static void parse_options(const char *options, char *serial, UInt32 *location, Boolean *waitEOF);
 static void setup_cfLanguage(void);
 static void *read_thread(void *reference);
+static void *reqestWait_thread(void *reference);
+static void usbSoftReset(printer_data_t *userData, cups_sc_status_t *status);
+static void usbDrainOutput(printer_data_t *userData, cups_sc_status_t *status);
+static void usbGetBidirectional(printer_data_t *userData, cups_sc_status_t *status, char *data, int *datalen);
+static void usbGetDeviceID(printer_data_t *userData, cups_sc_status_t *status, char *data, int *datalen);
+static void usbGetDevState(printer_data_t *userData, cups_sc_status_t *status, char *data, int *datalen);
 
 
 #if defined(__i386__)
@@ -257,6 +277,12 @@ print_device(const char *uri,		/* I - Device URI */
   pthread_cond_t  *readCompleteConditionPtr = NULL;	/* Read complete condition */
   pthread_mutex_t *readMutexPtr = NULL;			/* Read mutex */
   CFStringRef	  driverBundlePath;			/* Class driver path */
+  int             reqWait_create = 0;			/* RequestWait thread created? */
+  pthread_t       reqWaitThread;			/* RequestWait thread */
+  pthread_cond_t  *reqWaitCompCondPtr = NULL;		/* RequestWait complete condition */
+  pthread_mutex_t *reqWaitMutexPtr = NULL;		/* RequestWait mutex */
+  pthread_mutex_t *waitCloseMutexPtr = NULL;		/* wait close mutex */
+  pthread_mutex_t *writeCompMutexPtr = NULL;		/* write complete mutex */
 
   setup_cfLanguage();
   parse_options(options, serial, &printer_data.location, &printer_data.waitEOF);
@@ -358,16 +384,44 @@ print_device(const char *uri,		/* I - Device URI */
     if (pthread_mutex_init(&printer_data.readMutex, NULL) == 0)
       readMutexPtr = &printer_data.readMutex;
 
+    printer_data.done = 0;
+
     if (pthread_create(&thr, NULL, read_thread, &printer_data) == 0)
       thread_created = 1;
 
     if (thread_created == 0) 
       fprintf(stderr, "WARNING: Couldn't create read channel\n");
+
+    if (pthread_cond_init(&printer_data.reqWaitCompCond, NULL) == 0)	
+      reqWaitCompCondPtr = &printer_data.reqWaitCompCond;
+
+    if (pthread_mutex_init(&printer_data.reqWaitMutex, NULL) == 0)
+      reqWaitMutexPtr = &printer_data.reqWaitMutex;
+
+    printer_data.reqWaitDone = 0;
+    printer_data.reqWqitFlag = 0;
+
+    if (pthread_create(&reqWaitThread, NULL, reqestWait_thread, &printer_data) == 0)
+      reqWait_create = 1;
+
+    if (reqWait_create == 0) 
+      fprintf(stderr, "WARNING: Couldn't create sidechannel thread!\n");
+
+    if (pthread_mutex_init(&printer_data.waitCloseMutex, NULL) == 0)
+      waitCloseMutexPtr = &printer_data.waitCloseMutex;
+
+    if (pthread_mutex_init(&printer_data.writeCompMutex, NULL) == 0)
+      writeCompMutexPtr = &printer_data.writeCompMutex;
   }
 
   /*
    * The main thread sends the print file...
    */
+
+  printer_data.writeDone = 0;
+  printer_data.dataSize = 0;
+  printer_data.dataOffset = 0;
+  pthread_mutex_lock(writeCompMutexPtr);
 
   while (status == noErr && copies-- > 0) {
     UInt32		wbytes;			/* Number of bytes written */
@@ -386,6 +440,15 @@ print_device(const char *uri,		/* I - Device URI */
       tbytes += nbytes;
 
       while (nbytes > 0 && status == noErr) {
+	if (printer_data.writeDone) {
+	  printer_data.dataSize = nbytes;
+	  printer_data.dataOffset = bufptr - buffer;
+	  memcpy(printer_data.dataBuffer, buffer, nbytes);
+
+	  status = -1;
+	  break;
+	}
+
 	wbytes = nbytes;
 	status = (*(printer_data.printerDriver))->WritePipe( printer_data.printerDriver, (UInt8*)bufptr, &wbytes, 0 /* nbytes > wbytes? 0: feof(fp) */ );
 	if (wbytes < 0 || noErr != status) {
@@ -402,6 +465,9 @@ print_device(const char *uri,		/* I - Device URI */
 	fprintf(stderr, "DEBUG: Sending print file, %qd bytes...\n", (off_t)tbytes);
     }
   }
+
+  printer_data.writeDone = 1;
+  pthread_mutex_unlock(writeCompMutexPtr);
 
   if (thread_created) {
     /* Signal the read thread that we are done... */
@@ -420,6 +486,35 @@ print_device(const char *uri,		/* I - Device URI */
     pthread_join( thr,NULL);				/* wait for the child thread to return */
   }
 
+  if (reqWait_create) {
+    /* Signal the cupsSideChannelDoRequest wait thread that we are done... */
+    printer_data.reqWaitDone = 1;
+
+    /* 
+     * Give the cupsSideChannelDoRequest wait thread WAITEOF_DELAY seconds to complete
+     * all the data. If we are not signaled in that time then force the thread to exit
+     * by setting the waiteof to be false. Plese note that this relies on us using the
+     * timeout class driver.
+     */
+    struct timespec reqWaitSleepUntil = { time(NULL) + WAITEOF_DELAY, 0 };
+    pthread_mutex_lock(&printer_data.reqWaitMutex);
+
+    while (!printer_data.reqWqitFlag) {
+      if (pthread_cond_timedwait(&printer_data.reqWaitCompCond,
+                                 &printer_data.reqWaitMutex,
+				 (const struct timespec *)&reqWaitSleepUntil) != 0) {
+	printer_data.waitEOF = false;
+	printer_data.reqWqitFlag = 1;
+      }
+    }
+    pthread_mutex_unlock(&printer_data.reqWaitMutex);
+    pthread_join(reqWaitThread,NULL);			/* wait for the child thread to return */
+  }
+
+  /* interface close wait mutex(for softreset) */
+  pthread_mutex_lock(waitCloseMutexPtr);
+  pthread_mutex_unlock(waitCloseMutexPtr);
+
   /*
    * Close the connection and input file and general clean up...
    */
@@ -433,6 +528,18 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (readMutexPtr != NULL)
     pthread_mutex_destroy(&printer_data.readMutex);
+
+  if (waitCloseMutexPtr != NULL)
+    pthread_mutex_destroy(&printer_data.waitCloseMutex);
+
+  if (writeCompMutexPtr != NULL)
+    pthread_mutex_destroy(&printer_data.writeCompMutex);
+
+  if (reqWaitCompCondPtr != NULL)
+    pthread_cond_destroy(&printer_data.reqWaitCompCond);
+
+  if (reqWaitMutexPtr != NULL)
+    pthread_mutex_destroy(&printer_data.reqWaitMutex);
 
   if (printer_data.make != NULL)
     CFRelease(printer_data.make);
@@ -792,6 +899,8 @@ static kern_return_t load_printerdriver(printer_data_t *printer, CFStringRef *dr
 
 static kern_return_t registry_open(printer_data_t *printer, CFStringRef *driverBundlePath)
 {
+  printer->directionalFlag = 0;
+
   kern_return_t kr = load_printerdriver(printer, driverBundlePath);
   if (kr != kIOReturnSuccess) {
     kr = -2;
@@ -807,6 +916,8 @@ static kern_return_t registry_open(printer_data_t *printer, CFStringRef *driverB
 	  kr = -1;
 	}
       }
+    } else {
+      printer->directionalFlag = 1;
     }
   }
 
@@ -1389,6 +1500,202 @@ static void *read_thread(void *reference)
   pthread_mutex_unlock(&userData->readMutex);
 
   return NULL;
+}
+
+/*
+ * 'reqestWait_thread()' - A thread cupsSideChannelDoRequest wait.
+ */
+static void *reqestWait_thread(void *reference) {
+  printer_data_t *userData = (printer_data_t *)reference;
+  int datalen;
+  cups_sc_command_t command;
+  cups_sc_status_t status;
+  uint64_t start, delay;
+  struct mach_timebase_info timeBaseInfo;
+  char data[2048];
+
+  /*
+   * Calculate what 100 milliSeconds are in mach absolute time...
+   */
+  mach_timebase_info(&timeBaseInfo);
+  delay = ((uint64_t)100000000 * (uint64_t)timeBaseInfo.denom) / (uint64_t)timeBaseInfo.numer;
+
+  /* interface close wait mutex lock. */
+  pthread_mutex_lock(&(userData->waitCloseMutex));
+
+  do {
+    /* 
+     * Remember when we started so we can throttle the loop after the cupsSideChannelDoRequest call...
+     */
+    start = mach_absolute_time();
+
+    /* Poll for a command... */
+    command=0;
+    datalen = sizeof(data);
+    bzero(data, sizeof(data));
+
+    if (!cupsSideChannelRead(&command, &status, data, &datalen, 0.0)) {
+      datalen = sizeof(data);
+
+      switch (command) {
+	case CUPS_SC_CMD_SOFT_RESET:
+	    /* do a soft reset */
+	    usbSoftReset(userData, &status);
+	    datalen = 0;
+	    userData->reqWaitDone = 1;
+	    break;
+	case CUPS_SC_CMD_DRAIN_OUTPUT:
+	    /* drain all pending output */
+	    usbDrainOutput(userData, &status);
+	    datalen = 0;
+	    break;
+	case CUPS_SC_CMD_GET_BIDI:
+	    /* return whether the connection is bidirectional */
+	    usbGetBidirectional(userData, &status, data, &datalen);
+	    break;
+	case CUPS_SC_CMD_GET_DEVICE_ID:
+	    /* return the IEEE-1284 device ID */
+	    usbGetDeviceID(userData, &status, data, &datalen);
+	    break;
+	case CUPS_SC_CMD_GET_STATE:
+	    /* return the device state */
+	    usbGetDevState(userData, &status, data, &datalen);
+	    break;
+	default:
+	    status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	    datalen = 0;
+	    break;
+      }
+
+      if (userData->writeDone) {
+        status = CUPS_SC_STATUS_NONE;
+      }
+
+      /* Send a response... */
+      cupsSideChannelWrite(command, status, data, datalen, 1.0);
+    }
+
+    /*
+     * Make sure this loop executes no more than once every 500 miliseconds...
+     */
+    if ((userData->waitEOF) || (!userData->reqWaitDone)) {
+      mach_wait_until(start + delay);
+    }
+  } while(!userData->reqWaitDone);
+
+  sleep(1);
+  pthread_mutex_lock(&userData->reqWaitMutex);
+  userData->reqWqitFlag = 1;
+  pthread_cond_signal(&userData->reqWaitCompCond);
+  pthread_mutex_unlock(&userData->reqWaitMutex);
+
+  /* interface close wait mutex unlock. */
+  pthread_mutex_unlock(&(userData->waitCloseMutex));
+
+  return NULL;
+}
+
+#pragma mark -
+/*
+ * 'usbSoftReset'
+ */
+static void usbSoftReset(printer_data_t *userData, cups_sc_status_t *status) {
+  OSStatus err;
+
+  /* write stop. */
+  userData->writeDone = 1;
+
+  /* Abort (print_device()-WritePipe kIOReturnAborted return) */
+  if (userData->printerDriver != NULL)
+    err = (*(userData->printerDriver))->Abort(userData->printerDriver);
+
+  /* print_device() WritePipe_Loop break wait. */
+  pthread_mutex_lock(&(userData->writeCompMutex));
+  pthread_mutex_unlock(&(userData->writeCompMutex));
+
+  /* SoftReset */
+  if (userData->printerDriver != NULL)
+    (*(userData->printerDriver))->SoftReset(userData->printerDriver, 0);
+
+  if (status != NULL)
+    *status  = CUPS_SC_STATUS_OK;
+}
+
+/*
+ * 'usbDrainOutput'
+ */
+static void usbDrainOutput(printer_data_t *userData, cups_sc_status_t *status) {
+  OSStatus osSts = noErr;	/* Function results */
+  OSStatus err = noErr;
+  UInt32  wbytes;			/* Number of bytes written */
+  ssize_t nbytes;			/* Number of bytes read */
+  char *bufptr;
+
+  bufptr = userData->dataBuffer+userData->dataOffset;
+  nbytes = userData->dataSize;
+
+  while((nbytes > 0) && (osSts == noErr)) {
+    wbytes = nbytes;
+    osSts = (*(userData->printerDriver))->WritePipe(userData->printerDriver, (UInt8*)bufptr, &wbytes, 0);
+
+    if (wbytes < 0 || noErr != osSts) {
+      if (osSts != kIOReturnAborted) {
+	err = (*(userData->printerDriver))->Abort(userData->printerDriver);
+	break;
+      }
+    }
+
+    nbytes -= wbytes;
+    bufptr += wbytes;
+  }
+
+  if (status != NULL) {
+    if ((osSts != noErr) || (err != noErr)) {
+      *status  = CUPS_SC_STATUS_IO_ERROR;
+    } else {
+      *status  = CUPS_SC_STATUS_OK;
+    }
+  }
+}
+
+/*
+ * 'usbGetBidirectional'
+ */
+static void usbGetBidirectional(printer_data_t *userData, cups_sc_status_t *status, char *data, int *datalen) {
+  *data = userData->directionalFlag;
+  *datalen = 1;
+
+  if (status != NULL)
+    *status = CUPS_SC_STATUS_OK;
+}
+
+/*
+ * 'usbGetDeviceID'
+ */
+static void usbGetDeviceID(printer_data_t *userData, cups_sc_status_t *status, char *data, int *datalen) {
+  UInt32 deviceLocation = 0;
+  CFStringRef deviceIDString = NULL;
+
+  /* GetDeviceID */
+  copy_devicestring(userData->printerObj, &deviceIDString, &deviceLocation);
+  CFStringGetCString(deviceIDString, data, *datalen, kCFStringEncodingUTF8);
+  *datalen = strlen(data);
+
+  if (status != NULL) {
+    *status  = CUPS_SC_STATUS_OK;
+  }
+}
+
+/*
+ * 'usbGetDevState'
+ */
+static void usbGetDevState(printer_data_t *userData, cups_sc_status_t *status, char *data, int *datalen) {
+  *data = CUPS_SC_STATE_ONLINE;
+  *datalen = 1;
+
+  if (status != NULL) {
+    *status = CUPS_SC_STATUS_OK;
+  }
 }
 
 /*
