@@ -1,8 +1,11 @@
-CHANGES.txt - 2006-11-21
+CHANGES.txt - 2007-01-02
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- Added a new side-channel API for drivers and backends
+	  for basic device control and information queries (STR
+	  #1898)
 	- The scheduler now uses poll(), epoll(), or /dev/kqueue
 	  instead of select() when possible (STR #1261)
 	- Added new cupsArrayGetIndex() and cupsArrayGetInsert()
