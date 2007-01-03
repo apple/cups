@@ -104,7 +104,7 @@ static char		*get_md5_password(const char *username,
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
-#else
+#elif !defined(HAVE_USERSEC_H)
 static void		to64(char *s, unsigned long v, int n);
 #endif /* HAVE_LIBPAM */
 
@@ -2340,7 +2340,7 @@ pam_func(
 
   return (PAM_SUCCESS);
 }
-#else
+#elif !defined(HAVE_USERSEC_H)
 
 
 /*
