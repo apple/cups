@@ -52,8 +52,8 @@
 #  include <dbus/dbus.h>
 #  ifdef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND
 #    define dbus_message_append_iter_init dbus_message_iter_init_append
-#    define dbus_message_iter_append_string(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_STRING, v)
-#    define dbus_message_iter_append_uint32(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_UINT32, v)
+#    define dbus_message_iter_append_string(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_STRING, &(v))
+#    define dbus_message_iter_append_uint32(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_UINT32, &(v))
 #  endif /* HAVE_DBUS_MESSAGE_ITER_INIT_APPEND */
 #endif /* HAVE_DBUS */
 
