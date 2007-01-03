@@ -1471,6 +1471,8 @@ fix_make_model(
   }
   else if (!strncasecmp(old_make_model, "deskjet", 7))
     snprintf(make_model, make_model_size, "HP DeskJet%s", old_make_model + 7);
+  else if (!strncasecmp(old_make_model, "officejet", 9))
+    snprintf(make_model, make_model_size, "HP OfficeJet%s", old_make_model + 9);
   else if (!strncasecmp(old_make_model, "stylus_pro_", 11))
     snprintf(make_model, make_model_size, "EPSON Stylus Pro %s",
              old_make_model + 11);
