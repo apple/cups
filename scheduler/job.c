@@ -465,7 +465,6 @@ cupsdCleanJobs(void)
 void
 cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 {
-  int			job_history;	/* Did cupsdCancelJob() keep the job? */
   cupsd_printer_t	*printer;	/* Current printer */
 
 
@@ -710,8 +709,6 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
      /*
       * Close out this job...
       */
-
-      job_history = JobHistory && !(job->dtype & CUPS_PRINTER_REMOTE);
 
       cupsdCancelJob(job, 0, IPP_JOB_COMPLETED);
       cupsdCheckJobs();

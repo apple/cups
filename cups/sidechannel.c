@@ -223,7 +223,7 @@ cupsSideChannelRead(
     * length...
     */
 
-    *status  = (cups_sc_command_t)buffer[1];
+    *status  = (cups_sc_status_t)buffer[1];
     *datalen = templen;
 
     memcpy(data, buffer + 4, templen);

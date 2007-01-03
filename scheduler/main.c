@@ -134,9 +134,6 @@ main(int  argc,				/* I - Number of command-line args */
 			browse_time,	/* Next browse send time */
 			senddoc_time,	/* Send-Document time */
 			expire_time,	/* Subscription expire time */
-#ifndef __APPLE__
-			netif_time,	/* Network interface poll time */
-#endif /* !__APPLE__ */
 			mallinfo_time;	/* Malloc information time */
   size_t		string_count,	/* String count */
 			alloc_bytes,	/* Allocated string bytes */
@@ -539,9 +536,6 @@ main(int  argc,				/* I - Number of command-line args */
   senddoc_time  = time(NULL);
   expire_time   = time(NULL);
   fds           = 1;
-#ifndef __APPLE__
-  netif_time    = 0;
-#endif /* !__APPLE__ */
 
   while (!stop_scheduler)
   {
