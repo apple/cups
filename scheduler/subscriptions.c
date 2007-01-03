@@ -3,7 +3,7 @@
  *
  *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1359,11 +1359,11 @@ cupsd_send_dbus(cupsd_eventmask_t event,/* I - Event to send */
 
   dbus_message_append_iter_init(message, &iter);
   if (dest)
-    dbus_message_iter_append_string(&iter, &(dest->name));
+    dbus_message_iter_append_string(&iter, dest->name);
   if (job)
   {
-    dbus_message_iter_append_uint32(&iter, &(job->id));
-    dbus_message_iter_append_string(&iter, &(job->username));
+    dbus_message_iter_append_uint32(&iter, job->id);
+    dbus_message_iter_append_string(&iter, job->username);
   }
 
   dbus_connection_send(con, message, NULL);
