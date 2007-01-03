@@ -1,6 +1,6 @@
                 Common UNIX Printing System License Agreement
 
-                Copyright 1997-2006 by Easy Software Products
+                Copyright 1997-2007 by Easy Software Products
                         44141 AIRPORT VIEW DR STE 204
                      HOLLYWOOD, MARYLAND 20636 USA
 

@@ -1,4 +1,4 @@
-README - CUPS v1.2rc1 - 2006-03-24
+README - CUPS v1.3svn - 2007-01-03
 ----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
@@ -170,7 +170,7 @@ PRINTING FILES
 
 LEGAL STUFF
 
-    CUPS is Copyright 1993-2006 by Easy Software Products.  CUPS,
+    CUPS is Copyright 1993-2007 by Easy Software Products.  CUPS,
     the CUPS logo, and the Common UNIX Printing System are the
     trademark property of Easy Software Products.
 
