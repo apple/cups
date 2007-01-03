@@ -4,7 +4,7 @@
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1054,7 +1054,7 @@ ippReadIO(void       *src,		/* I - Data source */
           if ((n = (*cb)(src, buffer, 8)) < 8)
 	  {
 	    DEBUG_printf(("ippReadIO: Unable to read header (%d bytes read)!\n", n));
-	    return (n == 0 ? IPP_IDLE : IPP_ERROR);
+	    return (IPP_ERROR);
 	  }
 
 	 /*
