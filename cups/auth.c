@@ -3,7 +3,7 @@
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   This file contains Kerberos support code, copyright 2006 by
  *   Jelmer Vernooij.
@@ -269,7 +269,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     */
 
     httpEncode64_2(encode, sizeof(encode), http->userpass,
-                   strlen(http->userpass));
+                   (int)strlen(http->userpass));
     snprintf(http->_authstring, sizeof(http->_authstring), "Basic %s", encode);
   }
   else

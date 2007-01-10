@@ -3,7 +3,7 @@
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -267,7 +267,7 @@ cupsEncodeOptions2(
       int	namelen;		/* Length of name */
 
 
-      namelen = strlen(option->name);
+      namelen = (int)strlen(option->name);
 
       if (namelen < 9 || strcmp(option->name + namelen - 8, "-default"))
       {
@@ -502,7 +502,7 @@ cupsEncodeOptions2(
 	    * octet-string
 	    */
 
-            attr->values[j].unknown.length = strlen(val);
+            attr->values[j].unknown.length = (int)strlen(val);
 	    attr->values[j].unknown.data   = _cupsStrAlloc(val);
 
             DEBUG_printf(("cupsEncodeOptions2: Added octet-string value \"%s\"...\n",

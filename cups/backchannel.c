@@ -3,7 +3,7 @@
  *
  *   Backchannel functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -95,7 +95,11 @@ cupsBackChannelRead(char   *buffer,	/* I - Buffer to read */
   * Read bytes from the pipe...
   */
 
+#ifdef WIN32
+  return ((ssize_t)read(3, buffer, (unsigned)bytes));
+#else
   return (read(3, buffer, bytes));
+#endif /* WIN32 */
 }
 
 
@@ -153,7 +157,11 @@ cupsBackChannelWrite(
     * Write bytes to the pipe...
     */
 
+#ifdef WIN32
+    count = (ssize_t)write(3, buffer, (unsigned)(bytes - total));
+#else
     count = write(3, buffer, bytes - total);
+#endif /* WIN32 */
 
     if (count < 0)
     {
@@ -175,7 +183,7 @@ cupsBackChannelWrite(
     }
   }
 
-  return (bytes);
+  return ((ssize_t)bytes);
 }
 
 

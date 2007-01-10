@@ -1402,7 +1402,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
     if (!http->blocking && !httpWait(http, 10000))
       return (0);
 
-    bytes = http_read_ssl(http, buffer, length);
+    bytes = (ssize_t)http_read_ssl(http, buffer, (int)length);
   }
 #endif /* HAVE_SSL */
   else
@@ -2301,7 +2301,11 @@ static int				/* O - Bytes written */
 http_bio_puts(BIO        *h,		/* I - BIO data */
               const char *str)		/* I - String to write */
 {
+#ifdef WIN32
+  return (send(((http_t *)h->ptr)->fd, str, (int)strlen(str), 0));
+#else
   return (send(((http_t *)h->ptr)->fd, str, strlen(str), 0));
+#endif /* WIN32 */
 }
 
 
@@ -2327,7 +2331,12 @@ http_bio_read(BIO  *h,			/* I - BIO data */
 
     if (!http_wait(http, 10000, 0))
     {
+#ifdef WIN32
+      http->error = WSAETIMEDOUT;
+#else
       http->error = ETIMEDOUT;
+#endif /* WIN32 */
+
       return (-1);
     }
   }

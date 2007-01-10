@@ -8,7 +8,7 @@
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -392,7 +392,7 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
     return (-1);
   }
 
-  bytes = fp->ptr - fp->buf;
+  bytes = (ssize_t)(fp->ptr - fp->buf);
 
   DEBUG_printf(("    Flushing %ld bytes...\n", (long)bytes));
 
@@ -1104,7 +1104,7 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
   * Write the string...
   */
 
-  bytes = strlen(s);
+  bytes = (int)strlen(s);
 
   if (fp->mode == 's')
   {
@@ -1179,14 +1179,14 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
         DEBUG_printf(("    cups_fill() returned -1, total=%d\n", total));
 
         if (total > 0)
-          return (total);
+          return ((ssize_t)total);
 	else
 	  return (-1);
       }
 
-    count = fp->end - fp->ptr;
-    if (count > bytes)
-      count = bytes;
+    count = (ssize_t)(fp->end - fp->ptr);
+    if (count > (ssize_t)bytes)
+      count = (ssize_t)bytes;
 
     memcpy(buf, fp->ptr, count);
     fp->ptr += count;
@@ -1206,7 +1206,7 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
 
   DEBUG_printf(("    total=%d\n", total));
 
-  return (total);
+  return ((ssize_t)total);
 }
 
 
@@ -1328,7 +1328,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
   */
 
   if (fp->ptr)
-    bytes = fp->end - fp->buf;
+    bytes = (ssize_t)(fp->end - fp->buf);
   else
     bytes = 0;
 
@@ -1582,16 +1582,16 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
     if (cups_write(fp, buf, bytes) < 0)
       return (-1);
 
-    fp->pos += bytes;
+    fp->pos += (off_t)bytes;
 
-    return (bytes);
+    return ((ssize_t)bytes);
   }
 
   if ((fp->ptr + bytes) > fp->end)
     if (cupsFileFlush(fp))
       return (-1);
 
-  fp->pos += bytes;
+  fp->pos += (off_t)bytes;
 
   if (bytes > sizeof(fp->buf))
   {
@@ -1606,7 +1606,7 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
   {
     memcpy(fp->ptr, buf, bytes);
     fp->ptr += bytes;
-    return (bytes);
+    return ((ssize_t)bytes);
   }
 }
 
@@ -1687,7 +1687,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
   */
 
   if (fp->ptr && fp->end)
-    fp->pos += fp->end - fp->buf;
+    fp->pos += (off_t)(fp->end - fp->buf);
 
 #ifdef HAVE_LIBZ
   DEBUG_printf(("    fp->compressed=%d\n", fp->compressed));
@@ -1995,10 +1995,17 @@ cups_read(cups_file_t *fp,		/* I - CUPS file */
 
   for (;;)
   {
+#ifdef WIN32
+    if (fp->mode == 's')
+      total = (ssize_t)recv(fp->fd, buf, (unsigned)bytes, 0);
+    else
+      total = (ssize_t)read(fp->fd, buf, (unsigned)bytes);
+#else
     if (fp->mode == 's')
       total = recv(fp->fd, buf, bytes, 0);
     else
       total = read(fp->fd, buf, bytes);
+#endif /* WIN32 */
 
     if (total >= 0)
       break;
@@ -2044,10 +2051,17 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
   total = 0;
   while (bytes > 0)
   {
+#ifdef WIN32
+    if (fp->mode == 's')
+      count = (ssize_t)send(fp->fd, buf, (unsigned)bytes, 0);
+    else
+      count = (ssize_t)write(fp->fd, buf, (unsigned)bytes);
+#else
     if (fp->mode == 's')
       count = send(fp->fd, buf, bytes, 0);
     else
       count = write(fp->fd, buf, bytes);
+#endif /* WIN32 */
 
     if (count < 0)
     {
@@ -2076,7 +2090,7 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
   * Return the total number of bytes written...
   */
 
-  return (total);
+  return ((ssize_t)total);
 }
 
 
