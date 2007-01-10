@@ -246,7 +246,7 @@ cupsAdminCreateWindowsPPD(
       if ((ptr = strchr(line, ':')) == NULL)
       {
         snprintf(line, sizeof(line),
-	          _cupsLangString(language, _("Missing value on line %d!\n")),
+	          _cupsLangString(language, _("Missing value on line %d!")),
 		  linenum);
         _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
 
@@ -265,7 +265,7 @@ cupsAdminCreateWindowsPPD(
       {
         snprintf(line, sizeof(line),
 	         _cupsLangString(language,
-		                 _("Missing double quote on line %d!\n")),
+		                 _("Missing double quote on line %d!")),
 	         linenum);
         _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
 
@@ -284,7 +284,7 @@ cupsAdminCreateWindowsPPD(
       {
         snprintf(line, sizeof(line),
 	         _cupsLangString(language,
-		                 _("Bad option + choice on line %d!\n")),
+		                 _("Bad option + choice on line %d!")),
 	         linenum);
         _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
 
@@ -326,6 +326,21 @@ cupsAdminCreateWindowsPPD(
 
   cupsFileClose(srcfp);
   unlink(src);
+
+  if (linenum == 0)
+  {
+    snprintf(line, sizeof(line),
+             _cupsLangString(language, _("Empty PPD file!")),
+             linenum);
+    _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
+
+    cupsFileClose(dstfp);
+    unlink(buffer);
+
+    *buffer = '\0';
+
+    return (NULL);
+  }
 
  /*
   * Now add the CUPS-specific attributes and options...
@@ -659,7 +674,7 @@ cupsAdminExportSamba(
   {
     snprintf(message, sizeof(message),
              _cupsLangString(language,
-        		     _("Unable to set Windows printer driver (%d)!\n")),
+        		     _("Unable to set Windows printer driver (%d)!")),
         		     status);
 
     _cupsSetError(IPP_INTERNAL_ERROR, message);
