@@ -3,7 +3,7 @@
  *
  *   Transcoding support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are
  *   the property of Easy Software Products and are protected by Federal
@@ -292,7 +292,7 @@ cupsCharsetToUTF8(
       encoding < 0 || encoding >= CUPS_ENCODING_VBCS_END)
   {
     strlcpy((char *)dest, src, maxout);
-    return (strlen((char *)dest));
+    return ((int)strlen((char *)dest));
   }
 
  /*
@@ -324,7 +324,7 @@ cupsCharsetToUTF8(
 
     *destptr = '\0';
 
-    return (destptr - dest);
+    return ((int)(destptr - dest));
   }
 
  /*
@@ -392,7 +392,7 @@ cupsUTF8ToCharset(
       encoding < 0 || encoding >= CUPS_ENCODING_VBCS_END)
   {
     strlcpy(dest, (char *)src, maxout);
-    return (strlen(dest));
+    return ((int)strlen(dest));
   }
 
  /*
@@ -431,7 +431,7 @@ cupsUTF8ToCharset(
 
     *destptr = '\0';
 
-    return (destptr - dest);
+    return ((int)(destptr - dest));
   }
 
  /*
@@ -968,7 +968,7 @@ conv_utf8_to_vbcs(
 
     if (unichar < 0x80)
     {
-      *dest++ = (cups_vbcs_t)unichar;
+      *dest++ = (cups_sbcs_t)unichar;
       continue;
     }
 

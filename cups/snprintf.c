@@ -3,7 +3,7 @@
  *
  *   snprintf functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -195,7 +195,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	    sprintf(temp, tformat, va_arg(ap, double));
 
-            bytes += strlen(temp);
+            bytes += (int)strlen(temp);
 
             if (bufptr)
 	    {
@@ -225,7 +225,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	    sprintf(temp, tformat, va_arg(ap, int));
 
-            bytes += strlen(temp);
+            bytes += (int)strlen(temp);
 
 	    if (bufptr)
 	    {
@@ -248,7 +248,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	    sprintf(temp, tformat, va_arg(ap, void *));
 
-            bytes += strlen(temp);
+            bytes += (int)strlen(temp);
 
 	    if (bufptr)
 	    {
@@ -275,7 +275,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 	      else
 	      {
 		if ((bufptr + width) > bufend)
-		  width = bufend - bufptr;
+		  width = (int)(bufend - bufptr);
 
 		memcpy(bufptr, va_arg(ap, char *), (size_t)width);
 		bufptr += width;
@@ -287,7 +287,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 	    if ((s = va_arg(ap, char *)) == NULL)
 	      s = "(null)";
 
-	    slen = strlen(s);
+	    slen = (int)strlen(s);
 	    if (slen > width && prec != width)
 	      width = slen;
 
@@ -296,7 +296,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 	    if (bufptr)
 	    {
 	      if ((bufptr + width) > bufend)
-	        width = bufend - bufptr;
+	        width = (int)(bufend - bufptr);
 
               if (slen > width)
 	        slen = width;

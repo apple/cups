@@ -3,7 +3,7 @@
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
  *   Jelmer Vernooij.
@@ -974,7 +974,11 @@ httpGets(char   *line,			/* I - Line to read into */
       if (!http->blocking && !http_wait(http, 10000, 1))
       {
         DEBUG_puts("httpGets: Timed out!");
+#ifdef WIN32
+        http->error = WSAETIMEDOUT;
+#else
         http->error = ETIMEDOUT;
+#endif /* WIN32 */
         return (NULL);
       }
 
@@ -1050,7 +1054,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	*lineptr++ = *bufptr++;
     }
 
-    http->used -= bufptr - http->buffer;
+    http->used -= (int)(bufptr - http->buffer);
     if (http->used > 0)
       memmove(http->buffer, bufptr, http->used);
 
@@ -1323,8 +1327,8 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
     return (0);
   }
-  else if (length > http->data_remaining)
-    length = http->data_remaining;
+  else if (length > (size_t)http->data_remaining)
+    length = (size_t)http->data_remaining;
 
   if (http->used == 0 && length <= 256)
   {
@@ -1379,15 +1383,15 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
   if (http->used > 0)
   {
-    if (length > http->used)
-      length = http->used;
+    if (length > (size_t)http->used)
+      length = (size_t)http->used;
 
-    bytes = length;
+    bytes = (ssize_t)length;
 
     DEBUG_printf(("httpRead2: grabbing %d bytes from input buffer...\n", bytes));
 
     memcpy(buffer, http->buffer, length);
-    http->used -= length;
+    http->used -= (int)length;
 
     if (http->used > 0)
       memmove(http->buffer, http->buffer + length, http->used);
@@ -1408,9 +1412,13 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
     DEBUG_printf(("httpRead2: reading %d bytes from socket...\n", length));
 
+#ifdef WIN32
+    bytes = (ssize_t)recv(http->fd, buffer, (int)length, 0);
+#else
     while ((bytes = recv(http->fd, buffer, length, 0)) < 0)
       if (errno != EINTR)
         break;
+#endif /* WIN32 */
 
     DEBUG_printf(("httpRead2: read %d bytes from socket...\n", bytes));
   }
@@ -2071,8 +2079,8 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       DEBUG_printf(("    copying %d bytes to wbuffer...\n", length));
 
       memcpy(http->wbuffer + http->wused, buffer, length);
-      http->wused += length;
-      bytes = length;
+      http->wused += (int)length;
+      bytes = (ssize_t)length;
     }
     else
     {
@@ -2083,9 +2091,9 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       DEBUG_printf(("    writing %d bytes to socket...\n", length));
 
       if (http->data_encoding == HTTP_ENCODE_CHUNKED)
-	bytes = http_write_chunk(http, buffer, length);
+	bytes = (ssize_t)http_write_chunk(http, buffer, (int)length);
       else
-	bytes = http_write(http, buffer, length);
+	bytes = (ssize_t)http_write(http, buffer, (int)length);
 
       DEBUG_printf(("    wrote %d bytes...\n", bytes));
     }
@@ -3061,7 +3069,7 @@ http_write_chunk(http_t     *http,	/* I - HTTP connection */
   */
 
   sprintf(header, "%x\r\n", length);
-  if (http_write(http, header, strlen(header)) < 0)
+  if (http_write(http, header, (int)strlen(header)) < 0)
   {
     DEBUG_puts("    http_write of length failed!");
     return (-1);

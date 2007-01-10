@@ -3,7 +3,7 @@
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -819,17 +819,17 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       strlcpy(profile->resolution, name, sizeof(profile->resolution));
       strlcpy(profile->media_type, text, sizeof(profile->media_type));
 
-      profile->density      = _cupsStrScand(string, &sptr, loc);
-      profile->gamma        = _cupsStrScand(sptr, &sptr, loc);
-      profile->matrix[0][0] = _cupsStrScand(sptr, &sptr, loc);
-      profile->matrix[0][1] = _cupsStrScand(sptr, &sptr, loc);
-      profile->matrix[0][2] = _cupsStrScand(sptr, &sptr, loc);
-      profile->matrix[1][0] = _cupsStrScand(sptr, &sptr, loc);
-      profile->matrix[1][1] = _cupsStrScand(sptr, &sptr, loc);
-      profile->matrix[1][2] = _cupsStrScand(sptr, &sptr, loc);
-      profile->matrix[2][0] = _cupsStrScand(sptr, &sptr, loc);
-      profile->matrix[2][1] = _cupsStrScand(sptr, &sptr, loc);
-      profile->matrix[2][2] = _cupsStrScand(sptr, &sptr, loc);
+      profile->density      = (float)_cupsStrScand(string, &sptr, loc);
+      profile->gamma        = (float)_cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[0][0] = (float)_cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[0][1] = (float)_cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[0][2] = (float)_cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[1][0] = (float)_cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[1][1] = (float)_cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[1][2] = (float)_cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[2][0] = (float)_cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[2][1] = (float)_cupsStrScand(sptr, &sptr, loc);
+      profile->matrix[2][2] = (float)_cupsStrScand(sptr, &sptr, loc);
     }
     else if (!strcmp(keyword, "cupsFilter"))
     {
@@ -928,8 +928,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       if (!strcmp(ctype, "curve"))
       {
         cparam->type = PPD_CUSTOM_CURVE;
-	cparam->minimum.custom_curve = _cupsStrScand(cminimum, NULL, loc);
-	cparam->maximum.custom_curve = _cupsStrScand(cmaximum, NULL, loc);
+	cparam->minimum.custom_curve = (float)_cupsStrScand(cminimum, NULL, loc);
+	cparam->maximum.custom_curve = (float)_cupsStrScand(cmaximum, NULL, loc);
       }
       else if (!strcmp(ctype, "int"))
       {
@@ -940,8 +940,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       else if (!strcmp(ctype, "invcurve"))
       {
         cparam->type = PPD_CUSTOM_INVCURVE;
-	cparam->minimum.custom_invcurve = _cupsStrScand(cminimum, NULL, loc);
-	cparam->maximum.custom_invcurve = _cupsStrScand(cmaximum, NULL, loc);
+	cparam->minimum.custom_invcurve = (float)_cupsStrScand(cminimum, NULL, loc);
+	cparam->maximum.custom_invcurve = (float)_cupsStrScand(cmaximum, NULL, loc);
       }
       else if (!strcmp(ctype, "passcode"))
       {
@@ -958,14 +958,14 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       else if (!strcmp(ctype, "points"))
       {
         cparam->type = PPD_CUSTOM_POINTS;
-	cparam->minimum.custom_points = _cupsStrScand(cminimum, NULL, loc);
-	cparam->maximum.custom_points = _cupsStrScand(cmaximum, NULL, loc);
+	cparam->minimum.custom_points = (float)_cupsStrScand(cminimum, NULL, loc);
+	cparam->maximum.custom_points = (float)_cupsStrScand(cmaximum, NULL, loc);
       }
       else if (!strcmp(ctype, "real"))
       {
         cparam->type = PPD_CUSTOM_REAL;
-	cparam->minimum.custom_real = _cupsStrScand(cminimum, NULL, loc);
-	cparam->maximum.custom_real = _cupsStrScand(cmaximum, NULL, loc);
+	cparam->minimum.custom_real = (float)_cupsStrScand(cminimum, NULL, loc);
+	cparam->maximum.custom_real = (float)_cupsStrScand(cmaximum, NULL, loc);
       }
       else if (!strcmp(ctype, "string"))
       {
@@ -1001,7 +1001,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     else if (!strcmp(keyword, "HWMargins"))
     {
       for (i = 0, sptr = string; i < 4; i ++)
-        ppd->custom_margins[i] = _cupsStrScand(sptr, &sptr, loc);
+        ppd->custom_margins[i] = (float)_cupsStrScand(sptr, &sptr, loc);
     }
     else if (!strncmp(keyword, "Custom", 6) && !strcmp(name, "True"))
     {
@@ -1400,7 +1400,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     else if (!strcmp(keyword, "OrderDependency") ||
              !strcmp(keyword, "NonUIOrderDependency"))
     {
-      order = _cupsStrScand(string, &sptr, loc);
+      order = (float)_cupsStrScand(string, &sptr, loc);
 
       if (!sptr || sscanf(sptr, "%40s%40s", name, keyword) != 2)
       {
@@ -1728,8 +1728,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	goto error;
       }
 
-      size->width  = _cupsStrScand(string, &sptr, loc);
-      size->length = _cupsStrScand(sptr, NULL, loc);
+      size->width  = (float)_cupsStrScand(string, &sptr, loc);
+      size->length = (float)_cupsStrScand(sptr, NULL, loc);
 
       ppd_free(string);
       string = NULL;
@@ -1750,10 +1750,10 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	goto error;
       }
 
-      size->left   = _cupsStrScand(string, &sptr, loc);
-      size->bottom = _cupsStrScand(sptr, &sptr, loc);
-      size->right  = _cupsStrScand(sptr, &sptr, loc);
-      size->top    = _cupsStrScand(sptr, NULL, loc);
+      size->left   = (float)_cupsStrScand(string, &sptr, loc);
+      size->bottom = (float)_cupsStrScand(sptr, &sptr, loc);
+      size->right  = (float)_cupsStrScand(sptr, &sptr, loc);
+      size->top    = (float)_cupsStrScand(sptr, NULL, loc);
 
       ppd_free(string);
       string = NULL;

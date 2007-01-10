@@ -2156,10 +2156,10 @@ ippWriteIO(void       *dst,		/* I - Destination */
                   n = 4;
 
 		  if (value->string.charset != NULL)
-                    n += strlen(value->string.charset);
+                    n += (int)strlen(value->string.charset);
 
 		  if (value->string.text != NULL)
-                    n += strlen(value->string.text);
+                    n += (int)strlen(value->string.text);
 
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
@@ -2562,7 +2562,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
     DEBUG_printf(("attr->name = %s, attr->num_values = %d, bytes = %d\n",
                   attr->name, attr->num_values, bytes));
 
-    bytes += strlen(attr->name);	/* Name */
+    bytes += (int)strlen(attr->name);	/* Name */
     bytes += attr->num_values;		/* Value tag for each value */
     bytes += 2 * attr->num_values;	/* Name lengths */
     bytes += 2 * attr->num_values;	/* Value lengths */
@@ -2594,7 +2594,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	       i < attr->num_values;
 	       i ++, value ++)
 	    if (value->string.text != NULL)
-	      bytes += strlen(value->string.text);
+	      bytes += (int)strlen(value->string.text);
 	  break;
 
       case IPP_TAG_DATE :
@@ -2618,10 +2618,10 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	       i ++, value ++)
 	  {
 	    if (value->string.charset != NULL)
-	      bytes += strlen(value->string.charset);
+	      bytes += (int)strlen(value->string.charset);
 
 	    if (value->string.text != NULL)
-	      bytes += strlen(value->string.text);
+	      bytes += (int)strlen(value->string.text);
 	  }
 	  break;
 
@@ -2629,7 +2629,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
 	       i ++, value ++)
-            bytes += ipp_length(value->collection, 1);
+            bytes += (int)ipp_length(value->collection, 1);
 	  break;
 
       default :
@@ -2678,7 +2678,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
   * Loop until all bytes are read...
   */
 
-  for (tbytes = 0, bytes = 0; tbytes < length; tbytes += bytes, buffer += bytes)
+  for (tbytes = 0, bytes = 0; tbytes < (int)length; tbytes += bytes, buffer += bytes)
   {
     DEBUG_printf(("tbytes = %d, http->state = %d\n", tbytes, http->state));
 
@@ -2691,8 +2691,8 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
       * Do "fast read" from HTTP buffer directly...
       */
 
-      if (http->used > (length - tbytes))
-        bytes = length - tbytes;
+      if (http->used > (int)(length - tbytes))
+        bytes = (int)(length - tbytes);
       else
         bytes = http->used;
 
@@ -2783,7 +2783,11 @@ ipp_read_file(int         *fd,		/* I - File descriptor */
               ipp_uchar_t *buffer,	/* O - Read buffer */
 	      size_t      length)	/* I - Number of bytes to read */
 {
+#ifdef WIN32
+  return ((ssize_t)read(*fd, buffer, (unsigned)length));
+#else
   return (read(*fd, buffer, length));
+#endif /* WIN32 */
 }
 
 
@@ -2796,7 +2800,11 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
                ipp_uchar_t *buffer,	/* I - Data to write */
                size_t      length)	/* I - Number of bytes to write */
 {
+#ifdef WIN32
+  return ((ssize_t)write(*fd, buffer, (unsigned)length));
+#else
   return (write(*fd, buffer, length));
+#endif /* WIN32 */
 }
 
 

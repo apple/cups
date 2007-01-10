@@ -3,7 +3,7 @@
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -30,6 +30,13 @@
 /*
  * Include necessary headers...
  */
+
+#  include <sys/types.h>
+#  if defined(WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
+#    define __CUPS_SSIZE_T_DEFINED
+/* Windows does not support the ssize_t type, so map it to off_t... */
+typedef off_t ssize_t;			/* @private@ */
+#  endif /* WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
 #  include "ipp.h"
 #  include "ppd.h"

@@ -3,7 +3,7 @@
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -549,7 +549,7 @@ char *					/* O - Encoded string */
 httpEncode64(char       *out,		/* I - String to write to */
              const char *in)		/* I - String to read from */
 {
-  return (httpEncode64_2(out, 512, in, strlen(in)));
+  return (httpEncode64_2(out, 512, in, (int)strlen(in)));
 }
 
 
@@ -1112,7 +1112,7 @@ httpSeparateURI(
 
       char *resptr = resource + strlen(resource);
 
-      uri = http_copy_decode(resptr, uri, resourcelen - (resptr - resource),
+      uri = http_copy_decode(resptr, uri, resourcelen - (int)(resptr - resource),
                              NULL, decoding & HTTP_URI_CODING_QUERY);
     }
   }

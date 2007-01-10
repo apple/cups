@@ -7,7 +7,7 @@
  *   MANY OF THE FUNCTIONS IN THIS HEADER ARE PRIVATE AND SUBJECT TO
  *   CHANGE AT ANY TIME.  USE AT YOUR OWN RISK.
  *
- *   Copyright 2001-2006 by Easy Software Products.
+ *   Copyright 2001-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -48,9 +48,12 @@
 #include "debug.h"
 #include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
+#ifdef WIN32
+#else
+#  include <unistd.h>
+#  include <sys/wait.h>
+#endif /* WIN32 */
 
 
 /*
@@ -1125,8 +1128,11 @@ _cupsAdminSetServerSettings(
           cupsFilePuts(temp, "Listen " CUPS_DEFAULT_DOMAINSOCKET "\n");
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */
       }
-      else if (value && value[0] == '/' &&
-               strcmp(CUPS_DEFAULT_DOMAINSOCKET, value))
+      else if (value && value[0] == '/'
+#ifdef CUPS_DEFAULT_DOMAINSOCKET
+               && strcmp(CUPS_DEFAULT_DOMAINSOCKET, value)
+#endif /* CUPS_DEFAULT_DOMAINSOCKET */
+               )
         cupsFilePrintf(temp, "Listen %s\n", value);
     }
     else if (!strcasecmp(line, "Browsing") ||
@@ -1681,6 +1687,10 @@ do_samba_command(const char *command,	/* I - Command to run */
 		 const char *authfile,	/* I - Samba authentication file */
 		 FILE *logfile)		/* I - Optional log file */
 {
+#ifdef WIN32
+  return (1);				/* Always fail on Windows... */
+
+#else
   int		status;			/* Status of command */
   int		pid;			/* Process ID of child */
 
@@ -1739,6 +1749,7 @@ do_samba_command(const char *command,	/* I - Command to run */
     return (WEXITSTATUS(status));
   else
     return (-WTERMSIG(status));
+#endif /* WIN32 */
 }
 
 
@@ -1756,7 +1767,9 @@ get_cupsd_conf(
     int             *remote)		/* O - Remote file? */
 {
   int		fd;			/* Temporary file descriptor */
+#ifndef WIN32
   struct stat	info;			/* cupsd.conf file information */
+#endif /* WIN32 */
   http_status_t	status;			/* Status of getting cupsd.conf */
   char		host[HTTP_MAX_HOST];	/* Hostname for connection */
 
@@ -1773,6 +1786,7 @@ get_cupsd_conf(
   snprintf(name, namesize, "%s/cupsd.conf", cg->cups_serverroot);
   *remote = 0;
 
+#ifndef WIN32
   if (!strcasecmp(host, "localhost") && !access(name, R_OK))
   {
    /*
@@ -1799,6 +1813,7 @@ get_cupsd_conf(
       status = HTTP_OK;
   }
   else
+#endif /* !WIN32 */
   {
    /*
     * Read cupsd.conf via a HTTP GET request...

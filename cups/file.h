@@ -8,7 +8,7 @@
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -36,11 +36,11 @@
  */
 
 #  include <sys/types.h>
-
-#  ifdef WIN32
+#  if defined(WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
+#    define __CUPS_SSIZE_T_DEFINED
 /* Windows does not support the ssize_t type, so map it to off_t... */
 typedef off_t ssize_t;			/* @private@ */
-#  endif /* WIN32 */
+#  endif /* WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
 
 /*

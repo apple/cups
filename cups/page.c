@@ -3,7 +3,7 @@
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -86,11 +86,11 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       */
 
       loc = localeconv();
-      w   = _cupsStrScand(name + 7, &nameptr, loc);
+      w   = (float)_cupsStrScand(name + 7, &nameptr, loc);
       if (!nameptr || *nameptr != 'x')
         return (NULL);
 
-      l = _cupsStrScand(nameptr + 1, &nameptr, loc);
+      l = (float)_cupsStrScand(nameptr + 1, &nameptr, loc);
       if (!nameptr)
         return (NULL);
 

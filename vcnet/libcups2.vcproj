@@ -123,106 +123,496 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath="..\cups\adminutil.c">
+			</File>
+			<File
 				RelativePath="..\cups\array.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\attr.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\auth.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\backchannel.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\cups\backend.c">
+			</File>
+			<File
+				RelativePath="..\cups\custom.c">
 			</File>
 			<File
 				RelativePath="..\cups\dest.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\dir.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\emit.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\encode.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\file.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\getputfile.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\globals.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\http-addr.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\http-addrlist.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\http-support.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\http.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\ipp-support.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\ipp.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\langprintf.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\language.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\cups\localize.c">
 			</File>
 			<File
 				RelativePath="..\cups\mark.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\md5.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\md5passwd.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\cups\normalize.c">
+				RelativePath="..\cups\notify.c">
 			</File>
 			<File
 				RelativePath="..\cups\options.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\page.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\ppd.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\cups\request.c">
 			</File>
 			<File
 				RelativePath="..\cups\snprintf.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\string.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\tempfile.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\transcode.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\usersys.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\cups\util.c">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="WIN32"/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath="..\cups\adminutil.h">
+			</File>
 			<File
 				RelativePath="..\cups\array.h">
 			</File>
@@ -249,6 +639,12 @@
 			</File>
 			<File
 				RelativePath="..\cups\http.h">
+			</File>
+			<File
+				RelativePath="..\cups\i18n.h">
+			</File>
+			<File
+				RelativePath="..\cups\ipp-private.h">
 			</File>
 			<File
 				RelativePath="..\cups\ipp.h">
