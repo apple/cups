@@ -26,9 +26,11 @@ _cupsStrFormatd
 _cupsStrFree
 _cupsStrScand
 _cupsStrStatistics
+_cups_snprintf
 _cups_strcpy
 _cups_strlcat
 _cups_strlcpy
+_cups_vsnprintf
 _ippAddAttr
 _ippFindOption
 _ippFreeAttr

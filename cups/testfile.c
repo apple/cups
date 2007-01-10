@@ -3,7 +3,7 @@
  *
  *   File test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -86,8 +86,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     fputs("cupsFileFind: ", stdout);
+#ifdef WIN32
+    if (cupsFileFind("notepad.exe", "C:/WINDOWS", 1, filename, sizeof(filename)) &&
+	cupsFileFind("notepad.exe", "C:/WINDOWS;C:/WINDOWS/SYSTEM32", 1, filename, sizeof(filename)))
+#else
     if (cupsFileFind("cat", "/bin", 1, filename, sizeof(filename)) &&
 	cupsFileFind("cat", "/bin:/usr/bin", 1, filename, sizeof(filename)))
+#endif /* WIN32 */
       printf("PASS (%s)\n", filename);
     else
     {
@@ -165,7 +170,12 @@ read_write_tests(int compression)	/* I - Use compression? */
   * Initialize the write buffer with random data...
   */
 
+#ifdef WIN32
+  srand((unsigned)time(NULL));
+#else
   srand(time(NULL));
+#endif /* WIN32 */
+
   for (i = 0; i < (int)sizeof(writebuf); i ++)
     writebuf[i] = rand();
 
@@ -362,14 +372,28 @@ read_write_tests(int compression)	/* I - Use compression? */
     }
 
    /*
-    * cupsGetChar()
+    * cupsFileGetChar()
     */
 
-    fputs("cupsGetChar(): ", stdout);
+    fputs("cupsFileGetChar(): ", stdout);
 
+#ifdef DEBUG
+    puts("\ni     byte\n----- -----");
+
+    for (i = 0; i < 256; i ++)
+    {
+      byte = cupsFileGetChar(fp);
+
+      printf("%-5d %-5d\n", i, byte);
+
+      if (byte != i)
+        break;
+    }
+#else
     for (i = 0; i < 256; i ++)
       if ((byte = cupsFileGetChar(fp)) != i)
         break;
+#endif /* DEBUG */
 
     if (i >= 256)
       puts("PASS");

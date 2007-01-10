@@ -95,6 +95,16 @@
 
 
 /*
+ * Some operating systems don't define O_BINARY, which is used by Microsoft
+ * and IBM to flag binary files...
+ */
+
+#ifndef O_BINARY
+#  define O_BINARY 0
+#endif /* !O_BINARY */
+
+
+/*
  * Types and structures...
  */
 
@@ -332,7 +342,11 @@ cupsFileFind(const char *filename,	/* I - File to find */
 
   while (*path)
   {
+#ifdef WIN32
+    if (*path == ';' || (*path == ':' && ((bufptr - buffer) > 1 || !isalpha(buffer[0] & 255))))
+#else
     if (*path == ';' || *path == ':')
+#endif /* WIN32 */
     {
       if (bufptr > buffer && bufptr[-1] != '/' && bufptr < bufend)
         *bufptr++ = '/';
@@ -344,7 +358,10 @@ cupsFileFind(const char *filename,	/* I - File to find */
 #else
       if (!access(buffer, executable ? X_OK : 0))
 #endif /* WIN32 */
+      {
+        DEBUG_printf(("cupsFileFind: Returning \"%s\"\n", buffer));
         return (buffer);
+      }
 
       bufptr = buffer;
     }
@@ -364,9 +381,15 @@ cupsFileFind(const char *filename,	/* I - File to find */
   strlcpy(bufptr, filename, bufend - bufptr);
 
   if (!access(buffer, 0))
+  {
+    DEBUG_printf(("cupsFileFind: Returning \"%s\"\n", buffer));
     return (buffer);
+  }
   else
+  {
+    DEBUG_puts("cupsFileFind: Returning NULL");
     return (NULL);
+  }
 }
 
 
@@ -427,7 +450,10 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
   */
 
   if (!fp || (fp->mode != 'r' && fp->mode != 's'))
+  {
+    DEBUG_puts("cupsFileGetChar: Bad arguments!");
     return (-1);
+  }
 
  /*
   * If the input buffer is empty, try to read more data...
@@ -435,11 +461,16 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
 
   if (fp->ptr >= fp->end)
     if (cups_fill(fp) < 0)
+    {
+      DEBUG_puts("cupsFileGetChar: Unable to fill buffer!");
       return (-1);
+    }
 
  /*
   * Return the next character in the buffer...
   */
+
+  DEBUG_printf(("cupsFileGetChar: Returning %d...\n", *(fp->ptr) & 255));
 
   return (*(fp->ptr)++ & 255);
 }
@@ -780,15 +811,15 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   switch (*mode)
   {
     case 'a' : /* Append file */
-        fd = open(filename, O_RDWR | O_CREAT | O_APPEND | O_LARGEFILE, 0666);
+        fd = open(filename, O_RDWR | O_CREAT | O_APPEND | O_LARGEFILE | O_BINARY, 0666);
         break;
 
     case 'r' : /* Read file */
-	fd = open(filename, O_RDONLY | O_LARGEFILE, 0);
+	fd = open(filename, O_RDONLY | O_LARGEFILE | O_BINARY, 0);
 	break;
 
     case 'w' : /* Write file */
-        fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT | O_LARGEFILE, 0666);
+        fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT | O_LARGEFILE | O_BINARY, 0666);
         break;
 
     case 's' : /* Read/write socket */

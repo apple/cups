@@ -34,13 +34,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ssleay32.lib libeay32.lib ws2_32.lib"
-				OutputFile="$(OutDir)/libcups2.dll"
+				OutputFile="libcups2d.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\vcnet\libcups2.def"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/libcups2.pdb"
+				ProgramDatabaseFile="libcups2d.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/libcups2.lib"
+				ImportLibrary="libcups2d.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -84,14 +84,15 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ssleay32.lib libeay32.lib ws2_32.lib"
-				OutputFile="$(OutDir)/libcups2.dll"
+				OutputFile="libcups2.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\vcnet\libcups2.def"
 				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="libcups2.pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/libcups2.lib"
+				ImportLibrary="libcups2.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
