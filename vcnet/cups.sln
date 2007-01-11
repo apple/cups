@@ -8,6 +8,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testfile", "testfile.vcproj
 		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3} = {CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testhttp", "testhttp.vcproj", "{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3} = {CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -20,6 +25,10 @@ Global
 		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Debug.Build.0 = Debug|Win32
 		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release.ActiveCfg = Release|Win32
 		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release.Build.0 = Release|Win32
+		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Debug.ActiveCfg = Debug|Win32
+		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Debug.Build.0 = Debug|Win32
+		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Release.ActiveCfg = Release|Win32
+		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Release.Build.0 = Release|Win32
 		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Debug.ActiveCfg = Debug|Win32
 		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Debug.Build.0 = Debug|Win32
 		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Release.ActiveCfg = Release|Win32

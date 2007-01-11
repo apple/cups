@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="testfile"
+	Name="testhttp"
 	ProjectGUID="{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -32,10 +32,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="Debug\testfile.exe"
+				OutputFile="Debug\testhttp.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/testfile.pdb"
+				ProgramDatabaseFile="$(OutDir)/testhttp.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -78,7 +78,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="testfile.exe"
+				OutputFile="testhttp.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
@@ -115,7 +115,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\cups\testfile.c">
+				RelativePath="..\cups\testhttp.c">
 			</File>
 		</Filter>
 		<Filter
