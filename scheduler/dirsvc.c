@@ -163,7 +163,7 @@ cupsdLoadRemoteCache(void)
   * Don't load the cache if the CUPS remote protocol is disabled...
   */
 
-  if (!(BrowseRemoteProtocols & BROWSE_CUPS))
+  if (!Browsing || !(BrowseRemoteProtocols & BROWSE_CUPS))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "cupsdLoadRemoteCache: Not loading remote cache.");
