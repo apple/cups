@@ -201,6 +201,18 @@ file in the <CODE>PageSize</CODE>, <CODE>InputSlot</CODE>, and
 lpoptions -p printer -l
 </PRE>
 
+<P>When <CODE>Custom</CODE> is listed for the <CODE>PageSize</CODE> option, you can specify custom media sizes using one of the following forms:</P>
+
+<PRE CLASS="command">
+lp -o media=Custom.<I>WIDTH</I>x<I>LENGTH</I> filename
+lp -o media=Custom.<I>WIDTH</I>x<I>LENGTH</I>in filename
+lp -o media=Custom.<I>WIDTH</I>x<I>LENGTH</I>cm filename
+lp -o media=Custom.<I>WIDTH</I>x<I>LENGTH</I>mm filename
+</PRE>
+
+<P>where "WIDTH" and "LENGTH" are the width and length of the media in points, inches, centimeters, or millimeters, respectively.</P>
+
+
 <H3><A NAME="ORIENTATION">Setting the Orientation</A></H3>
 
 <P>The <CODE>-o landscape</CODE> option will rotate the page 90
@@ -294,6 +306,12 @@ configuration; CUPS includes the following banner files:</P>
 	"unclassified" label at the top and bottom.
 
 </UL>
+
+
+<H3><A NAME="OUTPUTORDER">Specifying the Output Order</A></H3>
+
+<P>The <CODE>-o outputorder=normal</CODE> and <CODE>-o outputorder=reverse</CODE> options specify the order of the pages. Normal order prints page 1 first, page 2 second, and so forth. Reverse order prints page 1 last.</P>
+
 
 <H3><A NAME="PAGERANGES">Selecting a Range of Pages</A></H3>
 
