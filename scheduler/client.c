@@ -623,6 +623,7 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
     cupsdClearString(&con->filename);
     cupsdClearString(&con->command);
     cupsdClearString(&con->options);
+    cupsdClearString(&con->query_string);
 
     if (con->request)
     {
@@ -788,6 +789,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	cupsdClearString(&con->command);
 	cupsdClearString(&con->options);
+	cupsdClearString(&con->query_string);
 
 	if (con->request)
 	{
@@ -2703,6 +2705,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
     cupsdClearString(&con->command);
     cupsdClearString(&con->options);
+    cupsdClearString(&con->query_string);
 
     if (!con->http.keep_alive)
     {
@@ -3460,7 +3463,12 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   */
 
   if ((options = strchr(con->uri, '?')) != NULL)
+  {
     options ++;
+
+    if (strchr(options, '='))
+      cupsdSetStringf(&(con->query_string), "QUERY_STRING=%s", options);
+  }
 
  /*
   * Check for known types...
@@ -4064,7 +4072,6 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 		http_user_agent[1024],	/* HTTP_USER_AGENT environment variable */
 		lang[1024],		/* LANG environment variable */
 		path_info[1024],	/* PATH_INFO environment variable */
-		*query_string,		/* QUERY_STRING env variable */
 		remote_addr[1024],	/* REMOTE_ADDR environment variable */
 		remote_host[1024],	/* REMOTE_HOST environment variable */
 		remote_user[1024],	/* REMOTE_USER environment variable */
@@ -4095,8 +4102,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
                   "pipe_command: command=\"%s\", options=\"%s\"",
                   command, options ? options : "(null)");
 
-  argv[0]      = command;
-  query_string = NULL;
+  argv[0] = command;
 
   if (options)
     strlcpy(argbuf, options, sizeof(argbuf));
@@ -4123,10 +4129,12 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     path_info[0] = '\0';
   }
 
-  if (*commptr == '?' && con->operation == HTTP_GET)
+  cupsdLogMessage(CUPSD_LOG_INFO, "commptr=\"%s\"", commptr);
+
+  if (*commptr == '?' && con->operation == HTTP_GET && !con->query_string)
   {
     commptr ++;
-    cupsdSetStringf(&query_string, "QUERY_STRING=%s", commptr);
+    cupsdSetStringf(&(con->query_string), "QUERY_STRING=%s", commptr);
   }
 
   argc = 1;
@@ -4257,18 +4265,15 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   if (con->operation == HTTP_GET)
   {
-    for (i = 0; i < argc; i ++)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "argv[%d] = \"%s\"", i, argv[i]);
-
     envp[envc ++] = "REQUEST_METHOD=GET";
 
-    if (query_string)
+    if (con->query_string)
     {
      /*
       * Add GET form variables after ?...
       */
 
-      envp[envc ++] = query_string;
+      envp[envc ++] = con->query_string;
     }
   }
   else
@@ -4312,8 +4317,6 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   if (cupsdOpenPipe(fds))
   {
-    cupsdClearString(&query_string);
-
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create pipes for CGI %s - %s",
                     argv[0], strerror(errno));
     return (0);
@@ -4350,8 +4353,6 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     *outfile = fds[0];
     close(fds[1]);
   }
-
-  cupsdClearString(&query_string);
 
   return (pid);
 }

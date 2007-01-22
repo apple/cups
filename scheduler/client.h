@@ -41,7 +41,8 @@ struct cupsd_client_s
 					/* Localized URL/URI for GET/PUT */
 			*filename,	/* Filename of output file */
 			*command,	/* Command to run */
-			*options;	/* Options for command */
+			*options,	/* Options for command */
+			*query_string;	/* QUERY_STRING environment variable */
   int			file;		/* Input/output file */
   int			file_ready;	/* Input ready on file/pipe? */
   int			pipe_pid;	/* Pipe process ID (or 0 if not a pipe) */
