@@ -2005,7 +2005,7 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
       protocols |= BROWSE_DNSSD;
     else if (!strcasecmp(valstart, "all"))
       protocols |= BROWSE_ALL;
-    else
+    else if (strcasecmp(valstart, "none"))
       return (-1);
 
     for (valstart = valend; *valstart; valstart ++)
