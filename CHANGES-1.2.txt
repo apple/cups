@@ -3,6 +3,30 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.8
 
+	- Documentation fixes (STR #2141, STR #2157)
+	- The scheduler did not pass HTTP GET form variables to
+	  custom CGI programs (STR #2173)
+	- The lpoptions command now displays the reason why a PPD
+	  file cannot be found (STR #2184)
+	- The scheduler did not accept "none" as a browse
+	  protocol name (STR #2200)
+	- The scheduler still loaded the remote printer cache,
+	  even when browsing was disabled (STR #2198)
+	- The SNMP backend now shows OfficeJet printers with the
+	  "HP" manufacturer prefix (STR #2151)
+	- Web interface HTML cleanup (STR #2153)
+	- The parallel backend consumed 100% CPU on FreeBSD due
+	  to an apparently common parallel port driver bug (STR
+	  #2161)
+	- ippReadIO() incorrectly returned IPP_IDLE when the
+	  initial IPP message header could not be read (STR
+	  #2179)
+	- cupsRasterInterpretPPD() did not support custom options
+	  (STR #1960)
+	- Collated output produced by the PostScript filter could
+	  lose some options (STR #2137)
+	- job-hold-until with time values for the next day would
+	  be held for 60 days (STR #2144)
 	- Some types of Sun raster files did not print correctly
 	  (STR #2107)
 	- Raw PBM files did not print correctly (STR #2106)
