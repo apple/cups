@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cups_it\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-05-21 10:08-0400\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
 "PO-Revision-Date: 2006-11-16 00:34+0100\n"
 "Last-Translator: Vincenzo Reale <smart2128@baslug.org>\n"
 "Language-Team: Italian <kde-i18n-it@mail.kde.org>\n"
@@ -73,8 +73,12 @@ msgstr "No"
 msgid "Auto"
 msgstr "Auto"
 
-msgid "Enter your username and password or the root username and password to access this page."
-msgstr "Inserisci il tuo nome utente e la tua password o il nome utente e la password di root per accedere a questa pagina."
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page."
+msgstr ""
+"Inserisci il tuo nome utente e la tua password o il nome utente e la "
+"password di root per accedere a questa pagina."
 
 msgid "You must use a https: URL to access this page."
 msgstr "Devi usare un URL https: per accedere a questa pagina."
@@ -100,8 +104,10 @@ msgstr "%s non supportato!"
 msgid "The printer or class was not found."
 msgstr "La stampante o la classe non è stata trovata."
 
-msgid "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
-msgstr "printer-uri deve essere nella forma \"ipp://NOMEHOST/classes/NOMECLASSE\"."
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr ""
+"printer-uri deve essere nella forma \"ipp://NOMEHOST/classes/NOMECLASSE\"."
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -138,19 +144,29 @@ msgstr "Lingua \"%s\" non supportata!"
 msgid "The notify-user-data value is too large (%d > 63 octets)!"
 msgstr "Il valore notify-user-data è troppo grande (%d > 63 ottetti)!"
 
-msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
-msgstr "L'attributo notify-lease-duration non può essere usato con le sottoscrizioni delle operazioni."
+msgid ""
+"The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr ""
+"L'attributo notify-lease-duration non può essere usato con le sottoscrizioni "
+"delle operazioni."
 
-msgid "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
-msgstr "printer-uri deve essere nella forma \"ipp://NOMEHOST/printers/NOMESTAMPANTE\"."
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgstr ""
+"printer-uri deve essere nella forma \"ipp://NOMEHOST/printers/NOMESTAMPANTE"
+"\"."
 
 #, c-format
 msgid "A class named \"%s\" already exists!"
 msgstr "Una classe con nome \"%s\" già esiste!"
 
 #, c-format
-msgid "File device URIs have been disabled! To enable, see the FileDevice directive in \"%s/cupsd.conf\"."
-msgstr "Gli URI del file di dispositivo sono stati disabilitati! Per abilitarli, vedere la direttiva FileDevice in \"%s/cupsd.conf\"."
+msgid ""
+"File device URIs have been disabled! To enable, see the FileDevice directive "
+"in \"%s/cupsd.conf\"."
+msgstr ""
+"Gli URI del file di dispositivo sono stati disabilitati! Per abilitarli, "
+"vedere la direttiva FileDevice in \"%s/cupsd.conf\"."
 
 #, c-format
 msgid "Bad device-uri \"%s\"!"
@@ -200,7 +216,8 @@ msgstr "L'operazione #%d non è bloccata per l'autenticazione!"
 
 #, c-format
 msgid "You are not authorized to authenticate job #%d owned by \"%s\"!"
-msgstr "Non sei autorizzato ad autenticare l'operazione #%d di proprietà di \"%s\"!"
+msgstr ""
+"Non sei autorizzato ad autenticare l'operazione #%d di proprietà di \"%s\"!"
 
 msgid "The printer-uri attribute is required!"
 msgstr "L'attributo printer-uri è richiesto!"
@@ -218,7 +235,8 @@ msgstr "Nessuna operazione attiva su %s!"
 
 #, c-format
 msgid "You are not authorized to delete job #%d owned by \"%s\"!"
-msgstr "Non sei autorizzato ad eliminare l'operazione #%d di proprietà di \"%s\"!"
+msgstr ""
+"Non sei autorizzato ad eliminare l'operazione #%d di proprietà di \"%s\"!"
 
 #, c-format
 msgid "Job #%d is already %s - can't cancel."
@@ -296,7 +314,8 @@ msgstr "L'operazione #%d è terminata e non può essere modificata!"
 
 #, c-format
 msgid "You are not authorized to move job #%d owned by \"%s\"!"
-msgstr "Non sei autorizzato a spostare l'operazione #%d di proprietà di \"%s\"!"
+msgstr ""
+"Non sei autorizzato a spostare l'operazione #%d di proprietà di \"%s\"!"
 
 msgid "job-printer-uri attribute missing!"
 msgstr "attributo job-printer-uri mancante!"
@@ -329,7 +348,9 @@ msgstr "L'operazione #%d non è bloccata!"
 
 #, c-format
 msgid "You are not authorized to release job id %d owned by \"%s\"!"
-msgstr "Non sei autorizzata a rilasciare l'operazione con id %d di proprietà di \"%s\"!"
+msgstr ""
+"Non sei autorizzata a rilasciare l'operazione con id %d di proprietà di \"%s"
+"\"!"
 
 #, c-format
 msgid "Job #%d is not complete!"
@@ -341,11 +362,15 @@ msgstr "L'operazione #%d non può essere riavviata - nessun file!"
 
 #, c-format
 msgid "You are not authorized to restart job id %d owned by \"%s\"!"
-msgstr "Non sei autorizzato a riavviare l'operazione con id %d di proprietà di \"%s\"!"
+msgstr ""
+"Non sei autorizzato a riavviare l'operazione con id %d di proprietà di \"%s"
+"\"!"
 
 #, c-format
 msgid "You are not authorized to send document for job #%d owned by \"%s\"!"
-msgstr "Non sei autorizzato a inviare il documento per l'operazione #%d di proprietà di \"%s\"!"
+msgstr ""
+"Non sei autorizzato a inviare il documento per l'operazione #%d di proprietà "
+"di \"%s\"!"
 
 #, c-format
 msgid "Bad document-format \"%s\"!"
@@ -353,7 +378,9 @@ msgstr "document-format \"%s\" errato!"
 
 #, c-format
 msgid "You are not authorized to alter job id %d owned by \"%s\"!"
-msgstr "Non sei autorizzato a modificare l'operazione con id %d di proprietà di \"%s\"!"
+msgstr ""
+"Non sei autorizzato a modificare l'operazione con id %d di proprietà di \"%s"
+"\"!"
 
 #, c-format
 msgid "%s cannot be changed."
@@ -443,8 +470,11 @@ msgid "lpq: Unknown destination \"%s\"!\n"
 msgstr "lpq: Destinazione \"%s\" sconosciuta!\n"
 
 #, c-format
-msgid "lp: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lp: errore - i nomi della variabile d'ambiente %s non esistono nella destinazione \"%s\"!\n"
+msgid ""
+"lp: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+"lp: errore - i nomi della variabile d'ambiente %s non esistono nella "
+"destinazione \"%s\"!\n"
 
 msgid "lpq: error - no default destination available.\n"
 msgstr "lpq: errore - nessuna destinazione predefinita disponibile.\n"
@@ -453,7 +483,8 @@ msgstr "lpq: errore - nessuna destinazione predefinita disponibile.\n"
 msgid "lpq: get-jobs failed: %s\n"
 msgstr "lpq: get-jobs fallito: %s\n"
 
-msgid "Rank   Owner      Pri  Job        Files                       Total Size\n"
+msgid ""
+"Rank   Owner      Pri  Job        Files                       Total Size\n"
 msgstr "Posiz.   Proprietario  Stamp.  Operaz.   File         Dim. totali\n"
 
 msgid "Rank    Owner   Job     File(s)                         Total Size\n"
@@ -502,14 +533,19 @@ msgid "lpr: error - expected value after -%c option!\n"
 msgstr "lpr: errore - valore atteso dopo l'opzione -%c!\n"
 
 #, c-format
-msgid "lpr: warning - '%c' format modifier not supported - output may not be correct!\n"
-msgstr "lpr: attenzione - il modificatore di formato '%c' non è supportato - il risultato potrebbe non essere corretto!\n"
+msgid ""
+"lpr: warning - '%c' format modifier not supported - output may not be "
+"correct!\n"
+msgstr ""
+"lpr: attenzione - il modificatore di formato '%c' non è supportato - il "
+"risultato potrebbe non essere corretto!\n"
 
 msgid "lpr: error - expected option=value after -o option!\n"
 msgstr "lpr: errore - attesa opzione=valore dopo l'opzione -o !\n"
 
 msgid "lpr: warning - email notification is not currently supported!\n"
-msgstr "lpr: attenzione - le notifiche via email non sono al momento supportate!\n"
+msgstr ""
+"lpr: attenzione - le notifiche via email non sono al momento supportate!\n"
 
 msgid "lpr: error - expected destination after -P option!\n"
 msgstr "lpr: errore - destinazione attesa dopo l'opzione -P!\n"
@@ -537,8 +573,11 @@ msgid "lpr: error - too many files - \"%s\"\n"
 msgstr "lpr: errore - troppi file - \"%s\"\n"
 
 #, c-format
-msgid "lpr: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lpr: errore - i nomi della variabile d'ambiente %s non esistono nella destinazione \"%s\"!\n"
+msgid ""
+"lpr: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+"lpr: errore - i nomi della variabile d'ambiente %s non esistono nella "
+"destinazione \"%s\"!\n"
 
 msgid "lpr: error - no default destination available.\n"
 msgstr "lpr: errore - nessuna destinazione predefinita disponibile.\n"
@@ -663,27 +702,38 @@ msgstr "cupsaddsmb: Impossibile convertire il file PPD per %s - %s\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to copy Windows 2000 printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Impossibile copiare i file del driver di stampa di Windows 2000 (%d)!\n"
+msgstr ""
+"cupsaddsmb: Impossibile copiare i file del driver di stampa di Windows 2000 "
+"(%d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to copy CUPS printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Impossibile copiare i file del driver di stampa di CUPS (%d)!\n"
+msgstr ""
+"cupsaddsmb: Impossibile copiare i file del driver di stampa di CUPS (%d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to install Windows 2000 printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Impossibile installare i file del driver di stampa di Windows 2000 (%d)!\n"
+msgstr ""
+"cupsaddsmb: Impossibile installare i file del driver di stampa di Windows "
+"2000 (%d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to copy Windows 9x printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Impossibile copiare i file del driver di stampa di Windows 9x (%d)!\n"
+msgstr ""
+"cupsaddsmb: Impossibile copiare i file del driver di stampa di Windows 9x (%"
+"d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to install Windows 9x printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Impossibile installare i file del driver di stampa di Windows 9x (%d)!\n"
+msgstr ""
+"cupsaddsmb: Impossibile installare i file del driver di stampa di Windows 9x "
+"(%d)!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to set Windows printer driver (%d)!\n"
-msgstr "cupsaddsmb: Impossibile configurare i file del driver di stampa di Windows (%d)!\n"
+msgstr ""
+"cupsaddsmb: Impossibile configurare i file del driver di stampa di Windows (%"
+"d)!\n"
 
 msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
@@ -1062,10 +1112,12 @@ msgstr " PASS\n"
 
 #, c-format
 msgid ""
-"        WARN    Duplex option keyword %s should be named Duplex or JCLDuplex!\n"
+"        WARN    Duplex option keyword %s should be named Duplex or "
+"JCLDuplex!\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"        WARN    La parola chiave Duplex %s dovrebbe essere Duplex o JCLDuplex!\n"
+"        WARN    La parola chiave Duplex %s dovrebbe essere Duplex o "
+"JCLDuplex!\n"
 "                RIF: Pagina 122, sezione 5.17\n"
 
 msgid "        WARN    Default choices conflicting!\n"
@@ -1097,7 +1149,8 @@ msgid ""
 "        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
 "                REF: Pages 61-62, section 5.3.\n"
 msgstr ""
-"        WARN    PCFileName maggiore di 8.3 in violazione della specifica PPD.\n"
+"        WARN    PCFileName maggiore di 8.3 in violazione della specifica "
+"PPD.\n"
 "                RIF: Pagine 61-62, sezione 5.3.\n"
 
 msgid ""
@@ -1118,7 +1171,8 @@ msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
 "                REF: Pages 78-79, section 5.7.\n"
 msgstr ""
-"        WARN    Protocols contiene PJL, ma gli attributi JCL non sono impostati.\n"
+"        WARN    Protocols contiene PJL, ma gli attributi JCL non sono "
+"impostati.\n"
 "                RIF: Pagine 78-79, sezione 5.7.\n"
 
 #, c-format
@@ -1129,8 +1183,7 @@ msgstr ""
 "        WARN    %s condivide un prefisso comune con %s\n"
 "                RIF: Pagina 15, sezione 3.2.\n"
 
-#, c-format
-#, fuzzy
+#, fuzzy, c-format
 msgid "    %d ERROR%s FOUND\n"
 msgstr "    %d ERROR%s TROVATI\n"
 
@@ -1146,10 +1199,12 @@ msgstr ""
 "                (restrizione=\"%s %s %s %s\")\n"
 
 msgid ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
+"gz]]\n"
 "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
 msgstr ""
-"Uso: cupstestppd [-q] [-r] [-v[v]] nomefile1.ppd[.gz] [... nomefileN.ppd[.gz]]\n"
+"Uso: cupstestppd [-q] [-r] [-v[v]] nomefile1.ppd[.gz] [... nomefileN.ppd[."
+"gz]]\n"
 "       programma | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 msgid "lpstat: Need \"completed\" or \"not-completed\" after -W!\n"
@@ -1222,15 +1277,20 @@ msgid "system default destination: %s\n"
 msgstr "destinazione predefinita di sistema: %s\n"
 
 #, c-format
-msgid "lpstat: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lpstat: errore - i nomi della variabile d'ambiente %s non esistono nella destinazione \"%s\"!\n"
+msgid ""
+"lpstat: error - %s environment variable names non-existent destination \"%s"
+"\"!\n"
+msgstr ""
+"lpstat: errore - i nomi della variabile d'ambiente %s non esistono nella "
+"destinazione \"%s\"!\n"
 
 msgid "no system default destination\n"
 msgstr "nessuna destinazione predefinita di sistema\n"
 
 #, c-format
 msgid "Output for printer %s is sent to remote printer %s on %s\n"
-msgstr "L'uscita per la stampante %s è inviata alla stampante remota %s su %s\n"
+msgstr ""
+"L'uscita per la stampante %s è inviata alla stampante remota %s su %s\n"
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -1238,7 +1298,8 @@ msgstr "L'uscita per la stampante %s è inviata a %s\n"
 
 #, c-format
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
-msgstr "L'uscita per la stampante %s/%s è inviata alla stampante remota %s su %s\n"
+msgstr ""
+"L'uscita per la stampante %s/%s è inviata alla stampante remota %s su %s\n"
 
 #, c-format
 msgid "Output for printer %s/%s is sent to %s\n"
@@ -1382,13 +1443,15 @@ msgid "lpadmin: Expected class name after '-c' option!\n"
 msgstr "lpadmin: Atteso nome classe dopo l'opzione '-c'!\n"
 
 msgid "lpadmin: Class name can only contain printable characters!\n"
-msgstr "lpadmin: Il nome della classe può contenere solo caratteri stampabili!\n"
+msgstr ""
+"lpadmin: Il nome della classe può contenere solo caratteri stampabili!\n"
 
 msgid "lpadmin: Expected printer name after '-d' option!\n"
 msgstr "lpadmin: Atteso nome stampante dopo l'opzione '-d'!\n"
 
 msgid "lpadmin: Printer name can only contain printable characters!\n"
-msgstr "lpadmin: Il nome della stampante può contenere solo caratteri stampabili!\n"
+msgstr ""
+"lpadmin: Il nome della stampante può contenere solo caratteri stampabili!\n"
 
 msgid "lpadmin: Expected hostname after '-h' option!\n"
 msgstr "lpadmin: Atteso nome host dopo l'opzione '-h'!\n"
@@ -1515,8 +1578,10 @@ msgstr ""
 "\n"
 "    lpadmin [-h server] -d destinazione\n"
 "    lpadmin [-h server] -x destinazione\n"
-"    lpadmin [-h server] -p stampante [-c aggiungi-classe] [-i interfaccia] [-m modello]\n"
-"                       [-r rimuovi-classe] [-v dispositivo] [-D descrizione]\n"
+"    lpadmin [-h server] -p stampante [-c aggiungi-classe] [-i interfaccia] [-"
+"m modello]\n"
+"                       [-r rimuovi-classe] [-v dispositivo] [-D "
+"descrizione]\n"
 "                       [-P file-ppd] [-o nome=valore]\n"
 "                       [-u allow:user,user] [-u deny:user,user]\n"
 "\n"
@@ -1566,7 +1631,9 @@ msgid "lp: Expected job ID after -i option!\n"
 msgstr "lp: Atteso ID dell'operazione dopo l'opzione -i!\n"
 
 msgid "lp: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "lp: Errore- impossibile stampare file e modificare operazioni simultaneamente!\n"
+msgstr ""
+"lp: Errore- impossibile stampare file e modificare operazioni "
+"simultaneamente!\n"
 
 msgid "lp: Error - bad job ID!\n"
 msgstr "lp: Errore - ID dell'operazione errato!\n"
@@ -1618,8 +1685,10 @@ msgstr "lp: Attenzione - opzione del tipo di contenuto ignorata!\n"
 msgid "lp: Unknown option '%c'!\n"
 msgstr "lp: Opzione '%c' sconosciuta!\n"
 
-msgid "lp: Error - cannot print from stdin if files or a job ID are provided!\n"
-msgstr "lp: Errore - impossibile stampare da stdin senza file o ID dell'operazione!\n"
+msgid ""
+"lp: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgstr ""
+"lp: Errore - impossibile stampare da stdin senza file o ID dell'operazione!\n"
 
 #, c-format
 msgid "lp: Unable to access \"%s\" - %s\n"
@@ -1803,7 +1872,8 @@ msgstr "lppasswd: File delle password non aggiornato!\n"
 
 #, c-format
 msgid "lppasswd: failed to backup old password file: %s\n"
-msgstr "lppasswd: copia di sicurezza del vecchio file delle password fallita: %s\n"
+msgstr ""
+"lppasswd: copia di sicurezza del vecchio file delle password fallita: %s\n"
 
 #, c-format
 msgid "lppasswd: failed to rename password file: %s\n"
@@ -1854,8 +1924,12 @@ msgstr "Modifica classe"
 msgid "Add Class"
 msgstr "Aggiungi classe"
 
-msgid "The class name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
-msgstr "Il nome della classe può contenere fino a 127 caratteri stampabili e non può contenere spazi, barre (/), o cancelletti (#)."
+msgid ""
+"The class name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"Il nome della classe può contenere fino a 127 caratteri stampabili e non può "
+"contenere spazi, barre (/), o cancelletti (#)."
 
 msgid "Unable to modify class:"
 msgstr "Impossibile modificare la classe:"
@@ -1869,8 +1943,12 @@ msgstr "Modifica stampante"
 msgid "Add Printer"
 msgstr "Aggiungi stampante"
 
-msgid "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
-msgstr "Il nome della stampante può contenere fino a 127 caratteri stampabili e non può contenere spazi, barre (/), o cancelletti (#)."
+msgid ""
+"The printer name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"Il nome della stampante può contenere fino a 127 caratteri stampabili e non "
+"può contenere spazi, barre (/), o cancelletti (#)."
 
 msgid "Unable to get list of printer drivers:"
 msgstr "Impossibile ottenere l'elenco dei driver della stampante:"
@@ -2157,7 +2235,9 @@ msgid "cupsaddsmb: No Windows printer drivers are installed!\n"
 msgstr "cupsaddsmb: Nessun driver di stampa di Windows è installato!\n"
 
 msgid "cupsaddsmb: Warning, no Windows 2000 printer drivers are installed!\n"
-msgstr "cupsaddsmb: Attenzione, nessun driver di stampa di Windows 2000 è installato!\n"
+msgstr ""
+"cupsaddsmb: Attenzione, nessun driver di stampa di Windows 2000 è "
+"installato!\n"
 
 #, c-format
 msgid "lpadmin: Printer %s is already a member of class %s.\n"
@@ -2250,15 +2330,20 @@ msgid "%s: Error - expected hostname after '-h' option!\n"
 msgstr "%s: Errore - atteso nome host dopo l'opzione '-h'!\n"
 
 #, c-format
-msgid "%s: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s: errore - i nomi della variabile d'ambiente %s non esistono nella destinazione \"%s\"!\n"
+msgid ""
+"%s: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+"%s: errore - i nomi della variabile d'ambiente %s non esistono nella "
+"destinazione \"%s\"!\n"
 
 #, c-format
 msgid "%s: error - no default destination available.\n"
 msgstr "%s: errore - nessuna destinazione predefinita disponibile.\n"
 
-msgid "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
-msgstr "Uso: lpq [-P dest] [-U nomeutente] [-h nomehost[:porta]] [-l] [+intervallo]\n"
+msgid ""
+"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
+msgstr ""
+"Uso: lpq [-P dest] [-U nomeutente] [-h nomehost[:porta]] [-l] [+intervallo]\n"
 
 #, c-format
 msgid "%s: Error - expected hostname after '-H' option!\n"
@@ -2269,8 +2354,12 @@ msgid "%s: Error - expected value after '-%c' option!\n"
 msgstr "%s: Errore - atteso valore dopo l'opzione '-%c'!\n"
 
 #, c-format
-msgid "%s: Warning - '%c' format modifier not supported - output may not be correct!\n"
-msgstr "%s: Attenzione - Modificatore di formato '%c' non supportato - il risultato potrebbe non essere corretto!\n"
+msgid ""
+"%s: Warning - '%c' format modifier not supported - output may not be "
+"correct!\n"
+msgstr ""
+"%s: Attenzione - Modificatore di formato '%c' non supportato - il risultato "
+"potrebbe non essere corretto!\n"
 
 #, c-format
 msgid "%s: error - expected option=value after '-o' option!\n"
@@ -2301,8 +2390,11 @@ msgid "%s: Error - too many files - \"%s\"\n"
 msgstr "%s: Errore - troppi file - \"%s\"\n"
 
 #, c-format
-msgid "%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s: Errore - i nomi della variabile d'ambiente %s non esistono nella destinazione \"%s\"!\n"
+msgid ""
+"%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+"%s: Errore - i nomi della variabile d'ambiente %s non esistono nella "
+"destinazione \"%s\"!\n"
 
 #, c-format
 msgid "%s: Error - no default destination available.\n"
@@ -2358,7 +2450,9 @@ msgstr "%s: Atteso ID dell'operazione dopo l'opzione '-i'!\n"
 
 #, c-format
 msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "%s: Errore - impossibile stampare file e modificare operazioni contemporaneamente!\n"
+msgstr ""
+"%s: Errore - impossibile stampare file e modificare operazioni "
+"contemporaneamente!\n"
 
 #, c-format
 msgid "%s: Error - bad job ID!\n"
@@ -2398,7 +2492,8 @@ msgstr "%s: Errore - atteso nome di blocco dopo l'opzione '-H'!\n"
 
 #, c-format
 msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
-msgstr "%s: Usare l'ID dell'operazione ('-i idoperazione') prima di '-H restart'!\n"
+msgstr ""
+"%s: Usare l'ID dell'operazione ('-i idoperazione') prima di '-H restart'!\n"
 
 #, c-format
 msgid "%s: Error - expected page list after '-P' option!\n"
@@ -2421,12 +2516,18 @@ msgid "%s: Warning - content type option ignored!\n"
 msgstr "%s: Attenzione - opzione del tipo di contenuto ignorata!\n"
 
 #, c-format
-msgid "%s: Error - cannot print from stdin if files or a job ID are provided!\n"
-msgstr "%s: Errore - impossibile stampare da stdin senza file o ID dell'operazione!\n"
+msgid ""
+"%s: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgstr ""
+"%s: Errore - impossibile stampare da stdin senza file o ID dell'operazione!\n"
 
 #, c-format
-msgid "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' option!\n"
-msgstr "%s: Errore - usare \"completed\", \"not-completed\", o \"all\" dopo l'opzione '-W'!\n"
+msgid ""
+"%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
+"option!\n"
+msgstr ""
+"%s: Errore - usare \"completed\", \"not-completed\", o \"all\" dopo "
+"l'opzione '-W'!\n"
 
 #, c-format
 msgid "%s: Error - expected destination after '-b' option!\n"
@@ -2486,7 +2587,8 @@ msgid "cupsd: Expected config filename after \"-c\" option!\n"
 msgstr "cupsd: Atteso nome file di configurazione dopo l'opzione \"-c\"!\n"
 
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
-msgstr "cupsd: supporto launchd(8) non compilato, esecuzione in modalità normale.\n"
+msgstr ""
+"cupsd: supporto launchd(8) non compilato, esecuzione in modalità normale.\n"
 
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting!\n"
@@ -2517,11 +2619,18 @@ msgstr ""
 msgid "        WARN    Line %d only contains whitespace!\n"
 msgstr "        WARN    La riga %d contiene solamente spazi bianchi!\n"
 
-msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
-msgstr "        WARN    Il file contiene un misto di interruzioni di riga CR, LF, e CR LF!\n"
+msgid ""
+"        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
+msgstr ""
+"        WARN    Il file contiene un misto di interruzioni di riga CR, LF, e "
+"CR LF!\n"
 
-msgid "        WARN    Non-Windows PPD files should use lines ending with only LF, not CR LF!\n"
-msgstr "        WARN    I file PPD per sistemi diversi da Windows dovrebbero usare solo interruzioni di riga LF, non CR LF!\n"
+msgid ""
+"        WARN    Non-Windows PPD files should use lines ending with only LF, "
+"not CR LF!\n"
+msgstr ""
+"        WARN    I file PPD per sistemi diversi da Windows dovrebbero usare "
+"solo interruzioni di riga LF, non CR LF!\n"
 
 msgid "Printer Maintenance"
 msgstr "Manutenzione stampanti"
@@ -2543,19 +2652,31 @@ msgstr "      **FAIL**  Lingua \"%s\" errata!\n"
 
 #, c-format
 msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr "      **FAIL**  Stringa di traduzione \"%s\" mancante per l'opzione %s!\n"
+msgstr ""
+"      **FAIL**  Stringa di traduzione \"%s\" mancante per l'opzione %s!\n"
 
 #, c-format
-msgid "      **FAIL**  Default translation string for option %s contains 8-bit characters!\n"
-msgstr "      **FAIL**  La stringa di traduzione predefinita per l'opzione %s contiene caratteri di 8-bit!\n"
+msgid ""
+"      **FAIL**  Default translation string for option %s contains 8-bit "
+"characters!\n"
+msgstr ""
+"      **FAIL**  La stringa di traduzione predefinita per l'opzione %s "
+"contiene caratteri di 8-bit!\n"
 
 #, c-format
-msgid "      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr "      **FAIL**  Stringa di traduzione \"%s\" mancante per l'opzione %s, scelta %s!\n"
+msgid ""
+"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr ""
+"      **FAIL**  Stringa di traduzione \"%s\" mancante per l'opzione %s, "
+"scelta %s!\n"
 
 #, c-format
-msgid "      **FAIL**  Default translation string for option %s choice %s contains 8-bit characters!\n"
-msgstr "      **FAIL**  La stringa di traduzione predefinita per l'opzione %s scelta %s contiene caratteri di 8-bit!\n"
+msgid ""
+"      **FAIL**  Default translation string for option %s choice %s contains "
+"8-bit characters!\n"
+msgstr ""
+"      **FAIL**  La stringa di traduzione predefinita per l'opzione %s scelta "
+"%s contiene caratteri di 8-bit!\n"
 
 #, c-format
 msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
@@ -2578,7 +2699,8 @@ msgstr "Opzione + scelta errata alla riga %d!\n"
 
 #, c-format
 msgid "Unable to copy Windows 2000 printer driver files (%d)!\n"
-msgstr "Impossibile copiare i file dei driver di stampa di Windows 2000 (%d)!\n"
+msgstr ""
+"Impossibile copiare i file dei driver di stampa di Windows 2000 (%d)!\n"
 
 #, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!\n"
@@ -2586,7 +2708,8 @@ msgstr "Impossibile copiare i file dei driver di stampa di CUPS (%d)!\n"
 
 #, c-format
 msgid "Unable to install Windows 2000 printer driver files (%d)!\n"
-msgstr "Impossibile installare i file dei driver di stampa di Windows 2000 (%d)!\n"
+msgstr ""
+"Impossibile installare i file dei driver di stampa di Windows 2000 (%d)!\n"
 
 #, c-format
 msgid "Unable to copy Windows 9x printer driver files (%d)!\n"
@@ -2594,7 +2717,8 @@ msgstr "Impossibile copiare i file dei driver di stampa di Windows 9x (%d)!\n"
 
 #, c-format
 msgid "Unable to install Windows 9x printer driver files (%d)!\n"
-msgstr "Impossibile installare i file dei driver di stampa di Windows 9x (%d)!\n"
+msgstr ""
+"Impossibile installare i file dei driver di stampa di Windows 9x (%d)!\n"
 
 msgid "No Windows printer drivers are installed!\n"
 msgstr "Nessun driver di stampa di Windows è installato!\n"
@@ -2639,7 +2763,8 @@ msgstr "Impossibile copiare i file dei driver di stampa di CUPS (%d)!"
 
 #, c-format
 msgid "Unable to install Windows 2000 printer driver files (%d)!"
-msgstr "Impossibile installare i file dei driver di stampa di Windows 2000 (%d)!"
+msgstr ""
+"Impossibile installare i file dei driver di stampa di Windows 2000 (%d)!"
 
 #, c-format
 msgid "Unable to copy Windows 9x printer driver files (%d)!"
@@ -2680,8 +2805,12 @@ msgid "Job #%d is already completed - can't cancel."
 msgstr "L'operazione #%d è già completata - impossibile annullare."
 
 #, c-format
-msgid "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
-msgstr "Devi accedere a questa pagina usando l'URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
+msgid ""
+"You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
+"s:%d%s</A>."
+msgstr ""
+"Devi accedere a questa pagina usando l'URL <A HREF=\"https://%s:%d%s"
+"\">https://%s:%d%s</A>."
 
 #, c-format
 msgid "Unsupported format '%s'!"
@@ -2795,7 +2924,8 @@ msgid ""
 "\n"
 "    -h       Show program usage\n"
 "\n"
-"    Note: this program only validates the DSC comments, not the PostScript itself.\n"
+"    Note: this program only validates the DSC comments, not the PostScript "
+"itself.\n"
 msgstr ""
 "Uso: cupstestdsc [opzioni] nomefile.ps [... nomefile.ps]\n"
 "       cupstestdsc [opzioni] -\n"
@@ -2804,7 +2934,8 @@ msgstr ""
 "\n"
 "    -h       Mostra l'utilizzo del programma\n"
 "\n"
-"    Nota: questo programma valida solo i commenti DSC, non il PostScript stesso.\n"
+"    Nota: questo programma valida solo i commenti DSC, non il PostScript "
+"stesso.\n"
 
 #, c-format
 msgid "Password for %s on %s? "
@@ -2817,3 +2948,67 @@ msgstr ""
 "      **FAIL**  1284DeviceId deve essere 1284DeviceID!\n"
 "                RIF: Pagina 72, sezione 5.5\n"
 
+#, fuzzy, c-format
+msgid "Missing value on line %d!"
+msgstr "Valore mancante alla riga %d!\n"
+
+#, fuzzy, c-format
+msgid "Missing double quote on line %d!"
+msgstr "Doppi apici mancanti alla riga %d!\n"
+
+#, fuzzy, c-format
+msgid "Bad option + choice on line %d!"
+msgstr "Opzione + scelta errata alla riga %d!\n"
+
+#, fuzzy
+msgid "Empty PPD file!"
+msgstr "Impossibile copiare il file PPD!"
+
+#, fuzzy, c-format
+msgid "Unable to set Windows printer driver (%d)!"
+msgstr "Impossibile configurare il driver di stampa di Windows (%d)!\n"
+
+#, fuzzy, c-format
+msgid "Unable to run \"%s\": %s\n"
+msgstr "cupsaddsmb: Impossibile eseguire \"%s\": %s\n"
+
+#, fuzzy
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Inserisci il tuo nome utente e la tua password o il nome utente e la "
+"password di root per accedere a questa pagina."
+
+#, fuzzy, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "L'operazione #%d è già annullata - impossibile annullare."
+
+#, c-format
+msgid "Bad notify-recipient URI \"%s\"!"
+msgstr ""
+
+#, c-format
+msgid "notify-recipient URI \"%s\" uses unknown scheme!"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "Bad notify-pull-method \"%s\"!"
+msgstr "port-monitor \"%s\" errato!"
+
+#, fuzzy, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID!\n"
+"                REF: Page 72, section 5.5\n"
+msgstr ""
+"      **FAIL**  1284DeviceId deve essere 1284DeviceID!\n"
+"                RIF: Pagina 72, sezione 5.5\n"
+
+#, fuzzy, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d ERROR%s TROVATI\n"
+
+#, fuzzy, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s\n"
+msgstr "lpoptions: Impossibile aprire il file PPD per %s!\n"

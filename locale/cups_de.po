@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-04-14 14:35-0400\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
 "PO-Revision-Date: 2006-07-17 19:55+0200\n"
 "Last-Translator: Bernd Krumböck <b.krumboeck@rewe-group.at>\n"
 "Language-Team: Deutsch\n"
@@ -75,8 +75,12 @@ msgstr "Nein"
 msgid "Auto"
 msgstr "Automatisch"
 
-msgid "Enter your username and password or the root username and password to access this page."
-msgstr "Für Zugang Benutzername und Passwort (oder Benutzername und Passwort für root) eingeben."
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page."
+msgstr ""
+"Für Zugang Benutzername und Passwort (oder Benutzername und Passwort für "
+"root) eingeben."
 
 msgid "You must use a https: URL to access this page."
 msgstr "Eine https:-URL ist für den Zugriff erforderlich."
@@ -102,8 +106,10 @@ msgstr "%s nicht unterstützt!"
 msgid "The printer or class was not found."
 msgstr "Drucker oder Klasse nicht gefunden."
 
-msgid "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
-msgstr "Die printer-uri muss in der Form \"ipp://HOSTNAME/classes/KLASSENNAME\" sein."
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr ""
+"Die printer-uri muss in der Form \"ipp://HOSTNAME/classes/KLASSENNAME\" sein."
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -140,19 +146,28 @@ msgstr "Sprache \"%s\" nicht unterstützt!"
 msgid "The notify-user-data value is too large (%d > 63 octets)!"
 msgstr "Der Wert von notify-user-data ist zu groß (%d > 63 Oktette)!"
 
-msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
-msgstr "notify-lease-duration kann nicht bei Auftragssubskriptionen verwendet werden."
+msgid ""
+"The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr ""
+"notify-lease-duration kann nicht bei Auftragssubskriptionen verwendet werden."
 
-msgid "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
-msgstr "Die printer-uri muss in der Form \"ipp://HOSTNAME/printers/DRUCKERNAME\" sein."
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgstr ""
+"Die printer-uri muss in der Form \"ipp://HOSTNAME/printers/DRUCKERNAME\" "
+"sein."
 
 #, c-format
 msgid "A class named \"%s\" already exists!"
 msgstr "Eine Klasse namens \"%s\" existiert bereits!"
 
 #, c-format
-msgid "File device URIs have been disabled! To enable, see the FileDevice directive in \"%s/cupsd.conf\"."
-msgstr "Ausgabe auf Dateien gesperrt! Gegebenenfalls FileDevice-Einstellung in \"%s/cupsd.conf\" ändern."
+msgid ""
+"File device URIs have been disabled! To enable, see the FileDevice directive "
+"in \"%s/cupsd.conf\"."
+msgstr ""
+"Ausgabe auf Dateien gesperrt! Gegebenenfalls FileDevice-Einstellung in \"%s/"
+"cupsd.conf\" ändern."
 
 #, c-format
 msgid "Bad device-uri \"%s\"!"
@@ -343,11 +358,15 @@ msgstr "Auftrag #%d kann nicht neu gestartet werden - keine Dateien!"
 
 #, c-format
 msgid "You are not authorized to restart job id %d owned by \"%s\"!"
-msgstr "Sie sind nicht berechtigt den Auftrag mit der ID %d von \"%s\" neu zu starten!"
+msgstr ""
+"Sie sind nicht berechtigt den Auftrag mit der ID %d von \"%s\" neu zu "
+"starten!"
 
 #, c-format
 msgid "You are not authorized to send document for job #%d owned by \"%s\"!"
-msgstr "Sie sind nicht berechtigt ein Dokument für den Auftrag #%d von \"%s\" zu senden!"
+msgstr ""
+"Sie sind nicht berechtigt ein Dokument für den Auftrag #%d von \"%s\" zu "
+"senden!"
 
 #, c-format
 msgid "Bad document-format \"%s\"!"
@@ -355,7 +374,8 @@ msgstr "document-format \"%s\" ist falsch!"
 
 #, c-format
 msgid "You are not authorized to alter job id %d owned by \"%s\"!"
-msgstr "Sie sind nicht berechtigt den Aufrag mit der ID %d von \"%s\" abzuändern."
+msgstr ""
+"Sie sind nicht berechtigt den Aufrag mit der ID %d von \"%s\" abzuändern."
 
 #, c-format
 msgid "%s cannot be changed."
@@ -445,8 +465,10 @@ msgid "lpq: Unknown destination \"%s\"!\n"
 msgstr "lpq: Unbekanntes Ziel \"%s\"!\n"
 
 #, c-format
-msgid "lp: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lp: Fehler - Umgebungsvariable %s enhält nicht vorhandenes Ziel \"%s\"!\n"
+msgid ""
+"lp: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+"lp: Fehler - Umgebungsvariable %s enhält nicht vorhandenes Ziel \"%s\"!\n"
 
 msgid "lpq: error - no default destination available.\n"
 msgstr "lpq: Fehler - kein Standardziel verfügbar.\n"
@@ -455,8 +477,10 @@ msgstr "lpq: Fehler - kein Standardziel verfügbar.\n"
 msgid "lpq: get-jobs failed: %s\n"
 msgstr "lpq: get-jobs fehlgeschlagen: %s\n"
 
-msgid "Rank   Owner      Pri  Job        Files                       Total Size\n"
-msgstr "Rang   Besitzer   Pri  Auftrag    Dateien                     Gesamtgröße\n"
+msgid ""
+"Rank   Owner      Pri  Job        Files                       Total Size\n"
+msgstr ""
+"Rang   Besitzer   Pri  Auftrag    Dateien                     Gesamtgröße\n"
 
 msgid "Rank    Owner   Job     File(s)                         Total Size\n"
 msgstr "Rang    Besitz  Auftrag Datei(en)                       Gesamtgröße\n"
@@ -504,14 +528,19 @@ msgid "lpr: error - expected value after -%c option!\n"
 msgstr "lpr: Fehler - Es wird ein Wert hinter dem Parameter -%c erwartet!\n"
 
 #, c-format
-msgid "lpr: warning - '%c' format modifier not supported - output may not be correct!\n"
-msgstr "lpr: Warnung - Formatangabe '%c' nicht unterstützt - Ausgabe evtl. fehlerhaft!\n"
+msgid ""
+"lpr: warning - '%c' format modifier not supported - output may not be "
+"correct!\n"
+msgstr ""
+"lpr: Warnung - Formatangabe '%c' nicht unterstützt - Ausgabe evtl. "
+"fehlerhaft!\n"
 
 msgid "lpr: error - expected option=value after -o option!\n"
 msgstr "lpr: Fehler - Erwarte Parameter=Wert hinter dem Parameter -o!\n"
 
 msgid "lpr: warning - email notification is not currently supported!\n"
-msgstr "lpr: Warnung - Email Benachrichtigung wird zurzeit nicht unterstützt!\n"
+msgstr ""
+"lpr: Warnung - Email Benachrichtigung wird zurzeit nicht unterstützt!\n"
 
 msgid "lpr: error - expected destination after -P option!\n"
 msgstr "lpr: Fehler - Erwarte Ziel hinter dem Parameter -P!\n"
@@ -539,8 +568,11 @@ msgid "lpr: error - too many files - \"%s\"\n"
 msgstr "lpr: Fehler - Zu viele Dateien \"%s\"\n"
 
 #, c-format
-msgid "lpr: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lpr: Fehler - Die Umgebungsvariable %s beinhaltet das nicht vorhandene Ziel \"%s\"!\n"
+msgid ""
+"lpr: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+"lpr: Fehler - Die Umgebungsvariable %s beinhaltet das nicht vorhandene Ziel "
+"\"%s\"!\n"
 
 msgid "lpr: error - no default destination available.\n"
 msgstr "lpr: Fehler - Kein Standardziel verfügbar.\n"
@@ -554,7 +586,8 @@ msgstr "lpr: Fehler - Kann temporäre Datei \"%s\" nicht erstellen - %s\n"
 
 #, c-format
 msgid "lpr: error - unable to write to temporary file \"%s\" - %s\n"
-msgstr "lpr: Fehler - Kann nicht in die temporäre Datei \"%s\" schreiben - %s\n"
+msgstr ""
+"lpr: Fehler - Kann nicht in die temporäre Datei \"%s\" schreiben - %s\n"
 
 msgid "lpr: error - stdin is empty, so no job has been sent.\n"
 msgstr "lpr: Fehler - stdin ist leer, kein Auftrag gesendet.\n"
@@ -665,7 +698,8 @@ msgstr "cupsaddsmb: Kann PPD Datei nicht konvertieren für %s - %s\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to copy Windows 2000 printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Kann Windows 2000 Druckertreiberdateien (%d) nicht kopieren!\n"
+msgstr ""
+"cupsaddsmb: Kann Windows 2000 Druckertreiberdateien (%d) nicht kopieren!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to copy CUPS printer driver files (%d)!\n"
@@ -673,15 +707,19 @@ msgstr "cupsaddsmb: Kann CUPS Druckertreiberdateien (%d) nicht kopieren!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to install Windows 2000 printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Kann Windows 2000 Druckertreiberdateien (%d) nicht installieren!\n"
+msgstr ""
+"cupsaddsmb: Kann Windows 2000 Druckertreiberdateien (%d) nicht "
+"installieren!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to copy Windows 9x printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Kann Windows 9x Druckertreiberdateien (%d) nicht kopieren!\n"
+msgstr ""
+"cupsaddsmb: Kann Windows 9x Druckertreiberdateien (%d) nicht kopieren!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to install Windows 9x printer driver files (%d)!\n"
-msgstr "cupsaddsmb: Kann Windows 9x Druckertreiberdateien (%d) nicht installieren!\n"
+msgstr ""
+"cupsaddsmb: Kann Windows 9x Druckertreiberdateien (%d) nicht installieren!\n"
 
 #, c-format
 msgid "cupsaddsmb: Unable to set Windows printer driver (%d)!\n"
@@ -709,10 +747,12 @@ msgstr ""
 "  -v                Zusätzliche Ausgaben einschalten (zeige Kommandos)\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
-msgstr "cupstestppd: Der Parameter -q ist nicht kompatibel mit dem Parameter -v.\n"
+msgstr ""
+"cupstestppd: Der Parameter -q ist nicht kompatibel mit dem Parameter -v.\n"
 
 msgid "cupstestppd: The -v option is incompatible with the -q option.\n"
-msgstr "cupstestppd: Der Parameter -v ist nicht kompatibel mit dem Parameter -d.\n"
+msgstr ""
+"cupstestppd: Der Parameter -v ist nicht kompatibel mit dem Parameter -d.\n"
 
 #, c-format
 msgid ""
@@ -895,7 +935,8 @@ msgid ""
 "      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
 "                REF: Pages 59-60, section 5.3.\n"
 msgstr ""
-"      **FEHLGESCHLAGEN**  FALSCH ModelName - \"%c\" nicht in Zeichenkette erlaubt.\n"
+"      **FEHLGESCHLAGEN**  FALSCH ModelName - \"%c\" nicht in Zeichenkette "
+"erlaubt.\n"
 "                REF: Seiten 59-60, Kapitel 5.3.\n"
 
 msgid "        PASS    ModelName\n"
@@ -1065,10 +1106,12 @@ msgstr " BESTANDEN\n"
 
 #, c-format
 msgid ""
-"        WARN    Duplex option keyword %s should be named Duplex or JCLDuplex!\n"
+"        WARN    Duplex option keyword %s should be named Duplex or "
+"JCLDuplex!\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"        WARNUNG    Schlüsselwort für Duplexparameter %s sollte Duplex oder JCLDuplex heißen!\n"
+"        WARNUNG    Schlüsselwort für Duplexparameter %s sollte Duplex oder "
+"JCLDuplex heißen!\n"
 "                REF: Seite 122, Kapitel 5.17\n"
 
 msgid "        WARN    Default choices conflicting!\n"
@@ -1100,7 +1143,8 @@ msgid ""
 "        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
 "                REF: Pages 61-62, section 5.3.\n"
 msgstr ""
-"        WARNUNG    PCFileName länger als 8.3 ist eine Verletzung der PPD Spez.\n"
+"        WARNUNG    PCFileName länger als 8.3 ist eine Verletzung der PPD "
+"Spez.\n"
 "                REF: Seiten 61-62, Kapitel 5.3.\n"
 
 msgid ""
@@ -1121,7 +1165,8 @@ msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
 "                REF: Pages 78-79, section 5.7.\n"
 msgstr ""
-"        WARNUNG    Protokoll enthält PJL jedoch sind keine JCL Eigenschaften gesetzt.\n"
+"        WARNUNG    Protokoll enthält PJL jedoch sind keine JCL Eigenschaften "
+"gesetzt.\n"
 "                REF: Seiten 78-79, Kapitel 5.7.\n"
 
 #, c-format
@@ -1148,10 +1193,12 @@ msgstr ""
 "                (Beschränkung=\"%s %s %s %s\")\n"
 
 msgid ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
+"gz]]\n"
 "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
 msgstr ""
-"Benutzung: cupstestppd [-q] [-r] [-v[v]] Dateiname1.ppd[.gz] [... DateinameN.ppd[.gz]]\n"
+"Benutzung: cupstestppd [-q] [-r] [-v[v]] Dateiname1.ppd[.gz] [... DateinameN."
+"ppd[.gz]]\n"
 "       Programm | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 msgid "lpstat: Need \"completed\" or \"not-completed\" after -W!\n"
@@ -1224,15 +1271,20 @@ msgid "system default destination: %s\n"
 msgstr "System Standardziel: %s\n"
 
 #, c-format
-msgid "lpstat: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lpstat: Fehler - Umgebungsvariable %s enthält das nicht vorhandene Ziel \"%s\"!\n"
+msgid ""
+"lpstat: error - %s environment variable names non-existent destination \"%s"
+"\"!\n"
+msgstr ""
+"lpstat: Fehler - Umgebungsvariable %s enthält das nicht vorhandene Ziel \"%s"
+"\"!\n"
 
 msgid "no system default destination\n"
 msgstr "Kein systemweites Standardziel\n"
 
 #, c-format
 msgid "Output for printer %s is sent to remote printer %s on %s\n"
-msgstr "Ausgabe für Drucker %s wurde gesendet an entfernten Drucker %s auf %s\n"
+msgstr ""
+"Ausgabe für Drucker %s wurde gesendet an entfernten Drucker %s auf %s\n"
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -1240,7 +1292,8 @@ msgstr "Ausgabe für Drucker %s wurde gesendet an %s\n"
 
 #, c-format
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
-msgstr "Ausgabe für Drucker %s/%s wurde gesendet an entfernten Drucker %s auf %s\n"
+msgstr ""
+"Ausgabe für Drucker %s/%s wurde gesendet an entfernten Drucker %s auf %s\n"
 
 #, c-format
 msgid "Output for printer %s/%s is sent to %s\n"
@@ -1432,7 +1485,9 @@ msgid "lpadmin: Expected class after '-r' option!\n"
 msgstr "lpadmin: Klasse wird hinter dem Parameter '-r' erwartet!\n"
 
 msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
-msgstr "lpadmin: Benutzerliste für Erlaubt/Verweigert wird nach dem Parameter '-u' erwartet!\n"
+msgstr ""
+"lpadmin: Benutzerliste für Erlaubt/Verweigert wird nach dem Parameter '-u' "
+"erwartet!\n"
 
 #, c-format
 msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
@@ -1449,7 +1504,8 @@ msgid "lpadmin: Expected device URI after '-v' option!\n"
 msgstr "lpadmin: Erwarte Geräte URI hinter dem Parameter '-v'!\n"
 
 msgid "lpadmin: Expected printer or class after '-x' option!\n"
-msgstr "lpadmin: Drucker oder Klasse wird hinter dem Parameter '-x' erwartet!\n"
+msgstr ""
+"lpadmin: Drucker oder Klasse wird hinter dem Parameter '-x' erwartet!\n"
 
 msgid ""
 "lpadmin: Unable to set the printer description:\n"
@@ -1462,7 +1518,8 @@ msgid "lpadmin: Expected description after '-D' option!\n"
 msgstr "lpadmin: Beschreibung wird hinter dem Parameter '-D' erwartet!\n"
 
 msgid "lpadmin: Expected file type(s) after '-I' option!\n"
-msgstr "lpadmin: Dateityp(en) wird bzw. werden hinter dem Parameter '-I' erwartet!\n"
+msgstr ""
+"lpadmin: Dateityp(en) wird bzw. werden hinter dem Parameter '-I' erwartet!\n"
 
 msgid "lpadmin: Warning - content type list ignored!\n"
 msgstr "lpadmin: Warnung - Datentypliste ignoriert!\n"
@@ -1517,10 +1574,13 @@ msgstr ""
 "\n"
 "    lpadmin [-h Server] -d Ziel\n"
 "    lpadmin [-h Server] -x Ziel\n"
-"    lpadmin [-h Server] -p Drucker [-c hinzuzufügende-Klasse] [-i Interface] [-m Modell]\n"
-"                       [-r zu-löschende-Klasse] [-v Gerät] [-D Beschreibung]\n"
+"    lpadmin [-h Server] -p Drucker [-c hinzuzufügende-Klasse] [-i Interface] "
+"[-m Modell]\n"
+"                       [-r zu-löschende-Klasse] [-v Gerät] [-D "
+"Beschreibung]\n"
 "                       [-P PPD-Datei] [-o Name=Wert]\n"
-"                       [-u allow:Benutzer,Benutzer] [-u deny:Benutzer,Benutzer]\n"
+"                       [-u allow:Benutzer,Benutzer] [-u deny:Benutzer,"
+"Benutzer]\n"
 "\n"
 
 #, c-format
@@ -1537,7 +1597,8 @@ msgstr "lpadmin: add-printer (Setzen des Modells) fehlgeschlagen: %s\n"
 
 #, c-format
 msgid "lpadmin: add-printer (set description) failed: %s\n"
-msgstr "lpadmin: Drucker hinzufügen (Setzen der Beschreibung) fehlgeschlagen: %s\n"
+msgstr ""
+"lpadmin: Drucker hinzufügen (Setzen der Beschreibung) fehlgeschlagen: %s\n"
 
 #, c-format
 msgid "lpadmin: add-printer (set location) failed: %s\n"
@@ -1568,7 +1629,8 @@ msgid "lp: Expected job ID after -i option!\n"
 msgstr "lp: Auftrags ID wird hinter dem Parameter -i erwartet!\n"
 
 msgid "lp: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "lp: Fehler - Kann nicht gleichzeitig Dateien drucken und Aufträge abändern!\n"
+msgstr ""
+"lp: Fehler - Kann nicht gleichzeitig Dateien drucken und Aufträge abändern!\n"
 
 msgid "lp: Error - bad job ID!\n"
 msgstr "lp: Fehler - Falsche Auftrags ID!\n"
@@ -1620,8 +1682,11 @@ msgstr "lp: Warnung - Parameter für Inhaltstyp ignoriert!\n"
 msgid "lp: Unknown option '%c'!\n"
 msgstr "lp: Unbekannter Parameter '%c'!\n"
 
-msgid "lp: Error - cannot print from stdin if files or a job ID are provided!\n"
-msgstr "lp: Fehler - Kann nicht von stdin drucken wenn Dateien oder eine Auftrags ID übergeben wurde!\n"
+msgid ""
+"lp: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgstr ""
+"lp: Fehler - Kann nicht von stdin drucken wenn Dateien oder eine Auftrags ID "
+"übergeben wurde!\n"
 
 #, c-format
 msgid "lp: Unable to access \"%s\" - %s\n"
@@ -1779,7 +1844,8 @@ msgid ""
 "your username, and must contain at least one letter and number.\n"
 msgstr ""
 "lppasswd: Bedaure, Passwort zurückgewiesen.\n"
-"Ihr Passwort muss zumindest 6 Zeichen lang sein, darf nicht den Benutzernamen\n"
+"Ihr Passwort muss zumindest 6 Zeichen lang sein, darf nicht den "
+"Benutzernamen\n"
 "enthalten, und muss mindestens einen Buchstaben und eine Zahl enthalten.\n"
 
 msgid "lppasswd: Password file busy!\n"
@@ -1856,8 +1922,12 @@ msgstr "Klasse ändern"
 msgid "Add Class"
 msgstr "Klasse hinzufügen"
 
-msgid "The class name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
-msgstr "Der Klassenname darf nur bis zu 127 druckbare Zeichen und keine Leerzeichen, Slashes (/), oder das Rautezeichen (#) enthalten."
+msgid ""
+"The class name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"Der Klassenname darf nur bis zu 127 druckbare Zeichen und keine Leerzeichen, "
+"Slashes (/), oder das Rautezeichen (#) enthalten."
 
 msgid "Unable to modify class:"
 msgstr "Kann Klasse nicht ändern:"
@@ -1871,8 +1941,12 @@ msgstr "Drucker ändern"
 msgid "Add Printer"
 msgstr "Drucker hinzufügen"
 
-msgid "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
-msgstr "Der Druckername darf nur bis zu 127 druckbare Zeichen und keine Leerzeichen, Slashes (/), oder das Rautezeichen (#) enthalten."
+msgid ""
+"The printer name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"Der Druckername darf nur bis zu 127 druckbare Zeichen und keine Leerzeichen, "
+"Slashes (/), oder das Rautezeichen (#) enthalten."
 
 msgid "Unable to get list of printer drivers:"
 msgstr "Holen der Druckertreiberliste nicht möglich:"
@@ -2000,7 +2074,8 @@ msgid "cupsaddsmb crashed on signal %d"
 msgstr "cupsaddsmb abgestürzt mit Signal %d"
 
 msgid "A Samba username is required to export printer drivers!"
-msgstr "Ein Samba Benutzername wird benötigt um Drucker für Samba bereitzustellen!"
+msgstr ""
+"Ein Samba Benutzername wird benötigt um Drucker für Samba bereitzustellen!"
 
 msgid "A Samba password is required to export printer drivers!"
 msgstr "Ein Samba Passwort wird benötigt um Druckertreiber bereitzustellen!"
@@ -2203,7 +2278,9 @@ msgid "Usage: lpmove job/src dest\n"
 msgstr "Benutzung: lpmove Auftrag/Quelle Ziel\n"
 
 msgid "lpstat: Need \"completed\", \"not-completed\", or \"all\" after -W!\n"
-msgstr "lpstat: Brauche \"completed\", \"not-completed\", oder \"all\" hinter dem Parameter -W!\n"
+msgstr ""
+"lpstat: Brauche \"completed\", \"not-completed\", oder \"all\" hinter dem "
+"Parameter -W!\n"
 
 #, c-format
 msgid "%s accepting requests since %s\n"
@@ -2253,15 +2330,21 @@ msgid "%s: Error - expected hostname after '-h' option!\n"
 msgstr "%s: Fehler - Hostname wird hinter dem Parameter '-h' erwartet!\n"
 
 #, c-format
-msgid "%s: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s: Fehler - Die Umgebungsvariable %s enthält das nicht existierende Ziel \"%s\"!\n"
+msgid ""
+"%s: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+"%s: Fehler - Die Umgebungsvariable %s enthält das nicht existierende Ziel \"%"
+"s\"!\n"
 
 #, c-format
 msgid "%s: error - no default destination available.\n"
 msgstr "%s: Fehler - Kein Standardziel verfügbar.\n"
 
-msgid "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
-msgstr "Benutzung: lpq [-P Ziel] [-U Benutzername] [-h Hostname[:Port]] [-l] [+Intervall]\n"
+msgid ""
+"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
+msgstr ""
+"Benutzung: lpq [-P Ziel] [-U Benutzername] [-h Hostname[:Port]] [-l] "
+"[+Intervall]\n"
 
 #, c-format
 msgid "%s: Error - expected hostname after '-H' option!\n"
@@ -2272,8 +2355,12 @@ msgid "%s: Error - expected value after '-%c' option!\n"
 msgstr "%s: Fehler - Wert wird hinter dem Paramter '-%c' erwartet!\n"
 
 #, c-format
-msgid "%s: Warning - '%c' format modifier not supported - output may not be correct!\n"
-msgstr "%s: Warnung - Formatangabe '%c' nicht unterstützt - Ausgabe ist möglicherweise falsch!\n"
+msgid ""
+"%s: Warning - '%c' format modifier not supported - output may not be "
+"correct!\n"
+msgstr ""
+"%s: Warnung - Formatangabe '%c' nicht unterstützt - Ausgabe ist "
+"möglicherweise falsch!\n"
 
 #, c-format
 msgid "%s: error - expected option=value after '-o' option!\n"
@@ -2304,8 +2391,11 @@ msgid "%s: Error - too many files - \"%s\"\n"
 msgstr "%s: Fehler - Zu viele Dateien - \"%s\"\n"
 
 #, c-format
-msgid "%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s: Fehler - Die Umgebungsvariable %s enthält das nicht existierende Ziel \"%s\"!\n"
+msgid ""
+"%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+"%s: Fehler - Die Umgebungsvariable %s enthält das nicht existierende Ziel \"%"
+"s\"!\n"
 
 #, c-format
 msgid "%s: Error - no default destination available.\n"
@@ -2333,7 +2423,8 @@ msgstr "%s: Fehler - unbekanntes Ziel \"%s\"!\n"
 
 #, c-format
 msgid "%s: Error - expected reason text after '-r' option!\n"
-msgstr "%s: Fehler - Begründungstext wird hinter dem Parameter '-r' erwartet!\n"
+msgstr ""
+"%s: Fehler - Begründungstext wird hinter dem Parameter '-r' erwartet!\n"
 
 #, c-format
 msgid "%s: Error - expected username after '-u' option!\n"
@@ -2361,7 +2452,8 @@ msgstr "%s: Auftrags ID wird hinter dem Parameter '-i' erwartet!\n"
 
 #, c-format
 msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "%s: Fehler - Kann nicht gleichzeitig Dateien drucken und Aufträge abändern!\n"
+msgstr ""
+"%s: Fehler - Kann nicht gleichzeitig Dateien drucken und Aufträge abändern!\n"
 
 #, c-format
 msgid "%s: Error - bad job ID!\n"
@@ -2373,7 +2465,9 @@ msgstr "%s: Fehler - Kopienanzahl wird hinter dem Parameter '-n' erwartet!\n"
 
 #, c-format
 msgid "%s: Error - expected option string after '-o' option!\n"
-msgstr "%s: Fehler - Zeichenkette mit Parametern wird hinter dem Parameter '-o' erwartet!\n"
+msgstr ""
+"%s: Fehler - Zeichenkette mit Parametern wird hinter dem Parameter '-o' "
+"erwartet!\n"
 
 #, c-format
 msgid "%s: Error - expected priority after '-%c' option!\n"
@@ -2397,7 +2491,8 @@ msgstr "%s: Warnung - Modusangabe ignoriert!\n"
 
 #, c-format
 msgid "%s: Error - expected hold name after '-H' option!\n"
-msgstr "%s: Fehler - Haltebezeichnung wird hinter dem Parameter '-H' erwartet!\n"
+msgstr ""
+"%s: Fehler - Haltebezeichnung wird hinter dem Parameter '-H' erwartet!\n"
 
 #, c-format
 msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
@@ -2424,12 +2519,19 @@ msgid "%s: Warning - content type option ignored!\n"
 msgstr "%s: Warnung - Parameter für Inhaltstyp ignoriert!\n"
 
 #, c-format
-msgid "%s: Error - cannot print from stdin if files or a job ID are provided!\n"
-msgstr "%s: Fehler - Kann nicht von stdin drucken wenn Dateien oder eine Autrags ID übergeben wurde!\n"
+msgid ""
+"%s: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgstr ""
+"%s: Fehler - Kann nicht von stdin drucken wenn Dateien oder eine Autrags ID "
+"übergeben wurde!\n"
 
 #, c-format
-msgid "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' option!\n"
-msgstr "%s: Fehler - Brauche \"completed\", \"not-completed\", oder \"all\" hinter dem Parameter '-W'!\n"
+msgid ""
+"%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
+"option!\n"
+msgstr ""
+"%s: Fehler - Brauche \"completed\", \"not-completed\", oder \"all\" hinter "
+"dem Parameter '-W'!\n"
 
 #, c-format
 msgid "%s: Error - expected destination after '-b' option!\n"
@@ -2486,10 +2588,13 @@ msgid "Job subscriptions cannot be renewed!"
 msgstr "Auftragssubkription kann nicht erneuert werden!"
 
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
-msgstr "cupsd: Konfigurationsdateiname wird hinter dem Paramter \"-c\" erwartet!\n"
+msgstr ""
+"cupsd: Konfigurationsdateiname wird hinter dem Paramter \"-c\" erwartet!\n"
 
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
-msgstr "cupsd: launchd(8)-unterstützung wurde nicht kompiliert, laufe im normalen Modus.\n"
+msgstr ""
+"cupsd: launchd(8)-unterstützung wurde nicht kompiliert, laufe im normalen "
+"Modus.\n"
 
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting!\n"
@@ -2520,11 +2625,17 @@ msgstr ""
 msgid "        WARN    Line %d only contains whitespace!\n"
 msgstr "        WARNUNG    Zeile %d enthält nur Whitespace!\n"
 
-msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
-msgstr "        WARNUNG    Datei enthält gemischt CR, LF und CR LF als Zeilenende!\n"
+msgid ""
+"        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
+msgstr ""
+"        WARNUNG    Datei enthält gemischt CR, LF und CR LF als Zeilenende!\n"
 
-msgid "        WARN    Non-Windows PPD files should use lines ending with only LF, not CR LF!\n"
-msgstr "        WARNUNG    Nicht-Windows PPD Dateien sollten nur das Zeilenende LF benutzen, nicht CR LF!\n"
+msgid ""
+"        WARN    Non-Windows PPD files should use lines ending with only LF, "
+"not CR LF!\n"
+msgstr ""
+"        WARNUNG    Nicht-Windows PPD Dateien sollten nur das Zeilenende LF "
+"benutzen, nicht CR LF!\n"
 
 msgid "Printer Maintenance"
 msgstr "Druckerwartung"
@@ -2546,19 +2657,31 @@ msgstr "      **FEHLGESCHLAGEN**  Falsche Sprache \"%s\"!\n"
 
 #, c-format
 msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr "      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s!\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s!\n"
 
 #, c-format
-msgid "      **FAIL**  Default translation string for option %s contains 8-bit characters!\n"
-msgstr "      **FEHLGESCHLAGEN**  Standardübersetzung für Parameter %s enthält 8-bit Zeichen!\n"
+msgid ""
+"      **FAIL**  Default translation string for option %s contains 8-bit "
+"characters!\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  Standardübersetzung für Parameter %s enthält 8-bit "
+"Zeichen!\n"
 
 #, c-format
-msgid "      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr "      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s, Auswahl %s!\n"
+msgid ""
+"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s, "
+"Auswahl %s!\n"
 
 #, c-format
-msgid "      **FAIL**  Default translation string for option %s choice %s contains 8-bit characters!\n"
-msgstr "      **FEHLGESCHLAGEN**  Standardübersetzung für Parameter %s Auswahl %s enthält 8-bit Zeichen!\n"
+msgid ""
+"      **FAIL**  Default translation string for option %s choice %s contains "
+"8-bit characters!\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  Standardübersetzung für Parameter %s Auswahl %s "
+"enthält 8-bit Zeichen!\n"
 
 #, c-format
 msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
@@ -2683,8 +2806,12 @@ msgid "Job #%d is already completed - can't cancel."
 msgstr "Auftrag #%d wurde bereits beendet - abbrechen nicht möglich."
 
 #, c-format
-msgid "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
-msgstr "Um auf diese Seite zuzugreifen müssen Sie die URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A> verwenden."
+msgid ""
+"You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
+"s:%d%s</A>."
+msgstr ""
+"Um auf diese Seite zuzugreifen müssen Sie die URL <A HREF=\"https://%s:%d%s"
+"\">https://%s:%d%s</A> verwenden."
 
 #, c-format
 msgid "Unsupported format '%s'!"
@@ -2798,7 +2925,8 @@ msgid ""
 "\n"
 "    -h       Show program usage\n"
 "\n"
-"    Note: this program only validates the DSC comments, not the PostScript itself.\n"
+"    Note: this program only validates the DSC comments, not the PostScript "
+"itself.\n"
 msgstr ""
 "Benutzung: cupstestdsc [Parameter] Dateiname.ps [... Dateiname.ps]\n"
 "       cupstestdsc [Parameter] -\n"
@@ -2807,7 +2935,8 @@ msgstr ""
 "\n"
 "    -h       Zeige Gebrauchsanleitung\n"
 "\n"
-"    Notiz: Dieses Programm validiert nur die DSC Kommentare, nicht das PostScript selbst.\n"
+"    Notiz: Dieses Programm validiert nur die DSC Kommentare, nicht das "
+"PostScript selbst.\n"
 
 #, c-format
 msgid "Password for %s on %s? "
@@ -2819,3 +2948,68 @@ msgid ""
 msgstr ""
 "      **FEHLGESCHLAGEN**  1284DeviceId muss 1284DeviceID sein!\n"
 "                REF: Seite 72, Kapitel 5.5\n"
+
+#, fuzzy, c-format
+msgid "Missing value on line %d!"
+msgstr "Vermisse Wert in Zeile %d!\n"
+
+#, fuzzy, c-format
+msgid "Missing double quote on line %d!"
+msgstr "Vermisse doppelte Anführungszeichen in Zeile %d!\n"
+
+#, fuzzy, c-format
+msgid "Bad option + choice on line %d!"
+msgstr "Falscher Parameter + Auswahl in Zeile %d!\n"
+
+#, fuzzy
+msgid "Empty PPD file!"
+msgstr "Kann PPD Datei nicht kopieren!"
+
+#, fuzzy, c-format
+msgid "Unable to set Windows printer driver (%d)!"
+msgstr "Kann Windows Druckertreiber nicht setzen (%d)!\n"
+
+#, fuzzy, c-format
+msgid "Unable to run \"%s\": %s\n"
+msgstr "cupsaddsmb: Kann \"%s\" nicht ausführen: %s\n"
+
+#, fuzzy
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Für Zugang Benutzername und Passwort (oder Benutzername und Passwort für "
+"root) eingeben."
+
+#, fuzzy, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "Auftrag #%d wurde bereits abgebrochen - abbrechen nicht möglich."
+
+#, c-format
+msgid "Bad notify-recipient URI \"%s\"!"
+msgstr ""
+
+#, c-format
+msgid "notify-recipient URI \"%s\" uses unknown scheme!"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "Bad notify-pull-method \"%s\"!"
+msgstr "Falscher port-monitor \"%s\"!"
+
+#, fuzzy, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID!\n"
+"                REF: Page 72, section 5.5\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  1284DeviceId muss 1284DeviceID sein!\n"
+"                REF: Seite 72, Kapitel 5.5\n"
+
+#, fuzzy, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d FEHLER%s GEFUNDEN\n"
+
+#, fuzzy, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s\n"
+msgstr "lpoptions: Kann PPD für %s nicht öffnen!\n"

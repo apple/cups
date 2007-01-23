@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-05-21 10:08-0400\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
 "PO-Revision-Date: 2006-06-27 22:55+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
@@ -2937,3 +2937,68 @@ msgid ""
 msgstr ""
 "      **FAIL**  1284DeviceId は 1284DeviceID でなければなりません!\n"
 "                REF: 72 ページ、セクション 5.5\n"
+
+#, fuzzy, c-format
+msgid "Missing value on line %d!"
+msgstr "%d 行に値がありません!\n"
+
+#, fuzzy, c-format
+msgid "Missing double quote on line %d!"
+msgstr "%d 行に二重引用符がありません!\n"
+
+#, fuzzy, c-format
+msgid "Bad option + choice on line %d!"
+msgstr "%d 行に不正なオプションと選択があります!\n"
+
+#, fuzzy
+msgid "Empty PPD file!"
+msgstr "PPD ファイルをコピーできません!"
+
+#, fuzzy, c-format
+msgid "Unable to set Windows printer driver (%d)!"
+msgstr "Windows プリンタドライバを設定できません (%d)!\n"
+
+#, fuzzy, c-format
+msgid "Unable to run \"%s\": %s\n"
+msgstr "cupsaddsmb: \"%s\" を実行できません: %s\n"
+
+#, fuzzy
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"このページにアクセスするために、あなたのユーザ名とパスワード、あるいは root "
+"のユーザ名とパスワードを入力してください。"
+
+#, fuzzy, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "ジョブ #%d はすでにキャンセルされています - キャンセルできません。"
+
+#, c-format
+msgid "Bad notify-recipient URI \"%s\"!"
+msgstr ""
+
+#, c-format
+msgid "notify-recipient URI \"%s\" uses unknown scheme!"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "Bad notify-pull-method \"%s\"!"
+msgstr "\"%s\" は無効な port-monitor です!"
+
+#, fuzzy, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID!\n"
+"                REF: Page 72, section 5.5\n"
+msgstr ""
+"      **FAIL**  1284DeviceId は 1284DeviceID でなければなりません!\n"
+"                REF: 72 ページ、セクション 5.5\n"
+
+#, fuzzy, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d 個のエラー%s が見つかりました\n"
+
+#, fuzzy, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s\n"
+msgstr "lpoptions: %s の PPD ファイルを開くことができません!\n"

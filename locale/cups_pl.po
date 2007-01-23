@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-05-21 10:07-0400\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
 "PO-Revision-Date: 2006-05-09 17:20+0200\n"
 "Last-Translator: Piotr Drąg <raven@pmail.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -2947,3 +2947,68 @@ msgid ""
 msgstr ""
 "      **ZAWIÓDŁ**  Błędny %s wybór %s!\n"
 "                REF: strona 122, sekcja 5.17\n"
+
+#, fuzzy, c-format
+msgid "Missing value on line %d!"
+msgstr "Brakująca wartość w wierszu %d!\n"
+
+#, fuzzy, c-format
+msgid "Missing double quote on line %d!"
+msgstr "Brakujący cudzysłów w wierszu %d!\n"
+
+#, fuzzy, c-format
+msgid "Bad option + choice on line %d!"
+msgstr "Błędna opcja + wybór w wierszu %d!\n"
+
+#, fuzzy
+msgid "Empty PPD file!"
+msgstr "Nie można skopiować pliku PPD!"
+
+#, fuzzy, c-format
+msgid "Unable to set Windows printer driver (%d)!"
+msgstr "Nie można ustawić sterownika drukarki Windows (%d)!\n"
+
+#, fuzzy, c-format
+msgid "Unable to run \"%s\": %s\n"
+msgstr "cupsaddsmb: nie można uruchomić \"%s\": %s\n"
+
+#, fuzzy
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Podaj swoją nazwę użytkownika i hasło lub nazwę użytkownika root i hasło, "
+"aby uzyskać dostęp do tej strony."
+
+#, fuzzy, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "Zadanie #%d zostało już anulowane - nie można anulować."
+
+#, c-format
+msgid "Bad notify-recipient URI \"%s\"!"
+msgstr ""
+
+#, c-format
+msgid "notify-recipient URI \"%s\" uses unknown scheme!"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "Bad notify-pull-method \"%s\"!"
+msgstr "Błędne \"%s\" port-monitor!"
+
+#, fuzzy, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID!\n"
+"                REF: Page 72, section 5.5\n"
+msgstr ""
+"      **ZAWIÓDŁ**  Błędny %s wybór %s!\n"
+"                REF: strona 122, sekcja 5.17\n"
+
+#, fuzzy, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    ZNALEZIONO %d BŁĘDÓW%s\n"
+
+#, fuzzy, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s\n"
+msgstr "lpoptions: nie można otworzyć pliku PPD dla %s!\n"

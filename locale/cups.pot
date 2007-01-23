@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2006-05-21 10:07-0400\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2606,6 +2606,62 @@ msgstr ""
 msgid ""
 "      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
 "                REF: Page 72, section 5.5\n"
+msgstr ""
+
+#, c-format
+msgid "Missing value on line %d!"
+msgstr ""
+
+#, c-format
+msgid "Missing double quote on line %d!"
+msgstr ""
+
+#, c-format
+msgid "Bad option + choice on line %d!"
+msgstr ""
+
+msgid "Empty PPD file!"
+msgstr ""
+
+#, c-format
+msgid "Unable to set Windows printer driver (%d)!"
+msgstr ""
+
+#, c-format
+msgid "Unable to run \"%s\": %s\n"
+msgstr ""
+
+msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
+msgstr ""
+
+#, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr ""
+
+#, c-format
+msgid "Bad notify-recipient URI \"%s\"!"
+msgstr ""
+
+#, c-format
+msgid "notify-recipient URI \"%s\" uses unknown scheme!"
+msgstr ""
+
+#, c-format
+msgid "Bad notify-pull-method \"%s\"!"
+msgstr ""
+
+#, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID!\n"
+"                REF: Page 72, section 5.5\n"
+msgstr ""
+
+#, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr ""
+
+#, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s\n"
 msgstr ""
 
 
