@@ -889,7 +889,7 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
         * Run-length compress the graphics...
 	*/
 
-	for (compptr = CompBuffer, repeat_char = CompBuffer[0], repeat_count = 1;
+	for (compptr = CompBuffer + 1, repeat_char = CompBuffer[0], repeat_count = 1;
 	     *compptr;
 	     compptr ++)
 	  if (*compptr == repeat_char)
@@ -908,12 +908,18 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
 	  */
 
 	  if (repeat_count & 1)
+	  {
+	    repeat_count --;
 	    putchar('0');
+	  }
 
-	  putchar(',');
+          if (repeat_count > 0)
+	    putchar(',');
 	}
 	else
 	  ZPLCompress(repeat_char, repeat_count);
+
+	fflush(stdout);
 
        /*
         * Save this line for the next round...
