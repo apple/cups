@@ -1379,7 +1379,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
     strlcat(state, reason, sizeof(state));
 
     prefix  = ",";
-    message = NULL;
+    message = "";
 
     if (!strncmp(reason, "media-needed", 12))
       message = "Media tray needs to be filled.";

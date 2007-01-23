@@ -4,6 +4,9 @@ CHANGES-1.2.txt
 CHANGES IN CUPS V1.2.8
 
 	- Documentation fixes (STR #2141, STR #2157)
+	- The IPP backend now clears the printer-state-message
+	  when there are no outstanding errors or warnings (STR
+	  #2126)
 	- The CUPS Java scripting support did not work with
 	  recent versions of Java due to the use of Sun's private
 	  Base64 class (STR #2152)
