@@ -87,7 +87,7 @@ pot:
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c
 	(cat cups.header; \
-	 tail +6 cups.pot | sed -e '1,$$s/PACKAGE VERSION/CUPS 1.2/' \
+	 tail +6 cups.pot | sed -e '1,$$s/PACKAGE VERSION/CUPS 1.3/' \
 	     -e '1,$$s/charset=CHARSET/charset=utf-8/'; \
 	 cat cups.footer) > cups.pot.N
 	mv cups.pot.N cups.pot
