@@ -4,6 +4,8 @@ CHANGES-1.2.txt
 CHANGES IN CUPS V1.2.8
 
 	- Documentation fixes (STR #2141, STR #2157)
+	- The ZPL label printer driver could produce stretched
+	  output (PR #6448)
 	- The IPP backend now clears the printer-state-message
 	  when there are no outstanding errors or warnings (STR
 	  #2126)
