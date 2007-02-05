@@ -3064,17 +3064,18 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
     return (NULL);
   }
 
-#if HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
-/*
- * Use a policy to search for valid certificates who's common name matches the
- * servername...
- */
+#  if HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
+ /*
+  * Use a policy to search for valid certificates who's common name matches the
+  * servername...
+  */
 
   SecPolicySearchRef	policy_search;	/* Policy search ref */
   SecPolicyRef		policy;		/* Policy ref */
   CSSM_DATA		options;	/* Policy options */
   CSSM_APPLE_TP_SSL_OPTIONS
 			ssl_options;	/* SSL Option for hostname */
+
 
   if ((err = SecPolicySearchCreate(CSSM_CERT_X_509v3, &CSSMOID_APPLE_TP_SSL, 
 			      NULL, &policy_search)))
@@ -3112,13 +3113,13 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
 
   err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
 					  keychain, FALSE, &search);
-#else
-/*
- * Assume there is exactly one SecIdentity in the keychain...
- */
+#  else
+ /*
+  * Assume there is exactly one SecIdentity in the keychain...
+  */
 
   err = SecIdentitySearchCreate(keychain, CSSM_KEYUSE_SIGN, &search);
-#endif /* HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY */
+#  endif /* HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY */
 
   if (err)
     cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -3127,31 +3128,33 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
   else
   {
     if ((err = SecIdentitySearchCopyNext(search, &identity)))
+    {
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 			"Cannot find signing key in keychain \"%s\", error %d",
 			ServerCertificate, (int)err);
+    }
+    else
+    {
+      if (CFGetTypeID(identity) != SecIdentityGetTypeID())
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "SecIdentitySearchCopyNext CFTypeID failure!");
       else
       {
-	if (CFGetTypeID(identity) != SecIdentityGetTypeID())
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "SecIdentitySearchCopyNext CFTypeID failure!");
-	else
-	{
-	if ((certificates = CFArrayCreate(NULL, (const void **)&identity, 
-					1, &kCFTypeArrayCallBacks)) == NULL)
-	  cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create certificate array");
-	}
-
-	CFRelease(identity);
+      if ((certificates = CFArrayCreate(NULL, (const void **)&identity, 
+				      1, &kCFTypeArrayCallBacks)) == NULL)
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create certificate array");
       }
+
+      CFRelease(identity);
+    }
 
     CFRelease(search);
   }
 
-#if HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
+#  if HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
   CFRelease(policy);
   CFRelease(policy_search);
-#endif /* HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY */
+#  endif /* HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY */
 
   return (certificates);
 }
@@ -4008,6 +4011,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   cups_file_t	*fp;			/* Seed/info file */
   int		infofd;			/* Info file descriptor */
 
+
  /*
   * Run the "certtool" command to generate a self-signed certificate...
   */
@@ -4034,8 +4038,8 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     return (0);
   }
 
-    cupsFilePrintf(fp, "%s\nr\n\ny\nb\ns\ny\n%s\n\n\n\n\n%s\ny\n", 
-                 con->servername, con->servername, ServerAdmin);
+  cupsFilePrintf(fp, "%s\nr\n\ny\nb\ns\ny\n%s\n\n\n\n\n%s\ny\n", 
+        	 con->servername, con->servername, ServerAdmin);
   cupsFileClose(fp);
 
   cupsdLogMessage(CUPSD_LOG_INFO,
