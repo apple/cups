@@ -309,8 +309,8 @@ cupsRasterInterpretPPD(
       (h->cupsBitsPerColor != 1 && h->cupsBitsPerColor != 2 &&
        h->cupsBitsPerColor != 4 && h->cupsBitsPerColor != 8 &&
        h->cupsBitsPerColor != 16) ||
-      h->cupsBorderlessScalingFactor < 0.9 ||
-      h->cupsBorderlessScalingFactor > 1.1)
+      h->cupsBorderlessScalingFactor < 0.5 ||
+      h->cupsBorderlessScalingFactor > 2.0)
     return (-1);
 
  /*

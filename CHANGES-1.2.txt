@@ -4,6 +4,9 @@ CHANGES-1.2.txt
 CHANGES IN CUPS V1.2.8
 
 	- Documentation fixes (STR #2141, STR #2157)
+	- cupsBorderlessScalingFacter was limited to a range of
+	  0.9 to 1.1, but some printers need larger values (STR
+	  #2222)
 	- Landscape printing of PDF files did not always work
 	  (STR #2149)
 	- Fixed slow USB printing on Minolta printers (STR #2104,
