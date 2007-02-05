@@ -91,6 +91,11 @@ Summary: Common UNIX Printing System - Estonian support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
+%package fr
+Summary: Common UNIX Printing System - French support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package it
 Summary: Common UNIX Printing System - Italian support
 Group: System Environment/Daemons
@@ -429,6 +434,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups/templates/et
 /usr/share/cups/templates/et/*
 /usr/share/locale/et/cups_et.po
+
+%files fr
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/fr
+/usr/share/doc/cups/fr/index.html
+%dir /usr/share/doc/cups/fr/images
+/usr/share/doc/cups/fr/images/*
+%dir /usr/share/cups/templates/fr
+/usr/share/cups/templates/fr/*
+/usr/share/locale/fr/cups_fr.po
 
 %files it
 %defattr(-,root,root)

@@ -1,4 +1,4 @@
-CREDITS.txt - 2006-10-02
+CREDITS.txt - 2007-02-05
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -6,6 +6,7 @@ like to thank the following individuals for their contributions:
 
     Nathaniel Barbour              - Lots of testing and feedback.
     N. Becker                      - setsid().
+    Philippe Combes                - French localization.
     Jean-Eric Cuendet              - GhostScript filters for CUPS.
     Van Dang                       - HTTP and IPP policeman.
     L. Peter Deutsch               - MD5 code.
