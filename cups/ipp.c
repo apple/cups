@@ -1098,8 +1098,11 @@ ippReadIO(void       *src,		/* I - Data source */
 	  break;
 
     case IPP_ATTRIBUTE :
-        while ((*cb)(src, buffer, 1) > 0)
+        for (;;)
 	{
+	  if ((*cb)(src, buffer, 1) < 1)
+	    return (IPP_ERROR);
+
 	  DEBUG_printf(("ippReadIO: ipp->current=%p, ipp->prev=%p\n",
 	                ipp->current, ipp->prev));
 
