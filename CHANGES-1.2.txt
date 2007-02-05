@@ -4,6 +4,8 @@ CHANGES-1.2.txt
 CHANGES IN CUPS V1.2.8
 
 	- Documentation fixes (STR #2141, STR #2157)
+	- The scheduler did not choose SSL certificates correctly
+	  on Mac OS X (STR #2225)
 	- The scheduler could get in an infinite loop when
 	  printing to a remote class (STR #2228)
 	- The jobs web page did not have separating space after

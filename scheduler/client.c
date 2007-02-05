@@ -39,7 +39,7 @@
  *   cupsdWritePipe()        - Flag that data is available on the CGI pipe.
  *   check_if_modified()     - Decode an "If-Modified-Since" line.
  *   encrypt_client()        - Enable encryption for the client...
- *   get_cdsa_server_certs() - Convert a keychain name into the CFArrayRef
+ *   get_cdsa_certificate()  - Convert a keychain name into the CFArrayRef
  *			       required by SSLSetCertificate.
  *   get_file()              - Get a filename and state info.
  *   install_conf_file()     - Install a configuration file.
@@ -59,6 +59,9 @@
 
 #ifdef HAVE_CDSASSL
 #  include <Security/Security.h>
+#  ifdef HAVE_SECIDENTITYSEARCHPRIV_H
+#    include <Security/SecIdentitySearchPriv.h>
+#  endif /* HAVE_SECIDENTITYSEARCHPRIV_H */
 #  ifdef HAVE_SECBASEPRIV_H
 #    include <Security/SecBasePriv.h>
 #  else
@@ -80,7 +83,7 @@ static int		check_if_modified(cupsd_client_t *con,
 static int		encrypt_client(cupsd_client_t *con);
 #endif /* HAVE_SSL */
 #ifdef HAVE_CDSASSL
-static CFArrayRef	get_cdsa_server_certs(void);
+static CFArrayRef	get_cdsa_certificate(cupsd_client_t *con);
 #endif /* HAVE_CDSASSL */
 static char		*get_file(cupsd_client_t *con, struct stat *filestats,
 			          char *filename, int len);
@@ -89,7 +92,7 @@ static int		is_cgi(cupsd_client_t *con, const char *filename,
 		               struct stat *filestats, mime_type_t *type);
 static int		is_path_absolute(const char *path);
 #ifdef HAVE_SSL
-static int		make_certificate(void);
+static int		make_certificate(cupsd_client_t *con);
 #endif /* HAVE_SSL */
 static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 			             char *command, char *options, int root);
@@ -2821,7 +2824,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     * Nope, make a self-signed certificate...
     */
 
-    if (!make_certificate())
+    if (!make_certificate(con))
       return (0);
   }
 
@@ -2880,7 +2883,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     * Nope, make a self-signed certificate...
     */
 
-    if (!make_certificate())
+    if (!make_certificate(con))
       return (0);
   }
 
@@ -2952,7 +2955,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
   error            = 0;
   conn->session    = NULL;
-  conn->certsArray = get_cdsa_server_certs();
+  conn->certsArray = get_cdsa_certificate(con);
 
   if (!conn->certsArray)
   {
@@ -2960,8 +2963,8 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     * No keychain (yet), make a self-signed certificate...
     */
 
-    if (make_certificate())
-      conn->certsArray = get_cdsa_server_certs();
+    if (make_certificate(con))
+      conn->certsArray = get_cdsa_certificate(con);
   }
 
   if (!conn->certsArray)
@@ -3040,59 +3043,91 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
 #ifdef HAVE_CDSASSL
 /*
- * 'get_cdsa_server_certs()' - Convert a keychain name into the CFArrayRef
- *			       required by SSLSetCertificate.
- *
- * For now we assumes that there is exactly one SecIdentity in the
- * keychain - i.e. there is exactly one matching cert/private key pair.
- * In the future we will search a keychain for a SecIdentity matching a
- * specific criteria.  We also skip the operation of adding additional
- * non-signing certs from the keychain to the CFArrayRef.
- *
- * To create a self-signed certificate for testing use the certtool.
- * Executing the following as root will do it:
- *
- *     certtool c k=/Library/Keychains/System.keychain
+ * 'get_cdsa_certificate()' - Get a SSL/TLS certificate from the System keychain.
  */
 
-static CFArrayRef			/* O - Array of certificates */
-get_cdsa_server_certs(void)
+static CFArrayRef				/* O - Array of certificates */
+get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
 {
   OSStatus		err;		/* Error info */
-  SecKeychainRef	kcRef;		/* Keychain reference */
-  SecIdentitySearchRef	srchRef;	/* Search reference */
+  SecKeychainRef	keychain;	/* Keychain reference */
+  SecIdentitySearchRef	search;		/* Search reference */
   SecIdentityRef	identity;	/* Identity */
-  CFArrayRef		ca;		/* Certificate array */
+  CFArrayRef		certificates = NULL;
+					/* Certificate array */
 
 
-  kcRef    = NULL;
-  srchRef  = NULL;
-  identity = NULL;
-  ca	   = NULL;
-  err      = SecKeychainOpen(ServerCertificate, &kcRef);
+  if ((err = SecKeychainOpen(ServerCertificate, &keychain)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot open keychain \"%s\", %s",
+	            ServerCertificate, cssmErrorString(err));
+    return (NULL);
+  }
+
+#if HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
+/*
+ * Use a policy to search for valid certificates who's common name matches the
+ * servername...
+ */
+
+  SecPolicySearchRef	policy_search;	/* Policy search ref */
+  SecPolicyRef		policy;		/* Policy ref */
+  CSSM_DATA		options;	/* Policy options */
+  CSSM_APPLE_TP_SSL_OPTIONS
+			ssl_options;	/* SSL Option for hostname */
+
+  if ((err = SecPolicySearchCreate(CSSM_CERT_X_509v3, &CSSMOID_APPLE_TP_SSL, 
+			      NULL, &policy_search)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create a policy search reference");
+    CFRelease(keychain);
+    return (NULL);
+  }
+
+  if ((err = SecPolicySearchCopyNext(policy_search, &policy)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, 
+		    "Cannot find a policy to use for searching");
+    CFRelease(keychain);
+    CFRelease(policy_search);
+    return (NULL);
+  }
+
+  memset(&ssl_options, 0, sizeof(ssl_options));
+  ssl_options.Version = CSSM_APPLE_TP_SSL_OPTS_VERSION;
+  ssl_options.ServerName = con->servername;
+  ssl_options.ServerNameLen = strlen(con->servername);
+
+  options.Data = (uint8 *)&ssl_options;
+  options.Length = sizeof(ssl_options);
+
+  if ((err = SecPolicySetValue(policy, &options)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, 
+		    "Cannot set policy value to use for searching");
+    CFRelease(keychain);
+    CFRelease(policy_search);
+    return (NULL);
+  }
+
+  err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
+					  keychain, FALSE, &search);
+#else
+/*
+ * Assume there is exactly one SecIdentity in the keychain...
+ */
+
+  err = SecIdentitySearchCreate(keychain, CSSM_KEYUSE_SIGN, &search);
+#endif /* HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY */
 
   if (err)
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot open keychain \"%s\", error %d.",
-	            ServerCertificate, (int)err);
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "Cannot create keychain search reference: %s", 
+		    cssmErrorString(err));
   else
   {
-   /*
-    * Search for "any" identity matching specified key use;
-    * in this app, we expect there to be exactly one.
-    */
-
-    err = SecIdentitySearchCreate(kcRef, CSSM_KEYUSE_SIGN, &srchRef);
-
-    if (err)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		      "Cannot find signing key in keychain \"%s\", error %d",
-		      ServerCertificate, (int)err);
-    else
-    {
-      err = SecIdentitySearchCopyNext(srchRef, &identity);
-
-      if (err)
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
+    if ((err = SecIdentitySearchCopyNext(search, &identity)))
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
 			"Cannot find signing key in keychain \"%s\", error %d",
 			ServerCertificate, (int)err);
       else
@@ -3102,28 +3137,23 @@ get_cdsa_server_certs(void)
 	                  "SecIdentitySearchCopyNext CFTypeID failure!");
 	else
 	{
-	 /*
-	  * Found one. Place it in a CFArray.
-	  * TBD: snag other (non-identity) certs from keychain and add them
-	  * to array as well.
-	  */
-
-	  ca = CFArrayCreate(NULL, (const void **)&identity, 1, &kCFTypeArrayCallBacks);
-
-	  if (ca == nil)
-	    cupsdLogMessage(CUPSD_LOG_ERROR, "CFArrayCreate error");
+	if ((certificates = CFArrayCreate(NULL, (const void **)&identity, 
+					1, &kCFTypeArrayCallBacks)) == NULL)
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create certificate array");
 	}
 
 	CFRelease(identity);
       }
 
-      CFRelease(srchRef);
-    }
-
-    CFRelease(kcRef);
+    CFRelease(search);
   }
 
-  return (ca);
+#if HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
+  CFRelease(policy);
+  CFRelease(policy_search);
+#endif /* HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY */
+
+  return (certificates);
 }
 #endif /* HAVE_CDSASSL */
 
@@ -3631,7 +3661,7 @@ is_path_absolute(const char *path)	/* I - Input path */
  */
 
 static int				/* O - 1 on success, 0 on failure */
-make_certificate(void)
+make_certificate(cupsd_client_t *con)	/* I - Client connection */
 {
 #if defined(HAVE_LIBSSL) && defined(HAVE_WAITPID)
   int		pid,			/* Process ID of command */
@@ -3968,18 +3998,18 @@ make_certificate(void)
   return (1);
 
 #elif defined(HAVE_CDSASSL) && defined(HAVE_WAITPID)
-  int	pid,				/* Process ID of command */
-	status;				/* Status of command */
-  char	command[1024],			/* Command */
-	keychain[1024],			/* Keychain argument */
-	*argv[5],			/* Command-line arguments */
-	*envp[MAX_ENV];			/* Environment variables */
-
+  int		pid,			/* Process ID of command */
+		status;			/* Status of command */
+  char		command[1024],		/* Command */
+		*argv[4],		/* Command-line arguments */
+		*envp[MAX_ENV + 1],	/* Environment variables */
+		keychain[1024],		/* Keychain argument */
+		infofile[1024];		/* Type-in information for cert */
+  cups_file_t	*fp;			/* Seed/info file */
+  int		infofd;			/* Info file descriptor */
 
  /*
-  * Run the "certtool" command to generate a self-signed certificate:
-  *
-  *     certtool c Z k=ServerCertificate
+  * Run the "certtool" command to generate a self-signed certificate...
   */
 
   if (!cupsFileFind("certtool", getenv("PATH"), 1, command, sizeof(command)))
@@ -3989,6 +4019,25 @@ make_certificate(void)
     return (0);
   }
 
+ /*
+  * Create a file with the certificate information fields...
+  *
+  * Note: This assumes that the default questions are asked by the certtool
+  * command...
+  */
+
+  if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create certificate information file %s - %s",
+                    infofile, strerror(errno));
+    return (0);
+  }
+
+    cupsFilePrintf(fp, "%s\nr\n\ny\nb\ns\ny\n%s\n\n\n\n\n%s\ny\n", 
+                 con->servername, con->servername, ServerAdmin);
+  cupsFileClose(fp);
+
   cupsdLogMessage(CUPSD_LOG_INFO,
                   "Generating SSL server key and certificate...");
 
@@ -3996,14 +4045,22 @@ make_certificate(void)
 
   argv[0] = "certtool";
   argv[1] = "c";
-  argv[2] = "Z";
-  argv[3] = keychain;
-  argv[4] = NULL;
+  argv[2] = keychain;
+  argv[3] = NULL;
 
   cupsdLoadEnv(envp, MAX_ENV);
 
-  if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, &pid))
+  infofd = open(infofile, O_RDONLY);
+
+  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, &pid))
+  {
+    close(infofd);
+    unlink(infofile);
     return (0);
+  }
+
+  close(infofd);
+  unlink(infofile);
 
   while (waitpid(pid, &status, 0) < 0)
     if (errno != EINTR)

@@ -49,8 +49,17 @@ if test x$enable_ssl != xno; then
 		 # /admin just yet...
 		 #ENCRYPTION_REQUIRED="  Encryption Required"
 		 AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
+		 AC_CHECK_HEADER(Security/SecIdentitySearchPriv.h,AC_DEFINE(HAVE_SECIDENTITYSEARCHPRIV_H))
 		 AC_DEFINE(HAVE_SSL)
-		 AC_DEFINE(HAVE_CDSASSL)])
+		 AC_DEFINE(HAVE_CDSASSL)
+		 dnl Check for SecIdentitySearchCreateWithPolicy...
+		 AC_MSG_CHECKING(for SecIdentitySearchCreateWithPolicy)
+		 if test $uversion -ge 80; then
+			 AC_DEFINE(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
+			 AC_MSG_RESULT(yes)
+		 else
+			 AC_MSG_RESULT(no)
+		 fi])
 	fi
     fi
 
