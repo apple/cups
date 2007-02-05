@@ -4,6 +4,7 @@ CHANGES-1.2.txt
 CHANGES IN CUPS V1.2.8
 
 	- Documentation fixes (STR #2141, STR #2157)
+	- Updated Japanese localization (STR #2216)
 	- cupsBorderlessScalingFacter was limited to a range of
 	  0.9 to 1.1, but some printers need larger values (STR
 	  #2222)

@@ -25,8 +25,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-01-23 09:44-0500\n"
-"PO-Revision-Date: 2006-06-27 22:55+0900\n"
+"POT-Creation-Date: 2007-01-23 09:19-0500\n"
+"PO-Revision-Date: 2007-01-27 13:43+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -2938,67 +2938,53 @@ msgstr ""
 "      **FAIL**  1284DeviceId は 1284DeviceID でなければなりません!\n"
 "                REF: 72 ページ、セクション 5.5\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Missing value on line %d!"
-msgstr "%d 行に値がありません!\n"
+msgstr "%d 行に値がありません!"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Missing double quote on line %d!"
-msgstr "%d 行に二重引用符がありません!\n"
+msgstr "%d 行に二重引用符がありません!"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Bad option + choice on line %d!"
-msgstr "%d 行に不正なオプションと選択があります!\n"
+msgstr "%d 行に不正なオプションと選択があります!"
 
-#, fuzzy
 msgid "Empty PPD file!"
-msgstr "PPD ファイルをコピーできません!"
+msgstr "PPD ファイルが空です!"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to set Windows printer driver (%d)!"
-msgstr "Windows プリンタドライバを設定できません (%d)!\n"
+msgstr "Windows プリンタドライバを設定できません (%d)!"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to run \"%s\": %s\n"
-msgstr "cupsaddsmb: \"%s\" を実行できません: %s\n"
+msgstr "\"%s\" を実行できません: %s\n"
 
-#, fuzzy
-msgid ""
-"Enter your username and password or the root username and password to access "
-"this page. If you are using Kerberos authentication, make sure you have a "
-"valid Kerberos ticket."
-msgstr ""
-"このページにアクセスするために、あなたのユーザ名とパスワード、あるいは root "
-"のユーザ名とパスワードを入力してください。"
-
-#, fuzzy, c-format
+#, c-format
 msgid "Job #%d is already canceled - can't cancel."
 msgstr "ジョブ #%d はすでにキャンセルされています - キャンセルできません。"
 
 #, c-format
 msgid "Bad notify-recipient URI \"%s\"!"
-msgstr ""
+msgstr "\"%s\" は不正な notify-recipient URI です!"
 
 #, c-format
 msgid "notify-recipient URI \"%s\" uses unknown scheme!"
-msgstr ""
+msgstr "notify-recipient URI \"%s\" には未知のスキームが使われています!"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Bad notify-pull-method \"%s\"!"
-msgstr "\"%s\" は無効な port-monitor です!"
+msgstr "\"%s\" は無効な notify-pull-method です!"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "      **FAIL**  %s must be 1284DeviceID!\n"
 "                REF: Page 72, section 5.5\n"
 msgstr ""
-"      **FAIL**  1284DeviceId は 1284DeviceID でなければなりません!\n"
+"      **FAIL**  %s は 1284DeviceID でなければなりません!\n"
 "                REF: 72 ページ、セクション 5.5\n"
 
-#, fuzzy, c-format
-msgid "    %d ERRORS FOUND\n"
-msgstr "    %d 個のエラー%s が見つかりました\n"
-
-#, fuzzy, c-format
+#, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s\n"
-msgstr "lpoptions: %s の PPD ファイルを開くことができません!\n"
+msgstr "lpoptions: %s の PPD ファイルを開くことができません!: %s\n"
