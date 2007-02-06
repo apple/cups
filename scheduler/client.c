@@ -61,13 +61,26 @@
 #  include <Security/Security.h>
 #  ifdef HAVE_SECIDENTITYSEARCHPRIV_H
 #    include <Security/SecIdentitySearchPriv.h>
+#  else /* Declare prototype for function in that header... */
+extern OSStatus SecIdentitySearchCreateWithPolicy(SecPolicyRef policy, 
+				CFStringRef idString, CSSM_KEYUSE keyUsage, 
+				CFTypeRef keychainOrArray, 
+				Boolean returnOnlyValidIdentities, 
+				SecIdentitySearchRef* searchRef);
 #  endif /* HAVE_SECIDENTITYSEARCHPRIV_H */
+#  ifdef HAVE_SECPOLICYPRIV_H
+#    include <Security/SecPolicyPriv.h>
+#  else /* Declare prototype for function in that header... */
+extern OSStatus SecPolicySetValue(SecPolicyRef policyRef, 
+                                  const CSSM_DATA *value);
+#  endif /* HAVE_SECPOLICYPRIV_H */
 #  ifdef HAVE_SECBASEPRIV_H
 #    include <Security/SecBasePriv.h>
-#  else
-     extern const char *cssmErrorString(int error);
+#  else /* Declare prototype for function in that header... */
+extern const char *cssmErrorString(int error);
 #  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_CDSASSL */
+
 #ifdef HAVE_GNUTLS
 #  include <gnutls/x509.h>
 #endif /* HAVE_GNUTLS */
