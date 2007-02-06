@@ -154,6 +154,10 @@ UNIX® operating systems. This package provides Spanish support.
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Estonian support.
 
+%description fr
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides French support.
+
 %description it
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Italian support.
