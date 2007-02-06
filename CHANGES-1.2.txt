@@ -4,6 +4,9 @@ CHANGES-1.2.txt
 CHANGES IN CUPS V1.2.8
 
 	- Documentation fixes (STR #2141, STR #2157)
+	- Changing the "Save debugging information" setting in
+	  the web interface no longer affects the other server
+	  settings (STR #1993)
 	- The scheduler did not choose SSL certificates correctly
 	  on Mac OS X (STR #2225)
 	- The scheduler could get in an infinite loop when
