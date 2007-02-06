@@ -914,7 +914,7 @@ cgiSetIPPObjectVars(
 
                 snprintf(valptr, sizeof(value) - (valptr - value),
 		         "<A HREF=\"%s\">%s</A>", url,
-			 strrchr(url, '/') + 1);
+			 strrchr(attr->values[i].string.text, '/') + 1);
 	      }
 	      else
 		cgiRewriteURL(attr->values[i].string.text, valptr,

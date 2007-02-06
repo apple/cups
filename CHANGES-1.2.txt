@@ -4,6 +4,8 @@ CHANGES-1.2.txt
 CHANGES IN CUPS V1.2.8
 
 	- Documentation fixes (STR #2141, STR #2157)
+	- Members of a class with Unicode names did not appear
+	  correctly in the web interface (STR #2154)
 	- Changing the "Save debugging information" setting in
 	  the web interface no longer affects the other server
 	  settings (STR #1993)
