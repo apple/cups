@@ -2273,7 +2273,8 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 	       con->servername, con->serverport, con->uri);
 
       snprintf(redirect, sizeof(redirect),
-               "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"3;https://%s:%d%s\">\n",
+               "<META HTTP-EQUIV=\"Refresh\" "
+	       "CONTENT=\"3;URL=https://%s:%d%s\">\n",
 	       con->servername, con->serverport, con->uri);
     }
     else
