@@ -3,7 +3,7 @@
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1280,43 +1280,47 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
         memcpy(bounding_box, doc->bounding_box,
 	       sizeof(bounding_box));
       }
-      else if (doc->number_up == 1 && !doc->fitplot)
+      else if (doc->number_up == 1 && !doc->fitplot  && Orientation)
       {
         int	temp_bbox[4];		/* Temporary bounding box */
 
 
+        memcpy(temp_bbox, bounding_box, sizeof(temp_bbox));
+
+        fprintf(stderr, "DEBUG: Orientation = %d\n", Orientation);
+        fprintf(stderr, "DEBUG: original bounding_box = [ %d %d %d %d ]\n",
+		bounding_box[0], bounding_box[1],
+		bounding_box[2], bounding_box[3]);
+        fprintf(stderr, "DEBUG: PageWidth = %.1f, PageLength = %.1f\n",
+	        PageWidth, PageLength);
+
         switch (Orientation)
 	{
-	  case 0 : /* Portrait */
-              break;
-
 	  case 1 : /* Landscape */
-	      temp_bbox[0] = PageWidth - bounding_box[3];
-	      temp_bbox[1] = bounding_box[0];
-	      temp_bbox[2] = PageWidth - bounding_box[1];
-	      temp_bbox[3] = bounding_box[2];
-
-	      memcpy(bounding_box, temp_bbox, sizeof(bounding_box));
+	      bounding_box[0] = PageLength - temp_bbox[3];
+	      bounding_box[1] = temp_bbox[0];
+	      bounding_box[2] = PageLength - temp_bbox[1];
+	      bounding_box[3] = temp_bbox[2];
               break;
 
 	  case 2 : /* Reverse Portrait */
-	      temp_bbox[0] = PageWidth - bounding_box[0];
-	      temp_bbox[1] = PageLength - bounding_box[1];
-	      temp_bbox[2] = PageWidth - bounding_box[2];
-	      temp_bbox[3] = PageLength - bounding_box[3];
-
-	      memcpy(bounding_box, temp_bbox, sizeof(bounding_box));
+	      bounding_box[0] = PageWidth - temp_bbox[2];
+	      bounding_box[1] = PageLength - temp_bbox[3];
+	      bounding_box[2] = PageWidth - temp_bbox[0];
+	      bounding_box[3] = PageLength - temp_bbox[1];
               break;
 
 	  case 3 : /* Reverse Landscape */
-	      temp_bbox[0] = bounding_box[1];
-	      temp_bbox[1] = PageLength - bounding_box[2];
-	      temp_bbox[2] = bounding_box[3];
-	      temp_bbox[3] = PageLength - bounding_box[0];
-
-	      memcpy(bounding_box, temp_bbox, sizeof(bounding_box));
+	      bounding_box[0] = temp_bbox[1];
+	      bounding_box[1] = PageWidth - temp_bbox[2];
+	      bounding_box[2] = temp_bbox[3];
+	      bounding_box[3] = PageWidth - temp_bbox[0];
               break;
 	}
+
+        fprintf(stderr, "DEBUG: updated bounding_box = [ %d %d %d %d ]\n",
+		bounding_box[0], bounding_box[1],
+		bounding_box[2], bounding_box[3]);
       }
     }
 #if 0
