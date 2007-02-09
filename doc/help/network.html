@@ -5,16 +5,267 @@
 </HEAD>
 <BODY>
 
-<H2 CLASS="title"><A NAME="URI">Network Printer URIs</A></H2>
+<P>This help document describes how to discover, configure, and use TCP/IP network printers with CUPS.</P>
 
-<P>Once you have set the IP address you can access the printer or
-print server using the <CODE>ipp</CODE>, <CODE>lpd</CODE>, or
-<CODE>socket</CODE> backends. The following is a list of common
-network interfaces and printer servers and the settings you
-should use with CUPS:</P>
+<H2 CLASS="title"><A NAME="ADDRESS">Getting the IP Address</A></H2>
+
+<P>Every network printer or print server has a unique Internet Protocol (IP) address associated with it. This address is either configured manually or set using an automatic network protocol such as the <A HREF="#BOOTP">Boot Protocol (BOOTP)</A>, <A HREF="#DHCP">Dynamic Host Control Protocol (DHCP)</A>, Reverse Address Resolution Protocol (RARP), or ZeroConf.</P>
+
+<P>You can normally find the IP address of a printer on the printer's control panel or by printing the configuration or status page. The <A HREF="#SNMP">Simple Network Management Protocol (SNMP)</A> can also be used to get the IP address remotely, which happens automatically when you visit the CUPS administration web page or choose an available CUPS device when adding a printer.</P>
+
+
+<H2 CLASS="title"><A NAME="CONFIG">Configuring the IP Address</A></H2>
+
+<P>When you first install a network printer or print server on your LAN, you need to set the Internet Protocol ("IP") address. Most higher-end "workgroup" printers allow you to set the address through the printer control panel. However, if you have many printers you will want to assign the addresses remotely - this makes administration a bit easier and avoids assigning duplicate addresses accidentally.</P>
+
+<P>To setup your printer or print server for remote address assignment, you'll need the Ethernet Media Access Control ("MAC") address, also sometimes called a node address, and the IP address you want to use for the device. The Ethernet MAC address can often be found on the printer test page or bottom of the print server.</P>
+
+<H3><A NAME="DHCP">Configuring the IP Address Using DHCP</A></H3>
+
+<P>The DHCP protocol is the usual way of setting the IP address of a printer on a managed network. Using the standard <TT>dhcpd(8)</TT> program supplied with UNIX you simply need to add a line to the <VAR>/etc/dhcpd.conf</VAR> file:</P>
+
+<PRE CLASS="command">
+host <I>hostname</I> {
+  hardware ethernet <I>mac-address</I>;
+  fixed-address <I>ip-address</I>;
+}
+</PRE>
+
+<P>Make sure that the hostname you use is also listed in the <VAR>/etc/hosts</VAR> file or is registered with your DNS server.</P>
+
+<H3><A NAME="BOOTP">Configuring the IP Address Using BOOTP</A></H3>
+
+<P>The BOOTP protocol is used when you need to provide additional information such as the location of a configuration file to the network interface. Using the standard <TT>bootpd(8)</TT> program supplied with UNIX you simply need to add a line to the <VAR>/etc/bootptab</VAR> file; for IRIX:</P>
+
+<PRE CLASS="command">
+myprinter 08:00:69:00:12:34 192.0.2.2 <VAR>myprinter.boot</VAR>
+</PRE>
+
+<P>Newer versions of <TT>bootpd</TT> use a different format:</P>
+
+<PRE CLASS="command">
+myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>
+</PRE>
+
+<P>The <VAR>myprinter.boot</VAR> file resides in the <VAR>/usr/local/boot</VAR> directory by default. If you do not need to provide a boot file you may leave the last part of the line blank.</P>
+
+<BLOCKQUOTE><B>Note:</B> Some versions of UNIX do not enable the BOOTP service by default. The <VAR>/etc/inetd.conf</VAR> or <VAR>/etc/xinetd.d/bootp</VAR> file usually contains a line for the BOOTP service that can be uncommented if needed.</BLOCKQUOTE>
+
+
+<H2 CLASS="title"><A NAME="VERIFY">Verifying the Printer Connection</A></H2>
+
+<P>To test that the IP address has been successfully assigned and
+that the printer is properly connected to your LAN, type:</P>
+
+<PRE CLASS="command">
+<KBD>ping ip-address</KBD>
+</PRE>
+
+<P>If the connection is working properly you will see something
+like:</P>
+
+<PRE CLASS="command">
+<KBD>ping myprinter</KBD>
+PING myprinter (192.0.2.2): 56 data bytes
+64 bytes from 192.0.2.2: icmp_seq=0 ttl=15 time=5 ms
+64 bytes from 192.0.2.2: icmp_seq=1 ttl=15 time=3 ms
+64 bytes from 192.0.2.2: icmp_seq=2 ttl=15 time=3 ms
+64 bytes from 192.0.2.2: icmp_seq=3 ttl=15 time=3 ms
+</PRE>
+
+<P>If not, verify that the printer or print server is connected
+to the LAN, it is powered on, the LAN cabling is good, and the IP
+address is set correctly. You can usually see the current IP
+address and network status by printing a configuration or test
+page on the device.</P>
+
+
+<H2 CLASS="title"><A NAME="PROTOCOLS">Network Protocols Supported by CUPS</H2>
+
+<P>CUPS supports most network printers using one of three TCP/IP-based protocols. Printer discovery is currently accomplished using the SNMP protocol, however future versions of CUPS will also include support for multicast DNS service discovery as well.</P>
+
+<H3><A NAME="SOCKET">AppSocket Protocol</A></H3>
+
+<P>The AppSocket protocol (sometimes also called the JetDirect protocol, owing to its origins with the HP JetDirect network interfaces) is the simplest, fastest, and generally the most reliable network protocol used for printers. AppSocket printing normally happens over port 9100 and uses the <tt>socket</tt> URI scheme:</P>
+
+<PRE>
+socket://<i>ip-address-or-hostname</i>
+socket://<i>ip-address-or-hostname</i>?waiteof=false
+socket://<i>ip-address-or-hostname</i>:<i>port-number</i>
+socket://<i>ip-address-or-hostname</i>:<i>port-number</i>?waiteof=false
+</PRE>
+
+<P>The "waiteof" option controls whether the <tt>socket</tt> backend waits for the printer to complete the printing of the job. The default is to wait.</P>
+
+<H3><A NAME="IPP">Internet Printing Protocol (IPP)</A></H3>
+
+<P>IPP is the only protocol that CUPS supports natively, and is also supported by many network printers. We recommend using this protocol over others whenever the printer or server supports it. IPP printing normally happens over port 631 and uses the <tt>http</tt> and <tt>ipp</tt> URI schemes:</P>
+
+<PRE>
+http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
+http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value</i>
+http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&option=value</i>
+ipp://<i>ip-address-or-hostname</i>/<i>resource</i>
+ipp://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value</i>
+ipp://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value&option=value</i>
+ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
+ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value</i>
+ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&option=value</i>
+</PRE>
+
+<P>The <tt>ipp</tt> backend supports many options, which are summarized in <A HREF="#TABLE2">Table 2</A>.</P>
+
+<DIV CLASS="table"><TABLE SUMMARY="IPP URI Options">
+<CAPTION>Table 2: <A NAME="TABLE2">IPP URI Options</A></CAPTION>
+<THEAD>
+<TR>
+	<TH>Option</TH>
+	<TH>Description</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD><TT>compression=gzip</TT></TD>
+	<TD>Specifies that print data should be compressed before sending.</TD>
+</TR>
+<TR>
+	<TD><TT>encryption=always</TT></TD>
+	<TD>Specifies that the connection to the IPP server should be encrypted using SSL.</TD>
+</TR>
+<TR>
+	<TD><TT>encryption=ifrequested</TT></TD>
+	<TD>Specifies that the connection to the IPP server should only be encrypted if the server requests it.</TD>
+</TR>
+<TR>
+	<TD><TT>encryption=never</TT></TD>
+	<TD>Specifies that the connection to the IPP server should not be encrypted.</TD>
+</TR>
+<TR>
+	<TD><TT>encryption=required</TT></TD>
+	<TD>Specifies that the connection to the IPP server should be encrypted using TLS.</TD>
+</TR>
+<TR>
+	<TD><TT>version=1.0</TT></TD>
+	<TD>Specifies that version 1.0 of the IPP protocol should be used instead of the default version 1.1.</TD>
+</TR>
+<TR>
+	<TD><TT>waitjob=false</TT></TD>
+	<TD>Specifies that the IPP backend should not wait for the job to complete.</TD>
+</TR>
+<TR>
+	<TD><TT>waitprinter=false</TT></TD>
+	<TD>Specifies that the IPP backend should not wait for the printer to become idle before sending the print job.</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
+
+<H3><A NAME="LPD">Line Printer Daemon (LPD) Protocol</A></H3>
+
+<P>LPD is the original network printing protocol and is supported by many network printers. Due to limitations in the LPD protocol, we do not recommend using it if the printer or server supports one of the other protocols. LPD printing normally happens over port 515 and uses the <tt>lpd</tt> URI scheme:</P>
+
+<PRE>
+lpd://<i>ip-address-or-hostname</i>/<i>queue</i>
+lpd://<i>ip-address-or-hostname</i>/<i>queue</i>?<i>option=value</i>
+lpd://<i>ip-address-or-hostname</i>/<i>queue</i>?<i>option=value&option=value</i>
+</PRE>
+
+<P><A HREF="#TABLE3">Table 3</A> summarizes the options supported by the <tt>lpd</tt> backend.</P>
+
+<DIV CLASS="table"><TABLE SUMMARY="LPD URI Options">
+<CAPTION>Table 3: <A NAME="TABLE3">LPD URI Options</A></CAPTION>
+<THEAD>
+<TR>
+	<TH>Option</TH>
+	<TH>Description</TH>
+</TR>
+</THEAD>
+<TBODY>
+<TR>
+	<TD><TT>banner=on</TT></TD>
+	<TD>Specifies that a banner page should be printed by the server.</TD>
+</TR>
+<TR>
+	<TD><TT>contimeout=<I>seconds</I></TT></TD>
+	<TD>Specifies the number of seconds to wait for the connection to the server to complete.</TD>
+</TR>
+<TR>
+	<TD><TT>format=c</TT></TD>
+	<TD>Specifies that the print data is a CIF file.</TD>
+</TR>
+<TR>
+	<TD><TT>format=d</TT></TD>
+	<TD>Specifies that the print data is a DVI file.</TD>
+</TR>
+<TR>
+	<TD><TT>format=f</TT></TD>
+	<TD>Specifies that the print data is a plain text file.</TD>
+</TR>
+<TR>
+	<TD><TT>format=g</TT></TD>
+	<TD>Specifies that the print data is a Berkeley plot file.</TD>
+</TR>
+<TR>
+	<TD><TT>format=l</TT></TD>
+	<TD>Specifies that the print data is a raw (preformatted) print file.</TD>
+</TR>
+<TR>
+	<TD><TT>format=n</TT></TD>
+	<TD>Specifies that the print data is a ditroff file.</TD>
+</TR>
+<TR>
+	<TD><TT>format=o</TT></TD>
+	<TD>Specifies that the print data is a PostScript file.</TD>
+</TR>
+<TR>
+	<TD><TT>format=p</TT></TD>
+	<TD>Specifies that the print data is a plain text file that should be "pretty" printed with a header and footer.</TD>
+</TR>
+<TR>
+	<TD><TT>format=r</TT></TD>
+	<TD>Specifies that the print data is a FORTRAN carriage control file.</TD>
+</TR>
+<TR>
+	<TD><TT>format=t</TT></TD>
+	<TD>Specifies that the print data is a troff Graphic Systems C/A/T phototypesetter file.</TD>
+</TR>
+<TR>
+	<TD><TT>format=v</TT></TD>
+	<TD>Specifies that the print data is a Sun raster file.</TD>
+</TR>
+<TR>
+	<TD><TT>order=data,control</TT></TD>
+	<TD>Specifies that the print data files should be sent before the control file.</TD>
+</TR>
+<TR>
+	<TD><TT>reserve=none</TT></TD>
+	<TD>Specifies that the backend should not reserve a source port.</TD>
+</TR>
+<TR>
+	<TD><TT>reserve=rfc1179</TT></TD>
+	<TD>Specifies that the backend should reserve a source port from 721 to 731 as required by RFC 1179.</TD>
+</TR>
+<TR>
+	<TD><TT>sanitize_title=no</TT></TD>
+	<TD>Specifies that the job title string should not be restricted to ASCII characters.</TD>
+</TR>
+<TR>
+	<TD><TT>sanitize_title=yes</TT></TD>
+	<TD>Specifies that the job title string should be restricted to ASCII characters.</TD>
+</TR>
+<TR>
+	<TD><TT>timeout=<I>seconds</I></TT></TD>
+	<TD>Specifies the number of seconds to wait for LPD commands to complete.</TD>
+</TR>
+</TBODY>
+</TABLE></DIV>
+
+
+<H3><A NAME="URI">Common Network Printer URIs</A></H3>
+
+<P>Once you have set the IP address you can access the printer or print server using the <TT>ipp</TT>, <TT>lpd</TT>, or <TT>socket</TT> backends. <A HREF="#TABLE1">Table 1</A> shows a list of common network interfaces and printer servers and the settings you should use with CUPS:</P>
 
 <DIV CLASS="table"><TABLE SUMMARY="Common Device URIs">
-<CAPTION>Table 1: Common Device URIs</CAPTION>
+<CAPTION>Table 1: <A NAME="TABLE1">Common Device URIs</A></CAPTION>
 <THEAD>
 <TR>
 	<TH>Model/Manufacturer</TH>
@@ -131,152 +382,155 @@ should use with CUPS:</P>
 </TBODY>
 </TABLE></DIV>
 
-<H2 CLASS="title"><A NAME="ADDRESS">Getting the IP Address</A></H2>
 
-<P>When you first install a network printer or print server on
-your LAN, you need to set the Internet Protocol ("IP") address.
-On most higher-end "workgroup" printers, you can set the address
-through the printer control panel. However, in most cases you
-will want to assign the addresses remotely from your workstation.
-This makes administration a bit easier and avoids assigning
-duplicate addresses accidentally.</P>
+<H2 CLASS="title"><A NAME="SNMP">Troubleshooting SNMP Discovery Problems</A></H2>
 
-<P>To setup your printer or print server for remote address
-assignment, you'll need the Ethernet Media Access Control ("MAC")
-address, also sometimes called a node address, and the IP address
-you want to use for the device. The Ethernet MAC address can
-often be found on the printer test page or bottom of the print
-server.</P>
+<P>Whenever you view the administration web page or a list of supported device URIs, the <tt>snmp</tt> backend will probe the local network(s) using Simple Network Management Protocol (SNMP) broadcasts. Printers that respond to these broadcasts are then interrogated for the make and model and supported protocols, yielding a device URI that can be used to add the printer.</P> 
 
-<H3>Configuring the IP Address Using ARP</H3>
+<P>That said, the SNMP requests sometimes expose problems in vendor SNMP or IPP implementations. If you are experiencing long delays in loading the CUPS web interface administration page, or if you don't see your printer listed, the following instructions will help you to diagnose those problems and/or provide important feedback to the CUPS developers so that we can correct problems and improve the SNMP backend in future releases.</P>
 
-<P>The easiest way to set the IP address of a network device is
-to use the <CODE>arp(8)</CODE> command.  The <CODE>arp</CODE>
-sends an Address Resolution Protocol ("ARP") packet to the
-specified Ethernet MAC address, setting the network device's IP
-address:</P>
+<H3>Quick Fixes</H3>
+
+<P>If you don't use "public" as your community name, create a text file called <VAR>/etc/cups/snmp.conf</VAR> and put the following line in it:</P>
 
 <PRE CLASS="command">
-<KBD>arp -s ip-address ethernet-address</KBD>
-<KBD>arp -s host.domain.com 08:00:69:00:12:34</KBD>
-<KBD>arp -s 192.0.2.2 08:00:69:00:12:34</KBD>
+Community <I>your community name</I>
 </PRE>
 
-<H3>Configuring the IP Address Using RARP</H3>
+<P>If you have more than one community name, list them all on separate lines.</P>
 
-<P>The most flexible way to remotely assign IP addresses under
-UNIX is through the Reverse Address Resolution Protocol ("RARP").
-RARP allows a network device to request an IP address using its
-Ethernet MAC address, and one or more RARP servers on the network
-will respond with an ARP packet with the IP address the device
-can use.</P>
+<P>If you don't support SNMP v1 on your network, you are currently "out of luck". That said, we will be adding v2, v2c, and v3 support in future CUPS releases once we have a handle on the actual requirements people have for such things. Please file or update an <A HREF="http://www.cups.org/str.php">SNMP enhancement request</A> with <em>specific</em> requirements you have - what you need supported, why you need it supported, and how you would like to see the functionality provided/exposed - so that we can do it "right" the first time.</P>
 
-<P>RARP should be used when you have to manage many printers or
-print servers, or when you have a network device that does not
-remember its IP address after a power cycle. If you just have a
-single printer or print server, the <CODE>arp</CODE> command is
-the way to go.</P>
+<H3>Basic Debugging</H3>
 
-<P>Some UNIX operating systems use a program called
-<CODE>rarpd(8)</CODE> to manage RARP. Others, like Linux, support
-this protocol in the kernel. For systems that provide the
-<CODE>rarpd</CODE> program you will need to start it before RARP
-lookups will work:</P>
+<P>The SNMP backend supports a debugging mode that is activated by running it from a shell prompt. If you are using Bash (/bin/bash), Bourne shell (/bin/sh), Korn shell (/bin/ksh), or Z shell (/bin/zsh), you can run the following command to get a verbose log of the SNMP backend:</P>
 
 <PRE CLASS="command">
-<KBD>rarpd</KBD>
+CUPS_DEBUG_LEVEL=2 /usr/lib/cups/backend/snmp 2>&amp;1 | tee snmp.log
 </PRE>
 
-<P>Under IRIX you can enable this functionality by default
-using:</P>
+<P>For C shell (/bin/csh) and TCsh (/bin/tcsh), use the following command instead:</P>
 
 <PRE CLASS="command">
-<KBD>chkconfig rarpd on</KBD>
+(setenv CUPS_DEBUG_LEVEL 2; /usr/lib/cups/backend/snmp) |& tee snmp.log
 </PRE>
 
-<P>Both the <CODE>rarpd</CODE> program and kernel RARP support
-read a list of Ethernet and IP addresses from the file
-<VAR>/etc/ethers</VAR>. Each line contains the Ethernet address
-(colon delimited) followed by an IP address or hostname like:</P>
+<P>On MacOS X you'll find the SNMP backend in /usr/libexec/cups/backend instead:</P>
 
 <PRE CLASS="command">
-08:00:69:00:12:34 myprinter.mydomain.com
-08:00:69:00:12:34 192.0.2.2
+CUPS_DEBUG_LEVEL=2 /usr/libexec/cups/backend/snmp 2>&amp;1 | tee snmp.log
 </PRE>
 
-<P>Add a line to this file and cycle the power on the printer or
-print server to set its address.</P>
+<P>The output will look something like this:</P>
 
-<H3>Configuring the IP Address Using BOOTP</H3>
+<PRE STYLE="margin-left: 36pt">
+ 1  INFO: Using default SNMP Address @LOCAL
+ 2  INFO: Using default SNMP Community public
+ 3  DEBUG: Scanning for devices in "public" via "@LOCAL"...
+ 4  DEBUG: 0.000 Sending 46 bytes to 192.168.2.255...
+ 5  DEBUG: SEQUENCE 44 bytes
+ 6  DEBUG:     INTEGER 1 bytes 0
+ 7  DEBUG:     OCTET STRING 6 bytes "public"
+ 8  DEBUG:     Get-Request-PDU 31 bytes
+ 9  DEBUG:         INTEGER 4 bytes 1149539174
+10  DEBUG:         INTEGER 1 bytes 0
+11  DEBUG:         INTEGER 1 bytes 0
+12  DEBUG:         SEQUENCE 17 bytes
+13  DEBUG:             SEQUENCE 15 bytes
+14  DEBUG:                 OID 11 bytes .1.3.6.1.2.1.25.3.2.1.2.1
+15  DEBUG:                 NULL VALUE 0 bytes
+16  DEBUG: 0.001 Received 55 bytes from 192.168.2.229...
+17  DEBUG: community="public"
+18  DEBUG: request-id=1149539174
+19  DEBUG: error-status=0
+20  DEBUG: SEQUENCE 53 bytes
+21  DEBUG:     INTEGER 1 bytes 0
+22  DEBUG:     OCTET STRING 6 bytes "public"
+23  DEBUG:     Get-Response-PDU 40 bytes
+24  DEBUG:         INTEGER 4 bytes 1149539174
+25  DEBUG:         INTEGER 1 bytes 0
+26  DEBUG:         INTEGER 1 bytes 0
+27  DEBUG:         SEQUENCE 26 bytes
+28  DEBUG:             SEQUENCE 24 bytes
+29  DEBUG:                 OID 11 bytes .1.3.6.1.2.1.25.3.2.1.2.1
+30  DEBUG:                 OID 9 bytes .1.3.6.1.2.1.25.3.1.5
+31  DEBUG: add_cache(addr=0xbfffe170, addrname="192.168.2.229",
+    uri="(null)", id="(null)", make_and_model="(null)")
+32  DEBUG: 0.002 Sending 46 bytes to 192.168.2.229...
+33  DEBUG: SEQUENCE 44 bytes
+34  DEBUG:     INTEGER 1 bytes 0
+35  DEBUG:     OCTET STRING 6 bytes "public"
+36  DEBUG:     Get-Request-PDU 31 bytes
+37  DEBUG:         INTEGER 4 bytes 1149539175
+38  DEBUG:         INTEGER 1 bytes 0
+39  DEBUG:         INTEGER 1 bytes 0
+40  DEBUG:         SEQUENCE 17 bytes
+41  DEBUG:             SEQUENCE 15 bytes
+42  DEBUG:                 OID 11 bytes .1.3.6.1.2.1.25.3.2.1.3.1
+43  DEBUG:                 NULL VALUE 0 bytes
+44  DEBUG: 0.003 Received 69 bytes from 192.168.2.229...
+45  DEBUG: community="public"
+46  DEBUG: request-id=1149539175
+47  DEBUG: error-status=0
+48  DEBUG: SEQUENCE 67 bytes
+49  DEBUG:     INTEGER 1 bytes 0
+50  DEBUG:     OCTET STRING 6 bytes "public"
+51  DEBUG:     Get-Response-PDU 54 bytes
+52  DEBUG:         INTEGER 4 bytes 1149539175
+53  DEBUG:         INTEGER 1 bytes 0
+54  DEBUG:         INTEGER 1 bytes 0
+55  DEBUG:         SEQUENCE 40 bytes
+56  DEBUG:             SEQUENCE 38 bytes
+57  DEBUG:                 OID 11 bytes .1.3.6.1.2.1.25.3.2.1.3.1
+58  DEBUG:                 OCTET STRING 23 bytes "HP LaserJet 4000
+    Series"
+59  DEBUG: 1.001 Probing 192.168.2.229...
+60  DEBUG: 1.001 Trying socket://192.168.2.229:9100...
+61  DEBUG: 192.168.2.229 supports AppSocket!
+62  DEBUG: 1.002 Scan complete!
+63  network socket://192.168.2.229 "HP LaserJet 4000 Series"
+    "HP LaserJet 4000 Series 192.168.2.229" ""
+</PRE>
 
-<P>The BOOTP protocol is used when you need to provide additional
-information such as the location of a configuration file to the
-network interface. Using the standard <CODE>bootpd(8)</CODE>
-program supplied with UNIX you simply need to add a line to the
-<VAR>/etc/bootptab</VAR> file; for IRIX:</P>
+<H3>Dissecting the Output</H3>
+
+<P>The first two lines are just informational and let you know that the default community name and address are being used. Lines 3-15 contain the initial SNMP query for the device type OID (.1.3.6.1.2.1.25.3.2.1.2.1) from the Host MIB.</P>
+
+<P>Lines 16-31 show the response we got from an HP LaserJet 4000 network printer. At this point we discover that it is a printer device and then send another SNMP query (lines 32-43) for the device description OID (.1.3.6.1.2.1.25.3.2.1.3.1) from the Host MIB as well.</P>
+
+<P>Lines 44-58 show the response to the device description query, which tells us that this is an HP LaserJet 4000 Series printer.</P>
+
+<P>On line 59 we start our active connection probe and discover that this print server supports the AppSocket (JetDirect) protocol on port 9100.</P>
+
+<P>Finally, line 63 shows the device information line for the print server that is sent to CUPS.</P>
+
+<H3>Reporting Problems</H3>
+
+If you don't see your printer listed, or the wrong information is listed, then you need to gather more information on the printer. The easiest way to do this is to run the snmpwalk command:
 
 <PRE CLASS="command">
-myprinter 08:00:69:00:12:34 192.0.2.2 <VAR>myprinter.boot</VAR>
+snmpwalk -Cc -v 1 -c public <I>ip-address</I> | tee snmpwalk.log
 </PRE>
 
-<P>Newer versions of <CODE>bootpd</CODE> use a different
-format:</P>
+<P>where "ip-address" is the IP address of the printer or print server. You should see a <em>lot</em> of values stream by - the ones you want to see are:</P>
 
-<PRE CLASS="command">
-myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>
+<PRE STYLE="margin-left: 36pt">
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: HP LaserJet 4000 Series
 </PRE>
 
-<P>The <VAR>myprinter.boot</VAR> file resides in the
-<VAR>/usr/local/boot</VAR> directory by default. If you do not
-need to provide a boot file you may leave the last part of the
-line blank.</P>
+<P>The hrDeviceType line should show hrDevicePrinter; if not, then your printer or print server doesn't identify itself as a printer. The hrDeviceDescr line should provide a human-readable string for the make and model of the printer, although in some cases you'll just see something less useful like "Axis OfficeBASIC Parallel Print Server".</P>
 
-<BLOCKQUOTE><B>Note:</B>
+<P>Once you have collected the snmpwalk output, you should go to the  <A HREF="http://www.cups.org/str.php">CUPS Bugs &amp; Features page</A> to submit a feature request to support your printer or print server. Be sure to attach those two log files you created - they will help us to identify the SNMP values we need to look for.</P>
 
-<P>Some versions of UNIX do not enable the BOOTP service by
-default. The <VAR>/etc/inetd.conf</VAR> usually contains a line
-for the BOOTP service that can be uncommented if needed.</P>
 
-</BLOCKQUOTE>
+<H2 CLASS="title"><A NAME="SERVERS">Configuring Print Servers</A></H2>
 
-<H2 CLASS="title"><A NAME="VERIFY">Verifying the Printer Connection</A></H2>
+<H3><A NAME="AXIS">Configuring Axis Print Servers</A></H3>
 
-<P>To test that the IP address has been successfully assigned and
-that the printer is properly connected to your LAN, type:</P>
+<P>The Axis print servers can be configured using BOOTP or DHCP. However, on models that do not provide IPP support an additional step must be performed to configure the TCP/IP portion of the print server for use with CUPS.</P>
 
-<PRE CLASS="command">
-<KBD>ping ip-address</KBD>
-</PRE>
-
-<P>If the connection is working properly you will see something
-like:</P>
-
-<PRE CLASS="command">
-<KBD>ping myprinter</KBD>
-PING myprinter (192.0.2.2): 56 data bytes
-64 bytes from 192.0.2.2: icmp_seq=0 ttl=15 time=5 ms
-64 bytes from 192.0.2.2: icmp_seq=1 ttl=15 time=3 ms
-64 bytes from 192.0.2.2: icmp_seq=2 ttl=15 time=3 ms
-64 bytes from 192.0.2.2: icmp_seq=3 ttl=15 time=3 ms
-</PRE>
-
-<P>If not, verify that the printer or print server is connected
-to the LAN, it is powered on, the LAN cabling is good, and the IP
-address is set correctly. You can usually see the current IP
-address and network status by printing a configuration or test
-page on the device.</P>
-
-<H2 CLASS="title"><A NAME="AXIS">Configuring Axis Print Servers</A></H2>
-
-<P>The Axis print servers can be configured using ARP, RARP, or
-BOOTP. However, on models that do not provide IPP support an
-additional step must be performed to configure the TCP/IP portion
-of the print server for use with CUPS.</P>
-
-<P>Each print server contains a configuration file named
-<VAR>config</VAR> that contains a list of network parameters used
-by the server. To modify this file you must first download it
-from the print server using the <CODE>ftp(1)</CODE> program:</P>
+<P>Each print server contains a configuration file named <VAR>config</VAR> that contains a list of network parameters used by the server. To modify this file you must first download it from the print server using the <TT>ftp(1)</TT> program:</P>
 
 <PRE CLASS="command">
 <KBD>ftp ip-address</KBD>
@@ -297,8 +551,7 @@ ftp> <KBD>quit</KBD>
 221 Goodbye.
 </PRE>
 
-<P>Next, edit the file with your favorite text editor and locate
-the lines beginning with:</P>
+<P>Next, edit the file with your favorite text editor and locate the lines beginning with:</P>
 
 <PRE CLASS="command">
 RTN_OPT.     : YES
@@ -312,16 +565,13 @@ RTEL_PR7.    : 0
 RTEL_PR8.    : 0
 </PRE>
 
-<P>Change the <CODE>RTN_OPT</CODE> line to read:</P>
+<P>Change the <TT>RTN_OPT</TT> line to read:</P>
 
 <PRE CLASS="command">
 RTN_OPT.     : <KBD>NO</KBD>
 </PRE>
 
-<P>This disables the Reverse TELNET protocol and enables the
-standard TELNET protocol on the print server. Next, assign a port
-number for each parallel and serial port on the server as
-follows:</P>
+<P>This disables the Reverse TELNET protocol and enables the standard TELNET protocol on the print server. Next, assign a port number for each parallel and serial port on the server as follows:</P>
 
 <PRE CLASS="command">
 RTEL_PR1.    : <KBD>9100</KBD>
@@ -334,10 +584,7 @@ RTEL_PR7.    : <KBD>9106</KBD>
 RTEL_PR8.    : <KBD>9107</KBD>
 </PRE>
 
-<P>This essentially makes the Axis print server look like a
-Hewlett Packard JetDirect EX print server. Save the file and then
-upload the new <VAR>config</VAR> file using the <CODE>ftp</CODE>
-command:</P>
+<P>This essentially makes the Axis print server look like a Hewlett Packard JetDirect EX print server. Save the file and then upload the new <VAR>config</VAR> file using the <TT>ftp</TT> command:</P>
 
 <PRE CLASS="command">
 <KBD>ftp ip-address</KBD>
@@ -363,17 +610,11 @@ ftp> <KBD>quit</KBD>
 
 <P>Your Axis print server is now ready for use!</P>
 
-<H2 CLASS="title"><A NAME="LINKSYS">Configuring Linksys Print Servers</A></H2>
+<H3><A NAME="LINKSYS">Configuring Linksys Print Servers</A></H3>
 
-<P>The Linksys print servers can be configured using ARP, RARP,
-or BOOTP. Like older Axis print servers, an additional step must
-be performed to configure the TCP/IP portion of the print server
-for use with CUPS.</P>
+<P>The Linksys print servers can be configured using BOOTP or DHCP. Like older Axis print servers, an additional step must be performed to configure the TCP/IP portion of the print server for use with CUPS.</P>
 
-<P>Each print server contains a configuration file named
-<VAR>CONFIG</VAR> that contains a list of network parameters used
-by the server. To modify this file you must first download it
-from the print server using the <CODE>ftp(1)</CODE> program:</P>
+<P>Each print server contains a configuration file named <VAR>CONFIG</VAR> that contains a list of network parameters used by the server. To modify this file you must first download it from the print server using the <TT>ftp(1)</TT> program:</P>
 
 <PRE CLASS="command">
 <KBD>ftp -n ip-address</KBD>
@@ -392,8 +633,7 @@ ftp> <KBD>quit</KBD>
 221 Goodbye.
 </PRE>
 
-<P>Next, edit the file with your favorite text editor and locate
-the lines beginning with:</P>
+<P>Next, edit the file with your favorite text editor and locate the lines beginning with:</P>
 
 <PRE CLASS="command">
 0100 L1_PROUT:P1
@@ -401,8 +641,7 @@ the lines beginning with:</P>
 0140 L3_PROUT:P1
 </PRE>
 
-<P>Change the port number for each parallel and serial port on
-the server as follows:</P>
+<P>Change the port number for each parallel and serial port on the server as follows:</P>
 
 <PRE CLASS="command">
 0100 L1_PROUT:<KBD>P1</KBD>
@@ -410,9 +649,7 @@ the server as follows:</P>
 0140 L3_PROUT:<KBD>P3</KBD>
 </PRE>
 
-<P>This maps each virtual printer with a physical port. Save the
-file and then upload the new <VAR>CONFIG</VAR> file using the
-<CODE>ftp</CODE> command:</P>
+<P>This maps each virtual printer with a physical port. Save the file and then upload the new <VAR>CONFIG</VAR> file using the <TT>ftp</TT> command:</P>
 
 <PRE CLASS="command">
 <KBD>ftp -n ip-address</KBD>
