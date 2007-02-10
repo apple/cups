@@ -2590,7 +2590,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       {
 	if ((prefilter = mimeFilterLookup(MimeDatabase, filter->src,
 					  printer->prefiltertype)))
+	{
 	  cupsArrayAdd(prefilters, prefilter);
+	  job->cost += prefilter->cost;
+	}
 
 	cupsArrayAdd(prefilters, filter);
       }
