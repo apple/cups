@@ -1,8 +1,9 @@
-CHANGES.txt - 2007-01-02
+CHANGES.txt - 2007-02-10
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- Added support for driver-specific pre-filters (STR #2108)
 	- Added a new side-channel API for drivers and backends
 	  for basic device control and information queries (STR
 	  #1898)

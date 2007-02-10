@@ -12,7 +12,7 @@
 
   CUPS PPD extensions specification for the Common UNIX Printing System (CUPS).
 
-  Copyright 1997-2006 by Easy Software Products.
+  Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
   property of Easy Software Products and are protected by Federal
@@ -290,6 +290,24 @@ to disable the port monitor for the given URI scheme.</p>
 
 <em>*% Specify a printer-specific port monitor for an Epson USB printer</em> 
 *cupsPortMonitor usb/USB Status Monitor: "epson-usb"
+</pre>
+
+<h3>cupsPreFilter</h3>
+
+<p class='summary'>*cupsPreFilter: "source/type cost program"</p>
+
+<p>This string attribute provides a pre-filter rule. The pre-filter
+program will be inserted in the conversion chain immediately 
+before the filter that accepts the given MIME type.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% PDF pre-filter</em>
+*cupsPreFilter: "application/pdf 100 mypdfprefilter"
+
+<em>*% PNG pre-filter</em>
+*cupsPreFilter: "image/png 0 mypngprefilter"
 </pre>
 
 <h3>cupsVersion</h3>
@@ -950,6 +968,14 @@ in the PPD file for a given locale.</blockquote>
 
 
 <h2 class='title'><a name='HISTORY'>Change History</a></h2>
+
+<h3>Changes in CUPS 1.3</h3>
+
+<ul>
+
+	<li>Added <tt>cupsPreFilter</tt> attribute.</li>
+
+</ul>
 
 <h3>Changes in CUPS 1.2.8</h3>
 

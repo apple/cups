@@ -3,7 +3,7 @@
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -70,7 +70,8 @@
  */
 
 static void	add_printer_defaults(cupsd_printer_t *p);
-static void	add_printer_filter(cupsd_printer_t *p, const char *filter);
+static void	add_printer_filter(cupsd_printer_t *p, mime_type_t *type,
+				   const char *filter);
 static void	add_printer_formats(cupsd_printer_t *p);
 static int	compare_printers(void *first, void *second, void *data);
 static void	delete_printer_filters(cupsd_printer_t *p);
@@ -731,6 +732,7 @@ cupsdDeletePrinter(
   delete_printer_filters(p);
 
   mimeDeleteType(MimeDatabase, p->filetype);
+  mimeDeleteType(MimeDatabase, p->prefiltertype);
 
   cupsdFreePrinterUsers(p);
   cupsdFreeQuotas(p);
@@ -1242,6 +1244,9 @@ cupsdRenamePrinter(
 
   mimeDeleteType(MimeDatabase, p->filetype);
   p->filetype = mimeAddType(MimeDatabase, "printer", name);
+
+  mimeDeleteType(MimeDatabase, p->prefiltertype);
+  p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", name);
 
  /*
   * Rename the printer...
@@ -1876,7 +1881,20 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	* handle "raw" printing by users.
 	*/
 
-        add_printer_filter(p, "application/vnd.cups-raw 0 -");
+        add_printer_filter(p, p->filetype, "application/vnd.cups-raw 0 -");
+
+       /*
+	* Add any pre-filters in the PPD file...
+	*/
+
+	if ((ppdattr = ppdFindAttr(ppd, "cupsPreFilter", NULL)) != NULL)
+	{
+	  p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", p->name);
+
+	  for (; ppdattr; ppdattr = ppdFindNextAttr(ppd, "cupsPreFilter", NULL))
+	    if (ppdattr->value)
+	      add_printer_filter(p, p->prefiltertype, ppdattr->value);
+	}
 
        /*
 	* Add any filters in the PPD file...
@@ -1886,7 +1904,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	for (i = 0; i < ppd->num_filters; i ++)
 	{
           DEBUG_printf(("ppd->filters[%d] = \"%s\"\n", i, ppd->filters[i]));
-          add_printer_filter(p, ppd->filters[i]);
+          add_printer_filter(p, p->filetype, ppd->filters[i]);
 	}
 
 	if (ppd->num_filters == 0)
@@ -1895,7 +1913,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	  * If there are no filters, add a PostScript printing filter.
 	  */
 
-          add_printer_filter(p, "application/vnd.cups-postscript 0 -");
+          add_printer_filter(p, p->filetype,
+	                     "application/vnd.cups-postscript 0 -");
         }
 
        /*
@@ -1970,13 +1989,14 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	* handle "raw" printing by users.
 	*/
 
-        add_printer_filter(p, "application/vnd.cups-raw 0 -");
+        add_printer_filter(p, p->filetype, "application/vnd.cups-raw 0 -");
 
        /*
         * Add a PostScript filter, since this is still possibly PS printer.
 	*/
 
-	add_printer_filter(p, "application/vnd.cups-postscript 0 -");
+	add_printer_filter(p, p->filetype,
+	                   "application/vnd.cups-postscript 0 -");
       }
       else
       {
@@ -1993,11 +2013,12 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	  */
 
 	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                       "printer-make-and-model", NULL, "Local System V Printer");
+                       "printer-make-and-model", NULL,
+		       "Local System V Printer");
 
 	  snprintf(filename, sizeof(filename), "*/* 0 %s/interfaces/%s",
 	           ServerRoot, p->name);
-	  add_printer_filter(p, filename);
+	  add_printer_filter(p, p->filetype, filename);
 	}
 	else if (p->device_uri &&
 	         !strncmp(p->device_uri, "ipp://", 6) &&
@@ -2094,12 +2115,12 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     length += 13 + strlen(p->job_sheets[0]) + strlen(p->job_sheets[1]);
     length += 32;
     if (BrowseLocalOptions)
-      length += 12 + strlen(BrowseLocalOptions); 
+      length += 12 + strlen(BrowseLocalOptions);
 
    /*
     * Allocate the new string...
     */
- 
+
     if ((p->browse_attrs = calloc(1, length)) == NULL)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to allocate %d bytes for browse data!",
@@ -2869,6 +2890,7 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
 static void
 add_printer_filter(
     cupsd_printer_t  *p,		/* I - Printer to add to */
+    mime_type_t	     *filtertype,	/* I - Filter or prefilter MIME type */
     const char       *filter)		/* I - Filter to add */
 {
   char		super[MIME_MAX_SUPER],	/* Super-type for filter */
@@ -2939,9 +2961,9 @@ add_printer_filter(
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "add_printer_filter: %s: adding filter %s/%s %s/%s %d %s",
                       p->name, temptype->super, temptype->type,
-		      p->filetype->super, p->filetype->type,
+		      filtertype->super, filtertype->type,
                       cost, program);
-      mimeAddFilter(MimeDatabase, temptype, p->filetype, cost, program);
+      mimeAddFilter(MimeDatabase, temptype, filtertype, cost, program);
     }
 }
 

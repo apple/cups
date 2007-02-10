@@ -3,7 +3,7 @@
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -143,6 +143,8 @@ extern mime_filter_t	*mimeAddFilter(mime_t *mime, mime_type_t *src,
 extern void		mimeDeleteFilter(mime_t *mime, mime_filter_t *filter);
 extern cups_array_t	*mimeFilter(mime_t *mime, mime_type_t *src,
 			            mime_type_t *dst, int *cost);
+extern mime_filter_t	*mimeFilterLookup(mime_t *mime, mime_type_t *src,
+			                  mime_type_t *dst);
 extern mime_filter_t	*mimeFirstFilter(mime_t *mime);
 extern mime_filter_t	*mimeNextFilter(mime_t *mime);
 extern int		mimeNumFilters(mime_t *mime);

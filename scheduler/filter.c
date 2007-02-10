@@ -3,7 +3,7 @@
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -23,12 +23,12 @@
  *
  * Contents:
  *
- *   mimeAddFilter()   - Add a filter to the current MIME database.
- *   mimeFilter()      - Find the fastest way to convert from one type to
- *                       another.
- *   compare_filters() - Compare two filters...
- *   find_filters()    - Find the filters to convert from one type to another.
- *   lookup()          - Lookup a filter...
+ *   mimeAddFilter()    - Add a filter to the current MIME database.
+ *   mimeFilter()       - Find the fastest way to convert from one type to
+ *                        another.
+ *   mimeFilterLookup() - Lookup a filter...
+ *   compare_filters()  - Compare two filters...
+ *   find_filters()     - Find the filters to convert from one type to another.
  */
 
 /*
@@ -64,7 +64,6 @@ static int		compare_srcs(mime_filter_t *, mime_filter_t *);
 static cups_array_t	*find_filters(mime_t *mime, mime_type_t *src,
 			              mime_type_t *dst, int *cost,
 				      _mime_typelist_t *visited);
-static mime_filter_t	*lookup(mime_t *, mime_type_t *, mime_type_t *);
 
 
 /*
@@ -93,7 +92,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
   * destination...
   */
 
-  if ((temp = lookup(mime, src, dst)) != NULL)
+  if ((temp = mimeFilterLookup(mime, src, dst)) != NULL)
   {
    /*
     * Yup, does the existing filter have a higher cost?  If so, copy the
@@ -194,6 +193,25 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
 
 
 /*
+ * 'mimeFilterLookup()' - Lookup a filter...
+ */
+
+mime_filter_t *				/* O - Filter for src->dst */
+mimeFilterLookup(mime_t      *mime,	/* I - MIME database */
+                 mime_type_t *src,	/* I - Source type */
+                 mime_type_t *dst)	/* I - Destination type */
+{
+  mime_filter_t	key;			/* Key record for filter search */
+
+
+  key.src = src;
+  key.dst = dst;
+
+  return ((mime_filter_t *)cupsArrayFind(mime->filters, &key));
+}
+
+
+/*
  * 'compare_filters()' - Compare two filters...
  */
 
@@ -260,7 +278,7 @@ find_filters(mime_t           *mime,	/* I - MIME database */
   * See if there is a filter that can convert the files directly...
   */
 
-  if ((current = lookup(mime, src, dst)) != NULL)
+  if ((current = mimeFilterLookup(mime, src, dst)) != NULL)
   {
    /*
     * Got a direct filter!
@@ -388,25 +406,6 @@ find_filters(mime_t           *mime,	/* I - MIME database */
   DEBUG_puts("    Returning zippo...");
 
   return (NULL);
-}
-
-
-/*
- * 'lookup()' - Lookup a filter...
- */
-
-static mime_filter_t *			/* O - Filter for src->dst */
-lookup(mime_t      *mime,		/* I - MIME database */
-       mime_type_t *src,		/* I - Source type */
-       mime_type_t *dst)		/* I - Destination type */
-{
-  mime_filter_t	key;			/* Key record for filter search */
-
-
-  key.src = src;
-  key.dst = dst;
-
-  return ((mime_filter_t *)cupsArrayFind(mime->filters, &key));
 }
 
 

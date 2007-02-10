@@ -1411,7 +1411,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       job->hold_until = curtime +
                         ((17 - curdate->tm_hour) * 60 + 59 -
 			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
-  }  
+  }
   else if (!strcmp(when, "second-shift"))
   {
    /*
@@ -1427,7 +1427,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       job->hold_until = curtime +
                         ((15 - curdate->tm_hour) * 60 + 59 -
 			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
-  }  
+  }
   else if (!strcmp(when, "third-shift"))
   {
    /*
@@ -1443,7 +1443,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       job->hold_until = curtime +
                         ((23 - curdate->tm_hour) * 60 + 59 -
 			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
-  }  
+  }
   else if (!strcmp(when, "weekend"))
   {
    /*
@@ -1696,7 +1696,7 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
 	}
 	else if (!sscanf(message, "%*d%d", &copies))
 	  copies = 1;
-	  
+
         job->sheets->values[0].integer += copies;
 
 	if (job->printer->page_limit)
@@ -1856,7 +1856,7 @@ free_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * 'ipp_length()' - Compute the size of the buffer needed to hold 
+ * 'ipp_length()' - Compute the size of the buffer needed to hold
  *		    the textual IPP attributes.
  */
 
@@ -2381,7 +2381,7 @@ set_time(cupsd_job_t *job,		/* I - Job to update */
  * 'set_hold_until()' - Set the hold time and update job-hold-until attribute...
  */
 
-static void 
+static void
 set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
 	       time_t      holdtime)	/* I - Hold until time */
 {
@@ -2407,7 +2407,7 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
   */
 
   holddate = gmtime(&holdtime);
-  snprintf(holdstr, sizeof(holdstr), "%d:%d:%d", holddate->tm_hour, 
+  snprintf(holdstr, sizeof(holdstr), "%d:%d:%d", holddate->tm_hour,
 	   holddate->tm_min, holddate->tm_sec);
 
   if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
@@ -2438,8 +2438,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 {
   int			i;		/* Looping var */
   int			slot;		/* Pipe slot */
-  cups_array_t		*filters;	/* Filters for job */
+  cups_array_t		*filters,	/* Filters for job */
+			*prefilters;	/* Filters with prefilters */
   mime_filter_t		*filter,	/* Current filter */
+			*prefilter,	/* Prefilter */
 			port_monitor;	/* Port monitor filter */
   char			method[255],	/* Method for output */
 			*optptr,	/* Pointer to options */
@@ -2571,6 +2573,30 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     {
       cupsArrayDelete(filters);
       filters = NULL;
+    }
+
+   /*
+    * If this printer has any pre-filters, insert the required pre-filter
+    * in the filters array...
+    */
+
+    if (printer->prefiltertype && filters)
+    {
+      prefilters = cupsArrayNew(NULL, NULL);
+
+      for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+	   filter;
+	   filter = (mime_filter_t *)cupsArrayNext(filters))
+      {
+	if ((prefilter = mimeFilterLookup(MimeDatabase, filter->src,
+					  printer->prefiltertype)))
+	  cupsArrayAdd(prefilters, prefilter);
+
+	cupsArrayAdd(prefilters, filter);
+      }
+
+      cupsArrayDelete(filters);
+      filters = prefilters;
     }
   }
 
@@ -3125,19 +3151,19 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 		      strerror(errno));
       snprintf(printer->state_message, sizeof(printer->state_message),
 	       "Unable to create status pipes - %s.", strerror(errno));
-  
+
       cupsdAddPrinterHistory(printer);
-  
+
       cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
 		    "Job canceled because the server could not create the job "
 		    "status pipes.");
-  
+
       goto abort_job;
     }
-  
+
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job: status_pipes = [ %d %d ]",
 		    job->status_pipes[0], job->status_pipes[1]);
-  
+
     job->status_buffer = cupsdStatBufNew(job->status_pipes[0], "[Job %d]",
 					 job->id);
   }
