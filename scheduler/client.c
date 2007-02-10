@@ -659,6 +659,14 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
       con->language = NULL;
     }
 
+#ifdef HAVE_AUTHORIZATION_H
+    if (con->authref)
+    {
+      AuthorizationFree(con->authref, kAuthorizationFlagDefaults);
+      con->authref = NULL;
+    }
+#endif /* HAVE_AUTHORIZATION_H */
+
    /*
     * Re-enable new client connections if we are going back under the
     * limit...
@@ -2330,6 +2338,9 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
                 http_status_t  code,	/* I - HTTP status code */
 	        char           *type)	/* I - MIME type of document */
 {
+  char	auth_str[1024];			/* Authorization string */
+
+
  /*
   * Send the HTTP status header...
   */
@@ -2378,27 +2389,52 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
     else
       auth_type = con->best->type;
 
+    auth_str[0] = '\0';
+
     if (auth_type == AUTH_BASIC || auth_type == AUTH_BASICDIGEST)
-    {
-      if (httpPrintf(HTTP(con),
-                     "WWW-Authenticate: Basic realm=\"CUPS\"\r\n") < 0)
-	return (0);
-    }
+      strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
     else if (auth_type == AUTH_DIGEST)
-    {
-      if (httpPrintf(HTTP(con),
-                     "WWW-Authenticate: Digest realm=\"CUPS\", nonce=\"%s\"\r\n",
-		     con->http.hostname) < 0)
-	return (0);
-    }
+      snprintf(auth_str, sizeof(auth_str), "Digest realm=\"CUPS\", nonce=\"%s\"",
+	       con->http.hostname);
 #ifdef HAVE_GSSAPI
     else if (auth_type == AUTH_KERBEROS && !con->no_negotiate &&
 	     con->gss_output_token.length == 0)
-    {
-      if (httpPrintf(HTTP(con), "WWW-Authenticate: Negotiate\r\n") < 0)
-        return (0);
-    }
+      strlcpy(auth_str, "Negotiate", sizeof(auth_str));
 #endif /* HAVE_GSSAPI */
+
+#ifdef HAVE_AUTHORIZATION_H
+    if (con->best)
+    {
+      int 	 i;			/* Looping var */
+      char	*auth_key;		/* Auth key buffer */
+      size_t	auth_size;		/* Size of remaining buffer */
+
+
+      auth_key  = auth_str + strlen(auth_str);
+      auth_size = sizeof(auth_str) - (auth_key - auth_str);
+
+      for (i = 0; i < con->best->num_names; i ++)
+      {
+	if (!strncasecmp(con->best->names[i], "@AUTHKEY(", 9))
+	{
+	  snprintf(auth_key, auth_size, ", authkey=\"%s\"",
+	           con->best->names[i] + 9);
+	  /* end parenthesis is stripped in conf.c */
+	  break;
+        }
+	else if (!strcasecmp(con->best->names[i], "@SYSTEM") &&
+	         SystemGroupAuthKey)
+	{
+	  snprintf(auth_key, auth_size, ", authkey=\"%s\"", SystemGroupAuthKey);
+	  break;
+	}
+      }
+    }
+#endif /* HAVE_AUTHORIZATION_H */
+
+    if (auth_str[0] &&
+	httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)
+      return (0);
   }
 
 #ifdef HAVE_GSSAPI

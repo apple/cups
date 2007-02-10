@@ -126,6 +126,10 @@ static cupsd_var_t	variables[] =
   { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_INTEGER },
   { "KeepAliveTimeout",		&KeepAliveTimeout,	CUPSD_VARTYPE_INTEGER },
   { "KeepAlive",		&KeepAlive,		CUPSD_VARTYPE_BOOLEAN },
+#ifdef HAVE_LAUNCHD
+  { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_INTEGER },
+  { "LaunchdConf",		&LaunchdConf,		CUPSD_VARTYPE_STRING },
+#endif /* HAVE_LAUNCHD */
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
   { "LogFilePerm",		&LogFilePerm,		CUPSD_VARTYPE_INTEGER },
@@ -163,13 +167,12 @@ static cupsd_var_t	variables[] =
   { "ServerKey",		&ServerKey,		CUPSD_VARTYPE_STRING },
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
-#ifdef HAVE_LAUNCHD
-  { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_INTEGER },
-  { "LaunchdConf",		&LaunchdConf,		CUPSD_VARTYPE_STRING },
-#endif /* HAVE_LAUNCHD */
   { "ServerName",		&ServerName,		CUPSD_VARTYPE_STRING },
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
+#ifdef HAVE_AUTHORIZATION_H
+  { "SystemGroupAuthKey",	&SystemGroupAuthKey,	CUPSD_VARTYPE_STRING },
+#endif /* HAVE_AUTHORIZATION_H */
   { "TempDir",			&TempDir,		CUPSD_VARTYPE_STRING },
   { "Timeout",			&Timeout,		CUPSD_VARTYPE_INTEGER },
   { "UseNetworkDefault",	&UseNetworkDefault,	CUPSD_VARTYPE_BOOLEAN }
@@ -443,6 +446,10 @@ cupsdReadConfiguration(void)
 
   cupsdDeleteAllPolicies();
   cupsdClearString(&DefaultPolicy);
+
+#ifdef HAVE_AUTHORIZATION_H
+  cupsdClearString(&SystemGroupAuthKey);
+#endif /* HAVE_AUTHORIZATION_H */
 
   MaxSubscriptions           = 100;
   MaxSubscriptionsPerJob     = 0;
@@ -1828,6 +1835,20 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       while (isspace(*value & 255))
 	value ++;
 
+#ifdef HAVE_AUTHORIZATION_H
+      if (!strncmp(value, "@AUTHKEY(", 9))
+      {
+       /*
+	* Grab "@AUTHKEY(name)" value...
+	*/
+
+        for (valptr = value + 9; *valptr != ')' && *valptr; valptr ++);
+
+	if (*valptr)
+	  *valptr++ = '\0';
+      }
+      else
+#endif /* HAVE_AUTHORIZATION_H */
       if (*value == '\"' || *value == '\'')
       {
        /*

@@ -71,6 +71,9 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   int		bytes;			/* Number of bytes read/written */
   char		buffer[32768];		/* Output buffer */
   http_status_t	expect;			/* Expect: header to use */
+#ifdef HAVE_AUTHORIZATION_H
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+#endif /* HAVE_AUTHORIZATION_H */
 
 
   DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
@@ -430,6 +433,18 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 	  break;
     }
   }
+
+#ifdef HAVE_AUTHORIZATION_H
+ /*
+  * Delete any authorization reference created for this request...
+  */
+  
+  if (cg->auth_ref)
+  {
+    AuthorizationFree(cg->auth_ref, kAuthorizationFlagDefaults);
+    cg->auth_ref = NULL;
+  }
+#endif /* HAVE_AUTHORIZATION_H */
 
   return (response);
 }

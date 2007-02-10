@@ -56,6 +56,7 @@
  *   get_md5_password()        - Get an MD5 password.
  *   pam_func()                - PAM conversation function.
  *   to64()                    - Base64-encode an integer value...
+ *   check_authref()           - Check an authorization services reference.
  */
 
 /*
@@ -83,6 +84,14 @@
 #ifdef HAVE_MEMBERSHIP_H
 #  include <membership.h>
 #endif /* HAVE_MEMBERSHIP_H */
+#ifdef HAVE_AUTHORIZATION_H
+#  include <Security/AuthorizationTags.h>
+#  ifdef HAVE_SECBASEPRIV_H
+#    include <Security/SecBasePriv.h>
+#  else
+extern const char *cssmErrorString(int error);
+#  endif /* HAVE_SECBASEPRIV_H */
+#endif /* HAVE_AUTHORIZATION_H */
 
 
 /*
@@ -91,6 +100,9 @@
 
 static cupsd_authmask_t	*add_allow(cupsd_location_t *loc);
 static cupsd_authmask_t	*add_deny(cupsd_location_t *loc);
+#ifdef HAVE_AUTHORIZATION_H
+static int		check_authref(cupsd_client_t *con, const char *right);
+#endif /* HAVE_AUTHORIZATION_H */
 static int		compare_locations(cupsd_location_t *a,
 			                  cupsd_location_t *b);
 #if !HAVE_LIBPAM && !defined(HAVE_USERSEC_H)
@@ -371,6 +383,14 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   username[0] = '\0';
   password[0] = '\0';
 
+#ifdef HAVE_AUTHORIZATION_H
+  if (con->authref)
+  {
+    AuthorizationFree(con->authref, kAuthorizationFlagDefaults);
+    con->authref = NULL;
+  }
+#endif /* HAVE_AUTHORIZATION_H */
+
   if (type == AUTH_NONE)
   {
    /*
@@ -391,6 +411,59 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
                     "cupsdAuthorize: No authentication data provided.");
     return;
   }
+#ifdef HAVE_AUTHORIZATION_H
+  else if (!strncmp(authorization, "AuthRef", 6) && 
+           !strcasecmp(con->http.hostname, "localhost"))
+  {
+    OSStatus		status;		/* Status */
+    int			authlen;	/* Auth string length */
+    AuthorizationItemSet *authinfo;	/* Authorization item set */
+
+   /*
+    * Get the Authorization Services data...
+    */
+
+    authorization += 7;
+    while (isspace(*authorization & 255))
+      authorization ++;
+
+    authlen = sizeof(nonce);
+    httpDecode64_2(nonce, &authlen, authorization);
+
+    if (authlen != kAuthorizationExternalFormLength)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+	              "cupsdAuthorize: External Authorization reference size"
+	              "is incorrect!");
+      return;
+    }
+
+    if ((status = AuthorizationCreateFromExternalForm(
+		      (AuthorizationExternalForm *)nonce, &con->authref)) != 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "cupsdAuthorize: AuthorizationCreateFromExternalForm "
+		      "returned %d (%s)",
+		      (int)status, cssmErrorString(status));
+      return;
+    }
+
+    if ((status = AuthorizationCopyInfo(con->authref, 
+					kAuthorizationEnvironmentUsername, 
+					&authinfo)) != 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "cupsdAuthorize: AuthorizationCopyInfo returned %d (%s)",
+		      (int)status, cssmErrorString(status));
+      return;
+    }
+  
+    if (authinfo->count == 1)
+      strlcpy(username, authinfo->items[0].value, sizeof(username));
+
+    AuthorizationFreeItemSet(authinfo);
+  }
+#endif /* HAVE_AUTHORIZATION_H */
   else if (!strncmp(authorization, "Local", 5) &&
            !strcasecmp(con->http.hostname, "localhost"))
   {
@@ -1835,6 +1908,28 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsAuthorized: Checking user membership...");
 
+#ifdef HAVE_AUTHORIZATION_H
+   /*
+    * If an authorization reference was supplied it must match a right name...
+    */
+
+    if (con->authref)
+    {
+      for (i = 0; i < best->num_names; i ++)
+      {
+	if (!strncasecmp(best->names[i], "@AUTHKEY(", 9) && 
+	    check_authref(con, best->names[i] + 9))
+	  return (HTTP_OK);
+	else if (!strcasecmp(best->names[i], "@SYSTEM") &&
+	         SystemGroupAuthKey &&
+		 check_authref(con, SystemGroupAuthKey))
+	  return (HTTP_OK);
+      }
+
+      return (HTTP_UNAUTHORIZED);
+    }
+#endif /* HAVE_AUTHORIZATION_H */
+
     for (i = 0; i < best->num_names; i ++)
     {
       if (!strcasecmp(best->names[i], "@OWNER") && owner &&
@@ -1978,6 +2073,59 @@ add_deny(cupsd_location_t *loc)		/* I - Location to add to */
   memset(temp, 0, sizeof(cupsd_authmask_t));
   return (temp);
 }
+
+
+#ifdef HAVE_AUTHORIZATION_H
+/*
+ * 'check_authref()' - Check if an authorization services reference has the
+ *		       supplied right.
+ */
+
+static int				/* O - 1 if right is valid, 0 otherwise */
+check_authref(cupsd_client_t *con,	/* I - Connection */
+	      const char     *right)	/* I - Right name */
+{
+  OSStatus		status;		/* OS Status */
+  AuthorizationItem	authright;	/* Authorization right */
+  AuthorizationRights	authrights;	/* Authorization rights */
+  AuthorizationFlags	authflags;	/* Authorization flags */
+
+
+ /*
+  * Check to see if the user is allowed to perform the task...
+  */
+
+  if (!con->authref)
+    return (0);
+
+  authright.name        = right;
+  authright.valueLength = 0;
+  authright.value       = NULL;
+  authright.flags       = 0;
+
+  authrights.count = 1;
+  authrights.items = &authright;
+
+  authflags = kAuthorizationFlagDefaults | 
+	      kAuthorizationFlagExtendRights;
+
+  if ((status = AuthorizationCopyRights(con->authref, &authrights, 
+					kAuthorizationEmptyEnvironment, 
+					authflags, NULL)) != 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "AuthorizationCopyRights(\"%s\") returned %d (%s)",
+		    authright.name, (int)status, cssmErrorString(status));
+    return (0);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "AuthorizationCopyRights(\"%s\") succeeded!",
+		  authright.name);
+
+  return (1);
+}
+#endif /* HAVE_AUTHORIZATION_H */
 
 
 /*

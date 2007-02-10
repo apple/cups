@@ -278,6 +278,7 @@
  * What Security framework headers do we have?
  */
 
+#undef HAVE_AUTHORIZATION_H
 #undef HAVE_SECPOLICY_H
 #undef HAVE_SECPOLICYPRIV_H
 #undef HAVE_SECBASEPRIV_H

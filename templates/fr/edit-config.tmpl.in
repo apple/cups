@@ -9,6 +9,7 @@ function reset_config()
 "\\n" +
 "# Groupe des utilisateurs UNIX pour les administrateurs CUPS...\\n" +
 "SystemGroup @CUPS_SYSTEM_GROUPS@\\n" +
+"@CUPS_SYSTEM_AUTHKEY@\\n" +
 "\\n" +
 "\\n" +
 "# N'accepter que les connexions de la machine locale.\\n" +

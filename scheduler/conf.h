@@ -201,6 +201,12 @@ VAR char		*LaunchdConf		VALUE(NULL);
 					/* launchd(8) configuration file */
 #endif /* HAVE_LAUNCHD */
 
+#ifdef HAVE_AUTHORIZATION_H
+VAR char		*SystemGroupAuthKey	VALUE(NULL);
+					/* System group auth key */
+#endif /* HAVE_AUTHORIZATION_H */
+
+
 /*
  * Prototypes...
  */

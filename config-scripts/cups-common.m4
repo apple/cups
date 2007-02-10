@@ -192,6 +192,7 @@ dnl Extra platform-specific libraries...
 BACKLIBS=""
 CUPSDLIBS=""
 DBUSDIR=""
+CUPS_SYSTEM_AUTHKEY=""
 
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
 
@@ -222,6 +223,12 @@ case $uname in
 		dnl Check for notify_post support
 		AC_CHECK_HEADER(notify.h,AC_DEFINE(HAVE_NOTIFY_H))
 		AC_CHECK_FUNCS(notify_post)
+
+		dnl Check for Authorization Services support
+		AC_CHECK_HEADER(Security/Authorization.h, [
+			AC_DEFINE(HAVE_AUTHORIZATION_H)
+			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"])
+		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
                 ;;
 
 	Linux*)
@@ -246,6 +253,8 @@ case $uname in
 		fi
 		;;
 esac
+
+AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 
 dnl See if we have POSIX ACL support...
 SAVELIBS="$LIBS"

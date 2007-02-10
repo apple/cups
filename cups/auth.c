@@ -52,6 +52,15 @@
 #  include <unistd.h>
 #endif /* WIN32 || __EMX__ */
 
+#if HAVE_AUTHORIZATION_H
+#  include <Security/Authorization.h>
+#  ifdef HAVE_SECBASEPRIV_H
+#    include <Security/SecBasePriv.h>
+#  else
+extern const char *cssmErrorString(int error);
+#  endif /* HAVE_SECBASEPRIV_H */
+#endif /* HAVE_AUTHORIZATION_H */
+
 
 /*
  * Local functions...
@@ -87,6 +96,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
 		encode[2048];		/* Encoded username:password */
+  int		localauth;		/* Local authentication result */
   _cups_globals_t *cg;			/* Global data */
 
 
@@ -112,14 +122,20 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * See if we can do local authentication...
   */
 
-  if (http->digest_tries < 3 && !cups_local_auth(http))
+  if (http->digest_tries < 3)
   {
-    DEBUG_printf(("cupsDoAuthentication: authstring=\"%s\"\n", http->authstring));
-
-    if (http->status == HTTP_UNAUTHORIZED)
-      http->digest_tries ++;
-
-    return (0);
+    if ((localauth = cups_local_auth(http)) == 0)
+    {
+      DEBUG_printf(("cupsDoAuthentication: authstring=\"%s\"\n",
+                    http->authstring));
+  
+      if (http->status == HTTP_UNAUTHORIZED)
+	http->digest_tries ++;
+  
+      return (0);
+    }
+    else if (localauth == -1)
+      return (-1);			/* Error or canceled */
   }
 
  /*
@@ -391,7 +407,9 @@ cups_get_gss_creds(
  *                       available/applicable...
  */
 
-static int				/* O - 0 if available, -1 if not */
+static int				/* O - 0 if available */
+					/*     1 if not  available */
+					/*    -1 error */
 cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 {
 #if defined(WIN32) || defined(__EMX__)
@@ -401,11 +419,20 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
   return (-1);
 #else
-  int		pid;			/* Current process ID */
-  FILE		*fp;			/* Certificate file */
-  char		filename[1024],		/* Certificate filename */
-		certificate[33];	/* Certificate string */
+  int			pid;		/* Current process ID */
+  FILE			*fp;		/* Certificate file */
+  char			filename[1024],	/* Certificate filename */
+			certificate[33];/* Certificate string */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+#if defined(HAVE_AUTHORIZATION_H)
+  OSStatus		status;		/* Status */
+  AuthorizationItem	auth_right;	/* Authorization right */
+  AuthorizationRights	auth_rights;	/* Authorization rights */
+  AuthorizationFlags	auth_flags;	/* Authorization flags */
+  AuthorizationExternalForm auth_extrn;	/* Authorization ref external */
+  char			auth_key[1024];	/* Buffer */
+  char			buffer[1024];	/* Buffer */
+#endif /* HAVE_AUTHORIZATION_H */
 
 
   DEBUG_printf(("cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"\n",
@@ -421,6 +448,79 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     DEBUG_puts("cups_local_auth: Not a local connection!");
     return (-1);
   }
+
+#if defined(HAVE_AUTHORIZATION_H)
+ /*
+  * Delete any previous authorization reference...
+  */
+  
+  if (cg->auth_ref)
+  {
+    AuthorizationFree(cg->auth_ref, kAuthorizationFlagDefaults);
+    cg->auth_ref = NULL;
+  }
+
+  if (httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey", 
+		       auth_key, sizeof(auth_key)))
+  {
+    status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, 
+				 kAuthorizationFlagDefaults, &cg->auth_ref);
+    if (status != errAuthorizationSuccess)
+    {
+      DEBUG_printf(("cups_local_auth: AuthorizationCreate() returned %d (%s)\n",
+		    (int)status, cssmErrorString(status)));
+      return (-1);
+    }
+
+    auth_right.name        = auth_key;
+    auth_right.valueLength = 0;
+    auth_right.value       = NULL;
+    auth_right.flags       = 0;
+
+    auth_rights.count = 1;
+    auth_rights.items = &auth_right;
+
+    auth_flags = kAuthorizationFlagDefaults | 
+		 kAuthorizationFlagPreAuthorize |
+		 kAuthorizationFlagInteractionAllowed | 
+		 kAuthorizationFlagExtendRights;
+
+    status = AuthorizationCopyRights(cg->auth_ref, &auth_rights, 
+				     kAuthorizationEmptyEnvironment, 
+				     auth_flags, NULL);
+    if (status == errAuthorizationSuccess)
+      status = AuthorizationMakeExternalForm(cg->auth_ref, &auth_extrn);
+
+    if (status == errAuthorizationSuccess)
+    {
+     /*
+      * Set the authorization string and return...
+      */
+
+      httpEncode64_2(buffer, sizeof(buffer), (void *)&auth_extrn, 
+		     sizeof(auth_extrn));
+
+      http->authstring = malloc(strlen(buffer) + 9);
+      sprintf(http->authstring, "AuthRef %s", buffer);
+
+      /* Copy back to _authstring for backwards compatibility */
+      strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+
+      DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
+		    http->authstring));
+      return (0);
+    }
+    else if (status == errAuthorizationCanceled)
+      return (-1);
+
+    DEBUG_printf(("cups_local_auth: AuthorizationCopyRights() returned %d (%s)\n",
+		  (int)status, cssmErrorString(status)));
+
+  /*
+   * Fall through to try certificates...
+   */
+  }
+#endif /* HAVE_AUTHORIZATION_H */
 
  /*
   * Try opening a certificate file for this PID.  If that fails,
@@ -438,34 +538,32 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     fp = fopen(filename, "r");
   }
 
-  if (fp == NULL)
+  if (fp)
   {
-    DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
-                  filename, strerror(errno)));
-    return (-1);
+   /*
+    * Read the certificate from the file...
+    */
+
+    fgets(certificate, sizeof(certificate), fp);
+    fclose(fp);
+
+   /*
+    * Set the authorization string and return...
+    */
+
+    http->authstring = malloc(strlen(certificate) + 10);
+    sprintf(http->authstring, "Local %s", certificate);
+
+    /* Copy back to _authstring for backwards compatibility */
+    strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+
+    DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
+		  http->authstring));
+
+    return (0);
   }
 
- /*
-  * Read the certificate from the file...
-  */
-
-  fgets(certificate, sizeof(certificate), fp);
-  fclose(fp);
-
- /*
-  * Set the authorization string and return...
-  */
-
-  http->authstring = malloc(strlen(certificate) + 10);
-  sprintf(http->authstring, "Local %s", certificate);
-
-  /* Copy back to _authstring for backwards compatibility */
-  strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
-
-  DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
-                http->authstring));
-
-  return (0);
+  return (1);
 #endif /* WIN32 || __EMX__ */
 }
 

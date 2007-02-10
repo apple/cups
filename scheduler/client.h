@@ -22,6 +22,10 @@
  *         WWW: http://www.cups.org
  */
 
+#ifdef HAVE_AUTHORIZATION_H
+#  include <Security/Authorization.h>
+#endif /* HAVE_AUTHORIZATION_H */
+
 /*
  * HTTP client structure...
  */
@@ -63,6 +67,9 @@ struct cupsd_client_s
   gss_cred_id_t 	gss_delegated_cred;
 					/* Credentials from client header */
 #endif /* HAVE_GSSAPI */
+#ifdef HAVE_AUTHORIZATION_H
+  AuthorizationRef	authref;	/* Authorization ref */
+#endif /* HAVE_AUTHORIZATION_H */
 };
 
 #define HTTP(con) &((con)->http)
