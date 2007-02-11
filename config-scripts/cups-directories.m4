@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -192,9 +192,9 @@ AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
 
 dnl Xinetd support...
-XINETD=""
+AC_ARG_WITH(xinetd, [  --with-xinetd           set path for xinetd config files],XINETD="$withval",XINETD="")
 
-if test ! -x /sbin/launchd; then
+if test "x$XINETD" = x -a ! -x /sbin/launchd; then
 	for dir in /private/etc/xinetd.d /etc/xinetd.d /usr/local/etc/xinetd.d; do
 		if test -d $dir; then
 			XINETD="$dir"
@@ -225,6 +225,28 @@ AC_SUBST(CUPS_CACHEDIR)
 CUPS_DATADIR="$datadir/cups"
 AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$datadir/cups")
 AC_SUBST(CUPS_DATADIR)
+
+# Icon directory
+AC_ARG_WITH(icondir, [  --with-icondir          set path for application icons],icondir="$withval",icondir="")
+
+if test "x$icondir" = x -a -d /usr/share/icons; then
+	ICONDIR="/usr/share/icons"
+else
+	ICONDIR="$icondir"
+fi
+
+AC_SUBST(ICONDIR)
+
+# Menu directory
+AC_ARG_WITH(menudir, [  --with-menudir          set path for application menus],menudir="$withval",menudir="")
+
+if test "x$menudir" = x -a -d /usr/share/applications; then
+	MENUDIR="/usr/share/applications"
+else
+	MENUDIR="$menudir"
+fi
+
+AC_SUBST(MENUDIR)
 
 # Documentation files
 AC_ARG_WITH(docdir, [  --with-docdir           set path for documentation],docdir="$withval",docdir="")

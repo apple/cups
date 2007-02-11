@@ -3,7 +3,7 @@ dnl   "$Id$"
 dnl
 dnl   GSSAPI/Kerberos library detection.
 dnl
-dnl   Copyright 2006 by Easy Software Products.
+dnl   Copyright 2006-2007 by Easy Software Products.
 dnl
 dnl   This file contains Kerberos support code, copyright 2006 by
 dnl   Jelmer Vernooij.
@@ -83,7 +83,7 @@ if test x$enable_gssapi != xno; then
 fi
 
 dnl Default GSS service name...
-AC_ARG_WITH(gssservicename, [  --with-gssservicename         set default gss service name],
+AC_ARG_WITH(gssservicename, [  --with-gssservicename   set default gss service name],
 	default_gssservicename="$withval",
 	default_gssservicename="default")
 

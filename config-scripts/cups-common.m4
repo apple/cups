@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -242,7 +242,8 @@ case $uname in
 					AC_DEFINE(HAVE_DBUS)
 					CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
 					CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
-					DBUSDIR="/etc/dbus-1/system.d"
+					AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory ], dbusdir="$withval", dbusdir="/etc/dbus-1")
+					DBUSDIR="$dbusdir"
 					AC_CHECK_LIB(dbus-1,
 					    dbus_message_iter_init_append,
 					    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
