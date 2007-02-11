@@ -905,6 +905,7 @@ help_load_file(
 		*text;			/* Text for anchor */
   off_t		offset;			/* File offset */
   char		quote;			/* Quote character */
+  help_word_t	*word;			/* Current word */
   int		wordlen;		/* Length of word */
 
 
@@ -1056,6 +1057,17 @@ help_load_file(
 
 	if (node->text)
 	  free(node->text);
+
+        if (node->words)
+	{
+	  for (word = (help_word_t *)cupsArrayFirst(node->words);
+	       word;
+	       word = (help_word_t *)cupsArrayNext(node->words))
+	    help_delete_word(word);
+
+	  cupsArrayDelete(node->words);
+	  node->words = NULL;
+	}
 
 	node->section = section[0] ? strdup(section) : NULL;
 	node->text    = strdup(text);
