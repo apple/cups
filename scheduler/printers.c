@@ -2830,6 +2830,27 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
 
 
  /*
+  * Maintain a common array of default attribute names...
+  */
+
+  if (!CommonDefaults)
+  {
+    CommonDefaults = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("copies-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("document-format-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("finishings-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-hold-until-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-priority-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-sheets-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("media-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("number-up-default"));
+    cupsArrayAdd(CommonDefaults,
+                 _cupsStrAlloc("orientation-requested-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("sides-default"));
+  }
+
+ /*
   * Add all of the default options from the .conf files...
   */
 
@@ -2843,6 +2864,9 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
     {
       snprintf(name, sizeof(name), "%s-default", option->name);
       num_options = cupsAddOption(name, option->value, num_options, &options);
+
+      if (!cupsArrayFind(CommonDefaults, name))
+        cupsArrayAdd(CommonDefaults, _cupsStrAlloc(name));
     }
   }
 

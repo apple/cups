@@ -4,6 +4,9 @@ CHANGES.txt - 2007-02-11
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2131)
+	- Server-side default options are now sent to clients when
+	  the "printer-defaults" attribute group is requested (STR
+	  #1923)
 	- Added support for Linux "relro" linker option (STR #1614)
 	- CUPS now validates the number-up option value (STR #1329)
 	- The on-line help now provides better search capabilities

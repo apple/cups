@@ -972,10 +972,13 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
   const char	*info,			/* printer-info attribute */
 		*make_model,		/* printer-make-and-model attribute */
 		*name;			/* printer-name attribute */
-  char		job_sheets[1024],	/* job-sheets option */
-		reasons[1024],		/* printer-state-reasons attribute */
-		*rptr,			/* Pointer into reasons string */
-		temp[255];		/* Temporary string for numbers */
+  char		job_sheets[1024],	/* job-sheets-default attribute */
+		reasons[1024];		/* printer-state-reasons attribute */
+  int		num_options;		/* Number of options */
+  cups_option_t	*options;		/* Options */
+  char		optname[1024],		/* Option name */
+		value[2048],		/* Option value */
+		*ptr;			/* Pointer into name/value */
   static const char * const pattrs[] =	/* Attributes we're interested in */
 		{
 		  "job-sheets-default",
@@ -987,7 +990,8 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 		  "printer-state",
 		  "printer-state-change-time",
 		  "printer-state-reasons",
-		  "printer-type"
+		  "printer-type",
+		  "printer-defaults"
 		};
 
 
@@ -1028,7 +1032,7 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
         break;
 
      /*
-      * Pull the needed attributes from this job...
+      * Pull the needed attributes from this printer...
       */
 
       accepting   = 0;
@@ -1036,6 +1040,8 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
       info        = NULL;
       make_model  = NULL;
       name        = NULL;
+      num_options = 0;
+      options     = NULL;
       shared      = 1;
       state       = IPP_PRINTER_IDLE;
       type        = CUPS_PRINTER_LOCAL;
@@ -1081,18 +1087,92 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 	         attr->value_tag == IPP_TAG_KEYWORD)
 	{
 	  strlcpy(reasons, attr->values[0].string.text, sizeof(reasons));
-	  for (i = 1, rptr = reasons + strlen(reasons);
+	  for (i = 1, ptr = reasons + strlen(reasons);
 	       i < attr->num_values;
 	       i ++)
 	  {
-	    snprintf(rptr, sizeof(reasons) - (rptr - reasons), ",%s",
+	    snprintf(ptr, sizeof(reasons) - (ptr - reasons), ",%s",
 	             attr->values[i].string.text);
-	    rptr += strlen(rptr);
+	    ptr += strlen(ptr);
 	  }
 	}
 	else if (!strcmp(attr->name, "printer-type") &&
 	         attr->value_tag == IPP_TAG_ENUM)
           type = attr->values[0].integer;
+        else if (strncmp(attr->name, "notify-", 7) &&
+	         (attr->value_tag == IPP_TAG_BOOLEAN ||
+		  attr->value_tag == IPP_TAG_ENUM ||
+		  attr->value_tag == IPP_TAG_INTEGER ||
+		  attr->value_tag == IPP_TAG_KEYWORD ||
+		  attr->value_tag == IPP_TAG_NAME ||
+		  attr->value_tag == IPP_TAG_RANGE) &&
+		 strstr(attr->name, "-default"))
+	{
+	  char	*valptr;		/* Pointer into attribute value */
+
+
+	 /*
+	  * Add a default option...
+	  */
+
+          strlcpy(optname, attr->name, sizeof(optname));
+	  if ((ptr = strstr(optname, "-default")) != NULL)
+	    *ptr = '\0';
+
+          value[0] = '\0';
+	  for (i = 0, ptr = value; i < attr->num_values; i ++)
+	  {
+	    if (ptr >= (value + sizeof(value) - 1))
+	      break;
+
+            if (i)
+	      *ptr++ = ',';
+
+            switch (attr->value_tag)
+	    {
+	      case IPP_TAG_INTEGER :
+	      case IPP_TAG_ENUM :
+	          snprintf(ptr, sizeof(value) - (ptr - value), "%d",
+		           attr->values[i].integer);
+	          break;
+
+	      case IPP_TAG_BOOLEAN :
+	          if (attr->values[i].boolean)
+		    strlcpy(ptr, "true", sizeof(value) - (ptr - value));
+		  else
+		    strlcpy(ptr, "false", sizeof(value) - (ptr - value));
+	          break;
+
+	      case IPP_TAG_RANGE :
+	          if (attr->values[i].range.lower ==
+		          attr->values[i].range.upper)
+	            snprintf(ptr, sizeof(value) - (ptr - value), "%d",
+		             attr->values[i].range.lower);
+		  else
+	            snprintf(ptr, sizeof(value) - (ptr - value), "%d-%d",
+		             attr->values[i].range.lower,
+			     attr->values[i].range.upper);
+	          break;
+
+	      default :
+		  for (valptr = attr->values[i].string.text;
+		       *valptr && ptr < (value + sizeof(value) - 2);)
+		  {
+	            if (strchr(" \t\n\\\'\"", *valptr))
+		      *ptr++ = '\\';
+
+		    *ptr++ = *valptr++;
+		  }
+
+		  *ptr = '\0';
+	          break;
+	    }
+
+	    ptr += strlen(ptr);
+          }
+
+	  num_options = cupsAddOption(optname, value, num_options, &options);
+	}
 
         attr = attr->next;
       }
@@ -1103,6 +1183,8 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 
       if (!name)
       {
+        cupsFreeOptions(num_options, options);
+
         if (attr == NULL)
 	  break;
 	else
@@ -1113,6 +1195,12 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 
       if ((dest = cupsGetDest(name, NULL, num_dests, *dests)) != NULL)
       {
+        dest->num_options = num_options;
+	dest->options     = options;
+
+        num_options = 0;
+	options     = NULL;
+
         if (job_sheets[0])
           dest->num_options = cupsAddOption("job-sheets", job_sheets,
 	                                    dest->num_options,
@@ -1123,13 +1211,13 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 	                                    dest->num_options,
 	                                    &(dest->options));
 
-        sprintf(temp, "%d", accepting);
-	dest->num_options = cupsAddOption("printer-is-accepting-jobs", temp,
+        sprintf(value, "%d", accepting);
+	dest->num_options = cupsAddOption("printer-is-accepting-jobs", value,
 					  dest->num_options,
 					  &(dest->options));
 
-        sprintf(temp, "%d", shared);
-	dest->num_options = cupsAddOption("printer-is-shared", temp,
+        sprintf(value, "%d", shared);
+	dest->num_options = cupsAddOption("printer-is-shared", value,
 					  dest->num_options,
 					  &(dest->options));
 
@@ -1138,15 +1226,15 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 	                                    make_model, dest->num_options,
 	                                    &(dest->options));
 
-        sprintf(temp, "%d", state);
-	dest->num_options = cupsAddOption("printer-state", temp,
+        sprintf(value, "%d", state);
+	dest->num_options = cupsAddOption("printer-state", value,
 					  dest->num_options,
 					  &(dest->options));
 
         if (change_time)
 	{
-	  sprintf(temp, "%d", change_time);
-	  dest->num_options = cupsAddOption("printer-state-change-time", temp,
+	  sprintf(value, "%d", change_time);
+	  dest->num_options = cupsAddOption("printer-state-change-time", value,
 					    dest->num_options,
 					    &(dest->options));
         }
@@ -1156,11 +1244,13 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 					    dest->num_options,
 	                                    &(dest->options));
 
-        sprintf(temp, "%d", type);
-	dest->num_options = cupsAddOption("printer-type", temp,
+        sprintf(value, "%d", type);
+	dest->num_options = cupsAddOption("printer-type", value,
 					  dest->num_options,
 					  &(dest->options));
       }
+
+      cupsFreeOptions(num_options, options);
 
       if (attr == NULL)
 	break;

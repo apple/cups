@@ -4613,6 +4613,16 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "uri-authentication-supported");
       cupsArrayAdd(ra, "uri-security-supported");
     }
+    else if (!strcmp(value, "printer-defaults"))
+    {
+      char	*name;			/* Option name */
+
+
+      for (name = (char *)cupsArrayFirst(CommonDefaults);
+           name;
+	   name = (char *)cupsArrayNext(CommonDefaults))
+        cupsArrayAdd(ra, name);
+    }
     else if (!strcmp(value, "subscription-template"))
     {
       cupsArrayAdd(ra, "notify-attributes");

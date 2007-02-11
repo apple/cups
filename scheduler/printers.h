@@ -99,6 +99,8 @@ typedef struct cupsd_printer_s
 
 VAR ipp_t		*CommonData	VALUE(NULL);
 					/* Common printer object attrs */
+VAR cups_array_t	*CommonDefaults	VALUE(NULL);
+					/* Common -default option names */
 VAR cups_array_t	*Printers	VALUE(NULL),
 					/* Printer list */
 			*ImplicitPrinters VALUE(NULL);
