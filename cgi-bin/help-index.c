@@ -3,7 +3,7 @@
  *
  *   On-line help index routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -28,13 +28,16 @@
  *   helpLoadIndex()            - Load a help index from disk.
  *   helpSaveIndex()            - Save a help index to disk.
  *   helpSearchIndex()          - Search an index.
+ *   help_add_word()            - Add a word to a node.
  *   help_compile_search()      - Convert a search string into a regular expression.
  *   help_delete_node()         - Free all memory used by a node.
+ *   help_delete_word()         - Free all memory used by a word.
  *   help_load_directory()      - Load a directory of files into an index.
  *   help_load_file()           - Load a HTML files into an index.
  *   help_new_node()            - Create a new node and add it to an index.
  *   help_sort_nodes_by_name()  - Sort nodes by section, filename, and anchor.
  *   help_sort_nodes_by_score() - Sort nodes by score and text.
+ *   help_sort_words()          - Sort words alphabetically.
  */
 
 /*
@@ -46,10 +49,117 @@
 
 
 /*
+ * List of common English words that should not be indexed...
+ */
+
+static char		help_common_words[][6] =
+			{
+			  "about",
+			  "all",
+			  "an",
+			  "and",
+			  "are",
+			  "as",
+			  "at",
+			  "be",
+			  "been",
+			  "but",
+			  "by",
+			  "call",
+			  "can",
+			  "come",
+			  "could",
+			  "day",
+			  "did",
+			  "do",
+			  "down",
+			  "each",
+			  "find",
+			  "first",
+			  "for",
+			  "from",
+			  "go",
+			  "had",
+			  "has",
+			  "have",
+			  "he",
+			  "her",
+			  "him",
+			  "his",
+			  "hot",
+			  "how",
+			  "if",
+			  "in",
+			  "is",
+			  "it",
+			  "know",
+			  "like",
+			  "long",
+			  "look",
+			  "make",
+			  "many",
+			  "may",
+			  "more",
+			  "most",
+			  "my",
+			  "no",
+			  "now",
+			  "of",
+			  "on",
+			  "one",
+			  "or",
+			  "other",
+			  "out",
+			  "over",
+			  "said",
+			  "see",
+			  "she",
+			  "side",
+			  "so",
+			  "some",
+			  "sound",
+			  "than",
+			  "that",
+			  "the",
+			  "their",
+			  "them",
+			  "then",
+			  "there",
+			  "these",
+			  "they",
+			  "thing",
+			  "this",
+			  "time",
+			  "to",
+			  "two",
+			  "up",
+			  "use",
+			  "was",
+			  "water",
+			  "way",
+			  "we",
+			  "were",
+			  "what",
+			  "when",
+			  "which",
+			  "who",
+			  "will",
+			  "with",
+			  "word",
+			  "would",
+			  "write",
+			  "you",
+			  "your"
+			};
+
+
+/*
  * Local functions...
  */
 
+static help_word_t	*help_add_word(help_node_t *n, const char *text);
 static void		help_delete_node(help_node_t *n);
+static void		help_delete_word(help_word_t *w);
 static int		help_load_directory(help_index_t *hi,
 			                    const char *directory,
 					    const char *relative);
@@ -63,6 +173,7 @@ static help_node_t	*help_new_node(const char *filename, const char *anchor,
 				       size_t length);
 static int		help_sort_by_name(help_node_t *p1, help_node_t *p2);
 static int		help_sort_by_score(help_node_t *p1, help_node_t *p2);
+static int		help_sort_words(help_word_t *w1, help_word_t *w2);
 
 
 /*
@@ -84,9 +195,6 @@ helpDeleteIndex(help_index_t *hi)	/* I - Help index */
        node;
        node = (help_node_t *)cupsArrayNext(hi->nodes))
   {
-    cupsArrayRemove(hi->nodes, node);
-    cupsArrayRemove(hi->sorted, node);
-
     if (!hi->search)
       help_delete_node(node);
   }
@@ -157,6 +265,7 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
   size_t	length;			/* Length in bytes */
   int		update;			/* Update? */
   help_node_t	*node;			/* Current node */
+  help_word_t	*word;			/* Current word */
 
 
   DEBUG_printf(("helpLoadIndex(hifile=\"%s\", directory=\"%s\")\n",
@@ -192,11 +301,13 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 
     cupsFileLock(fp, 1);
 
-    if (cupsFileGets(fp, line, sizeof(line)) && !strcmp(line, "HELPV1"))
+    if (cupsFileGets(fp, line, sizeof(line)) && !strcmp(line, "HELPV2"))
     {
      /*
       * Got a valid header line, now read the data lines...
       */
+
+      node = NULL;
 
       while (cupsFileGets(fp, line, sizeof(line)))
       {
@@ -205,41 +316,80 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 	*
 	*     filename mtime offset length "section" "text"
 	*     filename#anchor offset length "text"
+	*     SP count word
 	*/
 
-	filename = line;
-
-	if ((ptr = strchr(line, ' ')) == NULL)
-          break;
-
-	while (isspace(*ptr & 255))
-          *ptr++ = '\0';
-
-	if ((anchor = strrchr(filename, '#')) != NULL)
-	{
-          *anchor++ = '\0';
-	  mtime = 0;
-	}
-	else
-	  mtime = strtol(ptr, &ptr, 10);
-
-	offset = strtoll(ptr, &ptr, 10);
-	length = strtoll(ptr, &ptr, 10);
-
-	while (isspace(*ptr & 255))
-          ptr ++;
-
-        if (!anchor)
+        if (line[0] == ' ')
 	{
 	 /*
-	  * Get section...
+	  * Read a word in the current node...
 	  */
+
+          if (!node || (ptr = strrchr(line, ' ')) == NULL)
+	    continue;
+
+          if ((word = help_add_word(node, ptr + 1)) != NULL)
+	    word->count = atoi(line + 1);
+        }
+	else
+	{
+	 /*
+	  * Add a node...
+	  */
+
+	  filename = line;
+
+	  if ((ptr = strchr(line, ' ')) == NULL)
+            break;
+
+	  while (isspace(*ptr & 255))
+            *ptr++ = '\0';
+
+	  if ((anchor = strrchr(filename, '#')) != NULL)
+	  {
+            *anchor++ = '\0';
+	    mtime = 0;
+	  }
+	  else
+	    mtime = strtol(ptr, &ptr, 10);
+
+	  offset = strtoll(ptr, &ptr, 10);
+	  length = strtoll(ptr, &ptr, 10);
+
+	  while (isspace(*ptr & 255))
+            ptr ++;
+
+          if (!anchor)
+	  {
+	   /*
+	    * Get section...
+	    */
+
+            if (*ptr != '\"')
+	      break;
+
+            ptr ++;
+	    sectptr = ptr;
+
+            while (*ptr && *ptr != '\"')
+	      ptr ++;
+
+            if (*ptr != '\"')
+	      break;
+
+            *ptr++ = '\0';
+
+            strlcpy(section, sectptr, sizeof(section));
+
+	    while (isspace(*ptr & 255))
+              ptr ++;
+          }
 
           if (*ptr != '\"')
 	    break;
 
           ptr ++;
-	  sectptr = ptr;
+	  text = ptr;
 
           while (*ptr && *ptr != '\"')
 	    ptr ++;
@@ -249,33 +399,14 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 
           *ptr++ = '\0';
 
-          strlcpy(section, sectptr, sizeof(section));
+	  if ((node = help_new_node(filename, anchor, section, text,
+				    mtime, offset, length)) == NULL)
+            break;
 
-	  while (isspace(*ptr & 255))
-            ptr ++;
+	  node->score = -1;
+
+	  cupsArrayAdd(hi->nodes, node);
         }
-
-        if (*ptr != '\"')
-	  break;
-
-        ptr ++;
-	text = ptr;
-
-        while (*ptr && *ptr != '\"')
-	  ptr ++;
-
-        if (*ptr != '\"')
-	  break;
-
-        *ptr++ = '\0';
-
-	if ((node = help_new_node(filename, anchor, section, text,
-				  mtime, offset, length)) == NULL)
-          break;
-
-	node->score = -1;
-
-	cupsArrayAdd(hi->nodes, node);
       }
     }
 
@@ -339,6 +470,7 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
 {
   cups_file_t	*fp;			/* Index file */
   help_node_t	*node;			/* Current node */
+  help_word_t	*word;			/* Current word */
 
 
   DEBUG_printf(("helpSaveIndex(hi=%p, hifile=\"%s\")\n", hi, hifile));
@@ -356,7 +488,7 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
 
   cupsFileLock(fp, 1);
 
-  cupsFilePuts(fp, "HELPV1\n");
+  cupsFilePuts(fp, "HELPV2\n");
 
   for (node = (help_node_t *)cupsArrayFirst(hi->nodes);
        node;
@@ -382,6 +514,16 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
 			 node->section ? node->section : "", node->text) < 0)
         break;
     }
+
+   /*
+    * Then write the words associated with the node...
+    */
+
+    for (word = (help_word_t *)cupsArrayFirst(node->words);
+         word;
+	 word = (help_word_t *)cupsArrayNext(node->words))
+      if (cupsFilePrintf(fp, " %d %s\n", word->count, word->text) < 0)
+        break;
   }
 
   cupsFileFlush(fp);
@@ -407,6 +549,7 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
 {
   help_index_t	*search;		/* Search index */
   help_node_t	*node;			/* Current node */
+  help_word_t	*word;			/* Current word */
   void		*sc;			/* Search context */
   int		matches;		/* Number of matches */
 
@@ -487,16 +630,27 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
       continue;
     else if (filename && strcmp(node->filename, filename))
       continue;
-    else if ((matches = cgiDoSearch(sc, node->text)) > 0)
+    else
     {
-     /*
-      * Found a match, add the node to the search index...
-      */
+      matches = cgiDoSearch(sc, node->text);
 
-      node->score = matches;
+      for (word = (help_word_t *)cupsArrayFirst(node->words);
+           word;
+	   word = (help_word_t *)cupsArrayNext(node->words))
+        if (cgiDoSearch(sc, word->text) > 0)
+          matches += word->count;
 
-      cupsArrayAdd(search->nodes, node);      
-      cupsArrayAdd(search->sorted, node);      
+      if (matches > 0)
+      {
+       /*
+	* Found a match, add the node to the search index...
+	*/
+
+	node->score = matches;
+
+	cupsArrayAdd(search->nodes, node);      
+	cupsArrayAdd(search->sorted, node);      
+      }
     }
 
  /*
@@ -514,12 +668,70 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
 
 
 /*
+ * 'help_add_word()' - Add a word to a node.
+ */
+
+static help_word_t *			/* O - New word */
+help_add_word(help_node_t *n,		/* I - Node */
+              const char  *text)	/* I - Word text */
+{
+  help_word_t	*w,			/* New word */
+		key;			/* Search key */
+
+
+  DEBUG_printf(("help_add_word(n=%p, text=\"%s\")\n", n, text));
+
+ /*
+  * Create the words array as needed...
+  */
+
+  if (!n->words)
+    n->words = cupsArrayNew((cups_array_func_t)help_sort_words, NULL);
+
+ /*
+  * See if the word is already added...
+  */
+
+  key.text = (char *)text;
+
+  if ((w = (help_word_t *)cupsArrayFind(n->words, &key)) == NULL)
+  {
+   /*
+    * Create a new word...
+    */
+
+    if ((w = calloc(1, sizeof(help_word_t))) == NULL)
+      return (NULL);
+
+    if ((w->text = strdup(text)) == NULL)
+    {
+      free(w);
+      return (NULL);
+    }
+
+    cupsArrayAdd(n->words, w);
+  }
+
+ /*
+  * Bump the counter for this word and return it...
+  */
+
+  w->count ++;
+
+  return (w);
+}
+
+
+/*
  * 'help_delete_node()' - Free all memory used by a node.
  */
 
 static void
 help_delete_node(help_node_t *n)	/* I - Node */
 {
+  help_word_t	*w;			/* Current word */
+
+
   DEBUG_printf(("help_delete_node(n=%p)\n", n));
 
   if (!n)
@@ -537,7 +749,33 @@ help_delete_node(help_node_t *n)	/* I - Node */
   if (n->text)
     free(n->text);
 
+  for (w = (help_word_t *)cupsArrayFirst(n->words);
+       w;
+       w = (help_word_t *)cupsArrayNext(n->words))
+    help_delete_word(w);
+
+  cupsArrayDelete(n->words);
+
   free(n);
+}
+
+
+/*
+ * 'help_delete_word()' - Free all memory used by a word.
+ */
+
+static void
+help_delete_word(help_word_t *w)	/* I - Word */
+{
+  DEBUG_printf(("help_delete_word(w=%p)\n", w));
+
+  if (!w)
+    return;
+
+  if (w->text)
+    free(w->text);
+
+  free(w);
 }
 
 
@@ -667,6 +905,7 @@ help_load_file(
 		*text;			/* Text for anchor */
   off_t		offset;			/* File offset */
   char		quote;			/* Quote character */
+  int		wordlen;		/* Length of word */
 
 
   DEBUG_printf(("help_load_file(hi=%p, filename=\"%s\", relative=\"%s\", mtime=%ld)\n",
@@ -861,7 +1100,95 @@ help_load_file(
       */
 
       cupsArrayAdd(hi->nodes, node);
+
+      if (!anchor)
+        node = NULL;
       break;
+    }
+
+    if (node)
+    {
+     /*
+      * Scan this line for words...
+      */
+
+      for (ptr = line; *ptr; ptr ++)
+      {
+       /*
+	* Skip HTML stuff...
+	*/
+
+	if (*ptr == '<')
+	{
+          if (!strncmp(ptr, "<!--", 4))
+	  {
+	   /*
+	    * Skip HTML comment...
+	    */
+
+            if ((text = strstr(ptr + 4, "-->")) == NULL)
+	      ptr += strlen(ptr) - 1;
+	    else
+	      ptr = text + 2;
+	  }
+	  else
+	  {
+	   /*
+            * Skip HTML element...
+	    */
+
+            for (ptr ++; *ptr && *ptr != '>'; ptr ++)
+	      if (*ptr == '\"' || *ptr == '\'')
+	      {
+		for (quote = *ptr++; *ptr && *ptr != quote; ptr ++);
+
+		if (!*ptr)
+		  ptr --;
+	      }
+
+	    if (!*ptr)
+	      ptr --;
+          }
+
+          continue;
+	}
+	else if (*ptr == '&')
+	{
+	 /*
+	  * Skip HTML entity...
+	  */
+
+	  for (ptr ++; *ptr && *ptr != ';'; ptr ++);
+
+	  if (!*ptr)
+	    ptr --;
+
+	  continue;
+	}
+	else if (!isalnum(*ptr & 255))
+          continue;
+
+       /*
+	* Found the start of a word, search until we find the end...
+	*/
+
+	for (text = ptr, ptr ++; *ptr && isalnum(*ptr & 255); ptr ++);
+
+	wordlen = ptr - text;
+
+	if (*ptr)
+          *ptr = '\0';
+	else
+          ptr --;
+
+	if (wordlen > 1 && !bsearch(text, help_common_words,
+	                            (sizeof(help_common_words) /
+				     sizeof(help_common_words[0])),
+				    sizeof(help_common_words[0]),
+				    (int (*)(const void *, const void *))
+				        strcasecmp))
+          help_add_word(node, text);
+      }
     }
 
    /*
@@ -975,6 +1302,21 @@ help_sort_by_score(help_node_t *n1,	/* I - First node */
     return (diff);
 
   return (strcasecmp(n1->text, n2->text));
+}
+
+
+/*
+ * 'help_sort_words()' - Sort words alphabetically.
+ */
+
+static int				/* O - Difference */
+help_sort_words(help_word_t *w1,	/* I - Second word */
+                help_word_t *w2)	/* I - Second word */
+{
+  DEBUG_printf(("help_sort_words(w1=%p(\"%s\"), w2=%p(\"%s\"))\n",
+                w1, w1->text, w2, w2->text));
+
+  return (strcasecmp(w1->text, w2->text));
 }
 
 

@@ -3,7 +3,7 @@
  *
  *   On-line help index definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -36,19 +36,26 @@
  * Data structures...
  */
 
-typedef struct				/**** Help node structure... ****/
+typedef struct help_word_s		/**** Help word structure... ****/
+{
+  int		count;			/* Number of occurrences */
+  char		*text;			/* Word text */
+} help_word_t;
+
+typedef struct help_node_s		/**** Help node structure... ****/
 {
   char		*filename;		/* Filename, relative to help dir */
   char		*section;		/* Section name (NULL if none) */
   char		*anchor;		/* Anchor name (NULL if none) */
   char		*text;			/* Text in anchor */
+  cups_array_t	*words;			/* Words after this node */
   time_t	mtime;			/* Last modification time */
   off_t		offset;			/* Offset in file */
   size_t	length;			/* Length in bytes */
   int		score;			/* Search score */
 } help_node_t;
 
-typedef struct				/**** Help index structure ****/
+typedef struct help_index_s		/**** Help index structure ****/
 {
   int		search;			/* 1 = search index, 0 = normal */
   cups_array_t	*nodes;			/* Nodes sorted by filename */

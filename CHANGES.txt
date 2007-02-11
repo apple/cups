@@ -4,6 +4,8 @@ CHANGES.txt - 2007-02-10
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2131)
+	- The on-line help now provides better search capabilities
+	  (STR #1701)
 	- The web interface "Add This Printer" button now allows you
 	  to change the printer name, description,  and location
 	  (STR #1646)

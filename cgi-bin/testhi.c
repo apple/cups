@@ -3,7 +3,7 @@
  *
  *   Help index test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -105,11 +105,15 @@ list_nodes(const char   *title,		/* I - Title string */
   for (i = 1, node = (help_node_t *)cupsArrayFirst(nodes);
        node;
        i ++, node = (help_node_t *)cupsArrayNext(nodes))
+  {
     if (node->anchor)
-      printf("    %d: %s#%s \"%s\"\n", i, node->filename, node->anchor,
+      printf("    %d: %s#%s \"%s\"", i, node->filename, node->anchor,
              node->text);
     else
-      printf("    %d: %s \"%s\"\n", i, node->filename, node->text);
+      printf("    %d: %s \"%s\"", i, node->filename, node->text);
+
+    printf(" (%d words)\n", cupsArrayCount(node->words));
+  }
 }
 
 
