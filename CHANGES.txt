@@ -4,6 +4,9 @@ CHANGES.txt - 2007-02-11
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2131)
+	- The notify-events-default and
+	  notify-lease-duration-default attributes can now be set
+	  (STR #1671)
 	- Server-side default options are now sent to clients when
 	  the "printer-defaults" attribute group is requested (STR
 	  #1923)

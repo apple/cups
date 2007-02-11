@@ -492,10 +492,6 @@ cupsdCreateCommonData(void)
 		(int)(sizeof(notify_attrs) / sizeof(notify_attrs[0])),
 		NULL, notify_attrs);
 
-  /* notify-lease-duration-default */
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-               "notify-lease-duration-default", DefaultLeaseDuration);
-
   /* notify-lease-duration-supported */
   ippAddRange(CommonData, IPP_TAG_PRINTER,
               "notify-lease-duration-supported", 0,
@@ -504,10 +500,6 @@ cupsdCreateCommonData(void)
   /* notify-max-events-supported */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                "notify-max-events-supported", MaxEvents);
-
-  /* notify-events-default */
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-               "notify-events-default", NULL, "job-completed");
 
   /* notify-events-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -2904,6 +2896,14 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
   if (!cupsGetOption("orientation-requested", p->num_options, p->options))
     ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                   "orientation-requested-default", IPP_PORTRAIT);
+
+  if (!cupsGetOption("notify-lease-duration", p->num_options, p->options))
+    ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+        	  "notify-lease-duration-default", DefaultLeaseDuration);
+
+  if (!cupsGetOption("notify-events", p->num_options, p->options))
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+        	 "notify-events-default", NULL, "job-completed");
 }
 
 

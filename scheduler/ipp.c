@@ -4676,6 +4676,8 @@ create_subscription(
   int			interval,	/* notify-time-interval */
 			lease;		/* notify-lease-duration */
   unsigned		mask;		/* notify-events */
+  ipp_attribute_t	*notify_events,/* notify-events(-default) */
+			*notify_lease;	/* notify-lease-duration(-default) */
 
 
 #ifdef DEBUG
@@ -4784,6 +4786,23 @@ create_subscription(
     jobid      = 0;
     mask       = CUPSD_EVENT_NONE;
 
+    if (printer)
+    {
+      notify_events = ippFindAttribute(printer->attrs, "notify-events-default",
+                                       IPP_TAG_KEYWORD);
+      notify_lease  = ippFindAttribute(printer->attrs,
+                                       "notify-lease-duration-default",
+                                       IPP_TAG_INTEGER);
+
+      if (notify_lease)
+        lease = notify_lease->values[0].integer;
+    }
+    else
+    {
+      notify_events = NULL;
+      notify_lease  = NULL;
+    }
+
     while (attr && attr->group_tag != IPP_TAG_ZERO)
     {
       if (!strcmp(attr->name, "notify-recipient") &&
@@ -4872,10 +4891,7 @@ create_subscription(
       }
       else if (!strcmp(attr->name, "notify-events") &&
                attr->value_tag == IPP_TAG_KEYWORD)
-      {
-        for (i = 0; i < attr->num_values; i ++)
-	  mask |= cupsdEventValue(attr->values[i].string.text);
-      }
+        notify_events = attr;
       else if (!strcmp(attr->name, "notify-lease-duration") &&
                attr->value_tag == IPP_TAG_INTEGER)
         lease = attr->values[0].integer;
@@ -4887,6 +4903,12 @@ create_subscription(
         jobid = attr->values[0].integer;
 
       attr = attr->next;
+    }
+
+    if (notify_events)
+    {
+      for (i = 0; i < notify_events->num_values; i ++)
+	mask |= cupsdEventValue(notify_events->values[i].string.text);
     }
 
     if (recipient)
@@ -8678,9 +8700,6 @@ set_printer_defaults(
                       attr->values[0].string.text);
       cupsdSetString(&printer->error_policy, attr->values[0].string.text);
     }
-    else if (!strcmp(attr->name, "notify-lease-duration-default") ||
-             !strcmp(attr->name, "notify-events-default"))
-      continue;
 
    /*
     * Skip any other non-default attributes...
