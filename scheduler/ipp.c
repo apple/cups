@@ -1198,7 +1198,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
  /*
   * Validate job template attributes; for now just document-format,
-  * copies, and page-ranges...
+  * copies, number-up, and page-ranges...
   */
 
   if (filetype && printer->filetypes &&
@@ -1229,6 +1229,24 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                       attr->values[0].integer);
       ippAddInteger(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_INTEGER,
 	            "copies", attr->values[0].integer);
+      return (NULL);
+    }
+  }
+
+  if ((attr = ippFindAttribute(con->request, "number-up",
+                               IPP_TAG_INTEGER)) != NULL)
+  {
+    if (attr->values[0].integer != 1 &&
+        attr->values[0].integer != 2 &&
+        attr->values[0].integer != 4 &&
+        attr->values[0].integer != 6 &&
+        attr->values[0].integer != 9 &&
+        attr->values[0].integer != 16)
+    {
+      send_ipp_status(con, IPP_ATTRIBUTES, _("Bad number-up value %d."),
+                      attr->values[0].integer);
+      ippAddInteger(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_INTEGER,
+	            "number-up", attr->values[0].integer);
       return (NULL);
     }
   }

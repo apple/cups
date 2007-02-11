@@ -1,9 +1,10 @@
-CHANGES.txt - 2007-02-10
+CHANGES.txt - 2007-02-11
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2131)
+	- CUPS now validates the number-up option value (STR #1329)
 	- The on-line help now provides better search capabilities
 	  (STR #1701)
 	- The web interface "Add This Printer" button now allows you
