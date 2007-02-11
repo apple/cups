@@ -56,8 +56,11 @@ AC_ARG_WITH(arch64flags, [  --with-arch64flags="flags"
 ARCH64FLAGS=""
 AC_SUBST(ARCH64FLAGS)
 
-dnl Position-Independent Executable support on Linux and *BSD...
+dnl Position-Independent Executable support on Linux...
 AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fPIE option, default=no])
+
+dnl Read-only data/program support on Linux...
+AC_ARG_ENABLE(relro, [  --enable-relro          use GCC relro option, default=no])
 
 dnl Update compiler options...
 CXXLIBS=""
@@ -65,6 +68,9 @@ AC_SUBST(CXXLIBS)
 
 PIEFLAGS=""
 AC_SUBST(PIEFLAGS)
+
+RELROFLAGS=""
+AC_SUBST(RELROFLAGS)
 
 if test -n "$GCC"; then
 	# Add GCC-specific compiler options...
@@ -85,6 +91,10 @@ if test -n "$GCC"; then
 		Linux*)
 			if test x$enable_pie = xyes; then
 				PIEFLAGS="-pie -fPIE"
+			fi
+
+			if test x$enable_relro = xyes; then
+				RELROFLAGS="-Wl,-z,relro"
 			fi
 			;;
 
