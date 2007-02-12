@@ -36,7 +36,7 @@
  *   push_stack()             - Push an object on the stack.
  *   roll_stack()             - Rotate stack objects.
  *   scan_ps()                - Scan a string for the next PS object.
- *   setpagedevice()        - Simulate the PostScript setpagedevice operator.
+ *   setpagedevice()          - Simulate the PostScript setpagedevice operator.
  *   DEBUG_object()           - Print an objects value...
  *   DEBUG_stack()            - Print a stack...
  */
