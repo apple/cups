@@ -7,7 +7,7 @@
  *   MANY OF THE FUNCTIONS IN THIS HEADER ARE PRIVATE AND SUBJECT TO
  *   CHANGE AT ANY TIME.  USE AT YOUR OWN RISK.
  *
- *   Copyright 2001-2006 by Easy Software Products.
+ *   Copyright 2001-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -53,6 +53,7 @@ extern "C" {
 
 #  define CUPS_SERVER_DEBUG_LOGGING	"_debug_logging"
 #  define CUPS_SERVER_REMOTE_ADMIN	"_remote_admin"
+#  define CUPS_SERVER_REMOTE_ANY	"_remote_any"
 #  define CUPS_SERVER_REMOTE_PRINTERS	"_remote_printers"
 #  define CUPS_SERVER_SHARE_PRINTERS	"_share_printers"
 #  define CUPS_SERVER_USER_CANCEL_ANY	"_user_cancel_any"

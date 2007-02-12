@@ -21,7 +21,7 @@ Listen localhost:@DEFAULT_IPP_PORT@
 # Show shared printers on the local network.
 Browsing On
 BrowseOrder allow,deny
-BrowseAllow @LOCAL
+BrowseAllow all
 
 # Default authentication type, when authentication is required...
 DefaultAuthType Basic

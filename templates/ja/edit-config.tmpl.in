@@ -20,7 +20,7 @@ function reset_config()
 "# Show shared printers on the local network.\\n" +
 "Browsing On\\n" +
 "BrowseOrder allow,deny\\n" +
-"BrowseAllow @LOCAL\\n" +
+"BrowseAllow all\\n" +
 "\\n" +
 "\\n" +
 "# Authenticate against system accounts by default...\\n" +

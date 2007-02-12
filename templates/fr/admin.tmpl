@@ -1,5 +1,5 @@
 <TABLE CELLPADDING="0" CELLSPACING="0" WIDTH="100%" SUMMARY="Tâches d'administration">
-<TR><TD VALIGN="TOP" NOWRAP>
+<TR><TD VALIGN="TOP">
 
 <H2 CLASS="title">Imprimantes</H2>
 
@@ -36,7 +36,7 @@ ALT="Administrer les classes" CLASS="button"></A>
 tâches" CLASS="button"></A>
 </P>
 
-</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 
 <H2 CLASS="title">Serveur</H2>
 
@@ -67,6 +67,7 @@ CLASS="button"></A>
 imprimantes partagées par d'autres systèmes<BR>
 <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Partager les
 imprimantes publiques connectées à ce système<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Autoriser
 l'administration à distance<BR>
 <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Autoriser les

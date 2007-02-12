@@ -20,7 +20,7 @@ function reset_config()
 "# Publier les imprimantes partagées sur le réseau local.\\n" +
 "Browsing On\\n" +
 "BrowseOrder allow,deny\\n" +
-"BrowseAllow @LOCAL\\n" +
+"BrowseAllow all\\n" +
 "\\n" +
 "\\n" +
 "# S'authentifier par défaut via les comptes UNIX...\\n" +

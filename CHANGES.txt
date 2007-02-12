@@ -4,6 +4,10 @@ CHANGES.txt - 2007-02-11
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2131)
+	- The default configuration now allows browse packets from
+	  any address (STR #2008)
+	- The web interface now provides an "allow printing from the
+	  Internet" check box (STR #1897)
 	- The notify-events-default and
 	  notify-lease-duration-default attributes can now be set
 	  (STR #1671)

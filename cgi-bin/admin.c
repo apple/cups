@@ -1597,6 +1597,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     cups_option_t	*settings;	/* Server settings */
     const char		*debug_logging,	/* DEBUG_LOGGING value */
 			*remote_admin,	/* REMOTE_ADMIN value */
+			*remote_any,	/* REMOTE_ANY value */
 			*remote_printers,
 					/* REMOTE_PRINTERS value */
 			*share_printers,/* SHARE_PRINTERS value */
@@ -1610,6 +1611,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
     debug_logging   = cgiGetVariable("DEBUG_LOGGING") ? "1" : "0";
     remote_admin    = cgiGetVariable("REMOTE_ADMIN") ? "1" : "0";
+    remote_any      = cgiGetVariable("REMOTE_ANY") ? "1" : "0";
     remote_printers = cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0";
     share_printers  = cgiGetVariable("SHARE_PRINTERS") ? "1" : "0";
     user_cancel_any = cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0";
@@ -1637,6 +1639,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
                                             num_settings, settings)) ||
         strcmp(remote_admin, cupsGetOption(CUPS_SERVER_REMOTE_ADMIN,
                                            num_settings, settings)) ||
+        strcmp(remote_any, cupsGetOption(CUPS_SERVER_REMOTE_ANY,
+                                         num_settings, settings)) ||
         strcmp(remote_printers, cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS,
                                               num_settings, settings)) ||
         strcmp(share_printers, cupsGetOption(CUPS_SERVER_SHARE_PRINTERS,
@@ -1655,6 +1659,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
                                    debug_logging, num_settings, &settings);
       num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ADMIN,
                                    remote_admin, num_settings, &settings);
+      num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
+                                   remote_any, num_settings, &settings);
       num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
                                    remote_printers, num_settings, &settings);
       num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS,
@@ -2199,6 +2205,10 @@ do_menu(http_t *http)			/* I - HTTP connection */
   if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ADMIN, num_settings,
                            settings)) != NULL && atoi(val))
     cgiSetVariable("REMOTE_ADMIN", "CHECKED");
+
+  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ANY, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("REMOTE_ANY", "CHECKED");
 
   if ((val = cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS, num_settings,
                            settings)) != NULL && atoi(val))
