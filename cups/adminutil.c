@@ -1016,7 +1016,6 @@ _cupsAdminSetServerSettings(
   int		old_remote_printers,	/* Show remote printers */
 		old_share_printers,	/* Share local printers */
 		old_remote_admin,	/* Remote administration allowed? */
-		old_remote_any,		/* Remote access from anywhere? */
 		old_user_cancel_any,	/* Cancel-job policy set? */
 		old_debug_logging;	/* LogLevel debug set? */
   cups_option_t	*cupsd_settings,	/* New settings */
@@ -1793,14 +1792,9 @@ _cupsAdminSetServerSettings(
                                 	 old_remote_admin ? "1" : "0",
 					 cupsd_num_settings, &cupsd_settings);
 
-    if (remote_any >= 0)
-      cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
-                                	 remote_any ? "1" : "0",
-					 cupsd_num_settings, &cupsd_settings);
-    else
-      cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
-                                	 old_remote_any ? "1" : "0",
-					 cupsd_num_settings, &cupsd_settings);
+    cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
+                                       remote_any ? "1" : "0",
+				       cupsd_num_settings, &cupsd_settings);
 
     if (remote_printers >= 0)
       cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
