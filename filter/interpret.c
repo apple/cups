@@ -30,6 +30,9 @@
  *                              header.
  *   copy_stack()             - Copy the top N stack objects.
  *   delete_stack()           - Free memory used by a stack.
+ *   error_object()           - Add an object's value to the current error
+ *                              message.
+ *   error_stack()            - Add a stack to the current error message.
  *   index_stack()            - Copy the Nth value on the stack.
  *   new_stack()              - Create a new stack.
  *   pop_stock()              - Pop the top object off the stack.
@@ -37,8 +40,8 @@
  *   roll_stack()             - Rotate stack objects.
  *   scan_ps()                - Scan a string for the next PS object.
  *   setpagedevice()          - Simulate the PostScript setpagedevice operator.
- *   DEBUG_object()           - Print an objects value...
- *   DEBUG_stack()            - Print a stack...
+ *   DEBUG_object()           - Print an objects value.
+ *   DEBUG_stack()            - Print a stack.
  */
 
 /*
@@ -101,6 +104,8 @@ typedef struct
 
 static int		copy_stack(_cups_ps_stack_t *st, int count);
 static void		delete_stack(_cups_ps_stack_t *st);
+static void		error_object(_cups_ps_obj_t *obj);
+static void		error_stack(_cups_ps_stack_t *st, const char *title);
 static _cups_ps_obj_t	*index_stack(_cups_ps_stack_t *st, int n);
 static _cups_ps_stack_t	*new_stack(void);
 static _cups_ps_obj_t	*pop_stack(_cups_ps_stack_t *st);
@@ -161,8 +166,13 @@ cupsRasterInterpretPPD(
   * Range check input...
   */
 
+  _cupsRasterClearError();
+
   if (!h)
+  {
+    _cupsRasterAddError("Page header cannot be NULL!\n");
     return (-1);
+  }
 
  /*
   * Reset the page header to the defaults...
@@ -298,7 +308,10 @@ cupsRasterInterpretPPD(
   */
 
   if (func && (*func)(h, preferred_bits))
+  {
+    _cupsRasterAddError("Page header callback returned error.\n");
     return (-1);
+  }
 
  /*
   * Check parameters...
@@ -311,7 +324,10 @@ cupsRasterInterpretPPD(
        h->cupsBitsPerColor != 16) ||
       h->cupsBorderlessScalingFactor < 0.5 ||
       h->cupsBorderlessScalingFactor > 2.0)
+  {
+    _cupsRasterAddError("Page header uses unsupported values.\n");
     return (-1);
+  }
 
  /*
   * Compute the bitmap parameters...
@@ -421,21 +437,18 @@ _cupsRasterExecPS(
                 h, preferred_bits, code ? code : "(null)"));
 
  /*
-  * Range check input...
-  */
-
-  if (!h || !code)
-    return (-1);
-
- /*
   * Copy the PostScript code and create a stack...
   */
 
   if ((codecopy = strdup(code)) == NULL)
+  {
+    _cupsRasterAddError("Unable to duplicate code string.\n");
     return (-1);
+  }
 
   if ((st = new_stack()) == NULL)
   {
+    _cupsRasterAddError("Unable to create stack.\n");
     free(codecopy);
     return (-1);
   }
@@ -538,6 +551,7 @@ _cupsRasterExecPS(
           break;
 
       case CUPS_PS_OTHER :
+          _cupsRasterAddError("Unknown operator \"%s\"!\n", obj->value.other);
           DEBUG_printf(("    Unknown operator \"%s\"!\n", obj->value.other));
           break;
     }
@@ -554,6 +568,8 @@ _cupsRasterExecPS(
 
   if (st->num_objs > 0)
   {
+    error_stack(st, "Stack not empty:");
+
 #ifdef DEBUG
     fputs("    Stack not empty:", stdout);
     DEBUG_stack(st);
@@ -615,6 +631,106 @@ delete_stack(_cups_ps_stack_t *st)	/* I - Stack */
 {
   free(st->objs);
   free(st);
+}
+
+
+/*
+ * 'error_object()' - Add an object's value to the current error message.
+ */
+
+static void
+error_object(_cups_ps_obj_t *obj)	/* I - Object to add */
+{
+  switch (obj->type)
+  {
+    case CUPS_PS_NAME :
+	_cupsRasterAddError(" /%s", obj->value.name);
+	break;
+
+    case CUPS_PS_NUMBER :
+	_cupsRasterAddError(" %g", obj->value.number);
+	break;
+
+    case CUPS_PS_STRING :
+	_cupsRasterAddError(" (%s)", obj->value.string);
+	break;
+
+    case CUPS_PS_BOOLEAN :
+	if (obj->value.boolean)
+	  _cupsRasterAddError(" true");
+	else
+	  _cupsRasterAddError(" false");
+	break;
+
+    case CUPS_PS_NULL :
+	_cupsRasterAddError(" null");
+	break;
+
+    case CUPS_PS_START_ARRAY :
+	_cupsRasterAddError(" [");
+	break;
+
+    case CUPS_PS_END_ARRAY :
+	_cupsRasterAddError(" ]");
+	break;
+
+    case CUPS_PS_START_DICT :
+	_cupsRasterAddError(" <<");
+	break;
+
+    case CUPS_PS_END_DICT :
+	_cupsRasterAddError(" >>");
+	break;
+
+    case CUPS_PS_COPY :
+	_cupsRasterAddError(" --copy--");
+        break;
+
+    case CUPS_PS_DUP :
+	_cupsRasterAddError(" --dup--");
+        break;
+
+    case CUPS_PS_INDEX :
+	_cupsRasterAddError(" --index--");
+        break;
+
+    case CUPS_PS_POP :
+	_cupsRasterAddError(" --pop--");
+        break;
+
+    case CUPS_PS_ROLL :
+	_cupsRasterAddError(" --roll--");
+        break;
+
+    case CUPS_PS_SETPAGEDEVICE :
+	_cupsRasterAddError(" --setpagedevice--");
+        break;
+
+    case CUPS_PS_OTHER :
+	_cupsRasterAddError(" --%s--", obj->value.other);
+	break;
+  }
+}
+
+
+/*
+ * 'error_stack()' - Add a stack to the current error message...
+ */
+
+static void
+error_stack(_cups_ps_stack_t *st,	/* I - Stack */
+            const char       *title)	/* I - Title string */
+{
+  int			c;		/* Looping var */
+  _cups_ps_obj_t	*obj;		/* Current object on stack */
+
+
+  _cupsRasterAddError(title);
+
+  for (obj = st->objs, c = st->num_objs; c > 0; c --, obj ++)
+    error_object(obj);
+
+  _cupsRasterAddError("\n");
 }
 
 

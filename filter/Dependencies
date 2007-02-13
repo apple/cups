@@ -71,13 +71,16 @@ image-zoom.o: ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 image.o: image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
 image.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 image.o: ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
+error.o: image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
+error.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+error.o: ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 interpret.o: ../cups/string.h ../config.h image-private.h image.h raster.h
 interpret.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
 interpret.o: ../cups/array.h ../cups/file.h ../cups/language.h
 interpret.o: ../cups/debug.h
-raster.o: raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
-raster.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
-raster.o: ../cups/string.h ../config.h
+raster.o: image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
+raster.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+raster.o: ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 form-main.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-main.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 form-main.o: ../cups/language.h ../cups/string.h ../config.h
@@ -116,9 +119,9 @@ rastertolabel.o: ../cups/array.h ../cups/file.h ../cups/language.h
 rastertolabel.o: ../cups/string.h ../config.h raster.h
 testimage.o: image.h raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 testimage.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-testraster.o: raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-testraster.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-testraster.o: ../cups/string.h ../config.h
+testraster.o: image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
+testraster.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+testraster.o: ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 textcommon.o: textcommon.h common.h ../cups/cups.h ../cups/ipp.h
 textcommon.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 textcommon.o: ../cups/language.h ../cups/language.h ../cups/string.h
@@ -199,13 +202,16 @@ image-zoom.32.o: image-zoom.c  ../cups/language.h ../cups/debug.h ../cups/string
 image.32.o: image.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
 image.32.o: image.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 image.32.o: image.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
+error.32.o: error.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
+error.32.o: error.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+error.32.o: error.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 interpret.32.o: interpret.c  ../cups/string.h ../config.h image-private.h image.h raster.h
 interpret.32.o: interpret.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
 interpret.32.o: interpret.c  ../cups/array.h ../cups/file.h ../cups/language.h
 interpret.32.o: interpret.c  ../cups/debug.h
-raster.32.o: raster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
-raster.32.o: raster.c  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
-raster.32.o: raster.c  ../cups/string.h ../config.h
+raster.32.o: raster.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
+raster.32.o: raster.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+raster.32.o: raster.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 form-main.32.o: form-main.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-main.32.o: form-main.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 form-main.32.o: form-main.c  ../cups/language.h ../cups/string.h ../config.h
@@ -244,9 +250,9 @@ rastertolabel.32.o: rastertolabel.c  ../cups/array.h ../cups/file.h ../cups/lang
 rastertolabel.32.o: rastertolabel.c  ../cups/string.h ../config.h raster.h
 testimage.32.o: testimage.c  image.h raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 testimage.32.o: testimage.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-testraster.32.o: testraster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-testraster.32.o: testraster.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-testraster.32.o: testraster.c  ../cups/string.h ../config.h
+testraster.32.o: testraster.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
+testraster.32.o: testraster.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+testraster.32.o: testraster.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 textcommon.32.o: textcommon.c  textcommon.h common.h ../cups/cups.h ../cups/ipp.h
 textcommon.32.o: textcommon.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 textcommon.32.o: textcommon.c  ../cups/language.h ../cups/language.h ../cups/string.h
@@ -327,13 +333,16 @@ image-zoom.64.o: image-zoom.c  ../cups/language.h ../cups/debug.h ../cups/string
 image.64.o: image.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
 image.64.o: image.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 image.64.o: image.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
+error.64.o: error.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
+error.64.o: error.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+error.64.o: error.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 interpret.64.o: interpret.c  ../cups/string.h ../config.h image-private.h image.h raster.h
 interpret.64.o: interpret.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
 interpret.64.o: interpret.c  ../cups/array.h ../cups/file.h ../cups/language.h
 interpret.64.o: interpret.c  ../cups/debug.h
-raster.64.o: raster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
-raster.64.o: raster.c  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
-raster.64.o: raster.c  ../cups/string.h ../config.h
+raster.64.o: raster.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
+raster.64.o: raster.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+raster.64.o: raster.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 form-main.64.o: form-main.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-main.64.o: form-main.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 form-main.64.o: form-main.c  ../cups/language.h ../cups/string.h ../config.h
@@ -372,9 +381,9 @@ rastertolabel.64.o: rastertolabel.c  ../cups/array.h ../cups/file.h ../cups/lang
 rastertolabel.64.o: rastertolabel.c  ../cups/string.h ../config.h raster.h
 testimage.64.o: testimage.c  image.h raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 testimage.64.o: testimage.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-testraster.64.o: testraster.c  raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-testraster.64.o: testraster.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-testraster.64.o: testraster.c  ../cups/string.h ../config.h
+testraster.64.o: testraster.c  image-private.h image.h raster.h ../cups/cups.h ../cups/ipp.h
+testraster.64.o: testraster.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+testraster.64.o: testraster.c  ../cups/language.h ../cups/debug.h ../cups/string.h ../config.h
 textcommon.64.o: textcommon.c  textcommon.h common.h ../cups/cups.h ../cups/ipp.h
 textcommon.64.o: textcommon.c  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 textcommon.64.o: textcommon.c  ../cups/language.h ../cups/language.h ../cups/string.h

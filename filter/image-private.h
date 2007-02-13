@@ -217,7 +217,8 @@ extern cups_izoom_t	*_cupsImageZoomNew(cups_image_t *img, int xc0, int yc0,
 extern int		_cupsRasterExecPS(cups_page_header2_t *h,
 			                  int *preferred_bits,
 			                  const char *code);
-
+extern void		_cupsRasterAddError(const char *f, ...);
+extern void		_cupsRasterClearError(void);
 
 #endif /* !_CUPS_IMAGE_PRIVATE_H_ */
 

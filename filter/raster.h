@@ -332,6 +332,9 @@ extern unsigned		cupsRasterReadHeader2(cups_raster_t *r,
 extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
 			                       cups_page_header2_t *h);
 
+/**** New in CUPS 1.3 ****/
+extern const char	*cupsRasterErrorString(void);
+
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */

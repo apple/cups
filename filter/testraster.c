@@ -241,6 +241,7 @@ main(void)
   if (_cupsRasterExecPS(&header, &preferred_bits, setpagedevice_code))
   {
     puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
     errors ++;
   }
   else if (preferred_bits != 17 ||
@@ -268,6 +269,7 @@ main(void)
 			"setpagedevice\n"))
   {
     puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
     errors ++;
   }
   else if (header.PageSize[0] != 792 || header.PageSize[1] != 612)
@@ -290,6 +292,7 @@ main(void)
 			"pop pop pop"))
   {
     puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
     errors ++;
   }
   else
@@ -322,6 +325,7 @@ main(void)
   if (_cupsRasterExecPS(&header, &preferred_bits, dsc_code))
   {
     puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
     errors ++;
   }
   else

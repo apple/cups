@@ -53,7 +53,7 @@
  * Include necessary headers...
  */
 
-#include "raster.h"
+#include "image-private.h"
 #include <cups/debug.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -136,8 +136,14 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
   cups_raster_t	*r;			/* New stream */
 
 
+  _cupsRasterClearError();
+
   if ((r = calloc(sizeof(cups_raster_t), 1)) == NULL)
+  {
+    _cupsRasterAddError("Unable to allocate memory for raster stream: %s\n",
+                        strerror(errno));
     return (NULL);
+  }
 
   r->fd   = fd;
   r->mode = mode == CUPS_RASTER_WRITE_COMPRESSED ? CUPS_RASTER_WRITE : mode;
@@ -150,6 +156,8 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
 
     if (!cups_read(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync)))
     {
+      _cupsRasterAddError("Unable to read header from raster stream: %s\n",
+                          strerror(errno));
       free(r);
       return (NULL);
     }
@@ -161,6 +169,7 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
         r->sync != CUPS_RASTER_SYNCv2 &&
         r->sync != CUPS_RASTER_REVSYNCv2)
     {
+      _cupsRasterAddError("Unknown raster format %08x!\n", r->sync);
       free(r);
       return (NULL);
     }
@@ -191,6 +200,8 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
     if (cups_write(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync))
             < sizeof(r->sync))
     {
+      _cupsRasterAddError("Unable to write raster stream header: %s\n",
+                          strerror(errno));
       free(r);
       return (NULL);
     }

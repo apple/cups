@@ -43,7 +43,7 @@ HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
 		image-photocd.o image-pix.o image-png.o image-pnm.o \
 		image-sgi.o image-sgilib.o image-sun.o image-tiff.o \
-		image-zoom.o image.o interpret.o raster.o
+		image-zoom.o image.o error.o interpret.o raster.o
 IMAGE32OBJS =	$(IMAGEOBJS:.o=.32.o)
 IMAGE64OBJS =	$(IMAGEOBJS:.o=.64.o)
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
@@ -243,7 +243,7 @@ libcupsimage.2.dylib:	$(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
-		-current_version 2.2.0 \
+		-current_version 2.3.0 \
 		-compatibility_version 2.0.0 \
 		$(IMAGEOBJS) $(DSOLIBS) -L../cups $(LINKCUPS) -lm
 	$(RM) libcupsimage.dylib
@@ -270,7 +270,7 @@ libcupsimage.la:       $(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
 		-L../cups $(LINKCUPS) \
-		-rpath $(LIBDIR) -version-info 2:2
+		-rpath $(LIBDIR) -version-info 2:3
 
 
 #
@@ -366,9 +366,9 @@ testraster:	testraster.o ../cups/libcups.a libcupsimage.a
 # rasterbench
 #
 
-rasterbench:	rasterbench.o raster.o
+rasterbench:	rasterbench.o libcupsimage.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ rasterbench.o raster.o
+	$(CC) $(LDFLAGS) -o $@ rasterbench.o libcupsimage.a $(LIBS)
 
 
 #
