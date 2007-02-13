@@ -3,7 +3,7 @@
  *
  *   Raster test program routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -49,7 +49,12 @@
  * Test PS commands and header...
  */
 
-static const char *test_code =
+static const char *dsc_code =
+"[{\n"
+"%%BeginFeature: *Foo None\n"
+"%%EndFeature\n"
+"} stopped cleartomark\n";
+static const char *setpagedevice_code =
 "<<"
 "/MediaClass(Media Class)"
 "/MediaColor((Media Color))"
@@ -138,7 +143,7 @@ static const char *test_code =
 "/cupsPreferredBitsPerColor 17"
 ">> setpagedevice";
 
-static cups_page_header2_t test_header =
+static cups_page_header2_t setpagedevice_header =
 {
   "Media Class",			/* MediaClass */
   "(Media Color)",			/* MediaColor */
@@ -233,12 +238,13 @@ main(void)
   header.Collate = CUPS_TRUE;
   preferred_bits = 0;
 
-  if (_cupsRasterExecPS(&header, &preferred_bits, test_code))
+  if (_cupsRasterExecPS(&header, &preferred_bits, setpagedevice_code))
   {
     puts("FAIL (error from function)");
     errors ++;
   }
-  else if (preferred_bits != 17 || memcmp(&header, &test_header, sizeof(header)))
+  else if (preferred_bits != 17 ||
+           memcmp(&header, &setpagedevice_header, sizeof(header)))
   {
     puts("FAIL (bad header)");
 
@@ -246,7 +252,7 @@ main(void)
       printf("    cupsPreferredBitsPerColor %d, expected 17\n",
              preferred_bits);
 
-    print_changes(&test_header, &header);
+    print_changes(&setpagedevice_header, &header);
     errors ++;
   }
   else
@@ -309,6 +315,17 @@ main(void)
     if(header.Collate && !header.Duplex && !header.Tumble)
       puts("PASS");
   }
+
+  fputs("_cupsRasterExecPS(\"%%Begin/EndFeature code\"): ", stdout);
+  fflush(stdout);
+
+  if (_cupsRasterExecPS(&header, &preferred_bits, dsc_code))
+  {
+    puts("FAIL (error from function)");
+    errors ++;
+  }
+  else
+    puts("PASS");
 
 #if 0
   fputs("_cupsRasterExecPS(\"\"): ", stdout);
