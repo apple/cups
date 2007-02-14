@@ -1952,6 +1952,15 @@ do_delete_class(http_t *http)		/* I - HTTP connection */
   * Show the results...
   */
 
+  if (cupsLastError() <= IPP_OK_CONFLICT)
+  {
+   /*
+    * Redirect successful updates back to the classes page...
+    */
+
+    cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect&URL=/classes");
+  }
+
   cgiStartHTML(cgiText(_("Delete Class")));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
@@ -2022,6 +2031,15 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
  /*
   * Show the results...
   */
+
+  if (cupsLastError() <= IPP_OK_CONFLICT)
+  {
+   /*
+    * Redirect successful updates back to the printers page...
+    */
+
+    cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect&URL=/printers");
+  }
 
   cgiStartHTML(cgiText(_("Delete Printer")));
 

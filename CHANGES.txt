@@ -1,9 +1,11 @@
-CHANGES.txt - 2007-02-11
+CHANGES.txt - 2007-02-14
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2131)
+	- The classes or printers list is now shown after a
+	  successful deletion from the web interface (STR #1999)
 	- The default configuration now allows browse packets from
 	  any address (STR #2008)
 	- The web interface now provides an "allow printing from the
