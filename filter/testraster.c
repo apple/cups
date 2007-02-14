@@ -51,7 +51,8 @@
 
 static const char *dsc_code =
 "[{\n"
-"%%BeginFeature: *Foo None\n"
+"%%BeginFeature: *PageSize Tabloid\n"
+"<</PageSize[792 1224]>>setpagedevice\n"
 "%%EndFeature\n"
 "} stopped cleartomark\n";
 static const char *setpagedevice_code =
@@ -326,6 +327,12 @@ main(void)
   {
     puts("FAIL (error from function)");
     puts(cupsRasterErrorString());
+    errors ++;
+  }
+  else if (header.PageSize[0] != 792 || header.PageSize[1] != 1224)
+  {
+    printf("FAIL (bad PageSize [%d %d], expected [792 1224])\n",
+           header.PageSize[0], header.PageSize[1]);
     errors ++;
   }
   else

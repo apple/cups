@@ -3,7 +3,7 @@
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -68,12 +68,16 @@ typedef enum
   CUPS_PS_END_ARRAY,
   CUPS_PS_START_DICT,
   CUPS_PS_END_DICT,
+  CUPS_PS_START_PROC,
+  CUPS_PS_END_PROC,
+  CUPS_PS_CLEARTOMARK,
   CUPS_PS_COPY,
   CUPS_PS_DUP,
   CUPS_PS_INDEX,
   CUPS_PS_POP,
   CUPS_PS_ROLL,
   CUPS_PS_SETPAGEDEVICE,
+  CUPS_PS_STOPPED,
   CUPS_PS_OTHER
 } _cups_ps_type_t;
 
@@ -102,6 +106,7 @@ typedef struct
  * Local functions...
  */
 
+static int		cleartomark_stack(_cups_ps_stack_t *st);
 static int		copy_stack(_cups_ps_stack_t *st, int count);
 static void		delete_stack(_cups_ps_stack_t *st);
 static void		error_object(_cups_ps_obj_t *obj);
@@ -137,8 +142,8 @@ static void		DEBUG_stack(_cups_ps_stack_t *st);
  * requested attributes cannot be supported.
  *
  * cupsRasterInterpretPPD() supports a subset of the PostScript language.
- * Currently only the [, ], <<, >>, copy, dup, index, pop, roll, and
- * setpagedevice operators are supported.
+ * Currently only the [, ], <<, >>, {, }, cleartomark, copy, dup, index,
+ * pop, roll, setpagedevice, and stopped operators are supported.
  *
  * @since CUPS 1.2@
  */
@@ -473,6 +478,18 @@ _cupsRasterExecPS(
           /* Do nothing for regular values */
 	  break;
 
+      case CUPS_PS_CLEARTOMARK :
+          pop_stack(st);
+
+	  if (cleartomark_stack(st))
+	    _cupsRasterAddError("cleartomark: Stack underflow!\n");
+
+#ifdef DEBUG
+          fputs("    dup: ", stdout);
+	  DEBUG_stack(st);
+#endif /* DEBUG */
+          break;
+
       case CUPS_PS_COPY :
           pop_stack(st);
 	  if ((obj = pop_stack(st)) != NULL)
@@ -550,6 +567,12 @@ _cupsRasterExecPS(
 #endif /* DEBUG */
           break;
 
+      case CUPS_PS_START_PROC :
+      case CUPS_PS_END_PROC :
+      case CUPS_PS_STOPPED :
+          pop_stack(st);
+	  break;
+
       case CUPS_PS_OTHER :
           _cupsRasterAddError("Unknown operator \"%s\"!\n", obj->value.other);
           DEBUG_printf(("    Unknown operator \"%s\"!\n", obj->value.other));
@@ -587,6 +610,24 @@ _cupsRasterExecPS(
   */
 
   return (0);
+}
+
+
+/*
+ * 'cleartomark_stack()' - Clear to the last mark ([) on the stack.
+ */
+
+static int				/* O - 0 on success, -1 on error */
+cleartomark_stack(_cups_ps_stack_t *st)	/* I - Stack */
+{
+  _cups_ps_obj_t	*obj;		/* Current object on stack */
+
+
+  while ((obj = pop_stack(st)) != NULL)
+    if (obj->type == CUPS_PS_START_ARRAY)
+      break;
+
+  return (obj ? 0 : -1);
 }
 
 
@@ -682,8 +723,20 @@ error_object(_cups_ps_obj_t *obj)	/* I - Object to add */
 	_cupsRasterAddError(" >>");
 	break;
 
+    case CUPS_PS_START_PROC :
+	_cupsRasterAddError(" {");
+	break;
+
+    case CUPS_PS_END_PROC :
+	_cupsRasterAddError(" }");
+	break;
+
     case CUPS_PS_COPY :
 	_cupsRasterAddError(" --copy--");
+        break;
+
+    case CUPS_PS_CLEARTOMARK :
+	_cupsRasterAddError(" --cleartomark--");
         break;
 
     case CUPS_PS_DUP :
@@ -704,6 +757,10 @@ error_object(_cups_ps_obj_t *obj)	/* I - Object to add */
 
     case CUPS_PS_SETPAGEDEVICE :
 	_cupsRasterAddError(" --setpagedevice--");
+        break;
+
+    case CUPS_PS_STOPPED :
+	_cupsRasterAddError(" --stopped--");
         break;
 
     case CUPS_PS_OTHER :
@@ -1110,11 +1167,13 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 	}
         break;
 
-    case '{' :				/* Start/end procedure */
-    case '}' :
-	obj.type           = CUPS_PS_OTHER;
-	obj.value.other[0] = *cur;
+    case '{' :				/* Start procedure */
+        obj.type = CUPS_PS_START_PROC;
+	cur ++;
+        break;
 
+    case '}' :				/* End procedure */
+        obj.type = CUPS_PS_END_PROC;
 	cur ++;
         break;
 
@@ -1212,6 +1271,8 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 	  }
 	  else if (!strcmp(obj.value.other, "null"))
 	    obj.type = CUPS_PS_NULL;
+	  else if (!strcmp(obj.value.other, "cleartomark"))
+	    obj.type = CUPS_PS_CLEARTOMARK;
 	  else if (!strcmp(obj.value.other, "copy"))
 	    obj.type = CUPS_PS_COPY;
 	  else if (!strcmp(obj.value.other, "dup"))
@@ -1224,6 +1285,8 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 	    obj.type = CUPS_PS_ROLL;
 	  else if (!strcmp(obj.value.other, "setpagedevice"))
 	    obj.type = CUPS_PS_SETPAGEDEVICE;
+	  else if (!strcmp(obj.value.other, "stopped"))
+	    obj.type = CUPS_PS_STOPPED;
 	}
 	break;
   }
@@ -1506,6 +1569,18 @@ DEBUG_object(_cups_ps_obj_t *obj)	/* I - Object to print */
 	fputs(">>", stdout);
 	break;
 
+    case CUPS_PS_START_PROC :
+	fputs("{", stdout);
+	break;
+
+    case CUPS_PS_END_PROC :
+	fputs("}", stdout);
+	break;
+
+    case CUPS_PS_CLEARTOMARK :
+	fputs("--cleartomark--", stdout);
+        break;
+
     case CUPS_PS_COPY :
 	fputs("--copy--", stdout);
         break;
@@ -1528,6 +1603,10 @@ DEBUG_object(_cups_ps_obj_t *obj)	/* I - Object to print */
 
     case CUPS_PS_SETPAGEDEVICE :
 	fputs("--setpagedevice--", stdout);
+        break;
+
+    case CUPS_PS_STOPPED :
+	fputs("--stopped--", stdout);
         break;
 
     case CUPS_PS_OTHER :
