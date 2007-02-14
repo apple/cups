@@ -4176,10 +4176,11 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   int		envc;			/* Number of environment variables */
   char		argbuf[10240],		/* Argument buffer */
 		*argv[100],		/* Argument strings */
-		*envp[MAX_ENV + 17];	/* Environment variables */
+		*envp[MAX_ENV + 18];	/* Environment variables */
   char		content_length[1024],	/* CONTENT_LENGTH environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		http_cookie[32768],	/* HTTP_COOKIE environment variable */
+		http_referer[1024],	/* HTTP_REFERER environment variable */
 		http_user_agent[1024],	/* HTTP_USER_AGENT environment variable */
 		lang[1024],		/* LANG environment variable */
 		path_info[1024],	/* PATH_INFO environment variable */
@@ -4372,6 +4373,13 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     snprintf(http_user_agent, sizeof(http_user_agent), "HTTP_USER_AGENT=%s",
              con->http.fields[HTTP_FIELD_USER_AGENT]);
     envp[envc ++] = http_user_agent;
+  }
+
+  if (con->http.fields[HTTP_FIELD_REFERER][0])
+  {
+    snprintf(http_referer, sizeof(http_referer), "HTTP_REFERER=%s",
+             con->http.fields[HTTP_FIELD_REFERER]);
+    envp[envc ++] = http_referer;
   }
 
   if (con->operation == HTTP_GET)

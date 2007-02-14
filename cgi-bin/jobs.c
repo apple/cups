@@ -181,6 +181,20 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
   ippDelete(cupsDoRequest(http, request, "/jobs"));
 
+  if (cupsLastError() <= IPP_OK_CONFLICT && getenv("HTTP_REFERER"))
+  {
+   /*
+    * Redirect successful updates back to the parent page...
+    */
+
+    char	url[1024];		/* Encoded URL */
+
+
+    strcpy(url, "5;URL=");
+    cgiFormEncode(url + 6, getenv("HTTP_REFERER"), sizeof(url) - 6);
+    cgiSetVariable("refresh_page", url);
+  }
+
   cgiStartHTML(cgiText(_("Jobs")));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
