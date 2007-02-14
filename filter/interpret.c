@@ -28,6 +28,7 @@
  *   cupsRasterInterpretPPD() - Interpret PPD commands to create a page header.
  *   _cupsRasterExecPS()      - Execute PostScript code to initialize a page
  *                              header.
+ *   cleartomark_stack()      - Clear to the last mark ([) on the stack.
  *   copy_stack()             - Copy the top N stack objects.
  *   delete_stack()           - Free memory used by a stack.
  *   error_object()           - Add an object's value to the current error
@@ -40,7 +41,7 @@
  *   roll_stack()             - Rotate stack objects.
  *   scan_ps()                - Scan a string for the next PS object.
  *   setpagedevice()          - Simulate the PostScript setpagedevice operator.
- *   DEBUG_object()           - Print an objects value.
+ *   DEBUG_object()           - Print an object value.
  *   DEBUG_stack()            - Print a stack.
  */
 
