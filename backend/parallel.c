@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c 6068 2006-10-27 17:10:34Z mike $"
+ * "$Id: parallel.c 6181 2007-01-03 18:51:27Z mike $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -189,10 +189,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   do
   {
-#ifdef __linux
+#if defined(__linux) || defined(__FreeBSD__)
    /*
-    * The Linux parallel port driver currently is broken WRT select()
-    * and bidirection I/O...
+    * The Linux and FreeBSD parallel port drivers currently are broken WRT
+    * select() and bidirection I/O...
     */
 
     device_fd = open(resource, O_WRONLY | O_EXCL);
@@ -206,7 +206,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     }
     else
       use_bc = 1;
-#endif /* __linux */
+#endif /* __linux || __FreeBSD__ */
 
     if (device_fd == -1)
     {
@@ -598,5 +598,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: parallel.c 6068 2006-10-27 17:10:34Z mike $".
+ * End of "$Id: parallel.c 6181 2007-01-03 18:51:27Z mike $".
  */

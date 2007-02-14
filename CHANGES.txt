@@ -1,5 +1,91 @@
-CHANGES.txt - 2006-11-16
+CHANGES.txt - 2007-02-06
 ------------------------
+
+CHANGES IN CUPS V1.2.8
+
+	- Documentation fixes (STR #2141, STR #2157)
+	- The HTTP upgrade redirection used by the scheduler did
+	  not work with Internet Explorer (STR #2235)
+	- Members of a class with Unicode names did not appear
+	  correctly in the web interface (STR #2154)
+	- Changing the "Save debugging information" setting in
+	  the web interface no longer affects the other server
+	  settings (STR #1993)
+	- The scheduler did not choose SSL certificates correctly
+	  on Mac OS X (STR #2225)
+	- The scheduler could get in an infinite loop when
+	  printing to a remote class (STR #2228)
+	- The jobs web page did not have separating space after
+	  the number of pages column (STR #2230)
+	- Added French localization (STR #2221)
+	- Updated Spanish localization (STR #2223)
+	- Updated Japanese localization (STR #2216)
+	- cupsBorderlessScalingFacter was limited to a range of
+	  0.9 to 1.1, but some printers need larger values (STR
+	  #2222)
+	- Landscape printing of PDF files did not always work
+	  (STR #2149)
+	- Fixed slow USB printing on Minolta printers (STR #2104,
+	  STR #2219)
+	- The ZPL label printer driver could produce stretched
+	  output (PR #6448)
+	- The IPP backend now clears the printer-state-message
+	  when there are no outstanding errors or warnings (STR
+	  #2126)
+	- The CUPS Java scripting support did not work with
+	  recent versions of Java due to the use of Sun's private
+	  Base64 class (STR #2152)
+	- The scheduler did not pass HTTP GET form variables to
+	  custom CGI programs (STR #2173)
+	- The lpoptions command now displays the reason why a PPD
+	  file cannot be found (STR #2184)
+	- The scheduler did not accept "none" as a browse
+	  protocol name (STR #2200)
+	- The scheduler still loaded the remote printer cache,
+	  even when browsing was disabled (STR #2198)
+	- The SNMP backend now shows OfficeJet printers with the
+	  "HP" manufacturer prefix (STR #2151)
+	- Web interface HTML cleanup (STR #2153)
+	- The parallel backend consumed 100% CPU on FreeBSD due
+	  to an apparently common parallel port driver bug (STR
+	  #2161)
+	- ippReadIO() incorrectly returned IPP_IDLE when the
+	  initial IPP message header could not be read (STR
+	  #2179)
+	- cupsRasterInterpretPPD() did not support custom options
+	  (STR #1960)
+	- Collated output produced by the PostScript filter could
+	  lose some options (STR #2137)
+	- job-hold-until with time values for the next day would
+	  be held for 60 days (STR #2144)
+	- Some types of Sun raster files did not print correctly
+	  (STR #2107)
+	- Raw PBM files did not print correctly (STR #2106)
+	- The SNMP backend no longer uses IPP with HP printers,
+	  as some recent firmware versions appear to not work
+	  (STR #2055)
+	- cupsMarkOptions() did not handle the
+	  multiple-document-handling option (STR #2135)
+	- lpstat did not show the local job ID of active printers
+	  (STR #2125)
+	- The backends incorrectly used STATUS:
+	  media-tray-empty-error messages for out-of-paper
+	  conditions (STR #2123, STR #2124)
+	- cupsGetPPD2() returned the wrong error when the PPD
+	  file did not exist (STR #2122)
+	- cupsDoAuthentication() did not translate the password
+	  prompt (STR #2121)
+	- httpGetLength2() did not handle error messages without
+	  content correctly (STR #2133)
+	- Added support for 32/64-bit libraries on HP-UX Itanium
+	  systems (STR #2115)
+	- Fixed a configure script problem with the 32/64-bit
+	  library support (STR #2114)
+	- The PostScript filter did not properly output document
+	  setup commands for reversed output (STR #2111)
+	- The scheduler did not parse IPv6 netmasks properly (STR
+	  #2117)
+
 
 CHANGES IN CUPS V1.2.7
 

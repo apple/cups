@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c 5926 2006-09-05 20:45:47Z mike $"
+ * "$Id: lpoptions.c 6205 2007-01-22 22:04:43Z mike $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -440,8 +440,8 @@ list_options(cups_dest_t *dest)	/* I - Destination to list */
   if ((filename = cupsGetPPD(dest->name)) == NULL)
   {
     _cupsLangPrintf(stderr,
-                    _("lpoptions: Destination %s has no PPD file!\n"),
-		    dest->name);
+                    _("lpoptions: Unable to get PPD file for %s: %s\n"),
+		    dest->name, cupsLastErrorString());
     return;
   }
 
@@ -484,5 +484,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c 5926 2006-09-05 20:45:47Z mike $".
+ * End of "$Id: lpoptions.c 6205 2007-01-22 22:04:43Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6061 2006-10-23 00:26:52Z mike $"
+ * "$Id: job.c 6234 2007-02-05 20:25:50Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -373,13 +373,11 @@ cupsdCheckJobs(void)
 
         pclass = printer;
 
-        if (!(pclass->type & CUPS_PRINTER_REMOTE))
-	{
-	  if (pclass->state != IPP_PRINTER_STOPPED)
-	    printer = cupsdFindAvailablePrinter(job->dest);
-	  else
-	    printer = NULL;
-	}
+        if (!(pclass->type & CUPS_PRINTER_REMOTE) &&
+	    pclass->state != IPP_PRINTER_STOPPED)
+          printer = cupsdFindAvailablePrinter(job->dest);
+	else
+	  printer = NULL;
       }
 
       if (!printer && !pclass)
@@ -1497,7 +1495,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     */
 
     if (job->hold_until < curtime)
-      job->hold_until += 24 * 60 * 60 * 60;
+      job->hold_until += 24 * 60 * 60;
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetJobHoldUntil: hold_until = %d",
@@ -3469,5 +3467,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 6061 2006-10-23 00:26:52Z mike $".
+ * End of "$Id: job.c 6234 2007-02-05 20:25:50Z mike $".
  */

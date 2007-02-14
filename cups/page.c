@@ -1,9 +1,9 @@
 /*
- * "$Id: page.c 5549 2006-05-19 19:39:28Z mike $"
+ * "$Id: page.c 6188 2007-01-10 16:23:06Z mike $"
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -50,9 +50,12 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
             const char *name)		/* I - Size name */
 {
   int		i;			/* Looping var */
+  ppd_size_t	*size;			/* Current page size */
   float		w, l;			/* Width and length of page */
   char		*nameptr;		/* Pointer into name */
   struct lconv	*loc;			/* Locale data */
+  ppd_coption_t	*coption;		/* Custom option for page size */
+  ppd_cparam_t	*cparam;		/* Custom option parameter */
 
 
   if (!ppd)
@@ -66,11 +69,11 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       * Find the custom page size...
       */
 
-      for (i = 0; i < ppd->num_sizes; i ++)
-	if (!strcmp("Custom", ppd->sizes[i].name))
+      for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
+	if (!strcmp("Custom", size->name))
           break;
 
-      if (i == ppd->num_sizes)
+      if (!i)
         return (NULL);
 
      /*
@@ -83,52 +86,65 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       */
 
       loc = localeconv();
-      w   = _cupsStrScand(name + 7, &nameptr, loc);
+      w   = (float)_cupsStrScand(name + 7, &nameptr, loc);
       if (!nameptr || *nameptr != 'x')
         return (NULL);
 
-      l = _cupsStrScand(nameptr + 1, &nameptr, loc);
+      l = (float)_cupsStrScand(nameptr + 1, &nameptr, loc);
       if (!nameptr)
         return (NULL);
 
       if (!strcasecmp(nameptr, "in"))
       {
-        ppd->sizes[i].width  = w * 72.0f;
-	ppd->sizes[i].length = l * 72.0f;
-	ppd->sizes[i].left   = ppd->custom_margins[0];
-	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w * 72.0f - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l * 72.0f - ppd->custom_margins[3];
+        w *= 72.0f;
+	l *= 72.0f;
       }
-      else if (!strcasecmp(nameptr, "cm"))
+      else if (!strcasecmp(nameptr, "ft"))
       {
-        ppd->sizes[i].width  = w / 2.54f * 72.0f;
-	ppd->sizes[i].length = l / 2.54f * 72.0f;
-	ppd->sizes[i].left   = ppd->custom_margins[0];
-	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w / 2.54f * 72.0f - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l / 2.54f * 72.0f - ppd->custom_margins[3];
+        w *= 12.0f * 72.0f;
+	l *= 12.0f * 72.0f;
       }
       else if (!strcasecmp(nameptr, "mm"))
       {
-        ppd->sizes[i].width  = w / 25.4f * 72.0f;
-	ppd->sizes[i].length = l / 25.4f * 72.0f;
-	ppd->sizes[i].left   = ppd->custom_margins[0];
-	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w / 25.4f * 72.0f - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l / 25.4f * 72.0f - ppd->custom_margins[3];
+        w *= 72.0f / 25.4f;
+        l *= 72.0f / 25.4f;
       }
-      else
+      else if (!strcasecmp(nameptr, "cm"))
       {
-        ppd->sizes[i].width  = w;
-	ppd->sizes[i].length = l;
-	ppd->sizes[i].left   = ppd->custom_margins[0];
-	ppd->sizes[i].bottom = ppd->custom_margins[1];
-	ppd->sizes[i].right  = w - ppd->custom_margins[2];
-	ppd->sizes[i].top    = l - ppd->custom_margins[3];
+        w *= 72.0f / 2.54f;
+        l *= 72.0f / 2.54f;
+      }
+      else if (!strcasecmp(nameptr, "m"))
+      {
+        w *= 72.0f / 0.0254f;
+        l *= 72.0f / 0.0254f;
       }
 
-      return (ppd->sizes + i);
+      size->width  = w;
+      size->length = l;
+      size->left   = ppd->custom_margins[0];
+      size->bottom = ppd->custom_margins[1];
+      size->right  = w - ppd->custom_margins[2];
+      size->top    = l - ppd->custom_margins[3];
+
+     /*
+      * Update the custom option records for the page size, too...
+      */
+
+      if ((coption = ppdFindCustomOption(ppd, "PageSize")) != NULL)
+      {
+        if ((cparam = ppdFindCustomParam(coption, "Width")) != NULL)
+	  cparam->current.custom_points = w;
+
+        if ((cparam = ppdFindCustomParam(coption, "Height")) != NULL)
+	  cparam->current.custom_points = l;
+      }
+
+     /*
+      * Return the page size...
+      */
+
+      return (size);
     }
     else
     {
@@ -136,9 +152,9 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       * Lookup by name...
       */
 
-      for (i = 0; i < ppd->num_sizes; i ++)
-	if (!strcasecmp(name, ppd->sizes[i].name))
-          return (ppd->sizes + i);
+      for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
+	if (!strcmp(name, size->name))
+          return (size);
     }
   }
   else
@@ -147,9 +163,9 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
     * Find default...
     */
 
-    for (i = 0; i < ppd->num_sizes; i ++)
-      if (ppd->sizes[i].marked)
-        return (ppd->sizes + i);
+    for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
+      if (size->marked)
+        return (size);
   }
 
   return (NULL);
@@ -193,5 +209,5 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: page.c 5549 2006-05-19 19:39:28Z mike $".
+ * End of "$Id: page.c 6188 2007-01-10 16:23:06Z mike $".
  */

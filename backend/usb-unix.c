@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c 6111 2006-11-15 20:28:39Z mike $"
+ * "$Id: usb-unix.c 6234 2007-02-05 20:25:50Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -84,7 +84,9 @@ print_device(const char *uri,		/* I - Device URI */
     * device ID over and over and over when they get a read request...
     */
 
-    use_bc = strcasecmp(hostname, "Canon") && !strstr(hostname, "Minolta");
+    use_bc = strcasecmp(hostname, "Canon") &&
+             strcasecmp(hostname, "Konica Minolta") &&
+             strcasecmp(hostname, "Minolta");
 
     if ((device_fd = open_device(uri, &use_bc)) == -1)
     {
@@ -524,5 +526,5 @@ open_device(const char *uri,		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c 6111 2006-11-15 20:28:39Z mike $".
+ * End of "$Id: usb-unix.c 6234 2007-02-05 20:25:50Z mike $".
  */

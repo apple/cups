@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6052 2006-10-20 20:35:41Z mike $"
+ * "$Id: ipp.c 6145 2006-12-06 20:10:16Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -5372,7 +5372,10 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     return;
   }
   else
+  {
+    dtype &= CUPS_PRINTER_CLASS;
     dmask = CUPS_PRINTER_CLASS;
+  }
 
  /*
   * Check policy...
@@ -9158,5 +9161,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6052 2006-10-20 20:35:41Z mike $".
+ * End of "$Id: ipp.c 6145 2006-12-06 20:10:16Z mike $".
  */

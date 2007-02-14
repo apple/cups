@@ -1,9 +1,9 @@
 /*
- * "$Id: auth.c 5961 2006-09-16 19:08:36Z mike $"
+ * "$Id: auth.c 6191 2007-01-10 16:48:37Z mike $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -75,6 +75,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
 		encode[512];		/* Encoded username:password */
+  _cups_globals_t *cg;			/* Global data */
 
 
   DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")\n",
@@ -114,8 +115,15 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     * Nope - get a new password from the user...
     */
 
-    snprintf(prompt, sizeof(prompt), _("Password for %s on %s? "), cupsUser(),
-             http->hostname[0] == '/' ? "localhost" : http->hostname);
+    cg = _cupsGlobals();
+
+    if (!cg->lang_default)
+      cg->lang_default = cupsLangDefault();
+
+    snprintf(prompt, sizeof(prompt),
+             _cupsLangString(cg->lang_default, _("Password for %s on %s? ")),
+	     cupsUser(),
+	     http->hostname[0] == '/' ? "localhost" : http->hostname);
 
     http->digest_tries  = strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE],
                                       "Digest", 5) != 0;
@@ -144,7 +152,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     */
 
     httpEncode64_2(encode, sizeof(encode), http->userpass,
-                   strlen(http->userpass));
+                   (int)strlen(http->userpass));
     snprintf(http->authstring, sizeof(http->authstring), "Basic %s", encode);
   }
   else
@@ -251,5 +259,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c 5961 2006-09-16 19:08:36Z mike $".
+ * End of "$Id: auth.c 6191 2007-01-10 16:48:37Z mike $".
  */

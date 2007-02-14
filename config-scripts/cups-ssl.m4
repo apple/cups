@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-ssl.m4 5630 2006-06-05 18:42:53Z mike $"
+dnl "$Id: cups-ssl.m4 6238 2007-02-06 16:04:25Z mike $"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -42,15 +42,33 @@ if test x$enable_ssl != xno; then
     dnl Look for CDSA...
     if test "x${SSLLIBS}" = "x" -a "x${enable_cdsassl}" != "xno"; then
 	if test $uname = Darwin; then
-	    AC_CHECK_HEADER(Security/SecureTransport.h,
-		[SSLLIBS="-framework CoreFoundation -framework Security"
-		 # MacOS X doesn't (yet) come with pre-installed encryption
-		 # certificates for CUPS, so don't enable encryption on
-		 # /admin just yet...
-		 #ENCRYPTION_REQUIRED="  Encryption Required"
-		 AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
-		 AC_DEFINE(HAVE_SSL)
-		 AC_DEFINE(HAVE_CDSASSL)])
+	    AC_CHECK_HEADER(Security/SecureTransport.h, [
+		SSLLIBS="-framework CoreFoundation -framework Security"
+		# MacOS X doesn't (yet) come with pre-installed encryption
+		# certificates for CUPS, so don't enable encryption on
+		# /admin just yet...
+		#ENCRYPTION_REQUIRED="  Encryption Required"
+		AC_DEFINE(HAVE_SSL)
+		AC_DEFINE(HAVE_CDSASSL)
+
+		dnl Check for the various security headers...
+		AC_CHECK_HEADER(Security/SecPolicy.h,
+		    AC_DEFINE(HAVE_SECPOLICY_H))
+		AC_CHECK_HEADER(Security/SecPolicyPriv.h,
+		    AC_DEFINE(HAVE_SECPOLICYPRIV_H))
+		AC_CHECK_HEADER(Security/SecBasePriv.h,
+		    AC_DEFINE(HAVE_SECBASEPRIV_H))
+		AC_CHECK_HEADER(Security/SecIdentitySearchPriv.h,
+		    AC_DEFINE(HAVE_SECIDENTITYSEARCHPRIV_H))
+
+		dnl Check for SecIdentitySearchCreateWithPolicy...
+		AC_MSG_CHECKING(for SecIdentitySearchCreateWithPolicy)
+		if test $uversion -ge 80; then
+		    AC_DEFINE(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
+		    AC_MSG_RESULT(yes)
+		else
+		    AC_MSG_RESULT(no)
+		fi])
 	fi
     fi
 
@@ -115,5 +133,5 @@ AC_SUBST(EXPORT_SSLLIBS)
 
 
 dnl
-dnl End of "$Id: cups-ssl.m4 5630 2006-06-05 18:42:53Z mike $".
+dnl End of "$Id: cups-ssl.m4 6238 2007-02-06 16:04:25Z mike $".
 dnl

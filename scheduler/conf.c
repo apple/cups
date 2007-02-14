@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 5905 2006-08-29 20:48:59Z mike $"
+ * "$Id: conf.c 6205 2007-01-22 22:04:43Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1316,7 +1316,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
   * Get the address...
   */
 
-  ip[0]   = ip[1]   = ip[2]   = ip[2]   = 0x00000000;
+  ip[0]   = ip[1]   = ip[2]   = ip[3]   = 0x00000000;
   mask[0] = mask[1] = mask[2] = mask[3] = 0xffffffff;
 
   if ((maskval = strchr(value, '/')) != NULL)
@@ -1501,7 +1501,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "get_addr_and_mask(value=\"%s\", "
-                  "ip=[%08x:%08x:%08x:%08x], mask=[%08x:%08x:%08x:%08x]",
+                  "ip=[%08x:%08x:%08x:%08x], mask=[%08x:%08x:%08x:%08x])",
              value, ip[0], ip[1], ip[2], ip[3], mask[0], mask[1], mask[2],
 	     mask[3]);
 
@@ -1990,7 +1990,7 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
       protocols |= BROWSE_DNSSD;
     else if (!strcasecmp(valstart, "all"))
       protocols |= BROWSE_ALL;
-    else
+    else if (strcasecmp(valstart, "none"))
       return (-1);
 
     for (valstart = valend; *valstart; valstart ++)
@@ -3289,5 +3289,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 5905 2006-08-29 20:48:59Z mike $".
+ * End of "$Id: conf.c 6205 2007-01-22 22:04:43Z mike $".
  */

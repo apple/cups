@@ -1,13 +1,13 @@
 package com.easysw.cups;
 
 /**
- * @version 1.00 06-NOV-2002
+ * @version 1.1 23-JAN-2007
  * @author  Easy Software Products
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2002 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -19,11 +19,11 @@ package com.easysw.cups;
  *       Attn: CUPS Licensing Information
  *       Easy Software Products
  *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636-3111 USA
+ *       Hollywood, Maryland 20636 USA
  *
- *       Voice: (301) 373-9603
+ *       Voice: (301) 373-9600
  *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *         WWW: http://www.cups.org/
  */
 
 /**
@@ -31,7 +31,7 @@ package com.easysw.cups;
  * server, and processing responses.
  *
  * @author	TDB
- * @version	1.0
+ * @version	1.1
  * @since	JDK1.3
  */
 
@@ -483,8 +483,7 @@ public class IPPHttp
       if (auth_type.compareTo("basic") == 0)
       {
         s1 = user + ":" + passwd;
-        IPPBase64Encoder encoder = new IPPBase64Encoder();
-        String auth_string = encoder.encode(s1.getBytes());
+        String auth_string = Base64Coder.encodeString(s1);
         s1 = "Authorization: Basic " + auth_string + "\r\n";
         os.write(s1.getBytes(), 0, s1.length());
       }

@@ -1,9 +1,9 @@
 /*
- * "$Id: dirsvc.c 6090 2006-11-14 16:35:27Z mike $"
+ * "$Id: dirsvc.c 6205 2007-01-22 22:04:43Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -163,7 +163,7 @@ cupsdLoadRemoteCache(void)
   * Don't load the cache if the CUPS remote protocol is disabled...
   */
 
-  if (!(BrowseRemoteProtocols & BROWSE_CUPS))
+  if (!Browsing || !(BrowseRemoteProtocols & BROWSE_CUPS))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "cupsdLoadRemoteCache: Not loading remote cache.");
@@ -3192,5 +3192,5 @@ slp_url_callback(
 
 
 /*
- * End of "$Id: dirsvc.c 6090 2006-11-14 16:35:27Z mike $".
+ * End of "$Id: dirsvc.c 6205 2007-01-22 22:04:43Z mike $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: rastertolabel.c 5703 2006-06-29 18:12:04Z mike $"
+ * "$Id: rastertolabel.c 6236 2007-02-05 21:04:04Z mike $"
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2001-2006 by Easy Software Products.
+ *   Copyright 2001-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -77,7 +77,7 @@
  */
 
 unsigned char	*Buffer;		/* Output buffer */
-char		*CompBuffer;		/* Compression buffer */
+unsigned char	*CompBuffer;		/* Compression buffer */
 unsigned char	*LastBuffer;		/* Last buffer */
 int		LastSet;		/* Number of repeat characters */
 int		ModelNumber,		/* cupsModelNumber attribute */
@@ -750,7 +750,7 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
         * Run-length compress the graphics...
 	*/
 
-	for (compptr = CompBuffer, repeat_char = CompBuffer[0], repeat_count = 1;
+	for (compptr = CompBuffer + 1, repeat_char = CompBuffer[0], repeat_count = 1;
 	     *compptr;
 	     compptr ++)
 	  if (*compptr == repeat_char)
@@ -769,12 +769,18 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
 	  */
 
 	  if (repeat_count & 1)
+	  {
+	    repeat_count --;
 	    putchar('0');
+	  }
 
-	  putchar(',');
+          if (repeat_count > 0)
+	    putchar(',');
 	}
 	else
 	  ZPLCompress(repeat_char, repeat_count);
+
+	fflush(stdout);
 
        /*
         * Save this line for the next round...
@@ -878,7 +884,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * and return.
     */
 
-    fputs("ERROR: rastertodymo job-id user title copies options [file]\n", stderr);
+    fputs("ERROR: rastertolabel job-id user title copies options [file]\n", stderr);
     return (1);
   }
 
@@ -1008,5 +1014,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertolabel.c 5703 2006-06-29 18:12:04Z mike $".
+ * End of "$Id: rastertolabel.c 6236 2007-02-05 21:04:04Z mike $".
  */

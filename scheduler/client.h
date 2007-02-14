@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h 5932 2006-09-11 14:21:23Z mike $"
+ * "$Id: client.h 6205 2007-01-22 22:04:43Z mike $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -41,7 +41,8 @@ struct cupsd_client_s
 					/* Localized URL/URI for GET/PUT */
 			*filename,	/* Filename of output file */
 			*command,	/* Command to run */
-			*options;	/* Options for command */
+			*options,	/* Options for command */
+			*query_string;	/* QUERY_STRING environment variable */
   int			file;		/* Input/output file */
   int			file_ready;	/* Input ready on file/pipe? */
   int			pipe_pid;	/* Pipe process ID (or 0 if not a pipe) */
@@ -122,5 +123,5 @@ extern int	cupsdWriteClient(cupsd_client_t *con);
 
 
 /*
- * End of "$Id: client.h 5932 2006-09-11 14:21:23Z mike $".
+ * End of "$Id: client.h 6205 2007-01-22 22:04:43Z mike $".
  */

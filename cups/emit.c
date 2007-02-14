@@ -1,9 +1,9 @@
 /*
- * "$Id: emit.c 5934 2006-09-11 14:54:40Z mike $"
+ * "$Id: emit.c 6191 2007-01-10 16:48:37Z mike $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -291,7 +291,11 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
 
     while (buflength > 0)
     {
+#ifdef WIN32
+      if ((bytes = (ssize_t)write(fd, bufptr, (unsigned)buflength)) < 0)
+#else
       if ((bytes = write(fd, bufptr, buflength)) < 0)
+#endif /* WIN32 */
       {
         if (errno == EAGAIN || errno == EINTR)
 	  continue;
@@ -725,7 +729,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	else
 	  pos = 4;
 
-	values[pos] = orientation;
+	values[pos] = (float)orientation;
 
         for (pos = 0; pos < 5; pos ++)
 	{
@@ -811,7 +815,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 
       if (choices[i]->code && choices[i]->code[0])
       {
-        j = strlen(choices[i]->code);
+        j = (int)strlen(choices[i]->code);
 	memcpy(bufptr, choices[i]->code, j);
 	bufptr += j;
 
@@ -942,5 +946,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c 5934 2006-09-11 14:54:40Z mike $".
+ * End of "$Id: emit.c 6191 2007-01-10 16:48:37Z mike $".
  */

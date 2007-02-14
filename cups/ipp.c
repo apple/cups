@@ -1,10 +1,10 @@
 /*
- * "$Id: ipp.c 5624 2006-06-02 15:15:23Z mike $"
+ * "$Id: ipp.c 6234 2007-02-05 20:25:50Z mike $"
  *
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -1054,7 +1054,7 @@ ippReadIO(void       *src,		/* I - Data source */
           if ((n = (*cb)(src, buffer, 8)) < 8)
 	  {
 	    DEBUG_printf(("ippReadIO: Unable to read header (%d bytes read)!\n", n));
-	    return (n == 0 ? IPP_IDLE : IPP_ERROR);
+	    return (IPP_ERROR);
 	  }
 
 	 /*
@@ -1098,8 +1098,11 @@ ippReadIO(void       *src,		/* I - Data source */
 	  break;
 
     case IPP_ATTRIBUTE :
-        while ((*cb)(src, buffer, 1) > 0)
+        for (;;)
 	{
+	  if ((*cb)(src, buffer, 1) < 1)
+	    return (IPP_ERROR);
+
 	  DEBUG_printf(("ippReadIO: ipp->current=%p, ipp->prev=%p\n",
 	                ipp->current, ipp->prev));
 
@@ -2156,10 +2159,10 @@ ippWriteIO(void       *dst,		/* I - Destination */
                   n = 4;
 
 		  if (value->string.charset != NULL)
-                    n += strlen(value->string.charset);
+                    n += (int)strlen(value->string.charset);
 
 		  if (value->string.text != NULL)
-                    n += strlen(value->string.text);
+                    n += (int)strlen(value->string.text);
 
                   if (n > (sizeof(buffer) - 2))
 		    return (IPP_ERROR);
@@ -2562,7 +2565,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
     DEBUG_printf(("attr->name = %s, attr->num_values = %d, bytes = %d\n",
                   attr->name, attr->num_values, bytes));
 
-    bytes += strlen(attr->name);	/* Name */
+    bytes += (int)strlen(attr->name);	/* Name */
     bytes += attr->num_values;		/* Value tag for each value */
     bytes += 2 * attr->num_values;	/* Name lengths */
     bytes += 2 * attr->num_values;	/* Value lengths */
@@ -2594,7 +2597,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	       i < attr->num_values;
 	       i ++, value ++)
 	    if (value->string.text != NULL)
-	      bytes += strlen(value->string.text);
+	      bytes += (int)strlen(value->string.text);
 	  break;
 
       case IPP_TAG_DATE :
@@ -2618,10 +2621,10 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	       i ++, value ++)
 	  {
 	    if (value->string.charset != NULL)
-	      bytes += strlen(value->string.charset);
+	      bytes += (int)strlen(value->string.charset);
 
 	    if (value->string.text != NULL)
-	      bytes += strlen(value->string.text);
+	      bytes += (int)strlen(value->string.text);
 	  }
 	  break;
 
@@ -2629,7 +2632,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
 	       i ++, value ++)
-            bytes += ipp_length(value->collection, 1);
+            bytes += (int)ipp_length(value->collection, 1);
 	  break;
 
       default :
@@ -2678,7 +2681,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
   * Loop until all bytes are read...
   */
 
-  for (tbytes = 0, bytes = 0; tbytes < length; tbytes += bytes, buffer += bytes)
+  for (tbytes = 0, bytes = 0; tbytes < (int)length; tbytes += bytes, buffer += bytes)
   {
     DEBUG_printf(("tbytes = %d, http->state = %d\n", tbytes, http->state));
 
@@ -2691,8 +2694,8 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
       * Do "fast read" from HTTP buffer directly...
       */
 
-      if (http->used > (length - tbytes))
-        bytes = length - tbytes;
+      if (http->used > (int)(length - tbytes))
+        bytes = (int)(length - tbytes);
       else
         bytes = http->used;
 
@@ -2783,7 +2786,11 @@ ipp_read_file(int         *fd,		/* I - File descriptor */
               ipp_uchar_t *buffer,	/* O - Read buffer */
 	      size_t      length)	/* I - Number of bytes to read */
 {
+#ifdef WIN32
+  return ((ssize_t)read(*fd, buffer, (unsigned)length));
+#else
   return (read(*fd, buffer, length));
+#endif /* WIN32 */
 }
 
 
@@ -2796,7 +2803,11 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
                ipp_uchar_t *buffer,	/* I - Data to write */
                size_t      length)	/* I - Number of bytes to write */
 {
+#ifdef WIN32
+  return ((ssize_t)write(*fd, buffer, (unsigned)length));
+#else
   return (write(*fd, buffer, length));
+#endif /* WIN32 */
 }
 
 
@@ -2824,5 +2835,5 @@ _ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
 
 
 /*
- * End of "$Id: ipp.c 5624 2006-06-02 15:15:23Z mike $".
+ * End of "$Id: ipp.c 6234 2007-02-05 20:25:50Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c 5838 2006-08-17 14:41:42Z mike $"
+ * "$Id: ipp-var.c 6244 2007-02-06 21:08:59Z mike $"
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -914,7 +914,7 @@ cgiSetIPPObjectVars(
 
                 snprintf(valptr, sizeof(value) - (valptr - value),
 		         "<A HREF=\"%s\">%s</A>", url,
-			 strrchr(url, '/') + 1);
+			 strrchr(attr->values[i].string.text, '/') + 1);
 	      }
 	      else
 		cgiRewriteURL(attr->values[i].string.text, valptr,
@@ -1280,5 +1280,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 5838 2006-08-17 14:41:42Z mike $".
+ * End of "$Id: ipp-var.c 6244 2007-02-06 21:08:59Z mike $".
  */

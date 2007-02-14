@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-opsys.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id: cups-opsys.m4 6145 2006-12-06 20:10:16Z mike $"
 dnl
 dnl   Operating system stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -22,9 +22,10 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
-dnl Get the operating system and version number...
+dnl Get the operating system, version number, and architecture...
 uname=`uname`
 uversion=`uname -r | sed -e '1,$s/^[[^0-9]]*\([[0-9]]*\)\.\([[0-9]]*\).*/\1\2/'`
+uarch=`uname -m`
 
 case "$uname" in
 	GNU* | GNU/*)
@@ -39,5 +40,5 @@ case "$uname" in
 esac
 
 dnl
-dnl "$Id: cups-opsys.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id: cups-opsys.m4 6145 2006-12-06 20:10:16Z mike $"
 dnl

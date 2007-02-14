@@ -1,10 +1,10 @@
 /*
- * "$Id: dest.c 6044 2006-10-17 20:32:59Z mike $"
+ * "$Id: dest.c 6191 2007-01-10 16:48:37Z mike $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -500,7 +500,9 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
   cups_option_t	*option;		/* Current option */
   _ipp_option_t	*match;			/* Matching attribute for option */
   FILE		*fp;			/* File pointer */
+#ifndef WIN32
   const char	*home;			/* HOME environment variable */
+#endif /* WIN32 */
   char		filename[1024];		/* lpoptions file */
   int		num_temps;		/* Number of temporary destinations */
   cups_dest_t	*temps,			/* Temporary destinations */
@@ -1083,5 +1085,5 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: dest.c 6044 2006-10-17 20:32:59Z mike $".
+ * End of "$Id: dest.c 6191 2007-01-10 16:48:37Z mike $".
  */

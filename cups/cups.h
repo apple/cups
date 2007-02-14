@@ -1,9 +1,9 @@
 /*
- * "$Id: cups.h 6092 2006-11-14 16:36:36Z mike $"
+ * "$Id: cups.h 6188 2007-01-10 16:23:06Z mike $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -30,6 +30,13 @@
 /*
  * Include necessary headers...
  */
+
+#  include <sys/types.h>
+#  if defined(WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
+#    define __CUPS_SSIZE_T_DEFINED
+/* Windows does not support the ssize_t type, so map it to off_t... */
+typedef off_t ssize_t;			/* @private@ */
+#  endif /* WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
 #  include "ipp.h"
 #  include "ppd.h"
@@ -61,10 +68,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION		1.0207
+#  define CUPS_VERSION		1.0208
 #  define CUPS_VERSION_MAJOR	1
 #  define CUPS_VERSION_MINOR	2
-#  define CUPS_VERSION_PATCH	7
+#  define CUPS_VERSION_PATCH	8
 #  define CUPS_DATE_ANY		-1
 
 
@@ -244,5 +251,5 @@ extern cups_file_t	*cupsTempFile2(char *filename, int len);
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 6092 2006-11-14 16:36:36Z mike $".
+ * End of "$Id: cups.h 6188 2007-01-10 16:23:06Z mike $".
  */

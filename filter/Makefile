@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5649 2006-06-14 21:03:17Z mike $"
+# "$Id: Makefile 6158 2006-12-17 01:44:21Z mike $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -25,6 +25,7 @@
 #
 
 include ../Makedefs
+
 
 FILTERS	=	gziptoany hpgltops texttops pstops $(IMGFILTERS) \
 		rastertolabel rastertoepson rastertohp
@@ -355,9 +356,10 @@ rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 # testraster
 #
 
-testraster:	testraster.o raster.o
+testraster:	testraster.o ../cups/libcups.a libcupsimage.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testraster.o raster.o
+	$(CC) $(LDFLAGS) -o $@ testraster.o libcupsimage.a ../cups/libcups.a \
+		$(IMGLIBS) $(DSOLIBS) $(LIBS)
 
 
 #
@@ -387,5 +389,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5649 2006-06-14 21:03:17Z mike $".
+# End of "$Id: Makefile 6158 2006-12-17 01:44:21Z mike $".
 #

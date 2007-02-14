@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6061 2006-10-23 00:26:52Z mike $"
+ * "$Id: ipp.c 6214 2007-01-23 17:01:48Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -1380,7 +1380,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
     strlcat(state, reason, sizeof(state));
 
     prefix  = ",";
-    message = NULL;
+    message = "";
 
     if (!strncmp(reason, "media-needed", 12))
       message = "Media tray needs to be filled.";
@@ -1666,5 +1666,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 6061 2006-10-23 00:26:52Z mike $".
+ * End of "$Id: ipp.c 6214 2007-01-23 17:01:48Z mike $".
  */

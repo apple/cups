@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5902 2006-08-29 15:51:19Z mike $"
+# "$Id: Makefile 6128 2006-12-05 16:07:23Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -237,7 +237,7 @@ check:	all
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 
-aix bsd deb depot inst pkg rpm setld slackware swinstall tardist:
+aix bsd deb depot inst pkg setld slackware swinstall tardist:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
 
 epm:
@@ -245,6 +245,9 @@ epm:
 
 osx:
 	epm $(EPMFLAGS) -f osx -s packaging/installer.tif cups packaging/cups.list
+
+rpm:
+	epm $(EPMFLAGS) -f rpm -s packaging/installer.gif cups packaging/cups.list
 
 .PHONEY:	dist
 dist:	all
@@ -260,5 +263,5 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 5902 2006-08-29 15:51:19Z mike $".
+# End of "$Id: Makefile 6128 2006-12-05 16:07:23Z mike $".
 #

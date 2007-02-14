@@ -1,9 +1,9 @@
 /*
- * "$Id: string.c 5368 2006-04-02 19:23:50Z mike $"
+ * "$Id: string.c 6188 2007-01-10 16:23:06Z mike $"
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -243,7 +243,7 @@ _cupsStrFormatd(char         *buf,	/* I - String */
   if (loc && loc->decimal_point)
   {
     dec    = loc->decimal_point;
-    declen = strlen(dec);
+    declen = (int)strlen(dec);
   }
   else
   {
@@ -425,6 +425,47 @@ _cupsStrScand(const char   *buf,	/* I - Pointer to number */
         *bufptr = NULL;
 
       return (0.0);
+    }
+
+    while (isdigit(*buf & 255))
+      if (tempptr < (temp + sizeof(temp) - 1))
+	*tempptr++ = *buf++;
+      else
+      {
+	if (bufptr)
+	  *bufptr = NULL;
+
+	return (0.0);
+      }
+  }
+
+  if (*buf == 'e' || *buf == 'E')
+  {
+   /*
+    * Read exponent...
+    */
+
+    if (tempptr < (temp + sizeof(temp) - 1))
+      *tempptr++ = *buf++;
+    else
+    {
+      if (bufptr)
+	*bufptr = NULL;
+
+      return (0.0);
+    }
+
+    if (*buf == '+' || *buf == '-')
+    {
+      if (tempptr < (temp + sizeof(temp) - 1))
+	*tempptr++ = *buf++;
+      else
+      {
+	if (bufptr)
+	  *bufptr = NULL;
+
+	return (0.0);
+      }
     }
 
     while (isdigit(*buf & 255))
@@ -702,5 +743,5 @@ compare_sp_items(_cups_sp_item_t *a,	/* I - First item */
 
 
 /*
- * End of "$Id: string.c 5368 2006-04-02 19:23:50Z mike $".
+ * End of "$Id: string.c 6188 2007-01-10 16:23:06Z mike $".
  */

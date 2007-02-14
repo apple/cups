@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sun.c 5509 2006-05-11 11:41:36Z mike $"
+ * "$Id: image-sun.c 6149 2006-12-06 20:25:42Z mike $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -171,7 +171,7 @@ _cupsImageReadSunRaster(
 
   for (y = 0; y < img->ysize; y ++)
   {
-    if (ras_depth != 8 || ras_maplength > 0)
+    if ((ras_depth != 8 && ras_depth != 24) || ras_maplength > 0)
       p = scanline;
     else
       p = in;
@@ -221,12 +221,12 @@ _cupsImageReadSunRaster(
           *p = 0;
 
 	if (bit > 1)
+          bit >>= 1;
+	else
 	{
           bit = 128;
           scanptr ++;
 	}
-	else
-          bit >>= 1;
       }
     }
     else if (ras_depth == 1)
@@ -253,12 +253,12 @@ _cupsImageReadSunRaster(
 	}
 
 	if (bit > 1)
+          bit >>= 1;
+	else
 	{
           bit = 128;
           scanptr ++;
 	}
-	else
-          bit >>= 1;
       }
     }
     else if (ras_depth == 8 && ras_maplength > 0)
@@ -389,5 +389,5 @@ read_unsigned(FILE *fp)			/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c 5509 2006-05-11 11:41:36Z mike $".
+ * End of "$Id: image-sun.c 6149 2006-12-06 20:25:42Z mike $".
  */

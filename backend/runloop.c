@@ -1,5 +1,5 @@
 /*
- * "$Id: runloop.c 5776 2006-07-26 20:55:13Z mike $"
+ * "$Id: runloop.c 6145 2006-12-06 20:10:16Z mike $"
  *
  *   Common run loop API for the Common UNIX Printing System (CUPS).
  *
@@ -206,7 +206,7 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 	  if (!paperout)
 	  {
 	    fputs("ERROR: Out of paper!\n", stderr);
-	    fputs("STATUS: +media-tray-empty-error\n", stderr);
+	    fputs("STATE: +media-empty-error\n", stderr);
 	    paperout = 1;
 	  }
         }
@@ -229,7 +229,7 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
       {
         if (paperout)
 	{
-	  fputs("STATUS: -media-tray-empty-error\n", stderr);
+	  fputs("STATE: -media-empty-error\n", stderr);
 	  paperout = 0;
 	}
 
@@ -258,5 +258,5 @@ backendRunLoop(int print_fd,		/* I - Print file descriptor */
 
 
 /*
- * End of "$Id: runloop.c 5776 2006-07-26 20:55:13Z mike $".
+ * End of "$Id: runloop.c 6145 2006-12-06 20:10:16Z mike $".
  */

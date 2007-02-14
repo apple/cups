@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 5716 2006-07-11 17:56:57Z mike $"
+ * "$Id: util.c 6145 2006-12-06 20:10:16Z mike $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1649,7 +1649,8 @@ cups_get_printer_uri(
     ippDelete(response);
   }
 
-  _cupsSetError(IPP_INTERNAL_ERROR, "No printer-uri found!");
+  if (cupsLastError() != IPP_NOT_FOUND)
+    _cupsSetError(IPP_INTERNAL_ERROR, "No printer-uri found!");
 
   *host     = '\0';
   *resource = '\0';
@@ -1659,5 +1660,5 @@ cups_get_printer_uri(
 
 
 /*
- * End of "$Id: util.c 5716 2006-07-11 17:56:57Z mike $".
+ * End of "$Id: util.c 6145 2006-12-06 20:10:16Z mike $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: http-addrlist.c 5679 2006-06-20 14:45:15Z mike $"
+ * "$Id: http-addrlist.c 6188 2007-01-10 16:23:06Z mike $"
  *
  *   HTTP address list routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -62,7 +62,7 @@ httpAddrConnect(
     * Create the socket...
     */
 
-    if ((*sock = socket(addrlist->addr.addr.sa_family, SOCK_STREAM, 0)) < 0)
+    if ((*sock = (int)socket(addrlist->addr.addr.sa_family, SOCK_STREAM, 0)) < 0)
     {
      /*
       * Don't abort yet, as this could just be an issue with the local
@@ -248,7 +248,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	*/
 
 	strlcpy(ipv6, hostname + 4, sizeof(ipv6));
-	if ((ipv6len = strlen(ipv6) - 1) >= 0 && ipv6[ipv6len] == ']')
+	if ((ipv6len = (int)strlen(ipv6) - 1) >= 0 && ipv6[ipv6len] == ']')
 	{
           ipv6[ipv6len] = '\0';
 	  hostname      = ipv6;
@@ -268,7 +268,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	*/
 
 	strlcpy(ipv6, hostname + 1, sizeof(ipv6));
-	if ((ipv6len = strlen(ipv6) - 1) >= 0 && ipv6[ipv6len] == ']')
+	if ((ipv6len = (int)strlen(ipv6) - 1) >= 0 && ipv6[ipv6len] == ']')
 	{
           ipv6[ipv6len] = '\0';
 	  hostname      = ipv6;
@@ -605,5 +605,5 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
 
 /*
- * End of "$Id: http-addrlist.c 5679 2006-06-20 14:45:15Z mike $".
+ * End of "$Id: http-addrlist.c 6188 2007-01-10 16:23:06Z mike $".
  */

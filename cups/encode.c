@@ -1,9 +1,9 @@
 /*
- * "$Id: encode.c 5753 2006-07-18 19:53:24Z mike $"
+ * "$Id: encode.c 6266 2007-02-11 21:20:48Z mike $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -82,7 +82,7 @@ static const _ipp_option_t ipp_options[] =
   { "natural-scaling-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "notify-charset",		IPP_TAG_CHARSET,	IPP_TAG_SUBSCRIPTION },
   { "notify-events",		IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
-  { "notify-lease-time",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
+  { "notify-lease-duration",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
   { "notify-natural-language",	IPP_TAG_LANGUAGE,	IPP_TAG_SUBSCRIPTION },
   { "notify-pull-method",	IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
   { "notify-recipient",		IPP_TAG_URI,		IPP_TAG_SUBSCRIPTION },
@@ -265,7 +265,7 @@ cupsEncodeOptions2(
       int	namelen;		/* Length of name */
 
 
-      namelen = strlen(option->name);
+      namelen = (int)strlen(option->name);
 
       if (namelen < 9 || strcmp(option->name + namelen - 8, "-default"))
       {
@@ -500,7 +500,7 @@ cupsEncodeOptions2(
 	    * octet-string
 	    */
 
-            attr->values[j].unknown.length = strlen(val);
+            attr->values[j].unknown.length = (int)strlen(val);
 	    attr->values[j].unknown.data   = _cupsStrAlloc(val);
 
             DEBUG_printf(("cupsEncodeOptions2: Added octet-string value \"%s\"...\n",
@@ -567,5 +567,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 5753 2006-07-18 19:53:24Z mike $".
+ * End of "$Id: encode.c 6266 2007-02-11 21:20:48Z mike $".
  */

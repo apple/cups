@@ -1,9 +1,9 @@
 /*
- * "$Id: http.c 6111 2006-11-15 20:28:39Z mike $"
+ * "$Id: http.c 6191 2007-01-10 16:48:37Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -694,8 +694,18 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
     * after the transfer is complete...
     */
 
-    if (http->fields[HTTP_FIELD_CONTENT_LENGTH][0] == '\0')
-      http->data_remaining = 2147483647;
+    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
+    {
+     /*
+      * Default content length is 0 for errors and 2^31-1 for other
+      * successful requests...
+      */
+
+      if (http->status >= HTTP_MULTIPLE_CHOICES)
+        http->data_remaining = 0;
+      else
+        http->data_remaining = 2147483647;
+    }
     else
       http->data_remaining = strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
                                      NULL, 10);
@@ -920,7 +930,11 @@ httpGets(char   *line,			/* I - Line to read into */
       if (!http->blocking && !http_wait(http, 10000, 1))
       {
         DEBUG_puts("httpGets: Timed out!");
+#ifdef WIN32
+        http->error = WSAETIMEDOUT;
+#else
         http->error = ETIMEDOUT;
+#endif /* WIN32 */
         return (NULL);
       }
 
@@ -996,7 +1010,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	*lineptr++ = *bufptr++;
     }
 
-    http->used -= bufptr - http->buffer;
+    http->used -= (int)(bufptr - http->buffer);
     if (http->used > 0)
       memmove(http->buffer, bufptr, http->used);
 
@@ -1269,8 +1283,8 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
     return (0);
   }
-  else if (length > http->data_remaining)
-    length = http->data_remaining;
+  else if (length > (size_t)http->data_remaining)
+    length = (size_t)http->data_remaining;
 
   if (http->used == 0 && length <= 256)
   {
@@ -1325,15 +1339,15 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
   if (http->used > 0)
   {
-    if (length > http->used)
-      length = http->used;
+    if (length > (size_t)http->used)
+      length = (size_t)http->used;
 
-    bytes = length;
+    bytes = (ssize_t)length;
 
     DEBUG_printf(("httpRead2: grabbing %d bytes from input buffer...\n", bytes));
 
     memcpy(buffer, http->buffer, length);
-    http->used -= length;
+    http->used -= (int)length;
 
     if (http->used > 0)
       memmove(http->buffer, http->buffer + length, http->used);
@@ -1344,7 +1358,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
     if (!http->blocking && !httpWait(http, 10000))
       return (0);
 
-    bytes = http_read_ssl(http, buffer, length);
+    bytes = (ssize_t)http_read_ssl(http, buffer, (int)length);
   }
 #endif /* HAVE_SSL */
   else
@@ -1354,9 +1368,13 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
     DEBUG_printf(("httpRead2: reading %d bytes from socket...\n", length));
 
+#ifdef WIN32
+    bytes = (ssize_t)recv(http->fd, buffer, (int)length, 0);
+#else
     while ((bytes = recv(http->fd, buffer, length, 0)) < 0)
       if (errno != EINTR)
         break;
+#endif /* WIN32 */
 
     DEBUG_printf(("httpRead2: read %d bytes from socket...\n", bytes));
   }
@@ -2004,8 +2022,8 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       DEBUG_printf(("    copying %d bytes to wbuffer...\n", length));
 
       memcpy(http->wbuffer + http->wused, buffer, length);
-      http->wused += length;
-      bytes = length;
+      http->wused += (int)length;
+      bytes = (ssize_t)length;
     }
     else
     {
@@ -2016,9 +2034,9 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       DEBUG_printf(("    writing %d bytes to socket...\n", length));
 
       if (http->data_encoding == HTTP_ENCODE_CHUNKED)
-	bytes = http_write_chunk(http, buffer, length);
+	bytes = (ssize_t)http_write_chunk(http, buffer, (int)length);
       else
-	bytes = http_write(http, buffer, length);
+	bytes = (ssize_t)http_write(http, buffer, (int)length);
 
       DEBUG_printf(("    wrote %d bytes...\n", bytes));
     }
@@ -2226,7 +2244,11 @@ static int				/* O - Bytes written */
 http_bio_puts(BIO        *h,		/* I - BIO data */
               const char *str)		/* I - String to write */
 {
+#ifdef WIN32
+  return (send(((http_t *)h->ptr)->fd, str, (int)strlen(str), 0));
+#else
   return (send(((http_t *)h->ptr)->fd, str, strlen(str), 0));
+#endif /* WIN32 */
 }
 
 
@@ -2252,7 +2274,12 @@ http_bio_read(BIO  *h,			/* I - BIO data */
 
     if (!http_wait(http, 10000, 0))
     {
+#ifdef WIN32
+      http->error = WSAETIMEDOUT;
+#else
       http->error = ETIMEDOUT;
+#endif /* WIN32 */
+
       return (-1);
     }
   }
@@ -2730,43 +2757,30 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
   * encryption on the link...
   */
 
-  httpClearFields(&myhttp);
-  httpSetField(&myhttp, HTTP_FIELD_CONNECTION, "upgrade");
-  httpSetField(&myhttp, HTTP_FIELD_UPGRADE, "TLS/1.0, SSL/2.0, SSL/3.0");
+  httpClearFields(http);
+  httpSetField(http, HTTP_FIELD_CONNECTION, "upgrade");
+  httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.0, SSL/2.0, SSL/3.0");
 
-  if ((ret = httpOptions(&myhttp, "*")) == 0)
+  if ((ret = httpOptions(http, "*")) == 0)
   {
    /*
     * Wait for the secure connection...
     */
 
-    while (httpUpdate(&myhttp) == HTTP_CONTINUE);
+    while (httpUpdate(http) == HTTP_CONTINUE);
   }
 
-  httpFlush(&myhttp);
+  httpFlush(http);
 
  /*
-  * Copy the HTTP data back over, if any...
+  * Restore the HTTP request data...
   */
 
-  http->fd         = myhttp.fd;
-  http->error      = myhttp.error;
-  http->activity   = myhttp.activity;
-  http->status     = myhttp.status;
-  http->version    = myhttp.version;
-  http->keep_alive = myhttp.keep_alive;
-  http->used       = myhttp.used;
-
-  if (http->used)
-    memcpy(http->buffer, myhttp.buffer, http->used);
-
-  http->auth_type   = myhttp.auth_type;
-  http->nonce_count = myhttp.nonce_count;
-
-  memcpy(http->nonce, myhttp.nonce, sizeof(http->nonce));
-
-  http->tls        = myhttp.tls;
-  http->encryption = myhttp.encryption;
+  memcpy(http->fields, myhttp.fields, sizeof(http->fields));
+  http->data_encoding   = myhttp.data_encoding;
+  http->data_remaining  = myhttp.data_remaining;
+  http->_data_remaining = myhttp._data_remaining;
+  http->expect          = myhttp.expect;
 
  /*
   * See if we actually went secure...
@@ -3013,7 +3027,7 @@ http_write_chunk(http_t     *http,	/* I - HTTP connection */
   */
 
   sprintf(header, "%x\r\n", length);
-  if (http_write(http, header, strlen(header)) < 0)
+  if (http_write(http, header, (int)strlen(header)) < 0)
   {
     DEBUG_puts("    http_write of length failed!");
     return (-1);
@@ -3088,5 +3102,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 6111 2006-11-15 20:28:39Z mike $".
+ * End of "$Id: http.c 6191 2007-01-10 16:48:37Z mike $".
  */

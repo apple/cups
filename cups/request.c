@@ -1,9 +1,9 @@
 /*
- * "$Id: request.c 5555 2006-05-20 13:35:58Z mike $"
+ * "$Id: request.c 6188 2007-01-10 16:23:06Z mike $"
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -285,7 +285,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
 #ifdef WIN32
       if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH &&
-          http->error != ETIMEDOUT)
+          http->error != WSAETIMEDOUT)
 #else
       if (http->error != ENETDOWN && http->error != ENETUNREACH &&
           http->error != ETIMEDOUT)
@@ -479,5 +479,5 @@ _cupsSetError(ipp_status_t status,	/* I - IPP status code */
 
 
 /*
- * End of "$Id: request.c 5555 2006-05-20 13:35:58Z mike $".
+ * End of "$Id: request.c 6188 2007-01-10 16:23:06Z mike $".
  */

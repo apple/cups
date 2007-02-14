@@ -1,10 +1,10 @@
 /*
- * "$Id: http.h 5889 2006-08-24 21:44:35Z mike $"
+ * "$Id: http.h 6188 2007-01-10 16:23:06Z mike $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -36,6 +36,11 @@
 #  include <time.h>
 #  include <sys/types.h>
 #  ifdef WIN32
+#    ifndef __CUPS_SSIZE_T_DEFINED
+#      define __CUPS_SSIZE_T_DEFINED
+/* Windows does not support the ssize_t type, so map it to off_t... */
+typedef off_t ssize_t;			/* @private@ */
+#    endif /* !__CUPS_SSIZE_T_DEFINED */
 #    include <winsock2.h>
 #    include <ws2tcpip.h>
 #  else
@@ -508,5 +513,5 @@ extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h 5889 2006-08-24 21:44:35Z mike $".
+ * End of "$Id: http.h 6188 2007-01-10 16:23:06Z mike $".
  */

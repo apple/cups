@@ -1,5 +1,5 @@
 /*
- * "$Id: snmp.c 6090 2006-11-14 16:35:27Z mike $"
+ * "$Id: snmp.c 6181 2007-01-03 18:51:27Z mike $"
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
@@ -1471,6 +1471,8 @@ fix_make_model(
   }
   else if (!strncasecmp(old_make_model, "deskjet", 7))
     snprintf(make_model, make_model_size, "HP DeskJet%s", old_make_model + 7);
+  else if (!strncasecmp(old_make_model, "officejet", 9))
+    snprintf(make_model, make_model_size, "HP OfficeJet%s", old_make_model + 9);
   else if (!strncasecmp(old_make_model, "stylus_pro_", 11))
     snprintf(make_model, make_model_size, "EPSON Stylus Pro %s",
              old_make_model + 11);
@@ -1729,14 +1731,16 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 
   if (device->make_and_model &&
       (!strncasecmp(device->make_and_model, "Epson", 5) ||
+       !strncasecmp(device->make_and_model, "HP ", 3) ||
+       !strncasecmp(device->make_and_model, "Hewlett", 7) ||
        !strncasecmp(device->make_and_model, "Kyocera", 7) ||
        !strncasecmp(device->make_and_model, "Lexmark", 7) ||
        !strncasecmp(device->make_and_model, "Tektronix", 9) ||
        !strncasecmp(device->make_and_model, "Xerox", 5)))
   {
    /*
-    * Epson, Kyocera, Lexmark, Tektronix, and Xerox printers often lock up on
-    * IPP probes, so exclude them from the IPP connection test...
+    * Epson, HP, Kyocera, Lexmark, Tektronix, and Xerox printers often lock
+    * up on IPP probes, so exclude them from the IPP connection test...
     */
 
     http = NULL;
@@ -1769,9 +1773,9 @@ probe_device(snmp_cache_t *device)	/* I - Device */
     static const char * const resources[] =
 			{		/* Common resource paths for IPP */
 			  "/ipp",
-			  "/ipp/port2",
-			  "/ipp/port3",
-			  "/EPSON_IPP_Printer",
+			  /*"/ipp/port2",*/
+			  /*"/ipp/port3",*/
+			  /*"/EPSON_IPP_Printer",*/
 			  "/LPT1",
 			  "/LPT2",
 			  "/COM1",
@@ -2455,5 +2459,5 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 
 
 /*
- * End of "$Id: snmp.c 6090 2006-11-14 16:35:27Z mike $".
+ * End of "$Id: snmp.c 6181 2007-01-03 18:51:27Z mike $".
  */

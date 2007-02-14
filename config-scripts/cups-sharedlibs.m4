@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-sharedlibs.m4 5582 2006-05-24 01:00:35Z mike $"
+dnl "$Id: cups-sharedlibs.m4 6145 2006-12-06 20:10:16Z mike $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
@@ -36,10 +36,20 @@ if test x$enable_shared != xno; then
 			DSOFLAGS="$DSOFLAGS -Wl,-h,\`basename \$@\` -G \$(OPTIM)"
 			;;
 		HP-UX*)
-			LIBCUPS="libcups.sl.2"
-			LIBCUPSIMAGE="libcupsimage.sl.2"
-			DSO="\$(LD)"
-			DSOFLAGS="$DSOFLAGS -b -z +h \`basename \$@\`"
+			case "$uarch" in
+				ia64)
+					LIBCUPS="libcups.so.2"
+					LIBCUPSIMAGE="libcupsimage.so.2"
+					DSO="\$(CC)"
+					DSOFLAGS="$DSOFLAGS -Wl,-b,-z,+h,\`basename \$@\`"
+					;;
+				*)
+					LIBCUPS="libcups.sl.2"
+					LIBCUPSIMAGE="libcupsimage.sl.2"
+					DSO="\$(LD)"
+					DSOFLAGS="$DSOFLAGS -b -z +h \`basename \$@\`"
+					;;
+			esac
 			;;
 		IRIX)
 			LIBCUPS="libcups.so.2"
@@ -126,9 +136,18 @@ if test "$DSO" != ":"; then
 	case $uname in
                 HP-UX*)
 			# HP-UX needs the path, even for /usr/lib...
-                	DSOFLAGS="+s +b $libdir $DSOFLAGS"
-                	DSO32FLAGS="+s +b $LIB32DIR $DSO32FLAGS"
-                	DSO64FLAGS="+s +b $LIB64DIR $DSO64FLAGS"
+			case "$uarch" in
+				ia64)
+					DSOFLAGS="-Wl,+s,+b,$libdir $DSOFLAGS"
+					DSO32FLAGS="-Wl,+s,+b,$LIB32DIR $DSO32FLAGS"
+					DSO64FLAGS="-Wl,+s,+b,$LIB64DIR $DSO64FLAGS"
+					;;
+				*)
+                			DSOFLAGS="+s +b $libdir $DSOFLAGS"
+                			DSO32FLAGS="+s +b $LIB32DIR $DSO32FLAGS"
+                			DSO64FLAGS="+s +b $LIB64DIR $DSO64FLAGS"
+					;;
+			esac
                 	LDFLAGS="$LDFLAGS -Wl,+s,+b,$libdir"
                 	EXPORT_LDFLAGS="-Wl,+s,+b,$libdir"
 			;;
@@ -173,5 +192,5 @@ AC_SUBST(IMGLIBS)
 AC_SUBST(EXPORT_LDFLAGS)
 
 dnl
-dnl End of "$Id: cups-sharedlibs.m4 5582 2006-05-24 01:00:35Z mike $".
+dnl End of "$Id: cups-sharedlibs.m4 6145 2006-12-06 20:10:16Z mike $".
 dnl

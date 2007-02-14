@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-driverd.c 5422 2006-04-18 15:16:00Z mike $"
+ * "$Id: cups-driverd.c 6214 2007-01-23 17:01:48Z mike $"
  *
  *   PPD/driver support for the Common UNIX Printing System (CUPS).
  *
@@ -147,6 +147,7 @@ add_ppd(const char *name,		/* I - PPD name */
 	size_t     size)		/* I - File size */
 {
   ppd_info_t	*ppd;			/* PPD */
+  char		*recommended;		/* Foomatic driver string */
 
 
  /*
@@ -196,6 +197,14 @@ add_ppd(const char *name,		/* I - PPD name */
   strlcpy(ppd->record.make_and_model, make_and_model,
           sizeof(ppd->record.make_and_model));
   strlcpy(ppd->record.device_id, device_id, sizeof(ppd->record.device_id));
+
+ /*
+  * Strip confusing (and often wrong) "recommended" suffix added by
+  * Foomatic drivers...
+  */
+
+  if ((recommended = strstr(ppd->record.make_and_model, " (recommended)")) != NULL)
+    *recommended = '\0';
 
  /*
   * Return the new PPD pointer...
@@ -1113,5 +1122,5 @@ load_drivers(void)
 
 
 /*
- * End of "$Id: cups-driverd.c 5422 2006-04-18 15:16:00Z mike $".
+ * End of "$Id: cups-driverd.c 6214 2007-01-23 17:01:48Z mike $".
  */

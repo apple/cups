@@ -1158,6 +1158,9 @@ void PSOutputDev::writeHeader(int firstPage, int lastPage,
     break;
   }
 
+  // Tell CUPS pstops filter not to do its own rotation...
+  writePSFmt("%%cupsRotation: %d\n", pageRotate);
+
   writePSFmt("%%Producer: xpdf/pdftops %s\n", xpdfVersion);
   xref->getDocInfo(&info);
   if (info.isDict() && info.dictLookup("Creator", &obj1)->isString()) {
@@ -2509,14 +2512,16 @@ GBool PSOutputDev::startPage(int pageNum, GfxState *state) {
     } else {
       rotate = (360 - state->getRotate()) % 360;
       if (rotate == 0 || rotate == 180) {
-	if (width > height && width > imgWidth) {
+	if ((width > height && imgWidth < imgHeight) ||
+	    (height > width && imgHeight < imgWidth)) {
 	  rotate += 90;
 	  landscape = gTrue;
 	} else {
 	  landscape = gFalse;
 	}
       } else { // rotate == 90 || rotate == 270
-	if (height > width && height > imgWidth) {
+	if ((width > height && imgWidth < imgHeight) ||
+	    (height > width && imgHeight < imgWidth)) {
 	  rotate = 270 - rotate;
 	  landscape = gTrue;
 	} else {

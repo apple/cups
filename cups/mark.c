@@ -1,9 +1,9 @@
 /*
- * "$Id: mark.c 6036 2006-10-13 22:06:43Z mike $"
+ * "$Id: mark.c 6188 2007-01-10 16:23:06Z mike $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -409,26 +409,27 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	  case PPD_CUSTOM_CURVE :
 	  case PPD_CUSTOM_INVCURVE :
 	  case PPD_CUSTOM_REAL :
-	      cparam->current.custom_real = _cupsStrScand(choice + 7, NULL,
-	                                                  loc);
+	      cparam->current.custom_real = (float)_cupsStrScand(choice + 7,
+	                                                         NULL, loc);
 	      break;
 
 	  case PPD_CUSTOM_POINTS :
-	      cparam->current.custom_points = _cupsStrScand(choice + 7,
-	                                                    &units, loc);
+	      cparam->current.custom_points = (float)_cupsStrScand(choice + 7,
+	                                                           &units,
+	                                                           loc);
 
               if (units)
 	      {
         	if (!strcasecmp(units, "cm"))
-	          cparam->current.custom_points *= 72.0 / 2.54;	      
+	          cparam->current.custom_points *= 72.0f / 2.54f;	      
         	else if (!strcasecmp(units, "mm"))
-	          cparam->current.custom_points *= 72.0 / 25.4;	      
+	          cparam->current.custom_points *= 72.0f / 25.4f;	      
         	else if (!strcasecmp(units, "m"))
-	          cparam->current.custom_points *= 72.0 / 0.0254;	      
+	          cparam->current.custom_points *= 72.0f / 0.0254f;	      
         	else if (!strcasecmp(units, "in"))
-	          cparam->current.custom_points *= 72.0;	      
+	          cparam->current.custom_points *= 72.0f;	      
         	else if (!strcasecmp(units, "ft"))
-	          cparam->current.custom_points *= 12 * 72.0;	      
+	          cparam->current.custom_points *= 12.0f * 72.0f;	      
               }
 	      break;
 
@@ -485,26 +486,27 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	  case PPD_CUSTOM_CURVE :
 	  case PPD_CUSTOM_INVCURVE :
 	  case PPD_CUSTOM_REAL :
-	      cparam->current.custom_real = _cupsStrScand(val->value, NULL,
-	                                                  loc);
+	      cparam->current.custom_real = (float)_cupsStrScand(val->value,
+	                                                         NULL, loc);
 	      break;
 
 	  case PPD_CUSTOM_POINTS :
-	      cparam->current.custom_points = _cupsStrScand(val->value, &units,
-	                                                    loc);
+	      cparam->current.custom_points = (float)_cupsStrScand(val->value,
+	                                                           &units,
+	                                                           loc);
 
 	      if (units)
 	      {
         	if (!strcasecmp(units, "cm"))
-		  cparam->current.custom_points *= 72.0 / 2.54;	      
+		  cparam->current.custom_points *= 72.0f / 2.54f;
         	else if (!strcasecmp(units, "mm"))
-		  cparam->current.custom_points *= 72.0 / 25.4;	      
+		  cparam->current.custom_points *= 72.0f / 25.4f;
         	else if (!strcasecmp(units, "m"))
-		  cparam->current.custom_points *= 72.0 / 0.0254;	      
+		  cparam->current.custom_points *= 72.0f / 0.0254f;
         	else if (!strcasecmp(units, "in"))
-		  cparam->current.custom_points *= 72.0;	      
+		  cparam->current.custom_points *= 72.0f;
         	else if (!strcasecmp(units, "ft"))
-		  cparam->current.custom_points *= 12 * 72.0;	      
+		  cparam->current.custom_points *= 12.0f * 72.0f;
 	      }
 	      break;
 
@@ -677,5 +679,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c 6036 2006-10-13 22:06:43Z mike $".
+ * End of "$Id: mark.c 6188 2007-01-10 16:23:06Z mike $".
  */

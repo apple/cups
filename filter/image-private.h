@@ -1,5 +1,5 @@
 /*
- * "$Id: image-private.h 5191 2006-02-27 02:47:56Z mike $"
+ * "$Id: image-private.h 6158 2006-12-17 01:44:21Z mike $"
  *
  *   Private image library definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -33,6 +33,7 @@
  */
 
 #  include "image.h"
+#  include "raster.h"
 #  include <cups/cups.h>
 #  include <cups/debug.h>
 #  include <cups/string.h>
@@ -213,9 +214,13 @@ extern cups_izoom_t	*_cupsImageZoomNew(cups_image_t *img, int xc0, int yc0,
 					   int ysize, int rotated,
 					   cups_iztype_t type);
 
+extern int		_cupsRasterExecPS(cups_page_header2_t *h,
+			                  int *preferred_bits,
+			                  const char *code);
+
 
 #endif /* !_CUPS_IMAGE_PRIVATE_H_ */
 
 /*
- * End of "$Id: image-private.h 5191 2006-02-27 02:47:56Z mike $".
+ * End of "$Id: image-private.h 6158 2006-12-17 01:44:21Z mike $".
  */

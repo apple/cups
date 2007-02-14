@@ -1,10 +1,10 @@
 /*
- * "$Id: langprintf.c 5926 2006-09-05 20:45:47Z mike $"
+ * "$Id: langprintf.c 6188 2007-01-10 16:23:06Z mike $"
  *
  *   Localized printf/puts functions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2002-2006 by Easy Software Products.
+ *   Copyright 2002-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -88,7 +88,7 @@ _cupsLangPrintf(FILE        *fp,	/* I - File to write to */
   */
 
   if (bytes > 0)
-    return (fwrite(output, 1, bytes, fp));
+    return ((int)fwrite(output, 1, bytes, fp));
   else
     return (bytes);
 }
@@ -133,7 +133,7 @@ _cupsLangPuts(FILE        *fp,		/* I - File to write to */
   */
 
   if (bytes > 0)
-    return (fwrite(output, 1, bytes, fp));
+    return ((int)fwrite(output, 1, bytes, fp));
   else
     return (bytes);
 }
@@ -224,5 +224,5 @@ _cupsSetLocale(char *argv[])		/* IO - Command-line arguments */
 
 
 /*
- * End of "$Id: langprintf.c 5926 2006-09-05 20:45:47Z mike $".
+ * End of "$Id: langprintf.c 6188 2007-01-10 16:23:06Z mike $".
  */
