@@ -2316,11 +2316,11 @@ get_gss_creds(const char *service_name)	/* I - Service name */
   major_status = gss_acquire_cred(&minor_status, server_name, GSS_C_INDEFINITE,
 			          GSS_C_NO_OID_SET, GSS_C_ACCEPT,
 				  &server_creds, NULL, NULL);
-  gss_release_name(&minor_status, &server_name);
   if (GSS_ERROR(major_status))
   {
     cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status,
                        "gss_acquire_cred() failed"); 
+    gss_release_name(&minor_status, &server_name);
     gss_release_buffer(&minor_status, &token);
     return (NULL);
   }
@@ -2328,6 +2328,7 @@ get_gss_creds(const char *service_name)	/* I - Service name */
   cupsdLogMessage(CUPSD_LOG_INFO, "Credentials acquired successfully for %s.", 
                   (char *)token.value);
 
+  gss_release_name(&minor_status, &server_name);
   gss_release_buffer(&minor_status, &token);
 
   return (server_creds);

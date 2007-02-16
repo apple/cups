@@ -3,7 +3,7 @@ CHANGES.txt - 2007-02-14
 
 CHANGES IN CUPS V1.3
 
-	- Documentation updates (STR #2131)
+	- Documentation updates (STR #2130, STR #2131)
 	- Job operations (cancel, hold, release, etc.) from the
 	  web interface now return back to the original page (STR
 	  #2239)
