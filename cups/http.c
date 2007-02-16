@@ -1664,11 +1664,11 @@ httpReconnect(http_t *http)		/* I - HTTP connection */
 
     if (http_setup_ssl(http) != 0)
     {
-#ifdef WIN32
+#  ifdef WIN32
       closesocket(http->fd);
-#else
+#  else
       close(http->fd);
-#endif /* WIN32 */
+#  endif /* WIN32 */
 
       return (-1);
     }
@@ -2829,6 +2829,8 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
   * encryption on the link...
   */
 
+  http->field_authorization = NULL;	/* Don't free the auth string */
+
   httpClearFields(http);
   httpSetField(http, HTTP_FIELD_CONNECTION, "upgrade");
   httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.0, SSL/2.0, SSL/3.0");
@@ -2849,10 +2851,11 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
   */
 
   memcpy(http->fields, myhttp.fields, sizeof(http->fields));
-  http->data_encoding   = myhttp.data_encoding;
-  http->data_remaining  = myhttp.data_remaining;
-  http->_data_remaining = myhttp._data_remaining;
-  http->expect          = myhttp.expect;
+  http->data_encoding       = myhttp.data_encoding;
+  http->data_remaining      = myhttp.data_remaining;
+  http->_data_remaining     = myhttp._data_remaining;
+  http->expect              = myhttp.expect;
+  http->field_authorization = myhttp.field_authorization;
 
  /*
   * See if we actually went secure...
