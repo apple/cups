@@ -831,7 +831,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 
     puts("% Create composite fonts...");
 
-    for (i = 1 + PrettyPrint; i >= 0; i --)
+    for (i = PrettyPrint ? 2 : 1; i >= 0; i --)
     {
       puts("8 dict begin");
       puts("/FontType 0 def/FontMatrix[1.0 0 0 1.0 0 0]def/FMapType 2 def/Encoding[");
