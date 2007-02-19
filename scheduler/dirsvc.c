@@ -165,7 +165,7 @@ static SLPBoolean	slp_url_callback(SLPHandle hslp, const char *srvurl,
  * only finds other CUPS servers (not all IPP based printers).
  */
 static char	dnssdIPPRegType[]    = "_ipp._tcp,_cups";
-static char	dnssdIPPFaxRegType[] = "_ipp._tcp,_cups,_fax";
+static char	dnssdIPPFaxRegType[] = "_fax-ipp._tcp";
 
 static char	*dnssdBuildTxtRecord(int *txt_len, cupsd_printer_t *p);
 static void	dnssdDeregisterPrinter(cupsd_printer_t *p);
@@ -207,17 +207,12 @@ cupsdDeregisterPrinter(
   {
     cups_ptype_t savedtype = p->type;	/* Saved printer type */
 
-
     p->type |= CUPS_PRINTER_DELETE;
 
     send_cups_browse(p);
 
     p->type = savedtype;
   }
-
- /*
-  * Restore it's type...
-  */
 
 #ifdef HAVE_LIBSLP
   if (BrowseLocalProtocols & BROWSE_SLP)
@@ -689,7 +684,7 @@ cupsdSaveRemoteCache(void)
     return;
   }
   else
-    cupsdLogMessage(CUPSD_LOG_INFO, "Saving remote.cache...");
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Saving remote.cache...");
 
  /*
   * Restrict access to the file...
@@ -2285,7 +2280,7 @@ process_browse_data(
   * Update the state...
   */
 
-  cupsdSetPrinterState(p, state, 0);
+  p->state       = state;
   p->browse_time = time(NULL);
 
   if ((lease_duration = cupsGetOption("lease-duration", num_attrs,
@@ -2888,8 +2883,7 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
   if (txt_record)
     free(txt_record);
 
-  if (name)
-    free(name);
+  cupsdClearString(&name);
 }
 #endif /* HAVE_DNSSD */
 

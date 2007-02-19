@@ -766,7 +766,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Update the browse list as needed...
     */
 
-    if (Browsing && BrowseRemoteProtocols)
+    if (Browsing)
     {
 #ifdef HAVE_LIBSLP
       if ((BrowseRemoteProtocols & BROWSE_SLP) &&
@@ -785,6 +785,22 @@ main(int  argc,				/* I - Number of command-line args */
     {
       cupsdSendBrowseList();
       browse_time = current_time;
+    }
+
+   /*
+    * Update the root certificate once every 5 minutes if we have client
+    * connections...
+    */
+
+    if ((current_time - RootCertTime) >= RootCertDuration && RootCertDuration &&
+        !RunUser && cupsArrayCount(Clients))
+    {
+     /*
+      * Update the root certificate...
+      */
+
+      cupsdDeleteCert(0);
+      cupsdAddCert(0, "root");
     }
 
    /*
@@ -856,22 +872,6 @@ main(int  argc,				/* I - Number of command-line args */
 		      CUPS_LLCAST total_bytes);
 
       mallinfo_time = current_time;
-    }
-
-   /*
-    * Update the root certificate once every 5 minutes if we have client
-    * connections...
-    */
-
-    if ((current_time - RootCertTime) >= RootCertDuration && RootCertDuration &&
-        !RunUser && cupsArrayCount(Clients))
-    {
-     /*
-      * Update the root certificate...
-      */
-
-      cupsdDeleteCert(0);
-      cupsdAddCert(0, "root");
     }
 
    /*
