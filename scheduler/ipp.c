@@ -936,7 +936,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
                                IPP_TAG_BOOLEAN)) != NULL)
   {
     if (pclass->shared && !attr->values[0].boolean)
-      cupsdSendBrowseDelete(pclass);
+      cupsdDeregisterPrinter(pclass, 1);
 
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Setting %s printer-is-shared to %d (was %d.)",
@@ -2256,7 +2256,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
                                IPP_TAG_BOOLEAN)) != NULL)
   {
     if (printer->shared && !attr->values[0].boolean)
-      cupsdSendBrowseDelete(printer);
+      cupsdDeregisterPrinter(printer, 1);
 
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Setting %s printer-is-shared to %d (was %d.)",

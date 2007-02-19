@@ -22,6 +22,10 @@
  *         WWW: http://www.cups.org
  */
 
+#ifdef HAVE_DNSSD
+#  include <dns_sd.h>
+#endif /* HAVE_DNSSD */
+
 /*
  * Quota data...
  */
@@ -90,6 +94,16 @@ typedef struct cupsd_printer_s
 #ifdef __APPLE__
   char		*recoverable;		/* com.apple.print.recoverable-message */
 #endif /* __APPLE__ */
+
+#ifdef HAVE_DNSSD
+  char		*reg_name,		/* Name used for service registration */
+		*product,		/* PPD Product string */
+		*pdl,			/* pdl value for TXT record */
+		*txt_record;		/* TXT record contents */
+  int		txt_len;		/* TXT record length */
+  DNSServiceRef	dnssd_ipp_ref;		/* DNSServiceRegister ref for _ipp */
+  int		dnssd_ipp_fd;		/* File descriptor for DNSServiceRegister reference */
+#endif /* HAVE_DNSSD */
 } cupsd_printer_t;
 
 

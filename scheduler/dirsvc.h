@@ -4,7 +4,7 @@
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -45,7 +45,7 @@
 #define BROWSE_CUPS	1		/* CUPS */
 #define	BROWSE_SLP	2		/* SLPv2 */
 #define BROWSE_LDAP	4		/* LDAP */
-#define BROWSE_DNSSD	8		/* DNS Service Discovery aka Bonjour */
+#define BROWSE_DNSSD	8		/* DNS Service Discovery (aka Bonjour) */
 #define BROWSE_ALL	15		/* All protocols */
 
 
@@ -163,16 +163,20 @@ VAR char		*BrowseLDAPBindDN VALUE(NULL),
  * Prototypes...
  */
 
+extern void	cupsdDeregisterPrinter(cupsd_printer_t *p, int removeit);
 extern void	cupsdLoadRemoteCache(void);
+extern void	cupsdRegisterPrinter(cupsd_printer_t *p);
 extern void	cupsdRestartPolling(void);
 extern void	cupsdSaveRemoteCache(void);
-extern void	cupsdSendBrowseDelete(cupsd_printer_t *p);
 extern void	cupsdSendBrowseList(void);
 extern void	cupsdStartBrowsing(void);
 extern void	cupsdStartPolling(void);
 extern void	cupsdStopBrowsing(void);
 extern void	cupsdStopPolling(void);
 extern void	cupsdUpdateCUPSBrowse(void);
+#ifdef HAVE_DNSSD
+extern void	cupsdUpdateDNSSDBrowse(cupsd_printer_t *p);
+#endif /* HAVE_DNSSD */
 #ifdef HAVE_LDAP
 extern void	cupsdUpdateLDAPBrowse(void);
 #endif /* HAVE_LDAP */

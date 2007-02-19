@@ -315,6 +315,21 @@
 
 
 /*
+ * Do we have DNS Service Discovery (aka Bonjour)?
+ */
+
+#undef HAVE_DNSSD
+
+
+/*
+ * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
+ */
+
+#undef HAVE_COREFOUNDATION
+#undef HAVE_SYSTEMCONFIGURATION
+
+
+/*
  * Do we have <sys/ioctl.h>?
  */
 

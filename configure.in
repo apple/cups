@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Configuration script for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -44,6 +44,7 @@ sinclude(config-scripts/cups-ssl.m4)
 sinclude(config-scripts/cups-pam.m4)
 sinclude(config-scripts/cups-threads.m4)
 sinclude(config-scripts/cups-largefile.m4)
+sinclude(config-scripts/cups-dnssd.m4)
 sinclude(config-scripts/cups-launchd.m4)
 sinclude(config-scripts/cups-defaults.m4)
 sinclude(config-scripts/cups-pap.m4)

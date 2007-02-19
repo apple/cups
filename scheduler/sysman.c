@@ -307,7 +307,7 @@ cupsdUpdateSystemMonitor(void)
 	{
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "Deregistering local printer \"%s\"", p->name);
-	  cupsdSendBrowseDelete(p);
+	  cupsdDeregisterPrinter(p, 0);
 	}
       }
 
@@ -363,18 +363,19 @@ cupsdUpdateSystemMonitor(void)
 	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
 	     p;
 	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
-	  cupsdSendBrowseDelete(p);
+	  cupsdDeregisterPrinter(p, 1);
 
        /*
 	* Now re-register them...
-	*
-	* TODO: This might need updating for MDNS.
 	*/
 
 	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
 	     p;
 	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
+	{
 	  p->browse_time = 0;
+	  cupsdRegisterPrinter(p);
+	}
       }
       else
         cupsdLogMessage(CUPSD_LOG_DEBUG,

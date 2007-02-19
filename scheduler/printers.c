@@ -692,13 +692,18 @@ cupsdDeletePrinter(
   }
 
  /*
-  * Remove this printer from any classes and send a browse delete message...
+  * Remove this printer from any classes...
   */
 
   if (!(p->type & CUPS_PRINTER_IMPLICIT))
   {
     cupsdDeletePrinterFromClasses(p);
-    cupsdSendBrowseDelete(p);
+
+   /*
+    * Deregister from any browse protocols...
+    */
+
+    cupsdDeregisterPrinter(p, 1);
   }
 
  /*
@@ -741,6 +746,11 @@ cupsdDeletePrinter(
   cupsdClearString(&p->port_monitor);
   cupsdClearString(&p->op_policy);
   cupsdClearString(&p->error_policy);
+
+#ifdef HAVE_DNSSD
+  cupsdClearString(&p->product);
+  cupsdClearString(&p->pdl);
+#endif /* HAVE_DNSSD */
 
   cupsArrayDelete(p->filetypes);
 
@@ -1947,6 +1957,10 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	    attr->values[i].string.text = _cupsStrAlloc("bcp");
 	}
 
+#ifdef HAVE_DNSSD
+	cupsdSetString(&p->product, ppd->product);
+#endif /* HAVE_DNSSD */
+
        /*
         * Close the PPD and set the type...
 	*/
@@ -2182,6 +2196,12 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   write_irix_config(p);
   write_irix_state(p);
 #endif /* __sgi */
+
+ /*
+  * Let the browse protocols reflect the change
+  */
+
+  cupsdRegisterPrinter(p);
 }
 
 
@@ -2335,6 +2355,12 @@ cupsdSetPrinterState(
   }
 
   cupsdAddPrinterHistory(p);
+
+ /*
+  * Let the browse protocols reflect the change...
+  */
+
+  cupsdRegisterPrinter(p);
 
  /*
   * Save the printer configuration if a printer goes from idle or processing
@@ -3083,6 +3109,54 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 
     attr->values[i].string.text = _cupsStrAlloc(mimetype);
   }
+
+#ifdef HAVE_DNSSD
+  {
+    char		pdl[1024];	/* Buffer to build pdl list */
+    mime_filter_t	*filter;	/* MIME filter looping var */
+
+
+    pdl[0] = '\0';
+
+    if (mimeType(MimeDatabase, "application", "pdf"))
+      strlcat(pdl, "application/pdf,", sizeof(pdl));
+
+    if (mimeType(MimeDatabase, "application", "postscript"))
+      strlcat(pdl, "application/postscript,", sizeof(pdl));
+
+    if (mimeType(MimeDatabase, "application", "vnd.cups-raster"))
+      strlcat(pdl, "application/vnd.cups-raster,", sizeof(pdl));
+
+   /*
+    * Determine if this is a Tioga PrintJobMgr based queue...
+    */
+
+    for (filter = (mime_filter_t *)cupsArrayFirst(MimeDatabase->filters);
+	 filter;
+	 filter = (mime_filter_t *)cupsArrayNext(MimeDatabase->filters))
+    {
+      if (filter->dst == p->filetype && filter->filter && 
+	  strstr(filter->filter, "PrintJobMgr"))
+	break;
+    }
+
+   /*
+    * We only support raw printing if this is not a Tioga PrintJobMgr based
+    * queue and if application/octet-stream is a known conversion...
+    */
+
+    if (!filter && mimeType(MimeDatabase, "application", "octet-stream"))
+      strlcat(pdl, "application/octet-stream,", sizeof(pdl));
+
+    if (mimeType(MimeDatabase, "image", "png"))
+      strlcat(pdl, "image/png,", sizeof(pdl));
+
+    if (pdl[0])
+      pdl[strlen(pdl) - 1] = '\0';	/* Remove trailing comma */
+
+    cupsdSetString(&p->pdl, pdl);
+  }
+#endif /* HAVE_DNSSD */
 }
 
 

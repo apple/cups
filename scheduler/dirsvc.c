@@ -23,10 +23,13 @@
  *
  * Contents:
  *
+ *   cupsdDeregisterPrinter()      - Stop sending broadcast information for a 
+ *				     local printer and remove any pending
+ *                                   references to remote printers.
  *   cupsdLoadRemoteCache()        - Load the remote printer cache.
+ *   cupsdRegisterPrinter()        - Start sending broadcast information for a
+ *                                   printer update the broadcast contents.
  *   cupsdSaveRemoteCache()        - Save the remote printer cache.
- *   cupsdSendBrowseDelete()       - Send a "browse delete" message for a
- *                                   printer.
  *   cupsdSendBrowseList()         - Send new browsing information as necessary.
  *   cupsdStartBrowsing()          - Start sending and receiving broadcast
  *                                   information.
@@ -36,9 +39,18 @@
  *   cupsdStopPolling()            - Stop polling servers as needed.
  *   cupsdUpdateCUPSBrowse()       - Update the browse lists using the CUPS
  *                                   protocol.
+ *   cupsdUpdateDNSSDBrowse()      - Handle DNS-SD queries.
  *   cupsdUpdateLDAPBrowse()       - Scan for new printers via LDAP...
  *   cupsdUpdatePolling()          - Read status messages from the poll daemons.
  *   cupsdUpdateSLPBrowse()        - Get browsing information via SLP.
+ *   dnssdBuildTxtRecord()         - Build a TXT record from printer info.
+ *   dnssdDeregisterPrinter()      - Stop sending broadcast information for a
+ *                                   printer.
+ *   dnssdPackTxtRecord()          - Pack an array of key/value pairs into the
+ *                                   TXT record format.
+ *   dnssdRegisterCallback()       - DNSServiceRegister callback.
+ *   dnssdRegisterPrinter()        - Start sending broadcast information for a
+ *                                   printer or update the broadcast contents.
  *   dequote()                     - Remote quotes from a string.
  *   process_browse_data()         - Process new browse data.
  *   process_implicit_classes()    - Create/update implicit classes as needed.
@@ -59,6 +71,18 @@
 
 #include "cupsd.h"
 #include <grp.h>
+
+#ifdef HAVE_DNSSD
+#  include <dns_sd.h>
+#  include <nameser.h>
+#  include <nameser.h>
+#  ifdef HAVE_COREFOUNDATION
+#    include <CoreFoundation/CoreFoundation.h>
+#  endif /* HAVE_COREFOUNDATION */
+#  ifdef HAVE_SYSTEMCONFIGURATION
+#    include <SystemConfiguration/SystemConfiguration.h>
+#  endif /* HAVE_SYSTEMCONFIGURATION */
+#endif /* HAVE_DNSSD */
 
 
 /*
@@ -134,6 +158,77 @@ static SLPBoolean	slp_url_callback(SLPHandle hslp, const char *srvurl,
 			                 unsigned short lifetime,
 			                 SLPError errcode, void *cookie);
 #endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_DNSSD
+/*
+ * For IPP register using a subtype of 'cups' so that shared printer browsing
+ * only finds other CUPS servers (not all IPP based printers).
+ */
+static char	dnssdIPPRegType[]    = "_ipp._tcp,_cups";
+static char	dnssdIPPFaxRegType[] = "_ipp._tcp,_cups,_fax";
+
+static char	*dnssdBuildTxtRecord(int *txt_len, cupsd_printer_t *p);
+static void	dnssdDeregisterPrinter(cupsd_printer_t *p);
+static char	*dnssdPackTxtRecord(int *txt_len, char *keyvalue[][2],
+		                    int count);
+static void	dnssdRegisterCallback(DNSServiceRef sdRef,
+		                      DNSServiceFlags flags, 
+				      DNSServiceErrorType errorCode,
+				      const char *name, const char *regtype,
+				      const char *domain, void *context);
+static void	dnssdRegisterPrinter(cupsd_printer_t *p);
+#endif /* HAVE_DNSSD */
+
+
+/*
+ * 'cupsdDeregisterPrinter()' - Stop sending broadcast information for a 
+ *				local printer and remove any pending
+ *                              references to remote printers.
+ */
+
+void
+cupsdDeregisterPrinter(
+    cupsd_printer_t *p,			/* I - Printer to register */
+    int             removeit)		/* I - Printer being permanently removed */
+{
+ /*
+  * Only deregister if browsing is enabled and it's a local printers...
+  */
+
+  if (!Browsing || !p->shared ||
+      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+    return;
+
+ /*
+  * Announce the deletion...
+  */
+
+  if ((BrowseLocalProtocols & BROWSE_CUPS))
+  {
+    cups_ptype_t savedtype = p->type;	/* Saved printer type */
+
+
+    p->type |= CUPS_PRINTER_DELETE;
+
+    send_cups_browse(p);
+
+    p->type = savedtype;
+  }
+
+ /*
+  * Restore it's type...
+  */
+
+#ifdef HAVE_LIBSLP
+  if (BrowseLocalProtocols & BROWSE_SLP)
+    slp_dereg_printer(p);
+#endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_DNSSD
+  if (removeit && (BrowseLocalProtocols & BROWSE_DNSSD))
+    dnssdDeregisterPrinter(p);
+#endif /* HAVE_DNSSD */
+}
 
 
 /*
@@ -525,6 +620,30 @@ cupsdLoadRemoteCache(void)
 
 
 /*
+ * 'cupsdRegisterPrinter()' - Start sending broadcast information for a
+ *                            printer or update the broadcast contents.
+ */
+
+void
+cupsdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
+{
+  if (!Browsing || !BrowseLocalProtocols || !BrowseInterval || !NumBrowsers ||
+      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+    return;
+
+#ifdef HAVE_LIBSLP
+/*  if (BrowseLocalProtocols & BROWSE_SLP)
+    slpRegisterPrinter(p); */
+#endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_DNSSD
+  if (BrowseLocalProtocols & BROWSE_DNSSD)
+    dnssdRegisterPrinter(p);
+#endif /* HAVE_DNSSD */
+}
+
+
+/*
  * 'cupsdRestartPolling()' - Restart polling servers as needed.
  */
 
@@ -667,41 +786,6 @@ cupsdSaveRemoteCache(void)
   }
 
   cupsFileClose(fp);
-}
-
-
-/*
- * 'cupsdSendBrowseDelete()' - Send a "browse delete" message for a printer.
- */
-
-void
-cupsdSendBrowseDelete(
-    cupsd_printer_t *p)			/* I - Printer to delete */
-{
- /*
-  * Only announce if browsing is enabled and this is a local queue...
-  */
-
-  if (!Browsing || !p->shared ||
-      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
-    return;
-
- /*
-  * First mark the printer for deletion...
-  */
-
-  p->type |= CUPS_PRINTER_DELETE;
-
- /*
-  * Announce the deletion...
-  */
-
-  if ((BrowseLocalProtocols & BROWSE_CUPS) && BrowseSocket >= 0)
-    send_cups_browse(p);
-#ifdef HAVE_LIBSLP
-  if ((BrowseLocalProtocols & BROWSE_SLP) && BrowseSLPHandle)
-    slp_dereg_printer(p);
-#endif /* HAVE_LIBSLP */
 }
 
 
@@ -853,6 +937,7 @@ cupsdStartBrowsing(void)
 {
   int			val;		/* Socket option value */
   struct sockaddr_in	addr;		/* Broadcast address */
+  cupsd_printer_t	*p;		/* Current printer */
 
 
   BrowseNext = NULL;
@@ -1045,6 +1130,16 @@ cupsdStartBrowsing(void)
     BrowseLDAPRefresh = 0;
   }
 #endif /* HAVE_OPENLDAP */
+
+ /*
+  * Register the individual printers
+  */
+
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (cupsd_printer_t *)cupsArrayNext(Printers))
+    if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+      cupsdRegisterPrinter(p);
 }
 
 
@@ -1158,8 +1253,25 @@ cupsdStartPolling(void)
 void
 cupsdStopBrowsing(void)
 {
+  cupsd_printer_t	*p;		/* Current printer */
+
+
   if (!Browsing || !(BrowseLocalProtocols | BrowseRemoteProtocols))
     return;
+
+ /*
+  * De-register the individual printers
+  */
+
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (cupsd_printer_t *)cupsArrayNext(Printers))
+    if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+      cupsdDeregisterPrinter(p, 1);
+
+ /*
+  * Shut down browsing sockets...
+  */
 
   if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_CUPS) &&
       BrowseSocket >= 0)
@@ -1501,6 +1613,34 @@ cupsdUpdateCUPSBrowse(void)
                       (ipp_pstate_t)state, location, info, make_model,
 		      num_attrs, attrs);
 }
+
+
+#ifdef HAVE_DNSSD
+/*
+ * 'cupsdUpdateDNSSDBrowse()' - Handle DNS-SD queries.
+ */
+
+void
+cupsdUpdateDNSSDBrowse(
+    cupsd_printer_t *p)			/* I - Printer being queried */
+{
+  DNSServiceErrorType	sdErr;		/* Service discovery error */
+
+
+  if ((sdErr = DNSServiceProcessResult(p->dnssd_ipp_ref))
+          != kDNSServiceErr_NoError)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "DNS Service Discovery registration error %d for \"%s\"!",
+	            sdErr, p->name);
+    cupsdRemoveSelect(p->dnssd_ipp_fd);
+    DNSServiceRefDeallocate(p->dnssd_ipp_ref);
+
+    p->dnssd_ipp_ref = NULL;
+    p->dnssd_ipp_fd  = -1;
+  }
+}
+#endif /* HAVE_DNSSD */
 
 
 #ifdef HAVE_OPENLDAP
@@ -2145,7 +2285,7 @@ process_browse_data(
   * Update the state...
   */
 
-  p->state       = state;
+  cupsdSetPrinterState(p, state, 0);
   p->browse_time = time(NULL);
 
   if ((lease_duration = cupsGetOption("lease-duration", num_attrs,
@@ -2301,6 +2441,457 @@ process_browse_data(
 
   cupsdWritePrintcap();
 }
+
+
+#ifdef HAVE_DNSSD
+/*
+ * 'dnssdBuildTxtRecord()' - Build a TXT record from printer info.
+ */
+
+static char *				/* O - TXT record */
+dnssdBuildTxtRecord(
+    int             *txt_len,		/* O - TXT record length */
+    cupsd_printer_t *p)			/* I - Printer information */
+{
+  int		i;			/* Looping var */
+  char		type_str[32],		/* Type to string buffer */
+		state_str[32],		/* State to string buffer */
+		rp_str[1024],		/* Queue name string buffer */
+		*keyvalue[32][2];	/* Table of key/value pairs */
+
+
+ /*
+  * Load up the key value pairs...
+  */
+
+  i = 0;
+
+  keyvalue[i  ][0] = "txtvers";
+  keyvalue[i++][1] = "1";
+
+  keyvalue[i  ][0] = "qtotal";
+  keyvalue[i++][1] = "1";
+
+  keyvalue[i  ][0] = "rp";
+  keyvalue[i++][1] = rp_str;
+  snprintf(rp_str, sizeof(rp_str), "%s/%s", 
+	   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers", p->name);
+
+  keyvalue[i  ][0] = "ty";
+  keyvalue[i++][1] = p->make_model;
+
+  if (p->location && *p->location != '\0')
+  {
+    keyvalue[i  ][0] = "note";
+    keyvalue[i++][1] = p->location;
+  }
+
+  keyvalue[i  ][0] = "product";
+  keyvalue[i++][1] = p->product ? p->product : "Unknown";
+
+  snprintf(type_str, sizeof(type_str), "0x%X", p->type | CUPS_PRINTER_REMOTE);
+  snprintf(state_str, sizeof(state_str), "%d", p->state);
+
+  keyvalue[i  ][0] = "printer-state";
+  keyvalue[i++][1] = state_str;
+
+  keyvalue[i  ][0] = "printer-type";
+  keyvalue[i++][1] = type_str;
+
+  keyvalue[i  ][0] = "Transparent";
+  keyvalue[i++][1] = "T";
+
+  keyvalue[i  ][0] = "Binary";
+  keyvalue[i++][1] = "T";
+
+  if ((p->type & CUPS_PRINTER_FAX))
+  {
+    keyvalue[i  ][0] = "Fax";
+    keyvalue[i++][1] = "T";
+  }
+
+  if ((p->type & CUPS_PRINTER_COLOR))
+  {
+    keyvalue[i  ][0] = "Color";
+    keyvalue[i++][1] = "T";
+  }
+
+  if ((p->type & CUPS_PRINTER_DUPLEX))
+  {
+    keyvalue[i  ][0] = "Duplex";
+    keyvalue[i++][1] = "T";
+  }
+
+  if ((p->type & CUPS_PRINTER_STAPLE))
+  {
+    keyvalue[i  ][0] = "Staple";
+    keyvalue[i++][1] = "T";
+  }
+
+  if ((p->type & CUPS_PRINTER_COPIES))
+  {
+    keyvalue[i  ][0] = "Copies";
+    keyvalue[i++][1] = "T";
+  }
+
+  if ((p->type & CUPS_PRINTER_COLLATE))
+  {
+    keyvalue[i  ][0] = "Collate";
+    keyvalue[i++][1] = "T";
+  }
+
+  if ((p->type & CUPS_PRINTER_PUNCH))
+  {
+    keyvalue[i  ][0] = "Punch";
+    keyvalue[i++][1] = "T";
+  }
+
+  if ((p->type & CUPS_PRINTER_BIND))
+  {
+    keyvalue[i  ][0] = "Bind";
+    keyvalue[i++][1] = "T";
+  }
+
+  if ((p->type & CUPS_PRINTER_SORT))
+  {
+    keyvalue[i  ][0] = "Sort";
+    keyvalue[i++][1] = "T";
+  }
+
+  keyvalue[i  ][0] = "pdl";
+  keyvalue[i++][1] = p->pdl ? p->pdl : "application/postscript";
+
+ /*
+  * Then pack them into a proper txt record...
+  */
+
+  return (dnssdPackTxtRecord(txt_len, keyvalue, i));
+}
+
+
+/*
+ * 'dnssdDeregisterPrinter()' - Stop sending broadcast information for a
+ *                              printer.
+ */
+
+static void
+dnssdDeregisterPrinter(
+    cupsd_printer_t *p)			/* I - Printer */
+{
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdDeregisterPrinter(%s)", p->name);
+
+ /*
+  * Closing the socket deregisters the service
+  */
+
+  if (p->dnssd_ipp_ref)
+  {
+    cupsdRemoveSelect(p->dnssd_ipp_fd);
+    DNSServiceRefDeallocate(p->dnssd_ipp_ref);
+    p->dnssd_ipp_ref = NULL;
+    p->dnssd_ipp_fd  = -1;
+  }
+
+  cupsdClearString(&p->reg_name);
+  cupsdClearString(&p->txt_record);
+}
+
+
+/*
+ * 'dnssdPackTxtRecord()' - Pack an array of key/value pairs into the
+ *                          TXT record format.
+ */
+
+static char *				/* O - TXT record */
+dnssdPackTxtRecord(int  *txt_len,	/* O - TXT record length */
+		   char *keyvalue[][2],	/* I - Table of key value pairs */
+		   int  count)		/* I - Items in table */
+{
+  int  i;				/* Looping var */
+  int  length;				/* Length of TXT record */
+  int  length2;				/* Length of value */
+  char *txtRecord;			/* TXT record buffer */
+  char *cursor;				/* Looping pointer */
+
+
+ /*
+  * Calculate the buffer size
+  */
+
+  for (length = i = 0; i < count; i++)
+    length += 1 + strlen(keyvalue[i][0]) + 
+	      (keyvalue[i][1] ? 1 + strlen(keyvalue[i][1]) : 0);
+
+ /*
+  * Allocate and fill it
+  */
+
+  txtRecord = malloc(length);
+  if (txtRecord)
+  {
+    *txt_len = length;
+
+    for (cursor = txtRecord, i = 0; i < count; i++)
+    {
+     /*
+      * Drop in the p-string style length byte followed by the data
+      */
+
+      length  = strlen(keyvalue[i][0]);
+      length2 = keyvalue[i][1] ? 1 + strlen(keyvalue[i][1]) : 0;
+
+      *cursor++ = (unsigned char)(length + length2);
+
+      memcpy(cursor, keyvalue[i][0], length);
+      cursor += length;
+
+      if (length2)
+      {
+        length2 --;
+	*cursor++ = '=';
+	memcpy(cursor, keyvalue[i][1], length2);
+	cursor += length2;
+      }
+    }
+  }
+
+  return (txtRecord);
+}
+
+
+/*
+ * 'dnssdRegisterCallback()' - DNSServiceRegister callback.
+ */
+
+static void
+dnssdRegisterCallback(
+    DNSServiceRef	sdRef,		/* I - DNS Service reference */
+    DNSServiceFlags	flags,		/* I - Reserved for future use */
+    DNSServiceErrorType	errorCode,	/* I - Error code */
+    const char		*name,     	/* I - Service name */
+    const char		*regtype,  	/* I - Service type */
+    const char		*domain,   	/* I - Domain. ".local" for now */
+    void		*context)	/* I - User-defined context */
+{
+  (void)context;
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, 
+		  "dnssdRegisterCallback(%s, %s)", name, regtype);
+
+  if (errorCode)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, 
+		    "DNSServiceRegister failed with error %d", (int)errorCode);
+    return;
+  }
+}
+
+
+/*
+ * 'dnssdRegisterPrinter()' - Start sending broadcast information for a printer
+ *		              or update the broadcast contents.
+ */
+
+static void 
+dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
+{
+  DNSServiceErrorType	se;		/* dnssd errors */
+  cupsd_listener_t	*lis;		/* Current listening socket */
+  char			*txt_record,	/* TXT record buffer */
+			*name;		/* Service name */
+  int			txt_len,	/* TXT record length */
+			port;		/* IPP port number */
+  char			str_buffer[1024];
+					/* C-string buffer */
+  const char		*computerName;  /* Computer name c-string ptr */
+  const char		*regtype;	/* Registration type */
+#ifdef HAVE_COREFOUNDATION_H
+  CFStringRef		computerNameRef;/* Computer name CFString */
+  CFStringEncoding	nameEncoding;	/* Computer name encoding */
+  CFMutableStringRef	shortNameRef;	/* Mutable name string */
+  CFIndex		nameLength;	/* Name string length */
+#else
+  int			nameLength;	/* Name string length */
+#endif	/* HAVE_COREFOUNDATION_H */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdRegisterPrinter(%s) %s", p->name,
+                  !p->dnssd_ipp_ref ? "new" : "update");
+
+ /*
+  * If per-printer sharing was just disabled make sure we're not
+  * registered before returning.
+  */
+
+  if (!p->shared)
+  {
+    dnssdDeregisterPrinter(p);
+    return;
+  }
+
+ /*
+  * Get the computer name as a c-string...
+  */
+
+#ifdef HAVE_COREFOUNDATION_H
+  computerName = NULL;
+  if ((computerNameRef = SCDynamicStoreCopyComputerName(NULL, &nameEncoding)))
+    if ((computerName = CFStringGetCStringPtr(computerNameRef,
+                                              kCFStringEncodingUTF8)) == NULL)
+      if (CFStringGetCString(computerNameRef, str_buffer, sizeof(str_buffer),
+                             kCFStringEncodingUTF8))
+	computerName = str_buffer;
+#else
+  computerName = ServerName;
+#endif	/* HAVE_COREFOUNDATION_H */
+
+ /*
+  * The registered name takes the form of "<printer-info> @ <computer name>"...
+  */
+
+  name = NULL;
+  if (computerName)
+    cupsdSetStringf(&name, "%s @ %s",
+                    (p->info && strlen(p->info)) ? p->info : p->name,
+		    computerName);
+  else
+    cupsdSetString(&name, (p->info && strlen(p->info)) ? p->info : p->name);
+
+#ifdef HAVE_COREFOUNDATION_H
+  if (computerNameRef)
+    CFRelease(computerNameRef);
+#endif	/* HAVE_COREFOUNDATION_H */
+
+ /*
+  * If an existing printer was renamed, unregister it and start over...
+  */
+
+  if (p->reg_name && strcmp(p->reg_name, name))
+    dnssdDeregisterPrinter(p);
+
+  txt_len    = 0;			/* anti-compiler-warning-code */
+  txt_record = dnssdBuildTxtRecord(&txt_len, p);
+
+  if (!p->dnssd_ipp_ref)
+  {
+   /*
+    * Initial registration...
+    */
+
+    cupsdSetString(&p->reg_name, name);
+
+    port = ippPort();
+
+    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+	 lis;
+	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+    {
+      if (lis->address.addr.sa_family == AF_INET)
+      {
+	port = ntohs(lis->address.ipv4.sin_port);
+	break;
+      }
+      else if (lis->address.addr.sa_family == AF_INET6)
+      {
+	port = ntohs(lis->address.ipv6.sin6_port);
+	break;
+      }
+    }
+
+   /*
+    * Use the _fax subtype for fax queues...
+    */
+
+    regtype = (p->type & CUPS_PRINTER_FAX) ? dnssdIPPFaxRegType :
+                                             dnssdIPPRegType;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdRegisterPrinter(%s) type is \"%s\"",
+                    p->name, regtype);
+
+    se = DNSServiceRegister(&p->dnssd_ipp_ref, 0, 0, name, regtype, 
+			    NULL, NULL, htons(port), txt_len, txt_record,
+			    dnssdRegisterCallback, p);
+
+   /*
+    * In case the name is too long, try shortening the string one character
+    * at a time...
+    */
+
+    if (se == kDNSServiceErr_BadParam)
+    {
+#ifdef HAVE_COREFOUNDATION_H
+      if ((shortNameRef = CFStringCreateMutable(NULL, 0)) != NULL)
+      {
+	CFStringAppendCString(shortNameRef, name, kCFStringEncodingUTF8);
+        nameLength = CFStringGetLength(shortNameRef);
+
+	while (se == kDNSServiceErr_BadParam && nameLength > 1)
+	{
+	  CFStringDelete(shortNameRef, CFRangeMake(--nameLength, 1));
+	  if (CFStringGetCString(shortNameRef, str_buffer, sizeof(str_buffer),
+	                         kCFStringEncodingUTF8))
+	  {
+	    se = DNSServiceRegister(&p->dnssd_ipp_ref, 0, 0, str_buffer,
+	                            regtype, NULL, NULL, htons(port),
+				    txt_len, txt_record,
+				    dnssdRegisterCallback, p);
+	  }
+	}
+
+	CFRelease(shortNameRef);
+      }
+#else
+      nameLength = strlen(name);
+      while (se == kDNSServiceErr_BadParam && nameLength > 1)
+      {
+	name[--nameLength] = '\0';
+	se = DNSServiceRegister(&p->dnssd_ipp_ref, 0, 0, str_buffer, regtype, 
+				NULL, NULL, htons(port), txt_len, txt_record,
+				dnssdRegisterCallback, p);
+      }
+#endif	/* HAVE_COREFOUNDATION_H */
+    }
+
+    if (se == kDNSServiceErr_NoError)
+    {
+      p->dnssd_ipp_fd = DNSServiceRefSockFD(p->dnssd_ipp_ref);
+      p->txt_record   = txt_record;
+      p->txt_len      = txt_len;
+      txt_record      = NULL;
+
+      cupsdAddSelect(p->dnssd_ipp_fd, (cupsd_selfunc_t)cupsdUpdateDNSSDBrowse,
+                     NULL, (void *)p);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "DNS-SD registration of \"%s\" failed with %d",
+		      p->name, se);
+  }
+  else if (txt_len != p->txt_len || memcmp(txt_record, p->txt_record, txt_len))
+  {
+   /*
+    * Update the existing registration...
+    */
+
+    /* A TTL of 0 means use record's original value (Radar 3176248) */
+    se = DNSServiceUpdateRecord(p->dnssd_ipp_ref, NULL, 0,
+				txt_len, txt_record, 0);
+
+    if (p->txt_record)
+      free(p->txt_record);
+
+    p->txt_record = txt_record;
+    p->txt_len    = txt_len;
+    txt_record    = NULL;
+  }
+
+  if (txt_record)
+    free(txt_record);
+
+  if (name)
+    free(name);
+}
+#endif /* HAVE_DNSSD */
 
 
 /*

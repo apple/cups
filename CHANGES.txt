@@ -1,9 +1,11 @@
-CHANGES.txt - 2007-02-14
+CHANGES.txt - 2007-02-19
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2130, STR #2131)
+	- Added support for DNS-SD (aka "Bonjour") printer sharing
+	  (STR #1171)
 	- Job operations (cancel, hold, release, etc.) from the
 	  web interface now return back to the original page (STR
 	  #2239)

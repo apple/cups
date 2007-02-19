@@ -30,19 +30,19 @@
 
 typedef enum
 {
-  CUPSD_LOG_ATTR = -3,		/* Used internally for attributes */
-  CUPSD_LOG_STATE,		/* Used internally for state-reasons */
-  CUPSD_LOG_PAGE,		/* Used internally for page logging */
+  CUPSD_LOG_ATTR = -3,			/* Used internally for attributes */
+  CUPSD_LOG_STATE,			/* Used internally for state-reasons */
+  CUPSD_LOG_PAGE,			/* Used internally for page logging */
   CUPSD_LOG_NONE,
-  CUPSD_LOG_EMERG,		/* Emergency issues */
-  CUPSD_LOG_ALERT,		/* Something bad happened that needs attention */
-  CUPSD_LOG_CRIT,		/* Critical error but server continues */
-  CUPSD_LOG_ERROR,		/* Error condition */
-  CUPSD_LOG_WARN,		/* Warning */
-  CUPSD_LOG_NOTICE,		/* Normal condition that needs logging */
-  CUPSD_LOG_INFO,		/* General information */
-  CUPSD_LOG_DEBUG,		/* General debugging */
-  CUPSD_LOG_DEBUG2		/* Detailed debugging */
+  CUPSD_LOG_EMERG,			/* Emergency issues */
+  CUPSD_LOG_ALERT,			/* Something bad happened that needs attention */
+  CUPSD_LOG_CRIT,			/* Critical error but server continues */
+  CUPSD_LOG_ERROR,			/* Error condition */
+  CUPSD_LOG_WARN,			/* Warning */
+  CUPSD_LOG_NOTICE,			/* Normal condition that needs logging */
+  CUPSD_LOG_INFO,			/* General information */
+  CUPSD_LOG_DEBUG,			/* General debugging */
+  CUPSD_LOG_DEBUG2			/* Detailed debugging */
 } cupsd_loglevel_t;
 
 
@@ -50,8 +50,8 @@ typedef enum
  * Printcap formats...
  */
 
-#define PRINTCAP_BSD	0	/* Berkeley LPD format */
-#define PRINTCAP_SOLARIS 1	/* Solaris lpsched format */
+#define PRINTCAP_BSD		0	/* Berkeley LPD format */
+#define PRINTCAP_SOLARIS	1	/* Solaris lpsched format */
 
 
 /*

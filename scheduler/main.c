@@ -674,7 +674,12 @@ main(int  argc,				/* I - Number of command-line args */
       * Got an error from select!
       */
 
-      if (errno == EINTR)	/* Just interrupted by a signal */
+#ifdef HAVE_DNSSD
+      cupsd_printer_t	*p;		/* Current printer */
+#endif /* HAVE_DNSSD */
+
+
+      if (errno == EINTR)		/* Just interrupted by a signal */
         continue;
 
      /*
@@ -713,6 +718,15 @@ main(int  argc,				/* I - Number of command-line args */
 			job->status_buffer ? job->status_buffer->fd : -1,
 			job->print_pipes[0], job->print_pipes[1],
 			job->back_pipes[0], job->back_pipes[1]);
+
+#ifdef HAVE_DNSSD
+      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	   p;
+	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
+        cupsdLogMessage(CUPSD_LOG_EMERG, "printer[%s] %d", p->name,
+	                p->dnssd_ipp_fd);
+#endif /* HAVE_DNSSD */
+
       break;
     }
 
