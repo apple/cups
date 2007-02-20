@@ -81,12 +81,14 @@ print_device(const char *uri,		/* I - Device URI */
   do
   {
    /*
-    * Disable backchannel data when printing to Canon or Minolta USB
-    * printers - apparently these printers will return the IEEE-1284
-    * device ID over and over and over when they get a read request...
+    * Disable backchannel data when printing to Brother, Canon, or
+    * Minolta USB printers - apparently these printers will return
+    * the IEEE-1284 device ID over and over and over when they get
+    * a read request...
     */
 
-    use_bc = strcasecmp(hostname, "Canon") &&
+    use_bc = strcasecmp(hostname, "Brother") &&
+             strcasecmp(hostname, "Canon") &&
              strcasecmp(hostname, "Konica Minolta") &&
              strcasecmp(hostname, "Minolta");
 
