@@ -38,16 +38,16 @@ encryption settings for the client.</P>
 <PRE CLASS="command">
 ServerName foo.bar.com
 ServerName 11.22.33.44
+ServerName foo.bar.com:8631
 </PRE>
 
 <H3>Description</H3>
 
-<P>The <CODE>ServerName</CODE> directive specifies sets the
-remote server that is to be used for all client operations.  That
-is, it redirects all client requests to the remote server.</P>
+<P>The <CODE>ServerName</CODE> directive specifies sets the remote server that is to be used for all client operations. That is, it redirects all client requests to the remote server.</P>
 
-<P>The default is to use the local server
-("<VAR>localhost</VAR>") or domain socket, if so configured.</P>
+<P>The default port number is 631 but can be overridden by adding a colon followed by the desired port number to the value.</P>
+
+<P>The default is to use the local server ("<VAR>localhost</VAR>") or domain socket, if so configured.</P>
 
 </BODY>
 </HTML>
