@@ -454,7 +454,7 @@ done
 # Create the test report source file...
 #
 
-strfile=cups-str-1.2-`date +%Y-%m-%d`-$user.html
+strfile=cups-str-1.3-`date +%Y-%m-%d`-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile
