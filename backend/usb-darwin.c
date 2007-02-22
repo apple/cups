@@ -572,16 +572,27 @@ static Boolean list_device_callback(void *refcon, io_service_t obj)
     copy_devicestring(obj, &deviceIDString, &deviceLocation);
     if (deviceIDString != NULL) {
       CFStringRef make = NULL,  model = NULL, serial = NULL;
-      char uristr[1024], makestr[1024], modelstr[1024], serialstr[1024], optionsstr[1024];
-      char idstr[1024];
+      char uristr[1024], makestr[1024], modelstr[1024], serialstr[1024];
+      char optionsstr[1024], idstr[1024];
 
       copy_deviceinfo(deviceIDString, &make, &model, &serial);
 
       modelstr[0] = '/';
 
-      CFStringGetCString(deviceIDString, idstr, sizeof(idstr),    kCFStringEncodingUTF8);
-      CFStringGetCString(make, makestr, sizeof(makestr),    kCFStringEncodingUTF8);
-      CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1, kCFStringEncodingUTF8);
+      CFStringGetCString(deviceIDString, idstr, sizeof(idstr),
+                         kCFStringEncodingUTF8);
+
+      if (make)
+        CFStringGetCString(make, makestr, sizeof(makestr),
+	                   kCFStringEncodingUTF8);
+      else
+        strcpy(makestr, "Unknown");
+
+      if (model)
+	CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1,
+      			   kCFStringEncodingUTF8);
+      else
+        strcpy(modelstr + 1, "Printer");
 
      /*
       * Fix common HP 1284 bug...
