@@ -5,7 +5,7 @@
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
-#   Copyright 1999-2006 by Easy Software Products, all rights reserved.
+#   Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -366,6 +366,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/reject.8.gz
 
 %dir /var/cache/cups
+%attr(0775,root,sys) %dir /var/cache/cups/rss
 %dir /var/log/cups
 %dir /var/run/cups
 %attr(0711,lp,sys) %dir /var/run/cups/certs

@@ -1,0 +1,30 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription">
+
+<H2 CLASS="title">Add RSS Subscription</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">Name:</TH>
+<TD><INPUT TYPE="TEXT" NAME="SUBSCRIPTION_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?SUBSCRIPTION_NAME}"><BR>
+<SMALL>(May contain any printable characters except "/" and "#")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Queue:</TH>
+<TD><SELECT NAME="PRINTER_URI" SIZE="10"><OPTION VALUE="#ALL#"{?PRINTER_URI=#ALL#? SELECTED:}>All Queues</OPTIONS>{[printer_name]<OPTION VALUE="{printer_uri_supported}"{?PRINTER_URI={printer_uri_supported}? SELECTED:}>{printer_name}</OPTION>}</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Events:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_STOPPED" {?EVENT_PRINTER_STOPPED}>Queue Stopped<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_CREATED" {?EVENT_JOB_CREATED}>Job Created<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_COMPLETED" {?EVENT_JOB_COMPLETED}>Job Completed<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_STOPPED" {?EVENT_JOB_STOPPED}>Job Stopped<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_AUDIT" {?EVENT_SERVER_AUDIT}>Server Auditing</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-add-rss-subscription.gif" ALT="Add RSS Subscription"></TD>
+</TR>
+</TABLE>
+
+</FORM>

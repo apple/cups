@@ -23,19 +23,21 @@
  *
  * Contents:
  *
- *   main()                    - Main entry for CGI.
- *   do_am_class()             - Add or modify a class.
- *   do_am_printer()           - Add or modify a printer.
- *   do_config_printer()       - Configure the default options for a printer.
- *   do_config_server()        - Configure server settings.
- *   do_delete_class()         - Delete a class...
- *   do_delete_printer()       - Delete a printer...
- *   do_export()               - Export printers to Samba...
- *   do_menu()                 - Show the main menu...
- *   do_printer_op()           - Do a printer operation.
- *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
- *   do_set_sharing()          - Set printer-is-shared value...
- *   match_string()            - Return the number of matching characters.
+ *   main()                       - Main entry for CGI.
+ *   do_add_rss_subscription()    - Add a RSS subscription.
+ *   do_am_class()                - Add or modify a class.
+ *   do_am_printer()              - Add or modify a printer.
+ *   do_cancel_rss_subscription() - Cancel a RSS subscription.
+ *   do_config_printer()          - Configure the default options for a printer.
+ *   do_config_server()           - Configure server settings.
+ *   do_delete_class()            - Delete a class...
+ *   do_delete_printer()          - Delete a printer...
+ *   do_export()                  - Export printers to Samba...
+ *   do_menu()                    - Show the main menu...
+ *   do_printer_op()              - Do a printer operation.
+ *   do_set_allowed_users()       - Set the allowed/denied users for a queue.
+ *   do_set_sharing()             - Set printer-is-shared value...
+ *   match_string()               - Return the number of matching characters.
  */
 
 /*
@@ -55,8 +57,10 @@
  * Local functions...
  */
 
+static void	do_add_rss_subscription(http_t *http);
 static void	do_am_class(http_t *http, int modify);
 static void	do_am_printer(http_t *http, int modify);
+static void	do_cancel_rss_subscription(http_t *http);
 static void	do_config_printer(http_t *http);
 static void	do_config_server(http_t *http);
 static void	do_delete_class(http_t *http);
@@ -186,6 +190,12 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_config_server(http);
     else if (!strcmp(op, "export-samba"))
       do_export(http);
+#ifdef HAVE_LIBMXML
+    else if (!strcmp(op, "add-rss-subscription"))
+      do_add_rss_subscription(http);
+    else if (!strcmp(op, "cancel-rss-subscription"))
+      do_cancel_rss_subscription(http);
+#endif /* HAVE_LIBMXML */
     else
     {
      /*
@@ -219,6 +229,75 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   return (0);
+}
+
+
+/*
+ * 'do_add_rss_subscription()' - Add a RSS subscription.
+ */
+
+static void
+do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
+{
+  ipp_t		*request,		/* IPP request data */
+		*response;		/* IPP response data */
+  char		rss_uri[1024];		/* RSS notify-recipient URI */
+  int		num_events;		/* Number of events */
+  const char	*events[10],		/* Subscribed events */
+		*subscription_name,	/* Subscription name */
+		*printer_uri;		/* Printer URI */
+
+
+ /*
+  * See if we have all of the required information...
+  */
+
+  subscription_name = cgiGetVariable("SUBSCRIPTION_NAME");
+  printer_uri       = cgiGetVariable("PRINTER_URI");
+  num_events        = 0;
+
+  if (cgiGetVariable("EVENT_PRINTER_STOPPED"))
+    events[num_events ++] = "printer-stopped";
+  if (cgiGetVariable("EVENT_JOB_CREATED"))
+    events[num_events ++] = "job-created";
+  if (cgiGetVariable("EVENT_JOB_COMPLETED"))
+    events[num_events ++] = "job-completed";
+  if (cgiGetVariable("EVENT_JOB_STOPPED"))
+    events[num_events ++] = "job-stopped";
+  if (cgiGetVariable("EVENT_SERVER_AUDIT"))
+    events[num_events ++] = "server-audit";
+
+  if (!subscription_name || !printer_uri || !num_events)
+  {
+   /*
+    * Build a CUPS_GET_PRINTERS request, which requires the
+    * following attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    */
+
+    request  = ippNewRequest(CUPS_GET_PRINTERS);
+    response = cupsDoRequest(http, request, "/");
+
+    cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+
+    ippDelete(response);
+
+    cgiStartHTML(cgiText(_("Add RSS Subscription")));
+
+    cgiCopyTemplateLang("add-rss-subscription.tmpl");
+
+    cgiEndHTML();
+  }
+  else
+  {
+    cgiStartHTML(cgiText(_("Add RSS Subscription")));
+
+    puts("Got it.");
+
+    cgiEndHTML();
+  }
 }
 
 
@@ -259,13 +338,9 @@ do_am_class(http_t *http,		/* I - HTTP connection */
     *
     *    attributes-charset
     *    attributes-natural-language
-    *    printer-uri
     */
 
     request = ippNewRequest(CUPS_GET_PRINTERS);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, "ipp://localhost/printers");
 
    /*
     * Do the request and get back a response...
@@ -1058,6 +1133,21 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
   if (oldinfo)
     ippDelete(oldinfo);
+}
+
+
+/*
+ * 'do_cancel_rss_subscription()' - Cancel a RSS subscription.
+ */
+
+static void
+do_cancel_rss_subscription(http_t *http)/* I - HTTP connection */
+{
+  cgiStartHTML(cgiText(_("Cancel RSS Subscription")));
+
+  cgiCopyTemplateLang("cancel-rss-subscription.tmpl");
+
+  cgiEndHTML();
 }
 
 
@@ -2486,6 +2576,20 @@ do_menu(http_t *http)			/* I - HTTP connection */
   }
   else
     perror(filename);
+
+#ifdef HAVE_LIBMXML
+ /*
+  * Subscriptions...
+  */
+
+  cgiSetVariable("HAVE_LIBMXML", "YES");
+
+  request = ippNewRequest(IPP_GET_SUBSCRIPTIONS);
+
+  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  {
+  }
+#endif /* HAVE_LIBMXML */
 
  /*
   * Finally, show the main menu template...

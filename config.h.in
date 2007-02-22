@@ -522,6 +522,13 @@
 #undef HAVE_KQUEUE
 
 
+/*
+ * Do we have the Mini-XML library?
+ */
+
+#undef HAVE_LIBMXML
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

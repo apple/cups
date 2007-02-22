@@ -3,7 +3,7 @@
 #
 #   Notifier makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -25,7 +25,7 @@
 include ../Makedefs
 
 
-TARGETS =	mailto testnotify
+TARGETS =	mailto $(RSSBIN) testnotify
 OBJS	=	mailto.o testnotify.o
 
 
@@ -53,6 +53,8 @@ install:	all
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
 	done
+	$(INSTALL_DIR) -m 755 $(CACHEDIR)/rss
+	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
 
 
 #
@@ -65,6 +67,7 @@ uninstall:
 	done
 	-$(RMDIR) $(SERVERBIN)/notifier
 	-$(RMDIR) $(SERVERBIN)
+	-$(RMDIR) $(CACHEDIR)/rss
 
 
 #
@@ -82,6 +85,15 @@ depend:
 mailto:	mailto.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o mailto mailto.o $(LIBS)
+
+
+#
+# rss
+#
+
+rss:	rss.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o rss rss.o $(RSSLIBS) $(LIBS)
 
 
 #
