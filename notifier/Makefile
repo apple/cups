@@ -25,8 +25,8 @@
 include ../Makedefs
 
 
-TARGETS =	mailto $(RSSBIN) testnotify
-OBJS	=	mailto.o testnotify.o
+TARGETS =	mailto rss testnotify
+OBJS	=	mailto.o rss.o testnotify.o
 
 
 #
@@ -93,7 +93,7 @@ mailto:	mailto.o ../cups/$(LIBCUPS)
 
 rss:	rss.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o rss rss.o $(RSSLIBS) $(LIBS)
+	$(CC) $(LDFLAGS) -o rss rss.o $(LIBS)
 
 
 #

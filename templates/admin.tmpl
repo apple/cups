@@ -36,19 +36,6 @@ ALT="Manage Classes" CLASS="button"></A>
 Jobs" CLASS="button"></A>
 </P>
 
-{HAVE_LIBMXML?<H2 CLASS="title">RSS Subscriptions</H2>
-
-<P>
-<A HREF="/admin/?op=add-rss-subscription"><IMG SRC="/images/button-add-rss-subscription.gif" ALT="Add RSS Subscription" CLASS="button"></A>
-</P>
-
-{subscription_id?<TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="0" SUMMARY="RSS Subscriptions">
-<THEAD><TR><TH>Name</TH><TH>Events</TH><TH>Queue</TH></TR></THEAD>
-<TBODY>{[subscription_id]
-<TR><TD><A HREF="{subscription_uri}">{subscription_name}</A> <A HREF="/admin/?op=cancel-rss-subscription&amp;subscription_id={subscription_id}"><IMG SRC="/images/button-cancel-rss-subscription.gif" CLASS="button" ALT="Cancel RSS Subscription"></A></TD><TD>{notify_events}</TD><TD>{notify_printer_name}</TD></TR>}
-</TBODY>
-</TABLE>:}:}
-
 </TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 
 <H2 CLASS="title">Server</H2>
@@ -89,3 +76,16 @@ CLASS="button"></A>
 
 </TD></TR>
 </TABLE>
+
+<H2 CLASS="title">Subscriptions</H2>
+
+<P>
+<A HREF="/admin/?op=add-rss-subscription"><IMG SRC="/images/button-add-rss-subscription.gif" ALT="Add RSS Subscription" CLASS="button"></A>
+</P>
+
+{notify_subscription_id?<TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="0" SUMMARY="RSS Subscriptions">
+<THEAD><TR CLASS="data"><TH>Name</TH><TH>Events</TH><TH>Queue</TH></TR></THEAD>
+<TBODY>{[notify_subscription_id]
+<TR><TD NOWRAP><A HREF="{notify_recipient_uri}">{notify_subscription_id}: {notify_recipient_name}</A> <A HREF="/admin/?op=cancel-subscription&amp;notify_subscription_id={notify_subscription_id}"><IMG SRC="/images/button-cancel-subscription.gif" CLASS="button" ALT="Cancel RSS Subscription"></A>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:All Queues}</TD></TR>}
+</TBODY>
+</TABLE>:}

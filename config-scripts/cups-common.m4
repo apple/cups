@@ -188,18 +188,6 @@ esac
 
 AC_SUBST(ARFLAGS)
 
-dnl Mini-XML for RSS support...
-RSSBIN=""
-RSSLIBS=""
-
-AC_CHECK_LIB(mxml, mxmlLoadFile, [
-             AC_DEFINE(HAVE_LIBMXML)
-	     RSSBIN="rss"
-	     RSSLIBS="-lmxml"])
-
-AC_SUBST(RSSBIN)
-AC_SUBST(RSSLIBS)
-
 dnl Extra platform-specific libraries...
 BACKLIBS=""
 CUPSDLIBS=""

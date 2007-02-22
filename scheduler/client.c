@@ -3227,11 +3227,13 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
 
  /*
-  * Need to add DocumentRoot global...
+  * Figure out the real filename...
   */
 
   if (!strncmp(con->uri, "/ppd/", 5))
     snprintf(filename, len, "%s%s", ServerRoot, con->uri);
+  else if (!strncmp(con->uri, "/rss/", 5) && !strchr(con->uri + 5, '/'))
+    snprintf(filename, len, "%s/rss/%s", CacheDir, con->uri + 5);
   else if (!strncmp(con->uri, "/admin/conf/", 12))
     snprintf(filename, len, "%s%s", ServerRoot, con->uri + 11);
   else if (!strncmp(con->uri, "/admin/log/", 11))

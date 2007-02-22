@@ -149,7 +149,7 @@ httpAssembleURI(
   if (!ptr)
     goto assemble_overflow;
 
-  if (!strcmp(scheme, "mailto:"))
+  if (!strcmp(scheme, "mailto"))
   {
    /*
     * mailto: only has :, no //...

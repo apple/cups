@@ -423,7 +423,7 @@ apihelp:
 		array.h array.c >../doc/help/api-array.html
 	mxmldoc --section "Programming" --title "CUPS API" \
 		--intro api-cups.shtml \
-		cups.h dest.c getputfile.c language.c \
+		cups.h dest.c getputfile.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c >../doc/help/api-cups.html
 	mxmldoc --section "Programming" --title "File and Directory APIs" \

@@ -5522,7 +5522,7 @@ get_notifications(cupsd_client_t *con)	/* I - Client connection */
   int			interval;	/* Poll interval */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_subscription_attrs(con=%p[%d])",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_notifications(con=%p[%d])",
                   con, con->http.fd);
 
  /*

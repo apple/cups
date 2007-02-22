@@ -3,7 +3,7 @@
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -826,6 +826,144 @@ cgiSetIPPObjectVars(
 	valptr ++;
 
       cgiSetArray("job_printer_name", element, valptr);
+    }
+
+   /*
+    * Localize event names in "notify_events" variable...
+    */
+
+    if (!strcmp(name, "notify_events"))
+    {
+      size_t	remaining;		/* Remaining bytes in buffer */
+
+
+      value[0] = '\0';
+      valptr   = value;
+
+      for (i = 0; i < attr->num_values; i ++)
+      {
+        if (valptr >= (value + sizeof(value) - 3))
+	  break;
+
+        if (i)
+	{
+	  *valptr++ = ',';
+	  *valptr++ = ' ';
+        }
+
+        remaining = sizeof(value) - (valptr - value);
+
+        if (!strcmp(attr->values[i].string.text, "printer-stopped"))
+	  strlcpy(valptr, _("Printer Stopped"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "printer-added"))
+	  strlcpy(valptr, _("Printer Added"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "printer-modified"))
+	  strlcpy(valptr, _("Printer Modified"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "printer-deleted"))
+	  strlcpy(valptr, _("Printer Deleted"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "job-created"))
+	  strlcpy(valptr, _("Job Created"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "job-completed"))
+	  strlcpy(valptr, _("Job Completed"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "job-stopped"))
+	  strlcpy(valptr, _("Job Stopped"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "job-config-changed"))
+	  strlcpy(valptr, _("Job Options Changed"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "server-restarted"))
+	  strlcpy(valptr, _("Server Restarted"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "server-started"))
+	  strlcpy(valptr, _("Server Started"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "server-stopped"))
+	  strlcpy(valptr, _("Server Stopped"), remaining);
+	else if (!strcmp(attr->values[i].string.text, "server-audit"))
+	  strlcpy(valptr, _("Server Security Auditing"), remaining);
+	else
+          strlcpy(valptr, attr->values[i].string.text, remaining);
+
+        valptr += strlen(valptr);
+      }
+
+      cgiSetArray("notify_events", element, value);
+      continue;
+    }
+
+   /*
+    * Add "notify_printer_name" variable if we have a "notify_printer_uri"
+    * attribute...
+    */
+
+    if (!strcmp(name, "notify_printer_uri"))
+    {
+      if ((valptr = strrchr(attr->values[0].string.text, '/')) == NULL)
+	valptr = "unknown";
+      else
+	valptr ++;
+
+      cgiSetArray("notify_printer_name", element, valptr);
+    }
+
+   /*
+    * Add "notify_recipient_name" variable if we have a "notify_recipient_uri"
+    * attribute, and rewrite recipient URI...
+    */
+
+    if (!strcmp(name, "notify_recipient_uri"))
+    {
+      char	uri[1024],		/* New URI */
+		scheme[32],		/* Scheme portion of URI */
+		userpass[256],		/* Username/password portion of URI */
+		host[1024],		/* Hostname portion of URI */
+		resource[1024],		/* Resource portion of URI */
+		*options;		/* Options in URI */
+      int	port;			/* Port number */
+
+
+      httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text,
+                      scheme, sizeof(scheme), userpass, sizeof(userpass),
+		      host, sizeof(host), &port, resource, sizeof(resource));
+
+      if (!strcmp(scheme, "rss"))
+      {
+       /*
+        * RSS notification...
+	*/
+
+        if ((options = strchr(resource, '?')) != NULL)
+	  *options = '\0';
+
+        if (host[0])
+	{
+	 /*
+	  * Link to remote feed...
+	  */
+
+	  httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "http",
+	                  userpass, host, port, resource);
+          strlcpy(name, uri, sizeof(name));
+	}
+	else
+	{
+	 /*
+	  * Link to local feed...
+	  */
+
+	  snprintf(uri, sizeof(uri), "/rss%s", resource);
+          strlcpy(name, resource + 1, sizeof(name));
+	}
+      }
+      else
+      {
+       /*
+        * Other...
+	*/
+
+        strlcpy(uri, attr->values[0].string.text, sizeof(uri));
+	strlcpy(name, resource, sizeof(name));
+      }
+
+      cgiSetArray("notify_recipient_uri", element, uri);
+      cgiSetArray("notify_recipient_name", element, name);
+      continue;
     }
 
    /*
