@@ -243,9 +243,12 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
 		*response;		/* IPP response data */
   char		rss_uri[1024];		/* RSS notify-recipient URI */
   int		num_events;		/* Number of events */
-  const char	*events[10],		/* Subscribed events */
+  const char	*events[12],		/* Subscribed events */
 		*subscription_name,	/* Subscription name */
-		*printer_uri;		/* Printer URI */
+		*printer_uri,		/* Printer URI */
+		*ptr,			/* Pointer into name */
+		*user;			/* Username */
+  int		max_events;		/* Maximum number of events */
 
 
  /*
@@ -256,25 +259,42 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
   printer_uri       = cgiGetVariable("PRINTER_URI");
   num_events        = 0;
 
-  if (cgiGetVariable("EVENT_PRINTER_STOPPED"))
-    events[num_events ++] = "printer-stopped";
   if (cgiGetVariable("EVENT_JOB_CREATED"))
     events[num_events ++] = "job-created";
   if (cgiGetVariable("EVENT_JOB_COMPLETED"))
     events[num_events ++] = "job-completed";
   if (cgiGetVariable("EVENT_JOB_STOPPED"))
     events[num_events ++] = "job-stopped";
+  if (cgiGetVariable("EVENT_JOB_CONFIG_CHANGED"))
+    events[num_events ++] = "job-config-changed";
+  if (cgiGetVariable("EVENT_PRINTER_STOPPED"))
+    events[num_events ++] = "printer-stopped";
+  if (cgiGetVariable("EVENT_PRINTER_ADDED"))
+    events[num_events ++] = "printer-added";
+  if (cgiGetVariable("EVENT_PRINTER_MODIFIED"))
+    events[num_events ++] = "printer-modified";
+  if (cgiGetVariable("EVENT_PRINTER_DELETED"))
+    events[num_events ++] = "printer-deleted";
+  if (cgiGetVariable("EVENT_SERVER_STARTED"))
+    events[num_events ++] = "server-started";
+  if (cgiGetVariable("EVENT_SERVER_STOPPED"))
+    events[num_events ++] = "server-stopped";
+  if (cgiGetVariable("EVENT_SERVER_RESTARTED"))
+    events[num_events ++] = "server-restarted";
   if (cgiGetVariable("EVENT_SERVER_AUDIT"))
     events[num_events ++] = "server-audit";
 
-  if (!subscription_name || !printer_uri || !num_events)
+  if ((ptr = cgiGetVariable("MAX_EVENTS")) != NULL)
+    max_events = atoi(ptr);
+  else
+    max_events = 0;
+
+  if (!subscription_name || !printer_uri || !num_events ||
+      max_events <= 0 || max_events > 9999)
   {
    /*
-    * Build a CUPS_GET_PRINTERS request, which requires the
-    * following attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
+    * Don't have everything we need, so get the available printers
+    * and classes and (re)show the add page...
     */
 
     request  = ippNewRequest(CUPS_GET_PRINTERS);
@@ -289,15 +309,82 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
     cgiCopyTemplateLang("add-rss-subscription.tmpl");
 
     cgiEndHTML();
+    return;
+  }
+
+ /*
+  * Validate the subscription name...
+  */
+
+  for (ptr = subscription_name; *ptr; ptr ++)
+    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
+      break;
+
+  if (*ptr)
+  {
+    cgiSetVariable("ERROR",
+                   cgiText(_("The subscription name may not "
+			     "contain spaces, slashes (/), or the "
+			     "pound sign (#).")));
+    cgiStartHTML(_("Add RSS Subscription"));
+    cgiCopyTemplateLang("error.tmpl");
+    cgiEndHTML();
+    return;
+  }
+
+ /*
+  * Add the subscription...
+  */
+
+  ptr = subscription_name + strlen(subscription_name) - 4;
+  if (ptr < subscription_name || strcmp(ptr, ".rss"))
+    httpAssembleURIf(HTTP_URI_CODING_ALL, rss_uri, sizeof(rss_uri), "rss",
+                     NULL, NULL, 0, "/%s.rss?max_events=%d", subscription_name,
+		     max_events);
+  else
+    httpAssembleURIf(HTTP_URI_CODING_ALL, rss_uri, sizeof(rss_uri), "rss",
+                     NULL, NULL, 0, "/%s?max_events=%d", subscription_name,
+		     max_events);
+
+  request = ippNewRequest(IPP_CREATE_PRINTER_SUBSCRIPTION);
+
+  if (!strcasecmp(printer_uri, "#ALL#"))
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, "ipp://localhost/");
+  else
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, printer_uri);
+
+  if ((user = getenv("REMOTE_USER")) == NULL)
+    user = "guest";
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+               NULL, user);
+
+  ippAddString(request, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI, "notify-recipient",
+               NULL, rss_uri);
+  ippAddStrings(request, IPP_TAG_SUBSCRIPTION, IPP_TAG_KEYWORD, "notify-events",
+                num_events, NULL, events);
+
+  ippDelete(cupsDoRequest(http, request, "/"));
+
+  if (cupsLastError() > IPP_OK_CONFLICT)
+  {
+    cgiStartHTML(_("Add RSS Subscription"));
+    cgiShowIPPError(_("Unable to add RSS subscription:"));
   }
   else
   {
-    cgiStartHTML(cgiText(_("Add RSS Subscription")));
+   /*
+    * Redirect successful updates back to the admin page...
+    */
 
-    puts("Got it.");
-
-    cgiEndHTML();
+    cgiSetVariable("refresh_page", "5;URL=/admin");
+    cgiStartHTML(_("Add RSS Subscription"));
+    cgiCopyTemplateLang("subscription-added.tmpl");
   }
+
+  cgiEndHTML();
 }
 
 

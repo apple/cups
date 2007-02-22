@@ -140,6 +140,15 @@ text/html			html htm printable(0,1024) +\
 text/plain			txt printable(0,1024)
 text/css			css
 
+
+########################################################################
+#
+# RSS feed type...
+#
+
+application/rss+xml		rss
+
+
 ########################################################################
 #
 # CUPS-specific types...
