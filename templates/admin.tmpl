@@ -86,6 +86,6 @@ CLASS="button"></A>
 {notify_subscription_id?<TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="0" SUMMARY="RSS Subscriptions">
 <THEAD><TR CLASS="data"><TH>ID</TH><TH>Name</TH><TH>Events</TH><TH>Queue</TH></TR></THEAD>
 <TBODY>{[notify_subscription_id]
-<TR><TD><A HREF="{notify_recipient_uri}">{notify_subscription_id}</A></TD><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A> <A HREF="/admin/?op=cancel-subscription&amp;notify_subscription_id={notify_subscription_id}"><IMG SRC="/images/button-cancel-subscription.gif" CLASS="button" ALT="Cancel RSS Subscription"></A>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:All Queues}</TD></TR>}
+<TR><TD><A HREF="{notify_recipient_uri}">{notify_subscription_id}</A></TD><TD NOWRAP><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A> <A HREF="/admin/?op=cancel-subscription&amp;notify_subscription_id={notify_subscription_id}"><IMG SRC="/images/button-cancel-subscription.gif" CLASS="button" ALT="Cancel RSS Subscription"></A>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:All Queues}</TD></TR>}
 </TBODY>
 </TABLE>:}
