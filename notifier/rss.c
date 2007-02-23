@@ -23,6 +23,14 @@
  *
  * Contents:
  *
+ *   main()           - Main entry for the test notifier.
+ *   compare_rss()    - Compare two messages.
+ *   delete_message() - Free all memory used by a message.
+ *   load_rss()       - Load an existing RSS feed file.
+ *   new_message()    - Create a new RSS message.
+ *   password_cb()    - Return the cached password.
+ *   save_rss()       - Save messages to a RSS file.
+ *   xml_escape()     - Copy a string, escaping &, <, and > as needed.
  */
 
 /*
@@ -44,7 +52,8 @@ typedef struct _cups_rss_s		/**** RSS message data ****/
 {
   int		sequence_number;	/* notify-sequence-number */
   char		*subject,		/* Message subject/summary */
-		*text;			/* Message text */
+		*text,			/* Message text */
+		*link_url;		/* Link to printer */
   time_t	event_time;		/* When the event occurred */
 } _cups_rss_t;
 
@@ -64,9 +73,10 @@ static int		compare_rss(_cups_rss_t *a, _cups_rss_t *b);
 static void		delete_message(_cups_rss_t *rss);
 static void		load_rss(cups_array_t *rss, const char *filename);
 static _cups_rss_t	*new_message(int sequence_number, char *subject,
-			             char *text, time_t event_time);
+			             char *text, char *link, time_t event_time);
 static const char	*password_cb(const char *prompt);
-static int		save_rss(cups_array_t *rss, const char *filename);
+static int		save_rss(cups_array_t *rss, const char *filename,
+			         const char *baseurl);
 static char		*xml_escape(const char *s);
 
 
@@ -86,18 +96,27 @@ main(int  argc,				/* I - Number of command-line arguments */
 		host[1024],		/* Hostname for remote RSS */
 		resource[1024],		/* RSS file */
 		*options;		/* Options */
-  int		port;			/* Port number for remote RSS */
+  int		port,			/* Port number for remote RSS */
+		max_events;		/* Maximum number of events */
   http_t	*http;			/* Connection to remote server */
   http_status_t	status;			/* HTTP GET/PUT status code */
   char		filename[1024],		/* Local filename */
 		newname[1024];		/* filename.N */
   cups_lang_t	*language;		/* Language information */
   ipp_attribute_t *printer_up_time,	/* Timestamp on event */
-		*notify_sequence_number;/* Sequence number */
+		*notify_sequence_number,/* Sequence number */
+		*notify_printer_uri;	/* Printer URI */
   char		*subject,		/* Subject for notification message */
-		*text;			/* Text for notification message */
+		*text,			/* Text for notification message */
+		link_url[1024],		/* Link to printer */
+		link_scheme[32],	/* Scheme for link */
+		link_username[256],	/* Username for link */
+		link_host[1024],	/* Host for link */
+		link_resource[1024];	/* Resource for link */
+  int		link_port;		/* Link port */
   cups_array_t	*rss;			/* RSS message array */
   _cups_rss_t	*msg;			/* RSS message */
+  char		baseurl[1024];		/* Base URL */
 
 
   fprintf(stderr, "DEBUG: argc=%d\n", argc);
@@ -116,8 +135,20 @@ main(int  argc,				/* I - Number of command-line arguments */
     return (1);
   }
 
+  max_events = 20;
+
   if ((options = strchr(resource, '?')) != NULL)
+  {
     *options++ = '\0';
+
+    if (!strncmp(options, "max_events=", 11))
+    {
+      max_events = atoi(options + 11);
+
+      if (max_events <= 0)
+        max_events = 20;
+    }
+  }
 
   rss = cupsArrayNew((cups_array_func_t)compare_rss, NULL);
 
@@ -171,10 +202,15 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
     strlcpy(newname, filename, sizeof(newname));
+
+    httpAssembleURI(HTTP_URI_CODING_ALL, baseurl, sizeof(baseurl), "http",
+                    NULL, host, port, resource);
   }
   else
   {
-    const char	*cachedir;		/* CUPS_CACHEDIR */
+    const char	*cachedir,		/* CUPS_CACHEDIR */
+		*server_name,		/* SERVER_NAME */
+		*server_port;		/* SERVER_PORT */
 
 
     http = NULL;
@@ -182,8 +218,17 @@ main(int  argc,				/* I - Number of command-line arguments */
     if ((cachedir = getenv("CUPS_CACHEDIR")) == NULL)
       cachedir = CUPS_CACHEDIR;
 
+    if ((server_name = getenv("SERVER_NAME")) == NULL)
+      server_name = "localhost";
+
+    if ((server_port = getenv("SERVER_PORT")) == NULL)
+      server_port = "631";
+
     snprintf(filename, sizeof(filename), "%s/rss%s", cachedir, resource);
     snprintf(newname, sizeof(newname), "%s.N", filename);
+
+    httpAssembleURIf(HTTP_URI_CODING_ALL, baseurl, sizeof(baseurl), "http",
+                     NULL, server_name, atoi(server_port), "/rss%s", resource);
   }
 
  /*
@@ -238,6 +283,8 @@ main(int  argc,				/* I - Number of command-line arguments */
                                               IPP_TAG_INTEGER);
     notify_sequence_number = ippFindAttribute(event, "notify-sequence-number",
                                 	      IPP_TAG_INTEGER);
+    notify_printer_uri     = ippFindAttribute(event, "notify-printer-uri",
+                                	      IPP_TAG_URI);
     subject                = cupsNotifySubject(language, event);
     text                   = cupsNotifyText(language, event);
 
@@ -247,8 +294,22 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Create a new RSS message...
       */
 
+      if (notify_printer_uri)
+      {
+        httpSeparateURI(HTTP_URI_CODING_ALL,
+	                notify_printer_uri->values[0].string.text,
+			link_scheme, sizeof(link_scheme),
+                        link_username, sizeof(link_username),
+			link_host, sizeof(link_host), &link_port,
+		        link_resource, sizeof(link_resource));
+        httpAssembleURI(HTTP_URI_CODING_ALL, link_url, sizeof(link_url),
+	                "http", link_username, link_host, link_port,
+			link_resource);
+      }
+
       msg = new_message(notify_sequence_number->values[0].integer,
                         xml_escape(subject), xml_escape(text),
+			notify_printer_uri ? xml_escape(link_url) : NULL,
 			printer_up_time->values[0].integer);
 
       if (!msg)
@@ -273,10 +334,23 @@ main(int  argc,				/* I - Number of command-line arguments */
       cupsArrayAdd(rss, msg);
 
      /*
+      * Trim the array as needed...
+      */
+
+      while (cupsArrayCount(rss) > max_events)
+      {
+        msg = cupsArrayFirst(rss);
+
+	cupsArrayRemove(rss, msg);
+
+	delete_message(msg);
+      }
+
+     /*
       * Save the messages to the file again, uploading as needed...
       */ 
 
-      if (save_rss(rss, newname))
+      if (save_rss(rss, newname, baseurl))
       {
 	if (http)
 	{
@@ -337,6 +411,9 @@ delete_message(_cups_rss_t *msg)	/* I - RSS message */
   if (msg->text)
     free(msg->text);
 
+  if (msg->link_url)
+    free(msg->link_url);
+
   free(msg);
 }
 
@@ -349,6 +426,112 @@ static void
 load_rss(cups_array_t *rss,		/* I - RSS messages */
          const char   *filename)	/* I - File to load */
 {
+  FILE		*fp;			/* File pointer */
+  char		line[4096],		/* Line from file */
+		*subject,		/* Subject */
+		*text,			/* Text */
+		*link_url,		/* Link URL */
+		*start,			/* Start of element */
+		*end;			/* End of element */
+  time_t	event_time;		/* Event time */
+  int		sequence_number;	/* Sequence number */
+  int		in_item;		/* In an item */
+  _cups_rss_t	*msg;			/* New message */
+
+
+  if ((fp = fopen(filename, "r")) == NULL)
+  {
+    if (errno != ENOENT)
+      fprintf(stderr, "ERROR: Unable to open %s: %s\n", filename,
+              strerror(errno));
+
+    return;
+  }
+
+  subject         = NULL;
+  text            = NULL;
+  link_url        = NULL;
+  event_time      = 0;
+  sequence_number = 0;
+  in_item         = 0;
+
+  while (fgets(line, sizeof(line), fp))
+  {
+    if (strstr(line, "<item>"))
+      in_item = 1;
+    else if (strstr(line, "</item>") && in_item)
+    {
+      if (subject && text)
+      {
+        msg = new_message(sequence_number, subject, text, link_url,
+	                  event_time);
+
+        if (msg)
+	  cupsArrayAdd(rss, msg);
+
+      }
+      else
+      {
+        if (subject)
+	  free(subject);
+
+	if (text)
+	  free(text);
+
+	if (link_url)
+	  free(link_url);
+      }
+
+      subject         = NULL;
+      text            = NULL;
+      link_url        = NULL;
+      event_time      = 0;
+      sequence_number = 0;
+      in_item         = 0;
+    }
+    else if (!in_item)
+      continue;
+    else if ((start = strstr(line, "<title>")) != NULL)
+    {
+      start += 7;
+      if ((end = strstr(start, "</title>")) != NULL)
+      {
+        *end    = '\0';
+	subject = strdup(start);
+      }
+    }
+    else if ((start = strstr(line, "<description>")) != NULL)
+    {
+      start += 13;
+      if ((end = strstr(start, "</description>")) != NULL)
+      {
+        *end = '\0';
+	text = strdup(start);
+      }
+    }
+    else if ((start = strstr(line, "<link>")) != NULL)
+    {
+      start += 6;
+      if ((end = strstr(start, "</link>")) != NULL)
+      {
+        *end     = '\0';
+	link_url = strdup(start);
+      }
+    }
+    else if ((start = strstr(line, "<pubDate>")) != NULL)
+    {
+      start += 9;
+      if ((end = strstr(start, "</pubDate>")) != NULL)
+      {
+        *end       = '\0';
+	event_time = httpGetDateTime(start);
+      }
+    }
+    else if ((start = strstr(line, "<guid>")) != NULL)
+      sequence_number = atoi(start + 6);
+  }
+
+  fclose(fp);
 }
 
 
@@ -360,6 +543,7 @@ static _cups_rss_t *			/* O - New message */
 new_message(int    sequence_number,	/* I - notify-sequence-number */
             char   *subject,		/* I - Subject/summary */
             char   *text,		/* I - Text */
+	    char   *link_url,		/* I - Link to printer */
 	    time_t event_time)		/* I - Date/time of event */
 {
   _cups_rss_t	*msg;			/* New message */
@@ -371,6 +555,7 @@ new_message(int    sequence_number,	/* I - notify-sequence-number */
   msg->sequence_number = sequence_number;
   msg->subject         = subject;
   msg->text            = text;
+  msg->link_url        = link_url;
   msg->event_time      = event_time;
 
   return (msg);
@@ -396,12 +581,12 @@ password_cb(const char *prompt)		/* I - Prompt string, unused */
 
 static int				/* O - 1 on success, 0 on failure */
 save_rss(cups_array_t *rss,		/* I - RSS messages */
-         const char   *filename)	/* I - File to save to */
+         const char   *filename,	/* I - File to save to */
+	 const char   *baseurl)		/* I - Base URL */
 {
   FILE		*fp;			/* File pointer */
   _cups_rss_t	*msg;			/* Current message */
-  time_t	curtime;		/* Current time */
-  struct tm	*curdate;		/* Current date */
+  char		date[1024];		/* Current date */
 
 
   if ((fp = fopen(filename, "w")) == NULL)
@@ -415,13 +600,13 @@ save_rss(cups_array_t *rss,		/* I - RSS messages */
   fputs("<rss version=\"2.0\">\n", fp);
   fputs("  <channel>\n", fp);
   fputs("    <title>CUPS RSS Feed</title>\n", fp);
+  fprintf(fp, "    <link>%s</link>\n", baseurl);
+  fputs("    <description>CUPS RSS Feed</title>\n", fp);
+  fputs("    <generator>" CUPS_SVERSION "</generator>\n", fp);
+  fputs("    <ttl>1</ttl>\n", fp);
 
-  curtime = time(NULL);
-  curdate = gmtime(&curtime);
-
-  fprintf(fp, "    <pubDate>%04d-%02d-%02dT%02d:%02d:%02d+00:00</pubDate>\n",
-          curdate->tm_year + 1900, curdate->tm_mon + 1, curdate->tm_mday,
-	  curdate->tm_hour, curdate->tm_min, curdate->tm_sec);
+  fprintf(fp, "    <pubDate>%s</pubDate>\n",
+          httpGetDateString2(time(NULL), date, sizeof(date)));
 
   for (msg = (_cups_rss_t *)cupsArrayLast(rss);
        msg;
@@ -430,13 +615,10 @@ save_rss(cups_array_t *rss,		/* I - RSS messages */
     fputs("    <item>\n", fp);
     fprintf(fp, "      <title>%s</title>\n", msg->subject);
     fprintf(fp, "      <description>%s</description>\n", msg->text);
-
-    curdate = gmtime(&(msg->event_time));
-
-    fprintf(fp, "      <pubDate>%04d-%02d-%02dT%02d:%02d:%02d+00:00</pubDate>\n",
-            curdate->tm_year + 1900, curdate->tm_mon + 1, curdate->tm_mday,
-	    curdate->tm_hour, curdate->tm_min, curdate->tm_sec);
-
+    if (msg->link_url)
+      fprintf(fp, "      <link>%s</link>\n", msg->link_url);
+    fprintf(fp, "      <pubDate>%s</pubDate>\n",
+            httpGetDateString2(msg->event_time, date, sizeof(date)));
     fprintf(fp, "      <guid>%d</guid>\n", msg->sequence_number);
     fputs("    </item>\n", fp);
   }
