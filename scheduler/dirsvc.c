@@ -2588,7 +2588,16 @@ dnssdDeregisterPrinter(
   }
 
   cupsdClearString(&p->reg_name);
-  cupsdClearString(&p->txt_record);
+
+  if (p->txt_record)
+  {
+   /*
+    * p->txt_record is malloc'd, not _cupsStrAlloc'd...
+    */
+
+    free(p->txt_record);
+    p->txt_record = NULL;
+  }
 }
 
 

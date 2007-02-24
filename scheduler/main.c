@@ -1995,12 +1995,12 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
       return (0);
 
  /*
-  * If select has been active in the last second (fds != 0) or we have
+  * If select has been active in the last second (fds > 0) or we have
   * many resources in use then don't bother trying to optimize the
   * timeout, just make it 1 second.
   */
 
-  if (fds || cupsArrayCount(Clients) > 50)
+  if (fds > 0 || cupsArrayCount(Clients) > 50)
     return (1);
 
  /*
@@ -2060,7 +2060,7 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
 	    why     = "browse timeout a printer";
 	  }
 	}
-	else if (!(p->type & CUPS_PRINTER_IMPLICIT))
+	else if (p->shared && !(p->type & CUPS_PRINTER_IMPLICIT))
 	{
 	  if (BrowseInterval && (p->browse_time + BrowseInterval) < timeout)
 	  {
@@ -2134,8 +2134,8 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   * Log and return the timeout value...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "select_timeout: %ld seconds to %s",
-                  timeout, why);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "select_timeout(%d): %ld seconds to %s",
+                  fds, timeout, why);
 
   return (timeout);
 }

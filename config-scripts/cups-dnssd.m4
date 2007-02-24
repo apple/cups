@@ -40,22 +40,7 @@ if test x$enable_dnssd != xno; then
 	])
 fi
 
-if test "x$DNSSDLIBS" = x; then
-	CUPS_DEFAULT_BROWSELOCALPROTOCOLS="cups"
-	CUPS_DEFAULT_BROWSEREMOTEPROTOCOLS="cups"
-else
-	CUPS_DEFAULT_BROWSELOCALPROTOCOLS="cups dnssd"
-	# OSX 10.5 will not browse for shared printers with the cups protocol...
-	if test "$uname" = "Darwin" -a $uversion -ge 90; then
-		CUPS_DEFAULT_BROWSEREMOTEPROTOCOLS=""
-	else
-		CUPS_DEFAULT_BROWSEREMOTEPROTOCOLS="cups"
-	fi
-fi
-
 AC_SUBST(DNSSDLIBS)
-AC_SUBST(CUPS_DEFAULT_BROWSELOCALPROTOCOLS)
-AC_SUBST(CUPS_DEFAULT_BROWSEREMOTEPROTOCOLS)
 
 dnl
 dnl End of "$Id$".

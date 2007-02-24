@@ -62,20 +62,46 @@ AC_SUBST(CUPS_BROWSING)
 
 dnl Default BrowseLocalProtocols
 AC_ARG_WITH(local_protocols, [  --with-local-protocols  set default BrowseLocalProtocols, default="CUPS"],
-	CUPS_BROWSE_LOCAL_PROTOCOLS="$withval",
-	if test "x$DNSSDLIBS" != x; then
+	default_local_protocols="$withval",
+	default_local_protocols="default")
+
+if test x$with_local_protocols != xno; then
+	if test "x$default_local_protocols" = "xdefault"; then
+		if test "x$DNSSDLIBS" != "x"; then
 		CUPS_BROWSE_LOCAL_PROTOCOLS="CUPS dnssd"
 	else
 		CUPS_BROWSE_LOCAL_PROTOCOLS="CUPS"
-	fi)
+		fi
+	else
+		CUPS_BROWSE_LOCAL_PROTOCOLS="$default_local_protocols"
+	fi
+else
+	CUPS_BROWSE_LOCAL_PROTOCOLS=""
+fi
+
 AC_SUBST(CUPS_BROWSE_LOCAL_PROTOCOLS)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS,
 	"$CUPS_BROWSE_LOCAL_PROTOCOLS")
 
 dnl Default BrowseRemoteProtocols
 AC_ARG_WITH(remote_protocols, [  --with-remote-protocols set default BrowseRemoteProtocols, default="CUPS"],
-	CUPS_BROWSE_REMOTE_PROTOCOLS="$withval",
-	CUPS_BROWSE_REMOTE_PROTOCOLS="CUPS")
+	default_remote_protocols="$withval",
+	default_remote_protocols="default")
+
+if test x$with_remote_protocols != xno; then
+	if test "x$default_remote_protocols" = "xdefault"; then
+		if test "$uname" = "Darwin" -a $uversion -ge 90; then
+			CUPS_BROWSE_REMOTE_PROTOCOLS=""
+		else
+			CUPS_BROWSE_REMOTE_PROTOCOLS="CUPS"
+		fi
+	else
+		CUPS_BROWSE_REMOTE_PROTOCOLS="$default_remote_protocols"
+	fi
+else
+	CUPS_BROWSE_REMOTE_PROTOCOLS=""
+fi
+
 AC_SUBST(CUPS_BROWSE_REMOTE_PROTOCOLS)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS,
 	"$CUPS_BROWSE_REMOTE_PROTOCOLS")
