@@ -366,7 +366,21 @@ cupsdLoadAllClasses(void)
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG, "Loading class %s...", value);
 
-        p = cupsdAddClass(value);
+       /*
+        * Since prior classes may have implicitly defined this class,
+	* see if it already exists...
+	*/
+
+        if ((p = cupsdFindDest(value)) != NULL)
+	{
+	  p->type = CUPS_PRINTER_CLASS;
+	  cupsdSetStringf(&p->uri, "ipp://%s:%d/classes/%s", ServerName,
+	                  LocalPort, value);
+	  cupsdSetString(&p->error_policy, "retry-job");
+	}
+	else
+          p = cupsdAddClass(value);
+
 	p->accepting = 1;
 	p->state     = IPP_PRINTER_IDLE;
 
