@@ -1289,6 +1289,7 @@ cupsdSaveAllPrinters(void)
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
   cups_option_t		*option;	/* Current option */
+  const char		*ptr;		/* Pointer into info/location */
 
 
  /*
@@ -1363,11 +1364,40 @@ cupsdSaveAllPrinters(void)
       cupsFilePrintf(fp, "<Printer %s>\n", printer->name);
 
     if (printer->info)
-      cupsFilePrintf(fp, "Info %s\n", printer->info);
+    {
+      if ((ptr = strchr(printer->info, '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the info string...
+	*/
+
+        cupsFilePuts(fp, "Info ");
+	cupsFileWrite(fp, printer->info, ptr - printer->info);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "Info %s\n", printer->info);
+    }
 
     if (printer->location)
-      cupsFilePrintf(fp, "Location %s\n", printer->location);
+    {
+      if ((ptr = strchr(printer->info, '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the location string...
+	*/
 
+        cupsFilePuts(fp, "Location ");
+	cupsFileWrite(fp, printer->location, ptr - printer->location);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "Location %s\n", printer->location);
+    }
     if (printer->device_uri)
       cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
 

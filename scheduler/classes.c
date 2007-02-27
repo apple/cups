@@ -3,7 +3,7 @@
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -703,6 +703,7 @@ cupsdSaveAllClasses(void)
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
   cups_option_t		*option;	/* Current option */
+  const char		*ptr;		/* Pointer into info/location */
 
 
  /*
@@ -777,10 +778,40 @@ cupsdSaveAllClasses(void)
       cupsFilePrintf(fp, "<Class %s>\n", pclass->name);
 
     if (pclass->info)
-      cupsFilePrintf(fp, "Info %s\n", pclass->info);
+    {
+      if ((ptr = strchr(pclass->info, '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the info string...
+	*/
+
+        cupsFilePuts(fp, "Info ");
+	cupsFileWrite(fp, pclass->info, ptr - pclass->info);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "Info %s\n", pclass->info);
+    }
 
     if (pclass->location)
-      cupsFilePrintf(fp, "Location %s\n", pclass->location);
+    {
+      if ((ptr = strchr(pclass->info, '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the location string...
+	*/
+
+        cupsFilePuts(fp, "Location ");
+	cupsFileWrite(fp, pclass->location, ptr - pclass->location);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "Location %s\n", pclass->location);
+    }
 
     if (pclass->state == IPP_PRINTER_STOPPED)
     {

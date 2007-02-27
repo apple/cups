@@ -508,7 +508,7 @@ cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
   */
 
   *value = NULL;
-  
+
   while (cupsFileGets(fp, buf, buflen))
   {
     (*linenum) ++;
@@ -519,15 +519,24 @@ cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
 
     if ((ptr = strchr(buf, '#')) != NULL)
     {
-      while (ptr > buf)
+      if (ptr > buf && ptr[-1] == '\\')
       {
-	if (!isspace(ptr[-1] & 255))
-	  break;
-
-        ptr --;
+        // Unquote the #...
+	_cups_strcpy(ptr - 1, ptr);
       }
+      else
+      {
+        // Strip the comment and any trailing whitespace...
+	while (ptr > buf)
+	{
+	  if (!isspace(ptr[-1] & 255))
+	    break;
 
-      *ptr = '\0';
+	  ptr --;
+	}
+
+	*ptr = '\0';
+      }
     }
 
    /*
