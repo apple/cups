@@ -1864,7 +1864,11 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: username=\"%s\"",
 	            con->username);
 
+#ifdef HAVE_AUTHORIZATION_H
+    if (!con->username[0] && !con->authref)
+#else
     if (!con->username[0])
+#endif /* HAVE_AUTHORIZATION_H */
     {
       if (best->satisfy == AUTH_SATISFY_ALL || auth == AUTH_DENY)
 	return (HTTP_UNAUTHORIZED);	/* Non-anonymous needs user/pass */
@@ -1887,8 +1891,13 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   * Get the user info...
   */
 
-  pw = getpwnam(username);
-  endpwent();
+  if (username[0])
+  {
+    pw = getpwnam(username);
+    endpwent();
+  }
+  else
+    pw = NULL;
 
   if (best->level == AUTH_USER)
   {
