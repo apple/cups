@@ -11,7 +11,7 @@
 
   CUPS IPP specification for the Common UNIX Printing System (CUPS).
 
-  Copyright 1997-2006 by Easy Software Products.
+  Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
   property of Easy Software Products and are protected by Federal
@@ -359,6 +359,10 @@ Print-Job request:
 
 <dl>
 
+	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
+
 	<dt>"job-billing" (text(MAX)):<span class='info'>CUPS 1.1</span>
 
 	<dd>The client OPTIONALLY supplies a billing string that is logged
@@ -423,6 +427,16 @@ Response:
 
 </dl>
 
+<p>Group 3: Unsupported Attributes (status=client-eror-attributes-or-values-not-supported)
+
+<dl>
+
+	<dt>auth-info-required (1setOf Type2 keyword)
+
+	<dd>The required authentication information.
+
+</dl
+
 <h3 class='title'><span class='info'>CUPS 1.1</span><a name='CREATE_JOB'>Create-Job Operation</a></h3>
 
 <p>The Create-Job operation (0x0005) creates a new, empty print job.
@@ -451,6 +465,10 @@ Create-Job request:
 <p>Group 2: Job Template Attributes
 
 <dl>
+
+	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
 
 	<dt>"job-billing" (text(MAX)):<span class='info'>CUPS 1.1</span>
 
@@ -513,6 +531,16 @@ Create-Job Response:
 	<dt>Standard Job Attributes
 
 </dl>
+
+<p>Group 3: Unsupported Attributes (status=client-eror-attributes-or-values-not-supported)
+
+<dl>
+
+	<dt>auth-info-required (1setOf Type2 keyword)
+
+	<dd>The required authentication information.
+
+</dl
 
 <h3 class='title'><span class='info'>CUPS 1.1</span><a name='SET_JOB_ATTRIBUTES'>Set-Job-Attributes Operation</a></h3>
 
@@ -1608,6 +1636,16 @@ CUPS-Authenticate-Job request:
 
 </dl>
 
+<p>Group 2: Job Attributes
+
+<dl>
+
+	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
+
+</dl>
+
 <h4>CUPS-Authenticate-Job Response</h4>
 
 <p>The following groups of attributes are send as part of the
@@ -1629,6 +1667,16 @@ CUPS-Authenticate-Job Response:
 
 </dl>
 
+<p>Group 2: Unsupported Attributes (status=client-eror-attributes-or-values-not-supported)
+
+<dl>
+
+	<dt>auth-info-required (1setOf Type2 keyword)
+
+	<dd>The required authentication information.
+
+</dl
+
 <h2 class='title'><a name='ATTRIBUTES'>Attributes</a></h2>
 
 <p>CUPS provides many extension attributes to support multiple
@@ -1641,7 +1689,7 @@ classes.</p>
 operation and enumerate all of the available hardware devices and
 network protocols that are supported by the server.</p>
 
-<h4>device-class (type2 keyword)</h4>
+<h4><a name="device-class">device-class (type2 keyword)</a></h4>
 
 <p>The device-class attribute specifies the class of device and can be
 one of the following:
@@ -1661,24 +1709,24 @@ one of the following:
 
 </ul>
 
-<h4>device-id (text(127))</h4>
+<h4><a name="device-id">device-id (text(127))</a></h4>
 
 <p>The device-id attribute specifies the IEEE-1284 device ID
 string for the device.</p>
 
-<h4>device-info (text(127))</h4>
+<h4><a name="device-info">device-info (text(127))</a></h4>
 
 <p>The device-info attribute specifies a human-readable string describing
 the device, e.g. "Parallel Port #1".
 
-<h4>device-make-and-model (text(127))</h4>
+<h4><a name="device-make-and-model">device-make-and-model (text(127))</a></h4>
 
 <p>The device-makr-and-model attribute specifies a device
 identification string provided by the printer connected to the device.
 If the device or printer does not support identification then this
 attribute contains the string "unknown".
 
-<h4>device-uri (uri)</h4>
+<h4><a name="device-uri">device-uri (uri)</a></h4>
 
 <p>The device-uri attribute specifies a unique identifier for the
 device. The actual format of the device-uri string depends on the value
@@ -1726,13 +1774,17 @@ of the device-class attribute:
 
 <h3 class='title'><a name='JOB_TEMPLATE_ATTRIBUTES'>Job Template Attributes</a></h3>
 
-<h4>blackplot (boolean)</h4>
+<h4><a name="auth-info">auth-info (1setOf text(MAX))</a></h4>
+
+<p>The auth-info attribute specifies the authentication information to use when printing to a remote device. The order and content of each text value is specifed by the <a href="#auth-info-required">auth-info-required</a> printer attribute.
+
+<h4><a name="blackplot">blackplot (boolean)</a></h4>
 
 <p>The blackplot attribute specifies whether HP-GL/2 plot files should be
 rendered entirely in black ink (blackplot=true) or using the colors and shades
 specified in the file (blackplot=false). The default value is false.
 
-<h4>brightness (integer(0:200))</h4>
+<h4><a name="brightness">brightness (integer(0:200))</a></h4>
 
 <p>The brightness attribute specifies the overall brightness of the printed
 output in percent. A brightness of 100 is normal, while 200 is twice as
@@ -1741,24 +1793,24 @@ bright and 50 is half as bright. The default value is 100.
 <p>Brightness is applied to the Cyan, Magenta, Yellow, and Black values using
 the function "f(x) = brightness / 100 * x".
 
-<h4>columns (integer(1:4))</h4>
+<h4><a name="columns">columns (integer(1:4))</a></h4>
 
 <p>The columns attribute specifies the number of columns to generate when
 printing text files. The default value is 1.
 
-<h4>cpi (type2 enum)</h4>
+<h4><a name="cpi">cpi (type2 enum)</a></h4>
 
 <p>The cpi attribute specifies the number of characters per inch when
 printing text files. Only the values 10, 12, and 17 are currently
 supported. The default value is 10.
 
-<h4>fitplot (boolean)</h4>
+<h4><a name="fitplot">fitplot (boolean)</a></h4>
 
 <p>The fitplot attribute specifies whether to scale HP-GL/2 plot files to
 fit on the selected media (fitplot=true) or use the physical scale specified
 in the plot file (fitplot=false). The default value is false.
 
-<h4>gamma (integer(1:10000))</h4>
+<h4><a name="gamma">gamma (integer(1:10000))</a></h4>
 
 <p>The gamma attribute specifies the luminance correction for the output.
 A value of 1000 specifies no correction, while values of 2000 and 500 will
@@ -1768,17 +1820,17 @@ generate lighter and darker output, respectively. The default value is
 <p>Gamma is applied to the Red, Green, and Blue values (or luminance for
 grayscale output) using the function "f(x) = x<SUp>(1000/gamma)</SUp>".
 
-<h4>hue (integer(-180:180))</h4>
+<h4><a name="hue">hue (integer(-180:180))</a></h4>
 
 <p>The hue attribute specifies a color hue rotation when printing image
 files. The default value is 0.
 
-<h4>job-billing (text(MAX))<span class='info'>CUPS 1.1</span></h4>
+<h4><a name="job-billing">job-billing (text(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 
 <p>The job-billing attribute provides a text value to associate with a job
 for billing purposes.
 
-<h4>job-hold-until (keyword | name(MAX))<span class='info'>CUPS 1.1</span></h4>
+<h4><a name="job-hold-until">job-hold-until (keyword | name(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 
 <p>The job-hold-until attribute specifies a hold time. In addition to the
 standard IPP/1.1 keyword names, CUPS supports name values of the form
@@ -1787,7 +1839,7 @@ Greenwich Mean Time (GMT) and <i>not</i> in the local time zone. If the
 specified time is less than the current time, the job is held until the
 next day.
 
-<h4>job-sheets (1setof type3 keyword | name(MAX))<span class='info'>CUPS 1.1</span></h4>
+<h4><a name="job-sheets">job-sheets (1setof type3 keyword | name(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 
 <p>The job-sheets attribute specifies one or two banner files that are printed
 before and after a job. The reserved value of "none" disables banner printing.
@@ -1797,7 +1849,7 @@ The default value is stored in the job-sheets-default attribute.
 If two values are supplied, the first value is used as the starting banner
 file and the second as the ending banner file.
 
-<h4>job-originating-host-name (name(MAX))</h4>
+<h4><a name="job-originating-host-name">job-originating-host-name (name(MAX))</a></h4>
 
 <p><i>(CUPS 1.1.5 and higher)</i>
 
@@ -1809,19 +1861,19 @@ resolution is enabled.  The localhost address (127.0.0.1) is
 
 <p>This attribute is read-only.
 
-<h4>lpi (type2 enum)</h4>
+<h4><a name="lpi">lpi (type2 enum)</a></h4>
 
 <p>The lpi attribute specifies the number of lines per inch when
 printing text files. Only the values 6 and 8 are currently supported.
 The default value is 6.
 
-<h4>mirror (boolean)</h4>
+<h4><a name="mirror">mirror (boolean)</a></h4>
 
 <p>The mirror attribute specifies whether pages are mirrored on
 their X axis, which is useful for printing transfer images on
 special media. The default value is false.
 
-<h4>natural-scaling (integer(1:1000))<span class='info'>CUPS 1.1.9</span></h4>
+<h4><a name="natural-scaling">natural-scaling (integer(1:1000))</a><span class='info'>CUPS 1.1.9</span></h4>
 <p>The natural-scaling attribute specifies the scaling of image files with
 respect to the natural image size. A value of 100 specifies that the image
 file should exactly the natural size, while 50 is half the natural size
@@ -1830,7 +1882,7 @@ and 200 is twice the natural size. The default value is 100.
 <p>The ppi option can be used to override the natural resolution of the
 image, which controls the natural size.
 
-<h4>number-up-layout (type2 keyword)<span class='info'>CUPS 1.1.15</span></h4>
+<h4><a name="number-up-layout">number-up-layout (type2 keyword)</a><span class='info'>CUPS 1.1.15</span></h4>
 <p>The number-up-layout attribute specifies the order each input
 page is placed on each output page. The following keywords are
 presently defined:
@@ -1855,7 +1907,7 @@ presently defined:
 
 </ul>
 
-<h4>page-border (type2 keyword)<span class='info'>CUPS 1.1.15</span></h4>
+<h4><a name="page-border">page-border (type2 keyword)</a><span class='info'>CUPS 1.1.15</span></h4>
 <p>The page-border attribute specifies whether a border is
 draw around each page. The following keywords are presently
 defined:
@@ -1874,44 +1926,44 @@ defined:
 
 </ul>
 
-<h4>page-bottom (integer(0:MAX))</h4>
+<h4><a name="page-bottom">page-bottom (integer(0:MAX))</a></h4>
 
 <p>The page-bottom attribute specifies the bottom margin in points (72 points
 equals 1 inch). The default value is the device physical margin.
 
-<h4>page-label (text(MAX))<span class='info'>CUPS 1.1.7</span></h4>
+<h4><a name="page-label">page-label (text(MAX))</a><span class='info'>CUPS 1.1.7</span></h4>
 <p>The page-label attribute provides a text value to place in
 the header and footer on each page. If a classification level is
 set on the server, then this classification is printed before
 the page label.
 
-<h4>page-left (integer(0:MAX))</h4>
+<h4><a name="page-left">page-left (integer(0:MAX))</a></h4>
 
 <p>The page-left attribute specifies the left margin in points (72 points
 equals 1 inch). The default value is the device physical margin.
 
-<h4>page-right (integer(0:MAX))</h4>
+<h4><a name="page-right">page-right (integer(0:MAX))</a></h4>
 
 <p>The page-right attribute specifies the right margin in points (72 points
 equals 1 inch). The default value is the device physical margin.
 
-<h4>page-set (type2 keyword)</h4>
+<h4><a name="page-set">page-set (type2 keyword)</a></h4>
 
 <p>The page-set attribute specifies which pages to print in a file. The
 supported keywords are "all", "even", and "odd". The default value is
 "all".
 
-<h4>page-top (integer(0:MAX))</h4>
+<h4><a name="page-top">page-top (integer(0:MAX))</a></h4>
 
 <p>The page-top attribute specifies the top margin in points (72 points
 equals 1 inch). The default value is the device physical margin.
 
-<h4>penwidth (integer(0:MAX))</h4>
+<h4><a name="penwidth">penwidth (integer(0:MAX))</a></h4>
 
 <p>The penwidth attribute specifies the default pen width in micrometers
 when printing HP-GL/2 plot files. The default value is 1000 (1 millimeter).
 
-<h4>position (type2 keyword)</h4>
+<h4><a name="position">position (type2 keyword)</a></h4>
 
 <p>The position attribute specifies the location of image files on the
 media. The following keyword values are recognized:
@@ -1943,26 +1995,26 @@ media. The following keyword values are recognized:
 
 </ul>
 
-<h4>ppi (integer(1:MAX))</h4>
+<h4><a name="ppi">ppi (integer(1:MAX))</a></h4>
 
 <p>The ppi attribute specifies the resolution of an image file in pixels
 per inch. The default value is the resolution included with the file or
 128 if no resolution information is available.
 
-<h4>prettyprint (boolean)</h4>
+<h4><a name="prettyprint">prettyprint (boolean)</a></h4>
 
 <p>The prettyprint attribute specifies whether text files should be printed
 with a shaded header and keyword highlighting (prettyprint=true) or without
 additional formatting (prettyprint=false). The default value is false.
 
-<h4>saturation (integer(0:200))</h4>
+<h4><a name="saturation">saturation (integer(0:200))</a></h4>
 
 <p>The saturation attribute specifies the color saturation when
 printing image files. A saturation of 100 is normal, while values of 50
 and 200 will be half and twice as colorful, respectively. The default
 value is 100.
 
-<h4>scaling (integer(1:1000))</h4>
+<h4><a name="scaling">scaling (integer(1:1000))</a></h4>
 
 <p>The scaling attribute specifies the scaling of image files with
 respect to the selected media. A value of 100 specifies that the image
@@ -1971,7 +2023,7 @@ image dimensions. The default value is unspecified.
 
 <p>The scaling attribute overrides the ppi attribute if specified.
 
-<h4>wrap (boolean)</h4>
+<h4><a name="wrap">wrap (boolean)</a></h4>
 
 <p>The wrap attribute specifies whether long lines should be wrapped
 (wrap=true) or not (wrap=false) when printing text files. The default
@@ -1979,32 +2031,32 @@ value is true.
 
 <h3 class='title'><a name='PPD_ATTRIBUTES'>PPD Attributes</a></h3>
 
-<h4>ppd-device-id (text(127))</h4>
+<h4><a name="ppd-device-id">ppd-device-id (text(127))</a></h4>
 
 <p>The ppd-device-id attribute specifies the IEEE-1284 device ID
 string for the device described by the PPD file.</p>
 
-<h4>ppd-natural-language (naturalLanguage)</h4>
+<h4><a name="ppd-natural-scaling">ppd-natural-language (naturalLanguage)</a></h4>
 
 <p>The ppd-natural-language attribute specifies the language encoding
 of the PPD file (the LanguageVersion attribute in the PPD file). If the
 language is unknown or undefined then "en" (English) is assumed.
 
-<h4>ppd-make (text(127))</h4>
+<h4><a name="ppd-make">ppd-make (text(127))</a></h4>
 
 <p>The ppd-make attribute specifies the manufacturer of the printer
 (the Manufacturer attribute in the PPD file). If the manufacturer
 is not specified in the PPD file then an educated guess is made using
 the NickName attribute in the PPD file.
 
-<h4>ppd-make-and-model (text(127))</h4>
+<h4><a name="ppd-make-and-model">ppd-make-and-model (text(127))</a></h4>
 
 <p>The ppd-make-and-model attribute specifies the manufacturer and model
 name of the PPD file (the NickName attribute in the PPD file). If the
 make and model is not specified in the PPD file then the ModelName or
 ShortNickName attributes are used instead.
 
-<h4>ppd-name (name(255))</h4>
+<h4><a name="ppd-name">ppd-name (name(255))</a></h4>
 
 <p>The ppd-name attribute specifies the PPD filename on the server
 relative to the model directory. The forward slash (/) is used to
@@ -2012,31 +2064,31 @@ delineate directories.
 
 <h3 class='title'><a name='PRINTER_ATTRIBUTES'>Printer Attributes</a></h3>
 
-<h4>job-k-limit (integer)<span class='info'>CUPS 1.1</span></h4>
+<h4><a name="job-k-limit">job-k-limit (integer)</a><span class='info'>CUPS 1.1</span></h4>
 
 <p>The job-k-limit attribute specifies the maximum number of kilobytes that
 may be printed by a user, including banner files. The default value of 0
 specifies that there is no limit.
 
-<h4>job-page-limit (integer)<span class='info'>CUPS 1.1</span></h4>
+<h4><a name="job-page-limit">job-page-limit (integer)</a><span class='info'>CUPS 1.1</span></h4>
 
 <p>The job-page-limit attribute specifies the maximum number of pages that
 may be printed by a user, including banner files. The default value of 0
 specifies that there is no limit.
 
-<h4>job-quota-period (integer)<span class='info'>CUPS 1.1</span></h4>
+<h4><a name="job-quota-period">job-quota-period (integer)</a><span class='info'>CUPS 1.1</span></h4>
 
 <p>The job-quota-period attribute specifies the time period used for quota
 calculations, in seconds. The default value of 0 specifies that the limits
 apply to all jobs that have been printed by a user that are still known to
 the system.
 
-<h4>job-sheets-supported (1setof type3 keyword | name(MAX))<span class='info'>CUPS 1.1</span></h4>
+<h4><a name="job-sheets-completed">job-sheets-supported (1setof type3 keyword | name(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 
 <p>The job-sheets-supported attribute specifies the available banner files.
 There will always be at least one banner file available called "none".
 
-<h4>printer-type (type2 enum)</h4>
+<h4><a name="printer-type">printer-type (type2 enum)</a></h4>
 
 <p>The printer-type attribute specifies printer type and
 capability bits for the printer or class. The default value is
