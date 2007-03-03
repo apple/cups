@@ -205,6 +205,9 @@ static cups_page_header2_t setpagedevice_header =
  * Local functions...
  */
 
+static int	do_ppd_tests(const char *filename);
+static int	do_ps_tests(void);
+static int	do_raster_tests(void);
 static void	print_changes(cups_page_header2_t *header,
 		              cups_page_header2_t *expected);
 
@@ -214,19 +217,85 @@ static void	print_changes(cups_page_header2_t *header,
  */
 
 int					/* O - Exit status */
-main(void)
+main(int  argc,				/* I - Number of command-line args */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int			page, x, y;	/* Looping vars */
-  FILE			*fp;		/* Raster file */
-  cups_raster_t		*r;		/* Raster stream */
-  cups_page_header2_t	header,		/* Page header */
-			expected;	/* Expected page header */
-  unsigned char		data[2048];	/* Raster data */
-  int			preferred_bits;	/* Preferred bits */
   int			errors;		/* Number of errors */
 
 
-  errors = 0;
+  if (argc == 1)
+  {
+    errors = do_ps_tests();
+    errors += do_raster_tests();
+  }
+  else if (argc == 2)
+    errors = do_ppd_tests(argv[1]);
+  else
+  {
+    puts("Usage: testraster [filename.ppd]");
+    errors = 1;
+  }
+
+  return (errors);
+}
+
+
+/*
+ * 'do_ppd_tests()' - Test the default option commands in a PPD file.
+ */
+
+static int				/* O - Number of errors */
+do_ppd_tests(const char *filename)	/* I - PPD file */
+{
+  ppd_file_t		*ppd;		/* PPD file data */
+  cups_page_header2_t	header;		/* Page header */
+
+
+  printf("\"%s\": ", filename);
+  fflush(stdout);
+
+  if ((ppd = ppdOpenFile(filename)) == NULL)
+  {
+    ppd_status_t	status;		/* Status from PPD loader */
+    int			line;		/* Line number containing error */
+
+
+    status = ppdLastError(&line);
+
+    puts("FAIL (bad PPD file)");
+    printf("    %s on line %d\n", ppdErrorString(status), line);
+
+    return (1);
+  }
+
+  ppdMarkDefaults(ppd);
+
+  if (cupsRasterInterpretPPD(&header, ppd, 0, NULL, NULL))
+  {
+    puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
+
+    return (1);
+  }
+  else
+  {
+    puts("PASS");
+
+    return (0);
+  }
+}
+
+
+/*
+ * 'do_ps_tests()' - Test standard PostScript commands.
+ */
+
+static int
+do_ps_tests(void)
+{
+  cups_page_header2_t	header;		/* Page header */
+  int			preferred_bits;	/* Preferred bits */
+  int			errors;		/* Number of errors */
 
  /*
   * Test PS exec code...
@@ -424,6 +493,26 @@ main(void)
   else
     puts("PASS");
 #endif /* 0 */
+
+  return (errors);
+}
+
+
+/*
+ * 'do_raster_tests()' - Test reading and writing of raster data.
+ */
+
+static int				/* O - Number of errors */
+do_raster_tests(void)
+{
+  int			page, x, y;	/* Looping vars */
+  FILE			*fp;		/* Raster file */
+  cups_raster_t		*r;		/* Raster stream */
+  cups_page_header2_t	header,		/* Page header */
+			expected;	/* Expected page header */
+  unsigned char		data[2048];	/* Raster data */
+  int			errors;		/* Number of errors */
+
 
  /*
   * Test writing...
@@ -718,9 +807,8 @@ main(void)
   cupsRasterClose(r);
   fclose(fp);
 
-  return (errors > 0);
+  return (errors);
 }
-
 
 
 /*

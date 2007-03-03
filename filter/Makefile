@@ -359,7 +359,7 @@ rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 testraster:	testraster.o ../cups/libcups.a libcupsimage.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testraster.o libcupsimage.a ../cups/libcups.a \
-		$(IMGLIBS) $(DSOLIBS) $(LIBS)
+		$(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) $(SSLLIBS) $(LIBGSSAPI)
 
 
 #
