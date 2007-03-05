@@ -205,7 +205,8 @@ static cups_page_header2_t setpagedevice_header =
  * Local functions...
  */
 
-static int	do_ppd_tests(const char *filename);
+static int	do_ppd_tests(const char *filename, int num_options,
+		             cups_option_t *options);
 static int	do_ps_tests(void);
 static int	do_raster_tests(void);
 static void	print_changes(cups_page_header2_t *header,
@@ -220,7 +221,7 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  int			errors;		/* Number of errors */
+  int		errors;			/* Number of errors */
 
 
   if (argc == 1)
@@ -228,12 +229,44 @@ main(int  argc,				/* I - Number of command-line args */
     errors = do_ps_tests();
     errors += do_raster_tests();
   }
-  else if (argc == 2)
-    errors = do_ppd_tests(argv[1]);
   else
   {
-    puts("Usage: testraster [filename.ppd]");
-    errors = 1;
+    int			i;		/* Looping var */
+    int			num_options;	/* Number of options */
+    cups_option_t	*options;	/* Options */
+
+
+    for (errors = 0, num_options = 0, options = NULL, i = 1; i < argc; i ++)
+    {
+      if (argv[i][0] == '-')
+      {
+        if (argv[i][1] == 'o')
+        {
+          if (argv[i][2])
+            num_options = cupsParseOptions(argv[i] + 2, num_options, &options);
+          else
+          {
+            i ++;
+            if (i < argc)
+              num_options = cupsParseOptions(argv[i], num_options, &options);
+            else
+            {
+              puts("Usage: testraster [-o name=value ...] [filename.ppd ...]");
+              return (1);
+            }
+          }
+        }
+        else
+        {
+          puts("Usage: testraster [-o name=value ...] [filename.ppd ...]");
+          return (1);
+        }
+      }
+      else
+        errors += do_ppd_tests(argv[i], num_options, options);
+    }
+
+    cupsFreeOptions(num_options, options);
   }
 
   return (errors);
@@ -245,7 +278,9 @@ main(int  argc,				/* I - Number of command-line args */
  */
 
 static int				/* O - Number of errors */
-do_ppd_tests(const char *filename)	/* I - PPD file */
+do_ppd_tests(const char    *filename,	/* I - PPD file */
+             int           num_options,	/* I - Number of options */
+             cups_option_t *options)	/* I - Options */
 {
   ppd_file_t		*ppd;		/* PPD file data */
   cups_page_header2_t	header;		/* Page header */
@@ -269,6 +304,7 @@ do_ppd_tests(const char *filename)	/* I - PPD file */
   }
 
   ppdMarkDefaults(ppd);
+  cupsMarkOptions(ppd, num_options, options);
 
   if (cupsRasterInterpretPPD(&header, ppd, 0, NULL, NULL))
   {
