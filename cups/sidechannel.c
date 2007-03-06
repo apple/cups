@@ -196,7 +196,7 @@ cupsSideChannelRead(
   * Validate the data length in the message...
   */
 
-  templen = ((buffer[0] & 255) << 8) | (buffer[1] & 255);
+  templen = ((buffer[2] & 255) << 8) | (buffer[3] & 255);
 
   if (templen > 0 && (!data || !datalen))
   {
