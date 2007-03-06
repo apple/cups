@@ -1720,7 +1720,18 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
       * Set attribute(s)...
       */
 
-      /**** TODO ****/
+      int		num_attrs;	/* Number of attributes */
+      cups_option_t	*attrs;		/* Attributes */
+      const char	*attr;		/* Attribute */
+
+
+      num_attrs = cupsParseOptions(message, 0, &attrs);
+
+      if ((attr = cupsGetOption("auth-info-required", num_attrs,
+                                attrs)) != NULL)
+        cupsdSetAuthInfoRequired(job->printer, attr, NULL);
+
+      cupsFreeOptions(num_attrs, attrs);
     }
 #ifdef __APPLE__
     else if (!strncmp(message, "recoverable:", 12))

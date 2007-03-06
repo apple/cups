@@ -414,6 +414,13 @@ cupsdLoadAllClasses(void)
                       "Syntax error on line %d of classes.conf.", linenum);
       return;
     }
+    else if (!strcasecmp(line, "AuthInfoRequired"))
+    {
+      if (!cupsdSetAuthInfoRequired(p, value, NULL))
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Bad AuthInfoRequired on line %d of classes.conf.",
+			linenum);
+    }
     else if (!strcasecmp(line, "Info"))
     {
       if (value)
@@ -790,6 +797,14 @@ cupsdSaveAllClasses(void)
       cupsFilePrintf(fp, "<DefaultClass %s>\n", pclass->name);
     else
       cupsFilePrintf(fp, "<Class %s>\n", pclass->name);
+
+    if (pclass->num_auth_info_required > 0)
+    {
+      cupsFilePrintf(fp, "AuthInfoRequired %s", pclass->auth_info_required[0]);
+      for (i = 1; i < pclass->num_auth_info_required; i ++)
+        cupsFilePrintf(fp, ",%s", pclass->auth_info_required[i]);
+      cupsFilePutChar(fp, '\n');
+    }
 
     if (pclass->info)
     {

@@ -181,7 +181,8 @@ static void	reject_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	release_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	renew_subscription(cupsd_client_t *con, int sub_id);
 static void	restart_job(cupsd_client_t *con, ipp_attribute_t *uri);
-static void	save_auth_info(cupsd_client_t *con, cupsd_job_t *job);
+static void	save_auth_info(cupsd_client_t *con, cupsd_job_t *job,
+		               ipp_attribute_t *auth_info);
 #if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
 static void	save_krb5_creds(cupsd_client_t *con, cupsd_job_t *job);
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */
@@ -1141,7 +1142,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 	mime_type_t     *filetype)	/* I - First print file type, if any */
 {
   http_status_t	status;			/* Policy status */
-  ipp_attribute_t *attr;		/* Current attribute */
+  ipp_attribute_t *attr,		/* Current attribute */
+		*auth_info;		/* auth-info attribute */
   const char	*val;			/* Default option value */
   int		priority;		/* Job priority */
   char		*title;			/* Job name/title */
@@ -1340,8 +1342,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if (attr)
       cupsdSetString(&attr->values[0].string.text, con->username);
-
-    save_auth_info(con, job);
   }
   else if (attr)
   {
@@ -1362,6 +1362,30 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     attr->group_tag = IPP_TAG_JOB;
     _cupsStrFree(attr->name);
     attr->name = _cupsStrAlloc("job-originating-user-name");
+  }
+
+  auth_info = ippFindAttribute(job->attrs, "auth-info", IPP_TAG_TEXT);
+
+  if (con->username[0] || auth_info)
+  {
+    save_auth_info(con, job, auth_info);
+
+   /*
+    * Remove the auth-info attribute from the attribute data...
+    */
+
+    if (auth_info)
+    {
+      if (job->attrs->prev)
+        job->attrs->prev->next = auth_info->next;
+      else
+        job->attrs->attrs = auth_info->next;
+
+      if (job->attrs->last == auth_info)
+        job->attrs->last = job->attrs->prev;
+
+      _ippFreeAttr(auth_info);
+    }
   }
 
   if ((attr = ippFindAttribute(job->attrs, "job-originating-host-name",
@@ -2590,7 +2614,8 @@ static void
 authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 	         ipp_attribute_t *uri)	/* I - Job URI */
 {
-  ipp_attribute_t	*attr;		/* Job-id attribute */
+  ipp_attribute_t	*attr,		/* job-id attribute */
+			*auth_info;	/* auth-info attribute */
   int			jobid;		/* Job ID */
   cupsd_job_t		*job;		/* Current job */
   char			method[HTTP_MAX_URI],
@@ -2692,7 +2717,9 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
   * See if we have already authenticated...
   */
 
-  if (!con->username[0])
+  auth_info = ippFindAttribute(con->request, "auth-info", IPP_TAG_TEXT);
+
+  if (!con->username[0] && !auth_info)
   {
     send_ipp_status(con, IPP_NOT_AUTHORIZED,
                     _("No authentication information provided!"));
@@ -2713,7 +2740,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
   * Save the authentication information for this job...
   */
 
-  save_auth_info(con, job);
+  save_auth_info(con, job, auth_info);
 
  /*
   * Reset the job-hold-until value to "no-hold"...
@@ -7520,8 +7547,10 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
  */
 
 static void
-save_auth_info(cupsd_client_t *con,	/* I - Client connection */
-               cupsd_job_t    *job)	/* I - Job */
+save_auth_info(
+    cupsd_client_t  *con,		/* I - Client connection */
+    cupsd_job_t     *job,		/* I - Job */
+    ipp_attribute_t *auth_info)		/* I - auth-info attribute, if any */
 {
   int		i;			/* Looping var */
   char		filename[1024];		/* Job authentication filename */
@@ -7533,9 +7562,9 @@ save_auth_info(cupsd_client_t *con,	/* I - Client connection */
   * This function saves the in-memory authentication information for
   * a job so that it can be used to authenticate with a remote host.
   * The information is stored in a file that is readable only by the
-  * root user.  The username and password are Base-64 encoded, each
-  * on a separate line, followed by random number (up to 1024) of
-  * newlines to limit the amount of information that is exposed.
+  * root user.  The fields are Base-64 encoded, each on a separate line,
+  * followed by random number (up to 1024) of newlines to limit the
+  * amount of information that is exposed.
   *
   * Because of the potential for exposing of authentication information,
   * this functionality is only enabled when running cupsd as root.
@@ -7571,19 +7600,35 @@ save_auth_info(cupsd_client_t *con,	/* I - Client connection */
   fchown(cupsFileNumber(fp), 0, 0);
   fchmod(cupsFileNumber(fp), 0400);
 
- /*
-  * Write the authenticated username...
-  */
+  if (auth_info)
+  {
+   /*
+    * Write 1 to 4 auth values...
+    */
 
-  httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
-  cupsFilePrintf(fp, "%s\n", line);
+    for (i = 0; i < auth_info->num_values; i ++)
+    {
+      httpEncode64_2(line, sizeof(line), auth_info->values[i].string.text,
+                     strlen(auth_info->values[i].string.text));
+      cupsFilePrintf(fp, "%s\n", line);
+    }
+  }
+  else
+  {
+   /*
+    * Write the authenticated username...
+    */
 
- /*
-  * Write the authenticated password...
-  */
+    httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
+    cupsFilePrintf(fp, "%s\n", line);
 
-  httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
-  cupsFilePrintf(fp, "%s\n", line);
+   /*
+    * Write the authenticated password...
+    */
+
+    httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
+    cupsFilePrintf(fp, "%s\n", line);
+  }
 
  /*
   * Write a random number of newlines to the end of the file...

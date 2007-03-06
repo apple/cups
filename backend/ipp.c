@@ -1340,6 +1340,8 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
       unlink(pstmpname);
 #endif /* __APPLE__ */
 
+    fputs("ATTR: auth-info-required=username,password\n", stderr);
+
     exit(CUPS_BACKEND_AUTH_REQUIRED);
 
     return (NULL);			/* Eliminate compiler warning */

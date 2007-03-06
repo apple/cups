@@ -954,6 +954,13 @@ cupsdLoadAllPrinters(void)
                       "Syntax error on line %d of printers.conf.", linenum);
       return;
     }
+    else if (!strcasecmp(line, "AuthInfoRequired"))
+    {
+      if (!cupsdSetAuthInfoRequired(p, value, NULL))
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Bad AuthInfoRequired on line %d of printers.conf.",
+			linenum);
+    }
     else if (!strcasecmp(line, "Info"))
     {
       if (value)
@@ -1363,6 +1370,14 @@ cupsdSaveAllPrinters(void)
     else
       cupsFilePrintf(fp, "<Printer %s>\n", printer->name);
 
+    if (printer->num_auth_info_required > 0)
+    {
+      cupsFilePrintf(fp, "AuthInfoRequired %s", printer->auth_info_required[0]);
+      for (i = 1; i < printer->num_auth_info_required; i ++)
+        cupsFilePrintf(fp, ",%s", printer->auth_info_required[i]);
+      cupsFilePutChar(fp, '\n');
+    }
+
     if (printer->info)
     {
       if ((ptr = strchr(printer->info, '#')) != NULL)
@@ -1457,6 +1472,119 @@ cupsdSaveAllPrinters(void)
   }
 
   cupsFileClose(fp);
+}
+
+
+/*
+ * 'cupsdSetAuthInfoRequired()' - Set the required authentication info.
+ */
+
+int					/* O - 1 if value OK, 0 otherwise */
+cupsdSetAuthInfoRequired(
+    cupsd_printer_t *p,			/* I - Printer */
+    const char      *values,		/* I - Plain text value (or NULL) */
+    ipp_attribute_t *attr)		/* I - IPP attribute value (or NULL) */
+{
+  int	i;				/* Looping var */
+
+
+  p->num_auth_info_required = 0;
+
+ /*
+  * Do we have a plain text value?
+  */
+
+  if (values)
+  {
+   /*
+    * Yes, grab the keywords...
+    */
+
+    const char	*end;			/* End of current value */
+
+
+    while (*values && p->num_auth_info_required < 4)
+    {
+      if ((end = strchr(values, ',')) == NULL)
+        end = values + strlen(values);
+
+      if (!strncmp(values, "none", end - values))
+      {
+        if (p->num_auth_info_required != 0 || *end)
+	  return (0);
+
+        p->auth_info_required[p->num_auth_info_required] = "none";
+	p->num_auth_info_required ++;
+
+	return (1);
+      }
+      else if (!strncmp(values, "domain", end - values))
+      {
+        p->auth_info_required[p->num_auth_info_required] = "domain";
+	p->num_auth_info_required ++;
+      }
+      else if (!strncmp(values, "password", end - values))
+      {
+        p->auth_info_required[p->num_auth_info_required] = "password";
+	p->num_auth_info_required ++;
+      }
+      else if (!strncmp(values, "username", end - values))
+      {
+        p->auth_info_required[p->num_auth_info_required] = "username";
+	p->num_auth_info_required ++;
+      }
+      else
+        return (0);
+    }
+
+    if (p->num_auth_info_required == 0)
+    {
+      p->auth_info_required[0]  = "none";
+      p->num_auth_info_required = 1;
+    }
+
+    return (1);
+  }
+
+ /*
+  * Grab values from an attribute instead...
+  */
+
+  if (!attr || attr->num_values > 4)
+    return (0);
+
+  for (i = 0; i < attr->num_values; i ++)
+  {
+    if (!strcmp(attr->values[i].string.text, "none"))
+    {
+      if (p->num_auth_info_required != 0 || attr->num_values != 1)
+	return (0);
+
+      p->auth_info_required[p->num_auth_info_required] = "none";
+      p->num_auth_info_required ++;
+
+      return (1);
+    }
+    else if (!strcmp(attr->values[i].string.text, "domain"))
+    {
+      p->auth_info_required[p->num_auth_info_required] = "domain";
+      p->num_auth_info_required ++;
+    }
+    else if (!strcmp(attr->values[i].string.text, "password"))
+    {
+      p->auth_info_required[p->num_auth_info_required] = "password";
+      p->num_auth_info_required ++;
+    }
+    else if (!strcmp(attr->values[i].string.text, "username"))
+    {
+      p->auth_info_required[p->num_auth_info_required] = "username";
+      p->num_auth_info_required ++;
+    }
+    else
+      return (0);
+  }
+
+  return (1);
 }
 
 
@@ -1585,6 +1713,13 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                 "job-k-limit", p->k_limit);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "job-page-limit", p->page_limit);
+  if (p->num_auth_info_required)
+    ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		  "auth-info-required", p->num_auth_info_required,
+		  NULL, p->auth_info_required);
+  else
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		 "auth-info-required", NULL, "none");
 
   if (cupsArrayCount(Banners) > 0 && !(p->type & CUPS_PRINTER_REMOTE))
   {
