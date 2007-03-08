@@ -937,11 +937,18 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
         ppdEmitJCL(ppd, stdout, doc->job_id, doc->user, doc->title);
 
 	puts("%!PS-Adobe-3.0");
-	
-        pageinfo = (pstops_page_t *)cupsArrayFirst(doc->pages);
-	copy_bytes(doc->temp, 0, pageinfo->offset);
 
 	number = 0;
+      }
+
+     /*
+      * Copy the prolog as needed...
+      */
+
+      if (!number)
+      {
+        pageinfo = (pstops_page_t *)cupsArrayFirst(doc->pages);
+	copy_bytes(doc->temp, 0, pageinfo->offset);
       }
 
      /*
