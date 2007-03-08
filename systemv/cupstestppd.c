@@ -3,7 +3,7 @@
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -30,6 +30,7 @@
  *   main()           - Main entry for test program.
  *   show_conflicts() - Show option conflicts in a PPD file.
  *   usage()          - Show program usage...
+ *   valid_utf8()     - Check whether a string contains valid UTF-8 text.
  */
 
 /*
@@ -77,7 +78,7 @@ enum
 void	check_basics(const char *filename);
 void	show_conflicts(ppd_file_t *ppd);
 void	usage(void);
-
+int	valid_utf8(const char *s);
 
 /*
  * 'main()' - Main entry for test program.
@@ -1068,7 +1069,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	       option = ppdNextOption(ppd))
 	  {
 	    snprintf(keyword, sizeof(keyword), "%s.Translation", langstart);
-	    if (!ppdFindAttr(ppd, keyword, option->keyword))
+	    if ((attr = ppdFindAttr(ppd, keyword, option->keyword)) == NULL)
 	    {
 	      if (verbose >= 0)
 	      {
@@ -1077,6 +1078,21 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 		_cupsLangPrintf(stdout,
 	                	_("      **FAIL**  Missing \"%s\" translation "
+				  "string for option %s!\n"),
+				langstart, option->keyword);
+              }
+
+	      errors ++;
+	    }
+	    else if (!valid_utf8(attr->text))
+	    {
+	      if (verbose >= 0)
+	      {
+		if (!errors && !verbose)
+		  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		_cupsLangPrintf(stdout,
+	                	_("      **FAIL**  Bad UTF-8 \"%s\" translation "
 				  "string for option %s!\n"),
 				langstart, option->keyword);
               }
@@ -1116,7 +1132,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		snprintf(ckeyword, sizeof(ckeyword), "%s.Custom%s",
 		         langstart, option->keyword);
 
-		if (!ppdFindAttr(ppd, ckeyword, "True"))
+		if ((attr = ppdFindAttr(ppd, ckeyword, "True")) == NULL)
 		{
 		  if (verbose >= 0)
 		  {
@@ -1125,6 +1141,23 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 		    _cupsLangPrintf(stdout,
 	                	    _("      **FAIL**  Missing \"%s\" "
+				      "translation string for option %s, "
+				      "choice %s!\n"),
+				    langstart, ckeyword + 1 + strlen(langstart),
+				    "True");
+        	  }
+
+		  errors ++;
+		}
+		else if (!valid_utf8(attr->text))
+	        {
+	          if (verbose >= 0)
+	          {
+		    if (!errors && !verbose)
+		      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		    _cupsLangPrintf(stdout,
+	                	    _("      **FAIL**  Bad UTF-8 \"%s\" "
 				      "translation string for option %s, "
 				      "choice %s!\n"),
 				    langstart, ckeyword + 1 + strlen(langstart),
@@ -1142,7 +1175,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		  {
 		    snprintf(ckeyword, sizeof(ckeyword), "%s.ParamCustom%s",
 		             langstart, option->keyword);
-		    if (!ppdFindAttr(ppd, ckeyword, cparam->name))
+		    if ((attr = ppdFindAttr(ppd, ckeyword, cparam->name)) == NULL)
 		    {
 		      if (verbose >= 0)
 		      {
@@ -1160,10 +1193,28 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 		      errors ++;
 		    }
+		    else if (!valid_utf8(attr->text))
+		    {
+		      if (verbose >= 0)
+		      {
+			if (!errors && !verbose)
+			  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+			_cupsLangPrintf(stdout,
+	                		_("      **FAIL**  Bad UTF-8 \"%s\" "
+					  "translation string for option %s, "
+					  "choice %s!\n"),
+					langstart,
+					ckeyword + 1 + strlen(langstart),
+				        cparam->name);
+        	      }
+
+		      errors ++;
+		    }
                   }
                 }
 	      }
-	      else if (!ppdFindAttr(ppd, keyword, option->choices[j].choice))
+	      else if ((attr = ppdFindAttr(ppd, keyword, option->choices[j].choice)) == NULL)
 	      {
 		if (verbose >= 0)
 		{
@@ -1172,6 +1223,23 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 		  _cupsLangPrintf(stdout,
 	                	  _("      **FAIL**  Missing \"%s\" "
+				    "translation string for option %s, "
+				    "choice %s!\n"),
+				  langstart, option->keyword,
+				  option->choices[j].choice);
+        	}
+
+		errors ++;
+	      }
+	      else if (!valid_utf8(attr->text))
+	      {
+		if (verbose >= 0)
+		{
+		  if (!errors && !verbose)
+		    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		  _cupsLangPrintf(stdout,
+	                	  _("      **FAIL**  Bad UTF-8 \"%s\" "
 				    "translation string for option %s, "
 				    "choice %s!\n"),
 				  langstart, option->keyword,
@@ -1785,6 +1853,82 @@ usage(void)
 		  "       program | cupstestppd [-q] [-r] [-v[v]] -\n"));
 
   exit(ERROR_USAGE);
+}
+
+
+/*
+ * 'valid_utf8()' - Check whether a string contains valid UTF-8 text.
+ */
+
+int					/* O - 1 if valid, 0 if not */
+valid_utf8(const char *s)		/* I - String to check */
+{
+  while (*s)
+  {
+    if (*s & 0x80)
+    {
+     /*
+      * Check for valid UTF-8 sequence...
+      */
+
+      if ((*s & 0xc0) == 0x80)
+        return (0);			/* Illegal suffix byte */
+      else if ((*s & 0xe0) == 0xc0)
+      {
+       /*
+        * 2-byte sequence...
+        */
+
+        s ++;
+
+        if ((*s & 0xc0) != 0x80)
+          return (0);			/* Missing suffix byte */
+      }
+      else if ((*s & 0xf0) == 0xe0)
+      {
+       /*
+        * 3-byte sequence...
+        */
+
+        s ++;
+
+        if ((*s & 0xc0) != 0x80)
+          return (0);			/* Missing suffix byte */
+
+        s ++;
+
+        if ((*s & 0xc0) != 0x80)
+          return (0);			/* Missing suffix byte */
+      }
+      else if ((*s & 0xf8) == 0xf0)
+      {
+       /*
+        * 4-byte sequence...
+        */
+
+        s ++;
+
+        if ((*s & 0xc0) != 0x80)
+          return (0);			/* Missing suffix byte */
+
+        s ++;
+
+        if ((*s & 0xc0) != 0x80)
+          return (0);			/* Missing suffix byte */
+
+        s ++;
+
+        if ((*s & 0xc0) != 0x80)
+          return (0);			/* Missing suffix byte */
+      }
+      else
+        return (0);			/* Bad sequence */
+    }
+
+    s ++;
+  }
+
+  return (1);
 }
 
 
