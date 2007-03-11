@@ -279,9 +279,16 @@ main(int  argc,				// I - Number of command-line args
 
   globalParams = new GlobalParams(buffer);
 
-  globalParams->setPSPaperWidth(width);
-  globalParams->setPSPaperHeight(length);
-  globalParams->setPSImageableArea(left, bottom, right, top);
+  if (fit || globalParams->getPSPaperWidth() > 0)
+  {
+    // Only set paper size and area if we are fitting to the job's
+    // page size or the pdftops.conf file does not contain
+    // "psPaperSize match"...
+    globalParams->setPSPaperWidth(width);
+    globalParams->setPSPaperHeight(length);
+    globalParams->setPSImageableArea(left, bottom, right, top);
+  }
+
   globalParams->setPSDuplex(duplex);
   globalParams->setPSExpandSmaller(fit);
   globalParams->setPSShrinkLarger(fit);
