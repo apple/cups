@@ -162,7 +162,7 @@ cupsdStartProcess(
 		 linkpath);
       else
 	snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
-		 dirname(command), linkpath);
+		 dirname((char *)command), linkpath);
     }
     else
       snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);

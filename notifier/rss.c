@@ -73,7 +73,8 @@ static int		compare_rss(_cups_rss_t *a, _cups_rss_t *b);
 static void		delete_message(_cups_rss_t *rss);
 static void		load_rss(cups_array_t *rss, const char *filename);
 static _cups_rss_t	*new_message(int sequence_number, char *subject,
-			             char *text, char *link, time_t event_time);
+			             char *text, char *link_url,
+				     time_t event_time);
 static const char	*password_cb(const char *prompt);
 static int		save_rss(cups_array_t *rss, const char *filename,
 			         const char *baseurl);
