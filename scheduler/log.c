@@ -465,9 +465,10 @@ static int				/* O  - 1 if log file open */
 check_log_file(cups_file_t **lf,	/* IO - Log file */
 	       const char  *logname)	/* I  - Log filename */
 {
-  char	backname[1024],			/* Backup log filename */
-	filename[1024],			/* Formatted log filename */
-	*ptr;				/* Pointer into filename */
+  char		backname[1024],		/* Backup log filename */
+		filename[1024],		/* Formatted log filename */
+		*ptr;			/* Pointer into filename */
+  const char	*logptr;		/* Pointer into log filename */
 
 
  /*
@@ -499,17 +500,17 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
     else
       filename[0] = '\0';
 
-    for (ptr = filename + strlen(filename);
-         *logname && ptr < (filename + sizeof(filename) - 1);
-	 logname ++)
-      if (*logname == '%')
+    for (logptr = logname, ptr = filename + strlen(filename);
+         *logptr && ptr < (filename + sizeof(filename) - 1);
+	 logptr ++)
+      if (*logptr == '%')
       {
        /*
         * Format spec...
 	*/
 
-        logname ++;
-	if (*logname == 's')
+        logptr ++;
+	if (*logptr == 's')
 	{
 	 /*
 	  * Insert the server name...
@@ -524,11 +525,11 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 	  * Otherwise just insert the character...
 	  */
 
-	  *ptr++ = *logname;
+	  *ptr++ = *logptr;
 	}
       }
       else
-	*ptr++ = *logname;
+	*ptr++ = *logptr;
 
     *ptr = '\0';
   }
