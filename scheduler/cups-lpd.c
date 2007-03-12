@@ -96,7 +96,8 @@ static int	get_printer(http_t *http, const char *name, char *dest,
 		            int destsize, cups_option_t **options,
 			    int *accepting, int *shared, ipp_pstate_t *state);
 static int	print_file(http_t *http, int id, const char *filename,
-		           const char *docname, const char *user, int last);
+		           const char *docname, const char *user,
+			   const char *format, int last);
 static int	recv_print_job(const char *name, int num_defaults,
 		               cups_option_t *defaults);
 static int	remove_jobs(const char *name, const char *agent,
@@ -824,6 +825,7 @@ print_file(http_t     *http,		/* I - HTTP connection */
 	   const char *filename,	/* I - File to print */
            const char *docname,		/* I - document-name */
 	   const char *user,		/* I - requesting-user-name */
+	   const char *format,		/* I - document-format */
 	   int        last)		/* I - 1 = last file in job */
 {
   ipp_t		*request;		/* IPP request */
@@ -845,6 +847,10 @@ print_file(http_t     *http,		/* I - HTTP connection */
   if (docname)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
         	 "document-name", NULL, docname);
+
+  if (format)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+                 "document-format", NULL, format);
 
   if (last)
     ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
@@ -1278,6 +1284,8 @@ recv_print_job(
         	docnumber ++;
 
         	if (print_file(http, id, temp[i], docname, user,
+		               cupsGetOption("document-format", num_options,
+			                     options),
 	                       docnumber == doccount))
                   status = 1;
 		else
