@@ -331,7 +331,8 @@ do_ps_tests(void)
 {
   cups_page_header2_t	header;		/* Page header */
   int			preferred_bits;	/* Preferred bits */
-  int			errors;		/* Number of errors */
+  int			errors = 0;	/* Number of errors */
+
 
  /*
   * Test PS exec code...
@@ -547,7 +548,7 @@ do_raster_tests(void)
   cups_page_header2_t	header,		/* Page header */
 			expected;	/* Expected page header */
   unsigned char		data[2048];	/* Raster data */
-  int			errors;		/* Number of errors */
+  int			errors = 0;	/* Number of errors */
 
 
  /*
