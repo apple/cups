@@ -4,7 +4,7 @@
 #
 #   Startup/shutdown script for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -136,6 +136,20 @@ unset TMPDIR
 
 
 #
+# Make sure we have the standard program directories in the path
+# since some operating systems (this means YOU HP-UX!) don't
+# provide a standard path on boot-up...
+#
+
+if "x$PATH" = x; then
+	PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+else
+	PATH="/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
+fi
+
+export PATH
+
+#
 # See if the CUPS server (cupsd) is running...
 #
 
@@ -199,6 +213,16 @@ case $1 in
 		else
 			echo "cups: scheduler is not running."
 		fi
+		;;
+
+	start_msg)
+		# HP-UX non-standard...
+		echo "Starting CUPS Server"
+		;;
+
+	stop_msg)
+		# HP-UX non-standard...
+		echo "Starting CUPS Server"
 		;;
 
 	*)

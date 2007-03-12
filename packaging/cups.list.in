@@ -635,7 +635,7 @@ EOF
 %subpackage
 
 %system !darwin
-i 0755 root sys cups init/cups.sh
+i 0755 root sys cups init/cups.sh start(@RCSTART@) stop(@RCSTOP) runlevels(@RCLEVELS@)
 %subpackage lpd
 %if XINETD
 f 0644 root sys $XINETD/cups-lpd init/cups-lpd

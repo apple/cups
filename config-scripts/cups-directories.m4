@@ -123,24 +123,24 @@ fi
 
 dnl Setup init.d locations...
 AC_ARG_WITH(rcdir, [  --with-rcdir            set path for rc scripts],rcdir="$withval",rcdir="")
+AC_ARG_WITH(rclevels, [  --with-rclevels         set run levels for rc scripts],rclevels="$withval",rclevels="2 3 5")
+AC_ARG_WITH(rcstart, [  --with-rcstart          set start number for rc scripts],rcstart="$withval",rcstart="99")
+AC_ARG_WITH(rcstop, [  --with-rcstop           set stop number for rc scripts],rcstop="$withval",rcstop="00")
+
+INITDIR=""
+INITDDIR=""
+RCLEVELS="$rclevels"
+RCSTART="$rcstart"
+RCSTOP="$rcstop"
 
 if test x$rcdir = x; then
 	case "$uname" in
-		FreeBSD* | OpenBSD* | MirBsD* | ekkoBSD*)
-			# FreeBSD and OpenBSD
-			INITDIR=""
-			INITDDIR=""
-			;;
-
-		NetBSD*)
-			# NetBSD
-			INITDIR=""
-			INITDDIR="/etc/rc.d"
+		AIX*)
+			INITDIR="/etc/rc.d"
 			;;
 
 		Darwin*)
 			# Darwin and MacOS X...
-			INITDIR=""
 			if test -x /sbin/launchd; then
 				INITDDIR="/System/Library/LaunchDaemons"
 			else 
@@ -148,48 +148,75 @@ if test x$rcdir = x; then
 			fi
 			;;
 
+		FreeBSD* | OpenBSD* | MirBsD* | ekkoBSD*)
+			# FreeBSD and OpenBSD
+			;;
+
+		HP-UX*)
+			INITDIR="/sbin"
+			RCLEVELS="2"
+			RCSTART="620"
+			RCSTOP="380"
+			;;
+
+		IRIX*)
+			# IRIX
+			INITDIR="/etc"
+			RCSTART="60"
+			RCSTOP="25"
+			;;
+
 		Linux | GNU)
 			# Linux/HURD seems to choose an init.d directory at random...
 			if test -d /sbin/init.d; then
 				# SuSE
 				INITDIR="/sbin/init.d"
-				INITDDIR=".."
 			else
 				if test -d /etc/init.d; then
 					# Others
 					INITDIR="/etc"
-					INITDDIR="../init.d"
 				else
 					# RedHat
 					INITDIR="/etc/rc.d"
-					INITDDIR="../init.d"
 				fi
 			fi
+			RCSTART="81"
+			RCSTOP="36"
 			;;
 
-		OSF1* | HP-UX*)
+		NetBSD*)
+			# NetBSD
+			INITDDIR="/etc/rc.d"
+			;;
+
+		OSF1*)
 			INITDIR="/sbin"
-			INITDDIR="../init.d"
 			;;
 
-		AIX*)
-			INITDIR="/etc/rc.d"
-			INITDDIR=".."
+		SunOS*)
+			# Solaris
+			INITDIR="/etc"
+			RCSTART="81"
 			;;
 
 		*)
 			INITDIR="/etc"
-			INITDDIR="../init.d"
 			;;
 
 	esac
 else
-	INITDIR=""
-	INITDDIR="$rcdir"
+	if test "x$rclevels" = x; then
+		INITDDIR="$rcdir"
+	else
+		INITDIR="$rcdir"
+	fi
 fi
 
 AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
+AC_SUBST(RCLEVELS)
+AC_SUBST(RCSTART)
+AC_SUBST(RCSTOP)
 
 dnl Xinetd support...
 AC_ARG_WITH(xinetd, [  --with-xinetd           set path for xinetd config files],XINETD="$withval",XINETD="")
