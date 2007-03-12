@@ -3722,7 +3722,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   int		pid,			/* Process ID of command */
 		status;			/* Status of command */
   char		command[1024],		/* Command */
-		*argv[11],		/* Command-line arguments */
+		*argv[12],		/* Command-line arguments */
 		*envp[MAX_ENV + 1],	/* Environment variables */
 		home[1024],		/* HOME environment variable */
 		infofile[1024],		/* Type-in information for cert */
