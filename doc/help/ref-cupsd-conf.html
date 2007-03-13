@@ -236,6 +236,7 @@ HREF="#Require"><CODE>Require</CODE></A> directive instead.</P>
   AuthType Basic
   AuthType Digest
   AuthType BasicDigest
+  AuthType Negotiate
 &lt;/Location&gt;
 </PRE>
 
@@ -260,12 +261,15 @@ authentication to perform:</P>
 	should be performed using the
 	<VAR>/etc/cups/passwd.md5</VAR> file</LI>
 
+	<LI><CODE>Negotiate</CODE> - Kerberos authentication
+	should be performed</LI>
+
 </UL>
 
-<P>When using <CODE>Basic</CODE>, <CODE>Digest</CODE>, or
-<CODE>BasicDigest</CODE> authentication, clients connecting
-through the <CODE>localhost</CODE> interface can also
-authenticate using certificates.</P>
+<P>When using <CODE>Basic</CODE>, <CODE>Digest</CODE>,
+<CODE>BasicDigest</CODE>, or <CODE>Negotiate</CODE> authentication,
+clients connecting through the <CODE>localhost</CODE> interface can
+also authenticate using certificates.</P>
 
 <P>The <CODE>AuthType</CODE> directive must appear inside a <A
 HREF="#Location"><CODE>Location</CODE></A> or <A
@@ -856,6 +860,7 @@ for data files.</P>
 DefaultAuthType Basic
 DefaultAuthType BasicDigest
 DefaultAuthType Digest
+DefaultAuthType Negotiate
 </PRE>
 
 <H3>Description</H3>
