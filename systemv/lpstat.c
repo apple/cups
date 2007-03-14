@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c 6090 2006-11-14 16:35:27Z mike $"
+ * "$Id: lpstat.c 6084 2006-11-14 14:35:53Z mike $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -42,6 +42,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <cups/http-private.h>
 #include <cups/string.h>
 #include <cups/cups.h>
 #include <cups/i18n.h>
@@ -2248,5 +2249,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c 6090 2006-11-14 16:35:27Z mike $".
+ * End of "$Id: lpstat.c 6084 2006-11-14 14:35:53Z mike $".
  */

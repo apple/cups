@@ -1,9 +1,12 @@
 /*
- * "$Id: auth.c 5948 2006-09-12 13:58:39Z mike $"
+ * "$Id: auth.c 6314 2007-03-01 19:11:54Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ *
+ *   This file contains Kerberos support code, copyright 2006 by
+ *   Jelmer Vernooij.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -49,9 +52,11 @@
  *   compare_locations()       - Compare two locations.
  *   cups_crypt()              - Encrypt the password using the DES or MD5
  *                               algorithms, as needed.
+ *   get_gss_creds()           - Obtain GSS credentials.
  *   get_md5_password()        - Get an MD5 password.
  *   pam_func()                - PAM conversation function.
  *   to64()                    - Base64-encode an integer value...
+ *   check_authref()           - Check an authorization services reference.
  */
 
 /*
@@ -79,6 +84,14 @@
 #ifdef HAVE_MEMBERSHIP_H
 #  include <membership.h>
 #endif /* HAVE_MEMBERSHIP_H */
+#ifdef HAVE_AUTHORIZATION_H
+#  include <Security/AuthorizationTags.h>
+#  ifdef HAVE_SECBASEPRIV_H
+#    include <Security/SecBasePriv.h>
+#  else
+extern const char *cssmErrorString(int error);
+#  endif /* HAVE_SECBASEPRIV_H */
+#endif /* HAVE_AUTHORIZATION_H */
 
 
 /*
@@ -87,17 +100,23 @@
 
 static cupsd_authmask_t	*add_allow(cupsd_location_t *loc);
 static cupsd_authmask_t	*add_deny(cupsd_location_t *loc);
+#ifdef HAVE_AUTHORIZATION_H
+static int		check_authref(cupsd_client_t *con, const char *right);
+#endif /* HAVE_AUTHORIZATION_H */
 static int		compare_locations(cupsd_location_t *a,
 			                  cupsd_location_t *b);
 #if !HAVE_LIBPAM && !defined(HAVE_USERSEC_H)
 static char		*cups_crypt(const char *pw, const char *salt);
 #endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
+#ifdef HAVE_GSSAPI
+static gss_cred_id_t	get_gss_creds(const char *service_name);
+#endif /* HAVE_GSSAPI */
 static char		*get_md5_password(const char *username,
 			                  const char *group, char passwd[33]);
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
-#else
+#elif !defined(HAVE_USERSEC_H)
 static void		to64(char *s, unsigned long v, int n);
 #endif /* HAVE_LIBPAM */
 
@@ -309,8 +328,8 @@ void
 cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 {
   int		type;			/* Authentication type */
-  char		*authorization,		/* Pointer into Authorization string */
-		*ptr,			/* Pointer into string */
+  const char	*authorization;		/* Pointer into Authorization string */
+  char		*ptr,			/* Pointer into string */
 		username[65],		/* Username string */
 		password[33];		/* Password string */
   const char	*localuser;		/* Certificate username */
@@ -356,13 +375,21 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   * Decode the Authorization string...
   */
 
-  authorization = con->http.fields[HTTP_FIELD_AUTHORIZATION];
+  authorization = httpGetField(&con->http, HTTP_FIELD_AUTHORIZATION);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAuthorize: Authorization=\"%s\"",
                   authorization);
 
   username[0] = '\0';
   password[0] = '\0';
+
+#ifdef HAVE_AUTHORIZATION_H
+  if (con->authref)
+  {
+    AuthorizationFree(con->authref, kAuthorizationFlagDefaults);
+    con->authref = NULL;
+  }
+#endif /* HAVE_AUTHORIZATION_H */
 
   if (type == AUTH_NONE)
   {
@@ -384,6 +411,59 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
                     "cupsdAuthorize: No authentication data provided.");
     return;
   }
+#ifdef HAVE_AUTHORIZATION_H
+  else if (!strncmp(authorization, "AuthRef", 6) && 
+           !strcasecmp(con->http.hostname, "localhost"))
+  {
+    OSStatus		status;		/* Status */
+    int			authlen;	/* Auth string length */
+    AuthorizationItemSet *authinfo;	/* Authorization item set */
+
+   /*
+    * Get the Authorization Services data...
+    */
+
+    authorization += 7;
+    while (isspace(*authorization & 255))
+      authorization ++;
+
+    authlen = sizeof(nonce);
+    httpDecode64_2(nonce, &authlen, authorization);
+
+    if (authlen != kAuthorizationExternalFormLength)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+	              "cupsdAuthorize: External Authorization reference size"
+	              "is incorrect!");
+      return;
+    }
+
+    if ((status = AuthorizationCreateFromExternalForm(
+		      (AuthorizationExternalForm *)nonce, &con->authref)) != 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "cupsdAuthorize: AuthorizationCreateFromExternalForm "
+		      "returned %d (%s)",
+		      (int)status, cssmErrorString(status));
+      return;
+    }
+
+    if ((status = AuthorizationCopyInfo(con->authref, 
+					kAuthorizationEnvironmentUsername, 
+					&authinfo)) != 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "cupsdAuthorize: AuthorizationCopyInfo returned %d (%s)",
+		      (int)status, cssmErrorString(status));
+      return;
+    }
+  
+    if (authinfo->count == 1)
+      strlcpy(username, authinfo->items[0].value, sizeof(username));
+
+    AuthorizationFreeItemSet(authinfo);
+  }
+#endif /* HAVE_AUTHORIZATION_H */
   else if (!strncmp(authorization, "Local", 5) &&
            !strcasecmp(con->http.hostname, "localhost"))
   {
@@ -754,6 +834,118 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
   }
+#ifdef HAVE_GSSAPI
+  else if (!strncmp(authorization, "Negotiate", 9) && type == AUTH_KERBEROS) 
+  {
+    int			len;		/* Length of authorization string */
+    gss_cred_id_t	server_creds;	/* Server credentials */
+    gss_ctx_id_t	context;	/* Authorization context */
+    OM_uint32		major_status,	/* Major status code */
+			minor_status;	/* Minor status code */
+    gss_buffer_desc	input_token = GSS_C_EMPTY_BUFFER,
+					/* Input token from string */
+			output_token = GSS_C_EMPTY_BUFFER;
+					/* Output token for username */
+    gss_name_t		client_name;	/* Client name */
+
+
+    con->gss_output_token.length = 0;
+
+   /*
+    * Find the start of the Kerberos input token...
+    */
+
+    authorization += 9;
+    while (isspace(*authorization & 255))
+      authorization ++;
+
+    if (!*authorization)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdAuthorize: No authentication data specified.");
+      return;
+    }
+
+   /*
+    * Get the server credentials...
+    */
+
+    if ((server_creds = get_gss_creds(GSSServiceName)) == NULL)
+    {
+      con->no_negotiate = 1;
+      return;	
+    }
+
+   /*
+    * Decode the authorization string to get the input token...
+    */
+
+    len                = strlen(authorization);
+    input_token.value  = malloc(len);
+    input_token.value  = httpDecode64_2(input_token.value, &len,
+		                        authorization);
+    input_token.length = len;
+
+   /*
+    * Accept the input token to get the authorization info...
+    */
+
+    context      = GSS_C_NO_CONTEXT;
+    client_name  = GSS_C_NO_NAME;
+    major_status = gss_accept_sec_context(&minor_status,
+					  &context,
+					  server_creds, 
+					  &input_token,
+					  GSS_C_NO_CHANNEL_BINDINGS,
+					  &client_name,
+					  NULL,
+					  &con->gss_output_token,
+					  NULL,
+					  NULL,
+					  &con->gss_delegated_cred);
+
+    if (GSS_ERROR(major_status))
+    {
+      cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
+                         "cupsdAuthorize: Error accepting GSSAPI security "
+			 "context");
+
+      if (context != GSS_C_NO_CONTEXT)
+	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
+
+      con->no_negotiate = 1;
+      return;
+    }
+
+   /*
+    * Get the username associated with the credentials...
+    */
+
+    if (major_status == GSS_S_COMPLETE)
+    {
+      major_status = gss_display_name(&minor_status, client_name, 
+				      &output_token, NULL);
+
+      if (GSS_ERROR(major_status))
+      {
+	cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
+                           "cupsdAuthorize: Error getting username");
+	gss_release_name(&minor_status, &client_name);
+	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
+	con->no_negotiate = 1;
+	return;
+      }
+
+      gss_release_name(&minor_status, &client_name);
+      strlcpy(username, output_token.value, sizeof(username));
+
+      gss_release_buffer(&minor_status, &output_token);
+      gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
+    }
+    else
+      gss_release_name(&minor_status, &client_name);
+  }
+#endif /* HAVE_GSSAPI */
   else
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -1493,7 +1685,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 		  "NONE",
 		  "BASIC",
 		  "DIGEST",
-		  "BASICDIGEST"
+		  "BASICDIGEST",
+		  "KERBEROS"
 		};
 
 
@@ -1623,9 +1816,11 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   * See if encryption is required...
   */
 
-  if (best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
+  if ((best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
       strcasecmp(con->http.hostname, "localhost") &&
-      best->satisfy == AUTH_SATISFY_ALL)
+      best->satisfy == AUTH_SATISFY_ALL) &&
+      !(best->type == AUTH_KERBEROS || 
+        (best->type == AUTH_NONE && DefaultAuthType == AUTH_KERBEROS)))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsAuthorized: Need upgrade to TLS...");
@@ -1669,7 +1864,11 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: username=\"%s\"",
 	            con->username);
 
+#ifdef HAVE_AUTHORIZATION_H
+    if (!con->username[0] && !con->authref)
+#else
     if (!con->username[0])
+#endif /* HAVE_AUTHORIZATION_H */
     {
       if (best->satisfy == AUTH_SATISFY_ALL || auth == AUTH_DENY)
 	return (HTTP_UNAUTHORIZED);	/* Non-anonymous needs user/pass */
@@ -1692,8 +1891,13 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   * Get the user info...
   */
 
-  pw = getpwnam(username);
-  endpwent();
+  if (username[0])
+  {
+    pw = getpwnam(username);
+    endpwent();
+  }
+  else
+    pw = NULL;
 
   if (best->level == AUTH_USER)
   {
@@ -1712,6 +1916,28 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsAuthorized: Checking user membership...");
+
+#ifdef HAVE_AUTHORIZATION_H
+   /*
+    * If an authorization reference was supplied it must match a right name...
+    */
+
+    if (con->authref)
+    {
+      for (i = 0; i < best->num_names; i ++)
+      {
+	if (!strncasecmp(best->names[i], "@AUTHKEY(", 9) && 
+	    check_authref(con, best->names[i] + 9))
+	  return (HTTP_OK);
+	else if (!strcasecmp(best->names[i], "@SYSTEM") &&
+	         SystemGroupAuthKey &&
+		 check_authref(con, SystemGroupAuthKey))
+	  return (HTTP_OK);
+      }
+
+      return (HTTP_UNAUTHORIZED);
+    }
+#endif /* HAVE_AUTHORIZATION_H */
 
     for (i = 0; i < best->num_names; i ++)
     {
@@ -1858,6 +2084,59 @@ add_deny(cupsd_location_t *loc)		/* I - Location to add to */
 }
 
 
+#ifdef HAVE_AUTHORIZATION_H
+/*
+ * 'check_authref()' - Check if an authorization services reference has the
+ *		       supplied right.
+ */
+
+static int				/* O - 1 if right is valid, 0 otherwise */
+check_authref(cupsd_client_t *con,	/* I - Connection */
+	      const char     *right)	/* I - Right name */
+{
+  OSStatus		status;		/* OS Status */
+  AuthorizationItem	authright;	/* Authorization right */
+  AuthorizationRights	authrights;	/* Authorization rights */
+  AuthorizationFlags	authflags;	/* Authorization flags */
+
+
+ /*
+  * Check to see if the user is allowed to perform the task...
+  */
+
+  if (!con->authref)
+    return (0);
+
+  authright.name        = right;
+  authright.valueLength = 0;
+  authright.value       = NULL;
+  authright.flags       = 0;
+
+  authrights.count = 1;
+  authrights.items = &authright;
+
+  authflags = kAuthorizationFlagDefaults | 
+	      kAuthorizationFlagExtendRights;
+
+  if ((status = AuthorizationCopyRights(con->authref, &authrights, 
+					kAuthorizationEmptyEnvironment, 
+					authflags, NULL)) != 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "AuthorizationCopyRights(\"%s\") returned %d (%s)",
+		    authright.name, (int)status, cssmErrorString(status));
+    return (0);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "AuthorizationCopyRights(\"%s\") succeeded!",
+		  authright.name);
+
+  return (1);
+}
+#endif /* HAVE_AUTHORIZATION_H */
+
+
 /*
  * 'compare_locations()' - Compare two locations.
  */
@@ -1991,6 +2270,79 @@ cups_crypt(const char *pw,		/* I - Password string */
   }
 }
 #endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
+
+
+#ifdef HAVE_GSSAPI
+/*
+ * 'get_gss_creds()' - Obtain GSS credentials.
+ */
+
+static gss_cred_id_t			/* O - Server credentials */
+get_gss_creds(const char *service_name)	/* I - Service name */
+{
+  OM_uint32	major_status,		/* Major status code */
+		minor_status;		/* Minor status code */
+  gss_name_t	server_name;		/* Server name */
+  gss_cred_id_t	server_creds;		/* Server credentials */
+  gss_buffer_desc token = GSS_C_EMPTY_BUFFER;
+					/* Service name token */
+  char		buf[1024],		/* Service name buffer */
+		fqdn[HTTP_MAX_URI];	/* Hostname of server */
+
+
+  snprintf(buf, sizeof(buf), "%s@%s", service_name,
+	   httpGetHostname(NULL, fqdn, sizeof(fqdn)));
+
+  token.value  = buf;
+  token.length = strlen(buf);
+  server_name  = GSS_C_NO_NAME;
+  major_status = gss_import_name(&minor_status, &token,
+	 			 GSS_C_NT_HOSTBASED_SERVICE,
+				 &server_name);
+
+  memset(&token, 0, sizeof(token));
+
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status, 
+		       "gss_import_name() failed");
+    return (NULL);
+  }
+
+  major_status = gss_display_name(&minor_status, server_name, &token, NULL);
+
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status,
+                       "gss_display_name() failed"); 
+    return (NULL);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Attempting to acquire credentials for %s...", 
+                  (char *)token.value);
+
+  server_creds = GSS_C_NO_CREDENTIAL;
+  major_status = gss_acquire_cred(&minor_status, server_name, GSS_C_INDEFINITE,
+			          GSS_C_NO_OID_SET, GSS_C_ACCEPT,
+				  &server_creds, NULL, NULL);
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status,
+                       "gss_acquire_cred() failed"); 
+    gss_release_name(&minor_status, &server_name);
+    gss_release_buffer(&minor_status, &token);
+    return (NULL);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Credentials acquired successfully for %s.", 
+                  (char *)token.value);
+
+  gss_release_name(&minor_status, &server_name);
+  gss_release_buffer(&minor_status, &token);
+
+  return (server_creds);
+}
+#endif /* HAVE_GSSAPI */
 
 
 /*
@@ -2146,7 +2498,7 @@ pam_func(
 
   return (PAM_SUCCESS);
 }
-#else
+#elif !defined(HAVE_USERSEC_H)
 
 
 /*
@@ -2170,5 +2522,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 5948 2006-09-12 13:58:39Z mike $".
+ * End of "$Id: auth.c 6314 2007-03-01 19:11:54Z mike $".
  */

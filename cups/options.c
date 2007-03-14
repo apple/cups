@@ -1,9 +1,9 @@
 /*
- * "$Id: options.c 5151 2006-02-22 22:43:17Z mike $"
+ * "$Id: options.c 6310 2007-02-27 14:20:39Z mike $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -366,9 +366,26 @@ cupsMarkOptions(
     }
     else if (!strcasecmp(optptr->name, "output-bin"))
     {
-      if (cupsGetOption("OutputBin", num_options, options) == NULL)
+      if (!cupsGetOption("OutputBin", num_options, options))
         if (ppdMarkOption(ppd, "OutputBin", optptr->value))
           conflict = 1;
+    }
+    else if (!strcasecmp(optptr->name, "multiple-document-handling"))
+    {
+      if (!cupsGetOption("Collate", num_options, options) &&
+          ppdFindOption(ppd, "Collate"))
+      {
+        if (strcasecmp(optptr->value, "separate-documents-uncollated-copies"))
+	{
+	  if (ppdMarkOption(ppd, "Collate", "True"))
+            conflict = 1;
+        }
+	else
+	{
+	  if (ppdMarkOption(ppd, "Collate", "False"))
+            conflict = 1;
+        }
+      }
     }
     else if (ppdMarkOption(ppd, optptr->name, optptr->value))
       conflict = 1;
@@ -578,7 +595,7 @@ cupsParseOptions(
 
 
 /*
- * 'cupsRemoveOptions()' - Remove an option from an option array.
+ * 'cupsRemoveOption()' - Remove an option from an option array.
  *
  * @since CUPS 1.2@
  */
@@ -622,7 +639,7 @@ cupsRemoveOption(
       free(option->value);
 
     if (i > 0)
-      memmove(option, option + 1, i * sizeof(cups_option_t *));
+      memmove(option, option + 1, i * sizeof(cups_option_t));
   }
 
  /*
@@ -634,5 +651,5 @@ cupsRemoveOption(
 
 
 /*
- * End of "$Id: options.c 5151 2006-02-22 22:43:17Z mike $".
+ * End of "$Id: options.c 6310 2007-02-27 14:20:39Z mike $".
  */

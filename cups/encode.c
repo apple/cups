@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 6266 2007-02-11 21:20:48Z mike $"
+ * "$Id: encode.c 6267 2007-02-11 23:24:22Z mike $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -61,6 +61,7 @@ static const _ipp_option_t ipp_options[] =
   { "copies",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { "copies-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "document-format",		IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
+  { "document-format-default",	IPP_TAG_MIMETYPE,	IPP_TAG_PRINTER },
   { "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB },
   { "finishings-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { "fitplot",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
@@ -82,7 +83,9 @@ static const _ipp_option_t ipp_options[] =
   { "natural-scaling-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "notify-charset",		IPP_TAG_CHARSET,	IPP_TAG_SUBSCRIPTION },
   { "notify-events",		IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
+  { "notify-events-default",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { "notify-lease-duration",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
+  { "notify-lease-duration-default", IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "notify-natural-language",	IPP_TAG_LANGUAGE,	IPP_TAG_SUBSCRIPTION },
   { "notify-pull-method",	IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
   { "notify-recipient",		IPP_TAG_URI,		IPP_TAG_SUBSCRIPTION },
@@ -567,5 +570,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 6266 2007-02-11 21:20:48Z mike $".
+ * End of "$Id: encode.c 6267 2007-02-11 23:24:22Z mike $".
  */

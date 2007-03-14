@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5628 2006-06-05 15:25:23Z mike $"
+# "$Id: Makefile 5627 2006-06-05 15:24:20Z mike $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -225,5 +225,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5628 2006-06-05 15:25:23Z mike $".
+# End of "$Id: Makefile 5627 2006-06-05 15:24:20Z mike $".
 #

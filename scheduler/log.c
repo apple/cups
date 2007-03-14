@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 6027 2006-10-11 21:04:58Z mike $"
+ * "$Id: log.c 6328 2007-03-12 14:45:42Z mike $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,11 +23,12 @@
  *
  * Contents:
  *
- *   cupsdGetDateTime() - Returns a pointer to a date/time string.
- *   cupsdLogMessage()  - Log a message to the error log file.
- *   cupsdLogPage()     - Log a page to the page log file.
- *   cupsdLogRequest()  - Log an HTTP request in Common Log Format.
- *   check_log_file()   - Open/rotate a log file if it needs it.
+ *   cupsdGetDateTime()   - Returns a pointer to a date/time string.
+ *   cupsdLogGSSMessage() - Log a GSSAPI error...
+ *   cupsdLogMessage()    - Log a message to the error log file.
+ *   cupsdLogPage()       - Log a page to the page log file.
+ *   cupsdLogRequest()    - Log an HTTP request in Common Log Format.
+ *   check_log_file()     - Open/rotate a log file if it needs it.
  */
 
 /*
@@ -105,6 +106,56 @@ cupsdGetDateTime(time_t t)		/* I - Time value */
 
   return (s);
 }
+
+
+#ifdef HAVE_GSSAPI
+/*
+ * 'cupsdLogGSSMessage()' - Log a GSSAPI error...
+ */
+
+int					/* O - 1 on success, 0 on error */
+cupsdLogGSSMessage(
+    int        level,			/* I - Log level */
+    int	       major_status,		/* I - Major GSSAPI status */
+    int	       minor_status, 		/* I - Minor GSSAPI status */
+    const char *message,		/* I - printf-style message string */
+    ...)				/* I - Additional args as needed */
+{
+  OM_uint32	err_major_status,	/* Major status code for display */
+		err_minor_status;	/* Minor status code for display */
+  OM_uint32	msg_ctx;		/* Message context */
+  gss_buffer_desc major_status_string = GSS_C_EMPTY_BUFFER,
+					/* Major status message */
+		minor_status_string = GSS_C_EMPTY_BUFFER;
+					/* Minor status message */
+  int		ret;			/* Return value */
+
+
+  msg_ctx             = 0;
+  err_major_status    = gss_display_status(&err_minor_status,
+	                        	   major_status,
+					   GSS_C_GSS_CODE,
+					   GSS_C_NO_OID,
+					   &msg_ctx,
+					   &major_status_string);
+
+  if (!GSS_ERROR(err_major_status))
+    err_major_status = gss_display_status(&err_minor_status,
+	                        	  minor_status,
+					  GSS_C_MECH_CODE,
+					  GSS_C_NULL_OID,
+					  &msg_ctx,
+					  &minor_status_string);
+
+  ret = cupsdLogMessage(level, "%s: %s, %s", message,
+			(char *)major_status_string.value,
+			(char *)minor_status_string.value);
+  gss_release_buffer(&err_minor_status, &major_status_string);
+  gss_release_buffer(&err_minor_status, &minor_status_string);
+
+  return (ret);
+}
+#endif /* HAVE_GSSAPI */
 
 
 /*
@@ -414,9 +465,10 @@ static int				/* O  - 1 if log file open */
 check_log_file(cups_file_t **lf,	/* IO - Log file */
 	       const char  *logname)	/* I  - Log filename */
 {
-  char	backname[1024],			/* Backup log filename */
-	filename[1024],			/* Formatted log filename */
-	*ptr;				/* Pointer into filename */
+  char		backname[1024],		/* Backup log filename */
+		filename[1024],		/* Formatted log filename */
+		*ptr;			/* Pointer into filename */
+  const char	*logptr;		/* Pointer into log filename */
 
 
  /*
@@ -448,17 +500,17 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
     else
       filename[0] = '\0';
 
-    for (ptr = filename + strlen(filename);
-         *logname && ptr < (filename + sizeof(filename) - 1);
-	 logname ++)
-      if (*logname == '%')
+    for (logptr = logname, ptr = filename + strlen(filename);
+         *logptr && ptr < (filename + sizeof(filename) - 1);
+	 logptr ++)
+      if (*logptr == '%')
       {
        /*
         * Format spec...
 	*/
 
-        logname ++;
-	if (*logname == 's')
+        logptr ++;
+	if (*logptr == 's')
 	{
 	 /*
 	  * Insert the server name...
@@ -473,11 +525,11 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 	  * Otherwise just insert the character...
 	  */
 
-	  *ptr++ = *logname;
+	  *ptr++ = *logptr;
 	}
       }
       else
-	*ptr++ = *logname;
+	*ptr++ = *logptr;
 
     *ptr = '\0';
   }
@@ -551,5 +603,5 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c 6027 2006-10-11 21:04:58Z mike $".
+ * End of "$Id: log.c 6328 2007-03-12 14:45:42Z mike $".
  */

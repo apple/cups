@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h 5970 2006-09-19 20:11:08Z mike $"
+ * "$Id: job.h 6170 2007-01-02 17:26:41Z mike $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -46,6 +46,7 @@ typedef struct cupsd_job_s
   ipp_t			*attrs;		/* Job attributes */
   int			print_pipes[2],	/* Print data pipes */
 			back_pipes[2],	/* Backchannel pipes */
+			side_pipes[2],	/* Sidechannel pipes */
 			status_pipes[2];/* Status pipes */
   cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
   int			cost;		/* Filtering cost */
@@ -55,6 +56,9 @@ typedef struct cupsd_job_s
   int			status;		/* Status code from filters */
   cupsd_printer_t	*printer;	/* Printer this job is assigned to */
   int			tries;		/* Number of tries for this job */
+#ifdef HAVE_GSSAPI
+  char			*ccname;	/* KRB5CCNAME environment variable */
+#endif /* HAVE_GSSAPI */
 } cupsd_job_t;
 
 
@@ -122,5 +126,5 @@ extern void		cupsdUpdateJob(cupsd_job_t *job);
 
 
 /*
- * End of "$Id: job.h 5970 2006-09-19 20:11:08Z mike $".
+ * End of "$Id: job.h 6170 2007-01-02 17:26:41Z mike $".
  */

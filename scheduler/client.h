@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h 6205 2007-01-22 22:04:43Z mike $"
+ * "$Id: client.h 6253 2007-02-10 18:48:40Z mike $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -21,6 +21,10 @@
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
+
+#ifdef HAVE_AUTHORIZATION_H
+#  include <Security/Authorization.h>
+#endif /* HAVE_AUTHORIZATION_H */
 
 /*
  * HTTP client structure...
@@ -56,6 +60,16 @@ struct cupsd_client_s
   http_addr_t		clientaddr;	/* Client address */
   char			servername[256];/* Server name for connection */
   int			serverport;	/* Server port for connection */
+#ifdef HAVE_GSSAPI
+  int			no_negotiate;	/* Don't offer WWW-Authenticate: Negotiate */
+  gss_buffer_desc 	gss_output_token;
+					/* Output token for Negotiate header */
+  gss_cred_id_t 	gss_delegated_cred;
+					/* Credentials from client header */
+#endif /* HAVE_GSSAPI */
+#ifdef HAVE_AUTHORIZATION_H
+  AuthorizationRef	authref;	/* Authorization ref */
+#endif /* HAVE_AUTHORIZATION_H */
 };
 
 #define HTTP(con) &((con)->http)
@@ -108,7 +122,7 @@ extern void	cupsdDeleteAllListeners(void);
 extern int	cupsdFlushHeader(cupsd_client_t *con);
 extern void	cupsdPauseListening(void);
 extern int	cupsdProcessIPPRequest(cupsd_client_t *con);
-extern int	cupsdReadClient(cupsd_client_t *con);
+extern void	cupsdReadClient(cupsd_client_t *con);
 extern void	cupsdResumeListening(void);
 extern int	cupsdSendCommand(cupsd_client_t *con, char *command,
 		                 char *options, int root);
@@ -119,9 +133,10 @@ extern void	cupsdShutdownClient(cupsd_client_t *con);
 extern void	cupsdStartListening(void);
 extern void	cupsdStopListening(void);
 extern void	cupsdUpdateCGI(void);
-extern int	cupsdWriteClient(cupsd_client_t *con);
+extern void	cupsdWriteClient(cupsd_client_t *con);
+extern void	cupsdWritePipe(cupsd_client_t *con);
 
 
 /*
- * End of "$Id: client.h 6205 2007-01-22 22:04:43Z mike $".
+ * End of "$Id: client.h 6253 2007-02-10 18:48:40Z mike $".
  */

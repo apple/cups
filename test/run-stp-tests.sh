@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 6113 2006-11-15 20:37:45Z mike $"
+# "$Id: run-stp-tests.sh 6297 2007-02-21 02:24:16Z mike $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -454,7 +454,7 @@ done
 # Create the test report source file...
 #
 
-strfile=cups-str-1.2-`date +%Y-%m-%d`-$user.html
+strfile=cups-str-1.3-`date +%Y-%m-%d`-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile
@@ -584,5 +584,5 @@ echo "A HTML report was created in test/$strfile."
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh 6113 2006-11-15 20:37:45Z mike $"
+# End of "$Id: run-stp-tests.sh 6297 2007-02-21 02:24:16Z mike $"
 #

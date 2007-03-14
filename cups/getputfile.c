@@ -1,5 +1,5 @@
 /*
- * "$Id: getputfile.c 5235 2006-03-06 13:02:23Z mike $"
+ * "$Id: getputfile.c 5633 2006-06-06 14:47:42Z mike $"
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
@@ -35,8 +35,8 @@
  * Include necessary headers...
  */
 
+#include "http-private.h"
 #include "cups.h"
-#include "ipp.h"
 #include "language.h"
 #include "string.h"
 #include "debug.h"
@@ -488,5 +488,5 @@ cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: getputfile.c 5235 2006-03-06 13:02:23Z mike $".
+ * End of "$Id: getputfile.c 5633 2006-06-06 14:47:42Z mike $".
  */

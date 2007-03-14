@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c 5970 2006-09-19 20:11:08Z mike $"
+ * "$Id: listen.c 6123 2006-11-21 15:36:04Z mike $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -90,14 +90,7 @@ cupsdPauseListening(void)
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-    if (lis->fd >= 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdPauseListening: Removing fd %d from InputSet...",
-                      lis->fd);
-
-      FD_CLR(lis->fd, InputSet);
-    }
+    cupsdRemoveSelect(lis->fd);
 }
 
 
@@ -123,13 +116,7 @@ cupsdResumeListening(void)
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-    if (lis->fd >= 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdResumeListening: Adding fd %d to InputSet...",
-                      lis->fd);
-      FD_SET(lis->fd, InputSet);
-    }
+    cupsdAddSelect(lis->fd, (cupsd_selfunc_t)cupsdAcceptClient, NULL, lis);
 }
 
 
@@ -444,5 +431,5 @@ cupsdStopListening(void)
 
 
 /*
- * End of "$Id: listen.c 5970 2006-09-19 20:11:08Z mike $".
+ * End of "$Id: listen.c 6123 2006-11-21 15:36:04Z mike $".
  */

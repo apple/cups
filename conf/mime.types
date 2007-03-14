@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types 6003 2006-10-02 16:26:04Z mike $"
+# "$Id: mime.types 6301 2007-02-22 13:45:17Z mike $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -140,6 +140,15 @@ text/html			html htm printable(0,1024) +\
 text/plain			txt printable(0,1024)
 text/css			css
 
+
+########################################################################
+#
+# RSS feed type...
+#
+
+application/rss+xml		rss
+
+
 ########################################################################
 #
 # CUPS-specific types...
@@ -167,5 +176,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 application/octet-stream
 
 #
-# End of "$Id: mime.types 6003 2006-10-02 16:26:04Z mike $".
+# End of "$Id: mime.types 6301 2007-02-22 13:45:17Z mike $".
 #

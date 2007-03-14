@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-prolog.c 6003 2006-10-02 16:26:04Z mike $"
+ * "$Id: hpgl-prolog.c 5997 2006-10-02 15:33:05Z mike $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
@@ -373,5 +373,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c 6003 2006-10-02 16:26:04Z mike $".
+ * End of "$Id: hpgl-prolog.c 5997 2006-10-02 15:33:05Z mike $".
  */

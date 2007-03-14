@@ -1,9 +1,9 @@
 /*
- * "$Id: config.h 6189 2007-01-10 16:30:34Z mike $"
+ * "$Id: config.h 4828 2005-11-11 12:53:38Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2007 by Easy Software Products.
+ *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -37,38 +37,16 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION		"CUPS v1.2.8"
-#define CUPS_MINIMAL		"CUPS/1.2.8"
+#define CUPS_SVERSION		"CUPS v1.2svn"
+#define CUPS_MINIMAL		"CUPS/1.2svn"
 
 
 /*
- * Default user and groups...
+ * Default user and group...
  */
 
-#define CUPS_DEFAULT_USER "lp"
-#define CUPS_DEFAULT_GROUP "lp"
-#define CUPS_DEFAULT_SYSTEM_GROUPS "sys root"
-
-
-/*
- * Default file permissions...
- */
-
-#define CUPS_DEFAULT_CONFIG_FILE_PERM 0640
-#define CUPS_DEFAULT_LOG_FILE_PERM 0644
-
-
-/*
- * Default browsing settings...
- */
-
-#define CUPS_DEFAULT_BROWSING 1
-#define CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS "CUPS"
-#define CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS "CUPS"
-#define CUPS_DEFAULT_BROWSE_SHORT_NAMES 1
-#define CUPS_DEFAULT_DEFAULT_SHARED 1
-#define CUPS_DEFAULT_IMPLICIT_CLASSES 1
-#define CUPS_DEFAULT_USE_NETWORK_DEFAULT 1
+#define CUPS_DEFAULT_USER	"lp"
+#define CUPS_DEFAULT_GROUP	"sys"
 
 
 /*
@@ -144,13 +122,6 @@
  */
 
 #undef HAVE_CRYPT_H
-
-
-/*
- * Do we have <scsi/sg.h>?
- */
-
-#undef HAVE_SCSI_SG_H
 
 
 /*
@@ -246,13 +217,6 @@
 
 
 /*
- * Do we have the POSIX ACL functions?
- */
-
-#undef HAVE_ACL_INIT
-
-
-/*
  * Do we have the langinfo.h header file?
  */
 
@@ -265,8 +229,8 @@
 
 #undef HAVE_CDSASSL
 #undef HAVE_GNUTLS
-#define HAVE_LIBSSL 1
-#define HAVE_SSL 1
+#undef HAVE_LIBSSL
+#undef HAVE_SSL
 
 
 /*
@@ -274,14 +238,6 @@
  */
 
 #undef HAVE_LIBSLP
-
-
-/*
- * Do we have an LDAP library?
- */
-
-#undef HAVE_LDAP
-#undef HAVE_OPENLDAP
 
 
 /*
@@ -376,15 +332,6 @@
 
 
 /*
- * Do we have launchd support?
- */
-
-/* #undef HAVE_LAUNCH_H */
-/* #undef HAVE_LAUNCHD */
-#define CUPS_DEFAULT_LAUNCHD_CONF ""
-
-
-/*
  * Various scripting languages...
  */
 
@@ -398,63 +345,8 @@
 #define CUPS_PYTHON	"/usr/bin/python"
 
 
-/*
- * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
- */
-
-/* #undef HAVE_COREFOUNDATION */
-/* #undef HAVE_SYSTEMCONFIGURATION */
-
-
-/*
- * Do we have CoreFoundation public and private headers?
- */
-
-/* #undef HAVE_COREFOUNDATION_H */
-/* #undef HAVE_CFPRIV_H */
-/* #undef HAVE_CFBUNDLEPRIV_H */
-
-
-/*
- * Do we have CFLocaleCreateCanonicalLocaleIdentifierFromString()?
- */
-
-/* #undef HAVE_CF_LOCALE_ID */
-
-
-/*
- * Do we have MacOSX 10.4's mbr_XXX functions()?
- */
-
-/* #undef HAVE_MEMBERSHIP_H */
-/* #undef HAVE_MBR_UID_TO_UUID */
-
-
-/*
- * Do we have Darwin's notify_post() header and function?
- */
-
-/* #undef HAVE_NOTIFY_H */
-/* #undef HAVE_NOTIFY_POST */
-
-
-/*
- * Do we have DBUS?
- */
-
-/* #undef HAVE_DBUS */
-/* #undef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND */
-
-
-/*
- * Do we have the AppleTalk/at_proto.h header?
- */
-
-/* #undef HAVE_APPLETALK_AT_PROTO_H */
-
-
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 6189 2007-01-10 16:30:34Z mike $".
+ * End of "$Id: config.h 4828 2005-11-11 12:53:38Z mike $".
  */

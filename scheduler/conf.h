@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h 5696 2006-06-26 18:34:20Z mike $"
+ * "$Id: conf.h 6291 2007-02-19 21:54:27Z mike $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -30,19 +30,19 @@
 
 typedef enum
 {
-  CUPSD_LOG_ATTR = -3,		/* Used internally for attributes */
-  CUPSD_LOG_STATE,		/* Used internally for state-reasons */
-  CUPSD_LOG_PAGE,		/* Used internally for page logging */
+  CUPSD_LOG_ATTR = -3,			/* Used internally for attributes */
+  CUPSD_LOG_STATE,			/* Used internally for state-reasons */
+  CUPSD_LOG_PAGE,			/* Used internally for page logging */
   CUPSD_LOG_NONE,
-  CUPSD_LOG_EMERG,		/* Emergency issues */
-  CUPSD_LOG_ALERT,		/* Something bad happened that needs attention */
-  CUPSD_LOG_CRIT,		/* Critical error but server continues */
-  CUPSD_LOG_ERROR,		/* Error condition */
-  CUPSD_LOG_WARN,		/* Warning */
-  CUPSD_LOG_NOTICE,		/* Normal condition that needs logging */
-  CUPSD_LOG_INFO,		/* General information */
-  CUPSD_LOG_DEBUG,		/* General debugging */
-  CUPSD_LOG_DEBUG2		/* Detailed debugging */
+  CUPSD_LOG_EMERG,			/* Emergency issues */
+  CUPSD_LOG_ALERT,			/* Something bad happened that needs attention */
+  CUPSD_LOG_CRIT,			/* Critical error but server continues */
+  CUPSD_LOG_ERROR,			/* Error condition */
+  CUPSD_LOG_WARN,			/* Warning */
+  CUPSD_LOG_NOTICE,			/* Normal condition that needs logging */
+  CUPSD_LOG_INFO,			/* General information */
+  CUPSD_LOG_DEBUG,			/* General debugging */
+  CUPSD_LOG_DEBUG2			/* Detailed debugging */
 } cupsd_loglevel_t;
 
 
@@ -50,8 +50,8 @@ typedef enum
  * Printcap formats...
  */
 
-#define PRINTCAP_BSD	0	/* Berkeley LPD format */
-#define PRINTCAP_SOLARIS 1	/* Solaris lpsched format */
+#define PRINTCAP_BSD		0	/* Berkeley LPD format */
+#define PRINTCAP_SOLARIS	1	/* Solaris lpsched format */
 
 
 /*
@@ -111,6 +111,12 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Remote root user */
 			*Classification		VALUE(NULL);
 					/* Classification of system */
+#ifdef HAVE_GSSAPI
+VAR char		*GSSServiceName		VALUE(NULL);
+					/* GSS service name */
+VAR char		*Krb5Keytab		VALUE(NULL);
+					/* Kerberos Keytab */
+#endif /* HAVE_GSSAPI */
 VAR uid_t		User			VALUE(1);
 					/* User ID for server */
 VAR gid_t		Group			VALUE(0);
@@ -127,7 +133,7 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Maximum number of clients */
 			MaxClientsPerHost	VALUE(0),
 					/* Maximum number of clients per host */
-			MaxCopies		VALUE(100),
+			MaxCopies		VALUE(CUPS_DEFAULT_MAX_COPIES),
 					/* Maximum number of copies per job */
 			MaxLogSize		VALUE(1024 * 1024),
 					/* Maximum size of log files */
@@ -195,21 +201,32 @@ VAR char		*LaunchdConf		VALUE(NULL);
 					/* launchd(8) configuration file */
 #endif /* HAVE_LAUNCHD */
 
+#ifdef HAVE_AUTHORIZATION_H
+VAR char		*SystemGroupAuthKey	VALUE(NULL);
+					/* System group auth key */
+#endif /* HAVE_AUTHORIZATION_H */
+
+
 /*
  * Prototypes...
  */
 
 extern char	*cupsdGetDateTime(time_t t);
 extern int	cupsdReadConfiguration(void);
-extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
+#ifdef HAVE_GSSAPI
+extern int	cupsdLogGSSMessage(int level, int major_status,
+		                   int minor_status,
+		                   const char *message, ...);
+#endif /* HAVE_GSSAPI */
 extern int	cupsdLogMessage(int level, const char *message, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif /* __GNUC__ */
 ;
 extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
+extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 
 
 /*
- * End of "$Id: conf.h 5696 2006-06-26 18:34:20Z mike $".
+ * End of "$Id: conf.h 6291 2007-02-19 21:54:27Z mike $".
  */

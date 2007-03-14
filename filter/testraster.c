@@ -1,9 +1,9 @@
 /*
- * "$Id: testraster.c 6158 2006-12-17 01:44:21Z mike $"
+ * "$Id: testraster.c 6331 2007-03-12 16:07:31Z mike $"
  *
  *   Raster test program routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -49,7 +49,13 @@
  * Test PS commands and header...
  */
 
-static const char *test_code =
+static const char *dsc_code =
+"[{\n"
+"%%BeginFeature: *PageSize Tabloid\n"
+"<</PageSize[792 1224]>>setpagedevice\n"
+"%%EndFeature\n"
+"} stopped cleartomark\n";
+static const char *setpagedevice_code =
 "<<"
 "/MediaClass(Media Class)"
 "/MediaColor((Media Color))"
@@ -138,7 +144,7 @@ static const char *test_code =
 "/cupsPreferredBitsPerColor 17"
 ">> setpagedevice";
 
-static cups_page_header2_t test_header =
+static cups_page_header2_t setpagedevice_header =
 {
   "Media Class",			/* MediaClass */
   "(Media Color)",			/* MediaColor */
@@ -199,6 +205,10 @@ static cups_page_header2_t test_header =
  * Local functions...
  */
 
+static int	do_ppd_tests(const char *filename, int num_options,
+		             cups_option_t *options);
+static int	do_ps_tests(void);
+static int	do_raster_tests(void);
 static void	print_changes(cups_page_header2_t *header,
 		              cups_page_header2_t *expected);
 
@@ -208,19 +218,121 @@ static void	print_changes(cups_page_header2_t *header,
  */
 
 int					/* O - Exit status */
-main(void)
+main(int  argc,				/* I - Number of command-line args */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int			page, x, y;	/* Looping vars */
-  FILE			*fp;		/* Raster file */
-  cups_raster_t		*r;		/* Raster stream */
-  cups_page_header2_t	header,		/* Page header */
-			expected;	/* Expected page header */
-  unsigned char		data[2048];	/* Raster data */
+  int		errors;			/* Number of errors */
+
+
+  if (argc == 1)
+  {
+    errors = do_ps_tests();
+    errors += do_raster_tests();
+  }
+  else
+  {
+    int			i;		/* Looping var */
+    int			num_options;	/* Number of options */
+    cups_option_t	*options;	/* Options */
+
+
+    for (errors = 0, num_options = 0, options = NULL, i = 1; i < argc; i ++)
+    {
+      if (argv[i][0] == '-')
+      {
+        if (argv[i][1] == 'o')
+        {
+          if (argv[i][2])
+            num_options = cupsParseOptions(argv[i] + 2, num_options, &options);
+          else
+          {
+            i ++;
+            if (i < argc)
+              num_options = cupsParseOptions(argv[i], num_options, &options);
+            else
+            {
+              puts("Usage: testraster [-o name=value ...] [filename.ppd ...]");
+              return (1);
+            }
+          }
+        }
+        else
+        {
+          puts("Usage: testraster [-o name=value ...] [filename.ppd ...]");
+          return (1);
+        }
+      }
+      else
+        errors += do_ppd_tests(argv[i], num_options, options);
+    }
+
+    cupsFreeOptions(num_options, options);
+  }
+
+  return (errors);
+}
+
+
+/*
+ * 'do_ppd_tests()' - Test the default option commands in a PPD file.
+ */
+
+static int				/* O - Number of errors */
+do_ppd_tests(const char    *filename,	/* I - PPD file */
+             int           num_options,	/* I - Number of options */
+             cups_option_t *options)	/* I - Options */
+{
+  ppd_file_t		*ppd;		/* PPD file data */
+  cups_page_header2_t	header;		/* Page header */
+
+
+  printf("\"%s\": ", filename);
+  fflush(stdout);
+
+  if ((ppd = ppdOpenFile(filename)) == NULL)
+  {
+    ppd_status_t	status;		/* Status from PPD loader */
+    int			line;		/* Line number containing error */
+
+
+    status = ppdLastError(&line);
+
+    puts("FAIL (bad PPD file)");
+    printf("    %s on line %d\n", ppdErrorString(status), line);
+
+    return (1);
+  }
+
+  ppdMarkDefaults(ppd);
+  cupsMarkOptions(ppd, num_options, options);
+
+  if (cupsRasterInterpretPPD(&header, ppd, 0, NULL, NULL))
+  {
+    puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
+
+    return (1);
+  }
+  else
+  {
+    puts("PASS");
+
+    return (0);
+  }
+}
+
+
+/*
+ * 'do_ps_tests()' - Test standard PostScript commands.
+ */
+
+static int
+do_ps_tests(void)
+{
+  cups_page_header2_t	header;		/* Page header */
   int			preferred_bits;	/* Preferred bits */
-  int			errors;		/* Number of errors */
+  int			errors = 0;	/* Number of errors */
 
-
-  errors = 0;
 
  /*
   * Test PS exec code...
@@ -233,12 +345,14 @@ main(void)
   header.Collate = CUPS_TRUE;
   preferred_bits = 0;
 
-  if (_cupsRasterExecPS(&header, &preferred_bits, test_code))
+  if (_cupsRasterExecPS(&header, &preferred_bits, setpagedevice_code))
   {
     puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
     errors ++;
   }
-  else if (preferred_bits != 17 || memcmp(&header, &test_header, sizeof(header)))
+  else if (preferred_bits != 17 ||
+           memcmp(&header, &setpagedevice_header, sizeof(header)))
   {
     puts("FAIL (bad header)");
 
@@ -246,7 +360,7 @@ main(void)
       printf("    cupsPreferredBitsPerColor %d, expected 17\n",
              preferred_bits);
 
-    print_changes(&test_header, &header);
+    print_changes(&setpagedevice_header, &header);
     errors ++;
   }
   else
@@ -262,6 +376,7 @@ main(void)
 			"setpagedevice\n"))
   {
     puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
     errors ++;
   }
   else if (header.PageSize[0] != 792 || header.PageSize[1] != 612)
@@ -284,6 +399,7 @@ main(void)
 			"pop pop pop"))
   {
     puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
     errors ++;
   }
   else
@@ -309,6 +425,24 @@ main(void)
     if(header.Collate && !header.Duplex && !header.Tumble)
       puts("PASS");
   }
+
+  fputs("_cupsRasterExecPS(\"%%Begin/EndFeature code\"): ", stdout);
+  fflush(stdout);
+
+  if (_cupsRasterExecPS(&header, &preferred_bits, dsc_code))
+  {
+    puts("FAIL (error from function)");
+    puts(cupsRasterErrorString());
+    errors ++;
+  }
+  else if (header.PageSize[0] != 792 || header.PageSize[1] != 1224)
+  {
+    printf("FAIL (bad PageSize [%d %d], expected [792 1224])\n",
+           header.PageSize[0], header.PageSize[1]);
+    errors ++;
+  }
+  else
+    puts("PASS");
 
 #if 0
   fputs("_cupsRasterExecPS(\"\"): ", stdout);
@@ -396,6 +530,26 @@ main(void)
   else
     puts("PASS");
 #endif /* 0 */
+
+  return (errors);
+}
+
+
+/*
+ * 'do_raster_tests()' - Test reading and writing of raster data.
+ */
+
+static int				/* O - Number of errors */
+do_raster_tests(void)
+{
+  int			page, x, y;	/* Looping vars */
+  FILE			*fp;		/* Raster file */
+  cups_raster_t		*r;		/* Raster stream */
+  cups_page_header2_t	header,		/* Page header */
+			expected;	/* Expected page header */
+  unsigned char		data[2048];	/* Raster data */
+  int			errors = 0;	/* Number of errors */
+
 
  /*
   * Test writing...
@@ -690,9 +844,8 @@ main(void)
   cupsRasterClose(r);
   fclose(fp);
 
-  return (errors > 0);
+  return (errors);
 }
-
 
 
 /*
@@ -935,5 +1088,5 @@ print_changes(
 
 
 /*
- * End of "$Id: testraster.c 6158 2006-12-17 01:44:21Z mike $".
+ * End of "$Id: testraster.c 6331 2007-03-12 16:07:31Z mike $".
  */

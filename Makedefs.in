@@ -1,9 +1,9 @@
 #
-# "$Id: Makedefs.in 5799 2006-08-03 00:54:38Z mike $"
+# "$Id: Makedefs.in 6332 2007-03-12 16:08:51Z mike $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -93,6 +93,7 @@ LIBMALLOC	=	@LIBMALLOC@
 LIBPAPER	=	@LIBPAPER@
 LIBPNG		=	@LIBPNG@
 LIBSLP		=	@LIBSLP@
+LIBGSSAPI	=	@LIBGSSAPI@
 LIBTIFF		=	@LIBTIFF@
 LIBZ		=	@LIBZ@
 
@@ -129,10 +130,12 @@ CXXFLAGS	=	-I.. $(SSLFLAGS) @CPPFLAGS@ @CXXFLAGS@ \
 CXXLIBS		=	@CXXLIBS@
 DSOFLAGS	=	@DSOFLAGS@
 DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
+DNSSDLIBS	=	@DNSSDLIBS@
 IMGLIBS		=	@IMGLIBS@
 IMGFILTERS	=	@IMGFILTERS@
+LAUNCHDLIBS	=	@LAUNCHDLIBS@
 LDFLAGS		=	-L../cups -L../filter $(ARCHFLAGS) \
-			@LDFLAGS@ @PIEFLAGS@ $(OPTIM)
+			@LDFLAGS@ @RELROFLAGS@ @PIEFLAGS@ $(OPTIM)
 LINKCUPS	=	@LINKCUPS@ $(SSLLIBS)
 LINKCUPSIMAGE	=	@LINKCUPSIMAGE@
 LIBS		=	$(LINKCUPS) $(COMMONLIBS)
@@ -144,7 +147,6 @@ PDFTOPS		=	@PDFTOPS@
 PHPDIR		=	@PHPDIR@
 SSLFLAGS	=	@SSLFLAGS@
 SSLLIBS		=	@SSLLIBS@
-LAUNCHDLIBS	=	@LAUNCHDLIBS@
 
 #
 # Separate 32/64-bit library support...
@@ -206,6 +208,7 @@ BINDIR		=	$(BUILDROOT)@bindir@
 CACHEDIR	=	$(BUILDROOT)@CUPS_CACHEDIR@
 DATADIR		=	$(BUILDROOT)@CUPS_DATADIR@
 DOCDIR		=	$(BUILDROOT)@CUPS_DOCROOT@
+ICONDIR		=	@ICONDIR@
 INCLUDEDIR	=	$(BUILDROOT)$(includedir)
 INITDIR		=	@INITDIR@
 INITDDIR	=	@INITDDIR@
@@ -213,7 +216,11 @@ LIBDIR		=	$(BUILDROOT)$(libdir)
 LOCALEDIR	= 	$(BUILDROOT)@CUPS_LOCALEDIR@
 LOGDIR		= 	$(BUILDROOT)@CUPS_LOGDIR@
 MANDIR		=	$(BUILDROOT)@mandir@
+MENUDIR		=	@MENUDIR@
 PMANDIR		=	$(BUILDROOT)@PMANDIR@
+RCLEVELS	=	@RCLEVELS@
+RCSTART		=	@RCSTART@
+RCSTOP		=	@RCSTOP@
 REQUESTS	= 	$(BUILDROOT)@CUPS_REQUESTS@
 SBINDIR		=	$(BUILDROOT)@sbindir@
 SERVERBIN	= 	$(BUILDROOT)@CUPS_SERVERBIN@
@@ -269,5 +276,5 @@ DBUSDIR		=	@DBUSDIR@
 
 
 #
-# End of "$Id: Makedefs.in 5799 2006-08-03 00:54:38Z mike $"
+# End of "$Id: Makedefs.in 6332 2007-03-12 16:08:51Z mike $"
 #

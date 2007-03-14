@@ -1,9 +1,9 @@
 /*
- * "$Id: subscriptions.c 5991 2006-09-29 02:26:29Z mike $"
+ * "$Id: subscriptions.c 6176 2007-01-03 15:28:30Z mike $"
  *
  *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -52,8 +52,8 @@
 #  include <dbus/dbus.h>
 #  ifdef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND
 #    define dbus_message_append_iter_init dbus_message_iter_init_append
-#    define dbus_message_iter_append_string(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_STRING, v)
-#    define dbus_message_iter_append_uint32(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_UINT32, v)
+#    define dbus_message_iter_append_string(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_STRING, &(v))
+#    define dbus_message_iter_append_uint32(i,v) dbus_message_iter_append_basic(i, DBUS_TYPE_UINT32, &(v))
 #  endif /* HAVE_DBUS_MESSAGE_ITER_INIT_APPEND */
 #endif /* HAVE_DBUS */
 
@@ -1226,10 +1226,7 @@ cupsdStopAllNotifiers(void)
 
   if (NotifierPipes[0] >= 0)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStopAllNotifiers: Removing fd %d from InputSet...",
-	            NotifierPipes[0]);
-    FD_CLR(NotifierPipes[0], InputSet);
+    cupsdRemoveSelect(NotifierPipes[0]);
 
     cupsdStatBufDelete(NotifierStatusBuffer);
 
@@ -1362,11 +1359,11 @@ cupsd_send_dbus(cupsd_eventmask_t event,/* I - Event to send */
 
   dbus_message_append_iter_init(message, &iter);
   if (dest)
-    dbus_message_iter_append_string(&iter, &(dest->name));
+    dbus_message_iter_append_string(&iter, dest->name);
   if (job)
   {
-    dbus_message_iter_append_uint32(&iter, &(job->id));
-    dbus_message_iter_append_string(&iter, &(job->username));
+    dbus_message_iter_append_uint32(&iter, job->id);
+    dbus_message_iter_append_string(&iter, job->username);
   }
 
   dbus_connection_send(con, message, NULL);
@@ -1571,11 +1568,8 @@ cupsd_start_notifier(
 
     NotifierStatusBuffer = cupsdStatBufNew(NotifierPipes[0], "[Notifier]");
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "start_notifier: Adding fd %d to InputSet...",
-		    NotifierPipes[0]);
-
-    FD_SET(NotifierPipes[0], InputSet);
+    cupsdAddSelect(NotifierPipes[0], (cupsd_selfunc_t)cupsdUpdateNotifierStatus,
+                   NULL, NULL);
   }
 
   if (cupsdOpenPipe(fds))
@@ -1597,7 +1591,7 @@ cupsd_start_notifier(
   */
 
   if (cupsdStartProcess(command, argv, envp, fds[0], -1, NotifierPipes[1],
-			-1, 0, &pid) < 0)
+			-1, -1, 0, &pid) < 0)
   {
    /*
     * Error - can't fork!
@@ -1627,5 +1621,5 @@ cupsd_start_notifier(
 
 
 /*
- * End of "$Id: subscriptions.c 5991 2006-09-29 02:26:29Z mike $".
+ * End of "$Id: subscriptions.c 6176 2007-01-03 15:28:30Z mike $".
  */

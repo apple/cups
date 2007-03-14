@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-compiler.m4 6145 2006-12-06 20:10:16Z mike $"
+dnl "$Id: cups-compiler.m4 6264 2007-02-11 17:11:15Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -56,8 +56,11 @@ AC_ARG_WITH(arch64flags, [  --with-arch64flags="flags"
 ARCH64FLAGS=""
 AC_SUBST(ARCH64FLAGS)
 
-dnl Position-Independent Executable support on Linux and *BSD...
+dnl Position-Independent Executable support on Linux...
 AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fPIE option, default=no])
+
+dnl Read-only data/program support on Linux...
+AC_ARG_ENABLE(relro, [  --enable-relro          use GCC relro option, default=no])
 
 dnl Update compiler options...
 CXXLIBS=""
@@ -65,6 +68,9 @@ AC_SUBST(CXXLIBS)
 
 PIEFLAGS=""
 AC_SUBST(PIEFLAGS)
+
+RELROFLAGS=""
+AC_SUBST(RELROFLAGS)
 
 if test -n "$GCC"; then
 	# Add GCC-specific compiler options...
@@ -85,6 +91,10 @@ if test -n "$GCC"; then
 		Linux*)
 			if test x$enable_pie = xyes; then
 				PIEFLAGS="-pie -fPIE"
+			fi
+
+			if test x$enable_relro = xyes; then
+				RELROFLAGS="-Wl,-z,relro"
 			fi
 			;;
 
@@ -435,5 +445,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4 6145 2006-12-06 20:10:16Z mike $".
+dnl End of "$Id: cups-compiler.m4 6264 2007-02-11 17:11:15Z mike $".
 dnl

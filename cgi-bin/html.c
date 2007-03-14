@@ -1,5 +1,5 @@
 /*
- * "$Id: html.c 5549 2006-05-19 19:39:28Z mike $"
+ * "$Id: html.c 5548 2006-05-19 19:38:31Z mike $"
  *
  *   HTML support functions for the Common UNIX Printing System (CUPS).
  *
@@ -183,5 +183,5 @@ cgi_null_passwd(const char *prompt)	/* I - Prompt string (unused) */
 
 
 /*
- * End of "$Id: html.c 5549 2006-05-19 19:39:28Z mike $".
+ * End of "$Id: html.c 5548 2006-05-19 19:38:31Z mike $".
  */

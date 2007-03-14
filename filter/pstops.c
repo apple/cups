@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 6247 2007-02-07 20:54:37Z mike $"
+ * "$Id: pstops.c 6320 2007-03-08 13:36:56Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -937,11 +937,18 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
         ppdEmitJCL(ppd, stdout, doc->job_id, doc->user, doc->title);
 
 	puts("%!PS-Adobe-3.0");
-	
-        pageinfo = (pstops_page_t *)cupsArrayFirst(doc->pages);
-	copy_bytes(doc->temp, 0, pageinfo->offset);
 
 	number = 0;
+      }
+
+     /*
+      * Copy the prolog as needed...
+      */
+
+      if (!number)
+      {
+        pageinfo = (pstops_page_t *)cupsArrayFirst(doc->pages);
+	copy_bytes(doc->temp, 0, pageinfo->offset);
       }
 
      /*
@@ -3281,5 +3288,5 @@ write_labels(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 6247 2007-02-07 20:54:37Z mike $".
+ * End of "$Id: pstops.c 6320 2007-03-08 13:36:56Z mike $".
  */

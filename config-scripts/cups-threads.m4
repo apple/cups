@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-threads.m4 6061 2006-10-23 00:26:52Z mike $"
+dnl "$Id: cups-threads.m4 6057 2006-10-23 00:17:26Z mike $"
 dnl
 dnl   Threading stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -59,5 +59,5 @@ fi
 AC_SUBST(PTHREAD_FLAGS)
 
 dnl
-dnl End of "$Id: cups-threads.m4 6061 2006-10-23 00:26:52Z mike $".
+dnl End of "$Id: cups-threads.m4 6057 2006-10-23 00:17:26Z mike $".
 dnl

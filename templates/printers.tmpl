@@ -15,14 +15,15 @@
 {printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published.
 {?device_uri=?:<BR><B>Device URI:</B> {device_uri}}
 
-<P>
+<P><TABLE WIDTH="100%" CELLPADDING="5" SUMMARY="Actions">
+<TR VALIGN="TOP"><TD>
 <A HREF="{printer_uri_supported}?op=print-test-page">
 <IMG SRC="/images/button-print-test-page.gif" ALT="Print Test Page" CLASS="button"></A>
 {?cupscommand=1?<A HREF="{printer_uri_supported}?op=clean-print-heads">
 <IMG SRC="/images/button-clean-print-heads.gif" ALT="Clean Print Heads" CLASS="button"></A>
 <A HREF="{printer_uri_supported}?op=print-self-test-page">
-<IMG SRC="/images/button-print-self-test-page.gif" ALT="Print Self Test Page" CLASS="button"></A>:}
-{printer_state=5?
+<IMG SRC="/images/button-print-self-test-page.gif" ALT="Print Self Test Page" CLASS="button"></A>:}</TD>
+<TD>{printer_state=5?
 <A HREF="{admin_uri}?op=start-printer&amp;printer_name={%printer_name}">
 <IMG SRC="/images/button-start-printer.gif" ALT="Start Printer" CLASS="button"></A>
 :
@@ -39,8 +40,8 @@
 <A HREF="{printer_uri_supported}?op=move-jobs&amp;printer_name={%printer_name}">
 <IMG SRC="/images/button-move-jobs.gif" ALT="Move All Jobs" CLASS="button"></A>
 <A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-cancel-all-jobs.gif" ALT="Cancel All Jobs" CLASS="button"></A>
-{printer_is_shared=0?
+<IMG SRC="/images/button-cancel-all-jobs.gif" ALT="Cancel All Jobs" CLASS="button"></A></TD>
+<TD>{printer_is_shared=0?
 <A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=1">
 <IMG SRC="/images/button-publish-printer.gif" ALT="Publish Printer" CLASS="button"></A>
 :
@@ -56,8 +57,9 @@
 <A HREF="{admin_uri}?op=set-as-default&amp;printer_name={%printer_name}">
 <IMG SRC="/images/button-set-as-default.gif" ALT="Set As Default" CLASS="button"></A>
 <A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-set-allowed-users.gif" ALT="Set Allowed Users" CLASS="button"></A>
-</P>
+<IMG SRC="/images/button-set-allowed-users.gif" ALT="Set Allowed Users" CLASS="button"></A></TD>
+</TR>
+</TABLE></P>
 </TD>
 </TR>
 </TABLE>

@@ -1,5 +1,5 @@
 /*
- * "$Id: attr.c 5826 2006-08-15 19:04:11Z mike $"
+ * "$Id: attr.c 5825 2006-08-15 19:03:49Z mike $"
  *
  *   PPD model-specific attribute routines for the Common UNIX Printing System
  *   (CUPS).
@@ -163,5 +163,5 @@ ppdFindNextAttr(ppd_file_t *ppd,	/* I - PPD file data */
 
 
 /*
- * End of "$Id: attr.c 5826 2006-08-15 19:04:11Z mike $".
+ * End of "$Id: attr.c 5825 2006-08-15 19:03:49Z mike $".
  */

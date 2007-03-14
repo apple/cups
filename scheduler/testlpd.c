@@ -1,5 +1,5 @@
 /*
- * "$Id: testlpd.c 5868 2006-08-23 19:39:39Z mike $"
+ * "$Id: testlpd.c 6331 2007-03-12 16:07:31Z mike $"
  *
  *   cups-lpd test program for the Common UNIX Printing System (CUPS).
  *
@@ -184,6 +184,11 @@ main(int  argc,				/* I - Number of command-line arguments */
     status = status_long(cupslpd_stdin[1], cupslpd_stdout[0], dest, opargs);
   else if (!strcmp(op, "status-short"))
     status = status_short(cupslpd_stdin[1], cupslpd_stdout[0], dest, opargs);
+  else
+  {
+    printf("Unknown operation \"%s\"!\n", op);
+    status = 1;
+  }
 
  /*
   * Kill the test program...
@@ -296,8 +301,8 @@ print_job(int  outfd,			/* I - Command file descriptor */
            "Hlocalhost\n"
            "P%s\n"
            "J%s\n"
-           "ldfA%03.3dlocalhost\n"
-           "UdfA%03.3dlocalhost\n"
+           "ldfA%03dlocalhost\n"
+           "UdfA%03dlocalhost\n"
            "N%s\n",
 	   cupsUser(), jobname, sequence, sequence, jobname);
 
@@ -307,7 +312,7 @@ print_job(int  outfd,			/* I - Command file descriptor */
 
   bytes = strlen(control);
 
-  snprintf(command, sizeof(command), "\002%d cfA%03.3dlocalhost\n",
+  snprintf(command, sizeof(command), "\002%d cfA%03dlocalhost\n",
            bytes, sequence);
 
   if ((status = do_command(outfd, infd, command)) != 0)
@@ -344,7 +349,7 @@ print_job(int  outfd,			/* I - Command file descriptor */
   * Send the data file...
   */
 
-  snprintf(command, sizeof(command), "\003%d dfA%03.3dlocalhost\n",
+  snprintf(command, sizeof(command), "\003%d dfA%03dlocalhost\n",
            (int)fileinfo.st_size, sequence);
 
   if ((status = do_command(outfd, infd, command)) != 0)
@@ -546,5 +551,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testlpd.c 5868 2006-08-23 19:39:39Z mike $".
+ * End of "$Id: testlpd.c 6331 2007-03-12 16:07:31Z mike $".
  */

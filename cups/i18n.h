@@ -1,5 +1,5 @@
 /*
- * "$Id: i18n.h 5926 2006-09-05 20:45:47Z mike $"
+ * "$Id: i18n.h 5925 2006-09-05 19:43:11Z mike $"
  *
  *   (Private) localization support for the Common UNIX Printing System (CUPS).
  *
@@ -114,5 +114,5 @@ extern void		_cupsSetLocale(char *argv[]);
 #endif /* !_CUPS_I18N_H_ */
 
 /*
- * End of "$Id: i18n.h 5926 2006-09-05 20:45:47Z mike $".
+ * End of "$Id: i18n.h 5925 2006-09-05 19:43:11Z mike $".
  */

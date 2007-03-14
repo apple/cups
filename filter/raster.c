@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c 6061 2006-10-23 00:26:52Z mike $"
+ * "$Id: raster.c 6274 2007-02-13 21:05:28Z mike $"
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
@@ -43,6 +43,7 @@
  *   cups_raster_read_header() - Read a raster page header.
  *   cups_raster_update()      - Update the raster header and row count for the
  *                               current page.
+ *   cups_raster_write()       - Write a row of raster data...
  *   cups_read()               - Read bytes from a file.
  *   cups_swap()               - Swap bytes in raster data...
  *   cups_write()              - Write bytes to a file.
@@ -52,7 +53,7 @@
  * Include necessary headers...
  */
 
-#include "raster.h"
+#include "image-private.h"
 #include <cups/debug.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -98,6 +99,7 @@ static unsigned	cups_raster_read_header(cups_raster_t *r);
 static int	cups_raster_read(cups_raster_t *r, unsigned char *buf,
 		                 int bytes);
 static void	cups_raster_update(cups_raster_t *r);
+static int	cups_raster_write(cups_raster_t *r, const unsigned char *pixels);
 static int	cups_read(int fd, unsigned char *buf, int bytes);
 static void	cups_swap(unsigned char *buf, int bytes);
 static int	cups_write(int fd, const unsigned char *buf, int bytes);
@@ -134,11 +136,17 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
   cups_raster_t	*r;			/* New stream */
 
 
+  _cupsRasterClearError();
+
   if ((r = calloc(sizeof(cups_raster_t), 1)) == NULL)
+  {
+    _cupsRasterAddError("Unable to allocate memory for raster stream: %s\n",
+                        strerror(errno));
     return (NULL);
+  }
 
   r->fd   = fd;
-  r->mode = mode;
+  r->mode = mode == CUPS_RASTER_WRITE_COMPRESSED ? CUPS_RASTER_WRITE : mode;
 
   if (mode == CUPS_RASTER_READ)
   {
@@ -148,6 +156,8 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
 
     if (!cups_read(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync)))
     {
+      _cupsRasterAddError("Unable to read header from raster stream: %s\n",
+                          strerror(errno));
       free(r);
       return (NULL);
     }
@@ -159,6 +169,7 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
         r->sync != CUPS_RASTER_SYNCv2 &&
         r->sync != CUPS_RASTER_REVSYNCv2)
     {
+      _cupsRasterAddError("Unknown raster format %08x!\n", r->sync);
       free(r);
       return (NULL);
     }
@@ -178,11 +189,19 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
     * Open for write - put sync word...
     */
 
-    r->sync = CUPS_RASTER_SYNC;
+    if (mode == CUPS_RASTER_WRITE_COMPRESSED)
+    {
+      r->compressed = 1;
+      r->sync       = CUPS_RASTER_SYNCv2;
+    }
+    else
+      r->sync = CUPS_RASTER_SYNC;
 
     if (cups_write(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync))
             < sizeof(r->sync))
     {
+      _cupsRasterAddError("Unable to write raster stream header: %s\n",
+                          strerror(errno));
       free(r);
       return (NULL);
     }
@@ -524,6 +543,10 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
                       unsigned char *p,	/* I - Bytes to write */
 		      unsigned      len)/* I - Number of bytes to write */
 {
+  int		bytes;			/* Bytes read */
+  unsigned	remaining;		/* Bytes remaining */
+
+
 #ifdef DEBUG
   fprintf(stderr, "cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u\n",
           r, p, len, r->remaining);
@@ -532,13 +555,113 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   if (r == NULL || r->mode != CUPS_RASTER_WRITE || r->remaining == 0)
     return (0);
 
+  if (!r->compressed)
+  {
+   /*
+    * Without compression, just write the raster data raw...
+    */
+
+    r->remaining -= len / r->header.cupsBytesPerLine;
+
+    return (cups_write(r->fd, p, len));
+  }
+
  /*
-  * No write compression, just write the raster data raw...
+  * Otherwise, compress each line...
   */
 
-  r->remaining -= len / r->header.cupsBytesPerLine;
+  for (remaining = len; remaining > 0; remaining -= bytes, p += bytes)
+  {
+   /*
+    * Figure out the number of remaining bytes on the current line...
+    */
 
-  return (cups_write(r->fd, p, len));
+    if ((bytes = remaining) > (r->pend - r->pcurrent))
+      bytes = r->pend - r->pcurrent;
+
+    if (r->count > 0)
+    {
+     /*
+      * Check to see if this line is the same as the previous line...
+      */
+
+      if (memcmp(p, r->pcurrent, bytes))
+      {
+        if (!cups_raster_write(r, r->pixels))
+	  return (0);
+
+	r->count = 0;
+      }
+      else
+      {
+       /*
+        * Mark more bytes as the same...
+	*/
+
+        r->pcurrent += bytes;
+
+	if (r->pcurrent >= r->pend)
+	{
+	 /*
+          * Increase the repeat count...
+	  */
+
+	  r->count ++;
+	  r->pcurrent = r->pixels;
+
+	 /*
+          * Flush out this line if it is the last one...
+	  */
+
+	  r->remaining --;
+
+	  if (r->remaining == 0)
+	    return (cups_raster_write(r, r->pixels));
+	  else if (r->count == 256)
+	  {
+	    if (cups_raster_write(r, r->pixels) == 0)
+	      return (0);
+
+	    r->count = 0;
+	  }
+	}
+
+	continue;
+      }
+    }
+
+    if (r->count == 0)
+    {
+     /*
+      * Copy the raster data to the buffer...
+      */
+
+      memcpy(r->pcurrent, p, bytes);
+
+      r->pcurrent += bytes;
+
+      if (r->pcurrent >= r->pend)
+      {
+       /*
+        * Increase the repeat count...
+	*/
+
+	r->count ++;
+	r->pcurrent = r->pixels;
+
+       /*
+        * Flush out this line if it is the last one...
+	*/
+
+	r->remaining --;
+
+	if (r->remaining == 0)
+	  return (cups_raster_write(r, r->pixels));
+      }
+    }
+  }
+
+  return (len);
 }
 
 
@@ -840,6 +963,120 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
 
 
 /*
+ * 'cups_raster_write()' - Write a row of compressed raster data...
+ */
+
+static int				/* O - Number of bytes written */
+cups_raster_write(
+    cups_raster_t       *r,		/* I - Raster stream */
+    const unsigned char *pixels)	/* I - Pixel data to write */
+{
+  const unsigned char	*start,		/* Start of sequence */
+			*ptr,		/* Current pointer in sequence */
+			*pend,		/* End of raster buffer */
+			*plast;		/* Pointer to last pixel */
+  unsigned char		*wptr;		/* Pointer into write buffer */
+  int			bpp,		/* Bytes per pixel */
+			count,		/* Count */
+			maxrun;		/* Maximum run of 128 * bpp */
+
+
+#ifdef DEBUG
+  fprintf(stderr, "cups_raster_write(r=%p, pixels=%p)\n", r, pixels);
+#endif /* DEBUG */
+
+ /*
+  * Allocate a write buffer as needed...
+  */
+
+  count = r->header.cupsBytesPerLine * 2;
+  if (count > r->bufsize)
+  {
+    if (r->buffer)
+      wptr = realloc(r->buffer, count);
+    else
+      wptr = malloc(count);
+
+    if (!wptr)
+      return (-1);
+
+    r->buffer  = wptr;
+    r->bufsize = count;
+  }
+
+ /*
+  * Write the row repeat count...
+  */
+
+  bpp     = r->bpp;
+  pend    = pixels + r->header.cupsBytesPerLine;
+  plast   = pend - bpp;
+  wptr    = r->buffer;
+  *wptr++ = r->count - 1;
+  maxrun  = 128 * bpp;
+
+ /*
+  * Write using a modified TIFF "packbits" compression...
+  */
+
+  for (ptr = pixels; ptr < pend;)
+  {
+    start = ptr;
+    ptr += bpp;
+
+    if (ptr == pend)
+    {
+     /*
+      * Encode a single pixel at the end...
+      */
+
+      *wptr++ = 0;
+      for (count = bpp; count > 0; count --)
+        *wptr++ = *start++;
+    }
+    else if (!memcmp(start, ptr, bpp))
+    {
+     /*
+      * Encode a sequence of repeating pixels...
+      */
+
+      for (count = 2; count < 128 && ptr < plast; count ++, ptr += bpp)
+        if (memcmp(ptr, ptr + bpp, bpp))
+	  break;
+
+      *wptr++ = count - 1;
+      for (count = bpp; count > 0; count --)
+        *wptr++ = *ptr++;
+    }
+    else
+    {
+     /*
+      * Encode a sequence of non-repeating pixels...
+      */
+
+      for (count = 1; count < 127 && ptr < plast; count ++, ptr += bpp)
+        if (!memcmp(ptr, ptr + bpp, bpp))
+	  break;
+
+      if (ptr >= plast && count < 128)
+      {
+        count ++;
+	ptr += bpp;
+      }
+ 
+      *wptr++ = 257 - count;
+
+      count *= bpp;
+      memcpy(wptr, start, count);
+      wptr += count;
+    }
+  }
+
+  return (cups_write(r->fd, r->buffer, wptr - r->buffer));
+}
+
+
+/*
  * 'cups_read()' - Read bytes from a file.
  */
 
@@ -928,5 +1165,5 @@ cups_write(int                 fd,	/* I - File descriptor */
 
 
 /*
- * End of "$Id: raster.c 6061 2006-10-23 00:26:52Z mike $".
+ * End of "$Id: raster.c 6274 2007-02-13 21:05:28Z mike $".
  */

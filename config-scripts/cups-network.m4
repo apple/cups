@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4 6049 2006-10-20 15:07:21Z mike $"
+dnl "$Id: cups-network.m4 6046 2006-10-20 14:43:30Z mike $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -51,7 +51,7 @@ else
 	maxfiles=4096
 fi
 
-AC_ARG_WITH(maxfiles, [  --with-maxfiles=N       set maximum number of file descriptors for scheduler (deprecated) ],
+AC_ARG_WITH(maxfiles, [  --with-maxfiles=N       set maximum number of file descriptors for scheduler ],
 	maxfiles=$withval)
 
 AC_DEFINE_UNQUOTED(CUPS_MAX_FDS, $maxfiles)
@@ -90,5 +90,5 @@ AC_SUBST(CUPS_DEFAULT_DOMAINSOCKET)
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
 
 dnl
-dnl End of "$Id: cups-network.m4 6049 2006-10-20 15:07:21Z mike $".
+dnl End of "$Id: cups-network.m4 6046 2006-10-20 14:43:30Z mike $".
 dnl

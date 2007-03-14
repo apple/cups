@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makefile 6304 2007-02-22 22:06:23Z mike $"
 #
 #   Notifier makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -25,8 +25,8 @@
 include ../Makedefs
 
 
-TARGETS =	mailto testnotify
-OBJS	=	mailto.o testnotify.o
+TARGETS =	mailto rss testnotify
+OBJS	=	mailto.o rss.o testnotify.o
 
 
 #
@@ -53,6 +53,8 @@ install:	all
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
 	done
+	$(INSTALL_DIR) -m 755 $(CACHEDIR)/rss
+	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
 
 
 #
@@ -65,6 +67,7 @@ uninstall:
 	done
 	-$(RMDIR) $(SERVERBIN)/notifier
 	-$(RMDIR) $(SERVERBIN)
+	-$(RMDIR) $(CACHEDIR)/rss
 
 
 #
@@ -85,6 +88,15 @@ mailto:	mailto.o ../cups/$(LIBCUPS)
 
 
 #
+# rss
+#
+
+rss:	rss.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o rss rss.o $(LIBS)
+
+
+#
 # testnotify
 #
 
@@ -99,5 +111,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
+# End of "$Id: Makefile 6304 2007-02-22 22:06:23Z mike $".
 #

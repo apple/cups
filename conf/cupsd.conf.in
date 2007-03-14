@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in 5454 2006-04-23 21:46:38Z mike $"
+# "$Id: cupsd.conf.in 6268 2007-02-12 02:46:11Z mike $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.  See "man cupsd.conf" for a complete description of this
@@ -12,6 +12,7 @@ LogLevel info
 
 # Administrator user group...
 SystemGroup @CUPS_SYSTEM_GROUPS@
+@CUPS_SYSTEM_AUTHKEY@
 
 # Only listen for connections from the local machine.
 Listen localhost:@DEFAULT_IPP_PORT@
@@ -20,7 +21,7 @@ Listen localhost:@DEFAULT_IPP_PORT@
 # Show shared printers on the local network.
 Browsing On
 BrowseOrder allow,deny
-BrowseAllow @LOCAL
+BrowseAllow all
 
 # Default authentication type, when authentication is required...
 DefaultAuthType Basic
@@ -73,5 +74,5 @@ DefaultAuthType Basic
 </Policy>
 
 #
-# End of "$Id: cupsd.conf.in 5454 2006-04-23 21:46:38Z mike $".
+# End of "$Id: cupsd.conf.in 6268 2007-02-12 02:46:11Z mike $".
 #

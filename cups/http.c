@@ -1,9 +1,12 @@
 /*
- * "$Id: http.c 6191 2007-01-10 16:48:37Z mike $"
+ * "$Id: http.c 6285 2007-02-16 01:10:55Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ *
+ *   This file contains Kerberos support code, copyright 2006 by
+ *   Jelmer Vernooij.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -108,6 +111,9 @@
 #  include <sys/time.h>
 #  include <sys/resource.h>
 #endif /* !WIN32 */
+#ifdef HAVE_POLL
+#  include <sys/poll.h>
+#endif /* HAVE_POLL */
 
 
 /*
@@ -275,6 +281,12 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
     else
       httpSetField(http, HTTP_FIELD_HOST, http->hostname);
 
+    if (http->field_authorization)
+    {
+      free(http->field_authorization);
+      http->field_authorization = NULL;
+    }
+
     http->expect = (http_status_t)0;
   }
 }
@@ -287,15 +299,18 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
 void
 httpClose(http_t *http)			/* I - HTTP connection */
 {
+#ifdef HAVE_GSSAPI
+  OM_uint32	minor_status,		/* Minor status code */
+		major_status;		/* Major status code */
+#endif /* HAVE_GSSAPI */
+
+
   DEBUG_printf(("httpClose(http=%p)\n", http));
 
   if (!http)
     return;
 
   httpAddrFreeList(http->addrlist);
-
-  if (http->input_set)
-    free(http->input_set);
 
   if (http->cookie)
     free(http->cookie);
@@ -310,6 +325,20 @@ httpClose(http_t *http)			/* I - HTTP connection */
 #else
   close(http->fd);
 #endif /* WIN32 */
+
+#ifdef HAVE_GSSAPI
+  if (http->gssctx != GSS_C_NO_CONTEXT)
+    major_status = gss_delete_sec_context(&minor_status, &http->gssctx,
+                                          GSS_C_NO_BUFFER);
+
+  if (http->gssname != GSS_C_NO_NAME)
+    major_status = gss_release_name(&minor_status, &http->gssname);
+#endif /* HAVE_GSSAPI */
+
+  httpClearFields(http);
+
+  if (http->authstring && http->authstring != http->_authstring)
+    free(http->authstring);
 
   free(http);
 }
@@ -383,6 +412,11 @@ httpConnectEncrypt(
   http->blocking = 1;
   http->activity = time(NULL);
   http->fd       = -1;
+
+#ifdef HAVE_GSSAPI
+  http->gssctx  = GSS_C_NO_CONTEXT;
+  http->gssname = GSS_C_NO_NAME;
+#endif /* HAVE_GSSAPI */
 
  /*
   * Set the encryption status...
@@ -624,6 +658,16 @@ httpGetField(http_t       *http,	/* I - HTTP connection */
 {
   if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
     return (NULL);
+  else if (field == HTTP_FIELD_AUTHORIZATION && 
+	   http->field_authorization)
+  {
+   /*
+    * Special case for WWW-Authenticate: as its contents can be
+    * longer than HTTP_MAX_VALUE...
+    */
+
+    return (http->field_authorization);
+  }
   else
     return (http->fields[field]);
 }
@@ -1620,11 +1664,11 @@ httpReconnect(http_t *http)		/* I - HTTP connection */
 
     if (http_setup_ssl(http) != 0)
     {
-#ifdef WIN32
+#  ifdef WIN32
       closesocket(http->fd);
-#else
+#  else
       close(http->fd);
-#endif /* WIN32 */
+#  endif /* WIN32 */
 
       return (-1);
     }
@@ -1693,6 +1737,19 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
     return;
 
   strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
+
+ /*
+  * Special case for Authorization: as its contents can be
+  * longer than HTTP_MAX_VALUE
+  */
+
+  if (field == HTTP_FIELD_AUTHORIZATION)
+  {
+    if (http->field_authorization)
+      free(http->field_authorization);
+
+    http->field_authorization = strdup(value);
+  }
 }
 
 
@@ -2481,9 +2538,10 @@ http_send(http_t       *http,	/* I - HTTP connection */
   for (i = 0; i < HTTP_FIELD_MAX; i ++)
     if (http->fields[i][0] != '\0')
     {
-      DEBUG_printf(("%s: %s\n", http_fields[i], http->fields[i]));
+      DEBUG_printf(("%s: %s\n", http_fields[i], httpGetField(http, i)));
 
-      if (httpPrintf(http, "%s: %s\r\n", http_fields[i], http->fields[i]) < 1)
+      if (httpPrintf(http, "%s: %s\r\n", http_fields[i], 
+		     httpGetField(http, i)) < 1)
       {
 	http->status = HTTP_ERROR;
 	return (-1);
@@ -2514,6 +2572,20 @@ http_send(http_t       *http,	/* I - HTTP connection */
   httpFlushWrite(http);
   httpGetLength2(http);
   httpClearFields(http);
+
+ /*
+  * The Kerberos authentication string can only be used once...
+  */
+
+  if (http->authstring && !strncmp(http->authstring, "Negotiate", 9))
+  {
+    http->_authstring[0] = '\0';
+
+    if (http->authstring != http->_authstring)
+      free(http->authstring);
+  
+    http->authstring = http->_authstring;
+  }
 
   return (0);
 }
@@ -2757,6 +2829,8 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
   * encryption on the link...
   */
 
+  http->field_authorization = NULL;	/* Don't free the auth string */
+
   httpClearFields(http);
   httpSetField(http, HTTP_FIELD_CONNECTION, "upgrade");
   httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.0, SSL/2.0, SSL/3.0");
@@ -2777,10 +2851,11 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
   */
 
   memcpy(http->fields, myhttp.fields, sizeof(http->fields));
-  http->data_encoding   = myhttp.data_encoding;
-  http->data_remaining  = myhttp.data_remaining;
-  http->_data_remaining = myhttp._data_remaining;
-  http->expect          = myhttp.expect;
+  http->data_encoding       = myhttp.data_encoding;
+  http->data_remaining      = myhttp.data_remaining;
+  http->_data_remaining     = myhttp._data_remaining;
+  http->expect              = myhttp.expect;
+  http->field_authorization = myhttp.field_authorization;
 
  /*
   * See if we actually went secure...
@@ -2819,12 +2894,13 @@ http_wait(http_t *http,			/* I - HTTP connection */
           int    msec,			/* I - Milliseconds to wait */
 	  int    usessl)		/* I - Use SSL context? */
 {
-#ifndef WIN32
-  struct rlimit		limit;          /* Runtime limit */
-  int			set_size;	/* Size of select set */
-#endif /* !WIN32 */
+#ifdef HAVE_POLL
+  struct pollfd		pfd;		/* Polled file descriptor */
+#else
+  fd_set		input_set;	/* select() input set */
   struct timeval	timeout;	/* Timeout */
-  int			nfds;		/* Result from select() */
+#endif /* HAVE_POLL */
+  int			nfds;		/* Result from select()/poll() */
 
 
   DEBUG_printf(("http_wait(http=%p, msec=%d)\n", http, msec));
@@ -2855,41 +2931,20 @@ http_wait(http_t *http,			/* I - HTTP connection */
 #endif /* HAVE_SSL */
 
  /*
-  * Then try doing a select() to poll the socket...
+  * Then try doing a select() or poll() to poll the socket...
   */
 
-  if (!http->input_set)
-  {
-#ifdef WIN32
-   /*
-    * Windows has a fixed-size select() structure, different (surprise,
-    * surprise!) from all UNIX implementations.  Just allocate this
-    * fixed structure...
-    */
+#ifdef HAVE_POLL
+  pfd.fd     = http->fd;
+  pfd.events = POLLIN;
 
-    http->input_set = calloc(1, sizeof(fd_set));
+  while ((nfds = poll(&pfd, 1, msec)) < 0 && errno == EINTR);
+
 #else
-   /*
-    * Allocate the select() input set based upon the max number of file
-    * descriptors available for this process...
-    */
-
-    getrlimit(RLIMIT_NOFILE, &limit);
-
-    set_size = (limit.rlim_cur + 31) / 8 + 4;
-    if (set_size < sizeof(fd_set))
-      set_size = sizeof(fd_set);
-
-    http->input_set = calloc(1, set_size);
-#endif /* WIN32 */
-
-    if (!http->input_set)
-      return (0);
-  }
-
   do
   {
-    FD_SET(http->fd, http->input_set);
+    FD_ZERO(&input_set);
+    FD_SET(http->fd, &input_set);
 
     DEBUG_printf(("http_wait: msec=%d, http->fd=%d\n", msec, http->fd));
 
@@ -2898,20 +2953,19 @@ http_wait(http_t *http,			/* I - HTTP connection */
       timeout.tv_sec  = msec / 1000;
       timeout.tv_usec = (msec % 1000) * 1000;
 
-      nfds = select(http->fd + 1, http->input_set, NULL, NULL, &timeout);
+      nfds = select(http->fd + 1, &input_set, NULL, NULL, &timeout);
     }
     else
-      nfds = select(http->fd + 1, http->input_set, NULL, NULL, NULL);
+      nfds = select(http->fd + 1, &input_set, NULL, NULL, NULL);
 
     DEBUG_printf(("http_wait: select() returned %d...\n", nfds));
   }
-#ifdef WIN32
+#  ifdef WIN32
   while (nfds < 0 && WSAGetLastError() == WSAEINTR);
-#else
+#  else
   while (nfds < 0 && errno == EINTR);
-#endif /* WIN32 */
-
-  FD_CLR(http->fd, http->input_set);
+#  endif /* WIN32 */
+#endif /* HAVE_POLL */
 
   DEBUG_printf(("http_wait: returning with nfds=%d...\n", nfds));
 
@@ -3102,5 +3156,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 6191 2007-01-10 16:48:37Z mike $".
+ * End of "$Id: http.c 6285 2007-02-16 01:10:55Z mike $".
  */

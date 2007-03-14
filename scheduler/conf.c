@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 6205 2007-01-22 22:04:43Z mike $"
+ * "$Id: conf.c 6253 2007-02-10 18:48:40Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -117,13 +117,19 @@ static cupsd_var_t	variables[] =
   { "FilterLimit",		&FilterLimit,		CUPSD_VARTYPE_INTEGER },
   { "FilterNice",		&FilterNice,		CUPSD_VARTYPE_INTEGER },
   { "FontPath",			&FontPath,		CUPSD_VARTYPE_STRING },
-  { "HideImplicitMembers",	&HideImplicitMembers,	CUPSD_VARTYPE_BOOLEAN },
+#ifdef HAVE_GSSAPI
+  { "GSSServiceName",		&GSSServiceName,	CUPSD_VARTYPE_STRING },
+#endif /* HAVE_GSSAPI */
   { "ImplicitClasses",		&ImplicitClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitAnyClasses",	&ImplicitAnyClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },
   { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_INTEGER },
   { "KeepAliveTimeout",		&KeepAliveTimeout,	CUPSD_VARTYPE_INTEGER },
   { "KeepAlive",		&KeepAlive,		CUPSD_VARTYPE_BOOLEAN },
+#ifdef HAVE_LAUNCHD
+  { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_INTEGER },
+  { "LaunchdConf",		&LaunchdConf,		CUPSD_VARTYPE_STRING },
+#endif /* HAVE_LAUNCHD */
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
   { "LogFilePerm",		&LogFilePerm,		CUPSD_VARTYPE_INTEGER },
@@ -161,13 +167,12 @@ static cupsd_var_t	variables[] =
   { "ServerKey",		&ServerKey,		CUPSD_VARTYPE_STRING },
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
-#ifdef HAVE_LAUNCHD
-  { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_INTEGER },
-  { "LaunchdConf",		&LaunchdConf,		CUPSD_VARTYPE_STRING },
-#endif /* HAVE_LAUNCHD */
   { "ServerName",		&ServerName,		CUPSD_VARTYPE_STRING },
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
+#ifdef HAVE_AUTHORIZATION_H
+  { "SystemGroupAuthKey",	&SystemGroupAuthKey,	CUPSD_VARTYPE_STRING },
+#endif /* HAVE_AUTHORIZATION_H */
   { "TempDir",			&TempDir,		CUPSD_VARTYPE_STRING },
   { "Timeout",			&Timeout,		CUPSD_VARTYPE_INTEGER },
   { "UseNetworkDefault",	&UseNetworkDefault,	CUPSD_VARTYPE_BOOLEAN }
@@ -288,6 +293,9 @@ cupsdReadConfiguration(void)
   cupsdSetString(&RemoteRoot, "remroot");
   cupsdSetString(&ServerHeader, "CUPS/1.2");
   cupsdSetString(&StateDir, CUPS_STATEDIR);
+#ifdef HAVE_GSSAPI
+  cupsdSetString(&GSSServiceName, CUPS_DEFAULT_GSSSERVICENAME);
+#endif /* HAVE_GSSAPI */
 
   if (!strcmp(CUPS_DEFAULT_PRINTCAP, "/etc/printers.conf"))
     PrintcapFormat = PRINTCAP_SOLARIS;
@@ -434,10 +442,14 @@ cupsdReadConfiguration(void)
   MaxActiveJobs       = 0;
   MaxJobsPerUser      = 0;
   MaxJobsPerPrinter   = 0;
-  MaxCopies           = 100;
+  MaxCopies           = CUPS_DEFAULT_MAX_COPIES;
 
   cupsdDeleteAllPolicies();
   cupsdClearString(&DefaultPolicy);
+
+#ifdef HAVE_AUTHORIZATION_H
+  cupsdClearString(&SystemGroupAuthKey);
+#endif /* HAVE_AUTHORIZATION_H */
 
   MaxSubscriptions           = 100;
   MaxSubscriptionsPerJob     = 0;
@@ -1705,6 +1717,16 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       if (loc->level == AUTH_ANON)
 	loc->level = AUTH_USER;
     }
+#ifdef HAVE_GSSAPI
+    else if (!strcasecmp(value, "kerberos") ||
+	     !strcasecmp(value, "gssapi"))
+    {
+      loc->type = AUTH_KERBEROS;
+
+      if (loc->level == AUTH_ANON)
+	loc->level = AUTH_USER;
+    }
+#endif /* HAVE_GSSAPI */
     else
     {
       cupsdLogMessage(CUPSD_LOG_WARN,
@@ -1813,6 +1835,20 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       while (isspace(*value & 255))
 	value ++;
 
+#ifdef HAVE_AUTHORIZATION_H
+      if (!strncmp(value, "@AUTHKEY(", 9))
+      {
+       /*
+	* Grab "@AUTHKEY(name)" value...
+	*/
+
+        for (valptr = value + 9; *valptr != ')' && *valptr; valptr ++);
+
+	if (*valptr)
+	  *valptr++ = '\0';
+      }
+      else
+#endif /* HAVE_AUTHORIZATION_H */
       if (*value == '\"' || *value == '\'')
       {
        /*
@@ -2700,6 +2736,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	DefaultAuthType = AUTH_DIGEST;
       else if (!strcasecmp(value, "basicdigest"))
 	DefaultAuthType = AUTH_BASICDIGEST;
+#ifdef HAVE_GSSAPI
+      else if (!strcasecmp(value, "kerberos"))
+        DefaultAuthType = AUTH_KERBEROS;
+#endif /* HAVE_GSSAPI */
       else
       {
 	cupsdLogMessage(CUPSD_LOG_WARN,
@@ -2730,6 +2770,19 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
     }
 #endif /* HAVE_SSL */
+#ifdef HAVE_GSSAPI
+    else if (!strcasecmp(line, "Krb5Keytab"))
+    {
+      cupsdSetStringf(&Krb5Keytab, "KRB5_KTNAME=%s", value);
+      putenv(Krb5Keytab);
+
+#  ifdef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY
+      gsskrb5_register_acceptor_identity(value);
+#  else
+      cupsdSetEnv("KRB5_KTNAME", value);
+#  endif /* HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY */
+    }
+#endif /* HAVE_GSSAPI */
     else if (!strcasecmp(line, "User"))
     {
      /*
@@ -3289,5 +3342,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 6205 2007-01-22 22:04:43Z mike $".
+ * End of "$Id: conf.c 6253 2007-02-10 18:48:40Z mike $".
  */

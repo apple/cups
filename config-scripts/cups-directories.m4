@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-directories.m4 5905 2006-08-29 20:48:59Z mike $"
+dnl "$Id: cups-directories.m4 6332 2007-03-12 16:08:51Z mike $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -123,24 +123,24 @@ fi
 
 dnl Setup init.d locations...
 AC_ARG_WITH(rcdir, [  --with-rcdir            set path for rc scripts],rcdir="$withval",rcdir="")
+AC_ARG_WITH(rclevels, [  --with-rclevels         set run levels for rc scripts],rclevels="$withval",rclevels="2 3 5")
+AC_ARG_WITH(rcstart, [  --with-rcstart          set start number for rc scripts],rcstart="$withval",rcstart="99")
+AC_ARG_WITH(rcstop, [  --with-rcstop           set stop number for rc scripts],rcstop="$withval",rcstop="00")
+
+INITDIR=""
+INITDDIR=""
+RCLEVELS="$rclevels"
+RCSTART="$rcstart"
+RCSTOP="$rcstop"
 
 if test x$rcdir = x; then
 	case "$uname" in
-		FreeBSD* | OpenBSD* | MirBsD* | ekkoBSD*)
-			# FreeBSD and OpenBSD
-			INITDIR=""
-			INITDDIR=""
-			;;
-
-		NetBSD*)
-			# NetBSD
-			INITDIR=""
-			INITDDIR="/etc/rc.d"
+		AIX*)
+			INITDIR="/etc/rc.d"
 			;;
 
 		Darwin*)
 			# Darwin and MacOS X...
-			INITDIR=""
 			if test -x /sbin/launchd; then
 				INITDDIR="/System/Library/LaunchDaemons"
 			else 
@@ -148,53 +148,80 @@ if test x$rcdir = x; then
 			fi
 			;;
 
+		FreeBSD* | OpenBSD* | MirBsD* | ekkoBSD*)
+			# FreeBSD and OpenBSD
+			;;
+
+		HP-UX*)
+			INITDIR="/sbin"
+			RCLEVELS="2"
+			RCSTART="620"
+			RCSTOP="380"
+			;;
+
+		IRIX*)
+			# IRIX
+			INITDIR="/etc"
+			RCSTART="60"
+			RCSTOP="25"
+			;;
+
 		Linux | GNU)
 			# Linux/HURD seems to choose an init.d directory at random...
 			if test -d /sbin/init.d; then
 				# SuSE
 				INITDIR="/sbin/init.d"
-				INITDDIR=".."
 			else
 				if test -d /etc/init.d; then
 					# Others
 					INITDIR="/etc"
-					INITDDIR="../init.d"
 				else
 					# RedHat
 					INITDIR="/etc/rc.d"
-					INITDDIR="../init.d"
 				fi
 			fi
+			RCSTART="81"
+			RCSTOP="36"
 			;;
 
-		OSF1* | HP-UX*)
+		NetBSD*)
+			# NetBSD
+			INITDDIR="/etc/rc.d"
+			;;
+
+		OSF1*)
 			INITDIR="/sbin"
-			INITDDIR="../init.d"
 			;;
 
-		AIX*)
-			INITDIR="/etc/rc.d"
-			INITDDIR=".."
+		SunOS*)
+			# Solaris
+			INITDIR="/etc"
+			RCSTART="81"
 			;;
 
 		*)
 			INITDIR="/etc"
-			INITDDIR="../init.d"
 			;;
 
 	esac
 else
-	INITDIR=""
-	INITDDIR="$rcdir"
+	if test "x$rclevels" = x; then
+		INITDDIR="$rcdir"
+	else
+		INITDIR="$rcdir"
+	fi
 fi
 
 AC_SUBST(INITDIR)
 AC_SUBST(INITDDIR)
+AC_SUBST(RCLEVELS)
+AC_SUBST(RCSTART)
+AC_SUBST(RCSTOP)
 
 dnl Xinetd support...
-XINETD=""
+AC_ARG_WITH(xinetd, [  --with-xinetd           set path for xinetd config files],XINETD="$withval",XINETD="")
 
-if test ! -x /sbin/launchd; then
+if test "x$XINETD" = x -a ! -x /sbin/launchd; then
 	for dir in /private/etc/xinetd.d /etc/xinetd.d /usr/local/etc/xinetd.d; do
 		if test -d $dir; then
 			XINETD="$dir"
@@ -225,6 +252,28 @@ AC_SUBST(CUPS_CACHEDIR)
 CUPS_DATADIR="$datadir/cups"
 AC_DEFINE_UNQUOTED(CUPS_DATADIR, "$datadir/cups")
 AC_SUBST(CUPS_DATADIR)
+
+# Icon directory
+AC_ARG_WITH(icondir, [  --with-icondir          set path for application icons],icondir="$withval",icondir="")
+
+if test "x$icondir" = x -a -d /usr/share/icons; then
+	ICONDIR="/usr/share/icons"
+else
+	ICONDIR="$icondir"
+fi
+
+AC_SUBST(ICONDIR)
+
+# Menu directory
+AC_ARG_WITH(menudir, [  --with-menudir          set path for application menus],menudir="$withval",menudir="")
+
+if test "x$menudir" = x -a -d /usr/share/applications; then
+	MENUDIR="/usr/share/applications"
+else
+	MENUDIR="$menudir"
+fi
+
+AC_SUBST(MENUDIR)
 
 # Documentation files
 AC_ARG_WITH(docdir, [  --with-docdir           set path for documentation],docdir="$withval",docdir="")
@@ -316,5 +365,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 5905 2006-08-29 20:48:59Z mike $".
+dnl End of "$Id: cups-directories.m4 6332 2007-03-12 16:08:51Z mike $".
 dnl

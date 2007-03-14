@@ -1,5 +1,5 @@
 /*
- * "$Id: testfile.c 6193 2007-01-10 19:27:04Z mike $"
+ * "$Id: testfile.c 6192 2007-01-10 19:26:48Z mike $"
  *
  *   File test program for the Common UNIX Printing System (CUPS).
  *
@@ -468,5 +468,5 @@ read_write_tests(int compression)	/* I - Use compression? */
 
 
 /*
- * End of "$Id: testfile.c 6193 2007-01-10 19:27:04Z mike $".
+ * End of "$Id: testfile.c 6192 2007-01-10 19:26:48Z mike $".
  */

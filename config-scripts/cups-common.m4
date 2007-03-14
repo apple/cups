@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-common.m4 6145 2006-12-06 20:10:16Z mike $"
+dnl "$Id: cups-common.m4 6304 2007-02-22 22:06:23Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Easy Software Products and are protected by Federal
@@ -28,9 +28,12 @@ AC_PREREQ(2.50)
 dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
-dnl Version number information...
-CUPS_VERSION="1.2.8"
+dnl Versio number information...
+CUPS_VERSION="1.3svn"
 CUPS_REVISION=""
+if test -z "$CUPS_REVISION" -a -d .svn; then
+	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
+fi
 
 AC_SUBST(CUPS_VERSION)
 AC_SUBST(CUPS_REVISION)
@@ -189,6 +192,7 @@ dnl Extra platform-specific libraries...
 BACKLIBS=""
 CUPSDLIBS=""
 DBUSDIR=""
+CUPS_SYSTEM_AUTHKEY=""
 
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
 
@@ -219,6 +223,12 @@ case $uname in
 		dnl Check for notify_post support
 		AC_CHECK_HEADER(notify.h,AC_DEFINE(HAVE_NOTIFY_H))
 		AC_CHECK_FUNCS(notify_post)
+
+		dnl Check for Authorization Services support
+		AC_CHECK_HEADER(Security/Authorization.h, [
+			AC_DEFINE(HAVE_AUTHORIZATION_H)
+			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"])
+		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
                 ;;
 
 	Linux*)
@@ -232,7 +242,8 @@ case $uname in
 					AC_DEFINE(HAVE_DBUS)
 					CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
 					CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
-					DBUSDIR="/etc/dbus-1/system.d"
+					AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory ], dbusdir="$withval", dbusdir="/etc/dbus-1")
+					DBUSDIR="$dbusdir"
 					AC_CHECK_LIB(dbus-1,
 					    dbus_message_iter_init_append,
 					    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
@@ -243,6 +254,8 @@ case $uname in
 		fi
 		;;
 esac
+
+AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 
 dnl See if we have POSIX ACL support...
 SAVELIBS="$LIBS"
@@ -264,5 +277,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 6145 2006-12-06 20:10:16Z mike $".
+dnl End of "$Id: cups-common.m4 6304 2007-02-22 22:06:23Z mike $".
 dnl

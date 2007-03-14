@@ -1,9 +1,9 @@
 /*
- * "$Id: ieee1284.c 5866 2006-08-23 03:03:49Z mike $"
+ * "$Id: ieee1284.c 6293 2007-02-20 13:40:55Z mike $"
  *
  *   IEEE-1284 support functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -93,84 +93,87 @@ backendGetDeviceID(
   * Range check input...
   */
 
-  if (fd < 0 ||
-      !device_id || device_id_size < 32 ||
-      !make_model || make_model_size < 32)
+  if (!device_id || device_id_size < 32)
   {
     DEBUG_puts("backendGetDeviceID: Bad args!");
     return (-1);
   }
 
-  *device_id  = '\0';
-  *make_model = '\0';
+  if (make_model)
+    *make_model = '\0';
 
   if (uri)
     *uri = '\0';
 
- /*
-  * Get the device ID string...
-  */
-
-#ifdef __linux
-  if (!ioctl(fd, LPIOC_GET_DEVICE_ID(device_id_size), device_id))
+  if (fd >= 0)
   {
    /*
-    * Extract the length of the device ID string from the first two
-    * bytes.  The 1284 spec says the length is stored MSB first...
+    * Get the device ID string...
     */
 
-    length = (((unsigned)device_id[0] & 255) << 8) +
-	     ((unsigned)device_id[1] & 255);
+    *device_id = '\0';
 
-   /*
-    * Check to see if the length is larger than our buffer; first
-    * assume that the vendor incorrectly implemented the 1284 spec,
-    * and then limit the length to the size of our buffer...
-    */
+#ifdef __linux
+    if (!ioctl(fd, LPIOC_GET_DEVICE_ID(device_id_size), device_id))
+    {
+     /*
+      * Extract the length of the device ID string from the first two
+      * bytes.  The 1284 spec says the length is stored MSB first...
+      */
 
-    if (length > (device_id_size - 2))
-      length = (((unsigned)device_id[1] & 255) << 8) +
-	       ((unsigned)device_id[0] & 255);
+      length = (((unsigned)device_id[0] & 255) << 8) +
+	       ((unsigned)device_id[1] & 255);
 
-    if (length > (device_id_size - 2))
-      length = device_id_size - 2;
+     /*
+      * Check to see if the length is larger than our buffer; first
+      * assume that the vendor incorrectly implemented the 1284 spec,
+      * and then limit the length to the size of our buffer...
+      */
 
-   /*
-    * Copy the device ID text to the beginning of the buffer and
-    * nul-terminate.
-    */
+      if (length > (device_id_size - 2))
+	length = (((unsigned)device_id[1] & 255) << 8) +
+		 ((unsigned)device_id[0] & 255);
 
-    memmove(device_id, device_id + 2, length);
-    device_id[length] = '\0';
-  }
+      if (length > (device_id_size - 2))
+	length = device_id_size - 2;
+
+     /*
+      * Copy the device ID text to the beginning of the buffer and
+      * nul-terminate.
+      */
+
+      memmove(device_id, device_id + 2, length);
+      device_id[length] = '\0';
+    }
 #  ifdef DEBUG
-  else
-    printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
+    else
+      printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
 #  endif /* DEBUG */
 #endif /* __linux */
 
 #if defined(__sun) && defined(ECPPIOC_GETDEVID)
-  did.mode = ECPP_CENTRONICS;
-  did.len  = device_id_size - 1;
-  did.rlen = 0;
-  did.addr = device_id;
+    did.mode = ECPP_CENTRONICS;
+    did.len  = device_id_size - 1;
+    did.rlen = 0;
+    did.addr = device_id;
 
-  if (!ioctl(fd, ECPPIOC_GETDEVID, &did))
-  {
-   /*
-    * Nul-terminate the device ID text.
-    */
+    if (!ioctl(fd, ECPPIOC_GETDEVID, &did))
+    {
+     /*
+      * Nul-terminate the device ID text.
+      */
 
-    if (did.rlen < (device_id_size - 1))
-      device_id[did.rlen] = '\0';
-    else
-      device_id[device_id_size - 1] = '\0';
-  }
+      if (did.rlen < (device_id_size - 1))
+	device_id[did.rlen] = '\0';
+      else
+	device_id[device_id_size - 1] = '\0';
+    }
 #  ifdef DEBUG
-  else
-    printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
+    else
+      printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
 #  endif /* DEBUG */
 #endif /* __sun && ECPPIOC_GETDEVID */
+  }
 
   DEBUG_printf(("backendGetDeviceID: device_id=\"%s\"\n", device_id));
 
@@ -181,7 +184,8 @@ backendGetDeviceID(
   * Get the make and model...
   */
 
-  backendGetMakeModel(device_id, make_model, make_model_size);
+  if (make_model)
+    backendGetMakeModel(device_id, make_model, make_model_size);
 
  /*
   * Then generate a device URI...
@@ -499,5 +503,5 @@ backendGetMakeModel(
 
 
 /*
- * End of "$Id: ieee1284.c 5866 2006-08-23 03:03:49Z mike $".
+ * End of "$Id: ieee1284.c 6293 2007-02-20 13:40:55Z mike $".
  */

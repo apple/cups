@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c 5572 2006-05-22 18:47:09Z mike $"
+ * "$Id: classes.c 5571 2006-05-22 18:46:55Z mike $"
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -463,5 +463,5 @@ show_class(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: classes.c 5572 2006-05-22 18:47:09Z mike $".
+ * End of "$Id: classes.c 5571 2006-05-22 18:46:55Z mike $".
  */

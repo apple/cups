@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-defaults.m4 6234 2007-02-05 20:25:50Z mike $"
+dnl "$Id: cups-defaults.m4 6309 2007-02-24 03:11:56Z mike $"
 dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
@@ -62,16 +62,46 @@ AC_SUBST(CUPS_BROWSING)
 
 dnl Default BrowseLocalProtocols
 AC_ARG_WITH(local_protocols, [  --with-local-protocols  set default BrowseLocalProtocols, default="CUPS"],
-	CUPS_BROWSE_LOCAL_PROTOCOLS="$withval",
-	CUPS_BROWSE_LOCAL_PROTOCOLS="CUPS")
+	default_local_protocols="$withval",
+	default_local_protocols="default")
+
+if test x$with_local_protocols != xno; then
+	if test "x$default_local_protocols" = "xdefault"; then
+		if test "x$DNSSDLIBS" != "x"; then
+		CUPS_BROWSE_LOCAL_PROTOCOLS="CUPS dnssd"
+	else
+		CUPS_BROWSE_LOCAL_PROTOCOLS="CUPS"
+		fi
+	else
+		CUPS_BROWSE_LOCAL_PROTOCOLS="$default_local_protocols"
+	fi
+else
+	CUPS_BROWSE_LOCAL_PROTOCOLS=""
+fi
+
 AC_SUBST(CUPS_BROWSE_LOCAL_PROTOCOLS)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS,
 	"$CUPS_BROWSE_LOCAL_PROTOCOLS")
 
 dnl Default BrowseRemoteProtocols
 AC_ARG_WITH(remote_protocols, [  --with-remote-protocols set default BrowseRemoteProtocols, default="CUPS"],
-	CUPS_BROWSE_REMOTE_PROTOCOLS="$withval",
-	CUPS_BROWSE_REMOTE_PROTOCOLS="CUPS")
+	default_remote_protocols="$withval",
+	default_remote_protocols="default")
+
+if test x$with_remote_protocols != xno; then
+	if test "x$default_remote_protocols" = "xdefault"; then
+		if test "$uname" = "Darwin" -a $uversion -ge 90; then
+			CUPS_BROWSE_REMOTE_PROTOCOLS=""
+		else
+			CUPS_BROWSE_REMOTE_PROTOCOLS="CUPS"
+		fi
+	else
+		CUPS_BROWSE_REMOTE_PROTOCOLS="$default_remote_protocols"
+	fi
+else
+	CUPS_BROWSE_REMOTE_PROTOCOLS=""
+fi
+
 AC_SUBST(CUPS_BROWSE_REMOTE_PROTOCOLS)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS,
 	"$CUPS_BROWSE_REMOTE_PROTOCOLS")
@@ -251,6 +281,18 @@ fi
 
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTCAP, "$CUPS_DEFAULT_PRINTCAP")
 
+dnl Default MaxCopies value...
+AC_ARG_WITH(max-copies, [  --with-max-copies       set max copies value, default=100 ],
+	CUPS_MAX_COPIES="$withval",
+	if test "x$uname" = xDarwin; then
+		CUPS_MAX_COPIES="999"
+	else
+		CUPS_MAX_COPIES="100"
+	fi)
+
+AC_SUBST(CUPS_MAX_COPIES)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_MAX_COPIES, $CUPS_MAX_COPIES)
+
 dnl
-dnl End of "$Id: cups-defaults.m4 6234 2007-02-05 20:25:50Z mike $".
+dnl End of "$Id: cups-defaults.m4 6309 2007-02-24 03:11:56Z mike $".
 dnl

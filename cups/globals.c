@@ -1,9 +1,9 @@
 /*
- * "$Id: globals.c 5373 2006-04-06 20:03:32Z mike $"
+ * "$Id: globals.c 6253 2007-02-10 18:48:40Z mike $"
  *
  *   Global variable access routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -180,6 +180,11 @@ globals_destructor(void *value)		/* I - Data to free */
 
   cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
 
+#ifdef HAVE_AUTHORIZATION_H
+  if (cg->auth_ref)
+    AuthorizationFree(cg->auth_ref, kAuthorizationFlagDefaults);
+#endif /* HAVE_AUTHORIZATION_H */
+
   free(value);
 }
 
@@ -226,5 +231,5 @@ _cupsGlobals(void)
 
 
 /*
- * End of "$Id: globals.c 5373 2006-04-06 20:03:32Z mike $".
+ * End of "$Id: globals.c 6253 2007-02-10 18:48:40Z mike $".
  */

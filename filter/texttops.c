@@ -1,9 +1,9 @@
 /*
- * "$Id: texttops.c 6003 2006-10-02 16:26:04Z mike $"
+ * "$Id: texttops.c 6288 2007-02-19 12:59:55Z mike $"
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -812,7 +812,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 
     puts("% Reencode base fonts");
 
-    for (i = 1 + PrettyPrint; i >= 0; i --)
+    for (i = PrettyPrint ? 2 : 1; i >= 0; i --)
       for (j = 0; j < NumFonts; j ++)
       {
 	printf("/%s findfont\n", Fonts[j][i]);
@@ -831,7 +831,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 
     puts("% Create composite fonts...");
 
-    for (i = 1 + PrettyPrint; i >= 0; i --)
+    for (i = PrettyPrint ? 2 : 1; i >= 0; i --)
     {
       puts("8 dict begin");
       puts("/FontType 0 def/FontMatrix[1.0 0 0 1.0 0 0]def/FMapType 2 def/Encoding[");
@@ -1307,5 +1307,5 @@ write_text(const char *s)	/* I - String to write */
 
 
 /*
- * End of "$Id: texttops.c 6003 2006-10-02 16:26:04Z mike $".
+ * End of "$Id: texttops.c 6288 2007-02-19 12:59:55Z mike $".
  */

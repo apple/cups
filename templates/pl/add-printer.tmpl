@@ -1,22 +1,23 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{device_uri?<INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">:}
 
 <H2 CLASS="title">Dodaj nową drukarkę</H2>
 
 <TABLE>
 <TR>
 <TH CLASS="label">Nazwa:</TH>
-<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"><BR>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?template_name}"><BR>
 <SMALL>(Może zawierać dowolne drukowalne znaki z wyjątkiem "/", "#" i spacji)</SMALL></TD>
 </TR>
 <TR>
 <TH CLASS="label">Położenie:</TH>
-<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"><BR>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127" VALUE="{?PRINTER_LOCATION}"><BR>
 <SMALL>(Położenie czytelne dla człowieka, takie jak "Laboratorium 1")</SMALL></TD>
 </TR>
 <TR>
 <TH CLASS="label">Opis:</TH>
-<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"><BR>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127" VALUE="{?PRINTER_INFO}"><BR>
 <SMALL>(Opis czytelny dla człowieka, taki jak "HP LaserJet z Dupleksem")</SMALL></TD>
 </TR>
 <TR>

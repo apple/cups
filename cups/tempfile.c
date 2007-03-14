@@ -1,5 +1,5 @@
 /*
- * "$Id: tempfile.c 6040 2006-10-17 02:24:49Z mike $"
+ * "$Id: tempfile.c 6039 2006-10-17 02:24:34Z mike $"
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
@@ -238,5 +238,5 @@ cupsTempFile2(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id: tempfile.c 6040 2006-10-17 02:24:49Z mike $".
+ * End of "$Id: tempfile.c 6039 2006-10-17 02:24:34Z mike $".
  */

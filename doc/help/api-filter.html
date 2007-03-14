@@ -52,6 +52,9 @@ used when writing backends, filters, and port monitors.</p>
 use the <tt>CUPS_BACKEND_</tt> constants and
 <tt>cupsBackChannel</tt> functions, respectively.</p>
 
+<p>The <var>&lt;cups/sidechannel.h&gt;</var> header file must be
+included to use the <tt>CUPS_SC_</tt> constants and <tt>cupsSideChannel</tt> functions.</p>
+
 <p>Programs using these functions must be linked to the CUPS
 library: <var>libcups.a</var>, <var>libcups.so.2</var>,
 <var>libcups.2.dylib</var>, <var>libcups_s.a</var>, or
@@ -63,9 +66,177 @@ library:</p>
 <kbd>gcc -o myprogram myprogram.c -lcups</kbd>
 </pre>
 
+
 <h2 class='title'>Compatibility</h2>
 
-<p>All of these functions require CUPS 1.2 or higher.</p>
+<p>The <tt>cupsBackChannel</tt> functions require CUPS 1.2 or higher. The <tt>cupsSideChannel</tt> functions require CUPS 1.3 or higher.</p>
+
+
+<h2 class='title'>Using the cupsBackChannel APIs</h2>
+
+<p>The <tt>cupsBackChannel</tt> APIs allow your filters, drivers, and port monitors to read data back from a printer and your backends to send data from a printer to the filters, drivers, and port monitors associated with the current job. Back-channel data is normally sent by the printer in response to a command sent from your program to the printer via <tt>stdout</tt>.</p>
+
+<p>The <tt>cupsBackChannelRead()</tt> function reads data from the printer via the backend. You provide a timeout in seconds along with a buffer pointer and the size of that buffer. It returns the number of bytes or -1 if there was an error. The following code example shows how to poll for back-channel data in your program:</p>
+
+<pre class='command'>
+#include &lt;cups/cups.h&gt;
+
+char buffer[8192];
+ssize_t bytes;
+
+/* Use a timeout of 0.0 seconds to poll for back-channel data */
+bytes = cupsBackChannelRead(buffer, sizeof(buffer), 0.0);
+</pre>
+
+<p>If you are writing a backend, the <tt>cupsBackChannelWrite()</tt> function sends any back-channel data you have received from the printer to upstream filters in the print filter chain. We recommend using a timeout of 1.0 seconds:</p>
+
+<pre class='command'>
+#include &lt;cups/cups.h&gt;
+
+char buffer[8192];
+ssize_t bytes;
+
+/* Use a timeout of 1.0 seconds to give filters a chance to read */
+cupsBackChannelWrite(buffer, bytes, 1.0);
+</pre>
+
+
+<h2 class='title'>Using the cupsSideChannel APIs</h2>
+
+<p>The <tt>cupsSideChannel</tt> APIs allow your filters, drivers, port monitors, and backend to send and receive the following out-of-band commands:</p>
+
+<ul>
+
+	<li><tt>CUPS_SC_CMD_SOFT_RESET</tt> -  Do a soft reset</li>
+	<li><tt>CUPS_SC_CMD_DRAIN_OUTPUT</tt> -  Drain all pending output</li>
+	<li><tt>CUPS_SC_CMD_GET_BIDI</tt> -  Return bidirectional capabilities</li>
+	<li><tt>CUPS_SC_CMD_GET_DEVICE_ID</tt> -  Return the IEEE-1284 device ID</li>
+	<li><tt>CUPS_SC_CMD_GET_STATE</tt> - Return the device state</li>
+
+</ul>
+
+
+<h3>Sending Commands from a Filter, Driver, or Port Monitor</h3>
+
+<p>The <tt>cupsSideChannelDoRequest()</tt> function is used by filters, drivers, and port monitors to send a command to the backend and read back a response:</p>
+
+<pre class='command'>
+cups_sc_status_t cupsSideChannelDoRequest(cups_sc_command_t command,
+                                          char *data, int *datalen,
+                                          double timeout);
+</pre>
+
+<p>The <tt>CUPS_SC_CMD_SOFT_RESET</tt> and <tt>CUPS_SC_CMD_DRAIN_OUTPUT</tt> commands do not return any data values, while the others return one or more bytes. The <tt>timeout</tt> parameter allows your program to poll or wait for the command to complete - use a timeout of 30 seconds for <tt>CUPS_SC_CMD_SOFT_RESET</tt> and <tt>CUPS_SC_CMD_DRAIN_OUTPUT</tt> and a timeout of 1 second for all other commands.</p>
+
+<p><tt>CUPS_SC_CMD_GET_BIDI</tt> returns a single <tt>char</tt> value that tells you whether the backend supports bidirectional communications:</p>
+
+<pre class='command'>
+#include &lt;cups/sidechannel.h&gt;
+
+char data;
+int datalen;
+cups_sc_bidi_t bidi;
+cups_sc_status_t status;
+
+/* Tell cupsSideChannelDoRequest() how big our buffer is... */
+datalen = 1;
+
+/* Get the bidirectional capabilities, waiting for up to 1 second */
+status  = cupsSideChannelDoRequest(CUPS_SC_CMD_GET_BIDI, &amp;data, &amp;datalen, 1.0);
+
+/* Use the returned value if OK was returned and the length is still 1 */
+if (status == CUPS_SC_STATUS_OK && datalen == 1)
+  bidi = (cups_sc_bidi_t)data;
+else
+  bidi = CUPS_SC_BIDI_NOT_SUPPORTED;
+</pre>
+
+<p><tt>CUPS_SC_CMD_GET_DEVICE_ID</tt> returns a string of characters containing the IEEE-1284 device ID for the connected printer:</p>
+
+<pre class='command'>
+#include &lt;cups/sidechannel.h&gt;
+
+char data[2049];
+int datalen;
+cups_sc_status_t status;
+
+/* Tell cupsSideChannelDoRequest() how big our buffer is, less 1 byte for nul-termination... */
+datalen = sizeof(data) - 1;
+
+/* Get the IEEE-1284 device ID, waiting for up to 1 second */
+status  = cupsSideChannelDoRequest(CUPS_SC_CMD_GET_DEVICE_ID, data, &amp;datalen, 1.0);
+
+/* Use the returned value if OK was returned and the length is non-zero */
+if (status == CUPS_SC_STATUS_OK && datalen > 0)
+  data[datalen] = '\0';
+else
+  data[0] = '\0';
+</pre>
+
+<p><tt>CUPS_SC_CMD_GET_STATE</tt> returns a single <tt>char</tt> value that tells you the current device state:</p>
+
+<pre class='command'>
+#include &lt;cups/sidechannel.h&gt;
+
+char data;
+int datalen;
+cups_sc_state_t state;
+cups_sc_status_t status;
+
+/* Tell cupsSideChannelDoRequest() how big our buffer is... */
+datalen = 1;
+
+/* Get the bidirectional capabilities, waiting for up to 1 second */
+status  = cupsSideChannelDoRequest(CUPS_SC_CMD_GET_STATE, &amp;data, &amp;datalen, 1.0);
+
+/* Use the returned value if OK was returned and the length is still 1 */
+if (status == CUPS_SC_STATUS_OK && datalen == 1)
+  state = (cups_sc_state_t)data;
+else
+  state = CUPS_SC_STATE_OFFLINE;
+</pre>
+
+
+<h3>Handling Commands in your Backend</h3>
+
+<p>The <tt>cupsSideChannelRead()</tt> function is used by backends to read a command from a filter, driver, or port monitor:</p>
+
+<pre class='command'>
+int cupsSideChannelRead(cups_sc_command_t &amp;command,
+                        cups_sc_status_t  &amp;status,
+                        char *data, int *datalen, double timeout);
+</pre>
+
+<p>Backends can either poll for commands using a <tt>timeout</tt> of 0.0, wait indefinitely for commands using a <tt>timeout</tt> of -1.0 (probably in a separate thread for that purpose), or use <tt>select()</tt> or <tt>poll()</tt> on the <tt>CUPS_SC_FD</tt> file descriptor (4) to handle input and output on several file descriptors at the same time. Backends can pass <tt>NULL</tt> for the <tt>data</tt> and <tt>datalen</tt> parameters, since none of the commands sent by upstream filters contain any data at this time.</p>
+
+<p>Once a command is processed, the backend uses the <tt>cupsSideChannelWrite()</tt> function to send its response:</p>
+
+<pre class='command'>
+#include &lt;cups/sidechannel.h&gt;
+
+cups_sc_command_t command;
+cups_sc_status_t status;
+
+/* Poll for a command... */
+if (!cupsSideChannelRead(&amp;command, &amp;status, NULL, NULL, 0.0))
+{
+  char data[2048];
+  int datalen;
+
+  switch (command)
+  {
+    ... handle supported commands, file data/datalen/status with values as needed ...
+
+    default :
+        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	datalen = 0;
+	break;
+  }
+
+  /* Send a response... */
+  cupsSideChannelWrite(command, status, data, datalen, 1.0);
+}
+</pre>
 <h2 class='title'>Contents</h2>
 <ul>
 	<li><a href='#FUNCTIONS'>Functions</a></li>
@@ -75,6 +246,9 @@ library:</p>
 <ul>
 	<li><a href='#cupsBackChannelRead'><tt>cupsBackChannelRead()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#cupsBackChannelWrite'><tt>cupsBackChannelWrite()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsSideChannelDoRequest'><tt>cupsSideChannelDoRequest()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
+	<li><a href='#cupsSideChannelRead'><tt>cupsSideChannelRead()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
+	<li><a href='#cupsSideChannelWrite'><tt>cupsSideChannelWrite()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
 </ul>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsBackChannelRead'>cupsBackChannelRead()</a></h3>
@@ -134,5 +308,109 @@ cupsBackChannelWrite(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Bytes written or -1 on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsSideChannelDoRequest'>cupsSideChannelDoRequest()</a></h3>
+<h4>Description</h4>
+<p>Send a side-channel command to a backend and wait for a response.
+
+This function is normally only called by filters, drivers, or port
+monitors in order to communicate with the backend used by the current
+printer.  Programs must be prepared to handle timeout or &quot;not
+implemented&quot; status codes, which indicate that the backend or device
+do not support the specified side-channel command.
+
+The &quot;datalen&quot; parameter must be initialized to the size of the buffer
+pointed to by the &quot;data&quot; parameter.  cupsSideChannelDoRequest() will
+update the value to contain the number of data bytes in the buffer.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#cups_sc_status_t'>cups_sc_status_t</a>
+cupsSideChannelDoRequest(
+    cups_sc_command_t command,
+    char * data,
+    int * datalen,
+    double timeout);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>command</tt></td><td>Command to send</td></tr>
+<tr><td><tt>data</tt></td><td>Response data buffer pointer</td></tr>
+<tr><td><tt>datalen</tt></td><td>Size of data buffer on entry, number of bytes in buffer on return</td></tr>
+<tr><td><tt>timeout</tt></td><td>Timeout in seconds</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Status of command</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsSideChannelRead'>cupsSideChannelRead()</a></h3>
+<h4>Description</h4>
+<p>Read a side-channel message.
+
+This function is normally only called by backend programs to read
+commands from a filter, driver, or port monitor program.  The
+caller must be prepared to handle incomplete or invalid messages
+and return the corresponding status codes.
+
+The &quot;datalen&quot; parameter must be initialized to the size of the buffer
+pointed to by the &quot;data&quot; parameter.  cupsSideChannelDoRequest() will
+update the value to contain the number of data bytes in the buffer.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+int
+cupsSideChannelRead(
+    cups_sc_command_t * command,
+    <a href='#cups_sc_status_t'>cups_sc_status_t</a> * status,
+    char * data,
+    int * datalen,
+    double timeout);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>command</tt></td><td>Command code</td></tr>
+<tr><td><tt>status</tt></td><td>Status code</td></tr>
+<tr><td><tt>data</tt></td><td>Data buffer pointer</td></tr>
+<tr><td><tt>datalen</tt></td><td>Size of data buffer on entry, number of bytes in buffer on return</td></tr>
+<tr><td><tt>timeout</tt></td><td>Timeout in seconds</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsSideChannelWrite'>cupsSideChannelWrite()</a></h3>
+<h4>Description</h4>
+<p>Write a side-channel message.
+
+This function is normally only called by backend programs to send
+responses to a filter, driver, or port monitor program.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+int
+cupsSideChannelWrite(
+    cups_sc_command_t command,
+    <a href='#cups_sc_status_t'>cups_sc_status_t</a> status,
+    const char * data,
+    int datalen,
+    double timeout);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>command</tt></td><td>Command code</td></tr>
+<tr><td><tt>status</tt></td><td>Status code</td></tr>
+<tr><td><tt>data</tt></td><td>Data buffer pointer</td></tr>
+<tr><td><tt>datalen</tt></td><td>Number of bytes of data</td></tr>
+<tr><td><tt>timeout</tt></td><td>Timeout in seconds</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on error</p>
 </body>
 </html>

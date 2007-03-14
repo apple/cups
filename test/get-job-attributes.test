@@ -15,6 +15,7 @@
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri job-uri $uri
+#	ATTR keyword requested-attributes job-media-sheets-completed,job-state
 
 	# What statuses are OK?
 	#STATUS ok
@@ -23,5 +24,4 @@
 	# What attributes do we expect?
 	EXPECT job-uri
 	EXPECT job-state
-	EXPECT bogus-attribute
 }

@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c 6188 2007-01-10 16:23:06Z mike $"
+ * "$Id: http-support.c 6304 2007-02-22 22:06:23Z mike $"
  *
  *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -149,7 +149,7 @@ httpAssembleURI(
   if (!ptr)
     goto assemble_overflow;
 
-  if (!strcmp(scheme, "mailto:"))
+  if (!strcmp(scheme, "mailto"))
   {
    /*
     * mailto: only has :, no //...
@@ -1327,5 +1327,5 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 
 
 /*
- * End of "$Id: http-support.c 6188 2007-01-10 16:23:06Z mike $".
+ * End of "$Id: http-support.c 6304 2007-02-22 22:06:23Z mike $".
  */

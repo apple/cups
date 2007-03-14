@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c 6191 2007-01-10 16:48:37Z mike $"
+ * "$Id: emit.c 6190 2007-01-10 16:48:27Z mike $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -355,6 +355,15 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     * of the PJL commands to initialize PJL processing.
     */
 
+    ppd_attr_t	*charset;		/* PJL charset */
+
+
+    if ((charset = ppdFindAttr(ppd, "cupsPJLCharset", NULL)) != NULL)
+    {
+      if (!charset->value || strcasecmp(charset->value, "UTF-8"))
+        charset = NULL;
+    }
+
     fputs("\033%-12345X@PJL\n", fp);
     for (ptr = ppd->jcl_begin + 9; *ptr;)
       if (!strncmp(ptr, "@PJL JOB", 8))
@@ -404,7 +413,7 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     for (ptr = temp; *ptr; ptr ++)
       if (*ptr == '\"')
         *ptr = '\'';
-      else if (*ptr & 128)
+      else if (charset && (*ptr & 128))
         *ptr = '?';
 
    /*
@@ -946,5 +955,5 @@ ppd_sort(ppd_choice_t **c1,	/* I - First choice */
 
 
 /*
- * End of "$Id: emit.c 6191 2007-01-10 16:48:37Z mike $".
+ * End of "$Id: emit.c 6190 2007-01-10 16:48:27Z mike $".
  */

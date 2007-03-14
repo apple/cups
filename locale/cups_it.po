@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cups_it\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-01-23 09:19-0500\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
 "PO-Revision-Date: 2006-11-16 00:34+0100\n"
 "Last-Translator: Vincenzo Reale <smart2128@baslug.org>\n"
 "Language-Team: Italian <kde-i18n-it@mail.kde.org>\n"
@@ -2972,6 +2972,15 @@ msgstr "Impossibile configurare il driver di stampa di Windows (%d)!\n"
 msgid "Unable to run \"%s\": %s\n"
 msgstr "cupsaddsmb: Impossibile eseguire \"%s\": %s\n"
 
+#, fuzzy
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Inserisci il tuo nome utente e la tua password o il nome utente e la "
+"password di root per accedere a questa pagina."
+
 #, fuzzy, c-format
 msgid "Job #%d is already canceled - can't cancel."
 msgstr "L'operazione #%d è già annullata - impossibile annullare."
@@ -2995,6 +3004,10 @@ msgid ""
 msgstr ""
 "      **FAIL**  1284DeviceId deve essere 1284DeviceID!\n"
 "                RIF: Pagina 72, sezione 5.5\n"
+
+#, fuzzy, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d ERROR%s TROVATI\n"
 
 #, fuzzy, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s\n"

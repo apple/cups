@@ -26,10 +26,10 @@
 # Daniel Nylander <po@danielnylander.se>, 2006, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: CUPS 1.2\n"
+"Project-Id-Version: CUPS 1.3\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-01-23 09:19-0500\n"
-"PO-Revision-Date: 2007-01-23 16:23+0100\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
+"PO-Revision-Date: 2007-01-23 16:31+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -2828,7 +2828,7 @@ msgstr "Saknar värde på rad %d!"
 
 #, c-format
 msgid "Missing double quote on line %d!"
-msgstr "Saknar citationstecken på rad %d!\n"
+msgstr "Saknar dubbla citationstecken på rad %d!"
 
 #, c-format
 msgid "Bad option + choice on line %d!"
@@ -2844,6 +2844,9 @@ msgstr "Kunde inte ställa in Windows-skrivardrivrutin (%d)!"
 #, c-format
 msgid "Unable to run \"%s\": %s\n"
 msgstr "Kunde inte köra \"%s\": %s\n"
+
+msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
+msgstr "Ange ditt användarnamn och lösenord eller root-användarnamnet och lösenord för att komma åt denna sida. Om du använder Kerberos-autentisering, kontrollera att du har en giltig Kerberos-biljett."
 
 #, c-format
 msgid "Job #%d is already canceled - can't cancel."
@@ -2868,6 +2871,10 @@ msgid ""
 msgstr ""
 "      **FEL**   %s måste vara 1284DeviceID!\n"
 "                REF: Sida 72, sektion 5.5\n"
+
+#, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d FEL HITTADES\n"
 
 #, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s\n"

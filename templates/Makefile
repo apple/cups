@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5878 2006-08-24 15:55:42Z mike $"
+# "$Id: Makefile 5877 2006-08-24 15:54:12Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -156,5 +156,5 @@ uninstall-languages:
 
 
 #
-# End of "$Id: Makefile 5878 2006-08-24 15:55:42Z mike $".
+# End of "$Id: Makefile 5877 2006-08-24 15:54:12Z mike $".
 #

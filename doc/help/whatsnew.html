@@ -1,38 +1,31 @@
 <HTML>
 <!-- SECTION: Getting Started -->
 <HEAD>
-	<TITLE>What's New in CUPS 1.2</TITLE>
+	<TITLE>What's New in CUPS 1.3</TITLE>
 </HEAD>
 <BODY>
 
-<P>CUPS 1.2 adds over 90 changes and new features to CUPS 1.1.x.
+<P>CUPS 1.3 adds over ??? changes and new features to CUPS 1.2.x.
 This page provides a high-level outline of these changes. If you
 have never used CUPS before, read the <A
 HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 
-<H2 CLASS="title"><A NAME="CHANGES">Changes in CUPS 1.2</A></H2>
+<H2 CLASS="title"><A NAME="CHANGES">Changes in CUPS 1.3</A></H2>
 
 <DL CLASS="category">
 
 	<DT>Networking</DT>
 	<DD><OL START="1">
 
-		<LI><EM>IPv6;</EM> CUPS now supports IPv6
-		connectivity when the host operating system
-		provides it</LI>
+		<LI><EM>Kerberos;</EM> CUPS now supports Kerberos authentication</LI>
 
-		<LI><EM>Domain Sockets;</EM> CUPS now supports
-		the much faster UNIX domain sockets for local
-		printing</LI>
+		<LI><EM>Mac OS X Improvements;</EM> CUPS now supports the Authorization Services framework, providing role-based access control in addition to the tradition UNIX model</LI>
 
-		<LI><EM>Auto-SSL;</EM> CUPS now automatically
-		detects when a client is connecting with SSL
-		encryption, so it can support both unencrypted,
-		SSL-encrypted, and TLS-encrypted connections over
-		a single port</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Network Printer Discovery;</EM> CUPS can
-		now find printers on the LAN using SNMP</LI>
+		<LI><EM>;</EM> </LI>
+
+		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
@@ -40,40 +33,13 @@ HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 	<DT>Browsing</DT>
 	<DD><OL START="5">
 
-		<LI><EM>LDAP Support;</EM> CUPS now supports
-		printer sharing via the Lightweight Directory
-		Access Protocol, version 3</LI>
+		<LI><EM>CUPS Browsing;</EM> The default configuration now shows shared printers from any address (not just <tt>@LOCAL</tt>)</LI>
 
-		<LI><EM>Printer Lease Times;</EM> The server's
-		BrowseTimeout value is now included</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Network Default Options;</EM> The server
-		now advertises a printer's default options such
-		as job-sheets, media, and so forth</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Network Default Printer;</EM> CUPS now
-		advertises server-default printers so that
-		clients can choose the correct default network
-		printer</LI>
-
-		<LI><EM>"Delete Printer" Message;</EM> CUPS now
-		sends a final "delete printer" message to all
-		clients when a printer is deleted, allowing for
-		extremely long BrowseTimeout values without
-		side-effects</LI>
-
-		<LI><EM>BrowseLocalOptions and
-		BrowseRemoteOptions Support;</EM> You can
-		configure CUPS to use specific IPP options for
-		local and remote printers, for example to
-		compress print jobs that are sent over a slow WAN
-		link</LI>
-
-		<LI><EM>BrowseLocalProtocols and
-		BrowseRemoteProtocols Support;</EM> You can
-		configure CUPS to use different protocols for
-		advertising local shared printers and discovering
-		remote shared printers</LI>
+		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
@@ -81,92 +47,19 @@ HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 	<DT>Web Interface</DT>
 	<DD><OL START="12">
 
-		<LI><EM>Improved Look and Feel;</EM> The web
-		interface has improved readability and a more
-		consistent design</LI>
+		<LI><EM>Internet Printer Sharing;</EM> You can now share printers over the Internet via the basic server settings</LI>
 
-		<LI><EM>New Searchable On-Line Help;</EM> The
-		on-line help has been reorganized into
-		categorized articles and references and can be
-		searched</LI>
+		<LI><EM>Improved On-Line Help;</EM> Searching the on-line help now shows results for all text, not just headings and links</LI>
 
-		<LI><EM>Add This Printer;</EM> The administration
-		page offers a new <VAR>Add This Printer</VAR>
-		button for automatically-discovered printers,
-		making printer configuration even easier than
-		before</LI>
+		<LI><EM>Printer Setup;</EM> The <VAR>Add This Printer</VAR> button now allows you to change the default name, location, and description</LI>
 
-		<LI><EM>Export Printers to Samba;</EM> The
-		administration page now offers an <VAR>Export
-		Printers to Samba</VAR> button and function which
-		allows administrators to export printer drivers
-		to Windows clients via Samba</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Change Settings;</EM> The administration
-		page offers a new simple server settings form for
-		controlling common configuration settings such as
-		printer sharing and remote administration</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Edit Configuration File;</EM> The
-		administration page now provides a form for
-		editing the <VAR>cupsd.conf</VAR> file from your
-		web browser</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>View Log Files;</EM> The administration
-		page now provides access to the
-		<VAR>access_log</VAR>, <VAR>error_log</VAR>, and
-		<VAR>page_log</VAR> log files</LI>
-
-		<LI><EM>Searchable Classes, Jobs, and
-		Printers;</EM> the class, job, and printer pages
-		can now be searched and shown in ascending or
-		descending order, with the results displayed in
-		groups of 10</LI>
-
-		<LI><EM>Links for Class Members;</EM> When
-		viewing a printer class, we now provide
-		hyperlinks to each of the class members -
-		previously only the names were shown</LI>
-
-		<LI><EM>Print Self-Test Page;</EM> When the
-		printer driver supports the CUPS command file
-		format, you can now print the printer's self-test
-		page</LI>
-
-		<LI><EM>Clean Print Heads;</EM> When the printer
-		driver supports the CUPS command file format, you
-		can now clean the printer's heads</LI>
-
-		<LI><EM>Set Default Options;</EM> You can now set
-		the default options for a printer, including the
-		new operation and error policies (the previous
-		incarnation of this was confusingly called
-		"Configure Printer")</LI>
-
-		<LI><EM>Set Default Printer;</EM> You can now
-		make a printer the default printer on the
-		network</LI>
-
-		<LI><EM>Set Allowed Users;</EM> You can now set
-		the list of users and/or groups that are allowed
-		or not allowed to access a printer or class</LI>
-
-		<LI><EM>Cancel All Jobs;</EM> You can now cancel
-		all jobs on a printer or class</LI>
-
-		<LI><EM>Move Job;</EM> You can now move an active
-		job to a different printer or class</LI>
-
-		<LI><EM>Move All Jobs;</EM> You can now move all
-		active jobs to a different printer or class</LI>
-
-		<LI><EM>Per-Printer Sharing;</EM> You can now
-		share (Publish) or hide (Unpublish) printers
-		individually</LI>
-
-		<LI><EM>Show All Jobs;</EM> You can now view all
-		jobs in addition to just the active or completed
-		jobs</LI>
+		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
@@ -174,99 +67,17 @@ HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 	<DT>IPP Support</DT>
 	<DD><OL START="31"></EM></LI>
 
-		<LI><EM>IPP Notifications;</EM> CUPS now supports
-		the complete IPP notification specification to
-		provide asynchronous event notification to
-		clients and users</LI>
+		<LI><EM>Printer Defaults;</EM> The <tt>document-forma-default</tt>, <tt>notify-events-default</tt>, and <tt>notify-lease-duration-default</tt> attributes can be set for each printer and class</LI>
 
-		<LI><EM>ippget Notification Scheme;</EM> CUPS now
-		supports the required <CODE>ippget</CODE> pull
-		method for event notification, allowing
-		applications to receive events asychronously</LI>
+		<LI><EM>Server-Side Options;</EM> Server-side default options can now be retrieved using the "printer-defaults" group keyword</LI>
 
-		<LI><EM>mailto Notification Scheme;</EM> CUPS now
-		supports <CODE>mailto</CODE> recipients as
-		proposed by the Printer Working Group, allowing
-		users to receive event notifications via
-		email</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>CUPS Extensions to IPP
-		Notifications;</EM> CUPS adds several server
-		events (start, stop, restart, and audit) that can
-		be monitored via the IPP notification
-		operations</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>CUPS-Get-Printers Improvements;</EM> The
-		CUPS-Get-Printers operation now returns all
-		queues by default and filters the results based
-		on the <CODE>requesting-user-name</CODE>
-		attribute</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Proxy Authentication;</EM> CUPS provides
-		the new CUPS-Authenticate-Job operation to
-		support proxy authentication of print jobs</LI>
-
-		<LI><EM>Unique Job IDs;</EM> CUPS maintains a new
-		<CODE>job-uuid</CODE> attribute which provides a
-		unique identifier that can be used to track a job
-		on your network or anywhere in the world</LI>
-
-		<LI><EM>port-monitor;</EM> CUPS now supports the
-		per-printer <CODE>port-monitor</CODE> and
-		<CODE>port-monitor-supported</CODE> attributes
-		for device-specific data/transport encoding</LI>
-
-		<LI><EM>printer-op-policy;</EM> CUPS supports new
-		<CODE>printer-op-policy</CODE> and
-		<CODE>printer-op-policy-supported</CODE>
-		attributes which provide per-printer fine-grained
-		access control policies</LI>
-
-		<LI><EM>printer-error-policy;</EM> CUPS supports
-		new <CODE>printer-error-policy</CODE> and
-		<CODE>printer-error-policy-supported</CODE>
-		attributes which provide per-printer control over
-		job error handling</LI>
-
-		<LI><EM>printer-is-shared;</EM> CUPS supports a
-		new <CODE>printer-is-shared</CODE> attribute
-		which provides per-printer sharing</LI>
-
-		<LI><EM>printer-state-change-time;</EM> CUPS now
-		tracks the last time and date of a change to the
-		printer configuration, enabled/disabled state, or
-		accepting/rejecting state</LI>
-
-		<LI><EM>printer-uri-supported;</EM> CUPS now
-		reports the IP address or hostname used by the
-		client in the <CODE>printer-uri-supported</CODE>
-		attribute - this prevents hostname resolution
-		issues on complex networks</LI>
-
-		<LI><EM>requested-attributes;</EM> CUPS now fully
-		supports limiting of attributes by name or group
-		- previously CUPS would only limit common
-		attributes and did not support attribute group
-		names</LI>
-
-		<LI><EM>Default Job Template Attributes;</EM>
-		CUPS now supports arbitrary default job template
-		attributes and applies them to print jobs as
-		needed</LI>
-
-		<LI><EM>which-jobs;</EM> The Get-Jobs operation
-		now supports a <CODE>which-jobs</CODE> value of
-		"all" to return all jobs regardless of state</LI>
-
-		<LI><EM>document-format-supported;</EM> The
-		<CODE>document-format-supported</CODE> attribute
-		now reflects the formats that are actually
-		supported by the printer</LI>
-
-		<LI><EM>printer-type;</EM> The
-		<CODE>printer-type</CODE> attribute now provides
-		bits for "not shared", "authenticated", and
-		"supports commands"</LI>
+		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
@@ -274,106 +85,13 @@ HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 	<DT>Scheduler</DT>
 	<DD><OL START="49">
 
-		<LI><EM>Remote Printer Caching;</EM> The scheduler
-		now maintains a remote printer cache so that
-		remote printers are not lost when the scheduler
-		or system is restarted</LI>
+		<LI><EM>Client Support;</EM> The scheduler now uses <tt>poll()</tt>, <tt>epoll()</tt>, or <var>/dev/kqueue</var> on platforms that provide them to support large numbers of clients</LI>
 
-		<LI><EM>Job Caching;</EM> The scheduler now
-		maintains a job cache so that completed jobs do
-		not need to be loaded into memory all of the time
-		- jobs are loaded and unloaded automatically for
-		optimum performance and memory usage</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Other Performance Improvements;</EM>
-		Thanks to new CUPS API interfaces, the schedule
-		now uses less memory, less CPU, and scales to
-		even larger installations</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Improved Logging;</EM> CUPS now logs the
-		IPP operation and status in in the
-		<VAR>access_log</VAR> file</LI>
-
-		<LI><EM>Policies;</EM> CUPS now provides
-		per-printer and server access control policies
-		based on IPP operations in addition to the
-		traditional location-based access control
-		available in previous releases</LI>
-
-		<LI><EM>DefaultAuthType;</EM> In conjunction with
-		the new policy support, CUPS now supports a
-		default authentication type that is used for IPP
-		operations requiring a username</LI>
-
-		<LI><EM>DefaultEncryption;</EM> When
-		authenticating a request, CUPS now uses the
-		<CODE>DefaultEncryption</CODE> setting in
-		addition to any location or policy encryption
-		setting in effect</LI>
-
-		<LI><EM>Per-Printer
-		document-format-supported;</EM> CUPS now
-		maintains per-printer
-		<CODE>document-format-supported</CODE> attributes
-		that reflect the formats that can be printed by a
-		particular printer</LI>
-
-		<LI><EM>Server-side Default Options;</EM> CUPS
-		now supports server-side default options for each
-		printer or class that are applied to new
-		jobs</LI>
-
-		<LI><EM>POSIX ACL Support;</EM> CUPS now uses
-		POSIX ACLs, when available, to allows multiple
-		system groups to be used for local certificate
-		authentication</LI>
-
-		<LI><EM>RunAsUser Removed;</EM> The insecure
-		RunAsUser mode has been removed in favor of OS
-		mechanisms such as SELinux</LI>
-
-		<LI><EM>Launchd Support;</EM> The schedule now
-		supports running via the MacOS X launchd program,
-		delaying cupsd startup until needed</LI>
-
-		<LI><EM>Dynamic Device Lookup;</EM> The scheduler
-		now queries the backends for devices as
-		needed - no more restarting to get new devices!</LI>
-
-		<LI><EM>Dynamic PPD/Printer Driver Lookup;</EM>
-		The scheduler now scans for PPD files and/or
-		printer drivers as needed - no more restarting
-		after installing drivers, and PPD files can be
-		generated dynamically!</LI>
-
-		<LI><EM>Port Monitor Support;</EM> CUPS now
-		supports "port monitor" filters between the
-		printer driver filters and backend to do printer-
-		and device-specific encoding and transport
-		functions.</LI>
-
-		<LI><EM>Multi-File Job Improvements;</EM> CUPS
-		now sends multi-file jobs in a single connection
-		to the printer or remote server, preserving the
-		order of jobs</LI>
-
-		<LI><EM>Environment Variable Support;</EM> The
-		scheduler now supports setting environment
-		variables for filters and CGI programs via the
-		Apache <CODE>PassEnv</CODE> and
-		<CODE>SetEnv</CODE> directives</LI>
-
-		<LI><EM>Improved CGI Support;</EM> The scheduler
-		now supports more of the CGI/1.1
-		specification</LI>
-
-		<LI><EM>Log Files;</EM> Log files are now
-		accessible via HTTP requests using the
-		<VAR>/conf/log/filename</VAR> resource</LI>
-
-		<LI><EM>Power Management;</EM> The scheduler now
-		responds to power management events from the
-		operating system (currently MacOS X only)</LI>
+		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
@@ -381,16 +99,13 @@ HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 	<DT>LPD Client Support</DT>
 	<DD><OL START="69">
 
-		<LI><EM>Performance Improvements;</EM> CUPS no
-		longer loads every available printer before
-		accepting a print job</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Banner Support;</EM> Banner pages can now
-		be requested by an LPD client, with server-side
-		overrides as desired</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Multi-File Support;</EM> CUPS now creates
-		a single IPP job for multi-file LPD jobs</LI>
+		<LI><EM>;</EM> </LI>
+
+		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
@@ -398,17 +113,13 @@ HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 	<DT>Localization and Internationalization</DT>
 	<DD><OL START="72">
 
-		<LI><EM>Command-Line Programs;</EM> All
-		command-line programs are now fully
-		localized</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Character Set Support;</EM> CUPS now
-		supports a wider range of character sets
-		including Big5 and Shift-JIS</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Globalized PPD Support;</EM> PPD files
-		can now contain multiple language
-		localizations</LI>
+		<LI><EM>;</EM> </LI>
+
+		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
@@ -416,34 +127,19 @@ HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 	<DT>Printer Drivers</DT>
 	<DD><OL START="75">
 
-		<LI><EM>New Drivers;</EM> CUPS 1.2 adds Zebra
-		CPCL and EPL label printer drivers</LI>
+		<LI><EM>Side-Channel API;</EM> This new API provides out-of-band control of devices</LI>
 
-		<LI><EM>Driver Interfaces;</EM> CUPS now supports
-		driver interfaces which allow a driver to
-		advertise the printers it supports and
-		automatically generate the PPD file as
-		needed</LI>
+		<LI><EM>PJL Support;</EM> New <tt>cupsPJLCharset</tt> attribute controls character set for PJL strings</LI>
 
-		<LI><EM>High-Definition Range Color;</EM> CUPS
-		1.2 adds 16-bit per channel color support</LI>
+		<LI><EM>HTTP API;</EM> The <tt>http_t</tt> structure is now completely private</LI>
 
-		<LI><EM>Raster Compression;</EM> The CUPS raster
-		format has been updated to use data
-		compression for faster printing</LI>
+		<LI><EM>Label Printer Driver;</EM> Added support for the Intellibar label printers</LI>
 
-		<LI><EM>Extended Printer Attributes;</EM> The
-		CUPS raster format has been extended to support
-		additional per-page printer-specific
-		attributes</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Back-Channel Data Support;</EM> Printer
-		drivers can now read data back from the printer
-		device</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Custom PPD Options;</EM> PPD files can
-		now contain options that accept custom
-		values</LI>
+		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
@@ -451,86 +147,16 @@ HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 	<DT>CUPS API</DT>
 	<DD><OL START="82">
 
-		<LI><EM>Thread Safety;</EM> All of the CUPS API
-		is now thread-safe on systems that support POSIX
-		threads</LI>
+		<LI><EM>Array API;</EM> New <tt>cupsArrayGetIndex()</tt> and <tt>cupsArrayGetInsert()</tt> functions</LI>
 
-		<LI><EM>Performance Improvements;</EM> Many of
-		the existing APIs have been optimized for
-		speed</LI>
+		<LI><EM>Destination API;</EM> New <tt>cupsRemoveDest()</tt> and <tt>cupsSetDefaultDest()</tt> functions</LI>
 
-		<LI><EM>Array API;</EM> The new array API
-		provides a generic array container and is used to
-		implement many of the new CUPS 1.2 features and
-		performance improvements</LI>
+		<LI><EM>;</EM> </LI>
 
-		<LI><EM>Directory API;</EM> The new directory API
-		allows applications to portably list the contents
-		of a directory</LI>
-
-		<LI><EM>File API;</EM> The new file API supports
-		optionally-compressed file IO and simple socket
-		communications without the limitations of
-		stdio</LI>
-
-		<LI><EM>HTTP API;</EM> The HTTP API now provides
-		many new URI and address handling functions,
-		accessor functions to key <CODE>http_t</CODE>
-		information, write-buffering functions, and large
-		file APIs</LI>
-
-		<LI><EM>IPP API;</EM> The IPP API now provides
-		functions to encode arbitrary options, add
-		<CODE>octetString</CODE> attributes, create
-		common IPP requests, convert IPP status and
-		operation code values to/from strings, and read
-		and write IPP messages via callbacks.</LI>
-
-		<LI><EM>PPD API;</EM> The PPD API has been
-		updated with new functions to support reading
-		from CUPS files, localization of globalized PPD
-		files, emission of arbitrary ranges of options,
-		custom option support, enhanced JCL support, and
-		access to all options in the PPD file</LI>
-
-		<LI><EM>Error Handling;</EM> The CUPS API now
-		provides a convenience function to get the full
-		error message of the last request</LI>
-
-		<LI><EM>Back-Channel API;</EM> The new
-		back-channel API provides backends and filters
-		with access to information sent back from a
-		printer</LI>
+		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
-
-	<DT>CUPS Imaging API</DT>
-	<DD><OL START="92">
-
-		<LI><EM>Image API;</EM> The new image API
-		provides access to image files of arbitrary size
-		and is based on the CUPS 1.1.x private image
-		filter APIs</LI>
-
-		<LI><EM>Raster API;</EM> The raster API provides
-		new functions to read and write the version 2
-		raster page headers, and a new function to
-		generate a page header from marked PPD
-		options</LI>
-
-	</OL></DD>
-
-	<DT>Scripting Support</DT>
-	<DD><OL START="94">
-
-		<LI><EM>PHP Bindings;</EM> The PHP language
-		bindings have been revamped to be more consistent
-		with the CUPS API and are now officially
-		supported and installed by default if you have
-		PHP installed on your system</LI>
-
-	</OL></DD>
 
 </DL>
 

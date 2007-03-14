@@ -1,5 +1,5 @@
 <TABLE CELLPADDING="0" CELLSPACING="0" WIDTH="100%" SUMMARY="Tareas de administraci&oacute;n">
-<TR><TD VALIGN="TOP" NOWRAP>
+<TR><TD VALIGN="TOP">
 
 <H2 CLASS="title">Impresoras</H2>
 
@@ -36,7 +36,7 @@ ALT="Administrar clases" CLASS="button"></A>
 trabajos" CLASS="button"></A>
 </P>
 
-</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 
 <H2 CLASS="title">Servidor</H2>
 
@@ -65,6 +65,7 @@ CLASS="button"></A>
 <P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Mostrar impresoras compartidas por otros sistemas<BR>
 <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Compartir impresoras p&uacute;blicas conectadas a este sistema<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Permitir administraci&oacute;n remota<BR>
 <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Permitir a los usuarios cancelar cualquier trabajo (no s&oacute;lo los suyos propios)<BR>
 <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Guardar informaci&oacute;n de depuraci&oacute;n para b&uacute;squeda de problemas</P>

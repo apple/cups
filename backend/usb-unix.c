@@ -1,11 +1,11 @@
 /*
- * "$Id: usb-unix.c 6234 2007-02-05 20:25:50Z mike $"
+ * "$Id: usb-unix.c 6293 2007-02-20 13:40:55Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
  *   This file is included from "usb.c" when compiled on UNIX/Linux.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -30,6 +30,7 @@
  *   print_device() - Print a file to a USB device.
  *   list_devices() - List all USB devices.
  *   open_device()  - Open a USB device...
+ *   side_cb()      - Handle side-channel requests...
  */
 
 /*
@@ -44,7 +45,8 @@
  * Local functions...
  */
 
-int	open_device(const char *uri, int *use_bc);
+static int	open_device(const char *uri, int *use_bc);
+static void	side_cb(int print_fd, int device_fd, int use_bc);
 
 
 /*
@@ -79,12 +81,14 @@ print_device(const char *uri,		/* I - Device URI */
   do
   {
    /*
-    * Disable backchannel data when printing to Canon or Minolta USB
-    * printers - apparently these printers will return the IEEE-1284
-    * device ID over and over and over when they get a read request...
+    * Disable backchannel data when printing to Brother, Canon, or
+    * Minolta USB printers - apparently these printers will return
+    * the IEEE-1284 device ID over and over and over when they get
+    * a read request...
     */
 
-    use_bc = strcasecmp(hostname, "Canon") &&
+    use_bc = strcasecmp(hostname, "Brother") &&
+             strcasecmp(hostname, "Canon") &&
              strcasecmp(hostname, "Konica Minolta") &&
              strcasecmp(hostname, "Minolta");
 
@@ -162,7 +166,7 @@ print_device(const char *uri,		/* I - Device URI */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, use_bc);
+    tbytes = backendRunLoop(print_fd, device_fd, use_bc, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
       fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
@@ -288,7 +292,7 @@ list_devices(void)
  * 'open_device()' - Open a USB device...
  */
 
-int					/* O - File descriptor or -1 on error */
+static int				/* O - File descriptor or -1 on error */
 open_device(const char *uri,		/* I - Device URI */
             int        *use_bc)		/* O - Set to 0 for unidirectional */
 {
@@ -526,5 +530,70 @@ open_device(const char *uri,		/* I - Device URI */
 
 
 /*
- * End of "$Id: usb-unix.c 6234 2007-02-05 20:25:50Z mike $".
+ * 'side_cb()' - Handle side-channel requests...
+ */
+
+static void
+side_cb(int print_fd,			/* I - Print file */
+        int device_fd,			/* I - Device file */
+	int use_bc)			/* I - Using back-channel? */
+{
+  cups_sc_command_t	command;	/* Request command */
+  cups_sc_status_t	status;		/* Request/response status */
+  char			data[2048];	/* Request/response data */
+  int			datalen;	/* Request/response data size */
+
+
+  datalen = sizeof(data);
+
+  if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
+  {
+    fputs("WARNING: Failed to read side-channel request!\n", stderr);
+    return;
+  }
+
+  switch (command)
+  {
+    case CUPS_SC_CMD_DRAIN_OUTPUT :
+        if (tcdrain(device_fd))
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else
+	  status = CUPS_SC_STATUS_OK;
+
+	datalen = 0;
+        break;
+
+    case CUPS_SC_CMD_GET_BIDI :
+        data[0] = use_bc;
+        datalen = 1;
+        break;
+
+    case CUPS_SC_CMD_GET_DEVICE_ID :
+        memset(data, 0, sizeof(data));
+
+        if (backendGetDeviceID(device_fd, data, sizeof(data) - 1,
+	                       NULL, 0, NULL, NULL, 0))
+        {
+	  status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	  datalen = 0;
+	}
+	else
+        {
+	  status  = CUPS_SC_STATUS_OK;
+	  datalen = strlen(data);
+	}
+        break;
+
+    default :
+        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	datalen = 0;
+	break;
+  }
+
+  cupsSideChannelWrite(command, status, data, datalen, 1.0);
+}
+
+
+/*
+ * End of "$Id: usb-unix.c 6293 2007-02-20 13:40:55Z mike $".
  */

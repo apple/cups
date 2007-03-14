@@ -1,5 +1,5 @@
 /*
- * "$Id: testnotify.c 5716 2006-07-11 17:56:57Z mike $"
+ * "$Id: testnotify.c 5715 2006-07-11 17:56:13Z mike $"
  *
  *   Test notifier for the Common UNIX Printing System (CUPS).
  *
@@ -289,5 +289,5 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
 
 
 /*
- * End of "$Id: testnotify.c 5716 2006-07-11 17:56:57Z mike $".
+ * End of "$Id: testnotify.c 5715 2006-07-11 17:56:13Z mike $".
  */

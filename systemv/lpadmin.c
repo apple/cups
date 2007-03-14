@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c 5926 2006-09-05 20:45:47Z mike $"
+ * "$Id: lpadmin.c 5925 2006-09-05 19:43:11Z mike $"
  *
  *   "lpadmin" command for the Common UNIX Printing System (CUPS).
  *
@@ -1986,5 +1986,5 @@ validate_name(const char *name)		/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c 5926 2006-09-05 20:45:47Z mike $".
+ * End of "$Id: lpadmin.c 5925 2006-09-05 19:43:11Z mike $".
  */

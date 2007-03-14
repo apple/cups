@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# "$Id: cups-config.in 5799 2006-08-03 00:54:38Z mike $"
+# "$Id: cups-config.in 5919 2006-08-31 04:20:45Z mike $"
 # 
 #   CUPS configuration utility.
 #
@@ -24,7 +24,7 @@
 #
 
 VERSION="@CUPS_VERSION@"
-APIVERSION="1.2"
+APIVERSION="1.3"
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
@@ -43,7 +43,7 @@ INSTALLSTATIC=@INSTALLSTATIC@
 # flags for C++ compiler:
 CFLAGS=""
 LDFLAGS="@EXPORT_LDFLAGS@"
-LIBS="@EXPORT_SSLLIBS@ @EXPORT_LIBZ@ @LIBS@"
+LIBS="@LIBGSSAPI@ @EXPORT_SSLLIBS@ @EXPORT_LIBZ@ @LIBS@"
 IMGLIBS="@EXPORT_LIBTIFF@ @EXPORT_LIBJPEG@ @EXPORT_LIBPNG@"
 
 # Check for local invocation...
@@ -151,5 +151,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in 5799 2006-08-03 00:54:38Z mike $".
+# End of "$Id: cups-config.in 5919 2006-08-31 04:20:45Z mike $".
 #

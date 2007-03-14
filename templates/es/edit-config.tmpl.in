@@ -9,6 +9,7 @@ function reset_config()
 "\\n" +
 "# Administrator user group...\\n" +
 "SystemGroup @CUPS_SYSTEM_GROUPS@\\n" +
+"@CUPS_SYSTEM_AUTHKEY@\\n" +
 "\\n" +
 "\\n" +
 "# Only listen for connections from the local machine.\\n" +
@@ -19,7 +20,7 @@ function reset_config()
 "# Show shared printers on the local network.\\n" +
 "Browsing On\\n" +
 "BrowseOrder allow,deny\\n" +
-"BrowseAllow @LOCAL\\n" +
+"BrowseAllow all\\n" +
 "\\n" +
 "\\n" +
 "# Authenticate against system accounts by default...\\n" +

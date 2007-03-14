@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c 5926 2006-09-05 20:45:47Z mike $"
+ * "$Id: lp.c 5925 2006-09-05 19:43:11Z mike $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
@@ -840,5 +840,5 @@ sighandler(int s)			/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c 5926 2006-09-05 20:45:47Z mike $".
+ * End of "$Id: lp.c 5925 2006-09-05 19:43:11Z mike $".
  */

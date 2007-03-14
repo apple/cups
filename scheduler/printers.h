@@ -1,9 +1,9 @@
 /*
- * "$Id: printers.h 5828 2006-08-15 21:21:45Z mike $"
+ * "$Id: printers.h 6318 2007-03-06 04:36:55Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -21,6 +21,10 @@
  *       EMail: cups-info@cups.org
  *         WWW: http://www.cups.org
  */
+
+#ifdef HAVE_DNSSD
+#  include <dns_sd.h>
+#endif /* HAVE_DNSSD */
 
 /*
  * Quota data...
@@ -67,7 +71,8 @@ typedef struct cupsd_printer_s
   char		*port_monitor;		/* Port monitor */
   int		raw;			/* Raw queue? */
   int		remote;			/* Remote queue? */
-  mime_type_t	*filetype;		/* Pseudo-filetype for printer */
+  mime_type_t	*filetype,		/* Pseudo-filetype for printer */
+		*prefiltertype;		/* Pseudo-filetype for pre-filters */
   cups_array_t	*filetypes;		/* Supported file types */
   void		*job;			/* Current job in queue */
   ipp_t		*attrs;			/* Attributes supported by this printer */
@@ -86,9 +91,21 @@ typedef struct cupsd_printer_s
   int		sequence_number;	/* Increasing sequence number */
   int		num_options;		/* Number of default options */
   cups_option_t	*options;		/* Default options */
+  int		num_auth_info_required;	/* Number of required auth fields */
+  const char	*auth_info_required[4];	/* Required authentication fields */
 #ifdef __APPLE__
   char		*recoverable;		/* com.apple.print.recoverable-message */
 #endif /* __APPLE__ */
+
+#ifdef HAVE_DNSSD
+  char		*reg_name,		/* Name used for service registration */
+		*product,		/* PPD Product string */
+		*pdl,			/* pdl value for TXT record */
+		*txt_record;		/* TXT record contents */
+  int		txt_len;		/* TXT record length */
+  DNSServiceRef	dnssd_ipp_ref;		/* DNSServiceRegister ref for _ipp */
+  int		dnssd_ipp_fd;		/* File descriptor for DNSServiceRegister reference */
+#endif /* HAVE_DNSSD */
 } cupsd_printer_t;
 
 
@@ -98,6 +115,8 @@ typedef struct cupsd_printer_s
 
 VAR ipp_t		*CommonData	VALUE(NULL);
 					/* Common printer object attrs */
+VAR cups_array_t	*CommonDefaults	VALUE(NULL);
+					/* Common -default option names */
 VAR cups_array_t	*Printers	VALUE(NULL),
 					/* Printer list */
 			*ImplicitPrinters VALUE(NULL);
@@ -117,7 +136,8 @@ VAR cupsd_policy_t	*DefaultPolicyPtr
 
 extern cupsd_printer_t	*cupsdAddPrinter(const char *name);
 extern void		cupsdAddPrinterHistory(cupsd_printer_t *p);
-extern void		cupsdAddPrinterUser(cupsd_printer_t *p, const char *username);
+extern void		cupsdAddPrinterUser(cupsd_printer_t *p,
+			                    const char *username);
 extern void		cupsdCreateCommonData(void);
 extern void		cupsdDeleteAllPrinters(void);
 extern void		cupsdDeletePrinter(cupsd_printer_t *p, int update);
@@ -126,26 +146,31 @@ extern cupsd_printer_t	*cupsdFindPrinter(const char *name);
 extern void		cupsdFreePrinterUsers(cupsd_printer_t *p);
 extern void		cupsdFreeQuotas(cupsd_printer_t *p);
 extern void		cupsdLoadAllPrinters(void);
-extern void		cupsdRenamePrinter(cupsd_printer_t *p, const char *name);
+extern void		cupsdRenamePrinter(cupsd_printer_t *p,
+			                   const char *name);
+extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
+			                  int buflen);
 extern void		cupsdSaveAllPrinters(void);
+extern int		cupsdSetAuthInfoRequired(cupsd_printer_t *p,
+			                         const char *values,
+						 ipp_attribute_t *attr);
 extern void		cupsdSetPrinterAttrs(cupsd_printer_t *p);
-extern void		cupsdSetPrinterReasons(cupsd_printer_t *p, const char *s);
-extern void		cupsdSetPrinterState(cupsd_printer_t *p, ipp_pstate_t s, int update);
+extern void		cupsdSetPrinterReasons(cupsd_printer_t *p,
+			                       const char *s);
+extern void		cupsdSetPrinterState(cupsd_printer_t *p, ipp_pstate_t s,
+			                     int update);
 #define			cupsdStartPrinter(p,u) cupsdSetPrinterState((p), IPP_PRINTER_IDLE, (u))
 extern void		cupsdStopPrinter(cupsd_printer_t *p, int update);
 extern void		cupsdUpdatePrinters(void);
-extern cupsd_quota_t	*cupsdUpdateQuota(cupsd_printer_t *p, const char *username,
-			                  int pages, int k);
-extern const char	*cupsdValidateDest(const char *hostname,
-			        	   const char *resource,
+extern cupsd_quota_t	*cupsdUpdateQuota(cupsd_printer_t *p,
+			                  const char *username, int pages,
+					  int k);
+extern const char	*cupsdValidateDest(const char *uri,
 			        	   cups_ptype_t *dtype,
 					   cupsd_printer_t **printer);
 extern void		cupsdWritePrintcap(void);
 
-extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
-			                  int buflen);
-
 
 /*
- * End of "$Id: printers.h 5828 2006-08-15 21:21:45Z mike $".
+ * End of "$Id: printers.h 6318 2007-03-06 04:36:55Z mike $".
  */

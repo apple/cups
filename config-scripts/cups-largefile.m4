@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-largefile.m4 4732 2005-09-30 23:23:25Z mike $"
+dnl "$Id: cups-largefile.m4 6330 2007-03-12 14:50:45Z mike $"
 dnl
 dnl   Large file support stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -30,11 +30,11 @@ LARGEFILE=""
 if test x$enable_largefile != xno; then
 	LARGEFILE="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE"
 
-	if test $ac_cv_sys_large_files = 1; then
+	if test x$ac_cv_sys_large_files = x1; then
 		LARGEFILE="$LARGEFILE -D_LARGE_FILES"
 	fi
 
-	if test $ac_cv_sys_file_offset_bits = 64; then
+	if test x$ac_cv_sys_file_offset_bits = x64; then
 		LARGEFILE="$LARGEFILE -D_FILE_OFFSET_BITS=64"
 	fi
 fi
@@ -57,5 +57,5 @@ fi
 AC_CHECK_FUNC(strtoll, AC_DEFINE(HAVE_STRTOLL))
 
 dnl
-dnl End of "$Id: cups-largefile.m4 4732 2005-09-30 23:23:25Z mike $".
+dnl End of "$Id: cups-largefile.m4 6330 2007-03-12 14:50:45Z mike $".
 dnl

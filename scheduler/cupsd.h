@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h 5305 2006-03-18 03:05:12Z mike $"
+ * "$Id: cupsd.h 6170 2007-01-02 17:26:41Z mike $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -151,13 +151,17 @@ extern const char *cups_hstrerror(int);
 
 
 /*
+ * Select callback function type...
+ */
+
+typedef void (*cupsd_selfunc_t)(void *data);
+
+
+/*
  * Globals...
  */
 
-VAR int			MaxFDs,		/* Maximum number of files */
-			SetSize;	/* The size of the input/output sets */
-VAR fd_set		*InputSet,	/* Input files for select() */
-			*OutputSet;	/* Output files for select() */
+VAR int			MaxFDs;		/* Maximum number of files */
 
 VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
@@ -200,9 +204,18 @@ extern int	cupsdEndProcess(int pid, int force);
 extern const char *cupsdFinishProcess(int pid, char *name, int namelen);
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
-				  int errfd, int backfd, int root, int *pid);
+				  int errfd, int backfd, int sidefd,
+				  int root, int *pid);
+
+extern int	cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
+		               cupsd_selfunc_t write_cb, void *data);
+extern int	cupsdDoSelect(long timeout);
+extern int	cupsdIsSelecting(int fd);
+extern void	cupsdRemoveSelect(int fd);
+extern void	cupsdStartSelect(void);
+extern void	cupsdStopSelect(void);
 
 
 /*
- * End of "$Id: cupsd.h 5305 2006-03-18 03:05:12Z mike $".
+ * End of "$Id: cupsd.h 6170 2007-01-02 17:26:41Z mike $".
  */

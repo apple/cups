@@ -1,9 +1,9 @@
 /*
- * "$Id: process.c 5376 2006-04-06 20:32:07Z mike $"
+ * "$Id: process.c 6326 2007-03-11 17:50:18Z mike $"
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -121,6 +121,7 @@ cupsdStartProcess(
     int        outfd,			/* I - Standard output file descriptor */
     int        errfd,			/* I - Standard error file descriptor */
     int        backfd,			/* I - Backchannel file descriptor */
+    int        sidefd,			/* I - Sidechannel file descriptor */
     int        root,			/* I - Run as root? */
     int        *pid)			/* O - Process ID */
 {
@@ -161,7 +162,7 @@ cupsdStartProcess(
 		 linkpath);
       else
 	snprintf(processPath, sizeof(processPath), "CFProcessPath=%s/%s",
-		 dirname(command), linkpath);
+		 dirname((char *)command), linkpath);
     }
     else
       snprintf(processPath, sizeof(processPath), "CFProcessPath=%s", command);
@@ -216,6 +217,12 @@ cupsdStartProcess(
       else
         open("/dev/null", O_RDWR);
       fcntl(3, F_SETFL, O_NDELAY);
+    }
+    if (sidefd != 4 && sidefd > 0)
+    {
+      close(4);
+      dup(sidefd);
+      fcntl(4, F_SETFL, O_NDELAY);
     }
 
    /*
@@ -344,5 +351,5 @@ compare_procs(cupsd_proc_t *a,		/* I - First process */
 
 
 /*
- * End of "$Id: process.c 5376 2006-04-06 20:32:07Z mike $".
+ * End of "$Id: process.c 6326 2007-03-11 17:50:18Z mike $".
  */

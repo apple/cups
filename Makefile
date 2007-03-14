@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 6128 2006-12-05 16:07:23Z mike $"
+# "$Id: Makefile 6332 2007-03-12 16:08:51Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -69,7 +69,8 @@ distclean:	clean
 	$(RM) man/cups-deviced.man man/cups-driverd.man
 	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
 	$(RM) man/cupsd.conf.man man/lpoptions.man
-	$(RM) packaging/cups templates/edit-config.tmpl templates/header.tmpl
+	$(RM) packaging/cups.list
+	$(RM) templates/edit-config.tmpl templates/header.tmpl
 	-$(RM) doc/*/index.html
 	-$(RM) templates/*/edit-config.tmpl
 	-$(RM) templates/*/header.tmpl
@@ -103,14 +104,17 @@ install:	installhdrs
 		echo Installing init scripts...; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/init.d; \
 		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
+		for level in $(RCLEVELS); do \
+			$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc$${level}.d; \
+			$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc$${level}.d/S$(RCSTART)cups; \
+			if test `uname` = HP-UX; then \
+				level=`expr $$level - 1`; \
+				$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc$${level}.d; \
+			fi; \
+			$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc$${level}.d/K$(RCSTOP)cups; \
+		done; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc0.d; \
-		$(INSTALL_SCRIPT) init/cups.sh  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc2.d; \
-		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc2.d/S99cups; \
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc3.d; \
-		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc3.d/S99cups; \
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc5.d; \
-		$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
+		$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc0.d/K$(RCSTOP)cups; \
 	fi
 	if test "x$(INITDIR)" = x -a "x$(INITDDIR)" != x; then \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
@@ -131,26 +135,29 @@ install:	installhdrs
 	fi
 	if test "x$(DBUSDIR)" != x; then \
 		echo Installing cups.conf in $(DBUSDIR)...;\
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(DBUSDIR); \
-		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/cups.conf; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(DBUSDIR)/system.d; \
+		$(INSTALL_DATA) packaging/cups-dbus.conf $(BUILDROOT)$(DBUSDIR)/system.d/cups.conf; \
 	fi
 	if test "x$(XINETD)" != x; then \
 		echo Installing xinetd configuration file for cups-lpd...; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(XINETD); \
 		$(INSTALL_DATA) init/cups-lpd $(BUILDROOT)$(XINETD)/cups-lpd; \
 	fi
-	if test -d /usr/share/applications; then \
+	if test "x$(MENUDIR)" != x; then \
+		echo Installing desktop menu...; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(MENUDIR); \
+		$(INSTALL_DATA) desktop/cups.desktop $(BUILDROOT)$(MENUDIR); \
+	fi
+	if test "x$(ICONDIR)" != x; then \
 		echo Installing desktop icons...; \
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/applications; \
-		$(INSTALL_DATA) desktop/cups.desktop $(BUILDROOT)/usr/share/applications; \
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/icons/hicolor/16x16/apps; \
-		$(INSTALL_DATA) desktop/cups-16.png $(BUILDROOT)/usr/share/icons/hicolor/16x16/apps/cups.png; \
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/icons/hicolor/32x32/apps; \
-		$(INSTALL_DATA) desktop/cups-32.png $(BUILDROOT)/usr/share/icons/hicolor/32x32/apps/cups.png; \
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/icons/hicolor/64x64/apps; \
-		$(INSTALL_DATA) desktop/cups-64.png $(BUILDROOT)/usr/share/icons/hicolor/64x64/apps/cups.png; \
-		$(INSTALL_DIR) -m 755 $(BUILDROOT)/usr/share/icons/hicolor/128x128/apps; \
-		$(INSTALL_DATA) desktop/cups-128.png $(BUILDROOT)/usr/share/icons/hicolor/128x128/apps/cups.png; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(ICONDIR)/hicolor/16x16/apps; \
+		$(INSTALL_DATA) desktop/cups-16.png $(BUILDROOT)$(ICONDIR)/hicolor/16x16/apps/cups.png; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(ICONDIR)/hicolor/32x32/apps; \
+		$(INSTALL_DATA) desktop/cups-32.png $(BUILDROOT)$(ICONDIR)/hicolor/32x32/apps/cups.png; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(ICONDIR)/hicolor/64x64/apps; \
+		$(INSTALL_DATA) desktop/cups-64.png $(BUILDROOT)$(ICONDIR)/hicolor/64x64/apps/cups.png; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(ICONDIR)/hicolor/128x128/apps; \
+		$(INSTALL_DATA) desktop/cups-128.png $(BUILDROOT)$(ICONDIR)/hicolor/128x128/apps/cups.png; \
 	fi
 
 
@@ -263,5 +270,5 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 6128 2006-12-05 16:07:23Z mike $".
+# End of "$Id: Makefile 6332 2007-03-12 16:08:51Z mike $".
 #

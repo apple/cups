@@ -101,6 +101,7 @@ require CUPS 1.1 or higher.</p>
 <tr><td><tt>HTTP_AUTH_MD5_INT</tt> </td><td>Digest authentication in use for body</td></tr>
 <tr><td><tt>HTTP_AUTH_MD5_SESS</tt> </td><td>MD5-session authentication in use</td></tr>
 <tr><td><tt>HTTP_AUTH_MD5_SESS_INT</tt> </td><td>MD5-session authentication in use for body</td></tr>
+<tr><td><tt>HTTP_AUTH_NEGOTIATE</tt> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></td><td>GSSAPI authentication in use </td></tr>
 <tr><td><tt>HTTP_AUTH_NONE</tt> </td><td>No authentication in use</td></tr>
 </tbody></table></div>
 <!-- NEW PAGE -->
@@ -3011,7 +3012,7 @@ typedef enum <a href='#http_encryption_e'>http_encryption_e</a> http_encryption_
 <!-- NEW PAGE -->
 <h3 class='title'><a name='http_t'>http_t</a></h3>
 <h4>Description</h4>
-<p>HTTP connection structure.</p>
+<p>HTTP connection type</p>
 <h4>Definition</h4>
 <pre>
 typedef struct _http_s http_t;

@@ -1,5 +1,5 @@
 /*
- * "$Id: testsub.c 5940 2006-09-11 18:30:09Z mike $"
+ * "$Id: testsub.c 5938 2006-09-11 18:23:46Z mike $"
  *
  *   Scheduler notification tester for the Common UNIX Printing System (CUPS).
  *
@@ -527,5 +527,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testsub.c 5940 2006-09-11 18:30:09Z mike $".
+ * End of "$Id: testsub.c 5938 2006-09-11 18:23:46Z mike $".
  */

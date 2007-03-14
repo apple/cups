@@ -1,5 +1,5 @@
 /*
- * "$Id: sysman.c 6090 2006-11-14 16:35:27Z mike $"
+ * "$Id: sysman.c 6291 2007-02-19 21:54:27Z mike $"
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
@@ -160,10 +160,8 @@ cupsdStartSystemMonitor(void)
     return;
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStartSystemMonitor: Adding fd %d to InputSet...",
-                  SysEventPipes[0]);
-  FD_SET(SysEventPipes[0], InputSet);
+  cupsdAddSelect(SysEventPipes[0], (cupsd_selfunc_t)cupsdUpdateSystemMonitor,
+                 NULL, NULL);
 
  /*
   * Set non-blocking mode on the descriptor we will be receiving notification
@@ -220,12 +218,7 @@ cupsdStopSystemMonitor(void)
 
   if (SysEventPipes[0] >= 0)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStopSystemMonitor: Removing fd %d from InputSet...",
-	            SysEventPipes[0]);
-
-    FD_CLR(SysEventPipes[0], InputSet);
-
+    cupsdRemoveSelect(SysEventPipes[0]);
     cupsdClosePipe(SysEventPipes);
   }
 }
@@ -314,7 +307,7 @@ cupsdUpdateSystemMonitor(void)
 	{
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "Deregistering local printer \"%s\"", p->name);
-	  cupsdSendBrowseDelete(p);
+	  cupsdDeregisterPrinter(p, 0);
 	}
       }
 
@@ -370,18 +363,19 @@ cupsdUpdateSystemMonitor(void)
 	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
 	     p;
 	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
-	  cupsdSendBrowseDelete(p);
+	  cupsdDeregisterPrinter(p, 1);
 
        /*
 	* Now re-register them...
-	*
-	* TODO: This might need updating for MDNS.
 	*/
 
 	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
 	     p;
 	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
+	{
 	  p->browse_time = 0;
+	  cupsdRegisterPrinter(p);
+	}
       }
       else
         cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -757,5 +751,5 @@ sysEventTimerNotifier(
 
 
 /*
- * End of "$Id: sysman.c 6090 2006-11-14 16:35:27Z mike $".
+ * End of "$Id: sysman.c 6291 2007-02-19 21:54:27Z mike $".
  */

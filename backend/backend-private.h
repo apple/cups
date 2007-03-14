@@ -1,9 +1,9 @@
 /*
- * "$Id: backend-private.h 5771 2006-07-20 18:06:20Z mike $"
+ * "$Id: backend-private.h 6170 2007-01-02 17:26:41Z mike $"
  *
  *   Backend support definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -33,6 +33,7 @@
  */
 
 #  include <cups/backend.h>
+#  include <cups/sidechannel.h>
 #  include <cups/cups.h>
 #  include <cups/debug.h>
 #  include <stdlib.h>
@@ -59,7 +60,9 @@ extern int	backendGetDeviceID(int fd, char *device_id, int device_id_size,
 				   const char *scheme, char *uri, int uri_size);
 extern int	backendGetMakeModel(const char *device_id, char *make_model,
 			            int make_model_size);
-extern ssize_t	backendRunLoop(int print_fd, int device_fd, int use_bc);
+extern ssize_t	backendRunLoop(int print_fd, int device_fd, int use_bc,
+		               void (*side_cb)(int print_fd, int device_fd,
+			                       int use_bc));
 
 
 #  ifdef __cplusplus
@@ -69,5 +72,5 @@ extern ssize_t	backendRunLoop(int print_fd, int device_fd, int use_bc);
 
 
 /*
- * End of "$Id: backend-private.h 5771 2006-07-20 18:06:20Z mike $".
+ * End of "$Id: backend-private.h 6170 2007-01-02 17:26:41Z mike $".
  */

@@ -1,5 +1,5 @@
 //
-// "$Id: pdftops.cxx 4906 2006-01-10 20:53:28Z mike $"
+// "$Id: pdftops.cxx 6324 2007-03-11 02:09:46Z mike $"
 //
 //   PDF to PostScript filter front-end for the Common UNIX Printing
 //   System (CUPS).
@@ -279,9 +279,16 @@ main(int  argc,				// I - Number of command-line args
 
   globalParams = new GlobalParams(buffer);
 
-  globalParams->setPSPaperWidth(width);
-  globalParams->setPSPaperHeight(length);
-  globalParams->setPSImageableArea(left, bottom, right, top);
+  if (fit || globalParams->getPSPaperWidth() > 0)
+  {
+    // Only set paper size and area if we are fitting to the job's
+    // page size or the pdftops.conf file does not contain
+    // "psPaperSize match"...
+    globalParams->setPSPaperWidth(width);
+    globalParams->setPSPaperHeight(length);
+    globalParams->setPSImageableArea(left, bottom, right, top);
+  }
+
   globalParams->setPSDuplex(duplex);
   globalParams->setPSExpandSmaller(fit);
   globalParams->setPSShrinkLarger(fit);
@@ -341,5 +348,5 @@ main(int  argc,				// I - Number of command-line args
 
 
 //
-// End of "$Id: pdftops.cxx 4906 2006-01-10 20:53:28Z mike $".
+// End of "$Id: pdftops.cxx 6324 2007-03-11 02:09:46Z mike $".
 //

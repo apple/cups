@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makefile 5919 2006-08-31 04:20:45Z mike $"
 #
 #   IPP test makefile for the Common UNIX Printing System (CUPS).
 #
@@ -69,7 +69,7 @@ uninstall:
 ipptest:	ipptest.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o ipptest ipptest.o  ../cups/libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -80,5 +80,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
+# End of "$Id: Makefile 5919 2006-08-31 04:20:45Z mike $".
 #

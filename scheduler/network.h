@@ -1,5 +1,5 @@
 /*
- * "$Id: network.h 6090 2006-11-14 16:35:27Z mike $"
+ * "$Id: network.h 6086 2006-11-14 15:43:55Z mike $"
  *
  *   Network interface definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -57,5 +57,5 @@ extern void		cupsdNetIFUpdate(void);
 
 
 /*
- * End of "$Id: network.h 6090 2006-11-14 16:35:27Z mike $".
+ * End of "$Id: network.h 6086 2006-11-14 15:43:55Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: jobs.c 5104 2006-02-15 03:21:04Z mike $"
+ * "$Id: jobs.c 6277 2007-02-14 16:07:28Z mike $"
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -181,6 +181,20 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
   ippDelete(cupsDoRequest(http, request, "/jobs"));
 
+  if (cupsLastError() <= IPP_OK_CONFLICT && getenv("HTTP_REFERER"))
+  {
+   /*
+    * Redirect successful updates back to the parent page...
+    */
+
+    char	url[1024];		/* Encoded URL */
+
+
+    strcpy(url, "5;URL=");
+    cgiFormEncode(url + 6, getenv("HTTP_REFERER"), sizeof(url) - 6);
+    cgiSetVariable("refresh_page", url);
+  }
+
   cgiStartHTML(cgiText(_("Jobs")));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
@@ -199,5 +213,5 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: jobs.c 5104 2006-02-15 03:21:04Z mike $".
+ * End of "$Id: jobs.c 6277 2007-02-14 16:07:28Z mike $".
  */

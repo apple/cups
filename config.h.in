@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 6238 2007-02-06 16:04:25Z mike $"
+ * "$Id: config.h.in 6304 2007-02-22 22:06:23Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -75,6 +75,13 @@
  */
 
 #define CUPS_DEFAULT_PRINTCAP	"/etc/printcap"
+
+
+/*
+ * Default MaxCopies value...
+ */
+
+#define CUPS_DEFAULT_MAX_COPIES	100
 
 
 /*
@@ -271,6 +278,7 @@
  * What Security framework headers do we have?
  */
 
+#undef HAVE_AUTHORIZATION_H
 #undef HAVE_SECPOLICY_H
 #undef HAVE_SECPOLICYPRIV_H
 #undef HAVE_SECBASEPRIV_H
@@ -304,6 +312,21 @@
  */
 
 #undef HAVE_LIBPAPER
+
+
+/*
+ * Do we have DNS Service Discovery (aka Bonjour)?
+ */
+
+#undef HAVE_DNSSD
+
+
+/*
+ * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
+ */
+
+#undef HAVE_COREFOUNDATION
+#undef HAVE_SYSTEMCONFIGURATION
 
 
 /*
@@ -468,8 +491,39 @@
 #undef HAVE_APPLETALK_AT_PROTO_H
 
 
+/*
+ * Do we have the GSSAPI support library (for Kerberos support)?
+ */
+
+#undef HAVE_GSSAPI
+#undef HAVE_GSSAPI_H
+#undef HAVE_GSSAPI_GSSAPI_H
+#undef HAVE_GSSAPI_GSSAPI_GENERIC_H
+#undef HAVE_GSSAPI_GSSAPI_KRB5_H
+#undef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY
+#undef HAVE_GSS_C_NT_HOSTBASED_SERVICE
+#undef HAVE_KRB5_H
+#undef HAVE_HEIMDAL
+
+
+/*
+ * Default GSS service name...
+ */
+
+#define CUPS_DEFAULT_GSSSERVICENAME	""
+
+
+/*
+ * Select/poll interfaces...
+ */
+
+#undef HAVE_POLL
+#undef HAVE_EPOLL
+#undef HAVE_KQUEUE
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 6238 2007-02-06 16:04:25Z mike $".
+ * End of "$Id: config.h.in 6304 2007-02-22 22:06:23Z mike $".
  */

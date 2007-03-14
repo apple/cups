@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 6262 2007-02-11 16:59:33Z mike $"
+ * "$Id: adminutil.c 6270 2007-02-12 14:27:47Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -768,6 +768,7 @@ _cupsAdminGetServerSettings(
 
     int		remote_access = 0,	/* Remote access allowed? */
 		remote_admin = 0,	/* Remote administration allowed? */
+		remote_any = 0,		/* Remote access from anywhere allowed? */
 		browsing = 1,		/* Browsing enabled? */
 		browse_allow = 1,	/* Browse address set? */
 		browse_address = 0,	/* Browse address set? */
@@ -900,6 +901,9 @@ _cupsAdminGetServerSettings(
 	       )
       {
 	remote_admin = 1;
+
+	if (!strcasecmp(value, "all"))
+	  remote_any = 1;
       }
       else if (line[0] != '<' && !in_location && !in_policy)
         cg->cupsd_num_settings = cupsAddOption(line, value,
@@ -917,6 +921,11 @@ _cupsAdminGetServerSettings(
     cg->cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ADMIN,
                                            (remote_access && remote_admin) ?
 					       "1" : "0",
+					   cg->cupsd_num_settings,
+					   &(cg->cupsd_settings));
+
+    cg->cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
+                                           remote_any ? "1" : "0",
 					   cg->cupsd_num_settings,
 					   &(cg->cupsd_settings));
 
@@ -992,6 +1001,7 @@ _cupsAdminSetServerSettings(
   int		remote_printers,	/* Show remote printers */
 		share_printers,		/* Share local printers */
 		remote_admin,		/* Remote administration allowed? */
+		remote_any,		/* Remote access from anywhere? */
 		user_cancel_any,	/* Cancel-job policy set? */
 		debug_logging;		/* LogLevel debug set? */
   int		wrote_port_listen,	/* Wrote the port/listen lines? */
@@ -1060,6 +1070,12 @@ _cupsAdminSetServerSettings(
   else
     old_remote_admin = 0;
 
+  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ANY, cupsd_num_settings,
+                           cupsd_settings)) != NULL)
+    remote_any = atoi(val);
+  else
+    remote_any = 0;
+
   if ((val = cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS, cupsd_num_settings,
                            cupsd_settings)) != NULL)
     old_remote_printers = atoi(val);
@@ -1101,12 +1117,16 @@ _cupsAdminSetServerSettings(
   else
     debug_logging = -1;
 
+  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ANY, num_settings,
+                           settings)) != NULL)
+    remote_any = atoi(val);
+
   if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ADMIN, num_settings,
                            settings)) != NULL)
   {
     remote_admin = atoi(val);
 
-    if (remote_admin == old_remote_admin)
+    if (remote_admin == old_remote_admin && remote_any < 0)
     {
      /*
       * No change to this setting...
@@ -1140,7 +1160,7 @@ _cupsAdminSetServerSettings(
   {
     share_printers = atoi(val);
 
-    if (share_printers == old_share_printers)
+    if (share_printers == old_share_printers && remote_any < 0)
     {
      /*
       * No change to this setting...
@@ -1278,7 +1298,7 @@ _cupsAdminSetServerSettings(
 	  cupsFilePuts(temp, "BrowseOrder allow,deny\n");
 
 	  if (remote_printers > 0)
-	    cupsFilePuts(temp, "BrowseAllow @LOCAL\n");
+	    cupsFilePuts(temp, "BrowseAllow all\n");
 
 	  if (share_printers > 0)
 	    cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
@@ -1366,7 +1386,8 @@ _cupsAdminSetServerSettings(
         cupsFilePuts(temp, "  Order allow,deny\n");
 
 	if (remote_admin)
-	  cupsFilePuts(temp, "  Allow @LOCAL\n");
+	  cupsFilePrintf(temp, "  Allow %s\n",
+	                 remote_any > 0 ? "all" : "@LOCAL");
 	else
 	  cupsFilePuts(temp, "  Allow localhost\n");
       }
@@ -1384,7 +1405,8 @@ _cupsAdminSetServerSettings(
         cupsFilePuts(temp, "  Order allow,deny\n");
 
 	if (remote_admin)
-	  cupsFilePuts(temp, "  Allow @LOCAL\n");
+	  cupsFilePrintf(temp, "  Allow %s\n",
+	                 remote_any > 0 ? "all" : "@LOCAL");
 	else
 	  cupsFilePuts(temp, "  Allow localhost\n");
       }
@@ -1405,7 +1427,8 @@ _cupsAdminSetServerSettings(
         cupsFilePuts(temp, "  Order allow,deny\n");
 
 	if (remote_admin > 0 || share_printers > 0)
-	  cupsFilePuts(temp, "  Allow @LOCAL\n");
+	  cupsFilePrintf(temp, "  Allow %s\n",
+	                 remote_any > 0 ? "all" : "@LOCAL");
 	else
 	  cupsFilePuts(temp, "  Allow localhost\n");
       }
@@ -1564,7 +1587,7 @@ _cupsAdminSetServerSettings(
       cupsFilePuts(temp, "BrowseOrder allow,deny\n");
 
       if (remote_printers > 0)
-	cupsFilePuts(temp, "BrowseAllow @LOCAL\n");
+	cupsFilePuts(temp, "BrowseAllow all\n");
 
       if (share_printers > 0)
 	cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
@@ -1626,7 +1649,7 @@ _cupsAdminSetServerSettings(
                        "  Order allow,deny\n");
 
     if (remote_admin > 0 || share_printers > 0)
-      cupsFilePuts(temp, "  Allow @LOCAL\n");
+      cupsFilePrintf(temp, "  Allow %s\n", remote_any > 0 ? "all" : "@LOCAL");
     else
       cupsFilePuts(temp, "  Allow localhost\n");
 
@@ -1644,7 +1667,7 @@ _cupsAdminSetServerSettings(
                        "  Order allow,deny\n");
 
     if (remote_admin)
-      cupsFilePuts(temp, "  Allow @LOCAL\n");
+      cupsFilePrintf(temp, "  Allow %s\n", remote_any > 0 ? "all" : "@LOCAL");
     else
       cupsFilePuts(temp, "  Allow localhost\n");
 
@@ -1665,7 +1688,7 @@ _cupsAdminSetServerSettings(
                        "  Order allow,deny\n");
 
     if (remote_admin)
-      cupsFilePuts(temp, "  Allow @LOCAL\n");
+      cupsFilePrintf(temp, "  Allow %s\n", remote_any > 0 ? "all" : "@LOCAL");
     else
       cupsFilePuts(temp, "  Allow localhost\n");
 
@@ -1768,6 +1791,10 @@ _cupsAdminSetServerSettings(
       cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ADMIN,
                                 	 old_remote_admin ? "1" : "0",
 					 cupsd_num_settings, &cupsd_settings);
+
+    cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
+                                       remote_any ? "1" : "0",
+				       cupsd_num_settings, &cupsd_settings);
 
     if (remote_printers >= 0)
       cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
@@ -2128,5 +2155,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 6262 2007-02-11 16:59:33Z mike $".
+ * End of "$Id: adminutil.c 6270 2007-02-12 14:27:47Z mike $".
  */

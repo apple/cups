@@ -1,5 +1,5 @@
 /*
- * "$Id: common.h 6003 2006-10-02 16:26:04Z mike $"
+ * "$Id: common.h 5997 2006-10-02 15:33:05Z mike $"
  *
  *   Common filter definitions for the Common UNIX Printing System (CUPS).
  *
@@ -89,5 +89,5 @@ extern void	WriteTextComment(const char *name, const char *value);
 
 
 /*
- * End of "$Id: common.h 6003 2006-10-02 16:26:04Z mike $".
+ * End of "$Id: common.h 5997 2006-10-02 15:33:05Z mike $".
  */

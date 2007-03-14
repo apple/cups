@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 6188 2007-01-10 16:23:06Z mike $"
+ * "$Id: http-private.h 6187 2007-01-10 16:20:42Z mike $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -55,6 +55,24 @@
 #    define closesocket(f) close(f)
 #  endif /* WIN32 */
 
+#  ifdef HAVE_GSSAPI
+#    ifdef HAVE_GSSAPI_GSSAPI_H
+#      include <gssapi/gssapi.h>
+#    endif /* HAVE_GSSAPI_GSSAPI_H */
+#    ifdef HAVE_GSSAPI_GSSAPI_GENERIC_H
+#      include <gssapi/gssapi_generic.h>
+#    endif /* HAVE_GSSAPI_GSSAPI_GENERIC_H */
+#    ifdef HAVE_GSSAPI_GSSAPI_KRB5_H
+#      include <gssapi/gssapi_krb5.h>
+#    endif /* HAVE_GSSAPI_GSSAPI_KRB5_H */
+#    ifdef HAVE_GSSAPI_H
+#      include <gssapi.h>
+#    endif /* HAVE_GSSAPI_H */
+#    ifndef HAVE_GSS_C_NT_HOSTBASED_SERVICE
+#      define GSS_C_NT_HOSTBASED_SERVICE gss_nt_service_name
+#    endif /* !HAVE_GSS_C_NT_HOSTBASED_SERVICE */
+#  endif /* HAVE_GSSAPI */
+
 #  if defined(__sgi) || (defined(__APPLE__) && !defined(_SOCKLEN_T))
 /*
  * IRIX and MacOS X 10.2.x do not define socklen_t, and in fact use an int instead of
@@ -65,6 +83,7 @@ typedef int socklen_t;
 #  endif /* __sgi || (__APPLE__ && !_SOCKLEN_T) */
 
 #  include "http.h"
+#  include "md5.h"
 #  include "ipp-private.h"
 
 #  if defined HAVE_LIBSSL
@@ -118,6 +137,64 @@ extern OSStatus	_httpReadCDSA(SSLConnectionRef connection, void *data,
 extern OSStatus	_httpWriteCDSA(SSLConnectionRef connection, const void *data,
 		               size_t *dataLength);
 #  endif /* HAVE_LIBSSL */
+
+
+struct _http_s				/**** HTTP connection structure. ****/
+{
+  int			fd;		/* File descriptor for this socket */
+  int			blocking;	/* To block or not to block */
+  int			error;		/* Last error on read */
+  time_t		activity;	/* Time since last read/write */
+  http_state_t		state;		/* State of client */
+  http_status_t		status;		/* Status of last request */
+  http_version_t	version;	/* Protocol version */
+  http_keepalive_t	keep_alive;	/* Keep-alive supported? */
+  struct sockaddr_in	_hostaddr;	/* Address of connected host @deprecated@ */
+  char			hostname[HTTP_MAX_HOST],
+  					/* Name of connected host */
+			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
+					/* Field values */
+  char			*data;		/* Pointer to data buffer */
+  http_encoding_t	data_encoding;	/* Chunked or not */
+  int			_data_remaining;/* Number of bytes left @deprecated@ */
+  int			used;		/* Number of bytes used in buffer */
+  char			buffer[HTTP_MAX_BUFFER];
+					/* Buffer for incoming data */
+  int			auth_type;	/* Authentication in use */
+  _cups_md5_state_t	md5_state;	/* MD5 state */
+  char			nonce[HTTP_MAX_VALUE];
+					/* Nonce value */
+  int			nonce_count;	/* Nonce count */
+  void			*tls;		/* TLS state information */
+  http_encryption_t	encryption;	/* Encryption requirements */
+  /**** New in CUPS 1.1.19 ****/
+  fd_set		*input_set;	/* select() set for httpWait() @deprecated@ */
+  http_status_t		expect;		/* Expect: header @since CUPS 1.1.19@ */
+  char			*cookie;	/* Cookie value(s) @since CUPS 1.1.19@ */
+  /**** New in CUPS 1.1.20 ****/
+  char			_authstring[HTTP_MAX_VALUE],
+					/* Current Authentication value. @deprecated@ */
+			userpass[HTTP_MAX_VALUE];
+					/* Username:password string @since CUPS 1.1.20@ */
+  int			digest_tries;	/* Number of tries for digest auth @since CUPS 1.1.20@ */
+  /**** New in CUPS 1.2 ****/
+  off_t			data_remaining;	/* Number of bytes left @since CUPS 1.2@ */
+  http_addr_t		*hostaddr;	/* Current host address and port @since CUPS 1.2@ */
+  http_addrlist_t	*addrlist;	/* List of valid addresses @since CUPS 1.2@ */
+  char			wbuffer[HTTP_MAX_BUFFER];
+					/* Buffer for outgoing data */
+  int			wused;		/* Write buffer bytes used @since CUPS 1.2@ */
+  /**** New in CUPS 1.3 ****/
+  char			*field_authorization;
+					/* Authorization field @since CUPS 1.3@ */
+  char			*authstring;	/* Current authorization field @since CUPS 1.3 */
+#  ifdef HAVE_GSSAPI
+  gss_OID 		gssmech;	/* Authentication mechanism @since CUPS 1.3@ */
+  gss_ctx_id_t		gssctx;		/* Authentication context @since CUPS 1.3@ */
+  gss_name_t		gssname;	/* Authentication server name @since CUPS 1.3@ */
+#  endif /* HAVE_GSSAPI */
+};
+
 
 /*
  * Some OS's don't have hstrerror(), most notably Solaris...
@@ -188,5 +265,5 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 6188 2007-01-10 16:23:06Z mike $".
+ * End of "$Id: http-private.h 6187 2007-01-10 16:20:42Z mike $".
  */

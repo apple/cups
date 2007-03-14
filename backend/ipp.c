@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6214 2007-01-23 17:01:48Z mike $"
+ * "$Id: ipp.c 6318 2007-03-06 04:36:55Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -53,7 +53,6 @@
 #include <cups/string.h>
 #include <signal.h>
 #include <sys/wait.h>
-
 
 /*
  * Globals...
@@ -459,7 +458,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     const char	*request_root;		/* CUPS_REQUESTROOT env var */
     char	afilename[1024],	/* a##### filename */
-		aline[1024];		/* Line from file */
+		aline[2048];		/* Line from file */
     FILE	*fp;			/* File pointer */
 
 
@@ -1341,6 +1340,8 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
       unlink(pstmpname);
 #endif /* __APPLE__ */
 
+    fputs("ATTR: auth-info-required=username,password\n", stderr);
+
     exit(CUPS_BACKEND_AUTH_REQUIRED);
 
     return (NULL);			/* Eliminate compiler warning */
@@ -1666,5 +1667,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 6214 2007-01-23 17:01:48Z mike $".
+ * End of "$Id: ipp.c 6318 2007-03-06 04:36:55Z mike $".
  */

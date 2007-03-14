@@ -1,5 +1,5 @@
 /*
- * "$Id: search.c 5963 2006-09-17 19:01:47Z mike $"
+ * "$Id: search.c 5962 2006-09-17 19:01:26Z mike $"
  *
  *   Search routines for the Common UNIX Printing System (CUPS).
  *
@@ -366,5 +366,5 @@ cgiFreeSearch(void *search)		/* I - Search context */
 
 
 /*
- * End of "$Id: search.c 5963 2006-09-17 19:01:47Z mike $".
+ * End of "$Id: search.c 5962 2006-09-17 19:01:26Z mike $".
  */

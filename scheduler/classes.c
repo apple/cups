@@ -1,9 +1,9 @@
 /*
- * "$Id: classes.c 5151 2006-02-22 22:43:17Z mike $"
+ * "$Id: classes.c 6318 2007-03-06 04:36:55Z mike $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -366,7 +366,21 @@ cupsdLoadAllClasses(void)
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG, "Loading class %s...", value);
 
-        p = cupsdAddClass(value);
+       /*
+        * Since prior classes may have implicitly defined this class,
+	* see if it already exists...
+	*/
+
+        if ((p = cupsdFindDest(value)) != NULL)
+	{
+	  p->type = CUPS_PRINTER_CLASS;
+	  cupsdSetStringf(&p->uri, "ipp://%s:%d/classes/%s", ServerName,
+	                  LocalPort, value);
+	  cupsdSetString(&p->error_policy, "retry-job");
+	}
+	else
+          p = cupsdAddClass(value);
+
 	p->accepting = 1;
 	p->state     = IPP_PRINTER_IDLE;
 
@@ -399,6 +413,13 @@ cupsdLoadAllClasses(void)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of classes.conf.", linenum);
       return;
+    }
+    else if (!strcasecmp(line, "AuthInfoRequired"))
+    {
+      if (!cupsdSetAuthInfoRequired(p, value, NULL))
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Bad AuthInfoRequired on line %d of classes.conf.",
+			linenum);
     }
     else if (!strcasecmp(line, "Info"))
     {
@@ -703,6 +724,7 @@ cupsdSaveAllClasses(void)
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
   cups_option_t		*option;	/* Current option */
+  const char		*ptr;		/* Pointer into info/location */
 
 
  /*
@@ -776,11 +798,49 @@ cupsdSaveAllClasses(void)
     else
       cupsFilePrintf(fp, "<Class %s>\n", pclass->name);
 
+    if (pclass->num_auth_info_required > 0)
+    {
+      cupsFilePrintf(fp, "AuthInfoRequired %s", pclass->auth_info_required[0]);
+      for (i = 1; i < pclass->num_auth_info_required; i ++)
+        cupsFilePrintf(fp, ",%s", pclass->auth_info_required[i]);
+      cupsFilePutChar(fp, '\n');
+    }
+
     if (pclass->info)
-      cupsFilePrintf(fp, "Info %s\n", pclass->info);
+    {
+      if ((ptr = strchr(pclass->info, '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the info string...
+	*/
+
+        cupsFilePuts(fp, "Info ");
+	cupsFileWrite(fp, pclass->info, ptr - pclass->info);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "Info %s\n", pclass->info);
+    }
 
     if (pclass->location)
-      cupsFilePrintf(fp, "Location %s\n", pclass->location);
+    {
+      if ((ptr = strchr(pclass->info, '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the location string...
+	*/
+
+        cupsFilePuts(fp, "Location ");
+	cupsFileWrite(fp, pclass->location, ptr - pclass->location);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "Location %s\n", pclass->location);
+    }
 
     if (pclass->state == IPP_PRINTER_STOPPED)
     {
@@ -864,5 +924,5 @@ cupsdUpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c 5151 2006-02-22 22:43:17Z mike $".
+ * End of "$Id: classes.c 6318 2007-03-06 04:36:55Z mike $".
  */

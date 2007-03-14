@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h 5878 2006-08-24 15:55:42Z mike $"
+ * "$Id: ipp.h 5873 2006-08-24 14:37:24Z mike $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -499,5 +499,5 @@ extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h 5878 2006-08-24 15:55:42Z mike $".
+ * End of "$Id: ipp.h 5873 2006-08-24 14:37:24Z mike $".
  */

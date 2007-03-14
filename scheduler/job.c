@@ -1,9 +1,9 @@
 /*
- * "$Id: job.c 6234 2007-02-05 20:25:50Z mike $"
+ * "$Id: job.c 6318 2007-03-06 04:36:55Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -127,6 +127,8 @@ cupsdAddJob(int        priority,	/* I - Job priority */
   job->back_pipes[1]   = -1;
   job->print_pipes[0]  = -1;
   job->print_pipes[1]  = -1;
+  job->side_pipes[0]   = -1;
+  job->side_pipes[1]   = -1;
   job->status_pipes[0] = -1;
   job->status_pipes[1] = -1;
 
@@ -461,7 +463,6 @@ cupsdCleanJobs(void)
 void
 cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 {
-  int			job_history;	/* Did cupsdCancelJob() keep the job? */
   cupsd_printer_t	*printer;	/* Current printer */
 
 
@@ -478,11 +479,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     * Close the pipe and clear the input bit.
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdFinishJob: Removing fd %d from InputSet...",
-                    job->status_buffer->fd);
-
-    FD_CLR(job->status_buffer->fd, InputSet);
+    cupsdRemoveSelect(job->status_buffer->fd);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "cupsdFinishJob: Closing status pipes [ %d %d ]...",
@@ -711,8 +708,6 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
       * Close out this job...
       */
 
-      job_history = JobHistory && !(job->dtype & CUPS_PRINTER_REMOTE);
-
       cupsdCancelJob(job, 0, IPP_JOB_COMPLETED);
       cupsdCheckJobs();
     }
@@ -921,13 +916,6 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   cups_file_t		*fp;		/* Job file */
   int			fileid;		/* Current file ID */
   ipp_attribute_t	*attr;		/* Job attribute */
-  char			scheme[32],	/* Scheme portion of URI */
-			username[64],	/* Username portion of URI */
-			host[HTTP_MAX_HOST],
-					/* Host portion of URI */
-			resource[HTTP_MAX_URI];
-					/* Resource portion of URI */
-  int			port;		/* Port portion of URI */
   const char		*dest;		/* Destination */
   mime_type_t		**filetypes;	/* New filetypes array */
   int			*compressions;	/* New compressions array */
@@ -1011,11 +999,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       return;
     }
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, scheme,
-                    sizeof(scheme), username, sizeof(username), host,
-		    sizeof(host), &port, resource, sizeof(resource));
-
-    if ((dest = cupsdValidateDest(host, resource, &(job->dtype),
+    if ((dest = cupsdValidateDest(attr->values[0].string.text, &(job->dtype),
                                   NULL)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -1427,7 +1411,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       job->hold_until = curtime +
                         ((17 - curdate->tm_hour) * 60 + 59 -
 			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
-  }  
+  }
   else if (!strcmp(when, "second-shift"))
   {
    /*
@@ -1443,7 +1427,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       job->hold_until = curtime +
                         ((15 - curdate->tm_hour) * 60 + 59 -
 			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
-  }  
+  }
   else if (!strcmp(when, "third-shift"))
   {
    /*
@@ -1459,7 +1443,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       job->hold_until = curtime +
                         ((23 - curdate->tm_hour) * 60 + 59 -
 			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
-  }  
+  }
   else if (!strcmp(when, "weekend"))
   {
    /*
@@ -1622,17 +1606,19 @@ cupsdStopJob(cupsd_job_t *job,		/* I - Job */
 
   cupsdClosePipe(job->back_pipes);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdStopJob: Closing side pipes [ %d %d ]...",
+                  job->side_pipes[0], job->side_pipes[1]);
+
+  cupsdClosePipe(job->side_pipes);
+
   if (job->status_buffer)
   {
    /*
     * Close the pipe and clear the input bit.
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStopJob: Removing fd %d from InputSet...",
-	            job->status_buffer->fd);
-
-    FD_CLR(job->status_buffer->fd, InputSet);
+    cupsdRemoveSelect(job->status_buffer->fd);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdStopJob: Closing status pipes [ %d %d ]...",
@@ -1710,7 +1696,7 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
 	}
 	else if (!sscanf(message, "%*d%d", &copies))
 	  copies = 1;
-	  
+
         job->sheets->values[0].integer += copies;
 
 	if (job->printer->page_limit)
@@ -1734,7 +1720,18 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
       * Set attribute(s)...
       */
 
-      /**** TODO ****/
+      int		num_attrs;	/* Number of attributes */
+      cups_option_t	*attrs;		/* Attributes */
+      const char	*attr;		/* Attribute */
+
+
+      num_attrs = cupsParseOptions(message, 0, &attrs);
+
+      if ((attr = cupsGetOption("auth-info-required", num_attrs,
+                                attrs)) != NULL)
+        cupsdSetAuthInfoRequired(job->printer, attr, NULL);
+
+      cupsFreeOptions(num_attrs, attrs);
     }
 #ifdef __APPLE__
     else if (!strncmp(message, "recoverable:", 12))
@@ -1853,6 +1850,9 @@ free_job(cupsd_job_t *job)		/* I - Job */
 {
   cupsdClearString(&job->username);
   cupsdClearString(&job->dest);
+#ifdef HAVE_GSSAPI
+  cupsdClearString(&job->ccname);
+#endif /* HAVE_GSSAPI */
 
   if (job->num_files > 0)
   {
@@ -1867,7 +1867,7 @@ free_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * 'ipp_length()' - Compute the size of the buffer needed to hold 
+ * 'ipp_length()' - Compute the size of the buffer needed to hold
  *		    the textual IPP attributes.
  */
 
@@ -2082,6 +2082,8 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       job->back_pipes[1]   = -1;
       job->print_pipes[0]  = -1;
       job->print_pipes[1]  = -1;
+      job->side_pipes[0]   = -1;
+      job->side_pipes[1]   = -1;
       job->status_pipes[0] = -1;
       job->status_pipes[1] = -1;
 
@@ -2337,6 +2339,8 @@ load_request_root(void)
       job->back_pipes[1]   = -1;
       job->print_pipes[0]  = -1;
       job->print_pipes[1]  = -1;
+      job->side_pipes[0]   = -1;
+      job->side_pipes[1]   = -1;
       job->status_pipes[0] = -1;
       job->status_pipes[1] = -1;
 
@@ -2388,7 +2392,7 @@ set_time(cupsd_job_t *job,		/* I - Job to update */
  * 'set_hold_until()' - Set the hold time and update job-hold-until attribute...
  */
 
-static void 
+static void
 set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
 	       time_t      holdtime)	/* I - Hold until time */
 {
@@ -2414,7 +2418,7 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
   */
 
   holddate = gmtime(&holdtime);
-  snprintf(holdstr, sizeof(holdstr), "%d:%d:%d", holddate->tm_hour, 
+  snprintf(holdstr, sizeof(holdstr), "%d:%d:%d", holddate->tm_hour,
 	   holddate->tm_min, holddate->tm_sec);
 
   if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
@@ -2445,8 +2449,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 {
   int			i;		/* Looping var */
   int			slot;		/* Pipe slot */
-  cups_array_t		*filters;	/* Filters for job */
+  cups_array_t		*filters,	/* Filters for job */
+			*prefilters;	/* Filters with prefilters */
   mime_filter_t		*filter,	/* Current filter */
+			*prefilter,	/* Prefilter */
 			port_monitor;	/* Port monitor filter */
   char			method[255],	/* Method for output */
 			*optptr,	/* Pointer to options */
@@ -2466,7 +2472,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 			title[IPP_MAX_NAME],
 					/* Job title string */
 			copies[255],	/* # copies string */
-			*envp[MAX_ENV + 11],
+			*envp[MAX_ENV + 12],
 					/* Environment variables */
 			charset[255],	/* CHARSET env variable */
 			class_name[255],/* CLASS env variable */
@@ -2578,6 +2584,33 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     {
       cupsArrayDelete(filters);
       filters = NULL;
+    }
+
+   /*
+    * If this printer has any pre-filters, insert the required pre-filter
+    * in the filters array...
+    */
+
+    if (printer->prefiltertype && filters)
+    {
+      prefilters = cupsArrayNew(NULL, NULL);
+
+      for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+	   filter;
+	   filter = (mime_filter_t *)cupsArrayNext(filters))
+      {
+	if ((prefilter = mimeFilterLookup(MimeDatabase, filter->src,
+					  printer->prefiltertype)))
+	{
+	  cupsArrayAdd(prefilters, prefilter);
+	  job->cost += prefilter->cost;
+	}
+
+	cupsArrayAdd(prefilters, filter);
+      }
+
+      cupsArrayDelete(filters);
+      filters = prefilters;
     }
   }
 
@@ -2707,6 +2740,18 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
     fcntl(job->back_pipes[1], F_SETFL,
           fcntl(job->back_pipes[1], F_GETFL) | O_NONBLOCK);
+
+   /*
+    * Create the side-channel pipes and make them non-blocking...
+    */
+
+    socketpair(AF_LOCAL, SOCK_STREAM, 0, job->side_pipes);
+
+    fcntl(job->side_pipes[0], F_SETFL,
+          fcntl(job->side_pipes[0], F_GETFL) | O_NONBLOCK);
+
+    fcntl(job->side_pipes[1], F_SETFL,
+          fcntl(job->side_pipes[1], F_GETFL) | O_NONBLOCK);
   }
 
  /*
@@ -3083,6 +3128,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     envp[envc ++] = class_name;
   }
 
+#ifdef HAVE_GSSAPI
+  if (job->ccname)
+    envp[envc ++] = job->ccname;
+#endif /* HAVE_GSSAPI */
+
   envp[envc] = NULL;
 
   for (i = 0; i < envc; i ++)
@@ -3115,19 +3165,19 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 		      strerror(errno));
       snprintf(printer->state_message, sizeof(printer->state_message),
 	       "Unable to create status pipes - %s.", strerror(errno));
-  
+
       cupsdAddPrinterHistory(printer);
-  
+
       cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, job->printer, job,
 		    "Job canceled because the server could not create the job "
 		    "status pipes.");
-  
+
       goto abort_job;
     }
-  
+
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job: status_pipes = [ %d %d ]",
 		    job->status_pipes[0], job->status_pipes[1]);
-  
+
     job->status_buffer = cupsdStatBufNew(job->status_pipes[0], "[Job %d]",
 					 job->id);
   }
@@ -3244,7 +3294,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
     pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
                             filterfds[slot][1], job->status_pipes[1],
-		            job->back_pipes[0], 0, job->filters + i);
+		            job->back_pipes[0], job->side_pipes[0], 0,
+			    job->filters + i);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "start_job: Closing filter pipes for slot %d "
@@ -3314,8 +3365,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
       pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
 			      filterfds[slot][1], job->status_pipes[1],
-			      job->back_pipes[1], backroot,
-			      &(job->backend));
+			      job->back_pipes[1], job->side_pipes[1],
+			      backroot, &(job->backend));
 
       if (pid == 0)
       {
@@ -3352,6 +3403,12 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
         	      job->back_pipes[0], job->back_pipes[1]);
 
       cupsdClosePipe(job->back_pipes);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "start_job: Closing side pipes [ %d %d ]...",
+        	      job->side_pipes[0], job->side_pipes[1]);
+
+      cupsdClosePipe(job->side_pipes);
 
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		      "start_job: Closing status output pipe %d...",
@@ -3397,11 +3454,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   free(argv);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "start_job: Adding fd %d to InputSet...",
-                  job->status_buffer->fd);
-
-  FD_SET(job->status_buffer->fd, InputSet);
+  cupsdAddSelect(job->status_buffer->fd, (cupsd_selfunc_t)cupsdUpdateJob, NULL,
+                 job);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
                 job->id);
@@ -3467,5 +3521,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 6234 2007-02-05 20:25:50Z mike $".
+ * End of "$Id: job.c 6318 2007-03-06 04:36:55Z mike $".
  */

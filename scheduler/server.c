@@ -1,5 +1,5 @@
 /*
- * "$Id: server.c 5493 2006-05-05 16:33:57Z mike $"
+ * "$Id: server.c 6123 2006-11-21 15:36:04Z mike $"
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
@@ -107,10 +107,7 @@ cupsdStartServer(void)
   {
     CGIStatusBuffer = cupsdStatBufNew(CGIPipes[0], "[CGI]");
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStartServer: Adding fd %d to InputSet...",
-		    CGIPipes[0]);
-    FD_SET(CGIPipes[0], InputSet);
+    cupsdAddSelect(CGIPipes[0], (cupsd_selfunc_t)cupsdUpdateCGI, NULL, NULL);
   }
 
  /*
@@ -158,11 +155,7 @@ cupsdStopServer(void)
 
   if (CGIPipes[0] >= 0)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdStopServer: Removing fd %d from InputSet...",
-                    CGIPipes[0]);
-
-    FD_CLR(CGIPipes[0], InputSet);
+    cupsdRemoveSelect(CGIPipes[0]);
 
     cupsdStatBufDelete(CGIStatusBuffer);
     close(CGIPipes[1]);
@@ -211,5 +204,5 @@ cupsdStopServer(void)
 
 
 /*
- * End of "$Id: server.c 5493 2006-05-05 16:33:57Z mike $".
+ * End of "$Id: server.c 6123 2006-11-21 15:36:04Z mike $".
  */

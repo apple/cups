@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-01-23 09:19-0500\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
 "PO-Revision-Date: 2006-07-17 19:55+0200\n"
 "Last-Translator: Bernd Krumböck <b.krumboeck@rewe-group.at>\n"
 "Language-Team: Deutsch\n"
@@ -2973,6 +2973,15 @@ msgstr "Kann Windows Druckertreiber nicht setzen (%d)!\n"
 msgid "Unable to run \"%s\": %s\n"
 msgstr "cupsaddsmb: Kann \"%s\" nicht ausführen: %s\n"
 
+#, fuzzy
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Für Zugang Benutzername und Passwort (oder Benutzername und Passwort für "
+"root) eingeben."
+
 #, fuzzy, c-format
 msgid "Job #%d is already canceled - can't cancel."
 msgstr "Auftrag #%d wurde bereits abgebrochen - abbrechen nicht möglich."
@@ -2996,6 +3005,10 @@ msgid ""
 msgstr ""
 "      **FEHLGESCHLAGEN**  1284DeviceId muss 1284DeviceID sein!\n"
 "                REF: Seite 72, Kapitel 5.5\n"
+
+#, fuzzy, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d FEHLER%s GEFUNDEN\n"
 
 #, fuzzy, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s\n"

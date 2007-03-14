@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c 6061 2006-10-23 00:26:52Z mike $"
+ * "$Id: lpd.c 6058 2006-10-23 00:20:09Z mike $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
@@ -1242,5 +1242,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c 6061 2006-10-23 00:26:52Z mike $".
+ * End of "$Id: lpd.c 6058 2006-10-23 00:20:09Z mike $".
  */

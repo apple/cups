@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 5940 2006-09-11 18:30:09Z mike $"
+# "$Id: Makefile 6291 2007-02-19 21:54:27Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -43,6 +43,7 @@ CUPSDOBJS =	\
 		printers.o \
 		process.o \
 		quotas.o \
+		select.o \
 		server.o \
 		statbuf.o \
 		subscriptions.o \
@@ -188,14 +189,15 @@ cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
-		$(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS) $(LIBS)
+		$(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBS) \
+		$(LIBGSSAPI)
 
 cupsd-static:	$(CUPSDOBJS) libmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
-		$(LIBMALLOC) $(CUPSDLIBS)
+		$(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 
 
 #
@@ -261,7 +263,7 @@ testdirsvc:	testdirsvc.o
 testlpd:	testlpd.o ../cups/libcups.a cups-lpd
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testlpd testlpd.o ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)
+		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(LIBGSSAPI)
 
 
 #
@@ -271,7 +273,7 @@ testlpd:	testlpd.o ../cups/libcups.a cups-lpd
 testmime:	testmime.o libmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)
+		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(LIBGSSAPI)
 
 
 #
@@ -281,7 +283,7 @@ testmime:	testmime.o libmime.a ../cups/libcups.a
 testspeed:	testspeed.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(SSLLIBS)
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #
@@ -291,7 +293,7 @@ testspeed:	testspeed.o ../cups/libcups.a
 testsub:	testsub.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testsub testsub.o ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #
@@ -302,5 +304,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5940 2006-09-11 18:30:09Z mike $".
+# End of "$Id: Makefile 6291 2007-02-19 21:54:27Z mike $".
 #

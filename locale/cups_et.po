@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-01-23 09:19-0500\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
 "PO-Revision-Date: 2006-09-93 01:41+0200\n"
 "Last-Translator: Marek Laane <bald@starman.ee>\n"
 "Language-Team: Estonian <et@li.org>\n"
@@ -2930,6 +2930,15 @@ msgstr "Ei õnnestu määrata Windowsi printeridraiverit (%d)!\n"
 msgid "Unable to run \"%s\": %s\n"
 msgstr "cupsaddsmb: \"%s\" käivitamine ebaõnnestus: %s\n"
 
+#, fuzzy
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Selle lehekülje avamiseks andke enda või administraatori (root) kasutajanimi "
+"ja parool."
+
 #, fuzzy, c-format
 msgid "Job #%d is already canceled - can't cancel."
 msgstr "Töö nr %d on juba katkestatud - enam ei saa katkestada."
@@ -2953,6 +2962,10 @@ msgid ""
 msgstr ""
 "      **EBAÕNN**  1284DeviceId peab olema 1284DeviceID!\n"
 "                  Viide: lk 72, sektsioon 5.5\n"
+
+#, fuzzy, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d VIGA%s LEITUD\n"
 
 #, fuzzy, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s\n"

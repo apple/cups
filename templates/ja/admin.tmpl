@@ -1,5 +1,5 @@
 <TABLE CELLPADDING="0" CELLSPACING="0" CLASS="button" WIDTH="100%" SUMMARY="Administration Tasks">
-<TR><TD VALIGN="TOP" NOWRAP>
+<TR><TD VALIGN="TOP">
 
 <H2 CLASS="title">プリンタ</H2>
 
@@ -35,7 +35,7 @@ ALT="クラスの管理" CLASS="button"></A>
 <A HREF="/jobs/"><IMG SRC="/images/button-manage-jobs.gif" ALT="ジョブの管理" CLASS="button"></A>
 </P>
 
-</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 
 <H2 CLASS="title">サーバ</H2>
 
@@ -63,6 +63,7 @@ CLASS="button"></A>
 <P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> ほかのシステムで共有されているプリンタを表示<BR>
 <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> このシステムに接続されている公開済みプリンタを共有<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> リモート管理を許可<BR>
 <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> どのジョブであってもキャンセルすることを (たとえ所有者でなくても) ユーザに許可<BR>
 <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> トラブルシューティングのためにデバッグ情報を保存</P>

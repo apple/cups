@@ -6,13 +6,21 @@
 	<string>org.cups.cupsd</string>
 	<key>OnDemand</key>
 	<true/>
+	<key>KeepAlive</key>
+	<dict>
+		<key>PathState</key>
+		<dict>
+			<key>/private/var/run/cups/cupsd</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>RunAtLoad</key>
+	<false/>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/usr/sbin/cupsd</string>
 		<string>-l</string>
 	</array>
-	<key>RunAtLoad</key>
-	<true/>
 	<key>ServiceIPC</key>
 	<true/>
 	<key>Sockets</key>

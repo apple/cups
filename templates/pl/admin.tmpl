@@ -1,5 +1,5 @@
 <TABLE CELLPADDING="0" CELLSPACING="0" WIDTH="100%" SUMMARY="Zadania administracyjne">
-<TR><TD VALIGN="TOP" NOWRAP>
+<TR><TD VALIGN="TOP">
 
 <H2 CLASS="title">Drukarki</H2>
 
@@ -35,7 +35,7 @@ ALT="Zarządzaj klasami" CLASS="button"></A>
 <A HREF="/jobs/"><IMG SRC="/images/button-manage-jobs.gif" ALT="Zarządzaj zadaniami" CLASS="button"></A>
 </P>
 
-</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
 
 <H2 CLASS="title">Serwer</H2>
 
@@ -63,6 +63,7 @@ CLASS="button"></A>
 <P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Wyświetl drukarki udostępniane przez inne systemy<BR>
 <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Udostępnij opublikowane drukarki połączone do tego systemu<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Pozwól na zdalną administrację<BR>
 <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Pozwól użytkownikom na anulowanie każdego zadania (nie tylko ich)<BR>
 <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Zapisz informacje o debugowaniu do rozwiązywania problemów</P>

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 6234 2007-02-05 20:25:50Z mike $"
+# "$Id: cups.list.in 6332 2007-03-12 16:08:51Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -353,6 +353,7 @@ d 0755 root sys $LOGDIR -
 d 0710 root $CUPS_GROUP $REQUESTS -
 d 1770 root $CUPS_GROUP $REQUESTS/tmp -
 d 0775 root $CUPS_GROUP $CACHEDIR -
+d 0775 root $CUPS_GROUP $CACHEDIR/rss -
 #d 0755 root $CUPS_GROUP $CACHEDIR/ppd -
 d 0755 root $CUPS_GROUP $STATEDIR -
 d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
@@ -486,7 +487,6 @@ f 0644 root sys $INCLUDEDIR/cups/http.h cups/http.h
 f 0644 root sys $INCLUDEDIR/cups/image.h filter/image.h
 f 0644 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
 f 0644 root sys $INCLUDEDIR/cups/language.h cups/language.h
-f 0644 root sys $INCLUDEDIR/cups/md5.h cups/md5.h
 f 0644 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
 f 0644 root sys $INCLUDEDIR/cups/raster.h filter/raster.h
 f 0644 root sys $INCLUDEDIR/cups/transcode.h cups/transcode.h
@@ -635,7 +635,7 @@ EOF
 %subpackage
 
 %system !darwin
-i 0755 root sys cups init/cups.sh
+i 0755 root sys cups init/cups.sh start(@RCSTART@) stop(@RCSTOP) runlevels(@RCLEVELS@)
 %subpackage lpd
 %if XINETD
 f 0644 root sys $XINETD/cups-lpd init/cups-lpd
@@ -643,5 +643,5 @@ f 0644 root sys $XINETD/cups-lpd init/cups-lpd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 6234 2007-02-05 20:25:50Z mike $".
+# End of "$Id: cups.list.in 6332 2007-03-12 16:08:51Z mike $".
 #

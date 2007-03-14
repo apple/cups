@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5609 2006-05-30 20:31:10Z mike $"
+# "$Id: Makefile 6209 2007-01-23 15:38:01Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -87,7 +87,7 @@ pot:
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c
 	(cat cups.header; \
-	 tail +6 cups.pot | sed -e '1,$$s/PACKAGE VERSION/CUPS 1.2/' \
+	 tail +6 cups.pot | sed -e '1,$$s/PACKAGE VERSION/CUPS 1.3/' \
 	     -e '1,$$s/charset=CHARSET/charset=utf-8/'; \
 	 cat cups.footer) > cups.pot.N
 	mv cups.pot.N cups.pot
@@ -112,5 +112,5 @@ translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
 
 
 #
-# End of "$Id: Makefile 5609 2006-05-30 20:31:10Z mike $".
+# End of "$Id: Makefile 6209 2007-01-23 15:38:01Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.c 5838 2006-08-17 14:41:42Z mike $"
+ * "$Id: policy.c 5837 2006-08-17 14:37:40Z mike $"
  *
  *   Policy routines for the Common UNIX Printing System (CUPS).
  *
@@ -330,5 +330,5 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 
 
 /*
- * End of "$Id: policy.c 5838 2006-08-17 14:41:42Z mike $".
+ * End of "$Id: policy.c 5837 2006-08-17 14:37:40Z mike $".
  */

@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-01-23 09:19-0500\n"
+"POT-Creation-Date: 2007-01-23 09:44-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2631,6 +2631,9 @@ msgstr ""
 msgid "Unable to run \"%s\": %s\n"
 msgstr ""
 
+msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
+msgstr ""
+
 #, c-format
 msgid "Job #%d is already canceled - can't cancel."
 msgstr ""
@@ -2651,6 +2654,10 @@ msgstr ""
 msgid ""
 "      **FAIL**  %s must be 1284DeviceID!\n"
 "                REF: Page 72, section 5.5\n"
+msgstr ""
+
+#, c-format
+msgid "    %d ERRORS FOUND\n"
 msgstr ""
 
 #, c-format
