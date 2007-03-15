@@ -1,6 +1,41 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.9
+
+	- The scheduler did not use the default job-sheets
+	  (banners) for implicit classes (STR #2284)
+	- The scheduler could crash when listing complete jobs
+	  that had been unloaded from memory (STR #2288)
+	- The French localization was doubled up (STR #2287)
+	- Build system fixes for several platforms (STR #2260,
+	  STR #2275)
+	- The scheduler's openssl certificate generation code was
+	  broken on some platforms (STR #2282)
+	- The scheduler's log rotation check for devices was
+	  broken (STR #2278)
+	- The LPD mini-daemon did not handle the document-format
+	  option correctly (STR #2266)
+	- The pdftops filter ignored the "match" size option in the
+	  pdftops.conf file (STR #2285)
+	- cupstestppd now validates UTF-8 text strings in
+	  globalized PPD files (STR #2283)
+	- The outputorder=reverse option did not work with all
+	  printers (STR #2279)
+	- Classes containing other classes did not always work
+	  (STR #2255)
+	- Printer location and description information was lost
+	  if the corresponding string contained the "#" character
+	  (STR #2254)
+	- cupsRemoveOption() did not work properly (STR #2264)
+	- The USB backend did not work with some USB to parallel
+	  cables on Mac OS X.
+	- The test page did not print the rulers properly on
+	  large media sizes (STR #2252)
+	- The text filter could crash when pretty printing certain
+	  types of files (STR #2158)
+
+
 CHANGES IN CUPS V1.2.8
 
 	- Documentation fixes (STR #2141, STR #2157)
