@@ -5503,9 +5503,6 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     if ((job->dtype & dmask) != dtype &&
         (!job->printer || (job->printer->type & dmask) != dtype))
       continue;
-    if (username[0] && strcasecmp(username, job->username))
-      continue;
-
     if (completed && job->state_value <= IPP_JOB_STOPPED)
       continue;
 
@@ -5515,6 +5512,9 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     cupsdLoadJob(job);
 
     if (!job->attrs)
+      continue;
+
+    if (username[0] && strcasecmp(username, job->username))
       continue;
 
     if (count > 0)
