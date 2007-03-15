@@ -2978,6 +2978,9 @@ process_implicit_classes(void)
         cupsdSetString(&pclass->location, p->location);
         cupsdSetString(&pclass->info, p->info);
 
+        cupsdSetString(&pclass->job_sheets[0], p->job_sheets[0]);
+        cupsdSetString(&pclass->job_sheets[1], p->job_sheets[1]);
+
         update = 1;
 
         cupsdLogMessage(CUPSD_LOG_DEBUG, "Added implicit class \"%s\"...",
