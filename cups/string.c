@@ -266,9 +266,9 @@ _cupsStrFormatd(char         *buf,	/* I - String */
          tempptr < tempdec && bufptr < bufend;
 	 *bufptr++ = *tempptr++);
 
-    tempdec += declen;
+    tempptr += declen;
 
-    if (*tempdec && bufptr < bufend)
+    if (*tempptr && bufptr < bufend)
     {
       *bufptr++ = '.';
 

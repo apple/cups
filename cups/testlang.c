@@ -34,6 +34,7 @@
 
 #include <stdio.h>
 #include "i18n.h"
+#include "string.h"
 
 
 /*
@@ -44,9 +45,23 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
+  int			i;		/* Looping var */
+  int			errors = 0;	/* Number of errors */
   cups_lang_t		*language;	/* Message catalog */
   cups_lang_t		*language2;	/* Message catalog */
+  struct lconv		*loc;		/* Locale data */
+  char			buffer[1024];	/* String buffer */
+  double		number;		/* Number */
+  static const char * const tests[] =	/* Test strings */
+  {
+    "1",
+    "-1",
+    "3",
+    "5.125"
+  };
 
+
+  _cupsSetLocale(argv);
 
   if (argc == 1)
   {
@@ -61,6 +76,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (language != language2)
   {
+    errors ++;
+
     puts("**** ERROR: Language cache did not work! ****");
     puts("First result from cupsLangGet:");
   }
@@ -80,7 +97,26 @@ main(int  argc,				/* I - Number of command-line arguments */
     printf("Yes      = \"%s\"\n", _cupsLangString(language2, "Yes"));
   }
 
-  return (0);
+  loc = localeconv();
+
+  for (i = 0; i < (int)(sizeof(tests) / sizeof(tests[0])); i ++)
+  {
+    number = _cupsStrScand(tests[i], NULL, loc);
+
+    printf("_cupsStrScand(\"%s\") number=%f\n", tests[i], number);
+
+    _cupsStrFormatd(buffer, buffer + sizeof(buffer), number, loc);
+
+    printf("_cupsStrFormatd(%f) buffer=\"%s\"\n", number, buffer);
+
+    if (strcmp(buffer, tests[i]))
+    {
+      errors ++;
+      puts("**** ERROR: Bad formatted number! ****");
+    }
+  }
+
+  return (errors > 0);
 }
 
 
