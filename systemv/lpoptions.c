@@ -175,7 +175,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 	        dest = dests;
 
 	      if (dest == NULL)
+              {
 		_cupsLangPuts(stderr, _("lpoptions: No printers!?!\n"));
+                return (1);
+              }
 
 	      for (j = 0; j < dest->num_options; j ++)
 		if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
@@ -248,7 +251,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 	        dest = dests;
 
 	      if (dest == NULL)
+              {
 		_cupsLangPuts(stderr, _("lpoptions: No printers!?!\n"));
+                return (1);
+              }
 
 	      for (j = 0; j < dest->num_options; j ++)
 		if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
