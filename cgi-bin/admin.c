@@ -360,8 +360,8 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, user);
 
-  ippAddString(request, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI, "notify-recipient",
-               NULL, rss_uri);
+  ippAddString(request, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
+               "notify-recipient-uri", NULL, rss_uri);
   ippAddStrings(request, IPP_TAG_SUBSCRIPTION, IPP_TAG_KEYWORD, "notify-events",
                 num_events, NULL, events);
   ippAddInteger(request, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,

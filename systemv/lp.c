@@ -3,7 +3,7 @@
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -290,7 +290,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      snprintf(email, sizeof(email), "mailto:%s@%s", cupsUser(),
 	               httpGetHostname(NULL, buffer, sizeof(buffer)));
-	      num_options = cupsAddOption("notify-recipient", email,
+	      num_options = cupsAddOption("notify-recipient-uri", email,
 	                                  num_options, &options);
 	    }
 

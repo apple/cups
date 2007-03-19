@@ -88,7 +88,7 @@ static const _ipp_option_t ipp_options[] =
   { "notify-lease-duration-default", IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { "notify-natural-language",	IPP_TAG_LANGUAGE,	IPP_TAG_SUBSCRIPTION },
   { "notify-pull-method",	IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
-  { "notify-recipient",		IPP_TAG_URI,		IPP_TAG_SUBSCRIPTION },
+  { "notify-recipient-uri",	IPP_TAG_URI,		IPP_TAG_SUBSCRIPTION },
   { "notify-time-interval",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
   { "notify-user-data",		IPP_TAG_STRING,		IPP_TAG_SUBSCRIPTION },
   { "number-up",		IPP_TAG_INTEGER,	IPP_TAG_JOB },

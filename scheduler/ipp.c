@@ -4845,7 +4845,7 @@ create_subscription(
 
     while (attr && attr->group_tag != IPP_TAG_ZERO)
     {
-      if (!strcmp(attr->name, "notify-recipient") &&
+      if (!strcmp(attr->name, "notify-recipient-uri") &&
           attr->value_tag == IPP_TAG_URI)
       {
        /*
@@ -4864,7 +4864,7 @@ create_subscription(
 			    resource, sizeof(resource)) < HTTP_URI_OK)
         {
           send_ipp_status(con, IPP_NOT_POSSIBLE,
-	                  _("Bad notify-recipient URI \"%s\"!"), recipient);
+	                  _("Bad notify-recipient-uri URI \"%s\"!"), recipient);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_URI_SCHEME);
 	  return;
@@ -4875,7 +4875,7 @@ create_subscription(
         if (access(notifier, X_OK))
 	{
           send_ipp_status(con, IPP_NOT_POSSIBLE,
-	                  _("notify-recipient URI \"%s\" uses unknown scheme!"),
+	                  _("notify-recipient-uri URI \"%s\" uses unknown scheme!"),
 			  recipient);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_URI_SCHEME);
