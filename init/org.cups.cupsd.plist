@@ -29,7 +29,13 @@
 		<array>
 			<dict>
 				<key>SockNodeName</key>
-				<string>localhost</string>
+				<string>::1</string>
+				<key>SockServiceName</key>
+				<string>ipp</string>
+			</dict>
+			<dict>
+				<key>SockNodeName</key>
+				<string>127.0.0.1</string>
 				<key>SockServiceName</key>
 				<string>ipp</string>
 			</dict>
