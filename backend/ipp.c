@@ -3,7 +3,7 @@
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -521,6 +521,9 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
     {
+      if (job_cancelled)
+	break;
+
       if (getenv("CLASS") != NULL)
       {
        /*
@@ -567,9 +570,20 @@ main(int  argc,				/* I - Number of command-line args */
 	perror("ERROR: Unable to connect to IPP host");
 	sleep(30);
       }
+
+      if (job_cancelled)
+	break;
     }
   }
   while (http == NULL);
+
+  if (job_cancelled)
+  {
+    if (argc == 6 || strcmp(filename, argv[6]))
+      unlink(filename);
+
+    return (CUPS_BACKEND_FAILED);
+  }
 
   fputs("STATE: -connecting-to-device\n", stderr);
   fprintf(stderr, "INFO: Connected to %s...\n", hostname);

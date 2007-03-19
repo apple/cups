@@ -3,7 +3,7 @@
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -87,6 +87,9 @@ typedef struct
 static cupsd_var_t	variables[] =
 {
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
+#ifdef __APPLE__
+  { "AppleQuotas",		&AppleQuotas,		CUPSD_VARTYPE_BOOLEAN },
+#endif  /* __APPLE__ */
   { "AutoPurgeJobs", 		&JobAutoPurge,		CUPSD_VARTYPE_BOOLEAN },
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
 #ifdef HAVE_LDAP
@@ -462,6 +465,10 @@ cupsdReadConfiguration(void)
   LaunchdTimeout = DEFAULT_TIMEOUT + 10;
   cupsdSetString(&LaunchdConf, CUPS_DEFAULT_LAUNCHD_CONF);
 #endif /* HAVE_LAUNCHD */
+
+#ifdef __APPLE__
+  AppleQuotas = TRUE;
+#endif  /* __APPLE__ */
 
  /*
   * Read the configuration file...

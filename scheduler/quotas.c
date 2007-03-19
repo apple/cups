@@ -3,7 +3,7 @@
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -100,6 +100,19 @@ cupsdUpdateQuota(
   cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "cupsdUpdateQuota: p=%s username=%s pages=%d k=%d",
                   p->name, username, pages, k);
+
+#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
+ /*
+  * Use Apple PrintService quota enforcement if installed (X Server only)
+  */
+
+  if (AppleQuotas && PSQUpdateQuotaProc)
+  { 
+    q->page_count = (*PSQUpdateQuotaProc)(p->name, p->info, username, pages, 0);
+
+    return (q);
+  }
+#endif /* __APPLE__ && HAVE_DLFCN_H */
 
   curtime = time(NULL);
 

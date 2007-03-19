@@ -522,6 +522,13 @@
 #undef HAVE_KQUEUE
 
 
+/*
+ * Do we have the <dlfcn.h> header?
+ */
+
+#undef HAVE_DLFCN_H
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

@@ -113,6 +113,11 @@
 #  include <paper.h>
 #endif /* HAVE_LIBPAPER */
 
+#ifdef HAVE_MEMBERSHIP_H
+#  include <membership.h>
+#  include <membershipPriv.h>
+#endif /* HAVE_MEMBERSHIP_H */
+
 
 /*
  * Local functions...
@@ -3164,7 +3169,24 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   int		i;			/* Looping var */
   char		username[33];		/* Username */
   cupsd_quota_t	*q;			/* Quota data */
+#ifdef HAVE_MBR_UID_TO_UUID
+ /*
+  * Use Apple membership APIs which require that all names represent
+  * valid user account or group records accessible by the server.
+  */
+
+  uuid_t	usr_uuid;		/* UUID for job requesting user  */
+  uuid_t	usr2_uuid;		/* UUID for ACL user name entry  */
+  uuid_t	grp_uuid;		/* UUID for ACL group name entry */
+  int		mbr_err;		/* Error from membership function */
+  int		is_member;		/* Is this user a member? */
+#else
+ /*
+  * Use standard POSIX APIs for checking users and groups...
+  */
+
   struct passwd	*pw;			/* User password data */
+#endif /* HAVE_MBR_UID_TO_UUID */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "check_quotas(%p[%d], %p[%s])",
@@ -3224,8 +3246,34 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
   if (p->num_users)
   {
+#ifdef HAVE_MBR_UID_TO_UUID
+   /*
+    * Get UUID for job requesting user...
+    */
+
+    if (mbr_user_name_to_uuid((char *)username, usr_uuid))
+    {
+     /*
+      * Unknown user...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "check_quotas: UUID lookup failed for user \"%s\"",
+		      username);
+      cupsdLogMessage(CUPSD_LOG_INFO,
+		      "Denying user \"%s\" access to printer \"%s\" "
+		      "(unknown user)...",
+		      username, p->name);
+      return (0);
+    }
+#else
+   /*
+    * Get UID and GID of requesting user...
+    */
+
     pw = getpwnam(username);
     endpwent();
+#endif /* HAVE_MBR_UID_TO_UUID */
 
     for (i = 0; i < p->num_users; i ++)
       if (p->users[i][0] == '@')
@@ -3234,11 +3282,86 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
         * Check group membership...
 	*/
 
+#ifdef HAVE_MBR_UID_TO_UUID
+	if ((mbr_err = mbr_group_name_to_uuid((char *)p->users[i] + 1,
+	                                      grp_uuid)) != 0)
+	{
+	 /*
+	  * Invalid ACL entries are ignored for matching; just record a
+	  * warning in the log...
+	  */
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "check_quotas: UUID lookup failed for ACL entry "
+			  "\"%s\" (err=%d)", p->users[i], mbr_err);
+	  cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "Access control entry \"%s\" not a valid group name; "
+			  "entry ignored", p->users[i]);
+	}
+	else
+	{
+	  if ((mbr_err = mbr_check_membership(usr_uuid, grp_uuid,
+	                                      &is_member)) != 0)
+	  {
+	   /*
+	    * At this point, there should be no errors, but check anyways...
+	    */
+
+	    cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                    "check_quotas: group \"%s\" membership check "
+			    "failed (err=%d)", p->users[i] + 1, mbr_err);
+            is_member = 0;
+	  }
+
+         /*
+	  * Stop if we found a match...
+	  */
+
+	  if (is_member)
+	    break;
+	}
+#else
         if (cupsdCheckGroup(username, pw, p->users[i] + 1))
 	  break;
+#endif /* HAVE_MBR_UID_TO_UUID */
       }
+#ifdef HAVE_MBR_UID_TO_UUID
+      else
+      {
+        if ((mbr_err = mbr_user_name_to_uuid((char *)p->users[i],
+					     usr2_uuid)) != 0)
+    	{
+	 /*
+	  * Invalid ACL entries are ignored for matching; just record a
+	  * warning in the log...
+	  */
+
+          cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "check_quotas: UUID lookup failed for ACL entry "
+			  "\"%s\" (err=%d)", p->users[i], mbr_err);
+          cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "Access control entry \"%s\" not a valid user name; "
+			  "entry ignored", p->users[i]);
+	}
+	else
+	{
+	  if ((mbr_err = mbr_check_membership(usr_uuid, usr2_uuid,
+	                                      &is_member)) != 0)
+          {
+	    cupsdLogMessage(CUPSD_LOG_DEBUG,
+			    "check_quotas: User \"%s\" identity check failed "
+			    "(err=%d)", p->users[i], mbr_err);
+	    is_member = 0;
+	  }
+
+	  if (is_member)
+	    break;
+	}
+      }
+#else
       else if (!strcasecmp(username, p->users[i]))
 	break;
+#endif /* HAVE_MBR_UID_TO_UUID */
 
     if ((i < p->num_users) == p->deny_users)
     {
@@ -3253,6 +3376,66 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   * Check quotas...
   */
 
+#ifdef __APPLE__
+  if (AppleQuotas)
+  {
+   /*
+    * TODO: Define these special page count values as constants!
+    */
+
+    if (q->page_count == -4) /* special case: unlimited user */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request approved for printer %s (%s): " 
+		      "unlimited quota.",
+		      username, p->name, p->info);
+      q->page_count = 0; /* allow user to print */
+      return (1);
+    }
+    else if (q->page_count == -3) /* quota exceeded */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request denied for printer %s (%s): "
+		      "quota limit exceeded.",
+		      username, p->name, p->info);
+      q->page_count = 2; /* force quota exceeded failure */
+      return (0);
+    }
+    else if (q->page_count == -2) /* quota disabled for user */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request denied for printer %s (%s): "
+		      "printing disabled for user.",
+		      username, p->name, p->info);
+      q->page_count = 2; /* force quota exceeded failure */
+      return (0);
+    }
+    else if (q->page_count == -1) /* quota access error */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request denied for printer %s (%s): "
+		      "unable to determine quota limit.",
+		      username, p->name, p->info);
+      q->page_count = 2; /* force quota exceeded failure */
+      return (0);
+    }
+    else if (q->page_count < 0) /* user not found or other error */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request denied for printer %s (%s): "
+		      "user disabled / missing quota.",
+		      username, p->name, p->info);
+      q->page_count = 2; /* force quota exceeded failure */
+      return (0);
+    }
+    else /* page within user limits */
+    {
+      q->page_count = 0; /* allow user to print */
+      return (1);
+    }
+  }
+  else
+#endif /* __APPLE__ */
   if (p->k_limit || p->page_limit)
   {
     if ((q = cupsdUpdateQuota(p, username, 0, 0)) == NULL)

@@ -89,6 +89,9 @@ fi
 AC_SUBST(CUPS_DEFAULT_DOMAINSOCKET)
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
 
+AC_CHECK_HEADERS(AppleTalk/at_proto.h,AC_DEFINE(HAVE_APPLETALK_AT_PROTO_H),,
+	[#include <netat/appletalk.h>])
+
 dnl
 dnl End of "$Id$".
 dnl

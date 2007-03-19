@@ -10,7 +10,7 @@
 	<dict>
 		<key>PathState</key>
 		<dict>
-			<key>/private/var/run/cups/cupsd</key>
+			<key>/private/var/spool/cups/cache/org.cups.cupsd</key>
 			<true/>
 		</dict>
 	</dict>

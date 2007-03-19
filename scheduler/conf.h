@@ -4,7 +4,7 @@
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -200,6 +200,11 @@ VAR int			LaunchdTimeout		VALUE(DEFAULT_TIMEOUT);
 VAR char		*LaunchdConf		VALUE(NULL);
 					/* launchd(8) configuration file */
 #endif /* HAVE_LAUNCHD */
+
+#ifdef __APPLE__
+VAR int			AppleQuotas		VALUE(TRUE);
+					/* Use Apple PrintService Quotas instead of CUPS quotas */
+#endif  /* __APPLE__ */
 
 #ifdef HAVE_AUTHORIZATION_H
 VAR char		*SystemGroupAuthKey	VALUE(NULL);

@@ -61,7 +61,7 @@
 #ifdef HAVE_LAUNCH_H
 #  include <launch.h>
 #  include <libgen.h>
-#  define CUPS_KEEPALIVE	CUPS_STATEDIR "/org.cups.cupsd"
+#  define CUPS_KEEPALIVE	CUPS_CACHEDIR "/org.cups.cupsd"
 					/* Name of the launchd KeepAlive file */
 #  ifndef LAUNCH_JOBKEY_KEEPALIVE
 #    define LAUNCH_JOBKEY_KEEPALIVE "KeepAlive"
@@ -80,6 +80,10 @@
 #ifdef HAVE_NOTIFY_H
 #  include <notify.h>
 #endif /* HAVE_NOTIFY_H */
+
+#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
+#  include <dlfcn.h>
+#endif /* __APPLE__ && HAVE_DLFCN_H */
 
 
 /*
@@ -122,6 +126,12 @@ static CFURLRef		launchd_conf_url = NULL;
 static CFDictionaryRef	launchd_conf_dict = NULL;
 					/* org.cups.cupsd.plist dict */
 #endif /* HAVE_LAUNCHD */
+
+#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
+static const char *PSQLibPath = "/usr/lib/libPrintServiceQuota.dylib";
+static const char *PSQLibFuncName = "PSQUpdateQuota";
+static void *PSQLibRef;			/* libPrintServiceQuota.dylib */
+#endif /* HAVE_DLFCN_H */
 
 
 /*
@@ -423,6 +433,17 @@ main(int  argc,				/* I - Number of command-line args */
     launchd_checkin();
   }
 #endif /* HAVE_LAUNCHD */
+
+#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
+ /*
+  * Load Print Service quota enforcement library (X Server only)
+  */
+
+  PSQLibRef = dlopen(PSQLibPath, RTLD_LAZY);
+
+  if (PSQLibRef)
+    PSQUpdateQuotaProc = dlsym(PSQLibRef, PSQLibFuncName);
+#endif /* __APPLE__ && HAVE_DLFCN_H */
 
  /*
   * Startup the server...

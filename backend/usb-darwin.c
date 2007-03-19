@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- * © Copyright 2005-2006 Apple Computer, Inc. All rights reserved.
+ * Copyright © 2005-2007 Apple Inc. All rights reserved.
  *
  * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
  * Inc. ("Apple") in consideration of your agreement to the following
@@ -185,6 +185,8 @@ typedef struct printer_data_s {			/**** Printer context data ****/
 
   UInt32		location;
   Boolean		waitEOF;
+  
+  CFRunLoopTimerRef statusTimer;
 
   pthread_cond_t	reqWaitCompCond;
   pthread_mutex_t	reqWaitMutex;
@@ -206,6 +208,7 @@ typedef struct printer_data_s {			/**** Printer context data ****/
 
 static Boolean list_device_callback(void *refcon, io_service_t obj);
 static Boolean find_device_callback(void *refcon, io_service_t obj);
+static void statusTimerCallback(CFRunLoopTimerRef timer, void *info);
 static void iterate_printers(iterator_callback_t callBack, void *userdata);
 static void device_added(void *userdata, io_iterator_t iterator);
 static void copy_deviceinfo(CFStringRef deviceIDString, CFStringRef *make, CFStringRef *model, CFStringRef *serial);
@@ -637,11 +640,11 @@ static Boolean list_device_callback(void *refcon, io_service_t obj)
 static Boolean find_device_callback(void *refcon, io_service_t obj)
 {
   Boolean keepLooking = true;
+  printer_data_t *userData = (printer_data_t *)refcon;
 
-  if (obj != 0x0 && refcon != NULL) {
+  if (obj != 0x0) {
     CFStringRef idString = NULL;
     UInt32 location = -1;
-    printer_data_t *userData = (printer_data_t *)refcon;
 
     copy_devicestring(obj, &idString, &location);
     if (idString != NULL) {
@@ -676,12 +679,33 @@ static Boolean find_device_callback(void *refcon, io_service_t obj)
     }
   }
   else {		
-    keepLooking = (refcon != NULL && ((printer_data_t *)refcon)->printerObj == 0);
+    keepLooking = (userData->printerObj == 0);
+    if (obj == 0x0 && keepLooking) {
+      CFRunLoopTimerContext context = { 0, userData, NULL, NULL, NULL };
+      CFRunLoopTimerRef timer = CFRunLoopTimerCreate(NULL, CFAbsoluteTimeGetCurrent() + 1.0, 10, 0x0, 0x0, statusTimerCallback, &context);
+      if (timer != NULL) {
+	CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
+	userData->statusTimer = timer;
+      }
+    }
+  }
+  
+  if (!keepLooking && userData->statusTimer != NULL) {
+    fputs("STATE: -offline-error\n", stderr);
+    fputs("INFO: Printer is now on-line.\n", stderr);
+    CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), userData->statusTimer, kCFRunLoopDefaultMode);
+    CFRelease(userData->statusTimer);
+    userData->statusTimer = NULL;
   }
 
   return keepLooking;
 }
 
+static void statusTimerCallback (CFRunLoopTimerRef timer, void *info)
+{
+  fputs("STATE: +offline-error\n", stderr);
+  fputs("INFO: Printer is currently off-line.\n", stderr);
+}
 
 #pragma mark -
 /*
@@ -877,23 +901,20 @@ static kern_return_t unload_classdriver(classdriver_context_t ***classDriver)
 
 static kern_return_t load_printerdriver(printer_data_t *printer, CFStringRef *driverBundlePath)
 {
-  IOCFPlugInInterface **iodev = NULL;
-  SInt32 score;
+  IOCFPlugInInterface	**iodev = NULL;
+  SInt32		score;
+  kern_return_t		kr;
+  printer_interface_t	intf;
+  HRESULT		res;
 
-  kern_return_t kr = IOCreatePlugInInterfaceForService(printer->printerObj, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &iodev, &score);
-  if (kr == kIOReturnSuccess) {
-    printer_interface_t intf;
-    HRESULT res = (*iodev)->QueryInterface(iodev, USB_INTERFACE_KIND, (LPVOID *) &intf);
-    if (res == noErr) {
-      CFMutableDictionaryRef properties = NULL;
+  kr = IOCreatePlugInInterfaceForService(printer->printerObj, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &iodev, &score);
+  if (kr == kIOReturnSuccess)
+  {
+    if ((res = (*iodev)->QueryInterface(iodev, USB_INTERFACE_KIND, (LPVOID *) &intf)) == noErr)
+    {
+      *driverBundlePath = IORegistryEntryCreateCFProperty(printer->printerObj, kUSBClassDriverProperty, NULL, kNilOptions);
 
-      kr = IORegistryEntryCreateCFProperties(printer->printerObj, &properties, NULL, kNilOptions);
-      if (kr == kIOReturnSuccess) {
-	if (properties != NULL) {
-	  *driverBundlePath = (CFStringRef) CFDictionaryGetValue(properties, kUSBClassDriverProperty);
-	}
-	kr = load_classdriver(*driverBundlePath, intf, &printer->printerDriver);
-      }
+      kr = load_classdriver(*driverBundlePath, intf, &printer->printerDriver);
 
       if (kr != kIOReturnSuccess)
 	(*intf)->Release(intf);
@@ -1034,40 +1055,37 @@ static OSStatus copy_deviceid(classdriver_context_t **printer, CFStringRef *devi
 
 static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, UInt32 *deviceLocation)
 {
-  IOCFPlugInInterface **iodev = NULL;
-  SInt32 score;
+  IOCFPlugInInterface	**iodev = NULL;
+  SInt32		score;
+  kern_return_t		kr;
+  printer_interface_t	intf;
+  HRESULT		res;
+  classdriver_context_t	**klassDriver = NULL;
+  CFStringRef		driverBundlePath;
 
-  kern_return_t kr = IOCreatePlugInInterfaceForService(usbInterface, kIOUSBInterfaceUserClientTypeID, 
+  kr = IOCreatePlugInInterfaceForService(usbInterface, kIOUSBInterfaceUserClientTypeID, 
 						       kIOCFPlugInInterfaceID, &iodev, &score);
-  if (kr == kIOReturnSuccess) {
-    printer_interface_t intf;
-
-    HRESULT res = (*iodev)->QueryInterface(iodev, USB_INTERFACE_KIND, (LPVOID *) &intf);
-    if (res == noErr) {
+  if (kr == kIOReturnSuccess)
+  {
+    if ((res = (*iodev)->QueryInterface(iodev, USB_INTERFACE_KIND, (LPVOID *) &intf)) == noErr)
+    {
       /* ignore the result for location id... */
       (void)(*intf)->GetLocationID(intf, deviceLocation);
 
-      CFMutableDictionaryRef properties = NULL;
-      kr = IORegistryEntryCreateCFProperties(usbInterface, &properties, NULL, kNilOptions);
-      if (kIOReturnSuccess == kr) {
-	classdriver_context_t **klassDriver = NULL;
-	CFStringRef driverBundlePath = NULL;
+      driverBundlePath = IORegistryEntryCreateCFProperty( usbInterface, kUSBClassDriverProperty, NULL, kNilOptions );
 
-	if (properties != NULL) {
-	  driverBundlePath = (CFStringRef) CFDictionaryGetValue(properties, kUSBClassDriverProperty);
-	}
+      kr = load_classdriver(driverBundlePath, intf, &klassDriver);
 
-	kr = load_classdriver(driverBundlePath, intf, &klassDriver);
-	if (kr != kIOReturnSuccess && driverBundlePath != NULL)
-	  kr = load_classdriver(NULL, intf, &klassDriver);
-	if (kr == kIOReturnSuccess && klassDriver != NULL) {				
+      if (kr != kIOReturnSuccess && driverBundlePath != NULL)
+	kr = load_classdriver(NULL, intf, &klassDriver);
+
+      if (kr == kIOReturnSuccess && klassDriver != NULL)			
 	  kr = copy_deviceid(klassDriver, deviceID);						
-	}
-	unload_classdriver(&klassDriver);
 
-	if (properties != NULL)
-	  CFRelease(properties);
-      }
+      unload_classdriver(&klassDriver);
+
+      if (driverBundlePath != NULL)
+	CFRelease(driverBundlePath);
 
       /* (*intf)->Release(intf); */
     }		

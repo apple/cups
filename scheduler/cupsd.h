@@ -172,6 +172,16 @@ VAR int			Launchd		VALUE(0);
 					/* Running from launchd */
 #endif /* HAVE_LAUNCH_H */
 
+#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
+typedef int (*PSQUpdateQuotaProcPtr)(const char *printer, const char *info, 
+                                     const char *user, int nPages, int options);
+VAR PSQUpdateQuotaProcPtr PSQUpdateQuotaProc
+					VALUE(0);
+					/* Apple PrintService quota function */
+#endif /* __APPLE__ && HAVE_DLFCN_H */
+
+
+
 
 /*
  * Prototypes...

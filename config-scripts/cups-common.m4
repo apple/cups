@@ -220,6 +220,9 @@ case $uname in
 		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))
 		AC_CHECK_FUNCS(mbr_uid_to_uuid)
 
+		dnl Need <dlfcn.h> header...
+		AC_CHECK_HEADER(dlfcn.h,AC_DEFINE(HAVE_DLFCN_H))
+
 		dnl Check for notify_post support
 		AC_CHECK_HEADER(notify.h,AC_DEFINE(HAVE_NOTIFY_H))
 		AC_CHECK_FUNCS(notify_post)
