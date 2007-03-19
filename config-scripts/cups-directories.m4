@@ -148,7 +148,7 @@ if test x$rcdir = x; then
 			fi
 			;;
 
-		FreeBSD* | OpenBSD* | MirBsD* | ekkoBSD*)
+		FreeBSD* | OpenBSD* | MirBSD* | ekkoBSD*)
 			# FreeBSD and OpenBSD
 			;;
 
