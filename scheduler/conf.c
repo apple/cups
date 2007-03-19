@@ -1718,10 +1718,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	loc->level = AUTH_USER;
     }
 #ifdef HAVE_GSSAPI
-    else if (!strcasecmp(value, "kerberos") ||
-	     !strcasecmp(value, "gssapi"))
+    else if (!strcasecmp(value, "negotiate"))
     {
-      loc->type = AUTH_KERBEROS;
+      loc->type = AUTH_NEGOTIATE;
 
       if (loc->level == AUTH_ANON)
 	loc->level = AUTH_USER;
@@ -2737,8 +2736,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else if (!strcasecmp(value, "basicdigest"))
 	DefaultAuthType = AUTH_BASICDIGEST;
 #ifdef HAVE_GSSAPI
-      else if (!strcasecmp(value, "kerberos"))
-        DefaultAuthType = AUTH_KERBEROS;
+      else if (!strcasecmp(value, "negotiate"))
+        DefaultAuthType = AUTH_NEGOTIATE;
 #endif /* HAVE_GSSAPI */
       else
       {

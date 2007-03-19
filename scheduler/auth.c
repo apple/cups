@@ -835,7 +835,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     }
   }
 #ifdef HAVE_GSSAPI
-  else if (!strncmp(authorization, "Negotiate", 9) && type == AUTH_KERBEROS) 
+  else if (!strncmp(authorization, "Negotiate", 9) && type == AUTH_NEGOTIATE) 
   {
     int			len;		/* Length of authorization string */
     gss_cred_id_t	server_creds;	/* Server credentials */
@@ -1819,8 +1819,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   if ((best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
       strcasecmp(con->http.hostname, "localhost") &&
       best->satisfy == AUTH_SATISFY_ALL) &&
-      !(best->type == AUTH_KERBEROS || 
-        (best->type == AUTH_NONE && DefaultAuthType == AUTH_KERBEROS)))
+      !(best->type == AUTH_NEGOTIATE || 
+        (best->type == AUTH_NONE && DefaultAuthType == AUTH_NEGOTIATE)))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsAuthorized: Need upgrade to TLS...");

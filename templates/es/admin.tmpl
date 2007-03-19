@@ -67,6 +67,7 @@ CLASS="button"></A>
 <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Compartir impresoras p&uacute;blicas conectadas a este sistema<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Permitir administraci&oacute;n remota<BR>
+{have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Use Kerberos authentication<BR>:}
 <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Permitir a los usuarios cancelar cualquier trabajo (no s&oacute;lo los suyos propios)<BR>
 <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Guardar informaci&oacute;n de depuraci&oacute;n para b&uacute;squeda de problemas</P>
 

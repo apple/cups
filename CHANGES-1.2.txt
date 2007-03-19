@@ -1,6 +1,21 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.10
+
+	- The init script path check was broken.
+	- CUPS incorrectly used the attribute "notify-recipient"
+	  instead of "notify-recicpient-uri" in several places
+	  (STR #2297)
+	- Fixed a configure script bug on MirBSD (STR #2294)
+	- The pdftops filter did not limit the amount of recursion
+	  of page sets (STR #2293)
+	- Custom page sizes with fractional point sizes did not
+	  work (STR #2296)
+	- The lpoptions command would crash when adding or removing
+	  options on a system with no printers (STR #2295)
+
+
 CHANGES IN CUPS V1.2.9
 
 	- The scheduler did not use the default job-sheets

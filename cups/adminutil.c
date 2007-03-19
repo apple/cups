@@ -4,9 +4,6 @@
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   MANY OF THE FUNCTIONS IN THIS HEADER ARE PRIVATE AND SUBJECT TO
- *   CHANGE AT ANY TIME.  USE AT YOUR OWN RISK.
- *
  *   Copyright 2001-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -31,8 +28,10 @@
  *
  *   cupsAdminCreateWindowsPPD()   - Create the Windows PPD file for a printer.
  *   cupsAdminExportSamba()        - Export a printer to Samba.
- *   _cupsAdminGetServerSettings() - Get settings from the server.
- *   _cupsAdminSetServerSettings() - Set settings on the server.
+ *   cupsAdminGetServerSettings()  - Get settings from the server.
+ *   _cupsAdminGetServerSettings() - Get settings from the server (private).
+ *   cupsAdminSetServerSettings()  - Set settings on the server.
+ *   _cupsAdminSetServerSettings() - Set settings on the server (private).
  *   do_samba_command()            - Do a SAMBA command.
  *   get_cupsd_conf()              - Get the current cupsd.conf file.
  *   invalidate_cupsd_cache()      - Invalidate the cached cupsd.conf settings.
@@ -694,6 +693,25 @@ cupsAdminExportSamba(
 
 
 /*
+ * 'cupsAdminGetServerSettings()' - Get settings from the server.
+ *
+ * The returned settings should be freed with cupsFreeOptions() when
+ * you are done with them.
+ *
+ * @since CUPS 1.3@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsAdminGetServerSettings(
+    http_t        *http,		/* I - Connection to server */
+    int           *num_settings,	/* O - Number of settings */
+    cups_option_t **settings)		/* O - Settings */
+{
+  return (_cupsAdminGetServerSettings(http, num_settings, settings));
+}
+
+
+/*
  * '_cupsAdminGetServerSettings()' - Get settings from the server.
  *
  * The returned settings should be freed with cupsFreeOptions() when
@@ -963,6 +981,22 @@ _cupsAdminGetServerSettings(
                                   *num_settings, settings);
 
   return (cg->cupsd_num_settings > 0);
+}
+
+
+/*
+ * 'cupsAdminSetServerSettings()' - Set settings on the server.
+ *
+ * @since CUPS 1.3@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsAdminSetServerSettings(
+    http_t        *http,		/* I - Connection to server */
+    int           num_settings,		/* I - Number of settings */
+    cups_option_t *settings)		/* I - Settings */
+{
+  return (_cupsAdminSetServerSettings(http, num_settings, settings));
 }
 
 
@@ -1531,14 +1565,13 @@ _cupsAdminSetServerSettings(
       }
     }
     else if (!in_policy && !in_location &&
-             (val = cupsGetOption(line, num_settings, settings)) != NULL &&
-             !cupsGetOption(line, cupsd_num_settings, cupsd_settings))
+             (val = cupsGetOption(line, num_settings, settings)) != NULL)
     {
      /*
-      * Add this directive to the list of directives we have written...
+      * Replace this directive's value with the new one...
       */
 
-      cupsd_num_settings = cupsAddOption(line, value, cupsd_num_settings,
+      cupsd_num_settings = cupsAddOption(line, val, cupsd_num_settings,
                                          &cupsd_settings);
 
      /*
@@ -1546,7 +1579,7 @@ _cupsAdminSetServerSettings(
       * only support setting root directives, not in sections...
       */
 
-      cupsFilePrintf(temp, "%s %s\n", line, value);
+      cupsFilePrintf(temp, "%s %s\n", line, val);
     }
     else if (value)
     {
@@ -1752,8 +1785,8 @@ _cupsAdminSetServerSettings(
                                          cupsd_num_settings, &cupsd_settings);
 
      /*
-      * Write the new value in its place, without indentation since we
-      * only support setting root directives, not in sections...
+      * Write the new value, without indentation since we only support
+      * setting root directives, not in sections...
       */
 
       cupsFilePrintf(temp, "%s %s\n", setting->name, setting->value);

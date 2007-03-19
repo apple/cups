@@ -1834,6 +1834,10 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 			*remote_printers,
 					/* REMOTE_PRINTERS value */
 			*share_printers,/* SHARE_PRINTERS value */
+#ifdef HAVE_GSSAPI
+			*default_auth_type,
+					/* DefaultAuthType value */
+#endif /* HAVE_GSSAPI */
 			*user_cancel_any;
 					/* USER_CANCEL_ANY value */
 
@@ -1842,12 +1846,17 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     * Get the checkbox values from the form...
     */
 
-    debug_logging   = cgiGetVariable("DEBUG_LOGGING") ? "1" : "0";
-    remote_admin    = cgiGetVariable("REMOTE_ADMIN") ? "1" : "0";
-    remote_any      = cgiGetVariable("REMOTE_ANY") ? "1" : "0";
-    remote_printers = cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0";
-    share_printers  = cgiGetVariable("SHARE_PRINTERS") ? "1" : "0";
-    user_cancel_any = cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0";
+    debug_logging     = cgiGetVariable("DEBUG_LOGGING") ? "1" : "0";
+    remote_admin      = cgiGetVariable("REMOTE_ADMIN") ? "1" : "0";
+    remote_any        = cgiGetVariable("REMOTE_ANY") ? "1" : "0";
+    remote_printers   = cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0";
+    share_printers    = cgiGetVariable("SHARE_PRINTERS") ? "1" : "0";
+    user_cancel_any   = cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0";
+#ifdef HAVE_GSSAPI
+    default_auth_type = cgiGetVariable("KERBEROS") ? "Negotiate" : "Basic";
+
+    fprintf(stderr, "DEBUG: DefaultAuthType %s\n", default_auth_type);
+#endif /* HAVE_GSSAPI */
 
    /*
     * Get the current server settings...
@@ -1878,6 +1887,11 @@ do_config_server(http_t *http)		/* I - HTTP connection */
                                               num_settings, settings)) ||
         strcmp(share_printers, cupsGetOption(CUPS_SERVER_SHARE_PRINTERS,
                                              num_settings, settings)) ||
+#ifdef HAVE_GSSAPI
+        !cupsGetOption("DefaultAuthType", num_settings, settings) ||
+	strcmp(default_auth_type, cupsGetOption("DefaultAuthType",
+	                                        num_settings, settings)) ||
+#endif /* HAVE_GSSAPI */
         strcmp(user_cancel_any, cupsGetOption(CUPS_SERVER_USER_CANCEL_ANY,
                                               num_settings, settings)))
     {
@@ -1900,6 +1914,10 @@ do_config_server(http_t *http)		/* I - HTTP connection */
                                    share_printers, num_settings, &settings);
       num_settings = cupsAddOption(CUPS_SERVER_USER_CANCEL_ANY,
                                    user_cancel_any, num_settings, &settings);
+#ifdef HAVE_GSSAPI
+      num_settings = cupsAddOption("DefaultAuthType", default_auth_type,
+                                   num_settings, &settings);
+#endif /* HAVE_GSSAPI */
 
       if (!_cupsAdminSetServerSettings(http, num_settings, settings))
       {
@@ -2472,6 +2490,14 @@ do_menu(http_t *http)			/* I - HTTP connection */
   if ((val = cupsGetOption(CUPS_SERVER_USER_CANCEL_ANY, num_settings,
                            settings)) != NULL && atoi(val))
     cgiSetVariable("USER_CANCEL_ANY", "CHECKED");
+
+#ifdef HAVE_GSSAPI
+  cgiSetVariable("HAVE_GSSAPI", "1");
+
+  if ((val = cupsGetOption("DefaultAuthType", num_settings,
+                           settings)) != NULL && !strcasecmp(val, "Negotiate"))
+    cgiSetVariable("KERBEROS", "CHECKED");
+#endif /* HAVE_GSSAPI */
 
   cupsFreeOptions(num_settings, settings);
 

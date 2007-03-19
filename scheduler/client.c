@@ -2221,7 +2221,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   * never disable it in that case.
   */
 
-  if (code >= HTTP_BAD_REQUEST && con->http.auth_type != AUTH_KERBEROS)
+  if (code >= HTTP_BAD_REQUEST && con->http.auth_type != AUTH_NEGOTIATE)
     con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 
  /*
@@ -2397,7 +2397,7 @@ cupsdSendHeader(cupsd_client_t *con,	/* I - Client to send to */
       snprintf(auth_str, sizeof(auth_str), "Digest realm=\"CUPS\", nonce=\"%s\"",
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
-    else if (auth_type == AUTH_KERBEROS && !con->no_negotiate &&
+    else if (auth_type == AUTH_NEGOTIATE && !con->no_negotiate &&
 	     con->gss_output_token.length == 0)
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
 #endif /* HAVE_GSSAPI */
