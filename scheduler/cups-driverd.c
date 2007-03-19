@@ -684,7 +684,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     { "german",		"de" },
     { "greek",		"el" },
     { "italian",	"it" },
-    { "japanese",	"jp" },
+    { "japanese",	"ja" },
     { "norwegian",	"no" },
     { "polish",		"pl" },
     { "portuguese",	"pt" },

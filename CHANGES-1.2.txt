@@ -3,6 +3,8 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.10
 
+	- _cupsAdminSetServerSettings() did not support changing
+	  of top-level directives as designed.
 	- The init script path check was broken.
 	- CUPS incorrectly used the attribute "notify-recipient"
 	  instead of "notify-recicpient-uri" in several places
