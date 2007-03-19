@@ -27,6 +27,7 @@
 
 #
 # This little script uses convert from ImageMagick to generate CUPS buttons.
+# It requires ImageMagick version 6.2.4 or higher.
 #
 # It can generate 20-pixel high one-line buttons and 40-pixel high two-line
 # buttons.
@@ -64,6 +65,9 @@ if test $# -lt 2; then
 elif test ! -d tools; then
 	echo ERROR: You MUST run the makebuttons script from the main CUPS source directory!
 	exit 1
+elif test "x`convert --help | grep extent`" = x; then
+	echo ERROR: This script requires ImageMagick 6.2.4 or higher.
+	exit 1
 else
 	locale=$1
 	list=$2
@@ -74,12 +78,6 @@ if test ! -f $list; then
 	exit 1
 elif test ! -r $list; then
 	echo "ERROR: $list: cannot read file."
-	exit 1
-elif test x`which convert` = x; then
-	echo "ERROR: ImageMagick 'convert' command is not your PATH!"
-	exit 1
-elif test x`which identify` = x; then
-	echo "ERROR: ImageMagick 'identify' command is not your PATH!"
 	exit 1
 fi
 
