@@ -6,7 +6,7 @@ like to thank the following individuals for their contributions:
 
     Nathaniel Barbour              - Lots of testing and feedback.
     N. Becker                      - setsid().
-    Philippe Combes                - French localization.
+    Philippe Combes                - French localization and buttons script.
     Jean-Eric Cuendet              - GhostScript filters for CUPS.
     Van Dang                       - HTTP and IPP policeman.
     L. Peter Deutsch               - MD5 code.

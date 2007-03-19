@@ -1,9 +1,11 @@
-CHANGES.txt - 2007-02-19
+CHANGES.txt - 2007-03-19
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2130, STR #2131)
+	- Added new "makebuttons" script in the "tools" directory
+	  for creating web interface buttons (STR #2231)
 	- Added support for DNS-SD (aka "Bonjour") printer sharing
 	  (STR #1171)
 	- Job operations (cancel, hold, release, etc.) from the

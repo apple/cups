@@ -26,8 +26,11 @@ files and directories:</P>
 	<LI><VAR>doc/images/button-*.gif</VAR> - the web
 	interface button images</LI>
 
-	<LI><VAR>doc/images/button-*.scm</VAR> - the Gimp scripts
-	we use to generate the web interface button images</LI>
+	<LI><VAR>tools/buttons.txt</VAR> - the English text for the
+	web interface buttons</LI>
+
+	<LI><VAR>tools/makebuttons</VAR> - the shell script we use
+	to generate the web interface button images</LI>
 
 	<LI><VAR>doc/index.html</VAR> - the web interface home
 	page</LI>
@@ -44,7 +47,7 @@ localization files are  placed in subdirectories under the
 <VAR>doc</VAR> and <VAR>templates</VAR> using the locale name.
 Locale names are either <VAR>ll</VAR> or <VAR>ll_CC</VAR>, where
 "ll" is the 2-letter language code and "CC" is the 2-letter
-country code.</P>
+country code. <em>CUPS does not currently use or support the newer <VAR>ll-region</VAR> syntax for locale names.</em></P>
 
 <P>All non-image files must be encoded using the UTF-8 character
 set.</P>
@@ -86,22 +89,19 @@ Comment[<I>ll_CC</I>]=<I>Translation of "CUPS Web Interface"</I>
 
 <H2 CLASS="title"><A NAME="IMAGES">Button Images</A></H2>
 
-<P>The web interface button images are used to activate functions
-on the CUPS web pages. Table 1 lists the button images and the
-English text labels for those buttons. Use the supplied Gimp
-scripts to create button images that match the CUPS web interface
-and save them in the <VAR>doc/ll_CC/images</VAR> subdirectory.
-The Gimp button scripts can be installed using the following
-command:</P>
+<P>The web interface button images are used to activate functions on
+the CUPS web pages. Table 1 lists the button images and the English
+text labels for those buttons. Copy the file
+<VAR>tools/buttons.txt</VAR> to <VAR>buttons-ll_CC.txt</VAR>,
+translate the text in that file (use UTF-8 as the text encoding!),
+and then use the supplied <VAR>tools/makebuttons</VAR> script to
+create button images that match the CUPS web interface:</P>
 
 <PRE CLASS="command">
-cp doc/images/button*.scm ~/.gimp-2.2/scripts
+cp tools/buttons.txt buttons-ll_CC.txt
+vi buttons-ll_CC.txt
+tools/makebuttons ll_CC buttons-ll_CC.txt
 </PRE>
-
-<P>If you have already started the Gimp application, choose
-<VAR>Refresh Scripts</VAR> from the <VAR>Xtns->Script-Fu</VAR>
-sub-menu. The button scripts will be available under a new
-<VAR>Btns</VAR menu in the Gimp tool window.</P>
 
 <P>When you have created all of the button images, edit the
 <VAR>Makedefs</VAR> file and add the locale name to the

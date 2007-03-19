@@ -1,0 +1,270 @@
+#!/bin/sh
+#
+# "$Id$"
+#
+#   Button generation script for the Common UNIX Printing System (CUPS).
+#
+#   Originally created and donated by Philippe Combes (see STR #2231).
+#
+#   Copyright 2007 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44141 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3142 USA
+#
+#       Voice: (301) 373-9600
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+
+#
+# This little script uses convert from ImageMagick to generate CUPS buttons.
+#
+# It can generate 20-pixel high one-line buttons and 40-pixel high two-line
+# buttons.
+#
+# Usage:
+#
+#     tools/makebuttons locale buttons.txt
+#
+# "Locale" is the locale name, either "ll" or "ll_CC" where "ll" is the
+# 2-letter language abbreviation and "CC" is the 2-letter ISO country
+# code.  The new "ll-region" syntax is *not* supported at this time
+# and should not be used!
+#
+# "Buttons.txt" is a file containing the buttons to be created and must
+# be formatted as follows:
+#
+#     filename.gif color text for button
+# 
+# "filename.gif" is the name of the image file to create.
+#
+# "color" is the color of the button, one of "std" (the normal olive
+# background), "black", "green", or "red".
+#
+# The remainder of the line following the color is used as the text
+# for the button.  Use "@UP" and "@DOWN" to include up and down arrows,
+# and "\\n" to break the text into 2 lines (not generally recommended).
+#
+# Lines starting with '#' are treated as comments.  See the file
+# "tools/buttons.txt" for inspiration...
+#
+
+if test $# -lt 2; then
+	echo Usage: tools/makebuttons locale buttons.txt
+	exit 1
+elif test ! -d tools; then
+	echo ERROR: You MUST run the makebuttons script from the main CUPS source directory!
+	exit 1
+else
+	locale=$1
+	list=$2
+fi
+
+if test ! -f $list; then
+	echo "ERROR: $list: file not found."
+	exit 1
+elif test ! -r $list; then
+	echo "ERROR: $list: cannot read file."
+	exit 1
+elif test x`which convert` = x; then
+	echo "ERROR: ImageMagick 'convert' command is not your PATH!"
+	exit 1
+elif test x`which identify` = x; then
+	echo "ERROR: ImageMagick 'identify' command is not your PATH!"
+	exit 1
+fi
+
+
+# Bitstream Vera font...
+font="fonts/Vera.ttf"
+
+# Base image
+base="tools/buttons.gif"
+
+# Colors
+background="#d4d4a4"
+black="#000000"
+green="#009900"
+red="#cc0000"
+standard="#666633"
+
+
+# 'generate_button()' - Create a button image.
+#
+# Arg 1: button filename (WITH .gif extension!)
+# Arg 2: button color: black, green, red or std (only the initial letter matters)
+# Arg 3+: the text !
+
+function generate_button()
+{
+	# Collect arguments...
+	filename=$1
+	shift
+
+	color=$1
+	shift
+
+	txt="$*"
+
+	# Show progress...
+	echo Creating $filename...
+
+	# Figure out the foreground and background colors...
+	bgclr=$background
+
+	case x$color in
+		xb*)
+        		fgclr=$black
+        		fuzz="10%"
+        		;;
+
+		xg*)
+        		fgclr=$green
+        		fuzz="10%"
+        		;;
+
+		xr*)
+        		fgclr=$red
+        		fuzz="1%"
+        		;;
+
+		xs*)
+        		fgclr=$standard
+        		fuzz="10%"
+        		;;
+
+		*)
+        		echo "ERROR: Unknown color $color for $filename!"
+        		exit 1
+        		;;
+	esac
+
+	# See if we need to add the up or down arrows...
+	add_arrows=0 # 1: up arrows, 2: down arrows
+
+	if echo $txt | grep '@UP' > /dev/null 2>&1; then
+		add_arrows=1
+		txt="`echo $txt | sed 's|@UP||g'`"
+	elif echo $txt | grep '@DOWN' > /dev/null 2>&1; then
+		add_arrows=2
+		txt="`echo $txt | sed 's|@DOWN||g'`"
+	fi
+
+	tmp_btn=/tmp/cups-btn-$$.bmp
+
+	# First step: generate an image trimmed to the text.
+	#  -> annotate a 40x400 rectangle with the provided text
+	#  -> trim to the text
+	convert $base -extent 400x40 -fill "$fgclr" \
+		-draw "rectangle 0,0 399,39" \
+        	-fill "#ffffff" -encoding Unicode -pointsize 13 -font "$font" \
+        	-gravity Center -annotate 0x0+0+0 "$txt" -trim $tmp_btn
+
+	# From the 1st step, we get text width and height
+	txt_h=`identify -format "%h" $tmp_btn`
+	txt_w=`identify -format "%w" $tmp_btn`
+
+	if test $txt_h -gt 32; then
+		echo "ERROR: 2 lines maximum for the button text"
+		exit 1
+	fi
+
+	# With the default font, one line is less than 16 pixels high, and a
+	# two lines of text is at least 20 pixels high.  So, from the text
+	# height we guess if we need a one- or two-line button.
+	if test $txt_h -ge 18; then
+		btn_h=40
+	else
+		btn_h=20
+	fi
+
+	if test $add_arrows -gt 0; then
+		if test $btn_h -eq 20; then
+			txt_w=`expr $txt_w + 36`
+		elif test $btn_h -eq 40; then
+			txt_w=`expr $txt_w + 58`
+		fi
+	fi
+
+	# Second step: generate the button.
+	#
+	# Procedure:
+	#
+	#     - Draw a rectangle with the background color (for correct
+	#       button borders)
+	#     - Draw a roundRectangle (args are coordinates, not lengths!)
+	#     - Make the background transparent (with correct fuzz feature)
+	#     - Annotate centered text (in height, it is necessary to have
+	#       -1 in y parameter so that the text is not too low)
+	rad=`expr $btn_h / 2`
+	btn_w=`expr $txt_w + $rad + $rad`
+	btn_top=`expr $btn_h - 1`
+
+	convert $base \
+        	-extent $btn_w'x'$btn_h -fill "$bgclr" \
+        	-draw "rectangle 0,0 $btn_w,$btn_h" -fill "$fgclr" \
+        	-draw "roundRectangle 0,0 `expr $btn_w - 1`,$btn_top `expr $rad - 1`,$rad" \
+        	-fuzz $fuzz -transparent "$bgclr" -write $filename \
+        	-fill "#ffffff" -encoding Unicode -pointsize 13 \
+        	-font "$font" -gravity Center -annotate 0x0+0-1 "$txt" \
+        	$filename
+
+	if test $add_arrows -gt 0; then
+		if test $add_arrows -eq 1; then
+			# UP arrows
+        		if test $btn_h -eq 20; then
+				# 1-line buttons
+        			pts1="9,15 21,15 15,4"
+        			pts2="`expr $btn_w - 10`,15 `expr $btn_w - 22`,15 `expr $btn_w - 16`,4"
+        		else
+				# 2-line buttons
+        			pts1="16,30 34,30 25,10"
+        			pts2="`expr $btn_w - 17`,30 `expr $btn_w - 35`,30 `expr $btn_w - 26`,10"
+        		fi
+		else
+			# DOWN arrows
+        		if [ $btn_h -eq 20 ]; then
+				# 1-line buttons
+        			pts1="9,4 21,4 15,15"
+        			pts2="`expr $btn_w - 10`,4 `expr $btn_w - 22`,4 `expr $btn_w - 16`,15"
+        		else
+				# 2-line buttons
+        			pts1="16,10 34,10 25,30"
+        			pts2="`expr $btn_w - 17`,10 `expr $btn_w - 35`,10 `expr $btn_w - 26`,30"
+        		fi
+		fi
+
+		convert $filename -fill "#ffffff" -draw "polygon $pts1" \
+        		-draw "polygon $pts2" $filename
+	fi
+
+	rm -f $tmp_btn
+}
+
+# Make sure the locale-specific destination directory exists...
+if test ! -d doc/$locale/images; then
+	echo Creating doc/$locale/images...
+	mkdir -p doc/$locale/images
+fi
+
+# Process each line in the file...
+cat $list | while read line; do
+	if test "x`echo $line | cut -c1`" = "x#"; then
+		continue
+	fi
+
+	generate_button doc/$locale/images/$line
+done
+
+#
+# End of "$Id$".
+#
