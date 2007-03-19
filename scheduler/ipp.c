@@ -1175,16 +1175,31 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   * Check policy...
   */
 
+  auth_info = ippFindAttribute(job->attrs, "auth-info", IPP_TAG_TEXT);
+
   if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
     send_http_error(con, status);
     return (NULL);
   }
-  else if ((printer->type & CUPS_PRINTER_AUTHENTICATED) && !con->username[0])
+  else if ((printer->type & CUPS_PRINTER_AUTHENTICATED) &&
+           !con->username[0] && !auth_info)
   {
     send_http_error(con, HTTP_UNAUTHORIZED);
     return (NULL);
   }
+#ifdef HAVE_SSL
+  else if (auth_info && !con->http.tls &&
+           !httpAddrLocalhost(con->http.hostaddr))
+  {
+   /*
+    * Require encryption of auth-info over non-local connections...
+    */
+
+    send_http_error(con, HTTP_UPGRADE_REQUIRED);
+    return (NULL);
+  }
+#endif /* HAVE_SSL */
 
  /*
   * See if the printer is accepting jobs...
@@ -1363,8 +1378,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     _cupsStrFree(attr->name);
     attr->name = _cupsStrAlloc("job-originating-user-name");
   }
-
-  auth_info = ippFindAttribute(job->attrs, "auth-info", IPP_TAG_TEXT);
 
   if (con->username[0] || auth_info)
   {
