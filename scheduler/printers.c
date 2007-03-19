@@ -2288,6 +2288,14 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     if (BrowseLocalOptions)
       length += 12 + strlen(BrowseLocalOptions);
 
+    if (p->num_auth_info_required > 0)
+    {
+      length += 18;			/* auth-info-required */
+
+      for (i = 0; i < p->num_auth_info_required; i ++)
+        length += strlen(p->auth_info_required[i]) + 1;
+    }
+
    /*
     * Allocate the new string...
     */
@@ -2334,7 +2342,20 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	}
       }
 
-      *attrptr = '\0';
+      if (p->num_auth_info_required > 0)
+      {
+        strcpy(attrptr, "auth-info-required");
+	attrptr += 18;
+
+	for (i = 0; i < p->num_auth_info_required; i ++)
+	{
+	  *attrptr++ = i ? ',' : '=';
+	  strcpy(attrptr, p->auth_info_required[i]);
+	  attrptr += strlen(attrptr);
+	}
+      }
+      else
+	*attrptr = '\0';
     }
   }
 

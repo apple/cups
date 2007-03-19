@@ -2448,10 +2448,11 @@ dnssdBuildTxtRecord(
     int             *txt_len,		/* O - TXT record length */
     cupsd_printer_t *p)			/* I - Printer information */
 {
-  int		i;			/* Looping var */
+  int		i, j;			/* Looping vars */
   char		type_str[32],		/* Type to string buffer */
 		state_str[32],		/* State to string buffer */
 		rp_str[1024],		/* Queue name string buffer */
+		air_str[1024],		/* auth-info-required string buffer */
 		*keyvalue[32][2];	/* Table of key/value pairs */
 
 
@@ -2555,6 +2556,27 @@ dnssdBuildTxtRecord(
 
   keyvalue[i  ][0] = "pdl";
   keyvalue[i++][1] = p->pdl ? p->pdl : "application/postscript";
+
+  if (p->num_auth_info_required)
+  {
+    char	*air = air_str;		/* Pointer into string */
+
+
+    for (j = 0; j < p->num_auth_info_required; j ++)
+    {
+      if (air >= (air_str + sizeof(air_str) - 2))
+        break;
+
+      if (j)
+        *air++ = ',';
+
+      strlcpy(air, p->auth_info_required[j], sizeof(air_str) - (air - air_str));
+      air += strlen(air);
+    }
+
+    keyvalue[i  ][0] = "air";
+    keyvalue[i++][1] = air;
+  }
 
  /*
   * Then pack them into a proper txt record...
@@ -3082,7 +3104,7 @@ process_implicit_classes(void)
 
 /*
  * 'send_cups_browse()' - Send new browsing information using the CUPS
- *                           protocol.
+ *                        protocol.
  */
 
 static void
