@@ -1,9 +1,9 @@
 /*
- * "$Id: cgi-private.h 4921 2006-01-12 21:26:26Z mike $"
+ * "$Id: cgi-private.h 6361 2007-03-19 16:01:28Z mike $"
  *
  *   Private CGI definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -40,5 +40,5 @@
 
 
 /*
- * End of "$Id: cgi-private.h 4921 2006-01-12 21:26:26Z mike $".
+ * End of "$Id: cgi-private.h 6361 2007-03-19 16:01:28Z mike $".
  */

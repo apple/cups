@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 6318 2007-03-06 04:36:55Z mike $"
+ * "$Id: printers.c 6354 2007-03-19 06:16:32Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -2288,6 +2288,14 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     if (BrowseLocalOptions)
       length += 12 + strlen(BrowseLocalOptions);
 
+    if (p->num_auth_info_required > 0)
+    {
+      length += 18;			/* auth-info-required */
+
+      for (i = 0; i < p->num_auth_info_required; i ++)
+        length += strlen(p->auth_info_required[i]) + 1;
+    }
+
    /*
     * Allocate the new string...
     */
@@ -2334,7 +2342,20 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	}
       }
 
-      *attrptr = '\0';
+      if (p->num_auth_info_required > 0)
+      {
+        strcpy(attrptr, "auth-info-required");
+	attrptr += 18;
+
+	for (i = 0; i < p->num_auth_info_required; i ++)
+	{
+	  *attrptr++ = i ? ',' : '=';
+	  strcpy(attrptr, p->auth_info_required[i]);
+	  attrptr += strlen(attrptr);
+	}
+      }
+      else
+	*attrptr = '\0';
     }
   }
 
@@ -3632,5 +3653,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 6318 2007-03-06 04:36:55Z mike $".
+ * End of "$Id: printers.c 6354 2007-03-19 06:16:32Z mike $".
  */

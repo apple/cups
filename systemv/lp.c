@@ -1,9 +1,9 @@
 /*
- * "$Id: lp.c 5925 2006-09-05 19:43:11Z mike $"
+ * "$Id: lp.c 6356 2007-03-19 13:54:48Z mike $"
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -290,7 +290,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      snprintf(email, sizeof(email), "mailto:%s@%s", cupsUser(),
 	               httpGetHostname(NULL, buffer, sizeof(buffer)));
-	      num_options = cupsAddOption("notify-recipient", email,
+	      num_options = cupsAddOption("notify-recipient-uri", email,
 	                                  num_options, &options);
 	    }
 
@@ -840,5 +840,5 @@ sighandler(int s)			/* I - Signal number */
 
 
 /*
- * End of "$Id: lp.c 5925 2006-09-05 19:43:11Z mike $".
+ * End of "$Id: lp.c 6356 2007-03-19 13:54:48Z mike $".
  */

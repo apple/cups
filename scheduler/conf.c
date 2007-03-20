@@ -1,9 +1,9 @@
 /*
- * "$Id: conf.c 6253 2007-02-10 18:48:40Z mike $"
+ * "$Id: conf.c 6365 2007-03-19 20:56:57Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -87,6 +87,9 @@ typedef struct
 static cupsd_var_t	variables[] =
 {
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
+#ifdef __APPLE__
+  { "AppleQuotas",		&AppleQuotas,		CUPSD_VARTYPE_BOOLEAN },
+#endif  /* __APPLE__ */
   { "AutoPurgeJobs", 		&JobAutoPurge,		CUPSD_VARTYPE_BOOLEAN },
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
 #ifdef HAVE_LDAP
@@ -462,6 +465,10 @@ cupsdReadConfiguration(void)
   LaunchdTimeout = DEFAULT_TIMEOUT + 10;
   cupsdSetString(&LaunchdConf, CUPS_DEFAULT_LAUNCHD_CONF);
 #endif /* HAVE_LAUNCHD */
+
+#ifdef __APPLE__
+  AppleQuotas = TRUE;
+#endif  /* __APPLE__ */
 
  /*
   * Read the configuration file...
@@ -1718,10 +1725,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	loc->level = AUTH_USER;
     }
 #ifdef HAVE_GSSAPI
-    else if (!strcasecmp(value, "kerberos") ||
-	     !strcasecmp(value, "gssapi"))
+    else if (!strcasecmp(value, "negotiate"))
     {
-      loc->type = AUTH_KERBEROS;
+      loc->type = AUTH_NEGOTIATE;
 
       if (loc->level == AUTH_ANON)
 	loc->level = AUTH_USER;
@@ -2737,8 +2743,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else if (!strcasecmp(value, "basicdigest"))
 	DefaultAuthType = AUTH_BASICDIGEST;
 #ifdef HAVE_GSSAPI
-      else if (!strcasecmp(value, "kerberos"))
-        DefaultAuthType = AUTH_KERBEROS;
+      else if (!strcasecmp(value, "negotiate"))
+        DefaultAuthType = AUTH_NEGOTIATE;
 #endif /* HAVE_GSSAPI */
       else
       {
@@ -3342,5 +3348,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 6253 2007-02-10 18:48:40Z mike $".
+ * End of "$Id: conf.c 6365 2007-03-19 20:56:57Z mike $".
  */

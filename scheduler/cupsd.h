@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h 6170 2007-01-02 17:26:41Z mike $"
+ * "$Id: cupsd.h 6365 2007-03-19 20:56:57Z mike $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -172,6 +172,16 @@ VAR int			Launchd		VALUE(0);
 					/* Running from launchd */
 #endif /* HAVE_LAUNCH_H */
 
+#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
+typedef int (*PSQUpdateQuotaProcPtr)(const char *printer, const char *info, 
+                                     const char *user, int nPages, int options);
+VAR PSQUpdateQuotaProcPtr PSQUpdateQuotaProc
+					VALUE(0);
+					/* Apple PrintService quota function */
+#endif /* __APPLE__ && HAVE_DLFCN_H */
+
+
+
 
 /*
  * Prototypes...
@@ -217,5 +227,5 @@ extern void	cupsdStopSelect(void);
 
 
 /*
- * End of "$Id: cupsd.h 6170 2007-01-02 17:26:41Z mike $".
+ * End of "$Id: cupsd.h 6365 2007-03-19 20:56:57Z mike $".
  */

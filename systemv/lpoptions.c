@@ -1,5 +1,5 @@
 /*
- * "$Id: lpoptions.c 6202 2007-01-22 21:37:45Z mike $"
+ * "$Id: lpoptions.c 6347 2007-03-18 03:21:36Z mike $"
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
@@ -174,6 +174,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
 	        dest = dests;
 
+	      if (dest == NULL)
+              {
+		_cupsLangPuts(stderr, _("lpoptions: No printers!?!\n"));
+                return (1);
+              }
+
 	      for (j = 0; j < dest->num_options; j ++)
 		if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
 		  num_options = cupsAddOption(dest->options[j].name,
@@ -243,6 +249,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
 	        dest = dests;
+
+	      if (dest == NULL)
+              {
+		_cupsLangPuts(stderr, _("lpoptions: No printers!?!\n"));
+                return (1);
+              }
 
 	      for (j = 0; j < dest->num_options; j ++)
 		if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
@@ -484,5 +496,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c 6202 2007-01-22 21:37:45Z mike $".
+ * End of "$Id: lpoptions.c 6347 2007-03-18 03:21:36Z mike $".
  */

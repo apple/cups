@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6318 2007-03-06 04:36:55Z mike $"
+ * "$Id: ipp.c 6370 2007-03-20 14:36:12Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -112,6 +112,17 @@
 #ifdef HAVE_LIBPAPER
 #  include <paper.h>
 #endif /* HAVE_LIBPAPER */
+
+#ifdef HAVE_MEMBERSHIP_H
+#  include <membership.h>
+#endif /* HAVE_MEMBERSHIP_H */
+#ifdef HAVE_MEMBERSHIPPRIV_H
+#  include <membershipPriv.h>
+#else
+extern int mbr_user_name_to_uuid(const char* name, uuid_t uu);
+extern int mbr_group_name_to_uuid(const char* name, uuid_t uu);
+extern int mbr_check_membership_by_id(uuid_t user, gid_t group, int* ismember);
+#endif /* HAVE_MEMBERSHIPPRIV_H */
 
 
 /*
@@ -1175,16 +1186,31 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   * Check policy...
   */
 
+  auth_info = ippFindAttribute(job->attrs, "auth-info", IPP_TAG_TEXT);
+
   if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
     send_http_error(con, status);
     return (NULL);
   }
-  else if ((printer->type & CUPS_PRINTER_AUTHENTICATED) && !con->username[0])
+  else if ((printer->type & CUPS_PRINTER_AUTHENTICATED) &&
+           !con->username[0] && !auth_info)
   {
     send_http_error(con, HTTP_UNAUTHORIZED);
     return (NULL);
   }
+#ifdef HAVE_SSL
+  else if (auth_info && !con->http.tls &&
+           !httpAddrLocalhost(con->http.hostaddr))
+  {
+   /*
+    * Require encryption of auth-info over non-local connections...
+    */
+
+    send_http_error(con, HTTP_UPGRADE_REQUIRED);
+    return (NULL);
+  }
+#endif /* HAVE_SSL */
 
  /*
   * See if the printer is accepting jobs...
@@ -1363,8 +1389,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     _cupsStrFree(attr->name);
     attr->name = _cupsStrAlloc("job-originating-user-name");
   }
-
-  auth_info = ippFindAttribute(job->attrs, "auth-info", IPP_TAG_TEXT);
 
   if (con->username[0] || auth_info)
   {
@@ -3151,7 +3175,24 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   int		i;			/* Looping var */
   char		username[33];		/* Username */
   cupsd_quota_t	*q;			/* Quota data */
+#ifdef HAVE_MBR_UID_TO_UUID
+ /*
+  * Use Apple membership APIs which require that all names represent
+  * valid user account or group records accessible by the server.
+  */
+
+  uuid_t	usr_uuid;		/* UUID for job requesting user  */
+  uuid_t	usr2_uuid;		/* UUID for ACL user name entry  */
+  uuid_t	grp_uuid;		/* UUID for ACL group name entry */
+  int		mbr_err;		/* Error from membership function */
+  int		is_member;		/* Is this user a member? */
+#else
+ /*
+  * Use standard POSIX APIs for checking users and groups...
+  */
+
   struct passwd	*pw;			/* User password data */
+#endif /* HAVE_MBR_UID_TO_UUID */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "check_quotas(%p[%d], %p[%s])",
@@ -3211,8 +3252,34 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
   if (p->num_users)
   {
+#ifdef HAVE_MBR_UID_TO_UUID
+   /*
+    * Get UUID for job requesting user...
+    */
+
+    if (mbr_user_name_to_uuid((char *)username, usr_uuid))
+    {
+     /*
+      * Unknown user...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "check_quotas: UUID lookup failed for user \"%s\"",
+		      username);
+      cupsdLogMessage(CUPSD_LOG_INFO,
+		      "Denying user \"%s\" access to printer \"%s\" "
+		      "(unknown user)...",
+		      username, p->name);
+      return (0);
+    }
+#else
+   /*
+    * Get UID and GID of requesting user...
+    */
+
     pw = getpwnam(username);
     endpwent();
+#endif /* HAVE_MBR_UID_TO_UUID */
 
     for (i = 0; i < p->num_users; i ++)
       if (p->users[i][0] == '@')
@@ -3221,11 +3288,86 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
         * Check group membership...
 	*/
 
+#ifdef HAVE_MBR_UID_TO_UUID
+	if ((mbr_err = mbr_group_name_to_uuid((char *)p->users[i] + 1,
+	                                      grp_uuid)) != 0)
+	{
+	 /*
+	  * Invalid ACL entries are ignored for matching; just record a
+	  * warning in the log...
+	  */
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "check_quotas: UUID lookup failed for ACL entry "
+			  "\"%s\" (err=%d)", p->users[i], mbr_err);
+	  cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "Access control entry \"%s\" not a valid group name; "
+			  "entry ignored", p->users[i]);
+	}
+	else
+	{
+	  if ((mbr_err = mbr_check_membership(usr_uuid, grp_uuid,
+	                                      &is_member)) != 0)
+	  {
+	   /*
+	    * At this point, there should be no errors, but check anyways...
+	    */
+
+	    cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                    "check_quotas: group \"%s\" membership check "
+			    "failed (err=%d)", p->users[i] + 1, mbr_err);
+            is_member = 0;
+	  }
+
+         /*
+	  * Stop if we found a match...
+	  */
+
+	  if (is_member)
+	    break;
+	}
+#else
         if (cupsdCheckGroup(username, pw, p->users[i] + 1))
 	  break;
+#endif /* HAVE_MBR_UID_TO_UUID */
       }
+#ifdef HAVE_MBR_UID_TO_UUID
+      else
+      {
+        if ((mbr_err = mbr_user_name_to_uuid((char *)p->users[i],
+					     usr2_uuid)) != 0)
+    	{
+	 /*
+	  * Invalid ACL entries are ignored for matching; just record a
+	  * warning in the log...
+	  */
+
+          cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "check_quotas: UUID lookup failed for ACL entry "
+			  "\"%s\" (err=%d)", p->users[i], mbr_err);
+          cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "Access control entry \"%s\" not a valid user name; "
+			  "entry ignored", p->users[i]);
+	}
+	else
+	{
+	  if ((mbr_err = mbr_check_membership(usr_uuid, usr2_uuid,
+	                                      &is_member)) != 0)
+          {
+	    cupsdLogMessage(CUPSD_LOG_DEBUG,
+			    "check_quotas: User \"%s\" identity check failed "
+			    "(err=%d)", p->users[i], mbr_err);
+	    is_member = 0;
+	  }
+
+	  if (is_member)
+	    break;
+	}
+      }
+#else
       else if (!strcasecmp(username, p->users[i]))
 	break;
+#endif /* HAVE_MBR_UID_TO_UUID */
 
     if ((i < p->num_users) == p->deny_users)
     {
@@ -3240,6 +3382,66 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   * Check quotas...
   */
 
+#ifdef __APPLE__
+  if (AppleQuotas)
+  {
+   /*
+    * TODO: Define these special page count values as constants!
+    */
+
+    if (q->page_count == -4) /* special case: unlimited user */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request approved for printer %s (%s): " 
+		      "unlimited quota.",
+		      username, p->name, p->info);
+      q->page_count = 0; /* allow user to print */
+      return (1);
+    }
+    else if (q->page_count == -3) /* quota exceeded */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request denied for printer %s (%s): "
+		      "quota limit exceeded.",
+		      username, p->name, p->info);
+      q->page_count = 2; /* force quota exceeded failure */
+      return (0);
+    }
+    else if (q->page_count == -2) /* quota disabled for user */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request denied for printer %s (%s): "
+		      "printing disabled for user.",
+		      username, p->name, p->info);
+      q->page_count = 2; /* force quota exceeded failure */
+      return (0);
+    }
+    else if (q->page_count == -1) /* quota access error */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request denied for printer %s (%s): "
+		      "unable to determine quota limit.",
+		      username, p->name, p->info);
+      q->page_count = 2; /* force quota exceeded failure */
+      return (0);
+    }
+    else if (q->page_count < 0) /* user not found or other error */
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "User \"%s\" request denied for printer %s (%s): "
+		      "user disabled / missing quota.",
+		      username, p->name, p->info);
+      q->page_count = 2; /* force quota exceeded failure */
+      return (0);
+    }
+    else /* page within user limits */
+    {
+      q->page_count = 0; /* allow user to print */
+      return (1);
+    }
+  }
+  else
+#endif /* __APPLE__ */
   if (p->k_limit || p->page_limit)
   {
     if ((q = cupsdUpdateQuota(p, username, 0, 0)) == NULL)
@@ -4832,7 +5034,7 @@ create_subscription(
 
     while (attr && attr->group_tag != IPP_TAG_ZERO)
     {
-      if (!strcmp(attr->name, "notify-recipient") &&
+      if (!strcmp(attr->name, "notify-recipient-uri") &&
           attr->value_tag == IPP_TAG_URI)
       {
        /*
@@ -4851,7 +5053,7 @@ create_subscription(
 			    resource, sizeof(resource)) < HTTP_URI_OK)
         {
           send_ipp_status(con, IPP_NOT_POSSIBLE,
-	                  _("Bad notify-recipient URI \"%s\"!"), recipient);
+	                  _("Bad notify-recipient-uri URI \"%s\"!"), recipient);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_URI_SCHEME);
 	  return;
@@ -4862,7 +5064,7 @@ create_subscription(
         if (access(notifier, X_OK))
 	{
           send_ipp_status(con, IPP_NOT_POSSIBLE,
-	                  _("notify-recipient URI \"%s\" uses unknown scheme!"),
+	                  _("notify-recipient-uri URI \"%s\" uses unknown scheme!"),
 			  recipient);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_URI_SCHEME);
@@ -5503,9 +5705,6 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     if ((job->dtype & dmask) != dtype &&
         (!job->printer || (job->printer->type & dmask) != dtype))
       continue;
-    if (username[0] && strcasecmp(username, job->username))
-      continue;
-
     if (completed && job->state_value <= IPP_JOB_STOPPED)
       continue;
 
@@ -5515,6 +5714,9 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     cupsdLoadJob(job);
 
     if (!job->attrs)
+      continue;
+
+    if (username[0] && strcasecmp(username, job->username))
       continue;
 
     if (count > 0)
@@ -7658,7 +7860,6 @@ static void
 save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
                 cupsd_job_t    *job)	/* I - Job */
 {
-#  ifndef __APPLE__
   krb5_context	krb_context;		/* Kerberos context */
   krb5_ccache	ccache;			/* Credentials cache */
   OM_uint32	major_status,		/* Major status code */
@@ -7699,7 +7900,6 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
                   krb5_cc_get_name(krb_context, ccache));
   krb5_cc_close(krb_context, ccache);
-#  endif /* !__APPLE__ */
 }
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 
@@ -9248,5 +9448,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6318 2007-03-06 04:36:55Z mike $".
+ * End of "$Id: ipp.c 6370 2007-03-20 14:36:12Z mike $".
  */

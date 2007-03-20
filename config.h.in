@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 6304 2007-02-22 22:06:23Z mike $"
+ * "$Id: config.h.in 6370 2007-03-20 14:36:12Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -465,6 +465,7 @@
  */
 
 #undef HAVE_MEMBERSHIP_H
+#undef HAVE_MEMBERSHIPPRIV_H
 #undef HAVE_MBR_UID_TO_UUID
 
 
@@ -522,8 +523,15 @@
 #undef HAVE_KQUEUE
 
 
+/*
+ * Do we have the <dlfcn.h> header?
+ */
+
+#undef HAVE_DLFCN_H
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 6304 2007-02-22 22:06:23Z mike $".
+ * End of "$Id: config.h.in 6370 2007-03-20 14:36:12Z mike $".
  */

@@ -1,10 +1,10 @@
 /*
- * "$Id: conf.h 6291 2007-02-19 21:54:27Z mike $"
+ * "$Id: conf.h 6365 2007-03-19 20:56:57Z mike $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -201,6 +201,11 @@ VAR char		*LaunchdConf		VALUE(NULL);
 					/* launchd(8) configuration file */
 #endif /* HAVE_LAUNCHD */
 
+#ifdef __APPLE__
+VAR int			AppleQuotas		VALUE(TRUE);
+					/* Use Apple PrintService Quotas instead of CUPS quotas */
+#endif  /* __APPLE__ */
+
 #ifdef HAVE_AUTHORIZATION_H
 VAR char		*SystemGroupAuthKey	VALUE(NULL);
 					/* System group auth key */
@@ -228,5 +233,5 @@ extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 
 
 /*
- * End of "$Id: conf.h 6291 2007-02-19 21:54:27Z mike $".
+ * End of "$Id: conf.h 6365 2007-03-19 20:56:57Z mike $".
  */

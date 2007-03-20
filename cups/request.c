@@ -1,5 +1,5 @@
 /*
- * "$Id: request.c 6253 2007-02-10 18:48:40Z mike $"
+ * "$Id: request.c 6355 2007-03-19 06:33:04Z mike $"
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
@@ -143,6 +143,19 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   }
   else
     file = NULL;
+
+#ifdef HAVE_SSL
+ /*
+  * See if we have an auth-info attribute and are communicating over
+  * a non-local link.  If so, encrypt the link so that we can pass
+  * the authentication information securely...
+  */
+
+  if (ippFindAttribute(request, "auth-info", IPP_TAG_TEXT) &&
+      !httpAddrLocalhost(http->hostaddr) && !http->tls &&
+      httpEncryption(http, HTTP_ENCRYPT_REQUIRED))
+    return (NULL);
+#endif /* HAVE_SSL */
 
  /*
   * Loop until we can send the request without authorization problems.
@@ -494,5 +507,5 @@ _cupsSetError(ipp_status_t status,	/* I - IPP status code */
 
 
 /*
- * End of "$Id: request.c 6253 2007-02-10 18:48:40Z mike $".
+ * End of "$Id: request.c 6355 2007-03-19 06:33:04Z mike $".
  */

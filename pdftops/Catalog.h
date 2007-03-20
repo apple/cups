@@ -85,7 +85,7 @@ private:
   Object acroForm;		// AcroForm dictionary
   GBool ok;			// true if catalog is valid
 
-  int readPageTree(Dict *pages, PageAttrs *attrs, int start);
+  int readPageTree(Dict *pages, PageAttrs *attrs, int start, int callDepth);
   Object *findDestInTree(Object *tree, GString *name, Object *obj);
 };
 

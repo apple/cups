@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 6304 2007-02-22 22:06:23Z mike $"
+dnl "$Id: cups-common.m4 6370 2007-03-20 14:36:12Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -216,9 +216,13 @@ case $uname in
 		AC_CHECK_HEADER(CoreFoundation/CFPriv.h,AC_DEFINE(HAVE_CFPRIV_H))
 		AC_CHECK_HEADER(CoreFoundation/CFBundlePriv.h,AC_DEFINE(HAVE_CFBUNDLEPRIV_H))
 
-		dnl Check for the new membership functions in MacOSX 10.4 (Tiger)...
+		dnl Check for the new membership functions in MacOSX 10.4...
 		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))
+		AC_CHECK_HEADER(membershipPriv.h,AC_DEFINE(HAVE_MEMBERSHIPPRIV_H))
 		AC_CHECK_FUNCS(mbr_uid_to_uuid)
+
+		dnl Need <dlfcn.h> header...
+		AC_CHECK_HEADER(dlfcn.h,AC_DEFINE(HAVE_DLFCN_H))
 
 		dnl Check for notify_post support
 		AC_CHECK_HEADER(notify.h,AC_DEFINE(HAVE_NOTIFY_H))
@@ -277,5 +281,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 6304 2007-02-22 22:06:23Z mike $".
+dnl End of "$Id: cups-common.m4 6370 2007-03-20 14:36:12Z mike $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6318 2007-03-06 04:36:55Z mike $"
+ * "$Id: job.c 6365 2007-03-19 20:56:57Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1700,7 +1700,28 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
         job->sheets->values[0].integer += copies;
 
 	if (job->printer->page_limit)
-	  cupsdUpdateQuota(job->printer, job->username, copies, 0);
+	{
+	  cupsd_quota_t *q = cupsdUpdateQuota(job->printer, job->username,
+					      copies, 0);
+
+#ifdef __APPLE__
+	  if (AppleQuotas && q->page_count == -3)
+	  {
+	   /*
+	    * Quota limit exceeded, cancel job in progress immediately...
+	    */
+
+	    cupsdLogMessage(CUPSD_LOG_INFO,
+			    "Job %d canceled: pages exceed user %s quota "
+			    "limit on printer %s (%s).",
+			    job->id, job->username, job->printer->name,
+			    job->printer->info);
+
+	    cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
+	    return;
+	  }
+#endif /* __APPLE__ */
+	}
       }
 
       cupsdLogPage(job, message);
@@ -3521,5 +3542,5 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
 
 /*
- * End of "$Id: job.c 6318 2007-03-06 04:36:55Z mike $".
+ * End of "$Id: job.c 6365 2007-03-19 20:56:57Z mike $".
  */
