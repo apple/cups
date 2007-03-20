@@ -465,6 +465,7 @@
  */
 
 #undef HAVE_MEMBERSHIP_H
+#undef HAVE_MEMBERSHIPPRIV_H
 #undef HAVE_MBR_UID_TO_UUID
 
 
