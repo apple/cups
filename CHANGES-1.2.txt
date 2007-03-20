@@ -3,6 +3,9 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.10
 
+	- ppdLocalize() now supports localizing for Japanese
+	  using the "jp" locale name used by the ppdmerge
+	  program from the CUPS DDK 1.1.0 (STR #2301)
 	- _cupsAdminSetServerSettings() did not support changing
 	  of top-level directives as designed.
 	- The init script path check was broken.

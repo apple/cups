@@ -3,7 +3,7 @@
  *
  *   PPD custom option routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -183,6 +183,19 @@ ppd_text(ppd_file_t *ppd,		/* I - PPD file */
   {
     snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll, keyword);
     attr = ppdFindAttr(ppd, lkeyword, spec);
+
+    if (!attr && !strcmp(ll, "ja"))
+    {
+     /*
+      * Due to a bug in the CUPS DDK 1.1.0 ppdmerge program, Japanese
+      * PPD files were incorrectly assigned "jp" as the locale name
+      * instead of "ja".  Support both the old (incorrect) and new
+      * locale names for Japanese...
+      */
+
+      snprintf(lkeyword, sizeof(lkeyword), "jp.%s", keyword);
+      attr = ppdFindAttr(ppd, lkeyword, spec);
+    }
   }
 
 #ifdef DEBUG
