@@ -258,7 +258,7 @@ cupsRasterInterpretPPD(
   {
     float sc = atof(val);
 
-    if (sc >= 0.9 && sc <= 1.1)
+    if (sc >= 0.5 && sc <= 2.0)
       h->cupsBorderlessScalingFactor = sc;
   }
 
