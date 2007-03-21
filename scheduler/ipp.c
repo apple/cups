@@ -1863,7 +1863,7 @@ add_job_subscriptions(
 
     while (attr && attr->group_tag != IPP_TAG_ZERO)
     {
-      if (!strcmp(attr->name, "notify-recipient") &&
+      if (!strcmp(attr->name, "notify-recipient-uri") &&
           attr->value_tag == IPP_TAG_URI)
         recipient = attr->values[0].string.text;
       else if (!strcmp(attr->name, "notify-pull-method") &&
