@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 6361 2007-03-19 16:01:28Z mike $"
+ * "$Id: admin.c 6378 2007-03-21 07:18:18Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -1862,7 +1862,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     * Get the current server settings...
     */
 
-    if (!_cupsAdminGetServerSettings(http, &num_settings, &settings))
+    if (!cupsAdminGetServerSettings(http, &num_settings, &settings))
     {
       cgiStartHTML(cgiText(_("Change Settings")));
       cgiSetVariable("MESSAGE",
@@ -1919,7 +1919,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
                                    num_settings, &settings);
 #endif /* HAVE_GSSAPI */
 
-      if (!_cupsAdminSetServerSettings(http, num_settings, settings))
+      if (!cupsAdminSetServerSettings(http, num_settings, settings))
       {
 	cgiStartHTML(cgiText(_("Change Settings")));
 	cgiSetVariable("MESSAGE",
@@ -2460,7 +2460,7 @@ do_menu(http_t *http)			/* I - HTTP connection */
   * Get the current server settings...
   */
 
-  if (!_cupsAdminGetServerSettings(http, &num_settings, &settings))
+  if (!cupsAdminGetServerSettings(http, &num_settings, &settings))
   {
     cgiSetVariable("SETTINGS_MESSAGE",
                    cgiText(_("Unable to open cupsd.conf file:")));
@@ -3251,5 +3251,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 6361 2007-03-19 16:01:28Z mike $".
+ * End of "$Id: admin.c 6378 2007-03-21 07:18:18Z mike $".
  */

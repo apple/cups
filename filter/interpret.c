@@ -1,5 +1,5 @@
 /*
- * "$Id: interpret.c 6281 2007-02-14 16:32:42Z mike $"
+ * "$Id: interpret.c 6371 2007-03-20 23:18:01Z mike $"
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
@@ -258,7 +258,7 @@ cupsRasterInterpretPPD(
   {
     float sc = atof(val);
 
-    if (sc >= 0.9 && sc <= 1.1)
+    if (sc >= 0.5 && sc <= 2.0)
       h->cupsBorderlessScalingFactor = sc;
   }
 
@@ -1640,5 +1640,5 @@ DEBUG_stack(_cups_ps_stack_t *st)	/* I - Stack */
 
 
 /*
- * End of "$Id: interpret.c 6281 2007-02-14 16:32:42Z mike $".
+ * End of "$Id: interpret.c 6371 2007-03-20 23:18:01Z mike $".
  */

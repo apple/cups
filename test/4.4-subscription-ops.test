@@ -1,5 +1,5 @@
 #
-# "$Id: 4.4-subscription-ops.test 5831 2006-08-16 19:28:09Z mike $"
+# "$Id: 4.4-subscription-ops.test 6379 2007-03-21 14:57:22Z mike $"
 #
 #   Verify that the CUPS subscription operations work.
 #
@@ -18,7 +18,7 @@
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
 
         GROUP subscription
-	ATTR uri notify-recipient testnotify://
+	ATTR uri notify-recipient-uri testnotify://
 	ATTR keyword notify-events printer-state-changed
 	ATTR integer notify-lease-duration 5
 
@@ -71,12 +71,12 @@
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
 
         GROUP subscription
-	ATTR uri notify-recipient testnotify://
+	ATTR uri notify-recipient-uri testnotify://
 	ATTR keyword notify-events printer-state-changed
 	ATTR integer notify-lease-duration 5
 
         GROUP subscription
-	ATTR uri notify-recipient testnotify://
+	ATTR uri notify-recipient-uri testnotify://
 	ATTR keyword notify-events printer-config-changed
 	ATTR integer notify-lease-duration 5
 
@@ -118,5 +118,5 @@
 }
 
 #
-# End of "$Id: 4.4-subscription-ops.test 5831 2006-08-16 19:28:09Z mike $"
+# End of "$Id: 4.4-subscription-ops.test 6379 2007-03-21 14:57:22Z mike $"
 #

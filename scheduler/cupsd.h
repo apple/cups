@@ -1,9 +1,9 @@
 /*
- * "$Id: cupsd.h 6365 2007-03-19 20:56:57Z mike $"
+ * "$Id: cupsd.h 6376 2007-03-21 06:39:10Z mike $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -220,12 +220,14 @@ extern int	cupsdStartProcess(const char *command, char *argv[],
 extern int	cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
 		               cupsd_selfunc_t write_cb, void *data);
 extern int	cupsdDoSelect(long timeout);
+#ifdef CUPSD_IS_SELECTING
 extern int	cupsdIsSelecting(int fd);
+#endif /* CUPSD_IS_SELECTING */
 extern void	cupsdRemoveSelect(int fd);
 extern void	cupsdStartSelect(void);
 extern void	cupsdStopSelect(void);
 
 
 /*
- * End of "$Id: cupsd.h 6365 2007-03-19 20:56:57Z mike $".
+ * End of "$Id: cupsd.h 6376 2007-03-21 06:39:10Z mike $".
  */

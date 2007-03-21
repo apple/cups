@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 6361 2007-03-19 16:01:28Z mike $"
+ * "$Id: adminutil.c 6378 2007-03-21 07:18:18Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -59,6 +59,12 @@
  * Local functions...
  */
 
+extern int		_cupsAdminGetServerSettings(http_t *http,
+				                    int *num_settings,
+			                            cups_option_t **settings);
+extern int		_cupsAdminSetServerSettings(http_t *http,
+			                            int num_settings,
+			                            cups_option_t *settings);
 static int		do_samba_command(const char *command,
 			                 const char *address,
 			                 const char *subcommand,
@@ -2188,5 +2194,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 6361 2007-03-19 16:01:28Z mike $".
+ * End of "$Id: adminutil.c 6378 2007-03-21 07:18:18Z mike $".
  */

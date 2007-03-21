@@ -1,9 +1,9 @@
 /*
- * "$Id: testdirsvc.c 5301 2006-03-17 23:44:33Z mike $"
+ * "$Id: testdirsvc.c 6376 2007-03-21 06:39:10Z mike $"
  *
  *   Browsing test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -41,7 +41,7 @@
  * Local functions...
  */
 
-void	usage(void);
+static void	usage(void);
 
 
 /*
@@ -320,7 +320,7 @@ main(int  argc,				/* I - Number of command-line arguments */
  * 'usage()' - Show program usage...
  */
 
-void
+static void
 usage(void)
 {
   puts("Usage: testdirsvc [-c] [-i interval] [-l lease-duration] "
@@ -331,5 +331,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testdirsvc.c 5301 2006-03-17 23:44:33Z mike $".
+ * End of "$Id: testdirsvc.c 6376 2007-03-21 06:39:10Z mike $".
  */

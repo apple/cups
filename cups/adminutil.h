@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.h 6268 2007-02-12 02:46:11Z mike $"
+ * "$Id: adminutil.h 6378 2007-03-21 07:18:18Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -71,12 +71,12 @@ extern int	cupsAdminExportSamba(const char *dest, const char *ppd,
 extern char	*cupsAdminCreateWindowsPPD(http_t *http, const char *dest,
 		                           char *buffer, int bufsize);
 
-extern int	_cupsAdminGetServerSettings(http_t *http,
-			                    int *num_settings,
-		                            cups_option_t **settings);
-extern int	_cupsAdminSetServerSettings(http_t *http,
-		                            int num_settings,
-		                            cups_option_t *settings);
+extern int	cupsAdminGetServerSettings(http_t *http,
+			                   int *num_settings,
+		                           cups_option_t **settings);
+extern int	cupsAdminSetServerSettings(http_t *http,
+		                           int num_settings,
+		                           cups_option_t *settings);
 
 
 #  ifdef __cplusplus
@@ -86,5 +86,5 @@ extern int	_cupsAdminSetServerSettings(http_t *http,
 #endif /* !_CUPS_ADMINUTIL_H_ */
 
 /*
- * End of "$Id: adminutil.h 6268 2007-02-12 02:46:11Z mike $".
+ * End of "$Id: adminutil.h 6378 2007-03-21 07:18:18Z mike $".
  */

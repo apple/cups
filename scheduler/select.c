@@ -1,9 +1,9 @@
 /*
- * "$Id: select.c 6166 2006-12-29 20:35:18Z mike $"
+ * "$Id: select.c 6376 2007-03-21 06:39:10Z mike $"
  *
  *   Select abstraction functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2006 by Easy Software Products.
+ *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -710,6 +710,7 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 }
 
 
+#ifdef CUPSD_IS_SELECTING
 /*
  * 'cupsdIsSelecting()' - Determine whether we are monitoring a file
  *                        descriptor.
@@ -720,6 +721,7 @@ cupsdIsSelecting(int fd)		/* I - File descriptor */
 {
   return (find_fd(fd) != NULL);
 }
+#endif /* CUPSD_IS_SELECTING */
 
 
 /*
@@ -942,5 +944,5 @@ find_fd(int fd)				/* I - File descriptor */
 
 
 /*
- * End of "$Id: select.c 6166 2006-12-29 20:35:18Z mike $".
+ * End of "$Id: select.c 6376 2007-03-21 06:39:10Z mike $".
  */

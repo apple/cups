@@ -1,9 +1,9 @@
 /*
- * "$Id: testsub.c 5938 2006-09-11 18:23:46Z mike $"
+ * "$Id: testsub.c 6376 2007-03-21 06:39:10Z mike $"
  *
  *   Scheduler notification tester for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2006 by Easy Software Products.
+ *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -50,7 +50,7 @@ static int	terminate = 0;
  * Local functions...
  */
 
-void		print_attributes(ipp_t *ipp, int indent);
+static void	print_attributes(ipp_t *ipp, int indent);
 static void	sigterm_handler(int sig);
 static void	usage(void);
 
@@ -304,7 +304,7 @@ main(int  argc,				/* I - Number of command-line arguments */
  * 'print_attributes()' - Print the attributes in a request...
  */
 
-void
+static void
 print_attributes(ipp_t *ipp,		/* I - IPP request */
                  int   indent)		/* I - Indentation */
 {
@@ -527,5 +527,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testsub.c 5938 2006-09-11 18:23:46Z mike $".
+ * End of "$Id: testsub.c 6376 2007-03-21 06:39:10Z mike $".
  */

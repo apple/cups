@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h 6253 2007-02-10 18:48:40Z mike $"
+ * "$Id: client.h 6383 2007-03-21 20:01:20Z mike $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -126,17 +126,17 @@ extern void	cupsdReadClient(cupsd_client_t *con);
 extern void	cupsdResumeListening(void);
 extern int	cupsdSendCommand(cupsd_client_t *con, char *command,
 		                 char *options, int root);
-extern int	cupsdSendError(cupsd_client_t *con, http_status_t code);
+extern int	cupsdSendError(cupsd_client_t *con, http_status_t code,
+		               int auth_type);
 extern int	cupsdSendHeader(cupsd_client_t *con, http_status_t code,
-		                char *type);
+		                char *type, int auth_type);
 extern void	cupsdShutdownClient(cupsd_client_t *con);
 extern void	cupsdStartListening(void);
 extern void	cupsdStopListening(void);
 extern void	cupsdUpdateCGI(void);
 extern void	cupsdWriteClient(cupsd_client_t *con);
-extern void	cupsdWritePipe(cupsd_client_t *con);
 
 
 /*
- * End of "$Id: client.h 6253 2007-02-10 18:48:40Z mike $".
+ * End of "$Id: client.h 6383 2007-03-21 20:01:20Z mike $".
  */
