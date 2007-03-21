@@ -36,7 +36,6 @@
  *   cupsdSendHeader()       - Send an HTTP request.
  *   cupsdUpdateCGI()        - Read status messages from CGI scripts and programs.
  *   cupsdWriteClient()      - Write data to a client as needed.
- *   cupsdWritePipe()        - Flag that data is available on the CGI pipe.
  *   check_if_modified()     - Decode an "If-Modified-Since" line.
  *   encrypt_client()        - Enable encryption for the client...
  *   get_cdsa_certificate()  - Convert a keychain name into the CFArrayRef
@@ -48,6 +47,7 @@
  *   make_certificate()      - Make a self-signed SSL/TLS certificate.
  *   pipe_command()          - Pipe the output of a command to the remote client.
  *   write_file()            - Send a file via HTTP.
+ *   write_pipe()            - Flag that data is available on the CGI pipe.
  */
 
 /*
@@ -112,6 +112,7 @@ static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 static int		write_file(cupsd_client_t *con, http_status_t code,
 		        	   char *filename, char *type,
 				   struct stat *filestats);
+static void		write_pipe(cupsd_client_t *con);
 
 
 /*
@@ -2168,7 +2169,7 @@ cupsdSendCommand(
 
   fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
-  cupsdAddSelect(con->file, (cupsd_selfunc_t)cupsdWritePipe, NULL, con);
+  cupsdAddSelect(con->file, (cupsd_selfunc_t)write_pipe, NULL, con);
 
   con->sent_header = 0;
   con->file_ready  = 0;
@@ -2543,7 +2544,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     * Make sure we select on the CGI output...
     */
 
-    cupsdAddSelect(con->file, (cupsd_selfunc_t)cupsdWritePipe, NULL, con);
+    cupsdAddSelect(con->file, (cupsd_selfunc_t)write_pipe, NULL, con);
 
     if (!con->file_ready)
     {
@@ -2768,23 +2769,6 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
   }
 
   con->http.activity = time(NULL);
-}
-
-
-/*
- * 'cupsdWritePipe()' - Flag that data is available on the CGI pipe.
- */
-
-void
-cupsdWritePipe(cupsd_client_t *con)	/* I - Client connection */
-{
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdWritePipe: CGI output on fd %d...",
-                  con->file);
-
-  con->file_ready = 1;
-
-  cupsdRemoveSelect(con->file);
-  cupsdAddSelect(con->http.fd, NULL, (cupsd_selfunc_t)cupsdWriteClient, con);
 }
 
 
@@ -4529,6 +4513,23 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
                  (cupsd_selfunc_t)cupsdWriteClient, con);
 
   return (1);
+}
+
+
+/*
+ * 'write_pipe()' - Flag that data is available on the CGI pipe.
+ */
+
+static void
+write_pipe(cupsd_client_t *con)		/* I - Client connection */
+{
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "write_pipe: CGI output on fd %d...",
+                  con->file);
+
+  con->file_ready = 1;
+
+  cupsdRemoveSelect(con->file);
+  cupsdAddSelect(con->http.fd, NULL, (cupsd_selfunc_t)cupsdWriteClient, con);
 }
 
 

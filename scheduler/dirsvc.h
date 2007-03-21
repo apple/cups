@@ -173,14 +173,12 @@ extern void	cupsdStartBrowsing(void);
 extern void	cupsdStartPolling(void);
 extern void	cupsdStopBrowsing(void);
 extern void	cupsdStopPolling(void);
-extern void	cupsdUpdateCUPSBrowse(void);
 #ifdef HAVE_DNSSD
 extern void	cupsdUpdateDNSSDBrowse(cupsd_printer_t *p);
 #endif /* HAVE_DNSSD */
 #ifdef HAVE_LDAP
 extern void	cupsdUpdateLDAPBrowse(void);
 #endif /* HAVE_LDAP */
-extern void	cupsdUpdatePolling(void);
 extern void	cupsdUpdateSLPBrowse(void);
 
 

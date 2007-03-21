@@ -3,7 +3,7 @@
  *
  *   Select abstraction functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2006 by Easy Software Products.
+ *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -710,6 +710,7 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 }
 
 
+#ifdef CUPSD_IS_SELECTING
 /*
  * 'cupsdIsSelecting()' - Determine whether we are monitoring a file
  *                        descriptor.
@@ -720,6 +721,7 @@ cupsdIsSelecting(int fd)		/* I - File descriptor */
 {
   return (find_fd(fd) != NULL);
 }
+#endif /* CUPSD_IS_SELECTING */
 
 
 /*

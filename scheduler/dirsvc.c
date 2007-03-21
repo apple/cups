@@ -37,11 +37,8 @@
  *   cupsdStopBrowsing()           - Stop sending and receiving broadcast
  *                                   information.
  *   cupsdStopPolling()            - Stop polling servers as needed.
- *   cupsdUpdateCUPSBrowse()       - Update the browse lists using the CUPS
- *                                   protocol.
  *   cupsdUpdateDNSSDBrowse()      - Handle DNS-SD queries.
  *   cupsdUpdateLDAPBrowse()       - Scan for new printers via LDAP...
- *   cupsdUpdatePolling()          - Read status messages from the poll daemons.
  *   cupsdUpdateSLPBrowse()        - Get browsing information via SLP.
  *   dnssdBuildTxtRecord()         - Build a TXT record from printer info.
  *   dnssdDeregisterPrinter()      - Stop sending broadcast information for a
@@ -63,6 +60,9 @@
  *   slp_get_attr()                - Get an attribute from an SLP registration.
  *   slp_reg_callback()            - Empty SLPRegReport.
  *   slp_url_callback()            - SLP service url callback
+ *   update_cups_browse()          - Update the browse lists using the CUPS
+ *                                   protocol.
+ *   update_polling()              - Read status messages from the poll daemons.
  */
 
 /*
@@ -105,6 +105,9 @@ static void	send_ldap_browse(cupsd_printer_t *p);
 #ifdef HAVE_LIBSLP
 static void	send_slp_browse(cupsd_printer_t *p);
 #endif /* HAVE_LIBSLP */
+static void	update_cups_browse(void);
+static void	update_polling(void);
+
 
 #ifdef HAVE_OPENLDAP
 static const char * const ldap_attrs[] =/* CUPS LDAP attributes */
@@ -1025,7 +1028,7 @@ cupsdStartBrowsing(void)
       * We only listen if we want remote printers...
       */
 
-      cupsdAddSelect(BrowseSocket, (cupsd_selfunc_t)cupsdUpdateCUPSBrowse,
+      cupsdAddSelect(BrowseSocket, (cupsd_selfunc_t)update_cups_browse,
                      NULL, NULL);
     }
   }
@@ -1237,7 +1240,7 @@ cupsdStartPolling(void)
   * Finally, add the pipe to the input selection set...
   */
 
-  cupsdAddSelect(PollPipe, (cupsd_selfunc_t)cupsdUpdatePolling, NULL, NULL);
+  cupsdAddSelect(PollPipe, (cupsd_selfunc_t)update_polling, NULL, NULL);
 }
 
 
@@ -1334,279 +1337,6 @@ cupsdStopPolling(void)
   for (i = 0, pollp = Polled; i < NumPolled; i ++, pollp ++)
     if (pollp->pid)
       cupsdEndProcess(pollp->pid, 0);
-}
-
-
-/*
- * 'cupsdUpdateCUPSBrowse()' - Update the browse lists using the CUPS protocol.
- */
-
-void
-cupsdUpdateCUPSBrowse(void)
-{
-  int		i;			/* Looping var */
-  int		auth;			/* Authorization status */
-  int		len;			/* Length of name string */
-  int		bytes;			/* Number of bytes left */
-  char		packet[1541],		/* Broadcast packet */
-		*pptr;			/* Pointer into packet */
-  socklen_t	srclen;			/* Length of source address */
-  http_addr_t	srcaddr;		/* Source address */
-  char		srcname[1024];		/* Source hostname */
-  unsigned	address[4];		/* Source address */
-  unsigned	type;			/* Printer type */
-  unsigned	state;			/* Printer state */
-  char		uri[HTTP_MAX_URI],	/* Printer URI */
-		host[HTTP_MAX_URI],	/* Host portion of URI */
-		resource[HTTP_MAX_URI],	/* Resource portion of URI */
-		info[IPP_MAX_NAME],	/* Information string */
-		location[IPP_MAX_NAME],	/* Location string */
-		make_model[IPP_MAX_NAME];/* Make and model string */
-  int		num_attrs;		/* Number of attributes */
-  cups_option_t	*attrs;			/* Attributes */
-
-
- /*
-  * Read a packet from the browse socket...
-  */
-
-  srclen = sizeof(srcaddr);
-  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet) - 1, 0, 
-                        (struct sockaddr *)&srcaddr, &srclen)) < 0)
-  {
-   /*
-    * "Connection refused" is returned under Linux if the destination port
-    * or address is unreachable from a previous sendto(); check for the
-    * error here and ignore it for now...
-    */
-
-    if (errno != ECONNREFUSED && errno != EAGAIN)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Browse recv failed - %s.",
-                      strerror(errno));
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Browsing turned off.");
-
-      cupsdStopBrowsing();
-      Browsing = 0;
-    }
-
-    return;
-  }
-
-  packet[bytes] = '\0';
-
- /*
-  * If we're about to sleep, ignore incoming browse packets.
-  */
-
-  if (Sleeping)
-    return;
-
- /*
-  * Figure out where it came from...
-  */
-
-#ifdef AF_INET6
-  if (srcaddr.addr.sa_family == AF_INET6)
-  {
-    address[0] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[0]);
-    address[1] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[1]);
-    address[2] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[2]);
-    address[3] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[3]);
-  }
-  else
-#endif /* AF_INET6 */
-  {
-    address[0] = 0;
-    address[1] = 0;
-    address[2] = 0;
-    address[3] = ntohl(srcaddr.ipv4.sin_addr.s_addr);
-  }
-
-  if (HostNameLookups)
-    httpAddrLookup(&srcaddr, srcname, sizeof(srcname));
-  else
-    httpAddrString(&srcaddr, srcname, sizeof(srcname));
-
-  len = strlen(srcname);
-
- /*
-  * Do ACL stuff...
-  */
-
-  if (BrowseACL)
-  {
-    if (httpAddrLocalhost(&srcaddr) || !strcasecmp(srcname, "localhost"))
-    {
-     /*
-      * Access from localhost (127.0.0.1) is always allowed...
-      */
-
-      auth = AUTH_ALLOW;
-    }
-    else
-    {
-     /*
-      * Do authorization checks on the domain/address...
-      */
-
-      switch (BrowseACL->order_type)
-      {
-        default :
-	    auth = AUTH_DENY;	/* anti-compiler-warning-code */
-	    break;
-
-	case AUTH_ALLOW : /* Order Deny,Allow */
-            auth = AUTH_ALLOW;
-
-            if (cupsdCheckAuth(address, srcname, len,
-	        	  BrowseACL->num_deny, BrowseACL->deny))
-	      auth = AUTH_DENY;
-
-            if (cupsdCheckAuth(address, srcname, len,
-	        	  BrowseACL->num_allow, BrowseACL->allow))
-	      auth = AUTH_ALLOW;
-	    break;
-
-	case AUTH_DENY : /* Order Allow,Deny */
-            auth = AUTH_DENY;
-
-            if (cupsdCheckAuth(address, srcname, len,
-	        	  BrowseACL->num_allow, BrowseACL->allow))
-	      auth = AUTH_ALLOW;
-
-            if (cupsdCheckAuth(address, srcname, len,
-	        	  BrowseACL->num_deny, BrowseACL->deny))
-	      auth = AUTH_DENY;
-	    break;
-      }
-    }
-  }
-  else
-    auth = AUTH_ALLOW;
-
-  if (auth == AUTH_DENY)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "cupsdUpdateCUPSBrowse: Refused %d bytes from %s", bytes,
-                    srcname);
-    return;
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdUpdateCUPSBrowse: (%d bytes from %s) %s", bytes,
-		  srcname, packet);
-
- /*
-  * Parse packet...
-  */
-
-  if (sscanf(packet, "%x%x%1023s", &type, &state, uri) < 3)
-  {
-    cupsdLogMessage(CUPSD_LOG_WARN,
-                    "cupsdUpdateCUPSBrowse: Garbled browse packet - %s", packet);
-    return;
-  }
-
-  strcpy(location, "Location Unknown");
-  strcpy(info, "No Information Available");
-  make_model[0] = '\0';
-  num_attrs     = 0;
-  attrs         = NULL;
-
-  if ((pptr = strchr(packet, '\"')) != NULL)
-  {
-   /*
-    * Have extended information; can't use sscanf for it because not all
-    * sscanf's allow empty strings with %[^\"]...
-    */
-
-    for (i = 0, pptr ++;
-         i < (sizeof(location) - 1) && *pptr && *pptr != '\"';
-         i ++, pptr ++)
-      location[i] = *pptr;
-
-    if (i)
-      location[i] = '\0';
-
-    if (*pptr == '\"')
-      pptr ++;
-
-    while (*pptr && isspace(*pptr & 255))
-      pptr ++;
-
-    if (*pptr == '\"')
-    {
-      for (i = 0, pptr ++;
-           i < (sizeof(info) - 1) && *pptr && *pptr != '\"';
-           i ++, pptr ++)
-	info[i] = *pptr;
-
-      info[i] = '\0';
-
-      if (*pptr == '\"')
-	pptr ++;
-
-      while (*pptr && isspace(*pptr & 255))
-	pptr ++;
-
-      if (*pptr == '\"')
-      {
-	for (i = 0, pptr ++;
-             i < (sizeof(make_model) - 1) && *pptr && *pptr != '\"';
-             i ++, pptr ++)
-	  make_model[i] = *pptr;
-
-	if (*pptr == '\"')
-	  pptr ++;
-
-	make_model[i] = '\0';
-
-        if (*pptr)
-	  num_attrs = cupsParseOptions(pptr, num_attrs, &attrs);
-      }
-    }
-  }
-
-  DEBUG_puts(packet);
-  DEBUG_printf(("type=%x, state=%x, uri=\"%s\"\n"
-                "location=\"%s\", info=\"%s\", make_model=\"%s\"\n",
-	        type, state, uri, location, info, make_model));
-
- /*
-  * Pull the URI apart to see if this is a local or remote printer...
-  */
-
-  if (is_local_queue(uri, host, sizeof(host), resource, sizeof(resource)))
-  {
-    cupsFreeOptions(num_attrs, attrs);
-    return;
-  }
-
- /*
-  * Do relaying...
-  */
-
-  for (i = 0; i < NumRelays; i ++)
-    if (cupsdCheckAuth(address, srcname, len, 1, &(Relays[i].from)))
-      if (sendto(BrowseSocket, packet, bytes, 0,
-                 (struct sockaddr *)&(Relays[i].to),
-		 httpAddrLength(&(Relays[i].to))) <= 0)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdUpdateCUPSBrowse: sendto failed for relay %d - %s.",
-	                i + 1, strerror(errno));
-	cupsFreeOptions(num_attrs, attrs);
-	return;
-      }
-
- /*
-  * Process the browse data...
-  */
-
-  process_browse_data(uri, host, resource, (cups_ptype_t)type,
-                      (ipp_pstate_t)state, location, info, make_model,
-		      num_attrs, attrs);
 }
 
 
@@ -1741,36 +1471,6 @@ cupsdUpdateLDAPBrowse(void)
   }
 }
 #endif /* HAVE_OPENLDAP */
-
-
-/*
- * 'cupsdUpdatePolling()' - Read status messages from the poll daemons.
- */
-
-void
-cupsdUpdatePolling(void)
-{
-  char		*ptr,			/* Pointer to end of line in buffer */
-		message[1024];		/* Pointer to message text */
-  int		loglevel;		/* Log level for message */
-
-
-  while ((ptr = cupsdStatBufUpdate(PollStatusBuffer, &loglevel,
-                                   message, sizeof(message))) != NULL)
-    if (!strchr(PollStatusBuffer->buffer, '\n'))
-      break;
-
-  if (ptr == NULL && !PollStatusBuffer->bufused)
-  {
-   /*
-    * All polling processes have died; stop polling...
-    */
-
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdUpdatePolling: all polling processes have exited!");
-    cupsdStopPolling();
-  }
-}
 
 
 #ifdef HAVE_LIBSLP 
@@ -3796,6 +3496,309 @@ slp_url_callback(
   return (SLP_TRUE);
 }
 #endif /* HAVE_LIBSLP */
+
+
+/*
+ * 'update_cups_browse()' - Update the browse lists using the CUPS protocol.
+ */
+
+static void
+update_cups_browse(void)
+{
+  int		i;			/* Looping var */
+  int		auth;			/* Authorization status */
+  int		len;			/* Length of name string */
+  int		bytes;			/* Number of bytes left */
+  char		packet[1541],		/* Broadcast packet */
+		*pptr;			/* Pointer into packet */
+  socklen_t	srclen;			/* Length of source address */
+  http_addr_t	srcaddr;		/* Source address */
+  char		srcname[1024];		/* Source hostname */
+  unsigned	address[4];		/* Source address */
+  unsigned	type;			/* Printer type */
+  unsigned	state;			/* Printer state */
+  char		uri[HTTP_MAX_URI],	/* Printer URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI],	/* Resource portion of URI */
+		info[IPP_MAX_NAME],	/* Information string */
+		location[IPP_MAX_NAME],	/* Location string */
+		make_model[IPP_MAX_NAME];/* Make and model string */
+  int		num_attrs;		/* Number of attributes */
+  cups_option_t	*attrs;			/* Attributes */
+
+
+ /*
+  * Read a packet from the browse socket...
+  */
+
+  srclen = sizeof(srcaddr);
+  if ((bytes = recvfrom(BrowseSocket, packet, sizeof(packet) - 1, 0, 
+                        (struct sockaddr *)&srcaddr, &srclen)) < 0)
+  {
+   /*
+    * "Connection refused" is returned under Linux if the destination port
+    * or address is unreachable from a previous sendto(); check for the
+    * error here and ignore it for now...
+    */
+
+    if (errno != ECONNREFUSED && errno != EAGAIN)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Browse recv failed - %s.",
+                      strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Browsing turned off.");
+
+      cupsdStopBrowsing();
+      Browsing = 0;
+    }
+
+    return;
+  }
+
+  packet[bytes] = '\0';
+
+ /*
+  * If we're about to sleep, ignore incoming browse packets.
+  */
+
+  if (Sleeping)
+    return;
+
+ /*
+  * Figure out where it came from...
+  */
+
+#ifdef AF_INET6
+  if (srcaddr.addr.sa_family == AF_INET6)
+  {
+    address[0] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[0]);
+    address[1] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[1]);
+    address[2] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[2]);
+    address[3] = ntohl(srcaddr.ipv6.sin6_addr.s6_addr32[3]);
+  }
+  else
+#endif /* AF_INET6 */
+  {
+    address[0] = 0;
+    address[1] = 0;
+    address[2] = 0;
+    address[3] = ntohl(srcaddr.ipv4.sin_addr.s_addr);
+  }
+
+  if (HostNameLookups)
+    httpAddrLookup(&srcaddr, srcname, sizeof(srcname));
+  else
+    httpAddrString(&srcaddr, srcname, sizeof(srcname));
+
+  len = strlen(srcname);
+
+ /*
+  * Do ACL stuff...
+  */
+
+  if (BrowseACL)
+  {
+    if (httpAddrLocalhost(&srcaddr) || !strcasecmp(srcname, "localhost"))
+    {
+     /*
+      * Access from localhost (127.0.0.1) is always allowed...
+      */
+
+      auth = AUTH_ALLOW;
+    }
+    else
+    {
+     /*
+      * Do authorization checks on the domain/address...
+      */
+
+      switch (BrowseACL->order_type)
+      {
+        default :
+	    auth = AUTH_DENY;	/* anti-compiler-warning-code */
+	    break;
+
+	case AUTH_ALLOW : /* Order Deny,Allow */
+            auth = AUTH_ALLOW;
+
+            if (cupsdCheckAuth(address, srcname, len,
+	        	  BrowseACL->num_deny, BrowseACL->deny))
+	      auth = AUTH_DENY;
+
+            if (cupsdCheckAuth(address, srcname, len,
+	        	  BrowseACL->num_allow, BrowseACL->allow))
+	      auth = AUTH_ALLOW;
+	    break;
+
+	case AUTH_DENY : /* Order Allow,Deny */
+            auth = AUTH_DENY;
+
+            if (cupsdCheckAuth(address, srcname, len,
+	        	  BrowseACL->num_allow, BrowseACL->allow))
+	      auth = AUTH_ALLOW;
+
+            if (cupsdCheckAuth(address, srcname, len,
+	        	  BrowseACL->num_deny, BrowseACL->deny))
+	      auth = AUTH_DENY;
+	    break;
+      }
+    }
+  }
+  else
+    auth = AUTH_ALLOW;
+
+  if (auth == AUTH_DENY)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "update_cups_browse: Refused %d bytes from %s", bytes,
+                    srcname);
+    return;
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "update_cups_browse: (%d bytes from %s) %s", bytes,
+		  srcname, packet);
+
+ /*
+  * Parse packet...
+  */
+
+  if (sscanf(packet, "%x%x%1023s", &type, &state, uri) < 3)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "update_cups_browse: Garbled browse packet - %s", packet);
+    return;
+  }
+
+  strcpy(location, "Location Unknown");
+  strcpy(info, "No Information Available");
+  make_model[0] = '\0';
+  num_attrs     = 0;
+  attrs         = NULL;
+
+  if ((pptr = strchr(packet, '\"')) != NULL)
+  {
+   /*
+    * Have extended information; can't use sscanf for it because not all
+    * sscanf's allow empty strings with %[^\"]...
+    */
+
+    for (i = 0, pptr ++;
+         i < (sizeof(location) - 1) && *pptr && *pptr != '\"';
+         i ++, pptr ++)
+      location[i] = *pptr;
+
+    if (i)
+      location[i] = '\0';
+
+    if (*pptr == '\"')
+      pptr ++;
+
+    while (*pptr && isspace(*pptr & 255))
+      pptr ++;
+
+    if (*pptr == '\"')
+    {
+      for (i = 0, pptr ++;
+           i < (sizeof(info) - 1) && *pptr && *pptr != '\"';
+           i ++, pptr ++)
+	info[i] = *pptr;
+
+      info[i] = '\0';
+
+      if (*pptr == '\"')
+	pptr ++;
+
+      while (*pptr && isspace(*pptr & 255))
+	pptr ++;
+
+      if (*pptr == '\"')
+      {
+	for (i = 0, pptr ++;
+             i < (sizeof(make_model) - 1) && *pptr && *pptr != '\"';
+             i ++, pptr ++)
+	  make_model[i] = *pptr;
+
+	if (*pptr == '\"')
+	  pptr ++;
+
+	make_model[i] = '\0';
+
+        if (*pptr)
+	  num_attrs = cupsParseOptions(pptr, num_attrs, &attrs);
+      }
+    }
+  }
+
+  DEBUG_puts(packet);
+  DEBUG_printf(("type=%x, state=%x, uri=\"%s\"\n"
+                "location=\"%s\", info=\"%s\", make_model=\"%s\"\n",
+	        type, state, uri, location, info, make_model));
+
+ /*
+  * Pull the URI apart to see if this is a local or remote printer...
+  */
+
+  if (is_local_queue(uri, host, sizeof(host), resource, sizeof(resource)))
+  {
+    cupsFreeOptions(num_attrs, attrs);
+    return;
+  }
+
+ /*
+  * Do relaying...
+  */
+
+  for (i = 0; i < NumRelays; i ++)
+    if (cupsdCheckAuth(address, srcname, len, 1, &(Relays[i].from)))
+      if (sendto(BrowseSocket, packet, bytes, 0,
+                 (struct sockaddr *)&(Relays[i].to),
+		 httpAddrLength(&(Relays[i].to))) <= 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "update_cups_browse: sendto failed for relay %d - %s.",
+	                i + 1, strerror(errno));
+	cupsFreeOptions(num_attrs, attrs);
+	return;
+      }
+
+ /*
+  * Process the browse data...
+  */
+
+  process_browse_data(uri, host, resource, (cups_ptype_t)type,
+                      (ipp_pstate_t)state, location, info, make_model,
+		      num_attrs, attrs);
+}
+
+
+/*
+ * 'update_polling()' - Read status messages from the poll daemons.
+ */
+
+static void
+update_polling(void)
+{
+  char		*ptr,			/* Pointer to end of line in buffer */
+		message[1024];		/* Pointer to message text */
+  int		loglevel;		/* Log level for message */
+
+
+  while ((ptr = cupsdStatBufUpdate(PollStatusBuffer, &loglevel,
+                                   message, sizeof(message))) != NULL)
+    if (!strchr(PollStatusBuffer->buffer, '\n'))
+      break;
+
+  if (ptr == NULL && !PollStatusBuffer->bufused)
+  {
+   /*
+    * All polling processes have died; stop polling...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "update_polling: all polling processes have exited!");
+    cupsdStopPolling();
+  }
+}
 
 
 /*

@@ -134,7 +134,6 @@ extern void	cupsdStartListening(void);
 extern void	cupsdStopListening(void);
 extern void	cupsdUpdateCGI(void);
 extern void	cupsdWriteClient(cupsd_client_t *con);
-extern void	cupsdWritePipe(cupsd_client_t *con);
 
 
 /*

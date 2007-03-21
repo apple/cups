@@ -50,7 +50,6 @@
  *   cupsdStopAllJobs()         - Stop all print jobs.
  *   cupsdStopJob()             - Stop a print job.
  *   cupsdUnloadCompletedJobs() - Flush completed job history from memory.
- *   cupsdUpdateJob()           - Read a status update from a jobs filters.
  *   compare_active_jobs()      - Compare the job IDs and priorities of two
  *                                jobs.
  *   compare_jobs()             - Compare the job IDs of two jobs.
@@ -66,6 +65,7 @@
  *                                attribute...
  *   start_job()                - Start a print job.
  *   unload_job()               - Unload a job from memory.
+ *   update_job()               - Read a status update from a jobs filters.
  */
 
 /*
@@ -106,6 +106,7 @@ static void	set_time(cupsd_job_t *job, const char *name);
 static void	set_hold_until(cupsd_job_t *job, time_t holdtime);
 static void	start_job(cupsd_job_t *job, cupsd_printer_t *printer);
 static void	unload_job(cupsd_job_t *job);
+static void	update_job(cupsd_job_t *job);
 
 
 /*
@@ -1651,183 +1652,6 @@ cupsdUnloadCompletedJobs(void)
     if (job->attrs && job->state_value >= IPP_JOB_STOPPED &&
         job->access_time < expire)
       unload_job(job);
-}
-
-
-/*
- * 'cupsdUpdateJob()' - Read a status update from a job's filters.
- */
-
-void
-cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
-{
-  int		i;			/* Looping var */
-  int		copies;			/* Number of copies printed */
-  char		message[1024],		/* Message text */
-		*ptr;			/* Pointer update... */
-  int		loglevel,		/* Log level for message */
-		event = 0;		/* Events? */
-
-
-  while ((ptr = cupsdStatBufUpdate(job->status_buffer, &loglevel,
-                                   message, sizeof(message))) != NULL)
-  {
-   /*
-    * Process page and printer state messages as needed...
-    */
-
-    if (loglevel == CUPSD_LOG_PAGE)
-    {
-     /*
-      * Page message; send the message to the page_log file and update the
-      * job sheet count...
-      */
-
-      if (job->sheets != NULL)
-      {
-        if (!strncasecmp(message, "total ", 6))
-	{
-	 /*
-	  * Got a total count of pages from a backend or filter...
-	  */
-
-	  copies = atoi(message + 6);
-	  copies -= job->sheets->values[0].integer; /* Just track the delta */
-	}
-	else if (!sscanf(message, "%*d%d", &copies))
-	  copies = 1;
-
-        job->sheets->values[0].integer += copies;
-
-	if (job->printer->page_limit)
-	{
-	  cupsd_quota_t *q = cupsdUpdateQuota(job->printer, job->username,
-					      copies, 0);
-
-#ifdef __APPLE__
-	  if (AppleQuotas && q->page_count == -3)
-	  {
-	   /*
-	    * Quota limit exceeded, cancel job in progress immediately...
-	    */
-
-	    cupsdLogMessage(CUPSD_LOG_INFO,
-			    "Job %d canceled: pages exceed user %s quota "
-			    "limit on printer %s (%s).",
-			    job->id, job->username, job->printer->name,
-			    job->printer->info);
-
-	    cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
-	    return;
-	  }
-#else
-          (void)q;
-#endif /* __APPLE__ */
-	}
-      }
-
-      cupsdLogPage(job, message);
-
-      cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
-                    "Printed %d page(s).", job->sheets->values[0].integer);
-    }
-    else if (loglevel == CUPSD_LOG_STATE)
-    {
-      cupsdSetPrinterReasons(job->printer, message);
-      cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
-    }
-    else if (loglevel == CUPSD_LOG_ATTR)
-    {
-     /*
-      * Set attribute(s)...
-      */
-
-      int		num_attrs;	/* Number of attributes */
-      cups_option_t	*attrs;		/* Attributes */
-      const char	*attr;		/* Attribute */
-
-
-      num_attrs = cupsParseOptions(message, 0, &attrs);
-
-      if ((attr = cupsGetOption("auth-info-required", num_attrs,
-                                attrs)) != NULL)
-        cupsdSetAuthInfoRequired(job->printer, attr, NULL);
-
-      cupsFreeOptions(num_attrs, attrs);
-    }
-#ifdef __APPLE__
-    else if (!strncmp(message, "recoverable:", 12))
-    {
-      cupsdSetPrinterReasons(job->printer,
-                             "+com.apple.print.recoverable-warning");
-
-      ptr = message + 12;
-      while (isspace(*ptr & 255))
-        ptr ++;
-
-      cupsdSetString(&job->printer->recoverable, ptr);
-      cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
-    }
-    else if (!strncmp(message, "recovered:", 10))
-    {
-      cupsdSetPrinterReasons(job->printer,
-                             "-com.apple.print.recoverable-warning");
-
-      ptr = message + 10;
-      while (isspace(*ptr & 255))
-        ptr ++;
-
-      cupsdSetString(&job->printer->recoverable, ptr);
-      cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
-    }
-#endif /* __APPLE__ */
-    else if (loglevel <= CUPSD_LOG_INFO)
-    {
-     /*
-      * Some message to show in the printer-state-message attribute...
-      */
-
-      strlcpy(job->printer->state_message, message,
-              sizeof(job->printer->state_message));
-      cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
-    }
-
-    if (!strchr(job->status_buffer->buffer, '\n'))
-      break;
-  }
-
-  if ((event & CUPSD_EVENT_PRINTER_STATE_CHANGED))
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE_CHANGED, job->printer, NULL,
-		  (job->printer->type & CUPS_PRINTER_CLASS) ?
-		      "Class \"%s\" state changed." :
-		      "Printer \"%s\" state changed.",
-		  job->printer->name);
-
-  if (ptr == NULL && !job->status_buffer->bufused)
-  {
-   /*
-    * See if all of the filters and the backend have returned their
-    * exit statuses.
-    */
-
-    for (i = 0; job->filters[i] < 0; i ++);
-
-    if (job->filters[i])
-      return;
-
-    if (job->current_file >= job->num_files && job->backend > 0)
-      return;
-
-   /*
-    * Handle the end of job stuff...
-    */
-
-    cupsdFinishJob(job);
-  }
 }
 
 
@@ -3467,7 +3291,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   free(argv);
 
-  cupsdAddSelect(job->status_buffer->fd, (cupsd_selfunc_t)cupsdUpdateJob, NULL,
+  cupsdAddSelect(job->status_buffer->fd, (cupsd_selfunc_t)update_job, NULL,
                  job);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
@@ -3530,6 +3354,183 @@ unload_job(cupsd_job_t *job)		/* I - Job */
   job->state      = NULL;
   job->sheets     = NULL;
   job->job_sheets = NULL;
+}
+
+
+/*
+ * 'update_job()' - Read a status update from a job's filters.
+ */
+
+void
+update_job(cupsd_job_t *job)	/* I - Job to check */
+{
+  int		i;			/* Looping var */
+  int		copies;			/* Number of copies printed */
+  char		message[1024],		/* Message text */
+		*ptr;			/* Pointer update... */
+  int		loglevel,		/* Log level for message */
+		event = 0;		/* Events? */
+
+
+  while ((ptr = cupsdStatBufUpdate(job->status_buffer, &loglevel,
+                                   message, sizeof(message))) != NULL)
+  {
+   /*
+    * Process page and printer state messages as needed...
+    */
+
+    if (loglevel == CUPSD_LOG_PAGE)
+    {
+     /*
+      * Page message; send the message to the page_log file and update the
+      * job sheet count...
+      */
+
+      if (job->sheets != NULL)
+      {
+        if (!strncasecmp(message, "total ", 6))
+	{
+	 /*
+	  * Got a total count of pages from a backend or filter...
+	  */
+
+	  copies = atoi(message + 6);
+	  copies -= job->sheets->values[0].integer; /* Just track the delta */
+	}
+	else if (!sscanf(message, "%*d%d", &copies))
+	  copies = 1;
+
+        job->sheets->values[0].integer += copies;
+
+	if (job->printer->page_limit)
+	{
+	  cupsd_quota_t *q = cupsdUpdateQuota(job->printer, job->username,
+					      copies, 0);
+
+#ifdef __APPLE__
+	  if (AppleQuotas && q->page_count == -3)
+	  {
+	   /*
+	    * Quota limit exceeded, cancel job in progress immediately...
+	    */
+
+	    cupsdLogMessage(CUPSD_LOG_INFO,
+			    "Job %d canceled: pages exceed user %s quota "
+			    "limit on printer %s (%s).",
+			    job->id, job->username, job->printer->name,
+			    job->printer->info);
+
+	    cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
+	    return;
+	  }
+#else
+          (void)q;
+#endif /* __APPLE__ */
+	}
+      }
+
+      cupsdLogPage(job, message);
+
+      cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+                    "Printed %d page(s).", job->sheets->values[0].integer);
+    }
+    else if (loglevel == CUPSD_LOG_STATE)
+    {
+      cupsdSetPrinterReasons(job->printer, message);
+      cupsdAddPrinterHistory(job->printer);
+      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+    }
+    else if (loglevel == CUPSD_LOG_ATTR)
+    {
+     /*
+      * Set attribute(s)...
+      */
+
+      int		num_attrs;	/* Number of attributes */
+      cups_option_t	*attrs;		/* Attributes */
+      const char	*attr;		/* Attribute */
+
+
+      num_attrs = cupsParseOptions(message, 0, &attrs);
+
+      if ((attr = cupsGetOption("auth-info-required", num_attrs,
+                                attrs)) != NULL)
+        cupsdSetAuthInfoRequired(job->printer, attr, NULL);
+
+      cupsFreeOptions(num_attrs, attrs);
+    }
+#ifdef __APPLE__
+    else if (!strncmp(message, "recoverable:", 12))
+    {
+      cupsdSetPrinterReasons(job->printer,
+                             "+com.apple.print.recoverable-warning");
+
+      ptr = message + 12;
+      while (isspace(*ptr & 255))
+        ptr ++;
+
+      cupsdSetString(&job->printer->recoverable, ptr);
+      cupsdAddPrinterHistory(job->printer);
+      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+    }
+    else if (!strncmp(message, "recovered:", 10))
+    {
+      cupsdSetPrinterReasons(job->printer,
+                             "-com.apple.print.recoverable-warning");
+
+      ptr = message + 10;
+      while (isspace(*ptr & 255))
+        ptr ++;
+
+      cupsdSetString(&job->printer->recoverable, ptr);
+      cupsdAddPrinterHistory(job->printer);
+      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+    }
+#endif /* __APPLE__ */
+    else if (loglevel <= CUPSD_LOG_INFO)
+    {
+     /*
+      * Some message to show in the printer-state-message attribute...
+      */
+
+      strlcpy(job->printer->state_message, message,
+              sizeof(job->printer->state_message));
+      cupsdAddPrinterHistory(job->printer);
+      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+    }
+
+    if (!strchr(job->status_buffer->buffer, '\n'))
+      break;
+  }
+
+  if ((event & CUPSD_EVENT_PRINTER_STATE_CHANGED))
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE_CHANGED, job->printer, NULL,
+		  (job->printer->type & CUPS_PRINTER_CLASS) ?
+		      "Class \"%s\" state changed." :
+		      "Printer \"%s\" state changed.",
+		  job->printer->name);
+
+  if (ptr == NULL && !job->status_buffer->bufused)
+  {
+   /*
+    * See if all of the filters and the backend have returned their
+    * exit statuses.
+    */
+
+    for (i = 0; job->filters[i] < 0; i ++);
+
+    if (job->filters[i])
+      return;
+
+    if (job->current_file >= job->num_files && job->backend > 0)
+      return;
+
+   /*
+    * Handle the end of job stuff...
+    */
+
+    cupsdFinishJob(job);
+  }
 }
 
 

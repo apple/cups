@@ -3,7 +3,7 @@
  *
  *   Subscription definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -164,7 +164,6 @@ extern void	cupsdExpireSubscriptions(cupsd_printer_t *dest,
 extern void	cupsdLoadAllSubscriptions(void);
 extern void	cupsdSaveAllSubscriptions(void);
 extern void	cupsdStopAllNotifiers(void);
-extern void	cupsdUpdateNotifierStatus(void);
 
 
 /*

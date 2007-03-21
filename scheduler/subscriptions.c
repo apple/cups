@@ -34,13 +34,13 @@
  *   cupsdLoadAllSubscriptions()   - Load all subscriptions from the .conf file.
  *   cupsdSaveAllSubscriptions()   - Save all subscriptions to the .conf file.
  *   cupsdStopAllNotifiers()       - Stop all notifier processes.
- *   cupsdUpdateNotifierStatus()   - Read messages from notifiers.
  *   cupsd_compare_subscriptions() - Compare two subscriptions.
  *   cupsd_delete_event()          - Delete a single event...
  *   cupsd_send_dbus()             - Send a DBUS notification...
  *   cupsd_send_notification()     - Send a notification for the specified
  *                                   event.
  *   cupsd_start_notifier()        - Start a notifier subprocess...
+ *   cupsd_update_notifier()       - Read messages from notifiers.
  */
 
 /*
@@ -73,6 +73,7 @@ static void	cupsd_send_dbus(cupsd_eventmask_t event, cupsd_printer_t *dest,
 static void	cupsd_send_notification(cupsd_subscription_t *sub,
 		                        cupsd_event_t *event);
 static void	cupsd_start_notifier(cupsd_subscription_t *sub);
+static void	cupsd_update_notifier(void);
 
 
 /*
@@ -1241,24 +1242,6 @@ cupsdStopAllNotifiers(void)
 
 
 /*
- * 'cupsdUpdateNotifierStatus()' - Read messages from notifiers.
- */
-
-void
-cupsdUpdateNotifierStatus(void)
-{
-  char		message[1024];		/* Pointer to message text */
-  int		loglevel;		/* Log level for message */
-
-
-  while (cupsdStatBufUpdate(NotifierStatusBuffer, &loglevel,
-                            message, sizeof(message)))
-    if (!strchr(NotifierStatusBuffer->buffer, '\n'))
-      break;
-}
-
-
-/*
  * 'cupsd_compare_subscriptions()' - Compare two subscriptions.
  */
 
@@ -1568,7 +1551,7 @@ cupsd_start_notifier(
 
     NotifierStatusBuffer = cupsdStatBufNew(NotifierPipes[0], "[Notifier]");
 
-    cupsdAddSelect(NotifierPipes[0], (cupsd_selfunc_t)cupsdUpdateNotifierStatus,
+    cupsdAddSelect(NotifierPipes[0], (cupsd_selfunc_t)cupsd_update_notifier,
                    NULL, NULL);
   }
 
@@ -1617,6 +1600,24 @@ cupsd_start_notifier(
 
     close(fds[0]);
   }
+}
+
+
+/*
+ * 'cupsd_update_notifier()' - Read messages from notifiers.
+ */
+
+void
+cupsd_update_notifier(void)
+{
+  char		message[1024];		/* Pointer to message text */
+  int		loglevel;		/* Log level for message */
+
+
+  while (cupsdStatBufUpdate(NotifierStatusBuffer, &loglevel,
+                            message, sizeof(message)))
+    if (!strchr(NotifierStatusBuffer->buffer, '\n'))
+      break;
 }
 
 
