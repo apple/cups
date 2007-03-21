@@ -7,7 +7,7 @@
  *   in CUPS_DATADIR/model and dynamically generated PPD files using
  *   the driver helper programs in CUPS_SERVERBIN/driver.
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -63,9 +63,10 @@ typedef struct				/**** PPD record ****/
   size_t	size;			/* Size in bytes */
   char		name[512 - sizeof(time_t) - sizeof(size_t)],
 					/* PPD name */
-		natural_language[128],	/* Natural language(s) */
+		natural_language[6],	/* LanguageVersion */
+		product[122],		/* Product */
 		make[128],		/* Manufacturer */
-		make_and_model[128],	/* Make and model */
+		make_and_model[128],	/* NickName/ModelName */
 		device_id[128];		/* IEEE 1284 Device ID */
 } ppd_rec_t;
 
@@ -92,8 +93,9 @@ int		ChangedPPD;		/* Did we change the PPD database? */
  */
 
 static ppd_info_t	*add_ppd(const char *name, const char *natural_language,
-		         const char *make, const char *make_and_model,
-			 const char *device_id, time_t mtime, size_t size);
+		        	 const char *make, const char *make_and_model,
+				 const char *device_id, const char *product,
+				 time_t mtime, size_t size);
 static int		cat_ppd(const char *name);
 static int		compare_names(const ppd_info_t *p0,
 			              const ppd_info_t *p1);
@@ -141,8 +143,9 @@ static ppd_info_t *			/* O - PPD */
 add_ppd(const char *name,		/* I - PPD name */
         const char *natural_language,	/* I - Language(s) */
         const char *make,		/* I - Manufacturer */
-	const char *make_and_model,	/* I - NickName */
+	const char *make_and_model,	/* I - NickName/ModelName */
 	const char *device_id,		/* I - 1284DeviceID */
+	const char *product,		/* I - Product */
         time_t     mtime,		/* I - Modification time */
 	size_t     size)		/* I - File size */
 {
@@ -193,6 +196,7 @@ add_ppd(const char *name,		/* I - PPD name */
   strlcpy(ppd->record.name, name, sizeof(ppd->record.name));
   strlcpy(ppd->record.natural_language, natural_language,
           sizeof(ppd->record.natural_language));
+  strlcpy(ppd->record.product, product, sizeof(ppd->record.product));
   strlcpy(ppd->record.make, make, sizeof(ppd->record.make));
   strlcpy(ppd->record.make_and_model, make_and_model,
           sizeof(ppd->record.make_and_model));
@@ -404,7 +408,8 @@ list_ppds(int        request_id,	/* I - Request ID */
 		send_make,		/* Send ppd-make attribute? */
 		send_make_and_model,	/* Send ppd-make-and-model attribute? */
 		send_name,		/* Send ppd-name attribute? */
-		send_device_id;		/* Send ppd-device-id attribute? */
+		send_device_id,		/* Send ppd-device-id attribute? */
+		send_product;		/* Send ppd-product attribute? */
 
 
   fprintf(stderr, "DEBUG2: [cups-driverd] list_ppds(request_id=%d, limit=%d, opt=\"%s\"\n",
@@ -533,7 +538,7 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Add the raw driver...
   */
 
-  add_ppd("raw", "en", "Raw", "Raw Queue", "", 0, 0);
+  add_ppd("raw", "en", "Raw", "Raw Queue", "", "", 0, 0);
 
  /*
   * Sort the PPDs by make and model...
@@ -561,6 +566,7 @@ list_ppds(int        request_id,	/* I - Request ID */
     send_make_and_model   = 1;
     send_natural_language = 1;
     send_device_id        = 1;
+    send_product          = 1;
   }
   else
   {
@@ -571,6 +577,7 @@ list_ppds(int        request_id,	/* I - Request ID */
     send_make_and_model   = strstr(requested, "ppd-make-and-model") != NULL;
     send_natural_language = strstr(requested, "ppd-natural-language") != NULL;
     send_device_id        = strstr(requested, "ppd-device-id") != NULL;
+    send_product          = strstr(requested, "ppd-product") != NULL;
   }
 
   puts("Content-Type: application/ipp\n");
@@ -616,6 +623,10 @@ list_ppds(int        request_id,	/* I - Request ID */
       if (send_device_id)
         cupsdSendIPPString(IPP_TAG_TEXT, "ppd-device-id",
 	                   ppd->record.device_id);
+
+      if (send_product)
+        cupsdSendIPPString(IPP_TAG_TEXT, "ppd-product",
+	                   ppd->record.product);
 
      /*
       * If we have only requested the ppd-make attribute, then skip
@@ -665,7 +676,9 @@ load_ppds(const char *d,		/* I - Actual directory */
 		make_model[256],	/* Make and Model */
 		model_name[256],	/* ModelName */
 		nick_name[256],		/* NickName */
-		device_id[256];		/* 1284DeviceID */
+		device_id[256],		/* 1284DeviceID */
+		product[256];		/* Product */
+  cups_array_t	*products;		/* Array of product strings */
   ppd_info_t	*ppd,			/* New PPD file */
 		key;			/* Search key */
   int		new_ppd;		/* Is this a new PPD? */
@@ -789,6 +802,8 @@ load_ppds(const char *d,		/* I - Actual directory */
     * Now read until we get the NickName field...
     */
 
+    products = cupsArrayNew(NULL, NULL);
+
     model_name[0]    = '\0';
     nick_name[0]     = '\0';
     manufacturer[0]  = '\0';
@@ -810,6 +825,11 @@ load_ppds(const char *d,		/* I - Actual directory */
 	sscanf(line, "%*[^\"]\"%255[^\"]", nick_name);
       else if (!strncasecmp(line, "*1284DeviceID:", 14))
 	sscanf(line, "%*[^\"]\"%255[^\"]", device_id);
+      else if (!strncasecmp(line, "*Product:", 9))
+      {
+	sscanf(line, "%*[^\"]\"(%255[^)]", product);
+	cupsArrayAdd(products, strdup(product));
+      }
       else if (!strncmp(line, "*OpenUI", 7))
       {
        /*
@@ -817,7 +837,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 	* before the first OpenUI...
 	*/
 
-        if (model_name[0] || nick_name[0])
+        if ((model_name[0] || nick_name[0]) && cupsArrayCount(products) > 0)
 	  break;
       }
     }
@@ -841,8 +861,28 @@ load_ppds(const char *d,		/* I - Actual directory */
     while (isspace(make_model[0] & 255))
       _cups_strcpy(make_model, make_model + 1);
 
-    if (!make_model[0])
-      continue;	/* Nope... */
+    if (!make_model[0] || cupsArrayCount(products) == 0)
+    {
+     /*
+      * We don't have all the info needed, so skip this file...
+      */
+
+      if (!make_model[0])
+        fprintf(stderr, "WARNING: Missing NickName and ModelName in %s!\n",
+	        filename);
+
+      if (cupsArrayCount(products) == 0)
+        fprintf(stderr, "WARNING: Missing Product in %s!\n", filename);
+
+      for (ptr = (char *)cupsArrayFirst(products);
+           ptr;
+	   ptr = (char *)cupsArrayNext(products))
+	free(ptr);
+
+      cupsArrayDelete(products);
+
+      continue;
+    }
 
    /*
     * See if we got a manufacturer...
@@ -967,7 +1007,9 @@ load_ppds(const char *d,		/* I - Actual directory */
 
       fprintf(stderr, "DEBUG: [cups-driverd] Adding ppd \"%s\"...\n", name);
 
+      /* TODO: Support multiple Products... */
       if (!add_ppd(name, lang_version, manufacturer, make_model, device_id,
+                   (char *)cupsArrayFirst(products),
                    dent->fileinfo.st_mtime, dent->fileinfo.st_size))
       {
         cupsDirClose(dir);
@@ -994,8 +1036,21 @@ load_ppds(const char *d,		/* I - Actual directory */
               sizeof(ppd->record.make_and_model));
       strlcpy(ppd->record.natural_language, lang_version,
               sizeof(ppd->record.natural_language));
+      strlcpy(ppd->record.product, (char *)cupsArrayFirst(products),
+              sizeof(ppd->record.product));
       strlcpy(ppd->record.device_id, device_id, sizeof(ppd->record.device_id));
     }
+
+   /*
+    * Free products...
+    */
+
+    for (ptr = (char *)cupsArrayFirst(products);
+         ptr;
+	 ptr = (char *)cupsArrayNext(products))
+      free(ptr);
+
+    cupsArrayDelete(products);
 
     ChangedPPD = 1;
   }
@@ -1024,7 +1079,8 @@ load_drivers(void)
 		natural_language[128],	/* ppd-natural-language */
 		make[128],		/* ppd-make */
 		make_and_model[256],	/* ppd-make-and-model */
-		device_id[256];		/* ppd-device-id */
+		device_id[256],		/* ppd-device-id */
+		product[256];		/* ppd-product */
 
 
  /*
@@ -1069,15 +1125,18 @@ load_drivers(void)
        /*
         * Each line is of the form:
 	*
-	*   \"ppd-name\" ppd-natural-language "ppd-make" "ppd-make-and-model"
+	*   "ppd-name" ppd-natural-language "ppd-make" "ppd-make-and-model" \
+	*       "ppd-device-id" "ppd-product"
 	*/
 
         device_id[0] = '\0';
+	product[0]   = '\0';
 
         if (sscanf(line, "\"%511[^\"]\"%127s%*[ \t]\"%127[^\"]\""
-	                 "%*[ \t]\"%256[^\"]\"%*[ \t]\"%256[^\"]\"",
+	                 "%*[ \t]\"%256[^\"]\"%*[ \t]\"%256[^\"]\""
+			 "%*[ \t]\"%256[^\"]\"",
 	           name, natural_language, make, make_and_model,
-		   device_id) < 4)
+		   device_id, product) < 4)
         {
 	 /*
 	  * Bad format; strip trailing newline and write an error message.
@@ -1097,7 +1156,7 @@ load_drivers(void)
 	  */
 
           if (!add_ppd(name, natural_language, make, make_and_model, device_id,
-	               0, 0))
+	               product, 0, 0))
 	  {
             cupsDirClose(dir);
 	    return (0);
