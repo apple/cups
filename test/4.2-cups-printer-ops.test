@@ -105,7 +105,7 @@
 	ATTR name requesting-user-name $user
 
         GROUP subscription
-	ATTR uri notify-recipient testnotify://
+	ATTR uri notify-recipient-uri testnotify://
 	ATTR keyword notify-events printer-added,printer-modified,printer-deleted
 
 	# What statuses are OK?

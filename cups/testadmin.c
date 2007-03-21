@@ -73,7 +73,7 @@ main(int  argc,				/* I - Number of command-line args */
     for (i = 1, num_settings = 0; i < argc; i ++)
       num_settings = cupsParseOptions(argv[i], num_settings, &settings);
 
-    if (_cupsAdminSetServerSettings(http, num_settings, settings))
+    if (cupsAdminSetServerSettings(http, num_settings, settings))
     {
       puts("New server settings:");
       cupsFreeOptions(num_settings, settings);
@@ -91,7 +91,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Get the current configuration...
   */
 
-  if (_cupsAdminGetServerSettings(http, &num_settings, &settings))
+  if (cupsAdminGetServerSettings(http, &num_settings, &settings))
   {
     show_settings(num_settings, settings);
     cupsFreeOptions(num_settings, settings);

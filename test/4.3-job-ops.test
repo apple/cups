@@ -69,7 +69,7 @@
 	ATTR name requesting-user-name $user
 
         GROUP subscription
-	ATTR uri notify-recipient testnotify
+	ATTR uri notify-recipient-uri testnotify
 
 	FILE testfile.jpg
 
