@@ -126,9 +126,10 @@ extern void	cupsdReadClient(cupsd_client_t *con);
 extern void	cupsdResumeListening(void);
 extern int	cupsdSendCommand(cupsd_client_t *con, char *command,
 		                 char *options, int root);
-extern int	cupsdSendError(cupsd_client_t *con, http_status_t code);
+extern int	cupsdSendError(cupsd_client_t *con, http_status_t code,
+		               int auth_type);
 extern int	cupsdSendHeader(cupsd_client_t *con, http_status_t code,
-		                char *type);
+		                char *type, int auth_type);
 extern void	cupsdShutdownClient(cupsd_client_t *con);
 extern void	cupsdStartListening(void);
 extern void	cupsdStopListening(void);

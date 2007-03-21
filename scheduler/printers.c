@@ -1508,7 +1508,7 @@ cupsdSetAuthInfoRequired(
       if ((end = strchr(values, ',')) == NULL)
         end = values + strlen(values);
 
-      if (!strncmp(values, "none", end - values))
+      if ((end - values) == 4 && !strncmp(values, "none", 4))
       {
         if (p->num_auth_info_required != 0 || *end)
 	  return (0);
@@ -1518,17 +1518,27 @@ cupsdSetAuthInfoRequired(
 
 	return (1);
       }
-      else if (!strncmp(values, "domain", end - values))
+      else if ((end - values) == 9 && !strncmp(values, "negotiate", 9))
+      {
+        if (p->num_auth_info_required != 0 || *end)
+	  return (0);
+
+        p->auth_info_required[p->num_auth_info_required] = "negotiate";
+	p->num_auth_info_required ++;
+
+	return (1);
+      }
+      else if ((end - values) == 6 && !strncmp(values, "domain", 6))
       {
         p->auth_info_required[p->num_auth_info_required] = "domain";
 	p->num_auth_info_required ++;
       }
-      else if (!strncmp(values, "password", end - values))
+      else if ((end - values) == 8 && !strncmp(values, "password", 8))
       {
         p->auth_info_required[p->num_auth_info_required] = "password";
 	p->num_auth_info_required ++;
       }
-      else if (!strncmp(values, "username", end - values))
+      else if ((end - values) == 8 && !strncmp(values, "username", 8))
       {
         p->auth_info_required[p->num_auth_info_required] = "username";
 	p->num_auth_info_required ++;
@@ -1561,6 +1571,16 @@ cupsdSetAuthInfoRequired(
 	return (0);
 
       p->auth_info_required[p->num_auth_info_required] = "none";
+      p->num_auth_info_required ++;
+
+      return (1);
+    }
+    else if (!strcmp(attr->values[i].string.text, "negotiate"))
+    {
+      if (p->num_auth_info_required != 0 || attr->num_values != 1)
+	return (0);
+
+      p->auth_info_required[p->num_auth_info_required] = "negotiate";
       p->num_auth_info_required ++;
 
       return (1);
@@ -1660,9 +1680,22 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     if (auth)
     {
       if (auth->type == AUTH_BASIC || auth->type == AUTH_BASICDIGEST)
+      {
 	auth_supported = "basic";
+	cupsdSetAuthInfoRequired(p, "username,password", NULL);
+      }
       else if (auth->type == AUTH_DIGEST)
+      {
 	auth_supported = "digest";
+	cupsdSetAuthInfoRequired(p, "username,password", NULL);
+      }
+#ifdef HAVE_GSSAPI
+      else if (auth->type == AUTH_NEGOTIATE)
+      {
+	auth_supported = "negotiate";
+	cupsdSetAuthInfoRequired(p, "negotiate", NULL);
+      }
+#endif /* HAVE_GSSAPI */
 
       if (auth->type != AUTH_NONE)
         p->type |= CUPS_PRINTER_AUTHENTICATED;
