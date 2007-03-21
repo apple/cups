@@ -50,7 +50,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   char		buffer[8192];		/* Data buffer */
   int		bytes;			/* Number of bytes read/written */
   int		copies;			/* Number of copies */
-  const char	*content_type;		/* Content type for file... */
 
 
  /*

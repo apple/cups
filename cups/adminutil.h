@@ -71,12 +71,12 @@ extern int	cupsAdminExportSamba(const char *dest, const char *ppd,
 extern char	*cupsAdminCreateWindowsPPD(http_t *http, const char *dest,
 		                           char *buffer, int bufsize);
 
-extern int	_cupsAdminGetServerSettings(http_t *http,
-			                    int *num_settings,
-		                            cups_option_t **settings);
-extern int	_cupsAdminSetServerSettings(http_t *http,
-		                            int num_settings,
-		                            cups_option_t *settings);
+extern int	cupsAdminGetServerSettings(http_t *http,
+			                   int *num_settings,
+		                           cups_option_t **settings);
+extern int	cupsAdminSetServerSettings(http_t *http,
+		                           int num_settings,
+		                           cups_option_t *settings);
 
 
 #  ifdef __cplusplus

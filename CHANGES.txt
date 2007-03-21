@@ -4,6 +4,8 @@ CHANGES.txt - 2007-03-21
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2130, STR #2131)
+	- The scheduler now reports the PostScript product string
+	  from PPD files in CUPS-Get-PPDs responses (STR #1900)
 	- Raw printing with queues pointing to the file pseudo-
 	  device and multiple files and/or banners now works (STR
 	  #1933)

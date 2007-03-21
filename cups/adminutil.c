@@ -59,6 +59,12 @@
  * Local functions...
  */
 
+extern int		_cupsAdminGetServerSettings(http_t *http,
+				                    int *num_settings,
+			                            cups_option_t **settings);
+extern int		_cupsAdminSetServerSettings(http_t *http,
+			                            int num_settings,
+			                            cups_option_t *settings);
 static int		do_samba_command(const char *command,
 			                 const char *address,
 			                 const char *subcommand,

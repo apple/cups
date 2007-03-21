@@ -1862,7 +1862,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     * Get the current server settings...
     */
 
-    if (!_cupsAdminGetServerSettings(http, &num_settings, &settings))
+    if (!cupsAdminGetServerSettings(http, &num_settings, &settings))
     {
       cgiStartHTML(cgiText(_("Change Settings")));
       cgiSetVariable("MESSAGE",
@@ -1919,7 +1919,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
                                    num_settings, &settings);
 #endif /* HAVE_GSSAPI */
 
-      if (!_cupsAdminSetServerSettings(http, num_settings, settings))
+      if (!cupsAdminSetServerSettings(http, num_settings, settings))
       {
 	cgiStartHTML(cgiText(_("Change Settings")));
 	cgiSetVariable("MESSAGE",
@@ -2460,7 +2460,7 @@ do_menu(http_t *http)			/* I - HTTP connection */
   * Get the current server settings...
   */
 
-  if (!_cupsAdminGetServerSettings(http, &num_settings, &settings))
+  if (!cupsAdminGetServerSettings(http, &num_settings, &settings))
   {
     cgiSetVariable("SETTINGS_MESSAGE",
                    cgiText(_("Unable to open cupsd.conf file:")));
