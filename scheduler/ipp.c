@@ -113,16 +113,18 @@
 #  include <paper.h>
 #endif /* HAVE_LIBPAPER */
 
-#ifdef HAVE_MEMBERSHIP_H
-#  include <membership.h>
-#endif /* HAVE_MEMBERSHIP_H */
-#ifdef HAVE_MEMBERSHIPPRIV_H
-#  include <membershipPriv.h>
-#else
+#ifdef __APPLE__
+#  ifdef HAVE_MEMBERSHIP_H
+#    include <membership.h>
+#  endif /* HAVE_MEMBERSHIP_H */
+#  ifdef HAVE_MEMBERSHIPPRIV_H
+#    include <membershipPriv.h>
+#  else
 extern int mbr_user_name_to_uuid(const char* name, uuid_t uu);
 extern int mbr_group_name_to_uuid(const char* name, uuid_t uu);
 extern int mbr_check_membership_by_id(uuid_t user, gid_t group, int* ismember);
-#endif /* HAVE_MEMBERSHIPPRIV_H */
+#  endif /* HAVE_MEMBERSHIPPRIV_H */
+#endif /* __APPLE__ */
 
 
 /*
@@ -1186,7 +1188,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   * Check policy...
   */
 
-  auth_info = ippFindAttribute(job->attrs, "auth-info", IPP_TAG_TEXT);
+  auth_info = ippFindAttribute(con->request, "auth-info", IPP_TAG_TEXT);
 
   if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
