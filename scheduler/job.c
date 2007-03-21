@@ -1720,6 +1720,8 @@ cupsdUpdateJob(cupsd_job_t *job)	/* I - Job to check */
 	    cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
 	    return;
 	  }
+#else
+          (void)q;
 #endif /* __APPLE__ */
 	}
       }
@@ -2527,20 +2529,6 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     return;
   }
 
-  if (printer->raw && !strncmp(printer->device_uri, "file:", 5))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Job ID %d cannot be printed to raw queue pointing to "
-		    "a file!",
-                    job->id);
-
-    strlcpy(printer->state_message, "Raw printers cannot use file: devices!",
-            sizeof(printer->state_message));
-    cupsdStopPrinter(printer, 1);
-    cupsdAddPrinterHistory(printer);
-    return;
-  }
-
  /*
   * Figure out what filters are required to convert from
   * the source to the destination type...
@@ -2670,10 +2658,12 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   FilterLevel += job->cost;
 
  /*
-  * Add decompression filters, if any...
+  * Add decompression/raw filter as needed...
   */
 
-  if (!printer->raw && job->compressions[job->current_file])
+  if ((!printer->raw && job->compressions[job->current_file]) ||
+      (!filters && !printer->remote &&
+       (job->num_files > 1 || !strncmp(printer->device_uri, "file:", 5))))
   {
    /*
     * Add gziptoany filter to the front of the list...
@@ -2737,9 +2727,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   job->state->values[0].integer = IPP_JOB_PROCESSING;
   job->state_value              = IPP_JOB_PROCESSING;
+
   job->status  = 0;
   job->printer = printer;
   printer->job = job;
+
   cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
 
   if (job->current_file == 0)
@@ -3117,7 +3109,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
 
-  if (!printer->remote &&
+  if (!printer->remote && !printer->raw &&
       (filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
   {
     snprintf(final_content_type, sizeof(final_content_type),

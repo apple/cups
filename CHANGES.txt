@@ -1,9 +1,12 @@
-CHANGES.txt - 2007-03-19
+CHANGES.txt - 2007-03-21
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #2130, STR #2131)
+	- Raw printing with queues pointing to the file pseudo-
+	  device and multiple files and/or banners now works (STR
+	  #1933)
 	- Added new public cupsAdminGetServerSettings() and
 	  cupsAdminSetServerSettings() APIs.
 	- Added new "makebuttons" script in the "tools" directory

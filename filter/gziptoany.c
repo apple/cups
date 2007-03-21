@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   GZIP pre-filter for the Common UNIX Printing System (CUPS).
+ *   GZIP/raw pre-filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -25,32 +25,28 @@
  *
  * Contents:
  *
- *   main() - Uncompress gzip'd files and send them to stdout...
+ *   main() - Copy (and uncompress) files to stdout.
  */
 
 /*
  * Include necessary headers...
  */
 
+#include <cups/file.h>
 #include <cups/string.h>
 #include <stdlib.h>
 #include <errno.h>
 
-#ifdef HAVE_LIBZ
-#  include <zlib.h>
-#endif /* HAVE_LIBZ */
-
 
 /*
- * 'main()' - Uncompress gzip'd files and send them to stdout...
+ * 'main()' - Copy (and uncompress) files to stdout.
  */
 
 int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-#ifdef HAVE_LIBZ
-  gzFile	fp;			/* GZIP'd file */
+  cups_file_t	*fp;			/* File */
   char		buffer[8192];		/* Data buffer */
   int		bytes;			/* Number of bytes read/written */
   int		copies;			/* Number of copies */
@@ -68,42 +64,43 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
  /*
-  * Get the copy count; if the MIME type is "application/vnd.cups-raw" then
-  * make copies since the file is going straight to a backend...
+  * Get the copy count; if we have no final content type, this is a
+  * raw queue or raw print file, so we need to make copies...
   */
 
-  if ((content_type = getenv("CONTENT_TYPE")) != NULL &&
-      !strcasecmp(content_type, "application/vnd.cups-raw"))
+  if (!getenv("FINAL_CONTENT_TYPE"))
     copies = atoi(argv[4]);
   else
     copies = 1;
 
  /*
-  * Open the gzip file...
+  * Open the file...
   */
 
-  if ((fp = gzopen(argv[6], "rb")) == NULL)
+  if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
   {
-    fprintf(stderr, "ERROR: Unable to open GZIP file: %s\n", strerror(errno));
+    fprintf(stderr, "ERROR: Unable to open file \"%s\": %s\n", argv[6],
+            strerror(errno));
     return (1);
   }
 
  /*
-  * Copy the gzip file to stdout...
+  * Copy the file to stdout...
   */
 
   setbuf(stdout, NULL);
 
   while (copies > 0)
   {
-    gzrewind(fp);
+    cupsFileRewind(fp);
 
-    while ((bytes = gzread(fp, buffer, sizeof(buffer))) > 0)
+    while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
       if (fwrite(buffer, 1, bytes, stdout) < bytes)
       {
-	fprintf(stderr, "ERROR: Unable to write uncompressed document data: %s\n",
+	fprintf(stderr,
+	        "ERROR: Unable to write uncompressed document data: %s\n",
         	strerror(ferror(stdout)));
-	gzclose(fp);
+	cupsFileClose(fp);
 
 	return (1);
       }
@@ -115,14 +112,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Close the file and return...
   */
 
-  gzclose(fp);
+  cupsFileClose(fp);
 
   return (0);
-#else
-  fputs("INFO: Hint: recompile CUPS with ZLIB.\n", stderr);
-  fputs("ERROR: GZIP compression support not compiled in!\n", stderr);
-  return (1);
-#endif /* HAVE_LIBZ */
 }
 
 
