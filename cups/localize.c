@@ -69,6 +69,7 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   ppd_choice_t	*choice;		/* Current choice */
   ppd_coption_t	*coption;		/* Current custom option */
   ppd_cparam_t	*cparam;		/* Current custom parameter */
+  ppd_attr_t	*attr;			/* Current attribute */
   cups_lang_t	*lang;			/* Current language */
   char		ckeyword[PPD_MAX_NAME],	/* Custom keyword */
 		ll_CC[6],		/* Language + country locale */
@@ -150,6 +151,16 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
         strlcpy(cparam->text, text, sizeof(cparam->text));
     }
   }
+
+ /*
+  * Translate ICC profile names...
+  */
+
+  for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+    if ((text = ppd_text(ppd, "cupsICCProfile", attr->name, ll_CC, ll)) != NULL)
+      strlcpy(attr->text, text, sizeof(attr->text));
 
   return (0);
 }
