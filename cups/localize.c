@@ -156,11 +156,24 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   * Translate ICC profile names...
   */
 
+  if ((attr = ppdFindAttr(ppd, "APCustomColorMatchingName", NULL)) != NULL)
+  {
+    if ((text = ppd_text(ppd, "APCustomColorMachingName", attr->spec,
+                         ll_CC, ll)) != NULL)
+      strlcpy(attr->text, text, sizeof(attr->text));
+  }
+
   for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
        attr;
        attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
-    if ((text = ppd_text(ppd, "cupsICCProfile", attr->name, ll_CC, ll)) != NULL)
+  {
+    cupsArraySave(ppd->sorted_attrs);
+
+    if ((text = ppd_text(ppd, "cupsICCProfile", attr->spec, ll_CC, ll)) != NULL)
       strlcpy(attr->text, text, sizeof(attr->text));
+
+    cupsArrayRestore(ppd->sorted_attrs);
+  }
 
   return (0);
 }
