@@ -970,9 +970,11 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 		change_time,		/* printer-state-change-time attribute */
 		type;			/* printer-type attribute */
   const char	*info,			/* printer-info attribute */
+		*location,		/* printer-location attribute */
 		*make_model,		/* printer-make-and-model attribute */
 		*name;			/* printer-name attribute */
   char		job_sheets[1024],	/* job-sheets-default attribute */
+		auth_info_req[1024],	/* auth-info-required attribute */
 		reasons[1024];		/* printer-state-reasons attribute */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
@@ -981,10 +983,12 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 		*ptr;			/* Pointer into name/value */
   static const char * const pattrs[] =	/* Attributes we're interested in */
 		{
+		  "auth-info-required",
 		  "job-sheets-default",
 		  "printer-info",
 		  "printer-is-accepting-jobs",
 		  "printer-is-shared",
+		  "printer-location",
 		  "printer-make-and-model",
 		  "printer-name",
 		  "printer-state",
@@ -1038,6 +1042,7 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
       accepting   = 0;
       change_time = 0;
       info        = NULL;
+      location    = NULL;
       make_model  = NULL;
       name        = NULL;
       num_options = 0;
@@ -1046,14 +1051,30 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
       state       = IPP_PRINTER_IDLE;
       type        = CUPS_PRINTER_LOCAL;
 
-      strcpy(job_sheets, "");
-      strcpy(reasons, "");
+      auth_info_req[0] = '\0';
+      job_sheets[0]    = '\0';
+      reasons[0]       = '\0';
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
-        if (!strcmp(attr->name, "job-sheets-default") &&
-	    (attr->value_tag == IPP_TAG_KEYWORD ||
-	     attr->value_tag == IPP_TAG_NAME))
+        if (!strcmp(attr->name, "auth-info-required") &&
+	    attr->value_tag == IPP_TAG_KEYWORD)
+        {
+	  strlcpy(auth_info_req, attr->values[0].string.text,
+		  sizeof(auth_info_req));
+
+	  for (i = 1, ptr = auth_info_req + strlen(auth_info_req);
+	       i < attr->num_values;
+	       i ++)
+	  {
+	    snprintf(ptr, sizeof(auth_info_req) - (ptr - auth_info_req), ",%s",
+	             attr->values[i].string.text);
+	    ptr += strlen(ptr);
+	  }
+        }
+        else if (!strcmp(attr->name, "job-sheets-default") &&
+	         (attr->value_tag == IPP_TAG_KEYWORD ||
+	          attr->value_tag == IPP_TAG_NAME))
         {
 	  if (attr->num_values == 2)
 	    snprintf(job_sheets, sizeof(job_sheets), "%s,%s",
@@ -1071,6 +1092,9 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 	else if (!strcmp(attr->name, "printer-is-shared") &&
 	         attr->value_tag == IPP_TAG_BOOLEAN)
           shared = attr->values[0].boolean;
+        else if (!strcmp(attr->name, "printer-location") &&
+	         attr->value_tag == IPP_TAG_TEXT)
+	  location = attr->values[0].string.text;
         else if (!strcmp(attr->name, "printer-make-and-model") &&
 	         attr->value_tag == IPP_TAG_TEXT)
 	  make_model = attr->values[0].string.text;
@@ -1201,6 +1225,11 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
         num_options = 0;
 	options     = NULL;
 
+        if (auth_info_req[0])
+          dest->num_options = cupsAddOption("auth-info-required", auth_info_req,
+	                                    dest->num_options,
+	                                    &(dest->options));
+
         if (job_sheets[0])
           dest->num_options = cupsAddOption("job-sheets", job_sheets,
 	                                    dest->num_options,
@@ -1220,6 +1249,11 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 	dest->num_options = cupsAddOption("printer-is-shared", value,
 					  dest->num_options,
 					  &(dest->options));
+
+        if (location)
+          dest->num_options = cupsAddOption("printer-location",
+	                                    location, dest->num_options,
+	                                    &(dest->options));
 
         if (make_model)
           dest->num_options = cupsAddOption("printer-make-and-model",
