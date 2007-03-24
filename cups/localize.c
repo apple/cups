@@ -158,7 +158,7 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
 
   if ((attr = ppdFindAttr(ppd, "APCustomColorMatchingName", NULL)) != NULL)
   {
-    if ((text = ppd_text(ppd, "APCustomColorMachingName", attr->spec,
+    if ((text = ppd_text(ppd, "APCustomColorMatchingName", attr->spec,
                          ll_CC, ll)) != NULL)
       strlcpy(attr->text, text, sizeof(attr->text));
   }
