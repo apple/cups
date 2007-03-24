@@ -405,6 +405,13 @@ HOME=/tmp/cups-$user
 export HOME
 
 #
+# Force POSIX locale for tests...
+#
+
+LANG=C
+export LANG
+
+#
 # Start the server; run as foreground daemon in the background...
 #
 
