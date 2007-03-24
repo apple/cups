@@ -1537,7 +1537,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 	if (doc->number_up > 1 || doc->fitplot)
 	  continue;
       }
-      else if (!strncmp(line, "%%EndFeature:", 13))
+      else if (!strncmp(line, "%%EndFeature", 12))
       {
         feature = 0;
 
