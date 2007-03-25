@@ -32,9 +32,14 @@ LIBGSSAPI=""
 if test x$enable_gssapi != xno; then
 	AC_PATH_PROG(KRB5CONFIG, krb5-config)
 	if test "x$KRB5CONFIG" != x; then
-		CFLAGS="`$KRB5CONFIG --cflags gssapi` $CFLAGS"		
-		CPPFLAGS="`$KRB5CONFIG --cflags gssapi` $CPPFLAGS"		
-		LIBGSSAPI="`$KRB5CONFIG --libs gssapi`"
+		if test "x$uname" = "xDarwin"; then
+			# Mac OS X weak-links to the Kerberos framework...
+			LIBGSSAPI="-weak_framework Kerberos"
+		else
+			CFLAGS="`$KRB5CONFIG --cflags gssapi` $CFLAGS"		
+			CPPFLAGS="`$KRB5CONFIG --cflags gssapi` $CPPFLAGS"		
+			LIBGSSAPI="`$KRB5CONFIG --libs gssapi`"
+		fi
 		AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
 	else
 		# Solaris provides its own GSSAPI implementation...

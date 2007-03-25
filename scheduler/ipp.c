@@ -7869,6 +7869,21 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
 		minor_status;		/* Minor status code */
 
 
+#  ifdef __APPLE__
+   /*
+    * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+    * to use it...
+    */
+
+    if (krb5_init_context == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "save_krb5_creds: GSSAPI/Kerberos framework is not "
+		      "present");
+      return;
+    }
+#  endif /* __APPLE__ */
+
  /*
   * Setup a cached context for the job filters to use...
   */

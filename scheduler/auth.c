@@ -849,6 +849,21 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     gss_name_t		client_name;	/* Client name */
 
 
+#  ifdef __APPLE__
+   /*
+    * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+    * to use it...
+    */
+
+    if (gss_init_sec_context == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "GSSAPI/Kerberos authentication failed because the "
+		      "Kerberos framework is not present.");
+      return;
+    }
+#  endif /* __APPLE__ */
+
     con->gss_output_token.length = 0;
 
    /*

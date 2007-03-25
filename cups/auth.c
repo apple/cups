@@ -198,6 +198,20 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 					/* Pointer into Authorization string */
 
 
+#  ifdef __APPLE__
+   /*
+    * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+    * to use it...
+    */
+
+    if (gss_init_sec_context == NULL)
+    {
+      DEBUG_puts("cupsDoAuthentication: Weak-linked GSSAPI/Kerberos framework "
+                 "is not present");
+      return (-1);
+    }
+#  endif /* __APPLE__ */
+
     if (http->gssname == GSS_C_NO_NAME)
     {
       if ((gss_service_name = getenv("CUPS_GSSSERVICENAME")) == NULL)
