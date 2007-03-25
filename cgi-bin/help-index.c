@@ -899,6 +899,7 @@ help_load_file(
   cups_file_t	*fp;			/* HTML file */
   help_node_t	*node;			/* Current node */
   char		line[1024],		/* Line from file */
+		temp[1024],		/* Temporary word */
                 section[1024],		/* Section */
 		*ptr,			/* Pointer into line */
 		*anchor,		/* Anchor name */
@@ -1150,6 +1151,7 @@ help_load_file(
 	    */
 
             for (ptr ++; *ptr && *ptr != '>'; ptr ++)
+	    {
 	      if (*ptr == '\"' || *ptr == '\'')
 	      {
 		for (quote = *ptr++; *ptr && *ptr != quote; ptr ++);
@@ -1157,6 +1159,7 @@ help_load_file(
 		if (!*ptr)
 		  ptr --;
 	      }
+	    }
 
 	    if (!*ptr)
 	      ptr --;
@@ -1188,18 +1191,18 @@ help_load_file(
 
 	wordlen = ptr - text;
 
-	if (*ptr)
-          *ptr = '\0';
-	else
-          ptr --;
+        memcpy(temp, text, wordlen);
+	temp[wordlen] = '\0';
 
-	if (wordlen > 1 && !bsearch(text, help_common_words,
+        ptr --;
+
+	if (wordlen > 1 && !bsearch(temp, help_common_words,
 	                            (sizeof(help_common_words) /
 				     sizeof(help_common_words[0])),
 				    sizeof(help_common_words[0]),
 				    (int (*)(const void *, const void *))
 				        strcasecmp))
-          help_add_word(node, text);
+          help_add_word(node, temp);
       }
     }
 
