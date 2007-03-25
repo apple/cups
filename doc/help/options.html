@@ -106,6 +106,31 @@ listed using the <B>lpoptions</B> command:</P>
 lpoptions -p printer -l
 </PRE>
 
+<H3><A NAME="INSTANCES">Creating Saved Options</A></H3>
+
+<P>Saved options are supported in CUPS through <em>printer
+instances</em>. Printer instances are, as their name implies, copies
+of a printer that have certain options associated with them. Use the
+<B>lpoptions</B> command to create a printer instance:</P>
+
+<PRE CLASS="command">
+lpoptions -p printer/instance -o name=value ...
+</PRE>
+
+<P>The <CODE>-p printer/instance</CODE> option provides the name of
+the instance, which is always the printer name, a slash, and the
+instance name which can contain any printable characters except
+space and slash. The remaining options are then associated with the
+instance instead of the main queue. For example, the following
+command creates a duplex instance of the LaserJet queue:</P>
+
+<PRE CLASS="command">
+lpoptions -p LaserJet/duplex -o sides=two-sided-long-edge
+</PRE>
+
+<P>Instances <em>do not</em> inherit lpoptions from the main
+queue.</P>
+
 <H3><A NAME="COPIES">Printing Multiple Copies</A></H3>
 
 <P>Both the <B>lp</B> and <B>lpr</B> commands have options for
