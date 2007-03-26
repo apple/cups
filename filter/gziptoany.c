@@ -91,6 +91,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   while (copies > 0)
   {
+    if (!getenv("FINAL_CONTENT_TYPE"))
+      fputs("PAGE: 1 1\n", stderr);
+
     cupsFileRewind(fp);
 
     while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
