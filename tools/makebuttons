@@ -85,9 +85,6 @@ fi
 # Bitstream Vera font...
 font="fonts/Vera.ttf"
 
-# Base image
-base="tools/buttons.gif"
-
 # Colors
 background="#d4d4a4"
 black="#000000"
@@ -162,7 +159,7 @@ function generate_button()
 	# First step: generate an image trimmed to the text.
 	#  -> annotate a 40x400 rectangle with the provided text
 	#  -> trim to the text
-	convert $base -extent 400x40 -fill "$fgclr" \
+	convert xc:transparent -extent 400x40 -fill "$fgclr" \
 		-draw "rectangle 0,0 399,39" \
         	-fill "#ffffff" -encoding Unicode -pointsize 13 -font "$font" \
         	-gravity Center -annotate 0x0+0+0 "$txt" -trim $tmp_btn
@@ -207,7 +204,7 @@ function generate_button()
 	btn_w=`expr $txt_w + $rad + $rad`
 	btn_top=`expr $btn_h - 1`
 
-	convert $base \
+	convert xc:transparent \
         	-extent $btn_w'x'$btn_h -fill "$bgclr" \
         	-draw "rectangle 0,0 $btn_w,$btn_h" -fill "$fgclr" \
         	-draw "roundRectangle 0,0 `expr $btn_w - 1`,$btn_top `expr $rad - 1`,$rad" \

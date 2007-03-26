@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 6320 2007-03-08 13:36:56Z mike $"
+ * "$Id: pstops.c 6391 2007-03-24 14:35:56Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -1537,7 +1537,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 	if (doc->number_up > 1 || doc->fitplot)
 	  continue;
       }
-      else if (!strncmp(line, "%%EndFeature:", 13))
+      else if (!strncmp(line, "%%EndFeature", 12))
       {
         feature = 0;
 
@@ -3288,5 +3288,5 @@ write_labels(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 6320 2007-03-08 13:36:56Z mike $".
+ * End of "$Id: pstops.c 6391 2007-03-24 14:35:56Z mike $".
  */

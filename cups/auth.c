@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6253 2007-02-10 18:48:40Z mike $"
+ * "$Id: auth.c 6397 2007-03-25 23:33:32Z mike $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -197,6 +197,20 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     const char		*authorization;
 					/* Pointer into Authorization string */
 
+
+#  ifdef __APPLE__
+   /*
+    * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+    * to use it...
+    */
+
+    if (gss_init_sec_context == NULL)
+    {
+      DEBUG_puts("cupsDoAuthentication: Weak-linked GSSAPI/Kerberos framework "
+                 "is not present");
+      return (-1);
+    }
+#  endif /* __APPLE__ */
 
     if (http->gssname == GSS_C_NO_NAME)
     {
@@ -569,5 +583,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c 6253 2007-02-10 18:48:40Z mike $".
+ * End of "$Id: auth.c 6397 2007-03-25 23:33:32Z mike $".
  */

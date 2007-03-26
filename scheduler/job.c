@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6376 2007-03-21 06:39:10Z mike $"
+ * "$Id: job.c 6399 2007-03-26 14:27:48Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2934,7 +2934,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc ++] = printer_name;
 
   if (!printer->remote && !printer->raw &&
-      (filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL)
+      (filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL &&
+      filter->dst)
   {
     snprintf(final_content_type, sizeof(final_content_type),
              "FINAL_CONTENT_TYPE=%s/%s",
@@ -3535,5 +3536,5 @@ update_job(cupsd_job_t *job)	/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c 6376 2007-03-21 06:39:10Z mike $".
+ * End of "$Id: job.c 6399 2007-03-26 14:27:48Z mike $".
  */

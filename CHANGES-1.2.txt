@@ -1,6 +1,26 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.11
+
+	- The pstops filter did not handle %%EndFeature comments
+	  properly (STR #2306)
+	- Fixed a problem with the Polish web page printer icons
+	  (STR #2305)
+	- ppdLocalize() now also localizes the cupsICCProfile
+	  attributes.
+	- The scheduler still had a reference to the incorrect
+	  "notify-recipient" attribute (STR #2307)
+	- The "make check" and "make test" subscription tests did
+	  not set the locale (STR #2307)
+	- The "make check" and "make test" subscription tests
+	  incorrectly used the notify-recipient attribute instead
+	  of notify-recipient-uri (STR #2307)
+	- cupsRasterInterpretPPD() incorrectly limited the
+	  cupsBorderlessScalingFactor when specified in the
+	  job options.
+
+
 CHANGES IN CUPS V1.2.10
 
 	- ppdLocalize() now supports localizing for Japanese

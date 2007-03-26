@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 6356 2007-03-19 13:54:48Z mike $"
+ * "$Id: encode.c 6386 2007-03-23 19:03:01Z mike $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -52,6 +52,8 @@
 
 static const _ipp_option_t ipp_options[] =
 {
+  { "auth-info",		IPP_TAG_TEXT,		IPP_TAG_JOB },
+  { "auth-info-required",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { "blackplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { "blackplot-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { "brightness",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
@@ -117,6 +119,7 @@ static const _ipp_option_t ipp_options[] =
   { "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { "printer-is-accepting-jobs",IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { "printer-is-shared",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { "printer-location",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { "printer-make-and-model",	IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { "printer-more-info",	IPP_TAG_URI,		IPP_TAG_PRINTER },
   { "printer-op-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
@@ -570,5 +573,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 6356 2007-03-19 13:54:48Z mike $".
+ * End of "$Id: encode.c 6386 2007-03-23 19:03:01Z mike $".
  */

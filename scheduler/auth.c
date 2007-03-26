@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6361 2007-03-19 16:01:28Z mike $"
+ * "$Id: auth.c 6397 2007-03-25 23:33:32Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -848,6 +848,21 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 					/* Output token for username */
     gss_name_t		client_name;	/* Client name */
 
+
+#  ifdef __APPLE__
+   /*
+    * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+    * to use it...
+    */
+
+    if (gss_init_sec_context == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "GSSAPI/Kerberos authentication failed because the "
+		      "Kerberos framework is not present.");
+      return;
+    }
+#  endif /* __APPLE__ */
 
     con->gss_output_token.length = 0;
 
@@ -2522,5 +2537,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 6361 2007-03-19 16:01:28Z mike $".
+ * End of "$Id: auth.c 6397 2007-03-25 23:33:32Z mike $".
  */

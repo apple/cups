@@ -1,5 +1,5 @@
 /*
- * "$Id: localize.c 6367 2007-03-20 01:34:29Z mike $"
+ * "$Id: localize.c 6388 2007-03-24 14:21:31Z mike $"
  *
  *   PPD custom option routines for the Common UNIX Printing System (CUPS).
  *
@@ -69,6 +69,7 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   ppd_choice_t	*choice;		/* Current choice */
   ppd_coption_t	*coption;		/* Current custom option */
   ppd_cparam_t	*cparam;		/* Current custom parameter */
+  ppd_attr_t	*attr;			/* Current attribute */
   cups_lang_t	*lang;			/* Current language */
   char		ckeyword[PPD_MAX_NAME],	/* Custom keyword */
 		ll_CC[6],		/* Language + country locale */
@@ -151,6 +152,29 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
     }
   }
 
+ /*
+  * Translate ICC profile names...
+  */
+
+  if ((attr = ppdFindAttr(ppd, "APCustomColorMatchingName", NULL)) != NULL)
+  {
+    if ((text = ppd_text(ppd, "APCustomColorMatchingName", attr->spec,
+                         ll_CC, ll)) != NULL)
+      strlcpy(attr->text, text, sizeof(attr->text));
+  }
+
+  for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+  {
+    cupsArraySave(ppd->sorted_attrs);
+
+    if ((text = ppd_text(ppd, "cupsICCProfile", attr->spec, ll_CC, ll)) != NULL)
+      strlcpy(attr->text, text, sizeof(attr->text));
+
+    cupsArrayRestore(ppd->sorted_attrs);
+  }
+
   return (0);
 }
 
@@ -215,5 +239,5 @@ ppd_text(ppd_file_t *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: localize.c 6367 2007-03-20 01:34:29Z mike $".
+ * End of "$Id: localize.c 6388 2007-03-24 14:21:31Z mike $".
  */

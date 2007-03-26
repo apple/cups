@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertolabel.c 6235 2007-02-05 21:03:49Z mike $"
+ * "$Id: rastertolabel.c 6401 2007-03-26 14:36:01Z mike $"
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -336,7 +336,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
         * Set label size...
 	*/
 
-        printf("q%d\n", header->cupsWidth);
+        printf("q%d\n", (header->cupsWidth + 7) & ~7);
         break;
 
     case ZEBRA_ZPL :
@@ -1306,5 +1306,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertolabel.c 6235 2007-02-05 21:03:49Z mike $".
+ * End of "$Id: rastertolabel.c 6401 2007-03-26 14:36:01Z mike $".
  */

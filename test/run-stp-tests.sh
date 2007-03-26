@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 6380 2007-03-21 15:18:53Z mike $"
+# "$Id: run-stp-tests.sh 6389 2007-03-24 14:26:04Z mike $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -405,6 +405,13 @@ HOME=/tmp/cups-$user
 export HOME
 
 #
+# Force POSIX locale for tests...
+#
+
+LANG=C
+export LANG
+
+#
 # Start the server; run as foreground daemon in the background...
 #
 
@@ -584,5 +591,5 @@ echo "A HTML report was created in test/$strfile."
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh 6380 2007-03-21 15:18:53Z mike $"
+# End of "$Id: run-stp-tests.sh 6389 2007-03-24 14:26:04Z mike $"
 #

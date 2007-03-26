@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6383 2007-03-21 20:01:20Z mike $"
+ * "$Id: ipp.c 6397 2007-03-25 23:33:32Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -7869,6 +7869,21 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
 		minor_status;		/* Minor status code */
 
 
+#  ifdef __APPLE__
+   /*
+    * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+    * to use it...
+    */
+
+    if (krb5_init_context == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "save_krb5_creds: GSSAPI/Kerberos framework is not "
+		      "present");
+      return;
+    }
+#  endif /* __APPLE__ */
+
  /*
   * Setup a cached context for the job filters to use...
   */
@@ -9458,5 +9473,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6383 2007-03-21 20:01:20Z mike $".
+ * End of "$Id: ipp.c 6397 2007-03-25 23:33:32Z mike $".
  */

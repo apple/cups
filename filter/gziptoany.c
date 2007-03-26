@@ -1,5 +1,5 @@
 /*
- * "$Id: gziptoany.c 6378 2007-03-21 07:18:18Z mike $"
+ * "$Id: gziptoany.c 6400 2007-03-26 14:29:40Z mike $"
  *
  *   GZIP/raw pre-filter for the Common UNIX Printing System (CUPS).
  *
@@ -91,6 +91,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   while (copies > 0)
   {
+    if (!getenv("FINAL_CONTENT_TYPE"))
+      fputs("PAGE: 1 1\n", stderr);
+
     cupsFileRewind(fp);
 
     while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
@@ -118,5 +121,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: gziptoany.c 6378 2007-03-21 07:18:18Z mike $".
+ * End of "$Id: gziptoany.c 6400 2007-03-26 14:29:40Z mike $".
  */
