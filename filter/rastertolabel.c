@@ -336,7 +336,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
         * Set label size...
 	*/
 
-        printf("q%d\n", header->cupsWidth);
+        printf("q%d\n", (header->cupsWidth + 7) & ~7);
         break;
 
     case ZEBRA_ZPL :
