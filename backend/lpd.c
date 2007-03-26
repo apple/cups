@@ -3,7 +3,7 @@
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -74,6 +74,14 @@ static int	abort_job = 0;		/* Non-zero if we get SIGTERM */
 
 
 /*
+ * Print mode...
+ */
+
+#define MODE_STANDARD		0	/* Queue a copy */
+#define MODE_STREAM		1	/* Stream a copy */
+
+
+/*
  * The order for control and data files in LPD requests...
  */
 
@@ -96,9 +104,9 @@ static int	abort_job = 0;		/* Non-zero if we get SIGTERM */
 
 static int	lpd_command(int lpd_fd, int timeout, char *format, ...);
 static int	lpd_queue(const char *hostname, int port, const char *printer,
-		          const char *filename,
-		          const char *user, const char *title, int copies,
-			  int banner, int format, int order, int reserve,
+		          int print_fd, int mode, const char *user,
+			  const char *title, int copies, int banner,
+			  int format, int order, int reserve,
 			  int manual_copies, int timeout, int contimeout);
 static void	lpd_timeout(int sig);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
@@ -131,7 +139,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 			*filename,	/* File to print */
 			title[256];	/* Title string */
   int			port;		/* Port number */
+  int			fd;		/* Print file */
   int			status;		/* Status of LPD job */
+  int			mode;		/* Print mode */
   int			banner;		/* Print banner page? */
   int			format;		/* Print format */
   int			order;		/* Order of control/data files */
@@ -190,44 +200,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * If we have 7 arguments, print the file named on the command-line.
-  * Otherwise, copy stdin to a temporary file and print the temporary
-  * file.
-  */
-
-  if (argc == 6)
-  {
-   /*
-    * Copy stdin to a temporary file...
-    */
-
-    int  fd;		/* Temporary file */
-    char buffer[8192];	/* Buffer for copying */
-    int  bytes;		/* Number of bytes read */
-
-
-    if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
-    {
-      perror("ERROR: unable to create temporary file");
-      return (CUPS_BACKEND_FAILED);
-    }
-
-    while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-      if (write(fd, buffer, bytes) < bytes)
-      {
-        perror("ERROR: unable to write to temporary file");
-	close(fd);
-	unlink(tmpfilename);
-	return (CUPS_BACKEND_FAILED);
-      }
-
-    close(fd);
-    filename = tmpfilename;
-  }
-  else
-    filename = argv[6];
-
- /*
   * Extract the hostname and printer name from the URI...
   */
 
@@ -249,6 +221,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * See if there are any options...
   */
 
+  mode          = MODE_STANDARD;
   banner        = 0;
   format        = 'l';
   order         = ORDER_CONTROL_DATA;
@@ -353,6 +326,19 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	else
 	  fprintf(stderr, "ERROR: Unknown format character \"%c\"\n", value[0]);
       }
+      else if (!strcasecmp(name, "mode") && value[0])
+      {
+       /*
+        * Set control/data order...
+	*/
+
+        if (!strcasecmp(value, "standard"))
+	  order = MODE_STANDARD;
+	else if (!strcasecmp(value, "stream"))
+	  order = MODE_STREAM;
+	else
+	  fprintf(stderr, "ERROR: Unknown print mode \"%s\"\n", value);
+      }
       else if (!strcasecmp(name, "order") && value[0])
       {
        /*
@@ -420,6 +406,64 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     }
   }
 
+  if (mode == MODE_STREAM)
+    order = ORDER_CONTROL_DATA;
+
+ /*
+  * If we have 7 arguments, print the file named on the command-line.
+  * Otherwise, copy stdin to a temporary file and print the temporary
+  * file.
+  */
+
+  if (argc == 6 && mode == MODE_STANDARD)
+  {
+   /*
+    * Copy stdin to a temporary file...
+    */
+
+    char buffer[8192];	/* Buffer for copying */
+    int  bytes;		/* Number of bytes read */
+
+
+    if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
+    {
+      perror("ERROR: unable to create temporary file");
+      return (CUPS_BACKEND_FAILED);
+    }
+
+    while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+      if (write(fd, buffer, bytes) < bytes)
+      {
+        perror("ERROR: unable to write to temporary file");
+	close(fd);
+	unlink(tmpfilename);
+	return (CUPS_BACKEND_FAILED);
+      }
+
+    filename = tmpfilename;
+  }
+  else if (argc == 6)
+  {
+   /*
+    * Stream from stdin...
+    */
+
+    filename = NULL;
+    fd       = 0;
+  }
+  else
+  {
+    filename = argv[6];
+    fd       = open(filename, O_RDONLY);
+
+    if (fd == -1)
+    {
+      fprintf(stderr, "ERROR: Unable to open print file %s: %s\n",
+              filename, strerror(errno));
+      return (CUPS_BACKEND_FAILED);
+    }
+  }
+
  /*
   * Sanitize the document title...
   */
@@ -455,7 +499,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       copies        = atoi(argv[4]);
     }
 
-    status = lpd_queue(hostname, port, resource + 1, filename,
+    status = lpd_queue(hostname, port, resource + 1, fd, mode,
                        username, title, copies,
 		       banner, format, order, reserve, manual_copies,
 		       timeout, contimeout);
@@ -464,7 +508,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
   }
   else
-    status = lpd_queue(hostname, port, resource + 1, filename,
+    status = lpd_queue(hostname, port, resource + 1, fd, mode,
                        username, title, 1,
 		       banner, format, order, reserve, 1,
 		       timeout, contimeout);
@@ -475,6 +519,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (tmpfilename[0])
     unlink(tmpfilename);
+
+  if (fd)
+    close(fd);
 
  /*
   * Return the queue status...
@@ -560,7 +607,8 @@ static int				/* O - Zero on success, non-zero on failure */
 lpd_queue(const char *hostname,		/* I - Host to connect to */
           int        port,		/* I - Port to connect on */
           const char *printer,		/* I - Printer/queue name */
-	  const char *filename,		/* I - File to print */
+	  int        print_fd,		/* I - File to print */
+	  int        mode,		/* I - Print mode */
           const char *user,		/* I - Requesting user */
 	  const char *title,		/* I - Job title */
 	  int        copies,		/* I - Number of copies */
@@ -572,7 +620,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	  int        timeout,		/* I - Timeout... */
 	  int        contimeout)	/* I - Connection timeout */
 {
-  FILE			*fp;		/* Job file */
   char			localhost[255];	/* Local host name */
   int			error;		/* Error number */
   struct stat		filestats;	/* File statistics */
@@ -838,25 +885,25 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     * Next, open the print file and figure out its size...
     */
 
-    if (stat(filename, &filestats))
+    if (print_fd)
     {
-      httpAddrFreeList(addrlist);
-      close(fd);
+      if (fstat(print_fd, &filestats))
+      {
+	httpAddrFreeList(addrlist);
+	close(fd);
 
-      perror("ERROR: unable to stat print file");
-      return (CUPS_BACKEND_FAILED);
+	perror("ERROR: unable to stat print file");
+	return (CUPS_BACKEND_FAILED);
+      }
+
+      filestats.st_size *= manual_copies;
     }
-
-    filestats.st_size *= manual_copies;
-
-    if ((fp = fopen(filename, "rb")) == NULL)
-    {
-      httpAddrFreeList(addrlist);
-      close(fd);
-
-      perror("ERROR: unable to open print file for reading");
-      return (CUPS_BACKEND_FAILED);
-    }
+    else
+#ifdef _LARGEFILE_SOURCE
+      filestats.st_size = (size_t)(999999999999.0);
+#else
+      filestats.st_size = 2147483647;
+#endif /* _LARGEFILE_SOURCE */
 
    /*
     * Send a job header to the printer, specifying no banner page and
@@ -968,9 +1015,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       tbytes = 0;
       for (copy = 0; copy < manual_copies; copy ++)
       {
-	rewind(fp);
+	lseek(print_fd, 0, SEEK_SET);
 
-	while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+	while ((nbytes = read(print_fd, buffer, sizeof(buffer))) > 0)
 	{
 	  fprintf(stderr, "INFO: Spooling LPR job, %.0f%% complete...\n",
         	  100.0 * tbytes / filestats.st_size);
@@ -985,33 +1032,38 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	}
       }
 
-      if (tbytes < filestats.st_size)
-	status = errno;
-      else if (lpd_write(fd, "", 1) < 1)
+      if (mode == MODE_STANDARD)
       {
-        perror("ERROR: Unable to send trailing nul to printer");
-	status = errno;
+	if (tbytes < filestats.st_size)
+	  status = errno;
+	else if (lpd_write(fd, "", 1) < 1)
+	{
+          perror("ERROR: Unable to send trailing nul to printer");
+	  status = errno;
+	}
+	else
+	{
+	 /*
+          * Read the status byte from the printer; if we can't read the byte
+	  * back now, we should set status to "errno", however at this point
+	  * we know the printer got the whole file and we don't necessarily
+	  * want to requeue it over and over...
+	  */
+
+	  alarm(timeout);
+
+          if (recv(fd, &status, 1, 0) < 1)
+	  {
+	    fprintf(stderr, "WARNING: Remote host did not respond with data "
+	                    "status byte after %d seconds!\n", timeout);
+	    status = 0;
+          }
+
+	  alarm(0);
+	}
       }
       else
-      {
-       /*
-        * Read the status byte from the printer; if we can't read the byte
-	* back now, we should set status to "errno", however at this point
-	* we know the printer got the whole file and we don't necessarily
-	* want to requeue it over and over...
-	*/
-
-	alarm(timeout);
-
-        if (recv(fd, &status, 1, 0) < 1)
-	{
-	  fprintf(stderr, "WARNING: Remote host did not respond with data "
-	                  "status byte after %d seconds!\n", timeout);
-	  status = 0;
-        }
-
-	alarm(0);
-      }
+        status = 0;
 
       if (status != 0)
 	fprintf(stderr, "ERROR: Remote host did not accept data file (%d)\n",
@@ -1065,7 +1117,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     */
 
     close(fd);
-    fclose(fp);
 
     if (status == 0)
     {
