@@ -150,7 +150,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fputs("Usage: scsi:/dev/file job-id user title copies options [file]\n", stderr);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]\n"),
+		    argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
 

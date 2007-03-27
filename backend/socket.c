@@ -129,8 +129,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
-            argv[0]);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]\n"),
+        	    argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
 
@@ -244,12 +245,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
-    fprintf(stderr, "ERROR: Unable to locate printer \'%s\'!\n", hostname);
+    _cupsLangPrintf(stderr,
+                    _("ERROR: Unable to locate printer \'%s\'!\n"), hostname);
     return (CUPS_BACKEND_STOP);
   }
 
-  fprintf(stderr, "INFO: Attempting to connect to host %s on port %d\n",
-          hostname, port);
+  _cupsLangPrintf(stderr,
+                  _("INFO: Attempting to connect to host %s on port %d\n"),
+        	  hostname, port);
 
   fputs("STATE: +connecting-to-device\n", stderr);
 
@@ -269,8 +272,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        fprintf(stderr, "INFO: Unable to connect to \"%s\", queuing on next printer in class...\n",
-		hostname);
+        _cupsLangPrintf(stderr,
+	                _("INFO: Unable to connect to \"%s\", queuing on "
+			  "next printer in class...\n"),
+			hostname);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -284,9 +289,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       if (error == ECONNREFUSED || error == EHOSTDOWN ||
           error == EHOSTUNREACH)
       {
-	fprintf(stderr,
-	        "INFO: Network host \'%s\' is busy; will retry in %d seconds...\n",
-                hostname, delay);
+	_cupsLangPrintf(stderr,
+	                _("INFO: Network host \'%s\' is busy; will retry "
+			  "in %d seconds...\n"),
+                	hostname, delay);
 	sleep(delay);
 
 	if (delay < 30)
@@ -303,17 +309,17 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
   fputs("STATE: -connecting-to-device\n", stderr);
-  fprintf(stderr, "INFO: Connected to %s...\n", hostname);
+  _cupsLangPrintf(stderr, _("INFO: Connected to %s...\n"), hostname);
 
 #ifdef AF_INET6
   if (addr->addr.addr.sa_family == AF_INET6)
-    fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6)...\n", 
+    _cupsLangPrintf(stderr, _("DEBUG: Connected to [%s]:%d (IPv6)...\n"), 
 		    httpAddrString(&addr->addr, addrname, sizeof(addrname)),
 		    ntohs(addr->addr.ipv6.sin6_port));
   else
 #endif /* AF_INET6 */
     if (addr->addr.addr.sa_family == AF_INET)
-      fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4)...\n",
+      _cupsLangPrintf(stderr, _("DEBUG: Connected to %s:%d (IPv4)...\n"),
 		      httpAddrString(&addr->addr, addrname, sizeof(addrname)),
 		      ntohs(addr->addr.ipv4.sin_port));
 
@@ -336,8 +342,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     tbytes = backendRunLoop(print_fd, device_fd, 1, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
-      fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
-	      CUPS_LLCAST tbytes);
+      _cupsLangPrintf(stderr,
+                      _("INFO: Sent print file, " CUPS_LLFMT " bytes...\n"),
+		      CUPS_LLCAST tbytes);
   }
 
   if (waiteof)
@@ -346,7 +353,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Shutdown the socket and wait for the other end to finish...
     */
 
-    fputs("INFO: Print file sent, waiting for printer to finish...\n", stderr);
+    _cupsLangPuts(stderr,
+                  _("INFO: Print file sent, waiting for printer to "
+		    "finish...\n"));
 
     shutdown(device_fd, 1);
 
@@ -371,8 +380,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 	if ((bc_bytes = read(device_fd, resource, sizeof(resource))) > 0)
 	{
-	  fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
-		  (int)bc_bytes);
+	  _cupsLangPrintf(stderr,
+	                  _("DEBUG: Received %d bytes of back-channel data!\n"),
+			  (int)bc_bytes);
 	  cupsBackChannelWrite(resource, bc_bytes, 1.0);
 	}
 	else
@@ -399,7 +409,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     close(print_fd);
 
   if (tbytes >= 0)
-    fputs("INFO: Ready to print.\n", stderr);
+    _cupsLangPuts(stderr, _("INFO: Ready to print.\n"));
 
   return (tbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }
@@ -424,7 +434,7 @@ side_cb(int print_fd,			/* I - Print file */
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
   {
-    fputs("WARNING: Failed to read side-channel request!\n", stderr);
+    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
     return;
   }
 

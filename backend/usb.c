@@ -192,7 +192,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fputs("Usage: usb job-id user title copies options [file]\n", stderr);
+    _cupsLangPuts(stderr,
+                  _("Usage: usb job-id user title copies options [file]\n"));
     return (CUPS_BACKEND_FAILED);
   }
 
@@ -207,7 +208,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		      hostname, sizeof(hostname), &port,
 		      resource, sizeof(resource)) < HTTP_URI_OK)
   {
-    fputs("ERROR: No device URI found in argv[0] or in DEVICE_URI environment variable!\n", stderr);
+    _cupsLangPuts(stderr,
+                  _("ERROR: No device URI found in argv[0] or in DEVICE_URI "
+		    "environment variable!\n"));
     return (1);
   }
 
@@ -243,8 +246,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
-      fprintf(stderr, "ERROR: unable to open print file %s - %s\n",
-              argv[6], strerror(errno));
+      _cupsLangPrintf(stderr, _("ERROR: unable to open print file %s - %s\n"),
+        	      argv[6], strerror(errno));
       return (CUPS_BACKEND_FAILED);
     }
 

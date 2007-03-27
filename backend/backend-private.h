@@ -36,6 +36,7 @@
 #  include <cups/sidechannel.h>
 #  include <cups/cups.h>
 #  include <cups/debug.h>
+#  include <cups/i18n.h>
 #  include <stdlib.h>
 #  include <errno.h>
 #  include <cups/string.h>

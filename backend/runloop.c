@@ -132,7 +132,7 @@ backendRunLoop(
 	if (errno == ENXIO && !offline)
 	{
 	  fputs("STATE: +offline-error\n", stderr);
-	  fputs("INFO: Printer is currently off-line.\n", stderr);
+	  _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
 	  offline = 1;
 	}
 
@@ -156,9 +156,10 @@ backendRunLoop(
     {
       if ((bc_bytes = read(device_fd, bc_buffer, sizeof(bc_buffer))) > 0)
       {
-	fprintf(stderr,
-	        "DEBUG: Received " CUPS_LLFMT " bytes of back-channel data!\n",
-	        CUPS_LLCAST bc_bytes);
+	_cupsLangPrintf(stderr,
+	        	_("DEBUG: Received " CUPS_LLFMT " bytes of "
+			  "back-channel data!\n"),
+	        	CUPS_LLCAST bc_bytes);
         cupsBackChannelWrite(bc_buffer, bc_bytes, 1.0);
       }
     }
@@ -195,8 +196,8 @@ backendRunLoop(
 
       print_ptr = print_buffer;
 
-      fprintf(stderr, "DEBUG: Read %d bytes of print data...\n",
-              (int)print_bytes);
+      _cupsLangPrintf(stderr, _("DEBUG: Read %d bytes of print data...\n"),
+        	      (int)print_bytes);
     }
 
    /*
@@ -216,7 +217,7 @@ backendRunLoop(
 	{
 	  if (!paperout)
 	  {
-	    fputs("ERROR: Out of paper!\n", stderr);
+	    _cupsLangPuts(stderr, _("ERROR: Out of paper!\n"));
 	    fputs("STATE: +media-empty-error\n", stderr);
 	    paperout = 1;
 	  }
@@ -226,7 +227,7 @@ backendRunLoop(
 	  if (!offline)
 	  {
 	    fputs("STATE: +offline-error\n", stderr);
-	    fputs("INFO: Printer is currently off-line.\n", stderr);
+	    _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
 	    offline = 1;
 	  }
 	}
@@ -247,11 +248,12 @@ backendRunLoop(
 	if (offline)
 	{
 	  fputs("STATE: -offline-error\n", stderr);
-	  fputs("INFO: Printer is now on-line.\n", stderr);
+	  _cupsLangPuts(stderr, _("INFO: Printer is now on-line.\n"));
 	  offline = 0;
 	}
 
-        fprintf(stderr, "DEBUG: Wrote %d bytes of print data...\n", (int)bytes);
+        _cupsLangPrintf(stderr, _("DEBUG: Wrote %d bytes of print data...\n"),
+	                (int)bytes);
 
         print_bytes -= bytes;
 	print_ptr   += bytes;
