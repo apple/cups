@@ -26,6 +26,7 @@
  *
  * Contents:
  *
+ *   main() - Test the device-ID functions.
  */
 
 /*

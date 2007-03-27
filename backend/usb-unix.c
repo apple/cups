@@ -103,9 +103,8 @@ print_device(const char *uri,		/* I - Device URI */
 	* available printer in the class.
 	*/
 
-        _cupsLangPuts(stderr,
-	              _("INFO: Unable to open USB device, queuing on next "
-		        "printer in class...\n"));
+        fputs(_("INFO: Unable to contact printer, queuing on next "
+		"printer in class...\n"), stderr);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -118,23 +117,20 @@ print_device(const char *uri,		/* I - Device URI */
 
       if (errno == EBUSY)
       {
-        _cupsLangPuts(stderr,
-	              _("INFO: USB port busy; will retry in 30 seconds...\n"));
-	sleep(30);
+        fputs(_("INFO: Printer busy; will retry in 10 seconds...\n"), stderr);
+	sleep(10);
       }
       else if (errno == ENXIO || errno == EIO || errno == ENOENT ||
                errno == ENODEV)
       {
-        _cupsLangPuts(stderr,
-	              _("INFO: Printer not connected; will retry in 30 "
-		        "seconds...\n"));
+        fputs(_("INFO: Printer not connected; will retry in 30 seconds...\n"),
+	      stderr);
 	sleep(30);
       }
       else
       {
-	_cupsLangPrintf(stderr,
-	                _("ERROR: Unable to open USB device \"%s\": %s\n"),
-	        	uri, strerror(errno));
+	fprintf(stderr, _("ERROR: Unable to open device file \"%s\": %s\n"),
+	        resource, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
     }
@@ -174,9 +170,13 @@ print_device(const char *uri,		/* I - Device URI */
     tbytes = backendRunLoop(print_fd, device_fd, use_bc, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
-      _cupsLangPrintf(stderr,
-                      _("INFO: Sent print file, " CUPS_LLFMT " bytes...\n"),
-	              CUPS_LLCAST tbytes);
+      fprintf(stderr,
+#ifdef HAVE_LONG_LONG
+              _("INFO: Sent print file, %lld bytes...\n"),
+#else
+              _("INFO: Sent print file, %ld bytes...\n"),
+#endif /* HAVE_LONG_LONG */
+              CUPS_LLCAST tbytes);
   }
 
  /*
@@ -388,9 +388,8 @@ open_device(const char *uri,		/* I - Device URI */
 	  * Yes, return this file descriptor...
 	  */
 
-	  _cupsLangPrintf(stderr,
-	                  _("DEBUG: Printer using device file \"%s\"...\n"),
-			  device);
+	  fprintf(stderr, "DEBUG: Printer using device file \"%s\"...\n",
+		  device);
 
 	  return (fd);
 	}
@@ -410,9 +409,8 @@ open_device(const char *uri,		/* I - Device URI */
 
       if (busy)
       {
-	_cupsLangPuts(stderr,
-	              _("INFO: USB printer is busy; will retry in 5 "
-		        "seconds...\n"));
+	fputs(_("INFO: Printer is busy; will retry in 5 seconds...\n"),
+	      stderr);
 	sleep(5);
       }
     }
@@ -504,9 +502,8 @@ open_device(const char *uri,		/* I - Device URI */
 
       if (busy)
       {
-	_cupsLangPuts(stderr,
-	              _("INFO: USB printer is busy; will retry in 5 "
-		        "seconds...\n"));
+	fputs(_("INFO: Printer is busy; will retry in 5 seconds...\n"),
+	      stderr);
 	sleep(5);
       }
     }
@@ -558,7 +555,7 @@ side_cb(int print_fd,			/* I - Print file */
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
   {
-    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
+    fputs(_("WARNING: Failed to read side-channel request!\n"), stderr);
     return;
   }
 

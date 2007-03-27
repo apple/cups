@@ -170,9 +170,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    _cupsLangPrintf(stderr,
-                    _("Usage: %s job-id user title copies options [file]\n"),
-		    argv[0]);
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
+	    argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
 
@@ -244,9 +243,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        _cupsLangPuts(stderr,
-	              _("INFO: Unable to open serial port, queuing on next "
-		        "printer in class...\n"));
+        fputs(_("INFO: Unable to contact printer, queuing on next "
+		"printer in class...\n"), stderr);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -259,17 +257,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       if (errno == EBUSY)
       {
-        _cupsLangPuts(stderr,
-	              _("INFO: Serial port busy; will retry in 30 "
-		        "seconds...\n"));
+        fputs(_("INFO: Printer busy; will retry in 30 seconds...\n"), stderr);
 	sleep(30);
       }
       else
       {
-	_cupsLangPrintf(stderr,
-	                _("ERROR: Unable to open serial port device file "
-			  "\"%s\": %s\n"),
-	        	resource, strerror(errno));
+	fprintf(stderr, _("ERROR: Unable to open device file \"%s\": %s\n"),
+	        resource, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
     }
@@ -385,8 +379,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      break;
 #  endif /* B230400 */
           default :
-	      _cupsLangPrintf(stderr, _("WARNING: Unsupported baud rate %s!\n"),
-	                      value);
+	      fprintf(stderr, _("WARNING: Unsupported baud rate %s!\n"),
+	              value);
 	      break;
 	}
 #endif /* B19200 == 19200 */
@@ -590,10 +584,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       {
 	if ((bc_bytes = read(device_fd, bc_buffer, sizeof(bc_buffer))) > 0)
 	{
-	  _cupsLangPrintf(stderr,
-	                  _("DEBUG: Received " CUPS_LLFMT " bytes of "
-			    "back-channel data!\n"),
-	        	  CUPS_LLCAST bc_bytes);
+	  fprintf(stderr,
+	          "DEBUG: Received " CUPS_LLFMT " bytes of back-channel data!\n",
+	          CUPS_LLCAST bc_bytes);
           cupsBackChannelWrite(bc_buffer, bc_bytes, 1.0);
 	}
       }
@@ -661,8 +654,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      * Wait for DSR to go high...
 	      */
 
-	      _cupsLangPuts(stderr,
-	                    _("DEBUG: DSR is low; waiting for device...\n"));
+	      fputs("DEBUG: DSR is low; waiting for device...\n", stderr);
 
               do
 	      {
@@ -677,8 +669,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      }
 	      while (!(status & TIOCM_DSR));
 
-	      _cupsLangPuts(stderr,
-	                    _("DEBUG: DSR is high; writing to device...\n"));
+	      fputs("DEBUG: DSR is high; writing to device...\n", stderr);
             }
 	}
 
@@ -704,7 +695,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	}
 	else
 	{
-          _cupsLangPrintf(stderr, _("DEBUG: Wrote %d bytes...\n"), (int)bytes);
+          fprintf(stderr, "DEBUG: Wrote %d bytes...\n", (int)bytes);
 
           print_bytes -= bytes;
 	  print_ptr   += bytes;
@@ -1265,7 +1256,7 @@ side_cb(int print_fd,			/* I - Print file */
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
   {
-    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
+    fputs(_("WARNING: Failed to read side-channel request!\n"), stderr);
     return;
   }
 

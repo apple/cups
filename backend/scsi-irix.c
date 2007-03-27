@@ -95,8 +95,7 @@ print_device(const char *resource,	/* I - SCSI device */
 
   if (strncmp(resource, "/dev/scsi/", 10) != 0)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Bad SCSI device file \"%s\"!\n"),
-                    resource);
+    fprintf(stderr, _("ERROR: Bad SCSI device file \"%s\"!\n"), resource);
     return (CUPS_BACKEND_STOP);
   }
 
@@ -119,10 +118,8 @@ print_device(const char *resource,	/* I - SCSI device */
 	* available printer in the class.
 	*/
 
-        _cupsLangPuts(stderr,
-	              _("INFO: Unable to open SCSI device, queuing on next "
-		        "printer in class...\n"),
-		      stderr);
+        fputs(_("INFO: Unable to contact printer, queuing on next "
+		"printer in class...\n"), stderr);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -135,16 +132,13 @@ print_device(const char *resource,	/* I - SCSI device */
 
       if (errno != EAGAIN && errno != EBUSY)
       {
-	_cupsLangPrintf(stderr,
-	                _("ERROR: Unable to open SCSI device \"%s\" - %s\n"),
-        		resource, strerror(errno));
+	fprintf(stderr, _("ERROR: Unable to open device file \"%s\": %s\n"),
+	        uri, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
       else
       {
-        _cupsLangPrintf(stderr,
-	                _("INFO: SCSI device \"%s\" busy; retrying...\n"),
-	        	resource);
+        fputs(_("INFO: Printer busy; will retry in 30 seconds...\n"), stderr);
         sleep(30);
       }
     }
@@ -206,10 +200,9 @@ print_device(const char *resource,	/* I - SCSI device */
 	if (ioctl(scsi_fd, DS_ENTER, &scsi_req) < 0 ||
             scsi_req.ds_status != 0)
         {
-	  _cupsLangPrintf(stderr,
-	                  _("WARNING: SCSI command timed out (%d); "
-			    "retrying...\n"),
-	        	  scsi_req.ds_status);
+	  fprintf(stderr,
+	          _("WARNING: SCSI command timed out (%d); retrying...\n"),
+	          scsi_req.ds_status);
           sleep(try + 1);
 	}
 	else
@@ -217,8 +210,8 @@ print_device(const char *resource,	/* I - SCSI device */
 
       if (try >= 10)
       {
-	_cupsLangPrintf(stderr, _("ERROR: Unable to send print data (%d)\n"),
-	        	scsi_req.ds_status);
+	fprintf(stderr, _("ERROR: Unable to send print data (%d)\n"),
+	        scsi_req.ds_status);
         close(scsi_fd);
 	return (CUPS_BACKEND_FAILED);
       }

@@ -3,7 +3,7 @@
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2006 by Easy Software Products, all rights reserved.
+ *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -312,7 +312,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (argc > 2)
   {
-    _cupsLangPuts(stderr, _("Usage: snmp [host-or-ip-address]\n"));
+    fputs(_("Usage: snmp [host-or-ip-address]\n"), stderr);
     return (1);
   }
 
@@ -627,26 +627,26 @@ asn1_debug(unsigned char *buffer,	/* I - Buffer */
       case ASN1_BOOLEAN :
           integer = asn1_get_integer(&buffer, bufend, value_length);
 
-          _cupsLangPrintf(stderr, "DEBUG: %*sBOOLEAN %d bytes %d\n", indent, "",
+          fprintf(stderr, "DEBUG: %*sBOOLEAN %d bytes %d\n", indent, "",
 	          value_length, integer);
           break;
 
       case ASN1_INTEGER :
           integer = asn1_get_integer(&buffer, bufend, value_length);
 
-          _cupsLangPrintf(stderr, "DEBUG: %*sINTEGER %d bytes %d\n", indent, "",
+          fprintf(stderr, "DEBUG: %*sINTEGER %d bytes %d\n", indent, "",
 	          value_length, integer);
           break;
 
       case ASN1_OCTET_STRING :
-          _cupsLangPrintf(stderr, "DEBUG: %*sOCTET STRING %d bytes \"%s\"\n", indent, "",
+          fprintf(stderr, "DEBUG: %*sOCTET STRING %d bytes \"%s\"\n", indent, "",
 	          value_length, asn1_get_string(&buffer, bufend,
 		                                value_length, string,
 						sizeof(string)));
           break;
 
       case ASN1_NULL_VALUE :
-          _cupsLangPrintf(stderr, "DEBUG: %*sNULL VALUE %d bytes\n", indent, "",
+          fprintf(stderr, "DEBUG: %*sNULL VALUE %d bytes\n", indent, "",
 	          value_length);
 
 	  buffer += value_length;
@@ -655,15 +655,15 @@ asn1_debug(unsigned char *buffer,	/* I - Buffer */
       case ASN1_OID :
           asn1_get_oid(&buffer, bufend, value_length, oid, SNMP_MAX_OID);
 
-          _cupsLangPrintf(stderr, "DEBUG: %*sOID %d bytes ", indent, "",
+          fprintf(stderr, "DEBUG: %*sOID %d bytes ", indent, "",
 	          value_length);
 	  for (i = 0; oid[i]; i ++)
-	    _cupsLangPrintf(stderr, ".%d", oid[i]);
+	    fprintf(stderr, ".%d", oid[i]);
 	  putc('\n', stderr);
           break;
 
       case ASN1_SEQUENCE :
-          _cupsLangPrintf(stderr, "DEBUG: %*sSEQUENCE %d bytes\n", indent, "",
+          fprintf(stderr, "DEBUG: %*sSEQUENCE %d bytes\n", indent, "",
 	          value_length);
           asn1_debug(buffer, value_length, indent + 4);
 
@@ -671,7 +671,7 @@ asn1_debug(unsigned char *buffer,	/* I - Buffer */
           break;
 
       case ASN1_GET_REQUEST :
-          _cupsLangPrintf(stderr, "DEBUG: %*sGet-Request-PDU %d bytes\n", indent, "",
+          fprintf(stderr, "DEBUG: %*sGet-Request-PDU %d bytes\n", indent, "",
 	          value_length);
           asn1_debug(buffer, value_length, indent + 4);
 
@@ -679,7 +679,7 @@ asn1_debug(unsigned char *buffer,	/* I - Buffer */
           break;
 
       case ASN1_GET_RESPONSE :
-          _cupsLangPrintf(stderr, "DEBUG: %*sGet-Response-PDU %d bytes\n", indent, "",
+          fprintf(stderr, "DEBUG: %*sGet-Response-PDU %d bytes\n", indent, "",
 	          value_length);
           asn1_debug(buffer, value_length, indent + 4);
 
@@ -687,7 +687,7 @@ asn1_debug(unsigned char *buffer,	/* I - Buffer */
           break;
 
       default :
-          _cupsLangPrintf(stderr, "DEBUG: %*sUNKNOWN(%x) %d bytes\n", indent, "",
+          fprintf(stderr, "DEBUG: %*sUNKNOWN(%x) %d bytes\n", indent, "",
 	          value_type, value_length);
 
 	  buffer += value_length;
@@ -1619,9 +1619,9 @@ hex_debug(unsigned char *buffer,	/* I - Buffer */
   for (col = 0; len > 0; col ++, buffer ++, len --)
   {
     if ((col & 15) == 0)
-      _cupsLangPrintf(stderr, "DEBUG: %04X ", col);
+      fprintf(stderr, "DEBUG: %04X ", col);
 
-    _cupsLangPrintf(stderr, " %02X", *buffer);
+    fprintf(stderr, " %02X", *buffer);
 
     if ((col & 15) == 15)
       putc('\n', stderr);
@@ -1665,7 +1665,7 @@ open_snmp_socket(void)
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
-    _cupsLangPrintf(stderr, "ERROR: Unable to create SNMP socket - %s\n",
+    fprintf(stderr, "ERROR: Unable to create SNMP socket - %s\n",
             strerror(errno));
 
     return (-1);
@@ -1679,7 +1679,7 @@ open_snmp_socket(void)
 
   if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
   {
-    _cupsLangPrintf(stderr, "ERROR: Unable to set broadcast mode - %s\n",
+    fprintf(stderr, "ERROR: Unable to set broadcast mode - %s\n",
             strerror(errno));
 
     close(fd);
@@ -1835,7 +1835,7 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 
         if (!supported)
 	{
-	  _cupsLangPrintf(stderr, "ERROR: Missing printer-uri-supported from %s!\n",
+	  fprintf(stderr, "ERROR: Missing printer-uri-supported from %s!\n",
 	          device->addrname);
 
 	  httpClose(http);
@@ -2000,7 +2000,7 @@ read_snmp_conf(const char *address)	/* I - Single address to probe */
     while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
     {
       if (!value)
-        _cupsLangPrintf(stderr, "ERROR: Missing value on line %d of %s!\n", linenum,
+        fprintf(stderr, "ERROR: Missing value on line %d of %s!\n", linenum,
 	        filename);
       else if (!strcasecmp(line, "Address"))
       {
@@ -2019,7 +2019,7 @@ read_snmp_conf(const char *address)	/* I - Single address to probe */
       else if (!strcasecmp(line, "MaxRunTime"))
         MaxRunTime = atoi(value);
       else
-        _cupsLangPrintf(stderr, "ERROR: Unknown directive %s on line %d of %s!\n",
+        fprintf(stderr, "ERROR: Unknown directive %s on line %d of %s!\n",
 	        line, linenum, filename);
     }
 
@@ -2070,8 +2070,8 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   if ((bytes = recvfrom(fd, buffer, sizeof(buffer), 0, (void *)&addr,
                         &addrlen)) < 0)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to read data from socket: %s\n"),
-        	    strerror(errno));
+    fprintf(stderr, "ERROR: Unable to read data from socket: %s\n",
+            strerror(errno));
     return;
   }
 
@@ -2089,8 +2089,8 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 
   if (asn1_decode_snmp(buffer, bytes, &packet))
   {
-    _cupsLangPrintf(stderr, _("ERROR: Bad SNMP packet from %s: %s\n"),
-                    addrname, packet.error);
+    fprintf(stderr, "ERROR: Bad SNMP packet from %s: %s\n",
+            addrname, packet.error);
 
     asn1_debug(buffer, bytes, 0);
     hex_debug(buffer, bytes);
@@ -2262,7 +2262,7 @@ scan_devices(int fd)			/* I - SNMP socket */
 
     if (!addrs)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to scan \"%s\"!\n"), address);
+      fprintf(stderr, "ERROR: Unable to scan \"%s\"!\n", address);
       continue;
     }
 
@@ -2365,8 +2365,8 @@ send_snmp_query(
 
   if (bytes < 0)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to send SNMP query: %s\n"),
-                    packet.error);
+    fprintf(stderr, "ERROR: Unable to send SNMP query: %s\n",
+            packet.error);
     return;
   }
 
@@ -2384,8 +2384,8 @@ send_snmp_query(
   addr->ipv4.sin_port = htons(SNMP_PORT);
 
   if (sendto(fd, buffer, bytes, 0, (void *)addr, sizeof(addr->ipv4)) < bytes)
-    _cupsLangPrintf(stderr, _("ERROR: Unable to send %d bytes to %s: %s\n"),
-        	    bytes, addrname, strerror(errno));
+    fprintf(stderr, "ERROR: Unable to send %d bytes to %s: %s\n",
+            bytes, addrname, strerror(errno));
 }
 
 
@@ -2407,8 +2407,8 @@ try_connect(http_addr_t *addr,		/* I - Socket address */
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to create socket: %s\n"),
-                    strerror(errno));
+    fprintf(stderr, "ERROR: Unable to create socket: %s\n",
+            strerror(errno));
     return (-1);
   }
 

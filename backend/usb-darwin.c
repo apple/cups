@@ -309,10 +309,10 @@ print_device(const char *uri,		/* I - Device URI */
       printer_data.printerDriver = 0x0;
     }
 
-    fprintf(stderr, "INFO: Looking for '%s %s'\n", hostname, resource);
+    fprintf(stderr, "DEBUG: Looking for '%s %s'\n", hostname, resource);
     iterate_printers(find_device_callback, &printer_data);		
 
-    fprintf(stderr, "INFO: Opening Connection\n");
+    fputs("DEBUG: Opening connection\n", stderr);
 
     driverBundlePath = NULL;
     status = registry_open(&printer_data, &driverBundlePath);
@@ -335,8 +335,8 @@ print_device(const char *uri,		/* I - Device URI */
       if (driverBundlePath == NULL || !CFStringGetCString(driverBundlePath, buffer, sizeof(buffer), kCFStringEncodingUTF8))
         strlcpy(buffer, "USB class driver", sizeof(buffer));
 
-      fprintf(stderr, "STATE: +apple-missing-usbclassdriver-error\n" \
-		      "FATAL: Could not load %s\n", buffer);
+      fputs("STATE: +apple-missing-usbclassdriver-error\n", stderr);
+      fprintf(stderr, _("FATAL: Could not load %s\n"), buffer);
 
       if (driverBundlePath)
 	CFRelease(driverBundlePath);
@@ -351,7 +351,7 @@ print_device(const char *uri,		/* I - Device URI */
       sleep( PRINTER_POLLING_INTERVAL );
       countdown -= PRINTER_POLLING_INTERVAL;
       if ( countdown <= 0 ) {
-	fprintf(stderr, "INFO: Printer busy (status:0x%08x)\n", (int)status);
+	fprintf(stderr, _("INFO: Printer busy (status:0x%08x)\n"), (int)status);
 	countdown = SUBSEQUENT_LOG_INTERVAL;	/* subsequent log entries, every 15 seconds */
       }
     }
@@ -393,7 +393,7 @@ print_device(const char *uri,		/* I - Device URI */
       thread_created = 1;
 
     if (thread_created == 0) 
-      fprintf(stderr, "WARNING: Couldn't create read channel\n");
+      fputs(_("WARNING: Couldn't create read channel\n"), stderr);
 
     if (pthread_cond_init(&printer_data.reqWaitCompCond, NULL) == 0)	
       reqWaitCompCondPtr = &printer_data.reqWaitCompCond;
@@ -408,7 +408,7 @@ print_device(const char *uri,		/* I - Device URI */
       reqWait_create = 1;
 
     if (reqWait_create == 0) 
-      fprintf(stderr, "WARNING: Couldn't create sidechannel thread!\n");
+      fputs(_("WARNING: Couldn't create sidechannel thread!\n"), stderr);
 
     if (pthread_mutex_init(&printer_data.waitCloseMutex, NULL) == 0)
       waitCloseMutexPtr = &printer_data.waitCloseMutex;
@@ -431,7 +431,7 @@ print_device(const char *uri,		/* I - Device URI */
     ssize_t		nbytes;			/* Number of bytes read */
     off_t		tbytes = 0;		/* Total number of bytes written */
 
-    fprintf(stderr, "INFO: Sending data\n");
+    fputs(_("INFO: Sending data\n"), stderr);
 
     if (STDIN_FILENO != fd) {
       fputs("PAGE: 1 1", stderr);
@@ -456,7 +456,7 @@ print_device(const char *uri,		/* I - Device URI */
 	status = (*(printer_data.printerDriver))->WritePipe( printer_data.printerDriver, (UInt8*)bufptr, &wbytes, 0 /* nbytes > wbytes? 0: feof(fp) */ );
 	if (wbytes < 0 || noErr != status) {
 	  OSStatus err = (*(printer_data.printerDriver))->Abort(printer_data.printerDriver);
-	  fprintf(stderr, "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n", status, err);
+	  fprintf(stderr, _("ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"), status, err);
 	  break;
 	}
 
@@ -465,7 +465,7 @@ print_device(const char *uri,		/* I - Device URI */
       }
 
       if (fd != 0 && status == noErr)
-	fprintf(stderr, "DEBUG: Sending print file, %qd bytes...\n", (off_t)tbytes);
+	fprintf(stderr, _("DEBUG: Sending print file, %lld bytes...\n"), (off_t)tbytes);
     }
   }
 
@@ -692,7 +692,7 @@ static Boolean find_device_callback(void *refcon, io_service_t obj)
   
   if (!keepLooking && userData->statusTimer != NULL) {
     fputs("STATE: -offline-error\n", stderr);
-    fputs("INFO: Printer is now on-line.\n", stderr);
+    fputs(_("INFO: Printer is now on-line.\n"), stderr);
     CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), userData->statusTimer, kCFRunLoopDefaultMode);
     CFRelease(userData->statusTimer);
     userData->statusTimer = NULL;
@@ -704,7 +704,7 @@ static Boolean find_device_callback(void *refcon, io_service_t obj)
 static void statusTimerCallback (CFRunLoopTimerRef timer, void *info)
 {
   fputs("STATE: +offline-error\n", stderr);
-  fputs("INFO: Printer is currently off-line.\n", stderr);
+  fputs(_("INFO: Printer is currently off-line.\n"), stderr);
 }
 
 #pragma mark -
@@ -871,7 +871,7 @@ static kern_return_t load_classdriver(CFStringRef driverPath, printer_interface_
 #ifdef DEBUG
   char bundlestr[1024];
   CFStringGetCString(bundle, bundlestr, sizeof(bundlestr), kCFStringEncodingUTF8);
-  fprintf(stderr, "DEBUG:load_classdriver(%s) (kr:0x%08x)\n", bundlestr, (int)kr);
+  fprintf(stderr, "DEBUG: load_classdriver(%s) (kr:0x%08x)\n", bundlestr, (int)kr);
 #endif /* DEBUG */
 
   return kr;
@@ -1223,7 +1223,7 @@ static void parse_options(const char *options, char *serial, UInt32 *location, B
 	*waitEOF = false;
       }
       else {
-	fprintf(stderr, "WARNING: Boolean expected for waiteof option \"%s\"\n", value);
+	fprintf(stderr, _("WARNING: Boolean expected for waiteof option \"%s\"\n"), value);
       }
     }
     else if (strcasecmp(optionName, "serial") == 0) {
@@ -1268,7 +1268,7 @@ static void setup_cfLanguage(void)
     CFRelease(lang[0]);
     CFRelease(langArray);
   } else {
-    fprintf(stderr, "DEBUG: usb: LANG environment variable missing.\n");
+    fputs("DEBUG: usb: LANG environment variable missing.\n", stderr);
   }
 }
 
@@ -1370,7 +1370,7 @@ static void run_ppc_backend(int argc, char *argv[], int fd)
     }
   }
   else {
-    fprintf(stderr, "DEBUG: usb child running i386 again\n");
+    fputs("DEBUG: usb child running i386 again\n", stderr);
     exitstatus = ENOENT;
   }
 
