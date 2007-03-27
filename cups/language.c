@@ -603,7 +603,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   pthread_mutex_lock(&lang_mutex);
 #endif /* HAVE_PTHREAD_H */
 
-  if ((lang = cups_cache_lookup(langname, encoding)) != NULL)
+  if ((lang = cups_cache_lookup(real, encoding)) != NULL)
   {
 #ifdef HAVE_PTHREAD_H
     pthread_mutex_unlock(&lang_mutex);
