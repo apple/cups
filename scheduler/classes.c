@@ -266,6 +266,14 @@ cupsdFindAvailablePrinter(
   }
 
  /*
+  * Make sure that the last printer is also a valid index into the printer
+  * array.  If not, reset the last printer to 0...
+  */
+
+  if (c->last_printer >= c->num_printers)
+    c->last_printer = 0;
+
+ /*
   * Loop through the printers in the class and return the first idle
   * printer...  We keep track of the last printer that we used so that
   * a "round robin" type of scheduling is realized (otherwise the first
