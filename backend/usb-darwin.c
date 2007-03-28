@@ -58,6 +58,7 @@
 #include <mach/mach_error.h>
 #include <mach/mach_time.h>
 #include <cups/debug.h>
+#include <cups/i18n.h>
 #include <cups/sidechannel.h>
 
 #include <CoreFoundation/CoreFoundation.h>
