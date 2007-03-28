@@ -1165,7 +1165,7 @@ check_permissions(const char *filename,	/* I - File/directory name */
   {
     if (errno == ENOENT && create_dir)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Creating missing directory \"%s\"",
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Creating missing directory \"%s\"",
                       filename);
 
       if (mkdir(filename, mode))
@@ -1204,9 +1204,9 @@ check_permissions(const char *filename,	/* I - File/directory name */
 
   if (dir_created || fileinfo.st_uid != user || fileinfo.st_gid != group)
   {
-    cupsdLogMessage(CUPSD_LOG_WARN, "Repairing ownership of \"%s\"", filename);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing ownership of \"%s\"", filename);
 
-    if (chown(filename, user, group))
+    if (chown(filename, user, group) && !getuid())
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to change ownership of \"%s\" - %s", filename,
@@ -1217,7 +1217,8 @@ check_permissions(const char *filename,	/* I - File/directory name */
 
   if (dir_created || (fileinfo.st_mode & 07777) != mode)
   {
-    cupsdLogMessage(CUPSD_LOG_WARN, "Repairing access permissions of \"%s\"", filename);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing access permissions of \"%s\"",
+                    filename);
 
     if (chmod(filename, mode))
     {
