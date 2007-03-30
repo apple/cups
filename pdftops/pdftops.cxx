@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <cups/string.h>
+#include <cups/i18n.h>
 #include "parseargs.h"
 #include "GString.h"
 #include "gmem.h"
@@ -92,14 +93,15 @@ main(int  argc,				// I - Number of command-line args
 
   // Make sure we have the right number of arguments for CUPS!
   if (argc < 6 || argc > 7) {
-    fputs("Usage: pdftops job user title copies options [filename]\n", stderr);
+    fprintf(stderr, _("Usage: %s job user title copies options [filename]\n"),
+            argv[0]);
     return (1);
   }
 
   // Copy stdin if needed...
   if (argc == 6) {
     if ((fd = cupsTempFd(tempfile, sizeof(tempfile))) < 0) {
-      perror("ERROR: Unable to copy PDF file");
+      perror(_("ERROR: Unable to copy PDF file"));
       return (1);
     }
 
