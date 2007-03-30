@@ -40,4 +40,4 @@ test1284.o: ../cups/file.h ../cups/language.h ../cups/debug.h ../cups/i18n.h
 test1284.o: ../cups/transcode.h
 usb.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 usb.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-usb.o: ../cups/string.h ../config.h
+usb.o: ../cups/string.h ../cups/i18n.h ../config.h

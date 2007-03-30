@@ -133,7 +133,7 @@ print_device(const char *resource,	/* I - SCSI device */
       if (errno != EAGAIN && errno != EBUSY)
       {
 	fprintf(stderr, _("ERROR: Unable to open device file \"%s\": %s\n"),
-	        uri, strerror(errno));
+	        resource, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
       else

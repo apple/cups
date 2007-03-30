@@ -45,6 +45,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <cups/string.h>
+#include <cups/i18n.h>
 #include <signal.h>
 
 #ifdef WIN32
