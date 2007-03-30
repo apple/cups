@@ -376,11 +376,12 @@ cupsdCheckJobs(void)
 
         pclass = printer;
 
-        if (!(pclass->type & CUPS_PRINTER_REMOTE) &&
-	    pclass->state != IPP_PRINTER_STOPPED)
-          printer = cupsdFindAvailablePrinter(job->dest);
-	else
+        if (pclass->state == IPP_PRINTER_STOPPED)
 	  printer = NULL;
+        else if (pclass->type & CUPS_PRINTER_REMOTE)
+	  break;
+	else
+	  printer = cupsdFindAvailablePrinter(printer->name);
       }
 
       if (!printer && !pclass)
