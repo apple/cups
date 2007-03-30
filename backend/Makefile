@@ -212,6 +212,7 @@ usb:	usb.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o usb usb.o libbackend.a $(BACKLIBS) $(LIBS)
 usb.o:	usb.c usb-darwin.c usb-unix.c
+usb-darwin.c usb-unix.c: ../cups/i18n.h
 
 
 #
