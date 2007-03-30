@@ -3,7 +3,7 @@
  *
  *   Portable Any Map file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -135,7 +135,7 @@ _cupsImageReadPNM(
   if (img->xsize == 0 || img->xsize > CUPS_IMAGE_MAX_WIDTH ||
       img->ysize == 0 || img->ysize > CUPS_IMAGE_MAX_HEIGHT)
   {
-    fprintf(stderr, "ERROR: Bad PNM dimensions %dx%d!\n",
+    fprintf(stderr, "DEBUG: Bad PNM dimensions %dx%d!\n",
             img->xsize, img->ysize);
     fclose(fp);
     return (1);
@@ -143,7 +143,7 @@ _cupsImageReadPNM(
 
   if (maxval == 0)
   {
-    fprintf(stderr, "ERROR: Bad PNM max value %d!\n", maxval);
+    fprintf(stderr, "DEBUG: Bad PNM max value %d!\n", maxval);
     fclose(fp);
     return (1);
   }

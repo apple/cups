@@ -38,6 +38,7 @@
  */
 
 #include "textcommon.h"
+#include <cups/i18n.h>
 
 
 /*
@@ -238,7 +239,7 @@ WriteProlog(const char *title,		/* I - Title of job */
   }
   else
   {
-    fprintf(stderr, "ERROR: Unable to open \"%s\" - %s\n", filename,
+    fprintf(stderr, _("ERROR: Unable to open \"%s\" - %s\n"), filename,
             strerror(errno));
     exit(1);
   }
@@ -258,7 +259,7 @@ WriteProlog(const char *title,		/* I - Title of job */
       * Can't open charset file!
       */
 
-      fprintf(stderr, "ERROR: Unable to open %s: %s\n", filename,
+      fprintf(stderr, _("ERROR: Unable to open %s: %s\n"), filename,
               strerror(errno));
       exit(1);
     }
@@ -274,7 +275,7 @@ WriteProlog(const char *title,		/* I - Title of job */
       */
 
       fclose(fp);
-      fprintf(stderr, "ERROR: Bad/empty charset file %s\n", filename);
+      fprintf(stderr, _("ERROR: Bad charset file %s\n"), filename);
       exit(1);
     }
 
@@ -285,7 +286,7 @@ WriteProlog(const char *title,		/* I - Title of job */
       */
 
       fclose(fp);
-      fprintf(stderr, "ERROR: Bad charset file %s\n", filename);
+      fprintf(stderr, _("ERROR: Bad charset file %s\n"), filename);
       exit(1);
     }
 
@@ -346,7 +347,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 	  * Can't have a font without all required values...
 	  */
 
-	  fprintf(stderr, "ERROR: bad font description line: %s\n", valptr);
+	  fprintf(stderr, _("ERROR: Bad font description line: %s\n"), valptr);
 	  fclose(fp);
 	  exit(1);
 	}
@@ -359,7 +360,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 	  Directions[NumFonts] = -1;
 	else
 	{
-	  fprintf(stderr, "ERROR: Bad text direction %s\n", valptr);
+	  fprintf(stderr, _("ERROR: Bad text direction %s\n"), valptr);
 	  fclose(fp);
 	  exit(1);
 	}
@@ -382,7 +383,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 	  * Can't have a font without all required values...
 	  */
 
-	  fprintf(stderr, "ERROR: bad font description line: %s\n", valptr);
+	  fprintf(stderr, _("ERROR: Bad font description line: %s\n"), valptr);
 	  fclose(fp);
 	  exit(1);
 	}
@@ -395,7 +396,7 @@ WriteProlog(const char *title,		/* I - Title of job */
           Widths[NumFonts] = 2;
 	else 
 	{
-	  fprintf(stderr, "ERROR: Bad text width %s\n", valptr);
+	  fprintf(stderr, _("ERROR: Bad text width %s\n"), valptr);
 	  fclose(fp);
 	  exit(1);
 	}
@@ -510,7 +511,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 	  * Can't have a font without all required values...
 	  */
 
-	  fprintf(stderr, "ERROR: bad font description line: %s\n", valptr);
+	  fprintf(stderr, _("ERROR: Bad font description line: %s\n"), valptr);
 	  fclose(fp);
 	  exit(1);
 	}
@@ -523,7 +524,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 	  Directions[NumFonts] = -1;
 	else
 	{
-	  fprintf(stderr, "ERROR: Bad text direction %s\n", valptr);
+	  fprintf(stderr, _("ERROR: Bad text direction %s\n"), valptr);
 	  fclose(fp);
 	  exit(1);
 	}
@@ -546,7 +547,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 	  * Can't have a font without all required values...
 	  */
 
-	  fprintf(stderr, "ERROR: bad font description line: %s\n", valptr);
+	  fprintf(stderr, _("ERROR: Bad font description line: %s\n"), valptr);
 	  fclose(fp);
 	  exit(1);
 	}
@@ -559,7 +560,7 @@ WriteProlog(const char *title,		/* I - Title of job */
           Widths[NumFonts] = 2;
 	else 
 	{
-	  fprintf(stderr, "ERROR: Bad text width %s\n", valptr);
+	  fprintf(stderr, _("ERROR: Bad text width %s\n"), valptr);
 	  fclose(fp);
 	  exit(1);
 	}
@@ -615,7 +616,7 @@ WriteProlog(const char *title,		/* I - Title of job */
     }
     else
     {
-      fprintf(stderr, "ERROR: Bad charset type %s\n", lineptr);
+      fprintf(stderr, _("ERROR: Bad charset type %s\n"), lineptr);
       fclose(fp);
       exit(1);
     }

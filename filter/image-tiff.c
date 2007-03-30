@@ -3,7 +3,7 @@
  *
  *   TIFF file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -100,14 +100,14 @@ _cupsImageReadTIFF(
 
   if ((tif = TIFFFdOpen(fileno(fp), "", "r")) == NULL)
   {
-    fputs("ERROR: TIFFFdOpen() failed!\n", stderr);
+    fputs("DEBUG: TIFFFdOpen() failed!\n", stderr);
     fclose(fp);
     return (-1);
   }
 
   if (!TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width))
   {
-    fputs("ERROR: No image width tag in the file!\n", stderr);
+    fputs("DEBUG: No image width tag in the file!\n", stderr);
     TIFFClose(tif);
     fclose(fp);
     return (-1);
@@ -115,7 +115,7 @@ _cupsImageReadTIFF(
 
   if (!TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height))
   {
-    fputs("ERROR: No image height tag in the file!\n", stderr);
+    fputs("DEBUG: No image height tag in the file!\n", stderr);
     TIFFClose(tif);
     fclose(fp);
     return (-1);
@@ -123,7 +123,7 @@ _cupsImageReadTIFF(
 
   if (!TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric))
   {
-    fputs("ERROR: No photometric tag in the file!\n", stderr);
+    fputs("DEBUG: No photometric tag in the file!\n", stderr);
     TIFFClose(tif);
     fclose(fp);
     return (-1);
@@ -131,7 +131,7 @@ _cupsImageReadTIFF(
 
   if (!TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression))
   {
-    fputs("ERROR: No compression tag in the file!\n", stderr);
+    fputs("DEBUG: No compression tag in the file!\n", stderr);
     TIFFClose(tif);
     fclose(fp);
     return (-1);
@@ -176,7 +176,7 @@ _cupsImageReadTIFF(
 
     if (img->xppi == 0 || img->yppi == 0)
     {
-      fputs("ERROR: Bad TIFF resolution.\n", stderr);
+      fputs("DEBUG: Bad TIFF resolution.\n", stderr);
       img->xppi = img->yppi = 128;
     }
 
@@ -204,7 +204,7 @@ _cupsImageReadTIFF(
       (bits != 1 && bits != 2 && bits != 4 && bits != 8) ||
       samples < 1 || samples > 4)
   {
-    fprintf(stderr, "ERROR: Bad TIFF dimensions %ux%ux%ux%u!\n",
+    fprintf(stderr, "DEBUG: Bad TIFF dimensions %ux%ux%ux%u!\n",
             (unsigned)width, (unsigned)height, (unsigned)bits,
 	    (unsigned)samples);
     TIFFClose(tif);
@@ -664,7 +664,7 @@ _cupsImageReadTIFF(
     case PHOTOMETRIC_PALETTE :
 	if (!TIFFGetField(tif, TIFFTAG_COLORMAP, &redcmap, &greencmap, &bluecmap))
 	{
-          fputs("ERROR: No colormap tag in the file!\n", stderr);
+          fputs("DEBUG: No colormap tag in the file!\n", stderr);
 	  fclose(fp);
 	  return (-1);
 	}
@@ -1701,7 +1701,7 @@ _cupsImageReadTIFF(
 	free(out);
 
 	TIFFClose(tif);
-	fputs("ERROR: Unknown TIFF photometric value!\n", stderr);
+	fputs("DEBUG: Unknown TIFF photometric value!\n", stderr);
 	return (-1);
   }
 

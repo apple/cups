@@ -3,7 +3,7 @@
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2005 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -35,6 +35,7 @@
  */
 
 #include "textcommon.h"
+#include <cups/i18n.h>
 
 
 /*
@@ -523,7 +524,7 @@ TextMain(const char *name,	/* I - Name of filter */
 
   if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, "ERROR: %s job-id user title copies options [file]\n",
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
             name);
     return (1);
   }
@@ -543,7 +544,7 @@ TextMain(const char *name,	/* I - Name of filter */
 
     if ((fp = fopen(argv[6], "rb")) == NULL)
     {
-      perror("ERROR: unable to open print file - ");
+      perror("DEBUG: unable to open print file - ");
       return (1);
     }
   }

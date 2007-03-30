@@ -3,7 +3,7 @@
  *
  *   Alias PIX image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -88,7 +88,7 @@ _cupsImageReadPIX(
   if (width <= 0 || height <= 0 ||
       (depth != 8 && depth != 24))
   {
-    fprintf(stderr, "ERROR: Bad PIX image dimensions %dx%dx%d\n",
+    fprintf(stderr, "DEBUG: Bad PIX image dimensions %dx%dx%d\n",
             width, height, depth);
     fclose(fp);
     return (1);

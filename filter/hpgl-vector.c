@@ -3,7 +3,7 @@
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -635,7 +635,7 @@ decode_number(unsigned char **s,	/* IO - String to decode */
       else if (**s < 63)
       {
         if (**s != '\r' && **s != '\n')
-          fprintf(stderr, "ERROR: Bad PE character 0x%02X!\n", **s);
+          fprintf(stderr, "DEBUG: Bad PE character 0x%02X!\n", **s);
 
         continue;
       }
@@ -677,7 +677,7 @@ decode_number(unsigned char **s,	/* IO - String to decode */
       else if (**s < 63)
       {
         if (**s != '\r' && **s != '\n')
-          fprintf(stderr, "ERROR: Bad PE character 0x%02X!\n", **s);
+          fprintf(stderr, "DEBUG: Bad PE character 0x%02X!\n", **s);
 
         continue;
       }

@@ -3,7 +3,7 @@
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -82,8 +82,9 @@ CR_color_range(int     num_params,	/* I - Number of parameters */
     ColorRange[2][1] = params[5].value.number - params[4].value.number;
   }
   else
-    fprintf(stderr, "WARNING: HP-GL/2 \'CR\' command with invalid number of parameters (%d)!\n",
-            num_params);
+    fprintf(stderr,
+            "DEBUG: HP-GL/2 \'CR\' command with invalid number of "
+	    "parameters (%d)!\n", num_params);
 }
 
 
@@ -208,8 +209,9 @@ NP_number_pens(int     num_params,	/* I - Number of parameters */
   else if (num_params == 1 && params[0].value.number <= 1024)
     PenCount = (int)params[0].value.number;
   else
-    fprintf(stderr, "WARNING: HP-GL/2 \'NP\' command with invalid number of parameters (%d)!\n",
-            num_params);
+    fprintf(stderr,
+            "DEBUG: HP-GL/2 \'NP\' command with invalid number of "
+	    "parameters (%d)!\n", num_params);
 
   for (i = 0; i <= PenCount; i ++)
     Pens[i].width = PenWidth;
@@ -292,8 +294,9 @@ PC_pen_color(int     num_params,	/* I - Number of parameters */
 	     Pens[PenNumber].width * PenScaling);
   }
   else
-    fprintf(stderr, "WARNING: HP-GL/2 \'PC\' command with invalid number of parameters (%d)!\n",
-            num_params);
+    fprintf(stderr,
+            "DEBUG: HP-GL/2 \'PC\' command with invalid number of "
+	    "parameters (%d)!\n", num_params);
 }
 
 
@@ -360,8 +363,9 @@ PW_pen_width(int     num_params,	/* I - Number of parameters */
 	     Pens[PenNumber].width * PenScaling);
   }
   else
-    fprintf(stderr, "WARNING: HP-GL/2 \'PW\' command with invalid number of parameters (%d)!\n",
-            num_params);
+    fprintf(stderr,
+            "DEBUG: HP-GL/2 \'PW\' command with invalid number of "
+	    "parameters (%d)!\n", num_params);
 }
 
 
@@ -408,8 +412,10 @@ SP_select_pen(int     num_params,	/* I - Number of parameters */
   else if (params[0].value.number <= PenCount)
     PenNumber = (int)params[0].value.number;
   else
-    fprintf(stderr, "WARNING: HP-GL/2 \'SP\' command with invalid number or value of parameters (%d, %d)!\n",
-            num_params, (int)params[0].value.number);
+    fprintf(stderr,
+            "DEBUG: HP-GL/2 \'SP\' command with invalid number or value "
+	    "of parameters (%d, %d)!\n", num_params,
+	    (int)params[0].value.number);
 
   if (PageDirty)
     printf("%.3f %.3f %.3f %.2f SP\n", Pens[PenNumber].rgb[0],
@@ -444,8 +450,9 @@ WU_width_units(int     num_params,	/* I - Number of parameters */
   else if (num_params == 1)
     WidthUnits = (int)params[0].value.number;
   else
-    fprintf(stderr, "WARNING: HP-GL/2 \'WU\' command with invalid number of parameters (%d)!\n",
-            num_params);
+    fprintf(stderr,
+            "DEBUG: HP-GL/2 \'WU\' command with invalid number of "
+	    "parameters (%d)!\n", num_params);
 }
 
 

@@ -3,7 +3,7 @@
  *
  *   GIF image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -246,7 +246,7 @@ _cupsImageReadGIF(
 
           if (img->xsize == 0 || img->ysize == 0)
 	  {
-	    fprintf(stderr, "ERROR: Bad GIF image dimensions: %dx%d\n",
+	    fprintf(stderr, "DEBUG: Bad GIF image dimensions: %dx%d\n",
 	            img->xsize, img->ysize);
 	    fclose(fp);
 	    return (1);

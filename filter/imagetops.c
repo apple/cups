@@ -3,7 +3,7 @@
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -37,6 +37,7 @@
 #include "common.h"
 #include "image.h"
 #include <math.h>
+#include <cups/i18n.h>
 
 
 /*
@@ -120,12 +121,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc < 6 || argc > 7)
   {
-    fputs("ERROR: imagetops job-id user title copies options [file]\n", stderr);
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
+            argv[0]);
     return (1);
   }
-
-  fprintf(stderr, "INFO: %s %s %s %s %s %s %s\n", argv[0], argv[1], argv[2],
-          argv[3], argv[4], argv[5], argv[6] ? argv[6] : "(null)");
 
  /*
   * Copy stdin as needed...
@@ -308,7 +307,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (img == NULL)
   {
-    fputs("ERROR: Unable to open image file for printing!\n", stderr);
+    fputs(_("ERROR: Unable to open image file for printing!\n"), stderr);
     ppdClose(ppd);
     return (1);
   }
@@ -803,7 +802,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         if (ppd && ppd->num_filters == 0)
           fprintf(stderr, "PAGE: %d %d\n", page, realcopies);
 
-	fprintf(stderr, "INFO: Printing page %d...\n", page);
+	fprintf(stderr, _("INFO: Printing page %d...\n"), page);
 
         printf("%%%%Page: %d %d\n", page, page);
 

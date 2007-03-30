@@ -35,6 +35,7 @@
 
 #include "hpgltops.h"
 #include <ctype.h>
+#include <cups/i18n.h>
 
 #define MAX_PARAMS 16384
 
@@ -143,7 +144,7 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
     * file which we can't handle - abort!
     */
 
-    fputs("ERROR: Invalid HP-GL/2 command seen, unable to print file!\n",
+    fputs(_("ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"),
           stderr);
     return (-1);
   }

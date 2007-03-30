@@ -3,7 +3,7 @@
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -49,6 +49,7 @@
 #include "raster.h"
 #include <unistd.h>
 #include <math.h>
+#include <cups/i18n.h>
 
 
 /*
@@ -213,12 +214,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc < 6 || argc > 7)
   {
-    fputs("ERROR: imagetoraster job-id user title copies options [file]\n", stderr);
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
+            argv[0]);
     return (1);
   }
-
-  fprintf(stderr, "INFO: %s %s %s %s %s %s %s\n", argv[0], argv[1], argv[2],
-          argv[3], argv[4], argv[5], argv[6] ? argv[6] : "(null)");
 
  /*
   * See if we need to use the imagetops and pstoraster filters instead...
@@ -456,7 +455,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (cupsRasterInterpretPPD(&header, ppd, num_options, options, raster_cb))
   {
-    fputs("ERROR: Bad page setup!\n", stderr);
+    fputs(_("ERROR: Bad page setup!\n"), stderr);
+    fprintf(stderr, "DEBUG: %s\n", cupsRasterErrorString());
     return (1);
   }
 
@@ -618,7 +618,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Open the input image to print...
   */
 
-  fputs("INFO: Loading image file...\n", stderr);
+  fputs(_("INFO: Loading image file...\n"), stderr);
 
   if (header.cupsColorSpace == CUPS_CSPACE_CIEXYZ ||
       header.cupsColorSpace == CUPS_CSPACE_CIELab ||
@@ -632,7 +632,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (img == NULL)
   {
-    fputs("ERROR: Unable to open image file for printing!\n", stderr);
+    fputs(_("ERROR: Unable to open image file for printing!\n"), stderr);
     ppdClose(ppd);
     return (1);
   }
@@ -1137,7 +1137,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     for (xpage = 0; xpage < xpages; xpage ++)
       for (ypage = 0; ypage < ypages; ypage ++, page ++)
       {
-        fprintf(stderr, "INFO: Formatting page %d...\n", page);
+        fprintf(stderr, _("INFO: Formatting page %d...\n"), page);
 
 	if (Orientation & 1)
 	{
@@ -1194,7 +1194,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	              header.cupsBytesPerLine)
 	      {
-		fputs("ERROR: Unable to write raster data to driver!\n", stderr);
+		fputs(_("ERROR: Unable to write raster data to driver!\n"),
+		      stderr);
 		cupsImageClose(img);
 		exit(1);
 	      }
@@ -1289,7 +1290,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	                              header.cupsBytesPerLine)
 	    {
-              fputs("ERROR: Unable to write raster data to driver!\n", stderr);
+              fputs(_("ERROR: Unable to write raster data to driver!\n"),
+	            stderr);
 	      cupsImageClose(img);
 	      exit(1);
 	    }
@@ -1328,7 +1330,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	              header.cupsBytesPerLine)
 	      {
-		fputs("ERROR: Unable to write raster data to driver!\n", stderr);
+		fputs(_("ERROR: Unable to write raster data to driver!\n"),
+		      stderr);
 		cupsImageClose(img);
 		exit(1);
 	      }
