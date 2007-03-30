@@ -17,7 +17,7 @@ parallel.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 parallel.o: ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
 scsi.o: ../cups/backend.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 scsi.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-scsi.o: ../cups/string.h ../config.h
+scsi.o: ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
 serial.o: backend-private.h ../cups/backend.h ../cups/sidechannel.h
 serial.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
 serial.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
