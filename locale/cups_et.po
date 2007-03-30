@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-01-23 09:44-0500\n"
+"POT-Creation-Date: 2007-03-30 16:49-0400\n"
 "PO-Revision-Date: 2006-09-93 01:41+0200\n"
 "Last-Translator: Marek Laane <bald@starman.ee>\n"
 "Language-Team: Estonian <et@li.org>\n"
@@ -33,713 +33,698 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "Options Installed"
-msgstr "Paigaldatud valikud"
-
-msgid "Class"
-msgstr "Klass"
-
-msgid "Printer"
-msgstr "Printer"
-
-msgid "Extra"
-msgstr "Ekstra"
-
-msgid "General"
-msgstr "Üldine"
-
-msgid "Media Size"
-msgstr "Türkimaterjali suurus"
-
-msgid "Media Type"
-msgstr "Trükimaterjali tüüp"
-
-msgid "Media Source"
-msgstr "Trükimaterjali allikas"
-
-msgid "Output Mode"
-msgstr "Väljundirežiim"
-
-msgid "Resolution"
-msgstr "Lahutus"
-
-msgid "Variable"
-msgstr "Muutuv"
-
-msgid "Yes"
-msgstr "Jah"
-
-msgid "No"
-msgstr "i"
-
-msgid "Auto"
-msgstr "Automaatne"
-
-msgid ""
-"Enter your username and password or the root username and password to access "
-"this page."
-msgstr ""
-"Selle lehekülje avamiseks andke enda või administraatori (root) kasutajanimi "
-"ja parool."
-
-msgid "You must use a https: URL to access this page."
-msgstr "Selle lehekülje avamiseks tuleb kasutada https: URL-i."
-
-#, c-format
-msgid "Bad request version number %d.%d!"
-msgstr "Vigane soovi versiooninumber %d.%d!"
-
-msgid "No attributes in request!"
-msgstr "Soovis puuduvad atribuudid!"
-
-#, c-format
-msgid "Attribute groups are out of order (%x < %x)!"
-msgstr "Atribuudigrupid pole õiges järjekorras (%x < %x)!"
-
-msgid "Missing required attributes!"
-msgstr "Nõutud atribuudid puuduvad!"
-
-#, c-format
-msgid "%s not supported!"
-msgstr "%s pole toetatud!"
-
-msgid "The printer or class was not found."
-msgstr "Printerit või klassi ei leitud."
-
-msgid ""
-"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
-msgstr "printer-uri peab olema kujul \"ipp://MASINANIMI/classes/KLASSINIMI\"."
-
-#, c-format
-msgid "The printer-uri \"%s\" contains invalid characters."
-msgstr "printer-uri \"%s\" sisaldab vigaseid märke."
-
-#, c-format
-msgid "A printer named \"%s\" already exists!"
-msgstr "Printer nimega \"%s\" on juba olemas!"
-
-#, c-format
-msgid "Attempt to set %s printer-state to bad value %d!"
-msgstr "Katse määrata %s printer-state vigase väärtusega %d!"
-
-#, c-format
-msgid "add_class: Unknown printer-op-policy \"%s\"."
-msgstr "add_class: tundmatu printer-op-policy \"%s\"."
-
-#, c-format
-msgid "add_class: Unknown printer-error-policy \"%s\"."
-msgstr "add_class: tundmatu printer-error-policy \"%s\"."
-
-msgid "Unable to allocate memory for file types!"
-msgstr "Failitüüpidele ei õnnestu mälu eraldada!"
-
-#, c-format
-msgid "Character set \"%s\" not supported!"
-msgstr "Märgistik \"%s\" pole toetatud!"
-
-#, c-format
-msgid "Language \"%s\" not supported!"
-msgstr "Keel \"%s\" pole toetatud!"
-
-#, c-format
-msgid "The notify-user-data value is too large (%d > 63 octets)!"
-msgstr "notify-user-data väärtus on liiga suur (%d > 63 oktetti)!"
-
-msgid ""
-"The notify-lease-duration attribute cannot be used with job subscriptions."
-msgstr "notify-lease-duration atribuuti ei saa kasutada töötellimuste korral."
-
-msgid ""
-"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
-msgstr ""
-"printer-uri peab olema kujul \"ipp://MASINANIMI/printers/PRINTERINIMI\"."
-
-#, c-format
-msgid "A class named \"%s\" already exists!"
-msgstr "Klass nimega \"%s\" on juba olemas!"
-
-#, c-format
-msgid ""
-"File device URIs have been disabled! To enable, see the FileDevice directive "
-"in \"%s/cupsd.conf\"."
-msgstr ""
-"Failiseadme URI-d on keelatud! Nende lubamiseks vaadake FileDevice "
-"direktiivi failis \"%s/cupsd.conf\"."
-
-#, c-format
-msgid "Bad device-uri \"%s\"!"
-msgstr "Vigane device-uri \"%s\"!"
-
-#, c-format
-msgid "Bad port-monitor \"%s\"!"
-msgstr "Vigane port-monitor \"%s\"!"
-
-#, c-format
-msgid "Bad printer-state value %d!"
-msgstr "Vigane printer-state väärtus %d!"
-
-#, c-format
-msgid "Unknown printer-op-policy \"%s\"."
-msgstr "Tundmatu printer-op-policy \"%s\"."
-
-#, c-format
-msgid "Unknown printer-error-policy \"%s\"."
-msgstr "Tundmatu printer-error-policy  \"%s\"."
-
-#, c-format
-msgid "Unable to copy interface script - %s!"
-msgstr "Liideseskripti kopeerimine ebaõnnestus - %s!"
-
-#, c-format
-msgid "Unable to copy PPD file - %s!"
-msgstr "PPD-faili kopeerimine ebaõnnestus - %s!"
-
-msgid "Unable to copy PPD file!"
-msgstr "PPD-faili kopeerimine ebaõnnestus!"
-
-msgid "Got a printer-uri attribute but no job-id!"
-msgstr "Saadi printer-uri atribuut, aga mitte job-id!"
-
-#, c-format
-msgid "Bad job-uri attribute \"%s\"!"
-msgstr "Vigane job-uri atribuut \"%s\"!"
-
-#, c-format
-msgid "Job #%d doesn't exist!"
-msgstr "Tööd nr %d ei ole olemas!"
-
-#, c-format
-msgid "Job #%d is not held for authentication!"
-msgstr "Tööd nr %d ei hoita autentimiseks!"
-
-#, c-format
-msgid "You are not authorized to authenticate job #%d owned by \"%s\"!"
-msgstr "Teil pole õigust autentida tööd nr %d, mille omanik on \"%s\"!"
-
-msgid "The printer-uri attribute is required!"
-msgstr "Vajalik on printer-uri atribuut!"
-
-msgid "Missing requesting-user-name attribute!"
-msgstr "Puudub requesting-user-name atribuut!"
-
-#, c-format
-msgid "The printer-uri \"%s\" is not valid."
-msgstr "printer-uri \"%s\" ei ole korrektne."
-
-#, c-format
-msgid "No active jobs on %s!"
-msgstr "%s: pole ühtegi aktiivset tööd!"
-
-#, c-format
-msgid "You are not authorized to delete job #%d owned by \"%s\"!"
-msgstr "Teil pole õigust kustutada tööd nr %d, mille omanik on \"%s\"!"
-
-#, c-format
-msgid "Job #%d is already %s - can't cancel."
-msgstr "Töö nr %d on juba %s - ei saa katkestada."
-
-msgid "The printer or class is not shared!"
-msgstr "Printer või klass pole ühiskasutuses!"
-
-#, c-format
-msgid "Destination \"%s\" is not accepting jobs."
-msgstr "Sihtkoht \"%s\" ei võta töid vastu."
-
-#, c-format
-msgid "Bad copies value %d."
-msgstr "Vigane koopiate väärtus %d."
-
-#, c-format
-msgid "Bad page-ranges values %d-%d."
-msgstr "Vigased lehevahemike väärtused %d-%d."
-
-msgid "Too many active jobs."
-msgstr "Liiga palju aktiivseid täid."
-
-msgid "Quota limit reached."
-msgstr "Kvoot on täis."
-
-#, c-format
-msgid "Unable to add job for destination \"%s\"!"
-msgstr "Töö lisamine sihtkohale \"%s\" ebaõnnestus!"
-
-msgid "No subscription attributes in request!"
-msgstr "Soovis puuduvad tellimisatribuudid!"
-
-msgid "notify-events not specified!"
-msgstr "notify-events pole määratud!"
-
-#, c-format
-msgid "Job %d not found!"
-msgstr "Tööd %d ei leitud!"
-
-msgid "No default printer"
-msgstr "Vaikimisi printer puudub"
-
-msgid "cups-deviced failed to execute."
-msgstr "cups-deviced käivitamine ebaõnnestus."
-
-msgid "cups-driverd failed to execute."
-msgstr "cups-driverd käivitamine ebaõnnestus."
-
-msgid "No destinations added."
-msgstr "Sihtkohti pole lisatud."
-
-#, c-format
-msgid "notify-subscription-id %d no good!"
-msgstr "notify-subscription-id %d on vigane!"
-
-#, c-format
-msgid "Job #%s does not exist!"
-msgstr "Tööd nr %s ei ole olemas!"
-
-#, c-format
-msgid "Job #%d does not exist!"
-msgstr "Tööd nr %d ei ole olemas!"
-
-msgid "No subscriptions found."
-msgstr "Tellimusi ei leitud."
-
-#, c-format
-msgid "Not authorized to hold job #%d owned by \"%s\"!"
-msgstr "Pole õigust hoida tööd %d, mille omanik on \"%s\"!"
-
-#, c-format
-msgid "Job #%d is finished and cannot be altered!"
-msgstr "Töö nr %d on lõpetatud ja seda ei saa muuta!"
-
-#, c-format
-msgid "You are not authorized to move job #%d owned by \"%s\"!"
-msgstr "Teil pole õigust liigutada tööd nr %d, mille omanik on \"%s\"!"
-
-msgid "job-printer-uri attribute missing!"
-msgstr "job-printer-uri atribuut puudub!"
-
-#, c-format
-msgid "Unsupported compression \"%s\"!"
-msgstr "Toetamata tihendus \"%s\"!"
-
-msgid "No file!?!"
-msgstr "Faili polegi!?!"
-
-#, c-format
-msgid "Could not scan type \"%s\"!"
-msgstr "Tüübi \"%s\" uurimine ebaõnnestus!"
-
-#, c-format
-msgid "Unsupported format '%s/%s'!"
-msgstr "Toetamata vorming '%s/%s'!"
-
-msgid "Printer not shared!"
-msgstr "Printer ei ole ühiskasutuses!"
-
-#, c-format
-msgid "Too many jobs - %d jobs, max jobs is %d."
-msgstr "Liiga palju töid - %d tööd, maksimaalselt võib olla %d."
-
-#, c-format
-msgid "Job #%d is not held!"
-msgstr "Tööd nr %d ei hoita!"
-
-#, c-format
-msgid "You are not authorized to release job id %d owned by \"%s\"!"
-msgstr "Teil pole õigust vabastada tööd ID-ga %d, mille omanik on \"%s\"!"
-
-#, c-format
-msgid "Job #%d is not complete!"
-msgstr "Töö nr %d ei ole lõpetatud!"
-
-#, c-format
-msgid "Job #%d cannot be restarted - no files!"
-msgstr "Tööd nr %d ei saa taaskäivitada - faile pole!"
-
-#, c-format
-msgid "You are not authorized to restart job id %d owned by \"%s\"!"
-msgstr "Teil pole õigust taaskäivitada tööd ID-ga %d, mille omanik on \"%s\"!"
-
-#, c-format
-msgid "You are not authorized to send document for job #%d owned by \"%s\"!"
-msgstr "Teil pole õigust saata dokumenti tööle nr %d, mille omanik on \"%s\"!"
-
-#, c-format
-msgid "Bad document-format \"%s\"!"
-msgstr "Vigane document-format \"%s\"!"
-
-#, c-format
-msgid "You are not authorized to alter job id %d owned by \"%s\"!"
-msgstr "Teil pole õigust muuta töö ID-d %d, mille omanik on \"%s\"!"
-
-#, c-format
-msgid "%s cannot be changed."
-msgstr "%s ei ole muudetav."
-
-msgid "Bad job-priority value!"
-msgstr "Vigane töö prioriteedi väärtus!"
-
-msgid "Job is completed and cannot be changed."
-msgstr "Töö on lõpetatud ja seda ei saa muuta."
-
-msgid "Bad job-state value!"
-msgstr "Vigane job-state väärtus!"
-
-msgid "Job state cannot be changed."
-msgstr "Töö olekut ei saa muuta."
-
-#, c-format
-msgid "Unsupported compression attribute %s!"
-msgstr "Toetamata tihenduse atribuut %s!"
-
-#, c-format
-msgid "Unsupported format \"%s\"!"
-msgstr "Toetamata vorming \"%s\"!"
-
-#, c-format
-msgid "%s is not implemented by the CUPS version of lpc.\n"
-msgstr "%s on CUPS-i lpc versioonis toetamata.\n"
-
-msgid ""
-"Commands may be abbreviated.  Commands are:\n"
-"\n"
-"exit    help    quit    status  ?\n"
-msgstr ""
-"Käske võib lühendada. Käsud on järgmised:\n"
-"\n"
-"exit    help    quit    status  ?\n"
-
-msgid "help\t\tget help on commands\n"
-msgstr "help\t\tabi käskude kohta\n"
-
-msgid "status\t\tshow status of daemon and queue\n"
-msgstr "status\t\tdeemoni ja järjekorra staatuse kuvamine\n"
-
-msgid "?Invalid help command unknown\n"
-msgstr "?Vigane abikäsk tundmatu"
-
-#, c-format
-msgid "\tprinter is on device '%s' speed -1\n"
-msgstr "\tprinter seadmes '%s' kiirus -1\n"
-
-msgid "\tqueuing is enabled\n"
-msgstr "\tjärjekord on lubatud\n"
-
-msgid "\tqueuing is disabled\n"
-msgstr "\tjärjekord on keelatud\n"
-
-msgid "\tprinting is enabled\n"
-msgstr "\ttrükkimine on lubatud\n"
-
-msgid "\tprinting is disabled\n"
-msgstr "\ttrükkimine on keelatud\n"
-
-msgid "\tno entries\n"
-msgstr "\tkirjeid pole\n"
+msgid "\t\t(all)\n"
+msgstr "\t\t(kõik)\n"
+
+msgid "\t\t(none)\n"
+msgstr "\t\t(puudub)\n"
 
 #, c-format
 msgid "\t%d entries\n"
 msgstr "\t%d kirjet\n"
 
+msgid "\tAfter fault: continue\n"
+msgstr "\tVea järel: jätkatakse\n"
+
+msgid "\tAlerts:"
+msgstr "\tHoiatused:"
+
+msgid "\tBanner required\n"
+msgstr "\tBanner nõutav\n"
+
+msgid "\tCharset sets:\n"
+msgstr "\tMärgistikud:\n"
+
+msgid "\tConnection: direct\n"
+msgstr "\tÜhendus: otsene\n"
+
+msgid "\tConnection: remote\n"
+msgstr "\tÜhendus: võrgus\n"
+
+msgid "\tDefault page size:\n"
+msgstr "\tVaikimisi lehe suurus:\n"
+
+msgid "\tDefault pitch:\n"
+msgstr "\tVaikimisi tihedus:\n"
+
+msgid "\tDefault port settings:\n"
+msgstr "\tVaikimisi pordi seadistused:\n"
+
+#, c-format
+msgid "\tDescription: %s\n"
+msgstr "\tKirjeldus: %s\n"
+
+msgid ""
+"\tForm mounted:\n"
+"\tContent types: any\n"
+"\tPrinter types: unknown\n"
+msgstr ""
+"\tVorm ühendatud:\n"
+"\tSisu tüübid: suvaline\n"
+"\tPrinteri tüübid: teadmata\n"
+
+msgid "\tForms allowed:\n"
+msgstr "\tLubatud vormid:\n"
+
+#, c-format
+msgid "\tInterface: %s.ppd\n"
+msgstr "\tLiides: %s.ppd\n"
+
+#, c-format
+msgid "\tInterface: %s/interfaces/%s\n"
+msgstr "\tLiides: %s/interfaces/%s\n"
+
+#, c-format
+msgid "\tInterface: %s/ppd/%s.ppd\n"
+msgstr "\tLiides: %s/ppd/%s.ppd\n"
+
+#, c-format
+msgid "\tLocation: %s\n"
+msgstr "\tAsukoht: %s\n"
+
+msgid "\tOn fault: no alert\n"
+msgstr "\tVea korral: hoiatus puudub\n"
+
+msgid "\tUsers allowed:\n"
+msgstr "\tLubatud kasutajad:\n"
+
+msgid "\tUsers denied:\n"
+msgstr "\tKeelatud kasutajad:\n"
+
 msgid "\tdaemon present\n"
 msgstr "\tdeemon töötab\n"
 
-msgid "lpq: Unable to contact server!\n"
-msgstr "lpq: serveriga ei õnnestu ühendust luua!\n"
+msgid "\tno entries\n"
+msgstr "\tkirjeid pole\n"
 
 #, c-format
-msgid "%s: Sorry, no encryption support compiled in!\n"
-msgstr "%s: vabandust, krüptotoetus pole kompileeritud!\n"
+msgid "\tprinter is on device '%s' speed -1\n"
+msgstr "\tprinter seadmes '%s' kiirus -1\n"
+
+msgid "\tprinting is disabled\n"
+msgstr "\ttrükkimine on keelatud\n"
+
+msgid "\tprinting is enabled\n"
+msgstr "\ttrükkimine on lubatud\n"
 
 #, c-format
-msgid "lpq: Unknown destination \"%s/%s\"!\n"
-msgstr "lpq: tundmatu sihtkoht \"%s/%s\"!\n"
+msgid "\tqueued for %s\n"
+msgstr "\tjärjekorras %s jaoks\n"
 
-#, c-format
-msgid "lpq: Unknown destination \"%s\"!\n"
-msgstr "lpq: tundmatu sihtkoht \"%s\"!\n"
+msgid "\tqueuing is disabled\n"
+msgstr "\tjärjekord on keelatud\n"
 
-#, c-format
+msgid "\tqueuing is enabled\n"
+msgstr "\tjärjekord on lubatud\n"
+
+msgid "\treason unknown\n"
+msgstr "\tpõhjus teadmata\n"
+
 msgid ""
-"lp: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lp: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
-
-msgid "lpq: error - no default destination available.\n"
-msgstr "lpq: viga - vaikimisi sihtkoht pole saadaval.\n"
-
-#, c-format
-msgid "lpq: get-jobs failed: %s\n"
-msgstr "lpq: get-jobs ebaõnnestus: %s\n"
-
-msgid ""
-"Rank   Owner      Pri  Job        Files                       Total Size\n"
+"\n"
+"    DETAILED CONFORMANCE TEST RESULTS\n"
 msgstr ""
-"Järk   Omanik      Prio  Töö        Failid                       Kogusuurus\n"
+"\n"
+"    ÜKSIKASJALIKUD SOBIVUSTESTI TULEMUSED\n"
 
-msgid "Rank    Owner   Job     File(s)                         Total Size\n"
-msgstr "Järk    Omanik   Töö     Failid                         Kogusuurus\n"
+msgid "                REF: Page 15, section 3.1.\n"
+msgstr "                Viide: lk 15, sektsioon 3.1.\n"
 
-#, c-format
-msgid "%s: %-33.33s [job %d localhost]\n"
-msgstr "%s: %-33.33s [töö %d localhost]\n"
+msgid "                REF: Page 15, section 3.2.\n"
+msgstr "                Viide: lk 15, sektsioon 3.2.\n"
+
+msgid "                REF: Page 19, section 3.3.\n"
+msgstr "                Viide: lk 19, sektsioon 3.3.\n"
+
+msgid "                REF: Page 20, section 3.4.\n"
+msgstr "                Viide: lk 20, sektsioon 3.4.\n"
+
+msgid "                REF: Page 27, section 3.5.\n"
+msgstr "                Viide: lk 27, sektsioon 3.5.\n"
+
+msgid "                REF: Page 42, section 5.2.\n"
+msgstr "                Viide: lk 42, sektsioon 5.2.\n"
+
+msgid "                REF: Pages 16-17, section 3.2.\n"
+msgstr "                Viide: lk 16-17, sektsioon 3.2.\n"
+
+msgid "                REF: Pages 42-45, section 5.2.\n"
+msgstr "                Viide: lk 42-45, sektsioon 5.2.\n"
+
+msgid "                REF: Pages 45-46, section 5.2.\n"
+msgstr "                Viide: lk 45-46, sektsioon 5.2.\n"
+
+msgid "                REF: Pages 48-49, section 5.2.\n"
+msgstr "                Viide: lk 48-49, sektsioon 5.2.\n"
+
+msgid "                REF: Pages 52-54, section 5.2.\n"
+msgstr "                Viide: lk 52-54, sektsioon 5.2.\n"
 
 #, c-format
 msgid "        %-39.39s %.0f bytes\n"
 msgstr "        %-39.39s %.0f baiti\n"
 
 #, c-format
-msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
-msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f baiti\n"
+msgid "        PASS    Default%s\n"
+msgstr "        SOORITATUD    Default%s\n"
 
-#, c-format
-msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
-msgstr "%-7s %-7.7s %-7d %-31.31s %.0f baiti\n"
+msgid "        PASS    DefaultImageableArea\n"
+msgstr "        SOORITATUD    DefaultImageableArea\n"
 
-msgid "no entries\n"
-msgstr "kirjeid pole\n"
+msgid "        PASS    DefaultPaperDimension\n"
+msgstr "        SOORITATUD    DefaultPaperDimension\n"
 
-#, c-format
-msgid "lpq: get-printer-attributes failed: %s\n"
-msgstr "lpq: get-printer-attributes ebaõnnestus: %s\n"
+msgid "        PASS    FileVersion\n"
+msgstr "        SOORITATUD    FileVersion\n"
 
-#, c-format
-msgid "%s is ready\n"
-msgstr "%s on valmis\n"
+msgid "        PASS    FormatVersion\n"
+msgstr "        SOORITATUD    FormatVersion\n"
 
-#, c-format
-msgid "%s is ready and printing\n"
-msgstr "%s on valmis ja trükib"
+msgid "        PASS    LanguageEncoding\n"
+msgstr "        SOORITATUD    LanguageEncoding\n"
 
-#, c-format
-msgid "%s is not ready\n"
-msgstr "%s ei ole valmis\n"
+msgid "        PASS    LanguageVersion\n"
+msgstr "        SOORITATUD    LanguageVersion\n"
 
-msgid "Usage: lpq [-P dest] [-l] [+interval]\n"
-msgstr "Kasutamine: lpq [-P sihtkoht] [-l] [+intervall]\n"
+msgid "        PASS    Manufacturer\n"
+msgstr "        SOORITATUD    Manufacturer\n"
 
-#, c-format
-msgid "lpr: error - expected value after -%c option!\n"
-msgstr "lpr: viga - oodati väärust pärast võtit -%c!\n"
+msgid "        PASS    ModelName\n"
+msgstr "        SOORITATUD    ModelName\n"
 
-#, c-format
-msgid ""
-"lpr: warning - '%c' format modifier not supported - output may not be "
-"correct!\n"
-msgstr ""
-"lpr: hoiatus - '%c' vormingus modifikaator pole toetatud - väljund võib olla "
-"vigane!\n"
+msgid "        PASS    NickName\n"
+msgstr "        SOORITATUD    NickName\n"
 
-msgid "lpr: error - expected option=value after -o option!\n"
-msgstr "lpr: viga - oodati võti=väärtus pärast võtit -o!\n"
+msgid "        PASS    PCFileName\n"
+msgstr "        SOORITATUD    PCFileName\n"
 
-msgid "lpr: warning - email notification is not currently supported!\n"
-msgstr "lpr: hoiatus - märguanne e-postiga pole veel toetatud!\n"
+msgid "        PASS    PSVersion\n"
+msgstr "        SOORITATUD    PSVersion\n"
 
-msgid "lpr: error - expected destination after -P option!\n"
-msgstr "lpr: viga - oodati sihtkohta pärast võtit -P!\n"
+msgid "        PASS    PageRegion\n"
+msgstr "        SOORITATUD    PageRegion\n"
 
-msgid "lpr: error - expected copy count after -# option!\n"
-msgstr "lpr: viga - oodati koopiate arvu pärast võtit -#!\n"
+msgid "        PASS    PageSize\n"
+msgstr "        SOORITATUD    PageSize\n"
 
-#, c-format
-msgid "lpr: error - expected name after -%c option!\n"
-msgstr "lpr: viga - oodati nime pärast võtit -%c!\n"
+msgid "        PASS    Product\n"
+msgstr "        SOORITATUD    Product\n"
 
-msgid "lpr: error - expected username after -U option!\n"
-msgstr "lpr: viga - oodati kasutajanime pärast võtit -U!\n"
-
-#, c-format
-msgid "lpr: error - unknown option '%c'!\n"
-msgstr "lpr: viga - tundmatu võti '%c'!\n"
-
-#, c-format
-msgid "lpr: error - unable to access \"%s\" - %s\n"
-msgstr "lpr: viga - ligipääs asukohale \"%s\" ebaõnnestus - %s\n"
-
-#, c-format
-msgid "lpr: error - too many files - \"%s\"\n"
-msgstr "lpr: viga - liiga palju faile - \"%s\"\n"
+msgid "        PASS    ShortNickName\n"
+msgstr "        SOORITATUD    ShortNickName\n"
 
 #, c-format
 msgid ""
-"lpr: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "lpr: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
-
-msgid "lpr: error - no default destination available.\n"
-msgstr "lpr: viga - vaikimisi sihtkoht pole saadaval.\n"
-
-msgid "lpr: error - scheduler not responding!\n"
-msgstr "lpr: viga - ajastaja ei vasta!\n"
-
-#, c-format
-msgid "lpr: error - unable to create temporary file \"%s\" - %s\n"
-msgstr "lpr: viga - ei õnnestu luua ajutist faili \"%s\" - %s\n"
-
-#, c-format
-msgid "lpr: error - unable to write to temporary file \"%s\" - %s\n"
-msgstr "lpr: viga - ei õnnestu kirjutada ajutist faili \"%s\" - %s\n"
-
-msgid "lpr: error - stdin is empty, so no job has been sent.\n"
-msgstr "lpr: viga - standardsisend on tühi, ühtegi tööd ei ole saadetud.\n"
-
-#, c-format
-msgid "lpr: error - unable to print file: %s\n"
-msgstr "lpr: viga - ei õnnestu trükkida faili: %s\n"
-
-msgid "lprm: Unable to contact server!\n"
-msgstr "lprm: ei õnnestu saada ühendust serveriga!\n"
-
-#, c-format
-msgid "lprm: Unknown destination \"%s\"!\n"
-msgstr "lprm: tundmatu sihtkoht \"%s\"!\n"
-
-#, c-format
-msgid "lprm: Unknown option '%c'!\n"
-msgstr "lprm: tundmatu võti '%c'!\n"
-
-msgid "lprm: Job or printer not found!\n"
-msgstr "lprm: tööd või printerit ei leitud!\n"
-
-msgid "lprm: Not authorized to lprm job(s)!\n"
-msgstr "lprm: pole õigust lprm töid!\n"
-
-#, c-format
-msgid "lprm: You don't own job ID %d!\n"
-msgstr "lprm: töö ID %d ei kuulu Teile!\n"
-
-msgid "lprm: Unable to lprm job(s)!\n"
-msgstr "lprm: tööde lprm ei ole võimalik!\n"
-
-msgid "lprm: Unable to cancel job(s)!\n"
-msgstr "lprm: tööde katkestamine ei ole võimalik!\n"
-
-#, c-format
-msgid "%s: Don't know what to do!\n"
-msgstr "%s: ei tea, mida ette võtta!\n"
-
-#, c-format
-msgid "%s: Expected server name after -h!\n"
-msgstr "%s: oodati serveri nime pärast -h!\n"
-
-#, c-format
-msgid "%s: Expected reason text after -r!\n"
-msgstr "%s: oodati teksti pärast -r!\n"
-
-#, c-format
-msgid "%s: Unknown option '%c'!\n"
-msgstr "%s: tundmatu võti '%c'!\n"
-
-#, c-format
-msgid "%s: Unable to connect to server: %s\n"
-msgstr "%s: ei õnnestu saada ühendust serveriga: %s\n"
-
-#, c-format
-msgid "%s: Operation failed: %s\n"
-msgstr "%s: toiming ebaõnnestus: %s\n"
-
-msgid "cancel: Error - expected hostname after '-h' option!\n"
-msgstr "cancel: viga - oodati masinanime pärast võtit '.h'!\n"
-
-msgid "cancel: Error - expected username after '-u' option!\n"
-msgstr "cancel: viga - oodati kasutajanime pärast võtit '-u'!\n"
-
-#, c-format
-msgid "cancel: Unknown option '%c'!\n"
-msgstr "cancel: tundmatu võti '%c'!\n"
-
-#, c-format
-msgid "cancel: Unknown destination \"%s\"!\n"
-msgstr "cancel: tundmatu sihtkoht \"%s\"!\n"
-
-msgid "cancel: Unable to contact server!\n"
-msgstr "cancel: ei õnnestu saada ühendust serveriga!\n"
-
-#, c-format
-msgid "cancel: %s failed: %s\n"
-msgstr "cancel: %s ebaõnnestus: %s\n"
-
-#, c-format
-msgid "cupsaddsmb: Missing value on line %d!\n"
-msgstr "cupsaddsmb: puudub väärtus real %d!\n"
-
-#, c-format
-msgid "cupsaddsmb: Missing double quote on line %d!\n"
-msgstr "cupsaddsmb: puuduvad kahekordsed jutumärgid real %d!\n"
-
-#, c-format
-msgid "cupsaddsmb: Bad option + choice on line %d!\n"
-msgstr "cupsaddsmb: vigane võti + valik real %d!\n"
-
-#, c-format
-msgid "cupsaddsmb: Unable to connect to server \"%s\" for %s - %s\n"
-msgstr "cupsaddsmb: ei õnnestu saada ühendust serveriga \"%s\" %s jaoks - %s\n"
-
-#, c-format
-msgid "cupsaddsmb: No PPD file for printer \"%s\" - skipping!\n"
-msgstr "cupsaddsmb: puudub PPD printerile \"%s\" - jäetakse vahele!\n"
-
-#, c-format
-msgid "cupsaddsmb: get-printer-attributes failed for \"%s\": %s\n"
-msgstr "cupsaddsmb: get-printer-attributes ebaõnnestus \"%s\" jaoks: %s\n"
-
-#, c-format
-msgid "cupsaddsmb: Unable to convert PPD file for %s - %s\n"
-msgstr "cupsaddsmb: ei õnnestunud teisendada PPD-faili %s jaoks - %s\n"
-
-#, c-format
-msgid "cupsaddsmb: Unable to copy Windows 2000 printer driver files (%d)!\n"
+"        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
+"                (constraint=\"%s %s %s %s\")\n"
 msgstr ""
-"cupsaddsmb: ei õnnestunud kopeerida Windows 2000 printeridraiverifaile (%"
-"d)!\n"
+"        HOIATUS    \"%s %s\" on konfliktis \"%s %s\"\n"
+"                   (constraint=\"%s %s %s %s\")\n"
 
 #, c-format
-msgid "cupsaddsmb: Unable to copy CUPS printer driver files (%d)!\n"
+msgid "        WARN    %s has no corresponding options!\n"
+msgstr "        HOIATUS    %s on ilma vastavate võtmeteta!\n"
+
+#, c-format
+msgid ""
+"        WARN    %s shares a common prefix with %s\n"
+"                REF: Page 15, section 3.2.\n"
 msgstr ""
-"cupsaddsmb: ei õnnestunud kopeerida CUPS-i printeridraiverifaile (%d)!\n"
+"        HOIATUS    %s on sama prefiksiga, mis %s\n"
+"                   Viide: lk 15, sektsioon 3.2.\n"
+
+msgid "        WARN    Default choices conflicting!\n"
+msgstr "        HOIATUS    Vaikevalikud on konfliktis!\n"
 
 #, c-format
-msgid "cupsaddsmb: Unable to install Windows 2000 printer driver files (%d)!\n"
+msgid ""
+"        WARN    Duplex option keyword %s should be named Duplex or "
+"JCLDuplex!\n"
+"                REF: Page 122, section 5.17\n"
 msgstr ""
-"cupsaddsmb: ei õnnestunud paigaldada Windows 2000 printeridraiverifaile (%"
-"d)!\n"
-
-#, c-format
-msgid "cupsaddsmb: Unable to copy Windows 9x printer driver files (%d)!\n"
-msgstr ""
-"cupsaddsmb: ei õnnestunud kopeerida Windows 9x printeridraiverifaile (%d)!\n"
-
-#, c-format
-msgid "cupsaddsmb: Unable to install Windows 9x printer driver files (%d)!\n"
-msgstr ""
-"cupsaddsmb: ei õnnestunud paigaldada Windows 9x printeridraiverifaile (%d)!\n"
-
-#, c-format
-msgid "cupsaddsmb: Unable to set Windows printer driver (%d)!\n"
-msgstr "cupsaddsmb: ei õnnestunud määrata Windowsi printeridraiverit (%d)!\n"
+"        HOIATUS    Dupleksi võtme võtmesõna %s peab olema nimega Duplex või "
+"JCLDuplex!\n"
+"                   Viide: lk 122, sektsioon 5.17\n"
 
 msgid ""
-"Usage: cupsaddsmb [options] printer1 ... printerN\n"
-"       cupsaddsmb [options] -a\n"
-"\n"
-"Options:\n"
-"  -H samba-server  Use the named SAMBA server\n"
-"  -U samba-user    Authenticate using the named SAMBA user\n"
-"  -a               Export all printers\n"
-"  -h cups-server   Use the named CUPS server\n"
-"  -v               Be verbose (show commands)\n"
+"        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
+msgstr "        HOIATUS    Fail sisaldab CR. LF ja CR LF reavahetuste segu!\n"
+
+msgid ""
+"        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
+"                REF: Pages 56-57, section 5.3.\n"
 msgstr ""
-"Kasutamine: cupsaddsmb [võtmed] printer1 ... printerN\n"
-"            cupsaddsmb [võtmed] -a\n"
-"\n"
-"Võtmed:\n"
-"  -H samba-server    määratud SAMBA-serveri kasutamine\n"
-"  -U samba-kasutaja  määratud SAMBA kasutajaga autentimine\n"
-"  -a                 Kõigi printerite eksport\n"
-"  -h cups-server     määratud CUPS-serveri kasutamine\n"
-"  -v                 Häälekus (käskude näitamine)\n"
+"        HOIATUS    LanguageEncoding on PPD 4.3 spetsifikatsiooni järgi "
+"nõutav.\n"
+"                   Viide: lk 56-57, sektsioon 5.3.\n"
 
-msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
-msgstr "cupstestppd: võti -q ei sobi kokku võtmega -v.\n"
+#, c-format
+msgid "        WARN    Line %d only contains whitespace!\n"
+msgstr "        HOIATUS    Rida %d sisaldab ainult tühikut!\n"
 
-msgid "cupstestppd: The -v option is incompatible with the -q option.\n"
-msgstr "cupstestppd: võti -v ei sobi kokku võtmega -q.\n"
+msgid ""
+"        WARN    Manufacturer required by PPD 4.3 spec.\n"
+"                REF: Pages 58-59, section 5.3.\n"
+msgstr ""
+"        HOIATUS    Manufacturer on PPD 4.3 spetsifikatsiooni järgi nõutav.\n"
+"                   Viide: lk 58-59, sektsioon 5.3.\n"
+
+msgid ""
+"        WARN    Non-Windows PPD files should use lines ending with only LF, "
+"not CR LF!\n"
+msgstr ""
+"        HOIATUS    Mitte-Windowsi PPD-failid peavad kasutama ainult LF, "
+"mitte CR LF reavahetusi!\n"
+
+#, c-format
+msgid ""
+"        WARN    Obsolete PPD version %.1f!\n"
+"                REF: Page 42, section 5.2.\n"
+msgstr ""
+"        HOIATUS    Iganenud PPD versioon %.1f!\n"
+"                   Viide: lk 42, sektsioon 5.2.\n"
+
+msgid ""
+"        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
+"        HOIATUS    PCFileName pikem kui 8.3 läheb vastuollu PPD "
+"spetsifikatsiooniga.\n"
+"                   Viide: lk 61-62, sektsioon 5.3.\n"
+
+msgid ""
+"        WARN    Protocols contains PJL but JCL attributes are not set.\n"
+"                REF: Pages 78-79, section 5.7.\n"
+msgstr ""
+"        HOIATUS    Protocols sisaldab PJL, kuid JCL atribuudid pole "
+"määratud.\n"
+"                   Viide: lk 78-79, sektsioon 5.7.\n"
+
+msgid ""
+"        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
+"                REF: Pages 78-79, section 5.7.\n"
+msgstr ""
+"        HOIATUS    Protocols sisaldab nii PJL kui ka BCP; oodati TBCP.\n"
+"                   Viide: lk 78-79, sektsioon 5.7.\n"
+
+msgid ""
+"        WARN    ShortNickName required by PPD 4.3 spec.\n"
+"                REF: Pages 64-65, section 5.3.\n"
+msgstr ""
+"        HOIATUS    ShortNickName on PPD 4.3 spetsifikatsiooni järgi nõutav.\n"
+"                   Viide: lk 64-65, sektsioon 5.3.\n"
+
+#, c-format
+msgid "      **FAIL**  %s %s does not exist!\n"
+msgstr "      **EBAÕNN**  %s %s ei ole olemas!\n"
+
+#, fuzzy, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID!\n"
+"                REF: Page 72, section 5.5\n"
+msgstr ""
+"      **EBAÕNN**  1284DeviceId peab olema 1284DeviceID!\n"
+"                  Viide: lk 72, sektsioon 5.5\n"
+
+#, fuzzy, c-format
+msgid ""
+"      **FAIL**  BAD Default%s %s\n"
+"                REF: Page 40, section 4.5.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE Default%s %s\n"
+"                  Viide: lk 40, sektsioon 4.5.\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultImageableArea %s!\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE DefaultImageableArea %s!\n"
+"                  Viide: lk 102, sektsioon 5.15.\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultPaperDimension %s!\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE DefaultPaperDimension %s!\n"
+"                  Viide: lk 103, sektsioon 5.15.\n"
+
+msgid ""
+"      **FAIL**  BAD JobPatchFile attribute in file\n"
+"                REF: Page 24, section 3.4.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE JobPatchFile atribuut failis\n"
+"                  Viide: lk 24, sektsioon 3.4.\n"
+
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE Manufacturer (peab olema \"HP\")\n"
+"                  Viide: lk 211, tabel D.1.\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
+"                REF: Pages 59-60, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE ModelName - \"%c\" ei ole stringis lubatud.\n"
+"                  Viide: lk 59-60, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
+"                REF: Pages 62-64, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE PSVersion - pole \"(string) int\".\n"
+"                  Viide: lk 62-64, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  BAD Product - not \"(string)\".\n"
+"                REF: Page 62, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE Product - pole \"(string)\".\n"
+"                  Viide: lk 62, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
+"                REF: Pages 64-65, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE ShortNickName - pikem kui 31 märki.\n"
+"                  Viide: lk 64-65, sektsioon 5.3.\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad %s choice %s!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+"      **EBAÕNN**  Vigane %s valik %s!\n"
+"                  Viide: lk 122, sektsioon 5.17\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad %s choice %s!\n"
+"                REF: Page 84, section 5.9\n"
+msgstr ""
+"      **EBAÕNN**  Vigane %s valik %s!\n"
+"                  Viide: lk 84, sektsioon 5.9\n"
+
+#, fuzzy, c-format
+msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
+msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
+
+#, fuzzy, c-format
+msgid ""
+"      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice %"
+"s!\n"
+msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s, valikule %s!\n"
+
+#, c-format
+msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
+msgstr "      **EBAÕNN**  Vigane cupsFilter väärtus \"%s\"!\n"
+
+#, c-format
+msgid "      **FAIL**  Bad language \"%s\"!\n"
+msgstr "      **EBAÕNN**  Vigane keel \"%s\"!\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s choice %s contains "
+"8-bit characters!\n"
+msgstr ""
+"      **EBAÕNN**  Vaikimisi tõlkestring võtmele %s, valikule %s sisaldab 8-"
+"bitiseid märke!\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s contains 8-bit "
+"characters!\n"
+msgstr ""
+"      **EBAÕNN**  Vaikimisi tõlkestring võtmele %s sisaldab 8-bitiseid "
+"märke!\n"
+
+#, c-format
+msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
+msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s, valikule %s!\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED %s does not define choice None!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK %s ei defineeri valikut None!\n"
+"                  Viide: lk 122, sektsioon 5.17\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED Default%s\n"
+"                REF: Page 40, section 4.5.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK Default%s\n"
+"                  Viide: lk 40, sektsioon 4.5.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED DefaultImageableArea\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK DefaultImageableArea\n"
+"                  Viide: lk 102, sektsioon 5.15.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED DefaultPaperDimension\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK DefaultPaperDimension\n"
+"                  Viide: lk 103, sektsioon 5.15.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED FileVersion\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK FileVersion\n"
+"                  Viide: lk 56, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED FormatVersion\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK FormatVersion\n"
+"                  Viide: lk 56, sektsioon 5.3.\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK ImageableArea PageSize %s jaoks\n"
+"                  Viide: lk 41, sektsioon 5.\n"
+"                  Viide: lk 102, sektsioon 5.15.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED LanguageEncoding\n"
+"                REF: Pages 56-57, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK LanguageEncoding\n"
+"                  Viide: lk 56-57, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED LanguageVersion\n"
+"                REF: Pages 57-58, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK LanguageVersion\n"
+"                  Viide: lk 57-58, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED Manufacturer\n"
+"                REF: Pages 58-59, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK Manufacturer\n"
+"                  Viide: lk 58-59, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED ModelName\n"
+"                REF: Pages 59-60, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK ModelName\n"
+"                  Viide: lk 59-60, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED NickName\n"
+"                REF: Page 60, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK NickName\n"
+"                  Viide: lk 60, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED PCFileName\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK PCFileName\n"
+"                  Viide: lk 61-62, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED PSVersion\n"
+"                REF: Pages 62-64, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK PSVersion\n"
+"                  Viide: lk 62-64, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED PageRegion\n"
+"                REF: Page 100, section 5.14.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK PageRegion\n"
+"                  Viide: lk 100, sektsioon 5.14.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 99, section 5.14.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK PageSize\n"
+"                  Viide: lk 41, sektsioon 5.\n"
+"                  Viide: lk 99, sektsioon 5.14.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Pages 99-100, section 5.14.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK PageSize\n"
+"                  Viide: lk 99-100, sektsioon 5.14.\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK PaperDimension PageSize %s jaoks\n"
+"                  Viide: lk 41, sektsioon 5.\n"
+"                  Viide: lk 103, sektsioon 5.15.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED Product\n"
+"                REF: Page 62, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK Product\n"
+"                  Viide: lk 62, sektsioon 5.3.\n"
+
+msgid ""
+"      **FAIL**  REQUIRED ShortNickName\n"
+"                REF: Page 64-65, section 5.3.\n"
+msgstr ""
+"      **EBAÕNN**  VAJALIK ShortNickName\n"
+"                  Viide: lk 64-65, sektsioon 5.3.\n"
+
+#, fuzzy, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d VIGA%s LEITUD\n"
+
+#, c-format
+msgid ""
+"    Bad %%%%BoundingBox: on line %d!\n"
+"        REF: Page 39, %%%%BoundingBox:\n"
+msgstr ""
+"    Vigane %%%%BoundingBox: real %d!\n"
+"        Viide: lk 39, %%%%BoundingBox:\n"
+
+#, c-format
+msgid ""
+"    Bad %%%%Page: on line %d!\n"
+"        REF: Page 53, %%%%Page:\n"
+msgstr ""
+"    Vigane %%%%Page: real %d!\n"
+"        Viide: lk 53, %%%%Page:\n"
+
+#, c-format
+msgid ""
+"    Bad %%%%Pages: on line %d!\n"
+"        REF: Page 43, %%%%Pages:\n"
+msgstr ""
+"    Vigane %%%%Pages: real %d!\n"
+"        Viide: lk 43, %%%%Pages:\n"
+
+#, c-format
+msgid ""
+"    Line %d is longer than 255 characters (%d)!\n"
+"        REF: Page 25, Line Length\n"
+msgstr ""
+"    Rida %d on pikem kui 255 märki (%d)!\n"
+"        Viide: lk 25, Line Length\n"
+
+msgid ""
+"    Missing %!PS-Adobe-3.0 on first line!\n"
+"        REF: Page 17, 3.1 Conforming Documents\n"
+msgstr ""
+"    Puudub %!PS-Adobe-3.0 esimesel real!\n"
+"        Viide: lk 17, 3.1 Conforming Documents\n"
+
+#, c-format
+msgid ""
+"    Missing %%EndComments comment!\n"
+"        REF: Page 41, %%EndComments\n"
+msgstr ""
+"    Puudub %%EndComments kommentaar!\n"
+"        Viide: lk 41, %%EndComments\n"
+
+#, c-format
+msgid ""
+"    Missing or bad %%BoundingBox: comment!\n"
+"        REF: Page 39, %%BoundingBox:\n"
+msgstr ""
+"    Puuduv või vigane %%BoundingBox: kommentaar!\n"
+"        Viide: lk 39, %%BoundingBox:\n"
+
+#, c-format
+msgid ""
+"    Missing or bad %%Page: comments!\n"
+"        REF: Page 53, %%Page:\n"
+msgstr ""
+"    Puuduvad või vigased %%Page: kommentaarid!\n"
+"        Viide: lk 53, %%Page:\n"
+
+#, c-format
+msgid ""
+"    Missing or bad %%Pages: comment!\n"
+"        REF: Page 43, %%Pages:\n"
+msgstr ""
+"    Puuduv või vigane %%Pages: kommentaar!\n"
+"        Viide: lk 43, %%Pages:\n"
+
+msgid "    NO ERRORS FOUND\n"
+msgstr "    VIGU EI LEITUD\n"
+
+#, c-format
+msgid "    Saw %d lines that exceeded 255 characters!\n"
+msgstr "    Nähti %d rida, mis ületas 255 märgi piiri!+n"
+
+#, c-format
+msgid "    Too many %%BeginDocument comments!\n"
+msgstr "    Liiga palju %%BeginDocument kommentaare!\n"
+
+#, c-format
+msgid "    Too many %%EndDocument comments!\n"
+msgstr "    Liiga palju %%EndDocument kommentaare!\n"
+
+msgid "    Warning: file contains binary data!\n"
+msgstr "    Hoiatus: fail sisaldab binaarandmeid!\n"
+
+#, c-format
+msgid "    Warning: no %%EndComments comment in file!\n"
+msgstr "    Hoiatus: failis puudub %%EndComments kommentaar!\n"
+
+#, c-format
+msgid "    Warning: obsolete DSC version %.1f in file!\n"
+msgstr "    Hoiatus: iganenud DSC versioon %.1f failis!\n"
+
+msgid " FAIL\n"
+msgstr " EBAÕNN\n"
 
 #, c-format
 msgid ""
@@ -757,785 +742,1620 @@ msgstr ""
 " EBAÕNN\n"
 "      **EBAÕNN**  PPD-faili avamine ebaõnnestus - %s real %d.\n"
 
-msgid "                REF: Page 42, section 5.2.\n"
-msgstr "                Viide: lk 42, sektsioon 5.2.\n"
-
-msgid "                REF: Page 20, section 3.4.\n"
-msgstr "                Viide: lk 20, sektsioon 3.4.\n"
-
-msgid "                REF: Pages 45-46, section 5.2.\n"
-msgstr "                Viide: lk 45-46, sektsioon 5.2.\n"
-
-msgid "                REF: Pages 42-45, section 5.2.\n"
-msgstr "                Viide: lk 42-45, sektsioon 5.2.\n"
-
-msgid "                REF: Pages 48-49, section 5.2.\n"
-msgstr "                Viide: lk 48-49, sektsioon 5.2.\n"
-
-msgid "                REF: Pages 52-54, section 5.2.\n"
-msgstr "                Viide: lk 52-54, sektsioon 5.2.\n"
-
-msgid "                REF: Page 15, section 3.2.\n"
-msgstr "                Viide: lk 15, sektsioon 3.2.\n"
-
-msgid "                REF: Page 15, section 3.1.\n"
-msgstr "                Viide: lk 15, sektsioon 3.1.\n"
-
-msgid "                REF: Pages 16-17, section 3.2.\n"
-msgstr "                Viide: lk 16-17, sektsioon 3.2.\n"
-
-msgid "                REF: Page 19, section 3.3.\n"
-msgstr "                Viide: lk 19, sektsioon 3.3.\n"
-
-msgid "                REF: Page 27, section 3.5.\n"
-msgstr "                Viide: lk 27, sektsioon 3.5.\n"
-
-msgid ""
-"\n"
-"    DETAILED CONFORMANCE TEST RESULTS\n"
-msgstr ""
-"\n"
-"    ÜKSIKASJALIKUD SOBIVUSTESTI TULEMUSED\n"
-
-#, c-format
-msgid "        WARN    %s has no corresponding options!\n"
-msgstr "        HOIATUS    %s on ilma vastavate võtmeteta!\n"
-
-msgid " FAIL\n"
-msgstr " EBAÕNN\n"
-
-msgid ""
-"      **FAIL**  REQUIRED DefaultImageableArea\n"
-"                REF: Page 102, section 5.15.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK DefaultImageableArea\n"
-"                  Viide: lk 102, sektsioon 5.15.\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  BAD DefaultImageableArea %s!\n"
-"                REF: Page 102, section 5.15.\n"
-msgstr ""
-"      **EBAÕNN**  VIGANE DefaultImageableArea %s!\n"
-"                  Viide: lk 102, sektsioon 5.15.\n"
-
-msgid "        PASS    DefaultImageableArea\n"
-msgstr "        SOORITATUD    DefaultImageableArea\n"
-
-msgid ""
-"      **FAIL**  REQUIRED DefaultPaperDimension\n"
-"                REF: Page 103, section 5.15.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK DefaultPaperDimension\n"
-"                  Viide: lk 103, sektsioon 5.15.\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  BAD DefaultPaperDimension %s!\n"
-"                REF: Page 103, section 5.15.\n"
-msgstr ""
-"      **EBAÕNN**  VIGANE DefaultPaperDimension %s!\n"
-"                  Viide: lk 103, sektsioon 5.15.\n"
-
-msgid "        PASS    DefaultPaperDimension\n"
-msgstr "        SOORITATUD    DefaultPaperDimension\n"
-
-#, fuzzy, c-format
-msgid ""
-"      **FAIL**  BAD Default%s %s\n"
-"                REF: Page 40, section 4.5.\n"
-msgstr ""
-"      **EBAÕNN**  VIGANE Default%s %s\n"
-"                  Viide: lk 40, sektsioon 4.5.\n"
-
-#, c-format
-msgid "        PASS    Default%s\n"
-msgstr "        SOORITATUD    Default%s\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  REQUIRED Default%s\n"
-"                REF: Page 40, section 4.5.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK Default%s\n"
-"                  Viide: lk 40, sektsioon 4.5.\n"
-
-msgid "        PASS    FileVersion\n"
-msgstr "        SOORITATUD    FileVersion\n"
-
-msgid ""
-"      **FAIL**  REQUIRED FileVersion\n"
-"                REF: Page 56, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK FileVersion\n"
-"                  Viide: lk 56, sektsioon 5.3.\n"
-
-msgid "        PASS    FormatVersion\n"
-msgstr "        SOORITATUD    FormatVersion\n"
-
-msgid ""
-"      **FAIL**  REQUIRED FormatVersion\n"
-"                REF: Page 56, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK FormatVersion\n"
-"                  Viide: lk 56, sektsioon 5.3.\n"
-
-msgid "        PASS    LanguageEncoding\n"
-msgstr "        SOORITATUD    LanguageEncoding\n"
-
-msgid ""
-"      **FAIL**  REQUIRED LanguageEncoding\n"
-"                REF: Pages 56-57, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK LanguageEncoding\n"
-"                  Viide: lk 56-57, sektsioon 5.3.\n"
-
-msgid "        PASS    LanguageVersion\n"
-msgstr "        SOORITATUD    LanguageVersion\n"
-
-msgid ""
-"      **FAIL**  REQUIRED LanguageVersion\n"
-"                REF: Pages 57-58, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK LanguageVersion\n"
-"                  Viide: lk 57-58, sektsioon 5.3.\n"
-
-msgid ""
-"      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
-"                REF: Page 211, table D.1.\n"
-msgstr ""
-"      **EBAÕNN**  VIGANE Manufacturer (peab olema \"HP\")\n"
-"                  Viide: lk 211, tabel D.1.\n"
-
-msgid "        PASS    Manufacturer\n"
-msgstr "        SOORITATUD    Manufacturer\n"
-
-msgid ""
-"      **FAIL**  REQUIRED Manufacturer\n"
-"                REF: Pages 58-59, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK Manufacturer\n"
-"                  Viide: lk 58-59, sektsioon 5.3.\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
-"                REF: Pages 59-60, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VIGANE ModelName - \"%c\" ei ole stringis lubatud.\n"
-"                  Viide: lk 59-60, sektsioon 5.3.\n"
-
-msgid "        PASS    ModelName\n"
-msgstr "        SOORITATUD    ModelName\n"
-
-msgid ""
-"      **FAIL**  REQUIRED ModelName\n"
-"                REF: Pages 59-60, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK ModelName\n"
-"                  Viide: lk 59-60, sektsioon 5.3.\n"
-
-msgid "        PASS    NickName\n"
-msgstr "        SOORITATUD    NickName\n"
-
-msgid ""
-"      **FAIL**  REQUIRED NickName\n"
-"                REF: Page 60, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK NickName\n"
-"                  Viide: lk 60, sektsioon 5.3.\n"
-
-msgid "        PASS    PageSize\n"
-msgstr "        SOORITATUD    PageSize\n"
-
-msgid ""
-"      **FAIL**  REQUIRED PageSize\n"
-"                REF: Pages 99-100, section 5.14.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK PageSize\n"
-"                  Viide: lk 99-100, sektsioon 5.14.\n"
-
-msgid "        PASS    PageRegion\n"
-msgstr "        SOORITATUD    PageRegion\n"
-
-msgid ""
-"      **FAIL**  REQUIRED PageRegion\n"
-"                REF: Page 100, section 5.14.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK PageRegion\n"
-"                  Viide: lk 100, sektsioon 5.14.\n"
-
-msgid "        PASS    PCFileName\n"
-msgstr "        SOORITATUD    PCFileName\n"
-
-msgid ""
-"      **FAIL**  REQUIRED PCFileName\n"
-"                REF: Pages 61-62, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK PCFileName\n"
-"                  Viide: lk 61-62, sektsioon 5.3.\n"
-
-msgid ""
-"      **FAIL**  BAD Product - not \"(string)\".\n"
-"                REF: Page 62, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VIGANE Product - pole \"(string)\".\n"
-"                  Viide: lk 62, sektsioon 5.3.\n"
-
-msgid "        PASS    Product\n"
-msgstr "        SOORITATUD    Product\n"
-
-msgid ""
-"      **FAIL**  REQUIRED Product\n"
-"                REF: Page 62, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK Product\n"
-"                  Viide: lk 62, sektsioon 5.3.\n"
-
-msgid ""
-"      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
-"                REF: Pages 62-64, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VIGANE PSVersion - pole \"(string) int\".\n"
-"                  Viide: lk 62-64, sektsioon 5.3.\n"
-
-msgid "        PASS    PSVersion\n"
-msgstr "        SOORITATUD    PSVersion\n"
-
-msgid ""
-"      **FAIL**  REQUIRED PSVersion\n"
-"                REF: Pages 62-64, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK PSVersion\n"
-"                  Viide: lk 62-64, sektsioon 5.3.\n"
-
-msgid ""
-"      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
-"                REF: Pages 64-65, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VIGANE ShortNickName - pikem kui 31 märki.\n"
-"                  Viide: lk 64-65, sektsioon 5.3.\n"
-
-msgid "        PASS    ShortNickName\n"
-msgstr "        SOORITATUD    ShortNickName\n"
-
-msgid ""
-"      **FAIL**  REQUIRED ShortNickName\n"
-"                REF: Page 64-65, section 5.3.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK ShortNickName\n"
-"                  Viide: lk 64-65, sektsioon 5.3.\n"
-
-msgid ""
-"      **FAIL**  BAD JobPatchFile attribute in file\n"
-"                REF: Page 24, section 3.4.\n"
-msgstr ""
-"      **EBAÕNN**  VIGANE JobPatchFile atribuut failis\n"
-"                  Viide: lk 24, sektsioon 3.4.\n"
-
-msgid ""
-"      **FAIL**  REQUIRED PageSize\n"
-"                REF: Page 41, section 5.\n"
-"                REF: Page 99, section 5.14.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK PageSize\n"
-"                  Viide: lk 41, sektsioon 5.\n"
-"                  Viide: lk 99, sektsioon 5.14.\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
-"                REF: Page 41, section 5.\n"
-"                REF: Page 102, section 5.15.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK ImageableArea PageSize %s jaoks\n"
-"                  Viide: lk 41, sektsioon 5.\n"
-"                  Viide: lk 102, sektsioon 5.15.\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
-"                REF: Page 41, section 5.\n"
-"                REF: Page 103, section 5.15.\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK PaperDimension PageSize %s jaoks\n"
-"                  Viide: lk 41, sektsioon 5.\n"
-"                  Viide: lk 103, sektsioon 5.15.\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Bad %s choice %s!\n"
-"                REF: Page 84, section 5.9\n"
-msgstr ""
-"      **EBAÕNN**  Vigane %s valik %s!\n"
-"                  Viide: lk 84, sektsioon 5.9\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  REQUIRED %s does not define choice None!\n"
-"                REF: Page 122, section 5.17\n"
-msgstr ""
-"      **EBAÕNN**  VAJALIK %s ei defineeri valikut None!\n"
-"                  Viide: lk 122, sektsioon 5.17\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Bad %s choice %s!\n"
-"                REF: Page 122, section 5.17\n"
-msgstr ""
-"      **EBAÕNN**  Vigane %s valik %s!\n"
-"                  Viide: lk 122, sektsioon 5.17\n"
-
 msgid " PASS\n"
 msgstr " SOORITATUD\n"
 
 #, c-format
-msgid ""
-"        WARN    Duplex option keyword %s should be named Duplex or "
-"JCLDuplex!\n"
-"                REF: Page 122, section 5.17\n"
-msgstr ""
-"        HOIATUS    Dupleksi võtme võtmesõna %s peab olema nimega Duplex või "
-"JCLDuplex!\n"
-"                   Viide: lk 122, sektsioon 5.17\n"
+msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
+msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f baiti\n"
 
-msgid "        WARN    Default choices conflicting!\n"
-msgstr "        HOIATUS    Vaikevalikud on konfliktis!\n"
+#, c-format
+msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
+msgstr "%-7s %-7.7s %-7d %-31.31s %.0f baiti\n"
+
+#, c-format
+msgid "%s accepting requests since %s\n"
+msgstr "%s võtab soove vastu alates %s\n"
+
+#, c-format
+msgid "%s cannot be changed."
+msgstr "%s ei ole muudetav."
+
+#, c-format
+msgid "%s is not implemented by the CUPS version of lpc.\n"
+msgstr "%s on CUPS-i lpc versioonis toetamata.\n"
+
+#, c-format
+msgid "%s is not ready\n"
+msgstr "%s ei ole valmis\n"
+
+#, c-format
+msgid "%s is ready\n"
+msgstr "%s on valmis\n"
+
+#, c-format
+msgid "%s is ready and printing\n"
+msgstr "%s on valmis ja trükib"
 
 #, c-format
 msgid ""
-"        WARN    Obsolete PPD version %.1f!\n"
-"                REF: Page 42, section 5.2.\n"
+"%s not accepting requests since %s -\n"
+"\t%s\n"
 msgstr ""
-"        HOIATUS    Iganenud PPD versioon %.1f!\n"
-"                   Viide: lk 42, sektsioon 5.2.\n"
+"%s ei võta soove vastu alates %s -\n"
+"\t%s\n"
 
-msgid ""
-"        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
-"                REF: Pages 56-57, section 5.3.\n"
-msgstr ""
-"        HOIATUS    LanguageEncoding on PPD 4.3 spetsifikatsiooni järgi "
-"nõutav.\n"
-"                   Viide: lk 56-57, sektsioon 5.3.\n"
+#, c-format
+msgid "%s not supported!"
+msgstr "%s pole toetatud!"
 
-msgid ""
-"        WARN    Manufacturer required by PPD 4.3 spec.\n"
-"                REF: Pages 58-59, section 5.3.\n"
-msgstr ""
-"        HOIATUS    Manufacturer on PPD 4.3 spetsifikatsiooni järgi nõutav.\n"
-"                   Viide: lk 58-59, sektsioon 5.3.\n"
-
-msgid ""
-"        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
-"                REF: Pages 61-62, section 5.3.\n"
-msgstr ""
-"        HOIATUS    PCFileName pikem kui 8.3 läheb vastuollu PPD "
-"spetsifikatsiooniga.\n"
-"                   Viide: lk 61-62, sektsioon 5.3.\n"
-
-msgid ""
-"        WARN    ShortNickName required by PPD 4.3 spec.\n"
-"                REF: Pages 64-65, section 5.3.\n"
-msgstr ""
-"        HOIATUS    ShortNickName on PPD 4.3 spetsifikatsiooni järgi nõutav.\n"
-"                   Viide: lk 64-65, sektsioon 5.3.\n"
-
-msgid ""
-"        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
-"                REF: Pages 78-79, section 5.7.\n"
-msgstr ""
-"        HOIATUS    Protocols sisaldab nii PJL kui ka BCP; oodati TBCP.\n"
-"                   Viide: lk 78-79, sektsioon 5.7.\n"
-
-msgid ""
-"        WARN    Protocols contains PJL but JCL attributes are not set.\n"
-"                REF: Pages 78-79, section 5.7.\n"
-msgstr ""
-"        HOIATUS    Protocols sisaldab PJL, kuid JCL atribuudid pole "
-"määratud.\n"
-"                   Viide: lk 78-79, sektsioon 5.7.\n"
+#, c-format
+msgid "%s/%s accepting requests since %s\n"
+msgstr "%s/%s võtab soove vastu alates %s\n"
 
 #, c-format
 msgid ""
-"        WARN    %s shares a common prefix with %s\n"
-"                REF: Page 15, section 3.2.\n"
+"%s/%s not accepting requests since %s -\n"
+"\t%s\n"
 msgstr ""
-"        HOIATUS    %s on sama prefiksiga, mis %s\n"
-"                   Viide: lk 15, sektsioon 3.2.\n"
+"%s/%s ei võta soove vastu alates %s -\n"
+"\t%s\n"
 
 #, c-format
-msgid "    %d ERROR%s FOUND\n"
-msgstr "    %d VIGA%s LEITUD\n"
+msgid "%s: %-33.33s [job %d localhost]\n"
+msgstr "%s: %-33.33s [töö %d localhost]\n"
 
-msgid "    NO ERRORS FOUND\n"
-msgstr "    VIGU EI LEITUD\n"
+#, c-format
+msgid "%s: %s failed: %s\n"
+msgstr "%s: %s ebaõnnestus: %s\n"
+
+#, c-format
+msgid "%s: Don't know what to do!\n"
+msgstr "%s: ei tea, mida ette võtta!\n"
 
 #, c-format
 msgid ""
-"        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
-"                (constraint=\"%s %s %s %s\")\n"
+"%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr "%s: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
+
+#, c-format
+msgid "%s: Error - bad job ID!\n"
+msgstr "%s: viga - vigane töö ID!\n"
+
+#, c-format
+msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
+msgstr "%s: viga - faile trükkida ja töid muuta ei saa ühel ajal!\n"
+
+#, c-format
+msgid ""
+"%s: Error - cannot print from stdin if files or a job ID are provided!\n"
 msgstr ""
-"        HOIATUS    \"%s %s\" on konfliktis \"%s %s\"\n"
-"                   (constraint=\"%s %s %s %s\")\n"
+"%s: viga - standardsisendist ei saa trükkida, kui antud on failid või töö "
+"ID!\n"
+
+#, c-format
+msgid "%s: Error - expected character set after '-S' option!\n"
+msgstr "%s: viga - võtme '-S' järel oodati märgistikku!\n"
+
+#, c-format
+msgid "%s: Error - expected content type after '-T' option!\n"
+msgstr "%s: viga - võtme '-T' järel oodati sisu tüüpi!\n"
+
+#, c-format
+msgid "%s: Error - expected copies after '-n' option!\n"
+msgstr "%s: viga - võtme '-n' järel oodati koopiaid!\n"
+
+#, c-format
+msgid "%s: Error - expected copy count after '-#' option!\n"
+msgstr "%s: viga - võtme '-#' järel oodati koopiate arvu!\n"
+
+#, c-format
+msgid "%s: Error - expected destination after '-P' option!\n"
+msgstr "%s: viga - võtme '-P' järel oodati sihtkohta!\n"
+
+#, c-format
+msgid "%s: Error - expected destination after '-b' option!\n"
+msgstr "%s: viga - võtme '-b' järel oodati sihtkohta!\n"
+
+#, c-format
+msgid "%s: Error - expected destination after '-d' option!\n"
+msgstr "%s: viga - võtme '-d' järel oodati sihtkohta!\n"
+
+#, c-format
+msgid "%s: Error - expected form after '-f' option!\n"
+msgstr "%s: viga - võtme '-f' järel oodati vormi!\n"
+
+#, c-format
+msgid "%s: Error - expected hold name after '-H' option!\n"
+msgstr "%s: viga - võtme '-H' järel oodati hoitava nime!\n"
+
+#, c-format
+msgid "%s: Error - expected hostname after '-H' option!\n"
+msgstr "%s: viga - võtme '-H' järel oodati masinanime!\n"
+
+#, c-format
+msgid "%s: Error - expected hostname after '-h' option!\n"
+msgstr "%s: viga - võtme '-h' järel oodati masinanime!\n"
+
+#, c-format
+msgid "%s: Error - expected mode list after '-y' option!\n"
+msgstr "%s: viga - võtme '-y' järel oodati režiimiloendit!\n"
+
+#, c-format
+msgid "%s: Error - expected name after '-%c' option!\n"
+msgstr "%s: viga - võtme '-%c' järel oodati nime!\n"
+
+#, c-format
+msgid "%s: Error - expected option string after '-o' option!\n"
+msgstr "%s: viga - võtme '-o' järel oodati võtmestringi!\n"
+
+#, c-format
+msgid "%s: Error - expected page list after '-P' option!\n"
+msgstr "%s: viga - võtme '-P' järel oodati leheloendit!\n"
+
+#, c-format
+msgid "%s: Error - expected priority after '-%c' option!\n"
+msgstr "%s: viga - võtme '-%c' järel oodati prioriteeti!\n"
+
+#, c-format
+msgid "%s: Error - expected reason text after '-r' option!\n"
+msgstr "%s: viga - võtme '-r' järel oodati teksti!\n"
+
+#, c-format
+msgid "%s: Error - expected title after '-t' option!\n"
+msgstr "%s: viga - võtme '-t' järel oodati tiitlit!\n"
+
+#, c-format
+msgid "%s: Error - expected username after '-U' option!\n"
+msgstr "%s: viga - võtme '-U' järel oodati kasutajanime!\n"
+
+#, c-format
+msgid "%s: Error - expected username after '-u' option!\n"
+msgstr "%s: viga - võtme '-u' järel oodati kasutajanime!\n"
+
+#, c-format
+msgid "%s: Error - expected value after '-%c' option!\n"
+msgstr "%s: viga - võtme '-%c' järel oodati väärtust!\n"
+
+#, c-format
+msgid ""
+"%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
+"option!\n"
+msgstr ""
+"%s: viga - võtme '-W' järel on vajalik \"completed\", \"not-completed\" või "
+"\"all\"!\n"
+
+#, c-format
+msgid "%s: Error - no default destination available.\n"
+msgstr "%s: viga - vaikimisi sihtkoht pole saadaval.\n"
+
+#, c-format
+msgid "%s: Error - priority must be between 1 and 100.\n"
+msgstr "%s: viga - prioriteet peab olema vahemikus 1 kuni 100.\n"
+
+#, c-format
+msgid "%s: Error - scheduler not responding!\n"
+msgstr "%s: viga - ajastaja ei vasta!\n"
+
+#, c-format
+msgid "%s: Error - stdin is empty, so no job has been sent.\n"
+msgstr "%s: viga - standardsisend on tühi, ühtegi tööd ei saadetud.\n"
+
+#, c-format
+msgid "%s: Error - too many files - \"%s\"\n"
+msgstr "%s: viga - liiga palju faile - \"%s\"\n"
+
+#, c-format
+msgid "%s: Error - unable to access \"%s\" - %s\n"
+msgstr "%s: viga - ei õnnestu ligipääs \"%s\" - %s\n"
+
+#, c-format
+msgid "%s: Error - unable to create temporary file \"%s\" - %s\n"
+msgstr "%s: viga - ei õnnestu luua ajutist faili \"%s\" - %s\n"
+
+#, c-format
+msgid "%s: Error - unable to write to temporary file \"%s\" - %s\n"
+msgstr "%s: viga - ei õnnestu kirjutada ajutisse faili \"%s\" - %s\n"
+
+#, c-format
+msgid "%s: Error - unknown destination \"%s\"!\n"
+msgstr "%s: viga - tundmatu sihtkoht \"%s\"!\n"
+
+#, c-format
+msgid "%s: Error - unknown destination \"%s/%s\"!\n"
+msgstr "%s: viga - tundmatu sihtkoht \"%s/%s\"!\n"
+
+#, c-format
+msgid "%s: Error - unknown option '%c'!\n"
+msgstr "%s: viga - tundmatu võti '%c'!\n"
+
+#, c-format
+msgid "%s: Expected job ID after '-i' option!\n"
+msgstr "%s: võtme '-i' järel oodati töö ID-d!\n"
+
+#, c-format
+msgid "%s: Invalid destination name in list \"%s\"!\n"
+msgstr "%s: vigane sihtkoha nimi loendis \"%s\"!\n"
+
+#, c-format
+msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
+msgstr "%s: enne '-H restart' on vajalik töö ID ('-i tööid')!\n"
+
+#, c-format
+msgid "%s: Operation failed: %s\n"
+msgstr "%s: toiming ebaõnnestus: %s\n"
+
+#, c-format
+msgid "%s: Sorry, no encryption support compiled in!\n"
+msgstr "%s: vabandust, krüptotoetus pole kompileeritud!\n"
+
+#, c-format
+msgid "%s: Unable to connect to server\n"
+msgstr "%s: ei õnnestu saada ühendust serveriga\n"
+
+#, c-format
+msgid "%s: Unable to connect to server: %s\n"
+msgstr "%s: ei õnnestu saada ühendust serveriga: %s\n"
+
+#, c-format
+msgid "%s: Unable to contact server!\n"
+msgstr "%s: ei õnnestu saada ühendust serveriga!\n"
+
+#, c-format
+msgid "%s: Unknown destination \"%s\"!\n"
+msgstr "%s: tundmatu sihtkoht \"%s\"!\n"
+
+#, c-format
+msgid ""
+"%s: Warning - '%c' format modifier not supported - output may not be "
+"correct!\n"
+msgstr ""
+"%s: hoiatus - '%c' vormingus modifikaator pole toetatud - väljund võib olla "
+"vigane!\n"
+
+#, c-format
+msgid "%s: Warning - character set option ignored!\n"
+msgstr "%s: hoiatus - märgistikuvõtit ignoreeritakse!\n"
+
+#, c-format
+msgid "%s: Warning - content type option ignored!\n"
+msgstr "%s: hoiatus - sisu tüübi võtit ignoreeritakse!\n"
+
+#, c-format
+msgid "%s: Warning - form option ignored!\n"
+msgstr "%s: hoiatus - vormivõtit ignoreeritakse!\n"
+
+#, c-format
+msgid "%s: Warning - mode option ignored!\n"
+msgstr "%s: hoiatus - režiimivõtit ignoreeritakse!\n"
+
+#, c-format
+msgid ""
+"%s: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr "%s: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
+
+#, c-format
+msgid "%s: error - expected option=value after '-o' option!\n"
+msgstr "%s: viga - võtme '-o' järel oodati võti=väärtus!\n"
+
+#, c-format
+msgid "%s: error - no default destination available.\n"
+msgstr "%s: viga - vaikimisi sihtkoht pole saadaval.\n"
+
+msgid "?Invalid help command unknown\n"
+msgstr "?Vigane abikäsk tundmatu"
+
+msgid "A Samba password is required to export printer drivers!"
+msgstr "Printeridraiverite ekspordiks on nõutav Samba parool!"
+
+msgid "A Samba username is required to export printer drivers!"
+msgstr "Printeridraiverite ekspordiks on nõutav Samba kasutajanimi!"
+
+#, c-format
+msgid "A class named \"%s\" already exists!"
+msgstr "Klass nimega \"%s\" on juba olemas!"
+
+#, c-format
+msgid "A printer named \"%s\" already exists!"
+msgstr "Printer nimega \"%s\" on juba olemas!"
+
+msgid "Accept Jobs"
+msgstr "Nõustu töödega"
+
+msgid "Add Class"
+msgstr "Klassi lisamine"
+
+msgid "Add Printer"
+msgstr "Printeri lisamine"
+
+msgid "Add RSS Subscription"
+msgstr ""
+
+msgid "Administration"
+msgstr "Haldus"
+
+#, c-format
+msgid "Attempt to set %s printer-state to bad value %d!"
+msgstr "Katse määrata %s printer-state vigase väärtusega %d!"
+
+#, c-format
+msgid "Attribute groups are out of order (%x < %x)!"
+msgstr "Atribuudigrupid pole õiges järjekorras (%x < %x)!"
+
+msgid "Bad OpenGroup"
+msgstr "Vigane OpenGroup"
+
+msgid "Bad OpenUI/JCLOpenUI"
+msgstr "Vigane OpenUI/JCLOpenUI"
+
+msgid "Bad OrderDependency"
+msgstr "Vigane OrderDependency"
+
+msgid "Bad UIConstraints"
+msgstr "Vigane UIConstraints"
+
+#, c-format
+msgid "Bad copies value %d."
+msgstr "Vigane koopiate väärtus %d."
+
+msgid "Bad custom parameter"
+msgstr "Vigane kohandatud parameeter"
+
+#, c-format
+msgid "Bad device-uri \"%s\"!"
+msgstr "Vigane device-uri \"%s\"!"
+
+#, c-format
+msgid "Bad document-format \"%s\"!"
+msgstr "Vigane document-format \"%s\"!"
+
+msgid "Bad job-priority value!"
+msgstr "Vigane töö prioriteedi väärtus!"
+
+msgid "Bad job-state value!"
+msgstr "Vigane job-state väärtus!"
+
+#, c-format
+msgid "Bad job-uri attribute \"%s\"!"
+msgstr "Vigane job-uri atribuut \"%s\"!"
+
+#, fuzzy, c-format
+msgid "Bad notify-pull-method \"%s\"!"
+msgstr "Vigane port-monitor \"%s\"!"
+
+#, fuzzy, c-format
+msgid "Bad notify-recipient-uri URI \"%s\"!"
+msgstr "Vigane port-monitor \"%s\"!"
+
+#, fuzzy, c-format
+msgid "Bad number-up value %d."
+msgstr "Vigane koopiate väärtus %d."
+
+#, fuzzy, c-format
+msgid "Bad option + choice on line %d!"
+msgstr "Vigane võti + valik real %d!\n"
+
+#, c-format
+msgid "Bad page-ranges values %d-%d."
+msgstr "Vigased lehevahemike väärtused %d-%d."
+
+#, c-format
+msgid "Bad port-monitor \"%s\"!"
+msgstr "Vigane port-monitor \"%s\"!"
+
+#, c-format
+msgid "Bad printer-state value %d!"
+msgstr "Vigane printer-state väärtus %d!"
+
+#, c-format
+msgid "Bad request version number %d.%d!"
+msgstr "Vigane soovi versiooninumber %d.%d!"
+
+#, fuzzy
+msgid "Bad subscription ID!"
+msgstr "Tellimusi ei leitud."
+
+msgid "Banners"
+msgstr "Bännerid"
+
+msgid "Cancel RSS Subscription"
+msgstr ""
+
+msgid "Change Settings"
+msgstr "Seadistuste muutmine"
+
+#, c-format
+msgid "Character set \"%s\" not supported!"
+msgstr "Märgistik \"%s\" pole toetatud!"
+
+msgid "Classes"
+msgstr "Klassid"
 
 msgid ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
-"gz]]\n"
-"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
+"Commands may be abbreviated.  Commands are:\n"
+"\n"
+"exit    help    quit    status  ?\n"
 msgstr ""
-"Kasutamine: cupstestppd [-q] [-r] [-v[v]] failinimi1.ppd[.gz] [... "
-"failinimiN.ppd[.gz]]\n"
-"            program | cupstestppd [-q] [-r] [-v[v]] -\n"
+"Käske võib lühendada. Käsud on järgmised:\n"
+"\n"
+"exit    help    quit    status  ?\n"
 
-msgid "lpstat: Need \"completed\" or \"not-completed\" after -W!\n"
-msgstr "lpstat: pärast -W on vajalik \"completed\" või \"not-completed\"!\n"
+#, c-format
+msgid "Could not scan type \"%s\"!"
+msgstr "Tüübi \"%s\" uurimine ebaõnnestus!"
 
-msgid "lpstat: The -b option requires a destination argument.\n"
-msgstr "lpstat: võti -b nõuab sihtkoha argumenti.\n"
+msgid "Cover open."
+msgstr ""
+
+msgid "Custom"
+msgstr "Kohandatud"
+
+#, c-format
+msgid "DEBUG: %d files to send in job...\n"
+msgstr ""
+
+msgid "DEBUG: Getting supported attributes...\n"
+msgstr ""
+
+#, c-format
+msgid "DEBUG: Sending print file, %lld bytes...\n"
+msgstr ""
+
+msgid "Delete Class"
+msgstr "Klassi kustutamine"
+
+msgid "Delete Printer"
+msgstr "Printeri kustutamine"
+
+#, c-format
+msgid "Destination \"%s\" is not accepting jobs."
+msgstr "Sihtkoht \"%s\" ei võta töid vastu."
+
+msgid "Developer almost empty."
+msgstr ""
+
+msgid "Developer empty!"
+msgstr ""
+
+#, c-format
+msgid ""
+"Device: uri = %s\n"
+"        class = %s\n"
+"        info = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+msgstr ""
+"Seade: uri = %s\n"
+"       klass = %s\n"
+"       info = %s\n"
+"       valmistaja-ja-mudel = %s\n"
+"       seadme-id = %s\n"
+
+msgid "Door open."
+msgstr ""
+
+#, fuzzy, c-format
+msgid "EMERG: Unable to allocate memory for page info: %s\n"
+msgstr "Failitüüpidele ei õnnestu mälu eraldada!"
+
+#, fuzzy, c-format
+msgid "EMERG: Unable to allocate memory for pages array: %s\n"
+msgstr "Failitüüpidele ei õnnestu mälu eraldada!"
+
+#, fuzzy, c-format
+msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
+msgstr "lpoptions: ei õnnestu lisada printerit või isendit: %s\n"
+
+#, c-format
+msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Bad %%IncludeFeature: comment!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Bad %%Page: comment in file!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Bad %%PageBoundingBox: comment in file!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "ERROR: Bad SCSI device file \"%s\"!\n"
+msgstr "Vigane device-uri \"%s\"!"
+
+#, c-format
+msgid "ERROR: Bad charset file %s\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Bad charset type %s\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Bad font description line: %s\n"
+msgstr ""
+
+msgid "ERROR: Bad page setup!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Bad text direction %s\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Bad text width %s\n"
+msgstr ""
+
+msgid "ERROR: Destination printer does not exist!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Duplicate %%BoundingBox: comment seen!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Duplicate %%Pages: comment seen!\n"
+msgstr ""
+
+#, fuzzy
+msgid "ERROR: Empty print file!\n"
+msgstr "PPD-faili kopeerimine ebaõnnestus!"
+
+msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Missing %%EndProlog!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Missing %%EndSetup!\n"
+msgstr ""
+
+msgid ""
+"ERROR: Missing device URI on command-line and no DEVICE_URI environment "
+"variable!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: No %%BoundingBox: comment in header!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: No %%Pages: comment in header!\n"
+msgstr ""
+
+msgid ""
+"ERROR: No device URI found in argv[0] or in DEVICE_URI environment "
+"variable!\n"
+msgstr ""
+
+msgid "ERROR: No pages found!\n"
+msgstr ""
+
+msgid "ERROR: Out of paper!\n"
+msgstr ""
+
+msgid "ERROR: PRINTER environment variable not defined!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Print file was not accepted (%s)!\n"
+msgstr ""
+
+#, fuzzy
+msgid "ERROR: Printer not responding!\n"
+msgstr "Printer ei ole ühiskasutuses!"
+
+#, c-format
+msgid "ERROR: Remote host did not accept control file (%d)\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Remote host did not accept data file (%d)\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to add file %d to job: %s\n"
+msgstr "lpadmin: ei õnnestu avada faili \"%s\": %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to cancel job %d: %s\n"
+msgstr "lprm: tööde katkestamine ei ole võimalik!\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to create temporary compressed print file: %s\n"
+msgstr "lpadmin: ei õnnestu luua ajutist faili: %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to create temporary file - %s.\n"
+msgstr "lpadmin: ei õnnestu luua ajutist faili - %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to create temporary file: %s\n"
+msgstr "lpadmin: ei õnnestu luua ajutist faili: %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to exec pictwpstops: %s\n"
+msgstr "%s: ei õnnestu saada ühendust serveriga: %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to fork pictwpstops: %s\n"
+msgstr "Protsessi harutamine ebaõnnestus!"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to get PPD file for printer \"%s\" - %s.\n"
+msgstr "cupsaddsmb: puudub PPD-fail printerile \"%s\" - %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to get job %d attributes (%s)!\n"
+msgstr "Printeri atribuutide hankimine ebaõnnestus!"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to get printer status (%s)!\n"
+msgstr "Printeri oleku hankimine ebaõnnestus:"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to locate printer '%s'!\n"
+msgstr "Printeri muutmine ebaõnnestus:"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to open \"%s\" - %s\n"
+msgstr "lp: ei õnnestu ligipääs \"%s\" - %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to open %s: %s\n"
+msgstr "cupsaddsmb: \"%s\" käivitamine ebaõnnestus: %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to open device file \"%s\": %s\n"
+msgstr "lpadmin: ei õnnestu avada faili \"%s\": %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to open file \"%s\" - %s\n"
+msgstr "lpadmin: ei õnnestu avada faili \"%s\": %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to open file \"%s\": %s\n"
+msgstr "lpadmin: ei õnnestu avada faili \"%s\": %s\n"
+
+#, fuzzy
+msgid "ERROR: Unable to open image file for printing!\n"
+msgstr "lpoptions: ei õnnestu avada PPD-faili %s jaoks!\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to open print file \"%s\": %s\n"
+msgstr "lpadmin: ei õnnestu avada faili \"%s\": %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to open print file %s - %s\n"
+msgstr "lpadmin: ei õnnestu avada PPD-faili \"%s\" - %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to open print file %s: %s\n"
+msgstr "lp: ei õnnestu trükkida faili: %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to open temporary compressed print file: %s\n"
+msgstr "lpadmin: ei õnnestu luua ajutist faili: %s\n"
+
+#, c-format
+msgid "ERROR: Unable to seek to offset %ld in file - %s\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Unable to seek to offset %lld in file - %s\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to send print data (%d)\n"
+msgstr "Ei õnnestu määrata Windowsi printeridraiverit (%d)!\n"
+
+#, c-format
+msgid "ERROR: Unable to wait for pictwpstops: %s\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to write %d bytes to \"%s\": %s\n"
+msgstr "cupsaddsmb: \"%s\" käivitamine ebaõnnestus: %s\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unable to write print data: %s\n"
+msgstr "lp: ei õnnestu trükkida faili: %s\n"
+
+#, fuzzy
+msgid "ERROR: Unable to write raster data to driver!\n"
+msgstr "Printeri atribuutide hankimine ebaõnnestus!"
+
+#, c-format
+msgid "ERROR: Unable to write uncompressed document data: %s\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "ERROR: Unknown encryption option value \"%s\"!\n"
+msgstr "%s: tundmatu sihtkoht \"%s\"!\n"
+
+#, c-format
+msgid "ERROR: Unknown file order \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Unknown format character \"%c\"\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "ERROR: Unknown option \"%s\" with value \"%s\"!\n"
+msgstr "cupsd: tundmatu võti \"%c\" - loobutakse!\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unknown print mode \"%s\"\n"
+msgstr "%s: tundmatu sihtkoht \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "ERROR: Unknown version option value \"%s\"!\n"
+msgstr "%s: tundmatu sihtkoht \"%s\"!\n"
+
+#, c-format
+msgid "ERROR: Unsupported brightness value %s, using brightness=100!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Unsupported gamma value %s, using gamma=1000!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Unsupported number-up value %d, using number-up=1!\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"ERROR: Unsupported number-up-layout value %s, using number-up-layout=lrtb!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Unsupported page-border value %s, using page-border=none!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: pictwpstops exited on signal %d!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "ERROR: pictwpstops exited with status %d!\n"
+msgstr "cupsaddsmb ebaõnnestus olekuga %d"
+
+msgid ""
+"ERROR: recoverable: Unable to connect to printer; will retry in 30 "
+"seconds...\n"
+msgstr ""
+
+msgid "Edit Configuration File"
+msgstr "Seadistustefaili muutmine"
+
+#, fuzzy
+msgid "Empty PPD file!"
+msgstr "PPD-faili kopeerimine ebaõnnestus!"
+
+msgid "Ending Banner"
+msgstr "Lõpetav bänner"
+
+msgid "Enter old password:"
+msgstr "Vana parool:"
+
+msgid "Enter password again:"
+msgstr "Parool teist korda:"
+
+msgid "Enter password:"
+msgstr "Parool:"
+
+#, fuzzy
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Selle lehekülje avamiseks andke enda või administraatori (root) kasutajanimi "
+"ja parool."
+
+msgid "Error Policy"
+msgstr "Veareegel"
 
 msgid "Error: need hostname after '-h' option!\n"
 msgstr "Viga: pärast võtit '-h' on vajalik masinanimi!\n"
 
-#, c-format
-msgid "lpstat: Unknown option '%c'!\n"
-msgstr "lpstat: tundmatu võti '%c'!\n"
+msgid "Export Printers to Samba"
+msgstr "Printerite eksport Sambasse"
+
+msgid "FAIL\n"
+msgstr "EBAÕNN\n"
 
 #, c-format
-msgid "lpstat: Invalid destination name in list \"%s\"!\n"
-msgstr "lpstat: vigane sihtkoha nimi loendis \"%s\"!\n"
+msgid "FATAL: Could not load %s\n"
+msgstr ""
 
 #, c-format
-msgid "lpstat: Unknown destination \"%s\"!\n"
-msgstr "lpstat: tundmatu sihtkoht \"%s\"!\n"
+msgid ""
+"File device URIs have been disabled! To enable, see the FileDevice directive "
+"in \"%s/cupsd.conf\"."
+msgstr ""
+"Failiseadme URI-d on keelatud! Nende lubamiseks vaadake FileDevice "
+"direktiivi failis \"%s/cupsd.conf\"."
+
+msgid "Fuser temperature high!"
+msgstr ""
+
+msgid "Fuser temperature low!"
+msgstr ""
+
+msgid "General"
+msgstr "Üldine"
+
+msgid "Got a printer-uri attribute but no job-id!"
+msgstr "Saadi printer-uri atribuut, aga mitte job-id!"
+
+msgid "Help"
+msgstr "Abi"
 
 #, c-format
-msgid "lpstat: Unable to connect to server %s on port %d: %s\n"
+msgid "INFO: Attempting to connect to host %s for printer %s\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "INFO: Attempting to connect to host %s on port %d\n"
 msgstr "lpstat: ei õnnestu saada ühendust serveriga %s pordis %d: %s\n"
 
-#, c-format
-msgid "lpstat: get-printers failed: %s\n"
-msgstr "lpstat: get-printers ebaõnnestus: %s\n"
-
-#, c-format
-msgid "%s accepting requests since Jan 01 00:00\n"
-msgstr "%s võtab soove vastu alates 01. jaan 00:00\n"
-
-#, c-format
-msgid ""
-"%s not accepting requests since Jan 01 00:00 -\n"
-"\t%s\n"
+msgid "INFO: Canceling print job...\n"
 msgstr ""
-"%s ei võta soove vastu alates 01. jaan 00:00 -\n"
-"\t%s\n"
 
 #, c-format
-msgid "%s/%s accepting requests since Jan 01 00:00\n"
-msgstr "%s/%s võtab soove vastu alates 01. jaan 00:00\n"
-
-#, c-format
-msgid ""
-"%s/%s not accepting requests since Jan 01 00:00 -\n"
-"\t%s\n"
+msgid "INFO: Connected to %s...\n"
 msgstr ""
-"%s/%s ei võta soove vastu alates 01. jaan 00:00 -\n"
-"\t%s\n"
 
 #, c-format
-msgid "lpstat: get-classes failed: %s\n"
-msgstr "lpstat: get-classes ebaõnnestus: %s\n"
+msgid "INFO: Connecting to %s on port %d...\n"
+msgstr ""
+
+msgid "INFO: Control file sent successfully\n"
+msgstr ""
+
+msgid "INFO: Data file sent successfully\n"
+msgstr ""
 
 #, c-format
-msgid "members of class %s:\n"
-msgstr "klassi %s liikmed:\n"
+msgid "INFO: Formatting page %d...\n"
+msgstr ""
+
+msgid "INFO: Loading image file...\n"
+msgstr ""
+
+msgid "INFO: Print file sent, waiting for printer to finish...\n"
+msgstr ""
 
 #, c-format
-msgid "system default destination: %s/%s\n"
-msgstr "süsteemi vaikimisi sihtkoht: %s/%s\n"
+msgid "INFO: Printer busy (status:0x%08x)\n"
+msgstr ""
+
+msgid "INFO: Printer busy; will retry in 10 seconds...\n"
+msgstr ""
+
+msgid "INFO: Printer busy; will retry in 30 seconds...\n"
+msgstr ""
+
+msgid "INFO: Printer busy; will retry in 5 seconds...\n"
+msgstr ""
+
+msgid "INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n"
+msgstr ""
+
+msgid "INFO: Printer is busy; will retry in 5 seconds...\n"
+msgstr ""
+
+msgid "INFO: Printer is currently off-line.\n"
+msgstr ""
+
+msgid "INFO: Printer is now on-line.\n"
+msgstr ""
+
+msgid "INFO: Printer not connected; will retry in 30 seconds...\n"
+msgstr ""
 
 #, c-format
-msgid "system default destination: %s\n"
-msgstr "süsteemi vaikimisi sihtkoht: %s\n"
+msgid "INFO: Printing page %d, %d%% complete...\n"
+msgstr ""
+
+#, c-format
+msgid "INFO: Printing page %d...\n"
+msgstr ""
+
+msgid "INFO: Ready to print.\n"
+msgstr ""
+
+#, c-format
+msgid "INFO: Sending control file (%lu bytes)\n"
+msgstr ""
+
+#, c-format
+msgid "INFO: Sending control file (%u bytes)\n"
+msgstr ""
+
+msgid "INFO: Sending data\n"
+msgstr ""
+
+#, c-format
+msgid "INFO: Sending data file (%ld bytes)\n"
+msgstr ""
+
+#, c-format
+msgid "INFO: Sending data file (%lld bytes)\n"
+msgstr ""
+
+#, c-format
+msgid "INFO: Sent print file, %ld bytes...\n"
+msgstr ""
+
+#, c-format
+msgid "INFO: Sent print file, %lld bytes...\n"
+msgstr ""
+
+#, c-format
+msgid "INFO: Spooling LPR job, %.0f%% complete...\n"
+msgstr ""
+
+msgid "INFO: Unable to contact printer, queuing on next printer in class...\n"
+msgstr ""
+
+msgid "INFO: Waiting for job to complete...\n"
+msgstr ""
+
+msgid "Illegal control character"
+msgstr "Lubamatu juhtmärk"
+
+msgid "Illegal main keyword string"
+msgstr "Lubamatu peamine võtmesõnastring"
+
+msgid "Illegal option keyword string"
+msgstr "Lubamatu võtme võtmesõnastring"
+
+msgid "Illegal translation string"
+msgstr "Lubamatu tõlkestring"
+
+msgid "Illegal whitespace character"
+msgstr "Lubamatu tühimärk"
+
+msgid "Ink/toner almost empty."
+msgstr ""
+
+msgid "Ink/toner empty!"
+msgstr ""
+
+msgid "Ink/toner waste bin almost full."
+msgstr ""
+
+msgid "Ink/toner waste bin full!"
+msgstr ""
+
+msgid "Interlock open."
+msgstr ""
+
+msgid "Internal error"
+msgstr "Sisemine viga"
+
+msgid "JCL"
+msgstr "JCL"
+
+#, c-format
+msgid "Job #%d cannot be restarted - no files!"
+msgstr "Tööd nr %d ei saa taaskäivitada - faile pole!"
+
+#, c-format
+msgid "Job #%d does not exist!"
+msgstr "Tööd nr %d ei ole olemas!"
+
+#, c-format
+msgid "Job #%d is already aborted - can't cancel."
+msgstr "Tööst nr %d on juba loobutud - enam ei saa katkestada."
+
+#, fuzzy, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "Töö nr %d on juba katkestatud - enam ei saa katkestada."
+
+#, c-format
+msgid "Job #%d is already completed - can't cancel."
+msgstr "Töö nr %d on juba lõpetatud - enam ei saa katkestada."
+
+#, c-format
+msgid "Job #%d is finished and cannot be altered!"
+msgstr "Töö nr %d on lõpetatud ja seda ei saa muuta!"
+
+#, c-format
+msgid "Job #%d is not complete!"
+msgstr "Töö nr %d ei ole lõpetatud!"
+
+#, c-format
+msgid "Job #%d is not held for authentication!"
+msgstr "Tööd nr %d ei hoita autentimiseks!"
+
+#, c-format
+msgid "Job #%d is not held!"
+msgstr "Tööd nr %d ei hoita!"
+
+#, c-format
+msgid "Job #%s does not exist!"
+msgstr "Tööd nr %s ei ole olemas!"
+
+#, c-format
+msgid "Job %d not found!"
+msgstr "Tööd %d ei leitud!"
+
+#, fuzzy
+msgid "Job Completed"
+msgstr "lõpetatud"
+
+msgid "Job Created"
+msgstr ""
+
+#, fuzzy
+msgid "Job Options Changed"
+msgstr "Töötoiming ebaõnnestus:"
+
+#, fuzzy
+msgid "Job Stopped"
+msgstr "peatatud"
+
+msgid "Job is completed and cannot be changed."
+msgstr "Töö on lõpetatud ja seda ei saa muuta."
+
+msgid "Job operation failed:"
+msgstr "Töötoiming ebaõnnestus:"
+
+msgid "Job state cannot be changed."
+msgstr "Töö olekut ei saa muuta."
+
+msgid "Job subscriptions cannot be renewed!"
+msgstr "Töötellimusi ei saa uuendada!"
+
+msgid "Jobs"
+msgstr "Tööd"
+
+#, c-format
+msgid "Language \"%s\" not supported!"
+msgstr "Keel \"%s\" pole toetatud!"
+
+msgid "Line longer than the maximum allowed (255 characters)"
+msgstr "Rida lubatust pikem (255 märki)"
+
+msgid "Media Size"
+msgstr "Türkimaterjali suurus"
+
+msgid "Media Source"
+msgstr "Trükimaterjali allikas"
+
+msgid "Media Type"
+msgstr "Trükimaterjali tüüp"
+
+#, fuzzy
+msgid "Media jam!"
+msgstr "Trükimaterjali tüüp"
+
+msgid "Media tray almost empty."
+msgstr ""
+
+msgid "Media tray empty!"
+msgstr ""
+
+msgid "Media tray missing!"
+msgstr ""
+
+msgid "Media tray needs to be filled."
+msgstr ""
+
+msgid "Memory allocation error"
+msgstr "Mälueralduse viga"
+
+msgid "Missing PPD-Adobe-4.x header"
+msgstr "Puudub PPD-Adobe-4.x päis"
+
+msgid "Missing asterisk in column 1"
+msgstr "Puudub tärn veerus 1"
+
+#, fuzzy, c-format
+msgid "Missing double quote on line %d!"
+msgstr "Puuduvad topeltjutumärgid real %d!\n"
+
+msgid "Missing form variable!"
+msgstr "Puudub vormi muutuja!"
+
+msgid "Missing notify-subscription-ids attribute!"
+msgstr "Puudub notify-subscription-ids atribuut!"
+
+msgid "Missing requesting-user-name attribute!"
+msgstr "Puudub requesting-user-name atribuut!"
+
+msgid "Missing required attributes!"
+msgstr "Nõutud atribuudid puuduvad!"
+
+#, fuzzy, c-format
+msgid "Missing value on line %d!"
+msgstr "Puudub väärtus real %d!\n"
+
+msgid "Missing value string"
+msgstr "Puudub väärtusestring"
 
 #, c-format
 msgid ""
-"lpstat: error - %s environment variable names non-existent destination \"%s"
-"\"!\n"
-msgstr "lpstat: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+msgstr ""
+"Mudel:  nimi = %s\n"
+"        loomulik_keel = %s\n"
+"        valmistaja-ja-mudel = %s\n"
+"        seadme-id = %s\n"
 
-msgid "no system default destination\n"
-msgstr "süsteemi vaikimisi sihtkoht puudub\n"
+msgid "Modify Class"
+msgstr "Klassi muutmine"
+
+msgid "Modify Printer"
+msgstr "Printeri muutmine"
+
+msgid "Move All Jobs"
+msgstr "Kõigi tööde liigutamine"
+
+msgid "Move Job"
+msgstr "Töö liigutamine"
 
 #, c-format
-msgid "Output for printer %s is sent to remote printer %s on %s\n"
-msgstr "Printeri %s väljund saadetakse võrguprinterisse %s masinas %s\n"
+msgid "NOTICE: Print file accepted - job ID %d.\n"
+msgstr ""
+
+msgid "NOTICE: Print file accepted - job ID unknown.\n"
+msgstr ""
+
+msgid "NULL PPD file pointer"
+msgstr "NULL PPD-faili viit"
+
+msgid "No"
+msgstr "i"
+
+msgid "No Windows printer drivers are installed!"
+msgstr "Ühtegi Windowsi printeridraiverit pole paigaldatud!"
+
+#, c-format
+msgid "No active jobs on %s!"
+msgstr "%s: pole ühtegi aktiivset tööd!"
+
+msgid "No attributes in request!"
+msgstr "Soovis puuduvad atribuudid!"
+
+msgid "No authentication information provided!"
+msgstr "Autentimisinfot pole antud!"
+
+msgid "No default printer"
+msgstr "Vaikimisi printer puudub"
+
+msgid "No destinations added."
+msgstr "Sihtkohti pole lisatud."
+
+msgid "No file!?!"
+msgstr "Faili polegi!?!"
+
+msgid "No subscription attributes in request!"
+msgstr "Soovis puuduvad tellimisatribuudid!"
+
+msgid "No subscriptions found."
+msgstr "Tellimusi ei leitud."
+
+msgid "None"
+msgstr "Puudub"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "OPC almost at end-of-life."
+msgstr ""
+
+msgid "OPC at end-of-life!"
+msgstr ""
+
+msgid "OpenGroup without a CloseGroup first"
+msgstr "OpenGroup ilma eelneva CloseGroup"
+
+msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
+msgstr "OpenUI/JCLOpenUI ilma eelneva CloseUI/JCLCloseUI"
+
+msgid "Operation Policy"
+msgstr "Toimimisreegel"
+
+msgid "Options Installed"
+msgstr "Paigaldatud valikud"
+
+msgid "Out of toner!"
+msgstr ""
+
+msgid "Output Mode"
+msgstr "Väljundirežiim"
+
+msgid "Output bin almost full."
+msgstr ""
+
+msgid "Output bin full!"
+msgstr ""
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
 msgstr "Printeri %s väljund saadetakse %s\n"
 
 #, c-format
-msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
-msgstr "Printeri %s/%s väljund saadetakse võrguprinterisse %s masinas %s\n"
+msgid "Output for printer %s is sent to remote printer %s on %s\n"
+msgstr "Printeri %s väljund saadetakse võrguprinterisse %s masinas %s\n"
 
 #, c-format
 msgid "Output for printer %s/%s is sent to %s\n"
 msgstr "Printeri %s/%s väljund saadetakse %s\n"
 
 #, c-format
-msgid "device for %s: %s\n"
-msgstr "seade %s jaoks: %s\n"
+msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
+msgstr "Printeri %s/%s väljund saadetakse võrguprinterisse %s masinas %s\n"
+
+msgid "Output tray missing!"
+msgstr ""
+
+msgid "PASS\n"
+msgstr "SOORITATUD\n"
+
+msgid "PS Binary Protocol"
+msgstr "PS binaarprotokoll"
 
 #, c-format
-msgid "device for %s/%s: %s\n"
-msgstr "seade %s/%s jaoks: %s\n"
+msgid "Password for %s on %s? "
+msgstr "Parool %s jaoks masinas %s? "
 
 #, c-format
-msgid "lpstat: get-jobs failed: %s\n"
-msgstr "lpstat: get-jobs ebaõnnestus: %s\n"
+msgid "Password for %s required to access %s via SAMBA: "
+msgstr "%s vajab parooli pääsemaks ligi %s SAMBA kaudu: "
 
-#, c-format
-msgid "\tqueued for %s\n"
-msgstr "\tjärjekorras %s jaoks\n"
+msgid "Policies"
+msgstr "Reeglid"
 
-#, c-format
-msgid "printer %s is idle.  enabled since %s\n"
-msgstr "printer %s on jõude.  sisse lülitatud alates %s\n"
+msgid "Print Job:"
+msgstr "Trükitöö:"
 
-#, c-format
-msgid "printer %s now printing %s-%d.  enabled since %s\n"
-msgstr "printer %s trükib praegu %s-%d.  sisse lülitatud alates %s\n"
+msgid "Print Test Page"
+msgstr "Testlehekülje trükkimine"
 
-#, c-format
-msgid "printer %s disabled since %s -\n"
-msgstr "printer %s välja lülitatud alates %s -\n"
+#, fuzzy
+msgid "Printer Added"
+msgstr "Printer"
 
-msgid "\treason unknown\n"
-msgstr "\tpõhjus teadmata\n"
+#, fuzzy
+msgid "Printer Deleted"
+msgstr "Printer ei ole ühiskasutuses!"
+
+msgid "Printer Maintenance"
+msgstr "Printeri hooldus"
+
+#, fuzzy
+msgid "Printer Modified"
+msgstr "Printeri hooldus"
+
+#, fuzzy
+msgid "Printer Stopped"
+msgstr "Printer ei ole ühiskasutuses!"
+
+#, fuzzy
+msgid "Printer off-line."
+msgstr "Printeri hooldus"
+
+msgid "Printer:"
+msgstr "Printer:"
+
+msgid "Printers"
+msgstr "Printerid"
+
+msgid "Purge Jobs"
+msgstr "Puhasta tööd"
+
+msgid "Quota limit reached."
+msgstr "Kvoot on täis."
+
+msgid "Rank    Owner   Job     File(s)                         Total Size\n"
+msgstr "Järk    Omanik   Töö     Failid                         Kogusuurus\n"
 
 msgid ""
-"\tForm mounted:\n"
-"\tContent types: any\n"
-"\tPrinter types: unknown\n"
+"Rank   Owner      Pri  Job        Files                       Total Size\n"
 msgstr ""
-"\tVorm ühendatud:\n"
-"\tSisu tüübid: suvaline\n"
-"\tPrinteri tüübid: teadmata\n"
+"Järk   Omanik      Prio  Töö        Failid                       Kogusuurus\n"
+
+msgid "Reject Jobs"
+msgstr "Lükka tööd tagasi"
+
+msgid "Resolution"
+msgstr "Lahutus"
 
 #, c-format
-msgid "\tDescription: %s\n"
-msgstr "\tKirjeldus: %s\n"
+msgid "Running command: %s %s -N -A %s -c '%s'\n"
+msgstr "Käivitatakse käsk: %s %s -N -A %s -c '%s'\n"
 
-msgid "\tAlerts:"
-msgstr "\tHoiatused:"
+msgid "Server Restarted"
+msgstr ""
 
-#, c-format
-msgid "\tLocation: %s\n"
-msgstr "\tAsukoht: %s\n"
+msgid "Server Security Auditing"
+msgstr ""
 
-msgid "\tConnection: remote\n"
-msgstr "\tÜhendus: võrgus\n"
+msgid "Server Started"
+msgstr ""
 
-#, c-format
-msgid "\tInterface: %s.ppd\n"
-msgstr "\tLiides: %s.ppd\n"
+msgid "Server Stopped"
+msgstr ""
 
-msgid "\tConnection: direct\n"
-msgstr "\tÜhendus: otsene\n"
+msgid "Set Allowed Users"
+msgstr "Lubatud kasutajate määramine"
 
-#, c-format
-msgid "\tInterface: %s/interfaces/%s\n"
-msgstr "\tLiides: %s/interfaces/%s\n"
+msgid "Set As Default"
+msgstr "Määra vaikeväärtuseks"
 
-#, c-format
-msgid "\tInterface: %s/ppd/%s.ppd\n"
-msgstr "\tLiides: %s/ppd/%s.ppd\n"
+msgid "Set Printer Options"
+msgstr "Printeri valikute määramine"
 
-msgid "\tOn fault: no alert\n"
-msgstr "\tVea korral: hoiatus puudub\n"
+msgid "Set Publishing"
+msgstr "Avaldamise määramine"
 
-msgid "\tAfter fault: continue\n"
-msgstr "\tVea järel: jätkatakse\n"
+msgid "Start Class"
+msgstr "Käivita klass"
 
-msgid "\tUsers allowed:\n"
-msgstr "\tLubatud kasutajad:\n"
+msgid "Start Printer"
+msgstr "Käivita printer"
 
-msgid "\tUsers denied:\n"
-msgstr "\tKeelatud kasutajad:\n"
+msgid "Starting Banner"
+msgstr "Alustav bänner"
 
-msgid "\t\t(all)\n"
-msgstr "\t\t(kõik)\n"
+msgid "Stop Class"
+msgstr "Peata klass"
 
-msgid "\tForms allowed:\n"
-msgstr "\tLubatud vormid:\n"
-
-msgid "\t\t(none)\n"
-msgstr "\t\t(puudub)\n"
-
-msgid "\tBanner required\n"
-msgstr "\tBanner nõutav\n"
-
-msgid "\tCharset sets:\n"
-msgstr "\tMärgistikud:\n"
-
-msgid "\tDefault pitch:\n"
-msgstr "\tVaikimisi tihedus:\n"
-
-msgid "\tDefault page size:\n"
-msgstr "\tVaikimisi lehe suurus:\n"
-
-msgid "\tDefault port settings:\n"
-msgstr "\tVaikimisi pordi seadistused:\n"
-
-#, c-format
-msgid "printer %s/%s is idle.  enabled since %s\n"
-msgstr "printer %s/%s on jõude.  sisse lülitatud alates %s\n"
-
-#, c-format
-msgid "printer %s/%s now printing %s-%d.  enabled since %s\n"
-msgstr "printer %s/%s trükib praegu %s-%d.  sisse lülitatud alates %s\n"
-
-#, c-format
-msgid "printer %s/%s disabled since %s -\n"
-msgstr "printer %s/%s välja lülitatud alates %s -\n"
-
-msgid "scheduler is running\n"
-msgstr "ajastaja töötab\n"
-
-msgid "scheduler is not running\n"
-msgstr "ajastaja ei tööta\n"
-
-#, c-format
-msgid "lpadmin: Unable to connect to server: %s\n"
-msgstr "lpadmin: ei õnnestu saada ühendust serveriga: %s\n"
+msgid "Stop Printer"
+msgstr "Peata printer"
 
 msgid ""
-"lpadmin: Unable to add a printer to the class:\n"
-"         You must specify a printer name first!\n"
+"The class name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
-"lpadmin: ei õnnestu lisada printerit klassi:\n"
-"         Kõigepealt tuleb määrata printeri nimi!\n"
-
-msgid "lpadmin: Expected class name after '-c' option!\n"
-msgstr "lpadmin: võtme '-c' järel oodati klassi nime!\n"
-
-msgid "lpadmin: Class name can only contain printable characters!\n"
-msgstr "lpadmin: klassi nimi tohib sisaldada ainult trükitavaid märke!\n"
-
-msgid "lpadmin: Expected printer name after '-d' option!\n"
-msgstr "lpadmin: võtme '-d' järel oodati printeri nime!\n"
-
-msgid "lpadmin: Printer name can only contain printable characters!\n"
-msgstr "lpadmin: printeri nimi tohib sisaldada ainult trükitavaid märke!\n"
-
-msgid "lpadmin: Expected hostname after '-h' option!\n"
-msgstr "lpadmin: võtme '-h' järel oodati masinanime!\n"
+"Klassi nimes tohib olla ainult kuni 127 trükitavat märki ning selles ei tohi "
+"sisalduda tühikuid, kaldkriipse (/) ega trelle (#)."
 
 msgid ""
-"lpadmin: Unable to set the interface script:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-"lpadmin: ei õnnestu määrata liideseskripti:\n"
-"         Kõigepealt tuleb määrata printeri nimi!\n"
-
-msgid "lpadmin: Expected interface after '-i' option!\n"
-msgstr "lpadmin: võtme '-i' järel oodati liidest!\n"
-
-msgid ""
-"lpadmin: Unable to set the interface script or PPD file:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-"lpadmin: ei õnnestu määrata liideseskripti või PPD-faili:\n"
-"         Kõigepealt tuleb määrata printeri nimi!\n"
-
-msgid "lpadmin: Expected model after '-m' option!\n"
-msgstr "lpadmin: võtme '-m' järel oodati mudelit!\n"
-
-msgid "lpadmin: Expected name=value after '-o' option!\n"
-msgstr "lpadmin: võtme '-o' järel oodati nimi=väärtus!\n"
-
-msgid "lpadmin: Expected printer after '-p' option!\n"
-msgstr "lpadmin: võtme '-p' järel oodati printerit!\n"
-
-msgid ""
-"lpadmin: Unable to remove a printer from the class:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-"lpadmin: ei õnnestu eemaldada printerit klassist:\n"
-"         Kõigepealt tuleb määrata printeri nimi!\n"
-
-msgid "lpadmin: Expected class after '-r' option!\n"
-msgstr "lpadmin: võtme '-r' järel oodati klassi!\n"
-
-msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
-msgstr "lpadmin: võtme '-u' järel oodati allow/deny:kasutajateloend"
+"The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr "notify-lease-duration atribuuti ei saa kasutada töötellimuste korral."
 
 #, c-format
-msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
-msgstr "lpadmin: tundmatu allow/deny võti \"%s\"!\n"
+msgid "The notify-user-data value is too large (%d > 63 octets)!"
+msgstr "notify-user-data väärtus on liiga suur (%d > 63 oktetti)!"
 
 msgid ""
-"lpadmin: Unable to set the device URI:\n"
-"         You must specify a printer name first!\n"
+"The printer name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
-"lpadmin: ei õnnestu määrata seadme URI:\n"
-"         Kõigepealt tuleb määrata printeri nimi!\n"
+"Printeri nimes tohib olla ainult kuni 127 trükitavat märki ning selles ei "
+"tohi sisalduda tühikuid, kaldkriipse (/) ega trelle (#)."
 
-msgid "lpadmin: Expected device URI after '-v' option!\n"
-msgstr "lpadmin: võtme '-v' järel oodati seadme URI!\n"
+msgid "The printer or class is not shared!"
+msgstr "Printer või klass pole ühiskasutuses!"
 
-msgid "lpadmin: Expected printer or class after '-x' option!\n"
-msgstr "lpadmin: võtme '-x' järel oodati printerit või klassi!\n"
-
-msgid ""
-"lpadmin: Unable to set the printer description:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-"lpadmin: ei õnnestu määrata printeri kirjeldust:\n"
-"         Kõigepealt tuleb määrata printeri nimi!\n"
-
-msgid "lpadmin: Expected description after '-D' option!\n"
-msgstr "lpadmin: võtme '-D' järel oodati kirjeldust!\n"
-
-msgid "lpadmin: Expected file type(s) after '-I' option!\n"
-msgstr "lpadmin: võtme '-I' järel oodati faili tüüpi/tüüpe!\n"
-
-msgid "lpadmin: Warning - content type list ignored!\n"
-msgstr "lpadmin: hoiatus - sisu tüüpide loendit ignoreeritakse!\n"
-
-msgid ""
-"lpadmin: Unable to set the printer location:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-"lpadmin: ei õnnestu määrata printeri asukohta:\n"
-"         Kõigepealt tuleb määrata printeri nimi!\n"
-
-msgid "lpadmin: Expected location after '-L' option!\n"
-msgstr "lpadmin: võtme '-L' järel oodati asukohta!\n"
-
-msgid ""
-"lpadmin: Unable to set the PPD file:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-"lpadmin: ei õnnestu määrata PPD-faili:\n"
-"         Kõigepealt tuleb määrata printeri nimi!\n"
-
-msgid "lpadmin: Expected PPD after '-P' option!\n"
-msgstr "lpadmin: võtme '-P' järel oodati PPD-d!\n"
+msgid "The printer or class was not found."
+msgstr "Printerit või klassi ei leitud."
 
 #, c-format
-msgid "lpadmin: Unknown option '%c'!\n"
-msgstr "lpadmin: tundmatu võti '%c'!\n"
+msgid "The printer-uri \"%s\" contains invalid characters."
+msgstr "printer-uri \"%s\" sisaldab vigaseid märke."
 
-#, c-format
-msgid "lpadmin: Unknown argument '%s'!\n"
-msgstr "lpadmin: tundmatu argument '%s'!\n"
+msgid "The printer-uri attribute is required!"
+msgstr "Vajalik on printer-uri atribuut!"
 
 msgid ""
-"lpadmin: Unable to set the printer options:\n"
-"         You must specify a printer name first!\n"
+"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr "printer-uri peab olema kujul \"ipp://MASINANIMI/classes/KLASSINIMI\"."
+
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
 msgstr ""
-"lpadmin: ei õnnestu määrata printeri võtmeid:\n"
-"         Kõigepealt tuleb määrata printeri nimi!\n"
+"printer-uri peab olema kujul \"ipp://MASINANIMI/printers/PRINTERINIMI\"."
+
+#, fuzzy
+msgid ""
+"The subscription name may not contain spaces, slashes (/), question marks "
+"(?), or the pound sign (#)."
+msgstr ""
+"Klassi nimes tohib olla ainult kuni 127 trükitavat märki ning selles ei tohi "
+"sisalduda tühikuid, kaldkriipse (/) ega trelle (#)."
+
+msgid "Toner low."
+msgstr ""
+
+msgid "Too many active jobs."
+msgstr "Liiga palju aktiivseid täid."
+
+msgid "Unable to access cupsd.conf file:"
+msgstr "Ligipääs failile cupsd.conf ebaõnnestus:"
+
+#, fuzzy
+msgid "Unable to add RSS subscription:"
+msgstr "Printeri lisamine ebaõnnestus:"
+
+msgid "Unable to add class:"
+msgstr "Klassi lisamine ebaõnnestus:"
+
+#, c-format
+msgid "Unable to add job for destination \"%s\"!"
+msgstr "Töö lisamine sihtkohale \"%s\" ebaõnnestus!"
+
+msgid "Unable to add printer:"
+msgstr "Printeri lisamine ebaõnnestus:"
+
+msgid "Unable to allocate memory for file types!"
+msgstr "Failitüüpidele ei õnnestu mälu eraldada!"
+
+#, fuzzy
+msgid "Unable to cancel RSS subscription:"
+msgstr "Printeri muutmine ebaõnnestus:"
+
+msgid "Unable to change printer-is-shared attribute:"
+msgstr "Atribuudi printer-is-shared muutmine ebaõnnestus:"
+
+msgid "Unable to change printer:"
+msgstr "Printeri muutmine ebaõnnestus:"
+
+msgid "Unable to change server settings:"
+msgstr "Serveri seadistuste muutmine ebaõnnestus:"
+
+#, c-format
+msgid "Unable to copy CUPS printer driver files (%d)!"
+msgstr "Ei õnnestu kopeerida CUPS-i printeridraiverifaile (%d)!"
+
+#, c-format
+msgid "Unable to copy PPD file - %s!"
+msgstr "PPD-faili kopeerimine ebaõnnestus - %s!"
+
+msgid "Unable to copy PPD file!"
+msgstr "PPD-faili kopeerimine ebaõnnestus!"
+
+#, c-format
+msgid "Unable to copy Windows 2000 printer driver files (%d)!"
+msgstr "Ei õnnestu kopeerida Windows 2000 printeridraiverifaile (%d)!"
+
+#, c-format
+msgid "Unable to copy Windows 9x printer driver files (%d)!"
+msgstr "Ei õnnestu kopeerida Windows 9x printeridraiverifaile (%d)!"
+
+#, c-format
+msgid "Unable to copy interface script - %s!"
+msgstr "Liideseskripti kopeerimine ebaõnnestus - %s!"
+
+msgid "Unable to create temporary file:"
+msgstr "Ajutise faili loomine ebaõnnestus:"
+
+msgid "Unable to delete class:"
+msgstr "Klassi kustutamine ebaõnnestus:"
+
+msgid "Unable to delete printer:"
+msgstr "Printeri kustutamine ebaõnnestus:"
+
+msgid "Unable to edit cupsd.conf files larger than 1MB!"
+msgstr "Suurema cupsd.conf faili kui 1 MB muutmine ei ole võimalik!"
+
+msgid "Unable to find destination for job!"
+msgstr "Tööle ei leitud sihtkohta!"
+
+msgid "Unable to get PPD file!"
+msgstr "PPD-faili hankimine ebaõnnestus!"
+
+msgid "Unable to get class list:"
+msgstr "Klassiloendi hankimine ebaõnnestus:"
+
+msgid "Unable to get class status:"
+msgstr "Klassi oleku hankimine ebaõnnestus:"
+
+msgid "Unable to get list of printer drivers:"
+msgstr "Printeridraiverite loendi hankimine ebaõnnestus:"
+
+msgid "Unable to get printer attributes:"
+msgstr "Printeri atribuutide hankimine ebaõnnestus:"
+
+msgid "Unable to get printer list:"
+msgstr "Printeriloendi hankimine ebaõnnestus:"
+
+msgid "Unable to get printer status:"
+msgstr "Printeri oleku hankimine ebaõnnestus:"
+
+#, c-format
+msgid "Unable to install Windows 2000 printer driver files (%d)!"
+msgstr "Ei õnnestu paigaldada Windows 2000 printeridraiverifaile (%d)!"
+
+#, c-format
+msgid "Unable to install Windows 9x printer driver files (%d)!"
+msgstr "Ei õnnestu paigaldada Windows 9x printeridraiverifaile (%d)!"
+
+msgid "Unable to modify class:"
+msgstr "Klassi muutmine ebaõnnestus:"
+
+msgid "Unable to modify printer:"
+msgstr "Printeri muutmine ebaõnnestus:"
+
+msgid "Unable to move job"
+msgstr "Töö liigutamine ebaõnnestus"
+
+msgid "Unable to move jobs"
+msgstr "Tööde liigutamine ebaõnnestus"
+
+msgid "Unable to open PPD file"
+msgstr "PPD-faili avamine ebaõnnestus"
+
+msgid "Unable to open PPD file:"
+msgstr "PPD-faili avamine ebaõnnestus:"
+
+msgid "Unable to open cupsd.conf file:"
+msgstr "Faili cupsd.conf avaline ebaõnnestus:"
+
+msgid "Unable to print test page:"
+msgstr "Testlehekülje trükkimine ebaõnnestus:"
+
+#, fuzzy, c-format
+msgid "Unable to run \"%s\": %s\n"
+msgstr "cupsaddsmb: \"%s\" käivitamine ebaõnnestus: %s\n"
+
+msgid "Unable to send maintenance job:"
+msgstr "Hooldustöö saatmine ebaõnnestus:"
+
+#, fuzzy, c-format
+msgid "Unable to set Windows printer driver (%d)!"
+msgstr "Ei õnnestu määrata Windowsi printeridraiverit (%d)!\n"
+
+msgid "Unable to set options:"
+msgstr "Valikute määramine ebaõnnestus:"
+
+msgid "Unable to upload cupsd.conf file:"
+msgstr "Faili cupsd.conf üleslaadimine ebaõnnestus:"
+
+msgid "Unknown"
+msgstr "Teadmata"
+
+#, fuzzy, c-format
+msgid "Unknown printer error (%s)!"
+msgstr "Tundmatu printer-error-policy  \"%s\"."
+
+#, c-format
+msgid "Unknown printer-error-policy \"%s\"."
+msgstr "Tundmatu printer-error-policy  \"%s\"."
+
+#, c-format
+msgid "Unknown printer-op-policy \"%s\"."
+msgstr "Tundmatu printer-op-policy \"%s\"."
+
+#, c-format
+msgid "Unsupported compression \"%s\"!"
+msgstr "Toetamata tihendus \"%s\"!"
+
+#, c-format
+msgid "Unsupported compression attribute %s!"
+msgstr "Toetamata tihenduse atribuut %s!"
+
+#, c-format
+msgid "Unsupported format \"%s\"!"
+msgstr "Toetamata vorming \"%s\"!"
+
+#, c-format
+msgid "Unsupported format '%s'!"
+msgstr "Toetamata vorming '%s'!"
+
+#, c-format
+msgid "Unsupported format '%s/%s'!"
+msgstr "Toetamata vorming '%s/%s'!"
 
 msgid ""
 "Usage:\n"
@@ -1559,1135 +2379,12 @@ msgstr ""
 "kasutaja]\n"
 
 #, c-format
-msgid "lpadmin: Unable to create temporary file: %s\n"
-msgstr "lpadmin: ei õnnestu luua ajutist faili: %s\n"
-
-#, c-format
-msgid "lpadmin: Unable to open file \"%s\": %s\n"
-msgstr "lpadmin: ei õnnestu avada faili \"%s\": %s\n"
-
-#, c-format
-msgid "lpadmin: add-printer (set model) failed: %s\n"
-msgstr "lpadmin: add-printer (mudeli määramine) ebaõnnestus: %s\n"
-
-#, c-format
-msgid "lpadmin: add-printer (set description) failed: %s\n"
-msgstr "lpadmin: add-printer (kirjelduse määramine) ebaõnnestus: %s\n"
-
-#, c-format
-msgid "lpadmin: add-printer (set location) failed: %s\n"
-msgstr "lpadmin: add-printer (asukoha määramine) ebaõnnestus: %s\n"
-
-#, c-format
-msgid "lpadmin: Unable to create temporary file - %s\n"
-msgstr "lpadmin: ei õnnestu luua ajutist faili - %s\n"
-
-#, c-format
-msgid "lpadmin: Unable to open PPD file \"%s\" - %s\n"
-msgstr "lpadmin: ei õnnestu avada PPD-faili \"%s\" - %s\n"
-
-#, c-format
-msgid "lpadmin: %s failed: %s\n"
-msgstr "lpadmin: %s ebaõnnestus: %s\n"
-
-msgid "lp: Expected destination after -d option!\n"
-msgstr "lp: võtme -d järel oodati sihtkohta!\n"
-
-msgid "lp: Expected form after -f option!\n"
-msgstr "lp: võtme -f järel oodati vormi!\n"
-
-msgid "lp: Expected hostname after -h option!\n"
-msgstr "lp: võtme -h järel oodati masinanime!\n"
-
-msgid "lp: Expected job ID after -i option!\n"
-msgstr "lp: võtme -i järel oodati töö ID-d!\n"
-
-msgid "lp: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "lp: viga - faile ei saa trükkida ja töid muuta ühel ajal!\n"
-
-msgid "lp: Error - bad job ID!\n"
-msgstr "lp: viga - vigane töö ID!\n"
-
-msgid "lp: Expected copies after -n option!\n"
-msgstr "lp: võtme -n järel oodati koopiaid!\n"
-
-msgid "lp: Expected option string after -o option!\n"
-msgstr "lp. võtme -o järel oodati võtme stringi!\n"
-
-#, c-format
-msgid "lp: Expected priority after -%c option!\n"
-msgstr "lp: võtme -%c järel oodati prioriteeti!\n"
-
-msgid "lp: Priority must be between 1 and 100.\n"
-msgstr "lp: prioriteet peab olema vahemikus 1 kuni 100.\n"
-
-msgid "lp: Expected title after -t option!\n"
-msgstr "lp: võtme -t järel oodati tiitlit!\n"
-
-msgid "lp: Expected mode list after -y option!\n"
-msgstr "lp: võtme -y järel oodati režiimiloendit!\n"
-
-msgid "lp: Warning - mode option ignored!\n"
-msgstr "lp: hoiatus - režiimivõtit ignoreeritakse!\n"
-
-msgid "lp: Expected hold name after -H option!\n"
-msgstr "lp: vätme -H järel oodati hoitava nime!\n"
-
-msgid "lp: Need job ID (-i) before \"-H restart\"!\n"
-msgstr "lp: enne \"-H restart\" on vajalik töö ID (-i)!\n"
-
-msgid "lp: Expected page list after -P option!\n"
-msgstr "lp: võtme -P järel oodati leheloendit!\n"
-
-msgid "lp: Expected character set after -S option!\n"
-msgstr "lp: võtme -S järel oodati märgistikku!\n"
-
-msgid "lp: Warning - character set option ignored!\n"
-msgstr "lp: hoiatus - märgistikuvõtit ignoreeritakse!\n"
-
-msgid "lp: Expected content type after -T option!\n"
-msgstr "lp: võtme -T järel oodati sisu tüüpi!\n"
-
-msgid "lp: Warning - content type option ignored!\n"
-msgstr "lp: hoiatus - sisu tüübi võtit ignoreeritakse!\n"
-
-#, c-format
-msgid "lp: Unknown option '%c'!\n"
-msgstr "lp: tundmatu võti '%c'!\n"
-
-msgid ""
-"lp: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgid "Usage: %s job-id user title copies options [file]\n"
 msgstr ""
-"lp: viga - standardsisendist ei saa trükkida, kui on antud failid või töö "
-"ID!\n"
 
 #, c-format
-msgid "lp: Unable to access \"%s\" - %s\n"
-msgstr "lp: ei õnnestu ligipääs \"%s\" - %s\n"
-
-#, c-format
-msgid "lp: Too many files - \"%s\"\n"
-msgstr "lp: liiga palju faile - \"%s\"\n"
-
-msgid "lp: error - no default destination available.\n"
-msgstr "lp: viga - vaikimisi sihtkoht pole saadaval.\n"
-
-msgid "lp: error - scheduler not responding!\n"
-msgstr "lp: viga - ajastaja ei vasta!\n"
-
-#, c-format
-msgid "lp: unable to create temporary file \"%s\" - %s\n"
-msgstr "lp: ei õnnestu luua ajutist faili  \"%s\" - %s\n"
-
-#, c-format
-msgid "lp: error - unable to write to temporary file \"%s\" - %s\n"
-msgstr "lp: viga - ei õnnestu kirjutada ajutisse faili \"%s\" - %s\n"
-
-msgid "lp: stdin is empty, so no job has been sent.\n"
-msgstr "lp: standardsisend on tühi, ühtegi tööd ei saadetud.\n"
-
-#, c-format
-msgid "lp: unable to print file: %s\n"
-msgstr "lp: ei õnnestu trükkida faili: %s\n"
-
-#, c-format
-msgid "request id is %s-%d (%d file(s))\n"
-msgstr "soovi ID on %s-%d (%d fail(i))\n"
-
-#, c-format
-msgid "lp: restart-job failed: %s\n"
-msgstr "lp: restart-job ebaõnnestus: %s\n"
-
-#, c-format
-msgid "lp: set-job-attributes failed: %s\n"
-msgstr "lp: set-job-attributes ebaõnnestus: %s\n"
-
-#, c-format
-msgid "lpinfo: Unable to connect to server: %s\n"
-msgstr "lpinfo: ei õnnestu saada ühendust serveriga: %s\n"
-
-#, c-format
-msgid "lpinfo: Unknown option '%c'!\n"
-msgstr "lpinfo: tundmatu võti '%c'!\n"
-
-#, c-format
-msgid "lpinfo: Unknown argument '%s'!\n"
-msgstr "lpinfo: tundmatu argument '%s'!\n"
-
-#, c-format
-msgid "lpinfo: cups-get-devices failed: %s\n"
-msgstr "lpinfo: cups-get-devices ebaõnnestus: %s\n"
-
-#, c-format
-msgid ""
-"Device: uri = %s\n"
-"        class = %s\n"
-"        info = %s\n"
-"        make-and-model = %s\n"
+msgid "Usage: %s job-id user title copies options file\n"
 msgstr ""
-"Seade: uri = %s\n"
-"       klass = %s\n"
-"       info = %s\n"
-"       valmistaja-ja-mudel = %s\n"
-
-#, c-format
-msgid "lpinfo: cups-get-ppds failed: %s\n"
-msgstr "lpinfo: cups-get-ppds ebaõnnestus: %s\n"
-
-#, c-format
-msgid ""
-"Model:  name = %s\n"
-"        natural_language = %s\n"
-"        make-and-model = %s\n"
-msgstr ""
-"Mudel:  nimi = %s\n"
-"        loomulik_keel = %s\n"
-"        valmistaja-ja-mudel = %s\n"
-
-#, c-format
-msgid "lpmove: Unknown option '%c'!\n"
-msgstr "lpmove: tundmatu võti '%c'!\n"
-
-#, c-format
-msgid "lpmove: Unknown argument '%s'!\n"
-msgstr "lpmove: tundmatu argument '%s'!\n"
-
-msgid "Usage: lpmove job dest\n"
-msgstr "Kasutamine: lpmove töö sihtkoht\n"
-
-#, c-format
-msgid "lpmove: Unable to connect to server: %s\n"
-msgstr "lpmove: ei õnnestu saada ühendust serveriga: %s\n"
-
-#, c-format
-msgid "lpmove: move-job failed: %s\n"
-msgstr "lpmove: move-job ebaõnnestus: %s\n"
-
-msgid "lpoptions: Unknown printer or class!\n"
-msgstr "lpoptions: tundmatu printer või klass!\n"
-
-msgid "lpoptions: No printers!?!\n"
-msgstr "lpoptions: printerit polegi!?!\n"
-
-#, c-format
-msgid "lpoptions: Unable to add printer or instance: %s\n"
-msgstr "lpoptions: ei õnnestu lisada printerit või isendit: %s\n"
-
-#, c-format
-msgid "lpoptions: Destination %s has no PPD file!\n"
-msgstr "lpoptions: sihtkohal %s pole PPD-faili!\n"
-
-#, c-format
-msgid "lpoptions: Unable to open PPD file for %s!\n"
-msgstr "lpoptions: ei õnnestu avada PPD-faili %s jaoks!\n"
-
-msgid ""
-"Usage: lpoptions [-h server] [-E] -d printer\n"
-"       lpoptions [-h server] [-E] [-p printer] -l\n"
-"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
-"       lpoptions [-h server] [-E] -x printer\n"
-msgstr ""
-"Kasutamine: lpoptions [-h server] [-E] -d printer\n"
-"            lpoptions [-h server] [-E] [-p printer] -l\n"
-"            lpoptions [-h server] [-E] -p printer -o võti[=väärtus] ...\n"
-"            lpoptions [-h server] [-E] -x printer\n"
-
-msgid "lppasswd: Only root can add or delete passwords!\n"
-msgstr ""
-"lppasswd: ainult administraator (root) võib paroole lisada või kustutada!\n"
-
-msgid "Enter old password:"
-msgstr "Vana parool:"
-
-#, c-format
-msgid "lppasswd: Unable to copy password string: %s\n"
-msgstr "lppasswd: ei õnnestu kopeerida paroolistringi: %s\n"
-
-msgid "Enter password:"
-msgstr "Parool:"
-
-msgid "Enter password again:"
-msgstr "Parool teist korda:"
-
-msgid "lppasswd: Sorry, passwords don't match!\n"
-msgstr "lppasswd: vabandust, paroolid ei kattu!+n"
-
-msgid ""
-"lppasswd: Sorry, password rejected.\n"
-"Your password must be at least 6 characters long, cannot contain\n"
-"your username, and must contain at least one letter and number.\n"
-msgstr ""
-"lppasswd: vabandust, parool lükati tagasi.\n"
-"Parool peab koosnema vähemalt 6 märgist, ei tohi sisaldada Teie\n"
-"kasutajanime ning peab sisaldama vähemalt üht tähte ja üht numbrit.\n"
-
-msgid "lppasswd: Password file busy!\n"
-msgstr "lppasswd: paroolifail on hõivatud!\n"
-
-#, c-format
-msgid "lppasswd: Unable to open password file: %s\n"
-msgstr "lppasswd: ei õnnestu avada paroolifaili: %s\n"
-
-#, c-format
-msgid "lppasswd: Unable to write to password file: %s\n"
-msgstr "lppasswd: ei õnnestu kirjutada paroolifaili: %s\n"
-
-#, c-format
-msgid "lppasswd: user \"%s\" and group \"%s\" do not exist.\n"
-msgstr "lppasswd: kasutajat \"%s\" ja gruppi \"%s\" ei ole olemas.\n"
-
-msgid "lppasswd: Sorry, password doesn't match!\n"
-msgstr "lppasswd: vabandust , parool ei kattu!\n"
-
-msgid "lppasswd: Password file not updated!\n"
-msgstr "lppasswd: paroolifaili ei uuendatud!\n"
-
-#, c-format
-msgid "lppasswd: failed to backup old password file: %s\n"
-msgstr "lppasswd. vana paroolifaili varundamine ebaõnnestus: %s\n"
-
-#, c-format
-msgid "lppasswd: failed to rename password file: %s\n"
-msgstr "lppasswd: paroolifaili ümbernimetamine ebaõnnestus: %s\n"
-
-msgid "Usage: lppasswd [-g groupname]\n"
-msgstr "Kasutamine: lppasswd [-g grupinimi]\n"
-
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]\n"
-msgstr ""
-"Kasutamine: lppasswd [-g grupinimi] [kasutajanimi]\n"
-"            lppasswd [-g grupinimi] -a [kasutajanimi]\n"
-"            lppasswd [-g grupinimi] -x [kasutajanimi]\n"
-
-msgid "Start Printer"
-msgstr "Käivita printer"
-
-msgid "Stop Printer"
-msgstr "Peata printer"
-
-msgid "Start Class"
-msgstr "Käivita klass"
-
-msgid "Stop Class"
-msgstr "Peata klass"
-
-msgid "Accept Jobs"
-msgstr "Nõustu töödega"
-
-msgid "Reject Jobs"
-msgstr "Lükka tööd tagasi"
-
-msgid "Purge Jobs"
-msgstr "Puhasta tööd"
-
-msgid "Set As Default"
-msgstr "Määra vaikeväärtuseks"
-
-msgid "Administration"
-msgstr "Haldus"
-
-msgid "Modify Class"
-msgstr "Klassi muutmine"
-
-msgid "Add Class"
-msgstr "Klassi lisamine"
-
-msgid ""
-"The class name may only contain up to 127 printable characters and may not "
-"contain spaces, slashes (/), or the pound sign (#)."
-msgstr ""
-"Klassi nimes tohib olla ainult kuni 127 trükitavat märki ning selles ei tohi "
-"sisalduda tühikuid, kaldkriipse (/) ega trelle (#)."
-
-msgid "Unable to modify class:"
-msgstr "Klassi muutmine ebaõnnestus:"
-
-msgid "Unable to add class:"
-msgstr "Klassi lisamine ebaõnnestus:"
-
-msgid "Modify Printer"
-msgstr "Printeri muutmine"
-
-msgid "Add Printer"
-msgstr "Printeri lisamine"
-
-msgid ""
-"The printer name may only contain up to 127 printable characters and may not "
-"contain spaces, slashes (/), or the pound sign (#)."
-msgstr ""
-"Printeri nimes tohib olla ainult kuni 127 trükitavat märki ning selles ei "
-"tohi sisalduda tühikuid, kaldkriipse (/) ega trelle (#)."
-
-msgid "Unable to get list of printer drivers:"
-msgstr "Printeridraiverite loendi hankimine ebaõnnestus:"
-
-msgid "Unable to modify printer:"
-msgstr "Printeri muutmine ebaõnnestus:"
-
-msgid "Unable to add printer:"
-msgstr "Printeri lisamine ebaõnnestus:"
-
-msgid "Set Printer Options"
-msgstr "Printeri valikute määramine"
-
-msgid "Missing form variable!"
-msgstr "Puudub vormi muutuja!"
-
-msgid "Unable to get PPD file!"
-msgstr "PPD-faili hankimine ebaõnnestus!"
-
-msgid "Unable to open PPD file:"
-msgstr "PPD-faili avamine ebaõnnestus:"
-
-msgid "Banners"
-msgstr "Bännerid"
-
-msgid "Starting Banner"
-msgstr "Alustav bänner"
-
-msgid "Ending Banner"
-msgstr "Lõpetav bänner"
-
-msgid "Policies"
-msgstr "Reeglid"
-
-msgid "Error Policy"
-msgstr "Veareegel"
-
-msgid "Operation Policy"
-msgstr "Toimimisreegel"
-
-msgid "PS Binary Protocol"
-msgstr "PS binaarprotokoll"
-
-msgid "None"
-msgstr "Puudub"
-
-msgid "Unable to set options:"
-msgstr "Valikute määramine ebaõnnestus:"
-
-msgid "Change Settings"
-msgstr "Seadistuste muutmine"
-
-msgid "Unable to change server settings:"
-msgstr "Serveri seadistuste muutmine ebaõnnestus:"
-
-msgid "Unable to upload cupsd.conf file:"
-msgstr "Faili cupsd.conf üleslaadimine ebaõnnestus:"
-
-msgid "Edit Configuration File"
-msgstr "Seadistustefaili muutmine"
-
-msgid "Unable to create temporary file:"
-msgstr "Ajutise faili loomine ebaõnnestus:"
-
-msgid "Unable to access cupsd.conf file:"
-msgstr "Ligipääs failile cupsd.conf ebaõnnestus:"
-
-msgid "Unable to edit cupsd.conf files larger than 1MB!"
-msgstr "Suurema cupsd.conf faili kui 1 MB muutmine ei ole võimalik!"
-
-msgid "Delete Class"
-msgstr "Klassi kustutamine"
-
-msgid "Unable to delete class:"
-msgstr "Klassi kustutamine ebaõnnestus:"
-
-msgid "Delete Printer"
-msgstr "Printeri kustutamine"
-
-msgid "Unable to delete printer:"
-msgstr "Printeri kustutamine ebaõnnestus:"
-
-msgid "Export Printers to Samba"
-msgstr "Printerite eksport Sambasse"
-
-msgid "Unable to fork process!"
-msgstr "Protsessi harutamine ebaõnnestus!"
-
-msgid "Unable to connect to server!"
-msgstr "Ühendumine serveriga ebaõnnestus!"
-
-msgid "Unable to get printer attributes!"
-msgstr "Printeri atribuutide hankimine ebaõnnestus!"
-
-msgid "Unable to convert PPD file!"
-msgstr "PPD-faili teisendamine ebaõnnestus!"
-
-msgid "Unable to copy Windows 2000 printer driver files!"
-msgstr "Windows 2000 printeridraiverifailide kopeerimine ebaõnnestus!"
-
-msgid "Unable to install Windows 2000 printer driver files!"
-msgstr "Windows 2000 printeridraiverifailide paigaldamine ebaõnnestus!"
-
-msgid "Unable to copy Windows 9x printer driver files!"
-msgstr "Windows 9x printeridraiverifailide kopeerimine ebaõnnestus!"
-
-msgid "Unable to install Windows 9x printer driver files!"
-msgstr "Windows 9x printeridraiverifailide paigaldamine ebaõnnestus!"
-
-msgid "Unable to set Windows printer driver!"
-msgstr "Windowsi printeridraiveri määramine ebaõnnestus!"
-
-msgid "No printer drivers found!"
-msgstr "Printeridraivereid ei leitud!"
-
-msgid "Unable to execute cupsaddsmb command!"
-msgstr "Käsu cupsaddsmb täitmine ebaõnnestus!"
-
-#, c-format
-msgid "cupsaddsmb failed with status %d"
-msgstr "cupsaddsmb ebaõnnestus olekuga %d"
-
-#, c-format
-msgid "cupsaddsmb crashed on signal %d"
-msgstr "cupsaddsmb elas üle krahhi signaaliga %d"
-
-msgid "A Samba username is required to export printer drivers!"
-msgstr "Printeridraiverite ekspordiks on nõutav Samba kasutajanimi!"
-
-msgid "A Samba password is required to export printer drivers!"
-msgstr "Printeridraiverite ekspordiks on nõutav Samba parool!"
-
-msgid "Unable to open cupsd.conf file:"
-msgstr "Faili cupsd.conf avaline ebaõnnestus:"
-
-msgid "Unable to change printer:"
-msgstr "Printeri muutmine ebaõnnestus:"
-
-msgid "Set Allowed Users"
-msgstr "Lubatud kasutajate määramine"
-
-msgid "Unable to get printer attributes:"
-msgstr "Printeri atribuutide hankimine ebaõnnestus:"
-
-msgid "Set Publishing"
-msgstr "Avaldamise määramine"
-
-msgid "Unable to change printer-is-shared attribute:"
-msgstr "Atribuudi printer-is-shared muutmine ebaõnnestus:"
-
-msgid "Classes"
-msgstr "Klassid"
-
-msgid "Unable to get class list:"
-msgstr "Klassiloendi hankimine ebaõnnestus:"
-
-msgid "Unable to get class status:"
-msgstr "Klassi oleku hankimine ebaõnnestus:"
-
-msgid "Move Job"
-msgstr "Töö liigutamine"
-
-msgid "Unable to find destination for job!"
-msgstr "Tööle ei leitud sihtkohta!"
-
-msgid "Move All Jobs"
-msgstr "Kõigi tööde liigutamine"
-
-msgid "Unable to move job"
-msgstr "Töö liigutamine ebaõnnestus"
-
-msgid "Unable to move jobs"
-msgstr "Tööde liigutamine ebaõnnestus"
-
-msgid "Print Test Page"
-msgstr "Testlehekülje trükkimine"
-
-msgid "Unable to print test page:"
-msgstr "Testlehekülje trükkimine ebaõnnestus:"
-
-msgid "Jobs"
-msgstr "Tööd"
-
-msgid "Job operation failed:"
-msgstr "Töötoiming ebaõnnestus:"
-
-msgid "Printers"
-msgstr "Printerid"
-
-msgid "Unable to get printer list:"
-msgstr "Printeriloendi hankimine ebaõnnestus:"
-
-msgid "Unable to get printer status:"
-msgstr "Printeri oleku hankimine ebaõnnestus:"
-
-msgid "OK"
-msgstr "OK"
-
-msgid "Unable to open PPD file"
-msgstr "PPD-faili avamine ebaõnnestus"
-
-msgid "NULL PPD file pointer"
-msgstr "NULL PPD-faili viit"
-
-msgid "Memory allocation error"
-msgstr "Mälueralduse viga"
-
-msgid "Missing PPD-Adobe-4.x header"
-msgstr "Puudub PPD-Adobe-4.x päis"
-
-msgid "Missing value string"
-msgstr "Puudub väärtusestring"
-
-msgid "Internal error"
-msgstr "Sisemine viga"
-
-msgid "Bad OpenGroup"
-msgstr "Vigane OpenGroup"
-
-msgid "OpenGroup without a CloseGroup first"
-msgstr "OpenGroup ilma eelneva CloseGroup"
-
-msgid "Bad OpenUI/JCLOpenUI"
-msgstr "Vigane OpenUI/JCLOpenUI"
-
-msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
-msgstr "OpenUI/JCLOpenUI ilma eelneva CloseUI/JCLCloseUI"
-
-msgid "Bad OrderDependency"
-msgstr "Vigane OrderDependency"
-
-msgid "Bad UIConstraints"
-msgstr "Vigane UIConstraints"
-
-msgid "Missing asterisk in column 1"
-msgstr "Puudub tärn veerus 1"
-
-msgid "Line longer than the maximum allowed (255 characters)"
-msgstr "Rida lubatust pikem (255 märki)"
-
-msgid "Illegal control character"
-msgstr "Lubamatu juhtmärk"
-
-msgid "Illegal main keyword string"
-msgstr "Lubamatu peamine võtmesõnastring"
-
-msgid "Illegal option keyword string"
-msgstr "Lubamatu võtme võtmesõnastring"
-
-msgid "Illegal translation string"
-msgstr "Lubamatu tõlkestring"
-
-msgid "Illegal whitespace character"
-msgstr "Lubamatu tühimärk"
-
-msgid "Bad custom parameter"
-msgstr "Vigane kohandatud parameeter"
-
-msgid "Unknown"
-msgstr "Teadmata"
-
-msgid "Custom"
-msgstr "Kohandatud"
-
-msgid "JCL"
-msgstr "JCL"
-
-msgid "No authentication information provided!"
-msgstr "Autentimisinfot pole antud!"
-
-#, c-format
-msgid "Password for %s required to access %s via SAMBA: "
-msgstr "%s vajab parooli pääsemaks ligi %s SAMBA kaudu: "
-
-#, c-format
-msgid "Running command: %s %s -N -U '%s%%%s' -c '%s'\n"
-msgstr "Käivitatakse käsk: %s %s -N -U '%s%%%s' -c '%s'\n"
-
-#, c-format
-msgid "cupsaddsmb: Unable to run \"%s\": %s\n"
-msgstr "cupsaddsmb: \"%s\" käivitamine ebaõnnestus: %s\n"
-
-msgid "cupsaddsmb: No Windows printer drivers are installed!\n"
-msgstr "cupsaddsmb: ühtegi Windowsi printeridraiverit pole paigaldatud!\n"
-
-msgid "cupsaddsmb: Warning, no Windows 2000 printer drivers are installed!\n"
-msgstr ""
-"cupsaddsmb: hoiatus - ühtegi Windows 2000 printeridraiverit pole "
-"paigaldatud!\n"
-
-#, c-format
-msgid "lpadmin: Printer %s is already a member of class %s.\n"
-msgstr "lpadmin: printer %s on juba klassi %s liige.\n"
-
-msgid "lpadmin: No member names were seen!\n"
-msgstr "lpadmin: ei nähtud ühtegi liikme nime!\n"
-
-#, c-format
-msgid "lpadmin: Printer %s is not a member of class %s.\n"
-msgstr "lpadmin: printer %s ei ole klassi %s liige.\n"
-
-#, c-format
-msgid ""
-"Device: uri = %s\n"
-"        class = %s\n"
-"        info = %s\n"
-"        make-and-model = %s\n"
-"        device-id = %s\n"
-msgstr ""
-"Seade: uri = %s\n"
-"       klass = %s\n"
-"       info = %s\n"
-"       valmistaja-ja-mudel = %s\n"
-"       seadme-id = %s\n"
-
-#, c-format
-msgid ""
-"Model:  name = %s\n"
-"        natural_language = %s\n"
-"        make-and-model = %s\n"
-"        device-id = %s\n"
-msgstr ""
-"Mudel:  nimi = %s\n"
-"        loomulik_keel = %s\n"
-"        valmistaja-ja-mudel = %s\n"
-"        seadme-id = %s\n"
-
-msgid "Usage: lpmove job/src dest\n"
-msgstr "Kasutamine: lpmove töö/lähtekoht sihtkoht\n"
-
-msgid "lpstat: Need \"completed\", \"not-completed\", or \"all\" after -W!\n"
-msgstr ""
-"lpstat: pärast -W on vajalik \"completed\", \"not-completed\" või \"all\"!\n"
-
-#, c-format
-msgid "%s accepting requests since %s\n"
-msgstr "%s võtab soove vastu alates %s\n"
-
-#, c-format
-msgid ""
-"%s not accepting requests since %s -\n"
-"\t%s\n"
-msgstr ""
-"%s ei võta soove vastu alates %s -\n"
-"\t%s\n"
-
-#, c-format
-msgid "%s/%s accepting requests since %s\n"
-msgstr "%s/%s võtab soove vastu alates %s\n"
-
-#, c-format
-msgid ""
-"%s/%s not accepting requests since %s -\n"
-"\t%s\n"
-msgstr ""
-"%s/%s ei võta soove vastu alates %s -\n"
-"\t%s\n"
-
-msgid "lpc> "
-msgstr "lpc> "
-
-#, c-format
-msgid "%s: Unable to contact server!\n"
-msgstr "%s: ei õnnestu saada ühendust serveriga!\n"
-
-#, c-format
-msgid "%s: Error - expected username after '-U' option!\n"
-msgstr "%s: viga - võtme '-U' järel oodati kasutajanime!\n"
-
-#, c-format
-msgid "%s: Error - unknown destination \"%s/%s\"!\n"
-msgstr "%s: viga - tundmatu sihtkoht \"%s/%s\"!\n"
-
-#, c-format
-msgid "%s: Unknown destination \"%s\"!\n"
-msgstr "%s: tundmatu sihtkoht \"%s\"!\n"
-
-#, c-format
-msgid "%s: Error - expected hostname after '-h' option!\n"
-msgstr "%s: viga - võtme '-h' järel oodati masinanime!\n"
-
-#, c-format
-msgid ""
-"%s: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
-
-#, c-format
-msgid "%s: error - no default destination available.\n"
-msgstr "%s: viga - vaikimisi sihtkoht pole saadaval.\n"
-
-msgid ""
-"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
-msgstr ""
-"Kasutamine: lpq [-P sihtkoht] [-U kasutajanimi] [-h masinanimi[:port]] [-l] "
-"[+intervall]\n"
-
-#, c-format
-msgid "%s: Error - expected hostname after '-H' option!\n"
-msgstr "%s: viga - võtme '-H' järel oodati masinanime!\n"
-
-#, c-format
-msgid "%s: Error - expected value after '-%c' option!\n"
-msgstr "%s: viga - võtme '-%c' järel oodati väärtust!\n"
-
-#, c-format
-msgid ""
-"%s: Warning - '%c' format modifier not supported - output may not be "
-"correct!\n"
-msgstr ""
-"%s: hoiatus - '%c' vormingus modifikaator pole toetatud - väljund võib olla "
-"vigane!\n"
-
-#, c-format
-msgid "%s: error - expected option=value after '-o' option!\n"
-msgstr "%s: viga - võtme '-o' järel oodati võti=väärtus!\n"
-
-#, c-format
-msgid "%s: Error - expected destination after '-P' option!\n"
-msgstr "%s: viga - võtme '-P' järel oodati sihtkohta!\n"
-
-#, c-format
-msgid "%s: Error - expected copy count after '-#' option!\n"
-msgstr "%s: viga - võtme '-#' järel oodati koopiate arvu!\n"
-
-#, c-format
-msgid "%s: Error - expected name after '-%c' option!\n"
-msgstr "%s: viga - võtme '-%c' järel oodati nime!\n"
-
-#, c-format
-msgid "%s: Error - unknown option '%c'!\n"
-msgstr "%s: viga - tundmatu võti '%c'!\n"
-
-#, c-format
-msgid "%s: Error - unable to access \"%s\" - %s\n"
-msgstr "%s: viga - ei õnnestu ligipääs \"%s\" - %s\n"
-
-#, c-format
-msgid "%s: Error - too many files - \"%s\"\n"
-msgstr "%s: viga - liiga palju faile - \"%s\"\n"
-
-#, c-format
-msgid ""
-"%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
-
-#, c-format
-msgid "%s: Error - no default destination available.\n"
-msgstr "%s: viga - vaikimisi sihtkoht pole saadaval.\n"
-
-#, c-format
-msgid "%s: Error - scheduler not responding!\n"
-msgstr "%s: viga - ajastaja ei vasta!\n"
-
-#, c-format
-msgid "%s: Error - unable to create temporary file \"%s\" - %s\n"
-msgstr "%s: viga - ei õnnestu luua ajutist faili \"%s\" - %s\n"
-
-#, c-format
-msgid "%s: Error - unable to write to temporary file \"%s\" - %s\n"
-msgstr "%s: viga - ei õnnestu kirjutada ajutisse faili \"%s\" - %s\n"
-
-#, c-format
-msgid "%s: Error - stdin is empty, so no job has been sent.\n"
-msgstr "%s: viga - standardsisend on tühi, ühtegi tööd ei saadetud.\n"
-
-#, c-format
-msgid "%s: Error - unknown destination \"%s\"!\n"
-msgstr "%s: viga - tundmatu sihtkoht \"%s\"!\n"
-
-#, c-format
-msgid "%s: Error - expected reason text after '-r' option!\n"
-msgstr "%s: viga - võtme '-r' järel oodati teksti!\n"
-
-#, c-format
-msgid "%s: Error - expected username after '-u' option!\n"
-msgstr "%s: viga - võtme '-u' järel oodati kasutajanime!\n"
-
-#, c-format
-msgid "%s: %s failed: %s\n"
-msgstr "%s: %s ebaõnnestus: %s\n"
-
-#, c-format
-msgid "%s: Error - expected destination after '-d' option!\n"
-msgstr "%s: viga - võtme '-d' järel oodati sihtkohta!\n"
-
-#, c-format
-msgid "%s: Error - expected form after '-f' option!\n"
-msgstr "%s: viga - võtme '-f' järel oodati vormi!\n"
-
-#, c-format
-msgid "%s: Warning - form option ignored!\n"
-msgstr "%s: hoiatus - vormivõtit ignoreeritakse!\n"
-
-#, c-format
-msgid "%s: Expected job ID after '-i' option!\n"
-msgstr "%s: võtme '-i' järel oodati töö ID-d!\n"
-
-#, c-format
-msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "%s: viga - faile trükkida ja töid muuta ei saa ühel ajal!\n"
-
-#, c-format
-msgid "%s: Error - bad job ID!\n"
-msgstr "%s: viga - vigane töö ID!\n"
-
-#, c-format
-msgid "%s: Error - expected copies after '-n' option!\n"
-msgstr "%s: viga - võtme '-n' järel oodati koopiaid!\n"
-
-#, c-format
-msgid "%s: Error - expected option string after '-o' option!\n"
-msgstr "%s: viga - võtme '-o' järel oodati võtmestringi!\n"
-
-#, c-format
-msgid "%s: Error - expected priority after '-%c' option!\n"
-msgstr "%s: viga - võtme '-%c' järel oodati prioriteeti!\n"
-
-#, c-format
-msgid "%s: Error - priority must be between 1 and 100.\n"
-msgstr "%s: viga - prioriteet peab olema vahemikus 1 kuni 100.\n"
-
-#, c-format
-msgid "%s: Error - expected title after '-t' option!\n"
-msgstr "%s: viga - võtme '-t' järel oodati tiitlit!\n"
-
-#, c-format
-msgid "%s: Error - expected mode list after '-y' option!\n"
-msgstr "%s: viga - võtme '-y' järel oodati režiimiloendit!\n"
-
-#, c-format
-msgid "%s: Warning - mode option ignored!\n"
-msgstr "%s: hoiatus - režiimivõtit ignoreeritakse!\n"
-
-#, c-format
-msgid "%s: Error - expected hold name after '-H' option!\n"
-msgstr "%s: viga - võtme '-H' järel oodati hoitava nime!\n"
-
-#, c-format
-msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
-msgstr "%s: enne '-H restart' on vajalik töö ID ('-i tööid')!\n"
-
-#, c-format
-msgid "%s: Error - expected page list after '-P' option!\n"
-msgstr "%s: viga - võtme '-P' järel oodati leheloendit!\n"
-
-#, c-format
-msgid "%s: Error - expected character set after '-S' option!\n"
-msgstr "%s: viga - võtme '-S' järel oodati märgistikku!\n"
-
-#, c-format
-msgid "%s: Warning - character set option ignored!\n"
-msgstr "%s: hoiatus - märgistikuvõtit ignoreeritakse!\n"
-
-#, c-format
-msgid "%s: Error - expected content type after '-T' option!\n"
-msgstr "%s: viga - võtme '-T' järel oodati sisu tüüpi!\n"
-
-#, c-format
-msgid "%s: Warning - content type option ignored!\n"
-msgstr "%s: hoiatus - sisu tüübi võtit ignoreeritakse!\n"
-
-#, c-format
-msgid ""
-"%s: Error - cannot print from stdin if files or a job ID are provided!\n"
-msgstr ""
-"%s: viga - standardsisendist ei saa trükkida, kui antud on failid või töö "
-"ID!\n"
-
-#, c-format
-msgid ""
-"%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
-"option!\n"
-msgstr ""
-"%s: viga - võtme '-W' järel on vajalik \"completed\", \"not-completed\" või "
-"\"all\"!\n"
-
-#, c-format
-msgid "%s: Error - expected destination after '-b' option!\n"
-msgstr "%s: viga - võtme '-b' järel oodati sihtkohta!\n"
-
-#, c-format
-msgid "%s: Invalid destination name in list \"%s\"!\n"
-msgstr "%s: vigane sihtkoha nimi loendis \"%s\"!\n"
-
-#, c-format
-msgid "%s: Unable to connect to server\n"
-msgstr "%s: ei õnnestu saada ühendust serveriga\n"
-
-msgid "Print Job:"
-msgstr "Trükitöö:"
-
-msgid "pending"
-msgstr "ootel"
-
-msgid "held"
-msgstr "hoitud"
-
-msgid "processing"
-msgstr "töötlemisel"
-
-msgid "stopped"
-msgstr "peatatud"
-
-msgid "canceled"
-msgstr "katkestatud"
-
-msgid "aborted"
-msgstr "loobutud"
-
-msgid "completed"
-msgstr "lõpetatud"
-
-msgid "unknown"
-msgstr "teadmata"
-
-msgid "untitled"
-msgstr "nimeta"
-
-msgid "Printer:"
-msgstr "Printer:"
-
-msgid "idle"
-msgstr "jõude"
-
-msgid "Missing notify-subscription-ids attribute!"
-msgstr "Puudub notify-subscription-ids atribuut!"
-
-msgid "Job subscriptions cannot be renewed!"
-msgstr "Töötellimusi ei saa uuendada!"
-
-msgid "cupsd: Expected config filename after \"-c\" option!\n"
-msgstr "cupsd: võtme \"-c\" järel oodati seadistustefaili nime!\n"
-
-msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
-msgstr ""
-"cupsd: launchd(8) toetus pole kompileeritud, käivitatakse tavarežiimis.\n"
-
-#, c-format
-msgid "cupsd: Unknown option \"%c\" - aborting!\n"
-msgstr "cupsd: tundmatu võti \"%c\" - loobutakse!\n"
-
-#, c-format
-msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
-msgstr "cupsd: tundmatu argument \"%s\" - loobutakse!\n"
-
-msgid ""
-"Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
-"\n"
-"-c config-file      Load alternate configuration file\n"
-"-f                  Run in the foreground\n"
-"-F                  Run in the foreground but detach\n"
-"-h                  Show this usage message\n"
-"-l                  Run cupsd from launchd(8)\n"
-msgstr ""
-"Kasutamine: cupsd [-c seadistustefail] [-f] [-F] [-h] [-l]\n"
-"\n"
-"-c seadistustefail      Alternatiivse seadistustefaili laadimine\n"
-"-f                      Käivitamine esiplaanil\n"
-"-F                      Käivitamine esiplaanil, aga lahtihaagituna\n"
-"-h                      Kasutamisteate näitamine\n"
-"-l                      cupsd käivitamine launchd(8) pealt\n"
-
-#, c-format
-msgid "        WARN    Line %d only contains whitespace!\n"
-msgstr "        HOIATUS    Rida %d sisaldab ainult tühikut!\n"
-
-msgid ""
-"        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
-msgstr "        HOIATUS    Fail sisaldab CR. LF ja CR LF reavahetuste segu!\n"
-
-msgid ""
-"        WARN    Non-Windows PPD files should use lines ending with only LF, "
-"not CR LF!\n"
-msgstr ""
-"        HOIATUS    Mitte-Windowsi PPD-failid peavad kasutama ainult LF, "
-"mitte CR LF reavahetusi!\n"
-
-msgid "Printer Maintenance"
-msgstr "Printeri hooldus"
-
-msgid "Unable to send maintenance job:"
-msgstr "Hooldustöö saatmine ebaõnnestus:"
-
-#, c-format
-msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
-msgstr "cupsaddsmb: puudub PPD-fail printerile \"%s\" - %s\n"
-
-#, c-format
-msgid "      **FAIL**  %s %s does not exist!\n"
-msgstr "      **EBAÕNN**  %s %s ei ole olemas!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad language \"%s\"!\n"
-msgstr "      **EBAÕNN**  Vigane keel \"%s\"!\n"
-
-#, c-format
-msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Default translation string for option %s contains 8-bit "
-"characters!\n"
-msgstr ""
-"      **EBAÕNN**  Vaikimisi tõlkestring võtmele %s sisaldab 8-bitiseid "
-"märke!\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s, valikule %s!\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Default translation string for option %s choice %s contains "
-"8-bit characters!\n"
-msgstr ""
-"      **EBAÕNN**  Vaikimisi tõlkestring võtmele %s, valikule %s sisaldab 8-"
-"bitiseid märke!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-msgstr "      **EBAÕNN**  Vigane cupsFilter väärtus \"%s\"!\n"
-
-msgid "Help"
-msgstr "Abi"
-
-#, c-format
-msgid "Missing value on line %d!\n"
-msgstr "Puudub väärtus real %d!\n"
-
-#, c-format
-msgid "Missing double quote on line %d!\n"
-msgstr "Puuduvad topeltjutumärgid real %d!\n"
-
-#, c-format
-msgid "Bad option + choice on line %d!\n"
-msgstr "Vigane võti + valik real %d!\n"
-
-#, c-format
-msgid "Unable to copy Windows 2000 printer driver files (%d)!\n"
-msgstr "Ei õnnestu kopeerida Windows 2000 printeridraiverifaile (%d)!\n"
-
-#, c-format
-msgid "Unable to copy CUPS printer driver files (%d)!\n"
-msgstr "Ei õnnestu kopeerida CUPS-i printeridraiverifaile (%d)!\n"
-
-#, c-format
-msgid "Unable to install Windows 2000 printer driver files (%d)!\n"
-msgstr "Ei õnnestu paigaldada Windows 2000 printeridraiverifaile (%d)!\n"
-
-#, c-format
-msgid "Unable to copy Windows 9x printer driver files (%d)!\n"
-msgstr "Ei õnnestu kopeerida Windows 9x printeridraiverifaile (%d)!\n"
-
-#, c-format
-msgid "Unable to install Windows 9x printer driver files (%d)!\n"
-msgstr "Ei õnnestu paigaldada Winodws 9x printeridraiverifaile (%d)!\n"
-
-msgid "No Windows printer drivers are installed!\n"
-msgstr "Ühtegi Windowsi printeridraiverit pole paigaldatud!+n"
-
-msgid "Warning, no Windows 2000 printer drivers are installed!\n"
-msgstr "Hoiatus - ühtegi Windows 2000 printeridraiverit pole paigaldatud!\n"
-
-#, c-format
-msgid "Unable to set Windows printer driver (%d)!\n"
-msgstr "Ei õnnestu määrata Windowsi printeridraiverit (%d)!\n"
 
 msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
@@ -2712,167 +2409,22 @@ msgstr ""
 "  -h cups-server       Määratud CUPS-serveri kasutamine\n"
 "  -v                   Häälekus (käskude näitamine)\n"
 
-#, c-format
-msgid "Unable to copy Windows 2000 printer driver files (%d)!"
-msgstr "Ei õnnestu kopeerida Windows 2000 printeridraiverifaile (%d)!"
-
-#, c-format
-msgid "Unable to copy CUPS printer driver files (%d)!"
-msgstr "Ei õnnestu kopeerida CUPS-i printeridraiverifaile (%d)!"
-
-#, c-format
-msgid "Unable to install Windows 2000 printer driver files (%d)!"
-msgstr "Ei õnnestu paigaldada Windows 2000 printeridraiverifaile (%d)!"
-
-#, c-format
-msgid "Unable to copy Windows 9x printer driver files (%d)!"
-msgstr "Ei õnnestu kopeerida Windows 9x printeridraiverifaile (%d)!"
-
-#, c-format
-msgid "Unable to install Windows 9x printer driver files (%d)!"
-msgstr "Ei õnnestu paigaldada Windows 9x printeridraiverifaile (%d)!"
-
-msgid "No Windows printer drivers are installed!"
-msgstr "Ühtegi Windowsi printeridraiverit pole paigaldatud!"
-
-msgid "Warning, no Windows 2000 printer drivers are installed!"
-msgstr "Hoiatus - ühtegi Windows 2000 printeridraiverit pole paigaldatud!"
-
-#, c-format
-msgid "open of %s failed: %s"
-msgstr "%s avamine ebaõnnestus: %s"
-
-#, c-format
-msgid "Running command: %s %s -N -A %s -c '%s'\n"
-msgstr "Käivitatakse käsk: %s %s -N -A %s -c '%s'\n"
-
-#, c-format
-msgid "stat of %s failed: %s"
-msgstr "%s stat ebaõnnestus: %s"
-
-#, c-format
-msgid "Job #%d is already cancelled - can't cancel."
-msgstr "Töö nr %d on juba katkestatud - enam ei saa katkestada."
-
-#, c-format
-msgid "Job #%d is already aborted - can't cancel."
-msgstr "Tööst nr %d on juba loobutud - enam ei saa katkestada."
-
-#, c-format
-msgid "Job #%d is already completed - can't cancel."
-msgstr "Töö nr %d on juba lõpetatud - enam ei saa katkestada."
-
-#, c-format
 msgid ""
-"You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
-"s:%d%s</A>."
+"Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
+"\n"
+"-c config-file      Load alternate configuration file\n"
+"-f                  Run in the foreground\n"
+"-F                  Run in the foreground but detach\n"
+"-h                  Show this usage message\n"
+"-l                  Run cupsd from launchd(8)\n"
 msgstr ""
-"Sellele leheküljele pääseb URL-iga <A HREF=\"https://%s:%d%s\">https://%s:%d%"
-"s</A>."
-
-#, c-format
-msgid "Unsupported format '%s'!"
-msgstr "Toetamata vorming '%s'!"
-
-msgid "FAIL\n"
-msgstr "EBAÕNN\n"
-
-#, c-format
-msgid ""
-"    Line %d is longer than 255 characters (%d)!\n"
-"        REF: Page 25, Line Length\n"
-msgstr ""
-"    Rida %d on pikem kui 255 märki (%d)!\n"
-"        Viide: lk 25, Line Length\n"
-
-msgid ""
-"    Missing %!PS-Adobe-3.0 on first line!\n"
-"        REF: Page 17, 3.1 Conforming Documents\n"
-msgstr ""
-"    Puudub %!PS-Adobe-3.0 esimesel real!\n"
-"        Viide: lk 17, 3.1 Conforming Documents\n"
-
-#, c-format
-msgid ""
-"    Bad %%%%Pages: on line %d!\n"
-"        REF: Page 43, %%%%Pages:\n"
-msgstr ""
-"    Vigane %%%%Pages: real %d!\n"
-"        Viide: lk 43, %%%%Pages:\n"
-
-#, c-format
-msgid ""
-"    Bad %%%%BoundingBox: on line %d!\n"
-"        REF: Page 39, %%%%BoundingBox:\n"
-msgstr ""
-"    Vigane %%%%BoundingBox: real %d!\n"
-"        Viide: lk 39, %%%%BoundingBox:\n"
-
-#, c-format
-msgid ""
-"    Bad %%%%Page: on line %d!\n"
-"        REF: Page 53, %%%%Page:\n"
-msgstr ""
-"    Vigane %%%%Page: real %d!\n"
-"        Viide: lk 53, %%%%Page:\n"
-
-#, c-format
-msgid ""
-"    Missing or bad %%BoundingBox: comment!\n"
-"        REF: Page 39, %%BoundingBox:\n"
-msgstr ""
-"    Puuduv või vigane %%BoundingBox: kommentaar!\n"
-"        Viide: lk 39, %%BoundingBox:\n"
-
-#, c-format
-msgid ""
-"    Missing or bad %%Pages: comment!\n"
-"        REF: Page 43, %%Pages:\n"
-msgstr ""
-"    Puuduv või vigane %%Pages: kommentaar!\n"
-"        Viide: lk 43, %%Pages:\n"
-
-#, c-format
-msgid ""
-"    Missing %%EndComments comment!\n"
-"        REF: Page 41, %%EndComments\n"
-msgstr ""
-"    Puudub %%EndComments kommentaar!\n"
-"        Viide: lk 41, %%EndComments\n"
-
-#, c-format
-msgid ""
-"    Missing or bad %%Page: comments!\n"
-"        REF: Page 53, %%Page:\n"
-msgstr ""
-"    Puuduvad või vigased %%Page: kommentaarid!\n"
-"        Viide: lk 53, %%Page:\n"
-
-#, c-format
-msgid "    Too many %%EndDocument comments!\n"
-msgstr "    Liiga palju %%EndDocument kommentaare!\n"
-
-#, c-format
-msgid "    Too many %%BeginDocument comments!\n"
-msgstr "    Liiga palju %%BeginDocument kommentaare!\n"
-
-#, c-format
-msgid "    Saw %d lines that exceeded 255 characters!\n"
-msgstr "    Nähti %d rida, mis ületas 255 märgi piiri!+n"
-
-msgid "PASS\n"
-msgstr "SOORITATUD\n"
-
-msgid "    Warning: file contains binary data!\n"
-msgstr "    Hoiatus: fail sisaldab binaarandmeid!\n"
-
-#, c-format
-msgid "    Warning: obsolete DSC version %.1f in file!\n"
-msgstr "    Hoiatus: iganenud DSC versioon %.1f failis!\n"
-
-#, c-format
-msgid "    Warning: no %%EndComments comment in file!\n"
-msgstr "    Hoiatus: failis puudub %%EndComments kommentaar!\n"
+"Kasutamine: cupsd [-c seadistustefail] [-f] [-F] [-h] [-l]\n"
+"\n"
+"-c seadistustefail      Alternatiivse seadistustefaili laadimine\n"
+"-f                      Käivitamine esiplaanil\n"
+"-F                      Käivitamine esiplaanil, aga lahtihaagituna\n"
+"-h                      Kasutamisteate näitamine\n"
+"-l                      cupsd käivitamine launchd(8) pealt\n"
 
 msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
@@ -2895,78 +2447,1112 @@ msgstr ""
 "    Märkus: see programm kontrollib ainult DSC kommentaare, mitte "
 "PostScripti ennast.\n"
 
-#, c-format
-msgid "Password for %s on %s? "
-msgstr "Parool %s jaoks masinas %s? "
+msgid ""
+"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
+"gz]]\n"
+"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
+msgstr ""
+"Kasutamine: cupstestppd [-q] [-r] [-v[v]] failinimi1.ppd[.gz] [... "
+"failinimiN.ppd[.gz]]\n"
+"            program | cupstestppd [-q] [-r] [-v[v]] -\n"
+
+msgid "Usage: lpmove job/src dest\n"
+msgstr "Kasutamine: lpmove töö/lähtekoht sihtkoht\n"
 
 msgid ""
-"      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
-"                REF: Page 72, section 5.5\n"
+"Usage: lpoptions [-h server] [-E] -d printer\n"
+"       lpoptions [-h server] [-E] [-p printer] -l\n"
+"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
+"       lpoptions [-h server] [-E] -x printer\n"
 msgstr ""
-"      **EBAÕNN**  1284DeviceId peab olema 1284DeviceID!\n"
-"                  Viide: lk 72, sektsioon 5.5\n"
+"Kasutamine: lpoptions [-h server] [-E] -d printer\n"
+"            lpoptions [-h server] [-E] [-p printer] -l\n"
+"            lpoptions [-h server] [-E] -p printer -o võti[=väärtus] ...\n"
+"            lpoptions [-h server] [-E] -x printer\n"
 
-#, fuzzy, c-format
-msgid "Missing value on line %d!"
-msgstr "Puudub väärtus real %d!\n"
+msgid "Usage: lppasswd [-g groupname]\n"
+msgstr "Kasutamine: lppasswd [-g grupinimi]\n"
 
-#, fuzzy, c-format
-msgid "Missing double quote on line %d!"
-msgstr "Puuduvad topeltjutumärgid real %d!\n"
-
-#, fuzzy, c-format
-msgid "Bad option + choice on line %d!"
-msgstr "Vigane võti + valik real %d!\n"
-
-#, fuzzy
-msgid "Empty PPD file!"
-msgstr "PPD-faili kopeerimine ebaõnnestus!"
-
-#, fuzzy, c-format
-msgid "Unable to set Windows printer driver (%d)!"
-msgstr "Ei õnnestu määrata Windowsi printeridraiverit (%d)!\n"
-
-#, fuzzy, c-format
-msgid "Unable to run \"%s\": %s\n"
-msgstr "cupsaddsmb: \"%s\" käivitamine ebaõnnestus: %s\n"
-
-#, fuzzy
 msgid ""
-"Enter your username and password or the root username and password to access "
-"this page. If you are using Kerberos authentication, make sure you have a "
-"valid Kerberos ticket."
+"Usage: lppasswd [-g groupname] [username]\n"
+"       lppasswd [-g groupname] -a [username]\n"
+"       lppasswd [-g groupname] -x [username]\n"
 msgstr ""
-"Selle lehekülje avamiseks andke enda või administraatori (root) kasutajanimi "
-"ja parool."
+"Kasutamine: lppasswd [-g grupinimi] [kasutajanimi]\n"
+"            lppasswd [-g grupinimi] -a [kasutajanimi]\n"
+"            lppasswd [-g grupinimi] -x [kasutajanimi]\n"
+
+msgid ""
+"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
+msgstr ""
+"Kasutamine: lpq [-P sihtkoht] [-U kasutajanimi] [-h masinanimi[:port]] [-l] "
+"[+intervall]\n"
+
+msgid "Usage: snmp [host-or-ip-address]\n"
+msgstr ""
 
 #, fuzzy, c-format
-msgid "Job #%d is already canceled - can't cancel."
-msgstr "Töö nr %d on juba katkestatud - enam ei saa katkestada."
+msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
+msgstr "lp: võtme -f järel oodati vormi!\n"
 
-#, c-format
-msgid "Bad notify-recipient URI \"%s\"!"
+msgid "WARNING: Couldn't create read channel\n"
+msgstr ""
+
+msgid "WARNING: Couldn't create sidechannel thread!\n"
+msgstr ""
+
+msgid "WARNING: Failed to read side-channel request!\n"
 msgstr ""
 
 #, c-format
-msgid "notify-recipient URI \"%s\" uses unknown scheme!"
+msgid "WARNING: Option \"%s\" cannot be included via IncludeFeature!\n"
 msgstr ""
 
-#, fuzzy, c-format
-msgid "Bad notify-pull-method \"%s\"!"
-msgstr "Vigane port-monitor \"%s\"!"
-
-#, fuzzy, c-format
+#, c-format
 msgid ""
-"      **FAIL**  %s must be 1284DeviceID!\n"
-"                REF: Page 72, section 5.5\n"
+"WARNING: Remote host did not respond with command status byte after %d "
+"seconds!\n"
 msgstr ""
-"      **EBAÕNN**  1284DeviceId peab olema 1284DeviceID!\n"
-"                  Viide: lk 72, sektsioon 5.5\n"
+
+#, c-format
+msgid ""
+"WARNING: Remote host did not respond with control status byte after %d "
+"seconds!\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"WARNING: Remote host did not respond with data status byte after %d "
+"seconds!\n"
+msgstr ""
+
+#, c-format
+msgid "WARNING: SCSI command timed out (%d); retrying...\n"
+msgstr ""
+
+msgid ""
+"WARNING: This document does not conform to the Adobe Document Structuring "
+"Conventions and may not print correctly!\n"
+msgstr ""
 
 #, fuzzy, c-format
-msgid "    %d ERRORS FOUND\n"
-msgstr "    %d VIGA%s LEITUD\n"
+msgid "WARNING: Unknown choice \"%s\" for option \"%s\"!\n"
+msgstr "%s: tundmatu sihtkoht \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "WARNING: Unknown option \"%s\"!\n"
+msgstr "%s: tundmatu võti '%c'!\n"
+
+#, fuzzy, c-format
+msgid "WARNING: Unsupported baud rate %s!\n"
+msgstr "Toetamata vorming '%s'!"
+
+#, c-format
+msgid ""
+"WARNING: recoverable: Network host '%s' is busy; will retry in %d "
+"seconds...\n"
+msgstr ""
+
+msgid "Warning, no Windows 2000 printer drivers are installed!"
+msgstr "Hoiatus - ühtegi Windows 2000 printeridraiverit pole paigaldatud!"
+
+msgid "Yes"
+msgstr "Jah"
+
+#, c-format
+msgid ""
+"You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
+"s:%d%s</A>."
+msgstr ""
+"Sellele leheküljele pääseb URL-iga <A HREF=\"https://%s:%d%s\">https://%s:%d%"
+"s</A>."
+
+msgid "aborted"
+msgstr "loobutud"
+
+msgid "canceled"
+msgstr "katkestatud"
+
+msgid "completed"
+msgstr "lõpetatud"
+
+msgid "cups-deviced failed to execute."
+msgstr "cups-deviced käivitamine ebaõnnestus."
+
+msgid "cups-driverd failed to execute."
+msgstr "cups-driverd käivitamine ebaõnnestus."
+
+#, c-format
+msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
+msgstr "cupsaddsmb: puudub PPD-fail printerile \"%s\" - %s\n"
+
+msgid "cupsd: Expected config filename after \"-c\" option!\n"
+msgstr "cupsd: võtme \"-c\" järel oodati seadistustefaili nime!\n"
+
+#, c-format
+msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
+msgstr "cupsd: tundmatu argument \"%s\" - loobutakse!\n"
+
+#, c-format
+msgid "cupsd: Unknown option \"%c\" - aborting!\n"
+msgstr "cupsd: tundmatu võti \"%c\" - loobutakse!\n"
+
+msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
+msgstr ""
+"cupsd: launchd(8) toetus pole kompileeritud, käivitatakse tavarežiimis.\n"
+
+msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
+msgstr "cupstestppd: võti -q ei sobi kokku võtmega -v.\n"
+
+msgid "cupstestppd: The -v option is incompatible with the -q option.\n"
+msgstr "cupstestppd: võti -v ei sobi kokku võtmega -q.\n"
+
+#, c-format
+msgid "device for %s/%s: %s\n"
+msgstr "seade %s/%s jaoks: %s\n"
+
+#, c-format
+msgid "device for %s: %s\n"
+msgstr "seade %s jaoks: %s\n"
+
+msgid "held"
+msgstr "hoitud"
+
+msgid "help\t\tget help on commands\n"
+msgstr "help\t\tabi käskude kohta\n"
+
+msgid "idle"
+msgstr "jõude"
+
+msgid "job-printer-uri attribute missing!"
+msgstr "job-printer-uri atribuut puudub!"
+
+msgid "lpadmin: Class name can only contain printable characters!\n"
+msgstr "lpadmin: klassi nimi tohib sisaldada ainult trükitavaid märke!\n"
+
+msgid "lpadmin: Expected PPD after '-P' option!\n"
+msgstr "lpadmin: võtme '-P' järel oodati PPD-d!\n"
+
+msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
+msgstr "lpadmin: võtme '-u' järel oodati allow/deny:kasutajateloend"
+
+msgid "lpadmin: Expected class after '-r' option!\n"
+msgstr "lpadmin: võtme '-r' järel oodati klassi!\n"
+
+msgid "lpadmin: Expected class name after '-c' option!\n"
+msgstr "lpadmin: võtme '-c' järel oodati klassi nime!\n"
+
+msgid "lpadmin: Expected description after '-D' option!\n"
+msgstr "lpadmin: võtme '-D' järel oodati kirjeldust!\n"
+
+msgid "lpadmin: Expected device URI after '-v' option!\n"
+msgstr "lpadmin: võtme '-v' järel oodati seadme URI!\n"
+
+msgid "lpadmin: Expected file type(s) after '-I' option!\n"
+msgstr "lpadmin: võtme '-I' järel oodati faili tüüpi/tüüpe!\n"
+
+msgid "lpadmin: Expected hostname after '-h' option!\n"
+msgstr "lpadmin: võtme '-h' järel oodati masinanime!\n"
+
+msgid "lpadmin: Expected interface after '-i' option!\n"
+msgstr "lpadmin: võtme '-i' järel oodati liidest!\n"
+
+msgid "lpadmin: Expected location after '-L' option!\n"
+msgstr "lpadmin: võtme '-L' järel oodati asukohta!\n"
+
+msgid "lpadmin: Expected model after '-m' option!\n"
+msgstr "lpadmin: võtme '-m' järel oodati mudelit!\n"
+
+msgid "lpadmin: Expected name=value after '-o' option!\n"
+msgstr "lpadmin: võtme '-o' järel oodati nimi=väärtus!\n"
+
+msgid "lpadmin: Expected printer after '-p' option!\n"
+msgstr "lpadmin: võtme '-p' järel oodati printerit!\n"
+
+msgid "lpadmin: Expected printer name after '-d' option!\n"
+msgstr "lpadmin: võtme '-d' järel oodati printeri nime!\n"
+
+msgid "lpadmin: Expected printer or class after '-x' option!\n"
+msgstr "lpadmin: võtme '-x' järel oodati printerit või klassi!\n"
+
+msgid "lpadmin: No member names were seen!\n"
+msgstr "lpadmin: ei nähtud ühtegi liikme nime!\n"
+
+#, c-format
+msgid "lpadmin: Printer %s is already a member of class %s.\n"
+msgstr "lpadmin: printer %s on juba klassi %s liige.\n"
+
+#, c-format
+msgid "lpadmin: Printer %s is not a member of class %s.\n"
+msgstr "lpadmin: printer %s ei ole klassi %s liige.\n"
+
+msgid "lpadmin: Printer name can only contain printable characters!\n"
+msgstr "lpadmin: printeri nimi tohib sisaldada ainult trükitavaid märke!\n"
+
+msgid ""
+"lpadmin: Unable to add a printer to the class:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: ei õnnestu lisada printerit klassi:\n"
+"         Kõigepealt tuleb määrata printeri nimi!\n"
+
+#, c-format
+msgid "lpadmin: Unable to connect to server: %s\n"
+msgstr "lpadmin: ei õnnestu saada ühendust serveriga: %s\n"
+
+#, c-format
+msgid "lpadmin: Unable to create temporary file - %s\n"
+msgstr "lpadmin: ei õnnestu luua ajutist faili - %s\n"
+
+#, c-format
+msgid "lpadmin: Unable to create temporary file: %s\n"
+msgstr "lpadmin: ei õnnestu luua ajutist faili: %s\n"
+
+#, c-format
+msgid "lpadmin: Unable to open PPD file \"%s\" - %s\n"
+msgstr "lpadmin: ei õnnestu avada PPD-faili \"%s\" - %s\n"
+
+#, c-format
+msgid "lpadmin: Unable to open file \"%s\": %s\n"
+msgstr "lpadmin: ei õnnestu avada faili \"%s\": %s\n"
+
+msgid ""
+"lpadmin: Unable to remove a printer from the class:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: ei õnnestu eemaldada printerit klassist:\n"
+"         Kõigepealt tuleb määrata printeri nimi!\n"
+
+msgid ""
+"lpadmin: Unable to set the PPD file:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: ei õnnestu määrata PPD-faili:\n"
+"         Kõigepealt tuleb määrata printeri nimi!\n"
+
+msgid ""
+"lpadmin: Unable to set the device URI:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: ei õnnestu määrata seadme URI:\n"
+"         Kõigepealt tuleb määrata printeri nimi!\n"
+
+msgid ""
+"lpadmin: Unable to set the interface script or PPD file:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: ei õnnestu määrata liideseskripti või PPD-faili:\n"
+"         Kõigepealt tuleb määrata printeri nimi!\n"
+
+msgid ""
+"lpadmin: Unable to set the interface script:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: ei õnnestu määrata liideseskripti:\n"
+"         Kõigepealt tuleb määrata printeri nimi!\n"
+
+msgid ""
+"lpadmin: Unable to set the printer description:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: ei õnnestu määrata printeri kirjeldust:\n"
+"         Kõigepealt tuleb määrata printeri nimi!\n"
+
+msgid ""
+"lpadmin: Unable to set the printer location:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: ei õnnestu määrata printeri asukohta:\n"
+"         Kõigepealt tuleb määrata printeri nimi!\n"
+
+msgid ""
+"lpadmin: Unable to set the printer options:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: ei õnnestu määrata printeri võtmeid:\n"
+"         Kõigepealt tuleb määrata printeri nimi!\n"
+
+#, c-format
+msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
+msgstr "lpadmin: tundmatu allow/deny võti \"%s\"!\n"
+
+#, c-format
+msgid "lpadmin: Unknown argument '%s'!\n"
+msgstr "lpadmin: tundmatu argument '%s'!\n"
+
+#, c-format
+msgid "lpadmin: Unknown option '%c'!\n"
+msgstr "lpadmin: tundmatu võti '%c'!\n"
+
+msgid "lpadmin: Warning - content type list ignored!\n"
+msgstr "lpadmin: hoiatus - sisu tüüpide loendit ignoreeritakse!\n"
+
+msgid "lpc> "
+msgstr "lpc> "
+
+#, c-format
+msgid "lpinfo: Unable to connect to server: %s\n"
+msgstr "lpinfo: ei õnnestu saada ühendust serveriga: %s\n"
+
+#, c-format
+msgid "lpinfo: Unknown argument '%s'!\n"
+msgstr "lpinfo: tundmatu argument '%s'!\n"
+
+#, c-format
+msgid "lpinfo: Unknown option '%c'!\n"
+msgstr "lpinfo: tundmatu võti '%c'!\n"
+
+#, c-format
+msgid "lpmove: Unable to connect to server: %s\n"
+msgstr "lpmove: ei õnnestu saada ühendust serveriga: %s\n"
+
+#, c-format
+msgid "lpmove: Unknown argument '%s'!\n"
+msgstr "lpmove: tundmatu argument '%s'!\n"
+
+#, c-format
+msgid "lpmove: Unknown option '%c'!\n"
+msgstr "lpmove: tundmatu võti '%c'!\n"
+
+msgid "lpoptions: No printers!?!\n"
+msgstr "lpoptions: printerit polegi!?!\n"
+
+#, c-format
+msgid "lpoptions: Unable to add printer or instance: %s\n"
+msgstr "lpoptions: ei õnnestu lisada printerit või isendit: %s\n"
 
 #, fuzzy, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s\n"
 msgstr "lpoptions: ei õnnestu avada PPD-faili %s jaoks!\n"
+
+#, c-format
+msgid "lpoptions: Unable to open PPD file for %s!\n"
+msgstr "lpoptions: ei õnnestu avada PPD-faili %s jaoks!\n"
+
+msgid "lpoptions: Unknown printer or class!\n"
+msgstr "lpoptions: tundmatu printer või klass!\n"
+
+msgid "lppasswd: Only root can add or delete passwords!\n"
+msgstr ""
+"lppasswd: ainult administraator (root) võib paroole lisada või kustutada!\n"
+
+msgid "lppasswd: Password file busy!\n"
+msgstr "lppasswd: paroolifail on hõivatud!\n"
+
+msgid "lppasswd: Password file not updated!\n"
+msgstr "lppasswd: paroolifaili ei uuendatud!\n"
+
+msgid "lppasswd: Sorry, password doesn't match!\n"
+msgstr "lppasswd: vabandust , parool ei kattu!\n"
+
+msgid ""
+"lppasswd: Sorry, password rejected.\n"
+"Your password must be at least 6 characters long, cannot contain\n"
+"your username, and must contain at least one letter and number.\n"
+msgstr ""
+"lppasswd: vabandust, parool lükati tagasi.\n"
+"Parool peab koosnema vähemalt 6 märgist, ei tohi sisaldada Teie\n"
+"kasutajanime ning peab sisaldama vähemalt üht tähte ja üht numbrit.\n"
+
+msgid "lppasswd: Sorry, passwords don't match!\n"
+msgstr "lppasswd: vabandust, paroolid ei kattu!+n"
+
+#, c-format
+msgid "lppasswd: Unable to copy password string: %s\n"
+msgstr "lppasswd: ei õnnestu kopeerida paroolistringi: %s\n"
+
+#, c-format
+msgid "lppasswd: Unable to open password file: %s\n"
+msgstr "lppasswd: ei õnnestu avada paroolifaili: %s\n"
+
+#, c-format
+msgid "lppasswd: Unable to write to password file: %s\n"
+msgstr "lppasswd: ei õnnestu kirjutada paroolifaili: %s\n"
+
+#, c-format
+msgid "lppasswd: failed to backup old password file: %s\n"
+msgstr "lppasswd. vana paroolifaili varundamine ebaõnnestus: %s\n"
+
+#, c-format
+msgid "lppasswd: failed to rename password file: %s\n"
+msgstr "lppasswd: paroolifaili ümbernimetamine ebaõnnestus: %s\n"
+
+#, c-format
+msgid "lppasswd: user \"%s\" and group \"%s\" do not exist.\n"
+msgstr "lppasswd: kasutajat \"%s\" ja gruppi \"%s\" ei ole olemas.\n"
+
+msgid "lprm: Unable to contact server!\n"
+msgstr "lprm: ei õnnestu saada ühendust serveriga!\n"
+
+#, c-format
+msgid ""
+"lpstat: error - %s environment variable names non-existent destination \"%s"
+"\"!\n"
+msgstr "lpstat: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
+
+#, c-format
+msgid "members of class %s:\n"
+msgstr "klassi %s liikmed:\n"
+
+msgid "no entries\n"
+msgstr "kirjeid pole\n"
+
+msgid "no system default destination\n"
+msgstr "süsteemi vaikimisi sihtkoht puudub\n"
+
+msgid "notify-events not specified!"
+msgstr "notify-events pole määratud!"
+
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" uses unknown scheme!"
+msgstr ""
+
+#, c-format
+msgid "notify-subscription-id %d no good!"
+msgstr "notify-subscription-id %d on vigane!"
+
+#, c-format
+msgid "open of %s failed: %s"
+msgstr "%s avamine ebaõnnestus: %s"
+
+msgid "pending"
+msgstr "ootel"
+
+#, c-format
+msgid "printer %s disabled since %s -\n"
+msgstr "printer %s välja lülitatud alates %s -\n"
+
+#, c-format
+msgid "printer %s is idle.  enabled since %s\n"
+msgstr "printer %s on jõude.  sisse lülitatud alates %s\n"
+
+#, c-format
+msgid "printer %s now printing %s-%d.  enabled since %s\n"
+msgstr "printer %s trükib praegu %s-%d.  sisse lülitatud alates %s\n"
+
+#, c-format
+msgid "printer %s/%s disabled since %s -\n"
+msgstr "printer %s/%s välja lülitatud alates %s -\n"
+
+#, c-format
+msgid "printer %s/%s is idle.  enabled since %s\n"
+msgstr "printer %s/%s on jõude.  sisse lülitatud alates %s\n"
+
+#, c-format
+msgid "printer %s/%s now printing %s-%d.  enabled since %s\n"
+msgstr "printer %s/%s trükib praegu %s-%d.  sisse lülitatud alates %s\n"
+
+msgid "processing"
+msgstr "töötlemisel"
+
+#, c-format
+msgid "request id is %s-%d (%d file(s))\n"
+msgstr "soovi ID on %s-%d (%d fail(i))\n"
+
+msgid "scheduler is not running\n"
+msgstr "ajastaja ei tööta\n"
+
+msgid "scheduler is running\n"
+msgstr "ajastaja töötab\n"
+
+#, c-format
+msgid "stat of %s failed: %s"
+msgstr "%s stat ebaõnnestus: %s"
+
+msgid "status\t\tshow status of daemon and queue\n"
+msgstr "status\t\tdeemoni ja järjekorra staatuse kuvamine\n"
+
+msgid "stopped"
+msgstr "peatatud"
+
+#, c-format
+msgid "system default destination: %s\n"
+msgstr "süsteemi vaikimisi sihtkoht: %s\n"
+
+#, c-format
+msgid "system default destination: %s/%s\n"
+msgstr "süsteemi vaikimisi sihtkoht: %s/%s\n"
+
+msgid "unknown"
+msgstr "teadmata"
+
+msgid "untitled"
+msgstr "nimeta"
+
+#~ msgid ""
+#~ "      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
+#~ "                REF: Page 72, section 5.5\n"
+#~ msgstr ""
+#~ "      **EBAÕNN**  1284DeviceId peab olema 1284DeviceID!\n"
+#~ "                  Viide: lk 72, sektsioon 5.5\n"
+
+#~ msgid "    %d ERROR%s FOUND\n"
+#~ msgstr "    %d VIGA%s LEITUD\n"
+
+#~ msgid "%s accepting requests since Jan 01 00:00\n"
+#~ msgstr "%s võtab soove vastu alates 01. jaan 00:00\n"
+
+#~ msgid ""
+#~ "%s not accepting requests since Jan 01 00:00 -\n"
+#~ "\t%s\n"
+#~ msgstr ""
+#~ "%s ei võta soove vastu alates 01. jaan 00:00 -\n"
+#~ "\t%s\n"
+
+#~ msgid "%s/%s accepting requests since Jan 01 00:00\n"
+#~ msgstr "%s/%s võtab soove vastu alates 01. jaan 00:00\n"
+
+#~ msgid ""
+#~ "%s/%s not accepting requests since Jan 01 00:00 -\n"
+#~ "\t%s\n"
+#~ msgstr ""
+#~ "%s/%s ei võta soove vastu alates 01. jaan 00:00 -\n"
+#~ "\t%s\n"
+
+#~ msgid "%s: Expected reason text after -r!\n"
+#~ msgstr "%s: oodati teksti pärast -r!\n"
+
+#~ msgid "%s: Expected server name after -h!\n"
+#~ msgstr "%s: oodati serveri nime pärast -h!\n"
+
+#~ msgid "%s: Unknown option '%c'!\n"
+#~ msgstr "%s: tundmatu võti '%c'!\n"
+
+#~ msgid "Auto"
+#~ msgstr "Automaatne"
+
+#~ msgid "Bad option + choice on line %d!\n"
+#~ msgstr "Vigane võti + valik real %d!\n"
+
+#~ msgid "Class"
+#~ msgstr "Klass"
+
+#~ msgid ""
+#~ "Device: uri = %s\n"
+#~ "        class = %s\n"
+#~ "        info = %s\n"
+#~ "        make-and-model = %s\n"
+#~ msgstr ""
+#~ "Seade: uri = %s\n"
+#~ "       klass = %s\n"
+#~ "       info = %s\n"
+#~ "       valmistaja-ja-mudel = %s\n"
+
+#~ msgid ""
+#~ "Enter your username and password or the root username and password to "
+#~ "access this page."
+#~ msgstr ""
+#~ "Selle lehekülje avamiseks andke enda või administraatori (root) "
+#~ "kasutajanimi ja parool."
+
+#~ msgid "Extra"
+#~ msgstr "Ekstra"
+
+#~ msgid "Job #%d doesn't exist!"
+#~ msgstr "Tööd nr %d ei ole olemas!"
+
+#~ msgid "Job #%d is already %s - can't cancel."
+#~ msgstr "Töö nr %d on juba %s - ei saa katkestada."
+
+#~ msgid "Job #%d is already cancelled - can't cancel."
+#~ msgstr "Töö nr %d on juba katkestatud - enam ei saa katkestada."
+
+#~ msgid "Missing double quote on line %d!\n"
+#~ msgstr "Puuduvad topeltjutumärgid real %d!\n"
+
+#~ msgid "Missing value on line %d!\n"
+#~ msgstr "Puudub väärtus real %d!\n"
+
+#~ msgid ""
+#~ "Model:  name = %s\n"
+#~ "        natural_language = %s\n"
+#~ "        make-and-model = %s\n"
+#~ msgstr ""
+#~ "Mudel:  nimi = %s\n"
+#~ "        loomulik_keel = %s\n"
+#~ "        valmistaja-ja-mudel = %s\n"
+
+#~ msgid "No Windows printer drivers are installed!\n"
+#~ msgstr "Ühtegi Windowsi printeridraiverit pole paigaldatud!+n"
+
+#~ msgid "No printer drivers found!"
+#~ msgstr "Printeridraivereid ei leitud!"
+
+#~ msgid "Not authorized to hold job #%d owned by \"%s\"!"
+#~ msgstr "Pole õigust hoida tööd %d, mille omanik on \"%s\"!"
+
+#~ msgid "Printer"
+#~ msgstr "Printer"
+
+#~ msgid "Printer not shared!"
+#~ msgstr "Printer ei ole ühiskasutuses!"
+
+#~ msgid "Running command: %s %s -N -U '%s%%%s' -c '%s'\n"
+#~ msgstr "Käivitatakse käsk: %s %s -N -U '%s%%%s' -c '%s'\n"
+
+#~ msgid "The printer-uri \"%s\" is not valid."
+#~ msgstr "printer-uri \"%s\" ei ole korrektne."
+
+#~ msgid "Too many jobs - %d jobs, max jobs is %d."
+#~ msgstr "Liiga palju töid - %d tööd, maksimaalselt võib olla %d."
+
+#~ msgid "Unable to connect to server!"
+#~ msgstr "Ühendumine serveriga ebaõnnestus!"
+
+#~ msgid "Unable to convert PPD file!"
+#~ msgstr "PPD-faili teisendamine ebaõnnestus!"
+
+#~ msgid "Unable to copy CUPS printer driver files (%d)!\n"
+#~ msgstr "Ei õnnestu kopeerida CUPS-i printeridraiverifaile (%d)!\n"
+
+#~ msgid "Unable to copy Windows 2000 printer driver files (%d)!\n"
+#~ msgstr "Ei õnnestu kopeerida Windows 2000 printeridraiverifaile (%d)!\n"
+
+#~ msgid "Unable to copy Windows 2000 printer driver files!"
+#~ msgstr "Windows 2000 printeridraiverifailide kopeerimine ebaõnnestus!"
+
+#~ msgid "Unable to copy Windows 9x printer driver files (%d)!\n"
+#~ msgstr "Ei õnnestu kopeerida Windows 9x printeridraiverifaile (%d)!\n"
+
+#~ msgid "Unable to copy Windows 9x printer driver files!"
+#~ msgstr "Windows 9x printeridraiverifailide kopeerimine ebaõnnestus!"
+
+#~ msgid "Unable to execute cupsaddsmb command!"
+#~ msgstr "Käsu cupsaddsmb täitmine ebaõnnestus!"
+
+#~ msgid "Unable to fork process!"
+#~ msgstr "Protsessi harutamine ebaõnnestus!"
+
+#~ msgid "Unable to get printer attributes!"
+#~ msgstr "Printeri atribuutide hankimine ebaõnnestus!"
+
+#~ msgid "Unable to install Windows 2000 printer driver files (%d)!\n"
+#~ msgstr "Ei õnnestu paigaldada Windows 2000 printeridraiverifaile (%d)!\n"
+
+#~ msgid "Unable to install Windows 2000 printer driver files!"
+#~ msgstr "Windows 2000 printeridraiverifailide paigaldamine ebaõnnestus!"
+
+#~ msgid "Unable to install Windows 9x printer driver files (%d)!\n"
+#~ msgstr "Ei õnnestu paigaldada Winodws 9x printeridraiverifaile (%d)!\n"
+
+#~ msgid "Unable to install Windows 9x printer driver files!"
+#~ msgstr "Windows 9x printeridraiverifailide paigaldamine ebaõnnestus!"
+
+#~ msgid "Unable to set Windows printer driver (%d)!\n"
+#~ msgstr "Ei õnnestu määrata Windowsi printeridraiverit (%d)!\n"
+
+#~ msgid "Unable to set Windows printer driver!"
+#~ msgstr "Windowsi printeridraiveri määramine ebaõnnestus!"
+
+#~ msgid ""
+#~ "Usage: cupsaddsmb [options] printer1 ... printerN\n"
+#~ "       cupsaddsmb [options] -a\n"
+#~ "\n"
+#~ "Options:\n"
+#~ "  -H samba-server  Use the named SAMBA server\n"
+#~ "  -U samba-user    Authenticate using the named SAMBA user\n"
+#~ "  -a               Export all printers\n"
+#~ "  -h cups-server   Use the named CUPS server\n"
+#~ "  -v               Be verbose (show commands)\n"
+#~ msgstr ""
+#~ "Kasutamine: cupsaddsmb [võtmed] printer1 ... printerN\n"
+#~ "            cupsaddsmb [võtmed] -a\n"
+#~ "\n"
+#~ "Võtmed:\n"
+#~ "  -H samba-server    määratud SAMBA-serveri kasutamine\n"
+#~ "  -U samba-kasutaja  määratud SAMBA kasutajaga autentimine\n"
+#~ "  -a                 Kõigi printerite eksport\n"
+#~ "  -h cups-server     määratud CUPS-serveri kasutamine\n"
+#~ "  -v                 Häälekus (käskude näitamine)\n"
+
+#~ msgid "Usage: lpmove job dest\n"
+#~ msgstr "Kasutamine: lpmove töö sihtkoht\n"
+
+#~ msgid "Usage: lpq [-P dest] [-l] [+interval]\n"
+#~ msgstr "Kasutamine: lpq [-P sihtkoht] [-l] [+intervall]\n"
+
+#~ msgid "Variable"
+#~ msgstr "Muutuv"
+
+#~ msgid "Warning, no Windows 2000 printer drivers are installed!\n"
+#~ msgstr "Hoiatus - ühtegi Windows 2000 printeridraiverit pole paigaldatud!\n"
+
+#~ msgid "You are not authorized to alter job id %d owned by \"%s\"!"
+#~ msgstr "Teil pole õigust muuta töö ID-d %d, mille omanik on \"%s\"!"
+
+#~ msgid "You are not authorized to authenticate job #%d owned by \"%s\"!"
+#~ msgstr "Teil pole õigust autentida tööd nr %d, mille omanik on \"%s\"!"
+
+#~ msgid "You are not authorized to delete job #%d owned by \"%s\"!"
+#~ msgstr "Teil pole õigust kustutada tööd nr %d, mille omanik on \"%s\"!"
+
+#~ msgid "You are not authorized to move job #%d owned by \"%s\"!"
+#~ msgstr "Teil pole õigust liigutada tööd nr %d, mille omanik on \"%s\"!"
+
+#~ msgid "You are not authorized to release job id %d owned by \"%s\"!"
+#~ msgstr "Teil pole õigust vabastada tööd ID-ga %d, mille omanik on \"%s\"!"
+
+#~ msgid "You are not authorized to restart job id %d owned by \"%s\"!"
+#~ msgstr ""
+#~ "Teil pole õigust taaskäivitada tööd ID-ga %d, mille omanik on \"%s\"!"
+
+#~ msgid "You are not authorized to send document for job #%d owned by \"%s\"!"
+#~ msgstr ""
+#~ "Teil pole õigust saata dokumenti tööle nr %d, mille omanik on \"%s\"!"
+
+#~ msgid "You must use a https: URL to access this page."
+#~ msgstr "Selle lehekülje avamiseks tuleb kasutada https: URL-i."
+
+#~ msgid "add_class: Unknown printer-error-policy \"%s\"."
+#~ msgstr "add_class: tundmatu printer-error-policy \"%s\"."
+
+#~ msgid "add_class: Unknown printer-op-policy \"%s\"."
+#~ msgstr "add_class: tundmatu printer-op-policy \"%s\"."
+
+#~ msgid "cancel: %s failed: %s\n"
+#~ msgstr "cancel: %s ebaõnnestus: %s\n"
+
+#~ msgid "cancel: Error - expected hostname after '-h' option!\n"
+#~ msgstr "cancel: viga - oodati masinanime pärast võtit '.h'!\n"
+
+#~ msgid "cancel: Error - expected username after '-u' option!\n"
+#~ msgstr "cancel: viga - oodati kasutajanime pärast võtit '-u'!\n"
+
+#~ msgid "cancel: Unable to contact server!\n"
+#~ msgstr "cancel: ei õnnestu saada ühendust serveriga!\n"
+
+#~ msgid "cancel: Unknown destination \"%s\"!\n"
+#~ msgstr "cancel: tundmatu sihtkoht \"%s\"!\n"
+
+#~ msgid "cancel: Unknown option '%c'!\n"
+#~ msgstr "cancel: tundmatu võti '%c'!\n"
+
+#~ msgid "cupsaddsmb crashed on signal %d"
+#~ msgstr "cupsaddsmb elas üle krahhi signaaliga %d"
+
+#~ msgid "cupsaddsmb failed with status %d"
+#~ msgstr "cupsaddsmb ebaõnnestus olekuga %d"
+
+#~ msgid "cupsaddsmb: Bad option + choice on line %d!\n"
+#~ msgstr "cupsaddsmb: vigane võti + valik real %d!\n"
+
+#~ msgid "cupsaddsmb: Missing double quote on line %d!\n"
+#~ msgstr "cupsaddsmb: puuduvad kahekordsed jutumärgid real %d!\n"
+
+#~ msgid "cupsaddsmb: Missing value on line %d!\n"
+#~ msgstr "cupsaddsmb: puudub väärtus real %d!\n"
+
+#~ msgid "cupsaddsmb: No PPD file for printer \"%s\" - skipping!\n"
+#~ msgstr "cupsaddsmb: puudub PPD printerile \"%s\" - jäetakse vahele!\n"
+
+#~ msgid "cupsaddsmb: No Windows printer drivers are installed!\n"
+#~ msgstr "cupsaddsmb: ühtegi Windowsi printeridraiverit pole paigaldatud!\n"
+
+#~ msgid "cupsaddsmb: Unable to connect to server \"%s\" for %s - %s\n"
+#~ msgstr ""
+#~ "cupsaddsmb: ei õnnestu saada ühendust serveriga \"%s\" %s jaoks - %s\n"
+
+#~ msgid "cupsaddsmb: Unable to convert PPD file for %s - %s\n"
+#~ msgstr "cupsaddsmb: ei õnnestunud teisendada PPD-faili %s jaoks - %s\n"
+
+#~ msgid "cupsaddsmb: Unable to copy CUPS printer driver files (%d)!\n"
+#~ msgstr ""
+#~ "cupsaddsmb: ei õnnestunud kopeerida CUPS-i printeridraiverifaile (%d)!\n"
+
+#~ msgid "cupsaddsmb: Unable to copy Windows 2000 printer driver files (%d)!\n"
+#~ msgstr ""
+#~ "cupsaddsmb: ei õnnestunud kopeerida Windows 2000 printeridraiverifaile (%"
+#~ "d)!\n"
+
+#~ msgid "cupsaddsmb: Unable to copy Windows 9x printer driver files (%d)!\n"
+#~ msgstr ""
+#~ "cupsaddsmb: ei õnnestunud kopeerida Windows 9x printeridraiverifaile (%"
+#~ "d)!\n"
+
+#~ msgid ""
+#~ "cupsaddsmb: Unable to install Windows 2000 printer driver files (%d)!\n"
+#~ msgstr ""
+#~ "cupsaddsmb: ei õnnestunud paigaldada Windows 2000 printeridraiverifaile (%"
+#~ "d)!\n"
+
+#~ msgid ""
+#~ "cupsaddsmb: Unable to install Windows 9x printer driver files (%d)!\n"
+#~ msgstr ""
+#~ "cupsaddsmb: ei õnnestunud paigaldada Windows 9x printeridraiverifaile (%"
+#~ "d)!\n"
+
+#~ msgid "cupsaddsmb: Unable to run \"%s\": %s\n"
+#~ msgstr "cupsaddsmb: \"%s\" käivitamine ebaõnnestus: %s\n"
+
+#~ msgid "cupsaddsmb: Unable to set Windows printer driver (%d)!\n"
+#~ msgstr ""
+#~ "cupsaddsmb: ei õnnestunud määrata Windowsi printeridraiverit (%d)!\n"
+
+#~ msgid ""
+#~ "cupsaddsmb: Warning, no Windows 2000 printer drivers are installed!\n"
+#~ msgstr ""
+#~ "cupsaddsmb: hoiatus - ühtegi Windows 2000 printeridraiverit pole "
+#~ "paigaldatud!\n"
+
+#~ msgid "cupsaddsmb: get-printer-attributes failed for \"%s\": %s\n"
+#~ msgstr "cupsaddsmb: get-printer-attributes ebaõnnestus \"%s\" jaoks: %s\n"
+
+#~ msgid "lp: Error - bad job ID!\n"
+#~ msgstr "lp: viga - vigane töö ID!\n"
+
+#~ msgid "lp: Error - cannot print files and alter jobs simultaneously!\n"
+#~ msgstr "lp: viga - faile ei saa trükkida ja töid muuta ühel ajal!\n"
+
+#~ msgid ""
+#~ "lp: Error - cannot print from stdin if files or a job ID are provided!\n"
+#~ msgstr ""
+#~ "lp: viga - standardsisendist ei saa trükkida, kui on antud failid või töö "
+#~ "ID!\n"
+
+#~ msgid "lp: Expected character set after -S option!\n"
+#~ msgstr "lp: võtme -S järel oodati märgistikku!\n"
+
+#~ msgid "lp: Expected content type after -T option!\n"
+#~ msgstr "lp: võtme -T järel oodati sisu tüüpi!\n"
+
+#~ msgid "lp: Expected copies after -n option!\n"
+#~ msgstr "lp: võtme -n järel oodati koopiaid!\n"
+
+#~ msgid "lp: Expected destination after -d option!\n"
+#~ msgstr "lp: võtme -d järel oodati sihtkohta!\n"
+
+#~ msgid "lp: Expected form after -f option!\n"
+#~ msgstr "lp: võtme -f järel oodati vormi!\n"
+
+#~ msgid "lp: Expected hold name after -H option!\n"
+#~ msgstr "lp: vätme -H järel oodati hoitava nime!\n"
+
+#~ msgid "lp: Expected hostname after -h option!\n"
+#~ msgstr "lp: võtme -h järel oodati masinanime!\n"
+
+#~ msgid "lp: Expected job ID after -i option!\n"
+#~ msgstr "lp: võtme -i järel oodati töö ID-d!\n"
+
+#~ msgid "lp: Expected mode list after -y option!\n"
+#~ msgstr "lp: võtme -y järel oodati režiimiloendit!\n"
+
+#~ msgid "lp: Expected option string after -o option!\n"
+#~ msgstr "lp. võtme -o järel oodati võtme stringi!\n"
+
+#~ msgid "lp: Expected page list after -P option!\n"
+#~ msgstr "lp: võtme -P järel oodati leheloendit!\n"
+
+#~ msgid "lp: Expected priority after -%c option!\n"
+#~ msgstr "lp: võtme -%c järel oodati prioriteeti!\n"
+
+#~ msgid "lp: Expected title after -t option!\n"
+#~ msgstr "lp: võtme -t järel oodati tiitlit!\n"
+
+#~ msgid "lp: Need job ID (-i) before \"-H restart\"!\n"
+#~ msgstr "lp: enne \"-H restart\" on vajalik töö ID (-i)!\n"
+
+#~ msgid "lp: Priority must be between 1 and 100.\n"
+#~ msgstr "lp: prioriteet peab olema vahemikus 1 kuni 100.\n"
+
+#~ msgid "lp: Too many files - \"%s\"\n"
+#~ msgstr "lp: liiga palju faile - \"%s\"\n"
+
+#~ msgid "lp: Unable to access \"%s\" - %s\n"
+#~ msgstr "lp: ei õnnestu ligipääs \"%s\" - %s\n"
+
+#~ msgid "lp: Unknown option '%c'!\n"
+#~ msgstr "lp: tundmatu võti '%c'!\n"
+
+#~ msgid "lp: Warning - character set option ignored!\n"
+#~ msgstr "lp: hoiatus - märgistikuvõtit ignoreeritakse!\n"
+
+#~ msgid "lp: Warning - content type option ignored!\n"
+#~ msgstr "lp: hoiatus - sisu tüübi võtit ignoreeritakse!\n"
+
+#~ msgid "lp: Warning - mode option ignored!\n"
+#~ msgstr "lp: hoiatus - režiimivõtit ignoreeritakse!\n"
+
+#~ msgid ""
+#~ "lp: error - %s environment variable names non-existent destination \"%s"
+#~ "\"!\n"
+#~ msgstr "lp: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
+
+#~ msgid "lp: error - no default destination available.\n"
+#~ msgstr "lp: viga - vaikimisi sihtkoht pole saadaval.\n"
+
+#~ msgid "lp: error - scheduler not responding!\n"
+#~ msgstr "lp: viga - ajastaja ei vasta!\n"
+
+#~ msgid "lp: error - unable to write to temporary file \"%s\" - %s\n"
+#~ msgstr "lp: viga - ei õnnestu kirjutada ajutisse faili \"%s\" - %s\n"
+
+#~ msgid "lp: restart-job failed: %s\n"
+#~ msgstr "lp: restart-job ebaõnnestus: %s\n"
+
+#~ msgid "lp: set-job-attributes failed: %s\n"
+#~ msgstr "lp: set-job-attributes ebaõnnestus: %s\n"
+
+#~ msgid "lp: stdin is empty, so no job has been sent.\n"
+#~ msgstr "lp: standardsisend on tühi, ühtegi tööd ei saadetud.\n"
+
+#~ msgid "lp: unable to create temporary file \"%s\" - %s\n"
+#~ msgstr "lp: ei õnnestu luua ajutist faili  \"%s\" - %s\n"
+
+#~ msgid "lp: unable to print file: %s\n"
+#~ msgstr "lp: ei õnnestu trükkida faili: %s\n"
+
+#~ msgid "lpadmin: %s failed: %s\n"
+#~ msgstr "lpadmin: %s ebaõnnestus: %s\n"
+
+#~ msgid "lpadmin: add-printer (set description) failed: %s\n"
+#~ msgstr "lpadmin: add-printer (kirjelduse määramine) ebaõnnestus: %s\n"
+
+#~ msgid "lpadmin: add-printer (set location) failed: %s\n"
+#~ msgstr "lpadmin: add-printer (asukoha määramine) ebaõnnestus: %s\n"
+
+#~ msgid "lpadmin: add-printer (set model) failed: %s\n"
+#~ msgstr "lpadmin: add-printer (mudeli määramine) ebaõnnestus: %s\n"
+
+#~ msgid "lpinfo: cups-get-devices failed: %s\n"
+#~ msgstr "lpinfo: cups-get-devices ebaõnnestus: %s\n"
+
+#~ msgid "lpinfo: cups-get-ppds failed: %s\n"
+#~ msgstr "lpinfo: cups-get-ppds ebaõnnestus: %s\n"
+
+#~ msgid "lpmove: move-job failed: %s\n"
+#~ msgstr "lpmove: move-job ebaõnnestus: %s\n"
+
+#~ msgid "lpoptions: Destination %s has no PPD file!\n"
+#~ msgstr "lpoptions: sihtkohal %s pole PPD-faili!\n"
+
+#~ msgid "lpq: Unable to contact server!\n"
+#~ msgstr "lpq: serveriga ei õnnestu ühendust luua!\n"
+
+#~ msgid "lpq: Unknown destination \"%s\"!\n"
+#~ msgstr "lpq: tundmatu sihtkoht \"%s\"!\n"
+
+#~ msgid "lpq: Unknown destination \"%s/%s\"!\n"
+#~ msgstr "lpq: tundmatu sihtkoht \"%s/%s\"!\n"
+
+#~ msgid "lpq: error - no default destination available.\n"
+#~ msgstr "lpq: viga - vaikimisi sihtkoht pole saadaval.\n"
+
+#~ msgid "lpq: get-jobs failed: %s\n"
+#~ msgstr "lpq: get-jobs ebaõnnestus: %s\n"
+
+#~ msgid "lpq: get-printer-attributes failed: %s\n"
+#~ msgstr "lpq: get-printer-attributes ebaõnnestus: %s\n"
+
+#~ msgid ""
+#~ "lpr: error - %s environment variable names non-existent destination \"%s"
+#~ "\"!\n"
+#~ msgstr "lpr: viga - %s keskkonnamuutuja nimetab olematu sihtkoha \"%s\"!\n"
+
+#~ msgid "lpr: error - expected copy count after -# option!\n"
+#~ msgstr "lpr: viga - oodati koopiate arvu pärast võtit -#!\n"
+
+#~ msgid "lpr: error - expected destination after -P option!\n"
+#~ msgstr "lpr: viga - oodati sihtkohta pärast võtit -P!\n"
+
+#~ msgid "lpr: error - expected name after -%c option!\n"
+#~ msgstr "lpr: viga - oodati nime pärast võtit -%c!\n"
+
+#~ msgid "lpr: error - expected option=value after -o option!\n"
+#~ msgstr "lpr: viga - oodati võti=väärtus pärast võtit -o!\n"
+
+#~ msgid "lpr: error - expected username after -U option!\n"
+#~ msgstr "lpr: viga - oodati kasutajanime pärast võtit -U!\n"
+
+#~ msgid "lpr: error - expected value after -%c option!\n"
+#~ msgstr "lpr: viga - oodati väärust pärast võtit -%c!\n"
+
+#~ msgid "lpr: error - no default destination available.\n"
+#~ msgstr "lpr: viga - vaikimisi sihtkoht pole saadaval.\n"
+
+#~ msgid "lpr: error - scheduler not responding!\n"
+#~ msgstr "lpr: viga - ajastaja ei vasta!\n"
+
+#~ msgid "lpr: error - stdin is empty, so no job has been sent.\n"
+#~ msgstr "lpr: viga - standardsisend on tühi, ühtegi tööd ei ole saadetud.\n"
+
+#~ msgid "lpr: error - too many files - \"%s\"\n"
+#~ msgstr "lpr: viga - liiga palju faile - \"%s\"\n"
+
+#~ msgid "lpr: error - unable to access \"%s\" - %s\n"
+#~ msgstr "lpr: viga - ligipääs asukohale \"%s\" ebaõnnestus - %s\n"
+
+#~ msgid "lpr: error - unable to create temporary file \"%s\" - %s\n"
+#~ msgstr "lpr: viga - ei õnnestu luua ajutist faili \"%s\" - %s\n"
+
+#~ msgid "lpr: error - unable to print file: %s\n"
+#~ msgstr "lpr: viga - ei õnnestu trükkida faili: %s\n"
+
+#~ msgid "lpr: error - unable to write to temporary file \"%s\" - %s\n"
+#~ msgstr "lpr: viga - ei õnnestu kirjutada ajutist faili \"%s\" - %s\n"
+
+#~ msgid "lpr: error - unknown option '%c'!\n"
+#~ msgstr "lpr: viga - tundmatu võti '%c'!\n"
+
+#~ msgid ""
+#~ "lpr: warning - '%c' format modifier not supported - output may not be "
+#~ "correct!\n"
+#~ msgstr ""
+#~ "lpr: hoiatus - '%c' vormingus modifikaator pole toetatud - väljund võib "
+#~ "olla vigane!\n"
+
+#~ msgid "lpr: warning - email notification is not currently supported!\n"
+#~ msgstr "lpr: hoiatus - märguanne e-postiga pole veel toetatud!\n"
+
+#~ msgid "lprm: Job or printer not found!\n"
+#~ msgstr "lprm: tööd või printerit ei leitud!\n"
+
+#~ msgid "lprm: Not authorized to lprm job(s)!\n"
+#~ msgstr "lprm: pole õigust lprm töid!\n"
+
+#~ msgid "lprm: Unable to cancel job(s)!\n"
+#~ msgstr "lprm: tööde katkestamine ei ole võimalik!\n"
+
+#~ msgid "lprm: Unable to lprm job(s)!\n"
+#~ msgstr "lprm: tööde lprm ei ole võimalik!\n"
+
+#~ msgid "lprm: Unknown destination \"%s\"!\n"
+#~ msgstr "lprm: tundmatu sihtkoht \"%s\"!\n"
+
+#~ msgid "lprm: Unknown option '%c'!\n"
+#~ msgstr "lprm: tundmatu võti '%c'!\n"
+
+#~ msgid "lprm: You don't own job ID %d!\n"
+#~ msgstr "lprm: töö ID %d ei kuulu Teile!\n"
+
+#~ msgid "lpstat: Invalid destination name in list \"%s\"!\n"
+#~ msgstr "lpstat: vigane sihtkoha nimi loendis \"%s\"!\n"
+
+#~ msgid "lpstat: Need \"completed\" or \"not-completed\" after -W!\n"
+#~ msgstr "lpstat: pärast -W on vajalik \"completed\" või \"not-completed\"!\n"
+
+#~ msgid ""
+#~ "lpstat: Need \"completed\", \"not-completed\", or \"all\" after -W!\n"
+#~ msgstr ""
+#~ "lpstat: pärast -W on vajalik \"completed\", \"not-completed\" või \"all"
+#~ "\"!\n"
+
+#~ msgid "lpstat: The -b option requires a destination argument.\n"
+#~ msgstr "lpstat: võti -b nõuab sihtkoha argumenti.\n"
+
+#~ msgid "lpstat: Unable to connect to server %s on port %d: %s\n"
+#~ msgstr "lpstat: ei õnnestu saada ühendust serveriga %s pordis %d: %s\n"
+
+#~ msgid "lpstat: Unknown destination \"%s\"!\n"
+#~ msgstr "lpstat: tundmatu sihtkoht \"%s\"!\n"
+
+#~ msgid "lpstat: Unknown option '%c'!\n"
+#~ msgstr "lpstat: tundmatu võti '%c'!\n"
+
+#~ msgid "lpstat: get-classes failed: %s\n"
+#~ msgstr "lpstat: get-classes ebaõnnestus: %s\n"
+
+#~ msgid "lpstat: get-jobs failed: %s\n"
+#~ msgstr "lpstat: get-jobs ebaõnnestus: %s\n"
+
+#~ msgid "lpstat: get-printers failed: %s\n"
+#~ msgstr "lpstat: get-printers ebaõnnestus: %s\n"

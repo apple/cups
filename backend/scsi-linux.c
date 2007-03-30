@@ -133,7 +133,7 @@ print_device(const char *resource,	/* I - SCSI device */
 	*/
 
         _cupsLangPuts(stderr,
-	              _("INFO: Unable to open SCSI device, queuing on next "
+	              _("INFO: Unable to contact printer, queuing on next "
 		        "printer in class...\n"));
 
        /*

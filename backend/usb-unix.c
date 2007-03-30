@@ -409,7 +409,7 @@ open_device(const char *uri,		/* I - Device URI */
 
       if (busy)
       {
-	fputs(_("INFO: Printer is busy; will retry in 5 seconds...\n"),
+	fputs(_("INFO: Printer busy; will retry in 5 seconds...\n"),
 	      stderr);
 	sleep(5);
       }

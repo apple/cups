@@ -447,7 +447,7 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_LIBZ */
   }
 
-  fprintf(stderr, _("DEBUG: %d files to send in job...\n"), num_files);
+  fprintf(stderr, "DEBUG: %d files to send in job...\n", num_files);
 
  /*
   * Set the authentication info, if any...
@@ -538,7 +538,7 @@ main(int  argc,				/* I - Number of command-line args */
   do
   {
     fprintf(stderr, _("INFO: Connecting to %s on port %d...\n"),
-                    hostname, port);
+            hostname, port);
 
     if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
     {
@@ -673,7 +673,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Do the request...
     */
 
-    fputs(_("DEBUG: Getting supported attributes...\n"), stderr);
+    fputs("DEBUG: Getting supported attributes...\n", stderr);
 
     if ((supported = cupsDoRequest(http, request, resource)) == NULL)
       ipp_status = cupsLastError();
@@ -1247,7 +1247,7 @@ cancel_job(http_t     *http,		/* I - HTTP connection */
   ipp_t	*request;			/* Cancel-Job request */
 
 
-  fputs(_("INFO: Cancelling print job...\n"), stderr);
+  fputs(_("INFO: Canceling print job...\n"), stderr);
 
   request = ippNewRequest(IPP_CANCEL_JOB);
   request->request.op.version[1] = version;

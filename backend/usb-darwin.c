@@ -465,7 +465,7 @@ print_device(const char *uri,		/* I - Device URI */
       }
 
       if (fd != 0 && status == noErr)
-	fprintf(stderr, _("DEBUG: Sending print file, %lld bytes...\n"), (off_t)tbytes);
+	fprintf(stderr, "DEBUG: Sending print file, %lld bytes...\n", (off_t)tbytes);
     }
   }
 

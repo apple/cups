@@ -3,7 +3,7 @@
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2006 by Easy Software Products.
+#   Copyright 1993-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -82,8 +82,8 @@ uninstall-languages:
 
 pot:
 	echo Updating cups.pot...
-	cd ..; xgettext -o locale/cups.pot -j --keyword=_ --no-wrap \
-		--no-location --copyright-holder="Easy Software Products" \
+	cd ..; xgettext -o locale/cups.pot -j -s --keyword=_ --no-wrap \
+		--copyright-holder="Easy Software Products" \
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c
 	(cat cups.header; \
@@ -93,7 +93,7 @@ pot:
 	mv cups.pot.N cups.pot
 	for loc in $(LANGUAGES) ; do \
 		echo Merging changes into cups_$$loc.po... ; \
-		msgmerge -o cups_$$loc.po --no-location cups_$$loc.po cups.pot ; \
+		msgmerge -o cups_$$loc.po -s --no-location cups_$$loc.po cups.pot ; \
 	done
 
 
