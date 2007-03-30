@@ -1245,7 +1245,9 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       pageinfo->num_options = cupsAddOption("InputSlot", doc->ap_input_slot,
                                             pageinfo->num_options,
 					    &(pageinfo->options));
-      pageinfo->num_options = cupsAddOption("ManualFeed", doc->ap_manual_feed,
+      pageinfo->num_options = cupsAddOption("ManualFeed",
+                                            doc->ap_input_slot ? "False" :
+					        doc->ap_manual_feed,
                                             pageinfo->num_options,
 					    &(pageinfo->options));
     }
@@ -1258,7 +1260,9 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       pageinfo->num_options = cupsAddOption("InputSlot", doc->input_slot,
                                             pageinfo->num_options,
 					    &(pageinfo->options));
-      pageinfo->num_options = cupsAddOption("ManualFeed", doc->manual_feed,
+      pageinfo->num_options = cupsAddOption("ManualFeed",
+                                            doc->input_slot ? "False" :
+					        doc->manual_feed,
                                             pageinfo->num_options,
 					    &(pageinfo->options));
     }
