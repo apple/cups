@@ -361,19 +361,22 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
       while ((state = ippRead(http, response)) != IPP_DATA)
 	if (state == IPP_ERROR)
-	{
-	 /*
-          * Delete the response...
-	  */
-
-          DEBUG_puts("IPP read error!");
-	  ippDelete(response);
-	  response = NULL;
-
-          _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
-
 	  break;
-	}
+
+      if (state == IPP_ERROR)
+      {
+       /*
+        * Delete the response...
+	*/
+
+        DEBUG_puts("IPP read error!");
+	ippDelete(response);
+	response = NULL;
+
+        _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
+
+	break;
+      }
     }
   }
 
