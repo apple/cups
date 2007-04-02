@@ -150,6 +150,7 @@ main(int  argc,				/* I - Number of command-line args */
 		  "document-format-supported",
 		  "printer-is-accepting-jobs",
 		  "printer-state",
+		  "printer-state-message",
 		  "printer-state-reasons",
 		};
   static const char * const jattrs[] =
@@ -1286,6 +1287,11 @@ check_printer_state(
 {
   ipp_t	*request,			/* IPP request */
 	*response;			/* IPP response */
+  static const char * const attrs[] =	/* Attributes we want */
+  {
+    "printer-state-message",
+    "printer-state-reasons"
+  };
 
 
  /*
@@ -1302,8 +1308,9 @@ check_printer_state(
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                  "requesting-user-name", NULL, user);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-               "requested-attributes", NULL, "printer-state-reasons");
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                "requested-attributes",
+		(int)(sizeof(attrs) / sizeof(attrs[0])), NULL, attrs);
 
  /*
   * Do the request...
@@ -1437,13 +1444,18 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 {
   int			i;		/* Looping var */
   int			count;		/* Count of reasons shown... */
-  ipp_attribute_t	*reasons;	/* printer-state-reasons */
+  ipp_attribute_t	*psm,		/* pritner-state-message */
+			*reasons;	/* printer-state-reasons */
   const char		*reason;	/* Current reason */
   const char		*message;	/* Message to show */
   char			unknown[1024];	/* Unknown message string */
   const char		*prefix;	/* Prefix for STATE: line */
   char			state[1024];	/* State string */
 
+
+  if ((psm = ippFindAttribute(ipp, "printer-state-message",
+                              IPP_TAG_TEXT)) != NULL)
+    fprintf(stderr, "INFO: %s\n", psm->values[0].string.text);
 
   if ((reasons = ippFindAttribute(ipp, "printer-state-reasons",
                                   IPP_TAG_KEYWORD)) == NULL)

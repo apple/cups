@@ -4,6 +4,8 @@ CHANGES.txt - 2007-04-02
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131)
+	- The IPP backend now relays printer-state-message values
+	  from the server to the client (STR #2109)
 	- Added support for the PWG printer-alert and
 	  printer-alert-description attributes (STR #2088)
 	- Added support for LPD "stream" mode (STR #2036)
