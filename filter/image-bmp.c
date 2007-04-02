@@ -1,9 +1,9 @@
 /*
- * "$Id: image-bmp.c 5508 2006-05-11 11:41:16Z mike $"
+ * "$Id: image-bmp.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -110,7 +110,7 @@ _cupsImageReadBMP(
 
   if (offset < 0)
   {
-    fprintf(stderr, "ERROR: Bad BMP offset %d\n", offset);
+    fprintf(stderr, "DEBUG: Bad BMP offset %d\n", offset);
     fclose(fp);
     return (1);
   }
@@ -135,7 +135,7 @@ _cupsImageReadBMP(
       img->ysize == 0 || img->ysize > CUPS_IMAGE_MAX_HEIGHT ||
       (depth != 1 && depth != 4 && depth != 8 && depth != 24))
   {
-    fprintf(stderr, "ERROR: Bad BMP dimensions %ux%ux%d\n",
+    fprintf(stderr, "DEBUG: Bad BMP dimensions %ux%ux%d\n",
             img->xsize, img->ysize, depth);
     fclose(fp);
     return (1);
@@ -143,14 +143,14 @@ _cupsImageReadBMP(
 
   if (colors_used < 0 || colors_used > 256)
   {
-    fprintf(stderr, "ERROR: Bad BMP colormap size %d\n", colors_used);
+    fprintf(stderr, "DEBUG: Bad BMP colormap size %d\n", colors_used);
     fclose(fp);
     return (1);
   }
 
   if (img->xppi == 0 || img->yppi == 0)
   {
-    fprintf(stderr, "ERROR: Bad BMP resolution %dx%d PPI.\n",
+    fprintf(stderr, "DEBUG: Bad BMP resolution %dx%d PPI.\n",
             img->xppi, img->yppi);
     img->xppi = img->yppi = 128;
   }
@@ -535,5 +535,5 @@ read_long(FILE *fp)               /* I - File to read from */
 
 
 /*
- * End of "$Id: image-bmp.c 5508 2006-05-11 11:41:16Z mike $".
+ * End of "$Id: image-bmp.c 6420 2007-03-30 20:00:59Z mike $".
  */

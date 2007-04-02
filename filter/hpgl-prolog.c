@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-prolog.c 5997 2006-10-02 15:33:05Z mike $"
+ * "$Id: hpgl-prolog.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   HP-GL/2 prolog routines for for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -88,7 +88,8 @@ OutputProlog(char  *title,	/* I - Job title */
 
   if ((prolog = fopen(filename, "r")) == NULL)
   {
-    fprintf(stderr, "ERROR: Unable to open HPGL prolog \"%s\" for reading - %s\n",
+    fprintf(stderr,
+            "DEBUG: Unable to open HPGL prolog \"%s\" for reading - %s\n",
             filename, strerror(errno));
     exit(1);
   }
@@ -373,5 +374,5 @@ Outputf(const char *format,	/* I - Printf-style string */
 
 
 /*
- * End of "$Id: hpgl-prolog.c 5997 2006-10-02 15:33:05Z mike $".
+ * End of "$Id: hpgl-prolog.c 6420 2007-03-30 20:00:59Z mike $".
  */

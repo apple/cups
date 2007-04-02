@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-main.c 4494 2005-02-18 02:18:11Z mike $"
+ * "$Id: hpgl-main.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -36,6 +36,7 @@
 /*#define DEBUG*/
 #define _HPGL_MAIN_C_
 #include "hpgltops.h"
+#include <cups/i18n.h>
 
 
 /*
@@ -153,7 +154,8 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   if (argc < 6 || argc > 7)
   {
-    fputs("ERROR: hpgltops job-id user title copies options [file]\n", stderr);
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
+            argv[0]);
     return (1);
   }
 
@@ -172,7 +174,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
     if ((fp = fopen(argv[6], "rb")) == NULL)
     {
-      perror("ERROR: unable to open print file - ");
+      perror("DEBUG: unable to open print file - ");
       return (1);
     }
   }
@@ -270,5 +272,5 @@ compare_names(const void *p1,	/* I - First name */
 
 
 /*
- * End of "$Id: hpgl-main.c 4494 2005-02-18 02:18:11Z mike $".
+ * End of "$Id: hpgl-main.c 6420 2007-03-30 20:00:59Z mike $".
  */

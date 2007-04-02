@@ -33,6 +33,7 @@ like to thank the following individuals for their contributions:
     Vincenzo Reale                 - Italian localization.
     Petter Reinholdtsen            - HP-UX compiler stuff.
     Juan Pablo González Riopedre   - Spanish localization.
+    Opher Shachar                  - Hebrew localization.
     Stuart Stevens                 - HP JetDirect IPP information.
     Andrea Suatoni                 - IRIX desktop integration and testing.
     Tomohiro Kato                  - Japanese localization.

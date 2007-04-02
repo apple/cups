@@ -1,0 +1,265 @@
+BODY {
+  background: #cccc99;
+  color: #000000;
+  font-family: sans-serif;
+  direction: rtl;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: sans-serif;
+}
+
+KBD {
+  color: #006600;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monospace;
+}
+
+PRE.command {
+  color: #7f0000;
+  margin-left: 36pt;
+}
+
+PRE.command EM {
+  color: #3f0000;
+}
+
+P.command {
+  color: #7f0000;
+  font-family: monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #bbbb88;
+  border: solid thin #999966;
+  padding: 10pt;
+}
+
+A:link, A:visited {
+  text-decoration: none;
+  font-weight: bold;
+  color: #993300;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+  font-weight: bold;
+  color: #bb5500;
+}
+
+A.sel, TR.sel {
+  background-color: #eeeebb;
+  color: #993300;
+}
+
+TR.sel TD {
+  padding: 4pt;
+}
+
+A.unsel, A.unsel:visited {
+  background-color: #666633;
+  color: #e8e8b8;
+}
+
+A.unsel:link:hover, A.unsel:visited:hover, A.unsel:active {
+  background-color: #999966;
+  color: #663300;
+}
+
+INPUT[TYPE="TEXT"], TEXTAREA {
+  font-family: monospace;
+}
+
+INPUT[TYPE="IMAGE"] {
+  border: none;
+  padding: 2pt;
+  vertical-align: bottom;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.header, TR.header TH, TH.header, TR.trailer, TR.trailer TH, TH.trailer {
+  background-color: #bbbb88;
+}
+
+TR.page, TD.page {
+  background-color: #eeeebb;
+  height: 100%;
+  padding-top: 20pt;
+  padding-bottom: 20pt;
+}
+
+TR.data, TD.data, TR.data TD {
+  padding: 5;
+  border-bottom: solid 2pt #000000;
+}
+
+TR.data TH {
+  border-bottom: solid 2pt #000000;
+  padding-top: 10pt;
+  padding-right: 5pt;
+  text-align: right;
+}
+
+DIV.table TABLE {
+  border: solid thin #999966;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #bbbb88;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #bbbb88;
+  border: none;
+  border-bottom: solid thin #999966;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  padding-top: 5pt;
+  text-align: right;
+  vertical-align: top;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: #000000;
+  border: thin solid #000000;
+  color: #ffffff;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+.conflict {
+  color: red;
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+IMG.button {
+  border: none;
+  padding: 2pt;
+  vertical-align: middle;
+}
+
+DIV.sidebar {
+  background: #ddddaa;
+  border: solid 2px #cccc99;
+  float: right;
+  margin-left: 10pt;
+  padding: 5pt;
+  width: 25%;
+  /* These are not implemented by all browsers, but that's OK */
+  border-radius: 10pt;
+  -moz-border-radius: 10pt;
+  box-shadow: 5pt 5pt 5pt #cccccc;
+}
+
+DIV.sidebar P.l0 {
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 12pt;
+}
+
+DIV.sidebar P.l1 {
+  margin-bottom: 0;
+  margin-left: 36pt;
+  margin-right: 0;
+  margin-top: 0;
+  text-indent: -18pt;
+}
+
+DIV.sidebar P.l2 {
+  font-style: italic;
+  margin-bottom: 0;
+  margin-left: 54pt;
+  margin-right: 0;
+  margin-top: 0;
+  text-indent: -18pt;
+}
+
+TABLE.pager {
+  background: #cccc99;
+  border: solid thin #999966;
+  margin-top: 10pt;
+  padding: 2pt;
+  /* These are not implemented by all browsers, but that's OK */
+  border-radius: 10pt;
+  -moz-border-radius: 10pt;
+  box-shadow: 5pt 5pt 5pt #cccccc;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 54pt;
+  font-family: monospace;
+}
+
+SPAN.message {
+  font-style: italic;
+  font-size: smaller;
+}

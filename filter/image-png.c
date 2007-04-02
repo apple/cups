@@ -1,9 +1,9 @@
 /*
- * "$Id: image-png.c 5508 2006-05-11 11:41:16Z mike $"
+ * "$Id: image-png.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -120,7 +120,7 @@ _cupsImageReadPNG(
   if (width == 0 || width > CUPS_IMAGE_MAX_WIDTH ||
       height == 0 || height > CUPS_IMAGE_MAX_HEIGHT)
   {
-    fprintf(stderr, "ERROR: PNG image has invalid dimensions %ux%u!\n",
+    fprintf(stderr, "DEBUG: PNG image has invalid dimensions %ux%u!\n",
             (unsigned)width, (unsigned)height);
     fclose(fp);
     return (1);
@@ -137,7 +137,7 @@ _cupsImageReadPNG(
 
     if (img->xppi == 0 || img->yppi == 0)
     {
-      fprintf(stderr, "ERROR: PNG image has invalid resolution %dx%d PPI\n",
+      fprintf(stderr, "DEBUG: PNG image has invalid resolution %dx%d PPI\n",
               img->xppi, img->yppi);
 
       img->xppi = img->yppi = 128;
@@ -280,5 +280,5 @@ _cupsImageReadPNG(
 
 
 /*
- * End of "$Id: image-png.c 5508 2006-05-11 11:41:16Z mike $".
+ * End of "$Id: image-png.c 6420 2007-03-30 20:00:59Z mike $".
  */

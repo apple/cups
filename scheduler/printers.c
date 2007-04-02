@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 6383 2007-03-21 20:01:20Z mike $"
+ * "$Id: printers.c 6429 2007-04-02 13:44:52Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1194,7 +1194,20 @@ cupsdLoadAllPrinters(void)
     else if (!strcasecmp(line, "OpPolicy"))
     {
       if (value)
-        cupsdSetString(&p->op_policy, value);
+      {
+        cupsd_policy_t *pol;		/* Policy */
+
+
+        if ((pol = cupsdFindPolicy(value)) != NULL)
+	{
+          cupsdSetString(&p->op_policy, value);
+	  p->op_policy_ptr = pol;
+	}
+	else
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Bad policy \"%s\" on line %d of printers.conf",
+			  value, linenum);
+      }
       else
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2504,6 +2517,9 @@ cupsdSetPrinterReasons(
 	            (p->num_reasons - i) * sizeof(char *));
 
 	  i --;
+
+          if (!strcmp(reason, "paused") && p->state == IPP_PRINTER_STOPPED)
+	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
 	}
     }
     else if (p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
@@ -2520,6 +2536,9 @@ cupsdSetPrinterReasons(
       {
         p->reasons[i] = strdup(reason);
 	p->num_reasons ++;
+
+	if (!strcmp(reason, "paused") && p->state != IPP_PRINTER_STOPPED)
+	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
       }
     }
   }
@@ -3686,5 +3705,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 6383 2007-03-21 20:01:20Z mike $".
+ * End of "$Id: printers.c 6429 2007-04-02 13:44:52Z mike $".
  */

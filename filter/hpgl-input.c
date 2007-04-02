@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-input.c 5150 2006-02-22 19:21:50Z mike $"
+ * "$Id: hpgl-input.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,7 @@
 
 #include "hpgltops.h"
 #include <ctype.h>
+#include <cups/i18n.h>
 
 #define MAX_PARAMS 16384
 
@@ -143,7 +144,7 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
     * file which we can't handle - abort!
     */
 
-    fputs("ERROR: Invalid HP-GL/2 command seen, unable to print file!\n",
+    fputs(_("ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"),
           stderr);
     return (-1);
   }
@@ -269,5 +270,5 @@ FreeParameters(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c 5150 2006-02-22 19:21:50Z mike $".
+ * End of "$Id: hpgl-input.c 6420 2007-03-30 20:00:59Z mike $".
  */

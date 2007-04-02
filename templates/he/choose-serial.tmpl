@@ -1,0 +1,47 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
+<INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">
+
+<H2 CLASS="title">הגדרות פתחה (Port) טורית עבור {printer_name}</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">קצב שידור:</TH>
+<TD><SELECT NAME="BAUDRATE">
+{[baudrates]<OPTION {?baudrate={baudrates}?SELECTED:}>{baudrates}}
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">סיבית בדיקת זוגיות:</TH>
+<TD><SELECT NAME="PARITY">
+<OPTION VALUE="none" {?parity=none?SELECTED:}>ללא
+<OPTION VALUE="even" {?parity=even?SELECTED:}>זוגי
+<OPTION VALUE="odd" {?parity=odd?SELECTED:}>אי-זוגי
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">סיביות נתונים:</TH>
+<TD><SELECT NAME="BITS">
+<OPTION {?bits=8?SELECTED:}>8
+<OPTION {?bits=7?SELECTED:}>7
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">בקרת זרימה:</TH>
+<TD><SELECT NAME="FLOW">
+<OPTION VALUE="none" {?flow=none?SELECTED:}>ללא
+<OPTION VALUE="soft" {?flow=soft?SELECTED:}>XON/XOFF (תוכנה)
+<OPTION VALUE="hard" {?flow=hard?SELECTED:}>RTS/CTS (חומרה)
+<OPTION VALUE="dtrdsr" {?flow=dtrdsr?SELECTED:}>DTR/DSR (חומרה)
+</SELECT></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="המשך"></TD>
+</TR>
+</TABLE>
+
+</FORM>

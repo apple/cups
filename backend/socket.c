@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 6170 2007-01-02 17:26:41Z mike $"
+ * "$Id: socket.c 6403 2007-03-27 16:00:56Z mike $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -80,6 +80,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		*ptr;			/* Pointer into name or value */
   int		print_fd;		/* Print file */
   int		copies;			/* Number of copies to print */
+  time_t	start_time;		/* Time of first connect */
+  int		recoverable;		/* Recoverable error shown? */
+  int		contimeout;		/* Connection timeout */
   int		waiteof;		/* Wait for end-of-file? */
   int		port;			/* Port number */
   char		portname[255];		/* Port name */
@@ -129,7 +132,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, "Usage: %s job-id user title copies options [file]\n",
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
             argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
@@ -175,7 +178,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Get options, if any...
   */
 
-  waiteof = 1;
+  waiteof    = 1;
+  contimeout = 7 * 24 * 60 * 60;
 
   if ((options = strchr(resource, '?')) != NULL)
   {
@@ -233,6 +237,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
         waiteof = !value[0] || !strcasecmp(value, "on") ||
 		  !strcasecmp(value, "yes") || !strcasecmp(value, "true");
       }
+      else if (!strcasecmp(name, "contimeout"))
+      {
+       /*
+        * Set the connection timeout...
+	*/
+
+	if (atoi(value) > 0)
+	  contimeout = atoi(value);
+      }
     }
   }
 
@@ -240,15 +253,18 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Then try to connect to the remote host...
   */
 
+  recoverable = 0;
+  start_time  = time(NULL);
+
   sprintf(portname, "%d", port);
 
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
-    fprintf(stderr, "ERROR: Unable to locate printer \'%s\'!\n", hostname);
+    fprintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"), hostname);
     return (CUPS_BACKEND_STOP);
   }
 
-  fprintf(stderr, "INFO: Attempting to connect to host %s on port %d\n",
+  fprintf(stderr, _("INFO: Attempting to connect to host %s on port %d\n"),
           hostname, port);
 
   fputs("STATE: +connecting-to-device\n", stderr);
@@ -269,8 +285,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        fprintf(stderr, "INFO: Unable to connect to \"%s\", queuing on next printer in class...\n",
-		hostname);
+        fputs(_("INFO: Unable to contact printer, queuing on next "
+		"printer in class...\n"), stderr);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -284,9 +300,19 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       if (error == ECONNREFUSED || error == EHOSTDOWN ||
           error == EHOSTUNREACH)
       {
+        if (contimeout && (time(NULL) - start_time) > contimeout)
+	{
+	  fputs(_("ERROR: Printer not responding!\n"), stderr);
+	  return (CUPS_BACKEND_FAILED);
+	}
+
+        recoverable = 1;
+
 	fprintf(stderr,
-	        "INFO: Network host \'%s\' is busy; will retry in %d seconds...\n",
-                hostname, delay);
+	        _("WARNING: recoverable: Network host \'%s\' is busy; will "
+		  "retry in %d seconds...\n"),
+		hostname, delay);
+
 	sleep(delay);
 
 	if (delay < 30)
@@ -294,7 +320,11 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       }
       else
       {
-	perror("ERROR: Unable to connect to printer (retrying in 30 seconds)");
+        recoverable = 1;
+
+        fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
+	fputs(_("ERROR: recoverable: Unable to connect to printer; will "
+	        "retry in 30 seconds...\n"), stderr);
 	sleep(30);
       }
     }
@@ -302,20 +332,32 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       break;
   }
 
+  if (recoverable)
+  {
+   /*
+    * If we've shown a recoverable error make sure the printer proxies
+    * have a chance to see the recovered message. Not pretty but
+    * necessary for now...
+    */
+
+    fputs("INFO: recovered: \n", stderr);
+    sleep(5);
+  }
+
   fputs("STATE: -connecting-to-device\n", stderr);
-  fprintf(stderr, "INFO: Connected to %s...\n", hostname);
+  fprintf(stderr, _("INFO: Connected to %s...\n"), hostname);
 
 #ifdef AF_INET6
   if (addr->addr.addr.sa_family == AF_INET6)
     fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6)...\n", 
-		    httpAddrString(&addr->addr, addrname, sizeof(addrname)),
-		    ntohs(addr->addr.ipv6.sin6_port));
+	    httpAddrString(&addr->addr, addrname, sizeof(addrname)),
+	    ntohs(addr->addr.ipv6.sin6_port));
   else
 #endif /* AF_INET6 */
     if (addr->addr.addr.sa_family == AF_INET)
       fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4)...\n",
-		      httpAddrString(&addr->addr, addrname, sizeof(addrname)),
-		      ntohs(addr->addr.ipv4.sin_port));
+	      httpAddrString(&addr->addr, addrname, sizeof(addrname)),
+	      ntohs(addr->addr.ipv4.sin_port));
 
  /*
   * Print everything...
@@ -336,8 +378,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     tbytes = backendRunLoop(print_fd, device_fd, 1, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
-      fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
-	      CUPS_LLCAST tbytes);
+      fprintf(stderr,
+#ifdef HAVE_LONG_LONG
+              _("INFO: Sent print file, %lld bytes...\n"),
+#else
+              _("INFO: Sent print file, %ld bytes...\n"),
+#endif /* HAVE_LONG_LONG */
+              CUPS_LLCAST tbytes);
   }
 
   if (waiteof)
@@ -346,7 +393,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Shutdown the socket and wait for the other end to finish...
     */
 
-    fputs("INFO: Print file sent, waiting for printer to finish...\n", stderr);
+    fputs(_("INFO: Print file sent, waiting for printer to finish...\n"),
+          stderr);
 
     shutdown(device_fd, 1);
 
@@ -399,7 +447,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     close(print_fd);
 
   if (tbytes >= 0)
-    fputs("INFO: Ready to print.\n", stderr);
+    fputs(_("INFO: Ready to print.\n"), stderr);
 
   return (tbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }
@@ -424,7 +472,7 @@ side_cb(int print_fd,			/* I - Print file */
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
   {
-    fputs("WARNING: Failed to read side-channel request!\n", stderr);
+    fputs(_("WARNING: Failed to read side-channel request!\n"), stderr);
     return;
   }
 
@@ -455,5 +503,5 @@ side_cb(int print_fd,			/* I - Print file */
 
 
 /*
- * End of "$Id: socket.c 6170 2007-01-02 17:26:41Z mike $".
+ * End of "$Id: socket.c 6403 2007-03-27 16:00:56Z mike $".
  */

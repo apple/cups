@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c 6318 2007-03-06 04:36:55Z mike $"
+ * "$Id: classes.c 6423 2007-04-02 13:05:19Z mike $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -264,6 +264,14 @@ cupsdFindAvailablePrinter(
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to find class \"%s\"!", name);
     return (NULL);
   }
+
+ /*
+  * Make sure that the last printer is also a valid index into the printer
+  * array.  If not, reset the last printer to 0...
+  */
+
+  if (c->last_printer >= c->num_printers)
+    c->last_printer = 0;
 
  /*
   * Loop through the printers in the class and return the first idle
@@ -674,7 +682,20 @@ cupsdLoadAllClasses(void)
     else if (!strcasecmp(line, "OpPolicy"))
     {
       if (value)
-        cupsdSetString(&p->op_policy, value);
+      {
+        cupsd_policy_t *pol;		/* Policy */
+
+
+        if ((pol = cupsdFindPolicy(value)) != NULL)
+	{
+          cupsdSetString(&p->op_policy, value);
+	  p->op_policy_ptr = pol;
+	}
+	else
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Bad policy \"%s\" on line %d of classes.conf",
+			  value, linenum);
+      }
       else
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -924,5 +945,5 @@ cupsdUpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c 6318 2007-03-06 04:36:55Z mike $".
+ * End of "$Id: classes.c 6423 2007-04-02 13:05:19Z mike $".
  */

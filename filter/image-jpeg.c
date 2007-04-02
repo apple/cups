@@ -1,9 +1,9 @@
 /*
- * "$Id: image-jpeg.c 5508 2006-05-11 11:41:16Z mike $"
+ * "$Id: image-jpeg.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -129,7 +129,7 @@ _cupsImageReadJPEG(
   if (cinfo.output_width <= 0 || cinfo.output_width > CUPS_IMAGE_MAX_WIDTH ||
       cinfo.output_height <= 0 || cinfo.output_height > CUPS_IMAGE_MAX_HEIGHT)
   {
-    fprintf(stderr, "ERROR: Bad JPEG dimensions %dx%d!\n",
+    fprintf(stderr, "DEBUG: Bad JPEG dimensions %dx%d!\n",
             cinfo.output_width, cinfo.output_height);
 
     jpeg_destroy_decompress(&cinfo);
@@ -156,7 +156,7 @@ _cupsImageReadJPEG(
 
     if (img->xppi == 0 || img->yppi == 0)
     {
-      fprintf(stderr, "ERROR: Bad JPEG image resolution %dx%d PPI.\n",
+      fprintf(stderr, "DEBUG: Bad JPEG image resolution %dx%d PPI.\n",
               img->xppi, img->yppi);
       img->xppi = img->yppi = 128;
     }
@@ -320,5 +320,5 @@ _cupsImageReadJPEG(
 
 
 /*
- * End of "$Id: image-jpeg.c 5508 2006-05-11 11:41:16Z mike $".
+ * End of "$Id: image-jpeg.c 6420 2007-03-30 20:00:59Z mike $".
  */

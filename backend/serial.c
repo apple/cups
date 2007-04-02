@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c 6170 2007-01-02 17:26:41Z mike $"
+ * "$Id: serial.c 6403 2007-03-27 16:00:56Z mike $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -170,7 +170,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fputs("Usage: serial job-id user title copies options [file]\n", stderr);
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
+	    argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
 
@@ -242,8 +243,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        fputs("INFO: Unable to open serial port, queuing on next printer in class...\n",
-	      stderr);
+        fputs(_("INFO: Unable to contact printer, queuing on next "
+		"printer in class...\n"), stderr);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -256,12 +257,12 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       if (errno == EBUSY)
       {
-        fputs("INFO: Serial port busy; will retry in 30 seconds...\n", stderr);
+        fputs(_("INFO: Printer busy; will retry in 30 seconds...\n"), stderr);
 	sleep(30);
       }
       else
       {
-	fprintf(stderr, "ERROR: Unable to open serial port device file \"%s\": %s\n",
+	fprintf(stderr, _("ERROR: Unable to open device file \"%s\": %s\n"),
 	        resource, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
@@ -378,7 +379,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      break;
 #  endif /* B230400 */
           default :
-	      fprintf(stderr, "WARNING: Unsupported baud rate %s!\n", value);
+	      fprintf(stderr, _("WARNING: Unsupported baud rate %s!\n"),
+	              value);
 	      break;
 	}
 #endif /* B19200 == 19200 */
@@ -1254,7 +1256,7 @@ side_cb(int print_fd,			/* I - Print file */
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
   {
-    fputs("WARNING: Failed to read side-channel request!\n", stderr);
+    fputs(_("WARNING: Failed to read side-channel request!\n"), stderr);
     return;
   }
 
@@ -1285,5 +1287,5 @@ side_cb(int print_fd,			/* I - Print file */
 
 
 /*
- * End of "$Id: serial.c 6170 2007-01-02 17:26:41Z mike $".
+ * End of "$Id: serial.c 6403 2007-03-27 16:00:56Z mike $".
  */

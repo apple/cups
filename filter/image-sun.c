@@ -1,9 +1,9 @@
 /*
- * "$Id: image-sun.c 6147 2006-12-06 20:21:46Z mike $"
+ * "$Id: image-sun.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -127,7 +127,7 @@ _cupsImageReadSunRaster(
       img->ysize == 0 || img->ysize > CUPS_IMAGE_MAX_HEIGHT ||
       ras_depth == 0 || ras_depth > 32)
   {
-    fputs("ERROR: Raster image cannot be loaded!\n", stderr);
+    fputs("DEBUG: Raster image cannot be loaded!\n", stderr);
     return (1);
   }
 
@@ -389,5 +389,5 @@ read_unsigned(FILE *fp)			/* I - File to read from */
 
 
 /*
- * End of "$Id: image-sun.c 6147 2006-12-06 20:21:46Z mike $".
+ * End of "$Id: image-sun.c 6420 2007-03-30 20:00:59Z mike $".
  */

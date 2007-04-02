@@ -1,5 +1,5 @@
 /*
- * "$Id: parallel.c 6178 2007-01-03 18:09:17Z mike $"
+ * "$Id: parallel.c 6403 2007-03-27 16:00:56Z mike $"
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
@@ -131,7 +131,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fputs("Usage: parallel job-id user title copies options [file]\n", stderr);
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
+	    argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
 
@@ -221,8 +222,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        fputs("INFO: Unable to open parallel port, queuing on next printer "
-	      "in class...\n", stderr);
+        fputs(_("INFO: Unable to contact printer, queuing on next "
+		"printer in class...\n"), stderr);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -235,20 +236,18 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       if (errno == EBUSY)
       {
-        fputs("INFO: Parallel port busy; will retry in 30 seconds...\n",
-	      stderr);
+        fputs(_("INFO: Printer busy; will retry in 30 seconds...\n"), stderr);
 	sleep(30);
       }
       else if (errno == ENXIO || errno == EIO || errno == ENOENT)
       {
-        fputs("INFO: Printer not connected; will retry in 30 seconds...\n",
+        fputs(_("INFO: Printer not connected; will retry in 30 seconds...\n"),
 	      stderr);
 	sleep(30);
       }
       else
       {
-	fprintf(stderr,
-	        "ERROR: Unable to open parallel port device file \"%s\": %s\n",
+	fprintf(stderr, _("ERROR: Unable to open device file \"%s\": %s\n"),
 	        resource, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
@@ -289,8 +288,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     tbytes = backendRunLoop(print_fd, device_fd, use_bc, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
-      fprintf(stderr, "INFO: Sent print file, " CUPS_LLFMT " bytes...\n",
-	      CUPS_LLCAST tbytes);
+      fprintf(stderr,
+#ifdef HAVE_LONG_LONG
+              _("INFO: Sent print file, %lld bytes...\n"),
+#else
+              _("INFO: Sent print file, %ld bytes...\n"),
+#endif /* HAVE_LONG_LONG */
+              CUPS_LLCAST tbytes);
   }
 
  /*
@@ -618,7 +622,7 @@ side_cb(int print_fd,			/* I - Print file */
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
   {
-    fputs("WARNING: Failed to read side-channel request!\n", stderr);
+    fputs(_("WARNING: Failed to read side-channel request!\n"), stderr);
     return;
   }
 
@@ -665,5 +669,5 @@ side_cb(int print_fd,			/* I - Print file */
 
 
 /*
- * End of "$Id: parallel.c 6178 2007-01-03 18:09:17Z mike $".
+ * End of "$Id: parallel.c 6403 2007-03-27 16:00:56Z mike $".
  */

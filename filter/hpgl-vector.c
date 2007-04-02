@@ -1,9 +1,9 @@
 /*
- * "$Id: hpgl-vector.c 4494 2005-02-18 02:18:11Z mike $"
+ * "$Id: hpgl-vector.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   HP-GL/2 vector routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2005 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -635,7 +635,7 @@ decode_number(unsigned char **s,	/* IO - String to decode */
       else if (**s < 63)
       {
         if (**s != '\r' && **s != '\n')
-          fprintf(stderr, "ERROR: Bad PE character 0x%02X!\n", **s);
+          fprintf(stderr, "DEBUG: Bad PE character 0x%02X!\n", **s);
 
         continue;
       }
@@ -677,7 +677,7 @@ decode_number(unsigned char **s,	/* IO - String to decode */
       else if (**s < 63)
       {
         if (**s != '\r' && **s != '\n')
-          fprintf(stderr, "ERROR: Bad PE character 0x%02X!\n", **s);
+          fprintf(stderr, "DEBUG: Bad PE character 0x%02X!\n", **s);
 
         continue;
       }
@@ -771,5 +771,5 @@ plot_points(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-vector.c 4494 2005-02-18 02:18:11Z mike $".
+ * End of "$Id: hpgl-vector.c 6420 2007-03-30 20:00:59Z mike $".
  */

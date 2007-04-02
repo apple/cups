@@ -1,5 +1,5 @@
 /*
- * "$Id: scsi.c 6029 2006-10-12 17:55:17Z mike $"
+ * "$Id: scsi.c 6411 2007-03-28 23:02:51Z mike $"
  *
  *   SCSI printer backend for the Common UNIX Printing System (CUPS).
  *
@@ -59,6 +59,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <cups/string.h>
+#include <cups/i18n.h>
 #include <signal.h>
 
 #ifdef WIN32
@@ -150,7 +151,8 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fputs("Usage: scsi:/dev/file job-id user title copies options [file]\n", stderr);
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
+	    argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
 
@@ -220,5 +222,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: scsi.c 6029 2006-10-12 17:55:17Z mike $".
+ * End of "$Id: scsi.c 6411 2007-03-28 23:02:51Z mike $".
  */

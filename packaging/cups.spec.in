@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 6300 2007-02-22 04:46:59Z mike $"
+# "$Id: cups.spec.in 6431 2007-04-02 14:31:49Z mike $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -96,6 +96,11 @@ Summary: Common UNIX Printing System - French support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
+%package he
+Summary: Common UNIX Printing System - Hebrew support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package it
 Summary: Common UNIX Printing System - Italian support
 Group: System Environment/Daemons
@@ -157,6 +162,10 @@ UNIX® operating systems. This package provides Estonian support.
 %description fr
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides French support.
+
+%description he
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Hebrew support.
 
 %description it
 The Common UNIX Printing System provides a portable printing layer for 
@@ -450,6 +459,17 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/templates/fr/*
 /usr/share/locale/fr/cups_fr.po
 
+%files he
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/he
+/usr/share/doc/cups/he/index.html
+/usr/share/doc/cups/he/cups.css
+%dir /usr/share/doc/cups/he/images
+/usr/share/doc/cups/he/images/*
+%dir /usr/share/cups/templates/he
+/usr/share/cups/templates/he/*
+/usr/share/locale/he/cups_he.po
+
 %files it
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/it
@@ -498,5 +518,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 6300 2007-02-22 04:46:59Z mike $".
+# End of "$Id: cups.spec.in 6431 2007-04-02 14:31:49Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertolabel.c 6401 2007-03-26 14:36:01Z mike $"
+ * "$Id: rastertolabel.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -41,6 +41,7 @@
 
 #include <cups/cups.h>
 #include <cups/string.h>
+#include <cups/i18n.h>
 #include "raster.h"
 #include <stdlib.h>
 #include <unistd.h>
@@ -1176,7 +1177,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     * and return.
     */
 
-    fputs("ERROR: rastertolabel job-id user title copies options [file]\n", stderr);
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
+            argv[0]);
     return (1);
   }
 
@@ -1250,7 +1252,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       if ((y & 15) == 0)
-        fprintf(stderr, "INFO: Printing page %d, %d%% complete...\n", Page,
+        fprintf(stderr, _("INFO: Printing page %d, %d%% complete...\n"), Page,
 	        100 * y / header.cupsHeight);
 
      /*
@@ -1297,14 +1299,14 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   if (Page == 0)
-    fputs("ERROR: No pages found!\n", stderr);
+    fputs(_("ERROR: No pages found!\n"), stderr);
   else
-    fputs("INFO: Ready to print.\n", stderr);
+    fputs(_("INFO: Ready to print.\n"), stderr);
 
   return (Page == 0);
 }
 
 
 /*
- * End of "$Id: rastertolabel.c 6401 2007-03-26 14:36:01Z mike $".
+ * End of "$Id: rastertolabel.c 6420 2007-03-30 20:00:59Z mike $".
  */

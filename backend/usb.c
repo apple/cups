@@ -1,9 +1,9 @@
 /*
- * "$Id: usb.c 5590 2006-05-26 19:48:26Z mike $"
+ * "$Id: usb.c 6414 2007-03-30 13:40:57Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -45,6 +45,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <cups/string.h>
+#include <cups/i18n.h>
 #include <signal.h>
 
 #ifdef WIN32
@@ -192,7 +193,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fputs("Usage: usb job-id user title copies options [file]\n", stderr);
+    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
+            argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
 
@@ -207,7 +209,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		      hostname, sizeof(hostname), &port,
 		      resource, sizeof(resource)) < HTTP_URI_OK)
   {
-    fputs("ERROR: No device URI found in argv[0] or in DEVICE_URI environment variable!\n", stderr);
+    fputs(_("ERROR: No device URI found in argv[0] or in DEVICE_URI "
+	    "environment variable!\n"), stderr);
     return (1);
   }
 
@@ -243,7 +246,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
-      fprintf(stderr, "ERROR: unable to open print file %s - %s\n",
+      fprintf(stderr, _("ERROR: Unable to open print file %s - %s\n"),
               argv[6], strerror(errno));
       return (CUPS_BACKEND_FAILED);
     }
@@ -270,5 +273,5 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: usb.c 5590 2006-05-26 19:48:26Z mike $".
+ * End of "$Id: usb.c 6414 2007-03-30 13:40:57Z mike $".
  */

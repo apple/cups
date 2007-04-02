@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6399 2007-03-26 14:27:48Z mike $"
+ * "$Id: job.c 6424 2007-04-02 13:09:06Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -202,12 +202,11 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
 
     case IPP_JOB_COMPLETED :
        /*
-	* Clear the printer's state_message and state_reasons and move on...
+	* Clear the printer's printer-state-message and move on...
 	*/
 
 	printer->state_message[0] = '\0';
 
-	cupsdSetPrinterReasons(printer, "");
 	cupsdSetPrinterState(printer, IPP_PRINTER_IDLE, 0);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, printer, job,
@@ -376,11 +375,12 @@ cupsdCheckJobs(void)
 
         pclass = printer;
 
-        if (!(pclass->type & CUPS_PRINTER_REMOTE) &&
-	    pclass->state != IPP_PRINTER_STOPPED)
-          printer = cupsdFindAvailablePrinter(job->dest);
-	else
+        if (pclass->state == IPP_PRINTER_STOPPED)
 	  printer = NULL;
+        else if (pclass->type & CUPS_PRINTER_REMOTE)
+	  break;
+	else
+	  printer = cupsdFindAvailablePrinter(printer->name);
       }
 
       if (!printer && !pclass)
@@ -3536,5 +3536,5 @@ update_job(cupsd_job_t *job)	/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c 6399 2007-03-26 14:27:48Z mike $".
+ * End of "$Id: job.c 6424 2007-04-02 13:09:06Z mike $".
  */

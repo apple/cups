@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c 6187 2007-01-10 16:20:42Z mike $"
+ * "$Id: language.c 6407 2007-03-27 17:45:12Z mike $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -603,7 +603,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   pthread_mutex_lock(&lang_mutex);
 #endif /* HAVE_PTHREAD_H */
 
-  if ((lang = cups_cache_lookup(langname, encoding)) != NULL)
+  if ((lang = cups_cache_lookup(real, encoding)) != NULL)
   {
 #ifdef HAVE_PTHREAD_H
     pthread_mutex_unlock(&lang_mutex);
@@ -1326,5 +1326,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 6187 2007-01-10 16:20:42Z mike $".
+ * End of "$Id: language.c 6407 2007-03-27 17:45:12Z mike $".
  */

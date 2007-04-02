@@ -1,9 +1,9 @@
 /*
- * "$Id: snmp.c 6180 2007-01-03 18:19:32Z mike $"
+ * "$Id: snmp.c 6403 2007-03-27 16:00:56Z mike $"
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2006 by Easy Software Products, all rights reserved.
+ *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -312,7 +312,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (argc > 2)
   {
-    fputs("Usage: snmp [host-or-ip-address]\n", stderr);
+    fputs(_("Usage: snmp [host-or-ip-address]\n"), stderr);
     return (1);
   }
 
@@ -2089,8 +2089,8 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 
   if (asn1_decode_snmp(buffer, bytes, &packet))
   {
-    fprintf(stderr, "ERROR: Bad SNMP packet from %s: %s\n", addrname,
-            packet.error);
+    fprintf(stderr, "ERROR: Bad SNMP packet from %s: %s\n",
+            addrname, packet.error);
 
     asn1_debug(buffer, bytes, 0);
     hex_debug(buffer, bytes);
@@ -2365,7 +2365,8 @@ send_snmp_query(
 
   if (bytes < 0)
   {
-    fprintf(stderr, "ERROR: Unable to send SNMP query: %s\n", packet.error);
+    fprintf(stderr, "ERROR: Unable to send SNMP query: %s\n",
+            packet.error);
     return;
   }
 
@@ -2406,7 +2407,8 @@ try_connect(http_addr_t *addr,		/* I - Socket address */
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
-    fprintf(stderr, "ERROR: Unable to create socket: %s\n", strerror(errno));
+    fprintf(stderr, "ERROR: Unable to create socket: %s\n",
+            strerror(errno));
     return (-1);
   }
 
@@ -2459,5 +2461,5 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 
 
 /*
- * End of "$Id: snmp.c 6180 2007-01-03 18:19:32Z mike $".
+ * End of "$Id: snmp.c 6403 2007-03-27 16:00:56Z mike $".
  */

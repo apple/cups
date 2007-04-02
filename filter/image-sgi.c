@@ -1,9 +1,9 @@
 /*
- * "$Id: image-sgi.c 5508 2006-05-11 11:41:16Z mike $"
+ * "$Id: image-sgi.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   SGI image file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1993-2006 by Easy Software Products.
+ *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -83,7 +83,7 @@ _cupsImageReadSGI(
   if (sgip->xsize == 0 || sgip->ysize == 0 ||
       sgip->zsize == 0 || sgip->zsize > 4)
   {
-    fprintf(stderr, "ERROR: Bad SGI image dimensions %ux%ux%u!\n",
+    fprintf(stderr, "DEBUG: Bad SGI image dimensions %ux%ux%u!\n",
             sgip->xsize, sgip->ysize, sgip->zsize);
     sgiClose(sgip);
     fclose(fp);
@@ -279,5 +279,5 @@ _cupsImageReadSGI(
 
 
 /*
- * End of "$Id: image-sgi.c 5508 2006-05-11 11:41:16Z mike $".
+ * End of "$Id: image-sgi.c 6420 2007-03-30 20:00:59Z mike $".
  */

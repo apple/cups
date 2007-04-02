@@ -1,5 +1,5 @@
 /*
- * "$Id: request.c 6355 2007-03-19 06:33:04Z mike $"
+ * "$Id: request.c 6416 2007-03-30 18:30:33Z mike $"
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
@@ -361,19 +361,22 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
       while ((state = ippRead(http, response)) != IPP_DATA)
 	if (state == IPP_ERROR)
-	{
-	 /*
-          * Delete the response...
-	  */
-
-          DEBUG_puts("IPP read error!");
-	  ippDelete(response);
-	  response = NULL;
-
-          _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
-
 	  break;
-	}
+
+      if (state == IPP_ERROR)
+      {
+       /*
+        * Delete the response...
+	*/
+
+        DEBUG_puts("IPP read error!");
+	ippDelete(response);
+	response = NULL;
+
+        _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
+
+	break;
+      }
     }
   }
 
@@ -507,5 +510,5 @@ _cupsSetError(ipp_status_t status,	/* I - IPP status code */
 
 
 /*
- * End of "$Id: request.c 6355 2007-03-19 06:33:04Z mike $".
+ * End of "$Id: request.c 6416 2007-03-30 18:30:33Z mike $".
  */

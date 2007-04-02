@@ -1,5 +1,5 @@
 /*
- * "$Id: runloop.c 6170 2007-01-02 17:26:41Z mike $"
+ * "$Id: runloop.c 6403 2007-03-27 16:00:56Z mike $"
  *
  *   Common run loop API for the Common UNIX Printing System (CUPS).
  *
@@ -68,7 +68,8 @@ backendRunLoop(
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
-  fprintf(stderr, "DEBUG: backendRunLoop(print_fd=%d, device_fd=%d, use_bc=%d)\n",
+  fprintf(stderr,
+          "DEBUG: backendRunLoop(print_fd=%d, device_fd=%d, use_bc=%d)\n",
           print_fd, device_fd, use_bc);
 
  /*
@@ -132,7 +133,7 @@ backendRunLoop(
 	if (errno == ENXIO && !offline)
 	{
 	  fputs("STATE: +offline-error\n", stderr);
-	  fputs("INFO: Printer is currently off-line.\n", stderr);
+	  fputs(_("INFO: Printer is currently off-line.\n"), stderr);
 	  offline = 1;
 	}
 
@@ -216,8 +217,8 @@ backendRunLoop(
 	{
 	  if (!paperout)
 	  {
-	    fputs("ERROR: Out of paper!\n", stderr);
 	    fputs("STATE: +media-empty-error\n", stderr);
+	    fputs(_("ERROR: Out of paper!\n"), stderr);
 	    paperout = 1;
 	  }
         }
@@ -226,13 +227,14 @@ backendRunLoop(
 	  if (!offline)
 	  {
 	    fputs("STATE: +offline-error\n", stderr);
-	    fputs("INFO: Printer is currently off-line.\n", stderr);
+	    fputs(_("INFO: Printer is currently off-line.\n"), stderr);
 	    offline = 1;
 	  }
 	}
 	else if (errno != EAGAIN && errno != EINTR && errno != ENOTTY)
 	{
-	  perror("ERROR: Unable to write print data");
+	  fprintf(stderr, _("ERROR: Unable to write print data: %s\n"),
+	          strerror(errno));
 	  return (-1);
 	}
       }
@@ -247,7 +249,7 @@ backendRunLoop(
 	if (offline)
 	{
 	  fputs("STATE: -offline-error\n", stderr);
-	  fputs("INFO: Printer is now on-line.\n", stderr);
+	  fputs(_("INFO: Printer is now on-line.\n"), stderr);
 	  offline = 0;
 	}
 
@@ -269,5 +271,5 @@ backendRunLoop(
 
 
 /*
- * End of "$Id: runloop.c 6170 2007-01-02 17:26:41Z mike $".
+ * End of "$Id: runloop.c 6403 2007-03-27 16:00:56Z mike $".
  */

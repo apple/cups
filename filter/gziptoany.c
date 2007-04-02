@@ -1,5 +1,5 @@
 /*
- * "$Id: gziptoany.c 6400 2007-03-26 14:29:40Z mike $"
+ * "$Id: gziptoany.c 6420 2007-03-30 20:00:59Z mike $"
  *
  *   GZIP/raw pre-filter for the Common UNIX Printing System (CUPS).
  *
@@ -34,6 +34,7 @@
 
 #include <cups/file.h>
 #include <cups/string.h>
+#include <cups/i18n.h>
 #include <stdlib.h>
 #include <errno.h>
 
@@ -58,7 +59,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc != 7)
   {
-    fputs("ERROR: gziptoany job-id user title copies options file\n", stderr);
+    fprintf(stderr, _("Usage: %s job-id user title copies options file\n"),
+            argv[0]);
     return (1);
   }
 
@@ -78,7 +80,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
   {
-    fprintf(stderr, "ERROR: Unable to open file \"%s\": %s\n", argv[6],
+    fprintf(stderr, _("ERROR: Unable to open file \"%s\": %s\n"), argv[6],
             strerror(errno));
     return (1);
   }
@@ -100,7 +102,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (fwrite(buffer, 1, bytes, stdout) < bytes)
       {
 	fprintf(stderr,
-	        "ERROR: Unable to write uncompressed document data: %s\n",
+	        _("ERROR: Unable to write uncompressed document data: %s\n"),
         	strerror(ferror(stdout)));
 	cupsFileClose(fp);
 
@@ -121,5 +123,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: gziptoany.c 6400 2007-03-26 14:29:40Z mike $".
+ * End of "$Id: gziptoany.c 6420 2007-03-30 20:00:59Z mike $".
  */
