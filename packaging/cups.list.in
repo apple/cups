@@ -116,6 +116,9 @@
 %subpackage fr
 %description French support
 
+%subpackage he
+%description Hebrew support
+
 %subpackage it
 %description Italian support
 
@@ -367,6 +370,8 @@ f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
 f 0644 root sys $LOCALEDIR/et/cups_et.po locale/cups_et.po
 %subpackage fr
 f 0644 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
+%subpackage he
+f 0644 root sys $LOCALEDIR/he/cups_he.po locale/cups_he.po
 %subpackage it
 f 0644 root sys $LOCALEDIR/it/cups_it.po locale/cups_it.po
 %subpackage ja
@@ -444,6 +449,9 @@ f 0644 root sys $DATADIR/templates/et templates/et/*.tmpl
 %subpackage fr
 d 0755 root sys $DATADIR/templates/fr
 f 0644 root sys $DATADIR/templates/fr templates/fr/*.tmpl
+%subpackage he
+d 0755 root sys $DATADIR/templates/he
+f 0644 root sys $DATADIR/templates/he templates/he/*.tmpl
 %subpackage it
 d 0755 root sys $DATADIR/templates/it
 f 0644 root sys $DATADIR/templates/it templates/it/*.tmpl
@@ -546,6 +554,12 @@ d 0755 root sys $DOCDIR/fr
 f 0644 root sys $DOCDIR/fr doc/fr/*.html
 d 0755 root sys $DOCDIR/fr/images -
 f 0644 root sys $DOCDIR/fr/images doc/fr/images/*.gif
+%subpackage he
+d 0755 root sys $DOCDIR/he
+f 0644 root sys $DOCDIR/he doc/he/*.html
+f 0644 root sys $DOCDIR/he/cups.css doc/he/cups.css
+d 0755 root sys $DOCDIR/he/images -
+f 0644 root sys $DOCDIR/he/images doc/he/images/*.gif
 %subpackage it
 d 0755 root sys $DOCDIR/it
 f 0644 root sys $DOCDIR/it doc/it/*.html

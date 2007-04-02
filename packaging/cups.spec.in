@@ -96,6 +96,11 @@ Summary: Common UNIX Printing System - French support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
+%package he
+Summary: Common UNIX Printing System - Hebrew support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package it
 Summary: Common UNIX Printing System - Italian support
 Group: System Environment/Daemons
@@ -157,6 +162,10 @@ UNIX® operating systems. This package provides Estonian support.
 %description fr
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides French support.
+
+%description he
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Hebrew support.
 
 %description it
 The Common UNIX Printing System provides a portable printing layer for 
@@ -449,6 +458,17 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups/templates/fr
 /usr/share/cups/templates/fr/*
 /usr/share/locale/fr/cups_fr.po
+
+%files he
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/he
+/usr/share/doc/cups/he/index.html
+/usr/share/doc/cups/he/cups.css
+%dir /usr/share/doc/cups/he/images
+/usr/share/doc/cups/he/images/*
+%dir /usr/share/cups/templates/he
+/usr/share/cups/templates/he/*
+/usr/share/locale/he/cups_he.po
 
 %files it
 %defattr(-,root,root)

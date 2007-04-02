@@ -223,6 +223,9 @@ install-languages:
 		if test -f $$lang/index.html; then \
 			$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
 		fi; \
+		if test -f $$lang/cups.css; then \
+			$(INSTALL_MAN) $$lang/cups.css $(DOCDIR)/$$lang; \
+		fi; \
 		for file in $(WEBBUTTONS); do \
 			if test -f $$lang/$$file; then \
 				$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
@@ -252,6 +255,7 @@ uninstall: $(UNINSTALL_LANGUAGES)
 uninstall-languages:
 	-for lang in $(LANGUAGES); do \
 		$(RM) $(DOCDIR)/$$lang/index.html; \
+		$(RM) $(DOCDIR)/$$lang/cups.css; \
 		for file in $(WEBBUTTONS); do \
 			$(RM) $(DOCDIR)/$$lang/images/$$file; \
 		done \
