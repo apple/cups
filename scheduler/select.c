@@ -220,6 +220,7 @@ typedef struct _cupsd_fd_s
 static cups_array_t	*cupsd_fds = NULL;
 #if defined(HAVE_EPOLL) || defined(HAVE_KQUEUE)
 static cups_array_t	*cupsd_inactive_fds = NULL;
+static int		cupsd_in_select = 0;
 #endif /* HAVE_EPOLL || HAVE_KQUEUE */
 
 #ifdef HAVE_EPOLL
@@ -436,6 +437,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
                   "cupsdDoSelect: polling %d fds for %ld seconds...",
 		  cupsArrayCount(cupsd_fds), timeout);
 
+  cupsd_in_select = 1;
+
   if (timeout >= 0 && timeout < 86400)
     nfds = epoll_wait(cupsd_epoll_fd, cupsd_epoll_events, MaxFDs,
                       timeout * 1000);
@@ -480,6 +483,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdDoSelect: polling %d fds for %ld seconds...",
 		  cupsArrayCount(cupsd_fds), timeout);
+
+  cupsd_in_select = 1;
 
   if (timeout >= 0 && timeout < 86400)
   {
@@ -717,6 +722,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   * Release all inactive file descriptors...
   */
 
+  cupsd_in_select = 0;
+
   for (fdptr = (_cupsd_fd_t *)cupsArrayFirst(cupsd_inactive_fds);
        fdptr;
        fdptr = (_cupsd_fd_t *)cupsArrayNext(cupsd_inactive_fds))
@@ -841,10 +848,12 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
   cupsArrayRemove(cupsd_fds, fdptr);
 
 #if defined(HAVE_EPOLL) || defined(HAVE_KQUEUE)
-  cupsArrayAdd(cupsd_inactive_fds, fdptr);
-#else
-  release_fd(fdptr);
+  if (cupsd_in_select)
+    cupsArrayAdd(cupsd_inactive_fds, fdptr);
+  else
 #endif /* HAVE_EPOLL || HAVE_KQUEUE */
+
+  release_fd(fdptr);
 }
 
 
