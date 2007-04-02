@@ -108,6 +108,7 @@ cupsAdminCreateWindowsPPD(
 			option[41],	/* Option */
 			choice[41];	/* Choice */
   int			jcloption,	/* In a JCL option? */
+			jclorder,	/* Next JCL order dependency */
 			linenum;	/* Current line number */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
@@ -205,6 +206,7 @@ cupsAdminCreateWindowsPPD(
   */
 
   jcloption = 0;
+  jclorder  = 0;
   linenum   = 0;
   language  = cupsLangDefault();
 
@@ -243,10 +245,23 @@ cupsAdminCreateWindowsPPD(
       jcloption = 0;
       cupsFilePrintf(dstfp, "%s\n", line);
     }
+    else if (jcloption && !strncmp(line, "*OrderDependency:", 17))
+    {
+      for (ptr = line + 17; *ptr && isspace(*ptr & 255); ptr ++);
+
+      ptr = strchr(ptr, ' ');
+
+      if (ptr)
+      {
+	cupsFilePrintf(dstfp, "*OrderDependency: %d%s\n", jclorder, ptr);
+	jclorder ++;
+      }
+      else
+        cupsFilePrintf(dstfp, "%s\n", line);
+    }
     else if (jcloption &&
              strncmp(line, "*End", 4) &&
-             strncmp(line, "*Default", 8) &&
-             strncmp(line, "*OrderDependency", 16))
+             strncmp(line, "*Default", 8))
     {
       if ((ptr = strchr(line, ':')) == NULL)
       {
@@ -363,24 +378,24 @@ cupsAdminCreateWindowsPPD(
                                   IPP_TAG_ZERO)) != NULL &&
       (suppattr = ippFindAttribute(response, "job-hold-until-supported",
                                    IPP_TAG_ZERO)) != NULL)
-    write_option(dstfp, 10, "cupsJobHoldUntil", "Hold Until", "job-hold-until",
-                 suppattr, defattr, 0, 1);
+    write_option(dstfp, jclorder ++, "cupsJobHoldUntil", "Hold Until",
+                 "job-hold-until", suppattr, defattr, 0, 1);
 
   if ((defattr = ippFindAttribute(response, "job-priority-default",
                                   IPP_TAG_INTEGER)) != NULL &&
       (suppattr = ippFindAttribute(response, "job-priority-supported",
                                    IPP_TAG_RANGE)) != NULL)
-    write_option(dstfp, 11, "cupsJobPriority", "Priority", "job-priority",
-                 suppattr, defattr, 0, 1);
+    write_option(dstfp, jclorder ++, "cupsJobPriority", "Priority",
+                 "job-priority", suppattr, defattr, 0, 1);
 
   if ((defattr = ippFindAttribute(response, "job-sheets-default",
                                   IPP_TAG_ZERO)) != NULL &&
       (suppattr = ippFindAttribute(response, "job-sheets-supported",
                                    IPP_TAG_ZERO)) != NULL)
   {
-    write_option(dstfp, 20, "cupsJobSheetsStart", "Start Banner",
+    write_option(dstfp, jclorder ++, "cupsJobSheetsStart", "Start Banner",
                  "job-sheets", suppattr, defattr, 0, 2);
-    write_option(dstfp, 21, "cupsJobSheetsEnd", "End Banner",
+    write_option(dstfp, jclorder ++, "cupsJobSheetsEnd", "End Banner",
                  "job-sheets", suppattr, defattr, 1, 2);
   }
 
