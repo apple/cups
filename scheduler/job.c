@@ -202,12 +202,11 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
 
     case IPP_JOB_COMPLETED :
        /*
-	* Clear the printer's state_message and state_reasons and move on...
+	* Clear the printer's printer-state-message and move on...
 	*/
 
 	printer->state_message[0] = '\0';
 
-	cupsdSetPrinterReasons(printer, "");
 	cupsdSetPrinterState(printer, IPP_PRINTER_IDLE, 0);
 
 	cupsdAddEvent(CUPSD_EVENT_JOB_COMPLETED, printer, job,
