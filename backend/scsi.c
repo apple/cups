@@ -55,6 +55,7 @@
 
 #include <cups/backend.h>
 #include <cups/cups.h>
+#include <cups/i18n.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>

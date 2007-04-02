@@ -59,6 +59,7 @@
 #include <mach/mach_time.h>
 #include <cups/debug.h>
 #include <cups/sidechannel.h>
+#include <cups/i18n.h>
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/usb/IOUSBLib.h>
