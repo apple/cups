@@ -747,6 +747,9 @@ cupsdDeletePrinter(
   cupsdClearString(&p->op_policy);
   cupsdClearString(&p->error_policy);
 
+  cupsdClearString(&p->alert);
+  cupsdClearString(&p->alert_description);
+
 #ifdef HAVE_DNSSD
   cupsdClearString(&p->product);
   cupsdClearString(&p->pdl);

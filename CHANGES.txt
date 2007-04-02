@@ -1,9 +1,11 @@
-CHANGES.txt - 2007-03-26
+CHANGES.txt - 2007-04-02
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131)
+	- Added support for the PWG printer-alert and
+	  printer-alert-description attributes (STR #2088)
 	- Added support for LPD "stream" mode (STR #2036)
 	- The scheduler now reports the PostScript product string
 	  from PPD files in CUPS-Get-PPDs responses (STR #1900)

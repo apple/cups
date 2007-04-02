@@ -93,6 +93,9 @@ typedef struct cupsd_printer_s
   cups_option_t	*options;		/* Default options */
   int		num_auth_info_required;	/* Number of required auth fields */
   const char	*auth_info_required[4];	/* Required authentication fields */
+  char		*alert,			/* PSX printer-alert value */
+		*alert_description;	/* PSX printer-alert-description value */
+
 #ifdef __APPLE__
   char		*recoverable;		/* com.apple.print.recoverable-message */
 #endif /* __APPLE__ */

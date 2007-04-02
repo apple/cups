@@ -3458,6 +3458,19 @@ update_job(cupsd_job_t *job)	/* I - Job to check */
                                 attrs)) != NULL)
         cupsdSetAuthInfoRequired(job->printer, attr, NULL);
 
+      if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)
+      {
+        cupsdSetString(&job->printer->alert, attr);
+	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      }
+
+      if ((attr = cupsGetOption("printer-alert-description", num_attrs,
+                                attrs)) != NULL)
+      {
+        cupsdSetString(&job->printer->alert_description, attr);
+	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      }
+
       cupsFreeOptions(num_attrs, attrs);
     }
 #ifdef __APPLE__

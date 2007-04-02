@@ -4433,6 +4433,16 @@ copy_printer_attrs(
 		 printer->recoverable);
 #endif /* __APPLE__ */
 
+  if (printer->alert && (!ra || cupsArrayFind(ra, "printer-alert")))
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_STRING,
+                 "printer-alert", NULL, printer->alert);
+
+  if (printer->alert_description &&
+      (!ra || cupsArrayFind(ra, "printer-alert-description")))
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                 "printer-alert-description", NULL,
+		 printer->alert_description);
+
   if (!ra || cupsArrayFind(ra, "printer-current-time"))
     ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
                ippTimeToDate(curtime));
@@ -4825,6 +4835,8 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "pages-per-minute");
       cupsArrayAdd(ra, "pages-per-minute-color");
       cupsArrayAdd(ra, "pdl-override-supported");
+      cupsArrayAdd(ra, "printer-alert");
+      cupsArrayAdd(ra, "printer-alert-description");
       cupsArrayAdd(ra, "printer-current-time");
       cupsArrayAdd(ra, "printer-driver-installer");
       cupsArrayAdd(ra, "printer-info");
