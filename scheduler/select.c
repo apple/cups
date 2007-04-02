@@ -91,16 +91,17 @@
  * 
  *     0. Common Stuff
  *         a. CUPS array of file descriptor to callback functions
- *            and data.
- *         b. cupsdStartSelect() creates the array
- *         c. cupsdStopSelect() destroys the array and all elements.
+ *            and data + temporary array of removed fd's.
+ *         b. cupsdStartSelect() creates the arrays
+ *         c. cupsdStopSelect() destroys the arrays and all elements.
  *         d. cupsdAddSelect() adds to the array and allocates a
  *            new callback element.
- *         e. cupsdRemoveSelect() removes from the array and frees
- *            the callback element.
+ *         e. cupsdRemoveSelect() removes from the active array and
+ *            adds to the inactive array.
  *         f. _cupsd_fd_t provides a reference-counted structure for
  *            tracking file descriptors that are monitored.
- * 
+ *         g. cupsdDoSelect() frees all inactive FDs.
+ *
  *     1. select() O(n)
  *         a. Input/Output fd_set variables, copied to working
  *            copies and then used with select().
@@ -217,6 +218,9 @@ typedef struct _cupsd_fd_s
  */
 
 static cups_array_t	*cupsd_fds = NULL;
+#if defined(HAVE_EPOLL) || defined(HAVE_KQUEUE)
+static cups_array_t	*cupsd_inactive_fds = NULL;
+#endif /* HAVE_EPOLL || HAVE_KQUEUE */
 
 #ifdef HAVE_EPOLL
 static int		cupsd_epoll_fd = -1;
@@ -445,6 +449,9 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   {
     fdptr = (_cupsd_fd_t *)event->data.ptr;
 
+    if (cupsArrayFind(cupsd_inactive_fds, fdptr))
+      continue;
+
     retain_fd(fdptr);
 
     if (fdptr->read_cb && (event->events & (EPOLLIN | EPOLLERR | EPOLLHUP)))
@@ -494,6 +501,9 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   for (i = nfds, event = cupsd_kqueue_events; i > 0; i --, event ++)
   {
     fdptr = (_cupsd_fd_t *)event->udata;
+
+    if (cupsArrayFind(cupsd_inactive_fds, fdptr))
+      continue;
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "event->filter=%d, event->ident=%d",
                     event->filter, (int)event->ident);
@@ -702,6 +712,20 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 
 #endif /* HAVE_EPOLL */
 
+#if defined(HAVE_EPOLL) || defined(HAVE_KQUEUE)
+ /*
+  * Release all inactive file descriptors...
+  */
+
+  for (fdptr = (_cupsd_fd_t *)cupsArrayFirst(cupsd_inactive_fds);
+       fdptr;
+       fdptr = (_cupsd_fd_t *)cupsArrayNext(cupsd_inactive_fds))
+  {
+    cupsArrayRemove(cupsd_inactive_fds, fdptr);
+    release_fd(fdptr);
+  }
+#endif /* HAVE_EPOLL || HAVE_KQUEUE */
+
  /*
   * Return the number of file descriptors handled...
   */
@@ -810,11 +834,17 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
 #endif /* HAVE_EPOLL */
 
  /*
-  * Remove the file descriptor for from the FD array...
+  * Remove the file descriptor from the active array and add to the
+  * inactive array (or release, if we don't need the inactive array...)
   */
 
   cupsArrayRemove(cupsd_fds, fdptr);
+
+#if defined(HAVE_EPOLL) || defined(HAVE_KQUEUE)
+  cupsArrayAdd(cupsd_inactive_fds, fdptr);
+#else
   release_fd(fdptr);
+#endif /* HAVE_EPOLL || HAVE_KQUEUE */
 }
 
 
@@ -826,6 +856,10 @@ void
 cupsdStartSelect(void)
 {
   cupsd_fds = cupsArrayNew((cups_array_func_t)compare_fds, NULL);
+
+#if defined(HAVE_EPOLL) || defined(HAVE_KQUEUE)
+  cupsd_inactive_fds = cupsArrayNew((cups_array_func_t)compare_fds, NULL);
+#endif /* HAVE_EPOLL || HAVE_KQUEUE */
 
 #ifdef HAVE_EPOLL
   cupsd_epoll_fd     = epoll_create(MaxFDs);
@@ -863,6 +897,11 @@ cupsdStopSelect(void)
 
   cupsArrayDelete(cupsd_fds);
   cupsd_fds = NULL;
+
+#if defined(HAVE_EPOLL) || defined(HAVE_KQUEUE)
+  cupsArrayDelete(cupsd_inactive_fds);
+  cupsd_inactive_fds = NULL;
+#endif /* HAVE_EPOLL || HAVE_KQUEUE */
 
 #ifdef HAVE_EPOLL
   if (cupsd_epoll_events)
