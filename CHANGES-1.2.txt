@@ -3,6 +3,10 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.11
 
+	- The printer-state-reasons attribute was incorrectly
+	  cleared after a job completed (STR #2323)
+	- The scheduler did not set the printer operation policy
+	  on startup, only on soft reload (STR #2319)
 	- The AP_FIRSTPAGE_InputSlot option did not clear any
 	  ManualFeed setting that was made, which caused problems
 	  with some PPD files (STR #2318)
