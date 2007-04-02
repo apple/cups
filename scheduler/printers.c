@@ -2517,6 +2517,9 @@ cupsdSetPrinterReasons(
 	            (p->num_reasons - i) * sizeof(char *));
 
 	  i --;
+
+          if (!strcmp(reason, "paused") && p->state == IPP_PRINTER_STOPPED)
+	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
 	}
     }
     else if (p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
@@ -2533,6 +2536,9 @@ cupsdSetPrinterReasons(
       {
         p->reasons[i] = strdup(reason);
 	p->num_reasons ++;
+
+	if (!strcmp(reason, "paused") && p->state != IPP_PRINTER_STOPPED)
+	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
       }
     }
   }
