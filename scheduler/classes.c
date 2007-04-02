@@ -682,7 +682,20 @@ cupsdLoadAllClasses(void)
     else if (!strcasecmp(line, "OpPolicy"))
     {
       if (value)
-        cupsdSetString(&p->op_policy, value);
+      {
+        cupsd_policy_t *pol;		/* Policy */
+
+
+        if ((pol = cupsdFindPolicy(value)) != NULL)
+	{
+          cupsdSetString(&p->op_policy, value);
+	  p->op_policy_ptr = pol;
+	}
+	else
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Bad policy \"%s\" on line %d of classes.conf",
+			  value, linenum);
+      }
       else
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
