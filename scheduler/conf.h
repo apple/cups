@@ -97,6 +97,8 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Default charset */
 			*DefaultLocale		VALUE(NULL),
 					/* Default locale */
+			*ErrorPolicy		VALUE(NULL),
+					/* Default printer-error-policy */
 			*RIPCache		VALUE(NULL),
 					/* Amount of memory for RIPs */
 			*TempDir		VALUE(NULL),

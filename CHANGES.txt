@@ -4,6 +4,8 @@ CHANGES.txt - 2007-04-02
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131)
+	- Added a new ErrorPolicy directive in the cupsd.conf
+	  file (STR #1871)
 	- Printers that use JCL options are now exported to Samba
 	  correctly (STR #1985)
 	- The IPP backend now relays printer-state-message values

@@ -124,7 +124,7 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   cupsdSetString(&p->job_sheets[0], "none");
   cupsdSetString(&p->job_sheets[1], "none");
 
-  cupsdSetString(&p->error_policy, "stop-printer");
+  cupsdSetString(&p->error_policy, ErrorPolicy);
   cupsdSetString(&p->op_policy, DefaultPolicy);
 
   p->op_policy_ptr = DefaultPolicyPtr;
