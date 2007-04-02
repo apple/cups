@@ -1010,16 +1010,22 @@ main(int  argc,			/* I - Number of command-line arguments */
         * This file contains localizations, check them...
 	*/
 
-        char	*languages,		/* Copy of attribute value */
-		*langstart,		/* Start of current language */
-		*langptr,		/* Pointer into languages */
-		keyword[PPD_MAX_NAME],	/* Localization keyword */
-		ckeyword[PPD_MAX_NAME];	/* Custom option keyword */
+        char		*languages,	/* Copy of attribute value */
+			*langstart,	/* Start of current language */
+			*langptr,	/* Pointer into languages */
+			keyword[PPD_MAX_NAME],
+					/* Localization keyword */
+			ckeyword[PPD_MAX_NAME];
+					/* Custom option keyword */
 	ppd_coption_t	*coption;	/* Custom option */
 	ppd_cparam_t	*cparam;	/* Custom parameter */
+        cups_array_t	*langlist;	/* List of languages so far */
+        char		ll[3];		/* Base language */
 
 
         languages = strdup(attr->value);
+	langlist  = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+
 	for (langptr = languages; *langptr;)
 	{
 	 /*
@@ -1059,6 +1065,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    errors ++;
 	    continue;
 	  }
+
+          cupsArrayAdd(langlist, langstart);
 
          /*
 	  * Loop through all options and choices...
@@ -1132,24 +1140,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 		snprintf(ckeyword, sizeof(ckeyword), "%s.Custom%s",
 		         langstart, option->keyword);
 
-		if ((attr = ppdFindAttr(ppd, ckeyword, "True")) == NULL)
-		{
-		  if (verbose >= 0)
-		  {
-		    if (!errors && !verbose)
-		      _cupsLangPuts(stdout, _(" FAIL\n"));
-
-		    _cupsLangPrintf(stdout,
-	                	    _("      **FAIL**  Missing \"%s\" "
-				      "translation string for option %s, "
-				      "choice %s!\n"),
-				    langstart, ckeyword + 1 + strlen(langstart),
-				    "True");
-        	  }
-
-		  errors ++;
-		}
-		else if (!valid_utf8(attr->text))
+		if ((attr = ppdFindAttr(ppd, ckeyword, "True")) != NULL &&
+		    !valid_utf8(attr->text))
 	        {
 	          if (verbose >= 0)
 	          {
@@ -1273,6 +1265,48 @@ main(int  argc,			/* I - Number of command-line arguments */
             }
 	  }
         }
+
+       /*
+        * Verify that we have the base language for each localized one...
+	*/
+
+        for (langptr = (char *)cupsArrayFirst(langlist);
+	     langptr;
+	     langptr = (char *)cupsArrayNext(langlist))
+	  if (langptr[2])
+	  {
+	   /*
+	    * Lookup the base language...
+	    */
+
+	    cupsArraySave(langlist);
+
+	    strlcpy(ll, langptr, sizeof(ll));
+
+	    if (!cupsArrayFind(langlist, ll))
+	    {
+	      if (verbose >= 0)
+	      {
+		if (!errors && !verbose)
+		  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+		_cupsLangPrintf(stdout,
+				_("      **FAIL**  No base translation \"%s\" "
+				  "is included in file!\n"), ll);
+	      }
+
+	      errors ++;
+	    }
+
+	    cupsArrayRestore(langlist);
+	  }
+
+       /*
+        * Free memory used for the languages...
+	*/
+
+        cupsArrayDelete(langlist);
+	free(languages);
       }
 
       for (attr = ppdFindAttr(ppd, "cupsFilter", NULL);
