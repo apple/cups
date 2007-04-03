@@ -3,6 +3,7 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.11
 
+	- The USB backend did not work on NetBSD (STR #2324)
 	- The printer-state-reasons attribute was incorrectly
 	  cleared after a job completed (STR #2323)
 	- The scheduler did not set the printer operation policy

@@ -28,7 +28,6 @@
  *   do_am_class()             - Add or modify a class.
  *   do_am_printer()           - Add or modify a printer.
  *   do_cancel_subscription()  - Cancel a subscription.
- *   do_config_printer()       - Configure the default options for a printer.
  *   do_config_server()        - Configure server settings.
  *   do_delete_class()         - Delete a class...
  *   do_delete_printer()       - Delete a printer...
@@ -36,6 +35,7 @@
  *   do_menu()                 - Show the main menu...
  *   do_printer_op()           - Do a printer operation.
  *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
+ *   do_set_options()          - Configure the default options for a queue.
  *   do_set_sharing()          - Set printer-is-shared value...
  *   match_string()            - Return the number of matching characters.
  */
@@ -61,7 +61,7 @@ static void	do_add_rss_subscription(http_t *http);
 static void	do_am_class(http_t *http, int modify);
 static void	do_am_printer(http_t *http, int modify);
 static void	do_cancel_subscription(http_t *http);
-static void	do_config_printer(http_t *http);
+static void	do_set_options(http_t *http, int is_class);
 static void	do_config_server(http_t *http);
 static void	do_delete_class(http_t *http);
 static void	do_delete_printer(http_t *http);
@@ -184,8 +184,10 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_delete_class(http);
     else if (!strcmp(op, "delete-printer"))
       do_delete_printer(http);
+    else if (!strcmp(op, "set-class-options"))
+      do_set_options(http, 1);
     else if (!strcmp(op, "set-printer-options"))
-      do_config_printer(http);
+      do_set_options(http, 0);
     else if (!strcmp(op, "config-server"))
       do_config_server(http);
     else if (!strcmp(op, "export-samba"))
@@ -1291,525 +1293,6 @@ do_cancel_subscription(http_t *http)/* I - HTTP connection */
   }
 
   cgiEndHTML();
-}
-
-
-/*
- * 'do_config_printer()' - Configure the default options for a printer.
- */
-
-static void
-do_config_printer(http_t *http)		/* I - HTTP connection */
-{
-  int		i, j, k, m;		/* Looping vars */
-  int		have_options;		/* Have options? */
-  ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
-  ipp_attribute_t *attr;		/* IPP attribute */
-  char		uri[HTTP_MAX_URI];	/* Job URI */
-  const char	*var;			/* Variable value */
-  const char	*printer;		/* Printer printer name */
-  const char	*filename;		/* PPD filename */
-  char		tempfile[1024];		/* Temporary filename */
-  cups_file_t	*in,			/* Input file */
-		*out;			/* Output file */
-  char		line[1024];		/* Line from PPD file */
-  char		keyword[1024],		/* Keyword from Default line */
-		*keyptr;		/* Pointer into keyword... */
-  ppd_file_t	*ppd;			/* PPD file */
-  ppd_group_t	*group;			/* Option group */
-  ppd_option_t	*option;		/* Option */
-  ppd_attr_t	*protocol;		/* cupsProtocol attribute */
-  const char	*title;			/* Page title */
-
-
-  title = cgiText(_("Set Printer Options"));
-
-  fprintf(stderr, "DEBUG: do_config_printer(http=%p)\n", http);
-
- /*
-  * Get the printer name...
-  */
-
-  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                     "localhost", 0, "/printers/%s", printer);
-  else
-  {
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
-  fprintf(stderr, "DEBUG: printer=\"%s\", uri=\"%s\"...\n", printer, uri);
-
- /*
-  * Get the PPD file...
-  */
-
-  if ((filename = cupsGetPPD2(http, printer)) == NULL)
-  {
-    fputs("DEBUG: No PPD file!?!\n", stderr);
-
-    cgiStartHTML(title);
-    cgiShowIPPError(_("Unable to get PPD file!"));
-    cgiEndHTML();
-    return;
-  }
-
-  fprintf(stderr, "DEBUG: Got PPD file: \"%s\"\n", filename);
-
-  if ((ppd = ppdOpenFile(filename)) == NULL)
-  {
-    cgiSetVariable("ERROR", ppdErrorString(ppdLastError(&i)));
-    cgiSetVariable("MESSAGE", cgiText(_("Unable to open PPD file:")));
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
-  if (cgiGetVariable("job_sheets_start") != NULL ||
-      cgiGetVariable("job_sheets_end") != NULL)
-    have_options = 1;
-  else
-    have_options = 0;
-
-  ppdMarkDefaults(ppd);
-
-  DEBUG_printf(("<P>ppd->num_groups = %d\n"
-                "<UL>\n", ppd->num_groups));
-
-  for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-  {
-    DEBUG_printf(("<LI>%s<UL>\n", group->text));
-
-    for (j = group->num_options, option = group->options;
-         j > 0;
-	 j --, option ++)
-      if ((var = cgiGetVariable(option->keyword)) != NULL)
-      {
-        DEBUG_printf(("<LI>%s = \"%s\"</LI>\n", option->keyword, var));
-        have_options = 1;
-	ppdMarkOption(ppd, option->keyword, var);
-      }
-#ifdef DEBUG
-      else
-        printf("<LI>%s not defined!</LI>\n", option->keyword);
-#endif /* DEBUG */
-
-    DEBUG_puts("</UL></LI>");
-  }
-
-  DEBUG_printf(("</UL>\n"
-                "<P>ppdConflicts(ppd) = %d\n", ppdConflicts(ppd)));
-
-  if (!have_options || ppdConflicts(ppd))
-  {
-   /*
-    * Show the options to the user...
-    */
-
-    fputs("DEBUG: Showing options...\n", stderr);
-
-    ppdLocalize(ppd);
-
-    cgiStartHTML(cgiText(_("Set Printer Options")));
-    cgiCopyTemplateLang("set-printer-options-header.tmpl");
-
-    if (ppdConflicts(ppd))
-    {
-      for (i = ppd->num_groups, k = 0, group = ppd->groups;
-           i > 0;
-	   i --, group ++)
-	for (j = group->num_options, option = group->options;
-	     j > 0;
-	     j --, option ++)
-          if (option->conflicted)
-	  {
-	    cgiSetArray("ckeyword", k, option->keyword);
-	    cgiSetArray("ckeytext", k, option->text);
-	    k ++;
-	  }
-
-      cgiCopyTemplateLang("option-conflict.tmpl");
-    }
-
-    for (i = ppd->num_groups, group = ppd->groups;
-	 i > 0;
-	 i --, group ++)
-    {
-      if (!strcmp(group->name, "InstallableOptions"))
-	cgiSetVariable("GROUP", cgiText(_("Options Installed")));
-      else
-	cgiSetVariable("GROUP", group->text);
-
-      cgiCopyTemplateLang("option-header.tmpl");
-      
-      for (j = group->num_options, option = group->options;
-           j > 0;
-	   j --, option ++)
-      {
-        if (!strcmp(option->keyword, "PageRegion"))
-	  continue;
-
-        cgiSetVariable("KEYWORD", option->keyword);
-        cgiSetVariable("KEYTEXT", option->text);
-	    
-	if (option->conflicted)
-	  cgiSetVariable("CONFLICTED", "1");
-	else
-	  cgiSetVariable("CONFLICTED", "0");
-
-	cgiSetSize("CHOICES", 0);
-	cgiSetSize("TEXT", 0);
-	for (k = 0, m = 0; k < option->num_choices; k ++)
-	{
-	 /*
-	  * Hide custom option values...
-	  */
-
-	  if (!strcmp(option->choices[k].choice, "Custom"))
-	    continue;
-
-	  cgiSetArray("CHOICES", m, option->choices[k].choice);
-	  cgiSetArray("TEXT", m, option->choices[k].text);
-
-          m ++;
-
-          if (option->choices[k].marked)
-	    cgiSetVariable("DEFCHOICE", option->choices[k].choice);
-	}
-
-        switch (option->ui)
-	{
-	  case PPD_UI_BOOLEAN :
-              cgiCopyTemplateLang("option-boolean.tmpl");
-              break;
-	  case PPD_UI_PICKONE :
-              cgiCopyTemplateLang("option-pickone.tmpl");
-              break;
-	  case PPD_UI_PICKMANY :
-              cgiCopyTemplateLang("option-pickmany.tmpl");
-              break;
-	}
-      }
-
-      cgiCopyTemplateLang("option-trailer.tmpl");
-    }
-
-   /*
-    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
-    * following attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    */
-
-    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
-
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                     "localhost", 0, "/printers/%s", printer);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, uri);
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(http, request, "/")) != NULL)
-    {
-      if ((attr = ippFindAttribute(response, "job-sheets-supported",
-                                   IPP_TAG_ZERO)) != NULL)
-      {
-       /*
-	* Add the job sheets options...
-	*/
-
-	cgiSetVariable("GROUP", cgiText(_("Banners")));
-	cgiCopyTemplateLang("option-header.tmpl");
-
-	cgiSetSize("CHOICES", attr->num_values);
-	cgiSetSize("TEXT", attr->num_values);
-	for (k = 0; k < attr->num_values; k ++)
-	{
-	  cgiSetArray("CHOICES", k, attr->values[k].string.text);
-	  cgiSetArray("TEXT", k, attr->values[k].string.text);
-	}
-
-        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
-
-        cgiSetVariable("KEYWORD", "job_sheets_start");
-	cgiSetVariable("KEYTEXT", cgiText(_("Starting Banner")));
-        cgiSetVariable("DEFCHOICE", attr == NULL ?
-	                            "" : attr->values[0].string.text);
-
-	cgiCopyTemplateLang("option-pickone.tmpl");
-
-        cgiSetVariable("KEYWORD", "job_sheets_end");
-	cgiSetVariable("KEYTEXT", cgiText(_("Ending Banner")));
-        cgiSetVariable("DEFCHOICE", attr == NULL && attr->num_values > 1 ?
-	                            "" : attr->values[1].string.text);
-
-	cgiCopyTemplateLang("option-pickone.tmpl");
-
-	cgiCopyTemplateLang("option-trailer.tmpl");
-      }
-
-      if (ippFindAttribute(response, "printer-error-policy-supported",
-                           IPP_TAG_ZERO) ||
-          ippFindAttribute(response, "printer-op-policy-supported",
-	                   IPP_TAG_ZERO))
-      {
-       /*
-	* Add the error and operation policy options...
-	*/
-
-	cgiSetVariable("GROUP", cgiText(_("Policies")));
-	cgiCopyTemplateLang("option-header.tmpl");
-
-       /*
-        * Error policy...
-	*/
-
-        attr = ippFindAttribute(response, "printer-error-policy-supported",
-	                        IPP_TAG_ZERO);
-
-        if (attr)
-	{
-	  cgiSetSize("CHOICES", attr->num_values);
-	  cgiSetSize("TEXT", attr->num_values);
-	  for (k = 0; k < attr->num_values; k ++)
-	  {
-	    cgiSetArray("CHOICES", k, attr->values[k].string.text);
-	    cgiSetArray("TEXT", k, attr->values[k].string.text);
-	  }
-
-          attr = ippFindAttribute(response, "printer-error-policy",
-	                          IPP_TAG_ZERO);
-
-          cgiSetVariable("KEYWORD", "printer_error_policy");
-	  cgiSetVariable("KEYTEXT", cgiText(_("Error Policy")));
-          cgiSetVariable("DEFCHOICE", attr == NULL ?
-	                              "" : attr->values[0].string.text);
-        }
-
-	cgiCopyTemplateLang("option-pickone.tmpl");
-
-       /*
-        * Operation policy...
-	*/
-
-        attr = ippFindAttribute(response, "printer-op-policy-supported",
-	                        IPP_TAG_ZERO);
-
-        if (attr)
-	{
-	  cgiSetSize("CHOICES", attr->num_values);
-	  cgiSetSize("TEXT", attr->num_values);
-	  for (k = 0; k < attr->num_values; k ++)
-	  {
-	    cgiSetArray("CHOICES", k, attr->values[k].string.text);
-	    cgiSetArray("TEXT", k, attr->values[k].string.text);
-	  }
-
-          attr = ippFindAttribute(response, "printer-op-policy", IPP_TAG_ZERO);
-
-          cgiSetVariable("KEYWORD", "printer_op_policy");
-	  cgiSetVariable("KEYTEXT", cgiText(_("Operation Policy")));
-          cgiSetVariable("DEFCHOICE", attr == NULL ?
-	                              "" : attr->values[0].string.text);
-
-	  cgiCopyTemplateLang("option-pickone.tmpl");
-        }
-
-	cgiCopyTemplateLang("option-trailer.tmpl");
-      }
-
-      ippDelete(response);
-    }
-
-   /*
-    * Binary protocol support...
-    */
-
-    if (ppd->protocols && strstr(ppd->protocols, "BCP"))
-    {
-      protocol = ppdFindAttr(ppd, "cupsProtocol", NULL);
-
-      cgiSetVariable("GROUP", cgiText(_("PS Binary Protocol")));
-      cgiCopyTemplateLang("option-header.tmpl");
-
-      cgiSetSize("CHOICES", 2);
-      cgiSetSize("TEXT", 2);
-      cgiSetArray("CHOICES", 0, "None");
-      cgiSetArray("TEXT", 0, cgiText(_("None")));
-
-      if (strstr(ppd->protocols, "TBCP"))
-      {
-	cgiSetArray("CHOICES", 1, "TBCP");
-	cgiSetArray("TEXT", 1, "TBCP");
-      }
-      else
-      {
-	cgiSetArray("CHOICES", 1, "BCP");
-	cgiSetArray("TEXT", 1, "BCP");
-      }
-
-      cgiSetVariable("KEYWORD", "protocol");
-      cgiSetVariable("KEYTEXT", cgiText(_("PS Binary Protocol")));
-      cgiSetVariable("DEFCHOICE", protocol ? protocol->value : "None");
-
-      cgiCopyTemplateLang("option-pickone.tmpl");
-
-      cgiCopyTemplateLang("option-trailer.tmpl");
-    }
-
-    cgiCopyTemplateLang("set-printer-options-trailer.tmpl");
-    cgiEndHTML();
-  }
-  else
-  {
-   /*
-    * Set default options...
-    */
-
-    fputs("DEBUG: Setting options...\n", stderr);
-
-    out = cupsTempFile2(tempfile, sizeof(tempfile));
-    in  = cupsFileOpen(filename, "r");
-
-    if (!in || !out)
-    {
-      cgiSetVariable("ERROR", strerror(errno));
-      cgiStartHTML(cgiText(_("Set Printer Options")));
-      cgiCopyTemplateLang("error.tmpl");
-      cgiEndHTML();
-
-      if (in)
-        cupsFileClose(in);
-
-      if (out)
-      {
-        cupsFileClose(out);
-	unlink(tempfile);
-      }
-
-      unlink(filename);
-      return;
-    }
-
-    while (cupsFileGets(in, line, sizeof(line)))
-    {
-      if (!strncmp(line, "*cupsProtocol:", 14) && cgiGetVariable("protocol"))
-        continue;
-      else if (strncmp(line, "*Default", 8))
-        cupsFilePrintf(out, "%s\n", line);
-      else
-      {
-       /*
-        * Get default option name...
-	*/
-
-        strlcpy(keyword, line + 8, sizeof(keyword));
-
-	for (keyptr = keyword; *keyptr; keyptr ++)
-	  if (*keyptr == ':' || isspace(*keyptr & 255))
-	    break;
-
-        *keyptr = '\0';
-
-        if (!strcmp(keyword, "PageRegion") ||
-	    !strcmp(keyword, "PaperDimension") ||
-	    !strcmp(keyword, "ImageableArea"))
-	  var = cgiGetVariable("PageSize");
-	else
-	  var = cgiGetVariable(keyword);
-
-        if (var != NULL)
-	  cupsFilePrintf(out, "*Default%s: %s\n", keyword, var);
-	else
-	  cupsFilePrintf(out, "%s\n", line);
-      }
-    }
-
-    if ((var = cgiGetVariable("protocol")) != NULL)
-      cupsFilePrintf(out, "*cupsProtocol: %s\n", cgiGetVariable("protocol"));
-
-    cupsFileClose(in);
-    cupsFileClose(out);
-
-   /*
-    * Build a CUPS_ADD_PRINTER request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    *    job-sheets-default
-    *    [ppd file]
-    */
-
-    request = ippNewRequest(CUPS_ADD_PRINTER);
-
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                     "localhost", 0, "/printers/%s",
-		     cgiGetVariable("PRINTER_NAME"));
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, uri);
-
-    attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                         "job-sheets-default", 2, NULL, NULL);
-    attr->values[0].string.text = strdup(cgiGetVariable("job_sheets_start"));
-    attr->values[1].string.text = strdup(cgiGetVariable("job_sheets_end"));
-
-    if ((var = cgiGetVariable("printer_error_policy")) != NULL)
-      attr = ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                          "printer-error-policy", NULL, var);
-
-    if ((var = cgiGetVariable("printer_op_policy")) != NULL)
-      attr = ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                          "printer-op-policy", NULL, var);
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    ippDelete(cupsDoFileRequest(http, request, "/admin/", tempfile));
-
-    if (cupsLastError() > IPP_OK_CONFLICT)
-    {
-      cgiStartHTML(title);
-      cgiShowIPPError(_("Unable to set options:"));
-    }
-    else
-    {
-     /*
-      * Redirect successful updates back to the printer page...
-      */
-
-      char	refresh[1024];		/* Refresh URL */
-
-
-      cgiFormEncode(uri, printer, sizeof(uri));
-      snprintf(refresh, sizeof(refresh),
-               "5;URL=/admin/?OP=redirect&URL=/printers/%s", uri);
-      cgiSetVariable("refresh_page", refresh);
-
-      cgiStartHTML(title);
-
-      cgiCopyTemplateLang("printer-configured.tmpl");
-    }
-
-    cgiEndHTML();
-
-    unlink(tempfile);
-  }
-
-  unlink(filename);
 }
 
 
@@ -3110,6 +2593,553 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
 
     cgiEndHTML();
   }
+}
+
+
+/*
+ * 'do_set_options()' - Configure the default options for a queue.
+ */
+
+static void
+do_set_options(http_t *http,		/* I - HTTP connection */
+               int    is_class)		/* I - Set options for class? */
+{
+  int		i, j, k, m;		/* Looping vars */
+  int		have_options;		/* Have options? */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* IPP attribute */
+  char		uri[HTTP_MAX_URI];	/* Job URI */
+  const char	*var;			/* Variable value */
+  const char	*printer;		/* Printer printer name */
+  const char	*filename;		/* PPD filename */
+  char		tempfile[1024];		/* Temporary filename */
+  cups_file_t	*in,			/* Input file */
+		*out;			/* Output file */
+  char		line[1024];		/* Line from PPD file */
+  char		keyword[1024],		/* Keyword from Default line */
+		*keyptr;		/* Pointer into keyword... */
+  ppd_file_t	*ppd;			/* PPD file */
+  ppd_group_t	*group;			/* Option group */
+  ppd_option_t	*option;		/* Option */
+  ppd_attr_t	*protocol;		/* cupsProtocol attribute */
+  const char	*title;			/* Page title */
+
+
+  title = cgiText(is_class ? _("Set Class Options") : _("Set Printer Options"));
+
+  fprintf(stderr, "DEBUG: do_set_options(http=%p, is_class=%d)\n", http,
+          is_class);
+
+ /*
+  * Get the printer name...
+  */
+
+  if ((printer = cgiGetVariable("PRINTER_NAME")) != NULL)
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, is_class ? "/classes/%s" : "/printers/%s",
+		     printer);
+  else
+  {
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("error.tmpl");
+    cgiEndHTML();
+    return;
+  }
+
+  fprintf(stderr, "DEBUG: printer=\"%s\", uri=\"%s\"...\n", printer, uri);
+
+ /*
+  * Get the PPD file...
+  */
+
+  if (is_class)
+    filename = NULL;
+  else
+    filename = cupsGetPPD2(http, printer);
+
+  if (filename)
+  {
+    fprintf(stderr, "DEBUG: Got PPD file: \"%s\"\n", filename);
+
+    if ((ppd = ppdOpenFile(filename)) == NULL)
+    {
+      cgiSetVariable("ERROR", ppdErrorString(ppdLastError(&i)));
+      cgiSetVariable("MESSAGE", cgiText(_("Unable to open PPD file:")));
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("error.tmpl");
+      cgiEndHTML();
+      return;
+    }
+  }
+  else
+  {
+    fputs("DEBUG: No PPD file\n", stderr);
+    ppd = NULL;
+  }
+
+  if (cgiGetVariable("job_sheets_start") != NULL ||
+      cgiGetVariable("job_sheets_end") != NULL)
+    have_options = 1;
+  else
+    have_options = 0;
+
+  if (ppd)
+  {
+    ppdMarkDefaults(ppd);
+
+    DEBUG_printf(("<P>ppd->num_groups = %d\n"
+		  "<UL>\n", ppd->num_groups));
+
+    for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+    {
+      DEBUG_printf(("<LI>%s<UL>\n", group->text));
+
+      for (j = group->num_options, option = group->options;
+	   j > 0;
+	   j --, option ++)
+	if ((var = cgiGetVariable(option->keyword)) != NULL)
+	{
+	  DEBUG_printf(("<LI>%s = \"%s\"</LI>\n", option->keyword, var));
+	  have_options = 1;
+	  ppdMarkOption(ppd, option->keyword, var);
+	}
+#ifdef DEBUG
+	else
+	  printf("<LI>%s not defined!</LI>\n", option->keyword);
+#endif /* DEBUG */
+
+      DEBUG_puts("</UL></LI>");
+    }
+
+    DEBUG_printf(("</UL>\n"
+		  "<P>ppdConflicts(ppd) = %d\n", ppdConflicts(ppd)));
+  }
+
+  if (!have_options || ppdConflicts(ppd))
+  {
+   /*
+    * Show the options to the user...
+    */
+
+    fputs("DEBUG: Showing options...\n", stderr);
+
+    cgiStartHTML(cgiText(_("Set Printer Options")));
+    cgiCopyTemplateLang("set-printer-options-header.tmpl");
+
+    if (ppd)
+    {
+      ppdLocalize(ppd);
+
+      if (ppdConflicts(ppd))
+      {
+	for (i = ppd->num_groups, k = 0, group = ppd->groups;
+	     i > 0;
+	     i --, group ++)
+	  for (j = group->num_options, option = group->options;
+	       j > 0;
+	       j --, option ++)
+	    if (option->conflicted)
+	    {
+	      cgiSetArray("ckeyword", k, option->keyword);
+	      cgiSetArray("ckeytext", k, option->text);
+	      k ++;
+	    }
+
+	cgiCopyTemplateLang("option-conflict.tmpl");
+      }
+
+      for (i = ppd->num_groups, group = ppd->groups;
+	   i > 0;
+	   i --, group ++)
+      {
+	if (!strcmp(group->name, "InstallableOptions"))
+	  cgiSetVariable("GROUP", cgiText(_("Options Installed")));
+	else
+	  cgiSetVariable("GROUP", group->text);
+
+	cgiCopyTemplateLang("option-header.tmpl");
+	
+	for (j = group->num_options, option = group->options;
+	     j > 0;
+	     j --, option ++)
+	{
+	  if (!strcmp(option->keyword, "PageRegion"))
+	    continue;
+
+	  cgiSetVariable("KEYWORD", option->keyword);
+	  cgiSetVariable("KEYTEXT", option->text);
+	      
+	  if (option->conflicted)
+	    cgiSetVariable("CONFLICTED", "1");
+	  else
+	    cgiSetVariable("CONFLICTED", "0");
+
+	  cgiSetSize("CHOICES", 0);
+	  cgiSetSize("TEXT", 0);
+	  for (k = 0, m = 0; k < option->num_choices; k ++)
+	  {
+	   /*
+	    * Hide custom option values...
+	    */
+
+	    if (!strcmp(option->choices[k].choice, "Custom"))
+	      continue;
+
+	    cgiSetArray("CHOICES", m, option->choices[k].choice);
+	    cgiSetArray("TEXT", m, option->choices[k].text);
+
+	    m ++;
+
+	    if (option->choices[k].marked)
+	      cgiSetVariable("DEFCHOICE", option->choices[k].choice);
+	  }
+
+	  switch (option->ui)
+	  {
+	    case PPD_UI_BOOLEAN :
+		cgiCopyTemplateLang("option-boolean.tmpl");
+		break;
+	    case PPD_UI_PICKONE :
+		cgiCopyTemplateLang("option-pickone.tmpl");
+		break;
+	    case PPD_UI_PICKMANY :
+		cgiCopyTemplateLang("option-pickmany.tmpl");
+		break;
+	  }
+	}
+
+	cgiCopyTemplateLang("option-trailer.tmpl");
+      }
+    }
+
+   /*
+    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
+    * following attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    */
+
+    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s", printer);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    {
+      if ((attr = ippFindAttribute(response, "job-sheets-supported",
+                                   IPP_TAG_ZERO)) != NULL)
+      {
+       /*
+	* Add the job sheets options...
+	*/
+
+	cgiSetVariable("GROUP", cgiText(_("Banners")));
+	cgiCopyTemplateLang("option-header.tmpl");
+
+	cgiSetSize("CHOICES", attr->num_values);
+	cgiSetSize("TEXT", attr->num_values);
+	for (k = 0; k < attr->num_values; k ++)
+	{
+	  cgiSetArray("CHOICES", k, attr->values[k].string.text);
+	  cgiSetArray("TEXT", k, attr->values[k].string.text);
+	}
+
+        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
+
+        cgiSetVariable("KEYWORD", "job_sheets_start");
+	cgiSetVariable("KEYTEXT", cgiText(_("Starting Banner")));
+        cgiSetVariable("DEFCHOICE", attr == NULL ?
+	                            "" : attr->values[0].string.text);
+
+	cgiCopyTemplateLang("option-pickone.tmpl");
+
+        cgiSetVariable("KEYWORD", "job_sheets_end");
+	cgiSetVariable("KEYTEXT", cgiText(_("Ending Banner")));
+        cgiSetVariable("DEFCHOICE", attr == NULL && attr->num_values > 1 ?
+	                            "" : attr->values[1].string.text);
+
+	cgiCopyTemplateLang("option-pickone.tmpl");
+
+	cgiCopyTemplateLang("option-trailer.tmpl");
+      }
+
+      if (ippFindAttribute(response, "printer-error-policy-supported",
+                           IPP_TAG_ZERO) ||
+          ippFindAttribute(response, "printer-op-policy-supported",
+	                   IPP_TAG_ZERO))
+      {
+       /*
+	* Add the error and operation policy options...
+	*/
+
+	cgiSetVariable("GROUP", cgiText(_("Policies")));
+	cgiCopyTemplateLang("option-header.tmpl");
+
+       /*
+        * Error policy...
+	*/
+
+        attr = ippFindAttribute(response, "printer-error-policy-supported",
+	                        IPP_TAG_ZERO);
+
+        if (attr)
+	{
+	  cgiSetSize("CHOICES", attr->num_values);
+	  cgiSetSize("TEXT", attr->num_values);
+	  for (k = 0; k < attr->num_values; k ++)
+	  {
+	    cgiSetArray("CHOICES", k, attr->values[k].string.text);
+	    cgiSetArray("TEXT", k, attr->values[k].string.text);
+	  }
+
+          attr = ippFindAttribute(response, "printer-error-policy",
+	                          IPP_TAG_ZERO);
+
+          cgiSetVariable("KEYWORD", "printer_error_policy");
+	  cgiSetVariable("KEYTEXT", cgiText(_("Error Policy")));
+          cgiSetVariable("DEFCHOICE", attr == NULL ?
+	                              "" : attr->values[0].string.text);
+        }
+
+	cgiCopyTemplateLang("option-pickone.tmpl");
+
+       /*
+        * Operation policy...
+	*/
+
+        attr = ippFindAttribute(response, "printer-op-policy-supported",
+	                        IPP_TAG_ZERO);
+
+        if (attr)
+	{
+	  cgiSetSize("CHOICES", attr->num_values);
+	  cgiSetSize("TEXT", attr->num_values);
+	  for (k = 0; k < attr->num_values; k ++)
+	  {
+	    cgiSetArray("CHOICES", k, attr->values[k].string.text);
+	    cgiSetArray("TEXT", k, attr->values[k].string.text);
+	  }
+
+          attr = ippFindAttribute(response, "printer-op-policy", IPP_TAG_ZERO);
+
+          cgiSetVariable("KEYWORD", "printer_op_policy");
+	  cgiSetVariable("KEYTEXT", cgiText(_("Operation Policy")));
+          cgiSetVariable("DEFCHOICE", attr == NULL ?
+	                              "" : attr->values[0].string.text);
+
+	  cgiCopyTemplateLang("option-pickone.tmpl");
+        }
+
+	cgiCopyTemplateLang("option-trailer.tmpl");
+      }
+
+      ippDelete(response);
+    }
+
+   /*
+    * Binary protocol support...
+    */
+
+    if (ppd->protocols && strstr(ppd->protocols, "BCP"))
+    {
+      protocol = ppdFindAttr(ppd, "cupsProtocol", NULL);
+
+      cgiSetVariable("GROUP", cgiText(_("PS Binary Protocol")));
+      cgiCopyTemplateLang("option-header.tmpl");
+
+      cgiSetSize("CHOICES", 2);
+      cgiSetSize("TEXT", 2);
+      cgiSetArray("CHOICES", 0, "None");
+      cgiSetArray("TEXT", 0, cgiText(_("None")));
+
+      if (strstr(ppd->protocols, "TBCP"))
+      {
+	cgiSetArray("CHOICES", 1, "TBCP");
+	cgiSetArray("TEXT", 1, "TBCP");
+      }
+      else
+      {
+	cgiSetArray("CHOICES", 1, "BCP");
+	cgiSetArray("TEXT", 1, "BCP");
+      }
+
+      cgiSetVariable("KEYWORD", "protocol");
+      cgiSetVariable("KEYTEXT", cgiText(_("PS Binary Protocol")));
+      cgiSetVariable("DEFCHOICE", protocol ? protocol->value : "None");
+
+      cgiCopyTemplateLang("option-pickone.tmpl");
+
+      cgiCopyTemplateLang("option-trailer.tmpl");
+    }
+
+    cgiCopyTemplateLang("set-printer-options-trailer.tmpl");
+    cgiEndHTML();
+  }
+  else
+  {
+   /*
+    * Set default options...
+    */
+
+    fputs("DEBUG: Setting options...\n", stderr);
+
+    if (filename)
+    {
+      out = cupsTempFile2(tempfile, sizeof(tempfile));
+      in  = cupsFileOpen(filename, "r");
+
+      if (!in || !out)
+      {
+	cgiSetVariable("ERROR", strerror(errno));
+	cgiStartHTML(cgiText(_("Set Printer Options")));
+	cgiCopyTemplateLang("error.tmpl");
+	cgiEndHTML();
+
+	if (in)
+	  cupsFileClose(in);
+
+	if (out)
+	{
+	  cupsFileClose(out);
+	  unlink(tempfile);
+	}
+
+	unlink(filename);
+	return;
+      }
+
+      while (cupsFileGets(in, line, sizeof(line)))
+      {
+	if (!strncmp(line, "*cupsProtocol:", 14) && cgiGetVariable("protocol"))
+	  continue;
+	else if (strncmp(line, "*Default", 8))
+	  cupsFilePrintf(out, "%s\n", line);
+	else
+	{
+	 /*
+	  * Get default option name...
+	  */
+
+	  strlcpy(keyword, line + 8, sizeof(keyword));
+
+	  for (keyptr = keyword; *keyptr; keyptr ++)
+	    if (*keyptr == ':' || isspace(*keyptr & 255))
+	      break;
+
+	  *keyptr = '\0';
+
+	  if (!strcmp(keyword, "PageRegion") ||
+	      !strcmp(keyword, "PaperDimension") ||
+	      !strcmp(keyword, "ImageableArea"))
+	    var = cgiGetVariable("PageSize");
+	  else
+	    var = cgiGetVariable(keyword);
+
+	  if (var != NULL)
+	    cupsFilePrintf(out, "*Default%s: %s\n", keyword, var);
+	  else
+	    cupsFilePrintf(out, "%s\n", line);
+	}
+      }
+
+      if ((var = cgiGetVariable("protocol")) != NULL)
+	cupsFilePrintf(out, "*cupsProtocol: %s\n", cgiGetVariable("protocol"));
+
+      cupsFileClose(in);
+      cupsFileClose(out);
+    }
+    else
+    {
+     /*
+      * Make sure temporary filename is cleared when there is no PPD...
+      */
+
+      tempfile[0] = '\0';
+    }
+
+   /*
+    * Build a CUPS_ADD_MODIFY_CLASS/PRINTER request, which requires the
+    * following attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    printer-uri
+    *    job-sheets-default
+    *    printer-error-policy
+    *    printer-op-policy
+    *    [ppd file]
+    */
+
+    request = ippNewRequest(is_class ? CUPS_ADD_MODIFY_CLASS :
+                                       CUPS_ADD_MODIFY_PRINTER);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+    attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                         "job-sheets-default", 2, NULL, NULL);
+    attr->values[0].string.text = _cupsStrAlloc(cgiGetVariable("job_sheets_start"));
+    attr->values[1].string.text = _cupsStrAlloc(cgiGetVariable("job_sheets_end"));
+
+    if ((var = cgiGetVariable("printer_error_policy")) != NULL)
+      attr = ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                          "printer-error-policy", NULL, var);
+
+    if ((var = cgiGetVariable("printer_op_policy")) != NULL)
+      attr = ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                          "printer-op-policy", NULL, var);
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    if (filename)
+      ippDelete(cupsDoFileRequest(http, request, "/admin/", tempfile));
+    else
+      ippDelete(cupsDoRequest(http, request, "/admin/"));
+
+    if (cupsLastError() > IPP_OK_CONFLICT)
+    {
+      cgiStartHTML(title);
+      cgiShowIPPError(_("Unable to set options:"));
+    }
+    else
+    {
+     /*
+      * Redirect successful updates back to the printer page...
+      */
+
+      char	refresh[1024];		/* Refresh URL */
+
+
+      cgiFormEncode(uri, printer, sizeof(uri));
+      snprintf(refresh, sizeof(refresh), "5;URL=/admin/?OP=redirect&URL=/%s/%s",
+	       is_class ? "classes" : "printers", uri);
+      cgiSetVariable("refresh_page", refresh);
+
+      cgiStartHTML(title);
+
+      cgiCopyTemplateLang("printer-configured.tmpl");
+    }
+
+    cgiEndHTML();
+
+    if (filename)
+      unlink(tempfile);
+  }
+
+  if (filename)
+    unlink(filename);
 }
 
 
