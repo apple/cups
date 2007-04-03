@@ -80,6 +80,15 @@ print_device(const char *uri,		/* I - Device URI */
 
   do
   {
+#ifdef __NetBSD__
+   /*
+    * NetBSD's ulpt driver currently does not support the
+    * back-channel...
+    */
+
+    use_bc = 0;
+
+#else
    /*
     * Disable backchannel data when printing to Brother, Canon, or
     * Minolta USB printers - apparently these printers will return
@@ -91,6 +100,7 @@ print_device(const char *uri,		/* I - Device URI */
              strcasecmp(hostname, "Canon") &&
              strcasecmp(hostname, "Konica Minolta") &&
              strcasecmp(hostname, "Minolta");
+#endif /* __NetBSD__ */
 
     if ((device_fd = open_device(uri, &use_bc)) == -1)
     {
@@ -519,7 +529,12 @@ open_device(const char *uri,		/* I - Device URI */
   }
 #else
   {
-    if ((fd = open(uri + 4, O_RDWR | O_EXCL)) < 0)
+    if (use_bc)
+      fd = open(uri + 4, O_RDWR | O_EXCL);
+    else
+      fd = -1;
+
+    if (fd < 0)
     {
       fd      = open(uri + 4, O_WRONLY | O_EXCL);
       *use_bc = 0;
