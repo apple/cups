@@ -27,6 +27,7 @@
  *
  *   main()    - Send a file to the printer or server.
  *   side_cb() - Handle side-channel requests...
+ *   wait_bc() - Wait for back-channel data...
  */
 
 /*
@@ -56,6 +57,7 @@
  */
 
 static void	side_cb(int print_fd, int device_fd, int use_bc);
+static int	wait_bc(int device_fd, int secs);
 
 
 /*
@@ -93,9 +95,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		  *addr;		/* Connected address */
   char		addrname[256];		/* Address name */
   ssize_t	tbytes;			/* Total number of bytes written */
-  struct timeval timeout;		/* Timeout for select() */
-  fd_set	input;			/* Input set for select() */
-  ssize_t	bc_bytes;		/* Number of back-channel bytes read */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -387,6 +386,12 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
               CUPS_LLCAST tbytes);
   }
 
+ /*
+  * Get any pending back-channel data...
+  */
+
+  while (wait_bc(device_fd, 5) > 0);
+
   if (waiteof)
   {
    /*
@@ -398,37 +403,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     shutdown(device_fd, 1);
 
-    for (;;)
-    {
-     /*
-      * Wait a maximum of 90 seconds for backchannel data or a closed
-      * connection...
-      */
-
-      timeout.tv_sec  = 90;
-      timeout.tv_usec = 0;
-
-      FD_ZERO(&input);
-      FD_SET(device_fd, &input);
-
-      if (select(device_fd + 1, &input, NULL, NULL, &timeout) > 0)
-      {
-       /*
-	* Grab the data coming back and spit it out to stderr...
-	*/
-
-	if ((bc_bytes = read(device_fd, resource, sizeof(resource))) > 0)
-	{
-	  fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
-		  (int)bc_bytes);
-	  cupsBackChannelWrite(resource, bc_bytes, 1.0);
-	}
-	else
-	  break;
-      }
-      else
-	break;
-    }
+    while (wait_bc(device_fd, 90) > 0);
   }
 
  /*
@@ -499,6 +474,50 @@ side_cb(int print_fd,			/* I - Print file */
   }
 
   cupsSideChannelWrite(command, status, data, datalen, 1.0);
+}
+
+
+/*
+ * 'wait_bc()' - Wait for back-channel data...
+ */
+
+static int				/* O - # bytes read or -1 on error */
+wait_bc(int device_fd,			/* I - Socket */
+        int secs)			/* I - Seconds to wait */
+{
+  struct timeval timeout;		/* Timeout for select() */
+  fd_set	input;			/* Input set for select() */
+  ssize_t	bytes;			/* Number of back-channel bytes read */
+  char		buffer[1024];		/* Back-channel buffer */
+
+
+ /*
+  * Wait up to "secs" seconds for backchannel data...
+  */
+
+  timeout.tv_sec  = secs;
+  timeout.tv_usec = 0;
+
+  FD_ZERO(&input);
+  FD_SET(device_fd, &input);
+
+  if (select(device_fd + 1, &input, NULL, NULL, &timeout) > 0)
+  {
+   /*
+    * Grab the data coming back and spit it out to stderr...
+    */
+
+    if ((bytes = read(device_fd, buffer, sizeof(buffer))) > 0)
+    {
+      fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
+	      (int)bytes);
+      cupsBackChannelWrite(buffer, bytes, 1.0);
+    }
+
+    return (bytes);
+  }
+  else
+    return (-1);
 }
 
 
