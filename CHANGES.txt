@@ -4,6 +4,10 @@ CHANGES.txt - 2007-04-03
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131)
+	- The web interface no longer lists new printers on the
+	  main administration page.  Instead, a new "List Available
+	  Printers" button is provided that shows a separate page
+	  with the list of printers.
 	- The web interface now supports setting the banner and
 	  policy options on raw printers and classes (STR #2238)
 	- The socket backend now reads any pending back-channel

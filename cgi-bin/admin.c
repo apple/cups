@@ -32,6 +32,7 @@
  *   do_delete_class()         - Delete a class...
  *   do_delete_printer()       - Delete a printer...
  *   do_export()               - Export printers to Samba...
+ *   do_list_printers()        - List available printers...
  *   do_menu()                 - Show the main menu...
  *   do_printer_op()           - Do a printer operation.
  *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
@@ -66,6 +67,7 @@ static void	do_config_server(http_t *http);
 static void	do_delete_class(http_t *http);
 static void	do_delete_printer(http_t *http);
 static void	do_export(http_t *http);
+static void	do_list_printers(http_t *http);
 static void	do_menu(http_t *http);
 static void	do_printer_op(http_t *http,
 		              ipp_op_t op, const char *title);
@@ -172,6 +174,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_printer_op(http, CUPS_SET_DEFAULT, cgiText(_("Set As Default")));
     else if (!strcmp(op, "set-sharing"))
       do_set_sharing(http);
+    else if (!strcmp(op, "list-available-printers"))
+      do_list_printers(http);
     else if (!strcmp(op, "add-class"))
       do_am_class(http, 0);
     else if (!strcmp(op, "add-printer"))
@@ -1923,66 +1927,19 @@ do_export(http_t *http)			/* I - HTTP connection */
 
 
 /*
- * 'do_menu()' - Show the main menu...
+ * 'do_list_printers()' - List available printers...
  */
 
 static void
-do_menu(http_t *http)			/* I - HTTP connection */
+do_list_printers(http_t *http)		/* I - HTTP connection */
 {
-  int		num_settings;		/* Number of server settings */
-  cups_option_t	*settings;		/* Server settings */
-  const char	*val;			/* Setting value */
-  char		filename[1024];		/* Temporary filename */
-  const char	*datadir;		/* Location of data files */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* IPP attribute */
 
 
- /*
-  * Get the current server settings...
-  */
-
-  if (!cupsAdminGetServerSettings(http, &num_settings, &settings))
-  {
-    cgiSetVariable("SETTINGS_MESSAGE",
-                   cgiText(_("Unable to open cupsd.conf file:")));
-    cgiSetVariable("SETTINGS_ERROR", cupsLastErrorString());
-  }
-
-  if ((val = cupsGetOption(CUPS_SERVER_DEBUG_LOGGING, num_settings,
-                           settings)) != NULL && atoi(val))
-    cgiSetVariable("DEBUG_LOGGING", "CHECKED");
-
-  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ADMIN, num_settings,
-                           settings)) != NULL && atoi(val))
-    cgiSetVariable("REMOTE_ADMIN", "CHECKED");
-
-  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ANY, num_settings,
-                           settings)) != NULL && atoi(val))
-    cgiSetVariable("REMOTE_ANY", "CHECKED");
-
-  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS, num_settings,
-                           settings)) != NULL && atoi(val))
-    cgiSetVariable("REMOTE_PRINTERS", "CHECKED");
-
-  if ((val = cupsGetOption(CUPS_SERVER_SHARE_PRINTERS, num_settings,
-                           settings)) != NULL && atoi(val))
-    cgiSetVariable("SHARE_PRINTERS", "CHECKED");
-
-  if ((val = cupsGetOption(CUPS_SERVER_USER_CANCEL_ANY, num_settings,
-                           settings)) != NULL && atoi(val))
-    cgiSetVariable("USER_CANCEL_ANY", "CHECKED");
-
-#ifdef HAVE_GSSAPI
-  cgiSetVariable("HAVE_GSSAPI", "1");
-
-  if ((val = cupsGetOption("DefaultAuthType", num_settings,
-                           settings)) != NULL && !strcasecmp(val, "Negotiate"))
-    cgiSetVariable("KERBEROS", "CHECKED");
-#endif /* HAVE_GSSAPI */
-
-  cupsFreeOptions(num_settings, settings);
+  cgiStartHTML(cgiText(_("List Available Printers")));
+  fflush(stdout);
 
  /*
   * Get the list of printers and their devices...
@@ -2194,6 +2151,77 @@ do_menu(http_t *http)			/* I - HTTP connection */
       cupsArrayDelete(printer_devices);
     }
   }
+
+ /*
+  * Finally, show the printer list...
+  */
+
+  cgiCopyTemplateLang("list-available-printers.tmpl");
+
+  cgiEndHTML();
+}
+
+
+/*
+ * 'do_menu()' - Show the main menu...
+ */
+
+static void
+do_menu(http_t *http)			/* I - HTTP connection */
+{
+  int		num_settings;		/* Number of server settings */
+  cups_option_t	*settings;		/* Server settings */
+  const char	*val;			/* Setting value */
+  char		filename[1024];		/* Temporary filename */
+  const char	*datadir;		/* Location of data files */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+
+
+ /*
+  * Get the current server settings...
+  */
+
+  if (!cupsAdminGetServerSettings(http, &num_settings, &settings))
+  {
+    cgiSetVariable("SETTINGS_MESSAGE",
+                   cgiText(_("Unable to open cupsd.conf file:")));
+    cgiSetVariable("SETTINGS_ERROR", cupsLastErrorString());
+  }
+
+  if ((val = cupsGetOption(CUPS_SERVER_DEBUG_LOGGING, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("DEBUG_LOGGING", "CHECKED");
+
+  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ADMIN, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("REMOTE_ADMIN", "CHECKED");
+
+  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ANY, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("REMOTE_ANY", "CHECKED");
+
+  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("REMOTE_PRINTERS", "CHECKED");
+
+  if ((val = cupsGetOption(CUPS_SERVER_SHARE_PRINTERS, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("SHARE_PRINTERS", "CHECKED");
+
+  if ((val = cupsGetOption(CUPS_SERVER_USER_CANCEL_ANY, num_settings,
+                           settings)) != NULL && atoi(val))
+    cgiSetVariable("USER_CANCEL_ANY", "CHECKED");
+
+#ifdef HAVE_GSSAPI
+  cgiSetVariable("HAVE_GSSAPI", "1");
+
+  if ((val = cupsGetOption("DefaultAuthType", num_settings,
+                           settings)) != NULL && !strcasecmp(val, "Negotiate"))
+    cgiSetVariable("KERBEROS", "CHECKED");
+#endif /* HAVE_GSSAPI */
+
+  cupsFreeOptions(num_settings, settings);
 
  /*
   * See if Samba and the Windows drivers are installed...
