@@ -1,9 +1,11 @@
-CHANGES.txt - 2007-04-03
+CHANGES.txt - 2007-04-04
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131)
+	- The cupstestppd program now tests for existing filters,
+	  icons, profiles, and dialog extensions (STR #2326)
 	- The web interface no longer lists new printers on the
 	  main administration page.  Instead, a new "List Available
 	  Printers" button is provided that shows a separate page

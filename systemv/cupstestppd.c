@@ -42,6 +42,7 @@
 #include <cups/i18n.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 
 /*
@@ -99,6 +100,13 @@ main(int  argc,			/* I - Number of command-line arguments */
   int		ppdversion;	/* PPD spec version in PPD file */
   ppd_status_t	error;		/* Status of ppdOpen*() */
   int		line;		/* Line number for error */
+  struct stat	statbuf;	/* File information */
+  char		super[16],	/* Super-type for filter */
+		type[256],	/* Type for filter */
+		program[256],	/* Program/filter name */
+		pathprog[1024],	/* Complete path to program/filter */
+		*root;		/* Root directory */
+  int		cost;		/* Cost of filter */
   int		xdpi,		/* X resolution */
 		ydpi;		/* Y resolution */
   ppd_file_t	*ppd;		/* PPD file record */
@@ -126,6 +134,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   ppd     = NULL;
   files   = 0;
   status  = ERROR_NONE;
+  root    = "";
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-' && argv[i][1])
@@ -133,6 +142,15 @@ main(int  argc,			/* I - Number of command-line arguments */
       for (opt = argv[i] + 1; *opt; opt ++)
         switch (*opt)
 	{
+	  case 'R' :			/* Alternate root directory */
+	      i ++;
+
+	      if (i >= argc)
+	        usage();
+
+              root = argv[i];
+	      break;
+
 	  case 'q' :			/* Quiet mode */
 	      if (verbose > 0)
 	      {
@@ -1313,12 +1331,6 @@ main(int  argc,			/* I - Number of command-line arguments */
            attr;
 	   attr = ppdFindNextAttr(ppd, "cupsFilter", NULL))
       {
-        char	super[16],		/* Filter super type */
-		type[256],		/* Filter type */
-		program[256];		/* Filter program */
-	int	cost;			/* Filter cost */
-
-
         if (!attr->value ||
 	    sscanf(attr->value, "%15[^/]/%255s%d%255s", super, type, &cost,
 	           program) != 4)
@@ -1334,6 +1346,37 @@ main(int  argc,			/* I - Number of command-line arguments */
           }
 
 	  errors ++;
+	}
+	else
+	{
+	  if (program[0] == '/')
+	    snprintf(pathprog, sizeof(pathprog), "%s%s", root, program);
+	  else
+	  {
+	    if ((ptr = getenv("CUPS_SERVERBIN")) == NULL)
+	      ptr = CUPS_SERVERBIN;
+
+            if (*ptr == '/' || !*root)
+	      snprintf(pathprog, sizeof(pathprog), "%s%s/filter/%s", root, ptr,
+	               program);
+            else
+	      snprintf(pathprog, sizeof(pathprog), "%s/%s/filter/%s", root, ptr,
+	               program);
+          }
+
+	  if (stat(pathprog, &statbuf))
+	  {
+	    if (verbose >= 0)
+	    {
+	      if (!errors && !verbose)
+		_cupsLangPuts(stdout, _(" FAIL\n"));
+
+	      _cupsLangPrintf(stdout, _("      **FAIL**  Missing cupsFilter "
+					"file \"%s\"\n"), program);
+	    }
+
+	    errors ++;
+	  }
 	}
       }
 
@@ -1516,6 +1559,73 @@ main(int  argc,			/* I - Number of command-line arguments */
         	}
 	  }
       }
+
+     /*
+      * cupsICCProfile
+      */
+
+      for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL); 
+	   attr != NULL; 
+	   attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+      {
+	if (attr->value)
+	{
+	  if (attr->value[0] == '/')
+	    snprintf(pathprog, sizeof(pathprog), "%s%s", root, attr->value);
+	  else
+	  {
+	    if ((ptr = getenv("CUPS_DATADIR")) == NULL)
+	      ptr = CUPS_DATADIR;
+
+            if (*ptr == '/' || !*root)
+	      snprintf(pathprog, sizeof(pathprog), "%s%s/profiles/%s", root,
+	               ptr, attr->value);
+            else
+	      snprintf(pathprog, sizeof(pathprog), "%s/%s/profiles/%s", root,
+	               ptr, attr->value);
+          }
+	}
+
+	if (!attr->value || !attr->value[0] || stat(pathprog, &statbuf))
+	{
+	  if (verbose >= 0)
+	    _cupsLangPrintf(stdout,
+			    _("        WARN    Missing cupsICCProfile "
+			      "file \"%s\"\n"),
+			    !attr->value || !attr->value[0] ? "<NULL>" :
+							      attr->value);
+	}
+      }
+
+#ifdef __APPLE__
+     /*
+      * APDialogExtension
+      */
+
+      for (attr = ppdFindAttr(ppd, "APDialogExtension", NULL); 
+	   attr != NULL; 
+	   attr = ppdFindNextAttr(ppd, "APDialogExtension", NULL))
+      {
+	if ((!attr->value || stat(attr->value, &statbuf)) && verbose >= 0)
+	  _cupsLangPrintf(stdout, _("        WARN    Missing "
+				    "APDialogExtension file \"%s\"\n"),
+			  attr->value ? attr->value : "<NULL>");
+      }
+
+     /*
+      * APPrinterIconPath
+      */
+
+      for (attr = ppdFindAttr(ppd, "APPrinterIconPath", NULL); 
+	   attr != NULL; 
+	   attr = ppdFindNextAttr(ppd, "APPrinterIconPath", NULL))
+      {
+	if ((!attr->value || stat(attr->value, &statbuf)) && verbose >= 0)
+	  _cupsLangPrintf(stdout, _("        WARN    Missing "
+				    "APPrinterIconPath file \"%s\"\n"),
+			  attr->value ? attr->value : "<NULL>");
+      }
+#endif	/* __APPLE__ */
 
       if (verbose > 0)
       {
@@ -1882,9 +1992,10 @@ void
 usage(void)
 {
   _cupsLangPuts(stdout,
-                _("Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] "
-		  "[... filenameN.ppd[.gz]]\n"
-		  "       program | cupstestppd [-q] [-r] [-v[v]] -\n"));
+                _("Usage: cupstestppd [-R root-directory] [-q] [-r] [-v[v]] "
+		  "filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+		  "       program | cupstestppd [-R root-directory] [-q] [-r] "
+		  "[-v[v]] -\n"));
 
   exit(ERROR_USAGE);
 }
