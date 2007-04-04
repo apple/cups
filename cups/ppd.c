@@ -1003,7 +1003,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       for (i = 0, sptr = string; i < 4; i ++)
         ppd->custom_margins[i] = (float)_cupsStrScand(sptr, &sptr, loc);
     }
-    else if (!strncmp(keyword, "Custom", 6) && !strcmp(name, "True"))
+    else if (!strncmp(keyword, "Custom", 6) && !strcmp(name, "True") && !option)
     {
       DEBUG_puts("Processing Custom option...");
 
@@ -1076,6 +1076,34 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	*/
 
 	ppd_add_size(ppd, "Custom");
+
+	if ((option = ppdFindOption(ppd, "PageRegion")) == NULL)
+	{
+	  ppd_group_t	*gtemp;		/* Temporary group */
+
+	  if ((gtemp = ppd_get_group(ppd, "General", _("General"), cg,
+				     encoding)) == NULL)
+	  {
+	    DEBUG_puts("Unable to get general group!");
+
+	    goto error;
+	  }
+
+	  option = ppd_get_option(gtemp, "PageRegion");
+        }
+
+	if ((choice = ppd_add_choice(option, "Custom")) == NULL)
+	{
+	  DEBUG_puts("Unable to add Custom choice!");
+
+	  cg->ppd_status = PPD_ALLOC_ERROR;
+
+	  goto error;
+	}
+
+	strlcpy(choice->text, text[0] ? text : _("Custom"),
+		sizeof(choice->text));
+        option = NULL;
       }
     }
     else if (!strcmp(keyword, "LandscapeOrientation"))
@@ -1523,10 +1551,10 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
              !strcmp(keyword, "NonUIConstraints"))
     {
       if (ppd->num_consts == 0)
-	constraint = calloc(1, sizeof(ppd_const_t));
+	constraint = calloc(2, sizeof(ppd_const_t));
       else
 	constraint = realloc(ppd->consts,
-	                     (ppd->num_consts + 1) * sizeof(ppd_const_t));
+	                     (ppd->num_consts + 2) * sizeof(ppd_const_t));
 
       if (constraint == NULL)
       {
@@ -1685,6 +1713,34 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	      goto error;
 	    }
 	    break;
+      }
+
+     /*
+      * For CustomPageSize and InputSlot/ManualFeed, create a duplicate
+      * constraint for PageRegion...
+      */
+
+      if (!strcasecmp(constraint->option1, "CustomPageSize") &&
+          (!strcasecmp(constraint->option2, "InputSlot") ||
+	   !strcasecmp(constraint->option2, "ManualFeed")))
+      {
+        ppd->num_consts ++;
+
+        strcpy(constraint[1].option1, "PageRegion");
+	strcpy(constraint[1].choice1, "Custom");
+	strcpy(constraint[1].option2, constraint->option2);
+	strcpy(constraint[1].choice2, constraint->choice2);
+      }
+      else if (!strcasecmp(constraint->option2, "CustomPageSize") &&
+               (!strcasecmp(constraint->option1, "InputSlot") ||
+	        !strcasecmp(constraint->option1, "ManualFeed")))
+      {
+        ppd->num_consts ++;
+
+	strcpy(constraint[1].option1, constraint->option1);
+	strcpy(constraint[1].choice1, constraint->choice1);
+        strcpy(constraint[1].option2, "PageRegion");
+	strcpy(constraint[1].choice2, "Custom");
       }
 
      /*
