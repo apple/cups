@@ -1380,6 +1380,59 @@ main(int  argc,			/* I - Number of command-line arguments */
 	}
       }
 
+      for (attr = ppdFindAttr(ppd, "cupsPreFilter", NULL);
+           attr;
+	   attr = ppdFindNextAttr(ppd, "cupsPreFilter", NULL))
+      {
+        if (!attr->value ||
+	    sscanf(attr->value, "%15[^/]/%255s%d%255s", super, type, &cost,
+	           program) != 4)
+        {
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	    _cupsLangPrintf(stdout,
+	                    _("      **FAIL**  Bad cupsPreFilter value \"%s\"!\n"),
+			    attr->value ? attr->value : "");
+          }
+
+	  errors ++;
+	}
+	else
+	{
+	  if (program[0] == '/')
+	    snprintf(pathprog, sizeof(pathprog), "%s%s", root, program);
+	  else
+	  {
+	    if ((ptr = getenv("CUPS_SERVERBIN")) == NULL)
+	      ptr = CUPS_SERVERBIN;
+
+            if (*ptr == '/' || !*root)
+	      snprintf(pathprog, sizeof(pathprog), "%s%s/filter/%s", root, ptr,
+	               program);
+            else
+	      snprintf(pathprog, sizeof(pathprog), "%s/%s/filter/%s", root, ptr,
+	               program);
+          }
+
+	  if (stat(pathprog, &statbuf))
+	  {
+	    if (verbose >= 0)
+	    {
+	      if (!errors && !verbose)
+		_cupsLangPuts(stdout, _(" FAIL\n"));
+
+	      _cupsLangPrintf(stdout, _("      **FAIL**  Missing cupsPreFilter "
+					"file \"%s\"\n"), program);
+	    }
+
+	    errors ++;
+	  }
+	}
+      }
+
       if ((attr = ppdFindAttr(ppd, "1284DeviceID", NULL)) &&
           strcmp(attr->name, "1284DeviceID"))
       {
