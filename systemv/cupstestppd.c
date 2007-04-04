@@ -85,38 +85,39 @@ int	valid_utf8(const char *s);
  * 'main()' - Main entry for test program.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line args */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i, j, k, m, n;	/* Looping vars */
-  int		len;		/* Length of option name */
-  char		*opt;		/* Option character */
-  const char	*ptr;		/* Pointer into string */
-  int		files;		/* Number of files */
-  int		verbose;	/* Want verbose output? */
-  int		status;		/* Exit status */
-  int		errors;		/* Number of conformance errors */
-  int		ppdversion;	/* PPD spec version in PPD file */
-  ppd_status_t	error;		/* Status of ppdOpen*() */
-  int		line;		/* Line number for error */
-  struct stat	statbuf;	/* File information */
-  char		super[16],	/* Super-type for filter */
-		type[256],	/* Type for filter */
-		program[256],	/* Program/filter name */
-		pathprog[1024],	/* Complete path to program/filter */
-		*root;		/* Root directory */
-  int		cost;		/* Cost of filter */
-  int		xdpi,		/* X resolution */
-		ydpi;		/* Y resolution */
-  ppd_file_t	*ppd;		/* PPD file record */
-  ppd_attr_t	*attr;		/* PPD attribute */
-  ppd_size_t	*size;		/* Size record */
-  ppd_group_t	*group;		/* UI group */
-  ppd_option_t	*option;	/* Standard UI option */
-  ppd_group_t	*group2;	/* UI group */
-  ppd_option_t	*option2;	/* Standard UI option */
-  ppd_choice_t	*choice;	/* Standard UI option choice */
+  int		i, j, k, m, n;		/* Looping vars */
+  int		len;			/* Length of option name */
+  char		*opt;			/* Option character */
+  const char	*ptr;			/* Pointer into string */
+  int		files;			/* Number of files */
+  int		verbose;		/* Want verbose output? */
+  int		status;			/* Exit status */
+  int		errors;			/* Number of conformance errors */
+  int		ppdversion;		/* PPD spec version in PPD file */
+  ppd_status_t	error;			/* Status of ppdOpen*() */
+  int		line;			/* Line number for error */
+  struct stat	statbuf;		/* File information */
+  char		super[16],		/* Super-type for filter */
+		type[256],		/* Type for filter */
+		program[256],		/* Program/filter name */
+		pathprog[1024],		/* Complete path to program/filter */
+		*root;			/* Root directory */
+  int		cost;			/* Cost of filter */
+  int		xdpi,			/* X resolution */
+		ydpi;			/* Y resolution */
+  ppd_file_t	*ppd;			/* PPD file record */
+  ppd_attr_t	*attr;			/* PPD attribute */
+  ppd_size_t	*size;			/* Size record */
+  ppd_group_t	*group;			/* UI group */
+  ppd_option_t	*option;		/* Standard UI option */
+  ppd_group_t	*group2;		/* UI group */
+  ppd_option_t	*option2;		/* Standard UI option */
+  ppd_choice_t	*choice;		/* Standard UI option choice */
+  ppd_const_t	*c;			/* Current constraint */
   static char	*uis[] = { "BOOLEAN", "PICKONE", "PICKMANY" };
   static char	*sections[] = { "ANY", "DOCUMENT", "EXIT",
                                 "JCL", "PAGE", "PROLOG" };
@@ -336,6 +337,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    !strcmp(attr->name, "DefaultImageableArea") ||
 	    !strcmp(attr->name, "DefaultOutputOrder") ||
 	    !strcmp(attr->name, "DefaultPaperDimension") ||
+	    !strcmp(attr->name, "DefaultResolution") ||
 	    !strcmp(attr->name, "DefaultTransfer"))
 	  continue;
 
@@ -1449,6 +1451,66 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	errors ++;
       }
+
+     /*
+      * Check for bad UIConstraints...
+      */
+
+      for (j = ppd->num_consts, c = ppd->consts; j > 0; j --, c ++)
+      {
+	option  = ppdFindOption(ppd, c->option1);
+	option2 = ppdFindOption(ppd, c->option2);
+
+	if (!option || !option2)
+	{
+	  if (!errors && !verbose)
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+          if (!option)
+	    _cupsLangPrintf(stdout,
+	                    _("      **FAIL**  Missing option %s in "
+			      "UIConstraint \"*%s %s *%s %s\"!\n"),
+			    c->option1,
+			    c->option1, c->choice1, c->option2, c->choice2);
+	  
+          if (!option2)
+	    _cupsLangPrintf(stdout,
+	                    _("      **FAIL**  Missing option %s in "
+			      "UIConstraint \"*%s %s *%s %s\"!\n"),
+			    c->option2,
+			    c->option1, c->choice1, c->option2, c->choice2);
+
+          continue;
+	}
+
+	if (c->choice1[0] && !ppdFindChoice(option, c->choice1))
+	{
+	  if (!errors && !verbose)
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	  _cupsLangPrintf(stdout,
+			  _("      **FAIL**  Missing choice *%s %s in "
+			    "UIConstraint \"*%s %s *%s %s\"!\n"),
+			  c->option1, c->choice1,
+			  c->option1, c->choice1, c->option2, c->choice2);
+	}
+
+	if (c->choice2[0] && !ppdFindChoice(option2, c->choice2))
+	{
+	  if (!errors && !verbose)
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	  _cupsLangPrintf(stdout,
+			  _("      **FAIL**  Missing choice *%s %s in "
+			    "UIConstraint \"*%s %s *%s %s\"!\n"),
+			  c->option2, c->choice2,
+			  c->option1, c->choice1, c->option2, c->choice2);
+	}
+      }
+
+     /*
+      * Final pass/fail notification...
+      */
 
       if (errors)
 	status = ERROR_CONFORMANCE;
