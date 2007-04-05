@@ -6,19 +6,15 @@
 <P>
 <A HREF="/admin?op=add-printer"><IMG
 SRC="/images/button-add-printer.gif" ALT="Add Printer" CLASS="button"></A>
+<A HREF="/admin?op=list-available-printers"><IMG
+SRC="/images/button-list-available-printers.gif"
+ALT="List Available Printers" CLASS="button"></A>
 <A HREF="/printers/"><IMG SRC="/images/button-manage-printers.gif"
 ALT="Manage Printers" CLASS="button"></A>
 {have_samba?<A HREF="/admin/?op=export-samba"><IMG
 SRC="/images/button-export-samba.gif" ALT="Export Printers to Samba"
 CLASS="button"></A>:}
 </P>
-
-{#device_uri=0?:<P><B>New Printers Found:</B></P><UL>{[device_uri]
-<LI><A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
-SRC="/images/button-add-this-printer.gif" ALT="Add This Printer" CLASS="button"
-ALIGN="MIDDLE"></A>
-{device_make_and_model} ({device_info})</LI>
-}</UL>}
 
 <H2 CLASS="title">Classes</H2>
 

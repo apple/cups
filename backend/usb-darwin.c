@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-darwin.c 6422 2007-03-30 20:49:37Z mike $"
+ * "$Id: usb-darwin.c 6432 2007-04-02 21:50:28Z mike $"
  *
  * Copyright © 2005-2007 Apple Inc. All rights reserved.
  *
@@ -59,6 +59,7 @@
 #include <mach/mach_time.h>
 #include <cups/debug.h>
 #include <cups/sidechannel.h>
+#include <cups/i18n.h>
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/usb/IOUSBLib.h>
@@ -1728,5 +1729,5 @@ static void usbGetDevState(printer_data_t *userData, cups_sc_status_t *status, c
 }
 
 /*
- * End of "$Id: usb-darwin.c 6422 2007-03-30 20:49:37Z mike $".
+ * End of "$Id: usb-darwin.c 6432 2007-04-02 21:50:28Z mike $".
  */

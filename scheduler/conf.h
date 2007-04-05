@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h 6365 2007-03-19 20:56:57Z mike $"
+ * "$Id: conf.h 6436 2007-04-02 23:24:02Z mike $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -97,6 +97,8 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Default charset */
 			*DefaultLocale		VALUE(NULL),
 					/* Default locale */
+			*ErrorPolicy		VALUE(NULL),
+					/* Default printer-error-policy */
 			*RIPCache		VALUE(NULL),
 					/* Amount of memory for RIPs */
 			*TempDir		VALUE(NULL),
@@ -233,5 +235,5 @@ extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 
 
 /*
- * End of "$Id: conf.h 6365 2007-03-19 20:56:57Z mike $".
+ * End of "$Id: conf.h 6436 2007-04-02 23:24:02Z mike $".
  */

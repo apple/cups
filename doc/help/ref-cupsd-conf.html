@@ -1078,6 +1078,41 @@ default error log file is <VAR>/var/log/cups/error_log</VAR>.</P>
 information to the system log instead of a plain file.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.3</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+ErrorPolicy abort-job
+ErrorPolicy retry-job
+ErrorPolicy stop-printer
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>ErrorPolicy</CODE> directive defines the default policy that
+is used when a backend is unable to send a print job to the
+printer.</P>
+
+<P>The following values are supported:</P>
+
+<UL>
+
+	<LI><CODE>abort-job</CODE> - Abort the job and proceed
+	with the next job in the queue</LI>
+
+	<LI><CODE>retry-job</CODE> - Retry the job after waiting
+	for N seconds; the <VAR>cupsd.conf</VAR> <A
+	HREF="#JobRetryInterval"><CODE>JobRetryInterval</CODE></A>
+	directive controls the value of N</LI>
+
+	<LI><CODE>stop-printer</CODE> - Stop the printer and keep
+	the job for future printing; this is the default
+	value</LI>
+
+</UL>
+
+
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.18</SPAN><A NAME="FileDevice">FileDevice</A></H2>
 
 <H3>Examples</H3>

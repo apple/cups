@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 5877 2006-08-24 15:54:12Z mike $"
+# "$Id: Makefile 6440 2007-04-03 23:17:17Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1993-2006 by Easy Software Products.
+#   Copyright 1993-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -58,6 +58,7 @@ FILES	=	\
 		job-restart.tmpl \
 		jobs.tmpl \
 		jobs-header.tmpl \
+		list-available-printers.tmpl \
 		maintenance.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
@@ -156,5 +157,5 @@ uninstall-languages:
 
 
 #
-# End of "$Id: Makefile 5877 2006-08-24 15:54:12Z mike $".
+# End of "$Id: Makefile 6440 2007-04-03 23:17:17Z mike $".
 #

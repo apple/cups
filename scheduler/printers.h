@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 6318 2007-03-06 04:36:55Z mike $"
+ * "$Id: printers.h 6433 2007-04-02 21:50:50Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -93,6 +93,9 @@ typedef struct cupsd_printer_s
   cups_option_t	*options;		/* Default options */
   int		num_auth_info_required;	/* Number of required auth fields */
   const char	*auth_info_required[4];	/* Required authentication fields */
+  char		*alert,			/* PSX printer-alert value */
+		*alert_description;	/* PSX printer-alert-description value */
+
 #ifdef __APPLE__
   char		*recoverable;		/* com.apple.print.recoverable-message */
 #endif /* __APPLE__ */
@@ -172,5 +175,5 @@ extern void		cupsdWritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h 6318 2007-03-06 04:36:55Z mike $".
+ * End of "$Id: printers.h 6433 2007-04-02 21:50:50Z mike $".
  */

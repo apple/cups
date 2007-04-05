@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 6429 2007-04-02 13:44:52Z mike $"
+ * "$Id: printers.c 6436 2007-04-02 23:24:02Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -124,7 +124,7 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   cupsdSetString(&p->job_sheets[0], "none");
   cupsdSetString(&p->job_sheets[1], "none");
 
-  cupsdSetString(&p->error_policy, "stop-printer");
+  cupsdSetString(&p->error_policy, ErrorPolicy);
   cupsdSetString(&p->op_policy, DefaultPolicy);
 
   p->op_policy_ptr = DefaultPolicyPtr;
@@ -746,6 +746,9 @@ cupsdDeletePrinter(
   cupsdClearString(&p->port_monitor);
   cupsdClearString(&p->op_policy);
   cupsdClearString(&p->error_policy);
+
+  cupsdClearString(&p->alert);
+  cupsdClearString(&p->alert_description);
 
 #ifdef HAVE_DNSSD
   cupsdClearString(&p->product);
@@ -3705,5 +3708,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 6429 2007-04-02 13:44:52Z mike $".
+ * End of "$Id: printers.c 6436 2007-04-02 23:24:02Z mike $".
  */

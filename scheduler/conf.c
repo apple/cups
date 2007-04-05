@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 6409 2007-03-28 18:02:59Z mike $"
+ * "$Id: conf.c 6436 2007-04-02 23:24:02Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -116,6 +116,7 @@ static cupsd_var_t	variables[] =
   { "DefaultShared",		&DefaultShared,		CUPSD_VARTYPE_BOOLEAN },
   { "DocumentRoot",		&DocumentRoot,		CUPSD_VARTYPE_STRING },
   { "ErrorLog",			&ErrorLog,		CUPSD_VARTYPE_STRING },
+  { "ErrorPolicy",		&ErrorPolicy,		CUPSD_VARTYPE_STRING },
   { "FileDevice",		&FileDevice,		CUPSD_VARTYPE_BOOLEAN },
   { "FilterLimit",		&FilterLimit,		CUPSD_VARTYPE_INTEGER },
   { "FilterNice",		&FilterNice,		CUPSD_VARTYPE_INTEGER },
@@ -430,6 +431,8 @@ cupsdReadConfiguration(void)
 
   cupsdClearString(&BrowseLocalOptions);
   cupsdClearString(&BrowseRemoteOptions);
+
+  cupsdSetString(&ErrorPolicy, "stop-printer");
 
 #ifdef HAVE_LDAP
   cupsdClearString(&BrowseLDAPBindDN);
@@ -3349,5 +3352,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 6409 2007-03-28 18:02:59Z mike $".
+ * End of "$Id: conf.c 6436 2007-04-02 23:24:02Z mike $".
  */

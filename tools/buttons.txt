@@ -22,6 +22,7 @@ button-manage-printers.gif 	    standard  Manage Printers
 button-manage-server.gif 	    standard  Manage Server
 button-modify-class.gif 	    standard  Modify Class
 button-modify-printer.gif 	    standard  Modify Printer
+button-list-available-printers.gif  standard  List Available Printers
 button-move-job.gif 	            standard  Move Job
 button-move-jobs.gif 	            standard  Move All Jobs
 button-print-self-test-page.gif     standard  Print Self-Test Page

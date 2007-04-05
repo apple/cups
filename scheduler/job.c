@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6424 2007-04-02 13:09:06Z mike $"
+ * "$Id: job.c 6433 2007-04-02 21:50:50Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -3458,6 +3458,19 @@ update_job(cupsd_job_t *job)	/* I - Job to check */
                                 attrs)) != NULL)
         cupsdSetAuthInfoRequired(job->printer, attr, NULL);
 
+      if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)
+      {
+        cupsdSetString(&job->printer->alert, attr);
+	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      }
+
+      if ((attr = cupsGetOption("printer-alert-description", num_attrs,
+                                attrs)) != NULL)
+      {
+        cupsdSetString(&job->printer->alert_description, attr);
+	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      }
+
       cupsFreeOptions(num_attrs, attrs);
     }
 #ifdef __APPLE__
@@ -3536,5 +3549,5 @@ update_job(cupsd_job_t *job)	/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c 6424 2007-04-02 13:09:06Z mike $".
+ * End of "$Id: job.c 6433 2007-04-02 21:50:50Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6397 2007-03-25 23:33:32Z mike $"
+ * "$Id: ipp.c 6433 2007-04-02 21:50:50Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -4433,6 +4433,16 @@ copy_printer_attrs(
 		 printer->recoverable);
 #endif /* __APPLE__ */
 
+  if (printer->alert && (!ra || cupsArrayFind(ra, "printer-alert")))
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_STRING,
+                 "printer-alert", NULL, printer->alert);
+
+  if (printer->alert_description &&
+      (!ra || cupsArrayFind(ra, "printer-alert-description")))
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
+                 "printer-alert-description", NULL,
+		 printer->alert_description);
+
   if (!ra || cupsArrayFind(ra, "printer-current-time"))
     ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
                ippTimeToDate(curtime));
@@ -4825,6 +4835,8 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "pages-per-minute");
       cupsArrayAdd(ra, "pages-per-minute-color");
       cupsArrayAdd(ra, "pdl-override-supported");
+      cupsArrayAdd(ra, "printer-alert");
+      cupsArrayAdd(ra, "printer-alert-description");
       cupsArrayAdd(ra, "printer-current-time");
       cupsArrayAdd(ra, "printer-driver-installer");
       cupsArrayAdd(ra, "printer-info");
@@ -9473,5 +9485,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6397 2007-03-25 23:33:32Z mike $".
+ * End of "$Id: ipp.c 6433 2007-04-02 21:50:50Z mike $".
  */

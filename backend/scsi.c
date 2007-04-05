@@ -1,5 +1,5 @@
 /*
- * "$Id: scsi.c 6411 2007-03-28 23:02:51Z mike $"
+ * "$Id: scsi.c 6432 2007-04-02 21:50:28Z mike $"
  *
  *   SCSI printer backend for the Common UNIX Printing System (CUPS).
  *
@@ -55,6 +55,7 @@
 
 #include <cups/backend.h>
 #include <cups/cups.h>
+#include <cups/i18n.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -222,5 +223,5 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: scsi.c 6411 2007-03-28 23:02:51Z mike $".
+ * End of "$Id: scsi.c 6432 2007-04-02 21:50:28Z mike $".
  */
