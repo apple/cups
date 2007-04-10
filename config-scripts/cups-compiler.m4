@@ -435,6 +435,10 @@ case $uname in
 		# HP-UX 11.00 (at least) needs this definition to get the
 		# u_short type used by the IP headers...
 		OPTIM="$OPTIM -D_INCLUDE_HPUX_SOURCE"
+
+		# HP-UX 11.23 (at least) needs this definition to get the
+		# IPv6 header to work...
+		OPTIM="$OPTIM -D_HPUX_SOURCE"
 		;;
 
 	OSF*)
