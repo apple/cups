@@ -3581,9 +3581,9 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdSetString(&con->command, CUPS_JAVA);
 
     if (options)
-      cupsdSetStringf(&con->options, "%s %s", filename, options);
+      cupsdSetStringf(&con->options, " %s %s", filename, options);
     else
-      cupsdSetString(&con->options, filename);
+      cupsdSetStringf(&con->options, " %s", filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "is_cgi: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -3602,9 +3602,9 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdSetString(&con->command, CUPS_PERL);
 
     if (options)
-      cupsdSetStringf(&con->options, "%s %s", filename, options);
+      cupsdSetStringf(&con->options, " %s %s", filename, options);
     else
-      cupsdSetString(&con->options, filename);
+      cupsdSetStringf(&con->options, " %s", filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "is_cgi: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -3623,9 +3623,9 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdSetString(&con->command, CUPS_PHP);
 
     if (options)
-      cupsdSetStringf(&con->options, "%s %s", filename, options);
+      cupsdSetStringf(&con->options, " %s %s", filename, options);
     else
-      cupsdSetString(&con->options, filename);
+      cupsdSetStringf(&con->options, " %s", filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "is_cgi: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -3644,9 +3644,9 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdSetString(&con->command, CUPS_PYTHON);
 
     if (options)
-      cupsdSetStringf(&con->options, "%s %s", filename, options);
+      cupsdSetStringf(&con->options, " %s %s", filename, options);
     else
-      cupsdSetString(&con->options, filename);
+      cupsdSetStringf(&con->options, " %s", filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "is_cgi: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -4165,8 +4165,9 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   int		envc;			/* Number of environment variables */
   char		argbuf[10240],		/* Argument buffer */
 		*argv[100],		/* Argument strings */
-		*envp[MAX_ENV + 18];	/* Environment variables */
-  char		content_length[1024],	/* CONTENT_LENGTH environment variable */
+		*envp[MAX_ENV + 20];	/* Environment variables */
+  char		auth_type[256],		/* AUTH_TYPE environment variable */
+		content_length[1024],	/* CONTENT_LENGTH environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		http_cookie[32768],	/* HTTP_COOKIE environment variable */
 		http_referer[1024],	/* HTTP_REFERER environment variable */
@@ -4176,6 +4177,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 		remote_addr[1024],	/* REMOTE_ADDR environment variable */
 		remote_host[1024],	/* REMOTE_HOST environment variable */
 		remote_user[1024],	/* REMOTE_USER environment variable */
+		script_filename[1024],	/* SCRIPT_FILENAME environment variable */
 		script_name[1024],	/* SCRIPT_NAME environment variable */
 		server_name[1024],	/* SERVER_NAME environment variable */
 		server_port[1024];	/* SERVER_PORT environment variable */
@@ -4228,6 +4230,9 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   {
     commptr      = argbuf;
     path_info[0] = '\0';
+
+    if (*commptr == ' ')
+      commptr ++;
   }
 
   cupsdLogMessage(CUPSD_LOG_INFO, "commptr=\"%s\"", commptr);
@@ -4302,6 +4307,17 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   * Setup the environment variables as needed...
   */
 
+  if (con->username[0])
+  {
+    snprintf(auth_type, sizeof(auth_type), "AUTH_TYPE=%s",
+             httpGetField(HTTP(con), HTTP_FIELD_AUTHORIZATION));
+
+    if ((uriptr = strchr(auth_type + 10, ' ')) != NULL)
+      *uriptr = '\0';
+  }
+  else
+    auth_type[0] = '\0';
+
   if (con->language)
     snprintf(lang, sizeof(lang), "LANG=%s.UTF-8", con->language->language);
   else
@@ -4318,6 +4334,9 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   if ((uriptr = strchr(script_name, '?')) != NULL)
     *uriptr = '\0';
 
+  snprintf(script_filename, sizeof(script_filename), "SCRIPT_FILENAME=%s%s",
+           DocumentRoot, script_name + 12);
+
   sprintf(server_port, "SERVER_PORT=%d", con->serverport);
 
   snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s",
@@ -4325,13 +4344,18 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
 
+  if (auth_type[0])
+    envp[envc ++] = auth_type;
+
   envp[envc ++] = lang;
   envp[envc ++] = "REDIRECT_STATUS=1";
+  envp[envc ++] = "GATEWAY_INTERFACE=CGI/1.1";
   envp[envc ++] = server_name;
   envp[envc ++] = server_port;
   envp[envc ++] = remote_addr;
   envp[envc ++] = remote_host;
   envp[envc ++] = script_name;
+  envp[envc ++] = script_filename;
 
   if (path_info[0])
     envp[envc ++] = path_info;

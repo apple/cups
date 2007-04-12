@@ -3,6 +3,13 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.11
 
+	- Java, PHP, Perl, and Python scripts did not work
+	  properly (STR #2342)
+	- The scheduler would take forever to start if the
+	  maximum number of file descriptors was set to
+	  "unlimited" (STR #2329)
+	- The page-ranges option was incorrectly applied to the
+	  banner pages (STR #2336)
 	- Fixed some GCC compile warnings (STR #2340)
 	- The DBUS notification code was broken for older
 	  versions of DBUS (STR #2327)
