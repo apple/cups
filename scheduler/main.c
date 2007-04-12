@@ -366,7 +366,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     getrlimit(RLIMIT_NOFILE, &limit);
 
-    for (i = 0; i < limit.rlim_cur; i ++)
+    for (i = 0; i < limit.rlim_cur && i < 1024; i ++)
       close(i);
 #endif /* DEBUG */
   }
