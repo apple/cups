@@ -2721,6 +2721,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       if ((!strcmp(attr->name, "page-label") ||
            !strcmp(attr->name, "page-border") ||
            !strncmp(attr->name, "number-up", 9) ||
+	   !strcmp(attr->name, "page-ranges") ||
 	   !strcmp(attr->name, "page-set") ||
 	   !strcasecmp(attr->name, "AP_FIRSTPAGE_InputSlot") ||
 	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed")) &&
