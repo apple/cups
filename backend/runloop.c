@@ -104,7 +104,8 @@ backendRunLoop(
   * Now loop until we are out of data from print_fd...
   */
 
-  for (print_bytes = 0, print_ptr = print_buffer, offline = 0, paperout = 0, total_bytes = 0;;)
+  for (print_bytes = 0, print_ptr = print_buffer, offline = -1,
+           paperout = -1, total_bytes = 0;;)
   {
    /*
     * Use select() to determine whether we have data to copy around...
@@ -130,7 +131,7 @@ backendRunLoop(
 	* Pause printing to clear any pending errors...
 	*/
 
-	if (errno == ENXIO && !offline)
+	if (errno == ENXIO && offline != 1)
 	{
 	  fputs("STATE: +offline-error\n", stderr);
 	  fputs(_("INFO: Printer is currently off-line.\n"), stderr);
@@ -215,7 +216,7 @@ backendRunLoop(
 
         if (errno == ENOSPC)
 	{
-	  if (!paperout)
+	  if (paperout != 1)
 	  {
 	    fputs("STATE: +media-empty-error\n", stderr);
 	    fputs(_("ERROR: Out of paper!\n"), stderr);
@@ -224,7 +225,7 @@ backendRunLoop(
         }
 	else if (errno == ENXIO)
 	{
-	  if (!offline)
+	  if (offline != 1)
 	  {
 	    fputs("STATE: +offline-error\n", stderr);
 	    fputs(_("INFO: Printer is currently off-line.\n"), stderr);

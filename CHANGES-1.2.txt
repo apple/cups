@@ -3,6 +3,8 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.11
 
+	- The backends now manage the printer-state-reasons
+	  attribute more accurately (STR #2345)
 	- Java, PHP, Perl, and Python scripts did not work
 	  properly (STR #2342)
 	- The scheduler would take forever to start if the
