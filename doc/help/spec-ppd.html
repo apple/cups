@@ -204,13 +204,13 @@ http://www.vendor.com/help"
 
 <p>This attribute describes which language localizations are
 included in the PPD. The "locale list" string is a space-delimited
-list of locale names ("en", "en_US", "fr_FR", etc.)</p>
+list of locale names ("en", "en_US", "fr_CA", etc.)</p>
 
 <p>Example:</p>
 
 <pre class='command'>
 <em>*% Specify Canadian, UK, and US English, and Candian and French French</em> 
-*cupsLanguages: "en_CA en_UK en_US fr_CA fr_FR"
+*cupsLanguages: "en_CA en_UK en_US fr_CA fr_CA"
 </pre>
 
 <h3>cupsManualCopies</h3>
@@ -575,7 +575,10 @@ languages by following the following additional rules:</p>
 	<li>Localizations are specified using a locale prefix of
 	the form "ll" or "ll_CC." where "ll" is the 2-letter ISO
 	language code and "CC" is the 2-letter ISO country
-	code</li>
+	code<ul>
+		<li>A generic language translation ("ll") SHOULD be provided with country-specific differences ("ll_CC") provided only as needed</li>
+		<li>For historical reasons, the "zh" and "zh_CN" locales map to Simplified Chinese while the "zh_TW" locale maps to Traditional Chinese</li>
+	</ul></li>
 
 	<li>Locale-specific translation strings MUST be encoded
 	using UTF-8.</li>
@@ -612,17 +615,17 @@ in the PPD file for a given locale.</blockquote>
 <pre class='command'>
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
-*cupsLanguages: "de_DE fr_FR"
+*cupsLanguages: "de fr_CA"
 *ModelName: "Foobar Laser 9999"
 
 <em>*% Localize ModelName for French and German</em>
-*fr_FR.Translation ModelName/La Foobar Laser 9999: ""
-*de_DE.Translation ModelName/Foobar LaserDrucken 9999: ""
+*fr_CA.Translation ModelName/La Foobar Laser 9999: ""
+*de.Translation ModelName/Foobar LaserDrucken 9999: ""
 
 *cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html"
 <em>*% Localize printer-state-reason for French and German</em>
-*fr_FR.cupsIPPReason com.vendor-error/Une erreur s&egrave;rieuse s'est produite: "/help/com.vendor/error.html"
-*de_DE.cupsIPPReason com.vendor-error/Eine ernste St&ouml;rung trat: "/help/com.vendor/error.html"
+*fr_CA.cupsIPPReason com.vendor-error/Une erreur s&egrave;rieuse s'est produite: "/help/com.vendor/error.html"
+*de.cupsIPPReason com.vendor-error/Eine ernste St&ouml;rung trat: "/help/com.vendor/error.html"
 
 ...
 
@@ -630,16 +633,16 @@ in the PPD file for a given locale.</blockquote>
 *OrderDependency: 10 AnySetup *InputSlot
 *DefaultInputSlot: Auto
 <em>*% Localize InputSlot for French and German</em>
-*fr_FR.Translation InputSlot/Papier source: ""
-*de_DE.Translation InputSlot/Papiereinzug: ""
+*fr_CA.Translation InputSlot/Papier source: ""
+*de.Translation InputSlot/Papiereinzug: ""
 *InputSlot Auto/Default: "&lt;&lt;/ManualFeed false&gt;&gt;setpagedevice"
 <em>*% Localize InputSlot=Auto for French and German</em>
-*fr_FR.InputSlot Auto/Par Defaut: ""
-*de_DE.InputSlot Auto/Standard: ""
+*fr_CA.InputSlot Auto/Par Defaut: ""
+*de.InputSlot Auto/Standard: ""
 *InputSlot Manual/Manual Feed: "&lt;&lt;/ManualFeed true&gt;&gt;setpagedevice"
 <em>*% Localize InputSlot=Manual for French and German</em>
-*fr_FR.InputSlot Manual/Manuel mecanisme de alimentation: ""
-*de_DE.InputSlot Manual/Manueller Einzug: ""
+*fr_CA.InputSlot Manual/Manuel mecanisme de alimentation: ""
+*de.InputSlot Manual/Manueller Einzug: ""
 *CloseUI: *InputSlot
 </pre>
 

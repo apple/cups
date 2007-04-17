@@ -96,6 +96,32 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   strlcpy(ll_CC, lang->language, sizeof(ll_CC));
   strlcpy(ll, lang->language, sizeof(ll));
 
+  if (strlen(ll_CC) == 2)
+  {
+   /*
+    * Map "ll" to primary/origin country locales to have the best
+    * chance of finding a match...
+    */
+
+    if (!strcmp(ll_CC, "cs"))
+      strcpy(ll_CC, "cs_CZ");
+    else if (!strcmp(ll_CC, "en"))
+      strcpy(ll_CC, "en_US");
+    else if (!strcmp(ll_CC, "ja"))
+      strcpy(ll_CC, "ja_JP");
+    else if (!strcmp(ll_CC, "sv"))
+      strcpy(ll_CC, "sv_SE");
+    else if (!strcmp(ll_CC, "zh"))
+      strcpy(ll_CC, "zh_CN");		/* Simplified Chinese */
+    else
+    {
+      ll_CC[2] = '_';
+      ll_CC[3] = toupper(ll_CC[0] & 255);
+      ll_CC[4] = toupper(ll_CC[1] & 255);
+      ll_CC[5] = '\0';
+    }
+  }
+
   DEBUG_printf(("    lang->language=\"%s\", ll=\"%s\", ll_CC=\"%s\"...\n",
                 lang->language, ll, ll_CC));
 

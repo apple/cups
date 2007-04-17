@@ -3,6 +3,14 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.11
 
+	- ppdLocalize() now also tries a country-specific
+	  localization for when localizing to a generic locale
+	  name.
+	- The cupstestppd program now allows for partial
+	  localizations to reduce the size of universal PPD
+	  files.
+	- Chinese PPD files were incorrectly tagged with the
+	  "cn" locale (should have been "zh")
 	- The backends now manage the printer-state-reasons
 	  attribute more accurately (STR #2345)
 	- Java, PHP, Perl, and Python scripts did not work

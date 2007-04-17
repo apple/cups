@@ -1034,9 +1034,13 @@ main(int  argc,				/* I - Number of command-line args */
 			*langstart,	/* Start of current language */
 			*langptr,	/* Pointer into languages */
 			keyword[PPD_MAX_NAME],
-					/* Localization keyword */
-			ckeyword[PPD_MAX_NAME];
-					/* Custom option keyword */
+					/* Localization keyword (full) */
+			llkeyword[PPD_MAX_NAME],
+					/* Localization keyword (base) */
+			ckeyword[PPD_MAX_NAME],
+					/* Custom option keyword (full) */
+			cllkeyword[PPD_MAX_NAME];
+					/* Custom option keyword (base) */
 	ppd_coption_t	*coption;	/* Custom option */
 	ppd_cparam_t	*cparam;	/* Custom parameter */
         cups_array_t	*langlist;	/* List of languages so far */
@@ -1088,6 +1092,8 @@ main(int  argc,				/* I - Number of command-line args */
 
           cupsArrayAdd(langlist, langstart);
 
+          strlcpy(ll, langstart, sizeof(ll));
+
          /*
 	  * Loop through all options and choices...
 	  */
@@ -1097,7 +1103,10 @@ main(int  argc,				/* I - Number of command-line args */
 	       option = ppdNextOption(ppd))
 	  {
 	    snprintf(keyword, sizeof(keyword), "%s.Translation", langstart);
-	    if ((attr = ppdFindAttr(ppd, keyword, option->keyword)) == NULL)
+	    snprintf(llkeyword, sizeof(llkeyword), "%s.Translation", ll);
+
+	    if ((attr = ppdFindAttr(ppd, keyword, option->keyword)) == NULL &&
+	        (attr = ppdFindAttr(ppd, llkeyword, option->keyword)) == NULL)
 	    {
 	      if (verbose >= 0)
 	      {
@@ -1151,6 +1160,9 @@ main(int  argc,				/* I - Number of command-line args */
 
 	    snprintf(keyword, sizeof(keyword), "%s.%s", langstart,
 	             option->keyword);
+	    snprintf(llkeyword, sizeof(llkeyword), "%s.%s", ll,
+	             option->keyword);
+
             for (j = 0; j < option->num_choices; j ++)
 	    {
 	      if (!strcasecmp(option->choices[j].choice, "Custom") &&
@@ -1187,7 +1199,13 @@ main(int  argc,				/* I - Number of command-line args */
 		  {
 		    snprintf(ckeyword, sizeof(ckeyword), "%s.ParamCustom%s",
 		             langstart, option->keyword);
-		    if ((attr = ppdFindAttr(ppd, ckeyword, cparam->name)) == NULL)
+		    snprintf(cllkeyword, sizeof(cllkeyword), "%s.ParamCustom%s",
+		             ll, option->keyword);
+
+		    if ((attr = ppdFindAttr(ppd, ckeyword,
+		                            cparam->name)) == NULL &&
+			(attr = ppdFindAttr(ppd, cllkeyword,
+		                            cparam->name)) == NULL)
 		    {
 		      if (verbose >= 0)
 		      {
@@ -1226,7 +1244,10 @@ main(int  argc,				/* I - Number of command-line args */
                   }
                 }
 	      }
-	      else if ((attr = ppdFindAttr(ppd, keyword, option->choices[j].choice)) == NULL)
+	      else if ((attr = ppdFindAttr(ppd, keyword,
+	                                   option->choices[j].choice)) == NULL &&
+	               (attr = ppdFindAttr(ppd, llkeyword,
+	                                   option->choices[j].choice)) == NULL)
 	      {
 		if (verbose >= 0)
 		{
@@ -1303,7 +1324,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	    strlcpy(ll, langptr, sizeof(ll));
 
-	    if (!cupsArrayFind(langlist, ll))
+	    if (!cupsArrayFind(langlist, ll) && strcmp(ll, "zh"))
 	    {
 	      if (verbose >= 0)
 	      {
