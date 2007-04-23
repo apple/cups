@@ -7621,6 +7621,9 @@ renew_subscription(
   cupsdSaveAllSubscriptions();
 
   con->response->request.status.status_code = IPP_OK;
+
+  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                "notify-lease-duration", sub->lease);
 }
 
 
