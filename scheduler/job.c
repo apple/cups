@@ -3324,6 +3324,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   cupsdClosePipe(job->status_pipes);
   cupsdStatBufDelete(job->status_buffer);
 
+  job->status_buffer = NULL;
+
   cupsArrayDelete(filters);
 
   if (printer->remote && job->num_files > 1)
