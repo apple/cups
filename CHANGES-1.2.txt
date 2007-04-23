@@ -3,6 +3,16 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.11
 
+        - PDF files were not always printed using the correct
+          orientation (STR #2348)
+        - The scheduler could crash if you specified a bad file:
+          URI for a printer (STR #2351)
+        - The Renew-Subscription operation now returns the
+          notify-lease-duration value that was used (STR #2346)
+        - The IPP backend sent job options to IPP printers,
+          however some printers tried to override the options
+          embedded in the PS/PCL stream with those job options
+          (STR #2349)
 	- ppdLocalize() now also tries a country-specific
 	  localization for when localizing to a generic locale
 	  name.
