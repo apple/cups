@@ -59,14 +59,15 @@ static void	ppd_defaults(ppd_file_t *ppd, ppd_group_t *g);
  * 'ppdConflicts()' - Check to see if there are any conflicts.
  */
 
-int				/* O - Number of conflicts found */
-ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
+int					/* O - Number of conflicts found */
+ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
 {
-  int		i, j,		/* Looping variables */
-		conflicts;	/* Number of conflicts */
-  ppd_const_t	*c;		/* Current constraint */
-  ppd_option_t	*o1, *o2;	/* Options */
-  ppd_choice_t	*c1, *c2;	/* Choices */
+  int		i,			/* Looping variable */
+		conflicts;		/* Number of conflicts */
+  ppd_const_t	*c;			/* Current constraint */
+  ppd_option_t	*o1, *o2;		/* Options */
+  ppd_choice_t	*c1, *c2;		/* Choices */
+  ppd_choice_t	key;			/* Search key */
 
 
   if (!ppd)
@@ -86,38 +87,45 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
   * that conflict...
   */
 
-  for (i = ppd->num_consts, c = ppd->consts; i > 0; i --, c ++)
+  for (i = ppd->num_consts, c = ppd->consts, o1 = o2 = NULL, c1 = c2 = NULL;
+       i > 0;
+       i --, c ++)
   {
    /*
     * Grab pointers to the first option...
     */
 
-    o1 = ppdFindOption(ppd, c->option1);
+    if (!o1 || strcmp(c->option1, o1->keyword))
+    {
+      o1 = ppdFindOption(ppd, c->option1);
+      c1 = NULL;
+    }
 
     if (!o1)
       continue;
-    else if (c->choice1[0])
+    else if (c->choice1[0] && (!c1 || strcmp(c->choice1, c1->choice)))
     {
      /*
       * This constraint maps to a specific choice.
       */
 
-      c1 = ppdFindChoice(o1, c->choice1);
+      key.option = o1;
+
+      if ((c1 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
+          !c1->marked)
+        c1 = NULL;
     }
-    else
+    else if (!c1)
     {
      /*
       * This constraint applies to any choice for this option.
       */
 
-      for (j = o1->num_choices, c1 = o1->choices; j > 0; j --, c1 ++)
-        if (c1->marked)
-	  break;
+      key.option = o1;
 
-      if (!j ||
-          !strcasecmp(c1->choice, "None") ||
-          !strcasecmp(c1->choice, "Off") ||
-          !strcasecmp(c1->choice, "False"))
+      if ((c1 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
+          (!strcasecmp(c1->choice, "None") || !strcasecmp(c1->choice, "Off") ||
+           !strcasecmp(c1->choice, "False")))
         c1 = NULL;
     }
 
@@ -125,32 +133,37 @@ ppdConflicts(ppd_file_t *ppd)	/* I - PPD to check */
     * Grab pointers to the second option...
     */
 
-    o2 = ppdFindOption(ppd, c->option2);
+    if (!o2 || strcmp(c->option2, o2->keyword))
+    {
+      o2 = ppdFindOption(ppd, c->option2);
+      c2 = NULL;
+    }
 
     if (!o2)
       continue;
-    else if (c->choice2[0])
+    else if (c->choice2[0] && (!c2 || strcmp(c->choice2, c2->choice)))
     {
      /*
       * This constraint maps to a specific choice.
       */
 
-      c2 = ppdFindChoice(o2, c->choice2);
+      key.option = o2;
+
+      if ((c2 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
+          !c2->marked)
+        c2 = NULL;
     }
-    else
+    else if (!c2)
     {
      /*
       * This constraint applies to any choice for this option.
       */
 
-      for (j = o2->num_choices, c2 = o2->choices; j > 0; j --, c2 ++)
-        if (c2->marked)
-	  break;
+      key.option = o2;
 
-      if (!j ||
-          !strcasecmp(c2->choice, "None") ||
-          !strcasecmp(c2->choice, "Off") ||
-          !strcasecmp(c2->choice, "False"))
+      if ((c2 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
+          (!strcasecmp(c2->choice, "None") || !strcasecmp(c2->choice, "Off") ||
+           !strcasecmp(c2->choice, "False")))
         c2 = NULL;
     }
 
@@ -185,8 +198,8 @@ ppd_choice_t *				/* O - Choice pointer or NULL */
 ppdFindChoice(ppd_option_t *o,		/* I - Pointer to option */
               const char   *choice)	/* I - Name of choice */
 {
-  int		i;		/* Looping var */
-  ppd_choice_t	*c;		/* Current choice */
+  int		i;			/* Looping var */
+  ppd_choice_t	*c;			/* Current choice */
 
 
   if (o == NULL || choice == NULL)
@@ -208,19 +221,13 @@ ppd_choice_t *				/* O - Pointer to choice or NULL */
 ppdFindMarkedChoice(ppd_file_t *ppd,	/* I - PPD file */
                     const char *option)	/* I - Keyword/option name */
 {
-  int		i;		/* Looping var */
-  ppd_option_t	*o;		/* Pointer to option */
-  ppd_choice_t	*c;		/* Pointer to choice */
+  ppd_choice_t	key;			/* Search key for choice */
 
 
-  if ((o = ppdFindOption(ppd, option)) == NULL)
+  if ((key.option = ppdFindOption(ppd, option)) == NULL)
     return (NULL);
 
-  for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-    if (c->marked)
-      return (c);
-
-  return (NULL);
+  return ((ppd_choice_t *)cupsArrayFind(ppd->marked, &key));
 }
 
 
@@ -279,25 +286,25 @@ ppdFindOption(ppd_file_t *ppd,		/* I - PPD file data */
  * 'ppdIsMarked()' - Check to see if an option is marked...
  */
 
-int				/* O - Non-zero if option is marked */
-ppdIsMarked(ppd_file_t *ppd,	/* I - PPD file data */
-            const char *option,	/* I - Option/Keyword name */
-            const char *choice)	/* I - Choice name */
+int					/* O - Non-zero if option is marked */
+ppdIsMarked(ppd_file_t *ppd,		/* I - PPD file data */
+            const char *option,		/* I - Option/Keyword name */
+            const char *choice)		/* I - Choice name */
 {
-  ppd_option_t	*o;		/* Option pointer */
-  ppd_choice_t	*c;		/* Choice pointer */
+  ppd_choice_t	key,			/* Search key */
+		*c;			/* Choice pointer */
 
 
-  if (ppd == NULL)
+  if (!ppd)
     return (0);
 
-  if ((o = ppdFindOption(ppd, option)) == NULL)
+  if ((key.option = ppdFindOption(ppd, option)) == NULL)
     return (0);
 
-  if ((c = ppdFindChoice(o, choice)) == NULL)
+  if ((c = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) == NULL)
     return (0);
 
-  return (c->marked);
+  return (!strcmp(c->choice, choice));
 }
 
 
@@ -306,14 +313,28 @@ ppdIsMarked(ppd_file_t *ppd,	/* I - PPD file data */
  */
 
 void
-ppdMarkDefaults(ppd_file_t *ppd)/* I - PPD file record */
+ppdMarkDefaults(ppd_file_t *ppd)	/* I - PPD file record */
 {
-  int		i;		/* Looping variables */
-  ppd_group_t	*g;		/* Current group */
+  int		i;			/* Looping variables */
+  ppd_group_t	*g;			/* Current group */
+  ppd_choice_t	*c;			/* Current choice */
 
 
-  if (ppd == NULL)
+  if (!ppd)
     return;
+
+ /*
+  * Clean out the marked array...
+  */
+
+  for (c = (ppd_choice_t *)cupsArrayFirst(ppd->marked);
+       c;
+       c = (ppd_choice_t *)cupsArrayNext(ppd->marked))
+    cupsArrayRemove(ppd->marked, c);
+
+ /*
+  * Then repopulate it with the defaults...
+  */
 
   for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
     ppd_defaults(ppd, g);
@@ -336,7 +357,9 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 {
   int		i, j;			/* Looping vars */
   ppd_option_t	*o;			/* Option pointer */
-  ppd_choice_t	*c;			/* Choice pointer */
+  ppd_choice_t	*c,			/* Choice pointer */
+		*oldc,			/* Old choice pointer */
+		key;			/* Search key for choice */
   struct lconv	*loc;			/* Locale data */
 
 
@@ -358,8 +381,14 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   if (!strcasecmp(option, "AP_D_InputSlot"))
   {
     if ((o = ppdFindOption(ppd, "InputSlot")) != NULL)
-      for (i = 0; i < o->num_choices; i ++)
-	o->choices[i].marked = 0;
+    {
+      key.option = o;
+      if ((oldc = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL)
+      {
+        oldc->marked = 0;
+        cupsArrayRemove(ppd->marked, oldc);
+      }
+    }
   }
 
  /*
@@ -542,72 +571,97 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   * Option found; mark it and then handle unmarking any other options.
   */
 
-  c->marked = 1;
-
   if (o->ui != PPD_UI_PICKMANY)
   {
    /*
     * Unmark all other choices...
     */
 
-    for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-      if (strcasecmp(c->choice, choice))
+    if ((oldc = (ppd_choice_t *)cupsArrayFind(ppd->marked, c)) != NULL)
+    {
+      oldc->marked = 0;
+      cupsArrayRemove(ppd->marked, oldc);
+    }
+
+    if (!strcasecmp(option, "PageSize") || !strcasecmp(option, "PageRegion"))
+    {
+     /*
+      * Mark current page size...
+      */
+
+      for (j = 0; j < ppd->num_sizes; j ++)
+	ppd->sizes[j].marked = !strcasecmp(ppd->sizes[j].name,
+		                           choice);
+
+     /*
+      * Unmark the current PageSize or PageRegion setting, as
+      * appropriate...
+      */
+
+      if (!strcasecmp(option, "PageSize"))
       {
-        c->marked = 0;
-
-	if (!strcasecmp(option, "PageSize") ||
-	    !strcasecmp(option, "PageRegion"))
-	{
-	 /*
-	  * Mark current page size...
-	  */
-
-	  for (j = 0; j < ppd->num_sizes; j ++)
-	    ppd->sizes[j].marked = !strcasecmp(ppd->sizes[j].name,
-		                               choice);
-
-	 /*
-	  * Unmark the current PageSize or PageRegion setting, as
-	  * appropriate...
-	  */
-
-	  if (!strcasecmp(option, "PageSize"))
-	  {
-	    if ((o = ppdFindOption(ppd, "PageRegion")) != NULL)
-	      for (j = 0; j < o->num_choices; j ++)
-        	o->choices[j].marked = 0;
-	  }
-	  else
-	  {
-	    if ((o = ppdFindOption(ppd, "PageSize")) != NULL)
-	      for (j = 0; j < o->num_choices; j ++)
-        	o->choices[j].marked = 0;
-	  }
-	}
-	else if (!strcasecmp(option, "InputSlot"))
-	{
-	 /*
-	  * Unmark ManualFeed True and possibly mark ManualFeed False
-	  * option...
-	  */
-
-	  if ((o = ppdFindOption(ppd, "ManualFeed")) != NULL)
-	    for (j = 0; j < o->num_choices; j ++)
-              o->choices[j].marked = !strcasecmp(o->choices[j].choice, "False");
-	}
-	else if (!strcasecmp(option, "ManualFeed") &&
-	         !strcasecmp(choice, "True"))
-	{
-	 /*
-	  * Unmark InputSlot option...
-	  */
-
-	  if ((o = ppdFindOption(ppd, "InputSlot")) != NULL)
-	    for (j = 0; j < o->num_choices; j ++)
-              o->choices[j].marked = 0;
-	}
+	if ((o = ppdFindOption(ppd, "PageRegion")) != NULL)
+        {
+          key.option = o;
+          if ((oldc = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL)
+          {
+            oldc->marked = 0;
+            cupsArrayRemove(ppd->marked, oldc);
+          }
+        }
       }
+      else
+      {
+	if ((o = ppdFindOption(ppd, "PageSize")) != NULL)
+        {
+          key.option = o;
+          if ((oldc = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL)
+          {
+            oldc->marked = 0;
+            cupsArrayRemove(ppd->marked, oldc);
+          }
+        }
+      }
+    }
+    else if (!strcasecmp(option, "InputSlot"))
+    {
+     /*
+      * Unmark ManualFeed True and possibly mark ManualFeed False
+      * option...
+      */
+
+      if ((o = ppdFindOption(ppd, "ManualFeed")) != NULL)
+      {
+        key.option = o;
+        if ((oldc = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL)
+        {
+          oldc->marked = 0;
+          cupsArrayRemove(ppd->marked, oldc);
+        }
+      }
+    }
+    else if (!strcasecmp(option, "ManualFeed") &&
+	     !strcasecmp(choice, "True"))
+    {
+     /*
+      * Unmark InputSlot option...
+      */
+
+      if ((o = ppdFindOption(ppd, "InputSlot")) != NULL)
+      {
+        key.option = o;
+        if ((oldc = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL)
+        {
+          oldc->marked = 0;
+          cupsArrayRemove(ppd->marked, oldc);
+        }
+      }
+    }
   }
+
+  c->marked = 1;
+
+  cupsArrayAdd(ppd->marked, c);
 
  /*
   * Return the number of conflicts...
@@ -665,9 +719,6 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
   ppd_option_t	*o;		/* Current option */
   ppd_group_t	*sg;		/* Current sub-group */
 
-
-  if (g == NULL)
-    return;
 
   for (i = g->num_options, o = g->options; i > 0; i --, o ++)
     if (strcasecmp(o->keyword, "PageRegion") != 0)

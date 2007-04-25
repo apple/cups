@@ -3,7 +3,7 @@
  *
  *   Sorted array routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -90,6 +90,9 @@ struct _cups_array_s			/**** CUPS array structure ****/
   void			**elements;	/* Array elements */
   cups_array_func_t	compare;	/* Element comparison function */
   void			*data;		/* User data passed to compare */
+  cups_ahash_func_t	hashfunc;	/* Hash function */
+  int			hashsize,	/* Size of hash */
+			*hash;		/* Hash array */
 };
 
 
@@ -229,6 +232,9 @@ cupsArrayDelete(cups_array_t *a)	/* I - Array */
   if (a->alloc_elements)
     free(a->elements);
 
+  if (a->hashsize)
+    free(a->hash);
+
   free(a);
 }
 
@@ -306,7 +312,8 @@ cupsArrayFind(cups_array_t *a,		/* I - Array */
               void         *e)		/* I - Element */
 {
   int	current,			/* Current element */
-	diff;				/* Difference */
+	diff,				/* Difference */
+	hash;				/* Hash index */
 
 
  /*
@@ -327,7 +334,30 @@ cupsArrayFind(cups_array_t *a,		/* I - Array */
   * Yes, look for a match...
   */
 
-  current = cups_array_find(a, e, a->current, &diff);
+  if (a->hash)
+  {
+    hash = (*(a->hashfunc))(e, a->data);
+
+    if (hash < 0 || hash >= a->hashsize)
+    {
+      current = a->current;
+      hash    = -1;
+    }
+    else
+    {
+      current = a->hash[hash];
+
+      if (current < 0 || current >= a->num_elements)
+        current = a->current;
+    }
+  }
+  else
+  {
+    current = a->current;
+    hash    = -1;
+  }
+
+  current = cups_array_find(a, e, current, &diff);
   if (!diff)
   {
    /*
@@ -347,6 +377,9 @@ cupsArrayFind(cups_array_t *a,		/* I - Array */
     }
 
     a->current = current;
+
+    if (hash >= 0)
+      a->hash[hash] = current;
 
     return (a->elements[current]);
   }
@@ -500,6 +533,22 @@ cups_array_t *				/* O - Array */
 cupsArrayNew(cups_array_func_t f,	/* I - Comparison function */
              void              *d)	/* I - User data */
 {
+  return (cupsArrayNew2(f, d, 0, 0));
+}
+
+
+/*
+ * 'cupsArrayNew2()' - Create a new array with hash.
+ *
+ * @since CUPS 1.3@
+ */
+
+cups_array_t *				/* O - Array */
+cupsArrayNew2(cups_array_func_t  f,	/* I - Comparison function */
+              void               *d,	/* I - User data */
+              cups_ahash_func_t  h,	/* I - Hash function*/
+	      int                hsize)	/* I - Hash size */
+{
   cups_array_t	*a;			/* Array  */
 
 
@@ -517,6 +566,21 @@ cupsArrayNew(cups_array_func_t f,	/* I - Comparison function */
   a->insert    = -1;
   a->num_saved = 0;
   a->unique    = 1;
+
+  if (hsize > 0 && h)
+  {
+    a->hashfunc  = h;
+    a->hashsize  = hsize;
+    a->hash      = malloc(hsize * sizeof(int));
+
+    if (!a->hash)
+    {
+      free(a);
+      return (NULL);
+    }
+
+    memset(a->hash, -1, hsize * sizeof(int));
+  }
 
   return (a);
 }

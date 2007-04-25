@@ -1,9 +1,12 @@
-CHANGES.txt - 2007-04-04
+CHANGES.txt - 2007-04-25
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131)
+        - Add new cupsArrayNew2() API to support hashed lookups
+          of array elements (STR #2358)
+        - ppdConflicts() optimizations (STR #2358)
 	- The cupstestppd program now tests for existing filters,
 	  icons, profiles, and dialog extensions (STR #2326)
 	- The web interface no longer lists new printers on the

@@ -4,7 +4,7 @@
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -331,6 +331,9 @@ typedef struct ppd_file_s		/**** PPD File ****/
   cups_array_t	*sorted_attrs;		/* Attribute lookup array @since CUPS 1.2@ @private@ */
   cups_array_t	*options;		/* Option lookup array @since CUPS 1.2@ @private@ */
   cups_array_t	*coptions;		/* Custom options array @since CUPS 1.2@ @private@ */
+
+  /**** New in CUPS 1.3 ****/
+  cups_array_t	*marked;		/* Marked choices @since CUPS 1.3@ @private@ */
 } ppd_file_t;
 
 

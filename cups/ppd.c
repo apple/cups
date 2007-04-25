@@ -48,6 +48,8 @@
  *   ppd_add_choice()       - Add a choice to an option.
  *   ppd_add_size()         - Add a page size.
  *   ppd_compare_attrs()    - Compare two attributes.
+ *   ppd_compare_choices()  - Compare two choices...
+ *   ppd_compare_consts()   - Compare two constraints.
  *   ppd_compare_coptions() - Compare two custom options.
  *   ppd_compare_cparams()  - Compare two custom parameters.
  *   ppd_compare_options()  - Compare two options.
@@ -58,6 +60,7 @@
  *   ppd_get_cparam()       - Get a custom parameter record.
  *   ppd_get_group()        - Find or create the named group as needed.
  *   ppd_get_option()       - Find or create the named option as needed.
+ *   ppd_hash_option()      - Generate a hash of the option name...
  *   ppd_read()             - Read a line from a PPD file, skipping comment
  *                            lines as necessary.
  */
@@ -90,6 +93,8 @@
 #define PPD_TEXT	4		/* Line contained human-readable text */
 #define PPD_STRING	8		/* Line contained a string or code */
 
+#define PPD_HASHSIZE	512		/* Size of hash */
+
 
 /*
  * Local functions...
@@ -101,6 +106,8 @@ static ppd_attr_t	*ppd_add_attr(ppd_file_t *ppd, const char *name,
 static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
 static ppd_size_t	*ppd_add_size(ppd_file_t *ppd, const char *name);
 static int		ppd_compare_attrs(ppd_attr_t *a, ppd_attr_t *b);
+static int		ppd_compare_choices(ppd_choice_t *a, ppd_choice_t *b);
+static int		ppd_compare_consts(ppd_const_t *a, ppd_const_t *b);
 static int		ppd_compare_coptions(ppd_coption_t *a,
 			                     ppd_coption_t *b);
 static int		ppd_compare_cparams(ppd_cparam_t *a, ppd_cparam_t *b);
@@ -116,6 +123,7 @@ static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 			               const char *text, _cups_globals_t *cg,
 				       cups_encoding_t encoding);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
+static int		ppd_hash_option(ppd_option_t *option);
 static int		ppd_read(cups_file_t *fp, char *keyword, char *option,
 			         char *text, char **string, int ignoreblank,
 				 _cups_globals_t *cg);
@@ -184,6 +192,7 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   }
 
   cupsArrayDelete(ppd->options);
+  cupsArrayDelete(ppd->marked);
 
  /*
   * Free any page sizes...
@@ -1892,7 +1901,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   * each choice and custom option...
   */
 
-  ppd->options = cupsArrayNew((cups_array_func_t)ppd_compare_options, NULL);
+  ppd->options = cupsArrayNew2((cups_array_func_t)ppd_compare_options, NULL,
+                               (cups_ahash_func_t)ppd_hash_option,
+			       PPD_HASHSIZE);
 
   for (i = ppd->num_groups, group = ppd->groups;
        i > 0;
@@ -1914,6 +1925,20 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         coption->option = option;
     }
   }
+
+ /*
+  * Sort the constraints...
+  */
+
+  if (ppd->num_consts > 1)
+    qsort(ppd->consts, ppd->num_consts, sizeof(ppd_const_t),
+          (int (*)(const void *, const void *))ppd_compare_consts);
+
+ /*
+  * Create an array to track the marked choices...
+  */
+
+  ppd->marked = cupsArrayNew((cups_array_func_t)ppd_compare_choices, NULL);
 
  /*
   * Return the PPD file structure...
@@ -2205,6 +2230,40 @@ ppd_compare_attrs(ppd_attr_t *a,	/* I - First attribute */
     return (ret);
   else
     return (strcasecmp(a->spec, b->spec));
+}
+
+
+/*
+ * 'ppd_compare_choices()' - Compare two choices...
+ */
+
+static int				/* O - Result of comparison */
+ppd_compare_choices(ppd_choice_t *a,	/* I - First choice */
+                    ppd_choice_t *b)	/* I - Second choice */
+{
+  return (a->option - b->option);
+}
+
+
+/*
+ * 'ppd_compare_consts()' - Compare two constraints.
+ */
+
+static int				/* O - Result of comparison */
+ppd_compare_consts(ppd_const_t *a,	/* I - First constraint */
+                   ppd_const_t *b)	/* I - Second constraint */
+{
+  int	ret;				/* Result of comparison */
+
+
+  if ((ret = strcmp(a->option1, b->option1)) != 0)
+    return (ret);
+  else if ((ret = strcmp(a->choice1, b->choice1)) != 0)
+    return (ret);
+  else if ((ret = strcmp(a->option2, b->option2)) != 0)
+    return (ret);
+  else
+    return (strcmp(a->choice2, b->choice2));
 }
 
 
@@ -2542,6 +2601,24 @@ ppd_get_option(ppd_group_t *group,	/* I - Group */
   }
 
   return (option);
+}
+
+
+/*
+ * 'ppd_hash_option()' - Generate a hash of the option name...
+ */
+
+static int				/* O - Hash index */
+ppd_hash_option(ppd_option_t *option)	/* I - Option */
+{
+  int		hash = 0;		/* Hash index */
+  const char	*k;			/* Pointer into keyword */
+
+
+  for (hash = option->keyword[0], k = option->keyword + 1; *k;)
+    hash = 33 * hash + *k++;
+
+  return (hash & 511);
 }
 
 

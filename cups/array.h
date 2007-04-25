@@ -3,7 +3,7 @@
  *
  *   Sorted array definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -51,6 +51,9 @@ typedef struct _cups_array_s cups_array_t;
 					/**** CUPS array type ****/
 typedef int (*cups_array_func_t)(void *first, void *second, void *data);
 					/**** Array comparison function ****/
+typedef int (*cups_ahash_func_t)(void *element, void *data);
+					/**** Array hash function ****/
+
 
 /*
  * Functions...
@@ -70,6 +73,8 @@ extern void		*cupsArrayIndex(cups_array_t *a, int n);
 extern int		cupsArrayInsert(cups_array_t *a, void *e);
 extern void		*cupsArrayLast(cups_array_t *a);
 extern cups_array_t	*cupsArrayNew(cups_array_func_t f, void *d);
+extern cups_array_t	*cupsArrayNew2(cups_array_func_t f, void *d,
+			               cups_ahash_func_t h, int hsize);
 extern void		*cupsArrayNext(cups_array_t *a);
 extern void		*cupsArrayPrev(cups_array_t *a);
 extern int		cupsArrayRemove(cups_array_t *a, void *e);
