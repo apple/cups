@@ -434,7 +434,7 @@ d 0755 root sys $DATADIR/model -
 f 0644 root sys $DATADIR/model ppd/*.ppd
 
 d 0755 root sys $DATADIR/templates -
-c 0644 root sys $DATADIR/templates templates/*.tmpl
+f 0644 root sys $DATADIR/templates templates/*.tmpl
 
 # Japanese template files
 %subpackage de
@@ -637,6 +637,8 @@ f 0644 root sys /System/Library/LaunchDaemons/org.cups.cupsd.plist init/org.cups
 %postinstall <<EOF
 rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+killall cupsd
+sleep 1
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
 EOF
 %subpackage lpd
