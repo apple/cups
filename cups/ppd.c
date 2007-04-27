@@ -2616,7 +2616,7 @@ ppd_hash_option(ppd_option_t *option)	/* I - Option */
 
 
   for (hash = option->keyword[0], k = option->keyword + 1; *k;)
-    hash = 33 * hash + *k++;
+    hash = 33 * hash + toupper(*k++ & 255);
 
   return (hash & 511);
 }
