@@ -91,6 +91,14 @@ depend:
 
 
 #
+# Generate a ctags file...
+#
+
+ctags:
+	ctags -R .
+
+
+#
 # Install object and target files...
 #
 
