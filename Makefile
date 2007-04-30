@@ -66,6 +66,7 @@ distclean:	clean
 	$(RM) cups-config conf/cupsd.conf conf/pam.std
 	$(RM) doc/help/standard.html doc/index.html
 	$(RM) init/cups.sh init/cups-lpd
+	$(RM) man/client.conf.man
 	$(RM) man/cups-deviced.man man/cups-driverd.man
 	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
 	$(RM) man/cupsd.conf.man man/lpoptions.man
