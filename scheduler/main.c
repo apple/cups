@@ -33,10 +33,6 @@
  *   launchd_checkin()         - Check-in with launchd and collect the
  *                               listening fds.
  *   launchd_checkout()        - Check-out with launchd.
- *   launchd_create_dict()     - Create a dictionary representing the launchd
- *			         config file org.cups.cupsd.plist.
- *   launchd_sync_conf()       - Re-write the launchd config file
- *			         org.cups.cupsd.plist based on cupsd.conf.
  *   parent_handler()          - Catch USR1/CHLD signals...
  *   process_children()        - Process all dead children...
  *   sigchld_handler()         - Handle 'child' signals from old processes.
@@ -93,8 +89,6 @@
 #ifdef HAVE_LAUNCHD
 static void		launchd_checkin(void);
 static void		launchd_checkout(void);
-static CFDictionaryRef	launchd_create_dict(void);
-static int		launchd_sync_conf(void);
 #endif /* HAVE_LAUNCHD */
 static void		parent_handler(int sig);
 static void		process_children(void);
@@ -119,13 +113,6 @@ static int		dead_children = 0;
 					/* Dead children? */
 static int		stop_scheduler = 0;
 					/* Should the scheduler stop? */
-
-#ifdef HAVE_LAUNCHD
-static CFURLRef		launchd_conf_url = NULL;
-					/* org.cups.cupsd.plist url */
-static CFDictionaryRef	launchd_conf_dict = NULL;
-					/* org.cups.cupsd.plist dict */
-#endif /* HAVE_LAUNCHD */
 
 #if defined(__APPLE__) && defined(HAVE_DLFCN_H)
 static const char *PSQLibPath = "/usr/lib/libPrintServiceQuota.dylib";
@@ -420,14 +407,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (Launchd)
   {
    /*
-    * If we were started by launchd, make sure the cupsd plist file contains
-    * the same listeners as cupsd.conf.
-    */
-
-    launchd_sync_conf();
-
-   /*
-    * Then get the file descriptors from launchd...
+    * If we were started by launchd get the listen sockets file descriptors...
     */
 
     launchd_checkin();
@@ -638,7 +618,10 @@ main(int  argc,				/* I - Number of command-line args */
 #if HAVE_LAUNCHD
 	if (Launchd)
 	{
-	  launchd_sync_conf();
+	 /*
+	  * If we were started by launchd get the listen sockets file descriptors...
+	  */
+
 	  launchd_checkin();
 	}
 #endif /* HAVE_LAUNCHD */
@@ -952,21 +935,27 @@ main(int  argc,				/* I - Number of command-line args */
 
 #ifdef HAVE_LAUNCHD
  /*
-  * Update the launchd config file as needed...
+  * Update the launchd KeepAlive file as needed...
   */
 
   if (Launchd)
-  {
     launchd_checkout();
-    launchd_sync_conf();
-
-    if (launchd_conf_url)
-      CFRelease(launchd_conf_url);
-
-    if (launchd_conf_dict)
-      CFRelease(launchd_conf_dict);
-  }
 #endif /* HAVE_LAUNCHD */
+
+#ifdef __APPLE__
+#ifdef HAVE_DLFCN_H
+ /* 
+  * Unload Print Service quota enforcement library (X Server only) 
+  */
+
+  PSQUpdateQuotaProc = NULL;
+  if (PSQLibRef)
+  {
+    dlclose(PSQLibRef);
+    PSQLibRef = NULL;
+  }
+#endif /* HAVE_DLFCN_H */
+#endif	/* __APPLE__ */
 
 #ifdef __sgi
  /*
@@ -1335,38 +1324,6 @@ launchd_checkin(void)
     }
   }
 
- /*
-  * Collect the browse socket (if there is one)...
-  */
-
-  if ((ld_array = launch_data_dict_lookup(ld_sockets, "BrowseSockets")))
-  {
-    if (launch_data_get_type(ld_array) == LAUNCH_DATA_ARRAY)
-    {
-      if ((tmp = launch_data_array_get_index(ld_array, 0)))
-      {
-	if (launch_data_get_type(tmp) == LAUNCH_DATA_FD)
-	{
-	  if (BrowseSocket != -1)
-	    close(BrowseSocket);
-
-	  BrowseSocket = launch_data_get_fd(tmp);
-	}
-	else
-	  cupsdLogMessage(CUPSD_LOG_WARN,
-			  "launchd_checkin: BrowseSocket not a fd!");
-     }
-     else
-       cupsdLogMessage(CUPSD_LOG_WARN,
-		       "launchd_checkin: BrowseSockets is an empty array!");
-   }
-   else
-     cupsdLogMessage(CUPSD_LOG_WARN,
-                     "launchd_checkin: BrowseSockets is not an array!");
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: No BrowseSockets");
-
   launch_data_free(ld_msg);
   launch_data_free(ld_resp);
 }
@@ -1408,340 +1365,6 @@ launchd_checkout(void)
   }
 }
 
-
-/*
- * 'launchd_create_dict()' - Create a dictionary representing the launchd
- *			     config file org.cups.cupsd.plist.
- */
-
-static CFDictionaryRef			/* O - CFDictionary */
-launchd_create_dict(void)
-{
-  int			portnum;	/* Port number */
-  bool			runatload;	/* Run at load? */
-  CFMutableDictionaryRef cupsd_dict,	/* org.cups.cupsd.plist dictionary */
-			keepalive,	/* KeepAlive dictionary */
-			pathstate,	/* PathState dictionary */
-			sockets,	/* Sockets dictionary */
-			listener;	/* Listener dictionary */
-  CFMutableArrayRef	array;		/* Array */
-  CFNumberRef		socket_mode;	/* Domain socket mode bits */
-  CFStringRef		socket_path;	/* Domain socket path */
-  CFTypeRef		value;		/* CF values */
-  cupsd_listener_t	*lis;		/* Current listening socket */
-  struct servent	*service;	/* Services data base entry */
-  char			temp[1024];	/* Temporary buffer for value */
-
-
-  if ((cupsd_dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-				&kCFTypeDictionaryKeyCallBacks,
-				&kCFTypeDictionaryValueCallBacks)) == NULL)
-    return (NULL);
-
-  CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_LABEL),
-		       CFSTR("org.cups.cupsd"));
-  CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_ONDEMAND),
-		       kCFBooleanTrue);
-
- /*
-  * Use run-at-load and/or KeepAlive if there are active jobs, polling or
-  * shared printers to advertise...
-  */
-
-  if ((keepalive = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-				&kCFTypeDictionaryKeyCallBacks,
-				&kCFTypeDictionaryValueCallBacks)) != NULL)
-  {
-    if ((pathstate = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-				&kCFTypeDictionaryKeyCallBacks,
-				&kCFTypeDictionaryValueCallBacks)) != NULL)
-    {
-      CFDictionaryAddValue(pathstate, CFSTR(CUPS_KEEPALIVE), kCFBooleanTrue);
-      CFDictionaryAddValue(keepalive, CFSTR(LAUNCH_JOBKEY_PATHSTATE),
-			   pathstate);
-    }
-
-    CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_KEEPALIVE),
-			 keepalive);
-  }
-
-  runatload = (cupsArrayCount(ActiveJobs) || NumPolled || 
-	       (Browsing && BrowseLocalProtocols && 
-	        NumBrowsers && cupsArrayCount(Printers))) ? true : false;
-
-  CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_RUNATLOAD),
-		       runatload ? kCFBooleanTrue : kCFBooleanFalse);
-  CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_SERVICEIPC),
-		       kCFBooleanTrue);
-
-  if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 2,
-				    &kCFTypeArrayCallBacks)) != NULL)
-  {
-    CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_PROGRAMARGUMENTS),
-			 array);
-    CFArrayAppendValue(array, CFSTR("/usr/sbin/cupsd"));
-    CFArrayAppendValue(array, CFSTR("-l"));
-    CFRelease(array);
-  }
-
- /*
-  * Add a sockets dictionary...
-  */
-
-  if ((sockets = (CFMutableDictionaryRef)CFDictionaryCreateMutable(
-			      kCFAllocatorDefault, 0,
-			      &kCFTypeDictionaryKeyCallBacks,
-			      &kCFTypeDictionaryValueCallBacks)) != NULL)
-  {
-    CFDictionaryAddValue(cupsd_dict, CFSTR(LAUNCH_JOBKEY_SOCKETS), sockets);
-
-   /*
-    * Add a Listeners array to the sockets dictionary...
-    */
-
-    if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 0,
-				      &kCFTypeArrayCallBacks)) != NULL)
-    {
-      CFDictionaryAddValue(sockets, CFSTR("Listeners"), array);
-
-     /*
-      * For each listener add a dictionary to the listeners array...
-      */
-
-      for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
-	   lis;
-	   lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-      {
-	if ((listener = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-			      &kCFTypeDictionaryKeyCallBacks,
-			      &kCFTypeDictionaryValueCallBacks)) != NULL)
-	{
-	  CFArrayAppendValue(array, listener);
-
-#  ifdef AF_LOCAL
-	  if (lis->address.addr.sa_family == AF_LOCAL)
-	  {
-	    if ((socket_path = CFStringCreateWithCString(kCFAllocatorDefault,
-				      lis->address.un.sun_path,
-				      kCFStringEncodingUTF8)))
-	    {
-	      CFDictionaryAddValue(listener,
-				   CFSTR(LAUNCH_JOBSOCKETKEY_PATHNAME),
-				   socket_path);
-	      CFRelease(socket_path);
-	    }
-	    portnum = 0140777; /* (S_IFSOCK|S_IRWXU|S_IRWXG|S_IRWXO) or *
-				* 49663d decimal                        */
-	    if ((socket_mode = CFNumberCreate(kCFAllocatorDefault,
-					      kCFNumberIntType, &portnum)))
-	    {
-	      CFDictionaryAddValue(listener, CFSTR("SockPathMode"),
-				   socket_mode);
-	      CFRelease(socket_mode);
-	    }
-	  }
-	  else
-#  endif /* AF_LOCAL */
-	  {
-#  ifdef AF_INET6
-	    if (lis->address.addr.sa_family == AF_INET6)
-	    {
-	      CFDictionaryAddValue(listener,
-				   CFSTR(LAUNCH_JOBSOCKETKEY_FAMILY),
-				   CFSTR("IPv6"));
-	      portnum = lis->address.ipv6.sin6_port;
-	    }
-	    else
-#  endif /* AF_INET6 */
-	    {
-	      CFDictionaryAddValue(listener,
-				   CFSTR(LAUNCH_JOBSOCKETKEY_FAMILY),
-				   CFSTR("IPv4"));
-	      portnum = lis->address.ipv4.sin_port;
-	    }
-
-	    if ((service = getservbyport(portnum, NULL)))
-	      value = CFStringCreateWithCString(kCFAllocatorDefault,
-						service->s_name,
-						kCFStringEncodingUTF8);
-	    else
-	      value = CFNumberCreate(kCFAllocatorDefault,
-				     kCFNumberIntType, &portnum);
-
-	    if (value)
-	    {
-	      CFDictionaryAddValue(listener,
-				   CFSTR(LAUNCH_JOBSOCKETKEY_SERVICENAME),
-				   value);
-	      CFRelease(value);
-	    }	
-
-	    httpAddrString(&lis->address, temp, sizeof(temp));
-	    if ((value = CFStringCreateWithCString(kCFAllocatorDefault, temp,
-						   kCFStringEncodingUTF8)))
-	    {
-	      CFDictionaryAddValue(listener,
-				   CFSTR(LAUNCH_JOBSOCKETKEY_NODENAME),
-				   value);
-	      CFRelease(value);
-	    }
-	  }
-
-	  CFRelease(listener);
-	}
-      }
-
-      CFRelease(array);
-    }
-
-   /*
-    * Add the BrowseSocket to the sockets dictionary...
-    */
-
-    if (Browsing && (BrowseRemoteProtocols & BROWSE_CUPS))
-    {
-      if ((array = CFArrayCreateMutable(kCFAllocatorDefault, 0,
-					&kCFTypeArrayCallBacks)) != NULL)
-      {
-	CFDictionaryAddValue(sockets, CFSTR("BrowseSockets"), array);
-
-	if ((listener = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-				&kCFTypeDictionaryKeyCallBacks,
-				&kCFTypeDictionaryValueCallBacks)) != NULL)
-	{
-	  CFArrayAppendValue(array, listener);
-
-	  CFDictionaryAddValue(listener, CFSTR(LAUNCH_JOBSOCKETKEY_FAMILY),
-			       CFSTR("IPv4"));
-	  CFDictionaryAddValue(listener, CFSTR(LAUNCH_JOBSOCKETKEY_TYPE),
-			       CFSTR("dgram"));
-
-	  if ((service = getservbyport(BrowsePort, NULL)))
-	    value = CFStringCreateWithCString(kCFAllocatorDefault,
-					      service->s_name,
-					      kCFStringEncodingUTF8);
-	  else
-	    value = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType,
-				   &BrowsePort);
-
-	  CFDictionaryAddValue(listener,
-			       CFSTR(LAUNCH_JOBSOCKETKEY_SERVICENAME), value);
-	  CFRelease(value);
-
-	  CFRelease(listener);
-	}
-
-	CFRelease(array);
-      }
-    }
-
-    CFRelease(sockets);
-  }
-
-  return (cupsd_dict);
-}
-
-
-/*
- * 'launchd_sync_conf()' - Rewrite the launchd config file
- *			   org.cups.cupsd.plist based on cupsd.conf.
- */
-
-static int				/* O - 1 if the file was updated */
-launchd_sync_conf(void)
-{
-  SInt32		errorCode;	/* Error code */
-  CFDataRef		resourceData;	/* XML property list */
-  CFDictionaryRef	cupsd_dict;	/* New org.cups.cupsd.plist dict */
-
-
- /*
-  * If needed reconstitute the existing org.cups.cupsd.plist...
-  */
-
-  if (!launchd_conf_url && 
-      !(launchd_conf_url = CFURLCreateFromFileSystemRepresentation(
-				kCFAllocatorDefault,
-				(const unsigned char *)LaunchdConf,
-				strlen(LaunchdConf), false)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_sync_conf: "
-		    "Unable to create file URL for \"%s\"\n", LaunchdConf);
-    return (0);
-  }
-
-  if (!launchd_conf_dict)
-  {
-    if (CFURLCreateDataAndPropertiesFromResource(NULL, launchd_conf_url, 
-				&resourceData, NULL, NULL, &errorCode))
-    {
-      launchd_conf_dict = CFPropertyListCreateFromXMLData(NULL, resourceData,
-					      kCFPropertyListImmutable, NULL);
-      CFRelease(resourceData);
-    }
-
-    if (!launchd_conf_dict)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_sync_conf: "
-		      "Unable to create dictionary for \"%s\"\n", LaunchdConf);
-    }
-  }
-
- /*
-  * Create a new org.cups.cupsd.plist dictionary...
-  */
-
-  if ((cupsd_dict = launchd_create_dict()) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_sync_conf: "
-		    "Unable to create file URL for \"%s\"\n", LaunchdConf);
-    return (0);
-  }
-
- /*
-  * If the dictionaries are different write a new org.cups.cupsd.plist...
-  */
-
-  if (!CFEqual(cupsd_dict, launchd_conf_dict))
-  {
-    if ((resourceData = CFPropertyListCreateXMLData(kCFAllocatorDefault,
-						    cupsd_dict)))
-    {
-      if (CFURLWriteDataAndPropertiesToResource(launchd_conf_url, resourceData,
-						 NULL, &errorCode))
-      {
-       /*
-        * The new cupsd dictionary becomes the on-disk launchd dictionary...
-        */
-
-	if (launchd_conf_dict)
-	  CFRelease(launchd_conf_dict);
-
-	launchd_conf_dict = cupsd_dict;
-      }
-      else
-      {
-	cupsdLogMessage(CUPSD_LOG_WARN,
-			"launchd_sync_conf: "
-			"CFURLWriteDataAndPropertiesToResource(\"%s\") "
-			"failed: %d\n",
-			LaunchdConf, (int)errorCode);
-
-	CFRelease(cupsd_dict);
-      }
-  
-      CFRelease(resourceData);
-    }
-
-   /*
-    * Let the caller know we updated the file...
-    */
-
-    return (1);
-  }
-
-  return (0);
-}
 #endif /* HAVE_LAUNCHD */
 
 
