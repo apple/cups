@@ -281,7 +281,11 @@ cupsdCheckPermissions(
 
   if (!dir_created && is_dir && !S_ISDIR(fileinfo.st_mode))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a directory!", filename);
+    if (create_dir >= 0)
+      cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a directory!", filename);
+    else
+      syslog(LOG_ERR, "\"%s\" is not a directory!", filename);
+
     return (-1);
   }
 
@@ -291,27 +295,40 @@ cupsdCheckPermissions(
 
   if (dir_created || fileinfo.st_uid != user || fileinfo.st_gid != group)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing ownership of \"%s\"", filename);
+    if (create_dir >= 0)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing ownership of \"%s\"",
+                      filename);
 
     if (chown(filename, user, group) && !getuid())
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to change ownership of \"%s\" - %s", filename,
-		      strerror(errno));
+      if (create_dir >= 0)
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Unable to change ownership of \"%s\" - %s", filename,
+			strerror(errno));
+      else
+	syslog(LOG_ERR, "Unable to change ownership of \"%s\" - %s", filename,
+	       strerror(errno));
+
       return (1);
     }
   }
 
   if (dir_created || (fileinfo.st_mode & 07777) != mode)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing access permissions of \"%s\"",
-                    filename);
+    if (create_dir >= 0)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing access permissions of \"%s\"",
+		      filename);
 
     if (chmod(filename, mode))
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to change permissions of \"%s\" - %s", filename,
-		      strerror(errno));
+      if (create_dir >= 0)
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Unable to change permissions of \"%s\" - %s", filename,
+			strerror(errno));
+      else
+	syslog(LOG_ERR, "Unable to change permissions of \"%s\" - %s", filename,
+	       strerror(errno));
+
       return (1);
     }
   }
