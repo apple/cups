@@ -26,6 +26,7 @@
  *   cupsdAddPrinter()           - Add a printer to the system.
  *   cupsdAddPrinterHistory()    - Add the current printer state to the history.
  *   cupsdAddPrinterUser()       - Add a user to the ACL.
+ *   cupsdCreateCommonData()     - Create the common printer data.
  *   cupsdDeleteAllPrinters()    - Delete all printers from the system.
  *   cupsdDeletePrinter()        - Delete a printer from the system.
  *   cupsdFindPrinter()          - Find a printer in the list.
@@ -412,6 +413,10 @@ cupsdCreateCommonData(void)
 
   /* copies-supported */
   ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
+
+  /* cups-version */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_TEXT, "cups-version",
+               NULL, CUPS_SVERSION + 6);
 
   /* generated-natural-language-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
