@@ -28,6 +28,7 @@
  *   main()                    - Discover printers via SNMP.
  *   add_array()               - Add a string to an array.
  *   add_cache()               - Add a cached device...
+ *   add_device_uri()          - Add a device URI to the cache.
  *   alarm_handler()           - Handle alarm signals...
  *   asn1_decode_snmp()        - Decode a SNMP packet.
  *   asn1_debug()              - Decode an ASN1-encoded message.
@@ -52,7 +53,6 @@
  *                               packed integer value.
  *   compare_cache()           - Compare two cache entries.
  *   debug_printf()            - Display some debugging information.
- *   do_request()              - Do a non-blocking IPP request.
  *   fix_make_model()          - Fix common problems in the make-and-model
  *                               string.
  *   free_array()              - Free an array of strings.
@@ -82,13 +82,15 @@
 #include "backend-private.h"
 #include <cups/array.h>
 #include <cups/file.h>
+#include <regex.h>
 
 
 /*
  * This backend implements SNMP printer discovery.  It uses a broadcast-
- * based approach to get SNMP response packets from potential printers
- * and then interrogates each responder by trying to connect on port
- * 631, 9100, and 515.
+ * based approach to get SNMP response packets from potential printers,
+ * tries a mDNS lookup (Mac OS X only at present), a URI lookup based on
+ * the device description string, and finally a probe of port 9100
+ * (AppSocket) and 515 (LPD).
  *
  * The current focus is on printers with internal network cards, although
  * the code also works with many external print servers as well.  Future
@@ -104,8 +106,10 @@
  *     Address @IF(name)
  *     Community name
  *     DebugLevel N
+ *     DeviceURI "regex pattern" uri
  *     HostNameLookups on
  *     HostNameLookups off
+ *     MaxRunTime N
  *
  * The default is to use:
  *
@@ -113,6 +117,7 @@
  *     Community public
  *     DebugLevel 0
  *     HostNameLookups off
+ *     MaxRunTime 10
  *
  * This backend is known to work with the following network printers and
  * print servers:
@@ -162,6 +167,12 @@
  * Types...
  */
 
+typedef struct device_uri_s		/**** DeviceURI values ****/
+{
+  regex_t	re;			/* Regular expression to match */
+  cups_array_t	*uris;			/* URIs */
+} device_uri_t;
+
 typedef struct snmp_cache_s		/**** SNMP scan cache ****/
 {
   http_addr_t	address;		/* Address of device */
@@ -209,6 +220,7 @@ static char		*add_array(cups_array_t *a, const char *s);
 static void		add_cache(http_addr_t *addr, const char *addrname,
 			          const char *uri, const char *id,
 				  const char *make_and_model);
+static device_uri_t	*add_device_uri(char *value);
 static void		alarm_handler(int sig);
 static int		asn1_decode_snmp(unsigned char *buffer, size_t len,
 			                 snmp_packet_t *packet);
@@ -246,8 +258,6 @@ static int		asn1_size_oid(const int *oid);
 static int		asn1_size_packed(int integer);
 static int		compare_cache(snmp_cache_t *a, snmp_cache_t *b);
 static void		debug_printf(const char *format, ...);
-static ipp_t		*do_request(http_t *http, ipp_t *request,
-			            const char *resource);
 static void		fix_make_model(char *make_model,
 			               const char *old_make_model,
 				       int make_model_size);
@@ -281,12 +291,13 @@ static cups_array_t	*Addresses = NULL;
 static cups_array_t	*Communities = NULL;
 static cups_array_t	*Devices = NULL;
 static int		DebugLevel = 0;
-static int		DeviceTypeOID[] = { 1, 3, 6, 1, 2, 1, 25, 3,
-			                    2, 1, 2, 1, 0 };
 static int		DeviceDescOID[] = { 1, 3, 6, 1, 2, 1, 25, 3,
 			                    2, 1, 3, 1, 0 };
-static unsigned		DeviceTypeRequest;
 static unsigned		DeviceDescRequest;
+static int		DeviceTypeOID[] = { 1, 3, 6, 1, 2, 1, 25, 3,
+			                    2, 1, 2, 1, 0 };
+static unsigned		DeviceTypeRequest;
+static cups_array_t	*DeviceURIs = NULL;
 static int		HostNameLookups = 0;
 static int		MaxRunTime = 10;
 static struct timeval	StartTime;
@@ -430,6 +441,96 @@ add_cache(http_addr_t *addr,		/* I - Device IP address */
 
   if (uri)
     list_device(temp);
+}
+
+
+/*
+ * 'add_device_uri()' - Add a device URI to the cache.
+ *
+ * The value string is modified (chopped up) as needed.
+ */
+
+static device_uri_t *			/* O - Device URI */
+add_device_uri(char *value)		/* I - Value from snmp.conf */
+{
+  device_uri_t	*device_uri;		/* Device URI */
+  char		*start;			/* Start of value */
+
+
+ /*
+  * Allocate memory as needed...
+  */
+
+  if (!DeviceURIs)
+    DeviceURIs = cupsArrayNew(NULL, NULL);
+
+  if (!DeviceURIs)
+    return (NULL);
+
+  if ((device_uri = calloc(1, sizeof(device_uri_t))) == NULL)
+    return (NULL);
+
+  if ((device_uri->uris = cupsArrayNew(NULL, NULL)) == NULL)
+  {
+    free(device_uri);
+    return (NULL);
+  }
+
+ /*
+  * Scan the value string for the regular expression and URI(s)...
+  */
+
+  value ++; /* Skip leading " */
+
+  for (start = value; *value && *value != '\"'; value ++)
+    if (*value == '\\' && value[1])
+      _cups_strcpy(value, value + 1);
+
+  if (!*value)
+  {
+    fputs("ERROR: Missing end quote for DeviceURI!\n", stderr);
+
+    cupsArrayDelete(device_uri->uris);
+    free(device_uri);
+
+    return (NULL);
+  }
+
+  *value++ = '\0';
+
+  if (regcomp(&(device_uri->re), start, REG_EXTENDED | REG_ICASE))
+  {
+    fputs("ERROR: Bad regular expression for DeviceURI!\n", stderr);
+
+    cupsArrayDelete(device_uri->uris);
+    free(device_uri);
+
+    return (NULL);
+  }
+
+  while (*value)
+  {
+    while (isspace(*value & 255))
+      value ++;
+
+    if (!*value)
+      break;
+
+    for (start = value; *value && !isspace(*value & 255); value ++);
+
+    if (*value)
+      *value++ = '\0';
+
+    cupsArrayAdd(device_uri->uris, strdup(start));
+  }
+
+ /*
+  * Add the device URI to the list and return it...
+  */
+
+  cupsArrayAdd(DeviceURIs, device_uri);
+
+  return (device_uri);
 }
 
 
@@ -1260,173 +1361,6 @@ debug_printf(const char *format,	/* I - Printf-style format string */
 
 
 /*
- * 'do_request()' - Do a non-blocking IPP request.
- */
-
-static ipp_t *				/* O - Response data or NULL */
-do_request(http_t     *http,		/* I - HTTP connection to server */
-           ipp_t      *request,		/* I - IPP request */
-           const char *resource)	/* I - HTTP resource for POST */
-{
-  ipp_t		*response;		/* IPP response data */
-  http_status_t	status;			/* Status of HTTP request */
-  ipp_state_t	state;			/* State of IPP processing */
-
-
- /*
-  * Setup the HTTP variables needed...
-  */
-
-  httpClearFields(http);
-  httpSetLength(http, ippLength(request));
-  httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-
- /*
-  * Do the POST request...
-  */
-
-  debug_printf("DEBUG: %.3f POST %s...\n", run_time(), resource);
-
-  if (httpPost(http, resource))
-  {
-    if (httpReconnect(http))
-    {
-      _cupsSetError(IPP_DEVICE_ERROR, "Unable to reconnect");
-      return (NULL);
-    }
-    else if (httpPost(http, resource))
-    {
-      _cupsSetError(IPP_GONE, "Unable to POST");
-      return (NULL);
-    }
-  }
-
- /*
-  * Send the IPP data...
-  */
-
-  request->state = IPP_IDLE;
-  status         = HTTP_CONTINUE;
-
-  while ((state = ippWrite(http, request)) != IPP_DATA)
-    if (state == IPP_ERROR)
-    {
-      status = HTTP_ERROR;
-      break;
-    }
-    else if (httpCheck(http))
-    {
-      if ((status = httpUpdate(http)) != HTTP_CONTINUE)
-	break;
-    }
-
- /*
-  * Get the server's return status...
-  */
-
-  debug_printf("DEBUG: %.3f Getting response...\n", run_time());
-
-  while (status == HTTP_CONTINUE)
-    if (httpWait(http, 1000))
-      status = httpUpdate(http);
-    else
-    {
-      status      = HTTP_ERROR;
-      http->error = ETIMEDOUT;
-    }
-
-  if (status != HTTP_OK)
-  {
-   /*
-    * Flush any error message...
-    */
-
-    httpFlush(http);
-    response = NULL;
-  }
-  else
-  {
-   /*
-    * Read the response...
-    */
-
-    response = ippNew();
-
-    while ((state = ippRead(http, response)) != IPP_DATA)
-      if (state == IPP_ERROR)
-      {
-       /*
-        * Delete the response...
-	*/
-
-	ippDelete(response);
-	response = NULL;
-
-        _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
-	break;
-      }
-  }
-
- /*
-  * Delete the original request and return the response...
-  */
-  
-  ippDelete(request);
-
-  if (response)
-  {
-    ipp_attribute_t	*attr;		/* status-message attribute */
-
-
-    attr = ippFindAttribute(response, "status-message", IPP_TAG_TEXT);
-
-    _cupsSetError(response->request.status.status_code,
-                   attr ? attr->values[0].string.text :
-		       ippErrorString(response->request.status.status_code));
-  }
-  else if (status != HTTP_OK)
-  {
-    switch (status)
-    {
-      case HTTP_NOT_FOUND :
-          _cupsSetError(IPP_NOT_FOUND, httpStatus(status));
-	  break;
-
-      case HTTP_UNAUTHORIZED :
-          _cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status));
-	  break;
-
-      case HTTP_FORBIDDEN :
-          _cupsSetError(IPP_FORBIDDEN, httpStatus(status));
-	  break;
-
-      case HTTP_BAD_REQUEST :
-          _cupsSetError(IPP_BAD_REQUEST, httpStatus(status));
-	  break;
-
-      case HTTP_REQUEST_TOO_LARGE :
-          _cupsSetError(IPP_REQUEST_VALUE, httpStatus(status));
-	  break;
-
-      case HTTP_NOT_IMPLEMENTED :
-          _cupsSetError(IPP_OPERATION_NOT_SUPPORTED, httpStatus(status));
-	  break;
-
-      case HTTP_NOT_SUPPORTED :
-          _cupsSetError(IPP_VERSION_NOT_SUPPORTED, httpStatus(status));
-	  break;
-
-      default :
-	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status));
-	  break;
-    }
-  }
-
-  return (response);
-}
-
-
-/*
  * 'fix_make_model()' - Fix common problems in the make-and-model string.
  */
 
@@ -1718,216 +1652,67 @@ password_cb(const char *prompt)		/* I - Prompt message */
 static void
 probe_device(snmp_cache_t *device)	/* I - Device */
 {
-  int		i, j;			/* Looping vars */
-  http_t	*http;			/* HTTP connection for IPP */
-  char		uri[1024];		/* Full device URI */
+  char		uri[1024],		/* Full device URI */
+		*uriptr,		/* Pointer into URI */
+		*format;		/* Format string for device */
+  device_uri_t	*device_uri;		/* Current DeviceURI match */
 
-
- /*
-  * Try connecting via IPP first...
-  */
 
   debug_printf("DEBUG: %.3f Probing %s...\n", run_time(), device->addrname);
 
-  if (device->make_and_model &&
-      (!strncasecmp(device->make_and_model, "Epson", 5) ||
-       !strncasecmp(device->make_and_model, "HP ", 3) ||
-       !strncasecmp(device->make_and_model, "Hewlett", 7) ||
-       !strncasecmp(device->make_and_model, "Kyocera", 7) ||
-       !strncasecmp(device->make_and_model, "Lexmark", 7) ||
-       !strncasecmp(device->make_and_model, "Tektronix", 9) ||
-       !strncasecmp(device->make_and_model, "Xerox", 5)))
+#ifdef __APPLE__
+ /*
+  * TODO: Try an mDNS query first, and then fallback on direct probes...
+  */
+
+  if (!try_connect(&(device->address), device->addrname, 5353))
   {
-   /*
-    * Epson, HP, Kyocera, Lexmark, Tektronix, and Xerox printers often lock
-    * up on IPP probes, so exclude them from the IPP connection test...
-    */
-
-    http = NULL;
+    debug_printf("DEBUG: %s supports mDNS, not reporting!\n", device->addrname);
+    return;
   }
-  else
-  {
-   /*
-    * Otherwise, try connecting for up to 1 second...
-    */
-
-    alarm(1);
-    http = httpConnect(device->addrname, 631);
-    alarm(0);
-  }
-
-  if (http)
-  {
-   /*
-    * IPP is supported...
-    */
-
-    ipp_t		*request,	/* IPP request */
-			*response;	/* IPP response */
-    ipp_attribute_t	*model,		/* printer-make-and-model attribute */
-			*info,		/* printer-info attribute */
-			*supported;	/* printer-uri-supported attribute */
-    char		make_model[256],/* Make and model string to use */
-			temp[256];	/* Temporary make/model string */
-    int			num_uris;	/* Number of good URIs */
-    static const char * const resources[] =
-			{		/* Common resource paths for IPP */
-			  "/ipp",
-			  /*"/ipp/port2",*/
-			  /*"/ipp/port3",*/
-			  /*"/EPSON_IPP_Printer",*/
-			  "/LPT1",
-			  "/LPT2",
-			  "/COM1",
-			  "/"
-			};
-
-
-   /*
-    * Use non-blocking IO...
-    */
-
-    httpBlocking(http, 0);
-
-   /*
-    * Loop through a list of common resources that covers 99% of the
-    * IPP-capable printers on the market today...
-    */
-
-    for (i = 0, num_uris = 0;
-         i < (int)(sizeof(resources) / sizeof(resources[0]));
-         i ++)
-    {
-     /*
-      * Stop early if we are out of time...
-      */
-
-      if (MaxRunTime > 0 && run_time() >= MaxRunTime)
-        break;
-
-     /*
-      * Don't look past /ipp if we have found a working URI...
-      */
-
-      if (num_uris > 0 && strncmp(resources[i], "/ipp", 4))
-        break;
-
-      httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                      device->addrname, 631, resources[i]);
-
-      request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                   NULL, uri);
-
-      response = do_request(http, request, resources[i]);
-
-      debug_printf("DEBUG: %.3f %s %s (%s)\n", run_time(), uri,
-        	   ippErrorString(cupsLastError()), cupsLastErrorString());
-
-      if (response && response->request.status.status_code == IPP_OK)
-      {
-        model     = ippFindAttribute(response, "printer-make-and-model",
-	                             IPP_TAG_TEXT);
-        info      = ippFindAttribute(response, "printer-info", IPP_TAG_TEXT);
-        supported = ippFindAttribute(response, "printer-uri-supported",
-	                             IPP_TAG_URI);
-
-        if (!supported)
-	{
-	  fprintf(stderr, "ERROR: Missing printer-uri-supported from %s!\n",
-	          device->addrname);
-
-	  httpClose(http);
-	  return;
-	}
-
-        debug_printf("DEBUG: printer-info=\"%s\"\n",
-	             info ? info->values[0].string.text : "(null)");
-        debug_printf("DEBUG: printer-make-and-model=\"%s\"\n",
-	             model ? model->values[0].string.text : "(null)");
-
-       /*
-        * Don't advertise this port if the printer actually only supports
-	* a more generic version...
-	*/
-
-        if (!strncmp(resources[i], "/ipp/", 5))
-	{
-	  for (j = 0; j < supported->num_values; j ++)
-	    if (strstr(supported->values[j].string.text, "/ipp/"))
-	      break;
-
-	  if (j >= supported->num_values)
-	  {
-	    ippDelete(response);
-	    break;
-	  }
-        }
-
-       /*
-        * Don't use the printer-info attribute if it does not contain the
-	* IEEE-1284 device ID data...
-	*/
-
-        if (info &&
-	    (!strchr(info->values[0].string.text, ':') ||
-	     !strchr(info->values[0].string.text, ';')))
- 	  info = NULL;
-
-       /*
-        * Don't use the printer-make-and-model if it contains a generic
-	* string like "Ricoh IPP Printer"...
-	*/
-
-	if (model && strstr(model->values[0].string.text, "IPP Printer"))
-	  model = NULL;
-
-       /*
-        * If we don't have a printer-make-and-model string from the printer
-	* but do have the 1284 device ID string, generate a make-and-model
-	* string from the device ID info...
-	*/
-
-	if (model)
-          strlcpy(temp, model->values[0].string.text, sizeof(temp));
-	else if (info)
-	  backendGetMakeModel(info->values[0].string.text, temp, sizeof(temp));
-        else
-	  temp[0] = '\0';
-
-        fix_make_model(make_model, temp, sizeof(make_model));
-
-       /*
-        * Update the current device or add a new printer to the cache...
-	*/
-
-        if (num_uris == 0)
-	  update_cache(device, uri, 
-	               info ? info->values[0].string.text : NULL,
-	               make_model[0] ? make_model : NULL);
-	else
-          add_cache(&(device->address), device->addrname, uri,
-	            info ? info->values[0].string.text : NULL,
-	            make_model[0] ? make_model : NULL);
-
-        num_uris ++;
-      }
-
-      ippDelete(response);
-
-      if (num_uris > 0 && cupsLastError() != IPP_OK)
-        break;
-    }
-
-    httpClose(http);
-
-    if (num_uris > 0)
-      return;
-  }
+#endif /* __APPLE__ */
 
  /*
-  * OK, now try the standard ports...
+  * Lookup the device in the match table...
+  */
+
+  for (device_uri = (device_uri_t *)cupsArrayFirst(DeviceURIs);
+       device_uri;
+       device_uri = (device_uri_t *)cupsArrayNext(DeviceURIs))
+    if (!regexec(&(device_uri->re), device->make_and_model, 0, NULL, 0))
+    {
+     /*
+      * Found a match, add the URIs...
+      */
+
+      for (format = (char *)cupsArrayFirst(device_uri->uris);
+           format;
+	   format = (char *)cupsArrayNext(device_uri->uris))
+      {
+        for (uriptr = uri; *format && uriptr < (uri + sizeof(uri) - 1);)
+	  if (*format == '%' && format[1] == 's')
+	  {
+	   /*
+	    * Insert hostname/address...
+	    */
+
+	    strlcpy(uriptr, device->addrname, sizeof(uri) - (uriptr - uri));
+	    uriptr += strlen(uriptr);
+	    format += 2;
+	  }
+	  else
+	    *uriptr++ = *format++;
+
+        *uriptr = '\0';
+
+        update_cache(device, uri, NULL, NULL);
+      }
+
+      return;
+    }
+
+ /*
+  * Then try the standard ports...
   */
 
   if (!try_connect(&(device->address), device->addrname, 9100))
@@ -2011,6 +1796,15 @@ read_snmp_conf(const char *address)	/* I - Single address to probe */
         add_array(Communities, value);
       else if (!strcasecmp(line, "DebugLevel"))
         DebugLevel = atoi(value);
+      else if (!strcasecmp(line, "DeviceURI"))
+      {
+        if (*value != '\"')
+	  fprintf(stderr,
+	          "ERROR: Missing double quote for regular expression on "
+		  "line %d of %s!\n", linenum, filename);
+        else
+	  add_device_uri(value);
+      }
       else if (!strcasecmp(line, "HostNameLookups"))
         HostNameLookups = !strcasecmp(value, "on") ||
 	                  !strcasecmp(value, "yes") ||
