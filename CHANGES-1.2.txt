@@ -3,6 +3,14 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.11
 
+	- "make distclean" didn't remove all generated files
+	  (STR #2366)
+	- Fixed a bug in the advertisement of classes (STR
+	  #2373)
+	- The IPP backend now stays running until the job is
+	  actually printed by the remote server; previously
+	  it would stop monitoring the job if it was held or
+	  temporarily stopped (STR #2352)
         - PDF files were not always printed using the correct
           orientation (STR #2348)
         - The scheduler could crash if you specified a bad file:
