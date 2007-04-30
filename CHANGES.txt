@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
 	  STR #2356)
+	- backendRunLoop() now aborts immediately on SIGTERM
+	  if no data has been written yet (STR #2103)
 	- Due to poor IPP support from the vendors, the SNMP
 	  backend no longer tries IPP connections; instead,
 	  it now uses a lookup file with fallback to port 9100

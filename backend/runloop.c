@@ -137,6 +137,12 @@ backendRunLoop(
 	  fputs(_("INFO: Printer is currently off-line.\n"), stderr);
 	  offline = 1;
 	}
+	else if (errno == EINTR && total_bytes == 0)
+	{
+	  fputs("DEBUG: Received an interrupt before any bytes were "
+	        "written, aborting!\n", stderr);
+          return (0);
+	}
 
 	sleep(1);
 	continue;
