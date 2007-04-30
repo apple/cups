@@ -1159,8 +1159,7 @@ main(int  argc,				/* I - Number of command-line args */
           * Stop polling if the job is finished or pending-held...
 	  */
 
-          if (job_state->values[0].integer > IPP_JOB_PROCESSING ||
-	      job_state->values[0].integer == IPP_JOB_HELD)
+          if (job_state->values[0].integer > IPP_JOB_STOPPED)
 	  {
 	    if ((job_sheets = ippFindAttribute(response, 
 	                                       "job-media-sheets-completed",
@@ -1356,7 +1355,8 @@ compress_files(int  num_files,		/* I - Number of files */
     if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
     {
       fprintf(stderr,
-              _("ERROR: Unable to create temporary compressed print file: %s\n"),
+              _("ERROR: Unable to create temporary compressed print file: "
+	        "%s\n"),
 	      strerror(errno));
       exit(CUPS_BACKEND_FAILED);
     }
