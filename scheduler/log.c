@@ -3,7 +3,7 @@
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -546,10 +546,23 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
     if ((*lf = cupsFileOpen(filename, "a")) == NULL)
     {
-      syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
-             strerror(errno));
+     /*
+      * If the file is in CUPS_LOGDIR then try to create a missing directory...
+      */
 
-      return (0);
+      if (!strncmp(filename, CUPS_LOGDIR, strlen(CUPS_LOGDIR)))
+      {
+        cupsdCheckPermissions(CUPS_LOGDIR, NULL, 0755, RunUser, Group, 1, 1);
+
+        *lf = cupsFileOpen(filename, "a");
+      }
+
+      if (*lf == NULL)
+      {
+	syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
+	       strerror(errno));
+	return (0);
+      }
     }
 
     if (strncmp(filename, "/dev/", 5))

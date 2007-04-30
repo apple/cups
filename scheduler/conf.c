@@ -23,9 +23,9 @@
  *
  * Contents:
  *
- *   cupsdReadConfiguration() - Read the cupsd.conf file.
- *   check_permissions()      - Fix the mode and ownership of a file or
+ *   cupsdCheckPermissions()  - Fix the mode and ownership of a file or
  *                              directory.
+ *   cupsdReadConfiguration() - Read the cupsd.conf file.
  *   get_address()            - Get an address + port number from a line.
  *   get_addr_and_mask()      - Get an IP address and netmask.
  *   parse_aaa()              - Parse authentication, authorization, and
@@ -197,10 +197,6 @@ static unsigned		zeros[4] =
 /*
  * Local functions...
  */
-static int		check_permissions(const char *filename,
-			                  const char *suffix, int mode,
-					  int user, int group, int is_dir,
-					  int create_dir);
 static http_addrlist_t	*get_address(const char *value, int defport);
 static int		get_addr_and_mask(const char *value, unsigned *ip,
 			                  unsigned *mask);
@@ -211,6 +207,115 @@ static int		parse_protocols(const char *s);
 static int		read_configuration(cups_file_t *fp);
 static int		read_location(cups_file_t *fp, char *name, int linenum);
 static int		read_policy(cups_file_t *fp, char *name, int linenum);
+
+
+/*
+ * 'cupsdCheckPermissions()' - Fix the mode and ownership of a file or directory.
+ */
+
+int					/* O - 0 on success, -1 on error, 1 on warning */
+cupsdCheckPermissions(
+    const char *filename,		/* I - File/directory name */
+    const char *suffix,			/* I - Additional file/directory name */
+    int        mode,			/* I - Permissions */
+    int        user,			/* I - Owner */
+    int        group,			/* I - Group */
+    int        is_dir,			/* I - 1 = directory, 0 = file */
+    int        create_dir)		/* I - 1 = create directory, 0 = not */
+{
+  int		dir_created = 0;	/* Did we create a directory? */
+  char		pathname[1024];		/* File name with prefix */
+  struct stat	fileinfo;		/* Stat buffer */
+
+
+ /*
+  * Prepend the given root to the filename before testing it...
+  */
+
+  if (suffix)
+  {
+    snprintf(pathname, sizeof(pathname), "%s/%s", filename, suffix);
+    filename = pathname;
+  }
+
+ /*
+  * See if we can stat the file/directory...
+  */
+
+  if (stat(filename, &fileinfo))
+  {
+    if (errno == ENOENT && create_dir)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Creating missing directory \"%s\"",
+                      filename);
+
+      if (mkdir(filename, mode))
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to create directory \"%s\" - %s", filename,
+		        strerror(errno));
+        return (-1);
+      }
+
+      dir_created = 1;
+    }
+    else
+      return (create_dir ? -1 : 1);
+  }
+
+ /*
+  * Make sure it's a regular file...
+  */
+
+  if (!dir_created && !is_dir && !S_ISREG(fileinfo.st_mode))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a regular file!", filename);
+    return (-1);
+  }
+
+  if (!dir_created && is_dir && !S_ISDIR(fileinfo.st_mode))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a directory!", filename);
+    return (-1);
+  }
+
+ /*
+  * Fix owner, group, and mode as needed...
+  */
+
+  if (dir_created || fileinfo.st_uid != user || fileinfo.st_gid != group)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing ownership of \"%s\"", filename);
+
+    if (chown(filename, user, group) && !getuid())
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to change ownership of \"%s\" - %s", filename,
+		      strerror(errno));
+      return (1);
+    }
+  }
+
+  if (dir_created || (fileinfo.st_mode & 07777) != mode)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing access permissions of \"%s\"",
+                    filename);
+
+    if (chmod(filename, mode))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to change permissions of \"%s\" - %s", filename,
+		      strerror(errno));
+      return (1);
+    }
+  }
+
+ /*
+  * Everything is OK...
+  */
+
+  return (0);
+}
 
 
 /*
@@ -658,20 +763,28 @@ cupsdReadConfiguration(void)
   * writable by the user and group in the cupsd.conf file...
   */
 
-  if (check_permissions(CacheDir, NULL, 0775, RunUser, Group, 1, 1) < 0 ||
-      check_permissions(StateDir, NULL, 0755, RunUser, Group, 1, 1) < 0 ||
-      check_permissions(StateDir, "certs", RunUser ? 0711 : 0511, User,
-                	SystemGroupIDs[0], 1, 1) < 0 ||
-      check_permissions(ServerRoot, NULL, 0755, RunUser, Group, 1, 0) < 0 ||
-      check_permissions(ServerRoot, "ppd", 0755, RunUser, Group, 1, 1) < 0 ||
-      check_permissions(ServerRoot, "ssl", 0700, RunUser, Group, 1, 0) < 0 ||
-      check_permissions(ServerRoot, "cupsd.conf", ConfigFilePerm, RunUser,
-                        Group, 0, 0) < 0 ||
-      check_permissions(ServerRoot, "classes.conf", 0600, RunUser, Group,
-                        0, 0) < 0 ||
-      check_permissions(ServerRoot, "printers.conf", 0600, RunUser, Group,
-                        0, 0) < 0 ||
-      check_permissions(ServerRoot, "passwd.md5", 0600, User, Group, 0, 0) < 0)
+  if (cupsdCheckPermissions(RequestRoot, NULL, 0710, RunUser,
+			    Group, 1, 1) < 0 ||
+      cupsdCheckPermissions(CacheDir, NULL, 0775, RunUser,
+			    Group, 1, 1) < 0 ||
+      cupsdCheckPermissions(StateDir, NULL, 0755, RunUser,
+			    Group, 1, 1) < 0 ||
+      cupsdCheckPermissions(StateDir, "certs", RunUser ? 0711 : 0511, User,
+			    SystemGroupIDs[0], 1, 1) < 0 ||
+      cupsdCheckPermissions(ServerRoot, NULL, 0755, RunUser, 
+			    Group, 1, 0) < 0 ||
+      cupsdCheckPermissions(ServerRoot, "ppd", 0755, RunUser,
+			    Group, 1, 1) < 0 ||
+      cupsdCheckPermissions(ServerRoot, "ssl", 0700, RunUser,
+			    Group, 1, 0) < 0 ||
+      cupsdCheckPermissions(ServerRoot, "cupsd.conf", ConfigFilePerm, RunUser,
+			    Group, 0, 0) < 0 ||
+      cupsdCheckPermissions(ServerRoot, "classes.conf", 0600, RunUser,
+			    Group, 0, 0) < 0 ||
+      cupsdCheckPermissions(ServerRoot, "printers.conf", 0600, RunUser,
+			    Group, 0, 0) < 0 ||
+      cupsdCheckPermissions(ServerRoot, "passwd.md5", 0600, User,
+			    Group, 0, 0) < 0)
     return (0);
 
  /*
@@ -710,12 +823,8 @@ cupsdReadConfiguration(void)
   }
 
  /*
-  * Make sure the request and temporary directories have the right
-  * permissions...
+  * Make sure the temporary directory has the right permissions...
   */
-
-  if (check_permissions(RequestRoot, NULL, 0710, RunUser, Group, 1, 1) < 0)
-    return (0);
 
   if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)) ||
       access(TempDir, 0))
@@ -725,7 +834,7 @@ cupsdReadConfiguration(void)
     * is under the spool directory or does not exist...
     */
 
-    if (check_permissions(TempDir, NULL, 01770, RunUser, Group, 1, 1) < 0)
+    if (cupsdCheckPermissions(TempDir, NULL, 01770, RunUser, Group, 1, 1) < 0)
       return (0);
   }
 
@@ -1129,114 +1238,6 @@ cupsdReadConfiguration(void)
   cupsdClearString(&old_requestroot);
 
   return (1);
-}
-
-
-/*
- * 'check_permissions()' - Fix the mode and ownership of a file or directory.
- */
-
-static int				/* O - 0 on success, -1 on error, 1 on warning */
-check_permissions(const char *filename,	/* I - File/directory name */
-                  const char *suffix,	/* I - Additional file/directory name */
-                  int        mode,	/* I - Permissions */
-		  int        user,	/* I - Owner */
-		  int        group,	/* I - Group */
-		  int        is_dir,	/* I - 1 = directory, 0 = file */
-		  int        create_dir)/* I - 1 = create directory, 0 = not */
-{
-  int		dir_created = 0;	/* Did we create a directory? */
-  char		pathname[1024];		/* File name with prefix */
-  struct stat	fileinfo;		/* Stat buffer */
-
-
- /*
-  * Prepend the given root to the filename before testing it...
-  */
-
-  if (suffix)
-  {
-    snprintf(pathname, sizeof(pathname), "%s/%s", filename, suffix);
-    filename = pathname;
-  }
-
- /*
-  * See if we can stat the file/directory...
-  */
-
-  if (stat(filename, &fileinfo))
-  {
-    if (errno == ENOENT && create_dir)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "Creating missing directory \"%s\"",
-                      filename);
-
-      if (mkdir(filename, mode))
-      {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to create directory \"%s\" - %s", filename,
-		        strerror(errno));
-        return (-1);
-      }
-
-      dir_created = 1;
-    }
-    else
-      return (create_dir ? -1 : 1);
-  }
-
- /*
-  * Make sure it's a regular file...
-  */
-
-  if (!dir_created && !is_dir && !S_ISREG(fileinfo.st_mode))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a regular file!", filename);
-    return (-1);
-  }
-
-  if (!dir_created && is_dir && !S_ISDIR(fileinfo.st_mode))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a directory!", filename);
-    return (-1);
-  }
-
- /*
-  * Fix owner, group, and mode as needed...
-  */
-
-  if (dir_created || fileinfo.st_uid != user || fileinfo.st_gid != group)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing ownership of \"%s\"", filename);
-
-    if (chown(filename, user, group) && !getuid())
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to change ownership of \"%s\" - %s", filename,
-		      strerror(errno));
-      return (1);
-    }
-  }
-
-  if (dir_created || (fileinfo.st_mode & 07777) != mode)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Repairing access permissions of \"%s\"",
-                    filename);
-
-    if (chmod(filename, mode))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to change permissions of \"%s\" - %s", filename,
-		      strerror(errno));
-      return (1);
-    }
-  }
-
- /*
-  * Everything is OK...
-  */
-
-  return (0);
 }
 
 
