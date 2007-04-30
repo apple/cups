@@ -73,6 +73,10 @@
 #    endif /* !HAVE_GSS_C_NT_HOSTBASED_SERVICE */
 #  endif /* HAVE_GSSAPI */
 
+#  ifdef HAVE_AUTHORIZATION_H
+#    include <Security/Authorization.h>
+#  endif /* HAVE_AUTHORIZATION_H */
+
 #  if defined(__sgi) || (defined(__APPLE__) && !defined(_SOCKLEN_T))
 /*
  * IRIX and MacOS X 10.2.x do not define socklen_t, and in fact use an int instead of
@@ -193,6 +197,9 @@ struct _http_s				/**** HTTP connection structure. ****/
   gss_ctx_id_t		gssctx;		/* Authentication context @since CUPS 1.3@ */
   gss_name_t		gssname;	/* Authentication server name @since CUPS 1.3@ */
 #  endif /* HAVE_GSSAPI */
+#  ifdef HAVE_AUTHORIZATION_H
+  AuthorizationRef	auth_ref;	/* Authorization ref */
+#  endif /* HAVE_AUTHORIZATION_H */
 };
 
 

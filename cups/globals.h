@@ -40,10 +40,6 @@
 #    include <pthread.h>
 #  endif /* HAVE_PTHREAD_H */
 
-#  ifdef HAVE_AUTHORIZATION_H
-#    include <Security/Authorization.h>
-#  endif /* HAVE_AUTHORIZATION_H */
-
 
 /*
  * C++ magic...
@@ -130,11 +126,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 					/* Default printer */
   char			ppd_filename[HTTP_MAX_URI];
 					/* PPD filename */
-
-#ifdef HAVE_AUTHORIZATION_H
-  /* auth.c */
-  AuthorizationRef	auth_ref;	/* Authorization ref */
-#endif /* HAVE_AUTHORIZATION_H */
 } _cups_globals_t;
 
 

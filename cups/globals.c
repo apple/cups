@@ -180,11 +180,6 @@ globals_destructor(void *value)		/* I - Data to free */
 
   cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
 
-#ifdef HAVE_AUTHORIZATION_H
-  if (cg->auth_ref)
-    AuthorizationFree(cg->auth_ref, kAuthorizationFlagDefaults);
-#endif /* HAVE_AUTHORIZATION_H */
-
   free(value);
 }
 

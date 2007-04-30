@@ -335,6 +335,11 @@ httpClose(http_t *http)			/* I - HTTP connection */
     major_status = gss_release_name(&minor_status, &http->gssname);
 #endif /* HAVE_GSSAPI */
 
+#ifdef HAVE_AUTHORIZATION_H
+  if (http->auth_ref)
+    AuthorizationFree(http->auth_ref, kAuthorizationFlagDefaults);
+#endif /* HAVE_AUTHORIZATION_H */
+
   httpClearFields(http);
 
   if (http->authstring && http->authstring != http->_authstring)
@@ -2574,10 +2579,12 @@ http_send(http_t       *http,	/* I - HTTP connection */
   httpClearFields(http);
 
  /*
-  * The Kerberos authentication string can only be used once...
+  * The Kerberos and AuthRef authentication strings can only be used once...
   */
 
-  if (http->authstring && !strncmp(http->authstring, "Negotiate", 9))
+  if (http->authstring && 
+      (!strncmp(http->authstring, "Negotiate", 9) || 
+       !strncmp(http->authstring, "AuthRef", 7)))
   {
     http->_authstring[0] = '\0';
 
