@@ -80,6 +80,32 @@ messages. Level 3 adds a hex dump of the network data.</P>
 
 <P>The default setting is <VAR>0</VAR>.</P>
 
+<H2 CLASS="title"><A NAME="DeviceURI">DeviceURI</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+DeviceURI "HP.*JetDirect.*" socket://%s:9100 socket://%s:9101 socket://%s:9102
+DeviceURI "HP.*" socket://%s
+DeviceURI "Acme.*Laser.*" lpd://%s/print
+DeviceURI "Xerox.*"
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>DeviceURI</CODE> directive specifies a regular expression
+(enclosed in double quotes) that is matched against the SNMP device
+description OID returned by a printer. If the description matches the
+regular expression, each device URI that follows the regular expression
+is listed by the backend, with any occurrences of <CODE>%s</CODE>
+replaced by the device's hostname or IP address. If no URIs are listed,
+the device is ignored.</P>
+
+<P>The <CODE>DeviceURI</CODE> directives are processed serially in
+the order specified in the <VAR>snmp.conf</VAR> file until a match
+is found.</P>
+
+
 <H2 CLASS="title"><A NAME="HostNameLookups">HostNameLookups</A></H2>
 
 <H3>Examples</H3>
