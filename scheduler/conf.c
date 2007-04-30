@@ -221,7 +221,7 @@ cupsdCheckPermissions(
     int        user,			/* I - Owner */
     int        group,			/* I - Group */
     int        is_dir,			/* I - 1 = directory, 0 = file */
-    int        create_dir)		/* I - 1 = create directory, 0 = not */
+    int        create_dir)		/* I - 1 = create directory, -1 = create w/o logging, 0 = not */
 {
   int		dir_created = 0;	/* Did we create a directory? */
   char		pathname[1024];		/* File name with prefix */
@@ -246,14 +246,20 @@ cupsdCheckPermissions(
   {
     if (errno == ENOENT && create_dir)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "Creating missing directory \"%s\"",
-                      filename);
+      if (create_dir > 0)
+	cupsdLogMessage(CUPSD_LOG_DEBUG, "Creating missing directory \"%s\"",
+			filename);
 
       if (mkdir(filename, mode))
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to create directory \"%s\" - %s", filename,
-		        strerror(errno));
+        if (create_dir > 0)
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Unable to create directory \"%s\" - %s", filename,
+			  strerror(errno));
+        else
+	  syslog(LOG_ERR, "Unable to create directory \"%s\" - %s", filename,
+		 strerror(errno));
+
         return (-1);
       }
 

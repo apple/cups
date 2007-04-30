@@ -552,7 +552,7 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
       if (!strncmp(filename, CUPS_LOGDIR, strlen(CUPS_LOGDIR)))
       {
-        cupsdCheckPermissions(CUPS_LOGDIR, NULL, 0755, RunUser, Group, 1, 1);
+        cupsdCheckPermissions(CUPS_LOGDIR, NULL, 0755, RunUser, Group, 1, -1);
 
         *lf = cupsFileOpen(filename, "a");
       }
