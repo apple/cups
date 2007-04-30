@@ -77,8 +77,8 @@ AC_SUBST(UNINSTALL_LANGUAGES)
 
 AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh init/cups-lpd cups-config
 	  conf/cupsd.conf conf/pam.std doc/index.html
-	  doc/help/standard.html man/client.conf.man
-	  man/cups-deviced.man man/cups-driverd.man
+	  doc/help/ref-cupsd-conf.html doc/help/standard.html
+	  man/client.conf.man man/cups-deviced.man man/cups-driverd.man
 	  man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
 	  man/cupsd.conf.man man/lpoptions.man
 	  templates/edit-config.tmpl templates/header.tmpl

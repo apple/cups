@@ -64,7 +64,8 @@ clean:
 distclean:	clean
 	$(RM) Makedefs config.h config.log config.status
 	$(RM) cups-config conf/cupsd.conf conf/pam.std
-	$(RM) doc/help/standard.html doc/index.html
+	$(RM) doc/help/ref-cupsd-conf.html doc/help/standard.html
+	$(RM) doc/index.html
 	$(RM) init/cups.sh init/cups-lpd
 	$(RM) man/client.conf.man
 	$(RM) man/cups-deviced.man man/cups-driverd.man
