@@ -3,7 +3,10 @@ CHANGES.txt - 2007-04-25
 
 CHANGES IN CUPS V1.3
 
-	- Documentation updates (STR #1775, STR #2130, STR #2131)
+	- Documentation updates (STR #1775, STR #2130, STR #2131,
+	  STR #2356)
+	- cupsLangDefault() now maps new-style Apple locale names
+	  to the traditional ll_CC form (STR #2357)
         - Add new cupsArrayNew2() API to support hashed lookups
           of array elements (STR #2358)
         - ppdConflicts() optimizations (STR #2358)

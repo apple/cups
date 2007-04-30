@@ -984,6 +984,21 @@ _cupsMessageLookup(cups_array_t *a,	/* I - Message array */
  */
 
 #  ifdef HAVE_CF_LOCALE_ID
+
+typedef struct
+{
+  const char * const name;		/* Language name */
+  const char * const locale;		/* Locale name */
+} _apple_name_locale_t;
+
+static const _apple_name_locale_t apple_name_locale[] =
+{
+  { "en"	, "en_US" },
+  { "no"	, "nb"    },
+  { "zh-Hans"	, "zh_CN" },
+  { "zh-Hant"	, "zh_TW" }
+};
+
 /*
  * 'appleLangDefault()' - Get the default locale string.
  */
@@ -991,6 +1006,7 @@ _cupsMessageLookup(cups_array_t *a,	/* I - Message array */
 static const char *			/* O - Locale string */
 appleLangDefault(void)
 {
+  int			i;		/* Looping var */
   CFPropertyListRef 	localizationList;
 					/* List of localization data */
   CFStringRef		languageName;	/* Current name */
@@ -1033,9 +1049,30 @@ appleLangDefault(void)
 				 kCFStringEncodingASCII);
 	      CFRelease(localeName);
 
-	      if (!strcmp(cg->language, "en"))
-		strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
-	      else if (strchr(cg->language, '.') == NULL)
+	     /*
+	      * Map new language identifiers to locales...
+	      */
+
+	      for (i = 0;
+		   i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
+		   i++)
+	      {
+		if (!strcmp(cg->language, apple_name_locale[i].name))
+		{
+		  strlcpy(cg->language, apple_name_locale[i].locale, 
+			  sizeof(cg->language));
+		  break;
+		}
+	      }
+
+	     /*
+	      * Convert language subtag into region subtag...
+	      */
+
+	      if (cg->language[2] == '-')
+		cg->language[2] = '_';
+
+	      if (strchr(cg->language, '.') == NULL)
 		strlcat(cg->language, ".UTF-8", sizeof(cg->language));
 	    }
           }
