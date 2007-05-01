@@ -2562,7 +2562,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     con->file_ready = 0;
   }
 
-  if (con->response)
+  if (con->response && con->response->state != IPP_DATA)
   {
     ipp_state = ippWrite(HTTP(con), con->response);
     bytes     = ipp_state != IPP_ERROR && ipp_state != IPP_DATA;

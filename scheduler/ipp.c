@@ -65,6 +65,7 @@
  *   get_job_attrs()             - Get job attributes.
  *   get_jobs()                  - Get a list of jobs for the specified printer.
  *   get_notifications()         - Get events for a subscription.
+ *   get_ppd()                   - Get a named PPD from the local system.
  *   get_ppds()                  - Get the list of PPD files on the local
  *                                 system.
  *   get_printer_attrs()         - Get printer attributes.
@@ -92,6 +93,7 @@
  *   start_printer()             - Start a printer.
  *   stop_printer()              - Stop a printer.
  *   url_encode_attr()           - URL-encode a string attribute.
+ *   url_encode_string()         - URL-encode a string.
  *   user_allowed()              - See if a user is allowed to print to a queue.
  *   validate_job()              - Validate printer options and destination.
  *   validate_name()             - Make sure the printer name only contains
@@ -178,6 +180,7 @@ static void	get_devices(cupsd_client_t *con);
 static void	get_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_notifications(cupsd_client_t *con);
+static void	get_ppd(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_ppds(cupsd_client_t *con);
 static void	get_printers(cupsd_client_t *con, int type);
 static void	get_printer_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -216,6 +219,7 @@ static void	start_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	url_encode_attr(ipp_attribute_t *attr, char *buffer,
 		                int bufsize);
+static char	*url_encode_string(const char *s, char *buffer, int bufsize);
 static int	user_allowed(cupsd_printer_t *p, const char *username);
 static void	validate_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static int	validate_name(const char *name);
@@ -344,6 +348,8 @@ cupsdProcessIPPRequest(
       else if ((attr = ippFindAttribute(con->request, "job-uri",
                                         IPP_TAG_URI)) != NULL)
 	uri = attr;
+      else if (con->request->request.op.operation_id == CUPS_GET_PPD)
+        uri = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME);
       else
 	uri = NULL;
 
@@ -399,11 +405,12 @@ cupsdProcessIPPRequest(
         if (!uri)
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Missing printer-uri or job-uri attribute!");
+	                  "Missing printer-uri, job-uri, or ppd-name "
+			  "attribute!");
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                	"%04X %s Missing printer-uri or job-uri attribute",
-			IPP_BAD_REQUEST, con->http.hostname);
+                	"%04X %s Missing printer-uri, job-uri, or ppd-name "
+			"attribute", IPP_BAD_REQUEST, con->http.hostname);
         }
 
 	cupsdLogMessage(CUPSD_LOG_DEBUG, "Request attributes follow...");
@@ -570,6 +577,10 @@ cupsdProcessIPPRequest(
 
 	  case CUPS_GET_DEVICES :
               get_devices(con);
+              break;
+
+	  case CUPS_GET_PPD :
+              get_ppd(con, uri);
               break;
 
 	  case CUPS_GET_PPDS :
@@ -5888,6 +5899,77 @@ get_notifications(cupsd_client_t *con)	/* I - Client connection */
 
 
 /*
+ * 'get_ppd()' - Get a named PPD from the local system.
+ */
+
+static void
+get_ppd(cupsd_client_t  *con,		/* I - Client connection */
+        ipp_attribute_t *uri)		/* I - Printer URI or PPD name */
+{
+  http_status_t		status;		/* Policy status */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppd(%p[%d], %p[%s=%s])", con,
+                  con->http.fd, uri, uri->name, uri->values[0].string.text);
+
+  if (!strcmp(uri->name, "ppd-name"))
+  {
+   /*
+    * Return a PPD file from cups-driverd...
+    */
+
+    char	command[1024],	/* cups-driverd command */
+		options[1024],	/* Options to pass to command */
+		ppd_name[1024];	/* ppd-name */
+
+
+   /*
+    * Check policy...
+    */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
+
+   /*
+    * Run cups-driverd command with the given options...
+    */
+
+    snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
+    url_encode_string(uri->values[0].string.text, ppd_name, sizeof(ppd_name));
+    snprintf(options, sizeof(options), "get+%d+%s",
+             con->request->request.op.request_id, ppd_name);
+
+    if (cupsdSendCommand(con, command, options, 0))
+    {
+     /*
+      * Command started successfully, don't send an IPP response here...
+      */
+
+      ippDelete(con->response);
+      con->response = NULL;
+    }
+    else
+    {
+     /*
+      * Command failed, return "internal error" so the user knows something
+      * went wrong...
+      */
+
+      send_ipp_status(con, IPP_INTERNAL_ERROR,
+		      _("cups-driverd failed to execute."));
+    }
+  }
+  else
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The PPD file \"%s\" could not be found."),
+                    uri->values[0].string.text);
+}
+
+
+/*
  * 'get_ppds()' - Get the list of PPD files on the local system.
  */
 
@@ -5898,7 +5980,7 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   ipp_attribute_t	*limit,		/* Limit attribute */
 			*make,		/* ppd-make attribute */
 			*requested;	/* requested-attributes attribute */
-  char			command[1024],	/* cups-deviced command */
+  char			command[1024],	/* cups-driverd command */
 			options[1024],	/* Options to pass to command */
 			requested_str[256],
 					/* String for requested attributes */
@@ -9224,8 +9306,7 @@ url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
 {
   int	i;				/* Looping var */
   char	*bufptr,			/* Pointer into buffer */
-	*bufend,			/* End of buffer */
-	*valptr;			/* Pointer into value */
+	*bufend;			/* End of buffer */
 
 
   strlcpy(buffer, attr->name, bufsize);
@@ -9247,25 +9328,8 @@ url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
 
     *bufptr++ = '\'';
 
-    for (valptr = attr->values[i].string.text;
-         *valptr && bufptr < bufend;
-	 valptr ++)
-      if (*valptr == ' ')
-      {
-        if (bufptr >= (bufend - 2))
-	  break;
-
-        *bufptr++ = '%';
-	*bufptr++ = '2';
-	*bufptr++ = '0';
-      }
-      else if (*valptr == '\'' || *valptr == '\\')
-      {
-        *bufptr++ = '\\';
-        *bufptr++ = *valptr;
-      }
-      else
-        *bufptr++ = *valptr;
+    bufptr = url_encode_string(attr->values[i].string.text,
+                               bufptr, bufend - bufptr + 1);
 
     if (bufptr >= bufend)
       break;
@@ -9274,6 +9338,55 @@ url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
   }
 
   *bufptr = '\0';
+}
+
+
+/*
+ * 'url_encode_string()' - URL-encode a string.
+ */
+
+static char *				/* O - End of string */
+url_encode_string(const char *s,	/* I - String */
+                  char       *buffer,	/* I - String buffer */
+		  int        bufsize)	/* I - Size of buffer */
+{
+  char	*bufptr,			/* Pointer into buffer */
+	*bufend;			/* End of buffer */
+  static const char *hex = "0123456789ABCDEF";
+					/* Hex digits */
+
+
+  bufptr = buffer;
+  bufend = buffer + bufsize - 1;
+
+  while (*s && bufptr < bufend)
+  {
+    if (*s == ' ' || *s == '%')
+    {
+      if (bufptr >= (bufend - 2))
+	break;
+
+      *bufptr++ = '%';
+      *bufptr++ = hex[(*s >> 4) & 15];
+      *bufptr++ = hex[*s & 15];
+
+      s ++;
+    }
+    else if (*s == '\'' || *s == '\\')
+    {
+      if (bufptr >= (bufend - 1))
+	break;
+
+      *bufptr++ = '\\';
+      *bufptr++ = *s++;
+    }
+    else
+      *bufptr++ = *s++;
+  }
+
+  *bufptr = '\0';
+
+  return (bufptr);
 }
 
 

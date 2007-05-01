@@ -38,7 +38,7 @@ Output-bin Attribute Extension", and "IPP/1.1: finishings
 'fold',' trim', and 'bale' attribute values extension"
 specifications.</p>
 
-<p>CUPS also provides 13 new operations and many new attributes
+<p>CUPS also provides 15 new operations and many new attributes
 to support multiple IPP printers and printer classes on a single
 host.</p>
 
@@ -320,6 +320,12 @@ summary='Supported Operations'>
 	<td>1.2</td>
 	<td>0x400E</td>
 	<td>Authenticate a job for printing.</td>
+</tr>
+<tr>
+	<td><a href='#CUPS_GET_PPD'>CUPS-Get-PPD</a></td>
+	<td>1.3</td>
+	<td>0x400F</td>
+	<td>Get a PPD file.</td>
 </tr>
 </tbody>
 </table></div>
@@ -1685,6 +1691,77 @@ CUPS-Authenticate-Job Response:
 
 </dl
 
+<h3 class='title'><span class='info'>CUPS 1.3</span><a name='CUPS_GET_PPD'>CUPS-Get-PPD Operation</a></h3>
+
+<p>The CUPS-Get-PPD operation (0x400F) gets a PPD file from the
+server. The PPD file can be specified using a <tt>ppd-name</tt>
+returned by <a href='#CUPS_GET_PPDS'><tt>CUPS-Get-PPDs</tt></a>
+or using the <tt>printer-uri</tt> for a queue.</p>
+
+<p>If the PPD file is found, <tt>successful-ok</tt> is returned with
+the PPD file following the response data.</p>
+
+<p>If the PPD file cannot be served by the local server because
+the <tt>printer-uri</tt> attribute points to an external printer,
+a <tt>cups-see-other</tt> status is returned with the correct
+URI to use.</p>
+
+<p>If the PPD file does not exist, <tt>client-error-not-found</tt> is
+returned.</p>
+
+<h4>CUPS-Get-PPD Request</h4>
+
+<p>The following group of attributes is supplied as part of the
+CUPS-Get-PPD request:
+
+<p>Group 1: Operation Attributes
+
+<dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language"
+	attributes as described in section 3.1.4.1 of the IPP Model and
+	Semantics document.
+
+	<dt>"printer-uri" (uri)
+	<br><i>OR</i>
+	<br>"ppd-name" (name(255)):
+
+	<dd>The client MUST supply a printer URI or PPD name.
+
+</dl>
+
+<h4>CUPS-Get-PPD Response</h4>
+
+<p>The following group of attributes is sent as part of the
+CUPS-Get-PPD Response:
+
+<p>Group 1: Operation Attributes
+
+<dl>
+
+	<dt>Status Message:
+
+	<dd>The standard response status message.
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language"
+	attributes as described in section 3.1.4.2 of the IPP Model and
+	Semantics document.
+
+	<dt>"printer-uri" (uri):
+
+	<dd>The printer that provides the actual PPD file when
+	the status code is cups-see-other (0x280)
+
+</dl>
+
+<p>If the status code is <tt>successful-ok</tt>, the PPD file follows
+the end of the IPP response.</p>
+
+
 <h2 class='title'><a name='ATTRIBUTES'>Attributes</a></h2>
 
 <p>CUPS provides many extension attributes to support multiple
@@ -1843,7 +1920,7 @@ for billing purposes.
 <p>The job-hold-until attribute specifies a hold time. In addition to the
 standard IPP/1.1 keyword names, CUPS supports name values of the form
 "HH:MM" and "HH:MM:SS" that specify a hold time. The hold time is in
-Greenwich Mean Time (GMT) and <i>not</i> in the local time zone. If the
+Universal Coordinated Time (UTC) and <i>not</i> in the local time zone. If the
 specified time is less than the current time, the job is held until the
 next day.
 
@@ -2064,15 +2141,19 @@ ShortNickName attributes are used instead.
 relative to the model directory. The forward slash (/) is used to
 delineate directories.
 
-<h4><a name="ppd-natural-language">ppd-natural-language (naturalLanguage)</a></h4>
+<h4><a name="ppd-natural-language">ppd-natural-language (1setOf naturalLanguage)</a></h4>
 
 <p>The ppd-natural-language attribute specifies the language encoding
 of the PPD file (the LanguageVersion attribute in the PPD file). If the
 language is unknown or undefined then "en" (English) is assumed.
 
-<h4><a name="ppd-product">ppd-product (text(127))</a></h4>
+<h4><a name="ppd-product">ppd-product (1setOf text(127))</a></h4>
 
-<p>The ppd-product attribute specifies the Product attribute value in the PPD file.
+<p>The ppd-product attribute specifies the Product attribute values in the PPD file.
+
+<h4><a name="ppd-psversion">ppd-psversion (1setOf text(127))</a><span class="info">CUPS 1.3</span></h4>
+
+<p>The ppd-product attribute specifies the PSVersion attribute values in the PPD file.
 
 
 <h3 class='title'><a name='PRINTER_ATTRIBUTES'>Printer Attributes</a></h3>

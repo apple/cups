@@ -3,7 +3,7 @@
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -142,6 +142,15 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       if (!strcmp(argv[i], "-v"))
         Verbosity ++;
+      else if (!strcmp(argv[i], "-d"))
+      {
+        i ++;
+
+	if (i >= argc)
+	  usage(NULL);
+	else
+	  putenv(argv[i]);
+      }
       else if (!strcmp(argv[i], "-i"))
       {
         i++;
@@ -454,9 +463,28 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	      strlcpy(tokenptr, cupsUser(), sizeof(token) - (tokenptr - token));
 	      tempptr += 5;
 	    }
+	    else if (!strncasecmp(tempptr + 1, "ENV[", 4))
+	    {
+	      char *end;		/* End of $ENV[name] */
+
+
+	      if ((end = strchr(tempptr + 5, ']')) != NULL)
+	      {
+	        *end++ = '\0';
+		strlcpy(tokenptr,
+		        getenv(tempptr + 5) ? getenv(tempptr + 5) : tempptr + 5,
+		        sizeof(token) - (tokenptr - token));
+		tempptr = end;
+	      }
+	      else
+	      {
+		*tokenptr++ = *tempptr++;
+		*tokenptr   = '\0';
+	      }
+	    }
             else
 	    {
-	      *tokenptr++ = *tempptr ++;
+	      *tokenptr++ = *tempptr++;
 	      *tokenptr   = '\0';
 	    }
 
@@ -593,7 +621,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
     if (filename[0])
       response = cupsDoFileRequest(http, request, resource, filename);
     else
-      response = cupsDoRequest(http, request, resource);
+      response = cupsDoIORequest(http, request, resource, -1,
+                                 Verbosity ? 1 : -1);
 
     if (response == NULL)
     {
@@ -671,7 +700,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	  puts("        BAD STATUS");
 
 	printf("        status-code = %04x (%s)\n",
-	       cupsLastError(), cupsLastErrorString());
+	       cupsLastError(), ippErrorString(cupsLastError()));
 
         for (i = 0; i < num_expects; i ++)
 	  if (ippFindAttribute(response, expects[i], IPP_TAG_ZERO) == NULL)

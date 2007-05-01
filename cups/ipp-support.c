@@ -4,7 +4,7 @@
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -157,7 +157,8 @@ static char	* const ipp_std_ops[] =
 		  "CUPS-Get-Devices",
 		  "CUPS-Get-PPDs",
 		  "CUPS-Move-Job",
-		  "CUPS-Authenticate-Job"
+		  "CUPS-Authenticate-Job",
+		  "CUPS-Get-PPD"
 		};
 
 
@@ -179,6 +180,8 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
     return (ipp_status_oks[error]);
   else if (error == IPP_REDIRECTION_OTHER_SITE)
     return ("redirection-other-site");
+  else if (error == CUPS_SEE_OTHER)
+    return ("cups-see-other");
   else if (error >= IPP_BAD_REQUEST && error <= IPP_PRINT_SUPPORT_FILE_NOT_FOUND)
     return (ipp_status_400s[error - IPP_BAD_REQUEST]);
   else if (error >= IPP_INTERNAL_ERROR && error <= IPP_PRINTER_IS_DEACTIVATED)
@@ -213,6 +216,9 @@ ippErrorValue(const char *name)		/* I - Name */
   if (!strcasecmp(name, "redirection-other-site"))
     return (IPP_REDIRECTION_OTHER_SITE);
 
+  if (!strcasecmp(name, "cups-see-other"))
+    return (CUPS_SEE_OTHER);
+
   for (i = 0; i < (sizeof(ipp_status_400s) / sizeof(ipp_status_400s[0])); i ++)
     if (!strcasecmp(name, ipp_status_400s[i]))
       return ((ipp_status_t)(i + 0x400));
@@ -245,7 +251,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
     return (ipp_std_ops[op]);
   else if (op == IPP_PRIVATE)
     return ("windows-ext");
-  else if (op >= CUPS_GET_DEFAULT && op <= CUPS_AUTHENTICATE_JOB)
+  else if (op >= CUPS_GET_DEFAULT && op <= CUPS_GET_PPD)
     return (ipp_cups_ops[op - CUPS_GET_DEFAULT]);
 
  /*

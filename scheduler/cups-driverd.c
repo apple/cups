@@ -111,7 +111,7 @@ static ppd_info_t	*add_ppd(const char *name, const char *language,
 				 const char *device_id, const char *product,
 				 const char *psversion, time_t mtime,
 				 size_t size);
-static int		cat_ppd(const char *name);
+static int		cat_ppd(const char *name, int request_id);
 static int		compare_names(const ppd_info_t *p0,
 			              const ppd_info_t *p1);
 static int		compare_ppds(const ppd_info_t *p0,
@@ -139,12 +139,15 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (argc == 3 && !strcmp(argv[1], "cat"))
-    return (cat_ppd(argv[2]));
+    return (cat_ppd(argv[2], 0));
+  else if (argc == 4 && !strcmp(argv[1], "get"))
+    return (cat_ppd(argv[3], atoi(argv[2])));
   else if (argc == 5 && !strcmp(argv[1], "list"))
     return (list_ppds(atoi(argv[2]), atoi(argv[3]), argv[4]));
   else
   {
     fputs("Usage: cups-driverd cat ppd-name\n", stderr);
+    fputs("Usage: cups-driverd get request_id ppd-name\n", stderr);
     fputs("Usage: cups-driverd list request_id limit options\n", stderr);
     return (1);
   }
@@ -244,11 +247,13 @@ add_ppd(const char *name,		/* I - PPD name */
  */
 
 static int				/* O - Exit code */
-cat_ppd(const char *name)		/* I - PPD name */
+cat_ppd(const char *name,		/* I - PPD name */
+        int        request_id)		/* I - Request ID for response? */
 {
   char		scheme[256],		/* Scheme from PPD name */
 		*sptr;			/* Pointer into scheme */
   char		line[1024];		/* Line/filename */
+  char		message[2048];		/* status-message */
 
 
  /*
@@ -273,6 +278,8 @@ cat_ppd(const char *name)		/* I - PPD name */
   else
     scheme[0] = '\0';
 
+  puts("Content-Type: application/ipp\n");
+
   if (scheme[0])
   {
    /*
@@ -294,12 +301,37 @@ cat_ppd(const char *name)		/* I - PPD name */
 
       fprintf(stderr, "ERROR: [cups-driverd] Unable to access \"%s\" - %s\n",
               line, strerror(errno));
+
+      if (request_id > 0)
+      {
+        snprintf(message, sizeof(message), "Unable to access \"%s\" - %s",
+		 line, strerror(errno));
+
+	cupsdSendIPPHeader(IPP_NOT_FOUND, request_id);
+	cupsdSendIPPGroup(IPP_TAG_OPERATION);
+	cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+	cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+	                   "en-US");
+        cupsdSendIPPString(IPP_TAG_TEXT, "status-message", message);
+        cupsdSendIPPTrailer();
+      }
+
       return (1);
     }
 
    /*
     * Yes, let it cat the PPD file...
     */
+
+    if (request_id)
+    {
+      cupsdSendIPPHeader(IPP_OK, request_id);
+      cupsdSendIPPGroup(IPP_TAG_OPERATION);
+      cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+			 "en-US");
+      cupsdSendIPPTrailer();
+    }
 
     if (execl(line, scheme, "cat", name, (char *)NULL))
     {
@@ -329,6 +361,20 @@ cat_ppd(const char *name)		/* I - PPD name */
       */
 
       fprintf(stderr, "ERROR: [cups-driverd] Bad PPD name \"%s\"!\n", name);
+
+      if (request_id)
+      {
+	snprintf(message, sizeof(message), "Bad PPD name \"%s\"!", name);
+
+	cupsdSendIPPHeader(IPP_OK, request_id);
+	cupsdSendIPPGroup(IPP_TAG_OPERATION);
+	cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+	cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+			   "en-US");
+        cupsdSendIPPString(IPP_TAG_TEXT, "status-message", message);
+	cupsdSendIPPTrailer();
+      }
+
       return (1);
     }
 
@@ -387,7 +433,32 @@ cat_ppd(const char *name)		/* I - PPD name */
     {
       fprintf(stderr, "ERROR: [cups-driverd] Unable to open \"%s\" - %s\n",
               line, strerror(errno));
+
+      if (request_id)
+      {
+	snprintf(message, sizeof(message), "Unable to open \"%s\" - %s",
+		 line, strerror(errno));
+
+	cupsdSendIPPHeader(IPP_NOT_FOUND, request_id);
+	cupsdSendIPPGroup(IPP_TAG_OPERATION);
+	cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+	cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+			   "en-US");
+        cupsdSendIPPString(IPP_TAG_TEXT, "status-message", message);
+	cupsdSendIPPTrailer();
+      }
+
       return (1);
+    }
+
+    if (request_id)
+    {
+      cupsdSendIPPHeader(IPP_OK, request_id);
+      cupsdSendIPPGroup(IPP_TAG_OPERATION);
+      cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+                         "en-US");
+      cupsdSendIPPTrailer();
     }
 
    /*

@@ -45,6 +45,9 @@
 #else
 #  include <unistd.h>
 #endif /* WIN32 || __EMX__ */
+#ifndef O_BINARY
+#  define O_BINARY 0
+#endif /* O_BINARY */
 
 
 /*
@@ -60,6 +63,61 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
                   ipp_t      *request,	/* I - IPP request */
                   const char *resource,	/* I - HTTP resource for POST */
 		  const char *filename)	/* I - File to send or NULL for none */
+{
+  ipp_t		*response;		/* IPP response data */
+  int		infile;			/* Input file */
+
+
+  if (filename)
+  {
+    if ((infile = open(filename, O_RDONLY | O_BINARY)) < 0)
+    {
+     /*
+      * Can't get file information!
+      */
+
+      _cupsSetError(errno == ENOENT ? IPP_NOT_FOUND : IPP_NOT_AUTHORIZED,
+                    strerror(errno));
+
+      ippDelete(request);
+
+      return (NULL);
+    }
+  }
+  else
+    infile = -1;
+
+  response = cupsDoIORequest(http, request, resource, infile, -1);
+
+  if (infile >= 0)
+    close(infile);
+
+  return (response);
+}
+
+
+/*
+ * 'cupsDoIORequest()' - Do an IPP request with file descriptors.
+ *
+ * This function sends the IPP request to the specified server, retrying
+ * and authenticating as necessary.  The request is freed with ippDelete()
+ * after receiving a valid IPP response.
+ *
+ * If "infile" is a valid file descriptor, cupsDoIORequest() copies
+ * all of the data from the file after the IPP request message.
+ *
+ * If "outfile" is a valid file descriptor, cupsDoIORequest() copies
+ * all of the data after the IPP response message to the file.
+ *
+ * @since CUPS 1.3@
+ */
+
+ipp_t *					/* O - Response data */
+cupsDoIORequest(http_t     *http,	/* I - HTTP connection to server */
+                ipp_t      *request,	/* I - IPP request */
+                const char *resource,	/* I - HTTP resource for POST */
+		int        infile,	/* I - File to read from or -1 for none */
+		int        outfile)	/* I - File to write to or -1 for none */
 {
   ipp_t		*response;		/* IPP response data */
   size_t	length;			/* Content-Length value */
@@ -91,16 +149,16 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
   * See if we have a file to send...
   */
 
-  if (filename != NULL)
+  if (infile >= 0)
   {
-    if (stat(filename, &fileinfo))
+    if (fstat(infile, &fileinfo))
     {
      /*
       * Can't get file information!
       */
 
       _cupsSetError(errno == ENOENT ? IPP_NOT_FOUND : IPP_NOT_AUTHORIZED,
-                     strerror(errno));
+                    strerror(errno));
 
       ippDelete(request);
 
@@ -123,23 +181,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
       return (NULL);
     }
-
-    if ((file = fopen(filename, "rb")) == NULL)
-    {
-     /*
-      * Can't open file!
-      */
-
-      _cupsSetError(errno == ENOENT ? IPP_NOT_FOUND : IPP_NOT_AUTHORIZED,
-                     strerror(errno));
-
-      ippDelete(request);
-
-      return (NULL);
-    }
   }
-  else
-    file = NULL;
 
 #ifdef HAVE_SSL
  /*
@@ -171,8 +213,15 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     */
 
     length = ippLength(request);
-    if (filename)
+    if (infile >= 0)
+    {
+#ifndef WIN32
+      if (!S_ISREG(fileinfo.st_mode))
+        length = 0;			/* Chunk when piping */
+      else
+#endif /* !WIN32 */
       length += fileinfo.st_size;
+    }
 
     httpClearFields(http);
     httpSetLength(http, length);
@@ -232,7 +281,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
     else if (httpCheck(http))
       status = httpUpdate(http);
 
-    if (status == HTTP_CONTINUE && state == IPP_DATA && filename)
+    if (status == HTTP_CONTINUE && state == IPP_DATA && infile >= 0)
     {
       DEBUG_puts("cupsDoFileRequest: file write...");
 
@@ -240,9 +289,12 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
       * Send the file...
       */
 
-      rewind(file);
+#ifndef WIN32
+      if (S_ISREG(fileinfo.st_mode))
+#endif /* WIN32 */
+      lseek(infile, 0, SEEK_SET);
 
-      while ((bytes = (int)fread(buffer, 1, sizeof(buffer), file)) > 0)
+      while ((bytes = (int)read(infile, buffer, sizeof(buffer))) > 0)
       {
 	if (httpCheck(http))
 	{
@@ -374,21 +426,26 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
 
 	break;
       }
+      else if (outfile >= 0)
+      {
+       /*
+        * Write trailing data to file...
+	*/
+
+	while ((bytes = (int)httpRead2(http, buffer, sizeof(buffer))) > 0)
+	  if (write(outfile, buffer, bytes) < bytes)
+	    break;
+      }
+      else
+      {
+       /*
+        * Flush any remaining data...
+        */
+
+        httpFlush(http);
+      }
     }
   }
-
- /*
-  * Close the file if needed...
-  */
-
-  if (filename != NULL)
-    fclose(file);
-
- /*
-  * Flush any remaining data...
-  */
-
-  httpFlush(http);
 
  /*
   * Delete the original request and return the response...

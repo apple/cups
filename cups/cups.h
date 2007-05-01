@@ -244,6 +244,9 @@ extern int		cupsRemoveOption(const char *name, int num_options,
 extern cups_file_t	*cupsTempFile2(char *filename, int len);
 
 /**** New in CUPS 1.3 ****/
+extern ipp_t		*cupsDoIORequest(http_t *http, ipp_t *request,
+			                 const char *resource, int infile,
+					 int outfile);
 extern int		cupsRemoveDest(const char *name,
 			               const char *instance,
 				       int num_dests, cups_dest_t **dests);

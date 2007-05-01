@@ -5,6 +5,10 @@ CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
 	  STR #2356)
+	- Added a new cupsDoIORequest() function for reading
+	  and writing files via IPP requests (STR #2334)
+	- Added a new CUPS_GET_PPD operation for getting an
+	  available PPD file on the server (STR #2334) 
 	- CUPS_GET_PPDS now reports multiple ppd-product values
 	  if the corresponding PPD contains multiple products
 	  (STR #2334)

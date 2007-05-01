@@ -254,7 +254,8 @@ typedef enum ipp_op_e			/**** IPP operations... ****/
   CUPS_GET_DEVICES,			/* Get a list of supported devices */
   CUPS_GET_PPDS,			/* Get a list of supported drivers */
   CUPS_MOVE_JOB,			/* Move a job to a different printer */
-  CUPS_AUTHENTICATE_JOB			/* Authenticate a job @since CUPS 1.2@ */
+  CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2@ */
+  CUPS_GET_PPD				/* Get a PPD file @since CUPS 1.3@ */
 } ipp_op_t;
 
 /* Old names for the operations */
@@ -271,7 +272,8 @@ typedef enum ipp_status_e		/**** IPP status codes... ****/
   IPP_OK_TOO_MANY_EVENTS,		/* successful-ok-too-many-events */
   IPP_OK_BUT_CANCEL_SUBSCRIPTION,	/* successful-ok-but-cancel-subscription */
   IPP_OK_EVENTS_COMPLETE,		/* successful-ok-events-complete */
-  IPP_REDIRECTION_OTHER_SITE = 0x300,	/*  */
+  IPP_REDIRECTION_OTHER_SITE = 0x200,	/*  */
+  CUPS_SEE_OTHER = 0x280,		/* cups-see-other */
   IPP_BAD_REQUEST = 0x0400,		/* client-error-bad-request */
   IPP_FORBIDDEN,			/* client-error-forbidden */
   IPP_NOT_AUTHENTICATED,		/* client-error-not-authenticated */
