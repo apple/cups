@@ -1,10 +1,16 @@
-CHANGES.txt - 2007-04-30
+CHANGES.txt - 2007-05-01
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
 	  STR #2356)
+	- CUPS_GET_PPDS now reports multiple ppd-product values
+	  if the corresponding PPD contains multiple products
+	  (STR #2334)
+	- CUPS_GET_PPDS now reports the PSVersion attributes
+	  from a PPD file in the ppd-psversion attribute
+	  (STR #2334)
 	- Added a new printer attribute called "cups-version"
 	  which reports the version of CUPS that is running
 	  (STR #2240)
