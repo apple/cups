@@ -2531,10 +2531,10 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
 #ifdef DEBUG
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdWriteClient(con=%p) %d response=%p, file=%d "
+                  "cupsdWriteClient(con=%p) %d response=%p(%d), file=%d "
 		  "pipe_pid=%d state=%d",
-                  con, con->http.fd, con->response, con->file, con->pipe_pid,
-		  con->http.state);
+                  con, con->http.fd, con->response, con->response->state,
+		  con->file, con->pipe_pid, con->http.state);
 #endif /* DEBUG */
 
   if (con->http.state != HTTP_GET_SEND &&
@@ -2565,7 +2565,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
   if (con->response && con->response->state != IPP_DATA)
   {
     ipp_state = ippWrite(HTTP(con), con->response);
-    bytes     = ipp_state != IPP_ERROR && ipp_state != IPP_DATA;
+    bytes     = ipp_state != IPP_ERROR &&
+                (con->file >= 0 || ipp_state != IPP_DATA);
   }
   else if ((bytes = read(con->file, buf, sizeof(buf) - 1)) > 0)
   {

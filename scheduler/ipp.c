@@ -676,6 +676,15 @@ cupsdProcessIPPRequest(
 
 	length = ippLength(con->response);
 
+	if (con->file >= 0 && !con->pipe_pid)
+	{
+	  struct stat	fileinfo;	/* File information */
+
+
+          if (!fstat(con->file, &fileinfo))
+	    length += fileinfo.st_size;
+	}
+
 	if (httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
         	       CUPS_LLCAST length) < 0)
 	  return (0);
@@ -685,6 +694,11 @@ cupsdProcessIPPRequest(
 
 	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
 	con->http.data_remaining = length;
+
+	if (con->http.data_remaining <= INT_MAX)
+	  con->http._data_remaining = con->http.data_remaining;
+	else
+	  con->http._data_remaining = INT_MAX;
       }
 
       cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient,
@@ -5907,6 +5921,8 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
         ipp_attribute_t *uri)		/* I - Printer URI or PPD name */
 {
   http_status_t		status;		/* Policy status */
+  cupsd_printer_t	*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppd(%p[%d], %p[%s=%s])", con,
@@ -5961,6 +5977,74 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
       send_ipp_status(con, IPP_INTERNAL_ERROR,
 		      _("cups-driverd failed to execute."));
     }
+  }
+  else if (!strcmp(uri->name, "printer-uri") &&
+           cupsdValidateDest(uri->values[0].string.text, &dtype, &dest))
+  {
+    int 	i;			/* Looping var */
+    char	filename[1024];		/* PPD filename */
+
+
+   /*
+    * Check policy...
+    */
+
+    if ((status = cupsdCheckPolicy(dest->op_policy_ptr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
+
+   /*
+    * See if we need the PPD for a class or remote printer...
+    */
+
+    if (dtype & CUPS_PRINTER_REMOTE)
+    {
+      send_ipp_status(con, CUPS_SEE_OTHER, NULL);
+      ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI,
+                   "printer-uri", NULL, dest->uri);
+      return;
+    }
+    else if (dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+    {
+      for (i = 0; i < dest->num_printers; i ++)
+        if (!(dest->printers[i]->type &
+	      (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+	       CUPS_PRINTER_REMOTE)))
+	  break;
+
+      if (i < dest->num_printers)
+        dest = dest->printers[i];
+      else
+      {
+	send_ipp_status(con, CUPS_SEE_OTHER, NULL);
+	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI,
+		     "printer-uri", NULL, dest->printers[0]->uri);
+        return;
+      }
+    }
+
+   /*
+    * Found the printer with the PPD file, now see if there is one...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
+             dest->name);
+
+    if ((con->file = open(filename, O_RDONLY)) < 0)
+    {
+      send_ipp_status(con, IPP_NOT_FOUND,
+                      _("The PPD file \"%s\" could not be opened: %s"),
+		      uri->values[i].string.text, strerror(errno));
+      return;
+    }
+
+    fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
+
+    con->pipe_pid = 0;
+
+    send_ipp_status(con, IPP_OK, NULL);
   }
   else
     send_ipp_status(con, IPP_NOT_FOUND,
