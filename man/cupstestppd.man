@@ -21,15 +21,23 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH cupstestppd 1 "Common UNIX Printing System" "12 February 2006" "Easy Software Products"
+.TH cupstestppd 1 "Common UNIX Printing System" "3 May 2007" "Easy Software Products"
 .SH NAME
 cupstestppd \- test conformance of ppd files
 .SH SYNOPSIS
 .B cupstestppd
-[ -q ] [-r] [ -v[v] ] filename.ppd[.gz] [ ... filenameN.ppd[.gz] ]
+[ -R
+.I rootdir
+] [ -W
+.I category
+] [ -q ] [-r] [ -v[v] ] filename.ppd[.gz] [ ... filenameN.ppd[.gz] ]
 .br
 .B cupstestppd
-[ -q ] [-r] [ -v[v] ] -
+[ -R
+.I rootdir
+] [ -W
+.I category
+] [ -q ] [-r] [ -v[v] ] -
 .SH DESCRIPTION
 \fIcupstestppd\fR tests the conformance of PPD files to the
 Adobe PostScript Printer Description file format specification
@@ -42,6 +50,35 @@ on the command-line. The second form tests the PPD file provided
 on the standard input.
 .SH OPTIONS
 \fIcupstestppd\fR supports the following options:
+.TP 5
+-R rootdir
+.br
+Specifies an alternate root directory for the filter, pre-filter,
+and other support file checks.
+.TP 5
+-W constraints
+.br
+Report all UIConstraint errors as warnings.
+.TP 5
+-W defaults
+.br
+Except for size-related options, report all default option errors as warnings.
+.TP 5
+-W filters
+.br
+Report all filter errors as warnings.
+.TP 5
+-W translations
+.br
+Report all translation errors as warnings.
+.TP 5
+-W all
+.br
+Report all of the previous errors as warnings.
+.TP 5
+-W none
+.br
+Report all of the previous errors as errors.
 .TP 5
 -q
 .br
@@ -109,7 +146,7 @@ http://localhost:631/help
 .br
 Adobe PostScript Printer Description File Format Specification, Version 4.3.
 .SH COPYRIGHT
-Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
+Copyright 1997-2007 by Easy Software Products, All Rights Reserved.
 .\"
 .\" End of "$Id$".
 .\"

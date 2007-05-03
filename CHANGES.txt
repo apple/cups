@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
 	  STR #2263, STR #2356)
+	- Added new -R and -W options to the cupstestppd program
+	  for greater control over the testing of PPDs.
 	- Added a new cupsGetServerPPD() function for getting
 	  an available PPD from the server (STR #2334)
 	- Added a new cupsDoIORequest() function for reading
