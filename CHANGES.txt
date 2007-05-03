@@ -4,7 +4,7 @@ CHANGES.txt - 2007-05-03
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
-	  STR #2356)
+	  STR #2263, STR #2356)
 	- Added a new cupsGetServerPPD() function for getting
 	  an available PPD from the server (STR #2334)
 	- Added a new cupsDoIORequest() function for reading

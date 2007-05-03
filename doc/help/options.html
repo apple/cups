@@ -1,7 +1,7 @@
 <HTML>
 <!-- SECTION: Getting Started -->
 <HEAD>
-	<TITLE>Printing and Options</TITLE>
+	<TITLE>Command-Line Printing and Options</TITLE>
 </HEAD>
 <BODY>
 
@@ -169,6 +169,33 @@ HREF="man-lpstat.html">lpstat</A> commands:</P>
 lpq
 lpstat
 </PRE>
+
+
+<H2 CLASS="title"><A NAME="LPMOVE">Moving a Print Job</A></H2>
+
+<P>The <A HREF="man-lpmove.html">lpmove(8)</A> command moves a print
+job to a new printer or class:</P>
+
+<PRE CLASS="command">
+lpmove <I>job-id</I> <i>destination</i>
+</PRE>
+
+<P>The <I>job-id</I> is the number that was reported to you by
+the <B>lp</B> or <B>lpstat</B> commands. <i>Destination</i> is the
+name of a printer or class that you want to actually print the job.
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>The <B>lpmove</B> command is located in the system command
+directory (typically <VAR>/usr/sbin</VAR> or <VAR>/usr/local/sbin</VAR>),
+and so may not be in your command path. Specify the full path to the
+command if you get a "command not found" error, for example:
+
+<PRE CLASS="command">
+/usr/sbin/lpmove foo-123 bar
+</PRE>
+
+</BLOCKQUOTE>
 
 
 <H2 CLASS="title"><A NAME="OPTIONS">Standard Printing Options</A></H2>
