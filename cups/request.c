@@ -124,7 +124,6 @@ cupsDoIORequest(http_t     *http,	/* I - HTTP connection to server */
   http_status_t	status;			/* Status of HTTP request */
   int		got_status;		/* Did we get the status? */
   ipp_state_t	state;			/* State of IPP processing */
-  FILE		*file;			/* File to send */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
   char		buffer[32768];		/* Output buffer */

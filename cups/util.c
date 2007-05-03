@@ -40,6 +40,7 @@
  *   cupsGetPPD2()          - Get the PPD file for a printer on the specified
  *                            server.
  *   cupsGetPrinters()      - Get a list of printers from the default server.
+ *   cupsGetServerPPD()     - Get an available PPD file from the server.
  *   cupsLastError()        - Return the last IPP status code.
  *   cupsLastErrorString()  - Return the last IPP status-message.
  *   cupsPrintFile()        - Print a file to a printer or class on the default
@@ -1066,6 +1067,82 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   }
 
   return (n);
+}
+
+
+/*
+ * 'cupsGetServerPPD()' - Get an available PPD file from the server.
+ *
+ * This function returns the named PPD file from the server.  The
+ * list of available PPDs is provided by the IPP CUPS_GET_PPDS
+ * operation.
+ *
+ * You must remove (unlink) the PPD file when you are finished with
+ * it. The PPD filename is stored in a static location that will be
+ * overwritten on the next call to cupsGetPPD(), cupsGetPPD2(), or
+ * cupsGetServerPPD().
+ *
+ * @since CUPS 1.3@
+ */
+
+char *					/* O - Name of PPD file or NULL on error */
+cupsGetServerPPD(http_t     *http,	/* I - HTTP connection */
+                 const char *name)	/* I - Name of PPD file ("ppd-name") */
+{
+  int			fd;		/* PPD file descriptor */
+  ipp_t			*request;	/* IPP request */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Pointer to library globals */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!http || !name)
+  {
+    if (!http)
+      _cupsSetError(IPP_INTERNAL_ERROR, "No HTTP connection!");
+    else
+      _cupsSetError(IPP_INTERNAL_ERROR, "No PPD name!");
+
+    return (NULL);
+  }
+
+ /*
+  * Get a temp file...
+  */
+
+  if ((fd = cupsTempFd(cg->ppd_filename, sizeof(cg->ppd_filename))) < 0)
+  {
+   /*
+    * Can't open file; close the server connection and return NULL...
+    */
+
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+
+    return (NULL);
+  }
+
+ /*
+  * Get the PPD file...
+  */
+
+  request = ippNewRequest(CUPS_GET_PPD);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "ppd-name", NULL,
+               name);
+
+  ippDelete(cupsDoIORequest(http, request, "/", -1, fd));
+
+  close(fd);
+
+  if (cupsLastError() != IPP_OK)
+  {
+    unlink(cg->ppd_filename);
+    return (NULL);
+  }
+  else
+    return (cg->ppd_filename);
 }
 
 

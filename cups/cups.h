@@ -247,6 +247,7 @@ extern cups_file_t	*cupsTempFile2(char *filename, int len);
 extern ipp_t		*cupsDoIORequest(http_t *http, ipp_t *request,
 			                 const char *resource, int infile,
 					 int outfile);
+extern char		*cupsGetServerPPD(http_t *http, const char *name);
 extern int		cupsRemoveDest(const char *name,
 			               const char *instance,
 				       int num_dests, cups_dest_t **dests);
