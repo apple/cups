@@ -596,8 +596,9 @@ list_ppds(int        request_id,	/* I - Request ID */
             == sizeof(ppdsync) &&
         ppdsync == PPD_SYNC &&
         !stat(filename, &fileinfo) &&
-	(fileinfo.st_size - sizeof(sync) % sizeof(ppd_rec_t)) == 0 &&
-	(NumPPDs = (fileinfo.st_size - sizeof(sync)) / sizeof(ppd_rec_t)) > 0)
+	(fileinfo.st_size - sizeof(ppdsync) % sizeof(ppd_rec_t)) == 0 &&
+	(NumPPDs = (fileinfo.st_size - sizeof(ppdsync)) /
+	           sizeof(ppd_rec_t)) > 0)
     {
      /*
       * We have a ppds.dat file, so read it!

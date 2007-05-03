@@ -45,11 +45,8 @@
 #include <stdarg.h>
 #include <grp.h>
 #include <sys/utsname.h>
+#include <syslog.h>
 #include <cups/dir.h>
-
-#ifdef HAVE_VSYSLOG
-#  include <syslog.h>
-#endif /* HAVE_VSYSLOG */
 
 
 /*
