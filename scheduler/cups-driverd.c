@@ -557,14 +557,22 @@ list_ppds(int        request_id,	/* I - Request ID */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
   const char	*requested,		/* requested-attributes option */
-		*make;			/* ppd-make option */
-  int		send_natural_language,	/* Send ppd-natural-language? */
+		*device_id,		/* ppd-device-id option */
+		*language,		/* ppd-natural-language option */
+		*make,			/* ppd-make option */
+		*make_and_model,	/* ppd-make-and-model option */
+		*product,		/* ppd-product option */
+		*psversion;		/* ppd-psversion option */
+  int		mam_len,		/* Length of ppd-make-and-model */
+		device_id_len,		/* Length of ppd-device-id */
+		send_natural_language,	/* Send ppd-natural-language? */
 		send_make,		/* Send ppd-make? */
 		send_make_and_model,	/* Send ppd-make-and-model? */
 		send_name,		/* Send ppd-name? */
 		send_device_id,		/* Send ppd-device-id? */
 		send_product,		/* Send ppd-product? */
-		send_psversion;		/* Send ppd-psversion? */
+		send_psversion,		/* Send ppd-psversion? */
+		sent_header;		/* Sent the IPP header? */
 
 
   fprintf(stderr,
@@ -596,7 +604,7 @@ list_ppds(int        request_id,	/* I - Request ID */
             == sizeof(ppdsync) &&
         ppdsync == PPD_SYNC &&
         !stat(filename, &fileinfo) &&
-	(fileinfo.st_size - sizeof(ppdsync) % sizeof(ppd_rec_t)) == 0 &&
+	((fileinfo.st_size - sizeof(ppdsync)) % sizeof(ppd_rec_t)) == 0 &&
 	(NumPPDs = (fileinfo.st_size - sizeof(ppdsync)) /
 	           sizeof(ppd_rec_t)) > 0)
     {
@@ -740,12 +748,46 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Send IPP attributes...
   */
 
-  num_options = cupsParseOptions(opt, 0, &options);
-  requested   = cupsGetOption("requested-attributes", num_options, options);
-  make        = cupsGetOption("ppd-make", num_options, options);
+  num_options    = cupsParseOptions(opt, 0, &options);
+  requested      = cupsGetOption("requested-attributes", num_options, options);
+  device_id      = cupsGetOption("ppd-device-id", num_options, options);
+  language       = cupsGetOption("ppd-natural-language", num_options, options);
+  make           = cupsGetOption("ppd-make", num_options, options);
+  make_and_model = cupsGetOption("ppd-make-and-model", num_options, options);
+  product        = cupsGetOption("ppd-product", num_options, options);
+  psversion      = cupsGetOption("ppd-psversion", num_options, options);
 
-  fprintf(stderr, "DEBUG: [cups-driverd] requested=\"%s\"\n",
-          requested ? requested : "(nil)");
+  if (make_and_model)
+    mam_len = strlen(make_and_model);
+  else
+    mam_len = 0;
+
+  if (device_id)
+    device_id_len = strlen(device_id);
+  else
+    device_id_len = 0;
+
+  if (requested)
+    fprintf(stderr, "DEBUG: [cups-driverd] requested-attributes=\"%s\"\n",
+	    requested);
+  if (device_id)
+    fprintf(stderr, "DEBUG: [cups-driverd] ppd-device-id=\"%s\"\n",
+	    device_id);
+  if (language)
+    fprintf(stderr, "DEBUG: [cups-driverd] ppd-natural-language=\"%s\"\n",
+	    language);
+  if (make)
+    fprintf(stderr, "DEBUG: [cups-driverd] ppd-make=\"%s\"\n",
+	    make);
+  if (make_and_model)
+    fprintf(stderr, "DEBUG: [cups-driverd] ppd-make-and-model=\"%s\"\n",
+	    make_and_model);
+  if (product)
+    fprintf(stderr, "DEBUG: [cups-driverd] ppd-product=\"%s\"\n",
+	    product);
+  if (psversion)
+    fprintf(stderr, "DEBUG: [cups-driverd] ppd-psversion=\"%s\"\n",
+	    psversion);
 
   if (!requested || strstr(requested, "all"))
   {
@@ -772,10 +814,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 
   puts("Content-Type: application/ipp\n");
 
-  cupsdSendIPPHeader(IPP_OK, request_id);
-  cupsdSendIPPGroup(IPP_TAG_OPERATION);
-  cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
-  cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language", "en-US");
+  sent_header = 0;
 
   if (limit <= 0 || limit > NumPPDs)
     count = NumPPDs;
@@ -783,78 +822,143 @@ list_ppds(int        request_id,	/* I - Request ID */
     count = limit;
 
   for (i = NumPPDs, ppd = PPDs; count > 0 && i > 0; i --, ppd ++)
-    if (!make || !strcasecmp(ppd->record.make, make))
+  {
+   /*
+    * Filter PPDs based on make, model, or device ID...
+    */
+
+    if (device_id && strncasecmp(ppd->record.device_id, device_id,
+                                 device_id_len))
+      continue;				/* TODO: implement smart compare */
+
+    if (language)
     {
-     /*
-      * Send this PPD...
-      */
+      for (j = 0; j < PPD_MAX_LANG; j ++)
+	if (!ppd->record.languages[j][0] ||
+	    !strcasecmp(ppd->record.languages[j], language))
+	  break;
 
-      fprintf(stderr, "DEBUG: [cups-driverd] Sending %s (%s)...\n",
-              ppd->record.name, ppd->record.make_and_model);
-
-      count --;
-
-      cupsdSendIPPGroup(IPP_TAG_PRINTER);
-
-      if (send_name)
-        cupsdSendIPPString(IPP_TAG_NAME, "ppd-name", ppd->record.name);
-
-      if (send_natural_language)
-      {
-        cupsdSendIPPString(IPP_TAG_LANGUAGE, "ppd-natural-language",
-	                   ppd->record.languages[0]);
-
-        for (j = 1; j < PPD_MAX_LANG && ppd->record.languages[j][0]; j ++)
-	  cupsdSendIPPString(IPP_TAG_LANGUAGE, "", ppd->record.languages[j]);
-      }
-
-      if (send_make)
-        cupsdSendIPPString(IPP_TAG_TEXT, "ppd-make", ppd->record.make);
-
-      if (send_make_and_model)
-        cupsdSendIPPString(IPP_TAG_TEXT, "ppd-make-and-model",
-	                   ppd->record.make_and_model);
-
-      if (send_device_id)
-        cupsdSendIPPString(IPP_TAG_TEXT, "ppd-device-id",
-	                   ppd->record.device_id);
-
-      if (send_product)
-      {
-        cupsdSendIPPString(IPP_TAG_TEXT, "ppd-product",
-	                   ppd->record.products[0]);
-
-        for (j = 1; j < PPD_MAX_PROD && ppd->record.products[j][0]; j ++)
-	  cupsdSendIPPString(IPP_TAG_TEXT, "", ppd->record.products[j]);
-      }
-
-      if (send_psversion)
-      {
-        cupsdSendIPPString(IPP_TAG_TEXT, "ppd-psversion",
-	                   ppd->record.psversions[0]);
-
-        for (j = 1; j < PPD_MAX_VERS && ppd->record.psversions[j][0]; j ++)
-	  cupsdSendIPPString(IPP_TAG_TEXT, "", ppd->record.psversions[j]);
-      }
-
-     /*
-      * If we have only requested the ppd-make attribute, then skip
-      * the remaining PPDs with this make...
-      */
-
-      if (requested && !strcmp(requested, "ppd-make"))
-      {
-        const char	*this_make;	/* This ppd-make */
-
-
-        for (this_make = ppd->record.make, i --, ppd ++; i > 0; i --, ppd ++)
-	  if (strcasecmp(this_make, ppd->record.make))
-	    break;
-
-        i ++;
-	ppd --;
-      }
+      if (j >= PPD_MAX_LANG || !ppd->record.languages[j][0])
+	continue;
     }
+
+    if (make && strcasecmp(ppd->record.make, make))
+      continue;
+
+    if (make_and_model && strncasecmp(ppd->record.make_and_model,
+                                      make_and_model, mam_len))
+      continue;
+
+    if (product)
+    {
+      for (j = 0; j < PPD_MAX_PROD; j ++)
+	if (!ppd->record.products[j][0] ||
+	    !strcasecmp(ppd->record.products[j], product))
+	  break;
+
+      if (j >= PPD_MAX_PROD || !ppd->record.products[j][0])
+	continue;
+    }
+
+    if (psversion)
+    {
+      for (j = 0; j < PPD_MAX_VERS; j ++)
+	if (!ppd->record.psversions[j][0] ||
+	    !strcasecmp(ppd->record.psversions[j], psversion))
+	  break;
+
+      if (j >= PPD_MAX_VERS || !ppd->record.psversions[j][0])
+	continue;
+    }
+
+   /*
+    * Send this PPD...
+    */
+
+    if (!sent_header)
+    {
+      sent_header = 1;
+
+      cupsdSendIPPHeader(IPP_OK, request_id);
+      cupsdSendIPPGroup(IPP_TAG_OPERATION);
+      cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language", "en-US");
+    }
+
+    fprintf(stderr, "DEBUG: [cups-driverd] Sending %s (%s)...\n",
+	    ppd->record.name, ppd->record.make_and_model);
+
+    count --;
+
+    cupsdSendIPPGroup(IPP_TAG_PRINTER);
+
+    if (send_name)
+      cupsdSendIPPString(IPP_TAG_NAME, "ppd-name", ppd->record.name);
+
+    if (send_natural_language)
+    {
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "ppd-natural-language",
+			 ppd->record.languages[0]);
+
+      for (j = 1; j < PPD_MAX_LANG && ppd->record.languages[j][0]; j ++)
+	cupsdSendIPPString(IPP_TAG_LANGUAGE, "", ppd->record.languages[j]);
+    }
+
+    if (send_make)
+      cupsdSendIPPString(IPP_TAG_TEXT, "ppd-make", ppd->record.make);
+
+    if (send_make_and_model)
+      cupsdSendIPPString(IPP_TAG_TEXT, "ppd-make-and-model",
+			 ppd->record.make_and_model);
+
+    if (send_device_id)
+      cupsdSendIPPString(IPP_TAG_TEXT, "ppd-device-id",
+			 ppd->record.device_id);
+
+    if (send_product)
+    {
+      cupsdSendIPPString(IPP_TAG_TEXT, "ppd-product",
+			 ppd->record.products[0]);
+
+      for (j = 1; j < PPD_MAX_PROD && ppd->record.products[j][0]; j ++)
+	cupsdSendIPPString(IPP_TAG_TEXT, "", ppd->record.products[j]);
+    }
+
+    if (send_psversion)
+    {
+      cupsdSendIPPString(IPP_TAG_TEXT, "ppd-psversion",
+			 ppd->record.psversions[0]);
+
+      for (j = 1; j < PPD_MAX_VERS && ppd->record.psversions[j][0]; j ++)
+	cupsdSendIPPString(IPP_TAG_TEXT, "", ppd->record.psversions[j]);
+    }
+
+   /*
+    * If we have only requested the ppd-make attribute, then skip
+    * the remaining PPDs with this make...
+    */
+
+    if (requested && !strcmp(requested, "ppd-make"))
+    {
+      const char	*this_make;	/* This ppd-make */
+
+
+      for (this_make = ppd->record.make, i --, ppd ++; i > 0; i --, ppd ++)
+	if (strcasecmp(this_make, ppd->record.make))
+	  break;
+
+      i ++;
+      ppd --;
+    }
+  }
+
+  if (!sent_header)
+  {
+    cupsdSendIPPHeader(IPP_NOT_FOUND, request_id);
+    cupsdSendIPPGroup(IPP_TAG_OPERATION);
+    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language", "en-US");
+  }
 
   cupsdSendIPPTrailer();
 
@@ -1049,7 +1153,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       }
       else if (!strncasecmp(line, "*PSVersion:", 11))
       {
-	sscanf(line, "%*[^\"]\"(%255[^)]", psversion);
+	sscanf(line, "%*[^\"]\"%255[^\"]", psversion);
 	cupsArrayAdd(psversions, strdup(psversion));
       }
       else if (!strncasecmp(line, "*cupsLanguages:", 15))

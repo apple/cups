@@ -6062,13 +6062,26 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 {
   http_status_t		status;		/* Policy status */
   ipp_attribute_t	*limit,		/* Limit attribute */
+			*device,	/* ppd-device-id attribute */
+			*language,	/* ppd-natural-language attribute */
 			*make,		/* ppd-make attribute */
+			*model,		/* ppd-make-and-model attribute */
+			*product,	/* ppd-product attribute */
+			*psversion,	/* ppd-psverion attribute */
 			*requested;	/* requested-attributes attribute */
   char			command[1024],	/* cups-driverd command */
 			options[1024],	/* Options to pass to command */
-			requested_str[256],
+			device_str[256],/* Escaped ppd-device-id string */
+			language_str[256],
+					/* Escaped ppd-natural-language string */
+			make_str[256],	/* Escaped ppd-make string */
+			model_str[256],	/* Escaped ppd-make-and-model string */
+			product_str[256],
+					/* Escaped ppd-product string */
+			psversion_str[256],
+					/* Escaped ppd-psversion string */
+			requested_str[256];
 					/* String for requested attributes */
-			make_str[256];	/* Escaped ppd-make string */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppds(%p[%d])", con, con->http.fd);
@@ -6088,7 +6101,14 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   */
 
   limit     = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
+  device    = ippFindAttribute(con->request, "ppd-device-id", IPP_TAG_TEXT);
+  language  = ippFindAttribute(con->request, "ppd-natural-language",
+                               IPP_TAG_LANGUAGE);
   make      = ippFindAttribute(con->request, "ppd-make", IPP_TAG_TEXT);
+  model     = ippFindAttribute(con->request, "ppd-make-and-model",
+                               IPP_TAG_TEXT);
+  product   = ippFindAttribute(con->request, "ppd-product", IPP_TAG_TEXT);
+  psversion = ippFindAttribute(con->request, "ppd-psversion", IPP_TAG_TEXT);
   requested = ippFindAttribute(con->request, "requested-attributes",
                                IPP_TAG_KEYWORD);
 
@@ -6097,16 +6117,47 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   else
     strlcpy(requested_str, "requested-attributes=all", sizeof(requested_str));
 
+  if (device)
+    url_encode_attr(device, device_str, sizeof(device_str));
+  else
+    device_str[0] = '\0';
+
+  if (language)
+    url_encode_attr(language, language_str, sizeof(language_str));
+  else
+    language_str[0] = '\0';
+
   if (make)
     url_encode_attr(make, make_str, sizeof(make_str));
   else
     make_str[0] = '\0';
 
+  if (model)
+    url_encode_attr(model, model_str, sizeof(model_str));
+  else
+    model_str[0] = '\0';
+
+  if (product)
+    url_encode_attr(product, product_str, sizeof(product_str));
+  else
+    product_str[0] = '\0';
+
+  if (psversion)
+    url_encode_attr(psversion, psversion_str, sizeof(psversion_str));
+  else
+    psversion_str[0] = '\0';
+
   snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
-  snprintf(options, sizeof(options), "list+%d+%d+%s%s%s",
+  snprintf(options, sizeof(options), "list+%d+%d+%s%s%s%s%s%s%s%s%s%s%s%s%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0,
-	   requested_str, make ? "%20" : "", make_str);
+	   requested_str,
+	   device ? "%20" : "", device_str,
+	   language ? "%20" : "", language_str,
+	   make ? "%20" : "", make_str,
+	   model ? "%20" : "", model_str,
+	   product ? "%20" : "", product_str,
+	   psversion ? "%20" : "", psversion_str);
 
   if (cupsdSendCommand(con, command, options, 0))
   {
