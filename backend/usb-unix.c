@@ -80,10 +80,11 @@ print_device(const char *uri,		/* I - Device URI */
 
   do
   {
-#ifdef __NetBSD__
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
    /*
-    * NetBSD's ulpt driver currently does not support the
-    * back-channel...
+    * *BSD's ulpt driver currently does not support the
+    * back-channel, incorrectly returns data ready on a select(),
+    * and locks up on read()...
     */
 
     use_bc = 0;
@@ -100,7 +101,7 @@ print_device(const char *uri,		/* I - Device URI */
              strcasecmp(hostname, "Canon") &&
              strcasecmp(hostname, "Konica Minolta") &&
              strcasecmp(hostname, "Minolta");
-#endif /* __NetBSD__ */
+#endif /* __FreeBSD__ || __NetBSD__ || __OpenBSD__ || __DragonFly__ */
 
     if ((device_fd = open_device(uri, &use_bc)) == -1)
     {
