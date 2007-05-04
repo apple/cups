@@ -3,6 +3,50 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.11
 
+	- "make distclean" didn't remove all generated files
+	  (STR #2366)
+	- Fixed a bug in the advertisement of classes (STR
+	  #2373)
+	- The IPP backend now stays running until the job is
+	  actually printed by the remote server; previously
+	  it would stop monitoring the job if it was held or
+	  temporarily stopped (STR #2352)
+        - PDF files were not always printed using the correct
+          orientation (STR #2348)
+        - The scheduler could crash if you specified a bad file:
+          URI for a printer (STR #2351)
+        - The Renew-Subscription operation now returns the
+          notify-lease-duration value that was used (STR #2346)
+        - The IPP backend sent job options to IPP printers,
+          however some printers tried to override the options
+          embedded in the PS/PCL stream with those job options
+          (STR #2349)
+	- ppdLocalize() now also tries a country-specific
+	  localization for when localizing to a generic locale
+	  name.
+	- The cupstestppd program now allows for partial
+	  localizations to reduce the size of universal PPD
+	  files.
+	- Chinese PPD files were incorrectly tagged with the
+	  "cn" locale (should have been "zh")
+	- The backends now manage the printer-state-reasons
+	  attribute more accurately (STR #2345)
+	- Java, PHP, Perl, and Python scripts did not work
+	  properly (STR #2342)
+	- The scheduler would take forever to start if the
+	  maximum number of file descriptors was set to
+	  "unlimited" (STR #2329)
+	- The page-ranges option was incorrectly applied to the
+	  banner pages (STR #2336)
+	- Fixed some GCC compile warnings (STR #2340)
+	- The DBUS notification code was broken for older
+	  versions of DBUS (STR #2327)
+	- The IPv6 code did not compile on HP-UX 11.23 (STR
+	  #2331)
+	- PPD constraints did not work properly with custom
+	  options.
+	- Regular PPD options with the name "CustomFoo" did
+	  not work.
 	- The USB backend did not work on NetBSD (STR #2324)
 	- The printer-state-reasons attribute was incorrectly
 	  cleared after a job completed (STR #2323)

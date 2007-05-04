@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h 6436 2007-04-02 23:24:02Z mike $"
+ * "$Id: conf.h 6490 2007-04-30 18:09:30Z mike $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -218,8 +218,11 @@ VAR char		*SystemGroupAuthKey	VALUE(NULL);
  * Prototypes...
  */
 
+extern int	cupsdCheckPermissions(const char *filename,
+		                      const char *suffix, int mode,
+	 			      int user, int group, int is_dir,
+				      int create_dir);
 extern char	*cupsdGetDateTime(time_t t);
-extern int	cupsdReadConfiguration(void);
 #ifdef HAVE_GSSAPI
 extern int	cupsdLogGSSMessage(int level, int major_status,
 		                   int minor_status,
@@ -232,8 +235,9 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 ;
 extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
+extern int	cupsdReadConfiguration(void);
 
 
 /*
- * End of "$Id: conf.h 6436 2007-04-02 23:24:02Z mike $".
+ * End of "$Id: conf.h 6490 2007-04-30 18:09:30Z mike $".
  */

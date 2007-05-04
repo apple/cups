@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 6285 2007-02-16 01:10:55Z mike $"
+ * "$Id: http.c 6499 2007-04-30 21:44:43Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -334,6 +334,11 @@ httpClose(http_t *http)			/* I - HTTP connection */
   if (http->gssname != GSS_C_NO_NAME)
     major_status = gss_release_name(&minor_status, &http->gssname);
 #endif /* HAVE_GSSAPI */
+
+#ifdef HAVE_AUTHORIZATION_H
+  if (http->auth_ref)
+    AuthorizationFree(http->auth_ref, kAuthorizationFlagDefaults);
+#endif /* HAVE_AUTHORIZATION_H */
 
   httpClearFields(http);
 
@@ -2574,10 +2579,12 @@ http_send(http_t       *http,	/* I - HTTP connection */
   httpClearFields(http);
 
  /*
-  * The Kerberos authentication string can only be used once...
+  * The Kerberos and AuthRef authentication strings can only be used once...
   */
 
-  if (http->authstring && !strncmp(http->authstring, "Negotiate", 9))
+  if (http->authstring && 
+      (!strncmp(http->authstring, "Negotiate", 9) || 
+       !strncmp(http->authstring, "AuthRef", 7)))
   {
     http->_authstring[0] = '\0';
 
@@ -3156,5 +3163,5 @@ http_write_ssl(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 6285 2007-02-16 01:10:55Z mike $".
+ * End of "$Id: http.c 6499 2007-04-30 21:44:43Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.c 6253 2007-02-10 18:48:40Z mike $"
+ * "$Id: globals.c 6499 2007-04-30 21:44:43Z mike $"
  *
  *   Global variable access routines for the Common UNIX Printing System (CUPS).
  *
@@ -180,11 +180,6 @@ globals_destructor(void *value)		/* I - Data to free */
 
   cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
 
-#ifdef HAVE_AUTHORIZATION_H
-  if (cg->auth_ref)
-    AuthorizationFree(cg->auth_ref, kAuthorizationFlagDefaults);
-#endif /* HAVE_AUTHORIZATION_H */
-
   free(value);
 }
 
@@ -231,5 +226,5 @@ _cupsGlobals(void)
 
 
 /*
- * End of "$Id: globals.c 6253 2007-02-10 18:48:40Z mike $".
+ * End of "$Id: globals.c 6499 2007-04-30 21:44:43Z mike $".
  */

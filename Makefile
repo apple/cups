@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6332 2007-03-12 16:08:51Z mike $"
+# "$Id: Makefile 6500 2007-04-30 21:47:48Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -64,8 +64,10 @@ clean:
 distclean:	clean
 	$(RM) Makedefs config.h config.log config.status
 	$(RM) cups-config conf/cupsd.conf conf/pam.std
-	$(RM) doc/help/standard.html doc/index.html
+	$(RM) doc/help/ref-cupsd-conf.html doc/help/standard.html
+	$(RM) doc/index.html
 	$(RM) init/cups.sh init/cups-lpd
+	$(RM) man/client.conf.man
 	$(RM) man/cups-deviced.man man/cups-driverd.man
 	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
 	$(RM) man/cupsd.conf.man man/lpoptions.man
@@ -86,6 +88,14 @@ depend:
 		echo Making dependencies in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) depend) || exit 1;\
 	done
+
+
+#
+# Generate a ctags file...
+#
+
+ctags:
+	ctags -R .
 
 
 #
@@ -270,5 +280,5 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 6332 2007-03-12 16:08:51Z mike $".
+# End of "$Id: Makefile 6500 2007-04-30 21:47:48Z mike $".
 #

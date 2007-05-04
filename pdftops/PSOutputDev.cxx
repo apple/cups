@@ -2511,17 +2511,20 @@ GBool PSOutputDev::startPage(int pageNum, GfxState *state) {
       landscape = gFalse;
     } else {
       rotate = (360 - state->getRotate()) % 360;
+
+      fprintf(stderr, "DEBUG: Page rotate=%d, width=%d, height=%d, imgWidth=%d, imgHeight=%d\n",
+              state->getRotate(), width, height, imgWidth, imgHeight);
+
+      rotate = (360 - state->getRotate()) % 360;
       if (rotate == 0 || rotate == 180) {
-	if ((width > height && imgWidth < imgHeight) ||
-	    (height > width && imgHeight < imgWidth)) {
+	if (width > height && width > imgWidth) {
 	  rotate += 90;
 	  landscape = gTrue;
 	} else {
 	  landscape = gFalse;
 	}
       } else { // rotate == 90 || rotate == 270
-	if ((width > height && imgWidth < imgHeight) ||
-	    (height > width && imgHeight < imgWidth)) {
+	if (height > width && height > imgWidth) {
 	  rotate = 270 - rotate;
 	  landscape = gTrue;
 	} else {
@@ -2529,6 +2532,7 @@ GBool PSOutputDev::startPage(int pageNum, GfxState *state) {
 	}
       }
     }
+
     writePSFmt("%%%%PageOrientation: %s\n",
 	       landscape ? "Landscape" : "Portrait");
     writePS("pdfStartPage\n");

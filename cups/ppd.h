@@ -1,10 +1,10 @@
 /*
- * "$Id: ppd.h 5238 2006-03-07 04:41:42Z mike $"
+ * "$Id: ppd.h 6477 2007-04-25 19:55:45Z mike $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -331,6 +331,9 @@ typedef struct ppd_file_s		/**** PPD File ****/
   cups_array_t	*sorted_attrs;		/* Attribute lookup array @since CUPS 1.2@ @private@ */
   cups_array_t	*options;		/* Option lookup array @since CUPS 1.2@ @private@ */
   cups_array_t	*coptions;		/* Custom options array @since CUPS 1.2@ @private@ */
+
+  /**** New in CUPS 1.3 ****/
+  cups_array_t	*marked;		/* Marked choices @since CUPS 1.3@ @private@ */
 } ppd_file_t;
 
 
@@ -405,5 +408,5 @@ extern ppd_file_t	*ppdOpen2(cups_file_t *fp);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h 5238 2006-03-07 04:41:42Z mike $".
+ * End of "$Id: ppd.h 6477 2007-04-25 19:55:45Z mike $".
  */

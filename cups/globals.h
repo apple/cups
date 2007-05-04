@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.h 6253 2007-02-10 18:48:40Z mike $"
+ * "$Id: globals.h 6499 2007-04-30 21:44:43Z mike $"
  *
  *   Global variable definitions for the Common UNIX Printing System (CUPS).
  *
@@ -39,10 +39,6 @@
 #  ifdef HAVE_PTHREAD_H
 #    include <pthread.h>
 #  endif /* HAVE_PTHREAD_H */
-
-#  ifdef HAVE_AUTHORIZATION_H
-#    include <Security/Authorization.h>
-#  endif /* HAVE_AUTHORIZATION_H */
 
 
 /*
@@ -130,11 +126,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 					/* Default printer */
   char			ppd_filename[HTTP_MAX_URI];
 					/* PPD filename */
-
-#ifdef HAVE_AUTHORIZATION_H
-  /* auth.c */
-  AuthorizationRef	auth_ref;	/* Authorization ref */
-#endif /* HAVE_AUTHORIZATION_H */
 } _cups_globals_t;
 
 
@@ -157,5 +148,5 @@ extern void		_cupsSetError(ipp_status_t status, const char *message);
 #endif /* !_CUPS_GLOBALS_H_ */
 
 /*
- * End of "$Id: globals.h 6253 2007-02-10 18:48:40Z mike $".
+ * End of "$Id: globals.h 6499 2007-04-30 21:44:43Z mike $".
  */

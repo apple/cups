@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 6376 2007-03-21 06:39:10Z mike $"
+ * "$Id: dirsvc.c 6483 2007-04-30 17:16:16Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -2931,7 +2931,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 	{
 	  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
 	                   iface->hostname, iface->port,
-			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s%s" :
+			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s" :
 			                                    "/printers/%s",
 			   p->name);
 	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
@@ -3802,5 +3802,5 @@ update_polling(void)
 
 
 /*
- * End of "$Id: dirsvc.c 6376 2007-03-21 06:39:10Z mike $".
+ * End of "$Id: dirsvc.c 6483 2007-04-30 17:16:16Z mike $".
  */

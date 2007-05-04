@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6434 2007-04-02 22:07:10Z mike $"
+ * "$Id: ipp.c 6482 2007-04-30 17:05:59Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -101,6 +101,7 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		i;			/* Looping var */
+  int		send_options;		/* Send job options? */
   int		num_options;		/* Number of printer options */
   cups_option_t	*options;		/* Printer options */
   char		method[255],		/* Method in URI */
@@ -432,6 +433,8 @@ main(int  argc,				/* I - Number of command-line args */
     filename  = tmpfilename;
     files     = &filename;
     num_files = 1;
+
+    send_options = 0;
   }
   else
   {
@@ -441,6 +444,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     num_files = argc - 6;
     files     = argv + 6;
+
+    send_options = strncasecmp(content_type, "application/vnd.cups-", 21) != 0;
 
 #ifdef HAVE_LIBZ
     if (compression)
@@ -928,6 +933,7 @@ main(int  argc,				/* I - Number of command-line args */
 	content_type     = "application/postscript";
 	copies           = 1;
 	copies_remaining = 1;
+        send_options     = 0;
       }
     }
 #endif /* __APPLE__ */
@@ -943,7 +949,7 @@ main(int  argc,				/* I - Number of command-line args */
 	                            num_options, &options);
     }
 
-    if (copies_sup && version > 0)
+    if (copies_sup && version > 0 && send_options)
     {
      /*
       * Only send options if the destination printer supports the copies
@@ -1153,8 +1159,7 @@ main(int  argc,				/* I - Number of command-line args */
           * Stop polling if the job is finished or pending-held...
 	  */
 
-          if (job_state->values[0].integer > IPP_JOB_PROCESSING ||
-	      job_state->values[0].integer == IPP_JOB_HELD)
+          if (job_state->values[0].integer > IPP_JOB_STOPPED)
 	  {
 	    if ((job_sheets = ippFindAttribute(response, 
 	                                       "job-media-sheets-completed",
@@ -1350,7 +1355,8 @@ compress_files(int  num_files,		/* I - Number of files */
     if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
     {
       fprintf(stderr,
-              _("ERROR: Unable to create temporary compressed print file: %s\n"),
+              _("ERROR: Unable to create temporary compressed print file: "
+	        "%s\n"),
 	      strerror(errno));
       exit(CUPS_BACKEND_FAILED);
     }
@@ -1761,5 +1767,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 6434 2007-04-02 22:07:10Z mike $".
+ * End of "$Id: ipp.c 6482 2007-04-30 17:05:59Z mike $".
  */

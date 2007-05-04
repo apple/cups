@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c 6437 2007-04-03 17:38:10Z mike $"
+ * "$Id: usb-unix.c 6510 2007-05-04 13:08:05Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -80,10 +80,11 @@ print_device(const char *uri,		/* I - Device URI */
 
   do
   {
-#ifdef __NetBSD__
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
    /*
-    * NetBSD's ulpt driver currently does not support the
-    * back-channel...
+    * *BSD's ulpt driver currently does not support the
+    * back-channel, incorrectly returns data ready on a select(),
+    * and locks up on read()...
     */
 
     use_bc = 0;
@@ -100,7 +101,7 @@ print_device(const char *uri,		/* I - Device URI */
              strcasecmp(hostname, "Canon") &&
              strcasecmp(hostname, "Konica Minolta") &&
              strcasecmp(hostname, "Minolta");
-#endif /* __NetBSD__ */
+#endif /* __FreeBSD__ || __NetBSD__ || __OpenBSD__ || __DragonFly__ */
 
     if ((device_fd = open_device(uri, &use_bc)) == -1)
     {
@@ -617,5 +618,5 @@ side_cb(int print_fd,			/* I - Print file */
 
 
 /*
- * End of "$Id: usb-unix.c 6437 2007-04-03 17:38:10Z mike $".
+ * End of "$Id: usb-unix.c 6510 2007-05-04 13:08:05Z mike $".
  */

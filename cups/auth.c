@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6397 2007-03-25 23:33:32Z mike $"
+ * "$Id: auth.c 6499 2007-04-30 21:44:43Z mike $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -468,17 +468,17 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * Delete any previous authorization reference...
   */
   
-  if (cg->auth_ref)
+  if (http->auth_ref)
   {
-    AuthorizationFree(cg->auth_ref, kAuthorizationFlagDefaults);
-    cg->auth_ref = NULL;
+    AuthorizationFree(http->auth_ref, kAuthorizationFlagDefaults);
+    http->auth_ref = NULL;
   }
 
   if (httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey", 
 		       auth_key, sizeof(auth_key)))
   {
     status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, 
-				 kAuthorizationFlagDefaults, &cg->auth_ref);
+				 kAuthorizationFlagDefaults, &http->auth_ref);
     if (status != errAuthorizationSuccess)
     {
       DEBUG_printf(("cups_local_auth: AuthorizationCreate() returned %d (%s)\n",
@@ -499,11 +499,11 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 		 kAuthorizationFlagInteractionAllowed | 
 		 kAuthorizationFlagExtendRights;
 
-    status = AuthorizationCopyRights(cg->auth_ref, &auth_rights, 
+    status = AuthorizationCopyRights(http->auth_ref, &auth_rights, 
 				     kAuthorizationEmptyEnvironment, 
 				     auth_flags, NULL);
     if (status == errAuthorizationSuccess)
-      status = AuthorizationMakeExternalForm(cg->auth_ref, &auth_extrn);
+      status = AuthorizationMakeExternalForm(http->auth_ref, &auth_extrn);
 
     if (status == errAuthorizationSuccess)
     {
@@ -583,5 +583,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c 6397 2007-03-25 23:33:32Z mike $".
+ * End of "$Id: auth.c 6499 2007-04-30 21:44:43Z mike $".
  */

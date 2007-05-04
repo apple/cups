@@ -1,9 +1,41 @@
-CHANGES.txt - 2007-04-04
+CHANGES.txt - 2007-05-03
 ------------------------
 
 CHANGES IN CUPS V1.3
 
-	- Documentation updates (STR #1775, STR #2130, STR #2131)
+	- Documentation updates (STR #1775, STR #2130, STR #2131,
+	  STR #2263, STR #2356)
+	- Added new -R and -W options to the cupstestppd program
+	  for greater control over the testing of PPDs.
+	- Added a new cupsGetServerPPD() function for getting
+	  an available PPD from the server (STR #2334)
+	- Added a new cupsDoIORequest() function for reading
+	  and writing files via IPP requests (STR #2334)
+	- Added a new CUPS_GET_PPD operation for getting an
+	  available PPD file on the server (STR #2334) 
+	- CUPS_GET_PPDS now reports multiple ppd-product values
+	  if the corresponding PPD contains multiple products
+	  (STR #2334)
+	- CUPS_GET_PPDS now reports the PSVersion attributes
+	  from a PPD file in the ppd-psversion attribute
+	  (STR #2334)
+	- Added a new printer attribute called "cups-version"
+	  which reports the version of CUPS that is running
+	  (STR #2240)
+	- backendRunLoop() now aborts immediately on SIGTERM
+	  if no data has been written yet (STR #2103)
+	- Due to poor IPP support from the vendors, the SNMP
+	  backend no longer tries IPP connections; instead,
+	  it now uses a lookup file with fallback to port 9100
+	  (socket://address) and 515 (lpd://address) printing
+	  (STR #2035, STR #2354) 
+	- The scheduler now recreates the CUPS log directory as
+	  needed (STR #2353)
+	- cupsLangDefault() now maps new-style Apple locale names
+	  to the traditional ll_CC form (STR #2357)
+        - Add new cupsArrayNew2() API to support hashed lookups
+          of array elements (STR #2358)
+        - ppdConflicts() optimizations (STR #2358)
 	- The cupstestppd program now tests for existing filters,
 	  icons, profiles, and dialog extensions (STR #2326)
 	- The web interface no longer lists new printers on the

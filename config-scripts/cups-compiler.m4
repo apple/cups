@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 6264 2007-02-11 17:11:15Z mike $"
+dnl "$Id: cups-compiler.m4 6447 2007-04-10 18:02:00Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -435,6 +435,10 @@ case $uname in
 		# HP-UX 11.00 (at least) needs this definition to get the
 		# u_short type used by the IP headers...
 		OPTIM="$OPTIM -D_INCLUDE_HPUX_SOURCE"
+
+		# HP-UX 11.23 (at least) needs this definition to get the
+		# IPv6 header to work...
+		OPTIM="$OPTIM -D_HPUX_SOURCE"
 		;;
 
 	OSF*)
@@ -445,5 +449,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4 6264 2007-02-11 17:11:15Z mike $".
+dnl End of "$Id: cups-compiler.m4 6447 2007-04-10 18:02:00Z mike $".
 dnl

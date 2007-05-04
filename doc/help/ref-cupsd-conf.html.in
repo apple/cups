@@ -67,7 +67,7 @@ server activity.</P>
 information to the system log instead of a plain file.</P>
 
 <P>The default access log file is
-<VAR>/var/log/cups/access_log</VAR>.</P>
+<VAR>@CUPS_LOGDIR@/access_log</VAR>.</P>
 
 
 <H2 CLASS="title"><A NAME="Allow">Allow</A></H2>
@@ -521,8 +521,7 @@ BrowseLocalProtocols cups dns-sd
 <P>The <CODE>BrowseLocalProtocols</CODE> directive specifies the
 protocols to use when advertising local shared printers on the
 network. Multiple protocols can be specified by separating them
-with spaces. The default is <CODE>cups</CODE>, which is a
-broadcast-based protocol.</P>
+with spaces. The default is <CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE>.</P>
 
 
 <H2 CLASS="title"><A NAME="BrowseOrder">BrowseOrder</A></H2>
@@ -616,7 +615,10 @@ BrowseProtocols cups dns-sd
 protocols to use when showing and advertising shared printers on
 the local network. Multiple protocols can be specified by
 separating them with spaces. The default protocol is
-<CODE>cups</CODE>, which is a broadcast-based protocol.</P>
+<CODE>@CUPS_BROWSE_LOCAL_PROTOCOLS@</CODE> for
+<A HREF="#BrowseLocalProtocols"><CODE>BrowseLocalProtocols</CODE></A> and
+<CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE> for
+<A HREF="#BrowseRemoteProtocols"><CODE>BrowseRemoteProtocols</CODE></A>.</P>
 
 <BLOCKQUOTE><B>Note:</B>
 
@@ -698,8 +700,7 @@ BrowseRemoteProtocols cups dns-sd
 <P>The <CODE>BrowseRemoteProtocols</CODE> directive specifies the
 protocols to use when finding remote shared printers on the
 network. Multiple protocols can be specified by separating them
-with spaces. The default is <CODE>cups</CODE>, which is a
-broadcast-based protocol.</P>
+with spaces. The default is <CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE>.</P>
 
 
 <H2 CLASS="title"><A NAME="BrowseShortNames">BrowseShortNames</A></H2>
@@ -720,7 +721,7 @@ Short names are just the remote printer name, without the server
 same name, the printers will have long names ("printer@server1",
 "printer@server2".)</P>
 
-<P>The default value for this option is <CODE>Yes</CODE>.</P>
+<P>The default value for this option is <CODE>@CUPS_BROWSE_SHORT_NAMES@</CODE>.</P>
 
 
 <H2 CLASS="title"><A NAME="BrowseTimeout">BrowseTimeout</A></H2>
@@ -759,7 +760,7 @@ Browsing Off
 
 <P>The <CODE>Browsing</CODE> directive controls whether or not
 network printer browsing is enabled. The default setting is
-<CODE>On</CODE>.</P>
+<CODE>@CUPS_BROWSING@</CODE>.</P>
 
 <P>This directive does not enable sharing of local printers by
 itself; you must also use the <A
@@ -835,7 +836,7 @@ ConfigFilePerm 0640
 
 <P>The <CODE>ConfigFilePerm</CODE> directive specifies the
 permissions to use when writing configuration files. The default
-is 0640.</P>
+is @CUPS_CONFIG_FILE_PERM@.</P>
 
 
 <H2 CLASS="title"><A NAME="DataDir">DataDir</A></H2>
@@ -956,7 +957,7 @@ DefaultShared no
 
 <P>The <CODE>DefaultShared</CODE> directive specifies whether
 printers are shared (published) by default. The default is
-<CODE>yes</CODE>.</P>
+<CODE>@CUPS_DEFAULT_SHARED@</CODE>.</P>
 
 
 <H2 CLASS="title"><A NAME="Deny">Deny</A></H2>
@@ -1020,13 +1021,13 @@ DocumentRoot /foo/bar/doc/cups
 of web content for the HTTP server in CUPS. If an absolute path
 is not specified then it is assumed to be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default directory is <VAR>/usr/share/doc/cups</VAR>.</P>
+default directory is <VAR>@CUPS_DOCROOT@</VAR>.</P>
 
 <P>Documents are first looked up in a sub-directory for the
 primary language requested by the client (e.g.
-<VAR>/usr/share/doc/cups/fr/...</VAR>) and then directly under
+<VAR>@CUPS_DOCROOT@/fr/...</VAR>) and then directly under
 the <CODE>DocumentRoot</CODE> directory (e.g.
-<VAR>/usr/share/doc/cups/...</VAR>), so it is possible to
+<VAR>@CUPS_DOCROOT@/...</VAR>), so it is possible to
 localize the web content by providing subdirectories for each
 language needed.</P>
 
@@ -1069,7 +1070,7 @@ ErrorLog syslog
 log file. If the filename is not absolute then it is assumed to
 be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default error log file is <VAR>/var/log/cups/error_log</VAR>.</P>
+default error log file is <VAR>@CUPS_LOGDIR@/error_log</VAR>.</P>
 
 <P>The server name can be included in the filename by using
 <CODE>%s</CODE> in the name.</P>
@@ -1283,25 +1284,6 @@ performance problems with hostname lookups. Set this option to
 required.</P>
 
 
-<H2 CLASS="title"><A NAME="ImplicitClasses">ImplicitClasses</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-ImplicitClasses On
-ImplicitClasses Off
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>ImplicitClasses</CODE> directive controls whether
-implicit classes are created based upon the available network
-printers and classes. The default setting is <CODE>On</CODE> but
-is automatically turned <CODE>Off</CODE> if <A
-HREF="#Browsing"><CODE>Browsing</CODE></A> is turned
-<CODE>Off</CODE>.</P>
-
-
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.10</SPAN><A NAME="ImplicitAnyClasses">ImplicitAnyClasses</A></H2>
 
 <H3>Examples</H3>
@@ -1320,6 +1302,25 @@ setting is <CODE>Off</CODE>.</P>
 
 <P><A HREF="#ImplicitClasses"><CODE>ImplicitClasses</CODE></A>
 must be enabled for this directive to have any effect.</P>
+
+
+<H2 CLASS="title"><A NAME="ImplicitClasses">ImplicitClasses</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+ImplicitClasses On
+ImplicitClasses Off
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>ImplicitClasses</CODE> directive controls whether
+implicit classes are created based upon the available network
+printers and classes. The default setting is
+<CODE>@CUPS_IMPLICIT_CLASSES@</CODE> but is automatically turned
+<CODE>Off</CODE> if <A HREF="#Browsing"><CODE>Browsing</CODE></A> is turned
+<CODE>Off</CODE>.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.9</SPAN><A NAME="Include">Include</A></H2>
@@ -1819,7 +1820,7 @@ LogFilePerm 0600
 
 <P>The <CODE>LogFilePerm</CODE> directive specifies the
 permissions to use when writing configuration files. The default
-is 0644.</P>
+is @CUPS_LOG_FILE_PERM@.</P>
 
 
 <H2 CLASS="title"><A NAME="LogLevel">LogLevel</A></H2>
@@ -1934,7 +1935,7 @@ MaxCopies 65535
 
 <P>The <CODE>MaxCopies</CODE> directive controls the maximum
 number of copies that a user can print of a job. The default is
-100 copies.</P>
+@CUPS_MAX_COPIES@ copies.</P>
 
 <BLOCKQUOTE><B>Note:</B>
 
@@ -2107,7 +2108,7 @@ PageLog syslog
 log file. If the filename is not absolute then it is assumed to
 be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default page log file is <VAR>/var/log/cups/page_log</VAR>.</P>
+default page log file is <VAR>@CUPS_LOGDIR@/page_log</VAR>.</P>
 
 <P>The server name can be included in the filename by using
 <CODE>%s</CODE> in the name.</P>
@@ -2349,7 +2350,7 @@ RequestRoot /foo/bar/spool/cups
 incoming IPP requests and HTML forms. If an absolute path is not
 provided then it is assumed to be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default request directory is <VAR>/var/spool/cups</VAR>.</P>
+default request directory is <VAR>@CUPS_REQUESTS@</VAR>.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.7</SPAN><A NAME="Require">Require</A></H2>
@@ -2700,10 +2701,7 @@ SystemGroup root lpadmin
 <P>The <CODE>SystemGroup</CODE> directive specifies the system
 administration group for <CODE>System</CODE> authentication.
 Multiple groups can be listed, separated with spaces. The default
-is system-dependent and generally consists of all of the
-following groups, if present: <CODE>lpadmin</CODE>,
-<CODE>root</CODE>, <CODE>sys</CODE>, and/or
-<CODE>system</CODE>.</P>
+group list is <CODE>@CUPS_SYSTEM_GROUPS@</CODE>.</P>
 
 
 <H2 CLASS="title"><A NAME="TempDir">TempDir</A></H2>
@@ -2719,7 +2717,7 @@ TempDir /foo/bar/tmp
 
 <P>The <CODE>TempDir</CODE> directive specifies an absolute path
 for the directory to use for temporary files. The default
-directory is <VAR>/var/spool/cups/tmp</VAR>.</P>
+directory is <VAR>@CUPS_REQUESTS@/tmp</VAR>.</P>
 
 <P>Temporary directories must be world-writable and should have
 the "sticky" permission bit enabled so that other users cannot
@@ -2768,7 +2766,7 @@ advertising a default printer, the client's default printer is
 set to the first discovered printer, or to the implicit class for
 the same printer available from multiple servers.</P>
 
-<P>The default is <CODE>yes</CODE>.</P>
+<P>The default is <CODE>@CUPS_USE_NETWORK_DEFAULT@</CODE>.</P>
 
 
 <H2 CLASS="title"><A NAME="User">User</A></H2>
@@ -2784,7 +2782,7 @@ User guest
 
 <P>The <CODE>User</CODE> directive specifies the UNIX user that
 filter and CGI programs run as. The default user is
-<CODE>lp</CODE>.</P>
+<CODE>@CUPS_USER@</CODE>.</P>
 
 <BLOCKQUOTE><B>Note:</B>
 

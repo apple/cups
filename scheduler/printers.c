@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 6436 2007-04-02 23:24:02Z mike $"
+ * "$Id: printers.c 6501 2007-04-30 21:53:15Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -26,6 +26,7 @@
  *   cupsdAddPrinter()           - Add a printer to the system.
  *   cupsdAddPrinterHistory()    - Add the current printer state to the history.
  *   cupsdAddPrinterUser()       - Add a user to the ACL.
+ *   cupsdCreateCommonData()     - Create the common printer data.
  *   cupsdDeleteAllPrinters()    - Delete all printers from the system.
  *   cupsdDeletePrinter()        - Delete a printer from the system.
  *   cupsdFindPrinter()          - Find a printer in the list.
@@ -266,7 +267,7 @@ cupsdCreateCommonData(void)
 			*notifier;	/* Current notifier */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
-  static const ipp_orient_t orients[4] =/* orientation-requested-supported values */
+  static const int orients[4] =/* orientation-requested-supported values */
 		{
 		  IPP_PORTRAIT,
 		  IPP_LANDSCAPE,
@@ -289,7 +290,7 @@ cupsdCreateCommonData(void)
 		  "1.0",
 		  "1.1"
 		};
-  static const ipp_op_t	ops[] =		/* operations-supported values */
+  static const int	ops[] =		/* operations-supported values */
 		{
 		  IPP_PRINT_JOB,
 		  IPP_VALIDATE_JOB,
@@ -412,6 +413,10 @@ cupsdCreateCommonData(void)
 
   /* copies-supported */
   ippAddRange(CommonData, IPP_TAG_PRINTER, "copies-supported", 1, MaxCopies);
+
+  /* cups-version */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_TEXT, "cups-version",
+               NULL, CUPS_SVERSION + 6);
 
   /* generated-natural-language-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
@@ -545,11 +550,11 @@ cupsdCreateCommonData(void)
   /* operations-supported */
   ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                  "operations-supported",
-                 sizeof(ops) / sizeof(ops[0]) + JobFiles - 1, (int *)ops);
+                 sizeof(ops) / sizeof(ops[0]) + JobFiles - 1, ops);
 
   /* orientation-requested-supported */
   ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                 "orientation-requested-supported", 4, (int *)orients);
+                 "orientation-requested-supported", 4, orients);
 
   /* page-ranges-supported */
   ippAddBoolean(CommonData, IPP_TAG_PRINTER, "page-ranges-supported", 1);
@@ -1651,7 +1656,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
   int		num_finishings;		/* Number of finishings */
-  ipp_finish_t	finishings[5];		/* finishings-supported values */
+  int		finishings[5];		/* finishings-supported values */
   cups_option_t	*option;		/* Current printer option */
   static const char * const sides[3] =	/* sides-supported values */
 		{
@@ -2288,7 +2293,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       }
 
       ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                     "finishings-supported", num_finishings, (int *)finishings);
+                     "finishings-supported", num_finishings, finishings);
       ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                     "finishings-default", IPP_FINISHINGS_NONE);
     }
@@ -3708,5 +3713,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 6436 2007-04-02 23:24:02Z mike $".
+ * End of "$Id: printers.c 6501 2007-04-30 21:53:15Z mike $".
  */

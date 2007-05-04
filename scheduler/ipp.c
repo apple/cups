@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6433 2007-04-02 21:50:50Z mike $"
+ * "$Id: ipp.c 6508 2007-05-03 20:07:14Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -65,6 +65,7 @@
  *   get_job_attrs()             - Get job attributes.
  *   get_jobs()                  - Get a list of jobs for the specified printer.
  *   get_notifications()         - Get events for a subscription.
+ *   get_ppd()                   - Get a named PPD from the local system.
  *   get_ppds()                  - Get the list of PPD files on the local
  *                                 system.
  *   get_printer_attrs()         - Get printer attributes.
@@ -92,6 +93,7 @@
  *   start_printer()             - Start a printer.
  *   stop_printer()              - Stop a printer.
  *   url_encode_attr()           - URL-encode a string attribute.
+ *   url_encode_string()         - URL-encode a string.
  *   user_allowed()              - See if a user is allowed to print to a queue.
  *   validate_job()              - Validate printer options and destination.
  *   validate_name()             - Make sure the printer name only contains
@@ -178,6 +180,7 @@ static void	get_devices(cupsd_client_t *con);
 static void	get_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_notifications(cupsd_client_t *con);
+static void	get_ppd(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_ppds(cupsd_client_t *con);
 static void	get_printers(cupsd_client_t *con, int type);
 static void	get_printer_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -216,6 +219,7 @@ static void	start_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	url_encode_attr(ipp_attribute_t *attr, char *buffer,
 		                int bufsize);
+static char	*url_encode_string(const char *s, char *buffer, int bufsize);
 static int	user_allowed(cupsd_printer_t *p, const char *username);
 static void	validate_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static int	validate_name(const char *name);
@@ -344,6 +348,8 @@ cupsdProcessIPPRequest(
       else if ((attr = ippFindAttribute(con->request, "job-uri",
                                         IPP_TAG_URI)) != NULL)
 	uri = attr;
+      else if (con->request->request.op.operation_id == CUPS_GET_PPD)
+        uri = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME);
       else
 	uri = NULL;
 
@@ -399,11 +405,12 @@ cupsdProcessIPPRequest(
         if (!uri)
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Missing printer-uri or job-uri attribute!");
+	                  "Missing printer-uri, job-uri, or ppd-name "
+			  "attribute!");
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                	"%04X %s Missing printer-uri or job-uri attribute",
-			IPP_BAD_REQUEST, con->http.hostname);
+                	"%04X %s Missing printer-uri, job-uri, or ppd-name "
+			"attribute", IPP_BAD_REQUEST, con->http.hostname);
         }
 
 	cupsdLogMessage(CUPSD_LOG_DEBUG, "Request attributes follow...");
@@ -572,6 +579,10 @@ cupsdProcessIPPRequest(
               get_devices(con);
               break;
 
+	  case CUPS_GET_PPD :
+              get_ppd(con, uri);
+              break;
+
 	  case CUPS_GET_PPDS :
               get_ppds(con);
               break;
@@ -665,6 +676,15 @@ cupsdProcessIPPRequest(
 
 	length = ippLength(con->response);
 
+	if (con->file >= 0 && !con->pipe_pid)
+	{
+	  struct stat	fileinfo;	/* File information */
+
+
+          if (!fstat(con->file, &fileinfo))
+	    length += fileinfo.st_size;
+	}
+
 	if (httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
         	       CUPS_LLCAST length) < 0)
 	  return (0);
@@ -674,6 +694,11 @@ cupsdProcessIPPRequest(
 
 	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
 	con->http.data_remaining = length;
+
+	if (con->http.data_remaining <= INT_MAX)
+	  con->http._data_remaining = con->http.data_remaining;
+	else
+	  con->http._data_remaining = INT_MAX;
       }
 
       cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient,
@@ -5888,6 +5913,147 @@ get_notifications(cupsd_client_t *con)	/* I - Client connection */
 
 
 /*
+ * 'get_ppd()' - Get a named PPD from the local system.
+ */
+
+static void
+get_ppd(cupsd_client_t  *con,		/* I - Client connection */
+        ipp_attribute_t *uri)		/* I - Printer URI or PPD name */
+{
+  http_status_t		status;		/* Policy status */
+  cupsd_printer_t	*dest;		/* Destination */
+  cups_ptype_t		dtype;		/* Destination type */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppd(%p[%d], %p[%s=%s])", con,
+                  con->http.fd, uri, uri->name, uri->values[0].string.text);
+
+  if (!strcmp(uri->name, "ppd-name"))
+  {
+   /*
+    * Return a PPD file from cups-driverd...
+    */
+
+    char	command[1024],	/* cups-driverd command */
+		options[1024],	/* Options to pass to command */
+		ppd_name[1024];	/* ppd-name */
+
+
+   /*
+    * Check policy...
+    */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
+
+   /*
+    * Run cups-driverd command with the given options...
+    */
+
+    snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
+    url_encode_string(uri->values[0].string.text, ppd_name, sizeof(ppd_name));
+    snprintf(options, sizeof(options), "get+%d+%s",
+             con->request->request.op.request_id, ppd_name);
+
+    if (cupsdSendCommand(con, command, options, 0))
+    {
+     /*
+      * Command started successfully, don't send an IPP response here...
+      */
+
+      ippDelete(con->response);
+      con->response = NULL;
+    }
+    else
+    {
+     /*
+      * Command failed, return "internal error" so the user knows something
+      * went wrong...
+      */
+
+      send_ipp_status(con, IPP_INTERNAL_ERROR,
+		      _("cups-driverd failed to execute."));
+    }
+  }
+  else if (!strcmp(uri->name, "printer-uri") &&
+           cupsdValidateDest(uri->values[0].string.text, &dtype, &dest))
+  {
+    int 	i;			/* Looping var */
+    char	filename[1024];		/* PPD filename */
+
+
+   /*
+    * Check policy...
+    */
+
+    if ((status = cupsdCheckPolicy(dest->op_policy_ptr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
+
+   /*
+    * See if we need the PPD for a class or remote printer...
+    */
+
+    if (dtype & CUPS_PRINTER_REMOTE)
+    {
+      send_ipp_status(con, CUPS_SEE_OTHER, NULL);
+      ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI,
+                   "printer-uri", NULL, dest->uri);
+      return;
+    }
+    else if (dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+    {
+      for (i = 0; i < dest->num_printers; i ++)
+        if (!(dest->printers[i]->type &
+	      (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
+	       CUPS_PRINTER_REMOTE)))
+	  break;
+
+      if (i < dest->num_printers)
+        dest = dest->printers[i];
+      else
+      {
+	send_ipp_status(con, CUPS_SEE_OTHER, NULL);
+	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI,
+		     "printer-uri", NULL, dest->printers[0]->uri);
+        return;
+      }
+    }
+
+   /*
+    * Found the printer with the PPD file, now see if there is one...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
+             dest->name);
+
+    if ((con->file = open(filename, O_RDONLY)) < 0)
+    {
+      send_ipp_status(con, IPP_NOT_FOUND,
+                      _("The PPD file \"%s\" could not be opened: %s"),
+		      uri->values[i].string.text, strerror(errno));
+      return;
+    }
+
+    fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
+
+    con->pipe_pid = 0;
+
+    send_ipp_status(con, IPP_OK, NULL);
+  }
+  else
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The PPD file \"%s\" could not be found."),
+                    uri->values[0].string.text);
+}
+
+
+/*
  * 'get_ppds()' - Get the list of PPD files on the local system.
  */
 
@@ -5896,13 +6062,26 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 {
   http_status_t		status;		/* Policy status */
   ipp_attribute_t	*limit,		/* Limit attribute */
+			*device,	/* ppd-device-id attribute */
+			*language,	/* ppd-natural-language attribute */
 			*make,		/* ppd-make attribute */
+			*model,		/* ppd-make-and-model attribute */
+			*product,	/* ppd-product attribute */
+			*psversion,	/* ppd-psverion attribute */
 			*requested;	/* requested-attributes attribute */
-  char			command[1024],	/* cups-deviced command */
+  char			command[1024],	/* cups-driverd command */
 			options[1024],	/* Options to pass to command */
-			requested_str[256],
+			device_str[256],/* Escaped ppd-device-id string */
+			language_str[256],
+					/* Escaped ppd-natural-language string */
+			make_str[256],	/* Escaped ppd-make string */
+			model_str[256],	/* Escaped ppd-make-and-model string */
+			product_str[256],
+					/* Escaped ppd-product string */
+			psversion_str[256],
+					/* Escaped ppd-psversion string */
+			requested_str[256];
 					/* String for requested attributes */
-			make_str[256];	/* Escaped ppd-make string */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppds(%p[%d])", con, con->http.fd);
@@ -5922,7 +6101,14 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   */
 
   limit     = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
+  device    = ippFindAttribute(con->request, "ppd-device-id", IPP_TAG_TEXT);
+  language  = ippFindAttribute(con->request, "ppd-natural-language",
+                               IPP_TAG_LANGUAGE);
   make      = ippFindAttribute(con->request, "ppd-make", IPP_TAG_TEXT);
+  model     = ippFindAttribute(con->request, "ppd-make-and-model",
+                               IPP_TAG_TEXT);
+  product   = ippFindAttribute(con->request, "ppd-product", IPP_TAG_TEXT);
+  psversion = ippFindAttribute(con->request, "ppd-psversion", IPP_TAG_TEXT);
   requested = ippFindAttribute(con->request, "requested-attributes",
                                IPP_TAG_KEYWORD);
 
@@ -5931,16 +6117,47 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   else
     strlcpy(requested_str, "requested-attributes=all", sizeof(requested_str));
 
+  if (device)
+    url_encode_attr(device, device_str, sizeof(device_str));
+  else
+    device_str[0] = '\0';
+
+  if (language)
+    url_encode_attr(language, language_str, sizeof(language_str));
+  else
+    language_str[0] = '\0';
+
   if (make)
     url_encode_attr(make, make_str, sizeof(make_str));
   else
     make_str[0] = '\0';
 
+  if (model)
+    url_encode_attr(model, model_str, sizeof(model_str));
+  else
+    model_str[0] = '\0';
+
+  if (product)
+    url_encode_attr(product, product_str, sizeof(product_str));
+  else
+    product_str[0] = '\0';
+
+  if (psversion)
+    url_encode_attr(psversion, psversion_str, sizeof(psversion_str));
+  else
+    psversion_str[0] = '\0';
+
   snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
-  snprintf(options, sizeof(options), "list+%d+%d+%s%s%s",
+  snprintf(options, sizeof(options), "list+%d+%d+%s%s%s%s%s%s%s%s%s%s%s%s%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0,
-	   requested_str, make ? "%20" : "", make_str);
+	   requested_str,
+	   device ? "%20" : "", device_str,
+	   language ? "%20" : "", language_str,
+	   make ? "%20" : "", make_str,
+	   model ? "%20" : "", model_str,
+	   product ? "%20" : "", product_str,
+	   psversion ? "%20" : "", psversion_str);
 
   if (cupsdSendCommand(con, command, options, 0))
   {
@@ -7621,6 +7838,9 @@ renew_subscription(
   cupsdSaveAllSubscriptions();
 
   con->response->request.status.status_code = IPP_OK;
+
+  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+                "notify-lease-duration", sub->lease);
 }
 
 
@@ -9221,8 +9441,7 @@ url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
 {
   int	i;				/* Looping var */
   char	*bufptr,			/* Pointer into buffer */
-	*bufend,			/* End of buffer */
-	*valptr;			/* Pointer into value */
+	*bufend;			/* End of buffer */
 
 
   strlcpy(buffer, attr->name, bufsize);
@@ -9244,25 +9463,8 @@ url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
 
     *bufptr++ = '\'';
 
-    for (valptr = attr->values[i].string.text;
-         *valptr && bufptr < bufend;
-	 valptr ++)
-      if (*valptr == ' ')
-      {
-        if (bufptr >= (bufend - 2))
-	  break;
-
-        *bufptr++ = '%';
-	*bufptr++ = '2';
-	*bufptr++ = '0';
-      }
-      else if (*valptr == '\'' || *valptr == '\\')
-      {
-        *bufptr++ = '\\';
-        *bufptr++ = *valptr;
-      }
-      else
-        *bufptr++ = *valptr;
+    bufptr = url_encode_string(attr->values[i].string.text,
+                               bufptr, bufend - bufptr + 1);
 
     if (bufptr >= bufend)
       break;
@@ -9271,6 +9473,55 @@ url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
   }
 
   *bufptr = '\0';
+}
+
+
+/*
+ * 'url_encode_string()' - URL-encode a string.
+ */
+
+static char *				/* O - End of string */
+url_encode_string(const char *s,	/* I - String */
+                  char       *buffer,	/* I - String buffer */
+		  int        bufsize)	/* I - Size of buffer */
+{
+  char	*bufptr,			/* Pointer into buffer */
+	*bufend;			/* End of buffer */
+  static const char *hex = "0123456789ABCDEF";
+					/* Hex digits */
+
+
+  bufptr = buffer;
+  bufend = buffer + bufsize - 1;
+
+  while (*s && bufptr < bufend)
+  {
+    if (*s == ' ' || *s == '%')
+    {
+      if (bufptr >= (bufend - 2))
+	break;
+
+      *bufptr++ = '%';
+      *bufptr++ = hex[(*s >> 4) & 15];
+      *bufptr++ = hex[*s & 15];
+
+      s ++;
+    }
+    else if (*s == '\'' || *s == '\\')
+    {
+      if (bufptr >= (bufend - 1))
+	break;
+
+      *bufptr++ = '\\';
+      *bufptr++ = *s++;
+    }
+    else
+      *bufptr++ = *s++;
+  }
+
+  *bufptr = '\0';
+
+  return (bufptr);
 }
 
 
@@ -9485,5 +9736,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6433 2007-04-02 21:50:50Z mike $".
+ * End of "$Id: ipp.c 6508 2007-05-03 20:07:14Z mike $".
  */

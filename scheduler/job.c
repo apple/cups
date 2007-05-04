@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6433 2007-04-02 21:50:50Z mike $"
+ * "$Id: job.c 6462 2007-04-23 19:25:13Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2721,6 +2721,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       if ((!strcmp(attr->name, "page-label") ||
            !strcmp(attr->name, "page-border") ||
            !strncmp(attr->name, "number-up", 9) ||
+	   !strcmp(attr->name, "page-ranges") ||
 	   !strcmp(attr->name, "page-set") ||
 	   !strcasecmp(attr->name, "AP_FIRSTPAGE_InputSlot") ||
 	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed")) &&
@@ -3323,6 +3324,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   cupsdClosePipe(job->status_pipes);
   cupsdStatBufDelete(job->status_buffer);
 
+  job->status_buffer = NULL;
+
   cupsArrayDelete(filters);
 
   if (printer->remote && job->num_files > 1)
@@ -3549,5 +3552,5 @@ update_job(cupsd_job_t *job)	/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c 6433 2007-04-02 21:50:50Z mike $".
+ * End of "$Id: job.c 6462 2007-04-23 19:25:13Z mike $".
  */

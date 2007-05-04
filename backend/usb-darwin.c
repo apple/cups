@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-darwin.c 6432 2007-04-02 21:50:28Z mike $"
+ * "$Id: usb-darwin.c 6491 2007-04-30 18:21:52Z mike $"
  *
  * Copyright © 2005-2007 Apple Inc. All rights reserved.
  *
@@ -598,16 +598,6 @@ static Boolean list_device_callback(void *refcon, io_service_t obj)
       else
         strcpy(modelstr + 1, "Printer");
 
-     /*
-      * Fix common HP 1284 bug...
-      */
-
-      if (!strcasecmp(makestr, "Hewlett-Packard"))
-        strcpy(makestr, "HP");
-
-      if (!strncasecmp(modelstr + 1, "hp ", 3))
-        _cups_strcpy(modelstr + 1, modelstr + 4);
-
       optionsstr[0] = '\0';
       if (serial != NULL)
       {
@@ -621,6 +611,16 @@ static Boolean list_device_callback(void *refcon, io_service_t obj)
 
       httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
       strncat(uristr, optionsstr, sizeof(uristr));
+
+     /*
+      * Fix common HP 1284 bug...
+      */
+
+      if (!strcasecmp(makestr, "Hewlett-Packard"))
+        strcpy(makestr, "HP");
+
+      if (!strncasecmp(modelstr + 1, "hp ", 3))
+        _cups_strcpy(modelstr + 1, modelstr + 4);
 
       printf("direct %s \"%s %s\" \"%s %s USB\" \"%s\"\n", uristr, makestr,
              &modelstr[1], makestr, &modelstr[1], idstr);
@@ -654,7 +654,7 @@ static Boolean find_device_callback(void *refcon, io_service_t obj)
       copy_deviceinfo(idString, &make, &model, &serial);
       if (CFStringCompare(make, userData->make, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
 	if (CFStringCompare(model, userData->model, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
-	  if (userData->serial != NULL) {
+	  if (userData->serial != NULL && CFStringGetLength(userData->serial) > 0 ) {
 	    if (serial != NULL && CFStringCompare(serial, userData->serial, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
 	      IOObjectRetain(obj);
 	      userData->printerObj = obj;
@@ -1729,5 +1729,5 @@ static void usbGetDevState(printer_data_t *userData, cups_sc_status_t *status, c
 }
 
 /*
- * End of "$Id: usb-darwin.c 6432 2007-04-02 21:50:28Z mike $".
+ * End of "$Id: usb-darwin.c 6491 2007-04-30 18:21:52Z mike $".
  */
