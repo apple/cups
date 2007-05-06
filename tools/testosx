@@ -34,26 +34,36 @@ sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
 	<packaging/WELCOME.rtf >$pkgdir/Resources/Welcome.rtf
 cp packaging/installer.tif $pkgdir/Resources/background.tif
 
-cat >$pkgdir/Resources/preflight <<EOF
+if test -x /bin/launchctl; then
+	cat >$pkgdir/Resources/preflight <<EOF
+#!/bin/sh
+# Tell launchd to reload cupsd...
+launchctl stop org.cups.cups-lpd || exit 0
+launchctl stop org.cups.cupsd || exit 0
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+EOF
+else
+	cat >$pkgdir/Resources/preflight <<EOF
 #!/bin/sh
 # Stop any running cupsd processes...
 killall cupsd || exit 0
 EOF
+fi
+
 chmod 755 $pkgdir/Resources/preflight
 
 if test -x /bin/launchctl; then
 	cat >$pkgdir/Resources/postflight <<EOF
 #!/bin/sh
 
-# Remove old startup item and xinetd config file, we use launchd now...
-rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
+# Remove old xinetd config file, we use launchd now...
 rm -f /etc/xinetd.d/cups-lpd
 
 # Tell launchd to reload cupsd...
-launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
-launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist || exit 0
+launchctl start org.cups.cupsd
 EOF
 else
 	cat >$pkgdir/Resources/postflight <<EOF

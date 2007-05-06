@@ -132,12 +132,21 @@ install:	installhdrs
 			echo Installing StartupItems files...; \
 			$(INSTALL_SCRIPT) init/PrintingServices $(BUILDROOT)$(INITDDIR)/PrintingServices; \
 			$(INSTALL_DATA) init/StartupParameters.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
-			$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
+			$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
 			$(INSTALL_DATA) init/Localizable.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
 		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
 			echo Installing LaunchDaemons configuration files...; \
 			$(INSTALL_DATA) init/org.cups.cupsd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
 			$(INSTALL_DATA) init/org.cups.cups-lpd.plist $(BUILDROOT)/System/Library/LaunchDaemons; \
+			case `uname -r` in \
+				8.*) \
+				$(INSTALL_DIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices; \
+				$(INSTALL_SCRIPT) init/PrintingServices.launchd $(BUILDROOT)/System/Library/StartupItems/PrintingServices/PrintingServices; \
+				$(INSTALL_DATA) init/StartupParameters.plist $(BUILDROOT)/System/Library/StartupItems/PrintingServices/StartupParameters.plist; \
+				$(INSTALL_DIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices/Resources/English.lproj; \
+				$(INSTALL_DATA) init/Localizable.strings $(BUILDROOT)/System/Library/StartupItems/PrintingServices/Resources/English.lproj/Localizable.strings; \
+				;; \
+			esac \
 		else \
 			echo Installing RC script...; \
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
@@ -215,7 +224,9 @@ uninstall:
 			$(RM) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
 			$(RMDIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
 		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
-			$(RM) $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
+			$(RM) $(BUILDROOT)$(INITDDIR)/org.cups.cupsd.plist; \
+			$(RM) $(BUILDROOT)$(INITDDIR)/org.cups.cups-lpd.plist; \
+			$(RMDIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices; \
 		else \
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		fi \
