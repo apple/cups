@@ -2662,14 +2662,14 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
   
 	  if (relay->from.type == AUTH_IP)
 	    snprintf(temp2, sizeof(temp2), "%u.%u.%u.%u/%u.%u.%u.%u",
-		     relay->from.mask.ip.address[0],
-		     relay->from.mask.ip.address[1],
-		     relay->from.mask.ip.address[2],
-		     relay->from.mask.ip.address[3],
-		     relay->from.mask.ip.netmask[0],
-		     relay->from.mask.ip.netmask[1],
-		     relay->from.mask.ip.netmask[2],
-		     relay->from.mask.ip.netmask[3]);
+		     relay->from.mask.ip.address[0] >> 24,
+		     (relay->from.mask.ip.address[0] >> 16) & 255,
+		     (relay->from.mask.ip.address[0] >> 8) & 255,
+		     relay->from.mask.ip.address[0] & 255,
+		     relay->from.mask.ip.netmask[0] >> 24,
+		     (relay->from.mask.ip.netmask[0] >> 16) & 255,
+		     (relay->from.mask.ip.netmask[0] >> 8) & 255,
+		     relay->from.mask.ip.netmask[0] & 255);
 	  else
 	    strlcpy(temp2, relay->from.mask.name.name, sizeof(temp2));
   
