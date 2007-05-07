@@ -1364,7 +1364,6 @@ launchd_checkout(void)
     unlink(CUPS_KEEPALIVE);
   }
 }
-
 #endif /* HAVE_LAUNCHD */
 
 
