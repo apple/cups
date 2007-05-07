@@ -634,15 +634,26 @@ f 0644 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.$MAN8EXT
 # Startup scripts
 %system darwin
 f 0644 root sys /System/Library/LaunchDaemons/org.cups.cupsd.plist init/org.cups.cupsd.plist
-%postinstall <<EOF
-rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
+d 0755 root sys /System/Library/StartupItems/PrintingServices -
+f 0644 root sys /System/Library/StartupItems/PrintingServices/PrintingServices init/PrintingServices.launchd
+f 0644 root sys /System/Library/StartupItems/PrintingServices/StartupParamters.plist init/StartupParameters.plist
+d 0755 root sys /System/Library/StartupItems/PrintingServices/Resources -
+d 0755 root sys /System/Library/StartupItems/PrintingServices/Resources/English.lproj -
+f 0644 root sys /System/Library/StartupItems/PrintingServices/Resources/English.lproj/Localizable.strings init/Localizable.strings
+%preremove <<EOF
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 killall cupsd
-sleep 1
+EOF
+%postinstall <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
+launchctl start org.cups.cupsd
 EOF
 %subpackage lpd
 f 0644 root sys /System/Library/LaunchDaemons/org.cups.cups-lpd.plist init/org.cups.cups-lpd.plist
+%preremove <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+EOF
 %postinstall <<EOF
 rm -f /etc/xinetd.d/cups-lpd
 launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
