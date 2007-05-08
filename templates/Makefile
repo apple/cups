@@ -31,6 +31,7 @@ include ../Makedefs
 FILES	=	\
 		add-class.tmpl \
 		add-printer.tmpl \
+		add-rss-subscription.tmpl \
 		admin.tmpl \
 		choose-device.tmpl \
 		choose-make.tmpl \
@@ -90,6 +91,8 @@ FILES	=	\
 		search.tmpl \
 		set-printer-options-header.tmpl \
 		set-printer-options-trailer.tmpl \
+		subscription-added.tmpl \
+		subscription-canceled.tmpl \
 		test-page.tmpl \
 		trailer.tmpl \
 		users.tmpl
