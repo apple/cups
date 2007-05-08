@@ -3,6 +3,9 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.11
 
+	- Fixed the "relaying from" log message (STR #2376)
+	- Updated the launchd support on Mac OS X to better
+	  support reconfiguration.
 	- "make distclean" didn't remove all generated files
 	  (STR #2366)
 	- Fixed a bug in the advertisement of classes (STR
