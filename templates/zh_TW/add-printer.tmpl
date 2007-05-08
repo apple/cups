@@ -1,0 +1,28 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+
+<H2 CLASS="title">加入新的印表機</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">名稱：</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(可能包含任何除了 "/"、"#" 和 space 以外可列印的字元)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">位置：</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(容易理解的位置，像是 "實驗室一")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">描述：</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(容易理解的描述，像是 "HP LaserJet with Duplexer")</SMALL></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="繼續"></TD>
+</TR>
+</TABLE>
+
+</FORM>

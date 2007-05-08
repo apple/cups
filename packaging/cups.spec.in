@@ -121,6 +121,11 @@ Summary: Common UNIX Printing System - Swedish support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
+%package zh
+Summary: Common UNIX Printing System - Chinese support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %if %{?_with_php:1}%{!?_with_php:0}
 %package php
 Summary: Common UNIX Printing System - PHP support
@@ -182,6 +187,10 @@ UNIX® operating systems. This package provides Polish support.
 %description sv
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Swedish support.
+
+%description zh
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Chinese support.
 
 %if %{?_with_php:1}%{!?_with_php:0}
 %description php
@@ -509,6 +518,16 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups/templates/sv
 /usr/share/cups/templates/sv/*
 /usr/share/locale/sv/cups_sv.po
+
+%files zh
+%defattr(-,root,root)
+%dir /usr/share/doc/cups/zh_TW
+/usr/share/doc/cups/zh_TW/index.html
+%dir /usr/share/doc/cups/zh_TW/images
+/usr/share/doc/cups/zh_TW/images/*
+%dir /usr/share/cups/templates/zh_TW
+/usr/share/cups/templates/zh_TW/*
+/usr/share/locale/zh_TW/cups_zh_TW.po
 
 %if %{?_with_php:1}%{!?_with_php:0}
 %files php

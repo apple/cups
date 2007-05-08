@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>首頁 - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/favicon.ico" TYPE="image/x-icon">
+</HEAD>
+<BODY>
+<TABLE WIDTH="100%" STYLE="height: 100%;" BORDER="0" CELLSPACING="0" CELLPADDING="0" SUMMARY="Common UNIX Printing System @CUPS_VERSION@">
+<TR CLASS="header">
+<TD VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG SRC="/images/top-left.gif" WIDTH="15" HEIGHT="80" ALT=""></TD>
+<TD VALIGN="TOP" WIDTH="55" ROWSPAN="2"><IMG SRC="/images/top-middle.gif" WIDTH="55" HEIGHT="80" ALT=""></TD>
+<TD WIDTH="100%" HEIGHT="60"><H1>Common UNIX Printing System @CUPS_VERSION@@CUPS_REVISION@</H1></TD>
+<TD ALIGN="RIGHT" VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG
+SRC="/images/top-right.gif" WIDTH="15" HEIGHT="15" ALT=""></TD>
+</TR>
+<TR CLASS="header"><TD WIDTH="100%" VALIGN="BOTTOM" NOWRAP>
+
+<A CLASS="sel" HREF="/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;首頁&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/admin/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;管理&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/classes/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;分類&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/help/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;文件/求助&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/jobs/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;工作&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+&nbsp;<A CLASS="unsel" HREF="/printers/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
+HEIGHT="4" ALIGN="TOP" BORDER="0"
+ALT="">&nbsp;&nbsp;印表機&nbsp;&nbsp;<IMG
+SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
+BORDER="0" ALT=""></A>
+
+</TD></TR>
+<TR CLASS="page">
+<TD WIDTH="15">&nbsp;</TD>
+<TD COLSPAN="2" WIDTH="100%" VALIGN="TOP" CLASS="page">
+
+<H2 CLASS="title">歡迎！</H2>
+
+<P>此處的網頁讓您監看您的印表機和工作，以及
+進行系統管理任務。按下上方任何的分頁頁標或是
+下方的按鈕，以執行某個作業。</P>
+
+<P>
+<A HREF="/help/"><IMG SRC="/images/button-help.gif" CLASS="button" ALT="求助"></A>
+<A HREF="/admin?OP=add-class"><IMG SRC="/images/button-add-class.gif" CLASS="button" ALT="增加分類"></A>
+<A HREF="/admin?OP=add-printer"><IMG SRC="/images/button-add-printer.gif" CLASS="button" ALT="增加印表機"></A>
+<A HREF="/classes"><IMG SRC="/images/button-manage-classes.gif" CLASS="button" ALT="管理分類"></A>
+<A HREF="/jobs"><IMG SRC="/images/button-manage-jobs.gif" CLASS="button" ALT="管理工作"></A>
+<A HREF="/printers"><IMG SRC="/images/button-manage-printers.gif" CLASS="button" ALT="管理印表機"></A>
+<A HREF="/admin"><IMG SRC="/images/button-manage-server.gif" CLASS="button" ALT="管理伺服器"></A>
+</P>
+
+<P><I>如果向您要求使用者名稱與密碼，請輸入
+您的使用者名稱與密碼，或是 "root" 的使用者名稱與密碼。</I></P>
+
+<H2 CLASS="title">關於 CUPS</H2>
+
+<P>
+<IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
+STYLE="padding-right: 10px;" ALT="快樂的電腦與印表機">
+
+<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
+ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
+STYLE="padding-left: 10px; padding-bottom: 10px;"
+ALT="Easy Software Products"></A>
+
+CUPS 提供以 UNIX<SUP>&reg;</SUP> 為基礎的作業系統 
+一層具有可攜性的列印介面。它是由 <A HREF="http://www.easysw.com">Easy Software
+Products</a> 為了推動一個標準的列印解決方案所開發與維護。CUPS 是目前用於
+MacOS<SUP>&reg;</SUP> X 與大部份 Linux<SUP>&reg;</SUP> 發行版本的標準列印系統。</P>
+
+<P>CUPS 使用 <A HREF="http://www.pwg.org/ipp/"
+TARGET="_blank"> Internet Printing Protocol ("IPP")</A> 做為
+管理列印工作與佇列的基礎，並且加入瀏覽網路印表機和基於
+PostScript Printer Description ("PPD") 的列印選項，
+以支援真實世界中的列印。<BR CLEAR="ALL"></P>
+
+<H2 CLASS="title">印表機驅動程式與協助</H2>
+
+<P>造訪 CUPS 的官方網站以獲得印表機驅動程式與協助：</P>
+
+<PRE>
+    <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
+</PRE>
+
+<P>CUPS 的商業支援與進階版本名為 <A
+HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> 是提供自：</P>
+
+<PRE>
+    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
+</PRE>
+
+</TD>
+<TD WIDTH="15">&nbsp;</TD>
+</TR>
+<TR CLASS="header">
+<TD VALIGN="BOTTOM" WIDTH="15"><IMG SRC="/images/bottom-left.gif"
+WIDTH="15" HEIGHT="15" ALT=""></TD>
+<TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
+
+<P><SMALL>The Common UNIX Printing System, CUPS, and the CUPS logo are the
+trademark property of <A HREF="http://www.easysw.com">Easy Software
+Products</A>. CUPS is copyright 1997-2007 by Easy Software Products,
+All Rights Reserved.</SMALL></P>
+
+</TD>
+
+<TD ALIGN="RIGHT" VALIGN="BOTTOM" WIDTH="15"><IMG SRC="/images/bottom-right.gif"
+WIDTH="15" HEIGHT="15" ALT=""></TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>

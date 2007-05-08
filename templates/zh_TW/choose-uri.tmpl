@@ -1,0 +1,42 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
+<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{?current_make_and_model}">
+
+<H2 CLASS="title">{printer_name} 的裝置 URI</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">裝置 URI：</TH>
+<TD><INPUT TYPE="TEXT" SIZE="60" MAXLENGTH="1024" NAME="DEVICE_URI" VALUE="{device_uri}"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD>範例：
+<PRE>
+    http://hostname:631/ipp/
+    http://hostname:631/ipp/port1
+
+    ipp://hostname/ipp/
+    ipp://hostname/ipp/port1
+
+    lpd://hostname/queue
+
+    socket://hostname
+    socket://hostname:9100
+</PRE>
+
+<P>參看 <A HREF="/help/network.html" TARGET="_blank">"網路
+印表機"</A> 來取得正確的 URI 以用於您的印表機。</P>
+
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="繼續"></TD>
+</TR>
+</TABLE>
+
+</FORM>

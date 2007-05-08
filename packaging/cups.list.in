@@ -131,6 +131,9 @@
 %subpackage sv
 %description Swedish support
 
+%subpackage zh
+%description Chinese support
+
 %subpackage
 
 
@@ -380,6 +383,8 @@ f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
 f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
 %subpackage sv
 f 0644 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
+%subpackage zh
+f 0644 root sys $LOCALEDIR/zh_TW/cups_zh_TW.po locale/cups_zh_TW.po
 %subpackage
 
 d 0755 root sys $DATADIR -
@@ -464,6 +469,9 @@ f 0644 root sys $DATADIR/templates/pl templates/pl/*.tmpl
 %subpackage sv
 d 0755 root sys $DATADIR/templates/sv
 f 0644 root sys $DATADIR/templates/sv templates/sv/*.tmpl
+%subpackage zh
+d 0755 root sys $DATADIR/templates/zh_TW
+f 0644 root sys $DATADIR/templates/zh_TW templates/zh_TW/*.tmpl
 %subpackage
 
 # Config files
@@ -580,6 +588,11 @@ d 0755 root sys $DOCDIR/sv
 f 0644 root sys $DOCDIR/sv doc/sv/*.html
 d 0755 root sys $DOCDIR/sv/images -
 f 0644 root sys $DOCDIR/sv/images doc/sv/images/*.gif
+%subpackage zh
+d 0755 root sys $DOCDIR/zh_TW
+f 0644 root sys $DOCDIR/zh_TW doc/zh_TW/*.html
+d 0755 root sys $DOCDIR/zh_TW/images -
+f 0644 root sys $DOCDIR/zh_TW/images doc/zh_TW/images/*.gif
 %subpackage
 
 # Man pages

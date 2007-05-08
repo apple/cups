@@ -1,0 +1,64 @@
+{printer_type?:}{#printer_name=0?:
+{[printer_name]
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}
+{?printer_state_message=?:<SPAN CLASS="message">"{printer_state_message}"</SPAN>}</H2>
+
+<TABLE WIDTH="100%" CLASS="button" CELLSPACING="0" CELLPADDING="0" SUMMARY="{printer_name}">
+<TR>
+<TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
+<IMG SRC="/images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" CLASS="button" ALT=""></A>
+</TD>
+<TD VALIGN="TOP"><B>描述：</B> {printer_info}<BR>
+<B>位置：</B> {printer_location}<BR>
+<B>型號：</B> {printer_make_and_model}<BR>
+<B>狀態：</B> {printer_state=3?閒置:{printer_state=4?處理中:已停止}},
+{printer_is_accepting_jobs=0?正在拒絕工作:正在接受工作}, {printer_is_shared=0?未:} 公開。
+{?device_uri=?:<BR><B>裝置 URI:</B> {device_uri}}
+
+<P>
+<A HREF="{printer_uri_supported}?op=print-test-page">
+<IMG SRC="/images/button-print-test-page.gif" ALT="印表測試頁" CLASS="button"></A>
+{?cupscommand=1?<A HREF="{printer_uri_supported}?op=clean-print-heads">
+<IMG SRC="/images/button-clean-print-heads.gif" ALT="清理列印頭" CLASS="button"></A>
+<A HREF="{printer_uri_supported}?op=print-self-test-page">
+<IMG SRC="/images/button-print-self-test-page.gif" ALT="列印自我測試頁" CLASS="button"></A>:}
+{printer_state=5?
+<A HREF="{admin_uri}?op=start-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-start-printer.gif" ALT="啟動印表機" CLASS="button"></A>
+:
+<A HREF="{admin_uri}?op=stop-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-stop-printer.gif" ALT="停止印表機" CLASS="button"></A>
+}
+{printer_is_accepting_jobs=0?
+<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-accept-jobs.gif" ALT="接受工作" CLASS="button"></A>
+:
+<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-reject-jobs.gif" ALT="拒絕工作" CLASS="button"></A>
+}
+<A HREF="{printer_uri_supported}?op=move-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-move-jobs.gif" ALT="移動所有工作" CLASS="button"></A>
+<A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-cancel-all-jobs.gif" ALT="取消所有工作" CLASS="button"></A>
+{printer_is_shared=0?
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=1">
+<IMG SRC="/images/button-publish-printer.gif" ALT="公開印表機" CLASS="button"></A>
+:
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=0">
+<IMG SRC="/images/button-unpublish-printer.gif" ALT="不公開印表機" CLASS="button"></A>
+}
+<A HREF="{admin_uri}?op=modify-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-modify-printer.gif" ALT="修改印表機" CLASS="button"></A>
+<A HREF="{admin_uri}?op=set-printer-options&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-set-printer-options.gif" ALT="設定印表機選項" CLASS="button"></A>
+<A HREF="{admin_uri}?op=delete-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-delete-printer.gif" ALT="刪除印表機" CLASS="button"></A>
+<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-set-as-default.gif" ALT="設為預設印表機" CLASS="button"></A>
+<A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-set-allowed-users.gif" ALT="設定允許的使用者" CLASS="button"></A>
+</P>
+</TD>
+</TR>
+</TABLE>
+}}
