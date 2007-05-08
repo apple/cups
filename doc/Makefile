@@ -3,7 +3,7 @@
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2006 by Easy Software Products.
+#   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -38,9 +38,11 @@ WEBBUTTONS	=	\
 			images/button-accept-jobs.gif \
 			images/button-add-class.gif \
 			images/button-add-printer.gif \
+			images/button-add-rss-subscription.gif \
 			images/button-add-this-printer.gif \
 			images/button-cancel-all-jobs.gif \
 			images/button-cancel-job.gif \
+			images/button-cancel-subscription.gif \
 			images/button-change-settings.gif \
 			images/button-clean-print-heads.gif \
 			images/button-clear.gif \
@@ -51,6 +53,7 @@ WEBBUTTONS	=	\
 			images/button-export-samba.gif \
 			images/button-help.gif \
 			images/button-hold-job.gif \
+			images/button-list-available-printers.gif \
 			images/button-manage-classes.gif \
 			images/button-manage-jobs.gif \
 			images/button-manage-printers.gif \
