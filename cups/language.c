@@ -351,7 +351,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * preference so we have to look it up this way...
   */
 
-  if (!language)
+  if (!language && (language = getenv("LANG")) == NULL)
     language = appleLangDefault();
 
 #else
