@@ -91,15 +91,18 @@ enum
  * Local functions...
  */
 
-void	check_basics(const char *filename);
-int	check_constraints(ppd_file_t *ppd, int errors, int verbose, int warn);
-int	check_defaults(ppd_file_t *ppd, int errors, int verbose, int warn);
-int	check_filters(ppd_file_t *ppd, const char *root, int errors,
-	              int verbose, int warn);
-int	check_translations(ppd_file_t *ppd, int errors, int verbose, int warn);
-void	show_conflicts(ppd_file_t *ppd);
-void	usage(void);
-int	valid_utf8(const char *s);
+static void	check_basics(const char *filename);
+static int	check_constraints(ppd_file_t *ppd, int errors, int verbose,
+		                  int warn);
+static int	check_defaults(ppd_file_t *ppd, int errors, int verbose,
+		               int warn);
+static int	check_filters(ppd_file_t *ppd, const char *root, int errors,
+		              int verbose, int warn);
+static int	check_translations(ppd_file_t *ppd, int errors, int verbose,\
+		                   int warn);
+static void	show_conflicts(ppd_file_t *ppd);
+static void	usage(void);
+static int	valid_utf8(const char *s);
 
 
 /*
@@ -1589,7 +1592,7 @@ main(int  argc,				/* I - Number of command-line args */
  * 'check_basics()' - Check for CR LF, mixed line endings, and blank lines.
  */
 
-void
+static void
 check_basics(const char *filename)	/* I - PPD file to check */
 {
   cups_file_t	*fp;			/* File pointer */
@@ -1674,7 +1677,7 @@ check_basics(const char *filename)	/* I - PPD file to check */
  * 'check_constraints()' - Check UIConstraints in the PPD file.
  */
 
-int					/* O - Errors found */
+static int				/* O - Errors found */
 check_constraints(ppd_file_t *ppd,	/* I - PPD file */
                   int        errors,	/* I - Errors found */
                   int        verbose,	/* I - Verbosity level */
@@ -1758,7 +1761,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
  * 'check_defaults()' - Check default option keywords in the PPD file.
  */
 
-int					/* O - Errors found */
+static int				/* O - Errors found */
 check_defaults(ppd_file_t *ppd,		/* I - PPD file */
 	       int        errors,	/* I - Errors found */
 	       int        verbose,	/* I - Verbosity level */
@@ -1823,7 +1826,7 @@ check_defaults(ppd_file_t *ppd,		/* I - PPD file */
  * 'check_filters()' - Check filters in the PPD file.
  */
 
-int					/* O - Errors found */
+static int				/* O - Errors found */
 check_filters(ppd_file_t *ppd,		/* I - PPD file */
               const char *root,		/* I - Root directory */
 	      int        errors,	/* I - Errors found */
@@ -1953,7 +1956,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
  * 'check_translations()' - Check translations in the PPD file.
  */
 
-int					/* O - Errors found */
+static int				/* O - Errors found */
 check_translations(ppd_file_t *ppd,	/* I - PPD file */
                    int        errors,	/* I - Errors found */
                    int        verbose,	/* I - Verbosity level */
@@ -2247,7 +2250,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
  * 'show_conflicts()' - Show option conflicts in a PPD file.
  */
 
-void
+static void
 show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
 {
   int		i, j;			/* Looping variables */
@@ -2347,7 +2350,7 @@ show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
  * 'usage()' - Show program usage...
  */
 
-void
+static void
 usage(void)
 {
   _cupsLangPuts(stdout,
@@ -2373,7 +2376,7 @@ usage(void)
  * 'valid_utf8()' - Check whether a string contains valid UTF-8 text.
  */
 
-int					/* O - 1 if valid, 0 if not */
+static int				/* O - 1 if valid, 0 if not */
 valid_utf8(const char *s)		/* I - String to check */
 {
   while (*s)
