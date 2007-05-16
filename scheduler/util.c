@@ -194,7 +194,6 @@ cupsdSendIPPHeader(
 }
 
 
-#if 0 /* Not currently used */
 /*
  * 'cupsdSendIPPInteger()' - Send an integer attribute.
  */
@@ -210,7 +209,7 @@ cupsdSendIPPInteger(
 
  /*
   * Send IPP integer value: value tag (1 byte), name length (2 bytes),
-  * name string (without nul), and value (4 bytes)...
+  * name string (without nul), value length (2 bytes), and value (4 bytes)...
   */
 
   putchar(value_tag);
@@ -221,12 +220,14 @@ cupsdSendIPPInteger(
 
   fputs(name, stdout);
 
+  putchar(0);
+  putchar(4);
+
   putchar(value >> 24);
   putchar(value >> 16);
   putchar(value >> 8);
   putchar(value);
 }
-#endif /* 0 */
 
 
 /*

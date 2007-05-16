@@ -1512,20 +1512,39 @@ CUPS-Get-PPDs request:
 
 	<dt>"limit" (integer (1:MAX)):
 
-	<dd>The client OPTIONALLY supplies this attribute limiting the number of
-	PPDs that are returned.
+	<dd>The client OPTIONALLY supplies this attribute limiting the number of PPDs that are returned.
 
 	<dt>"ppd-make" (text(127)):
 
-	<dd>The client OPTIONALLY supplies a printer manufacturer to select
-	which PPDs are returned.
+	<dd>The client OPTIONALLY supplies a printer manufacturer to select which PPDs are returned.
+
+	<dt>"ppd-make-and-model" (text(127)):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies a make and model to select which PPDs are returned.
+
+	<dt>"ppd-model-number" (integer):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies a model number to select which PPDs are returned.
+
+	<dt>"ppd-natural-language" (naturalLanguage):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies a language to select which PPDs are returned.
+
+	<dt>"ppd-product" (text(127)):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies a PostScript product string to select which PPDs are returned.
+
+	<dt>"ppd-psversion" (text(127)):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies a PostScript version string to select which PPDs are returned.
+
+	<dt>"ppd-type" (type1 keyword):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies a driver type to select which PPDs are returned.
 
 	<dt>"requested-attributes" (1setOf keyword) :
 
-	<dd>The client OPTIONALLY supplies a set of attribute names and/or
-	attribute group names in whose values the requester is interested. If
-	the client omits this attribute, the server responds as if this
-	attribute had been supplied with a value of 'all'.
+	<dd>The client OPTIONALLY supplies a set of attribute names and/or attribute group names in whose values the requester is interested. If the client omits this attribute, the server responds as if this attribute had been supplied with a value of 'all'. Specify "ppd-make" to get a list of manufacturers.
 
 </dl>
 
@@ -2135,11 +2154,13 @@ name of the PPD file (the NickName attribute in the PPD file). If the
 make and model is not specified in the PPD file then the ModelName or
 ShortNickName attributes are used instead.
 
+<h4><a name="ppd-model-number">ppd-model-number (integer)</a><span class="info">CUPS 1.3</span></h4>
+
+<p>The ppd-model-number attribute provides the <tt>cupsModelNumber</tt> value from the PPD file.
+
 <h4><a name="ppd-name">ppd-name (name(255))</a></h4>
 
-<p>The ppd-name attribute specifies the PPD filename on the server
-relative to the model directory. The forward slash (/) is used to
-delineate directories.
+<p>The ppd-name attribute specifies either the PPD filename on the server relative to the model directory or a URI that maps to a specific driver interface in the driver directory. The forward slash (/) is used to delineate directories.
 
 <h4><a name="ppd-natural-language">ppd-natural-language (1setOf naturalLanguage)</a></h4>
 
@@ -2154,6 +2175,24 @@ language is unknown or undefined then "en" (English) is assumed.
 <h4><a name="ppd-psversion">ppd-psversion (1setOf text(127))</a><span class="info">CUPS 1.3</span></h4>
 
 <p>The ppd-product attribute specifies the PSVersion attribute values in the PPD file.
+
+<h4><a name="ppd-type">ppd-type (type1 keyword)</a><span class="info">CUPS 1.3</span></h4>
+
+<p>The ppd-type attribute specifies the type of driver described by the PPD file:</p>
+
+<ul>
+
+	<li><tt>fax</tt> - A facsimile or multi-function device</li>
+
+	<li><tt>pdf</tt> - A PDF printer</li>
+
+	<li><tt>postscript</tt> - A PostScript printer (no filters)</li>
+
+	<li><tt>raster</tt> - A CUPS raster driver</li>
+
+	<li><tt>unknown</tt> - An unknown or hybrid driver</li>
+
+</ul>
 
 
 <h3 class='title'><a name='PRINTER_ATTRIBUTES'>Printer Attributes</a></h3>
