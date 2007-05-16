@@ -109,6 +109,18 @@ default is <tt>true</tt> when <tt>cupsFlipDuplex</tt>  is <tt>true</tt> and <tt>
 
 <p>Also see the related <tt>cupsFlipDuplex</tt> attribute.</p>
 
+<h3>APRemoteQueueID</h3>
+
+<p class='summary'>*APRemoteQueueID: "string"</p>
+
+<p>This string attribute notifies the scheduler that this PPD is for a remote CUPS printer, typically shared via Bonjour.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+*APRemoteQueueID: "myprinter"
+</pre>
+
 <h3>cupsEvenDuplex</h3>
 
 <p class='summary'>*cupsEvenDuplex: boolean</p>
@@ -122,6 +134,18 @@ printing is selected. The default value is <code>false</code>.</p>
 <pre class='command'>
 <em>*% Always send an even number of pages when duplexing</em> 
 *cupsEvenDuplex: true
+</pre>
+
+<h3>cupsFax</h3>
+
+<p class='summary'>*cupsFax: boolean</p>
+
+<p>This boolean attribute specifies whether the PPD defines a facsimile device. The default is <tt>false</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*cupsFax: true
 </pre>
 
 <h3>cupsFilter</h3>
