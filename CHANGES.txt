@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
 	  STR #2263, STR #2356)
+	- The scheduler did not report Bonjour shared printers as
+	  remote printers (STR #2384)
 	- Added new -R and -W options to the cupstestppd program
 	  for greater control over the testing of PPDs.
 	- Added a new cupsGetServerPPD() function for getting
@@ -14,11 +16,17 @@ CHANGES IN CUPS V1.3
 	- Added a new CUPS_GET_PPD operation for getting an
 	  available PPD file on the server (STR #2334) 
 	- CUPS_GET_PPDS now reports multiple ppd-product values
-	  if the corresponding PPD contains multiple products
-	  (STR #2334)
+	  based on the PPD ModelName and Product strings (STR
+	  #2334, STR #2383)
 	- CUPS_GET_PPDS now reports the PSVersion attributes
 	  from a PPD file in the ppd-psversion attribute
 	  (STR #2334)
+	- CUPS_GET_PPDS now reports the cupsModelNumber attribute
+	  from a PPD file in the ppd-model-number attribute (STR
+	  #2383)
+	- CUPS_GET_PPDS now reports a driver type string in the
+	  ppd-type attribute based on the cupsFax and cupsFilter
+	  attributes in a PPD file (STR #2383)
 	- Added a new printer attribute called "cups-version"
 	  which reports the version of CUPS that is running
 	  (STR #2240)
