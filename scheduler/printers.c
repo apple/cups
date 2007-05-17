@@ -2180,23 +2180,24 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	cupsdSetString(&p->product, ppd->product);
 #endif /* HAVE_DNSSD */
 
-        if (ppdFindAttr(ppd, "APRemoteQueueID", NULL))
-	{
-	 /*
-	  * This is a shared Bonjour printer...
-	  */
-
-	  p->type |= CUPS_PRINTER_REMOTE;
-	}
+        ppdattr = ppdFindAttr(ppd, "APRemoteQueueID", NULL);
 
        /*
         * Close the PPD and set the type...
 	*/
 
-
 	ppdClose(ppd);
 
         printer_type = p->type;
+
+        if (ppdattr)
+	{
+	 /*
+	  * This is a shared Bonjour printer...
+	  */
+
+	  printer_type |= CUPS_PRINTER_REMOTE;
+	}
       }
       else if (!access(filename, 0))
       {
