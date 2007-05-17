@@ -4529,7 +4529,7 @@ copy_printer_attrs(
     * Add the CUPS-specific printer-type attribute...
     */
 
-    type = printer->type;
+    type = printer->external_type;
 
     if (printer == DefaultPrinter)
       type |= CUPS_PRINTER_DEFAULT;

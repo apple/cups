@@ -2311,10 +2311,20 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   }
 
  /*
+  * Save the local printer type value, which may have the CUPS_PRINTER_REMOTE
+  * bit set.  We use this value when sending the printer-type attribute to
+  * clients so they know whether the printer is really remote.  Doing it
+  * this way prevents the browsing code from timing out hardwired remote
+  * printers...
+  */
+
+  p->external_type = printer_type;
+
+ /*
   * Copy the printer options into a browse attributes string we can re-use.
   */
 
-  if (!(p->type & CUPS_PRINTER_REMOTE))
+  if (!(printer_type & CUPS_PRINTER_REMOTE))
   {
     const char	*valptr;		/* Pointer into value */
     char	*attrptr;		/* Pointer into attribute string */

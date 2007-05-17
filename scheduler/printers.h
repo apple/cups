@@ -63,7 +63,8 @@ typedef struct cupsd_printer_s
   char		*reasons[16];		/* printer-state-reasons strings */
   time_t	state_time;		/* Time at this state */
   char		*job_sheets[2];		/* Banners/job sheets */
-  cups_ptype_t	type;			/* Printer type (color, small, etc.) */
+  cups_ptype_t	type,			/* Printer type (color, small, etc.) */
+		external_type;		/* Printer type that is advertised */
   char		*browse_attrs;		/* Attributes sent with browse data */
   time_t	browse_expire;		/* Expiration time for printer */
   time_t	browse_time;		/* Last time update was sent/received */
