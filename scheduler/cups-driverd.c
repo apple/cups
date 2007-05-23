@@ -1262,8 +1262,13 @@ load_ppds(const char *d,		/* I - Actual directory */
 	  }
 	}
       }
-      else if (!strncmp(line, "*cupsFax:", 9) && strstr(line + 9, "true"))
-        type = PPD_TYPE_FAX;
+      else if (!strncmp(line, "*cupsFax:", 9))
+      {
+        for (ptr = line + 9; isspace(*ptr & 255); ptr ++);
+
+	if (!strncasecmp(ptr, "true", 4))
+          type = PPD_TYPE_FAX;
+      }
       else if (!strncmp(line, "*cupsFilter:", 12) &&
                (type == PPD_TYPE_POSTSCRIPT || type == PPD_TYPE_UNKNOWN))
       {
