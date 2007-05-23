@@ -23,11 +23,11 @@
  *
  * Contents:
  *
+ *   cupsdFindQuota()   - Find a quota record.
  *   cupsdFreeQuotas()  - Free quotas for a printer.
  *   cupsdUpdateQuota() - Update quota data for the specified printer and user.
  *   add_quota()        - Add a quota record for this printer and user.
  *   compare_quotas()   - Compare two quota records...
- *   find_quota()       - Find a quota record.
  */
 
 /*
@@ -44,7 +44,31 @@
 static cupsd_quota_t	*add_quota(cupsd_printer_t *p, const char *username);
 static int		compare_quotas(const cupsd_quota_t *q1,
 			               const cupsd_quota_t *q2);
-static cupsd_quota_t	*find_quota(cupsd_printer_t *p, const char *username);
+
+
+/*
+ * 'cupsdFindQuota()' - Find a quota record.
+ */
+
+cupsd_quota_t *				/* O - Quota data */
+cupsdFindQuota(
+    cupsd_printer_t *p,			/* I - Printer */
+    const char      *username)		/* I - User */
+{
+  cupsd_quota_t	*q,			/* Quota data pointer */
+		match;			/* Search data */
+
+
+  if (!p || !username)
+    return (NULL);
+
+  strlcpy(match.username, username, sizeof(match.username));
+
+  if ((q = (cupsd_quota_t *)cupsArrayFind(p->quotas, &match)) != NULL)
+    return (q);
+  else
+    return (add_quota(p, username));
+}
 
 
 /*
@@ -94,7 +118,7 @@ cupsdUpdateQuota(
   if (!p->k_limit && !p->page_limit)
     return (NULL);
 
-  if ((q = find_quota(p, username)) == NULL)
+  if ((q = cupsdFindQuota(p, username)) == NULL)
     return (NULL);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -215,30 +239,6 @@ compare_quotas(const cupsd_quota_t *q1,	/* I - First quota record */
                const cupsd_quota_t *q2)	/* I - Second quota record */
 {
   return (strcasecmp(q1->username, q2->username));
-}
-
-
-/*
- * 'find_quota()' - Find a quota record.
- */
-
-static cupsd_quota_t *			/* O - Quota data */
-find_quota(cupsd_printer_t *p,		/* I - Printer */
-           const char      *username)	/* I - User */
-{
-  cupsd_quota_t	*q,			/* Quota data pointer */
-		match;			/* Search data */
-
-
-  if (!p || !username)
-    return (NULL);
-
-  strlcpy(match.username, username, sizeof(match.username));
-
-  if ((q = (cupsd_quota_t *)cupsArrayFind(p->quotas, &match)) != NULL)
-    return (q);
-  else
-    return (add_quota(p, username));
 }
 
 

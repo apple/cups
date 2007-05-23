@@ -3411,7 +3411,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   */
 
 #ifdef __APPLE__
-  if (AppleQuotas)
+  if (AppleQuotas && (q = cupsdFindQuota(p, username)) != NULL)
   {
    /*
     * TODO: Define these special page count values as constants!
@@ -6036,7 +6036,7 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
     {
       send_ipp_status(con, IPP_NOT_FOUND,
                       _("The PPD file \"%s\" could not be opened: %s"),
-		      uri->values[i].string.text, strerror(errno));
+		      uri->values[0].string.text, strerror(errno));
       return;
     }
 
