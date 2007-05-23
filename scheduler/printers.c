@@ -67,6 +67,19 @@
 
 
 /*
+ * Currently Bonjour printers that are shared by CUPS servers are added
+ * manually by the user on Mac OS X systems.  While these printers *are*
+ * remote queues, the current print dialog will not show them if they
+ * (correctly) have the CUPS_PRINTER_REMOTE bit set.  This may change
+ * in future releases, however the code to do this is currently disabled.
+ *
+ * Define BONJOUR_IS_REMOTE to 1 to get the correct behavior...
+ */
+
+#define BONJOUR_IS_REMOTE 0
+
+
+/*
  * Local functions...
  */
 
@@ -2180,7 +2193,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	cupsdSetString(&p->product, ppd->product);
 #endif /* HAVE_DNSSD */
 
+#if BONJOUR_IS_REMOTE
         ppdattr = ppdFindAttr(ppd, "APRemoteQueueID", NULL);
+#endif /* BONJOUR_IS_REMOTE */
 
        /*
         * Close the PPD and set the type...
@@ -2190,6 +2205,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
         printer_type = p->type;
 
+#if BONJOUR_IS_REMOTE
         if (ppdattr)
 	{
 	 /*
@@ -2198,6 +2214,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
 	  printer_type |= CUPS_PRINTER_REMOTE;
 	}
+#endif /* BONJOUR_IS_REMOTE */
       }
       else if (!access(filename, 0))
       {
