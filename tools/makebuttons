@@ -34,7 +34,7 @@
 #
 # Usage:
 #
-#     tools/makebuttons locale buttons.txt
+#     tools/makebuttons [--font filename] locale buttons.txt
 #
 # "Locale" is the locale name, either "ll" or "ll_CC" where "ll" is the
 # 2-letter language abbreviation and "CC" is the 2-letter ISO country
@@ -59,8 +59,25 @@
 # "tools/buttons.txt" for inspiration...
 #
 
+# Bitstream Vera font...
+font="fonts/Vera.ttf"
+
+# Colors
+background="#d4d4a4"
+black="#000000"
+green="#009900"
+red="#cc0000"
+standard="#666633"
+
+
+if test "x$1" == x--font; then
+	shift
+	font="$1"
+	shift
+fi
+
 if test $# -lt 2; then
-	echo Usage: tools/makebuttons locale buttons.txt
+	echo Usage: tools/makebuttons "[--font filename]" locale buttons.txt
 	exit 1
 elif test ! -d tools; then
 	echo ERROR: You MUST run the makebuttons script from the main CUPS source directory!
@@ -80,17 +97,6 @@ elif test ! -r $list; then
 	echo "ERROR: $list: cannot read file."
 	exit 1
 fi
-
-
-# Bitstream Vera font...
-font="fonts/Vera.ttf"
-
-# Colors
-background="#d4d4a4"
-black="#000000"
-green="#009900"
-red="#cc0000"
-standard="#666633"
 
 
 # 'generate_button()' - Create a button image.
@@ -168,7 +174,7 @@ function generate_button()
 	txt_h=`identify -format "%h" $tmp_btn`
 	txt_w=`identify -format "%w" $tmp_btn`
 
-	if test $txt_h -gt 32; then
+	if test $txt_h -gt 40; then
 		echo "ERROR: 2 lines maximum for the button text"
 		exit 1
 	fi

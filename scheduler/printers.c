@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 6501 2007-04-30 21:53:15Z mike $"
+ * "$Id: printers.c 6539 2007-05-23 15:08:29Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -64,6 +64,19 @@
 
 #include "cupsd.h"
 #include <cups/dir.h>
+
+
+/*
+ * Currently Bonjour printers that are shared by CUPS servers are added
+ * manually by the user on Mac OS X systems.  While these printers *are*
+ * remote queues, the current print dialog will not show them if they
+ * (correctly) have the CUPS_PRINTER_REMOTE bit set.  This may change
+ * in future releases, however the code to do this is currently disabled.
+ *
+ * Define BONJOUR_IS_REMOTE to 1 to get the correct behavior...
+ */
+
+#define BONJOUR_IS_REMOTE 0
 
 
 /*
@@ -2180,6 +2193,10 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	cupsdSetString(&p->product, ppd->product);
 #endif /* HAVE_DNSSD */
 
+#if BONJOUR_IS_REMOTE
+        ppdattr = ppdFindAttr(ppd, "APRemoteQueueID", NULL);
+#endif /* BONJOUR_IS_REMOTE */
+
        /*
         * Close the PPD and set the type...
 	*/
@@ -2187,6 +2204,17 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	ppdClose(ppd);
 
         printer_type = p->type;
+
+#if BONJOUR_IS_REMOTE
+        if (ppdattr)
+	{
+	 /*
+	  * This is a shared Bonjour printer...
+	  */
+
+	  printer_type |= CUPS_PRINTER_REMOTE;
+	}
+#endif /* BONJOUR_IS_REMOTE */
       }
       else if (!access(filename, 0))
       {
@@ -2300,10 +2328,20 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   }
 
  /*
+  * Save the local printer type value, which may have the CUPS_PRINTER_REMOTE
+  * bit set.  We use this value when sending the printer-type attribute to
+  * clients so they know whether the printer is really remote.  Doing it
+  * this way prevents the browsing code from timing out hardwired remote
+  * printers...
+  */
+
+  p->external_type = printer_type;
+
+ /*
   * Copy the printer options into a browse attributes string we can re-use.
   */
 
-  if (!(p->type & CUPS_PRINTER_REMOTE))
+  if (!(printer_type & CUPS_PRINTER_REMOTE))
   {
     const char	*valptr;		/* Pointer into value */
     char	*attrptr;		/* Pointer into attribute string */
@@ -3713,5 +3751,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 6501 2007-04-30 21:53:15Z mike $".
+ * End of "$Id: printers.c 6539 2007-05-23 15:08:29Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6440 2007-04-03 23:17:17Z mike $"
+# "$Id: Makefile 6521 2007-05-08 02:11:10Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -31,6 +31,7 @@ include ../Makedefs
 FILES	=	\
 		add-class.tmpl \
 		add-printer.tmpl \
+		add-rss-subscription.tmpl \
 		admin.tmpl \
 		choose-device.tmpl \
 		choose-make.tmpl \
@@ -90,6 +91,8 @@ FILES	=	\
 		search.tmpl \
 		set-printer-options-header.tmpl \
 		set-printer-options-trailer.tmpl \
+		subscription-added.tmpl \
+		subscription-canceled.tmpl \
 		test-page.tmpl \
 		trailer.tmpl \
 		users.tmpl
@@ -157,5 +160,5 @@ uninstall-languages:
 
 
 #
-# End of "$Id: Makefile 6440 2007-04-03 23:17:17Z mike $".
+# End of "$Id: Makefile 6521 2007-05-08 02:11:10Z mike $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 6480 2007-04-27 18:53:20Z mike $"
+# "$Id: cups.list.in 6529 2007-05-08 19:48:20Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -130,6 +130,9 @@
 
 %subpackage sv
 %description Swedish support
+
+%subpackage zh
+%description Chinese support
 
 %subpackage
 
@@ -380,6 +383,8 @@ f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
 f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
 %subpackage sv
 f 0644 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
+%subpackage zh
+f 0644 root sys $LOCALEDIR/zh_TW/cups_zh_TW.po locale/cups_zh_TW.po
 %subpackage
 
 d 0755 root sys $DATADIR -
@@ -464,6 +469,9 @@ f 0644 root sys $DATADIR/templates/pl templates/pl/*.tmpl
 %subpackage sv
 d 0755 root sys $DATADIR/templates/sv
 f 0644 root sys $DATADIR/templates/sv templates/sv/*.tmpl
+%subpackage zh
+d 0755 root sys $DATADIR/templates/zh_TW
+f 0644 root sys $DATADIR/templates/zh_TW templates/zh_TW/*.tmpl
 %subpackage
 
 # Config files
@@ -580,6 +588,11 @@ d 0755 root sys $DOCDIR/sv
 f 0644 root sys $DOCDIR/sv doc/sv/*.html
 d 0755 root sys $DOCDIR/sv/images -
 f 0644 root sys $DOCDIR/sv/images doc/sv/images/*.gif
+%subpackage zh
+d 0755 root sys $DOCDIR/zh_TW
+f 0644 root sys $DOCDIR/zh_TW doc/zh_TW/*.html
+d 0755 root sys $DOCDIR/zh_TW/images -
+f 0644 root sys $DOCDIR/zh_TW/images doc/zh_TW/images/*.gif
 %subpackage
 
 # Man pages
@@ -634,15 +647,26 @@ f 0644 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.$MAN8EXT
 # Startup scripts
 %system darwin
 f 0644 root sys /System/Library/LaunchDaemons/org.cups.cupsd.plist init/org.cups.cupsd.plist
-%postinstall <<EOF
-rm -f /System/Library/StartupItems/PrintingServices/PrintingServices
+d 0755 root sys /System/Library/StartupItems/PrintingServices -
+f 0644 root sys /System/Library/StartupItems/PrintingServices/PrintingServices init/PrintingServices.launchd
+f 0644 root sys /System/Library/StartupItems/PrintingServices/StartupParamters.plist init/StartupParameters.plist
+d 0755 root sys /System/Library/StartupItems/PrintingServices/Resources -
+d 0755 root sys /System/Library/StartupItems/PrintingServices/Resources/English.lproj -
+f 0644 root sys /System/Library/StartupItems/PrintingServices/Resources/English.lproj/Localizable.strings init/Localizable.strings
+%preremove <<EOF
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 killall cupsd
-sleep 1
+EOF
+%postinstall <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
+launchctl start org.cups.cupsd
 EOF
 %subpackage lpd
 f 0644 root sys /System/Library/LaunchDaemons/org.cups.cups-lpd.plist init/org.cups.cups-lpd.plist
+%preremove <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+EOF
 %postinstall <<EOF
 rm -f /etc/xinetd.d/cups-lpd
 launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
@@ -659,5 +683,5 @@ f 0644 root sys $XINETD/cups-lpd init/cups-lpd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 6480 2007-04-27 18:53:20Z mike $".
+# End of "$Id: cups.list.in 6529 2007-05-08 19:48:20Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c 6489 2007-04-30 17:55:15Z mike $"
+ * "$Id: language.c 6532 2007-05-09 18:54:23Z mike $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -351,7 +351,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * preference so we have to look it up this way...
   */
 
-  if (!language)
+  if (!language && (language = getenv("LANG")) == NULL)
     language = appleLangDefault();
 
 #else
@@ -1363,5 +1363,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 6489 2007-04-30 17:55:15Z mike $".
+ * End of "$Id: language.c 6532 2007-05-09 18:54:23Z mike $".
  */

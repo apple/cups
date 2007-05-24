@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 6493 2007-04-30 19:33:31Z mike $"
+ * "$Id: main.c 6514 2007-05-07 18:59:25Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -1364,7 +1364,6 @@ launchd_checkout(void)
     unlink(CUPS_KEEPALIVE);
   }
 }
-
 #endif /* HAVE_LAUNCHD */
 
 
@@ -1778,5 +1777,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 6493 2007-04-30 19:33:31Z mike $".
+ * End of "$Id: main.c 6514 2007-05-07 18:59:25Z mike $".
  */

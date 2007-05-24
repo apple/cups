@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 6505 2007-05-03 17:44:22Z mike $"
+ * "$Id: conf.c 6518 2007-05-07 22:17:53Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -2662,14 +2662,14 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
   
 	  if (relay->from.type == AUTH_IP)
 	    snprintf(temp2, sizeof(temp2), "%u.%u.%u.%u/%u.%u.%u.%u",
-		     relay->from.mask.ip.address[0],
-		     relay->from.mask.ip.address[1],
-		     relay->from.mask.ip.address[2],
-		     relay->from.mask.ip.address[3],
-		     relay->from.mask.ip.netmask[0],
-		     relay->from.mask.ip.netmask[1],
-		     relay->from.mask.ip.netmask[2],
-		     relay->from.mask.ip.netmask[3]);
+		     relay->from.mask.ip.address[0] >> 24,
+		     (relay->from.mask.ip.address[0] >> 16) & 255,
+		     (relay->from.mask.ip.address[0] >> 8) & 255,
+		     relay->from.mask.ip.address[0] & 255,
+		     relay->from.mask.ip.netmask[0] >> 24,
+		     (relay->from.mask.ip.netmask[0] >> 16) & 255,
+		     (relay->from.mask.ip.netmask[0] >> 8) & 255,
+		     relay->from.mask.ip.netmask[0] & 255);
 	  else
 	    strlcpy(temp2, relay->from.mask.name.name, sizeof(temp2));
   
@@ -3373,5 +3373,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 6505 2007-05-03 17:44:22Z mike $".
+ * End of "$Id: conf.c 6518 2007-05-07 22:17:53Z mike $".
  */

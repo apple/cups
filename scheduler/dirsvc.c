@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 6483 2007-04-30 17:16:16Z mike $"
+ * "$Id: dirsvc.c 6538 2007-05-17 18:26:05Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -199,7 +199,7 @@ cupsdDeregisterPrinter(
   */
 
   if (!Browsing || !p->shared ||
-      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+      (p->external_type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     return;
 
  /*
@@ -626,7 +626,7 @@ void
 cupsdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 {
   if (!Browsing || !BrowseLocalProtocols || !BrowseInterval || !NumBrowsers ||
-      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+      (p->external_type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     return;
 
 #ifdef HAVE_LIBSLP
@@ -830,7 +830,7 @@ cupsdSendBrowseList(void)
     for (count = 0, p = (cupsd_printer_t *)cupsArrayFirst(Printers);
          count < max_count && p != NULL;
 	 p = (cupsd_printer_t *)cupsArrayNext(Printers))
-      if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
+      if (!(p->external_type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
           p->shared && p->browse_time < ut)
         count ++;
 
@@ -856,7 +856,8 @@ cupsdSendBrowseList(void)
 
       if (!p)
         break;
-      else if ((p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
+      else if ((p->external_type & (CUPS_PRINTER_REMOTE |
+                                    CUPS_PRINTER_IMPLICIT)) ||
                !p->shared)
         continue;
       else if (p->browse_time < ut)
@@ -3802,5 +3803,5 @@ update_polling(void)
 
 
 /*
- * End of "$Id: dirsvc.c 6483 2007-04-30 17:16:16Z mike $".
+ * End of "$Id: dirsvc.c 6538 2007-05-17 18:26:05Z mike $".
  */

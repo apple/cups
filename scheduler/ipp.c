@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6508 2007-05-03 20:07:14Z mike $"
+ * "$Id: ipp.c 6541 2007-05-23 20:18:00Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3411,7 +3411,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   */
 
 #ifdef __APPLE__
-  if (AppleQuotas)
+  if (AppleQuotas && (q = cupsdFindQuota(p, username)) != NULL)
   {
    /*
     * TODO: Define these special page count values as constants!
@@ -4529,7 +4529,7 @@ copy_printer_attrs(
     * Add the CUPS-specific printer-type attribute...
     */
 
-    type = printer->type;
+    type = printer->external_type;
 
     if (printer == DefaultPrinter)
       type |= CUPS_PRINTER_DEFAULT;
@@ -6001,7 +6001,7 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
 
     if (dtype & CUPS_PRINTER_REMOTE)
     {
-      send_ipp_status(con, CUPS_SEE_OTHER, NULL);
+      con->response->request.status.status_code = CUPS_SEE_OTHER;
       ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI,
                    "printer-uri", NULL, dest->uri);
       return;
@@ -6018,7 +6018,7 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
         dest = dest->printers[i];
       else
       {
-	send_ipp_status(con, CUPS_SEE_OTHER, NULL);
+        con->response->request.status.status_code = CUPS_SEE_OTHER;
 	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI,
 		     "printer-uri", NULL, dest->printers[0]->uri);
         return;
@@ -6036,7 +6036,7 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
     {
       send_ipp_status(con, IPP_NOT_FOUND,
                       _("The PPD file \"%s\" could not be opened: %s"),
-		      uri->values[i].string.text, strerror(errno));
+		      uri->values[0].string.text, strerror(errno));
       return;
     }
 
@@ -6044,7 +6044,7 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
 
     con->pipe_pid = 0;
 
-    send_ipp_status(con, IPP_OK, NULL);
+    con->response->request.status.status_code = IPP_OK;
   }
   else
     send_ipp_status(con, IPP_NOT_FOUND,
@@ -6066,8 +6066,10 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 			*language,	/* ppd-natural-language attribute */
 			*make,		/* ppd-make attribute */
 			*model,		/* ppd-make-and-model attribute */
+			*model_number,	/* ppd-model-number attribute */
 			*product,	/* ppd-product attribute */
 			*psversion,	/* ppd-psverion attribute */
+			*type,		/* ppd-type attribute */
 			*requested;	/* requested-attributes attribute */
   char			command[1024],	/* cups-driverd command */
 			options[1024],	/* Options to pass to command */
@@ -6076,10 +6078,13 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 					/* Escaped ppd-natural-language string */
 			make_str[256],	/* Escaped ppd-make string */
 			model_str[256],	/* Escaped ppd-make-and-model string */
+			model_number_str[256],
+					/* ppd-model-number string */
 			product_str[256],
 					/* Escaped ppd-product string */
 			psversion_str[256],
 					/* Escaped ppd-psversion string */
+			type_str[256],	/* Escaped ppd-type string */
 			requested_str[256];
 					/* String for requested attributes */
 
@@ -6100,17 +6105,20 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   * Run cups-driverd command with the given options...
   */
 
-  limit     = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
-  device    = ippFindAttribute(con->request, "ppd-device-id", IPP_TAG_TEXT);
-  language  = ippFindAttribute(con->request, "ppd-natural-language",
-                               IPP_TAG_LANGUAGE);
-  make      = ippFindAttribute(con->request, "ppd-make", IPP_TAG_TEXT);
-  model     = ippFindAttribute(con->request, "ppd-make-and-model",
-                               IPP_TAG_TEXT);
-  product   = ippFindAttribute(con->request, "ppd-product", IPP_TAG_TEXT);
-  psversion = ippFindAttribute(con->request, "ppd-psversion", IPP_TAG_TEXT);
-  requested = ippFindAttribute(con->request, "requested-attributes",
-                               IPP_TAG_KEYWORD);
+  limit        = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
+  device       = ippFindAttribute(con->request, "ppd-device-id", IPP_TAG_TEXT);
+  language     = ippFindAttribute(con->request, "ppd-natural-language",
+                                  IPP_TAG_LANGUAGE);
+  make         = ippFindAttribute(con->request, "ppd-make", IPP_TAG_TEXT);
+  model        = ippFindAttribute(con->request, "ppd-make-and-model",
+                                  IPP_TAG_TEXT);
+  model_number = ippFindAttribute(con->request, "ppd-model-number",
+                                  IPP_TAG_INTEGER);
+  product      = ippFindAttribute(con->request, "ppd-product", IPP_TAG_TEXT);
+  psversion    = ippFindAttribute(con->request, "ppd-psversion", IPP_TAG_TEXT);
+  type         = ippFindAttribute(con->request, "ppd-type", IPP_TAG_KEYWORD);
+  requested    = ippFindAttribute(con->request, "requested-attributes",
+                                  IPP_TAG_KEYWORD);
 
   if (requested)
     url_encode_attr(requested, requested_str, sizeof(requested_str));
@@ -6137,6 +6145,12 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   else
     model_str[0] = '\0';
 
+  if (model_number)
+    snprintf(model_number_str, sizeof(model_number_str), "ppd-model-number=%d",
+             model_number->values[0].integer);
+  else
+    model_number_str[0] = '\0';
+
   if (product)
     url_encode_attr(product, product_str, sizeof(product_str));
   else
@@ -6147,8 +6161,14 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   else
     psversion_str[0] = '\0';
 
+  if (type)
+    url_encode_attr(type, type_str, sizeof(type_str));
+  else
+    type_str[0] = '\0';
+
   snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
-  snprintf(options, sizeof(options), "list+%d+%d+%s%s%s%s%s%s%s%s%s%s%s%s%s",
+  snprintf(options, sizeof(options),
+           "list+%d+%d+%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0,
 	   requested_str,
@@ -6156,8 +6176,10 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 	   language ? "%20" : "", language_str,
 	   make ? "%20" : "", make_str,
 	   model ? "%20" : "", model_str,
+	   model_number ? "%20" : "", model_number_str,
 	   product ? "%20" : "", product_str,
-	   psversion ? "%20" : "", psversion_str);
+	   psversion ? "%20" : "", psversion_str,
+	   type ? "%20" : "", type_str);
 
   if (cupsdSendCommand(con, command, options, 0))
   {
@@ -8594,21 +8616,14 @@ send_ipp_status(cupsd_client_t *con,	/* I - Client connection */
   char		formatted[1024];	/* Formatted errror message */
 
 
-  if (message)
-  {
-    va_start(ap, message);
-    vsnprintf(formatted, sizeof(formatted),
-              _cupsLangString(con->language, message), ap);
-    va_end(ap);
+  va_start(ap, message);
+  vsnprintf(formatted, sizeof(formatted),
+            _cupsLangString(con->language, message), ap);
+  va_end(ap);
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "%s %s: %s",
-		    ippOpString(con->request->request.op.operation_id),
-		    ippErrorString(status), formatted);
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "%s %s",
-		    ippOpString(con->request->request.op.operation_id),
-		    ippErrorString(status));
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s %s: %s",
+		  ippOpString(con->request->request.op.operation_id),
+		  ippErrorString(status), formatted);
 
   con->response->request.status.status_code = status;
 
@@ -8622,9 +8637,8 @@ send_ipp_status(cupsd_client_t *con,	/* I - Client connection */
     ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                  "attributes-natural-language", NULL, DefaultLanguage);
 
-  if (message)
-    ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_TEXT,
-        	 "status-message", NULL, formatted);
+  ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_TEXT,
+               "status-message", NULL, formatted);
 }
 
 
@@ -9736,5 +9750,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6508 2007-05-03 20:07:14Z mike $".
+ * End of "$Id: ipp.c 6541 2007-05-23 20:18:00Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: quotas.c 6365 2007-03-19 20:56:57Z mike $"
+ * "$Id: quotas.c 6541 2007-05-23 20:18:00Z mike $"
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
@@ -23,11 +23,11 @@
  *
  * Contents:
  *
+ *   cupsdFindQuota()   - Find a quota record.
  *   cupsdFreeQuotas()  - Free quotas for a printer.
  *   cupsdUpdateQuota() - Update quota data for the specified printer and user.
  *   add_quota()        - Add a quota record for this printer and user.
  *   compare_quotas()   - Compare two quota records...
- *   find_quota()       - Find a quota record.
  */
 
 /*
@@ -44,7 +44,31 @@
 static cupsd_quota_t	*add_quota(cupsd_printer_t *p, const char *username);
 static int		compare_quotas(const cupsd_quota_t *q1,
 			               const cupsd_quota_t *q2);
-static cupsd_quota_t	*find_quota(cupsd_printer_t *p, const char *username);
+
+
+/*
+ * 'cupsdFindQuota()' - Find a quota record.
+ */
+
+cupsd_quota_t *				/* O - Quota data */
+cupsdFindQuota(
+    cupsd_printer_t *p,			/* I - Printer */
+    const char      *username)		/* I - User */
+{
+  cupsd_quota_t	*q,			/* Quota data pointer */
+		match;			/* Search data */
+
+
+  if (!p || !username)
+    return (NULL);
+
+  strlcpy(match.username, username, sizeof(match.username));
+
+  if ((q = (cupsd_quota_t *)cupsArrayFind(p->quotas, &match)) != NULL)
+    return (q);
+  else
+    return (add_quota(p, username));
+}
 
 
 /*
@@ -94,7 +118,7 @@ cupsdUpdateQuota(
   if (!p->k_limit && !p->page_limit)
     return (NULL);
 
-  if ((q = find_quota(p, username)) == NULL)
+  if ((q = cupsdFindQuota(p, username)) == NULL)
     return (NULL);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -219,29 +243,5 @@ compare_quotas(const cupsd_quota_t *q1,	/* I - First quota record */
 
 
 /*
- * 'find_quota()' - Find a quota record.
- */
-
-static cupsd_quota_t *			/* O - Quota data */
-find_quota(cupsd_printer_t *p,		/* I - Printer */
-           const char      *username)	/* I - User */
-{
-  cupsd_quota_t	*q,			/* Quota data pointer */
-		match;			/* Search data */
-
-
-  if (!p || !username)
-    return (NULL);
-
-  strlcpy(match.username, username, sizeof(match.username));
-
-  if ((q = (cupsd_quota_t *)cupsArrayFind(p->quotas, &match)) != NULL)
-    return (q);
-  else
-    return (add_quota(p, username));
-}
-
-
-/*
- * End of "$Id: quotas.c 6365 2007-03-19 20:56:57Z mike $".
+ * End of "$Id: quotas.c 6541 2007-05-23 20:18:00Z mike $".
  */

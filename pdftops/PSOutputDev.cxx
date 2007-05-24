@@ -1159,7 +1159,14 @@ void PSOutputDev::writeHeader(int firstPage, int lastPage,
   }
 
   // Tell CUPS pstops filter not to do its own rotation...
-  writePSFmt("%%cupsRotation: %d\n", pageRotate);
+  int cups_rotate = 0;
+  int width = (int)ceil(mediaBox->x2 - mediaBox->x1);
+  int height = (int)ceil(mediaBox->y2 - mediaBox->y1);
+  int imgWidth = (int)ceil(cropBox->x2 - cropBox->x1);
+
+  if (width > height && width > imgWidth) cups_rotate = 90;
+
+  writePSFmt("%%cupsRotation: %d\n", cups_rotate);
 
   writePSFmt("%%Producer: xpdf/pdftops %s\n", xpdfVersion);
   xref->getDocInfo(&info);
@@ -2515,7 +2522,6 @@ GBool PSOutputDev::startPage(int pageNum, GfxState *state) {
       fprintf(stderr, "DEBUG: Page rotate=%d, width=%d, height=%d, imgWidth=%d, imgHeight=%d\n",
               state->getRotate(), width, height, imgWidth, imgHeight);
 
-      rotate = (360 - state->getRotate()) % 360;
       if (rotate == 0 || rotate == 180) {
 	if (width > height && width > imgWidth) {
 	  rotate += 90;
