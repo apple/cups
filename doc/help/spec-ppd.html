@@ -700,6 +700,19 @@ in the PPD file for a given locale.</blockquote>
 
 <p>The resulting dictionary sets the page device attributes that are sent to your raster driver in the page header.</p>
 
+<h3>Custom Page Size Code</h3>
+
+<p>There are many possible implementations of the <tt>CustomPageSize</tt> code. For CUPS raster drivers, the following code is recommended:</p>
+
+<pre class='command'>
+*ParamCustomPageSize Width:        1 points <i>min-width max-width</i>
+*ParamCustomPageSize Height:       2 points <i>min-height max-height</i>
+*ParamCustomPageSize WidthOffset:  3 points 0 0
+*ParamCustomPageSize HeightOffset: 4 points 0 0
+*ParamCustomPageSize Orientation:  5 int 0 0
+*CustomPageSize True: "pop pop pop &lt;&lt;/PageSize[5 -2 roll]/ImagingBBox null&gt;&gt;setpagedevice"
+</pre>
+
 <h3>Supported PostScript Operators</h3>
 
 <p>CUPS supports the following PostScript operators in addition to the usual PostScript number, string (literal and hex-encoded), boolean, null, and name values:</p>
@@ -727,6 +740,28 @@ in the PPD file for a given locale.</blockquote>
 	<li><tt>setpagedevice</tt> - Set the page header values according to the key/value dictionary on the stack.</li>
 
 </ul>
+
+<blockquote><b>Note:</b> <em>Never<em> use the unsupported <tt>dict</tt> or <tt>put</tt> operators in your option code. These operators are typically used in option code dating back to Level 1 PostScript printers, which did not support the simpler <tt>&lt;&lt;</tt> or <tt>&gt;&gt;</tt> operators. If you have old option code using <tt>dict</tt> or <tt>put</tt>, you can rewrite it very easily to use the newer <tt>&lt;&lt;</tt> and <tt>&gt;&gt;</tt> operators instead. For example, the following code to set the page size:
+
+<style type='text/css'><!--
+PRE B {
+  background: #000000;
+  color: #ffffff;
+  padding: 2px 5px;
+}
+--></style>
+
+<pre class='command'>
+<b>1 dict dup</b> /PageSize [612 792] <b>put</b> setpagedevice
+</pre>
+
+<p>can be rewritten as:</p>
+
+<pre class='command'>
+<b>&lt;&lt;</b> /PageSize [612 792] <b>&gt;&gt;</b> setpagedevice
+</pre>
+
+</blockquote>
 
 <h3>Supported Page Device Attributes</h3>
 
@@ -1001,6 +1036,8 @@ in the PPD file for a given locale.</blockquote>
 <ul>
 
 	<li>Added <tt>cupsPreFilter</tt> attribute.</li>
+
+	<li>Added discussion of custom option code, sample <tt>CustomPageSize</tt> code, and "do not use dict and put" note.</li>
 
 </ul>
 
