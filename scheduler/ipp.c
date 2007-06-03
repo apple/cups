@@ -1061,6 +1061,10 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
   set_printer_defaults(con, pclass);
 
+  if ((attr = ippFindAttribute(con->request, "auth-info-required",
+                               IPP_TAG_KEYWORD)) != NULL)
+    cupsdSetAuthInfoRequired(printer, NULL, attr);
+
  /*
   * Update the printer class attributes and return...
   */
@@ -2372,6 +2376,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   }
 
   set_printer_defaults(con, printer);
+
+  if ((attr = ippFindAttribute(con->request, "auth-info-required",
+                               IPP_TAG_KEYWORD)) != NULL)
+    cupsdSetAuthInfoRequired(printer, NULL, attr);
 
  /*
   * See if we have all required attributes...
