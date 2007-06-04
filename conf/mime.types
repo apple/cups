@@ -78,20 +78,20 @@
 application/pdf			pdf string(0,%PDF)
 application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				contains(0,128,<1B>%-12345X) + \
-				(contains(0,1024,"LANGUAGE=POSTSCRIPT") \
-				 contains(0,1024,"LANGUAGE = Postscript") \
-				 contains(0,1024,"LANGUAGE = PostScript") \
-				 contains(0,1024,"LANGUAGE = POSTSCRIPT") \
-				 (contains(0,1024,<0a>%!) + \
-				  !contains(0,1024,"ENTER LANGUAGE")))
+				(contains(0,4096,"LANGUAGE=POSTSCRIPT") \
+				 contains(0,4096,"LANGUAGE = Postscript") \
+				 contains(0,4096,"LANGUAGE = PostScript") \
+				 contains(0,4096,"LANGUAGE = POSTSCRIPT") \
+				 (contains(0,4096,<0a>%!) + \
+				  !contains(0,4096,"ENTER LANGUAGE")))
 application/vnd.hp-HPGL		hpgl string(0,<1B>&)\
 				string(0,<1B>E<1B>%0B) \
 				string(0,<1B>%-1B) string(0,<201B>)\
 				string(0,BP;) string(0,IN;) string(0,DF;) \
 				string(0,BPINPS;) \
 				(contains(0,128,<1B>%-12345X) + \
-				 (contains(0,1024,"LANGUAGE=HPGL") \
-				  contains(0,1024,"LANGUAGE = HPGL")))
+				 (contains(0,4096,"LANGUAGE=HPGL") \
+				  contains(0,4096,"LANGUAGE = HPGL")))
 
 ########################################################################
 #
