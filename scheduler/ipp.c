@@ -1063,7 +1063,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "auth-info-required",
                                IPP_TAG_KEYWORD)) != NULL)
-    cupsdSetAuthInfoRequired(printer, NULL, attr);
+    cupsdSetAuthInfoRequired(pclass, NULL, attr);
 
  /*
   * Update the printer class attributes and return...
