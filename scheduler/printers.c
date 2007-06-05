@@ -35,6 +35,7 @@
  *   cupsdRenamePrinter()        - Rename a printer.
  *   cupsdSaveAllPrinters()      - Save all printer definitions to the
  *                                 printers.conf file.
+ *   cupsdSetAuthInfoRequired()  - Set the required authentication info.
  *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD
  *                                 file.
  *   cupsdSetPrinterReasons()    - Set/update the reasons strings.
