@@ -1,6 +1,20 @@
 CHANGES-1.2.txt
 ---------------
 
+CHANGES IN CUPS V1.2.12
+
+	- The web admin interface incorrectly handled the "share
+	  printers" and "show remote printers" settings (STR
+	  #2393)
+	- The scheduler's log messages about AuthClass and
+	  AuthGroupName advised using a replacement directive but
+	  had the wrong syntax (STR #2400)
+	- Updated the PostScript/PJL and HP-GL/2 MIME rules to
+	  look in the first 4k of the file, not just the first 1k
+	  (STR #2386)
+	- Updated the Italian localization (STR #2382)
+
+
 CHANGES IN CUPS V1.2.11
 
 	- Fixed the "relaying from" log message (STR #2376)

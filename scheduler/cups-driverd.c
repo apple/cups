@@ -299,7 +299,8 @@ cat_ppd(const char *name,		/* I - PPD name */
   else
     scheme[0] = '\0';
 
-  puts("Content-Type: application/ipp\n");
+  if (request_id > 0)
+    puts("Content-Type: application/ipp\n");
 
   if (scheme[0])
   {
