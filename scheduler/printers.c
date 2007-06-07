@@ -1580,6 +1580,8 @@ cupsdSetAuthInfoRequired(
       }
       else
         return (0);
+
+      values = (*end) ? end + 1 : end;
     }
 
     if (p->num_auth_info_required == 0)

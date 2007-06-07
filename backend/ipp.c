@@ -107,6 +107,7 @@ main(int  argc,				/* I - Number of command-line args */
   char		method[255],		/* Method in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
+		password_buf[255],	/* Password buffer */
 		resource[1024],		/* Resource info (printer name) */
 		addrname[256],		/* Address name */
 		*optptr,		/* Pointer to URI options */
@@ -517,8 +518,9 @@ main(int  argc,				/* I - Number of command-line args */
 	    * Decode password...
 	    */
 
-	    i = sizeof(password);
-	    httpDecode64_2(password, &i, aline);
+	    i = sizeof(password_buf);
+	    httpDecode64_2(password_buf, &i, aline);
+	    password = password_buf;
 	  }
 	}
 
