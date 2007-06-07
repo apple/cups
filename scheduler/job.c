@@ -465,6 +465,7 @@ void
 cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 {
   cupsd_printer_t	*printer;	/* Current printer */
+  ipp_attribute_t	*attr;		/* job-hold-until attribute */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] File %d is complete.",
@@ -657,7 +658,18 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
       case CUPS_BACKEND_AUTH_REQUIRED :
 	  cupsdStopJob(job, 0);
 
-	  cupsdSetJobHoldUntil(job, "authenticated");
+	  cupsdSetJobHoldUntil(job, "auth-info-required");
+
+	  if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
+				       IPP_TAG_KEYWORD)) == NULL)
+	    attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+	  if (attr)
+	  {
+	    attr->value_tag = IPP_TAG_KEYWORD;
+	    cupsdSetString(&(attr->values[0].string.text),
+	                   "auth-info-required");
+	  }
 
 	  job->state->values[0].integer = IPP_JOB_HELD;
 	  job->state_value              = IPP_JOB_HELD;
@@ -1373,7 +1385,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
 
   second = 0;
 
-  if (!strcmp(when, "indefinite") || !strcmp(when, "authenticated"))
+  if (!strcmp(when, "indefinite") || !strcmp(when, "auth-info-required"))
   {
    /*
     * Hold indefinitely...
