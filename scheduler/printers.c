@@ -1590,6 +1590,22 @@ cupsdSetAuthInfoRequired(
       p->num_auth_info_required = 1;
     }
 
+   /*
+    * Update the printer-type value as needed...
+    */
+
+    if (p->num_auth_info_required > 1 ||
+        strcmp(p->auth_info_required[0], "none"))
+    {
+      p->type          |= CUPS_PRINTER_AUTHENTICATED;
+      p->external_type |= CUPS_PRINTER_AUTHENTICATED;
+    }
+    else
+    {
+      p->type          &= ~CUPS_PRINTER_AUTHENTICATED;
+      p->external_type &= ~CUPS_PRINTER_AUTHENTICATED;
+    }
+
     return (1);
   }
 
@@ -1599,6 +1615,22 @@ cupsdSetAuthInfoRequired(
 
   if (!attr || attr->num_values > 4)
     return (0);
+
+ /*
+  * Update the printer-type value as needed...
+  */
+
+  if (attr->num_values > 1 ||
+      strcmp(attr->values[0].string.text, "none"))
+  {
+    p->type          |= CUPS_PRINTER_AUTHENTICATED;
+    p->external_type |= CUPS_PRINTER_AUTHENTICATED;
+  }
+  else
+  {
+    p->type          &= ~CUPS_PRINTER_AUTHENTICATED;
+    p->external_type &= ~CUPS_PRINTER_AUTHENTICATED;
+  }
 
   for (i = 0; i < attr->num_values; i ++)
   {
