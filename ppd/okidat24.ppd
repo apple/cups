@@ -5,7 +5,7 @@
 *%   Sample OKIDATA 24-Pin driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
 *%
-*%   Copyright 1997-2005 by Easy Software Products.
+*%   Copyright 1997-2007 by Easy Software Products.
 *%
 *%   These coded instructions, statements, and computer programs are the
 *%   property of Easy Software Products and are protected by Federal
@@ -24,20 +24,20 @@
 *%         WWW: http://www.cups.org
 *%
 *FormatVersion:	"4.3"
-*FileVersion:	"1.1"
+*FileVersion:	"1.3"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"OKIDAT24.PPD"
 *Manufacturer:	"Oki"
 *Product:	"(GNU Ghostscript)"
 *Product:	"(ESP Ghostscript)"
-*cupsVersion:	1.2
+*cupsVersion:	1.3
 *cupsManualCopies: True
 *cupsModelNumber:	1
 *cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
 *ModelName:     "OKIDATA 24-Pin Series"
 *ShortNickName: "OKIDATA 24-Pin Series"
-*NickName:      "OKIDATA 24-Pin Series CUPS v1.2"
+*NickName:      "OKIDATA 24-Pin Series CUPS v1.3"
 *PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
