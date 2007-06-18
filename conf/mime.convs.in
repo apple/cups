@@ -115,7 +115,7 @@ image/x-sun-raster	application/vnd.cups-raster	100	imagetoraster
 # without the -oraw option.
 #
 
-#application/octet-stream	application/vnd.cups-raw	0	-
+@DEFAULT_RAW_PRINTING@application/octet-stream	application/vnd.cups-raw	0	-
 
 #
 # End of "$Id$".

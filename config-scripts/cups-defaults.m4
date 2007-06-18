@@ -142,11 +142,11 @@ fi
 AC_SUBST(CUPS_IMPLICIT_CLASSES)
 
 dnl Default UseNetworkDefault
-AC_ARG_ENABLE(network_default, [  --enable-use-network-default
+AC_ARG_ENABLE(use_network_default, [  --enable-use-network-default
                           enable UseNetworkDefault by default, default=auto])
-if test "x$enable_network_default" != xno; then
+if test "x$enable_use_network_default" != xno; then
 	AC_MSG_CHECKING(whether to use network default printers)
-	if test "x$enable_network_default" = xyes -o $uname != Darwin; then
+	if test "x$enable_use_network_default" = xyes -o $uname != Darwin; then
 		CUPS_USE_NETWORK_DEFAULT="Yes"
 		AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 1)
 		AC_MSG_RESULT(yes)
@@ -292,6 +292,22 @@ AC_ARG_WITH(max-copies, [  --with-max-copies       set max copies value, default
 
 AC_SUBST(CUPS_MAX_COPIES)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_MAX_COPIES, $CUPS_MAX_COPIES)
+
+dnl Default raw printing state
+AC_ARG_ENABLE(raw_printing, [  --enable-raw-printing   enable raw printing by default, default=auto])
+if test "x$enable_raw_printing" != xno; then
+	AC_MSG_CHECKING(whether to raw printing)
+	if test "x$enable_raw_printing" = xyes -o $uname = Darwin; then
+		DEFAULT_RAW_PRINTING=""
+		AC_MSG_RESULT(yes)
+	else
+		DEFAULT_RAW_PRINTING="#"
+		AC_MSG_RESULT(no)
+	fi
+else
+	DEFAULT_RAW_PRINTING="#"
+fi
+AC_SUBST(DEFAULT_RAW_PRINTING)
 
 dnl
 dnl End of "$Id$".
