@@ -78,6 +78,10 @@ install:	all
 	echo Installing $(PHPCUPS) in $(PHPDIR)
 	$(INSTALL_DIR) $(PHPDIR)
 	$(INSTALL_BIN) $(PHPCUPS) $(PHPDIR)
+	if test "x$SYMROOT" != x; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp $(PHPCUPS) $(SYMROOT); \
+	fi
 
 
 #
@@ -96,7 +100,7 @@ uninstall:
 phpcups.so:	$(OBJS) ../../Makedefs
 	echo Linking $@...
 	if test `uname` = Darwin; then \
-		DSOFLAGS="-bundle -flat_namespace -undefined suppress"; \
+		DSOFLAGS="-bundle -flat_namespace -undefined suppress $(RC_CFLAGS)"; \
 	else \
 		DSOFLAGS="$(DSOFLAGS)"; \
 	fi; \

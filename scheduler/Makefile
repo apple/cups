@@ -135,11 +135,13 @@ install:	all
 	echo Creating $(SERVERROOT)/ssl...
 	$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl
 	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl
-	echo Creating $(STATEDIR)...
-	$(INSTALL_DIR) -m 755 $(STATEDIR)
-	echo Creating $(STATEDIR)/certs...
-	$(INSTALL_DIR) -m 511 $(STATEDIR)/certs
-	-chgrp $(CUPS_PRIMARY_SYSTEM_GROUP) $(STATEDIR)/certs
+	-if test "x`uname`" != xDarwin; then \
+		echo Creating $(STATEDIR)...; \
+		$(INSTALL_DIR) -m 755 $(STATEDIR); \
+		echo Creating $(STATEDIR)/certs...; \
+		$(INSTALL_DIR) -m 511 $(STATEDIR)/certs; \
+		chgrp $(CUPS_PRIMARY_SYSTEM_GROUP) $(STATEDIR)/certs; \
+	fi
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) -m 755 $(LOGDIR)
 	echo Creating $(REQUESTS)...
