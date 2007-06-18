@@ -296,7 +296,7 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_MAX_COPIES, $CUPS_MAX_COPIES)
 dnl Default raw printing state
 AC_ARG_ENABLE(raw_printing, [  --enable-raw-printing   enable raw printing by default, default=auto])
 if test "x$enable_raw_printing" != xno; then
-	AC_MSG_CHECKING(whether to raw printing)
+	AC_MSG_CHECKING(whether to enable raw printing)
 	if test "x$enable_raw_printing" = xyes -o $uname = Darwin; then
 		DEFAULT_RAW_PRINTING=""
 		AC_MSG_RESULT(yes)
