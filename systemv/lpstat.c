@@ -1397,9 +1397,11 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
           int        ranking,		/* I - Show job ranking? */
 	  const char *which)		/* I - Show which jobs? */
 {
+  int		i;			/* Looping var */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
-  ipp_attribute_t *attr;		/* Current attribute */
+  ipp_attribute_t *attr,		/* Current attribute */
+		*reasons;		/* Job state reasons attribute */
   const char	*dest,			/* Pointer into job-printer-uri */
 		*username,		/* Pointer to job-originating-user-name */
 		*title;			/* Pointer to job-name */
@@ -1420,7 +1422,8 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 		  "job-name",
 		  "time-at-creation",
 		  "job-printer-uri",
-		  "job-originating-user-name"
+		  "job-originating-user-name",
+		  "job-state-reasons"
 		};
 
 
@@ -1495,6 +1498,7 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
       dest     = NULL;
       jobtime  = 0;
       title    = "no title";
+      reasons  = NULL;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
       {
@@ -1522,6 +1526,10 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
         if (!strcmp(attr->name, "job-name") &&
 	    attr->value_tag == IPP_TAG_NAME)
 	  title = attr->values[0].string.text;
+
+        if (!strcmp(attr->name, "job-state-reasons") &&
+	    attr->value_tag == IPP_TAG_KEYWORD)
+	  reasons = attr;
 
         attr = attr->next;
       }
@@ -1665,7 +1673,17 @@ show_jobs(http_t     *http,		/* I - HTTP connection to server */
 	                    temp, username ? username : "unknown",
 			    1024.0 * size, date);
           if (long_status)
+          {
+	    if (reasons)
+	    {
+	      _cupsLangPuts(stdout, _("\tAlerts:"));
+	      for (i = 0; i < reasons->num_values; i ++)
+		_cupsLangPrintf(stdout, " %s",
+				reasons->values[i].string.text);
+	      _cupsLangPuts(stdout, "\n");
+	    }
 	    _cupsLangPrintf(stdout, _("\tqueued for %s\n"), dest);
+	  }
 	}
       }
 

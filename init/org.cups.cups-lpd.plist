@@ -12,6 +12,8 @@
 		<string>-o</string>
 		<string>document-format=application/octet-stream</string>
 	</array>
+	<key>SHAuthorizationRight</key>
+	<string>system.preferences</string>
 	<key>Sockets</key>
 	<dict>
 		<key>Listeners</key>

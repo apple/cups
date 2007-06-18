@@ -49,24 +49,25 @@
 *
 * Contents:
 *
-*  main()		- Send a file to the specified Appletalk printer.
-*  listDevices()	- List all LaserWriter printers in the local zone.
-*  printFile()		- Print file.
-*  papOpen()		- Open a pap session to a printer.
-*  papClose()		- Close a pap session.
-*  papWrite()		- Write bytes to a printer.
-*  papCloseResp()	- Send a pap close response.
-*  papSendRequest()	- Fomrat and send a pap packet.
-*  papCancelRequest()	- Cancel a pending pap request.
-*  statusUpdate()	- Print printer status to stderr.
-*  parseUri()		- Extract the print name and zone from a uri.
-*  addPercentEscapes()	- Encode a string with percent escapes.
-*  removePercentEscapes	- Remove percent escape sequences from a string.
-*  nbptuple_compare()	- Compare routine for qsort.
-*  okayToUseAppleTalk() - Returns true if AppleTalk is available and enabled.
-*  packet_name()	- Returns packet name string.
-*  connectTimeout()	- Returns the connect timeout preference value.
-*  signalHandler()	- handle SIGINT to close the session before quiting.
+*  main()		 - Send a file to the specified Appletalk printer.
+*  listDevices()	 - List all LaserWriter printers in the local zone.
+*  printFile()		 - Print file.
+*  papOpen()		 - Open a pap session to a printer.
+*  papClose()		 - Close a pap session.
+*  papWrite()		 - Write bytes to a printer.
+*  papCloseResp()	 - Send a pap close response.
+*  papSendRequest()	 - Fomrat and send a pap packet.
+*  papCancelRequest()	 - Cancel a pending pap request.
+*  sidechannel_request() - Handle side-channel requests.
+*  statusUpdate()	 - Print printer status to stderr.
+*  parseUri()		 - Extract the print name and zone from a uri.
+*  addPercentEscapes()	 - Encode a string with percent escapes.
+*  removePercentEscapes	 - Remove percent escape sequences from a string.
+*  nbptuple_compare()	 - Compare routine for qsort.
+*  okayToUseAppleTalk()  - Returns true if AppleTalk is available and enabled.
+*  packet_name()	 - Returns packet name string.
+*  connectTimeout()	 - Returns the connect timeout preference value.
+*  signalHandler()	 - handle SIGINT to close the session before quiting.
 */
 
 #include <config.h>
@@ -92,6 +93,8 @@
 
 #include <cups/cups.h>
 #include <cups/backend.h>
+#include <cups/sidechannel.h>
+#include <cups/i18n.h>
 
 #include <libkern/OSByteOrder.h>
 
@@ -167,6 +170,7 @@ static int papCloseResp(int sockfd, at_inet_t* dest, int xo, u_short tid,
 static int papSendRequest(int sockfd, at_inet_t* dest, u_char connID, 
 			  int function, u_char bitmap, int xo, int seqno);
 static int papCancelRequest(int sockfd, u_short tid);
+static void sidechannel_request();
 static void statusUpdate(char* status, u_char statusLen);
 static int parseUri(const char* argv0, char* name, char* type, char* zone);
 static int addPercentEscapes(const char* src, char* dst, int dstMax);
@@ -392,6 +396,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   char	sockBuffer[4096 + 1];    /* Socket buffer with room for nul */
   char	atpReqBuf[AT_PAP_DATA_SIZE];
   fd_set readSet;
+  int	use_sidechannel;	/* Use side channel? */
 
   at_nbptuple_t	tuple;
   at_inet_t	sendDataAddr;
@@ -417,6 +422,22 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;  /* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
+ /*
+  * Test the side channel descriptor before calling papOpen() since it may open
+  * an unused fd 4 (a.k.a. CUPS_SC_FD)...
+  */
+
+  FD_ZERO(&readSet);
+  FD_SET(CUPS_SC_FD, &readSet);
+
+  timeout.tv_sec  = 0;
+  timeout.tv_usec = 0;
+
+  if ((select(CUPS_SC_FD+1, &readSet, NULL, NULL, &timeout)) >= 0)
+    use_sidechannel = 1;
+  else
+    use_sidechannel = 0;
 
   /* try to find our printer */
   if ((err = nbp_make_entity(&entity, name, type, zone)) != noErr)
@@ -559,7 +580,11 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   fileBufferNbytes = 0;
   fileTbytes = 0;
   fileEOFRead = fileEOFSent = false;
+
   maxfdp1 = MAX(fdin, gSockfd) + 1;
+
+  if (use_sidechannel && CUPS_SC_FD >= maxfdp1)
+    maxfdp1 = CUPS_SC_FD + 1;
 
   if (gStatusInterval != 0)
   {
@@ -579,6 +604,9 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
 
     if (fileBufferNbytes == 0 && fileEOFRead == false)
       FD_SET(fdin, &readSet);
+
+    if (use_sidechannel)
+      FD_SET(CUPS_SC_FD, &readSet);
 
     /* Set the select timeout value based on the next status interval */
     if (gStatusInterval != 0)
@@ -603,6 +631,13 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
       if (gStatusInterval)
         nextStatusTime = time(NULL) + gStatusInterval;
     }
+
+   /*
+    * Check if we have a side-channel request ready...
+    */
+
+    if (use_sidechannel && FD_ISSET(CUPS_SC_FD, &readSet))
+      sidechannel_request();
 
     /* Was there an event on the input stream? */
     if (FD_ISSET(fdin, &readSet))
@@ -1226,6 +1261,50 @@ int papCancelRequest(int sockfd, u_short tid)
   sigprocmask(SIG_SETMASK, &osv, NULL);
 
   return 0;
+}
+
+
+/*
+ * 'sidechannel_request()' - Handle side-channel requests.
+ */
+
+static void
+sidechannel_request()
+{
+  cups_sc_command_t	command;	/* Request command */
+  cups_sc_status_t	status;		/* Request/response status */
+  char			data[2048];	/* Request/response data */
+  int			datalen;	/* Request/response data size */
+
+  datalen = sizeof(data);
+
+  if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
+  {
+    fputs(_("WARNING: Failed to read side-channel request!\n"), stderr);
+    return;
+  }
+
+  switch (command)
+  {
+    case CUPS_SC_CMD_GET_BIDI:		/* Is the connection bidirectional? */
+	data[0] = 1;
+	cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0);
+	break;
+
+    case CUPS_SC_CMD_GET_STATE:		/* Return device state */
+	data[0] = CUPS_SC_STATE_ONLINE;
+	cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0);
+	break;
+
+    case CUPS_SC_CMD_DRAIN_OUTPUT:	/* Drain all pending output */
+    case CUPS_SC_CMD_SOFT_RESET:	/* Do a soft reset */
+    case CUPS_SC_CMD_GET_DEVICE_ID:	/* Return IEEE-1284 device ID */
+    default:
+	cupsSideChannelWrite(command, CUPS_SC_STATUS_NOT_IMPLEMENTED, 
+			     NULL, 0, 1.0);
+	break;
+  }
+  return;
 }
 
 
