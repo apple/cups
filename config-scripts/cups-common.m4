@@ -196,11 +196,14 @@ CUPS_SYSTEM_AUTHKEY=""
 
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
 
+FONTS="fonts"
+AC_SUBST(FONTS)
 LEGACY_BACKENDS="parallel scsi"
 AC_SUBST(LEGACY_BACKENDS)
 
 case $uname in
         Darwin*)
+		FONTS=""
 		LEGACY_BACKENDS=""
                 BACKLIBS="-framework IOKit"
                 CUPSDLIBS="-framework IOKit -framework SystemConfiguration"

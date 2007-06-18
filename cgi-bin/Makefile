@@ -63,6 +63,12 @@ install:	all
 	for file in $(CGIS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/cgi-bin; \
 	done
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #

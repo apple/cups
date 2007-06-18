@@ -173,6 +173,12 @@ install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(RM) $(LIBDIR)/libcups.dylib; \
 		$(LN) $(LIBCUPS) $(LIBDIR)/libcups.dylib; \
 	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)

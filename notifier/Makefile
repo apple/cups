@@ -55,6 +55,12 @@ install:	all
 	done
 	$(INSTALL_DIR) -m 755 $(CACHEDIR)/rss
 	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #

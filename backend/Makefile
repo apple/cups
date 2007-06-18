@@ -71,6 +71,12 @@ install:	all
 	done
 	$(RM) $(SERVERBIN)/backend/http
 	$(LN) ipp $(SERVERBIN)/backend/http
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #

@@ -117,10 +117,12 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 #               for extra debug info)
 #
 
+ALL_CFLAGS	=	$(SSLFLAGS) @LARGEFILE@ @PTHREAD_FLAGS@ \
+			$(OPTIONS) $(CFLAGS)
 ARCHFLAGS	=	@ARCHFLAGS@
 ARFLAGS		=	@ARFLAGS@
 BACKLIBS	=	@BACKLIBS@
-CFLAGS		=	-I.. $(SSLFLAGS) @CPPFLAGS@ @CFLAGS@ \
+CFLAGS		=	-I.. @CPPFLAGS@ @CFLAGS@ \
 			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
 COMMONLIBS	=	@LIBS@
 CUPSDLIBS	=	@CUPSDLIBS@
@@ -130,6 +132,7 @@ CXXLIBS		=	@CXXLIBS@
 DSOFLAGS	=	@DSOFLAGS@
 DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
 DNSSDLIBS	=	@DNSSDLIBS@
+FONTS		=	@FONTS@
 IMGLIBS		=	@IMGLIBS@
 IMGFILTERS	=	@IMGFILTERS@
 LAUNCHDLIBS	=	@LAUNCHDLIBS@
@@ -250,15 +253,15 @@ DBUSDIR		=	@DBUSDIR@
 
 .c.o:
 	echo Compiling $<...
-	$(CC) $(ARCHFLAGS) $(OPTIM) $(CFLAGS) -c $<
+	$(CC) $(ARCHFLAGS) $(OPTIM) $(ALL_CFLAGS) -c $<
 
 .c.32.o:
 	echo Compiling 32-bit $<...
-	$(CC) $(ARCH32FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
+	$(CC) $(ARCH32FLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
 
 .c.64.o:
 	echo Compiling 64-bit $<...
-	$(CC) $(ARCH64FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
+	$(CC) $(ARCH64FLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
 
 .cxx.o:
 	echo Compiling $<...

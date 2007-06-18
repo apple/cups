@@ -62,6 +62,12 @@ install:	all
 	$(INSTALL_BIN) lprm $(BINDIR)
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) lpc $(SBINDIR)
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #

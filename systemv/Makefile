@@ -79,6 +79,12 @@ install:	all
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
 	$(INSTALL_BIN) -m 4755 -o root lppasswd $(BINDIR) || $(INSTALL_BIN) lppasswd $(BINDIR)
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #

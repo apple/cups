@@ -154,6 +154,12 @@ install:	all
 #	echo Creating $(CACHEDIR)/ppd...
 #	$(INSTALL_DIR) -m 755 $(CACHEDIR)/ppd
 #	-chgrp $(CUPS_GROUP) $(CACHEDIR)/ppd
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #
