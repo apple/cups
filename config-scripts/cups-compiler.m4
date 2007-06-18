@@ -39,11 +39,20 @@ AC_ARG_WITH(archflags, [  --with-archflags="flags"
 
 if test -z "$with_archflags"; then
 	ARCHFLAGS=""
+	LDARCHFLAGS=""
 else
 	ARCHFLAGS="$with_archflags"
+	if test "$uname" = Darwin; then
+		# Only link 32-bit programs - 64-bit is for the shared
+		# libraries...
+		LDARCHFLAGS="`echo $ARCHFLAGS | sed -e '1,$s/-arch x86_64//' -e '1,$s/-arch ppc64//'`"
+	else
+		LDARCHFLAGS="$ARCHFLAGS"
+	fi
 fi
 
 AC_SUBST(ARCHFLAGS)
+AC_SUBST(LDARCHFLAGS)
 
 dnl Setup support for separate 32/64-bit library generation...
 AC_ARG_WITH(arch32flags, [  --with-arch32flags="flags"
