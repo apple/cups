@@ -106,8 +106,7 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 #
 # Program options...
 #
-# ARCHFLAGS     Defines the default architecture build options, used
-#               when compiling separate 32/64-bit libraries.
+# ARCHFLAGS     Defines the default architecture build options.
 # ARCH32FLAGS   Defines the 32-bit architecture build options, used
 #               when compiling separate 32/64-bit libraries.
 # ARCH64FLAGS   Defines the 64-bit architecture build options, used
@@ -136,6 +135,7 @@ IMGFILTERS	=	@IMGFILTERS@
 LAUNCHDLIBS	=	@LAUNCHDLIBS@
 LDFLAGS		=	-L../cups -L../filter $(ARCHFLAGS) \
 			@LDFLAGS@ @RELROFLAGS@ @PIEFLAGS@ $(OPTIM)
+LEGACY_BACKENDS	=	@LEGACY_BACKENDS@
 LINKCUPS	=	@LINKCUPS@ $(SSLLIBS)
 LINKCUPSIMAGE	=	@LINKCUPSIMAGE@
 LIBS		=	$(LINKCUPS) $(COMMONLIBS)
