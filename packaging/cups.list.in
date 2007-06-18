@@ -226,8 +226,10 @@ d 0755 root sys $SERVERBIN/backend -
 f 0700 root sys $SERVERBIN/backend/ipp backend/ipp
 l 0700 root sys $SERVERBIN/backend/http ipp
 f 0700 root sys $SERVERBIN/backend/lpd backend/lpd
+%system !darwin
 f 0755 root sys $SERVERBIN/backend/parallel backend/parallel
 f 0755 root sys $SERVERBIN/backend/scsi backend/scsi
+%system all
 f 0755 root sys $SERVERBIN/backend/serial backend/serial
 f 0755 root sys $SERVERBIN/backend/snmp backend/snmp
 f 0755 root sys $SERVERBIN/backend/socket backend/socket
