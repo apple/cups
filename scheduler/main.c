@@ -166,6 +166,14 @@ main(int  argc,				/* I - Number of command-line args */
 
   fg = 0;
 
+#ifdef HAVE_LAUNCHD
+  if (getenv("CUPSD_LAUNCHD"))
+  {
+    Launchd = 1;
+    fg      = 1;
+  }
+#endif /* HAVE_LAUNCHD */
+
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
       for (opt = argv[i] + 1; *opt != '\0'; opt ++)

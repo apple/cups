@@ -11,11 +11,11 @@ dnl   Copyright ...
 dnl
 dnl
 
-AC_ARG_ENABLE(dnssd, [  --enable-dnssd            turn on DNS Service Discovery support, default=yes])
-AC_ARG_WITH(dnssd-libs, [  --with-dnssd-libs        set directory for DNS Service Discovery library],
+AC_ARG_ENABLE(dnssd, [  --enable-dnssd          turn on DNS Service Discovery support, default=yes])
+AC_ARG_WITH(dnssd-libs, [  --with-dnssd-libs       set directory for DNS Service Discovery library],
 	LDFLAGS="-L$withval $LDFLAGS"
 	DSOFLAGS="-L$withval $DSOFLAGS",)
-AC_ARG_WITH(dnssd-includes, [  --with-dnssd-includes    set directory for DNS Service Discovery includes],
+AC_ARG_WITH(dnssd-includes, [  --with-dnssd-includes   set directory for DNS Service Discovery includes],
 	CFLAGS="-I$withval $CFLAGS"
 	CXXFLAGS="-I$withval $CXXFLAGS"
 	CPPFLAGS="-I$withval $CPPFLAGS",)

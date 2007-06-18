@@ -196,6 +196,11 @@ CUPS_SYSTEM_AUTHKEY=""
 
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
 
+AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     libcups secorder file, default=libcups.order],
+	LIBCUPSORDER="$withval",
+	LIBCUPSORDER="libcups.order")
+AC_SUBST(LIBCUPSORDER)
+
 FONTS="fonts"
 AC_SUBST(FONTS)
 LEGACY_BACKENDS="parallel scsi"
@@ -206,7 +211,7 @@ case $uname in
 		FONTS=""
 		LEGACY_BACKENDS=""
                 BACKLIBS="-framework IOKit"
-                CUPSDLIBS="-framework IOKit -framework SystemConfiguration"
+                CUPSDLIBS="-sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration"
                 LIBS="-framework CoreFoundation $LIBS"
 
 		dnl Check for CFLocaleCreateCanonicalLocaleIdentifierFromString...

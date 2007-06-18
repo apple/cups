@@ -271,12 +271,14 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 # libcups.2.dylib
 #
 
-libcups.2.dylib:	$(LIBOBJS)
+libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.8.0 \
 		-compatibility_version 2.0.0 \
+		-exported_symbols_list libcups.exp \
+		-sectorder __TEXT __text $(LIBCUPSORDER) \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
