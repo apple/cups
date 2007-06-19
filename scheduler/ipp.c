@@ -8156,7 +8156,9 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
     return;
   }
 
-#  ifdef HAVE_HEIMDAL
+#  ifdef HAVE_KRB5_CC_RESOLVE
+  if (krb5_cc_resolve(krb5_context, "MEMORY:", &ccache))
+#  elif defined(HAVE_HEIMDAL)
   if (krb5_cc_gen_new(krb_context, &krb5_fcc_ops, &ccache))
 #  else
   if (krb5_cc_gen_new(krb_context, &ccache))
@@ -8177,8 +8179,14 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
     return;
   }
 
+#ifdef HAVE_KRB5_CC_RESOLVE
+  cupsdSetStringf(&(job->ccname), "KRB5CCNAME=MEMORY:%s",
+                  krb5_cc_get_name(krb_context, ccache));
+#else
   cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
                   krb5_cc_get_name(krb_context, ccache));
+#endif /* HAVE_KRB5_CC_RESOLVE */
+
   krb5_cc_close(krb_context, ccache);
 }
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */

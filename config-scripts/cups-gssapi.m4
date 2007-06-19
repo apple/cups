@@ -42,10 +42,19 @@ if test x$enable_gssapi != xno; then
 		fi
 		AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
 	else
-		# Solaris provides its own GSSAPI implementation...
-		AC_CHECK_LIB(gss, gss_display_status,
-			AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
-			LIBGSSAPI="-lgss")
+		# Check for vendor-specific implementations...
+		case "$uname" in
+			HP-UX*)
+				AC_CHECK_LIB(gss, gss_display_status,
+					AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
+					LIBGSSAPI="-lgss -lgssapi_krb5")
+				;;
+			SunOS*)
+				AC_CHECK_LIB(gss, gss_display_status,
+					AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
+					LIBGSSAPI="-lgss")
+				;;
+		esac
 	fi
 
 	if test "x$LIBGSSAPI" != x; then
@@ -60,6 +69,7 @@ if test x$enable_gssapi != xno; then
 
 		AC_CHECK_FUNC(gsskrb5_register_acceptor_identity, 
 			      AC_DEFINE(HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY))
+		AC_CHECK_FUNC(krb5_cc_resolve, AC_DEFINE(KRB5_CC_RESOLVE))
 
 		AC_MSG_CHECKING(for GSS_C_NT_HOSTBASED_SERVICE)
 		if test $ac_cv_header_gssapi_gssapi_h = yes; then
