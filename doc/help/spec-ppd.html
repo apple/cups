@@ -174,9 +174,49 @@ the special filter program "-" may be specified.</p>
 
 <p class='summary'>*cupsFlipDuplex: boolean</p>
 
-<p>This boolean attribute notifies the RIP filters that the
-destination printer requires an upside-down image for the back
-page. The default value is <code>false</code>.</p>
+<blockquote><b>Note:</b> The <tt>cupsFlipDuplex</tt> attribute is
+not supported on Mac OS X 10.5.x or earlier.</blockquote>
+
+<p>This boolean attribute specifies the coordinate system of the
+back side of the media when doing 2-sided printing using a CUPS
+raster driver. <a href='#TABLE_1'>Table 1</a> shows how
+<code>cupsFlipDuplex</code> interacts with the <code>Tumble</code>
+page attribute. The default value is <code>false</code>.</p>
+
+<div class='table'>
+<table width='80%' summary='Back Side Raster Coordinate System'>
+<caption>Table 1: <a name='TABLE_1'>Back Side Raster Coordinate System</a></caption>
+<thead>
+<tr>
+	<th>cupsFlipDuplex</th>
+	<th>Tumble</th>
+	<th>Image Presentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td><code>false</code></td>
+	<td><code>false</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>false</code></td>
+	<td><code>true</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>true</code></td>
+	<td><code>false</code></td>
+	<td>Left-to-right, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>true</code></td>
+	<td><code>true</code></td>
+	<td>Right-to-left, top-to-bottom</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 <p>Example:</p>
 
@@ -765,11 +805,11 @@ PRE B {
 
 <h3>Supported Page Device Attributes</h3>
 
-<p>Table 1 shows the supported page device attributes along with PostScript code examples.</p>
+<p>Table 2 shows the supported page device attributes along with PostScript code examples.</p>
 
 <div class='table'>
 <table summary='Supported Page Device Attributes'>
-<caption>Table 1: <a name='TABLE_1'>Supported Page Device Attributes</a></caption>
+<caption>Table 2: <a name='TABLE_2'>Supported Page Device Attributes</a></caption>
 <thead>
 <tr>
 	<th>Name(s)</th>
