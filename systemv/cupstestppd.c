@@ -27,10 +27,16 @@
  *
  * Contents:
  *
- *   main()           - Main entry for test program.
- *   show_conflicts() - Show option conflicts in a PPD file.
- *   usage()          - Show program usage...
- *   valid_utf8()     - Check whether a string contains valid UTF-8 text.
+ *   main()               - Main entry for test program.
+ *   check_basics()       - Check for CR LF, mixed line endings, and blank lines.
+ *   check_constraints()  - Check UIConstraints in the PPD file.
+ *   check_defaults()     - Check default option keywords in the PPD file.
+ *   check_filters()      - Check filters in the PPD file.
+ *   check_translations() - Check translations in the PPD file.
+ *   show_conflicts()     - Show option conflicts in a PPD file.
+ *   test_raster()        - Test PostScript commands for raster printers.
+ *   usage()              - Show program usage...
+ *   valid_utf8()         - Check whether a string contains valid UTF-8 text.
  */
 
 /*
@@ -40,6 +46,7 @@
 #include <cups/string.h>
 #include <cups/cups.h>
 #include <cups/i18n.h>
+#include <filter/raster.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -101,6 +108,7 @@ static int	check_filters(ppd_file_t *ppd, const char *root, int errors,
 static int	check_translations(ppd_file_t *ppd, int errors, int verbose,\
 		                   int warn);
 static void	show_conflicts(ppd_file_t *ppd);
+static int	test_raster(ppd_file_t *ppd, int verbose);
 static void	usage(void);
 static int	valid_utf8(const char *s);
 
@@ -366,6 +374,14 @@ main(int  argc,				/* I - Number of command-line args */
       if ((attr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL &&
           attr->value)
         ppdversion = (int)(10 * atof(attr->value) + 0.5);
+
+      for (j = 0; j < ppd->num_filters; j ++)
+        if (strstr(ppd->filters[j], "application/vnd.cups-raster"))
+	{
+	  if (!test_raster(ppd, verbose))
+	    errors ++;
+	  break;
+	}
 
      /*
       * Look for default keywords with no matching option...
@@ -1206,9 +1222,12 @@ main(int  argc,				/* I - Number of command-line args */
           if (!strcmp(attr->name, "DefaultColorSpace") ||
 	      !strcmp(attr->name, "DefaultColorSep") ||
 	      !strcmp(attr->name, "DefaultFont") ||
+	      !strcmp(attr->name, "DefaultHalftoneType") ||
 	      !strcmp(attr->name, "DefaultImageableArea") ||
+	      !strcmp(attr->name, "DefaultLeadingEdge") ||
 	      !strcmp(attr->name, "DefaultOutputOrder") ||
 	      !strcmp(attr->name, "DefaultPaperDimension") ||
+	      !strcmp(attr->name, "DefaultResolution") ||
 	      !strcmp(attr->name, "DefaultScreenProc") ||
 	      !strcmp(attr->name, "DefaultTransfer"))
 	    continue;
@@ -1543,6 +1562,14 @@ main(int  argc,				/* I - Number of command-line args */
 	  }
 	}
 
+	_cupsLangPrintf(stdout, "    num_consts = %d\n",
+	                ppd->num_consts);
+	for (j = 0; j < ppd->num_consts; j ++)
+	  _cupsLangPrintf(stdout,
+                	  "        consts[%d] = *%s %s *%s %s\n",
+        		  j, ppd->consts[j].option1, ppd->consts[j].choice1,
+			  ppd->consts[j].option2, ppd->consts[j].choice2);
+
 	_cupsLangPrintf(stdout, "    num_profiles = %d\n",
 	                ppd->num_profiles);
 	for (j = 0; j < ppd->num_profiles; j ++)
@@ -1781,7 +1808,9 @@ check_defaults(ppd_file_t *ppd,		/* I - PPD file */
 
     if (!strcmp(attr->name, "DefaultColorSpace") ||
 	!strcmp(attr->name, "DefaultFont") ||
+	!strcmp(attr->name, "DefaultHalftoneType") ||
 	!strcmp(attr->name, "DefaultImageableArea") ||
+	!strcmp(attr->name, "DefaultLeadingEdge") ||
 	!strcmp(attr->name, "DefaultOutputOrder") ||
 	!strcmp(attr->name, "DefaultPaperDimension") ||
 	!strcmp(attr->name, "DefaultResolution") ||
@@ -2044,6 +2073,9 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	   option;
 	   option = ppdNextOption(ppd))
       {
+        if (!strcmp(option->keyword, "PageRegion"))
+	  continue;
+
 	snprintf(keyword, sizeof(keyword), "%s.Translation", langstart);
 	snprintf(llkeyword, sizeof(llkeyword), "%s.Translation", ll);
 
@@ -2343,6 +2375,35 @@ show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
         	      o1->keyword, c1->choice, o2->keyword, c2->choice,
 		      c->option1, c->choice1, c->option2, c->choice2);
   }
+}
+
+
+/*
+ * 'test_raster()' - Test PostScript commands for raster printers.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+test_raster(ppd_file_t *ppd,		/* I - PPD file */
+            int        verbose)		/* I - Verbosity */
+{
+  cups_page_header2_t	header;		/* Page header */
+
+
+  ppdMarkDefaults(ppd);
+  if (cupsRasterInterpretPPD(&header, ppd, 0, NULL, 0))
+  {
+    if (!verbose)
+      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+    if (verbose >= 0)
+      _cupsLangPrintf(stdout,
+		      _("      **FAIL**  Default option code cannot be "
+			"interpreted: %s\n"), cupsRasterErrorString());
+
+    return (0);
+  }
+  else
+    return (1);
 }
 
 
