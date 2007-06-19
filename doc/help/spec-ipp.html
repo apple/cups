@@ -915,6 +915,11 @@ CUPS-Add-Modify-Printer request:
 	<dd>The client OPTIONALLY supplies a device URI for the
 	specified printer.
 
+	<dt>"port-monitor" (name(127)):
+
+	<dd>The client OPTIONALLY supplies a port monitor name for the
+	specified printer.
+
 	<dt>"ppd-name" (name(127)):
 
 	<dd>The client OPTIONALLY supplies a PPD name for the specified
@@ -2232,10 +2237,19 @@ calculations, in seconds. The default value of 0 specifies that the limits
 apply to all jobs that have been printed by a user that are still known to
 the system.
 
-<h4><a name="job-sheets-completed">job-sheets-supported (1setof type3 keyword | name(MAX))</a><span class='info'>CUPS 1.1</span></h4>
+<h4><a name="job-sheets-supported">job-sheets-supported (1setof type3 keyword | name(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 
 <p>The job-sheets-supported attribute specifies the available banner files.
 There will always be at least one banner file available called "none".
+
+<h4><a name="port-monitor">port-monitor" (name(127))</a></h4>
+
+<p>The port-monitor attribute specifies the port monitor to use when printing
+to this printer. The default port monitor is "none".
+
+<h4><a name="port-monitor-supported">port-monitor-supported" (1setOf name(127))</a></h4>
+
+<p>The port-monitor-supported attribute specifies the available port monitors.
 
 <h4><a name="printer-type">printer-type (type2 enum)</a></h4>
 
