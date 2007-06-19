@@ -834,6 +834,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  con->language = NULL;
 	}
 
+#ifdef HAVE_GSSAPI
+        con->gss_have_creds = 0;
+#endif /* HAVE_GSSAPI */
+
        /*
         * Grab the request line...
 	*/

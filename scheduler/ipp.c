@@ -8111,7 +8111,10 @@ save_auth_info(
   cupsFileClose(fp);
 
 #if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
-  save_krb5_creds(con, job);
+  if (con->gss_have_creds)
+    save_krb5_creds(con, job);
+  else if (job->ccname)
+    cupsdClearString(&(job->ccname));
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 }
 

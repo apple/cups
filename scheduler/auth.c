@@ -956,6 +956,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       gss_release_buffer(&minor_status, &output_token);
       gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
+
+      con->gss_have_creds = 1;
     }
     else
       gss_release_name(&minor_status, &client_name);
