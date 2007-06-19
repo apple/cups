@@ -2075,7 +2075,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 {
   http_status_t	status;			/* Policy status */
   int		i;			/* Looping var */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+  char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
@@ -2089,6 +2089,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   int		modify;			/* Non-zero if we are modifying */
   char		newname[IPP_MAX_NAME];	/* New printer name */
   int		need_restart_job;	/* Need to restart job? */
+  int		set_device_uri,		/* Did we set the device URI? */
+		set_port_monitor;	/* Did we set the port monitor? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_printer(%p[%d], %s)", con,
@@ -2098,8 +2100,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Do we have a valid URI?
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                  sizeof(method), username, sizeof(username), host,
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                  sizeof(scheme), username, sizeof(username), host,
 		  sizeof(host), &port, resource, sizeof(resource));
 
   if (strncmp(resource, "/printers/", 10) || strlen(resource) == 10)
@@ -2225,6 +2227,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
                                IPP_TAG_TEXT)) != NULL)
     cupsdSetString(&printer->info, attr->values[0].string.text);
 
+  set_device_uri = 0;
+
   if ((attr = ippFindAttribute(con->request, "device-uri",
                                IPP_TAG_URI)) != NULL)
   {
@@ -2234,11 +2238,11 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     need_restart_job = 1;
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, method,
-                    sizeof(method), username, sizeof(username), host,
+    httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
 
-    if (!strcmp(method, "file"))
+    if (!strcmp(scheme, "file"))
     {
      /*
       * See if the administrator has enabled file devices...
@@ -2264,7 +2268,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       * See if the backend exists and is executable...
       */
 
-      snprintf(srcfile, sizeof(srcfile), "%s/backend/%s", ServerBin, method);
+      snprintf(srcfile, sizeof(srcfile), "%s/backend/%s", ServerBin, scheme);
       if (access(srcfile, X_OK))
       {
        /*
@@ -2286,10 +2290,13 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 		                     sizeof(resource)));
 
     cupsdSetString(&printer->device_uri, attr->values[0].string.text);
+    set_device_uri = 1;
   }
 
+  set_port_monitor = 0;
+
   if ((attr = ippFindAttribute(con->request, "port-monitor",
-                               IPP_TAG_KEYWORD)) != NULL)
+                               IPP_TAG_NAME)) != NULL)
   {
     ipp_attribute_t	*supported;	/* port-monitor-supported attribute */
 
@@ -2313,12 +2320,14 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Setting %s port-monitor to \"%s\" (was \"%s\".)",
                     printer->name, attr->values[0].string.text,
-	            printer->port_monitor);
+	            printer->port_monitor ? printer->port_monitor : "none");
 
     if (strcmp(attr->values[0].string.text, "none"))
       cupsdSetString(&printer->port_monitor, attr->values[0].string.text);
     else
       cupsdClearString(&printer->port_monitor);
+
+    set_port_monitor = 1;
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs",
@@ -2524,6 +2533,47 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 	                "Copied PPD file successfully!");
         chmod(dstfile, 0644);
       }
+    }
+  }
+
+ /*
+  * If we set the device URI but not the port monitor, check which port
+  * monitor to use by default...
+  */
+
+  if (set_device_uri && !set_port_monitor)
+  {
+    ppd_file_t	*ppd;			/* PPD file */
+    ppd_attr_t	*ppdattr;		/* cupsPortMonitor attribute */
+
+
+    httpSeparateURI(HTTP_URI_CODING_ALL, printer->device_uri, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
+		    sizeof(host), &port, resource, sizeof(resource));
+
+    snprintf(srcfile, sizeof(srcfile), "%s/ppd/%s.ppd", ServerRoot,
+	     printer->name);
+    if ((ppd = ppdOpenFile(srcfile)) != NULL)
+    {
+      for (ppdattr = ppdFindAttr(ppd, "cupsPortMonitor", NULL);
+	   ppdattr;
+	   ppdattr = ppdFindNextAttr(ppd, "cupsPortMonitor", NULL))
+        if (!strcmp(scheme, ppdattr->spec))
+	{
+	  cupsdLogMessage(CUPSD_LOG_INFO,
+			  "Setting %s port-monitor to \"%s\" (was \"%s\".)",
+			  printer->name, ppdattr->value,
+			  printer->port_monitor ? printer->port_monitor : "none");
+
+	  if (strcmp(ppdattr->value, "none"))
+	    cupsdSetString(&printer->port_monitor, ppdattr->value);
+	  else
+	    cupsdClearString(&printer->port_monitor);
+
+	  break;
+	}
+
+      ppdClose(ppd);
     }
   }
 

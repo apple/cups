@@ -2190,9 +2190,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	* Show current and available port monitors for this printer...
 	*/
 
-	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "port-monitor",
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME, "port-monitor",
                      NULL, p->port_monitor ? p->port_monitor : "none");
-
 
         for (i = 1, ppdattr = ppdFindAttr(ppd, "cupsPortMonitor", NULL);
 	     ppdattr;
@@ -2206,7 +2205,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	    i ++;
 	}
 
-        attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+        attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
 	                     "port-monitor-supported", i, NULL, NULL);
 
         attr->values[0].string.text = _cupsStrAlloc("none");
