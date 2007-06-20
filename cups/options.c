@@ -387,6 +387,9 @@ cupsMarkOptions(
         }
       }
     }
+    else if (!strcasecmp(optptr->name, "mirror") &&
+             ppdMarkOption(ppd, "MirrorPrint", optptr->value))
+      conflict = 1;
     else if (ppdMarkOption(ppd, optptr->name, optptr->value))
       conflict = 1;
 

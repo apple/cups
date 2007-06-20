@@ -2422,9 +2422,16 @@ set_pstops_options(
   if ((choice = ppdFindMarkedChoice(ppd, "ManualFeed")) != NULL)
     doc->manual_feed = choice->choice;
 
-  if ((val = cupsGetOption("mirror", num_options, options)) != NULL &&
-      (!strcasecmp(val, "true") || !strcasecmp(val, "on") ||
-       !strcasecmp(val, "yes")))
+  if ((choice = ppdFindMarkedChoice(ppd, "MirrorPrint")) != NULL)
+  {
+    val = choice->choice;
+    choice->marked = 0;
+  }
+  else
+    val = cupsGetOption("mirror", num_options, options);
+
+  if (val && (!strcasecmp(val, "true") || !strcasecmp(val, "on") ||
+              !strcasecmp(val, "yes")))
     doc->mirror = 1;
 
  /*

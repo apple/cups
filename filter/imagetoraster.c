@@ -445,8 +445,16 @@ main(int  argc,				/* I - Number of command-line arguments */
   if ((val = cupsGetOption("hue", num_options, options)) != NULL)
     hue = atoi(val);
 
-  if ((val = cupsGetOption("mirror", num_options, options)) != NULL &&
-      strcasecmp(val, "True") == 0)
+  if ((choice = ppdFindMarkedChoice(ppd, "MirrorPrint")) != NULL)
+  {
+    val = choice->choice;
+    choice->marked = 0;
+  }
+  else
+    val = cupsGetOption("mirror", num_options, options);
+
+  if (val && (!strcasecmp(val, "true") || !strcasecmp(val, "on") ||
+              !strcasecmp(val, "yes")))
     Flip = 1;
 
  /*
