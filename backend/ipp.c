@@ -898,8 +898,8 @@ main(int  argc,				/* I - Number of command-line args */
           break;
 
       if (i < format_sup->num_values)
-        num_options = cupsAddOption("document-format", content_type,
-	                            num_options, &options);
+        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+	             "document-format", NULL, content_type);
     }
 
     if (copies_sup && version > 0 && send_options)
