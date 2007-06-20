@@ -929,7 +929,8 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   cups_file_t		*fp;		/* Job file */
   int			fileid;		/* Current file ID */
   ipp_attribute_t	*attr;		/* Job attribute */
-  const char		*dest;		/* Destination */
+  const char		*dest;		/* Destination name */
+  cupsd_printer_t	*destptr;	/* Pointer to destination */
   mime_type_t		**filetypes;	/* New filetypes array */
   int			*compressions;	/* New compressions array */
 
@@ -1013,7 +1014,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     }
 
     if ((dest = cupsdValidateDest(attr->values[0].string.text, &(job->dtype),
-                                  NULL)) == NULL)
+                                  &destptr)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
 	              "Unable to queue job for destination \"%s\"!",
@@ -1026,6 +1027,8 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
     cupsdSetString(&job->dest, dest);
   }
+  else
+    destptr = cupsdFindDest(job->dest);
 
   job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
                                      IPP_TAG_INTEGER);
@@ -1143,6 +1146,45 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     }
   }
 
+ /*
+  * Load authentication information as needed...
+  */
+
+  if (job->state_value < IPP_JOB_STOPPED)
+  {
+    snprintf(jobfile, sizeof(jobfile), "%s/a%05d", RequestRoot, job->id);
+
+    cupsdClearString(&job->auth_username);
+    cupsdClearString(&job->auth_domain);
+    cupsdClearString(&job->auth_password);
+
+    if ((fp = cupsFileOpen(jobfile, "r")) != NULL)
+    {
+      int	i,			/* Looping var */
+		bytes;			/* Size of auth data */
+      char	line[255],		/* Line from file */
+		data[255];		/* Decoded data */
+
+
+      for (i = 0;
+           i < destptr->num_auth_info_required &&
+	       cupsFileGets(fp, line, sizeof(line));
+	   i ++)
+      {
+        bytes = sizeof(data);
+        httpDecode64_2(data, &bytes, line);
+
+	if (!strcmp(destptr->auth_info_required[i], "username"))
+	  cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s", data);
+	else if (!strcmp(destptr->auth_info_required[i], "domain"))
+	  cupsdSetStringf(&job->auth_domain, "AUTH_DOMAIN=%s", data);
+	else if (!strcmp(destptr->auth_info_required[i], "password"))
+	  cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", data);
+      }
+
+      cupsFileClose(fp);
+    }
+  }
   job->access_time = time(NULL);
 }
 
@@ -1709,6 +1751,9 @@ free_job(cupsd_job_t *job)		/* I - Job */
 {
   cupsdClearString(&job->username);
   cupsdClearString(&job->dest);
+  cupsdClearString(&job->auth_username);
+  cupsdClearString(&job->auth_domain);
+  cupsdClearString(&job->auth_password);
 #ifdef HAVE_GSSAPI
   cupsdClearString(&job->ccname);
 #endif /* HAVE_GSSAPI */
@@ -2331,7 +2376,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 			title[IPP_MAX_NAME],
 					/* Job title string */
 			copies[255],	/* # copies string */
-			*envp[MAX_ENV + 12],
+			*envp[MAX_ENV + 15],
 					/* Environment variables */
 			charset[255],	/* CHARSET env variable */
 			class_name[255],/* CLASS env variable */
@@ -2978,6 +3023,13 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     snprintf(class_name, sizeof(class_name), "CLASS=%s", job->dest);
     envp[envc ++] = class_name;
   }
+
+  if (job->auth_username)
+    envp[envc ++] = job->auth_username;
+  if (job->auth_domain)
+    envp[envc ++] = job->auth_domain;
+  if (job->auth_password)
+    envp[envc ++] = job->auth_password;
 
 #ifdef HAVE_GSSAPI
   if (job->ccname)

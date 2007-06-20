@@ -8069,10 +8069,11 @@ save_auth_info(
     cupsd_job_t     *job,		/* I - Job */
     ipp_attribute_t *auth_info)		/* I - auth-info attribute, if any */
 {
-  int		i;			/* Looping var */
-  char		filename[1024];		/* Job authentication filename */
-  cups_file_t	*fp;			/* Job authentication file */
-  char		line[2048];		/* Line for file */
+  int			i;		/* Looping var */
+  char			filename[1024];	/* Job authentication filename */
+  cups_file_t		*fp;		/* Job authentication file */
+  char			line[2048];	/* Line for file */
+  cupsd_printer_t	*dest;		/* Destination printer/class */
 
 
  /*
@@ -8101,6 +8102,9 @@ save_auth_info(
   if (RunUser)
     return;
 
+  if ((dest = cupsdFindDest(job->dest)) == NULL)
+    return;
+
  /*
   * Create the authentication file and change permissions...
   */
@@ -8117,20 +8121,34 @@ save_auth_info(
   fchown(cupsFileNumber(fp), 0, 0);
   fchmod(cupsFileNumber(fp), 0400);
 
-  if (auth_info)
+  if (auth_info && auth_info->num_values == dest->num_auth_info_required)
   {
    /*
-    * Write 1 to 4 auth values...
+    * Write 1 to 3 auth values...
     */
+
+    cupsdClearString(&job->auth_username);
+    cupsdClearString(&job->auth_domain);
+    cupsdClearString(&job->auth_password);
 
     for (i = 0; i < auth_info->num_values; i ++)
     {
       httpEncode64_2(line, sizeof(line), auth_info->values[i].string.text,
                      strlen(auth_info->values[i].string.text));
       cupsFilePrintf(fp, "%s\n", line);
+
+      if (!strcmp(dest->auth_info_required[i], "username"))
+        cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s",
+	                auth_info->values[i].string.text);
+      else if (!strcmp(dest->auth_info_required[i], "domain"))
+        cupsdSetStringf(&job->auth_domain, "AUTH_DOMAIN=%s",
+	                auth_info->values[i].string.text);
+      else if (!strcmp(dest->auth_info_required[i], "password"))
+        cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s",
+	                auth_info->values[i].string.text);
     }
   }
-  else
+  else if (con->username[0])
   {
    /*
     * Write the authenticated username...
@@ -8139,12 +8157,17 @@ save_auth_info(
     httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
     cupsFilePrintf(fp, "%s\n", line);
 
+    cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s", con->username);
+    cupsdClearString(&job->auth_domain);
+
    /*
     * Write the authenticated password...
     */
 
     httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
     cupsFilePrintf(fp, "%s\n", line);
+
+    cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", con->password);
   }
 
  /*

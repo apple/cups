@@ -107,7 +107,6 @@ main(int  argc,				/* I - Number of command-line args */
   char		method[255],		/* Method in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
-		password_buf[255],	/* Password buffer */
 		resource[1024],		/* Resource info (printer name) */
 		addrname[256],		/* Address name */
 		*optptr,		/* Pointer to URI options */
@@ -476,61 +475,13 @@ main(int  argc,				/* I - Number of command-line args */
   else if (!getuid())
   {
    /*
-    * Try loading authentication information from the a##### file.
+    * Try loading authentication information from the environment.
     */
 
-    const char	*request_root;		/* CUPS_REQUESTROOT env var */
-    char	afilename[1024],	/* a##### filename */
-		aline[2048];		/* Line from file */
-    FILE	*fp;			/* File pointer */
+    if ((ptr = getenv("AUTH_USERNAME")) != NULL)
+      cupsSetUser(ptr);
 
-
-    if ((request_root = getenv("CUPS_REQUESTROOT")) != NULL)
-    {
-     /*
-      * Try opening authentication cache file...
-      */
-
-      snprintf(afilename, sizeof(afilename), "%s/a%05d", request_root,
-               atoi(argv[1]));
-      if ((fp = fopen(afilename, "r")) != NULL)
-      {
-       /*
-        * Read username...
-	*/
-
-        if (fgets(aline, sizeof(aline), fp))
-	{
-	 /*
-	  * Decode username...
-	  */
-
-          i = sizeof(username);
-	  httpDecode64_2(username, &i, aline);
-
-         /*
-	  * Read password...
-	  */
-
-	  if (fgets(aline, sizeof(aline), fp))
-	  {
-	   /*
-	    * Decode password...
-	    */
-
-	    i = sizeof(password_buf);
-	    httpDecode64_2(password_buf, &i, aline);
-	    password = password_buf;
-	  }
-	}
-
-       /*
-        * Close the file...
-	*/
-
-        fclose(fp);
-      }
-    }
+    password = getenv("AUTH_PASSWORD");
   }
 
  /*
