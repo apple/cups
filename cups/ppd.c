@@ -1022,10 +1022,14 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
       if ((option = ppdFindOption(ppd, keyword + 6)) == NULL)
       {
+        int		groupidx;	/* Index for current group */
 	ppd_group_t	*gtemp;		/* Temporary group */
 
 
         DEBUG_printf(("%s option not found for %s...\n", keyword + 6, keyword));
+
+        if (group)
+          groupidx = group - ppd->groups; /* Save index for current group */
 
 	if ((gtemp = ppd_get_group(ppd, "General", _("General"), cg,
 	                           encoding)) == NULL)
@@ -1034,6 +1038,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 	  goto error;
 	}
+
+        if (group)
+          group = ppd->groups + groupidx; /* Restore group pointer */
 
 	if ((option = ppd_get_option(gtemp, keyword + 6)) == NULL)
 	{
@@ -1088,7 +1095,11 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 	if ((option = ppdFindOption(ppd, "PageRegion")) == NULL)
 	{
+	  int		groupidx;	/* Index to current group */
 	  ppd_group_t	*gtemp;		/* Temporary group */
+
+          if (group)
+            groupidx = group - ppd->groups; /* Save index for current group */
 
 	  if ((gtemp = ppd_get_group(ppd, "General", _("General"), cg,
 				     encoding)) == NULL)
@@ -1097,6 +1108,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 	    goto error;
 	  }
+
+          if (group)
+            group = ppd->groups + groupidx; /* Restore group pointer */
 
 	  option = ppd_get_option(gtemp, "PageRegion");
         }
