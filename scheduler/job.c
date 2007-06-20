@@ -229,6 +229,10 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   snprintf(filename, sizeof(filename), "%s/a%05d", RequestRoot, job->id);
   unlink(filename);
 
+  cupsdClearString(&job->auth_username);
+  cupsdClearString(&job->auth_domain);
+  cupsdClearString(&job->auth_password);
+
  /*
   * Remove the print file for good if we aren't preserving jobs or
   * files...
