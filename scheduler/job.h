@@ -3,7 +3,7 @@
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -49,6 +49,7 @@ typedef struct cupsd_job_s
 			side_pipes[2],	/* Sidechannel pipes */
 			status_pipes[2];/* Status pipes */
   cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
+  int			status_level;	/* Highest log level in a status message */
   int			cost;		/* Filtering cost */
   int			filters[MAX_FILTERS + 1];
 					/* Filter process IDs, 0 terminated */

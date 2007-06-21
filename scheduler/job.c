@@ -3096,6 +3096,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
     job->status_buffer = cupsdStatBufNew(job->status_pipes[0], "[Job %d]",
 					 job->id);
+    job->status_level  = CUPSD_LOG_INFO;
   }
 
   job->status = 0;
@@ -3444,7 +3445,7 @@ unload_job(cupsd_job_t *job)		/* I - Job */
  */
 
 void
-update_job(cupsd_job_t *job)	/* I - Job to check */
+update_job(cupsd_job_t *job)		/* I - Job to check */
 {
   int		i;			/* Looping var */
   int		copies;			/* Number of copies printed */
@@ -3582,11 +3583,13 @@ update_job(cupsd_job_t *job)	/* I - Job to check */
       event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
     }
 #endif /* __APPLE__ */
-    else if (loglevel <= CUPSD_LOG_INFO)
+    else if (loglevel <= job->status_level)
     {
      /*
       * Some message to show in the printer-state-message attribute...
       */
+
+      job->status_level = loglevel;
 
       strlcpy(job->printer->state_message, message,
               sizeof(job->printer->state_message));
