@@ -182,6 +182,8 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
         r->sync == CUPS_RASTER_REVSYNCv1 ||
         r->sync == CUPS_RASTER_REVSYNCv2)
       r->swapped = 1;
+
+    DEBUG_printf(("r->swapped=%d, r->sync=%08x\n", r->swapped, r->sync));
   }
   else
   {
@@ -547,10 +549,8 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   unsigned	remaining;		/* Bytes remaining */
 
 
-#ifdef DEBUG
-  fprintf(stderr, "cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u\n",
-          r, p, len, r->remaining);
-#endif /* DEBUG */
+  DEBUG_printf(("cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u\n",
+		r, p, len, r->remaining));
 
   if (r == NULL || r->mode != CUPS_RASTER_WRITE || r->remaining == 0)
     return (0);
@@ -673,12 +673,7 @@ static unsigned				/* O - 1 on success, 0 on fail */
 cups_raster_read_header(
     cups_raster_t *r)			/* I - Raster stream */
 {
-  int		len;			/* Number of words to swap */
-  union swap_s				/* Swapping structure */
-  {
-    unsigned char	b[4];
-    unsigned		v;
-  }		*s;
+  int	len;				/* Length for read/swap */
 
 
   if (r == NULL || r->mode != CUPS_RASTER_READ)
@@ -707,10 +702,28 @@ cups_raster_read_header(
   */
 
   if (r->swapped)
-    for (len = 81, s = (union swap_s *)&(r->header.AdvanceDistance);
+  {
+    unsigned	*s,			/* Current word */
+		temp;			/* Temporary copy */
+
+
+    DEBUG_puts("Swapping header bytes...");
+
+    for (len = 81, s = &(r->header.AdvanceDistance);
 	 len > 0;
 	 len --, s ++)
-      s->v = (((((s->b[3] << 8) | s->b[2]) << 8) | s->b[1]) << 8) | s->b[0];
+    {
+      DEBUG_printf(("%08x =>", *s));
+
+      temp = *s;
+      *s   = ((temp & 0xff) << 24) |
+             ((temp & 0xff00) << 8) |
+             ((temp & 0xff0000) >> 8) |
+             ((temp & 0xff000000) >> 24);
+
+      DEBUG_printf((" %08x\n", *s));
+    }
+  }
 
  /*
   * Update the header and row count...
@@ -981,9 +994,7 @@ cups_raster_write(
 			maxrun;		/* Maximum run of 128 * bpp */
 
 
-#ifdef DEBUG
-  fprintf(stderr, "cups_raster_write(r=%p, pixels=%p)\n", r, pixels);
-#endif /* DEBUG */
+  DEBUG_printf(("cups_raster_write(r=%p, pixels=%p)\n", r, pixels));
 
  /*
   * Allocate a write buffer as needed...
