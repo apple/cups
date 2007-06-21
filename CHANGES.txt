@@ -4,7 +4,7 @@ CHANGES.txt - 2007-06-21
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
-	  STR #2263, STR #2356)
+	  STR #2263, STR #2356, STR #2397)
 	- The scheduler did not add a trailing banner page if a
 	  client did not specify the last document in a job (STR
 	  #1711)

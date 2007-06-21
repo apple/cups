@@ -114,6 +114,7 @@ WEBIMAGES	=	\
 			images/web-set-printer-options.gif \
 			images/web-test-page.gif
 HELPFILES	=	\
+			help/accounting.html \
 			help/api-array.html \
 			help/api-cups.html \
 			help/api-filedir.html \
