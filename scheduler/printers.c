@@ -1667,7 +1667,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   int		num_media;		/* Number of media options */
   cupsd_location_t *auth;		/* Pointer to authentication element */
   const char	*auth_supported;	/* Authentication supported */
-  cups_ptype_t	printer_type;		/* Printer type data */
   ppd_file_t	*ppd;			/* PPD file data */
   ppd_option_t	*input_slot,		/* InputSlot options */
 		*media_type,		/* MediaType options */
@@ -1815,8 +1814,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	                                   Classification : p->job_sheets[1]);
     }
   }
-
-  printer_type = p->type;
 
   p->raw    = 0;
   p->remote = 0;
@@ -2202,24 +2199,14 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	cupsdSetString(&p->product, ppd->product);
 #endif /* HAVE_DNSSD */
 
-        ppdattr = ppdFindAttr(ppd, "APRemoteQueueID", NULL);
+        if (ppdFindAttr(ppd, "APRemoteQueueID", NULL))
+	  p->type |= CUPS_PRINTER_REMOTE;
 
        /*
         * Close the PPD and set the type...
 	*/
 
 	ppdClose(ppd);
-
-        printer_type = p->type;
-
-        if (ppdattr)
-	{
-	 /*
-	  * This is a shared Bonjour printer...
-	  */
-
-	  printer_type |= CUPS_PRINTER_REMOTE;
-	}
       }
       else if (!access(filename, 0))
       {
@@ -2287,7 +2274,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	  * Tell the client this is really a hard-wired remote printer.
 	  */
 
-          printer_type |= CUPS_PRINTER_REMOTE;
+          p->type |= CUPS_PRINTER_REMOTE;
 
          /*
 	  * Point the printer-uri-supported attribute to the
@@ -2336,7 +2323,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   * Copy the printer options into a browse attributes string we can re-use.
   */
 
-  if (!(printer_type & CUPS_PRINTER_DISCOVERED))
+  if (!(p->type & CUPS_PRINTER_DISCOVERED))
   {
     const char	*valptr;		/* Pointer into value */
     char	*attrptr;		/* Pointer into attribute string */
