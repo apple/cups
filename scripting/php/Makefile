@@ -3,7 +3,7 @@
 #
 #   PHP Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -78,7 +78,7 @@ install:	all
 	echo Installing $(PHPCUPS) in $(PHPDIR)
 	$(INSTALL_DIR) $(PHPDIR)
 	$(INSTALL_BIN) $(PHPCUPS) $(PHPDIR)
-	if test "x$SYMROOT" != x; then \
+	if test "x$(SYMROOT)" != x; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(PHPCUPS) $(SYMROOT); \
 	fi
