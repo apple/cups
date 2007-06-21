@@ -1022,7 +1022,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
       if ((option = ppdFindOption(ppd, keyword + 6)) == NULL)
       {
-        int		groupidx;	/* Index for current group */
+        int		groupidx = -1;	/* Index for current group */
 	ppd_group_t	*gtemp;		/* Temporary group */
 
 
@@ -1095,7 +1095,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 	if ((option = ppdFindOption(ppd, "PageRegion")) == NULL)
 	{
-	  int		groupidx;	/* Index to current group */
+	  int		groupidx = -1;	/* Index to current group */
 	  ppd_group_t	*gtemp;		/* Temporary group */
 
           if (group)
