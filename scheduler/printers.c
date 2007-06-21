@@ -68,19 +68,6 @@
 
 
 /*
- * Currently Bonjour printers that are shared by CUPS servers are added
- * manually by the user on Mac OS X systems.  While these printers *are*
- * remote queues, the current print dialog will not show them if they
- * (correctly) have the CUPS_PRINTER_REMOTE bit set.  This may change
- * in future releases, however the code to do this is currently disabled.
- *
- * Define BONJOUR_IS_REMOTE to 1 to get the correct behavior...
- */
-
-#define BONJOUR_IS_REMOTE 0
-
-
-/*
  * Local functions...
  */
 
@@ -1391,7 +1378,7 @@ cupsdSaveAllPrinters(void)
     * Skip remote destinations and printer classes...
     */
 
-    if ((printer->type & CUPS_PRINTER_REMOTE) ||
+    if ((printer->type & CUPS_PRINTER_DISCOVERED) ||
         (printer->type & CUPS_PRINTER_CLASS) ||
 	(printer->type & CUPS_PRINTER_IMPLICIT))
       continue;
@@ -1596,15 +1583,9 @@ cupsdSetAuthInfoRequired(
 
     if (p->num_auth_info_required > 1 ||
         strcmp(p->auth_info_required[0], "none"))
-    {
-      p->type          |= CUPS_PRINTER_AUTHENTICATED;
-      p->external_type |= CUPS_PRINTER_AUTHENTICATED;
-    }
+      p->type |= CUPS_PRINTER_AUTHENTICATED;
     else
-    {
-      p->type          &= ~CUPS_PRINTER_AUTHENTICATED;
-      p->external_type &= ~CUPS_PRINTER_AUTHENTICATED;
-    }
+      p->type &= ~CUPS_PRINTER_AUTHENTICATED;
 
     return (1);
   }
@@ -1622,15 +1603,9 @@ cupsdSetAuthInfoRequired(
 
   if (attr->num_values > 1 ||
       strcmp(attr->values[0].string.text, "none"))
-  {
-    p->type          |= CUPS_PRINTER_AUTHENTICATED;
-    p->external_type |= CUPS_PRINTER_AUTHENTICATED;
-  }
+    p->type |= CUPS_PRINTER_AUTHENTICATED;
   else
-  {
-    p->type          &= ~CUPS_PRINTER_AUTHENTICATED;
-    p->external_type &= ~CUPS_PRINTER_AUTHENTICATED;
-  }
+    p->type &= ~CUPS_PRINTER_AUTHENTICATED;
 
   for (i = 0; i < attr->num_values; i ++)
   {
@@ -1735,7 +1710,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   */
 
   auth_supported = "requesting-user-name";
-  if (!(p->type & CUPS_PRINTER_REMOTE))
+  if (!(p->type & CUPS_PRINTER_DISCOVERED))
   {
     if (p->type & CUPS_PRINTER_CLASS)
       snprintf(resource, sizeof(resource), "/classes/%s", p->name);
@@ -1823,7 +1798,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		 "auth-info-required", NULL, "none");
 
-  if (cupsArrayCount(Banners) > 0 && !(p->type & CUPS_PRINTER_REMOTE))
+  if (cupsArrayCount(Banners) > 0 && !(p->type & CUPS_PRINTER_DISCOVERED))
   {
    /*
     * Setup the job-sheets-default attribute...
@@ -1846,7 +1821,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   p->raw    = 0;
   p->remote = 0;
 
-  if (p->type & CUPS_PRINTER_REMOTE)
+  if (p->type & CUPS_PRINTER_DISCOVERED)
   {
    /*
     * Tell the client this is a remote printer of some type...
@@ -2227,9 +2202,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	cupsdSetString(&p->product, ppd->product);
 #endif /* HAVE_DNSSD */
 
-#if BONJOUR_IS_REMOTE
         ppdattr = ppdFindAttr(ppd, "APRemoteQueueID", NULL);
-#endif /* BONJOUR_IS_REMOTE */
 
        /*
         * Close the PPD and set the type...
@@ -2239,7 +2212,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
         printer_type = p->type;
 
-#if BONJOUR_IS_REMOTE
         if (ppdattr)
 	{
 	 /*
@@ -2248,7 +2220,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
 	  printer_type |= CUPS_PRINTER_REMOTE;
 	}
-#endif /* BONJOUR_IS_REMOTE */
       }
       else if (!access(filename, 0))
       {
@@ -2362,20 +2333,10 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   }
 
  /*
-  * Save the local printer type value, which may have the CUPS_PRINTER_REMOTE
-  * bit set.  We use this value when sending the printer-type attribute to
-  * clients so they know whether the printer is really remote.  Doing it
-  * this way prevents the browsing code from timing out hardwired remote
-  * printers...
-  */
-
-  p->external_type = printer_type;
-
- /*
   * Copy the printer options into a browse attributes string we can re-use.
   */
 
-  if (!(printer_type & CUPS_PRINTER_REMOTE))
+  if (!(printer_type & CUPS_PRINTER_DISCOVERED))
   {
     const char	*valptr;		/* Pointer into value */
     char	*attrptr;		/* Pointer into attribute string */
@@ -2642,7 +2603,7 @@ cupsdSetPrinterState(
   * Can't set status of remote printers...
   */
 
-  if (p->type & CUPS_PRINTER_REMOTE)
+  if (p->type & CUPS_PRINTER_DISCOVERED)
     return;
 
  /*
@@ -2771,7 +2732,8 @@ cupsdUpdatePrinters(void)
     * Remove remote printers if we are no longer browsing...
     */
 
-    if (!Browsing && (p->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_REMOTE)))
+    if (!Browsing &&
+        (p->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_DISCOVERED)))
     {
       if (p->type & CUPS_PRINTER_IMPLICIT)
         cupsArrayRemove(ImplicitPrinters, p);
@@ -2793,7 +2755,7 @@ cupsdUpdatePrinters(void)
     * Update printer attributes as needed...
     */
 
-    if (!(p->type & CUPS_PRINTER_REMOTE))
+    if (!(p->type & CUPS_PRINTER_DISCOVERED))
       cupsdSetPrinterAttrs(p);
   }
 }
@@ -2888,7 +2850,7 @@ cupsdValidateDest(
 
     if (dtype)
       *dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
-                          CUPS_PRINTER_REMOTE);
+                          CUPS_PRINTER_REMOTE | CUPS_PRINTER_DISCOVERED);
 
     return (p->name);
   }
@@ -2947,7 +2909,7 @@ cupsdValidateDest(
 
       if (dtype)
 	*dtype = p->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
-                            CUPS_PRINTER_REMOTE);
+                            CUPS_PRINTER_REMOTE | CUPS_PRINTER_DISCOVERED);
 
       return (p->name);
     }

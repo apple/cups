@@ -199,7 +199,7 @@ cupsdDeregisterPrinter(
   */
 
   if (!Browsing || !p->shared ||
-      (p->external_type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     return;
 
  /*
@@ -318,7 +318,7 @@ cupsdLoadRemoteCache(void)
 
 	p->accepting     = 1;
 	p->state         = IPP_PRINTER_IDLE;
-	p->type          |= CUPS_PRINTER_REMOTE;
+	p->type          |= CUPS_PRINTER_REMOTE | CUPS_PRINTER_DISCOVERED;
 	p->browse_time   = now;
 	p->browse_expire = now + BrowseTimeout;
 
@@ -359,7 +359,7 @@ cupsdLoadRemoteCache(void)
 
 	p->accepting     = 1;
 	p->state         = IPP_PRINTER_IDLE;
-	p->type          |= CUPS_PRINTER_REMOTE;
+	p->type          |= CUPS_PRINTER_REMOTE | CUPS_PRINTER_DISCOVERED;
 	p->browse_time   = now;
 	p->browse_expire = now + BrowseTimeout;
 
@@ -626,7 +626,7 @@ void
 cupsdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 {
   if (!Browsing || !BrowseLocalProtocols || !BrowseInterval || !NumBrowsers ||
-      (p->external_type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     return;
 
 #ifdef HAVE_LIBSLP
@@ -719,7 +719,7 @@ cupsdSaveRemoteCache(void)
     * Skip local destinations...
     */
 
-    if (!(printer->type & CUPS_PRINTER_REMOTE))
+    if (!(printer->type & CUPS_PRINTER_DISCOVERED))
       continue;
 
    /*
@@ -830,7 +830,7 @@ cupsdSendBrowseList(void)
     for (count = 0, p = (cupsd_printer_t *)cupsArrayFirst(Printers);
          count < max_count && p != NULL;
 	 p = (cupsd_printer_t *)cupsArrayNext(Printers))
-      if (!(p->external_type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
+      if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
           p->shared && p->browse_time < ut)
         count ++;
 
@@ -856,8 +856,7 @@ cupsdSendBrowseList(void)
 
       if (!p)
         break;
-      else if ((p->external_type & (CUPS_PRINTER_REMOTE |
-                                    CUPS_PRINTER_IMPLICIT)) ||
+      else if ((p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
                !p->shared)
         continue;
       else if (p->browse_time < ut)
@@ -904,7 +903,7 @@ cupsdSendBrowseList(void)
     * If this is a remote queue, see if it needs to be timed out...
     */
 
-    if (p->type & CUPS_PRINTER_REMOTE)
+    if (p->type & CUPS_PRINTER_DISCOVERED)
     {
       if (p->browse_expire < to)
       {
@@ -1740,7 +1739,7 @@ process_browse_data(
   * See if we already have it listed in the Printers list, and add it if not...
   */
 
-  type   |= CUPS_PRINTER_REMOTE;
+  type   |= CUPS_PRINTER_REMOTE | CUPS_PRINTER_DISCOVERED;
   type   &= ~CUPS_PRINTER_IMPLICIT;
   update = 0;
   hptr   = strchr(host, '.');
