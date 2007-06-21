@@ -3519,9 +3519,14 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     }
     else if (loglevel == CUPSD_LOG_STATE)
     {
-      cupsdSetPrinterReasons(job->printer, message);
-      cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      if (!strcmp(message, "paused"))
+        cupsdStopPrinter(job->printer, 1);
+      else
+      {
+	cupsdSetPrinterReasons(job->printer, message);
+	cupsdAddPrinterHistory(job->printer);
+	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      }
     }
     else if (loglevel == CUPSD_LOG_ATTR)
     {
