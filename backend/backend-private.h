@@ -56,6 +56,7 @@ extern "C" {
  * Prototypes...
  */
 
+extern int	backendDrainOutput(int print_fd, int device_fd);
 extern int	backendGetDeviceID(int fd, char *device_id, int device_id_size,
 		                   char *make_model, int make_model_size,
 				   const char *scheme, char *uri, int uri_size);

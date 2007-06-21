@@ -458,7 +458,11 @@ side_cb(int print_fd,			/* I - Print file */
         * Our sockets disable the Nagle algorithm and data is sent immediately.
 	*/
 
-        status  = CUPS_SC_STATUS_OK;
+        if (backendDrainOutput(print_fd, device_fd))
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else 
+          status = CUPS_SC_STATUS_OK;
+
 	datalen = 0;
         break;
 

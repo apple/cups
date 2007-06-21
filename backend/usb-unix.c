@@ -578,7 +578,9 @@ side_cb(int print_fd,			/* I - Print file */
   switch (command)
   {
     case CUPS_SC_CMD_DRAIN_OUTPUT :
-        if (tcdrain(device_fd))
+        if (backendDrainOutput(print_fd, device_fd))
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else if (tcdrain(device_fd))
 	  status = CUPS_SC_STATUS_IO_ERROR;
 	else
 	  status = CUPS_SC_STATUS_OK;

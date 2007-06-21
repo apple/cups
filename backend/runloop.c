@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   Common run loop API for the Common UNIX Printing System (CUPS).
+ *   Common run loop APIs for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
@@ -25,7 +25,8 @@
  *
  * Contents:
  *
- *   backendRunLoop() - Read and write print and back-channel data.
+ *   backendDrainOutput() - Drain pending print data to the device.
+ *   backendRunLoop()     - Read and write print and back-channel data.
  */
 
 /*
@@ -38,6 +39,109 @@
 #else
 #  include <sys/select.h>
 #endif /* __hpux */
+
+
+/*
+ * 'backendDrainOutput()' - Drain pending print data to the device.
+ */
+
+int					/* O - 0 on success, -1 on error */
+backendDrainOutput(int print_fd,	/* I - Print file descriptor */
+                   int device_fd)	/* I - Device file descriptor */
+{
+  int		nfds;			/* Maximum file descriptor value + 1 */
+  fd_set	input;			/* Input set for reading */
+  ssize_t	print_bytes,		/* Print bytes read */
+		bytes;			/* Bytes written */
+  char		print_buffer[8192],	/* Print data buffer */
+		*print_ptr;		/* Pointer into print data buffer */
+  struct timeval timeout;		/* Timeout for read... */
+
+
+  fprintf(stderr, "DEBUG: backendDrainOutput(print_fd=%d, device_fd=%d)\n",
+          print_fd, device_fd);
+
+ /*
+  * Figure out the maximum file descriptor value to use with select()...
+  */
+
+  nfds = (print_fd > device_fd ? print_fd : device_fd) + 1;
+
+ /*
+  * Now loop until we are out of data from print_fd...
+  */
+
+  for (;;)
+  {
+   /*
+    * Use select() to determine whether we have data to copy around...
+    */
+
+    FD_ZERO(&input);
+    FD_SET(print_fd, &input);
+
+    timeout.tv_sec  = 0;
+    timeout.tv_usec = 0;
+
+    if (select(nfds, &input, NULL, NULL, &timeout) < 0)
+      return (-1);
+
+    if (!FD_ISSET(print_fd, &input))
+      return (0);
+
+    if ((print_bytes = read(print_fd, print_buffer,
+			    sizeof(print_buffer))) < 0)
+    {
+     /*
+      * Read error - bail if we don't see EAGAIN or EINTR...
+      */
+
+      if (errno != EAGAIN || errno != EINTR)
+      {
+	perror("ERROR: Unable to read print data");
+	return (-1);
+      }
+
+      print_bytes = 0;
+    }
+    else if (print_bytes == 0)
+    {
+     /*
+      * End of file, return...
+      */
+
+      return (0);
+    }
+
+    fprintf(stderr, "DEBUG: Read %d bytes of print data...\n",
+	    (int)print_bytes);
+
+    for (print_ptr = print_buffer; print_bytes > 0;)
+    {
+      if ((bytes = write(device_fd, print_ptr, print_bytes)) < 0)
+      {
+       /*
+        * Write error - bail if we don't see an error we can retry...
+	*/
+
+        if (errno != ENOSPC && errno != ENXIO && errno != EAGAIN &&
+	    errno != EINTR && errno != ENOTTY)
+	{
+	  fprintf(stderr, _("ERROR: Unable to write print data: %s\n"),
+	          strerror(errno));
+	  return (-1);
+	}
+      }
+      else
+      {
+        fprintf(stderr, "DEBUG: Wrote %d bytes of print data...\n", (int)bytes);
+
+        print_bytes -= bytes;
+	print_ptr   += bytes;
+      }
+    }
+  }
+}
 
 
 /*
@@ -69,8 +173,9 @@ backendRunLoop(
 
 
   fprintf(stderr,
-          "DEBUG: backendRunLoop(print_fd=%d, device_fd=%d, use_bc=%d)\n",
-          print_fd, device_fd, use_bc);
+          "DEBUG: backendRunLoop(print_fd=%d, device_fd=%d, use_bc=%d, "
+	  "side_cb=%p)\n",
+          print_fd, device_fd, use_bc, side_cb);
 
  /*
   * If we are printing data from a print driver on stdin, ignore SIGTERM
