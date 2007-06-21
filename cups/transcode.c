@@ -1435,7 +1435,7 @@ get_vbcs_charmap(
   char		*s;			/* Line parsing pointer */
   char		line[256];		/* Line from charset map file */
   int		i;			/* Loop variable */
-  int		wide;			/* 32-bit legacy char */
+  int		legacy;			/* 32-bit legacy char */
 
 
   DEBUG_printf(("get_vbcs_charmap(encoding=%d, filename=\"%s\")\n",
@@ -1504,8 +1504,8 @@ get_vbcs_charmap(
 
   cupsFileRewind(fp);
 
-  i    = 0;
-  wide = 0;
+  i      = 0;
+  legacy = 0;
 
   while (cupsFileGets(fp, line, sizeof(line)))
   {
@@ -1575,9 +1575,9 @@ get_vbcs_charmap(
       * Save VBCS 32-bit to Unicode mapping in sorted list table...
       */
 
-      if (!wide)
+      if (!legacy)
       {
-	wide            = 1;
+	legacy          = 1;
 	vmap->widecount = (mapcount - i + 1);
 	wide2uni        = (_cups_wide2uni_t *)calloc(vmap->widecount,
 	                                             sizeof(_cups_wide2uni_t));
