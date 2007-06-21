@@ -19,10 +19,10 @@
 
 	GROUP job
 	ATTR integer copies 1
+	ATTR name job-sheets unclassified,unclassified
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
 
 	# What attributes do we expect?
 	EXPECT job-id
@@ -50,6 +50,5 @@
 	FILE ../data/testprint.ps
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
 }

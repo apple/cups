@@ -357,6 +357,9 @@ cupsdCheckJobs(void)
         job->hold_until &&
 	job->hold_until < time(NULL))
     {
+      if (job->pending_timeout)
+        cupsdTimeoutJob(job);		/* Add trailing banner as needed */
+
       job->state->values[0].integer = IPP_JOB_PENDING;
       job->state_value              = IPP_JOB_PENDING;
     }

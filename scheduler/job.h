@@ -31,6 +31,7 @@ typedef struct cupsd_job_s
   int			id,		/* Job ID */
 			priority;	/* Job priority */
   ipp_jstate_t		state_value;	/* Cached job-state */
+  int			pending_timeout;/* Non-zero if the job was created and waiting on files */
   char			*username;	/* Printing user */
   char			*dest;		/* Destination printer or class */
   cups_ptype_t		dtype;		/* Destination type (class/remote bits) */
@@ -126,6 +127,7 @@ extern void		cupsdSetJobHoldUntil(cupsd_job_t *job, const char *when);
 extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
 extern void		cupsdStopAllJobs(int force);
 extern void		cupsdStopJob(cupsd_job_t *job, int force);
+extern void		cupsdTimeoutJob(cupsd_job_t *job);
 
 
 /*

@@ -26,7 +26,8 @@
  *
  * Contents:
  *
- *   cupsdProcessIPPRequest()    - Process an incoming IPP request...
+ *   cupsdProcessIPPRequest()    - Process an incoming IPP request.
+ *   cupsdTimeoutJob()           - Timeout a job waiting on job files.
  *   accept_jobs()               - Accept print jobs to a printer.
  *   add_class()                 - Add a class to the system.
  *   add_file()                  - Add a file to a job.
@@ -229,7 +230,7 @@ static int	validate_user(cupsd_job_t *job, cupsd_client_t *con,
 
 
 /*
- * 'cupsdProcessIPPRequest()' - Process an incoming IPP request...
+ * 'cupsdProcessIPPRequest()' - Process an incoming IPP request.
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -732,6 +733,45 @@ cupsdProcessIPPRequest(
 
 
 /*
+ * 'cupsdTimeoutJob()' - Timeout a job waiting on job files.
+ */
+
+void
+cupsdTimeoutJob(cupsd_job_t *job)	/* I - Job to timeout */
+{
+  cupsd_printer_t	*printer;	/* Destination printer or class */
+  ipp_attribute_t	*attr;		/* job-sheets attribute */
+  int			kbytes;		/* Kilobytes in banner */
+
+
+  job->pending_timeout = 0;
+
+ /*
+  * See if we need to add the ending sheet...
+  */
+
+  printer = cupsdFindDest(job->dest);
+  attr    = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
+
+  if (printer &&
+      !(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
+      attr && attr->num_values > 1)
+  {
+   /*
+    * Yes...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Adding end banner page \"%s\".",
+                    job->id, attr->values[1].string.text);
+
+    kbytes = copy_banner(NULL, job, attr->values[1].string.text);
+
+    cupsdUpdateQuota(printer, job->username, 0, kbytes);
+  }
+}
+
+
+/*
  * 'accept_jobs()' - Accept print jobs to a printer.
  */
 
@@ -1134,8 +1174,8 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
         	  "add_file(con=%p[%d], job=%d, filetype=%s/%s, compression=%d)",
-        	  con, con->http.fd, job->id, filetype->super, filetype->type,
-		  compression);
+        	  con, con ? con->http.fd : -1, job->id, filetype->super,
+		  filetype->type, compression);
 
  /*
   * Add the file to the job...
@@ -1159,8 +1199,10 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
   {
     cupsdCancelJob(job, 1, IPP_JOB_ABORTED);
 
-    send_ipp_status(con, IPP_INTERNAL_ERROR,
-                    _("Unable to allocate memory for file types!"));
+    if (con)
+      send_ipp_status(con, IPP_INTERNAL_ERROR,
+		      _("Unable to allocate memory for file types!"));
+
     return (-1);
   }
 
@@ -1718,8 +1760,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
-                      "Adding start banner page \"%s\" to job %d.",
-                      attr->values[0].string.text, job->id);
+                      "[Job %d] Adding start banner page \"%s\".",
+                      job->id, attr->values[0].string.text);
 
       kbytes = copy_banner(con, job, attr->values[0].string.text);
 
@@ -2872,7 +2914,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdReleaseJob(job);
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was authenticated by \"%s\".", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Authenticated by \"%s\".", jobid,
                   con->username);
 }
 
@@ -3189,7 +3231,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsdCancelJob(job, 0, IPP_JOB_CANCELED);
   cupsdCheckJobs();
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was canceled by \"%s\".", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Canceled by \"%s\".", jobid,
                   username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -3779,7 +3821,8 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "copy_banner(%p[%d], %p[%d], %s)",
-                  con, con->http.fd, job, job->id, name ? name : "(null)");
+                  con, con ? con->http.fd : -1, job, job->id,
+		  name ? name : "(null)");
 
  /*
   * Find the banner; return if not found or "none"...
@@ -4767,13 +4810,15 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   if ((job = add_job(con, printer, NULL)) == NULL)
     return;
 
+  job->pending_timeout = 1;
+
  /*
   * Save and log the job...
   */
 
   cupsdSaveJob(job);
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d created on \"%s\" by \"%s\".",
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Queued on \"%s\" by \"%s\".",
                   job->id, job->dest, job->username);
 }
 
@@ -6832,7 +6877,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
                   "Job job-hold-until value changed by user.");
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was held by \"%s\".", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Held by \"%s\".", jobid,
                   username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -7399,30 +7444,15 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * See if we need to add the ending sheet...
   */
 
-  attr = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
-
-  if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
-      attr && attr->num_values > 1)
-  {
-   /*
-    * Yes...
-    */
-
-    cupsdLogMessage(CUPSD_LOG_INFO, "Adding end banner page \"%s\" to job %d.",
-                    attr->values[1].string.text, job->id);
-
-    kbytes = copy_banner(con, job, attr->values[1].string.text);
-
-    cupsdUpdateQuota(printer, job->username, 0, kbytes);
-  }
+  cupsdTimeoutJob(job);
 
  /*
   * Log and save the job...
   */
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d queued on \"%s\" by \"%s\".", job->id,
-                  job->dest, job->username);
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Job %d hold_until = %d", job->id,
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Queued on \"%s\" by \"%s\".",
+                  job->id, job->dest, job->username);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] hold_until = %d", job->id,
                   (int)job->hold_until);
 
   cupsdSaveJob(job);
@@ -7832,7 +7862,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
                 "Job released by user.");
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was released by \"%s\".", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Released by \"%s\".", jobid,
                   username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -8052,7 +8082,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdRestartJob(job);
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Job %d was restarted by \"%s\".", jobid,
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Restarted by \"%s\".", jobid,
                   username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -8581,24 +8611,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * See if we need to add the ending sheet...
     */
 
-    if (printer &&
-        !(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
-        (attr = ippFindAttribute(job->attrs, "job-sheets",
-	                         IPP_TAG_ZERO)) != NULL &&
-        attr->num_values > 1)
-    {
-     /*
-      * Yes...
-      */
-
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "Adding end banner page \"%s\" to job %d.",
-        	      attr->values[1].string.text, job->id);
-
-      kbytes = copy_banner(con, job, attr->values[1].string.text);
-
-      cupsdUpdateQuota(printer, job->username, 0, kbytes);
-    }
+    cupsdTimeoutJob(job);
 
     if (job->state_value == IPP_JOB_STOPPED)
     {

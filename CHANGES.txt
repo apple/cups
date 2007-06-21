@@ -1,10 +1,13 @@
-CHANGES.txt - 2007-05-03
+CHANGES.txt - 2007-06-21
 ------------------------
 
 CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
 	  STR #2263, STR #2356)
+	- The scheduler did not add a trailing banner page if a
+	  client did not specify the last document in a job (STR
+	  #1711)
 	- The scheduler did not report Bonjour shared printers as
 	  remote printers (STR #2384)
 	- Added new -R and -W options to the cupstestppd program
