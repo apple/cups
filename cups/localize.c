@@ -201,6 +201,22 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
     cupsArrayRestore(ppd->sorted_attrs);
   }
 
+ /*
+  * Translate printer presets...
+  */
+
+  for (attr = ppdFindAttr(ppd, "APPrinterPreset", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "APPrinterPreset", NULL))
+  {
+    cupsArraySave(ppd->sorted_attrs);
+
+    if ((text = ppd_text(ppd, "APPrinterPreset", attr->spec, ll_CC, ll)) != NULL)
+      strlcpy(attr->text, text, sizeof(attr->text));
+
+    cupsArrayRestore(ppd->sorted_attrs);
+  }
+
   return (0);
 }
 
