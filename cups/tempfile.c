@@ -80,16 +80,19 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     tmpdir = tmppath;
   }
 #else
-  if ((tmpdir = getenv("TMPDIR")) == NULL)
-  {
-   /*
-    * Put root temp files in restricted temp directory...
-    */
+ /*
+  * Previously we put root temporary files in the default CUPS temporary
+  * directory under /var/spool/cups.  However, since the scheduler cleans
+  * out temporary files there and runs independently of the user apps, we
+  * don't want to use it unless specifically told to by cupsd.
+  */
 
-    if (getuid() == 0)
-      tmpdir = CUPS_REQUESTS "/tmp";
-    else
-      tmpdir = "/tmp";
+  if ((tmpdir = getenv("TMPDIR")) == NULL)
+#  ifdef __APPLE__
+    tmpdir = "/private/tmp";		/* /tmp is a symlink to /private/tmp */
+#  else
+    tmpdir = "/tmp";
+#  endif /* __APPLE__ */
   }
 #endif /* WIN32 */
 
