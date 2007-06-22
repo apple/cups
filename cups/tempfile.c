@@ -93,7 +93,6 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 #  else
     tmpdir = "/tmp";
 #  endif /* __APPLE__ */
-  }
 #endif /* WIN32 */
 
  /*
