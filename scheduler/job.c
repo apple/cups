@@ -432,9 +432,9 @@ cupsdCheckJobs(void)
 	                 "job-actual-printer-uri", NULL, printer->uri);
 	}
 
-        if ((!(printer->type & CUPS_PRINTER_REMOTE) &&	/* Printer is local */
+        if ((!(printer->type & CUPS_PRINTER_DISCOVERED) && /* Printer is local */
 	     printer->state == IPP_PRINTER_IDLE) ||	/* and idle */
-	    ((printer->type & CUPS_PRINTER_REMOTE) &&	/* Printer is remote */
+	    ((printer->type & CUPS_PRINTER_DISCOVERED) && /* Printer is remote */
 	     !printer->job))				/* and not printing */
 	  start_job(job, printer);
       }
