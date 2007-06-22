@@ -228,6 +228,22 @@ page attribute. The default value is <code>false</code>.</p>
 <p>Also see the related <tt>APDuplexRequiresFlippedMargins</tt>
 attribute.</p>
 
+<h3>cupsIPPFinishings</h3>
+
+<p class='summary'>*cupsIPPFinishings number/text: "*Option Choice"</p>
+
+<p>This attribute defines a mapping from IPP <code>finishings</code>
+values to PPD options and choices.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*cupsIPPFinishings 4/staple: "*StapleLocation SinglePortrait"
+*cupsIPPFinishings 5/punch: "*PunchMedia Yes *PunchLocation LeftSide"
+*cupsIPPFinishings 20/staple-top-left: "*StapleLocation SinglePortrait"
+*cupsIPPFinishings 21/staple-bottom-left: "*StapleLocation SingleLandscape"
+</pre>
+
 <h3>cupsIPPReason</h3>
 
 <p class='summary'>*cupsIPPReason reason/Reason Text: "optional URIs"</p>
@@ -1075,7 +1091,7 @@ PRE B {
 
 <ul>
 
-	<li>Added <tt>cupsPreFilter</tt> attribute.</li>
+	<li>Added <tt>cupsIPPFinishings</tt> and <tt>cupsPreFilter</tt> attributes.</li>
 
 	<li>Added discussion of custom option code, sample <tt>CustomPageSize</tt> code, and "do not use dict and put" note.</li>
 

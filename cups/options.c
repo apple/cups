@@ -31,6 +31,7 @@
  *   cupsMarkOptions()   - Mark command-line options in a PPD file.
  *   cupsParseOptions()  - Parse options from a command-line argument.
  *   cupsRemoveOptions() - Remove an option from an option array.
+ *   ppd_mark_choices()  - Mark one or more option choices from a string.
  */
 
 /*
@@ -42,6 +43,13 @@
 #include <ctype.h>
 #include "string.h"
 #include "debug.h"
+
+
+/*
+ * Local functions...
+ */
+
+static int	ppd_mark_choices(ppd_file_t *ppd, const char *options);
 
 
 /*
@@ -171,6 +179,7 @@ cupsMarkOptions(
   const char	*page_size;		/* PageSize option */
   cups_option_t	*optptr;		/* Current option */
   ppd_option_t	*option;		/* PPD option */
+  ppd_attr_t	*attr;			/* PPD attribute */
   static const char * const duplex_options[] =
 		{			/* Duplex option names */
 		  "Duplex",		/* Adobe */
@@ -385,6 +394,48 @@ cupsMarkOptions(
 	  if (ppdMarkOption(ppd, "Collate", "False"))
             conflict = 1;
         }
+      }
+    }
+    else if (!strcasecmp(optptr->name, "finishings"))
+    {
+     /*
+      * Lookup cupsIPPFinishings attributes for each value...
+      */
+
+      for (ptr = optptr->value; *ptr;)
+      {
+       /*
+        * Get the next finishings number...
+	*/
+
+        if (!isdigit(*ptr & 255))
+	  break;
+
+        if ((j = strtol(ptr, &ptr, 10)) < 3)
+	  break;
+
+       /*
+        * Skip separator as needed...
+	*/
+
+        if (*ptr == ',')
+	  ptr ++;
+
+       /*
+        * Look it up in the PPD file...
+	*/
+
+	sprintf(s, "%d", j);
+
+        if ((attr = ppdFindAttr(ppd, "cupsIPPFinishings", s)) == NULL)
+	  continue;
+
+       /*
+        * Apply "*Option Choice" settings from the attribute value...
+	*/
+
+        if (ppd_mark_choices(ppd, attr->value))
+	  conflict = 1;
       }
     }
     else if (!strcasecmp(optptr->name, "mirror") &&
@@ -650,6 +701,88 @@ cupsRemoveOption(
   */
 
   return (num_options);
+}
+
+
+/*
+ * 'ppd_mark_choices()' - Mark one or more option choices from a string.
+ */
+
+static int				/* O - 1 if there are conflicts, 0 otherwise */
+ppd_mark_choices(ppd_file_t *ppd,	/* I - PPD file */
+                 const char *options)	/* I - "*Option Choice ..." string */
+{
+  char	option[PPD_MAX_NAME],		/* Current option */
+	choice[PPD_MAX_NAME],		/* Current choice */
+	*ptr;				/* Pointer into option or choice */
+  int	conflict = 0;			/* Do we have a conflict? */
+
+
+  if (!options)
+    return (0);
+
+ /*
+  * Read all of the "*Option Choice" pairs from the string, marking PPD
+  * options as we go...
+  */
+
+  while (*options)
+  {
+   /*
+    * Skip leading whitespace...
+    */
+
+    while (isspace(*options & 255))
+      options ++;
+
+    if (*options != '*')
+      break;
+
+   /*
+    * Get the option name...
+    */
+
+    options ++;
+    ptr = option;
+    while (*options && !isspace(*options & 255) &&
+	       ptr < (option + sizeof(option) - 1))
+      *ptr++ = *options++;
+
+    if (ptr == option)
+      break;
+
+    *ptr = '\0';
+
+   /*
+    * Get the choice...
+    */
+
+    while (isspace(*options & 255))
+      options ++;
+
+    if (!*options)
+      break;
+
+    ptr = choice;
+    while (*options && !isspace(*options & 255) &&
+	       ptr < (choice + sizeof(choice) - 1))
+      *ptr++ = *options++;
+
+    *ptr = '\0';
+
+   /*
+    * Mark the option...
+    */
+
+    if (ppdMarkOption(ppd, option, choice))
+      conflict = 1;
+  }
+
+ /*
+  * Return whether we had any conflicts...
+  */
+
+  return (conflict);
 }
 
 
