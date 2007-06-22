@@ -78,6 +78,7 @@ OBJS	=	\
 		$(LIB64OBJS) \
 		testadmin.o \
 		testarray.o \
+		testcups.o \
 		testfile.o \
 		testhttp.o \
 		testi18n.o \
@@ -118,6 +119,7 @@ TARGETS	=	\
 		libcups.a \
 		testadmin \
 		testarray \
+		testcups \
 		testfile \
 		testhttp \
 		testi18n \
@@ -357,6 +359,16 @@ testadmin:	testadmin.o libcups.a
 testarray:	testarray.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testarray.o libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# testcups (dependency on static CUPS library is intentional)
+#
+
+testcups:	testcups.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testcups.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 

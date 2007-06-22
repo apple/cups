@@ -50,6 +50,7 @@ _cupsArrayIndex
 _cupsArrayInsert
 _cupsArrayLast
 _cupsArrayNew
+_cupsArrayNew2
 _cupsArrayNext
 _cupsArrayPrev
 _cupsArrayRemove
@@ -67,6 +68,7 @@ _cupsDirRead
 _cupsDirRewind
 _cupsDoAuthentication
 _cupsDoFileRequest
+_cupsDoIORequest
 _cupsDoRequest
 _cupsEncodeOptions
 _cupsEncodeOptions2
@@ -115,6 +117,7 @@ _cupsGetPassword
 _cupsGetPPD
 _cupsGetPPD2
 _cupsGetPrinters
+_cupsGetServerPPD
 _cupsLangDefault
 _cupsLangEncoding
 _cupsLangFlush
