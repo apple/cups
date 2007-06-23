@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6513 2007-05-06 23:50:25Z mike $"
+# "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -31,7 +31,7 @@ include Makedefs
 DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
 		notifier $(PDFTOPS) scheduler systemv test \
 		$(PHPDIR) \
-		conf data doc fonts ppd templates
+		conf data doc $(FONTS) ppd templates
 
 
 #
@@ -291,5 +291,5 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 6513 2007-05-06 23:50:25Z mike $".
+# End of "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $".
 #

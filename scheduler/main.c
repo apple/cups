@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 6514 2007-05-07 18:59:25Z mike $"
+ * "$Id: main.c 6564 2007-06-18 23:40:38Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -165,6 +165,14 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   fg = 0;
+
+#ifdef HAVE_LAUNCHD
+  if (getenv("CUPSD_LAUNCHD"))
+  {
+    Launchd = 1;
+    fg      = 1;
+  }
+#endif /* HAVE_LAUNCHD */
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -1777,5 +1785,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 6514 2007-05-07 18:59:25Z mike $".
+ * End of "$Id: main.c 6564 2007-06-18 23:40:38Z mike $".
  */

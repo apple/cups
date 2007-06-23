@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $"
 #
 #   Port monitor makefile for the Common UNIX Printing System (CUPS).
 #
@@ -63,6 +63,12 @@ install:	all
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/monitor; \
 	done
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #
@@ -103,5 +109,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
+# End of "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $".
 #

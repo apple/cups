@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 6504 2007-05-02 00:14:56Z mike $"
+ * "$Id: client.c 6570 2007-06-19 18:10:48Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -833,6 +833,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  cupsLangFree(con->language);
 	  con->language = NULL;
 	}
+
+#ifdef HAVE_GSSAPI
+        con->gss_have_creds = 0;
+#endif /* HAVE_GSSAPI */
 
        /*
         * Grab the request line...
@@ -4562,5 +4566,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 6504 2007-05-02 00:14:56Z mike $".
+ * End of "$Id: client.c 6570 2007-06-19 18:10:48Z mike $".
  */

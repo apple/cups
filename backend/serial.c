@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c 6403 2007-03-27 16:00:56Z mike $"
+ * "$Id: serial.c 6591 2007-06-21 20:35:28Z mike $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -1263,7 +1263,9 @@ side_cb(int print_fd,			/* I - Print file */
   switch (command)
   {
     case CUPS_SC_CMD_DRAIN_OUTPUT :
-        if (tcdrain(device_fd))
+        if (backendDrainOutput(print_fd, device_fd))
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else if (tcdrain(device_fd))
 	  status = CUPS_SC_STATUS_IO_ERROR;
 	else
 	  status = CUPS_SC_STATUS_OK;
@@ -1287,5 +1289,5 @@ side_cb(int print_fd,			/* I - Print file */
 
 
 /*
- * End of "$Id: serial.c 6403 2007-03-27 16:00:56Z mike $".
+ * End of "$Id: serial.c 6591 2007-06-21 20:35:28Z mike $".
  */

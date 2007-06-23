@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 6370 2007-03-20 14:36:12Z mike $"
+dnl "$Id: cups-common.m4 6564 2007-06-18 23:40:38Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -196,10 +196,22 @@ CUPS_SYSTEM_AUTHKEY=""
 
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
 
+AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     libcups secorder file, default=libcups.order],
+	LIBCUPSORDER="$withval",
+	LIBCUPSORDER="libcups.order")
+AC_SUBST(LIBCUPSORDER)
+
+FONTS="fonts"
+AC_SUBST(FONTS)
+LEGACY_BACKENDS="parallel scsi"
+AC_SUBST(LEGACY_BACKENDS)
+
 case $uname in
         Darwin*)
+		FONTS=""
+		LEGACY_BACKENDS=""
                 BACKLIBS="-framework IOKit"
-                CUPSDLIBS="-framework IOKit -framework SystemConfiguration"
+                CUPSDLIBS="-sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration"
                 LIBS="-framework CoreFoundation $LIBS"
 
 		dnl Check for CFLocaleCreateCanonicalLocaleIdentifierFromString...
@@ -281,5 +293,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 6370 2007-03-20 14:36:12Z mike $".
+dnl End of "$Id: cups-common.m4 6564 2007-06-18 23:40:38Z mike $".
 dnl

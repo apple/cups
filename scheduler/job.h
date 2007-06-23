@@ -1,9 +1,9 @@
 /*
- * "$Id: job.h 6376 2007-03-21 06:39:10Z mike $"
+ * "$Id: job.h 6593 2007-06-21 21:30:49Z mike $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Easy Software Products and are protected by Federal
@@ -31,6 +31,7 @@ typedef struct cupsd_job_s
   int			id,		/* Job ID */
 			priority;	/* Job priority */
   ipp_jstate_t		state_value;	/* Cached job-state */
+  int			pending_timeout;/* Non-zero if the job was created and waiting on files */
   char			*username;	/* Printing user */
   char			*dest;		/* Destination printer or class */
   cups_ptype_t		dtype;		/* Destination type (class/remote bits) */
@@ -49,6 +50,7 @@ typedef struct cupsd_job_s
 			side_pipes[2],	/* Sidechannel pipes */
 			status_pipes[2];/* Status pipes */
   cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
+  int			status_level;	/* Highest log level in a status message */
   int			cost;		/* Filtering cost */
   int			filters[MAX_FILTERS + 1];
 					/* Filter process IDs, 0 terminated */
@@ -56,6 +58,9 @@ typedef struct cupsd_job_s
   int			status;		/* Status code from filters */
   cupsd_printer_t	*printer;	/* Printer this job is assigned to */
   int			tries;		/* Number of tries for this job */
+  char			*auth_username,	/* AUTH_USERNAME environment variable, if any */
+			*auth_domain,	/* AUTH_DOMAIN environment variable, if any */
+			*auth_password;	/* AUTH_PASSWORD environment variable, if any */
 #ifdef HAVE_GSSAPI
   char			*ccname;	/* KRB5CCNAME environment variable */
 #endif /* HAVE_GSSAPI */
@@ -122,8 +127,9 @@ extern void		cupsdSetJobHoldUntil(cupsd_job_t *job, const char *when);
 extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
 extern void		cupsdStopAllJobs(int force);
 extern void		cupsdStopJob(cupsd_job_t *job, int force);
+extern void		cupsdTimeoutJob(cupsd_job_t *job);
 
 
 /*
- * End of "$Id: job.h 6376 2007-03-21 06:39:10Z mike $".
+ * End of "$Id: job.h 6593 2007-06-21 21:30:49Z mike $".
  */

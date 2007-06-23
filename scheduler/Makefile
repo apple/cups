@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6291 2007-02-19 21:54:27Z mike $"
+# "$Id: Makefile 6565 2007-06-18 23:50:16Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -135,11 +135,13 @@ install:	all
 	echo Creating $(SERVERROOT)/ssl...
 	$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl
 	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl
-	echo Creating $(STATEDIR)...
-	$(INSTALL_DIR) -m 755 $(STATEDIR)
-	echo Creating $(STATEDIR)/certs...
-	$(INSTALL_DIR) -m 511 $(STATEDIR)/certs
-	-chgrp $(CUPS_PRIMARY_SYSTEM_GROUP) $(STATEDIR)/certs
+	-if test "x`uname`" != xDarwin; then \
+		echo Creating $(STATEDIR)...; \
+		$(INSTALL_DIR) -m 755 $(STATEDIR); \
+		echo Creating $(STATEDIR)/certs...; \
+		$(INSTALL_DIR) -m 511 $(STATEDIR)/certs; \
+		chgrp $(CUPS_PRIMARY_SYSTEM_GROUP) $(STATEDIR)/certs; \
+	fi
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) -m 755 $(LOGDIR)
 	echo Creating $(REQUESTS)...
@@ -154,6 +156,12 @@ install:	all
 #	echo Creating $(CACHEDIR)/ppd...
 #	$(INSTALL_DIR) -m 755 $(CACHEDIR)/ppd
 #	-chgrp $(CUPS_GROUP) $(CACHEDIR)/ppd
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #
@@ -304,5 +312,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6291 2007-02-19 21:54:27Z mike $".
+# End of "$Id: Makefile 6565 2007-06-18 23:50:16Z mike $".
 #

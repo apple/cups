@@ -5,7 +5,7 @@
 *%   Sample IntelliBar label printer driver PPD file for the Common UNIX
 *%   Printing System (CUPS).
 *%
-*%   Copyright 2001-2006 by Easy Software Products.
+*%   Copyright 2001-2007 by Easy Software Products.
 *%
 *%   These coded instructions, statements, and computer programs are the
 *%   property of Easy Software Products and are protected by Federal
@@ -24,20 +24,20 @@
 *%         WWW: http://www.cups.org
 *%
 *FormatVersion:	"4.3"
-*FileVersion:	"1.2"
+*FileVersion:	"1.3"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"INTELBAR.PPD"
 *Manufacturer:	"Intellitech"
 *Product:	"(GNU Ghostscript)"
 *Product:	"(ESP Ghostscript)"
-*cupsVersion:	1.2
+*cupsVersion:	1.3
 *cupsManualCopies: False
 *cupsFilter:	"application/vnd.cups-raster 0 rastertolabel"
 *cupsModelNumber: 32
 *ModelName:     "Intellitech IntelliBar Series Label Printer"
 *ShortNickName: "Intellitech IntelliBar Series"
-*NickName:      "Intellitech IntelliBar Series Label Printer v1.2"
+*NickName:      "Intellitech IntelliBar Series Label Printer v1.3"
 *PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
@@ -85,7 +85,7 @@
 *OpenUI *inPrintDensity/Print Density: PickOne
 *OrderDependency: 20 DocumentSetup *inPrintDensity
 *DefaultinPrintDensity: Default
-*inPrintDensity Default/PrinterDefault: "<<cupsCompression -1>>setpagedevice"
+*inPrintDensity Default/PrinterDefault: "<</cupsCompression -1>>setpagedevice"
 *inPrintDensity -15: "<</cupsCompression 0>>setpagedevice"
 *inPrintDensity -14: "<</cupsCompression 3>>setpagedevice"
 *inPrintDensity -13: "<</cupsCompression 6>>setpagedevice"

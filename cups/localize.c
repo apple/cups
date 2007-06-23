@@ -1,5 +1,5 @@
 /*
- * "$Id: localize.c 6457 2007-04-17 18:40:55Z mike $"
+ * "$Id: localize.c 6602 2007-06-22 22:13:13Z mike $"
  *
  *   PPD custom option routines for the Common UNIX Printing System (CUPS).
  *
@@ -201,6 +201,22 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
     cupsArrayRestore(ppd->sorted_attrs);
   }
 
+ /*
+  * Translate printer presets...
+  */
+
+  for (attr = ppdFindAttr(ppd, "APPrinterPreset", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "APPrinterPreset", NULL))
+  {
+    cupsArraySave(ppd->sorted_attrs);
+
+    if ((text = ppd_text(ppd, "APPrinterPreset", attr->spec, ll_CC, ll)) != NULL)
+      strlcpy(attr->text, text, sizeof(attr->text));
+
+    cupsArrayRestore(ppd->sorted_attrs);
+  }
+
   return (0);
 }
 
@@ -265,5 +281,5 @@ ppd_text(ppd_file_t *ppd,		/* I - PPD file */
 
 
 /*
- * End of "$Id: localize.c 6457 2007-04-17 18:40:55Z mike $".
+ * End of "$Id: localize.c 6602 2007-06-22 22:13:13Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6482 2007-04-30 17:05:59Z mike $"
+ * "$Id: ipp.c 6582 2007-06-20 22:07:38Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -475,60 +475,13 @@ main(int  argc,				/* I - Number of command-line args */
   else if (!getuid())
   {
    /*
-    * Try loading authentication information from the a##### file.
+    * Try loading authentication information from the environment.
     */
 
-    const char	*request_root;		/* CUPS_REQUESTROOT env var */
-    char	afilename[1024],	/* a##### filename */
-		aline[2048];		/* Line from file */
-    FILE	*fp;			/* File pointer */
+    if ((ptr = getenv("AUTH_USERNAME")) != NULL)
+      cupsSetUser(ptr);
 
-
-    if ((request_root = getenv("CUPS_REQUESTROOT")) != NULL)
-    {
-     /*
-      * Try opening authentication cache file...
-      */
-
-      snprintf(afilename, sizeof(afilename), "%s/a%05d", request_root,
-               atoi(argv[1]));
-      if ((fp = fopen(afilename, "r")) != NULL)
-      {
-       /*
-        * Read username...
-	*/
-
-        if (fgets(aline, sizeof(aline), fp))
-	{
-	 /*
-	  * Decode username...
-	  */
-
-          i = sizeof(username);
-	  httpDecode64_2(username, &i, aline);
-
-         /*
-	  * Read password...
-	  */
-
-	  if (fgets(aline, sizeof(aline), fp))
-	  {
-	   /*
-	    * Decode password...
-	    */
-
-	    i = sizeof(password);
-	    httpDecode64_2(password, &i, aline);
-	  }
-	}
-
-       /*
-        * Close the file...
-	*/
-
-        fclose(fp);
-      }
-    }
+    password = getenv("AUTH_PASSWORD");
   }
 
  /*
@@ -945,8 +898,8 @@ main(int  argc,				/* I - Number of command-line args */
           break;
 
       if (i < format_sup->num_values)
-        num_options = cupsAddOption("document-format", content_type,
-	                            num_options, &options);
+        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+	             "document-format", NULL, content_type);
     }
 
     if (copies_sup && version > 0 && send_options)
@@ -1767,5 +1720,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 6482 2007-04-30 17:05:59Z mike $".
+ * End of "$Id: ipp.c 6582 2007-06-20 22:07:38Z mike $".
  */

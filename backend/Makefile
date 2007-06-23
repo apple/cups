@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 6414 2007-03-30 13:40:57Z mike $"
+# "$Id: Makefile 6576 2007-06-20 00:23:32Z mike $"
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Easy Software Products and are protected by Federal
@@ -26,8 +26,8 @@
 
 include ../Makedefs
 
-RBACKENDS =	ipp lpd
-UBACKENDS =	$(PAP) parallel scsi serial snmp socket usb
+RBACKENDS =	lpd
+UBACKENDS =	ipp $(PAP) $(LEGACY_BACKENDS) serial snmp socket usb
 TARGETS	=	betest test1284 libbackend.a $(RBACKENDS) $(UBACKENDS)
 LIBOBJS	=	ieee1284.o runloop.o
 OBJS	=	betest.o ipp.o lpd.o pap.o parallel.o scsi.o \
@@ -71,6 +71,12 @@ install:	all
 	done
 	$(RM) $(SERVERBIN)/backend/http
 	$(LN) ipp $(SERVERBIN)/backend/http
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #
@@ -222,5 +228,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6414 2007-03-30 13:40:57Z mike $".
+# End of "$Id: Makefile 6576 2007-06-20 00:23:32Z mike $".
 #

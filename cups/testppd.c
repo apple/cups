@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c 6159 2006-12-19 20:08:42Z mike $"
+ * "$Id: testppd.c 6580 2007-06-20 21:11:43Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -300,6 +300,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	   attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs))
         printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec,
 	       attr->text, attr->value ? attr->value : "");
+
+      ppdClose(ppd);
     }
   }
 
@@ -308,5 +310,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c 6159 2006-12-19 20:08:42Z mike $".
+ * End of "$Id: testppd.c 6580 2007-06-20 21:11:43Z mike $".
  */

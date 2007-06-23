@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6055 2006-10-23 00:11:55Z mike $"
+# "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $"
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
@@ -63,6 +63,12 @@ install:	all
 	for file in $(CGIS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/cgi-bin; \
 	done
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #
@@ -170,5 +176,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6055 2006-10-23 00:11:55Z mike $".
+# End of "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $".
 #

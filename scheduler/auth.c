@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6397 2007-03-25 23:33:32Z mike $"
+ * "$Id: auth.c 6570 2007-06-19 18:10:48Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -956,6 +956,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       gss_release_buffer(&minor_status, &output_token);
       gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
+
+      con->gss_have_creds = 1;
     }
     else
       gss_release_name(&minor_status, &client_name);
@@ -2537,5 +2539,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 6397 2007-03-25 23:33:32Z mike $".
+ * End of "$Id: auth.c 6570 2007-06-19 18:10:48Z mike $".
  */

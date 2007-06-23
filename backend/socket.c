@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 6438 2007-04-03 17:52:41Z mike $"
+ * "$Id: socket.c 6591 2007-06-21 20:35:28Z mike $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -458,7 +458,11 @@ side_cb(int print_fd,			/* I - Print file */
         * Our sockets disable the Nagle algorithm and data is sent immediately.
 	*/
 
-        status  = CUPS_SC_STATUS_OK;
+        if (backendDrainOutput(print_fd, device_fd))
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else 
+          status = CUPS_SC_STATUS_OK;
+
 	datalen = 0;
         break;
 
@@ -522,5 +526,5 @@ wait_bc(int device_fd,			/* I - Socket */
 
 
 /*
- * End of "$Id: socket.c 6438 2007-04-03 17:52:41Z mike $".
+ * End of "$Id: socket.c 6591 2007-06-21 20:35:28Z mike $".
  */

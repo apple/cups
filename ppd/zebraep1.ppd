@@ -5,7 +5,7 @@
 *%   Sample Zebra label printer driver PPD file for the Common UNIX Printing
 *%   System (CUPS).
 *%
-*%   Copyright 2001-2006 by Easy Software Products.
+*%   Copyright 2001-2007 by Easy Software Products.
 *%
 *%   These coded instructions, statements, and computer programs are the
 *%   property of Easy Software Products and are protected by Federal
@@ -24,14 +24,14 @@
 *%         WWW: http://www.cups.org
 *%
 *FormatVersion:	"4.3"
-*FileVersion:	"1.2"
+*FileVersion:	"1.3"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"ZEBRA.PPD"
 *Manufacturer:	"Zebra"
 *Product:	"(GNU Ghostscript)"
 *Product:	"(ESP Ghostscript)"
-*cupsVersion:	1.2
+*cupsVersion:	1.3
 *cupsManualCopies: False
 *cupsFilter:	"application/vnd.cups-raster 0 rastertolabel"
 *% cupsModelNumber is 16 for EPL1 line mode, 17 for EPL2 page mode,
@@ -39,7 +39,7 @@
 *cupsModelNumber: 16
 *ModelName:     "Zebra EPL1 Label Printer"
 *ShortNickName: "Zebra EPL1 Label Printer"
-*NickName:      "Zebra EPL1 Label Printer CUPS v1.2"
+*NickName:      "Zebra EPL1 Label Printer CUPS v1.3"
 *PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	False
@@ -245,7 +245,7 @@
 *OpenUI *Darkness/Media Darkness: PickOne
 *OrderDependency: 20 AnySetup *Darkness
 *DefaultDarkness: -1
-*Darkness -1/PrinterDefault: "<<cupsCompression -1>>setpagedevice"
+*Darkness -1/PrinterDefault: "<</cupsCompression -1>>setpagedevice"
 *Darkness 1: "<</cupsCompression 4>>setpagedevice"
 *Darkness 2: "<</cupsCompression 7>>setpagedevice"
 *Darkness 3: "<</cupsCompression 10>>setpagedevice"

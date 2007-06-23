@@ -1,5 +1,5 @@
 /*
- * "$Id: rss.c 6326 2007-03-11 17:50:18Z mike $"
+ * "$Id: rss.c 6596 2007-06-21 22:42:25Z mike $"
  *
  *   RSS notifier for the Common UNIX Printing System (CUPS).
  *
@@ -602,7 +602,7 @@ save_rss(cups_array_t *rss,		/* I - RSS messages */
   fputs("  <channel>\n", fp);
   fputs("    <title>CUPS RSS Feed</title>\n", fp);
   fprintf(fp, "    <link>%s</link>\n", baseurl);
-  fputs("    <description>CUPS RSS Feed</title>\n", fp);
+  fputs("    <description>CUPS RSS Feed</description>\n", fp);
   fputs("    <generator>" CUPS_SVERSION "</generator>\n", fp);
   fputs("    <ttl>1</ttl>\n", fp);
 
@@ -701,5 +701,5 @@ xml_escape(const char *s)		/* I - String to escape */
 
 
 /*
- * End of "$Id: rss.c 6326 2007-03-11 17:50:18Z mike $".
+ * End of "$Id: rss.c 6596 2007-06-21 22:42:25Z mike $".
  */

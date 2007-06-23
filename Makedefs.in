@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in 6332 2007-03-12 16:08:51Z mike $"
+# "$Id: Makedefs.in 6564 2007-06-18 23:40:38Z mike $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -106,8 +106,7 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 #
 # Program options...
 #
-# ARCHFLAGS     Defines the default architecture build options, used
-#               when compiling separate 32/64-bit libraries.
+# ARCHFLAGS     Defines the default architecture build options.
 # ARCH32FLAGS   Defines the 32-bit architecture build options, used
 #               when compiling separate 32/64-bit libraries.
 # ARCH64FLAGS   Defines the 64-bit architecture build options, used
@@ -118,10 +117,12 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 #               for extra debug info)
 #
 
+ALL_CFLAGS	=	$(SSLFLAGS) @LARGEFILE@ @PTHREAD_FLAGS@ \
+			$(OPTIONS) $(CFLAGS)
 ARCHFLAGS	=	@ARCHFLAGS@
 ARFLAGS		=	@ARFLAGS@
 BACKLIBS	=	@BACKLIBS@
-CFLAGS		=	-I.. $(SSLFLAGS) @CPPFLAGS@ @CFLAGS@ \
+CFLAGS		=	-I.. @CPPFLAGS@ @CFLAGS@ \
 			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
 COMMONLIBS	=	@LIBS@
 CUPSDLIBS	=	@CUPSDLIBS@
@@ -131,11 +132,14 @@ CXXLIBS		=	@CXXLIBS@
 DSOFLAGS	=	@DSOFLAGS@
 DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
 DNSSDLIBS	=	@DNSSDLIBS@
+FONTS		=	@FONTS@
 IMGLIBS		=	@IMGLIBS@
 IMGFILTERS	=	@IMGFILTERS@
 LAUNCHDLIBS	=	@LAUNCHDLIBS@
-LDFLAGS		=	-L../cups -L../filter $(ARCHFLAGS) \
+LDFLAGS		=	-L../cups -L../filter @LDARCHFLAGS@ \
 			@LDFLAGS@ @RELROFLAGS@ @PIEFLAGS@ $(OPTIM)
+LEGACY_BACKENDS	=	@LEGACY_BACKENDS@
+LIBCUPSORDER	=	@LIBCUPSORDER@
 LINKCUPS	=	@LINKCUPS@ $(SSLLIBS)
 LINKCUPSIMAGE	=	@LINKCUPSIMAGE@
 LIBS		=	$(LINKCUPS) $(COMMONLIBS)
@@ -250,15 +254,15 @@ DBUSDIR		=	@DBUSDIR@
 
 .c.o:
 	echo Compiling $<...
-	$(CC) $(ARCHFLAGS) $(OPTIM) $(CFLAGS) -c $<
+	$(CC) $(ARCHFLAGS) $(OPTIM) $(ALL_CFLAGS) -c $<
 
 .c.32.o:
 	echo Compiling 32-bit $<...
-	$(CC) $(ARCH32FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
+	$(CC) $(ARCH32FLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
 
 .c.64.o:
 	echo Compiling 64-bit $<...
-	$(CC) $(ARCH64FLAGS) $(OPTIM) $(CFLAGS) -c -o $@ $<
+	$(CC) $(ARCH64FLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
 
 .cxx.o:
 	echo Compiling $<...
@@ -276,5 +280,5 @@ DBUSDIR		=	@DBUSDIR@
 
 
 #
-# End of "$Id: Makedefs.in 6332 2007-03-12 16:08:51Z mike $"
+# End of "$Id: Makedefs.in 6564 2007-06-18 23:40:38Z mike $"
 #

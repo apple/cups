@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 6370 2007-03-20 14:36:12Z mike $"
+ * "$Id: config.h.in 6569 2007-06-19 00:16:59Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -503,6 +503,7 @@
 #undef HAVE_GSSAPI_GSSAPI_KRB5_H
 #undef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY
 #undef HAVE_GSS_C_NT_HOSTBASED_SERVICE
+#undef HAVE_KRB5_CC_RESOLVE
 #undef HAVE_KRB5_H
 #undef HAVE_HEIMDAL
 
@@ -533,5 +534,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 6370 2007-03-20 14:36:12Z mike $".
+ * End of "$Id: config.h.in 6569 2007-06-19 00:16:59Z mike $".
  */

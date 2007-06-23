@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6315 2007-03-03 00:12:26Z mike $"
+# "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $"
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
@@ -105,6 +105,12 @@ install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(STRIP) -x $(LIBDIR)/$(LIBCUPSIMAGE); \
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
+	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
 	fi
 
 installstatic:
@@ -389,5 +395,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6315 2007-03-03 00:12:26Z mike $".
+# End of "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 6420 2007-03-30 20:00:59Z mike $"
+ * "$Id: pstops.c 6578 2007-06-20 17:46:04Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -2422,9 +2422,16 @@ set_pstops_options(
   if ((choice = ppdFindMarkedChoice(ppd, "ManualFeed")) != NULL)
     doc->manual_feed = choice->choice;
 
-  if ((val = cupsGetOption("mirror", num_options, options)) != NULL &&
-      (!strcasecmp(val, "true") || !strcasecmp(val, "on") ||
-       !strcasecmp(val, "yes")))
+  if ((choice = ppdFindMarkedChoice(ppd, "MirrorPrint")) != NULL)
+  {
+    val = choice->choice;
+    choice->marked = 0;
+  }
+  else
+    val = cupsGetOption("mirror", num_options, options);
+
+  if (val && (!strcasecmp(val, "true") || !strcasecmp(val, "on") ||
+              !strcasecmp(val, "yes")))
     doc->mirror = 1;
 
  /*
@@ -3298,5 +3305,5 @@ write_labels(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 6420 2007-03-30 20:00:59Z mike $".
+ * End of "$Id: pstops.c 6578 2007-06-20 17:46:04Z mike $".
  */

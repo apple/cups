@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 6529 2007-05-08 19:48:20Z mike $"
+# "$Id: cups.list.in 6597 2007-06-22 16:41:58Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -226,8 +226,10 @@ d 0755 root sys $SERVERBIN/backend -
 f 0700 root sys $SERVERBIN/backend/ipp backend/ipp
 l 0700 root sys $SERVERBIN/backend/http ipp
 f 0700 root sys $SERVERBIN/backend/lpd backend/lpd
+%system !darwin
 f 0755 root sys $SERVERBIN/backend/parallel backend/parallel
 f 0755 root sys $SERVERBIN/backend/scsi backend/scsi
+%system all
 f 0755 root sys $SERVERBIN/backend/serial backend/serial
 f 0755 root sys $SERVERBIN/backend/snmp backend/snmp
 f 0755 root sys $SERVERBIN/backend/socket backend/socket
@@ -522,6 +524,7 @@ d 0755 root sys $DOCDIR -
 f 0644 root sys $DOCDIR doc/*.css
 f 0644 root sys $DOCDIR doc/*.html
 d 0755 root sys $DOCDIR/help -
+f 0644 root sys $DOCDIR/help/accounting.html doc/help/accounting.html
 f 0644 root sys $DOCDIR/help/cgi.html doc/help/cgi.html
 f 0644 root sys $DOCDIR/help/glossary.html doc/help/glossary.html
 f 0644 root sys $DOCDIR/help/license.html doc/help/license.html
@@ -683,5 +686,5 @@ f 0644 root sys $XINETD/cups-lpd init/cups-lpd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 6529 2007-05-08 19:48:20Z mike $".
+# End of "$Id: cups.list.in 6597 2007-06-22 16:41:58Z mike $".
 #

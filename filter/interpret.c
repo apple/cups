@@ -1,5 +1,5 @@
 /*
- * "$Id: interpret.c 6371 2007-03-20 23:18:01Z mike $"
+ * "$Id: interpret.c 6575 2007-06-19 23:56:24Z mike $"
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
@@ -1415,9 +1415,19 @@ setpagedevice(
       h->LeadingEdge = (unsigned)obj->value.number;
     else if (!strcmp(name, "ManualFeed") && obj->type == CUPS_PS_BOOLEAN)
       h->ManualFeed = (unsigned)obj->value.boolean;
-    else if ((!strcmp(name, "cupsMediaPosition") || /* Compatibility */
+    else if ((!strcmp(name, "cupsMediaPosition") ||
               !strcmp(name, "MediaPosition")) && obj->type == CUPS_PS_NUMBER)
+    {
+     /*
+      * cupsMediaPosition is supported for backwards compatibility only.
+      * We added it back in the Ghostscript 5.50 days to work around a
+      * bug in Ghostscript WRT handling of MediaPosition and setpagedevice.
+      *
+      * All new development should set MediaPosition...
+      */
+
       h->MediaPosition = (unsigned)obj->value.number;
+    }
     else if (!strcmp(name, "MediaWeight") && obj->type == CUPS_PS_NUMBER)
       h->MediaWeight = (unsigned)obj->value.number;
     else if (!strcmp(name, "MirrorPrint") && obj->type == CUPS_PS_BOOLEAN)
@@ -1640,5 +1650,5 @@ DEBUG_stack(_cups_ps_stack_t *st)	/* I - Stack */
 
 
 /*
- * End of "$Id: interpret.c 6371 2007-03-20 23:18:01Z mike $".
+ * End of "$Id: interpret.c 6575 2007-06-19 23:56:24Z mike $".
  */

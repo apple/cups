@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 6435 2007-04-02 22:43:39Z mike $"
+ * "$Id: adminutil.c 6549 2007-06-04 15:32:58Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -1335,14 +1335,21 @@ _cupsAdminSetServerSettings(
     {
       if (!wrote_browsing)
       {
+	int new_remote_printers = (remote_printers > 0 ||
+				   (remote_printers == -1 &&
+				    old_remote_printers > 0));
+	int new_share_printers = (share_printers > 0 ||
+				  (share_printers == -1 &&
+				   old_share_printers > 0));
+
         wrote_browsing = 1;
 
-        if (remote_printers > 0 || share_printers > 0)
+        if (new_remote_printers || new_share_printers)
 	{
-	  if (remote_printers > 0 && share_printers > 0)
+	  if (new_remote_printers && new_share_printers)
 	    cupsFilePuts(temp,
 	                 "# Enable printer sharing and shared printers.\n");
-	  else if (remote_printers > 0)
+	  else if (new_remote_printers)
 	    cupsFilePuts(temp,
 	                 "# Show shared printers on the local network.\n");
 	  else
@@ -1352,10 +1359,10 @@ _cupsAdminSetServerSettings(
 	  cupsFilePuts(temp, "Browsing On\n");
 	  cupsFilePuts(temp, "BrowseOrder allow,deny\n");
 
-	  if (remote_printers > 0)
+	  if (new_remote_printers)
 	    cupsFilePuts(temp, "BrowseAllow all\n");
 
-	  if (share_printers > 0)
+	  if (new_share_printers)
 	    cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
         }
 	else
@@ -2209,5 +2216,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 6435 2007-04-02 22:43:39Z mike $".
+ * End of "$Id: adminutil.c 6549 2007-06-04 15:32:58Z mike $".
  */

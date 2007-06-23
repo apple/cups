@@ -1,5 +1,5 @@
 /*
- * "$Id: testdriver.c 5390 2006-04-10 19:29:44Z mike $"
+ * "$Id: testdriver.c 6555 2007-06-07 01:33:44Z mike $"
  *
  *   Sample/test driver interface program for the Common UNIX Printing
  *   System (CUPS).
@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <cups/cups.h>
 
 
 /*
@@ -88,16 +89,23 @@ static int				/* O - Exit status */
 cat_ppd(const char *uri)		/* I - PPD URI */
 {
   int		i;			/* Looping var */
+  char		scheme[255],		/* URI scheme */
+		userpass[255],		/* Username/password (unused) */
+		hostname[255],		/* Hostname (unused) */
+		resource[1024];		/* Resource name */
+  int		port;			/* Port (unused) */
   const char	*name;			/* Pointer to name in URI */
 
 
-  if ((name = strchr(uri, ':')) == NULL)
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
+                      userpass, sizeof(userpass), hostname, sizeof(hostname),
+		      &port, resource, sizeof(resource)) < HTTP_URI_OK)
   {
     fprintf(stderr, "ERROR: Bad URI \"%s\"!\n", uri);
     return (1);
   }
 
-  name ++;
+  name = resource + 1;
 
   for (i = 0 ; i < (int)(sizeof(models) / sizeof(models[0])); i ++)
     if (!strcmp(name, models[i][0]))
@@ -167,7 +175,7 @@ list_ppds(const char *name)		/* I - Program name */
     base = name;
 
   for (i = 0; i < (int)(sizeof(models) / sizeof(models[0])); i ++)
-    printf("\"%s:%s\" en \"Test\" \"Test %s\" \"1284 device id\"\n",
+    printf("\"%s:///%s\" en \"Test\" \"Test %s\" \"1284 device id\"\n",
            base, models[i][0], models[i][1]);
 
   return (0);
@@ -175,5 +183,5 @@ list_ppds(const char *name)		/* I - Program name */
 
 
 /*
- * End of "$Id: testdriver.c 5390 2006-04-10 19:29:44Z mike $".
+ * End of "$Id: testdriver.c 6555 2007-06-07 01:33:44Z mike $".
  */

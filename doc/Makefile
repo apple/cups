@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6519 2007-05-08 01:55:27Z mike $"
+# "$Id: Makefile 6594 2007-06-21 21:51:15Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -114,6 +114,7 @@ WEBIMAGES	=	\
 			images/web-set-printer-options.gif \
 			images/web-test-page.gif
 HELPFILES	=	\
+			help/accounting.html \
 			help/api-array.html \
 			help/api-cups.html \
 			help/api-filedir.html \

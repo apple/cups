@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6304 2007-02-22 22:06:23Z mike $"
+# "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $"
 #
 #   Notifier makefile for the Common UNIX Printing System (CUPS).
 #
@@ -55,6 +55,12 @@ install:	all
 	done
 	$(INSTALL_DIR) -m 755 $(CACHEDIR)/rss
 	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #
@@ -111,5 +117,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6304 2007-02-22 22:06:23Z mike $".
+# End of "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $".
 #

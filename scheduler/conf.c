@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 6518 2007-05-07 22:17:53Z mike $"
+ * "$Id: conf.c 6547 2007-06-04 14:38:43Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -1797,7 +1797,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
       cupsdLogMessage(CUPSD_LOG_WARN,
                       "\"AuthClass %s\" is deprecated; consider using "
-		      "\"Require @groupname\" on line %d.",
+		      "\"Require user @groupname\" on line %d.",
 	              value, linenum);
     }
     else if (!strcasecmp(value, "system"))
@@ -1808,7 +1808,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
       cupsdLogMessage(CUPSD_LOG_WARN,
                       "\"AuthClass %s\" is deprecated; consider using "
-		      "\"Require @SYSTEM\" on line %d.",
+		      "\"Require user @SYSTEM\" on line %d.",
 	              value, linenum);
     }
     else
@@ -1825,7 +1825,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
     cupsdLogMessage(CUPSD_LOG_WARN,
                     "\"AuthGroupName %s\" directive is deprecated; consider "
-		    "using \"Require @%s\" on line %d.",
+		    "using \"Require user @%s\" on line %d.",
 		    value, value, linenum);
   }
   else if (!strcasecmp(line, "Require"))
@@ -3373,5 +3373,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 6518 2007-05-07 22:17:53Z mike $".
+ * End of "$Id: conf.c 6547 2007-06-04 14:38:43Z mike $".
  */

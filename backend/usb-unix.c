@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c 6510 2007-05-04 13:08:05Z mike $"
+ * "$Id: usb-unix.c 6591 2007-06-21 20:35:28Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -578,7 +578,9 @@ side_cb(int print_fd,			/* I - Print file */
   switch (command)
   {
     case CUPS_SC_CMD_DRAIN_OUTPUT :
-        if (tcdrain(device_fd))
+        if (backendDrainOutput(print_fd, device_fd))
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else if (tcdrain(device_fd))
 	  status = CUPS_SC_STATUS_IO_ERROR;
 	else
 	  status = CUPS_SC_STATUS_OK;
@@ -618,5 +620,5 @@ side_cb(int print_fd,			/* I - Print file */
 
 
 /*
- * End of "$Id: usb-unix.c 6510 2007-05-04 13:08:05Z mike $".
+ * End of "$Id: usb-unix.c 6591 2007-06-21 20:35:28Z mike $".
  */

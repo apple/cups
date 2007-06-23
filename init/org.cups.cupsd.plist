@@ -4,8 +4,6 @@
 <dict>
 	<key>Label</key>
 	<string>org.cups.cupsd</string>
-	<key>OnDemand</key>
-	<true/>
 	<key>KeepAlive</key>
 	<dict>
 		<key>PathState</key>
@@ -14,8 +12,6 @@
 			<true/>
 		</dict>
 	</dict>
-	<key>RunAtLoad</key>
-	<false/>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/usr/sbin/cupsd</string>
@@ -23,6 +19,8 @@
 	</array>
 	<key>ServiceIPC</key>
 	<true/>
+	<key>SHAuthorizationRight</key>
+	<string>system.preferences</string>
 	<key>Sockets</key>
 	<dict>
 		<key>Listeners</key>

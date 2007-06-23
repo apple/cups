@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6304 2007-02-22 22:06:23Z mike $"
+# "$Id: Makefile 6603 2007-06-22 22:23:21Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -78,6 +78,7 @@ OBJS	=	\
 		$(LIB64OBJS) \
 		testadmin.o \
 		testarray.o \
+		testcups.o \
 		testfile.o \
 		testhttp.o \
 		testi18n.o \
@@ -118,6 +119,7 @@ TARGETS	=	\
 		libcups.a \
 		testadmin \
 		testarray \
+		testcups \
 		testfile \
 		testhttp \
 		testi18n \
@@ -172,6 +174,12 @@ install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(STRIP) -x $(LIBDIR)/$(LIBCUPS); \
 		$(RM) $(LIBDIR)/libcups.dylib; \
 		$(LN) $(LIBCUPS) $(LIBDIR)/libcups.dylib; \
+	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
 	fi
 
 installstatic:
@@ -265,12 +273,14 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 # libcups.2.dylib
 #
 
-libcups.2.dylib:	$(LIBOBJS)
+libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.8.0 \
 		-compatibility_version 2.0.0 \
+		-exported_symbols_list libcups.exp \
+		-sectorder __TEXT __text $(LIBCUPSORDER) \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
@@ -349,6 +359,16 @@ testadmin:	testadmin.o libcups.a
 testarray:	testarray.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testarray.o libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# testcups (dependency on static CUPS library is intentional)
+#
+
+testcups:	testcups.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testcups.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -451,5 +471,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6304 2007-02-22 22:06:23Z mike $".
+# End of "$Id: Makefile 6603 2007-06-22 22:23:21Z mike $".
 #

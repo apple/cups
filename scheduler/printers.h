@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 6541 2007-05-23 20:18:00Z mike $"
+ * "$Id: printers.h 6590 2007-06-21 18:22:22Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -63,8 +63,7 @@ typedef struct cupsd_printer_s
   char		*reasons[16];		/* printer-state-reasons strings */
   time_t	state_time;		/* Time at this state */
   char		*job_sheets[2];		/* Banners/job sheets */
-  cups_ptype_t	type,			/* Printer type (color, small, etc.) */
-		external_type;		/* Printer type that is advertised */
+  cups_ptype_t	type;			/* Printer type (color, small, etc.) */
   char		*browse_attrs;		/* Attributes sent with browse data */
   time_t	browse_expire;		/* Expiration time for printer */
   time_t	browse_time;		/* Last time update was sent/received */
@@ -178,5 +177,5 @@ extern void		cupsdWritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h 6541 2007-05-23 20:18:00Z mike $".
+ * End of "$Id: printers.h 6590 2007-06-21 18:22:22Z mike $".
  */

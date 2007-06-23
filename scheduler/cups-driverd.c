@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-driverd.c 6540 2007-05-23 15:25:48Z mike $"
+ * "$Id: cups-driverd.c 6551 2007-06-05 13:32:22Z mike $"
  *
  *   PPD/driver support for the Common UNIX Printing System (CUPS).
  *
@@ -299,7 +299,8 @@ cat_ppd(const char *name,		/* I - PPD name */
   else
     scheme[0] = '\0';
 
-  puts("Content-Type: application/ipp\n");
+  if (request_id > 0)
+    puts("Content-Type: application/ipp\n");
 
   if (scheme[0])
   {
@@ -1707,5 +1708,5 @@ load_drivers(void)
 
 
 /*
- * End of "$Id: cups-driverd.c 6540 2007-05-23 15:25:48Z mike $".
+ * End of "$Id: cups-driverd.c 6551 2007-06-05 13:32:22Z mike $".
  */

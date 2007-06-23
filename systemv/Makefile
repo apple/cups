@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5627 2006-06-05 15:24:20Z mike $"
+# "$Id: Makefile 6574 2007-06-19 23:52:37Z mike $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -79,6 +79,12 @@ install:	all
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
 	$(INSTALL_BIN) -m 4755 -o root lppasswd $(BINDIR) || $(INSTALL_BIN) lppasswd $(BINDIR)
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #
@@ -149,9 +155,9 @@ cupstestdsc:	cupstestdsc.o ../cups/$(LIBCUPS)
 # cupstestppd
 #
 
-cupstestppd:	cupstestppd.o ../cups/$(LIBCUPS)
+cupstestppd:	cupstestppd.o ../cups/$(LIBCUPS) ../filter/$(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ cupstestppd.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ cupstestppd.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
 
 #
@@ -225,5 +231,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5627 2006-06-05 15:24:20Z mike $".
+# End of "$Id: Makefile 6574 2007-06-19 23:52:37Z mike $".
 #

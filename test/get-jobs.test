@@ -14,7 +14,7 @@
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
-	ATTR keyword which-jobs completed
+#	ATTR keyword which-jobs completed
 
 	# What statuses are OK?
 	STATUS successful-ok

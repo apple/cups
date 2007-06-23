@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $"
+# "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -62,6 +62,12 @@ install:	all
 	$(INSTALL_BIN) lprm $(BINDIR)
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) lpc $(SBINDIR)
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
 
 
 #
@@ -121,5 +127,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 5229 2006-03-05 16:48:12Z mike $".
+# End of "$Id: Makefile 6563 2007-06-18 22:18:46Z mike $".
 #

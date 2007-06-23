@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c 6477 2007-04-25 19:55:45Z mike $"
+ * "$Id: mark.c 6558 2007-06-18 18:11:49Z mike $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -112,7 +112,7 @@ ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
       key.option = o1;
 
       if ((c1 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
-          !c1->marked)
+          (!c1->marked || strcmp(c->choice1, c1->choice)))
         c1 = NULL;
     }
     else if (!c1)
@@ -150,7 +150,7 @@ ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
       key.option = o2;
 
       if ((c2 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
-          !c2->marked)
+          (!c2->marked || strcmp(c->choice2, c2->choice)))
         c2 = NULL;
     }
     else if (!c2)
@@ -730,5 +730,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c 6477 2007-04-25 19:55:45Z mike $".
+ * End of "$Id: mark.c 6558 2007-06-18 18:11:49Z mike $".
  */

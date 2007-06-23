@@ -1,5 +1,5 @@
 /*
- * "$Id: backend-private.h 6402 2007-03-27 07:54:14Z mike $"
+ * "$Id: backend-private.h 6591 2007-06-21 20:35:28Z mike $"
  *
  *   Backend support definitions for the Common UNIX Printing System (CUPS).
  *
@@ -56,6 +56,7 @@ extern "C" {
  * Prototypes...
  */
 
+extern int	backendDrainOutput(int print_fd, int device_fd);
 extern int	backendGetDeviceID(int fd, char *device_id, int device_id_size,
 		                   char *make_model, int make_model_size,
 				   const char *scheme, char *uri, int uri_size);
@@ -73,5 +74,5 @@ extern ssize_t	backendRunLoop(int print_fd, int device_fd, int use_bc,
 
 
 /*
- * End of "$Id: backend-private.h 6402 2007-03-27 07:54:14Z mike $".
+ * End of "$Id: backend-private.h 6591 2007-06-21 20:35:28Z mike $".
  */
