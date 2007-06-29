@@ -38,8 +38,6 @@ if test -x /bin/launchctl; then
 	cat >$pkgdir/Resources/preflight <<EOF
 #!/bin/sh
 # Tell launchd to reload cupsd...
-launchctl stop org.cups.cups-lpd || exit 0
-launchctl stop org.cups.cupsd || exit 0
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
 EOF
