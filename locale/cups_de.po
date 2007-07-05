@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-03-30 16:49-0400\n"
+"POT-Creation-Date: 2007-06-20 17:48-0700\n"
 "PO-Revision-Date: 2006-07-17 19:55+0200\n"
 "Last-Translator: Bernd Krumböck <b.krumboeck@rewe-group.at>\n"
 "Language-Team: Deutsch\n"
@@ -290,6 +290,18 @@ msgstr ""
 "        WARNUNG    Manufacturer wird verlangt von PPD 4.3 Spez.\n"
 "                REF: Seiten 58-59, Kapitel 5.3.\n"
 
+#, c-format
+msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "        WARN    Missing cupsICCProfile file \"%s\"\n"
+msgstr ""
+
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF!\n"
@@ -334,6 +346,65 @@ msgid ""
 msgstr ""
 "        WARNUNG    ShortNickName wird verlangt von PPD 4.3 Spez.\n"
 "                REF: Seiten 64-65, Kapitel 5.3.\n"
+
+#, fuzzy, c-format
+msgid "      %s  %s %s does not exist!\n"
+msgstr "      **FEHLGESCHLAGEN**  %s %s existiert nicht!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s!\n"
+
+#, fuzzy, c-format
+msgid ""
+"      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s, "
+"Auswahl %s!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad cupsFilter value \"%s\"!\n"
+msgstr "      **FEHLGESCHLAGEN**  Falscher cupsFilter Wert \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
+msgstr "      **FEHLGESCHLAGEN**  Falscher cupsFilter Wert \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad language \"%s\"!\n"
+msgstr "      **FEHLGESCHLAGEN**  Falsche Sprache \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s!\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s, "
+"Auswahl %s!\n"
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in UIConstraint \"*%s %s *%s %s\"!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "      %s  Missing cupsFilter file \"%s\"\n"
+msgstr "      **FEHLGESCHLAGEN**  Falscher cupsFilter Wert \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
+msgstr "      **FEHLGESCHLAGEN**  Falscher cupsFilter Wert \"%s\"!\n"
+
+#, c-format
+msgid "      %s  Missing option %s in UIConstraint \"*%s %s *%s %s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file!\n"
+msgstr ""
 
 #, c-format
 msgid "      **FAIL**  %s %s does not exist!\n"
@@ -380,6 +451,14 @@ msgstr ""
 
 msgid ""
 "      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  FALSCHER Manufacturer (sollte \"HP\" sein)\n"
+"                REF: Seite 211, Tabelle D.1.\n"
+
+#, fuzzy
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
 "                REF: Page 211, table D.1.\n"
 msgstr ""
 "      **FEHLGESCHLAGEN**  FALSCHER Manufacturer (sollte \"HP\" sein)\n"
@@ -432,6 +511,14 @@ msgstr ""
 "                REF: Seite 84, Kapitel 5.9\n"
 
 #, fuzzy, c-format
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
+msgstr "      **FEHLGESCHLAGEN**  Falsche Sprache \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
+msgstr "      **FEHLGESCHLAGEN**  Falsche Sprache \"%s\"!\n"
+
+#, fuzzy, c-format
 msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
 msgstr ""
 "      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s!\n"
@@ -451,6 +538,12 @@ msgstr "      **FEHLGESCHLAGEN**  Falscher cupsFilter Wert \"%s\"!\n"
 #, c-format
 msgid "      **FAIL**  Bad language \"%s\"!\n"
 msgstr "      **FEHLGESCHLAGEN**  Falsche Sprache \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
+msgstr ""
+"      **FEHLGESCHLAGEN**  Standardübersetzung für Parameter %s enthält 8-bit "
+"Zeichen!\n"
 
 #, c-format
 msgid ""
@@ -1261,6 +1354,10 @@ msgid "EMERG: Unable to allocate memory for pages array: %s\n"
 msgstr "Speicherreservierung für Dateitypen fehlgeschlagen!"
 
 #, fuzzy, c-format
+msgid "ERROR: %ld: (canceled:%ld)\n"
+msgstr "lprm: Kann keine Aufträge abbrechen!\n"
+
+#, fuzzy, c-format
 msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
 msgstr "lpoptions: Kann Drucker oder Instanz nicht hinzufügen: %s\n"
 
@@ -1552,6 +1649,10 @@ msgstr "cupsaddsmb fehlgeschlagen mit Status %d"
 msgid ""
 "ERROR: recoverable: Unable to connect to printer; will retry in 30 "
 "seconds...\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: select() returned %d\n"
 msgstr ""
 
 msgid "Edit Configuration File"
@@ -1850,6 +1951,9 @@ msgstr "Sprache \"%s\" nicht unterstützt!"
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr "Zeile ist länger als maximal erlaubt (255 Zeichen)"
 
+msgid "List Available Printers"
+msgstr ""
+
 msgid "Media Size"
 msgstr "Mediengröße"
 
@@ -2123,6 +2227,10 @@ msgstr "Erlaubte Benutzer festlegen:"
 msgid "Set As Default"
 msgstr "Setze als Standard"
 
+#, fuzzy
+msgid "Set Class Options"
+msgstr "Druckereinstellungen setzen"
+
 msgid "Set Printer Options"
 msgstr "Druckereinstellungen setzen"
 
@@ -2143,6 +2251,14 @@ msgstr "Stoppe Klasse"
 
 msgid "Stop Printer"
 msgstr "Stoppe Drucker"
+
+#, c-format
+msgid "The PPD file \"%s\" could not be found."
+msgstr ""
+
+#, c-format
+msgid "The PPD file \"%s\" could not be opened: %s"
+msgstr ""
 
 msgid ""
 "The class name may only contain up to 127 printable characters and may not "
@@ -2437,6 +2553,23 @@ msgstr ""
 "  -v                zusätzliche Ausgaben einschalten (zeige Befehle)\n"
 
 msgid ""
+"Usage: cupsctl [options] [param=value ... paramN=valueN]\n"
+"\n"
+"Options:\n"
+"\n"
+"    -E                      Enable encryption\n"
+"    -U username             Specify username\n"
+"    -h server[:port]        Specify server address\n"
+"\n"
+"    --[no-]debug-logging    Turn debug logging on/off\n"
+"    --[no-]remote-admin     Turn remote administration on/off\n"
+"    --[no-]remote-any       Allow/prevent access from the Internet\n"
+"    --[no-]remote-printers  Show/hide remote printers\n"
+"    --[no-]share-printers   Turn printer sharing on/off\n"
+"    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
+msgstr ""
+
+msgid ""
 "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
 "\n"
 "-c config-file      Load alternate configuration file\n"
@@ -2483,6 +2616,21 @@ msgstr ""
 "ppd[.gz]]\n"
 "       Programm | cupstestppd [-q] [-r] [-v[v]] -\n"
 
+msgid ""
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"       program | cupstestppd [options] -\n"
+"\n"
+"Options:\n"
+"\n"
+"    -R root-directory    Set alternate root\n"
+"    -W {all,none,constraints,defaults,filters,translations}\n"
+"                         Issue warnings instead of errors\n"
+"    -q                   Run silently\n"
+"    -r                   Use 'relaxed' open mode\n"
+"    -v                   Be slightly verbose\n"
+"    -vv                  Be very verbose\n"
+msgstr ""
+
 msgid "Usage: lpmove job/src dest\n"
 msgstr "Benutzung: lpmove Auftrag/Quelle Ziel\n"
 
@@ -2523,6 +2671,9 @@ msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
 msgstr "lp: Formular wird hinter dem Parameter -f erwartet!\n"
 
 msgid "WARNING: Couldn't create read channel\n"
+msgstr ""
+
+msgid "WARNING: Couldn't create side channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create sidechannel thread!\n"
@@ -2612,6 +2763,14 @@ msgstr "cups-driverd konnte nicht ausgeführt werden."
 #, c-format
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
 msgstr "cupsaddsmb: Keine PPD Datei für Drucker \"%s\" vorhanden - %s\n"
+
+#, fuzzy, c-format
+msgid "cupsctl: Unknown option \"%s\"!\n"
+msgstr "cancel: Unbekannter Parameter '%c'!\n"
+
+#, fuzzy, c-format
+msgid "cupsctl: Unknown option \"-%c\"!\n"
+msgstr "cancel: Unbekannter Parameter '%c'!\n"
 
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
 msgstr ""
@@ -3263,9 +3422,6 @@ msgstr "unbenannt"
 
 #~ msgid "cancel: Unknown destination \"%s\"!\n"
 #~ msgstr "cancel: Unbekanntes Ziel \"%s\"!\n"
-
-#~ msgid "cancel: Unknown option '%c'!\n"
-#~ msgstr "cancel: Unbekannter Parameter '%c'!\n"
 
 #~ msgid "cupsaddsmb crashed on signal %d"
 #~ msgstr "cupsaddsmb abgestürzt mit Signal %d"

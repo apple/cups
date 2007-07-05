@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-03-30 16:49-0400\n"
+"POT-Creation-Date: 2007-06-20 17:48-0700\n"
 "PO-Revision-Date: 2006-05-09 17:20+0200\n"
 "Last-Translator: Piotr Drąg <raven@pmail.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -292,6 +292,18 @@ msgstr ""
 "4.3.\n"
 "                REF: strony 58-59, sekcja 5.3.\n"
 
+#, c-format
+msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "        WARN    Missing cupsICCProfile file \"%s\"\n"
+msgstr ""
+
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF!\n"
@@ -338,6 +350,67 @@ msgstr ""
 "4.3.\n"
 "                REF: strony 64-65, sekcja 5.3.\n"
 
+#, fuzzy, c-format
+msgid "      %s  %s %s does not exist!\n"
+msgstr "      **ZAWIÓDŁ**  %s %s nie istnieje!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
+msgstr ""
+"      **ZAWIÓDŁ**  Brakujący łańcuch tekstowy tłumaczenia \"%s\" dla opcji %"
+"s!\n"
+
+#, fuzzy, c-format
+msgid ""
+"      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
+msgstr ""
+"      **ZAWIÓDŁ**  Brakujący łańcuch tekstowy tłumaczenia \"%s\" dla opcji %"
+"s, wybierz %s!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad cupsFilter value \"%s\"!\n"
+msgstr "      **ZAWIÓDŁ**  Błędna wartość cupsFilter \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
+msgstr "      **ZAWIÓDŁ**  Błędna wartość cupsFilter \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad language \"%s\"!\n"
+msgstr "      **ZAWIÓDŁ**  Błędny język \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s!\n"
+msgstr ""
+"      **ZAWIÓDŁ**  Brakujący łańcuch tekstowy tłumaczenia \"%s\" dla opcji %"
+"s!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr ""
+"      **ZAWIÓDŁ**  Brakujący łańcuch tekstowy tłumaczenia \"%s\" dla opcji %"
+"s, wybierz %s!\n"
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in UIConstraint \"*%s %s *%s %s\"!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "      %s  Missing cupsFilter file \"%s\"\n"
+msgstr "      **ZAWIÓDŁ**  Błędna wartość cupsFilter \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
+msgstr "      **ZAWIÓDŁ**  Błędna wartość cupsFilter \"%s\"!\n"
+
+#, c-format
+msgid "      %s  Missing option %s in UIConstraint \"*%s %s *%s %s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file!\n"
+msgstr ""
+
 #, c-format
 msgid "      **FAIL**  %s %s does not exist!\n"
 msgstr "      **ZAWIÓDŁ**  %s %s nie istnieje!\n"
@@ -383,6 +456,14 @@ msgstr ""
 
 msgid ""
 "      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+"      **ZAWIÓDŁ**  BŁĘDNE Manufacturer (powinno być \"HP\")\n"
+"                REF: strona 211, tablica D.1.\n"
+
+#, fuzzy
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
 "                REF: Page 211, table D.1.\n"
 msgstr ""
 "      **ZAWIÓDŁ**  BŁĘDNE Manufacturer (powinno być \"HP\")\n"
@@ -435,6 +516,14 @@ msgstr ""
 "                REF: strona 84, sekcja 5.9\n"
 
 #, fuzzy, c-format
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
+msgstr "      **ZAWIÓDŁ**  Błędny język \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
+msgstr "      **ZAWIÓDŁ**  Błędny język \"%s\"!\n"
+
+#, fuzzy, c-format
 msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
 msgstr ""
 "      **ZAWIÓDŁ**  Brakujący łańcuch tekstowy tłumaczenia \"%s\" dla opcji %"
@@ -455,6 +544,12 @@ msgstr "      **ZAWIÓDŁ**  Błędna wartość cupsFilter \"%s\"!\n"
 #, c-format
 msgid "      **FAIL**  Bad language \"%s\"!\n"
 msgstr "      **ZAWIÓDŁ**  Błędny język \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
+msgstr ""
+"      **ZAWIÓDŁ**  Domyślny łańcuch tekstowy tłumaczenia dla opcji %s "
+"zawiera 8 bitowe znaki!\n"
 
 #, c-format
 msgid ""
@@ -1260,6 +1355,10 @@ msgid "EMERG: Unable to allocate memory for pages array: %s\n"
 msgstr "Nie można przydzielić pamięci dla typów plików!"
 
 #, fuzzy, c-format
+msgid "ERROR: %ld: (canceled:%ld)\n"
+msgstr "lprm: nie można anulować zadań!\n"
+
+#, fuzzy, c-format
 msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
 msgstr "lpoptions: nie można dodać drukarki lub przykładu: %s\n"
 
@@ -1551,6 +1650,10 @@ msgstr "cupsaddsmb nie powiodło się ze stanem %d"
 msgid ""
 "ERROR: recoverable: Unable to connect to printer; will retry in 30 "
 "seconds...\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: select() returned %d\n"
 msgstr ""
 
 msgid "Edit Configuration File"
@@ -1848,6 +1951,9 @@ msgstr "Język \"%s\" jest nieobsługiwany!"
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr "Wiersz dłuższy niż maksymalnie dozwolony (255 znaków)"
 
+msgid "List Available Printers"
+msgstr ""
+
 msgid "Media Size"
 msgstr "Rozmiar nośnika"
 
@@ -2123,6 +2229,10 @@ msgstr "Ustaw zezwolonych użytkowników"
 msgid "Set As Default"
 msgstr "Ustaw jako domyślną"
 
+#, fuzzy
+msgid "Set Class Options"
+msgstr "Ustaw opcje drukarki"
+
 msgid "Set Printer Options"
 msgstr "Ustaw opcje drukarki"
 
@@ -2143,6 +2253,14 @@ msgstr "Zatrzymaj klasę"
 
 msgid "Stop Printer"
 msgstr "Zatrzymaj drukarkę"
+
+#, c-format
+msgid "The PPD file \"%s\" could not be found."
+msgstr ""
+
+#, c-format
+msgid "The PPD file \"%s\" could not be opened: %s"
+msgstr ""
 
 msgid ""
 "The class name may only contain up to 127 printable characters and may not "
@@ -2435,6 +2553,23 @@ msgstr ""
 "  -v               (wyświetla polecenia)\n"
 
 msgid ""
+"Usage: cupsctl [options] [param=value ... paramN=valueN]\n"
+"\n"
+"Options:\n"
+"\n"
+"    -E                      Enable encryption\n"
+"    -U username             Specify username\n"
+"    -h server[:port]        Specify server address\n"
+"\n"
+"    --[no-]debug-logging    Turn debug logging on/off\n"
+"    --[no-]remote-admin     Turn remote administration on/off\n"
+"    --[no-]remote-any       Allow/prevent access from the Internet\n"
+"    --[no-]remote-printers  Show/hide remote printers\n"
+"    --[no-]share-printers   Turn printer sharing on/off\n"
+"    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
+msgstr ""
+
+msgid ""
 "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
 "\n"
 "-c config-file      Load alternate configuration file\n"
@@ -2480,6 +2615,21 @@ msgstr ""
 "ppd[.gz]]\n"
 "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
 
+msgid ""
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"       program | cupstestppd [options] -\n"
+"\n"
+"Options:\n"
+"\n"
+"    -R root-directory    Set alternate root\n"
+"    -W {all,none,constraints,defaults,filters,translations}\n"
+"                         Issue warnings instead of errors\n"
+"    -q                   Run silently\n"
+"    -r                   Use 'relaxed' open mode\n"
+"    -v                   Be slightly verbose\n"
+"    -vv                  Be very verbose\n"
+msgstr ""
+
 msgid "Usage: lpmove job/src dest\n"
 msgstr "Użycie: lpmove zadanie/źródło cel\n"
 
@@ -2520,6 +2670,9 @@ msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
 msgstr "lp: oczekiwana forma po opcji -f!\n"
 
 msgid "WARNING: Couldn't create read channel\n"
+msgstr ""
+
+msgid "WARNING: Couldn't create side channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create sidechannel thread!\n"
@@ -2609,6 +2762,14 @@ msgstr "Nie powiodło się wykonanie cups-driverd."
 #, c-format
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
 msgstr "cupsaddsmb: brak pliku PPD dla drukarki \"%s\" - %s\n"
+
+#, fuzzy, c-format
+msgid "cupsctl: Unknown option \"%s\"!\n"
+msgstr "cancel: nieznana opcja \"%c\"!\n"
+
+#, fuzzy, c-format
+msgid "cupsctl: Unknown option \"-%c\"!\n"
+msgstr "cancel: nieznana opcja \"%c\"!\n"
 
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
 msgstr "cupsd: oczekiwana nazwa pliku konfiguracji po opcji \"-c\"!\n"
@@ -3263,9 +3424,6 @@ msgstr "nienazwane"
 
 #~ msgid "cancel: Unknown destination \"%s\"!\n"
 #~ msgstr "cancel: nieznany cel \"%s\"!\n"
-
-#~ msgid "cancel: Unknown option '%c'!\n"
-#~ msgstr "cancel: nieznana opcja \"%c\"!\n"
 
 #~ msgid "cupsaddsmb crashed on signal %d"
 #~ msgstr "cupsaddsmb wywalił się na sygnale %d"

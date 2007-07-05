@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-03-30 16:49-0400\n"
+"POT-Creation-Date: 2007-06-20 17:48-0700\n"
 "PO-Revision-Date: 2007-01-27 13:43+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
@@ -289,6 +289,18 @@ msgstr ""
 "        警告    Manufacturer は PPD 4.3 仕様で必須です。\n"
 "                REF: 58-59 ページ、セクション 5.3。\n"
 
+#, c-format
+msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "        WARN    Missing cupsICCProfile file \"%s\"\n"
+msgstr ""
+
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF!\n"
@@ -333,6 +345,61 @@ msgid ""
 msgstr ""
 "        警告    ShortNickName は PPD 4.3 仕様で必須です。\n"
 "                REF: 64-65 ページ、セクション 5.3。\n"
+
+#, fuzzy, c-format
+msgid "      %s  %s %s does not exist!\n"
+msgstr "      **失敗** %s %s は存在しません!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
+msgstr "      **失敗**  \"%s\" 翻訳文字列 (オプション %s 用) がありません!\n"
+
+#, fuzzy, c-format
+msgid ""
+"      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
+msgstr ""
+"      **失敗**  \"%s\" 翻訳文字列 (オプション %s、選択 %s) がありません!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad cupsFilter value \"%s\"!\n"
+msgstr "      **失敗**  \"%s\" は不正な cupsFilter 値です!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
+msgstr "      **失敗**  \"%s\" は不正な cupsFilter 値です!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad language \"%s\"!\n"
+msgstr "      **失敗**  無効な言語 \"%s\" です!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s!\n"
+msgstr "      **失敗**  \"%s\" 翻訳文字列 (オプション %s 用) がありません!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr ""
+"      **失敗**  \"%s\" 翻訳文字列 (オプション %s、選択 %s) がありません!\n"
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in UIConstraint \"*%s %s *%s %s\"!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "      %s  Missing cupsFilter file \"%s\"\n"
+msgstr "      **失敗**  \"%s\" は不正な cupsFilter 値です!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
+msgstr "      **失敗**  \"%s\" は不正な cupsFilter 値です!\n"
+
+#, c-format
+msgid "      %s  Missing option %s in UIConstraint \"*%s %s *%s %s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file!\n"
+msgstr ""
 
 #, c-format
 msgid "      **FAIL**  %s %s does not exist!\n"
@@ -384,6 +451,14 @@ msgstr ""
 "      **失敗**  不正な Manufacturer (\"HP\" でなければなりません)\n"
 "                REF: 211 ページ、表 D.1。\n"
 
+#, fuzzy
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+"      **失敗**  不正な Manufacturer (\"HP\" でなければなりません)\n"
+"                REF: 211 ページ、表 D.1。\n"
+
 #, c-format
 msgid ""
 "      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
@@ -430,6 +505,14 @@ msgstr ""
 "                REF: 84 ページ、セクション 5.9\n"
 
 #, fuzzy, c-format
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
+msgstr "      **失敗**  無効な言語 \"%s\" です!\n"
+
+#, fuzzy, c-format
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
+msgstr "      **失敗**  無効な言語 \"%s\" です!\n"
+
+#, fuzzy, c-format
 msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
 msgstr "      **失敗**  \"%s\" 翻訳文字列 (オプション %s 用) がありません!\n"
 
@@ -447,6 +530,12 @@ msgstr "      **失敗**  \"%s\" は不正な cupsFilter 値です!\n"
 #, c-format
 msgid "      **FAIL**  Bad language \"%s\"!\n"
 msgstr "      **失敗**  無効な言語 \"%s\" です!\n"
+
+#, fuzzy, c-format
+msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
+msgstr ""
+"      **失敗**  オプション %s のデフォルトの翻訳文字列が8ビット文字を含んでい"
+"ます!\n"
 
 #, c-format
 msgid ""
@@ -1246,6 +1335,10 @@ msgid "EMERG: Unable to allocate memory for pages array: %s\n"
 msgstr "ファイルタイプ用にメモリを割り当てられません!"
 
 #, fuzzy, c-format
+msgid "ERROR: %ld: (canceled:%ld)\n"
+msgstr "lprm: ジョブをキャンセルできません!\n"
+
+#, fuzzy, c-format
 msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
 msgstr "lpoptions: プリンタまたはインスタンスを追加できません: %s\n"
 
@@ -1537,6 +1630,10 @@ msgstr "cupsaddsmb は状態 %d で失敗しました"
 msgid ""
 "ERROR: recoverable: Unable to connect to printer; will retry in 30 "
 "seconds...\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: select() returned %d\n"
 msgstr ""
 
 msgid "Edit Configuration File"
@@ -1833,6 +1930,9 @@ msgstr "言語 \"%s\" はサポートされていません!"
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr "1 行が最大許可値 (255 文字) を超えています"
 
+msgid "List Available Printers"
+msgstr ""
+
 msgid "Media Size"
 msgstr "用紙サイズ"
 
@@ -2107,6 +2207,10 @@ msgstr "許可するユーザの設定"
 msgid "Set As Default"
 msgstr "デフォルトに設定"
 
+#, fuzzy
+msgid "Set Class Options"
+msgstr "プリンタオプションの設定"
+
 msgid "Set Printer Options"
 msgstr "プリンタオプションの設定"
 
@@ -2127,6 +2231,14 @@ msgstr "クラスの停止"
 
 msgid "Stop Printer"
 msgstr "プリンタの停止"
+
+#, c-format
+msgid "The PPD file \"%s\" could not be found."
+msgstr ""
+
+#, c-format
+msgid "The PPD file \"%s\" could not be opened: %s"
+msgstr ""
 
 msgid ""
 "The class name may only contain up to 127 printable characters and may not "
@@ -2421,6 +2533,23 @@ msgstr ""
 "  -v               冗長にする (コマンドを表示する)\n"
 
 msgid ""
+"Usage: cupsctl [options] [param=value ... paramN=valueN]\n"
+"\n"
+"Options:\n"
+"\n"
+"    -E                      Enable encryption\n"
+"    -U username             Specify username\n"
+"    -h server[:port]        Specify server address\n"
+"\n"
+"    --[no-]debug-logging    Turn debug logging on/off\n"
+"    --[no-]remote-admin     Turn remote administration on/off\n"
+"    --[no-]remote-any       Allow/prevent access from the Internet\n"
+"    --[no-]remote-printers  Show/hide remote printers\n"
+"    --[no-]share-printers   Turn printer sharing on/off\n"
+"    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
+msgstr ""
+
+msgid ""
 "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
 "\n"
 "-c config-file      Load alternate configuration file\n"
@@ -2467,6 +2596,21 @@ msgstr ""
 "ppd[.gz]]\n"
 "       プログラム | cupstestppd [-q] [-r] [-v[v]] -\n"
 
+msgid ""
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"       program | cupstestppd [options] -\n"
+"\n"
+"Options:\n"
+"\n"
+"    -R root-directory    Set alternate root\n"
+"    -W {all,none,constraints,defaults,filters,translations}\n"
+"                         Issue warnings instead of errors\n"
+"    -q                   Run silently\n"
+"    -r                   Use 'relaxed' open mode\n"
+"    -v                   Be slightly verbose\n"
+"    -vv                  Be very verbose\n"
+msgstr ""
+
 msgid "Usage: lpmove job/src dest\n"
 msgstr "使い方: lpmove ジョブまたはソース 宛先\n"
 
@@ -2507,6 +2651,9 @@ msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
 msgstr "lp: -f オプションのあとには用紙名が必要です!\n"
 
 msgid "WARNING: Couldn't create read channel\n"
+msgstr ""
+
+msgid "WARNING: Couldn't create side channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create sidechannel thread!\n"
@@ -2596,6 +2743,14 @@ msgstr "cups-driverd の実行に失敗しました。"
 #, c-format
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
 msgstr "cupsaddsmb: プリンタ \"%s\" の PPD ファイルがありません - %s\n"
+
+#, fuzzy, c-format
+msgid "cupsctl: Unknown option \"%s\"!\n"
+msgstr "cancel: '%c' は未知のオプションです!\n"
+
+#, fuzzy, c-format
+msgid "cupsctl: Unknown option \"-%c\"!\n"
+msgstr "cancel: '%c' は未知のオプションです!\n"
 
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
 msgstr "cupsd: -c オプションのあとには設定ファイル名が必要です!\n"
@@ -3255,9 +3410,6 @@ msgstr "タイトルなし"
 
 #~ msgid "cancel: Unknown destination \"%s\"!\n"
 #~ msgstr "cancel: \"%s\" は未知の宛先です!\n"
-
-#~ msgid "cancel: Unknown option '%c'!\n"
-#~ msgstr "cancel: '%c' は未知のオプションです!\n"
 
 #~ msgid "cupsaddsmb crashed on signal %d"
 #~ msgstr "cupsaddsmb はシグナル %d でクラッシュしました"

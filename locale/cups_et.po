@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-03-30 16:49-0400\n"
+"POT-Creation-Date: 2007-06-20 17:48-0700\n"
 "PO-Revision-Date: 2006-09-93 01:41+0200\n"
 "Last-Translator: Marek Laane <bald@starman.ee>\n"
 "Language-Team: Estonian <et@li.org>\n"
@@ -289,6 +289,18 @@ msgstr ""
 "        HOIATUS    Manufacturer on PPD 4.3 spetsifikatsiooni järgi nõutav.\n"
 "                   Viide: lk 58-59, sektsioon 5.3.\n"
 
+#, c-format
+msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "        WARN    Missing cupsICCProfile file \"%s\"\n"
+msgstr ""
+
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF!\n"
@@ -333,6 +345,59 @@ msgid ""
 msgstr ""
 "        HOIATUS    ShortNickName on PPD 4.3 spetsifikatsiooni järgi nõutav.\n"
 "                   Viide: lk 64-65, sektsioon 5.3.\n"
+
+#, fuzzy, c-format
+msgid "      %s  %s %s does not exist!\n"
+msgstr "      **EBAÕNN**  %s %s ei ole olemas!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
+msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
+
+#, fuzzy, c-format
+msgid ""
+"      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
+msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s, valikule %s!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad cupsFilter value \"%s\"!\n"
+msgstr "      **EBAÕNN**  Vigane cupsFilter väärtus \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
+msgstr "      **EBAÕNN**  Vigane cupsFilter väärtus \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Bad language \"%s\"!\n"
+msgstr "      **EBAÕNN**  Vigane keel \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s!\n"
+msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s, valikule %s!\n"
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in UIConstraint \"*%s %s *%s %s\"!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "      %s  Missing cupsFilter file \"%s\"\n"
+msgstr "      **EBAÕNN**  Vigane cupsFilter väärtus \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
+msgstr "      **EBAÕNN**  Vigane cupsFilter väärtus \"%s\"!\n"
+
+#, c-format
+msgid "      %s  Missing option %s in UIConstraint \"*%s %s *%s %s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file!\n"
+msgstr ""
 
 #, c-format
 msgid "      **FAIL**  %s %s does not exist!\n"
@@ -384,6 +449,14 @@ msgstr ""
 "      **EBAÕNN**  VIGANE Manufacturer (peab olema \"HP\")\n"
 "                  Viide: lk 211, tabel D.1.\n"
 
+#, fuzzy
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+"      **EBAÕNN**  VIGANE Manufacturer (peab olema \"HP\")\n"
+"                  Viide: lk 211, tabel D.1.\n"
+
 #, c-format
 msgid ""
 "      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
@@ -430,6 +503,14 @@ msgstr ""
 "                  Viide: lk 84, sektsioon 5.9\n"
 
 #, fuzzy, c-format
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
+msgstr "      **EBAÕNN**  Vigane keel \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
+msgstr "      **EBAÕNN**  Vigane keel \"%s\"!\n"
+
+#, fuzzy, c-format
 msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
 msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
 
@@ -446,6 +527,12 @@ msgstr "      **EBAÕNN**  Vigane cupsFilter väärtus \"%s\"!\n"
 #, c-format
 msgid "      **FAIL**  Bad language \"%s\"!\n"
 msgstr "      **EBAÕNN**  Vigane keel \"%s\"!\n"
+
+#, fuzzy, c-format
+msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
+msgstr ""
+"      **EBAÕNN**  Vaikimisi tõlkestring võtmele %s sisaldab 8-bitiseid "
+"märke!\n"
 
 #, c-format
 msgid ""
@@ -1243,6 +1330,10 @@ msgid "EMERG: Unable to allocate memory for pages array: %s\n"
 msgstr "Failitüüpidele ei õnnestu mälu eraldada!"
 
 #, fuzzy, c-format
+msgid "ERROR: %ld: (canceled:%ld)\n"
+msgstr "lprm: tööde katkestamine ei ole võimalik!\n"
+
+#, fuzzy, c-format
 msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
 msgstr "lpoptions: ei õnnestu lisada printerit või isendit: %s\n"
 
@@ -1534,6 +1625,10 @@ msgstr "cupsaddsmb ebaõnnestus olekuga %d"
 msgid ""
 "ERROR: recoverable: Unable to connect to printer; will retry in 30 "
 "seconds...\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: select() returned %d\n"
 msgstr ""
 
 msgid "Edit Configuration File"
@@ -1831,6 +1926,9 @@ msgstr "Keel \"%s\" pole toetatud!"
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr "Rida lubatust pikem (255 märki)"
 
+msgid "List Available Printers"
+msgstr ""
+
 msgid "Media Size"
 msgstr "Türkimaterjali suurus"
 
@@ -2102,6 +2200,10 @@ msgstr "Lubatud kasutajate määramine"
 msgid "Set As Default"
 msgstr "Määra vaikeväärtuseks"
 
+#, fuzzy
+msgid "Set Class Options"
+msgstr "Printeri valikute määramine"
+
 msgid "Set Printer Options"
 msgstr "Printeri valikute määramine"
 
@@ -2122,6 +2224,14 @@ msgstr "Peata klass"
 
 msgid "Stop Printer"
 msgstr "Peata printer"
+
+#, c-format
+msgid "The PPD file \"%s\" could not be found."
+msgstr ""
+
+#, c-format
+msgid "The PPD file \"%s\" could not be opened: %s"
+msgstr ""
 
 msgid ""
 "The class name may only contain up to 127 printable characters and may not "
@@ -2410,6 +2520,23 @@ msgstr ""
 "  -v                   Häälekus (käskude näitamine)\n"
 
 msgid ""
+"Usage: cupsctl [options] [param=value ... paramN=valueN]\n"
+"\n"
+"Options:\n"
+"\n"
+"    -E                      Enable encryption\n"
+"    -U username             Specify username\n"
+"    -h server[:port]        Specify server address\n"
+"\n"
+"    --[no-]debug-logging    Turn debug logging on/off\n"
+"    --[no-]remote-admin     Turn remote administration on/off\n"
+"    --[no-]remote-any       Allow/prevent access from the Internet\n"
+"    --[no-]remote-printers  Show/hide remote printers\n"
+"    --[no-]share-printers   Turn printer sharing on/off\n"
+"    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
+msgstr ""
+
+msgid ""
 "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
 "\n"
 "-c config-file      Load alternate configuration file\n"
@@ -2456,6 +2583,21 @@ msgstr ""
 "failinimiN.ppd[.gz]]\n"
 "            program | cupstestppd [-q] [-r] [-v[v]] -\n"
 
+msgid ""
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"       program | cupstestppd [options] -\n"
+"\n"
+"Options:\n"
+"\n"
+"    -R root-directory    Set alternate root\n"
+"    -W {all,none,constraints,defaults,filters,translations}\n"
+"                         Issue warnings instead of errors\n"
+"    -q                   Run silently\n"
+"    -r                   Use 'relaxed' open mode\n"
+"    -v                   Be slightly verbose\n"
+"    -vv                  Be very verbose\n"
+msgstr ""
+
 msgid "Usage: lpmove job/src dest\n"
 msgstr "Kasutamine: lpmove töö/lähtekoht sihtkoht\n"
 
@@ -2496,6 +2638,9 @@ msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
 msgstr "lp: võtme -f järel oodati vormi!\n"
 
 msgid "WARNING: Couldn't create read channel\n"
+msgstr ""
+
+msgid "WARNING: Couldn't create side channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create sidechannel thread!\n"
@@ -2585,6 +2730,14 @@ msgstr "cups-driverd käivitamine ebaõnnestus."
 #, c-format
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
 msgstr "cupsaddsmb: puudub PPD-fail printerile \"%s\" - %s\n"
+
+#, fuzzy, c-format
+msgid "cupsctl: Unknown option \"%s\"!\n"
+msgstr "cancel: tundmatu võti '%c'!\n"
+
+#, fuzzy, c-format
+msgid "cupsctl: Unknown option \"-%c\"!\n"
+msgstr "cancel: tundmatu võti '%c'!\n"
 
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
 msgstr "cupsd: võtme \"-c\" järel oodati seadistustefaili nime!\n"
@@ -3223,9 +3376,6 @@ msgstr "nimeta"
 
 #~ msgid "cancel: Unknown destination \"%s\"!\n"
 #~ msgstr "cancel: tundmatu sihtkoht \"%s\"!\n"
-
-#~ msgid "cancel: Unknown option '%c'!\n"
-#~ msgstr "cancel: tundmatu võti '%c'!\n"
 
 #~ msgid "cupsaddsmb crashed on signal %d"
 #~ msgstr "cupsaddsmb elas üle krahhi signaaliga %d"
