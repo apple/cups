@@ -16,7 +16,7 @@
 </head>
 <body>
 <!--
-  "$Id: api-filter.shtml 5138 2006-02-21 10:49:06Z mike $"
+  "$Id: api-filter.shtml 6170 2007-01-02 17:26:41Z mike $"
 
   Filter and backend API introduction for the Common UNIX Printing System (CUPS).
 
@@ -254,23 +254,22 @@ if (!cupsSideChannelRead(&amp;command, &amp;status, NULL, NULL, 0.0))
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsBackChannelRead'>cupsBackChannelRead()</a></h3>
 <h4>Description</h4>
 <p>Read data from the backchannel.
-
-Reads up to &quot;bytes&quot; bytes from the backchannel. The &quot;timeout&quot;
+<p>Reads up to &quot;bytes&quot; bytes from the backchannel. The &quot;timeout&quot;
 parameter controls how many seconds to wait for the data - use
 0.0 to return immediately if there is no data, -1.0 to wait
 for data indefinitely.
 
-</p>
+
 <h4>Syntax</h4>
-<pre>
-ssize_t
+<p><tt>
+ssize_t<br>
 cupsBackChannelRead(
     char * buffer,
     size_t bytes,
     double timeout);
-</pre>
+</tt></p>
 <h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>buffer</tt></td><td>Buffer to read</td></tr>
@@ -283,23 +282,22 @@ cupsBackChannelRead(
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsBackChannelWrite'>cupsBackChannelWrite()</a></h3>
 <h4>Description</h4>
 <p>Write data to the backchannel.
-
-Writes &quot;bytes&quot; bytes to the backchannel. The &quot;timeout&quot; parameter
+<p>Writes &quot;bytes&quot; bytes to the backchannel. The &quot;timeout&quot; parameter
 controls how many seconds to wait for the data to be written - use
 0.0 to return immediately if the data cannot be written, -1.0 to wait
 indefinitely.
 
-</p>
+
 <h4>Syntax</h4>
-<pre>
-ssize_t
+<p><tt>
+ssize_t<br>
 cupsBackChannelWrite(
     const char * buffer,
     size_t bytes,
     double timeout);
-</pre>
+</tt></p>
 <h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>buffer</tt></td><td>Buffer to write</td></tr>
@@ -312,29 +310,27 @@ cupsBackChannelWrite(
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsSideChannelDoRequest'>cupsSideChannelDoRequest()</a></h3>
 <h4>Description</h4>
 <p>Send a side-channel command to a backend and wait for a response.
-
-This function is normally only called by filters, drivers, or port
+<p>This function is normally only called by filters, drivers, or port
 monitors in order to communicate with the backend used by the current
 printer.  Programs must be prepared to handle timeout or &quot;not
 implemented&quot; status codes, which indicate that the backend or device
 do not support the specified side-channel command.
-
-The &quot;datalen&quot; parameter must be initialized to the size of the buffer
+<p>The &quot;datalen&quot; parameter must be initialized to the size of the buffer
 pointed to by the &quot;data&quot; parameter.  cupsSideChannelDoRequest() will
 update the value to contain the number of data bytes in the buffer.
 
-</p>
+
 <h4>Syntax</h4>
-<pre>
-<a href='#cups_sc_status_t'>cups_sc_status_t</a>
+<p><tt>
+<a href='#cups_sc_status_t'>cups_sc_status_t</a><br>
 cupsSideChannelDoRequest(
     cups_sc_command_t command,
     char * data,
     int * datalen,
     double timeout);
-</pre>
+</tt></p>
 <h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>command</tt></td><td>Command to send</td></tr>
@@ -348,29 +344,27 @@ cupsSideChannelDoRequest(
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsSideChannelRead'>cupsSideChannelRead()</a></h3>
 <h4>Description</h4>
 <p>Read a side-channel message.
-
-This function is normally only called by backend programs to read
+<p>This function is normally only called by backend programs to read
 commands from a filter, driver, or port monitor program.  The
 caller must be prepared to handle incomplete or invalid messages
 and return the corresponding status codes.
-
-The &quot;datalen&quot; parameter must be initialized to the size of the buffer
+<p>The &quot;datalen&quot; parameter must be initialized to the size of the buffer
 pointed to by the &quot;data&quot; parameter.  cupsSideChannelDoRequest() will
 update the value to contain the number of data bytes in the buffer.
 
-</p>
+
 <h4>Syntax</h4>
-<pre>
-int
+<p><tt>
+int<br>
 cupsSideChannelRead(
     cups_sc_command_t * command,
     <a href='#cups_sc_status_t'>cups_sc_status_t</a> * status,
     char * data,
     int * datalen,
     double timeout);
-</pre>
+</tt></p>
 <h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>command</tt></td><td>Command code</td></tr>
@@ -385,23 +379,22 @@ cupsSideChannelRead(
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsSideChannelWrite'>cupsSideChannelWrite()</a></h3>
 <h4>Description</h4>
 <p>Write a side-channel message.
-
-This function is normally only called by backend programs to send
+<p>This function is normally only called by backend programs to send
 responses to a filter, driver, or port monitor program.
 
-</p>
+
 <h4>Syntax</h4>
-<pre>
-int
+<p><tt>
+int<br>
 cupsSideChannelWrite(
     cups_sc_command_t command,
     <a href='#cups_sc_status_t'>cups_sc_status_t</a> status,
     const char * data,
     int datalen,
     double timeout);
-</pre>
+</tt></p>
 <h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><tt>command</tt></td><td>Command code</td></tr>

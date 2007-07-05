@@ -397,6 +397,12 @@ extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd);
 extern int		ppdLocalize(ppd_file_t *ppd);
 extern ppd_file_t	*ppdOpen2(cups_file_t *fp);
 
+/**** New in CUPS 1.3 ****/
+extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
+			                      const char *reason,
+					      const char *scheme,
+					      char *buffer, size_t bufsize);
+
 
 /*
  * C++ magic...

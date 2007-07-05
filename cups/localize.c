@@ -34,7 +34,11 @@
  *
  * Contents:
  *
- *   ppdLocalize() - Localize the PPD file to the current locale.
+ *   ppdLocalize()          - Localize the PPD file to the current locale.
+ *   ppdLocalizeIPPReason() - Get the localized version of a cupsIPPReason
+ *                            attribute.
+ *   ppd_ll_CC()            - Get the current locale names.
+ *   ppd_localized_attr()   - Find a localized attribute.
  */
 
 /*
@@ -49,9 +53,11 @@
  * Local functions...
  */
 
-static const char	*ppd_text(ppd_file_t *ppd, const char *keyword,
-			          const char *spec, const char *ll_CC,
-				  const char *ll);
+static void		ppd_ll_CC(char *ll_CC, char *ll);
+static ppd_attr_t	*ppd_localized_attr(ppd_file_t *ppd,
+			                    const char *keyword,
+			                    const char *spec, const char *ll_CC,
+				            const char *ll);
 
 
 /*
@@ -69,12 +75,11 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   ppd_choice_t	*choice;		/* Current choice */
   ppd_coption_t	*coption;		/* Current custom option */
   ppd_cparam_t	*cparam;		/* Current custom parameter */
-  ppd_attr_t	*attr;			/* Current attribute */
-  cups_lang_t	*lang;			/* Current language */
+  ppd_attr_t	*attr,			/* Current attribute */
+		*locattr;		/* Localized attribute */
   char		ckeyword[PPD_MAX_NAME],	/* Custom keyword */
 		ll_CC[6],		/* Language + country locale */
 		ll[3];			/* Language locale */
-  const char	*text;			/* Localized text */
 
 
  /*
@@ -90,8 +95,283 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   * Get the default language...
   */
 
+  ppd_ll_CC(ll_CC, ll);
+
+ /*
+  * Now lookup all of the groups, options, choices, etc.
+  */
+
+  for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
+  {
+    if ((locattr = ppd_localized_attr(ppd, "Translation", group->name,
+                                      ll_CC, ll)) != NULL)
+      strlcpy(group->text, locattr->text, sizeof(group->text));
+
+    for (j = group->num_options, option = group->options; j > 0; j --, option ++)
+    {
+      if ((locattr = ppd_localized_attr(ppd, "Translation", option->keyword,
+                                        ll_CC, ll)) != NULL)
+	strlcpy(option->text, locattr->text, sizeof(option->text));
+
+      for (k = option->num_choices, choice = option->choices;
+           k > 0;
+	   k --, choice ++)
+      {
+        if (strcmp(choice->choice, "Custom"))
+	  locattr = ppd_localized_attr(ppd, option->keyword, choice->choice,
+	                               ll_CC, ll);
+	else
+	{
+	  snprintf(ckeyword, sizeof(ckeyword), "Custom%s", option->keyword);
+
+	  locattr = ppd_localized_attr(ppd, ckeyword, "True", ll_CC, ll);
+	}
+
+        if (locattr)
+	  strlcpy(choice->text, locattr->text, sizeof(choice->text));
+      }
+    }
+  }
+
+ /*
+  * Translate any custom parameters...
+  */
+
+  for (coption = (ppd_coption_t *)cupsArrayFirst(ppd->coptions);
+       coption;
+       coption = (ppd_coption_t *)cupsArrayNext(ppd->coptions))
+  {
+    for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
+	 cparam;
+	 cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
+    {
+      snprintf(ckeyword, sizeof(ckeyword), "ParamCustom%s", coption->keyword);
+
+      if ((locattr = ppd_localized_attr(ppd, ckeyword, cparam->name,
+                                        ll_CC, ll)) != NULL)
+        strlcpy(cparam->text, locattr->text, sizeof(cparam->text));
+    }
+  }
+
+ /*
+  * Translate ICC profile names...
+  */
+
+  if ((attr = ppdFindAttr(ppd, "APCustomColorMatchingName", NULL)) != NULL)
+  {
+    if ((locattr = ppd_localized_attr(ppd, "APCustomColorMatchingName",
+                                      attr->spec, ll_CC, ll)) != NULL)
+      strlcpy(attr->text, locattr->text, sizeof(attr->text));
+  }
+
+  for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+  {
+    cupsArraySave(ppd->sorted_attrs);
+
+    if ((locattr = ppd_localized_attr(ppd, "cupsICCProfile", attr->spec,
+                                      ll_CC, ll)) != NULL)
+      strlcpy(attr->text, locattr->text, sizeof(attr->text));
+
+    cupsArrayRestore(ppd->sorted_attrs);
+  }
+
+ /*
+  * Translate printer presets...
+  */
+
+  for (attr = ppdFindAttr(ppd, "APPrinterPreset", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "APPrinterPreset", NULL))
+  {
+    cupsArraySave(ppd->sorted_attrs);
+
+    if ((locattr = ppd_localized_attr(ppd, "APPrinterPreset", attr->spec,
+                                      ll_CC, ll)) != NULL)
+      strlcpy(attr->text, locattr->text, sizeof(attr->text));
+
+    cupsArrayRestore(ppd->sorted_attrs);
+  }
+
+  return (0);
+}
+
+
+/*
+ * 'ppdLocalizeIPPReason()' - Get the localized version of a cupsIPPReason
+ *                            attribute.
+ *
+ * This function uses the current locale to find the corresponding reason
+ * text or URI from the attribute value. If "scheme" is NULL or "text",
+ * the returned value contains human-readable text from the translation
+ * string or attribute value. Otherwise the corresponding URI is returned.
+ *
+ * If no value of the requested scheme can be found, NULL is returned.
+ *
+ * @since CUPS 1.3@
+ */
+
+const char *				/* O - Value or NULL if not found */
+ppdLocalizeIPPReason(
+    ppd_file_t *ppd,			/* I - PPD file */
+    const char *reason,			/* I - IPP reason keyword to look up */
+    const char *scheme,			/* I - URI scheme or NULL for text */
+    char       *buffer,			/* I - Value buffer */
+    size_t     bufsize)			/* I - Size of value buffer */
+{
+  ppd_attr_t	*locattr;		/* Localized attribute */
+  char		ll_CC[6],		/* Language + country locale */
+		ll[3],			/* Language locale */
+		*bufptr,		/* Pointer into buffer */
+		*bufend,		/* Pointer to end of buffer */
+		*valptr;		/* Pointer into value */
+  int		ch,			/* Hex-encoded character */
+		schemelen;		/* Length of scheme name */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (buffer)
+    *buffer = '\0';
+
+  if (!ppd || !reason || (scheme && !*scheme) ||
+      !buffer || bufsize < PPD_MAX_TEXT)
+    return (NULL);
+
+ /*
+  * Get the default language...
+  */
+
+  ppd_ll_CC(ll_CC, ll);
+
+ /*
+  * Find the localized attribute...
+  */
+
+  if ((locattr = ppd_localized_attr(ppd, "cupsIPPReason", reason,
+                                    ll_CC, ll)) == NULL)
+    locattr = ppdFindAttr(ppd, "cupsIPPReason", reason);
+
+  if (!locattr)
+    return (NULL);
+
+ /*
+  * Now find the value we need...
+  */
+
+  bufend = buffer + bufsize - 1;
+
+  if (!scheme || !strcmp(scheme, "text"))
+  {
+   /*
+    * Copy a text value (either the translation text or text:... URIs from
+    * the value...
+    */
+
+    strlcpy(buffer, locattr->text, bufsize);
+
+    for (valptr = locattr->value, bufptr = buffer; *valptr && bufptr < bufend;)
+      if (!strncmp(valptr, "text:", 5))
+      {
+       /*
+        * Decode text: URI and add to the buffer...
+	*/
+
+	valptr += 5;
+
+        while (*valptr && !isspace(*valptr & 255) && bufptr < bufend)
+	{
+	  if (*valptr == '%' && isxdigit(valptr[1] & 255) &&
+	      isxdigit(valptr[2] & 255))
+	  {
+	   /*
+	    * Pull a hex-encoded character from the URI...
+	    */
+
+            valptr ++;
+
+	    if (isdigit(*valptr & 255))
+	      ch = (*valptr - '0') << 4;
+	    else
+	      ch = (tolower(*valptr) - 'a' + 10) << 4;
+	    valptr ++;
+
+	    if (isdigit(*valptr & 255))
+	      *bufptr++ = ch | (*valptr - '0');
+	    else
+	      *bufptr++ = ch | (tolower(*valptr) - 'a' + 10);
+	    valptr ++;
+	  }
+	  else if (*valptr == '+')
+	  {
+	    *bufptr++ = ' ';
+	    valptr ++;
+	  }
+	  else
+	    *bufptr++ = *valptr++;
+        }
+
+        while (isspace(*valptr & 255))
+	  valptr ++;
+      }
+
+    if (bufptr > buffer)
+      *bufptr = '\0';
+
+    return (buffer);
+  }
+  else
+  {
+   /*
+    * Copy a URI...
+    */
+
+    schemelen = strlen(scheme);
+    for (valptr = locattr->value, bufptr = buffer; *valptr && bufptr < bufend;)
+      if (!strncmp(valptr, scheme, schemelen) && valptr[schemelen] == ':')
+      {
+        while (*valptr && !isspace(*valptr & 255) && bufptr < bufend)
+	  *bufptr++ = *valptr++;
+
+	*bufptr = '\0';
+
+	return (buffer);
+      }
+
+    return (NULL);
+  }
+}
+
+
+/*
+ * 'ppd_ll_CC()' - Get the current locale names.
+ */
+
+static void
+ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
+          char *ll)			/* O - Generic locale name */
+          
+{
+  cups_lang_t	*lang;			/* Current language */
+
+
+ /*
+  * Get the current locale...
+  */
+
   if ((lang = cupsLangDefault()) == NULL)
-    return (-1);
+  {
+    strcpy(ll_CC, "en_US");
+    strcpy(ll, "en");
+    return;
+  }
+
+ /*
+  * Copy the locale name...
+  */
 
   strlcpy(ll_CC, lang->language, sizeof(ll_CC));
   strlcpy(ll, lang->language, sizeof(ll));
@@ -122,115 +402,21 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
     }
   }
 
-  DEBUG_printf(("    lang->language=\"%s\", ll=\"%s\", ll_CC=\"%s\"...\n",
+  DEBUG_printf(("ppd_ll_CC: lang->language=\"%s\", ll=\"%s\", ll_CC=\"%s\"...\n",
                 lang->language, ll, ll_CC));
-
- /*
-  * Now lookup all of the groups, options, choices, etc.
-  */
-
-  for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-  {
-    if ((text = ppd_text(ppd, "Translation", group->name, ll_CC, ll)) != NULL)
-      strlcpy(group->text, text, sizeof(group->text));
-
-    for (j = group->num_options, option = group->options; j > 0; j --, option ++)
-    {
-      if ((text = ppd_text(ppd, "Translation", option->keyword, ll_CC,
-                           ll)) != NULL)
-	strlcpy(option->text, text, sizeof(option->text));
-
-      for (k = option->num_choices, choice = option->choices;
-           k > 0;
-	   k --, choice ++)
-      {
-        if (strcmp(choice->choice, "Custom"))
-	  text = ppd_text(ppd, option->keyword, choice->choice, ll_CC, ll);
-	else
-	{
-	  snprintf(ckeyword, sizeof(ckeyword), "Custom%s", option->keyword);
-
-	  text = ppd_text(ppd, ckeyword, "True", ll_CC, ll);
-	}
-
-        if (text)
-	  strlcpy(choice->text, text, sizeof(choice->text));
-      }
-    }
-  }
-
- /*
-  * Translate any custom parameters...
-  */
-
-  for (coption = (ppd_coption_t *)cupsArrayFirst(ppd->coptions);
-       coption;
-       coption = (ppd_coption_t *)cupsArrayNext(ppd->coptions))
-  {
-    for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
-	 cparam;
-	 cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
-    {
-      snprintf(ckeyword, sizeof(ckeyword), "ParamCustom%s", coption->keyword);
-
-      if ((text = ppd_text(ppd, ckeyword, cparam->name, ll_CC, ll)) != NULL)
-        strlcpy(cparam->text, text, sizeof(cparam->text));
-    }
-  }
-
- /*
-  * Translate ICC profile names...
-  */
-
-  if ((attr = ppdFindAttr(ppd, "APCustomColorMatchingName", NULL)) != NULL)
-  {
-    if ((text = ppd_text(ppd, "APCustomColorMatchingName", attr->spec,
-                         ll_CC, ll)) != NULL)
-      strlcpy(attr->text, text, sizeof(attr->text));
-  }
-
-  for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
-       attr;
-       attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
-  {
-    cupsArraySave(ppd->sorted_attrs);
-
-    if ((text = ppd_text(ppd, "cupsICCProfile", attr->spec, ll_CC, ll)) != NULL)
-      strlcpy(attr->text, text, sizeof(attr->text));
-
-    cupsArrayRestore(ppd->sorted_attrs);
-  }
-
- /*
-  * Translate printer presets...
-  */
-
-  for (attr = ppdFindAttr(ppd, "APPrinterPreset", NULL);
-       attr;
-       attr = ppdFindNextAttr(ppd, "APPrinterPreset", NULL))
-  {
-    cupsArraySave(ppd->sorted_attrs);
-
-    if ((text = ppd_text(ppd, "APPrinterPreset", attr->spec, ll_CC, ll)) != NULL)
-      strlcpy(attr->text, text, sizeof(attr->text));
-
-    cupsArrayRestore(ppd->sorted_attrs);
-  }
-
-  return (0);
 }
 
 
 /*
- * 'ppd_text()' - Find the localized text as needed...
+ * 'ppd_localized_attr()' - Find a localized attribute.
  */
 
-static const char *			/* O - Localized text or NULL */
-ppd_text(ppd_file_t *ppd,		/* I - PPD file */
-         const char *keyword,		/* I - Main keyword */
-         const char *spec,		/* I - Option keyword */
-	 const char *ll_CC,		/* I - Language + country locale */
-	 const char *ll)		/* I - Language locale */
+static ppd_attr_t *			/* O - Localized attribute or NULL */
+ppd_localized_attr(ppd_file_t *ppd,	/* I - PPD file */
+		   const char *keyword,	/* I - Main keyword */
+		   const char *spec,	/* I - Option keyword */
+		   const char *ll_CC,	/* I - Language + country locale */
+		   const char *ll)	/* I - Language locale */
 {
   char		lkeyword[PPD_MAX_NAME];	/* Localization keyword */
   ppd_attr_t	*attr;			/* Current attribute */
@@ -272,11 +458,7 @@ ppd_text(ppd_file_t *ppd,		/* I - PPD file */
     puts("    NOT FOUND");
 #endif /* DEBUG */
 
- /*
-  * Return text if we find it...
-  */
-
-  return (attr ? attr->text : NULL);
+  return (attr);
 }
 
 
