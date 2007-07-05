@@ -818,6 +818,8 @@ list_ppds(int        request_id,	/* I - Request ID */
       type_str = NULL;
     }
   }
+  else
+    type = 0;
 
   if (requested)
     fprintf(stderr, "DEBUG: [cups-driverd] requested-attributes=\"%s\"\n",
