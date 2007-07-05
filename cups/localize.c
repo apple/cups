@@ -280,6 +280,9 @@ ppdLocalizeIPPReason(
         * Decode text: URI and add to the buffer...
 	*/
 
+        if (bufptr > buffer)
+	  *bufptr++ = ' ';		/* Add leading whitespace */
+
 	valptr += 5;
 
         while (*valptr && !isspace(*valptr & 255) && bufptr < bufend)
