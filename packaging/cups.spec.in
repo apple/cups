@@ -372,6 +372,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/accept.8.gz
 /usr/share/man/man8/cupsaddsmb.8.gz
+/usr/share/man/man8/cupsctl.8.gz
 /usr/share/man/man8/cupsd.8.gz
 /usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz

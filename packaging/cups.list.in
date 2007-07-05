@@ -282,6 +282,7 @@ l 0755 root sys $LIBDIR/lpadmin $SBINDIR/lpadmin
 l 0755 root sys $LIBDIR/reject accept
 f 0755 root sys $SBINDIR/accept systemv/accept
 f 0755 root sys $SBINDIR/cupsaddsmb systemv/cupsaddsmb
+f 0755 root sys $SBINDIR/cupsctl systemv/cupsctl
 f 0755 root sys $SBINDIR/lpadmin systemv/lpadmin
 f 0755 root sys $SBINDIR/lpc berkeley/lpc
 f 0755 root sys $SBINDIR/lpinfo systemv/lpinfo
@@ -630,6 +631,7 @@ f 0644 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT man/accept.$MAN8EXT
 l 0644 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsaddsmb.$MAN8EXT man/cupsaddsmb.$MAN8EXT
+f 0644 root sys $AMANDIR/man$MAN8DIR/cupsctl.$MAN8EXT man/cupsctl.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cups-polld.$MAN8EXT man/cups-polld.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsd.$MAN8EXT man/cupsd.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsenable.$MAN8EXT man/cupsenable.$MAN8EXT

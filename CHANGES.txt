@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
 	  STR #2263, STR #2356, STR #2397)
+	- Added a new cupsctl command for doing basic changes to
+	  the cupsd.conf file (STR #1777)
 	- Added a new ppdLocalizeIPPReason() function to get the
 	  localized text/URI for a given IPP reason keyword for a
 	  driver.
