@@ -1826,8 +1826,14 @@ read_snmp_conf(const char *address)	/* I - Single address to probe */
 
   if (cupsArrayCount(Addresses) == 0)
   {
-    fputs("INFO: Using default SNMP Address @LOCAL\n", stderr);
-    add_array(Addresses, "@LOCAL");
+   /*
+    * If we have no addresses, exit immediately...
+    */
+
+    fprintf(stderr,
+            "DEBUG: No address specified and no Address line in %s...\n",
+	    filename);
+    exit(0);
   }
 
   if (cupsArrayCount(Communities) == 0)

@@ -309,6 +309,26 @@ else
 fi
 AC_SUBST(DEFAULT_RAW_PRINTING)
 
+dnl Default SNMP options...
+AC_ARG_WITH(snmp-address, [  --with-snmp-address     set SNMP query address, default=auto ],
+	if test "x$withval" = x; then
+		CUPS_SNMP_ADDRESS=""
+	else
+		CUPS_SNMP_ADDRESS="Address $withval"
+	fi,
+	if test "x$uname" = xDarwin; then
+		CUPS_SNMP_ADDRESS=""
+	else
+		CUPS_SNMP_ADDRESS="Address @LOCAL"
+	fi)
+
+AC_ARG_WITH(snmp-community, [  --with-snmp-community   set SNMP community, default=public ],
+	CUPS_SNMP_COMMUNITY="Community $withval",
+	CUPS_SNMP_COMMUNITY="Community public")
+
+AC_SUBST(CUPS_SNMP_ADDRESS)
+AC_SUBST(CUPS_SNMP_COMMUNITY)
+
 dnl
 dnl End of "$Id$".
 dnl

@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.3
 
 	- Documentation updates (STR #1775, STR #2130, STR #2131,
 	  STR #2263, STR #2356, STR #2397)
+	- The SNMP backend no longer adds a default Address line
+	  when none is specified in the snmp.conf file; this allows
+	  the backend to be easily disabled as needed (STR #2434)
 	- Added a new cupsctl command for doing basic changes to
 	  the cupsd.conf file (STR #1777)
 	- Added a new ppdLocalizeIPPReason() function to get the
