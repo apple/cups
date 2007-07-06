@@ -1386,9 +1386,14 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     return (NULL);
   }
 
-  if (!check_quotas(con, printer))
+  if ((i = check_quotas(con, printer)) < 0)
   {
     send_ipp_status(con, IPP_NOT_POSSIBLE, _("Quota limit reached."));
+    return (NULL);
+  }
+  else if (i == 0)
+  {
+    send_ipp_status(con, IPP_NOT_AUTHORIZED, _("Not allowed to print."));
     return (NULL);
   }
 
@@ -3533,7 +3538,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 		      "quota limit exceeded.",
 		      username, p->name, p->info);
       q->page_count = 2; /* force quota exceeded failure */
-      return (0);
+      return (-1);
     }
     else if (q->page_count == -2) /* quota disabled for user */
     {
@@ -3542,7 +3547,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 		      "printing disabled for user.",
 		      username, p->name, p->info);
       q->page_count = 2; /* force quota exceeded failure */
-      return (0);
+      return (-1);
     }
     else if (q->page_count == -1) /* quota access error */
     {
@@ -3551,7 +3556,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 		      "unable to determine quota limit.",
 		      username, p->name, p->info);
       q->page_count = 2; /* force quota exceeded failure */
-      return (0);
+      return (-1);
     }
     else if (q->page_count < 0) /* user not found or other error */
     {
@@ -3560,7 +3565,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 		      "user disabled / missing quota.",
 		      username, p->name, p->info);
       q->page_count = 2; /* force quota exceeded failure */
-      return (0);
+      return (-1);
     }
     else /* page within user limits */
     {
@@ -3577,7 +3582,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to allocate quota data for user \"%s\"!",
                       username);
-      return (0);
+      return (-1);
     }
 
     if ((q->k_count >= p->k_limit && p->k_limit) ||
@@ -3585,7 +3590,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
     {
       cupsdLogMessage(CUPSD_LOG_INFO, "User \"%s\" is over the quota limit...",
                       username);
-      return (0);
+      return (-1);
     }
   }
 
