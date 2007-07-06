@@ -84,7 +84,7 @@ application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				 contains(0,4096,"LANGUAGE = POSTSCRIPT") \
 				 (contains(0,4096,<0a>%!) + \
 				  !contains(0,4096,"ENTER LANGUAGE")))
-application/vnd.hp-HPGL		hpgl string(0,<1B>&)\
+application/vnd.hp-HPGL		hpgl \
 				string(0,<1B>E<1B>%0B) \
 				string(0,<1B>%-1B) string(0,<201B>)\
 				string(0,BP;) string(0,IN;) string(0,DF;) \
