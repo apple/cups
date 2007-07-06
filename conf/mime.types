@@ -105,7 +105,7 @@ image/jpeg			jpeg jpg jpe string(0,<FFD8FF>) &&\
 				 char(3,0xe4) char(3,0xe5) char(3,0xe6) char(3,0xe7)\
 				 char(3,0xe8) char(3,0xe9) char(3,0xea) char(3,0xeb)\
 				 char(3,0xec) char(3,0xed) char(3,0xee) char(3,0xef))
-image/tiff			tiff tif string(0,MM) string(0,II)
+image/tiff			tiff tif string(0,MM<002A>) string(0,II<2A00>)
 image/x-photocd			pcd string(2048,PCD_IPI)
 image/x-portable-anymap		pnm
 image/x-portable-bitmap		pbm string(0,P1) string(0,P4)
