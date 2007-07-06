@@ -183,7 +183,9 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
   {
     bufptr = buf;
     while ((ch = getc(fp)) != ';')
-      if (bufptr < (buf + sizeof(buf) - 1))
+      if (ch == EOF)
+        break;
+      else if (bufptr < (buf + sizeof(buf) - 1))
         *bufptr++ = ch;
     *bufptr = '\0';
 
@@ -195,6 +197,10 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
   while (!done)
     switch (ch = getc(fp))
     {
+      case EOF :
+          done = 1;
+          break;
+
       case ',' :
       case ' ' :
       case '\n' :
