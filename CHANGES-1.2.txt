@@ -3,6 +3,23 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.12
 
+	- The image/tiff file matching rule incorrectly identified
+	  some text files as TIFF files (STR #2431)
+	- The filter(7) man page incorrectly documented the
+	  "PAGE: total #-pages" message (STR #2427)
+	- PCL text files were mis-identified as HP-GL/2 and
+	  caused the HP-GL/2 filter to hang (STR #2423)
+	- When printing to a queue with user ACLs, the scheduler
+	  incorrectly returned a quota error instead of a "not
+	  allowed to print" error (STR #2409)
+	- cupsaddsmb could get in a loop if no printer drivers
+	  were installed (STR #2407)
+	- cupsRasterReadHeader() did not byte-swap the header
+	  properly when compiled with certain versions of GCC.
+	- The IPP backend did not send the document-format
+	  attribute for filtered jobs (STR #2411)
+	- Some PPD files could cause a crash in ppdOpen2 (STR
+	  #2408)
 	- The web admin interface incorrectly handled the "share
 	  printers" and "show remote printers" settings (STR
 	  #2393)
