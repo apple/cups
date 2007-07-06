@@ -3,7 +3,7 @@
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 1997-2006 by Easy Software Products.
+.\"   Copyright 1997-2007 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Easy Software Products and are protected by Federal
@@ -21,7 +21,7 @@
 .\"       EMail: cups-info@cups.org
 .\"         WWW: http://www.cups.org
 .\"
-.TH filter 7 "Common UNIX Printing System" "23 March 2006" "Easy Software Products"
+.TH filter 7 "Common UNIX Printing System" "6 July 2007" "Easy Software Products"
 .SH NAME
 filter \- cups file conversion filter interface
 .SH SYNOPSIS
@@ -104,7 +104,7 @@ message to the current \fIErrorLog\fR using the "notice" log level.
 .TP 5
 PAGE: page-number #-copies
 .TP 5
-PAGE: #-pages total
+PAGE: total #-pages
 .br
 Adds an entry to the current \fIPageLog\fR. The first form adds
 #-copies to the job-media-sheets-completed attribute. The second
