@@ -1,0 +1,7 @@
+# DO NOT DELETE
+
+po2strings.o: ../cups/i18n.h ../cups/transcode.h ../cups/language.h
+po2strings.o: ../cups/array.h
+translate.o: ../cups/string.h ../config.h ../cups/file.h ../cups/http.h
+translate.o: ../cups/i18n.h ../cups/transcode.h ../cups/language.h
+translate.o: ../cups/array.h

@@ -25,11 +25,15 @@
 include ../Makedefs
 
 
+OBJS	=	po2strings.o strings2po.o translate.o
+TARGETS	=	po2strings strings2po translate
+
+
 #
 # Make everything...
 #
 
-all:	translate
+all:	$(TARGETS)
 
 
 #
@@ -37,14 +41,15 @@ all:	translate
 #
 
 clean:
-	$(RM) translate translate.o
+	$(RM) $(TARGETS) $(OBJS)
 
 
 #
-# Update dependencies...
+# Update dependencies (without system header dependencies...)
 #
 
 depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
 
 
 #
@@ -98,6 +103,30 @@ pot:
 
 
 #
+# po2strings - A simple utility which uses iconv to convert GNU gettext
+#              message catalogs to Mac OS X .strings files.
+#
+# po2strings filename.po filename.strings
+#
+
+po2strings:	po2strings.o ../cups/$(LIBCUPS)
+	echo Linking $<...
+	$(CC) $(LDFLAGS) -o po2strings po2strings.o $(LIBS)
+
+
+#
+# strings2po - A simple utility which uses iconv to convert Mac OS X
+#              .strings files to GNU gettext message catalogs.
+#
+# strings2po filename.strings filename.po
+#
+
+strings2po:	strings2po.o
+	echo Linking $<...
+	$(CC) $(LDFLAGS) -o strings2po strings2po.o
+
+
+#
 # translate - A simple utility which uses Google to translate the cups.pot
 #             file to one of several languages.
 #
@@ -108,7 +137,12 @@ translate:	translate.o ../cups/$(LIBCUPS)
 	echo Linking $<...
 	$(CC) $(LDFLAGS) -o translate translate.o $(LIBS)
 
-translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
+
+#
+# Dependencies...
+#
+  
+include Dependencies
 
 
 #
