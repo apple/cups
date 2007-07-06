@@ -263,6 +263,9 @@ export_dest(http_t     *http,		/* I - Connection to server */
     status = cupsAdminExportSamba(dest, ppdfile, SAMBAServer,
                                   SAMBAUser, SAMBAPassword,
 				  Verbosity ? stderr : NULL);
+
+    if (!status && cupsLastError() == IPP_NOT_FOUND)
+      break;
   }
 
   unlink(ppdfile);

@@ -676,12 +676,15 @@ cupsAdminExportSamba(
 				"are installed!")),
               sizeof(message));
 
-    _cupsSetError(IPP_INTERNAL_ERROR, message);
+    _cupsSetError(IPP_NOT_FOUND, message);
     _cupsLangPrintf(logfile, "%s\n", message);
   }
 
   if (have_drivers == 0)
+  {
+    _cupsSetError(IPP_NOT_FOUND, message);
     return (0);
+  }
 
  /*
   * Finally, associate the drivers we just added with the queue...
