@@ -23,12 +23,15 @@ dnl       EMail: cups-info@cups.org
 dnl         WWW: http://www.cups.org
 dnl
 
-dnl Default langugages...
-AC_ARG_WITH(languages, [  --with-languages        set installed languages, default="de es et fr he it ja pl sv zh_TW" ],
-	if test "x$withval" != xno; then
-		LANGUAGES="$withval"
-	fi,
-	LANGUAGES="de es et fr he it ja pl sv zh_TW")
+dnl Default languages...
+LANGUAGES="`ls -1 locale/*.po | sed -e '1,$s/locale\/cups_//' -e '1,$s/\.po//' | tr '\n' ' '`"
+
+AC_ARG_WITH(languages, [  --with-languages        set installed languages, default=all ],[
+	case "$withval" in
+		none | no) LANGUAGES="" ;;
+		all) ;;
+		*) LANGUAGES="$withval" ;;
+	esac])
 AC_SUBST(LANGUAGES)
 
 dnl Default ConfigFilePerm
