@@ -9,15 +9,17 @@
  *
  * Compile with:
  *
- *   gcc -o po2strings po2strings.c
+ *   gcc -o po2strings po2strings.c `cups-config --libs`
  *
  * Contents:
  *
- *   main() - Convert .po file to .strings.
+ *   main()         - Convert .po file to .strings.
+ *   write_string() - Write a string to the .strings file.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <cups/i18n.h>
 
 
 /*
@@ -34,137 +36,106 @@
  * Local functions...
  */
 
-static int	read_strings(FILE *strings, char *buffer, size_t bufsize,
-		             char **id, char **str);
-static void	write_po(FILE *po, const char *what, const char *s);
+static void	write_string(FILE *strings, const char *s);
 
 
 /*
- *   main() - Convert .strings file to .po.
+ *   main() - Convert .po file to .strings.
  */
 
 int					/* O - Exit code */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  FILE	*strings,			/* .strings file */
-	*po;				/* .po file */
-  char	iconv[1024],			/* iconv command */
-	buffer[8192],			/* Line buffer */
-	*id,				/* ID string */
-	*str;				/* Translation string */
-  int	count;				/* Number of messages converted */
+  FILE			*strings;	/* .strings file */
+  cups_array_t		*po;		/* .po file */
+  char			iconv[1024];	/* iconv command */
+  _cups_message_t	*msg;		/* Current message */
 
 
   if (argc != 3)
   {
-    puts("Usage: strings2po filename.strings filename.po");
+    puts("Usage: po2strings filename.po filename.strings");
     return (1);
   }
 
  /*
-  * Cheat by using iconv to convert the .strings file from UTF-16 to UTF-8
-  * which is what we need for the .po file (and it makes things a lot
-  * simpler...)
+  * Use the CUPS .po loader to get the message strings...
   */
 
-  snprintf(iconv, sizeof(iconv), "iconv -f utf-16 -t utf-8 '%s'", argv[1]);
-  if ((strings = popen(iconv, "r")) == NULL)
+  if ((po = _cupsMessageLoad(argv[1])) == NULL)
   {
     perror(argv[1]);
     return (1);
   }
 
-  if ((po = fopen(argv[2], "w")) == NULL)
+ /*
+  * Cheat by using iconv to write the .strings file with a UTF-16 encoding.
+  * The .po file uses UTF-8...
+  */
+
+  snprintf(iconv, sizeof(iconv), "iconv -f utf-8 -t utf-16 >'%s'", argv[2]);
+  if ((strings = popen(iconv, "w")) == NULL)
   {
     perror(argv[2]);
-    pclose(strings);
+    _cupsMessageFree(po);
     return (1);
   }
 
-  count = 0;
-
-  while (read_strings(strings, buffer, sizeof(buffer), &id, &str))
+  for (msg = (_cups_message_t *)cupsArrayFirst(po);
+       msg;
+       msg = (_cups_message_t *)cupsArrayNext(po))
   {
-    count ++;
-    write_po(po, "msgid", id);
-    write_po(po, "msgstr", str);
+    write_string(strings, msg->id);
+    fputs(" = ", strings);
+    write_string(strings, msg->str);
+    fputs(";\n", strings);
   }
+
+  printf("%s: %d messages.\n", argv[2], cupsArrayCount(po));
 
   pclose(strings);
-  fclose(po);
-
-  printf("%s: %d messages.\n", argv[2], count);
+  _cupsMessageFree(po);
 
   return (0);
 }
 
 
 /*
- * 'read_strings()' - Read a line from a .strings file.
- */
-
-static int				/* O - 1 on success, 0 on failure */
-read_strings(FILE   *strings,		/* I - .strings file */
-             char   *buffer,		/* I - Line buffer */
-	     size_t bufsize,		/* I - Size of line buffer */
-             char   **id,		/* O - Pointer to ID string */
-	     char   **str)		/* O - Pointer to translation string */
-{
-  char	*bufptr;			/* Pointer into buffer */
-
-
-  while (fgets(buffer, bufsize, strings))
-  {
-    if (buffer[0] != '\"')
-      continue;
-
-    *id = buffer + 1;
-
-    for (bufptr = buffer + 1; *bufptr && *bufptr != '\"'; bufptr ++)
-      if (*bufptr == '\\')
-        bufptr ++;
-
-    if (*bufptr != '\"')
-      continue;
-
-    *bufptr++ = '\0';
-
-    while (*bufptr && *bufptr != '\"')
-      bufptr ++;
-
-    if (!*bufptr)
-      continue;
-
-    bufptr ++;
-    *str = bufptr;
-
-    for (; *bufptr && *bufptr != '\"'; bufptr ++)
-      if (*bufptr == '\\')
-        bufptr ++;
-
-    if (*bufptr != '\"')
-      continue;
-
-    *bufptr++ = '\0';
-
-    return (1);
-  }
-
-  return (0);
-}
-
-
-/*
- * 'write_po()' - Write a line to the .po file.
+ * 'write_string()' - Write a string to the .strings file.
  */
 
 static void
-write_po(FILE       *po,		/* I - .po file */
-         const char *what,		/* I - Type of string */
-	 const char *s)			/* I - String to write */
+write_string(FILE       *strings,	/* I - .strings file */
+             const char *s)		/* I - String to write */
 {
-  fprintf(po, "%s \"%s\"\n", what, s);
+  putc('\"', strings);
+
+  while (*s)
+  {
+    switch (*s)
+    {
+      case '\n' :
+          fputs("\\n", strings);
+	  break;
+      case '\t' :
+          fputs("\\t", strings);
+	  break;
+      case '\\' :
+          fputs("\\\\", strings);
+	  break;
+      case '\"' :
+          fputs("\\\"", strings);
+	  break;
+      default :
+          putc(*s, strings);
+	  break;
+    }
+
+    s ++;
+  }
+
+  putc('\"', strings);
 }
 
 

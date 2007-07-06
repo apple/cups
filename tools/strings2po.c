@@ -13,7 +13,9 @@
  *
  * Contents:
  *
- *   main() - Convert .strings file to .po.
+ *   main()         - Convert .strings file to .po.
+ *   read_strings() - Read a line from a .strings file.
+ *   write_po()     - Write a line to the .po file.
  */
 
 #include <stdio.h>
