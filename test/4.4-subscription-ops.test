@@ -35,8 +35,8 @@
 	# The name of the test...
 	NAME "Verify Subscription Expiration"
 
-	# Delay test for 6 seconds to allow lease to expire...
-	DELAY 6
+	# Delay test for 7 seconds to allow lease to expire...
+	DELAY 7
 
 	# The operation to use
 	OPERATION Get-Subscription-Attributes

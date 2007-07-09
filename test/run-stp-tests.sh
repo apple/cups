@@ -268,6 +268,23 @@ if test $ssltype != 0; then
 fi
 
 #
+# Mac OS X filters and configuration files...
+#
+
+if test `uname` = Darwin; then
+	ln -s /usr/libexec/cups/filter/cgpdfto* /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/nsimagetopdf /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/nstexttopdf /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/pictwpstops /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/pstoappleps /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/pstocupsraster /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/pstopdffilter /tmp/cups-$user/bin/filter
+
+	ln -s /private/etc/cups/apple.* /tmp/cups-$user
+fi
+
+
+#
 # Then create the necessary config files...
 #
 
@@ -298,7 +315,7 @@ MaxLogSize 0
 AccessLog /tmp/cups-$user/log/access_log
 ErrorLog /tmp/cups-$user/log/error_log
 PageLog /tmp/cups-$user/log/page_log
-LogLevel debug2
+LogLevel debug
 PreserveJobHistory Yes
 <Policy default>
 <Limit All>

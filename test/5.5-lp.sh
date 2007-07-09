@@ -38,7 +38,7 @@ echo ""
 echo "LP Destination Test"
 echo ""
 echo "    lp -d Test1 testfile.jpg"
-../systemv/lp -d Test1 testfile.jpg 2>&1
+../systemv/lp -d Test1 -o job-hold-until=indefinite testfile.jpg 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
