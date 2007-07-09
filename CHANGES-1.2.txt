@@ -3,6 +3,8 @@ CHANGES-1.2.txt
 
 CHANGES IN CUPS V1.2.12
 
+	- The PHP cups_print_file() function crashed if the options
+	  array contained non-string option values (STR #2430)
 	- The image/tiff file matching rule incorrectly identified
 	  some text files as TIFF files (STR #2431)
 	- The filter(7) man page incorrectly documented the
