@@ -1044,11 +1044,11 @@ cupsdReadConfiguration(void)
 		      "CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class "
 		      "CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
-      cupsdLogMessage(CUPSD_LOG_INFO, "AuthType Basic");
+      cupsdLogMessage(CUPSD_LOG_INFO, "AuthType Default");
 
       po = cupsdAddPolicyOp(p, NULL, IPP_PAUSE_PRINTER);
       po->order_type = AUTH_ALLOW;
-      po->type       = AUTH_BASIC;
+      po->type       = DefaultAuthType;
       po->level      = AUTH_USER;
 
       cupsdAddName(po, "@SYSTEM");
@@ -1720,7 +1720,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
   else if (!strcasecmp(line, "AuthType"))
   {
    /*
-    * AuthType {none,basic,digest,basicdigest}
+    * AuthType {none,basic,digest,basicdigest,negotiate,default}
     */
 
     if (!strcasecmp(value, "none"))
@@ -1745,6 +1745,13 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     else if (!strcasecmp(value, "basicdigest"))
     {
       loc->type = AUTH_BASICDIGEST;
+
+      if (loc->level == AUTH_ANON)
+	loc->level = AUTH_USER;
+    }
+    else if (!strcasecmp(value, "default"))
+    {
+      loc->type = DefaultAuthType;
 
       if (loc->level == AUTH_ANON)
 	loc->level = AUTH_USER;
@@ -2758,7 +2765,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
     else if (!strcasecmp(line, "DefaultAuthType"))
     {
      /*
-      * DefaultAuthType {basic,digest,basicdigest}
+      * DefaultAuthType {basic,digest,basicdigest,negotiate}
       */
 
       if (!strcasecmp(value, "basic"))

@@ -40,7 +40,7 @@ function reset_config()
 "\\n" +
 "# Restrict access to configuration files...\\n" +
 "<Location /admin/conf>\\n" +
-"  AuthType Basic\\n" +
+"  AuthType Default\\n" +
 "  Require user @SYSTEM\\n" +
 "  Order allow,deny\\n" +
 "  Allow localhost\\n" +
@@ -56,7 +56,7 @@ function reset_config()
 "\\n" +
 "  # All administration operations require an adminstrator to authenticate...\\n" +
 "  <Limit Pause-Printer Resume-Printer Set-Printer-Attributes Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After CUPS-Add-Printer CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>\\n" +
-"    AuthType Basic\\n" +
+"    AuthType Default\\n" +
 "    Require user @SYSTEM\\n" +
 "    Order deny,allow\\n" +
 "  </Limit>\\n" +
