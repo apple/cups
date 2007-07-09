@@ -79,5 +79,13 @@ uninstall:
 
 
 #
+# Update PPD files...
+#
+
+ppds:
+	ppdc -d . -l `echo $(LANGUAGES) | tr ' ' ','` sample.drv
+
+
+#
 # End of "$Id$".
 #

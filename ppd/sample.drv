@@ -346,7 +346,7 @@ Version "1.3"
     *Resolution k 1 0 0 0 300dpi
     Resolution k 1 0 0 0 600dpi
 
-    *InputSlot 0 Default
+    *InputSlot 0 "Default/Printer Default"
     InputSlot 8 "Tray1/Tray 1"
     InputSlot 1 "Tray2/Tray 2"
     InputSlot 4 "Tray3/Tray 3"
@@ -386,7 +386,7 @@ Version "1.3"
 
   Group "PrinterSettings/Printer Settings"
     Option "inPrintDensity/Print Density" PickOne DocumentSetup 20.0
-      *Choice "Default/PrinterDefault" "<</cupsCompression -1>>setpagedevice"
+      *Choice "Default/Printer Default" "<</cupsCompression -1>>setpagedevice"
       Choice "-15/-15" "<</cupsCompression 0>>setpagedevice"
       Choice "-14/-14" "<</cupsCompression 3>>setpagedevice"
       Choice "-13/-13" "<</cupsCompression 6>>setpagedevice"
@@ -419,7 +419,7 @@ Version "1.3"
       Choice "14/14" "<</cupsCompression 96>>setpagedevice"
       Choice "15/15" "<</cupsCompression 100>>setpagedevice"
     Option "inPrintRate/Print Speed" PickOne DocumentSetup 20.0
-      *Choice "Default/PrinterDefault" "<</cupsRowFeed 0>>setpagedevice"
+      *Choice "Default/Printer Default" "<</cupsRowFeed 0>>setpagedevice"
       Choice "15/15 mm/sec." "<</cupsRowFeed 15>>setpagedevice"
       Choice "20/20 mm/sec." "<</cupsRowFeed 20>>setpagedevice"
       Choice "30/30 mm/sec." "<</cupsRowFeed 30>>setpagedevice"
@@ -547,14 +547,14 @@ Version "1.3"
     *Resolution k 1 0 0 0 203dpi
 
     Group "General/General"
-      Option "zeMediaTracking/MediaSize Tracking" PickOne AnySetup 20.0
+      Option "zeMediaTracking/Media Tracking" PickOne AnySetup 20.0
 	Choice "Continuous/Continuous" ""
 	*Choice "Web/Non-continuous (Web sensing)" ""
 	Choice "Mark/Non-continuous (Mark sensing)" ""
 
     Group "PrinterSettings/Printer Settings"
-      Option "Darkness/MediaSize Darkness" PickOne AnySetup 20.0
-	*Choice "-1/PrinterDefault" "<</cupsCompression -1>>setpagedevice"
+      Option "Darkness" PickOne AnySetup 20.0
+	*Choice "-1/Printer Default" "<</cupsCompression -1>>setpagedevice"
 	Choice "1/1" "<</cupsCompression 4>>setpagedevice"
 	Choice "2/2" "<</cupsCompression 7>>setpagedevice"
 	Choice "3/3" "<</cupsCompression 10>>setpagedevice"
@@ -586,13 +586,13 @@ Version "1.3"
 	Choice "29/29" "<</cupsCompression 97>>setpagedevice"
 	Choice "30/30" "<</cupsCompression 100>>setpagedevice"
       Option "zePrintRate/Print Rate" PickOne AnySetup 20.0
-	*Choice "Default/PrinterDefault" ""
+	*Choice "Default/Printer Default" ""
 	Choice "1/1 inch/sec." ""
 	Choice "2/2 inches/sec." ""
 	Choice "3/3 inches/sec." ""
 	Choice "4/4 inches/sec." ""
-      Option "zeTearOffPosition/Tear-off Adjust Position" PickOne AnySetup 20.0
-	*Choice "1000/PrinterDefault" "<</AdvanceDistance 1000>>setpagedevice"
+      Option "zeTearOffPosition/Tear-Off Adjust Position" PickOne AnySetup 20.0
+	*Choice "1000/Printer Default" "<</AdvanceDistance 1000>>setpagedevice"
 	Choice "-120/-120" "<</AdvanceDistance -120>>setpagedevice"
 	Choice "-115/-115" "<</AdvanceDistance -115>>setpagedevice"
 	Choice "-110/-110" "<</AdvanceDistance -110>>setpagedevice"
@@ -643,7 +643,7 @@ Version "1.3"
 	Choice "115/115" "<</AdvanceDistance 115>>setpagedevice"
 	Choice "120/120" "<</AdvanceDistance 120>>setpagedevice"
       Option "zeErrorReprint/Reprint After Error" PickOne AnySetup 20.0
-	*Choice "Saved/PrinterDefault" ""
+	*Choice "Saved/Printer Default" ""
 	Choice "Always/Always" ""
 	Choice "Never/Never" ""
   }
@@ -705,8 +705,8 @@ Version "1.3"
     Resolution k 1 0 0 0 600dpi
 
     Group "PrinterSettings/Printer Settings"
-      Option "Darkness/MediaSize Darkness" PickOne AnySetup 20.0
-	*Choice "-1/PrinterDefault" "<</cupsCompression -1>>setpagedevice"
+      Option "Darkness" PickOne AnySetup 20.0
+	*Choice "-1/Printer Default" "<</cupsCompression -1>>setpagedevice"
 	Choice "1/1" "<</cupsCompression 4>>setpagedevice"
 	Choice "2/2" "<</cupsCompression 7>>setpagedevice"
 	Choice "3/3" "<</cupsCompression 10>>setpagedevice"
@@ -738,7 +738,7 @@ Version "1.3"
 	Choice "29/29" "<</cupsCompression 97>>setpagedevice"
 	Choice "30/30" "<</cupsCompression 100>>setpagedevice"
       Option "zePrintRate/Print Rate" PickOne AnySetup 20.0
-	*Choice "Default/PrinterDefault" ""
+	*Choice "Default/Printer Default" ""
 	Choice "1/1 inch/sec." ""
 	Choice "1.5/1.5 inch/sec." ""
 	Choice "2/2 inches/sec." ""
@@ -802,13 +802,13 @@ Version "1.3"
     Resolution k 1 0 0 0 600dpi
 
     Group "General/General"
-      Option "MediaType/MediaSize Type" PickOne AnySetup 20.0
-	*Choice "Saved/PrinterDefault" ""
+      Option "MediaType/Media Type" PickOne AnySetup 20.0
+	*Choice "Saved/Printer Default" ""
 	Choice "Thermal/Thermal Transfer Media" "<</MediaType(Thermal)>>setpagedevice"
 	Choice "Direct/Direct Thermal Media" "<</MediaType(Direct)>>setpagedevice"
     Group "PrinterSettings/Printer Settings"
-      Option "Darkness/MediaSize Darkness" PickOne AnySetup 20.0
-	*Choice "-1/PrinterDefault" "<</cupsCompression -1>>setpagedevice"
+      Option "Darkness" PickOne AnySetup 20.0
+	*Choice "-1/Printer Default" "<</cupsCompression -1>>setpagedevice"
 	Choice "1/1" "<</cupsCompression 4>>setpagedevice"
 	Choice "2/2" "<</cupsCompression 7>>setpagedevice"
 	Choice "3/3" "<</cupsCompression 10>>setpagedevice"
@@ -840,7 +840,7 @@ Version "1.3"
 	Choice "29/29" "<</cupsCompression 97>>setpagedevice"
 	Choice "30/30" "<</cupsCompression 100>>setpagedevice"
       Option "zePrintRate/Print Rate" PickOne AnySetup 20.0
-	*Choice "Default/PrinterDefault" ""
+	*Choice "Default/Printer Default" ""
 	Choice "1/1 inch/sec." ""
 	Choice "1.5/1.5 inch/sec." ""
 	Choice "2/2 inches/sec." ""
@@ -908,17 +908,17 @@ Version "1.3"
     Resolution k 1 0 0 0 600dpi
 
     Group "General/General"
-      Option "zeMediaTracking/MediaSize Tracking" PickOne AnySetup 20.0
+      Option "zeMediaTracking/Media Tracking" PickOne AnySetup 20.0
 	Choice "Continuous/Continuous" ""
 	*Choice "Web/Non-continuous (Web sensing)" ""
 	Choice "Mark/Non-continuous (Mark sensing)" ""
-      Option "MediaType/MediaSize Type" PickOne AnySetup 20.0
-	*Choice "Saved/PrinterDefault" ""
+      Option "MediaType/Media Type" PickOne AnySetup 20.0
+	*Choice "Saved/Printer Default" ""
 	Choice "Thermal/Thermal Transfer Media" "<</MediaType(Thermal)>>setpagedevice"
 	Choice "Direct/Direct Thermal Media" "<</MediaType(Direct)>>setpagedevice"
     Group "PrinterSettings/Printer Settings"
-      Option "Darkness/MediaSize Darkness" PickOne AnySetup 20.0
-	*Choice "-1/PrinterDefault" "<</cupsCompression -1>>setpagedevice"
+      Option "Darkness" PickOne AnySetup 20.0
+	*Choice "-1/Printer Default" "<</cupsCompression -1>>setpagedevice"
 	Choice "1/1" "<</cupsCompression 4>>setpagedevice"
 	Choice "2/2" "<</cupsCompression 7>>setpagedevice"
 	Choice "3/3" "<</cupsCompression 10>>setpagedevice"
@@ -950,7 +950,7 @@ Version "1.3"
 	Choice "29/29" "<</cupsCompression 97>>setpagedevice"
 	Choice "30/30" "<</cupsCompression 100>>setpagedevice"
       Option "zePrintRate/Print Rate" PickOne AnySetup 20.0
-	*Choice "Default/PrinterDefault" ""
+	*Choice "Default/Printer Default" ""
 	Choice "1/1 inch/sec." ""
 	Choice "2/2 inches/sec." ""
 	Choice "3/3 inches/sec." ""
@@ -964,7 +964,7 @@ Version "1.3"
 	Choice "11/11 inches/sec." ""
 	Choice "12/12 inches/sec." ""
       Option "zeLabelTop/Label Top" PickOne AnySetup 20.0
-	*Choice "200/PrinterDefault" "<</cupsRowStep 200>>setpagedevice"
+	*Choice "200/Printer Default" "<</cupsRowStep 200>>setpagedevice"
 	Choice "-120/-120" "<</cupsRowStep -120>>setpagedevice"
 	Choice "-115/-115" "<</cupsRowStep -115>>setpagedevice"
 	Choice "-110/-110" "<</cupsRowStep -110>>setpagedevice"
@@ -1015,14 +1015,14 @@ Version "1.3"
 	Choice "115/115" "<</cupsRowStep 115>>setpagedevice"
 	Choice "120/120" "<</cupsRowStep 120>>setpagedevice"
       Option "zePrintMode/Print Mode" PickOne AnySetup 20.0
-	*Choice "Saved/PrinterDefault" ""
-	Choice "Tear/Tear-off" ""
+	*Choice "Saved/Printer Default" ""
+	Choice "Tear/Tear-Off" ""
 	Choice "Peel/Peel-Off" ""
 	Choice "Rewind/Rewind" ""
 	Choice "Applicator/Applicator" ""
 	Choice "Cutter/Cutter" ""
-      Option "zeTearOffPosition/Tear-off Adjust Position" PickOne AnySetup 20.0
-	*Choice "1000/PrinterDefault" "<</AdvanceDistance 1000>>setpagedevice"
+      Option "zeTearOffPosition/Tear-Off Adjust Position" PickOne AnySetup 20.0
+	*Choice "1000/Printer Default" "<</AdvanceDistance 1000>>setpagedevice"
 	Choice "-120/-120" "<</AdvanceDistance -120>>setpagedevice"
 	Choice "-115/-115" "<</AdvanceDistance -115>>setpagedevice"
 	Choice "-110/-110" "<</AdvanceDistance -110>>setpagedevice"
@@ -1073,7 +1073,7 @@ Version "1.3"
 	Choice "115/115" "<</AdvanceDistance 115>>setpagedevice"
 	Choice "120/120" "<</AdvanceDistance 120>>setpagedevice"
       Option "zeErrorReprint/Reprint After Error" PickOne AnySetup 20.0
-	*Choice "Saved/PrinterDefault" ""
+	*Choice "Saved/Printer Default" ""
 	Choice "Always/Always" ""
 	Choice "Never/Never" ""
   }
