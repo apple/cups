@@ -414,17 +414,14 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (!print_fd)
   {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-    sigset(SIGTERM, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
+    struct sigaction	action;		/* POSIX signal action */
+
+
     memset(&action, 0, sizeof(action));
 
     sigemptyset(&action.sa_mask);
     action.sa_handler = SIG_IGN;
     sigaction(SIGTERM, &action, NULL);
-#else
-    signal(SIGTERM, SIG_IGN);
-#endif /* HAVE_SIGSET */
   }
 
  /*
@@ -1643,36 +1640,54 @@ static void run_ppc_backend(int argc,
 
   if (usb_ppc_status == NULL)
   {
-    /* Catch SIGTERM if we are _not_ printing data from
-     * stdin (otherwise you can't cancel raw jobs...)
-     */
+   /*
+    * Setup a SIGTERM handler then block it before forking...
+    */
 
-    if (fd != 0)
-    {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-      sigset(SIGTERM, sigterm_handler);
-#elif defined(HAVE_SIGACTION)
-      struct sigaction action;	/* Actions for POSIX signals */
-      memset(&action, 0, sizeof(action));
-      sigaddset(&action.sa_mask, SIGTERM);
-      action.sa_handler = sigterm_handler;
-      sigaction(SIGTERM, &action, NULL);
-#else
-      signal(SIGTERM, sigterm_handler);
-#endif /* HAVE_SIGSET */
-    }
+    struct sigaction	action;		/* POSIX signal action */
+    sigset_t		newmask,	/* New signal mask */
+			oldmask;	/* Old signal mask */
+
+    memset(&action, 0, sizeof(action));
+    sigaddset(&action.sa_mask, SIGTERM);
+    action.sa_handler = sigterm_handler;
+    sigaction(SIGTERM, &action, NULL);
+
+    sigemptyset(&newmask);
+    sigaddset(&newmask, SIGTERM);
+    sigprocmask(SIG_BLOCK, &newmask, &oldmask);
 
     if ((child_pid = fork()) == 0)
     {
-      /* Child comes here. */
+     /*
+      * Child comes here...
+      */
+
       setenv("USB_PPC_STATUS", "1", false);
 
-      /* Tell the kernel we want the next exec call to favor the ppc architecture... */
+     /*
+      * Unblock signals before doing the exec...
+      */
+
+      memset(&action, 0, sizeof(action));
+      sigemptyset(&action.sa_mask);
+      action.sa_handler = SIG_DFL;
+      sigaction(SIGTERM, &action, NULL);
+
+      sigprocmask(SIG_SETMASK, &oldmask, NULL);
+
+     /*
+      * Tell the kernel the next exec call should favor the ppc architecture...
+      */
+
       int mib[] = { CTL_KERN, KERN_AFFINITY, 1, 1 };
       int namelen = 4;
       sysctl(mib, namelen, NULL, NULL, NULL, 0);
 
-      /* Set up the arguments and call exec... */
+     /*
+      * Set up the arguments and call exec...
+      */
+
       for (i = 0; i < argc && i < (sizeof(my_argv)/sizeof(my_argv[0])) - 1; i++)
 	my_argv[i] = argv[i];
 
@@ -1680,41 +1695,48 @@ static void run_ppc_backend(int argc,
 
       execv("/usr/libexec/cups/backend/usb", my_argv);
 
-      fprintf(stderr, "DEBUG: execv: %s\n", strerror(errno));
-      exitstatus = errno;
+      perror("/usr/libexec/cups/backend/usb");
+      exit(errno);
     }
-    else if (child_pid > 0)
+    else if (child_pid < 0)
     {
-      /* Parent comes here.
-       *
-       * Close the fds we won't be using then wait for the child backend to exit.
-       */
-      close(fd);
-      close(1);
+     /*
+      * Error - couldn't fork a new process!
+      */
 
-      fprintf(stderr, "DEBUG: Started usb(ppc) backend (PID %d)\n", (int)child_pid);
+      perror("fork");
+      exit(errno);
+    }
 
-      while ((waitpid_status = waitpid(child_pid, &childstatus, 0)) == (pid_t)-1 && errno == EINTR)
-        usleep(1000);
+   /*
+    * Unblock signals...
+    */
 
-      if (WIFSIGNALED(childstatus))
-      {
-	exitstatus = WTERMSIG(childstatus);
-	fprintf(stderr, "DEBUG: usb(ppc) backend %d crashed on signal %d!\n", child_pid, exitstatus);
-      }
-      else
-      {
-	if ((exitstatus = WEXITSTATUS(childstatus)) != 0)
-	  fprintf(stderr, "DEBUG: usb(ppc) backend %d stopped with status %d!\n", child_pid, exitstatus);
-	else
-	  fprintf(stderr, "DEBUG: PID %d exited with no errors\n", child_pid);
-      }
+    sigprocmask(SIG_SETMASK, &oldmask, NULL);
+
+   /*
+    * Close the fds we won't be using then wait for the child backend to exit.
+    */
+
+    close(fd);
+    close(1);
+
+    fprintf(stderr, "DEBUG: Started usb(ppc) backend (PID %d)\n", (int)child_pid);
+
+    while ((waitpid_status = waitpid(child_pid, &childstatus, 0)) == (pid_t)-1 && errno == EINTR)
+      usleep(1000);
+
+    if (WIFSIGNALED(childstatus))
+    {
+      exitstatus = WTERMSIG(childstatus);
+      fprintf(stderr, "DEBUG: usb(ppc) backend %d crashed on signal %d!\n", child_pid, exitstatus);
     }
     else
     {
-      /* fork() error */
-      fprintf(stderr, "DEBUG: fork: %s\n", strerror(errno));
-      exitstatus = errno;
+      if ((exitstatus = WEXITSTATUS(childstatus)) != 0)
+	fprintf(stderr, "DEBUG: usb(ppc) backend %d stopped with status %d!\n", child_pid, exitstatus);
+      else
+	fprintf(stderr, "DEBUG: PID %d exited with no errors\n", child_pid);
     }
   }
   else
