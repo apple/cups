@@ -1664,6 +1664,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   char		uri[HTTP_MAX_URI];	/* URI for printer */
   char		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   char		filename[1024];		/* Name of PPD file */
+  int		num_air;		/* Number of auth-info-required values */
+  const char	* const *air;		/* auth-info-required values */
   int		num_media;		/* Number of media options */
   cupsd_location_t *auth;		/* Pointer to authentication element */
   const char	*auth_supported;	/* Authentication supported */
@@ -1685,6 +1687,19 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 		  "one-sided",
 		  "two-sided-long-edge",
 		  "two-sided-short-edge"
+		};
+  static const char * const air_userpass[] =
+		{			/* Basic/Digest authentication */
+		  "username",
+		  "password"
+		};
+  static const char * const air_negotiate[] =
+		{			/* Kerberos authentication */
+		  "negotiate"
+		};
+  static const char * const air_none[] =
+		{			/* No authentication */
+		  "none"
 		};
 
 
@@ -1709,7 +1724,20 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   */
 
   auth_supported = "requesting-user-name";
-  if (!(p->type & CUPS_PRINTER_DISCOVERED))
+  num_air        = 1;
+  air            = air_none;
+
+  if (p->num_auth_info_required > 0 && strcmp(p->auth_info_required[0], "none"))
+  {
+    num_air = p->num_auth_info_required;
+    air     = p->auth_info_required;
+
+    if (!strcmp(air[0], "username"))
+      auth_supported = "basic";
+    else
+      auth_supported = "negotiate";
+  }
+  else if (!(p->type & CUPS_PRINTER_DISCOVERED))
   {
     if (p->type & CUPS_PRINTER_CLASS)
       snprintf(resource, sizeof(resource), "/classes/%s", p->name);
@@ -1725,18 +1753,21 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       if (auth->type == AUTH_BASIC || auth->type == AUTH_BASICDIGEST)
       {
 	auth_supported = "basic";
-	cupsdSetAuthInfoRequired(p, "username,password", NULL);
+	num_air        = 2;
+	air            = air_userpass;
       }
       else if (auth->type == AUTH_DIGEST)
       {
 	auth_supported = "digest";
-	cupsdSetAuthInfoRequired(p, "username,password", NULL);
+	num_air        = 2;
+	air            = air_userpass;
       }
 #ifdef HAVE_GSSAPI
       else if (auth->type == AUTH_NEGOTIATE)
       {
 	auth_supported = "negotiate";
-	cupsdSetAuthInfoRequired(p, "negotiate", NULL);
+	num_air        = 1;
+	air            = air_negotiate;
       }
 #endif /* HAVE_GSSAPI */
 
@@ -1747,6 +1778,11 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     }
     else
       p->type &= ~CUPS_PRINTER_AUTHENTICATED;
+  }
+  else if (p->type & CUPS_PRINTER_AUTHENTICATED)
+  {
+    num_air = 2;
+    air     = air_userpass;
   }
 
  /*
@@ -1789,13 +1825,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                 "job-k-limit", p->k_limit);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "job-page-limit", p->page_limit);
-  if (p->num_auth_info_required)
-    ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		  "auth-info-required", p->num_auth_info_required,
-		  NULL, p->auth_info_required);
-  else
-    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		 "auth-info-required", NULL, "none");
+  ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		"auth-info-required", num_air, NULL, air);
 
   if (cupsArrayCount(Banners) > 0 && !(p->type & CUPS_PRINTER_DISCOVERED))
   {
