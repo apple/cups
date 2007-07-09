@@ -670,6 +670,7 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     if (timeout == 86400 && Launchd && LaunchdTimeout && !NumPolled &&
+        !cupsArrayCount(ActiveJobs) &&
 	(!Browsing || 
 	 (!BrowseRemoteProtocols && 
 	  (!NumBrowsers || !BrowseLocalProtocols ||
