@@ -252,7 +252,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
 					 &http->gssctx,
 					 http->gssname, http->gssmech,
-					 GSS_C_MUTUAL_FLAG, GSS_C_INDEFINITE,
+					 GSS_C_DELEG_FLAG | GSS_C_MUTUAL_FLAG,
+					 GSS_C_INDEFINITE,
 					 GSS_C_NO_CHANNEL_BINDINGS,
 					 &input_token, &http->gssmech,
 					 &output_token, NULL, NULL);

@@ -69,7 +69,7 @@ if test x$enable_gssapi != xno; then
 
 		AC_CHECK_FUNC(gsskrb5_register_acceptor_identity, 
 			      AC_DEFINE(HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY))
-		AC_CHECK_FUNC(krb5_cc_resolve, AC_DEFINE(KRB5_CC_RESOLVE))
+		AC_CHECK_FUNC(krb5_cc_resolve, AC_DEFINE(HAVE_KRB5_CC_RESOLVE))
 
 		AC_MSG_CHECKING(for GSS_C_NT_HOSTBASED_SERVICE)
 		if test $ac_cv_header_gssapi_gssapi_h = yes; then
@@ -104,7 +104,7 @@ AC_ARG_WITH(gssservicename, [  --with-gssservicename   set default gss service n
 
 if test x$default_gssservicename != xno; then
 	if test "x$default_gssservicename" = "xdefault"; then
-		CUPS_DEFAULT_GSSSERVICENAME="IPP"
+		CUPS_DEFAULT_GSSSERVICENAME="ipp"
 	else
 		CUPS_DEFAULT_GSSSERVICENAME="$default_gssservicename"
 	fi

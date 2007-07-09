@@ -8,7 +8,7 @@
 #include <label.h>
 
 // Media sizes used by label drivers...
-*#media "w81h252/Address - 1 1/8 x 3 1/2\"" 81 252
+#media "w81h252/Address - 1 1/8 x 3 1/2\"" 81 252
 #media "w101h252/Large Address - 1 4/10 x 3 1/2\"" 101 252
 #media "w54h144/Return Address - 3/4 x 2\"" 54 144
 #media "w167h288/Shipping Address - 2 5/16 x 4\"" 167 288

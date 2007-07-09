@@ -8268,7 +8268,7 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   }
 
 #  ifdef HAVE_KRB5_CC_RESOLVE
-  if (krb5_cc_resolve(krb5_context, "MEMORY:", &ccache))
+  if (krb5_cc_resolve(krb_context, "MEMORY:", &ccache))
 #  elif defined(HAVE_HEIMDAL)
   if (krb5_cc_gen_new(krb_context, &krb5_fcc_ops, &ccache))
 #  else

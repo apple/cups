@@ -2582,7 +2582,7 @@ http_send(http_t       *http,	/* I - HTTP connection */
   * The Kerberos and AuthRef authentication strings can only be used once...
   */
 
-  if (http->authstring && 
+  if (http->field_authorization && http->authstring && 
       (!strncmp(http->authstring, "Negotiate", 9) || 
        !strncmp(http->authstring, "AuthRef", 7)))
   {
@@ -2863,6 +2863,7 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
   http->_data_remaining     = myhttp._data_remaining;
   http->expect              = myhttp.expect;
   http->field_authorization = myhttp.field_authorization;
+  http->digest_tries        = myhttp.digest_tries;
 
  /*
   * See if we actually went secure...

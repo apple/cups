@@ -965,8 +965,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 #endif /* HAVE_GSSAPI */
   else
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "cupsdAuthorize: Bad authentication data.");
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad authentication data.");
     return;
   }
 
