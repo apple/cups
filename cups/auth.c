@@ -423,7 +423,7 @@ cups_get_gss_creds(
  */
 
 static int				/* O - 0 if available */
-					/*     1 if not  available */
+					/*     1 if not available */
 					/*    -1 error */
 cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 {
@@ -432,7 +432,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * Currently WIN32 and OS-2 do not support the CUPS server...
   */
 
-  return (-1);
+  return (1);
 #else
   int			pid;		/* Current process ID */
   FILE			*fp;		/* Certificate file */
@@ -461,7 +461,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
       strcasecmp(http->hostname, "localhost") != 0)
   {
     DEBUG_puts("cups_local_auth: Not a local connection!");
-    return (-1);
+    return (1);
   }
 
 #if defined(HAVE_AUTHORIZATION_H)
