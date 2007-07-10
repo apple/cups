@@ -362,7 +362,8 @@ Version "1.3"
 // Intellitech IntelliBar Series Label Printer
 {
   Manufacturer "Intellitech"
-  ModelName "IntelliBar Series Label Printer"
+  ModelName "IntelliBar Label Printer"
+  Attribute ShortNickName "" "Intellibar Label Printer"
   PCFileName "INTELBAR.PPD"
   DriverType label
   ModelNumber $INTELLITECH_PCL
@@ -377,8 +378,8 @@ Version "1.3"
   UIConstraints "*inPrintMode Standard *inCutInterval "
   UIConstraints "*inPrintMode Standard *inTearInterval "
   UIConstraints "*inPrintMode Tear *inCutInterval "
-  UIConstraints "*inTearInterval  *inPrintMode Cut"
-  UIConstraints "*inTearInterval  *inPrintMode Standard"
+  UIConstraints "*inTearInterval *inPrintMode Cut"
+  UIConstraints "*inTearInterval *inPrintMode Standard"
 
   *MediaSize w288h432
 

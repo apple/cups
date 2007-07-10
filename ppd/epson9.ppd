@@ -1,137 +1,193 @@
 *PPD-Adobe: "4.3"
-*%
-*% "$Id$"
-*%
-*%   Sample EPSON 9-Pin driver PPD file for the Common UNIX Printing
-*%   System (CUPS).
-*%
-*%   Copyright 1997-2007 by Easy Software Products.
-*%
-*%   These coded instructions, statements, and computer programs are the
-*%   property of Easy Software Products and are protected by Federal
-*%   copyright law.  Distribution and use rights are outlined in the file
-*%   "LICENSE.txt" which should have been included with this file.  If this
-*%   file is missing or damaged please contact Easy Software Products
-*%   at:
-*%
-*%       Attn: CUPS Licensing Information
-*%       Easy Software Products
-*%       44141 Airport View Drive, Suite 204
-*%       Hollywood, Maryland 20636 USA
-*%
-*%       Voice: (301) 373-9600
-*%       EMail: cups-info@cups.org
-*%         WWW: http://www.cups.org
-*%
-*FormatVersion:	"4.3"
-*FileVersion:	"1.3"
-*LanguageVersion: English 
+*% PPD file for 9-Pin Series with CUPS.
+*% Created by the CUPS PPD Compiler v1.1.2.
+*% Copyright 1997-2007 by Easy Software Products.
+*% 
+*% These coded instructions, statements, and computer programs are the
+*% property of Easy Software Products and are protected by Federal
+*% copyright law.  Distribution and use rights are outlined in the file
+*% "LICENSE.txt" which should have been included with this file.  If this
+*% file is missing or damaged please contact Easy Software Products
+*% at:
+*% 
+*% Attn: CUPS Licensing Information
+*% Easy Software Products
+*% 44141 Airport View Drive, Suite 204
+*% Hollywood, Maryland 20636 USA
+*% 
+*% Voice: (301) 373-9600
+*% EMail: cups-info@cups.org
+*% WWW: http://www.cups.org
+*FormatVersion: "4.3"
+*FileVersion: "1.3"
+*LanguageVersion: English
 *LanguageEncoding: ISOLatin1
-*PCFileName:	"EPSON9.PPD"
-*Manufacturer:	"Epson"
-*Product:	"(GNU Ghostscript)"
-*Product:	"(ESP Ghostscript)"
-*cupsVersion:	1.3
-*cupsManualCopies: True
-*cupsModelNumber:	0
-*cupsFilter:	"application/vnd.cups-raster 0 rastertoepson"
-*ModelName:     "EPSON 9-Pin Series"
-*ShortNickName: "EPSON 9-Pin Series"
-*NickName:      "EPSON 9-Pin Series CUPS v1.3"
-*PSVersion:	"(3010.000) 81501"
-*LanguageLevel:	"3"
-*ColorDevice:	False
+*PCFileName: "EPSON9.PPD"
+*Product: "(GNU Ghostscript)"
+*Product: "(ESP Ghostscript)"
+*Manufacturer: "Epson"
+*ModelName: "Epson 9-Pin Series"
+*ShortNickName: "Epson 9-Pin Series"
+*NickName: "Epson 9-Pin Series, 1.3"
+*PSVersion: "(3010.000) 81501"
+*LanguageLevel: "3"
+*ColorDevice: False
 *DefaultColorSpace: Gray
-*FileSystem:	False
-*Throughput:	"1"
+*FileSystem: False
+*Throughput: "1"
 *LandscapeOrientation: Plus90
-*VariablePaperSize: True
-*TTRasterizer:	Type42
-
+*TTRasterizer: Type42
+*% Driver-defined attributes...
+*Product: "(GNU Ghostscript)"
+*Product: "(ESP Ghostscript)"
+*% CUPS attributes...
+*cupsVersion: 1.3
+*cupsModelNumber: 0
+*cupsManualCopies: True
+*cupsFilter: "application/vnd.cups-raster 50 rastertoepson"
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: Letter
-*PageSize Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
-*PageSize Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
-*PageSize A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
-*PageSize FanFoldUS:	"<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
+*PageSize Letter/Letter - 8.5x11in: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize Legal/Legal - 8.5x14in: "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageSize A4/A4 - 210x297mm: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageSize FanFoldUS/Fanfold - 14.875x11in: "<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageSize
-
-*OpenUI *PageRegion: PickOne
+*OpenUI *PageRegion/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageRegion
 *DefaultPageRegion: Letter
-*PageRegion Letter:	"<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
-*PageRegion Legal:	"<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
-*PageRegion A4:		"<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
-*PageRegion FanFoldUS:	"<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
+*PageRegion Letter/Letter - 8.5x11in: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion Legal/Legal - 8.5x14in: "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageRegion A4/A4 - 210x297mm: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageRegion FanFoldUS/Fanfold - 14.875x11in: "<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageRegion
-
-*DefaultImageableArea: Letter 
-*ImageableArea Letter:	"18.0 18.0 594.0 774.0"
-*ImageableArea Legal:	"18.0 18.0 594.0 990.0"
-*ImageableArea A4:	"18.0 18.0 577.0 824.0"
-*ImageableArea FanFoldUS: "18.0 18.0 1053.0 774.0"
-
+*DefaultImageableArea: Letter
+*ImageableArea Letter/Letter - 8.5x11in: "18.00 18.00 594.00 774.00"
+*ImageableArea Legal/Legal - 8.5x14in: "18.00 18.00 594.00 990.00"
+*ImageableArea A4/A4 - 210x297mm: "18.00 18.00 577.00 824.00"
+*ImageableArea FanFoldUS/Fanfold - 14.875x11in: "18.00 18.00 1053.00 774.00"
 *DefaultPaperDimension: Letter
-*PaperDimension Letter:	"612 792"
-*PaperDimension Legal:	"612 1008"
-*PaperDimension A4:	"595 842"
-*PaperDimension FanFoldUS: "1071 792"
-
-*MaxMediaWidth:  "1080"
-*MaxMediaHeight: "86400"
-*HWMargins:      0 0 0 0
+*PaperDimension Letter/Letter - 8.5x11in: "612.00 792.00"
+*PaperDimension Legal/Legal - 8.5x14in: "612.00 1008.00"
+*PaperDimension A4/A4 - 210x297mm: "595.00 842.00"
+*PaperDimension FanFoldUS/Fanfold - 14.875x11in: "1071.00 792.00"
+*MaxMediaWidth: "1080.00"
+*MaxMediaHeight: "86400.00"
+*HWMargins: 0.00 0.00 0.00 0.00
 *CustomPageSize True: "pop pop pop <</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice"
-*ParamCustomPageSize Width:        1 points 36 1080
-*ParamCustomPageSize Height:       2 points 36 86400
-*ParamCustomPageSize WidthOffset:  3 points 0 0
+*ParamCustomPageSize Width: 1 points 36.00 1080.00
+*ParamCustomPageSize Height: 2 points 36.00 86400.00
+*ParamCustomPageSize WidthOffset: 3 points 0 0
 *ParamCustomPageSize HeightOffset: 4 points 0 0
-*ParamCustomPageSize Orientation:  5 int 0 0
-
-*OpenUI *Resolution/Output Resolution: PickOne
-*OrderDependency: 20 AnySetup *Resolution
-*DefaultResolution: 120dpi
-*Resolution 60dpi/60x72 DPI: "<</HWResolution[60 72]/cupsRowCount 8>>setpagedevice"
-*Resolution 120dpi/120x72 DPI: "<</HWResolution[120 72]/cupsRowCount 8>>setpagedevice"
-*Resolution 240dpi/240x72 DPI: "<</HWResolution[240 72]/cupsRowCount 8>>setpagedevice"
+*ParamCustomPageSize Orientation: 5 int 0 0
+*RequiresPageRegion All: True
+*OpenUI *Resolution: PickOne
+*OrderDependency: 10.0 AnySetup *Resolution
+*DefaultResolution: 120x72dpi
+*Resolution 60x720dpi: "<</HWResolution[60 720]/cupsBitsPerColor 1/cupsRowCount 8/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
+*Resolution 120x72dpi: "<</HWResolution[120 72]/cupsBitsPerColor 1/cupsRowCount 8/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
+*Resolution 240x72dpi: "<</HWResolution[240 72]/cupsBitsPerColor 1/cupsRowCount 8/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
 *CloseUI: *Resolution
-
+*cupsLanguages: "de es fr it ja"
+*de.Translation Manufacturer/Epson: ""
+*de.Translation ModelName/Epson 9-Pin Series: ""
+*de.Translation ShortNickName/Epson 9-Pin Series: ""
+*de.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*de.Translation PageSize/Media Size: ""
+*de.PageSize Letter/Letter - 8.5x11in: ""
+*de.PageSize Legal/Legal - 8.5x14in: ""
+*de.PageSize A4/A4 - 210x297mm: ""
+*de.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*de.Translation Resolution/Auflösung: ""
+*de.Resolution 60x720dpi/60x720dpi: ""
+*de.Resolution 120x72dpi/120x72dpi: ""
+*de.Resolution 240x72dpi/240x72dpi: ""
+*es.Translation Manufacturer/Epson: ""
+*es.Translation ModelName/Epson 9-Pin Series: ""
+*es.Translation ShortNickName/Epson 9-Pin Series: ""
+*es.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*es.Translation PageSize/Media Size: ""
+*es.PageSize Letter/Letter - 8.5x11in: ""
+*es.PageSize Legal/Legal - 8.5x14in: ""
+*es.PageSize A4/A4 - 210x297mm: ""
+*es.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*es.Translation Resolution/Resolución: ""
+*es.Resolution 60x720dpi/60x720dpi: ""
+*es.Resolution 120x72dpi/120x72dpi: ""
+*es.Resolution 240x72dpi/240x72dpi: ""
+*fr.Translation Manufacturer/Epson: ""
+*fr.Translation ModelName/Epson 9-Pin Series: ""
+*fr.Translation ShortNickName/Epson 9-Pin Series: ""
+*fr.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*fr.Translation PageSize/Media Size: ""
+*fr.PageSize Letter/Letter - 8.5x11in: ""
+*fr.PageSize Legal/Legal - 8.5x14in: ""
+*fr.PageSize A4/A4 - 210x297mm: ""
+*fr.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*fr.Translation Resolution/Résolution: ""
+*fr.Resolution 60x720dpi/60x720dpi: ""
+*fr.Resolution 120x72dpi/120x72dpi: ""
+*fr.Resolution 240x72dpi/240x72dpi: ""
+*it.Translation Manufacturer/Epson: ""
+*it.Translation ModelName/Epson 9-Pin Series: ""
+*it.Translation ShortNickName/Epson 9-Pin Series: ""
+*it.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*it.Translation PageSize/Media Size: ""
+*it.PageSize Letter/Letter - 8.5x11in: ""
+*it.PageSize Legal/Legal - 8.5x14in: ""
+*it.PageSize A4/A4 - 210x297mm: ""
+*it.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*it.Translation Resolution/Risoluzione: ""
+*it.Resolution 60x720dpi/60x720dpi: ""
+*it.Resolution 120x72dpi/120x72dpi: ""
+*it.Resolution 240x72dpi/240x72dpi: ""
+*ja.Translation Manufacturer/Epson: ""
+*ja.Translation ModelName/Epson 9-Pin Series: ""
+*ja.Translation ShortNickName/Epson 9-Pin Series: ""
+*ja.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*ja.Translation PageSize/Media Size: ""
+*ja.PageSize Letter/Letter - 8.5x11in: ""
+*ja.PageSize Legal/Legal - 8.5x14in: ""
+*ja.PageSize A4/A4 - 210x297mm: ""
+*ja.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*ja.Translation Resolution/解像度: ""
+*ja.Resolution 60x720dpi/60x720dpi: ""
+*ja.Resolution 120x72dpi/120x72dpi: ""
+*ja.Resolution 240x72dpi/240x72dpi: ""
 *DefaultFont: Courier
-*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
-*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
-*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
-*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
-*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
-*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
-*Font Bookman-Light: Standard "(001.004S)" Standard ROM
-*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
-*Font Courier: Standard "(002.004S)" Standard ROM
-*Font Courier-Bold: Standard "(002.004S)" Standard ROM
-*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
-*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
-*Font Helvetica: Standard "(001.006S)" Standard ROM
-*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
-*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
-*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
-*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
-*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
-*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
-*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
-*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
-*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
-*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
-*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
-*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
-*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
-*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
-*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
-*Font Symbol: Special "(001.007S)" Special ROM
-*Font Times-Bold: Standard "(001.007S)" Standard ROM
-*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
-*Font Times-Italic: Standard "(001.007S)" Standard ROM
-*Font Times-Roman: Standard "(001.007S)" Standard ROM
-*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
-*Font ZapfDingbats: Special "(001.004S)" Standard ROM
-*%
-*% End of "$Id$".
-*%
+*Font AvantGarde-Book: Standard "(1.05)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(1.05)" Standard ROM
+*Font AvantGarde-Demi: Standard "(1.05)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(1.05)" Standard ROM
+*Font Bookman-Demi: Standard "(1.05)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(1.05)" Standard ROM
+*Font Bookman-Light: Standard "(1.05)" Standard ROM
+*Font Bookman-LightItalic: Standard "(1.05)" Standard ROM
+*Font Courier: Standard "(1.05)" Standard ROM
+*Font Courier-Bold: Standard "(1.05)" Standard ROM
+*Font Courier-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Courier-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica: Standard "(1.05)" Standard ROM
+*Font Helvetica-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Oblique: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(1.05)" Standard ROM
+*Font Palatino-Bold: Standard "(1.05)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Palatino-Italic: Standard "(1.05)" Standard ROM
+*Font Palatino-Roman: Standard "(1.05)" Standard ROM
+*Font Symbol: Special "(001.005)" Special ROM
+*Font Times-Bold: Standard "(1.05)" Standard ROM
+*Font Times-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Times-Italic: Standard "(1.05)" Standard ROM
+*Font Times-Roman: Standard "(1.05)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
+*Font ZapfDingbats: Special "(001.005)" Special ROM
+*% End of EPSON9.PPD, 08873 bytes.
