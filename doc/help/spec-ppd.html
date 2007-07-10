@@ -343,11 +343,21 @@ scheduler's <code>DocumentRoot</code> directory, a full HTTP URL
 valid URI which directs the user at additional information
 concerning the condition that is being reported.</p>
 
+<p>Since the reason text is limited to 80 characters by the PPD specification,
+longer text strings can be included by URI-encoding the text with the "text"
+scheme, for example "text:some%20text". Multiple <code>text</code> URIs are
+combined (with spaces between each URI) by the <tt>ppdLocalizeIPPReason</tt>
+into a single string that can be displayed to the user.</p>
+
 <p>Examples:</p>
 
 <pre class='command'>
 <em>*% Map com.vendor-error to text but no page</em>
 *cupsIPPReason com.vendor-error/A serious error occurred: ""
+
+<em>*% Map com.vendor-error to more than 80 characters of text but no page</em>
+*cupsIPPReason com.vendor-error/A serious error occurred: "text:Now%20is%20the%20time
+text:for%20all%20good%20men%20to%20come%20to%20the%20aid%20of%20their%20country."
 
 <em>*% Map com.vendor-error to text and a local page</em>
 *cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html"
@@ -1177,6 +1187,8 @@ PRE B {
 <ul>
 
 	<li>Added <tt>cupsBackSide</tt> and deprecated <tt>cupsFlipDuplex</tt>.</li>
+
+	<li>Added text URI information to <tt>cupsIPPReason</tt> documentation.</li>
 
 	<li>Added <tt>APPrinterPreset</tt>, <tt>cupsIPPFinishings</tt>, and <tt>cupsPreFilter</tt> attributes.</li>
 
