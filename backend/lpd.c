@@ -341,9 +341,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	*/
 
         if (!strcasecmp(value, "standard"))
-	  order = MODE_STANDARD;
+	  mode = MODE_STANDARD;
 	else if (!strcasecmp(value, "stream"))
-	  order = MODE_STREAM;
+	  mode = MODE_STREAM;
 	else
 	  fprintf(stderr, _("ERROR: Unknown print mode \"%s\"\n"), value);
       }
