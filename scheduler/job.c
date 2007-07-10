@@ -1036,8 +1036,16 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
     cupsdSetString(&job->dest, dest);
   }
-  else
-    destptr = cupsdFindDest(job->dest);
+  else if ((destptr = cupsdFindDest(job->dest)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "[Job %d] Unable to queue job for destination \"%s\"!",
+		    job->id, job->dest);
+    ippDelete(job->attrs);
+    job->attrs = NULL;
+    unlink(jobfile);
+    return;
+  }
 
   job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
                                      IPP_TAG_INTEGER);
