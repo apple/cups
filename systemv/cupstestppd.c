@@ -1099,7 +1099,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      _cupsLangPuts(stdout, _(" FAIL\n"));
 
             if (verbose >= 0)
-	      _cupsLangPrintf(stderr,
+	      _cupsLangPrintf(stdout,
 	                      _("      **FAIL**  Bad LanguageEncoding %s - "
 			        "must be ISOLatin1!\n"),
 	                      attr->value ? attr->value : "(null)");
@@ -1113,7 +1113,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      _cupsLangPuts(stdout, _(" FAIL\n"));
 
             if (verbose >= 0)
-	      _cupsLangPrintf(stderr,
+	      _cupsLangPrintf(stdout,
 	                      _("      **FAIL**  Bad LanguageVersion %s - "
 			        "must be English!\n"),
 	                      ppd->lang_version ? ppd->lang_version : "(null)");
