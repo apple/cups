@@ -95,7 +95,9 @@ for this printer driver.</p>
 <p>This boolean attribute notifies the RIP filters that the
 destination printer does not require the top and bottom margins
 of the <tt>ImageableArea</tt> swapped for the back page. The
-default is <tt>true</tt> when <tt>cupsFlipDuplex</tt>  is <tt>true</tt> and <tt>false</tt> otherwise.</p>
+default is <tt>true</tt> when <tt>cupsFlipDuplex</tt> is
+<tt>true</tt> or <tt>cupsBackSide</tt> is <tt>Flipped</tt>
+and <tt>false</tt> otherwise.</p>
 
 <p>Example:</p>
 
@@ -107,7 +109,7 @@ default is <tt>true</tt> when <tt>cupsFlipDuplex</tt>  is <tt>true</tt> and <tt>
 *APDuplexRequiresFlippedMargin: false
 </pre>
 
-<p>Also see the related <tt>cupsFlipDuplex</tt> attribute.</p>
+<p>Also see the related <tt>cupsBackSide</tt> attribute.</p>
 
 <h3>APPrinterPreset</h3>
 
@@ -144,6 +146,90 @@ pairs of PPD options and choices.</p>
 <pre class='command'>
 *APRemoteQueueID: "myprinter"
 </pre>
+
+<h3><span class='info'>CUPS 1.3</span>cupsBackSide</h3>
+
+<p class='summary'>*cupsBackSide: keyword</p>
+
+<p>This attribute requests special handling of the back side of pages
+when doing duplexed (2-sided) output. <a href='#TABLE_1'>Table 1</a>
+shows the supported keyword values for this attribute and their affect
+on the raster data sent to your driver. The default value is
+<code>Normal</code>.</p>
+
+<blockquote><b>Note:</b> <tt>cupsBackSide</tt> replaces the older
+<tt>cupsFlipDuplex</tt> attribute - if <tt>cupsBackSide</tt> is
+specified, <tt>cupsFlipDuplex</tt> will be ignored.</blockquote>
+
+<div class='table'>
+<table width='80%' summary='Back Side Raster Coordinate System'>
+<caption>Table 1: <a name='TABLE_1'>Back Side Raster Coordinate System</a></caption>
+<thead>
+<tr>
+	<th>cupsBackSide</th>
+	<th>Tumble Value</th>
+	<th>Image Presentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td><code>Normal</code></td>
+	<td><code>false</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>Normal</code></td>
+	<td><code>true</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>ManualTumble</code></td>
+	<td><code>false</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>ManualTumble</code></td>
+	<td><code>true</code></td>
+	<td>Right-to-left, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>Rotated</code></td>
+	<td><code>false</code></td>
+	<td>Right-to-left, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>Rotated</code></td>
+	<td><code>true</code></td>
+	<td>Right-to-left, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>Flipped</code> *</td>
+	<td><code>false</code></td>
+	<td>Left-to-right, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>Flipped</code> *</td>
+	<td><code>true</code></td>
+	<td>Right-to-left, top-to-bottom</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><em>* - Not supported in Mac OS X 10.5.x and earlier</em></p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Flip the page image for the back side of duplexed output</em> 
+*cupsBackSide: Flipped
+
+<em>*% Rotate the page image for the back side of duplexed output</em> 
+*cupsBackSide: Rotated
+</pre>
+
+<p>Also see the related <tt>APDuplexRequiresFlippedMargins</tt>
+attribute.</p>
 
 <h3>cupsEvenDuplex</h3>
 
@@ -194,63 +280,38 @@ the special filter program "-" may be specified.</p>
 *cupsFilter: "application/vnd.cups-postscript 0 -"
 </pre>
 
-<h3>cupsFlipDuplex</h3>
+<h3><span class='info'>Deprecated</span>cupsFlipDuplex</h3>
 
 <p class='summary'>*cupsFlipDuplex: boolean</p>
 
-<blockquote><b>Note:</b> The <tt>cupsFlipDuplex</tt> attribute is
-not supported on Mac OS X 10.5.x or earlier.</blockquote>
+<p>Due to implementation differences between Mac OS X and Ghostscript,
+the <tt>cupsFlipDuplex</tt> attribute is deprecated. Instead, use
+the <tt>cupsBackSide</tt> attribute to specify the coordinate
+system (pixel layout) of the page data on the back side of duplex
+pages.</p>
 
-<p>This boolean attribute specifies the coordinate system of the
-back side of the media when doing 2-sided printing using a CUPS
-raster driver. <a href='#TABLE_1'>Table 1</a> shows how
-<code>cupsFlipDuplex</code> interacts with the <code>Tumble</code>
-page attribute. The default value is <code>false</code>.</p>
+<p>The value <code>true</code> maps to a <tt>cupsBackSide</tt> value
+of <code>Rotated</code> on Mac OS X and <code>Flipped</code> with
+Ghostscript.</p>
 
-<div class='table'>
-<table width='80%' summary='Back Side Raster Coordinate System'>
-<caption>Table 1: <a name='TABLE_1'>Back Side Raster Coordinate System</a></caption>
-<thead>
-<tr>
-	<th>cupsFlipDuplex</th>
-	<th>Tumble</th>
-	<th>Image Presentation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<td><code>false</code></td>
-	<td><code>false</code></td>
-	<td>Left-to-right, top-to-bottom</td>
-</tr>
-<tr>
-	<td><code>false</code></td>
-	<td><code>true</code></td>
-	<td>Left-to-right, top-to-bottom</td>
-</tr>
-<tr>
-	<td><code>true</code></td>
-	<td><code>false</code></td>
-	<td>Left-to-right, bottom-to-top</td>
-</tr>
-<tr>
-	<td><code>true</code></td>
-	<td><code>true</code></td>
-	<td>Right-to-left, top-to-bottom</td>
-</tr>
-</tbody>
-</table>
-</div>
+<p>The default value is <code>false</code>.</p>
 
-<p>Example:</p>
+<blockquote><b>Note:</b> Mac OS X drivers that previously used
+<tt>cupsFlipDuplex</tt> may wish to provide both the old and
+new attributes for maximum compatibility, for example:
 
 <pre class='command'>
-<em>*% Flip the page image for the back side of duplexed output</em> 
+*cupsBackSide: Rotated
 *cupsFlipDuplex: true
 </pre>
 
-<p>Also see the related <tt>APDuplexRequiresFlippedMargins</tt>
-attribute.</p>
+Similarly, drivers written for other operating systems using
+Ghostscript can use:
+
+<pre class='command'>
+*cupsBackSide: Flipped
+*cupsFlipDuplex: true
+</pre></blockquote>
 
 <h3>cupsIPPFinishings</h3>
 
@@ -1114,6 +1175,8 @@ PRE B {
 <h3>Changes in CUPS 1.3</h3>
 
 <ul>
+
+	<li>Added <tt>cupsBackSide</tt> and deprecated <tt>cupsFlipDuplex</tt>.</li>
 
 	<li>Added <tt>APPrinterPreset</tt>, <tt>cupsIPPFinishings</tt>, and <tt>cupsPreFilter</tt> attributes.</li>
 

@@ -318,7 +318,7 @@ typedef struct ppd_file_s		/**** PPD File ****/
   char		**filters;		/* Filter strings... */
 
   /**** New in CUPS 1.1 ****/
-  int		flip_duplex;		/* 1 = Flip page for back sides @since CUPS 1.1@ */
+  int		flip_duplex;		/* 1 = Flip page for back sides @deprecated@ */
 
   /**** New in CUPS 1.1.19 ****/
   char		*protocols;		/* Protocols (BCP, TBCP) string @since CUPS 1.1.19@ */
