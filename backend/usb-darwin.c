@@ -220,6 +220,7 @@ typedef struct globals_s
   CFStringRef		model;
   CFStringRef		serial;
   UInt32		location;
+  UInt8			interfaceNum;
 
   CFRunLoopTimerRef 	status_timer;
 
@@ -256,7 +257,7 @@ static OSStatus copy_deviceid(classdriver_t **printer, CFStringRef *deviceID);
 static void *read_thread(void *reference);
 static void *sidechannel_thread(void *reference);
 static void copy_deviceinfo(CFStringRef deviceIDString, CFStringRef *make, CFStringRef *model, CFStringRef *serial);
-static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, UInt32 *deviceLocation);
+static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, UInt32 *deviceLocation, UInt8 *interfaceNum);
 static void device_added(void *userdata, io_iterator_t iterator);
 static void get_device_id(cups_sc_status_t *status, char *data, int *datalen);
 static void iterate_printers(iterator_callback_t callBack, void *userdata);
@@ -920,8 +921,9 @@ static Boolean list_device_cb(void *refcon,
   {
     CFStringRef deviceIDString = NULL;
     UInt32 deviceLocation = 0;
+    UInt8	interfaceNum = 0;
 
-    copy_devicestring(obj, &deviceIDString, &deviceLocation);
+    copy_devicestring(obj, &deviceIDString, &deviceLocation, &interfaceNum);
     if (deviceIDString != NULL)
     {
       CFStringRef make = NULL,  model = NULL, serial = NULL;
@@ -994,8 +996,9 @@ static Boolean find_device_cb(void *refcon,
   {
     CFStringRef idString = NULL;
     UInt32 location = -1;
+    UInt8	interfaceNum = 0;
 
-    copy_devicestring(obj, &idString, &location);
+    copy_devicestring(obj, &idString, &location, &interfaceNum);
     if (idString != NULL)
     {
       CFStringRef make = NULL,  model = NULL, serial = NULL;
@@ -1025,6 +1028,8 @@ static Boolean find_device_cb(void *refcon,
 	    if (g.location == 0 || g.location == location)
 	      keepLooking = false;
 	  }
+	  if ( !keepLooking )
+		g.interfaceNum = interfaceNum;
 	}
       }
 
@@ -1249,6 +1254,7 @@ static kern_return_t registry_open(CFStringRef *driverBundlePath)
 
   if (g.classdriver != NULL)
   {
+  	(*g.classdriver)->interfaceNumber = g.interfaceNum;
     kr = (*g.classdriver)->Open(g.classdriver, g.location, kUSBPrintingProtocolBidirectional);
     if (kr != kIOReturnSuccess || (*g.classdriver)->interface == NULL)
     {
@@ -1378,7 +1384,8 @@ static OSStatus copy_deviceid(classdriver_t **classdriver,
 
 static void copy_devicestring(io_service_t usbInterface,
 			      CFStringRef *deviceID,
-			      UInt32 *deviceLocation)
+			      UInt32 *deviceLocation,
+			      UInt8	*interfaceNumber )
 {
   IOCFPlugInInterface	**iodev = NULL;
   SInt32		score;
@@ -1397,6 +1404,7 @@ static void copy_devicestring(io_service_t usbInterface,
 					&intf)) == noErr)
     {
       (*intf)->GetLocationID(intf, deviceLocation);
+      (*intf)->GetInterfaceNumber(intf, interfaceNumber);
 
       driverBundlePath = IORegistryEntryCreateCFProperty(usbInterface,
 							 kUSBClassDriverProperty,
@@ -1914,10 +1922,11 @@ static void get_device_id(cups_sc_status_t *status,
 			  int *datalen)
 {
   UInt32 deviceLocation = 0;
+  UInt8	interfaceNum = 0;
   CFStringRef deviceIDString = NULL;
 
   /* GetDeviceID */
-  copy_devicestring(g.printer_obj, &deviceIDString, &deviceLocation);
+  copy_devicestring(g.printer_obj, &deviceIDString, &deviceLocation, &interfaceNum);
   if (deviceIDString)
   {
     CFStringGetCString(deviceIDString, data, *datalen, kCFStringEncodingUTF8);
