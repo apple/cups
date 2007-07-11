@@ -61,6 +61,10 @@ extern const char *cssmErrorString(int error);
 #  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_AUTHORIZATION_H */
 
+#if defined(SO_PEERCRED) && defined(AF_LOCAL)
+#  include <pwd.h>
+#endif /* SO_PEERCRED && AF_LOCAL */
+
 
 /*
  * Local functions...
@@ -439,7 +443,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   char			filename[1024],	/* Certificate filename */
 			certificate[33];/* Certificate string */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
-#if defined(HAVE_AUTHORIZATION_H)
+#  if defined(HAVE_AUTHORIZATION_H)
   OSStatus		status;		/* Status */
   AuthorizationItem	auth_right;	/* Authorization right */
   AuthorizationRights	auth_rights;	/* Authorization rights */
@@ -447,7 +451,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   AuthorizationExternalForm auth_extrn;	/* Authorization ref external */
   char			auth_key[1024];	/* Buffer */
   char			buffer[1024];	/* Buffer */
-#endif /* HAVE_AUTHORIZATION_H */
+#  endif /* HAVE_AUTHORIZATION_H */
 
 
   DEBUG_printf(("cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"\n",
@@ -464,7 +468,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     return (1);
   }
 
-#if defined(HAVE_AUTHORIZATION_H)
+#  if defined(HAVE_AUTHORIZATION_H)
  /*
   * Delete any previous authorization reference...
   */
@@ -535,7 +539,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
    * Fall through to try certificates...
    */
   }
-#endif /* HAVE_AUTHORIZATION_H */
+#  endif /* HAVE_AUTHORIZATION_H */
 
  /*
   * Try opening a certificate file for this PID.  If that fails,
@@ -566,7 +570,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * Set the authorization string and return...
     */
 
-    http->authstring = malloc(strlen(certificate) + 10);
+    http->authstring = malloc(strlen(certificate) + 7);
     sprintf(http->authstring, "Local %s", certificate);
 
     /* Copy back to _authstring for backwards compatibility */
@@ -577,6 +581,40 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
     return (0);
   }
+
+#  if defined(SO_PEERCRED) && defined(AF_LOCAL)
+ /*
+  * See if we can authenticate using the peer credentials provided over a
+  * domain socket; if so, specify "PeerCred username" as the authentication
+  * information...
+  */
+
+  if (http->hostaddr->addr.sa_family == AF_LOCAL)
+  {
+   /*
+    * Verify that the current cupsUser() matches the current UID...
+    */
+
+    struct passwd	*pwd;		/* Password information */
+    const char		*username;	/* Current username */
+
+    username = cupsUser();
+
+    if ((pwd = getpwnam(username)) != NULL && pwd->pw_uid == getuid())
+    {
+      http->authstring = malloc(strlen(username) + 10);
+      sprintf(http->authstring, "PeerCred %s", username);
+
+      /* Copy back to _authstring for backwards compatibility */
+      strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+
+      DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
+		    http->authstring));
+
+      return (0);
+    }
+  }
+#  endif /* SO_PEERCRED && AF_LOCAL */
 
   return (1);
 #endif /* WIN32 || __EMX__ */

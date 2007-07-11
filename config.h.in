@@ -531,6 +531,13 @@
 #undef HAVE_DLFCN_H
 
 
+/*
+ * Do we have <sys/ucred.h>?
+ */
+
+#undef HAVE_SYS_UCRED_H
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

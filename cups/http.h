@@ -64,6 +64,9 @@ typedef off_t ssize_t;			/* @private@ */
 #    ifdef AF_LOCAL
 #      include <sys/un.h>
 #    endif /* AF_LOCAL */
+#    if defined(LOCAL_PEERCRED) && !defined(SO_PEERCRED)
+#      define SO_PEERCRED LOCAL_PEERCRED
+#    endif /* LOCAL_PEERCRED && !SO_PEERCRED */
 #  endif /* WIN32 */
 
 /*

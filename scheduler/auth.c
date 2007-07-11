@@ -92,6 +92,14 @@
 extern const char *cssmErrorString(int error);
 #  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_AUTHORIZATION_H */
+#ifdef HAVE_SYS_UCRED_H
+#  include <sys/ucred.h>
+typedef struct xucred cupsd_ucred_t;
+#  define CUPSD_UCRED_UID(c) (c).cr_uid
+#else
+typedef struct ucred cupsd_ucred_t;
+#  define CUPSD_UCRED_UID(c) (c).uid
+#endif /* HAVE_SYS_UCRED_H */
 
 
 /*
@@ -433,8 +441,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     if (authlen != kAuthorizationExternalFormLength)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-	              "cupsdAuthorize: External Authorization reference size"
-	              "is incorrect!");
+	              "External Authorization reference size is incorrect!");
       return;
     }
 
@@ -442,8 +449,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 		      (AuthorizationExternalForm *)nonce, &con->authref)) != 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "cupsdAuthorize: AuthorizationCreateFromExternalForm "
-		      "returned %d (%s)",
+		      "AuthorizationCreateFromExternalForm returned %d (%s)",
 		      (int)status, cssmErrorString(status));
       return;
     }
@@ -453,7 +459,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 					&authinfo)) != 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "cupsdAuthorize: AuthorizationCopyInfo returned %d (%s)",
+		      "AuthorizationCopyInfo returned %d (%s)",
 		      (int)status, cssmErrorString(status));
       return;
     }
@@ -464,6 +470,57 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     AuthorizationFreeItemSet(authinfo);
   }
 #endif /* HAVE_AUTHORIZATION_H */
+#if defined(SO_PEERCRED) && defined(AF_LOCAL)
+  else if (!strncmp(authorization, "PeerCred ", 9) &&
+           con->http.hostaddr->addr.sa_family == AF_LOCAL)
+  {
+   /*
+    * Use peer credentials from domain socket connection...
+    */
+
+    struct passwd	*pwd;		/* Password entry for this user */
+    cupsd_ucred_t	peercred;	/* Peer credentials */
+    socklen_t		peersize;	/* Size of peer credentials */
+
+
+    if ((pwd = getpwnam(authorization + 9)) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "User \"%s\" does not exist!",
+                      authorization + 9);
+      return;
+    }
+
+    peersize = sizeof(peercred);
+
+    if (getsockopt(con->http.fd, SOL_SOCKET, SO_PEERCRED, &peercred, &peersize))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
+                      strerror(errno));
+      return;
+    }
+
+    if (pwd->pw_uid != CUPSD_UCRED_UID(peercred))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Invalid peer credentials for \"%s\" - got %d, "
+		      "expected %d!", authorization + 9,
+		      CUPSD_UCRED_UID(peercred), pwd->pw_uid);
+#  ifdef HAVE_SYS_UCRED_H
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: cr_version=%d",
+                      peercred.cr_version);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: cr_uid=%d",
+                      peercred.cr_uid);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: cr_ngroups=%d",
+                      peercred.cr_ngroups);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: cr_groups[0]=%d",
+                      peercred.cr_groups[0]);
+#  endif /* HAVE_SYS_UCRED_H */
+      return;
+    }
+
+    strlcpy(username, authorization + 9, sizeof(username));
+  }
+#endif /* SO_PEERCRED && AF_LOCAL */
   else if (!strncmp(authorization, "Local", 5) &&
            !strcasecmp(con->http.hostname, "localhost"))
   {
