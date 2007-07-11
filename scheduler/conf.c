@@ -91,6 +91,7 @@ static cupsd_var_t	variables[] =
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
 #ifdef HAVE_LDAP
   { "BrowseLDAPBindDN",		&BrowseLDAPBindDN,	CUPSD_VARTYPE_STRING },
+  { "BrowseLDAPCACertFile",	&BrowseLDAPCACertFile,	CUPSD_VARTYPE_STRING },
   { "BrowseLDAPDN",		&BrowseLDAPDN,		CUPSD_VARTYPE_STRING },
   { "BrowseLDAPPassword",	&BrowseLDAPPassword,	CUPSD_VARTYPE_STRING },
   { "BrowseLDAPServer",		&BrowseLDAPServer,	CUPSD_VARTYPE_STRING },
@@ -564,6 +565,7 @@ cupsdReadConfiguration(void)
   cupsdClearString(&BrowseLDAPDN);
   cupsdClearString(&BrowseLDAPPassword);
   cupsdClearString(&BrowseLDAPServer);
+  cupsdClearString(&BrowseLDAPCACertFile);
 #endif /* HAVE_LDAP */
 
   JobHistory          = DEFAULT_HISTORY;

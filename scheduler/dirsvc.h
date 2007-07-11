@@ -154,8 +154,10 @@ VAR char		*BrowseLDAPBindDN VALUE(NULL),
 					/* LDAP search DN */
 			*BrowseLDAPPassword VALUE(NULL),
 					/* LDAP login password */
-			*BrowseLDAPServer VALUE(NULL);
+			*BrowseLDAPServer VALUE(NULL),
 					/* LDAP server to use */
+			*BrowseLDAPCACertFile VALUE(NULL);
+					/* LDAP CA CERT file to use */
 #endif /* HAVE_LDAP */
 
 

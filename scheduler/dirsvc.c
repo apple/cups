@@ -954,8 +954,8 @@ cupsdStartBrowsing(void)
       if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"cupsdStartBrowsing: Unable to create broadcast "
-			"socket - %s.", strerror(errno));
+			"Unable to create broadcast socket - %s.",
+			strerror(errno));
 	BrowseLocalProtocols &= ~BROWSE_CUPS;
 	BrowseRemoteProtocols &= ~BROWSE_CUPS;
 	return;
@@ -973,8 +973,8 @@ cupsdStartBrowsing(void)
       if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"cupsdStartBrowsing: Unable to bind broadcast "
-			"socket - %s.", strerror(errno));
+			"Unable to bind broadcast socket - %s.",
+			strerror(errno));
 
 #ifdef WIN32
 	closesocket(BrowseSocket);
@@ -996,8 +996,7 @@ cupsdStartBrowsing(void)
     val = 1;
     if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdStartBrowsing: Unable to set broadcast mode - %s.",
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to set broadcast mode - %s.",
         	      strerror(errno));
 
 #ifdef WIN32
@@ -1076,6 +1075,24 @@ cupsdStartBrowsing(void)
       int		version = 3;	/* LDAP version */
       struct berval	bv = {0, ""};	/* SASL bind value */
 
+
+     /*
+      * Set the certificate file to use for encrypted LDAP sessions...
+      */
+
+      if (BrowseLDAPCACertFile)
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "cupsdStartBrowsing: Setting CA certificate file \"%s\"",
+			BrowseLDAPCACertFile);
+
+        if ((rc = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE,
+	                          (void *)BrowseLDAPCACertFile))
+	        != LDAP_SUCCESS)
+          cupsdLogMessage(CUPSD_LOG_ERROR,
+                          "Unable to set CA certificate file for LDAP "
+			  "connections: %d - %s", rc, ldap_err2string(rc));
+      }
 
      /*
       * LDAP stuff currently only supports ldapi EXTERNAL SASL binds...
