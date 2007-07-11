@@ -3,25 +3,16 @@
 .\"
 .\"   cupstestppd man page for the Common UNIX Printing System (CUPS).
 .\"
+.\"   Copyright 2007 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
-.\"   property of Easy Software Products and are protected by Federal
-.\"   copyright law.  Distribution and use rights are outlined in the file
-.\"   "LICENSE.txt" which should have been included with this file.  If this
-.\"   file is missing or damaged please contact Easy Software Products
-.\"   at:
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.\"       Attn: CUPS Licensing Information
-.\"       Easy Software Products
-.\"       44141 Airport View Drive, Suite 204
-.\"       Hollywood, Maryland 20636 USA
-.\"
-.\"       Voice: (301) 373-9600
-.\"       EMail: cups-info@cups.org
-.\"         WWW: http://www.cups.org
-.\"
-.TH cupstestppd 1 "Common UNIX Printing System" "3 May 2007" "Easy Software Products"
+.TH cupstestppd 1 "Common UNIX Printing System" "3 May 2007" "Apple Inc."
 .SH NAME
 cupstestppd \- test conformance of ppd files
 .SH SYNOPSIS
@@ -146,7 +137,7 @@ http://localhost:631/help
 .br
 Adobe PostScript Printer Description File Format Specification, Version 4.3.
 .SH COPYRIGHT
-Copyright 1997-2007 by Easy Software Products, All Rights Reserved.
+Copyright 2007 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

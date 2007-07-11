@@ -5,23 +5,14 @@
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
+#   Copyright 2007 by Apple Inc.
 #   Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
-#   property of Easy Software Products and are protected by Federal
-#   copyright law.  Distribution and use rights are outlined in the file
-#   "LICENSE.txt" which should have been included with this file.  If this
-#   file is missing or damaged please contact Easy Software Products
-#   at:
-#
-#       Attn: CUPS Licensing Information
-#       Easy Software Products
-#       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
-#
-#       Voice: (301) 373-9600
-#       EMail: cups-info@cups.org
-#         WWW: http://www.cups.org
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 # Conditional build options (--with name/--without name):
@@ -51,7 +42,7 @@ Group: System Environment/Daemons
 Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.gz
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
-Vendor: Easy Software Products
+Vendor: Apple Inc.
 
 # Use buildroot so as not to disturb the version already installed
 BuildRoot: /tmp/%{name}-root
@@ -135,9 +126,10 @@ Requires: %{name}-libs = %{epoch}:%{version}
 
 %description
 The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. It has been developed by Easy Software Products 
-to promote a standard printing solution for all UNIX vendors and users. 
-CUPS provides the System V and Berkeley command-line interfaces. 
+UNIX® operating systems. It was developed by Easy Software Products 
+to promote a standard printing solution for all UNIX vendors and users
+and is now owned by Apple Inc.  CUPS provides the System V and Berkeley
+command-line interfaces. 
 
 %description devel
 The Common UNIX Printing System provides a portable printing layer for 

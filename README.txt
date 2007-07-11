@@ -1,4 +1,4 @@
-README - CUPS v1.3svn - 2007-01-03
+README - CUPS v1.3rc1 - 2007-07-11
 ----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
@@ -29,15 +29,8 @@ INTRODUCTION
     EPSON, HP, OKIDATA, and Zebra printers are included that use
     these filters.
 
-    Drivers for thousands of printers are provided with our ESP
-    Print Pro software, available at:
-
-	    http://www.easysw.com/printpro/
-
     CUPS is licensed under the GNU General Public License and GNU
-    Library General Public License.  Please contact Easy Software
-    Products for commercial support and "binary distribution"
-    rights.
+    Library General Public License.
 
 
 READING THE DOCUMENTATION
@@ -59,12 +52,6 @@ GETTING SUPPORT AND OTHER RESOURCES
     provide many discussion forums which are available at:
 
 	http://www.cups.org/newsgroups.php
-
-    Commercial support (with a guaranteed response time) is
-    available from Easy Software Products.  For more information
-    see:
-
-	http://www.easysw.com/cups/
 
     See the CUPS web site at "http://www.cups.org/" for other
     site links.
@@ -133,10 +120,7 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 
     The sample drivers provide basic printing capabilities, but
     generally do not exercise the full potential of the printers
-    or CUPS.  For fully-functional commercial printer drivers
-    check out our ESP Print Pro software at:
-
-	http://www.easysw.com/printpro/
+    or CUPS.
 
 
 PRINTING FILES
@@ -170,9 +154,9 @@ PRINTING FILES
 
 LEGAL STUFF
 
-    CUPS is Copyright 1993-2007 by Easy Software Products.  CUPS,
-    the CUPS logo, and the Common UNIX Printing System are the
-    trademark property of Easy Software Products.
+    CUPS is Copyright 2007 by Apple Inc.  CUPS, the CUPS logo, and
+    the Common UNIX Printing System are the trademark property of
+    Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
 
@@ -189,18 +173,3 @@ LEGAL STUFF
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     "doc/help/license.html" or "LICENSE.txt" files for more
     information.
-
-    For commercial licensing information, please contact:
-
-	Attn: CUPS Licensing Information
-	Easy Software Products
-	44141 Airport View Drive, Suite 204
-	Hollywood, Maryland 20636 USA
-
-	Voice: +1.301.373.9600
-	Email: cups-info@cups.org
-	WWW: http://www.cups.org/
-
-    Note that commercial licensors may also require a license from
-    Derek B. Noonburg who developed the Xpdf software used to print
-    PDF files.

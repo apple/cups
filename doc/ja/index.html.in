@@ -83,15 +83,9 @@ BORDER="0" ALT=""></A>
 <IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
 STYLE="padding-right: 10px;" ALT="ご機嫌なコンピュータとプリンタ">
 
-<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
-ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
-STYLE="padding-left: 10px; padding-bottom: 10px;"
-ALT="Easy Software Products"></A>
-
 CUPS は、UNIX<SUP>&reg;</SUP> ベースのオペレーティングシステムのための、
 ポータブルな印刷レイヤを提供します。標準印刷ソリューションを促進する
-ために、<A HREF="http://www.easysw.com">Easy Software
-Products</a> によって開発および保守されています。CUPS は
+ために、<A HREF="http://www.apple.com">Apple Inc.</a> によって開発および保守されています。CUPS は
 MacOS<SUP>&reg;</SUP> X および多くの Linux<SUP>&reg;</SUP>
 ディストリビューションで採用されている標準印刷システムです。</P>
 
@@ -110,14 +104,6 @@ PostScript Printer Description ("PPD") の機能を追加しています。<BR C
     <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
 </PRE>
 
-<P>CUPS の商用サポート、および <A
-HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> と呼ばれる
-拡張バージョンは、以下の場所で入手可能です:</P>
-
-<PRE>
-    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
-</PRE>
-
 </TD>
 <TD WIDTH="15">&nbsp;</TD>
 </TR>
@@ -127,9 +113,8 @@ WIDTH="15" HEIGHT="15" ALT=""></TD>
 <TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
 
 <P><SMALL>The Common UNIX Printing System, CUPS, and the CUPS logo are the
-trademark property of <A HREF="http://www.easysw.com">Easy Software
-Products</A>. CUPS is copyright 1997-2007 by Easy Software Products,
-All Rights Reserved.</SMALL></P>
+trademark property of <A HREF="http://www.apple.com">Apple Inc.</A>
+CUPS is copyright 2007 by Apple Inc, All Rights Reserved.</SMALL></P>
 
 </TD>
 

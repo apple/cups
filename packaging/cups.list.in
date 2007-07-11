@@ -4,29 +4,20 @@
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
 #
+#   Copyright 2007 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
-#   property of Easy Software Products and are protected by Federal
-#   copyright law.  Distribution and use rights are outlined in the file
-#   "LICENSE.txt" which should have been included with this file.  If this
-#   file is missing or damaged please contact Easy Software Products
-#   at:
-#
-#       Attn: CUPS Licensing Information
-#       Easy Software Products
-#       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
-#
-#       Voice: (301) 373-9600
-#       EMail: cups-info@cups.org
-#         WWW: http://www.cups.org
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 # Product information
 %product Common UNIX Printing System
-%copyright 1993-2007 by Easy Software Products, All Rights Reserved.
-%vendor Easy Software Products
+%copyright 2007 by Apple Inc.
+%vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
 %format rpm
@@ -36,10 +27,10 @@
 %version @CUPS_VERSION@
 %format all
 %description The Common UNIX Printing System provides a portable printing
-%description layer for UNIX(r) operating systems.  It has been developed by
+%description layer for UNIX(r) operating systems.  It was developed by
 %description Easy Software Products to promote a standard printing solution
-%description for all UNIX vendors and users.  CUPS provides the System V and
-%description Berkeley command-line interfaces. 
+%description for all UNIX vendors and users and is now owned by Apple Inc.
+%description CUPS provides the System V and Berkeley command-line interfaces. 
 
 %format rpm
 %provides lpd

@@ -3,7 +3,9 @@
 #
 #   pdftops filter Makefile for the Common UNIX Printing System (CUPS).
 #
-#   CUPS filter changes Copyright 1997-2006 by Easy Software Products.
+#   CUPS filter changes Copyright 2007 by Apple Inc. and Copyright 1997-2006
+#   by Easy Software Products.
+#
 #   Xpdf code Copyright 1996-1999 by Derek B. Noonburg
 #
 

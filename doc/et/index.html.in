@@ -83,15 +83,10 @@ või administraatori (root) kasutajanimi ja parool.</I></P>
 <IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
 STYLE="padding-right: 10px;" ALT="Happy Computer and Printer">
 
-<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
-ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
-STYLE="padding-left: 10px; padding-bottom: 10px;"
-ALT="Easy Software Products"></A>
-
 CUPS pakub porditavat trükkimiskihti
 UNIX<SUP>&reg;</SUP> põhistele operatsioonisüsteemidele. CUPS-i töötas
-välja ja hooldab <A HREF="http://www.easysw.com">Easy Software
-Products</a>, selle siht on edendada standardseid trükkimislahendusi. CUPS on
+välja ja hooldab <A HREF="http://www.apple.com">Apple Inc</a>,
+selle siht on edendada standardseid trükkimislahendusi. CUPS on
 standardne trükkimissüsteem, mida kasutavad MacOS<SUP>&reg;</SUP> X ja
 suurem osa Linux<SUP>&reg;</SUP> distributsioone.</P>
 
@@ -110,14 +105,6 @@ ametlikku veebilehekülge:</P>
     <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
 </PRE>
 
-<P>Kommertstoetus ja CUPS-i täiustatud versioon nimetusega <A
-HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> on
-saadaval aadressil:</P>
-
-<PRE>
-    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
-</PRE>
-
 </TD>
 <TD WIDTH="15">&nbsp;</TD>
 </TR>
@@ -127,8 +114,7 @@ WIDTH="15" HEIGHT="15" ALT=""></TD>
 <TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
 
 <P><SMALL>Common UNIX Printing System, CUPS ja CUPS-i logo on
-firma <A HREF="http://www.easysw.com">Easy Software
-Products</A> kaubamärgid. CUPS-i autoriõigus 1997-2007: Easy Software Products,
+firma <A HREF="http://www.apple.com">Apple Inc.</A> kaubamärgid. CUPS-i autoriõigus 2007: Apple Inc,
 kõik õigused kaitstud.</SMALL></P>
 
 </TD>

@@ -5,8 +5,8 @@
 %%DocumentData: Clean7Bit
 %%DocumentSuppliedResources: procset testprint/1.3
 %%DocumentNeededResources: font Helvetica Helvetica-Bold Times-Roman
-%%Creator: Michael Sweet, Easy Software Products
-%%CreationDate: D:20070220113000+0500
+%%Creator: Michael Sweet, Apple Inc.
+%%CreationDate: D:20070606214000+0500
 %%Title: Test Page
 %%EndComments
 %%BeginProlog
@@ -14,23 +14,13 @@
 %
 %   PostScript test page for the Common UNIX Printing System ("CUPS").
 %
+%   Copyright 2007 Apple Inc.
 %   Copyright 1993-2007 Easy Software Products
 %
 %   These coded instructions, statements, and computer programs are the
-%   property of Easy Software Products and are protected by Federal
-%   copyright law.  Distribution and use rights are outlined in the file
-%   "LICENSE.txt" which should have been included with this file.  If this
-%   file is missing or damaged please contact Easy Software Products
-%   at:
-%
-%       Attn: CUPS Licensing Information
-%       Easy Software Products
-%       44141 Airport View Drive, Suite 204
-%       Hollywood, Maryland 20636 USA
-%
-%       Voice: (301) 373-9600
-%       EMail: cups-info@cups.org
-%         WWW: http://www.cups.org
+%   property of Apple Inc. and are protected by Federal copyright law.
+%   Distribution and use rights are outlined in the file "LICENSE.txt"
+%   which is included with the CUPS source distribution.
 %
 /SEXTANT {			% Draw a color wheel sextant...
 				% (name) white radius r g b SEXTANT -
@@ -136,24 +126,6 @@
   (Printing) show
   dup 1.2 mul moveto
   (System) show
-} bind def
-/ESPLOGO {			% Draw the ESP logo
-				% height ESPLOGO
-  gsave
-    48 div dup scale
-
-    /Helvetica-Bold findfont 38.2 scalefont setfont
-    0 setgray
-    -3 19.5 moveto (ESP) show
-
-    /Helvetica-Narrow-Oblique findfont 8.2 scalefont setfont
-    0 2 moveto (Easy Software Products) show
-
-    1 -0.01 0 { dup neg 1.0 add setgray 0 11 3 -1 roll 68 mul 4.5 rectfill } for
-
-    1 0 0 setrgbcolor
-    67.5 11 4.5 4.5 rectfill
-  grestore
 } bind def
 %%EndResource
 %%EndProlog
@@ -592,42 +564,31 @@ gsave
   (Printer Test Page) CENTER		% Show text centered
 
   % Draw the copyright notice at the bottom...
-  pageWidth 36 mul			% Center of page
-  pageHeight 12 mul			% Bottom of page
+  pageWidth 17 mul			% Center of page
+  pageHeight 10 mul			% Bottom of page
   moveto				% Position text
-  (Printed Using CUPS v1.3.x) CENTER	% Show text centered
+  (Printed Using CUPS v1.3.x) show
 
-  pageWidth 34 mul			% Left-center of page
+  pageWidth 17 mul			% Left side of page
   pageHeight 8 mul			% Move down...
   2 copy moveto				% Position text
   smallFont setfont			% Font
-  (Copyright 1993-2006 Easy Software Products, All Rights Reserved.) CENTER
-  pageHeight sub			% Move down...
+  (Copyright 2007 Apple Inc., All Rights Reserved. CUPS and the CUPS logo are the trademark) show
+  pageHeight 2 add sub			% Move down...
   2 copy moveto				% Position text
-  (CUPS, and the CUPS logo are the trademark property of Easy Software Products,) CENTER
-  pageHeight sub			% Move down...
-  2 copy moveto				% Position text
-  (44141 Airport View Drive, Suite 204, Hollywood, Maryland, 20636, USA.) CENTER
-  pageHeight sub			% Move down...
-  pageHeight sub			% Move down...
+  (property of Apple Inc., 1 Infinite Loop, Cupertino, CA 95014, USA.) show
+  pageHeight 2 mul 4 add sub		% Move down...
   moveto				% Position text
-  (Need help? Contact your operating system vendor or visit "http://www.cups.org/".) CENTER
+  (Need help? Contact your operating system vendor or visit "http://www.cups.org/".) show
 
   % Then the CUPS logo....
   gsave
     pageWidth 4 mul
     pageHeight 4 mul
     translate
-    pageWidth 9 mul CUPSLOGO
+    pageWidth 15 mul CUPSLOGO
   grestore
 
-  % And the ESP logo....
-  gsave
-    pageWidth 58 mul
-    pageHeight 4 mul
-    translate
-    pageWidth 6 mul ESPLOGO
-  grestore
 % Show the page...
 grestore
 showpage

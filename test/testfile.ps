@@ -3,34 +3,24 @@
 %%Pages: 1
 %%LanguageLevel: 1
 %%DocumentData: Clean7Bit
-%%DocumentSuppliedResources: procset testprint/1.0
+%%DocumentSuppliedResources: procset testprint/1.3
 %%DocumentNeededResources: font Helvetica Helvetica-Bold Times-Roman
-%%Creator: Michael Sweet, Easy Software Products
-%%CreationDate: May 11, 1999
+%%Creator: Michael Sweet, Apple Inc.
+%%CreationDate: D:20070606214000+0500
 %%Title: Test Page
 %%EndComments
 %%BeginProlog
-%%BeginResource procset testprint 1.2 0
+%%BeginResource procset testprint 1.3 0
 %
 %   PostScript test page for the Common UNIX Printing System ("CUPS").
 %
-%   Copyright 1993-2005 Easy Software Products
+%   Copyright 2007 Apple Inc.
+%   Copyright 1993-2007 Easy Software Products
 %
 %   These coded instructions, statements, and computer programs are the
-%   property of Easy Software Products and are protected by Federal
-%   copyright law.  Distribution and use rights are outlined in the file
-%   "LICENSE.txt" which should have been included with this file.  If this
-%   file is missing or damaged please contact Easy Software Products
-%   at:
-%
-%       Attn: CUPS Licensing Information
-%       Easy Software Products
-%       44141 Airport View Drive, Suite 204
-%       Hollywood, Maryland 20636 USA
-%
-%       Voice: (301) 373-9600
-%       EMail: cups-info@cups.org
-%         WWW: http://www.cups.org
+%   property of Apple Inc. and are protected by Federal copyright law.
+%   Distribution and use rights are outlined in the file "LICENSE.txt"
+%   which is included with the CUPS source distribution.
 %
 /SEXTANT {			% Draw a color wheel sextant...
 				% (name) white radius r g b SEXTANT -
@@ -137,81 +127,6 @@
   dup 1.2 mul moveto
   (System) show
 } bind def
-/ESPLOGO {			% Draw the ESP logo
-				% height ESPLOGO
-  % Compute the size of the logo...
-  0 0
-  2 index 1.5 mul 3 index
-
-  % Do the "metallic" fill from 10% black to 40% black...
-  1 -0.001 0 {
-    dup			% loopval
-    -0.15 mul		% loopval * -0.15
-    0.9 add		% 0.9 - loopval * 0.15
-    setgray		% set gray shade
-
-    0			% x
-    1 index neg		% loopval
-    1 add		% 1 - loopval
-    3 index		% height
-    mul			% height * (1 - loopval)
-    moveto		% starting point
-
-    dup			% loopval
-    3 index		% width
-    mul			% loopval * width
-    2 index		% height
-    lineto		% Next point
-
-    0			% x
-    2 index		% height
-    lineto		% Next point
-
-    closepath
-    fill
-
-    dup			% loopval
-    0.15 mul		% loopval * 0.15
-    0.6 add		% 0.6 + loopval * 0.15
-    setgray
-
-    dup			% loopval
-    neg 1 add		% 1 - loopval
-    3 index		% width
-    mul			% (1 - loopval) * width
-    0			% y
-    moveto		% Starting point
-
-    2 index		% width
-    exch		% loopval
-    2 index		% height
-    mul			% loopval * height
-    lineto		% Next point
-
-    1 index		% width
-    0			% y
-    lineto		% Next point
-
-    closepath
-    fill
-  } for
-
-  0 setgray rectstroke
-
-  /Helvetica-BoldOblique findfont 1 index 3 div scalefont setfont
-  dup 40 div
-
-  dup 4 mul 1 index 25 mul moveto (E) show
-  dup 10 mul 1 index 15 mul moveto (S) show
-  dup 16 mul 1 index 5 mul moveto (P) show
-
-  /Helvetica-BoldOblique findfont 2 index 5 div scalefont setfont
-  dup 14 mul 1 index 29 mul moveto (asy) show
-  dup 20 mul 1 index 19 mul moveto (oftware) show
-  dup 26 mul 1 index 9 mul moveto (roducts) show
-
-  pop
-} bind def
 %%EndResource
 %%EndProlog
 %%Page: 1 1
@@ -226,7 +141,6 @@ gsave
 
   4 setlinewidth			% Draw wide lines
   0 setgray closepath stroke		% Draw a clipping rectangle
-  1 setlinewidth			% Draw normal lines
 
   /pageWidth pageRight pageLeft sub def	% pageWidth = pageRight - pageLeft
   /pageHeight pageTop pageBottom sub def% pageHeight = pageTop - pageBottom
@@ -252,6 +166,104 @@ gsave
   /smallFont /Times-Roman findfont	% smallFont = Times-Roman
   pageHeight scalefont def		% size = pageHeight (nominally 11)
 
+  % Draw rulers along the edges...
+  /CENTIMETER 72 2.54 div def
+  /MILLIMETER 72 25.4 div def
+
+  /Times-Roman findfont			% Font for ruler numbers
+  11 scalefont setfont			% 11 points
+
+  gsave					% Left side inches
+    pageLeft 72 mul 0 translate		% Offset left edge
+
+    1 setlinewidth			% Draw normal lines
+    72 72 pageTop 72 mul {		% Height inches
+      dup dup
+      0 exch moveto 24 0 rlineto stroke	% Draw tic mark
+      24 exch pageHeight sub moveto	% Draw number
+      72 div cvi 10 string cvs RIGHT
+    } for
+
+    0.5 setlinewidth			% Draw thin lines
+    18 18 pageTop 72 mul {		% 1/4 inches
+      0 exch moveto 15 0 rlineto stroke	% Draw tic mark
+    } for
+
+    9 9 pageTop 72 mul {		% 1/8 inches
+      0 exch moveto 6 0 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  gsave					% Bottom inches
+    0 pageBottom 72 mul translate	% Offset bottom edge
+
+    1 setlinewidth			% Draw normal lines
+    72 72 pageRight 72 mul {		% Width inches
+      dup dup
+      0 moveto 0 24 rlineto stroke	% Draw tic mark
+      3 add 27 pageHeight sub moveto	% Draw number
+      72 div cvi 10 string cvs show
+    } for
+
+    0.5 setlinewidth			% Draw thin lines
+    18 18 pageRight 72 mul {		% 1/4 inches
+      0 moveto 0 15 rlineto stroke	% Draw tic mark
+    } for
+
+    9 9 pageRight 72 mul {		% 1/8 inches
+      0 moveto 0 6 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  gsave					% Right side centimeters
+    pageRight 72 mul 0 translate	% Offset right edge
+
+    1 setlinewidth			% Draw normal lines
+    CENTIMETER CENTIMETER
+        pageTop 72 mul {		% Height centimeters
+      0 exch moveto -24 0 rlineto stroke% Draw tic mark
+    } for
+    1 1 pageTop 2.54 mul {		% Height labels
+      dup
+      -24 exch CENTIMETER mul
+          pageHeight sub moveto		% Draw number
+      cvi 10 string cvs show
+    } for
+
+    0.5 setlinewidth			% Draw thin lines
+    0 0.5 CENTIMETER mul
+        pageTop 72 mul {		% 1/2 centimeters
+      0 exch moveto -15 0 rlineto stroke% Draw tic mark
+    } for
+    0 MILLIMETER pageTop 72 mul {	% Millimeters
+      0 exch moveto -6 0 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  gsave					% Top centimeters
+    0 pageTop 72 mul translate		% Offset top edge
+
+    1 setlinewidth			% Draw normal lines
+    CENTIMETER CENTIMETER
+        pageRight 72 mul {		% Width centimeters
+      0 moveto 0 -24 rlineto stroke	% Draw tic mark
+    } for
+    1 1 pageRight 2.54 mul {		% Width labels
+      dup
+      CENTIMETER mul 3 add -24 moveto	% Draw number
+      cvi 10 string cvs show
+    } for
+
+    0.5 setlinewidth			% Draw thin lines
+    0 0.5 CENTIMETER mul
+        pageRight 72 mul {		% 1/2 centimeters
+      0 moveto 0 -15 rlineto stroke	% Draw tic mark
+    } for
+    0 MILLIMETER pageRight 72 mul {	% Millimeters
+      0 moveto 0 -6 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
   % Offset page to account for lower-left margin...
   pageLeft 72 mul
   pageBottom 72 mul
@@ -260,6 +272,7 @@ gsave
   % Set text font and color...
   mediumFont setfont			% Font
   0 setgray				% Color
+  1 setlinewidth			% Draw normal lines
 
   % Draw the color wheel...
   gsave
@@ -284,7 +297,7 @@ gsave
 
   % Label the color wheel...
   pageWidth 18 mul			% x = pageWidth * 1/4 * 72
-  pageHeight 44 mul			% y = pageHeight * 19/32 * 72
+  pageHeight 43 mul			% y = pageHeight * 19/32 * 72
   moveto				% Position the text
   (Color Wheel) CENTER			% Show the text centered
 
@@ -342,7 +355,7 @@ gsave
 
   % Label the gray ramp...
   pageWidth 36 mul			% x = pageWidth * 1/2 * 72
-  pageHeight 44 mul			% y = pageHeight * 19/32 * 72
+  pageHeight 43 mul			% y = pageHeight * 19/32 * 72
   moveto				% Position the text
   (Gray Ramp) CENTER			% Show the text centered
 
@@ -374,7 +387,7 @@ gsave
 
   % Label the lines...
   pageWidth 54 mul			% x = pageWidth * 3/4 * 72
-  pageHeight 44 mul			% y = pageHeight * 19/32 * 72
+  pageHeight 43 mul			% y = pageHeight * 19/32 * 72
   moveto				% Position the text
   (1 Degree Radial Lines) CENTER	% Show the text centered
 
@@ -539,52 +552,43 @@ gsave
 
   % Serial Number
   pageHeight 2 mul sub			% Move down...
-  2 copy moveto				% Move to x & y
+  moveto				% Move to x & y
   (Serial #: ) RIGHT			% Label
   1 serialnumber NUMBER			% S/N
 
   % Draw the label at the top...
   pageWidth 36 mul			% Center of page
-  pageHeight 68 mul			% Top of page (15/16ths)
-  2 copy moveto				% Position text
+  pageHeight 66 mul			% Top of page (11/12ths)
+  moveto				% Position text
   bigFont setfont			% Font
   (Printer Test Page) CENTER		% Show text centered
 
   % Draw the copyright notice at the bottom...
-  pageWidth 36 mul			% Center of page
+  pageWidth 17 mul			% Center of page
   pageHeight 10 mul			% Bottom of page
-  2 copy moveto				% Position text
-  (Printed Using CUPS v1.2.x) CENTER	% Show text centered
+  moveto				% Position text
+  (Printed Using CUPS v1.3.x) show
 
-  pageHeight 2 mul sub			% Move down...
+  pageWidth 17 mul			% Left side of page
+  pageHeight 8 mul			% Move down...
   2 copy moveto				% Position text
   smallFont setfont			% Font
-  (Copyright 1993-2005 Easy Software Products, All Rights Reserved.) CENTER
-  pageHeight sub			% Move down...
+  (Copyright 2007 Apple Inc., All Rights Reserved. CUPS and the CUPS logo are the trademark) show
+  pageHeight 2 add sub			% Move down...
   2 copy moveto				% Position text
-  (CUPS, and the CUPS logo are the trademark property of) CENTER
-  pageHeight sub			% Move down...
-  2 copy moveto				% Position text
-  (Easy Software Products, 44141 Airport View Drive, Suite 204,) CENTER
-  pageHeight sub			% Move down...
-  2 copy moveto				% Position text
-  (Hollywood, Maryland, 20636, USA.) CENTER
+  (property of Apple Inc., 1 Infinite Loop, Cupertino, CA 95014, USA.) show
+  pageHeight 2 mul 4 add sub		% Move down...
+  moveto				% Position text
+  (Need help? Contact your operating system vendor or visit "http://www.cups.org/".) show
 
   % Then the CUPS logo....
   gsave
     pageWidth 4 mul
     pageHeight 4 mul
     translate
-    pageWidth 9 mul CUPSLOGO
+    pageWidth 15 mul CUPSLOGO
   grestore
 
-  % And the ESP logo....
-  gsave
-    pageWidth 59 mul
-    pageHeight 4 mul
-    translate
-    pageWidth 6 mul ESPLOGO
-  grestore
 % Show the page...
 grestore
 showpage

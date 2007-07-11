@@ -84,14 +84,8 @@ lösenord.</I></P>
 <IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
 STYLE="padding-right: 10px;" ALT="Glad dator och skrivare">
 
-<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
-ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
-STYLE="padding-left: 10px; padding-bottom: 10px;"
-ALT="Easy Software Products"></A>
-
 CUPS tillhandahåller ett portabelt skrivarlager för UNIX<SUP>&reg;</SUP>-baserade operativsystem. Det har utvecklats och 
-underhålls av <A HREF="http://www.easysw.com">Easy Software
-Products</a> för att erbjuda en standardiserad utskriftslösning. 
+underhålls av <A HREF="http://www.apple.com">Apple Inc.</a> för att erbjuda en standardiserad utskriftslösning. 
 CUPS är det utskriftssystemet som är standard på MacOS<SUP>&reg;</SUP> X och de flesta Linux<SUP>&reg;</SUP>-distributioner.</P>
 
 <P>CUPS använder <A HREF="http://www.pwg.org/ipp/"
@@ -107,14 +101,6 @@ och PostScript Printer Description-baserade ("PPD") utskriftsalternativ för att
     <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
 </PRE>
 
-<P>Kommersiell support och en utökad version av CUPS kallad <A
-HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> finns 
-tillgänglig på:</P>
-
-<PRE>
-    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
-</PRE>
-
 </TD>
 <TD WIDTH="15">&nbsp;</TD>
 </TR>
@@ -123,9 +109,8 @@ tillgänglig på:</P>
 WIDTH="15" HEIGHT="15" ALT=""></TD>
 <TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
 
-<P><SMALL>The Common UNIX Printing System, CUPS, och CUPS-logotypen är  varumärken för <A HREF="http://www.easysw.com">Easy Software
-Products</A>. CUPS är copyright 1997-2007 Easy Software Products,
-Alla rättigheter reserverade.</SMALL></P>
+<P><SMALL>The Common UNIX Printing System, CUPS, och CUPS-logotypen är  varumärken för <A HREF="http://www.apple.com">Apple Inc.</A>
+CUPS är copyright 2007 Apple Inc, Alla rättigheter reserverade.</SMALL></P>
 
 </TD>
 

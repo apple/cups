@@ -71,23 +71,14 @@ Attribute "Product" "" "(ESP Ghostscript)"
 Attribute "PSVersion" "" "(3010.000) 81501"
 Attribute "TTRasterizer" "" "Type42"
 
+Copyright "Copyright 2007 by Apple Inc."
 Copyright "Copyright 1997-2007 by Easy Software Products."
 Copyright ""
-Copyright "These coded instructions, statements, and computer programs are the"
-Copyright "property of Easy Software Products and are protected by Federal"
-Copyright "copyright law.  Distribution and use rights are outlined in the file"
-Copyright "\"LICENSE.txt\" which should have been included with this file.  If this"
-Copyright "file is missing or damaged please contact Easy Software Products"
-Copyright "at:"
-Copyright ""
-Copyright "Attn: CUPS Licensing Information"
-Copyright "Easy Software Products"
-Copyright "44141 Airport View Drive, Suite 204"
-Copyright "Hollywood, Maryland 20636 USA"
-Copyright ""
-Copyright "Voice: (301) 373-9600"
-Copyright "EMail: cups-info@cups.org"
-Copyright "WWW: http://www.cups.org"
+Copyright "These coded instructions, statements, and computer programs are the
+Copyright "property of Apple Inc. and are protected by Federal copyright
+Copyright "law.  Distribution and use rights are outlined in the file \"LICENSE.txt\""
+Copyright "which should have been included with this file.  If this file is
+Copyright "file is missing or damaged, see the license at \"http://www.cups.org/\"."
 
 Font *
 

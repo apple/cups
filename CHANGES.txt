@@ -1,8 +1,9 @@
-CHANGES.txt - 2007-07-10
+CHANGES.txt - 2007-07-11
 ------------------------
 
 CHANGES IN CUPS V1.3
 
+	- Copyright updates - CUPS is now owned by Apple Inc.
 	- Documentation updates (STR #1775, STR #2027, STR #2130,
 	  STR #2131, STR #2263, STR #2356, STR #2397)
 	- Added LDAP+SSL support (STR #1967)
