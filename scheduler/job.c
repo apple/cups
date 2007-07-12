@@ -57,6 +57,7 @@
  *   start_job()                - Start a print job.
  *   unload_job()               - Unload a job from memory.
  *   update_job()               - Read a status update from a jobs filters.
+ *   update_job_attrs()         - Update the job-printer-* attributes.
  */
 
 /*
@@ -98,6 +99,7 @@ static void	set_hold_until(cupsd_job_t *job, time_t holdtime);
 static void	start_job(cupsd_job_t *job, cupsd_printer_t *printer);
 static void	unload_job(cupsd_job_t *job);
 static void	update_job(cupsd_job_t *job);
+static void	update_job_attrs(cupsd_job_t *job);
 
 
 /*
@@ -493,6 +495,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
   }
 
   printer = job->printer;
+
+  update_job_attrs(job);
 
   if (job->status < 0)
   {
@@ -3529,6 +3533,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	cupsdAddPrinterHistory(job->printer);
 	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
       }
+
+      update_job_attrs(job);
     }
     else if (loglevel == CUPSD_LOG_ATTR)
     {
@@ -3602,6 +3608,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
               sizeof(job->printer->state_message));
       cupsdAddPrinterHistory(job->printer);
       event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+
+      update_job_attrs(job);
     }
 
     if (!strchr(job->status_buffer->buffer, '\n'))
@@ -3636,6 +3644,85 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
     cupsdFinishJob(job);
   }
+}
+
+
+/*
+ * 'update_job_attrs()' - Update the job-printer-* attributes.
+ */
+
+void
+update_job_attrs(cupsd_job_t *job)	/* I - Job to update */
+{
+  int			i;		/* Looping var */
+  int			num_reasons;	/* Actual number of reasons */
+  const char * const	*reasons;	/* Reasons */
+  static const char	*none = "none",	/* "none" */
+			*paused = "paused";
+					/* "paused" */
+
+
+ /*
+  * Get/create the job-printer-state-* attributes...
+  */
+
+  if (!job->printer_message)
+  {
+    if ((job->printer_message = ippFindAttribute(job->attrs,
+                                                 "job-printer-state-message",
+						 IPP_TAG_TEXT)) == NULL)
+      job->printer_message = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_TEXT,
+                                          "job-printer-state-message",
+					  NULL, "");
+  }
+
+  if (!job->printer_reasons)
+    job->printer_reasons = ippFindAttribute(job->attrs,
+					    "job-printer-state-reasons",
+					    IPP_TAG_KEYWORD);
+
+ /*
+  * If the job isn't printing, return now...
+  */
+
+  if (!job->printer)
+    return;
+
+ /*
+  * Otherwise copy the printer-state-message value...
+  */
+
+  if (job->printer->state_message[0])
+    cupsdSetString(&(job->printer_message->values[0].string.text),
+		   job->printer->state_message);
+
+ /*
+  * ... and the printer-state-reasons value...
+  */
+
+  if (job->printer->num_reasons == 0)
+  {
+    num_reasons = 1;
+    reasons     = job->printer->state == IPP_PRINTER_STOPPED ? &paused : &none;
+  }
+  else
+  {
+    num_reasons = job->printer->num_reasons;
+    reasons     = (const char * const *)job->printer->reasons;
+  }
+
+  if (!job->printer_reasons || job->printer_reasons->num_values != num_reasons)
+  {
+    ippDeleteAttribute(job->attrs, job->printer_reasons);
+
+    job->printer_reasons = ippAddStrings(job->attrs,
+                                         IPP_TAG_JOB, IPP_TAG_KEYWORD,
+					 "job-printer-state-reasons",
+					 num_reasons, NULL, NULL);
+  }
+
+  for (i = 0; i < num_reasons; i ++)
+    cupsdSetString(&(job->printer_reasons->values[i].string.text), reasons[i]);
 }
 
 

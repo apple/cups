@@ -34,6 +34,10 @@ typedef struct cupsd_job_s
   time_t		hold_until;	/* Hold expiration date/time */
   ipp_attribute_t	*state;		/* Job state */
   ipp_attribute_t	*job_sheets;	/* Job sheets (NULL if none) */
+  ipp_attribute_t	*printer_message,
+					/* job-printer-state-message */
+			*printer_reasons;
+					/* job-printer-state-reasons */
   int			current_file;	/* Current file in job */
   ipp_t			*attrs;		/* Job attributes */
   int			print_pipes[2],	/* Print data pipes */
@@ -102,7 +106,6 @@ extern void		cupsdCleanJobs(void);
 extern void		cupsdDeleteJob(cupsd_job_t *job);
 extern cupsd_job_t	*cupsdFindJob(int id);
 extern void		cupsdFinishJob(cupsd_job_t *job);
-extern void		cupsdUnloadCompletedJobs(void);
 extern void		cupsdFreeAllJobs(void);
 extern int		cupsdGetPrinterJobCount(const char *dest);
 extern int		cupsdGetUserJobCount(const char *username);
@@ -119,6 +122,7 @@ extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
 extern void		cupsdStopAllJobs(int force);
 extern void		cupsdStopJob(cupsd_job_t *job, int force);
 extern void		cupsdTimeoutJob(cupsd_job_t *job);
+extern void		cupsdUnloadCompletedJobs(void);
 
 
 /*
