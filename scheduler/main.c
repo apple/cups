@@ -421,16 +421,7 @@ main(int  argc,				/* I - Number of command-line args */
   PSQLibRef = dlopen(PSQLibPath, RTLD_LAZY);
 
   if (PSQLibRef)
-  {
     PSQUpdateQuotaProc = dlsym(PSQLibRef, PSQLibFuncName);
-
-   /*
-    * On Mac OS X Server, the default is to not share any printers.  I find that
-    * extremely strange for a server OS, but that's how it works...
-    */
-
-    DefaultShared = 0;
-  }
 #endif /* __APPLE__ && HAVE_DLFCN_H */
 
  /*
