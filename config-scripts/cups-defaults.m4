@@ -204,34 +204,34 @@ AC_ARG_WITH(cups_group, [  --with-cups-group       set default group for CUPS],
 AC_ARG_WITH(system_groups, [  --with-system-groups    set default system groups for CUPS],
 	CUPS_SYSTEM_GROUPS="$withval",
 	if test x$uname = xDarwin; then
-		GROUP_LIST="admin"
+		CUPS_SYSTEM_GROUPS="lpadmin admin"
 	else
-		GROUP_LIST="lpadmin sys system root"
-	fi
-
-	AC_MSG_CHECKING(for default system groups)
-	if test -f /etc/group; then
-		CUPS_SYSTEM_GROUPS=""
-		for group in $GROUP_LIST; do
-			if test "`grep \^${group}: /etc/group`" != ""; then
-				if test "x$CUPS_SYSTEM_GROUPS" = x; then
-					CUPS_SYSTEM_GROUPS="$group"
-				else
-					CUPS_SYSTEM_GROUPS="$CUPS_SYSTEM_GROUPS $group"
+		AC_MSG_CHECKING(for default system groups)
+		if test -f /etc/group; then
+			CUPS_SYSTEM_GROUPS=""
+			GROUP_LIST="lpadmin sys system root"
+			for group in $GROUP_LIST; do
+				if test "`grep \^${group}: /etc/group`" != ""; then
+					if test "x$CUPS_SYSTEM_GROUPS" = x; then
+						CUPS_SYSTEM_GROUPS="$group"
+					else
+						CUPS_SYSTEM_GROUPS="$CUPS_SYSTEM_GROUPS $group"
+					fi
 				fi
-			fi
-		done
+			done
 
-		if test "x$CUPS_SYSTEM_GROUPS" = x; then
-			CUPS_SYSTEM_GROUPS="$GROUP_LIST"
-			AC_MSG_RESULT(no groups found, using "$CUPS_SYSTEM_GROUPS")
+			if test "x$CUPS_SYSTEM_GROUPS" = x; then
+				CUPS_SYSTEM_GROUPS="$GROUP_LIST"
+				AC_MSG_RESULT(no groups found, using "$CUPS_SYSTEM_GROUPS")
+			else
+				AC_MSG_RESULT("$CUPS_SYSTEM_GROUPS")
+			fi
 		else
-			AC_MSG_RESULT("$CUPS_SYSTEM_GROUPS")
+			CUPS_SYSTEM_GROUPS="$GROUP_LIST"
+			AC_MSG_RESULT(no group file, using "$CUPS_SYSTEM_GROUPS")
 		fi
-	else
-		CUPS_SYSTEM_GROUPS="$GROUP_LIST"
-		AC_MSG_RESULT(no group file, using "$CUPS_SYSTEM_GROUPS")
 	fi)
+
 
 CUPS_PRIMARY_SYSTEM_GROUP="`echo $CUPS_SYSTEM_GROUPS | awk '{print $1}'`"
 
