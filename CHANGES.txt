@@ -1,7 +1,7 @@
 CHANGES.txt - 2007-07-12
 ------------------------
 
-CHANGES IN CUPS V1.3
+CHANGES IN CUPS V1.3b1
 
 	- Copyright updates - CUPS is now owned by Apple Inc.
 	- Documentation updates (STR #1775, STR #2027, STR #2130,

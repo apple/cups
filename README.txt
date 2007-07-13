@@ -1,5 +1,5 @@
-README - CUPS v1.3rc1 - 2007-07-11
-----------------------------------
+README - CUPS v1.3b1 - 2007-07-12
+---------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -8,10 +8,10 @@ instead...
 INTRODUCTION
 
     CUPS provides a portable printing layer for UNIX(r)-based
-    operating systems.  It has been developed by Easy Software
-    Products to promote a standard printing solution for all UNIX
-    vendors and users.  CUPS provides the System V and Berkeley
-    command-line interfaces.
+    operating systems.  It was developed by Easy Software Products
+    and is now owned and maintained by Apple Inc. to promote a
+    standard printing solution for all UNIX vendors and users.  CUPS
+    provides the System V and Berkeley command-line interfaces.
 
     CUPS uses the Internet Printing Protocol ("IPP") as the basis
     for managing print jobs and queues.  The Line Printer Daemon
@@ -30,7 +30,7 @@ INTRODUCTION
     these filters.
 
     CUPS is licensed under the GNU General Public License and GNU
-    Library General Public License.
+    Library General Public License versions 2.
 
 
 READING THE DOCUMENTATION
@@ -59,7 +59,7 @@ GETTING SUPPORT AND OTHER RESOURCES
 
 SETTING UP PRINTER QUEUES USING YOUR WEB BROWSER
 
-    CUPS 1.2 includes a web-based administration tool that allows
+    CUPS 1.3 includes a web-based administration tool that allows
     you to manage printers, classes, and jobs on your server. 
     Open the following URL in your browser to access the printer
     administration tools:
@@ -88,6 +88,7 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 	Driver                         PPD File
 	-----------------------------  ------------
 	Dymo Label Printers            dymo.ppd
+	Intellitech Intellibar         intelbar.ppd
 	EPSON Stylus Color Series      stcolor.ppd
 	EPSON Stylus Photo Series      stphoto.ppd
 	EPSON Stylus New Color Series  stcolor2.ppd
@@ -95,7 +96,6 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 	EPSON 9-pin Series             epson9.ppd
 	EPSON 24-pin Series            epson24.ppd
 	HP DeskJet Series              deskjet.ppd
-	HP New DeskJet Series          deskjet2.ppd
 	HP LaserJet Series             laserjet.ppd
 	OKIDATA 9-Pin Series           okidata9.ppd
 	OKIDATA 24-Pin Series          okidat24.ppd
