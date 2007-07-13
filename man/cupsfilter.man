@@ -24,6 +24,8 @@ cupsfilter \- convert a file to another format using cups filters
 .I copies
 ] [ -o
 .I name=value
+] [ -p
+.I filename.ppd
 ] [ -t
 .I title
 ]
@@ -49,6 +51,10 @@ Specifies the number of copies to generate.
 -o name=value
 .br
 Specifies options to pass to the CUPS filters.
+.TP 5
+-p filename.ppd
+.br
+Specifies the PPD file to use.
 .TP 5
 -t title
 .br
