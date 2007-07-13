@@ -106,7 +106,7 @@ changes.</P>
 <BLOCKQUOTE>Patches and files must conform to the standards
 outlined in the "<A HREF="#CODING">Coding Guidelines</A>" and "<A
 HREF="#MAKEFILES">Makefile Guidelines</A>" sections in this
-document. In addition, since Easy Software Products provides CUPS
+document. In addition, since Apple Inc. provides CUPS
 under multiple licenses, we require that you assign the copyright
 for your changes and files to us for inclusion in
 CUPS.</BLOCKQUOTE>
@@ -315,7 +315,7 @@ Guidelines</A>".</P>
 HREF="http://www.gnu.org/software/autoconf/">GNU autoconf</A> to
 tailor the library to the local operating system. Project files
 for major IDEs are also provided for Microsoft
-Windows<suP>&reg;</suP>. To improve portability, makefiles must
+Windows<SUP>&reg;</SUP>. To improve portability, makefiles must
 not make use of the unique features offered by <A
 HREF="http://www.gnu.org/software/make/">GNU make</A>. See the <A
 HREF="#MAKEFILES">Makefile Guidelines</A> section for a
@@ -344,8 +344,8 @@ tools/makesrcdist <I>version</I>
 <P>When run with no arguments, the script creates a snapshot of
 the current working copy and names it using the highest revision
 number in the WC, for example
-"/tmp/cups-1.2svn-r1234-source.tar.bz2" and
-"/tmp/cups-1.2svn-r1234-source.tar.gz". When run with two
+"/tmp/cups-1.3svn-r1234-source.tar.bz2" and
+"/tmp/cups-1.3svn-r1234-source.tar.gz". When run with two
 arguments, the script creates a release tag in the repository and
 exports that tag, creating the files
 "/tmp/cups-<I>version</I>-source.tar.bz2" and
@@ -354,7 +354,7 @@ exports that tag, creating the files
 <P>Binary packages are not generally distributed by the CUPS
 team, however the <VAR>packaging/cups.spec</VAR> and
 <VAR>packaging/cups.list</VAR> files may be used to create binary
-packages on Linux, MacOS X, and UNIX. The
+packages on Linux, Mac OS X, and UNIX. The
 <VAR>packaging/cups.spec</VAR> file produces a binary package
 using the <CODE>rpmbuild(8)</CODE> software:</P>
 
@@ -400,7 +400,7 @@ are available for each type of binary package:</P>
 </TR>
 <TR>
 	<TD>osx</TD>
-	<TD>MacOS X Install</TD>
+	<TD>Mac OS X Install</TD>
 </TR>
 <TR>
 	<TD>pkg</TD>
@@ -431,7 +431,7 @@ are available for each type of binary package:</P>
 <P>Finally, the <VAR>tools/testrpm</VAR> and
 <VAR>tools/testosx</VAR> scripts can be used to create binary
 packages from the current working copy for testing on Linux and
-MacOS X, respectively:</P>
+Mac OS X, respectively:</P>
 
 <PRE CLASS="command">
 tools/testrpm
@@ -625,24 +625,13 @@ the Subversion "&#36;Id$" tag:</P>
  *
  *   Description of file contents.
  *
- *   Copyright yyyy-YYYY by Easy Software Products, all rights
- *   reserved.
+ *   Copyright 2007 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are
- *   the property of Easy Software Products and are protected by
- *   Federal copyright law.  Distribution and use rights are outlined
- *   in the file "LICENSE.txt" which should have been included with
- *   this file.  If this file is missing or damaged please contact
- *   Easy Software Products at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org/
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
@@ -930,24 +919,13 @@ file, and CUPS copyright and license notice:</P>
 #
 #   Makefile for ...
 #
-#   Copyright yyyy-YYYY by Easy Software Products, all rights
-#   reserved.
+#   Copyright 2007 by Apple Inc.
 #
-#   These coded instructions, statements, and computer programs are
-#   the property of Easy Software Products and are protected by
-#   Federal copyright law.  Distribution and use rights are outlined
-#   in the file "LICENSE.txt" which should have been included with
-#   this file.  If this file is missing or damaged please contact
-#   Easy Software Products at:
-#
-#       Attn: CUPS Licensing Information
-#       Easy Software Products
-#       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
-#
-#       Voice: (301) 373-9600
-#       EMail: cups-info@cups.org
-#         WWW: http://www.cups.org/
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 </PRE>
 
