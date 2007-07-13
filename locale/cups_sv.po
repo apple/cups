@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.3\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-06-20 17:48-0700\n"
+"POT-Creation-Date: 2007-07-13 12:16-0400\n"
 "PO-Revision-Date: 2007-01-23 16:31+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
@@ -1091,6 +1091,10 @@ msgid "%s: Unknown destination \"%s\"!\n"
 msgstr "%s: Okänt mål \"%s\"!\n"
 
 #, c-format
+msgid "%s: Unknown option '%c'!\n"
+msgstr "%s: Okänd flagga \"%c\"!\n"
+
+#, c-format
 msgid ""
 "%s: Warning - '%c' format modifier not supported - output may not be "
 "correct!\n"
@@ -2051,6 +2055,10 @@ msgstr "Inga prenumerationer hittades."
 msgid "None"
 msgstr "Ingen"
 
+#, fuzzy
+msgid "Not allowed to print."
+msgstr "Ingen standardskrivare"
+
 msgid "OK"
 msgstr "OK"
 
@@ -2556,6 +2564,17 @@ msgstr ""
 "-l                  Kör cupsd från launchd(8)\n"
 
 msgid ""
+"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+"\n"
+"Options:\n"
+"\n"
+"  -c cupsd.conf   Set cupsd.conf file to use\n"
+"  -n copies       Set number of copies\n"
+"  -o name=value   Set option(s)\n"
+"  -t title        Set title\n"
+msgstr ""
+
+msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
 "       cupstestdsc [options] -\n"
 "\n"
@@ -2754,6 +2773,25 @@ msgstr "cupsd: Okänd flagga \"%c\" - avbryter!\n"
 
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr "cupsd: stöd för launchd(8) inte inbyggt, kör i normalt läge.\n"
+
+#, c-format
+msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
+msgstr ""
+
+msgid "cupsfilter: Only one filename can be specified!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
+msgstr "lpq: Okänt mål \"%s/%s\"!\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
 msgstr "cupstestppd: Flaggan -q är inte kompatibel med flaggan -v.\n"
@@ -3169,9 +3207,6 @@ msgstr "namnlös"
 #~ msgid "%s: Expected server name after -h!\n"
 #~ msgstr "%s: Förväntade servernamn efter -h!\n"
 
-#~ msgid "%s: Unknown option '%c'!\n"
-#~ msgstr "%s: Okänd flagga \"%c\"!\n"
-
 #~ msgid "Auto"
 #~ msgstr "Auto"
 
@@ -3585,9 +3620,6 @@ msgstr "namnlös"
 
 #~ msgid "lpq: Unknown destination \"%s\"!\n"
 #~ msgstr "lpq: Okänt mål \"%s\"!\n"
-
-#~ msgid "lpq: Unknown destination \"%s/%s\"!\n"
-#~ msgstr "lpq: Okänt mål \"%s/%s\"!\n"
 
 #~ msgid "lpq: error - no default destination available.\n"
 #~ msgstr "lpq: fel - inget standardmål tillgängligt.\n"

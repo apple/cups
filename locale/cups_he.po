@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-06-20 17:48-0700\n"
+"POT-Creation-Date: 2007-07-13 12:16-0400\n"
 "PO-Revision-Date: 2007-01-15 11:20+0200\n"
 "Last-Translator: Opher Shachar <ophers at ladpc co il>\n"
 "Language-Team: Hebrew, Opher Shachar and Yehuda Noyman.\n"
@@ -1081,6 +1081,10 @@ msgstr "%s: לא מצליח לתקשר עם השרת!\n"
 msgid "%s: Unknown destination \"%s\"!\n"
 msgstr "%s: יעד לא ידוע \"%s\"!\n"
 
+#, fuzzy, c-format
+msgid "%s: Unknown option '%c'!\n"
+msgstr "lp: אופציה לא ידועה '%c'!\n"
+
 #, c-format
 msgid ""
 "%s: Warning - '%c' format modifier not supported - output may not be "
@@ -2037,6 +2041,10 @@ msgstr "לא נמצאו מינויים."
 msgid "None"
 msgstr "כלום"
 
+#, fuzzy
+msgid "Not allowed to print."
+msgstr "אין מדפסת ברירת מחדל"
+
 msgid "OK"
 msgstr "אישור"
 
@@ -2537,6 +2545,17 @@ msgstr ""
 "-l                  הרץ את cupsd מ launchd(8)\n"
 
 msgid ""
+"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+"\n"
+"Options:\n"
+"\n"
+"  -c cupsd.conf   Set cupsd.conf file to use\n"
+"  -n copies       Set number of copies\n"
+"  -o name=value   Set option(s)\n"
+"  -t title        Set title\n"
+msgstr ""
+
+msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
 "       cupstestdsc [options] -\n"
 "\n"
@@ -2734,6 +2753,25 @@ msgstr "cupsd: אופציה לא ידועה \"%c\" - נוטש!\n"
 
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr "cupsd: תמיכה ב launchd(8) לא נכללה בהידור, רץ במצב רגיל.\n"
+
+#, c-format
+msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
+msgstr ""
+
+msgid "cupsfilter: Only one filename can be specified!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
+msgstr "lpq: יעד לא ידוע \"%s/%s\"!\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
 msgstr "cupstestppd: האופציה -q לא מתאימה לאופציה -v.\n"
@@ -3421,9 +3459,6 @@ msgstr "ללא שם"
 #~ msgid "lp: Too many files - \"%s\"\n"
 #~ msgstr "lp: יותר מדי קבצים - \"%s\"\n"
 
-#~ msgid "lp: Unknown option '%c'!\n"
-#~ msgstr "lp: אופציה לא ידועה '%c'!\n"
-
 #~ msgid "lp: Warning - character set option ignored!\n"
 #~ msgstr "lp: אזהרה - מתעלם מאופצית character set!\n"
 
@@ -3488,9 +3523,6 @@ msgstr "ללא שם"
 
 #~ msgid "lpq: Unknown destination \"%s\"!\n"
 #~ msgstr "lpq: יעד לא ידוע \"%s\"!\n"
-
-#~ msgid "lpq: Unknown destination \"%s/%s\"!\n"
-#~ msgstr "lpq: יעד לא ידוע \"%s/%s\"!\n"
 
 #~ msgid "lpq: error - no default destination available.\n"
 #~ msgstr "lpq: שגיאה - אין יעד ברירת מחדל זמין.\n"

@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-06-20 17:48-0700\n"
+"POT-Creation-Date: 2007-07-13 12:16-0400\n"
 "PO-Revision-Date: 2006-07-17 19:55+0200\n"
 "Last-Translator: Bernd Krumböck <b.krumboeck@rewe-group.at>\n"
 "Language-Team: Deutsch\n"
@@ -1105,6 +1105,10 @@ msgid "%s: Unknown destination \"%s\"!\n"
 msgstr "%s: Unbekanntes Ziel \"%s\"!\n"
 
 #, c-format
+msgid "%s: Unknown option '%c'!\n"
+msgstr "%s: Unbekannter Parameter '%c'!\n"
+
+#, c-format
 msgid ""
 "%s: Warning - '%c' format modifier not supported - output may not be "
 "correct!\n"
@@ -2070,6 +2074,10 @@ msgstr "Keine Subskription gefunden."
 msgid "None"
 msgstr "Kein(e)"
 
+#, fuzzy
+msgid "Not allowed to print."
+msgstr "Kein Standarddrucker"
+
 msgid "OK"
 msgstr "OK"
 
@@ -2578,6 +2586,17 @@ msgstr ""
 "-l                  cupsd über launchd(8) laufen lassen\n"
 
 msgid ""
+"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+"\n"
+"Options:\n"
+"\n"
+"  -c cupsd.conf   Set cupsd.conf file to use\n"
+"  -n copies       Set number of copies\n"
+"  -o name=value   Set option(s)\n"
+"  -t title        Set title\n"
+msgstr ""
+
+msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
 "       cupstestdsc [options] -\n"
 "\n"
@@ -2779,6 +2798,25 @@ msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr ""
 "cupsd: launchd(8)-unterstützung wurde nicht kompiliert, laufe im normalen "
 "Modus.\n"
+
+#, c-format
+msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
+msgstr ""
+
+msgid "cupsfilter: Only one filename can be specified!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
+msgstr "lpq: Unbekanntes Ziel \"%s/%s\"!\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
 msgstr ""
@@ -3202,9 +3240,6 @@ msgstr "unbenannt"
 #~ msgid "%s: Expected server name after -h!\n"
 #~ msgstr "%s: Servername wird hinter -h erwartet!\n"
 
-#~ msgid "%s: Unknown option '%c'!\n"
-#~ msgstr "%s: Unbekannter Parameter '%c'!\n"
-
 #~ msgid "Auto"
 #~ msgstr "Automatisch"
 
@@ -3615,9 +3650,6 @@ msgstr "unbenannt"
 
 #~ msgid "lpq: Unknown destination \"%s\"!\n"
 #~ msgstr "lpq: Unbekanntes Ziel \"%s\"!\n"
-
-#~ msgid "lpq: Unknown destination \"%s/%s\"!\n"
-#~ msgstr "lpq: Unbekanntes Ziel \"%s/%s\"!\n"
 
 #~ msgid "lpq: error - no default destination available.\n"
 #~ msgstr "lpq: Fehler - kein Standardziel verfügbar.\n"

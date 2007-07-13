@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-06-20 17:48-0700\n"
+"POT-Creation-Date: 2007-07-13 12:16-0400\n"
 "PO-Revision-Date: 2007-01-29 22:21+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre@tiscali.es>\n"
 "Language-Team: Spanish\n"
@@ -1108,6 +1108,10 @@ msgid "%s: Unknown destination \"%s\"!\n"
 msgstr "%s: Destino \"%s\" desconocido.\n"
 
 #, c-format
+msgid "%s: Unknown option '%c'!\n"
+msgstr "%s: Opción '%c' desconocida.\n"
+
+#, c-format
 msgid ""
 "%s: Warning - '%c' format modifier not supported - output may not be "
 "correct!\n"
@@ -2077,6 +2081,10 @@ msgstr "No se han encontrado subscripciones."
 msgid "None"
 msgstr "Ninguno"
 
+#, fuzzy
+msgid "Not allowed to print."
+msgstr "No hay impresora predeterminada"
+
 msgid "OK"
 msgstr "OK"
 
@@ -2597,6 +2605,17 @@ msgstr ""
 "-l                  Ejecuta cupsd desde launchd(8)\n"
 
 msgid ""
+"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+"\n"
+"Options:\n"
+"\n"
+"  -c cupsd.conf   Set cupsd.conf file to use\n"
+"  -n copies       Set number of copies\n"
+"  -o name=value   Set option(s)\n"
+"  -t title        Set title\n"
+msgstr ""
+
+msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
 "       cupstestdsc [options] -\n"
 "\n"
@@ -2801,6 +2820,25 @@ msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr ""
 "cupsd: el uso de launchd(8) no ha sido compilado, ejecutándose en modo "
 "normal.\n"
+
+#, c-format
+msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
+msgstr ""
+
+msgid "cupsfilter: Only one filename can be specified!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
+msgstr "lpq: Destino desconocido \"%s/%s\".\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
 msgstr "cupstestppd: La opción -q no es compatible con la opción -v.\n"
@@ -3222,9 +3260,6 @@ msgstr "sin título"
 
 #~ msgid "%s: Expected server name after -h!\n"
 #~ msgstr "%s: Se esperaba un nombre de servidor tras -h.\n"
-
-#~ msgid "%s: Unknown option '%c'!\n"
-#~ msgstr "%s: Opción '%c' desconocida.\n"
 
 #~ msgid "Auto"
 #~ msgstr "Auto"
@@ -3678,9 +3713,6 @@ msgstr "sin título"
 
 #~ msgid "lpq: Unknown destination \"%s\"!\n"
 #~ msgstr "lpq: Destino desconocido \"%s\".\n"
-
-#~ msgid "lpq: Unknown destination \"%s/%s\"!\n"
-#~ msgstr "lpq: Destino desconocido \"%s/%s\".\n"
 
 #~ msgid "lpq: error - no default destination available.\n"
 #~ msgstr "lpq: error - no está disponible el destino predeterminado.\n"

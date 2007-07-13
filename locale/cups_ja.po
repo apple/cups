@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-06-20 17:48-0700\n"
+"POT-Creation-Date: 2007-07-13 12:16-0400\n"
 "PO-Revision-Date: 2007-01-27 13:43+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
@@ -1089,6 +1089,10 @@ msgid "%s: Unknown destination \"%s\"!\n"
 msgstr "%s: \"%s\" は未知の宛先です!\n"
 
 #, c-format
+msgid "%s: Unknown option '%c'!\n"
+msgstr "%s: '%c' は未知のオプションです!\n"
+
+#, c-format
 msgid ""
 "%s: Warning - '%c' format modifier not supported - output may not be "
 "correct!\n"
@@ -2049,6 +2053,10 @@ msgstr "サブスクリプションが見つかりません。"
 msgid "None"
 msgstr "なし"
 
+#, fuzzy
+msgid "Not allowed to print."
+msgstr "デフォルトプリンタはありません"
+
 msgid "OK"
 msgstr "OK"
 
@@ -2558,6 +2566,17 @@ msgstr ""
 "-l                  launchd(8) から cupsd を実行する\n"
 
 msgid ""
+"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+"\n"
+"Options:\n"
+"\n"
+"  -c cupsd.conf   Set cupsd.conf file to use\n"
+"  -n copies       Set number of copies\n"
+"  -o name=value   Set option(s)\n"
+"  -t title        Set title\n"
+msgstr ""
+
+msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
 "       cupstestdsc [options] -\n"
 "\n"
@@ -2758,6 +2777,25 @@ msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr ""
 "cupsd: launchd(8) サポートがコンパイルされていないので、通常モードで動作しま"
 "す。\n"
+
+#, c-format
+msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
+msgstr ""
+
+msgid "cupsfilter: Only one filename can be specified!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
+msgstr ""
+
+#, fuzzy, c-format
+msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
+msgstr "lpq: \"%s/%s\" は未知の宛先です!\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
 msgstr "cupstestppd: -q オプションは -v オプションと両立できません。\n"
@@ -3174,9 +3212,6 @@ msgstr "タイトルなし"
 
 #~ msgid "%s: Expected server name after -h!\n"
 #~ msgstr "%s: -h のあとにはサーバ名が必要です!\n"
-
-#~ msgid "%s: Unknown option '%c'!\n"
-#~ msgstr "%s: '%c' は未知のオプションです!\n"
 
 #~ msgid "Auto"
 #~ msgstr "自動"
@@ -3604,9 +3639,6 @@ msgstr "タイトルなし"
 
 #~ msgid "lpq: Unknown destination \"%s\"!\n"
 #~ msgstr "lpq: \"%s\" は未知の宛先です!\n"
-
-#~ msgid "lpq: Unknown destination \"%s/%s\"!\n"
-#~ msgstr "lpq: \"%s/%s\" は未知の宛先です!\n"
 
 #~ msgid "lpq: error - no default destination available.\n"
 #~ msgstr "lpq: エラー - 利用可能なデフォルトの宛先がありません。\n"
