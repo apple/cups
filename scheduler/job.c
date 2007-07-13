@@ -429,7 +429,21 @@ cupsdCheckJobs(void)
 	     printer->state == IPP_PRINTER_IDLE) ||	/* and idle */
 	    ((printer->type & CUPS_PRINTER_DISCOVERED) && /* Printer is remote */
 	     !printer->job))				/* and not printing */
+        {
+	 /* 
+	  * Clear any message and reasons for the queue...
+	  */
+
+          printer->state_message[0] = '\0';
+
+	  cupsdSetPrinterReasons(printer, "none");
+
+	 /*
+	  * Start the job...
+	  */
+
 	  start_job(job, printer);
+	}
       }
     }
   }

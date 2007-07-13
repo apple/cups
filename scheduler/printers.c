@@ -2522,6 +2522,9 @@ cupsdSetPrinterReasons(
     p->num_reasons = 0;
   }
 
+  if (!strcmp(s, "none"))
+    return;
+
  /*
   * Loop through all of the reasons...
   */
