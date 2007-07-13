@@ -1,4 +1,3 @@
-#define DEBUG
 /*
  * "$Id$"
  *
@@ -1214,7 +1213,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Add an option record to the current sub-group, group, or file...
       */
 
-      printf("name=\"%s\" (%d)\n", name, strlen(name));
+      DEBUG_printf(("name=\"%s\" (%d)\n", name, strlen(name)));
 
       if (name[0] == '*')
         _cups_strcpy(name, name + 1); /* Eliminate leading asterisk */
@@ -2938,7 +2937,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
     *lineptr = '\0';
 
-/*    DEBUG_printf(("LINE = \"%s\"\n", line));*/
+    DEBUG_printf(("LINE = \"%s\"\n", line));
 
    /*
     * The dynamically created PPDs for older style Mac OS X
