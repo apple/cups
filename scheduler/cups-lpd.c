@@ -441,14 +441,41 @@ get_printer(http_t        *http,	/* I - HTTP connection */
     *options = NULL;
 
  /*
-  * If the queue name contains a space, lookup the printer-name using
-  * the printer-info value...
+  * See if the name is a queue name optionally with an instance name.
   */
 
-  if (strchr(name, ' '))
+  strlcpy(dest, name, destsize);
+  if ((value = strchr(dest, '/')) != NULL)
+    *value = '\0';
+
+ /*
+  * Setup the Get-Printer-Attributes request...
+  */
+
+  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+		   "localhost", 0, "/printers/%s", dest);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+	       NULL, uri);
+
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		"requested-attributes",
+		(int)(sizeof(requested) / sizeof(requested[0])),
+		NULL, requested);
+
+ /*
+  * Do the request...
+  */
+
+  response = cupsDoRequest(http, request, "/");
+
+  if (!response || cupsLastError() > IPP_OK_CONFLICT)
   {
    /*
-    * Lookup the printer-info...
+    * If we can't find the printer by name, look up the printer-name
+    * using the printer-info values...
     */
 
     ipp_attribute_t	*accepting_attr,/* printer-is-accepting-jobs */
@@ -457,6 +484,8 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 			*shared_attr,	/* printer-is-shared */
 			*state_attr;	/* printer-state */
 
+
+    ippDelete(response);
 
    /*
     * Setup the CUPS-Get-Printers request...
@@ -568,88 +597,45 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 
     name = dest;
   }
-  else
+
+ /*
+  * Get values from the response...
+  */
+
+  if (accepting)
   {
-   /*
-    * Otherwise treat it as a queue name optionally with an instance name.
-    */
-
-    strlcpy(dest, name, destsize);
-    if ((value = strchr(dest, '/')) != NULL)
-      *value = '\0';
-
-   /*
-    * Setup the Get-Printer-Attributes request...
-    */
-
-    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
-
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                     "localhost", 0, "/printers/%s", dest);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-        	 NULL, uri);
-
-    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                  "requested-attributes",
-		  (int)(sizeof(requested) / sizeof(requested[0])),
-                  NULL, requested);
-
-   /*
-    * Do the request...
-    */
-
-    response = cupsDoRequest(http, request, "/");
-
-    if (!response || cupsLastError() > IPP_OK_CONFLICT)
-    {
-      syslog(LOG_ERR, "Unable to check printer status - %s",
-             cupsLastErrorString());
-
-      ippDelete(response);
-
-      return (-1);
-    }
-
-   /*
-    * Get values from the response...
-    */
-
-    if (accepting)
-    {
-      if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
-                        	   IPP_TAG_BOOLEAN)) == NULL)
-	syslog(LOG_ERR, "No printer-is-accepting-jobs attribute found in "
-                	"response from server!");
-      else
-	*accepting = attr->values[0].boolean;
-    }
-
-    if (shared)
-    {
-      if ((attr = ippFindAttribute(response, "printer-is-shared",
-                        	   IPP_TAG_BOOLEAN)) == NULL)
-      {
-	syslog(LOG_ERR, "No printer-is-shared attribute found in "
-                	"response from server!");
-	*shared = 1;
-      }
-      else
-	*shared = attr->values[0].boolean;
-    }
-
-    if (state)
-    {
-      if ((attr = ippFindAttribute(response, "printer-state",
-                        	   IPP_TAG_ENUM)) == NULL)
-	syslog(LOG_ERR, "No printer-state attribute found in "
-                	"response from server!");
-      else
-	*state = (ipp_pstate_t)attr->values[0].integer;
-    }
-
-    ippDelete(response);
+    if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
+				 IPP_TAG_BOOLEAN)) == NULL)
+      syslog(LOG_ERR, "No printer-is-accepting-jobs attribute found in "
+		      "response from server!");
+    else
+      *accepting = attr->values[0].boolean;
   }
+
+  if (shared)
+  {
+    if ((attr = ippFindAttribute(response, "printer-is-shared",
+				 IPP_TAG_BOOLEAN)) == NULL)
+    {
+      syslog(LOG_ERR, "No printer-is-shared attribute found in "
+		      "response from server!");
+      *shared = 1;
+    }
+    else
+      *shared = attr->values[0].boolean;
+  }
+
+  if (state)
+  {
+    if ((attr = ippFindAttribute(response, "printer-state",
+				 IPP_TAG_ENUM)) == NULL)
+      syslog(LOG_ERR, "No printer-state attribute found in "
+		      "response from server!");
+    else
+      *state = (ipp_pstate_t)attr->values[0].integer;
+  }
+
+  ippDelete(response);
 
  /*
   * Override shared value for LPD using system-specific APIs...
