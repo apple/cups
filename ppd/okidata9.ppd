@@ -1,23 +1,14 @@
 *PPD-Adobe: "4.3"
 *% PPD file for 9-Pin Series with CUPS.
-*% Created by the CUPS PPD Compiler v1.1.2.
+*% Created by the CUPS PPD Compiler v1.2.0.
+*% Copyright 2007 by Apple Inc.
 *% Copyright 1997-2007 by Easy Software Products.
 *% 
 *% These coded instructions, statements, and computer programs are the
-*% property of Easy Software Products and are protected by Federal
-*% copyright law.  Distribution and use rights are outlined in the file
-*% "LICENSE.txt" which should have been included with this file.  If this
-*% file is missing or damaged please contact Easy Software Products
-*% at:
-*% 
-*% Attn: CUPS Licensing Information
-*% Easy Software Products
-*% 44141 Airport View Drive, Suite 204
-*% Hollywood, Maryland 20636 USA
-*% 
-*% Voice: (301) 373-9600
-*% EMail: cups-info@cups.org
-*% WWW: http://www.cups.org
+*% property of Apple Inc. and are protected by Federal copyright
+*% law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+*% which should have been included with this file.  If this file is
+*% file is missing or damaged, see the license at "http://www.cups.org/".
 *FormatVersion: "4.3"
 *FileVersion: "1.3"
 *LanguageVersion: English
@@ -40,11 +31,11 @@
 *% Driver-defined attributes...
 *Product: "(GNU Ghostscript)"
 *Product: "(ESP Ghostscript)"
-*% CUPS attributes...
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-raster 50 rastertoepson"
+*cupsLanguages: "da de es fi fr it ja ko no pt sv zh zh_TW"
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: Letter
@@ -88,7 +79,19 @@
 *Resolution 120x72dpi: "<</HWResolution[120 72]/cupsBitsPerColor 1/cupsRowCount 8/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
 *Resolution 240x72dpi: "<</HWResolution[240 72]/cupsBitsPerColor 1/cupsRowCount 8/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
 *CloseUI: *Resolution
-*cupsLanguages: "de es fr it ja"
+*da.Translation Manufacturer/Oki: ""
+*da.Translation ModelName/Oki 9-Pin Series: ""
+*da.Translation ShortNickName/Oki 9-Pin Series: ""
+*da.Translation NickName/Oki 9-Pin Series, 1.3: ""
+*da.Translation PageSize/Media Size: ""
+*da.PageSize Letter/Letter - 8.5x11in: ""
+*da.PageSize Legal/Legal - 8.5x14in: ""
+*da.PageSize A4/A4 - 210x297mm: ""
+*da.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*da.Translation Resolution/Resolution: ""
+*da.Resolution 60x720dpi/60x720dpi: ""
+*da.Resolution 120x72dpi/120x72dpi: ""
+*da.Resolution 240x72dpi/240x72dpi: ""
 *de.Translation Manufacturer/Oki: ""
 *de.Translation ModelName/Oki 9-Pin Series: ""
 *de.Translation ShortNickName/Oki 9-Pin Series: ""
@@ -98,7 +101,7 @@
 *de.PageSize Legal/Legal - 8.5x14in: ""
 *de.PageSize A4/A4 - 210x297mm: ""
 *de.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
-*de.Translation Resolution/Auflösung: ""
+*de.Translation Resolution/Resolution: ""
 *de.Resolution 60x720dpi/60x720dpi: ""
 *de.Resolution 120x72dpi/120x72dpi: ""
 *de.Resolution 240x72dpi/240x72dpi: ""
@@ -111,10 +114,23 @@
 *es.PageSize Legal/Legal - 8.5x14in: ""
 *es.PageSize A4/A4 - 210x297mm: ""
 *es.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
-*es.Translation Resolution/Resolución: ""
+*es.Translation Resolution/Resolution: ""
 *es.Resolution 60x720dpi/60x720dpi: ""
 *es.Resolution 120x72dpi/120x72dpi: ""
 *es.Resolution 240x72dpi/240x72dpi: ""
+*fi.Translation Manufacturer/Oki: ""
+*fi.Translation ModelName/Oki 9-Pin Series: ""
+*fi.Translation ShortNickName/Oki 9-Pin Series: ""
+*fi.Translation NickName/Oki 9-Pin Series, 1.3: ""
+*fi.Translation PageSize/Media Size: ""
+*fi.PageSize Letter/Letter - 8.5x11in: ""
+*fi.PageSize Legal/Legal - 8.5x14in: ""
+*fi.PageSize A4/A4 - 210x297mm: ""
+*fi.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*fi.Translation Resolution/Resolution: ""
+*fi.Resolution 60x720dpi/60x720dpi: ""
+*fi.Resolution 120x72dpi/120x72dpi: ""
+*fi.Resolution 240x72dpi/240x72dpi: ""
 *fr.Translation Manufacturer/Oki: ""
 *fr.Translation ModelName/Oki 9-Pin Series: ""
 *fr.Translation ShortNickName/Oki 9-Pin Series: ""
@@ -124,7 +140,7 @@
 *fr.PageSize Legal/Legal - 8.5x14in: ""
 *fr.PageSize A4/A4 - 210x297mm: ""
 *fr.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
-*fr.Translation Resolution/Résolution: ""
+*fr.Translation Resolution/Resolution: ""
 *fr.Resolution 60x720dpi/60x720dpi: ""
 *fr.Resolution 120x72dpi/120x72dpi: ""
 *fr.Resolution 240x72dpi/240x72dpi: ""
@@ -137,7 +153,7 @@
 *it.PageSize Legal/Legal - 8.5x14in: ""
 *it.PageSize A4/A4 - 210x297mm: ""
 *it.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
-*it.Translation Resolution/Risoluzione: ""
+*it.Translation Resolution/Resolution: ""
 *it.Resolution 60x720dpi/60x720dpi: ""
 *it.Resolution 120x72dpi/120x72dpi: ""
 *it.Resolution 240x72dpi/240x72dpi: ""
@@ -150,10 +166,88 @@
 *ja.PageSize Legal/Legal - 8.5x14in: ""
 *ja.PageSize A4/A4 - 210x297mm: ""
 *ja.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
-*ja.Translation Resolution/解像度: ""
+*ja.Translation Resolution/Resolution: ""
 *ja.Resolution 60x720dpi/60x720dpi: ""
 *ja.Resolution 120x72dpi/120x72dpi: ""
 *ja.Resolution 240x72dpi/240x72dpi: ""
+*ko.Translation Manufacturer/Oki: ""
+*ko.Translation ModelName/Oki 9-Pin Series: ""
+*ko.Translation ShortNickName/Oki 9-Pin Series: ""
+*ko.Translation NickName/Oki 9-Pin Series, 1.3: ""
+*ko.Translation PageSize/Media Size: ""
+*ko.PageSize Letter/Letter - 8.5x11in: ""
+*ko.PageSize Legal/Legal - 8.5x14in: ""
+*ko.PageSize A4/A4 - 210x297mm: ""
+*ko.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*ko.Translation Resolution/Resolution: ""
+*ko.Resolution 60x720dpi/60x720dpi: ""
+*ko.Resolution 120x72dpi/120x72dpi: ""
+*ko.Resolution 240x72dpi/240x72dpi: ""
+*no.Translation Manufacturer/Oki: ""
+*no.Translation ModelName/Oki 9-Pin Series: ""
+*no.Translation ShortNickName/Oki 9-Pin Series: ""
+*no.Translation NickName/Oki 9-Pin Series, 1.3: ""
+*no.Translation PageSize/Media Size: ""
+*no.PageSize Letter/Letter - 8.5x11in: ""
+*no.PageSize Legal/Legal - 8.5x14in: ""
+*no.PageSize A4/A4 - 210x297mm: ""
+*no.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*no.Translation Resolution/Resolution: ""
+*no.Resolution 60x720dpi/60x720dpi: ""
+*no.Resolution 120x72dpi/120x72dpi: ""
+*no.Resolution 240x72dpi/240x72dpi: ""
+*pt.Translation Manufacturer/Oki: ""
+*pt.Translation ModelName/Oki 9-Pin Series: ""
+*pt.Translation ShortNickName/Oki 9-Pin Series: ""
+*pt.Translation NickName/Oki 9-Pin Series, 1.3: ""
+*pt.Translation PageSize/Media Size: ""
+*pt.PageSize Letter/Letter - 8.5x11in: ""
+*pt.PageSize Legal/Legal - 8.5x14in: ""
+*pt.PageSize A4/A4 - 210x297mm: ""
+*pt.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*pt.Translation Resolution/Resolution: ""
+*pt.Resolution 60x720dpi/60x720dpi: ""
+*pt.Resolution 120x72dpi/120x72dpi: ""
+*pt.Resolution 240x72dpi/240x72dpi: ""
+*sv.Translation Manufacturer/Oki: ""
+*sv.Translation ModelName/Oki 9-Pin Series: ""
+*sv.Translation ShortNickName/Oki 9-Pin Series: ""
+*sv.Translation NickName/Oki 9-Pin Series, 1.3: ""
+*sv.Translation PageSize/Media Size: ""
+*sv.PageSize Letter/Letter - 8.5x11in: ""
+*sv.PageSize Legal/Legal - 8.5x14in: ""
+*sv.PageSize A4/A4 - 210x297mm: ""
+*sv.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*sv.Translation Resolution/Resolution: ""
+*sv.Resolution 60x720dpi/60x720dpi: ""
+*sv.Resolution 120x72dpi/120x72dpi: ""
+*sv.Resolution 240x72dpi/240x72dpi: ""
+*zh.Translation Manufacturer/Oki: ""
+*zh.Translation ModelName/Oki 9-Pin Series: ""
+*zh.Translation ShortNickName/Oki 9-Pin Series: ""
+*zh.Translation NickName/Oki 9-Pin Series, 1.3: ""
+*zh.Translation PageSize/Media Size: ""
+*zh.PageSize Letter/Letter - 8.5x11in: ""
+*zh.PageSize Legal/Legal - 8.5x14in: ""
+*zh.PageSize A4/A4 - 210x297mm: ""
+*zh.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*zh.Translation Resolution/Resolution: ""
+*zh.Resolution 60x720dpi/60x720dpi: ""
+*zh.Resolution 120x72dpi/120x72dpi: ""
+*zh.Resolution 240x72dpi/240x72dpi: ""
+*zh_TW.Translation Manufacturer/Oki: ""
+*zh_TW.Translation ModelName/Oki 9-Pin Series: ""
+*zh_TW.Translation ShortNickName/Oki 9-Pin Series: ""
+*zh_TW.Translation NickName/Oki 9-Pin Series, 1.3: ""
+*zh_TW.Translation PageSize/Media Size: ""
+*zh_TW.PageSize Letter/Letter - 8.5x11in: ""
+*zh_TW.PageSize Legal/Legal - 8.5x14in: ""
+*zh_TW.PageSize A4/A4 - 210x297mm: ""
+*zh_TW.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*zh_TW.Translation Resolution/Resolution: ""
+*zh_TW.Resolution 60x720dpi/60x720dpi: ""
+*zh_TW.Resolution 120x72dpi/120x72dpi: ""
+*zh_TW.Resolution 240x72dpi/240x72dpi: ""
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(1.05)" Standard ROM
 *Font AvantGarde-BookOblique: Standard "(1.05)" Standard ROM
@@ -190,4 +284,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of OKIDATA9.PPD, 08829 bytes.
+*% End of OKIDATA9.PPD, 13082 bytes.
