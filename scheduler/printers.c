@@ -1538,8 +1538,6 @@ cupsdSetAuthInfoRequired(
 
         p->auth_info_required[p->num_auth_info_required] = "negotiate";
 	p->num_auth_info_required ++;
-
-	return (1);
       }
       else if ((end - values) == 6 && !strncmp(values, "domain", 6))
       {

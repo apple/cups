@@ -176,6 +176,13 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 
   if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
   {
+    if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
+    {
+      DEBUG_printf(("cupsDoAuthentication: too many Negotiate tries (%d)\n",
+                    http->digest_tries));
+  
+      return (-1);
+    }
 #ifdef HAVE_GSSAPI
    /*
     * Kerberos authentication...
@@ -234,14 +241,12 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
       * back into gss via input_token...
       */
     }
-    else
+
+    if (http->gssctx != GSS_C_NO_CONTEXT)
     {
-      if (http->gssctx != GSS_C_NO_CONTEXT)
-      {
-	major_status = gss_delete_sec_context(&minor_status, &http->gssctx,
-	                                      GSS_C_NO_BUFFER);
-	http->gssctx = GSS_C_NO_CONTEXT;
-      }
+      major_status = gss_delete_sec_context(&minor_status, &http->gssctx,
+					    GSS_C_NO_BUFFER);
+      http->gssctx = GSS_C_NO_CONTEXT;
     }
 
     major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
@@ -377,19 +382,28 @@ cups_get_gss_creds(
 {
   gss_buffer_desc token = GSS_C_EMPTY_BUFFER;
 					/* Service token */
-  OM_uint32	major_status,		/* Major status code */
-		minor_status;		/* Minor status code */
-  gss_name_t	server_name;		/* Server name */
-  char		buf[1024],		/* Name buffer */
-		fqdn[HTTP_MAX_URI];	/* Server name buffer */
+  OM_uint32	  major_status,		/* Major status code */
+		  minor_status;		/* Minor status code */
+  gss_name_t	  server_name;		/* Server name */
+  char		  buf[1024],		/* Name buffer */
+		  fqdn[HTTP_MAX_URI];	/* Server name buffer */
+  struct hostent  *host;		/* Host entry to get FQDN */
 
+
+ /*
+  * Get the hostname...
+  */
+
+  httpGetHostname(http, fqdn, sizeof(fqdn));
+
+  if (!strcmp(fqdn, "localhost"))
+    httpGetHostname(NULL, fqdn, sizeof(fqdn));
 
  /*
   * Get a server name we can use for authentication purposes...
   */
 
-  snprintf(buf, sizeof(buf), "%s@%s", service_name,
-	   httpGetHostname(http, fqdn, sizeof(fqdn)));
+  snprintf(buf, sizeof(buf), "%s@%s", service_name, fqdn);
 
   token.value  = buf;
   token.length = strlen(buf);
@@ -449,11 +463,16 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
                 http, httpAddrString(http->hostaddr, filename, sizeof(filename)), http->hostname));
 
  /*
-  * See if we are accessing localhost...
+  * See if we are accessing localhost and the auth type is more than just
+  * Kerberos (Negotiate)...
   */
 
-  if (!httpAddrLocalhost(http->hostaddr) &&
-      strcasecmp(http->hostname, "localhost") != 0)
+  if ((!httpAddrLocalhost(http->hostaddr) &&
+       strcasecmp(http->hostname, "localhost") != 0)
+#ifdef HAVE_GSSAPI
+      || !strcmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate")
+#endif /* HAVE_GSSAPI */
+     )
   {
     DEBUG_puts("cups_local_auth: Not a local connection!");
     return (1);

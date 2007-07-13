@@ -99,7 +99,7 @@ enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication @since CUPS 1.2@ */
   CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands @since CUPS 1.2@ */
   CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered and added @since CUPS 1.3@ */
-  CUPS_PRINTER_OPTIONS = 0xe6fffc	/* ~(CLASS | REMOTE | IMPLICIT) */
+  CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED) */
 };
 
 typedef const char *(*cups_password_cb_t)(const char *);
