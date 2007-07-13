@@ -387,7 +387,6 @@ cups_get_gss_creds(
   gss_name_t	  server_name;		/* Server name */
   char		  buf[1024],		/* Name buffer */
 		  fqdn[HTTP_MAX_URI];	/* Server name buffer */
-  struct hostent  *host;		/* Host entry to get FQDN */
 
 
  /*
@@ -467,12 +466,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * Kerberos (Negotiate)...
   */
 
-  if ((!httpAddrLocalhost(http->hostaddr) &&
-       strcasecmp(http->hostname, "localhost") != 0)
-#ifdef HAVE_GSSAPI
-      || !strcmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate")
-#endif /* HAVE_GSSAPI */
-     )
+  if (!httpAddrLocalhost(http->hostaddr) &&
+      strcasecmp(http->hostname, "localhost") != 0)
   {
     DEBUG_puts("cups_local_auth: Not a local connection!");
     return (1);
@@ -562,6 +557,22 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   {
     DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
                   filename, strerror(errno)));
+
+#ifdef HAVE_GSSAPI
+   /*
+    * If local certificate authentication isn't available for this PID,
+    * check if we need Kerberos authentication...
+    */
+
+    if (!strcmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate"))
+    {
+     /*
+      * Yes, don't try the root certificate...
+      */
+
+      return (1);
+    }
+#endif /* HAVE_GSSAPI */
 
     snprintf(filename, sizeof(filename), "%s/certs/0", cg->cups_statedir);
     fp = fopen(filename, "r");
