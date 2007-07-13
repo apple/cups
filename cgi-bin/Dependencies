@@ -1,56 +1,56 @@
-# DO NOT DELETE
-
-help-index.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-help-index.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-help-index.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-help-index.o: ../cups/transcode.h ../cups/string.h ../config.h ../cups/dir.h
-html.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-html.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-html.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-html.o: ../cups/transcode.h ../cups/string.h ../config.h
-ipp-var.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-ipp-var.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-ipp-var.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-ipp-var.o: ../cups/transcode.h ../cups/string.h ../config.h
-search.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-search.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-search.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-search.o: ../cups/transcode.h ../cups/string.h ../config.h
-template.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-template.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-template.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-template.o: ../cups/transcode.h ../cups/string.h ../config.h
-var.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-var.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-var.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-var.o: ../cups/transcode.h ../cups/string.h ../config.h
-admin.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-admin.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-admin.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-admin.o: ../cups/transcode.h ../cups/string.h ../config.h ../cups/adminutil.h
-admin.o: ../cups/cups.h ../cups/file.h
-classes.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-classes.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-classes.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-classes.o: ../cups/transcode.h ../cups/string.h ../config.h
-help.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-help.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-help.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-help.o: ../cups/transcode.h ../cups/string.h ../config.h
-jobs.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-jobs.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-jobs.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-jobs.o: ../cups/transcode.h ../cups/string.h ../config.h
-printers.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-printers.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-printers.o: ../cups/array.h help-index.h ../cups/debug.h ../cups/i18n.h
-printers.o: ../cups/transcode.h ../cups/string.h ../config.h
-testcgi.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
-testcgi.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/array.h
-testcgi.o: help-index.h
-testhi.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
-testhi.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/array.h
-testhi.o: help-index.h
-testtemplate.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-testtemplate.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
-testtemplate.o: ../cups/language.h ../cups/array.h help-index.h
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+help-index.o: help-index.c cgi-private.h cgi.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/array.h help-index.h \
+  ../cups/debug.h ../cups/i18n.h ../cups/transcode.h ../cups/string.h \
+  ../config.h ../cups/dir.h
+html.o: html.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+ipp-var.o: ipp-var.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+search.o: search.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+template.o: template.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+var.o: var.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+admin.o: admin.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h \
+  ../cups/adminutil.h ../cups/cups.h ../cups/file.h
+classes.o: classes.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+help.o: help.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+jobs.o: jobs.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+printers.o: printers.c cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+testcgi.o: testcgi.c cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h \
+  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h \
+  ../cups/array.h help-index.h
+testhi.o: testhi.c cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h \
+  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h \
+  ../cups/array.h help-index.h
+testtemplate.o: testtemplate.c cgi.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/array.h help-index.h
