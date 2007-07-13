@@ -1,0 +1,64 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   cupsfilter man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 2007 by Apple Inc.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH cupsfilter 8 "Common UNIX Printing System" "12 July 2007" "Apple Inc."
+.SH NAME
+cupsfilter \- convert a file to another format using cups filters
+.SH SYNOPSIS
+.B cupsfilter
+[ -c
+.I config-file
+] -m
+.I mime/type
+[ -n
+.I copies
+] [ -o
+.I name=value
+] [ -t
+.I title
+]
+.I filename
+.SH DESCRIPTION
+\fIcupsfilter\fR is a front-end to the CUPS filter subsystem which allows you
+to convert a file to a specific format, just as if you had printed the file
+through CUPS.
+.SH OPTIONS
+.TP 5
+-c config-file
+.br
+Uses the named cupsd.conf configuration file.
+.TP 5
+-m mime/type
+.br
+Specifies the destination file type.
+.TP 5
+-n copies
+.br
+Specifies the number of copies to generate.
+.TP 5
+-o name=value
+.br
+Specifies options to pass to the CUPS filters.
+.TP 5
+-t title
+.br
+Specifies the document title.
+.SH SEE ALSO
+\fIcupsd.conf(5)\fR
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"

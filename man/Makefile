@@ -45,6 +45,7 @@ MAN7	=	backend.$(MAN7EXT) \
 MAN8	=	accept.$(MAN8EXT) \
 		cupsaddsmb.$(MAN8EXT) \
 		cupsctl.$(MAN8EXT) \
+		cupsfilter.$(MAN8EXT) \
 		cups-deviced.$(MAN8EXT) \
 		cups-driverd.$(MAN8EXT) \
 		cups-lpd.$(MAN8EXT) \

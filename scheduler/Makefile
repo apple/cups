@@ -46,6 +46,7 @@ MIMEOBJS =	\
 OBJS	=	\
 		$(CUPSDOBJS) \
 		$(MIMEOBJS) \
+		cupsfilter.o \
 		cups-deviced.o \
 		cups-driverd.o \
 		cups-lpd.o \
@@ -58,6 +59,7 @@ OBJS	=	\
 		util.o
 TARGETS	=	\
 		cupsd \
+		cupsfilter \
 		cups-deviced \
 		cups-driverd \
 		cups-lpd \
@@ -103,6 +105,8 @@ install:	all
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	echo Installing cupsd in $(SBINDIR)...
 	$(INSTALL_BIN) cupsd $(SBINDIR)
+	echo Installing cupsfilter in $(SBINDIR)...
+	$(INSTALL_BIN) cupsfilter $(SBINDIR)
 	echo Creating $(SERVERBIN)...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)
 	echo Creating $(SERVERBIN)/daemon...
@@ -123,10 +127,10 @@ install:	all
 	echo Creating $(SERVERROOT)/ppd...
 	$(INSTALL_DIR) -m 755 $(SERVERROOT)/ppd
 	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ppd
-	echo Creating $(SERVERROOT)/ssl...
-	$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl
-	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl
 	-if test "x`uname`" != xDarwin; then \
+		echo Creating $(SERVERROOT)/ssl...
+		$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl
+		-chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl
 		echo Creating $(STATEDIR)...; \
 		$(INSTALL_DIR) -m 755 $(STATEDIR); \
 		echo Creating $(STATEDIR)/certs...; \
@@ -197,6 +201,15 @@ cupsd-static:	$(CUPSDOBJS) libmime.a ../cups/libcups.a
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
 		$(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
+
+
+#
+# Make the cupsfilter utility.
+#
+
+cupsfilter:	cupsfilter.o libmime.a ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cupsfilter cupsfilter.o libmime.a $(LIBS)
 
 
 #
