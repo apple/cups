@@ -652,22 +652,26 @@ d 0755 root sys /System/Library/StartupItems/PrintingServices/Resources/English.
 f 0644 root sys /System/Library/StartupItems/PrintingServices/Resources/English.lproj/Localizable.strings init/Localizable.strings
 %preremove <<EOF
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
-killall cupsd
+killall cupsd || exit 0
+EOF
+%preinstall <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+killall cupsd || exit 0
 EOF
 %postinstall <<EOF
-launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
-launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
-launchctl start org.cups.cupsd
+launchctl load -D system /System/Library/LaunchDaemons/org.cups.cupsd.plist
 EOF
 %subpackage lpd
 f 0644 root sys /System/Library/LaunchDaemons/org.cups.cups-lpd.plist init/org.cups.cups-lpd.plist
 %preremove <<EOF
 launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
 EOF
+%preinstall <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+EOF
 %postinstall <<EOF
 rm -f /etc/xinetd.d/cups-lpd
-launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
-launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist
+launchctl load -D system /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist
 EOF
 %subpackage
 

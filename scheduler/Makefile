@@ -128,9 +128,9 @@ install:	all
 	$(INSTALL_DIR) -m 755 $(SERVERROOT)/ppd
 	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ppd
 	-if test "x`uname`" != xDarwin; then \
-		echo Creating $(SERVERROOT)/ssl...
-		$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl
-		-chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl
+		echo Creating $(SERVERROOT)/ssl...; \
+		$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl; \
+		-chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl; \
 		echo Creating $(STATEDIR)...; \
 		$(INSTALL_DIR) -m 755 $(STATEDIR); \
 		echo Creating $(STATEDIR)/certs...; \

@@ -37,9 +37,11 @@ cp packaging/installer.tif $pkgdir/Resources/background.tif
 if test -x /bin/launchctl; then
 	cat >$pkgdir/Resources/preflight <<EOF
 #!/bin/sh
-# Tell launchd to reload cupsd...
+# Tell launchd to stop cupsd...
+whoami
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+killall cupsd || exit 0
 EOF
 else
 	cat >$pkgdir/Resources/preflight <<EOF
@@ -59,9 +61,9 @@ if test -x /bin/launchctl; then
 rm -f /etc/xinetd.d/cups-lpd
 
 # Tell launchd to reload cupsd...
+whoami
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
 launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist || exit 0
-launchctl start org.cups.cupsd
 EOF
 else
 	cat >$pkgdir/Resources/postflight <<EOF
