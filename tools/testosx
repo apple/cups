@@ -39,8 +39,8 @@ if test -x /bin/launchctl; then
 #!/bin/sh
 # Tell launchd to stop cupsd...
 whoami
-launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
-launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+sudo launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+sudo launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
 killall cupsd || exit 0
 EOF
 else
@@ -62,8 +62,8 @@ rm -f /etc/xinetd.d/cups-lpd
 
 # Tell launchd to reload cupsd...
 whoami
-launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
-launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist || exit 0
+sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
+sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist || exit 0
 EOF
 else
 	cat >$pkgdir/Resources/postflight <<EOF
