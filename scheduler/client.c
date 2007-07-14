@@ -2431,9 +2431,14 @@ cupsdSendHeader(
     }
 #endif /* HAVE_AUTHORIZATION_H */
 
-    if (auth_str[0] &&
-	httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)
-      return (0);
+    if (auth_str[0])
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendHeader: WWW-Authenticate: %s",
+                      auth_str);
+
+      if (httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)
+        return (0);
+    }
   }
 
 #ifdef HAVE_GSSAPI

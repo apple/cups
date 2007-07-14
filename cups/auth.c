@@ -462,8 +462,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
                 http, httpAddrString(http->hostaddr, filename, sizeof(filename)), http->hostname));
 
  /*
-  * See if we are accessing localhost and the auth type is more than just
-  * Kerberos (Negotiate)...
+  * See if we are accessing localhost...
   */
 
   if (!httpAddrLocalhost(http->hostaddr) &&
@@ -610,7 +609,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * information...
   */
 
-  if (http->hostaddr->addr.sa_family == AF_LOCAL)
+  if (http->hostaddr->addr.sa_family == AF_LOCAL &&
+      !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
   {
    /*
     * Verify that the current cupsUser() matches the current UID...
