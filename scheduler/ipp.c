@@ -247,9 +247,12 @@ cupsdProcessIPPRequest(
 
   con->response = ippNew();
 
-  con->response->request.status.version[0] = con->request->request.op.version[0];
-  con->response->request.status.version[1] = con->request->request.op.version[1];
-  con->response->request.status.request_id = con->request->request.op.request_id;
+  con->response->request.status.version[0] =
+      con->request->request.op.version[0];
+  con->response->request.status.version[1] =
+      con->request->request.op.version[1];
+  con->response->request.status.request_id =
+      con->request->request.op.request_id;
 
  /*
   * Then validate the request header and required attributes...
@@ -347,7 +350,8 @@ cupsdProcessIPPRequest(
 
       if (charset)
 	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	     "attributes-charset", NULL, charset->values[0].string.text);
+        	     "attributes-charset", NULL,
+		     charset->values[0].string.text);
       else
 	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
         	     "attributes-charset", NULL, DefaultCharset);
@@ -621,7 +625,8 @@ cupsdProcessIPPRequest(
 
               send_ipp_status(con, IPP_OPERATION_NOT_SUPPORTED,
 	                      _("%s not supported!"),
-			      ippOpString(con->request->request.op.operation_id));
+			      ippOpString(
+			          con->request->request.op.operation_id));
 	      break;
 	}
       }
@@ -771,7 +776,7 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Printer or class URI */
 {
   http_status_t	status;			/* Policy status */
-  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  cups_ptype_t	dtype;			/* Destination type (printer/class) */
   cupsd_printer_t *printer;		/* Printer data */
 
 
@@ -823,7 +828,8 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
   {
     cupsdSaveAllPrinters();
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" now accepting jobs (\"%s\").",
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Printer \"%s\" now accepting jobs (\"%s\").",
                     printer->name, get_username(con));
   }
 
@@ -920,7 +926,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     if ((pclass = cupsdFindPrinter(resource + 9)) != NULL &&
-        !(pclass->type & CUPS_PRINTER_REMOTE))
+        !(pclass->type & CUPS_PRINTER_DISCOVERED))
     {
      /*
       * Yes, return an error...
@@ -960,7 +966,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     pclass = cupsdAddClass(resource + 9);
     modify = 0;
   }
-  else if (pclass->type & CUPS_PRINTER_REMOTE)
+  else if (pclass->type & CUPS_PRINTER_DISCOVERED)
   {
    /*
     * Rename the remote class to "Class"...
@@ -996,8 +1002,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs",
                                IPP_TAG_BOOLEAN)) != NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_INFO, "Setting %s printer-is-accepting-jobs to %d (was %d.)",
-               pclass->name, attr->values[0].boolean, pclass->accepting);
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Setting %s printer-is-accepting-jobs to %d (was %d.)",
+                    pclass->name, attr->values[0].boolean, pclass->accepting);
 
     pclass->accepting = attr->values[0].boolean;
     cupsdAddPrinterHistory(pclass);
@@ -1028,8 +1035,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
       return;
     }
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "Setting %s printer-state to %d (was %d.)", pclass->name,
-                    attr->values[0].integer, pclass->state);
+    cupsdLogMessage(CUPSD_LOG_INFO, "Setting %s printer-state to %d (was %d.)",
+                    pclass->name, attr->values[0].integer, pclass->state);
 
     if (attr->values[0].integer == IPP_PRINTER_STOPPED)
       cupsdStopPrinter(pclass, 0);
@@ -1164,9 +1171,9 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-        	  "add_file(con=%p[%d], job=%d, filetype=%s/%s, compression=%d)",
-        	  con, con ? con->http.fd : -1, job->id, filetype->super,
-		  filetype->type, compression);
+        	  "add_file(con=%p[%d], job=%d, filetype=%s/%s, "
+		  "compression=%d)", con, con ? con->http.fd : -1, job->id,
+		  filetype->super, filetype->type, compression);
 
  /*
   * Add the file to the job...
@@ -2191,7 +2198,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     */
 
     if ((printer = cupsdFindClass(resource + 10)) != NULL &&
-        !(printer->type & CUPS_PRINTER_REMOTE))
+        !(printer->type & CUPS_PRINTER_DISCOVERED))
     {
      /*
       * Yes, return an error...
@@ -2231,7 +2238,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     printer = cupsdAddPrinter(resource + 10);
     modify  = 0;
   }
-  else if (printer->type & CUPS_PRINTER_REMOTE)
+  else if (printer->type & CUPS_PRINTER_DISCOVERED)
   {
    /*
     * Rename the remote printer to "Printer@server"...
@@ -2403,8 +2410,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       return;
     }
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "Setting %s printer-state to %d (was %d.)", printer->name,
-               attr->values[0].integer, printer->state);
+    cupsdLogMessage(CUPSD_LOG_INFO, "Setting %s printer-state to %d (was %d.)",
+                    printer->name, attr->values[0].integer, printer->state);
 
     if (attr->values[0].integer == IPP_PRINTER_STOPPED)
       cupsdStopPrinter(printer, 0);
@@ -2601,7 +2608,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 	  cupsdLogMessage(CUPSD_LOG_INFO,
 			  "Setting %s port-monitor to \"%s\" (was \"%s\".)",
 			  printer->name, ppdattr->value,
-			  printer->port_monitor ? printer->port_monitor : "none");
+			  printer->port_monitor ? printer->port_monitor
+			                        : "none");
 
 	  if (strcmp(ppdattr->value, "none"))
 	    cupsdSetString(&printer->port_monitor, ppdattr->value);
@@ -3068,7 +3076,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
   cupsd_job_t	*job;			/* Job information */
-  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  cups_ptype_t	dtype;			/* Destination type (printer/class) */
   cupsd_printer_t *printer;		/* Printer data */
 
 
@@ -3656,7 +3664,8 @@ copy_attribute(
 	else
 	{
           for (i = 0; i < attr->num_values; i ++)
-	    toattr->values[i].string.text = _cupsStrAlloc(attr->values[i].string.text);
+	    toattr->values[i].string.text =
+	        _cupsStrAlloc(attr->values[i].string.text);
 	}
         break;
 
@@ -3714,7 +3723,8 @@ copy_attribute(
               toattr->values[i].string.charset =
 	          toattr->values[0].string.charset;
 
-	    toattr->values[i].string.text = _cupsStrAlloc(attr->values[i].string.text);
+	    toattr->values[i].string.text =
+	        _cupsStrAlloc(attr->values[i].string.text);
           }
         }
         break;
@@ -4130,7 +4140,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 {
   fd_set	input;			/* select() input set */
   struct timeval timeout;		/* select() timeout */
-  int		maxfd;			/* Maximum file descriptor for select() */
+  int		maxfd;			/* Max file descriptor for select() */
   char		tempfile[1024];		/* Temporary PPD file */
   int		tempfd;			/* Temporary PPD file descriptor */
   int		temppid;		/* Process ID of cups-driverd */
@@ -5023,7 +5033,7 @@ create_subscription(
   http_status_t	status;			/* Policy status */
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
   char			scheme[HTTP_MAX_URI],
 					/* Scheme portion of URI */
 			userpass[HTTP_MAX_URI],
@@ -5037,7 +5047,8 @@ create_subscription(
   cupsd_job_t		*job;		/* Job */
   int			jobid;		/* Job ID */
   cupsd_subscription_t	*sub;		/* Subscription object */
-  const char		*username,	/* requesting-user-name or authenticated username */
+  const char		*username,	/* requesting-user-name or
+					   authenticated username */
 			*recipient,	/* notify-recipient-uri */
 			*pullmethod;	/* notify-pull-method */
   ipp_attribute_t	*user_data;	/* notify-user-data */
@@ -5203,8 +5214,8 @@ create_subscription(
         if (access(notifier, X_OK))
 	{
           send_ipp_status(con, IPP_NOT_POSSIBLE,
-	                  _("notify-recipient-uri URI \"%s\" uses unknown scheme!"),
-			  recipient);
+	                  _("notify-recipient-uri URI \"%s\" uses unknown "
+			    "scheme!"), recipient);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_URI_SCHEME);
 	  return;
@@ -5373,7 +5384,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
                ipp_attribute_t *uri)	/* I - URI of printer or class */
 {
   http_status_t	status;			/* Policy status */
-  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  cups_ptype_t	dtype;			/* Destination type (printer/class) */
   cupsd_printer_t *printer;		/* Printer/class */
   char		filename[1024];		/* Script/PPD filename */
 
@@ -5687,7 +5698,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr;		/* Current attribute */
   const char	*dest;			/* Destination */
-  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  cups_ptype_t	dtype;			/* Destination type (printer/class) */
   cups_ptype_t	dmask;			/* Destination type mask */
   char		scheme[HTTP_MAX_URI],	/* Scheme portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
@@ -6098,7 +6109,10 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
     * See if we need the PPD for a class or remote printer...
     */
 
-    if (dtype & CUPS_PRINTER_REMOTE)
+    snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
+             dest->name);
+
+    if ((dtype & CUPS_PRINTER_REMOTE) && access(filename, 0))
     {
       con->response->request.status.status_code = CUPS_SEE_OTHER;
       ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI,
@@ -6109,9 +6123,14 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
     {
       for (i = 0; i < dest->num_printers; i ++)
         if (!(dest->printers[i]->type &
-	      (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
-	       CUPS_PRINTER_REMOTE)))
-	  break;
+	      (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)))
+	{
+	  snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
+		   dest->printers[i]->name);
+
+          if (!access(filename, 0))
+	    break;
+        }
 
       if (i < dest->num_printers)
         dest = dest->printers[i];
@@ -6127,9 +6146,6 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
    /*
     * Found the printer with the PPD file, now see if there is one...
     */
-
-    snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
-             dest->name);
 
     if ((con->file = open(filename, O_RDONLY)) < 0)
     {
@@ -6174,7 +6190,7 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 			options[1024],	/* Options to pass to command */
 			device_str[256],/* Escaped ppd-device-id string */
 			language_str[256],
-					/* Escaped ppd-natural-language string */
+					/* Escaped ppd-natural-language */
 			make_str[256],	/* Escaped ppd-make string */
 			model_str[256],	/* Escaped ppd-make-and-model string */
 			model_number_str[256],
@@ -6311,7 +6327,7 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		  ipp_attribute_t *uri)	/* I - Printer URI */
 {
   http_status_t		status;		/* Policy status */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
   cupsd_printer_t	*printer;	/* Printer/class */
   cups_array_t		*ra;		/* Requested attributes array */
 
@@ -6368,7 +6384,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
 {
   http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr;		/* Current attribute */
-  int		limit;			/* Maximum number of printers to return */
+  int		limit;			/* Max number of printers to return */
   int		count;			/* Number of printers that match */
   cupsd_printer_t *printer;		/* Current printer pointer */
   int		printer_type,		/* printer-type attribute */
@@ -6585,7 +6601,7 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
   cupsd_subscription_t	*sub;		/* Subscription */
   cups_array_t		*ra;		/* Requested attributes array */
   ipp_attribute_t	*attr;		/* Attribute */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
   char			scheme[HTTP_MAX_URI],
 					/* Scheme portion of URI */
 			username[HTTP_MAX_URI],
@@ -6894,7 +6910,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   cupsd_job_t	*job;			/* Current job */
   const char	*src;			/* Source printer/class */
   cups_ptype_t	stype,			/* Source type (printer or class) */
-		dtype;			/* Destination type (printer or class) */
+		dtype;			/* Destination type (printer/class) */
   char		scheme[HTTP_MAX_URI],	/* Scheme portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
@@ -7655,7 +7671,7 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Printer or class URI */
 {
   http_status_t	status;			/* Policy status */
-  cups_ptype_t	dtype;			/* Destination type (printer or class) */
+  cups_ptype_t	dtype;			/* Destination type (printer/class) */
   cupsd_printer_t *printer;		/* Printer data */
   ipp_attribute_t *attr;		/* printer-state-message text */
 
@@ -8456,7 +8472,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Grab format from client...
     */
 
-    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
+    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
+               super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"!"),
 	              format->values[0].string.text);
@@ -8752,7 +8769,7 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - Printer URI */
 {
   http_status_t		status;		/* Policy status */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
   cupsd_printer_t	*printer;	/* Printer */
 
 
@@ -9028,7 +9045,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
               else if (con->response->request.status.status_code == IPP_OK)
 	      {
 		job->state->values[0].integer = attr->values[0].integer;
-		job->state_value              = (ipp_jstate_t)attr->values[0].integer;
+		job->state_value = (ipp_jstate_t)attr->values[0].integer;
 
                 event |= CUPSD_EVENT_JOB_STATE;
 	      }
@@ -9416,7 +9433,7 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
               ipp_attribute_t *uri)	/* I - Printer URI */
 {
   http_status_t		status;		/* Policy status */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
   cupsd_printer_t	*printer;	/* Printer data */
 
 
@@ -9482,7 +9499,7 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
              ipp_attribute_t *uri)	/* I - Printer URI */
 {
   http_status_t		status;		/* Policy status */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
   cupsd_printer_t	*printer;	/* Printer data */
   ipp_attribute_t	*attr;		/* printer-state-message attribute */
 
@@ -9691,7 +9708,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   http_status_t		status;		/* Policy status */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_attribute_t	*format;	/* Document-format attribute */
-  cups_ptype_t		dtype;		/* Destination type (printer or class) */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
   char			super[MIME_MAX_SUPER],
 					/* Supertype of file */
 			type[MIME_MAX_TYPE];
@@ -9726,7 +9743,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   if ((format = ippFindAttribute(con->request, "document-format",
                                  IPP_TAG_MIMETYPE)) != NULL)
   {
-    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super, type) != 2)
+    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
+               super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"!"),
 		      format->values[0].string.text);
@@ -9784,7 +9802,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
  * 'validate_name()' - Make sure the printer name only contains valid chars.
  */
 
-static int			/* O - 0 if name is no good, 1 if name is good */
+static int			/* O - 0 if name is no good, 1 if good */
 validate_name(const char *name)	/* I - Name to check */
 {
   const char	*ptr;		/* Pointer into name */

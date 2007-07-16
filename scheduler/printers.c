@@ -2340,11 +2340,17 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   }
 
  /*
-  * Copy the printer options into a browse attributes string we can re-use.
+  * Force sharing off for remote queues...
   */
 
-  if (!(p->type & CUPS_PRINTER_DISCOVERED))
+  if (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
+    p->shared = 0;
+  else
   {
+   /*
+    * Copy the printer options into a browse attributes string we can re-use.
+    */
+
     const char	*valptr;		/* Pointer into value */
     char	*attrptr;		/* Pointer into attribute string */
 
