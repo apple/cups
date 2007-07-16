@@ -3,7 +3,15 @@
 if test ! -f tools/testosx; then
 	echo "Run this script from the top-level CUPS source directory, e.g.:"
 	echo ""
-	echo "    tools/testosx [version]"
+	echo "    sudo tools/testosx [version]"
+	echo ""
+	exit 1
+fi
+
+if test `whoami` != root; then
+	echo "Run this script with sudo, e.g.:"
+	echo ""
+	echo "    sudo tools/testosx [version]"
 	echo ""
 	exit 1
 fi
@@ -38,9 +46,10 @@ if test -x /bin/launchctl; then
 	cat >$pkgdir/Resources/preflight <<EOF
 #!/bin/sh
 # Tell launchd to stop cupsd...
-whoami
-sudo launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
-sudo launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+if test "x`whoami`" = xroot; then
+	sudo launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+	sudo launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+fi
 killall cupsd || exit 0
 EOF
 else
@@ -61,9 +70,10 @@ if test -x /bin/launchctl; then
 rm -f /etc/xinetd.d/cups-lpd
 
 # Tell launchd to reload cupsd...
-whoami
-sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
-sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist || exit 0
+if test "x`whoami`" = xroot; then
+	sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
+	sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist || exit 0
+fi
 EOF
 else
 	cat >$pkgdir/Resources/postflight <<EOF
@@ -75,6 +85,13 @@ EOF
 fi
 
 chmod 755 $pkgdir/Resources/postflight
+
+case `uname -r` in
+	8.* | 9.*)
+		cp packaging/InstallationCheck $pkgdir/Resources
+		chmod 755 $pkgdir/Resources/InstallationCheck
+		;;
+esac
 
 # Tag the current revision in the plist and web interface files...
 for file in packaging/cups-desc.plist packaging/cups-info.plist \
