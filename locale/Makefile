@@ -78,6 +78,8 @@ uninstall-languages:
 
 pot:
 	echo Updating cups.pot...
+	mv cups.pot cups.pot.bck
+	touch cups.pot
 	cd ..; xgettext -o locale/cups.pot -j -s --keyword=_ --no-wrap \
 		--copyright-holder="Easy Software Products" \
 		--msgid-bugs-address="http://www.cups.org/str.php" \

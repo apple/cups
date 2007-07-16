@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.3\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-13 12:16-0400\n"
+"POT-Creation-Date: 2007-07-16 16:34-0400\n"
 "PO-Revision-Date: 2007-01-23 16:31+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
@@ -396,10 +396,6 @@ msgid "      %s  No base translation \"%s\" is included in file!\n"
 msgstr ""
 
 #, c-format
-msgid "      **FAIL**  %s %s does not exist!\n"
-msgstr "      **FEL**   %s %s finns inte!\n"
-
-#, c-format
 msgid ""
 "      **FAIL**  %s must be 1284DeviceID!\n"
 "                REF: Page 72, section 5.5\n"
@@ -507,25 +503,6 @@ msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
 msgstr "      **FEL**   Felaktigt språk \"%s\"!\n"
 
 #, fuzzy, c-format
-msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
-msgstr "      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s!\n"
-
-#, fuzzy, c-format
-msgid ""
-"      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice %"
-"s!\n"
-msgstr ""
-"      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s, val %s!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-msgstr "      **FEL**   Felaktigt cupsFilter-värde \"%s\"!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad language \"%s\"!\n"
-msgstr "      **FEL**   Felaktigt språk \"%s\"!\n"
-
-#, fuzzy, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
 msgstr ""
 "      **FEL**   Standardöversättningssträng för flaggan %s innehåller 8-"
@@ -546,16 +523,6 @@ msgid ""
 msgstr ""
 "      **FEL**   Standardöversättningssträng för flaggan %s innehåller 8-"
 "bitars tecken!\n"
-
-#, c-format
-msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr "      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s!\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr ""
-"      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s, val %s!\n"
 
 #, c-format
 msgid ""
@@ -1279,17 +1246,6 @@ msgstr ""
 msgid "Custom"
 msgstr "Anpassad"
 
-#, c-format
-msgid "DEBUG: %d files to send in job...\n"
-msgstr ""
-
-msgid "DEBUG: Getting supported attributes...\n"
-msgstr ""
-
-#, c-format
-msgid "DEBUG: Sending print file, %lld bytes...\n"
-msgstr ""
-
 msgid "Delete Class"
 msgstr "Ta bort klass"
 
@@ -1334,10 +1290,6 @@ msgstr "Kunde inte allokera minne för filtyper!"
 #, fuzzy, c-format
 msgid "ERROR: %ld: (canceled:%ld)\n"
 msgstr "lprm: Kunde inte avbryta jobb!\n"
-
-#, fuzzy, c-format
-msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
-msgstr "lpoptions: Kunde inte lägga till skrivare eller instans: %s\n"
 
 #, c-format
 msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
@@ -2370,9 +2322,6 @@ msgstr "Kunde inte redigera cupsd.conf-filer större än 1MB!"
 msgid "Unable to find destination for job!"
 msgstr "Kunde inte hitta mål för jobb!"
 
-msgid "Unable to get PPD file!"
-msgstr "Kunde inte få tag på PPD-fil!"
-
 msgid "Unable to get class list:"
 msgstr "Kunde inte få tag på klasslista:"
 
@@ -2568,10 +2517,11 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"  -c cupsd.conf   Set cupsd.conf file to use\n"
-"  -n copies       Set number of copies\n"
-"  -o name=value   Set option(s)\n"
-"  -t title        Set title\n"
+"  -c cupsd.conf    Set cupsd.conf file to use\n"
+"  -n copies        Set number of copies\n"
+"  -o name=value    Set option(s)\n"
+"  -p filename.ppd  Set PPD file\n"
+"  -t title         Set title\n"
 msgstr ""
 
 msgid ""
@@ -2594,15 +2544,6 @@ msgstr ""
 "\n"
 "    Notera: detta program validerar endast DSC-kommentarer, inte själva "
 "PostScript.\n"
-
-msgid ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
-"gz]]\n"
-"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
-msgstr ""
-"Användning: cupstestppd [-q] [-r] [-v[v]] filnamn1.ppd[.gz] [... filnamnN.ppd"
-"[.gz]]\n"
-"            program | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -2662,9 +2603,6 @@ msgid "WARNING: Couldn't create read channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create side channel\n"
-msgstr ""
-
-msgid "WARNING: Couldn't create sidechannel thread!\n"
 msgstr ""
 
 msgid "WARNING: Failed to read side-channel request!\n"
@@ -3171,12 +3109,43 @@ msgstr "okänd"
 msgid "untitled"
 msgstr "namnlös"
 
+#~ msgid "      **FAIL**  %s %s does not exist!\n"
+#~ msgstr "      **FEL**   %s %s finns inte!\n"
+
 #~ msgid ""
 #~ "      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
 #~ "                REF: Page 72, section 5.5\n"
 #~ msgstr ""
 #~ "      **FEL**   1284DeviceId måste vara 1284DeviceID!\n"
 #~ "                REF: Sida 72, sektion 5.5\n"
+
+#, fuzzy
+#~ msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
+#~ msgstr "      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s!\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice "
+#~ "%s!\n"
+#~ msgstr ""
+#~ "      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s, val %"
+#~ "s!\n"
+
+#~ msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
+#~ msgstr "      **FEL**   Felaktigt cupsFilter-värde \"%s\"!\n"
+
+#~ msgid "      **FAIL**  Bad language \"%s\"!\n"
+#~ msgstr "      **FEL**   Felaktigt språk \"%s\"!\n"
+
+#~ msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
+#~ msgstr "      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s!\n"
+
+#~ msgid ""
+#~ "      **FAIL**  Missing \"%s\" translation string for option %s, choice %"
+#~ "s!\n"
+#~ msgstr ""
+#~ "      **FEL**   Saknar översättningssträng \"%s\" för flaggan %s, val %"
+#~ "s!\n"
 
 #~ msgid "    %d ERROR%s FOUND\n"
 #~ msgstr "    %d FEL%s HITTADES\n"
@@ -3229,6 +3198,10 @@ msgstr "namnlös"
 #~ "        klass = %s\n"
 #~ "        info = %s\n"
 #~ "        tillverkare-och-modell = %s\n"
+
+#, fuzzy
+#~ msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
+#~ msgstr "lpoptions: Kunde inte lägga till skrivare eller instans: %s\n"
 
 #~ msgid ""
 #~ "Enter your username and password or the root username and password to "
@@ -3316,6 +3289,9 @@ msgstr "namnlös"
 #~ msgid "Unable to fork process!"
 #~ msgstr "Kunde inte grena process!"
 
+#~ msgid "Unable to get PPD file!"
+#~ msgstr "Kunde inte få tag på PPD-fil!"
+
 #~ msgid "Unable to get printer attributes!"
 #~ msgstr "Kunde inte få tag på skrivarattribut!"
 
@@ -3359,6 +3335,15 @@ msgstr "namnlös"
 #~ "  -a               Exportera alla skrivare\n"
 #~ "  -h cups-server   Använd angiven CUPS-server\n"
 #~ "  -v               Var information (visa kommandon)\n"
+
+#~ msgid ""
+#~ "Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd"
+#~ "[.gz]]\n"
+#~ "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
+#~ msgstr ""
+#~ "Användning: cupstestppd [-q] [-r] [-v[v]] filnamn1.ppd[.gz] [... filnamnN."
+#~ "ppd[.gz]]\n"
+#~ "            program | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 #~ msgid "Usage: lpmove job dest\n"
 #~ msgstr "Användning: lpmove jobb mål\n"

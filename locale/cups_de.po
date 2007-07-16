@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-13 12:16-0400\n"
+"POT-Creation-Date: 2007-07-16 16:34-0400\n"
 "PO-Revision-Date: 2006-07-17 19:55+0200\n"
 "Last-Translator: Bernd Krumböck <b.krumboeck@rewe-group.at>\n"
 "Language-Team: Deutsch\n"
@@ -397,10 +397,6 @@ msgstr ""
 msgid "      %s  No base translation \"%s\" is included in file!\n"
 msgstr ""
 
-#, c-format
-msgid "      **FAIL**  %s %s does not exist!\n"
-msgstr "      **FEHLGESCHLAGEN**  %s %s existiert nicht!\n"
-
 #, fuzzy, c-format
 msgid ""
 "      **FAIL**  %s must be 1284DeviceID!\n"
@@ -510,27 +506,6 @@ msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
 msgstr "      **FEHLGESCHLAGEN**  Falsche Sprache \"%s\"!\n"
 
 #, fuzzy, c-format
-msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
-msgstr ""
-"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s!\n"
-
-#, fuzzy, c-format
-msgid ""
-"      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice %"
-"s!\n"
-msgstr ""
-"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s, "
-"Auswahl %s!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-msgstr "      **FEHLGESCHLAGEN**  Falscher cupsFilter Wert \"%s\"!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad language \"%s\"!\n"
-msgstr "      **FEHLGESCHLAGEN**  Falsche Sprache \"%s\"!\n"
-
-#, fuzzy, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
 msgstr ""
 "      **FEHLGESCHLAGEN**  Standardübersetzung für Parameter %s enthält 8-bit "
@@ -551,18 +526,6 @@ msgid ""
 msgstr ""
 "      **FEHLGESCHLAGEN**  Standardübersetzung für Parameter %s enthält 8-bit "
 "Zeichen!\n"
-
-#, c-format
-msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr ""
-"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s!\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr ""
-"      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s, "
-"Auswahl %s!\n"
 
 #, c-format
 msgid ""
@@ -1296,17 +1259,6 @@ msgstr ""
 msgid "Custom"
 msgstr "Benutzerspezifisch"
 
-#, c-format
-msgid "DEBUG: %d files to send in job...\n"
-msgstr ""
-
-msgid "DEBUG: Getting supported attributes...\n"
-msgstr ""
-
-#, c-format
-msgid "DEBUG: Sending print file, %lld bytes...\n"
-msgstr ""
-
 msgid "Delete Class"
 msgstr "Lösche Klasse"
 
@@ -1351,10 +1303,6 @@ msgstr "Speicherreservierung für Dateitypen fehlgeschlagen!"
 #, fuzzy, c-format
 msgid "ERROR: %ld: (canceled:%ld)\n"
 msgstr "lprm: Kann keine Aufträge abbrechen!\n"
-
-#, fuzzy, c-format
-msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
-msgstr "lpoptions: Kann Drucker oder Instanz nicht hinzufügen: %s\n"
 
 #, c-format
 msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
@@ -2391,9 +2339,6 @@ msgstr "Kann cupsd.conf Dateien größer als 1MB nicht bearbeiten!"
 msgid "Unable to find destination for job!"
 msgstr "Kann das Ziel für den Auftrag nicht ermitteln!"
 
-msgid "Unable to get PPD file!"
-msgstr "Kann PPD Datei nicht holen!"
-
 msgid "Unable to get class list:"
 msgstr "Kann Klassenliste nicht holen:"
 
@@ -2590,10 +2535,11 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"  -c cupsd.conf   Set cupsd.conf file to use\n"
-"  -n copies       Set number of copies\n"
-"  -o name=value   Set option(s)\n"
-"  -t title        Set title\n"
+"  -c cupsd.conf    Set cupsd.conf file to use\n"
+"  -n copies        Set number of copies\n"
+"  -o name=value    Set option(s)\n"
+"  -p filename.ppd  Set PPD file\n"
+"  -t title         Set title\n"
 msgstr ""
 
 msgid ""
@@ -2616,15 +2562,6 @@ msgstr ""
 "\n"
 "    Notiz: Dieses Programm validiert nur die DSC Kommentare, nicht das "
 "PostScript selbst.\n"
-
-msgid ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
-"gz]]\n"
-"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
-msgstr ""
-"Benutzung: cupstestppd [-q] [-r] [-v[v]] Dateiname1.ppd[.gz] [... DateinameN."
-"ppd[.gz]]\n"
-"       Programm | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -2684,9 +2621,6 @@ msgid "WARNING: Couldn't create read channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create side channel\n"
-msgstr ""
-
-msgid "WARNING: Couldn't create sidechannel thread!\n"
 msgstr ""
 
 msgid "WARNING: Failed to read side-channel request!\n"
@@ -3204,12 +3138,45 @@ msgstr "unbekannt"
 msgid "untitled"
 msgstr "unbenannt"
 
+#~ msgid "      **FAIL**  %s %s does not exist!\n"
+#~ msgstr "      **FEHLGESCHLAGEN**  %s %s existiert nicht!\n"
+
 #~ msgid ""
 #~ "      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
 #~ "                REF: Page 72, section 5.5\n"
 #~ msgstr ""
 #~ "      **FEHLGESCHLAGEN**  1284DeviceId muss 1284DeviceID sein!\n"
 #~ "                REF: Seite 72, Kapitel 5.5\n"
+
+#, fuzzy
+#~ msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
+#~ msgstr ""
+#~ "      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s!\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice "
+#~ "%s!\n"
+#~ msgstr ""
+#~ "      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s, "
+#~ "Auswahl %s!\n"
+
+#~ msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
+#~ msgstr "      **FEHLGESCHLAGEN**  Falscher cupsFilter Wert \"%s\"!\n"
+
+#~ msgid "      **FAIL**  Bad language \"%s\"!\n"
+#~ msgstr "      **FEHLGESCHLAGEN**  Falsche Sprache \"%s\"!\n"
+
+#~ msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
+#~ msgstr ""
+#~ "      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s!\n"
+
+#~ msgid ""
+#~ "      **FAIL**  Missing \"%s\" translation string for option %s, choice %"
+#~ "s!\n"
+#~ msgstr ""
+#~ "      **FEHLGESCHLAGEN**  Vermisse \"%s\" Übersetzung für Parameter %s, "
+#~ "Auswahl %s!\n"
 
 #~ msgid "    %d ERROR%s FOUND\n"
 #~ msgstr "    %d FEHLER%s GEFUNDEN\n"
@@ -3259,6 +3226,10 @@ msgstr "unbenannt"
 #~ "       class = %s\n"
 #~ "       info = %s\n"
 #~ "       make-and-model = %s\n"
+
+#, fuzzy
+#~ msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
+#~ msgstr "lpoptions: Kann Drucker oder Instanz nicht hinzufügen: %s\n"
 
 #~ msgid ""
 #~ "Enter your username and password or the root username and password to "
@@ -3345,6 +3316,9 @@ msgstr "unbenannt"
 #~ msgid "Unable to fork process!"
 #~ msgstr "Kann Prozess nicht forken!"
 
+#~ msgid "Unable to get PPD file!"
+#~ msgstr "Kann PPD Datei nicht holen!"
+
 #~ msgid "Unable to get printer attributes!"
 #~ msgstr "Kann Druckereigenschaften nicht holen!"
 
@@ -3386,6 +3360,15 @@ msgstr "unbenannt"
 #~ "  -a                Alle Drucker exportieren\n"
 #~ "  -h CUPS-Server    Benutze den genannten CUPS Server\n"
 #~ "  -v                Zusätzliche Ausgaben einschalten (zeige Kommandos)\n"
+
+#~ msgid ""
+#~ "Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd"
+#~ "[.gz]]\n"
+#~ "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
+#~ msgstr ""
+#~ "Benutzung: cupstestppd [-q] [-r] [-v[v]] Dateiname1.ppd[.gz] [... "
+#~ "DateinameN.ppd[.gz]]\n"
+#~ "       Programm | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 #~ msgid "Usage: lpmove job dest\n"
 #~ msgstr "Benutzung: lpmove Auftrag Ziel\n"

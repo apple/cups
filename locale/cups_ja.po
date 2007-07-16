@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-13 12:16-0400\n"
+"POT-Creation-Date: 2007-07-16 16:34-0400\n"
 "PO-Revision-Date: 2007-01-27 13:43+0900\n"
 "Last-Translator: Kenshi Muto <kmuto@debian.org>\n"
 "Language-Team: Japanese <LL@li.org>\n"
@@ -393,10 +393,6 @@ msgid "      %s  No base translation \"%s\" is included in file!\n"
 msgstr ""
 
 #, c-format
-msgid "      **FAIL**  %s %s does not exist!\n"
-msgstr "      **失敗** %s %s は存在しません!\n"
-
-#, c-format
 msgid ""
 "      **FAIL**  %s must be 1284DeviceID!\n"
 "                REF: Page 72, section 5.5\n"
@@ -504,25 +500,6 @@ msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
 msgstr "      **失敗**  無効な言語 \"%s\" です!\n"
 
 #, fuzzy, c-format
-msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
-msgstr "      **失敗**  \"%s\" 翻訳文字列 (オプション %s 用) がありません!\n"
-
-#, fuzzy, c-format
-msgid ""
-"      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice %"
-"s!\n"
-msgstr ""
-"      **失敗**  \"%s\" 翻訳文字列 (オプション %s、選択 %s) がありません!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-msgstr "      **失敗**  \"%s\" は不正な cupsFilter 値です!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad language \"%s\"!\n"
-msgstr "      **失敗**  無効な言語 \"%s\" です!\n"
-
-#, fuzzy, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
 msgstr ""
 "      **失敗**  オプション %s のデフォルトの翻訳文字列が8ビット文字を含んでい"
@@ -543,16 +520,6 @@ msgid ""
 msgstr ""
 "      **失敗**  オプション %s のデフォルトの翻訳文字列が8ビット文字を含んでい"
 "ます!\n"
-
-#, c-format
-msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr "      **失敗**  \"%s\" 翻訳文字列 (オプション %s 用) がありません!\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr ""
-"      **失敗**  \"%s\" 翻訳文字列 (オプション %s、選択 %s) がありません!\n"
 
 #, c-format
 msgid ""
@@ -1277,17 +1244,6 @@ msgstr ""
 msgid "Custom"
 msgstr "カスタム"
 
-#, c-format
-msgid "DEBUG: %d files to send in job...\n"
-msgstr ""
-
-msgid "DEBUG: Getting supported attributes...\n"
-msgstr ""
-
-#, c-format
-msgid "DEBUG: Sending print file, %lld bytes...\n"
-msgstr ""
-
 msgid "Delete Class"
 msgstr "クラスの削除"
 
@@ -1332,10 +1288,6 @@ msgstr "ファイルタイプ用にメモリを割り当てられません!"
 #, fuzzy, c-format
 msgid "ERROR: %ld: (canceled:%ld)\n"
 msgstr "lprm: ジョブをキャンセルできません!\n"
-
-#, fuzzy, c-format
-msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
-msgstr "lpoptions: プリンタまたはインスタンスを追加できません: %s\n"
 
 #, c-format
 msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
@@ -2373,9 +2325,6 @@ msgstr "1MB 以上の cupsd.conf ファイルは編集できません!"
 msgid "Unable to find destination for job!"
 msgstr "ジョブの宛先が見つかりません!"
 
-msgid "Unable to get PPD file!"
-msgstr "PPD ファイルを取得できません!"
-
 msgid "Unable to get class list:"
 msgstr "クラスリストを取得できません:"
 
@@ -2570,10 +2519,11 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"  -c cupsd.conf   Set cupsd.conf file to use\n"
-"  -n copies       Set number of copies\n"
-"  -o name=value   Set option(s)\n"
-"  -t title        Set title\n"
+"  -c cupsd.conf    Set cupsd.conf file to use\n"
+"  -n copies        Set number of copies\n"
+"  -o name=value    Set option(s)\n"
+"  -p filename.ppd  Set PPD file\n"
+"  -t title         Set title\n"
 msgstr ""
 
 msgid ""
@@ -2596,15 +2546,6 @@ msgstr ""
 "\n"
 "    注意: このプログラムは DSC コメントを検証するだけで、PostScript 自身を検"
 "証するものではありません。\n"
-
-msgid ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
-"gz]]\n"
-"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
-msgstr ""
-"使い方: cupstestppd [-q] [-r] [-v[v]] ファイル名1.ppd[.gz] [... ファイル名N."
-"ppd[.gz]]\n"
-"       プログラム | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -2664,9 +2605,6 @@ msgid "WARNING: Couldn't create read channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create side channel\n"
-msgstr ""
-
-msgid "WARNING: Couldn't create sidechannel thread!\n"
 msgstr ""
 
 msgid "WARNING: Failed to read side-channel request!\n"
@@ -3177,12 +3115,43 @@ msgstr "未知"
 msgid "untitled"
 msgstr "タイトルなし"
 
+#~ msgid "      **FAIL**  %s %s does not exist!\n"
+#~ msgstr "      **失敗** %s %s は存在しません!\n"
+
 #~ msgid ""
 #~ "      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
 #~ "                REF: Page 72, section 5.5\n"
 #~ msgstr ""
 #~ "      **FAIL**  1284DeviceId は 1284DeviceID でなければなりません!\n"
 #~ "                REF: 72 ページ、セクション 5.5\n"
+
+#, fuzzy
+#~ msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
+#~ msgstr ""
+#~ "      **失敗**  \"%s\" 翻訳文字列 (オプション %s 用) がありません!\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice "
+#~ "%s!\n"
+#~ msgstr ""
+#~ "      **失敗**  \"%s\" 翻訳文字列 (オプション %s、選択 %s) がありません!\n"
+
+#~ msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
+#~ msgstr "      **失敗**  \"%s\" は不正な cupsFilter 値です!\n"
+
+#~ msgid "      **FAIL**  Bad language \"%s\"!\n"
+#~ msgstr "      **失敗**  無効な言語 \"%s\" です!\n"
+
+#~ msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
+#~ msgstr ""
+#~ "      **失敗**  \"%s\" 翻訳文字列 (オプション %s 用) がありません!\n"
+
+#~ msgid ""
+#~ "      **FAIL**  Missing \"%s\" translation string for option %s, choice %"
+#~ "s!\n"
+#~ msgstr ""
+#~ "      **失敗**  \"%s\" 翻訳文字列 (オプション %s、選択 %s) がありません!\n"
 
 #~ msgid "    %d ERROR%s FOUND\n"
 #~ msgstr "    %d 個のエラー%s が見つかりました\n"
@@ -3235,6 +3204,10 @@ msgstr "タイトルなし"
 #~ "          class = %s\n"
 #~ "          info = %s\n"
 #~ "          make-and-model = %s\n"
+
+#, fuzzy
+#~ msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
+#~ msgstr "lpoptions: プリンタまたはインスタンスを追加できません: %s\n"
 
 #~ msgid ""
 #~ "Enter your username and password or the root username and password to "
@@ -3323,6 +3296,9 @@ msgstr "タイトルなし"
 #~ msgid "Unable to fork process!"
 #~ msgstr "プロセスをフォークできません!"
 
+#~ msgid "Unable to get PPD file!"
+#~ msgstr "PPD ファイルを取得できません!"
+
 #~ msgid "Unable to get printer attributes!"
 #~ msgstr "プリンタ属性を取得できません!"
 
@@ -3365,6 +3341,15 @@ msgstr "タイトルなし"
 #~ "  -a               すべてのプリンタをエキスポートする\n"
 #~ "  -h cupsサーバ    指定の CUPS サーバを使う\n"
 #~ "  -v               冗長にする (コマンドを表示する)\n"
+
+#~ msgid ""
+#~ "Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd"
+#~ "[.gz]]\n"
+#~ "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
+#~ msgstr ""
+#~ "使い方: cupstestppd [-q] [-r] [-v[v]] ファイル名1.ppd[.gz] [... ファイル名"
+#~ "N.ppd[.gz]]\n"
+#~ "       プログラム | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 #~ msgid "Usage: lpmove job dest\n"
 #~ msgstr "使い方: lpmove ジョブ 宛先\n"

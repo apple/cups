@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-13 12:16-0400\n"
+"POT-Creation-Date: 2007-07-16 16:34-0400\n"
 "PO-Revision-Date: 2007-01-15 11:20+0200\n"
 "Last-Translator: Opher Shachar <ophers at ladpc co il>\n"
 "Language-Team: Hebrew, Opher Shachar and Yehuda Noyman.\n"
@@ -387,10 +387,6 @@ msgstr ""
 msgid "      %s  No base translation \"%s\" is included in file!\n"
 msgstr ""
 
-#, c-format
-msgid "      **FAIL**  %s %s does not exist!\n"
-msgstr "      **נכשל** %s %s לא קיים!\n"
-
 #, fuzzy, c-format
 msgid ""
 "      **FAIL**  %s must be 1284DeviceID!\n"
@@ -499,24 +495,6 @@ msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
 msgstr "      ‫**נכשל**  שפה שגויה \"%s\"!\n"
 
 #, fuzzy, c-format
-msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
-msgstr "      ‫**נכשל**  חסר \"%s\" מחרוזת תרגום לאופציה %s!\n"
-
-#, fuzzy, c-format
-msgid ""
-"      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice %"
-"s!\n"
-msgstr "      ‫**נכשל** חסר \"%s\" מחרוזת תרגום לאופציה %s, בחירה %s!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-msgstr "      ‫**נכשל** ל cupsFilter ערך שגוי \"%s\"!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad language \"%s\"!\n"
-msgstr "      ‫**נכשל**  שפה שגויה \"%s\"!\n"
-
-#, fuzzy, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
 msgstr ""
 "      ‫**נכשל** מחרוזת תרגום ברירת מחדל לאופציה %s מכילה תווים של 8 סיביות!\n"
@@ -535,15 +513,6 @@ msgid ""
 "characters!\n"
 msgstr ""
 "      ‫**נכשל** מחרוזת תרגום ברירת מחדל לאופציה %s מכילה תווים של 8 סיביות!\n"
-
-#, c-format
-msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr "      ‫**נכשל**  חסר \"%s\" מחרוזת תרגום לאופציה %s!\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr "      ‫**נכשל** חסר \"%s\" מחרוזת תרגום לאופציה %s, בחירה %s!\n"
 
 #, c-format
 msgid ""
@@ -1267,17 +1236,6 @@ msgstr ""
 msgid "Custom"
 msgstr "מותאם"
 
-#, c-format
-msgid "DEBUG: %d files to send in job...\n"
-msgstr ""
-
-msgid "DEBUG: Getting supported attributes...\n"
-msgstr ""
-
-#, c-format
-msgid "DEBUG: Sending print file, %lld bytes...\n"
-msgstr ""
-
 msgid "Delete Class"
 msgstr "מחק מחלקה"
 
@@ -1322,10 +1280,6 @@ msgstr "הקצאת זיכרון לסוגי קבצים נכשלה!"
 #, c-format
 msgid "ERROR: %ld: (canceled:%ld)\n"
 msgstr ""
-
-#, fuzzy, c-format
-msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
-msgstr "lpoptions: לא מצליח להוסיף מדפסת או מופע-מדפסת: %s\n"
 
 #, c-format
 msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
@@ -2353,9 +2307,6 @@ msgstr "‫לא מצליח לערוך קובץ cupsd.conf גדול מ- 1MB!"
 msgid "Unable to find destination for job!"
 msgstr "לא מצליח למצוא יעד לעבודה!"
 
-msgid "Unable to get PPD file!"
-msgstr "‫לא מצליח לקבל קובץ PPD!"
-
 msgid "Unable to get class list:"
 msgstr "לא מצליח לקבל רשימת מחלקות:"
 
@@ -2549,10 +2500,11 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"  -c cupsd.conf   Set cupsd.conf file to use\n"
-"  -n copies       Set number of copies\n"
-"  -o name=value   Set option(s)\n"
-"  -t title        Set title\n"
+"  -c cupsd.conf    Set cupsd.conf file to use\n"
+"  -n copies        Set number of copies\n"
+"  -o name=value    Set option(s)\n"
+"  -p filename.ppd  Set PPD file\n"
+"  -t title         Set title\n"
 msgstr ""
 
 msgid ""
@@ -2575,15 +2527,6 @@ msgstr ""
 "\n"
 "    הערה: תוכנית זו רק מוודאת תקינות של הערות DSC, לא את ה- PostScript "
 "עצמו.\n"
-
-msgid ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
-"gz]]\n"
-"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
-msgstr ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
-"gz]]\n"
-"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -2642,9 +2585,6 @@ msgid "WARNING: Couldn't create read channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create side channel\n"
-msgstr ""
-
-msgid "WARNING: Couldn't create sidechannel thread!\n"
 msgstr ""
 
 msgid "WARNING: Failed to read side-channel request!\n"
@@ -3150,6 +3090,33 @@ msgstr "לא ידוע"
 msgid "untitled"
 msgstr "ללא שם"
 
+#~ msgid "      **FAIL**  %s %s does not exist!\n"
+#~ msgstr "      **נכשל** %s %s לא קיים!\n"
+
+#, fuzzy
+#~ msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
+#~ msgstr "      ‫**נכשל**  חסר \"%s\" מחרוזת תרגום לאופציה %s!\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice "
+#~ "%s!\n"
+#~ msgstr "      ‫**נכשל** חסר \"%s\" מחרוזת תרגום לאופציה %s, בחירה %s!\n"
+
+#~ msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
+#~ msgstr "      ‫**נכשל** ל cupsFilter ערך שגוי \"%s\"!\n"
+
+#~ msgid "      **FAIL**  Bad language \"%s\"!\n"
+#~ msgstr "      ‫**נכשל**  שפה שגויה \"%s\"!\n"
+
+#~ msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
+#~ msgstr "      ‫**נכשל**  חסר \"%s\" מחרוזת תרגום לאופציה %s!\n"
+
+#~ msgid ""
+#~ "      **FAIL**  Missing \"%s\" translation string for option %s, choice %"
+#~ "s!\n"
+#~ msgstr "      ‫**נכשל** חסר \"%s\" מחרוזת תרגום לאופציה %s, בחירה %s!\n"
+
 #~ msgid "%s accepting requests since Jan 01 00:00\n"
 #~ msgstr "%s מקבלת בקשות מאז 01 ינואר 00:00\n"
 
@@ -3192,6 +3159,10 @@ msgstr "ללא שם"
 #~ "        מחלקה = %s\n"
 #~ "        מידע = %s\n"
 #~ "        יצרן ודגם = %s\n"
+
+#, fuzzy
+#~ msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
+#~ msgstr "lpoptions: לא מצליח להוסיף מדפסת או מופע-מדפסת: %s\n"
 
 #~ msgid "Extra"
 #~ msgstr "נוסף"
@@ -3253,6 +3224,9 @@ msgstr "ללא שם"
 #~ msgid "Unable to execute cupsaddsmb command!"
 #~ msgstr "‫לא מצליח לבצע פקודת cupsaddsmb!"
 
+#~ msgid "Unable to get PPD file!"
+#~ msgstr "‫לא מצליח לקבל קובץ PPD!"
+
 #~ msgid "Unable to install Windows 2000 printer driver files (%d)!\n"
 #~ msgstr "לא מצליח להתקין קבצי מנהל התקן הדפסה של Windows 2000 (%d)!\n"
 
@@ -3288,6 +3262,15 @@ msgstr "ללא שם"
 #~ "  -a               ייצא את כל המדפסות\n"
 #~ "  -h cups-server   השתמש בשרת CUPS המצויין\n"
 #~ "  -v               פלט מפורט (הצג פקודות)\n"
+
+#~ msgid ""
+#~ "Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd"
+#~ "[.gz]]\n"
+#~ "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
+#~ msgstr ""
+#~ "Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd"
+#~ "[.gz]]\n"
+#~ "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 #~ msgid "Usage: lpmove job dest\n"
 #~ msgstr "Usage: lpmove job dest\n"

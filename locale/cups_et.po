@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-13 12:16-0400\n"
+"POT-Creation-Date: 2007-07-16 16:34-0400\n"
 "PO-Revision-Date: 2006-09-93 01:41+0200\n"
 "Last-Translator: Marek Laane <bald@starman.ee>\n"
 "Language-Team: Estonian <et@li.org>\n"
@@ -390,10 +390,6 @@ msgstr ""
 msgid "      %s  No base translation \"%s\" is included in file!\n"
 msgstr ""
 
-#, c-format
-msgid "      **FAIL**  %s %s does not exist!\n"
-msgstr "      **EBAÕNN**  %s %s ei ole olemas!\n"
-
 #, fuzzy, c-format
 msgid ""
 "      **FAIL**  %s must be 1284DeviceID!\n"
@@ -502,24 +498,6 @@ msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
 msgstr "      **EBAÕNN**  Vigane keel \"%s\"!\n"
 
 #, fuzzy, c-format
-msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
-msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
-
-#, fuzzy, c-format
-msgid ""
-"      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice %"
-"s!\n"
-msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s, valikule %s!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-msgstr "      **EBAÕNN**  Vigane cupsFilter väärtus \"%s\"!\n"
-
-#, c-format
-msgid "      **FAIL**  Bad language \"%s\"!\n"
-msgstr "      **EBAÕNN**  Vigane keel \"%s\"!\n"
-
-#, fuzzy, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
 msgstr ""
 "      **EBAÕNN**  Vaikimisi tõlkestring võtmele %s sisaldab 8-bitiseid "
@@ -540,15 +518,6 @@ msgid ""
 msgstr ""
 "      **EBAÕNN**  Vaikimisi tõlkestring võtmele %s sisaldab 8-bitiseid "
 "märke!\n"
-
-#, c-format
-msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s, valikule %s!\n"
 
 #, c-format
 msgid ""
@@ -1272,17 +1241,6 @@ msgstr ""
 msgid "Custom"
 msgstr "Kohandatud"
 
-#, c-format
-msgid "DEBUG: %d files to send in job...\n"
-msgstr ""
-
-msgid "DEBUG: Getting supported attributes...\n"
-msgstr ""
-
-#, c-format
-msgid "DEBUG: Sending print file, %lld bytes...\n"
-msgstr ""
-
 msgid "Delete Class"
 msgstr "Klassi kustutamine"
 
@@ -1327,10 +1285,6 @@ msgstr "Failitüüpidele ei õnnestu mälu eraldada!"
 #, fuzzy, c-format
 msgid "ERROR: %ld: (canceled:%ld)\n"
 msgstr "lprm: tööde katkestamine ei ole võimalik!\n"
-
-#, fuzzy, c-format
-msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
-msgstr "lpoptions: ei õnnestu lisada printerit või isendit: %s\n"
 
 #, c-format
 msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
@@ -2361,9 +2315,6 @@ msgstr "Suurema cupsd.conf faili kui 1 MB muutmine ei ole võimalik!"
 msgid "Unable to find destination for job!"
 msgstr "Tööle ei leitud sihtkohta!"
 
-msgid "Unable to get PPD file!"
-msgstr "PPD-faili hankimine ebaõnnestus!"
-
 msgid "Unable to get class list:"
 msgstr "Klassiloendi hankimine ebaõnnestus:"
 
@@ -2557,10 +2508,11 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"  -c cupsd.conf   Set cupsd.conf file to use\n"
-"  -n copies       Set number of copies\n"
-"  -o name=value   Set option(s)\n"
-"  -t title        Set title\n"
+"  -c cupsd.conf    Set cupsd.conf file to use\n"
+"  -n copies        Set number of copies\n"
+"  -o name=value    Set option(s)\n"
+"  -p filename.ppd  Set PPD file\n"
+"  -t title         Set title\n"
 msgstr ""
 
 msgid ""
@@ -2583,15 +2535,6 @@ msgstr ""
 "\n"
 "    Märkus: see programm kontrollib ainult DSC kommentaare, mitte "
 "PostScripti ennast.\n"
-
-msgid ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
-"gz]]\n"
-"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
-msgstr ""
-"Kasutamine: cupstestppd [-q] [-r] [-v[v]] failinimi1.ppd[.gz] [... "
-"failinimiN.ppd[.gz]]\n"
-"            program | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -2651,9 +2594,6 @@ msgid "WARNING: Couldn't create read channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create side channel\n"
-msgstr ""
-
-msgid "WARNING: Couldn't create sidechannel thread!\n"
 msgstr ""
 
 msgid "WARNING: Failed to read side-channel request!\n"
@@ -3161,12 +3101,41 @@ msgstr "teadmata"
 msgid "untitled"
 msgstr "nimeta"
 
+#~ msgid "      **FAIL**  %s %s does not exist!\n"
+#~ msgstr "      **EBAÕNN**  %s %s ei ole olemas!\n"
+
 #~ msgid ""
 #~ "      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
 #~ "                REF: Page 72, section 5.5\n"
 #~ msgstr ""
 #~ "      **EBAÕNN**  1284DeviceId peab olema 1284DeviceID!\n"
 #~ "                  Viide: lk 72, sektsioon 5.5\n"
+
+#, fuzzy
+#~ msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
+#~ msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice "
+#~ "%s!\n"
+#~ msgstr ""
+#~ "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s, valikule %s!\n"
+
+#~ msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
+#~ msgstr "      **EBAÕNN**  Vigane cupsFilter väärtus \"%s\"!\n"
+
+#~ msgid "      **FAIL**  Bad language \"%s\"!\n"
+#~ msgstr "      **EBAÕNN**  Vigane keel \"%s\"!\n"
+
+#~ msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
+#~ msgstr "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s!\n"
+
+#~ msgid ""
+#~ "      **FAIL**  Missing \"%s\" translation string for option %s, choice %"
+#~ "s!\n"
+#~ msgstr ""
+#~ "      **EBAÕNN**  Puudub \"%s\" tõlkestring võtmele %s, valikule %s!\n"
 
 #~ msgid "    %d ERROR%s FOUND\n"
 #~ msgstr "    %d VIGA%s LEITUD\n"
@@ -3216,6 +3185,10 @@ msgstr "nimeta"
 #~ "       klass = %s\n"
 #~ "       info = %s\n"
 #~ "       valmistaja-ja-mudel = %s\n"
+
+#, fuzzy
+#~ msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
+#~ msgstr "lpoptions: ei õnnestu lisada printerit või isendit: %s\n"
 
 #~ msgid ""
 #~ "Enter your username and password or the root username and password to "
@@ -3302,6 +3275,9 @@ msgstr "nimeta"
 #~ msgid "Unable to fork process!"
 #~ msgstr "Protsessi harutamine ebaõnnestus!"
 
+#~ msgid "Unable to get PPD file!"
+#~ msgstr "PPD-faili hankimine ebaõnnestus!"
+
 #~ msgid "Unable to get printer attributes!"
 #~ msgstr "Printeri atribuutide hankimine ebaõnnestus!"
 
@@ -3343,6 +3319,15 @@ msgstr "nimeta"
 #~ "  -a                 Kõigi printerite eksport\n"
 #~ "  -h cups-server     määratud CUPS-serveri kasutamine\n"
 #~ "  -v                 Häälekus (käskude näitamine)\n"
+
+#~ msgid ""
+#~ "Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd"
+#~ "[.gz]]\n"
+#~ "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
+#~ msgstr ""
+#~ "Kasutamine: cupstestppd [-q] [-r] [-v[v]] failinimi1.ppd[.gz] [... "
+#~ "failinimiN.ppd[.gz]]\n"
+#~ "            program | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 #~ msgid "Usage: lpmove job dest\n"
 #~ msgstr "Kasutamine: lpmove töö sihtkoht\n"

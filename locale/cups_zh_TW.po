@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cups 1.2.8\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-13 12:16-0400\n"
+"POT-Creation-Date: 2007-07-16 16:34-0400\n"
 "PO-Revision-Date: 2007-02-17 00:00+0800\n"
 "Last-Translator: Wei-Lun Chao <chaoweilun@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -387,10 +387,6 @@ msgid "      %s  No base translation \"%s\" is included in file!\n"
 msgstr ""
 
 #, c-format
-msgid "      **FAIL**  %s %s does not exist!\n"
-msgstr "      ** 失敗 **  %s %s 不存在！\n"
-
-#, c-format
 msgid ""
 "      **FAIL**  %s must be 1284DeviceID!\n"
 "                REF: Page 72, section 5.5\n"
@@ -498,24 +494,6 @@ msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
 msgstr "      ** 失敗 **  不當的語言「%s」！\n"
 
 #, fuzzy, c-format
-msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
-msgstr "      ** 失敗 **  缺少用於選項 %s 的「%s」翻譯字串！\n"
-
-#, fuzzy, c-format
-msgid ""
-"      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice %"
-"s!\n"
-msgstr "      ** 失敗 **  缺少用於選項 %s、選擇 %s 的「%s」翻譯字串！\n"
-
-#, c-format
-msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-msgstr "      ** 失敗 **  不當的 cupsFilter 值「%s」！\n"
-
-#, c-format
-msgid "      **FAIL**  Bad language \"%s\"!\n"
-msgstr "      ** 失敗 **  不當的語言「%s」！\n"
-
-#, fuzzy, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
 msgstr "      ** 失敗 **  預設用於選項 %s 的翻譯字串含有 8-位元字元！\n"
 
@@ -531,15 +509,6 @@ msgid ""
 "      **FAIL**  Default translation string for option %s contains 8-bit "
 "characters!\n"
 msgstr "      ** 失敗 **  預設用於選項 %s 的翻譯字串含有 8-位元字元！\n"
-
-#, c-format
-msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-msgstr "      ** 失敗 **  缺少用於選項 %s 的「%s」翻譯字串！\n"
-
-#, c-format
-msgid ""
-"      **FAIL**  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr "      ** 失敗 **  缺少用於選項 %s、選擇 %s 的「%s」翻譯字串！\n"
 
 #, c-format
 msgid ""
@@ -1258,17 +1227,6 @@ msgstr ""
 msgid "Custom"
 msgstr "自訂"
 
-#, c-format
-msgid "DEBUG: %d files to send in job...\n"
-msgstr ""
-
-msgid "DEBUG: Getting supported attributes...\n"
-msgstr ""
-
-#, c-format
-msgid "DEBUG: Sending print file, %lld bytes...\n"
-msgstr ""
-
 msgid "Delete Class"
 msgstr "刪除類別"
 
@@ -1313,10 +1271,6 @@ msgstr "無法配置用於檔案類型的記憶體！"
 #, c-format
 msgid "ERROR: %ld: (canceled:%ld)\n"
 msgstr ""
-
-#, fuzzy, c-format
-msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
-msgstr "lpoptions：無法加入印表機或實體：%s\n"
 
 #, c-format
 msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
@@ -2342,9 +2296,6 @@ msgstr "無法編輯 cupsd.conf 檔案大於 1 MB！"
 msgid "Unable to find destination for job!"
 msgstr "無法找到此工作之目的印表機！"
 
-msgid "Unable to get PPD file!"
-msgstr "無法取得 PPD 檔案！"
-
 msgid "Unable to get class list:"
 msgstr "無法取得類別表列："
 
@@ -2538,10 +2489,11 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"  -c cupsd.conf   Set cupsd.conf file to use\n"
-"  -n copies       Set number of copies\n"
-"  -o name=value   Set option(s)\n"
-"  -t title        Set title\n"
+"  -c cupsd.conf    Set cupsd.conf file to use\n"
+"  -n copies        Set number of copies\n"
+"  -o name=value    Set option(s)\n"
+"  -p filename.ppd  Set PPD file\n"
+"  -t title         Set title\n"
 msgstr ""
 
 msgid ""
@@ -2563,15 +2515,6 @@ msgstr ""
 "    -h       顯示程式用法\n"
 "\n"
 "    注意：這個程式只有驗證 DSC 註釋，而不是 PostScript 本身。\n"
-
-msgid ""
-"Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd[."
-"gz]]\n"
-"       program | cupstestppd [-q] [-r] [-v[v]] -\n"
-msgstr ""
-"用法：cupstestppd [-q] [-r] [-v[v]] 檔案名稱1.ppd [.gz] [...檔案名稱N.ppd [."
-"gz]]\n"
-"       程式 | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -2631,9 +2574,6 @@ msgid "WARNING: Couldn't create read channel\n"
 msgstr ""
 
 msgid "WARNING: Couldn't create side channel\n"
-msgstr ""
-
-msgid "WARNING: Couldn't create sidechannel thread!\n"
 msgstr ""
 
 msgid "WARNING: Failed to read side-channel request!\n"
@@ -3138,12 +3078,39 @@ msgstr "不明"
 msgid "untitled"
 msgstr "無標題"
 
+#~ msgid "      **FAIL**  %s %s does not exist!\n"
+#~ msgstr "      ** 失敗 **  %s %s 不存在！\n"
+
 #~ msgid ""
 #~ "      **FAIL**  1284DeviceId must be 1284DeviceID!\n"
 #~ "                REF: Page 72, section 5.5\n"
 #~ msgstr ""
 #~ "      ** 失敗 **  1284DeviceId 必須是 1284DeviceID！\n"
 #~ "               參考：頁面 72, 區段 5.5\n"
+
+#, fuzzy
+#~ msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
+#~ msgstr "      ** 失敗 **  缺少用於選項 %s 的「%s」翻譯字串！\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice "
+#~ "%s!\n"
+#~ msgstr "      ** 失敗 **  缺少用於選項 %s、選擇 %s 的「%s」翻譯字串！\n"
+
+#~ msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
+#~ msgstr "      ** 失敗 **  不當的 cupsFilter 值「%s」！\n"
+
+#~ msgid "      **FAIL**  Bad language \"%s\"!\n"
+#~ msgstr "      ** 失敗 **  不當的語言「%s」！\n"
+
+#~ msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
+#~ msgstr "      ** 失敗 **  缺少用於選項 %s 的「%s」翻譯字串！\n"
+
+#~ msgid ""
+#~ "      **FAIL**  Missing \"%s\" translation string for option %s, choice %"
+#~ "s!\n"
+#~ msgstr "      ** 失敗 **  缺少用於選項 %s、選擇 %s 的「%s」翻譯字串！\n"
 
 #~ msgid "%s accepting requests since Jan 01 00:00\n"
 #~ msgstr "%s 從 Jan 01 00:00 起接受請求\n"
@@ -3190,6 +3157,10 @@ msgstr "無標題"
 #~ "        類別 = %s\n"
 #~ "        資訊 = %s\n"
 #~ "        廠商與型號 = %s\n"
+
+#, fuzzy
+#~ msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
+#~ msgstr "lpoptions：無法加入印表機或實體：%s\n"
 
 #~ msgid "Extra"
 #~ msgstr "其他"
@@ -3260,6 +3231,9 @@ msgstr "無標題"
 #~ msgid "Unable to execute cupsaddsmb command!"
 #~ msgstr "無法執行 cupsaddsmb 命令！"
 
+#~ msgid "Unable to get PPD file!"
+#~ msgstr "無法取得 PPD 檔案！"
+
 #~ msgid "Unable to install Windows 2000 printer driver files (%d)!\n"
 #~ msgstr "無法安裝 Windows 2000 印表機驅動程式檔案 (%d)！\n"
 
@@ -3295,6 +3269,15 @@ msgstr "無標題"
 #~ "  -a               匯出所有印表機\n"
 #~ "  -h cups-server   使用被點名的 CUPS 伺服器\n"
 #~ "  -v               詳細輸出 (顯示命令)\n"
+
+#~ msgid ""
+#~ "Usage: cupstestppd [-q] [-r] [-v[v]] filename1.ppd[.gz] [... filenameN.ppd"
+#~ "[.gz]]\n"
+#~ "       program | cupstestppd [-q] [-r] [-v[v]] -\n"
+#~ msgstr ""
+#~ "用法：cupstestppd [-q] [-r] [-v[v]] 檔案名稱1.ppd [.gz] [...檔案名稱N.ppd "
+#~ "[.gz]]\n"
+#~ "       程式 | cupstestppd [-q] [-r] [-v[v]] -\n"
 
 #~ msgid "Usage: lpmove job dest\n"
 #~ msgstr "用法：lpmove 工作 目的印表機\n"
