@@ -2,36 +2,26 @@
 *%
 *% "$Id$"
 *%
-*%   Test PPD file for the Common UNIX Printing System (CUPS).
+*% Test PPD file for the Common UNIX Printing System (CUPS).
 *%
-*%   This file is used to test the CUPS PPD API functions and cannot be
-*%   used with any known printers.  Look at the PPD files in the "ppd"
-*%   subdirectory as well as the CUPS web site for working PPD files.
+*% This file is used to test the CUPS PPD API functions and cannot be
+*% used with any known printers.  Look at the PPD files in the "ppd"
+*% subdirectory as well as the CUPS web site for working PPD files.
 *%
-*%   If you are a PPD file developer, consider using the CUPS DDK to
-*%   create your PPD files - not only will it save you time, it produces
-*%   consistently high-quality files.
+*% If you are a PPD file developer, consider using the CUPS DDK to
+*% create your PPD files - not only will it save you time, it produces
+*% consistently high-quality files.
 *%
-*%   Copyright 2002-2006 by Easy Software Products.
-*%
-*%   These coded instructions, statements, and computer programs are the
-*%   property of Easy Software Products and are protected by Federal
-*%   copyright law.  Distribution and use rights are outlined in the file
-*%   "LICENSE.txt" which should have been included with this file.  If this
-*%   file is missing or damaged please contact Easy Software Products
-*%   at:
-*%
-*%       Attn: CUPS Licensing Information
-*%       Easy Software Products
-*%       44141 Airport View Drive, Suite 204
-*%       Hollywood, Maryland 20636-3111 USA
-*%
-*%       Voice: (301) 373-9603
-*%       EMail: cups-info@cups.org
-*%         WWW: http://www.cups.org
-*%
+*% Copyright 2007 by Apple Inc.
+*% Copyright 2002-2006 by Easy Software Products.
+*% 
+*% These coded instructions, statements, and computer programs are the
+*% property of Apple Inc. and are protected by Federal copyright
+*% law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+*% which should have been included with this file.  If this file is
+*% file is missing or damaged, see the license at "http://www.cups.org/".
 *FormatVersion:	"4.3"
-*FileVersion:	"1.2"
+*FileVersion:	"1.3"
 *LanguageVersion: English 
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"TEST.PPD"
@@ -43,7 +33,7 @@
 *cupsModelNumber: 1
 *ModelName:     "Test"
 *ShortNickName: "Test"
-*NickName:      "Test for CUPS v1.2"
+*NickName:      "Test for CUPS v1.3"
 *PSVersion:	"(3010.000) 81501"
 *LanguageLevel:	"3"
 *ColorDevice:	True
@@ -147,6 +137,18 @@
 *ParamCustomStringOption String: 1 string 1 10
 
 *CloseGroup: Extended
+
+*% IPP reasons (for ppdLocalizeIPPReason tests)
+*cupsIPPReason foo/Foo Reason: "http://foo/bar.html
+help:anchor='foo'%20bookID=Vendor%20Help
+/help/foo/bar.html"
+*End
+*fr.cupsIPPReason foo/La Foo Reason: "text:La%20Long
+text:Foo%20Reason
+http://foo/fr/bar.html
+help:anchor='foo'%20bookID=Vendor%20Help
+/help/fr/foo/bar.html"
+*End
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM

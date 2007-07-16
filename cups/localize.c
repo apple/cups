@@ -265,6 +265,7 @@ ppdLocalizeIPPReason(
     strlcpy(buffer, locattr->text, bufsize);
 
     for (valptr = locattr->value, bufptr = buffer; *valptr && bufptr < bufend;)
+    {
       if (!strncmp(valptr, "text:", 5))
       {
        /*
@@ -307,10 +308,24 @@ ppdLocalizeIPPReason(
 	  else
 	    *bufptr++ = *valptr++;
         }
-
-        while (isspace(*valptr & 255))
-	  valptr ++;
       }
+      else
+      {
+       /*
+        * Skip this URI...
+	*/
+
+        while (*valptr && !isspace(*valptr & 255))
+          valptr++;
+      }
+
+     /*
+      * Skip whitespace...
+      */
+
+      while (isspace(*valptr & 255))
+	valptr ++;
+    }
 
     if (bufptr > buffer)
       *bufptr = '\0';
@@ -324,9 +339,18 @@ ppdLocalizeIPPReason(
     */
 
     schemelen = strlen(scheme);
+    if (scheme[schemelen - 1] == ':')	/* Force scheme to be just the name */
+      schemelen --;
+
     for (valptr = locattr->value, bufptr = buffer; *valptr && bufptr < bufend;)
-      if (!strncmp(valptr, scheme, schemelen) && valptr[schemelen] == ':')
+    {
+      if ((!strncmp(valptr, scheme, schemelen) && valptr[schemelen] == ':') ||
+          (*valptr == '/' && !strcmp(scheme, "file")))
       {
+       /*
+        * Copy URI...
+	*/
+
         while (*valptr && !isspace(*valptr & 255) && bufptr < bufend)
 	  *bufptr++ = *valptr++;
 
@@ -334,6 +358,23 @@ ppdLocalizeIPPReason(
 
 	return (buffer);
       }
+      else
+      {
+       /*
+        * Skip this URI...
+	*/
+
+	while (*valptr && !isspace(*valptr & 255))
+	  valptr++;
+      }
+
+     /*
+      * Skip whitespace...
+      */
+
+      while (isspace(*valptr & 255))
+	valptr ++;
+    }
 
     return (NULL);
   }

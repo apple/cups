@@ -1,5 +1,12 @@
-CHANGES.txt - 2007-07-12
+CHANGES.txt - 2007-07-16
 ------------------------
+
+CHANGES IN CUPS V1.3??
+
+	- ppdLocalizeIPPReason() did not handle "scheme:" schemes or
+	  "file" URLs.
+	- ppdLocalizeIPPReason() was not exported on Mac OS X.
+
 
 CHANGES IN CUPS V1.3b1
 
