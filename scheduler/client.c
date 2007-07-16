@@ -2412,7 +2412,7 @@ cupsdSendHeader(
 #endif /* HAVE_GSSAPI */
 
 #ifdef HAVE_AUTHORIZATION_H
-    if (con->best)
+    if (con->best && strcmp(auth_str, "Negotiate"))
     {
       int 	 i;			/* Looping var */
       char	*auth_key;		/* Auth key buffer */
