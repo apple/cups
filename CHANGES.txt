@@ -3,6 +3,8 @@ CHANGES.txt - 2007-07-16
 
 CHANGES IN CUPS V1.3??
 
+	- The scheduler did not prevent remote queues from being
+	  shared/published.
 	- The scheduler did not remove the temporary request file on
 	  authentication errors.
 	- ppdLocalizeIPPReason() did not handle "scheme:" schemes or
