@@ -2102,6 +2102,16 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
           if (con->request)
 	  {
 	    cupsdProcessIPPRequest(con);
+
+	    if (con->filename)
+	    {
+	      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+			      "cupsdReadClient: %d Removing temp file %s",
+			      con->http.fd, con->filename);
+	      unlink(con->filename);
+	      cupsdClearString(&con->filename);
+	    }
+
 	    return;
 	  }
 	}
