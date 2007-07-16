@@ -3,6 +3,8 @@ CHANGES.txt - 2007-07-16
 
 CHANGES IN CUPS V1.3??
 
+	- The USB backend could deadlock on Mac OS X while performing
+	  a side-channel command.
 	- The scheduler did not prevent remote queues from being
 	  shared/published.
 	- The scheduler did not remove the temporary request file on

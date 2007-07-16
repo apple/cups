@@ -104,6 +104,7 @@
  * the printer after we've finished sending all the data
  */
 #define WAIT_EOF_DELAY			7
+#define WAIT_SIDE_DELAY			3
 #define DEFAULT_TIMEOUT			60L
 
 #define	USB_INTERFACE_KIND		CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID190)
@@ -230,6 +231,11 @@ typedef struct globals_s
   Boolean		wait_eof;
   int			drain_output;	/* Drain all pending output */
   int			bidi_flag;	/* 0=unidirectional, 1=bidirectional */
+
+  pthread_mutex_t	sidechannel_thread_mutex;
+  pthread_cond_t	sidechannel_thread_cond;
+  int			sidechannel_thread_stop;
+  int			sidechannel_thread_done;
 } globals_t;
 
 
@@ -442,6 +448,12 @@ print_device(const char *uri,		/* I - Device URI */
 
   if ((select(CUPS_SC_FD+1, &input_set, NULL, NULL, &stimeout)) >= 0)
   {
+    g.sidechannel_thread_stop = 0;
+    g.sidechannel_thread_done = 0;
+
+    pthread_cond_init(&g.sidechannel_thread_cond, NULL);
+    pthread_mutex_init(&g.sidechannel_thread_mutex, NULL);
+
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
       fputs(_("WARNING: Couldn't create side channel\n"), stderr);
@@ -621,7 +633,8 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  OSStatus err = (*g.classdriver)->Abort(g.classdriver);
 	  fprintf(stderr, _("ERROR: %ld: (canceled:%ld)\n"), (long)status, (long)err);
-	  return CUPS_BACKEND_STOP;
+	  status = CUPS_BACKEND_STOP;
+	  break;
 	}
 
         fprintf(stderr, "DEBUG: Wrote %d bytes of print data...\n", (int)bytes);
@@ -649,7 +662,21 @@ print_device(const char *uri,		/* I - Device URI */
   pthread_cond_signal(&g.readwrite_lock_cond);
   pthread_mutex_unlock(&g.readwrite_lock_mutex);
 
+  g.sidechannel_thread_stop = 1;
+  pthread_mutex_lock(&g.sidechannel_thread_mutex);
+  if (!g.sidechannel_thread_done)
+  {
+    cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
+    cond_timeout.tv_nsec = 0;
+    pthread_cond_timedwait(&g.sidechannel_thread_cond,
+                           &g.sidechannel_thread_mutex, &cond_timeout);
+  }
+  pthread_mutex_unlock(&g.sidechannel_thread_mutex);
+
   pthread_join(sidechannel_thread_id, NULL);
+
+  pthread_cond_destroy(&g.sidechannel_thread_cond);
+  pthread_mutex_destroy(&g.sidechannel_thread_mutex);
 
   pthread_cond_destroy(&g.readwrite_lock_cond);
   pthread_mutex_destroy(&g.readwrite_lock_mutex);
@@ -674,7 +701,8 @@ print_device(const char *uri,		/* I - Device URI */
     cond_timeout.tv_sec = time(NULL) + WAIT_EOF_DELAY;
     cond_timeout.tv_nsec = 0;
 
-    if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex, &cond_timeout) != 0)
+    if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
+                               &cond_timeout) != 0)
       g.wait_eof = false;
   }
   pthread_mutex_unlock(&g.read_thread_mutex);
@@ -788,12 +816,13 @@ sidechannel_thread(void *reference)
   char			data[2048];	/* Request/response data */
   int			datalen;	/* Request/response data size */
 
-  for (;;)
+
+  do
   {
     datalen = sizeof(data);
 
     if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-      break;
+      continue;
 
     switch (command)
     {
@@ -828,6 +857,13 @@ sidechannel_thread(void *reference)
 	  break;
     }
   }
+  while (!g.sidechannel_thread_stop);
+
+  pthread_mutex_lock(&g.sidechannel_thread_mutex);
+  g.sidechannel_thread_done = 1;
+  pthread_cond_signal(&g.sidechannel_thread_cond);
+  pthread_mutex_unlock(&g.sidechannel_thread_mutex);
+
   return NULL;
 }
 
