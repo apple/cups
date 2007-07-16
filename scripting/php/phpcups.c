@@ -1,28 +1,28 @@
 /*
- * "$Id: phpcups.c 5171 2006-02-25 08:44:43Z mike $"
+ * "$Id: phpcups.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 1997-2006 by Easy Software Products.
+ *   Copyright 2007 by Apple Inc.
+ *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9603
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org/
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
+ *   cups_convert_options()        - Convert a PHP options array to a CUPS options array.
+ *   zm_startup_phpcups()          - Initialize the CUPS module.
+ *   zif_cups_cancel_job()         - Cancel a job.
+ *   zif_cups_get_dests()          - Get a list of printers and classes.
+ *   zif_cups_get_jobs()           - Get a list of jobs.
+ *   zif_cups_last_error()         - Return the last IPP status code.
+ *   zif_cups_last_error_string()  - Return the last IPP status
+ *   zif_cups_print_file()         - Print a single file.
+ *   zif_cups_print_files()        - Print multiple files.
  */
 
 /*
@@ -87,15 +87,43 @@ cups_convert_options(
   int		num_options;		/* Number of options */
   HashTable	*ht;			/* Option array hash table */
   Bucket	*current;		/* Current element in array */
+  zval		*value;			/* Current value in array */
+  char		temp[255];		/* String value for numbers */
 
 
   ht          = Z_ARRVAL_P(optionsobj);
   num_options = 0;
 
   for (current = ht->pListHead; current; current = current->pListNext)
-    num_options = cupsAddOption(current->arKey,
-                                Z_STRVAL_P(((zval *)current->pDataPtr)),
-				num_options, options);
+  {
+    value = (zval *)current->pDataPtr;
+
+    switch (Z_TYPE_P(value))
+    {
+      case IS_LONG :
+          sprintf(temp, "%ld", Z_LVAL_P(value));
+          num_options = cupsAddOption(current->arKey, temp, num_options,
+	                              options);
+          break;
+
+      case IS_DOUBLE :
+          sprintf(temp, "%g", Z_DVAL_P(value));
+          num_options = cupsAddOption(current->arKey, temp, num_options,
+	                              options);
+          break;
+
+      case IS_BOOL :
+          num_options = cupsAddOption(current->arKey,
+	                              Z_BVAL_P(value) ? "true" : "false",
+				      num_options, options);
+          break;
+
+      case IS_STRING :
+          num_options = cupsAddOption(current->arKey, Z_STRVAL_P(value),
+				      num_options, options);
+          break;
+    }
+  }
 
   return (num_options);
 }
@@ -132,6 +160,7 @@ PHP_MINIT_FUNCTION(phpcups)
   REGISTER_LONG_CONSTANT("CUPS_PRINTER_NOT_SHARED", CUPS_PRINTER_NOT_SHARED, CONST_CS);
   REGISTER_LONG_CONSTANT("CUPS_PRINTER_AUTHENTICATED", CUPS_PRINTER_AUTHENTICATED, CONST_CS);
   REGISTER_LONG_CONSTANT("CUPS_PRINTER_COMMANDS", CUPS_PRINTER_COMMANDS, CONST_CS);
+  REGISTER_LONG_CONSTANT("CUPS_PRINTER_DISCOVERED", CUPS_PRINTER_DISCOVERED, CONST_CS);
   REGISTER_LONG_CONSTANT("CUPS_PRINTER_OPTIONS", CUPS_PRINTER_OPTIONS, CONST_CS);
 
   REGISTER_LONG_CONSTANT("IPP_OK", IPP_OK, CONST_CS);
@@ -204,7 +233,7 @@ PHP_FUNCTION(cups_cancel_job)
 
 
 /*
- * 'zif_cups_get_dests()' - .
+ * 'zif_cups_get_dests()' - Get a list of printers and classes.
  */
 
 PHP_FUNCTION(cups_get_dests)
@@ -454,5 +483,5 @@ PHP_FUNCTION(cups_print_files)
 
 
 /*
- * End of "$Id: phpcups.c 5171 2006-02-25 08:44:43Z mike $".
+ * End of "$Id: phpcups.c 6649 2007-07-11 21:46:42Z mike $".
  */

@@ -1,25 +1,16 @@
 /*
- * "$Id: cups.h 6590 2007-06-21 18:22:22Z mike $"
+ * "$Id: cups.h 6658 2007-07-13 01:13:26Z mike $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  *   This file is subject to the Apple OS-Developed Software exception.
  */
@@ -108,7 +99,7 @@ enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication @since CUPS 1.2@ */
   CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands @since CUPS 1.2@ */
   CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered and added @since CUPS 1.3@ */
-  CUPS_PRINTER_OPTIONS = 0xe6fffc	/* ~(CLASS | REMOTE | IMPLICIT) */
+  CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED) */
 };
 
 typedef const char *(*cups_password_cb_t)(const char *);
@@ -265,5 +256,5 @@ extern void		cupsSetDefaultDest(const char *name,
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 6590 2007-06-21 18:22:22Z mike $".
+ * End of "$Id: cups.h 6658 2007-07-13 01:13:26Z mike $".
  */

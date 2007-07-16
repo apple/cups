@@ -1,12 +1,10 @@
                 Common UNIX Printing System License Agreement
 
-                Copyright 1997-2007 by Easy Software Products
-                        44141 AIRPORT VIEW DR STE 204
-                     HOLLYWOOD, MARYLAND 20636 USA
+                        Copyright 2007 by Apple Inc.
+			     1 Infinite Loop
+			  Cupertino, CA 95014 USA
 
-                           Voice: +1.301.373.9600
-                          Email: cups-info@cups.org
-                          WWW: http://www.cups.org
+                         WWW: http://www.cups.org/
 
 
 INTRODUCTION
@@ -49,8 +47,8 @@ application, driver, or filter.
 
 LICENSE EXCEPTIONS
 
-In addition, as the copyright holder of CUPS, Easy Software
-Products grants the following special exceptions:
+In addition, as the copyright holder of CUPS, Apple Inc. grants
+the following special exceptions:
 
      1. Apple Operating System Development License Exception;
 
@@ -93,9 +91,9 @@ Products grants the following special exceptions:
 
      2. OpenSSL Toolkit License Exception;
 
-	a. Easy Software Products explicitly allows the
-	   compilation and distribution of the CUPS software
-	   with the OpenSSL Toolkit.
+	a. Apple Inc. explicitly allows the compilation and
+	   distribution of the CUPS software with the OpenSSL
+	   Toolkit.
 
 No developer is required to provide these exceptions in a
 derived work.
@@ -105,8 +103,8 @@ KERBEROS SUPPORT CODE
 
 The Kerberos support code ("KSC") is copyright 2006 by Jelmer
 Vernooij and is provided 'as-is', without any express or implied
-warranty.  In no event will the author or Easy Software Products
-be held liable for any damages arising from the use of the KSC.
+warranty.  In no event will the author or Apple Inc. be held
+liable for any damages arising from the use of the KSC.
 
 Sources files containing KSC have the following text at the top
 of each source file:
@@ -139,39 +137,12 @@ redistribute it freely, subject to the following restrictions:
 
 TRADEMARKS
 
-Easy Software Products has trademarked the Common UNIX Printing
-System, CUPS, and CUPS logo. You may use these names and logos
-in any direct port or binary distribution of CUPS. Please
-contact Easy Software Products for written permission to use
-them in derivative products. Our intention is to protect the
-value of these trademarks and ensure that any derivative product
-meets the same high-quality standards as the original.
-
-
-BINARY DISTRIBUTION RIGHTS
-
-Easy Software Products also sells rights to the CUPS source code
-under a binary distribution license for vendors that are unable
-to release source code for their additions and modifications to
-CUPS under the GNU GPL and LGPL. For information please contact
-us at the address shown above.
-
-The Common UNIX Printing System provides a "pdftops" filter that
-is based on the Xpdf software. For binary distribution licensing
-of this software, please contact:
-
-     Derek B. Noonburg
-     Email: derekn@glyphandcog.com
-     WWW: http://www.glyphandcog.com/
-
-
-SUPPORT
-
-Easy Software Products sells software support for CUPS as well
-as a commercial printing product based on CUPS called ESP Print
-Pro. You can find out more at our web site:
-
-     http://www.easysw.com/
+Apple Inc. has trademarked the Common UNIX Printing System, CUPS,
+and CUPS logo. You may use these names and logos in any direct port
+or binary distribution of CUPS. Please contact Apple Inc. for written
+permission to use them in derivative products. Our intention is to
+protect the value of these trademarks and ensure that any derivative
+product meets the same high-quality standards as the original.
 
 		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991

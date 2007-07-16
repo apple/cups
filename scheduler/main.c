@@ -1,25 +1,16 @@
 /*
- * "$Id: main.c 6564 2007-06-18 23:40:38Z mike $"
+ * "$Id: main.c 6654 2007-07-12 22:07:57Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
  *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
@@ -661,6 +652,7 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     if (timeout == 86400 && Launchd && LaunchdTimeout && !NumPolled &&
+        !cupsArrayCount(ActiveJobs) &&
 	(!Browsing || 
 	 (!BrowseRemoteProtocols && 
 	  (!NumBrowsers || !BrowseLocalProtocols ||
@@ -1785,5 +1777,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 6564 2007-06-18 23:40:38Z mike $".
+ * End of "$Id: main.c 6654 2007-07-12 22:07:57Z mike $".
  */

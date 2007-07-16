@@ -1,8 +1,9 @@
 /*
- * "$Id: ieee1394-linux.c 4703 2005-09-26 19:33:58Z mike $"
+ * "$Id: ieee1394-linux.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   Linux IEEE-1394 glue for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 2002 by Easy Software Products, all rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or
@@ -873,5 +874,5 @@ ieee1394_error(void)
 
 
 /*
- * End of "$Id: ieee1394-linux.c 4703 2005-09-26 19:33:58Z mike $".
+ * End of "$Id: ieee1394-linux.c 6649 2007-07-11 21:46:42Z mike $".
  */

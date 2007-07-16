@@ -1,5 +1,5 @@
 #
-# "$Id: mime.types 6545 2007-06-04 14:24:01Z mike $"
+# "$Id: mime.types 6649 2007-07-11 21:46:42Z mike $"
 #
 #   MIME types file for the Common UNIX Printing System (CUPS).
 #
@@ -7,23 +7,14 @@
 #   VERSIONS OF CUPS.  Instead, create a "local.types" file that
 #   reflects your local configuration changes.
 #
+#   Copyright 2007 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
-#   property of Easy Software Products and are protected by Federal
-#   copyright law.  Distribution and use rights are outlined in the file
-#   "LICENSE.txt" which should have been included with this file.  If this
-#   file is missing or damaged please contact Easy Software Products
-#   at:
-#
-#       Attn: CUPS Licensing Information
-#       Easy Software Products
-#       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
-#
-#       Voice: (301) 373-9600
-#       EMail: cups-info@cups.org
-#         WWW: http://www.cups.org
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 ########################################################################
@@ -84,7 +75,7 @@ application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				 contains(0,4096,"LANGUAGE = POSTSCRIPT") \
 				 (contains(0,4096,<0a>%!) + \
 				  !contains(0,4096,"ENTER LANGUAGE")))
-application/vnd.hp-HPGL		hpgl string(0,<1B>&)\
+application/vnd.hp-HPGL		hpgl \
 				string(0,<1B>E<1B>%0B) \
 				string(0,<1B>%-1B) string(0,<201B>)\
 				string(0,BP;) string(0,IN;) string(0,DF;) \
@@ -105,7 +96,7 @@ image/jpeg			jpeg jpg jpe string(0,<FFD8FF>) &&\
 				 char(3,0xe4) char(3,0xe5) char(3,0xe6) char(3,0xe7)\
 				 char(3,0xe8) char(3,0xe9) char(3,0xea) char(3,0xeb)\
 				 char(3,0xec) char(3,0xed) char(3,0xee) char(3,0xef))
-image/tiff			tiff tif string(0,MM) string(0,II)
+image/tiff			tiff tif string(0,MM<002A>) string(0,II<2A00>)
 image/x-photocd			pcd string(2048,PCD_IPI)
 image/x-portable-anymap		pnm
 image/x-portable-bitmap		pbm string(0,P1) string(0,P4)
@@ -180,5 +171,5 @@ application/vnd.cups-raw	(string(0,<1B>E) + !string(2,<1B>%0B)) \
 application/octet-stream
 
 #
-# End of "$Id: mime.types 6545 2007-06-04 14:24:01Z mike $".
+# End of "$Id: mime.types 6649 2007-07-11 21:46:42Z mike $".
 #

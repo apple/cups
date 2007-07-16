@@ -5,7 +5,7 @@
 </HEAD>
 <BODY>
 
-<P>CUPS 1.3 adds over ??? changes and new features to CUPS 1.2.x.
+<P>CUPS 1.3 adds over 30 changes and new features to CUPS 1.2.x.
 This page provides a high-level outline of these changes. If you
 have never used CUPS before, read the <A
 HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
@@ -19,141 +19,104 @@ HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 
 		<LI><EM>Kerberos;</EM> CUPS now supports Kerberos authentication</LI>
 
-		<LI><EM>Mac OS X Improvements;</EM> CUPS now supports the Authorization Services framework, providing role-based access control in addition to the tradition UNIX model</LI>
+		<LI><EM>Mac OS X Authorization Services;</EM> CUPS now supports the Authorization Services framework, providing role-based access control in addition to the tradition UNIX model</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>Peer Credentials;</EM> CUPS now supports authentication using peer credentials provided over UNiX domain sockets</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>SNMP Support;</EM> SNMP lookups are no longer performed by default, and IPP is no longer used for discovered printers</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>LPD Support;</EM> The LPD backend now supports a faster streaming mode that does not require a temporary file</LI>
 
 	</OL></DD>
 
 
 	<DT>Browsing</DT>
-	<DD><OL START="5">
+	<DD><OL START="6">
 
 		<LI><EM>CUPS Browsing;</EM> The default configuration now shows shared printers from any address (not just <tt>@LOCAL</tt>)</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>DNS-SD (Bonjour/Zeroconf) Support;</EM> CUPS
+		now supports printer sharing via DNS service discovery</LI>
 
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
+		<LI><EM>LDAP w/SSL;</EM> CUPS now supports encrypted LDAP sessions</LI>
 
 	</OL></DD>
 
 
 	<DT>Web Interface</DT>
-	<DD><OL START="12">
+	<DD><OL START="9">
 
 		<LI><EM>Internet Printer Sharing;</EM> You can now share printers over the Internet via the basic server settings</LI>
 
 		<LI><EM>Improved On-Line Help;</EM> Searching the on-line help now shows results for all text, not just headings and links</LI>
 
-		<LI><EM>Printer Setup;</EM> The <VAR>Add This Printer</VAR> button now allows you to change the default name, location, and description</LI>
+		<LI><EM>Printer Setup;</EM> The available printer list is now only show when requested and the <VAR>Add This Printer</VAR> button now allows you to change the default name, location, and description</LI>
 
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
+		<LI><EM>Printer Configuration;</EM> Raw printers and classes can now be configured using the <var>Set Printer Options</var> button</LI>
 
 	</OL></DD>
 
 
 	<DT>IPP Support</DT>
-	<DD><OL START="31"></EM></LI>
+	<DD><OL START="13"></EM></LI>
+
+		<LI><EM>Job Printer Attributes;</EM> CUPS now provides <tt>job-printer-state-message</tt> and <tt>job-printer-state-reasons</tt> attributes containing copies of the corresponding printer attributes to provide important history information with each job</LI>
+
+		<LI><EM>PPD Operations and Attributes;</EM> The new CUPS_GET_PPD operation allows you to retrieve PPD files from the scheduler; also, CUPS_GET_PPDS now reports more information and supports more value filters</LI>
 
 		<LI><EM>Printer Defaults;</EM> The <tt>document-forma-default</tt>, <tt>notify-events-default</tt>, and <tt>notify-lease-duration-default</tt> attributes can be set for each printer and class</LI>
 
+		<LI><EM>PWG Printer Alert Support;</EM> CUPS now supports the <tt>printer-alert</tt> and <tt>printer-alert-description</tt> attributes</LI>
+
 		<LI><EM>Server-Side Options;</EM> Server-side default options can now be retrieved using the "printer-defaults" group keyword</LI>
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
 
 	</OL></DD>
 
 
 	<DT>Scheduler</DT>
-	<DD><OL START="49">
+	<DD><OL START="18">
 
 		<LI><EM>Client Support;</EM> The scheduler now uses <tt>poll()</tt>, <tt>epoll()</tt>, or <var>/dev/kqueue</var> on platforms that provide them to support large numbers of clients</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>"Default" Authentication;</EM> You can now specify an <tt>AuthType</tt> of <tt>Default</tt> in locations and policies, which maps to the <tt>DefaultAuthType</tt> value</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>Larger Numbers of Clients;</EM> The scheduler now uses poll(), epoll(), or /dev/kqueue instead of select() when possible</LI>
 
-		<LI><EM>;</EM> </LI>
-
-	</OL></DD>
-
-
-	<DT>LPD Client Support</DT>
-	<DD><OL START="69">
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
-
-	</OL></DD>
-
-
-	<DT>Localization and Internationalization</DT>
-	<DD><OL START="72">
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
-
-		<LI><EM>;</EM> </LI>
+		<LI><EM>New cupsctl Command;</EM> The new cupsctl command allows you to perform basic server configuration from the command-line</LI>
 
 	</OL></DD>
 
 
 	<DT>Printer Drivers</DT>
-	<DD><OL START="75">
+	<DD><OL START="22">
 
-		<LI><EM>Side-Channel API;</EM> This new API provides out-of-band control of devices</LI>
-
-		<LI><EM>PJL Support;</EM> New <tt>cupsPJLCharset</tt> attribute controls character set for PJL strings</LI>
-
-		<LI><EM>HTTP API;</EM> The <tt>http_t</tt> structure is now completely private</LI>
+		<LI><EM>cupstestppd Improvements;</EM> The test utility now provides more extensive tests and options</LI>
 
 		<LI><EM>Label Printer Driver;</EM> Added support for the Intellibar label printers</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>Localized Printer Drivers;</EM> The CUPS sample drivers are now localized in several languages</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>PJL Support;</EM> New <tt>cupsPJLCharset</tt> attribute controls character set for PJL strings</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>Pre-Filter Support;</EM> Drivers can now register format-specific filters to pre-screen print jobs</LI>
+
+		<LI><EM>Side-Channel API;</EM> This new API provides out-of-band control of devices</LI>
 
 	</OL></DD>
 
 
 	<DT>CUPS API</DT>
-	<DD><OL START="82">
+	<DD><OL START="28">
 
-		<LI><EM>Array API;</EM> New <tt>cupsArrayGetIndex()</tt> and <tt>cupsArrayGetInsert()</tt> functions</LI>
+		<LI><EM>Administration API;</EM> New <tt>cupsAdminGetServerSettings()</tt> and <tt>cupsAdminSetServerSettings()</tt> functions</LI>
+
+		<LI><EM>Array API;</EM> New <tt>cupsArrayGetIndex()</tt>, <tt>cupsArrayGetInsert()</tt>, and <tt>cupsArrayNew2()</tt> functions</LI>
 
 		<LI><EM>Destination API;</EM> New <tt>cupsRemoveDest()</tt> and <tt>cupsSetDefaultDest()</tt> functions</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>HTTP API;</EM> The <tt>http_t</tt> structure is now completely private</LI>
 
-		<LI><EM>;</EM> </LI>
+		<LI><EM>PPD API;</EM> New <tt>ppdLocalizeIPPReason()</tt>function and greatly improved <tt>ppdConflicts()</tt> performance</LI>
 
 	</OL></DD>
 

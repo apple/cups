@@ -82,14 +82,8 @@ BORDER="0" ALT=""></A>
 <IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
 STYLE="padding-right: 10px;" ALT="מחשב ומדפסת שמחים">
 
-<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
-ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
-STYLE="padding-left: 10px; padding-bottom: 10px;"
-ALT="Easy Software Products"></A>
-
 CUPS מספקת ממשק הדפסה נייד למערכות הפעלה מבוססות <SUP>&reg;</SUP>UNIX.
-התוכנה מפותחת ומתוחזקת ע"י <A HREF="http://www.easysw.com">Easy Software
-Products</A> כדי לקדם פתרון הדפסה תקני. CUPS היא מערכת ההדפסה התקנית המותקנת
+התוכנה מפותחת ומתוחזקת ע"י <A HREF="http://www.apple.com">Apple Inc.</A> כדי לקדם פתרון הדפסה תקני. CUPS היא מערכת ההדפסה התקנית המותקנת
 על MacOS<SUP>&reg;</SUP> X ורוב מערכות ה- <SUP>&reg;</SUP>Linux.</P>
 
 <P>CUPS משתמשת ב <A HREF="http://www.pwg.org/ipp/" TARGET="_blank" 
@@ -106,13 +100,6 @@ dir=ltr>Internet Printing Protocol ("IPP")</A> כבסיס לניהול
     <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
 </PRE>
 
-<P>תמיכה מסחרית וגרסה מתקדמת של CUPS הנקראת <A
-HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> זמינה ב:</P>
-
-<PRE>
-    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
-</PRE>
-
 </TD>
 <TD WIDTH="15">&nbsp;</TD>
 </TR>
@@ -122,9 +109,8 @@ WIDTH="15" HEIGHT="15" ALT=""></TD>
 <TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;" dir=ltr>
 
 <P><SMALL>The Common UNIX Printing System, CUPS, and the CUPS logo are the
-trademark property of <A HREF="http://www.easysw.com">Easy Software
-Products</A>. CUPS is copyright 1997-2006 by Easy Software Products,
-All Rights Reserved.</SMALL></P>
+trademark property of <A HREF="http://www.apple.com">Apple Inc.</A>
+CUPS is copyright 2007 by Apple Inc, All Rights Reserved.</SMALL></P>
 
 </TD>
 

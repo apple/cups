@@ -42,4 +42,4 @@ like to thank the following individuals for their contributions:
     Yugami                         - LDAP browsing support.
 
 If I've missed someone, please let me know by sending an email to
-"mike@easysw.com".
+"msweet@apple.com".

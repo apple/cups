@@ -1,35 +1,30 @@
 #
-# "$Id: Makefile 6422 2007-03-30 20:49:37Z mike $"
+# "$Id: Makefile 6683 2007-07-16 20:35:14Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
+#   Copyright 2007 by Apple Inc.
 #   Copyright 1993-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
-#   property of Easy Software Products and are protected by Federal
-#   copyright law.  Distribution and use rights are outlined in the file
-#   "LICENSE.txt" which should have been included with this file.  If this
-#   file is missing or damaged please contact Easy Software Products
-#   at:
-#
-#       Attn: CUPS Licensing Information
-#       Easy Software Products
-#       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
-#
-#       Voice: (301) 373-9600
-#       EMail: cups-info@cups.org
-#         WWW: http://www.cups.org
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include ../Makedefs
+
+
+OBJS	=	po2strings.o strings2po.o translate.o
+TARGETS	=	po2strings strings2po translate
 
 
 #
 # Make everything...
 #
 
-all:	translate
+all:	$(TARGETS)
 
 
 #
@@ -37,14 +32,15 @@ all:	translate
 #
 
 clean:
-	$(RM) translate translate.o
+	$(RM) $(TARGETS) $(OBJS)
 
 
 #
-# Update dependencies...
+# Update dependencies (without system header dependencies...)
 #
 
 depend:
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
 
 
 #
@@ -82,12 +78,14 @@ uninstall-languages:
 
 pot:
 	echo Updating cups.pot...
+	mv cups.pot cups.pot.bck
+	touch cups.pot
 	cd ..; xgettext -o locale/cups.pot -j -s --keyword=_ --no-wrap \
 		--copyright-holder="Easy Software Products" \
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c
 	(cat cups.header; \
-	 tail +6 cups.pot | sed -e '1,$$s/PACKAGE VERSION/CUPS 1.3/' \
+	 cat cups.pot | sed -e '1,6d' -e '1,$$s/PACKAGE VERSION/CUPS 1.3/' \
 	     -e '1,$$s/charset=CHARSET/charset=utf-8/'; \
 	 cat cups.footer) > cups.pot.N
 	mv cups.pot.N cups.pot
@@ -95,6 +93,30 @@ pot:
 		echo Merging changes into cups_$$loc.po... ; \
 		msgmerge -o cups_$$loc.po -s --no-location cups_$$loc.po cups.pot ; \
 	done
+
+
+#
+# po2strings - A simple utility which uses iconv to convert GNU gettext
+#              message catalogs to Mac OS X .strings files.
+#
+# po2strings filename.po filename.strings
+#
+
+po2strings:	po2strings.o ../cups/$(LIBCUPS)
+	echo Linking $<...
+	$(CC) $(LDFLAGS) -o po2strings po2strings.o $(LIBS)
+
+
+#
+# strings2po - A simple utility which uses iconv to convert Mac OS X
+#              .strings files to GNU gettext message catalogs.
+#
+# strings2po filename.strings filename.po
+#
+
+strings2po:	strings2po.o
+	echo Linking $<...
+	$(CC) $(LDFLAGS) -o strings2po strings2po.o
 
 
 #
@@ -108,9 +130,14 @@ translate:	translate.o ../cups/$(LIBCUPS)
 	echo Linking $<...
 	$(CC) $(LDFLAGS) -o translate translate.o $(LIBS)
 
-translate.o:	../cups/http.h ../cups/i18n.h ../cups/language.h ../cups/string.h
+
+#
+# Dependencies...
+#
+  
+include Dependencies
 
 
 #
-# End of "$Id: Makefile 6422 2007-03-30 20:49:37Z mike $".
+# End of "$Id: Makefile 6683 2007-07-16 20:35:14Z mike $".
 #

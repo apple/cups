@@ -1,25 +1,16 @@
 /*
- * "$Id: ppd.c 6586 2007-06-21 17:44:22Z mike $"
+ * "$Id: ppd.c 6660 2007-07-13 05:09:30Z mike $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  *   PostScript is a trademark of Adobe Systems, Inc.
  *
@@ -1222,6 +1213,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Add an option record to the current sub-group, group, or file...
       */
 
+      DEBUG_printf(("name=\"%s\" (%d)\n", name, strlen(name)));
+
       if (name[0] == '*')
         _cups_strcpy(name, name + 1); /* Eliminate leading asterisk */
 
@@ -1895,8 +1888,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   cupsLangFree(language);
 
 #ifdef DEBUG
-  if (!feof(fp))
-    printf("Premature EOF at %lu...\n", (unsigned long)ftell(fp));
+  if (!cupsFileEOF(fp))
+    printf("Premature EOF at %lu...\n", (unsigned long)cupsFileTell(fp));
 #endif /* DEBUG */
 
   if (cg->ppd_status != PPD_OK)
@@ -3193,5 +3186,5 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c 6586 2007-06-21 17:44:22Z mike $".
+ * End of "$Id: ppd.c 6660 2007-07-13 05:09:30Z mike $".
  */

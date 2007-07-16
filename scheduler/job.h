@@ -1,25 +1,16 @@
 /*
- * "$Id: job.h 6593 2007-06-21 21:30:49Z mike $"
+ * "$Id: job.h 6655 2007-07-12 22:58:17Z mike $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -43,6 +34,10 @@ typedef struct cupsd_job_s
   time_t		hold_until;	/* Hold expiration date/time */
   ipp_attribute_t	*state;		/* Job state */
   ipp_attribute_t	*job_sheets;	/* Job sheets (NULL if none) */
+  ipp_attribute_t	*printer_message,
+					/* job-printer-state-message */
+			*printer_reasons;
+					/* job-printer-state-reasons */
   int			current_file;	/* Current file in job */
   ipp_t			*attrs;		/* Job attributes */
   int			print_pipes[2],	/* Print data pipes */
@@ -111,7 +106,6 @@ extern void		cupsdCleanJobs(void);
 extern void		cupsdDeleteJob(cupsd_job_t *job);
 extern cupsd_job_t	*cupsdFindJob(int id);
 extern void		cupsdFinishJob(cupsd_job_t *job);
-extern void		cupsdUnloadCompletedJobs(void);
 extern void		cupsdFreeAllJobs(void);
 extern int		cupsdGetPrinterJobCount(const char *dest);
 extern int		cupsdGetUserJobCount(const char *username);
@@ -128,8 +122,9 @@ extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
 extern void		cupsdStopAllJobs(int force);
 extern void		cupsdStopJob(cupsd_job_t *job, int force);
 extern void		cupsdTimeoutJob(cupsd_job_t *job);
+extern void		cupsdUnloadCompletedJobs(void);
 
 
 /*
- * End of "$Id: job.h 6593 2007-06-21 21:30:49Z mike $".
+ * End of "$Id: job.h 6655 2007-07-12 22:58:17Z mike $".
  */

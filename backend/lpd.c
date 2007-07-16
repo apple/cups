@@ -1,25 +1,16 @@
 /*
- * "$Id: lpd.c 6403 2007-03-27 16:00:56Z mike $"
+ * "$Id: lpd.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
  *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  *   This file is subject to the Apple OS-Developed Software exception.
  *
@@ -341,9 +332,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	*/
 
         if (!strcasecmp(value, "standard"))
-	  order = MODE_STANDARD;
+	  mode = MODE_STANDARD;
 	else if (!strcasecmp(value, "stream"))
-	  order = MODE_STREAM;
+	  mode = MODE_STREAM;
 	else
 	  fprintf(stderr, _("ERROR: Unknown print mode \"%s\"\n"), value);
       }
@@ -1314,5 +1305,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c 6403 2007-03-27 16:00:56Z mike $".
+ * End of "$Id: lpd.c 6649 2007-07-11 21:46:42Z mike $".
  */

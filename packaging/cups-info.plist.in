@@ -20,5 +20,7 @@
         <string>@CUPS_RELEASE@</string>
 	<key>IFPkgFlagAllowBackRev</key>
 	<true/>
+	<key>IFPkgFlagRootVolumeOnly</key>
+	<true/>
 </dict>
 </plist>

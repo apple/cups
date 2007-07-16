@@ -1,25 +1,16 @@
 /*
- * "$Id: printers.c 6595 2007-06-21 22:29:57Z mike $"
+ * "$Id: printers.c 6678 2007-07-16 18:03:35Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
@@ -1547,8 +1538,6 @@ cupsdSetAuthInfoRequired(
 
         p->auth_info_required[p->num_auth_info_required] = "negotiate";
 	p->num_auth_info_required ++;
-
-	return (1);
       }
       else if ((end - values) == 6 && !strncmp(values, "domain", 6))
       {
@@ -1664,6 +1653,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   char		uri[HTTP_MAX_URI];	/* URI for printer */
   char		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   char		filename[1024];		/* Name of PPD file */
+  int		num_air;		/* Number of auth-info-required values */
+  const char	* const *air;		/* auth-info-required values */
   int		num_media;		/* Number of media options */
   cupsd_location_t *auth;		/* Pointer to authentication element */
   const char	*auth_supported;	/* Authentication supported */
@@ -1685,6 +1676,19 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 		  "one-sided",
 		  "two-sided-long-edge",
 		  "two-sided-short-edge"
+		};
+  static const char * const air_userpass[] =
+		{			/* Basic/Digest authentication */
+		  "username",
+		  "password"
+		};
+  static const char * const air_negotiate[] =
+		{			/* Kerberos authentication */
+		  "negotiate"
+		};
+  static const char * const air_none[] =
+		{			/* No authentication */
+		  "none"
 		};
 
 
@@ -1709,7 +1713,20 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   */
 
   auth_supported = "requesting-user-name";
-  if (!(p->type & CUPS_PRINTER_DISCOVERED))
+  num_air        = 1;
+  air            = air_none;
+
+  if (p->num_auth_info_required > 0 && strcmp(p->auth_info_required[0], "none"))
+  {
+    num_air = p->num_auth_info_required;
+    air     = p->auth_info_required;
+
+    if (!strcmp(air[0], "username"))
+      auth_supported = "basic";
+    else
+      auth_supported = "negotiate";
+  }
+  else if (!(p->type & CUPS_PRINTER_DISCOVERED))
   {
     if (p->type & CUPS_PRINTER_CLASS)
       snprintf(resource, sizeof(resource), "/classes/%s", p->name);
@@ -1725,18 +1742,21 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       if (auth->type == AUTH_BASIC || auth->type == AUTH_BASICDIGEST)
       {
 	auth_supported = "basic";
-	cupsdSetAuthInfoRequired(p, "username,password", NULL);
+	num_air        = 2;
+	air            = air_userpass;
       }
       else if (auth->type == AUTH_DIGEST)
       {
 	auth_supported = "digest";
-	cupsdSetAuthInfoRequired(p, "username,password", NULL);
+	num_air        = 2;
+	air            = air_userpass;
       }
 #ifdef HAVE_GSSAPI
       else if (auth->type == AUTH_NEGOTIATE)
       {
 	auth_supported = "negotiate";
-	cupsdSetAuthInfoRequired(p, "negotiate", NULL);
+	num_air        = 1;
+	air            = air_negotiate;
       }
 #endif /* HAVE_GSSAPI */
 
@@ -1747,6 +1767,11 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     }
     else
       p->type &= ~CUPS_PRINTER_AUTHENTICATED;
+  }
+  else if (p->type & CUPS_PRINTER_AUTHENTICATED)
+  {
+    num_air = 2;
+    air     = air_userpass;
   }
 
  /*
@@ -1789,13 +1814,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                 "job-k-limit", p->k_limit);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "job-page-limit", p->page_limit);
-  if (p->num_auth_info_required)
-    ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		  "auth-info-required", p->num_auth_info_required,
-		  NULL, p->auth_info_required);
-  else
-    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		 "auth-info-required", NULL, "none");
+  ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		"auth-info-required", num_air, NULL, air);
 
   if (cupsArrayCount(Banners) > 0 && !(p->type & CUPS_PRINTER_DISCOVERED))
   {
@@ -2320,11 +2340,17 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   }
 
  /*
-  * Copy the printer options into a browse attributes string we can re-use.
+  * Force sharing off for remote queues...
   */
 
-  if (!(p->type & CUPS_PRINTER_DISCOVERED))
+  if (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT))
+    p->shared = 0;
+  else
   {
+   /*
+    * Copy the printer options into a browse attributes string we can re-use.
+    */
+
     const char	*valptr;		/* Pointer into value */
     char	*attrptr;		/* Pointer into attribute string */
 
@@ -2501,6 +2527,9 @@ cupsdSetPrinterReasons(
 
     p->num_reasons = 0;
   }
+
+  if (!strcmp(s, "none"))
+    return;
 
  /*
   * Loop through all of the reasons...
@@ -3734,5 +3763,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 6595 2007-06-21 22:29:57Z mike $".
+ * End of "$Id: printers.c 6678 2007-07-16 18:03:35Z mike $".
  */

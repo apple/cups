@@ -1,5 +1,5 @@
 /*
- * "$Id: translate.c 5261 2006-03-09 20:47:49Z mike $"
+ * "$Id: translate.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   HTTP-based translation program for the Common UNIX Printing System (CUPS).
  *
@@ -7,23 +7,14 @@
  *   several different languages.  The translation isn't perfect, but it's
  *   a start (better than working from scratch.)
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44145 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
@@ -448,5 +439,5 @@ write_string(cups_file_t *fp,		/* I - File to write to */
 
 
 /*
- * End of "$Id: translate.c 5261 2006-03-09 20:47:49Z mike $".
+ * End of "$Id: translate.c 6649 2007-07-11 21:46:42Z mike $".
  */

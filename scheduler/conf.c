@@ -1,25 +1,16 @@
 /*
- * "$Id: conf.c 6547 2007-06-04 14:38:43Z mike $"
+ * "$Id: conf.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
@@ -91,6 +82,7 @@ static cupsd_var_t	variables[] =
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
 #ifdef HAVE_LDAP
   { "BrowseLDAPBindDN",		&BrowseLDAPBindDN,	CUPSD_VARTYPE_STRING },
+  { "BrowseLDAPCACertFile",	&BrowseLDAPCACertFile,	CUPSD_VARTYPE_STRING },
   { "BrowseLDAPDN",		&BrowseLDAPDN,		CUPSD_VARTYPE_STRING },
   { "BrowseLDAPPassword",	&BrowseLDAPPassword,	CUPSD_VARTYPE_STRING },
   { "BrowseLDAPServer",		&BrowseLDAPServer,	CUPSD_VARTYPE_STRING },
@@ -564,6 +556,7 @@ cupsdReadConfiguration(void)
   cupsdClearString(&BrowseLDAPDN);
   cupsdClearString(&BrowseLDAPPassword);
   cupsdClearString(&BrowseLDAPServer);
+  cupsdClearString(&BrowseLDAPCACertFile);
 #endif /* HAVE_LDAP */
 
   JobHistory          = DEFAULT_HISTORY;
@@ -1044,11 +1037,11 @@ cupsdReadConfiguration(void)
 		      "CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class "
 		      "CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
-      cupsdLogMessage(CUPSD_LOG_INFO, "AuthType Basic");
+      cupsdLogMessage(CUPSD_LOG_INFO, "AuthType Default");
 
       po = cupsdAddPolicyOp(p, NULL, IPP_PAUSE_PRINTER);
       po->order_type = AUTH_ALLOW;
-      po->type       = AUTH_BASIC;
+      po->type       = DefaultAuthType;
       po->level      = AUTH_USER;
 
       cupsdAddName(po, "@SYSTEM");
@@ -1720,7 +1713,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
   else if (!strcasecmp(line, "AuthType"))
   {
    /*
-    * AuthType {none,basic,digest,basicdigest}
+    * AuthType {none,basic,digest,basicdigest,negotiate,default}
     */
 
     if (!strcasecmp(value, "none"))
@@ -1745,6 +1738,13 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     else if (!strcasecmp(value, "basicdigest"))
     {
       loc->type = AUTH_BASICDIGEST;
+
+      if (loc->level == AUTH_ANON)
+	loc->level = AUTH_USER;
+    }
+    else if (!strcasecmp(value, "default"))
+    {
+      loc->type = DefaultAuthType;
 
       if (loc->level == AUTH_ANON)
 	loc->level = AUTH_USER;
@@ -2758,7 +2758,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
     else if (!strcasecmp(line, "DefaultAuthType"))
     {
      /*
-      * DefaultAuthType {basic,digest,basicdigest}
+      * DefaultAuthType {basic,digest,basicdigest,negotiate}
       */
 
       if (!strcasecmp(value, "basic"))
@@ -3373,5 +3373,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 6547 2007-06-04 14:38:43Z mike $".
+ * End of "$Id: conf.c 6649 2007-07-11 21:46:42Z mike $".
  */

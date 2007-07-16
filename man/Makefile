@@ -1,25 +1,16 @@
 #
-# "$Id: Makefile 5727 2006-07-12 20:44:30Z mike $"
+# "$Id: Makefile 6657 2007-07-13 01:01:14Z mike $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
+#   Copyright 2007 by Apple Inc.
 #   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
-#   property of Easy Software Products and are protected by Federal
-#   copyright law.  Distribution and use rights are outlined in the file
-#   "LICENSE.txt" which should have been included with this file.  If this
-#   file is missing or damaged please contact Easy Software Products
-#   at:
-#
-#       Attn: CUPS Licensing Information
-#       Easy Software Products
-#       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
-#
-#       Voice: (301) 373-9600
-#       EMail: cups-info@cups.org
-#         WWW: http://www.cups.org
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include ../Makedefs
@@ -53,6 +44,8 @@ MAN7	=	backend.$(MAN7EXT) \
 		filter.$(MAN7EXT)
 MAN8	=	accept.$(MAN8EXT) \
 		cupsaddsmb.$(MAN8EXT) \
+		cupsctl.$(MAN8EXT) \
+		cupsfilter.$(MAN8EXT) \
 		cups-deviced.$(MAN8EXT) \
 		cups-driverd.$(MAN8EXT) \
 		cups-lpd.$(MAN8EXT) \
@@ -184,5 +177,5 @@ mantohtml:	mantohtml.o
 
 
 #
-# End of "$Id: Makefile 5727 2006-07-12 20:44:30Z mike $".
+# End of "$Id: Makefile 6657 2007-07-13 01:01:14Z mike $".
 #

@@ -1,27 +1,18 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 6389 2007-03-24 14:26:04Z mike $"
+# "$Id: run-stp-tests.sh 6649 2007-07-11 21:46:42Z mike $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
 #
+#   Copyright 2007 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
-#   property of Easy Software Products and are protected by Federal
-#   copyright law.  Distribution and use rights are outlined in the file
-#   "LICENSE.txt" which should have been included with this file.  If this
-#   file is missing or damaged please contact Easy Software Products
-#   at:
-#
-#       Attn: CUPS Licensing Information
-#       Easy Software Products
-#       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
-#
-#       Voice: (301) 373-9600
-#       EMail: cups-info@cups.org
-#         WWW: http://www.cups.org
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 argcount=$#
@@ -268,6 +259,23 @@ if test $ssltype != 0; then
 fi
 
 #
+# Mac OS X filters and configuration files...
+#
+
+if test `uname` = Darwin; then
+	ln -s /usr/libexec/cups/filter/cgpdfto* /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/nsimagetopdf /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/nstexttopdf /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/pictwpstops /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/pstoappleps /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/pstocupsraster /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/pstopdffilter /tmp/cups-$user/bin/filter
+
+	ln -s /private/etc/cups/apple.* /tmp/cups-$user
+fi
+
+
+#
 # Then create the necessary config files...
 #
 
@@ -298,7 +306,7 @@ MaxLogSize 0
 AccessLog /tmp/cups-$user/log/access_log
 ErrorLog /tmp/cups-$user/log/error_log
 PageLog /tmp/cups-$user/log/page_log
-LogLevel debug2
+LogLevel debug
 PreserveJobHistory Yes
 <Policy default>
 <Limit All>
@@ -591,5 +599,5 @@ echo "A HTML report was created in test/$strfile."
 echo ""
 
 #
-# End of "$Id: run-stp-tests.sh 6389 2007-03-24 14:26:04Z mike $"
+# End of "$Id: run-stp-tests.sh 6649 2007-07-11 21:46:42Z mike $"
 #

@@ -1,25 +1,18 @@
 /*
- * "$Id: transcode.c 6592 2007-06-21 21:04:40Z mike $"
+ * "$Id: transcode.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   Transcoding support for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are
- *   the property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the
- *   file "LICENSE.txt" which should have been included with this file.
- *   If this file is missing or damaged please contact Easy Software
- *   Products at:
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   This file is subject to the Apple OS-Developed Software exception.
  *
  * Contents:
  *
@@ -1655,5 +1648,5 @@ get_vbcs_charmap(
 
 
 /*
- * End of "$Id: transcode.c 6592 2007-06-21 21:04:40Z mike $"
+ * End of "$Id: transcode.c 6649 2007-07-11 21:46:42Z mike $"
  */

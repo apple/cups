@@ -1,25 +1,16 @@
 dnl
-dnl "$Id: cups-common.m4 6564 2007-06-18 23:40:38Z mike $"
+dnl "$Id: cups-common.m4 6682 2007-07-16 20:22:37Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
+dnl   Copyright 2007 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Easy Software Products and are protected by Federal
-dnl   copyright law.  Distribution and use rights are outlined in the file
-dnl   "LICENSE.txt" which should have been included with this file.  If this
-dnl   file is missing or damaged please contact Easy Software Products
-dnl   at:
-dnl
-dnl       Attn: CUPS Licensing Information
-dnl       Easy Software Products
-dnl       44141 Airport View Drive, Suite 204
-dnl       Hollywood, Maryland 20636 USA
-dnl
-dnl       Voice: (301) 373-9600
-dnl       EMail: cups-info@cups.org
-dnl         WWW: http://www.cups.org
+dnl   property of Apple Inc. and are protected by Federal copyright
+dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl   which should have been included with this file.  If this file is
+dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 dnl We need at least autoconf 2.50...
@@ -29,11 +20,11 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Versio number information...
-CUPS_VERSION="1.3svn"
+CUPS_VERSION="1.3b1"
 CUPS_REVISION=""
-if test -z "$CUPS_REVISION" -a -d .svn; then
-	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
-fi
+#if test -z "$CUPS_REVISION" -a -d .svn; then
+#	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
+#fi
 
 AC_SUBST(CUPS_VERSION)
 AC_SUBST(CUPS_REVISION)
@@ -132,6 +123,7 @@ AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H))
 AC_CHECK_HEADER(bstring.h,AC_DEFINE(HAVE_BSTRING_H))
 AC_CHECK_HEADER(usersec.h,AC_DEFINE(HAVE_USERSEC_H))
 AC_CHECK_HEADER(sys/ioctl.h,AC_DEFINE(HAVE_SYS_IOCTL_H))
+AC_CHECK_HEADER(sys/ucred.h,AC_DEFINE(HAVE_SYS_UCRED_H))
 AC_CHECK_HEADER(scsi/sg.h,AC_DEFINE(HAVE_SCSI_SG_H))
 
 dnl Checks for string functions.
@@ -243,7 +235,7 @@ case $uname in
 		dnl Check for Authorization Services support
 		AC_CHECK_HEADER(Security/Authorization.h, [
 			AC_DEFINE(HAVE_AUTHORIZATION_H)
-			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"])
+			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"])
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
                 ;;
 
@@ -293,5 +285,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 6564 2007-06-18 23:40:38Z mike $".
+dnl End of "$Id: cups-common.m4 6682 2007-07-16 20:22:37Z mike $".
 dnl

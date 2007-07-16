@@ -1,5 +1,13 @@
-README - CUPS v1.3svn - 2007-01-03
-----------------------------------
+README - CUPS v1.3b1 - 2007-07-13
+---------------------------------
+
+******************************************************************
+******************************************************************
+****                                                          ****
+****           BETA SOFTWARE - USE AT YOUR OWN RISK           ****
+****                                                          ****
+******************************************************************
+******************************************************************
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -8,10 +16,10 @@ instead...
 INTRODUCTION
 
     CUPS provides a portable printing layer for UNIX(r)-based
-    operating systems.  It has been developed by Easy Software
-    Products to promote a standard printing solution for all UNIX
-    vendors and users.  CUPS provides the System V and Berkeley
-    command-line interfaces.
+    operating systems.  It was developed by Easy Software Products
+    and is now owned and maintained by Apple Inc. to promote a
+    standard printing solution for all UNIX vendors and users.  CUPS
+    provides the System V and Berkeley command-line interfaces.
 
     CUPS uses the Internet Printing Protocol ("IPP") as the basis
     for managing print jobs and queues.  The Line Printer Daemon
@@ -29,15 +37,8 @@ INTRODUCTION
     EPSON, HP, OKIDATA, and Zebra printers are included that use
     these filters.
 
-    Drivers for thousands of printers are provided with our ESP
-    Print Pro software, available at:
-
-	    http://www.easysw.com/printpro/
-
     CUPS is licensed under the GNU General Public License and GNU
-    Library General Public License.  Please contact Easy Software
-    Products for commercial support and "binary distribution"
-    rights.
+    Library General Public License versions 2.
 
 
 READING THE DOCUMENTATION
@@ -60,19 +61,13 @@ GETTING SUPPORT AND OTHER RESOURCES
 
 	http://www.cups.org/newsgroups.php
 
-    Commercial support (with a guaranteed response time) is
-    available from Easy Software Products.  For more information
-    see:
-
-	http://www.easysw.com/cups/
-
     See the CUPS web site at "http://www.cups.org/" for other
     site links.
 
 
 SETTING UP PRINTER QUEUES USING YOUR WEB BROWSER
 
-    CUPS 1.2 includes a web-based administration tool that allows
+    CUPS 1.3 includes a web-based administration tool that allows
     you to manage printers, classes, and jobs on your server. 
     Open the following URL in your browser to access the printer
     administration tools:
@@ -101,6 +96,7 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 	Driver                         PPD File
 	-----------------------------  ------------
 	Dymo Label Printers            dymo.ppd
+	Intellitech Intellibar         intelbar.ppd
 	EPSON Stylus Color Series      stcolor.ppd
 	EPSON Stylus Photo Series      stphoto.ppd
 	EPSON Stylus New Color Series  stcolor2.ppd
@@ -108,7 +104,6 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 	EPSON 9-pin Series             epson9.ppd
 	EPSON 24-pin Series            epson24.ppd
 	HP DeskJet Series              deskjet.ppd
-	HP New DeskJet Series          deskjet2.ppd
 	HP LaserJet Series             laserjet.ppd
 	OKIDATA 9-Pin Series           okidata9.ppd
 	OKIDATA 24-Pin Series          okidat24.ppd
@@ -133,10 +128,7 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 
     The sample drivers provide basic printing capabilities, but
     generally do not exercise the full potential of the printers
-    or CUPS.  For fully-functional commercial printer drivers
-    check out our ESP Print Pro software at:
-
-	http://www.easysw.com/printpro/
+    or CUPS.
 
 
 PRINTING FILES
@@ -170,9 +162,9 @@ PRINTING FILES
 
 LEGAL STUFF
 
-    CUPS is Copyright 1993-2007 by Easy Software Products.  CUPS,
-    the CUPS logo, and the Common UNIX Printing System are the
-    trademark property of Easy Software Products.
+    CUPS is Copyright 2007 by Apple Inc.  CUPS, the CUPS logo, and
+    the Common UNIX Printing System are the trademark property of
+    Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
 
@@ -189,18 +181,3 @@ LEGAL STUFF
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     "doc/help/license.html" or "LICENSE.txt" files for more
     information.
-
-    For commercial licensing information, please contact:
-
-	Attn: CUPS Licensing Information
-	Easy Software Products
-	44141 Airport View Drive, Suite 204
-	Hollywood, Maryland 20636 USA
-
-	Voice: +1.301.373.9600
-	Email: cups-info@cups.org
-	WWW: http://www.cups.org/
-
-    Note that commercial licensors may also require a license from
-    Derek B. Noonburg who developed the Xpdf software used to print
-    PDF files.

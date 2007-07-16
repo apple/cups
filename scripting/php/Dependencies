@@ -1,6 +1,1 @@
-# DO NOT DELETE
-
-phpcups.o: ../../cups/string.h ../../config.h phpcups.h ../../cups/cups.h
-phpcups.o: ../../cups/ipp.h ../../cups/http.h ../../cups/ppd.h
-phpcups.o: ../../cups/array.h ../../cups/file.h ../../cups/language.h
-phpcups.o: ../../cups/language.h ../../cups/debug.h
+# DO NOT DELETE THIS LINE -- make depend depends on it.

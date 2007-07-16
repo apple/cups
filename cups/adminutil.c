@@ -1,26 +1,17 @@
 /*
- * "$Id: adminutil.c 6549 2007-06-04 15:32:58Z mike $"
+ * "$Id: adminutil.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 2001-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  *   This file is subject to the Apple OS-Developed Software exception.
  *
@@ -676,12 +667,15 @@ cupsAdminExportSamba(
 				"are installed!")),
               sizeof(message));
 
-    _cupsSetError(IPP_INTERNAL_ERROR, message);
+    _cupsSetError(IPP_NOT_FOUND, message);
     _cupsLangPrintf(logfile, "%s\n", message);
   }
 
   if (have_drivers == 0)
+  {
+    _cupsSetError(IPP_NOT_FOUND, message);
     return (0);
+  }
 
  /*
   * Finally, associate the drivers we just added with the queue...
@@ -2216,5 +2210,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 6549 2007-06-04 15:32:58Z mike $".
+ * End of "$Id: adminutil.c 6649 2007-07-11 21:46:42Z mike $".
  */

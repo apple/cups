@@ -1,8 +1,9 @@
 /*
- * "$Id: ieee1394.h 4494 2005-02-18 02:18:11Z mike $"
+ * "$Id: ieee1394.h 6649 2007-07-11 21:46:42Z mike $"
  *
  *   IEEE-1394 header for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 2002 by Easy Software Products, all rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or
@@ -99,5 +100,5 @@ extern const char	*ieee1394_error(void);
 
 
 /*
- * End of "$Id: ieee1394.h 4494 2005-02-18 02:18:11Z mike $".
+ * End of "$Id: ieee1394.h 6649 2007-07-11 21:46:42Z mike $".
  */

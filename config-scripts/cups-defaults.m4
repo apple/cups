@@ -1,34 +1,28 @@
 dnl
-dnl "$Id: cups-defaults.m4 6568 2007-06-18 23:58:08Z mike $"
+dnl "$Id: cups-defaults.m4 6656 2007-07-12 23:56:23Z mike $"
 dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
 dnl
+dnl   Copyright 2007 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Easy Software Products and are protected by Federal
-dnl   copyright law.  Distribution and use rights are outlined in the file
-dnl   "LICENSE.txt" which should have been included with this file.  If this
-dnl   file is missing or damaged please contact Easy Software Products
-dnl   at:
-dnl
-dnl       Attn: CUPS Licensing Information
-dnl       Easy Software Products
-dnl       44141 Airport View Drive, Suite 204
-dnl       Hollywood, Maryland 20636 USA
-dnl
-dnl       Voice: (301) 373-9600
-dnl       EMail: cups-info@cups.org
-dnl         WWW: http://www.cups.org
+dnl   property of Apple Inc. and are protected by Federal copyright
+dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl   which should have been included with this file.  If this file is
+dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-dnl Default langugages...
-AC_ARG_WITH(languages, [  --with-languages        set installed languages, default="de es et fr he it ja pl sv zh_TW" ],
-	if test "x$withval" != xno; then
-		LANGUAGES="$withval"
-	fi,
-	LANGUAGES="de es et fr he it ja pl sv zh_TW")
+dnl Default languages...
+LANGUAGES="`ls -1 locale/*.po | sed -e '1,$s/locale\/cups_//' -e '1,$s/\.po//' | tr '\n' ' '`"
+
+AC_ARG_WITH(languages, [  --with-languages        set installed languages, default=all ],[
+	case "$withval" in
+		none | no) LANGUAGES="" ;;
+		all) ;;
+		*) LANGUAGES="$withval" ;;
+	esac])
 AC_SUBST(LANGUAGES)
 
 dnl Default ConfigFilePerm
@@ -210,34 +204,34 @@ AC_ARG_WITH(cups_group, [  --with-cups-group       set default group for CUPS],
 AC_ARG_WITH(system_groups, [  --with-system-groups    set default system groups for CUPS],
 	CUPS_SYSTEM_GROUPS="$withval",
 	if test x$uname = xDarwin; then
-		GROUP_LIST="admin"
+		CUPS_SYSTEM_GROUPS="lpadmin admin"
 	else
-		GROUP_LIST="lpadmin sys system root"
-	fi
-
-	AC_MSG_CHECKING(for default system groups)
-	if test -f /etc/group; then
-		CUPS_SYSTEM_GROUPS=""
-		for group in $GROUP_LIST; do
-			if test "`grep \^${group}: /etc/group`" != ""; then
-				if test "x$CUPS_SYSTEM_GROUPS" = x; then
-					CUPS_SYSTEM_GROUPS="$group"
-				else
-					CUPS_SYSTEM_GROUPS="$CUPS_SYSTEM_GROUPS $group"
+		AC_MSG_CHECKING(for default system groups)
+		if test -f /etc/group; then
+			CUPS_SYSTEM_GROUPS=""
+			GROUP_LIST="lpadmin sys system root"
+			for group in $GROUP_LIST; do
+				if test "`grep \^${group}: /etc/group`" != ""; then
+					if test "x$CUPS_SYSTEM_GROUPS" = x; then
+						CUPS_SYSTEM_GROUPS="$group"
+					else
+						CUPS_SYSTEM_GROUPS="$CUPS_SYSTEM_GROUPS $group"
+					fi
 				fi
-			fi
-		done
+			done
 
-		if test "x$CUPS_SYSTEM_GROUPS" = x; then
-			CUPS_SYSTEM_GROUPS="$GROUP_LIST"
-			AC_MSG_RESULT(no groups found, using "$CUPS_SYSTEM_GROUPS")
+			if test "x$CUPS_SYSTEM_GROUPS" = x; then
+				CUPS_SYSTEM_GROUPS="$GROUP_LIST"
+				AC_MSG_RESULT(no groups found, using "$CUPS_SYSTEM_GROUPS")
+			else
+				AC_MSG_RESULT("$CUPS_SYSTEM_GROUPS")
+			fi
 		else
-			AC_MSG_RESULT("$CUPS_SYSTEM_GROUPS")
+			CUPS_SYSTEM_GROUPS="$GROUP_LIST"
+			AC_MSG_RESULT(no group file, using "$CUPS_SYSTEM_GROUPS")
 		fi
-	else
-		CUPS_SYSTEM_GROUPS="$GROUP_LIST"
-		AC_MSG_RESULT(no group file, using "$CUPS_SYSTEM_GROUPS")
 	fi)
+
 
 CUPS_PRIMARY_SYSTEM_GROUP="`echo $CUPS_SYSTEM_GROUPS | awk '{print $1}'`"
 
@@ -309,6 +303,26 @@ else
 fi
 AC_SUBST(DEFAULT_RAW_PRINTING)
 
+dnl Default SNMP options...
+AC_ARG_WITH(snmp-address, [  --with-snmp-address     set SNMP query address, default=auto ],
+	if test "x$withval" = x; then
+		CUPS_SNMP_ADDRESS=""
+	else
+		CUPS_SNMP_ADDRESS="Address $withval"
+	fi,
+	if test "x$uname" = xDarwin; then
+		CUPS_SNMP_ADDRESS=""
+	else
+		CUPS_SNMP_ADDRESS="Address @LOCAL"
+	fi)
+
+AC_ARG_WITH(snmp-community, [  --with-snmp-community   set SNMP community, default=public ],
+	CUPS_SNMP_COMMUNITY="Community $withval",
+	CUPS_SNMP_COMMUNITY="Community public")
+
+AC_SUBST(CUPS_SNMP_ADDRESS)
+AC_SUBST(CUPS_SNMP_COMMUNITY)
+
 dnl
-dnl End of "$Id: cups-defaults.m4 6568 2007-06-18 23:58:08Z mike $".
+dnl End of "$Id: cups-defaults.m4 6656 2007-07-12 23:56:23Z mike $".
 dnl

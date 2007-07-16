@@ -1,28 +1,19 @@
 /*
- * "$Id: client.c 6570 2007-06-19 18:10:48Z mike $"
+ * "$Id: client.c 6681 2007-07-16 20:11:52Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
  *   Jelmer Vernooij.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
@@ -2111,6 +2102,16 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
           if (con->request)
 	  {
 	    cupsdProcessIPPRequest(con);
+
+	    if (con->filename)
+	    {
+	      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+			      "cupsdReadClient: %d Removing temp file %s",
+			      con->http.fd, con->filename);
+	      unlink(con->filename);
+	      cupsdClearString(&con->filename);
+	    }
+
 	    return;
 	  }
 	}
@@ -2411,7 +2412,7 @@ cupsdSendHeader(
 #endif /* HAVE_GSSAPI */
 
 #ifdef HAVE_AUTHORIZATION_H
-    if (con->best)
+    if (con->best && strcmp(auth_str, "Negotiate"))
     {
       int 	 i;			/* Looping var */
       char	*auth_key;		/* Auth key buffer */
@@ -2440,9 +2441,14 @@ cupsdSendHeader(
     }
 #endif /* HAVE_AUTHORIZATION_H */
 
-    if (auth_str[0] &&
-	httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)
-      return (0);
+    if (auth_str[0])
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendHeader: WWW-Authenticate: %s",
+                      auth_str);
+
+      if (httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)
+        return (0);
+    }
   }
 
 #ifdef HAVE_GSSAPI
@@ -4566,5 +4572,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 6570 2007-06-19 18:10:48Z mike $".
+ * End of "$Id: client.c 6681 2007-07-16 20:11:52Z mike $".
  */

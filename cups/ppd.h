@@ -1,26 +1,17 @@
 /*
- * "$Id: ppd.h 6477 2007-04-25 19:55:45Z mike $"
+ * "$Id: ppd.h 6649 2007-07-11 21:46:42Z mike $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  *   PostScript is a trademark of Adobe Systems, Inc.
  *
@@ -318,7 +309,7 @@ typedef struct ppd_file_s		/**** PPD File ****/
   char		**filters;		/* Filter strings... */
 
   /**** New in CUPS 1.1 ****/
-  int		flip_duplex;		/* 1 = Flip page for back sides @since CUPS 1.1@ */
+  int		flip_duplex;		/* 1 = Flip page for back sides @deprecated@ */
 
   /**** New in CUPS 1.1.19 ****/
   char		*protocols;		/* Protocols (BCP, TBCP) string @since CUPS 1.1.19@ */
@@ -397,6 +388,12 @@ extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd);
 extern int		ppdLocalize(ppd_file_t *ppd);
 extern ppd_file_t	*ppdOpen2(cups_file_t *fp);
 
+/**** New in CUPS 1.3 ****/
+extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
+			                      const char *reason,
+					      const char *scheme,
+					      char *buffer, size_t bufsize);
+
 
 /*
  * C++ magic...
@@ -408,5 +405,5 @@ extern ppd_file_t	*ppdOpen2(cups_file_t *fp);
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h 6477 2007-04-25 19:55:45Z mike $".
+ * End of "$Id: ppd.h 6649 2007-07-11 21:46:42Z mike $".
  */

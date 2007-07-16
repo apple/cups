@@ -1,34 +1,25 @@
 #
-# "$Id: Makefile 6574 2007-06-19 23:52:37Z mike $"
+# "$Id: Makefile 6649 2007-07-11 21:46:42Z mike $"
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
+#   Copyright 2007 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
-#   property of Easy Software Products and are protected by Federal
-#   copyright law.  Distribution and use rights are outlined in the file
-#   "LICENSE.txt" which should have been included with this file.  If this
-#   file is missing or damaged please contact Easy Software Products
-#   at:
-#
-#       Attn: CUPS Licensing Information
-#       Easy Software Products
-#       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
-#
-#       Voice: (301) 373-9600
-#       EMail: cups-info@cups.org
-#         WWW: http://www.cups.org
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include ../Makedefs
 
-TARGETS	=	accept cancel cupsaddsmb cupstestdsc cupstestppd \
+TARGETS	=	accept cancel cupsaddsmb cupsctl cupstestdsc cupstestppd \
 		lp lpadmin lpinfo lpmove lpoptions lppasswd lpstat
-OBJS	=	accept.o cancel.o cupsaddsmb.o cupstestdsc.o cupstestppd.o \
-		lp.o lpadmin.o lpinfo.o lpmove.o lpoptions.o lppasswd.o \
-		lpstat.o
+OBJS	=	accept.o cancel.o cupsaddsmb.o cupsctl.o cupstestdsc.o \
+		cupstestppd.o lp.o lpadmin.o lpinfo.o lpmove.o lpoptions.o \
+		lppasswd.o lpstat.o
 
 
 #
@@ -64,6 +55,7 @@ install:	all
 	$(RM) $(SBINDIR)/reject
 	$(LN) accept $(SBINDIR)/reject
 	$(INSTALL_BIN) cupsaddsmb $(SBINDIR)
+	$(INSTALL_BIN) cupsctl $(SBINDIR)
 	$(INSTALL_BIN) lpadmin $(SBINDIR)
 	$(INSTALL_BIN) lpinfo $(SBINDIR)
 	$(INSTALL_BIN) lpmove $(SBINDIR)
@@ -140,6 +132,15 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsaddsmb cupsaddsmb.o $(LIBS)
+
+
+#
+# cupsctl
+#
+
+cupsctl:	cupsctl.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cupsctl cupsctl.o $(LIBS)
 
 
 #
@@ -231,5 +232,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6574 2007-06-19 23:52:37Z mike $".
+# End of "$Id: Makefile 6649 2007-07-11 21:46:42Z mike $".
 #

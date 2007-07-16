@@ -1,5 +1,5 @@
 /*
-* "$Id: usb-darwin.c 6591 2007-06-21 20:35:28Z mike $"
+* "$Id: usb-darwin.c 6680 2007-07-16 18:46:16Z mike $"
 *
 * Copyright © 2005-2007 Apple Inc. All rights reserved.
 *
@@ -104,6 +104,7 @@
  * the printer after we've finished sending all the data
  */
 #define WAIT_EOF_DELAY			7
+#define WAIT_SIDE_DELAY			3
 #define DEFAULT_TIMEOUT			60L
 
 #define	USB_INTERFACE_KIND		CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID190)
@@ -220,6 +221,7 @@ typedef struct globals_s
   CFStringRef		model;
   CFStringRef		serial;
   UInt32		location;
+  UInt8			interfaceNum;
 
   CFRunLoopTimerRef 	status_timer;
 
@@ -229,6 +231,11 @@ typedef struct globals_s
   Boolean		wait_eof;
   int			drain_output;	/* Drain all pending output */
   int			bidi_flag;	/* 0=unidirectional, 1=bidirectional */
+
+  pthread_mutex_t	sidechannel_thread_mutex;
+  pthread_cond_t	sidechannel_thread_cond;
+  int			sidechannel_thread_stop;
+  int			sidechannel_thread_done;
 } globals_t;
 
 
@@ -256,7 +263,7 @@ static OSStatus copy_deviceid(classdriver_t **printer, CFStringRef *deviceID);
 static void *read_thread(void *reference);
 static void *sidechannel_thread(void *reference);
 static void copy_deviceinfo(CFStringRef deviceIDString, CFStringRef *make, CFStringRef *model, CFStringRef *serial);
-static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, UInt32 *deviceLocation);
+static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, UInt32 *deviceLocation, UInt8 *interfaceNum);
 static void device_added(void *userdata, io_iterator_t iterator);
 static void get_device_id(cups_sc_status_t *status, char *data, int *datalen);
 static void iterate_printers(iterator_callback_t callBack, void *userdata);
@@ -414,17 +421,14 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (!print_fd)
   {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-    sigset(SIGTERM, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
+    struct sigaction	action;		/* POSIX signal action */
+
+
     memset(&action, 0, sizeof(action));
 
     sigemptyset(&action.sa_mask);
     action.sa_handler = SIG_IGN;
     sigaction(SIGTERM, &action, NULL);
-#else
-    signal(SIGTERM, SIG_IGN);
-#endif /* HAVE_SIGSET */
   }
 
  /*
@@ -444,6 +448,12 @@ print_device(const char *uri,		/* I - Device URI */
 
   if ((select(CUPS_SC_FD+1, &input_set, NULL, NULL, &stimeout)) >= 0)
   {
+    g.sidechannel_thread_stop = 0;
+    g.sidechannel_thread_done = 0;
+
+    pthread_cond_init(&g.sidechannel_thread_cond, NULL);
+    pthread_mutex_init(&g.sidechannel_thread_mutex, NULL);
+
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
       fputs(_("WARNING: Couldn't create side channel\n"), stderr);
@@ -623,7 +633,8 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  OSStatus err = (*g.classdriver)->Abort(g.classdriver);
 	  fprintf(stderr, _("ERROR: %ld: (canceled:%ld)\n"), (long)status, (long)err);
-	  return CUPS_BACKEND_STOP;
+	  status = CUPS_BACKEND_STOP;
+	  break;
 	}
 
         fprintf(stderr, "DEBUG: Wrote %d bytes of print data...\n", (int)bytes);
@@ -651,7 +662,21 @@ print_device(const char *uri,		/* I - Device URI */
   pthread_cond_signal(&g.readwrite_lock_cond);
   pthread_mutex_unlock(&g.readwrite_lock_mutex);
 
+  g.sidechannel_thread_stop = 1;
+  pthread_mutex_lock(&g.sidechannel_thread_mutex);
+  if (!g.sidechannel_thread_done)
+  {
+    cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
+    cond_timeout.tv_nsec = 0;
+    pthread_cond_timedwait(&g.sidechannel_thread_cond,
+                           &g.sidechannel_thread_mutex, &cond_timeout);
+  }
+  pthread_mutex_unlock(&g.sidechannel_thread_mutex);
+
   pthread_join(sidechannel_thread_id, NULL);
+
+  pthread_cond_destroy(&g.sidechannel_thread_cond);
+  pthread_mutex_destroy(&g.sidechannel_thread_mutex);
 
   pthread_cond_destroy(&g.readwrite_lock_cond);
   pthread_mutex_destroy(&g.readwrite_lock_mutex);
@@ -676,7 +701,8 @@ print_device(const char *uri,		/* I - Device URI */
     cond_timeout.tv_sec = time(NULL) + WAIT_EOF_DELAY;
     cond_timeout.tv_nsec = 0;
 
-    if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex, &cond_timeout) != 0)
+    if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
+                               &cond_timeout) != 0)
       g.wait_eof = false;
   }
   pthread_mutex_unlock(&g.read_thread_mutex);
@@ -790,12 +816,13 @@ sidechannel_thread(void *reference)
   char			data[2048];	/* Request/response data */
   int			datalen;	/* Request/response data size */
 
-  for (;;)
+
+  do
   {
     datalen = sizeof(data);
 
     if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-      break;
+      continue;
 
     switch (command)
     {
@@ -830,6 +857,13 @@ sidechannel_thread(void *reference)
 	  break;
     }
   }
+  while (!g.sidechannel_thread_stop);
+
+  pthread_mutex_lock(&g.sidechannel_thread_mutex);
+  g.sidechannel_thread_done = 1;
+  pthread_cond_signal(&g.sidechannel_thread_cond);
+  pthread_mutex_unlock(&g.sidechannel_thread_mutex);
+
   return NULL;
 }
 
@@ -923,8 +957,9 @@ static Boolean list_device_cb(void *refcon,
   {
     CFStringRef deviceIDString = NULL;
     UInt32 deviceLocation = 0;
+    UInt8	interfaceNum = 0;
 
-    copy_devicestring(obj, &deviceIDString, &deviceLocation);
+    copy_devicestring(obj, &deviceIDString, &deviceLocation, &interfaceNum);
     if (deviceIDString != NULL)
     {
       CFStringRef make = NULL,  model = NULL, serial = NULL;
@@ -997,8 +1032,9 @@ static Boolean find_device_cb(void *refcon,
   {
     CFStringRef idString = NULL;
     UInt32 location = -1;
+    UInt8	interfaceNum = 0;
 
-    copy_devicestring(obj, &idString, &location);
+    copy_devicestring(obj, &idString, &location, &interfaceNum);
     if (idString != NULL)
     {
       CFStringRef make = NULL,  model = NULL, serial = NULL;
@@ -1028,6 +1064,8 @@ static Boolean find_device_cb(void *refcon,
 	    if (g.location == 0 || g.location == location)
 	      keepLooking = false;
 	  }
+	  if ( !keepLooking )
+		g.interfaceNum = interfaceNum;
 	}
       }
 
@@ -1252,6 +1290,7 @@ static kern_return_t registry_open(CFStringRef *driverBundlePath)
 
   if (g.classdriver != NULL)
   {
+  	(*g.classdriver)->interfaceNumber = g.interfaceNum;
     kr = (*g.classdriver)->Open(g.classdriver, g.location, kUSBPrintingProtocolBidirectional);
     if (kr != kIOReturnSuccess || (*g.classdriver)->interface == NULL)
     {
@@ -1381,7 +1420,8 @@ static OSStatus copy_deviceid(classdriver_t **classdriver,
 
 static void copy_devicestring(io_service_t usbInterface,
 			      CFStringRef *deviceID,
-			      UInt32 *deviceLocation)
+			      UInt32 *deviceLocation,
+			      UInt8	*interfaceNumber )
 {
   IOCFPlugInInterface	**iodev = NULL;
   SInt32		score;
@@ -1400,6 +1440,7 @@ static void copy_devicestring(io_service_t usbInterface,
 					&intf)) == noErr)
     {
       (*intf)->GetLocationID(intf, deviceLocation);
+      (*intf)->GetInterfaceNumber(intf, interfaceNumber);
 
       driverBundlePath = IORegistryEntryCreateCFProperty(usbInterface,
 							 kUSBClassDriverProperty,
@@ -1643,36 +1684,54 @@ static void run_ppc_backend(int argc,
 
   if (usb_ppc_status == NULL)
   {
-    /* Catch SIGTERM if we are _not_ printing data from
-     * stdin (otherwise you can't cancel raw jobs...)
-     */
+   /*
+    * Setup a SIGTERM handler then block it before forking...
+    */
 
-    if (fd != 0)
-    {
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-      sigset(SIGTERM, sigterm_handler);
-#elif defined(HAVE_SIGACTION)
-      struct sigaction action;	/* Actions for POSIX signals */
-      memset(&action, 0, sizeof(action));
-      sigaddset(&action.sa_mask, SIGTERM);
-      action.sa_handler = sigterm_handler;
-      sigaction(SIGTERM, &action, NULL);
-#else
-      signal(SIGTERM, sigterm_handler);
-#endif /* HAVE_SIGSET */
-    }
+    struct sigaction	action;		/* POSIX signal action */
+    sigset_t		newmask,	/* New signal mask */
+			oldmask;	/* Old signal mask */
+
+    memset(&action, 0, sizeof(action));
+    sigaddset(&action.sa_mask, SIGTERM);
+    action.sa_handler = sigterm_handler;
+    sigaction(SIGTERM, &action, NULL);
+
+    sigemptyset(&newmask);
+    sigaddset(&newmask, SIGTERM);
+    sigprocmask(SIG_BLOCK, &newmask, &oldmask);
 
     if ((child_pid = fork()) == 0)
     {
-      /* Child comes here. */
+     /*
+      * Child comes here...
+      */
+
       setenv("USB_PPC_STATUS", "1", false);
 
-      /* Tell the kernel we want the next exec call to favor the ppc architecture... */
+     /*
+      * Unblock signals before doing the exec...
+      */
+
+      memset(&action, 0, sizeof(action));
+      sigemptyset(&action.sa_mask);
+      action.sa_handler = SIG_DFL;
+      sigaction(SIGTERM, &action, NULL);
+
+      sigprocmask(SIG_SETMASK, &oldmask, NULL);
+
+     /*
+      * Tell the kernel the next exec call should favor the ppc architecture...
+      */
+
       int mib[] = { CTL_KERN, KERN_AFFINITY, 1, 1 };
       int namelen = 4;
       sysctl(mib, namelen, NULL, NULL, NULL, 0);
 
-      /* Set up the arguments and call exec... */
+     /*
+      * Set up the arguments and call exec...
+      */
+
       for (i = 0; i < argc && i < (sizeof(my_argv)/sizeof(my_argv[0])) - 1; i++)
 	my_argv[i] = argv[i];
 
@@ -1680,41 +1739,48 @@ static void run_ppc_backend(int argc,
 
       execv("/usr/libexec/cups/backend/usb", my_argv);
 
-      fprintf(stderr, "DEBUG: execv: %s\n", strerror(errno));
-      exitstatus = errno;
+      perror("/usr/libexec/cups/backend/usb");
+      exit(errno);
     }
-    else if (child_pid > 0)
+    else if (child_pid < 0)
     {
-      /* Parent comes here.
-       *
-       * Close the fds we won't be using then wait for the child backend to exit.
-       */
-      close(fd);
-      close(1);
+     /*
+      * Error - couldn't fork a new process!
+      */
 
-      fprintf(stderr, "DEBUG: Started usb(ppc) backend (PID %d)\n", (int)child_pid);
+      perror("fork");
+      exit(errno);
+    }
 
-      while ((waitpid_status = waitpid(child_pid, &childstatus, 0)) == (pid_t)-1 && errno == EINTR)
-        usleep(1000);
+   /*
+    * Unblock signals...
+    */
 
-      if (WIFSIGNALED(childstatus))
-      {
-	exitstatus = WTERMSIG(childstatus);
-	fprintf(stderr, "DEBUG: usb(ppc) backend %d crashed on signal %d!\n", child_pid, exitstatus);
-      }
-      else
-      {
-	if ((exitstatus = WEXITSTATUS(childstatus)) != 0)
-	  fprintf(stderr, "DEBUG: usb(ppc) backend %d stopped with status %d!\n", child_pid, exitstatus);
-	else
-	  fprintf(stderr, "DEBUG: PID %d exited with no errors\n", child_pid);
-      }
+    sigprocmask(SIG_SETMASK, &oldmask, NULL);
+
+   /*
+    * Close the fds we won't be using then wait for the child backend to exit.
+    */
+
+    close(fd);
+    close(1);
+
+    fprintf(stderr, "DEBUG: Started usb(ppc) backend (PID %d)\n", (int)child_pid);
+
+    while ((waitpid_status = waitpid(child_pid, &childstatus, 0)) == (pid_t)-1 && errno == EINTR)
+      usleep(1000);
+
+    if (WIFSIGNALED(childstatus))
+    {
+      exitstatus = WTERMSIG(childstatus);
+      fprintf(stderr, "DEBUG: usb(ppc) backend %d crashed on signal %d!\n", child_pid, exitstatus);
     }
     else
     {
-      /* fork() error */
-      fprintf(stderr, "DEBUG: fork: %s\n", strerror(errno));
-      exitstatus = errno;
+      if ((exitstatus = WEXITSTATUS(childstatus)) != 0)
+	fprintf(stderr, "DEBUG: usb(ppc) backend %d stopped with status %d!\n", child_pid, exitstatus);
+      else
+	fprintf(stderr, "DEBUG: PID %d exited with no errors\n", child_pid);
     }
   }
   else
@@ -1892,10 +1958,11 @@ static void get_device_id(cups_sc_status_t *status,
 			  int *datalen)
 {
   UInt32 deviceLocation = 0;
+  UInt8	interfaceNum = 0;
   CFStringRef deviceIDString = NULL;
 
   /* GetDeviceID */
-  copy_devicestring(g.printer_obj, &deviceIDString, &deviceLocation);
+  copy_devicestring(g.printer_obj, &deviceIDString, &deviceLocation, &interfaceNum);
   if (deviceIDString)
   {
     CFStringGetCString(deviceIDString, data, *datalen, kCFStringEncodingUTF8);
@@ -1907,5 +1974,5 @@ static void get_device_id(cups_sc_status_t *status,
 
 
 /*
- * End of "$Id: usb-darwin.c 6591 2007-06-21 20:35:28Z mike $".
+ * End of "$Id: usb-darwin.c 6680 2007-07-16 18:46:16Z mike $".
  */

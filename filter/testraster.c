@@ -1,32 +1,16 @@
 /*
- * "$Id: testraster.c 6331 2007-03-12 16:07:31Z mike $"
+ * "$Id: testraster.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   Raster test program routines for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights for the CUPS Raster source
- *   files are outlined in the GNU Library General Public License, located
- *   in the "pstoraster" directory.  If this file is missing or damaged
- *   please contact Easy Software Products at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
- *
- *   This code and any derivative of it may be used and distributed
- *   freely under the terms of the GNU General Public License when
- *   used with GNU Ghostscript or its derivatives.  Use of the code
- *   (or any derivative of it) with software other than GNU
- *   GhostScript (or its derivatives) is governed by the CUPS license
- *   agreement.
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  *   This file is subject to the Apple OS-Developed Software exception.
  *
@@ -1088,5 +1072,5 @@ print_changes(
 
 
 /*
- * End of "$Id: testraster.c 6331 2007-03-12 16:07:31Z mike $".
+ * End of "$Id: testraster.c 6649 2007-07-11 21:46:42Z mike $".
  */

@@ -3,26 +3,17 @@ dnl   "$Id$"
 dnl
 dnl   GSSAPI/Kerberos library detection.
 dnl
+dnl   Copyright 2007 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products.
 dnl
 dnl   This file contains Kerberos support code, copyright 2006 by
 dnl   Jelmer Vernooij.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Easy Software Products and are protected by Federal
-dnl   copyright law.  Distribution and use rights are outlined in the file
-dnl   "LICENSE.txt" which should have been included with this file.  If this
-dnl   file is missing or damaged please contact Easy Software Products
-dnl   at:
-dnl
-dnl       Attn: CUPS Licensing Information
-dnl       Easy Software Products
-dnl       44141 Airport View Drive, Suite 204
-dnl       Hollywood, Maryland 20636 USA
-dnl
-dnl       Voice: (301) 373-9600
-dnl       EMail: cups-info@cups.org
-dnl         WWW: http://www.cups.org
+dnl   property of Apple Inc. and are protected by Federal copyright
+dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl   which should have been included with this file.  If this file is
+dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_ARG_ENABLE(gssapi, [  --enable-gssapi         turn on GSSAPI support, default=yes])
@@ -69,7 +60,7 @@ if test x$enable_gssapi != xno; then
 
 		AC_CHECK_FUNC(gsskrb5_register_acceptor_identity, 
 			      AC_DEFINE(HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY))
-		AC_CHECK_FUNC(krb5_cc_resolve, AC_DEFINE(KRB5_CC_RESOLVE))
+		AC_CHECK_FUNC(krb5_cc_resolve, AC_DEFINE(HAVE_KRB5_CC_RESOLVE))
 
 		AC_MSG_CHECKING(for GSS_C_NT_HOSTBASED_SERVICE)
 		if test $ac_cv_header_gssapi_gssapi_h = yes; then
@@ -104,7 +95,7 @@ AC_ARG_WITH(gssservicename, [  --with-gssservicename   set default gss service n
 
 if test x$default_gssservicename != xno; then
 	if test "x$default_gssservicename" = "xdefault"; then
-		CUPS_DEFAULT_GSSSERVICENAME="IPP"
+		CUPS_DEFAULT_GSSSERVICENAME="ipp"
 	else
 		CUPS_DEFAULT_GSSSERVICENAME="$default_gssservicename"
 	fi

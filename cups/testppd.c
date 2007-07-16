@@ -1,25 +1,16 @@
 /*
- * "$Id: testppd.c 6580 2007-06-20 21:11:43Z mike $"
+ * "$Id: testppd.c 6676 2007-07-16 17:09:09Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  *   This file is subject to the Apple OS-Developed Software exception.
  *
@@ -107,6 +98,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		status;			/* Status of tests (0 = success, 1 = fail) */
   int		conflicts;		/* Number of conflicts */
   char		*s;			/* String */
+  char		buffer[8192];		/* String buffer */
 
 
   status = 0;
@@ -146,6 +138,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("PASS");
     else
     {
+      status ++;
       printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
 	     (int)strlen(default_code));
 
@@ -164,6 +157,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("PASS");
     else
     {
+      status ++;
       printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
 	     (int)strlen(custom_code));
 
@@ -173,6 +167,62 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (s)
       free(s);
+
+   /*
+    * Test localization...
+    */
+
+    fputs("ppdLocalizeIPPReason(text): ", stdout);
+    if (ppdLocalizeIPPReason(ppd, "foo", NULL, buffer, sizeof(buffer)) &&
+        !strcmp(buffer, "Foo Reason"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"Foo Reason\")\n", buffer);
+    }
+
+    fputs("ppdLocalizeIPPReason(http): ", stdout);
+    if (ppdLocalizeIPPReason(ppd, "foo", "http", buffer, sizeof(buffer)) &&
+        !strcmp(buffer, "http://foo/bar.html"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"http://foo/bar.html\")\n", buffer);
+    }
+
+    fputs("ppdLocalizeIPPReason(help): ", stdout);
+    if (ppdLocalizeIPPReason(ppd, "foo", "help", buffer, sizeof(buffer)) &&
+        !strcmp(buffer, "help:anchor='foo'%20bookID=Vendor%20Help"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"help:anchor='foo'%%20bookID=Vendor%%20Help\")\n", buffer);
+    }
+
+    fputs("ppdLocalizeIPPReason(file): ", stdout);
+    if (ppdLocalizeIPPReason(ppd, "foo", "file", buffer, sizeof(buffer)) &&
+        !strcmp(buffer, "/help/foo/bar.html"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"/help/foo/bar.html\")\n", buffer);
+    }
+
+    putenv("LANG=fr");
+
+    fputs("ppdLocalizeIPPReason(fr text): ", stdout);
+    if (ppdLocalizeIPPReason(ppd, "foo", NULL, buffer, sizeof(buffer)) &&
+        !strcmp(buffer, "La Long Foo Reason"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"La Long Foo Reason\")\n", buffer);
+    }
 
     ppdClose(ppd);
   }
@@ -310,5 +360,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c 6580 2007-06-20 21:11:43Z mike $".
+ * End of "$Id: testppd.c 6676 2007-07-16 17:09:09Z mike $".
  */

@@ -85,16 +85,10 @@ contrase&ntilde;a de "root".</I></P>
 <IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
 STYLE="padding-right: 10px;" ALT="Ordenador feliz e impresora">
 
-<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
-ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
-STYLE="padding-left: 10px; padding-bottom: 10px;"
-ALT="Easy Software Products"></A>
-
 CUPS proporciona una capa de impresi&oacute;n portable 
 para sistemas operativos basados en
 UNIX<SUP>&reg;</SUP>. Est&aacute; desarrollado y mantenido
-por <A HREF="http://www.easysw.com">Easy Software
-Products</a> para favorecer una soluci&oacute;n de impresi&oacute;n
+por <A HREF="http://www.apple.com">Apple Inc.</a> para favorecer una soluci&oacute;n de impresi&oacute;n
 estandar. CUPS es el sistema de impresi&oacute;n estandar usado en
 MacOS<SUP>&reg;</SUP> X y la mayor&iacute;a de distribuciones
 Linux<SUP>&reg;</SUP>.</P>
@@ -115,14 +109,6 @@ y asistencia:</P>
     <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
 </PRE>
 
-<P>Soporte comercial y una versi&oacute;n mejorada de CUPS llamada <A
-HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> est&aacute;n
-disponibles en:</P>
-
-<PRE>
-    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
-</PRE>
-
 </TD>
 <TD WIDTH="15">&nbsp;</TD>
 </TR>
@@ -132,8 +118,8 @@ WIDTH="15" HEIGHT="15" ALT=""></TD>
 <TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
 
 <P><SMALL>Common UNIX Printing System, CUPS, y el logo de CUPS son
-marcas registradas de <A HREF="http://www.easysw.com">Easy Software
-Products</A>. Los derechos de copia de CUPS 1997-2007 son de Easy Software Products.
+marcas registradas de <A HREF="http://www.apple.com">Apple Inc.</A>
+Los derechos de copia de CUPS 2007 son de Apple Inc.
 Todos los derechos reservados.</SMALL></P>
 
 </TD>

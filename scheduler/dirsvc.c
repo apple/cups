@@ -1,25 +1,16 @@
 /*
- * "$Id: dirsvc.c 6590 2007-06-21 18:22:22Z mike $"
+ * "$Id: dirsvc.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
@@ -954,8 +945,8 @@ cupsdStartBrowsing(void)
       if ((BrowseSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"cupsdStartBrowsing: Unable to create broadcast "
-			"socket - %s.", strerror(errno));
+			"Unable to create broadcast socket - %s.",
+			strerror(errno));
 	BrowseLocalProtocols &= ~BROWSE_CUPS;
 	BrowseRemoteProtocols &= ~BROWSE_CUPS;
 	return;
@@ -973,8 +964,8 @@ cupsdStartBrowsing(void)
       if (bind(BrowseSocket, (struct sockaddr *)&addr, sizeof(addr)))
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"cupsdStartBrowsing: Unable to bind broadcast "
-			"socket - %s.", strerror(errno));
+			"Unable to bind broadcast socket - %s.",
+			strerror(errno));
 
 #ifdef WIN32
 	closesocket(BrowseSocket);
@@ -996,8 +987,7 @@ cupsdStartBrowsing(void)
     val = 1;
     if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdStartBrowsing: Unable to set broadcast mode - %s.",
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to set broadcast mode - %s.",
         	      strerror(errno));
 
 #ifdef WIN32
@@ -1076,6 +1066,24 @@ cupsdStartBrowsing(void)
       int		version = 3;	/* LDAP version */
       struct berval	bv = {0, ""};	/* SASL bind value */
 
+
+     /*
+      * Set the certificate file to use for encrypted LDAP sessions...
+      */
+
+      if (BrowseLDAPCACertFile)
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "cupsdStartBrowsing: Setting CA certificate file \"%s\"",
+			BrowseLDAPCACertFile);
+
+        if ((rc = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE,
+	                          (void *)BrowseLDAPCACertFile))
+	        != LDAP_SUCCESS)
+          cupsdLogMessage(CUPSD_LOG_ERROR,
+                          "Unable to set CA certificate file for LDAP "
+			  "connections: %d - %s", rc, ldap_err2string(rc));
+      }
 
      /*
       * LDAP stuff currently only supports ldapi EXTERNAL SASL binds...
@@ -3802,5 +3810,5 @@ update_polling(void)
 
 
 /*
- * End of "$Id: dirsvc.c 6590 2007-06-21 18:22:22Z mike $".
+ * End of "$Id: dirsvc.c 6649 2007-07-11 21:46:42Z mike $".
  */

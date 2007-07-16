@@ -1,8 +1,10 @@
-# DO NOT DELETE
-
-mailto.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
-mailto.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
-mailto.o: ../cups/transcode.h ../cups/string.h ../config.h
-testnotify.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
-testnotify.o: ../cups/array.h ../cups/file.h ../cups/language.h
-testnotify.o: ../cups/language.h ../cups/string.h ../config.h
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+mailto.o: mailto.c ../cups/cups.h ../cups/ipp.h ../cups/http.h \
+  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+rss.o: rss.c ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h \
+  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/language.h \
+  ../cups/string.h ../config.h ../cups/array.h
+testnotify.o: testnotify.c ../cups/cups.h ../cups/ipp.h ../cups/http.h \
+  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h \
+  ../cups/language.h ../cups/string.h ../config.h

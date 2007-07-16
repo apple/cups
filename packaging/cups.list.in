@@ -1,32 +1,23 @@
 #
-# "$Id: cups.list.in 6597 2007-06-22 16:41:58Z mike $"
+# "$Id: cups.list.in 6664 2007-07-13 17:41:02Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
 #
+#   Copyright 2007 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
-#   property of Easy Software Products and are protected by Federal
-#   copyright law.  Distribution and use rights are outlined in the file
-#   "LICENSE.txt" which should have been included with this file.  If this
-#   file is missing or damaged please contact Easy Software Products
-#   at:
-#
-#       Attn: CUPS Licensing Information
-#       Easy Software Products
-#       44141 Airport View Drive, Suite 204
-#       Hollywood, Maryland 20636 USA
-#
-#       Voice: (301) 373-9600
-#       EMail: cups-info@cups.org
-#         WWW: http://www.cups.org
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 # Product information
 %product Common UNIX Printing System
-%copyright 1993-2007 by Easy Software Products, All Rights Reserved.
-%vendor Easy Software Products
+%copyright 2007 by Apple Inc.
+%vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
 %format rpm
@@ -36,10 +27,10 @@
 %version @CUPS_VERSION@
 %format all
 %description The Common UNIX Printing System provides a portable printing
-%description layer for UNIX(r) operating systems.  It has been developed by
+%description layer for UNIX(r) operating systems.  It was developed by
 %description Easy Software Products to promote a standard printing solution
-%description for all UNIX vendors and users.  CUPS provides the System V and
-%description Berkeley command-line interfaces. 
+%description for all UNIX vendors and users and is now owned by Apple Inc.
+%description CUPS provides the System V and Berkeley command-line interfaces. 
 
 %format rpm
 %provides lpd
@@ -282,6 +273,7 @@ l 0755 root sys $LIBDIR/lpadmin $SBINDIR/lpadmin
 l 0755 root sys $LIBDIR/reject accept
 f 0755 root sys $SBINDIR/accept systemv/accept
 f 0755 root sys $SBINDIR/cupsaddsmb systemv/cupsaddsmb
+f 0755 root sys $SBINDIR/cupsctl systemv/cupsctl
 f 0755 root sys $SBINDIR/lpadmin systemv/lpadmin
 f 0755 root sys $SBINDIR/lpc berkeley/lpc
 f 0755 root sys $SBINDIR/lpinfo systemv/lpinfo
@@ -630,6 +622,8 @@ f 0644 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT man/accept.$MAN8EXT
 l 0644 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsaddsmb.$MAN8EXT man/cupsaddsmb.$MAN8EXT
+f 0644 root sys $AMANDIR/man$MAN8DIR/cupsctl.$MAN8EXT man/cupsctl.$MAN8EXT
+f 0644 root sys $AMANDIR/man$MAN8DIR/cupsfilter.$MAN8EXT man/cupsfilter.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cups-polld.$MAN8EXT man/cups-polld.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsd.$MAN8EXT man/cupsd.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsenable.$MAN8EXT man/cupsenable.$MAN8EXT
@@ -658,22 +652,26 @@ d 0755 root sys /System/Library/StartupItems/PrintingServices/Resources/English.
 f 0644 root sys /System/Library/StartupItems/PrintingServices/Resources/English.lproj/Localizable.strings init/Localizable.strings
 %preremove <<EOF
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
-killall cupsd
+killall cupsd || exit 0
+EOF
+%preinstall <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+killall cupsd || exit 0
 EOF
 %postinstall <<EOF
-launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
-launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
-launchctl start org.cups.cupsd
+launchctl load -D system /System/Library/LaunchDaemons/org.cups.cupsd.plist
 EOF
 %subpackage lpd
 f 0644 root sys /System/Library/LaunchDaemons/org.cups.cups-lpd.plist init/org.cups.cups-lpd.plist
 %preremove <<EOF
 launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
 EOF
+%preinstall <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+EOF
 %postinstall <<EOF
 rm -f /etc/xinetd.d/cups-lpd
-launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
-launchctl load /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist
+launchctl load -D system /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist
 EOF
 %subpackage
 
@@ -686,5 +684,5 @@ f 0644 root sys $XINETD/cups-lpd init/cups-lpd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 6597 2007-06-22 16:41:58Z mike $".
+# End of "$Id: cups.list.in 6664 2007-07-13 17:41:02Z mike $".
 #

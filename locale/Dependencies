@@ -1,0 +1,7 @@
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+po2strings.o: po2strings.c ../cups/i18n.h ../cups/transcode.h \
+  ../cups/language.h ../cups/array.h
+strings2po.o: strings2po.c
+translate.o: translate.c ../cups/string.h ../config.h ../cups/file.h \
+  ../cups/http.h ../cups/i18n.h ../cups/transcode.h ../cups/language.h \
+  ../cups/array.h

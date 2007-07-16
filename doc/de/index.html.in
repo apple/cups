@@ -84,15 +84,9 @@ den Benutzernamen und das Passwort des "root" Benutzers ein.</I></P>
 <IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
 STYLE="padding-right: 10px;" ALT="Happy Computer and Printer">
 
-<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
-ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
-STYLE="padding-left: 10px; padding-bottom: 10px;"
-ALT="Easy Software Products"></A>
-
 CUPS stellt eine portierbare Druckerschicht f&uuml;r
 UNIX<SUP>&reg;</SUP>-basierte Betriebssysteme bereit. Es wird entwickelt
-und gepflegt von <A HREF="http://www.easysw.com">Easy Software
-Products</a> um eine Standard Druckerl&ouml;sung zu f&ouml;rdern. CUPS ist das
+und gepflegt von <A HREF="http://www.apple.com">Apple Inc.</a> um eine Standard Druckerl&ouml;sung zu f&ouml;rdern. CUPS ist das
 Standard Drucksystem welches von MacOS<SUP>&reg;</SUP> X und den meisten
 Linux<SUP>&reg;</SUP> Distributionen verwendet wird.</P>
 
@@ -112,14 +106,6 @@ Unterst&uuml;tzung zu erhalten:</P>
     <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
 </PRE>
 
-<P>Kommerzieller Support und eine erweiterte Version von CUPS genannt <A
-HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> ist
-verf&uuml;gbar unter:</P>
-
-<PRE>
-    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
-</PRE>
-
 </TD>
 <TD WIDTH="15">&nbsp;</TD>
 </TR>
@@ -129,8 +115,7 @@ WIDTH="15" HEIGHT="15" ALT=""></TD>
 <TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
 
 <P><SMALL>Das Common UNIX Printing System, CUPS, und das CUPS Logo sind
-Warenzeichen der <A HREF="http://www.easysw.com">Easy Software
-Products</A>. CUPS ist urheberrechtlich gesch&uuml;tzt 1997-2007 von Easy Software Products,
+Warenzeichen der <A HREF="http://www.apple.com">Apple Inc./A> CUPS ist urheberrechtlich gesch&uuml;tzt 2007 von Apple Inc,
 Alle Rechte vorbehalten.</SMALL></P>
 
 </TD>

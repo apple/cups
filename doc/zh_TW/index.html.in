@@ -83,14 +83,8 @@ BORDER="0" ALT=""></A>
 <IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
 STYLE="padding-right: 10px;" ALT="快樂的電腦與印表機">
 
-<A HREF="http://www.easysw.com/"><IMG SRC="/images/esp-logo.gif"
-ALIGN="RIGHT" WIDTH="110" HEIGHT="68" BORDER="0"
-STYLE="padding-left: 10px; padding-bottom: 10px;"
-ALT="Easy Software Products"></A>
-
 CUPS 提供以 UNIX<SUP>&reg;</SUP> 為基礎的作業系統 
-一層具有可攜性的列印介面。它是由 <A HREF="http://www.easysw.com">Easy Software
-Products</a> 為了推動一個標準的列印解決方案所開發與維護。CUPS 是目前用於
+一層具有可攜性的列印介面。它是由 <A HREF="http://www.apple.com">Apple Inc.</a> 為了推動一個標準的列印解決方案所開發與維護。CUPS 是目前用於
 MacOS<SUP>&reg;</SUP> X 與大部份 Linux<SUP>&reg;</SUP> 發行版本的標準列印系統。</P>
 
 <P>CUPS 使用 <A HREF="http://www.pwg.org/ipp/"
@@ -107,13 +101,6 @@ PostScript Printer Description ("PPD") 的列印選項，
     <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
 </PRE>
 
-<P>CUPS 的商業支援與進階版本名為 <A
-HREF="http://www.easysw.com/printpro/">ESP Print Pro</A> 是提供自：</P>
-
-<PRE>
-    <A HREF="http://www.easysw.com/" TARGET="_blank">www.easysw.com</A>
-</PRE>
-
 </TD>
 <TD WIDTH="15">&nbsp;</TD>
 </TR>
@@ -123,9 +110,8 @@ WIDTH="15" HEIGHT="15" ALT=""></TD>
 <TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
 
 <P><SMALL>The Common UNIX Printing System, CUPS, and the CUPS logo are the
-trademark property of <A HREF="http://www.easysw.com">Easy Software
-Products</A>. CUPS is copyright 1997-2007 by Easy Software Products,
-All Rights Reserved.</SMALL></P>
+trademark property of <A HREF="http://www.apple.com">Apple Inc.</A>
+CUPS is copyright 2007 by Apple Inc, All Rights Reserved.</SMALL></P>
 
 </TD>
 

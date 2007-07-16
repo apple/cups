@@ -1,25 +1,16 @@
 /*
- * "$Id: job.c 6600 2007-06-22 18:19:20Z mike $"
+ * "$Id: job.c 6671 2007-07-13 23:35:24Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
@@ -66,6 +57,7 @@
  *   start_job()                - Start a print job.
  *   unload_job()               - Unload a job from memory.
  *   update_job()               - Read a status update from a jobs filters.
+ *   update_job_attrs()         - Update the job-printer-* attributes.
  */
 
 /*
@@ -107,6 +99,7 @@ static void	set_hold_until(cupsd_job_t *job, time_t holdtime);
 static void	start_job(cupsd_job_t *job, cupsd_printer_t *printer);
 static void	unload_job(cupsd_job_t *job);
 static void	update_job(cupsd_job_t *job);
+static void	update_job_attrs(cupsd_job_t *job);
 
 
 /*
@@ -436,7 +429,21 @@ cupsdCheckJobs(void)
 	     printer->state == IPP_PRINTER_IDLE) ||	/* and idle */
 	    ((printer->type & CUPS_PRINTER_DISCOVERED) && /* Printer is remote */
 	     !printer->job))				/* and not printing */
+        {
+	 /* 
+	  * Clear any message and reasons for the queue...
+	  */
+
+          printer->state_message[0] = '\0';
+
+	  cupsdSetPrinterReasons(printer, "none");
+
+	 /*
+	  * Start the job...
+	  */
+
 	  start_job(job, printer);
+	}
       }
     }
   }
@@ -502,6 +509,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
   }
 
   printer = job->printer;
+
+  update_job_attrs(job);
 
   if (job->status < 0)
   {
@@ -1036,8 +1045,16 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
     cupsdSetString(&job->dest, dest);
   }
-  else
-    destptr = cupsdFindDest(job->dest);
+  else if ((destptr = cupsdFindDest(job->dest)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "[Job %d] Unable to queue job for destination \"%s\"!",
+		    job->id, job->dest);
+    ippDelete(job->attrs);
+    job->attrs = NULL;
+    unlink(jobfile);
+    return;
+  }
 
   job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
                                      IPP_TAG_INTEGER);
@@ -3530,6 +3547,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	cupsdAddPrinterHistory(job->printer);
 	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
       }
+
+      update_job_attrs(job);
     }
     else if (loglevel == CUPSD_LOG_ATTR)
     {
@@ -3603,6 +3622,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
               sizeof(job->printer->state_message));
       cupsdAddPrinterHistory(job->printer);
       event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+
+      update_job_attrs(job);
     }
 
     if (!strchr(job->status_buffer->buffer, '\n'))
@@ -3641,5 +3662,84 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
 
 /*
- * End of "$Id: job.c 6600 2007-06-22 18:19:20Z mike $".
+ * 'update_job_attrs()' - Update the job-printer-* attributes.
+ */
+
+void
+update_job_attrs(cupsd_job_t *job)	/* I - Job to update */
+{
+  int			i;		/* Looping var */
+  int			num_reasons;	/* Actual number of reasons */
+  const char * const	*reasons;	/* Reasons */
+  static const char	*none = "none",	/* "none" */
+			*paused = "paused";
+					/* "paused" */
+
+
+ /*
+  * Get/create the job-printer-state-* attributes...
+  */
+
+  if (!job->printer_message)
+  {
+    if ((job->printer_message = ippFindAttribute(job->attrs,
+                                                 "job-printer-state-message",
+						 IPP_TAG_TEXT)) == NULL)
+      job->printer_message = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_TEXT,
+                                          "job-printer-state-message",
+					  NULL, "");
+  }
+
+  if (!job->printer_reasons)
+    job->printer_reasons = ippFindAttribute(job->attrs,
+					    "job-printer-state-reasons",
+					    IPP_TAG_KEYWORD);
+
+ /*
+  * If the job isn't printing, return now...
+  */
+
+  if (!job->printer)
+    return;
+
+ /*
+  * Otherwise copy the printer-state-message value...
+  */
+
+  if (job->printer->state_message[0])
+    cupsdSetString(&(job->printer_message->values[0].string.text),
+		   job->printer->state_message);
+
+ /*
+  * ... and the printer-state-reasons value...
+  */
+
+  if (job->printer->num_reasons == 0)
+  {
+    num_reasons = 1;
+    reasons     = job->printer->state == IPP_PRINTER_STOPPED ? &paused : &none;
+  }
+  else
+  {
+    num_reasons = job->printer->num_reasons;
+    reasons     = (const char * const *)job->printer->reasons;
+  }
+
+  if (!job->printer_reasons || job->printer_reasons->num_values != num_reasons)
+  {
+    ippDeleteAttribute(job->attrs, job->printer_reasons);
+
+    job->printer_reasons = ippAddStrings(job->attrs,
+                                         IPP_TAG_JOB, IPP_TAG_KEYWORD,
+					 "job-printer-state-reasons",
+					 num_reasons, NULL, NULL);
+  }
+
+  for (i = 0; i < num_reasons; i ++)
+    cupsdSetString(&(job->printer_reasons->values[i].string.text), reasons[i]);
+}
+
+
+/*
+ * End of "$Id: job.c 6671 2007-07-13 23:35:24Z mike $".
  */

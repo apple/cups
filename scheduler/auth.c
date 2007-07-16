@@ -1,28 +1,19 @@
 /*
- * "$Id: auth.c 6570 2007-06-19 18:10:48Z mike $"
+ * "$Id: auth.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
  *   Jelmer Vernooij.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Contents:
  *
@@ -92,6 +83,14 @@
 extern const char *cssmErrorString(int error);
 #  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_AUTHORIZATION_H */
+#ifdef HAVE_SYS_UCRED_H
+#  include <sys/ucred.h>
+typedef struct xucred cupsd_ucred_t;
+#  define CUPSD_UCRED_UID(c) (c).cr_uid
+#else
+typedef struct ucred cupsd_ucred_t;
+#  define CUPSD_UCRED_UID(c) (c).uid
+#endif /* HAVE_SYS_UCRED_H */
 
 
 /*
@@ -433,8 +432,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     if (authlen != kAuthorizationExternalFormLength)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-	              "cupsdAuthorize: External Authorization reference size"
-	              "is incorrect!");
+	              "External Authorization reference size is incorrect!");
       return;
     }
 
@@ -442,8 +440,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 		      (AuthorizationExternalForm *)nonce, &con->authref)) != 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "cupsdAuthorize: AuthorizationCreateFromExternalForm "
-		      "returned %d (%s)",
+		      "AuthorizationCreateFromExternalForm returned %d (%s)",
 		      (int)status, cssmErrorString(status));
       return;
     }
@@ -453,7 +450,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 					&authinfo)) != 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "cupsdAuthorize: AuthorizationCopyInfo returned %d (%s)",
+		      "AuthorizationCopyInfo returned %d (%s)",
 		      (int)status, cssmErrorString(status));
       return;
     }
@@ -464,6 +461,57 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     AuthorizationFreeItemSet(authinfo);
   }
 #endif /* HAVE_AUTHORIZATION_H */
+#if defined(SO_PEERCRED) && defined(AF_LOCAL)
+  else if (!strncmp(authorization, "PeerCred ", 9) &&
+           con->http.hostaddr->addr.sa_family == AF_LOCAL)
+  {
+   /*
+    * Use peer credentials from domain socket connection...
+    */
+
+    struct passwd	*pwd;		/* Password entry for this user */
+    cupsd_ucred_t	peercred;	/* Peer credentials */
+    socklen_t		peersize;	/* Size of peer credentials */
+
+
+    if ((pwd = getpwnam(authorization + 9)) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "User \"%s\" does not exist!",
+                      authorization + 9);
+      return;
+    }
+
+    peersize = sizeof(peercred);
+
+    if (getsockopt(con->http.fd, SOL_SOCKET, SO_PEERCRED, &peercred, &peersize))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
+                      strerror(errno));
+      return;
+    }
+
+    if (pwd->pw_uid != CUPSD_UCRED_UID(peercred))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Invalid peer credentials for \"%s\" - got %d, "
+		      "expected %d!", authorization + 9,
+		      CUPSD_UCRED_UID(peercred), pwd->pw_uid);
+#  ifdef HAVE_SYS_UCRED_H
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: cr_version=%d",
+                      peercred.cr_version);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: cr_uid=%d",
+                      peercred.cr_uid);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: cr_ngroups=%d",
+                      peercred.cr_ngroups);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: cr_groups[0]=%d",
+                      peercred.cr_groups[0]);
+#  endif /* HAVE_SYS_UCRED_H */
+      return;
+    }
+
+    strlcpy(username, authorization + 9, sizeof(username));
+  }
+#endif /* SO_PEERCRED && AF_LOCAL */
   else if (!strncmp(authorization, "Local", 5) &&
            !strcasecmp(con->http.hostname, "localhost"))
   {
@@ -965,8 +1013,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 #endif /* HAVE_GSSAPI */
   else
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "cupsdAuthorize: Bad authentication data.");
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad authentication data.");
     return;
   }
 
@@ -2539,5 +2586,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 6570 2007-06-19 18:10:48Z mike $".
+ * End of "$Id: auth.c 6649 2007-07-11 21:46:42Z mike $".
  */

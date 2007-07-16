@@ -1,28 +1,19 @@
 /*
- * "$Id: auth.c 6499 2007-04-30 21:44:43Z mike $"
+ * "$Id: auth.c 6673 2007-07-14 00:16:39Z mike $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   This file contains Kerberos support code, copyright 2006 by
  *   Jelmer Vernooij.
  *
  *   These coded instructions, statements, and computer programs are the
- *   property of Easy Software Products and are protected by Federal
- *   copyright law.  Distribution and use rights are outlined in the file
- *   "LICENSE.txt" which should have been included with this file.  If this
- *   file is missing or damaged please contact Easy Software Products
- *   at:
- *
- *       Attn: CUPS Licensing Information
- *       Easy Software Products
- *       44141 Airport View Drive, Suite 204
- *       Hollywood, Maryland 20636 USA
- *
- *       Voice: (301) 373-9600
- *       EMail: cups-info@cups.org
- *         WWW: http://www.cups.org
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  *   This file is subject to the Apple OS-Developed Software exception.
  *
@@ -60,6 +51,10 @@
 extern const char *cssmErrorString(int error);
 #  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_AUTHORIZATION_H */
+
+#if defined(SO_PEERCRED) && defined(AF_LOCAL)
+#  include <pwd.h>
+#endif /* SO_PEERCRED && AF_LOCAL */
 
 
 /*
@@ -181,6 +176,13 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 
   if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
   {
+    if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
+    {
+      DEBUG_printf(("cupsDoAuthentication: too many Negotiate tries (%d)\n",
+                    http->digest_tries));
+  
+      return (-1);
+    }
 #ifdef HAVE_GSSAPI
    /*
     * Kerberos authentication...
@@ -239,20 +241,19 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
       * back into gss via input_token...
       */
     }
-    else
+
+    if (http->gssctx != GSS_C_NO_CONTEXT)
     {
-      if (http->gssctx != GSS_C_NO_CONTEXT)
-      {
-	major_status = gss_delete_sec_context(&minor_status, &http->gssctx,
-	                                      GSS_C_NO_BUFFER);
-	http->gssctx = GSS_C_NO_CONTEXT;
-      }
+      major_status = gss_delete_sec_context(&minor_status, &http->gssctx,
+					    GSS_C_NO_BUFFER);
+      http->gssctx = GSS_C_NO_CONTEXT;
     }
 
     major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
 					 &http->gssctx,
 					 http->gssname, http->gssmech,
-					 GSS_C_MUTUAL_FLAG, GSS_C_INDEFINITE,
+					 GSS_C_DELEG_FLAG | GSS_C_MUTUAL_FLAG,
+					 GSS_C_INDEFINITE,
 					 GSS_C_NO_CHANNEL_BINDINGS,
 					 &input_token, &http->gssmech,
 					 &output_token, NULL, NULL);
@@ -381,19 +382,27 @@ cups_get_gss_creds(
 {
   gss_buffer_desc token = GSS_C_EMPTY_BUFFER;
 					/* Service token */
-  OM_uint32	major_status,		/* Major status code */
-		minor_status;		/* Minor status code */
-  gss_name_t	server_name;		/* Server name */
-  char		buf[1024],		/* Name buffer */
-		fqdn[HTTP_MAX_URI];	/* Server name buffer */
+  OM_uint32	  major_status,		/* Major status code */
+		  minor_status;		/* Minor status code */
+  gss_name_t	  server_name;		/* Server name */
+  char		  buf[1024],		/* Name buffer */
+		  fqdn[HTTP_MAX_URI];	/* Server name buffer */
 
+
+ /*
+  * Get the hostname...
+  */
+
+  httpGetHostname(http, fqdn, sizeof(fqdn));
+
+  if (!strcmp(fqdn, "localhost"))
+    httpGetHostname(NULL, fqdn, sizeof(fqdn));
 
  /*
   * Get a server name we can use for authentication purposes...
   */
 
-  snprintf(buf, sizeof(buf), "%s@%s", service_name,
-	   httpGetHostname(http, fqdn, sizeof(fqdn)));
+  snprintf(buf, sizeof(buf), "%s@%s", service_name, fqdn);
 
   token.value  = buf;
   token.length = strlen(buf);
@@ -422,7 +431,7 @@ cups_get_gss_creds(
  */
 
 static int				/* O - 0 if available */
-					/*     1 if not  available */
+					/*     1 if not available */
 					/*    -1 error */
 cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 {
@@ -431,14 +440,14 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * Currently WIN32 and OS-2 do not support the CUPS server...
   */
 
-  return (-1);
+  return (1);
 #else
   int			pid;		/* Current process ID */
   FILE			*fp;		/* Certificate file */
   char			filename[1024],	/* Certificate filename */
 			certificate[33];/* Certificate string */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
-#if defined(HAVE_AUTHORIZATION_H)
+#  if defined(HAVE_AUTHORIZATION_H)
   OSStatus		status;		/* Status */
   AuthorizationItem	auth_right;	/* Authorization right */
   AuthorizationRights	auth_rights;	/* Authorization rights */
@@ -446,7 +455,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   AuthorizationExternalForm auth_extrn;	/* Authorization ref external */
   char			auth_key[1024];	/* Buffer */
   char			buffer[1024];	/* Buffer */
-#endif /* HAVE_AUTHORIZATION_H */
+#  endif /* HAVE_AUTHORIZATION_H */
 
 
   DEBUG_printf(("cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"\n",
@@ -460,10 +469,10 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
       strcasecmp(http->hostname, "localhost") != 0)
   {
     DEBUG_puts("cups_local_auth: Not a local connection!");
-    return (-1);
+    return (1);
   }
 
-#if defined(HAVE_AUTHORIZATION_H)
+#  if defined(HAVE_AUTHORIZATION_H)
  /*
   * Delete any previous authorization reference...
   */
@@ -534,7 +543,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
    * Fall through to try certificates...
    */
   }
-#endif /* HAVE_AUTHORIZATION_H */
+#  endif /* HAVE_AUTHORIZATION_H */
 
  /*
   * Try opening a certificate file for this PID.  If that fails,
@@ -547,6 +556,22 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   {
     DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
                   filename, strerror(errno)));
+
+#ifdef HAVE_GSSAPI
+   /*
+    * If local certificate authentication isn't available for this PID,
+    * check if we need Kerberos authentication...
+    */
+
+    if (!strcmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate"))
+    {
+     /*
+      * Yes, don't try the root certificate...
+      */
+
+      return (1);
+    }
+#endif /* HAVE_GSSAPI */
 
     snprintf(filename, sizeof(filename), "%s/certs/0", cg->cups_statedir);
     fp = fopen(filename, "r");
@@ -565,7 +590,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * Set the authorization string and return...
     */
 
-    http->authstring = malloc(strlen(certificate) + 10);
+    http->authstring = malloc(strlen(certificate) + 7);
     sprintf(http->authstring, "Local %s", certificate);
 
     /* Copy back to _authstring for backwards compatibility */
@@ -577,11 +602,46 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     return (0);
   }
 
+#  if defined(SO_PEERCRED) && defined(AF_LOCAL)
+ /*
+  * See if we can authenticate using the peer credentials provided over a
+  * domain socket; if so, specify "PeerCred username" as the authentication
+  * information...
+  */
+
+  if (http->hostaddr->addr.sa_family == AF_LOCAL &&
+      !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
+  {
+   /*
+    * Verify that the current cupsUser() matches the current UID...
+    */
+
+    struct passwd	*pwd;		/* Password information */
+    const char		*username;	/* Current username */
+
+    username = cupsUser();
+
+    if ((pwd = getpwnam(username)) != NULL && pwd->pw_uid == getuid())
+    {
+      http->authstring = malloc(strlen(username) + 10);
+      sprintf(http->authstring, "PeerCred %s", username);
+
+      /* Copy back to _authstring for backwards compatibility */
+      strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+
+      DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
+		    http->authstring));
+
+      return (0);
+    }
+  }
+#  endif /* SO_PEERCRED && AF_LOCAL */
+
   return (1);
 #endif /* WIN32 || __EMX__ */
 }
 
 
 /*
- * End of "$Id: auth.c 6499 2007-04-30 21:44:43Z mike $".
+ * End of "$Id: auth.c 6673 2007-07-14 00:16:39Z mike $".
  */

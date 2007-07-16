@@ -1,45 +1,49 @@
-# DO NOT DELETE
-
-accept.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-accept.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-accept.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-cancel.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-cancel.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-cancel.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-cupsaddsmb.o: ../cups/string.h ../config.h ../cups/adminutil.h ../cups/cups.h
-cupsaddsmb.o: ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
-cupsaddsmb.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
-cupsaddsmb.o: ../cups/transcode.h ../cups/debug.h
-cupstestdsc.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-cupstestdsc.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-cupstestdsc.o: ../cups/language.h ../cups/file.h ../cups/i18n.h
-cupstestdsc.o: ../cups/transcode.h
-cupstestppd.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-cupstestppd.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-cupstestppd.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-lp.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lp.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-lp.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-lpadmin.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lpadmin.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-lpadmin.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-lpadmin.o: ../cups/debug.h
-lpinfo.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lpinfo.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-lpinfo.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-lpinfo.o: ../cups/debug.h
-lpmove.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lpmove.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-lpmove.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-lpmove.o: ../cups/debug.h
-lpoptions.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lpoptions.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-lpoptions.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-lppasswd.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lppasswd.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-lppasswd.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-lppasswd.o: ../cups/md5.h
-lpstat.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/md5.h
-lpstat.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/string.h ../cups/cups.h
-lpstat.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-lpstat.o: ../cups/i18n.h ../cups/transcode.h ../cups/debug.h
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+accept.o: accept.c ../cups/string.h ../config.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+cancel.o: cancel.c ../cups/string.h ../config.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+cupsaddsmb.o: cupsaddsmb.c ../cups/string.h ../config.h \
+  ../cups/adminutil.h ../cups/cups.h ../cups/ipp.h ../cups/http.h \
+  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/debug.h
+cupsctl.o: cupsctl.c ../cups/adminutil.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/string.h ../config.h ../cups/i18n.h \
+  ../cups/transcode.h
+cupstestdsc.o: cupstestdsc.c ../cups/string.h ../config.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/file.h ../cups/i18n.h \
+  ../cups/transcode.h
+cupstestppd.o: cupstestppd.c ../cups/string.h ../config.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h \
+  ../filter/raster.h
+lp.o: lp.c ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+lpadmin.o: lpadmin.c ../cups/string.h ../config.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h \
+  ../cups/debug.h
+lpinfo.o: lpinfo.c ../cups/string.h ../config.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h \
+  ../cups/debug.h
+lpmove.o: lpmove.c ../cups/string.h ../config.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h \
+  ../cups/debug.h
+lpoptions.o: lpoptions.c ../cups/string.h ../config.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+lppasswd.o: lppasswd.c ../cups/string.h ../config.h ../cups/cups.h \
+  ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h \
+  ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h \
+  ../cups/md5.h
+lpstat.o: lpstat.c ../cups/http-private.h ../config.h ../cups/http.h \
+  ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/string.h \
+  ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/i18n.h ../cups/transcode.h ../cups/debug.h

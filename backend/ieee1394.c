@@ -1,8 +1,9 @@
 /*
- * "$Id: ieee1394.c 5241 2006-03-07 22:07:44Z mike $"
+ * "$Id: ieee1394.c 6649 2007-07-11 21:46:42Z mike $"
  *
  *   IEEE-1394 backend for the Common UNIX Printing System (CUPS).
  *
+ *   Copyright 2007 by Apple Inc.
  *   Copyright 2002 by Easy Software Products, all rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or
@@ -263,5 +264,5 @@ list_devices(void)
 
 
 /*
- * End of "$Id: ieee1394.c 5241 2006-03-07 22:07:44Z mike $".
+ * End of "$Id: ieee1394.c 6649 2007-07-11 21:46:42Z mike $".
  */
