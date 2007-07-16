@@ -16,27 +16,18 @@
 </head>
 <body>
 <!--
-  "$Id: api-ppd.shtml 5138 2006-02-21 10:49:06Z mike $"
+  "$Id: api-ppd.shtml 6649 2007-07-11 21:46:42Z mike $"
 
   PPD API introduction for the Common UNIX Printing System (CUPS).
 
-  Copyright 1997-2006 by Easy Software Products.
+  Copyright 2007 by Apple Inc.
+  Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
-  property of Easy Software Products and are protected by Federal
-  copyright law.  Distribution and use rights are outlined in the file
-  "LICENSE.txt" which should have been included with this file.  If this
-  file is missing or damaged please contact Easy Software Products
-  at:
-
-      Attn: CUPS Licensing Information
-      Easy Software Products
-      44141 Airport View Drive, Suite 204
-      Hollywood, Maryland 20636 USA
-
-      Voice: (301) 373-9600
-      EMail: cups-info@cups.org
-	WWW: http://www.cups.org
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
 <h2 class='title'>Introduction</h2>
@@ -769,6 +760,9 @@ ppdLastError(
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdLocalize'>ppdLocalize()</a></h3>
 <h4>Description</h4>
 <p>Localize the PPD file to the current locale.
+<p>All groups, options, and choices are localized, as are ICC profile
+descriptions, printer presets, and custom option parameters.  Each
+localized string uses the UTF-8 character encoding.
 
 
 <h4>Syntax</h4>
@@ -792,7 +786,7 @@ ppdLocalize(
 attribute.
 <p>This function uses the current locale to find the corresponding reason
 text or URI from the attribute value. If &quot;scheme&quot; is NULL or &quot;text&quot;,
-the returned value contains human-readable text from the translation
+the returned value contains human-readable (UTF-8) text from the translation
 string or attribute value. Otherwise the corresponding URI is returned.
 <p>If no value of the requested scheme can be found, NULL is returned.
 

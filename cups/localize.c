@@ -54,6 +54,10 @@ static ppd_attr_t	*ppd_localized_attr(ppd_file_t *ppd,
 /*
  * 'ppdLocalize()' - Localize the PPD file to the current locale.
  *
+ * All groups, options, and choices are localized, as are ICC profile
+ * descriptions, printer presets, and custom option parameters.  Each
+ * localized string uses the UTF-8 character encoding.
+ *
  * @since CUPS 1.2@
  */
 
@@ -195,7 +199,7 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
  *
  * This function uses the current locale to find the corresponding reason
  * text or URI from the attribute value. If "scheme" is NULL or "text",
- * the returned value contains human-readable text from the translation
+ * the returned value contains human-readable (UTF-8) text from the translation
  * string or attribute value. Otherwise the corresponding URI is returned.
  *
  * If no value of the requested scheme can be found, NULL is returned.
