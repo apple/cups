@@ -72,6 +72,16 @@ AC_SUBST(PIEFLAGS)
 RELROFLAGS=""
 AC_SUBST(RELROFLAGS)
 
+AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     libcups secorder file, default=libcups.order],
+	LIBCUPSORDER="$withval",
+	LIBCUPSORDER="libcups.order")
+AC_SUBST(LIBCUPSORDER)
+
+AC_ARG_WITH(libcupsimageorder, [  --with-libcupimagesorder     libcupsimage secorder file, default=libcups.order],
+	LIBCUPSIMAGEORDER="$withval",
+	LIBCUPSIMAGEORDER="libcupsimage.order")
+AC_SUBST(LIBCUPSIMAGEORDER)
+
 if test -n "$GCC"; then
 	# Add GCC-specific compiler options...
 	if test -z "$OPTIM"; then

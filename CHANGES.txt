@@ -1,8 +1,12 @@
-CHANGES.txt - 2007-07-16
+CHANGES.txt - 2007-07-18
 ------------------------
 
 CHANGES IN CUPS V1.3??
 
+	- The filter makefile did not optimize the libcupsimage.2.dylib
+	  with a sectorder file.
+	- The IPP backend incorrectly wrote an empty printer message
+	  when processing the "none" state reason.
 	- The USB backend could deadlock on Mac OS X while performing
 	  a side-channel command.
 	- The scheduler did not prevent remote queues from being

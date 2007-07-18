@@ -188,11 +188,6 @@ CUPS_SYSTEM_AUTHKEY=""
 
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
 
-AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     libcups secorder file, default=libcups.order],
-	LIBCUPSORDER="$withval",
-	LIBCUPSORDER="libcups.order")
-AC_SUBST(LIBCUPSORDER)
-
 FONTS="fonts"
 AC_SUBST(FONTS)
 LEGACY_BACKENDS="parallel scsi"

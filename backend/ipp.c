@@ -1482,7 +1482,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
                reason);
     }
 
-    if (message)
+    if (message[0])
     {
       count ++;
       if (strstr(reasons->values[i].string.text, "error"))
