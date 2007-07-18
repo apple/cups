@@ -3,6 +3,8 @@ CHANGES.txt - 2007-07-18
 
 CHANGES IN CUPS V1.3??
 
+	- The default cupsd.conf file had typos and old operation names
+	  (STR #2450)
 	- The scheduler now erases authentication cache files using the
 	  7-pass US DoD algorithm.
 	- Delegated Kerberos credentials (proxy authentication) did not
