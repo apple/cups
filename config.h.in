@@ -529,6 +529,13 @@
 #undef HAVE_SYS_UCRED_H
 
 
+/*
+ * Do we have removefile()?
+ */
+
+#undef HAVE_REMOVEFILE
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

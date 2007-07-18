@@ -8274,8 +8274,13 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
     return;
   }
 
+ /*
+  * We MUST create a file-based cache because memory-based caches are
+  * only valid for the current process/address space.
+  */
+
 #  ifdef HAVE_KRB5_CC_RESOLVE
-  if (krb5_cc_resolve(krb_context, "MEMORY:", &ccache))
+  if (krb5_cc_resolve(krb_context, "FILE:", &ccache))
 #  elif defined(HAVE_HEIMDAL)
   if (krb5_cc_gen_new(krb_context, &krb5_fcc_ops, &ccache))
 #  else
@@ -8297,13 +8302,11 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
     return;
   }
 
-#ifdef HAVE_KRB5_CC_RESOLVE
-  cupsdSetStringf(&(job->ccname), "KRB5CCNAME=MEMORY:%s",
-                  krb5_cc_get_name(krb_context, ccache));
-#else
   cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
                   krb5_cc_get_name(krb_context, ccache));
-#endif /* HAVE_KRB5_CC_RESOLVE */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "[Job %d] save_krb5_creds: %s", job->id,
+                  job->ccname);
 
   krb5_cc_close(krb_context, ccache);
 }

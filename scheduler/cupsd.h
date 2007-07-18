@@ -218,6 +218,7 @@ extern void	cupsdRemoveSelect(int fd);
 extern void	cupsdStartSelect(void);
 extern void	cupsdStopSelect(void);
 
+extern int	cupsdRemoveFile(const char *filename);
 
 /*
  * End of "$Id$".

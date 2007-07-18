@@ -44,6 +44,7 @@
 #include <sys/resource.h>
 #include <syslog.h>
 #include <grp.h>
+#include <cups/dir.h>
 
 #ifdef HAVE_LAUNCH_H
 #  include <launch.h>
@@ -400,6 +401,43 @@ main(int  argc,				/* I - Number of command-line args */
     syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
            ConfigurationFile);
     return (1);
+  }
+
+  if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)))
+  {
+   /*
+    * Clean out the temporary directory...
+    */
+
+    cups_dir_t		*dir;		/* Temporary directory */
+    cups_dentry_t	*dent;		/* Directory entry */
+    char		tempfile[1024];	/* Temporary filename */
+
+
+    if ((dir = cupsDirOpen(TempDir)) != NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "Cleaning out old temporary files in \"%s\"...", TempDir);
+
+      while ((dent = cupsDirRead(dir)) != NULL)
+      {
+        snprintf(tempfile, sizeof(tempfile), "%s/%s", TempDir, dent->filename);
+
+	if (cupsdRemoveFile(tempfile))
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Unable to remove temporary file \"%s\" - %s",
+	                  tempfile, strerror(errno));
+        else
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "Removed temporary file \"%s\"...",
+	                  tempfile);
+      }
+
+      cupsDirClose(dir);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to open temporary directory \"%s\" - %s",
+                      TempDir, strerror(errno));
   }
 
 #if HAVE_LAUNCHD

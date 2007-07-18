@@ -34,6 +34,7 @@ CUPSDOBJS =	\
 		printers.o \
 		process.o \
 		quotas.o \
+		removefile.o \
 		select.o \
 		server.o \
 		statbuf.o \

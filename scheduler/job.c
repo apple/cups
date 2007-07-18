@@ -220,7 +220,10 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   */
 
   snprintf(filename, sizeof(filename), "%s/a%05d", RequestRoot, job->id);
-  unlink(filename);
+  if (cupsdRemoveFile(filename))
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to remove authentication cache: %s",
+		    strerror(errno));
 
   cupsdClearString(&job->auth_username);
   cupsdClearString(&job->auth_domain);
@@ -1780,7 +1783,21 @@ free_job(cupsd_job_t *job)		/* I - Job */
   cupsdClearString(&job->auth_domain);
   cupsdClearString(&job->auth_password);
 #ifdef HAVE_GSSAPI
-  cupsdClearString(&job->ccname);
+  if (job->ccname)
+  {
+   /*
+    * First erase the credential cache file, then clear the string referencing
+    * it.  We know the filename since the string will be of the form
+    * "KRB5CCNAME=FILE:/foo/bar"...
+    */
+
+    if (cupsdRemoveFile(job->ccname + 16))
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to remove Kerberos credential cache: %s",
+		      strerror(errno));
+
+    cupsdClearString(&job->ccname);
+  }
 #endif /* HAVE_GSSAPI */
 
   if (job->num_files > 0)

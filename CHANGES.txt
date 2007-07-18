@@ -3,6 +3,10 @@ CHANGES.txt - 2007-07-18
 
 CHANGES IN CUPS V1.3??
 
+	- The scheduler now erases authentication cache files using the
+	  7-pass US DoD algorithm.
+	- Delegated Kerberos credentials (proxy authentication) did not
+	  work.
 	- The filter makefile did not optimize the libcupsimage.2.dylib
 	  with a sectorder file.
 	- The IPP backend incorrectly wrote an empty printer message

@@ -157,8 +157,7 @@ esac
 AC_CHECK_FUNCS(sigaction)
 
 dnl Checks for wait functions.
-AC_CHECK_FUNCS(waitpid)
-AC_CHECK_FUNCS(wait3)
+AC_CHECK_FUNCS(waitpid wait3)
 
 dnl See if the tm structure has the tm_gmtoff member...
 AC_MSG_CHECKING(for tm_gmtoff member in tm structure)
@@ -167,6 +166,9 @@ AC_TRY_COMPILE([#include <time.h>],[struct tm t;
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_TM_GMTOFF),
 	AC_MSG_RESULT(no))
+
+dnl See if we have the removefile(3) function for securely removing files
+AC_CHECK_FUNCS(removefile)
 
 dnl Flags for "ar" command...
 case $uname in
