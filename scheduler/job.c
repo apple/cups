@@ -3453,10 +3453,12 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
   ippDelete(job->attrs);
 
-  job->attrs      = NULL;
-  job->state      = NULL;
-  job->sheets     = NULL;
-  job->job_sheets = NULL;
+  job->attrs           = NULL;
+  job->state           = NULL;
+  job->sheets          = NULL;
+  job->job_sheets      = NULL;
+  job->printer_message = NULL;
+  job->printer_reasons = NULL;
 }
 
 
@@ -3616,7 +3618,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       * Some message to show in the printer-state-message attribute...
       */
 
-      job->status_level = loglevel;
+      if (loglevel != CUPSD_LOG_NOTICE)
+        job->status_level = loglevel;
 
       strlcpy(job->printer->state_message, message,
               sizeof(job->printer->state_message));
