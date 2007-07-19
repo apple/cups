@@ -86,7 +86,7 @@ all:		$(TARGETS)
 
 clean:
 	$(RM) $(OBJS)
-	$(RM) $(TARGETS)
+	$(RM) $(TARGETS) convert
 
 
 #
@@ -128,7 +128,10 @@ install:	all
 	echo Creating $(SERVERROOT)/ppd...
 	$(INSTALL_DIR) -m 755 $(SERVERROOT)/ppd
 	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ppd
-	-if test "x`uname`" != xDarwin; then \
+	-if test "x`uname`" = xDarwin; then \
+		$(INSTALL_DIR) $(BUILDROOT)/System/Library/Printers/Libraries; \
+		$(LN) $(sbindir)/cupsfilter $(BUILDROOT)/System/Library/Printers/Libraries/convert; \
+	else \
 		echo Creating $(SERVERROOT)/ssl...; \
 		$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl; \
 		-chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl; \
@@ -166,10 +169,12 @@ install:	all
 
 uninstall:	all
 	$(RM) $(SBINDIR)/cupsd
+	$(RM) $(SBINDIR)/cupsfilter
 	$(RM) $(SERVERBIN)/daemon/cups-deviced
 	$(RM) $(SERVERBIN)/daemon/cups-driverd
 	$(RM) $(SERVERBIN)/daemon/cups-lpd
 	$(RM) $(SERVERBIN)/daemon/cups-polld
+	$(RM) $(BUILDROOT)/System/Library/Printers/Libraries/convert
 	-$(RMDIR) $(STATEDIR)/certs
 	-$(RMDIR) $(STATEDIR)
 	-$(RMDIR) $(SERVERROOT)/ppd
@@ -211,6 +216,8 @@ cupsd-static:	$(CUPSDOBJS) libmime.a ../cups/libcups.a
 cupsfilter:	cupsfilter.o libmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsfilter cupsfilter.o libmime.a $(LIBS)
+	$(RM) convert
+	$(LN) cupsfilter convert
 
 
 #
