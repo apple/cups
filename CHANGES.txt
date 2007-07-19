@@ -3,6 +3,8 @@ CHANGES.txt - 2007-07-19
 
 CHANGES IN CUPS V1.3??
 
+	- Backends could (incorrectly) run as root during discovery
+	  (STR #2454)
 	- Avahi is now supported for DNS-SD (Bonjour) printer sharing
 	  (STR #2455)
 	- The default cupsd.conf file had typos and old operation names

@@ -17,6 +17,7 @@
  *   main()            - Scan for devices and return an IPP response.
  *   add_dev()         - Add a new device to the list.
  *   compare_devs()    - Compare device names for sorting.
+ *   run_backend()     - Run a backend to gather the available devices.
  *   sigalrm_handler() - Handle alarm signals for backends that get hung
  */
 
@@ -27,10 +28,7 @@
 #include "util.h"
 #include <cups/array.h>
 #include <cups/dir.h>
-
-#ifdef __hpux
-#  define seteuid(uid) setresuid(-1, (uid), -1)
-#endif /* __hpux */
+#include <fcntl.h>
 
 
 /*
@@ -66,6 +64,7 @@ static dev_info_t	*add_dev(const char *device_class,
 				 const char *device_uri,
 				 const char *device_id);
 static int		compare_devs(dev_info_t *p0, dev_info_t *p1);
+static FILE		*run_backend(const char *backend, int uid, int *pid);
 static void		sigalrm_handler(int sig);
 
 
@@ -87,6 +86,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		count;			/* Number of devices from backend */
   int		compat;			/* Compatibility device? */
   FILE		*fp;			/* Pipe to device backend */
+  int		pid;			/* Process ID of backend */
   cups_dir_t	*dir;			/* Directory pointer */
   cups_dentry_t *dent;			/* Directory entry */
   char		filename[1024],		/* Name of backend */
@@ -204,25 +204,23 @@ main(int  argc,				/* I - Number of command-line args */
     * Change effective users depending on the backend permissions...
     */
 
-    if (!getuid())
-    {
-     /*
-      * Backends without permissions for normal users run as root,
-      * all others run as the unprivileged user...
-      */
-
-      if (!(dent->fileinfo.st_mode & (S_IRWXG | S_IRWXO)))
-        seteuid(0);
-      else
-        seteuid(normal_user);
-    }
+    snprintf(filename, sizeof(filename), "%s/%s", backends, dent->filename);
 
    /*
-    * Run the backend with no arguments and collect the output...
+    * Backends without permissions for normal users run as root,
+    * all others run as the unprivileged user...
     */
 
-    snprintf(filename, sizeof(filename), "%s/%s", backends, dent->filename);
-    if ((fp = popen(filename, "r")) != NULL)
+    fp = run_backend(filename,
+                     (dent->fileinfo.st_mode & (S_IRWXG | S_IRWXO))
+		         ? normal_user : 0,
+		     &pid);
+
+   /*
+    * Collect the output from the backend...
+    */
+
+    if (fp)
     {
      /*
       * Set an alarm for the first read from the backend; this avoids
@@ -312,7 +310,8 @@ main(int  argc,				/* I - Number of command-line args */
         fprintf(stderr, "WARNING: [cups-deviced] Backend \"%s\" did not "
 	                "respond within 30 seconds!\n", dent->filename);
 
-      pclose(fp);
+      fclose(fp);
+      kill(pid, SIGTERM);
 
      /*
       * Hack for backends that don't support the CUPS 1.1 calling convention:
@@ -341,13 +340,6 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
   cupsDirClose(dir);
-
- /*
-  * Switch back to root as needed...
-  */
-
-  if (!getuid() && geteuid())
-    seteuid(0);
 
  /*
   * Output the list of devices...
@@ -473,6 +465,71 @@ compare_devs(dev_info_t *d0,		/* I - First device */
     return (diff);
   else
     return (strcasecmp(d0->device_uri, d1->device_uri));
+}
+
+
+/*
+ * 'run_backend()' - Run a backend to gather the available devices.
+ */
+
+static FILE *				/* O - stdout of backend */
+run_backend(const char *backend,	/* I - Backend to run */
+            int        uid,		/* I - User ID to run as */
+	    int        *pid)		/* O - Process ID of backend */
+{
+  int	fds[2];				/* Pipe file descriptors */
+
+
+  if (pipe(fds))
+  {
+    fprintf(stderr, "ERROR: Unable to create a pipe for \"%s\" - %s\n",
+            backend, strerror(errno));
+    return (NULL);
+  }
+
+  if ((*pid = fork()) < 0)
+  {
+   /*
+    * Error!
+    */
+
+    fprintf(stderr, "ERROR: Unable to fork for \"%s\" - %s\n", backend,
+            strerror(errno));
+    close(fds[0]);
+    close(fds[1]);
+    return (NULL);
+  }
+  else if (!*pid)
+  {
+   /*
+    * Child comes here...
+    */
+
+    if (!getuid() && uid)
+      setuid(uid);			/* Run as restricted user */
+
+    close(0);				/* </dev/null */
+    open("/dev/null", O_RDONLY);
+
+    close(1);				/* >pipe */
+    dup(fds[1]);
+
+    close(fds[0]);			/* Close copies of pipes */
+    close(fds[1]);
+
+    execl(backend, backend, (char *)0);	/* Run it! */
+    fprintf(stderr, "ERROR: Unable to execute \"%s\" - %s\n", backend,
+            strerror(errno));
+    exit(1);
+  }
+
+ /*
+  * Parent comes here, make a FILE * from the input side of the pipe...
+  */
+
+  close(fds[1]);
+
+  return (fdopen(fds[0], "r"));
 }
 
 
