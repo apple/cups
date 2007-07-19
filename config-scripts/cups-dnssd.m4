@@ -29,17 +29,19 @@ DNSSDLIBS=""
 
 if test x$enable_dnssd != xno; then
 	AC_CHECK_HEADER(dns_sd.h, [
-		AC_DEFINE(HAVE_DNSSD)
 		case "$uname" in
 			Darwin*)
 				# Darwin and MacOS X...
 				DNSSDLIBS="-framework CoreFoundation -framework SystemConfiguration"
+				AC_DEFINE(HAVE_DNSSD)
 				AC_DEFINE(HAVE_COREFOUNDATION)
 				AC_DEFINE(HAVE_SYSTEMCONFIGURATION)
 				;;
 			*)
 				# All others...
-				DNSSDLIBS="???"
+				AC_CHECK_LIB(dns_sd,DNSServiceProcessResult,
+					AC_DEFINE(HAVE_DNSSD)
+					DNSSDLIBS="-ldns_sd")
 				;;
 		esac
 	])

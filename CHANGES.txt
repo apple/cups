@@ -1,8 +1,10 @@
-CHANGES.txt - 2007-07-18
+CHANGES.txt - 2007-07-19
 ------------------------
 
 CHANGES IN CUPS V1.3??
 
+	- Avahi is now supported for DNS-SD (Bonjour) printer sharing
+	  (STR #2455)
 	- The default cupsd.conf file had typos and old operation names
 	  (STR #2450)
 	- The scheduler now erases authentication cache files using the
