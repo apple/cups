@@ -483,8 +483,6 @@ escape_options(
 
   *sptr = '\0';
 
-  fprintf(stderr, "DEBUG: options=\"%s\"\n", s);
-
   return (s);
 }
 
@@ -597,6 +595,7 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
              int           num_options,	/* I - Number of filter options */
 	     cups_option_t *options)	/* I - Filter options */
 {
+  int		i;			/* Looping var */
   const char	*argv[8],		/* Command-line arguments */
 		*envp[11],		/* Environment variables */
 		*temp;			/* Temporary string */
@@ -676,6 +675,12 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
   envp[8]  = rip_cache;
   envp[9]  = userenv;
   envp[10] = NULL;
+
+  for (i = 0; argv[i]; i ++)
+    fprintf(stderr, "DEBUG: argv[%d]=\"%s\"\n", i, argv[i]);
+
+  for (i = 0; envp[i]; i ++)
+    fprintf(stderr, "DEBUG: envp[%d]=\"%s\"\n", i, envp[i]);
 
  /*
   * Execute all of the filters...
@@ -855,9 +860,11 @@ open_pipe(int *fds)			/* O - Pipe file descriptors (2) */
 static int				/* O - 0 on success, 1 on error */
 read_cupsd_conf(const char *filename)	/* I - File to read */
 {
+  cups_file_t	*fp;			/* cupsd.conf file */
   const char	*temp;			/* Temporary string */
   char		line[1024],		/* Line from file */
 		*ptr;			/* Pointer into line */
+  int		linenum;		/* Current line number */
 
 
   if ((temp = getenv("CUPS_DATADIR")) != NULL)
@@ -869,6 +876,8 @@ read_cupsd_conf(const char *filename)	/* I - File to read */
     set_string(&FontPath, temp);
   else
     set_string(&FontPath, CUPS_FONTPATH);
+
+  set_string(&RIPCache, "8m");
 
   if ((temp = getenv("CUPS_SERVERBIN")) != NULL)
     set_string(&ServerBin, temp);
@@ -882,6 +891,27 @@ read_cupsd_conf(const char *filename)	/* I - File to read */
     getcwd(line, sizeof(line));
 
   set_string(&ServerRoot, line);
+
+  if ((fp = cupsFileOpen(filename, "r")) != NULL)
+  {
+    linenum = 0;
+
+    while (cupsFileGetConf(fp, line, sizeof(line), &ptr, &linenum))
+    {
+      if (!strcasecmp(line, "DataDir"))
+        set_string(&DataDir, ptr);
+      else if (!strcasecmp(line, "FontPath"))
+        set_string(&FontPath, ptr);
+      else if (!strcasecmp(line, "RIPCache"))
+        set_string(&RIPCache, ptr);
+      else if (!strcasecmp(line, "ServerBin"))
+        set_string(&ServerBin, ptr);
+      else if (!strcasecmp(line, "ServerRoot"))
+        set_string(&ServerRoot, ptr);
+    }
+
+    cupsFileClose(fp);
+  }
 
   snprintf(line, sizeof(line),
            "%s/filter:" CUPS_BINDIR ":" CUPS_SBINDIR ":/bin/usr/bin",
@@ -920,7 +950,7 @@ usage(const char *command,		/* I - Command name */
 
   if (!strcmp(command, "cupsfilter"))
     _cupsLangPuts(stdout,
-		  _("Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+		  _("Usage: cupsfilter -m mime/type [ options ] filename\n"
 		    "\n"
 		    "Options:\n"
 		    "\n"
