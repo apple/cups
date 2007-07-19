@@ -236,7 +236,7 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 # libcupsimage.2.dylib
 #
 
-libcupsimage.2.dylib:	$(IMAGEOBJS)
+libcupsimage.2.dylib:	$(IMAGEOBJS) $(LIBCUPSIMAGEORDER)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
