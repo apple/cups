@@ -239,7 +239,18 @@ main(int  argc,				/* I - Number of command-line args */
           case 'o' : /* Specify option(s) or output filename */
 	      i ++;
 	      if (i < argc)
-	        num_options = cupsParseOptions(argv[i], num_options, &options);
+	      {
+	        if (!strcmp(command, "convert"))
+		{
+		  if (outfile)
+		    usage(command, NULL);
+		  else
+		    outfile = argv[i];
+		}
+		else
+	          num_options = cupsParseOptions(argv[i], num_options,
+		                                 &options);
+	      }
 	      else
 	        usage(command, opt);
 	      break;
