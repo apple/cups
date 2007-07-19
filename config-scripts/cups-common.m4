@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 6682 2007-07-16 20:22:37Z mike $"
+dnl "$Id: cups-common.m4 6689 2007-07-18 23:52:15Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -157,8 +157,7 @@ esac
 AC_CHECK_FUNCS(sigaction)
 
 dnl Checks for wait functions.
-AC_CHECK_FUNCS(waitpid)
-AC_CHECK_FUNCS(wait3)
+AC_CHECK_FUNCS(waitpid wait3)
 
 dnl See if the tm structure has the tm_gmtoff member...
 AC_MSG_CHECKING(for tm_gmtoff member in tm structure)
@@ -167,6 +166,9 @@ AC_TRY_COMPILE([#include <time.h>],[struct tm t;
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_TM_GMTOFF),
 	AC_MSG_RESULT(no))
+
+dnl See if we have the removefile(3) function for securely removing files
+AC_CHECK_FUNCS(removefile)
 
 dnl Flags for "ar" command...
 case $uname in
@@ -187,11 +189,6 @@ DBUSDIR=""
 CUPS_SYSTEM_AUTHKEY=""
 
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
-
-AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     libcups secorder file, default=libcups.order],
-	LIBCUPSORDER="$withval",
-	LIBCUPSORDER="libcups.order")
-AC_SUBST(LIBCUPSORDER)
 
 FONTS="fonts"
 AC_SUBST(FONTS)
@@ -285,5 +282,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 6682 2007-07-16 20:22:37Z mike $".
+dnl End of "$Id: cups-common.m4 6689 2007-07-18 23:52:15Z mike $".
 dnl

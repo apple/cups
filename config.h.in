@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: config.h.in 6689 2007-07-18 23:52:15Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -529,8 +529,15 @@
 #undef HAVE_SYS_UCRED_H
 
 
+/*
+ * Do we have removefile()?
+ */
+
+#undef HAVE_REMOVEFILE
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: config.h.in 6689 2007-07-18 23:52:15Z mike $".
  */

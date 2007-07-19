@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in 6649 2007-07-11 21:46:42Z mike $"
+# "$Id: Makedefs.in 6687 2007-07-18 19:49:45Z mike $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -131,6 +131,7 @@ LDFLAGS		=	-L../cups -L../filter @LDARCHFLAGS@ \
 			@LDFLAGS@ @RELROFLAGS@ @PIEFLAGS@ $(OPTIM)
 LEGACY_BACKENDS	=	@LEGACY_BACKENDS@
 LIBCUPSORDER	=	@LIBCUPSORDER@
+LIBCUPSIMAGEORDER =	@LIBCUPSIMAGEORDER@
 LINKCUPS	=	@LINKCUPS@ $(SSLLIBS)
 LINKCUPSIMAGE	=	@LINKCUPSIMAGE@
 LIBS		=	$(LINKCUPS) $(COMMONLIBS)
@@ -271,5 +272,5 @@ DBUSDIR		=	@DBUSDIR@
 
 
 #
-# End of "$Id: Makedefs.in 6649 2007-07-11 21:46:42Z mike $"
+# End of "$Id: Makedefs.in 6687 2007-07-18 19:49:45Z mike $"
 #

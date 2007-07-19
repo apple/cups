@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6671 2007-07-13 23:35:24Z mike $"
+ * "$Id: job.c 6689 2007-07-18 23:52:15Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -220,7 +220,10 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   */
 
   snprintf(filename, sizeof(filename), "%s/a%05d", RequestRoot, job->id);
-  unlink(filename);
+  if (cupsdRemoveFile(filename))
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to remove authentication cache: %s",
+		    strerror(errno));
 
   cupsdClearString(&job->auth_username);
   cupsdClearString(&job->auth_domain);
@@ -1780,7 +1783,21 @@ free_job(cupsd_job_t *job)		/* I - Job */
   cupsdClearString(&job->auth_domain);
   cupsdClearString(&job->auth_password);
 #ifdef HAVE_GSSAPI
-  cupsdClearString(&job->ccname);
+  if (job->ccname)
+  {
+   /*
+    * First erase the credential cache file, then clear the string referencing
+    * it.  We know the filename since the string will be of the form
+    * "KRB5CCNAME=FILE:/foo/bar"...
+    */
+
+    if (cupsdRemoveFile(job->ccname + 16))
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to remove Kerberos credential cache: %s",
+		      strerror(errno));
+
+    cupsdClearString(&job->ccname);
+  }
 #endif /* HAVE_GSSAPI */
 
   if (job->num_files > 0)
@@ -3453,10 +3470,12 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
   ippDelete(job->attrs);
 
-  job->attrs      = NULL;
-  job->state      = NULL;
-  job->sheets     = NULL;
-  job->job_sheets = NULL;
+  job->attrs           = NULL;
+  job->state           = NULL;
+  job->sheets          = NULL;
+  job->job_sheets      = NULL;
+  job->printer_message = NULL;
+  job->printer_reasons = NULL;
 }
 
 
@@ -3616,7 +3635,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       * Some message to show in the printer-state-message attribute...
       */
 
-      job->status_level = loglevel;
+      if (loglevel != CUPSD_LOG_NOTICE)
+        job->status_level = loglevel;
 
       strlcpy(job->printer->state_message, message,
               sizeof(job->printer->state_message));
@@ -3741,5 +3761,5 @@ update_job_attrs(cupsd_job_t *job)	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 6671 2007-07-13 23:35:24Z mike $".
+ * End of "$Id: job.c 6689 2007-07-18 23:52:15Z mike $".
  */

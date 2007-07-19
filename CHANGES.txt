@@ -1,8 +1,22 @@
-CHANGES.txt - 2007-07-16
+CHANGES.txt - 2007-07-19
 ------------------------
 
 CHANGES IN CUPS V1.3??
 
+	- Backends could (incorrectly) run as root during discovery
+	  (STR #2454)
+	- Avahi is now supported for DNS-SD (Bonjour) printer sharing
+	  (STR #2455)
+	- The default cupsd.conf file had typos and old operation names
+	  (STR #2450)
+	- The scheduler now erases authentication cache files using the
+	  7-pass US DoD algorithm.
+	- Delegated Kerberos credentials (proxy authentication) did not
+	  work.
+	- The filter makefile did not optimize the libcupsimage.2.dylib
+	  with a sectorder file.
+	- The IPP backend incorrectly wrote an empty printer message
+	  when processing the "none" state reason.
 	- The USB backend could deadlock on Mac OS X while performing
 	  a side-channel command.
 	- The scheduler did not prevent remote queues from being

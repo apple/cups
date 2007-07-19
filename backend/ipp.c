@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: ipp.c 6687 2007-07-18 19:49:45Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -1482,7 +1482,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
                reason);
     }
 
-    if (message)
+    if (message[0])
     {
       count ++;
       if (strstr(reasons->values[i].string.text, "error"))
@@ -1711,5 +1711,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: ipp.c 6687 2007-07-18 19:49:45Z mike $".
  */

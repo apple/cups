@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in 6634 2007-07-09 20:15:40Z mike $"
+# "$Id: cupsd.conf.in 6690 2007-07-18 23:58:37Z mike $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.  See "man cupsd.conf" for a complete description of this
@@ -49,14 +49,14 @@ DefaultAuthType Basic
 
 # Set the default printer/job policies...
 <Policy default>
-  # Job-related operations must be done by the owner or an adminstrator...
+  # Job-related operations must be done by the owner or an administrator...
   <Limit Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job CUPS-Move-Job>
     Require user @OWNER @SYSTEM
     Order deny,allow
   </Limit>
 
-  # All administration operations require an adminstrator to authenticate...
-  <Limit Pause-Printer Resume-Printer Set-Printer-Attributes Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After CUPS-Add-Printer CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
+  # All administration operations require an administrator to authenticate...
+  <Limit Pause-Printer Resume-Printer Set-Printer-Attributes Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class CUPS-Delete-Class CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
     AuthType Default
     Require user @SYSTEM
     Order deny,allow
@@ -74,5 +74,5 @@ DefaultAuthType Basic
 </Policy>
 
 #
-# End of "$Id: cupsd.conf.in 6634 2007-07-09 20:15:40Z mike $".
+# End of "$Id: cupsd.conf.in 6690 2007-07-18 23:58:37Z mike $".
 #

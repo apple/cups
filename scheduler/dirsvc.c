@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: dirsvc.c 6691 2007-07-19 19:09:46Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -65,14 +65,15 @@
 
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
-#  include <nameser.h>
-#  include <nameser.h>
-#  ifdef HAVE_COREFOUNDATION
-#    include <CoreFoundation/CoreFoundation.h>
-#  endif /* HAVE_COREFOUNDATION */
-#  ifdef HAVE_SYSTEMCONFIGURATION
-#    include <SystemConfiguration/SystemConfiguration.h>
-#  endif /* HAVE_SYSTEMCONFIGURATION */
+#  ifdef __APPLE__
+#    include <nameser.h>
+#    ifdef HAVE_COREFOUNDATION
+#      include <CoreFoundation/CoreFoundation.h>
+#    endif /* HAVE_COREFOUNDATION */
+#    ifdef HAVE_SYSTEMCONFIGURATION
+#      include <SystemConfiguration/SystemConfiguration.h>
+#    endif /* HAVE_SYSTEMCONFIGURATION */
+#  endif /* __APPLE__ */
 #endif /* HAVE_DNSSD */
 
 
@@ -3810,5 +3811,5 @@ update_polling(void)
 
 
 /*
- * End of "$Id: dirsvc.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: dirsvc.c 6691 2007-07-19 19:09:46Z mike $".
  */
