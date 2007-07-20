@@ -161,7 +161,7 @@ AC_ARG_WITH(cups_user, [  --with-cups-user        set default user for CUPS],
 	AC_MSG_CHECKING(for default print user)
 	if test -f /etc/passwd; then
 		CUPS_USER=""
-		for user in lp lpd guest daemon nobody; do
+		for user in _lp lp lpd guest daemon nobody; do
 			if test "`grep \^${user}: /etc/passwd`" != ""; then
 				CUPS_USER="$user"
 				AC_MSG_RESULT($user)
