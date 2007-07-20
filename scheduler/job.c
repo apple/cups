@@ -220,7 +220,7 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   */
 
   snprintf(filename, sizeof(filename), "%s/a%05d", RequestRoot, job->id);
-  if (cupsdRemoveFile(filename))
+  if (cupsdRemoveFile(filename) && errno != ENOENT)
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to remove authentication cache: %s",
 		    strerror(errno));
@@ -1791,10 +1791,10 @@ free_job(cupsd_job_t *job)		/* I - Job */
     * "KRB5CCNAME=FILE:/foo/bar"...
     */
 
-    if (cupsdRemoveFile(job->ccname + 16))
+    if (cupsdRemoveFile(job->ccname + 16) && errno != ENOENT)
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to remove Kerberos credential cache: %s",
-		      strerror(errno));
+                      "[Job %d] Unable to remove Kerberos credential cache: %s",
+		      job->id, strerror(errno));
 
     cupsdClearString(&job->ccname);
   }
