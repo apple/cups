@@ -72,14 +72,19 @@ AC_SUBST(PIEFLAGS)
 RELROFLAGS=""
 AC_SUBST(RELROFLAGS)
 
+LIBCUPSORDER="libcups.order"
 AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     libcups secorder file, default=libcups.order],
-	LIBCUPSORDER="$withval",
-	LIBCUPSORDER="libcups.order")
+	if test -f "$withval"; then
+		LIBCUPSORDER="$withval"
+	fi)
 AC_SUBST(LIBCUPSORDER)
 
-AC_ARG_WITH(libcupsimageorder, [  --with-libcupimagesorder     libcupsimage secorder file, default=libcups.order],
-	LIBCUPSIMAGEORDER="$withval",
-	LIBCUPSIMAGEORDER="libcupsimage.order")
+LIBCUPSIMAGEORDER="libcupsimage.order"
+AC_ARG_WITH(libcupsimageorder, [  --with-libcupimagesorder
+                          libcupsimage secorder file, default=libcupsimage.order],
+	if test -f "$withval"; then
+		LIBCUPSIMAGEORDER="$withval"
+	fi)
 AC_SUBST(LIBCUPSIMAGEORDER)
 
 if test -n "$GCC"; then
