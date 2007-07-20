@@ -2248,7 +2248,7 @@ static int				/* O - Result of comparison */
 ppd_compare_choices(ppd_choice_t *a,	/* I - First choice */
                     ppd_choice_t *b)	/* I - Second choice */
 {
-  return (a->option - b->option);
+  return (strcmp(a->option->keyword, b->option->keyword));
 }
 
 

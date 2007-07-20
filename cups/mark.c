@@ -73,6 +73,8 @@ ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
   for (o1 = ppdFirstOption(ppd); o1; o1 = ppdNextOption(ppd))
     o1->conflicted = 0;
 
+  cupsArraySave(ppd->marked);
+
  /*
   * Loop through all of the UI constraints and flag any options
   * that conflict...
@@ -172,6 +174,8 @@ ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
       o2->conflicted = 1;
     }
   }
+
+  cupsArrayRestore(ppd->marked);
 
  /*
   * Return the number of conflicts found...
@@ -617,8 +621,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
     else if (!strcasecmp(option, "InputSlot"))
     {
      /*
-      * Unmark ManualFeed True and possibly mark ManualFeed False
-      * option...
+      * Unmark ManualFeed option...
       */
 
       if ((o = ppdFindOption(ppd, "ManualFeed")) != NULL)
