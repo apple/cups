@@ -232,7 +232,8 @@ case $uname in
 		dnl Check for Authorization Services support
 		AC_CHECK_HEADER(Security/Authorization.h, [
 			AC_DEFINE(HAVE_AUTHORIZATION_H)
-			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"])
+			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"])
+#			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"])
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
                 ;;
 
