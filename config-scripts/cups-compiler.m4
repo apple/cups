@@ -80,7 +80,7 @@ AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     libcups secorder file, defa
 AC_SUBST(LIBCUPSORDER)
 
 LIBCUPSIMAGEORDER="libcupsimage.order"
-AC_ARG_WITH(libcupsimageorder, [  --with-libcupimagesorder
+AC_ARG_WITH(libcupsimageorder, [  --with-libcupsimagesorder
                           libcupsimage secorder file, default=libcupsimage.order],
 	if test -f "$withval"; then
 		LIBCUPSIMAGEORDER="$withval"
