@@ -68,7 +68,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   char	*cupslpd_argv[1000];		/* Arguments for cups-lpd */
   int	cupslpd_stdin[2],		/* Standard input for cups-lpd */
 	cupslpd_stdout[2],		/* Standard output for cups-lpd */
-	cupslpd_pid;			/* Process ID for cups-lpd */
+	cupslpd_pid,			/* Process ID for cups-lpd */
+	cupslpd_status;			/* Status of cups-lpd process */
 
 
  /*
@@ -86,7 +87,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       cupslpd_argv[cupslpd_argc++] = argv[i];
 
-      if (argv[i][2])
+      if (!argv[i][2])
       {
         i ++;
 
@@ -114,7 +115,10 @@ main(int  argc,				/* I - Number of command-line arguments */
       (strcmp(op, "print-job") && strcmp(op, "print-waiting") &&
        strcmp(op, "remove-job") && strcmp(op, "status-long") &&
        strcmp(op, "status-short")))
+  {
+    printf("op=\"%s\", dest=\"%s\", opargs=%p\n", op, dest, opargs);
     usage();
+  }
 
  /*
   * Run the cups-lpd program using pipes...
@@ -187,7 +191,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   close(cupslpd_stdin[1]);
   close(cupslpd_stdout[0]);
-  kill(cupslpd_pid, SIGTERM);
+
+  while (wait(&cupslpd_status) != cupslpd_pid);
+
+  printf("cups-lpd exit status was %d...\n", cupslpd_status);
 
  /*
   * Return the test status...
@@ -221,9 +228,9 @@ do_command(int        outfd,		/* I - Command file descriptor */
   }
 
   if (read(infd, &status, 1) < 1)
-    puts("IN: ERROR");
+    puts("STATUS: ERROR");
   else
-    printf("IN: %d\n", status);
+    printf("STATUS: %d\n", status);
 
   return (status);
 }
@@ -325,7 +332,7 @@ print_job(int  outfd,			/* I - Command file descriptor */
 
   if (read(infd, command, 1) < 1)
   {
-    puts("IN: ERROR");
+    puts("STATUS: ERROR");
     close(fd);
     return (-1);
   }
@@ -333,7 +340,7 @@ print_job(int  outfd,			/* I - Command file descriptor */
   {
     status = command[0];
 
-    printf("IN: %d\n", status);
+    printf("STATUS: %d\n", status);
   }
 
  /*
@@ -367,7 +374,7 @@ print_job(int  outfd,			/* I - Command file descriptor */
 
   if (read(infd, command, 1) < 1)
   {
-    puts("IN: ERROR");
+    puts("STATUS: ERROR");
     close(fd);
     return (-1);
   }
@@ -375,7 +382,7 @@ print_job(int  outfd,			/* I - Command file descriptor */
   {
     status = command[0];
 
-    printf("IN: %d\n", status);
+    printf("STATUS: %d\n", status);
   }
 
   return (status);
@@ -528,7 +535,7 @@ status_short(int  outfd,		/* I - Command file descriptor */
 static void
 usage(void)
 {
-  puts("Usage: testlpd [options] print-job printer user filename [... filename]");
+  puts("Usage: testlpd [options] print-job printer filename [... filename]");
   puts("       testlpd [options] print-waiting [printer or user]");
   puts("       testlpd [options] remove-job printer [user [job-id]]");
   puts("       testlpd [options] status-long [printer or user]");
