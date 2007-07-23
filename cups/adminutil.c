@@ -1754,7 +1754,7 @@ _cupsAdminSetServerSettings(
   {
     cupsFilePuts(temp, "<Policy default>\n"
                        "  # Job-related operations must be done by the owner "
-		       "or an adminstrator...\n"
+		       "or an administrator...\n"
                        "  <Limit Send-Document Send-URI Hold-Job Release-Job "
 		       "Restart-Job Purge-Jobs Set-Job-Attributes "
 		       "Create-Job-Subscription Renew-Subscription "
@@ -1765,7 +1765,7 @@ _cupsAdminSetServerSettings(
                        "    Order deny,allow\n"
                        "  </Limit>\n"
                        "  # All administration operations require an "
-		       "adminstrator to authenticate...\n"
+		       "administrator to authenticate...\n"
 		       "  <Limit Pause-Printer Resume-Printer "
                        "Set-Printer-Attributes Enable-Printer "
 		       "Disable-Printer Pause-Printer-After-Current-Job "

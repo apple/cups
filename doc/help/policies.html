@@ -54,7 +54,7 @@ trying to use the new policy.</P>
 
  1    &lt;Policy default>
  2      # Job-related operations must be done by the owner or an
-      adminstrator...
+      administrator...
  3      &lt;Limit Send-Document Send-URI Hold-Job Release-Job
       Restart-Job Purge-Jobs Set-Job-Attributes
       Create-Job-Subscription Renew-Subscription
@@ -65,7 +65,7 @@ trying to use the new policy.</P>
  5        Order deny,allow
  6      &lt;/Limit>
  7    
- 8      # All administration operations require an adminstrator
+ 8      # All administration operations require an administrator
       to authenticate...
  9      &lt;Limit Pause-Printer Resume-Printer
       Set-Printer-Attributes Enable-Printer Disable-Printer
@@ -602,7 +602,7 @@ management operations.</P>
 
  1    &lt;Policy lab999>
  2      # Job- and subscription-related operations must be done
-      by the owner, a lab technician, or an adminstrator...
+      by the owner, a lab technician, or an administrator...
  3      &lt;Limit Send-Document Send-URI Hold-Job Release-Job
       Restart-Job Purge-Jobs Set-Job-Attributes
       Create-Job-Subscription Renew-Subscription
@@ -615,7 +615,7 @@ management operations.</P>
  7      &lt;/Limit>
  8    
  9      # All administration operations require a lab technician
-      or an adminstrator to authenticate...
+      or an administrator to authenticate...
 10      &lt;Limit Pause-Printer Resume-Printer
       Set-Printer-Attributes Enable-Printer Disable-Printer
       Pause-Printer-After-Current-Job Hold-New-Jobs
