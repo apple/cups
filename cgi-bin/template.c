@@ -50,7 +50,7 @@ cgiCopyTemplateFile(FILE       *out,	/* I - Output file */
   FILE	*in;				/* Input file */
 
 
-  fprintf(stderr, "DEBUG: cgiCopyTemplateFile(out=%p, tmpl=\"%s\")\n", out,
+  fprintf(stderr, "DEBUG2: cgiCopyTemplateFile(out=%p, tmpl=\"%s\")\n", out,
           tmpl ? tmpl : "(null)");
 
  /*
@@ -93,7 +93,7 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
   FILE		*in;			/* Input file */
 
 
-  fprintf(stderr, "DEBUG: cgiCopyTemplateLang(tmpl=\"%s\")\n",
+  fprintf(stderr, "DEBUG2: cgiCopyTemplateLang(tmpl=\"%s\")\n",
           tmpl ? tmpl : "(null)");
 
  /*
@@ -115,7 +115,7 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
   else
     locale[0] = '\0';
 
-  fprintf(stderr, "DEBUG: locale=\"%s\"...\n", locale);
+  fprintf(stderr, "DEBUG2: locale=\"%s\"...\n", locale);
 
  /*
   * See if we have a template file for this language...
@@ -133,7 +133,7 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
       snprintf(filename, sizeof(filename), "%s/%s", directory, tmpl);
   }
 
-  fprintf(stderr, "DEBUG: Template file is \"%s\"...\n", filename);
+  fprintf(stderr, "DEBUG2: Template file is \"%s\"...\n", filename);
 
  /*
   * Open the template file...
@@ -231,7 +231,7 @@ cgi_copy(FILE *out,			/* I - Output file */
   int		uriencode;		/* Encode as URI */
 
 
-  fprintf(stderr, "DEBUG: %*sStarting at file position %ld...\n", indent, "",
+  fprintf(stderr, "DEBUG2: %*sStarting at file position %ld...\n", indent, "",
           ftell(in));
 
  /*
@@ -263,7 +263,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 
       if (s == name && isspace(ch & 255))
       {
-        fprintf(stderr, "DEBUG: %*sLone { at %ld...\n", indent, "", ftell(in));
+        fprintf(stderr, "DEBUG2: %*sLone { at %ld...\n", indent, "", ftell(in));
 
         if (out)
 	{
@@ -275,7 +275,7 @@ cgi_copy(FILE *out,			/* I - Output file */
       }
 
       if (ch == '}')
-	fprintf(stderr, "DEBUG: %*s\"{%s}\" at %ld...\n", indent, "", name,
+	fprintf(stderr, "DEBUG2: %*s\"{%s}\" at %ld...\n", indent, "", name,
         	ftell(in));
 
      /*
@@ -339,7 +339,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 
 	pos = ftell(in);
 
-        fprintf(stderr, "DEBUG: %*sLooping on \"%s\" at %ld, count=%d...\n",
+        fprintf(stderr, "DEBUG2: %*sLooping on \"%s\" at %ld, count=%d...\n",
 	        indent, "", name + 1, pos, count);
 
         if (count > 0)
@@ -355,7 +355,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 	else
 	  cgi_copy(NULL, in, 0, '}', indent + 2);
 
-        fprintf(stderr, "DEBUG: %*sFinished looping on \"%s\"...\n", indent,
+        fprintf(stderr, "DEBUG2: %*sFinished looping on \"%s\"...\n", indent,
 	        "", name + 1);
 
         continue;
@@ -491,7 +491,7 @@ cgi_copy(FILE *out,			/* I - Output file */
         if (ch != '?')
 	{
 	  fprintf(stderr,
-	          "DEBUG: %*sBad terminator '%c' at file position %ld...\n",
+	          "DEBUG2: %*sBad terminator '%c' at file position %ld...\n",
 	          indent, "", ch, ftell(in));
 	  return;
 	}
@@ -521,7 +521,7 @@ cgi_copy(FILE *out,			/* I - Output file */
       }
 
       fprintf(stderr,
-              "DEBUG: %*sStarting \"{%s%c%s\" at %ld, result=%d...\n",
+              "DEBUG2: %*sStarting \"{%s%c%s\" at %ld, result=%d...\n",
 	      indent, "", name, op, compare, ftell(in), result);
 
       if (result)
@@ -530,10 +530,10 @@ cgi_copy(FILE *out,			/* I - Output file */
 	* Comparison true; output first part and ignore second...
 	*/
 
-        fprintf(stderr, "DEBUG: %*sOutput first part...\n", indent, "");
+        fprintf(stderr, "DEBUG2: %*sOutput first part...\n", indent, "");
 	cgi_copy(out, in, element, ':', indent + 2);
 
-        fprintf(stderr, "DEBUG: %*sSkip second part...\n", indent, "");
+        fprintf(stderr, "DEBUG2: %*sSkip second part...\n", indent, "");
 	cgi_copy(NULL, in, element, '}', indent + 2);
       }
       else
@@ -542,14 +542,14 @@ cgi_copy(FILE *out,			/* I - Output file */
 	* Comparison false; ignore first part and output second...
 	*/
 
-        fprintf(stderr, "DEBUG: %*sSkip first part...\n", indent, "");
+        fprintf(stderr, "DEBUG2: %*sSkip first part...\n", indent, "");
 	cgi_copy(NULL, in, element, ':', indent + 2);
 
-        fprintf(stderr, "DEBUG: %*sOutput second part...\n", indent, "");
+        fprintf(stderr, "DEBUG2: %*sOutput second part...\n", indent, "");
 	cgi_copy(out, in, element, '}', indent + 2);
       }
 
-      fprintf(stderr, "DEBUG: %*sFinished \"{%s%c%s\", out=%p...\n", indent, "",
+      fprintf(stderr, "DEBUG2: %*sFinished \"{%s%c%s\", out=%p...\n", indent, "",
               name, op, compare, out);
     }
     else if (ch == '\\')	/* Quoted char */
@@ -563,11 +563,11 @@ cgi_copy(FILE *out,			/* I - Output file */
       putc(ch, out);
 
   if (ch == EOF)
-    fprintf(stderr, "DEBUG: %*sReturning at file position %ld on EOF...\n",
+    fprintf(stderr, "DEBUG2: %*sReturning at file position %ld on EOF...\n",
 	    indent, "", ftell(in));
   else
     fprintf(stderr,
-            "DEBUG: %*sReturning at file position %ld on character '%c'...\n",
+            "DEBUG2: %*sReturning at file position %ld on character '%c'...\n",
 	    indent, "", ftell(in), ch);
 
   if (ch == EOF && term)

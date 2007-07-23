@@ -1041,9 +1041,25 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       gss_release_name(&minor_status, &client_name);
   }
 #endif /* HAVE_GSSAPI */
-  else
+  else if (type != AUTH_NONE)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad authentication data.");
+    char	scheme[256];		/* Auth scheme... */
+    static const char * const types[] =	/* Auth types */
+    {
+      "None",
+      "Basic",
+      "Digest",
+      "BasicDigest",
+      "Negotiate"
+    };
+
+
+    if (sscanf(authorization, "%255s", scheme) != 1)
+      strcpy(scheme, "UNKNOWN");
+
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Bad authentication data \"%s ...\", expected \"%s ...\"",
+                    scheme, types[type]);
     return;
   }
 

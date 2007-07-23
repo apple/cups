@@ -2443,7 +2443,7 @@ cupsdSendHeader(
 
     if (auth_str[0])
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendHeader: WWW-Authenticate: %s",
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSendHeader: WWW-Authenticate: %s",
                       auth_str);
 
       if (httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)
@@ -2467,6 +2467,9 @@ cupsdSendHeader(
     	           con->gss_output_token.value,
 		   con->gss_output_token.length);
     gss_release_buffer(&minor_status, &con->gss_output_token);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdSendHeader: WWW-Authenticate: Negotiate %s", buf);
 
     if (httpPrintf(HTTP(con), "WWW-Authenticate: Negotiate %s\r\n", buf) < 0)
       return (0);
