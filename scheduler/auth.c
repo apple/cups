@@ -458,6 +458,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     if (authinfo->count == 1)
       strlcpy(username, authinfo->items[0].value, sizeof(username));
 
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAuthorize: Authorized as %s using AuthRef",
+		    username);
+
     AuthorizationFreeItemSet(authinfo);
   }
 #endif /* HAVE_AUTHORIZATION_H */
@@ -510,6 +514,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     }
 
     strlcpy(username, authorization + 9, sizeof(username));
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAuthorize: Authorized as %s using PeerCred",
+		    username);
   }
 #endif /* SO_PEERCRED && AF_LOCAL */
   else if (!strncmp(authorization, "Local", 5) &&
@@ -524,7 +532,13 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       authorization ++;
 
     if ((localuser = cupsdFindCert(authorization)) != NULL)
+    {
       strlcpy(username, localuser, sizeof(username));
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "cupsdAuthorize: Authorized as %s using Local",
+		      username);
+    }
     else
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -786,6 +800,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	    }
 #endif /* HAVE_LIBPAM */
           }
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+			  "cupsdAuthorize: Authorized as %s using Basic",
+			  username);
           break;
 
       case AUTH_BASICDIGEST :
@@ -810,6 +828,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	                    username);
             return;
 	  }
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+			  "cupsdAuthorize: Authorized as %s using BasicDigest",
+			  username);
 	  break;
     }
   }
@@ -881,6 +903,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	              username);
       return;
     }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAuthorize: Authorized as %s using Digest",
+		    username);
   }
 #ifdef HAVE_GSSAPI
   else if (!strncmp(authorization, "Negotiate", 9) && type == AUTH_NEGOTIATE) 
@@ -1002,6 +1028,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       gss_release_name(&minor_status, &client_name);
       strlcpy(username, output_token.value, sizeof(username));
 
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "cupsdAuthorize: Authorized as %s using Negotiate",
+		      username);
+
       gss_release_buffer(&minor_status, &output_token);
       gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
 
@@ -1025,9 +1055,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
   strlcpy(con->username, username, sizeof(con->username));
   strlcpy(con->password, password, sizeof(con->password));
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: username=\"%s\"",
-                  con->username);
 }
 
 
