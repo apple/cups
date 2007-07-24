@@ -400,6 +400,8 @@ cgi_copy(FILE *out,			/* I - Output file */
 	{
 	  if (uriencode)
 	    cgi_puturi(outptr, out);
+	  else if (!strcasecmp(name, "?cupsdconf_default"))
+	    fputs(outptr, stdout);
 	  else
 	    cgi_puts(outptr, out);
         }

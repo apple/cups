@@ -3,6 +3,8 @@ CHANGES.txt - 2007-07-24
 
 CHANGES IN CUPS V1.3rc1
 
+	- The web interface now pulls the default cupsd.conf file
+	  from cupsd.conf.default in the CUPS config directory.
 	- Added a help file for using Kerberos with CUPS.
 	- The scheduler now strips the "@KDC" portion of Kerberos
 	  usernames since those usernames typically do not appear in

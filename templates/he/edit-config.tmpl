@@ -1,0 +1,22 @@
+<SCRIPT TYPE="text/javascript">
+function reset_config()
+{
+  document.cups.CUPSDCONF.value = "{?cupsdconf_default}";
+}
+</SCRIPT>
+
+<H2 CLASS="title">קובץ הגדרות של השרת</H2>
+
+<FORM NAME="cups" METHOD="POST" ACTION="/admin/">
+
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+
+<TEXTAREA NAME="CUPSDCONF" COLS="80" ROWS="25" dir=ltr>{CUPSDCONF}</TEXTAREA>
+
+<P><INPUT TYPE="IMAGE" SRC="/images/button-save-changes.gif"
+ALT="שמור שינויים"> <A
+HREF="javascript:reset_config();"><IMG
+SRC="/images/button-use-default-config.gif" CLASS="button"
+ALT="השתמש בקובץ הגדרות התחלתי"></A></P>
+
+</FORM>

@@ -53,10 +53,6 @@ if test "x$LANGUAGES" != x; then
 			LANGFILES="$LANGFILES doc/$lang/index.html"
 		fi
 
-		if test -f templates/$lang/edit-config.tmpl.in; then
-			LANGFILES="$LANGFILES templates/$lang/edit-config.tmpl"
-		fi
-
 		if test -f templates/$lang/header.tmpl.in; then
 			LANGFILES="$LANGFILES templates/$lang/header.tmpl"
 		fi
@@ -73,7 +69,7 @@ AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh init/cups-lpd cups-config
 	  man/client.conf.man man/cups-deviced.man man/cups-driverd.man
 	  man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
 	  man/cupsd.conf.man man/lpoptions.man
-	  templates/edit-config.tmpl templates/header.tmpl
+	  templates/header.tmpl
 	  $LANGFILES)
 
 chmod +x cups-config

@@ -1558,7 +1558,10 @@ do_config_server(http_t *http)		/* I - HTTP connection */
   {
     struct stat	info;			/* cupsd.conf information */
     cups_file_t	*cupsd;			/* cupsd.conf file */
-    char	*buffer;		/* Buffer for entire file */
+    char	*buffer,		/* Buffer for entire file */
+		*bufptr,		/* Pointer into buffer */
+		*bufend;		/* End of buffer */
+    int		ch;			/* Character from file */
     char	filename[1024];		/* Filename */
     const char	*server_root;		/* Location of config files */
 
@@ -1639,12 +1642,53 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     free(buffer);
 
    /*
+    * Then get the default cupsd.conf file and put that into a string as
+    * well...
+    */
+
+    strlcat(filename, ".default", sizeof(filename));
+
+    if (!stat(filename, &info) && info.st_size < (1024 * 1024) &&
+        (cupsd = cupsFileOpen(filename, "r")) != NULL)
+    {
+      buffer = calloc(1, 2 * info.st_size + 1);
+      bufend = buffer + 2 * info.st_size - 1;
+
+      for (bufptr = buffer;
+           bufptr < bufend && (ch = cupsFileGetChar(cupsd)) != EOF;)
+      {
+        if (ch == '\\' || ch == '\"')
+	{
+	  *bufptr++ = '\\';
+	  *bufptr++ = ch;
+	}
+	else if (ch == '\n')
+	{
+	  *bufptr++ = '\\';
+	  *bufptr++ = 'n';
+	}
+	else if (ch == '\t')
+	{
+	  *bufptr++ = '\\';
+	  *bufptr++ = 't';
+	}
+	else if (ch >= ' ')
+	  *bufptr++ = ch;
+      }
+
+      *bufptr = '\0';
+
+      cupsFileClose(cupsd);
+
+      cgiSetVariable("CUPSDCONF_DEFAULT", buffer);
+      free(buffer);
+    }
+
+   /*
     * Show the current config file...
     */
 
     cgiStartHTML(cgiText(_("Edit Configuration File")));
-
-    printf("<!-- \"%s\" -->\n", filename);
 
     cgiCopyTemplateLang("edit-config.tmpl");
 
