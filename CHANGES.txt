@@ -1,8 +1,12 @@
-CHANGES.txt - 2007-07-20
+CHANGES.txt - 2007-07-24
 ------------------------
 
-CHANGES IN CUPS V1.3??
+CHANGES IN CUPS V1.3rc1
 
+	- Added a help file for using Kerberos with CUPS.
+	- The scheduler now strips the "@KDC" portion of Kerberos
+	  usernames since those usernames typically do not appear in
+	  the group membership lists used by CUPS.
 	- cupsMarkOptions() could (incorrectly) leave multiple option
 	  choices marked.
 	- Backends could (incorrectly) run as root during discovery

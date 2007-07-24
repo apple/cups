@@ -1010,11 +1010,14 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Get the username associated with the credentials...
     */
 
+    if (!con->gss_delegated_cred)
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "cupsdAuthorize: No delegated credentials!");
+
     if (major_status == GSS_S_CONTINUE_NEEDED)
       cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
                          "cupsdAuthorize: Credentials not complete");
-
-    if (major_status == GSS_S_COMPLETE)
+    else if (major_status == GSS_S_COMPLETE)
     {
       major_status = gss_display_name(&minor_status, client_name, 
 				      &output_token, NULL);

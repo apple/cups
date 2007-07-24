@@ -1,0 +1,129 @@
+<HTML>
+<!-- SECTION: Getting Started -->
+<HEAD>
+	<TITLE>Using Kerberos Authentication</TITLE>
+</HEAD>
+<BODY>
+
+<P>CUPS 1.3 adds Kerberos support which allows you to use a Key Distribution
+Center (KDC) for authentication on your local CUPS server and when printing
+to a remote authenticated queue. This document describes how to configure
+CUPS to use Kerberos authentication and provides helpful links to the MIT
+help pages for configuring Kerberos on your systems and network.</P>
+
+
+<H2 CLASS="title"><A NAME="KRB5">Configuring Kerberos on Your System</A></H2>
+
+<P>Before you can use Kerberos with CUPS, you will need to configure
+Kerberos on your system and setup a system as a KDC. Because this
+configuration is highly system and site-specific, please consult
+the following on-line resources provided by the creators of Kerberos
+at the Massachussetts Institute of Technology (MIT):</P>
+
+<UL>
+
+	<LI><A HREF="http://web.mit.edu/kerberos/">Kerberos: The Network
+	Authentication Protocol</A></LI>
+
+	<LI><A HREF="http://web.mit.edu/macdev/KfM/Common/Documentation/faq-osx.html">Kerberos
+	on Mac OS X Frequently Asked Questions</A></LI>
+
+</UL>
+
+<P>The Linux Documentation Project also has a HOWTO on Kerberos:</P>
+
+<UL>
+
+	<LI><A HREF="http://tldp.org/HOWTO/html_single/Kerberos-Infrastructure-HOWTO/">Kerberos
+	Infrastructure HOWTO</A></LI>
+
+</UL>
+
+
+<H2 CLASS="title"><A NAME="CUPS">Configuring CUPS to Use Kerberos</A></H2>
+
+<P>Once you have configured Kerberos on your system(s), you can then
+enable Kerberos authentication by selecting the <tt>Negotiate</tt>
+authentication type. The simplest way to do this is using the
+<tt>cupsctl(8)</tt> command:</P>
+
+<PRE CLASS="command">
+<KBD>cupsctl DefaultAuthType=Negotiate</KBD>
+</PRE>
+
+<P>You can also enable Kerberos from the web interface by checking the
+<VAR>Use Kerberos Authentication</VAR> box and clicking <VAR>Change
+Settings</VAR>:</P>
+
+<PRE CLASS="command">
+http://localhost:631/admin
+</PRE>
+
+<P>After you have enabled Kerberos authentication, add <tt>AuthType Default</tt>
+lines to the policies you want to protect with authentication, for example:</P>
+
+<PRE CLASS="command">
+<EM>Listing 1: <A NAME="LISTING01">Remote Printer Operation Policy</A></EM>
+
+ 1    &lt;Policy remote>
+ 2      # Job-related operations must be done by the owner or an
+      administrator...
+ 3      &lt;Limit Send-Document Send-URI Hold-Job Release-Job
+      Restart-Job Purge-Jobs Set-Job-Attributes
+      Create-Job-Subscription Renew-Subscription
+      Cancel-Subscription Get-Notifications Reprocess-Job
+      Cancel-Current-Job Suspend-Current-Job Resume-Job
+      CUPS-Move-Job>
+ 4        AuthType Default
+ 5        Require user @OWNER @SYSTEM
+ 6        Order deny,allow
+ 7      &lt;/Limit>
+ 8
+ 9      # Require authentication when creating jobs
+10      &lt;Limit Create-Job Print-Job Print-URI>
+11        AuthType Default
+12        Require valid-user
+13        Order deny,allow
+14      &lt;/Limit>
+15
+16      # All administration operations require an administrator
+      to authenticate...
+17      &lt;Limit Pause-Printer Resume-Printer
+      Set-Printer-Attributes Enable-Printer Disable-Printer
+      Pause-Printer-After-Current-Job Hold-New-Jobs
+      Release-Held-New-Jobs Deactivate-Printer Activate-Printer
+      Restart-Printer Shutdown-Printer Startup-Printer
+      Promote-Job Schedule-Job-After CUPS-Add-Printer
+      CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class
+      CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
+18        AuthType Default
+19        Require user @SYSTEM
+20        Order deny,allow
+21      &lt;/Limit>
+22    
+23      # Only the owner or an administrator can cancel or
+      authenticate a job...
+24      &lt;Limit Cancel-Job CUPS-Authenticate-Job>
+25        Require user @OWNER @SYSTEM
+26        Order deny,allow
+27      &lt;/Limit>
+28    
+29      &lt;Limit All>
+30        Order deny,allow
+31      &lt;/Limit>
+32    &lt;/Policy>
+</PRE>
+
+
+<H2 CLASS="title"><A NAME="IMPLEMENT">Implementation Information</A></H2>
+
+<P>CUPS implements Kerberos over HTTP using GSS API and the service name
+"ipp". Delegation of credentials (needed for remote printers with
+authentication) is only supported when using a single KDC on your network.</P>
+
+<P>After getting a user's Kerberos credentials, CUPS strips the "@KDC"
+portion of the username so that it can check the group membership locally,
+effectively treating the Kerberos account as a local user account.</P>
+
+</BODY>
+</HTML>

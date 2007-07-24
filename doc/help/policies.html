@@ -75,7 +75,7 @@ trying to use the new policy.</P>
       Promote-Job Schedule-Job-After CUPS-Add-Printer
       CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class
       CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
-10        AuthType Basic
+10        AuthType Default
 11        Require user @SYSTEM
 12        Order deny,allow
 13      &lt;/Limit>
@@ -147,7 +147,7 @@ administrative operations need to be authenticated:</P>
       Promote-Job Schedule-Job-After CUPS-Add-Printer
       CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class
       CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
-10        AuthType Basic
+10        AuthType Default
 11        Require user @SYSTEM
 12        Order deny,allow
 13      &lt;/Limit>
@@ -623,7 +623,7 @@ management operations.</P>
       Restart-Printer Shutdown-Printer Startup-Printer
       Promote-Job Schedule-Job-After CUPS-Accept-Jobs
       CUPS-Reject-Jobs CUPS-Set-Default>
-11        AuthType Basic
+11        AuthType Default
 12        Require user @lab999 @SYSTEM
 13        Order allow,deny
 14        Allow from 10.0.2.0/24

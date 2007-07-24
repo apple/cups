@@ -115,6 +115,7 @@ HELPFILES	=	\
 			help/api-raster.html \
 			help/cgi.html \
 			help/glossary.html \
+			help/kerberos.html \
 			help/license.html \
 			help/man-accept.html \
 			help/man-backend.html \
