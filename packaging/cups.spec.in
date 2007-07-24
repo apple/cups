@@ -67,6 +67,11 @@ Summary: Common UNIX Printing System - LPD support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version} xinetd
 
+%package da
+Summary: Common UNIX Printing System - Danish support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package de
 Summary: Common UNIX Printing System - German support
 Group: System Environment/Daemons
@@ -79,6 +84,11 @@ Requires: %{name} = %{epoch}:%{version}
 
 %package et
 Summary: Common UNIX Printing System - Estonian support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
+%package fi
+Summary: Common UNIX Printing System - Finnish support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
@@ -102,8 +112,28 @@ Summary: Common UNIX Printing System - Japanese support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
+%package ko
+Summary: Common UNIX Printing System - Korean support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
+%package no
+Summary: Common UNIX Printing System - Nowegian support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package pl
 Summary: Common UNIX Printing System - Polish support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
+%package pt
+Summary: Common UNIX Printing System - Portuguese support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
+%package ru
+Summary: Common UNIX Printing System - Russian support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
@@ -144,6 +174,10 @@ UNIX® operating systems. This package contains the CUPS shared libraries.
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides LPD client support.
 
+%description da
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Danish support.
+
 %description de
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides German support.
@@ -155,6 +189,10 @@ UNIX® operating systems. This package provides Spanish support.
 %description et
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Estonian support.
+
+%description fi
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Finnish support.
 
 %description fr
 The Common UNIX Printing System provides a portable printing layer for 
@@ -172,9 +210,25 @@ UNIX® operating systems. This package provides Italian support.
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Japanese support.
 
+%description ko
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Korean support.
+
+%description no
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Norwegian support.
+
 %description pl
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Polish support.
+
+%description pt
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Portuguese support.
+
+%description ru
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Russian support.
 
 %description sv
 The Common UNIX Printing System provides a portable printing layer for 
@@ -365,6 +419,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/accept.8.gz
 /usr/share/man/man8/cupsaddsmb.8.gz
 /usr/share/man/man8/cupsctl.8.gz
+/usr/share/man/man8/cupsfilter.8.gz
 /usr/share/man/man8/cupsd.8.gz
 /usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz
@@ -422,6 +477,10 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/cups-lpd.8.gz
 
+%files da
+%defattr(-,root,root)
+/usr/share/locale/da/cups_da.po
+
 %files de
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/de
@@ -451,6 +510,10 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups/templates/et
 /usr/share/cups/templates/et/*
 /usr/share/locale/et/cups_et.po
+
+%files fi
+%defattr(-,root,root)
+/usr/share/locale/fi/cups_fi.po
 
 %files fr
 %defattr(-,root,root)
@@ -493,6 +556,14 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/templates/ja/*
 /usr/share/locale/ja/cups_ja.po
 
+%files ko
+%defattr(-,root,root)
+/usr/share/locale/ko/cups_ko.po
+
+%files no
+%defattr(-,root,root)
+/usr/share/locale/no/cups_no.po
+
 %files pl
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/pl
@@ -502,6 +573,14 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups/templates/pl
 /usr/share/cups/templates/pl/*
 /usr/share/locale/pl/cups_pl.po
+
+%files pt
+%defattr(-,root,root)
+/usr/share/locale/pt/cups_pt.po
+
+%files ru
+%defattr(-,root,root)
+/usr/share/locale/ru/cups_ru.po
 
 %files sv
 %defattr(-,root,root)
@@ -521,6 +600,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/zh_TW/images/*
 %dir /usr/share/cups/templates/zh_TW
 /usr/share/cups/templates/zh_TW/*
+/usr/share/locale/zh/cups_zh.po
 /usr/share/locale/zh_TW/cups_zh_TW.po
 
 %if %{?_with_php:1}%{!?_with_php:0}
