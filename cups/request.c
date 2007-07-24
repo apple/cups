@@ -19,6 +19,7 @@
  *   cupsDoFileRequest() - Do an IPP request with a file.
  *   cupsDoRequest()     - Do an IPP request.
  *   _cupsSetError()     - Set the last IPP status code and status-message.
+ *   _cupsSetHTTPError() - Set the last error using the HTTP status.
  */
 
 /*
@@ -455,44 +456,7 @@ cupsDoIORequest(http_t     *http,	/* I - HTTP connection to server */
 		       ippErrorString(response->request.status.status_code));
   }
   else if (status != HTTP_OK)
-  {
-    switch (status)
-    {
-      case HTTP_NOT_FOUND :
-          _cupsSetError(IPP_NOT_FOUND, httpStatus(status));
-	  break;
-
-      case HTTP_UNAUTHORIZED :
-          _cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status));
-	  break;
-
-      case HTTP_FORBIDDEN :
-          _cupsSetError(IPP_FORBIDDEN, httpStatus(status));
-	  break;
-
-      case HTTP_BAD_REQUEST :
-          _cupsSetError(IPP_BAD_REQUEST, httpStatus(status));
-	  break;
-
-      case HTTP_REQUEST_TOO_LARGE :
-          _cupsSetError(IPP_REQUEST_VALUE, httpStatus(status));
-	  break;
-
-      case HTTP_NOT_IMPLEMENTED :
-          _cupsSetError(IPP_OPERATION_NOT_SUPPORTED, httpStatus(status));
-	  break;
-
-      case HTTP_NOT_SUPPORTED :
-          _cupsSetError(IPP_VERSION_NOT_SUPPORTED, httpStatus(status));
-	  break;
-
-      default :
-	  DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
-                	status));
-	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status));
-	  break;
-    }
-  }
+    _cupsSetHTTPError(status);
 
   return (response);
 }
@@ -538,6 +502,52 @@ _cupsSetError(ipp_status_t status,	/* I - IPP status code */
 
   if (message)
     cg->last_status_message = strdup(message);
+}
+
+
+/*
+ * '_cupsSetHTTPError()' - Set the last error using the HTTP status.
+ */
+
+void
+_cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
+{
+  switch (status)
+  {
+    case HTTP_NOT_FOUND :
+	_cupsSetError(IPP_NOT_FOUND, httpStatus(status));
+	break;
+
+    case HTTP_UNAUTHORIZED :
+	_cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status));
+	break;
+
+    case HTTP_FORBIDDEN :
+	_cupsSetError(IPP_FORBIDDEN, httpStatus(status));
+	break;
+
+    case HTTP_BAD_REQUEST :
+	_cupsSetError(IPP_BAD_REQUEST, httpStatus(status));
+	break;
+
+    case HTTP_REQUEST_TOO_LARGE :
+	_cupsSetError(IPP_REQUEST_VALUE, httpStatus(status));
+	break;
+
+    case HTTP_NOT_IMPLEMENTED :
+	_cupsSetError(IPP_OPERATION_NOT_SUPPORTED, httpStatus(status));
+	break;
+
+    case HTTP_NOT_SUPPORTED :
+	_cupsSetError(IPP_VERSION_NOT_SUPPORTED, httpStatus(status));
+	break;
+
+    default :
+	DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
+		      status));
+	_cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status));
+	break;
+  }
 }
 
 

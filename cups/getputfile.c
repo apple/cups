@@ -167,7 +167,10 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
       write(fd, buffer, bytes);
   }
   else
+  {
+    _cupsSetHTTPError(status);
     httpFlush(http);
+  }
 
  /*
   * Return the request status...
@@ -416,7 +419,10 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
   */
 
   if (status != HTTP_CREATED)
+  {
+    _cupsSetHTTPError(status);
     httpFlush(http);
+  }
 
   return (status);
 }

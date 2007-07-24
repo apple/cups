@@ -1,3 +1,4 @@
+//#define DEBUG
 /*
  * "$Id$"
  *
@@ -176,13 +177,6 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 
   if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
   {
-    if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
-    {
-      DEBUG_printf(("cupsDoAuthentication: too many Negotiate tries (%d)\n",
-                    http->digest_tries));
-  
-      return (-1);
-    }
 #ifdef HAVE_GSSAPI
    /*
     * Kerberos authentication...
@@ -214,6 +208,14 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     }
 #  endif /* __APPLE__ */
 
+    if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
+    {
+      DEBUG_printf(("cupsDoAuthentication: too many Negotiate tries (%d)\n",
+                    http->digest_tries));
+  
+      return (-1);
+    }
+
     if (http->gssname == GSS_C_NO_NAME)
     {
       if ((gss_service_name = getenv("CUPS_GSSSERVICENAME")) == NULL)
@@ -237,9 +239,34 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     if (*authorization)
     {
      /*
-      * For SPNEGO, this is where we'll feed the server's authorization data
-      * back into gss via input_token...
+      * Decode the authorization string to get the input token...
       */
+
+      int len = strlen(authorization);
+
+      input_token.value  = malloc(len);
+      input_token.value  = httpDecode64_2(input_token.value, &len,
+					  authorization);
+      input_token.length = len;
+
+#ifdef DEBUG
+      {
+        char *ptr = (char *)input_token.value;
+	int left = len;
+
+        fputs("input_token=", stdout);
+	while (left > 0)
+	{
+	  if (*ptr < ' ')
+	    printf("\\%03o", *ptr & 255);
+	  else
+	    putchar(*ptr);
+	  ptr ++;
+	  left --;
+	}
+	putchar('\n');
+      }
+#endif /* DEBUG */
     }
 
     if (http->gssctx != GSS_C_NO_CONTEXT)
@@ -563,7 +590,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * check if we need Kerberos authentication...
     */
 
-    if (!strcmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate"))
+    if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
     {
      /*
       * Yes, don't try the root certificate...
