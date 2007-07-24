@@ -1,4 +1,3 @@
-//#define DEBUG
 /*
  * "$Id$"
  *
@@ -66,6 +65,8 @@ extern const char *cssmErrorString(int error);
 #  ifdef DEBUG
 static void	DEBUG_gss_printf(OM_uint32 major_status, OM_uint32 minor_status,
 				 const char *message);
+#  else
+#    define DEBUG_gss_printf(major, minor, message)
 #  endif /* DEBUG  */
 static gss_name_t cups_get_gss_creds(http_t *http, const char *service_name);
 #endif /* HAVE_GSSAPI */
@@ -190,8 +191,10 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 					/* Input token */
     char		*gss_service_name;
 					/* GSS service name */
+#  ifdef USE_SPNEGO
     const char		*authorization;
 					/* Pointer into Authorization string */
+#  endif /* USE_SPNEGO */
 
 
 #  ifdef __APPLE__
@@ -226,6 +229,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
       http->gssname = cups_get_gss_creds(http, gss_service_name);
     }
 
+#  ifdef USE_SPNEGO /* We don't implement SPNEGO just yet... */
    /*
     * Find the start of the Kerberos input token...
     */
@@ -249,7 +253,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 					  authorization);
       input_token.length = len;
 
-#ifdef DEBUG
+#    ifdef DEBUG
       {
         char *ptr = (char *)input_token.value;
 	int left = len;
@@ -266,8 +270,9 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 	}
 	putchar('\n');
       }
-#endif /* DEBUG */
+#    endif /* DEBUG */
     }
+#  endif /* USE_SPNEGO */
 
     if (http->gssctx != GSS_C_NO_CONTEXT)
     {
@@ -279,7 +284,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
 					 &http->gssctx,
 					 http->gssname, http->gssmech,
-					 GSS_C_DELEG_FLAG | GSS_C_MUTUAL_FLAG,
+					 GSS_C_DELEG_FLAG | GSS_C_MUTUAL_FLAG |
+					     GSS_C_INTEG_FLAG,
 					 GSS_C_INDEFINITE,
 					 GSS_C_NO_CHANNEL_BINDINGS,
 					 &input_token, &http->gssmech,
@@ -297,10 +303,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
       return (-1);
     }
 
-#  ifdef DEBUG
     if (major_status == GSS_S_CONTINUE_NEEDED)
       DEBUG_gss_printf(major_status, minor_status, "Continuation needed!");
-#  endif /* DEBUG */
 
     if (output_token.length)
     {

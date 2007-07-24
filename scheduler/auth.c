@@ -1010,6 +1010,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Get the username associated with the credentials...
     */
 
+    if (major_status == GSS_S_CONTINUE_NEEDED)
+      cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
+                         "cupsdAuthorize: Credentials not complete");
+
     if (major_status == GSS_S_COMPLETE)
     {
       major_status = gss_display_name(&minor_status, client_name, 
@@ -1027,6 +1031,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       gss_release_name(&minor_status, &client_name);
       strlcpy(username, output_token.value, sizeof(username));
+      if ((ptr = strchr(username, '@')) != NULL)
+        *ptr = '\0';			/* Strip @KDC from the username */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 		      "cupsdAuthorize: Authorized as %s using Negotiate",
