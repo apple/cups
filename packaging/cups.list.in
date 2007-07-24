@@ -550,6 +550,7 @@ d 0755 root sys $DOCDIR/help -
 f 0644 root sys $DOCDIR/help/accounting.html doc/help/accounting.html
 f 0644 root sys $DOCDIR/help/cgi.html doc/help/cgi.html
 f 0644 root sys $DOCDIR/help/glossary.html doc/help/glossary.html
+f 0644 root sys $DOCDIR/help/kerberos.html doc/help/kerberos.html
 f 0644 root sys $DOCDIR/help/license.html doc/help/license.html
 f 0644 root sys $DOCDIR/help/network.html doc/help/network.html
 f 0644 root sys $DOCDIR/help/options.html doc/help/options.html

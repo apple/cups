@@ -388,6 +388,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/accounting.html
 /usr/share/doc/cups/help/cgi.html
 /usr/share/doc/cups/help/glossary.html
+/usr/share/doc/cups/help/kerberos.html
 /usr/share/doc/cups/help/license.html
 /usr/share/doc/cups/help/man-*.html
 /usr/share/doc/cups/help/network.html
