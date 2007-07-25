@@ -31,6 +31,7 @@
 #define CUPS_DEFAULT_USER	"lp"
 #define CUPS_DEFAULT_GROUP	"sys"
 #define CUPS_DEFAULT_SYSTEM_GROUPS	"sys root system"
+#define CUPS_DEFAULT_PRINTADMIN_AUTH	"@SYSTEM"
 
 
 /*

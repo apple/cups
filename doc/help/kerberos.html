@@ -88,30 +88,38 @@ lines to the policies you want to protect with authentication, for example:</P>
 15
 16      # All administration operations require an administrator
       to authenticate...
-17      &lt;Limit Pause-Printer Resume-Printer
-      Set-Printer-Attributes Enable-Printer Disable-Printer
-      Pause-Printer-After-Current-Job Hold-New-Jobs
-      Release-Held-New-Jobs Deactivate-Printer Activate-Printer
-      Restart-Printer Shutdown-Printer Startup-Printer
-      Promote-Job Schedule-Job-After CUPS-Add-Printer
-      CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class
-      CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
+17      &lt;Limit CUPS-Add-Printer CUPS-Delete-Printer
+      CUPS-Add-Class CUPS-Delete-Class CUPS-Set-Default>
 18        AuthType Default
 19        Require user @SYSTEM
 20        Order deny,allow
 21      &lt;/Limit>
 22    
-23      # Only the owner or an administrator can cancel or
+23      # All printer operations require a printer operator
+      to authenticate...
+24      &lt;Limit Pause-Printer Resume-Printer
+      Set-Printer-Attributes Enable-Printer Disable-Printer
+      Pause-Printer-After-Current-Job Hold-New-Jobs
+      Release-Held-New-Jobs Deactivate-Printer Activate-Printer
+      Restart-Printer Shutdown-Printer Startup-Printer
+      Promote-Job Schedule-Job-After CUPS-Accept-Jobs
+      CUPS-Reject-Jobs>
+25        AuthType Default
+26        Require user <em>varies by OS</em>
+27        Order deny,allow
+28      &lt;/Limit>
+29    
+30      # Only the owner or an administrator can cancel or
       authenticate a job...
-24      &lt;Limit Cancel-Job CUPS-Authenticate-Job>
-25        Require user @OWNER @SYSTEM
-26        Order deny,allow
-27      &lt;/Limit>
-28    
-29      &lt;Limit All>
-30        Order deny,allow
-31      &lt;/Limit>
-32    &lt;/Policy>
+31      &lt;Limit Cancel-Job CUPS-Authenticate-Job>
+32        Require user @OWNER @SYSTEM
+33        Order deny,allow
+34      &lt;/Limit>
+35    
+36      &lt;Limit All>
+37        Order deny,allow
+38      &lt;/Limit>
+39    &lt;/Policy>
 </PRE>
 
 

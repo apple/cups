@@ -186,6 +186,7 @@ dnl Extra platform-specific libraries...
 BACKLIBS=""
 CUPSDLIBS=""
 DBUSDIR=""
+CUPS_DEFAULT_PRINTADMIN_AUTH="@SYSTEM"
 CUPS_SYSTEM_AUTHKEY=""
 
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
@@ -232,8 +233,8 @@ case $uname in
 		dnl Check for Authorization Services support
 		AC_CHECK_HEADER(Security/Authorization.h, [
 			AC_DEFINE(HAVE_AUTHORIZATION_H)
+			CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
 			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"])
-#			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"])
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
                 ;;
 
@@ -261,6 +262,8 @@ case $uname in
 		;;
 esac
 
+AC_SUBST(CUPS_DEFAULT_PRINTADMIN_AUTH)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTADMIN_AUTH, "$CUPS_DEFAULT_PRINTADMIN_AUTH")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 
 dnl See if we have POSIX ACL support...

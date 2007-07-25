@@ -3,6 +3,10 @@ CHANGES.txt - 2007-07-24
 
 CHANGES IN CUPS V1.3rc1
 
+	- Updated the default cupsd.conf policy to list the
+	  "administrative" operations separately from the "printer
+	  control" operations so that it is easier to define a
+	  group of users that are "printer operators".
 	- The web interface now pulls the default cupsd.conf file
 	  from cupsd.conf.default in the CUPS config directory.
 	- Added a help file for using Kerberos with CUPS.

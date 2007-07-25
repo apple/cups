@@ -1403,8 +1403,8 @@ _cupsAdminSetServerSettings(
 	                     "cancel a job...\n"
 	                     "  <Limit Cancel-Job>\n"
 	                     "    Order deny,allow\n"
-	                     "    Allow @SYSTEM\n"
-			     "    Allow @OWNER\n"
+			     "    Require user @OWNER "
+			     CUPS_DEFAULT_PRINTADMIN_AUTH "\n"
 			     "  </Limit>\n");
       }
 
@@ -1556,7 +1556,8 @@ _cupsAdminSetServerSettings(
 	                   "a job...\n"
 	                   "  <Limit Cancel-Job>\n"
 	                   "    Order deny,allow\n"
-	                   "    Require user @OWNER @SYSTEM\n"
+	                   "    Require user @OWNER "
+			   CUPS_DEFAULT_PRINTADMIN_AUTH "\n"
 			   "  </Limit>\n");
 
       in_cancel_job = 0;
@@ -1785,8 +1786,9 @@ _cupsAdminSetServerSettings(
       cupsFilePuts(temp, "  # Only the owner or an administrator can cancel "
                          "a job...\n"
 	                 "  <Limit Cancel-Job>\n"
-	                 "    Require user @OWNER @SYSTEM\n"
 	                 "    Order deny,allow\n"
+	                 "    Require user @OWNER "
+			 CUPS_DEFAULT_PRINTADMIN_AUTH "\n"
 			 "  </Limit>\n");
 
     cupsFilePuts(temp, "  <Limit All>\n"

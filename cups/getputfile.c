@@ -26,10 +26,9 @@
  * Include necessary headers...
  */
 
-#include "http-private.h"
+#include "globals.h"
 #include "cups.h"
 #include "language.h"
-#include "string.h"
 #include "debug.h"
 #include <stdlib.h>
 #include <ctype.h>
