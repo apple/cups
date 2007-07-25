@@ -573,7 +573,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     return (NULL);
   }
 
-  ppd->language_level = 1;
+  ppd->language_level = 2;
   ppd->color_device   = 0;
   ppd->colorspace     = PPD_CS_GRAY;
   ppd->landscape      = -90;
