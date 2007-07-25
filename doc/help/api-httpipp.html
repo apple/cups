@@ -723,7 +723,7 @@ require CUPS 1.1 or higher.</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_status_e'>ipp_status_e</a></h3>
 <h4>Description</h4>
-<p>
+<p>IPP status codes...
 <h4>Values</h4>
 <div class='table'><table align='center' border='1' width='80%' summary='Values'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
@@ -966,6 +966,7 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#httpSeparate'><tt>httpSeparate()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#httpSeparate2'><tt>httpSeparate2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#httpSeparateURI'><tt>httpSeparateURI()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#httpSetAuthString'><tt>httpSetAuthString()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
 	<li><a href='#httpSetCookie'><tt>httpSetCookie()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
 	<li><a href='#httpSetExpect'><tt>httpSetExpect()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpSetField'><tt>httpSetField()</tt></a> </li>
@@ -1025,7 +1026,7 @@ status, prior to resubmitting your request.
 <p><tt>
 int<br>
 cupsDoAuthentication(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * method,
     const char * resource);
 </tt></p>
@@ -1050,7 +1051,7 @@ after receiving a valid IPP response.
 <p><tt>
 <a href='#ipp_t'>ipp_t</a> *<br>
 cupsDoFileRequest(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     <a href='#ipp_t'>ipp_t</a> * request,
     const char * resource,
     const char * filename);
@@ -1083,7 +1084,7 @@ all of the data after the IPP response message to the file.
 <p><tt>
 <a href='#ipp_t'>ipp_t</a> *<br>
 cupsDoIORequest(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     <a href='#ipp_t'>ipp_t</a> * request,
     const char * resource,
     int infile,
@@ -1112,7 +1113,7 @@ after receiving a valid IPP response.
 <p><tt>
 <a href='#ipp_t'>ipp_t</a> *<br>
 cupsDoRequest(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     <a href='#ipp_t'>ipp_t</a> * request,
     const char * resource);
 </tt></p>
@@ -1399,7 +1400,7 @@ httpAssembleURIf(
 <p><tt>
 void<br>
 httpBlocking(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     int b);
 </tt></p>
 <h4>Arguments</h4>
@@ -1419,7 +1420,7 @@ httpBlocking(
 <p><tt>
 int<br>
 httpCheck(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1439,7 +1440,7 @@ httpCheck(
 <p><tt>
 void<br>
 httpClearCookie(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1457,7 +1458,7 @@ httpClearCookie(
 <p><tt>
 void<br>
 httpClearFields(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1475,7 +1476,7 @@ httpClearFields(
 <p><tt>
 void<br>
 httpClose(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1491,7 +1492,7 @@ httpClose(
 <p>Connect to a HTTP server.
 <h4>Syntax</h4>
 <p><tt>
-http_t *<br>
+<a href='#http_t'>http_t</a> *<br>
 httpConnect(
     const char * host,
     int port);
@@ -1511,7 +1512,7 @@ httpConnect(
 <p>Connect to a HTTP server using encryption.
 <h4>Syntax</h4>
 <p><tt>
-http_t *<br>
+<a href='#http_t'>http_t</a> *<br>
 httpConnectEncrypt(
     const char * host,
     int port,
@@ -1583,7 +1584,7 @@ httpDecode64_2(
 <p><tt>
 int<br>
 httpDelete(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * uri);
 </tt></p>
 <h4>Arguments</h4>
@@ -1653,7 +1654,7 @@ httpEncode64_2(
 <p><tt>
 int<br>
 httpEncryption(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     <a href='#http_encryption_t'>http_encryption_t</a> e);
 </tt></p>
 <h4>Arguments</h4>
@@ -1673,7 +1674,7 @@ httpEncryption(
 <p><tt>
 int<br>
 httpError(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1691,7 +1692,7 @@ httpError(
 <p><tt>
 void<br>
 httpFlush(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1711,7 +1712,7 @@ httpFlush(
 <p><tt>
 int<br>
 httpFlushWrite(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1729,7 +1730,7 @@ httpFlushWrite(
 <p><tt>
 int<br>
 httpGet(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * uri);
 </tt></p>
 <h4>Arguments</h4>
@@ -1744,15 +1745,18 @@ httpGet(
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='httpGetAuthString'>httpGetAuthString()</a></h3>
 <h4>Description</h4>
-<p>Get the cached authorization string.
-<p>The authorization string is set by the cupsDoAuthorization() function.
+<p>Get the current authorization string.
+<p>The authorization string is set by cupsDoAuthentication() and
+httpSetAuthString().  Use httpGetAuthString() to retrieve the
+string to use with httpSetField() for the HTTP_FIELD_AUTHORIZATION
+value.
 
 
 <h4>Syntax</h4>
 <p><tt>
 char *<br>
 httpGetAuthString(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1772,7 +1776,7 @@ httpGetAuthString(
 <p><tt>
 int<br>
 httpGetBlocking(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1792,7 +1796,7 @@ httpGetBlocking(
 <p><tt>
 const char *<br>
 httpGetCookie(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1874,7 +1878,7 @@ httpGetDateTime(
 <p><tt>
 int<br>
 httpGetFd(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1892,7 +1896,7 @@ httpGetFd(
 <p><tt>
 const char *<br>
 httpGetField(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     http_field_t field);
 </tt></p>
 <h4>Arguments</h4>
@@ -1939,7 +1943,7 @@ and gethostbyname() to get the local hostname with domain.
 <p><tt>
 const char *<br>
 httpGetHostname(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     char * s,
     int slen);
 </tt></p>
@@ -1966,7 +1970,7 @@ content-length or transfer-encoding fields.
 <p><tt>
 int<br>
 httpGetLength(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -1989,7 +1993,7 @@ content larger than 2^31 - 1.
 <p><tt>
 off_t<br>
 httpGetLength2(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -2009,7 +2013,7 @@ httpGetLength2(
 <p><tt>
 http_status_t<br>
 httpGetStatus(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -2029,7 +2033,7 @@ httpGetStatus(
 <p><tt>
 char *<br>
 httpGetSubField(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     http_field_t field,
     const char * name,
     char * value);
@@ -2055,7 +2059,7 @@ httpGetSubField(
 <p><tt>
 char *<br>
 httpGetSubField2(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     http_field_t field,
     const char * name,
     char * value,
@@ -2083,7 +2087,7 @@ char *<br>
 httpGets(
     char * line,
     int length,
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -2103,7 +2107,7 @@ httpGets(
 <p><tt>
 int<br>
 httpHead(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * uri);
 </tt></p>
 <h4>Arguments</h4>
@@ -2207,7 +2211,7 @@ httpMD5String(
 <p><tt>
 int<br>
 httpOptions(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * uri);
 </tt></p>
 <h4>Arguments</h4>
@@ -2227,7 +2231,7 @@ httpOptions(
 <p><tt>
 int<br>
 httpPost(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * uri);
 </tt></p>
 <h4>Arguments</h4>
@@ -2247,7 +2251,7 @@ httpPost(
 <p><tt>
 int<br>
 httpPut(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * uri);
 </tt></p>
 <h4>Arguments</h4>
@@ -2271,7 +2275,7 @@ read more than 2GB of data.
 <p><tt>
 int<br>
 httpRead(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     char * buffer,
     int length);
 </tt></p>
@@ -2295,7 +2299,7 @@ httpRead(
 <p><tt>
 <a href='#ssize_t'>ssize_t</a><br>
 httpRead2(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     char * buffer,
     size_t length);
 </tt></p>
@@ -2317,7 +2321,7 @@ httpRead2(
 <p><tt>
 int<br>
 httpReconnect(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -2442,6 +2446,34 @@ httpSeparateURI(
 <h4>Returns</h4>
 <p>Result of separation</p>
 <!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='httpSetAuthString'>httpSetAuthString()</a></h3>
+<h4>Description</h4>
+<p>Set the current authorization string.
+<p>This function just stores a copy of the current authorization string in
+the HTTP connection object.  You must still call httpSetField() to set
+HTTP_FIELD_AUTHORIZATION prior to issuing a HTTP request using httpGet(),
+httpHead(), httpOptions(), httpPost, or httpPut().
+
+
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+httpSetAuthString(
+    <a href='#http_t'>http_t</a> * http,
+    const char * scheme,
+    const char * data);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>scheme</tt></td><td>Auth scheme (NULL to clear it)</td></tr>
+<tr><td><tt>data</tt></td><td>Auth data (NULL for none)</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='httpSetCookie'>httpSetCookie()</a></h3>
 <h4>Description</h4>
 <p>Set the cookie value(s)...
@@ -2451,7 +2483,7 @@ httpSeparateURI(
 <p><tt>
 void<br>
 httpSetCookie(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * cookie);
 </tt></p>
 <h4>Arguments</h4>
@@ -2474,7 +2506,7 @@ httpSetCookie(
 <p><tt>
 void<br>
 httpSetExpect(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     http_status_t expect);
 </tt></p>
 <h4>Arguments</h4>
@@ -2494,7 +2526,7 @@ httpSetExpect(
 <p><tt>
 void<br>
 httpSetField(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     http_field_t field,
     const char * value);
 </tt></p>
@@ -2518,7 +2550,7 @@ httpSetField(
 <p><tt>
 void<br>
 httpSetLength(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     size_t length);
 </tt></p>
 <h4>Arguments</h4>
@@ -2556,7 +2588,7 @@ httpStatus(
 <p><tt>
 int<br>
 httpTrace(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * uri);
 </tt></p>
 <h4>Arguments</h4>
@@ -2576,7 +2608,7 @@ httpTrace(
 <p><tt>
 http_status_t<br>
 httpUpdate(
-    http_t * http);
+    <a href='#http_t'>http_t</a> * http);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
@@ -2596,7 +2628,7 @@ httpUpdate(
 <p><tt>
 int<br>
 httpWait(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     int msec);
 </tt></p>
 <h4>Arguments</h4>
@@ -2620,7 +2652,7 @@ write more than 2GB of data.
 <p><tt>
 int<br>
 httpWrite(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * buffer,
     int length);
 </tt></p>
@@ -2644,7 +2676,7 @@ httpWrite(
 <p><tt>
 <a href='#ssize_t'>ssize_t</a><br>
 httpWrite2(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     const char * buffer,
     size_t length);
 </tt></p>
@@ -3312,7 +3344,7 @@ ippPort(void);
 <p><tt>
 ipp_state_t<br>
 ippRead(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     <a href='#ipp_t'>ipp_t</a> * ipp);
 </tt></p>
 <h4>Arguments</h4>
@@ -3418,7 +3450,7 @@ ippTimeToDate(
 <p><tt>
 ipp_state_t<br>
 ippWrite(
-    http_t * http,
+    <a href='#http_t'>http_t</a> * http,
     <a href='#ipp_t'>ipp_t</a> * ipp);
 </tt></p>
 <h4>Arguments</h4>
@@ -3581,11 +3613,12 @@ struct ipp_s<br>
 	<li><a href='#http_auth_t'><tt>http_auth_t</tt></a> </li>
 	<li><a href='#http_encoding_t'><tt>http_encoding_t</tt></a> </li>
 	<li><a href='#http_encryption_t'><tt>http_encryption_t</tt></a> </li>
-	<li><a href='#_HTTP_DEPRECATED'><tt>_HTTP_DEPRECATED</tt></a> </li>
+	<li><a href='#http_t'><tt>http_t</tt></a> </li>
 	<li><a href='#ipp_attribute_t'><tt>ipp_attribute_t</tt></a> </li>
 	<li><a href='#ipp_iocb_t'><tt>ipp_iocb_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#ipp_request_t'><tt>ipp_request_t</tt></a> </li>
 	<li><a href='#ipp_t'><tt>ipp_t</tt></a> </li>
+	<li><a href='#ipp_uchar_t'><tt>ipp_uchar_t</tt></a> </li>
 	<li><a href='#ipp_value_t'><tt>ipp_value_t</tt></a> </li>
 </ul>
 <!-- NEW PAGE -->
@@ -3624,12 +3657,12 @@ typedef enum <a href='#http_encoding_e'>http_encoding_e</a> http_encoding_t;
 typedef enum <a href='#http_encryption_e'>http_encryption_e</a> http_encryption_t;
 </tt></p>
 <!-- NEW PAGE -->
-<h3 class='title'><a name='_HTTP_DEPRECATED'>_HTTP_DEPRECATED</a></h3>
+<h3 class='title'><a name='http_t'>http_t</a></h3>
 <h4>Description</h4>
 <p>HTTP connection type
 <h4>Definition</h4>
 <p><tt>
-typedef http_t *http, char *buffer, int length) _HTTP_DEPRECATED;
+typedef struct _http_s http_t;
 </tt></p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_attribute_t'>ipp_attribute_t</a></h3>
@@ -3650,7 +3683,7 @@ typedef <a href='#ssize_t'>ssize_t</a> (*ipp_iocb_t)(void *, <a href='#ipp_uchar
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_request_t'>ipp_request_t</a></h3>
 <h4>Description</h4>
-<p>New in CUPS 1.2
+<p>Request Header
 <h4>Definition</h4>
 <p><tt>
 typedef union <a href='#ipp_request_u'>ipp_request_u</a> ipp_request_t;
@@ -3662,6 +3695,14 @@ typedef union <a href='#ipp_request_u'>ipp_request_u</a> ipp_request_t;
 <h4>Definition</h4>
 <p><tt>
 typedef struct <a href='#ipp_s'>ipp_s</a> ipp_t;
+</tt></p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='ipp_uchar_t'>ipp_uchar_t</a></h3>
+<h4>Description</h4>
+<p>IPP status codes...
+<h4>Definition</h4>
+<p><tt>
+typedef typedef unsigned char ipp_uchar_t;
 </tt></p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_value_t'>ipp_value_t</a></h3>
@@ -3680,7 +3721,7 @@ typedef union <a href='#ipp_value_u'>ipp_value_u</a> ipp_value_t;
 <!-- NEW PAGE -->
 <h3 class='title'><a name='ipp_request_u'>ipp_request_u</a></h3>
 <h4>Description</h4>
-<p>New in CUPS 1.2
+<p>Request Header
 <h4>Definition</h4>
 <p><tt>
 union ipp_request_u<br>

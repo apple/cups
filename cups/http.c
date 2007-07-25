@@ -59,6 +59,7 @@
  *   _httpReadCDSA()      - Read function for the CDSA library.
  *   _httpReadGNUTLS()    - Read function for the GNU TLS library.
  *   httpReconnect()      - Reconnect to a HTTP server...
+ *   httpSetAuthString()  - Set the current authorization string.
  *   httpSetCookie()      - Set the cookie value(s)...
  *   httpSetExpect()      - Set the Expect: header in a request.
  *   httpSetField()       - Set the value of an HTTP header.
@@ -607,9 +608,12 @@ httpGet(http_t     *http,		/* I - HTTP connection */
 
 
 /*
- * 'httpGetAuthString()' - Get the cached authorization string.
+ * 'httpGetAuthString()' - Get the current authorization string.
  *
- * The authorization string is set by the cupsDoAuthorization() function.
+ * The authorization string is set by cupsDoAuthentication() and
+ * httpSetAuthString().  Use httpGetAuthString() to retrieve the
+ * string to use with httpSetField() for the HTTP_FIELD_AUTHORIZATION
+ * value.
  *
  * @since CUPS 1.3@
  */
@@ -1693,6 +1697,62 @@ httpReconnect(http_t *http)		/* I - HTTP connection */
 #endif /* HAVE_SSL */
 
   return (0);
+}
+
+
+/*
+ * 'httpSetAuthString()' - Set the current authorization string.
+ *
+ * This function just stores a copy of the current authorization string in
+ * the HTTP connection object.  You must still call httpSetField() to set
+ * HTTP_FIELD_AUTHORIZATION prior to issuing a HTTP request using httpGet(),
+ * httpHead(), httpOptions(), httpPost, or httpPut().
+ *
+ * @since CUPS 1.3@
+ */
+
+void
+httpSetAuthString(http_t     *http,	/* I - HTTP connection */
+                  const char *scheme,	/* I - Auth scheme (NULL to clear it) */
+		  const char *data)	/* I - Auth data (NULL for none) */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!http)
+    return;
+
+  if (http->authstring && http->authstring != http->_authstring)
+  {
+    free(http->authstring);
+    http->authstring = http->_authstring;
+  }
+
+  if (scheme)
+  {
+   /*
+    * Set the current authorization string...
+    */
+
+    int len = (int)strlen(scheme) + (data ? (int)strlen(data) + 1 : 0) + 1;
+
+    if (len > (int)sizeof(http->_authstring))
+      http->authstring = malloc(len);
+
+    if (data)
+      snprintf(http->authstring, len, "%s %s", scheme, data);
+    else
+      strlcpy(http->authstring, scheme, len);
+  }
+  else
+  {
+   /*
+    * Clear the current authorization string...
+    */
+
+    http->_authstring[0] = '\0';
+  }
 }
 
 

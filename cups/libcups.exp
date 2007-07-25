@@ -214,6 +214,7 @@ _httpReconnect
 _httpSeparate
 _httpSeparate2
 _httpSeparateURI
+_httpSetAuthString
 _httpSetCookie
 _httpSetExpect
 _httpSetField

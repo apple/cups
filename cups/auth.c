@@ -108,12 +108,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * Clear the current authentication string...
   */
 
-  http->_authstring[0] = '\0';
-
-  if (http->authstring && http->authstring != http->_authstring)
-    free(http->authstring);
-
-  http->authstring = http->_authstring;
+  httpSetAuthString(http, NULL, NULL);
 
  /*
   * See if we can do local authentication...
@@ -310,18 +305,10 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     {
       httpEncode64_2(encode, sizeof(encode), output_token.value,
 		     output_token.length);
-
-      http->authstring = malloc(strlen(encode) + 11);
-      sprintf(http->authstring, "Negotiate %s", encode); /* Safe because allocated */
+      httpSetAuthString(http, "Negotiate", encode);
  
       major_status = gss_release_buffer(&minor_status, &output_token);
     }
-
-   /*
-    * Copy back what we can to _authstring for backwards compatibility...
-    */
-
-    strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
 #endif /* HAVE_GSSAPI */
   }
   else if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6))
@@ -332,7 +319,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 
     httpEncode64_2(encode, sizeof(encode), http->userpass,
                    (int)strlen(http->userpass));
-    snprintf(http->_authstring, sizeof(http->_authstring), "Basic %s", encode);
+    httpSetAuthString(http, "Basic", encode);
   }
   else
   {
@@ -340,15 +327,18 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     * Digest authentication...
     */
 
+    char digest[1024];			/* Digest auth data */
+
+
     httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
     httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
 
     httpMD5(cupsUser(), realm, strchr(http->userpass, ':') + 1, encode);
     httpMD5Final(nonce, method, resource, encode);
-    snprintf(http->_authstring, sizeof(http->_authstring),
-	     "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
-	     "uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce,
-	     resource, encode);
+    snprintf(digest, sizeof(digest),
+	     "username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", "
+	     "response=\"%s\"", cupsUser(), realm, nonce, resource, encode);
+    httpSetAuthString(http, "Digest", digest);
   }
 
   DEBUG_printf(("cupsDoAuthentication: authstring=\"%s\"\n", http->authstring));
@@ -554,11 +544,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
       httpEncode64_2(buffer, sizeof(buffer), (void *)&auth_extrn, 
 		     sizeof(auth_extrn));
 
-      http->authstring = malloc(strlen(buffer) + 9);
-      sprintf(http->authstring, "AuthRef %s", buffer);
-
-      /* Copy back to _authstring for backwards compatibility */
-      strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+      httpSetAuthString(http, "AuthRef", buffer);
 
       DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
 		    http->authstring));
@@ -621,11 +607,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * Set the authorization string and return...
     */
 
-    http->authstring = malloc(strlen(certificate) + 7);
-    sprintf(http->authstring, "Local %s", certificate);
-
-    /* Copy back to _authstring for backwards compatibility */
-    strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+    httpSetAuthString(http, "Local", certificate);
 
     DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
 		  http->authstring));
@@ -654,11 +636,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
     if ((pwd = getpwnam(username)) != NULL && pwd->pw_uid == getuid())
     {
-      http->authstring = malloc(strlen(username) + 10);
-      sprintf(http->authstring, "PeerCred %s", username);
-
-      /* Copy back to _authstring for backwards compatibility */
-      strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+      httpSetAuthString(http, "PeerCred", username);
 
       DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
 		    http->authstring));
