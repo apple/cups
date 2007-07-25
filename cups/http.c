@@ -34,6 +34,7 @@
  *   httpFlush()          - Flush data from a HTTP connection.
  *   httpFlushWrite()     - Flush data in write buffer.
  *   httpGet()            - Send a GET request to the server.
+ *   httpGetAuthString()  - Get the current authorization string.
  *   httpGetBlocking()    - Get the blocking/non-block state of a connection.
  *   httpGetCookie()      - Get any cookie data from the response.
  *   httpGetFd()          - Get the file descriptor associated with a
@@ -602,6 +603,24 @@ httpGet(http_t     *http,		/* I - HTTP connection */
         const char *uri)		/* I - URI to get */
 {
   return (http_send(http, HTTP_GET, uri));
+}
+
+
+/*
+ * 'httpGetAuthString()' - Get the cached authorization string.
+ *
+ * The authorization string is set by the cupsDoAuthorization() function.
+ *
+ * @since CUPS 1.3@
+ */
+
+char *					/* O - Authorization string */
+httpGetAuthString(http_t *http)		/* I - HTTP connection */
+{
+  if (http)
+    return (http->authstring);
+  else
+    return (NULL);
 }
 
 

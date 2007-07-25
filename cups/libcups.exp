@@ -183,6 +183,7 @@ _httpError
 _httpFlush
 _httpFlushWrite
 _httpGet
+_httpGetAuthString
 _httpGetBlocking
 _httpGetCookie
 _httpGetDateString

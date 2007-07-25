@@ -442,6 +442,8 @@ extern void		httpSetLength(http_t *http, size_t length);
 extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 			           size_t length);
 
+/**** New in CUPS 1.3 ****/
+extern char		*httpGetAuthString(http_t *http);
 
 /*
  * C++ magic...
