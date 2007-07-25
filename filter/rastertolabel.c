@@ -1075,7 +1075,7 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
   * Set the length of the data and write it...
   */
 
-  printf("\033*b%dW", comp_ptr - CompBuffer);
+  printf("\033*b%dW", (int)(comp_ptr - CompBuffer));
   fwrite(CompBuffer, comp_ptr - CompBuffer, 1, stdout);
 
  /*
