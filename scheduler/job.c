@@ -1255,7 +1255,10 @@ cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
   * Change the destination information...
   */
 
-  cupsdLoadJob(job);
+  if (job->state_value == IPP_JOB_PROCESSING)
+    cupsdStopJob(job, 0);
+  else
+    cupsdLoadJob(job);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, oldp, job,
                 "Job #%d moved from %s to %s.", job->id, olddest,
