@@ -3,6 +3,7 @@ CHANGES.txt - 2007-07-25
 
 CHANGES IN CUPS V1.3rc1
 
+	- The cups-lpd mini-daemon did not work on Mac OS X server.
 	- Added httpGetAuthString() and httpSetAuthString() APIs to get
 	  and set the current (cached) authorization string to use for
 	  HTTP requests.
