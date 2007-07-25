@@ -1724,10 +1724,9 @@ httpSetAuthString(http_t     *http,	/* I - HTTP connection */
     return;
 
   if (http->authstring && http->authstring != http->_authstring)
-  {
     free(http->authstring);
-    http->authstring = http->_authstring;
-  }
+
+  http->authstring = http->_authstring;
 
   if (scheme)
   {
