@@ -3,6 +3,9 @@ CHANGES.txt - 2007-07-26
 
 CHANGES IN CUPS V1.3rc1
 
+	- When lprm and cancel are run with no job ID, they now will
+	  cancel the first stopped job if no pending or processing
+	  jobs are left in the queue.
 	- The scheduler now logs successful print jobs, filter
 	  failures, and the job file types at the default log
 	  level (STR #2458)

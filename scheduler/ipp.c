@@ -3141,9 +3141,19 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	  jobid = job->id;
 	else
 	{
-	  send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
-	                  printer->name);
-	  return;
+	  for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+	       job;
+	       job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
+	    if (job->state_value == IPP_JOB_STOPPED &&
+		!strcasecmp(job->dest, printer->name))
+	      break;
+
+          if (!job)
+	  {
+	    send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
+			    printer->name);
+	    return;
+	  }
 	}
       }
     }
