@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.3\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-16 16:34-0400\n"
+"POT-Creation-Date: 2007-07-23 10:47-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -852,7 +852,7 @@ msgstr ""
 msgid "%s accepting requests since %s\n"
 msgstr ""
 
-#: scheduler/ipp.c:8987
+#: scheduler/ipp.c:8990
 #, c-format
 msgid "%s cannot be changed."
 msgstr ""
@@ -1120,6 +1120,11 @@ msgstr ""
 msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
 msgstr ""
 
+#: scheduler/cupsfilter.c:388
+#, c-format
+msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
+msgstr ""
+
 #: systemv/accept.c:223
 #, c-format
 msgid "%s: Operation failed: %s\n"
@@ -1149,14 +1154,34 @@ msgstr ""
 msgid "%s: Unable to contact server!\n"
 msgstr ""
 
+#: scheduler/cupsfilter.c:358
+#, c-format
+msgid "%s: Unable to determine MIME type of \"%s\"!\n"
+msgstr ""
+
+#: scheduler/cupsfilter.c:335
+#, c-format
+msgid "%s: Unable to read MIME database from \"%s\"!\n"
+msgstr ""
+
 #: berkeley/lpq.c:161 systemv/lpstat.c:543
 #, c-format
 msgid "%s: Unknown destination \"%s\"!\n"
 msgstr ""
 
-#: scheduler/cupsfilter.c:781
+#: scheduler/cupsfilter.c:367
+#, c-format
+msgid "%s: Unknown destination MIME type %s/%s!\n"
+msgstr ""
+
+#: scheduler/cupsfilter.c:949
 #, c-format
 msgid "%s: Unknown option '%c'!\n"
+msgstr ""
+
+#: scheduler/cupsfilter.c:350
+#, c-format
+msgid "%s: Unknown source MIME type %s/%s!\n"
 msgstr ""
 
 #: berkeley/lpr.c:178
@@ -1282,22 +1307,22 @@ msgstr ""
 msgid "Bad device-uri \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:8478 scheduler/ipp.c:9749
+#: scheduler/ipp.c:8481 scheduler/ipp.c:9752
 #, c-format
 msgid "Bad document-format \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:9003
+#: scheduler/ipp.c:9006
 msgid "Bad job-priority value!"
 msgstr ""
 
-#: scheduler/ipp.c:9028
+#: scheduler/ipp.c:9031
 msgid "Bad job-state value!"
 msgstr ""
 
 #: scheduler/ipp.c:2833 scheduler/ipp.c:3168 scheduler/ipp.c:5644
 #: scheduler/ipp.c:6813 scheduler/ipp.c:7039 scheduler/ipp.c:7803
-#: scheduler/ipp.c:8027 scheduler/ipp.c:8391 scheduler/ipp.c:8897
+#: scheduler/ipp.c:8027 scheduler/ipp.c:8394 scheduler/ipp.c:8900
 #, c-format
 msgid "Bad job-uri attribute \"%s\"!"
 msgstr ""
@@ -1375,7 +1400,7 @@ msgid ""
 "exit    help    quit    status  ?\n"
 msgstr ""
 
-#: scheduler/ipp.c:7321 scheduler/ipp.c:7337 scheduler/ipp.c:8494
+#: scheduler/ipp.c:7321 scheduler/ipp.c:7337 scheduler/ipp.c:8497
 #, c-format
 msgid "Could not scan type \"%s\"!"
 msgstr ""
@@ -1875,7 +1900,7 @@ msgstr ""
 
 #: scheduler/ipp.c:2811 scheduler/ipp.c:3100 scheduler/ipp.c:5621
 #: scheduler/ipp.c:6790 scheduler/ipp.c:7780 scheduler/ipp.c:8004
-#: scheduler/ipp.c:8368 scheduler/ipp.c:8874
+#: scheduler/ipp.c:8371 scheduler/ipp.c:8877
 msgid "Got a printer-uri attribute but no job-id!"
 msgstr ""
 
@@ -2087,7 +2112,7 @@ msgstr ""
 #: scheduler/ipp.c:2852 scheduler/ipp.c:3186 scheduler/ipp.c:5662
 #: scheduler/ipp.c:6667 scheduler/ipp.c:6831 scheduler/ipp.c:7012
 #: scheduler/ipp.c:7057 scheduler/ipp.c:7821 scheduler/ipp.c:8045
-#: scheduler/ipp.c:8409 scheduler/ipp.c:8915
+#: scheduler/ipp.c:8412 scheduler/ipp.c:8918
 #, c-format
 msgid "Job #%d does not exist!"
 msgstr ""
@@ -2107,7 +2132,7 @@ msgstr ""
 msgid "Job #%d is already completed - can't cancel."
 msgstr ""
 
-#: scheduler/ipp.c:7088 scheduler/ipp.c:8930
+#: scheduler/ipp.c:7088 scheduler/ipp.c:8933
 #, c-format
 msgid "Job #%d is finished and cannot be altered!"
 msgstr ""
@@ -2153,7 +2178,7 @@ msgstr ""
 msgid "Job Stopped"
 msgstr ""
 
-#: scheduler/ipp.c:9011
+#: scheduler/ipp.c:9014
 msgid "Job is completed and cannot be changed."
 msgstr ""
 
@@ -2161,7 +2186,7 @@ msgstr ""
 msgid "Job operation failed:"
 msgstr ""
 
-#: scheduler/ipp.c:9042 scheduler/ipp.c:9059 scheduler/ipp.c:9070
+#: scheduler/ipp.c:9045 scheduler/ipp.c:9062 scheduler/ipp.c:9073
 msgid "Job state cannot be changed."
 msgstr ""
 
@@ -2328,7 +2353,7 @@ msgstr ""
 msgid "No destinations added."
 msgstr ""
 
-#: scheduler/ipp.c:7287 scheduler/ipp.c:8460
+#: scheduler/ipp.c:7287 scheduler/ipp.c:8463
 msgid "No file!?!"
 msgstr ""
 
@@ -2599,8 +2624,8 @@ msgstr ""
 #: scheduler/ipp.c:3117 scheduler/ipp.c:4808 scheduler/ipp.c:5107
 #: scheduler/ipp.c:5406 scheduler/ipp.c:5759 scheduler/ipp.c:6349
 #: scheduler/ipp.c:6657 scheduler/ipp.c:6949 scheduler/ipp.c:6993
-#: scheduler/ipp.c:7302 scheduler/ipp.c:7693 scheduler/ipp.c:8790
-#: scheduler/ipp.c:9454 scheduler/ipp.c:9521 scheduler/ipp.c:9779
+#: scheduler/ipp.c:7302 scheduler/ipp.c:7693 scheduler/ipp.c:8793
+#: scheduler/ipp.c:9457 scheduler/ipp.c:9524 scheduler/ipp.c:9782
 msgid "The printer or class was not found."
 msgstr ""
 
@@ -2820,37 +2845,37 @@ msgstr ""
 msgid "Unknown printer error (%s)!"
 msgstr ""
 
-#: scheduler/ipp.c:9327
+#: scheduler/ipp.c:9330
 #, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:9312
+#: scheduler/ipp.c:9315
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:7268 scheduler/ipp.c:8441
+#: scheduler/ipp.c:7268 scheduler/ipp.c:8444
 #, c-format
 msgid "Unsupported compression \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:9732
+#: scheduler/ipp.c:9735
 #, c-format
 msgid "Unsupported compression attribute %s!"
 msgstr ""
 
-#: scheduler/ipp.c:9760
+#: scheduler/ipp.c:9763
 #, c-format
 msgid "Unsupported format \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:1315 scheduler/ipp.c:8573
+#: scheduler/ipp.c:1315 scheduler/ipp.c:8576
 #, c-format
 msgid "Unsupported format '%s'!"
 msgstr ""
 
-#: scheduler/ipp.c:7399 scheduler/ipp.c:8556
+#: scheduler/ipp.c:7399 scheduler/ipp.c:8559
 #, c-format
 msgid "Unsupported format '%s/%s'!"
 msgstr ""
@@ -2880,6 +2905,25 @@ msgstr ""
 #: filter/gziptoany.c:53
 #, c-format
 msgid "Usage: %s job-id user title copies options file\n"
+msgstr ""
+
+#: scheduler/cupsfilter.c:964
+msgid ""
+"Usage: convert [ options ]\n"
+"\n"
+"Options:\n"
+"\n"
+"  -f filename          Set file to be converted (otherwise stdin)\n"
+"  -o filename          Set file to be generated (otherwise stdout)\n"
+"  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
+"  -j mime/type         Set output MIME type (otherwise application/pdf)\n"
+"  -P filename.ppd      Set PPD file\n"
+"  -a 'name=value ...'  Set option(s)\n"
+"  -U username          Set username for job\n"
+"  -J title             Set title\n"
+"  -c copies            Set number of copies\n"
+"  -u                   Remove the PPD file when finished\n"
+"  -D                   Remove the input file when finished\n"
 msgstr ""
 
 #: systemv/cupsaddsmb.c:276
@@ -2914,7 +2958,7 @@ msgid ""
 "    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
 msgstr ""
 
-#: scheduler/main.c:1768
+#: scheduler/main.c:1806
 msgid ""
 "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
 "\n"
@@ -2925,9 +2969,9 @@ msgid ""
 "-l                  Run cupsd from launchd(8)\n"
 msgstr ""
 
-#: scheduler/cupsfilter.c:785
+#: scheduler/cupsfilter.c:953
 msgid ""
-"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+"Usage: cupsfilter -m mime/type [ options ] filename\n"
 "\n"
 "Options:\n"
 "\n"
@@ -3089,6 +3133,10 @@ msgstr ""
 msgid "completed"
 msgstr ""
 
+#: scheduler/cupsfilter.c:300
+msgid "convert: Use the -f option to specify a file to convert.\n"
+msgstr ""
+
 #: scheduler/ipp.c:5579
 msgid "cups-deviced failed to execute."
 msgstr ""
@@ -3112,46 +3160,26 @@ msgstr ""
 msgid "cupsctl: Unknown option \"-%c\"!\n"
 msgstr ""
 
-#: scheduler/main.c:177
+#: scheduler/main.c:178
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
 msgstr ""
 
-#: scheduler/main.c:252
+#: scheduler/main.c:253
 #, c-format
 msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
 msgstr ""
 
-#: scheduler/main.c:245
+#: scheduler/main.c:246
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting!\n"
 msgstr ""
 
-#: scheduler/main.c:232
+#: scheduler/main.c:233
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr ""
 
-#: scheduler/cupsfilter.c:281
-#, c-format
-msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
-msgstr ""
-
-#: scheduler/cupsfilter.c:215
+#: scheduler/cupsfilter.c:308
 msgid "cupsfilter: Only one filename can be specified!\n"
-msgstr ""
-
-#: scheduler/cupsfilter.c:252
-#, c-format
-msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
-msgstr ""
-
-#: scheduler/cupsfilter.c:240
-#, c-format
-msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
-msgstr ""
-
-#: scheduler/cupsfilter.c:260
-#, c-format
-msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
 msgstr ""
 
 #: systemv/cupstestppd.c:201

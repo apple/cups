@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c 6660 2007-07-13 05:09:30Z mike $"
+ * "$Id: ppd.c 6719 2007-07-25 00:08:49Z mike $"
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
@@ -573,7 +573,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     return (NULL);
   }
 
-  ppd->language_level = 1;
+  ppd->language_level = 2;
   ppd->color_device   = 0;
   ppd->colorspace     = PPD_CS_GRAY;
   ppd->landscape      = -90;
@@ -2248,7 +2248,7 @@ static int				/* O - Result of comparison */
 ppd_compare_choices(ppd_choice_t *a,	/* I - First choice */
                     ppd_choice_t *b)	/* I - Second choice */
 {
-  return (a->option - b->option);
+  return (strcmp(a->option->keyword, b->option->keyword));
 }
 
 
@@ -3186,5 +3186,5 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c 6660 2007-07-13 05:09:30Z mike $".
+ * End of "$Id: ppd.c 6719 2007-07-25 00:08:49Z mike $".
  */

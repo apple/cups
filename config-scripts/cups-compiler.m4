@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 6687 2007-07-18 19:49:45Z mike $"
+dnl "$Id: cups-compiler.m4 6698 2007-07-20 14:15:44Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -72,14 +72,19 @@ AC_SUBST(PIEFLAGS)
 RELROFLAGS=""
 AC_SUBST(RELROFLAGS)
 
+LIBCUPSORDER="libcups.order"
 AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     libcups secorder file, default=libcups.order],
-	LIBCUPSORDER="$withval",
-	LIBCUPSORDER="libcups.order")
+	if test -f "$withval"; then
+		LIBCUPSORDER="$withval"
+	fi)
 AC_SUBST(LIBCUPSORDER)
 
-AC_ARG_WITH(libcupsimageorder, [  --with-libcupimagesorder     libcupsimage secorder file, default=libcups.order],
-	LIBCUPSIMAGEORDER="$withval",
-	LIBCUPSIMAGEORDER="libcupsimage.order")
+LIBCUPSIMAGEORDER="libcupsimage.order"
+AC_ARG_WITH(libcupsimageorder, [  --with-libcupsimagesorder
+                          libcupsimage secorder file, default=libcupsimage.order],
+	if test -f "$withval"; then
+		LIBCUPSIMAGEORDER="$withval"
+	fi)
 AC_SUBST(LIBCUPSIMAGEORDER)
 
 if test -n "$GCC"; then
@@ -459,5 +464,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4 6687 2007-07-18 19:49:45Z mike $".
+dnl End of "$Id: cups-compiler.m4 6698 2007-07-20 14:15:44Z mike $".
 dnl

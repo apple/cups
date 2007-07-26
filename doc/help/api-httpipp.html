@@ -936,6 +936,7 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#httpFlush'><tt>httpFlush()</tt></a> </li>
 	<li><a href='#httpFlushWrite'><tt>httpFlushWrite()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpGet'><tt>httpGet()</tt></a> </li>
+	<li><a href='#httpGetAuthString'><tt>httpGetAuthString()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
 	<li><a href='#httpGetBlocking'><tt>httpGetBlocking()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpGetCookie'><tt>httpGetCookie()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
 	<li><a href='#httpGetDateString'><tt>httpGetDateString()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
@@ -965,6 +966,7 @@ require CUPS 1.1 or higher.</p>
 	<li><a href='#httpSeparate'><tt>httpSeparate()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#httpSeparate2'><tt>httpSeparate2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
 	<li><a href='#httpSeparateURI'><tt>httpSeparateURI()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#httpSetAuthString'><tt>httpSetAuthString()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
 	<li><a href='#httpSetCookie'><tt>httpSetCookie()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
 	<li><a href='#httpSetExpect'><tt>httpSetExpect()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
 	<li><a href='#httpSetField'><tt>httpSetField()</tt></a> </li>
@@ -1741,6 +1743,30 @@ httpGet(
 <h4>Returns</h4>
 <p>Status of call (0 = success)</p>
 <!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='httpGetAuthString'>httpGetAuthString()</a></h3>
+<h4>Description</h4>
+<p>Get the current authorization string.
+<p>The authorization string is set by cupsDoAuthentication() and
+httpSetAuthString().  Use httpGetAuthString() to retrieve the
+string to use with httpSetField() for the HTTP_FIELD_AUTHORIZATION
+value.
+
+
+<h4>Syntax</h4>
+<p><tt>
+char *<br>
+httpGetAuthString(
+    <a href='#http_t'>http_t</a> * http);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Authorization string</p>
+<!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='httpGetBlocking'>httpGetBlocking()</a></h3>
 <h4>Description</h4>
 <p>Get the blocking/non-block state of a connection.
@@ -2419,6 +2445,34 @@ httpSeparateURI(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Result of separation</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='httpSetAuthString'>httpSetAuthString()</a></h3>
+<h4>Description</h4>
+<p>Set the current authorization string.
+<p>This function just stores a copy of the current authorization string in
+the HTTP connection object.  You must still call httpSetField() to set
+HTTP_FIELD_AUTHORIZATION prior to issuing a HTTP request using httpGet(),
+httpHead(), httpOptions(), httpPost, or httpPut().
+
+
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+httpSetAuthString(
+    <a href='#http_t'>http_t</a> * http,
+    const char * scheme,
+    const char * data);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>scheme</tt></td><td>Auth scheme (NULL to clear it)</td></tr>
+<tr><td><tt>data</tt></td><td>Auth data (NULL for none)</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
 <!-- NEW PAGE -->
 <h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='httpSetCookie'>httpSetCookie()</a></h3>
 <h4>Description</h4>

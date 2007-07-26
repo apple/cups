@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in 6690 2007-07-18 23:58:37Z mike $"
+# "$Id: cupsd.conf.in 6720 2007-07-25 00:40:03Z mike $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.  See "man cupsd.conf" for a complete description of this
@@ -56,15 +56,22 @@ DefaultAuthType Basic
   </Limit>
 
   # All administration operations require an administrator to authenticate...
-  <Limit Pause-Printer Resume-Printer Set-Printer-Attributes Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class CUPS-Delete-Class CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
+  <Limit CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class CUPS-Delete-Class CUPS-Set-Default>
     AuthType Default
     Require user @SYSTEM
     Order deny,allow
   </Limit>
 
+  # All printer operations require a printer operator to authenticate...
+  <Limit Pause-Printer Resume-Printer Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After CUPS-Accept-Jobs CUPS-Reject-Jobs>
+    AuthType Default
+    Require user @CUPS_DEFAULT_PRINTADMIN_AUTH@
+    Order deny,allow
+  </Limit>
+
   # Only the owner or an administrator can cancel or authenticate a job...
   <Limit Cancel-Job CUPS-Authenticate-Job>
-    Require user @OWNER @SYSTEM
+    Require user @OWNER @CUPS_DEFAULT_PRINTADMIN_AUTH@
     Order deny,allow
   </Limit>
 
@@ -74,5 +81,5 @@ DefaultAuthType Basic
 </Policy>
 
 #
-# End of "$Id: cupsd.conf.in 6690 2007-07-18 23:58:37Z mike $".
+# End of "$Id: cupsd.conf.in 6720 2007-07-25 00:40:03Z mike $".
 #

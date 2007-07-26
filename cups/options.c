@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: options.c 6703 2007-07-20 21:28:10Z mike $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -22,6 +22,7 @@
  *   cupsMarkOptions()   - Mark command-line options in a PPD file.
  *   cupsParseOptions()  - Parse options from a command-line argument.
  *   cupsRemoveOptions() - Remove an option from an option array.
+ *   debug_marked()      - Output the marked array to stdout...
  *   ppd_mark_choices()  - Mark one or more option choices from a string.
  */
 
@@ -40,6 +41,11 @@
  * Local functions...
  */
 
+#ifdef DEBUG
+static void	debug_marked(ppd_file_t *ppd, const char *title);
+#else
+#  define debug_marked(ppd,title)
+#endif /* DEBUG */
 static int	ppd_mark_choices(ppd_file_t *ppd, const char *options);
 
 
@@ -205,6 +211,8 @@ cupsMarkOptions(
   if (ppd == NULL || num_options <= 0 || options == NULL)
     return (0);
 
+  debug_marked(ppd, "Before...");
+
  /*
   * Mark options...
   */
@@ -256,7 +264,7 @@ cupsMarkOptions(
             conflict = 1;
 
         if (cupsGetOption("EFMediaType", num_options, options) == NULL)
-	  if (ppdMarkOption(ppd, "EFMediaType", s))
+	  if (ppdMarkOption(ppd, "EFMediaType", s))		/* EFI */
             conflict = 1;
 
         if (cupsGetOption("EFMediaQualityMode", num_options, options) == NULL)
@@ -429,11 +437,15 @@ cupsMarkOptions(
 	  conflict = 1;
       }
     }
-    else if (!strcasecmp(optptr->name, "mirror") &&
-             ppdMarkOption(ppd, "MirrorPrint", optptr->value))
-      conflict = 1;
+    else if (!strcasecmp(optptr->name, "mirror"))
+    {
+      if (ppdMarkOption(ppd, "MirrorPrint", optptr->value))
+	conflict = 1;
+    }
     else if (ppdMarkOption(ppd, optptr->name, optptr->value))
       conflict = 1;
+
+  debug_marked(ppd, "After...");
 
   return (conflict);
 }
@@ -695,6 +707,28 @@ cupsRemoveOption(
 }
 
 
+#ifdef DEBUG
+/*
+ * 'debug_marked()' - Output the marked array to stdout...
+ */
+
+static void
+debug_marked(ppd_file_t *ppd,		/* I - PPD file data */
+             const char *title)		/* I - Title for list */
+{
+  ppd_choice_t	*c;			/* Current choice */
+
+
+  printf("cupsMarkOptions: %s\n", title);
+
+  for (c = (ppd_choice_t *)cupsArrayFirst(ppd->marked);
+       c;
+       c = (ppd_choice_t *)cupsArrayNext(ppd->marked))
+    printf("cupsMarkOptions: %s=%s\n", c->option->keyword, c->choice);
+}
+#endif /* DEBUG */
+
+
 /*
  * 'ppd_mark_choices()' - Mark one or more option choices from a string.
  */
@@ -778,5 +812,5 @@ ppd_mark_choices(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: options.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: options.c 6703 2007-07-20 21:28:10Z mike $".
  */

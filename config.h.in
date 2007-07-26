@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 6689 2007-07-18 23:52:15Z mike $"
+ * "$Id: config.h.in 6720 2007-07-25 00:40:03Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -31,6 +31,7 @@
 #define CUPS_DEFAULT_USER	"lp"
 #define CUPS_DEFAULT_GROUP	"sys"
 #define CUPS_DEFAULT_SYSTEM_GROUPS	"sys root system"
+#define CUPS_DEFAULT_PRINTADMIN_AUTH	"@SYSTEM"
 
 
 /*
@@ -539,5 +540,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 6689 2007-07-18 23:52:15Z mike $".
+ * End of "$Id: config.h.in 6720 2007-07-25 00:40:03Z mike $".
  */

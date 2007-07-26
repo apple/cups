@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: globals.h 6712 2007-07-24 00:13:05Z mike $"
  *
  *   Global variable definitions for the Common UNIX Printing System (CUPS).
  *
@@ -127,6 +127,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 extern const char	*_cupsGetPassword(const char *prompt);
 extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsSetError(ipp_status_t status, const char *message);
+extern void		_cupsSetHTTPError(http_status_t status);
 
 
 /*
@@ -139,5 +140,5 @@ extern void		_cupsSetError(ipp_status_t status, const char *message);
 #endif /* !_CUPS_GLOBALS_H_ */
 
 /*
- * End of "$Id: globals.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: globals.h 6712 2007-07-24 00:13:05Z mike $".
  */

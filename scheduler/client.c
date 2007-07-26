@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 6681 2007-07-16 20:11:52Z mike $"
+ * "$Id: client.c 6737 2007-07-26 19:08:40Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1024,7 +1024,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         snprintf(locale, sizeof(locale), "%s.%s",
 	         con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], DefaultCharset);
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "cupsdReadClient: %d Browser asked for language \"%s\"...",
                       con->http.fd, locale);
 
@@ -2412,7 +2412,7 @@ cupsdSendHeader(
 #endif /* HAVE_GSSAPI */
 
 #ifdef HAVE_AUTHORIZATION_H
-    if (con->best && strcmp(auth_str, "Negotiate"))
+    if (con->best && auth_type != AUTH_NEGOTIATE)
     {
       int 	 i;			/* Looping var */
       char	*auth_key;		/* Auth key buffer */
@@ -2443,7 +2443,7 @@ cupsdSendHeader(
 
     if (auth_str[0])
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSendHeader: WWW-Authenticate: %s",
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSendHeader: WWW-Authenticate: %s",
                       auth_str);
 
       if (httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)
@@ -2467,6 +2467,9 @@ cupsdSendHeader(
     	           con->gss_output_token.value,
 		   con->gss_output_token.length);
     gss_release_buffer(&minor_status, &con->gss_output_token);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdSendHeader: WWW-Authenticate: Negotiate %s", buf);
 
     if (httpPrintf(HTTP(con), "WWW-Authenticate: Negotiate %s\r\n", buf) < 0)
       return (0);
@@ -4491,7 +4494,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     if (con->username[0])
       cupsdAddCert(pid, con->username);
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "CGI %s started - PID = %d", command, pid);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "[CGI] %s started - PID = %d",
+                    command, pid);
 
     *outfile = fds[0];
     close(fds[1]);
@@ -4514,7 +4518,7 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 {
   con->file = open(filename, O_RDONLY);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "write_file: %d file=%d", con->http.fd,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "write_file: %d file=%d", con->http.fd,
                   con->file);
 
   if (con->file < 0)
@@ -4572,5 +4576,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 6681 2007-07-16 20:11:52Z mike $".
+ * End of "$Id: client.c 6737 2007-07-26 19:08:40Z mike $".
  */

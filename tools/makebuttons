@@ -239,13 +239,17 @@ function generate_button()
         		-draw "polygon $pts2" $filename
 	fi
 
+	convert $filename -colors 32 $filename
+
 	rm -f $tmp_btn
 }
 
 # Make sure the locale-specific destination directory exists...
-if test ! -d doc/$locale/images; then
-	echo Creating doc/$locale/images...
-	mkdir -p doc/$locale/images
+if test "$locale" != en; then
+	if test ! -d doc/$locale/images; then
+		echo Creating doc/$locale/images...
+		mkdir -p doc/$locale/images
+	fi
 fi
 
 # Process each line in the file...
@@ -254,7 +258,11 @@ cat $list | while read line; do
 		continue
 	fi
 
-	generate_button doc/$locale/images/$line
+	if test "$locale" = en; then
+		generate_button doc/images/$line
+	else
+		generate_button doc/$locale/images/$line
+	fi
 done
 
 #

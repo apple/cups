@@ -14,6 +14,7 @@ button-delete-class.gif 	    black     Delete Class
 button-delete-printer.gif 	    black     Delete Printer
 button-edit-configuration-file.gif  standard  Edit Configuration File
 button-export-samba.gif 	    standard  Export Printers to Samba
+button-find-new-printers.gif        standard  Find New Printers
 button-help.gif 	            standard  Help
 button-hold-job.gif 	            red       Hold Job
 button-manage-classes.gif 	    standard  Manage Classes
@@ -22,7 +23,6 @@ button-manage-printers.gif 	    standard  Manage Printers
 button-manage-server.gif 	    standard  Manage Server
 button-modify-class.gif 	    standard  Modify Class
 button-modify-printer.gif 	    standard  Modify Printer
-button-list-available-printers.gif  standard  List Available Printers
 button-move-job.gif 	            standard  Move Job
 button-move-jobs.gif 	            standard  Move All Jobs
 button-print-self-test-page.gif     standard  Print Self-Test Page

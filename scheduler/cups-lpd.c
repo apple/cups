@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c 6670 2007-07-13 23:15:02Z mike $"
+ * "$Id: cups-lpd.c 6723 2007-07-25 17:29:58Z mike $"
  *
  *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
  *
@@ -644,13 +644,12 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 #ifdef HAVE_CFPRIV_H /* MacOS X */
   if (shared && *shared)
   {
-    CFURLRef		prefsurl;	/* */
-    CFDataRef		xmldata;	/* */
-    CFPropertyListRef	plist;		/* */
-    CFStringRef		queueid;	/* */
-    CFArrayRef		lprqarray;	/* */
-    CFBooleanRef	serverflag;	/* */
-    Boolean		prefsok;	/* */
+    CFURLRef		prefsurl;	/* URL for preferences file */
+    CFDataRef		xmldata;	/* XML data from preferences file */
+    CFPropertyListRef	plist;		/* Property list from XML data */
+    CFStringRef		queueid;	/* CFString of destination name */
+    CFArrayRef		lprqarray;	/* Array of shared "LPR" printers */
+    CFBooleanRef	serverflag;	/* State of the print service */
     static const char printerprefsfile[] =
         "/Library/Preferences/com.apple.printservice.plist";
 					/* Preferences file */
@@ -679,22 +678,24 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 		     false);
       if (prefsurl)
       {
-        prefsok = CFURLCreateDataAndPropertiesFromResource(
-	              kCFAllocatorDefault, prefsurl, &xmldata, 
-		      NULL, NULL, NULL);
-        if (prefsok)
+        if (CFURLCreateDataAndPropertiesFromResource(kCFAllocatorDefault,
+	                                             prefsurl, &xmldata, NULL,
+						     NULL, NULL))
 	{
 	  plist = CFPropertyListCreateFromXMLData(kCFAllocatorDefault, xmldata, 
-						  kCFPropertyListImmutable, NULL);
+						  kCFPropertyListImmutable,
+						  NULL);
 	  if (plist)
 	  {
 	    serverflag = (CFBooleanRef)CFDictionaryGetValue(
-	                     (CFDictionaryRef)plist, CFSTR("serviceState"));
+	                                   (CFDictionaryRef)plist,
+					   CFSTR("serviceState"));
 
             if (serverflag && CFBooleanGetValue(serverflag))
 	    {
 	      lprqarray = (CFArrayRef)CFDictionaryGetValue(
-	                      (CFDictionaryRef)plist, CFSTR("lprSharedQueues"));
+	                                  (CFDictionaryRef)plist,
+					  CFSTR("lprSharedQueues"));
 
 	      if (lprqarray)
 	      {
@@ -704,23 +705,20 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 
                 if (queueid)
 		{
-	          *shared = CFArrayContainsValue(
-		        	lprqarray,
-		        	CFRangeMake(0, CFArrayGetCount(lprqarray)),
-				queueid);
+	          *shared = CFArrayContainsValue(lprqarray,
+						 CFRangeMake(0,
+						     CFArrayGetCount(lprqarray)),
+						 queueid);
 
                   CFRelease(queueid);
 		}
-
-                CFRelease(lprqarray);
 	      }
 	    }
 
-            if (serverflag)
-	      CFRelease(serverflag);
-
 	    CFRelease(plist);
 	  }
+
+	  CFRelease(xmldata);
 	}
 
 	CFRelease(prefsurl);
@@ -731,7 +729,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 	                "on queue: %s", name);
     }
   }
-#endif	/* HAVE_CFPRIV_H */
+#endif /* HAVE_CFPRIV_H */
 
  /*
   * Next look for the printer in the lpoptions file...
@@ -1702,5 +1700,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c 6670 2007-07-13 23:15:02Z mike $".
+ * End of "$Id: cups-lpd.c 6723 2007-07-25 17:29:58Z mike $".
  */

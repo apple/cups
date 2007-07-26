@@ -66,7 +66,7 @@ main(int  argc,				/* I - Number of command-line args */
     {
       if (argv[i][1] == '-')
       {
-        if (!strcmp(argv[i], "--debug_logging"))
+        if (!strcmp(argv[i], "--debug-logging"))
 	  num_settings = cupsAddOption(CUPS_SERVER_DEBUG_LOGGING, "1",
 	                               num_settings, &settings);
         else if (!strcmp(argv[i], "--no-debug-logging"))

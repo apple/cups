@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertolabel.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: rastertolabel.c 6718 2007-07-25 00:02:41Z mike $"
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -1075,7 +1075,7 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
   * Set the length of the data and write it...
   */
 
-  printf("\033*b%dW", comp_ptr - CompBuffer);
+  printf("\033*b%dW", (int)(comp_ptr - CompBuffer));
   fwrite(CompBuffer, comp_ptr - CompBuffer, 1, stdout);
 
  /*
@@ -1299,5 +1299,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertolabel.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: rastertolabel.c 6718 2007-07-25 00:02:41Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: admin.c 6733 2007-07-26 18:09:46Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -165,7 +165,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_printer_op(http, CUPS_SET_DEFAULT, cgiText(_("Set As Default")));
     else if (!strcmp(op, "set-sharing"))
       do_set_sharing(http);
-    else if (!strcmp(op, "list-available-printers"))
+    else if (!strcmp(op, "find-new-printers") ||
+             !strcmp(op, "list-available-printers"))
       do_list_printers(http);
     else if (!strcmp(op, "add-class"))
       do_am_class(http, 0);
@@ -366,7 +367,12 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
 
   ippDelete(cupsDoRequest(http, request, "/"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+  else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(_("Add RSS Subscription"));
     cgiShowIPPError(_("Unable to add RSS subscription:"));
@@ -627,7 +633,12 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+  else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(title);
     cgiShowIPPError(modify ? _("Unable to modify class:") :
@@ -1179,7 +1190,12 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     else
       ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-    if (cupsLastError() > IPP_OK_CONFLICT)
+    if (cupsLastError() == IPP_NOT_AUTHORIZED)
+    {
+      puts("Status: 401\n");
+      exit(0);
+    }
+    else if (cupsLastError() > IPP_OK_CONFLICT)
     {
       cgiStartHTML(title);
       cgiShowIPPError(modify ? _("Unable to modify printer:") :
@@ -1271,7 +1287,12 @@ do_cancel_subscription(http_t *http)/* I - HTTP connection */
 
   ippDelete(cupsDoRequest(http, request, "/"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+  else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(_("Cancel RSS Subscription"));
     cgiShowIPPError(_("Unable to cancel RSS subscription:"));
@@ -1399,6 +1420,12 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
       if (!cupsAdminSetServerSettings(http, num_settings, settings))
       {
+        if (cupsLastError() == IPP_NOT_AUTHORIZED)
+	{
+	  puts("Status: 401\n");
+	  exit(0);
+	}
+
 	cgiStartHTML(cgiText(_("Change Settings")));
 	cgiSetVariable("MESSAGE",
                        cgiText(_("Unable to change server settings:")));
@@ -1501,7 +1528,13 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
     status = cupsPutFile(http, "/admin/conf/cupsd.conf", tempfile);
 
-    if (status != HTTP_CREATED)
+    if (status == HTTP_UNAUTHORIZED)
+    {
+      puts("Status: 401\n");
+      unlink(tempfile);
+      exit(0);
+    }
+    else if (status != HTTP_CREATED)
     {
       cgiSetVariable("MESSAGE",
                      cgiText(_("Unable to upload cupsd.conf file:")));
@@ -1526,7 +1559,10 @@ do_config_server(http_t *http)		/* I - HTTP connection */
   {
     struct stat	info;			/* cupsd.conf information */
     cups_file_t	*cupsd;			/* cupsd.conf file */
-    char	*buffer;		/* Buffer for entire file */
+    char	*buffer,		/* Buffer for entire file */
+		*bufptr,		/* Pointer into buffer */
+		*bufend;		/* End of buffer */
+    int		ch;			/* Character from file */
     char	filename[1024];		/* Filename */
     const char	*server_root;		/* Location of config files */
 
@@ -1607,12 +1643,53 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     free(buffer);
 
    /*
+    * Then get the default cupsd.conf file and put that into a string as
+    * well...
+    */
+
+    strlcat(filename, ".default", sizeof(filename));
+
+    if (!stat(filename, &info) && info.st_size < (1024 * 1024) &&
+        (cupsd = cupsFileOpen(filename, "r")) != NULL)
+    {
+      buffer = calloc(1, 2 * info.st_size + 1);
+      bufend = buffer + 2 * info.st_size - 1;
+
+      for (bufptr = buffer;
+           bufptr < bufend && (ch = cupsFileGetChar(cupsd)) != EOF;)
+      {
+        if (ch == '\\' || ch == '\"')
+	{
+	  *bufptr++ = '\\';
+	  *bufptr++ = ch;
+	}
+	else if (ch == '\n')
+	{
+	  *bufptr++ = '\\';
+	  *bufptr++ = 'n';
+	}
+	else if (ch == '\t')
+	{
+	  *bufptr++ = '\\';
+	  *bufptr++ = 't';
+	}
+	else if (ch >= ' ')
+	  *bufptr++ = ch;
+      }
+
+      *bufptr = '\0';
+
+      cupsFileClose(cupsd);
+
+      cgiSetVariable("CUPSDCONF_DEFAULT", buffer);
+      free(buffer);
+    }
+
+   /*
     * Show the current config file...
     */
 
     cgiStartHTML(cgiText(_("Edit Configuration File")));
-
-    printf("<!-- \"%s\" -->\n", filename);
 
     cgiCopyTemplateLang("edit-config.tmpl");
 
@@ -1681,7 +1758,12 @@ do_delete_class(http_t *http)		/* I - HTTP connection */
   * Show the results...
   */
 
-  if (cupsLastError() <= IPP_OK_CONFLICT)
+  if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+  else if (cupsLastError() <= IPP_OK_CONFLICT)
   {
    /*
     * Redirect successful updates back to the classes page...
@@ -1761,7 +1843,12 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
   * Show the results...
   */
 
-  if (cupsLastError() <= IPP_OK_CONFLICT)
+  if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+  else if (cupsLastError() <= IPP_OK_CONFLICT)
   {
    /*
     * Redirect successful updates back to the printers page...
@@ -2325,7 +2412,12 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+  else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(title);
     cgiShowIPPError(_("Unable to change printer:"));
@@ -2446,7 +2538,12 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
 
     cgiStartHTML(cgiText(_("Set Allowed Users")));
 
-    if (cupsLastError() > IPP_OK_CONFLICT)
+    if (cupsLastError() == IPP_NOT_AUTHORIZED)
+    {
+      puts("Status: 401\n");
+      exit(0);
+    }
+    else if (cupsLastError() > IPP_OK_CONFLICT)
       cgiShowIPPError(_("Unable to get printer attributes:"));
     else
       cgiCopyTemplateLang("users.tmpl");
@@ -2583,7 +2680,12 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
 
     ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-    if (cupsLastError() > IPP_OK_CONFLICT)
+    if (cupsLastError() == IPP_NOT_AUTHORIZED)
+    {
+      puts("Status: 401\n");
+      exit(0);
+    }
+    else if (cupsLastError() > IPP_OK_CONFLICT)
     {
       cgiStartHTML(cgiText(_("Set Allowed Users")));
       cgiShowIPPError(_("Unable to change printer:"));
@@ -3127,7 +3229,12 @@ do_set_options(http_t *http,		/* I - HTTP connection */
     else
       ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-    if (cupsLastError() > IPP_OK_CONFLICT)
+    if (cupsLastError() == IPP_NOT_AUTHORIZED)
+    {
+      puts("Status: 401\n");
+      exit(0);
+    }
+    else if (cupsLastError() > IPP_OK_CONFLICT)
     {
       cgiStartHTML(title);
       cgiShowIPPError(_("Unable to set options:"));
@@ -3221,7 +3328,12 @@ do_set_sharing(http_t *http)		/* I - HTTP connection */
     ippDelete(response);
   }
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+  else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(cgiText(_("Set Publishing")));
     cgiShowIPPError(_("Unable to change printer-is-shared attribute:"));
@@ -3300,5 +3412,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: admin.c 6733 2007-07-26 18:09:46Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: http.h 6722 2007-07-25 17:19:09Z mike $"
  *
  *   Hyper-Text Transport Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -442,6 +442,10 @@ extern void		httpSetLength(http_t *http, size_t length);
 extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 			           size_t length);
 
+/**** New in CUPS 1.3 ****/
+extern char		*httpGetAuthString(http_t *http);
+extern void		httpSetAuthString(http_t *http, const char *scheme,
+			                  const char *data);
 
 /*
  * C++ magic...
@@ -453,5 +457,5 @@ extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: http.h 6722 2007-07-25 17:19:09Z mike $".
  */

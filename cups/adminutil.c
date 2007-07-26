@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: adminutil.c 6729 2007-07-26 00:30:52Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -583,6 +583,10 @@ cupsAdminExportSamba(
     }
   }
 
+ /*
+  * See if we have the Win9x PS driver...
+  */
+
   snprintf(file, sizeof(file), "%s/drivers/ADOBEPS4.DRV", cg->cups_datadir);
   if (!access(file, 0))
   {
@@ -640,6 +644,136 @@ cupsAdminExportSamba(
       snprintf(message, sizeof(message),
                _cupsLangString(language,
                 	       _("Unable to install Windows 9x printer "
+		        	 "driver files (%d)!")), status);
+
+      _cupsSetError(IPP_INTERNAL_ERROR, message);
+
+      if (logfile)
+	_cupsLangPrintf(logfile, "%s\n", message);
+
+      unlink(authfile);
+
+      return (0);
+    }
+  }
+
+ /*
+  * See if we have the 64-bit Windows PS driver...
+  *
+  * Files:
+  *
+  *     x64/ps5ui.dll
+  *     x64/pscript.hlp
+  *     x64/pscript.ntf
+  *     x64/pscript5.dll
+  */
+
+  snprintf(file, sizeof(file), "%s/drivers/x64/pscript5.dll", cg->cups_datadir);
+  if (!access(file, 0))
+  {
+    have_drivers |= 4;
+
+   /*
+    * 64-bit Windows driver is installed; do the smbclient commands needed
+    * to copy the Win64 drivers over...
+    */
+
+    snprintf(address, sizeof(address), "//%s/print$", samba_server);
+
+    snprintf(subcmd, sizeof(subcmd),
+             "mkdir x64;"
+	     "put %s x64/%s.ppd;"
+	     "put %s/drivers/x64/ps5ui.dll x64/ps5ui.dll;"
+	     "put %s/drivers/x64/pscript.hlp x64/pscript.hlp;"
+	     "put %s/drivers/x64/pscript.ntf x64/pscript.ntf;"
+	     "put %s/drivers/x64/pscript5.dll x64/pscript5.dll",
+	     ppd, dest, cg->cups_datadir, cg->cups_datadir,
+	     cg->cups_datadir, cg->cups_datadir);
+
+    if ((status = do_samba_command("smbclient", address, subcmd,
+                                   authfile, logfile)) != 0)
+    {
+      snprintf(message, sizeof(message),
+               _cupsLangString(language,
+	                       _("Unable to copy 64-bit Windows printer "
+	                         "driver files (%d)!")), status);
+
+      _cupsSetError(IPP_INTERNAL_ERROR, message);
+
+      if (logfile)
+	_cupsLangPrintf(logfile, "%s\n", message);
+
+      unlink(authfile);
+
+      return (0);
+    }
+
+   /*
+    * See if we also have the CUPS driver files; if so, use them!
+    */
+
+    snprintf(file, sizeof(file), "%s/drivers/x64/cupsps6.dll", cg->cups_datadir);
+    if (!access(file, 0))
+    {
+     /*
+      * Copy the CUPS driver files over...
+      */
+
+      snprintf(subcmd, sizeof(subcmd),
+               "put %s/drivers/x64/cups6.ini x64/cups6.ini;"
+               "put %s/drivers/x64/cupsps6.dll x64/cupsps6.dll;"
+	       "put %s/drivers/x64/cupsui6.dll x64/cupsui6.dll",
+	       cg->cups_datadir, cg->cups_datadir, cg->cups_datadir);
+
+      if ((status = do_samba_command("smbclient", address, subcmd,
+                                     authfile, logfile)) != 0)
+      {
+	snprintf(message, sizeof(message),
+        	 _cupsLangString(language,
+	                         _("Unable to copy 64-bit CUPS printer driver "
+				   "files (%d)!")), status);
+
+	_cupsSetError(IPP_INTERNAL_ERROR, message);
+
+	if (logfile)
+	  _cupsLangPrintf(logfile, "%s\n", message);
+
+        unlink(authfile);
+
+	return (0);
+      }
+      
+     /*
+      * Do the rpcclient command needed for the CUPS drivers...
+      */
+
+      snprintf(subcmd, sizeof(subcmd),
+               "adddriver \"Windows x64\" \"%s:"
+	       "pscript5.dll:%s.ppd:ps5ui.dll:pscript.hlp:NULL:RAW:"
+	       "pscript5.dll,%s.ppd,ps5ui.dll,pscript.hlp,pscript.ntf,"
+	       "cups6.ini,cupsps6.dll,cupsui6.dll\"",
+	       dest, dest, dest);
+    }
+    else
+    {
+     /*
+      * Don't have the CUPS drivers, so just use the standard Windows
+      * drivers...
+      */
+
+      snprintf(subcmd, sizeof(subcmd),
+               "adddriver \"Windows x64\" \"%s:"
+	       "pscript5.dll:%s.ppd:ps5ui.dll:pscript.hlp:NULL:RAW:"
+	       "pscript5.dll,%s.ppd,ps5ui.dll,pscript.hlp,pscript.ntf\"",
+	       dest, dest, dest);
+    }
+
+    if ((status = do_samba_command("rpcclient", samba_server, subcmd,
+                                   authfile, logfile)) != 0)
+    {
+      snprintf(message, sizeof(message),
+               _cupsLangString(language,
+                	       _("Unable to install Windows 2000 printer "
 		        	 "driver files (%d)!")), status);
 
       _cupsSetError(IPP_INTERNAL_ERROR, message);
@@ -1403,8 +1537,8 @@ _cupsAdminSetServerSettings(
 	                     "cancel a job...\n"
 	                     "  <Limit Cancel-Job>\n"
 	                     "    Order deny,allow\n"
-	                     "    Allow @SYSTEM\n"
-			     "    Allow @OWNER\n"
+			     "    Require user @OWNER "
+			     CUPS_DEFAULT_PRINTADMIN_AUTH "\n"
 			     "  </Limit>\n");
       }
 
@@ -1556,7 +1690,8 @@ _cupsAdminSetServerSettings(
 	                   "a job...\n"
 	                   "  <Limit Cancel-Job>\n"
 	                   "    Order deny,allow\n"
-	                   "    Require user @OWNER @SYSTEM\n"
+	                   "    Require user @OWNER "
+			   CUPS_DEFAULT_PRINTADMIN_AUTH "\n"
 			   "  </Limit>\n");
 
       in_cancel_job = 0;
@@ -1754,7 +1889,7 @@ _cupsAdminSetServerSettings(
   {
     cupsFilePuts(temp, "<Policy default>\n"
                        "  # Job-related operations must be done by the owner "
-		       "or an adminstrator...\n"
+		       "or an administrator...\n"
                        "  <Limit Send-Document Send-URI Hold-Job Release-Job "
 		       "Restart-Job Purge-Jobs Set-Job-Attributes "
 		       "Create-Job-Subscription Renew-Subscription "
@@ -1765,7 +1900,7 @@ _cupsAdminSetServerSettings(
                        "    Order deny,allow\n"
                        "  </Limit>\n"
                        "  # All administration operations require an "
-		       "adminstrator to authenticate...\n"
+		       "administrator to authenticate...\n"
 		       "  <Limit Pause-Printer Resume-Printer "
                        "Set-Printer-Attributes Enable-Printer "
 		       "Disable-Printer Pause-Printer-After-Current-Job "
@@ -1785,8 +1920,9 @@ _cupsAdminSetServerSettings(
       cupsFilePuts(temp, "  # Only the owner or an administrator can cancel "
                          "a job...\n"
 	                 "  <Limit Cancel-Job>\n"
-	                 "    Require user @OWNER @SYSTEM\n"
 	                 "    Order deny,allow\n"
+	                 "    Require user @OWNER "
+			 CUPS_DEFAULT_PRINTADMIN_AUTH "\n"
 			 "  </Limit>\n");
 
     cupsFilePuts(temp, "  <Limit All>\n"
@@ -2210,5 +2346,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: adminutil.c 6729 2007-07-26 00:30:52Z mike $".
  */

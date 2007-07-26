@@ -54,7 +54,7 @@ trying to use the new policy.</P>
 
  1    &lt;Policy default>
  2      # Job-related operations must be done by the owner or an
-      adminstrator...
+      administrator...
  3      &lt;Limit Send-Document Send-URI Hold-Job Release-Job
       Restart-Job Purge-Jobs Set-Job-Attributes
       Create-Job-Subscription Renew-Subscription
@@ -65,32 +65,40 @@ trying to use the new policy.</P>
  5        Order deny,allow
  6      &lt;/Limit>
  7    
- 8      # All administration operations require an adminstrator
+ 8      # All administration operations require an administrator
       to authenticate...
- 9      &lt;Limit Pause-Printer Resume-Printer
-      Set-Printer-Attributes Enable-Printer Disable-Printer
-      Pause-Printer-After-Current-Job Hold-New-Jobs
-      Release-Held-New-Jobs Deactivate-Printer Activate-Printer
-      Restart-Printer Shutdown-Printer Startup-Printer
-      Promote-Job Schedule-Job-After CUPS-Add-Printer
-      CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class
-      CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
-10        AuthType Basic
+ 9      &lt;Limit CUPS-Add-Printer CUPS-Delete-Printer CUPS-Add-Class
+      CUPS-Delete-Class CUPS-Set-Default>
+10        AuthType Default
 11        Require user @SYSTEM
 12        Order deny,allow
 13      &lt;/Limit>
 14    
-15      # Only the owner or an administrator can cancel or
+15      # All printer operations require a printer operator
+      to authenticate...
+16      &lt;Limit Pause-Printer Resume-Printer
+      Set-Printer-Attributes Enable-Printer Disable-Printer
+      Pause-Printer-After-Current-Job Hold-New-Jobs
+      Release-Held-New-Jobs Deactivate-Printer Activate-Printer
+      Restart-Printer Shutdown-Printer Startup-Printer
+      Promote-Job Schedule-Job-After CUPS-Accept-Jobs
+      CUPS-Reject-Jobs>
+17        AuthType Default
+18        Require user <em>varies by OS</em>
+19        Order deny,allow
+20      &lt;/Limit>
+21    
+22      # Only the owner or an administrator can cancel or
       authenticate a job...
-16      &lt;Limit Cancel-Job CUPS-Authenticate-Job>
-17        Require user @OWNER @SYSTEM
-18        Order deny,allow
-19      &lt;/Limit>
-20    
-21      &lt;Limit All>
-22        Order deny,allow
-23      &lt;/Limit>
-24    &lt;/Policy>
+23      &lt;Limit Cancel-Job CUPS-Authenticate-Job>
+24        Require user @OWNER @SYSTEM
+25        Order deny,allow
+26      &lt;/Limit>
+27    
+28      &lt;Limit All>
+29        Order deny,allow
+30      &lt;/Limit>
+31    &lt;/Policy>
 </PRE>
 
 <H3>The Default CUPS Operation Policy</H3>
@@ -139,18 +147,26 @@ however, <em>do</em> use the <TT>AuthType</TT> directive, and so
 administrative operations need to be authenticated:</P>
 
 <PRE CLASS="command">
- 9      &lt;Limit Pause-Printer Resume-Printer
+ 9      &lt;Limit CUPS-Add-Printer CUPS-Delete-Printer CUPS-Add-Class
+      CUPS-Delete-Class CUPS-Set-Default>
+10        AuthType Default
+11        Require user @SYSTEM
+12        Order deny,allow
+13      &lt;/Limit>
+14    
+15      # All printer operations require a printer operator
+      to authenticate...
+16      &lt;Limit Pause-Printer Resume-Printer
       Set-Printer-Attributes Enable-Printer Disable-Printer
       Pause-Printer-After-Current-Job Hold-New-Jobs
       Release-Held-New-Jobs Deactivate-Printer Activate-Printer
       Restart-Printer Shutdown-Printer Startup-Printer
-      Promote-Job Schedule-Job-After CUPS-Add-Printer
-      CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class
-      CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>
-10        AuthType Basic
-11        Require user @SYSTEM
-12        Order deny,allow
-13      &lt;/Limit>
+      Promote-Job Schedule-Job-After CUPS-Accept-Jobs
+      CUPS-Reject-Jobs>
+17        AuthType Default
+18        Require user <em>varies by OS</em>
+19        Order deny,allow
+20      &lt;/Limit>
 </PRE>
 
 <P>The "Order deny,allow" line at the end of both <TT>Limit</TT>
@@ -602,7 +618,7 @@ management operations.</P>
 
  1    &lt;Policy lab999>
  2      # Job- and subscription-related operations must be done
-      by the owner, a lab technician, or an adminstrator...
+      by the owner, a lab technician, or an administrator...
  3      &lt;Limit Send-Document Send-URI Hold-Job Release-Job
       Restart-Job Purge-Jobs Set-Job-Attributes
       Create-Job-Subscription Renew-Subscription
@@ -615,7 +631,7 @@ management operations.</P>
  7      &lt;/Limit>
  8    
  9      # All administration operations require a lab technician
-      or an adminstrator to authenticate...
+      or an administrator to authenticate...
 10      &lt;Limit Pause-Printer Resume-Printer
       Set-Printer-Attributes Enable-Printer Disable-Printer
       Pause-Printer-After-Current-Job Hold-New-Jobs
@@ -623,7 +639,7 @@ management operations.</P>
       Restart-Printer Shutdown-Printer Startup-Printer
       Promote-Job Schedule-Job-After CUPS-Accept-Jobs
       CUPS-Reject-Jobs CUPS-Set-Default>
-11        AuthType Basic
+11        AuthType Default
 12        Require user @lab999 @SYSTEM
 13        Order allow,deny
 14        Allow from 10.0.2.0/24

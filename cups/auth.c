@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6673 2007-07-14 00:16:39Z mike $"
+ * "$Id: auth.c 6722 2007-07-25 17:19:09Z mike $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -65,6 +65,8 @@ extern const char *cssmErrorString(int error);
 #  ifdef DEBUG
 static void	DEBUG_gss_printf(OM_uint32 major_status, OM_uint32 minor_status,
 				 const char *message);
+#  else
+#    define DEBUG_gss_printf(major, minor, message)
 #  endif /* DEBUG  */
 static gss_name_t cups_get_gss_creds(http_t *http, const char *service_name);
 #endif /* HAVE_GSSAPI */
@@ -106,12 +108,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   * Clear the current authentication string...
   */
 
-  http->_authstring[0] = '\0';
-
-  if (http->authstring && http->authstring != http->_authstring)
-    free(http->authstring);
-
-  http->authstring = http->_authstring;
+  httpSetAuthString(http, NULL, NULL);
 
  /*
   * See if we can do local authentication...
@@ -176,13 +173,6 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 
   if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
   {
-    if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
-    {
-      DEBUG_printf(("cupsDoAuthentication: too many Negotiate tries (%d)\n",
-                    http->digest_tries));
-  
-      return (-1);
-    }
 #ifdef HAVE_GSSAPI
    /*
     * Kerberos authentication...
@@ -196,8 +186,10 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 					/* Input token */
     char		*gss_service_name;
 					/* GSS service name */
+#  ifdef USE_SPNEGO
     const char		*authorization;
 					/* Pointer into Authorization string */
+#  endif /* USE_SPNEGO */
 
 
 #  ifdef __APPLE__
@@ -214,6 +206,14 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     }
 #  endif /* __APPLE__ */
 
+    if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
+    {
+      DEBUG_printf(("cupsDoAuthentication: too many Negotiate tries (%d)\n",
+                    http->digest_tries));
+  
+      return (-1);
+    }
+
     if (http->gssname == GSS_C_NO_NAME)
     {
       if ((gss_service_name = getenv("CUPS_GSSSERVICENAME")) == NULL)
@@ -224,6 +224,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
       http->gssname = cups_get_gss_creds(http, gss_service_name);
     }
 
+#  ifdef USE_SPNEGO /* We don't implement SPNEGO just yet... */
    /*
     * Find the start of the Kerberos input token...
     */
@@ -237,10 +238,36 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     if (*authorization)
     {
      /*
-      * For SPNEGO, this is where we'll feed the server's authorization data
-      * back into gss via input_token...
+      * Decode the authorization string to get the input token...
       */
+
+      int len = strlen(authorization);
+
+      input_token.value  = malloc(len);
+      input_token.value  = httpDecode64_2(input_token.value, &len,
+					  authorization);
+      input_token.length = len;
+
+#    ifdef DEBUG
+      {
+        char *ptr = (char *)input_token.value;
+	int left = len;
+
+        fputs("input_token=", stdout);
+	while (left > 0)
+	{
+	  if (*ptr < ' ')
+	    printf("\\%03o", *ptr & 255);
+	  else
+	    putchar(*ptr);
+	  ptr ++;
+	  left --;
+	}
+	putchar('\n');
+      }
+#    endif /* DEBUG */
     }
+#  endif /* USE_SPNEGO */
 
     if (http->gssctx != GSS_C_NO_CONTEXT)
     {
@@ -252,7 +279,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
 					 &http->gssctx,
 					 http->gssname, http->gssmech,
-					 GSS_C_DELEG_FLAG | GSS_C_MUTUAL_FLAG,
+					 GSS_C_DELEG_FLAG | GSS_C_MUTUAL_FLAG |
+					     GSS_C_INTEG_FLAG,
 					 GSS_C_INDEFINITE,
 					 GSS_C_NO_CHANNEL_BINDINGS,
 					 &input_token, &http->gssmech,
@@ -270,27 +298,17 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
       return (-1);
     }
 
-#  ifdef DEBUG
     if (major_status == GSS_S_CONTINUE_NEEDED)
       DEBUG_gss_printf(major_status, minor_status, "Continuation needed!");
-#  endif /* DEBUG */
 
     if (output_token.length)
     {
       httpEncode64_2(encode, sizeof(encode), output_token.value,
 		     output_token.length);
-
-      http->authstring = malloc(strlen(encode) + 11);
-      sprintf(http->authstring, "Negotiate %s", encode); /* Safe because allocated */
+      httpSetAuthString(http, "Negotiate", encode);
  
       major_status = gss_release_buffer(&minor_status, &output_token);
     }
-
-   /*
-    * Copy back what we can to _authstring for backwards compatibility...
-    */
-
-    strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
 #endif /* HAVE_GSSAPI */
   }
   else if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6))
@@ -301,7 +319,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
 
     httpEncode64_2(encode, sizeof(encode), http->userpass,
                    (int)strlen(http->userpass));
-    snprintf(http->_authstring, sizeof(http->_authstring), "Basic %s", encode);
+    httpSetAuthString(http, "Basic", encode);
   }
   else
   {
@@ -309,15 +327,18 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     * Digest authentication...
     */
 
+    char digest[1024];			/* Digest auth data */
+
+
     httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
     httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
 
     httpMD5(cupsUser(), realm, strchr(http->userpass, ':') + 1, encode);
     httpMD5Final(nonce, method, resource, encode);
-    snprintf(http->_authstring, sizeof(http->_authstring),
-	     "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", "
-	     "uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce,
-	     resource, encode);
+    snprintf(digest, sizeof(digest),
+	     "username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", "
+	     "response=\"%s\"", cupsUser(), realm, nonce, resource, encode);
+    httpSetAuthString(http, "Digest", digest);
   }
 
   DEBUG_printf(("cupsDoAuthentication: authstring=\"%s\"\n", http->authstring));
@@ -523,11 +544,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
       httpEncode64_2(buffer, sizeof(buffer), (void *)&auth_extrn, 
 		     sizeof(auth_extrn));
 
-      http->authstring = malloc(strlen(buffer) + 9);
-      sprintf(http->authstring, "AuthRef %s", buffer);
-
-      /* Copy back to _authstring for backwards compatibility */
-      strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+      httpSetAuthString(http, "AuthRef", buffer);
 
       DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
 		    http->authstring));
@@ -563,7 +580,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * check if we need Kerberos authentication...
     */
 
-    if (!strcmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate"))
+    if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
     {
      /*
       * Yes, don't try the root certificate...
@@ -590,11 +607,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * Set the authorization string and return...
     */
 
-    http->authstring = malloc(strlen(certificate) + 7);
-    sprintf(http->authstring, "Local %s", certificate);
-
-    /* Copy back to _authstring for backwards compatibility */
-    strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+    httpSetAuthString(http, "Local", certificate);
 
     DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
 		  http->authstring));
@@ -623,11 +636,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
     if ((pwd = getpwnam(username)) != NULL && pwd->pw_uid == getuid())
     {
-      http->authstring = malloc(strlen(username) + 10);
-      sprintf(http->authstring, "PeerCred %s", username);
-
-      /* Copy back to _authstring for backwards compatibility */
-      strlcpy(http->_authstring, http->authstring, sizeof(http->_authstring));
+      httpSetAuthString(http, "PeerCred", username);
 
       DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
 		    http->authstring));
@@ -643,5 +652,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c 6673 2007-07-14 00:16:39Z mike $".
+ * End of "$Id: auth.c 6722 2007-07-25 17:19:09Z mike $".
  */

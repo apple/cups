@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: auth.c 6732 2007-07-26 16:50:20Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -458,6 +458,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     if (authinfo->count == 1)
       strlcpy(username, authinfo->items[0].value, sizeof(username));
 
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAuthorize: Authorized as %s using AuthRef",
+		    username);
+
     AuthorizationFreeItemSet(authinfo);
   }
 #endif /* HAVE_AUTHORIZATION_H */
@@ -510,6 +514,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     }
 
     strlcpy(username, authorization + 9, sizeof(username));
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAuthorize: Authorized as %s using PeerCred",
+		    username);
   }
 #endif /* SO_PEERCRED && AF_LOCAL */
   else if (!strncmp(authorization, "Local", 5) &&
@@ -524,7 +532,13 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       authorization ++;
 
     if ((localuser = cupsdFindCert(authorization)) != NULL)
+    {
       strlcpy(username, localuser, sizeof(username));
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "cupsdAuthorize: Authorized as %s using Local",
+		      username);
+    }
     else
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -786,6 +800,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	    }
 #endif /* HAVE_LIBPAM */
           }
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+			  "cupsdAuthorize: Authorized as %s using Basic",
+			  username);
           break;
 
       case AUTH_BASICDIGEST :
@@ -810,6 +828,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	                    username);
             return;
 	  }
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+			  "cupsdAuthorize: Authorized as %s using BasicDigest",
+			  username);
 	  break;
     }
   }
@@ -881,6 +903,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	              username);
       return;
     }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAuthorize: Authorized as %s using Digest",
+		    username);
   }
 #ifdef HAVE_GSSAPI
   else if (!strncmp(authorization, "Negotiate", 9) && type == AUTH_NEGOTIATE) 
@@ -984,7 +1010,14 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Get the username associated with the credentials...
     */
 
-    if (major_status == GSS_S_COMPLETE)
+    if (!con->gss_delegated_cred)
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "cupsdAuthorize: No delegated credentials!");
+
+    if (major_status == GSS_S_CONTINUE_NEEDED)
+      cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
+                         "cupsdAuthorize: Credentials not complete");
+    else if (major_status == GSS_S_COMPLETE)
     {
       major_status = gss_display_name(&minor_status, client_name, 
 				      &output_token, NULL);
@@ -1001,6 +1034,12 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       gss_release_name(&minor_status, &client_name);
       strlcpy(username, output_token.value, sizeof(username));
+      if ((ptr = strchr(username, '@')) != NULL)
+        *ptr = '\0';			/* Strip @KDC from the username */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "cupsdAuthorize: Authorized as %s using Negotiate",
+		      username);
 
       gss_release_buffer(&minor_status, &output_token);
       gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
@@ -1011,9 +1050,25 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       gss_release_name(&minor_status, &client_name);
   }
 #endif /* HAVE_GSSAPI */
-  else
+  else if (type != AUTH_NONE)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad authentication data.");
+    char	scheme[256];		/* Auth scheme... */
+    static const char * const types[] =	/* Auth types */
+    {
+      "None",
+      "Basic",
+      "Digest",
+      "BasicDigest",
+      "Negotiate"
+    };
+
+
+    if (sscanf(authorization, "%255s", scheme) != 1)
+      strcpy(scheme, "UNKNOWN");
+
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Bad authentication data \"%s ...\", expected \"%s ...\"",
+                    scheme, types[type]);
     return;
   }
 
@@ -1025,9 +1080,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
   strlcpy(con->username, username, sizeof(con->username));
   strlcpy(con->password, password, sizeof(con->password));
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAuthorize: username=\"%s\"",
-                  con->username);
 }
 
 
@@ -1886,7 +1938,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
       !(best->type == AUTH_NEGOTIATE || 
         (best->type == AUTH_NONE && DefaultAuthType == AUTH_NEGOTIATE)))
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "cupsdIsAuthorized: Need upgrade to TLS...");
     return (HTTP_UPGRADE_REQUIRED);
   }
@@ -1913,7 +1965,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
     if (attr)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
                       "cupsdIsAuthorized: requesting-user-name=\"%s\"",
                       attr->values[0].string.text);
       username = attr->values[0].string.text;
@@ -1925,7 +1977,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   }
   else
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: username=\"%s\"",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdIsAuthorized: username=\"%s\"",
 	            con->username);
 
 #ifdef HAVE_AUTHORIZATION_H
@@ -2057,7 +2109,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   * The user isn't part of the specified group, so deny access...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "cupsdIsAuthorized: User not in group(s)!");
 
   return (HTTP_UNAUTHORIZED);
@@ -2586,5 +2638,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: auth.c 6732 2007-07-26 16:50:20Z mike $".
  */

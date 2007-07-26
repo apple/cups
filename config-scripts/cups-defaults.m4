@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-defaults.m4 6656 2007-07-12 23:56:23Z mike $"
+dnl "$Id: cups-defaults.m4 6720 2007-07-25 00:40:03Z mike $"
 dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
@@ -159,7 +159,13 @@ dnl Determine the correct username and group for this OS...
 AC_ARG_WITH(cups_user, [  --with-cups-user        set default user for CUPS],
 	CUPS_USER="$withval",
 	AC_MSG_CHECKING(for default print user)
-	if test -f /etc/passwd; then
+	if test x$uname = xDarwin; then
+		if x`id -u _lp 2>/dev/null` = x; then
+			CUPS_USER="lp";
+		else
+			CUPS_USER="_lp";
+		fi
+	elif test -f /etc/passwd; then
 		CUPS_USER=""
 		for user in lp lpd guest daemon nobody; do
 			if test "`grep \^${user}: /etc/passwd`" != ""; then
@@ -181,8 +187,14 @@ AC_ARG_WITH(cups_user, [  --with-cups-user        set default user for CUPS],
 AC_ARG_WITH(cups_group, [  --with-cups-group       set default group for CUPS],
 	CUPS_GROUP="$withval",
 	AC_MSG_CHECKING(for default print group)
-	if test -f /etc/group; then
-		GROUP_LIST="lp nobody"
+	if test x$uname = xDarwin; then
+		if x`id -g _lp 2>/dev/null` = x; then
+			CUPS_GROUP="lp";
+		else
+			CUPS_GROUP="_lp";
+		fi
+	elif test -f /etc/group; then
+		GROUP_LIST="_lp lp nobody"
 		CUPS_GROUP=""
 		for group in $GROUP_LIST; do
 			if test "`grep \^${group}: /etc/group`" != ""; then
@@ -204,7 +216,7 @@ AC_ARG_WITH(cups_group, [  --with-cups-group       set default group for CUPS],
 AC_ARG_WITH(system_groups, [  --with-system-groups    set default system groups for CUPS],
 	CUPS_SYSTEM_GROUPS="$withval",
 	if test x$uname = xDarwin; then
-		CUPS_SYSTEM_GROUPS="lpadmin admin"
+		CUPS_SYSTEM_GROUPS="admin"
 	else
 		AC_MSG_CHECKING(for default system groups)
 		if test -f /etc/group; then
@@ -324,5 +336,5 @@ AC_SUBST(CUPS_SNMP_ADDRESS)
 AC_SUBST(CUPS_SNMP_COMMUNITY)
 
 dnl
-dnl End of "$Id: cups-defaults.m4 6656 2007-07-12 23:56:23Z mike $".
+dnl End of "$Id: cups-defaults.m4 6720 2007-07-25 00:40:03Z mike $".
 dnl

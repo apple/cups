@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6689 2007-07-18 23:52:15Z mike $"
+ * "$Id: job.c 6735 2007-07-26 18:38:29Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -220,7 +220,7 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   */
 
   snprintf(filename, sizeof(filename), "%s/a%05d", RequestRoot, job->id);
-  if (cupsdRemoveFile(filename))
+  if (cupsdRemoveFile(filename) && errno != ENOENT)
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to remove authentication cache: %s",
 		    strerror(errno));
@@ -713,6 +713,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     * Filter had errors; stop job...
     */
 
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "[Job %d] Job stopped due to filter errors.", job->id);
     cupsdStopJob(job, 1);
     cupsdSaveJob(job);
     cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
@@ -741,6 +743,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
       * Close out this job...
       */
 
+      cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Completed successfully.",
+		      job->id);
       cupsdCancelJob(job, 0, IPP_JOB_COMPLETED);
       cupsdCheckJobs();
     }
@@ -1255,7 +1259,10 @@ cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
   * Change the destination information...
   */
 
-  cupsdLoadJob(job);
+  if (job->state_value == IPP_JOB_PROCESSING)
+    cupsdStopJob(job, 0);
+  else
+    cupsdLoadJob(job);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, oldp, job,
                 "Job #%d moved from %s to %s.", job->id, olddest,
@@ -1791,10 +1798,10 @@ free_job(cupsd_job_t *job)		/* I - Job */
     * "KRB5CCNAME=FILE:/foo/bar"...
     */
 
-    if (cupsdRemoveFile(job->ccname + 16))
+    if (cupsdRemoveFile(job->ccname + 16) && errno != ENOENT)
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to remove Kerberos credential cache: %s",
-		      strerror(errno));
+                      "[Job %d] Unable to remove Kerberos credential cache: %s",
+		      job->id, strerror(errno));
 
     cupsdClearString(&job->ccname);
   }
@@ -3761,5 +3768,5 @@ update_job_attrs(cupsd_job_t *job)	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 6689 2007-07-18 23:52:15Z mike $".
+ * End of "$Id: job.c 6735 2007-07-26 18:38:29Z mike $".
  */

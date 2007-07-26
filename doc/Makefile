@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6649 2007-07-11 21:46:42Z mike $"
+# "$Id: Makefile 6733 2007-07-26 18:09:46Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -42,9 +42,9 @@ WEBBUTTONS	=	\
 			images/button-delete-printer.gif \
 			images/button-edit-configuration-file.gif \
 			images/button-export-samba.gif \
+			images/button-find-new-printers.gif \
 			images/button-help.gif \
 			images/button-hold-job.gif \
-			images/button-list-available-printers.gif \
 			images/button-manage-classes.gif \
 			images/button-manage-jobs.gif \
 			images/button-manage-printers.gif \
@@ -115,6 +115,7 @@ HELPFILES	=	\
 			help/api-raster.html \
 			help/cgi.html \
 			help/glossary.html \
+			help/kerberos.html \
 			help/license.html \
 			help/man-accept.html \
 			help/man-backend.html \

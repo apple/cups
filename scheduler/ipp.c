@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6689 2007-07-18 23:52:15Z mike $"
+ * "$Id: ipp.c 6739 2007-07-26 19:30:03Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -3141,9 +3141,21 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	  jobid = job->id;
 	else
 	{
-	  send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
-	                  printer->name);
-	  return;
+	  for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+	       job;
+	       job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
+	    if (job->state_value == IPP_JOB_STOPPED &&
+		!strcasecmp(job->dest, printer->name))
+	      break;
+
+          if (job)
+	    jobid = job->id;
+	  else
+	  {
+	    send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
+			    printer->name);
+	    return;
+	  }
 	}
       }
     }
@@ -7407,9 +7419,6 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     return;
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "print_job: request file type is %s/%s.",
-	          filetype->super, filetype->type);
-
  /*
   * Read any embedded job ticket info from PS files...
   */
@@ -7424,6 +7433,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if ((job = add_job(con, printer, filetype)) == NULL)
     return;
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Adding job file of type %s/%s.",
+                  job->id, filetype->super, filetype->type);
 
  /*
   * Update quota data...
@@ -9872,5 +9884,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6689 2007-07-18 23:52:15Z mike $".
+ * End of "$Id: ipp.c 6739 2007-07-26 19:30:03Z mike $".
  */

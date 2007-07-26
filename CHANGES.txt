@@ -1,8 +1,41 @@
-CHANGES.txt - 2007-07-19
+CHANGES.txt - 2007-07-26
 ------------------------
 
-CHANGES IN CUPS V1.3??
+CHANGES IN CUPS V1.3rc1
 
+	- When lprm and cancel are run with no job ID, they now will
+	  cancel the first stopped job if no pending or processing
+	  jobs are left in the queue.
+	- The scheduler now logs successful print jobs, filter
+	  failures, and the job file types at the default log
+	  level (STR #2458)
+	- The scheduler now logs the usernames it is using for
+	  authorization at LogLevel debug instead of debug2 (STR #2448)
+	- Added Intellitech Intellibar and Zebra CPCL PPDs to the list
+	  of installed PPDs.
+	- Added 6" and 8" wide label sizes for the Zebra ZPL Label
+	  Printer driver (STR #2442)
+	- The cupsaddsmb program and web interface now support
+	  exporting of 64-bit Windows drivers, when available
+	  (STR #2439)
+	- Moving a job that was printing did not stop the job on the
+	  original printer (STR #2262)
+	- The cups-lpd mini-daemon did not work on Mac OS X server.
+	- Added httpGetAuthString() and httpSetAuthString() APIs to get
+	  and set the current (cached) authorization string to use for
+	  HTTP requests.
+	- Updated the default cupsd.conf policy to list the
+	  "administrative" operations separately from the "printer
+	  control" operations so that it is easier to define a
+	  group of users that are "printer operators".
+	- The web interface now pulls the default cupsd.conf file
+	  from cupsd.conf.default in the CUPS config directory.
+	- Added a help file for using Kerberos with CUPS.
+	- The scheduler now strips the "@KDC" portion of Kerberos
+	  usernames since those usernames typically do not appear in
+	  the group membership lists used by CUPS.
+	- cupsMarkOptions() could (incorrectly) leave multiple option
+	  choices marked.
 	- Backends could (incorrectly) run as root during discovery
 	  (STR #2454)
 	- Avahi is now supported for DNS-SD (Bonjour) printer sharing

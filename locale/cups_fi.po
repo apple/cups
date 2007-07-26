@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.3\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-16 16:34-0400\n"
+"POT-Creation-Date: 2007-07-23 10:47-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -892,6 +892,10 @@ msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
 msgstr ""
 
 #, c-format
+msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
+msgstr ""
+
+#, c-format
 msgid "%s: Operation failed: %s\n"
 msgstr ""
 
@@ -912,11 +916,27 @@ msgid "%s: Unable to contact server!\n"
 msgstr ""
 
 #, c-format
+msgid "%s: Unable to determine MIME type of \"%s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to read MIME database from \"%s\"!\n"
+msgstr ""
+
+#, c-format
 msgid "%s: Unknown destination \"%s\"!\n"
 msgstr ""
 
 #, c-format
+msgid "%s: Unknown destination MIME type %s/%s!\n"
+msgstr ""
+
+#, c-format
 msgid "%s: Unknown option '%c'!\n"
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown source MIME type %s/%s!\n"
 msgstr ""
 
 #, c-format
@@ -2254,6 +2274,24 @@ msgid "Usage: %s job-id user title copies options file\n"
 msgstr ""
 
 msgid ""
+"Usage: convert [ options ]\n"
+"\n"
+"Options:\n"
+"\n"
+"  -f filename          Set file to be converted (otherwise stdin)\n"
+"  -o filename          Set file to be generated (otherwise stdout)\n"
+"  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
+"  -j mime/type         Set output MIME type (otherwise application/pdf)\n"
+"  -P filename.ppd      Set PPD file\n"
+"  -a 'name=value ...'  Set option(s)\n"
+"  -U username          Set username for job\n"
+"  -J title             Set title\n"
+"  -c copies            Set number of copies\n"
+"  -u                   Remove the PPD file when finished\n"
+"  -D                   Remove the input file when finished\n"
+msgstr ""
+
+msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
 "       cupsaddsmb [options] -a\n"
 "\n"
@@ -2294,7 +2332,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+"Usage: cupsfilter -m mime/type [ options ] filename\n"
 "\n"
 "Options:\n"
 "\n"
@@ -2441,6 +2479,9 @@ msgstr ""
 msgid "completed"
 msgstr ""
 
+msgid "convert: Use the -f option to specify a file to convert.\n"
+msgstr ""
+
 msgid "cups-deviced failed to execute."
 msgstr ""
 
@@ -2473,23 +2514,7 @@ msgstr ""
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr ""
 
-#, c-format
-msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
-msgstr ""
-
 msgid "cupsfilter: Only one filename can be specified!\n"
-msgstr ""
-
-#, c-format
-msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
-msgstr ""
-
-#, c-format
-msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
-msgstr ""
-
-#, c-format
-msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
 msgstr ""
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"

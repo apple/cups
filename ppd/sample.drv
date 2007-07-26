@@ -60,6 +60,20 @@
 #media "w288h432/4.00x6.00\"" 288 432
 #media "w288h468/4.00x6.50\"" 288 468
 #media "w288h936/4.00x13.00\"" 288 936
+#media "w432h72/6.00x1.00\"" 432 72
+#media "w432h144/6.00x2.00\"" 432 144
+#media "w432h216/6.00x3.00\"" 432 216
+#media "w432h288/6.00x4.00\"" 432 288
+#media "w432h360/6.00x5.00\"" 432 360
+#media "w432h432/6.00x6.00\"" 432 432
+#media "w432h468/6.00x6.50\"" 432 468
+#media "w576h72/8.00x1.00\"" 576 72
+#media "w576h144/8.00x2.00\"" 576 144
+#media "w576h216/8.00x3.00\"" 576 216
+#media "w576h288/8.00x4.00\"" 576 288
+#media "w576h360/8.00x5.00\"" 576 360
+#media "w576h432/8.00x6.00\"" 576 432
+#media "w576h468/8.00x6.50\"" 576 468
 
 // Common stuff for all drivers...
 Attribute "cupsVersion" "" "1.3"
@@ -852,7 +866,7 @@ Version "1.3"
     HWMargins 0 0 0 0
     VariablePaperSize Yes
     MinSize 36 36
-    MaxSize 288 3600
+    MaxSize 576 3600
 
     MediaSize w90h18
     MediaSize w90h162
@@ -894,6 +908,20 @@ Version "1.3"
     MediaSize w288h432
     MediaSize w288h468
     MediaSize w288h936
+    MediaSize w432h72
+    MediaSize w432h144
+    MediaSize w432h216
+    MediaSize w432h288
+    MediaSize w432h360
+    MediaSize w432h432
+    MediaSize w432h468
+    MediaSize w576h72
+    MediaSize w576h144
+    MediaSize w576h216
+    MediaSize w576h288
+    MediaSize w576h360
+    MediaSize w576h432
+    MediaSize w576h468
 
     *Resolution k 1 0 0 0 203dpi
     Resolution k 1 0 0 0 300dpi

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 6689 2007-07-18 23:52:15Z mike $"
+dnl "$Id: cups-common.m4 6720 2007-07-25 00:40:03Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -20,7 +20,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Versio number information...
-CUPS_VERSION="1.3b1"
+CUPS_VERSION="1.3rc1"
 CUPS_REVISION=""
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -186,6 +186,7 @@ dnl Extra platform-specific libraries...
 BACKLIBS=""
 CUPSDLIBS=""
 DBUSDIR=""
+CUPS_DEFAULT_PRINTADMIN_AUTH="@SYSTEM"
 CUPS_SYSTEM_AUTHKEY=""
 
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
@@ -232,7 +233,8 @@ case $uname in
 		dnl Check for Authorization Services support
 		AC_CHECK_HEADER(Security/Authorization.h, [
 			AC_DEFINE(HAVE_AUTHORIZATION_H)
-			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"])
+			CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
+			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"])
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
                 ;;
 
@@ -260,6 +262,8 @@ case $uname in
 		;;
 esac
 
+AC_SUBST(CUPS_DEFAULT_PRINTADMIN_AUTH)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTADMIN_AUTH, "$CUPS_DEFAULT_PRINTADMIN_AUTH")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 
 dnl See if we have POSIX ACL support...
@@ -282,5 +286,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 6689 2007-07-18 23:52:15Z mike $".
+dnl End of "$Id: cups-common.m4 6720 2007-07-25 00:40:03Z mike $".
 dnl
