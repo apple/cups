@@ -1938,7 +1938,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
       !(best->type == AUTH_NEGOTIATE || 
         (best->type == AUTH_NONE && DefaultAuthType == AUTH_NEGOTIATE)))
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "cupsdIsAuthorized: Need upgrade to TLS...");
     return (HTTP_UPGRADE_REQUIRED);
   }
@@ -1965,7 +1965,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
     if (attr)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
                       "cupsdIsAuthorized: requesting-user-name=\"%s\"",
                       attr->values[0].string.text);
       username = attr->values[0].string.text;
@@ -1977,7 +1977,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   }
   else
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: username=\"%s\"",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdIsAuthorized: username=\"%s\"",
 	            con->username);
 
 #ifdef HAVE_AUTHORIZATION_H
@@ -2109,7 +2109,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   * The user isn't part of the specified group, so deny access...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "cupsdIsAuthorized: User not in group(s)!");
 
   return (HTTP_UNAUTHORIZED);

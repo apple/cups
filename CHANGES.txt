@@ -1,8 +1,10 @@
-CHANGES.txt - 2007-07-25
+CHANGES.txt - 2007-07-26
 ------------------------
 
 CHANGES IN CUPS V1.3rc1
 
+	- The scheduler now logs the usernames it is using for
+	  authorization at LogLevel debug instead of debug2 (STR #2448)
 	- Added Intellitech Intellibar and Zebra CPCL PPDs to the list
 	  of installed PPDs.
 	- Added 6" and 8" wide label sizes for the Zebra ZPL Label
