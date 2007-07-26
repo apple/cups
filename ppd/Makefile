@@ -21,8 +21,8 @@ include ../Makedefs
 
 FILES	=	deskjet.ppd dymo.ppd epson9.ppd epson24.ppd \
 		laserjet.ppd okidata9.ppd okidat24.ppd stcolor.ppd \
-		stcolor2.ppd stphoto.ppd stphoto2.ppd zebra.ppd zebraep1.ppd \
-		zebraep2.ppd
+		stcolor2.ppd stphoto.ppd stphoto2.ppd zebra.ppd \
+		zebracpl.ppd zebraep1.ppd zebraep2.ppd
 
 
 #

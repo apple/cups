@@ -3,6 +3,9 @@ CHANGES.txt - 2007-07-25
 
 CHANGES IN CUPS V1.3rc1
 
+	- Added Zebra CPCL PPD to the list of installed PPDs.
+	- Added 6" and 8" wide label sizes for the Zebra ZPL Label
+	  Printer driver (STR #2442)
 	- The cupsaddsmb program and web interface now support
 	  exporting of 64-bit Windows drivers, when available
 	  (STR #2439)
