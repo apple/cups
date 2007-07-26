@@ -713,6 +713,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     * Filter had errors; stop job...
     */
 
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "[Job %d] Job stopped due to filter errors.", job->id);
     cupsdStopJob(job, 1);
     cupsdSaveJob(job);
     cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
@@ -741,6 +743,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
       * Close out this job...
       */
 
+      cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Completed successfully.",
+		      job->id);
       cupsdCancelJob(job, 0, IPP_JOB_COMPLETED);
       cupsdCheckJobs();
     }

@@ -7407,9 +7407,6 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     return;
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "print_job: request file type is %s/%s.",
-	          filetype->super, filetype->type);
-
  /*
   * Read any embedded job ticket info from PS files...
   */
@@ -7424,6 +7421,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if ((job = add_job(con, printer, filetype)) == NULL)
     return;
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Adding job file of type %s/%s.",
+                  job->id, filetype->super, filetype->type);
 
  /*
   * Update quota data...
