@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsaddsmb 8 "Common UNIX Printing System" "20 October 2006" "Apple Inc."
+.TH cupsaddsmb 8 "Common UNIX Printing System" "25 July 2007" "Apple Inc."
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 
@@ -92,7 +92,6 @@ share, as follows:
 	guest ok = yes
 	writable = no
 	printable = yes
-	printer admin = root
 
     [print$]
 	comment = Printer Drivers
@@ -111,7 +110,10 @@ accordingly on your system as needed.
 The base driver for Windows 2000 and higher is the Microsoft
 PostScript driver, which is available on any system running
 Windows 2000 or higher in the
-%WINDIR%\\SYSTEM32\\SPOOL\\DRIVERS\\W32X86\\3 folder.
+%WINDIR%\\SYSTEM32\\SPOOL\\DRIVERS\\W32X86\\3 folder for 32-bit
+drivers and
+%WINDIR%\\SYSTEM32\\SPOOL\\DRIVERS\\X64\\3 folder for 64-bit
+drivers.
 .LP
 The CUPS printer driver is preferred over the Microsoft driver
 since it supports the page-label, job-billing, and
@@ -121,8 +123,10 @@ driver, so you will also need to get the Adobe driver to support
 Windows 95, 98, and Me clients. The Adobe and Microsoft drivers
 for Windows 2000 are identical.
 .LP
-Once you have extracted the driver files, copy them to the
-\fI@CUPS_DATADIR@/drivers\fR directory exactly as named below:
+Once you have extracted the driver files, copy the 32-bit drivers
+to the \fI@CUPS_DATADIR@/drivers\fR directory and the 64-bit
+drivers to the \fI@CUPS_DATADIR@/drivers/x64\fR directory exactly
+as named below:
 .nf
 
     [Windows 2000 and higher]
@@ -148,8 +152,10 @@ currently only Windows 2000 and higher is supported by the CUPS
 driver, so you will also need to get the Adobe driver to support
 Windows 95, 98, and Me clients.
 .LP
-Once you have extracted the driver files, copy them to the
-\fI@CUPS_DATADIR@/drivers\fR directory exactly as named below:
+Once you have extracted the driver files, copy the 32-bit drivers
+to the \fI@CUPS_DATADIR@/drivers\fR directory and the 64-bit
+drivers to the \fI@CUPS_DATADIR@/drivers/x64\fR directory exactly
+as named below:
 .nf
 
     [Windows 2000 and higher]
@@ -193,9 +199,7 @@ you use the UPPERCASE filenames shown above, otherwise
 \fIcupsaddsmb\fR will fail to export the drivers.
 
 .SH KNOWN ISSUES
-\fIcupsaddsmb\fR currently only supports 32-bit x86 drivers on
-Windows 2000 and higher. Support for 64-bit x86 drivers will be
-added in a future release.
+Getting the full set of Windows driver files should be easier.
 
 .SH SEE ALSO
 \fIsmbd(8)\fR, \fIsmb.conf(5)\fR,

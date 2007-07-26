@@ -3,6 +3,9 @@ CHANGES.txt - 2007-07-25
 
 CHANGES IN CUPS V1.3rc1
 
+	- The cupsaddsmb program and web interface now support
+	  exporting of 64-bit Windows drivers, when available
+	  (STR #2439)
 	- Moving a job that was printing did not stop the job on the
 	  original printer (STR #2262)
 	- The cups-lpd mini-daemon did not work on Mac OS X server.
