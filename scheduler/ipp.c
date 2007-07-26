@@ -3148,7 +3148,9 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 		!strcasecmp(job->dest, printer->name))
 	      break;
 
-          if (!job)
+          if (job)
+	    jobid = job->id;
+	  else
 	  {
 	    send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
 			    printer->name);
