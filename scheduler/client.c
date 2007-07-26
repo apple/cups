@@ -1024,7 +1024,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         snprintf(locale, sizeof(locale), "%s.%s",
 	         con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], DefaultCharset);
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "cupsdReadClient: %d Browser asked for language \"%s\"...",
                       con->http.fd, locale);
 
@@ -4494,7 +4494,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     if (con->username[0])
       cupsdAddCert(pid, con->username);
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "CGI %s started - PID = %d", command, pid);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "[CGI] %s started - PID = %d",
+                    command, pid);
 
     *outfile = fds[0];
     close(fds[1]);
@@ -4517,7 +4518,7 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 {
   con->file = open(filename, O_RDONLY);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "write_file: %d file=%d", con->http.fd,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "write_file: %d file=%d", con->http.fd,
                   con->file);
 
   if (con->file < 0)
