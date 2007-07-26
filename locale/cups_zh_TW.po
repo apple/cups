@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cups 1.2.8\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-23 10:47-0700\n"
+"POT-Creation-Date: 2007-07-16 16:34-0400\n"
 "PO-Revision-Date: 2007-02-17 00:00+0800\n"
 "Last-Translator: Wei-Lun Chao <chaoweilun@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -29,7 +29,7 @@ msgid "\t\t(all)\n"
 msgstr "\t\t(所有)\n"
 
 msgid "\t\t(none)\n"
-msgstr "\t\t(無一)\n"
+msgstr "\t\t(無)\n"
 
 #, c-format
 msgid "\t%d entries\n"
@@ -111,7 +111,7 @@ msgstr "\t沒有項目\n"
 
 #, c-format
 msgid "\tprinter is on device '%s' speed -1\n"
-msgstr "\t印表機位於裝置「%s」速度 -1\n"
+msgstr "\t印表機位於裝置“%s”速度 -1\n"
 
 msgid "\tprinting is disabled\n"
 msgstr "\t列印已停用\n"
@@ -124,10 +124,10 @@ msgid "\tqueued for %s\n"
 msgstr "\t已加入佇列於 %s\n"
 
 msgid "\tqueuing is disabled\n"
-msgstr "\t排隊已停用\n"
+msgstr "\t佇列已停用\n"
 
 msgid "\tqueuing is enabled\n"
-msgstr "\t排隊已啟用\n"
+msgstr "\t佇列已啟用\n"
 
 msgid "\treason unknown\n"
 msgstr "\t原因不詳\n"
@@ -174,11 +174,11 @@ msgstr "               參考：頁面 52-54, 區段 5.2。\n"
 
 #, c-format
 msgid "        %-39.39s %.0f bytes\n"
-msgstr "        %-39.39s %.0f 位元組\n"
+msgstr "        %-39.39s %.0f byte\n"
 
 #, c-format
 msgid "        PASS    Default%s\n"
-msgstr "        略過    預設 %s\n"
+msgstr "        略過    Default%s\n"
 
 msgid "        PASS    DefaultImageableArea\n"
 msgstr "        略過    DefaultImageableArea\n"
@@ -199,13 +199,13 @@ msgid "        PASS    LanguageVersion\n"
 msgstr "        略過    LanguageVersion\n"
 
 msgid "        PASS    Manufacturer\n"
-msgstr "        略過    製造商\n"
+msgstr "        略過    Manufacturer\n"
 
 msgid "        PASS    ModelName\n"
 msgstr "        略過    ModelName\n"
 
 msgid "        PASS    NickName\n"
-msgstr "        略過    暱稱\n"
+msgstr "        略過    NickName\n"
 
 msgid "        PASS    PCFileName\n"
 msgstr "        略過    PCFileName\n"
@@ -220,7 +220,7 @@ msgid "        PASS    PageSize\n"
 msgstr "        略過    PageSize\n"
 
 msgid "        PASS    Product\n"
-msgstr "        略過    產品\n"
+msgstr "        略過    Product\n"
 
 msgid "        PASS    ShortNickName\n"
 msgstr "        略過    ShortNickName\n"
@@ -230,8 +230,8 @@ msgid ""
 "        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
 "                (constraint=\"%s %s %s %s\")\n"
 msgstr ""
-"        警告    「%s %s」與「%s %s」產生衝突\n"
-"               (條件約束=「%s %s %s %s」)\n"
+"        警告    “%s %s”與“%s %s”產生衝突\n"
+"               (條件約束=“%s %s %s %s”)\n"
 
 #, c-format
 msgid "        WARN    %s has no corresponding options!\n"
@@ -276,20 +276,20 @@ msgid ""
 "        WARN    Manufacturer required by PPD 4.3 spec.\n"
 "                REF: Pages 58-59, section 5.3.\n"
 msgstr ""
-"        警告    由 PPD 4.3 spec 所需的製造商。\n"
+"        警告    由 PPD 4.3 spec 所需的 Manufacturer。\n"
 "               參考：頁面 58-59, 區段 5.3。\n"
 
 #, c-format
 msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
-msgstr ""
+msgstr "        警告    遺失 APDialogExtension 檔案“%s”"
 
 #, c-format
 msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
-msgstr ""
+msgstr "        警告    遺失 APPrinterIconPath 檔案“%s”"
 
 #, c-format
 msgid "        WARN    Missing cupsICCProfile file \"%s\"\n"
-msgstr ""
+msgstr "        警告    遺失 cupsICCProfile 檔案“%s”"
 
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
@@ -333,58 +333,58 @@ msgstr ""
 "        警告    由 PPD 4.3 spec 所需的 ShortNickName。\n"
 "               參考：頁面 64-65, 區段 5.3。\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  %s %s does not exist!\n"
-msgstr "      ** 失敗 **  %s %s 不存在！\n"
+msgstr "      %s  %s %s 不存在！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
-msgstr "      ** 失敗 **  缺少用於選項 %s 的「%s」翻譯字串！\n"
+msgstr "      %s  用於選項 %s 的 UTF-8 “%s”翻譯字串不正確！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
-msgstr "      ** 失敗 **  缺少用於選項 %s、選擇 %s 的「%s」翻譯字串！\n"
+msgstr "      %s  用於選項 %s ，選擇 %s 的 UTF-8 “%s”翻譯字串不正確！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  Bad cupsFilter value \"%s\"!\n"
-msgstr "      ** 失敗 **  不當的 cupsFilter 值「%s」！\n"
+msgstr "      %s  不正確的 cupsFilter 值“%s”！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
-msgstr "      ** 失敗 **  不當的 cupsFilter 值「%s」！\n"
+msgstr "      %s  不正確的 cupsPreFilter 值“%s”！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  Bad language \"%s\"!\n"
-msgstr "      ** 失敗 **  不當的語言「%s」！\n"
+msgstr "      %s  不正確的語言“%s”！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  Missing \"%s\" translation string for option %s!\n"
-msgstr "      ** 失敗 **  缺少用於選項 %s 的「%s」翻譯字串！\n"
+msgstr "      %s  遺失用於選項 %s 的“%s”翻譯字串！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr "      ** 失敗 **  缺少用於選項 %s、選擇 %s 的「%s」翻譯字串！\n"
+msgstr "      %s  遺失用於選項 %s，選擇 %s 的“%s”翻譯字串！\n"
 
 #, c-format
 msgid "      %s  Missing choice *%s %s in UIConstraint \"*%s %s *%s %s\"!\n"
-msgstr ""
+msgstr "      %s  遺失在 UIConstraint 裡的選擇 *%s %s “*%s %s *%s %s”！"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  Missing cupsFilter file \"%s\"\n"
-msgstr "      ** 失敗 **  不當的 cupsFilter 值「%s」！\n"
+msgstr "      %s  遺失 cupsFilter 檔案“%s”\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
-msgstr "      ** 失敗 **  不當的 cupsFilter 值「%s」！\n"
+msgstr "      %s  遺失 cupsPreFilter 檔案“%s”\n"
 
 #, c-format
 msgid "      %s  Missing option %s in UIConstraint \"*%s %s *%s %s\"!\n"
-msgstr ""
+msgstr "      %s  在 UIConstraint 裡遺失選項“%s”“*%s %s *%s %s”！"
 
 #, c-format
 msgid "      %s  No base translation \"%s\" is included in file!\n"
-msgstr ""
+msgstr "      %s  檔案裡未包含基本翻譯“%s”！"
 
 #, c-format
 msgid ""
@@ -399,7 +399,7 @@ msgid ""
 "      **FAIL**  BAD Default%s %s\n"
 "                REF: Page 40, section 4.5.\n"
 msgstr ""
-"      ** 失敗 **  不當的預設 %s %s\n"
+"      ** 失敗 **  不正確的 Default%s %s\n"
 "               參考：頁面 40, 區段 4.5。\n"
 
 #, c-format
@@ -407,7 +407,7 @@ msgid ""
 "      **FAIL**  BAD DefaultImageableArea %s!\n"
 "                REF: Page 102, section 5.15.\n"
 msgstr ""
-"      ** 失敗 **  不當的 DefaultImageableArea %s!\n"
+"      ** 失敗 **  不正確的 DefaultImageableArea %s!\n"
 "               參考：頁面 102, 區段 5.15。\n"
 
 #, c-format
@@ -415,29 +415,29 @@ msgid ""
 "      **FAIL**  BAD DefaultPaperDimension %s!\n"
 "                REF: Page 103, section 5.15.\n"
 msgstr ""
-"      ** 失敗 **  不當的 DefaultPaperDimension %s!\n"
+"      ** 失敗 **  不正確的 DefaultPaperDimension %s!\n"
 "               參考：頁面 103, 區段 5.15。\n"
 
 msgid ""
 "      **FAIL**  BAD JobPatchFile attribute in file\n"
 "                REF: Page 24, section 3.4.\n"
 msgstr ""
-"      ** 失敗 **  在檔案中不當的 JobPatchFile 屬性\n"
+"      ** 失敗 **  在檔案中不正確的 JobPatchFile 屬性\n"
 "               參考：頁面 24, 區段 3.4。\n"
 
 msgid ""
 "      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
 "                REF: Page 211, table D.1.\n"
 msgstr ""
-"      ** 失敗 **  不當的製造商(應該是「HP」)\n"
+"      ** 失敗 **  不正確的 Manufacturer(應該是“HP”)\n"
 "               參考：頁面 211, 表格 D.1。\n"
 
-#, fuzzy
+#,
 msgid ""
 "      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
 "                REF: Page 211, table D.1.\n"
 msgstr ""
-"      ** 失敗 **  不當的製造商(應該是「HP」)\n"
+"      ** 失敗 **  不正確的 Manufacturer(應該是“Oki”)\n"
 "               參考：頁面 211, 表格 D.1。\n"
 
 #, c-format
@@ -445,28 +445,28 @@ msgid ""
 "      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
 "                REF: Pages 59-60, section 5.3.\n"
 msgstr ""
-"      ** 失敗 **  不當的 ModelName -無法允許「%c」在字串中。\n"
+"      ** 失敗 **  不正確的 ModelName -無法允許“%c”在字串中。\n"
 "               參考：頁面 59-60, 區段 5.3。\n"
 
 msgid ""
 "      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
 "                REF: Pages 62-64, section 5.3.\n"
 msgstr ""
-"      ** 失敗 **  不當的 PSVersion - 不是「(字串) int」。\n"
+"      ** 失敗 **  不正確的 PSVersion - 不是“(字串) int”。\n"
 "               參考：頁面 62-64, 區段 5.3。\n"
 
 msgid ""
 "      **FAIL**  BAD Product - not \"(string)\".\n"
 "                REF: Page 62, section 5.3.\n"
 msgstr ""
-"      ** 失敗 **  不當的產品 - 不是「(字串)」。\n"
+"      ** 失敗 **  不正確的 Product - 不是“(字串)”。\n"
 "               參考：頁面 62, 區段 5.3。\n"
 
 msgid ""
 "      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
 "                REF: Pages 64-65, section 5.3.\n"
 msgstr ""
-"      ** 失敗 **  不當的 ShortNickName - 長度超過 31 個字元。\n"
+"      ** 失敗 **  不正確的 ShortNickName - 長度超過 31 個字元。\n"
 "               參考：頁面 64-65, 區段 5.3。\n"
 
 #, c-format
@@ -474,7 +474,7 @@ msgid ""
 "      **FAIL**  Bad %s choice %s!\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"      ** 失敗 **  不當的 %s 選擇 %s!\n"
+"      ** 失敗 **  不正確的 %s 選擇 %s!\n"
 "               參考：頁面 122, 區段 5.17\n"
 
 #, c-format
@@ -482,20 +482,20 @@ msgid ""
 "      **FAIL**  Bad %s choice %s!\n"
 "                REF: Page 84, section 5.9\n"
 msgstr ""
-"      ** 失敗 **  不當的 %s 選擇 %s!\n"
+"      ** 失敗 **  不正確的 %s 選擇 %s!\n"
 "               參考：頁面 84, 區段 5.9\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
-msgstr "      ** 失敗 **  不當的語言「%s」！\n"
+msgstr "      ** 失敗 **  不正確的語言編碼“%s”- 必須是 ISOLatin1！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
-msgstr "      ** 失敗 **  不當的語言「%s」！\n"
+msgstr "      ** 失敗 **  不正確的 LanguageVersion“%s”- 必須是 English！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
-msgstr "      ** 失敗 **  預設用於選項 %s 的翻譯字串含有 8-位元字元！\n"
+msgstr "      ** 失敗 **  預設選項編碼不得解譯：%s\n"
 
 #, c-format
 msgid ""
@@ -523,7 +523,7 @@ msgid ""
 "      **FAIL**  REQUIRED Default%s\n"
 "                REF: Page 40, section 4.5.\n"
 msgstr ""
-"      ** 失敗 **  必要的預設 %s\n"
+"      ** 失敗 **  必要的 Default%s\n"
 "               參考：頁面 40, 區段 4.5。\n"
 
 msgid ""
@@ -596,7 +596,7 @@ msgid ""
 "      **FAIL**  REQUIRED NickName\n"
 "                REF: Page 60, section 5.3.\n"
 msgstr ""
-"      ** 失敗 **  必要的暱稱\n"
+"      ** 失敗 **  必要的 NickName\n"
 "               參考：頁面 60, 區段 5.3。\n"
 
 msgid ""
@@ -650,7 +650,7 @@ msgid ""
 "      **FAIL**  REQUIRED Product\n"
 "                REF: Page 62, section 5.3.\n"
 msgstr ""
-"      ** 失敗 **  必要的產品\n"
+"      ** 失敗 **  必要的 Product\n"
 "               參考：頁面 62, 區段 5.3。\n"
 
 msgid ""
@@ -660,16 +660,16 @@ msgstr ""
 "      ** 失敗 **  必要的 ShortNickName\n"
 "               參考：頁面 64-65, 區段 5.3。\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "    %d ERRORS FOUND\n"
-msgstr "    找到 %d 個錯誤%s\n"
+msgstr "    找到 %d 個錯誤\n"
 
 #, c-format
 msgid ""
 "    Bad %%%%BoundingBox: on line %d!\n"
 "        REF: Page 39, %%%%BoundingBox:\n"
 msgstr ""
-"    不當的 %%%%BoundingBox：於第 %d 列！\n"
+"    不正確的 %%%%BoundingBox：於第 %d 列！\n"
 "       參考：頁面 39, %%%%BoundingBox：\n"
 
 #, c-format
@@ -677,7 +677,7 @@ msgid ""
 "    Bad %%%%Page: on line %d!\n"
 "        REF: Page 53, %%%%Page:\n"
 msgstr ""
-"    不當的 %%%%Page：於第 %d 列！\n"
+"    不正確的 %%%%Page：於第 %d 列！\n"
 "       參考：頁面 53, %%%%Page：\n"
 
 #, c-format
@@ -685,7 +685,7 @@ msgid ""
 "    Bad %%%%Pages: on line %d!\n"
 "        REF: Page 43, %%%%Pages:\n"
 msgstr ""
-"    不當的 %%%%Pages：於第 %d 列！\n"
+"    不正確的 %%%%Pages：於第 %d 列！\n"
 "       參考：頁面 43, %%%%Pages：\n"
 
 #, c-format
@@ -700,7 +700,7 @@ msgid ""
 "    Missing %!PS-Adobe-3.0 on first line!\n"
 "        REF: Page 17, 3.1 Conforming Documents\n"
 msgstr ""
-"    缺少 %!PS-Adobe-3.0 於第一列！\n"
+"    遺失 %!PS-Adobe-3.0 於第一列！\n"
 "       參考：頁面 17, 3.1 符合文件\n"
 
 #, c-format
@@ -708,7 +708,7 @@ msgid ""
 "    Missing %%EndComments comment!\n"
 "        REF: Page 41, %%EndComments\n"
 msgstr ""
-"    缺少 %%EndComments 註釋！\n"
+"    遺失 %%EndComments 註釋！\n"
 "       參考：頁面 41, %%EndComments\n"
 
 #, c-format
@@ -716,7 +716,7 @@ msgid ""
 "    Missing or bad %%BoundingBox: comment!\n"
 "        REF: Page 39, %%BoundingBox:\n"
 msgstr ""
-"    缺少或不當的 %%BoundingBox：註釋！\n"
+"    遺失或不正確的 %%BoundingBox：註釋！\n"
 "       參考：頁面 39, %%BoundingBox：\n"
 
 #, c-format
@@ -724,7 +724,7 @@ msgid ""
 "    Missing or bad %%Page: comments!\n"
 "        REF: Page 53, %%Page:\n"
 msgstr ""
-"    缺少或不當的 %%Page：註釋！\n"
+"    遺失或不正確的 %%Page：註釋！\n"
 "       參考：頁面 53, %%Page：\n"
 
 #, c-format
@@ -732,7 +732,7 @@ msgid ""
 "    Missing or bad %%Pages: comment!\n"
 "        REF: Page 43, %%Pages:\n"
 msgstr ""
-"    缺少或不當的 %%Pages：註釋！\n"
+"    遺失或不正確的 %%Pages：註釋！\n"
 "       參考：頁面 43, %%Pages：\n"
 
 msgid "    NO ERRORS FOUND\n"
@@ -785,11 +785,11 @@ msgstr " 略過\n"
 
 #, c-format
 msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
-msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f 位元組\n"
+msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f byte\n"
 
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
-msgstr "%-7s %-7.7s %-7d %-31.31s %.0f 位元組\n"
+msgstr "%-7s %-7.7s %-7d %-31.31s %.0f byte\n"
 
 #, c-format
 msgid "%s accepting requests since %s\n"
@@ -849,20 +849,20 @@ msgstr "%s：%s 失敗：%s\n"
 
 #, c-format
 msgid "%s: Don't know what to do!\n"
-msgstr "%s：不知道要做什麼！\n"
+msgstr "%s：不知道要執行什麼動作！\n"
 
 #, c-format
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s：錯誤 - %s 環境變數指稱不存在的目的印表機「%s」！\n"
+msgstr "%s：錯誤 - %s 環境變數指稱不存在的目的印表機“%s”！\n"
 
 #, c-format
 msgid "%s: Error - bad job ID!\n"
-msgstr "%s：錯誤 - 不當的工作識別號！\n"
+msgstr "%s：錯誤 - 不正確的工作識別號！\n"
 
 #, c-format
 msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "%s：錯誤 - 無法同步列印檔案和改變工作！\n"
+msgstr "%s：錯誤 - 無法同時列印檔案和改變工作！\n"
 
 #, c-format
 msgid ""
@@ -871,94 +871,94 @@ msgstr "%s：錯誤 - 如果已提供檔案或工作識別號，就無法從標�
 
 #, c-format
 msgid "%s: Error - expected character set after '-S' option!\n"
-msgstr "%s：錯誤 - 「-S」選項之後預期為字元集！\n"
+msgstr "%s：錯誤 - “-S”選項之後預期為字元集！\n"
 
 #, c-format
 msgid "%s: Error - expected content type after '-T' option!\n"
-msgstr "%s：錯誤 - 「-T」選項之後預期為內容類型！\n"
+msgstr "%s：錯誤 - “-T”選項之後預期為內容類型！\n"
 
 #, c-format
 msgid "%s: Error - expected copies after '-n' option!\n"
-msgstr "%s：錯誤 - 「-n」選項之後預期為份數！\n"
+msgstr "%s：錯誤 - “-n”選項之後預期為份數！\n"
 
 #, c-format
 msgid "%s: Error - expected copy count after '-#' option!\n"
-msgstr "%s：錯誤 - 「-#」選項之後預期為複製份數！\n"
+msgstr "%s：錯誤 - “-#”選項之後預期為複製份數！\n"
 
 #, c-format
 msgid "%s: Error - expected destination after '-P' option!\n"
-msgstr "%s：錯誤 - 「-P」選項之後預期為目的印表機！\n"
+msgstr "%s：錯誤 - “-P”選項之後預期為目的印表機！\n"
 
 #, c-format
 msgid "%s: Error - expected destination after '-b' option!\n"
-msgstr "%s：錯誤 - 「-b」選項之後預期為目的印表機！\n"
+msgstr "%s：錯誤 - “-b”選項之後預期為目的印表機！\n"
 
 #, c-format
 msgid "%s: Error - expected destination after '-d' option!\n"
-msgstr "%s：錯誤 - 「-d」選項之後預期為目的印表機！\n"
+msgstr "%s：錯誤 - “-d”選項之後預期為目的印表機！\n"
 
 #, c-format
 msgid "%s: Error - expected form after '-f' option!\n"
-msgstr "%s：錯誤 - 「-f」選項之後預期為形式！\n"
+msgstr "%s：錯誤 - “-f”選項之後預期為形式！\n"
 
 #, c-format
 msgid "%s: Error - expected hold name after '-H' option!\n"
-msgstr "%s：錯誤 - 「-H」選項之後預期為暫停名稱！\n"
+msgstr "%s：錯誤 - “-H”選項之後預期為暫停名稱！\n"
 
 #, c-format
 msgid "%s: Error - expected hostname after '-H' option!\n"
-msgstr "%s：錯誤 - 「-H」選項之後預期為主機名稱！\n"
+msgstr "%s：錯誤 - “-H”選項之後預期為主機名稱！\n"
 
 #, c-format
 msgid "%s: Error - expected hostname after '-h' option!\n"
-msgstr "%s：錯誤 - 「-h」選項之後預期為主機名稱！\n"
+msgstr "%s：錯誤 - “-h”選項之後預期為主機名稱！\n"
 
 #, c-format
 msgid "%s: Error - expected mode list after '-y' option!\n"
-msgstr "%s：錯誤 - 「-y」選項之後預期為模式表列！\n"
+msgstr "%s：錯誤 - “-y”選項之後預期為模式表列！\n"
 
 #, c-format
 msgid "%s: Error - expected name after '-%c' option!\n"
-msgstr "%s：錯誤 - 「-%c」選項之後預期為名稱！\n"
+msgstr "%s：錯誤 - “-%c”選項之後預期為名稱！\n"
 
 #, c-format
 msgid "%s: Error - expected option string after '-o' option!\n"
-msgstr "%s：錯誤 - 「-o」選項之後預期為選項字串！\n"
+msgstr "%s：錯誤 - “-o”選項之後預期為選項字串！\n"
 
 #, c-format
 msgid "%s: Error - expected page list after '-P' option!\n"
-msgstr "%s：錯誤 - 「-P」選項之後預期為頁面表列！\n"
+msgstr "%s：錯誤 - “-P”選項之後預期為頁面表列！\n"
 
 #, c-format
 msgid "%s: Error - expected priority after '-%c' option!\n"
-msgstr "%s：錯誤 - 「-%c」選項之後預期為優先權！\n"
+msgstr "%s：錯誤 - “-%c”選項之後預期為優先權！\n"
 
 #, c-format
 msgid "%s: Error - expected reason text after '-r' option!\n"
-msgstr "%s：錯誤 - 「-r」選項之後預期為理由文字！\n"
+msgstr "%s：錯誤 - “-r”選項之後預期為理由文字！\n"
 
 #, c-format
 msgid "%s: Error - expected title after '-t' option!\n"
-msgstr "%s：錯誤 - 「-t」選項之後預期為標題！\n"
+msgstr "%s：錯誤 - “-t”選項之後預期為標題！\n"
 
 #, c-format
 msgid "%s: Error - expected username after '-U' option!\n"
-msgstr "%s：錯誤 - 「-U」選項之後預期為使用者名稱！\n"
+msgstr "%s：錯誤 - “-U”選項之後預期為使用者名稱！\n"
 
 #, c-format
 msgid "%s: Error - expected username after '-u' option!\n"
-msgstr "%s：錯誤 - 「-u」選項之後預期為使用者名稱！\n"
+msgstr "%s：錯誤 - “-u”選項之後預期為使用者名稱！\n"
 
 #, c-format
 msgid "%s: Error - expected value after '-%c' option!\n"
-msgstr "%s：錯誤 - 「-%c」選項之後預期為設定值！\n"
+msgstr "%s：錯誤 - “-%c”選項之後預期為設定值！\n"
 
 #, c-format
 msgid ""
 "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
 "option!\n"
 msgstr ""
-"%s：錯誤 - 「-W」選項之後需要「completed」、「not-completed」或「all」！\n"
+"%s：錯誤 - “-W”選項之後需要“completed”、“not-completed”或“all”！\n"
 
 #, c-format
 msgid "%s: Error - no default destination available.\n"
@@ -978,47 +978,43 @@ msgstr "%s：錯誤 - 標準輸入為空，因而未發送任何工作。\n"
 
 #, c-format
 msgid "%s: Error - too many files - \"%s\"\n"
-msgstr "%s：錯誤 - 太多檔案 -「%s」\n"
+msgstr "%s：錯誤 - 太多檔案 -“%s”\n"
 
 #, c-format
 msgid "%s: Error - unable to access \"%s\" - %s\n"
-msgstr "%s：錯誤 - 無法存取「%s」- %s\n"
+msgstr "%s：錯誤 - 無法存取“%s”- %s\n"
 
 #, c-format
 msgid "%s: Error - unable to create temporary file \"%s\" - %s\n"
-msgstr "%s：錯誤 - 無法建立暫時檔案「%s」- %s\n"
+msgstr "%s：錯誤 - 無法建立暫時檔案“%s”- %s\n"
 
 #, c-format
 msgid "%s: Error - unable to write to temporary file \"%s\" - %s\n"
-msgstr "%s：錯誤 - 無法寫入暫時檔案「%s」- %s\n"
+msgstr "%s：錯誤 - 無法寫入暫時檔案“%s”- %s\n"
 
 #, c-format
 msgid "%s: Error - unknown destination \"%s\"!\n"
-msgstr "%s：錯誤 - 不明的目的印表機「%s」！\n"
+msgstr "%s：錯誤 - 不明的目的印表機“%s”！\n"
 
 #, c-format
 msgid "%s: Error - unknown destination \"%s/%s\"!\n"
-msgstr "%s：錯誤 - 不明的目的印表機「%s/%s」！\n"
+msgstr "%s：錯誤 - 不明的目的印表機“%s/%s”！\n"
 
 #, c-format
 msgid "%s: Error - unknown option '%c'!\n"
-msgstr "%s：錯誤 - 不明的選項「%c」！\n"
+msgstr "%s：錯誤 - 不明的選項“%c”！\n"
 
 #, c-format
 msgid "%s: Expected job ID after '-i' option!\n"
-msgstr "%s：「-i」選項之後預期為工作識別號！\n"
+msgstr "%s：“-i”選項之後預期為工作識別號！\n"
 
 #, c-format
 msgid "%s: Invalid destination name in list \"%s\"!\n"
-msgstr "%s：在表列「%s」中出現無效的目的印表機名稱！\n"
+msgstr "%s：在表列“%s”中出現無效的目的印表機名稱！\n"
 
 #, c-format
 msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
-msgstr "%s：「-H 重新啟動」之前需要工作識別號(「-i jobid」)！\n"
-
-#, c-format
-msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
-msgstr ""
+msgstr "%s：“-H 重新啟動”之前需要工作識別號(“-i jobid”)！\n"
 
 #, c-format
 msgid "%s: Operation failed: %s\n"
@@ -1041,28 +1037,12 @@ msgid "%s: Unable to contact server!\n"
 msgstr "%s：無法連上伺服器！\n"
 
 #, c-format
-msgid "%s: Unable to determine MIME type of \"%s\"!\n"
-msgstr ""
-
-#, c-format
-msgid "%s: Unable to read MIME database from \"%s\"!\n"
-msgstr ""
-
-#, c-format
 msgid "%s: Unknown destination \"%s\"!\n"
-msgstr "%s：不明的目的印表機「%s」！\n"
+msgstr "%s：不明的目的印表機“%s”！\n"
 
 #, c-format
-msgid "%s: Unknown destination MIME type %s/%s!\n"
-msgstr ""
-
-#, fuzzy, c-format
 msgid "%s: Unknown option '%c'!\n"
-msgstr "lp：不明的選項「%c」！\n"
-
-#, c-format
-msgid "%s: Unknown source MIME type %s/%s!\n"
-msgstr ""
+msgstr "%s：不明的選項“%c”！\n"
 
 #, c-format
 msgid ""
@@ -1089,11 +1069,11 @@ msgstr "%s：警告 - 已忽略模式選項！\n"
 #, c-format
 msgid ""
 "%s: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%s：錯誤 - %s 環境變數指稱不存在的目的印表機「%s」！\n"
+msgstr "%s：錯誤 - %s 環境變數指稱不存在的目的印表機“%s”！\n"
 
 #, c-format
 msgid "%s: error - expected option=value after '-o' option!\n"
-msgstr "%s：錯誤 - 「-o」選項之後預期為選項=值！\n"
+msgstr "%s：錯誤 - “-o”選項之後預期為選項=值！\n"
 
 #, c-format
 msgid "%s: error - no default destination available.\n"
@@ -1110,11 +1090,11 @@ msgstr "需要 Samba 使用者名稱以匯出印表機驅動程式！"
 
 #, c-format
 msgid "A class named \"%s\" already exists!"
-msgstr "名為「%s」的類別已經存在！"
+msgstr "名為“%s”的類別已經存在！"
 
 #, c-format
 msgid "A printer named \"%s\" already exists!"
-msgstr "名為的印表機「%s」已經存在！"
+msgstr "名為的印表機“%s”已經存在！"
 
 msgid "Accept Jobs"
 msgstr "接受工作"
@@ -1126,104 +1106,103 @@ msgid "Add Printer"
 msgstr "加入印表機"
 
 msgid "Add RSS Subscription"
-msgstr ""
+msgstr "加入 RSS 訂閱"
 
 msgid "Administration"
 msgstr "管理"
 
 #, c-format
 msgid "Attempt to set %s printer-state to bad value %d!"
-msgstr "試圖去設定 %s printer-state 為不當的值 %d！"
+msgstr "試圖去設定 %s printer-state 為不正確的值 %d！"
 
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)!"
 msgstr "屬性群組超出順序 (%x < %x)！"
 
 msgid "Bad OpenGroup"
-msgstr "不當的 OpenGroup"
+msgstr "不正確的 OpenGroup"
 
 msgid "Bad OpenUI/JCLOpenUI"
-msgstr "不當的 OpenUI/JCLOpenUI"
+msgstr "不正確的 OpenUI/JCLOpenUI"
 
 msgid "Bad OrderDependency"
-msgstr "不當的 OrderDependency"
+msgstr "不正確的 OrderDependency"
 
 msgid "Bad UIConstraints"
-msgstr "不當的 UIConstraints"
+msgstr "不正確的 UIConstraints"
 
 #, c-format
 msgid "Bad copies value %d."
-msgstr "不當的份數值 %d。"
+msgstr "不正確的份數值 %d。"
 
 msgid "Bad custom parameter"
-msgstr "不當的自訂參數"
+msgstr "不正確的自訂參數"
 
 #, c-format
 msgid "Bad device-uri \"%s\"!"
-msgstr "不當的 device-uri「%s」！"
+msgstr "不正確的 device-uri“%s”！"
 
 #, c-format
 msgid "Bad document-format \"%s\"!"
-msgstr "不當的文件格式「%s」！"
+msgstr "不正確的文件格式“%s”！"
 
 msgid "Bad job-priority value!"
-msgstr "不當的工作優先值！"
+msgstr "不正確的工作優先值！"
 
 msgid "Bad job-state value!"
-msgstr "不當的工作狀態值！"
+msgstr "不正確的工作狀態值！"
 
 #, c-format
 msgid "Bad job-uri attribute \"%s\"!"
-msgstr "不當的 job-uri 屬性「%s」！"
+msgstr "不正確的 job-uri 屬性“%s”！"
 
 #, c-format
 msgid "Bad notify-pull-method \"%s\"!"
-msgstr "不當的 notify-pull-method「%s」！"
+msgstr "不正確的 notify-pull-method“%s”！"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Bad notify-recipient-uri URI \"%s\"!"
-msgstr "不當的 notify-recipient URI「%s」！"
+msgstr "不正確的 notify-recipient-uri URI“%s”！"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Bad number-up value %d."
-msgstr "不當的份數值 %d。"
+msgstr "不正確的 number-up 值 %d。"
 
 #, c-format
 msgid "Bad option + choice on line %d!"
-msgstr "第 %d 列有不當的選項 + 選擇！"
+msgstr "第 %d 列有不正確的選項 + 選擇！"
 
 #, c-format
 msgid "Bad page-ranges values %d-%d."
-msgstr "不當的 page-ranges 值 %d-%d。"
+msgstr "不正確的 page-ranges 值 %d-%d。"
 
 #, c-format
 msgid "Bad port-monitor \"%s\"!"
-msgstr "不當的 port-monitor「%s」！"
+msgstr "不正確的 port-monitor“%s”！"
 
 #, c-format
 msgid "Bad printer-state value %d!"
-msgstr "不當的 printer-state 值 %d！"
+msgstr "不正確的 printer-state 值 %d！"
 
 #, c-format
 msgid "Bad request version number %d.%d!"
-msgstr "不當的請求版本號碼 %d.%d！"
+msgstr "不正確的請求版本號碼 %d.%d！"
 
-#, fuzzy
 msgid "Bad subscription ID!"
-msgstr "找不到訂用記錄。"
+msgstr "不正確的訂閱識別碼。"
 
 msgid "Banners"
 msgstr "橫幅"
 
 msgid "Cancel RSS Subscription"
-msgstr ""
+msgstr "取消 RSS 訂閱"
 
 msgid "Change Settings"
 msgstr "變更設定值"
 
 #, c-format
 msgid "Character set \"%s\" not supported!"
-msgstr "不支援字元集「%s」！"
+msgstr "不支援字元集“%s”！"
 
 msgid "Classes"
 msgstr "類別"
@@ -1239,10 +1218,10 @@ msgstr ""
 
 #, c-format
 msgid "Could not scan type \"%s\"!"
-msgstr "無法掃描型態「%s」！"
+msgstr "無法掃描型態“%s”！"
 
 msgid "Cover open."
-msgstr ""
+msgstr "封面開啟。"
 
 msgid "Custom"
 msgstr "自訂"
@@ -1255,13 +1234,13 @@ msgstr "刪除印表機"
 
 #, c-format
 msgid "Destination \"%s\" is not accepting jobs."
-msgstr "目的印表機「%s」並未接受工作。"
+msgstr "目的印表機“%s”並未接受工作。"
 
 msgid "Developer almost empty."
-msgstr ""
+msgstr "顯影劑將用完。"
 
 msgid "Developer empty!"
-msgstr ""
+msgstr "顯影劑已用完！"
 
 #, c-format
 msgid ""
@@ -1274,317 +1253,323 @@ msgstr ""
 "裝置：uri = %s\n"
 "        類別 = %s\n"
 "        資訊 = %s\n"
-"        廠商與型號 = %s\n"
+"        make-and-model = %s\n"
 "        裝置識別號 = %s\n"
 
 msgid "Door open."
-msgstr ""
+msgstr "蓋子已開啟。"
 
-#, fuzzy, c-format
+#, c-format
 msgid "EMERG: Unable to allocate memory for page info: %s\n"
-msgstr "無法配置用於檔案類型的記憶體！"
+msgstr "EMERG: 無法配置用於頁面資訊的記憶體：%s"
 
-#, fuzzy, c-format
+#, c-format
 msgid "EMERG: Unable to allocate memory for pages array: %s\n"
-msgstr "無法配置用於檔案類型的記憶體！"
+msgstr "EMERG: 無法配置用於頁面陣列的記憶體：%s"
 
 #, c-format
 msgid "ERROR: %ld: (canceled:%ld)\n"
-msgstr ""
+msgstr "ERROR: %ld: (取消：%ld)\n "
 
 #, c-format
 msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
-msgstr ""
+msgstr "ERROR: 發現不正確的 %%BoundingBox: 註解！"
 
 #, c-format
 msgid "ERROR: Bad %%IncludeFeature: comment!\n"
-msgstr ""
+msgstr "ERROR: 不正確的 %%IncludeFeature: 註解！"
 
 #, c-format
 msgid "ERROR: Bad %%Page: comment in file!\n"
-msgstr ""
+msgstr "ERROR: 檔案裡的 %%Page: 註解不正確！"
 
 #, c-format
 msgid "ERROR: Bad %%PageBoundingBox: comment in file!\n"
-msgstr ""
+msgstr "ERROR: 檔案裡的 %%Page: 註解不正確！"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Bad SCSI device file \"%s\"!\n"
-msgstr "不當的 device-uri「%s」！"
+msgstr "ERROR: 不正確的 SCSI 設備檔案“%s”！"
 
 #, c-format
 msgid "ERROR: Bad charset file %s\n"
-msgstr ""
+msgstr "ERROR: 不正確的字元集檔案“%s”\n"
 
 #, c-format
 msgid "ERROR: Bad charset type %s\n"
-msgstr ""
+msgstr "ERROR: 不正確的字元集類型“%s”\n"
 
 #, c-format
 msgid "ERROR: Bad font description line: %s\n"
-msgstr ""
+msgstr "ERROR: 不正確的描述列：%s\n"
 
 msgid "ERROR: Bad page setup!\n"
-msgstr ""
+msgstr "ERROR: 不正確的頁面設定！"
 
 #, c-format
 msgid "ERROR: Bad text direction %s\n"
-msgstr ""
+msgstr "ERROR: 不正確的文字方向 %s\n"
 
 #, c-format
 msgid "ERROR: Bad text width %s\n"
-msgstr ""
+msgstr "ERROR: 不正確的文字寬度 %s\n"
 
 msgid "ERROR: Destination printer does not exist!\n"
-msgstr ""
+msgstr "ERROR: 目標印表機不存在！\n"
 
 #, c-format
 msgid "ERROR: Duplicate %%BoundingBox: comment seen!\n"
-msgstr ""
+msgstr "ERROR: 發現重複的 %%BoundingBox: 註解！\n"
 
 #, c-format
 msgid "ERROR: Duplicate %%Pages: comment seen!\n"
-msgstr ""
+msgstr "ERROR: 發現重複的 %%Pages: 註解！\n"
 
-#, fuzzy
+#,
 msgid "ERROR: Empty print file!\n"
-msgstr "空的 PPD 檔案！"
+msgstr "ERROR: 空的列印檔案！\n"
 
 msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"
-msgstr ""
+msgstr "ERROR: 發現無效的 HP-GL/2 指令，無法列印至檔案！\n"
 
 #, c-format
 msgid "ERROR: Missing %%EndProlog!\n"
-msgstr ""
+msgstr "ERROR: 遺失 %%EndProlog！\n"
 
 #, c-format
 msgid "ERROR: Missing %%EndSetup!\n"
-msgstr ""
+msgstr "ERROR: 遺失 %%EndSetup！\n"
 
 msgid ""
 "ERROR: Missing device URI on command-line and no DEVICE_URI environment "
 "variable!\n"
 msgstr ""
+"ERROR: 在命令列裡遺失設備 URI，且沒有 DEVICE_URI 環境 "
+"變數！\n"
 
 #, c-format
 msgid "ERROR: No %%BoundingBox: comment in header!\n"
-msgstr ""
+msgstr "ERROR: 頁首裡沒有 %%BoundingBox: 註解！\n"
 
 #, c-format
 msgid "ERROR: No %%Pages: comment in header!\n"
-msgstr ""
+msgstr "ERROR: 頁首裡沒有 %%Pages: 註解！\n"
 
 msgid ""
 "ERROR: No device URI found in argv[0] or in DEVICE_URI environment "
 "variable!\n"
 msgstr ""
+"ERROR: 在 argv[0] 或 DEVICE_URI 環境裡找不到設備 URI "
+"變數！\n"
 
 msgid "ERROR: No pages found!\n"
-msgstr ""
+msgstr "ERROR: 找不到頁面！\n"
 
 msgid "ERROR: Out of paper!\n"
-msgstr ""
+msgstr "ERROR: 紙張用完！\n"
 
 msgid "ERROR: PRINTER environment variable not defined!\n"
-msgstr ""
+msgstr "ERROR: 未定義 PRINTER 環境變數！\n"
 
 #, c-format
 msgid "ERROR: Print file was not accepted (%s)!\n"
-msgstr ""
+msgstr "ERROR: 不接受列印檔案（%s）！\n"
 
-#, fuzzy
+#,
 msgid "ERROR: Printer not responding!\n"
-msgstr "印表機未共享！"
+msgstr "ERROR: 印表機無回應！\n"
 
 #, c-format
 msgid "ERROR: Remote host did not accept control file (%d)\n"
-msgstr ""
+msgstr "ERROR: 遠端主機不接受控制檔案 (%d)\n"
 
 #, c-format
 msgid "ERROR: Remote host did not accept data file (%d)\n"
-msgstr ""
+msgstr "ERROR: 遠端主機不接受資料檔案 (%d)\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to add file %d to job: %s\n"
-msgstr "lpadmin：無法開啟檔案「%s」：%s\n"
+msgstr "ERROR: 無法將檔案“%d”加入工作：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to cancel job %d: %s\n"
-msgstr "lprm：無法取消工作！\n"
+msgstr "ERROR: 無法取消工作“%d”：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to create temporary compressed print file: %s\n"
-msgstr "lpadmin：無法建立暫時檔案：%s\n"
+msgstr "ERROR: 無法建立暫時壓縮列印檔案：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to create temporary file - %s.\n"
-msgstr "lpadmin：無法建立暫時檔案 - %s\n"
+msgstr "ERROR: 無法建立暫時檔案 - %s。\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to create temporary file: %s\n"
-msgstr "lpadmin：無法建立暫時檔案：%s\n"
+msgstr "ERROR: 無法建立暫時檔案：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to exec pictwpstops: %s\n"
-msgstr "%s：無法連接伺服器：%s\n"
+msgstr "ERROR: 無法執行 pictwpstops：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
-msgstr "無法衍生進程！"
+msgstr "ERROR: 無法衍生 pictwpstops：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to get PPD file for printer \"%s\" - %s.\n"
-msgstr "cupsaddsmb：沒有任何用於印表機「%s」的 PPD 檔案- %s\n"
+msgstr "ERROR: 找不到用於印表機“%s”的 PPD 檔案 - %s。\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to get job %d attributes (%s)!\n"
-msgstr "無法取得印表機屬性！"
+msgstr "ERROR: 無法取得工作“%d”的屬性（%s）！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to get printer status (%s)!\n"
-msgstr "無法取得印表機狀態："
+msgstr "ERROR: 無法取得印表機狀態（%s）！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to locate printer '%s'!\n"
-msgstr "無法刪除印表機："
+msgstr "ERROR: 無法找到印表機“%s”！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to open \"%s\" - %s\n"
-msgstr "lp：無法存取「%s」- %s\n"
+msgstr "ERROR: 無法打開“%s”- %s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to open %s: %s\n"
-msgstr "無法運行「%s」：%s\n"
+msgstr "ERROR: 無法打開“%s”：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to open device file \"%s\": %s\n"
-msgstr "lpadmin：無法開啟檔案「%s」：%s\n"
+msgstr "ERROR: 無法開啟設備檔案“%s”：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to open file \"%s\" - %s\n"
-msgstr "lpadmin：無法開啟檔案「%s」：%s\n"
+msgstr "ERROR: 無法開啟檔案“%s”- %s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to open file \"%s\": %s\n"
-msgstr "lpadmin：無法開啟檔案「%s」：%s\n"
+msgstr "ERROR: 無法開啟檔案“%s”：%s\n"
 
-#, fuzzy
+#,
 msgid "ERROR: Unable to open image file for printing!\n"
-msgstr "lpoptions：無法開啟用於 %s 的 PPD 檔案！\n"
+msgstr "ERROR: 無法開啟用於列印的映像！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to open print file \"%s\": %s\n"
-msgstr "lpadmin：無法開啟檔案「%s」：%s\n"
+msgstr "ERROR: 無法開啟列印檔案“%s”：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to open print file %s - %s\n"
-msgstr "lpadmin：無法開啟 PPD 檔案「%s」- %s\n"
+msgstr "ERROR: 無法開啟列印檔案“%s”- %s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to open print file %s: %s\n"
-msgstr "lp：無法列印檔案：%s\n"
+msgstr "ERROR: 無法開啟列印檔案“%s”- %s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to open temporary compressed print file: %s\n"
-msgstr "lpadmin：無法建立暫時檔案：%s\n"
+msgstr "ERROR: 無法開啟暫時壓縮列印檔案：%s\n"
 
 #, c-format
 msgid "ERROR: Unable to seek to offset %ld in file - %s\n"
-msgstr ""
+msgstr "ERROR: 無法在檔案裡找到位移“%ld”- %s\n"
 
 #, c-format
 msgid "ERROR: Unable to seek to offset %lld in file - %s\n"
-msgstr ""
+msgstr "ERROR: 無法在檔案裡找到位移“%lld”- %s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to send print data (%d)\n"
-msgstr "無法設定 Windows 印表機驅動程式 (%d)！\n"
+msgstr "ERROR: 無法傳送列印資料 (%d)\n"
 
 #, c-format
 msgid "ERROR: Unable to wait for pictwpstops: %s\n"
-msgstr ""
+msgstr "ERROR: 無法等候 pictwpstops：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to write %d bytes to \"%s\": %s\n"
-msgstr "無法運行「%s」：%s\n"
+msgstr "ERROR: 無法寫入 %d byte 至“%s”：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to write print data: %s\n"
-msgstr "lp：無法列印檔案：%s\n"
+msgstr "ERROR: 無法寫入列印資料：%s\n"
 
-#, fuzzy
+#,
 msgid "ERROR: Unable to write raster data to driver!\n"
-msgstr "無法取得印表機屬性！"
+msgstr "ERROR: 無法將網格資料寫入驅動程式！\n"
 
 #, c-format
 msgid "ERROR: Unable to write uncompressed document data: %s\n"
-msgstr ""
+msgstr "ERROR: 無法寫入未壓縮文件資料：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unknown encryption option value \"%s\"!\n"
-msgstr "%s：不明的目的印表機「%s」！\n"
+msgstr "ERROR: 不明的加密選項值“%s”！\n"
 
 #, c-format
 msgid "ERROR: Unknown file order \"%s\"\n"
-msgstr ""
+msgstr "ERROR: 不明的檔案順序“%s”\n"
 
 #, c-format
 msgid "ERROR: Unknown format character \"%c\"\n"
-msgstr ""
+msgstr "ERROR: 不明的格式字元“%c”\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unknown option \"%s\" with value \"%s\"!\n"
-msgstr "cupsd：不明的選項「%c」- 放棄中！\n"
+msgstr "ERROR: 不明的選項“%s”，其值為“%s”！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unknown print mode \"%s\"\n"
-msgstr "%s：不明的目的印表機「%s」！\n"
+msgstr "ERROR: 不明的列印模式“%s”\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unknown version option value \"%s\"!\n"
-msgstr "%s：不明的目的印表機「%s」！\n"
+msgstr "ERROR: 不明的版本選項值“%s”！\n"
 
 #, c-format
 msgid "ERROR: Unsupported brightness value %s, using brightness=100!\n"
-msgstr ""
+msgstr "ERROR: 不支援的亮度值 %s，使用亮度=100！\n"
 
 #, c-format
 msgid "ERROR: Unsupported gamma value %s, using gamma=1000!\n"
-msgstr ""
+msgstr "ERROR: 不支援的光度值 %s，使用光度=1000！\n"
 
 #, c-format
 msgid "ERROR: Unsupported number-up value %d, using number-up=1!\n"
-msgstr ""
+msgstr "ERROR: 不支援的 number-up 值 %s，使用 number-up=1！\n"
 
 #, c-format
 msgid ""
 "ERROR: Unsupported number-up-layout value %s, using number-up-layout=lrtb!\n"
-msgstr ""
+msgstr "ERROR: 不支援的 nnumber-up-layout 值 %s，使用 number-up-layout=lrtb！\n"
 
 #, c-format
 msgid "ERROR: Unsupported page-border value %s, using page-border=none!\n"
-msgstr ""
+msgstr "ERROR: 不支援的頁邊值 %s，使用頁邊=無！\n"
 
 #, c-format
 msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
-msgstr ""
+msgstr "ERROR: 偵測到 doc_printf 溢流（%d byte），放棄！\n"
 
 #, c-format
 msgid "ERROR: pictwpstops exited on signal %d!\n"
-msgstr ""
+msgstr "ERROR: pictwpstops 退出，訊號 %d！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: pictwpstops exited with status %d!\n"
-msgstr "cupsaddsmb 失敗時狀態 %d"
+msgstr "ERROR: pictwpstops 退出，狀態 %d！\n"
 
 msgid ""
 "ERROR: recoverable: Unable to connect to printer; will retry in 30 "
 "seconds...\n"
 msgstr ""
+"ERROR: 可回復：無法連接印表機，將在 30 "
+"秒後重試⋯\n"
 
 #, c-format
 msgid "ERROR: select() returned %d\n"
-msgstr ""
+msgstr "ERROR: 選擇（）傳回 %d\n"
 
 msgid "Edit Configuration File"
 msgstr "編輯組態檔案"
@@ -1604,18 +1589,21 @@ msgstr "再次輸入密碼："
 msgid "Enter password:"
 msgstr "輸入密碼："
 
-#, fuzzy
+#,
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page. If you are using Kerberos authentication, make sure you have a "
 "valid Kerberos ticket."
-msgstr "輸入您的使用者名稱和密碼，或是系統管理者名稱和密碼，以存取此頁面。"
+msgstr ""
+"輸入您的使用者名稱和密碼，或 root 使用者名稱和密碼，以存取"
+"此頁面。如果您是使用 Kerberos 認證，請確定您擁有有效的 "
+"Kerberos 票卷。"
 
 msgid "Error Policy"
 msgstr "錯誤時策略"
 
 msgid "Error: need hostname after '-h' option!\n"
-msgstr "錯誤：「-h」選項之後需要主機名稱！\n"
+msgstr "錯誤：“-h”選項之後需要主機名稱！\n"
 
 msgid "Export Printers to Samba"
 msgstr "匯出印表機到 Samba"
@@ -1625,20 +1613,20 @@ msgstr "失敗\n"
 
 #, c-format
 msgid "FATAL: Could not load %s\n"
-msgstr ""
+msgstr "嚴重錯誤：無法載入“%s”\n"
 
 #, c-format
 msgid ""
 "File device URIs have been disabled! To enable, see the FileDevice directive "
 "in \"%s/cupsd.conf\"."
 msgstr ""
-"檔案裝置 URIs 已停用！要啟用的話，參看「%s/cupsd.conf」中的 FileDevice 指令。"
+"檔案裝置 URIs 已停用！要啟用的話，參看“%s/cupsd.conf”中的 FileDevice 指令。"
 
 msgid "Fuser temperature high!"
-msgstr ""
+msgstr "加熱器溫度高！"
 
 msgid "Fuser temperature low!"
-msgstr ""
+msgstr "加熱器溫度低！"
 
 msgid "General"
 msgstr "一般"
@@ -1647,118 +1635,118 @@ msgid "Got a printer-uri attribute but no job-id!"
 msgstr "得到 printer-uri 屬性但是沒有 job-id！"
 
 msgid "Help"
-msgstr "求助"
+msgstr "協助"
 
 #, c-format
 msgid "INFO: Attempting to connect to host %s for printer %s\n"
-msgstr ""
+msgstr "INFO: 嘗試為印表機“%2$s”連接主機“%1$s”\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "INFO: Attempting to connect to host %s on port %d\n"
-msgstr "lpstat：無法以連接埠 %2$d 連接伺服器 %1$s：%3$s\n"
+msgstr "INFO: 嘗試在“%d”埠上連接主機“%s”\n"
 
 msgid "INFO: Canceling print job...\n"
-msgstr ""
+msgstr "INFO: 正在取消列印工作⋯\n"
 
 #, c-format
 msgid "INFO: Connected to %s...\n"
-msgstr ""
+msgstr "INFO: 已連接“%s”⋯\n"
 
 #, c-format
 msgid "INFO: Connecting to %s on port %d...\n"
-msgstr ""
+msgstr "INFO: 正在連接“%d”埠上的“%s”⋯\n"
 
 msgid "INFO: Control file sent successfully\n"
-msgstr ""
+msgstr "INFO: 已成功傳送控制檔案\n"
 
 msgid "INFO: Data file sent successfully\n"
-msgstr ""
+msgstr "INFO: 已成功傳送資料檔案\n"
 
 #, c-format
 msgid "INFO: Formatting page %d...\n"
-msgstr ""
+msgstr "INFO: 正在格式化頁面 %d⋯\n"
 
 msgid "INFO: Loading image file...\n"
-msgstr ""
+msgstr "INFO: 正在載入影像檔案⋯\n"
 
 msgid "INFO: Print file sent, waiting for printer to finish...\n"
-msgstr ""
+msgstr "INFO: 已傳送列印檔案，等候印表機完成工作⋯\n"
 
 #, c-format
 msgid "INFO: Printer busy (status:0x%08x)\n"
-msgstr ""
+msgstr "INFO: 印表機忙碌中（狀態：0x%08x）\n"
 
 msgid "INFO: Printer busy; will retry in 10 seconds...\n"
-msgstr ""
+msgstr "INFO: 印表機忙碌中，將在 10 秒後重試⋯\n"
 
 msgid "INFO: Printer busy; will retry in 30 seconds...\n"
-msgstr ""
+msgstr "INFO: 印表機忙碌中，將在 30 秒後重試⋯\n"
 
 msgid "INFO: Printer busy; will retry in 5 seconds...\n"
-msgstr ""
+msgstr "INFO: 印表機忙碌中，將在 5 秒後重試⋯\n"
 
 msgid "INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n"
-msgstr ""
+msgstr "INFO: 列表機不支援 IPP/1.1，嘗試 IPP/1.0⋯\n"
 
 msgid "INFO: Printer is busy; will retry in 5 seconds...\n"
-msgstr ""
+msgstr "INFO: 印表機忙碌中，將在 5 秒後重試⋯\n"
 
 msgid "INFO: Printer is currently off-line.\n"
-msgstr ""
+msgstr "INFO: 印表機已離線。\n"
 
 msgid "INFO: Printer is now on-line.\n"
-msgstr ""
+msgstr "INFO: 印表機已在線上。\n"
 
 msgid "INFO: Printer not connected; will retry in 30 seconds...\n"
-msgstr ""
+msgstr "INFO: 未連接印表機；將在 30 秒後重試⋯\n"
 
 #, c-format
 msgid "INFO: Printing page %d, %d%% complete...\n"
-msgstr ""
+msgstr "INFO: 正在列印頁面 %d，%d%% 已完成⋯\n"
 
 #, c-format
 msgid "INFO: Printing page %d...\n"
-msgstr ""
+msgstr "INFO: 正在列印頁面 %d⋯\n"
 
 msgid "INFO: Ready to print.\n"
-msgstr ""
+msgstr "INFO: 已準備好進行列印。\n"
 
 #, c-format
 msgid "INFO: Sending control file (%lu bytes)\n"
-msgstr ""
+msgstr "INFO: 正在傳送控制檔案（%lu byte）\n"
 
 #, c-format
 msgid "INFO: Sending control file (%u bytes)\n"
-msgstr ""
+msgstr "INFO: 正在傳送控制檔案（%u byte）\n"
 
 msgid "INFO: Sending data\n"
-msgstr ""
+msgstr "INFO: 正在傳送資料\n"
 
 #, c-format
 msgid "INFO: Sending data file (%ld bytes)\n"
-msgstr ""
+msgstr "INFO: 正在傳送資料檔案（%ld byte）\n"
 
 #, c-format
 msgid "INFO: Sending data file (%lld bytes)\n"
-msgstr ""
+msgstr "INFO: 正在傳送資料檔案（%lld byte）\n"
 
 #, c-format
 msgid "INFO: Sent print file, %ld bytes...\n"
-msgstr ""
+msgstr "INFO: 傳送列印檔案，%ld byte⋯\n"
 
 #, c-format
 msgid "INFO: Sent print file, %lld bytes...\n"
-msgstr ""
+msgstr "INFO: 傳送列印檔案，%lld byte⋯\n"
 
 #, c-format
 msgid "INFO: Spooling LPR job, %.0f%% complete...\n"
-msgstr ""
+msgstr "INFO: 正在緩衝 LPR 工作，%.0f%% 已完成⋯\n"
 
 msgid "INFO: Unable to contact printer, queuing on next printer in class...\n"
-msgstr ""
+msgstr "INFO: 無法聯絡印表機，佇列於另一部印表機⋯\n"
 
 msgid "INFO: Waiting for job to complete...\n"
-msgstr ""
+msgstr "INFO: 正在等候工作完成⋯\n"
 
 msgid "Illegal control character"
 msgstr "不合法的控制字元"
@@ -1776,19 +1764,19 @@ msgid "Illegal whitespace character"
 msgstr "不合法的空白字元"
 
 msgid "Ink/toner almost empty."
-msgstr ""
+msgstr "墨水∕碳粉將用完。"
 
 msgid "Ink/toner empty!"
-msgstr ""
+msgstr "墨水∕碳粉已用完！"
 
 msgid "Ink/toner waste bin almost full."
-msgstr ""
+msgstr "墨水∕碳粉回收槽將滿。"
 
 msgid "Ink/toner waste bin full!"
-msgstr ""
+msgstr "墨水∕碳粉回收槽已滿！"
 
 msgid "Interlock open."
-msgstr ""
+msgstr "內部鎖已開啟。"
 
 msgid "Internal error"
 msgstr "內部錯誤"
@@ -1840,20 +1828,20 @@ msgstr "工作 #%s 不存在！"
 msgid "Job %d not found!"
 msgstr "找不到工作 %d！"
 
-#, fuzzy
+#,
 msgid "Job Completed"
-msgstr "已完成"
+msgstr "工作已完成"
 
 msgid "Job Created"
-msgstr ""
+msgstr "工作已建立"
 
-#, fuzzy
+#,
 msgid "Job Options Changed"
-msgstr "工作失敗："
+msgstr "工作選項已變更"
 
-#, fuzzy
+#,
 msgid "Job Stopped"
-msgstr "停止"
+msgstr "工作已停止"
 
 msgid "Job is completed and cannot be changed."
 msgstr "工作已完成而無法變更。"
@@ -1865,20 +1853,20 @@ msgid "Job state cannot be changed."
 msgstr "工作狀態無法變更。"
 
 msgid "Job subscriptions cannot be renewed!"
-msgstr "工作無法重新訂用！"
+msgstr "工作訂閱無法更新！"
 
 msgid "Jobs"
 msgstr "工作"
 
 #, c-format
 msgid "Language \"%s\" not supported!"
-msgstr "不支援語言「%s」！"
+msgstr "不支援語言“%s”！"
 
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr "列長超過允許的最大值(255 個字元)"
 
 msgid "List Available Printers"
-msgstr ""
+msgstr "列出可用的印表機"
 
 msgid "Media Size"
 msgstr "媒體大小"
@@ -1889,53 +1877,53 @@ msgstr "媒體來源"
 msgid "Media Type"
 msgstr "媒體類型"
 
-#, fuzzy
+#,
 msgid "Media jam!"
-msgstr "媒體大小"
+msgstr "媒體卡紙！"
 
 msgid "Media tray almost empty."
-msgstr ""
+msgstr "媒體匣將用完。"
 
 msgid "Media tray empty!"
-msgstr ""
+msgstr "媒體匣已用完！"
 
 msgid "Media tray missing!"
-msgstr ""
+msgstr "找不到媒體匣！"
 
 msgid "Media tray needs to be filled."
-msgstr ""
+msgstr "媒體匣需要填充。"
 
 msgid "Memory allocation error"
 msgstr "記憶體配置錯誤"
 
 msgid "Missing PPD-Adobe-4.x header"
-msgstr "缺少 PPD-Adobe-4.x 頁首"
+msgstr "遺失 PPD-Adobe-4.x 頁首"
 
 msgid "Missing asterisk in column 1"
-msgstr "在第一欄中缺少星號"
+msgstr "在第一欄中遺失星號"
 
 #, c-format
 msgid "Missing double quote on line %d!"
-msgstr "第 %d 列缺少雙引號！"
+msgstr "第 %d 列遺失雙引號！"
 
 msgid "Missing form variable!"
-msgstr "缺少形式變數！"
+msgstr "遺失形式變數！"
 
 msgid "Missing notify-subscription-ids attribute!"
-msgstr "缺少 notify-subscription-ids 屬性！"
+msgstr "遺失 notify-subscription-ids 屬性！"
 
 msgid "Missing requesting-user-name attribute!"
-msgstr "缺少 requesting-user-name 屬性！"
+msgstr "遺失 requesting-user-name 屬性！"
 
 msgid "Missing required attributes!"
-msgstr "缺少必要的屬性！"
+msgstr "遺失必要的屬性！"
 
 #, c-format
 msgid "Missing value on line %d!"
-msgstr "第 %d 列缺少設定值！"
+msgstr "第 %d 列遺失設定值！"
 
 msgid "Missing value string"
-msgstr "缺少值字串"
+msgstr "遺失值字串"
 
 #, c-format
 msgid ""
@@ -1946,7 +1934,7 @@ msgid ""
 msgstr ""
 "型號： 名稱 = %s\n"
 "        自然語言 = %s\n"
-"        廠商與型號 = %s\n"
+"        make-and-model = %s\n"
 "        裝置識別號 = %s\n"
 
 msgid "Modify Class"
@@ -1963,10 +1951,10 @@ msgstr "移動工作"
 
 #, c-format
 msgid "NOTICE: Print file accepted - job ID %d.\n"
-msgstr ""
+msgstr "NOTICE: 已接受列印檔案 - 工作識別碼 %d。\n"
 
 msgid "NOTICE: Print file accepted - job ID unknown.\n"
-msgstr ""
+msgstr "NOTICE: 已接受列印檔案 - 工作識別碼不明。\n"
 
 msgid "NULL PPD file pointer"
 msgstr "空的 PPD 檔案指標"
@@ -1997,26 +1985,26 @@ msgid "No file!?!"
 msgstr "沒有檔案!?!"
 
 msgid "No subscription attributes in request!"
-msgstr "在請求中沒有訂用屬性！"
+msgstr "在請求中沒有訂閱屬性！"
 
 msgid "No subscriptions found."
-msgstr "找不到訂用記錄。"
+msgstr "找不到訂閱記錄。"
 
 msgid "None"
-msgstr "無一"
+msgstr "無"
 
-#, fuzzy
+#,
 msgid "Not allowed to print."
-msgstr "無預設印表機"
+msgstr "不允許列印。"
 
 msgid "OK"
-msgstr "確定"
+msgstr "好"
 
 msgid "OPC almost at end-of-life."
-msgstr ""
+msgstr "OPC 使用期限將至。"
 
 msgid "OPC at end-of-life!"
-msgstr ""
+msgstr "OPC 已至使用期限。"
 
 msgid "OpenGroup without a CloseGroup first"
 msgstr "CloseGroup 未先於 OpenGroup 而出現"
@@ -2031,16 +2019,16 @@ msgid "Options Installed"
 msgstr "已安裝選項"
 
 msgid "Out of toner!"
-msgstr ""
+msgstr "碳粉已用完！"
 
 msgid "Output Mode"
 msgstr "輸出模式"
 
 msgid "Output bin almost full."
-msgstr ""
+msgstr "輸出槽將滿。"
 
 msgid "Output bin full!"
-msgstr ""
+msgstr "輸出槽已滿！"
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -2059,7 +2047,7 @@ msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
 msgstr "給印表機 %1$s/%2$s 的輸出已發送到位於 %4$s 的遠端印表機 %3$s\n"
 
 msgid "Output tray missing!"
-msgstr ""
+msgstr "輸出匣遺失！"
 
 msgid "PASS\n"
 msgstr "略過\n"
@@ -2084,28 +2072,28 @@ msgstr "列印工作："
 msgid "Print Test Page"
 msgstr "列印測試頁"
 
-#, fuzzy
+#,
 msgid "Printer Added"
-msgstr "印表機"
+msgstr "印表機已加入"
 
-#, fuzzy
+#,
 msgid "Printer Deleted"
-msgstr "印表機未共享！"
+msgstr "印表機已刪除"
 
 msgid "Printer Maintenance"
 msgstr "印表機維護"
 
-#, fuzzy
+#,
 msgid "Printer Modified"
-msgstr "印表機未共享！"
+msgstr "印表機已修改"
 
-#, fuzzy
+#,
 msgid "Printer Stopped"
-msgstr "印表機未共享！"
+msgstr "印表機已停止"
 
-#, fuzzy
+#,
 msgid "Printer off-line."
-msgstr "印表機維護"
+msgstr "印表機離線。"
 
 msgid "Printer:"
 msgstr "印表機："
@@ -2135,19 +2123,19 @@ msgstr "解析度"
 
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
-msgstr "正在執行命令：%s %s -N -A %s -c「%s」\n"
+msgstr "正在執行命令：%s %s -N -A %s -c“%s”\n"
 
 msgid "Server Restarted"
-msgstr ""
+msgstr "伺服器重新啟動"
 
 msgid "Server Security Auditing"
-msgstr ""
+msgstr "伺服器安全性審核"
 
 msgid "Server Started"
-msgstr ""
+msgstr "伺服器已啟動"
 
 msgid "Server Stopped"
-msgstr ""
+msgstr "伺服器已停止"
 
 msgid "Set Allowed Users"
 msgstr "設定允許的使用者"
@@ -2155,15 +2143,15 @@ msgstr "設定允許的使用者"
 msgid "Set As Default"
 msgstr "設成預設值"
 
-#, fuzzy
+#,
 msgid "Set Class Options"
-msgstr "設定印表機選項"
+msgstr "設定類別選項"
 
 msgid "Set Printer Options"
 msgstr "設定印表機選項"
 
 msgid "Set Publishing"
-msgstr "設定發布"
+msgstr "設定發佈"
 
 msgid "Start Class"
 msgstr "啟動類別"
@@ -2182,11 +2170,11 @@ msgstr "停止印表機"
 
 #, c-format
 msgid "The PPD file \"%s\" could not be found."
-msgstr ""
+msgstr "找不到 PPD 檔案“%s”。"
 
 #, c-format
 msgid "The PPD file \"%s\" could not be opened: %s"
-msgstr ""
+msgstr "無法打開 PPD 檔案“%s”：%s"
 
 msgid ""
 "The class name may only contain up to 127 printable characters and may not "
@@ -2218,46 +2206,46 @@ msgstr "找不到印表機或類別。"
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
-msgstr "printer-uri「%s」內含無效的字元。"
+msgstr "printer-uri“%s”內含無效的字元。"
 
 msgid "The printer-uri attribute is required!"
 msgstr "printer-uri 屬性為必要的！"
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
-msgstr "printer-uri 必須是「ipp://主機名稱/classes/類別名稱」的形式。"
+msgstr "printer-uri 必須是“ipp://主機名稱/classes/類別名稱”的形式。"
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
-msgstr "printer-uri 必須是「ipp://主機名稱/printers/印表機名稱」的形式。"
+msgstr "printer-uri 必須是“ipp://主機名稱/printers/印表機名稱”的形式。"
 
-#, fuzzy
+#,
 msgid ""
 "The subscription name may not contain spaces, slashes (/), question marks "
 "(?), or the pound sign (#)."
 msgstr ""
-"類別名稱最多只能包含 127 個可列印字元，而且不可包含空格、斜線(/)，或井字符號"
-"(#)。"
+"訂閱名稱不可包含空格、斜線（/）、問號"
+"（?）或井字符號(#)。"
 
 msgid "Toner low."
-msgstr ""
+msgstr "碳粉餘量過低。"
 
 msgid "Too many active jobs."
-msgstr "太多作用中工作。"
+msgstr "太多啟用中的工作。"
 
 msgid "Unable to access cupsd.conf file:"
 msgstr "無法存取 cupsd.conf 檔案："
 
-#, fuzzy
+#,
 msgid "Unable to add RSS subscription:"
-msgstr "無法加入印表機："
+msgstr "無法加入 RSS 訂閱："
 
 msgid "Unable to add class:"
 msgstr "無法加入類別："
 
 #, c-format
 msgid "Unable to add job for destination \"%s\"!"
-msgstr "無法於目的印表機「%s」加入工作！"
+msgstr "無法於目的印表機“%s”加入工作！"
 
 msgid "Unable to add printer:"
 msgstr "無法加入印表機："
@@ -2265,9 +2253,9 @@ msgstr "無法加入印表機："
 msgid "Unable to allocate memory for file types!"
 msgstr "無法配置用於檔案類型的記憶體！"
 
-#, fuzzy
+#,
 msgid "Unable to cancel RSS subscription:"
-msgstr "無法變更印表機："
+msgstr "無法取消 RSS 訂閱："
 
 msgid "Unable to change printer-is-shared attribute:"
 msgstr "無法變更印表機分享的屬性："
@@ -2368,7 +2356,7 @@ msgstr "無法列印測試頁："
 
 #, c-format
 msgid "Unable to run \"%s\": %s\n"
-msgstr "無法運行「%s」：%s\n"
+msgstr "無法運行“%s”：%s\n"
 
 msgid "Unable to send maintenance job:"
 msgstr "無法發送維護工作："
@@ -2386,21 +2374,21 @@ msgstr "無法上傳 cupsd.conf 檔案："
 msgid "Unknown"
 msgstr "不明的"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown printer error (%s)!"
-msgstr "不明的 printer-error-policy「%s」。"
+msgstr "不明的印表機錯誤（%s）！"
 
 #, c-format
 msgid "Unknown printer-error-policy \"%s\"."
-msgstr "不明的 printer-error-policy「%s」。"
+msgstr "不明的 printer-error-policy“%s”。"
 
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
-msgstr "不明的 printer-op-policy「%s」。"
+msgstr "不明的 printer-op-policy“%s”。"
 
 #, c-format
 msgid "Unsupported compression \"%s\"!"
-msgstr "不支援的壓縮「%s」！"
+msgstr "不支援的壓縮“%s”！"
 
 #, c-format
 msgid "Unsupported compression attribute %s!"
@@ -2408,15 +2396,15 @@ msgstr "不支援的壓縮屬性 %s！"
 
 #, c-format
 msgid "Unsupported format \"%s\"!"
-msgstr "不支援的格式「%s」！"
+msgstr "不支援的格式“%s”！"
 
 #, c-format
 msgid "Unsupported format '%s'!"
-msgstr "不支援格式「%s」！"
+msgstr "不支援格式“%s”！"
 
 #, c-format
 msgid "Unsupported format '%s/%s'!"
-msgstr "不支援的格式「%s/%s」！"
+msgstr "不支援的格式“%s/%s”！"
 
 msgid ""
 "Usage:\n"
@@ -2441,29 +2429,11 @@ msgstr ""
 
 #, c-format
 msgid "Usage: %s job-id user title copies options [file]\n"
-msgstr ""
+msgstr "用法：“%s”工作識別碼使用者標題拷貝選項 [檔案]\n"
 
 #, c-format
 msgid "Usage: %s job-id user title copies options file\n"
-msgstr ""
-
-msgid ""
-"Usage: convert [ options ]\n"
-"\n"
-"Options:\n"
-"\n"
-"  -f filename          Set file to be converted (otherwise stdin)\n"
-"  -o filename          Set file to be generated (otherwise stdout)\n"
-"  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
-"  -j mime/type         Set output MIME type (otherwise application/pdf)\n"
-"  -P filename.ppd      Set PPD file\n"
-"  -a 'name=value ...'  Set option(s)\n"
-"  -U username          Set username for job\n"
-"  -J title             Set title\n"
-"  -c copies            Set number of copies\n"
-"  -u                   Remove the PPD file when finished\n"
-"  -D                   Remove the input file when finished\n"
-msgstr ""
+msgstr "用法：“%s”工作識別碼使用者標題拷貝選項檔案\n"
 
 msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
@@ -2504,6 +2474,20 @@ msgid ""
 "    --[no-]share-printers   Turn printer sharing on/off\n"
 "    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
 msgstr ""
+"用法：cupsctl [選項] [param=value ... paramN=valueN]\n"
+"\n"
+"選項：\n"
+"\n"
+"    -E                      啟用加密\n"
+"    -U username             指定使用者名稱\n"
+"    -h server[:port]        指定伺服器位址\n"
+"\n"
+"    --[no-]debug-logging    開啟∕關閉除錯記錄\n"
+"    --[no-]remote-admin     開啟∕關閉遠端管理\n"
+"    --[no-]remote-any       允許∕避免連接 Internet\n"
+"    --[no-]remote-printers  顯示∕隱藏遠端印表機\n"
+"    --[no-]share-printers   開啟∕關閉印表機共享\n"
+"    --[no-]user-cancel-any  允許∕避免使用者取消任何工作\n"
 
 msgid ""
 "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
@@ -2523,7 +2507,7 @@ msgstr ""
 " -l                  從 launchd(8) 運行 cupsd\n"
 
 msgid ""
-"Usage: cupsfilter -m mime/type [ options ] filename\n"
+"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
 "\n"
 "Options:\n"
 "\n"
@@ -2533,6 +2517,15 @@ msgid ""
 "  -p filename.ppd  Set PPD file\n"
 "  -t title         Set title\n"
 msgstr ""
+"用法：cupsfilter -m mime/type [ options ] filename(s)\n"
+"\n"
+"選項：\n"
+"\n"
+"  -c cupsd.conf    設定要使用的 cupsd.conf 檔案\n"
+"  -n copies        設定份數\n"
+"  -o name=value    設定選項\n"
+"  -p filename.ppd  設定 PPD 檔案\n"
+"  -t title         設定標題\n"
 
 msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
@@ -2568,6 +2561,18 @@ msgid ""
 "    -v                   Be slightly verbose\n"
 "    -vv                  Be very verbose\n"
 msgstr ""
+"用法：cupstestppd [選項] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"       program | cupstestppd [選項] -\n"
+"\n"
+"選項：\n"
+"\n"
+"    -R root-directory    設定替用 root\n"
+"    -W {所有,無,限制,預設,濾鏡,翻譯}\n"
+"                         發出警告而不是錯誤\n"
+"    -q                   靜音執行\n"
+"    -r                   使用 'relaxed' 開啟模式\n"
+"    -v                   靜音詳盡執行\n"
+"    -vv                  非常詳盡\n"
 
 msgid "Usage: lpmove job/src dest\n"
 msgstr "用法：lpmove 工作/來源 目的印表機\n"
@@ -2602,69 +2607,74 @@ msgstr ""
 "隔]\n"
 
 msgid "Usage: snmp [host-or-ip-address]\n"
-msgstr ""
+msgstr "用法：snmp [host-or-ip-address]\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
-msgstr "lp：-f 選項之後預期為形式！\n"
+msgstr "WARNING: 布林期望 waiteof 選項“%s”\n"
 
 msgid "WARNING: Couldn't create read channel\n"
-msgstr ""
+msgstr "WARNING: 無法建立讀取通道\n"
 
 msgid "WARNING: Couldn't create side channel\n"
-msgstr ""
+msgstr "WARNING: 無法建立側邊通道\n"
 
 msgid "WARNING: Failed to read side-channel request!\n"
-msgstr ""
+msgstr "WARNING: 讀取側邊通道要求失敗！\n"
 
 #, c-format
 msgid "WARNING: Option \"%s\" cannot be included via IncludeFeature!\n"
-msgstr ""
+msgstr "WARNING: 無法透過 IncludeFeature 包含“%s”選項！\n"
 
 #, c-format
 msgid ""
 "WARNING: Remote host did not respond with command status byte after %d "
 "seconds!\n"
-msgstr ""
-
+msgstr "WARNING: 遠端主機沒有在 %d 秒後回應指令狀態"
+"位元！\n"
 #, c-format
 msgid ""
 "WARNING: Remote host did not respond with control status byte after %d "
 "seconds!\n"
-msgstr ""
+msgstr "WARNING: 遠端主機沒有在 %d 秒後回應控制狀態"
+"位元！\n"
 
 #, c-format
 msgid ""
 "WARNING: Remote host did not respond with data status byte after %d "
 "seconds!\n"
-msgstr ""
+msgstr "WARNING: 遠端主機沒有在 %d 秒後回應資料狀態"
+"位元！\n"
 
 #, c-format
 msgid "WARNING: SCSI command timed out (%d); retrying...\n"
-msgstr ""
+msgstr "WARNING: SCSI 指令逾時（%d）；重試中⋯\n"
 
 msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
 "Conventions and may not print correctly!\n"
-msgstr ""
+msgstr "WARNING: 此文件不符合 Adobe Document Structuring "
+"Conventions，可能無法正確列印！\n""
 
-#, fuzzy, c-format
+#, c-format
 msgid "WARNING: Unknown choice \"%s\" for option \"%s\"!\n"
-msgstr "%s：不明的目的印表機「%s」！\n"
+msgstr "WARNING: “%2$s”不明的選擇“%1$s”！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "WARNING: Unknown option \"%s\"!\n"
-msgstr "%s：不明的選項「%c」！\n"
+msgstr "WARNING: 不明的選項“%s”！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "WARNING: Unsupported baud rate %s!\n"
-msgstr "不支援的格式「%s」！"
+msgstr "WARNING: 不支援的波特率 %s！"
 
 #, c-format
 msgid ""
 "WARNING: recoverable: Network host '%s' is busy; will retry in %d "
 "seconds...\n"
 msgstr ""
+"WARNING: 可回復的：網路主機“%s”忙碌中；將在 %d "
+"秒後重試⋯\n"
 
 msgid "Warning, no Windows 2000 printer drivers are installed!"
 msgstr "警告，未安裝任何 Windows 2000 印表機驅動程式！"
@@ -2688,9 +2698,6 @@ msgstr "取消"
 msgid "completed"
 msgstr "已完成"
 
-msgid "convert: Use the -f option to specify a file to convert.\n"
-msgstr ""
-
 msgid "cups-deviced failed to execute."
 msgstr "cups-deviced 執行失敗。"
 
@@ -2699,32 +2706,48 @@ msgstr "cups-driverd 執行失敗。"
 
 #, c-format
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
-msgstr "cupsaddsmb：沒有任何用於印表機「%s」的 PPD 檔案- %s\n"
+msgstr "cupsaddsmb：沒有任何用於印表機“%s”的 PPD 檔案- %s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "cupsctl: Unknown option \"%s\"!\n"
-msgstr "取消：不明的選項「%c」！\n"
+msgstr "cupsctl：不明的選項“%s”！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "cupsctl: Unknown option \"-%c\"!\n"
-msgstr "取消：不明的選項「%c」！\n"
+msgstr "cupsctl：不明的選項“-%c”！\n"
 
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
-msgstr "cupsd：「-c」選項之後預期為配置檔案名稱！\n"
+msgstr "cupsd：“-c”選項之後預期為配置檔案名稱！\n"
 
 #, c-format
 msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
-msgstr "cupsd：不明的引數「%s」- 放棄中！\n"
+msgstr "cupsd：不明的引數“%s”- 放棄中！\n"
 
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting!\n"
-msgstr "cupsd：不明的選項「%c」- 放棄中！\n"
+msgstr "cupsd：不明的選項“%c”- 放棄中！\n"
 
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr "cupsd：launchd(8) 的支援未被編譯進來，以正常模式運行。\n"
 
+#, c-format
+msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
+msgstr "cupsfilter：沒有可用的濾鏡可從 %s/%s 轉換至 %s/%s！\n"
+
 msgid "cupsfilter: Only one filename can be specified!\n"
-msgstr ""
+msgstr "cupsfilter：只能指定一個檔案名稱！/n"
+
+#, c-format
+msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
+msgstr "cupsfilter：無法決定“%s”的 MIME 類型！\n"
+
+#, c-format
+msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
+msgstr "cupsfilter：無法從“%s”讀取 MIME 資料庫！\n"
+
+#, c-format
+msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
+msgstr "cupsfilter：不明的目標 MIME 類型 %s/%s！\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
 msgstr "cupstestppd：-q 選項與 -v 選項不相容。\n"
@@ -2750,55 +2773,55 @@ msgid "idle"
 msgstr "閒置"
 
 msgid "job-printer-uri attribute missing!"
-msgstr "缺少 job-printer-uri 屬性！"
+msgstr "遺失 job-printer-uri 屬性！"
 
 msgid "lpadmin: Class name can only contain printable characters!\n"
 msgstr "lpadmin：類別名稱只能包含可列印字元！\n"
 
 msgid "lpadmin: Expected PPD after '-P' option!\n"
-msgstr "lpadmin：「-P」選項之後預期為 PPD！\n"
+msgstr "lpadmin：“-P”選項之後預期為 PPD！\n"
 
 msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
-msgstr "lpadmin：「-u」選項之後預期為允許/拒絕：使用者串列！\n"
+msgstr "lpadmin：“-u”選項之後預期為允許/拒絕：使用者串列！\n"
 
 msgid "lpadmin: Expected class after '-r' option!\n"
-msgstr "lpadmin：「-r」選項之後預期為類別！\n"
+msgstr "lpadmin：“-r”選項之後預期為類別！\n"
 
 msgid "lpadmin: Expected class name after '-c' option!\n"
-msgstr "lpadmin：「-c」選項之後預期為類別名稱！\n"
+msgstr "lpadmin：“-c”選項之後預期為類別名稱！\n"
 
 msgid "lpadmin: Expected description after '-D' option!\n"
-msgstr "lpadmin：「-D」選項之後預期為描述！\n"
+msgstr "lpadmin：“-D”選項之後預期為描述！\n"
 
 msgid "lpadmin: Expected device URI after '-v' option!\n"
-msgstr "lpadmin：「-v」選項之後預期為裝置的 URI！\n"
+msgstr "lpadmin：“-v”選項之後預期為裝置的 URI！\n"
 
 msgid "lpadmin: Expected file type(s) after '-I' option!\n"
-msgstr "lpadmin：「-I」選項之後預期為檔案類型！\n"
+msgstr "lpadmin：“-I”選項之後預期為檔案類型！\n"
 
 msgid "lpadmin: Expected hostname after '-h' option!\n"
-msgstr "lpadmin：「-h」選項之後預期為主機名稱！\n"
+msgstr "lpadmin：“-h”選項之後預期為主機名稱！\n"
 
 msgid "lpadmin: Expected interface after '-i' option!\n"
-msgstr "lpadmin：「-i」選項之後預期為介面！\n"
+msgstr "lpadmin：“-i”選項之後預期為介面！\n"
 
 msgid "lpadmin: Expected location after '-L' option!\n"
-msgstr "lpadmin：「-L」選項之後預期為位置！\n"
+msgstr "lpadmin：“-L”選項之後預期為位置！\n"
 
 msgid "lpadmin: Expected model after '-m' option!\n"
-msgstr "lpadmin：「-m」選項之後預期為型號！\n"
+msgstr "lpadmin：“-m”選項之後預期為型號！\n"
 
 msgid "lpadmin: Expected name=value after '-o' option!\n"
-msgstr "lpadmin：「-o」選項之後預期為名稱=值！\n"
+msgstr "lpadmin：“-o”選項之後預期為名稱=值！\n"
 
 msgid "lpadmin: Expected printer after '-p' option!\n"
-msgstr "lpadmin：「-p」選項之後預期為印表機！\n"
+msgstr "lpadmin：“-p”選項之後預期為印表機！\n"
 
 msgid "lpadmin: Expected printer name after '-d' option!\n"
-msgstr "lpadmin：「-d」選項之後預期為印表機名稱！\n"
+msgstr "lpadmin：“-d”選項之後預期為印表機名稱！\n"
 
 msgid "lpadmin: Expected printer or class after '-x' option!\n"
-msgstr "lpadmin：「-x」選項之後預期為印表機或類別！\n"
+msgstr "lpadmin：“-x”選項之後預期為印表機或類別！\n"
 
 msgid "lpadmin: No member names were seen!\n"
 msgstr "lpadmin：未發現任何成員名稱！\n"
@@ -2835,11 +2858,11 @@ msgstr "lpadmin：無法建立暫時檔案：%s\n"
 
 #, c-format
 msgid "lpadmin: Unable to open PPD file \"%s\" - %s\n"
-msgstr "lpadmin：無法開啟 PPD 檔案「%s」- %s\n"
+msgstr "lpadmin：無法開啟 PPD 檔案“%s”- %s\n"
 
 #, c-format
 msgid "lpadmin: Unable to open file \"%s\": %s\n"
-msgstr "lpadmin：無法開啟檔案「%s」：%s\n"
+msgstr "lpadmin：無法開啟檔案“%s”：%s\n"
 
 msgid ""
 "lpadmin: Unable to remove a printer from the class:\n"
@@ -2899,15 +2922,15 @@ msgstr ""
 
 #, c-format
 msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
-msgstr "lpadmin：不明的允許/拒絕選項「%s」！\n"
+msgstr "lpadmin：不明的允許/拒絕選項“%s”！\n"
 
 #, c-format
 msgid "lpadmin: Unknown argument '%s'!\n"
-msgstr "lpadmin：不明的引數「%s」！\n"
+msgstr "lpadmin：不明的引數“%s”！\n"
 
 #, c-format
 msgid "lpadmin: Unknown option '%c'!\n"
-msgstr "lpadmin：不明的選項「%c」！\n"
+msgstr "lpadmin：不明的選項“%c”！\n"
 
 msgid "lpadmin: Warning - content type list ignored!\n"
 msgstr "lpadmin：警告 - 內容類型表列被忽略！\n"
@@ -2921,11 +2944,11 @@ msgstr "lpinfo：無法連接伺服器：%s\n"
 
 #, c-format
 msgid "lpinfo: Unknown argument '%s'!\n"
-msgstr "lpinfo：不明的引數「%s」！\n"
+msgstr "lpinfo：不明的引數“%s”！\n"
 
 #, c-format
 msgid "lpinfo: Unknown option '%c'!\n"
-msgstr "lpinfo：不明的選項「%c」！\n"
+msgstr "lpinfo：不明的選項“%c”！\n"
 
 #, c-format
 msgid "lpmove: Unable to connect to server: %s\n"
@@ -2933,11 +2956,11 @@ msgstr "lpmove：無法連接伺服器：%s\n"
 
 #, c-format
 msgid "lpmove: Unknown argument '%s'!\n"
-msgstr "lpmove：不明的引數「%s」！\n"
+msgstr "lpmove：不明的引數“%s”！\n"
 
 #, c-format
 msgid "lpmove: Unknown option '%c'!\n"
-msgstr "lpmove：不明的選項「%c」！\n"
+msgstr "lpmove：不明的選項“%c”！\n"
 
 msgid "lpoptions: No printers!?!\n"
 msgstr "lpoptions：沒有印表機 !?!\n"
@@ -3003,7 +3026,7 @@ msgstr "lppasswd：重新命名密碼檔案時失敗：%s\n"
 
 #, c-format
 msgid "lppasswd: user \"%s\" and group \"%s\" do not exist.\n"
-msgstr "lppasswd：使用者「%s」及群組「%s」不存在。\n"
+msgstr "lppasswd：使用者“%s”及群組“%s”不存在。\n"
 
 msgid "lprm: Unable to contact server!\n"
 msgstr "lprm：無法連上伺服器！\n"
@@ -3012,7 +3035,7 @@ msgstr "lprm：無法連上伺服器！\n"
 msgid ""
 "lpstat: error - %s environment variable names non-existent destination \"%s"
 "\"!\n"
-msgstr "lpstat：錯誤 - %s 環境變數指稱不存在的目的印表機「%s」！\n"
+msgstr "lpstat：錯誤 - %s 環境變數指稱不存在的目的印表機“%s”！\n"
 
 #, c-format
 msgid "members of class %s:\n"
@@ -3027,9 +3050,9 @@ msgstr "無系統預設目的印表機\n"
 msgid "notify-events not specified!"
 msgstr "notify-events 尚未指定！"
 
-#, fuzzy, c-format
+#, c-format
 msgid "notify-recipient-uri URI \"%s\" uses unknown scheme!"
-msgstr "notify-recipient URI「%s」使用不明的方案！"
+msgstr "notify-recipient-uri URI“%s”使用不明的方案！"
 
 #, c-format
 msgid "notify-subscription-id %d no good!"
@@ -3113,29 +3136,30 @@ msgstr "無標題"
 #~ "      ** 失敗 **  1284DeviceId 必須是 1284DeviceID！\n"
 #~ "               參考：頁面 72, 區段 5.5\n"
 
-#, fuzzy
+#,
 #~ msgid "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s!\n"
-#~ msgstr "      ** 失敗 **  缺少用於選項 %s 的「%s」翻譯字串！\n"
+#~ msgstr "      ** 失敗 **  用於選項 %s 的“%s” UTF-8 翻譯字串不正確！\n"
 
-#, fuzzy
+#,
 #~ msgid ""
 #~ "      **FAIL**  Bad UTF-8 \"%s\" translation string for option %s, choice "
 #~ "%s!\n"
-#~ msgstr "      ** 失敗 **  缺少用於選項 %s、選擇 %s 的「%s」翻譯字串！\n"
+#~ msgstr "      ** 失敗 **  用於選項 %s、選擇 %s 的 UTF-8 翻譯字串“%s”"
+#~ "不正確！\n"
 
 #~ msgid "      **FAIL**  Bad cupsFilter value \"%s\"!\n"
-#~ msgstr "      ** 失敗 **  不當的 cupsFilter 值「%s」！\n"
+#~ msgstr "      ** 失敗 **  不正確的 cupsFilter 值“%s”！\n"
 
 #~ msgid "      **FAIL**  Bad language \"%s\"!\n"
-#~ msgstr "      ** 失敗 **  不當的語言「%s」！\n"
+#~ msgstr "      ** 失敗 **  不正確的語言“%s”！\n"
 
 #~ msgid "      **FAIL**  Missing \"%s\" translation string for option %s!\n"
-#~ msgstr "      ** 失敗 **  缺少用於選項 %s 的「%s」翻譯字串！\n"
+#~ msgstr "      ** 失敗 **  遺失用於選項 %s 的“%s”翻譯字串！\n"
 
 #~ msgid ""
 #~ "      **FAIL**  Missing \"%s\" translation string for option %s, choice %"
 #~ "s!\n"
-#~ msgstr "      ** 失敗 **  缺少用於選項 %s、選擇 %s 的「%s」翻譯字串！\n"
+#~ msgstr "      ** 失敗 **  遺失用於選項 %s、選擇 %s 的“%s”翻譯字串！\n"
 
 #~ msgid "%s accepting requests since Jan 01 00:00\n"
 #~ msgstr "%s 從 Jan 01 00:00 起接受請求\n"
@@ -3167,7 +3191,7 @@ msgstr "無標題"
 #~ msgstr "自動"
 
 #~ msgid "Bad option + choice on line %d!\n"
-#~ msgstr "第 %d 列有不當的選項 + 選擇！\n"
+#~ msgstr "第 %d 列有不正確的選項 + 選擇！\n"
 
 #~ msgid "Class"
 #~ msgstr "類別"
@@ -3181,11 +3205,11 @@ msgstr "無標題"
 #~ "裝置：uri = %s\n"
 #~ "        類別 = %s\n"
 #~ "        資訊 = %s\n"
-#~ "        廠商與型號 = %s\n"
+#~ "        make-and-model = %s\n"
 
-#, fuzzy
+#,
 #~ msgid "ERROR: %ld: Unable to send print file to printer (canceled:%ld)\n"
-#~ msgstr "lpoptions：無法加入印表機或實體：%s\n"
+#~ msgstr "ERROR: %ld：無法傳送列印檔案至印表機（取消：%ld）\n"
 
 #~ msgid "Extra"
 #~ msgstr "其他"
@@ -3200,10 +3224,10 @@ msgstr "無標題"
 #~ msgstr "工作 #%d 已經取消 - 無法取消。"
 
 #~ msgid "Missing double quote on line %d!\n"
-#~ msgstr "第 %d 列缺少雙引號！\n"
+#~ msgstr "第 %d 列遺失雙引號！\n"
 
 #~ msgid "Missing value on line %d!\n"
-#~ msgstr "第 %d 列缺少設定值！\n"
+#~ msgstr "第 %d 列遺失設定值！\n"
 
 #~ msgid ""
 #~ "Model:  name = %s\n"
@@ -3212,7 +3236,7 @@ msgstr "無標題"
 #~ msgstr ""
 #~ "型號： 名稱 = %s\n"
 #~ "        自然語言 = %s\n"
-#~ "        廠商與型號 = %s\n"
+#~ "        make-and-model = %s\n"
 
 #~ msgid "No Windows printer drivers are installed!\n"
 #~ msgstr "未安裝任何 Windows 印表機驅動程式！\n"
@@ -3221,13 +3245,13 @@ msgstr "無標題"
 #~ msgstr "找不到印表機驅動程式！"
 
 #~ msgid "Not authorized to hold job #%d owned by \"%s\"!"
-#~ msgstr "未被授權暫停由「%2$s」所擁有的工作 #%1$d！"
+#~ msgstr "未被授權暫停由“%2$s”所擁有的工作 #%1$d！"
 
 #~ msgid "Running command: %s %s -N -U '%s%%%s' -c '%s'\n"
 #~ msgstr "正在執行命令：%s %s -N -U '%s%%%s' -c '%s'\n"
 
 #~ msgid "The printer-uri \"%s\" is not valid."
-#~ msgstr "printer-uri「%s」並非有效。"
+#~ msgstr "printer-uri“%s”並非有效。"
 
 #~ msgid "Too many jobs - %d jobs, max jobs is %d."
 #~ msgstr "太多工作 - %d 項工作，最大工作數為 %d。"
@@ -3317,70 +3341,70 @@ msgstr "無標題"
 #~ msgstr "警告，未安裝任何 Windows 2000 印表機驅動程式！\n"
 
 #~ msgid "You are not authorized to alter job id %d owned by \"%s\"!"
-#~ msgstr "您未被授權改變由「%2$s」所擁有的工作識別號 #%1$d！"
+#~ msgstr "您未被授權改變由“%2$s”所擁有的工作識別號 #%1$d！"
 
 #~ msgid "You are not authorized to authenticate job #%d owned by \"%s\"!"
-#~ msgstr "您未被授權去驗證由「%2$s」所擁有的工作 #%1$d！"
+#~ msgstr "您未被授權去驗證由“%2$s”所擁有的工作 #%1$d！"
 
 #~ msgid "You are not authorized to delete job #%d owned by \"%s\"!"
-#~ msgstr "您未被授權去刪除由「%2$s」所擁有的工作 #%1$d！"
+#~ msgstr "您未被授權去刪除由“%2$s”所擁有的工作 #%1$d！"
 
 #~ msgid "You are not authorized to move job #%d owned by \"%s\"!"
-#~ msgstr "您未被授權移動由「%2$s」所擁有的工作 #%1$d！"
+#~ msgstr "您未被授權移動由“%2$s”所擁有的工作 #%1$d！"
 
 #~ msgid "You are not authorized to release job id %d owned by \"%s\"!"
-#~ msgstr "您未被授權釋出由「%2$s」所擁有的工作識別號 %1$d！"
+#~ msgstr "您未被授權釋出由“%2$s”所擁有的工作識別號 %1$d！"
 
 #~ msgid "You are not authorized to restart job id %d owned by \"%s\"!"
-#~ msgstr "您未被授權重新啟動由「%2$s」所擁有的工作識別號 %1$d！"
+#~ msgstr "您未被授權重新啟動由“%2$s”所擁有的工作識別號 %1$d！"
 
 #~ msgid "You are not authorized to send document for job #%d owned by \"%s\"!"
-#~ msgstr "您未被授權發送文件給「%2$s」所擁有的工作 #%1$d！"
+#~ msgstr "您未被授權發送文件給“%2$s”所擁有的工作 #%1$d！"
 
 #~ msgid "You must use a https: URL to access this page."
 #~ msgstr "您必須使用 https：URL 以存取此頁面。"
 
 #~ msgid "add_class: Unknown printer-error-policy \"%s\"."
-#~ msgstr "add_class：不明的 printer-error-policy「%s」。"
+#~ msgstr "add_class：不明的 printer-error-policy“%s”。"
 
 #~ msgid "add_class: Unknown printer-op-policy \"%s\"."
-#~ msgstr "add_class：不明的 printer-op-policy「%s」。"
+#~ msgstr "add_class：不明的 printer-op-policy“%s”。"
 
 #~ msgid "cancel: %s failed: %s\n"
 #~ msgstr "取消：%s 失敗：%s\n"
 
 #~ msgid "cancel: Error - expected hostname after '-h' option!\n"
-#~ msgstr "取消：錯誤 - 預期「-h」選項之後有主機名稱！\n"
+#~ msgstr "取消：錯誤 - 預期“-h”選項之後有主機名稱！\n"
 
 #~ msgid "cancel: Error - expected username after '-u' option!\n"
-#~ msgstr "取消：錯誤 - 預期「-u」選項之後有使用者名稱！\n"
+#~ msgstr "取消：錯誤 - 預期“-u”選項之後有使用者名稱！\n"
 
 #~ msgid "cancel: Unable to contact server!\n"
 #~ msgstr "取消：無法連上伺服器！\n"
 
 #~ msgid "cancel: Unknown destination \"%s\"!\n"
-#~ msgstr "取消：不明的目的印表機「%s」！\n"
+#~ msgstr "取消：不明的目的印表機“%s”！\n"
 
 #~ msgid "cupsaddsmb crashed on signal %d"
 #~ msgstr "cupsaddsmb 當機於信號 %d"
 
 #~ msgid "cupsaddsmb: Bad option + choice on line %d!\n"
-#~ msgstr "cupsaddsmb：在第 %d 列上有不當的選項 + 選擇！\n"
+#~ msgstr "cupsaddsmb：在第 %d 列上有不正確的選項 + 選擇！\n"
 
 #~ msgid "cupsaddsmb: Missing double quote on line %d!\n"
-#~ msgstr "cupsaddsmb：在第 %d 列上缺少雙引號！\n"
+#~ msgstr "cupsaddsmb：在第 %d 列上遺失雙引號！\n"
 
 #~ msgid "cupsaddsmb: Missing value on line %d!\n"
-#~ msgstr "cupsaddsmb：在第 %d 列上缺少值！\n"
+#~ msgstr "cupsaddsmb：在第 %d 列上遺失值！\n"
 
 #~ msgid "cupsaddsmb: No PPD file for printer \"%s\" - skipping!\n"
-#~ msgstr "cupsaddsmb：沒有用於印表機「%s」的 PPD 檔案- 跳過！\n"
+#~ msgstr "cupsaddsmb：沒有用於印表機“%s”的 PPD 檔案- 跳過！\n"
 
 #~ msgid "cupsaddsmb: No Windows printer drivers are installed!\n"
 #~ msgstr "cupsaddsmb：未安裝任何 Windows 印表機驅動程式！\n"
 
 #~ msgid "cupsaddsmb: Unable to connect to server \"%s\" for %s - %s\n"
-#~ msgstr "cupsaddsmb：無法連接伺服器「%s」用於 %s - %s\n"
+#~ msgstr "cupsaddsmb：無法連接伺服器“%s”用於 %s - %s\n"
 
 #~ msgid "cupsaddsmb: Unable to convert PPD file for %s - %s\n"
 #~ msgstr "cupsaddsmb：無法轉換 PPD 檔案用於 %s - %s\n"
@@ -3403,7 +3427,7 @@ msgstr "無標題"
 #~ msgstr "cupsaddsmb：無法安裝 Windows 9x 印表機驅動程式檔案 (%d)！\n"
 
 #~ msgid "cupsaddsmb: Unable to run \"%s\": %s\n"
-#~ msgstr "cupsaddsmb：無法運行「%s」：%s\n"
+#~ msgstr "cupsaddsmb：無法運行“%s”：%s\n"
 
 #~ msgid "cupsaddsmb: Unable to set Windows printer driver (%d)!\n"
 #~ msgstr "cupsaddsmb：無法設定 Windows 印表機驅動程式 (%d)！\n"
@@ -3413,14 +3437,10 @@ msgstr "無標題"
 #~ msgstr "cupsaddsmb：警告，未安裝任何 Windows 2000 印表機驅動程式！\n"
 
 #~ msgid "cupsaddsmb: get-printer-attributes failed for \"%s\": %s\n"
-#~ msgstr "cupsaddsmb：get-printer-attributes 用於「%s」時失敗：%s\n"
-
-#, fuzzy
-#~ msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
-#~ msgstr "lpq：不明的目的印表機「%s/%s」！\n"
+#~ msgstr "cupsaddsmb：get-printer-attributes 用於“%s”時失敗：%s\n"
 
 #~ msgid "lp: Error - bad job ID!\n"
-#~ msgstr "lp：錯誤 - 不當的工作識別號！\n"
+#~ msgstr "lp：錯誤 - 不正確的工作識別號！\n"
 
 #~ msgid "lp: Error - cannot print files and alter jobs simultaneously!\n"
 #~ msgstr "lp：錯誤 - 無法同步列印檔案和改變工作！\n"
@@ -3466,13 +3486,13 @@ msgstr "無標題"
 #~ msgstr "lp：-t 選項之後預期為標題！\n"
 
 #~ msgid "lp: Need job ID (-i) before \"-H restart\"!\n"
-#~ msgstr "lp：「-H restart」之前需要工作識別號 (-i)！\n"
+#~ msgstr "lp：“-H restart”之前需要工作識別號 (-i)！\n"
 
 #~ msgid "lp: Priority must be between 1 and 100.\n"
 #~ msgstr "lp：優先權必須在 1 和 100 之間。\n"
 
 #~ msgid "lp: Too many files - \"%s\"\n"
-#~ msgstr "lp：太多檔案 -「%s」\n"
+#~ msgstr "lp：太多檔案 -“%s”\n"
 
 #~ msgid "lp: Warning - character set option ignored!\n"
 #~ msgstr "lp：警告 - 字元集選項被忽略！\n"
@@ -3486,7 +3506,7 @@ msgstr "無標題"
 #~ msgid ""
 #~ "lp: error - %s environment variable names non-existent destination \"%s"
 #~ "\"!\n"
-#~ msgstr "lp：錯誤 - %s 環境變數指稱到不存在的目的印表機「%s」！\n"
+#~ msgstr "lp：錯誤 - %s 環境變數指稱到不存在的目的印表機“%s”！\n"
 
 #~ msgid "lp: error - no default destination available.\n"
 #~ msgstr "lp：錯誤 - 無預設目的印表機可用。\n"
@@ -3495,7 +3515,7 @@ msgstr "無標題"
 #~ msgstr "lp：錯誤 - 排程程式無反應！\n"
 
 #~ msgid "lp: error - unable to write to temporary file \"%s\" - %s\n"
-#~ msgstr "lp：錯誤 - 無法寫入到暫時檔案「%s」- %s\n"
+#~ msgstr "lp：錯誤 - 無法寫入到暫時檔案“%s”- %s\n"
 
 #~ msgid "lp: restart-job failed: %s\n"
 #~ msgstr "lp：重新啟動工作時失敗：%s\n"
@@ -3507,7 +3527,7 @@ msgstr "無標題"
 #~ msgstr "lp：標準輸入為空，因而沒有發送任何工作。\n"
 
 #~ msgid "lp: unable to create temporary file \"%s\" - %s\n"
-#~ msgstr "lp：無法建立暫時檔案「%s」- %s\n"
+#~ msgstr "lp：無法建立暫時檔案“%s”- %s\n"
 
 #~ msgid "lpadmin: %s failed: %s\n"
 #~ msgstr "lpadmin：%s 失敗：%s\n"
@@ -3537,7 +3557,7 @@ msgstr "無標題"
 #~ msgstr "lpq：無法連上伺服器！\n"
 
 #~ msgid "lpq: Unknown destination \"%s\"!\n"
-#~ msgstr "lpq：不明的目的印表機「%s」！\n"
+#~ msgstr "lpq：不明的目的印表機“%s”！\n"
 
 #~ msgid "lpq: error - no default destination available.\n"
 #~ msgstr "lpq：錯誤 - 無預設目的印表機可用。\n"
@@ -3551,7 +3571,7 @@ msgstr "無標題"
 #~ msgid ""
 #~ "lpr: error - %s environment variable names non-existent destination \"%s"
 #~ "\"!\n"
-#~ msgstr "lpr：錯誤 - %s 環境變數指稱不存在的目的印表機「%s」！\n"
+#~ msgstr "lpr：錯誤 - %s 環境變數指稱不存在的目的印表機“%s”！\n"
 
 #~ msgid "lpr: error - expected copy count after -# option!\n"
 #~ msgstr "lpr：錯誤 - 預期 -# 選項之後有複製份數！\n"
@@ -3581,27 +3601,27 @@ msgstr "無標題"
 #~ msgstr "lpr：錯誤 - 標準輸入為空，因而無工作發出。\n"
 
 #~ msgid "lpr: error - too many files - \"%s\"\n"
-#~ msgstr "lpr：錯誤 - 太多檔案 -「%s」\n"
+#~ msgstr "lpr：錯誤 - 太多檔案 -“%s”\n"
 
 #~ msgid "lpr: error - unable to access \"%s\" - %s\n"
-#~ msgstr "lpr：錯誤 - 無法存取「%s」- %s\n"
+#~ msgstr "lpr：錯誤 - 無法存取“%s”- %s\n"
 
 #~ msgid "lpr: error - unable to create temporary file \"%s\" - %s\n"
-#~ msgstr "lpr：錯誤 - 無法建立暫時檔案「%s」- %s\n"
+#~ msgstr "lpr：錯誤 - 無法建立暫時檔案“%s”- %s\n"
 
 #~ msgid "lpr: error - unable to print file: %s\n"
 #~ msgstr "lpr：錯誤 - 無法列印檔案：%s\n"
 
 #~ msgid "lpr: error - unable to write to temporary file \"%s\" - %s\n"
-#~ msgstr "lpr：錯誤 - 無法寫入暫時檔案「%s」- %s\n"
+#~ msgstr "lpr：錯誤 - 無法寫入暫時檔案“%s”- %s\n"
 
 #~ msgid "lpr: error - unknown option '%c'!\n"
-#~ msgstr "lpr：錯誤 - 不明的選項「%c」！\n"
+#~ msgstr "lpr：錯誤 - 不明的選項“%c”！\n"
 
 #~ msgid ""
 #~ "lpr: warning - '%c' format modifier not supported - output may not be "
 #~ "correct!\n"
-#~ msgstr "lpr：警告 - 不支援「%c」格式修飾鍵 - 輸出也許無法正確！\n"
+#~ msgstr "lpr：警告 - 不支援“%c”格式修飾鍵 - 輸出也許無法正確！\n"
 
 #~ msgid "lpr: warning - email notification is not currently supported!\n"
 #~ msgstr "lpr：警告 - 目前並未支援以電子郵件通知！\n"
@@ -3616,32 +3636,32 @@ msgstr "無標題"
 #~ msgstr "lprm：無法以 lprm 移除工作！\n"
 
 #~ msgid "lprm: Unknown destination \"%s\"!\n"
-#~ msgstr "lprm：不明的目的印表機「%s」！\n"
+#~ msgstr "lprm：不明的目的印表機“%s”！\n"
 
 #~ msgid "lprm: Unknown option '%c'!\n"
-#~ msgstr "lprm：不明的選項「%c」！\n"
+#~ msgstr "lprm：不明的選項“%c”！\n"
 
 #~ msgid "lprm: You don't own job ID %d!\n"
 #~ msgstr "lprm：您並不擁有工作識別號 %d！\n"
 
 #~ msgid "lpstat: Invalid destination name in list \"%s\"!\n"
-#~ msgstr "lpstat：在表列「%s」中存在無效的目的印表機名稱！\n"
+#~ msgstr "lpstat：在表列“%s”中存在無效的目的印表機名稱！\n"
 
 #~ msgid "lpstat: Need \"completed\" or \"not-completed\" after -W!\n"
-#~ msgstr "lpstat：-W 之後需要「completed」或「not-completed」！\n"
+#~ msgstr "lpstat：-W 之後需要“completed”或“not-completed”！\n"
 
 #~ msgid ""
 #~ "lpstat: Need \"completed\", \"not-completed\", or \"all\" after -W!\n"
-#~ msgstr "lpstat：-W 之後需要「completed」、「not-completed」或「all」！\n"
+#~ msgstr "lpstat：-W 之後需要“completed”、“not-completed”或“all”！\n"
 
 #~ msgid "lpstat: The -b option requires a destination argument.\n"
 #~ msgstr "lpstat： -b 選項需要目的印表機的引數。\n"
 
 #~ msgid "lpstat: Unknown destination \"%s\"!\n"
-#~ msgstr "lpstat：不明的目的印表機「%s」！\n"
+#~ msgstr "lpstat：不明的目的印表機“%s”！\n"
 
 #~ msgid "lpstat: Unknown option '%c'!\n"
-#~ msgstr "lpstat：不明的選項「%c」！\n"
+#~ msgstr "lpstat：不明的選項“%c”！\n"
 
 #~ msgid "lpstat: get-classes failed: %s\n"
 #~ msgstr "lpstat：get-classes 失敗：%s\n"
