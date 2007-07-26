@@ -713,7 +713,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     * Filter had errors; stop job...
     */
 
-    cupsdLogMessage(CUPSD_LOG_INFO,
+    cupsdLogMessage(CUPSD_LOG_ERROR,
                     "[Job %d] Job stopped due to filter errors.", job->id);
     cupsdStopJob(job, 1);
     cupsdSaveJob(job);
