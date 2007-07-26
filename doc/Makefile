@@ -42,9 +42,9 @@ WEBBUTTONS	=	\
 			images/button-delete-printer.gif \
 			images/button-edit-configuration-file.gif \
 			images/button-export-samba.gif \
+			images/button-find-new-printers.gif \
 			images/button-help.gif \
 			images/button-hold-job.gif \
-			images/button-list-available-printers.gif \
 			images/button-manage-classes.gif \
 			images/button-manage-jobs.gif \
 			images/button-manage-printers.gif \

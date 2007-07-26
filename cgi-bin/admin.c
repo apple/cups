@@ -165,7 +165,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_printer_op(http, CUPS_SET_DEFAULT, cgiText(_("Set As Default")));
     else if (!strcmp(op, "set-sharing"))
       do_set_sharing(http);
-    else if (!strcmp(op, "list-available-printers"))
+    else if (!strcmp(op, "find-new-printers") ||
+             !strcmp(op, "list-available-printers"))
       do_list_printers(http);
     else if (!strcmp(op, "add-class"))
       do_am_class(http, 0);
