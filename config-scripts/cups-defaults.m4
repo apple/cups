@@ -160,7 +160,7 @@ AC_ARG_WITH(cups_user, [  --with-cups-user        set default user for CUPS],
 	CUPS_USER="$withval",
 	AC_MSG_CHECKING(for default print user)
 	if test x$uname = xDarwin; then
-		if x`id -u _lp 2>/dev/null` = x; then
+		if test x`id -u _lp 2>/dev/null` = x; then
 			CUPS_USER="lp";
 		else
 			CUPS_USER="_lp";
@@ -188,7 +188,7 @@ AC_ARG_WITH(cups_group, [  --with-cups-group       set default group for CUPS],
 	CUPS_GROUP="$withval",
 	AC_MSG_CHECKING(for default print group)
 	if test x$uname = xDarwin; then
-		if x`id -g _lp 2>/dev/null` = x; then
+		if test x`id -g _lp 2>/dev/null` = x; then
 			CUPS_GROUP="lp";
 		else
 			CUPS_GROUP="_lp";
