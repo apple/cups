@@ -3,6 +3,9 @@ CHANGES.txt - 2007-07-26
 
 CHANGES IN CUPS V1.3rc1
 
+	- The scheduler now logs successful print jobs, filter
+	  failures, and the job file types at the default log
+	  level (STR #2458)
 	- The scheduler now logs the usernames it is using for
 	  authorization at LogLevel debug instead of debug2 (STR #2448)
 	- Added Intellitech Intellibar and Zebra CPCL PPDs to the list
