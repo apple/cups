@@ -6,19 +6,15 @@
 <P>
 <A HREF="/admin?op=add-printer"><IMG
 SRC="/images/button-add-printer.gif" ALT="Drucker hinzuf&uuml;gen" CLASS="button"></A>
+<A HREF="/admin?op=list-available-printers"><IMG
+SRC="/images/button-list-available-printers.gif"
+ALT="Verfügbare Drucker auflisten" CLASS="button"></A>
 <A HREF="/printers/"><IMG SRC="/images/button-manage-printers.gif"
 ALT="Drucker verwalten" CLASS="button"></A>
 {have_samba?<A HREF="/admin/?op=export-samba"><IMG
 SRC="/images/button-export-samba.gif" ALT="Drucker f&uuml;r Samba exportieren"
 CLASS="button"></A>:}
 </P>
-
-{#device_uri=0?:<P><B>Neue Drucker gefunden:</B></P><UL>{[device_uri]
-<LI><A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
-SRC="/images/button-add-this-printer.gif" ALT="Diesen Drucker hinzufuegen" CLASS="button"
-ALIGN="MIDDLE"></A>
-{device_make_and_model} ({device_info})</LI>
-}</UL>}
 
 <H2 CLASS="title">Klassen</H2>
 
@@ -65,9 +61,9 @@ CLASS="button"></A>
 <P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Zeige verteilte Drucker von anderen Systemen<BR>
 <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Verteile publizierte Drucker welche mit diesem System verbunden sind<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Erlaube Drucken vom Internet aus<BR>
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Erlaube entfernte Verwaltung<BR>
-{have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Use Kerberos authentication<BR>:}
+{have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Benutze Kerberos Authentifizierung<BR>:}
 <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Erlaube Benutzern jeden Auftrag abzubrechen (nicht nur die Eigenen)<BR>
 <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Speichere Fehlerinformationen f&uuml;r Fehlersuche</P>
 
@@ -77,3 +73,16 @@ CLASS="button"></A>
 
 </TD></TR>
 </TABLE>
+
+<H2 CLASS="title">Subskriptionen</H2>
+
+<P>
+<A HREF="/admin/?op=add-rss-subscription"><IMG SRC="/images/button-add-rss-subscription.gif" ALT="RSS Subskription hinzufügen" CLASS="button"></A>
+</P>
+
+{notify_subscription_id?<TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="0" SUMMARY="RSS Subskriptionen">
+<THEAD><TR CLASS="data"><TH>ID</TH><TH>Name</TH><TH>Ereignis</TH><TH>Warteschlange</TH></TR></THEAD>
+<TBODY>{[notify_subscription_id]
+<TR><TD><A HREF="{notify_recipient_uri}">{notify_subscription_id}</A></TD><TD NOWRAP><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A> <A HREF="/admin/?op=cancel-subscription&amp;notify_subscription_id={notify_subscription_id}"><IMG SRC="/images/button-cancel-subscription.gif" CLASS="button" ALT="RSS Subskription k&uuml;ndigen"></A>&nbsp;</TD><TD>{notify_events} </TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:Alle Warteschlangen}</TD></TR>}
+</TBODY>
+</TABLE>:}
