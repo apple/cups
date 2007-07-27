@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-23 10:47-0700\n"
+"POT-Creation-Date: 2007-07-27 14:55-0700\n"
 "PO-Revision-Date: 2006-09-93 01:41+0200\n"
 "Last-Translator: Marek Laane <bald@starman.ee>\n"
 "Language-Team: Estonian <et@li.org>\n"
@@ -2296,6 +2296,14 @@ msgstr "Printeri muutmine ebaõnnestus:"
 
 msgid "Unable to change server settings:"
 msgstr "Serveri seadistuste muutmine ebaõnnestus:"
+
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
+msgstr ""
+
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
+msgstr ""
 
 #, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!"

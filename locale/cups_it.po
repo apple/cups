@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cups_it\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-23 10:47-0700\n"
+"POT-Creation-Date: 2007-07-27 14:55-0700\n"
 "PO-Revision-Date: 2006-11-16 00:34+0100\n"
 "Last-Translator: Vincenzo Reale <smart2128@baslug.org>\n"
 "Language-Team: Italian <kde-i18n-it@mail.kde.org>\n"
@@ -2314,6 +2314,14 @@ msgstr "Impossibile cambiare la stampante:"
 
 msgid "Unable to change server settings:"
 msgstr "Impossibile modificare le impostazioni del server:"
+
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
+msgstr ""
+
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
+msgstr ""
 
 #, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!"
