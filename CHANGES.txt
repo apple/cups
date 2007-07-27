@@ -3,6 +3,7 @@ CHANGES.txt - 2007-07-26
 
 CHANGES IN CUPS V1.3rc1
 
+	- cupsAdminGetServerSettings() did not handle </Foo> properly.
 	- When lprm and cancel are run with no job ID, they now will
 	  cancel the first stopped job if no pending or processing
 	  jobs are left in the queue.

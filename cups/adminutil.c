@@ -955,7 +955,7 @@ _cupsAdminGetServerSettings(
 
     while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
     {
-      if (!value)
+      if (!value && strncmp(line, "</", 2))
         continue;
 
       if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
