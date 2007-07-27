@@ -1,8 +1,9 @@
-CHANGES.txt - 2007-07-26
+CHANGES.txt - 2007-07-27
 ------------------------
 
 CHANGES IN CUPS V1.3rc1
 
+	- Updated the German localization (STR #2443)
 	- cupsAdminGetServerSettings() did not handle </Foo> properly.
 	- When lprm and cancel are run with no job ID, they now will
 	  cancel the first stopped job if no pending or processing
