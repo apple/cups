@@ -3566,7 +3566,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     else if (loglevel == CUPSD_LOG_STATE)
     {
       if (!strcmp(message, "paused"))
+      {
         cupsdStopPrinter(job->printer, 1);
+	return;
+      }
       else
       {
 	cupsdSetPrinterReasons(job->printer, message);
