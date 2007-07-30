@@ -2723,7 +2723,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * DefaultAuthType {basic,digest,basicdigest,negotiate}
       */
 
-      if (!strcasecmp(value, "basic"))
+      if (!strcasecmp(value, "none"))
+	DefaultAuthType = AUTH_NONE;
+      else if (!strcasecmp(value, "basic"))
 	DefaultAuthType = AUTH_BASIC;
       else if (!strcasecmp(value, "digest"))
 	DefaultAuthType = AUTH_DIGEST;
