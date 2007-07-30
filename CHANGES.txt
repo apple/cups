@@ -3,6 +3,7 @@ CHANGES.txt - 2007-07-30
 
 CHANGES IN CUPS V1.3rc2
 
+	- Added more range checking to the pdftops filter. 
 	- The scheduler would crash if a remote IPP queue was stopped
 	  (STR #2460)
 	- The scheduler did not allow "DefaultAuthType None".
