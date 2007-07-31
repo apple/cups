@@ -921,6 +921,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 			output_token = GSS_C_EMPTY_BUFFER;
 					/* Output token for username */
     gss_name_t		client_name;	/* Client name */
+    unsigned int	ret_flags;	/* Credential flags */
 
 
 #  ifdef __APPLE__
@@ -989,7 +990,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 					  &client_name,
 					  NULL,
 					  &con->gss_output_token,
-					  NULL,
+					  &ret_flags,
 					  NULL,
 					  &con->gss_delegated_cred);
 
