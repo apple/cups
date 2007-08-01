@@ -18,6 +18,7 @@
  *
  *   main()               - Main entry...
  *   add_page()           - Add a page to the pages array...
+ *   cancel_job()         - Flag the job as canceled.
  *   check_range()        - Check to see if the current page is selected for
  *   copy_bytes()         - Copy bytes from the input file to stdout...
  *   copy_comments()      - Copy all of the comments section...
@@ -53,6 +54,7 @@
 #include <cups/file.h>
 #include <cups/array.h>
 #include <cups/i18n.h>
+#include <signal.h>
 
 
 /*
@@ -147,10 +149,18 @@ typedef struct				/**** Document information ****/
 
 
 /*
+ * Local globals...
+ */
+
+static int		JobCanceled = 0;/* Set to 1 on SIGTERM */
+
+
+/*
  * Local functions...
  */
 
 static pstops_page_t	*add_page(pstops_doc_t *doc, const char *label);
+static void		cancel_job(int sig);
 static int		check_range(pstops_doc_t *doc, int page);
 static void		copy_bytes(cups_file_t *fp, off_t offset,
 			           size_t length);
@@ -236,6 +246,22 @@ main(int  argc,				/* I - Number of command-line args */
             argv[0]);
     return (1);
   }
+
+ /*
+  * Register a signal handler to cleanly cancel a job.
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, cancel_job);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = cancel_job;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, cancel_job);
+#endif /* HAVE_SIGSET */
 
  /*
   * If we have 7 arguments, print the file named on the command-line.
@@ -418,6 +444,19 @@ add_page(pstops_doc_t *doc,		/* I - Document information */
   doc->page ++;
 
   return (pageinfo);
+}
+
+
+/*
+ * 'cancel_job()' - Flag the job as canceled.
+ */
+
+static void
+cancel_job(int sig)			/* I - Signal number (unused) */
+{
+  (void)sig;
+
+  JobCanceled = 1;
 }
 
 
@@ -826,6 +865,9 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   fprintf(stderr, "DEBUG: Before page loop - %s", line);
   while (!strncmp(line, "%%Page:", 7))
   {
+    if (JobCanceled)
+      break;
+
     number ++;
 
     if (check_range(doc, (number - 1) / doc->number_up + 1))
@@ -885,7 +927,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
   number = doc->slow_order ? 0 : doc->page;
 
-  if (doc->temp)
+  if (doc->temp && !JobCanceled)
   {
     int	copy;				/* Current copy */
 
@@ -904,6 +946,9 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
     for (copy = !doc->slow_order; copy < doc->copies; copy ++)
     {
+      if (JobCanceled)
+	break;
+
      /*
       * Send end-of-job stuff followed by any start-of-job stuff required
       * for the JCL options...
@@ -957,6 +1002,9 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
       while (pageinfo)
       {
+        if (JobCanceled)
+	  break;
+
         number ++;
 
 	if (!ppd || !ppd->num_filters)
@@ -995,7 +1043,8 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   * Write/copy the trailer...
   */
 
-  linelen = copy_trailer(fp, doc, ppd, number, line, linelen, linesize);
+  if (!JobCanceled)
+    linelen = copy_trailer(fp, doc, ppd, number, line, linelen, linesize);
 }
 
 
@@ -1130,7 +1179,7 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
     puts("ESPshowpage");
   }
 
-  if (doc->temp)
+  if (doc->temp && !JobCanceled)
   {
    /*
     * Reopen the temporary file for reading...
@@ -1146,6 +1195,9 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
 
     for (copy = 1; copy < doc->copies; copy ++)
     {
+      if (JobCanceled)
+	break;
+
       if (!ppd || !ppd->num_filters)
 	fputs("PAGE: 1 1\n", stderr);
 
