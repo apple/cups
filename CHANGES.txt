@@ -1,5 +1,11 @@
-CHANGES.txt - 2007-07-30
+CHANGES.txt - 2007-08-01
 ------------------------
+
+
+CHANGES IN CUPS V1.3.0
+
+	- Added Portuguese and updated Italian message catalogs.
+
 
 CHANGES IN CUPS V1.3rc2
 
