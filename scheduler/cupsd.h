@@ -158,6 +158,11 @@ VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
 VAR int			NeedReload	VALUE(RELOAD_ALL);
 					/* Need to load configuration? */
+
+#ifdef HAVE_GSSAPI
+VAR krb5_context	KerberosContext;/* Kerberos context for credentials */
+#endif /* HAVE_GSSAPI */
+
 #ifdef HAVE_LAUNCH_H
 VAR int			Launchd		VALUE(0);
 					/* Running from launchd */

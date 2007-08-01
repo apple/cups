@@ -1793,15 +1793,10 @@ free_job(cupsd_job_t *job)		/* I - Job */
   if (job->ccname)
   {
    /*
-    * First erase the credential cache file, then clear the string referencing
-    * it.  We know the filename since the string will be of the form
-    * "KRB5CCNAME=FILE:/foo/bar"...
+    * Destroy the credential cache and clear the KRB5CCNAME env var string.
     */
 
-    if (cupsdRemoveFile(job->ccname + 16) && errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "[Job %d] Unable to remove Kerberos credential cache: %s",
-		      job->id, strerror(errno));
+    krb5_cc_destroy(KerberosContext, job->ccache);
 
     cupsdClearString(&job->ccname);
   }

@@ -60,7 +60,7 @@ if test x$enable_gssapi != xno; then
 
 		AC_CHECK_FUNC(gsskrb5_register_acceptor_identity, 
 			      AC_DEFINE(HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY))
-		AC_CHECK_FUNC(krb5_cc_resolve, AC_DEFINE(HAVE_KRB5_CC_RESOLVE))
+		AC_CHECK_FUNC(krb5_cc_new_unique, AC_DEFINE(HAVE_KRB5_CC_NEW_UNIQUE))
 
 		AC_MSG_CHECKING(for GSS_C_NT_HOSTBASED_SERVICE)
 		if test $ac_cv_header_gssapi_gssapi_h = yes; then

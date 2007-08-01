@@ -8255,72 +8255,56 @@ static void
 save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
                 cupsd_job_t    *job)	/* I - Job */
 {
-  krb5_context	krb_context;		/* Kerberos context */
-  krb5_ccache	ccache;			/* Credentials cache */
+#  ifndef HAVE_KRB5_CC_NEW_UNIQUE
+  char		cachename[1024];	/* Name of resolved cache */
+#  endif /* !HAVE_KRB5_CC_NEW_UNIQUE */
   OM_uint32	major_status,		/* Major status code */
 		minor_status;		/* Minor status code */
 
 
 #  ifdef __APPLE__
-   /*
-    * If the weak-linked GSSAPI/Kerberos library is not present, don't try
-    * to use it...
-    */
-
-    if (krb5_init_context == NULL)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-		      "save_krb5_creds: GSSAPI/Kerberos framework is not "
-		      "present");
-      return;
-    }
-#  endif /* __APPLE__ */
-
  /*
-  * Setup a cached context for the job filters to use...
+  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+  * to use it...
   */
 
-  if (krb5_init_context(&krb_context))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
+  if (krb5_init_context == NULL)
     return;
-  }
+#  endif /* __APPLE__ */
 
  /*
   * We MUST create a file-based cache because memory-based caches are
   * only valid for the current process/address space.
   */
 
-#  ifdef HAVE_KRB5_CC_RESOLVE
-  if (krb5_cc_resolve(krb_context, "FILE:", &ccache))
-#  elif defined(HAVE_HEIMDAL)
-  if (krb5_cc_gen_new(krb_context, &krb5_fcc_ops, &ccache))
+#  ifdef HAVE_KRB5_CC_NEW_UNIQUE
+  if (krb5_cc_new_unique(KerberosContext, "FILE", NULL, &(job->ccache)))
 #  else
-  if (krb5_cc_gen_new(krb_context, &ccache))
-#  endif /* HAVE_HEIMDAL */
+  snprintf(cachename, sizeof(cachename), "FILE:%s/k%05d", RequestRoot, job->id);
+
+  if (krb5_cc_resolve(KerberosContext, cachename, &(job->ccache)))
+#  endif /* HAVE_KRB5_CC_NEW_UNIQUE */
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create new credentials");
     return;
   }
 
   major_status = gss_krb5_copy_ccache(&minor_status, con->gss_delegated_cred,
-				      ccache);
+				      job->ccache);
 
   if (GSS_ERROR(major_status))
   {
     cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
                        "Unable to import client credentials cache");
-    krb5_cc_destroy(krb_context, ccache);
+    krb5_cc_destroy(KerberosContext, job->ccache);
     return;
   }
 
-  cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
-                  krb5_cc_get_name(krb_context, ccache));
+  cupsdSetStringf(&(job->ccname), "KRB5CCNAME=%s",
+                  krb5_cc_get_name(KerberosContext, job->ccache));
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "[Job %d] save_krb5_creds: %s", job->id,
                   job->ccname);
-
-  krb5_cc_close(krb_context, ccache);
 }
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 
