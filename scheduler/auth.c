@@ -2435,7 +2435,8 @@ get_gss_creds(const char *service_name)	/* I - Service name */
     return (NULL);
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Attempting to acquire credentials for %s...", 
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "get_gss_creds: Attempting to acquire credentials for %s...", 
                   (char *)token.value);
 
   server_creds = GSS_C_NO_CREDENTIAL;
@@ -2451,7 +2452,8 @@ get_gss_creds(const char *service_name)	/* I - Service name */
     return (NULL);
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Credentials acquired successfully for %s.", 
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "get_gss_creds: Credentials acquired successfully for %s.", 
                   (char *)token.value);
 
   gss_release_name(&minor_status, &server_name);
