@@ -165,6 +165,7 @@ AC_ARG_WITH(cups_user, [  --with-cups-user        set default user for CUPS],
 		else
 			CUPS_USER="_lp";
 		fi
+		AC_MSG_RESULT($CUPS_USER)
 	elif test -f /etc/passwd; then
 		CUPS_USER=""
 		for user in lp lpd guest daemon nobody; do
@@ -193,6 +194,7 @@ AC_ARG_WITH(cups_group, [  --with-cups-group       set default group for CUPS],
 		else
 			CUPS_GROUP="_lp";
 		fi
+		AC_MSG_RESULT($CUPS_GROUP)
 	elif test -f /etc/group; then
 		GROUP_LIST="_lp lp nobody"
 		CUPS_GROUP=""
