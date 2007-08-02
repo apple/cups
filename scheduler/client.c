@@ -4248,8 +4248,6 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
       commptr ++;
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "commptr=\"%s\"", commptr);
-
   if (*commptr == '?' && con->operation == HTTP_GET && !con->query_string)
   {
     commptr ++;
