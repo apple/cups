@@ -1,9 +1,13 @@
-CHANGES.txt - 2007-08-01
+CHANGES.txt - 2007-08-02
 ------------------------
 
 
 CHANGES IN CUPS V1.3.0
 
+	- The scheduler was not looking in the correct directories
+	  for LSB PPD files (STR #2464)
+	- Changed references to ESP Ghostscript to GPL Ghostscript
+	  (STR #2463)
 	- The PostScript filter did not cleanly terminate when
 	  the job was canceled or stopped.
 	- Fixed generation of Kerberos credentials for remote
