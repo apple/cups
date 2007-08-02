@@ -367,6 +367,28 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
   if (con->best && con->best->type != AUTH_NONE)
     type = con->best->type;
+  else if (!strncmp(con->uri, "/printers/", 10) ||
+           !strncmp(con->uri, "/classes/", 9))
+  {
+   /*
+    * Lookup the printer or class and see what kind of authentication it
+    * needs...
+    */
+
+    cupsd_printer_t	*p;		/* Printer or class */
+
+
+    if (!strncmp(con->uri, "/printers/", 10))
+      p = cupsdFindDest(con->uri + 10);
+    else
+      p = cupsdFindDest(con->uri + 9);
+
+    if (p && p->num_auth_info_required > 0 &&
+        !strcmp(p->auth_info_required[0], "negotiate"))
+      type = AUTH_NEGOTIATE;
+    else
+      type = DefaultAuthType;       
+  }
   else
     type = DefaultAuthType;
 
