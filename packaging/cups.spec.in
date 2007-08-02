@@ -578,6 +578,7 @@ rm -rf $RPM_BUILD_ROOT
 %files pt
 %defattr(-,root,root)
 /usr/share/locale/pt/cups_pt.po
+/usr/share/locale/pt_PT/cups_pt_PT.po
 
 %files ru
 %defattr(-,root,root)
