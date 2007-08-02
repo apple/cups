@@ -95,8 +95,8 @@ image/x-xpixmap		application/vnd.cups-raster	100	imagetoraster
 #image/x-xwindowdump	application/vnd.cups-raster	100	imagetoraster
 image/x-sun-raster	application/vnd.cups-raster	100	imagetoraster
 
-# pstoraster is now part of ESP Ghostscript...
-#application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
+# pstoraster is part of GPL Ghostscript...
+application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
 
 ########################################################################
 #

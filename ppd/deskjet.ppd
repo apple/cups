@@ -14,13 +14,14 @@
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "DESKJET.PPD"
-*Product: "(GNU Ghostscript)"
 *Product: "(ESP Ghostscript)"
+*Product: "(GPL Ghostscript)"
 *Manufacturer: "HP"
 *ModelName: "HP DeskJet Series"
 *ShortNickName: "HP DeskJet Series"
 *NickName: "HP DeskJet Series, 1.3"
-*PSVersion: "(3010.000) 81501"
+*PSVersion: "(3010.000) 81504"
+*PSVersion: "(3010.000) 860"
 *LanguageLevel: "3"
 *ColorDevice: True
 *DefaultColorSpace: RGB
@@ -29,13 +30,13 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*Product: "(GNU Ghostscript)"
 *Product: "(ESP Ghostscript)"
+*Product: "(GPL Ghostscript)"
 *cupsVersion: 1.3
 *cupsModelNumber: 1
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-raster 50 rastertohp"
-*cupsLanguages: "da de es fi fr it ja ko no pt sv zh zh_TW"
+*cupsLanguages: "da de es fi fr it ja ko no pt pt_PT sv zh zh_TW"
 *UIConstraints: *PageSize A3 *InputSlot Envelope
 *UIConstraints: *InputSlot Envelope *PageSize A3
 *UIConstraints: *PageSize A4 *InputSlot Envelope
@@ -507,6 +508,42 @@
 *pt.MediaType Special/Special Paper: ""
 *pt.MediaType Transparency/Transparência: ""
 *pt.MediaType Glossy/Papel acetinado: ""
+*pt_PT.Translation Manufacturer/HP: ""
+*pt_PT.Translation ModelName/HP DeskJet Series: ""
+*pt_PT.Translation ShortNickName/HP DeskJet Series: ""
+*pt_PT.Translation NickName/HP DeskJet Series, 1.3: ""
+*pt_PT.Translation PageSize/Media Size: ""
+*pt_PT.PageSize Letter/Letter - 8.5x11in: ""
+*pt_PT.PageSize Legal/Legal - 8.5x14in: ""
+*pt_PT.PageSize Executive/Executive - 7.25x10.5in: ""
+*pt_PT.PageSize Tabloid/Tabloid - 11x17in: ""
+*pt_PT.PageSize A3/A3 - 297x420mm: ""
+*pt_PT.PageSize A4/A4 - 210x297mm: ""
+*pt_PT.PageSize A5/A5 - 148x210mm: ""
+*pt_PT.PageSize B5/B5 - 182x257mm: ""
+*pt_PT.PageSize EnvISOB5/ISOB5 Envelope - 176x250mm: ""
+*pt_PT.PageSize Env10/#10 Envelope - 4.13x9.5in: ""
+*pt_PT.PageSize EnvC5/C5 Envelope - 162x229mm: ""
+*pt_PT.PageSize EnvDL/DL Envelope - 110x220mm: ""
+*pt_PT.PageSize EnvMonarch/Monarch Envelope - 3.875x7.5in: ""
+*pt_PT.Translation ColorModel/Modo Cor: ""
+*pt_PT.ColorModel Gray/Grayscale: ""
+*pt_PT.ColorModel RGB/Inativo: ""
+*pt_PT.ColorModel CMYK/CMYK: ""
+*pt_PT.Translation Resolution/Resolution: ""
+*pt_PT.Resolution 150dpi/150dpi: ""
+*pt_PT.Resolution 300dpi/300dpi: ""
+*pt_PT.Resolution 600dpi/600 DPI Grayscale: ""
+*pt_PT.Translation InputSlot/Media Source: ""
+*pt_PT.InputSlot Tray/Tray: ""
+*pt_PT.InputSlot Manual/Alimentação Manual: ""
+*pt_PT.InputSlot Envelope/Envelope Feed: ""
+*pt_PT.Translation MediaType/Media Type: ""
+*pt_PT.MediaType Plain/Papel normal: ""
+*pt_PT.MediaType Bond/Papel bond: ""
+*pt_PT.MediaType Special/Special Paper: ""
+*pt_PT.MediaType Transparency/Transparência: ""
+*pt_PT.MediaType Glossy/Papel acetinado: ""
 *sv.Translation Manufacturer/HP: ""
 *sv.Translation ModelName/HP DeskJet Series: ""
 *sv.Translation ShortNickName/HP DeskJet Series: ""
@@ -651,4 +688,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of DESKJET.PPD, 29820 bytes.
+*% End of DESKJET.PPD, 31445 bytes.

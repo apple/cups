@@ -6,8 +6,10 @@ code. For more information on CUPS see the file called
 "README.txt".  A complete change log can be found in
 "CHANGES.txt".
 
-**** IF YOU HAVE A NON-POSTSCRIPT PRINTER, YOU WILL ALSO    ****
-**** NEED TO INSTALL ESP GHOSTSCRIPT AFTER YOU INSTALL CUPS ****
+**** IF YOU HAVE A NON-POSTSCRIPT PRINTER AND ARE NOT       ****
+**** RUNNING MAC OS X, YOU WILL ALSO NEED TO INSTALL GPL    ****
+**** GHOSTSCRIPT WITH THE "cups" DRIVER AFTER YOU INSTALL   ****
+**** CUPS.                                                  ****
 
 
 BEFORE YOU BEGIN
@@ -20,7 +22,7 @@ BEFORE YOU BEGIN
     The makefiles used by the project should work with all
     versions of make.  We've tested them with GNU make as well as
     the make programs shipped by Compaq, HP, SGI, and Sun. 
-    FreeBSD users should use GNU make (gmake).
+    BSD users should use GNU make (gmake).
 
     Besides these tools you'll want the JPEG, PNG, TIFF, and ZLIB
     libraries for image support, the CDSA, GNU TLS, or OpenSSL
@@ -31,8 +33,9 @@ BEFORE YOU BEGIN
 
     Also, please note that CUPS no longer includes the
     Ghostscript- based pstoraster filter.  You *must* download
-    ESP Ghostscript separately from the CUPS web site if you want
-    to print PostScript files to non-PostScript printers.
+    GNU Ghostscript separately from the CUPS web site if you want
+    to print PostScript files to non-PostScript printers on
+    operating systems other than Mac OS X.
 
 
 COMPILING FROM SUBVERSION
