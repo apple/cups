@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.3\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-16 16:34-0400\n"
+"POT-Creation-Date: 2007-07-27 14:55-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -253,14 +253,12 @@ msgid ""
 "JCLDuplex!\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"        WARN    Duplex 选项关键词 %s 应命名为 Duplex 或"
-"JCLDuplex!\n"
+"        WARN    Duplex 选项关键词 %s 应命名为 Duplex 或JCLDuplex!\n"
 "                REF: 页 122，节 5.17。\n"
 
 msgid ""
 "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
-msgstr ""
-"        WARN    文件混有 CR、LF 和 CR LF 行尾！\n"
+msgstr "        WARN    文件混有 CR、LF 和 CR LF 行尾！\n"
 
 msgid ""
 "        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
@@ -296,8 +294,7 @@ msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF!\n"
 msgstr ""
-"        WARN    非 Windows PPD 文件应仅使用 LF 结束行，"
-"而不是 CR LF！\n"
+"        WARN    非 Windows PPD 文件应仅使用 LF 结束行，而不是 CR LF！\n"
 
 #, c-format
 msgid ""
@@ -346,8 +343,7 @@ msgstr "      %s  错误的 UTF-8“%s”转换字符串（用于选项“%s”�
 #, c-format
 msgid ""
 "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
-msgstr ""
-"      %s  错误的 UTF-8“%s”转换字符串（用于选项“%s”），选择“%s”！\n"
+msgstr "      %s  错误的 UTF-8“%s”转换字符串（用于选项“%s”），选择“%s”！\n"
 
 #, c-format
 msgid "      %s  Bad cupsFilter value \"%s\"!\n"
@@ -503,17 +499,13 @@ msgstr "      **失败**  不能解释默认选项编码：%s\n"
 msgid ""
 "      **FAIL**  Default translation string for option %s choice %s contains "
 "8-bit characters!\n"
-msgstr ""
-"      **失败**  选项 %s 选择 %s 的默认转换字符串含有 "
-"8 位字符！\n"
+msgstr "      **失败**  选项 %s 选择 %s 的默认转换字符串含有 8 位字符！\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  Default translation string for option %s contains 8-bit "
 "characters!\n"
-msgstr ""
-"      **失败**  选项 %s 的默认转换字符串含有 8 位"
-"字符！\n"
+msgstr "      **失败**  选项 %s 的默认转换字符串含有 8 位字符！\n"
 
 #, c-format
 msgid ""
@@ -859,8 +851,7 @@ msgstr "%s：不知道要做什么！\n"
 #, c-format
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr ""
-"%s：错误 - %s 个环境变量名称不存在目的位置“%s”！\n"
+msgstr "%s：错误 - %s 个环境变量名称不存在目的位置“%s”！\n"
 
 #, c-format
 msgid "%s: Error - bad job ID!\n"
@@ -873,8 +864,7 @@ msgstr "%s：错误 - 不能同时打印文件和更改作业！\n"
 #, c-format
 msgid ""
 "%s: Error - cannot print from stdin if files or a job ID are provided!\n"
-msgstr ""
-"%s：错误 - 如果文件或作业 ID 已提供，则不能从 stdin 打印！\n"
+msgstr "%s：错误 - 如果文件或作业 ID 已提供，则不能从 stdin 打印！\n"
 
 #, c-format
 msgid "%s: Error - expected character set after '-S' option!\n"
@@ -964,9 +954,7 @@ msgstr "%s：错误 - '-%c' 选项后期望值！\n"
 msgid ""
 "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
 "option!\n"
-msgstr ""
-"%s：错误 - '-W' 选项后需要“completed”、“not-completed”或“all”"
-"！\n"
+msgstr "%s：错误 - '-W' 选项后需要“completed”、“not-completed”或“all”！\n"
 
 #, c-format
 msgid "%s: Error - no default destination available.\n"
@@ -1025,6 +1013,10 @@ msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
 msgstr "%s：'-H restart' 之前需要作业 ID ('-i jobid')！\n"
 
 #, c-format
+msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
+msgstr ""
+
+#, c-format
 msgid "%s: Operation failed: %s\n"
 msgstr "%s：操作失败：%s\n"
 
@@ -1045,20 +1037,34 @@ msgid "%s: Unable to contact server!\n"
 msgstr "%s：无法联系服务器！\n"
 
 #, c-format
+msgid "%s: Unable to determine MIME type of \"%s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to read MIME database from \"%s\"!\n"
+msgstr ""
+
+#, c-format
 msgid "%s: Unknown destination \"%s\"!\n"
 msgstr "%s：未知目的位置“%s”！\n"
+
+#, c-format
+msgid "%s: Unknown destination MIME type %s/%s!\n"
+msgstr ""
 
 #, c-format
 msgid "%s: Unknown option '%c'!\n"
 msgstr "%s：未知选项 '%c'！\n"
 
 #, c-format
+msgid "%s: Unknown source MIME type %s/%s!\n"
+msgstr ""
+
+#, c-format
 msgid ""
 "%s: Warning - '%c' format modifier not supported - output may not be "
 "correct!\n"
-msgstr ""
-"%s：警告 - '%c' 格式修饰符不被支持 - 输出可能不"
-"正确！\n"
+msgstr "%s：警告 - '%c' 格式修饰符不被支持 - 输出可能不正确！\n"
 
 #, c-format
 msgid "%s: Warning - character set option ignored!\n"
@@ -1079,8 +1085,7 @@ msgstr "%s：警告 - 模式选项被忽略！\n"
 #, c-format
 msgid ""
 "%s: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr ""
-"%s：错误 - %s 个环境变量名称不存在目的位置“%s”！\n"
+msgstr "%s：错误 - %s 个环境变量名称不存在目的位置“%s”！\n"
 
 #, c-format
 msgid "%s: error - expected option=value after '-o' option!\n"
@@ -1353,9 +1358,7 @@ msgstr "ERROR: 缺少 %%EndSetup！\n"
 msgid ""
 "ERROR: Missing device URI on command-line and no DEVICE_URI environment "
 "variable!\n"
-msgstr ""
-"ERROR: 命令行中缺少设备 URI，也没有 DEVICE_URI 环境"
-"变量！\n"
+msgstr "ERROR: 命令行中缺少设备 URI，也没有 DEVICE_URI 环境变量！\n"
 
 #, c-format
 msgid "ERROR: No %%BoundingBox: comment in header!\n"
@@ -1368,9 +1371,7 @@ msgstr "ERROR: 无 %%Pages：标头中的批注！\n"
 msgid ""
 "ERROR: No device URI found in argv[0] or in DEVICE_URI environment "
 "variable!\n"
-msgstr ""
-"ERROR: 在 argv[0] 或 DEVICE_URI 环境"
-"变量中找不到设备 URI！\n"
+msgstr "ERROR: 在 argv[0] 或 DEVICE_URI 环境变量中找不到设备 URI！\n"
 
 msgid "ERROR: No pages found!\n"
 msgstr "ERROR: 找不到页面！\n"
@@ -1571,9 +1572,7 @@ msgstr "ERROR: pictwpstops 因状态 %d 退出！\n"
 msgid ""
 "ERROR: recoverable: Unable to connect to printer; will retry in 30 "
 "seconds...\n"
-msgstr ""
-"ERROR: 可恢复：无法连接到打印机；将在 30 "
-"秒钟后重试…\n"
+msgstr "ERROR: 可恢复：无法连接到打印机；将在 30 秒钟后重试…\n"
 
 #, c-format
 msgid "ERROR: select() returned %d\n"
@@ -1602,9 +1601,8 @@ msgid ""
 "this page. If you are using Kerberos authentication, make sure you have a "
 "valid Kerberos ticket."
 msgstr ""
-"请输入您的用户名称和密码或根用户名称和密码以访问"
-"此页面。如果您正在使用 Kerberos 鉴定，请确定您拥有"
-"有效的 Kerberos 票据。"
+"请输入您的用户名称和密码或根用户名称和密码以访问此页面。如果您正在使用 "
+"Kerberos 鉴定，请确定您拥有有效的 Kerberos 票据。"
 
 msgid "Error Policy"
 msgstr "错误策略"
@@ -1627,8 +1625,8 @@ msgid ""
 "File device URIs have been disabled! To enable, see the FileDevice directive "
 "in \"%s/cupsd.conf\"."
 msgstr ""
-"文件设备 URI 已被停用！要启用它，请参阅 FileDevice 指令，"
-"它在“%s/cupsd.conf”中。"
+"文件设备 URI 已被停用！要启用它，请参阅 FileDevice 指令，它在“%s/cupsd."
+"conf”中。"
 
 msgid "Fuser temperature high!"
 msgstr "加热鼓温度过高！"
@@ -2177,13 +2175,12 @@ msgid ""
 "The class name may only contain up to 127 printable characters and may not "
 "contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
-"类名称可能最多只能包含 127 个可打印的字符，可能无法"
-"含有空格、斜杠 (/) 或磅符号 (#)。"
+"类名称可能最多只能包含 127 个可打印的字符，可能无法含有空格、斜杠 (/) 或磅符"
+"号 (#)。"
 
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
-msgstr ""
-"notify-lease-duration 属性不能配合作业订阅使用。"
+msgstr "notify-lease-duration 属性不能配合作业订阅使用。"
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)!"
@@ -2193,8 +2190,8 @@ msgid ""
 "The printer name may only contain up to 127 printable characters and may not "
 "contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
-"打印机名称可能最多只能包含 127 个可打印的字符，可能无法"
-"含有空格、斜杠 (/) 或磅符号 (#)。"
+"打印机名称可能最多只能包含 127 个可打印的字符，可能无法含有空格、斜杠 (/) 或"
+"磅符号 (#)。"
 
 msgid "The printer or class is not shared!"
 msgstr "打印机或类没有共享！"
@@ -2211,20 +2208,16 @@ msgstr "需要 printer-uri 属性。"
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
-msgstr ""
-"printer-uri 必须是“ipp://HOSTNAME/classes/CLASSNAME”形式。"
+msgstr "printer-uri 必须是“ipp://HOSTNAME/classes/CLASSNAME”形式。"
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
-msgstr ""
-"printer-uri 必须是“ipp://HOSTNAME/classes/PRINTERNAME”形式。"
+msgstr "printer-uri 必须是“ipp://HOSTNAME/classes/PRINTERNAME”形式。"
 
 msgid ""
 "The subscription name may not contain spaces, slashes (/), question marks "
 "(?), or the pound sign (#)."
-msgstr ""
-"订阅名称可能无法含有空格、斜杠 (/)、问号 "
-"(?) 或磅符号 (#)。"
+msgstr "订阅名称可能无法含有空格、斜杠 (/)、问号 (?) 或磅符号 (#)。"
 
 msgid "Toner low."
 msgstr "碳粉不足。"
@@ -2262,6 +2255,14 @@ msgstr "无法更改打印机："
 
 msgid "Unable to change server settings:"
 msgstr "无法更改服务器设置："
+
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
+msgstr ""
+
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
+msgstr ""
 
 #, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!"
@@ -2433,6 +2434,24 @@ msgid "Usage: %s job-id user title copies options file\n"
 msgstr "Usage: %s job-id user title copies options file\n"
 
 msgid ""
+"Usage: convert [ options ]\n"
+"\n"
+"Options:\n"
+"\n"
+"  -f filename          Set file to be converted (otherwise stdin)\n"
+"  -o filename          Set file to be generated (otherwise stdout)\n"
+"  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
+"  -j mime/type         Set output MIME type (otherwise application/pdf)\n"
+"  -P filename.ppd      Set PPD file\n"
+"  -a 'name=value ...'  Set option(s)\n"
+"  -U username          Set username for job\n"
+"  -J title             Set title\n"
+"  -c copies            Set number of copies\n"
+"  -u                   Remove the PPD file when finished\n"
+"  -D                   Remove the input file when finished\n"
+msgstr ""
+
+msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
 "       cupsaddsmb [options] -a\n"
 "\n"
@@ -2504,7 +2523,7 @@ msgstr ""
 "-l                  Run cupsd from launchd(8)\n"
 
 msgid ""
-"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+"Usage: cupsfilter -m mime/type [ options ] filename\n"
 "\n"
 "Options:\n"
 "\n"
@@ -2514,15 +2533,6 @@ msgid ""
 "  -p filename.ppd  Set PPD file\n"
 "  -t title         Set title\n"
 msgstr ""
-"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
-"\n"
-"Options:\n"
-"\n"
-"  -c cupsd.conf    Set cupsd.conf file to use\n"
-"  -n copies        Set number of copies\n"
-"  -o name=value    Set option(s)\n"
-"  -p filename.ppd  Set PPD file\n"
-"  -t title         Set title\n"
 
 msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
@@ -2627,25 +2637,19 @@ msgstr "WARNING: 不能通过 IncludeFeature 包括选项“%s”！\n"
 msgid ""
 "WARNING: Remote host did not respond with command status byte after %d "
 "seconds!\n"
-msgstr ""
-"WARNING: 远程主机不响应命令状态字节（在 %d "
-"秒钟后）！\n"
+msgstr "WARNING: 远程主机不响应命令状态字节（在 %d 秒钟后）！\n"
 
 #, c-format
 msgid ""
 "WARNING: Remote host did not respond with control status byte after %d "
 "seconds!\n"
-msgstr ""
-"WARNING: 远程主机不响应控制状态字节（在 %d "
-"秒钟后）！\n"
+msgstr "WARNING: 远程主机不响应控制状态字节（在 %d 秒钟后）！\n"
 
 #, c-format
 msgid ""
 "WARNING: Remote host did not respond with data status byte after %d "
 "seconds!\n"
-msgstr ""
-"WARNING: 远程主机不响应数据状态字节（在 %d "
-"秒钟后）！\n"
+msgstr "WARNING: 远程主机不响应数据状态字节（在 %d 秒钟后）！\n"
 
 #, c-format
 msgid "WARNING: SCSI command timed out (%d); retrying...\n"
@@ -2655,8 +2659,8 @@ msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
 "Conventions and may not print correctly!\n"
 msgstr ""
-"WARNING: 此文稿不符合 Adobe Document Structuring "
-"Conventions，可能无法正确打印！\n"
+"WARNING: 此文稿不符合 Adobe Document Structuring Conventions，可能无法正确打"
+"印！\n"
 
 #, c-format
 msgid "WARNING: Unknown choice \"%s\" for option \"%s\"!\n"
@@ -2674,9 +2678,7 @@ msgstr "WARNING: 不被支持的波特率 %s！\n"
 msgid ""
 "WARNING: recoverable: Network host '%s' is busy; will retry in %d "
 "seconds...\n"
-msgstr ""
-"WARNING: 可恢复：网络主机 '%s' 正忙；将在 %d "
-"秒钟后重试…\n"
+msgstr "WARNING: 可恢复：网络主机 '%s' 正忙；将在 %d 秒钟后重试…\n"
 
 msgid "Warning, no Windows 2000 printer drivers are installed!"
 msgstr "警告，未安装 Windows 2000 打印机驱动程序！"
@@ -2689,8 +2691,7 @@ msgid ""
 "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
 "s:%d%s</A>."
 msgstr ""
-"您必须使用 URL <A HREF=\"https://%s:%d%s\">https://%"
-"s:%d%s</A> 访问此页面。"
+"您必须使用 URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A> 访问此页面。"
 
 msgid "aborted"
 msgstr "已中止"
@@ -2700,6 +2701,9 @@ msgstr "已取消"
 
 msgid "completed"
 msgstr "已完成"
+
+msgid "convert: Use the -f option to specify a file to convert.\n"
+msgstr ""
 
 msgid "cups-deviced failed to execute."
 msgstr "cups-deviced 执行失败。"
@@ -2733,24 +2737,8 @@ msgstr "cupsd：未知选项“%c”- 正在中止！\n"
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr "cupsd：launchd(8) 支持未编译，正在以正常模式运行。\n"
 
-#, c-format
-msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
-msgstr "cupsfilter：无滤镜可从 %s/%s 转换成 %s/%s！\n"
-
 msgid "cupsfilter: Only one filename can be specified!\n"
 msgstr "cupsfilter：只能指定一个文件名称！\n"
-
-#, c-format
-msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
-msgstr "cupsfilter：无法确定“%s”的 MIME 类型！\n"
-
-#, c-format
-msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
-msgstr "cupsfilter：无法从“%s”读取 MIME 数据库！\n"
-
-#, c-format
-msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
-msgstr "cupsfilter：未知目的 MIME 类型 %s/%s！\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
 msgstr "cupstestppd：-q 选项与 -v 选项不兼容。\n"
@@ -3038,9 +3026,7 @@ msgstr "lprm: 无法联系服务器！\n"
 msgid ""
 "lpstat: error - %s environment variable names non-existent destination \"%s"
 "\"!\n"
-msgstr ""
-"lpstat: 错误 - %s 个环境变量名称不存在目的位置“%s"
-"”！\n"
+msgstr "lpstat: 错误 - %s 个环境变量名称不存在目的位置“%s”！\n"
 
 #, c-format
 msgid "members of class %s:\n"
@@ -3130,3 +3116,36 @@ msgstr "未知"
 
 msgid "untitled"
 msgstr "未命名"
+
+#~ msgid ""
+#~ "Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+#~ "\n"
+#~ "Options:\n"
+#~ "\n"
+#~ "  -c cupsd.conf    Set cupsd.conf file to use\n"
+#~ "  -n copies        Set number of copies\n"
+#~ "  -o name=value    Set option(s)\n"
+#~ "  -p filename.ppd  Set PPD file\n"
+#~ "  -t title         Set title\n"
+#~ msgstr ""
+#~ "Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+#~ "\n"
+#~ "Options:\n"
+#~ "\n"
+#~ "  -c cupsd.conf    Set cupsd.conf file to use\n"
+#~ "  -n copies        Set number of copies\n"
+#~ "  -o name=value    Set option(s)\n"
+#~ "  -p filename.ppd  Set PPD file\n"
+#~ "  -t title         Set title\n"
+
+#~ msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
+#~ msgstr "cupsfilter：无滤镜可从 %s/%s 转换成 %s/%s！\n"
+
+#~ msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
+#~ msgstr "cupsfilter：无法确定“%s”的 MIME 类型！\n"
+
+#~ msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
+#~ msgstr "cupsfilter：无法从“%s”读取 MIME 数据库！\n"
+
+#~ msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
+#~ msgstr "cupsfilter：未知目的 MIME 类型 %s/%s！\n"

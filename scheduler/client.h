@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: client.h 6758 2007-08-02 00:13:44Z mike $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -53,7 +53,6 @@ struct cupsd_client_s
   int			serverport;	/* Server port for connection */
 #ifdef HAVE_GSSAPI
   int			gss_have_creds;	/* Have authenticated credentials */
-  int			no_negotiate;	/* Don't offer WWW-Authenticate: Negotiate */
   gss_buffer_desc 	gss_output_token;
 					/* Output token for Negotiate header */
   gss_cred_id_t 	gss_delegated_cred;
@@ -130,5 +129,5 @@ extern void	cupsdWriteClient(cupsd_client_t *con);
 
 
 /*
- * End of "$Id: client.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: client.h 6758 2007-08-02 00:13:44Z mike $".
  */

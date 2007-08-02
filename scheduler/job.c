@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6735 2007-07-26 18:38:29Z mike $"
+ * "$Id: job.c 6755 2007-08-01 19:02:47Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -1793,15 +1793,10 @@ free_job(cupsd_job_t *job)		/* I - Job */
   if (job->ccname)
   {
    /*
-    * First erase the credential cache file, then clear the string referencing
-    * it.  We know the filename since the string will be of the form
-    * "KRB5CCNAME=FILE:/foo/bar"...
+    * Destroy the credential cache and clear the KRB5CCNAME env var string.
     */
 
-    if (cupsdRemoveFile(job->ccname + 16) && errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "[Job %d] Unable to remove Kerberos credential cache: %s",
-		      job->id, strerror(errno));
+    krb5_cc_destroy(KerberosContext, job->ccache);
 
     cupsdClearString(&job->ccname);
   }
@@ -3566,7 +3561,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     else if (loglevel == CUPSD_LOG_STATE)
     {
       if (!strcmp(message, "paused"))
+      {
         cupsdStopPrinter(job->printer, 1);
+	return;
+      }
       else
       {
 	cupsdSetPrinterReasons(job->printer, message);
@@ -3768,5 +3766,5 @@ update_job_attrs(cupsd_job_t *job)	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 6735 2007-07-26 18:38:29Z mike $".
+ * End of "$Id: job.c 6755 2007-08-01 19:02:47Z mike $".
  */

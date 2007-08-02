@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-defaults.m4 6720 2007-07-25 00:40:03Z mike $"
+dnl "$Id: cups-defaults.m4 6754 2007-08-01 19:00:07Z mike $"
 dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
@@ -160,11 +160,12 @@ AC_ARG_WITH(cups_user, [  --with-cups-user        set default user for CUPS],
 	CUPS_USER="$withval",
 	AC_MSG_CHECKING(for default print user)
 	if test x$uname = xDarwin; then
-		if x`id -u _lp 2>/dev/null` = x; then
+		if test x`id -u _lp 2>/dev/null` = x; then
 			CUPS_USER="lp";
 		else
 			CUPS_USER="_lp";
 		fi
+		AC_MSG_RESULT($CUPS_USER)
 	elif test -f /etc/passwd; then
 		CUPS_USER=""
 		for user in lp lpd guest daemon nobody; do
@@ -188,11 +189,12 @@ AC_ARG_WITH(cups_group, [  --with-cups-group       set default group for CUPS],
 	CUPS_GROUP="$withval",
 	AC_MSG_CHECKING(for default print group)
 	if test x$uname = xDarwin; then
-		if x`id -g _lp 2>/dev/null` = x; then
+		if test x`id -g _lp 2>/dev/null` = x; then
 			CUPS_GROUP="lp";
 		else
 			CUPS_GROUP="_lp";
 		fi
+		AC_MSG_RESULT($CUPS_GROUP)
 	elif test -f /etc/group; then
 		GROUP_LIST="_lp lp nobody"
 		CUPS_GROUP=""
@@ -336,5 +338,5 @@ AC_SUBST(CUPS_SNMP_ADDRESS)
 AC_SUBST(CUPS_SNMP_COMMUNITY)
 
 dnl
-dnl End of "$Id: cups-defaults.m4 6720 2007-07-25 00:40:03Z mike $".
+dnl End of "$Id: cups-defaults.m4 6754 2007-08-01 19:00:07Z mike $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h 6689 2007-07-18 23:52:15Z mike $"
+ * "$Id: cupsd.h 6755 2007-08-01 19:02:47Z mike $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -158,6 +158,11 @@ VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
 VAR int			NeedReload	VALUE(RELOAD_ALL);
 					/* Need to load configuration? */
+
+#ifdef HAVE_GSSAPI
+VAR krb5_context	KerberosContext;/* Kerberos context for credentials */
+#endif /* HAVE_GSSAPI */
+
 #ifdef HAVE_LAUNCH_H
 VAR int			Launchd		VALUE(0);
 					/* Running from launchd */
@@ -221,5 +226,5 @@ extern void	cupsdStopSelect(void);
 extern int	cupsdRemoveFile(const char *filename);
 
 /*
- * End of "$Id: cupsd.h 6689 2007-07-18 23:52:15Z mike $".
+ * End of "$Id: cupsd.h 6755 2007-08-01 19:02:47Z mike $".
  */

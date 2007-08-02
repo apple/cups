@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.3\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-23 10:47-0700\n"
+"POT-Creation-Date: 2007-07-27 14:55-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -852,7 +852,7 @@ msgstr ""
 msgid "%s accepting requests since %s\n"
 msgstr ""
 
-#: scheduler/ipp.c:8990
+#: scheduler/ipp.c:9002
 #, c-format
 msgid "%s cannot be changed."
 msgstr ""
@@ -1228,11 +1228,11 @@ msgstr ""
 msgid "?Invalid help command unknown\n"
 msgstr ""
 
-#: cgi-bin/admin.c:1907
+#: cgi-bin/admin.c:1994
 msgid "A Samba password is required to export printer drivers!"
 msgstr ""
 
-#: cgi-bin/admin.c:1903
+#: cgi-bin/admin.c:1990
 msgid "A Samba username is required to export printer drivers!"
 msgstr ""
 
@@ -1250,20 +1250,20 @@ msgstr ""
 msgid "Accept Jobs"
 msgstr ""
 
-#: cgi-bin/admin.c:415
+#: cgi-bin/admin.c:421
 msgid "Add Class"
 msgstr ""
 
-#: cgi-bin/admin.c:702
+#: cgi-bin/admin.c:713
 msgid "Add Printer"
 msgstr ""
 
-#: cgi-bin/admin.c:302 cgi-bin/admin.c:325 cgi-bin/admin.c:371
-#: cgi-bin/admin.c:381
+#: cgi-bin/admin.c:303 cgi-bin/admin.c:326 cgi-bin/admin.c:377
+#: cgi-bin/admin.c:387
 msgid "Add RSS Subscription"
 msgstr ""
 
-#: cgi-bin/admin.c:200 cgi-bin/admin.c:211 cgi-bin/admin.c:2270
+#: cgi-bin/admin.c:201 cgi-bin/admin.c:212 cgi-bin/admin.c:2357
 msgid "Administration"
 msgstr ""
 
@@ -1307,32 +1307,32 @@ msgstr ""
 msgid "Bad device-uri \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:8481 scheduler/ipp.c:9752
+#: scheduler/ipp.c:8493 scheduler/ipp.c:9764
 #, c-format
 msgid "Bad document-format \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:9006
+#: scheduler/ipp.c:9018
 msgid "Bad job-priority value!"
 msgstr ""
 
-#: scheduler/ipp.c:9031
+#: scheduler/ipp.c:9043
 msgid "Bad job-state value!"
 msgstr ""
 
-#: scheduler/ipp.c:2833 scheduler/ipp.c:3168 scheduler/ipp.c:5644
-#: scheduler/ipp.c:6813 scheduler/ipp.c:7039 scheduler/ipp.c:7803
-#: scheduler/ipp.c:8027 scheduler/ipp.c:8394 scheduler/ipp.c:8900
+#: scheduler/ipp.c:2833 scheduler/ipp.c:3180 scheduler/ipp.c:5656
+#: scheduler/ipp.c:6825 scheduler/ipp.c:7051 scheduler/ipp.c:7815
+#: scheduler/ipp.c:8039 scheduler/ipp.c:8406 scheduler/ipp.c:8912
 #, c-format
 msgid "Bad job-uri attribute \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:5232
+#: scheduler/ipp.c:5244
 #, c-format
 msgid "Bad notify-pull-method \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:5206
+#: scheduler/ipp.c:5218
 #, c-format
 msgid "Bad notify-recipient-uri URI \"%s\"!"
 msgstr ""
@@ -1367,24 +1367,24 @@ msgstr ""
 msgid "Bad request version number %d.%d!"
 msgstr ""
 
-#: cgi-bin/admin.c:1248
+#: cgi-bin/admin.c:1264
 msgid "Bad subscription ID!"
 msgstr ""
 
-#: cgi-bin/admin.c:2865
+#: cgi-bin/admin.c:2967
 msgid "Banners"
 msgstr ""
 
-#: cgi-bin/admin.c:1249 cgi-bin/admin.c:1276 cgi-bin/admin.c:1286
+#: cgi-bin/admin.c:1265 cgi-bin/admin.c:1297 cgi-bin/admin.c:1307
 msgid "Cancel RSS Subscription"
 msgstr ""
 
-#: cgi-bin/admin.c:1345 cgi-bin/admin.c:1402 cgi-bin/admin.c:1411
-#: cgi-bin/admin.c:1422
+#: cgi-bin/admin.c:1366 cgi-bin/admin.c:1429 cgi-bin/admin.c:1438
+#: cgi-bin/admin.c:1449
 msgid "Change Settings"
 msgstr ""
 
-#: scheduler/ipp.c:1953 scheduler/ipp.c:5244
+#: scheduler/ipp.c:1953 scheduler/ipp.c:5256
 #, c-format
 msgid "Character set \"%s\" not supported!"
 msgstr ""
@@ -1400,7 +1400,7 @@ msgid ""
 "exit    help    quit    status  ?\n"
 msgstr ""
 
-#: scheduler/ipp.c:7321 scheduler/ipp.c:7337 scheduler/ipp.c:8497
+#: scheduler/ipp.c:7333 scheduler/ipp.c:7349 scheduler/ipp.c:8509
 #, c-format
 msgid "Could not scan type \"%s\"!"
 msgstr ""
@@ -1413,11 +1413,11 @@ msgstr ""
 msgid "Custom"
 msgstr ""
 
-#: cgi-bin/admin.c:1642 cgi-bin/admin.c:1653 cgi-bin/admin.c:1693
+#: cgi-bin/admin.c:1719 cgi-bin/admin.c:1730 cgi-bin/admin.c:1775
 msgid "Delete Class"
 msgstr ""
 
-#: cgi-bin/admin.c:1722 cgi-bin/admin.c:1733 cgi-bin/admin.c:1773
+#: cgi-bin/admin.c:1804 cgi-bin/admin.c:1815 cgi-bin/admin.c:1860
 msgid "Delete Printer"
 msgstr ""
 
@@ -1824,9 +1824,9 @@ msgstr ""
 msgid "ERROR: select() returned %d\n"
 msgstr ""
 
-#: cgi-bin/admin.c:1450 cgi-bin/admin.c:1462 cgi-bin/admin.c:1510
-#: cgi-bin/admin.c:1517 cgi-bin/admin.c:1549 cgi-bin/admin.c:1562
-#: cgi-bin/admin.c:1586 cgi-bin/admin.c:1613
+#: cgi-bin/admin.c:1477 cgi-bin/admin.c:1489 cgi-bin/admin.c:1543
+#: cgi-bin/admin.c:1550 cgi-bin/admin.c:1585 cgi-bin/admin.c:1598
+#: cgi-bin/admin.c:1622 cgi-bin/admin.c:1692
 msgid "Edit Configuration File"
 msgstr ""
 
@@ -1834,7 +1834,7 @@ msgstr ""
 msgid "Empty PPD file!"
 msgstr ""
 
-#: cgi-bin/admin.c:2886
+#: cgi-bin/admin.c:2988
 msgid "Ending Banner"
 msgstr ""
 
@@ -1854,7 +1854,7 @@ msgstr ""
 msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
 msgstr ""
 
-#: cgi-bin/admin.c:2928
+#: cgi-bin/admin.c:3030
 msgid "Error Policy"
 msgstr ""
 
@@ -1862,7 +1862,7 @@ msgstr ""
 msgid "Error: need hostname after '-h' option!\n"
 msgstr ""
 
-#: cgi-bin/admin.c:1895 cgi-bin/admin.c:1914
+#: cgi-bin/admin.c:1982 cgi-bin/admin.c:2001
 msgid "Export Printers to Samba"
 msgstr ""
 
@@ -1898,9 +1898,9 @@ msgstr ""
 msgid "General"
 msgstr ""
 
-#: scheduler/ipp.c:2811 scheduler/ipp.c:3100 scheduler/ipp.c:5621
-#: scheduler/ipp.c:6790 scheduler/ipp.c:7780 scheduler/ipp.c:8004
-#: scheduler/ipp.c:8371 scheduler/ipp.c:8877
+#: scheduler/ipp.c:2811 scheduler/ipp.c:3100 scheduler/ipp.c:5633
+#: scheduler/ipp.c:6802 scheduler/ipp.c:7792 scheduler/ipp.c:8016
+#: scheduler/ipp.c:8383 scheduler/ipp.c:8889
 msgid "Got a printer-uri attribute but no job-id!"
 msgstr ""
 
@@ -2104,40 +2104,40 @@ msgstr ""
 msgid "JCL"
 msgstr ""
 
-#: scheduler/ipp.c:8077
+#: scheduler/ipp.c:8089
 #, c-format
 msgid "Job #%d cannot be restarted - no files!"
 msgstr ""
 
-#: scheduler/ipp.c:2852 scheduler/ipp.c:3186 scheduler/ipp.c:5662
-#: scheduler/ipp.c:6667 scheduler/ipp.c:6831 scheduler/ipp.c:7012
-#: scheduler/ipp.c:7057 scheduler/ipp.c:7821 scheduler/ipp.c:8045
-#: scheduler/ipp.c:8412 scheduler/ipp.c:8918
+#: scheduler/ipp.c:2852 scheduler/ipp.c:3198 scheduler/ipp.c:5674
+#: scheduler/ipp.c:6679 scheduler/ipp.c:6843 scheduler/ipp.c:7024
+#: scheduler/ipp.c:7069 scheduler/ipp.c:7833 scheduler/ipp.c:8057
+#: scheduler/ipp.c:8424 scheduler/ipp.c:8930
 #, c-format
 msgid "Job #%d does not exist!"
 msgstr ""
 
-#: scheduler/ipp.c:3217
+#: scheduler/ipp.c:3229
 #, c-format
 msgid "Job #%d is already aborted - can't cancel."
 msgstr ""
 
-#: scheduler/ipp.c:3211
+#: scheduler/ipp.c:3223
 #, c-format
 msgid "Job #%d is already canceled - can't cancel."
 msgstr ""
 
-#: scheduler/ipp.c:3223
+#: scheduler/ipp.c:3235
 #, c-format
 msgid "Job #%d is already completed - can't cancel."
 msgstr ""
 
-#: scheduler/ipp.c:7088 scheduler/ipp.c:8933
+#: scheduler/ipp.c:7100 scheduler/ipp.c:8945
 #, c-format
 msgid "Job #%d is finished and cannot be altered!"
 msgstr ""
 
-#: scheduler/ipp.c:8059
+#: scheduler/ipp.c:8071
 #, c-format
 msgid "Job #%d is not complete!"
 msgstr ""
@@ -2147,17 +2147,17 @@ msgstr ""
 msgid "Job #%d is not held for authentication!"
 msgstr ""
 
-#: scheduler/ipp.c:7835
+#: scheduler/ipp.c:7847
 #, c-format
 msgid "Job #%d is not held!"
 msgstr ""
 
-#: scheduler/ipp.c:6645
+#: scheduler/ipp.c:6657
 #, c-format
 msgid "Job #%s does not exist!"
 msgstr ""
 
-#: scheduler/ipp.c:5330
+#: scheduler/ipp.c:5342
 #, c-format
 msgid "Job %d not found!"
 msgstr ""
@@ -2178,7 +2178,7 @@ msgstr ""
 msgid "Job Stopped"
 msgstr ""
 
-#: scheduler/ipp.c:9014
+#: scheduler/ipp.c:9026
 msgid "Job is completed and cannot be changed."
 msgstr ""
 
@@ -2186,11 +2186,11 @@ msgstr ""
 msgid "Job operation failed:"
 msgstr ""
 
-#: scheduler/ipp.c:9045 scheduler/ipp.c:9062 scheduler/ipp.c:9073
+#: scheduler/ipp.c:9057 scheduler/ipp.c:9074 scheduler/ipp.c:9085
 msgid "Job state cannot be changed."
 msgstr ""
 
-#: scheduler/ipp.c:7924
+#: scheduler/ipp.c:7936
 msgid "Job subscriptions cannot be renewed!"
 msgstr ""
 
@@ -2198,7 +2198,7 @@ msgstr ""
 msgid "Jobs"
 msgstr ""
 
-#: scheduler/ipp.c:1962 scheduler/ipp.c:5253
+#: scheduler/ipp.c:1962 scheduler/ipp.c:5265
 #, c-format
 msgid "Language \"%s\" not supported!"
 msgstr ""
@@ -2207,7 +2207,7 @@ msgstr ""
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr ""
 
-#: cgi-bin/admin.c:1932
+#: cgi-bin/admin.c:2019
 msgid "List Available Printers"
 msgstr ""
 
@@ -2260,12 +2260,12 @@ msgstr ""
 msgid "Missing double quote on line %d!"
 msgstr ""
 
-#: cgi-bin/admin.c:1654 cgi-bin/admin.c:1734 cgi-bin/admin.c:2298
-#: cgi-bin/admin.c:2400 cgi-bin/admin.c:2663 cgi-bin/admin.c:3186
+#: cgi-bin/admin.c:1731 cgi-bin/admin.c:1816 cgi-bin/admin.c:2385
+#: cgi-bin/admin.c:2492 cgi-bin/admin.c:2765 cgi-bin/admin.c:3293
 msgid "Missing form variable!"
 msgstr ""
 
-#: scheduler/ipp.c:5919
+#: scheduler/ipp.c:5931
 msgid "Missing notify-subscription-ids attribute!"
 msgstr ""
 
@@ -2295,11 +2295,11 @@ msgid ""
 "        device-id = %s\n"
 msgstr ""
 
-#: cgi-bin/admin.c:415
+#: cgi-bin/admin.c:421
 msgid "Modify Class"
 msgstr ""
 
-#: cgi-bin/admin.c:702
+#: cgi-bin/admin.c:713
 msgid "Modify Printer"
 msgstr ""
 
@@ -2328,11 +2328,11 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: cups/adminutil.c:661
+#: cups/adminutil.c:795
 msgid "No Windows printer drivers are installed!"
 msgstr ""
 
-#: scheduler/ipp.c:3144
+#: scheduler/ipp.c:3155
 #, c-format
 msgid "No active jobs on %s!"
 msgstr ""
@@ -2345,27 +2345,27 @@ msgstr ""
 msgid "No authentication information provided!"
 msgstr ""
 
-#: scheduler/ipp.c:5510
+#: scheduler/ipp.c:5522
 msgid "No default printer"
 msgstr ""
 
-#: scheduler/ipp.c:6417
+#: scheduler/ipp.c:6429
 msgid "No destinations added."
 msgstr ""
 
-#: scheduler/ipp.c:7287 scheduler/ipp.c:8463
+#: scheduler/ipp.c:7299 scheduler/ipp.c:8475
 msgid "No file!?!"
 msgstr ""
 
-#: scheduler/ipp.c:5148
+#: scheduler/ipp.c:5160
 msgid "No subscription attributes in request!"
 msgstr ""
 
-#: scheduler/ipp.c:6730
+#: scheduler/ipp.c:6742
 msgid "No subscriptions found."
 msgstr ""
 
-#: cgi-bin/admin.c:2982
+#: cgi-bin/admin.c:3084
 msgid "None"
 msgstr ""
 
@@ -2393,11 +2393,11 @@ msgstr ""
 msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
 msgstr ""
 
-#: cgi-bin/admin.c:2955
+#: cgi-bin/admin.c:3057
 msgid "Operation Policy"
 msgstr ""
 
-#: cgi-bin/admin.c:2777
+#: cgi-bin/admin.c:2879
 msgid "Options Installed"
 msgstr ""
 
@@ -2445,11 +2445,11 @@ msgstr ""
 msgid "PASS\n"
 msgstr ""
 
-#: cgi-bin/admin.c:2976 cgi-bin/admin.c:2996
+#: cgi-bin/admin.c:3078 cgi-bin/admin.c:3098
 msgid "PS Binary Protocol"
 msgstr ""
 
-#: cups/auth.c:153
+#: cups/auth.c:150
 #, c-format
 msgid "Password for %s on %s? "
 msgstr ""
@@ -2459,7 +2459,7 @@ msgstr ""
 msgid "Password for %s required to access %s via SAMBA: "
 msgstr ""
 
-#: cgi-bin/admin.c:2904
+#: cgi-bin/admin.c:3006
 msgid "Policies"
 msgstr ""
 
@@ -2527,7 +2527,7 @@ msgstr ""
 msgid "Resolution"
 msgstr ""
 
-#: cups/adminutil.c:1930
+#: cups/adminutil.c:2066
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
 msgstr ""
@@ -2548,8 +2548,8 @@ msgstr ""
 msgid "Server Stopped"
 msgstr ""
 
-#: cgi-bin/admin.c:2401 cgi-bin/admin.c:2447 cgi-bin/admin.c:2588
-#: cgi-bin/admin.c:2607
+#: cgi-bin/admin.c:2493 cgi-bin/admin.c:2539 cgi-bin/admin.c:2690
+#: cgi-bin/admin.c:2709
 msgid "Set Allowed Users"
 msgstr ""
 
@@ -2557,15 +2557,15 @@ msgstr ""
 msgid "Set As Default"
 msgstr ""
 
-#: cgi-bin/admin.c:2648
+#: cgi-bin/admin.c:2750
 msgid "Set Class Options"
 msgstr ""
 
-#: cgi-bin/admin.c:2648 cgi-bin/admin.c:2747 cgi-bin/admin.c:3023
+#: cgi-bin/admin.c:2750 cgi-bin/admin.c:2849 cgi-bin/admin.c:3125
 msgid "Set Printer Options"
 msgstr ""
 
-#: cgi-bin/admin.c:3187 cgi-bin/admin.c:3226 cgi-bin/admin.c:3244
+#: cgi-bin/admin.c:3294 cgi-bin/admin.c:3338 cgi-bin/admin.c:3356
 msgid "Set Publishing"
 msgstr ""
 
@@ -2577,7 +2577,7 @@ msgstr ""
 msgid "Start Printer"
 msgstr ""
 
-#: cgi-bin/admin.c:2879
+#: cgi-bin/admin.c:2981
 msgid "Starting Banner"
 msgstr ""
 
@@ -2589,17 +2589,17 @@ msgstr ""
 msgid "Stop Printer"
 msgstr ""
 
-#: scheduler/ipp.c:6166
+#: scheduler/ipp.c:6178
 #, c-format
 msgid "The PPD file \"%s\" could not be found."
 msgstr ""
 
-#: scheduler/ipp.c:6153
+#: scheduler/ipp.c:6165
 #, c-format
 msgid "The PPD file \"%s\" could not be opened: %s"
 msgstr ""
 
-#: cgi-bin/admin.c:573
+#: cgi-bin/admin.c:579
 msgid "The class name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
 
@@ -2607,12 +2607,12 @@ msgstr ""
 msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
 
-#: scheduler/ipp.c:1972 scheduler/ipp.c:5263
+#: scheduler/ipp.c:1972 scheduler/ipp.c:5275
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)!"
 msgstr ""
 
-#: cgi-bin/admin.c:772
+#: cgi-bin/admin.c:783
 msgid "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
 
@@ -2621,11 +2621,11 @@ msgid "The printer or class is not shared!"
 msgstr ""
 
 #: scheduler/ipp.c:797 scheduler/ipp.c:1088 scheduler/ipp.c:3012
-#: scheduler/ipp.c:3117 scheduler/ipp.c:4808 scheduler/ipp.c:5107
-#: scheduler/ipp.c:5406 scheduler/ipp.c:5759 scheduler/ipp.c:6349
-#: scheduler/ipp.c:6657 scheduler/ipp.c:6949 scheduler/ipp.c:6993
-#: scheduler/ipp.c:7302 scheduler/ipp.c:7693 scheduler/ipp.c:8793
-#: scheduler/ipp.c:9457 scheduler/ipp.c:9524 scheduler/ipp.c:9782
+#: scheduler/ipp.c:3117 scheduler/ipp.c:4820 scheduler/ipp.c:5119
+#: scheduler/ipp.c:5418 scheduler/ipp.c:5771 scheduler/ipp.c:6361
+#: scheduler/ipp.c:6669 scheduler/ipp.c:6961 scheduler/ipp.c:7005
+#: scheduler/ipp.c:7314 scheduler/ipp.c:7705 scheduler/ipp.c:8805
+#: scheduler/ipp.c:9469 scheduler/ipp.c:9536 scheduler/ipp.c:9794
 msgid "The printer or class was not found."
 msgstr ""
 
@@ -2646,7 +2646,7 @@ msgstr ""
 msgid "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
 msgstr ""
 
-#: cgi-bin/admin.c:322
+#: cgi-bin/admin.c:323
 msgid "The subscription name may not contain spaces, slashes (/), question marks (?), or the pound sign (#)."
 msgstr ""
 
@@ -2658,15 +2658,15 @@ msgstr ""
 msgid "Too many active jobs."
 msgstr ""
 
-#: cgi-bin/admin.c:1551 cgi-bin/admin.c:1564 cgi-bin/admin.c:1588
+#: cgi-bin/admin.c:1587 cgi-bin/admin.c:1600 cgi-bin/admin.c:1624
 msgid "Unable to access cupsd.conf file:"
 msgstr ""
 
-#: cgi-bin/admin.c:372
+#: cgi-bin/admin.c:378
 msgid "Unable to add RSS subscription:"
 msgstr ""
 
-#: cgi-bin/admin.c:634
+#: cgi-bin/admin.c:645
 msgid "Unable to add class:"
 msgstr ""
 
@@ -2675,7 +2675,7 @@ msgstr ""
 msgid "Unable to add job for destination \"%s\"!"
 msgstr ""
 
-#: cgi-bin/admin.c:1186
+#: cgi-bin/admin.c:1202
 msgid "Unable to add printer:"
 msgstr ""
 
@@ -2683,20 +2683,30 @@ msgstr ""
 msgid "Unable to allocate memory for file types!"
 msgstr ""
 
-#: cgi-bin/admin.c:1277
+#: cgi-bin/admin.c:1298
 msgid "Unable to cancel RSS subscription:"
 msgstr ""
 
-#: cgi-bin/admin.c:3227
+#: cgi-bin/admin.c:3339
 msgid "Unable to change printer-is-shared attribute:"
 msgstr ""
 
-#: cgi-bin/admin.c:2331 cgi-bin/admin.c:2589
+#: cgi-bin/admin.c:2423 cgi-bin/admin.c:2691
 msgid "Unable to change printer:"
 msgstr ""
 
-#: cgi-bin/admin.c:1347 cgi-bin/admin.c:1404
+#: cgi-bin/admin.c:1368 cgi-bin/admin.c:1431
 msgid "Unable to change server settings:"
+msgstr ""
+
+#: cups/adminutil.c:733
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
+msgstr ""
+
+#: cups/adminutil.c:698
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
 msgstr ""
 
 #: cups/adminutil.c:529
@@ -2718,7 +2728,7 @@ msgstr ""
 msgid "Unable to copy Windows 2000 printer driver files (%d)!"
 msgstr ""
 
-#: cups/adminutil.c:613
+#: cups/adminutil.c:617
 #, c-format
 msgid "Unable to copy Windows 9x printer driver files (%d)!"
 msgstr ""
@@ -2728,19 +2738,19 @@ msgstr ""
 msgid "Unable to copy interface script - %s!"
 msgstr ""
 
-#: cgi-bin/admin.c:1451 cgi-bin/admin.c:1463 cgi-bin/printers.c:214
+#: cgi-bin/admin.c:1478 cgi-bin/admin.c:1490 cgi-bin/printers.c:214
 msgid "Unable to create temporary file:"
 msgstr ""
 
-#: cgi-bin/admin.c:1696
+#: cgi-bin/admin.c:1778
 msgid "Unable to delete class:"
 msgstr ""
 
-#: cgi-bin/admin.c:1776
+#: cgi-bin/admin.c:1863
 msgid "Unable to delete printer:"
 msgstr ""
 
-#: cgi-bin/admin.c:1566
+#: cgi-bin/admin.c:1602
 msgid "Unable to edit cupsd.conf files larger than 1MB!"
 msgstr ""
 
@@ -2756,11 +2766,11 @@ msgstr ""
 msgid "Unable to get class status:"
 msgstr ""
 
-#: cgi-bin/admin.c:1101
+#: cgi-bin/admin.c:1112
 msgid "Unable to get list of printer drivers:"
 msgstr ""
 
-#: cgi-bin/admin.c:2450
+#: cgi-bin/admin.c:2547
 msgid "Unable to get printer attributes:"
 msgstr ""
 
@@ -2772,21 +2782,21 @@ msgstr ""
 msgid "Unable to get printer status:"
 msgstr ""
 
-#: cups/adminutil.c:572
+#: cups/adminutil.c:572 cups/adminutil.c:776
 #, c-format
 msgid "Unable to install Windows 2000 printer driver files (%d)!"
 msgstr ""
 
-#: cups/adminutil.c:642
+#: cups/adminutil.c:646
 #, c-format
 msgid "Unable to install Windows 9x printer driver files (%d)!"
 msgstr ""
 
-#: cgi-bin/admin.c:633
+#: cgi-bin/admin.c:644
 msgid "Unable to modify class:"
 msgstr ""
 
-#: cgi-bin/admin.c:1185
+#: cgi-bin/admin.c:1201
 msgid "Unable to modify printer:"
 msgstr ""
 
@@ -2802,11 +2812,11 @@ msgstr ""
 msgid "Unable to open PPD file"
 msgstr ""
 
-#: cgi-bin/admin.c:2688
+#: cgi-bin/admin.c:2790
 msgid "Unable to open PPD file:"
 msgstr ""
 
-#: cgi-bin/admin.c:2179
+#: cgi-bin/admin.c:2266
 msgid "Unable to open cupsd.conf file:"
 msgstr ""
 
@@ -2814,7 +2824,7 @@ msgstr ""
 msgid "Unable to print test page:"
 msgstr ""
 
-#: cups/adminutil.c:1961
+#: cups/adminutil.c:2097
 #, c-format
 msgid "Unable to run \"%s\": %s\n"
 msgstr ""
@@ -2823,16 +2833,16 @@ msgstr ""
 msgid "Unable to send maintenance job:"
 msgstr ""
 
-#: cups/adminutil.c:691
+#: cups/adminutil.c:825
 #, c-format
 msgid "Unable to set Windows printer driver (%d)!"
 msgstr ""
 
-#: cgi-bin/admin.c:3133
+#: cgi-bin/admin.c:3240
 msgid "Unable to set options:"
 msgstr ""
 
-#: cgi-bin/admin.c:1507
+#: cgi-bin/admin.c:1540
 msgid "Unable to upload cupsd.conf file:"
 msgstr ""
 
@@ -2845,37 +2855,37 @@ msgstr ""
 msgid "Unknown printer error (%s)!"
 msgstr ""
 
-#: scheduler/ipp.c:9330
+#: scheduler/ipp.c:9342
 #, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:9315
+#: scheduler/ipp.c:9327
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:7268 scheduler/ipp.c:8444
+#: scheduler/ipp.c:7280 scheduler/ipp.c:8456
 #, c-format
 msgid "Unsupported compression \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:9735
+#: scheduler/ipp.c:9747
 #, c-format
 msgid "Unsupported compression attribute %s!"
 msgstr ""
 
-#: scheduler/ipp.c:9763
+#: scheduler/ipp.c:9775
 #, c-format
 msgid "Unsupported format \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:1315 scheduler/ipp.c:8576
+#: scheduler/ipp.c:1315 scheduler/ipp.c:8588
 #, c-format
 msgid "Unsupported format '%s'!"
 msgstr ""
 
-#: scheduler/ipp.c:7399 scheduler/ipp.c:8559
+#: scheduler/ipp.c:7411 scheduler/ipp.c:8571
 #, c-format
 msgid "Unsupported format '%s/%s'!"
 msgstr ""
@@ -3108,7 +3118,7 @@ msgstr ""
 msgid "WARNING: recoverable: Network host '%s' is busy; will retry in %d seconds...\n"
 msgstr ""
 
-#: cups/adminutil.c:666
+#: cups/adminutil.c:800
 msgid "Warning, no Windows 2000 printer drivers are installed!"
 msgstr ""
 
@@ -3137,11 +3147,11 @@ msgstr ""
 msgid "convert: Use the -f option to specify a file to convert.\n"
 msgstr ""
 
-#: scheduler/ipp.c:5579
+#: scheduler/ipp.c:5591
 msgid "cups-deviced failed to execute."
 msgstr ""
 
-#: scheduler/ipp.c:6088 scheduler/ipp.c:6316
+#: scheduler/ipp.c:6100 scheduler/ipp.c:6328
 msgid "cups-driverd failed to execute."
 msgstr ""
 
@@ -3212,7 +3222,7 @@ msgstr ""
 msgid "idle"
 msgstr ""
 
-#: scheduler/ipp.c:6938
+#: scheduler/ipp.c:6950
 msgid "job-printer-uri attribute missing!"
 msgstr ""
 
@@ -3536,22 +3546,22 @@ msgstr ""
 msgid "no system default destination\n"
 msgstr ""
 
-#: scheduler/ipp.c:5312
+#: scheduler/ipp.c:5324
 msgid "notify-events not specified!"
 msgstr ""
 
-#: scheduler/ipp.c:5217
+#: scheduler/ipp.c:5229
 #, c-format
 msgid "notify-recipient-uri URI \"%s\" uses unknown scheme!"
 msgstr ""
 
-#: scheduler/ipp.c:3273 scheduler/ipp.c:5936 scheduler/ipp.c:6559
-#: scheduler/ipp.c:7913
+#: scheduler/ipp.c:3285 scheduler/ipp.c:5948 scheduler/ipp.c:6571
+#: scheduler/ipp.c:7925
 #, c-format
 msgid "notify-subscription-id %d no good!"
 msgstr ""
 
-#: cups/adminutil.c:788
+#: cups/adminutil.c:922
 #, c-format
 msgid "open of %s failed: %s"
 msgstr ""
@@ -3607,7 +3617,7 @@ msgstr ""
 msgid "scheduler is running\n"
 msgstr ""
 
-#: cups/adminutil.c:2032
+#: cups/adminutil.c:2168
 #, c-format
 msgid "stat of %s failed: %s"
 msgstr ""

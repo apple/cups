@@ -1,5 +1,5 @@
 /*
- * "$Id: job.h 6655 2007-07-12 22:58:17Z mike $"
+ * "$Id: job.h 6755 2007-08-01 19:02:47Z mike $"
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -57,6 +57,7 @@ typedef struct cupsd_job_s
 			*auth_domain,	/* AUTH_DOMAIN environment variable, if any */
 			*auth_password;	/* AUTH_PASSWORD environment variable, if any */
 #ifdef HAVE_GSSAPI
+  krb5_ccache		ccache;		/* Kerberos credential cache */
   char			*ccname;	/* KRB5CCNAME environment variable */
 #endif /* HAVE_GSSAPI */
 } cupsd_job_t;
@@ -126,5 +127,5 @@ extern void		cupsdUnloadCompletedJobs(void);
 
 
 /*
- * End of "$Id: job.h 6655 2007-07-12 22:58:17Z mike $".
+ * End of "$Id: job.h 6755 2007-08-01 19:02:47Z mike $".
  */

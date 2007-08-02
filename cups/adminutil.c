@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 6729 2007-07-26 00:30:52Z mike $"
+ * "$Id: adminutil.c 6741 2007-07-27 19:26:53Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -955,7 +955,7 @@ _cupsAdminGetServerSettings(
 
     while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
     {
-      if (!value)
+      if (!value && strncmp(line, "</", 2))
         continue;
 
       if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
@@ -2346,5 +2346,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 6729 2007-07-26 00:30:52Z mike $".
+ * End of "$Id: adminutil.c 6741 2007-07-27 19:26:53Z mike $".
  */

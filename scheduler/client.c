@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 6737 2007-07-26 19:08:40Z mike $"
+ * "$Id: client.c 6758 2007-08-02 00:13:44Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -2406,8 +2406,7 @@ cupsdSendHeader(
       snprintf(auth_str, sizeof(auth_str), "Digest realm=\"CUPS\", nonce=\"%s\"",
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
-    else if (auth_type == AUTH_NEGOTIATE && !con->no_negotiate &&
-	     con->gss_output_token.length == 0)
+    else if (auth_type == AUTH_NEGOTIATE && con->gss_output_token.length == 0)
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
 #endif /* HAVE_GSSAPI */
 
@@ -4576,5 +4575,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 6737 2007-07-26 19:08:40Z mike $".
+ * End of "$Id: client.c 6758 2007-08-02 00:13:44Z mike $".
  */

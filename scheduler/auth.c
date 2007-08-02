@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6732 2007-07-26 16:50:20Z mike $"
+ * "$Id: auth.c 6758 2007-08-02 00:13:44Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -921,6 +921,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 			output_token = GSS_C_EMPTY_BUFFER;
 					/* Output token for username */
     gss_name_t		client_name;	/* Client name */
+    unsigned int	ret_flags;	/* Credential flags */
 
 
 #  ifdef __APPLE__
@@ -960,10 +961,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     */
 
     if ((server_creds = get_gss_creds(GSSServiceName)) == NULL)
-    {
-      con->no_negotiate = 1;
       return;	
-    }
 
    /*
     * Decode the authorization string to get the input token...
@@ -989,7 +987,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 					  &client_name,
 					  NULL,
 					  &con->gss_output_token,
-					  NULL,
+					  &ret_flags,
 					  NULL,
 					  &con->gss_delegated_cred);
 
@@ -1001,8 +999,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       if (context != GSS_C_NO_CONTEXT)
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
-
-      con->no_negotiate = 1;
       return;
     }
 
@@ -1028,7 +1024,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
                            "cupsdAuthorize: Error getting username");
 	gss_release_name(&minor_status, &client_name);
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
-	con->no_negotiate = 1;
 	return;
       }
 
@@ -2434,7 +2429,8 @@ get_gss_creds(const char *service_name)	/* I - Service name */
     return (NULL);
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Attempting to acquire credentials for %s...", 
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "get_gss_creds: Attempting to acquire credentials for %s...", 
                   (char *)token.value);
 
   server_creds = GSS_C_NO_CREDENTIAL;
@@ -2450,7 +2446,8 @@ get_gss_creds(const char *service_name)	/* I - Service name */
     return (NULL);
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Credentials acquired successfully for %s.", 
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "get_gss_creds: Credentials acquired successfully for %s.", 
                   (char *)token.value);
 
   gss_release_name(&minor_status, &server_name);
@@ -2638,5 +2635,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 6732 2007-07-26 16:50:20Z mike $".
+ * End of "$Id: auth.c 6758 2007-08-02 00:13:44Z mike $".
  */

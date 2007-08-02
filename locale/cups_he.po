@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-23 10:47-0700\n"
+"POT-Creation-Date: 2007-07-27 14:55-0700\n"
 "PO-Revision-Date: 2007-01-15 11:20+0200\n"
 "Last-Translator: Opher Shachar <ophers at ladpc co il>\n"
 "Language-Team: Hebrew, Opher Shachar and Yehuda Noyman.\n"
@@ -2288,6 +2288,14 @@ msgstr "לא מצליח לשנות מדפסת:"
 
 msgid "Unable to change server settings:"
 msgstr "לא מצליח לשנות הגדרות שרת:"
+
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
+msgstr ""
+
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
+msgstr ""
 
 #, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!"

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 6689 2007-07-18 23:52:15Z mike $"
+ * "$Id: conf.c 6746 2007-07-30 16:47:10Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -2723,7 +2723,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * DefaultAuthType {basic,digest,basicdigest,negotiate}
       */
 
-      if (!strcasecmp(value, "basic"))
+      if (!strcasecmp(value, "none"))
+	DefaultAuthType = AUTH_NONE;
+      else if (!strcasecmp(value, "basic"))
 	DefaultAuthType = AUTH_BASIC;
       else if (!strcasecmp(value, "digest"))
 	DefaultAuthType = AUTH_DIGEST;
@@ -3335,5 +3337,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 6689 2007-07-18 23:52:15Z mike $".
+ * End of "$Id: conf.c 6746 2007-07-30 16:47:10Z mike $".
  */

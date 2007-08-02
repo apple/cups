@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.3\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-16 16:34-0400\n"
+"POT-Creation-Date: 2007-07-27 14:55-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -259,8 +259,7 @@ msgstr ""
 
 msgid ""
 "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
-msgstr ""
-"        경고    파일이 CR, LF 및 CR LF 라인 끝을 포함합니다!\n"
+msgstr "        경고    파일이 CR, LF 및 CR LF 라인 끝을 포함합니다!\n"
 
 msgid ""
 "        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
@@ -285,8 +284,8 @@ msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
 msgstr "        경고    \"%s\" APDialogExtension 파일 유실됨\n"
 
 #, c-format
-msgid "        WARN    Missing \"%s\" APPrinterIconPath file \"%s\"\n"
-msgstr "        경고    \"%s\" APPrinterIconPath 파일 유실됨\n"
+msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
+msgstr ""
 
 #, c-format
 msgid "        WARN    Missing cupsICCProfile file \"%s\"\n"
@@ -347,7 +346,7 @@ msgstr "      %s  %s 옵션에 대한 잘못된 \"%s\" UTF-8 번역 스트링!\n
 msgid ""
 "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
 msgstr ""
-      %s  %s 옵션에 대한 잘못된 \"%s\" UTF-8 번역 스트링, %s 선택사항!\n
+"      %s  %s 옵션에 대한 잘못된 \"%s\" UTF-8 번역 스트링, %s 선택사항!\n"
 
 #, c-format
 msgid "      %s  Bad cupsFilter value \"%s\"!\n"
@@ -371,7 +370,8 @@ msgstr "      %s  %s 옵션에 대한 \"%s\" 번역 스트링 유실됨, %s 선�
 
 #, c-format
 msgid "      %s  Missing choice *%s %s in UIConstraint \"*%s %s *%s %s\"!\n"
-msgstr "      %s  UIConstraint \"*%s %s *%s %s\"에 있는 *%s %s 선택사항 유실됨!\n"
+msgstr ""
+"      %s  UIConstraint \"*%s %s *%s %s\"에 있는 *%s %s 선택사항 유실됨!\n"
 
 #, c-format
 msgid "      %s  Missing cupsFilter file \"%s\"\n"
@@ -447,7 +447,8 @@ msgid ""
 "      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
 "                REF: Pages 59-60, section 5.3.\n"
 msgstr ""
-"      **실패**  잘못된 ModelName - \"%c\"은(는) 스트링에서 허용되지 않습니다.\n"
+"      **실패**  잘못된 ModelName - \"%c\"은(는) 스트링에서 허용되지 않습니"
+"다.\n"
 "                참조: 59-60페이지, 5.3 부분.\n"
 
 msgid ""
@@ -504,7 +505,8 @@ msgid ""
 "      **FAIL**  Default translation string for option %s choice %s contains "
 "8-bit characters!\n"
 msgstr ""
-"      **실패**  %s 옵션 %s 선택사항에 대한 기본 번역 스트링이 8비트 문자를 포함합니다!\n"
+"      **실패**  %s 옵션 %s 선택사항에 대한 기본 번역 스트링이 8비트 문자를 포"
+"함합니다!\n"
 
 #, c-format
 msgid ""
@@ -528,12 +530,14 @@ msgid ""
 msgstr ""
 "      **실패**  필요한 Default%s\n"
 "                참조: 40페이지, 4.5 부분.\n"
+
 msgid ""
 "      **FAIL**  REQUIRED DefaultImageableArea\n"
 "                REF: Page 102, section 5.15.\n"
 msgstr ""
 "      **실패**  필요한 DefaultImageableArea\n"
 "                참조: 102페이지, 5.15 부분.\n"
+
 msgid ""
 "      **FAIL**  REQUIRED DefaultPaperDimension\n"
 "                REF: Page 103, section 5.15.\n"
@@ -688,6 +692,7 @@ msgid ""
 msgstr ""
 "    잘못된 %%%%Page: %d번째 줄!\n"
 "        참조: 43페이지, %%%%Page:\n"
+
 #, c-format
 msgid ""
 "    Line %d is longer than 255 characters (%d)!\n"
@@ -854,8 +859,7 @@ msgstr "%s: 해야할 일 알 수 없음!\n"
 #, c-format
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr ""
-"%s: 오류 - \"%s\" 대상에 존재하지 않는 %s 환경 변수 이름!\n"
+msgstr "%s: 오류 - \"%s\" 대상에 존재하지 않는 %s 환경 변수 이름!\n"
 
 #, c-format
 msgid "%s: Error - bad job ID!\n"
@@ -960,7 +964,8 @@ msgid ""
 "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
 "option!\n"
 msgstr ""
-"%s: 오류 - '-W' 옵션 뒤에 \"completed\", \"not-completed\" 또는 \"all\"가 필요!\n"
+"%s: 오류 - '-W' 옵션 뒤에 \"completed\", \"not-completed\" 또는 \"all\"가 필"
+"요!\n"
 
 #, c-format
 msgid "%s: Error - no default destination available.\n"
@@ -1019,6 +1024,10 @@ msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
 msgstr "%s: '-H restart' 앞에 작업 ID('-i jobid') 필요!\n"
 
 #, c-format
+msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
+msgstr ""
+
+#, c-format
 msgid "%s: Operation failed: %s\n"
 msgstr "%s: 동작 실패: %s\n"
 
@@ -1039,19 +1048,36 @@ msgid "%s: Unable to contact server!\n"
 msgstr "%s: 서버에 접속할 수 없음!\n"
 
 #, c-format
+msgid "%s: Unable to determine MIME type of \"%s\"!\n"
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to read MIME database from \"%s\"!\n"
+msgstr ""
+
+#, c-format
 msgid "%s: Unknown destination \"%s\"!\n"
 msgstr "%s: 알 수 없는 대상 \"%s\"!\n"
+
+#, c-format
+msgid "%s: Unknown destination MIME type %s/%s!\n"
+msgstr ""
 
 #, c-format
 msgid "%s: Unknown option '%c'!\n"
 msgstr "%s: 알 수 없는 옵션 '%c'!\n"
 
 #, c-format
+msgid "%s: Unknown source MIME type %s/%s!\n"
+msgstr ""
+
+#, c-format
 msgid ""
 "%s: Warning - '%c' format modifier not supported - output may not be "
 "correct!\n"
 msgstr ""
-"%s: 경고 - '%c' 포맷 제어자가 지원되지 않음 - 출력이 올바르지 않을 수 있습니다!\n"
+"%s: 경고 - '%c' 포맷 제어자가 지원되지 않음 - 출력이 올바르지 않을 수 있습니"
+"다!\n"
 
 #, c-format
 msgid "%s: Warning - character set option ignored!\n"
@@ -1072,8 +1098,7 @@ msgstr "%s: 경고 - 모드 옵션이 무시됨!\n"
 #, c-format
 msgid ""
 "%s: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr ""
-"%s: 오류 - \"%s\" 대상에 존재하지 않는 %s 환경 변수 이름!\n"
+msgstr "%s: 오류 - \"%s\" 대상에 존재하지 않는 %s 환경 변수 이름!\n"
 
 #, c-format
 msgid "%s: error - expected option=value after '-o' option!\n"
@@ -1360,8 +1385,7 @@ msgstr "ERROR: %%Pages가 없음: 머리말에 설명!\n"
 msgid ""
 "ERROR: No device URI found in argv[0] or in DEVICE_URI environment "
 "variable!\n"
-msgstr ""
-"ERROR: argv[0] 또는 DEVICE_URI 환경에서 발견된 장비 URI가 없음!\n"
+msgstr "ERROR: argv[0] 또는 DEVICE_URI 환경에서 발견된 장비 URI가 없음!\n"
 
 msgid "ERROR: No pages found!\n"
 msgstr "ERROR: 페이지 없음!\n"
@@ -1541,7 +1565,8 @@ msgstr "ERROR: number-up=1을 사용하는, 지원되지 않는 %s 초과 값!\n
 msgid ""
 "ERROR: Unsupported number-up-layout value %s, using number-up-layout=lrtb!\n"
 msgstr ""
-"ERROR: number-up-layout=lrtb를 사용하는, 지원되지 않는 %s number-up-layout 값!\n"
+"ERROR: number-up-layout=lrtb를 사용하는, 지원되지 않는 %s number-up-layout "
+"값!\n"
 
 #, c-format
 msgid "ERROR: Unsupported page-border value %s, using page-border=none!\n"
@@ -1562,8 +1587,7 @@ msgstr "ERROR: pictwpstops가 %d 상태로 종료됨!\n"
 msgid ""
 "ERROR: recoverable: Unable to connect to printer; will retry in 30 "
 "seconds...\n"
-msgstr ""
-"ERROR: 복구 가능: 프린터에 연결할 수 없음; 30초 후에 다시 시도...\n
+msgstr "ERROR: 복구 가능: 프린터에 연결할 수 없음; 30초 후에 다시 시도...\n"
 
 #, c-format
 msgid "ERROR: select() returned %d\n"
@@ -1592,8 +1616,9 @@ msgid ""
 "this page. If you are using Kerberos authentication, make sure you have a "
 "valid Kerberos ticket."
 msgstr ""
-"이 페이지에 연결하려면 사용자 이름 및 암호 또는 root 사용자 이름 및 암호를 입력하십시오. "
-"Kerberos 인증을 사용하고 있다면, 유효한 Kerberos 티켓을 가지고 있는지 확인하십시오. "
+"이 페이지에 연결하려면 사용자 이름 및 암호 또는 root 사용자 이름 및 암호를 입"
+"력하십시오. Kerberos 인증을 사용하고 있다면, 유효한 Kerberos 티켓을 가지고 있"
+"는지 확인하십시오. "
 
 msgid "Error Policy"
 msgstr "오류 정책"
@@ -1616,8 +1641,8 @@ msgid ""
 "File device URIs have been disabled! To enable, see the FileDevice directive "
 "in \"%s/cupsd.conf\"."
 msgstr ""
-"파일 장비 URI가 비활성화되었습니다! 활성화하려면, \"%s/cupsd.conf\"에 있는 FileDevice를 "
-"보십시오."
+"파일 장비 URI가 비활성화되었습니다! 활성화하려면, \"%s/cupsd.conf\"에 있는 "
+"FileDevice를 보십시오."
 
 msgid "Fuser temperature high!"
 msgstr "퓨저 온도가 높음!"
@@ -1740,7 +1765,8 @@ msgid "INFO: Spooling LPR job, %.0f%% complete...\n"
 msgstr "INFO: LPR 작업 스풀 중, %.0f%% 완료...\n"
 
 msgid "INFO: Unable to contact printer, queuing on next printer in class...\n"
-msgstr "INFO: 프린터에 연결할 수 없기 때문에, 클래스에 있는 다음 프린터 대기 중...\n"
+msgstr ""
+"INFO: 프린터에 연결할 수 없기 때문에, 클래스에 있는 다음 프린터 대기 중...\n"
 
 msgid "INFO: Waiting for job to complete...\n"
 msgstr "INFO: 작업 완료 대기 중...\n"
@@ -2100,7 +2126,8 @@ msgstr "단계    소유자   작업     파일                         전체 �
 msgid ""
 "Rank   Owner      Pri  Job        Files                       Total Size\n"
 msgstr ""
-"단계   소유자      우선순위  작업        파일                       전체 크기\n"
+"단계   소유자      우선순위  작업        파일                       전체 크"
+"기\n"
 
 msgid "Reject Jobs"
 msgstr "작업 거부"
@@ -2166,13 +2193,12 @@ msgid ""
 "The class name may only contain up to 127 printable characters and may not "
 "contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
-"클래스 이름은 최대 127자의 프린트 가능한 문자만을 포함할 수 있고 빈 칸, 슬래시(/) 또는 파운드 "
-"기호(#)를 포함하지 않을 수 있습니다."
+"클래스 이름은 최대 127자의 프린트 가능한 문자만을 포함할 수 있고 빈 칸, 슬래"
+"시(/) 또는 파운드 기호(#)를 포함하지 않을 수 있습니다."
 
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
-msgstr""
-"notify-lease-duration 속성을 작업 구독과 함께 사용할 수 없습니다."
+msgstr "notify-lease-duration 속성을 작업 구독과 함께 사용할 수 없습니다."
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)!"
@@ -2182,8 +2208,8 @@ msgid ""
 "The printer name may only contain up to 127 printable characters and may not "
 "contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
-"프린터 이름은 최대 127자의 프린트 가능한 문자만을 포함할 수 있고 빈 칸, 슬래시(/) 또는 파운드 "
-"기호(#)를 포함하지 않을 수 있습니다."
+"프린터 이름은 최대 127자의 프린트 가능한 문자만을 포함할 수 있고 빈 칸, 슬래"
+"시(/) 또는 파운드 기호(#)를 포함하지 않을 수 있습니다."
 
 msgid "The printer or class is not shared!"
 msgstr "프린터 또는 클래스를 공유할 수 없음!"
@@ -2210,8 +2236,8 @@ msgid ""
 "The subscription name may not contain spaces, slashes (/), question marks "
 "(?), or the pound sign (#)."
 msgstr ""
-"구독 이름은 최대 127자의 프린트 가능한 문자만을 포함할 수 있고 빈 칸, 슬래시(/), 물음표(?) 또는 파운드 기호를 "
-"포함하지 않을 수 있습니다."
+"구독 이름은 최대 127자의 프린트 가능한 문자만을 포함할 수 있고 빈 칸, 슬래시"
+"(/), 물음표(?) 또는 파운드 기호를 포함하지 않을 수 있습니다."
 
 msgid "Toner low."
 msgstr "토너가 부족합니다."
@@ -2249,6 +2275,14 @@ msgstr "프린터를 변경할 수 없습니다."
 
 msgid "Unable to change server settings:"
 msgstr "서버 설정값을 변경할 수 없습니다."
+
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
+msgstr ""
+
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
+msgstr ""
 
 #, c-format
 msgid "Unable to copy CUPS printer driver files (%d)!"
@@ -2408,7 +2442,7 @@ msgstr ""
 "    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n"
 "                       [-r remove-class] [-v device] [-D description]\n"
 "                       [-P ppd-file] [-o name=value]\n"
-"                       [-u allow:user,user] [-u deny:user,user]\n" 
+"                       [-u allow:user,user] [-u deny:user,user]\n"
 "\n"
 
 #, c-format
@@ -2418,6 +2452,24 @@ msgstr "사용법: %s 작업 id 사용자 제목 복사 옵션 [파일]\n"
 #, c-format
 msgid "Usage: %s job-id user title copies options file\n"
 msgstr "사용법: %s 작업 id 사용자 제목 복사 옵션 [파일]\n"
+
+msgid ""
+"Usage: convert [ options ]\n"
+"\n"
+"Options:\n"
+"\n"
+"  -f filename          Set file to be converted (otherwise stdin)\n"
+"  -o filename          Set file to be generated (otherwise stdout)\n"
+"  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
+"  -j mime/type         Set output MIME type (otherwise application/pdf)\n"
+"  -P filename.ppd      Set PPD file\n"
+"  -a 'name=value ...'  Set option(s)\n"
+"  -U username          Set username for job\n"
+"  -J title             Set title\n"
+"  -c copies            Set number of copies\n"
+"  -u                   Remove the PPD file when finished\n"
+"  -D                   Remove the input file when finished\n"
+msgstr ""
 
 msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
@@ -2491,7 +2543,7 @@ msgstr ""
 "-l                  launchd(8)에서 cupsd 실행\n"
 
 msgid ""
-"Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+"Usage: cupsfilter -m mime/type [ options ] filename\n"
 "\n"
 "Options:\n"
 "\n"
@@ -2501,15 +2553,6 @@ msgid ""
 "  -p filename.ppd  Set PPD file\n"
 "  -t title         Set title\n"
 msgstr ""
-"사용법: cupsfilter -m mime/type [ 옵션 ] filename(s)\n"
-"\n"
-"옵션:\n"
-"\n"
-"  -c cupsd.conf    cupsd.conf 파일을 설정하여 사용\n"
-"  -n copies        많은 복사본 설정\n"
-"  -o name=value    옵션 설정(s)\n"
-"  -p filename.ppd  PPD 파일 설정\n"
-"  -t title         제목 설정\n"
 
 msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
@@ -2613,22 +2656,19 @@ msgstr "WARNING: IncludeFeature를 통해 \"%s\" 옵션을 포함할 수 없음!
 msgid ""
 "WARNING: Remote host did not respond with command status byte after %d "
 "seconds!\n"
-msgstr ""
-"WARNING: %d초 후에 원격 호스트가 명령 상태 바이트에 응답하지 않음!\n"
+msgstr "WARNING: %d초 후에 원격 호스트가 명령 상태 바이트에 응답하지 않음!\n"
 
 #, c-format
 msgid ""
 "WARNING: Remote host did not respond with control status byte after %d "
 "seconds!\n"
-msgstr ""
-"WARNING: %d초 후에 원격 호스트가 제어 상태 바이트에 응답하지 않음!\n"
+msgstr "WARNING: %d초 후에 원격 호스트가 제어 상태 바이트에 응답하지 않음!\n"
 
 #, c-format
 msgid ""
 "WARNING: Remote host did not respond with data status byte after %d "
 "seconds!\n"
-msgstr ""
-"WARNING: %d초 후에 원격 호스트가 데이터 상태 바이트에 응답하지 않음!\n"
+msgstr "WARNING: %d초 후에 원격 호스트가 데이터 상태 바이트에 응답하지 않음!\n"
 
 #, c-format
 msgid "WARNING: SCSI command timed out (%d); retrying...\n"
@@ -2638,8 +2678,8 @@ msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
 "Conventions and may not print correctly!\n"
 msgstr ""
-"WARNING: 이 도큐멘트는 Adobe Document Structuring Conventions을 실행하지 않기 때문에"
-"올바르게 프린트되지 않을 수 있음!\n"
+"WARNING: 이 도큐멘트는 Adobe Document Structuring Conventions을 실행하지 않"
+"기 때문에올바르게 프린트되지 않을 수 있음!\n"
 
 #, c-format
 msgid "WARNING: Unknown choice \"%s\" for option \"%s\"!\n"
@@ -2671,8 +2711,8 @@ msgid ""
 "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
 "s:%d%s</A>."
 msgstr ""
-"<A HREF=\"https://%s:%d%s\">https://%s:%d%s</A> URL을 사용하여 이 페이지에 연결해야 "
-"합니다."
+"<A HREF=\"https://%s:%d%s\">https://%s:%d%s</A> URL을 사용하여 이 페이지에 연"
+"결해야 합니다."
 
 msgid "aborted"
 msgstr "중단됨"
@@ -2682,6 +2722,9 @@ msgstr "취소됨"
 
 msgid "completed"
 msgstr "완료됨"
+
+msgid "convert: Use the -f option to specify a file to convert.\n"
+msgstr ""
 
 msgid "cups-deviced failed to execute."
 msgstr "cups-deviced 실행에 실패했습니다."
@@ -2710,29 +2753,13 @@ msgstr "cupsd: 알 수 없는 \"%s\" 변수 - 중단 중!\n"
 
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting!\n"
-msgstr "cupsd: 알 수 없는 \"%c\ 옵션 - 중단 중!\n"
+msgstr "cupsd: 알 수 없는 \"%c\" 옵션 - 중단 중!\n"
 
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr "cupsd: launchd(8) 지원이 컴파일되지 않아서, 일반 모드로 실행합니다.\n"
 
-#, c-format
-msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
-msgstr "cupsfilter: %s/%s에서 %s/%s까지 변환할 필터가 없음!\n"
-
 msgid "cupsfilter: Only one filename can be specified!\n"
 msgstr "cupsfilter: 하나의 사용자 이름만 지정됨!\n"
-
-#, c-format
-msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
-msgstr "cupsfilter: MIME 유형의 \"%s\"을(를) 결정할 수 없음!\n"
-
-#, c-format
-msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
-msgstr "cupsfilter: \"%s\"에서 MIME 데이터베이스를 읽을 수 없음!\n"
-
-#, c-format
-msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
-msgstr "cupsfilter: 알 수 없는 대상 MIME 유형 %s/%s!\n"
 
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
 msgstr "cupstestppd: -q 옵션은 -v 옵션과 호환되지 않습니다.\n"
@@ -2983,7 +3010,8 @@ msgid ""
 "your username, and must contain at least one letter and number.\n"
 msgstr ""
 "lppasswd: 죄송합니다, 암호가 거부되었습니다.\n"
-"암호는 최소한 6자 이상이어야 하고, 사용자 이름을 포함해서는 안되며, 최소 하나 이상의 문자 및 숫자를 포함해야 합니다.\n"
+"암호는 최소한 6자 이상이어야 하고, 사용자 이름을 포함해서는 안되며, 최소 하"
+"나 이상의 문자 및 숫자를 포함해야 합니다.\n"
 
 msgid "lppasswd: Sorry, passwords don't match!\n"
 msgstr "lppasswd: 죄송합니다, 암호가 일치하지 않습니다!\n"
@@ -3019,8 +3047,7 @@ msgstr "lprm: 서버에 연결할 수 없음!\n"
 msgid ""
 "lpstat: error - %s environment variable names non-existent destination \"%s"
 "\"!\n"
-msgstr ""
-"lpstat: 오류 - 존재하지 않는 \"%s\" 대상에 %s 환경 변수 이름!\n"
+msgstr "lpstat: 오류 - 존재하지 않는 \"%s\" 대상에 %s 환경 변수 이름!\n"
 
 #, c-format
 msgid "members of class %s:\n"
@@ -3079,7 +3106,9 @@ msgstr "처리 중"
 
 #, c-format
 msgid "request id is %s-%d (%d file(s))\n"
-msgstr "id 요청은 %s-%d (%d개의 파일)\n입니다"
+msgstr ""
+"id 요청은 %s-%d (%d개의 파일)\n"
+"입니다"
 
 msgid "scheduler is not running\n"
 msgstr "일정이 실행되지 않음\n"
@@ -3110,3 +3139,39 @@ msgstr "알 수 없음"
 
 msgid "untitled"
 msgstr "무제"
+
+#~ msgid "        WARN    Missing \"%s\" APPrinterIconPath file \"%s\"\n"
+#~ msgstr "        경고    \"%s\" APPrinterIconPath 파일 유실됨\n"
+
+#~ msgid ""
+#~ "Usage: cupsfilter -m mime/type [ options ] filename(s)\n"
+#~ "\n"
+#~ "Options:\n"
+#~ "\n"
+#~ "  -c cupsd.conf    Set cupsd.conf file to use\n"
+#~ "  -n copies        Set number of copies\n"
+#~ "  -o name=value    Set option(s)\n"
+#~ "  -p filename.ppd  Set PPD file\n"
+#~ "  -t title         Set title\n"
+#~ msgstr ""
+#~ "사용법: cupsfilter -m mime/type [ 옵션 ] filename(s)\n"
+#~ "\n"
+#~ "옵션:\n"
+#~ "\n"
+#~ "  -c cupsd.conf    cupsd.conf 파일을 설정하여 사용\n"
+#~ "  -n copies        많은 복사본 설정\n"
+#~ "  -o name=value    옵션 설정(s)\n"
+#~ "  -p filename.ppd  PPD 파일 설정\n"
+#~ "  -t title         제목 설정\n"
+
+#~ msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
+#~ msgstr "cupsfilter: %s/%s에서 %s/%s까지 변환할 필터가 없음!\n"
+
+#~ msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
+#~ msgstr "cupsfilter: MIME 유형의 \"%s\"을(를) 결정할 수 없음!\n"
+
+#~ msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
+#~ msgstr "cupsfilter: \"%s\"에서 MIME 데이터베이스를 읽을 수 없음!\n"
+
+#~ msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
+#~ msgstr "cupsfilter: 알 수 없는 대상 MIME 유형 %s/%s!\n"

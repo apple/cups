@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 6689 2007-07-18 23:52:15Z mike $"
+ * "$Id: main.c 6755 2007-08-01 19:02:47Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -461,6 +461,24 @@ main(int  argc,				/* I - Number of command-line args */
   if (PSQLibRef)
     PSQUpdateQuotaProc = dlsym(PSQLibRef, PSQLibFuncName);
 #endif /* __APPLE__ && HAVE_DLFCN_H */
+
+#ifdef HAVE_GSSAPI
+#  ifdef __APPLE__
+ /*
+  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+  * to use it...
+  */
+
+  if (krb5_init_context != NULL)
+#  endif /* __APPLE__ */
+
+ /*
+  * Setup a Kerberos context for the scheduler to use...
+  */
+
+  if (krb5_init_context(&KerberosContext))
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
+#endif /* HAVE_GSSAPI */
 
  /*
   * Startup the server...
@@ -970,6 +988,23 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef __APPLE__
   cupsdStopSystemMonitor();
 #endif /* __APPLE__ */
+
+#ifdef HAVE_GSSAPI
+#  ifdef __APPLE__
+ /*
+  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+  * to use it...
+  */
+
+  if (krb5_init_context != NULL)
+#  endif /* __APPLE__ */
+
+ /*
+  * Free the scheduler's Kerberos context...
+  */
+
+  krb5_free_context(KerberosContext);
+#endif /* HAVE_GSSAPI */
 
 #ifdef HAVE_LAUNCHD
  /*
@@ -1815,5 +1850,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 6689 2007-07-18 23:52:15Z mike $".
+ * End of "$Id: main.c 6755 2007-08-01 19:02:47Z mike $".
  */

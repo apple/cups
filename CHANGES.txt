@@ -1,8 +1,28 @@
-CHANGES.txt - 2007-07-26
+CHANGES.txt - 2007-08-01
 ------------------------
+
+
+CHANGES IN CUPS V1.3.0
+
+	- The PostScript filter did not cleanly terminate when
+	  the job was canceled or stopped.
+	- Fixed generation of Kerberos credentials for remote
+	  printing.
+	- Added Portuguese and updated Italian message catalogs.
+
+
+CHANGES IN CUPS V1.3rc2
+
+	- Added more range checking to the pdftops filter. 
+	- The scheduler would crash if a remote IPP queue was stopped
+	  (STR #2460)
+	- The scheduler did not allow "DefaultAuthType None".
+
 
 CHANGES IN CUPS V1.3rc1
 
+	- Updated the German localization (STR #2443)
+	- cupsAdminGetServerSettings() did not handle </Foo> properly.
 	- When lprm and cancel are run with no job ID, they now will
 	  cancel the first stopped job if no pending or processing
 	  jobs are left in the queue.
