@@ -33,7 +33,7 @@ BEFORE YOU BEGIN
 
     Also, please note that CUPS no longer includes the
     Ghostscript- based pstoraster filter.  You *must* download
-    GNU Ghostscript separately from the CUPS web site if you want
+    GPL Ghostscript separately from the CUPS web site if you want
     to print PostScript files to non-PostScript printers on
     operating systems other than Mac OS X.
 
