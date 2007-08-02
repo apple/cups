@@ -4,6 +4,8 @@ CHANGES.txt - 2007-08-02
 
 CHANGES IN CUPS V1.3.0
 
+	- The IPP backend did not return the "auth required" status
+	  when printing to a Kerberos-protected queue.
 	- The scheduler was not looking in the correct directories
 	  for LSB PPD files (STR #2464)
 	- Changed references to ESP Ghostscript to GPL Ghostscript

@@ -1179,7 +1179,15 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (ipp_status == IPP_NOT_AUTHORIZED)
+  {
+   /*
+    * Authorization failures here mean that we need Kerberos.  Username +
+    * password authentication is handled in the password_cb function.
+    */
+
+    fputs("ATTR: auth-info-required=negotiate\n", stderr);
     return (CUPS_BACKEND_AUTH_REQUIRED);
+  }
   else if (ipp_status > IPP_OK_CONFLICT)
     return (CUPS_BACKEND_FAILED);
   else
