@@ -1178,7 +1178,12 @@ main(int  argc,				/* I - Number of command-line args */
   * Return the queue status...
   */
 
-  return (ipp_status > IPP_OK_CONFLICT ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
+  if (ipp_status == IPP_NOT_AUTHORIZED)
+    return (CUPS_BACKEND_AUTH_REQUIRED);
+  else if (ipp_status > IPP_OK_CONFLICT)
+    return (CUPS_BACKEND_FAILED);
+  else
+    return (CUPS_BACKEND_OK);
 }
 
 
