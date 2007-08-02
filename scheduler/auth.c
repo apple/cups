@@ -961,10 +961,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     */
 
     if ((server_creds = get_gss_creds(GSSServiceName)) == NULL)
-    {
-      con->no_negotiate = 1;
       return;	
-    }
 
    /*
     * Decode the authorization string to get the input token...
@@ -1002,8 +999,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       if (context != GSS_C_NO_CONTEXT)
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
-
-      con->no_negotiate = 1;
       return;
     }
 
@@ -1029,7 +1024,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
                            "cupsdAuthorize: Error getting username");
 	gss_release_name(&minor_status, &client_name);
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
-	con->no_negotiate = 1;
 	return;
       }
 

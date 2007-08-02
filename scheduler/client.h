@@ -53,7 +53,6 @@ struct cupsd_client_s
   int			serverport;	/* Server port for connection */
 #ifdef HAVE_GSSAPI
   int			gss_have_creds;	/* Have authenticated credentials */
-  int			no_negotiate;	/* Don't offer WWW-Authenticate: Negotiate */
   gss_buffer_desc 	gss_output_token;
 					/* Output token for Negotiate header */
   gss_cred_id_t 	gss_delegated_cred;

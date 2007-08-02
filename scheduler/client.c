@@ -2406,8 +2406,7 @@ cupsdSendHeader(
       snprintf(auth_str, sizeof(auth_str), "Digest realm=\"CUPS\", nonce=\"%s\"",
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
-    else if (auth_type == AUTH_NEGOTIATE && !con->no_negotiate &&
-	     con->gss_output_token.length == 0)
+    else if (auth_type == AUTH_NEGOTIATE && con->gss_output_token.length == 0)
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
 #endif /* HAVE_GSSAPI */
 
