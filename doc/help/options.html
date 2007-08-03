@@ -511,6 +511,40 @@ scaled incorrectly!
 
 </BLOCKQUOTE>
 
+<H3><A NAME="OUTPUTORDER">Printing in Reverse Order</A></H3>
+
+<P>The <CODE>-o outputorder=reverse</CODE> option will print the
+pages in reverse order:</P>
+
+<PRE CLASS="command">
+lp -o outputorder=reverse filename
+lpr -o outputorder=reverse filename
+</PRE>
+
+<P>Similarly, the <CODE>-o outputorder=normal</CODE> option will
+print starting with page 1:</P>
+
+<PRE CLASS="command">
+lp -o outputorder=normal filename
+lpr -o outputorder=normal filename
+</PRE>
+
+<P>The default is <CODE>-o outputorder=normal</CODE> for
+printers that print face down and <CODE>-o outputorder=reverse</CODE>
+for printers that print face up.
+
+<H3><A NAME="MIRROR">Printing Mirrored Pages</A></H3>
+
+<P>The <CODE>-o mirror</CODE> option flips each page along the
+vertical access to produce a mirrored image:</P>
+
+<PRE CLASS="command">
+lp -o mirror filename
+lpr -o mirror filename
+</PRE>
+
+<P>This is typically used when printing on T-shirt transfer
+media or sometimes on transparencies.</P>
 
 <H3><A NAME="RAW">Raw or Unfiltered Output</A></H3>
 
@@ -604,6 +638,15 @@ highlighted, and comment lines are italicized:</P>
 <PRE CLASS="command">
 lp -o prettyprint filename
 lpr -o prettyprint filename
+</PRE>
+
+<H3><A NAME="WRAP">Turning Off Text Wrapping</A><H3>
+
+<P>The <CODE>-o nowrap</CODE> option disables wrapping of long lines:</P>
+
+<PRE CLASS="command">
+lp -o nowrap filename
+lpr -o nowrap filename
 </PRE>
 
 
