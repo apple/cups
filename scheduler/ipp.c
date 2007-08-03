@@ -8255,14 +8255,19 @@ static void
 save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
                 cupsd_job_t    *job)	/* I - Job */
 {
-#  ifndef HAVE_KRB5_CC_NEW_UNIQUE
-  char		cachename[1024];	/* Name of resolved cache */
-#  endif /* !HAVE_KRB5_CC_NEW_UNIQUE */
+#  if !defined(HAVE_KRB5_CC_NEW_UNIQUE) && !defined(HAVE_HEIMDAL)
+  cupsdLogMessage(CUPSD_LOG_INFO,
+                  "Sorry, your version of Kerberos does not support delegated "
+		  "credentials!");
+  return;
+
+#  else
+  krb5_error_code error;		/* Kerberos error code */
   OM_uint32	major_status,		/* Major status code */
 		minor_status;		/* Minor status code */
 
 
-#  ifdef __APPLE__
+#   ifdef __APPLE__
  /*
   * If the weak-linked GSSAPI/Kerberos library is not present, don't try
   * to use it...
@@ -8270,24 +8275,36 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
 
   if (krb5_init_context == NULL)
     return;
-#  endif /* __APPLE__ */
+#    endif /* __APPLE__ */
 
  /*
   * We MUST create a file-based cache because memory-based caches are
   * only valid for the current process/address space.
+  *
+  * Due to various bugs/features in different versions of Kerberos, we
+  * need either the krb5_cc_new_unique() function or Heimdal's version
+  * of krb5_cc_gen_new() to create a new FILE: credential cache that
+  * can be passed to the backend.  These functions create a temporary
+  * file (typically in /tmp) containing the cached credentials, which
+  * are removed when we have successfully printed a job.
   */
 
-#  ifdef HAVE_KRB5_CC_NEW_UNIQUE
-  if (krb5_cc_new_unique(KerberosContext, "FILE", NULL, &(job->ccache)))
-#  else
-  snprintf(cachename, sizeof(cachename), "FILE:%s/k%05d", RequestRoot, job->id);
-
-  if (krb5_cc_resolve(KerberosContext, cachename, &(job->ccache)))
-#  endif /* HAVE_KRB5_CC_NEW_UNIQUE */
+#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
+  if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL,
+                                  &(job->ccache))) != 0)
+#    else /* HAVE_HEIMDAL */
+  if ((error = krb5_cc_gen_new(krb_context, &krb5_fcc_ops,
+                               &(job->ccache))) != 0)
+#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create new credentials");
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create new credentials (%d/%s)",
+                    error, strerror(errno));
     return;
   }
+
+ /*
+  * Copy the user's credentials to the new cache file...
+  */
 
   major_status = gss_krb5_copy_ccache(&minor_status, con->gss_delegated_cred,
 				      job->ccache);
@@ -8300,12 +8317,18 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
     return;
   }
 
-  cupsdSetStringf(&(job->ccname), "KRB5CCNAME=%s",
+ /*
+  * Add the KRB5CCNAME environment variable to the job so that the
+  * backend can use the credentials when printing.
+  */
+
+  cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
                   krb5_cc_get_name(KerberosContext, job->ccache));
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "[Job %d] save_krb5_creds: %s", job->id,
                   job->ccname);
 }
+#  endif /* HAVE_KRB5_CC_NEW_UNIQUE || HAVE_HEIMDAL */
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 
 

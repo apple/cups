@@ -1,4 +1,4 @@
-CHANGES.txt - 2007-08-02
+CHANGES.txt - 2007-08-03
 ------------------------
 
 
@@ -13,7 +13,9 @@ CHANGES IN CUPS V1.3.0
 	- The PostScript filter did not cleanly terminate when
 	  the job was canceled or stopped.
 	- Fixed generation of Kerberos credentials for remote
-	  printing.
+	  printing.  Note that this requires a recent version of
+	  MIT Kerberos with a working krb5_cc_new_unique()
+	  function or Heimdal Kerberos.
 	- Added Portuguese and updated Italian message catalogs.
 
 
