@@ -1,5 +1,5 @@
-INSTALL - CUPS v1.3rc2 - 2007-07-30
------------------------------------
+INSTALL - CUPS v1.3.0 - 2007-08-03
+----------------------------------
 
 This file describes how to compile and install CUPS from source
 code. For more information on CUPS see the file called
@@ -30,6 +30,11 @@ BEFORE YOU BEGIN
     OpenSLP libraries for directory services support. CUPS will
     compile and run without these, however you'll miss out on
     many of the features provided by CUPS.
+
+    Kerberos support requires a very recent version of the MIT
+    implementation with the krb5_cc_new_unique() function or the
+    Heimdal implementation, along with the corresponding GSSAPI
+    pieces.
 
     Also, please note that CUPS no longer includes the
     Ghostscript- based pstoraster filter.  You *must* download
