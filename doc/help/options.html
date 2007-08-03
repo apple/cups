@@ -137,16 +137,16 @@ queue.</P>
 printing more than one copy of a file:</P>
 
 <PRE CLASS="command">
-lp -n <I>num-copies</I> filename
-lpr -#<I>num-copies</I> filename
+lp -n <EM>num-copies</EM> filename
+lpr -#<EM>num-copies</EM> filename
 </PRE>
 
 <P>Copies are normally <EM>not</EM> collated for you. Use the
 <CODE>-o Collate=True</CODE> option to get collated copies:</P>
 
 <PRE CLASS="command">
-lp -n <I>num-copies</I> -o Collate=True filename
-lpr -#<I>num-copies</I> -o Collate=True filename
+lp -n <EM>num-copies</EM> -o Collate=True filename
+lpr -#<EM>num-copies</EM> -o Collate=True filename
 </PRE>
 
 
@@ -156,11 +156,11 @@ lpr -#<I>num-copies</I> -o Collate=True filename
 HREF="man-lprm.html">lprm(1)</A> commands cancel a print job:</P>
 
 <PRE CLASS="command">
-cancel <I>job-id</I>
-lprm <I>job-id</I>
+cancel <EM>job-id</EM>
+lprm <EM>job-id</EM>
 </PRE>
 
-<P>The <I>job-id</I> is the number that was reported to you by
+<P>The <EM>job-id</EM> is the number that was reported to you by
 the <B>lp</B> command. You can also get the job ID using the <A
 HREF="man-lpq.html">lpq(1)</A> or <A
 HREF="man-lpstat.html">lpstat</A> commands:</P>
@@ -177,10 +177,10 @@ lpstat
 job to a new printer or class:</P>
 
 <PRE CLASS="command">
-lpmove <I>job-id</I> <i>destination</i>
+lpmove <EM>job-id</EM> <i>destination</i>
 </PRE>
 
-<P>The <I>job-id</I> is the number that was reported to you by
+<P>The <EM>job-id</EM> is the number that was reported to you by
 the <B>lp</B> or <B>lpstat</B> commands. <i>Destination</i> is the
 name of a printer or class that you want to actually print the job.
 
@@ -256,10 +256,10 @@ lpoptions -p printer -l
 <P>When <CODE>Custom</CODE> is listed for the <CODE>PageSize</CODE> option, you can specify custom media sizes using one of the following forms:</P>
 
 <PRE CLASS="command">
-lp -o media=Custom.<I>WIDTH</I>x<I>LENGTH</I> filename
-lp -o media=Custom.<I>WIDTH</I>x<I>LENGTH</I>in filename
-lp -o media=Custom.<I>WIDTH</I>x<I>LENGTH</I>cm filename
-lp -o media=Custom.<I>WIDTH</I>x<I>LENGTH</I>mm filename
+lp -o media=Custom.<EM>WIDTH</EM>x<EM>LENGTH</EM> filename
+lp -o media=Custom.<EM>WIDTH</EM>x<EM>LENGTH</EM>in filename
+lp -o media=Custom.<EM>WIDTH</EM>x<EM>LENGTH</EM>cm filename
+lp -o media=Custom.<EM>WIDTH</EM>x<EM>LENGTH</EM>mm filename
 </PRE>
 
 <P>where "WIDTH" and "LENGTH" are the width and length of the media in points, inches, centimeters, or millimeters, respectively.</P>
@@ -294,6 +294,7 @@ page depending on the value of N:</P>
 
 </UL>
 
+
 <H3><A NAME="SIDES">Printing On Both Sides of the Paper</A></H3>
 
 <P>The <CODE>-o sides=two-sided-short-edge</CODE> and <CODE>-o
@@ -316,6 +317,7 @@ lpr -o sides=two-sided-long-edge filename
 lp -o sides=one-sided filename
 lpr -o sides=one-sided filename
 </PRE>
+
 
 <H3><A NAME="JOBSHEETS">Selecting the Banner Page(s)</A></H3>
 
@@ -358,6 +360,60 @@ configuration; CUPS includes the following banner files:</P>
 	"unclassified" label at the top and bottom.
 
 </UL>
+
+
+<H3><A NAME="JOBHOLDUNTIL">Holding Jobs for Later Printing</A></H3>
+
+<P>The <CODE>-o job-hold-until=when</CODE> option tells CUPS to
+delay printing until the "when" time, which can be one of the
+following:</P>
+
+<UL>
+
+	<LI><CODE>-o job-hold-until=indefinite</CODE>; print only
+	after released by the user or an administrator</LI>
+
+	<LI><CODE>-o job-hold-until=day-time</CODE>; print from
+	6am to 6pm local time</LI>
+
+	<LI><CODE>-o job-hold-until=night</CODE>; print from
+	6pm to 6am local time</LI>
+
+	<LI><CODE>-o job-hold-until=second-shift</CODE>; print from
+	4pm to 12am local time</LI>
+
+	<LI><CODE>-o job-hold-until=third-shift</CODE>; print from
+	12am to 8am local time</LI>
+
+	<LI><CODE>-o job-hold-until=weekend</CODE>; print on Saturday
+	or Sunday</LI>
+
+	<LI><CODE>-o job-hold-until=HH:MM</CODE>; print at the specified
+	UTC time</LI>
+
+</UL>
+
+<H3><A NAME="RELEASEJOB">Releasing Held Jobs</A></H3>
+
+<P>Aside from the web interface, you can use the <B>lp</B> command
+to release a held job:</P>
+
+<PRE CLASS="command">
+lp -i <em>job-id</em> -H resume
+</PRE>
+
+<P>where "job-id" is the job ID reported by the <B>lpstat</B>
+command.</P>
+
+
+<H3><A NAME="JOBPRIORITY">Setting the Job Priority</A></H3>
+
+<P>The <CODE>-o job-priority=NNN</CODE> option tells CUPS to
+assign a priority to your job from 1 (lowest) to 100 (highest),
+which influences where the job appears in the print queue. Higher
+priority jobs are printed before lower priority jobs, however
+submitting a new job with a high priority will not interrupt an
+</P>
 
 
 <H3><A NAME="OUTPUTORDER">Specifying the Output Order</A></H3>
@@ -447,9 +503,14 @@ lpr -o fitplot filename
 
 <P>The default is to use the size specified in the file.</P>
 
-<BLOCKQUOTE>Note: This feature depends upon an accurate size in
+<BLOCKQUOTE><B>Note:</B>
+
+<P>This feature depends upon an accurate size in
 the print file. If no size is given in the file, the page may be
-scaled incorrectly!</BLOCKQUOTE>
+scaled incorrectly!
+
+</BLOCKQUOTE>
+
 
 <H3><A NAME="RAW">Raw or Unfiltered Output</A></H3>
 
@@ -523,11 +584,11 @@ page-right=value</CODE>, <CODE>-o page-top=value</CODE>, and
 margins:</P>
 
 <PRE CLASS="command">
-lp -o page-left=<I>value</I> filename
-lp -o page-right=<I>value</I> filename
-lp -o page-top=<I>value</I> filename
-lp -o page-bottom=<I>value</I> filename
-lpr -o page-left=<I>value</I> -o page-right=<I>value</I> -o page-top=<I>value</I> -o page-bottom=<I>value</I> filename
+lp -o page-left=<EM>value</EM> filename
+lp -o page-right=<EM>value</EM> filename
+lp -o page-top=<EM>value</EM> filename
+lp -o page-bottom=<EM>value</EM> filename
+lpr -o page-left=<EM>value</EM> -o page-right=<EM>value</EM> -o page-top=<EM>value</EM> -o page-bottom=<EM>value</EM> filename
 </PRE>
 
 <P>The <CODE>value</CODE> argument is the margin in points; each
@@ -544,6 +605,189 @@ highlighted, and comment lines are italicized:</P>
 lp -o prettyprint filename
 lpr -o prettyprint filename
 </PRE>
+
+
+<H2 CLASS="title"><SPAN CLASS="info">Not Supported on Mac OS X</SPAN><A NAME="IMAGEOPTIONS">Image Options</A></H2>
+
+<P>CUPS supports several options that are only used when printing
+image files. These options have absolutely no effect on PostScript, PDF,
+HP-GL/2, or text files.</P>
+
+<H3><A NAME="position">Positioning Images</A></H3>
+
+<P>The <CODE>-o position=name</CODE> option specifies the position of the
+image on the page:
+
+<UL>
+
+	<LI><CODE>center</CODE> - Center the image on the page (default)
+
+	<LI><CODE>top</CODE> - Print the image centered at the top of the page
+
+	<LI><CODE>left</CODE> - Print the image centered on the left of page
+
+	<LI><CODE>right</CODE> - Print the image centered on the right of the page
+
+	<LI><CODE>top-left</CODE> - Print the image at the top left corner of
+	the page
+
+	<LI><CODE>top-right</CODE> - Print the image at the top right corner of
+	the page
+
+	<LI><CODE>bottom</CODE> - Print the image centered at the bottom of
+	the page
+
+	<LI><CODE>bottom-left</CODE> - Print the image at the bottom left
+	corner of the page
+
+	<LI><CODE>bottom-right</CODE> - Print the image at the bottom right
+	corner of the page
+
+</UL>
+
+<H3><A NAME="scaling">Scaling Images</A></H3>
+
+<P>The <CODE>-o scaling=percent</CODE>, <CODE>-o
+ppi=value</CODE>, and <CODE>-o natural-scaling=percent</CODE>
+options change the size of a printed image:
+
+<PRE CLASS="command">
+lp -o scaling=<EM>percent</EM> filename 
+lp -o ppi=<EM>value</EM> filename
+lpr -o natural-scaling=<EM>percent</EM> filename
+</PRE>
+
+<P>The <CODE>scaling=percent</CODE> value is a number from 1 to 800
+specifying the size in relation to the page (<EM>not</EM> the image.) A
+scaling of 100 percent will fill the page as completely as the image
+aspect ratio allows. A scaling of 200 percent will print on up to 4
+pages.
+
+<P>The <CODE>ppi=value</CODE> value is a number from 1 to 1200 specifying the
+resolution of the image in pixels per inch. An image that is 3000x2400
+pixels will print 10x8 inches at 300 pixels per inch, for example. If
+the specified resolution makes the image larger than the page, multiple
+pages will be printed to satisfy the request.
+
+<P>The <CODE>natural-scaling=percent</CODE> value is a number
+from 1 to 800 specifying the size in relation to the natural
+image size. A scaling of 100 percent will print the image at its
+natural size, while a scaling of 50 percent will print the image
+at half its natural size. If the specified scaling makes the
+image larger than the page, multiple pages will be printed to
+satisfy the request.
+
+<H3><A NAME="hue">Adjusting Image Hue (Tint)</A></H3>
+
+<P>The <CODE>-o hue=value</CODE> option will adjust the hue of the
+printed image, much like the tint control on your television:
+
+<PRE CLASS="command">
+lp -o hue=<EM>value</EM> filename
+lpr -o hue=<EM>value</EM> filename
+</PRE>
+
+<P>The <CODE>value</CODE> argument is a number from -360 to 360 and represents
+the color hue rotation. The following table summarizes the change you'll see
+with different colors:</P>
+
+<DIV CLASS="table"><TABLE SUMMARY="Hue Values">
+<TR>
+	<TH>Original</TH>
+	<TH>hue=-45</TH>
+	<TH>hue=45</TH>
+</TR>
+<TR>
+	<TD>Red</TD>
+	<TD>Purple</TD>
+	<TD>Yellow-orange</TD>
+</TR>
+<TR>
+	<TD>Green</TD>
+	<TD>Yellow-green</TD>
+	<TD>Blue-green</TD>
+</TR>
+<TR>
+	<TD>Yellow</TD>
+	<TD>Orange</TD>
+	<TD>Green-yellow</TD>
+</TR>
+<TR>
+	<TD>Blue</TD>
+	<TD>Sky-blue</TD>
+	<TD>Purple</TD>
+</TR>
+<TR>
+	<TD>Magenta</TD>
+	<TD>Indigo</TD>
+	<TD>Crimson</TD>
+</TR>
+<TR>
+	<TD>Cyan</TD>
+	<TD>Blue-green</TD>
+	<TD>Light-navy-blue</TD>
+</TR>
+</TABLE></DIV>
+
+<P>The default hue adjustment is 0.
+
+<H3><A NAME="saturation">Adjusting Image Saturation (Color)</A></H3>
+
+<P>The <CODE>-o saturation=percent</CODE> option adjusts the saturation
+of the colors in an image, much like the color control on your television:</P>
+
+<PRE CLASS="command">
+lp -o saturation=<EM>percent</EM> filename
+lpr -o saturation=<EM>percent</EM> filename
+</PRE>
+
+<P>The <CODE>percent</CODE> argument specifies the color saturation
+from 0 to 200. A color saturation of 0 produces a black-and-white
+print, while a value of 200 will make the colors extremely intense.</P>
+
+<P>The default saturation is 100.</P>
+
+
+<H2 CLASS="title"><A NAME="HPGL2OPTIONS">HP-GL/2 Options</A></H2>
+
+<P>CUPS supports several options that are only used when printing
+HP-GL/2 files. These options have absolutely no effect on PostScript, PDF,
+image, or text files.</P>
+
+<H3><A NAME="blackplot">Printing in Black</A></H3>
+
+<P>The <CODE>-o blackplot</CODE> option specifies that all pens should
+plot in black:</P>
+
+<PRE CLASS="command">
+lp -o blackplot filename
+lpr -o blackplot filename
+</PRE>
+
+<P>The default is to use the colors defined in the plot file or the
+standard pen colors defined in the HP-GL/2 reference manual from
+Hewlett Packard.
+
+<H3><A NAME="penwidth">Setting the Default Pen Width</A></H3>
+
+<P>The <CODE>-o penwidth=value</CODE> option specifies the default pen
+width for HP-GL/2 files:</P>
+
+<PRE CLASS="command">
+lp -o penwidth=<EM>value</EM> filename
+lpr -o penwidth=<EM>value</EM> filename
+</PRE>
+
+<P>The pen width <CODE>value</CODE> specifies the pen width in micrometers.
+The default value of 1000 produces lines that are 1 millimeter in width.
+Specifying a pen width of 0 produces lines that are exactly 1 pixel wide.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>This option is ignored when the pen widths are set in the plot
+file.
+
+</BLOCKQUOTE>
 
 </BODY>
 </HTML>

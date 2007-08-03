@@ -4,6 +4,8 @@ CHANGES.txt - 2007-08-03
 
 CHANGES IN CUPS V1.3.0
 
+	- The on-line help did not describe many common printing
+	  options (STR #1846)
 	- The IPP backend did not return the "auth required" status
 	  when printing to a Kerberos-protected queue.
 	- The scheduler was not looking in the correct directories
