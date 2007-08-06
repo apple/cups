@@ -3602,7 +3602,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       if ((attr = cupsGetOption("auth-info-required", num_attrs,
                                 attrs)) != NULL)
+      {
         cupsdSetAuthInfoRequired(job->printer, attr, NULL);
+	cupsdSaveAllPrinters();
+      }
 
       if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)
       {
