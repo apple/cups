@@ -8327,8 +8327,8 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "[Job %d] save_krb5_creds: %s", job->id,
                   job->ccname);
-}
 #  endif /* HAVE_KRB5_CC_NEW_UNIQUE || HAVE_HEIMDAL */
+}
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 
 
