@@ -1,2882 +1,1466 @@
-#
-# "$Id$"
-#
-#   Message catalog template for the Common UNIX Printing System (CUPS).
-#
-#   Copyright 2007 by Apple Inc.
-#   Copyright 2005-2007 by Easy Software Products.
-#
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
-#
 msgid ""
-msgstr ""
-"Project-Id-Version: CUPS 1.3\n"
-"Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2007-07-27 14:55-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-
+msgstr "Project-Id-Version: CUPS 1.3\nRapporter-Msgid-fejl-til: http://www.cups.org/str.php\nPOT-oprettelsesdato: 16-07-2007 16:34-0400\nPO-ændringsdato: DA-MO-YEAR:MI+ZONE\nSidste oversætter: FULDE NAVN <E-POST@ADRESSE>\nSprogteam: SPROG <LL@li.org>\nMIME-version: 1.0\nIndholdstype: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8 bit\n"
 msgid "\t\t(all)\n"
-msgstr ""
-
+msgstr "\t\t(alle)\n"
 msgid "\t\t(none)\n"
-msgstr ""
-
-#, c-format
+msgstr "\t\t(ingen)\n"
 msgid "\t%d entries\n"
-msgstr ""
-
+msgstr "\t%d optegnelser\n"
 msgid "\tAfter fault: continue\n"
-msgstr ""
-
+msgstr "\tEfter fejl: fortsæt\n"
 msgid "\tAlerts:"
-msgstr ""
-
+msgstr "\tAdvarsler:"
 msgid "\tBanner required\n"
-msgstr ""
-
+msgstr "\tBanner kræves\n"
 msgid "\tCharset sets:\n"
-msgstr ""
-
+msgstr "\tTegnsæt:\n"
 msgid "\tConnection: direct\n"
-msgstr ""
-
+msgstr "\tForbindelse: Direkte\n"
 msgid "\tConnection: remote\n"
-msgstr ""
-
+msgstr "\tForbindelse: Ekstern\n"
 msgid "\tDefault page size:\n"
-msgstr ""
-
+msgstr "\tStandardsidestørrelse:\n"
 msgid "\tDefault pitch:\n"
-msgstr ""
-
+msgstr "\tStandardhøjde:\n"
 msgid "\tDefault port settings:\n"
-msgstr ""
-
-#, c-format
+msgstr "\tStandardportindstillinger:\n"
 msgid "\tDescription: %s\n"
-msgstr ""
-
-msgid ""
-"\tForm mounted:\n"
-"\tContent types: any\n"
-"\tPrinter types: unknown\n"
-msgstr ""
-
+msgstr "\tBeskrivelse: %s\n"
+msgid "\tForm mounted:\n\tContent types: any\n\tPrinter types: unknown\n"
+msgstr "\tAktiv formular:\n\tIndholdstyper: alle\n\tPrintertyper: Ukendt\n"
 msgid "\tForms allowed:\n"
-msgstr ""
-
-#, c-format
+msgstr "\tFormularer tilladt:\n"
 msgid "\tInterface: %s.ppd\n"
-msgstr ""
-
-#, c-format
+msgstr "\tGrænseflade: %s.ppd\n"
 msgid "\tInterface: %s/interfaces/%s\n"
-msgstr ""
-
-#, c-format
+msgstr "\tGrænseflade: %s/grænseflader/%s\n"
 msgid "\tInterface: %s/ppd/%s.ppd\n"
-msgstr ""
-
-#, c-format
+msgstr "\tGrænseflade: %s/ppd/%s.ppd\n"
 msgid "\tLocation: %s\n"
-msgstr ""
-
+msgstr "\tPlacering: %s\n"
 msgid "\tOn fault: no alert\n"
-msgstr ""
-
+msgstr "\tVed fejl: Ingen advarsel\n"
 msgid "\tUsers allowed:\n"
-msgstr ""
-
+msgstr "\tBrugere tilladt:\n"
 msgid "\tUsers denied:\n"
-msgstr ""
-
+msgstr "\tBrugere ikke tilladt:\n"
 msgid "\tdaemon present\n"
-msgstr ""
-
+msgstr "\tdaemon til stede\n"
 msgid "\tno entries\n"
-msgstr ""
-
-#, c-format
+msgstr "\tingen optegnelser\n"
 msgid "\tprinter is on device '%s' speed -1\n"
-msgstr ""
-
+msgstr "\tprinter er på enheden '%s', hastighed -1\n"
 msgid "\tprinting is disabled\n"
-msgstr ""
-
+msgstr "\tudskrivning er slået fra\n"
 msgid "\tprinting is enabled\n"
-msgstr ""
-
-#, c-format
+msgstr "\tudskrivning er slået til\n"
 msgid "\tqueued for %s\n"
-msgstr ""
-
+msgstr "\tstår i kø til %s\n"
 msgid "\tqueuing is disabled\n"
-msgstr ""
-
+msgstr "\tkø er slået fra\n"
 msgid "\tqueuing is enabled\n"
-msgstr ""
-
+msgstr "\tkø er slået til\n"
 msgid "\treason unknown\n"
-msgstr ""
-
-msgid ""
-"\n"
-"    DETAILED CONFORMANCE TEST RESULTS\n"
-msgstr ""
-
+msgstr "\tårsag ukendt\n"
+msgid "\n    DETAILED CONFORMANCE TEST RESULTS\n"
+msgstr "\n    DETAJEREDE RESULTATER AF TEST AF OVERENSSTEMMELSE"
 msgid "                REF: Page 15, section 3.1.\n"
-msgstr ""
-
+msgstr "                REF: Side 15, afsnit 3.1.\n"
 msgid "                REF: Page 15, section 3.2.\n"
-msgstr ""
-
+msgstr "                REF: Side 15, afsnit 3.2.\n"
 msgid "                REF: Page 19, section 3.3.\n"
-msgstr ""
-
+msgstr "                REF: Side 19, afsnit 3.3.\n"
 msgid "                REF: Page 20, section 3.4.\n"
-msgstr ""
-
+msgstr "                REF: Side 20, afsnit 3.4.\n"
 msgid "                REF: Page 27, section 3.5.\n"
-msgstr ""
-
+msgstr "                REF: Side 27, afsnit 3.5.\n"
 msgid "                REF: Page 42, section 5.2.\n"
-msgstr ""
-
+msgstr "                REF: Side 42, afsnit 5.2.\n"
 msgid "                REF: Pages 16-17, section 3.2.\n"
-msgstr ""
-
+msgstr "                REF: Side 16-17, afsnit 3.2.\n"
 msgid "                REF: Pages 42-45, section 5.2.\n"
-msgstr ""
-
+msgstr "                REF: Side 42-45, afsnit 5.2.\n"
 msgid "                REF: Pages 45-46, section 5.2.\n"
-msgstr ""
-
+msgstr "                REF: Side 45-46, afsnit 5.2.\n"
 msgid "                REF: Pages 48-49, section 5.2.\n"
-msgstr ""
-
+msgstr "                REF: Side 48-49, afsnit 5.2.\n"
 msgid "                REF: Pages 52-54, section 5.2.\n"
-msgstr ""
-
-#, c-format
+msgstr "                REF: Side 52-54, afsnit 5.2.\n"
 msgid "        %-39.39s %.0f bytes\n"
-msgstr ""
-
-#, c-format
+msgstr "        %-39.39s %.0f byte\n"
 msgid "        PASS    Default%s\n"
-msgstr ""
-
+msgstr "        PASS    Default%s\n"
 msgid "        PASS    DefaultImageableArea\n"
-msgstr ""
-
+msgstr "        PASS    DefaultImageableArea\n"
 msgid "        PASS    DefaultPaperDimension\n"
-msgstr ""
-
+msgstr "        PASS    DefaultPaperDimension\n"
 msgid "        PASS    FileVersion\n"
-msgstr ""
-
+msgstr "        PASS    FileVersion\n"
 msgid "        PASS    FormatVersion\n"
-msgstr ""
-
+msgstr "        PASS    FormatVersion\n"
 msgid "        PASS    LanguageEncoding\n"
-msgstr ""
-
+msgstr "        PASS    LanguageEncoding\n"
 msgid "        PASS    LanguageVersion\n"
-msgstr ""
-
+msgstr "        PASS    LanguageVersion\n"
 msgid "        PASS    Manufacturer\n"
-msgstr ""
-
+msgstr "        PASS    Manufacturer\n"
 msgid "        PASS    ModelName\n"
-msgstr ""
-
+msgstr "        PASS    ModelName\n"
 msgid "        PASS    NickName\n"
-msgstr ""
-
+msgstr "        PASS    NickName\n"
 msgid "        PASS    PCFileName\n"
-msgstr ""
-
+msgstr "        PASS    PCFileName\n"
 msgid "        PASS    PSVersion\n"
-msgstr ""
-
+msgstr "        PASS    PSVersion\n"
 msgid "        PASS    PageRegion\n"
-msgstr ""
-
+msgstr "        PASS    PageRegion\n"
 msgid "        PASS    PageSize\n"
-msgstr ""
-
+msgstr "        PASS    PageSize\n"
 msgid "        PASS    Product\n"
-msgstr ""
-
+msgstr "        PASS    Product\n"
 msgid "        PASS    ShortNickName\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
-"                (constraint=\"%s %s %s %s\")\n"
-msgstr ""
-
-#, c-format
+msgstr "        PASS    ShortNickName\n"
+msgid "        WARN    \"%s %s\" conflicts with \"%s %s\"\n                (constraint=\"%s %s %s %s\")\n"
+msgstr "        WARN \"%s %s\" er i konflikt med \"%s %s\"\n                (begrænsning=\"%s %s %s %s\")\n"
 msgid "        WARN    %s has no corresponding options!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"        WARN    %s shares a common prefix with %s\n"
-"                REF: Page 15, section 3.2.\n"
-msgstr ""
-
+msgstr "        WARN    %s har ingen tilsvarende muligheder!\n"
+msgid "        WARN    %s shares a common prefix with %s\n                REF: Page 15, section 3.2.\n"
+msgstr "        WARN %s deler et almindeligt præfiks med %s\n                REF: Side 15, afsnit 3.2.\n"
 msgid "        WARN    Default choices conflicting!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"        WARN    Duplex option keyword %s should be named Duplex or "
-"JCLDuplex!\n"
-"                REF: Page 122, section 5.17\n"
-msgstr ""
-
-msgid ""
-"        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
-msgstr ""
-
-msgid ""
-"        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
-"                REF: Pages 56-57, section 5.3.\n"
-msgstr ""
-
-#, c-format
+msgstr "        WARN Standardvalg er i konflikt!\n"
+msgid "        WARN    Duplex option keyword %s should be named Duplex or JCLDuplex!\n                REF: Page 122, section 5.17\n"
+msgstr "        WARN Nøgleordet til dupleksmuligheden %s skal hedde Duplex eller JCLDuplex!\n                REF: Side 122, afsnit 5.17.\n"
+msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
+msgstr "        WARN Arkiv indeholder en blanding af linjeskifttyperne CR, LF og CR LF!\n"
+msgid "        WARN    LanguageEncoding required by PPD 4.3 spec.\n                REF: Pages 56-57, section 5.3.\n"
+msgstr "        WARN    LanguageEncoding kræves af PPD 4.3 spec.\n                REF: Side 56-57, afsnit 5.3.\n"
 msgid "        WARN    Line %d only contains whitespace!\n"
-msgstr ""
-
-msgid ""
-"        WARN    Manufacturer required by PPD 4.3 spec.\n"
-"                REF: Pages 58-59, section 5.3.\n"
-msgstr ""
-
-#, c-format
+msgstr "        WARN    Linje %d indeholder kun tom plads!\n"
+msgid "        WARN    Manufacturer required by PPD 4.3 spec.\n                REF: Pages 58-59, section 5.3.\n"
+msgstr "        WARN    Manufacturer kræves af PPD 4.3 spec.\n                REF: Side 58-59, afsnit 5.3.\n"
 msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
-msgstr ""
-
-#, c-format
+msgstr "        WARN    Manglende APDialogExtension-arkiv \"%s\"\n"
 msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
-msgstr ""
-
-#, c-format
+msgstr "        WARN    Manglende APPrinterIconPath-arkiv \"%s\"\n"
 msgid "        WARN    Missing cupsICCProfile file \"%s\"\n"
-msgstr ""
-
-msgid ""
-"        WARN    Non-Windows PPD files should use lines ending with only LF, "
-"not CR LF!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"        WARN    Obsolete PPD version %.1f!\n"
-"                REF: Page 42, section 5.2.\n"
-msgstr ""
-
-msgid ""
-"        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
-"                REF: Pages 61-62, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"        WARN    Protocols contains PJL but JCL attributes are not set.\n"
-"                REF: Pages 78-79, section 5.7.\n"
-msgstr ""
-
-msgid ""
-"        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
-"                REF: Pages 78-79, section 5.7.\n"
-msgstr ""
-
-msgid ""
-"        WARN    ShortNickName required by PPD 4.3 spec.\n"
-"                REF: Pages 64-65, section 5.3.\n"
-msgstr ""
-
-#, c-format
+msgstr "        WARN    Manglende cupsICCProfile-arkiv \"%s\"\n"
+msgid "        WARN    Non-Windows PPD files should use lines ending with only LF, not CR LF!\n"
+msgstr "        WARN    PPD-arkiver, som ikke stammer fra Windows, må kun bruge linjeskifttypen LF, ikke CR LF!\n"
+msgid "        WARN    Obsolete PPD version %.1f!\n                REF: Page 42, section 5.2.\n"
+msgstr "        WARN    Forældet PPD-version %.1f!\n                REF: Side 42, afsnit 5.2.\n"
+msgid "        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n                REF: Pages 61-62, section 5.3.\n"
+msgstr "        WARN    PCFileName længere end 8.3 overtræder PPD-spec.\n                REF: Side 61-62, afsnit 5.3.\n"
+msgid "        WARN    Protocols contains PJL but JCL attributes are not set.\n                REF: Pages 78-79, section 5.7.\n"
+msgstr "        WARN    Protokoller indeholder PJL, men JCL-egenskaber er ikke indstillet.\n                REF: Side 78-79, afsnit 5.7.\n"
+msgid "        WARN    Protocols contains both PJL and BCP; expected TBCP.\n                REF: Pages 78-79, section 5.7.\n"
+msgstr "        WARN    Protokoller indeholder både PJL og BCP; forventede TBCP.\n                REF: Side 78-79, afsnit 5.7.\n"
+msgid "        WARN    ShortNickName required by PPD 4.3 spec.\n                REF: Pages 64-65, section 5.3.\n"
+msgstr "        WARN    ShortNickName kræves af PPD 4.3 spec.\n                REF: Side 64-65, afsnit 5.3.\n"
 msgid "      %s  %s %s does not exist!\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  %s %s eksisterer ikke!\n"
 msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Ugyldig UTF-8 \"%s\"-oversættelsesstreng til muligheden %s!\n"
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
+msgstr "      %s  Ugyldig UTF-8 \&quot;%s\&quot;-oversættelsesstreng til muligheden %s, valg %s!\n"
 msgid "      %s  Bad cupsFilter value \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Ugyldig cupsFilter-værdi \"%s\"!\n"
 msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Ugyldig cupsPreFilter-værdi \&quot;%s\&quot;!\n"
 msgid "      %s  Bad language \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Ugyldigt sprog \"%s\"!\n"
 msgid "      %s  Missing \"%s\" translation string for option %s!\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Manglende \"%s\"-oversættelsesstreng til muligheden %s!\n"
 msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Manglende \&quot;%s\&quot;-oversættelsesstreng til muligheden %s, valg %s!\n"
 msgid "      %s  Missing choice *%s %s in UIConstraint \"*%s %s *%s %s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Manglende valg *%s %s i UIConstraint \"*%s %s *%s %s\"!\n"
 msgid "      %s  Missing cupsFilter file \"%s\"\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Manglende cupsFilter-arkiv \"%s\"\n"
 msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Manglende cupsPreFilter-arkiv \&quot;%s\&quot;\n"
 msgid "      %s  Missing option %s in UIConstraint \"*%s %s *%s %s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Manglende mulighed %s i UIConstraint \"*%s %s *%s %s\"!\n"
 msgid "      %s  No base translation \"%s\" is included in file!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  %s must be 1284DeviceID!\n"
-"                REF: Page 72, section 5.5\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  BAD Default%s %s\n"
-"                REF: Page 40, section 4.5.\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  BAD DefaultImageableArea %s!\n"
-"                REF: Page 102, section 5.15.\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  BAD DefaultPaperDimension %s!\n"
-"                REF: Page 103, section 5.15.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  BAD JobPatchFile attribute in file\n"
-"                REF: Page 24, section 3.4.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
-"                REF: Page 211, table D.1.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
-"                REF: Page 211, table D.1.\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
-"                REF: Pages 59-60, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
-"                REF: Pages 62-64, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  BAD Product - not \"(string)\".\n"
-"                REF: Page 62, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
-"                REF: Pages 64-65, section 5.3.\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  Bad %s choice %s!\n"
-"                REF: Page 122, section 5.17\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  Bad %s choice %s!\n"
-"                REF: Page 84, section 5.9\n"
-msgstr ""
-
-#, c-format
+msgstr "      %s  Ingen basisoversættelse \"%s\" er inkluderet i arkiv!\n"
+msgid "      **FAIL**  %s must be 1284DeviceID!\n                REF: Page 72, section 5.5\n"
+msgstr "      **FAIL**  %s skal være 1284DeviceID!\n                REF: Side 72, afsnit 5.5.\n"
+msgid "      **FAIL**  BAD Default%s %s\n                REF: Page 40, section 4.5.\n"
+msgstr "      **FAIL**  UGYLDIG Default%s %s\n                REF: Side 40, afsnit 4.5.\n"
+msgid "      **FAIL**  BAD DefaultImageableArea %s!\n                REF: Page 102, section 5.15.\n"
+msgstr "      **FAIL**  UGYLDIG DefaultImageableArea %s!\n                REF: Side 102, afsnit 5.15.\n"
+msgid "      **FAIL**  BAD DefaultPaperDimension %s!\n                REF: Page 103, section 5.15.\n"
+msgstr "      **FAIL**  UGYLDIG DefaultPaperDimension %s!\n                REF: Side 103, afsnit 5.15.\n"
+msgid "      **FAIL**  BAD JobPatchFile attribute in file\n                REF: Page 24, section 3.4.\n"
+msgstr "      **FAIL**  UGYLDIG JobPatchFile-egenskab i arkiv\n                REF: Side 24, afsnit 3.4.\n"
+msgid "      **FAIL**  BAD Manufacturer (should be \"HP\")\n                REF: Page 211, table D.1.\n"
+msgstr "      **FAIL**  UGYLDIG Manufacturer (skulle være \"HP\")\n                REF: Side 211, tabel D.1.\n"
+msgid "      **FAIL**  BAD Manufacturer (should be \"Oki\")\n                REF: Page 211, table D.1.\n"
+msgstr "      **FAIL**  UGYLDIG Manufacturer (skulle være \&quot;Oki\&quot;)\n                REF: Side 211, tabel D.1.\n"
+msgid "      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n                REF: Pages 59-60, section 5.3.\n"
+msgstr "      **FAIL**  UGYLDIGT ModelName - \"%c\" ikke tilladt i streng.\n                REF: Side 59-60, afsnit 5.3.\n"
+msgid "      **FAIL**  BAD PSVersion - not \"(string) int\".\n                REF: Pages 62-64, section 5.3.\n"
+msgstr "      **FAIL**  UGYLDIG PSVersion - ikke \"(string) int\".\n                REF: Side 62-64, afsnit 5.3.\n"
+msgid "      **FAIL**  BAD Product - not \"(string)\".\n                REF: Page 62, section 5.3.\n"
+msgstr "      **FAIL**  UGYLDIG Product - ikke \"(string)\".\n                REF: Side 62, afsnit 5.3.\n"
+msgid "      **FAIL**  BAD ShortNickName - longer than 31 chars.\n                REF: Pages 64-65, section 5.3.\n"
+msgstr "      **FAIL**  UGYLDIG ShortNickName - længere end 31 tegn.\n                REF: Side 64-65, afsnit 5.3.\n"
+msgid "      **FAIL**  Bad %s choice %s!\n                REF: Page 122, section 5.17\n"
+msgstr "      **FAIL**  Ugyldigt %s-valg %s!\n                REF: Side 122, afsnit 5.17.\n"
+msgid "      **FAIL**  Bad %s choice %s!\n                REF: Page 84, section 5.9\n"
+msgstr "      **FAIL**  Ugyldigt %s-valg %s!\n                REF: Side 84, afsnit 5.9.\n"
 msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
-msgstr ""
-
-#, c-format
+msgstr "      **FAIL**  Ugyldig LanguageEncoding %s - skal være ISOLatin1!\n"
 msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
-msgstr ""
-
-#, c-format
+msgstr "      **FAIL**  Ugyldig LanguageVersion %s - skal være dansk!\n"
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  Default translation string for option %s choice %s contains "
-"8-bit characters!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  Default translation string for option %s contains 8-bit "
-"characters!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  REQUIRED %s does not define choice None!\n"
-"                REF: Page 122, section 5.17\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  REQUIRED Default%s\n"
-"                REF: Page 40, section 4.5.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED DefaultImageableArea\n"
-"                REF: Page 102, section 5.15.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED DefaultPaperDimension\n"
-"                REF: Page 103, section 5.15.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED FileVersion\n"
-"                REF: Page 56, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED FormatVersion\n"
-"                REF: Page 56, section 5.3.\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
-"                REF: Page 41, section 5.\n"
-"                REF: Page 102, section 5.15.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED LanguageEncoding\n"
-"                REF: Pages 56-57, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED LanguageVersion\n"
-"                REF: Pages 57-58, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED Manufacturer\n"
-"                REF: Pages 58-59, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED ModelName\n"
-"                REF: Pages 59-60, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED NickName\n"
-"                REF: Page 60, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED PCFileName\n"
-"                REF: Pages 61-62, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED PSVersion\n"
-"                REF: Pages 62-64, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED PageRegion\n"
-"                REF: Page 100, section 5.14.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED PageSize\n"
-"                REF: Page 41, section 5.\n"
-"                REF: Page 99, section 5.14.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED PageSize\n"
-"                REF: Pages 99-100, section 5.14.\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
-"                REF: Page 41, section 5.\n"
-"                REF: Page 103, section 5.15.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED Product\n"
-"                REF: Page 62, section 5.3.\n"
-msgstr ""
-
-msgid ""
-"      **FAIL**  REQUIRED ShortNickName\n"
-"                REF: Page 64-65, section 5.3.\n"
-msgstr ""
-
-#, c-format
+msgstr "      **FAIL**  Standardkode til mulighed kunne ikke fortolkes: %s\n"
+msgid "      **FAIL**  Default translation string for option %s choice %s contains 8-bit characters!\n"
+msgstr "      **FAIL**  Standardoversættelsesstreng til muligheden %s, valg %s, indeholder 8 bit tegn!\n"
+msgid "      **FAIL**  Default translation string for option %s contains 8-bit characters!\n"
+msgstr "      **FAIL**  Standardoversættelsesstreng til muligheden %s indeholder 8 bit tegn!\n"
+msgid "      **FAIL**  REQUIRED %s does not define choice None!\n                REF: Page 122, section 5.17\n"
+msgstr "      **FAIL**  REQUIRED %s definerer ikke valget Ingen!\n                REF: Side 122, afsnit 5.17.\n"
+msgid "      **FAIL**  REQUIRED Default%s\n                REF: Page 40, section 4.5.\n"
+msgstr "      **FAIL**  REQUIRED Default%s\n                REF: Side 40, afsnit 4.5.\n"
+msgid "      **FAIL**  REQUIRED DefaultImageableArea\n                REF: Page 102, section 5.15.\n"
+msgstr "      **FAIL**  REQUIRED DefaultImageableArea\n                REF: Side 102, afsnit 5.15.\n"
+msgid "      **FAIL**  REQUIRED DefaultPaperDimension\n                REF: Page 103, section 5.15.\n"
+msgstr "      **FAIL**  REQUIRED DefaultPaperDimension\n                REF: Side 103, afsnit 5.15.\n"
+msgid "      **FAIL**  REQUIRED FileVersion\n                REF: Page 56, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED FileVersion\n                REF: Side 56, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED FormatVersion\n                REF: Page 56, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED FormatVersion\n                REF: Side 56, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED ImageableArea for PageSize %s\n                REF: Page 41, section 5.\n                REF: Page 102, section 5.15.\n"
+msgstr "      **FAIL**  REQUIRED ImageableArea til PageSize %s\n                REF: Side 41, afsnit 5.\n                REF: Side 102, afsnit 5.15.\n"
+msgid "      **FAIL**  REQUIRED LanguageEncoding\n                REF: Pages 56-57, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED LanguageEncoding\n                REF: Side 56-57, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED LanguageVersion\n                REF: Pages 57-58, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED LanguageVersion\n                REF: Side 57-58, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED Manufacturer\n                REF: Pages 58-59, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED Manufacturer\n                REF: Side 58-59, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED ModelName\n                REF: Pages 59-60, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED ModelName\n                REF: Side 59-60, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED NickName\n                REF: Page 60, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED NickName\n                REF: Side 60, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED PCFileName\n                REF: Pages 61-62, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED PCFileName\n                REF: Side 61-62, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED PSVersion\n                REF: Pages 62-64, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED PSVersion\n                REF: Side 62-64, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED PageRegion\n                REF: Page 100, section 5.14.\n"
+msgstr "      **FAIL**  REQUIRED PageRegion\n                REF: Side 100, afsnit 5.14.\n"
+msgid "      **FAIL**  REQUIRED PageSize\n                REF: Page 41, section 5.\n                REF: Page 99, section 5.14.\n"
+msgstr "      **FAIL**  REQUIRED PageSize\n                REF: Side 41, afsnit 5.\n                REF: Side 99, afsnit 5.14.\n"
+msgid "      **FAIL**  REQUIRED PageSize\n                REF: Pages 99-100, section 5.14.\n"
+msgstr "      **FAIL**  REQUIRED PageSize\n                REF: Side 99-100, afsnit 5.14.\n"
+msgid "      **FAIL**  REQUIRED PaperDimension for PageSize %s\n                REF: Page 41, section 5.\n                REF: Page 103, section 5.15.\n"
+msgstr "      **FAIL**  REQUIRED PaperDimension til PageSize %s\n                REF: Side 41, afsnit 5.\n                REF: Side 103, afsnit 5.15.\n"
+msgid "      **FAIL**  REQUIRED Product\n                REF: Page 62, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED Product\n                REF: Side 62, afsnit 5.3.\n"
+msgid "      **FAIL**  REQUIRED ShortNickName\n                REF: Page 64-65, section 5.3.\n"
+msgstr "      **FAIL**  REQUIRED ShortNickName\n                REF: Side 64-65, afsnit 5.3.\n"
 msgid "    %d ERRORS FOUND\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Bad %%%%BoundingBox: on line %d!\n"
-"        REF: Page 39, %%%%BoundingBox:\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Bad %%%%Page: on line %d!\n"
-"        REF: Page 53, %%%%Page:\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Bad %%%%Pages: on line %d!\n"
-"        REF: Page 43, %%%%Pages:\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Line %d is longer than 255 characters (%d)!\n"
-"        REF: Page 25, Line Length\n"
-msgstr ""
-
-msgid ""
-"    Missing %!PS-Adobe-3.0 on first line!\n"
-"        REF: Page 17, 3.1 Conforming Documents\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Missing %%EndComments comment!\n"
-"        REF: Page 41, %%EndComments\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Missing or bad %%BoundingBox: comment!\n"
-"        REF: Page 39, %%BoundingBox:\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Missing or bad %%Page: comments!\n"
-"        REF: Page 53, %%Page:\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Missing or bad %%Pages: comment!\n"
-"        REF: Page 43, %%Pages:\n"
-msgstr ""
-
+msgstr "    %d FEJL FUNDET\n"
+msgid "    Bad %%%%BoundingBox: on line %d!\n        REF: Page 39, %%%%BoundingBox:\n"
+msgstr "    Ugyldig %%%%BoundingBox: På linje %d!\n        REF: Side 39, %%%%BoundingBox:\n"
+msgid "    Bad %%%%Page: on line %d!\n        REF: Page 53, %%%%Page:\n"
+msgstr "    Ugyldig %%%%Page: På linje %d!\n        REF: Side 53, %%%%Page:\n"
+msgid "    Bad %%%%Pages: on line %d!\n        REF: Page 43, %%%%Pages:\n"
+msgstr "    Ugyldige %%%%Pages: På linje %d!\n        REF: Side 43, %%%%Pages:\n"
+msgid "    Line %d is longer than 255 characters (%d)!\n        REF: Page 25, Line Length\n"
+msgstr "    Linje %d er på mere end 255 tegn (%d)!\n        REF: Side 25, Linjelængde\n"
+msgid "    Missing %!PS-Adobe-3.0 on first line!\n        REF: Page 17, 3.1 Conforming Documents\n"
+msgstr "    Manglende %!PS-Adobe-3.0 på første linje!\n        REF: Side 17, 3.1 Overensstemmende dokumenter\n"
+msgid "    Missing %%EndComments comment!\n        REF: Page 41, %%EndComments\n"
+msgstr "    Manglende %%EndComments-kommentar!\n        REF: Side 41, %%EndComments\n"
+msgid "    Missing or bad %%BoundingBox: comment!\n        REF: Page 39, %%BoundingBox:\n"
+msgstr "    Manglende eller ugyldig %%BoundingBox: Kommentar!\n        REF: Side 39, %%BoundingBox:\n"
+msgid "    Missing or bad %%Page: comments!\n        REF: Page 53, %%Page:\n"
+msgstr "    Manglende eller ugyldig %%Page: Kommentarer!\n        REF: Side 53, %%Page:\n"
+msgid "    Missing or bad %%Pages: comment!\n        REF: Page 43, %%Pages:\n"
+msgstr "    Manglende eller ugyldig %%Pages: Kommentar!\n        REF: Side 43, %%Pages:\n"
 msgid "    NO ERRORS FOUND\n"
-msgstr ""
-
-#, c-format
+msgstr "    INGEN FEJL FUNDET\n"
 msgid "    Saw %d lines that exceeded 255 characters!\n"
-msgstr ""
-
-#, c-format
+msgstr "    Så %d linjer, der overskred 255 tegn!\n"
 msgid "    Too many %%BeginDocument comments!\n"
-msgstr ""
-
-#, c-format
+msgstr "    For mange %%BeginDocument-kommentarer!\n"
 msgid "    Too many %%EndDocument comments!\n"
-msgstr ""
-
+msgstr "    For mange %%EndDocument-kommentarer!\n"
 msgid "    Warning: file contains binary data!\n"
-msgstr ""
-
-#, c-format
+msgstr "    Advarsel: Arkiv indeholder binære data!\n"
 msgid "    Warning: no %%EndComments comment in file!\n"
-msgstr ""
-
-#, c-format
+msgstr "    Advarsel: Ingen %%EndComments-kommentar i arkiv!\n"
 msgid "    Warning: obsolete DSC version %.1f in file!\n"
-msgstr ""
-
+msgstr "    Advarsel: Forældet DSC-version %.1f i arkiv!\n"
 msgid " FAIL\n"
-msgstr ""
-
-#, c-format
-msgid ""
-" FAIL\n"
-"      **FAIL**  Unable to open PPD file - %s\n"
-msgstr ""
-
-#, c-format
-msgid ""
-" FAIL\n"
-"      **FAIL**  Unable to open PPD file - %s on line %d.\n"
-msgstr ""
-
+msgstr " FAIL\n"
+msgid " FAIL\n      **FAIL**  Unable to open PPD file - %s\n"
+msgstr " FAIL\n      **FAIL**  Kan ikke åbne PPD-arkiv - %s\n"
+msgid " FAIL\n      **FAIL**  Unable to open PPD file - %s on line %d.\n"
+msgstr " FAIL\n      **FAIL**  Kan ikke åbne PPD-arkiv - %s på linje %d.\n"
 msgid " PASS\n"
-msgstr ""
-
-#, c-format
+msgstr " PASS\n"
 msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
-msgstr ""
-
-#, c-format
+msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f byte\n"
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
-msgstr ""
-
-#, c-format
+msgstr "%-7s %-7.7s %-7d %-31.31s %.0f byte\n"
 msgid "%s accepting requests since %s\n"
-msgstr ""
-
-#, c-format
+msgstr "%s accepterer anmodninger siden %s\n"
 msgid "%s cannot be changed."
-msgstr ""
-
-#, c-format
+msgstr "%s kan ikke ændres."
 msgid "%s is not implemented by the CUPS version of lpc.\n"
-msgstr ""
-
-#, c-format
+msgstr "%s er ikke implementeret af CUPS-versionen af lpc.\n"
 msgid "%s is not ready\n"
-msgstr ""
-
-#, c-format
+msgstr "%s er ikke klar\n"
 msgid "%s is ready\n"
-msgstr ""
-
-#, c-format
+msgstr "%s er klar\n"
 msgid "%s is ready and printing\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"%s not accepting requests since %s -\n"
-"\t%s\n"
-msgstr ""
-
-#, c-format
+msgstr "%s er klar og udskriver\n"
+msgid "%s not accepting requests since %s -\n\t%s\n"
+msgstr "%s accepterer ikke anmodninger siden %s -\n\t%s\n"
 msgid "%s not supported!"
-msgstr ""
-
-#, c-format
+msgstr "%s ikke understøttet!"
 msgid "%s/%s accepting requests since %s\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"%s/%s not accepting requests since %s -\n"
-"\t%s\n"
-msgstr ""
-
-#, c-format
+msgstr "%s/%s accepterer anmodninger siden %s\n"
+msgid "%s/%s not accepting requests since %s -\n\t%s\n"
+msgstr "%s/%s accepterer ikke anmodninger siden %s -\n\t%s\n"
 msgid "%s: %-33.33s [job %d localhost]\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: %-33.33s [job %d localhost]\n"
 msgid "%s: %s failed: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: %s mislykkedes: %s\n"
 msgid "%s: Don't know what to do!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Ved ikke, hvad jeg skal gøre!\n"
+msgid "%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr "%s: Fejl - %s-miljøvariabel navngiver ikke eksisterende destination \"%s\"!\n"
 msgid "%s: Error - bad job ID!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - ugyldig job-id!\n"
 msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"%s: Error - cannot print from stdin if files or a job ID are provided!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - kan ikke udskrive arkiver og ændre job på samme tid!\n"
+msgid "%s: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgstr "%s: Fejl - kan ikke udskrive fra stdin, hvis der leveres arkiver eller en job-id!\n"
 msgid "%s: Error - expected character set after '-S' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede tegnsæt efter muligheden '-S'!\n"
 msgid "%s: Error - expected content type after '-T' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede indholdstype efter muligheden '-T'!\n"
 msgid "%s: Error - expected copies after '-n' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede kopier efter muligheden '-n'!\n"
 msgid "%s: Error - expected copy count after '-#' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede antal kopier efter muligheden '-#'!\n"
 msgid "%s: Error - expected destination after '-P' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede destination efter muligheden &aops;-P&aops;!\n"
 msgid "%s: Error - expected destination after '-b' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede destination efter muligheden &aops;-b&aops;!\n"
 msgid "%s: Error - expected destination after '-d' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede destination efter muligheden &aops;-d&aops;!\n"
 msgid "%s: Error - expected form after '-f' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede formular efter muligheden &aops;-f&aops;!\n"
 msgid "%s: Error - expected hold name after '-H' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede udsat navn efter muligheden '-H'!\n"
 msgid "%s: Error - expected hostname after '-H' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede værtsnavn efter muligheden &aops;-H&aops;!\n"
 msgid "%s: Error - expected hostname after '-h' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede værtsnavn efter muligheden &aops;-H&aops;!\n"
 msgid "%s: Error - expected mode list after '-y' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede funktionsliste efter muligheden &aops;-y&aops;!\n"
 msgid "%s: Error - expected name after '-%c' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede navn efter muligheden &aops;-%c&aops;!\n"
 msgid "%s: Error - expected option string after '-o' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede alternativ streng efter muligheden '-o'!\n"
 msgid "%s: Error - expected page list after '-P' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede sideliste efter muligheden &aops;-P&aops;!\n"
 msgid "%s: Error - expected priority after '-%c' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede prioritet efter muligheden &aops;-%c&aops;!\n"
 msgid "%s: Error - expected reason text after '-r' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede årsagstekst efter muligheden '-r'!\n"
 msgid "%s: Error - expected title after '-t' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede titel efter muligheden &aops;-t&aops;!\n"
 msgid "%s: Error - expected username after '-U' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede brugernavn efter muligheden &aops;-U&aops;!\n"
 msgid "%s: Error - expected username after '-u' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede brugernavn efter muligheden &aops;-u&aops;!\n"
 msgid "%s: Error - expected value after '-%c' option!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
-"option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Error - forventede værdi efter muligheden &aops;-%c&aops;!\n"
+msgid "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' option!\n"
+msgstr "%s: Fejl - skal have \"completed\", \"not-completed\" eller \"all\" efter muligheden '-W'!\n"
 msgid "%s: Error - no default destination available.\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - ingen tilgængelig standarddestination.\n"
 msgid "%s: Error - priority must be between 1 and 100.\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - prioritet skal være mellem 1 og 100.\n"
 msgid "%s: Error - scheduler not responding!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - planlægger svarer ikke!\n"
 msgid "%s: Error - stdin is empty, so no job has been sent.\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - stdin er tom, så der er ikke sendt noget job.\n"
 msgid "%s: Error - too many files - \"%s\"\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - for mange arkiver - \"%s\"\n"
 msgid "%s: Error - unable to access \"%s\" - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - kan ikke få adgang til \"%s\" - %s\n"
 msgid "%s: Error - unable to create temporary file \"%s\" - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - kan ikke oprette midlertidigt arkiv \&quot;%s\&quot; - %s\n"
 msgid "%s: Error - unable to write to temporary file \"%s\" - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - kan ikke skrive til midlertidigt arkiv \&quot;%s\&quot; - %s\n"
 msgid "%s: Error - unknown destination \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - ukendt destination \"%s\"!\n"
 msgid "%s: Error - unknown destination \"%s/%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - ukendt destination \&quot;%s/%s\&quot;!\n"
 msgid "%s: Error - unknown option '%c'!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - ukendt mulighed '%c'!\n"
 msgid "%s: Expected job ID after '-i' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Forventede job-id efter muligheden '-i'!\n"
 msgid "%s: Invalid destination name in list \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Ugyldigt destinationsnavn på listen \"%s\"!\n"
 msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
-msgstr ""
-
-#, c-format
-msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Skal have job-id ('-i jobid') før '-H restart'!\n"
 msgid "%s: Operation failed: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Handling mislykkedes: %s\n"
 msgid "%s: Sorry, no encryption support compiled in!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Beklager, der er ikke medkompileret krypteringsunderstøttelse!\n"
 msgid "%s: Unable to connect to server\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Kan ikke oprette forbindelse til server\n"
 msgid "%s: Unable to connect to server: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Kan ikke oprette forbindelse til server:%s\n"
 msgid "%s: Unable to contact server!\n"
-msgstr ""
-
-#, c-format
-msgid "%s: Unable to determine MIME type of \"%s\"!\n"
-msgstr ""
-
-#, c-format
-msgid "%s: Unable to read MIME database from \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Kan ikke kontakte server!\n"
 msgid "%s: Unknown destination \"%s\"!\n"
-msgstr ""
-
-#, c-format
-msgid "%s: Unknown destination MIME type %s/%s!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Ukendt destination \&quot;%s\&quot;!\n"
 msgid "%s: Unknown option '%c'!\n"
-msgstr ""
-
-#, c-format
-msgid "%s: Unknown source MIME type %s/%s!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"%s: Warning - '%c' format modifier not supported - output may not be "
-"correct!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Ukendt mulighed &aops;%c&aops;!\n"
+msgid "%s: Warning - '%c' format modifier not supported - output may not be correct!\n"
+msgstr "%s: Advarsel - '%c'-formatmodifikation ikke understøttet - resultat muligvis ikke korrekt!"
 msgid "%s: Warning - character set option ignored!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Advarsel - muligheden tegnsæt ignoreret!\n"
 msgid "%s: Warning - content type option ignored!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Advarsel - muligheden indholdstype ignoreret!\n"
 msgid "%s: Warning - form option ignored!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Advarsel - muligheden formular ignoreret!\n"
 msgid "%s: Warning - mode option ignored!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"%s: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Advarsel - muligheden funktion ignoreret!\n"
+msgid "%s: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr "%s: Fejl - %s-miljøvariabel navngiver ikke eksisterende destination \&quot;%s\&quot;!\n"
 msgid "%s: error - expected option=value after '-o' option!\n"
-msgstr ""
-
-#, c-format
+msgstr "%s: Fejl - forventede mulighed=værdi efter muligheden &aops;-o&aops;!\n"
 msgid "%s: error - no default destination available.\n"
-msgstr ""
-
+msgstr "%s: Fejl - ingen tilgængelig standarddestination.\n"
 msgid "?Invalid help command unknown\n"
-msgstr ""
-
+msgstr "?Ugyldig hjælpekommando ukendt\n"
 msgid "A Samba password is required to export printer drivers!"
-msgstr ""
-
+msgstr "Der kræves en Samba-adgangskode til eksport af printerarkiver!"
 msgid "A Samba username is required to export printer drivers!"
-msgstr ""
-
-#, c-format
+msgstr "Der kræves et Samba-brugernavn til eksport af printerarkiver!"
 msgid "A class named \"%s\" already exists!"
-msgstr ""
-
-#, c-format
+msgstr "Der findes allerede en klasse kaldet \"%s\"!"
 msgid "A printer named \"%s\" already exists!"
-msgstr ""
-
+msgstr "Der findes allerede en printer kaldet \&quot;%s\&quot;!"
 msgid "Accept Jobs"
-msgstr ""
-
+msgstr "Accepter job"
 msgid "Add Class"
-msgstr ""
-
+msgstr "Tilføj klasse"
 msgid "Add Printer"
-msgstr ""
-
+msgstr "Tilføj printer"
 msgid "Add RSS Subscription"
-msgstr ""
-
+msgstr "Tilføj RSS-abonnement"
 msgid "Administration"
-msgstr ""
-
-#, c-format
+msgstr "Administration"
 msgid "Attempt to set %s printer-state to bad value %d!"
-msgstr ""
-
-#, c-format
+msgstr "Forsøger at indstille %s-printer-state til ugyldig værdi %d!"
 msgid "Attribute groups are out of order (%x < %x)!"
-msgstr ""
-
+msgstr "Egenskabsgrupper er ikke i rækkefølge (%x < %x)!"
 msgid "Bad OpenGroup"
-msgstr ""
-
+msgstr "Ugyldig OpenGroup"
 msgid "Bad OpenUI/JCLOpenUI"
-msgstr ""
-
+msgstr "Ugyldig OpenUI/JCLOpenUI"
 msgid "Bad OrderDependency"
-msgstr ""
-
+msgstr "Ugyldig OrderDependency"
 msgid "Bad UIConstraints"
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig UIConstraints"
 msgid "Bad copies value %d."
-msgstr ""
-
+msgstr "Ugyldig værdi for kopier %d."
 msgid "Bad custom parameter"
-msgstr ""
-
-#, c-format
+msgstr "Ugylidig speciel parameter"
 msgid "Bad device-uri \"%s\"!"
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig device-uri \"%s\"!"
 msgid "Bad document-format \"%s\"!"
-msgstr ""
-
+msgstr "Ugyldigt document-format \&quot;%s\&quot;!"
 msgid "Bad job-priority value!"
-msgstr ""
-
+msgstr "Ugyldig værdi for job-priority!"
 msgid "Bad job-state value!"
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig værdi for job-state!"
 msgid "Bad job-uri attribute \"%s\"!"
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig egenskab for job-uri \&quot;%s\&quot;!"
 msgid "Bad notify-pull-method \"%s\"!"
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig notify-pull-method \"%s\"!"
 msgid "Bad notify-recipient-uri URI \"%s\"!"
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig notify-recipient-uri URI \"%s\"!"
 msgid "Bad number-up value %d."
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig værdi for number-up %d."
 msgid "Bad option + choice on line %d!"
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig mulighed + valg på linje %d!"
 msgid "Bad page-ranges values %d-%d."
-msgstr ""
-
-#, c-format
+msgstr "Ugyldige værdier for page-ranges %d-%d."
 msgid "Bad port-monitor \"%s\"!"
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig port-monitor \"%s\"!"
 msgid "Bad printer-state value %d!"
-msgstr ""
-
-#, c-format
+msgstr "Ugyldig værdi for printer-state %d!"
 msgid "Bad request version number %d.%d!"
-msgstr ""
-
+msgstr "Ugyldigt versionsnummer på anmodning %d.%d!"
 msgid "Bad subscription ID!"
-msgstr ""
-
+msgstr "Ugyldig abonnements-id!"
 msgid "Banners"
-msgstr ""
-
+msgstr "Bannere"
 msgid "Cancel RSS Subscription"
-msgstr ""
-
+msgstr "Annuller RSS-abonnement"
 msgid "Change Settings"
-msgstr ""
-
-#, c-format
+msgstr "Skift indstillinger"
 msgid "Character set \"%s\" not supported!"
-msgstr ""
-
+msgstr "Tegnsættet \"%s\" understøttes ikke!"
 msgid "Classes"
-msgstr ""
-
-msgid ""
-"Commands may be abbreviated.  Commands are:\n"
-"\n"
-"exit    help    quit    status  ?\n"
-msgstr ""
-
-#, c-format
+msgstr "Klasser"
+msgid "Commands may be abbreviated.  Commands are:\n\nexit    help    quit    status  ?\n"
+msgstr "Kommandoer kan være forkortet.  Kommandoer er:\n\nexit    help    quit    status  ?\n"
 msgid "Could not scan type \"%s\"!"
-msgstr ""
-
+msgstr "Kunne ikke scanne typen \"%s\"!"
 msgid "Cover open."
-msgstr ""
-
+msgstr "Dæksel åbent."
 msgid "Custom"
-msgstr ""
-
+msgstr "Speciel"
 msgid "Delete Class"
-msgstr ""
-
+msgstr "Slet klasse"
 msgid "Delete Printer"
-msgstr ""
-
-#, c-format
+msgstr "Slet printer"
 msgid "Destination \"%s\" is not accepting jobs."
-msgstr ""
-
+msgstr "Destinationen \"%s\" accepterer ikke job."
 msgid "Developer almost empty."
-msgstr ""
-
+msgstr "Fremkalder næsten tom."
 msgid "Developer empty!"
-msgstr ""
-
-#, c-format
-msgid ""
-"Device: uri = %s\n"
-"        class = %s\n"
-"        info = %s\n"
-"        make-and-model = %s\n"
-"        device-id = %s\n"
-msgstr ""
-
+msgstr "Fremkalder tom!"
+msgid "Device: uri = %s\n        class = %s\n        info = %s\n        make-and-model = %s\n        device-id = %s\n"
+msgstr "Enhed: uri = %s\n        class = %s\n        info = %s\n        make-and-model = %s\n        device-id = %s\n"
 msgid "Door open."
-msgstr ""
-
-#, c-format
+msgstr "Dæksel åbent."
 msgid "EMERG: Unable to allocate memory for page info: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "EMERG: Kan ikke tildele hukommelse til sideinfo: %s\n"
 msgid "EMERG: Unable to allocate memory for pages array: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "EMERG: Kan ikke tildele hukommelse til rækkefølge af sider: %s\n"
 msgid "ERROR: %ld: (canceled:%ld)\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: %ld: (Annulleret:%ld)\n"
 msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldig %%BoundingBox: Kommentar set!\n"
 msgid "ERROR: Bad %%IncludeFeature: comment!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldig %%IncludeFeature: Kommentar!\n"
 msgid "ERROR: Bad %%Page: comment in file!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldig %%Page: Kommentar i arkiv!\n"
 msgid "ERROR: Bad %%PageBoundingBox: comment in file!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldig %%PageBoundingBox: Kommentar i arkiv!\n"
 msgid "ERROR: Bad SCSI device file \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldigt SCSI-enhedsarkiv \"%s\"!\n"
 msgid "ERROR: Bad charset file %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldigt tegnsætsarkiv %s\n"
 msgid "ERROR: Bad charset type %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldig type på tegnsæt %s\n"
 msgid "ERROR: Bad font description line: %s\n"
-msgstr ""
-
+msgstr "ERROR: Ugyldig linje til skriftbeskrivelse: %s\n"
 msgid "ERROR: Bad page setup!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldigt sidelayout!\n"
 msgid "ERROR: Bad text direction %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldig tekstretning %s\n"
 msgid "ERROR: Bad text width %s\n"
-msgstr ""
-
+msgstr "ERROR: Ugyldig tekstbredde %s\n"
 msgid "ERROR: Destination printer does not exist!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Destinationsprinter findes ikke!\n"
 msgid "ERROR: Duplicate %%BoundingBox: comment seen!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Dubleret %%BoundingBox: Kommentar set!\n"
 msgid "ERROR: Duplicate %%Pages: comment seen!\n"
-msgstr ""
-
+msgstr "ERROR: Dublerede %%Pages: Kommentar set!\n"
 msgid "ERROR: Empty print file!\n"
-msgstr ""
-
+msgstr "ERROR: Tomt udskriftsarkiv!\n"
 msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ugyldig HP-GL/2-kommando set, kan ikke udskrive arkiv!\n"
 msgid "ERROR: Missing %%EndProlog!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Manglende %%EndProlog!\n"
 msgid "ERROR: Missing %%EndSetup!\n"
-msgstr ""
-
-msgid ""
-"ERROR: Missing device URI on command-line and no DEVICE_URI environment "
-"variable!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Manglende %%EndSetup!\n"
+msgid "ERROR: Missing device URI on command-line and no DEVICE_URI environment variable!\n"
+msgstr "ERROR: Manglende device URI på kommandolinjen og ingen DEVICE_URI-miljøvariabel!\n"
 msgid "ERROR: No %%BoundingBox: comment in header!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ingen %%BoundingBox: Kommentar i header!\n"
 msgid "ERROR: No %%Pages: comment in header!\n"
-msgstr ""
-
-msgid ""
-"ERROR: No device URI found in argv[0] or in DEVICE_URI environment "
-"variable!\n"
-msgstr ""
-
+msgstr "ERROR: Ingen %%Pages: Kommentar i header!\n"
+msgid "ERROR: No device URI found in argv[0] or in DEVICE_URI environment variable!\n"
+msgstr "ERROR: Ingen device URI fundet i argv[0] eller i DEVICE_URI-miljøvariabel!\n"
 msgid "ERROR: No pages found!\n"
-msgstr ""
-
+msgstr "ERROR: Ingen sider fundet!\n"
 msgid "ERROR: Out of paper!\n"
-msgstr ""
-
+msgstr "ERROR: Ikke mere papir!\n"
 msgid "ERROR: PRINTER environment variable not defined!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: PRINTER-miljøvariabel ikke defineret!\n"
 msgid "ERROR: Print file was not accepted (%s)!\n"
-msgstr ""
-
+msgstr "ERROR: Udskriftsarkiv blev ikke accepteret (%s)!\n"
 msgid "ERROR: Printer not responding!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Printer svarer ikke!\n"
 msgid "ERROR: Remote host did not accept control file (%d)\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ekstern vært accepterede ikke kontrolarkiv (%d)\n"
 msgid "ERROR: Remote host did not accept data file (%d)\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ekstern vært accepterede ikke dataarkiv (%d)\n"
 msgid "ERROR: Unable to add file %d to job: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke føje arkivet %d til job: %s\n"
 msgid "ERROR: Unable to cancel job %d: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke annullere jobbet %d: %s\n"
 msgid "ERROR: Unable to create temporary compressed print file: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke oprette midlertidigt komprimeret udskriftsarkiv: %s\n"
 msgid "ERROR: Unable to create temporary file - %s.\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke oprette midlertidigt arkiv - %s.\n"
 msgid "ERROR: Unable to create temporary file: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke oprette midlertidigt arkiv: %s\n"
 msgid "ERROR: Unable to exec pictwpstops: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke exec pictwpstops: %s\n"
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke fork pictwpstops: %s\n"
 msgid "ERROR: Unable to get PPD file for printer \"%s\" - %s.\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke hente PPD-arkiv til printeren \"%s\" - %s.\n"
 msgid "ERROR: Unable to get job %d attributes (%s)!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke hente egenskaber til jobbet %d (%s)!\n"
 msgid "ERROR: Unable to get printer status (%s)!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke hente printerstatus (%s)!\n"
 msgid "ERROR: Unable to locate printer '%s'!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke finde printeren '%s'!\n"
 msgid "ERROR: Unable to open \"%s\" - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke åbne \&quot;%s\&quot; - %s\n"
 msgid "ERROR: Unable to open %s: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke åbne %s: %s\n"
 msgid "ERROR: Unable to open device file \"%s\": %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke åbne enhedsarkivet \"%s\": %s\n"
 msgid "ERROR: Unable to open file \"%s\" - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke åbne arkivet \&quot;%s\&quot; - %s\n"
 msgid "ERROR: Unable to open file \"%s\": %s\n"
-msgstr ""
-
+msgstr "ERROR: Kan ikke åbne arkivet \&quot;%s\&quot;: %s\n"
 msgid "ERROR: Unable to open image file for printing!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke åbne billedarkiv til udskrivning!\n"
 msgid "ERROR: Unable to open print file \"%s\": %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke åbne udskriftarkivet \&quot;%s\&quot;: %s\n"
 msgid "ERROR: Unable to open print file %s - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke åbne udskriftsarkivet %s - %s\n"
 msgid "ERROR: Unable to open print file %s: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke åbne udskriftarkivet &quot;%s&quot;: %s\n"
 msgid "ERROR: Unable to open temporary compressed print file: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke åbne midlertidigt komprimeret udskriftsarkiv: %s\n"
 msgid "ERROR: Unable to seek to offset %ld in file - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke forsøge at forskyde %ld i arkiv - %s\n"
 msgid "ERROR: Unable to seek to offset %lld in file - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke forsøge at forskyde %lld i arkiv - %s\n"
 msgid "ERROR: Unable to send print data (%d)\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke sende udskriftsdata (%d)\n"
 msgid "ERROR: Unable to wait for pictwpstops: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke vente på pictwpstops: %s\n"
 msgid "ERROR: Unable to write %d bytes to \"%s\": %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke skrive %d byte til \"%s\": %s\n"
 msgid "ERROR: Unable to write print data: %s\n"
-msgstr ""
-
+msgstr "ERROR: Kan ikke skrive udskriftsdata: %s\n"
 msgid "ERROR: Unable to write raster data to driver!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke skrive rasterdata til driver!\n"
 msgid "ERROR: Unable to write uncompressed document data: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Kan ikke skrive ukomprimerede dokumentdata: %s\n"
 msgid "ERROR: Unknown encryption option value \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ukendt værdi i krypteringsmulighed \"%s\"!\n"
 msgid "ERROR: Unknown file order \"%s\"\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ukendt arkivrækkefølge \"%s\"\n"
 msgid "ERROR: Unknown format character \"%c\"\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ukendt formattegn \"%c\"\n"
 msgid "ERROR: Unknown option \"%s\" with value \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ukendt mulighed \"%s\" med værdien \"%s\"!\n"
 msgid "ERROR: Unknown print mode \"%s\"\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ukendt udskriftsfunktion \"%s\"\n"
 msgid "ERROR: Unknown version option value \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Ukendt værdi på versionsmulighed \"%s\"!\n"
 msgid "ERROR: Unsupported brightness value %s, using brightness=100!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Værdi for lysstyrke %s ikke understøttet, bruger lysstyrke=100!\n"
 msgid "ERROR: Unsupported gamma value %s, using gamma=1000!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Værdi for gamma %s ikke understøttet, bruger gamma=1000!\n"
 msgid "ERROR: Unsupported number-up value %d, using number-up=1!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"ERROR: Unsupported number-up-layout value %s, using number-up-layout=lrtb!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Værdi for number-up %s ikke understøttet, bruger number-up=1!\n"
+msgid "ERROR: Unsupported number-up-layout value %s, using number-up-layout=lrtb!\n"
+msgstr "ERROR: Værdi for number-up-layout %s ikke understøttet, bruger number-up-layout=lrtb!\n"
 msgid "ERROR: Unsupported page-border value %s, using page-border=none!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: Værdi for page-border %s ikke understøttet, bruger page-border=none!\n"
 msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: doc_printf-overløb (%d byte) registreret, annullerer!\n"
 msgid "ERROR: pictwpstops exited on signal %d!\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: pictwpstops afsluttede på signalet %d!\n"
 msgid "ERROR: pictwpstops exited with status %d!\n"
-msgstr ""
-
-msgid ""
-"ERROR: recoverable: Unable to connect to printer; will retry in 30 "
-"seconds...\n"
-msgstr ""
-
-#, c-format
+msgstr "ERROR: pictwpstops afsluttede med status %d!\n"
+msgid "ERROR: recoverable: Unable to connect to printer; will retry in 30 seconds...\n"
+msgstr "ERROR: Kan gendannes: Kan ikke oprette forbindelse til printer; prøver igen om 30 sekunder...\n"
 msgid "ERROR: select() returned %d\n"
-msgstr ""
-
+msgstr "ERROR: select() returnerede %d\n"
 msgid "Edit Configuration File"
-msgstr ""
-
+msgstr "Rediger konfigurationsarkiv"
 msgid "Empty PPD file!"
-msgstr ""
-
+msgstr "Tomt PPD-arkiv!"
 msgid "Ending Banner"
-msgstr ""
-
+msgstr "Slutbanner"
 msgid "Enter old password:"
-msgstr ""
-
+msgstr "Skriv gammel adgangskode:"
 msgid "Enter password again:"
-msgstr ""
-
+msgstr "Skriv adgangskode igen:"
 msgid "Enter password:"
-msgstr ""
-
-msgid ""
-"Enter your username and password or the root username and password to access "
-"this page. If you are using Kerberos authentication, make sure you have a "
-"valid Kerberos ticket."
-msgstr ""
-
+msgstr "Skriv adgangskode:"
+msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
+msgstr "Skriv dit brugernavn og din adgangskode eller root-brugernavnet og -adgangskoden for at få adgang til denne side. Hvis du bruger Kerberos-godkendelse, skal du sikre dig, at du har en gyldig Kerberos-billet."
 msgid "Error Policy"
-msgstr ""
-
+msgstr "Fejlpolitik"
 msgid "Error: need hostname after '-h' option!\n"
-msgstr ""
-
+msgstr "Fejl: Værtsnavn kræves efter muligheden '-h'!\n"
 msgid "Export Printers to Samba"
-msgstr ""
-
+msgstr "Eksporter printere til Samba"
 msgid "FAIL\n"
-msgstr ""
-
-#, c-format
+msgstr "FAIL\n"
 msgid "FATAL: Could not load %s\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"File device URIs have been disabled! To enable, see the FileDevice directive "
-"in \"%s/cupsd.conf\"."
-msgstr ""
-
+msgstr "FATAL: Kunne ikke indlæse %s\n"
+msgid "File device URIs have been disabled! To enable, see the FileDevice directive in \"%s/cupsd.conf\"."
+msgstr "Arkivets device URIs er blevet slået fra! Du slår det til ved at se i FileDevice-direktivet i \"%s/cupsd.conf\"."
 msgid "Fuser temperature high!"
-msgstr ""
-
+msgstr "Fixertemperatur høj!"
 msgid "Fuser temperature low!"
-msgstr ""
-
+msgstr "Fixertemperatur lav!"
 msgid "General"
-msgstr ""
-
+msgstr "Generelt"
 msgid "Got a printer-uri attribute but no job-id!"
-msgstr ""
-
+msgstr "Fik en printer-uri-egenskab, men ingen job-id!"
 msgid "Help"
-msgstr ""
-
-#, c-format
+msgstr "Hjælp"
 msgid "INFO: Attempting to connect to host %s for printer %s\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Forsøger at oprette forbindelse til værten %s for printeren %s\n"
 msgid "INFO: Attempting to connect to host %s on port %d\n"
-msgstr ""
-
+msgstr "INFO: Forsøger at oprette forbindelse til værten %s på porten %d\n"
 msgid "INFO: Canceling print job...\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Annullerer udskriftsjob...\n"
 msgid "INFO: Connected to %s...\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Forbundet til %s...\n"
 msgid "INFO: Connecting to %s on port %d...\n"
-msgstr ""
-
+msgstr "INFO: Opretter forbindelse til %s på port %d...\n"
 msgid "INFO: Control file sent successfully\n"
-msgstr ""
-
+msgstr "INFO: Kontrolarkiv sendt\n"
 msgid "INFO: Data file sent successfully\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Dataarkiv sendt\n"
 msgid "INFO: Formatting page %d...\n"
-msgstr ""
-
+msgstr "INFO: Formaterer siden %d...\n"
 msgid "INFO: Loading image file...\n"
-msgstr ""
-
+msgstr "INFO: Indlæser billedarkivet...\n"
 msgid "INFO: Print file sent, waiting for printer to finish...\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Udskriftsarkiv sendt, venter på, at printer bliver færdig...\n"
 msgid "INFO: Printer busy (status:0x%08x)\n"
-msgstr ""
-
+msgstr "INFO: Printer i brug (status:0x%08x)\n"
 msgid "INFO: Printer busy; will retry in 10 seconds...\n"
-msgstr ""
-
+msgstr "INFO: Printer i brug; prøver igen om 10 sekunder...\n"
 msgid "INFO: Printer busy; will retry in 30 seconds...\n"
-msgstr ""
-
+msgstr "INFO: Printer i brug; prøver igen om 30 sekunder...\n"
 msgid "INFO: Printer busy; will retry in 5 seconds...\n"
-msgstr ""
-
+msgstr "INFO: Printer i brug; prøver igen om 5 sekunder...\n"
 msgid "INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n"
-msgstr ""
-
+msgstr "INFO: Printer understøtter ikke IPP/1.1, prøver IPP/1.0...\n"
 msgid "INFO: Printer is busy; will retry in 5 seconds...\n"
-msgstr ""
-
+msgstr "INFO: Printer i brug;prøver igen om 5 sekunder...\n"
 msgid "INFO: Printer is currently off-line.\n"
-msgstr ""
-
+msgstr "INFO: Printer er passiv.\n"
 msgid "INFO: Printer is now on-line.\n"
-msgstr ""
-
+msgstr "INFO: Printer er nu aktiv.\n"
 msgid "INFO: Printer not connected; will retry in 30 seconds...\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Printer ikke tilsluttet; prøver igen om 30 sekunder...\n"
 msgid "INFO: Printing page %d, %d%% complete...\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Udskriver side %d, %d%% færdig...\n"
 msgid "INFO: Printing page %d...\n"
-msgstr ""
-
+msgstr "INFO: Udskriver side %d...\n"
 msgid "INFO: Ready to print.\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Klar til at udskrive.\n"
 msgid "INFO: Sending control file (%lu bytes)\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Sender kontrolarkiv (%lu byte)\n"
 msgid "INFO: Sending control file (%u bytes)\n"
-msgstr ""
-
+msgstr "INFO: Sender kontrolarkiv (%u byte)\n"
 msgid "INFO: Sending data\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Sender data\n"
 msgid "INFO: Sending data file (%ld bytes)\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Sender dataarkiv (%ld byte)\n"
 msgid "INFO: Sending data file (%lld bytes)\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Sender dataarkiv (%lld byte)\n"
 msgid "INFO: Sent print file, %ld bytes...\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Sendt udskriftsarkiv, %ld byte...\n"
 msgid "INFO: Sent print file, %lld bytes...\n"
-msgstr ""
-
-#, c-format
+msgstr "INFO: Sendt udskriftsarkiv, %lld byte...\n"
 msgid "INFO: Spooling LPR job, %.0f%% complete...\n"
-msgstr ""
-
+msgstr "INFO: Spoler LPR-job, %.0f%% færdig...\n"
 msgid "INFO: Unable to contact printer, queuing on next printer in class...\n"
-msgstr ""
-
+msgstr "INFO: Kan ikke kontakte printer, sætter job i kø på næste printer i klassen...\n"
 msgid "INFO: Waiting for job to complete...\n"
-msgstr ""
-
+msgstr "INFO: Venter på, at job bliver færdigt...\n"
 msgid "Illegal control character"
-msgstr ""
-
+msgstr "Ulovligt kontroltegn"
 msgid "Illegal main keyword string"
-msgstr ""
-
+msgstr "Ulovlig streng til hovednøgleord"
 msgid "Illegal option keyword string"
-msgstr ""
-
+msgstr "Ulovlig nøgleordsstreng til mulighed"
 msgid "Illegal translation string"
-msgstr ""
-
+msgstr "Ulovlig oversættelsesstreng"
 msgid "Illegal whitespace character"
-msgstr ""
-
+msgstr "Ulovlig tegn for tom plads"
 msgid "Ink/toner almost empty."
-msgstr ""
-
+msgstr "Blæk/toner næsten tom."
 msgid "Ink/toner empty!"
-msgstr ""
-
+msgstr "Blæk/toner tom!"
 msgid "Ink/toner waste bin almost full."
-msgstr ""
-
+msgstr "Affaldsbeholder til blæk/toner næsten fuld."
 msgid "Ink/toner waste bin full!"
-msgstr ""
-
+msgstr "Affaldsbeholder til blæk/toner fuld!"
 msgid "Interlock open."
-msgstr ""
-
+msgstr "Sikkerhedsafbryder åben."
 msgid "Internal error"
-msgstr ""
-
+msgstr "Intern fejl"
 msgid "JCL"
-msgstr ""
-
-#, c-format
+msgstr "JCL"
 msgid "Job #%d cannot be restarted - no files!"
-msgstr ""
-
-#, c-format
+msgstr "Job #%d kan ikke startes igen - ingen arkiver!"
 msgid "Job #%d does not exist!"
-msgstr ""
-
-#, c-format
+msgstr "Job #%d eksisterer ikke!"
 msgid "Job #%d is already aborted - can't cancel."
-msgstr ""
-
-#, c-format
+msgstr "Job #%d er allerede afbrudt - kan ikke annullere."
 msgid "Job #%d is already canceled - can't cancel."
-msgstr ""
-
-#, c-format
+msgstr "Job #%d er allerede annulleret - kan ikke annullere."
 msgid "Job #%d is already completed - can't cancel."
-msgstr ""
-
-#, c-format
+msgstr "Job #%d er allerede færdigt - kan ikke annullere."
 msgid "Job #%d is finished and cannot be altered!"
-msgstr ""
-
-#, c-format
+msgstr "Job #%d er færdigt og kan ikke ændres!"
 msgid "Job #%d is not complete!"
-msgstr ""
-
-#, c-format
+msgstr "Job #%d er ikke færdigt!"
 msgid "Job #%d is not held for authentication!"
-msgstr ""
-
-#, c-format
+msgstr "Job #%d er ikke udsat til godkendelse!"
 msgid "Job #%d is not held!"
-msgstr ""
-
-#, c-format
+msgstr "Job #%d er ikke udsat!"
 msgid "Job #%s does not exist!"
-msgstr ""
-
-#, c-format
+msgstr "Job #%s eksisterer ikke!"
 msgid "Job %d not found!"
-msgstr ""
-
+msgstr "Job %d findes ikke!"
 msgid "Job Completed"
-msgstr ""
-
+msgstr "Job færdigt"
 msgid "Job Created"
-msgstr ""
-
+msgstr "Job oprettet"
 msgid "Job Options Changed"
-msgstr ""
-
+msgstr "Jobmuligheder ændret"
 msgid "Job Stopped"
-msgstr ""
-
+msgstr "Job stoppet"
 msgid "Job is completed and cannot be changed."
-msgstr ""
-
+msgstr "Job er færdigt og kan ikke ændres."
 msgid "Job operation failed:"
-msgstr ""
-
+msgstr "Jobhandling mislykkedes:"
 msgid "Job state cannot be changed."
-msgstr ""
-
+msgstr "Jobstatus kan ikke ændres."
 msgid "Job subscriptions cannot be renewed!"
-msgstr ""
-
+msgstr "Jobabonnementer kan ikke fornys!"
 msgid "Jobs"
-msgstr ""
-
-#, c-format
+msgstr "Job"
 msgid "Language \"%s\" not supported!"
-msgstr ""
-
+msgstr "Sproget \&quot;%s\&quot; understøttes ikke!"
 msgid "Line longer than the maximum allowed (255 characters)"
-msgstr ""
-
+msgstr "Linje længere end det maksimalt tilladte (255 tegn)"
 msgid "List Available Printers"
-msgstr ""
-
+msgstr "Vis tilgængelige printere"
 msgid "Media Size"
-msgstr ""
-
+msgstr "Mediestørrelse"
 msgid "Media Source"
-msgstr ""
-
+msgstr "Mediekilde"
 msgid "Media Type"
-msgstr ""
-
+msgstr "Medietype"
 msgid "Media jam!"
-msgstr ""
-
+msgstr "Mediestop!"
 msgid "Media tray almost empty."
-msgstr ""
-
+msgstr "Mediebakke næsten tom."
 msgid "Media tray empty!"
-msgstr ""
-
+msgstr "Mediebakke tom!"
 msgid "Media tray missing!"
-msgstr ""
-
+msgstr "Mediebakke mangler!"
 msgid "Media tray needs to be filled."
-msgstr ""
-
+msgstr "Mediebakke skal fyldes op."
 msgid "Memory allocation error"
-msgstr ""
-
+msgstr "Fejl i hukommelsestildeling"
 msgid "Missing PPD-Adobe-4.x header"
-msgstr ""
-
+msgstr "Manglende PPD-Adobe-4.x header"
 msgid "Missing asterisk in column 1"
-msgstr ""
-
-#, c-format
+msgstr "Manglende stjerne i kolonne 1"
 msgid "Missing double quote on line %d!"
-msgstr ""
-
+msgstr "Manglende dobbelt anførselstegn i linje %d!"
 msgid "Missing form variable!"
-msgstr ""
-
+msgstr "Manglende formularvariabel!"
 msgid "Missing notify-subscription-ids attribute!"
-msgstr ""
-
+msgstr "Manglende notify-subscription-ids-egenskab!"
 msgid "Missing requesting-user-name attribute!"
-msgstr ""
-
+msgstr "Manglende requesting-user-name-egenskab!"
 msgid "Missing required attributes!"
-msgstr ""
-
-#, c-format
+msgstr "Manglende nødvendige egenskaber!"
 msgid "Missing value on line %d!"
-msgstr ""
-
+msgstr "Manglende værdi i linje %d!"
 msgid "Missing value string"
-msgstr ""
-
-#, c-format
-msgid ""
-"Model:  name = %s\n"
-"        natural_language = %s\n"
-"        make-and-model = %s\n"
-"        device-id = %s\n"
-msgstr ""
-
+msgstr "Manglende værdistreng"
+msgid "Model:  name = %s\n        natural_language = %s\n        make-and-model = %s\n        device-id = %s\n"
+msgstr "Model:  name = %s\n        natural_language = %s\n        make-and-model = %s\n        device-id = %s\n"
 msgid "Modify Class"
-msgstr ""
-
+msgstr "Rediger klasse"
 msgid "Modify Printer"
-msgstr ""
-
+msgstr "Rediger printer"
 msgid "Move All Jobs"
-msgstr ""
-
+msgstr "Flyt alle job"
 msgid "Move Job"
-msgstr ""
-
-#, c-format
+msgstr "Flyt job"
 msgid "NOTICE: Print file accepted - job ID %d.\n"
-msgstr ""
-
+msgstr "NOTICE: Udskriftsarkiv accepteret - job-id %d.\n"
 msgid "NOTICE: Print file accepted - job ID unknown.\n"
-msgstr ""
-
+msgstr "NOTICE: Udskriftsarkiv accepteret - job-id ukendt.\n"
 msgid "NULL PPD file pointer"
-msgstr ""
-
+msgstr "NULL PPD-arkivmarkør"
 msgid "No"
-msgstr ""
-
+msgstr "Nej"
 msgid "No Windows printer drivers are installed!"
-msgstr ""
-
-#, c-format
+msgstr "Der er ikke installeret nogen Windows-printerdrivere!"
 msgid "No active jobs on %s!"
-msgstr ""
-
+msgstr "Ingen aktive job på %s!"
 msgid "No attributes in request!"
-msgstr ""
-
+msgstr "Ingen egenskaber i anmodning!"
 msgid "No authentication information provided!"
-msgstr ""
-
+msgstr "Ingen godkendelsesoplysninger leveret!"
 msgid "No default printer"
-msgstr ""
-
+msgstr "Ingen standardprinter"
 msgid "No destinations added."
-msgstr ""
-
+msgstr "Ingen destinationer tilføjet."
 msgid "No file!?!"
-msgstr ""
-
+msgstr "Intet arkiv!?!"
 msgid "No subscription attributes in request!"
-msgstr ""
-
+msgstr "Ingen abonnementsegenskaber i anmodning!"
 msgid "No subscriptions found."
-msgstr ""
-
+msgstr "Ingen abonnementer fundet."
 msgid "None"
-msgstr ""
-
+msgstr "Ingen"
 msgid "Not allowed to print."
-msgstr ""
-
+msgstr "Må ikke udskrive."
 msgid "OK"
-msgstr ""
-
+msgstr "OK"
 msgid "OPC almost at end-of-life."
-msgstr ""
-
+msgstr "OPC næsten slidt op."
 msgid "OPC at end-of-life!"
-msgstr ""
-
+msgstr "OPC slidt op!"
 msgid "OpenGroup without a CloseGroup first"
-msgstr ""
-
+msgstr "OpenGroup uden en CloseGroup først"
 msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
-msgstr ""
-
+msgstr "OpenUI/JCLOpenUI uden en CloseUI/JCLCloseUI først"
 msgid "Operation Policy"
-msgstr ""
-
+msgstr "Driftspolitik"
 msgid "Options Installed"
-msgstr ""
-
+msgstr "Ekstraudstyr installeret"
 msgid "Out of toner!"
-msgstr ""
-
+msgstr "Ikke mere toner!"
 msgid "Output Mode"
-msgstr ""
-
+msgstr "Udskriftsfunktion"
 msgid "Output bin almost full."
-msgstr ""
-
+msgstr "Udbakke næsten fuld."
 msgid "Output bin full!"
-msgstr ""
-
-#, c-format
+msgstr "Udbakke fuld!"
 msgid "Output for printer %s is sent to %s\n"
-msgstr ""
-
-#, c-format
+msgstr "Udskrifter til printer %s er sendt til %s\n"
 msgid "Output for printer %s is sent to remote printer %s on %s\n"
-msgstr ""
-
-#, c-format
+msgstr "Udskrifter til printer %s er sendt til ekstern printer %s på %s\n"
 msgid "Output for printer %s/%s is sent to %s\n"
-msgstr ""
-
-#, c-format
+msgstr "Udskrifter til printer %s/%s er sendt til %s\n"
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
-msgstr ""
-
+msgstr "Udskrifter til printer %s/%s er sendt til ekstern printer %s på %s\n"
 msgid "Output tray missing!"
-msgstr ""
-
+msgstr "Udbakke mangler!"
 msgid "PASS\n"
-msgstr ""
-
+msgstr "PASS\n"
 msgid "PS Binary Protocol"
-msgstr ""
-
-#, c-format
+msgstr "PS-binær protokol"
 msgid "Password for %s on %s? "
-msgstr ""
-
-#, c-format
+msgstr "Adgangskode til %s på %s? "
 msgid "Password for %s required to access %s via SAMBA: "
-msgstr ""
-
+msgstr "Adgangskode til %s kræves til adgang til %s via SAMBA: "
 msgid "Policies"
-msgstr ""
-
+msgstr "Politikker"
 msgid "Print Job:"
-msgstr ""
-
+msgstr "Udskriftsjob:"
 msgid "Print Test Page"
-msgstr ""
-
+msgstr "Udskriv testside"
 msgid "Printer Added"
-msgstr ""
-
+msgstr "Printer tilføjet"
 msgid "Printer Deleted"
-msgstr ""
-
+msgstr "Printer slettet"
 msgid "Printer Maintenance"
-msgstr ""
-
+msgstr "Printervedligeholdelse"
 msgid "Printer Modified"
-msgstr ""
-
+msgstr "Printer ændret"
 msgid "Printer Stopped"
-msgstr ""
-
+msgstr "Printer stoppet"
 msgid "Printer off-line."
-msgstr ""
-
+msgstr "Printer passiv."
 msgid "Printer:"
-msgstr ""
-
+msgstr "Printer:"
 msgid "Printers"
-msgstr ""
-
+msgstr "Printere"
 msgid "Purge Jobs"
-msgstr ""
-
+msgstr "Udrens job"
 msgid "Quota limit reached."
-msgstr ""
-
+msgstr "Maks. kvote nået."
 msgid "Rank    Owner   Job     File(s)                         Total Size\n"
-msgstr ""
-
-msgid ""
-"Rank   Owner      Pri  Job        Files                       Total Size\n"
-msgstr ""
-
+msgstr "Grad    Ejer   Job     Arkiv(er)                         Str. i alt\n"
+msgid "Rank   Owner      Pri  Job        Files                       Total Size\n"
+msgstr "Grad   Ejer      Pri  Job        Arkiver                       Str. i alt\n"
 msgid "Reject Jobs"
-msgstr ""
-
+msgstr "Afvis job"
 msgid "Resolution"
-msgstr ""
-
-#, c-format
+msgstr "Opløsning"
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
-msgstr ""
-
+msgstr "Aktiv kommando: %s %s -N -A %s -c '%s'\n"
 msgid "Server Restarted"
-msgstr ""
-
+msgstr "Server startet igen"
 msgid "Server Security Auditing"
-msgstr ""
-
+msgstr "Kontrol af serversikkerhed"
 msgid "Server Started"
-msgstr ""
-
+msgstr "Server startet"
 msgid "Server Stopped"
-msgstr ""
-
+msgstr "Server stoppet"
 msgid "Set Allowed Users"
-msgstr ""
-
+msgstr "Indstil tilladte brugere"
 msgid "Set As Default"
-msgstr ""
-
+msgstr "Indstil som standard"
 msgid "Set Class Options"
-msgstr ""
-
+msgstr "Indstil klassemuligheder"
 msgid "Set Printer Options"
-msgstr ""
-
+msgstr "Indstil printermuligheder"
 msgid "Set Publishing"
-msgstr ""
-
+msgstr "Indstil publicering"
 msgid "Start Class"
-msgstr ""
-
+msgstr "Start klasse"
 msgid "Start Printer"
-msgstr ""
-
+msgstr "Start printer"
 msgid "Starting Banner"
-msgstr ""
-
+msgstr "Starter banner"
 msgid "Stop Class"
-msgstr ""
-
+msgstr "Stop klasse"
 msgid "Stop Printer"
-msgstr ""
-
-#, c-format
+msgstr "Stop printer"
 msgid "The PPD file \"%s\" could not be found."
-msgstr ""
-
-#, c-format
+msgstr "PPD-arkivet \"%s\" findes ikke."
 msgid "The PPD file \"%s\" could not be opened: %s"
-msgstr ""
-
-msgid ""
-"The class name may only contain up to 127 printable characters and may not "
-"contain spaces, slashes (/), or the pound sign (#)."
-msgstr ""
-
-msgid ""
-"The notify-lease-duration attribute cannot be used with job subscriptions."
-msgstr ""
-
-#, c-format
+msgstr "PPD-arkivet \&quot;%s\&quot; kunne ikke åbnes: %s"
+msgid "The class name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
+msgstr "Klassenavnet må kun indeholde op til 127 tegn, der kan udskrives, og må ikke indeholde mellemrum, skråstreger (/) og nummertegnet (#)."
+msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr "Egenskaben notify-lease-duration kan ikke bruges med jobabonnementer."
 msgid "The notify-user-data value is too large (%d > 63 octets)!"
-msgstr ""
-
-msgid ""
-"The printer name may only contain up to 127 printable characters and may not "
-"contain spaces, slashes (/), or the pound sign (#)."
-msgstr ""
-
+msgstr "Værdien for notify-user-data er for stor (%d > 63 oktetter)!"
+msgid "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
+msgstr "Printernavnet må kun indeholde op til 127 tegn, der kan udskrives, og må ikke indeholde mellemrum, skråstreger (/) og nummertegnet (#)."
 msgid "The printer or class is not shared!"
-msgstr ""
-
+msgstr "Printeren eller klassen er ikke delt!"
 msgid "The printer or class was not found."
-msgstr ""
-
-#, c-format
+msgstr "Printeren eller klassen findes ikke."
 msgid "The printer-uri \"%s\" contains invalid characters."
-msgstr ""
-
+msgstr "Printer-uri \"%s\" indeholder ugyldige tegn."
 msgid "The printer-uri attribute is required!"
-msgstr ""
-
-msgid ""
-"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
-msgstr ""
-
-msgid ""
-"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
-msgstr ""
-
-msgid ""
-"The subscription name may not contain spaces, slashes (/), question marks "
-"(?), or the pound sign (#)."
-msgstr ""
-
+msgstr "Egenskaben printer-uri kræves!"
+msgid "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr "Printer-uri skal have formatet \"ipp://VÆRTSNAVN/klasser/KLASSENAVN\"."
+msgid "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgstr "Printer-uri skal have formatet \&quot;ipp://VÆRTSNAVN/printere/PRINTERNAVN\&quot;."
+msgid "The subscription name may not contain spaces, slashes (/), question marks (?), or the pound sign (#)."
+msgstr "Abonnementsnavnet må ikke indeholde mellemrum, skråstreger (/), spørgsmålstegn (?) og nummertegnet (#)."
 msgid "Toner low."
-msgstr ""
-
+msgstr "Toner lav."
 msgid "Too many active jobs."
-msgstr ""
-
+msgstr "For mange aktive job."
 msgid "Unable to access cupsd.conf file:"
-msgstr ""
-
+msgstr "Kan ikke få adgang til arkivet cupsd.conf:"
 msgid "Unable to add RSS subscription:"
-msgstr ""
-
+msgstr "Kan ikke tilføje RSS-abonnement:"
 msgid "Unable to add class:"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke tilføje klasse:"
 msgid "Unable to add job for destination \"%s\"!"
-msgstr ""
-
+msgstr "Kan ikke tilføje job til destinationen \"%s\"!"
 msgid "Unable to add printer:"
-msgstr ""
-
+msgstr "Kan ikke tilføje printer:"
 msgid "Unable to allocate memory for file types!"
-msgstr ""
-
+msgstr "Kan ikke tildele hukommelse til arkivtyper!"
 msgid "Unable to cancel RSS subscription:"
-msgstr ""
-
+msgstr "Kan ikke annullere RSS-abonnement:"
 msgid "Unable to change printer-is-shared attribute:"
-msgstr ""
-
+msgstr "Kan ikke ændre egenskaben printer-is-shared:"
 msgid "Unable to change printer:"
-msgstr ""
-
+msgstr "Kan ikke skifte printer:"
 msgid "Unable to change server settings:"
-msgstr ""
-
-#, c-format
-msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
-msgstr ""
-
-#, c-format
-msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke ændre serverindstillinger:"
 msgid "Unable to copy CUPS printer driver files (%d)!"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke kopiere CUPS-printerarkiver (%d)!"
 msgid "Unable to copy PPD file - %s!"
-msgstr ""
-
+msgstr "Kan ikke kopiere PPD-arkiv - %s!"
 msgid "Unable to copy PPD file!"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke kopiere PPD-arkiv!"
 msgid "Unable to copy Windows 2000 printer driver files (%d)!"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke kopiere Windows 2000-printerarkiver (%d)!"
 msgid "Unable to copy Windows 9x printer driver files (%d)!"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke kopiere Windows 9x-printerarkiver (%d)!"
 msgid "Unable to copy interface script - %s!"
-msgstr ""
-
+msgstr "Kan ikke kopiere grænsefladeinstruks - %s!"
 msgid "Unable to create temporary file:"
-msgstr ""
-
+msgstr "Kan ikke oprette midlertidigt arkiv:"
 msgid "Unable to delete class:"
-msgstr ""
-
+msgstr "Kan ikke slette klasse:"
 msgid "Unable to delete printer:"
-msgstr ""
-
+msgstr "Kan ikke slette printer:"
 msgid "Unable to edit cupsd.conf files larger than 1MB!"
-msgstr ""
-
+msgstr "Kan ikke redigere cupsd.conf-arkiver på mere end 1 MB!"
 msgid "Unable to find destination for job!"
-msgstr ""
-
+msgstr "Kan ikke finde jobbets destination!"
 msgid "Unable to get class list:"
-msgstr ""
-
+msgstr "Kan ikke hente klasseliste:"
 msgid "Unable to get class status:"
-msgstr ""
-
+msgstr "Kan ikke hente klassestatus:"
 msgid "Unable to get list of printer drivers:"
-msgstr ""
-
+msgstr "Kan ikke hente liste over printerarkiver:"
 msgid "Unable to get printer attributes:"
-msgstr ""
-
+msgstr "Kan ikke hente printeregenskaber:"
 msgid "Unable to get printer list:"
-msgstr ""
-
+msgstr "Kan ikke hente printerliste:"
 msgid "Unable to get printer status:"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke hente printerstatus:"
 msgid "Unable to install Windows 2000 printer driver files (%d)!"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke installere Windows 2000-printerarkiver (%d)!"
 msgid "Unable to install Windows 9x printer driver files (%d)!"
-msgstr ""
-
+msgstr "Kan ikke installere Windows 9x-printerarkiver (%d)!"
 msgid "Unable to modify class:"
-msgstr ""
-
+msgstr "Kan ikke ændre klasse:"
 msgid "Unable to modify printer:"
-msgstr ""
-
+msgstr "Kan ikke ændre printer:"
 msgid "Unable to move job"
-msgstr ""
-
+msgstr "Kan ikke flytte job"
 msgid "Unable to move jobs"
-msgstr ""
-
+msgstr "Kan ikke flytte job"
 msgid "Unable to open PPD file"
-msgstr ""
-
+msgstr "Kan ikke åbne PPD-arkiv"
 msgid "Unable to open PPD file:"
-msgstr ""
-
+msgstr "Kan ikke åbne PPD-arkiv:"
 msgid "Unable to open cupsd.conf file:"
-msgstr ""
-
+msgstr "Kan ikke åbne arkivet cupsd.conf:"
 msgid "Unable to print test page:"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke udskrive testside:"
 msgid "Unable to run \"%s\": %s\n"
-msgstr ""
-
+msgstr "Kan ikke afvikle \&quot;%s\&quot;: %s\n"
 msgid "Unable to send maintenance job:"
-msgstr ""
-
-#, c-format
+msgstr "Kan ikke sende vedligholdelsesjob:"
 msgid "Unable to set Windows printer driver (%d)!"
-msgstr ""
-
+msgstr "Kan ikke indstille Windows-printerarkiv (%d)!"
 msgid "Unable to set options:"
-msgstr ""
-
+msgstr "Kan ikke indstille muligheder:"
 msgid "Unable to upload cupsd.conf file:"
-msgstr ""
-
+msgstr "Kan ikke overføre arkivet cupsd.conf:"
 msgid "Unknown"
-msgstr ""
-
-#, c-format
+msgstr "Ukendt"
 msgid "Unknown printer error (%s)!"
-msgstr ""
-
-#, c-format
+msgstr "Ukendt printerfejl (%s)!"
 msgid "Unknown printer-error-policy \"%s\"."
-msgstr ""
-
-#, c-format
+msgstr "Ukendt printer-error-policy \"%s\"."
 msgid "Unknown printer-op-policy \"%s\"."
-msgstr ""
-
-#, c-format
+msgstr "Ukendt printer-op-policy \"%s\"."
 msgid "Unsupported compression \"%s\"!"
-msgstr ""
-
-#, c-format
+msgstr "Ikke understøttet komprimering \"%s\"!"
 msgid "Unsupported compression attribute %s!"
-msgstr ""
-
-#, c-format
+msgstr "Ikke understøttet komprimeringsegenskab %s!"
 msgid "Unsupported format \"%s\"!"
-msgstr ""
-
-#, c-format
+msgstr "Ikke understøttet format \&quot;%s\&quot;!"
 msgid "Unsupported format '%s'!"
-msgstr ""
-
-#, c-format
+msgstr "Ikke understøttet format \&quot;%s\&quot;!"
 msgid "Unsupported format '%s/%s'!"
-msgstr ""
-
-msgid ""
-"Usage:\n"
-"\n"
-"    lpadmin [-h server] -d destination\n"
-"    lpadmin [-h server] -x destination\n"
-"    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n"
-"                       [-r remove-class] [-v device] [-D description]\n"
-"                       [-P ppd-file] [-o name=value]\n"
-"                       [-u allow:user,user] [-u deny:user,user]\n"
-"\n"
-msgstr ""
-
-#, c-format
+msgstr "Ikke understøttet format '%s/%s'!"
+msgid "Usage:\n\n    lpadmin [-h server] -d destination\n    lpadmin [-h server] -x destination\n    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n                       [-r remove-class] [-v device] [-D description]\n                       [-P ppd-file] [-o name=value]\n                       [-u allow:user,user] [-u deny:user,user]\n\n"
+msgstr "Brug:\n\n    lpadmin [-h server] -d destination\n    lpadmin [-h server] -x destination\n    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n                       [-r remove-class] [-v device] [-D description]\n                       [-P ppd-file] [-o name=value]\n                       [-u allow:user,user] [-u deny:user,user]\n\n"
 msgid "Usage: %s job-id user title copies options [file]\n"
-msgstr ""
-
-#, c-format
+msgstr "Brug: %s job-id user title copies options [file]\n"
 msgid "Usage: %s job-id user title copies options file\n"
-msgstr ""
-
-msgid ""
-"Usage: convert [ options ]\n"
-"\n"
-"Options:\n"
-"\n"
-"  -f filename          Set file to be converted (otherwise stdin)\n"
-"  -o filename          Set file to be generated (otherwise stdout)\n"
-"  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
-"  -j mime/type         Set output MIME type (otherwise application/pdf)\n"
-"  -P filename.ppd      Set PPD file\n"
-"  -a 'name=value ...'  Set option(s)\n"
-"  -U username          Set username for job\n"
-"  -J title             Set title\n"
-"  -c copies            Set number of copies\n"
-"  -u                   Remove the PPD file when finished\n"
-"  -D                   Remove the input file when finished\n"
-msgstr ""
-
-msgid ""
-"Usage: cupsaddsmb [options] printer1 ... printerN\n"
-"       cupsaddsmb [options] -a\n"
-"\n"
-"Options:\n"
-"  -E               Encrypt the connection to the server\n"
-"  -H samba-server  Use the named SAMBA server\n"
-"  -U samba-user    Authenticate using the named SAMBA user\n"
-"  -a               Export all printers\n"
-"  -h cups-server   Use the named CUPS server\n"
-"  -v               Be verbose (show commands)\n"
-msgstr ""
-
-msgid ""
-"Usage: cupsctl [options] [param=value ... paramN=valueN]\n"
-"\n"
-"Options:\n"
-"\n"
-"    -E                      Enable encryption\n"
-"    -U username             Specify username\n"
-"    -h server[:port]        Specify server address\n"
-"\n"
-"    --[no-]debug-logging    Turn debug logging on/off\n"
-"    --[no-]remote-admin     Turn remote administration on/off\n"
-"    --[no-]remote-any       Allow/prevent access from the Internet\n"
-"    --[no-]remote-printers  Show/hide remote printers\n"
-"    --[no-]share-printers   Turn printer sharing on/off\n"
-"    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
-msgstr ""
-
-msgid ""
-"Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
-"\n"
-"-c config-file      Load alternate configuration file\n"
-"-f                  Run in the foreground\n"
-"-F                  Run in the foreground but detach\n"
-"-h                  Show this usage message\n"
-"-l                  Run cupsd from launchd(8)\n"
-msgstr ""
-
-msgid ""
-"Usage: cupsfilter -m mime/type [ options ] filename\n"
-"\n"
-"Options:\n"
-"\n"
-"  -c cupsd.conf    Set cupsd.conf file to use\n"
-"  -n copies        Set number of copies\n"
-"  -o name=value    Set option(s)\n"
-"  -p filename.ppd  Set PPD file\n"
-"  -t title         Set title\n"
-msgstr ""
-
-msgid ""
-"Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
-"       cupstestdsc [options] -\n"
-"\n"
-"Options:\n"
-"\n"
-"    -h       Show program usage\n"
-"\n"
-"    Note: this program only validates the DSC comments, not the PostScript "
-"itself.\n"
-msgstr ""
-
-msgid ""
-"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
-"       program | cupstestppd [options] -\n"
-"\n"
-"Options:\n"
-"\n"
-"    -R root-directory    Set alternate root\n"
-"    -W {all,none,constraints,defaults,filters,translations}\n"
-"                         Issue warnings instead of errors\n"
-"    -q                   Run silently\n"
-"    -r                   Use 'relaxed' open mode\n"
-"    -v                   Be slightly verbose\n"
-"    -vv                  Be very verbose\n"
-msgstr ""
-
+msgstr "Brug: %s job-id user title copies options file\n"
+msgid "Usage: cupsaddsmb [options] printer1 ... printerN\n       cupsaddsmb [options] -a\n\nOptions:\n  -E               Encrypt the connection to the server\n  -H samba-server  Use the named SAMBA server\n  -U samba-user    Authenticate using the named SAMBA user\n  -a               Export all printers\n  -h cups-server   Use the named CUPS server\n  -v               Be verbose (show commands)\n"
+msgstr "Brug: cupsaddsmb [options] printer1 ... printerN\n       cupsaddsmb [options] -a\n\nOptions:\n  -E               Krypter forbindelsen til serveren\n  -H samba-server  Brug den navngivne SAMBA-server\n  -U samba-user    Godkend vha. den navngivne SAMBA-bruger\n  -a               Eksporter alle printere\n  -h cups-server   Brug den navngivne CUPS-server\n  -v               Vær detaljeret (vis kommandoer)\n"
+msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]\n\nOptions:\n\n    -E                      Enable encryption\n    -U username             Specify username\n    -h server[:port]        Specify server address\n\n    --[no-]debug-logging    Turn debug logging on/off\n    --[no-]remote-admin     Turn remote administration on/off\n    --[no-]remote-any       Allow/prevent access from the Internet\n    --[no-]remote-printers  Show/hide remote printers\n    --[no-]share-printers   Turn printer sharing on/off\n    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
+msgstr "Brug: cupsctl [options] [param=value ... paramN=valueN]\n\nOptions:\n\n    -E                      Slå kryptering til\n    -U username             Anfør brugernavn\n    -h server[:port]        Anfør serveradresse\n\n    --[no-]debug-logging    Slå fejlfindingslog til/fra\n    --[no-]remote-admin     Slå ekstern administration til/fra\n    --[no-]remote-any       Tillad/afvis adgang fra Internet\n    --[no-]remote-printers  Vis/skjul eksterne printere\n    --[no-]share-printers   Slå printerdeling til/fra\n    --[no-]user-cancel-any  Tillad/forbyd brugere at annullere job\n"
+msgid "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n\n-c config-file      Load alternate configuration file\n-f                  Run in the foreground\n-F                  Run in the foreground but detach\n-h                  Show this usage message\n-l                  Run cupsd from launchd(8)\n"
+msgstr "Brug: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n\n-c config-file      Indlæs alternativ konfigurationsarkiv\n-f                  Afvikl i forgrunden\n-F                  Afvikl i baggrunden, men fjern\n-h                  Vis denne brugsmeddelelse\n-l                  Start cupsd fra startd(8)\n"
+msgid "Usage: cupsfilter -m mime/type [ options ] filename(s)\n\nOptions:\n\n  -c cupsd.conf    Set cupsd.conf file to use\n  -n copies        Set number of copies\n  -o name=value    Set option(s)\n  -p filename.ppd  Set PPD file\n  -t title         Set title\n"
+msgstr "Brug: cupsfilter -m mime/type [ options ] filename(s)\n\nOptions:\n\n  -c cupsd.conf    Indstil cupsd.conf-arkiv til at bruge\n  -n kopier        Indstil antal kopier\n  -o name=value    Indstil mulighed(er)\n  -p filename.ppd  Indstil PPD-arkiv\n  -t title         Indstil titel\n"
+msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n       cupstestdsc [options] -\n\nOptions:\n\n    -h       Show program usage\n\n    Note: this program only validates the DSC comments, not the PostScript itself.\n"
+msgstr "Brug: cupstestdsc [options] filename.ps [... filename.ps]\n       cupstestdsc [options] -\n\nOptions:\n\n    -h       Vis programbrug\n\n    Bemærk: Dette program godkender kun DSC-kommentarer, ikke selve PostScript.\n"
+msgid "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n       program | cupstestppd [options] -\n\nOptions:\n\n    -R root-directory    Set alternate root\n    -W {all,none,constraints,defaults,filters,translations}\n                         Issue warnings instead of errors\n    -q                   Run silently\n    -r                   Use 'relaxed' open mode\n    -v                   Be slightly verbose\n    -vv                  Be very verbose\n"
+msgstr "Brug: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n       program | cupstestppd [options] -\n\nOptions:\n\n    -R root-directory    Indstil alternativ root\n    -W {all,none,constraints,defaults,filters,translations}\n                         Udsted advarsler i stedet for fejl\n    -q                   Afvikl i stilhed\n    -r                   Brug 'relaxed' åben funktion\n    -v                   Vær lidt detaljeret    -vv                  Vær meget detaljeret"
 msgid "Usage: lpmove job/src dest\n"
-msgstr ""
-
-msgid ""
-"Usage: lpoptions [-h server] [-E] -d printer\n"
-"       lpoptions [-h server] [-E] [-p printer] -l\n"
-"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
-"       lpoptions [-h server] [-E] -x printer\n"
-msgstr ""
-
+msgstr "Brug: lpmove job/src dest\n"
+msgid "Usage: lpoptions [-h server] [-E] -d printer\n       lpoptions [-h server] [-E] [-p printer] -l\n       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n       lpoptions [-h server] [-E] -x printer\n"
+msgstr "Brug: lpoptions [-h server] [-E] -d printer\n       lpoptions [-h server] [-E] [-p printer] -l\n       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n       lpoptions [-h server] [-E] -x printer\n"
 msgid "Usage: lppasswd [-g groupname]\n"
-msgstr ""
-
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]\n"
-msgstr ""
-
-msgid ""
-"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
-msgstr ""
-
+msgstr "Brug: lppasswd [-g groupname]\n"
+msgid "Usage: lppasswd [-g groupname] [username]\n       lppasswd [-g groupname] -a [username]\n       lppasswd [-g groupname] -x [username]\n"
+msgstr "Brug: lppasswd [-g groupname] [username]\n       lppasswd [-g groupname] -a [username]\n       lppasswd [-g groupname] -x [username]\n"
+msgid "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
+msgstr "Brug: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
 msgid "Usage: snmp [host-or-ip-address]\n"
-msgstr ""
-
-#, c-format
+msgstr "Brug: snmp [host-or-ip-address]\n"
 msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
-msgstr ""
-
+msgstr "ADVARSEL: Boolesk forventet for muligheden waiteof \"%s\"\n"
 msgid "WARNING: Couldn't create read channel\n"
-msgstr ""
-
+msgstr "ADVARSEL: Kunne ikke oprette læsekanal\n"
 msgid "WARNING: Couldn't create side channel\n"
-msgstr ""
-
+msgstr "ADVARSEL: Kunne ikke oprette sidekanal\n"
 msgid "WARNING: Failed to read side-channel request!\n"
-msgstr ""
-
-#, c-format
+msgstr "ADVARSEL: Kunne ikke læse anmodningen om side-channel!\n"
 msgid "WARNING: Option \"%s\" cannot be included via IncludeFeature!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"WARNING: Remote host did not respond with command status byte after %d "
-"seconds!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"WARNING: Remote host did not respond with control status byte after %d "
-"seconds!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"WARNING: Remote host did not respond with data status byte after %d "
-"seconds!\n"
-msgstr ""
-
-#, c-format
+msgstr "ADVARSEL: Muligheden \"%s\" kan ikke inkluderes via IncludeFeature!\n"
+msgid "WARNING: Remote host did not respond with command status byte after %d seconds!\n"
+msgstr "ADVARSEL: Ekstern vært svarede ikke med kommandostatus-byte efter %d sekunder!\n"
+msgid "WARNING: Remote host did not respond with control status byte after %d seconds!\n"
+msgstr "ADVARSEL: Ekstern vært svarede ikke med kontrolstatus-byte efter %d sekunder!\n"
+msgid "WARNING: Remote host did not respond with data status byte after %d seconds!\n"
+msgstr "ADVARSEL: Ekstern vært svarede ikke med datastatus-byte efter %d sekunder!\n"
 msgid "WARNING: SCSI command timed out (%d); retrying...\n"
-msgstr ""
-
-msgid ""
-"WARNING: This document does not conform to the Adobe Document Structuring "
-"Conventions and may not print correctly!\n"
-msgstr ""
-
-#, c-format
+msgstr "ADVARSEL: Timeout i SCSI-kommando (%d); prøver igen...\n"
+msgid "WARNING: This document does not conform to the Adobe Document Structuring Conventions and may not print correctly!\n"
+msgstr "ADVARSEL: Dette dokument overholder ikke Adobe Document Structuring Conventions og udskrives muligvis ikke korrekt!\n"
 msgid "WARNING: Unknown choice \"%s\" for option \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "ADVARSEL: Ukendt valg \&quot;%s\&quot; til muligheden \&quot;%s\&quot;!\n"
 msgid "WARNING: Unknown option \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "ADVARSEL: Ukendt mulighed \&quot;%s\&quot;!\n"
 msgid "WARNING: Unsupported baud rate %s!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"WARNING: recoverable: Network host '%s' is busy; will retry in %d "
-"seconds...\n"
-msgstr ""
-
+msgstr "ADVARSEL: Ikke understøttet baudhastighed %s!\n"
+msgid "WARNING: recoverable: Network host '%s' is busy; will retry in %d seconds...\n"
+msgstr "ADVARSEL: Kan gendannes: Netværksværten '%s' er i brug; prøver igen om ´%d sekunder...\n"
 msgid "Warning, no Windows 2000 printer drivers are installed!"
-msgstr ""
-
+msgstr "Advarsel - der er ikke installeret nogen Windows 2000-printerarkiver!"
 msgid "Yes"
-msgstr ""
-
-#, c-format
-msgid ""
-"You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
-"s:%d%s</A>."
-msgstr ""
-
+msgstr "Ja"
+msgid "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
+msgstr "Du skal åbne denne side vha. URL-adressen <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
 msgid "aborted"
-msgstr ""
-
+msgstr "afbrudt"
 msgid "canceled"
-msgstr ""
-
+msgstr "annulleret"
 msgid "completed"
-msgstr ""
-
-msgid "convert: Use the -f option to specify a file to convert.\n"
-msgstr ""
-
+msgstr "færdig"
 msgid "cups-deviced failed to execute."
-msgstr ""
-
+msgstr "cups-deviced blev ikke udført."
 msgid "cups-driverd failed to execute."
-msgstr ""
-
-#, c-format
+msgstr "cups-driverd blev ikke udført."
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "cupsaddsmb: Intet PPD-arkiv til printeren \"%s\" - %s\n"
 msgid "cupsctl: Unknown option \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "cupsctl: Ukendt mulighed \&quot;%s\&quot;!\n"
 msgid "cupsctl: Unknown option \"-%c\"!\n"
-msgstr ""
-
+msgstr "cupsctl: Ukendt mulighed \&quot;-%c\&quot;!\n"
 msgid "cupsd: Expected config filename after \"-c\" option!\n"
-msgstr ""
-
-#, c-format
+msgstr "cupsd: Forventede config-arkivnavn efter muligheden \"-c\"!\n"
 msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
-msgstr ""
-
-#, c-format
+msgstr "cupsd: Ukendt argument \&quot;%s\&quot; - afbryder!\n"
 msgid "cupsd: Unknown option \"%c\" - aborting!\n"
-msgstr ""
-
+msgstr "cupsd: Ukendt mulighed \&quot;%c\&quot; - afbryder!\n"
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
-msgstr ""
-
+msgstr "cupsd: launchd(8)-understøttelse ikke medkompileret, afvikles i normal funktion.\n"
+msgid "cupsfilter: No filter to convert from %s/%s to %s/%s!\n"
+msgstr "cupsfilter: Intet filter at konvertere fra %s/%s til %s/%s!\n"
 msgid "cupsfilter: Only one filename can be specified!\n"
-msgstr ""
-
+msgstr "cupsfilter: Der kan kun anføres et arkivnavn!\n"
+msgid "cupsfilter: Unable to determine MIME type of \"%s\"!\n"
+msgstr "cupsfilter: Kan ikke bestemme MIME-typen på \"%s\"!\n"
+msgid "cupsfilter: Unable to read MIME database from \"%s\"!\n"
+msgstr "cupsfilter: Kan ikke læse MIME-databasen på \&quot;%s\&quot;!\n"
+msgid "cupsfilter: Unknown destination MIME type %s/%s!\n"
+msgstr "cupsfilter: Ukendt destination på MIME-typen \&quot;%s/%s\&quot;!\n"
 msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
-msgstr ""
-
+msgstr "cupstestppd: Muligheden -q er inkompatibel med muligheden -v.\n"
 msgid "cupstestppd: The -v option is incompatible with the -q option.\n"
-msgstr ""
-
-#, c-format
+msgstr "cupstestppd: Muligheden -v er inkompatibel med muligheden -q.\n"
 msgid "device for %s/%s: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "enhed til %s/%s: %s\n"
 msgid "device for %s: %s\n"
-msgstr ""
-
+msgstr "enhed til %s: %s\n"
 msgid "held"
-msgstr ""
-
+msgstr "udsat"
 msgid "help\t\tget help on commands\n"
-msgstr ""
-
+msgstr "hjælp\t\tfå hjælp til kommandoer"
 msgid "idle"
-msgstr ""
-
+msgstr "ledig"
 msgid "job-printer-uri attribute missing!"
-msgstr ""
-
+msgstr "egenskaben job-printer-uri mangler!"
 msgid "lpadmin: Class name can only contain printable characters!\n"
-msgstr ""
-
+msgstr "lpadmin: Klassenavn må kun indeholde tegn, der kan udskrives!\n"
 msgid "lpadmin: Expected PPD after '-P' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede PPD efter muligheden '-P'!\n"
 msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede allow/deny:userlist efter muligheden '-u'!\n"
 msgid "lpadmin: Expected class after '-r' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede klasse efter muligheden &aops;-r&aops;!\n"
 msgid "lpadmin: Expected class name after '-c' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede klassenavn efter muligheden &aops;-c&aops;!\n"
 msgid "lpadmin: Expected description after '-D' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede beskrivelse efter muligheden &aops;-D&aops;!\n"
 msgid "lpadmin: Expected device URI after '-v' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede device URI efter muligheden '-v'!\n"
 msgid "lpadmin: Expected file type(s) after '-I' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede arkivtype(r) efter muligheden '-I'!\n"
 msgid "lpadmin: Expected hostname after '-h' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede værtsnavn efter muligheden &aops;-h&aops;!\n"
 msgid "lpadmin: Expected interface after '-i' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede grænseflade efter muligheden &aops;-i&aops;!\n"
 msgid "lpadmin: Expected location after '-L' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede placering efter muligheden &aops;-L&aops;!\n"
 msgid "lpadmin: Expected model after '-m' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede model efter muligheden &aops;-m&aops;!\n"
 msgid "lpadmin: Expected name=value after '-o' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede navn=værdi efter muligheden &aops;-o&aops;!\n"
 msgid "lpadmin: Expected printer after '-p' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede printer efter muligheden &aops;-p&aops;!\n"
 msgid "lpadmin: Expected printer name after '-d' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede printernavn efter muligheden &aops;-d&aops;!\n"
 msgid "lpadmin: Expected printer or class after '-x' option!\n"
-msgstr ""
-
+msgstr "lpadmin: Forventede printer eller klasse efter muligheden '-x'!\n"
 msgid "lpadmin: No member names were seen!\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Ingen medlemsnavne set!\n"
 msgid "lpadmin: Printer %s is already a member of class %s.\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Printeren %s er allerede medlem af klassen %s.\n"
 msgid "lpadmin: Printer %s is not a member of class %s.\n"
-msgstr ""
-
+msgstr "lpadmin: Printeren %s er ikke medlem af klassen %s.\n"
 msgid "lpadmin: Printer name can only contain printable characters!\n"
-msgstr ""
-
-msgid ""
-"lpadmin: Unable to add a printer to the class:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Printernavn må kun indeholde tegn, der kan udskrives!\n"
+msgid "lpadmin: Unable to add a printer to the class:\n         You must specify a printer name first!\n"
+msgstr "lpadmin: Kan ikke føje en printer til klassen:\n         Du skal angive et printernavn først!\n"
 msgid "lpadmin: Unable to connect to server: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Kan ikke oprette forbindelse til server: %s\n"
 msgid "lpadmin: Unable to create temporary file - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Kan ikke oprette midlertidigt arkiv - %s\n"
 msgid "lpadmin: Unable to create temporary file: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Kan ikke oprette midlertidigt arkiv: %s\n"
 msgid "lpadmin: Unable to open PPD file \"%s\" - %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Kan ikke åbne PPD-arkivet \&quot;%s\&quot; - %s\n"
 msgid "lpadmin: Unable to open file \"%s\": %s\n"
-msgstr ""
-
-msgid ""
-"lpadmin: Unable to remove a printer from the class:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-
-msgid ""
-"lpadmin: Unable to set the PPD file:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-
-msgid ""
-"lpadmin: Unable to set the device URI:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-
-msgid ""
-"lpadmin: Unable to set the interface script or PPD file:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-
-msgid ""
-"lpadmin: Unable to set the interface script:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-
-msgid ""
-"lpadmin: Unable to set the printer description:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-
-msgid ""
-"lpadmin: Unable to set the printer location:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-
-msgid ""
-"lpadmin: Unable to set the printer options:\n"
-"         You must specify a printer name first!\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Kan ikke åbne arkivet \&quot;%s\&quot;: %s\n"
+msgid "lpadmin: Unable to remove a printer from the class:\n         You must specify a printer name first!\n"
+msgstr "lpadmin: Kan ikke fjerne en printer fra klassen:\n         Du skal angive et printernavn først!\n"
+msgid "lpadmin: Unable to set the PPD file:\n         You must specify a printer name first!\n"
+msgstr "lpadmin: Kan ikke indstille PPD-arkivet:\n         Du skal angive et printernavn først!\n"
+msgid "lpadmin: Unable to set the device URI:\n         You must specify a printer name first!\n"
+msgstr "lpadmin: Kan ikke indstille device URI:\n         Du skal angive et printernavn først!\n"
+msgid "lpadmin: Unable to set the interface script or PPD file:\n         You must specify a printer name first!\n"
+msgstr "lpadmin: Kan ikke indstille grænsefladeinstruksen eller PPD-arkivet:\n         Du skal angive et printernavn først!\n"
+msgid "lpadmin: Unable to set the interface script:\n         You must specify a printer name first!\n"
+msgstr "lpadmin: Kan ikke indstille grænsefladeinstruksen:\n         Du skal angive et printernavn først!\n"
+msgid "lpadmin: Unable to set the printer description:\n         You must specify a printer name first!\n"
+msgstr "lpadmin: Kan ikke indstille printerbeskrivelsen:\n         Du skal angive et printernavn først!\n"
+msgid "lpadmin: Unable to set the printer location:\n         You must specify a printer name first!\n"
+msgstr "lpadmin: Kan ikke indstille printerplaceringen:\n         Du skal angive et printernavn først!\n"
+msgid "lpadmin: Unable to set the printer options:\n         You must specify a printer name first!\n"
+msgstr "lpadmin: Kan ikke indstille printermulighederne:\n         Du skal angive et printernavn først!\n"
 msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Ukendt mulighed for tillad/afvis \"%s\"!\n"
 msgid "lpadmin: Unknown argument '%s'!\n"
-msgstr ""
-
-#, c-format
+msgstr "lpadmin: Ukendt argument \&quot;%s\&quot;!\n"
 msgid "lpadmin: Unknown option '%c'!\n"
-msgstr ""
-
+msgstr "lpadmin: Ukendt mulighed &aops;%c&aops;!\n"
 msgid "lpadmin: Warning - content type list ignored!\n"
-msgstr ""
-
+msgstr "lpadmin: Advarsel - listen indholdstype ignoreret!\n"
 msgid "lpc> "
-msgstr ""
-
-#, c-format
+msgstr "lpc> "
 msgid "lpinfo: Unable to connect to server: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lpinfo: Kan ikke oprette forbindelse til server: %s\n"
 msgid "lpinfo: Unknown argument '%s'!\n"
-msgstr ""
-
-#, c-format
+msgstr "lpinfo: Ukendt argument \&quot;%s\&quot;!\n"
 msgid "lpinfo: Unknown option '%c'!\n"
-msgstr ""
-
-#, c-format
+msgstr "lpinfo: Ukendt mulighed &aops;%c&aops;!\n"
 msgid "lpmove: Unable to connect to server: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lpmove: Kan ikke oprette forbindelse til server: %s\n"
 msgid "lpmove: Unknown argument '%s'!\n"
-msgstr ""
-
-#, c-format
+msgstr "lpmove: Ukendt argument \&quot;%s\&quot;!\n"
 msgid "lpmove: Unknown option '%c'!\n"
-msgstr ""
-
+msgstr "lpmove: Ukendt mulighed &aops;%c&aops;!\n"
 msgid "lpoptions: No printers!?!\n"
-msgstr ""
-
-#, c-format
+msgstr "lpoptions: Ingen printere!?!\n"
 msgid "lpoptions: Unable to add printer or instance: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lpoptions: Kan ikke tilføje printer eller tilfælde: %s\n"
 msgid "lpoptions: Unable to get PPD file for %s: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lpoptions: Kan ikke hente PPD-arkivet til &quot;%s&quot;: %s\n"
 msgid "lpoptions: Unable to open PPD file for %s!\n"
-msgstr ""
-
+msgstr "lpoptions: Kan ikke åbne PPD-arkivet til %s!\n"
 msgid "lpoptions: Unknown printer or class!\n"
-msgstr ""
-
+msgstr "lpoptions: Ukendt printer eller klasse!\n"
 msgid "lppasswd: Only root can add or delete passwords!\n"
-msgstr ""
-
+msgstr "lppasswd: Det er kun root, der må tilføje og slette adgangskoder!\n"
 msgid "lppasswd: Password file busy!\n"
-msgstr ""
-
+msgstr "lppasswd: Adgangskodearkiv i brug!\n"
 msgid "lppasswd: Password file not updated!\n"
-msgstr ""
-
+msgstr "lppasswd: Adgangskodearkiv ikke opdateret!\n"
 msgid "lppasswd: Sorry, password doesn't match!\n"
-msgstr ""
-
-msgid ""
-"lppasswd: Sorry, password rejected.\n"
-"Your password must be at least 6 characters long, cannot contain\n"
-"your username, and must contain at least one letter and number.\n"
-msgstr ""
-
+msgstr "lppasswd: Beklager, adgangskoderne er ikke de samme!\n"
+msgid "lppasswd: Sorry, password rejected.\nYour password must be at least 6 characters long, cannot contain\nyour username, and must contain at least one letter and number.\n"
+msgstr "lppasswd: Beklager, adgangskode afvist. Adgangskoden skal bestå af mindst 6 tegn, må ikke indeholde dit brugernavn og skal indeholde mindst et bogstav og et tal.\n"
 msgid "lppasswd: Sorry, passwords don't match!\n"
-msgstr ""
-
-#, c-format
+msgstr "lppasswd: Beklager, adgangskoderne er ikke de samme!\n"
 msgid "lppasswd: Unable to copy password string: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lppasswd: Kan ikke kopiere adgangskodestreng: %s\n"
 msgid "lppasswd: Unable to open password file: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lppasswd: Kan ikke åbne adgangskodearkiv: %s\n"
 msgid "lppasswd: Unable to write to password file: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lppasswd: Kan ikke skrive til adgangskodearkiv: %s\n"
 msgid "lppasswd: failed to backup old password file: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lppasswd: kunne ikke sikkerhedskopiere gammelt adgangskodearkiv: %s\n"
 msgid "lppasswd: failed to rename password file: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "lppasswd: kunne ikke omdøbe adgangskodearkiv: %s\n"
 msgid "lppasswd: user \"%s\" and group \"%s\" do not exist.\n"
-msgstr ""
-
+msgstr "lppasswd: brugeren \"%s\" og gruppen \"%s\" findes ikke.\n"
 msgid "lprm: Unable to contact server!\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"lpstat: error - %s environment variable names non-existent destination \"%s"
-"\"!\n"
-msgstr ""
-
-#, c-format
+msgstr "lprm: Kan ikke kontakte server!\n"
+msgid "lpstat: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr "lpstat: Fejl - %s-miljøvariabel navngiver ikke eksisterende destination \&quot;%s\&quot;!\n"
 msgid "members of class %s:\n"
-msgstr ""
-
+msgstr "medlemmer af klassen %s:\n"
 msgid "no entries\n"
-msgstr ""
-
+msgstr "ingen optegnelser"
 msgid "no system default destination\n"
-msgstr ""
-
+msgstr "ingen standarddestination til system"
 msgid "notify-events not specified!"
-msgstr ""
-
-#, c-format
+msgstr "notify-events ikke anført!"
 msgid "notify-recipient-uri URI \"%s\" uses unknown scheme!"
-msgstr ""
-
-#, c-format
+msgstr "notify-recipient-uri URI \"%s\" bruger ukendt skema!"
 msgid "notify-subscription-id %d no good!"
-msgstr ""
-
-#, c-format
+msgstr "notify-subscription-id %d ikke i orden!"
 msgid "open of %s failed: %s"
-msgstr ""
-
+msgstr "åbning af %s mislykkedes: %s"
 msgid "pending"
-msgstr ""
-
-#, c-format
+msgstr "afventer"
 msgid "printer %s disabled since %s -\n"
-msgstr ""
-
-#, c-format
+msgstr "printeren %s slået fra siden %s -\n"
 msgid "printer %s is idle.  enabled since %s\n"
-msgstr ""
-
-#, c-format
+msgstr "printeren %s er ledig.  Slået til siden %s\n"
 msgid "printer %s now printing %s-%d.  enabled since %s\n"
-msgstr ""
-
-#, c-format
+msgstr "printeren %s udskriver nu %s-%d.  Slået til siden %s\n"
 msgid "printer %s/%s disabled since %s -\n"
-msgstr ""
-
-#, c-format
+msgstr "printeren %s/%s slået fra siden %s -\n"
 msgid "printer %s/%s is idle.  enabled since %s\n"
-msgstr ""
-
-#, c-format
+msgstr "printeren %s/%s er ledig.  Slået til siden %s\n"
 msgid "printer %s/%s now printing %s-%d.  enabled since %s\n"
-msgstr ""
-
+msgstr "printeren %s/%s udskriver nu %s-%d.  Slået til siden %s\n"
 msgid "processing"
-msgstr ""
-
-#, c-format
+msgstr "behandler"
 msgid "request id is %s-%d (%d file(s))\n"
-msgstr ""
-
+msgstr "anmodnings-id er %s-%d (%d arkiv(er))\n"
 msgid "scheduler is not running\n"
-msgstr ""
-
+msgstr "planlægger er ikke aktiv\n"
 msgid "scheduler is running\n"
-msgstr ""
-
-#, c-format
+msgstr "planlægger er aktiv\n"
 msgid "stat of %s failed: %s"
-msgstr ""
-
+msgstr "stat af %s mislykkedes: %s"
 msgid "status\t\tshow status of daemon and queue\n"
-msgstr ""
-
+msgstr "status\t\tvis status for daemon og kø\n"
 msgid "stopped"
-msgstr ""
-
-#, c-format
+msgstr "stoppet"
 msgid "system default destination: %s\n"
-msgstr ""
-
-#, c-format
+msgstr "standarddestination til system: %s\n"
 msgid "system default destination: %s/%s\n"
-msgstr ""
-
+msgstr "standarddestination til system: %s/%s\n"
 msgid "unknown"
-msgstr ""
-
+msgstr "ukendt"
 msgid "untitled"
-msgstr ""
+msgstr "uden navn"

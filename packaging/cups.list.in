@@ -403,6 +403,7 @@ f 0644 root sys $LOCALEDIR/no/cups_no.po locale/cups_no.po
 f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
 %subpackage pt
 f 0644 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
+f 0644 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
 f 0644 root sys $LOCALEDIR/pt_PT/cups_pt_PT.po locale/cups_pt_PT.po
 %subpackage ru
 f 0644 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
