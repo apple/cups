@@ -366,7 +366,12 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
                   con->uri, con->best, con->best ? con->best->location : "");
 
   if (con->best && con->best->type != AUTH_NONE)
-    type = con->best->type;
+  {
+    if (con->best->type == AUTH_DEFAULT)
+      type = DefaultAuthType;
+    else
+      type = con->best->type;
+  }
   else if (!strncmp(con->uri, "/printers/", 10) ||
            !strncmp(con->uri, "/classes/", 9))
   {

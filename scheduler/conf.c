@@ -1003,7 +1003,7 @@ cupsdReadConfiguration(void)
 
       po = cupsdAddPolicyOp(p, NULL, IPP_PAUSE_PRINTER);
       po->order_type = AUTH_ALLOW;
-      po->type       = DefaultAuthType;
+      po->type       = AUTH_DEFAULT;
       po->level      = AUTH_USER;
 
       cupsdAddName(po, "@SYSTEM");
@@ -1706,7 +1706,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     }
     else if (!strcasecmp(value, "default"))
     {
-      loc->type = DefaultAuthType;
+      loc->type = AUTH_DEFAULT;
 
       if (loc->level == AUTH_ANON)
 	loc->level = AUTH_USER;

@@ -1,9 +1,12 @@
-CHANGES.txt - 2007-08-03
+CHANGES.txt - 2007-08-08
 ------------------------
 
 
 CHANGES IN CUPS V1.3.0
 
+	- "AuthType Default" did not work as expected when the
+	  "DefaultAuthType foo" line appeared after it in the
+	  cupsd.conf file.
 	- The on-line help did not describe many common printing
 	  options (STR #1846)
 	- The IPP backend did not return the "auth required" status

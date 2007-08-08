@@ -25,6 +25,7 @@
  * HTTP authorization types and levels...
  */
 
+#define AUTH_DEFAULT		-1	/* Use DefaultAuthType */
 #define AUTH_NONE		0	/* No authentication */
 #define AUTH_BASIC		1	/* Basic authentication */
 #define AUTH_DIGEST		2	/* Digest authentication */

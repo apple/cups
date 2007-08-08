@@ -2392,7 +2392,7 @@ cupsdSendHeader(
   {
     if (auth_type == AUTH_NONE)
     {
-      if (!con->best || con->best->type == AUTH_NONE)
+      if (!con->best || con->best->type <= AUTH_NONE)
 	auth_type = DefaultAuthType;
       else
 	auth_type = con->best->type;
