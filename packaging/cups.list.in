@@ -125,6 +125,9 @@
 %subpackage ko
 %description Korean support
 
+%subpackage nl
+%description Dutch support
+
 %subpackage no
 %description Norwegian support
 
@@ -397,6 +400,8 @@ f 0644 root sys $LOCALEDIR/it/cups_it.po locale/cups_it.po
 f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
 %subpackage ko
 f 0644 root sys $LOCALEDIR/ko/cups_ko.po locale/cups_ko.po
+%subpackage nl
+f 0644 root sys $LOCALEDIR/nl/cups_nl.po locale/cups_nl.po
 %subpackage no
 f 0644 root sys $LOCALEDIR/no/cups_no.po locale/cups_no.po
 %subpackage pl

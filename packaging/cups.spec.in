@@ -117,6 +117,11 @@ Summary: Common UNIX Printing System - Korean support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version}
 
+%package nl
+Summary: Common UNIX Printing System - Dutch support
+Group: System Environment/Daemons
+Requires: %{name} = %{epoch}:%{version}
+
 %package no
 Summary: Common UNIX Printing System - Nowegian support
 Group: System Environment/Daemons
@@ -213,6 +218,10 @@ UNIX® operating systems. This package provides Japanese support.
 %description ko
 The Common UNIX Printing System provides a portable printing layer for 
 UNIX® operating systems. This package provides Korean support.
+
+%description nl
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX® operating systems. This package provides Dutch support.
 
 %description no
 The Common UNIX Printing System provides a portable printing layer for 
@@ -560,6 +569,10 @@ rm -rf $RPM_BUILD_ROOT
 %files ko
 %defattr(-,root,root)
 /usr/share/locale/ko/cups_ko.po
+
+%files nl
+%defattr(-,root,root)
+/usr/share/locale/nl/cups_nl.po
 
 %files no
 %defattr(-,root,root)
