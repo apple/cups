@@ -978,33 +978,10 @@ main(int  argc,				/* I - Number of command-line args */
                     "Scheduler shutting down due to program error.");
 
  /*
-  * Close all network clients and stop all jobs...
+  * Close all network clients...
   */
 
   cupsdStopServer();
-
-  cupsdFreeAllJobs();
-
-#ifdef __APPLE__
-  cupsdStopSystemMonitor();
-#endif /* __APPLE__ */
-
-#ifdef HAVE_GSSAPI
-#  ifdef __APPLE__
- /*
-  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
-  * to use it...
-  */
-
-  if (krb5_init_context != NULL)
-#  endif /* __APPLE__ */
-
- /*
-  * Free the scheduler's Kerberos context...
-  */
-
-  krb5_free_context(KerberosContext);
-#endif /* HAVE_GSSAPI */
 
 #ifdef HAVE_LAUNCHD
  /*
@@ -1014,6 +991,36 @@ main(int  argc,				/* I - Number of command-line args */
   if (Launchd)
     launchd_checkout();
 #endif /* HAVE_LAUNCHD */
+
+ /*
+  * Stop all jobs...
+  */
+
+  cupsdFreeAllJobs();
+
+#ifdef __APPLE__
+ /*
+  * Stop monitoring system event monitoring...
+  */
+
+  cupsdStopSystemMonitor();
+#endif /* __APPLE__ */
+
+#ifdef HAVE_GSSAPI
+ /*
+  * Free the scheduler's Kerberos context...
+  */
+
+#  ifdef __APPLE__
+ /*
+  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+  * to use it...
+  */
+
+  if (krb5_init_context != NULL)
+#  endif /* __APPLE__ */
+  krb5_free_context(KerberosContext);
+#endif /* HAVE_GSSAPI */
 
 #ifdef __APPLE__
 #ifdef HAVE_DLFCN_H
