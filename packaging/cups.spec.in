@@ -353,7 +353,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/lib/cups
 %dir /usr/lib/cups/backend
 /usr/lib/cups/backend/http
-/usr/lib/cups/backend/ipp
+%attr(0700,root,root) /usr/lib/cups/backend/ipp
 %attr(0700,root,root) /usr/lib/cups/backend/lpd
 /usr/lib/cups/backend/parallel
 /usr/lib/cups/backend/scsi
