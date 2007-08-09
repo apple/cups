@@ -684,9 +684,9 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Load PPDs from LSB-defined locations...
   */
 
-  load_ppds("/usr/local/share/ppds", "lsb/local", 1);
-  load_ppds("/usr/share/ppds", "lsb/usr", 1);
-  load_ppds("/opt/share/ppds", "lsb/opt", 1);
+  load_ppds("/usr/local/share/ppd", "lsb/local", 1);
+  load_ppds("/usr/share/ppd", "lsb/usr", 1);
+  load_ppds("/opt/share/ppd", "lsb/opt", 1);
 #endif /* __APPLE__ */
 
  /*

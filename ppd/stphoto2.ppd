@@ -14,13 +14,14 @@
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "STPHOTO2.PPD"
-*Product: "(GNU Ghostscript)"
 *Product: "(ESP Ghostscript)"
+*Product: "(GPL Ghostscript)"
 *Manufacturer: "Epson"
 *ModelName: "Epson New Stylus Photo Series"
 *ShortNickName: "Epson New Stylus Photo Series"
 *NickName: "Epson New Stylus Photo Series, 1.3"
-*PSVersion: "(3010.000) 81501"
+*PSVersion: "(3010.000) 81504"
+*PSVersion: "(3010.000) 860"
 *LanguageLevel: "3"
 *ColorDevice: True
 *DefaultColorSpace: RGB
@@ -29,13 +30,13 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*Product: "(GNU Ghostscript)"
 *Product: "(ESP Ghostscript)"
+*Product: "(GPL Ghostscript)"
 *cupsVersion: 1.3
 *cupsModelNumber: 5
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-raster 50 rastertoepson"
-*cupsLanguages: "da de es fi fr it ja ko no pt sv zh zh_TW"
+*cupsLanguages: "da de es fi fr it ja ko no pt pt_PT sv zh zh_TW"
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: Letter
@@ -287,6 +288,25 @@
 *pt.Translation ColorModel/Modo Cor: ""
 *pt.ColorModel CMYK/CMYK: ""
 *pt.ColorModel Gray/Grayscale: ""
+*pt_PT.Translation Manufacturer/Epson: ""
+*pt_PT.Translation ModelName/Epson New Stylus Photo Series: ""
+*pt_PT.Translation ShortNickName/Epson New Stylus Photo Series: ""
+*pt_PT.Translation NickName/Epson New Stylus Photo Series, 1.3: ""
+*pt_PT.Translation PageSize/Media Size: ""
+*pt_PT.PageSize Letter/Letter - 8.5x11in: ""
+*pt_PT.PageSize Legal/Legal - 8.5x14in: ""
+*pt_PT.PageSize A4/A4 - 210x297mm: ""
+*pt_PT.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*pt_PT.PageSize Letter/Letter - 8.5x11in: ""
+*pt_PT.PageSize Legal/Legal - 8.5x14in: ""
+*pt_PT.PageSize A4/A4 - 210x297mm: ""
+*pt_PT.Translation Resolution/Resolution: ""
+*pt_PT.Resolution 180dpi/180dpi: ""
+*pt_PT.Resolution 360dpi/360dpi: ""
+*pt_PT.Resolution 720dpi/720dpi: ""
+*pt_PT.Translation ColorModel/Modo Cor: ""
+*pt_PT.ColorModel CMYK/CMYK: ""
+*pt_PT.ColorModel Gray/Grayscale: ""
 *sv.Translation Manufacturer/Epson: ""
 *sv.Translation ModelName/Epson New Stylus Photo Series: ""
 *sv.Translation ShortNickName/Epson New Stylus Photo Series: ""
@@ -380,4 +400,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of STPHOTO2.PPD, 17559 bytes.
+*% End of STPHOTO2.PPD, 18445 bytes.

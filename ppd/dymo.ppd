@@ -14,13 +14,14 @@
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "DYMO.PPD"
-*Product: "(GNU Ghostscript)"
 *Product: "(ESP Ghostscript)"
+*Product: "(GPL Ghostscript)"
 *Manufacturer: "Dymo"
 *ModelName: "Dymo Label Printer"
 *ShortNickName: "Dymo Label Printer"
 *NickName: "Dymo Label Printer, 1.3"
-*PSVersion: "(3010.000) 81501"
+*PSVersion: "(3010.000) 81504"
+*PSVersion: "(3010.000) 860"
 *LanguageLevel: "3"
 *ColorDevice: False
 *DefaultColorSpace: Gray
@@ -29,13 +30,13 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*Product: "(GNU Ghostscript)"
 *Product: "(ESP Ghostscript)"
+*Product: "(GPL Ghostscript)"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: False
 *cupsFilter: "application/vnd.cups-raster 50 rastertolabel"
-*cupsLanguages: "da de es fi fr it ja ko no pt sv zh zh_TW"
+*cupsLanguages: "da de es fi fr it ja ko no pt pt_PT sv zh zh_TW"
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: w81h252
@@ -328,6 +329,29 @@
 *pt.cupsDarkness Medium/Medium: ""
 *pt.cupsDarkness Normal/Normal: ""
 *pt.cupsDarkness Dark/Dark: ""
+*pt_PT.Translation Manufacturer/Dymo: ""
+*pt_PT.Translation ModelName/Dymo Label Printer: ""
+*pt_PT.Translation ShortNickName/Dymo Label Printer: ""
+*pt_PT.Translation NickName/Dymo Label Printer, 1.3: ""
+*pt_PT.Translation PageSize/Media Size: ""
+*pt_PT.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
+*pt_PT.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
+*pt_PT.PageSize w54h144/Return Address - 3/4x2in: ""
+*pt_PT.PageSize w167h288/Shipping Address - 2 5/16x4in: ""
+*pt_PT.PageSize w162h540/Internet Postage 2-Part - 2 1/4x7 1/2in: ""
+*pt_PT.PageSize w162h504/Internet Postage 3-Part - 2 1/4x7in: ""
+*pt_PT.PageSize w41h248/File Folder - 9/16x3 7/16in: ""
+*pt_PT.PageSize w41h144/Hanging Folder - 9/16x2in: ""
+*pt_PT.PageSize w153h198/3.5" Disk - 2 1/8x2 3/4in: ""
+*pt_PT.Translation Resolution/Resolution: ""
+*pt_PT.Resolution 136dpi/136dpi: ""
+*pt_PT.Resolution 203dpi/203dpi: ""
+*pt_PT.Resolution 300dpi/300dpi: ""
+*pt_PT.Translation cupsDarkness/Darkness: ""
+*pt_PT.cupsDarkness Light/Light: ""
+*pt_PT.cupsDarkness Medium/Medium: ""
+*pt_PT.cupsDarkness Normal/Normal: ""
+*pt_PT.cupsDarkness Dark/Dark: ""
 *sv.Translation Manufacturer/Dymo: ""
 *sv.Translation ModelName/Dymo Label Printer: ""
 *sv.Translation ShortNickName/Dymo Label Printer: ""
@@ -433,4 +457,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of DYMO.PPD, 21501 bytes.
+*% End of DYMO.PPD, 22651 bytes.

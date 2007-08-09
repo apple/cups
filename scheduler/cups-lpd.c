@@ -597,45 +597,47 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 
     name = dest;
   }
-
- /*
-  * Get values from the response...
-  */
-
-  if (accepting)
+  else
   {
-    if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
-				 IPP_TAG_BOOLEAN)) == NULL)
-      syslog(LOG_ERR, "No printer-is-accepting-jobs attribute found in "
-		      "response from server!");
-    else
-      *accepting = attr->values[0].boolean;
-  }
+   /*
+    * Get values from the response...
+    */
 
-  if (shared)
-  {
-    if ((attr = ippFindAttribute(response, "printer-is-shared",
-				 IPP_TAG_BOOLEAN)) == NULL)
+    if (accepting)
     {
-      syslog(LOG_ERR, "No printer-is-shared attribute found in "
-		      "response from server!");
-      *shared = 1;
+      if ((attr = ippFindAttribute(response, "printer-is-accepting-jobs",
+				   IPP_TAG_BOOLEAN)) == NULL)
+	syslog(LOG_ERR, "No printer-is-accepting-jobs attribute found in "
+			"response from server!");
+      else
+	*accepting = attr->values[0].boolean;
     }
-    else
-      *shared = attr->values[0].boolean;
-  }
 
-  if (state)
-  {
-    if ((attr = ippFindAttribute(response, "printer-state",
-				 IPP_TAG_ENUM)) == NULL)
-      syslog(LOG_ERR, "No printer-state attribute found in "
-		      "response from server!");
-    else
-      *state = (ipp_pstate_t)attr->values[0].integer;
-  }
+    if (shared)
+    {
+      if ((attr = ippFindAttribute(response, "printer-is-shared",
+				   IPP_TAG_BOOLEAN)) == NULL)
+      {
+	syslog(LOG_ERR, "No printer-is-shared attribute found in "
+			"response from server!");
+	*shared = 1;
+      }
+      else
+	*shared = attr->values[0].boolean;
+    }
 
-  ippDelete(response);
+    if (state)
+    {
+      if ((attr = ippFindAttribute(response, "printer-state",
+				   IPP_TAG_ENUM)) == NULL)
+	syslog(LOG_ERR, "No printer-state attribute found in "
+			"response from server!");
+      else
+	*state = (ipp_pstate_t)attr->values[0].integer;
+    }
+
+    ippDelete(response);
+  }
 
  /*
   * Override shared value for LPD using system-specific APIs...

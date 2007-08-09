@@ -228,6 +228,9 @@ main(int  argc,				/* I - Number of command-line args */
   cups_option_t	*options;		/* Print options */
   char		line[8192];		/* Line buffer */
   size_t	len;			/* Length of line buffer */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*

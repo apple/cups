@@ -1,13 +1,26 @@
-CHANGES.txt - 2007-08-01
+CHANGES.txt - 2007-08-08
 ------------------------
 
 
 CHANGES IN CUPS V1.3.0
 
+	- "AuthType Default" did not work as expected when the
+	  "DefaultAuthType foo" line appeared after it in the
+	  cupsd.conf file.
+	- The on-line help did not describe many common printing
+	  options (STR #1846)
+	- The IPP backend did not return the "auth required" status
+	  when printing to a Kerberos-protected queue.
+	- The scheduler was not looking in the correct directories
+	  for LSB PPD files (STR #2464)
+	- Changed references to ESP Ghostscript to GPL Ghostscript
+	  (STR #2463)
 	- The PostScript filter did not cleanly terminate when
 	  the job was canceled or stopped.
 	- Fixed generation of Kerberos credentials for remote
-	  printing.
+	  printing.  Note that this requires a recent version of
+	  MIT Kerberos with a working krb5_cc_new_unique()
+	  function or Heimdal Kerberos.
 	- Added Portuguese and updated Italian message catalogs.
 
 

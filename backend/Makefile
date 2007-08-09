@@ -17,8 +17,8 @@
 
 include ../Makedefs
 
-RBACKENDS =	lpd
-UBACKENDS =	ipp $(PAP) $(LEGACY_BACKENDS) serial snmp socket usb
+RBACKENDS =	ipp lpd
+UBACKENDS =	$(PAP) $(LEGACY_BACKENDS) serial snmp socket usb
 TARGETS	=	betest test1284 libbackend.a $(RBACKENDS) $(UBACKENDS)
 LIBOBJS	=	ieee1284.o runloop.o
 OBJS	=	betest.o ipp.o lpd.o pap.o parallel.o scsi.o \

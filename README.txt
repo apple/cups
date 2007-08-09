@@ -1,5 +1,5 @@
-README - CUPS v1.3rc2 - 2007-07-30
-----------------------------------
+README - CUPS v1.3.0 - 2007-08-03
+---------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -22,12 +22,11 @@ INTRODUCTION
     to support real-world printing under UNIX.
 
     CUPS includes an image file RIP that supports printing of
-    image files to non-PostScript printers.  A customized version
-    of GPL Ghostscript for CUPS called ESP Ghostscript is
-    available separately to support printing of PostScript files
-    within the CUPS driver framework.  Sample drivers for Dymo,
-    EPSON, HP, OKIDATA, and Zebra printers are included that use
-    these filters.
+    image files to non-PostScript printers.  GPL Ghostscript now
+    includes the "cups" driver to support printing of PostScript
+    files within the CUPS driver framework.  Sample drivers for
+    Dymo, EPSON, HP, OKIDATA, and Zebra printers are included that
+    use these filters.
 
     CUPS is licensed under the GNU General Public License and GNU
     Library General Public License versions 2.

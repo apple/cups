@@ -229,6 +229,19 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   cupsdClearString(&job->auth_domain);
   cupsdClearString(&job->auth_password);
 
+#ifdef HAVE_GSSAPI
+  if (job->ccname)
+  {
+   /*
+    * Destroy the credential cache and clear the KRB5CCNAME env var string.
+    */
+
+    krb5_cc_destroy(KerberosContext, job->ccache);
+
+    cupsdClearString(&job->ccname);
+  }
+#endif /* HAVE_GSSAPI */
+
  /*
   * Remove the print file for good if we aren't preserving jobs or
   * files...
@@ -3589,7 +3602,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       if ((attr = cupsGetOption("auth-info-required", num_attrs,
                                 attrs)) != NULL)
+      {
         cupsdSetAuthInfoRequired(job->printer, attr, NULL);
+	cupsdSaveAllPrinters();
+      }
 
       if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)
       {

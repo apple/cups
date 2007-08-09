@@ -293,7 +293,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     {
 #  ifdef DEBUG
       DEBUG_gss_printf(major_status, minor_status,
-		       "Unable to initialise security context");
+		       "Unable to initialize security context");
 #  endif /* DEBUG */
       return (-1);
     }
@@ -424,6 +424,8 @@ cups_get_gss_creds(
   */
 
   snprintf(buf, sizeof(buf), "%s@%s", service_name, fqdn);
+
+  DEBUG_printf(("cups_get_gss_creds: Looking up %s...\n", buf));
 
   token.value  = buf;
   token.length = strlen(buf);

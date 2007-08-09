@@ -2392,7 +2392,7 @@ cupsdSendHeader(
   {
     if (auth_type == AUTH_NONE)
     {
-      if (!con->best || con->best->type == AUTH_NONE)
+      if (!con->best || con->best->type <= AUTH_NONE)
 	auth_type = DefaultAuthType;
       else
 	auth_type = con->best->type;
@@ -4247,8 +4247,6 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     if (*commptr == ' ')
       commptr ++;
   }
-
-  cupsdLogMessage(CUPSD_LOG_INFO, "commptr=\"%s\"", commptr);
 
   if (*commptr == '?' && con->operation == HTTP_GET && !con->query_string)
   {
