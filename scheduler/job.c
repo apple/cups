@@ -230,16 +230,17 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   cupsdClearString(&job->auth_password);
 
 #ifdef HAVE_GSSAPI
-  if (job->ccname)
+ /*
+  * Destroy the credential cache and clear the KRB5CCNAME env var string.
+  */
+
+  if (job->ccache)
   {
-   /*
-    * Destroy the credential cache and clear the KRB5CCNAME env var string.
-    */
-
     krb5_cc_destroy(KerberosContext, job->ccache);
-
-    cupsdClearString(&job->ccname);
+    job->ccache = NULL;
   }
+
+  cupsdClearString(&job->ccname);
 #endif /* HAVE_GSSAPI */
 
  /*
@@ -1803,16 +1804,17 @@ free_job(cupsd_job_t *job)		/* I - Job */
   cupsdClearString(&job->auth_domain);
   cupsdClearString(&job->auth_password);
 #ifdef HAVE_GSSAPI
-  if (job->ccname)
+ /*
+  * Destroy the credential cache and clear the KRB5CCNAME env var string.
+  */
+
+  if (job->ccache)
   {
-   /*
-    * Destroy the credential cache and clear the KRB5CCNAME env var string.
-    */
-
     krb5_cc_destroy(KerberosContext, job->ccache);
-
-    cupsdClearString(&job->ccname);
+    job->ccache = NULL;
   }
+
+  cupsdClearString(&job->ccname);
 #endif /* HAVE_GSSAPI */
 
   if (job->num_files > 0)
