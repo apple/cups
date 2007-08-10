@@ -432,6 +432,7 @@ side_cb(int print_fd,			/* I - Print file */
   cups_sc_status_t	status;		/* Request/response status */
   char			data[2048];	/* Request/response data */
   int			datalen;	/* Request/response data size */
+  const char		*device_id;	/* 1284DEVICEID env var */
 
 
   datalen = sizeof(data);
@@ -461,6 +462,14 @@ side_cb(int print_fd,			/* I - Print file */
         data[0] = use_bc;
         datalen = 1;
         break;
+
+    case CUPS_SC_CMD_GET_DEVICE_ID :
+        if ((device_id = getenv("1284DEVICEID")) != NULL)
+	{
+	  strlcpy(data, device_id, sizeof(data));
+	  datalen = (int)strlen(data);
+	  break;
+	}
 
     default :
         status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
