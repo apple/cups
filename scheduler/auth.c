@@ -1026,11 +1026,19 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       if (context != GSS_C_NO_CONTEXT)
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
+
+      gss_release_cred(&minor_status, &server_creds);
       return;
     }
 
    /*
-    * Get the username associated with the credentials...
+    * Release our credentials...
+    */
+
+    gss_release_cred(&minor_status, &server_creds);
+
+   /*
+    * Get the username associated with the client's credentials...
     */
 
     if (!con->gss_delegated_cred)
