@@ -1,9 +1,11 @@
-CHANGES.txt - 2007-08-08
+CHANGES.txt - 2007-08-10
 ------------------------
 
 
 CHANGES IN CUPS V1.3.0
 
+	- The scheduler did not detect ServerBin misconfigurations
+	  (STR #2470)
 	- "AuthType Default" did not work as expected when the
 	  "DefaultAuthType foo" line appeared after it in the
 	  cupsd.conf file.

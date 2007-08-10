@@ -131,6 +131,13 @@ cupsdStartProcess(
                   "cupsdStartProcess(\"%s\", %p, %p, %d, %d, %d)",
                   command, argv, envp, infd, outfd, errfd);
 
+  if (access(command, X_OK))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to execute %s: %s", command,
+                    strerror(errno));
+    return (0);
+  }
+
 #if defined(__APPLE__)
   if (envp)
   {
