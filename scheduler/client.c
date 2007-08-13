@@ -161,9 +161,13 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   if ((con->http.fd = accept(lis->fd, (struct sockaddr *)con->http.hostaddr,
                              &addrlen)) < 0)
   {
+    if (errno == ENFILE || errno == EMFILE)
+      cupsdPauseListening();
+
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to accept client connection - %s.",
                     strerror(errno));
     free(con);
+
     return;
   }
 

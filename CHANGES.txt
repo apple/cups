@@ -1,9 +1,14 @@
-CHANGES.txt - 2007-08-08
+CHANGES.txt - 2007-08-13
 ------------------------
 
 
 CHANGES IN CUPS V1.3.0
 
+	- The scheduler did not handle out-of-file conditions
+	  gracefully when accepting new connections, leading to
+	  heavy CPU usage.
+	- The scheduler did not detect ServerBin misconfigurations
+	  (STR #2470)
 	- "AuthType Default" did not work as expected when the
 	  "DefaultAuthType foo" line appeared after it in the
 	  cupsd.conf file.

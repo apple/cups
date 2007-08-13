@@ -56,7 +56,8 @@ typedef enum
 {
   CUPSD_VARTYPE_INTEGER,		/* Integer option */
   CUPSD_VARTYPE_STRING,			/* String option */
-  CUPSD_VARTYPE_BOOLEAN			/* Boolean option */
+  CUPSD_VARTYPE_BOOLEAN,		/* Boolean option */
+  CUPSD_VARTYPE_PATHNAME		/* File/directory name option */
 } cupsd_vartype_t;
 
 typedef struct
@@ -81,7 +82,7 @@ static cupsd_var_t	variables[] =
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
 #ifdef HAVE_LDAP
   { "BrowseLDAPBindDN",		&BrowseLDAPBindDN,	CUPSD_VARTYPE_STRING },
-  { "BrowseLDAPCACertFile",	&BrowseLDAPCACertFile,	CUPSD_VARTYPE_STRING },
+  { "BrowseLDAPCACertFile",	&BrowseLDAPCACertFile,	CUPSD_VARTYPE_PATHNAME },
   { "BrowseLDAPDN",		&BrowseLDAPDN,		CUPSD_VARTYPE_STRING },
   { "BrowseLDAPPassword",	&BrowseLDAPPassword,	CUPSD_VARTYPE_STRING },
   { "BrowseLDAPServer",		&BrowseLDAPServer,	CUPSD_VARTYPE_STRING },
@@ -152,20 +153,20 @@ static cupsd_var_t	variables[] =
   { "RIPCache",			&RIPCache,		CUPSD_VARTYPE_STRING },
   { "RootCertDuration",		&RootCertDuration,	CUPSD_VARTYPE_INTEGER },
   { "ServerAdmin",		&ServerAdmin,		CUPSD_VARTYPE_STRING },
-  { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_STRING },
+  { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_PATHNAME },
 #ifdef HAVE_SSL
-  { "ServerCertificate",	&ServerCertificate,	CUPSD_VARTYPE_STRING },
+  { "ServerCertificate",	&ServerCertificate,	CUPSD_VARTYPE_PATHNAME },
 #  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
-  { "ServerKey",		&ServerKey,		CUPSD_VARTYPE_STRING },
+  { "ServerKey",		&ServerKey,		CUPSD_VARTYPE_PATHNAME },
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
   { "ServerName",		&ServerName,		CUPSD_VARTYPE_STRING },
-  { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_STRING },
+  { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_PATHNAME },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
 #ifdef HAVE_AUTHORIZATION_H
   { "SystemGroupAuthKey",	&SystemGroupAuthKey,	CUPSD_VARTYPE_STRING },
 #endif /* HAVE_AUTHORIZATION_H */
-  { "TempDir",			&TempDir,		CUPSD_VARTYPE_STRING },
+  { "TempDir",			&TempDir,		CUPSD_VARTYPE_PATHNAME },
   { "Timeout",			&Timeout,		CUPSD_VARTYPE_INTEGER },
   { "UseNetworkDefault",	&UseNetworkDefault,	CUPSD_VARTYPE_BOOLEAN }
 };
@@ -3075,6 +3076,20 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                      "Unknown boolean value %s on line %d.",
 	                      value, linenum);
 	    break;
+
+	case CUPSD_VARTYPE_PATHNAME :
+            if (value[0] == '/')
+	      strlcpy(temp, value, sizeof(temp));
+	    else
+	      snprintf(temp, sizeof(temp), "%s/%s", ServerRoot, value);
+
+            if (access(temp, 0))
+	    {
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "File or directory for \"%s %s\" on line %d "
+			      "does not exist!", line, value, linenum);
+              break;
+	    }
 
 	case CUPSD_VARTYPE_STRING :
 	    cupsdSetString((char **)var->ptr, value);

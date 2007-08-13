@@ -8299,6 +8299,7 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create new credentials (%d/%s)",
                     error, strerror(errno));
+    job->ccache = NULL;
     return;
   }
 
@@ -8314,6 +8315,7 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
     cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
                        "Unable to import client credentials cache");
     krb5_cc_destroy(KerberosContext, job->ccache);
+    job->ccache = NULL;
     return;
   }
 

@@ -90,6 +90,8 @@ VAR http_encryption_t	LocalEncryption	VALUE(HTTP_ENCRYPT_IF_REQUESTED);
 					/* Local port encryption to use */
 VAR cups_array_t	*Listeners	VALUE(NULL);
 					/* Listening sockets */
+VAR time_t		ListeningPaused	VALUE(0);
+					/* Time when listening was paused */
 VAR cups_array_t	*Clients	VALUE(NULL);
 					/* HTTP clients */
 VAR http_addrlist_t	*ServerAddrs	VALUE(NULL);

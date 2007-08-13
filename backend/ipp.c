@@ -51,6 +51,7 @@
  */
 
 static char	*password = NULL;	/* Password for device URI */
+static int	password_tries = 0;	/* Password tries */
 #ifdef __APPLE__
 static char	pstmpname[1024] = "";	/* Temporary PostScript file name */
 #endif /* __APPLE__ */
@@ -1372,8 +1373,12 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 {
   (void)prompt;
 
-  if (password)
+  if (password && password_tries < 3)
+  {
+    password_tries ++;
+
     return (password);
+  }
   else
   {
    /*

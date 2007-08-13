@@ -75,6 +75,10 @@ cupsdPauseListening(void)
   if (cupsArrayCount(Clients) == MaxClients)
     cupsdLogMessage(CUPSD_LOG_WARN,
                     "Max clients reached, holding new connections...");
+  else if (errno == ENFILE || errno == EMFILE)
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "Too many open files, holding new connections for "
+		    "30 seconds...");
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdPauseListening: Clearing input bits...");
 
@@ -82,6 +86,8 @@ cupsdPauseListening(void)
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
     cupsdRemoveSelect(lis->fd);
+
+  ListeningPaused = time(NULL) + 30;
 }
 
 
@@ -98,9 +104,7 @@ cupsdResumeListening(void)
   if (cupsArrayCount(Listeners) < 1)
     return;
 
-  if (cupsArrayCount(Clients) >= (MaxClients - 1))
-    cupsdLogMessage(CUPSD_LOG_WARN, "Resuming new connection processing...");
-
+  cupsdLogMessage(CUPSD_LOG_INFO, "Resuming new connection processing...");
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdResumeListening: Setting input bits...");
 
@@ -108,6 +112,8 @@ cupsdResumeListening(void)
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
     cupsdAddSelect(lis->fd, (cupsd_selfunc_t)cupsdAcceptClient, NULL, lis);
+
+  ListeningPaused = 0;
 }
 
 
