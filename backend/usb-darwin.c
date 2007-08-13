@@ -267,7 +267,7 @@ static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, 
 static void device_added(void *userdata, io_iterator_t iterator);
 static void get_device_id(cups_sc_status_t *status, char *data, int *datalen);
 static void iterate_printers(iterator_callback_t callBack, void *userdata);
-static void parse_options(const char *options, char *serial, UInt32 *location, Boolean *wait_eof);
+static void parse_options(const char *options, char *serial, int serial_size, UInt32 *location, Boolean *wait_eof);
 static void release_deviceinfo(CFStringRef *make, CFStringRef *model, CFStringRef *serial);
 static void setup_cfLanguage(void);
 static void soft_reset();
@@ -329,7 +329,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   setup_cfLanguage();
 
-  parse_options(options, serial, &location, &g.wait_eof);
+  parse_options(options, serial, sizeof(serial), &location, &g.wait_eof);
 
   if (resource[0] == '/')
     resource++;
@@ -1546,10 +1546,10 @@ CFStringRef cfstr_create_trim(const char *cstr)
 
 static void parse_options(const char *options,
 			  char *serial,
+			  int serial_size,
 			  UInt32 *location,
 			  Boolean *wait_eof)
 {
-  char	*serialnumber;		/* ?serial=<serial> or ?location=<location> */
   char	optionName[255],	/* Name of option */
 	value[255],		/* Value of option */
 	*ptr;			/* Pointer into name or value */
@@ -1561,8 +1561,6 @@ static void parse_options(const char *options,
 
   if (!options)
     return;
-
-  serialnumber = NULL;
 
   while (*options != '\0')
   {
@@ -1607,8 +1605,7 @@ static void parse_options(const char *options,
     }
     else if (strcasecmp(optionName, "serial") == 0)
     {
-      strcpy(serial, value);
-      serialnumber = serial;
+      strlcpy(serial, value, serial_size);
     }
     else if (strcasecmp(optionName, "location") == 0 && location)
       *location = strtol(value, NULL, 16);
