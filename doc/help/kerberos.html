@@ -11,6 +11,15 @@ to a remote authenticated queue. This document describes how to configure
 CUPS to use Kerberos authentication and provides helpful links to the MIT
 help pages for configuring Kerberos on your systems and network.</P>
 
+<BLOCKQUOTE><B>Note:</B>
+
+<P>In order to use Kerberos-authenticated shared printers, you <EM>must</EM> be
+running a version of MIT Kerberos with the <TT>krb5_cc_new_unique()</TT>
+function or Heimdal Kerberos. Otherwise, only local Kerberos authentication
+is supported.</P>
+
+</BLOCKQUOTE>
+
 
 <H2 CLASS="title"><A NAME="KRB5">Configuring Kerberos on Your System</A></H2>
 
@@ -126,8 +135,9 @@ lines to the policies you want to protect with authentication, for example:</P>
 <H2 CLASS="title"><A NAME="IMPLEMENT">Implementation Information</A></H2>
 
 <P>CUPS implements Kerberos over HTTP using GSS API and the service name
-"ipp". Delegation of credentials (needed for remote printers with
-authentication) is only supported when using a single KDC on your network.</P>
+"ipp". Delegation of credentials, which is needed when printing to a
+remote/shared printer with Kerberos authentication, is currently only supported
+when using a single KDC on your network.</P>
 
 <P>After getting a user's Kerberos credentials, CUPS strips the "@KDC"
 portion of the username so that it can check the group membership locally,

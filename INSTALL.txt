@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.3.0 - 2007-08-03
+INSTALL - CUPS v1.3.0 - 2007-08-13
 ----------------------------------
 
 This file describes how to compile and install CUPS from source
