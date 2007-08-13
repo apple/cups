@@ -802,6 +802,14 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_LAUNCHD */
 
    /*
+    * Resume listening for new connections as needed...
+    */
+
+    if (ListeningPaused && ListeningPaused <= current_time &&
+        cupsArrayCount(Clients) < MaxClients)
+      cupsdResumeListening();
+
+   /*
     * Expire subscriptions and unload completed jobs as needed...
     */
 
@@ -1706,6 +1714,21 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   now     = time(NULL);
   timeout = now + 86400;		/* 86400 == 1 day */
   why     = "do nothing";
+
+ /*
+  * Check whether we are accepting new connections...
+  */
+
+  if (ListeningPaused > 0 && cupsArrayCount(Clients) < MaxClients &&
+      ListeningPaused < timeout)
+  {
+    if (ListeningPaused <= now)
+      timeout = now;
+    else
+      timeout = ListeningPaused;
+
+    why = "resume listening";
+  }
 
  /*
   * Check the activity and close old clients...
