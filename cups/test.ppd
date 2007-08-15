@@ -149,6 +149,18 @@ http://foo/fr/bar.html
 help:anchor='foo'%20bookID=Vendor%20Help
 /help/fr/foo/bar.html"
 *End
+*zh_TW.cupsIPPReason foo/Number 1 Foo Reason: "text:Number%201
+text:Foo%20Reason
+http://foo/zh_TW/bar.html
+help:anchor='foo'%20bookID=Vendor%20Help
+/help/zh_TW/foo/bar.html"
+*End
+*zh.cupsIPPReason foo/Number 2 Foo Reason: "text:Number%202
+text:Foo%20Reason
+http://foo/zh/bar.html
+help:anchor='foo'%20bookID=Vendor%20Help
+/help/zh/foo/bar.html"
+*End
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM

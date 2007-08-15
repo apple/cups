@@ -224,6 +224,18 @@ main(int  argc,				/* I - Number of command-line arguments */
       printf("FAIL (\"%s\" instead of \"La Long Foo Reason\")\n", buffer);
     }
 
+    putenv("LANG=zh_TW");
+
+    fputs("ppdLocalizeIPPReason(zh_TW text): ", stdout);
+    if (ppdLocalizeIPPReason(ppd, "foo", NULL, buffer, sizeof(buffer)) &&
+        !strcmp(buffer, "Number 1 Foo Reason"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"Number 1 Foo Reason\")\n", buffer);
+    }
+
     ppdClose(ppd);
   }
   else
