@@ -85,9 +85,9 @@ cgiCopyTemplateFile(FILE       *out,	/* I - Output file */
 void
 cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
 {
-  int		i;			/* Looping var */
   char		filename[1024],		/* Filename */
-		locale[16];		/* Locale name */
+		locale[16],		/* Locale name */
+		*locptr;		/* Pointer into locale name */
   const char	*directory,		/* Directory for templates */
 		*lang;			/* Language */
   FILE		*in;			/* Input file */
@@ -100,22 +100,19 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
   * Convert the language to a locale name...
   */
 
+  locale[0] = '\0';
+
   if ((lang = getenv("LANG")) != NULL)
   {
-    for (i = 0; lang[i] && i < 15; i ++)
-      if (isalnum(lang[i] & 255) || lang[i] == '_')
-        locale[i] = tolower(lang[i]);
-      else if (lang[i] == '-')
-        locale[i] = '_';
-      else
-        break;
+    locale[0] = '/';
+    strlcpy(locale + 1, lang, sizeof(locale) - 1);
 
-    locale[i] = '\0';
+    if ((locptr = strchr(locale, '.')) != NULL)
+      *locptr = '\0';			/* Strip charset */
   }
-  else
-    locale[0] = '\0';
 
-  fprintf(stderr, "DEBUG2: locale=\"%s\"...\n", locale);
+  fprintf(stderr, "DEBUG: lang=\"%s\", locale=\"%s\"...\n",
+          lang ? lang : "(null)", locale);
 
  /*
   * See if we have a template file for this language...
@@ -123,14 +120,17 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
 
   directory = cgiGetTemplateDir();
 
-  snprintf(filename, sizeof(filename), "%s/%s/%s", directory, locale, tmpl);
-  if (access(filename, 0))
+  snprintf(filename, sizeof(filename), "%s%s/%s", directory, locale, tmpl);
+  if ((in = fopen(filename, "r")) == NULL)
   {
-    locale[2] = '\0';
+    locale[3] = '\0';
 
-    snprintf(filename, sizeof(filename), "%s/%s/%s", directory, locale, tmpl);
-    if (access(filename, 0))
+    snprintf(filename, sizeof(filename), "%s%s/%s", directory, locale, tmpl);
+    if ((in = fopen(filename, "r")) == NULL)
+    {
       snprintf(filename, sizeof(filename), "%s/%s", directory, tmpl);
+      in = fopen(filename, "r");
+    }
   }
 
   fprintf(stderr, "DEBUG2: Template file is \"%s\"...\n", filename);
@@ -139,7 +139,7 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
   * Open the template file...
   */
 
-  if ((in = fopen(filename, "r")) == NULL)
+  if (!in)
   {
     fprintf(stderr, "ERROR: Unable to open template file \"%s\" - %s\n",
             filename, strerror(errno));
