@@ -15,13 +15,14 @@
 {printer_is_accepting_jobs=0?rechazando trabajos:aceptando trabajos}, {printer_is_shared=0?no:} p&uacute;blica.
 {?device_uri=?:<BR><B>URI de la conexi&oacute;n:</B> {device_uri}}
 
-<P>
+<P><TABLE WIDTH="100%" CELLPADDING="5" SUMMARY="Acciones">
+<TR VALIGN="TOP"><TD>
 <A HREF="{printer_uri_supported}?op=print-test-page">
 <IMG SRC="/images/button-print-test-page.gif" ALT="Imprimir p&aacute;gina de prueba" CLASS="button"></A>
 {?cupscommand=1?<A HREF="{printer_uri_supported}?op=clean-print-heads">
 <IMG SRC="/images/button-clean-print-heads.gif" ALT="Limpiar cabezales de impresi&oacute;n" CLASS="button"></A>
 <A HREF="{printer_uri_supported}?op=print-self-test-page">
-<IMG SRC="/images/button-print-self-test-page.gif" ALT="Imprimir p&aacute;gina de auto-prueba" CLASS="button"></A>:}
+<IMG SRC="/images/button-print-self-test-page.gif" ALT="Imprimir p&aacute;gina de auto-prueba" CLASS="button"></A>:}</TD>
 {printer_state=5?
 <A HREF="{admin_uri}?op=start-printer&amp;printer_name={%printer_name}">
 <IMG SRC="/images/button-start-printer.gif" ALT="Iniciar impresora" CLASS="button"></A>
@@ -39,8 +40,8 @@
 <A HREF="{printer_uri_supported}?op=move-jobs&amp;printer_name={%printer_name}">
 <IMG SRC="/images/button-move-jobs.gif" ALT="Mover todos los trabajos" CLASS="button"></A>
 <A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-cancel-all-jobs.gif" ALT="Cancelar todos los trabajos" CLASS="button"></A>
-{printer_is_shared=0?
+<IMG SRC="/images/button-cancel-all-jobs.gif" ALT="Cancelar todos los trabajos" CLASS="button"></A></TD>
+<TD>{printer_is_shared=0?
 <A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=1">
 <IMG SRC="/images/button-publish-printer.gif" ALT="Publicar impresora" CLASS="button"></A>
 :
@@ -56,8 +57,9 @@
 <A HREF="{admin_uri}?op=set-as-default&amp;printer_name={%printer_name}">
 <IMG SRC="/images/button-set-as-default.gif" ALT="Poner como predeterminada" CLASS="button"></A>
 <A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-set-allowed-users.gif" ALT="Establecer usuarios permitidos" CLASS="button"></A>
-</P>
+<IMG SRC="/images/button-set-allowed-users.gif" ALT="Establecer usuarios permitidos" CLASS="button"></A></TD>
+</TR>
+</TABLE></P>
 </TD>
 </TR>
 </TABLE>
