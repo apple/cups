@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.1
 
+	- The web interface home page did not work for languages that
+	  were only partially localized (STR #2472)
 	- Updated the Spanish web interface localization (STR #2473)
 	- ppdLocalize() did not work for country-specific localizations.
 
