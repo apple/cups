@@ -4,6 +4,7 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.1
 
+	- The scheduler makefile contained a typo (STR #2483)
 	- The TBCP and BCP port monitors did not handle the trailing
 	  CTRL-D in some PostScript output properly.
 	- Fixed the localization instructions and German template for
