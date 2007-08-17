@@ -76,8 +76,9 @@ static int	exec_filter(const char *filter, char **argv, char **envp,
 		            int infd, int outfd);
 static int	exec_filters(cups_array_t *filters, const char *infile,
 		             const char *outfile, const char *ppdfile,
-			     const char *user, const char *title,
-			     int num_options, cups_option_t *options);
+			     const char *printer, const char *user,
+			     const char *title, int num_options,
+			     cups_option_t *options);
 static int	open_pipe(int *fds);
 static int	read_cupsd_conf(const char *filename);
 static void	set_string(char **s, const char *val);
@@ -396,8 +397,9 @@ main(int  argc,				/* I - Number of command-line args */
   * Do it!
   */
 
-  status = exec_filters(filters, infile, outfile, ppdfile, user, title,
-                        num_options, options);
+  status = exec_filters(filters, infile, outfile, ppdfile,
+                        !strcmp(command, "convert") ? "tofile" : "cupsfilter",
+			user, title, num_options, options);
 
  /*
   * Remove files as needed, then exit...
@@ -590,6 +592,7 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
              const char    *infile,	/* I - File to filter */
 	     const char    *outfile,	/* I - File to create */
 	     const char    *ppdfile,	/* I - PPD file, if any */
+	     const char    *printer,	/* I - Printer name */
 	     const char    *user,	/* I - Username */
 	     const char    *title,	/* I - Job title */
              int           num_options,	/* I - Number of filter options */
@@ -652,8 +655,8 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
   snprintf(rip_cache, sizeof(rip_cache), "RIP_CACHE=%s", RIPCache);
   snprintf(userenv, sizeof(userenv), "USER=%s", user);
 
-  argv[0] = "cupsfilter";
-  argv[1] = "0";
+  argv[0] = (char *)printer;
+  argv[1] = "1";
   argv[2] = user;
   argv[3] = title;
   argv[4] = cupsGetOption("copies", num_options, options);
