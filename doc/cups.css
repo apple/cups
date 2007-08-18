@@ -196,9 +196,10 @@ DIV.sidebar {
   background: #ddddaa;
   border: solid 2px #cccc99;
   float: right;
+  min-width: 25%;
   margin-left: 10pt;
+  max-width: 33%;
   padding: 5pt;
-  width: 25%;
   /* These are not implemented by all browsers, but that's OK */
   border-radius: 10pt;
   -moz-border-radius: 10pt;
