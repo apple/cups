@@ -197,18 +197,17 @@ httpAddrLookup(
 #endif /* AF_LOCAL */
 #ifdef HAVE_GETNAMEINFO
   {
+   /*
+    * STR #2486: httpAddrLookup() fails when getnameinfo() returns EAI_AGAIN
+    *
+    * FWIW, I think this is really a bug in the implementation of
+    * getnameinfo(), but falling back on httpAddrString() is easy to
+    * do...
+    */
+
     if (getnameinfo(&addr->addr, httpAddrLength(addr), name, namelen,
-                    NULL, 0, 0))
-    {
-     /*
-      * If we get an error back, then the address type is not supported
-      * and we should zero out the buffer...
-      */
-
-      name[0] = '\0';
-
-      return (NULL);
-    }
+		    NULL, 0, 0))
+      return (httpAddrString(addr, name, namelen));
   }
 #else
   {
