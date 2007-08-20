@@ -92,6 +92,8 @@ WEBIMAGES	=	\
 			images/printer-idle.gif \
 			images/printer-processing.gif \
 			images/printer-stopped.gif \
+			images/raster.png \
+			images/raster.svg \
 			images/smiley.jpg \
 			images/tab-left.gif \
 			images/tab-right.gif \
