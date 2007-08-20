@@ -479,17 +479,31 @@ ppd_localized_attr(ppd_file_t *ppd,	/* I - PPD file */
     snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll, keyword);
     attr = ppdFindAttr(ppd, lkeyword, spec);
 
-    if (!attr && !strcmp(ll, "ja"))
+    if (!attr)
     {
-     /*
-      * Due to a bug in the CUPS DDK 1.1.0 ppdmerge program, Japanese
-      * PPD files were incorrectly assigned "jp" as the locale name
-      * instead of "ja".  Support both the old (incorrect) and new
-      * locale names for Japanese...
-      */
+      if (!strcmp(ll, "ja"))
+      {
+       /*
+	* Due to a bug in the CUPS DDK 1.1.0 ppdmerge program, Japanese
+	* PPD files were incorrectly assigned "jp" as the locale name
+	* instead of "ja".  Support both the old (incorrect) and new
+	* locale names for Japanese...
+	*/
 
-      snprintf(lkeyword, sizeof(lkeyword), "jp.%s", keyword);
-      attr = ppdFindAttr(ppd, lkeyword, spec);
+	snprintf(lkeyword, sizeof(lkeyword), "jp.%s", keyword);
+	attr = ppdFindAttr(ppd, lkeyword, spec);
+      }
+      else if (!strcmp(ll, "no"))
+      {
+       /*
+	* Norway has two languages, "Bokmal" (the primary one)
+	* and "Nynorsk" (new Norwegian); we map "no" to "nb" here as
+	* recommended by the locale folks...
+	*/
+
+	snprintf(lkeyword, sizeof(lkeyword), "nb.%s", keyword);
+	attr = ppdFindAttr(ppd, lkeyword, spec);
+      }
     }
   }
 
