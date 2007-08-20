@@ -660,7 +660,8 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
         * End the label and eject...
 	*/
 
-        puts("^XZ");
+        puts("^IDR:CUPS.GRF^FS");
+	puts("^XZ");
 
        /*
         * Free compression buffers...
