@@ -394,6 +394,54 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     else
       type = DefaultAuthType;       
   }
+  else if (con->request)
+  {
+    ipp_attribute_t	*uri;		/* Printer or job URI */
+    char		scheme[32],	/* URI components */
+			userpass[HTTP_MAX_URI],
+			hostname[HTTP_MAX_URI],
+			resource[HTTP_MAX_URI];
+    int			port;		/* ... */
+    cupsd_printer_t	*p;		/* Printer or class */
+    cupsd_job_t		*job;		/* Job */
+
+
+    if ((uri = ippFindAttribute(con->request, "printer-uri",
+                                IPP_TAG_URI)) != NULL)
+    {
+      httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text,
+                      scheme, sizeof(scheme), userpass, sizeof(userpass),
+		      hostname, sizeof(hostname), &port,
+		      resource, sizeof(resource));
+
+      if (!strncmp(resource, "/printers/", 10))
+        p = cupsdFindDest(resource + 10);
+      else
+        p = cupsdFindDest(resource + 9);
+    }
+    else if ((uri = ippFindAttribute(con->request, "job-uri",
+                                     IPP_TAG_URI)) != NULL)
+    {
+      httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text,
+                      scheme, sizeof(scheme), userpass, sizeof(userpass),
+		      hostname, sizeof(hostname), &port,
+		      resource, sizeof(resource));
+
+      if (!strncmp(resource, "/jobs/", 6) &&
+          (job = cupsdFindJob(atoi(resource + 6))) != NULL)
+        p = cupsdFindDest(job->dest);
+      else
+        p = NULL;
+    }
+    else
+      p = NULL;
+
+    if (p && p->num_auth_info_required &&
+        !strcmp(p->auth_info_required[0], "negotiate"))
+      type = AUTH_NEGOTIATE;
+    else
+      type = DefaultAuthType;
+  }
   else
     type = DefaultAuthType;
 
