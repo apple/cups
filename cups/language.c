@@ -985,7 +985,7 @@ typedef struct
 static const _apple_name_locale_t apple_name_locale[] =
 {
   { "en"	, "en_US" },
-  { "no"	, "nb"    },
+  { "nb"	, "no"    },
   { "zh-Hans"	, "zh_CN" },
   { "zh-Hant"	, "zh_TW" }
 };
@@ -1040,6 +1040,9 @@ appleLangDefault(void)
 				 kCFStringEncodingASCII);
 	      CFRelease(localeName);
 
+              DEBUG_printf(("appleLangDefault: cg->language=\"%s\"\n",
+	                    cg->language));
+
 	     /*
 	      * Map new language identifiers to locales...
 	      */
@@ -1050,6 +1053,8 @@ appleLangDefault(void)
 	      {
 		if (!strcmp(cg->language, apple_name_locale[i].name))
 		{
+		  DEBUG_printf(("appleLangDefault: mapping \"%s\" to \"%s\"...\n",
+				cg->language, apple_name_locale[i].locale));
 		  strlcpy(cg->language, apple_name_locale[i].locale, 
 			  sizeof(cg->language));
 		  break;
