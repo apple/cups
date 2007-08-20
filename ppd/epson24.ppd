@@ -36,7 +36,7 @@
 *cupsModelNumber: 1
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-raster 50 rastertoepson"
-*cupsLanguages: "da de es fi fr it ja ko no pt pt_PT sv zh zh_TW"
+*cupsLanguages: "da de es fi fr it ja ko nl no pt pt_BR pt_PT sv zh zh_TW"
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: Letter
@@ -202,6 +202,21 @@
 *ko.Resolution 180dpi/180dpi: ""
 *ko.Resolution 360x180dpi/360x180dpi: ""
 *ko.Resolution 360x180dpi/360x180dpi: ""
+*nl.Translation Manufacturer/Epson: ""
+*nl.Translation ModelName/Epson 24-Pin Series: ""
+*nl.Translation ShortNickName/Epson 24-Pin Series: ""
+*nl.Translation NickName/Epson 24-Pin Series, 1.3: ""
+*nl.Translation PageSize/Media Size: ""
+*nl.PageSize Letter/Letter - 8.5x11in: ""
+*nl.PageSize Legal/Legal - 8.5x14in: ""
+*nl.PageSize A4/A4 - 210x297mm: ""
+*nl.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*nl.Translation Resolution/Resolution: ""
+*nl.Resolution 60dpi/60dpi: ""
+*nl.Resolution 120x60dpi/120x60dpi: ""
+*nl.Resolution 180dpi/180dpi: ""
+*nl.Resolution 360x180dpi/360x180dpi: ""
+*nl.Resolution 360x180dpi/360x180dpi: ""
 *no.Translation Manufacturer/Epson: ""
 *no.Translation ModelName/Epson 24-Pin Series: ""
 *no.Translation ShortNickName/Epson 24-Pin Series: ""
@@ -232,6 +247,21 @@
 *pt.Resolution 180dpi/180dpi: ""
 *pt.Resolution 360x180dpi/360x180dpi: ""
 *pt.Resolution 360x180dpi/360x180dpi: ""
+*pt_BR.Translation Manufacturer/Epson: ""
+*pt_BR.Translation ModelName/Epson 24-Pin Series: ""
+*pt_BR.Translation ShortNickName/Epson 24-Pin Series: ""
+*pt_BR.Translation NickName/Epson 24-Pin Series, 1.3: ""
+*pt_BR.Translation PageSize/Media Size: ""
+*pt_BR.PageSize Letter/Letter - 8.5x11in: ""
+*pt_BR.PageSize Legal/Legal - 8.5x14in: ""
+*pt_BR.PageSize A4/A4 - 210x297mm: ""
+*pt_BR.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
+*pt_BR.Translation Resolution/Resolution: ""
+*pt_BR.Resolution 60dpi/60dpi: ""
+*pt_BR.Resolution 120x60dpi/120x60dpi: ""
+*pt_BR.Resolution 180dpi/180dpi: ""
+*pt_BR.Resolution 360x180dpi/360x180dpi: ""
+*pt_BR.Resolution 360x180dpi/360x180dpi: ""
 *pt_PT.Translation Manufacturer/Epson: ""
 *pt_PT.Translation ModelName/Epson 24-Pin Series: ""
 *pt_PT.Translation ShortNickName/Epson 24-Pin Series: ""
@@ -328,4 +358,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of EPSON24.PPD, 15121 bytes.
+*% End of EPSON24.PPD, 16435 bytes.
