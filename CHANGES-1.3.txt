@@ -5,6 +5,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.1
 
 	- Documentation updates.
+	- CUPS-Authenticate-Job did not require Kerberos authentication
+	  on queues protected by Kerberos.
 	- The Zebra ZPL driver did not work with Brady label printers
 	  (STR #2487)
 	- Norwegian wasn't localized on Mac OS X.

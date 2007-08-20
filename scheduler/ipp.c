@@ -2877,8 +2877,22 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!con->username[0] && !auth_info)
   {
-    send_ipp_status(con, IPP_NOT_AUTHORIZED,
-                    _("No authentication information provided!"));
+    cupsd_printer_t	*printer;	/* Job destination */
+
+
+   /*
+    * No auth data.  If we need to authenticate via Kerberos, send a
+    * HTTP auth challenge, otherwise just return an IPP error...
+    */
+
+    printer = cupsdFindDest(job->dest);
+
+    if (printer && printer->num_auth_info_required > 0 &&
+        !strcmp(printer->auth_info_required[0], "negotiate"))
+      send_http_error(con, HTTP_UNAUTHORIZED, NULL);
+    else
+      send_ipp_status(con, IPP_NOT_AUTHORIZED,
+		      _("No authentication information provided!"));
     return;
   }
 
