@@ -2889,7 +2889,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
     if (printer && printer->num_auth_info_required > 0 &&
         !strcmp(printer->auth_info_required[0], "negotiate"))
-      send_http_error(con, HTTP_UNAUTHORIZED, NULL);
+      send_http_error(con, HTTP_UNAUTHORIZED, printer);
     else
       send_ipp_status(con, IPP_NOT_AUTHORIZED,
 		      _("No authentication information provided!"));
