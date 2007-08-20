@@ -646,9 +646,16 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
     snprintf(ppd, sizeof(ppd), "PPD=%s", temp);
   else
 #ifdef __APPLE__
+  if (!access("/System/Library/Frameworks/ApplicationServices.framework/"
+	      "Versions/A/Frameworks/PrintCore.framework/Versions/A/"
+	      "Resources/English.lproj/Generic.ppd", 0))
     strlcpy(ppd, "PPD=/System/Library/Frameworks/ApplicationServices.framework/"
                  "Versions/A/Frameworks/PrintCore.framework/Versions/A/"
 		 "Resources/English.lproj/Generic.ppd", sizeof(ppd));
+  else
+    strlcpy(ppd, "PPD=/System/Library/Frameworks/ApplicationServices.framework/"
+                 "Versions/A/Frameworks/PrintCore.framework/Versions/A/"
+		 "Resources/Generic.ppd", sizeof(ppd));
 #else
     snprintf(ppd, sizeof(ppd), "PPD=%s/model/laserjet.ppd", DataDir);
 #endif /* __APPLE__ */
