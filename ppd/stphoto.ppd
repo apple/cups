@@ -30,8 +30,6 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
 *cupsVersion: 1.3
 *cupsModelNumber: 3
 *cupsManualCopies: True
@@ -438,4 +436,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of STPHOTO.PPD, 19893 bytes.
+*% End of STPHOTO.PPD, 19833 bytes.

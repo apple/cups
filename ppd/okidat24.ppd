@@ -30,8 +30,6 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
 *cupsVersion: 1.3
 *cupsModelNumber: 1
 *cupsManualCopies: True
@@ -358,4 +356,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of OKIDAT24.PPD, 16169 bytes.
+*% End of OKIDAT24.PPD, 16109 bytes.

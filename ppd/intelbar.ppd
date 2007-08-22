@@ -30,8 +30,6 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
 *CustominTearInterval True: "<</cupsRowCount 2 1 roll>>setpagedevice"
 *CustominCutInterval True: "<</cupsRowStep 2 1 roll>>setpagedevice"
 *cupsVersion: 1.3
@@ -1550,4 +1548,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of INTELBAR.PPD, 59952 bytes.
+*% End of INTELBAR.PPD, 59892 bytes.

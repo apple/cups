@@ -31,8 +31,6 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
 *cupsLanguages: "da de es fi fr it ja ko nl no pt pt_BR pt_PT sv zh zh_TW"
 *UIConstraints: *Duplex *Option1 False
 *UIConstraints: *Option1 False *Duplex
@@ -636,4 +634,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of GENERIC.PPD, 30375 bytes.
+*% End of GENERIC.PPD, 30315 bytes.

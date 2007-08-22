@@ -30,8 +30,6 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*Product: "(ESP Ghostscript)"
-*Product: "(GPL Ghostscript)"
 *cupsVersion: 1.3
 *cupsModelNumber: 0
 *cupsManualCopies: False
@@ -778,4 +776,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of GENERPCL.PPD, 36012 bytes.
+*% End of GENERPCL.PPD, 35952 bytes.
