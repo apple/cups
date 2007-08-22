@@ -79,9 +79,13 @@ will receive print data starting at the bottom right corner of the page, with
 each line going right-to-left instead of left-to-right. The default value is
 <code>Normal</code>.</p>
 
-<blockquote><b>Note:</b> <tt>cupsBackSide</tt> replaces the older
-<tt>cupsFlipDuplex</tt> attribute - if <tt>cupsBackSide</tt> is
-specified, <tt>cupsFlipDuplex</tt> will be ignored.</blockquote>
+<blockquote><b>Note:</b>
+
+<p><tt>cupsBackSide</tt> replaces the older <tt>cupsFlipDuplex</tt>
+attribute - if <tt>cupsBackSide</tt> is specified, <tt>cupsFlipDuplex</tt>
+will be ignored.</p>
+
+</blockquote>
 
 <div class='table'>
 <table width='80%' summary='Back Side Raster Coordinate System'>
@@ -155,7 +159,7 @@ specified, <tt>cupsFlipDuplex</tt> will be ignored.</blockquote>
 *cupsBackSide: Rotated
 </pre>
 
-<p>Also see the related <tt>APDuplexRequiresFlippedMargin</tt>
+<p>Also see the related <a href='#APDuplexRequiresFlippedMargin'><tt>APDuplexRequiresFlippedMargin</tt></a>
 attribute.</p>
 
 <h3><span class='info'>CUPS 1.3</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
@@ -223,17 +227,19 @@ Ghostscript.</p>
 
 <p>The default value is <code>false</code>.</p>
 
-<blockquote><b>Note:</b> Mac OS X drivers that previously used
+<blockquote><b>Note:</b>
+
+<p>Mac OS X drivers that previously used
 <tt>cupsFlipDuplex</tt> may wish to provide both the old and
-new attributes for maximum compatibility, for example:
+new attributes for maximum compatibility, for example:</p>
 
 <pre class='command'>
 *cupsBackSide: Rotated
 *cupsFlipDuplex: true
 </pre>
 
-Similarly, drivers written for other operating systems using
-Ghostscript can use:
+<p>Similarly, drivers written for other operating systems using
+Ghostscript can use:</p>
 
 <pre class='command'>
 *cupsBackSide: Flipped
@@ -492,7 +498,7 @@ Add the named profile to the print settings using the key
 *APCustomColorMatchingProfile: AdobeRGB
 </pre>
 
-<h3><span class='info'>Mac OS X 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h3>
+<h3><span class='info'>Mac OS X 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h3>
 
 <p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
 
@@ -542,7 +548,66 @@ in order to be usable with all applications.</p>
 destination printer requires the top and bottom margins of the
 <tt>ImageableArea</tt> to be swapped for the back page. The
 default is <tt>true</tt> when <tt>cupsBackSide</tt> is <tt>Flipped</tt>
-and <tt>false</tt> otherwise.</p>
+and <tt>false</tt> otherwise. <a href='#TABLE_2'>Table 2</a> shows how
+<tt>APDuplexRequiresFlippedMargin</tt> interacts with <tt>cupsBackSide</tt>
+and the <tt>Tumble</tt> page attribute.</p>
+
+<div class='table'>
+<table width='80%' summary='Margin Flipping Modes'>
+<caption>Table 2: <a name='TABLE_2'>Margin Flipping Modes</a></caption>
+<thead>
+<tr>
+	<th>APDuplexRequiresFlippedMargin</th>
+	<th>cupsBackSide</th>
+	<th>Tumble Value</th>
+	<th>Margins</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>false</td>
+	<td>any</td>
+	<td>any</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>any</td>
+	<td>Normal</td>
+	<td>any</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>ManualDuplex</td>
+	<td>false</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>ManualDuplex</td>
+	<td>true</td>
+	<td>Flipped</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>Rotated</td>
+	<td>false</td>
+	<td>Flipped</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>Rotated</td>
+	<td>true</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>true or unspecified</td>
+	<td>Flipped</td>
+	<td>any</td>
+	<td>Flipped</td>
+</tr>
+</tbody>
+</table></div>
 
 <p>Example:</p>
 
@@ -554,7 +619,8 @@ and <tt>false</tt> otherwise.</p>
 *APDuplexRequiresFlippedMargin: false
 </pre>
 
-<p>Also see the related <tt>cupsBackSide</tt> attribute.</p>
+<p>Also see the related <a href='#cupsBackSide'><tt>cupsBackSide</tt></a>
+attribute.</p>
 
 <h3><span class='info'>Mac OS X 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
 
@@ -702,7 +768,48 @@ attribute can be used to override the default 3-component (RGB) colorspace.</p>
 *APDefaultCustomColorMatchingProfile: sRGB
 </pre>
 
-<h3><span class='info'>Mac OS X 10.4</span><a name='OID'>OID<i>MainKeyword</i></a></h3>
+
+<h2 class='title'><a name='AUTOCONFIG'>Auto-Configuration</a></h2>
+
+<p>CUPS supports several methods of auto-configuration via PPD attributes.
+Currently these methods are only implemented on Mac OS X and include the
+<a href='#APAutoSetupTool'><tt>APAutoSetupTool<tt></a> attribute documented
+previously.</p>
+
+<h3><span class='info'>Mac OS X 10.2</span><a name='QUERYKEYWORD'>?MainKeyword</a></h3>
+
+<p class='summary'>*?<i>MainKeyword</i>: "<br>
+  PostScript query code that writes a message using the = operator...<br>
+"<br>
+*End</p>
+
+<p>The <tt>?<i>MainKeyword</i><tt> attribute defines PostScript code that
+determines the currently selected/enabled option keyword (choice) for the
+main keyword (option). It is typically used when communicating with USB,
+serial, Appletalk, and AppSocket (port 9100) printers.</p>
+
+<p>The PostScript code typically sends its response back using the <tt>=</tt>
+operator.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+*OpenUI OptionDuplex/Duplexer Installed: Boolean
+*DuplexOptionDuplex: False
+*OptionDuplex False/Not Installed: ""
+*OptionDuplex True/Installed: ""
+
+<em>*% Query the printer for the presence of the duplexer option...</em>
+*?OptionDuplex: "
+  currentpagedevice /Duplex known
+  {(True)} {(False)} ifelse
+  = flush
+"
+*End
+*CloseUI: OptionDuplex
+</pre>
+
+<h3><span class='info'>Mac OS X 10.4</span><a name='OID'>OIDMainKeyword</a></h3>
 
 <p class='summary'>*?OID<i>MainKeyword</i>: ".n.n.n..."<br>
 *OID<i>MainKeyword</i> <i>OptionKeyword1</i>: "value"<br>
@@ -713,7 +820,9 @@ attribute can be used to override the default 3-component (RGB) colorspace.</p>
 SNMP OIDs that map to installable options. The first (query) line
 defines the OID to lookup on the network device. The second and
 subsequent attributes define a mapping from OID value to option
-keyword.</p>
+keyword. Since SNMP is an IP-based network protocol, this method
+is typically only used to configure AppSocket, IPP, and LPD network
+printers.</p>
 
 <p>Examples:</p>
 
@@ -846,13 +955,16 @@ option value is "2.0" then CUPS will output the string
 <p>CUPS supports three types of color profiles. The first type is
 based on sRGB and is used by the standard CUPS raster filters and
 ESP Ghostscript. The second type is based on ICC profiles and is
-used by the Core Graphics-based filters on MacOS X. The final
-type is based on well-known colorspaces such as sRGB and Adobe
-RGB.</p>
+used by the Quartz-based filters on MacOS X. The final type is
+based on well-known colorspaces such as sRGB and Adobe RGB.</p>
 
-<blockquote><b>Note:</b> At this time, none of the CUPS raster
+<blockquote><b>Note:</b>
+
+<p>At this time, none of the CUPS raster
 filters support ICC profiles. This will be addressed as time
-and resources permit.</blockquote>
+and resources permit.</p>
+
+</blockquote>
 
 <h3><a name='cupsColorProfile'>cupsColorProfile</a></h3>
 
@@ -920,13 +1032,13 @@ is not absolute, it is loaded relative to the
 
 <pre class='command'>
 <em>*% Specify a profile for CMYK printing at 360dpi on all media types</em> 
-*cupsICCProfile CMYK..360dpi/360dpi CMYK: "vendor/foo-360-cmyk.icc"
+*cupsICCProfile CMYK..360dpi/360dpi CMYK: "/Library/Printers/vendor/Profiles/foo-360-cmyk.icc"
 
 <em>*% Specify a profile for RGB printing at 720dpi on Glossy media</em> 
-*cupsColorProfile RGB.Glossy.720dpi/720dpi Glossy: "vendor/foo-720-glossy-rgb.icc"
+*cupsColorProfile RGB.Glossy.720dpi/720dpi Glossy: "/Library/Printers/vendor/Profiles/foo-720-glossy-rgb.icc"
 
 <em>*% Specify a default profile for printing at all other resolutions and media types</em> 
-*cupsICCProfile ../Default: "vendor/foo-default.icc"
+*cupsICCProfile ../Default: "/Library/Printers/vendor/Profiles/foo-default.icc"
 </pre>
 
 <h4>Customizing the Profile Selection Keywords</h4>
@@ -1020,12 +1132,15 @@ languages by following the following additional rules:</p>
 </ol>
 
 <blockquote><b>Note:</b>
-We use a <tt>LanguageEncoding</tt> value of <tt>ISOLatin1</tt>
+
+<p>We use a <tt>LanguageEncoding</tt> value of <tt>ISOLatin1</tt>
 and limit the allowed base translation strings to ASCII to avoid
 character coding issues that would otherwise occur. In addition,
 requiring the base translation strings to be in English allows
 for easier fallback translation when no localization is provided
-in the PPD file for a given locale.</blockquote>
+in the PPD file for a given locale.</p>
+
+</blockquote>
 
 <p>Examples:</p>
 
@@ -1134,7 +1249,16 @@ in the PPD file for a given locale.</blockquote>
 
 </ul>
 
-<blockquote><b>Note:</b> <em>Never<em> use the unsupported <tt>dict</tt> or <tt>put</tt> operators in your option code. These operators are typically used in option code dating back to Level 1 PostScript printers, which did not support the simpler <tt>&lt;&lt;</tt> or <tt>&gt;&gt;</tt> operators. If you have old option code using <tt>dict</tt> or <tt>put</tt>, you can rewrite it very easily to use the newer <tt>&lt;&lt;</tt> and <tt>&gt;&gt;</tt> operators instead. For example, the following code to set the page size:
+<blockquote><b>Note:</b>
+
+<p><em>Never<em> use the unsupported <tt>dict</tt> or <tt>put</tt>
+operators in your option code. These operators are typically used in
+option code dating back to Level 1 PostScript printers, which did not
+support the simpler <tt>&lt;&lt;</tt> or <tt>&gt;&gt;</tt> operators.
+If you have old option code using <tt>dict</tt> or <tt>put</tt>, you can
+rewrite it very easily to use the newer <tt>&lt;&lt;</tt> and
+<tt>&gt;&gt;</tt> operators instead. For example, the following code
+to set the page size:</p>
 
 <style type='text/css'><!--
 PRE B {
@@ -1424,13 +1548,15 @@ PRE B {
 
 <h2 class='title'><a name='HISTORY'>Change History</a></h2>
 
-<h3>Changes in CUPS 1.3</a></h3>
+<h3>Changes in CUPS 1.3.1</a></h3>
 
 <ul>
 
-	<li>Added missing Mac OS X <tt>AP</tt> keywords.</li>
+	<li>Added missing Mac OS X <tt>AP</tt> attributes.</li>
 
-	<li>Added <tt>OID<i>MainKeyword</i></tt> keywords.</li>
+	<li>Added section on auto-configuration including the
+	<tt>OID<i>MainKeyword</i></tt> and <tt>?<i>MainKeyword</i></tt>
+	attributes.</li>
 
 	<li>Minor reorganization.</li>
 
