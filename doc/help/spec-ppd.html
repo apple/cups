@@ -64,377 +64,10 @@ LINE-END = CR / LF / CR LF
 </pre>
 
 
-<h2 class='title'><a name='ATTRIBUTES'>General Attributes</a></h2>
+<h2 class='title'><a name='AUTOCONFIG'>Auto-Configuration</a></h2>
 
-<h3><span class='info'>CUPS 1.3</span><a name='cupsBackSide'>cupsBackSide</a></h3>
-
-<p class='summary'>*cupsBackSide: keyword</p>
-
-<p>This attribute requests special handling of the back side of pages
-when doing duplexed (2-sided) output. <a href='#TABLE_1'>Table 1</a>
-shows the supported keyword values for this attribute and their effect
-on the raster data sent to your driver. For example, when <tt>cupsBackSide</tt>
-is <code>Rotated</code> and <tt>Tumble</tt> is <tt>false</tt>, your driver
-will receive print data starting at the bottom right corner of the page, with
-each line going right-to-left instead of left-to-right. The default value is
-<code>Normal</code>.</p>
-
-<blockquote><b>Note:</b>
-
-<p><tt>cupsBackSide</tt> replaces the older <tt>cupsFlipDuplex</tt>
-attribute - if <tt>cupsBackSide</tt> is specified, <tt>cupsFlipDuplex</tt>
-will be ignored.</p>
-
-</blockquote>
-
-<div class='table'>
-<table width='80%' summary='Back Side Raster Coordinate System'>
-<caption>Table 1: <a name='TABLE_1'>Back Side Raster Coordinate System</a></caption>
-<thead>
-<tr>
-	<th>cupsBackSide</th>
-	<th>Tumble Value</th>
-	<th>Image Presentation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<td><code>Normal</code></td>
-	<td><code>false</code></td>
-	<td>Left-to-right, top-to-bottom</td>
-</tr>
-<tr>
-	<td><code>Normal</code></td>
-	<td><code>true</code></td>
-	<td>Left-to-right, top-to-bottom</td>
-</tr>
-<tr>
-	<td><code>ManualTumble</code></td>
-	<td><code>false</code></td>
-	<td>Left-to-right, top-to-bottom</td>
-</tr>
-<tr>
-	<td><code>ManualTumble</code></td>
-	<td><code>true</code></td>
-	<td>Right-to-left, bottom-to-top</td>
-</tr>
-<tr>
-	<td><code>Rotated</code></td>
-	<td><code>false</code></td>
-	<td>Right-to-left, bottom-to-top</td>
-</tr>
-<tr>
-	<td><code>Rotated</code></td>
-	<td><code>true</code></td>
-	<td>Right-to-left, top-to-bottom</td>
-</tr>
-<tr>
-	<td><code>Flipped</code> *</td>
-	<td><code>false</code></td>
-	<td>Left-to-right, bottom-to-top</td>
-</tr>
-<tr>
-	<td><code>Flipped</code> *</td>
-	<td><code>true</code></td>
-	<td>Right-to-left, top-to-bottom</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<p><em>* - Not supported in Mac OS X 10.5.x and earlier</em></p>
-
-<div class='figure'><table summary='Back side images'>
-<caption>Figure 1: Back side images</caption>
-<tr><td><img src='../images/raster.png' width='624' height='448' alt='Back side images'></td></tr>
-</table></div>
-
-<p>Examples:</p>
-
-<pre class='command'>
-<em>*% Flip the page image for the back side of duplexed output</em> 
-*cupsBackSide: Flipped
-
-<em>*% Rotate the page image for the back side of duplexed output</em> 
-*cupsBackSide: Rotated
-</pre>
-
-<p>Also see the related <a href='#APDuplexRequiresFlippedMargin'><tt>APDuplexRequiresFlippedMargin</tt></a>
-attribute.</p>
-
-<h3><span class='info'>CUPS 1.3</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
-
-<p class='summary'>*cupsEvenDuplex: boolean</p>
-
-<p>This boolean attribute notifies the RIP filters that the
-destination printer requires an even number of pages when 2-sided
-printing is selected. The default value is <code>false</code>.</p>
-
-<p>Example:</p>
-
-<pre class='command'>
-<em>*% Always send an even number of pages when duplexing</em> 
-*cupsEvenDuplex: true
-</pre>
-
-<h3><a name='cupsFax'>cupsFax</a></h3>
-
-<p class='summary'>*cupsFax: boolean</p>
-
-<p>This boolean attribute specifies whether the PPD defines a facsimile device. The default is <tt>false</tt>.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*cupsFax: true
-</pre>
-
-<h3><a name='cupsFilter'>cupsFilter</a></h3>
-
-<p class='summary'>*cupsFilter: "source/type cost program"</p>
-
-<p>This string attribute provides a conversion rule from the
-given source type to the printer's native format using the
-filter "program". If a printer supports the source type directly,
-the special filter program "-" may be specified.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-<em>*% Standard raster printer driver filter</em> 
-*cupsFilter: "application/vnd.cups-raster 100 rastertofoo"
-
-<em>*% Plain text filter</em> 
-*cupsFilter: "text/plain 10 texttofoo"
-
-<em>*% Pass-through filter for PostScript printers</em> 
-*cupsFilter: "application/vnd.cups-postscript 0 -"
-</pre>
-
-<h3><span class='info'>Deprecated</span><a name='cupsFlipDuplex'>cupsFlipDuplex</a></h3>
-
-<p class='summary'>*cupsFlipDuplex: boolean</p>
-
-<p>Due to implementation differences between Mac OS X and Ghostscript,
-the <tt>cupsFlipDuplex</tt> attribute is deprecated. Instead, use
-the <a href='#cupsBackSide'><tt>cupsBackSide</tt></a> attribute to specify
-the coordinate system (pixel layout) of the page data on the back side of
-duplex pages.</p>
-
-<p>The value <code>true</code> maps to a <tt>cupsBackSide</tt> value
-of <code>Rotated</code> on Mac OS X and <code>Flipped</code> with
-Ghostscript.</p>
-
-<p>The default value is <code>false</code>.</p>
-
-<blockquote><b>Note:</b>
-
-<p>Mac OS X drivers that previously used
-<tt>cupsFlipDuplex</tt> may wish to provide both the old and
-new attributes for maximum compatibility, for example:</p>
-
-<pre class='command'>
-*cupsBackSide: Rotated
-*cupsFlipDuplex: true
-</pre>
-
-<p>Similarly, drivers written for other operating systems using
-Ghostscript can use:</p>
-
-<pre class='command'>
-*cupsBackSide: Flipped
-*cupsFlipDuplex: true
-</pre></blockquote>
-
-<h3><span class='info'>CUPS 1.3</span><a name='cupsIPPFinishings'>cupsIPPFinishings</a></h3>
-
-<p class='summary'>*cupsIPPFinishings number/text: "*Option Choice ..."</p>
-
-<p>This attribute defines a mapping from IPP <code>finishings</code>
-values to PPD options and choices.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*cupsIPPFinishings 4/staple: "*StapleLocation SinglePortrait"
-*cupsIPPFinishings 5/punch: "*PunchMedia Yes *PunchLocation LeftSide"
-*cupsIPPFinishings 20/staple-top-left: "*StapleLocation SinglePortrait"
-*cupsIPPFinishings 21/staple-bottom-left: "*StapleLocation SingleLandscape"
-</pre>
-
-<h3><span class='info'>CUPS 1.3</span><a name='cupsIPPReason'>cupsIPPReason</a></h3>
-
-<p class='summary'>*cupsIPPReason reason/Reason Text: "optional URIs"</p>
-
-<p>This optional attribute maps custom
-<code>printer-state-reasons</code> keywords that are generated by
-the driver to human readable text. The optional URIs string
-contains zero or more URIs separated by a newline. Each URI can
-be a CUPS server absolute path to a help file under the
-scheduler's <code>DocumentRoot</code> directory, a full HTTP URL
-("http://www.domain.com/path/to/help/page.html"), or any other
-valid URI which directs the user at additional information
-concerning the condition that is being reported.</p>
-
-<p>Since the reason text is limited to 80 characters by the PPD specification,
-longer text strings can be included by URI-encoding the text with the "text"
-scheme, for example "text:some%20text". Multiple <code>text</code> URIs are
-combined (with spaces between each URI) by the <tt>ppdLocalizeIPPReason</tt>
-into a single string that can be displayed to the user.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-<em>*% Map com.vendor-error to text but no page</em>
-*cupsIPPReason com.vendor-error/A serious error occurred: ""
-
-<em>*% Map com.vendor-error to more than 80 characters of text but no page</em>
-*cupsIPPReason com.vendor-error/A serious error occurred: "text:Now%20is%20the%20time
-text:for%20all%20good%20men%20to%20come%20to%20the%20aid%20of%20their%20country."
-
-<em>*% Map com.vendor-error to text and a local page</em>
-*cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html"
-
-<em>*% Map com.vendor-error to text and a remote page</em>
-*cupsIPPReason com.vendor-error/A serious error occurred: "http://www.vendor.com/help"
-
-<em>*% Map com.vendor-error to text and a local, Apple help book, and remote page</em>
-*APHelpBook: "file:///Library/Printers/vendor/Help/filename"
-*cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html
-help:anchor='com.vendor-error'%20bookID=Vendor%20Help
-http://www.vendor.com/help"
-*End
-</pre>
-
-<h3><span class='info'>CUPS 1.2</span><a name='cupsLanguages'>cupsLanguages</a></h3>
-
-<p class='summary'>*cupsLanguages: "locale list"</p>
-
-<p>This attribute describes which language localizations are
-included in the PPD. The "locale list" string is a space-delimited
-list of locale names ("en", "en_US", "fr_CA", etc.)</p>
-
-<p>Example:</p>
-
-<pre class='command'>
-<em>*% Specify Canadian, UK, and US English, and Candian and French French</em> 
-*cupsLanguages: "en_CA en_UK en_US fr_CA fr_CA"
-</pre>
-
-<h3><a name='cupsManualCopies'>cupsManualCopies</a></h3>
-
-<p class='summary'>*cupsManualCopies: boolean</p>
-
-<p>This boolean attribute notifies the RIP filters that the
-destination printer does not support copy generation in
-hardware. The default value is <code>false</code>.</p>
-
-<p>Example:</p>
-
-<pre class='command'>
-<em>*% Tell the RIP filters to generate the copies for us</em> 
-*cupsManualCopies: true
-</pre>
-
-<h3><a name='cupsModelNumber'>cupsModelNumber</a></h3>
-
-<p class='summary'>*cupsModelNumber: number</p>
-
-<p>This integer attribute specifies a printer-specific model
-number. This number can be used by a filter program to adjust
-the output for a specific model of printer.</p>
-
-<p>Example:</p>
-
-<pre class='command'>
-<em>*% Specify an integer for a driver-specific model number</em> 
-*cupsModelNumber: 1234
-</pre>
-
-
-<h3><span class='info'>CUPS 1.3</span><a name='cupsPJLCharset'>cupsPJLCharset</a></h3>
-
-<p class='summary'>*cupsPJLCharset: "ISO character set name"</p>
-
-<p>This string attribute specifies the character set that is used
-for strings in PJL commands. If not specified, US-ASCII is
-assumed.</p>
-
-<p>Example:</p>
-
-<pre class='command'>
-<em>*% Specify UTF-8 is used in PJL strings</em>
-*cupsPJLCharset: "UTF-8"
-</pre>
-
-
-<h3><span class='info'>CUPS 1.2</span><a name='cupsPortMonitor'>cupsPortMonitor</a></h3>
-
-<p class='summary'>*cupsPortMonitor urischeme/Descriptive Text: "port monitor"</p>
-
-<p>This string attribute specifies printer-specific "port
-monitor" filters that may be used with the printer. The CUPS
-scheduler also looks for the <tt>Protocols</tt> attribute to see
-if the <tt>BCP</tt> or <tt>TBCP</tt> protocols are supported. If
-so, the corresponding port monitor ("bcp" and "tbcp",
-respectively) is listed in the printer's
-<tt>port-monitor-supported</tt> attribute.</p>
-
-<p>The "urischeme" portion of the attribute specifies the URI scheme
-that this port monitor should be used for. Typically this is used to
-pre-select a particular port monitor for each type of connection that
-is supported by the printer. The "port monitor" string can be "none"
-to disable the port monitor for the given URI scheme.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-<em>*% Specify a PostScript printer that supports the TBCP protocol</em>
-*Protocols: TBCP PJL
-
-<em>*% Specify that TBCP should be used for socket connections but not USB</em>
-*cupsPortMonitor socket/AppSocket Printing: "tbcp"
-*cupsPortMonitor usb/USB Printing: "none"
-
-<em>*% Specify a printer-specific port monitor for an Epson USB printer</em> 
-*cupsPortMonitor usb/USB Status Monitor: "epson-usb"
-</pre>
-
-<h3><span class='info'>CUPS 1.3</span><a name='cupsPreFilter'>cupsPreFilter</a></h3>
-
-<p class='summary'>*cupsPreFilter: "source/type cost program"</p>
-
-<p>This string attribute provides a pre-filter rule. The pre-filter
-program will be inserted in the conversion chain immediately 
-before the filter that accepts the given MIME type.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-<em>*% PDF pre-filter</em>
-*cupsPreFilter: "application/pdf 100 mypdfprefilter"
-
-<em>*% PNG pre-filter</em>
-*cupsPreFilter: "image/png 0 mypngprefilter"
-</pre>
-
-<h3><a name='cupsVersion'>cupsVersion</a></h3>
-
-<p class='summary'>*cupsVersion: major.minor</p>
-
-<p>This required attribute describes which version of the CUPS
-PPD file extensions was used. Currently it must be the string
-"1.0", "1.1", "1.2", or "1.3".</p>
-
-<p>Example:</p>
-
-<pre class='command'>
-<em>*% Specify a CUPS 1.2 driver</em> 
-*cupsVersion: "1.2"
-</pre>
-
-
-<h2 class='title'><a name='MACOSX'>Mac OS X Attributes</a></h2>
+<p>CUPS supports several methods of auto-configuration via PPD attributes.
+<em>Currently these methods are only implemented on Mac OS X.</em></p>
 
 <h3><span class='info'>Mac OS X 10.5</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
 
@@ -454,327 +87,6 @@ PPD file to stdout.</p>
 *% Use our setup tool when adding a printer
 *APAutoSetupTool: "/Library/Printers/vendor/Tools/autosetuptool"
 </pre>
-
-<h3><a name='APBookFile'>APBookFile</a></h3>
-
-<p class='summary'>*APBookFile: "file URL"</p>
-
-<p>This string attribute specifies the Apple help book file to use when
-looking up IPP reason codes for this printer driver. The
-<a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> attribute maps
-"help" URIs to this file.</p>
-
-<p>Example:</p>
-
-<pre class='command'>
-*APBookFile: "file:///Library/Printers/vendor/Help/filename"
-</pre>
-
-<h3><span class='info'>Mac OS X 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h3>
-
-<p class='summary'>*APCustomColorMatchingProfile: name</p>
-
-<p>This attribute defines a supported RGB color profile that can be used
-when doing custom color matching. Currently only <tt>sRGB</tt> and
-<tt>AdobeRGB</tt> are supported.</p>
-
-<blockquote><b>Note:</b>
-
-<p>If you provide multiple <tt>APCustomColorMatchingProfile</tt> attributes,
-you are responsible for providing the necessary user interface controls to
-select the profile in a <a href='#APDialogExtension'>print dialog pane</a>.
-Add the named profile to the print settings using the key
-<tt>kPMCustomColorMatchingProfileKey</tt>.</p>
-
-</blockquote>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*% Use sRGB for RGB color by default, but support both sRGB and AdobeRGB
-*APSupportsCustomColorMatching: true
-*APDefaultCustomColorMatchingProfile: sRGB
-*APCustomColorMatchingProfile: sRGB
-*APCustomColorMatchingProfile: AdobeRGB
-</pre>
-
-<h3><span class='info'>Mac OS X 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h3>
-
-<p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
-
-<p>This attribute defines the default RGB color profile that will be used
-when doing custom color matching. Currently only <tt>sRGB</tt> and
-<tt>AdobeRGB</tt> are supported.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*% Use sRGB for RGB color by default
-*APSupportsCustomColorMatching: true
-*APDefaultCustomColorMatchingProfile: sRGB
-</pre>
-
-<h3><span class='info'>Mac OS X 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
-
-<p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
-
-<p>This attribute defines additional option panes that are displayed in the
-print dialog. Each attribute adds one or more option panes. See the "OutputBinsPDE"
-example and <a href='http://developer.apple.com/qa/qa2004/qa1352.html'>Apple
-Technical Q&amp;A QA1352</a> for information on writing your own print dialog
-plug-ins.</p>
-
-<blockquote><b>Note:</b>
-
-<p>Starting with Mac OS X 10.5, each plug-in must be compiled "4-way fat"
-(32-bit and 64-bit for both PowerPC and Intel) with garbage collection enabled
-in order to be usable with all applications.</p>
-
-</blockquote>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*% Add two panes for finishing and driver options
-*APDialogExtension: "/Library/Printers/vendor/finishing.plugin"
-*APDialogExtension: "/Library/Printers/vendor/options.plugin"
-</pre>
-
-<h3><span class='info'>Mac OS X 10.4</span><a name='APDuplexRequiresFlippedMargin'>APDuplexRequiresFlippedMargin</a></h3>
-
-<p class='summary'>*APDuplexRequiresFlippedMargin: boolean</p>
-
-<p>This boolean attribute notifies the RIP filters that the
-destination printer requires the top and bottom margins of the
-<tt>ImageableArea</tt> to be swapped for the back page. The
-default is <tt>true</tt> when <tt>cupsBackSide</tt> is <tt>Flipped</tt>
-and <tt>false</tt> otherwise. <a href='#TABLE_2'>Table 2</a> shows how
-<tt>APDuplexRequiresFlippedMargin</tt> interacts with <tt>cupsBackSide</tt>
-and the <tt>Tumble</tt> page attribute.</p>
-
-<div class='table'>
-<table width='80%' summary='Margin Flipping Modes'>
-<caption>Table 2: <a name='TABLE_2'>Margin Flipping Modes</a></caption>
-<thead>
-<tr>
-	<th>APDuplexRequiresFlippedMargin</th>
-	<th>cupsBackSide</th>
-	<th>Tumble Value</th>
-	<th>Margins</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<td>false</td>
-	<td>any</td>
-	<td>any</td>
-	<td>Normal</td>
-</tr>
-<tr>
-	<td>any</td>
-	<td>Normal</td>
-	<td>any</td>
-	<td>Normal</td>
-</tr>
-<tr>
-	<td>true</td>
-	<td>ManualDuplex</td>
-	<td>false</td>
-	<td>Normal</td>
-</tr>
-<tr>
-	<td>true</td>
-	<td>ManualDuplex</td>
-	<td>true</td>
-	<td>Flipped</td>
-</tr>
-<tr>
-	<td>true</td>
-	<td>Rotated</td>
-	<td>false</td>
-	<td>Flipped</td>
-</tr>
-<tr>
-	<td>true</td>
-	<td>Rotated</td>
-	<td>true</td>
-	<td>Normal</td>
-</tr>
-<tr>
-	<td>true or unspecified</td>
-	<td>Flipped</td>
-	<td>any</td>
-	<td>Flipped</td>
-</tr>
-</tbody>
-</table></div>
-
-<p>Example:</p>
-
-<pre class='command'>
-<em>*% Rotate the back side images</em>
-*cupsBackSide: Rotated
-
-<em>*% Don't swap the top and bottom margins for the back side</em> 
-*APDuplexRequiresFlippedMargin: false
-</pre>
-
-<p>Also see the related <a href='#cupsBackSide'><tt>cupsBackSide</tt></a>
-attribute.</p>
-
-<h3><span class='info'>Mac OS X 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
-
-<p class='summary'>*APPrinterIconPath: "/Library/Printers/vendor/filename"</p>
-
-<p>This attribute defines the location of a printer icon file to use when
-displaying the printer.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*% Apple icon file
-*APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.icns"
-
-*% TIFF icon file
-*APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.tiff"
-
-*% PNG icon file
-*APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.png"
-
-*% JPEG icon file
-*APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.jpg"
-</pre>
-
-<h3><span class='info'>Mac OS X 10.4</span><a name='APPrinterLowInkTool'>APPrinterLowInkTool</a></h3>
-
-<p class='summary'>*APPrinterLowInkTool: "/Library/Printers/vendor/program"</p>
-
-<p>This attribute defines an program that checks the ink/toner/marker levels
-on a printer, returning an XML document with those levels. See the "InkTool"
-example and
-<a href='http://developer.apple.com/technotes/tn2005/tn2144.html'>Apple
-Technical Note TN2144</a> for more information.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*% Use a vendor monitoring program
-*APPrinterLowInkTool: "/Library/Printers/vendor/Tools/lowinktool"
-</pre>
-
-<h3><span class='info'>Mac OS X 10.5</span><a name='APPrinterPreset'>APPrinterPreset</a></h3>
-
-<p class='summary'>*APPrinterPreset name/text: "*Option Choice ..."</p>
-
-<p>This attribute defines presets for multiple options that show up
-in the print dialog of applications (such as iPhoto) that set the job
-style hint to <tt>NSPrintPhotoJobStyleHint</tt>. Each preset maps to one or
-more pairs of PPD options and choices as well as providing key/value data for
-the application. The following preset names are currently defined:</p>
-
-<ul>
-
-	<li><code>Photo_with_Paper_Auto-Detect</code>; Photo printing
-        with paper auto-detect</li>
-
-	<li><code>Photo_with_Paper_Auto-Detect_-_Fine</code>; Photo printing
-        with paper auto-detect - fine</li>
-
-	<li><code>Photo_on_Plain_Paper</code>; Photo printing on plain paper</li>
-
-	<li><code>Photo_on_Plain_Paper_-_Fine</code>; Photo printing on plain
-        paper - fine</li>
-
-	<li><code>Photo_on_Photo_Paper</code>; Photo printing on photo paper</li>
-
-	<li><code>Photo_on_Photo_Paper_-_Fine</code>; Photo printing on photo
-        paper - fine</li>
-
-	<li><code>Photo_on_Matte_Paper</code>; Photo printing on matte paper</li>
-
-	<li><code>Photo_on_Matte_Paper_-_Fine</code>; Photo printing on matte
-        paper - fine</li>
-
-</ul>
-
-<p>The value string consists of pairs of keywords, either an option name and
-choice (*MainKeyword OptionKeyword) or a preset identifier and value
-(com.apple.print.preset.foo value). Preset identifiers and their supported
-values are documented in "<a
-href='http://developer.apple.com/documentation/Printing/Conceptual/PresetDraft/presets_intro/chapter_1_section_2.html'
->Creating Printing Presets for iPhoto: Printing Presets File Format</a>".</p>
-
-<p>Presets, like options, can also be localized in multiple languages.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*APPrinterPreset Photo_on_Photo_Paper/Photo on Photo Paper: "
-  *MediaType Glossy
-  *ColorModel RGB
-  *Resolution 300dpi
-  com.apple.print.preset.graphicsType Photo
-  com.apple.print.preset.quality mid
-  com.apple.print.preset.media-front-coating glossy"
-*End
-*fr.APPrinterPreset Photo_on_Photo_Paper/Photo sur papier photographique: ""
-</pre>
-
-<h3><span class='info'>Mac OS X 10.3</span><a name='APPrinterUtilityPath'>APPrinterUtilityPath</a></h3>
-
-<p class='summary'>*APPrinterPrinterUtilityPath: "/Library/Printers/vendor/filename.app"</p>
-
-<p>This attribute defines a GUI application that can be used to do printer
-maintenance functions such as cleaning the print head(s). See ... for more
-information.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*% Define the printer utility application
-*APPrinterPrinterUtilityPath: "/Library/Printers/vendor/Tools/utility.app"
-</pre>
-
-<h3><span class='info'>Mac OS X 10.3</span><a name='APScanAppBundleID'>APScanAppBundleID</a></h3>
-
-<p class='summary'>*APScanAppBundleID: "bundle ID"</p>
-
-<p>This attribute defines the application to use when scanning pages from
-the device.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*APScanAppBundleID: "com.apple.ImageCaptureApp"
-</pre>
-
-<h3><span class='info'>Mac OS X 10.4</span><a name='APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a></h3>
-
-<p class='summary'>*APSupportsCustomColorMatching: boolean</p>
-
-<p>This attribute specifies that the driver provides its own custom color
-matching. When <tt>true</tt>, the default hand-off colorspace will be
-Generic Gray, Generic RGB, or Generic CMYK depending on the number of
-components the driver requests. The <a
-href='#APDefaultCustomColorMatchingProfile'><tt>APDefaultCustomColorMatchingProfile</tt></a>
-attribute can be used to override the default 3-component (RGB) colorspace.</p>
-
-<p>The default for <tt>APSupportsCustomColorMatching</tt> is <tt>false</tt>.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*APSupportsCustomColorMatching: true
-*APDefaultCustomColorMatchingProfile: sRGB
-</pre>
-
-
-<h2 class='title'><a name='AUTOCONFIG'>Auto-Configuration</a></h2>
-
-<p>CUPS supports several methods of auto-configuration via PPD attributes.
-Currently these methods are only implemented on Mac OS X and include the
-<a href='#APAutoSetupTool'><tt>APAutoSetupTool<tt></a> attribute documented
-previously.</p>
 
 <h3><span class='info'>Mac OS X 10.2</span><a name='QUERYKEYWORD'>?MainKeyword</a></h3>
 
@@ -902,6 +214,15 @@ option value is "2.0" then CUPS will output the string
 	characters ("minimum" and "maximum" are numbers)</li>
 
 </ul>
+
+<blockquote><b>Note:</b>
+
+<p>Custom options are not directly supported by the Mac OS X Print Dialog
+nor by the CUPS web interface at this time. Vendors that use custom
+options on Mac OS X must provide their own user interface via the
+<a href='#APDialogExtension'><tt>APDialogExtension</tt></a> attribute.</p>
+
+</blockquote>
 
 <p>Examples:</p>
 
@@ -1544,6 +865,692 @@ PRE B {
 </tr>
 </tbody>
 </table></div>
+
+
+<h2 class='title'><a name='ATTRIBUTES'>General Attributes</a></h2>
+
+<h3><span class='info'>CUPS 1.3</span><a name='cupsBackSide'>cupsBackSide</a></h3>
+
+<p class='summary'>*cupsBackSide: keyword</p>
+
+<p>This attribute requests special handling of the back side of pages
+when doing duplexed (2-sided) output. <a href='#TABLE_1'>Table 1</a>
+shows the supported keyword values for this attribute and their effect
+on the raster data sent to your driver. For example, when <tt>cupsBackSide</tt>
+is <code>Rotated</code> and <tt>Tumble</tt> is <tt>false</tt>, your driver
+will receive print data starting at the bottom right corner of the page, with
+each line going right-to-left instead of left-to-right. The default value is
+<code>Normal</code>.</p>
+
+<blockquote><b>Note:</b>
+
+<p><tt>cupsBackSide</tt> replaces the older <tt>cupsFlipDuplex</tt>
+attribute - if <tt>cupsBackSide</tt> is specified, <tt>cupsFlipDuplex</tt>
+will be ignored.</p>
+
+</blockquote>
+
+<div class='table'>
+<table width='80%' summary='Back Side Raster Coordinate System'>
+<caption>Table 1: <a name='TABLE_1'>Back Side Raster Coordinate System</a></caption>
+<thead>
+<tr>
+	<th>cupsBackSide</th>
+	<th>Tumble Value</th>
+	<th>Image Presentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td><code>Normal</code></td>
+	<td><code>false</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>Normal</code></td>
+	<td><code>true</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>ManualTumble</code></td>
+	<td><code>false</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>ManualTumble</code></td>
+	<td><code>true</code></td>
+	<td>Right-to-left, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>Rotated</code></td>
+	<td><code>false</code></td>
+	<td>Right-to-left, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>Rotated</code></td>
+	<td><code>true</code></td>
+	<td>Right-to-left, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>Flipped</code> *</td>
+	<td><code>false</code></td>
+	<td>Left-to-right, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>Flipped</code> *</td>
+	<td><code>true</code></td>
+	<td>Right-to-left, top-to-bottom</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><em>* - Not supported in Mac OS X 10.5.x and earlier</em></p>
+
+<div class='figure'><table summary='Back side images'>
+<caption>Figure 1: Back side images</caption>
+<tr><td><img src='../images/raster.png' width='624' height='448' alt='Back side images'></td></tr>
+</table></div>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Flip the page image for the back side of duplexed output</em> 
+*cupsBackSide: Flipped
+
+<em>*% Rotate the page image for the back side of duplexed output</em> 
+*cupsBackSide: Rotated
+</pre>
+
+<p>Also see the related <a href='#APDuplexRequiresFlippedMargin'><tt>APDuplexRequiresFlippedMargin</tt></a>
+attribute.</p>
+
+<h3><span class='info'>CUPS 1.3</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
+
+<p class='summary'>*cupsEvenDuplex: boolean</p>
+
+<p>This boolean attribute notifies the RIP filters that the
+destination printer requires an even number of pages when 2-sided
+printing is selected. The default value is <code>false</code>.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Always send an even number of pages when duplexing</em> 
+*cupsEvenDuplex: true
+</pre>
+
+<h3><a name='cupsFax'>cupsFax</a></h3>
+
+<p class='summary'>*cupsFax: boolean</p>
+
+<p>This boolean attribute specifies whether the PPD defines a facsimile device. The default is <tt>false</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*cupsFax: true
+</pre>
+
+<h3><a name='cupsFilter'>cupsFilter</a></h3>
+
+<p class='summary'>*cupsFilter: "source/type cost program"</p>
+
+<p>This string attribute provides a conversion rule from the
+given source type to the printer's native format using the
+filter "program". If a printer supports the source type directly,
+the special filter program "-" may be specified.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Standard raster printer driver filter</em> 
+*cupsFilter: "application/vnd.cups-raster 100 rastertofoo"
+
+<em>*% Plain text filter</em> 
+*cupsFilter: "text/plain 10 texttofoo"
+
+<em>*% Pass-through filter for PostScript printers</em> 
+*cupsFilter: "application/vnd.cups-postscript 0 -"
+</pre>
+
+<h3><span class='info'>Deprecated</span><a name='cupsFlipDuplex'>cupsFlipDuplex</a></h3>
+
+<p class='summary'>*cupsFlipDuplex: boolean</p>
+
+<p>Due to implementation differences between Mac OS X and Ghostscript,
+the <tt>cupsFlipDuplex</tt> attribute is deprecated. Instead, use
+the <a href='#cupsBackSide'><tt>cupsBackSide</tt></a> attribute to specify
+the coordinate system (pixel layout) of the page data on the back side of
+duplex pages.</p>
+
+<p>The value <code>true</code> maps to a <tt>cupsBackSide</tt> value
+of <code>Rotated</code> on Mac OS X and <code>Flipped</code> with
+Ghostscript.</p>
+
+<p>The default value is <code>false</code>.</p>
+
+<blockquote><b>Note:</b>
+
+<p>Mac OS X drivers that previously used
+<tt>cupsFlipDuplex</tt> may wish to provide both the old and
+new attributes for maximum compatibility, for example:</p>
+
+<pre class='command'>
+*cupsBackSide: Rotated
+*cupsFlipDuplex: true
+</pre>
+
+<p>Similarly, drivers written for other operating systems using
+Ghostscript can use:</p>
+
+<pre class='command'>
+*cupsBackSide: Flipped
+*cupsFlipDuplex: true
+</pre></blockquote>
+
+<h3><span class='info'>CUPS 1.3</span><a name='cupsIPPFinishings'>cupsIPPFinishings</a></h3>
+
+<p class='summary'>*cupsIPPFinishings number/text: "*Option Choice ..."</p>
+
+<p>This attribute defines a mapping from IPP <code>finishings</code>
+values to PPD options and choices.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*cupsIPPFinishings 4/staple: "*StapleLocation SinglePortrait"
+*cupsIPPFinishings 5/punch: "*PunchMedia Yes *PunchLocation LeftSide"
+*cupsIPPFinishings 20/staple-top-left: "*StapleLocation SinglePortrait"
+*cupsIPPFinishings 21/staple-bottom-left: "*StapleLocation SingleLandscape"
+</pre>
+
+<h3><span class='info'>CUPS 1.3</span><a name='cupsIPPReason'>cupsIPPReason</a></h3>
+
+<p class='summary'>*cupsIPPReason reason/Reason Text: "optional URIs"</p>
+
+<p>This optional attribute maps custom
+<code>printer-state-reasons</code> keywords that are generated by
+the driver to human readable text. The optional URIs string
+contains zero or more URIs separated by a newline. Each URI can
+be a CUPS server absolute path to a help file under the
+scheduler's <code>DocumentRoot</code> directory, a full HTTP URL
+("http://www.domain.com/path/to/help/page.html"), or any other
+valid URI which directs the user at additional information
+concerning the condition that is being reported.</p>
+
+<p>Since the reason text is limited to 80 characters by the PPD specification,
+longer text strings can be included by URI-encoding the text with the "text"
+scheme, for example "text:some%20text". Multiple <code>text</code> URIs are
+combined (with spaces between each URI) by the <tt>ppdLocalizeIPPReason</tt>
+into a single string that can be displayed to the user.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Map com.vendor-error to text but no page</em>
+*cupsIPPReason com.vendor-error/A serious error occurred: ""
+
+<em>*% Map com.vendor-error to more than 80 characters of text but no page</em>
+*cupsIPPReason com.vendor-error/A serious error occurred: "text:Now%20is%20the%20time
+text:for%20all%20good%20men%20to%20come%20to%20the%20aid%20of%20their%20country."
+
+<em>*% Map com.vendor-error to text and a local page</em>
+*cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html"
+
+<em>*% Map com.vendor-error to text and a remote page</em>
+*cupsIPPReason com.vendor-error/A serious error occurred: "http://www.vendor.com/help"
+
+<em>*% Map com.vendor-error to text and a local, Apple help book, and remote page</em>
+*APHelpBook: "file:///Library/Printers/vendor/Help/filename"
+*cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html
+help:anchor='com.vendor-error'%20bookID=Vendor%20Help
+http://www.vendor.com/help"
+*End
+</pre>
+
+<h3><span class='info'>CUPS 1.2</span><a name='cupsLanguages'>cupsLanguages</a></h3>
+
+<p class='summary'>*cupsLanguages: "locale list"</p>
+
+<p>This attribute describes which language localizations are
+included in the PPD. The "locale list" string is a space-delimited
+list of locale names ("en", "en_US", "fr_CA", etc.)</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify Canadian, UK, and US English, and Candian and French French</em> 
+*cupsLanguages: "en_CA en_UK en_US fr_CA fr_CA"
+</pre>
+
+<h3><a name='cupsManualCopies'>cupsManualCopies</a></h3>
+
+<p class='summary'>*cupsManualCopies: boolean</p>
+
+<p>This boolean attribute notifies the RIP filters that the
+destination printer does not support copy generation in
+hardware. The default value is <code>false</code>.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Tell the RIP filters to generate the copies for us</em> 
+*cupsManualCopies: true
+</pre>
+
+<h3><a name='cupsModelNumber'>cupsModelNumber</a></h3>
+
+<p class='summary'>*cupsModelNumber: number</p>
+
+<p>This integer attribute specifies a printer-specific model
+number. This number can be used by a filter program to adjust
+the output for a specific model of printer.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify an integer for a driver-specific model number</em> 
+*cupsModelNumber: 1234
+</pre>
+
+
+<h3><span class='info'>CUPS 1.3</span><a name='cupsPJLCharset'>cupsPJLCharset</a></h3>
+
+<p class='summary'>*cupsPJLCharset: "ISO character set name"</p>
+
+<p>This string attribute specifies the character set that is used
+for strings in PJL commands. If not specified, US-ASCII is
+assumed.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify UTF-8 is used in PJL strings</em>
+*cupsPJLCharset: "UTF-8"
+</pre>
+
+
+<h3><span class='info'>CUPS 1.2</span><a name='cupsPortMonitor'>cupsPortMonitor</a></h3>
+
+<p class='summary'>*cupsPortMonitor urischeme/Descriptive Text: "port monitor"</p>
+
+<p>This string attribute specifies printer-specific "port
+monitor" filters that may be used with the printer. The CUPS
+scheduler also looks for the <tt>Protocols</tt> attribute to see
+if the <tt>BCP</tt> or <tt>TBCP</tt> protocols are supported. If
+so, the corresponding port monitor ("bcp" and "tbcp",
+respectively) is listed in the printer's
+<tt>port-monitor-supported</tt> attribute.</p>
+
+<p>The "urischeme" portion of the attribute specifies the URI scheme
+that this port monitor should be used for. Typically this is used to
+pre-select a particular port monitor for each type of connection that
+is supported by the printer. The "port monitor" string can be "none"
+to disable the port monitor for the given URI scheme.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify a PostScript printer that supports the TBCP protocol</em>
+*Protocols: TBCP PJL
+
+<em>*% Specify that TBCP should be used for socket connections but not USB</em>
+*cupsPortMonitor socket/AppSocket Printing: "tbcp"
+*cupsPortMonitor usb/USB Printing: "none"
+
+<em>*% Specify a printer-specific port monitor for an Epson USB printer</em> 
+*cupsPortMonitor usb/USB Status Monitor: "epson-usb"
+</pre>
+
+<h3><span class='info'>CUPS 1.3</span><a name='cupsPreFilter'>cupsPreFilter</a></h3>
+
+<p class='summary'>*cupsPreFilter: "source/type cost program"</p>
+
+<p>This string attribute provides a pre-filter rule. The pre-filter
+program will be inserted in the conversion chain immediately 
+before the filter that accepts the given MIME type.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% PDF pre-filter</em>
+*cupsPreFilter: "application/pdf 100 mypdfprefilter"
+
+<em>*% PNG pre-filter</em>
+*cupsPreFilter: "image/png 0 mypngprefilter"
+</pre>
+
+<h3><a name='cupsVersion'>cupsVersion</a></h3>
+
+<p class='summary'>*cupsVersion: major.minor</p>
+
+<p>This required attribute describes which version of the CUPS
+PPD file extensions was used. Currently it must be the string
+"1.0", "1.1", "1.2", or "1.3".</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify a CUPS 1.2 driver</em> 
+*cupsVersion: "1.2"
+</pre>
+
+
+<h2 class='title'><a name='MACOSX'>Mac OS X Attributes</a></h2>
+
+<h3><a name='APBookFile'>APBookFile</a></h3>
+
+<p class='summary'>*APBookFile: "file URL"</p>
+
+<p>This string attribute specifies the Apple help book file to use when
+looking up IPP reason codes for this printer driver. The
+<a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> attribute maps
+"help" URIs to this file.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+*APBookFile: "file:///Library/Printers/vendor/Help/filename"
+</pre>
+
+<h3><span class='info'>Mac OS X 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h3>
+
+<p class='summary'>*APCustomColorMatchingProfile: name</p>
+
+<p>This attribute defines a supported RGB color profile that can be used
+when doing custom color matching. Currently only <tt>sRGB</tt> and
+<tt>AdobeRGB</tt> are supported.</p>
+
+<blockquote><b>Note:</b>
+
+<p>If you provide multiple <tt>APCustomColorMatchingProfile</tt> attributes,
+you are responsible for providing the necessary user interface controls to
+select the profile in a <a href='#APDialogExtension'>print dialog pane</a>.
+Add the named profile to the print settings using the key
+<tt>kPMCustomColorMatchingProfileKey</tt>.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use sRGB for RGB color by default, but support both sRGB and AdobeRGB
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+*APCustomColorMatchingProfile: sRGB
+*APCustomColorMatchingProfile: AdobeRGB
+</pre>
+
+<h3><span class='info'>Mac OS X 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h3>
+
+<p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
+
+<p>This attribute defines the default RGB color profile that will be used
+when doing custom color matching. Currently only <tt>sRGB</tt> and
+<tt>AdobeRGB</tt> are supported.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use sRGB for RGB color by default
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+</pre>
+
+<h3><span class='info'>Mac OS X 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
+
+<p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
+
+<p>This attribute defines additional option panes that are displayed in the
+print dialog. Each attribute adds one or more option panes. See the "OutputBinsPDE"
+example and <a href='http://developer.apple.com/qa/qa2004/qa1352.html'>Apple
+Technical Q&amp;A QA1352</a> for information on writing your own print dialog
+plug-ins.</p>
+
+<blockquote><b>Note:</b>
+
+<p>Starting with Mac OS X 10.5, each plug-in must be compiled "4-way fat"
+(32-bit and 64-bit for both PowerPC and Intel) with garbage collection enabled
+in order to be usable with all applications.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Add two panes for finishing and driver options
+*APDialogExtension: "/Library/Printers/vendor/finishing.plugin"
+*APDialogExtension: "/Library/Printers/vendor/options.plugin"
+</pre>
+
+<h3><span class='info'>Mac OS X 10.4</span><a name='APDuplexRequiresFlippedMargin'>APDuplexRequiresFlippedMargin</a></h3>
+
+<p class='summary'>*APDuplexRequiresFlippedMargin: boolean</p>
+
+<p>This boolean attribute notifies the RIP filters that the
+destination printer requires the top and bottom margins of the
+<tt>ImageableArea</tt> to be swapped for the back page. The
+default is <tt>true</tt> when <tt>cupsBackSide</tt> is <tt>Flipped</tt>
+and <tt>false</tt> otherwise. <a href='#TABLE_2'>Table 2</a> shows how
+<tt>APDuplexRequiresFlippedMargin</tt> interacts with <tt>cupsBackSide</tt>
+and the <tt>Tumble</tt> page attribute.</p>
+
+<div class='table'>
+<table width='80%' summary='Margin Flipping Modes'>
+<caption>Table 2: <a name='TABLE_2'>Margin Flipping Modes</a></caption>
+<thead>
+<tr>
+	<th>APDuplexRequiresFlippedMargin</th>
+	<th>cupsBackSide</th>
+	<th>Tumble Value</th>
+	<th>Margins</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>false</td>
+	<td>any</td>
+	<td>any</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>any</td>
+	<td>Normal</td>
+	<td>any</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>ManualDuplex</td>
+	<td>false</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>ManualDuplex</td>
+	<td>true</td>
+	<td>Flipped</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>Rotated</td>
+	<td>false</td>
+	<td>Flipped</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>Rotated</td>
+	<td>true</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>true or unspecified</td>
+	<td>Flipped</td>
+	<td>any</td>
+	<td>Flipped</td>
+</tr>
+</tbody>
+</table></div>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Rotate the back side images</em>
+*cupsBackSide: Rotated
+
+<em>*% Don't swap the top and bottom margins for the back side</em> 
+*APDuplexRequiresFlippedMargin: false
+</pre>
+
+<p>Also see the related <a href='#cupsBackSide'><tt>cupsBackSide</tt></a>
+attribute.</p>
+
+<h3><span class='info'>Mac OS X 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
+
+<p class='summary'>*APPrinterIconPath: "/Library/Printers/vendor/filename"</p>
+
+<p>This attribute defines the location of a printer icon file to use when
+displaying the printer.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Apple icon file
+*APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.icns"
+
+*% TIFF icon file
+*APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.tiff"
+
+*% PNG icon file
+*APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.png"
+
+*% JPEG icon file
+*APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.jpg"
+</pre>
+
+<h3><span class='info'>Mac OS X 10.4</span><a name='APPrinterLowInkTool'>APPrinterLowInkTool</a></h3>
+
+<p class='summary'>*APPrinterLowInkTool: "/Library/Printers/vendor/program"</p>
+
+<p>This attribute defines an program that checks the ink/toner/marker levels
+on a printer, returning an XML document with those levels. See the "InkTool"
+example and
+<a href='http://developer.apple.com/technotes/tn2005/tn2144.html'>Apple
+Technical Note TN2144</a> for more information.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use a vendor monitoring program
+*APPrinterLowInkTool: "/Library/Printers/vendor/Tools/lowinktool"
+</pre>
+
+<h3><span class='info'>Mac OS X 10.5</span><a name='APPrinterPreset'>APPrinterPreset</a></h3>
+
+<p class='summary'>*APPrinterPreset name/text: "*Option Choice ..."</p>
+
+<p>This attribute defines presets for multiple options that show up
+in the print dialog of applications (such as iPhoto) that set the job
+style hint to <tt>NSPrintPhotoJobStyleHint</tt>. Each preset maps to one or
+more pairs of PPD options and choices as well as providing key/value data for
+the application. The following preset names are currently defined:</p>
+
+<ul>
+
+	<li><code>Photo_with_Paper_Auto-Detect</code>; Photo printing
+        with paper auto-detect</li>
+
+	<li><code>Photo_with_Paper_Auto-Detect_-_Fine</code>; Photo printing
+        with paper auto-detect - fine</li>
+
+	<li><code>Photo_on_Plain_Paper</code>; Photo printing on plain paper</li>
+
+	<li><code>Photo_on_Plain_Paper_-_Fine</code>; Photo printing on plain
+        paper - fine</li>
+
+	<li><code>Photo_on_Photo_Paper</code>; Photo printing on photo paper</li>
+
+	<li><code>Photo_on_Photo_Paper_-_Fine</code>; Photo printing on photo
+        paper - fine</li>
+
+	<li><code>Photo_on_Matte_Paper</code>; Photo printing on matte paper</li>
+
+	<li><code>Photo_on_Matte_Paper_-_Fine</code>; Photo printing on matte
+        paper - fine</li>
+
+</ul>
+
+<p>The value string consists of pairs of keywords, either an option name and
+choice (*MainKeyword OptionKeyword) or a preset identifier and value
+(com.apple.print.preset.foo value). Preset identifiers and their supported
+values are documented in "<a
+href='http://developer.apple.com/documentation/Printing/Conceptual/PresetDraft/presets_intro/chapter_1_section_2.html'
+>Creating Printing Presets for iPhoto: Printing Presets File Format</a>".</p>
+
+<p>Presets, like options, can also be localized in multiple languages.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APPrinterPreset Photo_on_Photo_Paper/Photo on Photo Paper: "
+  *MediaType Glossy
+  *ColorModel RGB
+  *Resolution 300dpi
+  com.apple.print.preset.graphicsType Photo
+  com.apple.print.preset.quality mid
+  com.apple.print.preset.media-front-coating glossy"
+*End
+*fr.APPrinterPreset Photo_on_Photo_Paper/Photo sur papier photographique: ""
+</pre>
+
+<h3><span class='info'>Mac OS X 10.3</span><a name='APPrinterUtilityPath'>APPrinterUtilityPath</a></h3>
+
+<p class='summary'>*APPrinterPrinterUtilityPath: "/Library/Printers/vendor/filename.app"</p>
+
+<p>This attribute defines a GUI application that can be used to do printer
+maintenance functions such as cleaning the print head(s). See ... for more
+information.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Define the printer utility application
+*APPrinterPrinterUtilityPath: "/Library/Printers/vendor/Tools/utility.app"
+</pre>
+
+<h3><span class='info'>Mac OS X 10.3</span><a name='APScanAppBundleID'>APScanAppBundleID</a></h3>
+
+<p class='summary'>*APScanAppBundleID: "bundle ID"</p>
+
+<p>This attribute defines the application to use when scanning pages from
+the device.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APScanAppBundleID: "com.apple.ImageCaptureApp"
+</pre>
+
+<h3><span class='info'>Mac OS X 10.4</span><a name='APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a></h3>
+
+<p class='summary'>*APSupportsCustomColorMatching: boolean</p>
+
+<p>This attribute specifies that the driver provides its own custom color
+matching. When <tt>true</tt>, the default hand-off colorspace will be
+Generic Gray, Generic RGB, or Generic CMYK depending on the number of
+components the driver requests. The <a
+href='#APDefaultCustomColorMatchingProfile'><tt>APDefaultCustomColorMatchingProfile</tt></a>
+attribute can be used to override the default 3-component (RGB) colorspace.</p>
+
+<p>The default for <tt>APSupportsCustomColorMatching</tt> is <tt>false</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+</pre>
 
 
 <h2 class='title'><a name='HISTORY'>Change History</a></h2>
