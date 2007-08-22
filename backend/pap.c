@@ -242,7 +242,9 @@ int main (int argc, const char * argv[])
     /* Try to open the print file... */
     if ((fp = fopen(argv[6], "rb")) == NULL)
     {
-      fprintf(stderr, "ERROR: unable to open print file \"%s\": %s\n", argv[6], strerror(errno));
+      _cupsLangPrintf(stderr,
+                      _("ERROR: Unable to open print file \"%s\": %s\n"),
+		      argv[6], strerror(errno));
       return (1);
     }
 

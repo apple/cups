@@ -199,8 +199,9 @@ main(int  argc,				/* I - Number of command-line args */
   }
   else if (argc < 6)
   {
-    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
-            argv[0]);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]\n"),
+		    argv[0]);
     return (CUPS_BACKEND_STOP);
   }
 
@@ -224,8 +225,9 @@ main(int  argc,				/* I - Number of command-line args */
 		      hostname, sizeof(hostname), &port,
 		      resource, sizeof(resource)) < HTTP_URI_OK)
   {
-    fputs(_("ERROR: Missing device URI on command-line and no "
-	    "DEVICE_URI environment variable!\n"), stderr);
+    _cupsLangPuts(stderr,
+                  _("ERROR: Missing device URI on command-line and no "
+		    "DEVICE_URI environment variable!\n"));
     return (CUPS_BACKEND_STOP);
   }
 
@@ -327,7 +329,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  cupsSetEncryption(HTTP_ENCRYPT_IF_REQUESTED);
 	else
 	{
-	  fprintf(stderr,
+	  _cupsLangPrintf(stderr,
 	                  _("ERROR: Unknown encryption option value \"%s\"!\n"),
 	        	  value);
         }
@@ -340,7 +342,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  version = 1;
 	else
 	{
-	  fprintf(stderr,
+	  _cupsLangPrintf(stderr,
 	                  _("ERROR: Unknown version option value \"%s\"!\n"),
 	        	  value);
 	}
@@ -369,8 +371,9 @@ main(int  argc,				/* I - Number of command-line args */
         * Unknown option...
 	*/
 
-	fprintf(stderr, _("ERROR: Unknown option \"%s\" with value \"%s\"!\n"),
-	        name, value);
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Unknown option \"%s\" with value \"%s\"!\n"),
+			name, value);
       }
     }
   }
@@ -488,8 +491,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   do
   {
-    fprintf(stderr, _("INFO: Connecting to %s on port %d...\n"),
-            hostname, port);
+    _cupsLangPrintf(stderr, _("INFO: Connecting to %s on port %d...\n"),
+		    hostname, port);
 
     if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
     {
@@ -505,8 +508,9 @@ main(int  argc,				/* I - Number of command-line args */
 	* available printer in the class.
 	*/
 
-        fputs(_("INFO: Unable to contact printer, queuing on next "
-		"printer in class...\n"), stderr);
+        _cupsLangPuts(stderr,
+	              _("INFO: Unable to contact printer, queuing on next "
+			"printer in class...\n"));
 
         if (argc == 6 || strcmp(filename, argv[6]))
 	  unlink(filename);
@@ -525,16 +529,16 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  fputs(_("ERROR: Printer not responding!\n"), stderr);
+	  _cupsLangPuts(stderr, _("ERROR: Printer not responding!\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
         recoverable = 1;
 
-	fprintf(stderr,
-	        _("WARNING: recoverable: Network host \'%s\' is busy; will "
-		  "retry in %d seconds...\n"),
-		hostname, delay);
+	_cupsLangPrintf(stderr,
+			_("WARNING: recoverable: Network host \'%s\' is busy; "
+			  "will retry in %d seconds...\n"),
+			hostname, delay);
 
 	sleep(delay);
 
@@ -543,8 +547,8 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (h_errno)
       {
-	fprintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
-	        hostname);
+	_cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+			hostname);
 	return (CUPS_BACKEND_STOP);
       }
       else
@@ -552,8 +556,9 @@ main(int  argc,				/* I - Number of command-line args */
         recoverable = 1;
 
         fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
-	fputs(_("ERROR: recoverable: Unable to connect to printer; will "
-	        "retry in 30 seconds...\n"), stderr);
+	_cupsLangPuts(stderr,
+	              _("ERROR: recoverable: Unable to connect to printer; will "
+			"retry in 30 seconds...\n"));
 	sleep(30);
       }
 
@@ -572,7 +577,7 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
   fputs("STATE: -connecting-to-device\n", stderr);
-  fprintf(stderr, _("INFO: Connected to %s...\n"), hostname);
+  _cupsLangPrintf(stderr, _("INFO: Connected to %s...\n"), hostname);
 
 #ifdef AF_INET6
   if (http->hostaddr->addr.sa_family == AF_INET6)
@@ -638,16 +643,16 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  fputs(_("ERROR: Printer not responding!\n"), stderr);
+	  _cupsLangPuts(stderr, _("ERROR: Printer not responding!\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
         recoverable = 1;
 
-	fprintf(stderr,
-	        _("WARNING: recoverable: Network host \'%s\' is busy; will "
-		  "retry in %d seconds...\n"),
-		hostname, delay);
+	_cupsLangPrintf(stderr,
+			_("WARNING: recoverable: Network host \'%s\' is busy; "
+			  "will retry in %d seconds...\n"),
+			hostname, delay);
 
         report_printer_state(supported);
 
@@ -663,14 +668,15 @@ main(int  argc,				/* I - Number of command-line args */
 	* Switch to IPP/1.0...
 	*/
 
-	fputs(_("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n"),
-	      stderr);
+	_cupsLangPuts(stderr,
+	              _("INFO: Printer does not support IPP/1.1, trying "
+		        "IPP/1.0...\n"));
 	version = 0;
 	httpReconnect(http);
       }
       else if (ipp_status == IPP_NOT_FOUND)
       {
-        fputs(_("ERROR: Destination printer does not exist!\n"), stderr);
+        _cupsLangPuts(stderr, _("ERROR: Destination printer does not exist!\n"));
 
 	if (supported)
           ippDelete(supported);
@@ -679,8 +685,9 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else
       {
-	fprintf(stderr, _("ERROR: Unable to get printer status (%s)!\n"),
-	        cupsLastErrorString());
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Unable to get printer status (%s)!\n"),
+			cupsLastErrorString());
         sleep(10);
       }
 
@@ -742,8 +749,9 @@ main(int  argc,				/* I - Number of command-line args */
       * available printer in the class.
       */
 
-      fputs(_("INFO: Unable to contact printer, queuing on next "
-	      "printer in class...\n"), stderr);
+      _cupsLangPuts(stderr,
+                    _("INFO: Unable to contact printer, queuing on next "
+		      "printer in class...\n"));
 
       ippDelete(supported);
       httpClose(http);
@@ -944,7 +952,8 @@ main(int  argc,				/* I - Number of command-line args */
       if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
 	  ipp_status == IPP_PRINTER_BUSY)
       {
-        fputs(_("INFO: Printer busy; will retry in 10 seconds...\n"), stderr);
+        _cupsLangPuts(stderr,
+	              _("INFO: Printer busy; will retry in 10 seconds...\n"));
 	sleep(10);
       }
       else if ((ipp_status == IPP_BAD_REQUEST ||
@@ -954,25 +963,28 @@ main(int  argc,				/* I - Number of command-line args */
 	* Switch to IPP/1.0...
 	*/
 
-	fputs(_("INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n"),
-	      stderr);
+	_cupsLangPuts(stderr,
+	              _("INFO: Printer does not support IPP/1.1, trying "
+		        "IPP/1.0...\n"));
 	version = 0;
 	httpReconnect(http);
       }
       else
-        fprintf(stderr, _("ERROR: Print file was not accepted (%s)!\n"),
-	        cupsLastErrorString());
+        _cupsLangPrintf(stderr, _("ERROR: Print file was not accepted (%s)!\n"),
+			cupsLastErrorString());
     }
     else if ((job_id_attr = ippFindAttribute(response, "job-id",
                                              IPP_TAG_INTEGER)) == NULL)
     {
-      fputs(_("NOTICE: Print file accepted - job ID unknown.\n"), stderr);
+      _cupsLangPuts(stderr,
+                    _("NOTICE: Print file accepted - job ID unknown.\n"));
       job_id = 0;
     }
     else
     {
       job_id = job_id_attr->values[0].integer;
-      fprintf(stderr, _("NOTICE: Print file accepted - job ID %d.\n"), job_id);
+      _cupsLangPrintf(stderr, _("NOTICE: Print file accepted - job ID %d.\n"),
+                      job_id);
     }
 
     ippDelete(response);
@@ -1010,8 +1022,9 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  ipp_status = cupsLastError();
 
-	  fprintf(stderr, _("ERROR: Unable to add file %d to job: %s\n"),
-	          job_id, cupsLastErrorString());
+	  _cupsLangPrintf(stderr,
+			  _("ERROR: Unable to add file %d to job: %s\n"),
+			  job_id, cupsLastErrorString());
 	  break;
 	}
       }
@@ -1035,7 +1048,7 @@ main(int  argc,				/* I - Number of command-line args */
     if (!job_id || !waitjob)
       continue;
 
-    fputs(_("INFO: Waiting for job to complete...\n"), stderr);
+    _cupsLangPuts(stderr, _("INFO: Waiting for job to complete...\n"));
 
     for (; !job_cancelled;)
     {
@@ -1089,8 +1102,9 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  ippDelete(response);
 
-          fprintf(stderr, _("ERROR: Unable to get job %d attributes (%s)!\n"),
-	          job_id, cupsLastErrorString());
+          _cupsLangPrintf(stderr,
+			  _("ERROR: Unable to get job %d attributes (%s)!\n"),
+			  job_id, cupsLastErrorString());
           break;
 	}
       }
@@ -1211,7 +1225,7 @@ cancel_job(http_t     *http,		/* I - HTTP connection */
   ipp_t	*request;			/* Cancel-Job request */
 
 
-  fputs(_("INFO: Canceling print job...\n"), stderr);
+  _cupsLangPuts(stderr, _("INFO: Canceling print job...\n"));
 
   request = ippNewRequest(IPP_CANCEL_JOB);
   request->request.op.version[1] = version;
@@ -1231,8 +1245,8 @@ cancel_job(http_t     *http,		/* I - HTTP connection */
   ippDelete(cupsDoRequest(http, request, resource));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
-    fprintf(stderr, _("ERROR: Unable to cancel job %d: %s\n"), id,
-            cupsLastErrorString());
+    _cupsLangPrintf(stderr, _("ERROR: Unable to cancel job %d: %s\n"), id,
+		    cupsLastErrorString());
 }
 
 
@@ -1312,25 +1326,25 @@ compress_files(int  num_files,		/* I - Number of files */
   {
     if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
     {
-      fprintf(stderr,
-              _("ERROR: Unable to create temporary compressed print file: "
-	        "%s\n"),
-	      strerror(errno));
+      _cupsLangPrintf(stderr,
+		      _("ERROR: Unable to create temporary compressed print "
+		        "file: %s\n"), strerror(errno));
       exit(CUPS_BACKEND_FAILED);
     }
 
     if ((out = cupsFileOpenFd(fd, "w9")) == NULL)
     {
-      fprintf(stderr,
-              _("ERROR: Unable to open temporary compressed print file: %s\n"),
-	      strerror(errno));
+      _cupsLangPrintf(stderr,
+		      _("ERROR: Unable to open temporary compressed print "
+		        "file: %s\n"), strerror(errno));
       exit(CUPS_BACKEND_FAILED);
     }
 
     if ((in = cupsFileOpen(files[i], "r")) == NULL)
     {
-      fprintf(stderr, _("ERROR: Unable to open print file \"%s\": %s\n"),
-              files[i], strerror(errno));
+      _cupsLangPrintf(stderr,
+                      _("ERROR: Unable to open print file \"%s\": %s\n"),
+		      files[i], strerror(errno));
       cupsFileClose(out);
       exit(CUPS_BACKEND_FAILED);
     }
@@ -1339,8 +1353,9 @@ compress_files(int  num_files,		/* I - Number of files */
     while ((bytes = cupsFileRead(in, buffer, sizeof(buffer))) > 0)
       if (cupsFileWrite(out, buffer, bytes) < bytes)
       {
-        fprintf(stderr, _("ERROR: Unable to write %d bytes to \"%s\": %s\n"),
-	        (int)bytes, filename, strerror(errno));
+        _cupsLangPrintf(stderr,
+		        _("ERROR: Unable to write %d bytes to \"%s\": %s\n"),
+			(int)bytes, filename, strerror(errno));
         cupsFileClose(in);
         cupsFileClose(out);
 	exit(CUPS_BACKEND_FAILED);
@@ -1419,6 +1434,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
   char			unknown[1024];	/* Unknown message string */
   const char		*prefix;	/* Prefix for STATE: line */
   char			state[1024];	/* State string */
+  cups_lang_t		*language;	/* Current localization */
 
 
   if ((psm = ippFindAttribute(ipp, "printer-state-message",
@@ -1431,6 +1447,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
   state[0] = '\0';
   prefix   = "STATE: ";
+  language = cupsLangDefault();
 
   for (i = 0, count = 0; i < reasons->num_values; i ++)
   {
@@ -1504,11 +1521,11 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
     {
       count ++;
       if (strstr(reasons->values[i].string.text, "error"))
-        fprintf(stderr, "ERROR: %s\n", message);
+        fprintf(stderr, "ERROR: %s\n", _cupsLangString(language, message));
       else if (strstr(reasons->values[i].string.text, "warning"))
-        fprintf(stderr, "WARNING: %s\n", message);
+        fprintf(stderr, "WARNING: %s\n", _cupsLangString(language, message));
       else
-        fprintf(stderr, "INFO: %s\n", message);
+        fprintf(stderr, "INFO: %s\n", _cupsLangString(language, message));
     }
   }
 
@@ -1550,15 +1567,16 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
   printer = getenv("PRINTER");
   if (!printer)
   {
-    fputs(_("ERROR: PRINTER environment variable not defined!\n"), stderr);
+    _cupsLangPuts(stderr,
+                  _("ERROR: PRINTER environment variable not defined!\n"));
     return (-1);
   }
 
   if ((ppdfile = cupsGetPPD(printer)) == NULL)
   {
-    fprintf(stderr,
-            _("ERROR: Unable to get PPD file for printer \"%s\" - %s.\n"),
-            printer, cupsLastErrorString());
+    _cupsLangPrintf(stderr,
+		    _("ERROR: Unable to get PPD file for printer \"%s\" - "
+		      "%s.\n"), printer, cupsLastErrorString());
   }
   else
   {
@@ -1572,8 +1590,8 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
 
   if ((fd = cupsTempFd(pstmpname, sizeof(pstmpname))) < 0)
   {
-    fprintf(stderr, _("ERROR: Unable to create temporary file - %s.\n"),
-            strerror(errno));
+    _cupsLangPrintf(stderr, _("ERROR: Unable to create temporary file - %s.\n"),
+		    strerror(errno));
     if (ppdfile)
       unlink(ppdfile);
     return (-1);
@@ -1629,8 +1647,8 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
 
     execlp("pictwpstops", printer, argv[1], argv[2], argv[3], argv[4], argv[5],
            filename, NULL);
-    fprintf(stderr, _("ERROR: Unable to exec pictwpstops: %s\n"),
-            strerror(errno));
+    _cupsLangPrintf(stderr, _("ERROR: Unable to exec pictwpstops: %s\n"),
+		    strerror(errno));
     return (errno);
   }
 
@@ -1642,8 +1660,8 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
     * Error!
     */
 
-    fprintf(stderr, _("ERROR: Unable to fork pictwpstops: %s\n"),
-            strerror(errno));
+    _cupsLangPrintf(stderr, _("ERROR: Unable to fork pictwpstops: %s\n"),
+		    strerror(errno));
     unlink(filename);
     if (ppdfile)
       unlink(ppdfile);
@@ -1656,8 +1674,8 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
 
   if (wait(&status) < 0)
   {
-    fprintf(stderr, _("ERROR: Unable to wait for pictwpstops: %s\n"),
-            strerror(errno));
+    _cupsLangPrintf(stderr, _("ERROR: Unable to wait for pictwpstops: %s\n"),
+		    strerror(errno));
     close(fd);
     unlink(filename);
     if (ppdfile)
@@ -1673,11 +1691,11 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
   if (status)
   {
     if (status >= 256)
-      fprintf(stderr, _("ERROR: pictwpstops exited with status %d!\n"),
-              status / 256);
+      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited with status %d!\n"),
+		      status / 256);
     else
-      fprintf(stderr, _("ERROR: pictwpstops exited on signal %d!\n"),
-              status);
+      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited on signal %d!\n"),
+		      status);
 
     unlink(filename);
     return (status);

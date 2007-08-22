@@ -118,8 +118,8 @@ backendDrainOutput(int print_fd,	/* I - Print file descriptor */
         if (errno != ENOSPC && errno != ENXIO && errno != EAGAIN &&
 	    errno != EINTR && errno != ENOTTY)
 	{
-	  fprintf(stderr, _("ERROR: Unable to write print data: %s\n"),
-	          strerror(errno));
+	  _cupsLangPrintf(stderr, _("ERROR: Unable to write print data: %s\n"),
+			  strerror(errno));
 	  return (-1);
 	}
       }
@@ -230,7 +230,7 @@ backendRunLoop(
 	if (errno == ENXIO && offline != 1)
 	{
 	  fputs("STATE: +offline-error\n", stderr);
-	  fputs(_("INFO: Printer is currently off-line.\n"), stderr);
+	  _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
 	  offline = 1;
 	}
 	else if (errno == EINTR && total_bytes == 0)
@@ -321,7 +321,7 @@ backendRunLoop(
 	  if (paperout != 1)
 	  {
 	    fputs("STATE: +media-empty-error\n", stderr);
-	    fputs(_("ERROR: Out of paper!\n"), stderr);
+	    _cupsLangPuts(stderr, _("ERROR: Out of paper!\n"));
 	    paperout = 1;
 	  }
         }
@@ -330,7 +330,7 @@ backendRunLoop(
 	  if (offline != 1)
 	  {
 	    fputs("STATE: +offline-error\n", stderr);
-	    fputs(_("INFO: Printer is currently off-line.\n"), stderr);
+	    _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
 	    offline = 1;
 	  }
 	}
@@ -352,7 +352,7 @@ backendRunLoop(
 	if (offline)
 	{
 	  fputs("STATE: -offline-error\n", stderr);
-	  fputs(_("INFO: Printer is now on-line.\n"), stderr);
+	  _cupsLangPuts(stderr, _("INFO: Printer is now on-line.\n"));
 	  offline = 0;
 	}
 

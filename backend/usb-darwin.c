@@ -1,7 +1,7 @@
 /*
 * "$Id$"
 *
-* Copyright © 2005-2007 Apple Inc. All rights reserved.
+* Copyright ï¿½ 2005-2007 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -387,7 +387,7 @@ print_device(const char *uri,		/* I - Device URI */
         strlcpy(print_buffer, "USB class driver", sizeof(print_buffer));
 
       fputs("STATE: +apple-missing-usbclassdriver-error\n", stderr);
-      fprintf(stderr, _("FATAL: Could not load %s\n"), print_buffer);
+      _cupsLangPrintf(stderr, _("FATAL: Could not load %s\n"), print_buffer);
 
       if (driverBundlePath)
 	CFRelease(driverBundlePath);
@@ -404,7 +404,8 @@ print_device(const char *uri,		/* I - Device URI */
       countdown -= PRINTER_POLLING_INTERVAL;
       if (countdown <= 0)
       {
-	fprintf(stderr, _("INFO: Printer busy (status:0x%08x)\n"), (int)status);
+	_cupsLangPrintf(stderr, _("INFO: Printer busy (status:0x%08x)\n"),
+	                (int)status);
 	countdown = SUBSEQUENT_LOG_INTERVAL;	/* subsequent log entries, every 15 seconds */
       }
     }
@@ -456,7 +457,7 @@ print_device(const char *uri,		/* I - Device URI */
 
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
-      fputs(_("WARNING: Couldn't create side channel\n"), stderr);
+      _cupsLangPuts(stderr, _("WARNING: Couldn't create side channel\n"));
       return CUPS_BACKEND_STOP;
     }
   }
@@ -473,7 +474,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (pthread_create(&read_thread_id, NULL, read_thread, NULL))
   {
-    fputs(_("WARNING: Couldn't create read channel\n"), stderr);
+    _cupsLangPuts(stderr, _("WARNING: Couldn't create read channel\n"));
     return CUPS_BACKEND_STOP;
   }
 
@@ -488,7 +489,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   while (status == noErr && copies-- > 0)
   {
-    fputs(_("INFO: Sending data\n"), stderr);
+    _cupsLangPuts(stderr, _("INFO: Sending data\n"));
 
     if (print_fd != STDIN_FILENO)
     {
@@ -556,7 +557,7 @@ print_device(const char *uri,		/* I - Device URI */
 	}
 	else if (errno != EAGAIN)
 	{
-	 fprintf(stderr, _("ERROR: select() returned %d\n"), (int)errno);
+	 _cupsLangPrintf(stderr, _("ERROR: select() returned %d\n"), (int)errno);
 	 return CUPS_BACKEND_STOP;
 	}
       }
@@ -632,7 +633,8 @@ print_device(const char *uri,		/* I - Device URI */
 	  */
 
 	  OSStatus err = (*g.classdriver)->Abort(g.classdriver);
-	  fprintf(stderr, _("ERROR: %ld: (canceled:%ld)\n"), (long)status, (long)err);
+	  _cupsLangPrintf(stderr, _("ERROR: %ld: (canceled:%ld)\n"),
+	                  (long)status, (long)err);
 	  status = CUPS_BACKEND_STOP;
 	  break;
 	}
@@ -1091,7 +1093,7 @@ static Boolean find_device_cb(void *refcon,
   if (!keepLooking && g.status_timer != NULL)
   {
     fputs("STATE: -offline-error\n", stderr);
-    fputs(_("INFO: Printer is now on-line.\n"), stderr);
+    _cupsLangPuts(stderr, _("INFO: Printer is now on-line.\n"));
     CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), g.status_timer, kCFRunLoopDefaultMode);
     CFRelease(g.status_timer);
     g.status_timer = NULL;
@@ -1109,7 +1111,7 @@ static void status_timer_cb(CFRunLoopTimerRef timer,
 			    void *info)
 {
   fputs("STATE: +offline-error\n", stderr);
-  fputs(_("INFO: Printer is currently off-line.\n"), stderr);
+  _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
 }
 
 
@@ -1601,7 +1603,9 @@ static void parse_options(const char *options,
 	       strcasecmp(value, "false") == 0)
 	*wait_eof = false;
       else
-	fprintf(stderr, _("WARNING: Boolean expected for waiteof option \"%s\"\n"), value);
+	_cupsLangPrintf(stderr,
+	                _("WARNING: Boolean expected for waiteof option "
+			  "\"%s\"\n"), value);
     }
     else if (strcasecmp(optionName, "serial") == 0)
     {

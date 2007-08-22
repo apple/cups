@@ -110,7 +110,8 @@ print_device(const char *resource,	/* I - SCSI device */
 
   if (strncmp(resource, "/dev/sg", 7) != 0)
   {
-    fprintf(stderr, _("ERROR: Bad SCSI device file \"%s\"!\n"), resource);
+    _cupsLangPrintf(stderr, _("ERROR: Bad SCSI device file \"%s\"!\n"),
+                    resource);
     return (CUPS_BACKEND_STOP);
   }
 
@@ -148,13 +149,15 @@ print_device(const char *resource,	/* I - SCSI device */
 
       if (errno != EAGAIN && errno != EBUSY)
       {
-	fprintf(stderr, _("ERROR: Unable to open device file \"%s\": %s\n"),
-	        resource, strerror(errno));
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Unable to open device file \"%s\": %s\n"),
+			resource, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
       else
       {
-        fputs(_("INFO: Printer busy; will retry in 30 seconds...\n"), stderr);
+        _cupsLangPuts(stderr,
+	              _("INFO: Printer busy; will retry in 30 seconds...\n"));
         sleep(30);
       }
     }
@@ -220,9 +223,9 @@ print_device(const char *resource,	/* I - SCSI device */
 	if (ioctl(scsi_fd, SG_IO, &scsi_req) < 0 ||
             scsi_req.status != 0)
         {
-	  fprintf(stderr,
-	          _("WARNING: SCSI command timed out (%d); retrying...\n"),
-	          scsi_req.status);
+	  _cupsLangPrintf(stderr,
+			  _("WARNING: SCSI command timed out (%d); "
+			    "retrying...\n"), scsi_req.status);
           sleep(try + 1);
 	}
 	else
@@ -230,8 +233,8 @@ print_device(const char *resource,	/* I - SCSI device */
 
       if (try >= 10)
       {
-	fprintf(stderr, _("ERROR: Unable to send print data (%d)\n"),
-	        scsi_req.status);
+	_cupsLangPrintf(stderr, _("ERROR: Unable to send print data (%d)\n"),
+			scsi_req.status);
         close(scsi_fd);
 	return (CUPS_BACKEND_FAILED);
       }

@@ -122,8 +122,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
-	    argv[0]);
+    _cupsLangPrintf(stderr,
+		    _("Usage: %s job-id user title copies options [file]\n"),
+		    argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
 
@@ -213,8 +214,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        fputs(_("INFO: Unable to contact printer, queuing on next "
-		"printer in class...\n"), stderr);
+        _cupsLangPuts(stderr,
+	              _("INFO: Unable to contact printer, queuing on next "
+			"printer in class...\n"));
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -227,19 +229,22 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       if (errno == EBUSY)
       {
-        fputs(_("INFO: Printer busy; will retry in 30 seconds...\n"), stderr);
+        _cupsLangPuts(stderr,
+	              _("INFO: Printer busy; will retry in 30 seconds...\n"));
 	sleep(30);
       }
       else if (errno == ENXIO || errno == EIO || errno == ENOENT)
       {
-        fputs(_("INFO: Printer not connected; will retry in 30 seconds...\n"),
-	      stderr);
+        _cupsLangPuts(stderr,
+	              _("INFO: Printer not connected; will retry in 30 "
+		        "seconds...\n"));
 	sleep(30);
       }
       else
       {
-	fprintf(stderr, _("ERROR: Unable to open device file \"%s\": %s\n"),
-	        resource, strerror(errno));
+	_cupsLangPrintf(stderr,
+		        _("ERROR: Unable to open device file \"%s\": %s\n"),
+			resource, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
     }
@@ -279,13 +284,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     tbytes = backendRunLoop(print_fd, device_fd, use_bc, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
-      fprintf(stderr,
+      _cupsLangPrintf(stderr,
 #ifdef HAVE_LONG_LONG
-              _("INFO: Sent print file, %lld bytes...\n"),
+		      _("INFO: Sent print file, %lld bytes...\n"),
 #else
-              _("INFO: Sent print file, %ld bytes...\n"),
+		      _("INFO: Sent print file, %ld bytes...\n"),
 #endif /* HAVE_LONG_LONG */
-              CUPS_LLCAST tbytes);
+		      CUPS_LLCAST tbytes);
   }
 
  /*
@@ -613,7 +618,7 @@ side_cb(int print_fd,			/* I - Print file */
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
   {
-    fputs(_("WARNING: Failed to read side-channel request!\n"), stderr);
+    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
     return;
   }
 
