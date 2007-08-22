@@ -117,7 +117,6 @@ H2 SPAN.info, H3 SPAN.info {
 
 H2.title, H3.title {
   border-bottom: solid 2pt #000000;
-  page-break-before: always;
 }
 
 DT {
