@@ -5,6 +5,7 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.1
 
 	- Documentation updates.
+	- The configure script did not support --localedir=foo (STR #2488)
 	- The backends were not displaying their localized messages.
 	- CUPS-Authenticate-Job did not require Kerberos authentication
 	  on queues protected by Kerberos.

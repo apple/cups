@@ -292,20 +292,24 @@ AC_SUBST(CUPS_FONTPATH)
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$CUPS_FONTPATH")
 
 # Locale data
-case "$uname" in
-	Linux | GNU | *BSD* | Darwin*)
-		CUPS_LOCALEDIR="$datadir/locale"
-		;;
+if test "$localedir" = "\${datarootdir}/locale"; then
+	case "$uname" in
+		Linux | GNU | *BSD* | Darwin*)
+			CUPS_LOCALEDIR="$datarootdir/locale"
+			;;
 
-	OSF1* | AIX*)
-		CUPS_LOCALEDIR="$exec_prefix/lib/nls/msg"
-		;;
+		OSF1* | AIX*)
+			CUPS_LOCALEDIR="$exec_prefix/lib/nls/msg"
+			;;
 
-	*)
-		# This is the standard System V location...
-		CUPS_LOCALEDIR="$exec_prefix/lib/locale"
-		;;
-esac
+		*)
+			# This is the standard System V location...
+			CUPS_LOCALEDIR="$exec_prefix/lib/locale"
+			;;
+	esac
+else
+	CUPS_LOCALEDIR="$localedir"
+fi
 
 AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$CUPS_LOCALEDIR")
 AC_SUBST(CUPS_LOCALEDIR)
