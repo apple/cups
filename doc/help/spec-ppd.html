@@ -72,7 +72,7 @@ LINE-END = CR / LF / CR LF
 
 <p>This attribute requests special handling of the back side of pages
 when doing duplexed (2-sided) output. <a href='#TABLE_1'>Table 1</a>
-shows the supported keyword values for this attribute and their affect
+shows the supported keyword values for this attribute and their effect
 on the raster data sent to your driver. For example, when <tt>cupsBackSide</tt>
 is <code>Rotated</code> and <tt>Tumble</tt> is <tt>false</tt>, your driver
 will receive print data starting at the bottom right corner of the page, with
@@ -466,20 +466,46 @@ looking up IPP reason codes for this printer driver. The
 
 <h3><span class='info'>Mac OS X 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h3>
 
-<p class='summary'>*APCustomColorMatchingProfile name/text: "profile name"</p>
+<p class='summary'>*APCustomColorMatchingProfile: name</p>
 
-<p>This attribute defines the profile(s) to use when doing custom color
-matching. Typically it is used to tell the Mac OS X print filters which
-colorspace is expected when printing RGB color data.</p>
+<p>This attribute defines a supported RGB color profile that can be used
+when doing custom color matching. Currently only <tt>sRGB</tt> and
+<tt>AdobeRGB</tt> are supported.</p>
+
+<blockquote><b>Note:</b>
+
+<p>If you provide multiple <tt>APCustomColorMatchingProfile</tt> attributes,
+you are responsible for providing the necessary user interface controls to
+select the profile in a <a href='#APDialogExtension'>print dialog pane</a>.
+Add the named profile to the print settings using the key
+<tt>kPMCustomColorMatchingProfileKey</tt>.</p>
+
+</blockquote>
 
 <p>Examples:</p>
 
 <pre class='command'>
-*% Use sRGB for RGB color
-*APCustomColorMatchingProfile sRGB/sRGB: "sRGB"
+*% Use sRGB for RGB color by default, but support both sRGB and AdobeRGB
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+*APCustomColorMatchingProfile: sRGB
+*APCustomColorMatchingProfile: AdobeRGB
+</pre>
 
-*% Use AdobeRGB for AdobeRGB color
-*APCustomColorMatchingProfile AdobeRGB/AdobeRGB: "AdobeRGB"
+<h3><span class='info'>Mac OS X 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h3>
+
+<p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
+
+<p>This attribute defines the default RGB color profile that will be used
+when doing custom color matching. Currently only <tt>sRGB</tt> and
+<tt>AdobeRGB</tt> are supported.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use sRGB for RGB color by default
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
 </pre>
 
 <h3><span class='info'>Mac OS X 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
@@ -487,7 +513,7 @@ colorspace is expected when printing RGB color data.</p>
 <p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
 
 <p>This attribute defines additional option panes that are displayed in the
-print dialog. Each attribute adds a single option pane. See the "OutputBinsPDE"
+print dialog. Each attribute adds one or more option panes. See the "OutputBinsPDE"
 example and <a href='http://developer.apple.com/qa/qa2004/qa1352.html'>Apple
 Technical Q&amp;A QA1352</a> for information on writing your own print dialog
 plug-ins.</p>
@@ -495,8 +521,8 @@ plug-ins.</p>
 <blockquote><b>Note:</b>
 
 <p>Starting with Mac OS X 10.5, each plug-in must be compiled "4-way fat"
-(32-bit and 64-bit for both PowerPC and Intel) in order to be usable with
-all applications.</p>
+(32-bit and 64-bit for both PowerPC and Intel) with garbage collection enabled
+in order to be usable with all applications.</p>
 
 </blockquote>
 
@@ -513,8 +539,8 @@ all applications.</p>
 <p class='summary'>*APDuplexRequiresFlippedMargin: boolean</p>
 
 <p>This boolean attribute notifies the RIP filters that the
-destination printer does not require the top and bottom margins
-of the <tt>ImageableArea</tt> swapped for the back page. The
+destination printer requires the top and bottom margins of the
+<tt>ImageableArea</tt> to be swapped for the back page. The
 default is <tt>true</tt> when <tt>cupsBackSide</tt> is <tt>Flipped</tt>
 and <tt>false</tt> otherwise.</p>
 
@@ -575,9 +601,10 @@ Technical Note TN2144</a> for more information.</p>
 <p class='summary'>*APPrinterPreset name/text: "*Option Choice ..."</p>
 
 <p>This attribute defines presets for multiple options that show up
-in the print dialog on Mac OS X. Each preset maps to one or more
-pairs of PPD options and choices. The following preset names are
-currently defined:</p>
+in the print dialog of certain applications (such as iPhoto) on Mac OS X. Each
+preset maps to one or more pairs of PPD options and choices as well as providing
+key/value data for the application. The following preset names are currently
+defined:</p>
 
 <ul>
 
@@ -604,6 +631,13 @@ currently defined:</p>
 
 </ul>
 
+<p>The value string consists of pairs of keywords, either an option name and
+choice (*MainKeyword OptionKeyword) or a preset identifier and value
+(com.apple.print.preset.foo value). Preset identifiers and their supported
+values are documented in "<a
+href='http://developer.apple.com/documentation/Printing/Conceptual/PresetDraft/presets_intro/chapter_1_section_2.html'
+>Creating Printing Presets for iPhoto: Printing Presets File Format</a>".</p>
+
 <p>Presets, like options, can also be localized in multiple languages.</p>
 
 <p>Examples:</p>
@@ -612,7 +646,10 @@ currently defined:</p>
 *APPrinterPreset Photo_on_Photo_Paper/Photo on Photo Paper: "
   *MediaType Glossy
   *ColorModel RGB
-  *Resolution 300dpi"
+  *Resolution 300dpi
+  com.apple.print.preset.graphicsType Photo
+  com.apple.print.preset.quality mid
+  com.apple.print.preset.media-front-coating glossy"
 *End
 *fr.APPrinterPreset Photo_on_Photo_Paper/Photo sur papier photographique: ""
 </pre>
@@ -630,26 +667,6 @@ information.</p>
 <pre class='command'>
 *% Define the printer utility application
 *APPrinterPrinterUtilityPath: "/Library/Printers/vendor/Tools/utility.app"
-</pre>
-
-<h3><span class='info'>Mac OS X 10.5</span><a name='APRemoteQueueID'>APRemoteQueueID</a></h3>
-
-<p class='summary'>*APRemoteQueueID: "string"</p>
-
-<p>This string attribute notifies the scheduler that this PPD is for a remote
-CUPS printer, typically shared via Bonjour.</p>
-
-<blockquote><b>Note:</b>
-
-<p>This attribute is added automatically when adding a Bonjour shared printer
-on Mac OS X. It should never be included in the PPD files you distribute.</p>
-
-</blockquote>
-
-<p>Example:</p>
-
-<pre class='command'>
-*APRemoteQueueID: "myprinter"
 </pre>
 
 <h3><span class='info'>Mac OS X 10.3</span><a name='APScanAppBundleID'>APScanAppBundleID</a></h3>
@@ -670,12 +687,19 @@ the device.</p>
 <p class='summary'>*APSupportsCustomColorMatching: boolean</p>
 
 <p>This attribute specifies that the driver provides its own custom color
-matching. The default is <tt>false</tt>.</p>
+matching. When <tt>true</tt>, the default hand-off colorspace will be
+Generic Gray, Generic RGB, or Generic CMYK depending on the number of
+components the driver requests. The <a
+href='#APDefaultCustomColorMatchingProfile'><tt>APDefaultCustomColorMatchingProfile</tt></a>
+attribute can be used to override the default 3-component (RGB) colorspace.</p>
+
+<p>The default for <tt>APSupportsCustomColorMatching</tt> is <tt>false</tt>.</p>
 
 <p>Examples:</p>
 
 <pre class='command'>
-*APSupportsCustomColorMatching: false
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
 </pre>
 
 <h3><span class='info'>Mac OS X 10.4</span><a name='OID'>OID<i>MainKeyword</i></a></h3>
