@@ -601,10 +601,10 @@ Technical Note TN2144</a> for more information.</p>
 <p class='summary'>*APPrinterPreset name/text: "*Option Choice ..."</p>
 
 <p>This attribute defines presets for multiple options that show up
-in the print dialog of certain applications (such as iPhoto) on Mac OS X. Each
-preset maps to one or more pairs of PPD options and choices as well as providing
-key/value data for the application. The following preset names are currently
-defined:</p>
+in the print dialog of applications (such as iPhoto) that set the job
+style hint to <tt>NSPrintPhotoJobStyleHint</tt>. Each preset maps to one or
+more pairs of PPD options and choices as well as providing key/value data for
+the application. The following preset names are currently defined:</p>
 
 <ul>
 
@@ -843,10 +843,12 @@ option value is "2.0" then CUPS will output the string
 
 <h2 class='title'><a name='PROFILES'>Color Profiles</a></h2>
 
-<p>CUPS supports two types of color profiles. The first type is
+<p>CUPS supports three types of color profiles. The first type is
 based on sRGB and is used by the standard CUPS raster filters and
 ESP Ghostscript. The second type is based on ICC profiles and is
-used by the Core Graphics-based filters on MacOS X.</p>
+used by the Core Graphics-based filters on MacOS X. The final
+type is based on well-known colorspaces such as sRGB and Adobe
+RGB.</p>
 
 <blockquote><b>Note:</b> At this time, none of the CUPS raster
 filters support ICC profiles. This will be addressed as time
@@ -946,6 +948,19 @@ attributes define the mapping from selector to main keyword:</p>
 *cupsICCQualifier2: MediaType
 *cupsICCQualifier3: Resolution
 </pre>
+
+<h3><span class='info'>Mac OS X 10.5</span><a name='APCustom'>Custom Color Matching Support</a></h3>
+
+<p class='summary'>*<a href='#APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a>: true<br>
+*<a href='#APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a>: name<br>
+*<a href='#APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a>: name</p>
+
+<p>These attributes tell the Mac OS X raster filters that the printer
+driver uses its own custom color matching code and that generic color
+profiles should be used when generating 1-, 3-, and 4-component raster
+data as requested by the driver. The <tt>APCustomColorMatchingProfile</tt>
+and <tt>APDefaultColorMatchingProfile</tt> attributes specify alternate
+color profiles (sRGB or AdobeRGB) to use for 3-color (RGB) raster data.</p>
 
 
 <h2 class='title'><a name='I18N'>Globalized PPD Support</a></h2>
