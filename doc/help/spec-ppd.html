@@ -148,6 +148,318 @@ printers.</p>
 </pre>
 
 
+<h2 class='title'><a name='PROFILES'>Color Profiles</a></h2>
+
+<p>CUPS supports three types of color profiles. The first type is
+based on sRGB and is used by the standard CUPS raster filters and
+ESP Ghostscript. The second type is based on ICC profiles and is
+used by the Quartz-based filters on MacOS X. The final type is
+based on well-known colorspaces such as sRGB and Adobe RGB.</p>
+
+<blockquote><b>Note:</b>
+
+<p>At this time, none of the CUPS raster
+filters support ICC profiles. This will be addressed as time
+and resources permit.</p>
+
+</blockquote>
+
+<h3><a name='cupsColorProfile'>cupsColorProfile</a></h3>
+
+<p class='summary'>*cupsColorProfile Resolution/MediaType: "density
+gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"</p>
+
+<p>This string attribute specifies an sRGB-based color profile
+consisting of gamma and density controls and a 3x3 CMY color
+transform matrix.</p>
+
+<p>The <i>Resolution</i> and <i>MediaType</i> values may be "-"
+to act as a wildcard. Otherwise they must match one of the
+<tt>Resolution</tt> or <tt>MediaType</tt> attributes defined in
+the PPD file.</p>
+
+<p>The <i>density</i> and <i>gamma</i> values define gamma and
+density adjustment function such that:</p>
+
+<pre class='command'>
+f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
+</pre>
+
+<p>The <i>m00</i> through <i>m22</i> values define a 3x3
+transformation matrix for the CMY color values. The density
+function is applied <i>after</i> the CMY transformation:</p>
+
+<pre class='command'>
+| m00 m01 m02 |
+| m10 m11 m12 |
+| m20 m21 m22 |
+</pre>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify a profile for printing at 360dpi on all media types</em> 
+*cupsColorProfile 360dpi/-: "1.0 1.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
+
+<em>*% Specify a profile for printing at 720dpi on Glossy media</em> 
+*cupsColorProfile 720dpi/Glossy: "1.0 2.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
+
+<em>*% Specify a default profile for printing at all other resolutions and media types</em> 
+*cupsColorProfile -/-: "0.9 2.0 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
+</pre>
+
+<h3><span class='info'>Mac OS X 10.3/CUPS 1.2</span><a name='cupsICCProfile'>cupsICCProfile</a></h3>
+
+<p class='summary'>*cupsICCProfile
+ColorModel.MediaType.Resolution/Description: "filename"</p>
+
+<p>This attribute specifies an ICC color profile that is
+used to convert the document colors to the device
+colorspace. The <tt>ColorModel</tt>, <tt>MediaType</tt>, and
+<tt>Resolution</tt> keywords specify a selector for color
+profiles. If omitted, the color profile will match any option
+keyword for the corresponding main keyword.</p>
+
+<p>The <tt>Description</tt> specifies human-readable text that
+is associated with the color profile. The <tt>filename</tt>
+portion specifies the ICC color profile to use; if the filename
+is not absolute, it is loaded relative to the
+<var>/usr/share/cups/profiles</var> directory.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify a profile for CMYK printing at 360dpi on all media types</em> 
+*cupsICCProfile CMYK..360dpi/360dpi CMYK: "/Library/Printers/vendor/Profiles/foo-360-cmyk.icc"
+
+<em>*% Specify a profile for RGB printing at 720dpi on Glossy media</em> 
+*cupsColorProfile RGB.Glossy.720dpi/720dpi Glossy: "/Library/Printers/vendor/Profiles/foo-720-glossy-rgb.icc"
+
+<em>*% Specify a default profile for printing at all other resolutions and media types</em> 
+*cupsICCProfile ../Default: "/Library/Printers/vendor/Profiles/foo-default.icc"
+</pre>
+
+<h4>Customizing the Profile Selection Keywords</h4>
+
+<p>The <tt>MediaType</tt> and <tt>Resolution</tt> keywords can be
+reassigned to different main keywords, allowing drivers to do
+color profile selection based on different parameters. The
+<tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt>
+attributes define the mapping from selector to main keyword:</p>
+
+<pre class='command'>
+*cupsICCQualifier2: MainKeyword2
+*cupsICCQualifier3: MainKeyword3
+</pre>
+
+<p>The default mapping is as follows:</p>
+
+<pre class='command'>
+*cupsICCQualifier2: MediaType
+*cupsICCQualifier3: Resolution
+</pre>
+
+<h3><span class='info'>Mac OS X 10.4</span><a name='APCustom'>Custom Color Matching Support</a></h3>
+
+<p class='summary'>*<a href='#APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a>: true<br>
+*<a href='#APCustomColorMatchingName'>APCustomColorMatchingName</a> name/text: ""<br>
+*<a href='#APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a>: profile<br>
+*<a href='#APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a>: profile</p>
+
+<p>These attributes tell the Mac OS X raster filters that the printer
+driver provides its own custom color matching and that generic color
+profiles should be used when generating 1-, 3-, and 4-component raster
+data as requested by the driver. The <tt>APCustomColorMatchingProfile</tt>
+and <tt>APDefaultColorMatchingProfile</tt> attributes specify alternate
+color profiles (sRGB or AdobeRGB) to use for 3-color (RGB) raster data.</p>
+
+<h4><span class='info'>Mac OS X 10.5</span><a name='APCustomColorMatchingName'>APCustomColorMatchingName</a></h4>
+
+<p class='summary'>*APCustomColorMatchingName name/text: ""</p>
+
+<p>This attribute defines an alternate name for the color matching
+provided by a driver in the <var>Color Matching</var> print panel.
+The default is to use the name "Vendor Matching" or its localized
+equivalent.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Define the names for our color matching...
+*APCustomColorMatchingName name/AcmeColor(tm): ""
+*fr.APCustomColorMatchingName name/La AcmeColor(tm): ""
+</pre>
+
+<h4><span class='info'>Mac OS X 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h4>
+
+<p class='summary'>*APCustomColorMatchingProfile: name</p>
+
+<p>This attribute defines a supported RGB color profile that can be used
+when doing custom color matching. Currently only <tt>sRGB</tt> and
+<tt>AdobeRGB</tt> are supported. If not specified, RGB data will use the
+Generic RGB colorspace.</p>
+
+<blockquote><b>Note:</b>
+
+<p>If you provide multiple <tt>APCustomColorMatchingProfile</tt> attributes,
+you are responsible for providing the necessary user interface controls to
+select the profile in a <a href='#APDialogExtension'>print dialog pane</a>.
+Add the named profile to the print settings using the key
+<tt>kPMCustomColorMatchingProfileKey</tt>.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use sRGB for RGB color by default, but support both sRGB and AdobeRGB
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+*APCustomColorMatchingProfile: sRGB
+*APCustomColorMatchingProfile: AdobeRGB
+</pre>
+
+<h4><span class='info'>Mac OS X 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h4>
+
+<p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
+
+<p>This attribute defines the default RGB color profile that will be used
+when doing custom color matching. Currently only <tt>sRGB</tt> and
+<tt>AdobeRGB</tt> are supported.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use sRGB for RGB color by default
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+</pre>
+
+<h4><span class='info'>Mac OS X 10.4</span><a name='APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a></h4>
+
+<p class='summary'>*APSupportsCustomColorMatching: boolean</p>
+
+<p>This attribute specifies that the driver provides its own custom color
+matching. When <tt>true</tt>, the default hand-off colorspace will be
+Generic Gray, Generic RGB, or Generic CMYK depending on the number of
+components the driver requests. The <a
+href='#APDefaultCustomColorMatchingProfile'><tt>APDefaultCustomColorMatchingProfile</tt></a>
+attribute can be used to override the default 3-component (RGB) colorspace.</p>
+
+<p>The default for <tt>APSupportsCustomColorMatching</tt> is <tt>false</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+</pre>
+
+
+<h2 class='title'><a name='I18N'>Globalized PPD Support</a></h2>
+
+<p>CUPS 1.2 and higher adds support for PPD files containing multiple
+languages by following the following additional rules:</p>
+
+<ol>
+
+	<li>The <tt>LanguageVersion</tt> MUST be <tt>English</tt></li>
+
+	<li>The <tt>LanguageEncoding</tt> MUST be <tt>ISOLatin1</tt></li>
+
+	<li>The <tt>cupsLanguages</tt> attribute MUST be provided and
+	list each of the supported locales in the PPD file</li>
+
+	<li>Main and option keywords MUST NOT exceed 34 (instead of 40)
+	characters to allow room for the locale prefixes in translation
+	attributes</li>
+
+	<li>The main keyword "Translation" MUST NOT be used</li>
+
+	<li>Translation strings included with the main and option
+	keywords MUST NOT contain characters outside the ASCII
+	subset of ISOLatin1 and UTF-8; developers wishing to use
+	characters outside ASCII MUST provide a separate set of
+	English localization attributes for the affected keywords.</li>
+
+	<li>Localizations are specified using a locale prefix of
+	the form "ll" or "ll_CC." where "ll" is the 2-letter ISO
+	language code and "CC" is the 2-letter ISO country
+	code<ul>
+		<li>A generic language translation ("ll") SHOULD be provided with country-specific differences ("ll_CC") provided only as needed</li>
+		<li>For historical reasons, the "zh" and "zh_CN" locales map to Simplified Chinese while the "zh_TW" locale maps to Traditional Chinese</li>
+	</ul></li>
+
+	<li>Locale-specific translation strings MUST be encoded
+	using UTF-8.</li>
+
+	<li>Main keywords MUST be localized using one of the
+	following forms:
+	<p><tt>*ll.Translation MainKeyword/translation
+	text: ""</tt><br />
+	<tt>*ll_CC.Translation MainKeyword/translation
+	text: ""</tt></p></li>
+
+	<li>Option keywords MUST be localized using one of the
+	following forms:
+	<p><tt>*ll.MainKeyword OptionKeyword/translation
+	text: ""</tt><br />
+	<tt>*ll_CC.MainKeyword OptionKeyword/translation
+	text: ""</tt></p></li>
+
+	<li>Localization attributes MAY appear anywhere after the
+	first line of the PPD file</li>
+
+</ol>
+
+<blockquote><b>Note:</b>
+
+<p>We use a <tt>LanguageEncoding</tt> value of <tt>ISOLatin1</tt>
+and limit the allowed base translation strings to ASCII to avoid
+character coding issues that would otherwise occur. In addition,
+requiring the base translation strings to be in English allows
+for easier fallback translation when no localization is provided
+in the PPD file for a given locale.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*cupsLanguages: "de fr_CA"
+*ModelName: "Foobar Laser 9999"
+
+<em>*% Localize ModelName for French and German</em>
+*fr_CA.Translation ModelName/La Foobar Laser 9999: ""
+*de.Translation ModelName/Foobar LaserDrucken 9999: ""
+
+*cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html"
+<em>*% Localize printer-state-reason for French and German</em>
+*fr_CA.cupsIPPReason com.vendor-error/Une erreur s&egrave;rieuse s'est produite: "/help/com.vendor/error.html"
+*de.cupsIPPReason com.vendor-error/Eine ernste St&ouml;rung trat: "/help/com.vendor/error.html"
+
+...
+
+*OpenUI *InputSlot/Paper Source: PickOne
+*OrderDependency: 10 AnySetup *InputSlot
+*DefaultInputSlot: Auto
+<em>*% Localize InputSlot for French and German</em>
+*fr_CA.Translation InputSlot/Papier source: ""
+*de.Translation InputSlot/Papiereinzug: ""
+*InputSlot Auto/Default: "&lt;&lt;/ManualFeed false&gt;&gt;setpagedevice"
+<em>*% Localize InputSlot=Auto for French and German</em>
+*fr_CA.InputSlot Auto/Par Defaut: ""
+*de.InputSlot Auto/Standard: ""
+*InputSlot Manual/Manual Feed: "&lt;&lt;/ManualFeed true&gt;&gt;setpagedevice"
+<em>*% Localize InputSlot=Manual for French and German</em>
+*fr_CA.InputSlot Manual/Manuel mecanisme de alimentation: ""
+*de.InputSlot Manual/Manueller Einzug: ""
+*CloseUI: *InputSlot
+</pre>
+
+
 <h2 class='title'><a name='OPTIONS'>Custom Options</a></h2>
 
 <p>CUPS supports custom options using an extension of the
@@ -268,235 +580,6 @@ options on Mac OS X must provide their own user interface via the
 *CustomGammaDensity True: "&lt;&lt;/cupsReal1 3 -1 roll/cupsReal2 5 -1&gt;&gt;setpagedevice"
 *ParamCustomGammaDensity Gamma: 1 curve 0.1 10
 *ParamCustomGammaDensity Density: 2 real 0 2
-</pre>
-
-
-<h2 class='title'><a name='PROFILES'>Color Profiles</a></h2>
-
-<p>CUPS supports three types of color profiles. The first type is
-based on sRGB and is used by the standard CUPS raster filters and
-ESP Ghostscript. The second type is based on ICC profiles and is
-used by the Quartz-based filters on MacOS X. The final type is
-based on well-known colorspaces such as sRGB and Adobe RGB.</p>
-
-<blockquote><b>Note:</b>
-
-<p>At this time, none of the CUPS raster
-filters support ICC profiles. This will be addressed as time
-and resources permit.</p>
-
-</blockquote>
-
-<h3><a name='cupsColorProfile'>cupsColorProfile</a></h3>
-
-<p class='summary'>*cupsColorProfile Resolution/MediaType: "density
-gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"</p>
-
-<p>This string attribute specifies an sRGB-based color profile
-consisting of gamma and density controls and a 3x3 CMY color
-transform matrix.</p>
-
-<p>The <i>Resolution</i> and <i>MediaType</i> values may be "-"
-to act as a wildcard. Otherwise they must match one of the
-<tt>Resolution</tt> or <tt>MediaType</tt> attributes defined in
-the PPD file.</p>
-
-<p>The <i>density</i> and <i>gamma</i> values define gamma and
-density adjustment function such that:</p>
-
-<pre class='command'>
-f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
-</pre>
-
-<p>The <i>m00</i> through <i>m22</i> values define a 3x3
-transformation matrix for the CMY color values. The density
-function is applied <i>after</i> the CMY transformation:</p>
-
-<pre class='command'>
-| m00 m01 m02 |
-| m10 m11 m12 |
-| m20 m21 m22 |
-</pre>
-
-<p>Examples:</p>
-
-<pre class='command'>
-<em>*% Specify a profile for printing at 360dpi on all media types</em> 
-*cupsColorProfile 360dpi/-: "1.0 1.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
-
-<em>*% Specify a profile for printing at 720dpi on Glossy media</em> 
-*cupsColorProfile 720dpi/Glossy: "1.0 2.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
-
-<em>*% Specify a default profile for printing at all other resolutions and media types</em> 
-*cupsColorProfile -/-: "0.9 2.0 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
-</pre>
-
-<h3><span class='info'>Mac OS X 10.3/CUPS 1.2</span><a name='cupsICCProfile'>cupsICCProfile</a></h3>
-
-<p class='summary'>*cupsICCProfile
-ColorModel.MediaType.Resolution/Description: "filename"</p>
-
-<p>This attribute specifies an ICC color profile that is
-used to convert the document colors to the device
-colorspace. The <tt>ColorModel</tt>, <tt>MediaType</tt>, and
-<tt>Resolution</tt> keywords specify a selector for color
-profiles. If omitted, the color profile will match any option
-keyword for the corresponding main keyword.</p>
-
-<p>The <tt>Description</tt> specifies human-readable text that
-is associated with the color profile. The <tt>filename</tt>
-portion specifies the ICC color profile to use; if the filename
-is not absolute, it is loaded relative to the
-<var>/usr/share/cups/profiles</var> directory.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-<em>*% Specify a profile for CMYK printing at 360dpi on all media types</em> 
-*cupsICCProfile CMYK..360dpi/360dpi CMYK: "/Library/Printers/vendor/Profiles/foo-360-cmyk.icc"
-
-<em>*% Specify a profile for RGB printing at 720dpi on Glossy media</em> 
-*cupsColorProfile RGB.Glossy.720dpi/720dpi Glossy: "/Library/Printers/vendor/Profiles/foo-720-glossy-rgb.icc"
-
-<em>*% Specify a default profile for printing at all other resolutions and media types</em> 
-*cupsICCProfile ../Default: "/Library/Printers/vendor/Profiles/foo-default.icc"
-</pre>
-
-<h4>Customizing the Profile Selection Keywords</h4>
-
-<p>The <tt>MediaType</tt> and <tt>Resolution</tt> keywords can be
-reassigned to different main keywords, allowing drivers to do
-color profile selection based on different parameters. The
-<tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt>
-attributes define the mapping from selector to main keyword:</p>
-
-<pre class='command'>
-*cupsICCQualifier2: MainKeyword2
-*cupsICCQualifier3: MainKeyword3
-</pre>
-
-<p>The default mapping is as follows:</p>
-
-<pre class='command'>
-*cupsICCQualifier2: MediaType
-*cupsICCQualifier3: Resolution
-</pre>
-
-<h3><span class='info'>Mac OS X 10.5</span><a name='APCustom'>Custom Color Matching Support</a></h3>
-
-<p class='summary'>*<a href='#APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a>: true<br>
-*<a href='#APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a>: name<br>
-*<a href='#APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a>: name</p>
-
-<p>These attributes tell the Mac OS X raster filters that the printer
-driver uses its own custom color matching code and that generic color
-profiles should be used when generating 1-, 3-, and 4-component raster
-data as requested by the driver. The <tt>APCustomColorMatchingProfile</tt>
-and <tt>APDefaultColorMatchingProfile</tt> attributes specify alternate
-color profiles (sRGB or AdobeRGB) to use for 3-color (RGB) raster data.</p>
-
-
-<h2 class='title'><a name='I18N'>Globalized PPD Support</a></h2>
-
-<p>CUPS 1.2 and higher adds support for PPD files containing multiple
-languages by following the following additional rules:</p>
-
-<ol>
-
-	<li>The <tt>LanguageVersion</tt> MUST be <tt>English</tt></li>
-
-	<li>The <tt>LanguageEncoding</tt> MUST be <tt>ISOLatin1</tt></li>
-
-	<li>The <tt>cupsLanguages</tt> attribute MUST be provided and
-	list each of the supported locales in the PPD file</li>
-
-	<li>Main and option keywords MUST NOT exceed 34 (instead of 40)
-	characters to allow room for the locale prefixes in translation
-	attributes</li>
-
-	<li>The main keyword "Translation" MUST NOT be used</li>
-
-	<li>Translation strings included with the main and option
-	keywords MUST NOT contain characters outside the ASCII
-	subset of ISOLatin1 and UTF-8; developers wishing to use
-	characters outside ASCII MUST provide a separate set of
-	English localization attributes for the affected keywords.</li>
-
-	<li>Localizations are specified using a locale prefix of
-	the form "ll" or "ll_CC." where "ll" is the 2-letter ISO
-	language code and "CC" is the 2-letter ISO country
-	code<ul>
-		<li>A generic language translation ("ll") SHOULD be provided with country-specific differences ("ll_CC") provided only as needed</li>
-		<li>For historical reasons, the "zh" and "zh_CN" locales map to Simplified Chinese while the "zh_TW" locale maps to Traditional Chinese</li>
-	</ul></li>
-
-	<li>Locale-specific translation strings MUST be encoded
-	using UTF-8.</li>
-
-	<li>Main keywords MUST be localized using one of the
-	following forms:
-	<p><tt>*ll.Translation MainKeyword/translation
-	text: ""</tt><br />
-	<tt>*ll_CC.Translation MainKeyword/translation
-	text: ""</tt></p></li>
-
-	<li>Option keywords MUST be localized using one of the
-	following forms:
-	<p><tt>*ll.MainKeyword OptionKeyword/translation
-	text: ""</tt><br />
-	<tt>*ll_CC.MainKeyword OptionKeyword/translation
-	text: ""</tt></p></li>
-
-	<li>Localization attributes MAY appear anywhere after the
-	first line of the PPD file</li>
-
-</ol>
-
-<blockquote><b>Note:</b>
-
-<p>We use a <tt>LanguageEncoding</tt> value of <tt>ISOLatin1</tt>
-and limit the allowed base translation strings to ASCII to avoid
-character coding issues that would otherwise occur. In addition,
-requiring the base translation strings to be in English allows
-for easier fallback translation when no localization is provided
-in the PPD file for a given locale.</p>
-
-</blockquote>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*LanguageVersion: English
-*LanguageEncoding: ISOLatin1
-*cupsLanguages: "de fr_CA"
-*ModelName: "Foobar Laser 9999"
-
-<em>*% Localize ModelName for French and German</em>
-*fr_CA.Translation ModelName/La Foobar Laser 9999: ""
-*de.Translation ModelName/Foobar LaserDrucken 9999: ""
-
-*cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html"
-<em>*% Localize printer-state-reason for French and German</em>
-*fr_CA.cupsIPPReason com.vendor-error/Une erreur s&egrave;rieuse s'est produite: "/help/com.vendor/error.html"
-*de.cupsIPPReason com.vendor-error/Eine ernste St&ouml;rung trat: "/help/com.vendor/error.html"
-
-...
-
-*OpenUI *InputSlot/Paper Source: PickOne
-*OrderDependency: 10 AnySetup *InputSlot
-*DefaultInputSlot: Auto
-<em>*% Localize InputSlot for French and German</em>
-*fr_CA.Translation InputSlot/Papier source: ""
-*de.Translation InputSlot/Papiereinzug: ""
-*InputSlot Auto/Default: "&lt;&lt;/ManualFeed false&gt;&gt;setpagedevice"
-<em>*% Localize InputSlot=Auto for French and German</em>
-*fr_CA.InputSlot Auto/Par Defaut: ""
-*de.InputSlot Auto/Standard: ""
-*InputSlot Manual/Manual Feed: "&lt;&lt;/ManualFeed true&gt;&gt;setpagedevice"
-<em>*% Localize InputSlot=Manual for French and German</em>
-*fr_CA.InputSlot Manual/Manuel mecanisme de alimentation: ""
-*de.InputSlot Manual/Manueller Einzug: ""
-*CloseUI: *InputSlot
 </pre>
 
 
@@ -1254,50 +1337,6 @@ looking up IPP reason codes for this printer driver. The
 *APBookFile: "file:///Library/Printers/vendor/Help/filename"
 </pre>
 
-<h3><span class='info'>Mac OS X 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h3>
-
-<p class='summary'>*APCustomColorMatchingProfile: name</p>
-
-<p>This attribute defines a supported RGB color profile that can be used
-when doing custom color matching. Currently only <tt>sRGB</tt> and
-<tt>AdobeRGB</tt> are supported.</p>
-
-<blockquote><b>Note:</b>
-
-<p>If you provide multiple <tt>APCustomColorMatchingProfile</tt> attributes,
-you are responsible for providing the necessary user interface controls to
-select the profile in a <a href='#APDialogExtension'>print dialog pane</a>.
-Add the named profile to the print settings using the key
-<tt>kPMCustomColorMatchingProfileKey</tt>.</p>
-
-</blockquote>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*% Use sRGB for RGB color by default, but support both sRGB and AdobeRGB
-*APSupportsCustomColorMatching: true
-*APDefaultCustomColorMatchingProfile: sRGB
-*APCustomColorMatchingProfile: sRGB
-*APCustomColorMatchingProfile: AdobeRGB
-</pre>
-
-<h3><span class='info'>Mac OS X 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h3>
-
-<p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
-
-<p>This attribute defines the default RGB color profile that will be used
-when doing custom color matching. Currently only <tt>sRGB</tt> and
-<tt>AdobeRGB</tt> are supported.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*% Use sRGB for RGB color by default
-*APSupportsCustomColorMatching: true
-*APDefaultCustomColorMatchingProfile: sRGB
-</pre>
-
 <h3><span class='info'>Mac OS X 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
 
 <p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
@@ -1530,26 +1569,6 @@ the device.</p>
 
 <pre class='command'>
 *APScanAppBundleID: "com.apple.ImageCaptureApp"
-</pre>
-
-<h3><span class='info'>Mac OS X 10.4</span><a name='APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a></h3>
-
-<p class='summary'>*APSupportsCustomColorMatching: boolean</p>
-
-<p>This attribute specifies that the driver provides its own custom color
-matching. When <tt>true</tt>, the default hand-off colorspace will be
-Generic Gray, Generic RGB, or Generic CMYK depending on the number of
-components the driver requests. The <a
-href='#APDefaultCustomColorMatchingProfile'><tt>APDefaultCustomColorMatchingProfile</tt></a>
-attribute can be used to override the default 3-component (RGB) colorspace.</p>
-
-<p>The default for <tt>APSupportsCustomColorMatching</tt> is <tt>false</tt>.</p>
-
-<p>Examples:</p>
-
-<pre class='command'>
-*APSupportsCustomColorMatching: true
-*APDefaultCustomColorMatchingProfile: sRGB
 </pre>
 
 
