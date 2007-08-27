@@ -722,11 +722,11 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 static void
 list_devices(void)
 {
-#if defined(__hpux) || defined(__sgi) || defined(__sun) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#if defined(__hpux) || defined(__sgi) || defined(__sun) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
   static char	*funky_hex = "0123456789abcdefghijklmnopqrstuvwxyz";
 					/* Funky hex numbering used for some *
 					 * devices                           */
-#endif /* __hpux || __sgi || __sun || __FreeBSD__ || __OpenBSD__ */
+#endif /* __hpux || __sgi || __sun || __FreeBSD__ || __OpenBSD__ || __FreeBSD_kernel__ */
 
 #ifdef __linux
   int			i, j;		/* Looping vars */
@@ -1022,7 +1022,7 @@ list_devices(void)
       printf("serial serial:%s?baud=38400 \"Unknown\" \"Serial Port #%d\"\n",
              device, i + 1);
   }
-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
   int	i, j;		/* Looping vars */
   int	fd;		/* File descriptor */
   char	device[255];	/* Device filename */

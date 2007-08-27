@@ -281,7 +281,7 @@ list_devices(void)
   }
 #elif defined(__hpux)
 #elif defined(__osf)
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
   int   i;                      /* Looping var */
   char  device[255];            /* Device filename */
 

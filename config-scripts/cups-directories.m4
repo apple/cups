@@ -157,7 +157,7 @@ if test x$rcdir = x; then
 			RCSTOP="25"
 			;;
 
-		Linux | GNU)
+		Linux | GNU | GNU/k*BSD*)
 			# Linux/HURD seems to choose an init.d directory at random...
 			if test -d /sbin/init.d; then
 				# SuSE
