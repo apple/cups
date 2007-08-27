@@ -3,7 +3,9 @@ CHANGES.txt - 2007-08-27
 
 CHANGES IN CUPS V1.4b1
 
-	- Added generic PostScript and PCL printer driver PPDs.
+	- The scheduler (cupsd) now supports a new option (-t) to
+	  do a syntax check of the cupsd.conf file (STR #2003)
 	- Added new cupsGetPPD3() API to allow applications to
 	  cache PPDs safely (STR #1473)
+	- Added generic PostScript and PCL printer driver PPDs.
 

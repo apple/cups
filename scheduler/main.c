@@ -242,6 +242,11 @@ main(int  argc,				/* I - Number of command-line args */
 	      fg             = 1;
 	      break;
 
+          case 't' : /* Test the cupsd.conf file... */
+	      TestConfigFile = 1;
+	      fg             = 1;
+	      break;
+
 	  default : /* Unknown option */
               _cupsLangPrintf(stderr, _("cupsd: Unknown option \"%c\" - "
 	                                "aborting!\n"), *opt);
@@ -398,9 +403,17 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (!cupsdReadConfiguration())
   {
-    syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
-           ConfigurationFile);
+    if (TestConfigFile)
+      printf("%s contains errors\n", ConfigurationFile);
+    else
+      syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
+	     ConfigurationFile);
     return (1);
+  }
+  else if (TestConfigFile)
+  {
+    printf("%s is OK\n", ConfigurationFile);
+    return (0);
   }
 
   if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)))

@@ -152,6 +152,8 @@ typedef void (*cupsd_selfunc_t)(void *data);
  * Globals...
  */
 
+VAR int			TestConfigFile	VALUE(0);
+					/* Test the cupsd.conf file? */
 VAR int			MaxFDs;		/* Maximum number of files */
 
 VAR time_t		ReloadTime	VALUE(0);
