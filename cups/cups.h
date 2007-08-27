@@ -248,6 +248,10 @@ extern void		cupsSetDefaultDest(const char *name,
 					   int num_dests,
 					   cups_dest_t *dests);
 
+/**** New in CUPS 1.4 ****/
+extern http_status_t	cupsGetPPD3(http_t *http, const char *name,
+			            time_t *modtime, char *buffer,
+				    size_t bufsize);
 
 #  ifdef __cplusplus
 }

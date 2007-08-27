@@ -30,6 +30,8 @@
  *                            server.
  *   cupsGetPPD2()          - Get the PPD file for a printer on the specified
  *                            server.
+ *   cupsGetPPD3()          - Get the PPD file for a printer on the specified
+ *                            server if it has changed.
  *   cupsGetPrinters()      - Get a list of printers from the default server.
  *   cupsGetServerPPD()     - Get an available PPD file from the server.
  *   cupsLastError()        - Return the last IPP status code.
@@ -758,6 +760,8 @@ const char *				/* O - Filename for PPD file */
 cupsGetPPD(const char *name)		/* I - Printer name */
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  time_t	modtime = 0;		/* Modification time */
+
 
  /*
   * See if we can connect to the server...
@@ -774,7 +778,13 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   * Return the PPD file...
   */
 
-  return (cupsGetPPD2(cg->http, name));
+  cg->ppd_filename[0] = '\0';
+
+  if (cupsGetPPD3(cg->http, name, &modtime, cg->ppd_filename,
+                  sizeof(cg->ppd_filename)) == HTTP_OK)
+    return (cg->ppd_filename);
+  else
+    return (NULL);
 }
 
 
@@ -790,6 +800,43 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 const char *				/* O - Filename for PPD file */
 cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
             const char *name)		/* I - Printer name */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  time_t	modtime = 0;		/* Modification time */
+
+
+  cg->ppd_filename[0] = '\0';
+
+  if (cupsGetPPD3(http, name, &modtime, cg->ppd_filename,
+                  sizeof(cg->ppd_filename)) == HTTP_OK)
+    return (cg->ppd_filename);
+  else
+    return (NULL);
+}
+
+
+/*
+ * 'cupsGetPPD3()' - Get the PPD file for a printer on the specified
+ *                   server if it has changed.
+ *
+ * The "modtime" parameter contains the modification time of any
+ * locally-cached content and is updated with the time from the PPD file on
+ * the server.
+ *
+ * The "buffer" parameter contains the local PPD filename.  If it contains
+ * the empty string, a new temporary file is created, otherwise the existing
+ * file will be overwritten as needed.
+ *
+ * On success, HTTP_OK is returned for a new PPD file and HTTP_NOT_MODIFIED
+ * if the existing PPD file is up-to-date.  Any other status is an error.
+ */
+
+http_status_t				/* O  - HTTP status */
+cupsGetPPD3(http_t     *http,		/* I  - HTTP connection */
+            const char *name,		/* I  - Printer name */
+	    time_t     *modtime,	/* IO - Modification time */
+	    char       *buffer,		/* I  - Filename buffer */
+	    size_t     bufsize)		/* I  - Size of filename buffer */
 {
   int		http_port;		/* Port number */
   char		http_hostname[HTTP_MAX_HOST];
@@ -808,17 +855,32 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   * Range check input...
   */
 
-  DEBUG_printf(("cupsGetPPD2(http=%p, name=\"%s\")\n", http,
-                name ? name : "(null)"));
+  DEBUG_printf(("cupsGetPPD3(http=%p, name=\"%s\", modtime=%p(%d), buffer=%p, "
+                "bufsize=%d)\n", http, name ? name : "(null)", modtime,
+		modtime ? *modtime : 0, buffer, (int)bufsize));
 
-  if (!http || !name)
+  if (!http)
   {
-    if (!http)
-      _cupsSetError(IPP_INTERNAL_ERROR, "No HTTP connection!");
-    else
-      _cupsSetError(IPP_INTERNAL_ERROR, "No printer name!");
+    _cupsSetError(IPP_INTERNAL_ERROR, "No HTTP connection!");
+    return (HTTP_NOT_ACCEPTABLE);
+  }
 
-    return (NULL);
+  if (!name)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, "No printer name!");
+    return (HTTP_NOT_ACCEPTABLE);
+  }
+
+  if (!modtime)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, "No modification time!");
+    return (HTTP_NOT_ACCEPTABLE);
+  }
+
+  if (!buffer || bufsize <= 1)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, "Bad filename buffer!");
+    return (HTTP_NOT_ACCEPTABLE);
   }
 
  /*
@@ -827,7 +889,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
   if (!cups_get_printer_uri(http, name, hostname, sizeof(hostname), &port,
                             resource, sizeof(resource), 0))
-    return (NULL);
+    return (HTTP_NOT_FOUND);
 
   DEBUG_printf(("Printer hostname=\"%s\", port=%d\n", hostname, port));
 
@@ -872,14 +934,19 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   {
     DEBUG_puts("Unable to connect to server!");
 
-    return (NULL);
+    return (HTTP_SERVICE_UNAVAILABLE);
   }
 
  /*
   * Get a temp file...
   */
 
-  if ((fd = cupsTempFd(cg->ppd_filename, sizeof(cg->ppd_filename))) < 0)
+  if (buffer[0])
+    fd = open(buffer, O_CREAT | O_TRUNC | O_WRONLY, 0600);
+  else
+    fd = cupsTempFd(buffer, bufsize);
+
+  if (fd < 0)
   {
    /*
     * Can't open file; close the server connection and return NULL...
@@ -890,7 +957,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     if (http2 != http)
       httpClose(http2);
 
-    return (NULL);
+    return (HTTP_SERVER_ERROR);
   }
 
  /*
@@ -898,6 +965,10 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   */
 
   strlcat(resource, ".ppd", sizeof(resource));
+
+  if (*modtime > 0)
+    httpSetField(http2, HTTP_FIELD_IF_MODIFIED_SINCE,
+                 httpGetDateString(*modtime));
 
   status = cupsGetFd(http2, resource, fd);
 
@@ -910,7 +981,9 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   * See if we actually got the file or an error...
   */
 
-  if (status != HTTP_OK)
+  if (status == HTTP_OK)
+    *modtime = httpGetDateTime(httpGetField(http2, HTTP_FIELD_DATE));
+  else if (status != HTTP_NOT_MODIFIED)
   {
     switch (status)
     {
@@ -930,15 +1003,13 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     }
 
     unlink(cg->ppd_filename);
-
-    return (NULL);
   }
 
  /*
   * Return the PPD file...
   */
 
-  return (cg->ppd_filename);
+  return (status);
 }
 
 
