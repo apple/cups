@@ -77,7 +77,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Do the operation...
   */
 
-  if ((op = cgiGetVariable("OP")) != NULL && job_id > 0)
+  if ((op = cgiGetVariable("OP")) != NULL && job_id > 0 && cgiIsPOST())
   {
    /*
     * Do the operation...

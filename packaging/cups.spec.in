@@ -495,8 +495,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/de
 /usr/share/doc/cups/de/index.html
-%dir /usr/share/doc/cups/de/images
-/usr/share/doc/cups/de/images/*
 %dir /usr/share/cups/templates/de
 /usr/share/cups/templates/de/*
 /usr/share/locale/de/cups_de.po
@@ -505,8 +503,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/es
 /usr/share/doc/cups/es/index.html
-%dir /usr/share/doc/cups/es/images
-/usr/share/doc/cups/es/images/*
 %dir /usr/share/cups/templates/es
 /usr/share/cups/templates/es/*
 /usr/share/locale/es/cups_es.po
@@ -515,8 +511,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/et
 /usr/share/doc/cups/et/index.html
-%dir /usr/share/doc/cups/et/images
-/usr/share/doc/cups/et/images/*
 %dir /usr/share/cups/templates/et
 /usr/share/cups/templates/et/*
 /usr/share/locale/et/cups_et.po
@@ -529,8 +523,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/fr
 /usr/share/doc/cups/fr/index.html
-%dir /usr/share/doc/cups/fr/images
-/usr/share/doc/cups/fr/images/*
 %dir /usr/share/cups/templates/fr
 /usr/share/cups/templates/fr/*
 /usr/share/locale/fr/cups_fr.po
@@ -540,8 +532,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/doc/cups/he
 /usr/share/doc/cups/he/index.html
 /usr/share/doc/cups/he/cups.css
-%dir /usr/share/doc/cups/he/images
-/usr/share/doc/cups/he/images/*
 %dir /usr/share/cups/templates/he
 /usr/share/cups/templates/he/*
 /usr/share/locale/he/cups_he.po
@@ -550,8 +540,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/it
 /usr/share/doc/cups/it/index.html
-%dir /usr/share/doc/cups/it/images
-/usr/share/doc/cups/it/images/*
 %dir /usr/share/cups/templates/it
 /usr/share/cups/templates/it/*
 /usr/share/locale/it/cups_it.po
@@ -560,8 +548,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/ja
 /usr/share/doc/cups/ja/index.html
-%dir /usr/share/doc/cups/ja/images
-/usr/share/doc/cups/ja/images/*
 %dir /usr/share/cups/templates/ja
 /usr/share/cups/templates/ja/*
 /usr/share/locale/ja/cups_ja.po
@@ -582,8 +568,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/pl
 /usr/share/doc/cups/pl/index.html
-%dir /usr/share/doc/cups/pl/images
-/usr/share/doc/cups/pl/images/*
 %dir /usr/share/cups/templates/pl
 /usr/share/cups/templates/pl/*
 /usr/share/locale/pl/cups_pl.po
@@ -602,8 +586,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/sv
 /usr/share/doc/cups/sv/index.html
-%dir /usr/share/doc/cups/sv/images
-/usr/share/doc/cups/sv/images/*
 %dir /usr/share/cups/templates/sv
 /usr/share/cups/templates/sv/*
 /usr/share/locale/sv/cups_sv.po
@@ -612,8 +594,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/doc/cups/zh_TW
 /usr/share/doc/cups/zh_TW/index.html
-%dir /usr/share/doc/cups/zh_TW/images
-/usr/share/doc/cups/zh_TW/images/*
 %dir /usr/share/cups/templates/zh_TW
 /usr/share/cups/templates/zh_TW/*
 /usr/share/locale/zh/cups_zh.po

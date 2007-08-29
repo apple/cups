@@ -119,7 +119,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     do_menu(http);
   }
-  else if ((op = cgiGetVariable("OP")) != NULL)
+  else if ((op = cgiGetVariable("OP")) != NULL && cgiIsPOST())
   {
    /*
     * Do the operation...
@@ -2132,8 +2132,8 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 	    * Not found, so it must be a new printer...
 	    */
 
-            char	options[1024],	/* Form variables for this device */
-			*options_ptr;	/* Pointer into string */
+            char	option[1024],	/* Form variables for this device */
+			*option_ptr;	/* Pointer into string */
 	    const char	*ptr;		/* Pointer into device string */
 
 
@@ -2145,9 +2145,6 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 	    * suitable name.
 	    */
 
-	    strcpy(options, "TEMPLATE_NAME=");
-	    options_ptr = options + strlen(options);
-
             if (strncasecmp(device_info, "unknown", 7))
 	      ptr = device_info;
             else if ((ptr = strstr(device_uri, "://")) != NULL)
@@ -2155,49 +2152,20 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 	    else
 	      ptr = device_make_and_model;
 
-	    for (;
-	         options_ptr < (options + sizeof(options) - 1) && *ptr;
+	    for (option_ptr = option;
+	         option_ptr < (option + sizeof(option) - 1) && *ptr;
 		 ptr ++)
 	      if (isalnum(*ptr & 255) || *ptr == '_' || *ptr == '-' ||
 	          *ptr == '.')
-	        *options_ptr++ = *ptr;
-	      else if ((*ptr == ' ' || *ptr == '/') && options_ptr[-1] != '_')
-	        *options_ptr++ = '_';
+	        *option_ptr++ = *ptr;
+	      else if ((*ptr == ' ' || *ptr == '/') && option_ptr[-1] != '_')
+	        *option_ptr++ = '_';
 	      else if (*ptr == '?' || *ptr == '(')
 	        break;
 
-           /*
-	    * Then add the make and model in the printer info, so
-	    * that MacOS clients see something reasonable...
-	    */
+            *option_ptr = '\0';
 
-            strlcpy(options_ptr, "&PRINTER_LOCATION=Local+Printer"
-	                         "&PRINTER_INFO=",
-	            sizeof(options) - (options_ptr - options));
-	    options_ptr += strlen(options_ptr);
-
-            cgiFormEncode(options_ptr, device_make_and_model,
-	                  sizeof(options) - (options_ptr - options));
-	    options_ptr += strlen(options_ptr);
-
-           /*
-	    * Then copy the device URI...
-	    */
-
-	    strlcpy(options_ptr, "&DEVICE_URI=",
-	            sizeof(options) - (options_ptr - options));
-	    options_ptr += strlen(options_ptr);
-
-            cgiFormEncode(options_ptr, device_uri,
-	                  sizeof(options) - (options_ptr - options));
-	    options_ptr += strlen(options_ptr);
-
-            if (options_ptr < (options + sizeof(options) - 1))
-	    {
-	      *options_ptr++ = '|';
-	      cgiFormEncode(options_ptr, device_make_and_model,
-	                  sizeof(options) - (options_ptr - options));
-	    }
+            cgiSetArray("TEMPLATE_NAME", i, option);
 
            /*
 	    * Finally, set the form variables for this printer...
@@ -2205,7 +2173,6 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 
 	    cgiSetArray("device_info", i, device_info);
 	    cgiSetArray("device_make_and_model", i, device_make_and_model);
-	    cgiSetArray("device_options", i, options);
             cgiSetArray("device_uri", i, device_uri);
 	    i ++;
 	  }

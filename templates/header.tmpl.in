@@ -2,62 +2,28 @@
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
-	<TITLE>{title} - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
-	<!-- Prevent caching of CGI content -->
-	<META HTTP-EQUIV="Expires" CONTENT="now">
-	<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
-	{refresh_page?<META HTTP-EQUIV="Refresh" CONTENT="{refresh_page}">:}
+	<TITLE>{title} - CUPS 1.4svn-r6854</TITLE>
 	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
 	<LINK REL="SHORTCUT ICON" HREF="/favicon.ico" TYPE="image/x-icon">
+	{refresh_page?<META HTTP-EQUIV="Refresh" CONTENT="{refresh_page}">:}
 </HEAD>
 <BODY>
-<TABLE WIDTH="100%" STYLE="height: 100%;" BORDER="0" CELLSPACING="0" CELLPADDING="0" SUMMARY="{title}">
-<TR CLASS="header">
-<TD VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG SRC="/images/top-left.gif" WIDTH="15" HEIGHT="80" ALT=""></TD>
-<TD VALIGN="TOP" WIDTH="55" ROWSPAN="2"><IMG SRC="/images/top-middle.gif" WIDTH="55" HEIGHT="80" ALT=""></TD>
-<TD WIDTH="100%" HEIGHT="60"><H1>{title}</H1></TD>
-<TD ALIGN="RIGHT" VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG
-SRC="/images/top-right.gif" WIDTH="15" HEIGHT="15" ALT=""></TD>
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="32">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="32" HEIGHT="32" BORDER="0" ALT=""></A></TD>
+<TD CLASS="unsel"><A HREF="/">&nbsp;&nbsp;Home&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=admin?:un}sel"><A HREF="/admin">&nbsp;&nbsp;Administration&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=classes?:un}sel"><A HREF="/classes/">&nbsp;&nbsp;Classes&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=help?:un}sel"><A HREF="/help/">&nbsp;&nbsp;Online&nbsp;Help&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=jobs?:un}sel"><A HREF="/jobs/">&nbsp;&nbsp;Jobs&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=printers?:un}sel"><A HREF="/printers/">&nbsp;&nbsp;Printers&nbsp;&nbsp;</A></TD>
+<TD CLASS="spacer" WIDTH="100%"><A NAME="SPACER">&nbsp;</A></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="16" HEIGHT="32" ALT=""></TD>
 </TR>
-<TR CLASS="header"><TD WIDTH="100%" VALIGN="BOTTOM" NOWRAP>
+</TABLE>
+<IMG SRC="/images/shadow.png" WIDTH="100%" HEIGHT="4" ALT="">
 
-<A CLASS="unsel" HREF="/"><IMG SRC="/images/tab-left.gif"
-WIDTH="4" HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Home&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="{SECTION=admin?:un}sel" HREF="/admin"><IMG
-SRC="/images/tab-left.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT="">&nbsp;&nbsp;Administration&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="{SECTION=classes?:un}sel" HREF="/classes/"><IMG
-SRC="/images/tab-left.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT="">&nbsp;&nbsp;Classes&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="{SECTION=help?:un}sel" HREF="/help/"><IMG
-SRC="/images/tab-left.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT="">&nbsp;&nbsp;Documentation/Help&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="{SECTION=jobs?:un}sel" HREF="/jobs/"><IMG
-SRC="/images/tab-left.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT="">&nbsp;&nbsp;Jobs&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="{SECTION=printers?:un}sel" HREF="/printers/"><IMG
-SRC="/images/tab-left.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT="">&nbsp;&nbsp;Printers&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-</TD></TR>
-<TR CLASS="page">
-<TD WIDTH="15">&nbsp;</TD>
-<TD COLSPAN="2" WIDTH="100%" STYLE="height: 100%;" VALIGN="TOP" CLASS="page">
+<H1>{title}</H1>

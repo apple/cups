@@ -7,56 +7,25 @@
 	<LINK REL="SHORTCUT ICON" HREF="/favicon.ico" TYPE="image/x-icon">
 </HEAD>
 <BODY>
-<TABLE WIDTH="100%" STYLE="height: 100%;" BORDER="0" CELLSPACING="0" CELLPADDING="0" SUMMARY="Common UNIX Printing System @CUPS_VERSION@">
-<TR CLASS="header">
-<TD VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG SRC="/images/top-left.gif" WIDTH="15" HEIGHT="80" ALT=""></TD>
-<TD VALIGN="TOP" WIDTH="55" ROWSPAN="2"><IMG SRC="/images/top-middle.gif" WIDTH="55" HEIGHT="80" ALT=""></TD>
-<TD WIDTH="100%" HEIGHT="60"><H1>Common UNIX Printing System @CUPS_VERSION@@CUPS_REVISION@</H1></TD>
-<TD ALIGN="RIGHT" VALIGN="TOP" WIDTH="15" ROWSPAN="2"><IMG
-SRC="/images/top-right.gif" WIDTH="15" HEIGHT="15" ALT=""></TD>
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="32">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="32" HEIGHT="32" BORDER="0" ALT=""></A></TD>
+<TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Home&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Administration&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Classes&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Online&nbsp;Help&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Jobs&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Printers&nbsp;&nbsp;</A></TD>
+<TD CLASS="spacer" WIDTH="100%"><A NAME="SPACER">&nbsp;</A></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="16" HEIGHT="32" ALT=""></TD>
 </TR>
-<TR CLASS="header"><TD WIDTH="100%" VALIGN="BOTTOM" NOWRAP>
+</TABLE>
+<IMG SRC="/images/shadow.png" WIDTH="100%" HEIGHT="4" ALT="">
 
-<A CLASS="sel" HREF="/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
-HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Home&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="unsel" HREF="/admin/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
-HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Administration&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="unsel" HREF="/classes/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
-HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Classes&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="unsel" HREF="/help/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
-HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Documentation/Help&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="unsel" HREF="/jobs/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
-HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Jobs&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-&nbsp;<A CLASS="unsel" HREF="/printers/"><IMG SRC="/images/tab-left.gif" WIDTH="4"
-HEIGHT="4" ALIGN="TOP" BORDER="0"
-ALT="">&nbsp;&nbsp;Printers&nbsp;&nbsp;<IMG
-SRC="/images/tab-right.gif" WIDTH="4" HEIGHT="4" ALIGN="TOP"
-BORDER="0" ALT=""></A>
-
-</TD></TR>
-<TR CLASS="page">
-<TD WIDTH="15">&nbsp;</TD>
-<TD COLSPAN="2" WIDTH="100%" VALIGN="TOP" CLASS="page">
+<H1>Common UNIX Printing System @CUPS_VERSION@@CUPS_REVISION@</H1>
 
 <H2 CLASS="title">Welcome!</H2>
 
@@ -65,13 +34,13 @@ as perform system administration tasks. Click on any of the tabs above
 or on the buttons below to perform a task.</P>
 
 <P>
-<A HREF="/help/"><IMG SRC="/images/button-help.gif" CLASS="button" ALT="Help"></A>
-<A HREF="/admin?OP=add-class"><IMG SRC="/images/button-add-class.gif" CLASS="button" ALT="Add Class"></A>
-<A HREF="/admin?OP=add-printer"><IMG SRC="/images/button-add-printer.gif" CLASS="button" ALT="Add Printer"></A>
-<A HREF="/classes"><IMG SRC="/images/button-manage-classes.gif" CLASS="button" ALT="Manage Classes"></A>
-<A HREF="/jobs"><IMG SRC="/images/button-manage-jobs.gif" CLASS="button" ALT="Manage Jobs"></A>
-<A HREF="/printers"><IMG SRC="/images/button-manage-printers.gif" CLASS="button" ALT="Manage Printers"></A>
-<A HREF="/admin"><IMG SRC="/images/button-manage-server.gif" CLASS="button" ALT="Manage Server"></A>
+<FORM METHOD="GET" ACTION="/help/"><INPUT TYPE="submit" VALUE="Help"></FORM>
+<FORM METHOD="POST" ACTION="/admin"><INPUT TYPE="hidden" NAME="OP" VALUE="add-class"><INPUT TYPE="submit" VALUE="Add Class"></FORM>
+<FORM METHOD="POST" ACTION="/admin"><INPUT TYPE="hidden" NAME="OP" VALUE="add-printer"><INPUT TYPE="submit" VALUE="Add Printer"></FORM>
+<FORM METHOD="GET" ACTION="/classes"><INPUT TYPE="submit" VALUE="Manage Classes"></FORM>
+<FORM METHOD="GET" ACTION="/jobs"><INPUT TYPE="submit" VALUE="Manage Jobs"></FORM>
+<FORM METHOD="GET" ACTION="/printers"><INPUT TYPE="submit" VALUE="Manage Printers"></FORM>
+<FORM METHOD="GET" ACTION="/admin"><INPUT TYPE="submit" VALUE="Manage Server"></FORM>
 </P>
 
 <P><I>If you are asked for a username and password, enter your login
@@ -80,7 +49,7 @@ username and password or the "root" username and password.</I></P>
 <H2 CLASS="title">About CUPS</H2>
 
 <P>
-<IMG SRC="/images/happy.gif" ALIGN="LEFT" WIDTH="196" HEIGHT="144"
+<IMG SRC="/images/happy.png" ALIGN="LEFT" WIDTH="192" HEIGHT="128"
 STYLE="padding-right: 10px;" ALT="Happy Computer and Printer">
 
 CUPS provides a portable printing layer for
@@ -104,23 +73,12 @@ assistance:</P>
     <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
 </PRE>
 
-</TD>
-<TD WIDTH="15">&nbsp;</TD>
-</TR>
-<TR CLASS="header">
-<TD VALIGN="BOTTOM" WIDTH="15"><IMG SRC="/images/bottom-left.gif"
-WIDTH="15" HEIGHT="15" ALT=""></TD>
-<TD COLSPAN="2" WIDTH="100%" STYLE="padding: 5;">
-
-<P><SMALL>The Common UNIX Printing System, CUPS, and the CUPS logo are the
-trademark property of <A HREF="http://www.apple.com">Apple Inc.</A>
-CUPS is copyright 2007 by Apple Inc, All Rights Reserved.</SMALL></P>
-
-</TD>
-
-<TD ALIGN="RIGHT" VALIGN="BOTTOM" WIDTH="15"><IMG SRC="/images/bottom-right.gif"
-WIDTH="15" HEIGHT="15" ALT=""></TD>
-</TR>
+</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR><TD CLASS="trailer">The Common UNIX Printing System, CUPS, and
+the CUPS logo are the trademark property of
+<A HREF="http://www.apple.com">Apple, Inc.</A> CUPS is copyright 2007 by Apple
+Inc, all rights reserved.</TD></TR>
 </TABLE>
 </BODY>
 </HTML>

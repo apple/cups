@@ -1,5 +1,5 @@
 BODY {
-  background: #cccc99;
+  background: #e8e8e8;
   color: #000000;
   font-family: sans-serif;
 }
@@ -39,40 +39,93 @@ P.formula {
 }
 
 BLOCKQUOTE {
-  background: #bbbb88;
-  border: solid thin #999966;
-  padding: 10pt;
+  background: #e1e1e1;
+  border: inset 1px #dddddd;
+  padding: 10px;
+  /* These are not implemented by all browsers, but that's OK */
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+
+A IMG {
+  border: none;
 }
 
 A:link, A:visited {
   text-decoration: none;
-  font-weight: bold;
-  color: #993300;
+  color: #000099;
 }
 
 A:link:hover, A:visited:hover, A:active {
   text-decoration: underline;
-  font-weight: bold;
-  color: #bb5500;
+  color: #990099;
 }
 
-A.sel, TR.sel {
-  background-color: #eeeebb;
-  color: #993300;
+TABLE.page {
+  border: none;
+  border-collapse: collapse;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
-TR.sel TD {
-  padding: 4pt;
+TD.body {
+  height: 100%;
+  vertical-align: top;
 }
 
-A.unsel, A.unsel:visited {
-  background-color: #666633;
-  color: #e8e8b8;
+TD.sel, TD.unsel {
+  font-size: 120%;
+  vertical-align: middle;
 }
 
-A.unsel:link:hover, A.unsel:visited:hover, A.unsel:active {
-  background-color: #999966;
-  color: #663300;
+TD.sel A, TD.unsel A, TD.spacer A {
+  border-left: thin solid #aaaaaa;
+  line-height: 32px;
+  padding: 5px 0px;
+}
+
+TD.sel {
+  background: url(images/sel.gif);
+}
+
+TD.sel A, TD.sel A:hover {
+  color: #ffffff;
+  font-weight: normal;
+  text-decoration: none;
+}
+
+TD.unsel A, TD.unsel A:visited {
+  color: #333333;
+  font-weight: normal;
+}
+
+TD.unsel A:link:hover, TD.unsel A:visited:hover, TD.unsel A:active {
+  background: url(images/unsel-hover.gif);
+  color: #ffffff;
+  font-weight: normal;
+  text-decoration: none;
+}
+
+TD.unsel, TD.spacer {
+  background: url(images/unsel.gif);
+}
+
+TD.trailer {
+  background: #e1e1e1;
+  border: solid thin #cccccc;
+  color: #666666;
+  font-size: 80%;
+  padding: 5px;
+}
+
+TD.trailer A {
+  color: #666699;
+}
+
+FORM {
+  display: inline;
 }
 
 INPUT[TYPE="TEXT"], TEXTAREA {
@@ -89,31 +142,20 @@ SUB, SUP {
   font-size: 50%;
 }
 
-TR.header, TR.header TH, TH.header, TR.trailer, TR.trailer TH, TH.trailer {
-  background-color: #bbbb88;
-}
-
-TR.page, TD.page {
-  background-color: #eeeebb;
-  height: 100%;
-  padding-top: 20pt;
-  padding-bottom: 20pt;
-}
-
 TR.data, TD.data, TR.data TD {
   padding: 5;
-  border-bottom: solid 2pt #000000;
+  border-bottom: solid 1pt #999999;
 }
 
 TR.data TH {
-  border-bottom: solid 2pt #000000;
+  border-bottom: solid 1pt #999999;
   padding-top: 10pt;
   padding-left: 5pt;
   text-align: left;
 }
 
 DIV.table TABLE {
-  border: solid thin #999966;
+  border: solid thin #999999;
   border-spacing: 0;
   margin-left: auto;
   margin-right: auto;
@@ -129,14 +171,14 @@ DIV.table CAPTION {
 }
 
 DIV.table TABLE TD {
-  border: solid thin #bbbb88;
+  border: solid thin #bbbbbb;
   padding-top: 5pt;
 }
 
 DIV.table TABLE TH {
-  background: #bbbb88;
+  background: #bbbbbb;
   border: none;
-  border-bottom: solid thin #999966;
+  border-bottom: solid thin #999999;
 }
 
 DIV.figure TABLE {
@@ -183,27 +225,14 @@ H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
 }
 
 H2.title, H3.title {
-  border-bottom: solid 2pt #000000;
-}
-
-IMG.button {
-  border: none;
-  padding: 2pt;
-  vertical-align: middle;
+  border-bottom: solid 1pt #999999;
 }
 
 DIV.sidebar {
-  background: #ddddaa;
-  border: solid 2px #cccc99;
   float: right;
   min-width: 25%;
-  margin-left: 10pt;
+  margin-left: 10px;
   max-width: 33%;
-  padding: 5pt;
-  /* These are not implemented by all browsers, but that's OK */
-  border-radius: 10pt;
-  -moz-border-radius: 10pt;
-  box-shadow: 5pt 5pt 5pt #cccccc;
 }
 
 DIV.sidebar P.l0 {
@@ -230,15 +259,26 @@ DIV.sidebar P.l2 {
   text-indent: -18pt;
 }
 
-TABLE.pager {
-  background: #cccc99;
-  border: solid thin #999966;
-  margin-top: 10pt;
-  padding: 2pt;
+TABLE.inset {
+  background: #e1e1e1;
+  border: inset 1px #dddddd;
+  padding: 0;
   /* These are not implemented by all browsers, but that's OK */
-  border-radius: 10pt;
-  -moz-border-radius: 10pt;
-  box-shadow: 5pt 5pt 5pt #cccccc;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+
+TABLE.inset CAPTION {
+  caption-side: top;
+  color: #666666;
+  font-size: 80%;
+  margin-left: 10px;
+  margin-bottom: 2px;
+  text-align: left;
+}
+
+TABLE.inset TD {
+  padding: 5px;
 }
 
 DT {

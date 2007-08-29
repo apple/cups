@@ -3,11 +3,10 @@
 <H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}
 {?printer_state_message=?:<SPAN CLASS="message">"{printer_state_message}"</SPAN>}</H2>
 
-<TABLE WIDTH="100%" CLASS="button" CELLSPACING="0" CELLPADDING="0" SUMMARY="{printer_name}">
+<TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="0" SUMMARY="{printer_name}">
 <TR>
 <TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
-<IMG SRC="/images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" CLASS="button" ALT=""></A>
-</TD>
+<IMG SRC="/images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.png" WIDTH="128" HEIGHT="128" ALT=""></A>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <TD VALIGN="TOP"><B>Description:</B> {printer_info}<BR>
 <B>Location:</B> {printer_location}<BR>
 <B>Printer Driver:</B> {printer_make_and_model}<BR>
@@ -15,52 +14,37 @@
 {printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published.
 {?device_uri=?:<BR><B>Device URI:</B> {device_uri}}
 
-<P><TABLE WIDTH="100%" CELLPADDING="5" SUMMARY="Actions">
-<TR VALIGN="TOP"><TD>
-<A HREF="{printer_uri_supported}?op=print-test-page">
-<IMG SRC="/images/button-print-test-page.gif" ALT="Print Test Page" CLASS="button"></A>
-{?cupscommand=1?<A HREF="{printer_uri_supported}?op=clean-print-heads">
-<IMG SRC="/images/button-clean-print-heads.gif" ALT="Clean Print Heads" CLASS="button"></A>
-<A HREF="{printer_uri_supported}?op=print-self-test-page">
-<IMG SRC="/images/button-print-self-test-page.gif" ALT="Print Self Test Page" CLASS="button"></A>:}</TD>
-<TD>{printer_state=5?
-<A HREF="{admin_uri}?op=start-printer&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-start-printer.gif" ALT="Start Printer" CLASS="button"></A>
-:
-<A HREF="{admin_uri}?op=stop-printer&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-stop-printer.gif" ALT="Stop Printer" CLASS="button"></A>
+<P><TABLE CLASS="inset" WIDTH="100%" SUMMARY="Maintenance Commands">
+<CAPTION>Maintenance Commands</CAPTION>
+<TR><TD><FORM ACTION="{printer_uri_supported}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="print-test-page"><INPUT TYPE="SUBMIT" VALUE="Print Test Page"></FORM>
+{?cupscommand=1?<FORM ACTION="{printer_uri_supported}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="clean-print-heads"><INPUT TYPE="SUBMIT" VALUE="Clean Print Heads"></FORM>
+<FORM ACTION="{printer_uri_supported}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="print-self-test-page"><INPUT TYPE="SUBMIT" VALUE="Print Self Test Page"></FORM>:}
+{printer_state=5?
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="start-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Start Printer"></FORM>
+:<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="stop-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Stop Printer"></FORM>
 }
 {printer_is_accepting_jobs=0?
-<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-accept-jobs.gif" ALT="Accept Jobs" CLASS="button"></A>
-:
-<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-reject-jobs.gif" ALT="Reject Jobs" CLASS="button"></A>
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="accept-jobs"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Accept Jobs"></FORM>
+:<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="reject-jobs"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Reject Jobs"></FORM>
 }
-<A HREF="{printer_uri_supported}?op=move-jobs&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-move-jobs.gif" ALT="Move All Jobs" CLASS="button"></A>
-<A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-cancel-all-jobs.gif" ALT="Cancel All Jobs" CLASS="button"></A></TD>
-<TD>{printer_is_shared=0?
-<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=1">
-<IMG SRC="/images/button-publish-printer.gif" ALT="Publish Printer" CLASS="button"></A>
-:
-<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=0">
-<IMG SRC="/images/button-unpublish-printer.gif" ALT="Unpublish Printer" CLASS="button"></A>
+<FORM ACTION="{printer_uri_supported}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="move-jobs"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Move All Jobs"></FORM>
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="purge-jobs"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Cancel All Jobs"></FORM>
+</TABLE>
+
+<P><TABLE CLASS="inset" WIDTH="100%" SUMMARY="Administration Commands">
+<CAPTION>Administration Commands</CAPTION>
+<TR><TD>{printer_is_shared=0?
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-sharing"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}&amp;shared=1"><INPUT TYPE="SUBMIT" VALUE="Publish Printer"></FORM>
+:<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-sharing"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}&amp;shared=0"><INPUT TYPE="SUBMIT" VALUE="Unpublish Printer"></FORM>
 }
-<A HREF="{admin_uri}?op=modify-printer&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-modify-printer.gif" ALT="Modify Printer" CLASS="button"></A>
-<A HREF="{admin_uri}?op=set-printer-options&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-set-printer-options.gif" ALT="Set Printer Options" CLASS="button"></A>
-<A HREF="{admin_uri}?op=delete-printer&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-delete-printer.gif" ALT="Delete Printer" CLASS="button"></A>
-<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-set-as-default.gif" ALT="Set As Default" CLASS="button"></A>
-<A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={%printer_name}">
-<IMG SRC="/images/button-set-allowed-users.gif" ALT="Set Allowed Users" CLASS="button"></A></TD>
-</TR>
-</TABLE></P>
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="modify-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Modify Printer"></FORM>
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-printer-options"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Set Printer Options"></FORM>
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="delete-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Delete Printer"></FORM>
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-as-default"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Set As Default"></FORM>
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-allowed-users"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Set Allowed Users"></FORM></TD></TR>
+</TABLE>
 </TD>
 </TR>
 </TABLE>
 }}
+<BR>

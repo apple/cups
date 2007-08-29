@@ -980,7 +980,7 @@ cgiSetIPPObjectVars(
     for (i = 0; i < attr->num_values; i ++)
     {
       if (i)
-	strlcat(valptr, ",", sizeof(value) - (valptr - value));
+	strlcat(valptr, ", ", sizeof(value) - (valptr - value));
 
       valptr += strlen(valptr);
 
@@ -1207,9 +1207,8 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
 			count;		/* Number of jobs */
   const char		*var;		/* Form variable */
   void			*search;	/* Search data */
-  char			url[1024],	/* URL for prev/next/this */
-			*urlptr,	/* Position in URL */
-			*urlend;	/* End of URL */
+  char			url[1024],	/* Printer URI */
+			val[1024];	/* Form variable */
 
 
  /*
@@ -1250,7 +1249,8 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     * Get a list of matching job objects.
     */
 
-    if ((var = cgiGetVariable("QUERY")) != NULL)
+    if ((var = cgiGetVariable("QUERY")) != NULL &&
+        !cgiGetVariable("CLEAR"))
       search = cgiCompileSearch(var);
     else
       search = NULL;
@@ -1278,8 +1278,8 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     if (first < 0)
       first = 0;
 
-    sprintf(url, "%d", count);
-    cgiSetVariable("TOTAL", url);
+    sprintf(val, "%d", count);
+    cgiSetVariable("TOTAL", val);
 
     if ((var = cgiGetVariable("ORDER")) != NULL)
       ascending = !strcasecmp(var, "asc");
@@ -1308,61 +1308,23 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     * Save navigation URLs...
     */
 
-    urlend = url + sizeof(url);
-
-    if ((var = cgiGetVariable("QUERY")) != NULL)
-    {
-      if (dest)
-        snprintf(url, sizeof(url), "/%s/%s?QUERY=", cgiGetVariable("SECTION"),
-	         dest);
-      else
-        strlcpy(url, "/jobs/?QUERY=", sizeof(url));
-
-      urlptr = url + strlen(url);
-
-      cgiFormEncode(urlptr, var, urlend - urlptr);
-      urlptr += strlen(urlptr);
-
-      strlcpy(urlptr, "&", urlend - urlptr);
-      urlptr += strlen(urlptr);
-    }
+    if (dest)
+      snprintf(val, sizeof(val), "/%s/%s",  cgiGetVariable("SECTION"), dest);
     else
-    {
-      if (dest)
-        snprintf(url, sizeof(url), "/%s/%s?", cgiGetVariable("SECTION"), dest);
-      else
-        strlcpy(url, "/jobs/?", sizeof(url));
+      strlcpy(val, "/jobs/", sizeof(val));
 
-      urlptr = url + strlen(url);
-    }
-
-    if (which_jobs)
-    {
-      strlcpy(urlptr, "WHICH_JOBS=", urlend - urlptr);
-      urlptr += strlen(urlptr);
-
-      cgiFormEncode(urlptr, which_jobs, urlend - urlptr);
-      urlptr += strlen(urlptr);
-
-      strlcpy(urlptr, "&", urlend - urlptr);
-      urlptr += strlen(urlptr);
-    }
-
-    snprintf(urlptr, urlend - urlptr, "FIRST=%d", first);
-    cgiSetVariable("THISURL", url);
+    cgiSetVariable("THISURL", val);
 
     if (first > 0)
     {
-      snprintf(urlptr, urlend - urlptr, "FIRST=%d&ORDER=%s",
-	       first - CUPS_PAGE_MAX, ascending ? "asc" : "dec");
-      cgiSetVariable("PREVURL", url);
+      sprintf(val, "%d", first - CUPS_PAGE_MAX);
+      cgiSetVariable("PREV", val);
     }
 
     if ((first + CUPS_PAGE_MAX) < count)
     {
-      snprintf(urlptr, urlend - urlptr, "FIRST=%d&ORDER=%s",
-	       first + CUPS_PAGE_MAX, ascending ? "asc" : "dec");
-      cgiSetVariable("NEXTURL", url);
+      sprintf(val, "%d", first + CUPS_PAGE_MAX);
+      cgiSetVariable("NEXT", val);
     }
 
    /*

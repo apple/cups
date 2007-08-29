@@ -98,7 +98,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Get the default printer...
   */
 
-  if (!op)
+  if (!op || !cgiIsPOST())
   {
    /*
     * Get the default destination...
@@ -189,9 +189,7 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
 			count;		/* Number of classes */
   const char		*var;		/* Form variable */
   void			*search;	/* Search data */
-  char			url[1024],	/* URL for prev/next/this */
-			*urlptr,	/* Position in URL */
-			*urlend;	/* End of URL */
+  char			val[1024];	/* Form variable */
 
 
  /*
@@ -227,7 +225,8 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
     * Get a list of matching job objects.
     */
 
-    if ((var = cgiGetVariable("QUERY")) != NULL)
+    if ((var = cgiGetVariable("QUERY")) != NULL &&
+        !cgiGetVariable("CLEAR"))
       search = cgiCompileSearch(var);
     else
       search = NULL;
@@ -255,8 +254,8 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
     if (first < 0)
       first = 0;
 
-    sprintf(url, "%d", count);
-    cgiSetVariable("TOTAL", url);
+    sprintf(val, "%d", count);
+    cgiSetVariable("TOTAL", val);
 
     if ((var = cgiGetVariable("ORDER")) != NULL)
       ascending = !strcasecmp(var, "asc");
@@ -282,40 +281,18 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
     * Save navigation URLs...
     */
 
-    urlend = url + sizeof(url);
-
-    if ((var = cgiGetVariable("QUERY")) != NULL)
-    {
-      strlcpy(url, "/classes/?QUERY=", sizeof(url));
-      urlptr = url + strlen(url);
-
-      cgiFormEncode(urlptr, var, urlend - urlptr);
-      urlptr += strlen(urlptr);
-
-      strlcpy(urlptr, "&", urlend - urlptr);
-      urlptr += strlen(urlptr);
-    }
-    else
-    {
-      strlcpy(url, "/classes/?", sizeof(url));
-      urlptr = url + strlen(url);
-    }
-
-    snprintf(urlptr, urlend - urlptr, "FIRST=%d", first);
-    cgiSetVariable("THISURL", url);
+    cgiSetVariable("THISURL", "/classes/");
 
     if (first > 0)
     {
-      snprintf(urlptr, urlend - urlptr, "FIRST=%d&ORDER=%s",
-	       first - CUPS_PAGE_MAX, ascending ? "asc" : "dec");
-      cgiSetVariable("PREVURL", url);
+      sprintf(val, "%d", first - CUPS_PAGE_MAX);
+      cgiSetVariable("PREV", val);
     }
 
     if ((first + CUPS_PAGE_MAX) < count)
     {
-      snprintf(urlptr, urlend - urlptr, "FIRST=%d&ORDER=%s",
-	       first + CUPS_PAGE_MAX, ascending ? "asc" : "dec");
-      cgiSetVariable("NEXTURL", url);
+      sprintf(val, "%d", first + CUPS_PAGE_MAX);
+      cgiSetVariable("NEXT", val);
     }
 
    /*

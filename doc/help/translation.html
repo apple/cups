@@ -23,15 +23,6 @@ files and directories:</P>
 	<LI><VAR>desktop/cups.desktop</VAR> - the GNOME/KDE
 	desktop file pointing to the CUPS web interface</LI>
 
-	<LI><VAR>doc/images/button-*.gif</VAR> - the web
-	interface button images</LI>
-
-	<LI><VAR>tools/buttons.txt</VAR> - the English text for the
-	web interface buttons</LI>
-
-	<LI><VAR>tools/makebuttons</VAR> - the shell script we use
-	to generate the web interface button images</LI>
-
 	<LI><VAR>doc/index.html</VAR> - the web interface home
 	page</LI>
 
@@ -47,7 +38,8 @@ localization files are  placed in subdirectories under the
 <VAR>doc</VAR> and <VAR>templates</VAR> using the locale name.
 Locale names are either <VAR>ll</VAR> or <VAR>ll_CC</VAR>, where
 "ll" is the 2-letter language code and "CC" is the 2-letter
-country code. <em>CUPS does not currently use or support the newer <VAR>ll-region</VAR> syntax for locale names.</em></P>
+country code. <em>CUPS does not currently use or support the newer
+<VAR>ll-region</VAR> syntax for locale names.</em></P>
 
 <P>All non-image files must be encoded using the UTF-8 character
 set.</P>
@@ -56,11 +48,10 @@ set.</P>
 <H2 CLASS="title"><A NAME="SUBMIT">Submitting a Translation for CUPS</A></H2>
 
 <P>To submit a translation for inclusion in CUPS, translate the
-desktop file, all of the button images, template files, the
-<VAR>index.html.in</VAR> file, and the message catalog. Place
-these files in the correct subdirectory in the CUPS source code
-archive and run the following command to create an archive with
-your files:</P>
+desktop file, all of the template files, the <VAR>index.html.in</VAR>
+file, and the message catalog. Place these files in the correct
+subdirectories in the CUPS source code archive and run the following
+command to create an archive with your files:</P>
 
 <PRE CLASS="command">
 tar cvf <I>ll_CC</I>.tar.gz desktop/cups.desktop doc/<I>ll_CC</I> \
@@ -85,265 +76,6 @@ bottom with the <tt>Name</tt> and <tt>Comment</tt> keys:</P>
 Name[<I>ll_CC</I>]=<I>Translation of "Manage Printing"</I>
 Comment[<I>ll_CC</I>]=<I>Translation of "CUPS Web Interface"</I>
 </PRE>
-
-
-<H2 CLASS="title"><A NAME="IMAGES">Button Images</A></H2>
-
-<P>The web interface button images are used to activate functions on
-the CUPS web pages. Table 1 lists the button images and the English
-text labels for those buttons. Copy the file
-<VAR>tools/buttons.txt</VAR> to <VAR>buttons-ll_CC.txt</VAR>,
-translate the text in that file (use UTF-8 as the text encoding!),
-and then use the supplied <VAR>tools/makebuttons</VAR> script to
-create button images that match the CUPS web interface:</P>
-
-<PRE CLASS="command">
-cp tools/buttons.txt buttons-ll_CC.txt
-vi buttons-ll_CC.txt
-tools/makebuttons ll_CC buttons-ll_CC.txt
-</PRE>
-
-<BLOCKQUOTE><B>Note:</B> The <VAR>tools/makebuttons</VAR> script
-requires at least version 6.2.4 of the ImageMagick software to
-work.</BLOCKQUOTE>
-
-<P>When you have created all of the button images, edit the
-<VAR>Makedefs</VAR> file and add the locale name to the
-<CODE>LANGUAGES</CODE> variable. You can then run "make
-install" in the <VAR>doc</VAR> subdirectory to test the
-translated buttons.</P>
-
-<DIV CLASS="table"><TABLE SUMMARY="Web Interface Buttons">
-<CAPTION>Table 1: Web Interface Buttons</CAPTION>
-<THEAD>
-<TR>
-	<TH>Filename</TH>
-	<TH>Text</TH>
-</TR>
-</THEAD>
-<TBODY>
-<TR>
-	<TD>button-accept-jobs.gif</TD>
-	<TD>Accept Jobs</TD>
-</TR>
-<TR>
-	<TD>button-add-class.gif</TD>
-	<TD>Add Class</TD>
-</TR>
-<TR>
-	<TD>button-add-printer.gif</TD>
-	<TD>Add Printer</TD>
-</TR>
-<TR>
-	<TD>button-add-rss-subscription.gif</TD>
-	<TD>Add RSS Subscription</TD>
-</TR>
-<TR>
-	<TD>button-add-this-printer.gif</TD>
-	<TD>Add This Printer</TD>
-</TR>
-<TR>
-	<TD>button-cancel-all-jobs.gif</TD>
-	<TD>Cancel All Jobs</TD>
-</TR>
-<TR>
-	<TD>button-cancel-job.gif</TD>
-	<TD>Cancel Job</TD>
-</TR>
-<TR>
-	<TD>button-cancel-subscription.gif</TD>
-	<TD>Cancel Subscription</TD>
-</TR>
-<TR>
-	<TD>button-change-settings.gif</TD>
-	<TD>Change Settings</TD>
-</TR>
-<TR>
-	<TD>button-clean-print-heads.gif</TD>
-	<TD>Clean Print Heads</TD>
-</TR>
-<TR>
-	<TD>button-clear.gif</TD>
-	<TD>Clear</TD>
-</TR>
-<TR>
-	<TD>button-continue.gif</TD>
-	<TD>Continue</TD>
-</TR>
-<TR>
-	<TD>button-delete-class.gif</TD>
-	<TD>Delete Class</TD>
-</TR>
-<TR>
-	<TD>button-delete-printer.gif</TD>
-	<TD>Delete Printer</TD>
-</TR>
-<TR>
-	<TD>button-edit-configuration-file.gif</TD>
-	<TD>Edit Configuration File</TD>
-</TR>
-<TR>
-	<TD>button-export-samba.gif</TD>
-	<TD>Export Printers to Samba</TD>
-</TR>
-<TR>
-	<TD>button-find-new-printers.gif</TD>
-	<TD>Find New Printers</TD>
-</TR>
-<TR>
-	<TD>button-help.gif</TD>
-	<TD>Help</TD>
-</TR>
-<TR>
-	<TD>button-hold-job.gif</TD>
-	<TD>Hold Job</TD>
-</TR>
-<TR>
-	<TD>button-manage-classes.gif</TD>
-	<TD>Manage Classes</TD>
-</TR>
-<TR>
-	<TD>button-manage-jobs.gif</TD>
-	<TD>Manage Jobs</TD>
-</TR>
-<TR>
-	<TD>button-manage-printers.gif</TD>
-	<TD>Manage Printers</TD>
-</TR>
-<TR>
-	<TD>button-manage-server.gif</TD>
-	<TD>Manage Server</TD>
-</TR>
-<TR>
-	<TD>button-modify-class.gif</TD>
-	<TD>Modify Class</TD>
-</TR>
-<TR>
-	<TD>button-modify-printer.gif</TD>
-	<TD>Modify Printer</TD>
-</TR>
-<TR>
-	<TD>button-move-job.gif</TD>
-	<TD>Move Job</TD>
-</TR>
-<TR>
-	<TD>button-move-jobs.gif</TD>
-	<TD>Move All Jobs</TD>
-</TR>
-<TR>
-	<TD>button-print-self-test-page.gif</TD>
-	<TD>Print Self-Test Page</TD>
-</TR>
-<TR>
-	<TD>button-print-test-page.gif</TD>
-	<TD>Print Test Page</TD>
-</TR>
-<TR>
-	<TD>button-publish-printer.gif</TD>
-	<TD>Publish Printer</TD>
-</TR>
-<TR>
-	<TD>button-reject-jobs.gif</TD>
-	<TD>Reject Jobs</TD>
-</TR>
-<TR>
-	<TD>button-release-job.gif</TD>
-	<TD>Release Job</TD>
-</TR>
-<TR>
-	<TD>button-restart-job.gif</TD>
-	<TD>Reprint Job</TD>
-</TR>
-<TR>
-	<TD>button-save-changes.gif</TD>
-	<TD>Save Changes</TD>
-</TR>
-<TR>
-	<TD>button-search.gif</TD>
-	<TD>Search</TD>
-</TR>
-<TR>
-	<TD>button-set-allowed-users.gif</TD>
-	<TD>Set Allowed Users</TD>
-</TR>
-<TR>
-	<TD>button-set-as-default.gif</TD>
-	<TD>Set As Default</TD>
-</TR>
-<TR>
-	<TD>button-set-printer-options.gif</TD>
-	<TD>Set Printer Options</TD>
-</TR>
-<TR>
-	<TD>button-show-active.gif</TD>
-	<TD>Show Active Jobs</TD>
-</TR>
-<TR>
-	<TD>button-show-all.gif</TD>
-	<TD>Show All Jobs</TD>
-</TR>
-<TR>
-	<TD>button-show-completed.gif</TD>
-	<TD>Show Completed Jobs</TD>
-</TR>
-<TR>
-	<TD>button-show-next.gif</TD>
-	<TD>Show Next</TD>
-</TR>
-<TR>
-	<TD>button-show-previous.gif</TD>
-	<TD>Show Previous</TD>
-</TR>
-<TR>
-	<TD>button-sort-ascending.gif</TD>
-	<TD>Show Ascending</TD>
-</TR>
-<TR>
-	<TD>button-sort-descending.gif</TD>
-	<TD>Show Descending</TD>
-</TR>
-<TR>
-	<TD>button-start-class.gif</TD>
-	<TD>Start Class</TD>
-</TR>
-<TR>
-	<TD>button-start-printer.gif</TD>
-	<TD>Start Printer</TD>
-</TR>
-<TR>
-	<TD>button-stop-class.gif</TD>
-	<TD>Stop Class</TD>
-</TR>
-<TR>
-	<TD>button-stop-printer.gif</TD>
-	<TD>Stop Printer</TD>
-</TR>
-<TR>
-	<TD>button-unpublish-printer.gif</TD>
-	<TD>Unpublish Printer</TD>
-</TR>
-<TR>
-	<TD>button-use-default-config.gif</TD>
-	<TD>Use Default Configuration File</TD>
-</TR>
-<TR>
-	<TD>button-view-access-log.gif</TD>
-	<TD>View Access Log</TD>
-</TR>
-<TR>
-	<TD>button-view-error-log.gif</TD>
-	<TD>View Error Log</TD>
-</TR>
-<TR>
-	<TD>button-view-page-log.gif</TD>
-	<TD>View Page Log</TD>
-</TR>
-<TR>
-	<TD>button-view-printable-version.gif</TD>
-	<TD>View Printable Version</TD>
-</TR>
-</TBODY>
-</TABLE></DIV>
 
 
 <H2 CLASS="title"><A NAME="HOMEPAGE">The Home Page</A></H2>
@@ -527,7 +259,7 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>job-cancel.tmpl</TD>
-	<TD>This template shows "job cancelled".</TD>
+	<TD>This template shows "job canceled".</TD>
 </TR>
 <TR>
 	<TD>job-hold.tmpl</TD>
@@ -858,7 +590,7 @@ are displayed. Table 4 lists the supported values.</P>
 <CAPTION>Table 4: WHICH_JOBS Values</CAPTION>
 <THEAD>
 <TR>
-	<TH>OP Value</TH>
+	<TH>WHICH_JOBS Value</TH>
 	<TH>Description</TH>
 </TR>
 </THEAD>
@@ -1059,7 +791,7 @@ supported <CODE>OP</CODE> values.</P>
 </TR>
 <TR>
 	<TD>restart-job</TD>
-	<TD>Restarts/reprints a stopped, cancelled, completed, or aborted
+	<TD>Restarts/reprints a stopped, canceled, completed, or aborted
 	print job.</TD>
 </TR>
 </TBODY>
