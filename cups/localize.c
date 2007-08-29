@@ -417,7 +417,7 @@ ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
   strlcpy(ll_CC, lang->language, ll_CC_size);
   strlcpy(ll, lang->language, ll_size);
 
-  printf("ll_CC=\"%s\", ll=\"%s\"\n", ll_CC, ll);
+  DEBUG_printf(("ll_CC=\"%s\", ll=\"%s\"\n", ll_CC, ll));
 
   if (strlen(ll_CC) == 2)
   {
