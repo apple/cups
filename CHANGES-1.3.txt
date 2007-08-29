@@ -5,6 +5,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.1
 
 	- Documentation updates.
+	- The new peer credential support did not compile on FreeBSD
+	  (STR #2495)
 	- Direct links to help files did not set the current section
 	  so the table-of-contents was not shown.
 	- The configure script did not support --localedir=foo (STR #2488)

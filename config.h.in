@@ -524,6 +524,13 @@
 
 
 /*
+ * Do we have <sys/param.h>?
+ */
+
+#undef HAVE_SYS_PARAM_H
+
+
+/*
  * Do we have <sys/ucred.h>?
  */
 

@@ -83,6 +83,9 @@
 extern const char *cssmErrorString(int error);
 #  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_AUTHORIZATION_H */
+#ifdef HAVE_SYS_PARAM_H
+#  include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */
 #ifdef HAVE_SYS_UCRED_H
 #  include <sys/ucred.h>
 typedef struct xucred cupsd_ucred_t;
