@@ -150,6 +150,10 @@ static char	* const ipp_std_ops[] =
 		  "CUPS-Move-Job",
 		  "CUPS-Authenticate-Job",
 		  "CUPS-Get-PPD"
+		},
+		* const ipp_cups_ops2[] =
+		{
+		  "CUPS-Get-Document"
 		};
 
 
@@ -244,6 +248,8 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
     return ("windows-ext");
   else if (op >= CUPS_GET_DEFAULT && op <= CUPS_GET_PPD)
     return (ipp_cups_ops[op - CUPS_GET_DEFAULT]);
+  else if (op == CUPS_GET_DOCUMENT)
+    return (ipp_cups_ops2[0]);
 
  /*
   * No, build an "unknown-xxxx" operation string...
@@ -277,6 +283,10 @@ ippOpValue(const char *name)		/* I - Textual name */
   for (i = 0; i < (sizeof(ipp_cups_ops) / sizeof(ipp_cups_ops[0])); i ++)
     if (!strcasecmp(name, ipp_cups_ops[i]))
       return ((ipp_op_t)(i + 0x4001));
+
+  for (i = 0; i < (sizeof(ipp_cups_ops2) / sizeof(ipp_cups_ops2[0])); i ++)
+    if (!strcasecmp(name, ipp_cups_ops2[i]))
+      return ((ipp_op_t)(i + 0x4027));
 
   if (!strcasecmp(name, "CUPS-Add-Class"))
     return (CUPS_ADD_MODIFY_CLASS);

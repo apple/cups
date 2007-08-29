@@ -958,7 +958,7 @@ cupsdReadConfiguration(void)
 		      "Renew-Subscription Cancel-Subscription "
 		      "Get-Notifications Reprocess-Job Cancel-Current-Job "
 		      "Suspend-Current-Job Resume-Job CUPS-Move-Job "
-		      "CUPS-Authenticate-Job>");
+		      "CUPS-Authenticate-Job CUPS-Get-Document>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
 
       po = cupsdAddPolicyOp(p, NULL, IPP_SEND_DOCUMENT);
@@ -986,6 +986,7 @@ cupsdReadConfiguration(void)
       cupsdAddPolicyOp(p, po, IPP_RESUME_JOB);
       cupsdAddPolicyOp(p, po, CUPS_MOVE_JOB);
       cupsdAddPolicyOp(p, po, CUPS_AUTHENTICATE_JOB);
+      cupsdAddPolicyOp(p, po, CUPS_GET_DOCUMENT);
 
       cupsdLogMessage(CUPSD_LOG_INFO, "</Limit>");
 
@@ -3244,6 +3245,36 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
         cupsdLogMessage(CUPSD_LOG_WARN,
 	                "Missing </Limit> before </Policy> on line %d!",
 	                linenum);
+
+     /*
+      * Verify that we have an explicit policy for CUPS-Get-Document
+      * (ensures that upgrades do not introduce new security issues...)
+      */
+
+      for (i = 0; i < pol->num_ops; i ++)
+        if (pol->ops[i]->op == CUPS_GET_DOCUMENT)
+	  break;
+
+      if (i >= pol->num_ops)
+      {
+	for (i = 0; i < pol->num_ops; i ++)
+	  if (pol->ops[i]->op == IPP_SEND_DOCUMENT)
+            break;
+
+        if (i < pol->num_ops)
+	{
+	 /*
+	  * Add a new limit for CUPS-Get-Document using the Send-Document
+	  * limit as a template...
+	  */
+
+          cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "No limit for CUPS-Get-Document defined in policy %s "
+			  "- using Send-Document's policy", pol->name);
+
+          cupsdAddPolicyOp(pol, pol->ops[i], CUPS_GET_DOCUMENT);
+	}
+      }
 
       return (linenum);
     }

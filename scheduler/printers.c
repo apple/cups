@@ -321,6 +321,8 @@ cupsdCreateCommonData(void)
 		  CUPS_GET_PPDS,
 		  CUPS_MOVE_JOB,
 		  CUPS_AUTHENTICATE_JOB,
+		  CUPS_GET_PPD,
+		  CUPS_GET_DOCUMENT,
 		  IPP_RESTART_JOB
 		};
   static const char * const charsets[] =/* charset-supported values */

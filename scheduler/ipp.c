@@ -54,6 +54,7 @@
  *   get_default()               - Get the default destination.
  *   get_devices()               - Get the list of available devices on the
  *                                 local system.
+ *   get_document()              - Get a copy of a job file.
  *   get_job_attrs()             - Get job attributes.
  *   get_jobs()                  - Get a list of jobs for the specified printer.
  *   get_notifications()         - Get events for a subscription.
@@ -169,6 +170,7 @@ static void	create_subscription(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_default(cupsd_client_t *con);
 static void	get_devices(cupsd_client_t *con);
+static void	get_document(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_notifications(cupsd_client_t *con);
@@ -574,6 +576,10 @@ cupsdProcessIPPRequest(
 	  case CUPS_GET_DEVICES :
               get_devices(con);
               break;
+
+          case CUPS_GET_DOCUMENT :
+	      get_document(con, uri);
+	      break;
 
 	  case CUPS_GET_PPD :
               get_ppd(con, uri);
@@ -4535,6 +4541,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
                    con->servername, con->serverport, "/jobs/%d",
         	   job->id);
 
+  if (!ra || cupsArrayFind(ra, "document-count"))
+    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+        	  "document-count", job->num_files);
+
   if (!ra || cupsArrayFind(ra, "job-more-info"))
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-more-info", NULL, job_uri);
@@ -5604,6 +5614,150 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
     send_ipp_status(con, IPP_INTERNAL_ERROR,
                     _("cups-deviced failed to execute."));
   }
+}
+
+
+/*
+ * 'get_document()' - Get a copy of a job file.
+ */
+
+static void
+get_document(cupsd_client_t  *con,	/* I - Client connection */
+             ipp_attribute_t *uri)	/* I - Job URI */
+{
+  http_status_t	status;			/* Policy status */
+  ipp_attribute_t *attr;		/* Current attribute */
+  int		jobid;			/* Job ID */
+  int		docnum;			/* Document number */
+  cupsd_job_t	*job;			/* Current job */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  char		filename[1024],		/* Filename for document */
+		format[1024];		/* Format for document */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_document(%p[%d], %s)", con,
+                  con->http.fd, uri->values[0].string.text);
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (!strcmp(uri->name, "printer-uri"))
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id",
+                                 IPP_TAG_INTEGER)) == NULL)
+    {
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
+      return;
+    }
+
+    jobid = attr->values[0].integer;
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
+                    sizeof(method), username, sizeof(username), host,
+		    sizeof(host), &port, resource, sizeof(resource));
+
+    if (strncmp(resource, "/jobs/", 6))
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
+                      uri->values[0].string.text);
+      return;
+    }
+
+    jobid = atoi(resource + 6);
+  }
+
+ /*
+  * See if the job exists...
+  */
+
+  if ((job = cupsdFindJob(jobid)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"), jobid);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, NULL);
+    return;
+  }
+
+ /*
+  * Get the document number...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "document-number",
+                               IPP_TAG_INTEGER)) == NULL)
+  {
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("Missing document-number attribute!"));
+    return;
+  }
+
+  if ((docnum = attr->values[0].integer) < 1 || docnum > job->num_files ||
+      attr->num_values > 1)
+  {
+    send_ipp_status(con, IPP_NOT_FOUND, _("Document %d not found in job %d."),
+                    docnum, jobid);
+    return;
+  }
+
+  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, jobid,
+           docnum);
+  if ((con->file = open(filename, O_RDONLY)) == -1)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to open document %d in job %d - %s", docnum, jobid,
+		    strerror(errno));
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("Unable to open document %d in job %d!"), docnum, jobid);
+    return;
+  }
+
+  fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
+
+  cupsdLoadJob(job);
+
+  snprintf(format, sizeof(format), "%s/%s", job->filetypes[docnum - 1]->super,
+           job->filetypes[docnum - 1]->type);
+
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+               NULL, format);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "document-number",
+                docnum);
+  if ((attr = ippFindAttribute(job->attrs, "document-name",
+                               IPP_TAG_NAME)) != NULL)
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "document-name",
+                 NULL, attr->values[0].string.text);
 }
 
 

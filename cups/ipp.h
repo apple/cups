@@ -246,7 +246,8 @@ typedef enum ipp_op_e			/**** IPP operations... ****/
   CUPS_GET_PPDS,			/* Get a list of supported drivers */
   CUPS_MOVE_JOB,			/* Move a job to a different printer */
   CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2@ */
-  CUPS_GET_PPD				/* Get a PPD file @since CUPS 1.3@ */
+  CUPS_GET_PPD,				/* Get a PPD file @since CUPS 1.3@ */
+  CUPS_GET_DOCUMENT = 0x4027		/* Get a document file @since CUPS 1.4@ */
 } ipp_op_t;
 
 /* Old names for the operations */

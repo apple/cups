@@ -17,6 +17,7 @@
  * Contents:
  *
  *   cupsDoFileRequest() - Do an IPP request with a file.
+ *   cupsDoIORequest()   - Do an IPP request with file descriptors.
  *   cupsDoRequest()     - Do an IPP request.
  *   _cupsSetError()     - Set the last IPP status code and status-message.
  *   _cupsSetHTTPError() - Set the last error using the HTTP status.

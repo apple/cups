@@ -19,6 +19,7 @@
  *   escape_options()  - Convert an options array to a string.
  *   exec_filter()     - Execute a single filter.
  *   exec_filters()    - Execute filters for the given file and options.
+ *   get_job_file()    - Get the specified job file.
  *   open_pipe()       - Create a pipe which is closed on exec.
  *   read_cupsd_conf() - Read the cupsd.conf file to get the filter settings.
  *   set_string()      - Copy and set a string.
@@ -35,8 +36,10 @@
 #include <errno.h>
 #include "mime.h"
 #include <stdlib.h>
+#include <limits.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <sys/wait.h>
 #if defined(__APPLE__)
 #  include <libgen.h>
@@ -64,6 +67,8 @@ static char		*ServerRoot = NULL;
 					/* CUPS_SERVERROOT environment variable */
 static char		*RIPCache = NULL;
 					/* RIP_CACHE environment variable */
+static char		TempFile[1024] = "";
+					/* Temporary file */
 
 
 /*
@@ -79,9 +84,11 @@ static int	exec_filters(cups_array_t *filters, const char *infile,
 			     const char *printer, const char *user,
 			     const char *title, int num_options,
 			     cups_option_t *options);
+static void	get_job_file(const char *job);
 static int	open_pipe(int *fds);
 static int	read_cupsd_conf(const char *filename);
 static void	set_string(char **s, const char *val);
+static void	sighandler(int sig);
 static void	usage(const char *command, const char *opt);
 
 
@@ -214,7 +221,21 @@ main(int  argc,				/* I - Number of command-line args */
 	        usage(command, opt);
 	      break;
 
-          case 'j' : /* Specify destination MIME type... */
+          case 'j' : /* Get job file or specify destination MIME type... */
+              if (strcmp(command, "convert"))
+	      {
+	        i ++;
+		if (i < argc)
+		{
+		  get_job_file(argv[i]);
+		  infile = TempFile;
+		}
+		else
+		  usage(command, opt);
+
+                break;
+	      }
+
           case 'm' : /* Specify destination MIME type... */
 	      i ++;
 	      if (i < argc)
@@ -404,6 +425,9 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * Remove files as needed, then exit...
   */
+
+  if (TempFile[0])
+    unlink(TempFile);
 
   if (removeppd && ppdfile)
     unlink(ppdfile);
@@ -811,10 +835,102 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
 
 
 /*
+ * 'get_job_file()' - Get the specified job file.
+ */
+
+static void
+get_job_file(const char *job)		/* I - Job ID */
+{
+  long		jobid,			/* Job ID */
+		docnum;			/* Document number */
+  const char	*jobptr;		/* Pointer into job ID string */
+  char		uri[1024];		/* job-uri */
+  http_t	*http;			/* Connection to server */
+  ipp_t		*request;		/* Request data */
+  int		tempfd;			/* Temporary file */
+
+
+ /*
+  * Get the job ID and document number, if any...
+  */
+
+  if ((jobptr = strrchr(job, '-')) != NULL)
+    jobptr ++;
+  else
+    jobptr = job;
+
+  jobid = strtol(jobptr, (char **)&jobptr, 10);
+
+  if (*jobptr == ',')
+    docnum = strtol(jobptr + 1, NULL, 10);
+  else
+    docnum = 1;
+
+  if (jobid < 1 || jobid > INT_MAX)
+  {
+    _cupsLangPrintf(stderr, _("cupsfilter: Invalid job ID %d!\n"), (int)jobid);
+    exit(1);
+  }
+
+  if (docnum < 1 || docnum > INT_MAX)
+  {
+    _cupsLangPrintf(stderr, _("cupsfilter: Invalid document number %d!\n"),
+                    (int)docnum);
+    exit(1);
+  }
+
+ /*
+  * Ask the server for the document file...
+  */
+
+  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                 cupsEncryption())) == NULL)
+  {
+    _cupsLangPrintf(stderr, _("%s: Unable to connect to server\n"),
+                    "cupsfilter");
+    exit(1);
+  }
+
+  request = ippNewRequest(CUPS_GET_DOCUMENT);
+
+  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", (int)jobid);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "document-number",
+                (int)docnum);
+
+  if ((tempfd = cupsTempFd(TempFile, sizeof(TempFile))) == -1)
+  {
+    _cupsLangPrintf(stderr,
+                    _("cupsfilter: Unable to create temporary file: %s\n"),
+                    strerror(errno));
+    httpClose(http);
+    exit(1);
+  }
+
+  signal(SIGTERM, sighandler);
+
+  ippDelete(cupsDoIORequest(http, request, "/", -1, tempfd));
+
+  close(tempfd);
+
+  httpClose(http);
+
+  if (cupsLastError() != IPP_OK)
+  {
+    _cupsLangPrintf(stderr, _("cupsfilter: Unable to get job file - %s\n"),
+                    cupsLastErrorString());
+    unlink(TempFile);
+    exit(1);
+  }
+}
+
+
+/*
  * 'open_pipe()' - Create a pipe which is closed on exec.
  */
 
-int					/* O - 0 on success, -1 on error */
+static int				/* O - 0 on success, -1 on error */
 open_pipe(int *fds)			/* O - Pipe file descriptors (2) */
 {
  /*
@@ -948,6 +1064,28 @@ set_string(char       **s,		/* O - Copy of string */
 
 
 /*
+ * 'sighandler()' - Signal catcher for when we print from stdin...
+ */
+
+static void
+sighandler(int s)			/* I - Signal number */
+{
+ /*
+  * Remove the temporary file we're using to print a job file...
+  */
+
+  if (TempFile[0])
+    unlink(TempFile);
+
+ /*
+  * Exit...
+  */
+
+  exit(s);
+}
+
+
+/*
  * 'usage()' - Show program usage...
  */
 
@@ -965,6 +1103,7 @@ usage(const char *command,		/* I - Command name */
 		    "Options:\n"
 		    "\n"
 		    "  -c cupsd.conf    Set cupsd.conf file to use\n"
+		    "  -j job-id[,N]    Filter file N from the specified job (default is file 1)\n"
 		    "  -n copies        Set number of copies\n"
 		    "  -o name=value    Set option(s)\n"
 		    "  -p filename.ppd  Set PPD file\n"
