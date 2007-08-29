@@ -2843,7 +2843,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 	   !strcmp(attr->name, "page-ranges") ||
 	   !strcmp(attr->name, "page-set") ||
 	   !strcasecmp(attr->name, "AP_FIRSTPAGE_InputSlot") ||
-	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed")) &&
+	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed") ||
+	   !strcasecmp(attr->name, "com.apple.print.PrintSettings."
+	                           "PMTotalSidesImaged..n.") ||
+	   !strcasecmp(attr->name, "com.apple.print.PrintSettings."
+	                           "PMTotalBeginPages..n.")) &&
 	  banner_page)
         continue;
 
