@@ -127,25 +127,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fprintf(stderr, "DEBUG: op=\"%s\"...\n", op);
 
-    if (!strcmp(op, "redirect"))
-    {
-      const char *url;			/* Redirection URL... */
-      char	prefix[1024];		/* URL prefix */
-
-
-      if (getenv("HTTPS"))
-        snprintf(prefix, sizeof(prefix), "https://%s:%s",
-	         getenv("SERVER_NAME"), getenv("SERVER_PORT"));
-      else
-        snprintf(prefix, sizeof(prefix), "http://%s:%s",
-	         getenv("SERVER_NAME"), getenv("SERVER_PORT"));
-
-      if ((url = cgiGetVariable("URL")) != NULL)
-        printf("Location: %s%s\n\n", prefix, url);
-      else
-        printf("Location: %s/admin\n\n", prefix);
-    }
-    else if (!strcmp(op, "start-printer"))
+    if (!strcmp(op, "start-printer"))
       do_printer_op(http, IPP_RESUME_PRINTER, cgiText(_("Start Printer")));
     else if (!strcmp(op, "stop-printer"))
       do_printer_op(http, IPP_PAUSE_PRINTER, cgiText(_("Stop Printer")));
@@ -202,6 +184,24 @@ main(int  argc,				/* I - Number of command-line arguments */
       cgiCopyTemplateLang("error-op.tmpl");
       cgiEndHTML();
     }
+  }
+  else if (op && !strcmp(op, "redirect"))
+  {
+    const char *url;			/* Redirection URL... */
+    char	prefix[1024];		/* URL prefix */
+
+
+    if (getenv("HTTPS"))
+      snprintf(prefix, sizeof(prefix), "https://%s:%s",
+	       getenv("SERVER_NAME"), getenv("SERVER_PORT"));
+    else
+      snprintf(prefix, sizeof(prefix), "http://%s:%s",
+	       getenv("SERVER_NAME"), getenv("SERVER_PORT"));
+
+    if ((url = cgiGetVariable("URL")) != NULL)
+      printf("Location: %s%s\n\n", prefix, url);
+    else
+      printf("Location: %s/admin\n\n", prefix);
   }
   else
   {
