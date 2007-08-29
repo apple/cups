@@ -67,12 +67,12 @@ static void	cancel_job(http_t *http, const char *uri, int id,
 		           const char *resource, const char *user, int version);
 static void	check_printer_state(http_t *http, const char *uri,
 		                    const char *resource, const char *user,
-				    int version);
+				    int version, int job_id);
 #ifdef HAVE_LIBZ
 static void	compress_files(int num_files, char **files);
 #endif /* HAVE_LIBZ */
 static const char *password_cb(const char *);
-static int	report_printer_state(ipp_t *ipp);
+static int	report_printer_state(ipp_t *ipp, int job_id);
 
 #ifdef __APPLE__
 static int	run_pictwps_filter(char **argv, const char *filename);
@@ -654,7 +654,7 @@ main(int  argc,				/* I - Number of command-line args */
 			  "will retry in %d seconds...\n"),
 			hostname, delay);
 
-        report_printer_state(supported);
+        report_printer_state(supported, 0);
 
 	sleep(delay);
 
@@ -720,7 +720,7 @@ main(int  argc,				/* I - Number of command-line args */
 	        format_sup->values[i].string.text);
     }
 
-    report_printer_state(supported);
+    report_printer_state(supported, 0);
   }
   while (ipp_status > IPP_OK_CONFLICT);
 
@@ -1138,7 +1138,7 @@ main(int  argc,				/* I - Number of command-line args */
       * Check the printer state and report it if necessary...
       */
 
-      check_printer_state(http, uri, resource, argv[2], version);
+      check_printer_state(http, uri, resource, argv[2], version, job_id);
 
      /*
       * Wait 10 seconds before polling again...
@@ -1159,7 +1159,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Check the printer state and report it if necessary...
   */
 
-  check_printer_state(http, uri, resource, argv[2], version);
+  check_printer_state(http, uri, resource, argv[2], version, job_id);
 
  /*
   * Free memory...
@@ -1260,7 +1260,8 @@ check_printer_state(
     const char  *uri,			/* I - Printer URI */
     const char  *resource,		/* I - Resource path */
     const char  *user,			/* I - Username, if any */
-    int         version)		/* I - IPP version */
+    int         version,		/* I - IPP version */
+    int         job_id)			/* I - Current job ID */
 {
   ipp_t	*request,			/* IPP request */
 	*response;			/* IPP response */
@@ -1295,7 +1296,7 @@ check_printer_state(
 
   if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
-    report_printer_state(response);
+    report_printer_state(response, job_id);
     ippDelete(response);
   }
 }
@@ -1423,7 +1424,8 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
  */
 
 static int				/* O - Number of reasons shown */
-report_printer_state(ipp_t *ipp)	/* I - IPP response */
+report_printer_state(ipp_t *ipp,	/* I - IPP response */
+                     int   job_id)	/* I - Current job ID */
 {
   int			i;		/* Looping var */
   int			count;		/* Count of reasons shown... */
@@ -1453,10 +1455,14 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
   {
     reason = reasons->values[i].string.text;
 
-    strlcat(state, prefix, sizeof(state));
-    strlcat(state, reason, sizeof(state));
+    if (job_id == 0 || strcmp(reason, "paused"))
+    {
+      strlcat(state, prefix, sizeof(state));
+      strlcat(state, reason, sizeof(state));
 
-    prefix  = ",";
+      prefix  = ",";
+    }
+
     message = "";
 
     if (!strncmp(reason, "media-needed", 12))
