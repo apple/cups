@@ -25,81 +25,22 @@ WEBPAGES	=	\
 			favicon.ico \
 			index.html \
 			robots.txt
-WEBBUTTONS	=	\
-			images/button-accept-jobs.gif \
-			images/button-add-class.gif \
-			images/button-add-printer.gif \
-			images/button-add-rss-subscription.gif \
-			images/button-add-this-printer.gif \
-			images/button-cancel-all-jobs.gif \
-			images/button-cancel-job.gif \
-			images/button-cancel-subscription.gif \
-			images/button-change-settings.gif \
-			images/button-clean-print-heads.gif \
-			images/button-clear.gif \
-			images/button-continue.gif \
-			images/button-delete-class.gif \
-			images/button-delete-printer.gif \
-			images/button-edit-configuration-file.gif \
-			images/button-export-samba.gif \
-			images/button-find-new-printers.gif \
-			images/button-help.gif \
-			images/button-hold-job.gif \
-			images/button-manage-classes.gif \
-			images/button-manage-jobs.gif \
-			images/button-manage-printers.gif \
-			images/button-manage-server.gif \
-			images/button-modify-class.gif \
-			images/button-modify-printer.gif \
-			images/button-move-job.gif \
-			images/button-move-jobs.gif \
-			images/button-print-self-test-page.gif \
-			images/button-print-test-page.gif \
-			images/button-publish-printer.gif \
-			images/button-reject-jobs.gif \
-			images/button-release-job.gif \
-			images/button-restart-job.gif \
-			images/button-save-changes.gif \
-			images/button-search.gif \
-			images/button-set-allowed-users.gif \
-			images/button-set-as-default.gif \
-			images/button-set-printer-options.gif \
-			images/button-show-active.gif \
-			images/button-show-all.gif \
-			images/button-show-completed.gif \
-			images/button-show-next.gif \
-			images/button-show-previous.gif \
-			images/button-sort-ascending.gif \
-			images/button-sort-descending.gif \
-			images/button-start-class.gif \
-			images/button-start-printer.gif \
-			images/button-stop-class.gif \
-			images/button-stop-printer.gif \
-			images/button-unpublish-printer.gif \
-			images/button-use-default-config.gif \
-			images/button-view-access-log.gif \
-			images/button-view-error-log.gif \
-			images/button-view-page-log.gif \
-			images/button-view-printable-version.gif
 WEBIMAGES	=	\
-			images/bottom-left.gif \
-			images/bottom-right.gif \
-			images/classes.gif \
+			images/classes.png \
 			images/cups-block-diagram.gif \
-			images/esp-logo.gif \
-			images/happy.gif \
-			images/logo.gif \
-			images/printer-idle.gif \
-			images/printer-processing.gif \
-			images/printer-stopped.gif \
+			images/cups.png \
+			images/happy.png \
+			images/left.gif \
+			images/printer-idle.png \
+			images/printer-processing.png \
+			images/printer-stopped.png \
 			images/raster.png \
-			images/raster.svg \
+			images/right.gif \
+			images/sel.gif \
+			images/shadow.png \
 			images/smiley.jpg \
-			images/tab-left.gif \
-			images/tab-right.gif \
-			images/top-left.gif \
-			images/top-middle.gif \
-			images/top-right.gif \
+			images/unsel-hover.gif \
+			images/unsel.gif \
 			images/web-add-this-printer.gif \
 			images/web-password.gif \
 			images/web-printer-driver.gif \
@@ -211,7 +152,7 @@ install:	all $(INSTALL_LANGUAGES)
 		$(INSTALL_MAN) $$file $(DOCDIR)/help; \
 	done
 	$(INSTALL_DIR) -m 755 $(DOCDIR)/images
-	for file in $(WEBIMAGES) $(WEBBUTTONS); do \
+	for file in $(WEBIMAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
 	done
 
@@ -243,7 +184,7 @@ uninstall: $(UNINSTALL_LANGUAGES)
 	for file in $(HELPFILES); do \
 		$(INSTALL_MAN) $(DOCDIR)/help/$$file; \
 	done
-	for file in $(WEBIMAGES) $(WEBBUTTONS); do \
+	for file in $(WEBIMAGES); do \
 		$(INSTALL_MAN) $(DOCDIR)/images/$$file; \
 	done
 	-$(RMDIR) $(DOCDIR)/images
@@ -254,9 +195,6 @@ uninstall-languages:
 	-for lang in $(LANGUAGES); do \
 		$(RM) $(DOCDIR)/$$lang/index.html; \
 		$(RM) $(DOCDIR)/$$lang/cups.css; \
-		for file in $(WEBBUTTONS); do \
-			$(RM) $(DOCDIR)/$$lang/images/$$file; \
-		done \
 		$(RMDIR) $(DOCDIR)/$$lang/images; \
 		$(RMDIR) $(DOCDIR)/$$lang; \
 	done
