@@ -1319,7 +1319,7 @@ do_cancel_subscription(http_t *http)/* I - HTTP connection */
 static void
 do_config_server(http_t *http)		/* I - HTTP connection */
 {
-  if (cgiIsPOST() && !cgiGetVariable("CUPSDCONF"))
+  if (cgiGetVariable("CHANGESETTINGS"))
   {
    /*
     * Save basic setting changes...
@@ -1454,7 +1454,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
     cgiEndHTML();
   }
-  else if (cgiIsPOST())
+  else if (cgiGetVariable("SAVECHANGES") && cgiGetVariable("CUPSDCONF"))
   {
    /*
     * Save hand-edited config file...
