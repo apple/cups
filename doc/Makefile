@@ -27,9 +27,9 @@ WEBPAGES	=	\
 			robots.txt
 WEBIMAGES	=	\
 			images/classes.png \
-			images/cups-block-diagram.gif \
 			images/cups.png \
-			images/happy.png \
+			images/cups-block-diagram.gif \
+			images/cups-icon.png \
 			images/left.gif \
 			images/printer-idle.png \
 			images/printer-processing.png \
