@@ -22,7 +22,7 @@ include ../Makedefs
 WEBPAGES	=	\
 			cups.css \
 			cups-printable.css \
-			favicon.ico \
+			favicon.png \
 			index.html \
 			robots.txt
 WEBIMAGES	=	\

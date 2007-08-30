@@ -4,7 +4,7 @@
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
 	<TITLE>Home - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
 	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
-	<LINK REL="SHORTCUT ICON" HREF="/favicon.ico" TYPE="image/x-icon">
+	<LINK REL="SHORTCUT ICON" HREF="/favicon.png" TYPE="image/png">
 </HEAD>
 <BODY>
 <TABLE CLASS="page" SUMMARY="{title}">
@@ -12,7 +12,7 @@
 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
 <TR HEIGHT="32">
 <TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
-SRC="/images/left.gif" WIDTH="32" HEIGHT="32" BORDER="0" ALT=""></A></TD>
+SRC="/images/left.gif" WIDTH="64" HEIGHT="32" BORDER="0" ALT=""></A></TD>
 <TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Home&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Administration&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Classes&nbsp;&nbsp;</A></TD>
