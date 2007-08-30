@@ -257,6 +257,7 @@ cupsdCreateCommonData(void)
   cups_array_t		*notifiers;	/* Notifier array */
   char			filename[1024],	/* Filename */
 			*notifier;	/* Current notifier */
+  cupsd_policy_t	*p;		/* Current policy */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const int orients[4] =/* orientation-requested-supported values */
@@ -564,9 +565,12 @@ cupsdCreateCommonData(void)
 
   /* printer-op-policy-supported */
   attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                       "printer-op-policy-supported", NumPolicies, NULL, NULL);
-  for (i = 0; i < NumPolicies; i ++)
-    attr->values[i].string.text = _cupsStrAlloc(Policies[i]->name);
+                       "printer-op-policy-supported", cupsArrayCount(Policies),
+		       NULL, NULL);
+  for (i = 0, p = (cupsd_policy_t *)cupsArrayFirst(Policies);
+       p;
+       i ++, p = (cupsd_policy_t *)cupsArrayNext(Policies))
+    attr->values[i].string.text = _cupsStrAlloc(p->name);
 }
 
 

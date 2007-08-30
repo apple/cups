@@ -31,36 +31,37 @@
 
 
 /*
+ * Local functions...
+ */
+
+static int	compare_ops(cupsd_location_t *a, cupsd_location_t *b);
+static int	compare_policies(cupsd_policy_t *a, cupsd_policy_t *b);
+static int	hash_op(cupsd_location_t *op);
+
+
+/*
  * 'AddPolicy()' - Add a policy to the system.
  */
 
 cupsd_policy_t *			/* O - Policy */
 cupsdAddPolicy(const char *policy)	/* I - Name of policy */
 {
-  cupsd_policy_t	*temp,		/* Pointer to policy */
-			**tempa;	/* Pointer to policy array */
+  cupsd_policy_t	*temp;		/* Pointer to policy */
 
 
-  if (policy == NULL)
+  if (!policy)
     return (NULL);
 
-  if (NumPolicies == 0)
-    tempa = malloc(sizeof(cupsd_policy_t *));
-  else
-    tempa = realloc(Policies, sizeof(cupsd_policy_t *) * (NumPolicies + 1));
+  if (!Policies)
+    Policies = cupsArrayNew((cups_array_func_t)compare_policies, NULL);
 
-  if (tempa == NULL)
+  if (!Policies)
     return (NULL);
-
-  Policies = tempa;
-  tempa    += NumPolicies;
 
   if ((temp = calloc(1, sizeof(cupsd_policy_t))) != NULL)
   {
-    temp->name = strdup(policy);
-    *tempa     = temp;
-
-    NumPolicies ++;
+    cupsdSetString(&temp->name, policy);
+    cupsArrayAdd(Policies, temp);
   }
 
   return (temp);
@@ -77,35 +78,29 @@ cupsdAddPolicyOp(cupsd_policy_t   *p,	/* I - Policy */
                  ipp_op_t         op)	/* I - IPP operation code */
 {
   int			i;		/* Looping var */
-  cupsd_location_t	*temp,		/* New policy operation */
-			**tempa;	/* New policy operation array */
+  cupsd_location_t	*temp;		/* New policy operation */
   char			name[1024];	/* Interface name */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddPolicyOp(p=%p, po=%p, op=%x(%s))",
                   p, po, op, ippOpString(op));
 
-  if (p == NULL)
+  if (!p)
     return (NULL);
 
-  if (p->num_ops == 0)
-    tempa = malloc(sizeof(cupsd_location_t *));
-  else
-    tempa = realloc(p->ops, sizeof(cupsd_location_t *) * (p->num_ops + 1));
+  if (!p->ops)
+    p->ops = cupsArrayNew2((cups_array_func_t)compare_ops, NULL,
+                           (cups_ahash_func_t)hash_op, 128);
 
-  if (tempa == NULL)
+  if (!p->ops)
     return (NULL);
-
-  p->ops = tempa;
 
   if ((temp = calloc(1, sizeof(cupsd_location_t))) != NULL)
   {
-    p->ops            = tempa;
-    tempa[p->num_ops] = temp;
-    p->num_ops ++;
-
     temp->op    = op;
     temp->limit = AUTH_LIMIT_IPP;
+
+    cupsArrayAdd(p->ops, temp);
 
     if (po)
     {
@@ -127,7 +122,7 @@ cupsdAddPolicyOp(cupsd_policy_t   *p,	/* I - Policy */
 	{
 	  case AUTH_IP :
 	      cupsdAllowIP(temp, po->allow[i].mask.ip.address,
-	              po->allow[i].mask.ip.netmask);
+	                   po->allow[i].mask.ip.netmask);
 	      break;
 
           case AUTH_INTERFACE :
@@ -146,7 +141,7 @@ cupsdAddPolicyOp(cupsd_policy_t   *p,	/* I - Policy */
 	{
 	  case AUTH_IP :
 	      cupsdDenyIP(temp, po->deny[i].mask.ip.address,
-	              po->deny[i].mask.ip.netmask);
+	                  po->deny[i].mask.ip.netmask);
 	      break;
 
           case AUTH_INTERFACE :
@@ -216,29 +211,30 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 void
 cupsdDeleteAllPolicies(void)
 {
-  int			i, j;		/* Looping vars */
-  cupsd_policy_t	**p;		/* Current policy */
-  cupsd_location_t	**po;		/* Current policy op */
+  cupsd_policy_t	*p;		/* Current policy */
+  cupsd_location_t	*po;		/* Current policy op */
 
 
-  if (NumPolicies == 0)
+  if (!Policies)
     return;
 
-  for (i = NumPolicies, p = Policies; i > 0; i --, p ++)
+  for (p = (cupsd_policy_t *)cupsArrayFirst(Policies);
+       p;
+       p = (cupsd_policy_t *)cupsArrayNext(Policies))
   {
-    for (j = (*p)->num_ops, po = (*p)->ops; j > 0; j --, po ++)
-      cupsdDeleteLocation(*po);
+    for (po = (cupsd_location_t *)cupsArrayFirst(p->ops);
+         po;
+	 po = (cupsd_location_t *)cupsArrayNext(p->ops))
+      cupsdDeleteLocation(po);
 
-    if ((*p)->num_ops > 0)
-      free((*p)->ops);
-
-    free(*p);
+    cupsArrayDelete(p->ops);
+    cupsdClearString(&p->name);
+    free(p);
   }
 
-  free(Policies);
+  cupsArrayDelete(Policies);
 
-  NumPolicies = 0;
-  Policies    = NULL;
+  Policies = NULL;
 }
 
 
@@ -249,26 +245,22 @@ cupsdDeleteAllPolicies(void)
 cupsd_policy_t *			/* O - Policy */
 cupsdFindPolicy(const char *policy)	/* I - Name of policy */
 {
-  int			i;		/* Looping var */
-  cupsd_policy_t	**p;		/* Current policy */
+  cupsd_policy_t	key;		/* Search key */
 
 
  /*
   * Range check...
   */
 
-  if (policy == NULL)
+  if (!policy)
     return (NULL);
 
  /*
-  * Check the operation against the available policies...
+  * Look it up...
   */
 
-  for (i = NumPolicies, p = Policies; i > 0; i --, p ++)
-    if (!strcasecmp(policy, (*p)->name))
-      return (*p);
-
-  return (NULL);
+  key.name = (char *)policy;
+  return ((cupsd_policy_t *)cupsArrayFind(Policies, &key));
 }
 
 
@@ -280,8 +272,8 @@ cupsd_location_t *			/* O - Policy operation */
 cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
                   ipp_op_t       op)	/* I - IPP operation */
 {
-  int			i;		/* Looping var */
-  cupsd_location_t	**po;		/* Current policy operation */
+  cupsd_location_t	key,		/* Search key... */
+			*po;		/* Current policy operation */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))\n",
@@ -291,32 +283,67 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
   * Range check...
   */
 
-  if (p == NULL)
+  if (!p)
     return (NULL);
 
  /*
   * Check the operation against the available policies...
   */
 
-  for (i = p->num_ops, po = p->ops; i > 0; i --, po ++)
-    if ((*po)->op == op)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdFindPolicyOp: Found exact match...");
-      return (*po);
-    }
+  key.op = op;
+  if ((po = (cupsd_location_t *)cupsArrayFind(p->ops, &key)) != NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdFindPolicyOp: Found exact match...");
+    return (po);
+  }
 
-  for (i = p->num_ops, po = p->ops; i > 0; i --, po ++)
-    if ((*po)->op == IPP_ANY_OPERATION)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdFindPolicyOp: Found wildcard match...");
-      return (*po);
-    }
+  key.op = IPP_ANY_OPERATION;
+  if ((po = (cupsd_location_t *)cupsArrayFind(p->ops, &key)) != NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdFindPolicyOp: Found wildcard match...");
+    return (po);
+  }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp: No match found!");
 
   return (NULL);
+}
+
+
+/*
+ * 'compare_ops()' - Compare two operations.
+ */
+
+static int				/* O - Result of comparison */
+compare_ops(cupsd_location_t *a,	/* I - First operation */
+            cupsd_location_t *b)	/* I - Second operation */
+{
+  return (a->op - b->op);
+}
+
+
+/*
+ * 'compare_policies()' - Compare two policies.
+ */
+
+static int				/* O - Result of comparison */
+compare_policies(cupsd_policy_t *a,	/* I - First policy */
+                 cupsd_policy_t *b)	/* I - Second policy */
+{
+  return (strcasecmp(a->name, b->name));
+}
+
+
+/*
+ * 'hash_op()' - Generate a lookup hash for the operation.
+ */
+
+static int				/* O - Hash value */
+hash_op(cupsd_location_t *op)		/* I - Operation */
+{
+  return (((op->op >> 6) & 0x40) | (op->op & 0x3f));
 }
 
 

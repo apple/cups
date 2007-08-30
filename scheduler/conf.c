@@ -349,6 +349,7 @@ cupsdReadConfiguration(void)
 		*old_requestroot;	/* Old RequestRoot */
   const char	*tmpdir;		/* TMPDIR environment variable */
   struct stat	tmpinfo;		/* Temporary directory info */
+  cupsd_policy_t *p;			/* Policy */
 
 
  /*
@@ -930,7 +931,6 @@ cupsdReadConfiguration(void)
 
   if (!DefaultPolicyPtr)
   {
-    cupsd_policy_t	*p;		/* New policy */
     cupsd_location_t	*po;		/* New policy operation */
 
 
@@ -1047,11 +1047,12 @@ cupsdReadConfiguration(void)
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadConfiguration: NumPolicies=%d",
-                  NumPolicies);
-  for (i = 0; i < NumPolicies; i ++)
+                  cupsArrayCount(Policies));
+  for (i = 0, p = (cupsd_policy_t *)cupsArrayFirst(Policies);
+       p;
+       i ++, p = (cupsd_policy_t *)cupsArrayNext(Policies))
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdReadConfiguration: Policies[%d]=\"%s\"", i,
-                    Policies[i]->name);
+                    "cupsdReadConfiguration: Policies[%d]=\"%s\"", i, p->name);
 
  /*
   * If we are doing a full reload or the server root has changed, flush
@@ -3251,17 +3252,11 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
       * (ensures that upgrades do not introduce new security issues...)
       */
 
-      for (i = 0; i < pol->num_ops; i ++)
-        if (pol->ops[i]->op == CUPS_GET_DOCUMENT)
-	  break;
-
-      if (i >= pol->num_ops)
+      if ((op = cupsdFindPolicyOp(pol, CUPS_GET_DOCUMENT)) == NULL ||
+          op->op == IPP_ANY_OPERATION)
       {
-	for (i = 0; i < pol->num_ops; i ++)
-	  if (pol->ops[i]->op == IPP_SEND_DOCUMENT)
-            break;
-
-        if (i < pol->num_ops)
+        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+            op->op != IPP_ANY_OPERATION)
 	{
 	 /*
 	  * Add a new limit for CUPS-Get-Document using the Send-Document
@@ -3272,7 +3267,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	                  "No limit for CUPS-Get-Document defined in policy %s "
 			  "- using Send-Document's policy", pol->name);
 
-          cupsdAddPolicyOp(pol, pol->ops[i], CUPS_GET_DOCUMENT);
+          cupsdAddPolicyOp(pol, op, CUPS_GET_DOCUMENT);
 	}
       }
 

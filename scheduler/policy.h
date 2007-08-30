@@ -22,8 +22,7 @@
 typedef struct
 {
   char			*name;		/* Policy name */
-  int			num_ops;	/* Number of operations */
-  cupsd_location_t	**ops;		/* Operations */
+  cups_array_t		*ops;		/* Operations */
 } cupsd_policy_t;
 
 
@@ -31,9 +30,7 @@ typedef struct
  * Globals...
  */
 
-VAR int			NumPolicies	VALUE(0);
-					/* Number of policies */
-VAR cupsd_policy_t	**Policies	VALUE(NULL);
+VAR cups_array_t	*Policies	VALUE(NULL);
 					/* Policies */
 
 
