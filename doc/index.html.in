@@ -48,9 +48,7 @@ username and password or the "root" username and password.</I></P>
 
 <H2 CLASS="title">About CUPS</H2>
 
-<P>
-<IMG SRC="/images/happy.png" ALIGN="LEFT" WIDTH="192" HEIGHT="128"
-STYLE="padding-right: 10px;" ALT="Happy Computer and Printer">
+<P><IMG SRC="/images/cups-icon.png" ALIGN="LEFT" WIDTH="128" HEIGHT="128" STYLE="padding-right: 10px;" ALT="CUPS Icon">
 
 CUPS provides a portable printing layer for
 UNIX<SUP>&reg;</SUP>-based operating systems. It is developed and
