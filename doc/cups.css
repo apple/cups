@@ -51,6 +51,12 @@ A IMG {
   border: none;
 }
 
+A:link:hover IMG {
+  background: #e0e0e0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
 A:link, A:visited {
   text-decoration: none;
   color: #000099;
