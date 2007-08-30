@@ -1201,10 +1201,10 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       cgiShowIPPError(modify ? _("Unable to modify printer:") :
                                _("Unable to add printer:"));
     }
-    else
+    else if (modify)
     {
      /*
-      * Redirect successful updates back to the printer or set-options pages...
+      * Redirect successful updates back to the printer page...
       */
 
       char	refresh[1024];		/* Refresh URL */
@@ -1212,21 +1212,24 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
       cgiFormEncode(uri, name, sizeof(uri));
 
-      if (modify)
-	snprintf(refresh, sizeof(refresh),
-	         "5;/admin/?OP=redirect&URL=/printers/%s", uri);
-      else
-	snprintf(refresh, sizeof(refresh),
-	         "5;URL=/admin/?OP=set-printer-options&PRINTER_NAME=%s", uri);
+      snprintf(refresh, sizeof(refresh),
+	       "5;/admin/?OP=redirect&URL=/printers/%s", uri);
 
       cgiSetVariable("refresh_page", refresh);
 
       cgiStartHTML(title);
 
-      if (modify)
-        cgiCopyTemplateLang("printer-modified.tmpl");
-      else
-        cgiCopyTemplateLang("printer-added.tmpl");
+      cgiCopyTemplateLang("printer-modified.tmpl");
+    }
+    else
+    {
+     /*
+      * Set the printer options...
+      */
+
+      cgiSetVariable("OP", "set-printer-options");
+      do_set_options(http, 0);
+      return;
     }
 
     cgiEndHTML();
