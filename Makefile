@@ -63,9 +63,8 @@ distclean:	clean
 	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
 	$(RM) man/cupsd.conf.man man/lpoptions.man
 	$(RM) packaging/cups.list
-	$(RM) templates/edit-config.tmpl templates/header.tmpl
+	$(RM) templates/header.tmpl
 	-$(RM) doc/*/index.html
-	-$(RM) templates/*/edit-config.tmpl
 	-$(RM) templates/*/header.tmpl
 	-$(RM) -r autom4te*.cache
 
