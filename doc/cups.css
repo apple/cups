@@ -82,18 +82,20 @@ TD.body {
 }
 
 TD.sel, TD.unsel {
-  font-size: 120%;
-  vertical-align: middle;
-}
-
-TD.sel A, TD.unsel A, TD.spacer A {
   border-left: thin solid #aaaaaa;
-  line-height: 32px;
-  padding: 5px 0px;
+  font-size: 120%;
+  padding: 0px 5px;
+  text-align: center;
+  vertical-align: middle;
+  width: 14%;
 }
 
 TD.sel {
   background: url(images/sel.gif);
+}
+
+TD.unsel {
+  background: url(images/unsel.gif);
 }
 
 TD.sel A, TD.sel A:hover {
@@ -107,15 +109,15 @@ TD.unsel A, TD.unsel A:visited {
   font-weight: normal;
 }
 
-TD.unsel A:link:hover, TD.unsel A:visited:hover, TD.unsel A:active {
+TD.unsel:hover {
   background: url(images/unsel-hover.gif);
+  color: #ffffff;
+}
+
+TD.unsel A:link:hover, TD.unsel A:visited:hover, TD.unsel A:active {
   color: #ffffff;
   font-weight: normal;
   text-decoration: none;
-}
-
-TD.unsel, TD.spacer {
-  background: url(images/unsel.gif);
 }
 
 TD.trailer {

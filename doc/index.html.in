@@ -19,7 +19,9 @@ SRC="/images/left.gif" WIDTH="64" HEIGHT="32" BORDER="0" ALT=""></A></TD>
 <TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Online&nbsp;Help&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Jobs&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Printers&nbsp;&nbsp;</A></TD>
-<TD CLASS="spacer" WIDTH="100%"><A NAME="SPACER">&nbsp;</A></TD>
+<TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
+TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Search Help"
+AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 <TD><IMG SRC="/images/right.gif" WIDTH="16" HEIGHT="32" ALT=""></TD>
 </TR>
 </TABLE>
