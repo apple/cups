@@ -998,6 +998,8 @@ static const char *			/* O - Locale string */
 appleLangDefault(void)
 {
   int			i;		/* Looping var */
+  CFBundleRef		bundle;		/* Main bundle (if any) */
+  CFArrayRef		bundleList;	/* List of localizations in bundle */
   CFPropertyListRef 	localizationList;
 					/* List of localization data */
   CFStringRef		languageName;	/* Current name */
@@ -1014,68 +1016,89 @@ appleLangDefault(void)
   if (!cg->language[0])
   {
     if ((lang = getenv("LANG")))
-      strlcpy(cg->language, lang, sizeof(cg->language));
-    else
     {
+      strlcpy(cg->language, lang, sizeof(cg->language));
+      return (cg->language);
+    }
+    else if ((bundle = CFBundleGetMainBundle()) != NULL)
+    {
+      bundleList = CFBundleCopyBundleLocalizations(bundle);
       localizationList =
-          CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
-                                    kCFPreferencesCurrentApplication);
+	  CFBundleCopyPreferredLocalizationsFromArray(bundleList);
 
-      if (localizationList != NULL)
+      CFRelease(bundleList);
+
+      if (CFArrayGetCount(localizationList) == 0)
       {
-	if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
-	    CFArrayGetCount(localizationList) > 0)
-	{
-          languageName = CFArrayGetValueAtIndex(localizationList, 0);
-
-          if (languageName != NULL &&
-              CFGetTypeID(languageName) == CFStringGetTypeID())
-          {
-	    localeName = CFLocaleCreateCanonicalLocaleIdentifierFromString(
-	                     kCFAllocatorDefault, languageName);
-
-	    if (localeName != NULL)
-	    {
-	      CFStringGetCString(localeName, cg->language, sizeof(cg->language),
-				 kCFStringEncodingASCII);
-	      CFRelease(localeName);
-
-              DEBUG_printf(("appleLangDefault: cg->language=\"%s\"\n",
-	                    cg->language));
-
-	     /*
-	      * Map new language identifiers to locales...
-	      */
-
-	      for (i = 0;
-		   i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
-		   i++)
-	      {
-		if (!strcmp(cg->language, apple_name_locale[i].name))
-		{
-		  DEBUG_printf(("appleLangDefault: mapping \"%s\" to \"%s\"...\n",
-				cg->language, apple_name_locale[i].locale));
-		  strlcpy(cg->language, apple_name_locale[i].locale, 
-			  sizeof(cg->language));
-		  break;
-		}
-	      }
-
-	     /*
-	      * Convert language subtag into region subtag...
-	      */
-
-	      if (cg->language[2] == '-')
-		cg->language[2] = '_';
-
-	      if (strchr(cg->language, '.') == NULL)
-		strlcat(cg->language, ".UTF-8", sizeof(cg->language));
-	    }
-          }
-	}
+       /*
+	* If we can't find a common language supported by the application,
+	* then the app will default to English...
+	*/
 
 	CFRelease(localizationList);
+	strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
+	return  (cg->language);
       }
+    }
+    else
+      localizationList =
+	  CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
+				    kCFPreferencesCurrentApplication);
+
+    if (localizationList)
+    {
+      if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
+	  CFArrayGetCount(localizationList) > 0)
+      {
+	languageName = CFArrayGetValueAtIndex(localizationList, 0);
+
+	if (languageName &&
+	    CFGetTypeID(languageName) == CFStringGetTypeID())
+	{
+	  localeName = CFLocaleCreateCanonicalLocaleIdentifierFromString(
+			   kCFAllocatorDefault, languageName);
+
+	  if (localeName)
+	  {
+	    CFStringGetCString(localeName, cg->language, sizeof(cg->language),
+			       kCFStringEncodingASCII);
+	    CFRelease(localeName);
+
+	    DEBUG_printf(("appleLangDefault: cg->language=\"%s\"\n",
+			  cg->language));
+
+	   /*
+	    * Map new language identifiers to locales...
+	    */
+
+	    for (i = 0;
+		 i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
+		 i++)
+	    {
+	      if (!strcmp(cg->language, apple_name_locale[i].name))
+	      {
+		DEBUG_printf(("appleLangDefault: mapping \"%s\" to \"%s\"...\n",
+			      cg->language, apple_name_locale[i].locale));
+		strlcpy(cg->language, apple_name_locale[i].locale, 
+			sizeof(cg->language));
+		break;
+	      }
+	    }
+
+	   /*
+	    * Convert language subtag into region subtag...
+	    */
+
+	    if (cg->language[2] == '-')
+	      cg->language[2] = '_';
+
+	    if (!strchr(cg->language, '.'))
+	      strlcat(cg->language, ".UTF-8", sizeof(cg->language));
+	  }
+	}
+      }
+
+      CFRelease(localizationList);
     }
   
    /*
