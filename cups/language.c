@@ -990,6 +990,7 @@ static const _apple_name_locale_t apple_name_locale[] =
   { "zh-Hant"	, "zh_TW" }
 };
 
+
 /*
  * 'appleLangDefault()' - Get the default locale string.
  */
@@ -1020,9 +1021,9 @@ appleLangDefault(void)
       strlcpy(cg->language, lang, sizeof(cg->language));
       return (cg->language);
     }
-    else if ((bundle = CFBundleGetMainBundle()) != NULL)
+    else if ((bundle = CFBundleGetMainBundle()) != NULL &&
+             (bundleList = CFBundleCopyBundleLocalizations(bundle)) != NULL)
     {
-      bundleList = CFBundleCopyBundleLocalizations(bundle);
       localizationList =
 	  CFBundleCopyPreferredLocalizationsFromArray(bundleList);
 
@@ -1037,7 +1038,7 @@ appleLangDefault(void)
 
 	CFRelease(localizationList);
 	strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
-	return  (cg->language);
+	return (cg->language);
       }
     }
     else
