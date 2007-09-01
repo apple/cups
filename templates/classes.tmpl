@@ -1,6 +1,6 @@
 {#printer_name=0?:
 {[printer_name]
-<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}
+{#printer_name=1?:<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}}
 {?printer_state_message=?:<SPAN CLASS="message">"{printer_state_message}"</SPAN>}</H2>
 
 <TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="0" SUMMARY="{printer_name}">
@@ -10,7 +10,7 @@
 <TD VALIGN=TOP><B>Description:</B> {printer_info}<BR>
 <B>Location:</B> {printer_location}<BR>
 <B>Class State:</B> {printer_state=3?idle:{printer_state=4?processing:stopped}},
-{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published.
+{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published{default_name={printer_name}?, default printer:}.
 {?member_uris=?:<BR>Members: {member_uris}}
 
 <P><TABLE CLASS="inset" WIDTH="100%" SUMMARY="Maintenance Commands">
