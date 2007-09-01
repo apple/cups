@@ -1,8 +1,12 @@
-CHANGES.txt - 2007-08-29
+CHANGES.txt - 2007-08-31
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The printer list now shows the default media, banner, and
+	  duplex options as well as the color and duplex capabilities
+	  of printers (STR #1175)
+	- The web interface look-n-feel has been updated (STR #2492)
 	- The scheduler now supports a CUPS-Get-Document operation
 	  that returns the specified print job document (STR #118)
 	- The cupsfilter utility now supports a "-J jobid" option
