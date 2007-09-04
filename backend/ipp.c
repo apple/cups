@@ -102,9 +102,9 @@ main(int  argc,				/* I - Number of command-line args */
 		resource[1024],		/* Resource info (printer name) */
 		addrname[256],		/* Address name */
 		*optptr,		/* Pointer to URI options */
-		name[255],		/* Name of option */
-		value[255],		/* Value of option */
-		*ptr;			/* Pointer into name or value */
+		*name,			/* Name of option */
+		*value,			/* Value of option */
+		sep;			/* Separator character */
   int		num_files;		/* Number of files to print */
   char		**files,		/* Files to print */
 		*filename;		/* Pointer to single filename */
@@ -265,29 +265,30 @@ main(int  argc,				/* I - Number of command-line args */
       * Get the name...
       */
 
-      for (ptr = name; *optptr && *optptr != '=';)
-        if (ptr < (name + sizeof(name) - 1))
-          *ptr++ = *optptr++;
-      *ptr = '\0';
+      name = optptr;
 
-      if (*optptr == '=')
+      while (*optptr && *optptr != '=' && *optptr != '+' && *optptr != '&')
+        optptr ++;
+
+      if ((sep = *optptr) != '\0')
+        *optptr++ = '\0';
+
+      if (sep == '=')
       {
        /*
         * Get the value...
 	*/
 
-        optptr ++;
+        value = optptr;
 
-	for (ptr = value; *optptr && *optptr != '+' && *optptr != '&';)
-          if (ptr < (value + sizeof(value) - 1))
-            *ptr++ = *optptr++;
-	*ptr = '\0';
-
-	if (*optptr == '+' || *optptr == '&')
+	while (*optptr && *optptr != '+' && *optptr != '&')
 	  optptr ++;
+
+        if (*optptr)
+	  *optptr++ = '\0';
       }
       else
-        value[0] = '\0';
+        value = (char *)"";
 
      /*
       * Process the option...
@@ -473,7 +474,9 @@ main(int  argc,				/* I - Number of command-line args */
     * Try loading authentication information from the environment.
     */
 
-    if ((ptr = getenv("AUTH_USERNAME")) != NULL)
+    const char *ptr = getenv("AUTH_USERNAME");
+
+    if (ptr)
       cupsSetUser(ptr);
 
     password = getenv("AUTH_PASSWORD");

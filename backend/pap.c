@@ -1365,9 +1365,9 @@ static int parseUri(const char* argv0, char* name, char* type, char* zone)
         *resourcePtr,
         *typePtr,
         *options,		/* Pointer to options */
-        optionName[255],	/* Name of option */
-        value[255],		/* Value of option */
-        *ptr;			/* Pointer into name or value */
+        *optionName,		/* Name of option */
+        *value,			/* Value of option */
+        sep;			/* Separator character */
   int   port;			/* Port number (not used) */
   int   statusInterval;		/* */
 
@@ -1395,53 +1395,54 @@ static int parseUri(const char* argv0, char* name, char* type, char* zone)
 
     while (*options != '\0')
     {
-      /*
+     /*
       * Get the name...
       */
-      for (ptr = optionName; *options && *options != '=' && *options != '+'; )
-        *ptr++ = *options++;
 
-      *ptr = '\0';
-      value[0] = '\0';
+      optionName = options;
 
-      if (*options == '=')
+      while (*options && *options != '=' && *options != '+' && *options != '&')
+        options ++;
+
+      if ((sep = *options) != '\0')
+        *options++ = '\0';
+
+      if (sep == '=')
       {
-        /*
+       /*
         * Get the value...
-        */
-        
-        options ++;
-        
-        for (ptr = value; *options && *options != '+';)
-          *ptr++ = *options++;
+	*/
 
-        *ptr = '\0';
-        
-        if (*options == '+')
-          options ++;
-      }
-      else if (*options == '+')
-      {
-        options ++;
-      }
+        value = options;
 
-      /*
+	while (*options && *options != '+' && *options != '&')
+	  options ++;
+
+        if (*options)
+	  *options++ = '\0';
+      }
+      else
+        value = (char *)"";
+
+     /*
       * Process the option...
       */
-      if (strcasecmp(optionName, "waiteof") == 0)
+
+      if (!strcasecmp(optionName, "waiteof"))
       {
-        /*
-        * Set the banner...
+       /*
+        * Wait for the end of the print file?
         */
-        if (strcasecmp(value, "on") == 0 ||
-          strcasecmp(value, "yes") == 0 ||
-          strcasecmp(value, "true") == 0)
+
+        if (!strcasecmp(value, "on") ||
+            !strcasecmp(value, "yes") ||
+            !strcasecmp(value, "true"))
         {
           gWaitEOF = true;
         }
-        else if (strcasecmp(value, "off") == 0 ||
-            strcasecmp(value, "no") == 0 ||
-            strcasecmp(value, "false") == 0)
+        else if (!strcasecmp(value, "off") ||
+                 !strcasecmp(value, "no") ||
+                 !strcasecmp(value, "false"))
         {
           gWaitEOF = false;
         }
@@ -1450,13 +1451,17 @@ static int parseUri(const char* argv0, char* name, char* type, char* zone)
           fprintf(stderr, "WARNING: Boolean expected for waiteof option \"%s\"\n", value);
         }
       }
-      else if (strcasecmp(optionName, "status") == 0)
+      else if (!strcasecmp(optionName, "status"))
       {
+       /*
+        * Set status reporting interval...
+	*/
+
         statusInterval = atoi(value);
-        if (value[0] < '0' || value[0] > '9' || 
-          statusInterval < 0)
+        if (value[0] < '0' || value[0] > '9' || statusInterval < 0)
         {
-          fprintf(stderr, "WARNING: number expected for status option \"%s\"\n", value);
+          fprintf(stderr, "WARNING: number expected for status option \"%s\"\n",
+	          value);
         }
         else
         {
@@ -1471,20 +1476,24 @@ static int parseUri(const char* argv0, char* name, char* type, char* zone)
   if (*resourcePtr == '/')
     resourcePtr++;
 
-        /* If the resource has a slash we assume the slash seperates the AppleTalk object
-         * name from the AppleTalk type. If the slash is not present we assume the AppleTalk
-         * type is LaserWriter.
-         */
-        typePtr = strchr(resourcePtr, '/');
-        if (typePtr != NULL) {
-            *typePtr++ = '\0';
-        } else {
-            typePtr = "LaserWriter";
-        }
+ /* If the resource has a slash we assume the slash seperates the AppleTalk object
+  * name from the AppleTalk type. If the slash is not present we assume the AppleTalk
+  * type is LaserWriter.
+  */
 
-  removePercentEscapes(hostname,    zone, NBP_NVE_STR_SIZE + 1);
-  removePercentEscapes(resourcePtr,  name, NBP_NVE_STR_SIZE + 1);
-  removePercentEscapes(typePtr,     type, NBP_NVE_STR_SIZE + 1);
+  typePtr = strchr(resourcePtr, '/');
+  if (typePtr != NULL)
+  {
+    *typePtr++ = '\0';
+  }
+  else
+  {
+    typePtr = "LaserWriter";
+  }
+
+  removePercentEscapes(hostname, zone, NBP_NVE_STR_SIZE + 1);
+  removePercentEscapes(resourcePtr, name, NBP_NVE_STR_SIZE + 1);
+  removePercentEscapes(typePtr, type, NBP_NVE_STR_SIZE + 1);
 
   return 0;
 }

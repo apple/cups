@@ -48,7 +48,7 @@ int					/* O - Exit status */
 print_device(const char *uri,		/* I - Device URI */
              const char *hostname,	/* I - Hostname/manufacturer */
              const char *resource,	/* I - Resource/modelname */
-	     const char *options,	/* I - Device options/serial number */
+	     char       *options,	/* I - Device options/serial number */
 	     int        print_fd,	/* I - File descriptor to print */
 	     int        copies,		/* I - Copies to print */
 	     int	argc,		/* I - Number of command-line arguments (6 or 7) */

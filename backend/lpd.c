@@ -125,9 +125,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 			username[255],	/* Username info */
 			resource[1024],	/* Resource info (printer name) */
 			*options,	/* Pointer to options */
-			name[255],	/* Name of option */
-			value[255],	/* Value of option */
-			*ptr,		/* Pointer into name or value */
+			*name,		/* Name of option */
+			*value,		/* Value of option */
+			sep,		/* Separator character */
 			*filename,	/* File to print */
 			title[256];	/* Title string */
   int			port;		/* Port number */
@@ -277,29 +277,30 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Get the name...
       */
 
-      for (ptr = name; *options && *options != '=';)
-        if (ptr < (name + sizeof(name) - 1))
-          *ptr++ = *options++;
-      *ptr = '\0';
+      name = options;
 
-      if (*options == '=')
+      while (*options && *options != '=' && *options != '+' && *options != '&')
+        options ++;
+
+      if ((sep = *options) != '\0')
+        *options++ = '\0';
+
+      if (sep == '=')
       {
        /*
         * Get the value...
 	*/
 
-        options ++;
+        value = options;
 
-	for (ptr = value; *options && *options != '+' && *options != '&';)
-          if (ptr < (value + sizeof(value) - 1))
-            *ptr++ = *options++;
-	*ptr = '\0';
-
-	if (*options == '+' || *options == '&')
+	while (*options && *options != '+' && *options != '&')
 	  options ++;
+
+        if (*options)
+	  *options++ = '\0';
       }
       else
-        value[0] = '\0';
+        value = (char *)"";
 
      /*
       * Process the option...
@@ -478,6 +479,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Sanitize the title string so that we don't cause problems on
     * the remote end...
     */
+
+    char *ptr;
 
     for (ptr = title; *ptr; ptr ++)
       if (!isalnum(*ptr & 255) && !isspace(*ptr & 255))

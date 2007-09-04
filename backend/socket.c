@@ -68,9 +68,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		username[255],		/* Username info (not used) */
 		resource[1024],		/* Resource info (not used) */
 		*options,		/* Pointer to options */
-		name[255],		/* Name of option */
-		value[255],		/* Value of option */
-		*ptr;			/* Pointer into name or value */
+		*name,			/* Name of option */
+		*value,			/* Value of option */
+		sep;			/* Option separator */
   int		print_fd;		/* Print file */
   int		copies;			/* Number of copies to print */
   time_t	start_time;		/* Time of first connect */
@@ -83,7 +83,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		device_fd;		/* AppSocket */
   int		error;			/* Error code (if any) */
   http_addrlist_t *addrlist,		/* Address list */
-		  *addr;		/* Connected address */
+		*addr;			/* Connected address */
   char		addrname[256];		/* Address name */
   ssize_t	tbytes;			/* Total number of bytes written */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -191,29 +191,30 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Get the name...
       */
 
-      for (ptr = name; *options && *options != '=';)
-        if (ptr < (name + sizeof(name) - 1))
-          *ptr++ = *options++;
-      *ptr = '\0';
+      name = options;
 
-      if (*options == '=')
+      while (*options && *options != '=' && *options != '+' && *options != '&')
+        options ++;
+
+      if ((sep = *options) != '\0')
+        *options++ = '\0';
+
+      if (sep == '=')
       {
        /*
         * Get the value...
 	*/
 
-        options ++;
+        value = options;
 
-	for (ptr = value; *options && *options != '+' && *options != '&';)
-          if (ptr < (value + sizeof(value) - 1))
-            *ptr++ = *options++;
-	*ptr = '\0';
-
-	if (*options == '+' || *options == '&')
+	while (*options && *options != '+' && *options != '&')
 	  options ++;
+
+        if (*options)
+	  *options++ = '\0';
       }
       else
-        value[0] = '\0';
+        value = (char *)"";
 
      /*
       * Process the option...

@@ -104,9 +104,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		username[255],		/* Username info (not used) */
 		resource[1024],		/* Resource info (device and options) */
 		*options,		/* Pointer to options */
-		name[255],		/* Name of option */
-		value[255],		/* Value of option */
-		*ptr;			/* Pointer into name or value */
+		*name,			/* Name of option */
+		*value,			/* Value of option */
+		sep;			/* Option separator */
   int		port;			/* Port number (not used) */
   int		copies;			/* Number of copies to print */
   int		print_fd,		/* Print file */
@@ -289,29 +289,30 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Get the name...
       */
 
-      for (ptr = name; *options && *options != '=';)
-        if (ptr < (name + sizeof(name) - 1))
-          *ptr++ = *options++;
-      *ptr = '\0';
+      name = options;
 
-      if (*options == '=')
+      while (*options && *options != '=' && *options != '+' && *options != '&')
+        options ++;
+
+      if ((sep = *options) != '\0')
+        *options++ = '\0';
+
+      if (sep == '=')
       {
        /*
         * Get the value...
 	*/
 
-        options ++;
+        value = options;
 
-	for (ptr = value; *options && *options != '+' && *options != '&';)
-          if (ptr < (value + sizeof(value) - 1))
-            *ptr++ = *options++;
-	*ptr = '\0';
-
-	if (*options == '+' || *options == '&')
+	while (*options && *options != '+' && *options != '&')
 	  options ++;
+
+        if (*options)
+	  *options++ = '\0';
       }
       else
-        value[0] = '\0';
+        value = (char *)"";
 
      /*
       * Process the option...

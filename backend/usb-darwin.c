@@ -267,7 +267,7 @@ static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, 
 static void device_added(void *userdata, io_iterator_t iterator);
 static void get_device_id(cups_sc_status_t *status, char *data, int *datalen);
 static void iterate_printers(iterator_callback_t callBack, void *userdata);
-static void parse_options(const char *options, char *serial, int serial_size, UInt32 *location, Boolean *wait_eof);
+static void parse_options(char *options, char *serial, int serial_size, UInt32 *location, Boolean *wait_eof);
 static void release_deviceinfo(CFStringRef *make, CFStringRef *model, CFStringRef *serial);
 static void setup_cfLanguage(void);
 static void soft_reset();
@@ -304,7 +304,7 @@ int					/* O - Exit status */
 print_device(const char *uri,		/* I - Device URI */
              const char *hostname,	/* I - Hostname/manufacturer */
              const char *resource,	/* I - Resource/modelname */
-	     const char *options,	/* I - Device options/serial number */
+	     char       *options,	/* I - Device options/serial number */
 	     int        print_fd,	/* I - File descriptor to print */
 	     int        copies,		/* I - Copies to print */
 	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
@@ -1543,18 +1543,19 @@ CFStringRef cfstr_create_trim(const char *cstr)
 
 #pragma mark -
 /*
- * 'parse_options()' - Parse uri options.
+ * 'parse_options()' - Parse URI options.
  */
 
-static void parse_options(const char *options,
+static void parse_options(char *options,
 			  char *serial,
 			  int serial_size,
 			  UInt32 *location,
 			  Boolean *wait_eof)
 {
-  char	optionName[255],	/* Name of option */
-	value[255],		/* Value of option */
-	*ptr;			/* Pointer into name or value */
+  char	sep,				/* Separator character */
+	*name,				/* Name of option */
+	*value;				/* Value of option */
+
 
   if (serial)
     *serial = '\0';
@@ -1564,58 +1565,61 @@ static void parse_options(const char *options,
   if (!options)
     return;
 
-  while (*options != '\0')
+  while (*options)
   {
-    /* Get the name... */
-    for (ptr = optionName; *options && *options != '=' && *options != '+';)
-      *ptr++ = *options++;
+   /*
+    * Get the name...
+    */
 
-    *ptr = '\0';
-    value[0] = '\0';
+    name = options;
 
-    if (*options == '=')
-    {
-      /* Get the value... */
+    while (*options && *options != '=' && *options != '+' && *options != '&')
       options ++;
 
-      for (ptr = value; *options && *options != '+';)
-	*ptr++ = *options++;
+    if ((sep = *options) != '\0')
+      *options++ = '\0';
 
-      *ptr = '\0';
+    if (sep == '=')
+    {
+     /*
+      * Get the value...
+      */
 
-      if (*options == '+')
+      value = options;
+
+      while (*options && *options != '+' && *options != '&')
 	options ++;
-    }
-    else if (*options == '+')
-      options ++;
 
-    /*
-     * Process the option...
-     */
-    if (strcasecmp(optionName, "waiteof") == 0)
+      if (*options)
+	*options++ = '\0';
+    }
+    else
+      value = (char *)"";
+
+   /*
+    * Process the option...
+    */
+
+    if (!strcasecmp(name, "waiteof"))
     {
-      if (strcasecmp(value, "on") == 0 ||
-	  strcasecmp(value, "yes") == 0 ||
-	  strcasecmp(value, "true") == 0)
+      if (!strcasecmp(value, "on") ||
+	  !strcasecmp(value, "yes") ||
+	  !strcasecmp(value, "true"))
 	*wait_eof = true;
-      else if (strcasecmp(value, "off")   == 0 ||
-	       strcasecmp(value, "no")    == 0 ||
-	       strcasecmp(value, "false") == 0)
+      else if (!strcasecmp(value, "off") ||
+	       !strcasecmp(value, "no") ||
+	       !strcasecmp(value, "false"))
 	*wait_eof = false;
       else
 	_cupsLangPrintf(stderr,
 	                _("WARNING: Boolean expected for waiteof option "
 			  "\"%s\"\n"), value);
     }
-    else if (strcasecmp(optionName, "serial") == 0)
-    {
+    else if (!strcasecmp(name, "serial"))
       strlcpy(serial, value, serial_size);
-    }
-    else if (strcasecmp(optionName, "location") == 0 && location)
+    else if (!strcasecmp(name, "location") && location)
       *location = strtol(value, NULL, 16);
   }
-
-  return;
 }
 
 
