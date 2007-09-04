@@ -2393,8 +2393,30 @@ test_raster(ppd_file_t *ppd,		/* I - PPD file */
 
     return (0);
   }
-  else
+
+ /*
+  * Try a test of custom page size code, if available...
+  */
+
+  if (!ppdPageSize(ppd, "Custom.612x792"))
     return (1);
+
+  ppdMarkOption(ppd, "PageSize", "Custom.612x792");
+
+  if (cupsRasterInterpretPPD(&header, ppd, 0, NULL, 0))
+  {
+    if (!verbose)
+      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+    if (verbose >= 0)
+      _cupsLangPrintf(stdout,
+		      _("      **FAIL**  Default option code cannot be "
+			"interpreted: %s\n"), cupsRasterErrorString());
+
+    return (0);
+  }
+
+  return (1);
 }
 
 
