@@ -152,6 +152,18 @@ main(int  argc,				/* I - Number of command-line args */
 #endif	/* HAVE_LAUNCHD */
 
 
+#ifdef HAVE_GETEUID
+ /*
+  * Check for setuid invocation, which we do not support!
+  */
+
+  if (getuid() != geteuid())
+  {
+    fputs("cupsd: Cannot run as a setuid program!\n", stderr);
+    return (1);
+  }
+#endif /* HAVE_GETEUID */
+
  /*
   * Check for command-line arguments...
   */
