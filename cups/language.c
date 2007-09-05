@@ -1028,18 +1028,6 @@ appleLangDefault(void)
 	  CFBundleCopyPreferredLocalizationsFromArray(bundleList);
 
       CFRelease(bundleList);
-
-      if (CFArrayGetCount(localizationList) == 0)
-      {
-       /*
-	* If we can't find a common language supported by the application,
-	* then the app will default to English...
-	*/
-
-	CFRelease(localizationList);
-	strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
-	return (cg->language);
-      }
     }
     else
       localizationList =
