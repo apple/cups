@@ -115,7 +115,14 @@ message catalog and then make any necessary changes.</P>
 favorite text editor or translation program to translate the text
 to the desired language.</P>
 
-<P>Finally, add your locale to the <CODE>LANGUAGES</CODE>
+<P>Then validate your translation using the <VAR>locale/checkpo</VAR> utility:</P>
+
+<PRE CLASS="command">
+cd locale
+./checkpo cups_ll_CC.po
+</PRE>
+
+<P>After fixing any errors in your translation, add your locale to the <CODE>LANGUAGES</CODE>
 variable in the <VAR>Makedefs</VAR> file and run the "make
 install" command in the <VAR>locale</VAR> subdirectory to test
 the translation.</P>
