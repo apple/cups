@@ -16,8 +16,8 @@
 include ../Makedefs
 
 
-OBJS	=	po2strings.o strings2po.o translate.o
-TARGETS	=	po2strings strings2po translate
+OBJS	=	checkpo po2strings.o strings2po.o translate.o
+TARGETS	=	checkpo po2strings strings2po translate
 
 
 #
@@ -93,6 +93,18 @@ pot:
 		echo Merging changes into cups_$$loc.po... ; \
 		msgmerge -o cups_$$loc.po -s -N --no-location cups_$$loc.po cups.pot ; \
 	done
+
+
+#
+# checkpo - A simple utility to check PO files for correct translation
+#           strings.
+#
+# checkpo filename.po [... filenameN.po]
+#
+
+checkpo:	checkpo.o ../cups/$(LIBCUPS)
+	echo Linking $<...
+	$(CC) $(LDFLAGS) -o checkpo checkpo.o $(LIBS)
 
 
 #
