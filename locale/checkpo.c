@@ -14,6 +14,10 @@
  *
  * Contents:
  *
+ *   main()            - Validate .po files.
+ *   abbreviate()      - Abbreviate a message string as needed.
+ *   collect_formats() - Collect all of the format strings in the msgid.
+ *   free_formats()    - Free all of the format strings.
  */
 
 #include <stdio.h>
@@ -32,7 +36,7 @@ static void		free_formats(cups_array_t *fmts);
 
 
 /*
- *   main() - Convert .po file to .strings.
+ * 'main()' - Validate .po files.
  */
 
 int					/* O - Exit code */

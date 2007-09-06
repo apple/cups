@@ -385,10 +385,10 @@ msgstr "      %s  cupsFilter ファイル \"%s\" が見つかりません！\n"
 msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
 msgstr "      %s  cupsPreFilter ファイル \"%s\" が見つかりません！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      %s  Missing option %s in UIConstraint \"*%s %s *%s %s\"!\n"
 msgstr ""
-"      %s オプション *UIConstraint 内の %s %s \"*%s %s *%s %s\" が見つかりませ"
+"      %s オプション *UIConstraint 内の %s \"*%s %s *%s %s\" が見つかりませ"
 "ん！\n"
 
 #, c-format
@@ -504,9 +504,9 @@ msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
 msgstr ""
 "      **失敗**  無効な LanguageVersion %s - English でなければなりません！\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
-msgstr "      **失敗**  デフォルトのオプションコードが解釈できません：s\n"
+msgstr "      **失敗**  デフォルトのオプションコードが解釈できません：s: %s\n"
 
 #, c-format
 msgid ""
@@ -733,12 +733,12 @@ msgstr ""
 "    %%BoundingBox: コメントが見つからないか不正です！\n"
 "        REF：39 ページ、%%BoundingBox:\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "    Missing or bad %%Page: comments!\n"
 "        REF: Page 53, %%Page:\n"
 msgstr ""
-"    %Page: コメントが見つからないか不正です！\n"
+"    %%Page: コメントが見つからないか不正です！\n"
 "        REF：53 ページ、%%Page:\n"
 
 #, c-format
@@ -1525,9 +1525,9 @@ msgstr "ERROR: pictwpstops を待つことができません: %s\n"
 msgid "ERROR: Unable to write %d bytes to \"%s\": %s\n"
 msgstr "ERROR: %d バイトを \"%s\" に書き込めません：%s\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "ERROR: Unable to write print data: %s\n"
-msgstr "ERROR: プリントデータ %s を書き込めません：%s\n"
+msgstr "ERROR: プリントデータ %s を書き込めません：\n"
 
 msgid "ERROR: Unable to write raster data to driver!\n"
 msgstr "ERROR: ラスターデータをドライバに書き込めません！\n"
