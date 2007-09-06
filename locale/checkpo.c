@@ -42,11 +42,11 @@ main(int  argc,				/* I - Number of command-line args */
   int			i;		/* Looping var */
   cups_array_t		*po;		/* .po file */
   _cups_message_t	*msg;		/* Current message */
-  const char		*str;		/* Pointer into msgstr */
-  cups_array_t		*fmts;		/* Format strings in msgid */
-  char			*fmt;		/* Current format string */
+  cups_array_t		*idfmts,	/* Format strings in msgid */
+			*strfmts;	/* Format strings in msgstr */
+  char			*idfmt,		/* Current msgid format string */
+			*strfmt;	/* Current msgstr format string */
   int			fmtidx,		/* Format index */
-			fmtlen,		/* Length of format string */
 			fmtcount;	/* Format count */
   int			status,		/* Exit status */
 			pass,		/* Pass/fail status */
@@ -99,28 +99,24 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (strchr(msg->id, '%'))
       {
-        fmts     = collect_formats(msg->id);
-	fmt      = NULL;
-	fmtidx   = 0;
-	fmtcount = 0;
+        idfmts  = collect_formats(msg->id);
+	strfmts = collect_formats(msg->str);
+	fmtidx  = 0;
 
-        for (str = strchr(msg->str, '%'); str; str = strchr(str, '%'))
+        for (strfmt = (char *)cupsArrayFirst(strfmts);
+	     strfmt;
+	     strfmt = (char *)cupsArrayNext(strfmts))
 	{
-	  if (str[1] == '%')
-	  {
-	    str += 2;
-	    continue;
-	  }
-	  else if (isdigit(str[1] & 255) && str[2] == '$')
+	  if (isdigit(strfmt[1] & 255) && strfmt[2] == '$')
 	  {
 	   /*
 	    * Handle positioned format stuff...
 	    */
 
-            fmtidx = str[1] - '1';
-            str    += 3;
-	    fmt    = (char *)cupsArrayIndex(fmts, fmtidx);
-            fmtlen = fmt ? strlen(fmt) - 1 : 0;
+            fmtidx = strfmt[1] - '1';
+            strfmt += 3;
+	    if ((idfmt = (char *)cupsArrayIndex(idfmts, fmtidx)) != NULL)
+	      idfmt ++;
 	  }
 	  else
 	  {
@@ -128,20 +124,18 @@ main(int  argc,				/* I - Number of command-line args */
 	    * Compare against the current format...
 	    */
 
-	    fmt    = (char *)cupsArrayIndex(fmts, fmtidx);
-            fmtlen = fmt ? strlen(fmt) : 0;
+	    idfmt = (char *)cupsArrayIndex(idfmts, fmtidx);
           }
 
 	  fmtidx ++;
 
-	  if (!fmt || strncmp(str, fmt, fmtlen))
+	  if (!idfmt || strcmp(strfmt, idfmt))
 	    break;
 
-          str += fmtlen;
 	  fmtcount ++;
 	}
 
-        if (fmtcount != cupsArrayCount(fmts))
+        if (cupsArrayCount(strfmts) != cupsArrayCount(idfmts) || strfmt)
 	{
 	  if (pass)
 	  {
@@ -152,9 +146,21 @@ main(int  argc,				/* I - Number of command-line args */
 	  printf("    Bad translation string \"%s\"\n        for \"%s\"\n",
 	         abbreviate(msg->str, strbuf, sizeof(strbuf)),
 		 abbreviate(msg->id, idbuf, sizeof(idbuf)));
+          fputs("    Translation formats:", stdout);
+	  for (strfmt = (char *)cupsArrayFirst(strfmts);
+	       strfmt;
+	       strfmt = (char *)cupsArrayNext(strfmts))
+	    printf(" %s", strfmt);
+          fputs("\n    Original formats:", stdout);
+	  for (idfmt = (char *)cupsArrayFirst(idfmts);
+	       idfmt;
+	       idfmt = (char *)cupsArrayNext(idfmts))
+	    printf(" %s", idfmt);
+          putchar('\n');
 	}
 
-	free_formats(fmts);
+	free_formats(idfmts);
+	free_formats(strfmts);
       }
 
       if ((!strncmp(msg->id, "ALERT:", 6) && strncmp(msg->str, "ALERT:", 6)) ||
