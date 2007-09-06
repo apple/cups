@@ -93,7 +93,10 @@ main(int  argc,				/* I - Number of command-line args */
 	 msg = (_cups_message_t *)cupsArrayNext(po))
     {
       if (!msg->str || !msg->str[0])
+      {
         untranslated ++;
+	continue;
+      }
       else if (strchr(msg->id, '%'))
       {
         fmts     = collect_formats(msg->id);
@@ -153,6 +156,27 @@ main(int  argc,				/* I - Number of command-line args */
 
 	free_formats(fmts);
       }
+
+      if ((!strncmp(msg->id, "ALERT:", 6) && strncmp(msg->str, "ALERT:", 6)) ||
+          (!strncmp(msg->id, "CRIT:", 5) && strncmp(msg->str, "CRIT:", 5)) ||
+          (!strncmp(msg->id, "DEBUG:", 6) && strncmp(msg->str, "DEBUG:", 6)) ||
+          (!strncmp(msg->id, "DEBUG2:", 7) && strncmp(msg->str, "DEBUG2:", 7)) ||
+          (!strncmp(msg->id, "EMERG:", 6) && strncmp(msg->str, "EMERG:", 6)) ||
+          (!strncmp(msg->id, "ERROR:", 6) && strncmp(msg->str, "ERROR:", 6)) ||
+          (!strncmp(msg->id, "INFO:", 5) && strncmp(msg->str, "INFO:", 5)) ||
+          (!strncmp(msg->id, "NOTICE:", 7) && strncmp(msg->str, "NOTICE:", 7)) ||
+          (!strncmp(msg->id, "WARNING:", 8) && strncmp(msg->str, "WARNING:", 8)))
+      {
+        if (pass)
+	{
+	  pass = 0;
+	  puts("FAIL");
+	}
+
+	printf("    Bad prefix on filter message \"%s\"\n      for \"%s\"\n",
+	       abbreviate(msg->str, strbuf, sizeof(strbuf)),
+	       abbreviate(msg->id, idbuf, sizeof(idbuf)));
+      }
     }
 
     if (pass)
@@ -163,6 +187,7 @@ main(int  argc,				/* I - Number of command-line args */
         * Only allow 10% of messages to be untranslated before we fail...
 	*/
 
+        pass = 0;
         puts("FAIL");
 	printf("    Too many untranslated messages (%d of %d)\n", untranslated,
 	       cupsArrayCount(po));
@@ -174,10 +199,13 @@ main(int  argc,				/* I - Number of command-line args */
         puts("PASS");
     }
 
+    if (!pass)
+      status = 1;
+
     _cupsMessageFree(po);
   }
 
-  return (0);
+  return (status);
 }
 
 
