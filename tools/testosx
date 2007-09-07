@@ -95,7 +95,7 @@ esac
 
 # Tag the current revision in the plist and web interface files...
 for file in packaging/cups-desc.plist packaging/cups-info.plist \
-		doc/index.html doc/ja/index.html templates/header.tmpl; do
+		doc/index.html templates/header.tmpl; do
 	echo Updating $file...
 	sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
 		-e '1,$s/@CUPS_REVISION@//g' \
