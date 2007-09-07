@@ -1,8 +1,11 @@
-CHANGES.txt - 2007-08-31
+CHANGES.txt - 2007-09-07
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The web interface now allows you to go back to the make/
+	  manufacturer page if there is no matching printer driver
+	  on the model page (STR #2436)
 	- The printer list now shows the default media, banner, and
 	  duplex options as well as the color and duplex capabilities
 	  of printers (STR #1175)

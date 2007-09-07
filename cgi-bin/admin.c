@@ -1047,7 +1047,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	cgiCopyTemplateLang("choose-make.tmpl");
         cgiEndHTML();
       }
-      else if (!var)
+      else if (!var || cgiGetVariable("SELECT_MAKE"))
       {
         cgiStartHTML(title);
 	cgiCopyTemplateLang("choose-make.tmpl");
