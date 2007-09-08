@@ -37,7 +37,9 @@
 #define	BROWSE_SLP	2		/* SLPv2 */
 #define BROWSE_LDAP	4		/* LDAP */
 #define BROWSE_DNSSD	8		/* DNS Service Discovery (aka Bonjour) */
-#define BROWSE_ALL	15		/* All protocols */
+#define BROWSE_SMB	16		/* SMB/Samba */
+#define BROWSE_LPD	32		/* LPD via xinetd or launchd */
+#define BROWSE_ALL	63		/* All protocols */
 
 
 /*
@@ -150,6 +152,10 @@ VAR char		*BrowseLDAPBindDN VALUE(NULL),
 			*BrowseLDAPCACertFile VALUE(NULL);
 					/* LDAP CA CERT file to use */
 #endif /* HAVE_LDAP */
+VAR char		*LPDConfigFile	VALUE(NULL),
+					/* LPD configuration file */
+			*SMBConfigFile	VALUE(NULL);
+					/* SMB configuration file */
 
 
 /*

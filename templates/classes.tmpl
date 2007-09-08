@@ -10,7 +10,7 @@
 <TD VALIGN=TOP><B>Description:</B> {printer_info}<BR>
 <B>Location:</B> {printer_location}<BR>
 <B>Class State:</B> {printer_state=3?idle:{printer_state=4?processing:stopped}},
-{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {printer_is_shared=0?not:} published{default_name={printer_name}?, default printer:}.
+{printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {server_is_sharing_printers=0?not:{printer_is_shared=0?not:}} shared{default_name={printer_name}?, default printer:}.
 {?member_uris=?:<BR>Members: {member_uris}}
 
 <P><TABLE CLASS="inset" WIDTH="100%" SUMMARY="Maintenance Commands">
@@ -29,10 +29,10 @@
 
 <P><TABLE CLASS="inset" WIDTH="100%" SUMMARY="Administration Commands">
 <CAPTION>Administration Commands</CAPTION>
-<TR><TD>{printer_is_shared=0?
-<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-sharing"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}&amp;shared=1<INPUT TYPE="HIDDEN" NAME="is_class" VALUE="Y"><INPUT TYPE="SUBMIT" VALUE="Publish Printer"></FORM>
-:<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-sharing"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}&amp;shared=0<INPUT TYPE="HIDDEN" NAME="is_class" VALUE="Y"><INPUT TYPE="SUBMIT" VALUE="Unpublish Printer"></FORM>
-}
+<TR><TD>{server_is_sharing_printers=0?:{printer_is_shared=0?
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-sharing"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}&amp;shared=1<INPUT TYPE="HIDDEN" NAME="is_class" VALUE="Y"><INPUT TYPE="SUBMIT" VALUE="Share Class"></FORM>
+:<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-sharing"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}&amp;shared=0<INPUT TYPE="HIDDEN" NAME="is_class" VALUE="Y"><INPUT TYPE="SUBMIT" VALUE="Unshare Class"></FORM>
+}}
 <FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="modify-class"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Modify Class"></FORM>
 <FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="set-class-options"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Set Printer Options"></FORM>
 <FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="delete-class"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Delete Class"></FORM>

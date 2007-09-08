@@ -43,7 +43,7 @@
 
 <P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<BR>
-<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share published printers connected to this system<BR>
+<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
 {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Use Kerberos authentication (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}

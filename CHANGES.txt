@@ -3,6 +3,12 @@ CHANGES.txt - 2007-09-07
 
 CHANGES IN CUPS V1.4b1
 
+	- The web interface now enables/disables the printer
+	  sharing (formerly publishing) controls based on the
+	  server-is-sharing-printers state (STR #2233)
+	- The scheduler now tracks printer sharing via the
+	  server-is-sharing-printers attribute, and manages LPD
+	  and SMB sharing as well (STR #2233)
 	- The web interface now allows you to go back to the make/
 	  manufacturer page if there is no matching printer driver
 	  on the model page (STR #2436)

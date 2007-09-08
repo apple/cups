@@ -571,6 +571,9 @@ cupsdCreateCommonData(void)
        p;
        i ++, p = (cupsd_policy_t *)cupsArrayNext(Policies))
     attr->values[i].string.text = _cupsStrAlloc(p->name);
+
+  ippAddBoolean(CommonData, IPP_TAG_PRINTER, "server-is-sharing-printers",
+                BrowseLocalProtocols != 0 && Browsing);
 }
 
 

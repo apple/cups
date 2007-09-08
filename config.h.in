@@ -70,6 +70,14 @@
 
 
 /*
+ * Default Samba and LPD config files...
+ */
+
+#define CUPS_DEFAULT_SMB_CONFIG_FILE	""
+#define CUPS_DEFAULT_LPD_CONFIG_FILE	""
+
+
+/*
  * Default MaxCopies value...
  */
 

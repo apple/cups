@@ -53,7 +53,9 @@
  *   slp_url_callback()            - SLP service url callback
  *   update_cups_browse()          - Update the browse lists using the CUPS
  *                                   protocol.
+ *   update_lpd()                  - Update the LPD configuration as needed.
  *   update_polling()              - Read status messages from the poll daemons.
+ *   update_smb()                  - Update the SMB configuration as needed.
  */
 
 /*
@@ -98,7 +100,9 @@ static void	send_ldap_browse(cupsd_printer_t *p);
 static void	send_slp_browse(cupsd_printer_t *p);
 #endif /* HAVE_LIBSLP */
 static void	update_cups_browse(void);
+static void	update_lpd(int onoff);
 static void	update_polling(void);
+static void	update_smb(int onoff);
 
 
 #ifdef HAVE_OPENLDAP
@@ -1139,6 +1143,16 @@ cupsdStartBrowsing(void)
 #endif /* HAVE_OPENLDAP */
 
  /*
+  * Enable LPD and SMB printer sharing as needed through external programs...
+  */
+
+  if (BrowseLocalProtocols & BROWSE_LPD)
+    update_lpd(1);
+
+  if (BrowseLocalProtocols & BROWSE_SMB)
+    update_smb(1);
+
+ /*
   * Register the individual printers
   */
 
@@ -1318,6 +1332,16 @@ cupsdStopBrowsing(void)
     BrowseLDAPHandle = NULL;
   }
 #endif /* HAVE_OPENLDAP */
+
+ /*
+  * Disable LPD and SMB printer sharing as needed through external programs...
+  */
+
+  if (BrowseLocalProtocols & BROWSE_LPD)
+    update_lpd(0);
+
+  if (BrowseLocalProtocols & BROWSE_SMB)
+    update_smb(0);
 }
 
 
@@ -3781,6 +3805,90 @@ update_cups_browse(void)
 
 
 /*
+ * 'update_lpd()' - Update the LPD configuration as needed.
+ */
+
+static void
+update_lpd(int onoff)			/* - 1 = turn on, 0 = turn off */
+{
+  if (!LPDConfigFile)
+    return;
+
+  if (!strncmp(LPDConfigFile, "xinetd:///", 10))
+  {
+   /*
+    * Enable/disable LPD via the xinetd.d config file for cups-lpd...
+    */
+
+    char	newfile[1024];		/* New cups-lpd.N file */
+    cups_file_t	*ofp,			/* Original file pointer */
+		*nfp;			/* New file pointer */
+    char	line[1024];		/* Line from file */
+
+
+    snprintf(newfile, sizeof(newfile), "%s.N", LPDConfigFile + 9);
+
+    if ((ofp = cupsFileOpen(LPDConfigFile + 9, "r")) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open \"%s\" - %s",
+                      LPDConfigFile + 9, strerror(errno));
+      return;
+    }
+
+    if ((nfp = cupsFileOpen(newfile, "w")) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create \"%s\" - %s",
+                      newfile, strerror(errno));
+      cupsFileClose(ofp);
+      return;
+    }
+
+   /*
+    * Copy all of the lines from the cups-lpd file...
+    */
+
+    while (cupsFileGets(ofp, line, sizeof(line)))
+    {
+      if (line[0] == '{')
+      {
+        cupsFilePrintf(nfp, "%s\n", line);
+        snprintf(line, sizeof(line), "\tdisable = %s",
+	         onoff ? "no" : "yes");
+      }
+      else if (strstr(line, "disable ="))
+        continue;
+
+      cupsFilePrintf(nfp, "%s\n", line);
+    }
+
+    cupsFileClose(nfp);
+    cupsFileClose(ofp);
+    rename(newfile, LPDConfigFile + 9);
+  }
+  else if (!strncmp(LPDConfigFile, "launchd:///", 11))
+  {
+   /*
+    * Enable/disable LPD via the launchctl command...
+    */
+
+    char	*argv[5],		/* Arguments for command */
+		*envp[MAX_ENV];		/* Environment for command */
+    int		pid;			/* Process ID */
+
+
+    cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
+    argv[0] = (char *)"launchctl";
+    argv[1] = (char *)(onoff ? "load" : "unload");
+    argv[2] = (char *)"-w";
+    argv[3] = LPDConfigFile + 10;
+    argv[4] = NULL;
+
+    cupsdStartProcess("/bin/launchctl", argv, envp, -1, -1, -1, -1, -1, 1, &pid);
+  }
+}
+
+
+/*
  * 'update_polling()' - Read status messages from the poll daemons.
  */
 
@@ -3806,6 +3914,91 @@ update_polling(void)
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "update_polling: all polling processes have exited!");
     cupsdStopPolling();
+  }
+}
+
+
+/*
+ * 'update_smb()' - Update the SMB configuration as needed.
+ */
+
+static void
+update_smb(int onoff)			/* I - 1 = turn on, 0 = turn off */
+{
+  if (!SMBConfigFile)
+    return;
+
+  if (!strncmp(SMBConfigFile, "samba:///", 9))
+  {
+   /*
+    * Enable/disable SMB via the specified smb.conf config file...
+    */
+
+    char	newfile[1024];		/* New smb.conf.N file */
+    cups_file_t	*ofp,			/* Original file pointer */
+		*nfp;			/* New file pointer */
+    char	line[1024];		/* Line from file */
+    int		in_printers;		/* In [printers] section? */
+
+
+    snprintf(newfile, sizeof(newfile), "%s.N", SMBConfigFile + 8);
+
+    if ((ofp = cupsFileOpen(SMBConfigFile + 8, "r")) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open \"%s\" - %s",
+                      SMBConfigFile + 8, strerror(errno));
+      return;
+    }
+
+    if ((nfp = cupsFileOpen(newfile, "w")) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create \"%s\" - %s",
+                      newfile, strerror(errno));
+      cupsFileClose(ofp);
+      return;
+    }
+
+   /*
+    * Copy all of the lines from the smb.conf file...
+    */
+
+    in_printers = 0;
+
+    while (cupsFileGets(ofp, line, sizeof(line)))
+    {
+      if (in_printers && strstr(line, "printable ="))
+        snprintf(line, sizeof(line), "    printable = %s",
+	         onoff ? "yes" : "no");
+
+      cupsFilePrintf(nfp, "%s\n", line);
+
+      if (line[0] == '[')
+        in_printers = !strcmp(line, "[printers]");
+    }
+
+    cupsFileClose(nfp);
+    cupsFileClose(ofp);
+    rename(newfile, SMBConfigFile + 8);
+  }
+  else if (!strncmp(SMBConfigFile, "launchd:///", 11))
+  {
+   /*
+    * Enable/disable SMB via the launchctl command...
+    */
+
+    char	*argv[5],		/* Arguments for command */
+		*envp[MAX_ENV];		/* Environment for command */
+    int		pid;			/* Process ID */
+
+
+    cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
+    argv[0] = (char *)"launchctl";
+    argv[1] = (char *)(onoff ? "load" : "unload");
+    argv[2] = (char *)"-w";
+    argv[3] = SMBConfigFile + 10;
+    argv[4] = NULL;
+
+    cupsdStartProcess("/bin/launchctl", argv, envp, -1, -1, -1, -1, -1, 1, &pid);
   }
 }
 

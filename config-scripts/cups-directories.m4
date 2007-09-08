@@ -223,6 +223,47 @@ fi
 
 AC_SUBST(XINETD)
 
+dnl LPD sharing support...
+AC_ARG_WITH(lpdconfig, [  --with-lpdconfig        set URI for LPD config file],
+	LPDCONFIG="$withval", LPDCONFIG="")
+
+if test "x$LPDCONFIG" = x; then
+	if test -f /System/Library/LaunchDaemons/org.cups.cups-lpd.plist; then
+		LPDCONFIG="launchd:///System/Library/LaunchDaemons/org.cups.cups-lpd.plist"
+	elif test "x$XINETD" != x; then
+		LPDCONFIG="xinetd://$XINETD/cups-lpd"
+	fi
+fi
+
+if test "x$LPDCONFIG" = xoff; then
+	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LPD_CONFIG, "")
+else
+	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LPD_CONFIG, "$LPDCONFIG")
+fi
+
+dnl SMB sharing support...
+AC_ARG_WITH(smbconfig, [  --with-smbconfig        set URI for Samba config file],
+	SMBCONFIG="$withval", SMBCONFIG="")
+
+if test "x$SMBCONFIG" = x; then
+	if test -f /System/Library/LaunchDaemons/smbd.plist; then
+		SMBCONFIG="launchd:///System/Library/LaunchDaemons/smbd.plist"
+	else
+		for dir in /etc /etc/samba /usr/local/etc; do
+			if test -f $dir/smb.conf; then
+				SMBCONFIG="samba://$dir/smb.conf"
+				break
+			fi
+		done
+	fi
+fi
+
+if test "x$SMBCONFIG" = xoff; then
+	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SMB_CONFIG, "")
+else
+	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SMB_CONFIG, "$SMBCONFIG")
+fi
+
 dnl Setup default locations...
 # Cache data...
 AC_ARG_WITH(cachedir, [  --with-cachedir         set path for cache files],cachedir="$withval",cachedir="")

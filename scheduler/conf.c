@@ -126,6 +126,7 @@ static cupsd_var_t	variables[] =
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
   { "LogFilePerm",		&LogFilePerm,		CUPSD_VARTYPE_INTEGER },
+  { "LPDConfigFile",		&LPDConfigFile,		CUPSD_VARTYPE_STRING },
   { "MaxActiveJobs",		&MaxActiveJobs,		CUPSD_VARTYPE_INTEGER },
   { "MaxClients",		&MaxClients,		CUPSD_VARTYPE_INTEGER },
   { "MaxClientsPerHost",	&MaxClientsPerHost,	CUPSD_VARTYPE_INTEGER },
@@ -162,6 +163,7 @@ static cupsd_var_t	variables[] =
 #endif /* HAVE_SSL */
   { "ServerName",		&ServerName,		CUPSD_VARTYPE_STRING },
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_PATHNAME },
+  { "SMBConfigFile",		&SMBConfigFile,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
 #ifdef HAVE_AUTHORIZATION_H
   { "SystemGroupAuthKey",	&SystemGroupAuthKey,	CUPSD_VARTYPE_STRING },
@@ -546,6 +548,9 @@ cupsdReadConfiguration(void)
   BrowseTimeout         = DEFAULT_TIMEOUT;
   Browsing              = CUPS_DEFAULT_BROWSING;
   DefaultShared         = CUPS_DEFAULT_DEFAULT_SHARED;
+
+  cupsdSetString(&LPDConfigFile, CUPS_DEFAULT_LPD_CONFIG_FILE);
+  cupsdSetString(&SMBConfigFile, CUPS_DEFAULT_SMB_CONFIG_FILE);
 
   cupsdClearString(&BrowseLocalOptions);
   cupsdClearString(&BrowseRemoteOptions);
@@ -2020,6 +2025,10 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
       protocols |= BROWSE_LDAP;
     else if (!strcasecmp(valstart, "dnssd") || !strcasecmp(valstart, "bonjour"))
       protocols |= BROWSE_DNSSD;
+    else if (!strcasecmp(valstart, "lpd"))
+      protocols |= BROWSE_LPD;
+    else if (!strcasecmp(valstart, "smb"))
+      protocols |= BROWSE_SMB;
     else if (!strcasecmp(valstart, "all"))
       protocols |= BROWSE_ALL;
     else if (strcasecmp(valstart, "none"))
