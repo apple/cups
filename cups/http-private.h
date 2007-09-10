@@ -62,6 +62,9 @@
 #    ifndef HAVE_GSS_C_NT_HOSTBASED_SERVICE
 #      define GSS_C_NT_HOSTBASED_SERVICE gss_nt_service_name
 #    endif /* !HAVE_GSS_C_NT_HOSTBASED_SERVICE */
+#    ifdef HAVE_KRB5_H
+#      include <krb5.h>
+#    endif /* HAVE_KRB5_H */
 #  endif /* HAVE_GSSAPI */
 
 #  ifdef HAVE_AUTHORIZATION_H

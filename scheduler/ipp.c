@@ -100,10 +100,6 @@
 
 #include "cupsd.h"
 
-#ifdef HAVE_KRB5_H
-#  include <krb5.h>
-#endif /* HAVE_KRB5_H */
-
 #ifdef HAVE_LIBPAPER
 #  include <paper.h>
 #endif /* HAVE_LIBPAPER */
