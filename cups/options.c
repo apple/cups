@@ -72,7 +72,7 @@ cupsAddOption(const char    *name,	/* I - Name of option */
   */
 
   for (i = 0, temp = *options; i < num_options; i ++, temp ++)
-    if (strcasecmp(temp->name, name) == 0)
+    if (!strcasecmp(temp->name, name))
       break;
 
   if (i >= num_options)
@@ -92,7 +92,7 @@ cupsAddOption(const char    *name,	/* I - Name of option */
 
     *options    = temp;
     temp        += num_options;
-    temp->name  = strdup(name);
+    temp->name  = _cupsStrAlloc(name);
     num_options ++;
   }
   else
@@ -101,10 +101,10 @@ cupsAddOption(const char    *name,	/* I - Name of option */
     * Match found; free the old value...
     */
 
-    free(temp->value);
+    _cupsStrFree(temp->value);
   }
 
-  temp->value = strdup(value);
+  temp->value = _cupsStrAlloc(value);
 
   return (num_options);
 }
@@ -127,8 +127,8 @@ cupsFreeOptions(
 
   for (i = 0; i < num_options; i ++)
   {
-    free(options[i].name);
-    free(options[i].value);
+    _cupsStrFree(options[i].name);
+    _cupsStrFree(options[i].value);
   }
 
   free(options);
@@ -691,9 +691,9 @@ cupsRemoveOption(
     num_options --;
     i --;
 
-    free(option->name);
+    _cupsStrFree(option->name);
     if (option->value)
-      free(option->value);
+      _cupsStrFree(option->value);
 
     if (i > 0)
       memmove(option, option + 1, i * sizeof(cups_option_t));
