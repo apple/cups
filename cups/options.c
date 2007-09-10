@@ -692,8 +692,7 @@ cupsRemoveOption(
     i --;
 
     _cupsStrFree(option->name);
-    if (option->value)
-      _cupsStrFree(option->value);
+    _cupsStrFree(option->value);
 
     if (i > 0)
       memmove(option, option + 1, i * sizeof(cups_option_t));
