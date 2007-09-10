@@ -467,7 +467,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	      if (cparam->current.custom_string)
 	        free(cparam->current.custom_string);
 
-	      cparam->current.custom_string = strdup(choice + 7);
+	      cparam->current.custom_string = _cupsStrAlloc(choice + 7);
 	      break;
 	}
       }
@@ -544,7 +544,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 	      if (cparam->current.custom_string)
 		free(cparam->current.custom_string);
 
-	      cparam->current.custom_string = strdup(val->value);
+	      cparam->current.custom_string = _cupsStrAlloc(val->value);
 	      break;
 	}
       }
