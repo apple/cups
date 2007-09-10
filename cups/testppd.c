@@ -235,8 +235,6 @@ main(int  argc,				/* I - Number of command-line arguments */
       status ++;
       printf("FAIL (\"%s\" instead of \"Number 1 Foo Reason\")\n", buffer);
     }
-
-    ppdClose(ppd);
   }
   else
   {
@@ -362,10 +360,22 @@ main(int  argc,				/* I - Number of command-line arguments */
 	   attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs))
         printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec,
 	       attr->text, attr->value ? attr->value : "");
-
-      ppdClose(ppd);
     }
   }
+
+#ifdef __APPLE__
+  if (getenv("MallocStackLogging") && getenv("MallocStackLoggingNoCompact"))
+  {
+    char	command[1024];		/* malloc_history command */
+
+    snprintf(command, sizeof(command), "malloc_history %d -all_by_size",
+	     getpid());
+    fflush(stdout);
+    system(command);
+  }
+#endif /* __APPLE__ */
+
+  ppdClose(ppd);
 
   return (status);
 }
