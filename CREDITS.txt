@@ -1,4 +1,4 @@
-CREDITS.txt - 2007-02-05
+CREDITS.txt - 2007-09-10
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -19,6 +19,7 @@ like to thank the following individuals for their contributions:
     Till Kamppeter                 - Bug fixes, beta testing, evangelism.
     Kenshi Muto                    - Japanese localization, patches, and
                                      testing.
+    Tomohiro Kato                  - Japanese localization.
     Kiko                           - Bug fixes.
     Sergey V. Kovalyov             - ESP Print Pro and CUPS beta tester.
     Marek Laane                    - Estonian translation.
@@ -36,7 +37,7 @@ like to thank the following individuals for their contributions:
     Opher Shachar                  - Hebrew localization.
     Stuart Stevens                 - HP JetDirect IPP information.
     Andrea Suatoni                 - IRIX desktop integration and testing.
-    Tomohiro Kato                  - Japanese localization.
+    Teppo Turlianen                - Finnish localization.
     Tim Waugh                      - Lots of patches, testing, and Linux
                                      integration.
     Yugami                         - LDAP browsing support.
