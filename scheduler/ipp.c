@@ -8426,9 +8426,12 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   return;
 
 #  else
-  krb5_error_code error;		/* Kerberos error code */
-  OM_uint32	major_status,		/* Major status code */
-		minor_status;		/* Minor status code */
+  krb5_error_code	error;		/* Kerberos error code */
+  OM_uint32		major_status,	/* Major status code */
+			minor_status;	/* Minor status code */
+#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
+  krb5_principal	principal;	/* Kerberos principal */
+#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
 
 
 #   ifdef __APPLE__
@@ -8461,11 +8464,34 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
                                &(job->ccache))) != 0)
 #    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create new credentials (%d/%s)",
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create new credentials cache (%d/%s)",
                     error, strerror(errno));
     job->ccache = NULL;
     return;
   }
+
+  if ((error = krb5_parse_name(KerberosContext, con->username, &principal)) != 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to parse kerberos username (%d/%s)",
+                    error, strerror(errno));
+    krb5_cc_destroy(KerberosContext, job->ccache);
+    job->ccache = NULL;
+    return;
+  }
+
+  if ((error = krb5_cc_initialize(KerberosContext, job->ccache, principal)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to initialize credentials cache (%d/%s)", error,
+		    strerror(errno));
+    krb5_cc_destroy(KerberosContext, job->ccache);
+    krb5_free_principal(KerberosContext, principal);
+    job->ccache = NULL;
+    return;
+  }
+
+  krb5_free_principal(KerberosContext, principal);
 
  /*
   * Copy the user's credentials to the new cache file...
