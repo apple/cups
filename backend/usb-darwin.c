@@ -313,7 +313,8 @@ print_device(const char *uri,		/* I - Device URI */
   char		  serial[1024];		/* Serial number buffer */
   OSStatus	  status;		/* Function results */
   pthread_t	  read_thread_id,	/* Read thread */
-		  sidechannel_thread_id;/* Side channel thread */
+		  sidechannel_thread_id;/* Side-channel thread */
+  int		  sidechannel_started = 0;/* Was the side-channel thread started? */
   char		  print_buffer[8192],	/* Print data buffer */
 		  *print_ptr;		/* Pointer into print data buffer */
   UInt32	  location;		/* Unique location in bus topology */
@@ -326,6 +327,7 @@ print_device(const char *uri,		/* I - Device URI */
   struct timeval  *timeout,		/* Timeout pointer */
 		  stimeout;		/* Timeout for select() */
   struct timespec cond_timeout;		/* pthread condition timeout */
+
 
   setup_cfLanguage();
 
@@ -460,6 +462,8 @@ print_device(const char *uri,		/* I - Device URI */
       _cupsLangPuts(stderr, _("WARNING: Couldn't create side channel\n"));
       return CUPS_BACKEND_STOP;
     }
+
+    sidechannel_started = 1;
   }
 
  /*
@@ -658,27 +662,30 @@ print_device(const char *uri,		/* I - Device URI */
   * Wait for the side channel thread to exit...
   */
 
-  close(CUPS_SC_FD);
-  pthread_mutex_lock(&g.readwrite_lock_mutex);
-  g.readwrite_lock = 0;
-  pthread_cond_signal(&g.readwrite_lock_cond);
-  pthread_mutex_unlock(&g.readwrite_lock_mutex);
-
-  g.sidechannel_thread_stop = 1;
-  pthread_mutex_lock(&g.sidechannel_thread_mutex);
-  if (!g.sidechannel_thread_done)
+  if (sidechannel_started)
   {
-    cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
-    cond_timeout.tv_nsec = 0;
-    pthread_cond_timedwait(&g.sidechannel_thread_cond,
-                           &g.sidechannel_thread_mutex, &cond_timeout);
+    close(CUPS_SC_FD);
+    pthread_mutex_lock(&g.readwrite_lock_mutex);
+    g.readwrite_lock = 0;
+    pthread_cond_signal(&g.readwrite_lock_cond);
+    pthread_mutex_unlock(&g.readwrite_lock_mutex);
+
+    g.sidechannel_thread_stop = 1;
+    pthread_mutex_lock(&g.sidechannel_thread_mutex);
+    if (!g.sidechannel_thread_done)
+    {
+      cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
+      cond_timeout.tv_nsec = 0;
+      pthread_cond_timedwait(&g.sidechannel_thread_cond,
+			     &g.sidechannel_thread_mutex, &cond_timeout);
+    }
+    pthread_mutex_unlock(&g.sidechannel_thread_mutex);
+
+    pthread_join(sidechannel_thread_id, NULL);
+
+    pthread_cond_destroy(&g.sidechannel_thread_cond);
+    pthread_mutex_destroy(&g.sidechannel_thread_mutex);
   }
-  pthread_mutex_unlock(&g.sidechannel_thread_mutex);
-
-  pthread_join(sidechannel_thread_id, NULL);
-
-  pthread_cond_destroy(&g.sidechannel_thread_cond);
-  pthread_mutex_destroy(&g.sidechannel_thread_mutex);
 
   pthread_cond_destroy(&g.readwrite_lock_cond);
   pthread_mutex_destroy(&g.readwrite_lock_mutex);
