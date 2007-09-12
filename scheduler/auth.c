@@ -332,7 +332,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   int		type;			/* Authentication type */
   const char	*authorization;		/* Pointer into Authorization string */
   char		*ptr,			/* Pointer into string */
-		username[65],		/* Username string */
+		username[256],		/* Username string */
 		password[33];		/* Password string */
   const char	*localuser;		/* Certificate username */
   char		nonce[HTTP_MAX_VALUE],	/* Nonce value from client */
@@ -1045,8 +1045,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       gss_release_name(&minor_status, &client_name);
       strlcpy(username, output_token.value, sizeof(username));
-      if ((ptr = strchr(username, '@')) != NULL)
-        *ptr = '\0';			/* Strip @KDC from the username */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 		      "cupsdAuthorize: Authorized as %s using Negotiate",
@@ -1799,7 +1797,9 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   unsigned		address[4];	/* Authorization address */
   cupsd_location_t	*best;		/* Best match for location so far */
   int			hostlen;	/* Length of hostname */
-  const char		*username;	/* Username to authorize */
+  char			username[256],	/* Username to authorize */
+			ownername[256],	/* Owner name to authorize */
+			*ptr;		/* Pointer into username */
   struct passwd		*pw;		/* User password data */
   static const char * const levels[] =	/* Auth levels */
 		{
@@ -1979,7 +1979,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
       cupsdLogMessage(CUPSD_LOG_DEBUG,
                       "cupsdIsAuthorized: requesting-user-name=\"%s\"",
                       attr->values[0].string.text);
-      username = attr->values[0].string.text;
+      strlcpy(username, attr->values[0].string.text, sizeof(username));
     }
     else if (best->satisfy == AUTH_SATISFY_ALL || auth == AUTH_DENY)
       return (HTTP_UNAUTHORIZED);	/* Non-anonymous needs user/pass */
@@ -2003,7 +2003,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 	return (HTTP_OK);		/* unless overridden with Satisfy */
     }
 
-    username = con->username;
+    strlcpy(username, con->username, sizeof(username));
   }
 
  /*
@@ -2013,6 +2013,23 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
   if (!strcmp(username, "root"))
     return (HTTP_OK);
+
+ /*
+  * Strip any @domain or @KDC from the username and owner...
+  */
+
+  if ((ptr = strchr(username, '@')) != NULL)
+    *ptr = '\0';
+
+  if (owner)
+  {
+    strlcpy(ownername, owner, sizeof(ownername));
+
+    if ((ptr = strchr(ownername, '@')) != NULL)
+      *ptr = '\0';
+  }
+  else
+    ownername[0] = '\0';
 
  /*
   * Get the user info...
@@ -2069,7 +2086,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     for (i = 0; i < best->num_names; i ++)
     {
       if (!strcasecmp(best->names[i], "@OWNER") && owner &&
-          !strcasecmp(username, owner))
+          !strcasecmp(username, ownername))
 	return (HTTP_OK);
       else if (!strcasecmp(best->names[i], "@SYSTEM"))
       {

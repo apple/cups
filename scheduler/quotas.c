@@ -48,12 +48,15 @@ cupsdFindQuota(
 {
   cupsd_quota_t	*q,			/* Quota data pointer */
 		match;			/* Search data */
+  char		*ptr;			/* Pointer into username */
 
 
   if (!p || !username)
     return (NULL);
 
   strlcpy(match.username, username, sizeof(match.username));
+  if ((ptr = strchr(match.username, '@')) != NULL)
+    *ptr = '\0';			/* Strip @domain/@KDC */
 
   if ((q = (cupsd_quota_t *)cupsArrayFind(p->quotas, &match)) != NULL)
     return (q);
@@ -199,6 +202,7 @@ add_quota(cupsd_printer_t *p,		/* I - Printer */
           const char      *username)	/* I - User */
 {
   cupsd_quota_t	*q;			/* New quota data */
+  char		*ptr;			/* Pointer into username */
 
 
   if (!p || !username)
@@ -214,6 +218,8 @@ add_quota(cupsd_printer_t *p,		/* I - Printer */
     return (NULL);
 
   strlcpy(q->username, username, sizeof(q->username));
+  if ((ptr = strchr(q->username, '@')) != NULL)
+    *ptr = '\0';			/* Strip @domain/@KDC */
 
   cupsArrayAdd(p->quotas, q);
 
