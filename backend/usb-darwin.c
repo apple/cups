@@ -674,10 +674,22 @@ print_device(const char *uri,		/* I - Device URI */
     pthread_mutex_lock(&g.sidechannel_thread_mutex);
     if (!g.sidechannel_thread_done)
     {
+     /*
+      * Wait for the side-channel thread to exit...
+      */
+
       cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
       cond_timeout.tv_nsec = 0;
-      pthread_cond_timedwait(&g.sidechannel_thread_cond,
-			     &g.sidechannel_thread_mutex, &cond_timeout);
+      if (pthread_cond_timedwait(&g.sidechannel_thread_cond,
+			         &g.sidechannel_thread_mutex,
+				 &cond_timeout) != 0)
+      {
+       /*
+	* Force the side-channel thread to exit...
+	*/
+
+	pthread_kill(sidechannel_thread_id, SIGTERM);
+      }
     }
     pthread_mutex_unlock(&g.sidechannel_thread_mutex);
 
@@ -698,9 +710,7 @@ print_device(const char *uri,		/* I - Device URI */
 
  /*
   * Give the read thread WAIT_EOF_DELAY seconds to complete all the data. If
-  * we are not signaled in that time then force the thread to exit by setting
-  * the waiteof to be false. Plese note that this relies on us using the timeout
-  * class driver.
+  * we are not signaled in that time then force the thread to exit.
   */
 
   pthread_mutex_lock(&g.read_thread_mutex);
@@ -712,7 +722,13 @@ print_device(const char *uri,		/* I - Device URI */
 
     if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
                                &cond_timeout) != 0)
-      g.wait_eof = false;
+    {
+     /*
+      * Force the read thread to exit...
+      */
+
+      pthread_kill(read_thread_id, SIGTERM);
+    }
   }
   pthread_mutex_unlock(&g.read_thread_mutex);
 
@@ -836,8 +852,16 @@ sidechannel_thread(void *reference)
     switch (command)
     {
       case CUPS_SC_CMD_SOFT_RESET:	/* Do a soft reset */
-	  soft_reset();
-	  cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, NULL, 0, 1.0);
+          if ((*g.classdriver)->SoftReset != NULL)
+	  {
+	    soft_reset();
+	    cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, NULL, 0, 1.0);
+	  }
+	  else
+	  {
+	    cupsSideChannelWrite(command, CUPS_SC_STATUS_NOT_IMPLEMENTED,
+	                         NULL, 0, 1.0);
+	  }
 	  break;
 
       case CUPS_SC_CMD_DRAIN_OUTPUT:	/* Drain all pending output */
@@ -1900,7 +1924,7 @@ static void parse_pserror(char *sockBuffer,
 
 
 /*
- * 'soft_reset'
+ * 'soft_reset()' - Send a soft reset to the device.
  */
 
 static void soft_reset()
